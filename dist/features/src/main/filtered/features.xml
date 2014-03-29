@@ -25,10 +25,6 @@
 		<bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.commons-dbcp/1.4_3</bundle>
 		<bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.commons-lang/2.4_6</bundle>
 	</feature>
-	<feature name="jdbc-db2" version="10.5.0" resolver="(obr)" description="IBM DB2 Universal JDBC Driver">
-		<bundle>wrap:mvn:com.ibm.db2.jcc/db2jcc4/10.5.0</bundle>
-		<bundle>wrap:mvn:com.ibm.db2.jcc/db2jcc_license_cu/10.5.0</bundle>
-	</feature>
 	<feature name="mysql" version="5.1.16" resolver="(obr)" description="OSGI Enterprise JDBC support with MySQL implementation">
 		<!--feature>transaction</feature-->
 		<bundle>mvn:mysql/mysql-connector-java/5.1.16</bundle>
@@ -66,7 +62,6 @@
 	</feature>
 	<feature name="xipki-caserver" version="${project.version}" resolver="(obr)">
 		<feature>mysql</feature>
-		<feature>jdbc-db2</feature>
 		<feature>xipki-datasource</feature>
 		<feature>xipki-security</feature>
 		<feature>xipki-ca-api</feature>
@@ -97,7 +92,6 @@
 	</feature>
 	<feature name="xipki-ocspserver" version="${project.version}" resolver="(obr)">
 		<feature>mysql</feature>
-		<feature>jdbc-db2</feature>
 		<feature>xipki-datasource</feature>
 		<feature>xipki-security</feature>
 		<bundle>mvn:org.xipki/ocsp-api/${project.version}</bundle>
