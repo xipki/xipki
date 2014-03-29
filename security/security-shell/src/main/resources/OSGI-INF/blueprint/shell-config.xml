@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0"
+           xmlns:cm="http://aries.apache.org/blueprint/xmlns/blueprint-cm/v1.1.0"
+           default-activation="lazy">
+
+    <reference id="securityFactory" interface="org.xipki.security.api.SecurityFactory" />
+	
+    <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">  
+        <command name="keytool/list">
+            <action class="org.xipki.security.shell.P11ListSlotCommand">
+            	<property name="securityFactory" ref="securityFactory" />
+            </action>
+        </command>
+              
+        <command name="keytool/rsa">
+            <action class="org.xipki.security.shell.P11RSAKeyGenCommand">
+            	<property name="securityFactory" ref="securityFactory" />
+            </action>
+        </command>
+        
+        <command name="keytool/rsa-p12">
+            <action class="org.xipki.security.shell.P12RSAKeyGenCommand">
+            	<property name="securityFactory" ref="securityFactory" />
+            </action>
+        </command>
+
+        <command name="keytool/ec">
+            <action class="org.xipki.security.shell.P11ECKeyGenCommand">
+            	<property name="securityFactory" ref="securityFactory" />
+            </action>
+        </command>
+
+        <command name="keytool/ec-p12">
+            <action class="org.xipki.security.shell.P12ECKeyGenCommand">
+            	<property name="securityFactory" ref="securityFactory" />
+            </action>
+        </command>
+
+        <command name="keytool/req">
+            <action class="org.xipki.security.shell.P11CertRequestGenCommand">
+            	<property name="securityFactory" ref="securityFactory" />
+            </action>
+        </command>        
+        
+        <command name="keytool/req-p12">
+            <action class="org.xipki.security.shell.P12CertRequestGenCommand">
+            	<property name="securityFactory" ref="securityFactory" />
+            </action>
+        </command>
+
+        <command name="keytool/export-cert">
+            <action class="org.xipki.security.shell.P11CertExportCommand">
+            	<property name="securityFactory" ref="securityFactory" />
+            </action>
+        </command>        
+        
+        <command name="keytool/export-cert-p12">
+            <action class="org.xipki.security.shell.P12CertExportCommand">
+            </action>
+        </command>        
+        
+        <command name="keytool/update-cert">
+            <action class="org.xipki.security.shell.P11CertUpdateCommand">
+            	<property name="securityFactory" ref="securityFactory" />
+            </action>
+        </command>        
+        
+        <command name="keytool/update-cert-p12">
+            <action class="org.xipki.security.shell.P12CertUpdateCommand">
+            </action>
+        </command>
+        
+        <command name="keytool/delete-key">
+            <action class="org.xipki.security.shell.P11KeyDeleteCommand">
+            	<property name="securityFactory" ref="securityFactory" />
+            </action>
+        </command>
+        
+    </command-bundle>
+
+</blueprint>

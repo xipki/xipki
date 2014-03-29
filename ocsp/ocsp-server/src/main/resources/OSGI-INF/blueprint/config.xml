@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0" xmlns:cm="http://aries.apache.org/blueprint/xmlns/blueprint-cm/v1.1.0" xmlns:ext="http://aries.apache.org/blueprint/xmlns/blueprint-ext/v1.0.0">
+
+	<!--
+		Properties
+	 -->
+
+    <!-- Allow the use of system properties -->
+	<ext:property-placeholder placeholder-prefix="$[" placeholder-suffix="]" />
+	
+	<!--
+		Note: Don't include a "-" in the persistent-id, or the config admin will
+		interpret it as a service-factory.
+	-->
+	<cm:property-placeholder persistent-id="org.xipki.ocsp.server" update-strategy="reload">
+		<cm:default-properties>
+			<cm:property name="confFile" value="ocsp-config/ocsp-responder.properties"/>
+			<cm:property name="urlPatterns" value="/ocsp/*"/>
+			<cm:property name="includeCertHash" value="false"/>
+			<cm:property name="requireReqSigned" value="false"/>
+			<cm:property name="checkReqSignature" value="false"/>
+		</cm:default-properties>
+	</cm:property-placeholder>
+    
+   	<reference id="dataSourceFactory" interface="org.xipki.database.api.DataSourceFactory" />
+    <reference id="securityFactory" interface="org.xipki.security.api.SecurityFactory" />
+    <reference id="passwordResolver" interface="org.xipki.security.api.PasswordResolver" />
+        
+    <bean id="ocspResponder" class="org.xipki.ocsp.OcspResponder"
+			init-method="init">
+        <property name="confFile" value="${confFile}"/>
+        <property name="includeCertHash" value="${includeCertHash}"/>
+        <property name="requireReqSigned" value="${requireReqSigned}"/>
+        <property name="checkReqSignature" value="${checkReqSignature}"/>
+        <property name="dataSourceFactory" ref="dataSourceFactory"/>
+        <property name="securityFactory" ref="securityFactory"/>
+        <property name="passwordResolver" ref="passwordResolver"/>
+    </bean>
+    
+    <!-- create the servlet and inject our own app factory -->
+    <bean id="ocspServlet" class="org.xipki.ocsp.Rfc2560Servlet">
+        <property name="responder" ref="ocspResponder" />
+    </bean>
+
+    <!-- register it as a servlet service for the web extender -->
+    <service ref="ocspServlet" interface="javax.servlet.Servlet">
+        <service-properties>
+            <entry key="urlPatterns" value="${urlPatterns}" />
+        </service-properties>
+    </service>
+
+</blueprint>

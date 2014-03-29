@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0"
+           xmlns:cm="http://aries.apache.org/blueprint/xmlns/blueprint-cm/v1.1.0"
+           default-activation="lazy">
+
+	<reference id="raWorker" interface="org.xipki.ca.client.api.RAWorker" />
+	
+    <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
+
+        <command name="caclient/ra-enroll">
+            <action class="org.xipki.ca.client.shell.RAEnrollCertCommand">
+            	<property name="raWorker" ref="raWorker" />
+            </action>
+        </command>
+
+        <command name="caclient/ra-rev">
+            <action class="org.xipki.ca.client.shell.RARevocateCertCommand">
+            	<property name="raWorker" ref="raWorker" />
+            </action>
+        </command>
+        
+        <command name="caclient/ra-gencrl">
+            <action class="org.xipki.ca.client.shell.RAGenCRLCommand">
+            	<property name="raWorker" ref="raWorker" />
+            </action>
+        </command>
+        
+        <command name="caclient/ra-getcrl">
+            <action class="org.xipki.ca.client.shell.RAGetCRLCommand">
+            	<property name="raWorker" ref="raWorker" />
+            </action>
+        </command>
+        
+        <command name="caclient/enroll-loadtest">
+            <action class="org.xipki.ca.client.shell.loadtest.CALoadTestCommand">
+            	<property name="raWorker" ref="raWorker" />
+            </action>
+        </command>
+    </command-bundle>
+
+</blueprint>

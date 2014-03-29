@@ -1,0 +1,221 @@
+features:install xipki-caserver-shell
+features:install xipki-security-shell
+
+#################################################################
+#                       PREPARE ENVIRONMENET                    #
+#################################################################
+
+## Environment parameters
+ca:env-add -name env-name1 -value env-value1
+
+## CMP control: messageTimeBias is set to 300 seconds. 
+ca:cmpcontrol-set --msgTimeBias 300
+
+## Certificate Profiles
+ca:profile-add -name DFLT.RA -type java:org.xipki.ca.server.profile.DefaultRACertProfile
+ca:profile-add -name SubCA -type java:org.xipki.ca.certprofile.example.CertProfile_SubCA
+ca:profile-add -name CMP -type java:org.xipki.ca.certprofile.example.CertProfile_CMP
+ca:profile-add -name TLS -type java:org.xipki.ca.certprofile.example.CertProfile_TLS
+ca:profile-add -name TLS_C -type java:org.xipki.ca.certprofile.example.CertProfile_TLS_C
+
+## Publishers
+ca:publisher-add -name OCSP.PUBLISHER -type java:org.xipki.ca.server.publisher.DefaultCertPublisher \
+-confFile ca-demo/ocsp-db.properties
+
+## CRL Signer
+ca:crlsigner-add -signerType CA -period 0 -name CASIGN.CRLSIGNER
+
+#################################################################
+#                         GENERATE RCA                       #
+#################################################################
+## Add the profile RCA
+ca:profile-add -name  RCA -type java:org.xipki.ca.certprofile.example.CertProfile_RootCA
+
+## Generate keys and PKCS#10 request
+keytool:rsa-p12 -pwd 1234 -out output/RCA1.p12 -subject "CN=RCA1,O=xipki,C=DE"
+keytool:req-p12 -p12 output/RCA1.p12 -pwd 1234 -hash SHA256 -out output/RCA1.p10
+
+## Generate selfsigned RCA
+ca:gen-rca -name RCA1 \
+-subject "CN=RCA1,O=xipki,C=DE" -profile RCA -out output/RCA1.der \
+-permission all -nextSerial 1 -maxValidity 1825 -signerType PKCS12 \
+-signerConf password?1234%keystore?file:output/RCA1.p12%algo?sha256withRSA
+
+ca:caalias-add -ca RCA1 -alias RCA
+
+## Remove the profile RCA
+ca:profile-rm -name RCA
+
+## Add Profiles
+ca:caprofile-add -ca RCA1 -profile SubCA -profile DFLT.RA
+
+## Add publisher
+ca:capub-add -ca RCA1 -publisher OCSP.PUBLISHER
+
+## Restart the CA
+ca:ca-restart
+
+#################################################################
+#                           ADD SubCA 1                         #
+#################################################################
+## Generate keys and PKCS#10 request
+keytool:rsa-p12 -pwd 1234 -out output/SubCA1.p12 -subject "CN=SubCA1,O=xipki,C=DE"
+keytool:req-p12 -p12 output/SubCA1.p12 -pwd 1234 -hash SHA256 -out output/SubCA1.p10
+
+## Enroll SubCA certificate via Management interface of RCA1
+ca:enroll -ca RCA1 -p10 output/SubCA1.p10 -out output/SubCA1.der -profile SubCA
+
+## Add CA
+ca:ca-add -name SubCA1 \
+-permission all -nextSerial 1 -maxValidity 730 -signerType PKCS12 \
+-signerConf password?1234%keystore?file:output/SubCA1.p12%algo?sha256withRSA \
+-crlUri http://example.org/crl -cert output/SubCA1.der
+
+ca:caalias-add -ca SubCA1 -alias SubCA
+
+## Add cert profile to CA
+ca:caprofile-add -ca SubCA1 -profile DFLT.RA -profile CMP
+
+## Add publisher
+ca:capub-add -ca SubCA1 -publisher OCSP.PUBLISHER
+
+## Restart the CA
+ca:ca-restart
+
+## Issues CMP certificates via Management interface
+keytool:rsa-p12 -pwd 1234 -out output/requestor.p12 -subject "CN=requestor,O=xipki,C=DE"
+
+keytool:req-p12 -p12 output/requestor.p12 -pwd 1234 -hash SHA256 -out output/requestor.p10
+
+ca:enroll -ca SubCA1 -p10 output/requestor.p10 -out output/requestor.der -profile CMP
+
+keytool:rsa-p12 -pwd 1234 -out output/responder.p12 -subject "CN=responder,O=xipki,C=DE"
+
+keytool:req-p12 -p12 output/responder.p12 -pwd 1234 -hash SHA256 -out output/responder.p10
+
+ca:enroll -ca SubCA1 -p10 output/responder.p10 -out output/responder.der -profile CMP
+
+#################################################################
+#                       CONFIGURE CMP-IDENTIFIES                #
+#################################################################
+# CMP Responder
+ca:responder-set -cert output/responder.der -signerType PKCS12 \
+-signerConf password?1234%keystore?file:output/responder.p12%algo?sha256withRSA
+
+# CMP Requestors
+ca:requestor-add -cert output/requestor.der -name requestor
+
+# Add requestor to RCA1 and SubCA1
+ca:careq-add -requestor requestor -permission all -era -profile all -ca RCA1
+ca:careq-add -requestor requestor -permission all -era -profile all -ca SubCA1
+
+## Restart the CA
+ca:ca-restart
+
+#################################################################
+#              MANAGE CERTIFICATE WITH RA CLIENT                #
+#################################################################
+features:install xipki-caclient-shell
+
+## Enroll certificates
+keytool:rsa-p12 -pwd 1234 -out output/OCSP1.p12 -subject "CN=OCSP1,O=xipki,C=DE"
+keytool:req-p12 -p12 output/OCSP1.p12 -pwd 1234 -hash SHA256 -out output/OCSP1.p10
+
+caclient:ra-enroll -p10 output/OCSP1.p10 -profile OCSP
+
+keytool:rsa-p12 -pwd 1234 -out output/TLS1.p12 -subject "CN=TSL1,O=xipki,C=DE"
+keytool:req-p12 -p12 output/TLS1.p12 -pwd 1234 -hash SHA256 -out output/TLS1.p10
+
+caclient:ra-enroll -p10 output/TLS1.p10 -profile TLS
+
+keytool:rsa-p12 -pwd 1234 -out output/TLS2.p12 -subject "CN=TSL2,O=xipki,C=DE"
+keytool:req-p12 -p12 output/TLS2.p12 -pwd 1234 -hash SHA256 -out output/TLS2.p10
+
+caclient:ra-enroll -p10 output/TLS2.p10 -profile TLS
+
+## Revocate certificates
+caclient:ra-rev -cert output/TLS2.der -reason 2
+
+#################################################################
+#                        ADD SubCAwithCRL1                      #
+#################################################################
+## Generate keys and PKCS#10 request
+keytool:rsa-p12 -pwd 1234 -out output/SubCAwithCRL1.p12 -subject "CN=SubCAwithCRL1,O=xipki,C=DE"
+
+keytool:req-p12 -p12 output/SubCAwithCRL1.p12 -pwd 1234 -hash SHA256 -out output/SubCAwithCRL1.p10
+
+caclient:ra-enroll -p10 output/SubCAwithCRL1.p10 -profile SubCA
+
+## Add CA
+ca:ca-add -name SubCAwithCRL1 \
+-permission all -nextSerial 1 -maxValidity 1460 -signerType PKCS12 \
+-signerConf password?1234%keystore?file:output/SubCAwithCRL1.p12%algo?sha256withRSA \
+-crlUri http://example.org/crl \
+-ocspUri http://example.org/ocsp \
+-cert output/SubCAwithCRL1.der \
+-crlSigner CASIGN.CRLSIGNER
+
+ca:caalias-add -ca SubCAwithCRL1 -alias SubCAwithCRL
+
+## Add cert profile to CA
+ca:caprofile-add -profile TLS_C -ca SubCAwithCRL1
+
+## Add CMP requestor to CA
+ca:careq-add -requestor requestor -permission all -era -profile all -ca SubCAwithCRL1
+
+## Restart the CA
+ca:ca-restart
+
+## Restart caclient
+features:uninstall xipki-caclient-shell
+features:uninstall xipki-caclient
+features:install xipki-caclient
+features:install xipki-caclient-shell
+
+#################################################################
+#              MANAGE CERTIFICATE WITH RA CLIENT                #
+#################################################################
+## Enroll certificates
+keytool:rsa-p12 -pwd 1234 -out output/TLS_C1.p12 -subject "CN=TSL_C1,O=xipki,C=DE"
+
+keytool:req-p12 -p12 output/TLS_C1.p12 -pwd 1234 -hash SHA256 -out output/TLS_C1.p10
+
+caclient:ra-enroll -p10 output/TLS_C1.p10 -profile TLS_C
+
+keytool:rsa-p12 -pwd 1234 -out output/TLS_C2.p12 -subject "CN=TSL_C2,O=xipki,C=DE"
+
+keytool:req-p12 -p12 output/TLS_C2.p12 -pwd 1234 -hash SHA256 -out output/TLS_C2.p10
+
+caclient:ra-enroll -p10 output/TLS_C2.p10 -profile TLS_C
+
+## Revocate certificates
+caclient:ra-rev -cert output/TLS_C2.der -reason 3
+
+## Generate CRL
+caclient:ra-gencrl -ca SubCAwithCRL1 -out output/SubCAwithCRL1.crl
+
+#################################################################
+#              UNINSTALL UNNEEDED FEATURES                       #
+#################################################################
+features:uninstall xipki-caclient-shell
+features:uninstall xipki-caclient
+features:uninstall xipki-caserver-shell
+features:uninstall xipki-security-shell
+
+#################################################################
+#                              OCSP                             #
+#################################################################
+features:install xipki-ocspserver
+features:install xipki-ocspclient-shell
+
+ocsp:status -ca output/RCA1.der -cert output/SubCA1.der
+
+ocsp:status -ca output/SubCA1.der -cert output/TLS1.der
+ocsp:status -ca output/SubCA1.der -cert output/TLS2.der
+
+ocsp:status -ca output/SubCAwithCRL1.der -cert output/TLS_C1.der
+ocsp:status -ca output/SubCAwithCRL1.der -cert output/TLS_C2.der
+
+features:uninstall xipki-ocspclient-shell
+features:uninstall xipki-ocspclient
+
