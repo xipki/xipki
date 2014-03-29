@@ -59,8 +59,7 @@ public class AddLicense {
 	
 	public static void main(String[] args) {
 		try{
-			//String dirName = args[0];
-			String dirName = "/home/authentidate/ad-src/xipki-svn";
+			String dirName = args[0];
 			
 			File dir = new File(dirName);
 			addLicenseToDir(dir);			
