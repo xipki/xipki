@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<artifactId>security-group</artifactId>
+		<groupId>org.xipki</groupId>
+		<version>1.0.0-SNAPSHOT</version>
+	</parent>
+	<artifactId>security-shell</artifactId>
+	<packaging>bundle</packaging>
+	<name>XiPKI :: ${project.artifactId}</name>
+	<dependencies>
+		<dependency>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>security-command</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+	</dependencies>
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.felix</groupId>
+				<artifactId>maven-bundle-plugin</artifactId>
+				<configuration>
+					<instructions>
+						<Import-Package>
+              org.apache.felix.service.command,
+              org.apache.felix.gogo.commands,
+              org.apache.karaf.shell.console,
+              org.xipki.security.shell,
+              *
+            </Import-Package>
+					</instructions>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+</project>

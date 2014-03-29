@@ -1,0 +1,317 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0"
+           xmlns:cm="http://aries.apache.org/blueprint/xmlns/blueprint-cm/v1.1.0"
+           default-activation="lazy">
+
+    <reference id="caManager" interface="org.xipki.ca.server.mgmt.CAManager" />
+    <reference id="securityFactory" interface="org.xipki.security.api.SecurityFactory" />
+	<reference id="passwordResolver" interface="org.xipki.security.api.PasswordResolver" />
+	
+    <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
+
+		<!-- CA -->
+        <command name="ca/ca-restart">
+            <action class="org.xipki.ca.server.mgmt.shell.CaRestartCommand">
+            	<property name="caManager" ref="caManager" />
+            </action>
+        </command>
+
+        <command name="ca/ca-add">
+            <action class="org.xipki.ca.server.mgmt.shell.CaAddCommand">
+            	<property name="caManager" ref="caManager" />
+            </action>
+        </command>
+
+        <command name="ca/ca-rm">
+            <action class="org.xipki.ca.server.mgmt.shell.CaRemoveCommand">
+            	<property name="caManager" ref="caManager" />
+            </action>
+        </command>
+        
+        <command name="ca/gen-rca">
+            <action class="org.xipki.ca.server.mgmt.shell.CaGenRootCACommand">
+            	<property name="caManager" ref="caManager" />
+            	<property name="passwordResolver" ref="passwordResolver"/>
+       			<property name="securityFactory" ref="securityFactory"/>
+            </action>
+        </command>
+        
+        <command name="ca/publish-self">
+            <action class="org.xipki.ca.server.mgmt.shell.CaPublishRCACertCommand">
+            	<property name="caManager" ref="caManager" />
+            </action>
+        </command>
+        
+        <command name="ca/ca-list">
+            <action class="org.xipki.ca.server.mgmt.shell.CaListCommand">
+            	<property name="caManager" ref="caManager" />
+            </action>
+        </command>
+        
+        <command name="ca/ca-update">
+            <action class="org.xipki.ca.server.mgmt.shell.CaUpdateCommand">
+            	<property name="caManager" ref="caManager" />
+            </action>
+        </command>
+        
+        <!-- CA Alias -->
+        <command name="ca/caalias-add">
+            <action class="org.xipki.ca.server.mgmt.shell.CaAliasAddCommand">
+            	<property name="caManager" ref="caManager" />
+            </action>
+        </command>
+
+        <command name="ca/caalias-list">
+            <action class="org.xipki.ca.server.mgmt.shell.CaAliasListCommand">
+            	<property name="caManager" ref="caManager" />
+            </action>
+        </command>
+
+        <command name="ca/caalias-rm">
+            <action class="org.xipki.ca.server.mgmt.shell.CaAliasRemoveCommand">
+            	<property name="caManager" ref="caManager" />
+            </action>
+        </command>
+        
+        <!--  CA-Profile -->
+		<command name="ca/caprofile-add">
+            <action class="org.xipki.ca.server.mgmt.shell.CaProfileAddCommand">
+            	<property name="caManager" ref="caManager" />
+            </action>
+        </command>
+		
+		<command name="ca/caprofile-list">
+            <action class="org.xipki.ca.server.mgmt.shell.CaProfileListCommand">
+            	<property name="caManager" ref="caManager" />
+            </action>
+        </command>
+
+		<command name="ca/caprofile-rm">
+            <action class="org.xipki.ca.server.mgmt.shell.CaProfileRemoveCommand">
+            	<property name="caManager" ref="caManager" />
+            </action>
+        </command>        
+        
+		<!--  CA-Publisher -->
+		<command name="ca/capub-add">
+            <action class="org.xipki.ca.server.mgmt.shell.CaPublisherAddCommand">
+            	<property name="caManager" ref="caManager" />
+            </action>
+        </command>
+		
+		<command name="ca/capub-list">
+            <action class="org.xipki.ca.server.mgmt.shell.CaPublisherListCommand">
+            	<property name="caManager" ref="caManager" />
+            </action>
+        </command>
+
+		<command name="ca/capub-rm">
+            <action class="org.xipki.ca.server.mgmt.shell.CaPublisherRemoveCommand">
+            	<property name="caManager" ref="caManager" />
+            </action>
+        </command>
+        
+		<!--  CA-Requestor -->
+		<command name="ca/careq-add">
+            <action class="org.xipki.ca.server.mgmt.shell.CaRequestorAddCommand">
+            	<property name="caManager" ref="caManager" />
+            </action>
+        </command>
+		
+		<command name="ca/careq-list">
+            <action class="org.xipki.ca.server.mgmt.shell.CaRequestorListCommand">
+            	<property name="caManager" ref="caManager" />
+            </action>
+        </command>
+
+		<command name="ca/careq-rm">
+            <action class="org.xipki.ca.server.mgmt.shell.CaRequestorRemoveCommand">
+            	<property name="caManager" ref="caManager" />
+            </action>
+        </command>
+        
+        <!-- CMPControl -->
+		<command name="ca/cmpcontrol-list">
+            <action class="org.xipki.ca.server.mgmt.shell.CmpControlListCommand">
+            	<property name="caManager" ref="caManager" />
+            </action>
+        </command>
+		
+		<command name="ca/cmpcontrol-rm">
+            <action class="org.xipki.ca.server.mgmt.shell.CmpControlRemoveCommand">
+            	<property name="caManager" ref="caManager" />
+            </action>
+        </command>
+
+		<command name="ca/cmpcontrol-set">
+            <action class="org.xipki.ca.server.mgmt.shell.CmpControlSetCommand">
+            	<property name="caManager" ref="caManager" />
+            </action>
+        </command>
+
+		<command name="ca/cmpcontrol-update">
+            <action class="org.xipki.ca.server.mgmt.shell.CmpControlUpdateCommand">
+            	<property name="caManager" ref="caManager" />
+            </action>
+        </command>
+        <!-- CRL signer -->
+		<command name="ca/crlsigner-add">
+            <action class="org.xipki.ca.server.mgmt.shell.CrlSignerAddCommand">
+            	<property name="caManager" ref="caManager" />
+            </action>
+        </command>
+        
+		<command name="ca/crlsigner-list">
+            <action class="org.xipki.ca.server.mgmt.shell.CrlSignerListCommand">
+            	<property name="caManager" ref="caManager" />
+            </action>
+        </command>
+		
+		<command name="ca/crlsigner-rm">
+            <action class="org.xipki.ca.server.mgmt.shell.CrlSignerRemoveCommand">
+            	<property name="caManager" ref="caManager" />
+            </action>
+        </command>
+        
+		<command name="ca/crlsigner-update">
+            <action class="org.xipki.ca.server.mgmt.shell.CrlSignerUpdateCommand">
+            	<property name="caManager" ref="caManager" />
+            </action>
+        </command>
+                
+        <!-- Enroll Certificate -->
+		<command name="ca/enroll">
+            <action class="org.xipki.ca.server.mgmt.shell.EnrollCertCommand">
+            	<property name="caManager" ref="caManager" />
+            	<property name="securityFactory" ref="securityFactory"/>
+            </action>
+        </command>
+        
+		<!-- Environment -->
+        <command name="ca/env-add">
+            <action class="org.xipki.ca.server.mgmt.shell.EnvAddCommand">
+            	<property name="caManager" ref="caManager" />
+            </action>
+        </command>
+
+        <command name="ca/env-list">
+            <action class="org.xipki.ca.server.mgmt.shell.EnvListCommand">
+            	<property name="caManager" ref="caManager" />
+            </action>
+        </command>
+
+        <command name="ca/env-rm">
+            <action class="org.xipki.ca.server.mgmt.shell.EnvRemoveCommand">
+            	<property name="caManager" ref="caManager" />
+            </action>
+        </command>
+
+        <command name="ca/env-update">
+            <action class="org.xipki.ca.server.mgmt.shell.EnvUpdateCommand">
+            	<property name="caManager" ref="caManager" />
+            </action>
+        </command>
+        
+		<!-- Profile -->
+        <command name="ca/profile-add">
+            <action class="org.xipki.ca.server.mgmt.shell.ProfileAddCommand">
+            	<property name="caManager" ref="caManager" />
+            </action>
+        </command>
+
+        <command name="ca/profile-list">
+            <action class="org.xipki.ca.server.mgmt.shell.ProfileListCommand">
+            	<property name="caManager" ref="caManager" />
+            </action>
+        </command>
+
+        <command name="ca/profile-rm">
+            <action class="org.xipki.ca.server.mgmt.shell.ProfileRemoveCommand">
+            	<property name="caManager" ref="caManager" />
+            </action>
+        </command>
+
+        <command name="ca/profile-update">
+            <action class="org.xipki.ca.server.mgmt.shell.ProfileUpdateCommand">
+            	<property name="caManager" ref="caManager" />
+            </action>
+        </command>
+        
+		<!-- Publisher -->
+        <command name="ca/publisher-add">
+            <action class="org.xipki.ca.server.mgmt.shell.PublisherAddCommand">
+            	<property name="caManager" ref="caManager" />
+            </action>
+        </command>
+
+        <command name="ca/publisher-list">
+            <action class="org.xipki.ca.server.mgmt.shell.PublisherListCommand">
+            	<property name="caManager" ref="caManager" />
+            </action>
+        </command>
+
+        <command name="ca/publisher-rm">
+            <action class="org.xipki.ca.server.mgmt.shell.PublisherRemoveCommand">
+            	<property name="caManager" ref="caManager" />
+            </action>
+        </command>
+        
+        <command name="ca/publisher-update">
+            <action class="org.xipki.ca.server.mgmt.shell.PublisherUpdateCommand">
+            	<property name="caManager" ref="caManager" />
+            </action>
+        </command>
+        
+		<!-- Requestor -->
+        <command name="ca/requestor-add">
+            <action class="org.xipki.ca.server.mgmt.shell.RequestorAddCommand">
+            	<property name="caManager" ref="caManager" />
+            </action>
+        </command>
+
+        <command name="ca/requestor-list">
+            <action class="org.xipki.ca.server.mgmt.shell.RequestorListCommand">
+            	<property name="caManager" ref="caManager" />
+            </action>
+        </command>
+
+        <command name="ca/requestor-rm">
+            <action class="org.xipki.ca.server.mgmt.shell.RequestorRemoveCommand">
+            	<property name="caManager" ref="caManager" />
+            </action>
+        </command>
+
+        <command name="ca/requestor-update">
+            <action class="org.xipki.ca.server.mgmt.shell.RequestorUpdateCommand">
+            	<property name="caManager" ref="caManager" />
+            </action>
+        </command>
+        
+		<!-- Responder -->
+        <command name="ca/responder-list">
+            <action class="org.xipki.ca.server.mgmt.shell.ResponderListCommand">
+            	<property name="caManager" ref="caManager" />
+            </action>
+        </command>
+
+        <command name="ca/responder-rm">
+            <action class="org.xipki.ca.server.mgmt.shell.ResponderRemoveCommand">
+            	<property name="caManager" ref="caManager" />
+            </action>
+        </command>
+
+        <command name="ca/responder-set">
+            <action class="org.xipki.ca.server.mgmt.shell.ResponderSetCommand">
+            	<property name="caManager" ref="caManager" />
+            </action>
+        </command>
+
+        <command name="ca/responder-update">
+            <action class="org.xipki.ca.server.mgmt.shell.ResponderUpdateCommand">
+            	<property name="caManager" ref="caManager" />
+            </action>
+        </command>
+        
+    </command-bundle>
+
+</blueprint>
