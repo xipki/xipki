@@ -9,11 +9,6 @@
     <artifactId>dist-group</artifactId>
     <packaging>pom</packaging>
 
-    <properties>
-        <!-- dependency management versions -->
-        <karaf.version>2.3.3</karaf.version>
-    </properties>
-
     <modules>
         <module>assembly</module>
         <module>branding</module>

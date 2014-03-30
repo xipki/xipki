@@ -10,7 +10,25 @@
 	<artifactId>xipki-group</artifactId>
 	<packaging>pom</packaging>
 	<version>1.0.0-SNAPSHOT</version>
+	<name>XiPKI :: ${artifactId}</name>
+	<description>XiPKI CA and OCSP responder</description>
+	<url>http://xipki.org</url>
+	<licenses>
+		<license>
+			<name>The Apache Software License, Version 2.0</name>
+			<url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+			<distribution>repo</distribution>
+		</license>
+	</licenses>
+	<developers>
+		<developer>
+			<id>project-owner</id>
+			<name>Lijun Liao</name>
+			<email>lijun.liao@gmail.com</email>
+		</developer>
+	</developers>
 	<properties>
+		<karaf.version>2.3.4</karaf.version>
 		<bc.version>1.49</bc.version>
 		<slf4j.version>1.5.11</slf4j.version>
 		<commons-dbcp.version>1.4</commons-dbcp.version>
