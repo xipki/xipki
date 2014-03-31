@@ -1,6 +1,6 @@
 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0;
 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0;
-SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='TRADITIONAL,ALLOW_INVALID_DATES';
+SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='TRADITIONAL';
 
 DROP SCHEMA IF EXISTS `ca` ;
 CREATE SCHEMA IF NOT EXISTS `ca` DEFAULT CHARACTER SET utf8 COLLATE utf8_bin ;
@@ -217,6 +217,7 @@ CREATE  TABLE IF NOT EXISTS `cert` (
   `rev_invalidity_time` INT NULL COMMENT 'seconds since January 1, 1970, 00:00:00 GMT' ,
   `user_id` INT NULL ,
   `sha1_fp_pk` CHAR(40) NOT NULL ,
+  `sha1_fp_subject` CHAR(40) NOT NULL COMMENT 'SHA1 fingerprint of the canonicalized subject' ,
   PRIMARY KEY (`id`) ,
   INDEX `fk_cert_cainfo1_idx` (`cainfo_id` ASC) ,
   INDEX `fk_cert_requestorinfo1_idx` (`requestorinfo_id` ASC) ,
@@ -367,9 +368,7 @@ CREATE  TABLE IF NOT EXISTS `caalias` (
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;
-
-USE `ca` ;
-
+USE 'ca';
 
 SET SQL_MODE=@OLD_SQL_MODE;
 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
