@@ -21,6 +21,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -46,8 +47,11 @@ import java.util.concurrent.atomic.AtomicInteger;
 import javax.security.auth.x500.X500Principal;
 
 import org.bouncycastle.asn1.ASN1Integer;
+import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.DEROctetString;
+import org.bouncycastle.asn1.x500.RDN;
 import org.bouncycastle.asn1.x500.X500Name;
+import org.bouncycastle.asn1.x500.style.IETFUtils;
 import org.bouncycastle.asn1.x509.CRLReason;
 import org.bouncycastle.asn1.x509.Extension;
 import org.bouncycastle.util.encoders.Base64;
@@ -182,8 +186,8 @@ class CertStoreQueryExecutor
 		    	"(id, last_update, serial, subject,"
 		    	+ " notbefore, notafter, revocated,"
 		    	+ " certprofileinfo_id, cainfo_id,"
-		    	+ " requestorinfo_id, user_id, sha1_fp_pk)" + 
-				" VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+		    	+ " requestorinfo_id, user_id, sha1_fp_pk, sha1_fp_subject)" + 
+				" VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
 		PreparedStatement ps = borrowPreparedStatement(SQL_ADD_CERT);
 		if(ps == null) {
@@ -235,9 +239,10 @@ class CertStoreQueryExecutor
 				ps.setNull(idx++, Types.INTEGER);
 			}
 
-			byte[] sha1_fp_pk = fp(encodedSubjectPublicKey);
-			ps.setString(idx++, Hex.toHexString(sha1_fp_pk).toUpperCase());
-			
+			ps.setString(idx++, fp(encodedSubjectPublicKey));
+			X500Name subject = X500Name.getInstance(cert.getSubjectX500Principal().getEncoded());
+			String sha1_fp_subject = fp_canonicalized_name(subject);
+			ps.setString(idx++, sha1_fp_subject);
 			ps.executeUpdate();
 		}finally {
 			returnPreparedStatement(ps);
@@ -250,7 +255,7 @@ class CertStoreQueryExecutor
 			throw new SQLException("Cannot create prepared insert_raw_cert statement");
 		}
     		
-		String sha1_fp = Hex.toHexString(fp(certificate.getEncodedCert())).toUpperCase();
+		String sha1_fp = fp(certificate.getEncodedCert());
 
 		try{
 			int idx = 1;
@@ -529,7 +534,7 @@ class CertStoreQueryExecutor
 		}
 		
 		String sql = "thisUpdate, crl FROM crl WHERE cainfo_id=? ORDER BY thisUpdate DESC";		
-		sql = createFetchFirstSelectSQL(sql, 1); // TODO: check whether this works
+		sql = createFetchFirstSelectSQL(sql, 1);
 		PreparedStatement ps = borrowPreparedStatement(sql);
 		
 		ResultSet rs = null;
@@ -619,7 +624,7 @@ class CertStoreQueryExecutor
 				+ " FROM cert t1, rawcert t2"
 				+ " WHERE t1.cainfo_id=? AND t1.serial=? AND t2.cert_id=t1.id";
 		
-		sql = createFetchFirstSelectSQL(sql, 1); // TODO: check whether this works
+		sql = createFetchFirstSelectSQL(sql, 1);
 		PreparedStatement ps = borrowPreparedStatement(sql);
 		
 		ResultSet rs = null;
@@ -752,7 +757,10 @@ class CertStoreQueryExecutor
 			return false;
 		}
 		
-		String sql = "count(*) FROM cert WHERE cainfo_id=? AND subject=?";
+		X500Name name = new X500Name(subject);
+		String sha1_fp_subject = fp_canonicalized_name(name);
+		
+		String sql = "count(*) FROM cert WHERE cainfo_id=? AND sha1_fp_subject=?";
 		sql = createFetchFirstSelectSQL(sql, 1);
 		
 		PreparedStatement ps = borrowPreparedStatement(sql);
@@ -763,7 +771,7 @@ class CertStoreQueryExecutor
 		try{
 			int idx = 1;
 			ps.setInt(idx++, caId);
-			ps.setString(idx++, subject);
+			ps.setString(idx++, sha1_fp_subject);
 			
 			ResultSet rs = ps.executeQuery();
 			try{
@@ -795,7 +803,7 @@ class CertStoreQueryExecutor
 			return false;
 		}
 		
-		String sha1FpPk = Hex.toHexString(fp(encodedSubjectPublicKey)).toUpperCase();
+		String sha1FpPk = fp(encodedSubjectPublicKey);
 		
 		String sql = "count(*) FROM cert"
 				+ " WHERE cainfo_id=? AND sha1_fp_pk=?";
@@ -862,11 +870,11 @@ class CertStoreQueryExecutor
 		return prefix + " " + coreSql + " " + suffix;
 	}
 	
-	private byte[] fp(byte[] data)
+	private String fp(byte[] data)
 	{
 		synchronized (sha1md) {
 			sha1md.reset();
-			return sha1md.digest(data);
+			return Hex.toHexString(sha1md.digest(data)).toUpperCase();
 		}
 	}
 	
@@ -880,7 +888,7 @@ class CertStoreQueryExecutor
 			return id.intValue();
 		}
 
-		String hexSha1Fp = Hex.toHexString(fp(encodedCert)).toUpperCase();
+		String hexSha1Fp = fp(encodedCert);
 		
 		final String SQL_ADD_CAINFO =
 		    	"INSERT INTO " + store.getTable() +
@@ -992,6 +1000,59 @@ class CertStoreQueryExecutor
 		}catch(Throwable t) {
 			LOG.warn("Cannot return prepared statement and connection", t);
 		}
+	}
+
+	/**
+	 * First canonicalized the name, and then compute the SHA-1 fingerprint over the 
+	 * canonicalized subject string.
+	 * @param name
+	 * @return
+	 */
+	private String fp_canonicalized_name(X500Name name)
+	{
+		ASN1ObjectIdentifier[] _types = name.getAttributeTypes();
+		int n = _types.length;
+		List<String> types = new ArrayList<String>(n);
+		for(ASN1ObjectIdentifier type : _types)
+		{
+			types.add(type.getId());
+		}
+		
+		Collections.sort(types);
+		
+		StringBuilder sb = new StringBuilder();
+		for(int i = 0; i < n; i++)
+		{
+			String type = types.get(i);
+			if(i > 0)
+			{
+				sb.append(",");
+			}
+			sb.append(type).append("=");
+			RDN[] rdns = name.getRDNs(new ASN1ObjectIdentifier(type));
+			
+			for(int j = 0; j < rdns.length; j++)
+			{
+				if(j > 0)
+				{
+					sb.append(";");
+				}
+				RDN rdn = rdns[j];
+				String textValue = IETFUtils.valueToString(rdn.getFirst().getValue());
+				sb.append(textValue);				
+			}
+		}
+		
+		String canonicalizedName = sb.toString();
+		LOG.debug("Canocanilized name of '{}' is '{}'", name.toString(), canonicalizedName);
+		byte[] encoded;
+		try {
+			encoded = canonicalizedName.getBytes("UTF-8");
+		} catch (UnsupportedEncodingException e) {
+			LOG.warn("UnsupportedEncodingException: {}", e.getMessage());
+			encoded = canonicalizedName.getBytes();
+		}
+		return fp(encoded);
 	}
 
 }
