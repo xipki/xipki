@@ -2713,13 +2713,13 @@ public class CAManagerImpl implements CAManager
 
 	@Override
 	public void publishRootCA(String caname) throws CAMgmtException {
-		X509CACmpResponder cmpresponder = responders.get(caname);
-		if(cmpresponder == null)
+		X509CA ca = x509cas.get(caname);
+		if(ca == null)
 		{
 			throw new CAMgmtException("Cannot find CA named " + caname);
 		}
 		
-		X509CertificateWithMetaInfo certInfo = cmpresponder.getCA().getCAInfo().getCertificate();
+		X509CertificateWithMetaInfo certInfo = ca.getCAInfo().getCertificate();
 		if(certInfo.getCert().getSubjectX500Principal().equals(
 				certInfo.getCert().getIssuerX500Principal()) == false)
 		{
@@ -2734,7 +2734,7 @@ public class CAManagerImpl implements CAManager
 		} catch (CertificateEncodingException e) {
 			throw new CAMgmtException(e);
 		}
-		cmpresponder.getCA().publishCertificate(ci);		
+		ca.publishCertificate(ci);		
 	}
 
 	private static void assertNotNULL(String parameterName, String parameterValue)
