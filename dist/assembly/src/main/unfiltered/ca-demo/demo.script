@@ -20,7 +20,7 @@ ca:profile-add -name TLS_C -type java:org.xipki.ca.certprofile.example.CertProfi
 
 ## Publishers
 ca:publisher-add -name OCSP.PUBLISHER -type java:org.xipki.ca.server.publisher.DefaultCertPublisher \
--confFile ca-demo/ocsp-db.properties
+  -confFile ca-demo/ocsp-db.properties
 
 ## CRL Signer
 ca:crlsigner-add -signerType CA -period 0 -name CASIGN.CRLSIGNER
@@ -37,9 +37,9 @@ keytool:req-p12 -p12 output/RCA1.p12 -pwd 1234 -hash SHA256 -out output/RCA1.p10
 
 ## Generate selfsigned RCA
 ca:gen-rca -name RCA1 \
--subject "CN=RCA1,O=xipki,C=DE" -profile RCA -out output/RCA1.der \
--permission all -nextSerial 1 -maxValidity 1825 -signerType PKCS12 \
--signerConf password?1234%keystore?file:output/RCA1.p12%algo?sha256withRSA
+  -subject "CN=RCA1,O=xipki,C=DE" -profile RCA -out output/RCA1.der \
+  -permission all -nextSerial 1 -maxValidity 1825 -signerType PKCS12 \
+  -signerConf password?1234%keystore?file:output/RCA1.p12%algo?SHA256withRSA
 
 ca:caalias-add -ca RCA1 -alias RCA
 
@@ -55,6 +55,9 @@ ca:capub-add -ca RCA1 -publisher OCSP.PUBLISHER
 ## Restart the CA
 ca:ca-restart
 
+## Publish the self-signed certificate
+ca:publish-self -ca RCA1
+
 #################################################################
 #                           ADD SubCA 1                         #
 #################################################################
@@ -67,9 +70,9 @@ ca:enroll -ca RCA1 -p10 output/SubCA1.p10 -out output/SubCA1.der -profile SubCA
 
 ## Add CA
 ca:ca-add -name SubCA1 \
--permission all -nextSerial 1 -maxValidity 730 -signerType PKCS12 \
--signerConf password?1234%keystore?file:output/SubCA1.p12%algo?sha256withRSA \
--crlUri http://example.org/crl -cert output/SubCA1.der
+  -permission all -nextSerial 1 -maxValidity 730 -signerType PKCS12 \
+  -signerConf password?1234%keystore?file:output/SubCA1.p12%algo?SHA256withRSA \
+  -crlUri http://example.org/crl -cert output/SubCA1.der
 
 ca:caalias-add -ca SubCA1 -alias SubCA
 
@@ -100,7 +103,7 @@ ca:enroll -ca SubCA1 -p10 output/responder.p10 -out output/responder.der -profil
 #################################################################
 # CMP Responder
 ca:responder-set -cert output/responder.der -signerType PKCS12 \
--signerConf password?1234%keystore?file:output/responder.p12%algo?sha256withRSA
+  -signerConf password?1234%keystore?file:output/responder.p12%algo?SHA256withRSA
 
 # CMP Requestors
 ca:requestor-add -cert output/requestor.der -name requestor
@@ -148,12 +151,12 @@ caclient:ra-enroll -p10 output/SubCAwithCRL1.p10 -profile SubCA
 
 ## Add CA
 ca:ca-add -name SubCAwithCRL1 \
--permission all -nextSerial 1 -maxValidity 1460 -signerType PKCS12 \
--signerConf password?1234%keystore?file:output/SubCAwithCRL1.p12%algo?sha256withRSA \
--crlUri http://example.org/crl \
--ocspUri http://example.org/ocsp \
--cert output/SubCAwithCRL1.der \
--crlSigner CASIGN.CRLSIGNER
+  -permission all -nextSerial 1 -maxValidity 1460 -signerType PKCS12 \
+  -signerConf password?1234%keystore?file:output/SubCAwithCRL1.p12%algo?SHA256withRSA \
+  -crlUri http://example.org/crl \
+  -ocspUri http://example.org/ocsp \
+  -cert output/SubCAwithCRL1.der \
+  -crlSigner CASIGN.CRLSIGNER
 
 ca:caalias-add -ca SubCAwithCRL1 -alias SubCAwithCRL
 
