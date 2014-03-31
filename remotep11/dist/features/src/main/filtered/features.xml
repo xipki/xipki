@@ -18,8 +18,8 @@
 	</feature>
 	<feature name="xipki-remotep11-server" version="${project.version}" resolver="(obr)">
 		<feature>xipki-security-p11</feature>
-		<bundle>mvn:org.xipki.remotep11/remotep11-common/${project.version}</bundle>
-		<bundle>mvn:org.xipki.remotep11/remotep11-server/${project.version}</bundle>
+		<bundle>mvn:org.xipki/remotep11-common/${project.version}</bundle>
+		<bundle>mvn:org.xipki/remotep11-server/${project.version}</bundle>
 	</feature>
 	<feature name="xipki-security-shell" version="${project.version}" resolver="(obr)">
 		<feature>xipki-security-p11</feature>
