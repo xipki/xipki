@@ -44,7 +44,10 @@
 # export KARAF_BASE # Karaf base folder
 # export KARAF_OPTS # Additional available Karaf options
 
-NATIVE_LIB="native-lib/unix/`uname -s`-`uname -m`"
+UNAME=`uname -s`-`uname -m`
+UNAME=`echo $UNAME | tr '[:upper:]' '[:lower:]'`
+
+NATIVE_LIB="native-lib/unix/$UNAME"
 
 JAVA_OPTS="$JAVA_OPTS -Djava.library.path=$NATIVE_LIB"
 

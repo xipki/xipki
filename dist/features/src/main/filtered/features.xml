@@ -48,8 +48,8 @@
 		<feature>bouncycastle</feature>
 		<bundle>mvn:org.xipki/security-common/${project.version}</bundle>
 		<bundle>mvn:org.xipki/security-api/${project.version}</bundle>
-		<bundle>mvn:org.xipki.remotep11/remotep11-common/${project.version}</bundle>
-		<bundle>mvn:org.xipki.remotep11/remotep11-client/${project.version}</bundle>
+		<bundle>mvn:org.xipki/remotep11-common/${project.version}</bundle>
+		<bundle>mvn:org.xipki/remotep11-client/${project.version}</bundle>
 	</feature>
 	<feature name="xipki-ca-api" version="${project.version}" resolver="(obr)">
 		<bundle>mvn:org.xipki/security-common/${project.version}</bundle>
