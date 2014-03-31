@@ -44,7 +44,7 @@
 # export KARAF_BASE # Karaf base folder
 # export KARAF_OPTS # Additional available Karaf options
 
-UNAME=`uname -s`-`uname -m`
+UNAME=`uname -s`_`uname -m`
 UNAME=`echo $UNAME | tr '[:upper:]' '[:lower:]'`
 
 NATIVE_LIB="native-lib/unix/$UNAME"
