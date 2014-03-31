@@ -45,6 +45,13 @@
             <directoryMode>0755</directoryMode>
         </fileSet>
 
+        <!-- native libraries -->
+        <fileSet>
+            <directory>${project.build.directory}/native-lib</directory>
+            <outputDirectory>native-lib</outputDirectory>
+            <fileMode>0644</fileMode>
+            <directoryMode>0755</directoryMode>
+        </fileSet>
 
         <!-- Copy over start scripts -->
         <fileSet>
