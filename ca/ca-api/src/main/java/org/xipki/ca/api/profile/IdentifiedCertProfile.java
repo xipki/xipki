@@ -106,11 +106,6 @@ public class IdentifiedCertProfile implements CertProfile {
 	}
 
 	@Override
-	public boolean incSerialNumberIfSubjectExists() {
-		return certProfile.incSerialNumberIfSubjectExists();
-	}
-
-	@Override
 	public void checkPublicKey(SubjectPublicKeyInfo publicKey)
 			throws BadCertTemplateException
 	{

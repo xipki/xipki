@@ -31,7 +31,9 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.security.auth.x500.X500Principal;
 
@@ -40,7 +42,6 @@ import org.bouncycastle.asn1.ASN1GeneralizedTime;
 import org.bouncycastle.asn1.ASN1Integer;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.ASN1OctetString;
-import org.bouncycastle.asn1.DERPrintableString;
 import org.bouncycastle.asn1.DERSet;
 import org.bouncycastle.asn1.x500.RDN;
 import org.bouncycastle.asn1.x500.X500Name;
@@ -68,6 +69,7 @@ import org.bouncycastle.x509.extension.X509ExtensionUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.ca.api.CAMgmtException;
+import org.xipki.ca.api.CAStatus;
 import org.xipki.ca.api.CertAlreadyIssuedException;
 import org.xipki.ca.api.OperationException;
 import org.xipki.ca.api.OperationException.ErrorCode;
@@ -117,6 +119,9 @@ public class X509CA
 	private final CAManagerImpl caManager;
 	private final Object nextSerialLock = new Object();
 	private final Object crlLock = new Object();
+	
+	private final ConcurrentSkipListSet<String> pendingSubjectSha1Fps = new ConcurrentSkipListSet<String>();
+	private final AtomicInteger numActiveRevocations = new AtomicInteger(0);
 	
 	public X509CA(
 			CAManagerImpl caManager,
@@ -616,7 +621,107 @@ public class X509CA
 		
 		return true;
 	}
+	
+	public boolean republishCertificates(String publisherName)
+	{
+		if(publisherName == null)
+		{
+			throw new IllegalArgumentException("publisherName could not be null");
+		}
 		
+		IdentifiedCertPublisher publisher = null;
+		for(IdentifiedCertPublisher p : getPublishers())
+		{
+			if(p.getName().equals(publisherName))
+			{
+				publisher = p;
+				break;
+			}
+		}
+		
+		if(publisher == null)
+		{
+			throw new IllegalArgumentException(
+					"Could not find publisher " + publisherName + " for CA " + caInfo.getName());
+		}		
+		
+		CAStatus status = caInfo.getStatus();
+		
+		caInfo.setStatus(CAStatus.INACTIVE);
+		
+		// wait till no certificate request in process
+		while(pendingSubjectSha1Fps.isEmpty() == false || numActiveRevocations.get() > 0)
+		{
+			LOG.info("Certificate requests are still in process, wait 1 second");
+			try{
+				Thread.sleep(1000);
+			}catch(InterruptedException e){				
+			}
+		}
+		
+		try{
+			List<BigInteger> serials;
+			X509CertificateWithMetaInfo cacert = caInfo.getCertificate();
+			
+			Date notExpiredAt = null;
+			
+			BigInteger startSerial = BigInteger.ONE;
+			int numEntries = 100;
+			
+			do{
+				
+				try{
+					serials = certstore.getCertSerials(cacert, notExpiredAt, startSerial, numEntries);
+				} catch (SQLException e) {
+					LOG.error("SQLException, message: {}", e.getMessage());
+					LOG.debug("SQLException, message", e);
+					return false;
+				} catch (OperationException e) {
+					LOG.error("OperationException, message: {}", e.getMessage());
+					LOG.debug("OperationException, message", e);
+					return false;
+				}
+				
+				BigInteger maxSerial = BigInteger.ONE;
+				for(BigInteger serial : serials)
+				{
+					if(serial.compareTo(maxSerial) > 0)
+					{
+						maxSerial = serial;
+					}
+	
+					CertificateInfo certInfo;
+
+					try {
+						certInfo = certstore.getCertificateInfo(cacert, serial);
+					} catch (SQLException e) {
+						LOG.error("SQLException, message: {}", e.getMessage());
+						LOG.debug("SQLException, message", e);
+						return false;
+					} catch (OperationException e) {
+						LOG.error("OperationException, message: {}", e.getMessage());
+						LOG.debug("OperationException, message", e);
+						return false;
+					} catch (CertificateException e) {
+						LOG.error("CertificateException, message: {}", e.getMessage());
+						LOG.debug("CertificateException, message", e);
+						return false;
+					}
+					
+					publisher.certificateAdded(certInfo);
+				}
+				
+				startSerial = maxSerial.add(BigInteger.ONE);
+			}while(serials.size() >= numEntries);
+
+		}finally
+		{
+			caInfo.setStatus(status);
+		}
+		return true;
+	}
+	
+	
 	private boolean publishCRL(X509CRL crl)
 	{
 		X509CertificateWithMetaInfo cacert = caInfo.getCertificate();
@@ -661,19 +766,26 @@ public class X509CA
 		LOG.info("START revocateCertificate: ca={}, issuer={}, serialNumber={}, reason={}, invalidityTime={}",
 				new Object[]{caInfo.getName(), issuer, serialNumber, reason.getValue(), invalidityTime});
 		
-		int revocationResult = certstore.certificateRevoked(issuer, serialNumber, reason, invalidityTime);
-		
-		if(CERT_REVOCATED == revocationResult)
-		{
-			for(IdentifiedCertPublisher publisher : getPublishers())
+		numActiveRevocations.addAndGet(1);
+		int revocationResult;
+		try{
+			revocationResult = certstore.certificateRevoked(issuer, serialNumber, reason, invalidityTime);
+			
+			if(CERT_REVOCATED == revocationResult)
 			{
-				try{
-					publisher.certificateRevoked(issuer, serialNumber, reason.getValue().intValue(), invalidityTime);
-			    }
-			    catch (RuntimeException re) {
-			    	LOG.error("Error while publish certificate to the publisher " + publisher.getName(), re);
-			    }
+				for(IdentifiedCertPublisher publisher : getPublishers())
+				{
+					try{
+						publisher.certificateRevoked(issuer, serialNumber, reason.getValue().intValue(), invalidityTime);
+				    }
+				    catch (RuntimeException re) {
+				    	LOG.error("Error while publish certificate to the publisher " + publisher.getName(), re);
+				    }
+				}
 			}
+		}finally
+		{
+			numActiveRevocations.addAndGet(-1);
 		}
 		
 		LOG.info("SUCCESSFULL revocateCertificate: ca={}, issuer={}, serialNumber={}, reason={}, invalidityTime={}, revocationResult={} ({})",
@@ -751,6 +863,8 @@ public class X509CA
 		{
 			throw new CertAlreadyIssuedException("Certificate with the same subject as CA is not allowed");
 		}
+		String sha1FpSubject = certstore.fpCanonicalizedName(grantedSubject);
+		String grandtedSubjectText = grantedSubject.toString();
 		
 		if(keyUpdate)
 		{
@@ -767,187 +881,137 @@ public class X509CA
 			}
 		}
 		else
-		{		
-			boolean b = certstore.certIssued(this.caInfo.getCertificate(), grantedSubject.toString());
-			if(b)
+		{	
+			if(caInfo.isAllowDuplicateSubject() == false)
 			{
-				if(certProfile.incSerialNumberIfSubjectExists())
+				boolean b = certstore.certIssued(this.caInfo.getCertificate(), sha1FpSubject);
+				if(b)
 				{
-					do
-					{
-						grantedSubject = incSerialNumber(grantedSubject);
-					}while(certstore.certIssued(this.caInfo.getCertificate(), grantedSubject.toString()));					
-				}
-				else if(! caInfo.isAllowDuplicateSubject())
-				{
-					throw new CertAlreadyIssuedException("Certificate for the given subject already issued");
+					throw new CertAlreadyIssuedException("Certificate for the given subject " + grandtedSubjectText + " already issued");
 				}
 			}
 		}
-
-		StringBuilder msgBuilder = new StringBuilder();
-
-		if(subjectInfo.getWarning() != null)
-		{
-			msgBuilder.append(", ").append(subjectInfo.getWarning());
-		}
-			
-		notBefore = certProfile.getNotBefore(notBefore);
-		if(notBefore == null)
-		{
-			notBefore = new Date();
-		}
 		
-		Integer validity = certProfile.getValidity();
-		if(validity == null)
-		{
-			validity = caInfo.getMaxValidity();
-		}		
-		Date maxNotAfter = new Date(notBefore.getTime() + DAY * validity);
-		
-		if(notAfter != null)
-		{
-			if(notAfter.after(maxNotAfter))
+		// check request with the same subject is still in process
+		synchronized (pendingSubjectSha1Fps) {
+			if(pendingSubjectSha1Fps.contains(sha1FpSubject))
 			{
-				notAfter = maxNotAfter;
-				msgBuilder.append(", NotAfter modified");
+				throw new CertAlreadyIssuedException("Certificate for the given subject " + grandtedSubjectText + " already in process");
 			}
+			pendingSubjectSha1Fps.add(sha1FpSubject);
 		}
-		else
-		{
-			notAfter = maxNotAfter;
-		}		
-		
-		X509v3CertificateBuilder certBuilder = new X509v3CertificateBuilder(
-				caSubjectX500Name, 
-				nextSerial(),
-				notBefore,
-				notAfter,
-				grantedSubject,
-				publicKeyInfo);		
-		
-		CertificateInfo ret;
 		
 		try{
-			String warningMsg = addExtensions(
-					certBuilder, 
-					certProfile,
-					origCertProfileConf,
-					requestedSubject,
-					publicKeyInfo,
-					extensions,
-					caInfo.getPublicCAInfo());		
-			if(warningMsg != null && !warningMsg.isEmpty())
-			{
-				msgBuilder.append(", ").append(warningMsg);
-			}
-
-			ContentSigner contentSigner;
-			try {
-				contentSigner = caSigner.borrowContentSigner(signserviceTimeout);
-			} catch (NoIdleSignerException e) {
-				throw new OperationException(ErrorCode.System_Failure, "NoIdleSignerException: " + e.getMessage());
-			}
-
-			Certificate bcCert;
-			try{
-				bcCert = certBuilder.build(contentSigner).toASN1Structure();
-			}finally{
-				caSigner.returnContentSigner(contentSigner);
-			}
-			
-			byte[] encodedCert = bcCert.getEncoded();
-				
-			X509Certificate cert = (X509Certificate) cf.engineGenerateCertificate(new ByteArrayInputStream(encodedCert));
-			
-			try {
-				cert.verify(caInfo.getCertificate().getCert().getPublicKey());
-			} catch (Exception e) {
-				throw new OperationException(ErrorCode.System_Failure, "Signature of created certificate is invalid");
-			}
-			
-			X509CertificateWithMetaInfo certWithMeta = 
-					new X509CertificateWithMetaInfo(cert, grantedSubject.toString(), encodedCert);
-			
-			
-			ret = new CertificateInfo(certWithMeta, 
-					caInfo.getCertificate(), publicKeyInfo.getEncoded(), 
-					origCertProfileConf == null ? certProfileName : origCertProfileConf.getProfileName(), 
-					caInfo.getName());
-		} catch (CertificateException e) {
-			throw new OperationException(ErrorCode.System_Failure, "CertificateException: " + e.getMessage());
-		} catch (IOException e) {
-			throw new OperationException(ErrorCode.System_Failure, "IOException: " + e.getMessage());
-		} catch (CertProfileException e)
-		{
-			throw new OperationException(ErrorCode.System_Failure, "PasswordResolverException: " + e.getMessage());
-		} catch (BadCertTemplateException e) {
-			throw new OperationException(ErrorCode.BAD_CERT_TEMPLATE, e.getMessage());
-		}
-
-		if(msgBuilder.length() > 0)
-		{
-			ret.setWarningMessage(msgBuilder.substring(2));
-		}
-		
-		return ret;
-	}
+			StringBuilder msgBuilder = new StringBuilder();
 	
-	private static X500Name incSerialNumber(X500Name origName)
-	{
-		RDN[] rdns = origName.getRDNs();
-		
-		int commonNameIndex = -1;
-		int serialNumberIndex = -1;
-		for(int i = 0; i < rdns.length; i++)
-		{
-			RDN rdn = rdns[i];
-			ASN1ObjectIdentifier type = rdn.getFirst().getType();
-			if(ObjectIdentifiers.id_at_commonName.equals(type))
+			if(subjectInfo.getWarning() != null)
 			{
-				commonNameIndex = i;
+				msgBuilder.append(", ").append(subjectInfo.getWarning());
 			}
-			else if(ObjectIdentifiers.id_at_serialNumber.equals(type))
+				
+			notBefore = certProfile.getNotBefore(notBefore);
+			if(notBefore == null)
 			{
-				serialNumberIndex = i;
-			}
-		}
-
-		int serialNumber = 1;
-		if(serialNumberIndex != -1)
-		{
-			String s = IETFUtils.valueToString(rdns[serialNumberIndex].getFirst().getValue());
-			serialNumber = Integer.parseInt(s);
-			serialNumber++;
-		}
-		
-		RDN serialNumberRdn = new RDN(ObjectIdentifiers.id_at_serialNumber,
-				new DERPrintableString(Integer.toString(serialNumber)));
-		
-		if(serialNumberIndex != -1)
-		{
-			rdns[serialNumberIndex] = serialNumberRdn;
-			return new X500Name(rdns);
-		}
-		else
-		{
-			List<RDN> newRdns = new ArrayList<RDN>(rdns.length+1);
-			
-			if(commonNameIndex == -1)
-			{
-				newRdns.add(serialNumberRdn);
+				notBefore = new Date();
 			}
 			
-			for(int i = 0; i < rdns.length; i++)
+			Integer validity = certProfile.getValidity();
+			if(validity == null)
 			{
-				newRdns.add(rdns[i]);
-				if(i == commonNameIndex)
+				validity = caInfo.getMaxValidity();
+			}		
+			Date maxNotAfter = new Date(notBefore.getTime() + DAY * validity);
+			
+			if(notAfter != null)
+			{
+				if(notAfter.after(maxNotAfter))
 				{
-					newRdns.add(serialNumberRdn);
+					notAfter = maxNotAfter;
+					msgBuilder.append(", NotAfter modified");
 				}
 			}
+			else
+			{
+				notAfter = maxNotAfter;
+			}		
 			
-			return new X500Name(newRdns.toArray(new RDN[0]));
+			X509v3CertificateBuilder certBuilder = new X509v3CertificateBuilder(
+					caSubjectX500Name, 
+					nextSerial(),
+					notBefore,
+					notAfter,
+					grantedSubject,
+					publicKeyInfo);		
+			
+			CertificateInfo ret;
+			
+			try{
+				String warningMsg = addExtensions(
+						certBuilder, 
+						certProfile,
+						origCertProfileConf,
+						requestedSubject,
+						publicKeyInfo,
+						extensions,
+						caInfo.getPublicCAInfo());		
+				if(warningMsg != null && !warningMsg.isEmpty())
+				{
+					msgBuilder.append(", ").append(warningMsg);
+				}
+	
+				ContentSigner contentSigner;
+				try {
+					contentSigner = caSigner.borrowContentSigner(signserviceTimeout);
+				} catch (NoIdleSignerException e) {
+					throw new OperationException(ErrorCode.System_Failure, "NoIdleSignerException: " + e.getMessage());
+				}
+	
+				Certificate bcCert;
+				try{
+					bcCert = certBuilder.build(contentSigner).toASN1Structure();
+				}finally{
+					caSigner.returnContentSigner(contentSigner);
+				}
+				
+				byte[] encodedCert = bcCert.getEncoded();
+					
+				X509Certificate cert = (X509Certificate) cf.engineGenerateCertificate(new ByteArrayInputStream(encodedCert));
+				
+				try {
+					cert.verify(caInfo.getCertificate().getCert().getPublicKey());
+				} catch (Exception e) {
+					throw new OperationException(ErrorCode.System_Failure, "Signature of created certificate is invalid");
+				}
+				
+				X509CertificateWithMetaInfo certWithMeta = 
+						new X509CertificateWithMetaInfo(cert, grantedSubject.toString(), encodedCert);
+				
+				
+				ret = new CertificateInfo(certWithMeta, 
+						caInfo.getCertificate(), publicKeyInfo.getEncoded(), 
+						origCertProfileConf == null ? certProfileName : origCertProfileConf.getProfileName());
+			} catch (CertificateException e) {
+				throw new OperationException(ErrorCode.System_Failure, "CertificateException: " + e.getMessage());
+			} catch (IOException e) {
+				throw new OperationException(ErrorCode.System_Failure, "IOException: " + e.getMessage());
+			} catch (CertProfileException e)
+			{
+				throw new OperationException(ErrorCode.System_Failure, "PasswordResolverException: " + e.getMessage());
+			} catch (BadCertTemplateException e) {
+				throw new OperationException(ErrorCode.BAD_CERT_TEMPLATE, e.getMessage());
+			}
+	
+			if(msgBuilder.length() > 0)
+			{
+				ret.setWarningMessage(msgBuilder.substring(2));
+			}
+			
+			return ret;
+		}finally
+		{
+			synchronized (pendingSubjectSha1Fps) {
+				pendingSubjectSha1Fps.remove(sha1FpSubject);
+			}
 		}
 	}
 	

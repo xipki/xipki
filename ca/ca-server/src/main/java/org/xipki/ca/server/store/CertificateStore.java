@@ -18,6 +18,7 @@
 package org.xipki.ca.server.store;
 
 import java.math.BigInteger;
+import java.security.cert.CertificateException;
 import java.security.cert.X509CRL;
 import java.security.cert.X509Certificate;
 import java.sql.SQLException;
@@ -141,10 +142,10 @@ public class CertificateStore
 	}
 	
 	public boolean certIssued(X509CertificateWithMetaInfo caCert,
-			String subject)
+			String sha1FpSubject)
 	{
 		try {
-			return queryExecutor.certIssued(caCert, subject);
+			return queryExecutor.certIssued(caCert, sha1FpSubject);
 		} catch (OperationException e) {
 			LOG.error("queryExecutor.certIssued", e);
 			return false;
@@ -195,6 +196,16 @@ public class CertificateStore
 		return queryExecutor.getRevocatedCertificates(caCert, notExpiredAt, startSerial, numEntries);
 	}
 	
+	/**
+	 * 
+	 * @param caCert
+	 * @param notExpiredAt could be null.
+	 * @param startSerial
+	 * @param numEntries
+	 * @return
+	 * @throws SQLException
+	 * @throws OperationException
+	 */
 	public List<BigInteger> getCertSerials(X509CertificateWithMetaInfo caCert,
 			Date notExpiredAt, BigInteger startSerial, int numEntries)
 	throws SQLException, OperationException
@@ -208,10 +219,20 @@ public class CertificateStore
 		return queryExecutor.getEncodedCertificate(caCert, serial);
 	}
 	
+	public CertificateInfo getCertificateInfo(X509CertificateWithMetaInfo caCert, BigInteger serial)
+			throws SQLException, OperationException, CertificateException
+	{
+		return queryExecutor.getCertificateInfo(caCert, serial);
+	}
+	
 	public Long getGreatestSerialNumber(X509CertificateWithMetaInfo caCert)
 			throws SQLException, OperationException
 	{
 		return queryExecutor.getGreatestSerialNumber(caCert);
 	}
 	
+	public String fpCanonicalizedName(X500Name x500Name)
+	{
+		return queryExecutor.fp_canonicalized_name(x500Name);
+	}
 }

@@ -62,6 +62,19 @@ class CertprofileStore {
 		entries.put(name, id);
 	}
 	
+	synchronized String getName(Integer id)
+	{
+		for(String name : entries.keySet())
+		{
+			if(id == entries.get(name))
+			{
+				return name;
+			}
+		}
+		
+		return null;
+	}
+	
 	synchronized Integer getId(String name)
 	{
 		return entries.get(name);

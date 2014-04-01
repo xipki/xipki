@@ -34,6 +34,9 @@ public interface CAManager
 	
 	void publishRootCA(String caname) throws CAMgmtException;
 	
+	boolean republishCertificates(String caname, String publisherName)
+			throws CAMgmtException; 
+	
 	void removeCA(String caname) throws CAMgmtException;
 	
 	boolean restartCaSystem();
