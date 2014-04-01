@@ -71,6 +71,9 @@ public abstract class CmpResponder {
 	
 	protected final SecurityFactory securityFactory;
 	
+	
+	protected abstract boolean isCAInService();
+	
 	/**
 	 * @return never returns {@code null}.
 	 */
@@ -105,6 +108,11 @@ public abstract class CmpResponder {
 		
 		PKIHeader reqHeader = message.getHeader();
 		ASN1OctetString tid = reqHeader.getTransactionID();
+	
+		if(isCAInService() == false)
+		{
+			return buildErrorPkiMessage(tid, reqHeader, PKIFailureInfo.systemUnavail, "CA is out of service");
+		}
 		
 		checkRequestRecipient(reqHeader);
 		
