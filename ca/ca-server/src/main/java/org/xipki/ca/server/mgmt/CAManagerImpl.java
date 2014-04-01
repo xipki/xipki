@@ -2730,7 +2730,7 @@ public class CAManagerImpl implements CAManager
 		CertificateInfo ci;
 		try {
 			ci = new CertificateInfo(
-					certInfo, certInfo, encodedSubjectPublicKey, "UNKNOWN-Profile", caname);
+					certInfo, certInfo, encodedSubjectPublicKey, "UNKNOWN-Profile");
 		} catch (CertificateEncodingException e) {
 			throw new CAMgmtException(e);
 		}
@@ -2784,6 +2784,19 @@ public class CAManagerImpl implements CAManager
 		{
 			throw new CAMgmtException(e);
 		}
+	}
+
+	@Override
+	public boolean republishCertificates(String caname, String publisherName)
+			throws CAMgmtException 
+	{
+		X509CA ca = x509cas.get(caname);
+		if(ca == null)
+		{
+			throw new CAMgmtException("Cannot find CA named " + caname);
+		}
+
+		return ca.republishCertificates(publisherName);
 	}
 	
 }

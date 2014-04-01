@@ -152,11 +152,58 @@ class CertStatusStoreQueryExecutor
 			String certprofileName)
 			throws SQLException, CertificateEncodingException
 	{
-		final String SQL_ADD_CERT = 
-		    	"INSERT INTO cert " + 
-		    	"(id, last_update, serial, subject,"
-		    	+ " notbefore, notafter, revocated, certprofile_id, issuer_id)" + 
-				" VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+		addCert(issuer, certificate, certprofileName, false, null, null, null);
+	}
+	
+	/**
+	 * @throws SQLException if there is problem while accessing database.
+	 * @throws NoSuchAlgorithmException 
+	 * @throws CertificateEncodingException 
+	 */
+	void addCert(X509CertificateWithMetaInfo issuer,
+			X509CertificateWithMetaInfo certificate,
+			String certprofileName,
+			boolean revocated,
+			Date revocationTime,
+			Integer revocationReason,
+			Date invalidityTime)
+			throws SQLException, CertificateEncodingException
+	{
+		if(revocated)
+		{
+			if(revocationTime == null)
+			{
+				throw new IllegalArgumentException("revocationTime could not be null");
+			}
+		}
+
+		byte[] encodedCert = certificate.getEncodedCert();
+		String sha1FpCert = hashCalculator.hexHash(HashAlgoType.SHA1,   encodedCert);
+		boolean certRegistered = certRegistered(sha1FpCert);
+		if(certRegistered)
+		{
+			LOG.info("Certificate (issuer={}, serialNumber={}, subject={} already in the database, ignore it",
+					new Object[]{issuer.getSubject(), certificate.getCert().getSerialNumber(), certificate.getSubject()});
+			return;
+		}
+		
+		StringBuilder sb = new StringBuilder();
+    	sb.append("INSERT INTO cert "); 
+    	sb.append("(id, last_update, serial, subject");
+    	sb.append(", notbefore, notafter, revocated, certprofile_id, issuer_id");
+    	if(revocated)
+    	{
+    		sb.append(", rev_time, rev_invalidity_time, rev_reason");
+    	}
+    	sb.append(")");
+    	sb.append(" VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?");
+    	if(revocated)
+    	{
+    		sb.append(", ?, ?, ?");
+    	}
+    	sb.append(")");
+		
+    	final String SQL_ADD_CERT = sb.toString(); 
 
 		PreparedStatement ps = borrowPreparedStatement(SQL_ADD_CERT);
 		if(ps == null) {
@@ -177,10 +224,21 @@ class CertStatusStoreQueryExecutor
 			ps.setString(idx++, X509Util.canonicalizeName(cert.getSubjectX500Principal()));
 			ps.setLong(idx++, cert.getNotBefore().getTime()/1000);
 			ps.setLong(idx++, cert.getNotAfter().getTime()/1000);
-			ps.setBoolean(idx++, false);    			
+			ps.setBoolean(idx++, revocated);    			
 			ps.setInt(idx++, certprofileId);
 			ps.setInt(idx++, issuerId);
-
+			
+			if(revocated)
+			{
+				ps.setLong(idx++, revocationTime.getTime()/1000);
+				if(invalidityTime != null) {
+					ps.setLong(idx++, invalidityTime.getTime()/1000);
+				}else {
+					ps.setNull(idx++, Types.BIGINT);
+				}
+				ps.setInt(idx++, revocationReason == null? 0 : revocationReason.intValue());
+			}
+			
 			ps.executeUpdate();
 		}finally {
 			returnPreparedStatement(ps);
@@ -193,7 +251,6 @@ class CertStatusStoreQueryExecutor
 			throw new SQLException("Cannot create prepared insert_raw_cert statement");
 		}
     		
-		byte[] encodedCert = certificate.getEncodedCert();
 		try{
 			int idx = 1;
 			ps.setInt(idx++, certId);
@@ -215,7 +272,7 @@ class CertStatusStoreQueryExecutor
 		try{
 			int idx = 1;
 			ps.setInt(idx++, certId);
-			ps.setString(idx++, hashCalculator.hexHash(HashAlgoType.SHA1,   encodedCert));
+			ps.setString(idx++, sha1FpCert);
 			ps.setString(idx++, hashCalculator.hexHash(HashAlgoType.SHA224, encodedCert));
 			ps.setString(idx++, hashCalculator.hexHash(HashAlgoType.SHA256, encodedCert));
 			ps.setString(idx++, hashCalculator.hexHash(HashAlgoType.SHA384, encodedCert));
@@ -411,5 +468,69 @@ class CertStatusStoreQueryExecutor
 			LOG.warn("Cannot return prepared statement and connection", t);
 		}
 	}
-	
+
+	private boolean certRegistered(String sha1FpCert)
+			throws SQLException
+	{
+		String sql = "count(*) FROM certhash WHERE sha1_fp=?";
+		sql = createFetchFirstSelectSQL(sql, 1);
+		
+		PreparedStatement ps = borrowPreparedStatement(sql);
+		if(ps == null) {
+			throw new SQLException("Cannot create prepared statement");
+		}
+		
+		try{
+			int idx = 1;
+			ps.setString(idx++, sha1FpCert);
+			
+			ResultSet rs = ps.executeQuery();
+			try{
+				
+				if(rs.next())
+				{
+					return rs.getInt(1) > 0;
+				}
+			}finally{
+				rs.close();
+				rs = null;
+			}
+		}finally {
+			returnPreparedStatement(ps);
+		}
+		
+		return false;
+	}
+
+	private String createFetchFirstSelectSQL(String coreSql, int rows)
+	{
+		String prefix = "SELECT";
+		String suffix = "";
+		
+		switch(dataSource.getDatabaseType()) {
+			case DB2:
+				suffix = "FETCH FIRST " + rows + " ROWS ONLY"; 
+				break;
+			case INFORMIX:
+				prefix = "SELECT FIRST " + rows;
+				break;
+			case MSSQL2000:
+				prefix = "SELECT TOP " + rows;
+				break;
+			case MYSQL:
+				suffix = "LIMIT " + rows;
+				break;
+			case ORACLE:
+				 suffix = "AND ROWNUM <= " + rows;
+				break;
+			case POSTGRESQL:
+				suffix = " FETCH FIRST " + rows + " ROWS ONLY";
+				break;
+			default:
+				break;
+		}
+		
+		return prefix + " " + coreSql + " " + suffix;
+	}
+
 }

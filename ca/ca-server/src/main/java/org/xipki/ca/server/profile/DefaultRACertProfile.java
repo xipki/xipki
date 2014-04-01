@@ -133,11 +133,6 @@ public class DefaultRACertProfile implements CertProfile
 	}
 
 	@Override
-	public boolean incSerialNumberIfSubjectExists() {
-		return false;
-	}
-
-	@Override
 	public void checkPublicKey(SubjectPublicKeyInfo publicKey)
 			throws BadCertTemplateException
 	{		

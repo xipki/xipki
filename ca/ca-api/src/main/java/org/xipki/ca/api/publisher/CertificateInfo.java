@@ -18,6 +18,7 @@
 package org.xipki.ca.api.publisher;
 
 import java.security.cert.CertificateEncodingException;
+import java.util.Date;
 
 import org.xipki.ca.common.RequestorInfo;
 import org.xipki.ca.common.X509CertificateWithMetaInfo;
@@ -29,25 +30,27 @@ public class CertificateInfo
 	private final X509CertificateWithMetaInfo cert;
 	private final X509CertificateWithMetaInfo issuerCert;
 	private final String profileName;
-	private final String caName;
 	
 	private RequestorInfo requestor;
 	private String user;
 	
 	private String warningMessage;
 	
+	private boolean revocated;
+	private Integer revocationReason;
+	private Date revocationTime;
+	private Date invalidityTime;
+	
 	public CertificateInfo(X509CertificateWithMetaInfo cert, 
 			X509CertificateWithMetaInfo issuerCert,
 			byte[] subjectPublicKey,
-			String profileName,
-			String caName)
+			String profileName)
 		throws CertificateEncodingException
 	{
 		super();
 		ParamChecker.assertNotNull("cert", cert);
 		ParamChecker.assertNotNull("issuerCert", issuerCert);
 		ParamChecker.assertNotEmpty("profileName", profileName);
-		ParamChecker.assertNotEmpty("caName", caName);
 		ParamChecker.assertNotNull("subjectPublicKey", subjectPublicKey);
 		
 		this.cert = cert;
@@ -55,7 +58,6 @@ public class CertificateInfo
 		
 		this.issuerCert = issuerCert;
 		this.profileName = profileName;
-		this.caName = caName;
 	}
 
 	public byte[] getSubjectPublicKey()
@@ -86,10 +88,6 @@ public class CertificateInfo
 		this.warningMessage = warningMessage;
 	}
 
-	public String getCaName() {
-		return caName;
-	}
-
 	public RequestorInfo getRequestor() {
 		return requestor;
 	}
@@ -104,6 +102,38 @@ public class CertificateInfo
 
 	public void setUser(String user) {
 		this.user = user;
-	}	
+	}
+
+	public boolean isRevocated() {
+		return revocated;
+	}
+
+	public void setRevocated(boolean revocated) {
+		this.revocated = revocated;
+	}
+
+	public Integer getRevocationReason() {
+		return revocationReason;
+	}
+
+	public void setRevocationReason(Integer revocationReason) {
+		this.revocationReason = revocationReason;
+	}
+
+	public Date getRevocationTime() {
+		return revocationTime;
+	}
+
+	public void setRevocationTime(Date revocationTime) {
+		this.revocationTime = revocationTime;
+	}
+
+	public Date getInvalidityTime() {
+		return invalidityTime;
+	}
+
+	public void setInvalidityTime(Date invalidityTime) {
+		this.invalidityTime = invalidityTime;
+	}
 	
 }

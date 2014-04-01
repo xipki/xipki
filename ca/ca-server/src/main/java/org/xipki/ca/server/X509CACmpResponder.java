@@ -83,6 +83,7 @@ import org.bouncycastle.cert.crmf.CertificateRequestMessage;
 import org.bouncycastle.operator.ContentVerifierProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xipki.ca.api.CAStatus;
 import org.xipki.ca.api.CertAlreadyIssuedException;
 import org.xipki.ca.api.InsuffientPermissionException;
 import org.xipki.ca.api.OperationException;
@@ -123,7 +124,12 @@ public class X509CACmpResponder extends CmpResponder
 	{
 		return ca;
 	}	
-	
+
+	@Override
+	protected boolean isCAInService() {
+		return CAStatus.ACTIVE == ca.getCAInfo().getStatus();
+	}
+
 	@Override
 	protected PKIMessage intern_processPKIMessage(RequestorInfo requestor, String user, 
 			ASN1OctetString tid, GeneralPKIMessage message)
@@ -132,7 +138,7 @@ public class X509CACmpResponder extends CmpResponder
 		{
 			throw new IllegalArgumentException("Unknown requestor type " + requestor.getClass().getName());
 		}
-		
+
 		CmpRequestorInfo _requestor = (CmpRequestorInfo) requestor;
 		
 		PKIHeader reqHeader = message.getHeader();
@@ -951,4 +957,5 @@ public class X509CACmpResponder extends CmpResponder
 			throw new InsuffientPermissionException(msg);
 		}
 	}
+
 }

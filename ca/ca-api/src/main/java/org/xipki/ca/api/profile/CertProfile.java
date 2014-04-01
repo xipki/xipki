@@ -32,8 +32,6 @@ public interface CertProfile {
 	
 	void setEnvironmentParamterResolver(EnvironmentParameterResolver paramterResolver);
 
-	boolean incSerialNumberIfSubjectExists();
-	
 	Date getNotBefore(Date notBefore);
 	
 	Integer getValidity();

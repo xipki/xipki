@@ -195,12 +195,6 @@ public abstract class AbstractCertProfile implements CertProfile {
 	}	
 
 	@Override
-	public boolean incSerialNumberIfSubjectExists() {
-		return false;
-	}
-	
-
-	@Override
 	public void checkPublicKey(SubjectPublicKeyInfo publicKey)
 			throws BadCertTemplateException 
 	{		

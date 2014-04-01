@@ -102,9 +102,22 @@ public class DefaultCertPublisher implements CertPublisher {
 	public void certificateAdded(CertificateInfo certInfo)
 	{
 		try {
-			queryExecutor.addCert(certInfo.getIssuerCert(), 
-					certInfo.getCert(),
-					certInfo.getProfileName());
+			if(certInfo.isRevocated())
+			{
+				queryExecutor.addCert(certInfo.getIssuerCert(), 
+						certInfo.getCert(),
+						certInfo.getProfileName(),
+						certInfo.isRevocated(),
+						certInfo.getRevocationTime(),
+						certInfo.getRevocationReason(),
+						certInfo.getInvalidityTime());
+			}
+			else
+			{
+				queryExecutor.addCert(certInfo.getIssuerCert(), 
+						certInfo.getCert(),
+						certInfo.getProfileName());
+			}
 		} catch (Exception e) {			
 			LOG.error("Could not save certificate {}: {}. Message: {}",
 					new Object[]{certInfo.getCert().getSubject(),

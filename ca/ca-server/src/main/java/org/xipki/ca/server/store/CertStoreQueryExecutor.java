@@ -27,6 +27,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.CRLException;
 import java.security.cert.CertificateEncodingException;
+import java.security.cert.CertificateException;
 import java.security.cert.X509CRL;
 import java.security.cert.X509Certificate;
 import java.sql.Blob;
@@ -59,12 +60,15 @@ import org.bouncycastle.util.encoders.Hex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.ca.api.OperationException;
+import org.xipki.ca.api.OperationException.ErrorCode;
+import org.xipki.ca.api.publisher.CertificateInfo;
 import org.xipki.ca.common.CertBasedRequestorInfo;
 import org.xipki.ca.common.RequestorInfo;
 import org.xipki.ca.common.X509CertificateWithMetaInfo;
 import org.xipki.ca.server.CertRevocationInfo;
 import org.xipki.ca.server.CertStatus;
 import org.xipki.database.api.DataSource;
+import org.xipki.security.common.IoCertUtil;
 import org.xipki.security.common.ParamChecker;
 
 class CertStoreQueryExecutor
@@ -480,9 +484,7 @@ class CertStoreQueryExecutor
 		if(caCert == null) {
 			throw new IllegalArgumentException("caCert is null");
 		}
-		if(notExpiredAt == null) {
-			throw new IllegalArgumentException("notExpiredAt is null");
-		}
+
 		else if(numEntries < 1) {
 			throw new IllegalArgumentException("numSerials is not positive");
 		}
@@ -492,11 +494,15 @@ class CertStoreQueryExecutor
 			return Collections.emptyList();
 		}		
 		
-		String sql = "serial "
-				+ " FROM cert"
-				+ " WHERE cainfo_id=? AND serial>? AND notafter>?"
-				+ " ORDER BY serial ASC";
-		sql = createFetchFirstSelectSQL(sql, numEntries);
+		StringBuilder sb = new StringBuilder("serial FROM cert ");
+		sb.append(" WHERE cainfo_id=? AND serial>?");
+		if(notExpiredAt != null)
+		{
+			sb.append(" AND notafter>?");
+		}
+		sb.append(" ORDER BY serial ASC");
+		
+		final String sql = createFetchFirstSelectSQL(sb.toString(), numEntries);
 		PreparedStatement ps = borrowPreparedStatement(sql);
 		
 		ResultSet rs = null;
@@ -504,7 +510,10 @@ class CertStoreQueryExecutor
 			int idx = 1;
 			ps.setInt(idx++, caId.intValue());
 			ps.setLong(idx++, (startSerial == null)? 0 : startSerial.longValue()-1);
-			ps.setLong(idx++, notExpiredAt.getTime()/1000 + 1);
+			if(notExpiredAt != null)
+			{
+				ps.setLong(idx++, notExpiredAt.getTime()/1000 + 1);
+			}
 			rs = ps.executeQuery();
 			
 			List<BigInteger> ret = new ArrayList<BigInteger>();
@@ -649,6 +658,92 @@ class CertStoreQueryExecutor
 		return null;
 	}
 	
+
+	CertificateInfo getCertificateInfo(X509CertificateWithMetaInfo caCert, BigInteger serial)
+	throws SQLException, OperationException, CertificateException
+	{
+		ParamChecker.assertNotNull("caCert", caCert);
+		ParamChecker.assertNotNull("serial", serial);
+
+		Integer caId = getCaId(caCert);
+		if(caId == null) {
+			return null;
+		}		
+
+		final String col_certprofileinfo_id = "certprofileinfo_id";
+		final String col_subject = "subject";
+		final String col_revocated = "revocated";
+		final String col_rev_reason = "rev_reason";
+		final String col_rev_time = "rev_time";
+		final String col_rev_invalidity_time = "rev_invalidity_time";
+		final String col_cert = "cert";
+		
+		String sql = "t1." + col_certprofileinfo_id + " " + col_certprofileinfo_id +
+				", t1." + col_subject + " " + col_subject +
+				", t1." + col_revocated + " " + col_revocated + 
+				", t1." + col_rev_reason + " " + col_rev_reason + 
+				", t1." + col_rev_time + " " + col_rev_time +
+				", t1." + col_rev_invalidity_time + " " + col_rev_invalidity_time + 
+				", t2." + col_cert + " " + col_cert +
+				" FROM cert t1, rawcert t2" +
+				" WHERE t1.cainfo_id=? AND t1.serial=? AND t2.cert_id=t1.id";
+		
+		sql = createFetchFirstSelectSQL(sql, 1);
+		PreparedStatement ps = borrowPreparedStatement(sql);
+		
+		ResultSet rs = null;
+		try{
+			int idx = 1;
+			ps.setInt(idx++, caId.intValue());
+			ps.setLong(idx++, serial.longValue());
+			rs = ps.executeQuery();
+			
+			if(rs.next()) {
+				String b64Cert = rs.getString(col_cert);				
+				byte[] encodedCert = Base64.decode(b64Cert);
+				X509Certificate cert = IoCertUtil.parseCert(encodedCert);
+				
+				int certProfileInfo_id = rs.getInt(col_certprofileinfo_id);
+				String certProfileName = certprofileStore.getName(certProfileInfo_id);
+				
+				String subject = rs.getString(col_subject);
+				
+				X509CertificateWithMetaInfo certWithMeta = new X509CertificateWithMetaInfo(cert, subject, encodedCert);
+				
+				CertificateInfo certInfo = new CertificateInfo(certWithMeta,
+						caCert, cert.getPublicKey().getEncoded(), certProfileName);
+				
+				boolean revocated = rs.getBoolean(col_revocated);
+				certInfo.setRevocated(revocated);
+
+				if(revocated)
+				{
+					int rev_reason = rs.getInt(col_rev_reason);
+					certInfo.setRevocationReason(rev_reason);
+					
+					long rev_time = rs.getLong(col_rev_time);
+					certInfo.setRevocationTime(new Date(rev_time * 1000));
+					
+					long invalidity_time = rs.getLong(col_rev_invalidity_time);
+					certInfo.setInvalidityTime(new Date(invalidity_time * 1000));					
+				}
+				
+				return certInfo;
+			}
+		} catch (IOException e) {
+			throw new OperationException(ErrorCode.System_Failure, "IOException: " + e.getMessage());
+		}finally {
+			returnPreparedStatement(ps);
+			if(rs != null) {
+				rs.close();
+				rs = null;
+			}
+		}
+		
+		return null;
+	}
+	
+
 	List<CertRevocationInfo> getRevocatedCertificates(X509CertificateWithMetaInfo caCert,
 			Date notExpiredAt, BigInteger startSerial, int numEntries)
 	throws SQLException, OperationException
@@ -746,19 +841,16 @@ class CertStoreQueryExecutor
 		}
 	}
 	
-	boolean certIssued(X509CertificateWithMetaInfo caCert, String subject)
+	boolean certIssued(X509CertificateWithMetaInfo caCert, String sha1FpSubject)
 			throws OperationException, SQLException
 	{
-		byte[] encodedCert = caCert.getEncodedCert();		
+		byte[] encodedCert = caCert.getEncodedCert();
 		Integer caId =  caInfoStore.getCaIdForCert(encodedCert);
 
 		if(caId == null)
 		{
 			return false;
 		}
-		
-		X500Name name = new X500Name(subject);
-		String sha1_fp_subject = fp_canonicalized_name(name);
 		
 		String sql = "count(*) FROM cert WHERE cainfo_id=? AND sha1_fp_subject=?";
 		sql = createFetchFirstSelectSQL(sql, 1);
@@ -771,7 +863,7 @@ class CertStoreQueryExecutor
 		try{
 			int idx = 1;
 			ps.setInt(idx++, caId);
-			ps.setString(idx++, sha1_fp_subject);
+			ps.setString(idx++, sha1FpSubject);
 			
 			ResultSet rs = ps.executeQuery();
 			try{
@@ -1008,7 +1100,7 @@ class CertStoreQueryExecutor
 	 * @param name
 	 * @return
 	 */
-	private String fp_canonicalized_name(X500Name name)
+	public String fp_canonicalized_name(X500Name name)
 	{
 		ASN1ObjectIdentifier[] _types = name.getAttributeTypes();
 		int n = _types.length;
