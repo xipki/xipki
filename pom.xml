@@ -117,7 +117,7 @@
 				<version>2.3.7</version>
 				<configuration>
 					<instructions>
-						<Bundle-Vendor>Lijun Liao</Bundle-Vendor>
+						<Bundle-Vendor>Lijun Liao (xipki.org)</Bundle-Vendor>
 						<Bundle-Build-Id>${buildNumber}</Bundle-Build-Id>
 						<Bundle-Build-Timestamp>${timestamp}</Bundle-Build-Timestamp>
 					</instructions>
@@ -137,10 +137,10 @@
 					</execution>
 				</executions>
 			</plugin>
-			<!--plugin>
+			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>buildnumber-maven-plugin</artifactId>
-				<version>1.0-beta-4</version>
+				<version>1.1</version>
 				<executions>
 					<execution>
 						<phase>validate</phase>
@@ -150,13 +150,14 @@
 					</execution>
 				</executions>
 				<configuration>
+					<shortRevisionLength>8</shortRevisionLength>
 					<doCheck>false</doCheck>
 					<doUpdate>false</doUpdate>
 					<getRevisionOnlyOnce>true</getRevisionOnlyOnce>
-					<revisionOnScmFailure>NO_SVN</revisionOnScmFailure>
+					<revisionOnScmFailure>NO_GIT</revisionOnScmFailure>
 					<timestampFormat>{0,date,yyyy-MM-dd-HH:mm:ss}</timestampFormat>
 				</configuration>
-			</plugin-->
+			</plugin>
 		</plugins>
 	</build>
 	<dependencies>
