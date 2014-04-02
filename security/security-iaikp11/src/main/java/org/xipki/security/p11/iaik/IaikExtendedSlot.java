@@ -537,7 +537,10 @@ public class IaikExtendedSlot{
 		
 		if(b != null && b.booleanValue())
 		{
-			signingKeysById.put(Hex.toHexString(id).toUpperCase(), privateKey);
+			if(id != null)
+			{
+				signingKeysById.put(Hex.toHexString(id).toUpperCase(), privateKey);
+			}
 			if(label != null)
 			{
 				signingKeysByLabel.put(label, privateKey);
