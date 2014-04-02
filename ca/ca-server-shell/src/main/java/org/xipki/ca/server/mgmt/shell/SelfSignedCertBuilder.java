@@ -188,7 +188,13 @@ class SelfSignedCertBuilder {
 		throws OperationException
 	{
 		String certProfileName = certProfile.getName();
-		
+	
+		try{
+			certProfile.checkPublicKey(publicKeyInfo);
+		} catch (BadCertTemplateException e) {
+			throw new OperationException(ErrorCode.BAD_CERT_TEMPLATE, e.getMessage());
+		}
+
 		SubjectInfo subjectInfo;
 		// subject
 		try{
