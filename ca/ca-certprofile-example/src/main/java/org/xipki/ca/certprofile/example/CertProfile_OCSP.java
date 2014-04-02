@@ -65,8 +65,8 @@ public class CertProfile_OCSP extends AbstractEeCertProfile {
 	}
 	
 	@Override
-	public Integer getValidity() {
-		return 365 * 2;
+	protected int getMaxValidity() {
+		return 5 * 365;
 	}
 
 	@Override

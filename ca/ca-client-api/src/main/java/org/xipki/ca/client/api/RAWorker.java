@@ -53,7 +53,7 @@ public interface RAWorker
 	EnrollCertResult requestCert(CertReqMsg request, String extCertReqId, String caName)
 	throws RAWorkerException, PKIErrorException;
 	
-	CertReqMsg getCertReqMsgWithAppliedCertProfile(CertRequest request, String certReqId, String certProfile, ProofOfPossession popo)
+	CertReqMsg getCertReqMsgWithAppliedCertProfile(CertRequest request, String certProfile, ProofOfPossession popo)
 	throws RAWorkerException;
 	
 	CertIDOrError revocateCert(X500Name issuer, BigInteger serial, int reason)
