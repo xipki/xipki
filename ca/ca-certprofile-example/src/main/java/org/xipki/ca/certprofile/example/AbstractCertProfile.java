@@ -38,14 +38,15 @@ import org.xipki.ca.api.profile.ExtensionTuples;
 import org.xipki.ca.api.profile.KeyUsage;
 import org.xipki.ca.api.profile.SubjectInfo;
 import org.xipki.ca.certprofile.example.internal.X509Util;
+import org.xipki.security.common.CmpUtf8Pairs;
 import org.xipki.security.common.EnvironmentParameterResolver;
 
 public abstract class AbstractCertProfile implements CertProfile {
-	protected abstract void checkSubjectContent(X500Name requestedSubject) throws BadCertTemplateException;
+	public static final String CONF_KEY_validity = "validity";
 
-	@Override
-	public void initialize(String data) throws CertProfileException {	
-	}
+	private Integer validity;
+
+	protected abstract void checkSubjectContent(X500Name requestedSubject) throws BadCertTemplateException;
 
 	protected abstract Set<KeyUsage> getKeyUsage();
 	
@@ -55,6 +56,51 @@ public abstract class AbstractCertProfile implements CertProfile {
 	
 	protected abstract Map<ASN1ObjectIdentifier, ExtensionOccurrence> getAdditionalExtensionOccurences();
 		
+	protected abstract int getMaxValidity();
+
+	@Override
+	public Integer getValidity() {
+		if(validity == null)
+		{
+			throw new RuntimeException("CertProfile not initialized");
+		}
+		return validity;
+	}
+	
+	@Override
+	public void initialize(String data) throws CertProfileException 
+	{	
+		Integer pValidity = null;
+		if(data != null && data.isEmpty() == false)
+		{
+			CmpUtf8Pairs utf8Pairs = new CmpUtf8Pairs(data);
+			String validityS = utf8Pairs.getValue(CONF_KEY_validity);
+			if(validityS != null)
+			{
+				try{
+					pValidity = Integer.parseInt(validityS);
+				}catch(NumberFormatException e)
+				{
+					throw new CertProfileException("invalid validity " + validityS);
+				}
+			}
+		}
+		
+		int maxValidity = getMaxValidity();
+		if(pValidity == null)
+		{
+			validity = maxValidity;
+		}
+		else
+		{
+			if(pValidity < 1 || pValidity > maxValidity)
+			{
+				throw new CertProfileException("validity not within [1,"+ maxValidity + "]");
+			}
+			validity = pValidity.intValue();
+		}		
+	}
+	
 	@Override
 	public boolean isOnlyForRA() {
 		return false;
@@ -169,12 +215,6 @@ public abstract class AbstractCertProfile implements CertProfile {
 		return (value == null) ? null : new ExtensionTuple(type, critical, value);
 	}
 	
-
-	@Override
-	public ExtensionOccurrence getOccurenceOfAuthorityKeyIdentifier() {
-		return ExtensionOccurrence.NONCRITICAL_REQUIRED;
-	}
-
 	@Override
 	public ExtensionOccurrence getOccurenceOfSubjectKeyIdentifier() {
 		return ExtensionOccurrence.NONCRITICAL_REQUIRED;

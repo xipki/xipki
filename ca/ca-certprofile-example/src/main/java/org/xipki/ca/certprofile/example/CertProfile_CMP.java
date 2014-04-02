@@ -58,8 +58,8 @@ public class CertProfile_CMP extends AbstractEeCertProfile {
 	}
 	
 	@Override
-	public Integer getValidity() {
-		return 365 * 5;
+	protected int getMaxValidity() {
+		return 5 * 365;
 	}
 
 	@Override
