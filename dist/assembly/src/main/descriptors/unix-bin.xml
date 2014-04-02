@@ -70,6 +70,16 @@
             <directoryMode>0755</directoryMode>
         </fileSet>
 
+        <fileSet>
+            <directory>${project.basedir}/../../datasource/sql</directory>
+            <includes>
+                <include>*.sql</include>
+            </includes>
+            <outputDirectory>sql</outputDirectory>
+            <fileMode>0644</fileMode>
+            <directoryMode>0755</directoryMode>
+        </fileSet>
+
         <!-- Copy over start scripts -->
         <fileSet>
             <!-- in case we replace them with updated scripts
