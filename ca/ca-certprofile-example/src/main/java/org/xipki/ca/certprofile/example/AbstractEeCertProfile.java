@@ -17,9 +17,16 @@
 
 package org.xipki.ca.certprofile.example;
 
+import org.xipki.ca.api.profile.ExtensionOccurrence;
+
 
 public abstract class AbstractEeCertProfile extends AbstractCertProfile {
 
+	@Override
+	public ExtensionOccurrence getOccurenceOfAuthorityKeyIdentifier() {
+		return ExtensionOccurrence.NONCRITICAL_REQUIRED;
+	}
+	
 	@Override
 	protected boolean isCa() {
 		return false;

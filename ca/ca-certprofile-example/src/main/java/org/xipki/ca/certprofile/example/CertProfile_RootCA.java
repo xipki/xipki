@@ -52,13 +52,18 @@ public class CertProfile_RootCA extends AbstractCertProfile {
 	}	
 	
 	@Override
+	public ExtensionOccurrence getOccurenceOfAuthorityKeyIdentifier() {
+		return null;
+	}
+
+	@Override
 	public Date getNotBefore(Date notBefore){
 		return new Date();
 	}
 	
 	@Override
-	public Integer getValidity() {
-		return 365*8;
+	protected int getMaxValidity() {
+		return 10 * 365;
 	}
 
 	@Override
