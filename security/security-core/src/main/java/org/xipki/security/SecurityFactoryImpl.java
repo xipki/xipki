@@ -28,6 +28,7 @@ import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.PublicKey;
+import java.security.Security;
 import java.security.Signature;
 import java.security.SignatureException;
 import java.security.cert.X509Certificate;
@@ -39,11 +40,13 @@ import org.bouncycastle.asn1.DERNull;
 import org.bouncycastle.asn1.nist.NISTObjectIdentifiers;
 import org.bouncycastle.asn1.pkcs.CertificationRequest;
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
+import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.bouncycastle.asn1.x509.X509ObjectIdentifiers;
 import org.bouncycastle.asn1.x9.X9ObjectIdentifiers;
 import org.bouncycastle.cert.X509CertificateHolder;
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.operator.ContentSigner;
 import org.bouncycastle.operator.ContentVerifierProvider;
 import org.bouncycastle.operator.OperatorCreationException;
@@ -69,6 +72,10 @@ public class SecurityFactoryImpl implements SecurityFactory {
 	private String pkcs11Module;
 	
 	public SecurityFactoryImpl() {
+		if(Security.getProvider("BC") == null)
+		{
+			Security.addProvider(new BouncyCastleProvider());
+		}
 	}
 
 	@Override
@@ -114,7 +121,22 @@ public class SecurityFactoryImpl implements SecurityFactory {
 			boolean valid = verifier.verify(signatureValue);
 			if(valid == false)
 			{
-				throw new SignerException("The given signer and certificate do not match");
+				String subject = X500Name.getInstance(
+						cert.getSubjectX500Principal().getEncoded()).toString();
+
+				StringBuilder sb = new StringBuilder();
+				sb.append("Signer and certificate not match. ");
+				sb.append("signer type='").append(type).append("'; ");
+				
+				String pwd = keyValues.getValue("password");
+				if(pwd != null)
+				{
+					keyValues.putUtf8Pair("password", "****");
+				}				
+				sb.append("conf='").append(keyValues.getEncoded()).append("', ");				
+				sb.append("certificate subject='").append(subject).append("'");
+				
+				throw new SignerException(sb.toString());
 			}
 		} catch (IOException e) {
 			throw new SignerException(e.getMessage(), e);
