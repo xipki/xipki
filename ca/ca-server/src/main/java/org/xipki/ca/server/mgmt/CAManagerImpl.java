@@ -352,7 +352,13 @@ public class CAManagerImpl implements CAManager
 					caEntry.getPublicCAInfo().setCrlSignerCertificate(identifiedSigner.getCertificate());
 				}
 				
-				crlSigner = new CrlSigner(identifiedSigner, crlSignerEntry.getPeriod(), crlSignerEntry.getOverlap());
+				try {
+					crlSigner = new CrlSigner(identifiedSigner, crlSignerEntry.getPeriod(), crlSignerEntry.getOverlap());
+				} catch (OperationException e) {
+					LOG.error("CrlSigner.<init> (ca=" + caName + "): {}", e.getMessage());
+					LOG.debug("CrlSigner.<init> (ca=" + caName + ")", e);
+					return false;
+				}
 				crlSigner.setIncludeCertsInCrl(crlSignerEntry.includeCertsInCRL());
 			}
 			
@@ -363,11 +369,13 @@ public class CAManagerImpl implements CAManager
 						caEntry.getCertificate().getCert(),
 						passwordResolver);
 			} catch (PasswordResolverException e) {
-				LOG.error("security.createSigner caSigner (ca=" + caName + ")", e);
+				LOG.error("security.createSigner caSigner (ca=" + caName + "): {}", e.getMessage());
+				LOG.debug("security.createSigner caSigner (ca=" + caName + ")", e);
 				return false;
 			} catch (SignerException e)
 			{
-				LOG.error("security.createSigner caSigner (ca=" + caName + ")", e);
+				LOG.error("security.createSigner caSigner (ca=" + caName + "): {}", e.getMessage());
+				LOG.debug("security.createSigner caSigner (ca=" + caName + ")", e);
 				return false;
 			}
 			
@@ -375,7 +383,8 @@ public class CAManagerImpl implements CAManager
 			try {
 				ca = new X509CA(this, caEntry, caSigner, certstore, crlSigner);
 			} catch (OperationException e) {
-				LOG.error("X509CA.<init> (ca=" + caName + ")", e);
+				LOG.error("X509CA.<init> (ca=" + caName + "): {}", e.getMessage());
+				LOG.debug("X509CA.<init> (ca=" + caName + ")", e);
 				return false;
 			}
 			
@@ -389,11 +398,13 @@ public class CAManagerImpl implements CAManager
 							responder.getType(), responder.getConf(), responder.getCertificate(),
 							passwordResolver);
 				} catch (PasswordResolverException e) {
-					LOG.error("X509CA.<init>", e);
+					LOG.error("X509CA.<init>: {}", e.getMessage());
+					LOG.debug("X509CA.<init>", e);
 					return false;
 				} catch (SignerException e)
 				{
-					LOG.error("X509CA.<init>", e);
+					LOG.error("X509CA.<init>: {}", e.getMessage());
+					LOG.debug("X509CA.<init>", e);
 					return false;
 				}		
 
@@ -410,7 +421,8 @@ public class CAManagerImpl implements CAManager
 									X509Util.createX509CertWithMeta(cmpRequestorEntry.getCert()),
 									entry.isRa());
 						} catch (CertificateEncodingException e) {
-							LOG.error("CmpRequestorInfo.<init> (ca=" + caName + ")", e);
+							LOG.error("CmpRequestorInfo.<init> (ca=" + caName + "): {}", e.getMessage());
+							LOG.debug("CmpRequestorInfo.<init> (ca=" + caName + ")", e);
 							return false;
 						}
 						requestorInfo.setPermissions(entry.getPermissions());

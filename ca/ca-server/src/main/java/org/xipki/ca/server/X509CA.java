@@ -52,10 +52,13 @@ import org.bouncycastle.asn1.x509.CRLDistPoint;
 import org.bouncycastle.asn1.x509.CRLReason;
 import org.bouncycastle.asn1.x509.Certificate;
 import org.bouncycastle.asn1.x509.CertificateList;
+import org.bouncycastle.asn1.x509.DistributionPointName;
 import org.bouncycastle.asn1.x509.Extension;
 import org.bouncycastle.asn1.x509.Extensions;
 import org.bouncycastle.asn1.x509.GeneralName;
 import org.bouncycastle.asn1.x509.GeneralNames;
+import org.bouncycastle.asn1.x509.IssuingDistributionPoint;
+import org.bouncycastle.asn1.x509.ReasonFlags;
 import org.bouncycastle.asn1.x509.SubjectKeyIdentifier;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.bouncycastle.cert.CertIOException;
@@ -97,6 +100,7 @@ import org.xipki.security.common.ParamChecker;
 
 public class X509CA 
 {
+	public static final long MINUTE = 60L * 1000;
 	public static final int CERT_REVOCATED = 1;
 	public static final int CERT_NOT_EXISTS = 2;
 	public static final int CERT_REVOCATION_EXCEPTION = 3;
@@ -180,13 +184,13 @@ public class X509CA
 				throw new OperationException(ErrorCode.System_Failure, "SQLException: " + e.getMessage());
 			}
 
-			long period = crlSigner.getPeriod() - crlSigner.getOverlap();
+			long period = crlSigner.getPeriod();
 
-			long now = System.currentTimeMillis() / 1000;
+			long now = System.currentTimeMillis() / 1000; // in seconds
 
 			long initialDelay;
 			if(lastThisUpdate == 0 || // no CRL available
-			   now >= lastThisUpdate + period*60) // no CRL is created in the period
+			   now >= lastThisUpdate + period * 60) // no CRL is created in the period
 			{
 				initialDelay = 5; // generate CRL in 5 minutes to wait for the initialization of CA
 			}
@@ -197,7 +201,7 @@ public class X509CA
 			
 			ScheduledCRLGenerationService crlGenerationService = new ScheduledCRLGenerationService();
 			caManager.getScheduledThreadPoolExecutor().scheduleAtFixedRate(
-					crlGenerationService, initialDelay, period, TimeUnit.MINUTES);
+					crlGenerationService, initialDelay, crlSigner.getPeriod(), TimeUnit.MINUTES);
 		}
 		
 		Long greatestSerialNumber;
@@ -275,7 +279,6 @@ public class X509CA
 		}
 	}
 
-	// TODO: add nextUpdate for periodically generated CRL 
 	public X509CRL generateCRL()
 	throws OperationException
 	{		
@@ -292,13 +295,19 @@ public class X509CA
 			synchronized (crlLock) {
 				ConcurrentContentSigner signer = crlSigner.getSigner();
 				
-				boolean caAsIssuer = signer == null;
-				X500Name crlIssuer = caAsIssuer ? caSubjectX500Name :
+				boolean directCRL = signer == null;
+				X500Name crlIssuer = directCRL ? caSubjectX500Name :
 					X500Name.getInstance(signer.getCertificate().getSubjectX500Principal().getEncoded());
 				
 				Date thisUpdate = new Date();
 				X509v2CRLBuilder crlBuilder = new X509v2CRLBuilder(crlIssuer, thisUpdate);
-		
+				if(crlSigner.getPeriod() > 0)
+				{
+					Date nextUpdate = new Date(thisUpdate.getTime() + 
+							(crlSigner.getPeriod() + crlSigner.getOverlap()) * MINUTE);
+					crlBuilder.setNextUpdate(nextUpdate);
+				}
+				
 				BigInteger startSerial = BigInteger.ONE;
 				final int numEntries = 100;
 				
@@ -326,7 +335,7 @@ public class X509CA
 						Date revocationTime = revInfo.getRevocationTime();
 						Date invalidityTime = revInfo.getInvalidityTime();
 						
-						if(caAsIssuer || ! isFirstCRLEntry)
+						if(directCRL || ! isFirstCRLEntry)
 						{
 							crlBuilder.addCRLEntry(revInfo.getSerial(), revocationTime, reason, invalidityTime);
 						}
@@ -356,7 +365,6 @@ public class X509CA
 					
 				}while(revInfos.size() >= numEntries);
 				
-				// add extension CRL Number
 				int crlNumber;
 				try{
 					crlNumber = certstore.getNextFreeCRLNumber(cacert);
@@ -365,8 +373,27 @@ public class X509CA
 					LOG.error("getNextFreeCRLNumber", e);
 					throw new OperationException(ErrorCode.System_Failure, e.getMessage());
 				}
+
 				try{
+					// AuthorityKeyIdentifier
+					byte[] akiValues = directCRL ? this.caSKI : crlSigner.getSubjectKeyIdentifier();
+					AuthorityKeyIdentifier aki = new AuthorityKeyIdentifier(akiValues);
+					crlBuilder.addExtension(Extension.authorityKeyIdentifier, false, aki);
+
+					// add extension CRL Number
 					crlBuilder.addExtension(Extension.cRLNumber, false, new ASN1Integer(crlNumber));
+
+					// IssuingDistributionPoint
+					IssuingDistributionPoint idp = new IssuingDistributionPoint(
+							(DistributionPointName) null, // distributionPoint,
+							true, // onlyContainsUserCerts,
+							false, // onlyContainsCACerts,
+							(ReasonFlags) null, // onlySomeReasons,
+							true, // indirectCRL,
+							false // onlyContainsAttributeCerts
+							);
+					
+					crlBuilder.addExtension(Extension.issuingDistributionPoint, true, idp);
 				} catch (CertIOException e) {
 					LOG.error("crlBuilder.addExtension", e);
 					throw new OperationException(ErrorCode.System_Failure, e.getMessage());
@@ -1219,10 +1246,8 @@ public class X509CA
 		@Override
 		public void run() {
 			try {
-				commitNextSerial();
-			} catch (CAMgmtException e) {
-				LOG.error("Could not increment the next_serial, CAMgmtException: {}", e.getMessage());
-				LOG.debug("Could not increment the next_serial, CAMgmtException", e);
+				generateCRL();
+			} catch (OperationException e) {
 			}
 		}
 	}
@@ -1234,7 +1259,8 @@ public class X509CA
 			try {
 				commitNextSerial();
 			} catch (CAMgmtException e) {
-				LOG.error("Error while commit next_serial", e);
+				LOG.error("Could not increment the next_serial, CAMgmtException: {}", e.getMessage());
+				LOG.debug("Could not increment the next_serial, CAMgmtException", e);
 			}
 		}
 	}
