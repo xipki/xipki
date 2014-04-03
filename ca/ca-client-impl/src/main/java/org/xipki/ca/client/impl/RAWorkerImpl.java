@@ -245,7 +245,7 @@ public final class RAWorkerImpl extends AbstractRAWorker implements RAWorker
 				Set<String> profiles = new HashSet<String>(st.countTokens());
 				while(st.hasMoreTokens())
 				{
-					profiles.add(st.nextToken());
+					profiles.add(st.nextToken().trim());
 				}
 
 				CAConf ca = new CAConf(caname, _serviceUrl, IoCertUtil.parseCert(_cacertFile), profiles,
@@ -818,7 +818,7 @@ public final class RAWorkerImpl extends AbstractRAWorker implements RAWorker
 			CAConf ca = casMap.get(caname);
 			if(! ca.getProfiles().contains(certProfile))
 			{
-				throw new RAWorkerException("cert profile " + certProfile + " is not supported by the CAConf " + caname);
+				throw new RAWorkerException("cert profile " + certProfile + " is not supported by the CA " + caname);
 			}
 		}
 	}
