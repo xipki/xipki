@@ -493,7 +493,7 @@ public class X509CA
         }
         catch (IOException e)
         {
-            throw new IllegalArgumentException("error encoding reason: " + e);
+            throw new IllegalArgumentException("error encoding reason: " + e.getMessage(), e);
         }
     }
 
@@ -506,7 +506,7 @@ public class X509CA
         }
         catch (IOException e)
         {
-            throw new IllegalArgumentException("error encoding reason: " + e);
+            throw new IllegalArgumentException("error encoding reason: " + e.getMessage(), e);
         }
     }
     
@@ -524,7 +524,7 @@ public class X509CA
         }
         catch (IOException e)
         {
-            throw new IllegalArgumentException("error encoding reason: " + e);
+            throw new IllegalArgumentException("error encoding reason: " + e.getMessage(), e);
         }
     }
 
@@ -573,7 +573,8 @@ public class X509CA
 				return ret;
 			}catch(RuntimeException e)
 			{
-				LOG.warn("RuntimeException in generateCertificate()", e);
+				LOG.warn("RuntimeException in generateCertificate(): {}", e.getMessage());
+				LOG.debug("RuntimeException in generateCertificate()", e);
 				throw new OperationException(ErrorCode.System_Failure, "RuntimeException:  " + e.getMessage());
 			}
 		}finally

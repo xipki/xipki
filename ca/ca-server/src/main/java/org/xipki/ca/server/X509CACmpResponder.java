@@ -885,11 +885,14 @@ public class X509CACmpResponder extends CmpResponder
 			ContentVerifierProvider cvp = securityFactory.getContentVerifierProvider(publicKey);
 			return certRequest.isValidSigningKeyPOP(cvp);
 		} catch (InvalidKeyException e) {
-			LOG.error("isSignatureValid" , e);
+			LOG.error("verifyPOP, InvalidKeyException: {}" , e.getMessage());
+			LOG.debug("verifyPOP" , e);
 		} catch (IllegalStateException e) {
-			LOG.error("isSignatureValid" , e);
+			LOG.error("verifyPOP, IllegalStateException: {}" , e.getMessage());
+			LOG.debug("verifyPOP" , e);
 		} catch (CRMFException e) {
-			LOG.error("isSignatureValid" , e);
+			LOG.error("verifyPOP, CRMFException: {}" , e.getMessage());
+			LOG.debug("verifyPOP" , e);
 		}
 		return false;
 	}
