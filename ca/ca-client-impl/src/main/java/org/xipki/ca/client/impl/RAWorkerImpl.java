@@ -469,47 +469,7 @@ public final class RAWorkerImpl extends AbstractRAWorker implements RAWorker
 	throws RAWorkerException, PKIErrorException
 	{
 		ParamChecker.assertNotNull("request", request);
-		
-		AttributeTypeAndValue[] regInfo = request.getRegInfo();
-		
-		CmpUtf8Pairs utf8Pairs = null;
-		if (regInfo != null)
-		{
-			for(AttributeTypeAndValue atv : regInfo)
-			{
-				if(atv.getType().equals(CMPObjectIdentifiers.regInfo_utf8Pairs))
-				{
-					String atvValue = DERUTF8String.getInstance(atv.getValue()).getString();
-					utf8Pairs = new CmpUtf8Pairs(atvValue);
-					break;
-				}
-			}
-		}
-		
-		String profileName = (utf8Pairs == null) ? null : utf8Pairs.getValue(CmpUtf8Pairs.KEY_CERT_PROFILE);
-		if(profileName == null)
-		{
-			throw new RAWorkerException("No CertProfile is specified in the request");
-		}
-		
-		if(caName == null)
-		{
-			caName = getCANameForProfile(profileName);
-			if(caName == null)
-			{
-				throw new RAWorkerException("CertProfile " + profileName + " is not supported by any CA"); 
-			}
-		}
-		else
-		{
-			checkCertProfileSupportInCA(profileName, caName);
-		}
-		
-		X509CmpRequestor cmpRequestor = cmpRequestorsMap.get(caName);
-		if(cmpRequestor == null)
-		{
-			throw new RAWorkerException("could not find CA named " + caName);
-		}
+		X509CmpRequestor cmpRequestor = getCmpRequestor(request, caName);
 		
 		CmpResultType result;
 		try {
@@ -530,7 +490,6 @@ public final class RAWorkerImpl extends AbstractRAWorker implements RAWorker
 		{
 			throw new RuntimeException("Unknown result type: " + result.getClass().getName());
 		}
-		
 	}
 	
 	@Override
@@ -1052,6 +1011,70 @@ public final class RAWorkerImpl extends AbstractRAWorker implements RAWorker
 	protected java.security.cert.Certificate getCACertficate(String caname) {
 		CAConf caConf = casMap.get(caname);
 		return caConf == null ? null : caConf.getCert();
+	}
+
+	@Override
+	public byte[] envelope(CertReqMsg certReqMsg, String caName)
+		throws RAWorkerException
+	{
+		ParamChecker.assertNotNull("request", certReqMsg);
+		X509CmpRequestor cmpRequestor = getCmpRequestor(certReqMsg, caName);
+		try {
+			return cmpRequestor.envelope(certReqMsg).getEncoded();
+		} catch (IOException e) {
+			throw new RAWorkerException("IOException: " + e.getMessage(), e);
+		} catch (CmpRequestorException e) {
+			throw new RAWorkerException("CmpRequestorException: " + e.getMessage(), e);
+		}
 	}	
+	
+	private X509CmpRequestor getCmpRequestor(CertReqMsg request, String caName) 
+	throws RAWorkerException
+	{
+		ParamChecker.assertNotNull("request", request);
+		
+		AttributeTypeAndValue[] regInfo = request.getRegInfo();
+		
+		CmpUtf8Pairs utf8Pairs = null;
+		if (regInfo != null)
+		{
+			for(AttributeTypeAndValue atv : regInfo)
+			{
+				if(atv.getType().equals(CMPObjectIdentifiers.regInfo_utf8Pairs))
+				{
+					String atvValue = DERUTF8String.getInstance(atv.getValue()).getString();
+					utf8Pairs = new CmpUtf8Pairs(atvValue);
+					break;
+				}
+			}
+		}
+		
+		String profileName = (utf8Pairs == null) ? null : utf8Pairs.getValue(CmpUtf8Pairs.KEY_CERT_PROFILE);
+		if(profileName == null)
+		{
+			throw new RAWorkerException("No CertProfile is specified in the request");
+		}
+		
+		if(caName == null)
+		{
+			caName = getCANameForProfile(profileName);
+			if(caName == null)
+			{
+				throw new RAWorkerException("CertProfile " + profileName + " is not supported by any CA"); 
+			}
+		}
+		else
+		{
+			checkCertProfileSupportInCA(profileName, caName);
+		}
+		
+		X509CmpRequestor cmpRequestor = cmpRequestorsMap.get(caName);
+		if(cmpRequestor == null)
+		{
+			throw new RAWorkerException("could not find CA named " + caName);
+		}
+		
+		return cmpRequestor;
+	}
 	
 }
