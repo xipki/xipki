@@ -640,5 +640,12 @@ abstract class X509CmpRequestor extends CmpRequestor
 		PKIMessage pkiMessage = new PKIMessage(header, body);
 		return pkiMessage;
 	}
+	
+	public PKIMessage envelope(CertReqMsg req)
+			throws CmpRequestorException
+	{
+		PKIMessage request = buildPKIMessage(req);
+		return sign(request);
+	}
 
 }
