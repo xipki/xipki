@@ -46,7 +46,7 @@ public class P11RSAKeyGenCommand extends OsgiCommandSupport {
 			required = true, description = "Required. Slot index")
     protected Integer           slotIndex;
 	
-	@Option(name = "-label",
+	@Option(name = "-key-label",
 			required = true, description = "Required. Label of the PKCS#11 objects")
     protected String            label;
 	
