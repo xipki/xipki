@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.0.xsd" logicalFilePath="ocsp-init.xml">
+
+    <changeSet id="1">
+		<!-- table issuer -->
+        <createTable tableName="issuer">
+            <column name="id" type="INT(10)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="subject" type="VARCHAR(200)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="sha1_fp_name" type="CHAR(40)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="sha1_fp_key" type="CHAR(40)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="sha224_fp_name" type="CHAR(56)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="sha224_fp_key" type="CHAR(56)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="sha256_fp_name" type="CHAR(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="sha256_fp_key" type="CHAR(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="sha384_fp_name" type="CHAR(96)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="sha384_fp_key" type="CHAR(96)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="sha512_fp_name" type="CHAR(128)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="sha512_fp_key" type="CHAR(128)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="sha1_fp_cert" type="CHAR(40)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="cert" type="VARCHAR(2000)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+		<!-- table certprofile -->
+        <createTable tableName="certprofile">
+            <column name="id" type="INT(10)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="name" type="VARCHAR(45)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+		<!-- table cert -->
+        <createTable tableName="cert">
+            <column name="id" type="INT(10)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="issuer_id" type="INT(10)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="serial" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="certprofile_id" type="INT(10)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="subject" type="VARCHAR(200)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_update" remarks="seconds since January 1, 1970, 00:00:00 GMT" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="notbefore" remarks="seconds since January 1, 1970, 00:00:00 GMT" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="notafter" remarks="seconds since January 1, 1970, 00:00:00 GMT" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="revocated" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="rev_reason" type="INT"/>
+            <column name="rev_time" remarks="seconds since January 1, 1970, 00:00:00 GMT" type="INT"/>
+            <column name="rev_invalidity_time" remarks="seconds since January 1, 1970, 00:00:00 GMT" type="INT"/>
+        </createTable>
+
+		<!-- table certhash -->
+        <createTable tableName="certhash">
+            <column name="sha1_fp" type="CHAR(40)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="sha224_fp" type="CHAR(56)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="sha256_fp" type="CHAR(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="sha384_fp" type="CHAR(96)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="sha512_fp" type="CHAR(128)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="cert_id" type="INT(10)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+		<!-- table rawcert -->
+        <createTable tableName="rawcert">
+            <column name="cert" remarks="Base64 encoded certificate" type="VARCHAR(2000)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="cert_id" type="INT(10)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="2">
+        <addPrimaryKey constraintName="PRIMARY" tableName="issuer" columnNames="id"/>
+        <addPrimaryKey constraintName="PRIMARY" tableName="certprofile" columnNames="id"/>
+        <addPrimaryKey constraintName="PRIMARY" tableName="cert" columnNames="id"/>
+        <addPrimaryKey constraintName="PRIMARY" tableName="certhash" columnNames="cert_id"/>
+        <addPrimaryKey constraintName="PRIMARY" tableName="rawcert" columnNames="cert_id"/>
+   </changeSet>
+
+    <changeSet id="3">
+        <addForeignKeyConstraint baseColumnNames="issuer_id" baseTableName="cert" constraintName="fk_cert_cainfo1" 
+		deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id"
+		 referencedTableName="issuer"/>
+        <addForeignKeyConstraint baseColumnNames="certprofile_id" baseTableName="cert" constraintName="fk_cert_certprofile1"
+		 deferrable="false" initiallyDeferred="false" onDelete="CASCADE" onUpdate="NO ACTION" referencedColumnNames="id"
+		 referencedTableName="certprofile"/>
+        <addForeignKeyConstraint baseColumnNames="cert_id" baseTableName="certhash" constraintName="fk_certhash_cert1" deferrable="false"
+		 initiallyDeferred="false" onDelete="CASCADE" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="cert"/>
+        <addForeignKeyConstraint baseColumnNames="cert_id" baseTableName="rawcert" constraintName="fk_rawcert_cert1" deferrable="false"
+		 initiallyDeferred="false" onDelete="CASCADE" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="cert"/>
+    </changeSet>
+</databaseChangeLog>

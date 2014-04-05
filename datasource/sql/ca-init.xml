@@ -1,0 +1,347 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.0.xsd" logicalFilePath="ca-init.xml">
+	<!-- CA configuration :: create table -->
+	<changeSet id="1">
+		<!-- table cmpcontrol -->
+		<createTable tableName="cmpcontrol">
+			<column name="name" type="VARCHAR(45)">
+				<constraints nullable="false"/>
+			</column>
+			<column name="require_confirm_cert" type="INT">
+				<constraints nullable="false"/>
+			</column>
+			<column name="message_time_bias" remarks="seconds" type="INT">
+				<constraints nullable="false"/>
+			</column>
+			<column name="confirm_wait_time" remarks="seconds" type="INT">
+				<constraints nullable="false"/>
+			</column>
+			<column name="send_ca_cert" type="INT">
+				<constraints nullable="false"/>
+			</column>
+		</createTable>
+		<!-- table responder -->
+		<createTable tableName="responder">
+			<column name="name" type="VARCHAR(45)">
+				<constraints nullable="false"/>
+			</column>
+			<column name="type" type="VARCHAR(100)">
+				<constraints nullable="false"/>
+			</column>
+			<column name="conf" type="VARCHAR(4000)"/>
+			<column name="cert" type="VARCHAR(2000)"/>
+		</createTable>
+		<!-- table environment -->
+		<createTable tableName="environment">
+			<column name="name" type="VARCHAR(45)">
+				<constraints nullable="false"/>
+			</column>
+			<column name="value" type="VARCHAR(200)"/>
+		</createTable>
+		<!-- table crlsigner -->
+		<createTable tableName="crlsigner">
+			<column name="name" type="VARCHAR(45)">
+				<constraints nullable="false"/>
+			</column>
+			<column name="signer_type" type="VARCHAR(100)">
+				<constraints nullable="false"/>
+			</column>
+			<column name="signer_conf" type="VARCHAR(4000)"/>
+			<column name="signer_cert" type="VARCHAR(2000)"/>
+			<column name="period" remarks="minutes. 0 indicates no CRL will be generated automatically." type="INT">
+				<constraints nullable="false"/>
+			</column>
+			<column name="overlap" remarks="minutes" type="INT">
+				<constraints nullable="false"/>
+			</column>
+			<column defaultValueNumeric="0" name="include_certs_in_crl" type="INT">
+				<constraints nullable="false"/>
+			</column>
+		</createTable>
+		<!-- table requestor -->
+		<createTable tableName="requestor">
+			<column name="name" type="VARCHAR(45)">
+				<constraints nullable="false"/>
+			</column>
+			<column name="cert" type="VARCHAR(2000)">
+				<constraints nullable="false"/>
+			</column>
+		</createTable>
+		<!-- table publisher -->
+		<createTable tableName="publisher">
+			<column name="name" type="VARCHAR(45)">
+				<constraints nullable="false"/>
+			</column>
+			<column name="type" type="VARCHAR(100)">
+				<constraints nullable="false"/>
+			</column>
+			<column name="conf" type="VARCHAR(5000)"/>
+		</createTable>
+		<!-- table certprofile -->
+		<createTable tableName="certprofile">
+			<column name="name" type="VARCHAR(45)">
+				<constraints nullable="false"/>
+			</column>
+			<column name="type" type="VARCHAR(100)">
+				<constraints nullable="false"/>
+			</column>
+			<column name="conf" remarks="profile data, depends on the type" type="VARCHAR(4000)"/>
+		</createTable>
+		<!-- table ca -->
+		<createTable tableName="ca">
+			<column name="name" type="VARCHAR(45)">
+				<constraints nullable="false"/>
+			</column>
+			<column name="next_serial" type="INT(10)"/>
+			<column name="status" remarks="valid values: pending, enabled, disabled" type="VARCHAR(10)">
+				<constraints nullable="false"/>
+			</column>
+			<column name="subject" type="VARCHAR(200)">
+				<constraints nullable="false"/>
+			</column>
+			<column name="crl_uris" type="VARCHAR(100)"/>
+			<column name="ocsp_uris" type="VARCHAR(100)"/>
+			<column name="max_validity" type="INT">
+				<constraints nullable="false"/>
+			</column>
+			<column name="cert" type="VARCHAR(2000)">
+				<constraints nullable="false"/>
+			</column>
+			<column name="signer_type" type="VARCHAR(100)">
+				<constraints nullable="false"/>
+			</column>
+			<column name="signer_conf" type="VARCHAR(4000)">
+				<constraints nullable="false"/>
+			</column>
+			<column name="crlsigner_name" type="VARCHAR(45)"/>
+			<column defaultValueNumeric="1" name="allow_duplicate_key" type="INT">
+				<constraints nullable="false"/>
+			</column>
+			<column defaultValueNumeric="1" name="allow_duplicate_subject" type="INT">
+				<constraints nullable="false"/>
+			</column>
+			<column name="permissions" type="VARCHAR(100)">
+				<constraints nullable="false"/>
+			</column>
+		</createTable>
+		<!-- table caalias -->
+		<createTable tableName="caalias">
+			<column name="name" type="VARCHAR(45)">
+				<constraints nullable="false"/>
+			</column>
+			<column name="ca_name" type="VARCHAR(45)">
+				<constraints nullable="false"/>
+			</column>
+		</createTable>
+		<!-- table ca_has_requestor -->
+		<createTable tableName="ca_has_requestor">
+			<column name="ca_name" type="VARCHAR(45)">
+				<constraints nullable="false"/>
+			</column>
+			<column name="requestor_name" type="VARCHAR(45)">
+				<constraints nullable="false"/>
+			</column>
+			<column name="ra" type="INT">
+				<constraints nullable="false"/>
+			</column>
+			<column name="permissions" type="VARCHAR(100)"/>
+			<column name="profiles" type="VARCHAR(200)"/>
+		</createTable>
+		<!-- table ca_has_publisher -->
+		<createTable tableName="ca_has_publisher">
+			<column name="ca_name" type="VARCHAR(45)">
+				<constraints nullable="false"/>
+			</column>
+			<column name="publisher_name" type="VARCHAR(45)">
+				<constraints nullable="false"/>
+			</column>
+		</createTable>
+		<!-- table ca_has_profile -->
+		<createTable tableName="ca_has_certprofile">
+			<column name="ca_name" type="VARCHAR(45)">
+				<constraints nullable="false"/>
+			</column>
+			<column name="certprofile_name" type="VARCHAR(45)">
+				<constraints nullable="false"/>
+			</column>
+		</createTable>
+	</changeSet>
+	<!-- CertStore :: create table -->
+	<changeSet id="2">
+		<!-- table cainfo -->
+		<createTable tableName="cainfo">
+			<column name="id" type="INT(10)">
+				<constraints nullable="false"/>
+			</column>
+			<column name="subject" type="VARCHAR(200)">
+				<constraints nullable="false"/>
+			</column>
+			<column name="cert" type="VARCHAR(2000)">
+				<constraints nullable="false"/>
+			</column>
+			<column name="sha1_fp_cert" type="CHAR(40)">
+				<constraints nullable="false"/>
+			</column>
+		</createTable>
+		<!-- table requestorinfo -->
+		<createTable tableName="requestorinfo">
+			<column name="id" type="INT(10)">
+				<constraints nullable="false"/>
+			</column>
+			<column name="subject" type="VARCHAR(200)">
+				<constraints nullable="false"/>
+			</column>
+			<column name="cert" type="VARCHAR(2000)"/>
+			<column name="sha1_fp_cert" type="CHAR(40)"/>
+		</createTable>
+		<!-- table user -->
+		<createTable tableName="user">
+			<column name="id" type="INT(10)">
+				<constraints nullable="false"/>
+			</column>
+			<column name="name" type="VARCHAR(200)">
+				<constraints nullable="false"/>
+			</column>
+		</createTable>
+		<!-- table certprofileinfo -->
+		<createTable tableName="certprofileinfo">
+			<column name="id" type="INT(10)">
+				<constraints nullable="false"/>
+			</column>
+			<column name="name" type="VARCHAR(45)">
+				<constraints nullable="false"/>
+			</column>
+		</createTable>
+		<!-- table crl -->
+		<createTable tableName="crl">
+			<column autoIncrement="true" name="id" type="INT(10)">
+				<constraints primaryKey="true"/>
+			</column>
+			<column name="cainfo_id" type="INT(10)">
+				<constraints nullable="false"/>
+			</column>
+			<column name="crl_number" type="INT(10)">
+				<constraints nullable="false"/>
+			</column>
+			<column name="thisUpdate" type="INT">
+				<constraints nullable="false"/>
+			</column>
+			<column name="nextUpdate" type="INT"/>
+			<column name="crl" type="LONGBLOB">
+				<constraints nullable="false"/>
+			</column>
+		</createTable>
+		<!-- table cert -->
+		<createTable tableName="cert">
+			<column name="id" type="INT(10)">
+				<constraints nullable="false"/>
+			</column>
+			<column name="cainfo_id" type="INT(10)">
+				<constraints nullable="false"/>
+			</column>
+			<column name="serial" type="INT">
+				<constraints nullable="false"/>
+			</column>
+			<column name="certprofileinfo_id" type="INT(10)">
+				<constraints nullable="false"/>
+			</column>
+			<column name="requestorinfo_id" type="INT(10)"/>
+			<column name="subject" type="VARCHAR(200)">
+				<constraints nullable="false"/>
+			</column>
+			<column name="last_update" remarks="seconds since January 1, 1970, 00:00:00 GMT" type="INT">
+				<constraints nullable="false"/>
+			</column>
+			<column name="notbefore" remarks="seconds since January 1, 1970, 00:00:00 GMT" type="INT">
+				<constraints nullable="false"/>
+			</column>
+			<column name="notafter" remarks="seconds since January 1, 1970, 00:00:00 GMT" type="INT">
+				<constraints nullable="false"/>
+			</column>
+			<column name="revocated" type="INT">
+				<constraints nullable="false"/>
+			</column>
+			<column name="rev_reason" type="INT"/>
+			<column name="rev_time" remarks="seconds since January 1, 1970, 00:00:00 GMT" type="INT"/>
+			<column name="rev_invalidity_time" remarks="seconds since January 1, 1970, 00:00:00 GMT" type="INT"/>
+			<column name="user_id" type="INT(10)"/>
+			<column name="sha1_fp_pk" type="CHAR(40)">
+				<constraints nullable="false"/>
+			</column>
+		</createTable>
+		<!-- table rawcert -->
+		<createTable tableName="rawcert">
+			<column name="sha1_fp" type="VARCHAR(40)">
+				<constraints nullable="false"/>
+			</column>
+			<column name="cert" remarks="Base64 encoded certificate" type="VARCHAR(2000)">
+				<constraints nullable="false"/>
+			</column>
+			<column name="cert_id" type="INT(10)">
+				<constraints nullable="false"/>
+			</column>
+		</createTable>
+	</changeSet>
+	<!-- CA Configuration :: primary key -->
+	<changeSet id="3">
+		<addPrimaryKey constraintName="PRIMARY" tableName="cmpcontrol" columnNames="name"/>
+		<addPrimaryKey constraintName="PRIMARY" tableName="responder" columnNames="name"/>
+		<addPrimaryKey constraintName="PRIMARY" tableName="environment" columnNames="name"/>
+		<addPrimaryKey constraintName="PRIMARY" tableName="crlsigner" columnNames="name"/>
+		<addPrimaryKey constraintName="PRIMARY" tableName="requestor" columnNames="name"/>
+		<addPrimaryKey constraintName="PRIMARY" tableName="publisher" columnNames="name"/>
+		<addPrimaryKey constraintName="PRIMARY" tableName="certprofile" columnNames="name"/>
+		<addUniqueConstraint constraintName="name_UNIQUE" tableName="certprofile" columnNames="name" deferrable="false" disabled="false" initiallyDeferred="false"/>
+		<addPrimaryKey constraintName="PRIMARY" tableName="ca" columnNames="name"/>
+		<addPrimaryKey constraintName="PRIMARY" tableName="caalias" columnNames="name,ca_name"/>
+		<addPrimaryKey constraintName="PRIMARY" tableName="ca_has_requestor" columnNames="ca_name, requestor_name"/>
+		<addPrimaryKey constraintName="PRIMARY" tableName="ca_has_publisher" columnNames="ca_name, publisher_name"/>
+		<addPrimaryKey constraintName="PRIMARY" tableName="ca_has_certprofile" columnNames="ca_name, certprofile_name"/>
+	</changeSet>
+	<!-- CertStore :: primary key -->
+	<changeSet id="4">
+		<addPrimaryKey constraintName="PRIMARY" tableName="cainfo" columnNames="id"/>
+		<addPrimaryKey constraintName="PRIMARY" tableName="requestorinfo" columnNames="id"/>
+		<addPrimaryKey constraintName="PRIMARY" tableName="user" columnNames="id"/>
+		<addPrimaryKey constraintName="PRIMARY" tableName="certprofileinfo" columnNames="id"/>
+		<addPrimaryKey constraintName="PRIMARY" tableName="cert" columnNames="id"/>
+		<addPrimaryKey constraintName="PRIMARY" tableName="rawcert" columnNames="cert_id"/>
+	</changeSet>
+
+	<!-- CA Configuration :: foreign key -->
+	<changeSet id="5">
+
+		<addForeignKeyConstraint baseColumnNames="crlsigner_name" baseTableName="ca"
+			constraintName="fk_ca_crlsigner1" deferrable="false" initiallyDeferred="false" onDelete="CASCADE" onUpdate="NO ACTION" referencedColumnNames="name" referencedTableName="crlsigner"/>
+
+		<addForeignKeyConstraint baseColumnNames="requestor_name" baseTableName="ca_has_requestor" constraintName="fk_ca_has_cmprequestor_cmprequestor1" deferrable="false" initiallyDeferred="false" onDelete="CASCADE" onUpdate="NO ACTION" referencedColumnNames="name" referencedTableName="requestor"/>
+
+		<addForeignKeyConstraint baseColumnNames="publisher_name" baseTableName="ca_has_publisher" constraintName="fk_ca_has_publisher_publisher1" deferrable="false" initiallyDeferred="false" onDelete="CASCADE" onUpdate="NO ACTION" referencedColumnNames="name" referencedTableName="publisher"/>
+
+		<addForeignKeyConstraint baseColumnNames="certprofile_name" baseTableName="ca_has_certprofile" constraintName="fk_ca_has_certprofile_certprofile1" deferrable="false" initiallyDeferred="false" onDelete="CASCADE" onUpdate="NO ACTION" referencedColumnNames="name" referencedTableName="certprofile"/>
+
+		<addForeignKeyConstraint baseColumnNames="ca_name" baseTableName="ca_has_requestor" constraintName="fk_ca_has_cmprequestor_ca1" deferrable="false" initiallyDeferred="false" onDelete="CASCADE" onUpdate="NO ACTION" referencedColumnNames="name" referencedTableName="ca"/>
+
+		<addForeignKeyConstraint baseColumnNames="ca_name" baseTableName="ca_has_publisher" constraintName="fk_ca_has_publisher_ca1" deferrable="false" initiallyDeferred="false" onDelete="CASCADE" onUpdate="NO ACTION" referencedColumnNames="name" referencedTableName="ca"/>
+
+		<addForeignKeyConstraint baseColumnNames="ca_name" baseTableName="ca_has_certprofile" constraintName="fk_ca_has_certprofile_ca1" deferrable="false" initiallyDeferred="false" onDelete="CASCADE" onUpdate="NO ACTION" referencedColumnNames="name" referencedTableName="ca"/>
+	</changeSet>
+	
+	<!-- CertStore :: foreigen key -->
+	<changeSet id="6">
+		<addForeignKeyConstraint baseColumnNames="cainfo_id" baseTableName="cert" constraintName="fk_cert_cainfo1" deferrable="false" initiallyDeferred="false" onDelete="CASCADE" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="cainfo"/>
+
+		<addForeignKeyConstraint baseColumnNames="requestorinfo_id" baseTableName="cert" constraintName="fk_cert_requestorinfo1" deferrable="false" initiallyDeferred="false" onDelete="CASCADE" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="requestorinfo"/>
+
+		<addForeignKeyConstraint baseColumnNames="user_id" baseTableName="cert" constraintName="fk_cert_user1" deferrable="false" initiallyDeferred="false" onDelete="CASCADE" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="user"/>
+
+		<addForeignKeyConstraint baseColumnNames="certprofileinfo_id" baseTableName="cert" constraintName="fk_cert_certprofileinfo1" deferrable="false" initiallyDeferred="false" onDelete="CASCADE" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="certprofileinfo"/>
+
+		<addForeignKeyConstraint baseColumnNames="cainfo_id" baseTableName="crl" constraintName="fk_crl_cainfo1" deferrable="false" initiallyDeferred="false" onDelete="CASCADE" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="cainfo"/>
+
+		<addForeignKeyConstraint baseColumnNames="cert_id" baseTableName="rawcert" constraintName="fk_rawcert_cert1" deferrable="false" initiallyDeferred="false" onDelete="CASCADE" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="cert"/>
+
+		<addForeignKeyConstraint baseColumnNames="ca_name" baseTableName="caalias" constraintName="fk_servletname_ca1" deferrable="false" initiallyDeferred="false" onDelete="CASCADE" onUpdate="NO ACTION" referencedColumnNames="name" referencedTableName="ca"/>
+	</changeSet>
+
+</databaseChangeLog>
