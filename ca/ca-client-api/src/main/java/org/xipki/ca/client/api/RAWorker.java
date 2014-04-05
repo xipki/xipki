@@ -50,12 +50,6 @@ public interface RAWorker
 	EnrollCertResult requestCerts(EnrollCertRequestType request, String caName)
 	throws RAWorkerException, PKIErrorException;
 	
-	EnrollCertResult requestCert(CertReqMsg request, String extCertReqId, String caName)
-	throws RAWorkerException, PKIErrorException;
-	
-	CertReqMsg getCertReqMsgWithAppliedCertProfile(CertRequest request, String certProfile, ProofOfPossession popo)
-	throws RAWorkerException;
-	
 	CertIDOrError revocateCert(X500Name issuer, BigInteger serial, int reason)
 	throws RAWorkerException, PKIErrorException;
 	
@@ -80,5 +74,14 @@ public interface RAWorker
      */
     String getCaNameByIssuer(X500Name issuer)
     throws RAWorkerException;
+
+	EnrollCertResult requestCert(CertReqMsg certReqMsg, String extCertReqId, String caName)
+	throws RAWorkerException, PKIErrorException;
+	
+	CertReqMsg getCertReqMsgWithAppliedCertProfile(CertRequest request, String certProfile,
+			ProofOfPossession popo)
+	throws RAWorkerException;
+	
+	byte[] envelope(CertReqMsg certReqMsg, String caName) throws RAWorkerException;
 
 }
