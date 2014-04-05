@@ -338,9 +338,14 @@ public class CAManagerImpl implements CAManager
 				else
 				{
 					try{
+						X509Certificate crlSignerCert = crlSignerEntry.getCertificate();
 						identifiedSigner = securityFactory.createSigner(
-								signerType, crlSignerEntry.getConf(), crlSignerEntry.getCertificate(),
+								signerType, crlSignerEntry.getConf(), crlSignerCert,
 								passwordResolver);
+						if(crlSignerCert == null)
+						{
+							crlSignerEntry.setCertificate(identifiedSigner.getCertificate());
+						}
 					} catch (PasswordResolverException e) {
 						LOG.error("security.createSigner crlSigner (ca=" + caName + ")", e);
 						return false;
@@ -394,9 +399,14 @@ public class CAManagerImpl implements CAManager
 			{
 				ConcurrentContentSigner cmpSigner = null;
 				try {
+					X509Certificate responderCert = responder.getCertificate();
 					cmpSigner = securityFactory.createSigner(
-							responder.getType(), responder.getConf(), responder.getCertificate(),
+							responder.getType(), responder.getConf(), responderCert,
 							passwordResolver);
+					if(responderCert == null)
+					{
+						responder.setCertificate(cmpSigner.getCertificate());
+					}
 				} catch (PasswordResolverException e) {
 					LOG.error("X509CA.<init>: {}", e.getMessage());
 					LOG.debug("X509CA.<init>", e);
@@ -595,15 +605,20 @@ public class CAManagerImpl implements CAManager
 					throw new CAMgmtException("More than one CMPResponder is configured, but maximal one is allowed");
 				}
 				
-				String type = sqlResult.getString("type");
-				String conf = sqlResult.getString("conf");
-				String b64Cert = sqlResult.getString("cert");
-	
-				X509Certificate cert = generateCert(b64Cert);
 				CmpResponderEntry entry = new CmpResponderEntry();
+				
+				String type = sqlResult.getString("type");
 				entry.setType(type);
+
+				String conf = sqlResult.getString("conf");
 				entry.setConf(conf);
-				entry.setCert(cert);
+
+				String b64Cert = sqlResult.getString("cert");
+				if(b64Cert != null)
+				{
+					X509Certificate cert = generateCert(b64Cert);
+					entry.setCertificate(cert);
+				}
 				
 				this.responder = entry;
 			}
@@ -804,7 +819,7 @@ public class CAManagerImpl implements CAManager
 					entry.setConf(signer_conf);
 					if(signer_cert != null)
 					{
-						entry.setCert(generateCert(signer_cert));
+						entry.setCertificate(generateCert(signer_cert));
 					}
 				}			
 				entry.setPeriod(period);
@@ -1808,7 +1823,14 @@ public class CAManagerImpl implements CAManager
 			ps.setString(idx++, CmpResponderEntry.name);
 			ps.setString(idx++, dbEntry.getType());
 			ps.setString(idx++, dbEntry.getConf());
-			ps.setString(idx++, Base64.toBase64String(dbEntry.getCertificate().getEncoded()));
+			
+			String b64Cert = null;
+			X509Certificate cert = dbEntry.getCertificate();
+			if(cert != null)
+			{
+				b64Cert = Base64.toBase64String(dbEntry.getCertificate().getEncoded());
+			}
+			ps.setString(idx++, b64Cert);
 			
 			ps.executeUpdate();
 		}catch(SQLException e)

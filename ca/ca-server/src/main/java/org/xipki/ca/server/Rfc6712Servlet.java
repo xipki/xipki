@@ -99,8 +99,17 @@ public class Rfc6712Servlet extends HttpServlet
 			}
 			
 			X509CACmpResponder responder = caManager.getX509CACmpResponder(caName);
-			if(responder == null)
+			if(responder == null || responder.isCAInService() == false)
 			{
+				if(responder == null)
+				{
+					LOG.warn("Unknown CA {}", caName);
+				}
+				else
+				{
+					LOG.warn("CA {} is out of service", caName);
+				}
+				
 				response.setContentLength(0);
 				response.setStatus(HttpServletResponse.SC_NOT_FOUND);
 				response.flushBuffer();

@@ -27,6 +27,9 @@ import org.apache.felix.gogo.commands.Option;
 import org.xipki.ca.api.CAStatus;
 import org.xipki.ca.server.mgmt.CAEntry;
 import org.xipki.ca.server.mgmt.Permission;
+import org.xipki.security.api.ConcurrentContentSigner;
+import org.xipki.security.api.PasswordResolver;
+import org.xipki.security.api.SecurityFactory;
 import org.xipki.security.common.ConfigurationException;
 import org.xipki.security.common.IoCertUtil;
 
@@ -70,8 +73,7 @@ public class CaAddCommand extends CaCommand {
     protected String            crlSignerName;
 
 	@Option(name = "-cert",
-            description = "Required. CA certificate file", 
-            required = true)
+            description = "Required. CA certificate file")
     protected String            certFile;
 
 	@Option(name = "-signerType",
@@ -98,6 +100,9 @@ public class CaAddCommand extends CaCommand {
 	@Option(name = "-dds", aliases = { "--disableDuplicateSubject" },
             description = "Duplicate subject is not allowed")
     protected Boolean           disableDuplicateSubject;
+	
+	private SecurityFactory securityFactory;
+	private PasswordResolver passwordResolver;
    
     @Override
     protected Object doExecute() throws Exception {
@@ -110,13 +115,25 @@ public class CaAddCommand extends CaCommand {
 				System.out.println("invalid status: " + caStatus);
 				return null;
 			}
-		}			
+		}		
 		
-		X509Certificate caCert = IoCertUtil.parseCert(certFile);
+		X509Certificate caCert = null;
+		if(certFile != null)
+		{
+			caCert = IoCertUtil.parseCert(certFile);
+		}
 		
 		if("PKCS12".equalsIgnoreCase(signerType) || "JKS".equalsIgnoreCase(signerType))
 		{
 			signerConf = ShellUtil.replaceFileInSignerConf(signerConf);
+		}
+
+		// check whether the signer and certificate match
+		ConcurrentContentSigner signer = securityFactory.createSigner(signerType, signerConf, caCert, passwordResolver);
+		// retrieve the certificate from the key token if not specified explicitly
+		if(caCert == null)
+		{
+			caCert = signer.getCertificate();
 		}
 		
 		CAEntry entry = new CAEntry(caName, nextSerial, signerType, signerConf, caCert, 
@@ -151,4 +168,12 @@ public class CaAddCommand extends CaCommand {
     	
     	return null;
     }
+
+	public void setSecurityFactory(SecurityFactory securityFactory) {
+		this.securityFactory = securityFactory;
+	}
+
+	public void setPasswordResolver(PasswordResolver passwordResolver) {
+		this.passwordResolver = passwordResolver;
+	}
 }

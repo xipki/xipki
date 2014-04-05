@@ -62,7 +62,7 @@ public class CrlSignerEntry {
 		return cert;
 	}
 
-	public void setCert(X509Certificate cert) {
+	public void setCertificate(X509Certificate cert) {
 		this.cert = cert;
 	}	
 	

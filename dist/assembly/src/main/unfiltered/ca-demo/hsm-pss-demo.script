@@ -31,11 +31,18 @@ ca:crlsigner-add -signerType CA -period 0 -name CASIGN.CRLSIGNER
 ## Add the profile RCA
 ca:profile-add -name  RCA -type java:org.xipki.ca.certprofile.example.CertProfile_RootCA
 
+## Generate keys and PKCS#10 request
+keytool:rsa-p12 -pwd 1234 -out output/RCA1.p12 -subject "CN=RCA1,O=xipki,C=DE"
+keytool:req-p12 -p12 output/RCA1.p12 -pwd 1234 -hash SHA256 -out output/RCA1.p10
+
 ## Generate selfsigned RCA
 ca:gen-rca -name RCA1 \
   -subject "CN=RCA1,O=xipki,C=DE" -profile RCA -out output/RCA1.der \
-  -permission all -nextSerial 1 -maxValidity 1825 -signerType PKCS11 \
+  -permission all -nextSerial 1 -maxValidity 1825 -signerType PKCS12 \
   -signerConf algo?SHA256withRSAandMGF1%slot?1%key-label?RCA1
+
+## Update the certificate in the device
+keytool:update-cert -slot 1 -key-label RCA1 -cert output/RCA1.der
 
 ca:caalias-add -ca RCA1 -alias RCA
 
@@ -51,7 +58,7 @@ ca:capub-add -ca RCA1 -publisher OCSP.PUBLISHER
 ## Restart the CA
 ca:ca-restart
 
-## Publish the self-signed certificate 
+## Publish the self-signed certificate
 ca:publish-self -ca RCA1
 
 #################################################################
@@ -64,11 +71,13 @@ keytool:req-p12 -p12 output/SubCA1.p12 -pwd 1234 -hash SHA256 -out output/SubCA1
 ## Enroll SubCA certificate via Management interface of RCA1
 ca:enroll -ca RCA1 -p10 output/SubCA1.p10 -out output/SubCA1.der -profile SubCA
 
+keytool:update-cert-p12 -p12 output/SubCA1.p12 -pwd 1234 -cert output/SubCA1.der
+
 ## Add CA
 ca:ca-add -name SubCA1 \
   -permission all -nextSerial 1 -maxValidity 730 -signerType PKCS12 \
   -signerConf password?1234%keystore?file:output/SubCA1.p12%algo?SHA256withRSA \
-  -crlUri http://example.org/crl -cert output/SubCA1.der
+  -crlUri http://example.org/crl
 
 ca:caalias-add -ca SubCA1 -alias SubCA
 
@@ -88,17 +97,21 @@ keytool:req-p12 -p12 output/requestor.p12 -pwd 1234 -hash SHA256 -out output/req
 
 ca:enroll -ca SubCA1 -p10 output/requestor.p10 -out output/requestor.der -profile CMP
 
+keytool:update-cert-p12 -p12 output/requestor.p12 -pwd 1234 -cert output/requestor.der
+
 keytool:rsa-p12 -pwd 1234 -out output/responder.p12 -subject "CN=responder,O=xipki,C=DE"
 
 keytool:req-p12 -p12 output/responder.p12 -pwd 1234 -hash SHA256 -out output/responder.p10
 
 ca:enroll -ca SubCA1 -p10 output/responder.p10 -out output/responder.der -profile CMP
 
+keytool:update-cert-p12 -p12 output/responder.p12 -pwd 1234 -cert output/responder.der
+
 #################################################################
 #                       CONFIGURE CMP-IDENTIFIES                #
 #################################################################
 # CMP Responder
-ca:responder-set -cert output/responder.der -signerType PKCS12 \
+ca:responder-set -signerType PKCS12 \
   -signerConf password?1234%keystore?file:output/responder.p12%algo?SHA256withRSA
 
 # CMP Requestors
@@ -117,20 +130,33 @@ ca:ca-restart
 features:install xipki-caclient-shell
 
 ## Enroll certificates
+# Certificate OCSP1
 keytool:rsa-p12 -pwd 1234 -out output/OCSP1.p12 -subject "CN=OCSP1,O=xipki,C=DE"
+
 keytool:req-p12 -p12 output/OCSP1.p12 -pwd 1234 -hash SHA256 -out output/OCSP1.p10
 
-caclient:ra-enroll -p10 output/OCSP1.p10 -profile OCSP
+caclient:ra-enroll -p10 output/OCSP1.p10 -out output/OCSP1.der -profile OCSP
 
+keytool:update-cert-p12 -p12 output/OCSP1.p12 -pwd 1234 -cert output/OCSP1.der
+
+# Certificate TLS1
 keytool:rsa-p12 -pwd 1234 -out output/TLS1.p12 -subject "CN=TSL1,O=xipki,C=DE"
+
 keytool:req-p12 -p12 output/TLS1.p12 -pwd 1234 -hash SHA256 -out output/TLS1.p10
 
-caclient:ra-enroll -p10 output/TLS1.p10 -profile TLS
+caclient:ra-enroll -p10 output/TLS1.p10 -out output/TLS1.der -profile TLS
 
+keytool:update-cert-p12 -p12 output/TLS1.p12 -pwd 1234 -cert output/TLS1.der
+
+# Certificate TLS2
 keytool:rsa-p12 -pwd 1234 -out output/TLS2.p12 -subject "CN=TSL2,O=xipki,C=DE"
+
 keytool:req-p12 -p12 output/TLS2.p12 -pwd 1234 -hash SHA256 -out output/TLS2.p10
 
-caclient:ra-enroll -p10 output/TLS2.p10 -profile TLS
+caclient:ra-enroll -p10 output/TLS2.p10 -out output/TLS2.der -profile TLS
+
+keytool:update-cert-p12 -p12 output/TLS2.p12 -pwd 1234 -cert output/TLS2.der
+
 
 ## Revocate certificates
 caclient:ra-rev -cert output/TLS2.der -reason 2
@@ -143,7 +169,9 @@ keytool:rsa-p12 -pwd 1234 -out output/SubCAwithCRL1.p12 -subject "CN=SubCAwithCR
 
 keytool:req-p12 -p12 output/SubCAwithCRL1.p12 -pwd 1234 -hash SHA256 -out output/SubCAwithCRL1.p10
 
-caclient:ra-enroll -p10 output/SubCAwithCRL1.p10 -profile SubCA
+caclient:ra-enroll -p10 output/SubCAwithCRL1.p10 -out output/SubCAwithCRL1.der -profile SubCA
+
+keytool:update-cert-p12 -p12 output/SubCAwithCRL1.p12 -pwd 1234 -cert output/SubCAwithCRL1.der
 
 ## Add CA
 ca:ca-add -name SubCAwithCRL1 \
@@ -151,7 +179,6 @@ ca:ca-add -name SubCAwithCRL1 \
   -signerConf password?1234%keystore?file:output/SubCAwithCRL1.p12%algo?SHA256withRSA \
   -crlUri http://example.org/crl \
   -ocspUri http://example.org/ocsp \
-  -cert output/SubCAwithCRL1.der \
   -crlSigner CASIGN.CRLSIGNER
 
 ca:caalias-add -ca SubCAwithCRL1 -alias SubCAwithCRL
@@ -175,17 +202,23 @@ features:install xipki-caclient-shell
 #              MANAGE CERTIFICATE WITH RA CLIENT                #
 #################################################################
 ## Enroll certificates
+# Certificate TLS_C1
 keytool:rsa-p12 -pwd 1234 -out output/TLS_C1.p12 -subject "CN=TSL_C1,O=xipki,C=DE"
 
 keytool:req-p12 -p12 output/TLS_C1.p12 -pwd 1234 -hash SHA256 -out output/TLS_C1.p10
 
-caclient:ra-enroll -p10 output/TLS_C1.p10 -profile TLS_C
+caclient:ra-enroll -p10 output/TLS_C1.p10 -out output/TLS_C1.der -profile TLS_C
 
+keytool:update-cert-p12 -p12 output/TLS_C1.p12 -pwd 1234 -cert output/TLS_C1.der
+
+# Certificate TLS_C2
 keytool:rsa-p12 -pwd 1234 -out output/TLS_C2.p12 -subject "CN=TSL_C2,O=xipki,C=DE"
 
 keytool:req-p12 -p12 output/TLS_C2.p12 -pwd 1234 -hash SHA256 -out output/TLS_C2.p10
 
-caclient:ra-enroll -p10 output/TLS_C2.p10 -profile TLS_C
+caclient:ra-enroll -p10 output/TLS_C2.p10 -out output/TLS_C2.der -profile TLS_C
+
+keytool:update-cert-p12 -p12 output/TLS_C2.p12 -pwd 1234 -cert output/TLS_C2.der
 
 ## Revocate certificates
 caclient:ra-rev -cert output/TLS_C2.der -reason 3

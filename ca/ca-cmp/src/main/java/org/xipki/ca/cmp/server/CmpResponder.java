@@ -69,10 +69,9 @@ public abstract class CmpResponder {
 	
 	private int signserviceTimeout = 5000; // 5 seconds
 	
-	protected final SecurityFactory securityFactory;
+	protected final SecurityFactory securityFactory;	
 	
-	
-	protected abstract boolean isCAInService();
+	public abstract boolean isCAInService();
 	
 	/**
 	 * @return never returns {@code null}.
