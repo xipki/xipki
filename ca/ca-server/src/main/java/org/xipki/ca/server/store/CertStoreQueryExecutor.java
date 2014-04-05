@@ -173,50 +173,6 @@ class CertStoreQueryExecutor
 		}
 	}
 
-	private Boolean fpSubjectUpdated = false; 
-	// FIXME: remove me if all databases have been updated with sha1_fp_subject
-	private final void addFpSubjectIfNotExists() throws SQLException
-	{
-		synchronized (fpSubjectUpdated) {
-			if(fpSubjectUpdated)
-			{
-				return;
-			}
-			
-	    	final String SQL_READ = "SELECT id, subject FROM cert WHERE sha1_fp_subject = ?";    	
-			final String SQL_UPDATE = "UPDATE cert SET sha1_fp_subject = ? WHERE id = ?";
-
-	        PreparedStatement ps_read = borrowPreparedStatement(SQL_READ);
-	        PreparedStatement ps_update = borrowPreparedStatement(SQL_UPDATE);
-	        
-	        ResultSet rs = null;
-			try{
-				ps_read.setString(1, "AB");
-				rs = ps_read.executeQuery();
-				
-				while(rs.next()) {
-					int id = rs.getInt("id");
-					String subject = rs.getString("subject");
-					
-					String fp = fp_canonicalized_name(new X500Name(subject));
-					ps_update.setString(1, fp);
-					ps_update.setInt(2, id);
-					
-					ps_update.executeUpdate();
-				}
-				
-			}finally {
-				returnPreparedStatement(ps_read);
-				returnPreparedStatement(ps_update);
-	        	if(rs != null) {
-	        		rs.close();
-	        		rs = null;
-	        	}
-
-	        	fpSubjectUpdated = true;
-			}
-		}
-	}
 	/**
 	 * @throws SQLException if there is problem while accessing database.
 	 * @throws NoSuchAlgorithmException 
@@ -230,9 +186,6 @@ class CertStoreQueryExecutor
 			String user)
 			throws SQLException, OperationException
 	{
-		// FIXME: remove this line
-		addFpSubjectIfNotExists();
-		
 		final String SQL_ADD_CERT = 
 		    	"INSERT INTO cert " + 
 		    	"(id, last_update, serial, subject,"
