@@ -252,9 +252,9 @@ ENGINE = InnoDB;
 DROP TABLE IF EXISTS `rawcert` ;
 
 CREATE  TABLE IF NOT EXISTS `rawcert` (
+  `cert_id` INT NOT NULL ,
   `sha1_fp` VARCHAR(40) NOT NULL ,
   `cert` VARCHAR(2000) NOT NULL COMMENT 'Base64 encoded certificate' ,
-  `cert_id` INT NOT NULL ,
   PRIMARY KEY (`cert_id`) ,
   CONSTRAINT `fk_rawcert_cert1`
     FOREIGN KEY (`cert_id` )
