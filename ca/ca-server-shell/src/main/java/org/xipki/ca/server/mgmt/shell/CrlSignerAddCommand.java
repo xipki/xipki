@@ -22,6 +22,8 @@ import java.security.cert.X509Certificate;
 import org.apache.felix.gogo.commands.Command;
 import org.apache.felix.gogo.commands.Option;
 import org.xipki.ca.server.mgmt.CrlSignerEntry;
+import org.xipki.security.api.PasswordResolver;
+import org.xipki.security.api.SecurityFactory;
 import org.xipki.security.common.IoCertUtil;
 
 @Command(scope = "ca", name = "crlsigner-add", description="Add CRL signer")
@@ -42,7 +44,7 @@ public class CrlSignerAddCommand extends CaCommand {
 
 	@Option(name = "-cert",
             description = "CRL signer's certificate file")
-    protected String            signerCert;
+    protected String            signerCertFile;
 	
 	@Option(name = "-period",
             required=true, description = "Required. Interval in minutes of two CRLs, set to 0 to generate CRL on demand")
@@ -60,19 +62,31 @@ public class CrlSignerAddCommand extends CaCommand {
             description = "Certificates are not contained in the CRL, the default is not")
     protected Boolean            disableWithCerts;
 	
+	private SecurityFactory securityFactory;
+	private PasswordResolver passwordResolver;
+   
     @Override
     protected Object doExecute() throws Exception {
     	CrlSignerEntry entry = new CrlSignerEntry(name);
+
     	entry.setType(signerType);
+    	if("CA".equalsIgnoreCase(signerType) == false)
+    	{
+    		X509Certificate signerCert = null;
+        	if(signerCertFile != null)
+        	{
+        		signerCert = IoCertUtil.parseCert(signerCertFile);
+        		entry.setCertificate(signerCert);
+        	}
+        	// check whether we can initialize the signer
+    		securityFactory.createSigner(signerType, signerConf, signerCert, passwordResolver);
+    	}
+    	
     	if(signerConf != null)
     	{
     		entry.setConf(signerConf);
     	}
-    	if(signerCert != null)
-    	{
-    		X509Certificate cert = IoCertUtil.parseCert(signerCert);
-    		entry.setCert(cert);
-    	}
+    	
     	entry.setPeriod(period);
     	
     	if(overlap != null)
@@ -90,4 +104,13 @@ public class CrlSignerAddCommand extends CaCommand {
     	
     	return null;
     }
+
+	public void setSecurityFactory(SecurityFactory securityFactory) {
+		this.securityFactory = securityFactory;
+	}
+
+	public void setPasswordResolver(PasswordResolver passwordResolver) {
+		this.passwordResolver = passwordResolver;
+	}
+
 }

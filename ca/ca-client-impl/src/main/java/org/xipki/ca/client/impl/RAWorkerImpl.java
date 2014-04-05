@@ -94,6 +94,8 @@ import org.xipki.security.common.ParamChecker;
 
 public final class RAWorkerImpl extends AbstractRAWorker implements RAWorker
 {	
+	public static final String DEV_MODE = "dev.mode";
+	
 	/**
 	 * The certificate of the responder.
 	 */
@@ -188,6 +190,8 @@ public final class RAWorkerImpl extends AbstractRAWorker implements RAWorker
 			{}
 		}
 		
+		boolean dev_mode = Boolean.parseBoolean(props.getProperty(DEV_MODE, "false"));
+		
 		X509Certificate requestorCert = null;
 		String s = props.getProperty(REQUESTOR_CERT);
 		if(!isEmpty(s))
@@ -252,10 +256,22 @@ public final class RAWorkerImpl extends AbstractRAWorker implements RAWorker
 						IoCertUtil.parseCert(_responderFile));
 				cas.add(ca);
 				configuredCaNames.add(caname);
-			}catch(Exception e)
+			}catch(IOException e)
 			{
-				LOG.warn("Could not configure CA {}, {}", caname, e.getMessage());
-				LOG.debug("Could not configure CA " + caname, e);
+				LOG.warn("Could not configure CA {}, IOException: {}", caname, e.getMessage());
+				LOG.debug("Could not configure CA " + caname, e);				
+				if(dev_mode == false)					
+				{
+					throw e;
+				}
+			}catch(CertificateException e)
+			{
+				LOG.warn("Could not configure CA {}, CertificateException: {}", caname, e.getMessage());
+				LOG.debug("Could not configure CA " + caname, e);				
+				if(dev_mode == false)					
+				{
+					throw new ConfigurationException(e);
+				}
 			}
 		}
 		

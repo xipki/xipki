@@ -114,13 +114,13 @@
     </fileSets>
 
     <files>
-        <file>
+        <!--file>
             <source>${project.build.directory}/classes/README</source>
             <outputDirectory>/</outputDirectory>
             <destName>README</destName>
             <fileMode>0644</fileMode>
             <lineEnding>unix</lineEnding>
-        </file>
+        </file-->
     </files>
 
 </assembly>

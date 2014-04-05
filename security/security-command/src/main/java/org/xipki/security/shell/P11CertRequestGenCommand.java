@@ -58,11 +58,11 @@ public class P11CertRequestGenCommand extends OsgiCommandSupport {
 			required = true, description = "Required. Slot index of the PKCS#11 token")
     protected Integer           slotIndex;
 	
-	@Option(name = "-keyId",
+	@Option(name = "-key-id",
 			required = false, description = "Id of the private key in the PKCS#11 token. Either keyId or keyLabel must be specified")
     protected String            keyId;
 	
-	@Option(name = "-keyLabel",
+	@Option(name = "-key-label",
 			required = false, description = "Label of the private key in the PKCS#11 token. Either keyId or keyLabel must be specified")
     protected String            keyLabel;
 

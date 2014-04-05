@@ -19,6 +19,8 @@
         <command name="ca/ca-add">
             <action class="org.xipki.ca.server.mgmt.shell.CaAddCommand">
             	<property name="caManager" ref="caManager" />
+            	<property name="passwordResolver" ref="passwordResolver"/>
+       			<property name="securityFactory" ref="securityFactory"/>
             </action>
         </command>
 
@@ -158,6 +160,8 @@
 		<command name="ca/crlsigner-add">
             <action class="org.xipki.ca.server.mgmt.shell.CrlSignerAddCommand">
             	<property name="caManager" ref="caManager" />
+            	<property name="passwordResolver" ref="passwordResolver"/>
+       			<property name="securityFactory" ref="securityFactory"/>
             </action>
         </command>
         
@@ -309,6 +313,8 @@
         <command name="ca/responder-set">
             <action class="org.xipki.ca.server.mgmt.shell.ResponderSetCommand">
             	<property name="caManager" ref="caManager" />
+            	<property name="passwordResolver" ref="passwordResolver"/>
+       			<property name="securityFactory" ref="securityFactory"/>
             </action>
         </command>
 

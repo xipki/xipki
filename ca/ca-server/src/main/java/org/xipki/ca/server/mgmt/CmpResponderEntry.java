@@ -50,7 +50,7 @@ public class CmpResponderEntry {
 		return cert;
 	}
 
-	public void setCert(X509Certificate cert) {
+	public void setCertificate(X509Certificate cert) {
 		this.cert = cert;
 	}
 	
@@ -62,11 +62,18 @@ public class CmpResponderEntry {
 		sb.append("type: ").append(type).append('\n');
 		sb.append("conf: ").append(conf).append('\n');
 		sb.append("cert: ").append("\n");
-		sb.append("\tissuer: ").append(
-				X509Util.canonicalizeName(cert.getIssuerX500Principal())).append("\n");
-		sb.append("\tserialNumber: ").append(cert.getSerialNumber()).append("\n");
-		sb.append("\tsubject: ").append(
-				X509Util.canonicalizeName(cert.getSubjectX500Principal()));
+		if(cert != null)
+		{
+			sb.append("\tissuer: ").append(
+					X509Util.canonicalizeName(cert.getIssuerX500Principal())).append("\n");
+			sb.append("\tserialNumber: ").append(cert.getSerialNumber()).append("\n");
+			sb.append("\tsubject: ").append(
+					X509Util.canonicalizeName(cert.getSubjectX500Principal()));
+		}
+		else
+		{
+			sb.append("null");
+		}
 		return sb.toString();
 	}
 	

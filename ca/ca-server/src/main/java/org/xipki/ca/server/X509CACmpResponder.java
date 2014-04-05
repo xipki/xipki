@@ -126,7 +126,7 @@ public class X509CACmpResponder extends CmpResponder
 	}	
 
 	@Override
-	protected boolean isCAInService() {
+	public boolean isCAInService() {
 		return CAStatus.ACTIVE == ca.getCAInfo().getStatus();
 	}
 
