@@ -199,16 +199,8 @@ public class CaGenRootCACommand extends CaCommand {
     	return null;
     }
 
-	public PasswordResolver getPasswordResolver() {
-		return passwordResolver;
-	}
-
 	public void setPasswordResolver(PasswordResolver passwordResolver) {
 		this.passwordResolver = passwordResolver;
-	}
-
-	public SecurityFactory getSecurityFactory() {
-		return securityFactory;
 	}
 
 	public void setSecurityFactory(SecurityFactory securityFactory) {
