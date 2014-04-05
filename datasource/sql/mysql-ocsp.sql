@@ -82,8 +82,8 @@ ENGINE = InnoDB;
 DROP TABLE IF EXISTS `rawcert` ;
 
 CREATE  TABLE IF NOT EXISTS `rawcert` (
-  `cert` VARCHAR(2000) NOT NULL COMMENT 'Base64 encoded certificate' ,
   `cert_id` INT NOT NULL ,
+  `cert` VARCHAR(2000) NOT NULL COMMENT 'Base64 encoded certificate' ,
   PRIMARY KEY (`cert_id`) ,
   CONSTRAINT `fk_rawcert_cert1`
     FOREIGN KEY (`cert_id` )
@@ -99,12 +99,12 @@ ENGINE = InnoDB;
 DROP TABLE IF EXISTS `certhash` ;
 
 CREATE  TABLE IF NOT EXISTS `certhash` (
+  `cert_id` INT NOT NULL ,
   `sha1_fp` CHAR(40) NOT NULL ,
   `sha224_fp` CHAR(56) NOT NULL ,
   `sha256_fp` CHAR(64) NOT NULL ,
   `sha384_fp` CHAR(96) NOT NULL ,
   `sha512_fp` CHAR(128) NOT NULL ,
-  `cert_id` INT NOT NULL ,
   PRIMARY KEY (`cert_id`) ,
   INDEX `fk_certhash_cert1` (`cert_id` ASC) ,
   CONSTRAINT `fk_certhash_cert1`
