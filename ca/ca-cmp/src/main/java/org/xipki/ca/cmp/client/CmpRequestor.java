@@ -100,7 +100,7 @@ public abstract class CmpRequestor
 		this.signserviceTimeout = signserviceTimeout;
 	}
 	
-	protected PKIResponse signAndSend(PKIMessage request)
+	protected PKIMessage sign(PKIMessage request)
 	throws CmpRequestorException
 	{
 		try {
@@ -110,6 +110,13 @@ public abstract class CmpRequestor
 		} catch (NoIdleSignerException e) {
 			throw new CmpRequestorException("Could not sign the request", e);
 		}
+		return request;
+	}
+
+	protected PKIResponse signAndSend(PKIMessage request)
+	throws CmpRequestorException
+	{
+		request = sign(request);
 
 		byte[] encodedRequest;
 		try {
