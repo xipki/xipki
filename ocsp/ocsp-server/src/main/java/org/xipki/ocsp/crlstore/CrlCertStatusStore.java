@@ -264,9 +264,15 @@ public class CrlCertStatusStore implements CertStatusStore {
 	public CertStatusInfo getCertStatus(
 			HashAlgoType hashAlgo, byte[] issuerNameHash, byte[] issuerKeyHash,
 			BigInteger serialNumber,
-			boolean includeCertHash)
+			boolean includeCertHash,
+			HashAlgoType certHashAlgo)
 	throws CertStatusStoreException
 	{		
+		if(includeCertHash && certHashAlgo == null)
+		{
+			certHashAlgo = hashAlgo;
+		}
+		
 		Date thisUpdate;
 		Date nextUpdate = null;
 
@@ -300,11 +306,11 @@ public class CrlCertStatusStore implements CertStatusStore {
 		if(certStatusInfo == null)
 		{
 			return unknownSerialAsGood ?
-					CertStatusInfo.getGoodCertStatusInfo(hashAlgo, null, thisUpdate, nextUpdate) :
+					CertStatusInfo.getGoodCertStatusInfo(certHashAlgo, null, thisUpdate, nextUpdate) :
 					CertStatusInfo.getUnknownCertStatusInfo(thisUpdate, nextUpdate);
 		}
 		
-		return certStatusInfo.getCertStatusInfo(hashAlgo, thisUpdate, nextUpdate);
+		return certStatusInfo.getCertStatusInfo(certHashAlgo, thisUpdate, nextUpdate);
 	}
 
 	private static byte[] removingTagAndLenFromExtensionValue(byte[] encodedExtensionValue)

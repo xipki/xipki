@@ -146,9 +146,15 @@ public class DbCertStatusStore implements CertStatusStore
 	public CertStatusInfo getCertStatus(
 			HashAlgoType hashAlgo, byte[] issuerNameHash, byte[] issuerKeyHash,
 			BigInteger serialNumber,
-			boolean includeCertHash)
+			boolean includeCertHash,
+			HashAlgoType certHashAlgo)
 	throws CertStatusStoreException
 	{
+		if(includeCertHash && certHashAlgo == null)
+		{
+			certHashAlgo = hashAlgo;
+		}
+		
 		try{
 			Date thisUpdate = new Date();
 			
@@ -184,7 +190,7 @@ public class DbCertStatusStore implements CertStatusStore
 					if(includeCertHash)
 					{
 						int certId = rs.getInt("id");
-						certHash = getCertHash(certId, hashAlgo);					
+						certHash = getCertHash(certId, certHashAlgo);					
 					}
 					
 					CertStatusInfo certStatusInfo;
@@ -196,12 +202,12 @@ public class DbCertStatusStore implements CertStatusStore
 						long invalidatityTime = rs.getLong("rev_invalidity_time");
 						CertRevocationInfo revInfo = new CertRevocationInfo(reason, new Date(revocationTime * 1000),
 								new Date(invalidatityTime * 1000));
-						certStatusInfo = CertStatusInfo.getRevocatedCertStatusInfo(revInfo, hashAlgo, certHash,
+						certStatusInfo = CertStatusInfo.getRevocatedCertStatusInfo(revInfo, certHashAlgo, certHash,
 								thisUpdate, null);
 					}
 					else
 					{
-						certStatusInfo = CertStatusInfo.getGoodCertStatusInfo(hashAlgo, certHash, thisUpdate, null);
+						certStatusInfo = CertStatusInfo.getGoodCertStatusInfo(certHashAlgo, certHash, thisUpdate, null);
 					}
 					
 					return certStatusInfo;				
@@ -209,7 +215,7 @@ public class DbCertStatusStore implements CertStatusStore
 				else
 				{
 					return unknownSerialAsGood ?
-							CertStatusInfo.getGoodCertStatusInfo(hashAlgo, null, thisUpdate, null) :
+							CertStatusInfo.getGoodCertStatusInfo(certHashAlgo, null, thisUpdate, null) :
 							CertStatusInfo.getUnknownCertStatusInfo(thisUpdate, null);
 				}
 			}finally
