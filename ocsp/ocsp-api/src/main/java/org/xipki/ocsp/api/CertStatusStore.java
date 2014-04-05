@@ -22,6 +22,6 @@ import java.math.BigInteger;
 public interface CertStatusStore
 {	
 	CertStatusInfo getCertStatus(HashAlgoType hashAlgo, byte[] issuerNameHash,
-			byte[] issuerKeyHash, BigInteger serialNumber, boolean includeCertHash)
+			byte[] issuerKeyHash, BigInteger serialNumber, boolean includeCertHash, HashAlgoType certHashAlgo)
 	throws CertStatusStoreException;
 }

@@ -33,8 +33,11 @@ import java.security.cert.X509Certificate;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Properties;
+import java.util.Set;
+import java.util.StringTokenizer;
 
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.DERNull;
@@ -94,12 +97,25 @@ public class OcspResponder {
 	public static final String cacertFile_SUFFIX = ".cacertFile";
 	public static final String issuerCertFile_SUFFIX = ".issuerCertFile";
 	public static final String unknownSerialAsGood_SUFFIX = ".unknownSerialAsGood";
+	public static final String req_nonce_required = "req.nonce.required";
+	public static final String req_nonce_len_min = "req.nonce.minlen";
+	public static final String req_nonce_len_max = "req.nonce.maxlen";
+	public static final String req_hash_algos = "req.hashalgos";
+	public static final String resp_certhash_algo = "resp.certhash.algo";
+	
+	private static final Set<HashAlgoType> supportedHashAlgorithms = new HashSet<HashAlgoType>();	
 	
     private static final Logger LOG = LoggerFactory.getLogger(OcspResponder.class);
 	private boolean includeCertHash = false;
 	private boolean requireReqSigned = false;
 	private boolean checkReqSignature = false;
-
+	
+	private boolean reqNonceRequired = false;
+	private int reqNonceMinLen = 8;
+	private int reqNonceMaxLen = 32;
+	private Set<HashAlgoType> reqHashAlgos;
+	private HashAlgoType respHashAlgo;
+	
 	private ResponderSigner responder;
 
 	private List<CertStatusStore> certStatusStores = new ArrayList<CertStatusStore>();
@@ -110,6 +126,14 @@ public class OcspResponder {
 	
 	private String confFile;	
 
+	static{
+		supportedHashAlgorithms.add(HashAlgoType.SHA1);
+		supportedHashAlgorithms.add(HashAlgoType.SHA224);
+		supportedHashAlgorithms.add(HashAlgoType.SHA256);
+		supportedHashAlgorithms.add(HashAlgoType.SHA384);
+		supportedHashAlgorithms.add(HashAlgoType.SHA512);
+	}
+	
 	public OcspResponder()
 	{		
 	}
@@ -158,8 +182,61 @@ public class OcspResponder {
 			}
 		}
 		
+		String s;
+		
+		s = props.getProperty(req_nonce_required, "false");
+		reqNonceRequired = Boolean.parseBoolean(s);
+		
+		s = props.getProperty(req_nonce_len_min, "8");
+		reqNonceMinLen = Integer.parseInt(s);
+		
+		s = props.getProperty(req_nonce_len_max, "32");
+		reqNonceMaxLen = Integer.parseInt(s);
+		
+		s = props.getProperty(req_hash_algos);
+		reqHashAlgos = new HashSet<HashAlgoType>();
+		if(s != null)
+		{
+			StringTokenizer st = new StringTokenizer(s, ", ");
+			while(st.hasMoreTokens())
+			{
+				String token = st.nextToken().trim();
+				HashAlgoType algo = HashAlgoType.getHashAlgoType(token);
+				if(algo != null && supportedHashAlgorithms.contains(algo))
+				{
+					reqHashAlgos.add(algo);
+				}
+				else
+				{
+					throw new OCSPResponderException("Hash algorithm " + token + " is unsupported");
+				}
+			}
+		}
+		else
+		{
+			reqHashAlgos.addAll(supportedHashAlgorithms);
+		}
+		
+		s = props.getProperty(resp_certhash_algo);
+		if(s != null)
+		{
+			String token = s.trim();
+			if(token.isEmpty() == false)
+			{
+				HashAlgoType algo = HashAlgoType.getHashAlgoType(token);
+				if(algo != null && supportedHashAlgorithms.contains(algo))
+				{
+					respHashAlgo = algo;
+				}
+				else
+				{
+					throw new OCSPResponderException("Hash algorithm " +token + " is unsupported");
+				}
+			}
+		}
+		
 		X509Certificate requestorCert = null;
-		String s = props.getProperty(signer_cert);
+		s = props.getProperty(signer_cert);
 		if(s != null && s.isEmpty() == false)
 		{
 			requestorCert = parseCert(s);
@@ -363,10 +440,23 @@ public class OcspResponder {
 	
 			RespID respID = new RespID(responder.getResponderId());		
 			BasicOCSPRespBuilder basicOcspBuilder = new BasicOCSPRespBuilder(respID);
-			Extension nonceExtn = request.getExtension(OCSPObjectIdentifiers.id_pkix_ocsp_nonce);
+			Extension nonceExtn = request.getExtension(OCSPObjectIdentifiers.id_pkix_ocsp_nonce);			
 			if(nonceExtn != null)
 			{
+				byte[] nonce = nonceExtn.getExtnValue().getOctets();
+				int len = nonce.length;
+				if(len < reqNonceMinLen || len > reqNonceMaxLen)
+				{
+					LOG.warn("length of nonce {} not within [{},{}]", new Object[]{len, reqNonceMinLen, reqNonceMaxLen});
+					return createUnsuccessfullOCSPResp(CSPResponseStatus.malformedRequest);
+				}
+				
 				basicOcspBuilder.setResponseExtensions(new Extensions(nonceExtn));
+			}
+			else if(reqNonceRequired)
+			{
+				LOG.warn("nonce required, but is not present in the request");
+				return createUnsuccessfullOCSPResp(CSPResponseStatus.malformedRequest);
 			}
 			
 			for(int i = 0; i < n; i++)
@@ -374,21 +464,32 @@ public class OcspResponder {
 				Req req = requestList[i];
 				CertificateID certID =  req.getCertID();
 				String certIdHashAlgo = certID.getHashAlgOID().getId();
-				HashAlgoType hashAlgo = HashAlgoType.getHashAlgoType(certIdHashAlgo);
-				if(hashAlgo == null)
+				HashAlgoType reqHashAlgo = HashAlgoType.getHashAlgoType(certIdHashAlgo);
+				if(reqHashAlgo == null)
 				{
 					LOG.warn("unknown CertID.hashAlgorithm {}", certIdHashAlgo);
 					return createUnsuccessfullOCSPResp(CSPResponseStatus.malformedRequest);
-				}
+				}				
+				else if(reqHashAlgos.contains(reqHashAlgo) == false)
+				{
+					LOG.warn("CertID.hashAlgorithm {} not allowed", certIdHashAlgo);
+					return createUnsuccessfullOCSPResp(CSPResponseStatus.malformedRequest);
+				}				
 				
 				CertStatusInfo certStatusInfo = null;
 				
 				for(CertStatusStore store : certStatusStores)
 				{
+					HashAlgoType certHashAlgo = null;
+					if(includeCertHash)
+					{
+						certHashAlgo = (respHashAlgo != null) ? respHashAlgo : reqHashAlgo;
+					}					
+						
 					try {
 						certStatusInfo = store.getCertStatus(
-								hashAlgo, certID.getIssuerNameHash(), certID.getIssuerKeyHash(),
-								certID.getSerialNumber(), includeCertHash);
+								reqHashAlgo, certID.getIssuerNameHash(), certID.getIssuerKeyHash(),
+								certID.getSerialNumber(), includeCertHash, certHashAlgo);
 						if(certStatusInfo.getCertStatus() != CertStatus.ISSUER_UNKNOWN)
 						{
 							break;
@@ -427,7 +528,7 @@ public class OcspResponder {
 				Extensions extensions = null;
 				byte[] certHash = certStatusInfo.getCertHash();
 				if(includeCertHash && certHash != null)
-				{					
+				{
 					ASN1ObjectIdentifier hashAlgoOid = 
 							new ASN1ObjectIdentifier(certStatusInfo.getCertHashAlgo().getOid());
 					AlgorithmIdentifier aId = new AlgorithmIdentifier(hashAlgoOid, DERNull.INSTANCE);
