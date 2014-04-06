@@ -30,7 +30,8 @@ CREATE  TABLE IF NOT EXISTS `responder` (
   `type` VARCHAR(100) NOT NULL ,
   `conf` VARCHAR(4000) NULL DEFAULT NULL ,
   `cert` VARCHAR(2000) NULL DEFAULT NULL ,
-  PRIMARY KEY (`name`) )
+  PRIMARY KEY (`name`) ,
+  UNIQUE INDEX `name_UNIQUE` (`name` ASC) )
 ENGINE = InnoDB;
 
 
@@ -47,7 +48,8 @@ CREATE  TABLE IF NOT EXISTS `crlsigner` (
   `period` INT NOT NULL COMMENT 'minutes. 0 indicates no CRL will be generated automatically.' ,
   `overlap` INT NOT NULL COMMENT 'minutes' ,
   `include_certs_in_crl` SMALLINT NOT NULL DEFAULT 0 ,
-  PRIMARY KEY (`name`) )
+  PRIMARY KEY (`name`) ,
+  UNIQUE INDEX `name_UNIQUE` (`name` ASC) )
 ENGINE = InnoDB;
 
 
@@ -73,6 +75,7 @@ CREATE  TABLE IF NOT EXISTS `ca` (
   `permissions` VARCHAR(100) NOT NULL ,
   PRIMARY KEY (`name`) ,
   INDEX `fk_ca_crlsigner1_idx` (`crlsigner_name` ASC) ,
+  UNIQUE INDEX `name_UNIQUE` (`name` ASC) ,
   CONSTRAINT `fk_ca_crlsigner1`
     FOREIGN KEY (`crlsigner_name` )
     REFERENCES `crlsigner` (`name` )
@@ -89,7 +92,8 @@ DROP TABLE IF EXISTS `requestor` ;
 CREATE  TABLE IF NOT EXISTS `requestor` (
   `name` VARCHAR(45) NOT NULL ,
   `cert` VARCHAR(2000) NOT NULL ,
-  PRIMARY KEY (`name`) )
+  PRIMARY KEY (`name`) ,
+  UNIQUE INDEX `name_UNIQUE` (`name` ASC) )
 ENGINE = InnoDB;
 
 
@@ -154,7 +158,8 @@ CREATE  TABLE IF NOT EXISTS `cainfo` (
   `subject` VARCHAR(200) NOT NULL ,
   `cert` VARCHAR(2000) NOT NULL ,
   `sha1_fp_cert` CHAR(40) NOT NULL ,
-  PRIMARY KEY (`id`) )
+  PRIMARY KEY (`id`) ,
+  UNIQUE INDEX `id_UNIQUE` (`id` ASC) )
 ENGINE = InnoDB;
 
 
@@ -168,7 +173,8 @@ CREATE  TABLE IF NOT EXISTS `requestorinfo` (
   `subject` VARCHAR(200) NOT NULL ,
   `cert` VARCHAR(2000) NULL ,
   `sha1_fp_cert` CHAR(40) NULL ,
-  PRIMARY KEY (`id`) )
+  PRIMARY KEY (`id`) ,
+  UNIQUE INDEX `id_UNIQUE` (`id` ASC) )
 ENGINE = InnoDB;
 
 
@@ -180,7 +186,8 @@ DROP TABLE IF EXISTS `user` ;
 CREATE  TABLE IF NOT EXISTS `user` (
   `id` INT NOT NULL ,
   `name` VARCHAR(200) NOT NULL ,
-  PRIMARY KEY (`id`) )
+  PRIMARY KEY (`id`) ,
+  UNIQUE INDEX `id_UNIQUE` (`id` ASC) )
 ENGINE = InnoDB;
 
 
@@ -192,7 +199,8 @@ DROP TABLE IF EXISTS `certprofileinfo` ;
 CREATE  TABLE IF NOT EXISTS `certprofileinfo` (
   `id` INT NOT NULL ,
   `name` VARCHAR(45) NOT NULL ,
-  PRIMARY KEY (`id`) )
+  PRIMARY KEY (`id`) ,
+  UNIQUE INDEX `id_UNIQUE` (`id` ASC) )
 ENGINE = InnoDB;
 
 
@@ -223,6 +231,7 @@ CREATE  TABLE IF NOT EXISTS `cert` (
   INDEX `fk_cert_requestorinfo1_idx` (`requestorinfo_id` ASC) ,
   INDEX `fk_cert_user1_idx` (`user_id` ASC) ,
   INDEX `fk_cert_certprofileinfo1_idx` (`certprofileinfo_id` ASC) ,
+  UNIQUE INDEX `id_UNIQUE` (`id` ASC) ,
   CONSTRAINT `fk_cert_cainfo1`
     FOREIGN KEY (`cainfo_id` )
     REFERENCES `cainfo` (`id` )
@@ -275,7 +284,8 @@ CREATE  TABLE IF NOT EXISTS `cmpcontrol` (
   `message_time_bias` INT NOT NULL COMMENT 'seconds' ,
   `confirm_wait_time` INT NOT NULL COMMENT 'seconds' ,
   `send_ca_cert` SMALLINT NOT NULL ,
-  PRIMARY KEY (`name`) )
+  PRIMARY KEY (`name`) ,
+  UNIQUE INDEX `name_UNIQUE` (`name` ASC) )
 ENGINE = InnoDB;
 
 
@@ -287,7 +297,8 @@ DROP TABLE IF EXISTS `environment` ;
 CREATE  TABLE IF NOT EXISTS `environment` (
   `name` VARCHAR(45) NOT NULL ,
   `value` VARCHAR(200) NULL ,
-  PRIMARY KEY (`name`) )
+  PRIMARY KEY (`name`) ,
+  UNIQUE INDEX `name_UNIQUE` (`name` ASC) )
 ENGINE = InnoDB;
 
 
@@ -300,7 +311,8 @@ CREATE  TABLE IF NOT EXISTS `publisher` (
   `name` VARCHAR(45) NOT NULL ,
   `type` VARCHAR(100) NOT NULL ,
   `conf` VARCHAR(5000) NULL ,
-  PRIMARY KEY (`name`) )
+  PRIMARY KEY (`name`) ,
+  UNIQUE INDEX `name_UNIQUE` (`name` ASC) )
 ENGINE = InnoDB;
 
 
@@ -342,6 +354,7 @@ CREATE  TABLE IF NOT EXISTS `crl` (
   `crl` BLOB NOT NULL ,
   PRIMARY KEY (`id`) ,
   INDEX `fk_crl_cainfo1_idx` (`cainfo_id` ASC) ,
+  UNIQUE INDEX `id_UNIQUE` (`id` ASC) ,
   CONSTRAINT `fk_crl_cainfo1`
     FOREIGN KEY (`cainfo_id` )
     REFERENCES `cainfo` (`id` )
@@ -369,7 +382,7 @@ CREATE  TABLE IF NOT EXISTS `caalias` (
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;
 
-USE `ca`;
+
 
 SET SQL_MODE=@OLD_SQL_MODE;
 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
