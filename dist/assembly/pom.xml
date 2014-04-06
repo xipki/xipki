@@ -193,25 +193,44 @@
 									</artifactItems>
 								</configuration>
 							</execution>
-                                                        <execution>
-                                                                <!-- Uncompress the IAIK PKCS#11 native libraries -->
-                                                                <id>unpack-iaik</id>
-                                                                <phase>generate-resources</phase>
-                                                                <goals>
-                                                                        <goal>unpack</goal>
-                                                                </goals>
-                                                                <configuration>
-                                                                        <artifactItems>
-                                                                                <artifactItem>
-                                                                                        <groupId>at.tugraz.iaik</groupId>
-                                                                                        <artifactId>iaikPkcs11Wrapper-native</artifactId>
-                                                                                        <version>${pkcs11Wrapper.version}</version>
-                                                                                        <type>zip</type>
-                                                                                        <outputDirectory>target/native-lib</outputDirectory>
-                                                                                </artifactItem>
-                                                                        </artifactItems>
-                                                                </configuration>
-                                                        </execution>
+							<execution>
+								<!-- Uncompress the IAIK PKCS#11 native libraries -->
+								<id>unpack-iaik</id>
+								<phase>generate-resources</phase>
+								<goals>
+									<goal>unpack</goal>
+								</goals>
+								<configuration>
+									<artifactItems>
+										<artifactItem>
+											<groupId>at.tugraz.iaik</groupId>
+											<artifactId>iaikPkcs11Wrapper-native</artifactId>
+											<version>${pkcs11Wrapper.version}</version>
+											<type>zip</type>
+											<outputDirectory>target/native-lib</outputDirectory>
+										</artifactItem>
+									</artifactItems>
+								</configuration>
+							</execution>
+							<execution>
+								<id>unpack-liquibase</id>
+								<phase>generate-resources</phase>
+								<goals>
+									<goal>unpack</goal>
+								</goals>
+								<configuration>
+									<artifactItems>
+										<artifactItem>
+											<groupId>org.liquibase</groupId>
+											<artifactId>liquibase-core</artifactId>
+											<version>${liquibase.version}</version>
+											<classifier>bin</classifier>
+											<type>tar.gz</type>
+											<outputDirectory>target/sql/liquibase</outputDirectory>
+										</artifactItem>
+									</artifactItems>
+								</configuration>
+							</execution>
 						</executions>
 					</plugin>
 					<plugin>

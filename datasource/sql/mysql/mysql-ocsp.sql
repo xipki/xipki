@@ -26,7 +26,8 @@ CREATE  TABLE IF NOT EXISTS `issuer` (
   `sha512_fp_key` CHAR(128) NOT NULL ,
   `sha1_fp_cert` CHAR(40) NOT NULL ,
   `cert` VARCHAR(2000) NOT NULL ,
-  PRIMARY KEY (`id`) )
+  PRIMARY KEY (`id`) ,
+  UNIQUE INDEX `id_UNIQUE` (`id` ASC) )
 ENGINE = InnoDB;
 
 
@@ -38,7 +39,8 @@ DROP TABLE IF EXISTS `certprofile` ;
 CREATE  TABLE IF NOT EXISTS `certprofile` (
   `id` INT NOT NULL ,
   `name` VARCHAR(45) NOT NULL ,
-  PRIMARY KEY (`id`) )
+  PRIMARY KEY (`id`) ,
+  UNIQUE INDEX `id_UNIQUE` (`id` ASC) )
 ENGINE = InnoDB;
 
 
@@ -63,6 +65,7 @@ CREATE  TABLE IF NOT EXISTS `cert` (
   PRIMARY KEY (`id`) ,
   INDEX `fk_cert_cainfo1` (`issuer_id` ASC) ,
   INDEX `fk_cert_certprofile1` (`certprofile_id` ASC) ,
+  UNIQUE INDEX `id_UNIQUE` (`id` ASC) ,
   CONSTRAINT `fk_cert_cainfo1`
     FOREIGN KEY (`issuer_id` )
     REFERENCES `issuer` (`id` )
