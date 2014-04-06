@@ -73,8 +73,33 @@
         <fileSet>
             <directory>${project.basedir}/../../datasource/sql</directory>
             <includes>
-                <include>*.sql</include>
+                <include>ca-init.xml</include>
+                <include>ocsp-init.xml</include>
             </includes>
+            <outputDirectory>sql</outputDirectory>
+            <fileMode>0644</fileMode>
+            <directoryMode>0755</directoryMode>
+        </fileSet>
+
+        <fileSet>
+            <directory>${project.build.directory}/sql</directory>
+            <includes>
+                <include>liquibase/liquibase</include>
+            </includes>
+            <excludes>
+                <exclude>liquibase/javadoc/**</exclude>
+            </excludes>
+            <outputDirectory>sql</outputDirectory>
+            <fileMode>0755</fileMode>
+            <directoryMode>0755</directoryMode>
+        </fileSet>
+
+        <fileSet>
+            <directory>${project.build.directory}/sql</directory>
+            <excludes>
+                <exclude>liquibase/liquibase</exclude>
+                <exclude>liquibase/javadoc</exclude>
+            </excludes>
             <outputDirectory>sql</outputDirectory>
             <fileMode>0644</fileMode>
             <directoryMode>0755</directoryMode>
@@ -91,7 +116,6 @@
             <fileMode>0755</fileMode>
             <directoryMode>0755</directoryMode>
         </fileSet>
-
 
         <!-- Expanded Karaf -->
         <fileSet>
