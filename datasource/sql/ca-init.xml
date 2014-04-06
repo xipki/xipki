@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.0.xsd" logicalFilePath="ca-init.xml">
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
 	<!-- CA configuration :: create table -->
-	<changeSet id="1">
+	<changeSet author="xipki" id="1">
 		<!-- table cmpcontrol -->
 		<createTable tableName="cmpcontrol">
 			<column name="name" type="VARCHAR(45)">
-				<constraints nullable="false"/>
+				<constraints primaryKey="true" unique="true" nullable="false"/>
 			</column>
 			<column name="require_confirm_cert" type="INT">
 				<constraints nullable="false"/>
@@ -23,7 +23,7 @@
 		<!-- table responder -->
 		<createTable tableName="responder">
 			<column name="name" type="VARCHAR(45)">
-				<constraints nullable="false"/>
+				<constraints primaryKey="true" unique="true" nullable="false"/>
 			</column>
 			<column name="type" type="VARCHAR(100)">
 				<constraints nullable="false"/>
@@ -34,14 +34,14 @@
 		<!-- table environment -->
 		<createTable tableName="environment">
 			<column name="name" type="VARCHAR(45)">
-				<constraints nullable="false"/>
+				<constraints primaryKey="true" unique="true" nullable="false"/>
 			</column>
 			<column name="value" type="VARCHAR(200)"/>
 		</createTable>
 		<!-- table crlsigner -->
 		<createTable tableName="crlsigner">
 			<column name="name" type="VARCHAR(45)">
-				<constraints nullable="false"/>
+				<constraints primaryKey="true" unique="true" nullable="false"/>
 			</column>
 			<column name="signer_type" type="VARCHAR(100)">
 				<constraints nullable="false"/>
@@ -61,7 +61,7 @@
 		<!-- table requestor -->
 		<createTable tableName="requestor">
 			<column name="name" type="VARCHAR(45)">
-				<constraints nullable="false"/>
+				<constraints primaryKey="true" unique="true" nullable="false"/>
 			</column>
 			<column name="cert" type="VARCHAR(2000)">
 				<constraints nullable="false"/>
@@ -70,7 +70,7 @@
 		<!-- table publisher -->
 		<createTable tableName="publisher">
 			<column name="name" type="VARCHAR(45)">
-				<constraints nullable="false"/>
+				<constraints primaryKey="true" unique="true" nullable="false"/>
 			</column>
 			<column name="type" type="VARCHAR(100)">
 				<constraints nullable="false"/>
@@ -80,7 +80,7 @@
 		<!-- table certprofile -->
 		<createTable tableName="certprofile">
 			<column name="name" type="VARCHAR(45)">
-				<constraints nullable="false"/>
+				<constraints primaryKey="true" unique="true" nullable="false"/>
 			</column>
 			<column name="type" type="VARCHAR(100)">
 				<constraints nullable="false"/>
@@ -90,7 +90,7 @@
 		<!-- table ca -->
 		<createTable tableName="ca">
 			<column name="name" type="VARCHAR(45)">
-				<constraints nullable="false"/>
+				<constraints primaryKey="true" unique="true" nullable="false"/>
 			</column>
 			<column name="next_serial" type="INT(10)"/>
 			<column name="status" remarks="valid values: pending, enabled, disabled" type="VARCHAR(10)">
@@ -127,19 +127,20 @@
 		<!-- table caalias -->
 		<createTable tableName="caalias">
 			<column name="name" type="VARCHAR(45)">
-				<constraints nullable="false"/>
+				<constraints primaryKey="true" unique="true" nullable="false"/>
 			</column>
 			<column name="ca_name" type="VARCHAR(45)">
 				<constraints nullable="false"/>
 			</column>
 		</createTable>
+
 		<!-- table ca_has_requestor -->
 		<createTable tableName="ca_has_requestor">
 			<column name="ca_name" type="VARCHAR(45)">
-				<constraints nullable="false"/>
+				<constraints primaryKey="true" nullable="false"/>
 			</column>
 			<column name="requestor_name" type="VARCHAR(45)">
-				<constraints nullable="false"/>
+				<constraints primaryKey="true" nullable="false"/>
 			</column>
 			<column name="ra" type="INT">
 				<constraints nullable="false"/>
@@ -150,28 +151,28 @@
 		<!-- table ca_has_publisher -->
 		<createTable tableName="ca_has_publisher">
 			<column name="ca_name" type="VARCHAR(45)">
-				<constraints nullable="false"/>
+				<constraints primaryKey="true" nullable="false"/>
 			</column>
 			<column name="publisher_name" type="VARCHAR(45)">
-				<constraints nullable="false"/>
+				<constraints primaryKey="true" nullable="false"/>
 			</column>
 		</createTable>
 		<!-- table ca_has_profile -->
 		<createTable tableName="ca_has_certprofile">
 			<column name="ca_name" type="VARCHAR(45)">
-				<constraints nullable="false"/>
+				<constraints primaryKey="true" nullable="false"/>
 			</column>
 			<column name="certprofile_name" type="VARCHAR(45)">
-				<constraints nullable="false"/>
+				<constraints primaryKey="true" nullable="false"/>
 			</column>
 		</createTable>
 	</changeSet>
 	<!-- CertStore :: create table -->
-	<changeSet id="2">
+	<changeSet author="xipki" id="2">
 		<!-- table cainfo -->
 		<createTable tableName="cainfo">
 			<column name="id" type="INT(10)">
-				<constraints nullable="false"/>
+				<constraints primaryKey="true" unique="true" nullable="false"/>
 			</column>
 			<column name="subject" type="VARCHAR(200)">
 				<constraints nullable="false"/>
@@ -186,7 +187,7 @@
 		<!-- table requestorinfo -->
 		<createTable tableName="requestorinfo">
 			<column name="id" type="INT(10)">
-				<constraints nullable="false"/>
+				<constraints primaryKey="true" unique="true" nullable="false"/>
 			</column>
 			<column name="subject" type="VARCHAR(200)">
 				<constraints nullable="false"/>
@@ -197,7 +198,7 @@
 		<!-- table user -->
 		<createTable tableName="user">
 			<column name="id" type="INT(10)">
-				<constraints nullable="false"/>
+				<constraints primaryKey="true" unique="true" nullable="false"/>
 			</column>
 			<column name="name" type="VARCHAR(200)">
 				<constraints nullable="false"/>
@@ -206,7 +207,7 @@
 		<!-- table certprofileinfo -->
 		<createTable tableName="certprofileinfo">
 			<column name="id" type="INT(10)">
-				<constraints nullable="false"/>
+				<constraints primaryKey="true" unique="true" nullable="false"/>
 			</column>
 			<column name="name" type="VARCHAR(45)">
 				<constraints nullable="false"/>
@@ -215,7 +216,7 @@
 		<!-- table crl -->
 		<createTable tableName="crl">
 			<column autoIncrement="true" name="id" type="INT(10)">
-				<constraints primaryKey="true"/>
+				<constraints primaryKey="true" unique="true"/>
 			</column>
 			<column name="cainfo_id" type="INT(10)">
 				<constraints nullable="false"/>
@@ -234,7 +235,7 @@
 		<!-- table cert -->
 		<createTable tableName="cert">
 			<column name="id" type="INT(10)">
-				<constraints nullable="false"/>
+				<constraints primaryKey="true" unique="true" nullable="false"/>
 			</column>
 			<column name="cainfo_id" type="INT(10)">
 				<constraints nullable="false"/>
@@ -274,76 +275,19 @@
 		</createTable>
 		<!-- table rawcert -->
 		<createTable tableName="rawcert">
+			<column name="cert_id" type="INT(10)">
+				<constraints primaryKey="true" nullable="false"/>
+			</column>
 			<column name="sha1_fp" type="VARCHAR(40)">
 				<constraints nullable="false"/>
 			</column>
 			<column name="cert" remarks="Base64 encoded certificate" type="VARCHAR(2000)">
 				<constraints nullable="false"/>
 			</column>
-			<column name="cert_id" type="INT(10)">
-				<constraints nullable="false"/>
-			</column>
 		</createTable>
 	</changeSet>
-	<!-- CA Configuration :: primary key -->
-	<changeSet id="3">
-		<!-- table cmpcontrol -->
-		<addPrimaryKey constraintName="PRIMARY" tableName="cmpcontrol" columnNames="name"/>
-		<addUniqueConstraint constraintName="name_UNIQUE" tableName="cmpcontrol" columnNames="name" deferrable="false" disabled="false" initiallyDeferred="false"/>
-		<!-- table responder -->
-		<addPrimaryKey constraintName="PRIMARY" tableName="responder" columnNames="name"/>
-		<addUniqueConstraint constraintName="name_UNIQUE" tableName="responder" columnNames="name" deferrable="false" disabled="false" initiallyDeferred="false"/>
-		<!-- table environment -->
-		<addPrimaryKey constraintName="PRIMARY" tableName="environment" columnNames="name"/>
-		<addUniqueConstraint constraintName="name_UNIQUE" tableName="environment" columnNames="name" deferrable="false" disabled="false" initiallyDeferred="false"/>
-		<!-- table crlsigner -->
-		<addPrimaryKey constraintName="PRIMARY" tableName="crlsigner" columnNames="name"/>
-		<addUniqueConstraint constraintName="name_UNIQUE" tableName="crlsigner" columnNames="name" deferrable="false" disabled="false" initiallyDeferred="false"/>
-		<!-- table requestor -->
-		<addPrimaryKey constraintName="PRIMARY" tableName="requestor" columnNames="name"/>
-		<addUniqueConstraint constraintName="name_UNIQUE" tableName="requestor" columnNames="name" deferrable="false" disabled="false" initiallyDeferred="false"/>
-		<!-- table publisher -->
-		<addPrimaryKey constraintName="PRIMARY" tableName="publisher" columnNames="name"/>
-		<addUniqueConstraint constraintName="name_UNIQUE" tableName="publisher" columnNames="name" deferrable="false" disabled="false" initiallyDeferred="false"/>
-		<!-- table certprofile -->
-		<addPrimaryKey constraintName="PRIMARY" tableName="certprofile" columnNames="name"/>
-		<addUniqueConstraint constraintName="name_UNIQUE" tableName="certprofile" columnNames="name" deferrable="false" disabled="false" initiallyDeferred="false"/>
-		<!-- table ca -->
-		<addPrimaryKey constraintName="PRIMARY" tableName="ca" columnNames="name"/>
-		<addUniqueConstraint constraintName="name_UNIQUE" tableName="ca" columnNames="name" deferrable="false" disabled="false" initiallyDeferred="false"/>
-		<!-- table caalias -->
-		<addPrimaryKey constraintName="PRIMARY" tableName="caalias" columnNames="name,ca_name"/>
-		<addUniqueConstraint constraintName="name_UNIQUE" tableName="caalias" columnNames="name" deferrable="false" disabled="false" initiallyDeferred="false"/>
-
-		<addPrimaryKey constraintName="PRIMARY" tableName="ca_has_requestor" columnNames="ca_name, requestor_name"/>
-		<addPrimaryKey constraintName="PRIMARY" tableName="ca_has_publisher" columnNames="ca_name, publisher_name"/>
-		<addPrimaryKey constraintName="PRIMARY" tableName="ca_has_certprofile" columnNames="ca_name, certprofile_name"/>
-	</changeSet>
-	<!-- CertStore :: primary key -->
-	<changeSet id="4">
-		<!-- table crl -->
-		<addPrimaryKey constraintName="PRIMARY" tableName="crl" columnNames="id"/>
-		<addUniqueConstraint constraintName="id_UNIQUE" tableName="crl" columnNames="name" deferrable="false" disabled="false" initiallyDeferred="false"/>
-		<!-- tabel cainfo -->
-		<addPrimaryKey constraintName="PRIMARY" tableName="cainfo" columnNames="id"/>
-		<addUniqueConstraint constraintName="id_UNIQUE" tableName="cainfo" columnNames="name" deferrable="false" disabled="false" initiallyDeferred="false"/>
-		<!-- table requestorinfo -->
-		<addPrimaryKey constraintName="PRIMARY" tableName="requestorinfo" columnNames="id"/>
-		<addUniqueConstraint constraintName="id_UNIQUE" tableName="requestorinfo" columnNames="name" deferrable="false" disabled="false" initiallyDeferred="false"/>
-		<!-- table user -->
-		<addPrimaryKey constraintName="PRIMARY" tableName="user" columnNames="id"/>
-		<addUniqueConstraint constraintName="id_UNIQUE" tableName="user" columnNames="name" deferrable="false" disabled="false" initiallyDeferred="false"/>
-		<!-- table certprofileinfo -->
-		<addPrimaryKey constraintName="PRIMARY" tableName="certprofileinfo" columnNames="id"/>
-		<addUniqueConstraint constraintName="id_UNIQUE" tableName="certprofileinfo" columnNames="name" deferrable="false" disabled="false" initiallyDeferred="false"/>
-		<!-- table cert -->
-		<addPrimaryKey constraintName="PRIMARY" tableName="cert" columnNames="id"/>
-		<addUniqueConstraint constraintName="id_UNIQUE" tableName="cert" columnNames="name" deferrable="false" disabled="false" initiallyDeferred="false"/>
-		<!-- table rawcert -->
-		<addPrimaryKey constraintName="PRIMARY" tableName="rawcert" columnNames="cert_id"/>
-	</changeSet>
 	<!-- CA Configuration :: foreign key -->
-	<changeSet id="5">
+	<changeSet author="xipki" id="3">
 		<addForeignKeyConstraint deferrable="false" initiallyDeferred="false" onDelete="CASCADE" onUpdate="NO ACTION" baseColumnNames="crlsigner_name" baseTableName="ca" constraintName="fk_ca_crlsigner1" referencedColumnNames="name" referencedTableName="crlsigner"/>
 		<addForeignKeyConstraint deferrable="false" initiallyDeferred="false" onDelete="CASCADE" onUpdate="NO ACTION" baseColumnNames="ca_name" baseTableName="caalias" constraintName="fk_servletname_ca1" referencedColumnNames="name" referencedTableName="ca"/>
 		<!-- ca_ha_requestor -->
@@ -357,7 +301,7 @@
 		<addForeignKeyConstraint deferrable="false" initiallyDeferred="false" onDelete="CASCADE" onUpdate="NO ACTION" baseColumnNames="ca_name" baseTableName="ca_has_certprofile" constraintName="fk_ca_has_certprofile_ca1" referencedColumnNames="name" referencedTableName="ca"/>
 	</changeSet>
 	<!-- CertStore :: foreigen key -->
-	<changeSet id="6">
+	<changeSet author="xipki" id="4">
 		<addForeignKeyConstraint deferrable="false" initiallyDeferred="false" onDelete="CASCADE" onUpdate="NO ACTION" baseColumnNames="cainfo_id" baseTableName="crl" constraintName="fk_crl_cainfo1" referencedColumnNames="id" referencedTableName="cainfo"/>
 		<addForeignKeyConstraint deferrable="false" initiallyDeferred="false" onDelete="CASCADE" onUpdate="NO ACTION" baseColumnNames="cainfo_id" baseTableName="cert" constraintName="fk_cert_cainfo1" referencedColumnNames="id" referencedTableName="cainfo"/>
 		<addForeignKeyConstraint deferrable="false" initiallyDeferred="false" onDelete="CASCADE" onUpdate="NO ACTION" baseColumnNames="requestorinfo_id" baseTableName="cert" constraintName="fk_cert_requestorinfo1" referencedColumnNames="id" referencedTableName="requestorinfo"/>
