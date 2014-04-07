@@ -53,6 +53,7 @@
 		<junit.version>4.8.2</junit.version>
 		<pkcs11Wrapper.version>1.2.18</pkcs11Wrapper.version>
 		<liquibase.version>3.1.1</liquibase.version>
+		<mysql-jdbc.version>5.1.27</mysql-jdbc.version>
 	</properties>
 	<modules>
 		<module>security</module>
