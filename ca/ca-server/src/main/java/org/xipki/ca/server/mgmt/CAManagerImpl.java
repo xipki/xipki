@@ -2158,7 +2158,7 @@ public class CAManagerImpl implements CAManager
 		try{
 			ps = prepareStatement("UPDATE ca SET crlsigner_name=? WHERE name=?");
 			ps.setString(1, crlSignerName);
-			ps.setString(1, caName);
+			ps.setString(2, caName);
 			
 			ps.executeUpdate();
 		}catch(SQLException e)

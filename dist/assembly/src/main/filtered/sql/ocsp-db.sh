@@ -7,7 +7,7 @@ CHANGELOG_FILE=ocsp-init.xml
 JDBC_CP=../system/mysql/mysql-connector-java/${mysql-jdbc.version}/mysql-connector-java-${mysql-jdbc.version}.jar
 
 # retrieve the database configuration
-cat ../ocsp-config/$PROP_FILE | sed 's/\./_/' > .$PROP_FILE
+cat ../ca-demo/$PROP_FILE | sed 's/\./_/' > .$PROP_FILE
 . ./.$PROP_FILE
 rm .$PROP_FILE -f
 echo command=$COMMAND

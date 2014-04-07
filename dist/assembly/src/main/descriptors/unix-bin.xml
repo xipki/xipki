@@ -146,13 +146,13 @@
     </fileSets>
 
     <files>
-        <!--file>
-            <source>${project.build.directory}/classes/README</source>
+        <file>
+            <source>${project.build.directory}/classes/LICENSE</source>
             <outputDirectory>/</outputDirectory>
-            <destName>README</destName>
+            <destName>LICENSE</destName>
             <fileMode>0644</fileMode>
             <lineEnding>unix</lineEnding>
-        </file-->
+        </file>
     </files>
 
 </assembly>
