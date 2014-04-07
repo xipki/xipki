@@ -31,14 +31,10 @@ ca:crlsigner-add -signerType CA -period 0 -name CASIGN.CRLSIGNER
 ## Add the profile RCA
 ca:profile-add -name  RCA -type java:org.xipki.ca.certprofile.example.CertProfile_RootCA
 
-## Generate keys and PKCS#10 request
-keytool:rsa-p12 -pwd 1234 -out output/RCA1.p12 -subject "CN=RCA1,O=xipki,C=DE"
-keytool:req-p12 -p12 output/RCA1.p12 -pwd 1234 -hash SHA256 -out output/RCA1.p10
-
 ## Generate selfsigned RCA
 ca:gen-rca -name RCA1 \
   -subject "CN=RCA1,O=xipki,C=DE" -profile RCA -out output/RCA1.der \
-  -permission all -nextSerial 1 -maxValidity 1825 -signerType PKCS12 \
+  -permission all -nextSerial 1 -maxValidity 1825 -signerType PKCS11 \
   -signerConf algo?SHA256withRSA%slot?1%key-label?RCA1
 
 ## Update the certificate in the device

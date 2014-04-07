@@ -19,19 +19,26 @@ package org.xipki.security.shell;
 
 import iaik.pkcs.pkcs11.Session;
 import iaik.pkcs.pkcs11.objects.Certificate.CertificateType;
+import iaik.pkcs.pkcs11.objects.Object;
 import iaik.pkcs.pkcs11.objects.PrivateKey;
 import iaik.pkcs.pkcs11.objects.X509PublicKeyCertificate;
 
+import java.security.PublicKey;
 import java.security.cert.X509Certificate;
+import java.security.interfaces.ECPublicKey;
+import java.security.interfaces.RSAPublicKey;
 
 import org.apache.felix.gogo.commands.Command;
 import org.apache.felix.gogo.commands.Option;
 import org.apache.karaf.shell.console.OsgiCommandSupport;
 import org.bouncycastle.util.encoders.Hex;
+import org.xipki.security.NopPasswordResolver;
 import org.xipki.security.api.PKCS11SlotIdentifier;
+import org.xipki.security.api.PasswordResolverException;
 import org.xipki.security.api.Pkcs11KeyIdentifier;
 import org.xipki.security.api.SecurityFactory;
 import org.xipki.security.api.SignerException;
+import org.xipki.security.common.CmpUtf8Pairs;
 import org.xipki.security.common.IoCertUtil;
 import org.xipki.security.p11.iaik.IaikExtendedModule;
 import org.xipki.security.p11.iaik.IaikExtendedSlot;
@@ -63,15 +70,11 @@ public class P11CertUpdateCommand extends OsgiCommandSupport {
 	
 	private SecurityFactory securityFactory;
 	
-	public SecurityFactory getSecurityFactory() {
-		return securityFactory;
-	}
-
 	public void setSecurityFactory(SecurityFactory securityFactory) {
 		this.securityFactory = securityFactory;
 	}
 	
-    @Override
+	@Override
     protected Object doExecute() throws Exception {
     	Pkcs11KeyIdentifier keyIdentifier;
     	if(keyId != null && keyLabel == null)
@@ -109,42 +112,41 @@ public class P11CertUpdateCommand extends OsgiCommandSupport {
 			System.err.println("Could not find private key " + keyIdentifier);
 			return null;
 		}
-		
+				
 		X509PublicKeyCertificate existingCert = slot.getCertificateObject(privKey.getId().getByteArrayValue(), null);
 		X509Certificate newCert = IoCertUtil.parseCert(certFile);
 		
-        X509PublicKeyCertificate newCertTemp = new X509PublicKeyCertificate();
-        
-        newCertTemp.getId().setByteArrayValue(
-        		privKey.getId().getByteArrayValue());
-        newCertTemp.getLabel().setCharArrayValue(
-        		privKey.getLabel().getCharArrayValue());
-        newCertTemp.getToken().setBooleanValue(true);
-        newCertTemp.getCertificateType().setLongValue(
-        		CertificateType.X_509_PUBLIC_KEY);
-        
-        newCertTemp.getSubject().setByteArrayValue(
-        		newCert.getSubjectX500Principal().getEncoded());
-        newCertTemp.getIssuer().setByteArrayValue(
-        		newCert.getIssuerX500Principal().getEncoded());
-        newCertTemp.getSerialNumber().setByteArrayValue(
-        		newCert.getSerialNumber().toByteArray());
-        newCertTemp.getValue().setByteArrayValue(
-        		newCert.getEncoded());
-        
+		assertMatch(newCert);
+		
 		Session session = slot.borrowWritableSession();
 		try{
+	        X509PublicKeyCertificate newCertTemp;
+	        
+			newCertTemp = new X509PublicKeyCertificate();
+	        newCertTemp.getId().setByteArrayValue(
+	        		privKey.getId().getByteArrayValue());
+	        newCertTemp.getLabel().setCharArrayValue(
+	        		privKey.getLabel().getCharArrayValue());
+	        newCertTemp.getToken().setBooleanValue(true);
+	        newCertTemp.getCertificateType().setLongValue(
+	        		CertificateType.X_509_PUBLIC_KEY);
+
+			newCertTemp.getSubject().setByteArrayValue(
+	        		newCert.getSubjectX500Principal().getEncoded());
+	        newCertTemp.getIssuer().setByteArrayValue(
+	        		newCert.getIssuerX500Principal().getEncoded());
+	        newCertTemp.getSerialNumber().setByteArrayValue(
+	        		newCert.getSerialNumber().toByteArray());
+	        newCertTemp.getValue().setByteArrayValue(
+	        		newCert.getEncoded());
+			
 			if(existingCert != null)
 			{
 				session.destroyObject(existingCert);
-				Thread.sleep(1000); // wait for one second
-				// session.setAttributeValues(existingCert, newCertTemp);
-			}
-			
-			//else
-			{
-				session.createObject(newCertTemp);
-			}
+				Thread.sleep(1000);
+			}			
+
+			session.createObject(newCertTemp);
 		}finally
 		{
 			slot.returnWritableSession(session);
@@ -153,6 +155,39 @@ public class P11CertUpdateCommand extends OsgiCommandSupport {
 		IaikP11CryptService.getInstance(securityFactory.getPkcs11Module(), password).refresh();
 		System.out.println("Updated certificate");
         return null;
+    }    
+    
+    private void assertMatch(X509Certificate cert) throws SignerException, PasswordResolverException
+    {    	
+    	CmpUtf8Pairs pairs = new CmpUtf8Pairs("slot", slotIndex.toString());
+    	if(password != null)
+    	{
+    		pairs.putUtf8Pair("password", new String(password));
+    	}
+    	if(keyId != null)
+    	{
+    		pairs.putUtf8Pair("key-id", keyId);
+    	}
+    	if(keyLabel != null)
+    	{
+    		pairs.putUtf8Pair("key-label", keyLabel);
+    	}
+    	
+    	PublicKey pubKey = cert.getPublicKey();
+    	if(pubKey instanceof RSAPublicKey)
+    	{
+    		pairs.putUtf8Pair("algo", "SHA1withRSA");
+    	}
+    	else if(pubKey instanceof ECPublicKey)
+    	{
+    		pairs.putUtf8Pair("algo", "SHA1withECDSA");
+    	}
+    	else
+    	{
+    		throw new SignerException("Unknown key type: " + pubKey.getClass().getName());
+    	}
+    	
+   		securityFactory.createSigner("PKCS11", pairs.getEncoded(), cert, NopPasswordResolver.INSTANCE);
     }
 
 }

@@ -33,7 +33,6 @@ ca:profile-add -name  RCA -type java:org.xipki.ca.certprofile.example.CertProfil
 
 ## Generate keys and PKCS#10 request
 keytool:ec-p12 -curve secp256r1 -pwd 1234 -out output/RCA1.p12 -subject "CN=RCA1,O=xipki,C=DE"
-keytool:req-p12 -p12 output/RCA1.p12 -pwd 1234 -hash SHA256 -out output/RCA1.p10
 
 ## Generate selfsigned RCA
 ca:gen-rca -name RCA1 \

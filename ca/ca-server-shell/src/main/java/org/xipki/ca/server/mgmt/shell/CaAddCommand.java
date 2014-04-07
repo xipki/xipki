@@ -73,7 +73,7 @@ public class CaAddCommand extends CaCommand {
     protected String            crlSignerName;
 
 	@Option(name = "-cert",
-            description = "Required. CA certificate file")
+            description = "CA certificate file")
     protected String            certFile;
 
 	@Option(name = "-signerType",
