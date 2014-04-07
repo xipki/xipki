@@ -21,14 +21,21 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.security.Key;
 import java.security.KeyStore;
+import java.security.PublicKey;
 import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
+import java.security.interfaces.ECPublicKey;
+import java.security.interfaces.RSAPublicKey;
 import java.util.Enumeration;
 
 import org.apache.felix.gogo.commands.Command;
 import org.apache.felix.gogo.commands.Option;
 import org.apache.karaf.shell.console.OsgiCommandSupport;
+import org.xipki.security.NopPasswordResolver;
+import org.xipki.security.api.PasswordResolverException;
+import org.xipki.security.api.SecurityFactory;
 import org.xipki.security.api.SignerException;
+import org.xipki.security.common.CmpUtf8Pairs;
 import org.xipki.security.common.IoCertUtil;
 
 @Command(scope = "keytool", name = "update-cert-p12", description="Update certificate in PKCS#12 keystore")
@@ -45,6 +52,12 @@ public class P12CertUpdateCommand extends OsgiCommandSupport {
 			required = true, description = "Required. Certificate file")
     protected String            certFile;
 
+	private SecurityFactory securityFactory;
+	
+	public void setSecurityFactory(SecurityFactory securityFactory) {
+		this.securityFactory = securityFactory;
+	}
+	
     @Override
     protected Object doExecute() throws Exception 
     {
@@ -66,6 +79,8 @@ public class P12CertUpdateCommand extends OsgiCommandSupport {
     	
 		X509Certificate newCert = IoCertUtil.parseCert(certFile);			
 
+		assertMatch(newCert);
+		
 		String keyname = null;
 		Enumeration<String> aliases = ks.aliases();
 		while(aliases.hasMoreElements())
@@ -101,5 +116,30 @@ public class P12CertUpdateCommand extends OsgiCommandSupport {
 			}
 		}
 	}
+    
+    private void assertMatch(X509Certificate cert) throws SignerException, PasswordResolverException
+    {    	
+    	CmpUtf8Pairs pairs = new CmpUtf8Pairs("keystore", "file:" + p12File);
+    	if(password != null)
+    	{
+    		pairs.putUtf8Pair("password", new String(password));
+    	}
+    	
+    	PublicKey pubKey = cert.getPublicKey();
+    	if(pubKey instanceof RSAPublicKey)
+    	{
+    		pairs.putUtf8Pair("algo", "SHA1withRSA");
+    	}
+    	else if(pubKey instanceof ECPublicKey)
+    	{
+    		pairs.putUtf8Pair("algo", "SHA1withECDSA");
+    	}
+    	else
+    	{
+    		throw new SignerException("Unknown key type: " + pubKey.getClass().getName());
+    	}
+    	
+   		securityFactory.createSigner("PKCS12", pairs.getEncoded(), cert, NopPasswordResolver.INSTANCE);
+    }
 
 }

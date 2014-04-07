@@ -28,6 +28,7 @@ import org.xipki.security.api.P11KeypairGenerationResult;
 import org.xipki.security.api.PKCS11SlotIdentifier;
 import org.xipki.security.api.SecurityFactory;
 import org.xipki.security.common.IoCertUtil;
+import org.xipki.security.p11.iaik.IaikP11CryptService;
 import org.xipki.security.p11.iaik.P11KeypairGenerator;
 
 @Command(scope = "keytool", name = "rsa", description="Generate RSA keypair via PKCS#11")
@@ -94,12 +95,13 @@ public class P11RSAKeyGenCommand extends OsgiCommandSupport {
     	{
     		password = "dummy";
     	}
+    	char[] pwd = password.toCharArray();
     	
     	P11KeypairGenerator gen = new P11KeypairGenerator();
     	PKCS11SlotIdentifier slotId = new PKCS11SlotIdentifier(slotIndex, null);
     	
     	P11KeypairGenerationResult keyAndCert = gen.generateRSAKeypairAndCert(
-    			securityFactory.getPkcs11Module(), slotId, password.toCharArray(),
+    			securityFactory.getPkcs11Module(), slotId, pwd,
     			keysize, _publicExponent,
     			label, "CN=" + label);
     	
@@ -111,6 +113,8 @@ public class P11RSAKeyGenCommand extends OsgiCommandSupport {
 	   		IoCertUtil.save(certFile, keyAndCert.getCertificate().getEncoded());
 	   		System.out.println("Saved self-signed certificate in " + certFile.getPath());
     	}
+    	
+    	IaikP11CryptService.getInstance(securityFactory.getPkcs11Module(), pwd).refresh();
     	
     	return null;
     }

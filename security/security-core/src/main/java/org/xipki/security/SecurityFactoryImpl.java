@@ -125,8 +125,8 @@ public class SecurityFactoryImpl implements SecurityFactory {
 						cert.getSubjectX500Principal().getEncoded()).toString();
 
 				StringBuilder sb = new StringBuilder();
-				sb.append("Signer and certificate not match. ");
-				sb.append("signer type='").append(type).append("'; ");
+				sb.append("key and certificate not match. ");
+				sb.append("key type='").append(type).append("'; ");
 				
 				String pwd = keyValues.getValue("password");
 				if(pwd != null)
@@ -199,12 +199,12 @@ public class SecurityFactoryImpl implements SecurityFactory {
 			{
 				signatureAlgId = new AlgorithmIdentifier(PKCSObjectIdentifiers.sha1WithRSAEncryption, DERNull.INSTANCE);
 			}
-			if("SHA224withRSA".equalsIgnoreCase(algoS) || "RSAwithSHA224".equalsIgnoreCase(algoS) || 
+			else if("SHA224withRSA".equalsIgnoreCase(algoS) || "RSAwithSHA224".equalsIgnoreCase(algoS) || 
 					PKCSObjectIdentifiers.sha224WithRSAEncryption.getId().equals(algoS))
 			{
 				signatureAlgId = new AlgorithmIdentifier(PKCSObjectIdentifiers.sha224WithRSAEncryption, DERNull.INSTANCE);
 			}
-			if("SHA256withRSA".equalsIgnoreCase(algoS) || "RSAwithSHA256".equalsIgnoreCase(algoS) || 
+			else if("SHA256withRSA".equalsIgnoreCase(algoS) || "RSAwithSHA256".equalsIgnoreCase(algoS) || 
 					PKCSObjectIdentifiers.sha256WithRSAEncryption.getId().equals(algoS))
 			{
 				signatureAlgId = new AlgorithmIdentifier(PKCSObjectIdentifiers.sha256WithRSAEncryption, DERNull.INSTANCE);

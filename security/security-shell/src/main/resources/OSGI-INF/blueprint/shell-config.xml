@@ -67,6 +67,7 @@
         
         <command name="keytool/update-cert-p12">
             <action class="org.xipki.security.shell.P12CertUpdateCommand">
+            	<property name="securityFactory" ref="securityFactory" />
             </action>
         </command>
         
