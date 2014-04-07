@@ -111,6 +111,10 @@ class SelfSignedCertBuilder {
 			// password?1234%keystore?generate:keytype=rsa;keysize=2048;exponent=65535%hash?SHA256%padding?PKCS1v1_5
 			CmpUtf8Pairs keyValues = new CmpUtf8Pairs(signerConf);
 			String keystoreConf = keyValues.getValue("keystore");
+			if(keystoreConf == null)
+			{
+				throw new ConfigurationException("required parameter 'keystore', for types PKCS12 and JKS, is not specified");
+			}
 			if(keystoreConf.startsWith("generate:"))
 			{
 				String keyLabel = keyValues.getValue("key-label");						
