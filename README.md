@@ -56,7 +56,7 @@ Installation
     ```
 
 * Install
-  * Unpack the assembled xipki-<version>.tar.gz
+  * Unpack the assembled file
  
     In destination folder of the installation
     ```sh
