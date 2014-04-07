@@ -46,6 +46,28 @@
             <directoryMode>0755</directoryMode>
         </fileSet>
 
+        <fileSet>
+            <directory>${project.build.directory}/classes/sql</directory>
+            <includes>
+                <include>**/*.sh</include>
+            </includes>
+            <outputDirectory>sql</outputDirectory>
+            <filtered>false</filtered>
+            <fileMode>0755</fileMode>
+            <directoryMode>0755</directoryMode>
+        </fileSet>
+
+        <fileSet>
+            <directory>${project.build.directory}/classes/sql</directory>
+            <excludes>
+                <exclude>**/*.sh</exclude>
+            </excludes>            
+            <outputDirectory>/</outputDirectory>
+            <filtered>false</filtered>
+            <fileMode>0644</fileMode>
+            <directoryMode>0755</directoryMode>
+        </fileSet>
+
         <!-- Copy over everything unfiltered ressources -->
         <fileSet>
             <directory>${project.basedir}/src/main/unfiltered</directory>
@@ -71,24 +93,10 @@
         </fileSet>
 
         <fileSet>
-            <directory>${project.basedir}/../../datasource/sql</directory>
-            <includes>
-                <include>ca-init.xml</include>
-                <include>ocsp-init.xml</include>
-            </includes>
-            <outputDirectory>sql</outputDirectory>
-            <fileMode>0644</fileMode>
-            <directoryMode>0755</directoryMode>
-        </fileSet>
-
-        <fileSet>
             <directory>${project.build.directory}/sql</directory>
             <includes>
                 <include>liquibase/liquibase</include>
             </includes>
-            <excludes>
-                <exclude>liquibase/javadoc/**</exclude>
-            </excludes>
             <outputDirectory>sql</outputDirectory>
             <fileMode>0755</fileMode>
             <directoryMode>0755</directoryMode>
@@ -98,7 +106,7 @@
             <directory>${project.build.directory}/sql</directory>
             <excludes>
                 <exclude>liquibase/liquibase</exclude>
-                <exclude>liquibase/javadoc</exclude>
+                <exclude>liquibase/javadoc/**</exclude>
             </excludes>
             <outputDirectory>sql</outputDirectory>
             <fileMode>0644</fileMode>
