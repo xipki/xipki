@@ -40,9 +40,16 @@ public class CmpUtf8Pairs {
 		putUtf8Pair(name, value);
 	}
 	
+	public CmpUtf8Pairs()
+	{		
+	}
+
 	public CmpUtf8Pairs(String string)
 	{
-		if(string.length() < 2) return;
+		if(string == null || string.length() < 2)
+		{
+			return;
+		}
 		
 		// find the position of terminators
 		List<Integer> positions = new LinkedList<Integer>();
