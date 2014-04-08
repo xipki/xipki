@@ -147,7 +147,7 @@
 
     <files>
         <file>
-            <source>${project.build.directory}/classes/LICENSE</source>
+            <source>${project.basedir}/../../LICENSE</source>
             <outputDirectory>/</outputDirectory>
             <destName>LICENSE</destName>
             <fileMode>0644</fileMode>
