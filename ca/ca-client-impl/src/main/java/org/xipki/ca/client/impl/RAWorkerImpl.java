@@ -20,7 +20,11 @@ package org.xipki.ca.client.impl;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.math.BigInteger;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
 import java.security.Security;
+import java.security.SignatureException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509CRL;
 import java.security.cert.X509Certificate;
@@ -1024,12 +1028,6 @@ public final class RAWorkerImpl extends AbstractRAWorker implements RAWorker
 	}
 
 	@Override
-	protected java.security.cert.Certificate getCACertficate(String caname) {
-		CAConf caConf = casMap.get(caname);
-		return caConf == null ? null : caConf.getCert();
-	}
-
-	@Override
 	public byte[] envelope(CertReqMsg certReqMsg, String caName)
 		throws RAWorkerException
 	{
@@ -1091,6 +1089,45 @@ public final class RAWorkerImpl extends AbstractRAWorker implements RAWorker
 		}
 		
 		return cmpRequestor;
+	}
+
+	@Override
+	protected boolean verify(java.security.cert.Certificate caCert,
+			java.security.cert.Certificate cert) 
+	{
+		if(caCert instanceof X509Certificate == false)
+		{
+			return false;
+		}
+		if(cert instanceof X509Certificate == false)
+		{
+			return false;
+		}
+		
+		X509Certificate _caCert = (X509Certificate) caCert;
+		X509Certificate _cert = (X509Certificate) cert;
+
+		if(_cert.getIssuerX500Principal().equals(_caCert.getSubjectX500Principal()) == false)
+		{
+			return false;
+		}
+		
+		try{
+			_cert.verify(_caCert.getPublicKey());
+		}catch(SignatureException e)
+		{
+			return false;
+		} catch (InvalidKeyException e) {
+			return false;
+		} catch (CertificateException e) {
+			return false;
+		} catch (NoSuchAlgorithmException e) {
+			return false;
+		} catch (NoSuchProviderException e) {
+			return false;
+		}
+		
+		return true;
 	}
 	
 }

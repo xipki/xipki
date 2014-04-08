@@ -9,7 +9,7 @@ features:install xipki-security-shell
 ca:env-add -name env-name1 -value env-value1
 
 ## CMP control: messageTimeBias is set to 300 seconds. 
-ca:cmpcontrol-set --msgTimeBias 300
+ca:cmpcontrol-set --msgTimeBias 300 --enableSendCaCert
 
 ## Certificate Profiles
 ca:profile-add -name DFLT.RA -type java:org.xipki.ca.server.profile.DefaultRACertProfile
