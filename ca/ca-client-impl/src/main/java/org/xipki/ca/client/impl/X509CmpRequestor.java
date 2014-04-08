@@ -384,6 +384,19 @@ abstract class X509CmpRequestor extends CmpRequestor
 		
 		EnrollCertResultType result = new EnrollCertResultType();
 		
+		// CA certificates
+		CMPCertificate[] caPubs = certRep.getCaPubs();
+		if(caPubs != null && caPubs.length > 0)
+		{
+			for(int i = 0; i < caPubs.length; i++)
+			{
+				if(caPubs[i] != null)
+				{
+					result.addCACertificate(caPubs[i]);
+				}
+			}
+		}
+		
 		boolean isImplicitConfirm = CmpUtil.isImplictConfirm(response.getPkiMessage().getHeader());
 
 		CertificateConfirmationContentBuilder certConfirmBuilder = isImplicitConfirm ?
