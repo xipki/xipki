@@ -167,23 +167,28 @@ public class X509CACmpResponder extends CmpResponder
 				case PKIBody.TYPE_KEY_UPDATE_REQ:
 				case PKIBody.TYPE_P10_CERT_REQ:
 				case PKIBody.TYPE_CROSS_CERT_REQ:
+					boolean sendCaCert = cmpControl.isSendCaCert();
 					switch(type)
-					{
+					{						
 						case PKIBody.TYPE_CERT_REQ:
 							checkPermission(_requestor, Permission.CERT_REQ);
-							respBody = processCr(_requestor, user, tid, reqHeader, (CertReqMessages) reqBody.getContent(), confirmWaitTime);
+							respBody = processCr(_requestor, user, tid, reqHeader,
+									(CertReqMessages) reqBody.getContent(), confirmWaitTime, sendCaCert);
 							break;
 						case PKIBody.TYPE_KEY_UPDATE_REQ:
 							checkPermission(_requestor, Permission.KEY_UPDATE);
-							respBody = processKur(_requestor, user, tid, reqHeader, (CertReqMessages) reqBody.getContent(), confirmWaitTime);
+							respBody = processKur(_requestor, user, tid, reqHeader, 
+									(CertReqMessages) reqBody.getContent(), confirmWaitTime, sendCaCert);
 							break;
 						case PKIBody.TYPE_P10_CERT_REQ:
 							checkPermission(_requestor, Permission.CERT_REQ);
-							respBody = processP10cr(_requestor, user, tid, reqHeader, (CertificationRequest) reqBody.getContent(), confirmWaitTime);
+							respBody = processP10cr(_requestor, user, tid, reqHeader, 
+									(CertificationRequest) reqBody.getContent(), confirmWaitTime, sendCaCert);
 							break;
 						default: // PKIBody.TYPE_CROSS_CERT_REQ
 							checkPermission(_requestor, Permission.CROSS_CERT_REQ);
-							respBody = processCcp(_requestor, user, tid, reqHeader, (CertReqMessages) reqBody.getContent(), confirmWaitTime);
+							respBody = processCcp(_requestor, user, tid, reqHeader, 
+									(CertReqMessages) reqBody.getContent(), confirmWaitTime, sendCaCert);
 							break;
 					}
 	
@@ -364,18 +369,20 @@ public class X509CACmpResponder extends CmpResponder
 	 * 
 	 */
 	private PKIBody processCr(CmpRequestorInfo requestor, String user, ASN1OctetString tid, PKIHeader reqHeader,
-			CertReqMessages cr, long confirmWaitTime)
+			CertReqMessages cr, long confirmWaitTime, boolean sendCaCert)
 	throws InsuffientPermissionException
 	{
-		CertRepMessage repMessage = processCertReqMessages(requestor, user, tid, reqHeader, cr, false, confirmWaitTime);	
+		CertRepMessage repMessage = processCertReqMessages(requestor, user, tid, reqHeader, cr,
+				false, confirmWaitTime, sendCaCert);	
 		return new PKIBody(PKIBody.TYPE_CERT_REP, repMessage);
 	}
 	
 	private PKIBody processKur(CmpRequestorInfo requestor, String user, ASN1OctetString tid, PKIHeader reqHeader,
-			CertReqMessages kur, long confirmWaitTime) 
+			CertReqMessages kur, long confirmWaitTime, boolean sendCaCert) 
 	throws InsuffientPermissionException
 	{
-		CertRepMessage repMessage = processCertReqMessages(requestor, user, tid, reqHeader, kur, true, confirmWaitTime);
+		CertRepMessage repMessage = processCertReqMessages(requestor, user, tid, reqHeader, kur,
+				true, confirmWaitTime, sendCaCert);
 		return new PKIBody(PKIBody.TYPE_KEY_UPDATE_REP, repMessage);
 	}	
 
@@ -385,10 +392,11 @@ public class X509CACmpResponder extends CmpResponder
 	 */
 	private PKIBody processCcp(CmpRequestorInfo requestor, String user, 
 			ASN1OctetString tid, PKIHeader reqHeader,
-			CertReqMessages cr, long confirmWaitTime)
+			CertReqMessages cr, long confirmWaitTime, boolean sendCaCert)
 	throws InsuffientPermissionException
 	{
-		CertRepMessage repMessage = processCertReqMessages(requestor, user, tid, reqHeader, cr, false, confirmWaitTime);	
+		CertRepMessage repMessage = processCertReqMessages(requestor, user, tid, reqHeader, cr,
+				false, confirmWaitTime, sendCaCert);	
 		return new PKIBody(PKIBody.TYPE_CROSS_CERT_REP, repMessage);
 	}
 
@@ -397,7 +405,7 @@ public class X509CACmpResponder extends CmpResponder
 			String user,
 			ASN1OctetString tid,
 			PKIHeader reqHeader, 
-			CertReqMessages kur, boolean keyUpdate, long confirmWaitTime) 
+			CertReqMessages kur, boolean keyUpdate, long confirmWaitTime, boolean sendCaCert) 
 	throws InsuffientPermissionException
 	{
 		CmpRequestorInfo _requestor = (CmpRequestorInfo) requestor;
@@ -453,7 +461,9 @@ public class X509CACmpResponder extends CmpResponder
 			}
 		}
 		
-		return new CertRepMessage(null, certResponses);
+		CMPCertificate[] caPubs = sendCaCert ? 
+				new CMPCertificate[]{ca.getCAInfo().getCertInCMPFormat()} : null;
+		return new CertRepMessage(caPubs, certResponses);
 	}
 	
 	private static String getCertProfileName(PKIHeader pkiHeader) throws CMPException
@@ -534,12 +544,12 @@ public class X509CACmpResponder extends CmpResponder
 	/**
 	 * handle the PKI body with the choice {@code p10cr}<br/>
 	 * Since it is not possible to add attribute to the PKCS#10 request, the certificate profile 
-	 * must be specified in the attribute regInfo-utf8Pairs (1.3.6.1.5.5.7.5.2.1.) within
+	 * must be specified in the attribute regInfo-utf8Pairs (1.3.6.1.5.5.7.5.2.1) within
 	 * PKIHeader.generalInfo
 	 * 
 	 */
 	private PKIBody processP10cr(CmpRequestorInfo requestor, String user, ASN1OctetString tid, PKIHeader reqHeader,
-			CertificationRequest p10cr, long confirmWaitTime) 
+			CertificationRequest p10cr, long confirmWaitTime, boolean sendCaCert) 
 	throws InsuffientPermissionException
 	{
 		// verify the POP first
@@ -580,9 +590,11 @@ public class X509CACmpResponder extends CmpResponder
 				certResp = new CertResponse(certReqId, generateCmpRejectionStatus(PKIFailureInfo.badCertTemplate,
 						e.getMessage()));
 			}
-		}
+		}		
 		
-		CertRepMessage repMessage = new CertRepMessage(null, new CertResponse[]{certResp});				
+		CMPCertificate[] caPubs = sendCaCert ? 
+				new CMPCertificate[]{ca.getCAInfo().getCertInCMPFormat()} : null;
+		CertRepMessage repMessage = new CertRepMessage(caPubs, new CertResponse[]{certResp});				
 		return new PKIBody(PKIBody.TYPE_CERT_REP, repMessage);
 	}
 

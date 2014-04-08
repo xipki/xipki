@@ -19,11 +19,15 @@ package org.xipki.ca.cmp.client;
 
 import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.bouncycastle.asn1.cmp.CMPCertificate;
 import org.bouncycastle.asn1.crmf.ProofOfPossession;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xipki.ca.cmp.client.type.EnrollCertResultEntryType;
 import org.xipki.ca.cmp.client.type.EnrollCertResultType;
 import org.xipki.ca.cmp.client.type.ErrorResultEntryType;
@@ -38,12 +42,14 @@ import org.xipki.security.api.SecurityFactory;
 
 public abstract class AbstractRAWorker
 {	
+	private static final Logger LOG = LoggerFactory.getLogger(AbstractRAWorker.class);
+	
 	protected static final ProofOfPossession raVerified = new ProofOfPossession();
 	
 	protected abstract Certificate getCertificate(CMPCertificate cmpCert)
 	throws CertificateException;
 	
-	protected abstract Certificate getCACertficate(String caname);
+	protected abstract boolean verify(Certificate caCert, Certificate cert);
 	
 	protected SecurityFactory securityFactory;	
 	protected PasswordResolver passwordResolver;
@@ -87,10 +93,51 @@ public abstract class AbstractRAWorker
 			
 			certOrErrors.put(resultEntry.getId(), certOrError);			
 		}
+
+		Certificate caCert = null;
 		
-		Certificate caCertificate = getCACertficate(caname);
+		List<CMPCertificate> cmpCaPubs = result.getCACertificates();
 		
-		return new EnrollCertResult(caCertificate, certOrErrors);
+		if(cmpCaPubs != null && cmpCaPubs.isEmpty() == false)
+		{
+			List<Certificate> caPubs = new ArrayList<Certificate>(cmpCaPubs.size());
+			for(CMPCertificate cmpCaPub : cmpCaPubs)
+			{
+				try {
+					caPubs.add(getCertificate(cmpCaPub));
+				} catch (CertificateException e) {
+					LOG.error("Could not extract the caPub from CMPCertificate");
+				}
+			}
+			
+			for(CertificateOrError certOrError : certOrErrors.values())
+			{
+				Certificate cert = certOrError.getCertificate();
+				if(cert == null)
+				{
+					continue;
+				}
+				
+				if(caCert == null)
+				{
+					for(Certificate caPub : caPubs)
+					{
+						if(verify(caPub, cert))
+						{
+							caCert = caPub;
+						}
+					}
+				}
+				else if(verify(caCert, cert) == false)
+				{
+					LOG.warn("Not all certificates issued by CA embedded in caPubs, ignore the caPubs");
+					caCert = null;
+					break;
+				}
+			}
+		}
+		
+		return new EnrollCertResult(caCert, certOrErrors);
 	}
 
 	protected static PKIErrorException createPKIErrorException(ErrorResultType errResult)

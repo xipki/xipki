@@ -25,6 +25,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
+import org.bouncycastle.asn1.cmp.CMPCertificate;
+import org.bouncycastle.asn1.x509.Certificate;
 import org.xipki.ca.api.CAMgmtException;
 import org.xipki.ca.api.CAStatus;
 import org.xipki.ca.common.X509CertificateWithMetaInfo;
@@ -42,6 +44,7 @@ public class CAEntry
 	private final List<String> issuerLocations;
 	private int maxValidity;
 	private final X509CertificateWithMetaInfo cert;
+	private final CMPCertificate certInCMPFormat;
 	private String signerType;
 	private String signerConf;
 	private String crlSignerName;
@@ -69,12 +72,16 @@ public class CAEntry
 		this.name = name;
 		this.nextSerial = initialSerial;
 		
-		this.subject = X509Util.canonicalizeName(cert.getSubjectX500Principal());
+		Certificate bcCert;
 		try {
+			bcCert = Certificate.getInstance(cert.getEncoded());
 			this.cert = new X509CertificateWithMetaInfo(cert, this.subject, cert.getEncoded());
 		} catch (CertificateEncodingException e) {
 			throw new CAMgmtException("could not encode the CA certificate");
 		}
+		
+		this.subject = bcCert.getSubject().toString();
+		this.certInCMPFormat = new CMPCertificate(bcCert);
 		
 		this.signerType = signerType;
 		this.signerConf = signerConf;
@@ -253,6 +260,10 @@ public class CAEntry
 
 	public void setLastCommittedNextSerial(long lastCommittedNextSerial) {
 		this.lastCommittedNextSerial = lastCommittedNextSerial;
+	}
+
+	public CMPCertificate getCertInCMPFormat() {
+		return certInCMPFormat;
 	}
 
 }
