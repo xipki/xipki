@@ -17,7 +17,6 @@
 
 package org.xipki.ocsp.crlstore;
 
-import java.util.Arrays;
 import java.util.Date;
 import java.util.Map;
 
@@ -83,16 +82,19 @@ class CrlCertStatusInfo {
 			return CertStatusInfo.getUnknownCertStatusInfo(thisUpdate, nextUpdate);
 		case GOOD:
 		case REVOCATED:
-			byte[] certHash = getCertHash(hashAlgo);
-			byte[] copyOfCertHash = certHash == null ? null : Arrays.copyOf(certHash, certHash.length);
+			byte[] certHash = null;
+			if(hashAlgo != null)
+			{
+				certHash = getCertHash(hashAlgo);
+			}
 			if(certStatus == CertStatus.GOOD)
 			{
-				return CertStatusInfo.getGoodCertStatusInfo(hashAlgo, copyOfCertHash, thisUpdate, nextUpdate);
+				return CertStatusInfo.getGoodCertStatusInfo(hashAlgo, certHash, thisUpdate, nextUpdate);
 			}
 			else
 			{
 				return CertStatusInfo.getRevocatedCertStatusInfo(revocationInfo, hashAlgo,
-						getCertHash(hashAlgo), thisUpdate, nextUpdate);
+						certHash, thisUpdate, nextUpdate);
 			}
 		}
 		
