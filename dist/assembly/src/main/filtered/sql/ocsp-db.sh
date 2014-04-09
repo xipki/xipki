@@ -12,9 +12,25 @@ cat ../ca-demo/$PROP_FILE | sed 's/\./_/' > .$PROP_FILE
 rm .$PROP_FILE -f
 echo command=$COMMAND
 echo db.driverClassName=$db_driverClassName
-echo db.url=$db_url
 echo db.username=$db_username
+
 #echo db.password=$db_password
 
-liquibase/liquibase --url=$db_url --username=$db_username --password=$db_password --changeLogFile=$CHANGELOG_FILE --classpath=$JDBC_CP $COMMAND
+DFLT_SCHEMA=
+
+if [ "$db_driverClassName" == "com.ibm.db2.jcc.DB2Driver" ]; then
+        echo "Database type: DB2"
+        SEP=":currentSchema="
+        db_schema=${db_url#*$SEP}
+        db_url=${db_url%$SEP*}
+        DFLT_SCHEMA="--defaultSchemaName=$db_schema"
+
+        echo db.schema=$db_schema
+        echo db.url=$db_url
+else
+        echo "Database type: -"
+        echo db.url=$db_url
+fi
+
+liquibase/liquibase --url=$db_url --username=$db_username --password=$db_password --changeLogFile=$CHANGELOG_FILE --classpath=$JDBC_CP $DFLT_SCHEMA $COMMAND
 
