@@ -17,7 +17,7 @@ echo db.username=$db_username
 
 DFLT_SCHEMA=
 
-if [ "$db_driverClassName" == "com.ibm.db2.jcc.DB2Driver" ]; then
+if [ "$db_driverClassName" = "com.ibm.db2.jcc.DB2Driver" ]; then
         echo "Database type: DB2"
         SEP=":currentSchema="
         db_schema=${db_url#*$SEP}
