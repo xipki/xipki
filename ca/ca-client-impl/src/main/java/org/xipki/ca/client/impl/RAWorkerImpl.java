@@ -249,12 +249,17 @@ public final class RAWorkerImpl extends AbstractRAWorker implements RAWorker
 				String _cacertFile = props.getProperty(CA_PREFIX + caname + CA_CERT_SUFFIX);
 				String _responderFile = props.getProperty(CA_PREFIX + caname + CA_RESPONDER_SUFFIX);
 				String _profiles = props.getProperty(CA_PREFIX + caname + CA_PROFILES_SUFFIX);
-				StringTokenizer st = new StringTokenizer(_profiles, ",");
-				Set<String> profiles = new HashSet<String>(st.countTokens());
-				while(st.hasMoreTokens())
+				
+				Set<String> profiles = null;
+				if(_profiles != null)
 				{
-					profiles.add(st.nextToken().trim());
-				}
+					StringTokenizer st = new StringTokenizer(_profiles, ",");
+					profiles = new HashSet<String>(st.countTokens());
+					while(st.hasMoreTokens())
+					{
+						profiles.add(st.nextToken().trim());
+					}
+				}			
 
 				CAConf ca = new CAConf(caname, _serviceUrl, IoCertUtil.parseCert(_cacertFile), profiles,
 						IoCertUtil.parseCert(_responderFile));

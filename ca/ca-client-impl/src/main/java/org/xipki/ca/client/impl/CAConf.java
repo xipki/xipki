@@ -18,6 +18,7 @@
 package org.xipki.ca.client.impl;
 
 import java.security.cert.X509Certificate;
+import java.util.Collections;
 import java.util.Set;
 
 import org.bouncycastle.asn1.x500.X500Name;
@@ -37,14 +38,20 @@ class CAConf
 		ParamChecker.assertNotEmpty("name", name);
 		ParamChecker.assertNotEmpty("url", url);
 		ParamChecker.assertNotNull("cert", cert);
-		ParamChecker.assertNotEmpty("profiles", profiles);
 		ParamChecker.assertNotNull("responder", responder);
 		
 		this.name = name;
 		this.url = url;
 		this.cert = cert;
 		this.subject = X500Name.getInstance(cert.getSubjectX500Principal().getEncoded());
-		this.profiles = profiles;
+		if(profiles == null)
+		{
+			this.profiles = Collections.emptySet();
+		}
+		else
+		{
+			this.profiles = profiles;
+		}
 		this.responder = responder;
 	}
 
