@@ -69,6 +69,10 @@ public class CaUpdateCommand extends CaCommand {
             description = "CRL signer name or 'NULL'")
     protected String            crlSignerName;
 
+	@Option(name = "-numCrls",
+            description = "Number of CRLs to be kept in database")
+    protected Integer           numCrls;
+	
 	@Option(name = "-cert",
             description = "CA certificate file")
     protected String            certFile;
@@ -212,7 +216,8 @@ public class CaUpdateCommand extends CaCommand {
 				crlSignerName,
 				allowDuplicateKey,
 				allowDuplicateSubject,
-				_permissions);
+				_permissions,
+				numCrls);
     	
     	return null;
     }

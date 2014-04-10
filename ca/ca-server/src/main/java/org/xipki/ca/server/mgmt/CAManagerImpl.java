@@ -912,7 +912,7 @@ public class CAManagerImpl implements CAManager
 			ResultSet rs = stmt.executeQuery(
 					"SELECT name, next_serial, status, crl_uris, ocsp_uris, max_validity, "
 					+ "cert, signer_type, signer_conf, crlsigner_name, "
-					+ "allow_duplicate_key, allow_duplicate_subject, permissions FROM ca");
+					+ "allow_duplicate_key, allow_duplicate_subject, permissions, num_crls FROM ca");
 	
 			while(rs.next())
 			{
@@ -928,6 +928,7 @@ public class CAManagerImpl implements CAManager
 				String crlsigner_name = rs.getString("crlsigner_name");
 				boolean allowDuplicateKey = rs.getBoolean("allow_duplicate_key");
 				boolean allowDuplicateSubject = rs.getBoolean("allow_duplicate_subject");
+				int numCrls = rs.getInt("num_crls");
 				
 				String s = rs.getString("permissions");
 				Set<Permission> permissions = getPermissions(s);
@@ -947,7 +948,7 @@ public class CAManagerImpl implements CAManager
 				X509Certificate cert = generateCert(b64cert);
 	
 				CAEntry entry = new CAEntry(name, next_serial, signer_type, signer_conf, cert,
-						lOcspUris, lCrlUris, null);				
+						lOcspUris, lCrlUris, null, numCrls);				
 				entry.setLastCommittedNextSerial(next_serial);
 	
 				CAStatus caStatus = CAStatus.getCAStatus(status);
@@ -1060,8 +1061,8 @@ public class CAManagerImpl implements CAManager
 			ps = prepareStatement(
 					"INSERT INTO ca (name, subject, next_serial, status, crl_uris, ocsp_uris, max_validity, "
 					+ "cert, signer_type, signer_conf, crlsigner_name, "
-					+ "allow_duplicate_key, allow_duplicate_subject, permissions) "
-					+ "VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+					+ "allow_duplicate_key, allow_duplicate_subject, permissions, num_crls) "
+					+ "VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
 			int idx = 1;
 			ps.setString(idx++, name);
 			ps.setString(idx++, newCaDbEntry.getSubject());
@@ -1077,6 +1078,7 @@ public class CAManagerImpl implements CAManager
 			ps.setBoolean(idx++, newCaDbEntry.isAllowDuplicateKey());
 			ps.setBoolean(idx++, newCaDbEntry.isAllowDuplicateSubject());
 			ps.setString(idx++, toString(newCaDbEntry.getPermissions()));
+			ps.setInt(idx++, newCaDbEntry.getNumCrls());
 			
 			ps.executeUpdate();	
 		}catch(SQLException e)
@@ -1102,7 +1104,8 @@ public class CAManagerImpl implements CAManager
 			Set<String> crl_uris, Set<String> ocsp_uris,
 			Integer max_validity, String signer_type, String signer_conf,
 			String crlsigner_name, Boolean allow_duplicate_key, 
-			Boolean allow_duplicate_subject, Set<Permission> permissions)
+			Boolean allow_duplicate_subject, Set<Permission> permissions,
+			Integer numCrls)
 	throws CAMgmtException
 	{
 		if(cas.containsKey(name) == false)
@@ -1211,6 +1214,13 @@ public class CAManagerImpl implements CAManager
 			sb.append("permissions=?,");
 			iPermissions = i++;
 		}		
+		
+		Integer iNum_crls = null;
+		if(numCrls != null)
+		{
+			sb.append("num_crls=?,");
+			iNum_crls = i++;
+		}		
 
 		// delete the last ','
 		sb.deleteCharAt(sb.length() - 1);
@@ -1289,6 +1299,11 @@ public class CAManagerImpl implements CAManager
 				ps.setString(iPermissions, toString(permissions));
 			}
 	
+			if(iNum_crls != null)
+			{
+				ps.setInt(iNum_crls, numCrls);
+			}
+			
 			ps.setString(iName, name);
 			ps.executeUpdate();
 		}catch(SQLException e)

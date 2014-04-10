@@ -73,6 +73,7 @@ CREATE  TABLE IF NOT EXISTS `ca` (
   `allow_duplicate_key` SMALLINT NOT NULL DEFAULT 1 ,
   `allow_duplicate_subject` SMALLINT NOT NULL DEFAULT 1 ,
   `permissions` VARCHAR(100) NOT NULL ,
+  `num_crls` SMALLINT NOT NULL DEFAULT 30 ,
   PRIMARY KEY (`name`) ,
   INDEX `fk_ca_crlsigner1_idx` (`crlsigner_name` ASC) ,
   UNIQUE INDEX `name_UNIQUE` (`name` ASC) ,

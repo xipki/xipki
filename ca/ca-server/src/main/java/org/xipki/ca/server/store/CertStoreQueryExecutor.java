@@ -577,6 +577,66 @@ class CertStoreQueryExecutor
 		}		
 	}
 	
+	public int cleanupCRLs(X509CertificateWithMetaInfo caCert, int numCRLs)
+	throws SQLException, OperationException
+	{
+		if(numCRLs < 1) {
+			throw new IllegalArgumentException("numCRLs is not positive");
+		}
+		
+		ParamChecker.assertNotNull("caCert", caCert);
+		Integer caId = getCaId(caCert);
+		if(caId == null) {
+			return 0;
+		}
+		
+		String sql = "SELECT crl_number FROM crl WHERE cainfo_id=?";		
+		PreparedStatement ps = borrowPreparedStatement(sql);
+		
+		List<Integer> crlNumbers = new LinkedList<Integer>();
+		
+		ResultSet rs = null;
+		try{
+			int idx = 1;
+			ps.setInt(idx++, caId.intValue());
+			rs = ps.executeQuery();
+
+			while(rs.next()) {
+				int crlNumber = rs.getInt("crl_number");
+				crlNumbers.add(crlNumber);
+			}
+		}finally {
+			returnPreparedStatement(ps);
+			if(rs != null) {
+				rs.close();
+				rs = null;
+			}
+		}
+		
+		int n = crlNumbers.size();
+		Collections.sort(crlNumbers);
+		
+		int numCrlsToDelete = n - numCRLs;
+		if(numCrlsToDelete < 1)
+		{
+			return 0;
+		}
+		
+		int crlNumber = crlNumbers.get(numCrlsToDelete - 1);
+		sql = "DELETE FROM crl WHERE cainfo_id=? AND crl_number<?";		
+		ps = borrowPreparedStatement(sql);
+		
+		try{
+			int idx = 1;
+			ps.setInt(idx++, caId.intValue());
+			ps.setInt(idx++, crlNumber + 1);
+			ps.executeUpdate();
+		}finally {
+			returnPreparedStatement(ps);
+		}
+		
+		return numCrlsToDelete;
+	}
 	private static byte[] readBlob(Blob blob)
 	{
 		InputStream is;

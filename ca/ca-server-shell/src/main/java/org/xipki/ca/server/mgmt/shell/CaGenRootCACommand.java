@@ -92,6 +92,10 @@ public class CaGenRootCACommand extends CaCommand {
             description = "CRL signer name")
     protected String            crlSignerName;
 
+	@Option(name = "-numCrls",
+            description = "Number of CRLs to be kept in database")
+    protected Integer           numCrls;
+	
 	@Option(name = "-signerType",
             description = "Required. CA signer type",
             required = true)
@@ -155,7 +159,7 @@ public class CaGenRootCACommand extends CaCommand {
 		}
 		
 		CAEntry entry = new CAEntry(caName, nextSerial, signerType, signerConf, caCert, 
-				ocspUris, crlUris, null);
+				ocspUris, crlUris, null, numCrls);
 		
 		boolean allowDuplicateKey = isEnabled(enableDuplicateKey, disableDuplicateKey, false);
 		entry.setAllowDuplicateKey(allowDuplicateKey);
