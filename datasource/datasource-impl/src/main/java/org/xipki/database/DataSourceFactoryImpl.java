@@ -84,35 +84,35 @@ public class DataSourceFactoryImpl implements DataSourceFactory
 		String driverClassName = config.getProperty(DRIVER_CLASSNAME);
 		if(driverClassName != null)
 		{
-			ds.setDriverClassName(driverClassName);
+			ds.setDriverClassName(driverClassName.trim());
 		}		
 
 		// username
 		s = config.getProperty(USERNAME);
 		if(s != null)
 		{
-			ds.setUsername(s);
+			ds.setUsername(s.trim());
 		}
 		
 		// password
 		String password = config.getProperty(PASSWORD);
 		if(password != null)
 		{
-			ds.setPassword(password);
+			ds.setPassword(password.trim());
 		}
 		
 		// url
 		s = config.getProperty(URL);
 		if(s != null)
 		{
-			ds.setUrl(s);
+			ds.setUrl(s.trim());
 		}
 		
 		// connectionProperties
 		s = config.getProperty(CONNECTION_PROPERTIES);
 		if(s != null)
 		{
-			ds.setConnectionProperties(s);
+			ds.setConnectionProperties(s.trim());
 		}
 		
 		// defaultAutoCommit
@@ -237,7 +237,7 @@ public class DataSourceFactoryImpl implements DataSourceFactory
 		String prop = props.getProperty(key);
 		if(prop != null && !prop.isEmpty())
 		{
-			return Boolean.valueOf(prop);
+			return Boolean.valueOf(prop.trim());
 		}
 		
 		return null;
@@ -249,7 +249,7 @@ public class DataSourceFactoryImpl implements DataSourceFactory
 		if(prop != null && !prop.isEmpty())
 		{
 			try{
-				return Integer.parseInt(prop);
+				return Integer.parseInt(prop.trim());
 			}catch(NumberFormatException e)
 			{
 			}
@@ -264,7 +264,7 @@ public class DataSourceFactoryImpl implements DataSourceFactory
 		if(prop != null && !prop.isEmpty())
 		{
 			try{
-				return Long.parseLong(prop);
+				return Long.parseLong(prop.trim());
 			}catch(NumberFormatException e)
 			{
 			}
