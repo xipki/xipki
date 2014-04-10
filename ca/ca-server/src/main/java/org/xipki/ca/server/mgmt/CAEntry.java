@@ -53,12 +53,13 @@ public class CAEntry
 	private boolean allowDuplicateKey;
 	private boolean allowDuplicateSubject;
 	private Set<Permission> permissions;
+	private int numCrls;
 	
 	private PublicCAInfo publicCAInfo;
 	
 	public CAEntry(String name, long initialSerial,
 			String signerType, String signerConf, X509Certificate cert,
-			List<String> ocspUris, List<String> crlUris, List<String> issuerLocations)
+			List<String> ocspUris, List<String> crlUris, List<String> issuerLocations, Integer numCrls)
 	throws CAMgmtException
 	{
 		ParamChecker.assertNotEmpty("name", name);
@@ -69,6 +70,20 @@ public class CAEntry
 		{
 			throw new IllegalArgumentException("initialSerial is not positive (" + initialSerial + " < 1");
 		}
+		
+		if(numCrls == null)
+		{
+			this.numCrls = 30;
+		}
+		else if(numCrls >= 0)
+		{
+			this.numCrls = numCrls;
+		}
+		else
+		{
+			throw new IllegalArgumentException("numCrls could not be negative");
+		}
+		
 		this.name = name;
 		this.nextSerial = initialSerial;
 		
@@ -158,6 +173,11 @@ public class CAEntry
 		return crlSignerName;
 	}
 
+	public int getNumCrls()
+	{
+		return numCrls;
+	}
+	
 	public void setCrlSignerName(String crlSignerName) {
 		this.crlSignerName = crlSignerName;
 	}

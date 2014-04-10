@@ -128,7 +128,7 @@ public class CertificateStore
 		return queryExecutor.getThisUpdateOfCurrentCRL(cacert);
 	}
 	
-	public byte[] getEncodedCurrentCrl(X509CertificateWithMetaInfo cacert)
+	public byte[] getEncodedCurrentCRL(X509CertificateWithMetaInfo cacert)
 	{
 		try {
 			return queryExecutor.getEncodedCRL(cacert);
@@ -138,6 +138,19 @@ public class CertificateStore
 					e.getMessage());
 			LOG.error("Exception", e);
 			return null;
+		}
+	}
+	
+	public int cleanupCRLs(X509CertificateWithMetaInfo cacert, int numCRLs)
+	{
+		try {
+			return queryExecutor.cleanupCRLs(cacert, numCRLs);
+		} catch (Exception e) {
+			LOG.error("Could not cleanup CRLs ca={}: error message: {}",
+					X509Util.canonicalizeName(cacert.getCert().getSubjectX500Principal()),
+					e.getMessage());
+			LOG.error("Exception", e);
+			return 0;
 		}
 	}
 	

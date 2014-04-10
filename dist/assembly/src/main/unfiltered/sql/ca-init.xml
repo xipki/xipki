@@ -123,6 +123,9 @@
 			<column name="permissions" type="VARCHAR(100)">
 				<constraints nullable="false"/>
 			</column>
+                        <column defaultValueNumeric="30" name="num_crls" type="INT">
+                                <constraints nullable="false"/>
+                        </column>
 		</createTable>
 		<!-- table caalias -->
 		<createTable tableName="caalias">

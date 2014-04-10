@@ -253,7 +253,7 @@ public class X509CA
 		boolean successfull = false;
 		
 		try{
-			byte[] encodedCrl = certstore.getEncodedCurrentCrl(caInfo.getCertificate());
+			byte[] encodedCrl = certstore.getEncodedCurrentCRL(caInfo.getCertificate());
 			if(encodedCrl == null)
 			{
 				return null;			
@@ -279,9 +279,41 @@ public class X509CA
 		}
 	}
 
+	public void cleanupCRLs()
+	throws OperationException
+	{
+		int numCrls = caInfo.getNumCrls();
+		LOG.info("START cleanupCRLs: ca={}, numCrls={}", caInfo.getName(), numCrls);
+		
+		boolean successfull = false;
+		
+		try{
+			int numOfRemovedCRLs;
+			if(numCrls > 0)
+			{
+				numOfRemovedCRLs = certstore.cleanupCRLs(caInfo.getCertificate(), caInfo.getNumCrls());
+			}
+			else
+			{
+				numOfRemovedCRLs = 0;
+			}
+			successfull = true;
+			LOG.info("SUCCESSFULL cleanupCRLs: ca={}, numOfRemovedCRLs={}", caInfo.getName(), 
+					numOfRemovedCRLs);
+		} catch (RuntimeException e) {
+			throw new OperationException(ErrorCode.System_Failure, e.getClass().getName() + ": " + e.getMessage());
+		}
+		finally
+		{
+			if(successfull == false)
+			{
+				LOG.info("FAILED cleanupCRLs: ca={}", caInfo.getName());
+			}
+		}
+	}
 	public X509CRL generateCRL()
 	throws OperationException
-	{		
+	{
 		LOG.info("START generateCRL: ca={}", caInfo.getName());
 		
 		boolean successfull = false;
@@ -1248,6 +1280,7 @@ public class X509CA
 		public void run() {
 			try {
 				generateCRL();
+				cleanupCRLs();
 			} catch (OperationException e) {
 			}
 		}
