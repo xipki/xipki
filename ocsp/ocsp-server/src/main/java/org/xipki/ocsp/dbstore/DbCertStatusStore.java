@@ -18,22 +18,24 @@
 package org.xipki.ocsp.dbstore;
 
 import java.math.BigInteger;
-import java.security.NoSuchAlgorithmException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 import org.bouncycastle.util.encoders.Hex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.database.api.DataSource;
-import org.xipki.ocsp.CertprofileStore;
 import org.xipki.ocsp.IssuerEntry;
 import org.xipki.ocsp.IssuerHashNameAndKey;
 import org.xipki.ocsp.IssuerStore;
@@ -42,103 +44,132 @@ import org.xipki.ocsp.api.CertStatusInfo;
 import org.xipki.ocsp.api.CertStatusStore;
 import org.xipki.ocsp.api.CertStatusStoreException;
 import org.xipki.ocsp.api.HashAlgoType;
+import org.xipki.security.common.ParamChecker;
 
 public class DbCertStatusStore implements CertStatusStore
 {	
-	private static final Logger LOG = LoggerFactory.getLogger(DbCertStatusStore.class);
-	
-	private final DataSource dataSource;
-
-	private final boolean unknownSerialAsGood;
-	private IssuerStore issuerStore;
-	private CertprofileStore certprofileStore;
-	
-	public DbCertStatusStore(DataSource dataSource, boolean unknownSerialAsGood)
-	throws SQLException, NoSuchAlgorithmException
+	private class StoreUpdateService implements Runnable
 	{
-		this.dataSource = dataSource;
-		this.unknownSerialAsGood = unknownSerialAsGood;
-        this.issuerStore = initIssuerStore();
-        this.certprofileStore = initCertprofileStore();
-	}
-	
-	private IssuerStore initIssuerStore() 
-	throws SQLException
-	{
-		HashAlgoType[] hashAlgoTypes = {HashAlgoType.SHA1, HashAlgoType.SHA224, HashAlgoType.SHA256,
-				HashAlgoType.SHA384, HashAlgoType.SHA512};
-		
-		StringBuilder sb = new StringBuilder();
-		sb.append("SELECT id, subject");
-		for(HashAlgoType hashAlgoType : hashAlgoTypes)
-		{
-			String hashAlgo = hashAlgoType.name().toLowerCase();
-			sb.append(", ").append(hashAlgo).append("_fp_name");
-			sb.append(", ").append(hashAlgo).append("_fp_key");
-		};
-		sb.append(" FROM issuer");
-
-		String sql = sb.toString();
-        PreparedStatement ps = borrowPreparedStatement(sql);
-        
-        ResultSet rs = null;
-		try{
-			rs = ps.executeQuery();
-			List<IssuerEntry> caInfos = new LinkedList<IssuerEntry>();
-			while(rs.next()) {
-				int id = rs.getInt("id");
-				String subject = rs.getString("subject");
-				
-				Map<HashAlgoType, IssuerHashNameAndKey> hashes = new HashMap<HashAlgoType, IssuerHashNameAndKey>();
-				for(HashAlgoType hashAlgoType : hashAlgoTypes)
-				{
-					String hashAlgo = hashAlgoType.name().toLowerCase();
-					String hash_name = rs.getString(hashAlgo + "_fp_name");
-					String hash_key = rs.getString(hashAlgo + "_fp_key");
-					IssuerHashNameAndKey hash = new IssuerHashNameAndKey(
-							hashAlgoType, Hex.decode(hash_name), Hex.decode(hash_key));
-					hashes.put(hashAlgoType, hash);
-				}
-				
-				IssuerEntry caInfoEntry = new IssuerEntry(id, subject, hashes, null);
-				caInfos.add(caInfoEntry);
-			}
-			
-			return new IssuerStore(caInfos);
-		}finally {
-			returnPreparedStatement(ps);
-        	if(rs != null) {
-        		rs.close();
-        		rs = null;
-        	}
+		@Override
+		public void run() {
+			initIssuerStore();
 		}
 	}
 	
-	private CertprofileStore initCertprofileStore() 
-	throws SQLException
+	private static final Logger LOG = LoggerFactory.getLogger(DbCertStatusStore.class);
+	
+	private final String name;
+	private final DataSource dataSource;
+	private final boolean unknownSerialAsGood;
+	
+	private IssuerStore issuerStore;
+	private boolean initialized = false;
+	
+	public DbCertStatusStore(String name, DataSource dataSource, boolean unknownSerialAsGood)
 	{
-    	final String sql = "SELECT id, name FROM certprofile";    	
+		ParamChecker.assertNotEmpty("name", name);
+		ParamChecker.assertNotNull("dataSource", dataSource);
+		
+		this.name = name;
+		this.dataSource = dataSource;
+		this.unknownSerialAsGood = unknownSerialAsGood;
+		
+		initIssuerStore();
+		
+		StoreUpdateService storeUpdateService = new StoreUpdateService();
+		ScheduledThreadPoolExecutor scheduledThreadPoolExecutor = new ScheduledThreadPoolExecutor(1);
+		scheduledThreadPoolExecutor.scheduleAtFixedRate(
+				storeUpdateService, 60, 60, TimeUnit.SECONDS);
+	}
 
-        PreparedStatement ps = borrowPreparedStatement(sql);
-        
-        ResultSet rs = null;
+	private synchronized void initIssuerStore() 
+	{
 		try{
-			rs = ps.executeQuery();
-			Map<Integer, String> entries = new HashMap<Integer, String>();
-			
-			while(rs.next()) {
-				int id = rs.getInt("id");
-				String name = rs.getString("name");
-				entries.put(id, name);
+			if(initialized)
+			{
+				String sql = "SELECT id FROM issuer";
+		        PreparedStatement ps = borrowPreparedStatement(sql);
+	
+		        ResultSet rs = null;
+				try{
+					Set<Integer> newIds = new HashSet<Integer>();
+					
+					rs = ps.executeQuery();
+					while(rs.next()) {
+						int id = rs.getInt("id");
+						newIds.add(id);
+					}				
+					
+					// no change in the issuerStore
+					Set<Integer> ids = issuerStore.getIds();
+					if(ids.size() == newIds.size() && ids.containsAll(newIds) && newIds.containsAll(ids))
+					{
+						return;
+					}
+				}finally {
+					returnPreparedStatement(ps);
+		        	if(rs != null) {
+		        		rs.close();
+		        		rs = null;
+		        	}
+				}
 			}
 			
-			return new CertprofileStore(entries);
-		}finally {
-			returnPreparedStatement(ps);
-        	if(rs != null) {
-        		rs.close();
-        		rs = null;
-        	}
+			HashAlgoType[] hashAlgoTypes = {HashAlgoType.SHA1, HashAlgoType.SHA224, HashAlgoType.SHA256,
+					HashAlgoType.SHA384, HashAlgoType.SHA512};
+			
+			StringBuilder sb = new StringBuilder();
+			sb.append("SELECT id, subject");
+			for(HashAlgoType hashAlgoType : hashAlgoTypes)
+			{
+				String hashAlgo = hashAlgoType.name().toLowerCase();
+				sb.append(", ").append(hashAlgo).append("_fp_name");
+				sb.append(", ").append(hashAlgo).append("_fp_key");
+			};
+			sb.append(" FROM issuer");
+	
+			String sql = sb.toString();
+	        PreparedStatement ps = borrowPreparedStatement(sql);
+	        
+	        ResultSet rs = null;
+			try{
+				rs = ps.executeQuery();
+				List<IssuerEntry> caInfos = new LinkedList<IssuerEntry>();
+				while(rs.next()) {
+					int id = rs.getInt("id");
+					String subject = rs.getString("subject");
+					
+					Map<HashAlgoType, IssuerHashNameAndKey> hashes = new HashMap<HashAlgoType, IssuerHashNameAndKey>();
+					for(HashAlgoType hashAlgoType : hashAlgoTypes)
+					{
+						String hashAlgo = hashAlgoType.name().toLowerCase();
+						String hash_name = rs.getString(hashAlgo + "_fp_name");
+						String hash_key = rs.getString(hashAlgo + "_fp_key");
+						IssuerHashNameAndKey hash = new IssuerHashNameAndKey(
+								hashAlgoType, Hex.decode(hash_name), Hex.decode(hash_key));
+						hashes.put(hashAlgoType, hash);
+					}
+					
+					IssuerEntry caInfoEntry = new IssuerEntry(id, subject, hashes, null);
+					caInfos.add(caInfoEntry);
+				}
+				
+				initialized = false;
+				this.issuerStore = new IssuerStore(caInfos);
+				LOG.info("Updated CertStore: {}", name);
+				initialized = true;
+			}finally {
+				returnPreparedStatement(ps);
+	        	if(rs != null) {
+	        		rs.close();
+	        		rs = null;
+	        	}
+			}
+		}catch(Exception e)
+		{
+			LOG.error("Could not executing initIssurStore() for {},  {}: {}", 
+					new Object[]{name, e.getClass().getName(), e.getMessage()});
+			LOG.error("Could not executing initIssurStore()", e);
 		}
 	}
 	
@@ -150,6 +181,22 @@ public class DbCertStatusStore implements CertStatusStore
 			HashAlgoType certHashAlgo)
 	throws CertStatusStoreException
 	{
+		// wait for max. 0.5 second
+		int n = 5;
+		while(initialized == false && (n-- > 0))
+		{
+			try{
+				Thread.sleep(100);
+			}catch(InterruptedException e)
+			{				
+			}
+		}
+		
+		if(initialized == false)
+		{
+			throw new CertStatusStoreException("Initialization of CertStore is still in process");
+		}
+
 		if(includeCertHash && certHashAlgo == null)
 		{
 			certHashAlgo = hashAlgo;
@@ -177,15 +224,6 @@ public class DbCertStatusStore implements CertStatusStore
 			try{
 				if(rs.next())
 				{
-					int certprofileId = rs.getInt("certprofile_id");				
-					String profileName = certprofileId == 0 ? "NONE" : certprofileStore.getName(certprofileId);
-					if(profileName == null)
-					{
-						// new certprofile has been added after the last update of certprofileStore
-						this.certprofileStore = initCertprofileStore();
-						profileName = certprofileStore.getName(certprofileId);
-					}
-					
 					byte[] certHash = null;
 					if(includeCertHash)
 					{

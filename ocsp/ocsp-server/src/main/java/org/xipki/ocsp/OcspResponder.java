@@ -21,14 +21,9 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
 import java.security.Security;
-import java.security.cert.CRLException;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateException;
-import java.security.cert.CertificateFactory;
-import java.security.cert.X509CRL;
 import java.security.cert.X509Certificate;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -342,14 +337,8 @@ public class OcspResponder {
 	            	}
 	            }
 	            
-	            try {
-	            	DbCertStatusStore certStatusStore = new DbCertStatusStore(dataSource, unknownSerialAsGood);
-	            	this.certStatusStores.add(certStatusStore);
-				} catch (NoSuchAlgorithmException e) {
-					throw new OCSPResponderException(e);
-				} catch (SQLException e) {
-					throw new OCSPResponderException(e);
-				}
+            	DbCertStatusStore certStatusStore = new DbCertStatusStore(storeName, dataSource, unknownSerialAsGood);
+            	this.certStatusStores.add(certStatusStore);
 			}			
 		}
 		
@@ -378,18 +367,11 @@ public class OcspResponder {
 				String s1 = props.getProperty(crlstore_prefix + storeName + useUpdateDatesFromCRL_suffix);
 				boolean useUpdateDatesFromCRL = (s1 == null)? true : Boolean.getBoolean(s1); 
 				
-				X509CRL crl = parseCRL(crlFile);
-				
 				X509Certificate caCert = parseCert(cacertFile);				
 				X509Certificate crlIssuerCert = issuercertFile == null ? null : parseCert(issuercertFile);
 				
-				CrlCertStatusStore certStatusStore;
-				try {
-					certStatusStore = new CrlCertStatusStore(crl, caCert, crlIssuerCert,
+				CrlCertStatusStore certStatusStore = new CrlCertStatusStore(storeName, crlFile, caCert, crlIssuerCert,
 							useUpdateDatesFromCRL, unknownSerialAsGood);
-				} catch (CertStatusStoreException e) {
-					throw new OCSPResponderException(e);
-				}
 				this.certStatusStores.add(certStatusStore);
 			}
 		}		
@@ -613,9 +595,6 @@ public class OcspResponder {
 		this.passwordResolver = passwordResolver;
 	}
 
-
-
-	private static CertificateFactory certFact;
 	private static X509Certificate parseCert(String f) throws OCSPResponderException
 	{
 		try{
@@ -628,26 +607,6 @@ public class OcspResponder {
 		}
 	}
 	
-	private static X509CRL parseCRL(String f) throws OCSPResponderException
-	{
-		try{
-			if(certFact == null)
-			{
-				certFact = CertificateFactory.getInstance("X.509", "BC");
-			}
-			return (X509CRL) certFact.generateCRL(new FileInputStream(f));
-		}catch(IOException e)
-		{
-			throw new OCSPResponderException(e);
-		} catch (CertificateException e) {
-			throw new OCSPResponderException(e);
-		} catch (CRLException e) {
-			throw new OCSPResponderException(e);
-		} catch (NoSuchProviderException e) {
-			throw new OCSPResponderException(e);
-		}
-	}
-
 	public void setConfFile(String confFile) {
 		this.confFile = confFile;
 	}
