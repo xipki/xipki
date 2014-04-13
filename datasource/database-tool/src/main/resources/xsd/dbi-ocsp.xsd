@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xs:schema targetNamespace="http://xipki.org/xipki/dbi/ocsp/v1"
+ xmlns="http://xipki.org/xipki/dbi/ocsp/v1"
+ xmlns:xs="http://www.w3.org/2001/XMLSchema"
+ elementFormDefault="qualified" version="1.0"
+ xmlns:jxb="http://java.sun.com/xml/ns/jaxb" jxb:version="2.0"> 
+	<xs:annotation>
+		<xs:appinfo>
+			<jxb:schemaBindings>
+				<jxb:package name="org.xipki.dbi.ocsp.jaxb"/>
+			</jxb:schemaBindings>
+		</xs:appinfo>
+	</xs:annotation>
+
+	<!-- CertStore -->
+	<xs:element name="CertStore" type="CertStoreType"/>
+	
+	<xs:complexType name="CertStoreType">
+		<xs:all>
+			<xs:element name="issuers">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element ref="issuer" minOccurs="0" maxOccurs="unbounded"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="certprofiles">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element ref="certprofile" minOccurs="0" maxOccurs="unbounded"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="certsFiles">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="certsFile" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+		</xs:all>
+		<xs:attribute name="version" type="xs:string" use="required"/>
+	</xs:complexType>
+
+	<xs:element name="issuer" type="issuerType"/>
+	<xs:complexType name="issuerType">
+		<xs:all>
+			<xs:element name="id" type="xs:int" />
+			<xs:element name="subject" type="xs:string" />
+			<xs:element name="sha1_fp_name" type="xs:string" />		
+			<xs:element name="sha1_fp_key" type="xs:string" />
+			<xs:element name="sha224_fp_name" type="xs:string" />		
+			<xs:element name="sha224_fp_key" type="xs:string" />
+			<xs:element name="sha256_fp_name" type="xs:string" />		
+			<xs:element name="sha256_fp_key" type="xs:string" />
+			<xs:element name="sha384_fp_name" type="xs:string" />		
+			<xs:element name="sha384_fp_key" type="xs:string" />
+			<xs:element name="sha512_fp_name" type="xs:string" />		
+			<xs:element name="sha512_fp_key" type="xs:string" />
+			<xs:element name="sha1_fp_cert" type="xs:string" />
+			<xs:element name="cert" type="xs:string" />
+		</xs:all>
+	</xs:complexType>
+
+	<xs:element name="certprofile" type="certprofileType"/>
+	<xs:complexType name="certprofileType">
+		<xs:all>
+			<xs:element name="id" type="xs:int" />
+			<xs:element name="name" type="xs:string" />
+		</xs:all>
+	</xs:complexType>
+
+	<xs:element name="certs" type="certsType"/>
+	<xs:complexType name="certsType">
+		<xs:sequence>
+			<xs:element ref="cert" minOccurs="0" maxOccurs="unbounded"/>
+		</xs:sequence>
+	</xs:complexType>
+	
+	<xs:element name="cert" type="certType"/>
+	<xs:complexType name="certType">
+		<xs:all>
+			<xs:element name="id" type="xs:int" />
+			<xs:element name="issuer_id" type="xs:int"/>
+			<xs:element name="serial" type="xs:string"/>
+			<xs:element name="certprofile_id" type="xs:int"/>
+			<xs:element name="subject" type="xs:string"/>
+			<xs:element name="last_update" type="xs:string"/>
+			<xs:element name="notbefore" type="xs:string"/>
+			<xs:element name="notafter" type="xs:string"/>
+			<xs:element name="revocated" type="xs:boolean"/>
+			<xs:element name="rev_reason" type="xs:string" minOccurs="0"/>
+			<xs:element name="rev_time" type="xs:string" minOccurs="0"/>
+			<xs:element name="rev_invalidity_time" type="xs:string" minOccurs="0"/>
+			<xs:element name="sha1_fp_cert" type="xs:string"/>
+			<xs:element name="sha224_fp_cert" type="xs:string"/>
+			<xs:element name="sha256_fp_cert" type="xs:string"/>
+			<xs:element name="sha384_fp_cert" type="xs:string"/>
+			<xs:element name="sha512_fp_cert" type="xs:string"/>
+			<xs:element name="certFile" type="xs:string"/>		
+		</xs:all>		
+	</xs:complexType>
+</xs:schema>
