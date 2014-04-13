@@ -123,4 +123,11 @@
 		<feature>xipki-ocspclient</feature>
 		<bundle>mvn:org.xipki/ocsp-client-shell/${project.version}</bundle>
 	</feature>
+
+	<feature name="xipki-database-tool" version="${project.version}" resolver="(obr)">
+		<feature>mysql</feature>
+		<feature>xipki-datasource</feature>
+		<bundle>mvn:org.xipki/database-tool/${project.version}</bundle>
+	</feature>
+
 </features>

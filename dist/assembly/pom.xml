@@ -152,6 +152,7 @@
 								<feature>xipki-ocspclient-shell</feature>
 								<!-- optional features -->
 								<feature>xipki-remotep11</feature>
+								<feature>xipki-database-tool</feature>
 							</features>
 						</configuration>
 					</execution>
@@ -212,6 +213,26 @@
 									</artifactItems>
 								</configuration>
 							</execution>
+                                                        <execution>
+                                                                <!-- Extract the SQL scripts -->
+                                                                <id>unpack-sql</id>
+                                                                <phase>generate-resources</phase>
+                                                                <goals>
+                                                                        <goal>unpack</goal>
+                                                                </goals>
+                                                                <configuration>
+                                                                        <artifactItems>
+                                                                                <artifactItem>
+                                                                                        <groupId>org.xipki</groupId>
+                                                                                        <artifactId>ca-sql</artifactId>
+                                                                                        <version>${project.version}</version>
+                                                                                        <type>jar</type>
+											<includes>*.xml</includes>
+                                                                                        <outputDirectory>target/classes/sql</outputDirectory>
+                                                                                </artifactItem>
+                                                                        </artifactItems>
+                                                                </configuration>
+                                                        </execution>
 							<execution>
 								<id>unpack-liquibase</id>
 								<phase>generate-resources</phase>
