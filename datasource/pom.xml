@@ -28,5 +28,6 @@
 	<modules>
 		<module>datasource-api</module>
 		<module>datasource-impl</module>
+		<module>database-tool</module>
 	</modules>
 </project>
