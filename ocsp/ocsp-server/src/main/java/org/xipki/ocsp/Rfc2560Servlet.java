@@ -58,6 +58,14 @@ public class Rfc2560Servlet extends HttpServlet
 			throws ServletException, IOException
 	{
 		try{
+			if(responder == null)
+			{
+				LOG.error("responder in servlet not configured");			
+				response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+				response.setContentLength(0);
+				return;
+			}		
+
 			// accept only "application/ocsp-request" as content type
 			if (! CT_REQUEST.equalsIgnoreCase(request.getContentType()))
 			{

@@ -77,6 +77,7 @@ import org.xipki.security.api.PasswordResolver;
 import org.xipki.security.api.PasswordResolverException;
 import org.xipki.security.api.SecurityFactory;
 import org.xipki.security.api.SignerException;
+import org.xipki.security.common.HealthCheckResult;
 import org.xipki.security.common.IoCertUtil;
 
 public class OcspResponder {
@@ -609,5 +610,30 @@ public class OcspResponder {
 	
 	public void setConfFile(String confFile) {
 		this.confFile = confFile;
+	}
+	
+	public HealthCheckResult healthCheck()
+	{
+		HealthCheckResult result = new HealthCheckResult();
+		boolean healthy = true;
+		for(CertStatusStore store : certStatusStores)
+		{
+			boolean storeHealthy = store.isHealthy();
+			if(storeHealthy == false)
+			{
+				healthy = false;
+			}
+			result.putStatus("OCSP.CertStatusStore." + store.getName(), storeHealthy);
+		}
+		
+		boolean signerHealthy = responder.getSigner().isHealthy();
+		result.putStatus("OCSP.Signer", signerHealthy);
+		if(signerHealthy == false)
+		{
+			healthy = false;
+		}		
+		
+		result.setHealthy(healthy);
+		return result;		
 	}
 }

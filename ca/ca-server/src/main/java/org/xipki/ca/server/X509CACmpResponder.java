@@ -98,6 +98,7 @@ import org.xipki.security.api.ConcurrentContentSigner;
 import org.xipki.security.api.SecurityFactory;
 import org.xipki.security.common.CmpUtf8Pairs;
 import org.xipki.security.common.CustomObjectIdentifiers;
+import org.xipki.security.common.HealthCheckResult;
 
 public class X509CACmpResponder extends CmpResponder
 {
@@ -128,6 +129,19 @@ public class X509CACmpResponder extends CmpResponder
 	@Override
 	public boolean isCAInService() {
 		return CAStatus.ACTIVE == ca.getCAInfo().getStatus();
+	}
+
+	public HealthCheckResult healthCheck()
+	{
+		HealthCheckResult result = ca.healthCheck();
+		
+		boolean responderSignerHealthy = responder.isHealthy();
+		if(responderSignerHealthy == false)
+		{
+			result.setHealthy(result.isHealthy() && responderSignerHealthy);
+		}
+		result.putStatus("CA.CMPResponderSigner", responderSignerHealthy);
+		return result;
 	}
 
 	@Override

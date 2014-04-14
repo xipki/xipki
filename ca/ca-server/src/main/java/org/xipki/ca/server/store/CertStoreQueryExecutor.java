@@ -1207,5 +1207,31 @@ class CertStoreQueryExecutor
 		}
 		return fp(encoded);
 	}
+	
+	boolean isHealthy()
+	{
+    	final String sql = "SELECT id FROM cainfo";    	
+
+    	try{
+	        PreparedStatement ps = borrowPreparedStatement(sql);
+	        
+	        ResultSet rs = null;
+			try{
+				rs = ps.executeQuery();
+			}finally {
+				returnPreparedStatement(ps);
+	        	if(rs != null) {
+	        		rs.close();
+	        		rs = null;
+	        	}
+			}
+			return true;
+    	}catch(Exception e)
+    	{
+			LOG.error("isHealthy(). {}: {}", e.getClass().getName(), e.getMessage());
+			LOG.debug("isHealthy()", e);
+			return false;
+    	}
+	}
 
 }

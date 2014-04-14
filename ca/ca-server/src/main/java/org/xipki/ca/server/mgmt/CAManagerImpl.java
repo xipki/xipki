@@ -2731,6 +2731,21 @@ public class CAManagerImpl implements CAManager
 	public String getCaName(String aliasName) {
 		return caAliases.get(aliasName);
 	}
+	
+	@Override
+	public String getAliasName(String caName)
+	{
+		for(String alias : caAliases.keySet())
+		{
+			String thisCaName = caAliases.get(alias);
+			if(thisCaName.equals(caName))
+			{
+				return alias;
+			}
+		}
+		
+		return null;
+	}
 
 	@Override
 	public Set<String> getCaAliasNames() {

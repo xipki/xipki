@@ -19,6 +19,7 @@
 			<cm:property name="includeCertHash" value="false"/>
 			<cm:property name="requireReqSigned" value="false"/>
 			<cm:property name="checkReqSignature" value="false"/>
+			<cm:property name="healthUrlPatterns" value="/health/ocsp/*"/>
 		</cm:default-properties>
 	</cm:property-placeholder>
     
@@ -46,6 +47,17 @@
     <service ref="ocspServlet" interface="javax.servlet.Servlet">
         <service-properties>
             <entry key="urlPatterns" value="${urlPatterns}" />
+        </service-properties>
+    </service>
+
+    <!-- create the servlet and inject our own app factory -->
+    <bean id="healthServlet" class="org.xipki.ocsp.HealthCheckServlet">
+        <property name="responder" ref="ocspResponder" />
+    </bean>
+
+    <service ref="healthServlet" interface="javax.servlet.Servlet">
+        <service-properties>
+            <entry key="urlPatterns" value="${healthUrlPatterns}" />
         </service-properties>
     </service>
 
