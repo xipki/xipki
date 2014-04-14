@@ -48,4 +48,6 @@ public interface ConcurrentContentSigner {
 			throws NoIdleSignerException;
 	
 	public void returnContentSigner(ContentSigner signer);
+	
+	public boolean isHealthy();
 }
