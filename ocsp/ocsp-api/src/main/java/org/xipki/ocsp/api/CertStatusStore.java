@@ -24,4 +24,8 @@ public interface CertStatusStore
 	CertStatusInfo getCertStatus(HashAlgoType hashAlgo, byte[] issuerNameHash,
 			byte[] issuerKeyHash, BigInteger serialNumber, boolean includeCertHash, HashAlgoType certHashAlgo)
 	throws CertStatusStoreException;
+	
+	boolean isHealthy();
+	
+	String getName();
 }

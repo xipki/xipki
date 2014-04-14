@@ -63,7 +63,8 @@ import org.xipki.ocsp.api.HashAlgoType;
 import org.xipki.security.common.CustomObjectIdentifiers;
 import org.xipki.security.common.ParamChecker;
 
-public class CrlCertStatusStore implements CertStatusStore {
+public class CrlCertStatusStore implements CertStatusStore
+{
 	private static final Logger LOG = LoggerFactory.getLogger(CrlCertStatusStore.class);
 	
 	private class StoreUpdateService implements Runnable
@@ -485,6 +486,16 @@ public class CrlCertStatusStore implements CertStatusStore {
 		} catch (NoSuchProviderException e) {
 			throw new CertStatusStoreException(e);
 		}
+	}
+
+	@Override
+	public boolean isHealthy() {
+		return true;
+	}
+
+	@Override
+	public String getName() {
+		return name;
 	}
 
 }

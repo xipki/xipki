@@ -248,4 +248,9 @@ public class CertificateStore
 	{
 		return queryExecutor.fp_canonicalized_name(x500Name);
 	}
+	
+	public boolean isHealthy()
+	{
+		return queryExecutor.isHealthy();
+	}
 }

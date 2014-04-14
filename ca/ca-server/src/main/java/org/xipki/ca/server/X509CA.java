@@ -96,6 +96,7 @@ import org.xipki.ca.server.store.CertificateStore;
 import org.xipki.security.api.ConcurrentContentSigner;
 import org.xipki.security.api.NoIdleSignerException;
 import org.xipki.security.common.CustomObjectIdentifiers;
+import org.xipki.security.common.HealthCheckResult;
 import org.xipki.security.common.ParamChecker;
 
 public class X509CA 
@@ -1312,6 +1313,32 @@ public class X509CA
 		}		
 	}
 	
+	public HealthCheckResult healthCheck()
+	{
+		boolean caSignerHealthy = caSigner.isHealthy();
+		boolean databaseHealthy = certstore.isHealthy();
+		
+		boolean healthy = caSignerHealthy && databaseHealthy;
+
+		HealthCheckResult result = new HealthCheckResult();
+
+		if(crlSigner != null && crlSigner.getSigner() != null)
+		{
+			boolean crlSignerHealthy = crlSigner.getSigner().isHealthy();
+			if(crlSignerHealthy == false)
+			{
+				healthy = false;
+			}
+			result.putStatus("CA.CRLSigner", crlSignerHealthy);
+		}
+
+		result.setHealthy(healthy);
+		result.putStatus("CA.CASigner", caSignerHealthy);
+		result.putStatus("CA.Database", databaseHealthy);
+		
+		return result;
+	}
+
 	private static boolean equals(X500Name a, X500Name b)
 	{
 		ASN1ObjectIdentifier[] types_a = a.getAttributeTypes();

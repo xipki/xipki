@@ -49,6 +49,8 @@ public interface CAManager
 
 	void addCaAlias(String aliasName, String caName) throws CAMgmtException;
 	void removeCaAlias(String aliasName) throws CAMgmtException;
+	
+	String getAliasName(String caName);
 	String getCaName(String aliasName);
 	
 	Set<String> getCaAliasNames();

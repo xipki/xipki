@@ -344,9 +344,39 @@ public class DbCertStatusStore implements CertStatusStore
 		try{ 
     		Connection conn = ps.getConnection();
     		dataSource.returnConnection(conn);
-    		// TODO ps.closeOnCompletion();
 		}catch(Throwable t) {
 			LOG.warn("Cannot return prepared statement and connection", t);
 		}
+	}
+
+	@Override
+	public boolean isHealthy() {
+		final String sql = "SELECT id FROM issuer";
+		
+		try{
+	        PreparedStatement ps = borrowPreparedStatement(sql);
+
+	        ResultSet rs = null;
+			try{
+				rs = ps.executeQuery();
+				return true;
+			}finally {
+				returnPreparedStatement(ps);
+	        	if(rs != null) {
+	        		rs.close();
+	        		rs = null;
+	        	}
+			}
+		}catch(Exception e)
+		{
+			LOG.error("isHealthy(). {}: {}", e.getClass().getName(), e.getMessage());
+			LOG.debug("isHealthy()", e);
+			return false;
+		}
+	}
+
+	@Override
+	public String getName() {
+		return name;
 	}
 }

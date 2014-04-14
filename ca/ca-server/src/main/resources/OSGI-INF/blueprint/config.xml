@@ -16,6 +16,7 @@
 		<cm:default-properties>
 			<cm:property name="urlPatterns"  value="/cmp/*"/>
 			<cm:property name="caConfFile" value="ca-config/ca-db.properties" />
+			<cm:property name="healthUrlPatterns" value="/health/cmp/*"/>
 		</cm:default-properties>
 	</cm:property-placeholder>
     
@@ -42,6 +43,16 @@
     <service ref="caServlet" interface="javax.servlet.Servlet">
         <service-properties>
             <entry key="urlPatterns" value="${urlPatterns}" />
+        </service-properties>
+    </service>
+
+    <bean id="healthServlet" class="org.xipki.ca.server.HealthCheckServlet">
+        <property name="caManager" ref="caManager" />
+    </bean>
+
+    <service ref="healthServlet" interface="javax.servlet.Servlet">
+        <service-properties>
+            <entry key="urlPatterns" value="${healthUrlPatterns}" />
         </service-properties>
     </service>
 
