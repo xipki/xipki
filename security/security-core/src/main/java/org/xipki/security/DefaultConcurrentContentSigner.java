@@ -17,6 +17,7 @@
 
 package org.xipki.security;
 
+import java.io.OutputStream;
 import java.security.PrivateKey;
 import java.security.cert.X509Certificate;
 import java.util.List;
@@ -147,5 +148,27 @@ public class DefaultConcurrentContentSigner implements ConcurrentContentSigner{
 	public X509Certificate getCertificate() {
 		return certificate;
 	}
-	
+
+	@Override
+	public boolean isHealthy() {
+		ContentSigner signer = null;
+		try{			
+			signer = borrowContentSigner(60000); // wait for maximal 60 seconds
+			OutputStream stream = signer.getOutputStream();
+			stream.write(new byte[]{1,2,3,4});
+			byte[] signature = signer.getSignature();
+			return signature != null && signature.length > 0;
+		} catch(Exception e)
+		{
+			LOG.error("healthCheck(). {}: {}", e.getClass().getName(), e.getMessage());
+			LOG.debug("healthCheck()", e);
+			return false;
+		}		
+		finally{
+			if(signer != null)
+			{
+				returnContentSigner(signer);
+			}
+		}
+	}
 }

@@ -42,7 +42,13 @@ public class CaListCommand extends CaCommand {
 			sb.append(n + " CAs are configured:\n");		
 			for(String paramName : names)
 			{
-				sb.append("\t").append(paramName).append("\n");
+				sb.append("\t").append(paramName);
+				String alias = caManager.getAliasName(paramName);
+				if(alias != null)
+				{
+					sb.append(" (alias: ").append(alias).append(")");
+				}
+				sb.append("\n");
 			}
 		}
 		else
