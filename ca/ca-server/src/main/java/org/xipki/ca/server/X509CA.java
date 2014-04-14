@@ -1315,26 +1315,33 @@ public class X509CA
 	
 	public HealthCheckResult healthCheck()
 	{
-		boolean caSignerHealthy = caSigner.isHealthy();
-		boolean databaseHealthy = certstore.isHealthy();
-		
-		boolean healthy = caSignerHealthy && databaseHealthy;
-
 		HealthCheckResult result = new HealthCheckResult();
+
+		boolean healthy = true;
+		
+		boolean caSignerHealthy = caSigner.isHealthy();
+		healthy &= caSignerHealthy;
+		result.putStatus("CA.CASigner", caSignerHealthy);
+
+		boolean databaseHealthy = certstore.isHealthy();
+		healthy &= databaseHealthy;
+		result.putStatus("CA.Database", databaseHealthy);
 
 		if(crlSigner != null && crlSigner.getSigner() != null)
 		{
 			boolean crlSignerHealthy = crlSigner.getSigner().isHealthy();
-			if(crlSignerHealthy == false)
-			{
-				healthy = false;
-			}
+			healthy &= crlSignerHealthy;
 			result.putStatus("CA.CRLSigner", crlSignerHealthy);
 		}
 
+		for(IdentifiedCertPublisher publisher : getPublishers())
+		{
+			boolean ph = publisher.isHealthy();
+			healthy &= ph;
+			result.putStatus("CA.Publisher." + publisher.getName(), ph);
+		}
+
 		result.setHealthy(healthy);
-		result.putStatus("CA.CASigner", caSignerHealthy);
-		result.putStatus("CA.Database", databaseHealthy);
 		
 		return result;
 	}

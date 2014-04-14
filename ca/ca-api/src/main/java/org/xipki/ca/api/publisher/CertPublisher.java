@@ -43,4 +43,6 @@ public interface CertPublisher{
 			int reason, Date invalidityTime);	
 	
 	void crlAdded(X509CertificateWithMetaInfo cacert, X509CRL crl);
+	
+	boolean isHealthy();
 }
