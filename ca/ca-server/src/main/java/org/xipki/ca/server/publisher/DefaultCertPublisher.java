@@ -156,4 +156,9 @@ public class DefaultCertPublisher implements CertPublisher {
 	{
 	}
 
+	@Override
+	public boolean isHealthy() {
+		return queryExecutor.isHealthy();
+	}
+
 }

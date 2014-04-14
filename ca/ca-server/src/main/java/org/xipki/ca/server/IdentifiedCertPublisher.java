@@ -79,4 +79,9 @@ public class IdentifiedCertPublisher implements CertPublisher {
 	public String getName() {
 		return name;
 	}
+
+	@Override
+	public boolean isHealthy() {
+		return certPublisher.isHealthy();
+	}
 }
