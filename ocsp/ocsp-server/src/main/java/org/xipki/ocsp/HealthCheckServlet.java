@@ -18,15 +18,12 @@
 package org.xipki.ocsp;
 
 import java.io.IOException;
-import java.io.InputStream;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.bouncycastle.asn1.ASN1InputStream;
-import org.bouncycastle.asn1.cmp.PKIMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.security.common.HealthCheckResult;
@@ -83,16 +80,4 @@ public class HealthCheckServlet extends HttpServlet
 		response.flushBuffer();
 	}
 
-	protected PKIMessage generatePKIMessage(InputStream is) throws IOException
-	{
-		ASN1InputStream asn1Stream = new ASN1InputStream(is);
-		
-		try{
-			return PKIMessage.getInstance(asn1Stream.readObject());
-		}finally{
-			try{
-				asn1Stream.close();
-			}catch(IOException e){}
-		}
-	}
 }
