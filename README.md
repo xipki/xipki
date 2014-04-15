@@ -29,7 +29,7 @@ Installation
 ------------
 * Get a copy of XiPKI code
   ```sh
-  git clone git://github.com/xipki/XiPKI xipki
+  git clone git://github.com/xipki/xipki xipki
   ```
 
 * Prepare
