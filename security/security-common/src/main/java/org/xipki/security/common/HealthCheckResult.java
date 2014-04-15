@@ -46,17 +46,24 @@ public class HealthCheckResult {
 	public String toJsonMessage(boolean pretty)
 	{
 		StringBuilder sb = new StringBuilder();
-		sb.append("{\"healthcheck\" : {");
+		sb.append("{\"healthcheck\":{");
+		append(sb, "healthy", healthy, pretty);
+
+		StringBuilder message = new StringBuilder();
 		
 		Set<String> names = statuses.keySet();
-		if(names.isEmpty() == false)
+		for(String name : names)
 		{
-			for(String name : names)
-			{
-				append(sb, name, statuses.get(name), pretty);
-			}
-			sb.deleteCharAt(sb.length()-1); // delete the last comma
+			message.append(name).append(": ").append(statuses.get(name));
+			message.append(", ");
 		}
+
+		 // delete the last comma and space
+		message.deleteCharAt(message.length()-1);
+		message.deleteCharAt(message.length()-1);
+		
+		append(sb, "message", message.toString(), pretty);
+		sb.deleteCharAt(sb.length()-1);
 		
 		if(pretty)
 		{
@@ -72,7 +79,7 @@ public class HealthCheckResult {
 		{
 			sb.append("\n  ");
 		}
-		sb.append("\"").append(name).append("\": ");
+		sb.append("\"").append(name).append("\":");
 		if(value == null)
 		{
 			sb.append("null");
