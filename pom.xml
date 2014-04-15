@@ -61,6 +61,7 @@
 		<module>ca</module>
 		<module>ocsp</module>
 		<module>remotep11</module>
+		<module>audit</module>
 	</modules>
 	<scm>
 		<connection>scm:git:git@github.com:xipki/XiPKI.git</connection>
