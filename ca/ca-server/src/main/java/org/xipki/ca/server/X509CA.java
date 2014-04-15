@@ -1373,7 +1373,7 @@ public class X509CA
 			{
 				String va = IETFUtils.valueToString(rdns_a[i]);
 				String vb= IETFUtils.valueToString(rdns_b[i]);
-				if(va.equals(vb) == false)
+				if(va.equalsIgnoreCase(vb) == false)
 				{
 					return false;
 				}
