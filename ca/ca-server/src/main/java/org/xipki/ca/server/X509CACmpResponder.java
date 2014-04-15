@@ -133,14 +133,15 @@ public class X509CACmpResponder extends CmpResponder
 
 	public HealthCheckResult healthCheck()
 	{
+		boolean healthy = true;
+		
 		HealthCheckResult result = ca.healthCheck();
 		
-		boolean responderSignerHealthy = responder.isHealthy();
-		if(responderSignerHealthy == false)
-		{
-			result.setHealthy(result.isHealthy() && responderSignerHealthy);
-		}
-		result.putStatus("CA.CMPResponderSigner", responderSignerHealthy);
+		boolean responderHealthy = responder.isHealthy();
+		healthy &= responderHealthy;
+		
+		result.setHealthy(healthy);
+		result.putStatus("Responder.healthy", responderHealthy);
 		return result;
 	}
 

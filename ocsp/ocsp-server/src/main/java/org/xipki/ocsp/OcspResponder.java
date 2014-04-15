@@ -619,19 +619,13 @@ public class OcspResponder {
 		for(CertStatusStore store : certStatusStores)
 		{
 			boolean storeHealthy = store.isHealthy();
-			if(storeHealthy == false)
-			{
-				healthy = false;
-			}
-			result.putStatus("OCSP.CertStatusStore." + store.getName(), storeHealthy);
+			healthy &= storeHealthy;
+			result.putStatus("CertStatusStore." + store.getName() + ".healthy", storeHealthy);
 		}
 		
 		boolean signerHealthy = responder.getSigner().isHealthy();
-		result.putStatus("OCSP.Signer", signerHealthy);
-		if(signerHealthy == false)
-		{
-			healthy = false;
-		}		
+		healthy &= signerHealthy;
+		result.putStatus("Signer.healthy", signerHealthy);
 		
 		result.setHealthy(healthy);
 		return result;		
