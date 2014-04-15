@@ -49,22 +49,26 @@ public class HealthCheckResult {
 		sb.append("{\"healthcheck\":{");
 		append(sb, "healthy", healthy, pretty);
 
-		StringBuilder message = new StringBuilder();
-		
+		String message = null;
 		Set<String> names = statuses.keySet();
-		for(String name : names)
+		if(names == null || names.isEmpty() == false)
 		{
-			message.append(name).append(": ").append(statuses.get(name));
-			message.append(", ");
+			StringBuilder msgBuilder = new StringBuilder();
+			
+			for(String name : names)
+			{
+				msgBuilder.append(name).append(": ").append(statuses.get(name));
+				msgBuilder.append(", ");
+			}
+			message = msgBuilder.substring(0, msgBuilder.length() - 2);
 		}
 
-		 // delete the last comma and space
-		message.deleteCharAt(message.length()-1);
-		message.deleteCharAt(message.length()-1);
+		if(message != null)
+		{
+			append(sb, "message", message.toString(), pretty);
+		}
 		
-		append(sb, "message", message.toString(), pretty);
 		sb.deleteCharAt(sb.length()-1);
-		
 		if(pretty)
 		{
 			sb.append("\n");
@@ -102,6 +106,7 @@ public class HealthCheckResult {
 	public static void main(String[] args)
 	{
 		HealthCheckResult checkResult = new HealthCheckResult();
+		checkResult.setHealthy(false);
 		checkResult.putStatus("boolean-true", true);
 		checkResult.putStatus("boolean-false", false);
 		checkResult.putStatus("string", "hello");
@@ -112,6 +117,12 @@ public class HealthCheckResult {
 		
 		
 		System.out.println(checkResult.toJsonMessage(false));
+
+		checkResult = new HealthCheckResult();
+		checkResult.setHealthy(true);
+		System.out.println(checkResult.toJsonMessage(true));		
+		System.out.println(checkResult.toJsonMessage(false));
 		
+
 	}
 }

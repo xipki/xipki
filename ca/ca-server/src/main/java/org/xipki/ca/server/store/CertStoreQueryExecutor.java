@@ -1191,7 +1191,7 @@ class CertStoreQueryExecutor
 					sb.append(";");
 				}
 				RDN rdn = rdns[j];
-				String textValue = IETFUtils.valueToString(rdn.getFirst().getValue());
+				String textValue = IETFUtils.valueToString(rdn.getFirst().getValue()).toLowerCase();
 				sb.append(textValue);				
 			}
 		}
