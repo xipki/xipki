@@ -31,7 +31,6 @@ import org.xipki.ca.api.CAMgmtException;
 import org.xipki.ca.api.CAStatus;
 import org.xipki.ca.common.X509CertificateWithMetaInfo;
 import org.xipki.ca.server.PublicCAInfo;
-import org.xipki.ca.server.X509Util;
 import org.xipki.security.common.ParamChecker;
 
 public class CAEntry
@@ -90,12 +89,12 @@ public class CAEntry
 		Certificate bcCert;
 		try {
 			bcCert = Certificate.getInstance(cert.getEncoded());
-			this.cert = new X509CertificateWithMetaInfo(cert, this.subject, cert.getEncoded());
+			this.cert = new X509CertificateWithMetaInfo(cert, cert.getEncoded());
 		} catch (CertificateEncodingException e) {
 			throw new CAMgmtException("could not encode the CA certificate");
 		}
 		
-		this.subject = bcCert.getSubject().toString();
+		this.subject = cert.getSubjectX500Principal().getName();
 		this.certInCMPFormat = new CMPCertificate(bcCert);
 		
 		this.signerType = signerType;
@@ -203,7 +202,6 @@ public class CAEntry
 	{
 		StringBuilder sb = new StringBuilder();
 		sb.append("name: ").append(name).append('\n');
-		sb.append("subject: ").append(subject).append('\n');
 		sb.append("next_serial: ").append(nextSerial).append('\n');
 		sb.append("status: ").append(status.getStatus()).append('\n');
 		sb.append("crl_uris: ").append(getCrlUrisAsString()).append('\n');
@@ -213,10 +211,10 @@ public class CAEntry
 		sb.append("signer_conf: ").append(signerConf).append('\n');
 		sb.append("cert: ").append("\n");
 		sb.append("\tissuer: ").append(
-				X509Util.canonicalizeName(cert.getCert().getIssuerX500Principal())).append("\n");
+				cert.getCert().getIssuerX500Principal().getName()).append("\n");
 		sb.append("\tserialNumber: ").append(cert.getCert().getSerialNumber()).append("\n");
 		sb.append("\tsubject: ").append(
-				X509Util.canonicalizeName(cert.getCert().getSubjectX500Principal())).append("\n");
+				subject).append("\n");
 		
 		sb.append("crlsigner_name: ").append(crlSignerName).append('\n');
 		sb.append("allowDuplicateKey: ").append(allowDuplicateKey).append('\n');

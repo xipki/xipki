@@ -21,26 +21,22 @@ import java.util.Arrays;
 import java.util.Map;
 
 import org.xipki.ocsp.api.HashAlgoType;
-import org.xipki.security.common.ParamChecker;
 
 public class IssuerEntry 
 {
 	private final int id;
-	private final String subject;
 	private final Map<HashAlgoType, IssuerHashNameAndKey> issuerHashMap;
 	private final byte[] encodedCert;
 	
-	public IssuerEntry(int id, String subject, Map<HashAlgoType, IssuerHashNameAndKey> issuerHashMap,
+	public IssuerEntry(int id, Map<HashAlgoType, IssuerHashNameAndKey> issuerHashMap,
 			byte[] encodedCert)
 	{
-		ParamChecker.assertNotNull("subject", subject);
 		if(issuerHashMap == null || issuerHashMap.isEmpty())
 		{
 			throw new IllegalArgumentException("issuerHashMap is empty");
 		}
 		
 		this.id = id;
-		this.subject = subject;
 		this.issuerHashMap = issuerHashMap;
 		this.encodedCert = encodedCert;
 	}
@@ -49,10 +45,6 @@ public class IssuerEntry
 		return id;
 	}
 
-	public String getSubject() {
-		return subject;
-	}
-	
 	public boolean matchCert(byte[] encodedCert)
 	{
 		if(encodedCert == null)

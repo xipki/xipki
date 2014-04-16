@@ -18,31 +18,23 @@
 package org.xipki.ca.certprofile.example;
 
 import java.util.Collections;
-import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.Extension;
+import org.xipki.ca.api.profile.AbstractCACertProfile;
 import org.xipki.ca.api.profile.BadCertTemplateException;
 import org.xipki.ca.api.profile.ExtensionOccurrence;
 import org.xipki.ca.api.profile.KeyUsage;
 
-public class CertProfile_RootCA extends AbstractCertProfile {
-	private final Set<KeyUsage> keyUsages;
+public class CertProfile_RootCA extends AbstractCACertProfile {
 	private final Map<ASN1ObjectIdentifier, ExtensionOccurrence> extensionOccurences;
 	
 	public CertProfile_RootCA()
 	{
-		// KeyUsages
-		Set<KeyUsage> _keyUsages = new HashSet<KeyUsage>();
-		_keyUsages.add(KeyUsage.keyCertSign);
-		_keyUsages.add(KeyUsage.cRLSign);
-		keyUsages = Collections.unmodifiableSet(_keyUsages);
-		
 		// Extensions
 		Map<ASN1ObjectIdentifier, ExtensionOccurrence> _extensionOccurences =
 				new HashMap<ASN1ObjectIdentifier, ExtensionOccurrence>();
@@ -55,25 +47,15 @@ public class CertProfile_RootCA extends AbstractCertProfile {
 	public ExtensionOccurrence getOccurenceOfAuthorityKeyIdentifier() {
 		return null;
 	}
-
-	@Override
-	public Date getNotBefore(Date notBefore){
-		return new Date();
-	}
 	
 	@Override
-	protected int getMaxValidity() {
-		return 10 * 365;
+	public Integer getValidity() {
+		return 5 * 365;
 	}
 
 	@Override
 	protected void checkSubjectContent(X500Name requestedSubject) throws BadCertTemplateException
 	{
-	}
-
-	@Override
-	protected boolean isCa() {
-		return true;
 	}
 
 	@Override
@@ -90,5 +72,4 @@ public class CertProfile_RootCA extends AbstractCertProfile {
 	protected Map<ASN1ObjectIdentifier, ExtensionOccurrence> getAdditionalExtensionOccurences() {
 		return extensionOccurences;
 	}
-
 }

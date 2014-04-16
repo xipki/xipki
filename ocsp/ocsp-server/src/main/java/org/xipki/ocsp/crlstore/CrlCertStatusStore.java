@@ -22,11 +22,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
-import java.security.cert.CRLException;
 import java.security.cert.CertificateEncodingException;
-import java.security.cert.CertificateException;
-import java.security.cert.CertificateFactory;
 import java.security.cert.X509CRL;
 import java.security.cert.X509CRLEntry;
 import java.security.cert.X509Certificate;
@@ -61,6 +57,7 @@ import org.xipki.ocsp.api.CertStatusStore;
 import org.xipki.ocsp.api.CertStatusStoreException;
 import org.xipki.ocsp.api.HashAlgoType;
 import org.xipki.security.common.CustomObjectIdentifiers;
+import org.xipki.security.common.IoCertUtil;
 import org.xipki.security.common.ParamChecker;
 
 public class CrlCertStatusStore implements CertStatusStore
@@ -186,7 +183,7 @@ public class CrlCertStatusStore implements CertStatusStore
 	
 			LOG.info("CRL file {} has changed, updating of the CertStore required", crlFile);
 	
-			X509CRL crl = parseCRL(f);
+			X509CRL crl = IoCertUtil.parseCRL(crlFile);
 	
 			X500Principal issuer = crl.getIssuerX500Principal();
 			
@@ -331,8 +328,8 @@ public class CrlCertStatusStore implements CertStatusStore
 						
 						if(cert == null)
 						{
-							throw new CertStatusStoreException("Could not find certificate (issuer = '" + caName + 
-									"', serialNumber = '" + serialNumber + "')");
+							throw new CertStatusStoreException("Could not find certificate (issuer = '" + 
+									IoCertUtil.canonicalizeName(caName) + "', serialNumber = '" + serialNumber + "')");
 						}
 						certs.remove(cert);
 					}
@@ -468,24 +465,6 @@ public class CrlCertStatusStore implements CertStatusStore
 
 	public X509Certificate getCaCert() {
 		return caCert;
-	}
-	
-	private static CertificateFactory certFact;
-	private static X509CRL parseCRL(File f) throws IOException, CertStatusStoreException
-	{
-		try{
-			if(certFact == null)
-			{
-				certFact = CertificateFactory.getInstance("X.509", "BC");
-			}
-			return (X509CRL) certFact.generateCRL(new FileInputStream(f));
-		} catch (CertificateException e) {
-			throw new CertStatusStoreException(e);
-		} catch (CRLException e) {
-			throw new CertStatusStoreException(e);
-		} catch (NoSuchProviderException e) {
-			throw new CertStatusStoreException(e);
-		}
 	}
 
 	@Override

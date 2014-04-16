@@ -22,6 +22,8 @@ import java.security.cert.X509CRL;
 import java.security.cert.X509Certificate;
 import java.util.Date;
 
+import javax.security.auth.x500.X500Principal;
+
 import org.xipki.ca.common.X509CertificateWithMetaInfo;
 import org.xipki.database.api.DataSourceFactory;
 import org.xipki.security.api.PasswordResolver;
@@ -39,7 +41,7 @@ public interface CertPublisher{
 	void certificateRevoked(X509Certificate cert, 
 			int reason, Date invalidityTime);
 
-	void certificateRevoked(String issuer, BigInteger serialNumber,
+	void certificateRevoked(X500Principal issuer, BigInteger serialNumber,
 			int reason, Date invalidityTime);	
 	
 	void crlAdded(X509CertificateWithMetaInfo cacert, X509CRL crl);

@@ -15,7 +15,7 @@
  *
  */
 
-package org.xipki.ca.certprofile.example.internal;
+package org.xipki.ca.api.profile;
 
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.xipki.security.common.ParamChecker;

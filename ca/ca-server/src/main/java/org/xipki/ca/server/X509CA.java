@@ -43,9 +43,7 @@ import org.bouncycastle.asn1.ASN1Integer;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.ASN1OctetString;
 import org.bouncycastle.asn1.DERSet;
-import org.bouncycastle.asn1.x500.RDN;
 import org.bouncycastle.asn1.x500.X500Name;
-import org.bouncycastle.asn1.x500.style.IETFUtils;
 import org.bouncycastle.asn1.x509.AuthorityInformationAccess;
 import org.bouncycastle.asn1.x509.AuthorityKeyIdentifier;
 import org.bouncycastle.asn1.x509.CRLDistPoint;
@@ -97,6 +95,7 @@ import org.xipki.security.api.ConcurrentContentSigner;
 import org.xipki.security.api.NoIdleSignerException;
 import org.xipki.security.common.CustomObjectIdentifiers;
 import org.xipki.security.common.HealthCheckResult;
+import org.xipki.security.common.IoCertUtil;
 import org.xipki.security.common.ParamChecker;
 
 public class X509CA 
@@ -808,24 +807,16 @@ public class X509CA
 	public int revocateCertificate(X509Certificate cert, 
 			CRLReason reason, Date invalidityTime)
 	{
-		String issuer = X509Util.canonicalizeName(cert.getIssuerX500Principal());
-		BigInteger serialNumber = cert.getSerialNumber();
-		
-		return revocateCertificate(issuer, serialNumber, reason, invalidityTime);
+		BigInteger serialNumber = cert.getSerialNumber();		
+		return revocateCertificate(cert.getIssuerX500Principal(), serialNumber, reason, invalidityTime);
 	}
 
 	public int revocateCertificate(X500Principal issuer, BigInteger serialNumber,
 			CRLReason reason, Date invalidityTime)
 	{
-		String issuerName = X500Name.getInstance(issuer.getEncoded()).toString();
-		return revocateCertificate(issuerName, serialNumber, reason, invalidityTime);
-	}
-
-	public int revocateCertificate(String issuer, BigInteger serialNumber,
-			CRLReason reason, Date invalidityTime)
-	{
+		String issuerName = issuer.getName();
 		LOG.info("START revocateCertificate: ca={}, issuer={}, serialNumber={}, reason={}, invalidityTime={}",
-				new Object[]{caInfo.getName(), issuer, serialNumber, reason.getValue(), invalidityTime});
+				new Object[]{caInfo.getName(), issuerName, serialNumber, reason.getValue(), invalidityTime});
 		
 		numActiveRevocations.addAndGet(1);
 		int revocationResult;
@@ -850,7 +841,7 @@ public class X509CA
 		}
 		
 		LOG.info("SUCCESSFULL revocateCertificate: ca={}, issuer={}, serialNumber={}, reason={}, invalidityTime={}, revocationResult={} ({})",
-				new Object[]{caInfo.getName(), issuer, serialNumber, reason.getValue(), invalidityTime, revocationResult, getRevocationResultText(revocationResult)});
+				new Object[]{caInfo.getName(), issuerName, serialNumber, reason.getValue(), invalidityTime, revocationResult, getRevocationResultText(revocationResult)});
 		
 		return revocationResult;
 	}
@@ -920,11 +911,12 @@ public class X509CA
 		X500Name grantedSubject = subjectInfo.getGrantedSubject();
 
 		// make sure that the grantedSubject does not equal the CA's subject
-		if(equals(grantedSubject, caSubjectX500Name))
+		if(grantedSubject.equals(caSubjectX500Name))
 		{
 			throw new CertAlreadyIssuedException("Certificate with the same subject as CA is not allowed");
 		}
-		String sha1FpSubject = certstore.fpCanonicalizedName(grantedSubject);
+		
+		String sha1FpSubject = IoCertUtil.sha1sum_canonicalized_name(grantedSubject);
 		String grandtedSubjectText = grantedSubject.toString();
 		
 		if(keyUpdate)
@@ -1045,7 +1037,7 @@ public class X509CA
 				}
 				
 				X509CertificateWithMetaInfo certWithMeta = 
-						new X509CertificateWithMetaInfo(cert, grantedSubject.toString(), encodedCert);
+						new X509CertificateWithMetaInfo(cert, encodedCert);
 				
 				
 				ret = new CertificateInfo(certWithMeta, 
@@ -1344,43 +1336,6 @@ public class X509CA
 		result.setHealthy(healthy);
 		
 		return result;
-	}
-
-	private static boolean equals(X500Name a, X500Name b)
-	{
-		ASN1ObjectIdentifier[] types_a = a.getAttributeTypes();
-		ASN1ObjectIdentifier[] types_b = b.getAttributeTypes();
-		if(types_a.length != types_b.length)
-		{
-			return false;
-		}
-		
-		for(ASN1ObjectIdentifier type : types_a)
-		{
-			RDN[] rdns_b = b.getRDNs(type);
-			if(rdns_b == null)
-			{
-				return false;
-			}
-			
-			RDN[] rdns_a = a.getRDNs(type);
-			if(rdns_a.length != rdns_b.length)
-			{
-				return false;
-			}
-			
-			for(int i = 0; i < rdns_a.length; i++)
-			{
-				String va = IETFUtils.valueToString(rdns_a[i]);
-				String vb= IETFUtils.valueToString(rdns_b[i]);
-				if(va.equalsIgnoreCase(vb) == false)
-				{
-					return false;
-				}
-			}			
-		}
-		
-		return true;
 	}
 	
 	private static String getRevocationResultText(int code)

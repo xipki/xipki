@@ -15,9 +15,9 @@
  *
  */
 
-package org.xipki.ca.server.publisher;
+package org.xipki.security.common;
 
-enum HashAlgoType {
+public enum HashAlgoType {
 	SHA1,
 	SHA224,
 	SHA256,

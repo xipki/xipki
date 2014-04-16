@@ -15,14 +15,14 @@
  *
  */
 
-package org.xipki.ca.server.publisher;
+package org.xipki.security.common;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
 import org.bouncycastle.util.encoders.Hex;
 
-class HashCalculator {
+public class HashCalculator {
 	private MessageDigest sha1;
 	private MessageDigest sha224;
 	private MessageDigest sha256;

@@ -15,26 +15,37 @@
  *
  */
 
-package org.xipki.ca.certprofile.example;
+package org.xipki.ca.api.profile;
 
-import org.xipki.ca.api.profile.ExtensionOccurrence;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 
 
-public abstract class AbstractEeCertProfile extends AbstractCertProfile {
-
-	@Override
-	public ExtensionOccurrence getOccurenceOfAuthorityKeyIdentifier() {
-		return ExtensionOccurrence.NONCRITICAL_REQUIRED;
+public abstract class AbstractCACertProfile extends AbstractCertProfile {
+	protected Set<KeyUsage> keyUsages;
+	
+	public AbstractCACertProfile()
+	{
+		Set<KeyUsage> keyUsages = new HashSet<KeyUsage>();
+		keyUsages.add(KeyUsage.keyCertSign);
+		keyUsages.add(KeyUsage.cRLSign);
+		this.keyUsages = Collections.unmodifiableSet(keyUsages);
 	}
 	
 	@Override
 	protected boolean isCa() {
-		return false;
+		return true;
 	}
 
 	@Override
-	protected Integer getPathLenBasicConstraint() {
-		return null;
+	protected Set<KeyUsage> getKeyUsage() {
+		return keyUsages;
+	}
+	
+	@Override
+	public ExtensionOccurrence getOccurenceOfAuthorityKeyIdentifier() {
+		return ExtensionOccurrence.CRITICAL_REQUIRED;
 	}
 
 }

@@ -375,7 +375,7 @@ class CaConfigurationDbExporter extends DbPorter{
 		try{
 			stmt = createStatement();
 			
-			String sqlPart1 = "SELECT name, subject, next_serial, status, crl_uris, ocsp_uris, max_validity, "
+			String sqlPart1 = "SELECT name, next_serial, status, crl_uris, ocsp_uris, max_validity, "
 					+ "cert, signer_type, signer_conf, crlsigner_name, "
 					+ "allow_duplicate_key, allow_duplicate_subject, permissions";
 			String sqlPart2 = " FROM ca";
@@ -395,7 +395,6 @@ class CaConfigurationDbExporter extends DbPorter{
 			while(rs.next())
 			{
 				String name = rs.getString("name");
-				String subject = rs.getString("subject");
 				String next_serial = rs.getString("next_serial");
 				String status = rs.getString("status");
 				String crl_uris = rs.getString("crl_uris");
@@ -417,7 +416,6 @@ class CaConfigurationDbExporter extends DbPorter{
 				
 				CaType ca = new CaType();
 				ca.setName(name);
-				ca.setSubject(subject);
 				ca.setNextSerial(next_serial);
 				ca.setStatus(status);
 				ca.setCrlUris(crl_uris);

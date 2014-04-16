@@ -29,6 +29,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import javax.security.auth.x500.X500Principal;
+
 import org.apache.felix.gogo.commands.Command;
 import org.apache.felix.gogo.commands.Option;
 import org.apache.karaf.shell.console.OsgiCommandSupport;
@@ -36,7 +38,6 @@ import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.nist.NISTNamedCurves;
 import org.bouncycastle.asn1.sec.SECNamedCurves;
 import org.bouncycastle.asn1.teletrust.TeleTrusTNamedCurves;
-import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x9.X962NamedCurves;
 import org.bouncycastle.util.encoders.Hex;
 import org.xipki.security.api.PKCS11SlotIdentifier;
@@ -149,8 +150,8 @@ public class P11ListSlotCommand extends OsgiCommandSupport {
 					byte[] bytes = cert.getSubject().getByteArrayValue();					
 					String subject;
 					try{
-						X500Name name = X500Name.getInstance(bytes);
-						subject = name.toString();
+						X500Principal x500Prin = new X500Principal(bytes);
+						subject = x500Prin.getName();
 					}catch(Exception e)
 					{
 						subject = new String(bytes);
@@ -159,8 +160,8 @@ public class P11ListSlotCommand extends OsgiCommandSupport {
 					bytes = cert.getIssuer().getByteArrayValue();					
 					String issuer;
 					try{
-						X500Name name = X500Name.getInstance(bytes);
-						issuer = name.toString();
+						X500Principal x500Prin = new X500Principal(bytes);
+						issuer = x500Prin.getName();
 					}catch(Exception e)
 					{
 						issuer = new String(bytes);

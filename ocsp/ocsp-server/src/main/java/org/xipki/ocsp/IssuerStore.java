@@ -52,24 +52,6 @@ public class IssuerStore {
 		return ids;
 	}
 	
-	public Integer getIssuerIdForSubject(String subject)
-	{
-		IssuerEntry issuerEntry = getIssuerForSubject(subject);
-		return issuerEntry == null ? null : issuerEntry.getId();
-	}
-	
-	public IssuerEntry getIssuerForSubject(String subject)
-	{
-		for(IssuerEntry entry : entries) {
-			if(entry.getSubject().equals(subject))
-			{
-				return entry;
-			}
-		}
-		
-		return null;
-	}
-
 	public Integer getIssuerIdForFp( HashAlgoType hashAlgo, byte[] issuerNameHash, byte[] issuerKeyHash)
 	{
 		IssuerEntry issuerEntry = getIssuerForFp(hashAlgo, issuerNameHash, issuerKeyHash);

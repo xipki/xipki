@@ -753,7 +753,7 @@ public class X509CACmpResponder extends CmpResponder
 			}
 
 			int revocationResult = ca.revocateCertificate(
-					ca.getCAInfo().getCertificate().getSubject(),
+					ca.getCAInfo().getCertificate().getCert().getSubjectX500Principal(),
 					serialNumber.getPositiveValue(), reason, invalidityDate);
 			
 			if(revocationResult == X509CA.CERT_REVOCATED)
@@ -820,7 +820,8 @@ public class X509CACmpResponder extends CmpResponder
 			}
 			else 
 			{
-				ca.revocateCertificate(certInfo.getIssuerCert().getSubject(),
+				ca.revocateCertificate(
+						certInfo.getIssuerCert().getCert().getSubjectX500Principal(),
 						certInfo.getCert().getCert().getSerialNumber(),
 						CRLReason_cessationOfOperation, new Date());
 
@@ -879,7 +880,8 @@ public class X509CACmpResponder extends CmpResponder
 			Date invalidityDate = new Date();
 			for(CertificateInfo remainingCert : remainingCerts)
 			{
-				int revocationResult = ca.revocateCertificate(remainingCert.getIssuerCert().getSubject(),
+				int revocationResult = ca.revocateCertificate(
+						remainingCert.getIssuerCert().getCert().getSubjectX500Principal(),
 						remainingCert.getCert().getCert().getSerialNumber(),
 						CRLReason_cessationOfOperation, invalidityDate);
 				
@@ -941,7 +943,8 @@ public class X509CACmpResponder extends CmpResponder
 				Date invalidityDate = new Date();
 				for(CertificateInfo remainingCert : remainingCerts)
 				{
-					ca.revocateCertificate(remainingCert.getIssuerCert().getSubject(),
+					ca.revocateCertificate(
+							remainingCert.getIssuerCert().getCert().getSubjectX500Principal(),
 							remainingCert.getCert().getCert().getSerialNumber(),
 							CRLReason_cessationOfOperation, invalidityDate);
 				}
