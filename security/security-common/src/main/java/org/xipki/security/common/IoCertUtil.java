@@ -23,6 +23,10 @@ import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 
+import javax.security.auth.x500.X500Principal;
+
+import org.bouncycastle.asn1.x500.X500Name;
+
 public class IoCertUtil {
 
 	public static byte[] read(String fileName) throws IOException {
@@ -86,5 +90,15 @@ public class IoCertUtil {
             }
             return (X509Certificate) certFact.generateCertificate(certStream);
         }
-    }
+    }    
+    
+	public static String canonicalizeName(X500Name name)
+	{
+		try {
+			X500Principal prin = new X500Principal(name.getEncoded());
+			return prin.getName();
+		} catch (Exception e) {
+			return name.toString();
+		}
+	}
 }
