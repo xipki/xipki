@@ -178,7 +178,6 @@
 	<xs:complexType name="caType">
 		<xs:all>
 			<xs:element name="name" type="xs:string"/>
-			<xs:element name="subject" type="xs:string"/>
 			<xs:element name="next_serial" type="xs:string" />
 			<xs:element name="status" type="xs:string" />
 			<xs:element name="crl_uris" type="xs:string" minOccurs="0" />
@@ -285,9 +284,7 @@
 	<xs:complexType name="cainfoType">
 		<xs:all>
 			<xs:element name="id" type="xs:int" />
-			<xs:element name="subject" type="xs:string" />
 			<xs:element name="cert" type="xs:string" />
-			<xs:element name="sha1_fp_cert" type="xs:string" />		
 		</xs:all>
 	</xs:complexType>
 
@@ -295,9 +292,7 @@
 	<xs:complexType name="requestorinfoType">
 		<xs:all>
 			<xs:element name="id" type="xs:int" />
-			<xs:element name="subject" type="xs:string" />
 			<xs:element name="cert" type="xs:string" />
-			<xs:element name="sha1_fp_cert" type="xs:string" />		
 		</xs:all>
 	</xs:complexType>
 
@@ -322,9 +317,6 @@
 		<xs:all>
 			<xs:element name="id" type="xs:int" />
 			<xs:element name="cainfo_id" type="xs:int" />
-			<xs:element name="crl_number" type="xs:string" />
-			<xs:element name="thisUpdate" type="xs:string" />
-			<xs:element name="nextUpdate" type="xs:string" />		
 			<xs:element name="crlFile" type="xs:string" />		
 		</xs:all>
 	</xs:complexType>
@@ -341,21 +333,14 @@
 		<xs:all>
 			<xs:element name="id" type="xs:int" />
 			<xs:element name="cainfo_id" type="xs:string"/>
-			<xs:element name="serial" type="xs:string"/>
 			<xs:element name="certprofileinfo_id" type="xs:string"/>
 			<xs:element name="requestorinfo_id" type="xs:string"/>
-			<xs:element name="subject" type="xs:string"/>
 			<xs:element name="last_update" type="xs:string"/>
-			<xs:element name="notbefore" type="xs:string"/>
-			<xs:element name="notafter" type="xs:string"/>
 			<xs:element name="revocated" type="xs:boolean"/>
 			<xs:element name="rev_reason" type="xs:string"/>
 			<xs:element name="rev_time" type="xs:string" minOccurs="0"/>
 			<xs:element name="rev_invalidity_time" type="xs:string" minOccurs="0"/>
 			<xs:element name="user_id" type="xs:string"/>
-			<xs:element name="sha1_fp_pk" type="xs:string"/>
-			<xs:element name="sha1_fp_subject" type="xs:string"/>
-			<xs:element name="sha1_fp_cert" type="xs:string"/>
 			<xs:element name="certFile" type="xs:string"/>		
 		</xs:all>		
 	</xs:complexType>

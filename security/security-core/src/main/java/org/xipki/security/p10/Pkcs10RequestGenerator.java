@@ -28,6 +28,7 @@ import org.xipki.security.api.NoIdleSignerException;
 import org.xipki.security.api.PasswordResolverException;
 import org.xipki.security.api.SecurityFactory;
 import org.xipki.security.api.SignerException;
+import org.xipki.security.common.IoCertUtil;
 
 public class Pkcs10RequestGenerator {
 	
@@ -70,11 +71,12 @@ public class Pkcs10RequestGenerator {
 			SubjectPublicKeyInfo subjectPublicKeyInfo,
 			X500Name subjectDN)
 	{
+		subjectDN = IoCertUtil.sortName(subjectDN);
+
     	PKCS10CertificationRequestBuilder p10ReqBuilder = 
     			new PKCS10CertificationRequestBuilder(subjectDN, subjectPublicKeyInfo);
     	
-    	PKCS10CertificationRequest p10CertReq = p10ReqBuilder.build(contentSigner);    	
-    	return p10CertReq;
+    	return p10ReqBuilder.build(contentSigner);    	
 	}
 
 }

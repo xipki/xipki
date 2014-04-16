@@ -45,7 +45,7 @@ class CaCertStoreDbExporter extends DbPorter{
 	private final Marshaller marshaller;
 	private final SHA1Digest sha1md = new SHA1Digest();
 
-	private final int COUNT_CERTS_IN_ONE_FILE  = 100;
+	private final int COUNT_CERTS_IN_ONE_FILE  = 1000;
 
 	CaCertStoreDbExporter(DataSource dataSource, Marshaller marshaller, String baseDir) 
 			throws SQLException, PasswordResolverException, IOException
@@ -78,17 +78,13 @@ class CaCertStoreDbExporter extends DbPorter{
 		Statement stmt = null;
 		try{
 			stmt = createStatement();
-			String sql = "SELECT id, cainfo_id, crl_number, thisUpdate, nextUpdate, crl"
-					+ " FROM crl";
+			String sql = "SELECT id, cainfo_id, crl FROM crl";
 			ResultSet rs = stmt.executeQuery(sql);		
 
 			File crlDir = new File(baseDir + File.separator + DIRNAME_CRL);
 			while(rs.next()){
 				int id = rs.getInt("id");
 				int cainfo_id = rs.getInt("cainfo_id");
-				String crl_number = rs.getString("crl_number");
-				String thisUpdate = rs.getString("thisUpdate");
-				String nextUpdate = rs.getString("nextUpdate");
 				Blob blob = rs.getBlob("crl");					
 
 				byte[] encodedCrl = readBlob(blob);
@@ -100,9 +96,6 @@ class CaCertStoreDbExporter extends DbPorter{
 				
 				crl.setId(id);
 				crl.setCainfoId(cainfo_id);
-				crl.setCrlNumber(crl_number);
-				crl.setThisUpdate(thisUpdate);
-				crl.setNextUpdate(nextUpdate);
 				crl.setCrlFile("CRL/" + fp);
 				
 				crls.getCrl().add(crl);
@@ -126,21 +119,16 @@ class CaCertStoreDbExporter extends DbPorter{
 		Statement stmt = null;
 		try{
 			stmt = createStatement();
-			String sql = "SELECT id, subject, cert, sha1_fp_cert"
-					+ " FROM cainfo";
+			String sql = "SELECT id, cert FROM cainfo";
 			ResultSet rs = stmt.executeQuery(sql);		
 
 			while(rs.next()){
 				int id = rs.getInt("id");
-				String subject = rs.getString("subject");
 				String cert = rs.getString("cert");
-				String sha1_fp_cert = rs.getString("sha1_fp_cert");
 
 				CainfoType cainfo = new CainfoType();
 				cainfo.setId(id);
-				cainfo.setSubject(subject);
 				cainfo.setCert(cert);
-				cainfo.setSha1FpCert(sha1_fp_cert);
 				
 				cainfos.getCainfo().add(cainfo);
 			}
@@ -163,21 +151,16 @@ class CaCertStoreDbExporter extends DbPorter{
 		Statement stmt = null;
 		try{
 			stmt = createStatement();
-			String sql = "SELECT id, subject, cert, sha1_fp_cert"
-					+ " FROM requestorinfo";
+			String sql = "SELECT id, cert FROM requestorinfo";
 			ResultSet rs = stmt.executeQuery(sql);		
 
 			while(rs.next()){
 				int id = rs.getInt("id");
-				String subject = rs.getString("subject");
 				String cert = rs.getString("cert");
-				String sha1_fp_cert = rs.getString("sha1_fp_cert");
 
 				RequestorinfoType info = new RequestorinfoType();
 				info.setId(id);
-				info.setSubject(subject);
 				info.setCert(cert);
-				info.setSha1FpCert(sha1_fp_cert);
 				
 				infos.getRequestorinfo().add(info);
 			}
@@ -200,8 +183,7 @@ class CaCertStoreDbExporter extends DbPorter{
 		Statement stmt = null;
 		try{
 			stmt = createStatement();
-			String sql = "SELECT id, name"
-					+ " FROM user";
+			String sql = "SELECT id, name FROM user";
 			ResultSet rs = stmt.executeQuery(sql);		
 
 			while(rs.next()){
@@ -233,8 +215,7 @@ class CaCertStoreDbExporter extends DbPorter{
 		Statement stmt = null;
 		try{
 			stmt = createStatement();
-			String sql = "SELECT id, name"
-					+ " FROM certprofileinfo";
+			String sql = "SELECT id, name FROM certprofileinfo";
 			ResultSet rs = stmt.executeQuery(sql);		
 
 			while(rs.next()){
@@ -263,28 +244,15 @@ class CaCertStoreDbExporter extends DbPorter{
 	{	
 		CertsFiles certsFiles = new CertsFiles();
 	
-		String certSql_Part1 = "SELECT id, cainfo_id, serial, certprofileinfo_id," +
-				" requestorinfo_id, subject, last_update, notbefore, notafter," +
-				" revocated, rev_reason, rev_time, rev_invalidity_time, user_id," +
-				" sha1_fp_pk";
-		String certSql_Part2 = 	
+		String certSql = "SELECT id, cainfo_id, certprofileinfo_id," +
+				" requestorinfo_id, last_update," +
+				" revocated, rev_reason, rev_time, rev_invalidity_time, user_id" +
 				" FROM cert" +
 				" WHERE id > ? AND id < ?";		
 		
-		boolean sha1_fp_subject_present = true;
-		// test whether filed sha1_fp_subject is available		
-		PreparedStatement ps = prepareStatement(certSql_Part1 + ", sha1_fp_subject" + certSql_Part2);
-		try{
-			ps.setInt(1, 0);
-			ps.setInt(2, 2);
-			ps.executeQuery();
-		}catch(SQLException e)
-		{
-			sha1_fp_subject_present = false;
-			ps = prepareStatement(certSql_Part1 + certSql_Part2);
-		}
+		PreparedStatement ps = prepareStatement(certSql);
 		
-		String rawCertSql = "SELECT sha1_fp, cert FROM rawcert WHERE cert_id = ?";
+		String rawCertSql = "SELECT cert FROM rawcert WHERE cert_id = ?";
 		PreparedStatement rawCertPs = prepareStatement(rawCertSql);
 		
 		File certDir = new File(baseDir, "CERT");
@@ -310,37 +278,24 @@ class CaCertStoreDbExporter extends DbPorter{
 				while(rs.next()){
 					int id = rs.getInt("id");
 					String cainfo_id = rs.getString("cainfo_id");
-					String serial = rs.getString("serial");
 					String certprofileinfo_id = rs.getString("certprofileinfo_id");
 					String requestorinfo_id = rs.getString("requestorinfo_id");
-					String subject = rs.getString("subject");
 					String last_update = rs.getString("last_update");
-					String notbefore = rs.getString("notbefore");
-					String notafter = rs.getString("notafter");
 					boolean revocated = rs.getBoolean("revocated");
 					String rev_reason = rs.getString("rev_reason");
 					String rev_time = rs.getString("rev_time");
 					String rev_invalidity_time = rs.getString("rev_invalidity_time");
 					String user_id = rs.getString("user_id");
-					String sha1_fp_pk = rs.getString("sha1_fp_pk");
-					String sha1_fp_subject = null;
-					if(sha1_fp_subject_present)
-					{
-						sha1_fp_subject = rs.getString("sha1_fp_subject");
-						if(sha1_fp_subject.length() != 40) // invalid value
-						{
-							sha1_fp_subject = null;
-						}
-					}
 
 					String sha1_fp_cert;
 					rawCertPs.setInt(1, id);
 					ResultSet rawCertRs = rawCertPs.executeQuery();
 					try{
 						rawCertRs.next();
-						sha1_fp_cert = rawCertRs.getString("sha1_fp");
 						String b64Cert = rawCertRs.getString("cert");
-						IoCertUtil.save(new File(certDir, sha1_fp_cert), Base64.decode(b64Cert));
+						byte[] cert = Base64.decode(b64Cert);
+						sha1_fp_cert = IoCertUtil.sha1sum(cert);
+						IoCertUtil.save(new File(certDir, sha1_fp_cert), cert);
 					}finally
 					{
 						rawCertRs.close();
@@ -349,21 +304,14 @@ class CaCertStoreDbExporter extends DbPorter{
 					CertType cert = new CertType();
 					cert.setId(id);
 					cert.setCainfoId(cainfo_id);
-					cert.setSerial(serial);
 					cert.setCertprofileinfoId(certprofileinfo_id);
 					cert.setRequestorinfoId(requestorinfo_id);
-					cert.setSubject(subject);
 					cert.setLastUpdate(last_update);
-					cert.setNotbefore(notbefore);
-					cert.setNotafter(notafter);
 					cert.setRevocated(revocated);
 					cert.setRevReason(rev_reason);
 					cert.setRevTime(rev_time);
 					cert.setRevInvalidityTime(rev_invalidity_time);
 					cert.setUserId(user_id);
-					cert.setSha1FpPk(sha1_fp_pk);
-					cert.setSha1FpSubject(sha1_fp_subject);
-					cert.setSha1FpCert(sha1_fp_cert);
 					cert.setCertFile(DIRNAME_CERT + File.separator + sha1_fp_cert);
 
 					if(certsInCurrentFile.getCert().isEmpty())
