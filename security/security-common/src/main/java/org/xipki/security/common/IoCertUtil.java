@@ -138,12 +138,6 @@ public class IoCertUtil {
 		}
 	}
 	
-	public static X500Name sortName(X500Name name)
-	{
-		// TODO
-		return name;
-	}
-	
 	/**
 	 * First canonicalized the name, and then compute the SHA-1 finger-print over the 
 	 * canonicalized subject string.

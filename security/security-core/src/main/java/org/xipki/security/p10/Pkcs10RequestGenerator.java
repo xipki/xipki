@@ -71,8 +71,6 @@ public class Pkcs10RequestGenerator {
 			SubjectPublicKeyInfo subjectPublicKeyInfo,
 			X500Name subjectDN)
 	{
-		subjectDN = IoCertUtil.sortName(subjectDN);
-
     	PKCS10CertificationRequestBuilder p10ReqBuilder = 
     			new PKCS10CertificationRequestBuilder(subjectDN, subjectPublicKeyInfo);
     	
