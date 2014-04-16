@@ -173,7 +173,6 @@ public class P11CertRequestGenCommand extends OsgiCommandSupport {
     	{
     		subjectDN = cert.getSubject();
     	}
-    	subjectDN = IoCertUtil.sortName(subjectDN);
     	
     	SubjectPublicKeyInfo subjectPublicKeyInfo = cert.getSubjectPublicKeyInfo();
 		
