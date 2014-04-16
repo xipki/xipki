@@ -12,8 +12,6 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 
 import org.bouncycastle.util.encoders.Base64;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.xipki.database.api.DataSource;
 import org.xipki.dbi.ocsp.jaxb.CertStoreType;
 import org.xipki.dbi.ocsp.jaxb.CertStoreType.Certprofiles;
@@ -29,11 +27,8 @@ import org.xipki.security.common.IoCertUtil;
 import org.xipki.security.common.ParamChecker;
 
 class OcspCertStoreDbExporter extends DbPorter{
-	
-	@SuppressWarnings("unused")
-	private static final Logger LOG = LoggerFactory.getLogger(OcspCertStoreDbExporter.class);
 	private final Marshaller marshaller;
-	private final int COUNT_CERTS_IN_ONE_FILE  = 100;
+	private final int COUNT_CERTS_IN_ONE_FILE  = 1000;
 
 	OcspCertStoreDbExporter(DataSource dataSource, Marshaller marshaller, String baseDir) 
 			throws SQLException, PasswordResolverException, IOException
@@ -65,48 +60,17 @@ class OcspCertStoreDbExporter extends DbPorter{
 		try{
 			stmt = createStatement();
 			
-			String sql = "SELECT id, subject," + 
-					" sha1_fp_name, sha1_fp_key," +
-					" sha224_fp_name, sha224_fp_key," +
-					" sha256_fp_name, sha256_fp_key," +
-					" sha384_fp_name, sha384_fp_key," +
-					" sha512_fp_name, sha512_fp_key," +
-					" sha1_fp_cert, cert" +
-					" FROM issuer";
+			String sql = "SELECT id, cert FROM issuer";
 			
 			ResultSet rs = stmt.executeQuery(sql);		
 
 			while(rs.next()){
 				int id = rs.getInt("id");
-				String subject = rs.getString("subject");
-				String sha1_fp_cert = rs.getString("sha1_fp_cert");
 				String cert = rs.getString("cert");
-				String sha1_fp_name   = rs.getString("sha1_fp_name");
-				String sha1_fp_key    = rs.getString("sha1_fp_key");
-				String sha224_fp_name = rs.getString("sha224_fp_name");
-				String sha224_fp_key  = rs.getString("sha224_fp_key");
-				String sha256_fp_name = rs.getString("sha256_fp_name");
-				String sha256_fp_key  = rs.getString("sha256_fp_key");
-				String sha384_fp_name = rs.getString("sha384_fp_name");
-				String sha384_fp_key  = rs.getString("sha384_fp_key");
-				String sha512_fp_name = rs.getString("sha512_fp_name");
-				String sha512_fp_key  = rs.getString("sha512_fp_key");
 
 				IssuerType issuer = new IssuerType();
 				issuer.setId(id);
-				issuer.setSubject(subject);
-				issuer.setSha1FpCert(sha1_fp_cert);
 				issuer.setCert(cert);
-				issuer.setSha1FpName(sha1_fp_name);
-				issuer.setSha1FpKey(sha1_fp_key);
-				issuer.setSha224FpName(sha224_fp_name);
-				issuer.setSha224FpKey(sha224_fp_key);
-				issuer.setSha256FpName(sha256_fp_name);
-				issuer.setSha256FpKey(sha256_fp_key);
-				issuer.setSha384FpName(sha384_fp_name);
-				issuer.setSha384FpKey(sha384_fp_key);
-				issuer.setSha512FpName(sha512_fp_name);
-				issuer.setSha512FpKey(sha512_fp_key);
 				
 				issuers.getIssuer().add(issuer);
 			}
@@ -129,8 +93,7 @@ class OcspCertStoreDbExporter extends DbPorter{
 		Statement stmt = null;
 		try{
 			stmt = createStatement();
-			String sql = "SELECT id, name"
-					+ " FROM certprofile";
+			String sql = "SELECT id, name FROM certprofile";
 			ResultSet rs = stmt.executeQuery(sql);		
 
 			while(rs.next()){
@@ -159,19 +122,14 @@ class OcspCertStoreDbExporter extends DbPorter{
 	{	
 		CertsFiles certsFiles = new CertsFiles();
 	
-		String certSql = "SELECT id, issuer_id, serial, certprofile_id," +
-				" subject, last_update, notbefore, notafter," +
+		String certSql = "SELECT id, issuer_id, certprofile_id, last_update," +
 				" revocated, rev_reason, rev_time, rev_invalidity_time " +
 				" FROM cert" +
-				" WHERE id > ? AND id < ?";		
-
-		String certhashSql = "SELECT sha1_fp, sha224_fp, sha256_fp, sha384_fp, sha512_fp" +
-				" FROM certhash WHERE cert_id = ?";
+				" WHERE id > ? AND id < ?";
 
 		String rawCertSql = "SELECT cert FROM rawcert WHERE cert_id = ?";
 		
 		PreparedStatement certPs = prepareStatement(certSql);
-		PreparedStatement certhashPs = prepareStatement(certhashSql);
 		PreparedStatement rawCertPs = prepareStatement(rawCertSql);
 		
 		File certDir = new File(baseDir, "CERT");
@@ -197,43 +155,24 @@ class OcspCertStoreDbExporter extends DbPorter{
 				while(rs.next()){
 					int id = rs.getInt("id");
 					int issuer_id = rs.getInt("issuer_id");
-					String serial = rs.getString("serial");
 					int certprofile_id = rs.getInt("certprofile_id");
-					String subject = rs.getString("subject");
 					String last_update = rs.getString("last_update");
-					String notbefore = rs.getString("notbefore");
-					String notafter = rs.getString("notafter");
 					boolean revocated = rs.getBoolean("revocated");
 					String rev_reason = rs.getString("rev_reason");
 					String rev_time = rs.getString("rev_time");
 					String rev_invalidity_time = rs.getString("rev_invalidity_time");
 
-					String sha1_fp_cert;
-					String sha224_fp_cert;
-					String sha256_fp_cert;
-					String sha384_fp_cert;
-					String sha512_fp_cert;
-
-					certhashPs.setInt(1, id);
-					ResultSet certhashRs = certhashPs.executeQuery();
-					try{
-						certhashRs.next();
-						sha1_fp_cert = certhashRs.getString("sha1_fp");
-						sha224_fp_cert = certhashRs.getString("sha224_fp");
-						sha256_fp_cert = certhashRs.getString("sha256_fp");
-						sha384_fp_cert = certhashRs.getString("sha384_fp");
-						sha512_fp_cert = certhashRs.getString("sha512_fp");
-					}finally
-					{
-						certhashRs.close();
-					}
-
 					rawCertPs.setInt(1, id);
+					
+					String sha1_fp_cert;
+					
 					ResultSet rawCertRs = rawCertPs.executeQuery();
 					try{
 						rawCertRs.next();
 						String b64Cert = rawCertRs.getString("cert");
-						IoCertUtil.save(new File(certDir, sha1_fp_cert), Base64.decode(b64Cert));
+						byte[] cert = Base64.decode(b64Cert);
+						sha1_fp_cert = IoCertUtil.sha1sum(cert);
+						IoCertUtil.save(new File(certDir, sha1_fp_cert), cert);
 					}finally
 					{
 						rawCertRs.close();
@@ -243,21 +182,12 @@ class OcspCertStoreDbExporter extends DbPorter{
 
 					cert.setId(id);
 					cert.setIssuerId(issuer_id);
-					cert.setSerial(serial);
 					cert.setCertprofileId(certprofile_id);
-					cert.setSubject(subject);
 					cert.setLastUpdate(last_update);
-					cert.setNotbefore(notbefore);
-					cert.setNotafter(notafter);
 					cert.setRevocated(revocated);
 					cert.setRevReason(rev_reason);
 					cert.setRevTime(rev_time);
 					cert.setRevInvalidityTime(rev_invalidity_time);
-					cert.setSha1FpCert(sha1_fp_cert);
-					cert.setSha224FpCert(sha224_fp_cert);
-					cert.setSha256FpCert(sha256_fp_cert);
-					cert.setSha384FpCert(sha384_fp_cert);
-					cert.setSha512FpCert(sha512_fp_cert);
 					cert.setCertFile(DIRNAME_CERT + File.separator + sha1_fp_cert);
 
 					if(certsInCurrentFile.getCert().isEmpty())
@@ -294,10 +224,8 @@ class OcspCertStoreDbExporter extends DbPorter{
 		}finally
 		{
 			closeStatement(certPs);
-			closeStatement(certhashPs);
 			closeStatement(rawCertPs);
 		}
-
 		
 		return certsFiles;
 	}

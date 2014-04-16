@@ -20,7 +20,6 @@ package org.xipki.ca.common;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
 
-import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.crypto.RuntimeCryptoException;
 import org.xipki.security.common.ParamChecker;
 
@@ -31,23 +30,16 @@ public class X509CertificateWithMetaInfo {
 	
 	public X509CertificateWithMetaInfo(X509Certificate cert)
 	{
-		this(cert, null, null);
+		this(cert, null);
 	}
 	
-	public X509CertificateWithMetaInfo(X509Certificate cert, String subject, byte[] encodedCert)
+	public X509CertificateWithMetaInfo(X509Certificate cert, byte[] encodedCert)
 	{
 		ParamChecker.assertNotNull("cert", cert);
 
 		this.cert = cert;
 		
-		if(subject == null)
-		{
-			this.subject = X500Name.getInstance(cert.getSubjectX500Principal().getEncoded()).toString();
-		}
-		else
-		{
-			this.subject = subject;
-		}
+		this.subject = cert.getSubjectX500Principal().getName();
 				
 		if(encodedCert == null)
 		{

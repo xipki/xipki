@@ -40,7 +40,6 @@ import org.bouncycastle.asn1.DERNull;
 import org.bouncycastle.asn1.nist.NISTObjectIdentifiers;
 import org.bouncycastle.asn1.pkcs.CertificationRequest;
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
-import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.bouncycastle.asn1.x509.X509ObjectIdentifiers;
@@ -121,8 +120,7 @@ public class SecurityFactoryImpl implements SecurityFactory {
 			boolean valid = verifier.verify(signatureValue);
 			if(valid == false)
 			{
-				String subject = X500Name.getInstance(
-						cert.getSubjectX500Principal().getEncoded()).toString();
+				String subject = cert.getSubjectX500Principal().getName();
 
 				StringBuilder sb = new StringBuilder();
 				sb.append("key and certificate not match. ");

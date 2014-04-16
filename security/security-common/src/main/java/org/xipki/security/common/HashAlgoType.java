@@ -15,26 +15,12 @@
  *
  */
 
-package org.xipki.ca.certprofile.example;
+package org.xipki.security.common;
 
-import org.xipki.ca.api.profile.ExtensionOccurrence;
-
-
-public abstract class AbstractEeCertProfile extends AbstractCertProfile {
-
-	@Override
-	public ExtensionOccurrence getOccurenceOfAuthorityKeyIdentifier() {
-		return ExtensionOccurrence.NONCRITICAL_REQUIRED;
-	}
-	
-	@Override
-	protected boolean isCa() {
-		return false;
-	}
-
-	@Override
-	protected Integer getPathLenBasicConstraint() {
-		return null;
-	}
-
+public enum HashAlgoType {
+	SHA1,
+	SHA224,
+	SHA256,
+	SHA384,
+	SHA512
 }
