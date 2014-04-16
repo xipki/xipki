@@ -18,7 +18,6 @@
 package org.xipki.ca.certprofile.example;
 
 import java.util.Collections;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -27,12 +26,12 @@ import java.util.Set;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.Extension;
+import org.xipki.ca.api.profile.AbstractEECertProfile;
 import org.xipki.ca.api.profile.BadCertTemplateException;
 import org.xipki.ca.api.profile.ExtensionOccurrence;
 import org.xipki.ca.api.profile.KeyUsage;
-import org.xipki.ca.certprofile.example.internal.ObjectIdentifiers;
 
-public class CertProfile_TLS_C extends AbstractEeCertProfile {
+public class CertProfile_TLS_C extends AbstractEECertProfile {
 	private final Set<KeyUsage> keyUsages;
 	private final Set<ASN1ObjectIdentifier> extendedKeyUsages;
 	private final Map<ASN1ObjectIdentifier, ExtensionOccurrence> extensionOccurences;
@@ -56,16 +55,10 @@ public class CertProfile_TLS_C extends AbstractEeCertProfile {
 		_extensionOccurences.put(Extension.basicConstraints, ExtensionOccurrence.CRITICAL_REQUIRED);
 		_extensionOccurences.put(Extension.extendedKeyUsage, ExtensionOccurrence.NONCRITICAL_REQUIRED);
 		extensionOccurences = Collections.unmodifiableMap(_extensionOccurences);
-
-	}	
-	
-	@Override
-	public Date getNotBefore(Date notBefore){
-		return new Date();
 	}
 	
 	@Override
-	protected int getMaxValidity() {
+	public Integer getValidity() {
 		return 5 * 365;
 	}
 

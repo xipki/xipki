@@ -27,6 +27,8 @@ import java.security.cert.X509Certificate;
 import java.sql.SQLException;
 import java.util.Date;
 
+import javax.security.auth.x500.X500Principal;
+
 import org.bouncycastle.util.encoders.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -140,7 +142,7 @@ public class DefaultCertPublisher implements CertPublisher {
 	}
 
 	@Override
-	public void certificateRevoked(String issuer, BigInteger serialNumber,
+	public void certificateRevoked(X500Principal issuer, BigInteger serialNumber,
 			int reason, Date invalidityTime)
 	{
 		try {

@@ -36,14 +36,14 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.security.auth.x500.X500Principal;
 
-import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.Certificate;
 import org.bouncycastle.util.encoders.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.ca.common.X509CertificateWithMetaInfo;
-import org.xipki.ca.server.X509Util;
 import org.xipki.database.api.DataSource;
+import org.xipki.security.common.HashAlgoType;
+import org.xipki.security.common.HashCalculator;
 
 class CertStatusStoreQueryExecutor
 {
@@ -178,7 +178,7 @@ class CertStatusStoreQueryExecutor
 		}
 
 		byte[] encodedCert = certificate.getEncodedCert();
-		String sha1FpCert = hashCalculator.hexHash(HashAlgoType.SHA1,   encodedCert);
+		String sha1FpCert = hashCalculator.hexHash(HashAlgoType.SHA1, encodedCert);
 		boolean certRegistered = certRegistered(sha1FpCert);
 		if(certRegistered)
 		{
@@ -221,7 +221,7 @@ class CertStatusStoreQueryExecutor
 			ps.setInt(idx++, certId);
 			ps.setLong(idx++, System.currentTimeMillis()/1000);    			
 			ps.setString(idx++, cert.getSerialNumber().toString());
-			ps.setString(idx++, X509Util.canonicalizeName(cert.getSubjectX500Principal()));
+			ps.setString(idx++, cert.getSubjectX500Principal().getName());
 			ps.setLong(idx++, cert.getNotBefore().getTime()/1000);
 			ps.setLong(idx++, cert.getNotAfter().getTime()/1000);
 			ps.setBoolean(idx++, revocated);    			
@@ -291,18 +291,11 @@ class CertStatusStoreQueryExecutor
 				revocationReason, invalidityTime);
 	}
 
-	boolean revocateCert(X500Principal issuer, BigInteger serial, Date revocationTime, 
+	boolean revocateCert(X500Principal x500Issuer, BigInteger serial, Date revocationTime, 
 			int revocationReason, Date invalidityTime)
 		throws SQLException
 	{
-		String issuerName = X500Name.getInstance(issuer.getEncoded()).toString();
-		return revocateCert(issuerName, serial, revocationTime, revocationReason, invalidityTime);
-	}
-	
-	boolean revocateCert(String issuer, BigInteger serial, Date revocationTime, 
-		int revocationReason, Date invalidityTime)
-	throws SQLException
-	{
+		String issuer = x500Issuer.getName();
 		Integer issuer_id = issuerStore.getIdForSubject(issuer);
 		if(issuer_id == null) {
 			LOG.warn("Could find the issuer.id for the issuer " + issuer);
@@ -414,7 +407,7 @@ class CertStatusStoreQueryExecutor
 		id = issuerStore.getNextFreeId();
 		try{
 			String b64Cert = Base64.toBase64String(issuerCert.getEncodedCert());
-			String subject = X509Util.canonicalizeName(issuerCert.getCert().getSubjectX500Principal());
+			String subject = issuerCert.getCert().getSubjectX500Principal().getName();
 			int idx = 1;
 			ps.setInt(idx++, id.intValue());
 			ps.setString(idx++, subject);

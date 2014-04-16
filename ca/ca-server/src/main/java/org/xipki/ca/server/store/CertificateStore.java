@@ -25,6 +25,8 @@ import java.sql.SQLException;
 import java.util.Date;
 import java.util.List;
 
+import javax.security.auth.x500.X500Principal;
+
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.CRLReason;
 import org.bouncycastle.util.encoders.Base64;
@@ -36,7 +38,6 @@ import org.xipki.ca.common.X509CertificateWithMetaInfo;
 import org.xipki.ca.server.CertRevocationInfo;
 import org.xipki.ca.server.CertStatus;
 import org.xipki.ca.server.X509CA;
-import org.xipki.ca.server.X509Util;
 import org.xipki.database.api.DataSource;
 
 public class CertificateStore 
@@ -76,13 +77,12 @@ public class CertificateStore
 	public int certificateRevoked(X509Certificate cert, CRLReason reason,
 			Date invalidityTime) 
 	{
-		String issuer = X509Util.canonicalizeName(cert.getIssuerX500Principal());
 		BigInteger serialNumber = cert.getSerialNumber();
 		
-		return certificateRevoked(issuer, serialNumber, reason, invalidityTime);
+		return certificateRevoked(cert.getIssuerX500Principal(), serialNumber, reason, invalidityTime);
 	}
 
-	public int certificateRevoked(String issuer, BigInteger serialNumber,
+	public int certificateRevoked(X500Principal issuer, BigInteger serialNumber,
 			CRLReason reason, Date invalidityTime)
 	{
 		try {
@@ -111,7 +111,7 @@ public class CertificateStore
 			return true;
 		} catch (Exception e) {
 			LOG.error("Could not add CRL ca={}, thisUpdate={}: {}, ",
-					new Object[]{X509Util.canonicalizeName(cacert.getCert().getSubjectX500Principal()),
+				new Object[]{cacert.getCert().getSubjectX500Principal().getName(),
 					crl.getThisUpdate(), e.getMessage()});
 			LOG.error("Exception", e);
 			return false;
@@ -134,7 +134,7 @@ public class CertificateStore
 			return queryExecutor.getEncodedCRL(cacert);
 		} catch (Exception e) {
 			LOG.error("Could not get CRL ca={}: error message: {}",
-					X509Util.canonicalizeName(cacert.getCert().getSubjectX500Principal()),
+					cacert.getCert().getSubjectX500Principal().getName(),
 					e.getMessage());
 			LOG.error("Exception", e);
 			return null;
@@ -147,7 +147,7 @@ public class CertificateStore
 			return queryExecutor.cleanupCRLs(cacert, numCRLs);
 		} catch (Exception e) {
 			LOG.error("Could not cleanup CRLs ca={}: error message: {}",
-					X509Util.canonicalizeName(cacert.getCert().getSubjectX500Principal()),
+					cacert.getCert().getSubjectX500Principal().getName(),
 					e.getMessage());
 			LOG.error("Exception", e);
 			return 0;
@@ -181,6 +181,16 @@ public class CertificateStore
 		}
 	}
 
+	public CertStatus getCertStatusForSubject(X509CertificateWithMetaInfo caCert, X500Principal subject)
+	{
+		try{
+			return queryExecutor.getCertStatusForSubject(caCert, subject);
+		} catch (SQLException e) {
+			LOG.error("queryExecutor.getCertStatusForSubject", e);
+			return CertStatus.Unknown;
+		}
+	}
+
 	public CertStatus getCertStatusForSubject(X509CertificateWithMetaInfo caCert, X500Name subject)
 	{
 		try{
@@ -189,8 +199,8 @@ public class CertificateStore
 			LOG.error("queryExecutor.getCertStatusForSubject", e);
 			return CertStatus.Unknown;
 		}
- 
 	}
+
 	/**
 	 * Returns the first serial number ascend sorted {@code numEntries} revocated certificates
 	 * which are not expired at {@code notExpiredAt} and their serial numbers are not less than
@@ -242,11 +252,6 @@ public class CertificateStore
 			throws SQLException, OperationException
 	{
 		return queryExecutor.getGreatestSerialNumber(caCert);
-	}
-	
-	public String fpCanonicalizedName(X500Name x500Name)
-	{
-		return queryExecutor.fp_canonicalized_name(x500Name);
 	}
 	
 	public boolean isHealthy()

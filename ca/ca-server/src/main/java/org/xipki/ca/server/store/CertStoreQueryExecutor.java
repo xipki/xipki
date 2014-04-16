@@ -21,7 +21,6 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -48,11 +47,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 import javax.security.auth.x500.X500Principal;
 
 import org.bouncycastle.asn1.ASN1Integer;
-import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.DEROctetString;
-import org.bouncycastle.asn1.x500.RDN;
 import org.bouncycastle.asn1.x500.X500Name;
-import org.bouncycastle.asn1.x500.style.IETFUtils;
 import org.bouncycastle.asn1.x509.CRLReason;
 import org.bouncycastle.asn1.x509.Extension;
 import org.bouncycastle.util.encoders.Base64;
@@ -245,8 +241,7 @@ class CertStoreQueryExecutor
 			}
 
 			ps.setString(idx++, fp(encodedSubjectPublicKey));
-			X500Name subject = X500Name.getInstance(cert.getSubjectX500Principal().getEncoded());
-			String sha1_fp_subject = fp_canonicalized_name(subject);
+			String sha1_fp_subject = IoCertUtil.sha1sum_canonicalized_name(cert.getSubjectX500Principal());
 			ps.setString(idx++, sha1_fp_subject);
 			ps.executeUpdate();
 		}finally {
@@ -400,18 +395,11 @@ class CertStoreQueryExecutor
 				revocationReason, invalidityTime);
 	}
 
-	private boolean revocateCert(X500Principal issuer, BigInteger serial, Date revocationTime, 
+	boolean revocateCert(X500Principal x500Issuer, BigInteger serial, Date revocationTime, 
 			CRLReason revocationReason, Date invalidityTime)
 		throws SQLException
 	{
-		String issuerName = X500Name.getInstance(issuer.getEncoded()).toString();
-		return revocateCert(issuerName, serial, revocationTime, revocationReason, invalidityTime);
-	}
-
-	boolean revocateCert(String issuer, BigInteger serial, Date revocationTime, 
-		CRLReason revocationReason, Date invalidityTime)
-	throws SQLException
-	{
+		String issuer = x500Issuer.getName();
 		Integer cainfo_id = caInfoStore.getIdForSubject(issuer);
 		if(cainfo_id == null) {
 			LOG.warn("Could find the cainfo.id for the CA " + issuer);
@@ -732,7 +720,6 @@ class CertStoreQueryExecutor
 		}		
 
 		final String col_certprofileinfo_id = "certprofileinfo_id";
-		final String col_subject = "subject";
 		final String col_revocated = "revocated";
 		final String col_rev_reason = "rev_reason";
 		final String col_rev_time = "rev_time";
@@ -740,7 +727,6 @@ class CertStoreQueryExecutor
 		final String col_cert = "cert";
 		
 		String sql = "t1." + col_certprofileinfo_id + " " + col_certprofileinfo_id +
-				", t1." + col_subject + " " + col_subject +
 				", t1." + col_revocated + " " + col_revocated + 
 				", t1." + col_rev_reason + " " + col_rev_reason + 
 				", t1." + col_rev_time + " " + col_rev_time +
@@ -767,9 +753,7 @@ class CertStoreQueryExecutor
 				int certProfileInfo_id = rs.getInt(col_certprofileinfo_id);
 				String certProfileName = certprofileStore.getName(certProfileInfo_id);
 				
-				String subject = rs.getString(col_subject);
-				
-				X509CertificateWithMetaInfo certWithMeta = new X509CertificateWithMetaInfo(cert, subject, encodedCert);
+				X509CertificateWithMetaInfo certWithMeta = new X509CertificateWithMetaInfo(cert, encodedCert);
 				
 				CertificateInfo certInfo = new CertificateInfo(certWithMeta,
 						caCert, cert.getPublicKey().getEncoded(), certProfileName);
@@ -859,7 +843,19 @@ class CertStoreQueryExecutor
 		}		
 	}
 	
+	CertStatus getCertStatusForSubject(X509CertificateWithMetaInfo caCert, X500Principal subject)
+	throws SQLException
+	{
+		return getCertStatusForSubject(caCert, subject.getName());
+	}
+	
 	CertStatus getCertStatusForSubject(X509CertificateWithMetaInfo caCert, X500Name subject)
+	throws SQLException
+	{
+		return getCertStatusForSubject(caCert, subject.toString());
+	}
+	
+	private CertStatus getCertStatusForSubject(X509CertificateWithMetaInfo caCert, String subject)
 	throws SQLException
 	{
 		byte[] encodedCert = caCert.getEncodedCert();		
@@ -880,7 +876,7 @@ class CertStoreQueryExecutor
 		try{
 			int idx = 1;
 			ps.setInt(idx++, caId);
-			ps.setString(idx++, subject.toString());
+			ps.setString(idx++, subject);
 			
 			ResultSet rs = ps.executeQuery();
 			try{
@@ -1153,59 +1149,6 @@ class CertStoreQueryExecutor
 		}catch(Throwable t) {
 			LOG.warn("Cannot return prepared statement and connection", t);
 		}
-	}
-
-	/**
-	 * First canonicalized the name, and then compute the SHA-1 fingerprint over the 
-	 * canonicalized subject string.
-	 * @param name
-	 * @return
-	 */
-	String fp_canonicalized_name(X500Name name)
-	{
-		ASN1ObjectIdentifier[] _types = name.getAttributeTypes();
-		int n = _types.length;
-		List<String> types = new ArrayList<String>(n);
-		for(ASN1ObjectIdentifier type : _types)
-		{
-			types.add(type.getId());
-		}
-		
-		Collections.sort(types);
-		
-		StringBuilder sb = new StringBuilder();
-		for(int i = 0; i < n; i++)
-		{
-			String type = types.get(i);
-			if(i > 0)
-			{
-				sb.append(",");
-			}
-			sb.append(type).append("=");
-			RDN[] rdns = name.getRDNs(new ASN1ObjectIdentifier(type));
-			
-			for(int j = 0; j < rdns.length; j++)
-			{
-				if(j > 0)
-				{
-					sb.append(";");
-				}
-				RDN rdn = rdns[j];
-				String textValue = IETFUtils.valueToString(rdn.getFirst().getValue()).toLowerCase();
-				sb.append(textValue);				
-			}
-		}
-		
-		String canonicalizedName = sb.toString();
-		LOG.debug("Canocanilized name of '{}' is '{}'", name.toString(), canonicalizedName);
-		byte[] encoded;
-		try {
-			encoded = canonicalizedName.getBytes("UTF-8");
-		} catch (UnsupportedEncodingException e) {
-			LOG.warn("UnsupportedEncodingException: {}", e.getMessage());
-			encoded = canonicalizedName.getBytes();
-		}
-		return fp(encoded);
 	}
 	
 	boolean isHealthy()

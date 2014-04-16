@@ -22,6 +22,8 @@ import java.security.cert.X509CRL;
 import java.security.cert.X509Certificate;
 import java.util.Date;
 
+import javax.security.auth.x500.X500Principal;
+
 import org.xipki.ca.api.publisher.CertPublisher;
 import org.xipki.ca.api.publisher.CertPublisherException;
 import org.xipki.ca.api.publisher.CertificateInfo;
@@ -67,7 +69,7 @@ public class IdentifiedCertPublisher implements CertPublisher {
 	}
 
 	@Override
-	public void certificateRevoked(String issuer, BigInteger serialNumber, int reason, Date invalidityTime) {
+	public void certificateRevoked(X500Principal issuer, BigInteger serialNumber, int reason, Date invalidityTime) {
 		certPublisher.certificateRevoked(issuer, serialNumber, reason, invalidityTime);
 	}
 

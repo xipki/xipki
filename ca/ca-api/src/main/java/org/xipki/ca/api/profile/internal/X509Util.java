@@ -15,7 +15,7 @@
  *
  */
 
-package org.xipki.ca.certprofile.example.internal;
+package org.xipki.ca.api.profile.internal;
 
 import java.io.IOException;
 import java.util.ArrayList;

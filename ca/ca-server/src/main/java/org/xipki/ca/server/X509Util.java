@@ -18,8 +18,6 @@
 package org.xipki.ca.server;
 
 import java.io.IOException;
-import java.security.cert.CertificateEncodingException;
-import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -50,16 +48,9 @@ import org.xipki.ca.api.profile.CertProfileException;
 import org.xipki.ca.api.profile.CertificatePolicyInformation;
 import org.xipki.ca.api.profile.CertificatePolicyQualifier;
 import org.xipki.ca.api.profile.KeyUsage;
-import org.xipki.ca.common.X509CertificateWithMetaInfo;
 
 public class X509Util {
 
-	public static String canonicalizeName(X500Principal name)
-	{
-		X500Name xName = X500Name.getInstance(name.getEncoded());
-		return xName.toString();
-	}
-	
 	public static BasicConstraints createBasicConstraints(boolean isCa, Integer pathLen)
 	{
 		BasicConstraints basicConstraints;
@@ -257,15 +248,6 @@ public class X509Util {
 		}
 		
 		return new CertificatePolicies(pInfos);
-	}
-
-	public static X509CertificateWithMetaInfo createX509CertWithMeta(X509Certificate cert) 
-			throws CertificateEncodingException
-	{
-		String subject = canonicalizeName(cert.getSubjectX500Principal()).toString();
-		byte[] encoded = cert.getEncoded();
-		
-		return new X509CertificateWithMetaInfo(cert, subject, encoded);
 	}
 
 }

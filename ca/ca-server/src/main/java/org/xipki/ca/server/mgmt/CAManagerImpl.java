@@ -56,7 +56,6 @@ import org.xipki.ca.server.CmpRequestorInfo;
 import org.xipki.ca.server.CrlSigner;
 import org.xipki.ca.server.X509CA;
 import org.xipki.ca.server.X509CACmpResponder;
-import org.xipki.ca.server.X509Util;
 import org.xipki.ca.server.store.CertificateStore;
 import org.xipki.database.api.DataSource;
 import org.xipki.database.api.DataSourceFactory;
@@ -425,16 +424,9 @@ public class CAManagerImpl implements CAManager
 					for(CAHasRequestorEntry entry : caHasRequestorEntries)
 					{
 						CmpRequestorEntry cmpRequestorEntry = getCmpRequestor(entry.getRequestorName());
-						CmpRequestorInfo requestorInfo;
-						try {
-							requestorInfo = new CmpRequestorInfo(
-									X509Util.createX509CertWithMeta(cmpRequestorEntry.getCert()),
-									entry.isRa());
-						} catch (CertificateEncodingException e) {
-							LOG.error("CmpRequestorInfo.<init> (ca=" + caName + "): {}", e.getMessage());
-							LOG.debug("CmpRequestorInfo.<init> (ca=" + caName + ")", e);
-							return false;
-						}
+						CmpRequestorInfo requestorInfo = new CmpRequestorInfo(
+								new X509CertificateWithMetaInfo(cmpRequestorEntry.getCert()),
+								entry.isRa());
 						requestorInfo.setPermissions(entry.getPermissions());
 						requestorInfo.setProfiles(entry.getProfiles());					
 						caResponder.addAutorizatedRequestor(requestorInfo);
@@ -1248,7 +1240,7 @@ public class CAManagerImpl implements CAManager
 			
 			if(iCert != null)
 			{
-				ps.setString(iSubject, X509Util.canonicalizeName(cert.getSubjectX500Principal()));
+				ps.setString(iSubject, cert.getSubjectX500Principal().getName());
 				
 				String base64Cert = Base64.toBase64String(cert.getEncoded());
 				ps.setString(iCert, base64Cert);

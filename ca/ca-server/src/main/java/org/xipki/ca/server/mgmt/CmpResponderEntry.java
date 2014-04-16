@@ -19,8 +19,6 @@ package org.xipki.ca.server.mgmt;
 
 import java.security.cert.X509Certificate;
 
-import org.xipki.ca.server.X509Util;
-
 public class CmpResponderEntry {
 	public static final String name = "default";
 	private String type;
@@ -65,10 +63,10 @@ public class CmpResponderEntry {
 		if(cert != null)
 		{
 			sb.append("\tissuer: ").append(
-					X509Util.canonicalizeName(cert.getIssuerX500Principal())).append("\n");
+					cert.getIssuerX500Principal().getName()).append("\n");
 			sb.append("\tserialNumber: ").append(cert.getSerialNumber()).append("\n");
 			sb.append("\tsubject: ").append(
-					X509Util.canonicalizeName(cert.getSubjectX500Principal()));
+					cert.getSubjectX500Principal().getName());
 		}
 		else
 		{

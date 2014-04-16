@@ -119,7 +119,7 @@ public class DbCertStatusStore implements CertStatusStore
 					HashAlgoType.SHA384, HashAlgoType.SHA512};
 			
 			StringBuilder sb = new StringBuilder();
-			sb.append("SELECT id, subject");
+			sb.append("SELECT id");
 			for(HashAlgoType hashAlgoType : hashAlgoTypes)
 			{
 				String hashAlgo = hashAlgoType.name().toLowerCase();
@@ -137,7 +137,6 @@ public class DbCertStatusStore implements CertStatusStore
 				List<IssuerEntry> caInfos = new LinkedList<IssuerEntry>();
 				while(rs.next()) {
 					int id = rs.getInt("id");
-					String subject = rs.getString("subject");
 					
 					Map<HashAlgoType, IssuerHashNameAndKey> hashes = new HashMap<HashAlgoType, IssuerHashNameAndKey>();
 					for(HashAlgoType hashAlgoType : hashAlgoTypes)
@@ -150,7 +149,7 @@ public class DbCertStatusStore implements CertStatusStore
 						hashes.put(hashAlgoType, hash);
 					}
 					
-					IssuerEntry caInfoEntry = new IssuerEntry(id, subject, hashes, null);
+					IssuerEntry caInfoEntry = new IssuerEntry(id, hashes, null);
 					caInfos.add(caInfoEntry);
 				}
 				

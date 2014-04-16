@@ -2,24 +2,20 @@ package org.xipki.dbi;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
+import java.security.NoSuchAlgorithmException;
+import java.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 
-import org.bouncycastle.asn1.ASN1ObjectIdentifier;
-import org.bouncycastle.asn1.x500.RDN;
-import org.bouncycastle.asn1.x500.X500Name;
-import org.bouncycastle.asn1.x500.style.IETFUtils;
-import org.bouncycastle.crypto.digests.SHA1Digest;
+import org.bouncycastle.asn1.x509.Certificate;
 import org.bouncycastle.util.encoders.Base64;
-import org.bouncycastle.util.encoders.Hex;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xipki.database.api.DataSource;
 import org.xipki.dbi.ocsp.jaxb.CertStoreType;
 import org.xipki.dbi.ocsp.jaxb.CertStoreType.Certprofiles;
@@ -30,19 +26,24 @@ import org.xipki.dbi.ocsp.jaxb.CertprofileType;
 import org.xipki.dbi.ocsp.jaxb.CertsType;
 import org.xipki.dbi.ocsp.jaxb.IssuerType;
 import org.xipki.security.api.PasswordResolverException;
+import org.xipki.security.common.HashAlgoType;
+import org.xipki.security.common.HashCalculator;
 import org.xipki.security.common.IoCertUtil;
 import org.xipki.security.common.ParamChecker;
 
 class OcspCertStoreDbImporter extends DbPorter{
+	private static final Logger LOG = LoggerFactory.getLogger(OcspCertStoreDbImporter.class);
+	
 	private final Unmarshaller unmarshaller;
-	private final SHA1Digest sha1md = new SHA1Digest();
+	private final HashCalculator hashCalculator;
 	
 	OcspCertStoreDbImporter(DataSource dataSource, Unmarshaller unmarshaller, String srcDir) 
-			throws SQLException, PasswordResolverException, IOException
+			throws SQLException, PasswordResolverException, NoSuchAlgorithmException
 	{
 		super(dataSource, srcDir);
 		ParamChecker.assertNotNull("unmarshaller", unmarshaller);
 		this.unmarshaller = unmarshaller;		
+		this.hashCalculator = new HashCalculator();
 	}
 
 	public void importToDB() throws Exception
@@ -58,7 +59,7 @@ class OcspCertStoreDbImporter extends DbPorter{
 	}
 
 	private void import_issuer(Issuers issuers)
-			throws SQLException
+			throws SQLException, CertificateException
 	{
 		final String SQL_ADD_CAINFO =
 		    	"INSERT INTO issuer (" +
@@ -76,21 +77,43 @@ class OcspCertStoreDbImporter extends DbPorter{
 		try{
 			for(IssuerType issuer : issuers.getIssuer())
 			{
+				String b64Cert = issuer.getCert();
+				byte[] encodedCert = Base64.decode(b64Cert);
+				
+				Certificate c;
+				byte[] encodedName;
+				try {
+					c = Certificate.getInstance(encodedCert);
+					encodedName = c.getSubject().getEncoded("DER");
+				} catch (Exception e) {
+					LOG.error("could not parse certificate of issuer {}", issuer.getId());
+					LOG.debug("could not parse certificate of issuer " + issuer.getId(), e);
+					if(e instanceof CertificateException)
+					{
+						throw (CertificateException) e;
+					}
+					else
+					{
+						throw new CertificateException(e);
+					}
+				}
+				byte[] encodedKey = c.getSubjectPublicKeyInfo().getPublicKeyData().getBytes();
+
 				int idx = 1;
 				ps.setInt   (idx++, issuer.getId());
-				ps.setString(idx++, issuer.getSubject());
-				ps.setString(idx++, issuer.getSha1FpName());
-				ps.setString(idx++, issuer.getSha1FpKey());
-				ps.setString(idx++, issuer.getSha224FpName());
-				ps.setString(idx++, issuer.getSha224FpKey());
-				ps.setString(idx++, issuer.getSha256FpName());
-				ps.setString(idx++, issuer.getSha256FpKey());
-				ps.setString(idx++, issuer.getSha384FpName());
-				ps.setString(idx++, issuer.getSha384FpKey());
-				ps.setString(idx++, issuer.getSha512FpName());
-				ps.setString(idx++, issuer.getSha512FpKey());
-				ps.setString(idx++, issuer.getSha1FpCert());
-				ps.setString(idx++, issuer.getCert());
+				ps.setString(idx++, IoCertUtil.canonicalizeName(c.getSubject()));
+				ps.setString(idx++, hashCalculator.hexHash(HashAlgoType.SHA1, encodedName));
+				ps.setString(idx++, hashCalculator.hexHash(HashAlgoType.SHA1, encodedKey));
+				ps.setString(idx++, hashCalculator.hexHash(HashAlgoType.SHA224, encodedName));
+				ps.setString(idx++, hashCalculator.hexHash(HashAlgoType.SHA224, encodedKey));
+				ps.setString(idx++, hashCalculator.hexHash(HashAlgoType.SHA256, encodedName));
+				ps.setString(idx++, hashCalculator.hexHash(HashAlgoType.SHA256, encodedKey));
+				ps.setString(idx++, hashCalculator.hexHash(HashAlgoType.SHA384, encodedName));
+				ps.setString(idx++, hashCalculator.hexHash(HashAlgoType.SHA384, encodedKey));
+				ps.setString(idx++, hashCalculator.hexHash(HashAlgoType.SHA512, encodedName));
+				ps.setString(idx++, hashCalculator.hexHash(HashAlgoType.SHA512, encodedKey));
+				ps.setString(idx++, hashCalculator.hexHash(HashAlgoType.SHA512, encodedCert));
+				ps.setString(idx++, b64Cert);
 				
 				ps.execute();
 			}
@@ -121,7 +144,7 @@ class OcspCertStoreDbImporter extends DbPorter{
 	}
 
 	private void import_cert(CertsFiles certsfiles)
-			throws SQLException, JAXBException, IOException
+			throws SQLException, JAXBException, IOException, CertificateException
 	{
 		for(String certsFile : certsfiles.getCertsFile())
 		{
@@ -133,7 +156,7 @@ class OcspCertStoreDbImporter extends DbPorter{
 	}
 	
 	private void do_import_cert(CertsType certs)
-		throws SQLException, IOException
+		throws SQLException, IOException, CertificateException
 	{
 		final String SQL_ADD_CERT = 
 		    	"INSERT INTO cert (" + 
@@ -155,16 +178,35 @@ class OcspCertStoreDbImporter extends DbPorter{
 		try{
 			for(CertType cert : certs.getCert())
 			{
+				// rawcert
+				String filename = baseDir + File.separator + cert.getCertFile();
+				byte[] encodedCert = IoCertUtil.read(filename);
+				X509Certificate c;
+				try {
+					c = IoCertUtil.parseCert(encodedCert);
+				} catch (Exception e) {
+					LOG.error("could not parse certificate in file {}", filename);
+					LOG.debug("could not parse certificate in file " + filename, e);
+					if(e instanceof CertificateException)
+					{
+						throw (CertificateException) e;
+					}
+					else
+					{
+						throw new CertificateException(e);
+					}
+				}
+				
 				// cert
 				int idx = 1;
 				ps_cert.setInt   (idx++, cert.getId());
 				ps_cert.setInt   (idx++, cert.getIssuerId());
-				ps_cert.setString(idx++, cert.getSerial());
+				ps_cert.setString(idx++, c.getSerialNumber().toString());
 				ps_cert.setInt   (idx++, cert.getCertprofileId());
-				ps_cert.setString(idx++, cert.getSubject());
+				ps_cert.setString(idx++, c.getSubjectX500Principal().getName());
 				ps_cert.setString(idx++, cert.getLastUpdate());
-				ps_cert.setString(idx++, cert.getNotbefore());
-				ps_cert.setString(idx++, cert.getNotafter());
+				ps_cert.setLong  (idx++, c.getNotBefore().getTime() / 1000);
+				ps_cert.setLong  (idx++, c.getNotAfter().getTime() / 1000);
 				ps_cert.setBoolean(idx++, cert.isRevocated());
 				ps_cert.setString(idx++, cert.getRevReason());
 				ps_cert.setString(idx++, cert.getRevTime());
@@ -175,18 +217,15 @@ class OcspCertStoreDbImporter extends DbPorter{
 				// certhash
 				idx = 1;
 				ps_certhash.setInt(idx++, cert.getId());
-				ps_certhash.setString(idx++, cert.getSha1FpCert());
-				ps_certhash.setString(idx++, cert.getSha224FpCert());
-				ps_certhash.setString(idx++, cert.getSha256FpCert());
-				ps_certhash.setString(idx++, cert.getSha384FpCert());
-				ps_certhash.setString(idx++, cert.getSha512FpCert());
+				ps_certhash.setString(idx++, hashCalculator.hexHash(HashAlgoType.SHA1, encodedCert));
+				ps_certhash.setString(idx++, hashCalculator.hexHash(HashAlgoType.SHA224, encodedCert));
+				ps_certhash.setString(idx++, hashCalculator.hexHash(HashAlgoType.SHA256, encodedCert));
+				ps_certhash.setString(idx++, hashCalculator.hexHash(HashAlgoType.SHA384, encodedCert));
+				ps_certhash.setString(idx++, hashCalculator.hexHash(HashAlgoType.SHA512, encodedCert));
 				
 				ps_certhash.executeUpdate();
 				
 				// rawcert
-				String filename = baseDir + File.separator + cert.getCertFile();
-				byte[] encodedCert = IoCertUtil.read(filename);
-				
 				ps_rawcert.setInt   (1, cert.getId());
 				ps_rawcert.setString(2, Base64.toBase64String(encodedCert));   
 				
@@ -195,68 +234,6 @@ class OcspCertStoreDbImporter extends DbPorter{
 		}finally {
 			closeStatement(ps_cert);
 			closeStatement(ps_rawcert);
-		}
-
-	}
-
-	/**
-	 * First canonicalized the name, and then compute the SHA-1 fingerprint over the 
-	 * canonicalized subject string.
-	 * @param name
-	 * @return
-	 */
-	String fp_canonicalized_name(String dirName)
-	{
-		X500Name name = new X500Name(dirName);
-		
-		ASN1ObjectIdentifier[] _types = name.getAttributeTypes();
-		int n = _types.length;
-		List<String> types = new ArrayList<String>(n);
-		for(ASN1ObjectIdentifier type : _types)
-		{
-			types.add(type.getId());
-		}
-		
-		Collections.sort(types);
-		
-		StringBuilder sb = new StringBuilder();
-		for(int i = 0; i < n; i++)
-		{
-			String type = types.get(i);
-			if(i > 0)
-			{
-				sb.append(",");
-			}
-			sb.append(type).append("=");
-			RDN[] rdns = name.getRDNs(new ASN1ObjectIdentifier(type));
-			
-			for(int j = 0; j < rdns.length; j++)
-			{
-				if(j > 0)
-				{
-					sb.append(";");
-				}
-				RDN rdn = rdns[j];
-				String textValue = IETFUtils.valueToString(rdn.getFirst().getValue()).toLowerCase();
-				sb.append(textValue);				
-			}
-		}
-		
-		String canonicalizedName = sb.toString();
-		byte[] encoded;
-		try {
-			encoded = canonicalizedName.getBytes("UTF-8");
-		} catch (UnsupportedEncodingException e) {
-			encoded = canonicalizedName.getBytes();
-		}
-		
-		synchronized (sha1md) {
-			sha1md.reset();
-			sha1md.update(encoded, 0, encoded.length);
-			byte[] sha1fp = new byte[20];
-			sha1md.doFinal(sha1fp, 0);
-			
-			return Hex.toHexString(sha1fp).toUpperCase();
 		}
 	}
 	

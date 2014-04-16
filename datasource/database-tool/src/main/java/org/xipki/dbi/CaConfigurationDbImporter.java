@@ -2,12 +2,17 @@ package org.xipki.dbi;
 
 import java.io.File;
 import java.io.IOException;
+import java.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.Unmarshaller;
 
+import org.bouncycastle.util.encoders.Base64;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xipki.database.api.DataSource;
 import org.xipki.dbi.ca.jaxb.CAConfigurationType;
 import org.xipki.dbi.ca.jaxb.CAConfigurationType.CaHasCertprofiles;
@@ -35,9 +40,12 @@ import org.xipki.dbi.ca.jaxb.PublisherType;
 import org.xipki.dbi.ca.jaxb.RequestorType;
 import org.xipki.dbi.ca.jaxb.ResponderType;
 import org.xipki.security.api.PasswordResolverException;
+import org.xipki.security.common.IoCertUtil;
 import org.xipki.security.common.ParamChecker;
 
 class CaConfigurationDbImporter extends DbPorter{
+	private static final Logger LOG = LoggerFactory.getLogger(CaConfigurationDbImporter.class);
+	
 	private final Unmarshaller unmarshaller;
 	
 	CaConfigurationDbImporter(DataSource dataSource, Unmarshaller unmarshaller, String srcDir) 
@@ -230,7 +238,7 @@ class CaConfigurationDbImporter extends DbPorter{
 	}
 	
 	private void import_ca(Cas cas)
-	throws SQLException
+	throws SQLException, CertificateException
 	{
 		PreparedStatement ps = null;
 		try{
@@ -242,15 +250,32 @@ class CaConfigurationDbImporter extends DbPorter{
 			
 			for(CaType ca : cas.getCa())
 			{
+				String b64Cert = ca.getCert();
+				X509Certificate c;
+				try {
+					c = IoCertUtil.parseCert(Base64.decode(b64Cert));
+				} catch (Exception e) {
+					LOG.error("could not parse certificate of CA {}", ca.getName());
+					LOG.debug("could not parse certificate of CA " + ca.getName(), e);
+					if(e instanceof CertificateException)
+					{
+						throw (CertificateException) e;
+					}
+					else
+					{
+						throw new CertificateException(e);
+					}
+				}				
+				
 				int idx = 1;
 				ps.setString(idx++, ca.getName());
-				ps.setString(idx++, ca.getSubject());
+				ps.setString(idx++, c.getSubjectX500Principal().getName());
 				ps.setString(idx++, ca.getNextSerial());
 				ps.setString(idx++, ca.getStatus());
 				ps.setString(idx++, ca.getCrlUris());
 				ps.setString(idx++, ca.getOcspUris());
 				ps.setInt   (idx++, ca.getMaxValidity());
-				ps.setString(idx++, ca.getCert());
+				ps.setString(idx++, b64Cert);
 				ps.setString(idx++, ca.getSignerType());
 				ps.setString(idx++, ca.getSignerConf());
 				ps.setString(idx++, ca.getCrlsignerName());
