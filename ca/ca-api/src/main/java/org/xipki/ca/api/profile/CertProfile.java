@@ -28,6 +28,8 @@ public interface CertProfile {
 	
 	boolean isOnlyForRA();
 
+	boolean incSerialNumberIfSubjectExists();
+
 	void initialize(String data) throws CertProfileException;
 	
 	void setEnvironmentParamterResolver(EnvironmentParameterResolver paramterResolver);

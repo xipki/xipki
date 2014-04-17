@@ -137,4 +137,9 @@ public class DefaultRACertProfile implements CertProfile
 			throws BadCertTemplateException
 	{		
 	}
+
+	@Override
+	public boolean incSerialNumberIfSubjectExists() {
+		return false;
+	}
 }
