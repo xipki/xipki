@@ -20,32 +20,32 @@ package org.xipki.ca.server.mgmt.shell;
 import org.apache.karaf.shell.console.OsgiCommandSupport;
 import org.xipki.ca.server.mgmt.CAManager;
 
-public abstract class CaCommand extends OsgiCommandSupport 
+public abstract class CaCommand extends OsgiCommandSupport
 {
-	protected final static String permissionsText = 
-			"all|cert-req|cert-rev|key-update|CRL-gen|CRL-download|cross-cert-req";
-			
-	protected CAManager caManager;
+    protected final static String permissionsText =
+            "all|cert-req|cert-rev|key-update|CRL-gen|CRL-download|cross-cert-req";
 
-	public void setCaManager(CAManager caManager) {
-		this.caManager = caManager;
-	}
+    protected CAManager caManager;
 
-	protected boolean isEnabled(Boolean enabled, Boolean disabled, boolean defaultEnabled)
-	{
-		boolean b = defaultEnabled;
-		if(enabled != null){
-			b = enabled.booleanValue();
-		}
-		else if(disabled != null)
-		{
-			b = ! disabled.booleanValue();
-		}
-		return b;			
-	}
-	
-	protected static String getRealString(String s)
-	{
-		return CAManager.NULL.equalsIgnoreCase(s) ? null : s;
-	}
+    public void setCaManager(CAManager caManager) {
+        this.caManager = caManager;
+    }
+
+    protected boolean isEnabled(Boolean enabled, Boolean disabled, boolean defaultEnabled)
+    {
+        boolean b = defaultEnabled;
+        if(enabled != null){
+            b = enabled.booleanValue();
+        }
+        else if(disabled != null)
+        {
+            b = ! disabled.booleanValue();
+        }
+        return b;
+    }
+
+    protected static String getRealString(String s)
+    {
+        return CAManager.NULL.equalsIgnoreCase(s) ? null : s;
+    }
 }

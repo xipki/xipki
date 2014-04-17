@@ -80,185 +80,185 @@ import org.xipki.security.bcext.BcRSAContentVerifierProviderBuilder;
 import org.xipki.security.bcext.ECDSAContentVerifierProviderBuilder;
 
 public class KeyUtil {
-	private static final DefaultDigestAlgorithmIdentifierFinder dfltDigesAlgIdentifierFinder = 
-			new DefaultDigestAlgorithmIdentifierFinder();
-	
-	private static final Map<String, BcContentVerifierProviderBuilder> verifierProviderBuilders =
-			new HashMap<String, BcContentVerifierProviderBuilder>();
+    private static final DefaultDigestAlgorithmIdentifierFinder dfltDigesAlgIdentifierFinder =
+            new DefaultDigestAlgorithmIdentifierFinder();
 
-	private static final Map<String, KeyFactory> keyFactories = new HashMap<String, KeyFactory>();
+    private static final Map<String, BcContentVerifierProviderBuilder> verifierProviderBuilders =
+            new HashMap<String, BcContentVerifierProviderBuilder>();
 
-	public static ContentVerifierProvider getContentVerifierProvider(
-			X509Certificate verifierCert)
-	throws InvalidKeyException, OperatorCreationException
-	{
-		PublicKey publicKey = verifierCert.getPublicKey();
-		String keyAlg = publicKey.getAlgorithm().toUpperCase();
-		if(keyAlg.equals("EC"))
-		{
-			keyAlg = "ECDSA";
-		}
-		
-		BcContentVerifierProviderBuilder builder = verifierProviderBuilders.get(keyAlg);
-		if(builder == null)
-		{
-			if("RSA".equals(keyAlg))
-			{
-				builder = new BcRSAContentVerifierProviderBuilder(dfltDigesAlgIdentifierFinder);
-			}
-			else if("DSA".equals(keyAlg))
-			{
-				builder = new BcDSAContentVerifierProviderBuilder(dfltDigesAlgIdentifierFinder);
-			}
-			else if("ECDSA".equals(keyAlg))
-			{
-				builder = new ECDSAContentVerifierProviderBuilder(dfltDigesAlgIdentifierFinder);
-			}
-			else
-			{
-				throw new InvalidKeyException("unknown key algorithm of the public key " + keyAlg);
-			}
-			verifierProviderBuilders.put(keyAlg, builder);
-		}
-		
-		AsymmetricKeyParameter keyParam = KeyUtil.generatePublicKeyParameter(publicKey);
-		return builder.build(keyParam);
-	}
+    private static final Map<String, KeyFactory> keyFactories = new HashMap<String, KeyFactory>();
 
-	public static ContentVerifierProvider getContentVerifierProvider(
-			PublicKey publicKey)
-	throws OperatorCreationException, InvalidKeyException
-	{
-		String keyAlg = publicKey.getAlgorithm().toUpperCase();
-		if(keyAlg.equals("EC"))
-		{
-			keyAlg = "ECDSA";
-		}
-		
-		BcContentVerifierProviderBuilder builder = verifierProviderBuilders.get(keyAlg);
-		if(builder == null)
-		{
-			if("RSA".equals(keyAlg))
-			{
-				builder = new BcRSAContentVerifierProviderBuilder(dfltDigesAlgIdentifierFinder);
-			}
-			else if("DSA".equals(keyAlg))
-			{
-				builder = new BcDSAContentVerifierProviderBuilder(dfltDigesAlgIdentifierFinder);
-			}
-			else if("ECDSA".equals(keyAlg))
-			{
-				builder = new ECDSAContentVerifierProviderBuilder(dfltDigesAlgIdentifierFinder);
-			}
-			else
-			{
-				throw new OperatorCreationException("unknown key algorithm of the public key " + keyAlg);
-			}
-			verifierProviderBuilders.put(keyAlg, builder);
-		}
-		
-		AsymmetricKeyParameter keyParam = KeyUtil.generatePublicKeyParameter(publicKey);
-		return builder.build(keyParam);
-	}
+    public static ContentVerifierProvider getContentVerifierProvider(
+            X509Certificate verifierCert)
+    throws InvalidKeyException, OperatorCreationException
+    {
+        PublicKey publicKey = verifierCert.getPublicKey();
+        String keyAlg = publicKey.getAlgorithm().toUpperCase();
+        if(keyAlg.equals("EC"))
+        {
+            keyAlg = "ECDSA";
+        }
+
+        BcContentVerifierProviderBuilder builder = verifierProviderBuilders.get(keyAlg);
+        if(builder == null)
+        {
+            if("RSA".equals(keyAlg))
+            {
+                builder = new BcRSAContentVerifierProviderBuilder(dfltDigesAlgIdentifierFinder);
+            }
+            else if("DSA".equals(keyAlg))
+            {
+                builder = new BcDSAContentVerifierProviderBuilder(dfltDigesAlgIdentifierFinder);
+            }
+            else if("ECDSA".equals(keyAlg))
+            {
+                builder = new ECDSAContentVerifierProviderBuilder(dfltDigesAlgIdentifierFinder);
+            }
+            else
+            {
+                throw new InvalidKeyException("unknown key algorithm of the public key " + keyAlg);
+            }
+            verifierProviderBuilders.put(keyAlg, builder);
+        }
+
+        AsymmetricKeyParameter keyParam = KeyUtil.generatePublicKeyParameter(publicKey);
+        return builder.build(keyParam);
+    }
+
+    public static ContentVerifierProvider getContentVerifierProvider(
+            PublicKey publicKey)
+    throws OperatorCreationException, InvalidKeyException
+    {
+        String keyAlg = publicKey.getAlgorithm().toUpperCase();
+        if(keyAlg.equals("EC"))
+        {
+            keyAlg = "ECDSA";
+        }
+
+        BcContentVerifierProviderBuilder builder = verifierProviderBuilders.get(keyAlg);
+        if(builder == null)
+        {
+            if("RSA".equals(keyAlg))
+            {
+                builder = new BcRSAContentVerifierProviderBuilder(dfltDigesAlgIdentifierFinder);
+            }
+            else if("DSA".equals(keyAlg))
+            {
+                builder = new BcDSAContentVerifierProviderBuilder(dfltDigesAlgIdentifierFinder);
+            }
+            else if("ECDSA".equals(keyAlg))
+            {
+                builder = new ECDSAContentVerifierProviderBuilder(dfltDigesAlgIdentifierFinder);
+            }
+            else
+            {
+                throw new OperatorCreationException("unknown key algorithm of the public key " + keyAlg);
+            }
+            verifierProviderBuilders.put(keyAlg, builder);
+        }
+
+        AsymmetricKeyParameter keyParam = KeyUtil.generatePublicKeyParameter(publicKey);
+        return builder.build(keyParam);
+    }
 
 
-	public static KeyPair generateRSAKeypair(int keySize)
-			throws Exception
-	{
-		return generateRSAKeypair(keySize, null);
-	}
-	
-	public static KeyPair generateRSAKeypair(int keySize, BigInteger publicExponent)
-			throws Exception
-	{
-		KeyPairGenerator kpGen = KeyPairGenerator.getInstance("RSA", "BC");
-		
-		if(publicExponent == null)
-		{
-			publicExponent = RSAKeyGenParameterSpec.F4;
-		}
-		AlgorithmParameterSpec params = new RSAKeyGenParameterSpec(keySize,	publicExponent); 
-		kpGen.initialize(params);
-		return kpGen.generateKeyPair();
-	}
-		
-	public static KeyPair generateECKeypair(ASN1ObjectIdentifier curveId, char[] password)
-			throws Exception
-	{
-		KeyPairGenerator kpGen = KeyPairGenerator.getInstance("ECDSA", "BC");
-		ECNamedCurveParameterSpec spec = ECNamedCurveTable.getParameterSpec(curveId.getId());		
-		kpGen.initialize(spec);
-		return kpGen.generateKeyPair();
-	}
-	
-	private static KeyFactory getKeyFactory(String algorithm) 
-			throws InvalidKeySpecException
-	{
-		synchronized (keyFactories) {
-			KeyFactory kf = keyFactories.get(algorithm);
-			if(kf == null)
-			{
-				try {
-					kf = KeyFactory.getInstance(algorithm, "BC");
-				} catch (NoSuchAlgorithmException e) {
-					throw new InvalidKeySpecException("Could not find KeyFactory for " + algorithm + ": " + e.getMessage());
-				} catch (NoSuchProviderException e) {
-					throw new InvalidKeySpecException("Could not find KeyFactory for " + algorithm + ": " + e.getMessage());
-				}
-				keyFactories.put(algorithm, kf);
-			}
-			
-			return kf;
-		}
-	}
-	
-	public static PublicKey generatePublicKey(SubjectPublicKeyInfo pkInfo) 
-			throws IOException, NoSuchAlgorithmException, InvalidKeySpecException
-	{
-		X509EncodedKeySpec keyspec = new X509EncodedKeySpec(pkInfo.getEncoded());
-		ASN1ObjectIdentifier aid = pkInfo.getAlgorithm().getAlgorithm();
-		
-		KeyFactory kf;
-		if(PKCSObjectIdentifiers.rsaEncryption.equals(aid))
-		{
-			kf = KeyFactory.getInstance("RSA");
-		}
-		else if(X9ObjectIdentifiers.id_ecPublicKey.equals(aid))
-		{
-			kf = KeyFactory.getInstance("ECDSA");
-		}
-		else 
-		{
-			throw new InvalidKeySpecException("unsupported key algorithm: " + aid);
-		}
-		
-		return kf.generatePublic(keyspec);
-	}
+    public static KeyPair generateRSAKeypair(int keySize)
+            throws Exception
+    {
+        return generateRSAKeypair(keySize, null);
+    }
 
-	public static RSAPublicKey generateRSAPublicKey(BigInteger modulus, BigInteger publicExponent) 
-			throws InvalidKeySpecException
-	{
-		RSAPublicKeySpec keySpec = new RSAPublicKeySpec(modulus, publicExponent);
-		KeyFactory kf = getKeyFactory("RSA");
-		synchronized (kf) {
-			return (RSAPublicKey) kf.generatePublic(keySpec);
-		}
-	}
+    public static KeyPair generateRSAKeypair(int keySize, BigInteger publicExponent)
+            throws Exception
+    {
+        KeyPairGenerator kpGen = KeyPairGenerator.getInstance("RSA", "BC");
 
-	public static ECPublicKey generateECPublicKey(String curveOid, byte[] encodedQ) 
-			throws InvalidKeySpecException
-	{
-		ECNamedCurveParameterSpec spec = ECNamedCurveTable.getParameterSpec(curveOid);
-		ECPoint q = spec.getCurve().decodePoint(encodedQ);
-		ECPublicKeySpec keySpec = new ECPublicKeySpec(q, spec);
-		
-		KeyFactory kf = getKeyFactory("EC");
-		synchronized (kf) {
-			return (ECPublicKey) kf.generatePublic(keySpec);
-		}
-	}
+        if(publicExponent == null)
+        {
+            publicExponent = RSAKeyGenParameterSpec.F4;
+        }
+        AlgorithmParameterSpec params = new RSAKeyGenParameterSpec(keySize,    publicExponent);
+        kpGen.initialize(params);
+        return kpGen.generateKeyPair();
+    }
 
-	public static AsymmetricKeyParameter generatePrivateKeyParameter(
+    public static KeyPair generateECKeypair(ASN1ObjectIdentifier curveId, char[] password)
+            throws Exception
+    {
+        KeyPairGenerator kpGen = KeyPairGenerator.getInstance("ECDSA", "BC");
+        ECNamedCurveParameterSpec spec = ECNamedCurveTable.getParameterSpec(curveId.getId());
+        kpGen.initialize(spec);
+        return kpGen.generateKeyPair();
+    }
+
+    private static KeyFactory getKeyFactory(String algorithm)
+            throws InvalidKeySpecException
+    {
+        synchronized (keyFactories) {
+            KeyFactory kf = keyFactories.get(algorithm);
+            if(kf == null)
+            {
+                try {
+                    kf = KeyFactory.getInstance(algorithm, "BC");
+                } catch (NoSuchAlgorithmException e) {
+                    throw new InvalidKeySpecException("Could not find KeyFactory for " + algorithm + ": " + e.getMessage());
+                } catch (NoSuchProviderException e) {
+                    throw new InvalidKeySpecException("Could not find KeyFactory for " + algorithm + ": " + e.getMessage());
+                }
+                keyFactories.put(algorithm, kf);
+            }
+
+            return kf;
+        }
+    }
+
+    public static PublicKey generatePublicKey(SubjectPublicKeyInfo pkInfo)
+            throws IOException, NoSuchAlgorithmException, InvalidKeySpecException
+    {
+        X509EncodedKeySpec keyspec = new X509EncodedKeySpec(pkInfo.getEncoded());
+        ASN1ObjectIdentifier aid = pkInfo.getAlgorithm().getAlgorithm();
+
+        KeyFactory kf;
+        if(PKCSObjectIdentifiers.rsaEncryption.equals(aid))
+        {
+            kf = KeyFactory.getInstance("RSA");
+        }
+        else if(X9ObjectIdentifiers.id_ecPublicKey.equals(aid))
+        {
+            kf = KeyFactory.getInstance("ECDSA");
+        }
+        else
+        {
+            throw new InvalidKeySpecException("unsupported key algorithm: " + aid);
+        }
+
+        return kf.generatePublic(keyspec);
+    }
+
+    public static RSAPublicKey generateRSAPublicKey(BigInteger modulus, BigInteger publicExponent)
+            throws InvalidKeySpecException
+    {
+        RSAPublicKeySpec keySpec = new RSAPublicKeySpec(modulus, publicExponent);
+        KeyFactory kf = getKeyFactory("RSA");
+        synchronized (kf) {
+            return (RSAPublicKey) kf.generatePublic(keySpec);
+        }
+    }
+
+    public static ECPublicKey generateECPublicKey(String curveOid, byte[] encodedQ)
+            throws InvalidKeySpecException
+    {
+        ECNamedCurveParameterSpec spec = ECNamedCurveTable.getParameterSpec(curveOid);
+        ECPoint q = spec.getCurve().decodePoint(encodedQ);
+        ECPublicKeySpec keySpec = new ECPublicKeySpec(q, spec);
+
+        KeyFactory kf = getKeyFactory("EC");
+        synchronized (kf) {
+            return (ECPublicKey) kf.generatePublic(keySpec);
+        }
+    }
+
+    public static AsymmetricKeyParameter generatePrivateKeyParameter(
             PrivateKey key)
     throws InvalidKeyException
     {
@@ -278,104 +278,104 @@ public class KeyUtil {
         }
         else if(key instanceof ECPrivateKey)
         {
-        	return ECUtil.generatePrivateKeyParameter(key);
+            return ECUtil.generatePrivateKeyParameter(key);
         }
         else if(key instanceof DSAPrivateKey)
         {
-       		return DSAUtil.generatePrivateKeyParameter(key);
+               return DSAUtil.generatePrivateKeyParameter(key);
         }
         else
-        {       	
-			throw new InvalidKeyException("unknown key " + key.getClass().getName());
+        {
+            throw new InvalidKeyException("unknown key " + key.getClass().getName());
         }
-    }    
-    
+    }
+
     public static AsymmetricKeyParameter generatePublicKeyParameter(
             PublicKey key)
     throws InvalidKeyException
     {
         if (key instanceof RSAPublicKey)
         {
-        	RSAPublicKey k = (RSAPublicKey)key;
+            RSAPublicKey k = (RSAPublicKey)key;
             return new RSAKeyParameters(false, k.getModulus(), k.getPublicExponent());
         }
         else if(key instanceof ECPublicKey)
         {
-        	return ECUtil.generatePublicKeyParameter(key);
+            return ECUtil.generatePublicKeyParameter(key);
         }
         else if(key instanceof DSAPublicKey)
         {
-       		return DSAUtil.generatePublicKeyParameter(key);
+               return DSAUtil.generatePublicKeyParameter(key);
         }
         else
-        {       	
-			throw new InvalidKeyException("unknown key " + key.getClass().getName());
+        {
+            throw new InvalidKeyException("unknown key " + key.getClass().getName());
         }
     }
 
-	public static byte[] generateSelfSignedRSAKeyStore(
-			BigInteger serial,
-			String subject,
-			String keystoreType, char[] password, String keyLabel, 
-			int keysize, BigInteger publicExponent)
-	throws SignerException
-	{
-		final String provider = "BC";
-		
-		try{
-			X500Name subjectDN = new X500Name(subject);
-			KeyPair keypair = KeyUtil.generateRSAKeypair(keysize, publicExponent);
-			SubjectPublicKeyInfo pkInfo = SubjectPublicKeyInfoFactory.createSubjectPublicKeyInfo(
-					KeyUtil.generatePublicKeyParameter(keypair.getPublic()));
-			
-			KeyStore ks = KeyStore.getInstance(keystoreType, provider);
-			ks.load(null, password);
-			
-			Date dummyNotBefore = new Date();
-			Date dummyNotAfter = new Date(dummyNotBefore.getTime() + 3650L*24*3600*1000);
-			X509v3CertificateBuilder certBuilder = new X509v3CertificateBuilder(
-					subjectDN, serial, dummyNotBefore, dummyNotAfter, subjectDN,
-					pkInfo);
-	        X509KeyUsage ku = new X509KeyUsage(
-	       		 X509KeyUsage.nonRepudiation + X509KeyUsage.digitalSignature +
-	       		 X509KeyUsage.keyCertSign + X509KeyUsage.cRLSign);
-	        certBuilder.addExtension(
-	       		 X509Extension.keyUsage, true, ku);
-			
-			SoftTokenContentSignerBuilder signerBuilder = new SoftTokenContentSignerBuilder(
-					keypair.getPrivate());
-			
-			ConcurrentContentSigner concurrentSigner = signerBuilder.createSigner(
-					new AlgorithmIdentifier(PKCSObjectIdentifiers.sha256WithRSAEncryption, DERNull.INSTANCE), 1);
-			
-			ContentSigner signer = concurrentSigner.borrowContentSigner();
-			X509CertificateObject cert;
-			try{
-				cert = new X509CertificateObject(
-					certBuilder.build(signer).toASN1Structure());
-			}finally
-			{
-				concurrentSigner.returnContentSigner(signer);
-			}
-			
-			if(keyLabel == null)
-			{
-				keyLabel = "main";
-			}
-			
-			ks.setKeyEntry(keyLabel, keypair.getPrivate(), password, new Certificate[]{cert});
-			ByteArrayOutputStream out = new ByteArrayOutputStream();
-			ks.store(out, password);
-			out.flush();
-			
-			return out.toByteArray();
-		}catch(SignerException e)
-		{
-			throw e;
-		}catch(Exception e)
-		{
-			throw new SignerException(e);
-		}
-	}
+    public static byte[] generateSelfSignedRSAKeyStore(
+            BigInteger serial,
+            String subject,
+            String keystoreType, char[] password, String keyLabel,
+            int keysize, BigInteger publicExponent)
+    throws SignerException
+    {
+        final String provider = "BC";
+
+        try{
+            X500Name subjectDN = new X500Name(subject);
+            KeyPair keypair = KeyUtil.generateRSAKeypair(keysize, publicExponent);
+            SubjectPublicKeyInfo pkInfo = SubjectPublicKeyInfoFactory.createSubjectPublicKeyInfo(
+                    KeyUtil.generatePublicKeyParameter(keypair.getPublic()));
+
+            KeyStore ks = KeyStore.getInstance(keystoreType, provider);
+            ks.load(null, password);
+
+            Date dummyNotBefore = new Date();
+            Date dummyNotAfter = new Date(dummyNotBefore.getTime() + 3650L*24*3600*1000);
+            X509v3CertificateBuilder certBuilder = new X509v3CertificateBuilder(
+                    subjectDN, serial, dummyNotBefore, dummyNotAfter, subjectDN,
+                    pkInfo);
+            X509KeyUsage ku = new X509KeyUsage(
+                    X509KeyUsage.nonRepudiation + X509KeyUsage.digitalSignature +
+                    X509KeyUsage.keyCertSign + X509KeyUsage.cRLSign);
+            certBuilder.addExtension(
+                    X509Extension.keyUsage, true, ku);
+
+            SoftTokenContentSignerBuilder signerBuilder = new SoftTokenContentSignerBuilder(
+                    keypair.getPrivate());
+
+            ConcurrentContentSigner concurrentSigner = signerBuilder.createSigner(
+                    new AlgorithmIdentifier(PKCSObjectIdentifiers.sha256WithRSAEncryption, DERNull.INSTANCE), 1);
+
+            ContentSigner signer = concurrentSigner.borrowContentSigner();
+            X509CertificateObject cert;
+            try{
+                cert = new X509CertificateObject(
+                    certBuilder.build(signer).toASN1Structure());
+            }finally
+            {
+                concurrentSigner.returnContentSigner(signer);
+            }
+
+            if(keyLabel == null)
+            {
+                keyLabel = "main";
+            }
+
+            ks.setKeyEntry(keyLabel, keypair.getPrivate(), password, new Certificate[]{cert});
+            ByteArrayOutputStream out = new ByteArrayOutputStream();
+            ks.store(out, password);
+            out.flush();
+
+            return out.toByteArray();
+        }catch(SignerException e)
+        {
+            throw e;
+        }catch(Exception e)
+        {
+            throw new SignerException(e);
+        }
+    }
 
 }

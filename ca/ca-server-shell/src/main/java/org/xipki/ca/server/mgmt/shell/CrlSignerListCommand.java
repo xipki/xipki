@@ -26,34 +26,34 @@ import org.xipki.ca.server.mgmt.CrlSignerEntry;
 @Command(scope = "ca", name = "crlsigner-list", description="List CRL signers")
 public class CrlSignerListCommand extends CaCommand {
 
-	@Option(name = "-name",
+    @Option(name = "-name",
             description = "CRL signer name",
             required = false, multiValued = false)
-	protected String name;
+    protected String name;
 
     @Override
     protected Object doExecute() throws Exception {
-		StringBuilder sb = new StringBuilder();
-		
-		if(name == null)
-		{
-			Set<String> names = caManager.getCrlSignerNames();			
-			int n = names.size();
-			
-			sb.append(n + " CRL signers are configured:\n");		
-			for(String paramName : names)
-			{
-				sb.append("\t").append(paramName).append("\n");
-			}
-		}
-		else
-		{
-			CrlSignerEntry entry = caManager.getCrlSigner(name);
-			sb.append(entry.toString());
-		}
-		
-		System.out.println(sb.toString());
-		
+        StringBuilder sb = new StringBuilder();
+
+        if(name == null)
+        {
+            Set<String> names = caManager.getCrlSignerNames();
+            int n = names.size();
+
+            sb.append(n + " CRL signers are configured:\n");
+            for(String paramName : names)
+            {
+                sb.append("\t").append(paramName).append("\n");
+            }
+        }
+        else
+        {
+            CrlSignerEntry entry = caManager.getCrlSigner(name);
+            sb.append(entry.toString());
+        }
+
+        System.out.println(sb.toString());
+
         return null;
     }
 }

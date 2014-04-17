@@ -84,44 +84,44 @@ public class SignerUtil
     }
 
     static public PSSSigner createPSSRSASigner(AlgorithmIdentifier sigAlgId)
-    		throws OperatorCreationException
+            throws OperatorCreationException
     {
-    	return createPSSRSASigner(sigAlgId, null);
+        return createPSSRSASigner(sigAlgId, null);
     }
-    
+
     static public PSSSigner createPSSRSASigner(AlgorithmIdentifier sigAlgId, AsymmetricBlockCipher cipher)
-    		throws OperatorCreationException
+            throws OperatorCreationException
     {
-		if(PKCSObjectIdentifiers.id_RSASSA_PSS.equals(sigAlgId.getAlgorithm()) == false)
-		{
-			throw new OperatorCreationException("Signature algorithm " + sigAlgId.getAlgorithm() + " is not allowed");
-		}
-		
-    	BcDigestProvider digestProvider = BcDefaultDigestProvider.INSTANCE;
-    	AlgorithmIdentifier digAlgId;
-		try {
-			digAlgId = SignerUtil.extractDigesetAlgorithmIdentifier(sigAlgId);
-		} catch (NoSuchAlgorithmException e) {
-			throw new OperatorCreationException(e.getMessage(), e);
-		}
-    	Digest dig = digestProvider.get(digAlgId);
-		if(cipher == null)
-		{
-			cipher = new RSABlindedEngine();
-		}
-		
-		RSASSAPSSparams param = RSASSAPSSparams.getInstance(sigAlgId.getParameters());
-		
-		AlgorithmIdentifier mfgDigAlgId = AlgorithmIdentifier.getInstance(
-				param.getMaskGenAlgorithm().getParameters());
-		Digest mfgDig = digestProvider.get(mfgDigAlgId);
-		
-		int saltSize = param.getSaltLength().intValue();
-		int trailerField = param.getTrailerField().intValue();
-		
-		return new PSSSigner(cipher, dig, mfgDig, saltSize, getTrailer(trailerField));
+        if(PKCSObjectIdentifiers.id_RSASSA_PSS.equals(sigAlgId.getAlgorithm()) == false)
+        {
+            throw new OperatorCreationException("Signature algorithm " + sigAlgId.getAlgorithm() + " is not allowed");
+        }
+
+        BcDigestProvider digestProvider = BcDefaultDigestProvider.INSTANCE;
+        AlgorithmIdentifier digAlgId;
+        try {
+            digAlgId = SignerUtil.extractDigesetAlgorithmIdentifier(sigAlgId);
+        } catch (NoSuchAlgorithmException e) {
+            throw new OperatorCreationException(e.getMessage(), e);
+        }
+        Digest dig = digestProvider.get(digAlgId);
+        if(cipher == null)
+        {
+            cipher = new RSABlindedEngine();
+        }
+
+        RSASSAPSSparams param = RSASSAPSSparams.getInstance(sigAlgId.getParameters());
+
+        AlgorithmIdentifier mfgDigAlgId = AlgorithmIdentifier.getInstance(
+                param.getMaskGenAlgorithm().getParameters());
+        Digest mfgDig = digestProvider.get(mfgDigAlgId);
+
+        int saltSize = param.getSaltLength().intValue();
+        int trailerField = param.getTrailerField().intValue();
+
+        return new PSSSigner(cipher, dig, mfgDig, saltSize, getTrailer(trailerField));
     }
-    
+
     static private byte getTrailer(
             int trailerField)
     {
@@ -129,210 +129,210 @@ public class SignerUtil
         {
             return org.bouncycastle.crypto.signers.PSSSigner.TRAILER_IMPLICIT;
         }
-        
+
         throw new IllegalArgumentException("unknown trailer field");
     }
 
-    static public RSASSAPSSparams createPSSRSAParams(ASN1ObjectIdentifier digestAlgOID) 
-    		throws NoSuchAlgorithmException 
-    {	
-		int saltSize;
-		if(X509ObjectIdentifiers.id_SHA1.equals(digestAlgOID))
-		{
-			saltSize = 20;
-		}
-		else if(NISTObjectIdentifiers.id_sha224.equals(digestAlgOID))
-		{
-			saltSize = 28;
-		}
-		else if(NISTObjectIdentifiers.id_sha256.equals(digestAlgOID))
-		{
-			saltSize = 32;
-		}
-		else if(NISTObjectIdentifiers.id_sha384.equals(digestAlgOID))
-		{
-			saltSize = 48;
-		}
-		else if(NISTObjectIdentifiers.id_sha512.equals(digestAlgOID))
-		{
-			saltSize = 64;
-		}
-		else
-		{
-			throw new NoSuchAlgorithmException(
-					"Unknown digest algorithm " + digestAlgOID);
-		}
-    	
-		AlgorithmIdentifier digAlgId = new AlgorithmIdentifier(digestAlgOID, DERNull.INSTANCE);
+    static public RSASSAPSSparams createPSSRSAParams(ASN1ObjectIdentifier digestAlgOID)
+            throws NoSuchAlgorithmException
+    {
+        int saltSize;
+        if(X509ObjectIdentifiers.id_SHA1.equals(digestAlgOID))
+        {
+            saltSize = 20;
+        }
+        else if(NISTObjectIdentifiers.id_sha224.equals(digestAlgOID))
+        {
+            saltSize = 28;
+        }
+        else if(NISTObjectIdentifiers.id_sha256.equals(digestAlgOID))
+        {
+            saltSize = 32;
+        }
+        else if(NISTObjectIdentifiers.id_sha384.equals(digestAlgOID))
+        {
+            saltSize = 48;
+        }
+        else if(NISTObjectIdentifiers.id_sha512.equals(digestAlgOID))
+        {
+            saltSize = 64;
+        }
+        else
+        {
+            throw new NoSuchAlgorithmException(
+                    "Unknown digest algorithm " + digestAlgOID);
+        }
+
+        AlgorithmIdentifier digAlgId = new AlgorithmIdentifier(digestAlgOID, DERNull.INSTANCE);
         return new RSASSAPSSparams(
-        	digAlgId,
+            digAlgId,
             new AlgorithmIdentifier(PKCSObjectIdentifiers.id_mgf1, digAlgId),
             new ASN1Integer(saltSize),
             RSASSAPSSparams.DEFAULT_TRAILER_FIELD);
     }
-    
-	static public AlgorithmIdentifier buildRSAPSSAlgorithmIdentifier(
-			ASN1ObjectIdentifier digAlgOid)
-	throws NoSuchAlgorithmException
-	{		
-		RSASSAPSSparams params = createPSSRSAParams(digAlgOid);
-		return new AlgorithmIdentifier(PKCSObjectIdentifiers.id_RSASSA_PSS, params);
-	}
 
-	static public AlgorithmIdentifier buildDSASigAlgorithmIdentifier(AlgorithmIdentifier digAlgId)
-	throws NoSuchAlgorithmException
-	{
-		ASN1ObjectIdentifier digAlgOid = digAlgId.getAlgorithm();
-		ASN1ObjectIdentifier sid;
-		if(X509ObjectIdentifiers.id_SHA1.equals(digAlgOid))
-		{
-			sid = X9ObjectIdentifiers.id_dsa_with_sha1;
-		}
-		else if(NISTObjectIdentifiers.id_sha224.equals(digAlgOid))
-		{
-			sid = NISTObjectIdentifiers.dsa_with_sha224;
-		}
-		else if(NISTObjectIdentifiers.id_sha256.equals(digAlgOid))
-		{
-			sid = NISTObjectIdentifiers.dsa_with_sha256;
-		}
-		else if(NISTObjectIdentifiers.id_sha384.equals(digAlgOid))
-		{
-			sid = NISTObjectIdentifiers.dsa_with_sha384;
-		}
-		else if(NISTObjectIdentifiers.id_sha512.equals(digAlgOid))
-		{
-			sid = NISTObjectIdentifiers.dsa_with_sha512;
-		}
-		else
-		{
-			throw new NoSuchAlgorithmException("No signature algorithm for DSA with digest algorithm " + digAlgOid.getId());
-		}
-		return new AlgorithmIdentifier(sid, DERNull.INSTANCE);
-	}
-	
-	static public AlgorithmIdentifier extractDigesetAlgorithmIdentifier(AlgorithmIdentifier sigAlgId)
-	throws NoSuchAlgorithmException
-	{
-		ASN1ObjectIdentifier algOid = sigAlgId.getAlgorithm();
-		
-		ASN1ObjectIdentifier digestAlgOid;
-		if(X9ObjectIdentifiers.ecdsa_with_SHA1.equals(algOid))
-		{
-			digestAlgOid = X509ObjectIdentifiers.id_SHA1;
-		}
-		else if(X9ObjectIdentifiers.ecdsa_with_SHA224.equals(algOid))
-		{
-			digestAlgOid = NISTObjectIdentifiers.id_sha224;
-		}
-		else if(X9ObjectIdentifiers.ecdsa_with_SHA256.equals(algOid))
-		{
-			digestAlgOid = NISTObjectIdentifiers.id_sha256;
-		}
-		else if(X9ObjectIdentifiers.ecdsa_with_SHA384.equals(algOid))
-		{
-			digestAlgOid = NISTObjectIdentifiers.id_sha384;
-		}
-		else if(X9ObjectIdentifiers.ecdsa_with_SHA512.equals(algOid))
-		{
-			digestAlgOid = NISTObjectIdentifiers.id_sha512;
-		}
-		else if(PKCSObjectIdentifiers.sha1WithRSAEncryption.equals(algOid))
-		{
-			digestAlgOid = X509ObjectIdentifiers.id_SHA1;
-		}
-		else if(PKCSObjectIdentifiers.sha224WithRSAEncryption.equals(algOid))
-		{
-			digestAlgOid = NISTObjectIdentifiers.id_sha224;
-		}
-		else if(PKCSObjectIdentifiers.sha256WithRSAEncryption.equals(algOid))
-		{
-			digestAlgOid = NISTObjectIdentifiers.id_sha256;
-		}
-		else if(PKCSObjectIdentifiers.sha384WithRSAEncryption.equals(algOid))
-		{
-			digestAlgOid = NISTObjectIdentifiers.id_sha384;
-		}
-		else if(PKCSObjectIdentifiers.sha512WithRSAEncryption.equals(algOid))
-		{
-			digestAlgOid = NISTObjectIdentifiers.id_sha512;
-		}
-		else if(PKCSObjectIdentifiers.id_RSASSA_PSS.equals(algOid))
-    	{
-			ASN1Encodable asn1Encodable = sigAlgId.getParameters();
-    		RSASSAPSSparams param = RSASSAPSSparams.getInstance(asn1Encodable);    		
-    		digestAlgOid = param.getHashAlgorithm().getAlgorithm();
-    	}
-		else
-		{
-			throw new NoSuchAlgorithmException("Unknown signature algorithm" + algOid.getId());
-		}
-		
-		return new AlgorithmIdentifier(digestAlgOid, DERNull.INSTANCE);
-	}
+    static public AlgorithmIdentifier buildRSAPSSAlgorithmIdentifier(
+            ASN1ObjectIdentifier digAlgOid)
+    throws NoSuchAlgorithmException
+    {
+        RSASSAPSSparams params = createPSSRSAParams(digAlgOid);
+        return new AlgorithmIdentifier(PKCSObjectIdentifiers.id_RSASSA_PSS, params);
+    }
+
+    static public AlgorithmIdentifier buildDSASigAlgorithmIdentifier(AlgorithmIdentifier digAlgId)
+    throws NoSuchAlgorithmException
+    {
+        ASN1ObjectIdentifier digAlgOid = digAlgId.getAlgorithm();
+        ASN1ObjectIdentifier sid;
+        if(X509ObjectIdentifiers.id_SHA1.equals(digAlgOid))
+        {
+            sid = X9ObjectIdentifiers.id_dsa_with_sha1;
+        }
+        else if(NISTObjectIdentifiers.id_sha224.equals(digAlgOid))
+        {
+            sid = NISTObjectIdentifiers.dsa_with_sha224;
+        }
+        else if(NISTObjectIdentifiers.id_sha256.equals(digAlgOid))
+        {
+            sid = NISTObjectIdentifiers.dsa_with_sha256;
+        }
+        else if(NISTObjectIdentifiers.id_sha384.equals(digAlgOid))
+        {
+            sid = NISTObjectIdentifiers.dsa_with_sha384;
+        }
+        else if(NISTObjectIdentifiers.id_sha512.equals(digAlgOid))
+        {
+            sid = NISTObjectIdentifiers.dsa_with_sha512;
+        }
+        else
+        {
+            throw new NoSuchAlgorithmException("No signature algorithm for DSA with digest algorithm " + digAlgOid.getId());
+        }
+        return new AlgorithmIdentifier(sid, DERNull.INSTANCE);
+    }
+
+    static public AlgorithmIdentifier extractDigesetAlgorithmIdentifier(AlgorithmIdentifier sigAlgId)
+    throws NoSuchAlgorithmException
+    {
+        ASN1ObjectIdentifier algOid = sigAlgId.getAlgorithm();
+
+        ASN1ObjectIdentifier digestAlgOid;
+        if(X9ObjectIdentifiers.ecdsa_with_SHA1.equals(algOid))
+        {
+            digestAlgOid = X509ObjectIdentifiers.id_SHA1;
+        }
+        else if(X9ObjectIdentifiers.ecdsa_with_SHA224.equals(algOid))
+        {
+            digestAlgOid = NISTObjectIdentifiers.id_sha224;
+        }
+        else if(X9ObjectIdentifiers.ecdsa_with_SHA256.equals(algOid))
+        {
+            digestAlgOid = NISTObjectIdentifiers.id_sha256;
+        }
+        else if(X9ObjectIdentifiers.ecdsa_with_SHA384.equals(algOid))
+        {
+            digestAlgOid = NISTObjectIdentifiers.id_sha384;
+        }
+        else if(X9ObjectIdentifiers.ecdsa_with_SHA512.equals(algOid))
+        {
+            digestAlgOid = NISTObjectIdentifiers.id_sha512;
+        }
+        else if(PKCSObjectIdentifiers.sha1WithRSAEncryption.equals(algOid))
+        {
+            digestAlgOid = X509ObjectIdentifiers.id_SHA1;
+        }
+        else if(PKCSObjectIdentifiers.sha224WithRSAEncryption.equals(algOid))
+        {
+            digestAlgOid = NISTObjectIdentifiers.id_sha224;
+        }
+        else if(PKCSObjectIdentifiers.sha256WithRSAEncryption.equals(algOid))
+        {
+            digestAlgOid = NISTObjectIdentifiers.id_sha256;
+        }
+        else if(PKCSObjectIdentifiers.sha384WithRSAEncryption.equals(algOid))
+        {
+            digestAlgOid = NISTObjectIdentifiers.id_sha384;
+        }
+        else if(PKCSObjectIdentifiers.sha512WithRSAEncryption.equals(algOid))
+        {
+            digestAlgOid = NISTObjectIdentifiers.id_sha512;
+        }
+        else if(PKCSObjectIdentifiers.id_RSASSA_PSS.equals(algOid))
+        {
+            ASN1Encodable asn1Encodable = sigAlgId.getParameters();
+            RSASSAPSSparams param = RSASSAPSSparams.getInstance(asn1Encodable);
+            digestAlgOid = param.getHashAlgorithm().getAlgorithm();
+        }
+        else
+        {
+            throw new NoSuchAlgorithmException("Unknown signature algorithm" + algOid.getId());
+        }
+
+        return new AlgorithmIdentifier(digestAlgOid, DERNull.INSTANCE);
+    }
 
 
-	public static  boolean verifyPOP(CertificationRequest p10Request)
-	{
-		PKCS10CertificationRequest p10Req = new PKCS10CertificationRequest(p10Request);
-		return verifyPOP(p10Req);
-	}
-		
-	public static  boolean verifyPOP(PKCS10CertificationRequest p10Request)
-	{
-		try {
-			SubjectPublicKeyInfo pkInfo = p10Request.getSubjectPublicKeyInfo();
-			PublicKey pk = KeyUtil.generatePublicKey(pkInfo);
-			
-			ContentVerifierProvider cvp = KeyUtil.getContentVerifierProvider(pk);
-			return p10Request.isSignatureValid(cvp);
-		} catch (OperatorCreationException e) {
-			return false;
-		} catch (InvalidKeyException e) {
-			return false;
-		} catch (PKCSException e) {
-			return false;
-		} catch (NoSuchAlgorithmException e) {
-			return false;
-		} catch (InvalidKeySpecException e) {
-			return false;
-		} catch (IOException e) {
-			return false;
-		}
-	}
-	
-	public static byte[] leftmost(byte[] bytes, int bitCount)
-	{
-	    int byteLenKey = (bitCount + 7)/8;
-	    
-	    if (bitCount >= (bytes.length<<3))
-	    {
-	    	return bytes;
-	    }
-	    
+    public static  boolean verifyPOP(CertificationRequest p10Request)
+    {
+        PKCS10CertificationRequest p10Req = new PKCS10CertificationRequest(p10Request);
+        return verifyPOP(p10Req);
+    }
+
+    public static  boolean verifyPOP(PKCS10CertificationRequest p10Request)
+    {
+        try {
+            SubjectPublicKeyInfo pkInfo = p10Request.getSubjectPublicKeyInfo();
+            PublicKey pk = KeyUtil.generatePublicKey(pkInfo);
+
+            ContentVerifierProvider cvp = KeyUtil.getContentVerifierProvider(pk);
+            return p10Request.isSignatureValid(cvp);
+        } catch (OperatorCreationException e) {
+            return false;
+        } catch (InvalidKeyException e) {
+            return false;
+        } catch (PKCSException e) {
+            return false;
+        } catch (NoSuchAlgorithmException e) {
+            return false;
+        } catch (InvalidKeySpecException e) {
+            return false;
+        } catch (IOException e) {
+            return false;
+        }
+    }
+
+    public static byte[] leftmost(byte[] bytes, int bitCount)
+    {
+        int byteLenKey = (bitCount + 7)/8;
+
+        if (bitCount >= (bytes.length<<3))
+        {
+            return bytes;
+        }
+
         byte[] truncatedBytes = new byte[byteLenKey];
         System.arraycopy(bytes, 0, truncatedBytes, 0, byteLenKey);
-        
+
         if (bitCount%8 > 0) // shift the bits to the right
         {
             int shiftBits = 8-(bitCount%8);
-            
+
             for(int i = byteLenKey - 1; i > 0; i--)
             {
                 truncatedBytes[i] = (byte) (
-                		(byte2int(truncatedBytes[i]) >>> shiftBits) |
-                		((byte2int(truncatedBytes[i-1]) << (8-shiftBits)) & 0xFF));
+                        (byte2int(truncatedBytes[i]) >>> shiftBits) |
+                        ((byte2int(truncatedBytes[i-1]) << (8-shiftBits)) & 0xFF));
             }
             truncatedBytes[0] = (byte)(byte2int(truncatedBytes[0])>>>shiftBits);
         }
-        
+
         return truncatedBytes;
-	}
-	
-	private static int byte2int(byte b)
-	{
-		return b >= 0 ? b : 256 + b;
-	}
+    }
+
+    private static int byte2int(byte b)
+    {
+        return b >= 0 ? b : 256 + b;
+    }
 
 }
 

@@ -21,26 +21,26 @@ import org.bouncycastle.asn1.pkcs.CertificationRequest;
 
 public class P10EnrollCertRequestType extends IdentifiedObject
 {
-	private final String certProfile;
-	private final CertificationRequest p10Req;
-	
-	public P10EnrollCertRequestType(String id, String certProfile, CertificationRequest p10Req)
-	{
-		super(id);
-		if(p10Req == null)
-			throw new IllegalArgumentException("p10Req is null");
-				
-		this.certProfile = certProfile;
+    private final String certProfile;
+    private final CertificationRequest p10Req;
 
-		this.p10Req = p10Req;
-	}	
-	
-	public CertificationRequest getP10Req()
-	{
-		return p10Req;
-	}	
-	
-	public String getCertProfile() {
-		return certProfile;
-	}
+    public P10EnrollCertRequestType(String id, String certProfile, CertificationRequest p10Req)
+    {
+        super(id);
+        if(p10Req == null)
+            throw new IllegalArgumentException("p10Req is null");
+
+        this.certProfile = certProfile;
+
+        this.p10Req = p10Req;
+    }
+
+    public CertificationRequest getP10Req()
+    {
+        return p10Req;
+    }
+
+    public String getCertProfile() {
+        return certProfile;
+    }
 }

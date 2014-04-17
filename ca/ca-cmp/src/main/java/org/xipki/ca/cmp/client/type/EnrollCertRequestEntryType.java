@@ -23,41 +23,41 @@ import org.xipki.security.common.ParamChecker;
 
 public class EnrollCertRequestEntryType extends IdentifiedObject
 {
-	private String origCertProfile;
-	private final String certProfile;
-	
-	private final CertRequest certReq;
-	private final ProofOfPossession popo;
-	
-	public EnrollCertRequestEntryType(String id, String certProfile, 
-			CertRequest certReq, ProofOfPossession popo)
-	{
-		super(id);
-		ParamChecker.assertNotNull("certReq", certReq);
-		
-		this.certProfile = certProfile;
-		this.certReq = certReq;
-		this.popo = popo;
-	}
-		
-	public String getCertProfile() {
-		return certProfile;
-	}
+    private String origCertProfile;
+    private final String certProfile;
 
-	public CertRequest getCertReq() {
-		return certReq;
-	}
+    private final CertRequest certReq;
+    private final ProofOfPossession popo;
 
-	public ProofOfPossession getPopo() {
-		return popo;
-	}
+    public EnrollCertRequestEntryType(String id, String certProfile,
+            CertRequest certReq, ProofOfPossession popo)
+    {
+        super(id);
+        ParamChecker.assertNotNull("certReq", certReq);
 
-	public String getOrigCertProfile() {
-		return origCertProfile;
-	}
+        this.certProfile = certProfile;
+        this.certReq = certReq;
+        this.popo = popo;
+    }
 
-	public void setOrigCertProfile(String origCertProfile) {
-		this.origCertProfile = origCertProfile;
-	}	
-	
+    public String getCertProfile() {
+        return certProfile;
+    }
+
+    public CertRequest getCertReq() {
+        return certReq;
+    }
+
+    public ProofOfPossession getPopo() {
+        return popo;
+    }
+
+    public String getOrigCertProfile() {
+        return origCertProfile;
+    }
+
+    public void setOrigCertProfile(String origCertProfile) {
+        this.origCertProfile = origCertProfile;
+    }
+
 }

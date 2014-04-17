@@ -25,47 +25,47 @@ import org.xipki.security.common.ParamChecker;
 
 public class EnrollCertResultType implements CmpResultType
 {
-	private List<CMPCertificate> cACertificates;
-	private List<ResultEntryType> resultEntries;
-	
-	public EnrollCertResultType()
-	{
-	}
-	
-	public void addCACertificate(CMPCertificate cACertificate)
-	{
-		if(cACertificates == null)
-		{
-			cACertificates = new ArrayList<CMPCertificate>(1);
-		}
-		cACertificates.add(cACertificate);
-	}
-	
-	public void addResultEntry(ResultEntryType resultEntry)
-	{
-		ParamChecker.assertNotNull("resultEntry", resultEntry);
+    private List<CMPCertificate> cACertificates;
+    private List<ResultEntryType> resultEntries;
 
-		if(!(resultEntry instanceof EnrollCertResultEntryType || resultEntry instanceof ErrorResultEntryType))
-		{
-			throw new IllegalArgumentException("Unaccepted parameter of class " + resultEntry.getClass().getCanonicalName());
-		}
-		
-		if(resultEntries == null)
-		{
-			resultEntries = new ArrayList<ResultEntryType>(1);
-		}
-		
-		resultEntries.add(resultEntry);
-	}
+    public EnrollCertResultType()
+    {
+    }
 
-	public List<CMPCertificate> getCACertificates()
-	{
-		return cACertificates;
-	}
+    public void addCACertificate(CMPCertificate cACertificate)
+    {
+        if(cACertificates == null)
+        {
+            cACertificates = new ArrayList<CMPCertificate>(1);
+        }
+        cACertificates.add(cACertificate);
+    }
 
-	public List<ResultEntryType> getResultEntries()
-	{
-		return resultEntries;
-	}
-	
+    public void addResultEntry(ResultEntryType resultEntry)
+    {
+        ParamChecker.assertNotNull("resultEntry", resultEntry);
+
+        if(!(resultEntry instanceof EnrollCertResultEntryType || resultEntry instanceof ErrorResultEntryType))
+        {
+            throw new IllegalArgumentException("Unaccepted parameter of class " + resultEntry.getClass().getCanonicalName());
+        }
+
+        if(resultEntries == null)
+        {
+            resultEntries = new ArrayList<ResultEntryType>(1);
+        }
+
+        resultEntries.add(resultEntry);
+    }
+
+    public List<CMPCertificate> getCACertificates()
+    {
+        return cACertificates;
+    }
+
+    public List<ResultEntryType> getResultEntries()
+    {
+        return resultEntries;
+    }
+
 }

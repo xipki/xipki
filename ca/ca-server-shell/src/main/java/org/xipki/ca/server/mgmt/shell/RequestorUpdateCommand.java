@@ -26,23 +26,23 @@ import org.xipki.security.common.IoCertUtil;
 
 @Command(scope = "ca", name = "requestor-update", description="Update requestor")
 public class RequestorUpdateCommand extends CaCommand {
-	@Option(name = "-name",
-        	description = "Required. Requestor name",
+    @Option(name = "-name",
+            description = "Required. Requestor name",
             required = true)
-	protected String            name;
-	
-	@Option(name = "-cert",
-	        description = "Required. Requestor certificate file",
-	        required = true)
-	protected String            certFile;
+    protected String            name;
 
-	@Override
-	protected Object doExecute() throws Exception {
-		// check if the certificate is valid
-		byte[] certBytes = IoCertUtil.read(certFile);
-		IoCertUtil.parseCert(new ByteArrayInputStream(certBytes));	
-		caManager.changeCmpRequestor(name, Base64.toBase64String(certBytes));
-		
-		return null;
-	}
+    @Option(name = "-cert",
+            description = "Required. Requestor certificate file",
+            required = true)
+    protected String            certFile;
+
+    @Override
+    protected Object doExecute() throws Exception {
+        // check if the certificate is valid
+        byte[] certBytes = IoCertUtil.read(certFile);
+        IoCertUtil.parseCert(new ByteArrayInputStream(certBytes));
+        caManager.changeCmpRequestor(name, Base64.toBase64String(certBytes));
+
+        return null;
+    }
 }

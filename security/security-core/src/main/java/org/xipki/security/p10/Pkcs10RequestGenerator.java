@@ -31,50 +31,50 @@ import org.xipki.security.api.SignerException;
 import org.xipki.security.common.IoCertUtil;
 
 public class Pkcs10RequestGenerator {
-	
-	public PKCS10CertificationRequest generateRequest(
-			SecurityFactory securityFactory,
-			String signerType, String signerConf,
-			SubjectPublicKeyInfo subjectPublicKeyInfo, 
-			String subject)
-	throws PasswordResolverException, SignerException
-	{
-		X500Name subjectDN = new X500Name(subject);
-		return generateRequest(securityFactory, signerType, signerConf, subjectPublicKeyInfo, subjectDN);
-	}
 
-	public PKCS10CertificationRequest generateRequest(
-			SecurityFactory securityFactory,
-			String signerType, String signerConf,
-			SubjectPublicKeyInfo subjectPublicKeyInfo,
-			X500Name subjectDN)
-	throws PasswordResolverException, SignerException
-	{
-		ConcurrentContentSigner signer =
-				securityFactory.createSigner(signerType, signerConf, null, NopPasswordResolver.INSTANCE);
-		ContentSigner contentSigner;
-		try {
-			contentSigner = signer.borrowContentSigner();
-		} catch (NoIdleSignerException e) {
-			throw new SignerException(e);
-		}
-		try{
-			return generateRequest(contentSigner, subjectPublicKeyInfo, subjectDN);
-		}finally
-		{
-			signer.returnContentSigner(contentSigner);
-		}		
-	}
-	
-	public PKCS10CertificationRequest generateRequest(
-			ContentSigner contentSigner,
-			SubjectPublicKeyInfo subjectPublicKeyInfo,
-			X500Name subjectDN)
-	{
-    	PKCS10CertificationRequestBuilder p10ReqBuilder = 
-    			new PKCS10CertificationRequestBuilder(subjectDN, subjectPublicKeyInfo);
-    	
-    	return p10ReqBuilder.build(contentSigner);    	
-	}
+    public PKCS10CertificationRequest generateRequest(
+            SecurityFactory securityFactory,
+            String signerType, String signerConf,
+            SubjectPublicKeyInfo subjectPublicKeyInfo,
+            String subject)
+    throws PasswordResolverException, SignerException
+    {
+        X500Name subjectDN = new X500Name(subject);
+        return generateRequest(securityFactory, signerType, signerConf, subjectPublicKeyInfo, subjectDN);
+    }
+
+    public PKCS10CertificationRequest generateRequest(
+            SecurityFactory securityFactory,
+            String signerType, String signerConf,
+            SubjectPublicKeyInfo subjectPublicKeyInfo,
+            X500Name subjectDN)
+    throws PasswordResolverException, SignerException
+    {
+        ConcurrentContentSigner signer =
+                securityFactory.createSigner(signerType, signerConf, null, NopPasswordResolver.INSTANCE);
+        ContentSigner contentSigner;
+        try {
+            contentSigner = signer.borrowContentSigner();
+        } catch (NoIdleSignerException e) {
+            throw new SignerException(e);
+        }
+        try{
+            return generateRequest(contentSigner, subjectPublicKeyInfo, subjectDN);
+        }finally
+        {
+            signer.returnContentSigner(contentSigner);
+        }
+    }
+
+    public PKCS10CertificationRequest generateRequest(
+            ContentSigner contentSigner,
+            SubjectPublicKeyInfo subjectPublicKeyInfo,
+            X500Name subjectDN)
+    {
+        PKCS10CertificationRequestBuilder p10ReqBuilder =
+                new PKCS10CertificationRequestBuilder(subjectDN, subjectPublicKeyInfo);
+
+        return p10ReqBuilder.build(contentSigner);
+    }
 
 }

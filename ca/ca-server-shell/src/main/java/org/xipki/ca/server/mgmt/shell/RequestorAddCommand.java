@@ -24,22 +24,22 @@ import org.xipki.security.common.IoCertUtil;
 
 @Command(scope = "ca", name = "requestor-add", description="Add requestor")
 public class RequestorAddCommand extends CaCommand {
-	@Option(name = "-name",
-        	description = "Required. Requestor name",
+    @Option(name = "-name",
+            description = "Required. Requestor name",
             required = true, multiValued = false)
-	protected String            name;
-	
-	@Option(name = "-cert",
-	        description = "Required. Requestor certificate file",
-	        required = true)
-	protected String            certFile;
+    protected String            name;
+
+    @Option(name = "-cert",
+            description = "Required. Requestor certificate file",
+            required = true)
+    protected String            certFile;
 
 @Override
 protected Object doExecute() throws Exception {
-	CmpRequestorEntry entry = new CmpRequestorEntry(name);			
-	entry.setCert(IoCertUtil.parseCert(certFile));
-	caManager.addCmpRequestor(entry);
-	
-	return null;
+    CmpRequestorEntry entry = new CmpRequestorEntry(name);
+    entry.setCert(IoCertUtil.parseCert(certFile));
+    caManager.addCmpRequestor(entry);
+
+    return null;
 }
 }

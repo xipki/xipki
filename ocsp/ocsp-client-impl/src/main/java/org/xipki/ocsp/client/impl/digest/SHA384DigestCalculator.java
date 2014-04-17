@@ -28,7 +28,7 @@ import org.bouncycastle.operator.DigestCalculator;
 
 public class SHA384DigestCalculator implements DigestCalculator
 {
-	
+
     private ByteArrayOutputStream bOut = new ByteArrayOutputStream();
 
     public AlgorithmIdentifier getAlgorithmIdentifier()

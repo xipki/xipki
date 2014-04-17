@@ -28,89 +28,89 @@ import org.xipki.security.common.IoCertUtil;
 
 @Command(scope = "ca", name = "crlsigner-add", description="Add CRL signer")
 public class CrlSignerAddCommand extends CaCommand {
-	@Option( name = "-name",
-	         description = "Required. CRL signer name",
-	         required = true, multiValued = false)
-	protected String            name;
+    @Option( name = "-name",
+             description = "Required. CRL signer name",
+             required = true, multiValued = false)
+    protected String            name;
 
-	@Option(name = "-signerType",
+    @Option(name = "-signerType",
             description = "Required. CRL signer type, use 'CA' to sign the CRL by the CA itself",
             required = true)
     protected String            signerType;
 
-	@Option(name = "-signerConf",
+    @Option(name = "-signerConf",
             description = "CRL signer configuration")
     protected String            signerConf;
 
-	@Option(name = "-cert",
+    @Option(name = "-cert",
             description = "CRL signer's certificate file")
     protected String            signerCertFile;
-	
-	@Option(name = "-period",
+
+    @Option(name = "-period",
             required=true, description = "Required. Interval in minutes of two CRLs, set to 0 to generate CRL on demand")
     protected Integer            period;
-	
-	@Option(name = "-overlap",
+
+    @Option(name = "-overlap",
             description = "Overlap of CRL")
     protected Integer            overlap;
-	
-	@Option(name = "-ewc", aliases = { "--enableWithCerts" },
+
+    @Option(name = "-ewc", aliases = { "--enableWithCerts" },
             description = "Certificates are contained in the CRL, the default is not")
     protected Boolean            enableWithCerts;
-	
-	@Option(name = "-dwc", aliases = { "--disableWithCerts" },
+
+    @Option(name = "-dwc", aliases = { "--disableWithCerts" },
             description = "Certificates are not contained in the CRL, the default is not")
     protected Boolean            disableWithCerts;
-	
-	private SecurityFactory securityFactory;
-	private PasswordResolver passwordResolver;
-   
+
+    private SecurityFactory securityFactory;
+    private PasswordResolver passwordResolver;
+
     @Override
     protected Object doExecute() throws Exception {
-    	CrlSignerEntry entry = new CrlSignerEntry(name);
+        CrlSignerEntry entry = new CrlSignerEntry(name);
 
-    	entry.setType(signerType);
-    	if("CA".equalsIgnoreCase(signerType) == false)
-    	{
-    		X509Certificate signerCert = null;
-        	if(signerCertFile != null)
-        	{
-        		signerCert = IoCertUtil.parseCert(signerCertFile);
-        		entry.setCertificate(signerCert);
-        	}
-        	// check whether we can initialize the signer
-    		securityFactory.createSigner(signerType, signerConf, signerCert, passwordResolver);
-    	}
-    	
-    	if(signerConf != null)
-    	{
-    		entry.setConf(signerConf);
-    	}
-    	
-    	entry.setPeriod(period);
-    	
-    	if(overlap != null)
-    	{
-    		entry.setOverlap(overlap);
-    	}
-    	
-    	if(enableWithCerts != null && disableWithCerts != null )
-    	{
-    		System.err.println("Containing certificates in CRL could not be enabled and disabled at the same time");
-    	}
-    	boolean withCerts = isEnabled(enableWithCerts, disableWithCerts, false);    			
-    	entry.setIncludeCertsInCrl(withCerts);
-    	caManager.addCrlSigner(entry);
-    	
-    	return null;
+        entry.setType(signerType);
+        if("CA".equalsIgnoreCase(signerType) == false)
+        {
+            X509Certificate signerCert = null;
+            if(signerCertFile != null)
+            {
+                signerCert = IoCertUtil.parseCert(signerCertFile);
+                entry.setCertificate(signerCert);
+            }
+            // check whether we can initialize the signer
+            securityFactory.createSigner(signerType, signerConf, signerCert, passwordResolver);
+        }
+
+        if(signerConf != null)
+        {
+            entry.setConf(signerConf);
+        }
+
+        entry.setPeriod(period);
+
+        if(overlap != null)
+        {
+            entry.setOverlap(overlap);
+        }
+
+        if(enableWithCerts != null && disableWithCerts != null )
+        {
+            System.err.println("Containing certificates in CRL could not be enabled and disabled at the same time");
+        }
+        boolean withCerts = isEnabled(enableWithCerts, disableWithCerts, false);
+        entry.setIncludeCertsInCrl(withCerts);
+        caManager.addCrlSigner(entry);
+
+        return null;
     }
 
-	public void setSecurityFactory(SecurityFactory securityFactory) {
-		this.securityFactory = securityFactory;
-	}
+    public void setSecurityFactory(SecurityFactory securityFactory) {
+        this.securityFactory = securityFactory;
+    }
 
-	public void setPasswordResolver(PasswordResolver passwordResolver) {
-		this.passwordResolver = passwordResolver;
-	}
+    public void setPasswordResolver(PasswordResolver passwordResolver) {
+        this.passwordResolver = passwordResolver;
+    }
 
 }

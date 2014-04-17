@@ -63,279 +63,279 @@ import org.xipki.security.common.IoCertUtil;
 import org.xipki.security.common.ParamChecker;
 
 class CaCertStoreDbImporter extends DbPorter{
-	private static final Logger LOG = LoggerFactory.getLogger(CaConfigurationDbImporter.class);
+    private static final Logger LOG = LoggerFactory.getLogger(CaConfigurationDbImporter.class);
 
-	private final Unmarshaller unmarshaller;
-	private final HashCalculator hashCalculator;
-	
-	CaCertStoreDbImporter(DataSource dataSource, Unmarshaller unmarshaller, String srcDir) 
-			throws SQLException, PasswordResolverException, IOException, NoSuchAlgorithmException
-	{
-		super(dataSource, srcDir);
-		ParamChecker.assertNotNull("unmarshaller", unmarshaller);
-		this.unmarshaller = unmarshaller;
-		this.hashCalculator = new HashCalculator();
-	}
+    private final Unmarshaller unmarshaller;
+    private final HashCalculator hashCalculator;
 
-	public void importToDB() throws Exception
-	{
-		@SuppressWarnings("unchecked")
-		JAXBElement<CertStoreType> root = (JAXBElement<CertStoreType>) 
-				unmarshaller.unmarshal(new File(baseDir + File.separator + FILENAME_CA_CertStore));
-		CertStoreType certstore = root.getValue();
-		
-		import_cainfo(certstore.getCainfos());
-		import_requestorinfo(certstore.getRequestorinfos());
-		import_certprofileinfo(certstore.getCertprofileinfos());
-		import_user(certstore.getUsers());
-		import_crl(certstore.getCrls());
-		import_cert(certstore.getCertsFiles());
-	}
+    CaCertStoreDbImporter(DataSource dataSource, Unmarshaller unmarshaller, String srcDir)
+            throws SQLException, PasswordResolverException, IOException, NoSuchAlgorithmException
+    {
+        super(dataSource, srcDir);
+        ParamChecker.assertNotNull("unmarshaller", unmarshaller);
+        this.unmarshaller = unmarshaller;
+        this.hashCalculator = new HashCalculator();
+    }
 
-	private void import_cainfo(Cainfos cainfos)
-			throws SQLException, CertificateException, IOException
-	{
-		final String SQL_ADD_CAINFO =
-		    	"INSERT INTO cainfo" +
-		    	" (id, subject, sha1_fp_cert, cert)" + 
-				" VALUES (?, ?, ?, ?)";
-		
-		PreparedStatement ps = prepareStatement(SQL_ADD_CAINFO);
+    public void importToDB() throws Exception
+    {
+        @SuppressWarnings("unchecked")
+        JAXBElement<CertStoreType> root = (JAXBElement<CertStoreType>)
+                unmarshaller.unmarshal(new File(baseDir + File.separator + FILENAME_CA_CertStore));
+        CertStoreType certstore = root.getValue();
 
-		try{
-			for(CainfoType info : cainfos.getCainfo())
-			{
-				String b64Cert = info.getCert();
-				byte[] encodedCert = Base64.decode(b64Cert);
-				
-				X509Certificate c;
-				try{
-					c = IoCertUtil.parseCert(encodedCert);
-				} catch (Exception e) {
-					LOG.error("could not parse certificate of cainfo {}", info.getId());
-					LOG.debug("could not parse certificate of cainfo " + info.getId(), e);
-					if(e instanceof CertificateException)
-					{
-						throw (CertificateException) e;
-					}
-					else
-					{
-						throw new CertificateException(e);
-					}
-				}
-				
-				String hexSha1FpCert = hashCalculator.hexHash(HashAlgoType.SHA1, encodedCert);
+        import_cainfo(certstore.getCainfos());
+        import_requestorinfo(certstore.getRequestorinfos());
+        import_certprofileinfo(certstore.getCertprofileinfos());
+        import_user(certstore.getUsers());
+        import_crl(certstore.getCrls());
+        import_cert(certstore.getCertsFiles());
+    }
 
-				int idx = 1;
-				ps.setInt   (idx++, info.getId());
-				ps.setString(idx++, c.getSubjectX500Principal().getName());
-				ps.setString(idx++, hexSha1FpCert);
-				ps.setString(idx++, b64Cert);
-				
-				ps.execute();
-			}
-		}finally {
-			closeStatement(ps);
-		}
-	}
-	
-	private void import_requestorinfo(Requestorinfos requestorinfos)
-			throws SQLException, CertificateException, IOException
-	{
-		final String sql = "INSERT INTO requestorinfo (id, subject, sha1_fp_cert, cert) VALUES (?, ?, ?, ?)";
-		
-		PreparedStatement ps = prepareStatement(sql);
+    private void import_cainfo(Cainfos cainfos)
+            throws SQLException, CertificateException, IOException
+    {
+        final String SQL_ADD_CAINFO =
+                "INSERT INTO cainfo" +
+                " (id, subject, sha1_fp_cert, cert)" +
+                " VALUES (?, ?, ?, ?)";
 
-		try{
-			for(RequestorinfoType info : requestorinfos.getRequestorinfo())
-			{
-				String b64Cert = info.getCert();
-				byte[] encodedCert = Base64.decode(b64Cert);
-				X509Certificate cert = IoCertUtil.parseCert(encodedCert);
-				String hexSha1FpCert = hashCalculator.hexHash(HashAlgoType.SHA1, encodedCert);
+        PreparedStatement ps = prepareStatement(SQL_ADD_CAINFO);
 
-				int idx = 1;
-				ps.setInt   (idx++, info.getId());
-				ps.setString(idx++, cert.getSubjectX500Principal().getName());
-				ps.setString(idx++, hexSha1FpCert);
-				ps.setString(idx++, b64Cert);
-				
-				ps.execute();
-			}
-		}finally {
-			closeStatement(ps);
-		}
-	}
+        try{
+            for(CainfoType info : cainfos.getCainfo())
+            {
+                String b64Cert = info.getCert();
+                byte[] encodedCert = Base64.decode(b64Cert);
 
-	private void import_certprofileinfo(Certprofileinfos certprofileinfos)
-			throws SQLException
-	{
-		final String sql = "INSERT INTO certprofileinfo (id, name) VALUES (?, ?)";
-		
-		PreparedStatement ps = prepareStatement(sql);
+                X509Certificate c;
+                try{
+                    c = IoCertUtil.parseCert(encodedCert);
+                } catch (Exception e) {
+                    LOG.error("could not parse certificate of cainfo {}", info.getId());
+                    LOG.debug("could not parse certificate of cainfo " + info.getId(), e);
+                    if(e instanceof CertificateException)
+                    {
+                        throw (CertificateException) e;
+                    }
+                    else
+                    {
+                        throw new CertificateException(e);
+                    }
+                }
 
-		try{
-			for(CertprofileinfoType info : certprofileinfos.getCertprofileinfo())
-			{
-				int idx = 1;
-				ps.setInt   (idx++, info.getId());
-				ps.setString(idx++, info.getName());
-				
-				ps.execute();
-			}
-		}finally {
-			closeStatement(ps);
-		}		
-	}
+                String hexSha1FpCert = hashCalculator.hexHash(HashAlgoType.SHA1, encodedCert);
 
-	private void import_user(Users users)
-			throws SQLException
-	{
-		final String sql = "INSERT INTO user (id, name) VALUES (?, ?)";
-		
-		PreparedStatement ps = prepareStatement(sql);
+                int idx = 1;
+                ps.setInt   (idx++, info.getId());
+                ps.setString(idx++, c.getSubjectX500Principal().getName());
+                ps.setString(idx++, hexSha1FpCert);
+                ps.setString(idx++, b64Cert);
 
-		try{
-			for(UserType user : users.getUser())
-			{
-				int idx = 1;
-				ps.setInt   (idx++, user.getId());
-				ps.setString(idx++, user.getName());
-				
-				ps.execute();
-			}
-		}finally {
-			closeStatement(ps);
-		}	
-	}
+                ps.execute();
+            }
+        }finally {
+            closeStatement(ps);
+        }
+    }
 
-	private void import_crl(Crls crls)
-			throws SQLException, IOException, CertificateException, CRLException
-	{
-		final String sql = "INSERT INTO crl (cainfo_id, crl_number, thisUpdate, nextUpdate, crl) VALUES (?, ?, ?, ?, ?)";
+    private void import_requestorinfo(Requestorinfos requestorinfos)
+            throws SQLException, CertificateException, IOException
+    {
+        final String sql = "INSERT INTO requestorinfo (id, subject, sha1_fp_cert, cert) VALUES (?, ?, ?, ?)";
 
-		PreparedStatement ps = prepareStatement(sql);
+        PreparedStatement ps = prepareStatement(sql);
 
-		try{
-			for(CrlType crl : crls.getCrl())
-			{
-				String filename = baseDir + File.separator + crl.getCrlFile();
-				byte[] encodedCrl = IoCertUtil.read(filename);
-				
-				X509CRL c;
-				try {
-					c = IoCertUtil.parseCRL(new ByteArrayInputStream(encodedCrl));
-				} catch (CertificateException e) {
-					LOG.error("could not parse CRL in file {}", filename);
-					LOG.debug("could not parse CRL in file " + filename, e);
-					throw e;
-				} catch (CRLException e) {
-					LOG.error("could not parse CRL in file {}", filename);
-					LOG.debug("could not parse CRL in file " + filename, e);
-					throw e;
-				}
-				
-				byte[] octetString = c.getExtensionValue(Extension.cRLNumber.getId());
-				byte[] extnValue = DEROctetString.getInstance(octetString).getOctets();
-				BigInteger crlNumber = ASN1Integer.getInstance(extnValue).getPositiveValue();	
-				
-				int idx = 1;
-				ps.setInt   (idx++, crl.getCainfoId());
-				ps.setString(idx++, crlNumber.toString());
-				ps.setLong(idx++, c.getThisUpdate().getTime() / 1000);
-				ps.setLong(idx++, c.getNextUpdate().getTime() / 1000);
+        try{
+            for(RequestorinfoType info : requestorinfos.getRequestorinfo())
+            {
+                String b64Cert = info.getCert();
+                byte[] encodedCert = Base64.decode(b64Cert);
+                X509Certificate cert = IoCertUtil.parseCert(encodedCert);
+                String hexSha1FpCert = hashCalculator.hexHash(HashAlgoType.SHA1, encodedCert);
 
-				InputStream is = new ByteArrayInputStream(encodedCrl);
-				ps.setBlob(idx++, is);
-				
-				ps.executeUpdate();
-			}
-		}finally {
-			closeStatement(ps);
-		}
-	}
+                int idx = 1;
+                ps.setInt   (idx++, info.getId());
+                ps.setString(idx++, cert.getSubjectX500Principal().getName());
+                ps.setString(idx++, hexSha1FpCert);
+                ps.setString(idx++, b64Cert);
 
-	private void import_cert(CertsFiles certsfiles)
-			throws SQLException, JAXBException, IOException, CertificateException
-	{
-		for(String certsFile : certsfiles.getCertsFile())
-		{
-			@SuppressWarnings("unchecked")
-			JAXBElement<CertsType> root = (JAXBElement<CertsType>) 
-					unmarshaller.unmarshal(new File(baseDir + File.separator + certsFile));
-			do_import_cert(root.getValue());
-		}
-	}
-	
-	private void do_import_cert(CertsType certs)
-		throws SQLException, IOException, CertificateException
-	{
-		final String SQL_ADD_CERT = 
-		    	"INSERT INTO cert " + 
-		    	"(id, last_update, serial, subject,"
-		    	+ " notbefore, notafter, revocated, rev_reason, rev_time, rev_invalidity_time,"
-		    	+ " certprofileinfo_id, cainfo_id,"
-		    	+ " requestorinfo_id, user_id, sha1_fp_pk, sha1_fp_subject)" + 
-				" VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                ps.execute();
+            }
+        }finally {
+            closeStatement(ps);
+        }
+    }
 
-		final String SQL_ADD_RAWCERT = "INSERT INTO rawcert (cert_id, sha1_fp, cert) VALUES (?, ?, ?)";
+    private void import_certprofileinfo(Certprofileinfos certprofileinfos)
+            throws SQLException
+    {
+        final String sql = "INSERT INTO certprofileinfo (id, name) VALUES (?, ?)";
 
-		PreparedStatement ps_cert = prepareStatement(SQL_ADD_CERT);
-		PreparedStatement ps_rawcert = prepareStatement(SQL_ADD_RAWCERT);
+        PreparedStatement ps = prepareStatement(sql);
 
-		try{
-			for(CertType cert : certs.getCert())
-			{
-				// rawcert
-				String filename = baseDir + File.separator + cert.getCertFile();
-				byte[] encodedCert = IoCertUtil.read(filename);
+        try{
+            for(CertprofileinfoType info : certprofileinfos.getCertprofileinfo())
+            {
+                int idx = 1;
+                ps.setInt   (idx++, info.getId());
+                ps.setString(idx++, info.getName());
 
-				Certificate c;
-				try {
-					c = Certificate.getInstance(encodedCert);
-				} catch (Exception e) {
-					LOG.error("could not parse certificate in file {}", filename);
-					LOG.debug("could not parse certificate in file " + filename, e);
-					throw new CertificateException(e);
-				}
-				
-				byte[] encodedKey = c.getSubjectPublicKeyInfo().getPublicKeyData().getBytes();
-				
-				String hexSha1FpCert = hashCalculator.hexHash(HashAlgoType.SHA1, encodedCert);
+                ps.execute();
+            }
+        }finally {
+            closeStatement(ps);
+        }
+    }
 
-				// cert
-				int idx = 1;
-				ps_cert.setInt   (idx++, cert.getId());
-				ps_cert.setString(idx++, cert.getLastUpdate());
-				ps_cert.setString(idx++, c.getSerialNumber().toString());
-				ps_cert.setString(idx++, IoCertUtil.canonicalizeName(c.getSubject()));
-				ps_cert.setLong(idx++, c.getTBSCertificate().getStartDate().getDate().getTime() / 1000);
-				ps_cert.setLong(idx++, c.getTBSCertificate().getEndDate().getDate().getTime() / 1000);
-				ps_cert.setBoolean(idx++, cert.isRevocated());
-				ps_cert.setString(idx++, cert.getRevReason());
-				ps_cert.setString(idx++, cert.getRevTime());
-				ps_cert.setString(idx++, cert.getRevInvalidityTime());
-				ps_cert.setString(idx++, cert.getCertprofileinfoId());
-				ps_cert.setString(idx++, cert.getCainfoId());
-				ps_cert.setString(idx++, cert.getRequestorinfoId());
-				ps_cert.setString(idx++, cert.getUserId());
-				
-				ps_cert.setString(idx++, hashCalculator.hexHash(HashAlgoType.SHA1, encodedKey));				
-				String sha1FpSubject = IoCertUtil.sha1sum_canonicalized_name(c.getSubject());
-				ps_cert.setString(idx++, sha1FpSubject);
+    private void import_user(Users users)
+            throws SQLException
+    {
+        final String sql = "INSERT INTO user (id, name) VALUES (?, ?)";
 
-				ps_cert.executeUpdate();
+        PreparedStatement ps = prepareStatement(sql);
 
-				ps_rawcert.setInt   (1, cert.getId());
-				ps_rawcert.setString(2, hexSha1FpCert);
-				ps_rawcert.setString(3, Base64.toBase64String(encodedCert));   
-				
-				ps_rawcert.executeUpdate();
-			}
-		}finally {
-			closeStatement(ps_cert);
-			closeStatement(ps_rawcert);
-		}
-	}
-	
+        try{
+            for(UserType user : users.getUser())
+            {
+                int idx = 1;
+                ps.setInt   (idx++, user.getId());
+                ps.setString(idx++, user.getName());
+
+                ps.execute();
+            }
+        }finally {
+            closeStatement(ps);
+        }
+    }
+
+    private void import_crl(Crls crls)
+            throws SQLException, IOException, CertificateException, CRLException
+    {
+        final String sql = "INSERT INTO crl (cainfo_id, crl_number, thisUpdate, nextUpdate, crl) VALUES (?, ?, ?, ?, ?)";
+
+        PreparedStatement ps = prepareStatement(sql);
+
+        try{
+            for(CrlType crl : crls.getCrl())
+            {
+                String filename = baseDir + File.separator + crl.getCrlFile();
+                byte[] encodedCrl = IoCertUtil.read(filename);
+
+                X509CRL c;
+                try {
+                    c = IoCertUtil.parseCRL(new ByteArrayInputStream(encodedCrl));
+                } catch (CertificateException e) {
+                    LOG.error("could not parse CRL in file {}", filename);
+                    LOG.debug("could not parse CRL in file " + filename, e);
+                    throw e;
+                } catch (CRLException e) {
+                    LOG.error("could not parse CRL in file {}", filename);
+                    LOG.debug("could not parse CRL in file " + filename, e);
+                    throw e;
+                }
+
+                byte[] octetString = c.getExtensionValue(Extension.cRLNumber.getId());
+                byte[] extnValue = DEROctetString.getInstance(octetString).getOctets();
+                BigInteger crlNumber = ASN1Integer.getInstance(extnValue).getPositiveValue();
+
+                int idx = 1;
+                ps.setInt   (idx++, crl.getCainfoId());
+                ps.setString(idx++, crlNumber.toString());
+                ps.setLong(idx++, c.getThisUpdate().getTime() / 1000);
+                ps.setLong(idx++, c.getNextUpdate().getTime() / 1000);
+
+                InputStream is = new ByteArrayInputStream(encodedCrl);
+                ps.setBlob(idx++, is);
+
+                ps.executeUpdate();
+            }
+        }finally {
+            closeStatement(ps);
+        }
+    }
+
+    private void import_cert(CertsFiles certsfiles)
+            throws SQLException, JAXBException, IOException, CertificateException
+    {
+        for(String certsFile : certsfiles.getCertsFile())
+        {
+            @SuppressWarnings("unchecked")
+            JAXBElement<CertsType> root = (JAXBElement<CertsType>)
+                    unmarshaller.unmarshal(new File(baseDir + File.separator + certsFile));
+            do_import_cert(root.getValue());
+        }
+    }
+
+    private void do_import_cert(CertsType certs)
+        throws SQLException, IOException, CertificateException
+    {
+        final String SQL_ADD_CERT =
+                "INSERT INTO cert " +
+                "(id, last_update, serial, subject,"
+                + " notbefore, notafter, revocated, rev_reason, rev_time, rev_invalidity_time,"
+                + " certprofileinfo_id, cainfo_id,"
+                + " requestorinfo_id, user_id, sha1_fp_pk, sha1_fp_subject)" +
+                " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+
+        final String SQL_ADD_RAWCERT = "INSERT INTO rawcert (cert_id, sha1_fp, cert) VALUES (?, ?, ?)";
+
+        PreparedStatement ps_cert = prepareStatement(SQL_ADD_CERT);
+        PreparedStatement ps_rawcert = prepareStatement(SQL_ADD_RAWCERT);
+
+        try{
+            for(CertType cert : certs.getCert())
+            {
+                // rawcert
+                String filename = baseDir + File.separator + cert.getCertFile();
+                byte[] encodedCert = IoCertUtil.read(filename);
+
+                Certificate c;
+                try {
+                    c = Certificate.getInstance(encodedCert);
+                } catch (Exception e) {
+                    LOG.error("could not parse certificate in file {}", filename);
+                    LOG.debug("could not parse certificate in file " + filename, e);
+                    throw new CertificateException(e);
+                }
+
+                byte[] encodedKey = c.getSubjectPublicKeyInfo().getPublicKeyData().getBytes();
+
+                String hexSha1FpCert = hashCalculator.hexHash(HashAlgoType.SHA1, encodedCert);
+
+                // cert
+                int idx = 1;
+                ps_cert.setInt   (idx++, cert.getId());
+                ps_cert.setString(idx++, cert.getLastUpdate());
+                ps_cert.setString(idx++, c.getSerialNumber().toString());
+                ps_cert.setString(idx++, IoCertUtil.canonicalizeName(c.getSubject()));
+                ps_cert.setLong(idx++, c.getTBSCertificate().getStartDate().getDate().getTime() / 1000);
+                ps_cert.setLong(idx++, c.getTBSCertificate().getEndDate().getDate().getTime() / 1000);
+                ps_cert.setBoolean(idx++, cert.isRevocated());
+                ps_cert.setString(idx++, cert.getRevReason());
+                ps_cert.setString(idx++, cert.getRevTime());
+                ps_cert.setString(idx++, cert.getRevInvalidityTime());
+                ps_cert.setString(idx++, cert.getCertprofileinfoId());
+                ps_cert.setString(idx++, cert.getCainfoId());
+                ps_cert.setString(idx++, cert.getRequestorinfoId());
+                ps_cert.setString(idx++, cert.getUserId());
+
+                ps_cert.setString(idx++, hashCalculator.hexHash(HashAlgoType.SHA1, encodedKey));
+                String sha1FpSubject = IoCertUtil.sha1sum_canonicalized_name(c.getSubject());
+                ps_cert.setString(idx++, sha1FpSubject);
+
+                ps_cert.executeUpdate();
+
+                ps_rawcert.setInt   (1, cert.getId());
+                ps_rawcert.setString(2, hexSha1FpCert);
+                ps_rawcert.setString(3, Base64.toBase64String(encodedCert));
+
+                ps_rawcert.executeUpdate();
+            }
+        }finally {
+            closeStatement(ps_cert);
+            closeStatement(ps_rawcert);
+        }
+    }
+
 }

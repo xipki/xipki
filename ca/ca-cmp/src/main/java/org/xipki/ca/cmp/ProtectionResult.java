@@ -18,8 +18,8 @@
 package org.xipki.ca.cmp;
 
 public enum ProtectionResult {
-	VALID,
-	INVALID,
-	NOT_SIGNATURE_BASED,
-	SENDER_NOT_AUTHORIZED;
+    VALID,
+    INVALID,
+    NOT_SIGNATURE_BASED,
+    SENDER_NOT_AUTHORIZED;
 }

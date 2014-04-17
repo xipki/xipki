@@ -22,47 +22,47 @@ import org.apache.felix.gogo.commands.Option;
 
 @Command(scope = "ca", name = "cmpcontrol-update", description="Update CMP control")
 public class CmpControlUpdateCommand extends CaCommand {
-	@Option(name = "-ecc", aliases = { "--enableConfirmCert" },
+    @Option(name = "-ecc", aliases = { "--enableConfirmCert" },
             description = "Confirm of certificate is required, the default is not required")
     protected Boolean           enabledConfirmCert;
 
-	@Option(name = "-dcc", aliases = { "--disableConfirmCert" },
+    @Option(name = "-dcc", aliases = { "--disableConfirmCert" },
             description = "Confirm of certificate is not required")
     protected Boolean           disableConfirmCert;
-	
-	@Option(name = "-esc", aliases = { "--enableSendCaCert" },
+
+    @Option(name = "-esc", aliases = { "--enableSendCaCert" },
             description = "Enable sending CA certificate in the response, the default is disabled")
     protected Boolean            enableSendCaCert;
 
-	@Option(name = "-dsc", aliases = { "--disableSendCaCert" },
+    @Option(name = "-dsc", aliases = { "--disableSendCaCert" },
             description = "Disable sending CA certificate in the responsed")
     protected Boolean            disableSendCaCert;
 
-	@Option(name = "-mtb", aliases = { "--msgTimeBias" },
+    @Option(name = "-mtb", aliases = { "--msgTimeBias" },
             description = "Message time bias in seconds")
     protected Integer            messageTimeBias;
-	
-	@Option(name = "-cwt", aliases = { "--confirmWaitTime" },
+
+    @Option(name = "-cwt", aliases = { "--confirmWaitTime" },
             description = "Maximal confirmation time in seconds")
     protected Integer            confirmWaitTime;
 
     @Override
     protected Object doExecute() throws Exception {
-		Boolean requireConfirmCert = null;
-    	if(enabledConfirmCert != null || disableConfirmCert != null )
-    	{
-    		requireConfirmCert = isEnabled(enabledConfirmCert, disableConfirmCert, false);
-    	}
-     	
-    	Boolean sendCaCert = null;
-    	if(enableSendCaCert != null || disableSendCaCert != null )
-    	{
-    		sendCaCert = isEnabled(enableSendCaCert, disableSendCaCert, false);
-    		System.err.println("Sending CA certificate could not be enabled and disabled at the same time");
-    	}
-    	    			
-		caManager.changeCmpControl(requireConfirmCert, messageTimeBias, confirmWaitTime, sendCaCert);
-		
-    	return null;
+        Boolean requireConfirmCert = null;
+        if(enabledConfirmCert != null || disableConfirmCert != null )
+        {
+            requireConfirmCert = isEnabled(enabledConfirmCert, disableConfirmCert, false);
+        }
+
+        Boolean sendCaCert = null;
+        if(enableSendCaCert != null || disableSendCaCert != null )
+        {
+            sendCaCert = isEnabled(enableSendCaCert, disableSendCaCert, false);
+            System.err.println("Sending CA certificate could not be enabled and disabled at the same time");
+        }
+
+        caManager.changeCmpControl(requireConfirmCert, messageTimeBias, confirmWaitTime, sendCaCert);
+
+        return null;
     }
 }

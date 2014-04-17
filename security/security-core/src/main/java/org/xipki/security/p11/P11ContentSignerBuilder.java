@@ -44,101 +44,101 @@ import org.xipki.security.provider.P11PrivateKey;
 
 public class P11ContentSignerBuilder
 {
-	private final X509Certificate cert;
+    private final X509Certificate cert;
 
-	private final P11CryptService cryptService;
-	private final PKCS11SlotIdentifier slot;
-	private final Pkcs11KeyIdentifier keyId;
-	
-	public P11ContentSignerBuilder(
-			P11CryptService cryptService,
-			PKCS11SlotIdentifier slot, char[] password,
-			Pkcs11KeyIdentifier keyId,
-			X509Certificate cert) 
-			throws SignerException
-	{
-		ParamChecker.assertNotNull("cryptService", cryptService);
-		ParamChecker.assertNotNull("slot", slot);
-		ParamChecker.assertNotNull("keyId", keyId);
-		
-		this.cryptService = cryptService;
-		this.keyId = keyId;
-		this.slot = slot;
-		
-		boolean keyExists = false;
-		if(cert != null)
-		{
-			this.cert = cert;
-		}
-		else
-		{
-			this.cert = this.cryptService.getCertificate(slot, keyId);
-			keyExists = (this.cert != null);
-		}		
+    private final P11CryptService cryptService;
+    private final PKCS11SlotIdentifier slot;
+    private final Pkcs11KeyIdentifier keyId;
 
-		if(keyExists == false)
-		{
-			keyExists = (this.cryptService.getPublicKey(slot, keyId) != null);
-		}
-		
-		if(keyExists == false)
-		{
-			throw new SignerException("Key with " + keyId + " does not exist");
-		}
-	}
-	
-	public ConcurrentContentSigner createSigner(
-			AlgorithmIdentifier signatureAlgId,
-			int parallelism) 
-			throws OperatorCreationException, NoSuchPaddingException
-	{
-		if(parallelism < 1)
-		{
-			throw new IllegalArgumentException("non-positive parallelism is not allowed: " + parallelism);			
-		}
-		
-		List<ContentSigner> signers = new ArrayList<ContentSigner>(parallelism);
-		
-		PublicKey publicKey = cert.getPublicKey();
-		try{
-			for(int i = 0; i < parallelism; i++)
-			{
-				ContentSigner signer;
-				if(publicKey instanceof RSAPublicKey)
-				{
-					if(PKCSObjectIdentifiers.id_RSASSA_PSS.equals(signatureAlgId.getAlgorithm()))
-					{
-						signer = new P11RSAPSSContentSigner(cryptService, slot, keyId, signatureAlgId);
-					}
-					else
-					{
-						signer = new P11RSAContentSigner(cryptService, slot, keyId, signatureAlgId);
-					}
-				}
-				else if(publicKey instanceof ECPublicKey)
-				{
-					signer = new P11ECDSAContentSigner(cryptService, slot, keyId, signatureAlgId);
-				}
-				else
-				{
-					throw new OperatorCreationException("Unsupported key " + publicKey.getClass().getName());
-				}
-				signers.add(signer);
-			}
-		} catch (NoSuchAlgorithmException e) {
-			throw new OperatorCreationException("no such algorithm", e);
-		}
-		
-		PrivateKey privateKey;
-		try {
-			privateKey = new P11PrivateKey(cryptService, slot, keyId);
-		} catch (InvalidKeyException e) {
-			throw new OperatorCreationException("Could not construct P11PrivateKey: " + e.getMessage(), e);
-		}
+    public P11ContentSignerBuilder(
+            P11CryptService cryptService,
+            PKCS11SlotIdentifier slot, char[] password,
+            Pkcs11KeyIdentifier keyId,
+            X509Certificate cert)
+            throws SignerException
+    {
+        ParamChecker.assertNotNull("cryptService", cryptService);
+        ParamChecker.assertNotNull("slot", slot);
+        ParamChecker.assertNotNull("keyId", keyId);
 
-		DefaultConcurrentContentSigner concurrentSigner = new DefaultConcurrentContentSigner(signers, privateKey);
-		concurrentSigner.setCertificate(cert);
-		
-		return concurrentSigner;
-	}
+        this.cryptService = cryptService;
+        this.keyId = keyId;
+        this.slot = slot;
+
+        boolean keyExists = false;
+        if(cert != null)
+        {
+            this.cert = cert;
+        }
+        else
+        {
+            this.cert = this.cryptService.getCertificate(slot, keyId);
+            keyExists = (this.cert != null);
+        }
+
+        if(keyExists == false)
+        {
+            keyExists = (this.cryptService.getPublicKey(slot, keyId) != null);
+        }
+
+        if(keyExists == false)
+        {
+            throw new SignerException("Key with " + keyId + " does not exist");
+        }
+    }
+
+    public ConcurrentContentSigner createSigner(
+            AlgorithmIdentifier signatureAlgId,
+            int parallelism)
+            throws OperatorCreationException, NoSuchPaddingException
+    {
+        if(parallelism < 1)
+        {
+            throw new IllegalArgumentException("non-positive parallelism is not allowed: " + parallelism);
+        }
+
+        List<ContentSigner> signers = new ArrayList<ContentSigner>(parallelism);
+
+        PublicKey publicKey = cert.getPublicKey();
+        try{
+            for(int i = 0; i < parallelism; i++)
+            {
+                ContentSigner signer;
+                if(publicKey instanceof RSAPublicKey)
+                {
+                    if(PKCSObjectIdentifiers.id_RSASSA_PSS.equals(signatureAlgId.getAlgorithm()))
+                    {
+                        signer = new P11RSAPSSContentSigner(cryptService, slot, keyId, signatureAlgId);
+                    }
+                    else
+                    {
+                        signer = new P11RSAContentSigner(cryptService, slot, keyId, signatureAlgId);
+                    }
+                }
+                else if(publicKey instanceof ECPublicKey)
+                {
+                    signer = new P11ECDSAContentSigner(cryptService, slot, keyId, signatureAlgId);
+                }
+                else
+                {
+                    throw new OperatorCreationException("Unsupported key " + publicKey.getClass().getName());
+                }
+                signers.add(signer);
+            }
+        } catch (NoSuchAlgorithmException e) {
+            throw new OperatorCreationException("no such algorithm", e);
+        }
+
+        PrivateKey privateKey;
+        try {
+            privateKey = new P11PrivateKey(cryptService, slot, keyId);
+        } catch (InvalidKeyException e) {
+            throw new OperatorCreationException("Could not construct P11PrivateKey: " + e.getMessage(), e);
+        }
+
+        DefaultConcurrentContentSigner concurrentSigner = new DefaultConcurrentContentSigner(signers, privateKey);
+        concurrentSigner.setCertificate(cert);
+
+        return concurrentSigner;
+    }
 }

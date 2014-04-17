@@ -26,34 +26,34 @@ import org.xipki.ca.server.mgmt.PublisherEntry;
 @Command(scope = "ca", name = "publisher-list", description="List publishers")
 public class PublisherListCommand extends CaCommand {
 
-	@Option(name = "-name",
+    @Option(name = "-name",
             description = "Publisher Name",
             required = false, multiValued = false)
-	protected String name;
-	
+    protected String name;
+
     @Override
     protected Object doExecute() throws Exception {
-		StringBuilder sb = new StringBuilder();
-		
-		if(name == null)
-		{
-			Set<String> names = caManager.getPublisherNames();			
-			int n = names.size();
-			
-			sb.append(n + " Publishers are configured:\n");		
-			for(String paramName : names)
-			{
-				sb.append("\t").append(paramName).append("\n");
-			}
-		}
-		else
-		{
-			PublisherEntry entry = caManager.getPublisher(name);
-			sb.append(entry.toString());
-		}
-		
-		System.out.println(sb.toString());
-		
+        StringBuilder sb = new StringBuilder();
+
+        if(name == null)
+        {
+            Set<String> names = caManager.getPublisherNames();
+            int n = names.size();
+
+            sb.append(n + " Publishers are configured:\n");
+            for(String paramName : names)
+            {
+                sb.append("\t").append(paramName).append("\n");
+            }
+        }
+        else
+        {
+            PublisherEntry entry = caManager.getPublisher(name);
+            sb.append(entry.toString());
+        }
+
+        System.out.println(sb.toString());
+
         return null;
     }
 }

@@ -26,56 +26,56 @@ import org.xipki.security.common.ParamChecker;
 
 class CAConf
 {
-	private final String name;
-	private final String url;
-	private final X509Certificate cert;
-	private final X509Certificate responder;
-	private final X500Name subject;
-	private final Set<String> profiles;
-	
-	CAConf(String name, String url, X509Certificate cert, Set<String> profiles, X509Certificate responder) 
-	{
-		ParamChecker.assertNotEmpty("name", name);
-		ParamChecker.assertNotEmpty("url", url);
-		ParamChecker.assertNotNull("cert", cert);
-		ParamChecker.assertNotNull("responder", responder);
-		
-		this.name = name;
-		this.url = url;
-		this.cert = cert;
-		this.subject = X500Name.getInstance(cert.getSubjectX500Principal().getEncoded());
-		if(profiles == null)
-		{
-			this.profiles = Collections.emptySet();
-		}
-		else
-		{
-			this.profiles = profiles;
-		}
-		this.responder = responder;
-	}
+    private final String name;
+    private final String url;
+    private final X509Certificate cert;
+    private final X509Certificate responder;
+    private final X500Name subject;
+    private final Set<String> profiles;
 
-	public String getName() {
-		return name;
-	}
+    CAConf(String name, String url, X509Certificate cert, Set<String> profiles, X509Certificate responder)
+    {
+        ParamChecker.assertNotEmpty("name", name);
+        ParamChecker.assertNotEmpty("url", url);
+        ParamChecker.assertNotNull("cert", cert);
+        ParamChecker.assertNotNull("responder", responder);
 
-	public String getUrl() {
-		return url;
-	}
+        this.name = name;
+        this.url = url;
+        this.cert = cert;
+        this.subject = X500Name.getInstance(cert.getSubjectX500Principal().getEncoded());
+        if(profiles == null)
+        {
+            this.profiles = Collections.emptySet();
+        }
+        else
+        {
+            this.profiles = profiles;
+        }
+        this.responder = responder;
+    }
 
-	public X509Certificate getCert() {
-		return cert;
-	}
+    public String getName() {
+        return name;
+    }
 
-	public X500Name getSubject() {
-		return subject;
-	}
+    public String getUrl() {
+        return url;
+    }
 
-	public Set<String> getProfiles() {
-		return profiles;
-	}
+    public X509Certificate getCert() {
+        return cert;
+    }
 
-	public X509Certificate getResponder() {
-		return responder;
-	}		
+    public X500Name getSubject() {
+        return subject;
+    }
+
+    public Set<String> getProfiles() {
+        return profiles;
+    }
+
+    public X509Certificate getResponder() {
+        return responder;
+    }
 }

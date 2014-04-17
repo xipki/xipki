@@ -27,26 +27,26 @@ import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.bouncycastle.cert.X509CertificateHolder;
 import org.bouncycastle.operator.ContentVerifierProvider;
 
-public interface SecurityFactory {	
-	String getPkcs11Provider();
-	String getPkcs11Module();
-	
-	ConcurrentContentSigner createSigner(
-			String type, String conf, X509Certificate cert, PasswordResolver passwordResolver)
-	throws SignerException, PasswordResolverException;
+public interface SecurityFactory {
+    String getPkcs11Provider();
+    String getPkcs11Module();
 
-	ContentVerifierProvider getContentVerifierProvider(PublicKey publicKey) throws InvalidKeyException;
-	
-	ContentVerifierProvider getContentVerifierProvider(X509Certificate cert) throws InvalidKeyException;
-	
-	ContentVerifierProvider getContentVerifierProvider(X509CertificateHolder cert) throws InvalidKeyException;
-	
-	PublicKey generatePublicKey(SubjectPublicKeyInfo subjectPublicKeyInfo) throws InvalidKeyException;
-	
-	byte[] generateSelfSignedRSAKeyStore(
-			BigInteger serial, String subject, String keystoreType, char[] password, String keyLabel, 
-			int keysize, BigInteger publicExponent)
-	throws SignerException;
+    ConcurrentContentSigner createSigner(
+            String type, String conf, X509Certificate cert, PasswordResolver passwordResolver)
+    throws SignerException, PasswordResolverException;
 
-	boolean verifyPOPO(CertificationRequest p10Req);
+    ContentVerifierProvider getContentVerifierProvider(PublicKey publicKey) throws InvalidKeyException;
+
+    ContentVerifierProvider getContentVerifierProvider(X509Certificate cert) throws InvalidKeyException;
+
+    ContentVerifierProvider getContentVerifierProvider(X509CertificateHolder cert) throws InvalidKeyException;
+
+    PublicKey generatePublicKey(SubjectPublicKeyInfo subjectPublicKeyInfo) throws InvalidKeyException;
+
+    byte[] generateSelfSignedRSAKeyStore(
+            BigInteger serial, String subject, String keystoreType, char[] password, String keyLabel,
+            int keysize, BigInteger publicExponent)
+    throws SignerException;
+
+    boolean verifyPOPO(CertificationRequest p10Req);
 }

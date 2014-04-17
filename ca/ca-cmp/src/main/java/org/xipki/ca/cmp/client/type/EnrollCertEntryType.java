@@ -20,27 +20,27 @@ package org.xipki.ca.cmp.client.type;
 import org.bouncycastle.asn1.pkcs.CertificationRequest;
 import org.xipki.security.common.ParamChecker;
 
-public class EnrollCertEntryType 
+public class EnrollCertEntryType
 {
-	private final CertificationRequest p10Request;
-	private final String profile;
-	
-	public EnrollCertEntryType(CertificationRequest p10Request, String profile)
-	{
-		ParamChecker.assertNotNull("p10Request", p10Request);
-		ParamChecker.assertNotEmpty("profile", profile);
-		
-		this.p10Request = p10Request;
-		this.profile = profile;
-	}
+    private final CertificationRequest p10Request;
+    private final String profile;
 
-	public CertificationRequest getP10Request() {
-		return p10Request;
-	}
+    public EnrollCertEntryType(CertificationRequest p10Request, String profile)
+    {
+        ParamChecker.assertNotNull("p10Request", p10Request);
+        ParamChecker.assertNotEmpty("profile", profile);
 
-	public String getProfile() {
-		return profile;
-	}
-	
-	
+        this.p10Request = p10Request;
+        this.profile = profile;
+    }
+
+    public CertificationRequest getP10Request() {
+        return p10Request;
+    }
+
+    public String getProfile() {
+        return profile;
+    }
+
+
 }

@@ -18,5 +18,5 @@
 package org.xipki.ca.common;
 
 public interface RequestorInfo {
-	boolean isRA();
+    boolean isRA();
 }

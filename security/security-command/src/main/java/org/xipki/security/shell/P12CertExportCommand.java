@@ -31,59 +31,59 @@ import org.xipki.security.common.IoCertUtil;
 
 @Command(scope = "keytool", name = "export-cert-p12", description="Export certificate from PKCS#12 keystore")
 public class P12CertExportCommand extends OsgiCommandSupport {
-	@Option(name = "-p12",
-			required = true, description = "Required. PKCS#12 keystore file")
+    @Option(name = "-p12",
+            required = true, description = "Required. PKCS#12 keystore file")
     protected String            p12File;
 
-	@Option(name = "-pwd", aliases = { "--password" },
-			required = true, description = "Required. Password of the PKCS#12 file")
+    @Option(name = "-pwd", aliases = { "--password" },
+            required = true, description = "Required. Password of the PKCS#12 file")
     protected String            password;
-	
-	@Option(name = "-out",
-			required = true, description = "Required. Where to save the certificate")
+
+    @Option(name = "-out",
+            required = true, description = "Required. Where to save the certificate")
     protected String            outFile;
 
     @Override
-    protected Object doExecute() throws Exception 
+    protected Object doExecute() throws Exception
     {
-    	KeyStore ks;
-    	
-    	char[] pwd = password.toCharArray();
+        KeyStore ks;
 
-    	FileInputStream fIn = null;
-    	try{
-    		fIn = new FileInputStream(p12File);
-			ks = KeyStore.getInstance("PKCS12", "BC");
-			ks.load(fIn, pwd);
-    	}finally{
-    		if(fIn != null)
-    		{
-    			fIn.close();
-    		}
-    	}
-    	
-		String keyname = null;
-		Enumeration<String> aliases = ks.aliases();
-		while(aliases.hasMoreElements())
-		{
-			String alias = aliases.nextElement();
-			if(ks.isKeyEntry(alias))
-			{
-				keyname = alias;
-				break;
-			}
-		}
-		
-		if(keyname == null)
-		{
-			throw new SignerException("Could not find private key");
-		}
+        char[] pwd = password.toCharArray();
 
-		X509Certificate cert = (X509Certificate) ks.getCertificate(keyname);
-		IoCertUtil.save(new File(outFile), cert.getEncoded());		
-		System.out.println("Saved certificate in " + outFile);
-		
-		return null;
-	}
+        FileInputStream fIn = null;
+        try{
+            fIn = new FileInputStream(p12File);
+            ks = KeyStore.getInstance("PKCS12", "BC");
+            ks.load(fIn, pwd);
+        }finally{
+            if(fIn != null)
+            {
+                fIn.close();
+            }
+        }
+
+        String keyname = null;
+        Enumeration<String> aliases = ks.aliases();
+        while(aliases.hasMoreElements())
+        {
+            String alias = aliases.nextElement();
+            if(ks.isKeyEntry(alias))
+            {
+                keyname = alias;
+                break;
+            }
+        }
+
+        if(keyname == null)
+        {
+            throw new SignerException("Could not find private key");
+        }
+
+        X509Certificate cert = (X509Certificate) ks.getCertificate(keyname);
+        IoCertUtil.save(new File(outFile), cert.getEncoded());
+        System.out.println("Saved certificate in " + outFile);
+
+        return null;
+    }
 
 }

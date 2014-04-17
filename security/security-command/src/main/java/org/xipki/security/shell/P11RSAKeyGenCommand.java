@@ -33,90 +33,90 @@ import org.xipki.security.p11.iaik.P11KeypairGenerator;
 
 @Command(scope = "keytool", name = "rsa", description="Generate RSA keypair via PKCS#11")
 public class P11RSAKeyGenCommand extends OsgiCommandSupport {
-	@Option(name = "-keysize",
-			description = "Keysize in bit, the default is 2048",
-			required = false)
+    @Option(name = "-keysize",
+            description = "Keysize in bit, the default is 2048",
+            required = false)
     protected Integer            keysize;
-	
-	@Option(name = "-e",
-			description = "public exponent, the default is 65537",
-			required = false)
-    protected String            publicExponent;
-		
-	@Option(name = "-slot",
-			required = true, description = "Required. Slot index")
-    protected Integer           slotIndex;
-	
-	@Option(name = "-key-label",
-			required = true, description = "Required. Label of the PKCS#11 objects")
-    protected String            label;
-	
-	@Option(name = "-pwd", aliases = { "--password" },
-			required = false, description = "Password of the PKCS#11 token")
-    protected String            password;
-	
-	@Option(name = "-out",
-			required = false, description = "Output file name of certificate")
-    protected String            outputFilename;
-	
-	private SecurityFactory securityFactory;
-	
-	public SecurityFactory getSecurityFactory() {
-		return securityFactory;
-	}
 
-	public void setSecurityFactory(SecurityFactory securityFactory) {
-		this.securityFactory = securityFactory;
-	}
-	
+    @Option(name = "-e",
+            description = "public exponent, the default is 65537",
+            required = false)
+    protected String            publicExponent;
+
+    @Option(name = "-slot",
+            required = true, description = "Required. Slot index")
+    protected Integer           slotIndex;
+
+    @Option(name = "-key-label",
+            required = true, description = "Required. Label of the PKCS#11 objects")
+    protected String            label;
+
+    @Option(name = "-pwd", aliases = { "--password" },
+            required = false, description = "Password of the PKCS#11 token")
+    protected String            password;
+
+    @Option(name = "-out",
+            required = false, description = "Output file name of certificate")
+    protected String            outputFilename;
+
+    private SecurityFactory securityFactory;
+
+    public SecurityFactory getSecurityFactory() {
+        return securityFactory;
+    }
+
+    public void setSecurityFactory(SecurityFactory securityFactory) {
+        this.securityFactory = securityFactory;
+    }
+
     @Override
-    protected Object doExecute() throws Exception {   
-    	if(keysize == null)
-    	{
-    		keysize = 2048;
-    	}
-    	else if(keysize % 1024 != 0)
-    	{
-    		System.err.println("Keysize is not multiple of 1024: " + keysize);
-    		return null;
-    	}
-    	
-    	BigInteger _publicExponent;
-    	if(publicExponent == null)
-    	{
-    		_publicExponent = BigInteger.valueOf(65537);
-    	}
-    	else
-    	{
-    		_publicExponent = new BigInteger(publicExponent);
-    	}
-    	
-    	if(password == null)
-    	{
-    		password = "dummy";
-    	}
-    	char[] pwd = password.toCharArray();
-    	
-    	P11KeypairGenerator gen = new P11KeypairGenerator();
-    	PKCS11SlotIdentifier slotId = new PKCS11SlotIdentifier(slotIndex, null);
-    	
-    	P11KeypairGenerationResult keyAndCert = gen.generateRSAKeypairAndCert(
-    			securityFactory.getPkcs11Module(), slotId, pwd,
-    			keysize, _publicExponent,
-    			label, "CN=" + label);
-    	
-    	System.out.println("key id: " + Hex.toHexString(keyAndCert.getId()));
-    	System.out.println("key label: " + keyAndCert.getLabel());
-    	if(outputFilename != null)
-    	{
-	   		File certFile = new File(outputFilename);
-	   		IoCertUtil.save(certFile, keyAndCert.getCertificate().getEncoded());
-	   		System.out.println("Saved self-signed certificate in " + certFile.getPath());
-    	}
-    	
-    	IaikP11CryptService.getInstance(securityFactory.getPkcs11Module(), pwd).refresh();
-    	
-    	return null;
+    protected Object doExecute() throws Exception {
+        if(keysize == null)
+        {
+            keysize = 2048;
+        }
+        else if(keysize % 1024 != 0)
+        {
+            System.err.println("Keysize is not multiple of 1024: " + keysize);
+            return null;
+        }
+
+        BigInteger _publicExponent;
+        if(publicExponent == null)
+        {
+            _publicExponent = BigInteger.valueOf(65537);
+        }
+        else
+        {
+            _publicExponent = new BigInteger(publicExponent);
+        }
+
+        if(password == null)
+        {
+            password = "dummy";
+        }
+        char[] pwd = password.toCharArray();
+
+        P11KeypairGenerator gen = new P11KeypairGenerator();
+        PKCS11SlotIdentifier slotId = new PKCS11SlotIdentifier(slotIndex, null);
+
+        P11KeypairGenerationResult keyAndCert = gen.generateRSAKeypairAndCert(
+                securityFactory.getPkcs11Module(), slotId, pwd,
+                keysize, _publicExponent,
+                label, "CN=" + label);
+
+        System.out.println("key id: " + Hex.toHexString(keyAndCert.getId()));
+        System.out.println("key label: " + keyAndCert.getLabel());
+        if(outputFilename != null)
+        {
+               File certFile = new File(outputFilename);
+               IoCertUtil.save(certFile, keyAndCert.getCertificate().getEncoded());
+               System.out.println("Saved self-signed certificate in " + certFile.getPath());
+        }
+
+        IaikP11CryptService.getInstance(securityFactory.getPkcs11Module(), pwd).refresh();
+
+        return null;
     }
 
 }

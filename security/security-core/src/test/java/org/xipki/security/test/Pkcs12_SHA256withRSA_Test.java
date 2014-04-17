@@ -21,10 +21,10 @@ import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 
 public class Pkcs12_SHA256withRSA_Test extends Pkcs12_RSA_Test{
-	@Override
-	protected ASN1ObjectIdentifier getSignatureAlgorithm() {
-		return PKCSObjectIdentifiers.sha256WithRSAEncryption;
-	}
+    @Override
+    protected ASN1ObjectIdentifier getSignatureAlgorithm() {
+        return PKCSObjectIdentifiers.sha256WithRSAEncryption;
+    }
 
-	
+
 }

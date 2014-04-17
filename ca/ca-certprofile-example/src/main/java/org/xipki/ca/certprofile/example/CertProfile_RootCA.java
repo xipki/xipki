@@ -31,45 +31,45 @@ import org.xipki.ca.api.profile.ExtensionOccurrence;
 import org.xipki.ca.api.profile.KeyUsage;
 
 public class CertProfile_RootCA extends AbstractCACertProfile {
-	private final Map<ASN1ObjectIdentifier, ExtensionOccurrence> extensionOccurences;
-	
-	public CertProfile_RootCA()
-	{
-		// Extensions
-		Map<ASN1ObjectIdentifier, ExtensionOccurrence> _extensionOccurences =
-				new HashMap<ASN1ObjectIdentifier, ExtensionOccurrence>();
-		_extensionOccurences.put(Extension.keyUsage, ExtensionOccurrence.CRITICAL_REQUIRED);
-		_extensionOccurences.put(Extension.basicConstraints, ExtensionOccurrence.CRITICAL_REQUIRED);
-		extensionOccurences = Collections.unmodifiableMap(_extensionOccurences);
-	}	
-	
-	@Override
-	public ExtensionOccurrence getOccurenceOfAuthorityKeyIdentifier() {
-		return null;
-	}
-	
-	@Override
-	public Integer getValidity() {
-		return 5 * 365;
-	}
+    private final Map<ASN1ObjectIdentifier, ExtensionOccurrence> extensionOccurences;
 
-	@Override
-	protected void checkSubjectContent(X500Name requestedSubject) throws BadCertTemplateException
-	{
-	}
+    public CertProfile_RootCA()
+    {
+        // Extensions
+        Map<ASN1ObjectIdentifier, ExtensionOccurrence> _extensionOccurences =
+                new HashMap<ASN1ObjectIdentifier, ExtensionOccurrence>();
+        _extensionOccurences.put(Extension.keyUsage, ExtensionOccurrence.CRITICAL_REQUIRED);
+        _extensionOccurences.put(Extension.basicConstraints, ExtensionOccurrence.CRITICAL_REQUIRED);
+        extensionOccurences = Collections.unmodifiableMap(_extensionOccurences);
+    }
 
-	@Override
-	protected Integer getPathLenBasicConstraint() {
-		return null;
-	}
+    @Override
+    public ExtensionOccurrence getOccurenceOfAuthorityKeyIdentifier() {
+        return null;
+    }
 
-	@Override
-	protected Set<KeyUsage> getKeyUsage() {
-		return keyUsages;
-	}
+    @Override
+    public Integer getValidity() {
+        return 5 * 365;
+    }
 
-	@Override
-	protected Map<ASN1ObjectIdentifier, ExtensionOccurrence> getAdditionalExtensionOccurences() {
-		return extensionOccurences;
-	}
+    @Override
+    protected void checkSubjectContent(X500Name requestedSubject) throws BadCertTemplateException
+    {
+    }
+
+    @Override
+    protected Integer getPathLenBasicConstraint() {
+        return null;
+    }
+
+    @Override
+    protected Set<KeyUsage> getKeyUsage() {
+        return keyUsages;
+    }
+
+    @Override
+    protected Map<ASN1ObjectIdentifier, ExtensionOccurrence> getAdditionalExtensionOccurences() {
+        return extensionOccurences;
+    }
 }

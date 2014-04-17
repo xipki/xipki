@@ -41,115 +41,115 @@ import org.xipki.security.api.PasswordResolver;
 import org.xipki.security.api.SecurityFactory;
 
 public abstract class AbstractRAWorker
-{	
-	private static final Logger LOG = LoggerFactory.getLogger(AbstractRAWorker.class);
-	
-	protected static final ProofOfPossession raVerified = new ProofOfPossession();
-	
-	protected abstract Certificate getCertificate(CMPCertificate cmpCert)
-	throws CertificateException;
-	
-	protected abstract boolean verify(Certificate caCert, Certificate cert);
-	
-	protected SecurityFactory securityFactory;	
-	protected PasswordResolver passwordResolver;
-	
-	protected AbstractRAWorker()
-	{
-	}	
+{
+    private static final Logger LOG = LoggerFactory.getLogger(AbstractRAWorker.class);
 
-	public void setPasswordResolver(PasswordResolver passwordResolver) {
-		this.passwordResolver = passwordResolver;
-	}
+    protected static final ProofOfPossession raVerified = new ProofOfPossession();
 
-	protected EnrollCertResult parseEnrollCertResult(EnrollCertResultType result,
-			String caname)
-	throws RAWorkerException
-	{
-		Map<String, CertificateOrError> certOrErrors = new HashMap<String, CertificateOrError>();
-		for(ResultEntryType resultEntry : result.getResultEntries())
-		{
-			CertificateOrError certOrError;
-			if(resultEntry instanceof EnrollCertResultEntryType)
-			{
-				EnrollCertResultEntryType entry = (EnrollCertResultEntryType) resultEntry;
-				try {
-					Certificate cert = getCertificate(entry.getCert());
-					certOrError = new CertificateOrError(cert);
-				} catch (CertificateException e) {
-					throw new RAWorkerException(
-							"CertificateParsingException for request (id=" + entry.getId()+"): " + e.getMessage());
-				}
-			}
-			else if(resultEntry instanceof ErrorResultEntryType)
-			{
-				certOrError = new CertificateOrError(
-						((ErrorResultEntryType) resultEntry).getStatusInfo());
-			}
-			else
-			{
-				certOrError = null;
-			}
-			
-			certOrErrors.put(resultEntry.getId(), certOrError);			
-		}
+    protected abstract Certificate getCertificate(CMPCertificate cmpCert)
+    throws CertificateException;
 
-		Certificate caCert = null;
-		
-		List<CMPCertificate> cmpCaPubs = result.getCACertificates();
-		
-		if(cmpCaPubs != null && cmpCaPubs.isEmpty() == false)
-		{
-			List<Certificate> caPubs = new ArrayList<Certificate>(cmpCaPubs.size());
-			for(CMPCertificate cmpCaPub : cmpCaPubs)
-			{
-				try {
-					caPubs.add(getCertificate(cmpCaPub));
-				} catch (CertificateException e) {
-					LOG.error("Could not extract the caPub from CMPCertificate");
-				}
-			}
-			
-			for(CertificateOrError certOrError : certOrErrors.values())
-			{
-				Certificate cert = certOrError.getCertificate();
-				if(cert == null)
-				{
-					continue;
-				}
-				
-				if(caCert == null)
-				{
-					for(Certificate caPub : caPubs)
-					{
-						if(verify(caPub, cert))
-						{
-							caCert = caPub;
-						}
-					}
-				}
-				else if(verify(caCert, cert) == false)
-				{
-					LOG.warn("Not all certificates issued by CA embedded in caPubs, ignore the caPubs");
-					caCert = null;
-					break;
-				}
-			}
-		}
-		
-		return new EnrollCertResult(caCert, certOrErrors);
-	}
+    protected abstract boolean verify(Certificate caCert, Certificate cert);
 
-	protected static PKIErrorException createPKIErrorException(ErrorResultType errResult)
-	{
-		return new PKIErrorException(errResult.getStatus(),
-				errResult.getPkiFailureInfo(), errResult.getStatusMessage());
-	}
-	
-	public void setSecurityFactory(SecurityFactory securityFactory) {
-		this.securityFactory = securityFactory;
-	}
+    protected SecurityFactory securityFactory;
+    protected PasswordResolver passwordResolver;
 
-	
-	
+    protected AbstractRAWorker()
+    {
+    }
+
+    public void setPasswordResolver(PasswordResolver passwordResolver) {
+        this.passwordResolver = passwordResolver;
+    }
+
+    protected EnrollCertResult parseEnrollCertResult(EnrollCertResultType result,
+            String caname)
+    throws RAWorkerException
+    {
+        Map<String, CertificateOrError> certOrErrors = new HashMap<String, CertificateOrError>();
+        for(ResultEntryType resultEntry : result.getResultEntries())
+        {
+            CertificateOrError certOrError;
+            if(resultEntry instanceof EnrollCertResultEntryType)
+            {
+                EnrollCertResultEntryType entry = (EnrollCertResultEntryType) resultEntry;
+                try {
+                    Certificate cert = getCertificate(entry.getCert());
+                    certOrError = new CertificateOrError(cert);
+                } catch (CertificateException e) {
+                    throw new RAWorkerException(
+                            "CertificateParsingException for request (id=" + entry.getId()+"): " + e.getMessage());
+                }
+            }
+            else if(resultEntry instanceof ErrorResultEntryType)
+            {
+                certOrError = new CertificateOrError(
+                        ((ErrorResultEntryType) resultEntry).getStatusInfo());
+            }
+            else
+            {
+                certOrError = null;
+            }
+
+            certOrErrors.put(resultEntry.getId(), certOrError);
+        }
+
+        Certificate caCert = null;
+
+        List<CMPCertificate> cmpCaPubs = result.getCACertificates();
+
+        if(cmpCaPubs != null && cmpCaPubs.isEmpty() == false)
+        {
+            List<Certificate> caPubs = new ArrayList<Certificate>(cmpCaPubs.size());
+            for(CMPCertificate cmpCaPub : cmpCaPubs)
+            {
+                try {
+                    caPubs.add(getCertificate(cmpCaPub));
+                } catch (CertificateException e) {
+                    LOG.error("Could not extract the caPub from CMPCertificate");
+                }
+            }
+
+            for(CertificateOrError certOrError : certOrErrors.values())
+            {
+                Certificate cert = certOrError.getCertificate();
+                if(cert == null)
+                {
+                    continue;
+                }
+
+                if(caCert == null)
+                {
+                    for(Certificate caPub : caPubs)
+                    {
+                        if(verify(caPub, cert))
+                        {
+                            caCert = caPub;
+                        }
+                    }
+                }
+                else if(verify(caCert, cert) == false)
+                {
+                    LOG.warn("Not all certificates issued by CA embedded in caPubs, ignore the caPubs");
+                    caCert = null;
+                    break;
+                }
+            }
+        }
+
+        return new EnrollCertResult(caCert, certOrErrors);
+    }
+
+    protected static PKIErrorException createPKIErrorException(ErrorResultType errResult)
+    {
+        return new PKIErrorException(errResult.getStatus(),
+                errResult.getPkiFailureInfo(), errResult.getStatusMessage());
+    }
+
+    public void setSecurityFactory(SecurityFactory securityFactory) {
+        this.securityFactory = securityFactory;
+    }
+
+
+
 }

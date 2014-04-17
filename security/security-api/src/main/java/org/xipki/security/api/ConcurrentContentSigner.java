@@ -23,31 +23,31 @@ import java.security.cert.X509Certificate;
 import org.bouncycastle.operator.ContentSigner;
 
 public interface ConcurrentContentSigner {
-	
-	/**
-	 * 
-	 * @return the private key if possible. {@code null} may be returned.
-	 */
-	PrivateKey getPrivateKey();
-	
-	public void setCertificate(X509Certificate certificate);
-	
-	public X509Certificate getCertificate();
-	
-	void initialize(String conf, PasswordResolver passwordResolver) throws SignerException;
-	
-	public ContentSigner borrowContentSigner() throws NoIdleSignerException;
-	
-	/**
-	 * 
-	 * @param timeout timeout in milliseconds, 0 for infinitely
-	 * @return
-	 * @throws InterruptedException 
-	 */
-	public ContentSigner borrowContentSigner(int timeout) 
-			throws NoIdleSignerException;
-	
-	public void returnContentSigner(ContentSigner signer);
-	
-	public boolean isHealthy();
+
+    /**
+     *
+     * @return the private key if possible. {@code null} may be returned.
+     */
+    PrivateKey getPrivateKey();
+
+    public void setCertificate(X509Certificate certificate);
+
+    public X509Certificate getCertificate();
+
+    void initialize(String conf, PasswordResolver passwordResolver) throws SignerException;
+
+    public ContentSigner borrowContentSigner() throws NoIdleSignerException;
+
+    /**
+     *
+     * @param timeout timeout in milliseconds, 0 for infinitely
+     * @return
+     * @throws InterruptedException
+     */
+    public ContentSigner borrowContentSigner(int timeout)
+            throws NoIdleSignerException;
+
+    public void returnContentSigner(ContentSigner signer);
+
+    public boolean isHealthy();
 }

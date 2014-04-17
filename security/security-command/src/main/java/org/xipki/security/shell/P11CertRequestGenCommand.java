@@ -49,148 +49,148 @@ import org.xipki.security.p11.iaik.IaikP11ModulePool;
 
 @Command(scope = "keytool", name = "req", description="Generate PKCS#10 request with PKCS#11 device")
 public class P11CertRequestGenCommand extends OsgiCommandSupport {
-	@Option(name = "-subject",
-			required = false, 
-			description = "Subject in the PKCS#10 request. The default is the subject of self-signed certifite.")
+    @Option(name = "-subject",
+            required = false,
+            description = "Subject in the PKCS#10 request. The default is the subject of self-signed certifite.")
     protected String            subject;
 
-	@Option(name = "-slot",
-			required = true, description = "Required. Slot index of the PKCS#11 token")
+    @Option(name = "-slot",
+            required = true, description = "Required. Slot index of the PKCS#11 token")
     protected Integer           slotIndex;
-	
-	@Option(name = "-key-id",
-			required = false, description = "Id of the private key in the PKCS#11 token. Either keyId or keyLabel must be specified")
+
+    @Option(name = "-key-id",
+            required = false, description = "Id of the private key in the PKCS#11 token. Either keyId or keyLabel must be specified")
     protected String            keyId;
-	
-	@Option(name = "-key-label",
-			required = false, description = "Label of the private key in the PKCS#11 token. Either keyId or keyLabel must be specified")
+
+    @Option(name = "-key-label",
+            required = false, description = "Label of the private key in the PKCS#11 token. Either keyId or keyLabel must be specified")
     protected String            keyLabel;
 
-	@Option(name = "-pwd", aliases = { "--password" },
-			required = false, description = "Password to access the PKCS#11 token")
+    @Option(name = "-pwd", aliases = { "--password" },
+            required = false, description = "Password to access the PKCS#11 token")
     protected String            password;
-	
-	@Option(name = "-hash",
-			required = false, description = "Hash algorithm name. The default is SHA256")
+
+    @Option(name = "-hash",
+            required = false, description = "Hash algorithm name. The default is SHA256")
     protected String            hashAlgo;
 
-	@Option(name = "-out",
-			required = true, description = "Required. Output file name")
+    @Option(name = "-out",
+            required = true, description = "Required. Output file name")
     protected String            outputFilename;
-	
-	private SecurityFactory securityFactory;
-	
-	public void setSecurityFactory(SecurityFactory securityFactory) {
-		this.securityFactory = securityFactory;
-	}
-	
+
+    private SecurityFactory securityFactory;
+
+    public void setSecurityFactory(SecurityFactory securityFactory) {
+        this.securityFactory = securityFactory;
+    }
+
     @Override
     protected Object doExecute() throws Exception {
-    	if(hashAlgo == null)
-    	{
-    		hashAlgo = "SHA256";
-    	}
-    	
-    	Pkcs11KeyIdentifier keyIdentifier;
-    	if(keyId != null && keyLabel == null)
-    	{    		
-    		keyIdentifier = new Pkcs11KeyIdentifier(Hex.decode(keyId));
-    	}
-    	else if(keyId == null && keyLabel != null)
-    	{
-    		keyIdentifier = new Pkcs11KeyIdentifier(keyLabel);
-    	}
-    	else
-    	{
-    		throw new Exception("Exactly one of keyId or keyLabel should be specified");
-    	}    	
-    	
-		IaikExtendedModule module = IaikP11ModulePool.getInstance().getModule(
-				securityFactory.getPkcs11Module());
-		
-		IaikExtendedSlot slot = null;
-		try{
-			slot = module.getSlot(new PKCS11SlotIdentifier(slotIndex, null), 
-					password == null ? null : password.toCharArray());
-		}catch(SignerException e)
-		{
-			System.err.println("ERROR:  " + e.getMessage());
-			return null;
-		}
-		
-		char[] keyLabelChars = (keyLabel == null) ?
-				null : keyLabel.toCharArray();
-		
-		PrivateKey privKey = slot.getPrivateObject(null, null, keyIdentifier.getKeyId(), keyLabelChars);
-		if(privKey == null)
-		{
-			System.err.println("Could not find private key " + keyIdentifier);
-			return null;
-		}
-    	
-		boolean ec = privKey instanceof ECDSAPrivateKey;
+        if(hashAlgo == null)
+        {
+            hashAlgo = "SHA256";
+        }
 
-		Pkcs10RequestGenerator p10Gen = new Pkcs10RequestGenerator();
+        Pkcs11KeyIdentifier keyIdentifier;
+        if(keyId != null && keyLabel == null)
+        {
+            keyIdentifier = new Pkcs11KeyIdentifier(Hex.decode(keyId));
+        }
+        else if(keyId == null && keyLabel != null)
+        {
+            keyIdentifier = new Pkcs11KeyIdentifier(keyLabel);
+        }
+        else
+        {
+            throw new Exception("Exactly one of keyId or keyLabel should be specified");
+        }
 
-    	ASN1ObjectIdentifier sigAlgOid;
-    	
-    	hashAlgo = hashAlgo.trim().toUpperCase();
-    	
-    	if("SHA256".equalsIgnoreCase(hashAlgo) || "SHA-256".equalsIgnoreCase(hashAlgo))
-    	{
-    		sigAlgOid = ec ? X9ObjectIdentifiers.ecdsa_with_SHA256 : PKCSObjectIdentifiers.sha256WithRSAEncryption;
-    	}
-    	else if("SHA384".equalsIgnoreCase(hashAlgo) || "SHA-384".equalsIgnoreCase(hashAlgo))
-    	{
-    		sigAlgOid = ec ? X9ObjectIdentifiers.ecdsa_with_SHA384 : PKCSObjectIdentifiers.sha384WithRSAEncryption;
-    	}
-    	else if("SHA512".equalsIgnoreCase(hashAlgo) || "SHA-512".equalsIgnoreCase(hashAlgo))
-    	{
-    		sigAlgOid = ec ? X9ObjectIdentifiers.ecdsa_with_SHA512 : PKCSObjectIdentifiers.sha512WithRSAEncryption;
-    	}
-    	else
-    	{
-    		throw new Exception("Unsupported hash algorithm " + hashAlgo);
-    	}
-    	
-    	PKCS11SlotIdentifier slotId = new PKCS11SlotIdentifier(slotIndex, null);
-    	String signerConf = SecurityFactoryImpl.getPkcs11SignerConf(
-    					securityFactory.getPkcs11Module(), 
-    					slotId, keyIdentifier, password, 
-    					sigAlgOid.getId(), 1);
-    	
-		ConcurrentContentSigner identifiedSigner = 
-				securityFactory.createSigner("PKCS11", signerConf, null, NopPasswordResolver.INSTANCE); 
-		
-		Certificate cert = Certificate.getInstance(identifiedSigner.getCertificate().getEncoded());    	
-		
-    	X500Name subjectDN;
-    	if(subject != null)
-    	{
-    		subjectDN = new X500Name(subject);
-    	}
-    	else
-    	{
-    		subjectDN = cert.getSubject();
-    	}
-    	
-    	SubjectPublicKeyInfo subjectPublicKeyInfo = cert.getSubjectPublicKeyInfo();
-		
-		ContentSigner signer = identifiedSigner.borrowContentSigner();
-		
-		PKCS10CertificationRequest p10Req;
-		try{
-			p10Req  = p10Gen.generateRequest(signer, subjectPublicKeyInfo, subjectDN);
-		}finally
-		{
-			identifiedSigner.returnContentSigner(signer);
-		}
-    	
-		File file = new File(outputFilename);
-    	IoCertUtil.save(file, p10Req.getEncoded());
-    	System.out.println("Saved PKCS#10 request in " + file.getPath());
-    	
-    	return null;
+        IaikExtendedModule module = IaikP11ModulePool.getInstance().getModule(
+                securityFactory.getPkcs11Module());
+
+        IaikExtendedSlot slot = null;
+        try{
+            slot = module.getSlot(new PKCS11SlotIdentifier(slotIndex, null),
+                    password == null ? null : password.toCharArray());
+        }catch(SignerException e)
+        {
+            System.err.println("ERROR:  " + e.getMessage());
+            return null;
+        }
+
+        char[] keyLabelChars = (keyLabel == null) ?
+                null : keyLabel.toCharArray();
+
+        PrivateKey privKey = slot.getPrivateObject(null, null, keyIdentifier.getKeyId(), keyLabelChars);
+        if(privKey == null)
+        {
+            System.err.println("Could not find private key " + keyIdentifier);
+            return null;
+        }
+
+        boolean ec = privKey instanceof ECDSAPrivateKey;
+
+        Pkcs10RequestGenerator p10Gen = new Pkcs10RequestGenerator();
+
+        ASN1ObjectIdentifier sigAlgOid;
+
+        hashAlgo = hashAlgo.trim().toUpperCase();
+
+        if("SHA256".equalsIgnoreCase(hashAlgo) || "SHA-256".equalsIgnoreCase(hashAlgo))
+        {
+            sigAlgOid = ec ? X9ObjectIdentifiers.ecdsa_with_SHA256 : PKCSObjectIdentifiers.sha256WithRSAEncryption;
+        }
+        else if("SHA384".equalsIgnoreCase(hashAlgo) || "SHA-384".equalsIgnoreCase(hashAlgo))
+        {
+            sigAlgOid = ec ? X9ObjectIdentifiers.ecdsa_with_SHA384 : PKCSObjectIdentifiers.sha384WithRSAEncryption;
+        }
+        else if("SHA512".equalsIgnoreCase(hashAlgo) || "SHA-512".equalsIgnoreCase(hashAlgo))
+        {
+            sigAlgOid = ec ? X9ObjectIdentifiers.ecdsa_with_SHA512 : PKCSObjectIdentifiers.sha512WithRSAEncryption;
+        }
+        else
+        {
+            throw new Exception("Unsupported hash algorithm " + hashAlgo);
+        }
+
+        PKCS11SlotIdentifier slotId = new PKCS11SlotIdentifier(slotIndex, null);
+        String signerConf = SecurityFactoryImpl.getPkcs11SignerConf(
+                        securityFactory.getPkcs11Module(),
+                        slotId, keyIdentifier, password,
+                        sigAlgOid.getId(), 1);
+
+        ConcurrentContentSigner identifiedSigner =
+                securityFactory.createSigner("PKCS11", signerConf, null, NopPasswordResolver.INSTANCE);
+
+        Certificate cert = Certificate.getInstance(identifiedSigner.getCertificate().getEncoded());
+
+        X500Name subjectDN;
+        if(subject != null)
+        {
+            subjectDN = new X500Name(subject);
+        }
+        else
+        {
+            subjectDN = cert.getSubject();
+        }
+
+        SubjectPublicKeyInfo subjectPublicKeyInfo = cert.getSubjectPublicKeyInfo();
+
+        ContentSigner signer = identifiedSigner.borrowContentSigner();
+
+        PKCS10CertificationRequest p10Req;
+        try{
+            p10Req  = p10Gen.generateRequest(signer, subjectPublicKeyInfo, subjectDN);
+        }finally
+        {
+            identifiedSigner.returnContentSigner(signer);
+        }
+
+        File file = new File(outputFilename);
+        IoCertUtil.save(file, p10Req.getEncoded());
+        System.out.println("Saved PKCS#10 request in " + file.getPath());
+
+        return null;
     }
-    
+
 }

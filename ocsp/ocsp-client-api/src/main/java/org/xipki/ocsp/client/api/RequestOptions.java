@@ -21,27 +21,27 @@ import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.nist.NISTObjectIdentifiers;
 
 public class RequestOptions {
-	private boolean useNonce = true;
-	private ASN1ObjectIdentifier hashAlgorithmId = NISTObjectIdentifiers.id_sha256;
-	
-	public RequestOptions() {
-	}
+    private boolean useNonce = true;
+    private ASN1ObjectIdentifier hashAlgorithmId = NISTObjectIdentifiers.id_sha256;
 
-	public boolean isUseNonce() {
-		return useNonce;
-	}
+    public RequestOptions() {
+    }
 
-	public void setUseNonce(boolean useNonce) {
-		this.useNonce = useNonce;
-	}
+    public boolean isUseNonce() {
+        return useNonce;
+    }
 
-	public ASN1ObjectIdentifier getHashAlgorithmId() {
-		return hashAlgorithmId;
-	}
+    public void setUseNonce(boolean useNonce) {
+        this.useNonce = useNonce;
+    }
 
-	public void setHashAlgorithmId(ASN1ObjectIdentifier hashAlgorithmId) {
-		this.hashAlgorithmId = hashAlgorithmId;
-	}
+    public ASN1ObjectIdentifier getHashAlgorithmId() {
+        return hashAlgorithmId;
+    }
 
-	
+    public void setHashAlgorithmId(ASN1ObjectIdentifier hashAlgorithmId) {
+        this.hashAlgorithmId = hashAlgorithmId;
+    }
+
+
 }

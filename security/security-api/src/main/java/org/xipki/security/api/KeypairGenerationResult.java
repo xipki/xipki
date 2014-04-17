@@ -20,16 +20,16 @@ package org.xipki.security.api;
 import org.bouncycastle.cert.X509CertificateHolder;
 
 public abstract class KeypairGenerationResult {
-	private final X509CertificateHolder certificate;
-	
-	protected KeypairGenerationResult(
-			X509CertificateHolder certificate) 
-	{
-		this.certificate = certificate;
-	}
+    private final X509CertificateHolder certificate;
 
-	public X509CertificateHolder getCertificate() {
-		return certificate;
-	}
+    protected KeypairGenerationResult(
+            X509CertificateHolder certificate)
+    {
+        this.certificate = certificate;
+    }
+
+    public X509CertificateHolder getCertificate() {
+        return certificate;
+    }
 
 }

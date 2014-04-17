@@ -23,7 +23,7 @@ import org.apache.felix.gogo.commands.Command;
 public class CmpControlRemoveCommand extends CaCommand {
     @Override
     protected Object doExecute() throws Exception {
-    	caManager.removeCmpControl();
+        caManager.removeCmpControl();
         return null;
     }
 }

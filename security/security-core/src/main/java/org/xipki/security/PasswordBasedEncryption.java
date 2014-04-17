@@ -27,7 +27,7 @@ import javax.crypto.spec.PBEParameterSpec;
 
 public class PasswordBasedEncryption {
     private static final String CIPHER_ALGO = "PBEWITHSHA256AND256BITAES-CBC-BC";
-    
+
     public static byte[] encrypt(byte[] plaintext, char[] password, int iterationCount, byte[] salt)
     throws GeneralSecurityException
     {
@@ -37,7 +37,7 @@ public class PasswordBasedEncryption {
         SecretKey pbeKey = secretKeyFactory.generateSecret(pbeKeySpec);
 
         Cipher cipher = Cipher.getInstance(CIPHER_ALGO, "BC");
-        PBEParameterSpec pbeParameterSpec = new PBEParameterSpec(salt, iterationCount);        
+        PBEParameterSpec pbeParameterSpec = new PBEParameterSpec(salt, iterationCount);
         cipher.init(Cipher.ENCRYPT_MODE, pbeKey, pbeParameterSpec);
         pbeKeySpec.clearPassword();
 

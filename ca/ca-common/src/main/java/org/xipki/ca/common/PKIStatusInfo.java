@@ -19,33 +19,33 @@ package org.xipki.ca.common;
 
 
 public class PKIStatusInfo {
-	private final int status;
-	private final int pkiFailureInfo;
-	private final String statusMessage;
-	
-	public PKIStatusInfo(int status, int pkiFailureInfo, String statusMessage)
-	{
-		this.status = status;
-		this.pkiFailureInfo = pkiFailureInfo;
-		this.statusMessage = statusMessage;
-	}
+    private final int status;
+    private final int pkiFailureInfo;
+    private final String statusMessage;
 
-	public PKIStatusInfo(int status)
-	{
-		this.status = status;
-		this.pkiFailureInfo = 0;
-		this.statusMessage = null;
-	}
+    public PKIStatusInfo(int status, int pkiFailureInfo, String statusMessage)
+    {
+        this.status = status;
+        this.pkiFailureInfo = pkiFailureInfo;
+        this.statusMessage = statusMessage;
+    }
 
-	public int getStatus() {
-		return status;
-	}
+    public PKIStatusInfo(int status)
+    {
+        this.status = status;
+        this.pkiFailureInfo = 0;
+        this.statusMessage = null;
+    }
 
-	public int getPkiFailureInfo() {
-		return pkiFailureInfo;
-	}
+    public int getStatus() {
+        return status;
+    }
 
-	public String getStatusMessage() {
-		return statusMessage;
-	}
+    public int getPkiFailureInfo() {
+        return pkiFailureInfo;
+    }
+
+    public String getStatusMessage() {
+        return statusMessage;
+    }
 }

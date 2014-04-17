@@ -48,166 +48,166 @@ import org.xipki.ocsp.client.impl.digest.SHA256DigestCalculator;
 import org.xipki.ocsp.client.impl.digest.SHA384DigestCalculator;
 import org.xipki.ocsp.client.impl.digest.SHA512DigestCalculator;
 
-public abstract class AbstractOCSPRequestor implements OCSPRequestor 
+public abstract class AbstractOCSPRequestor implements OCSPRequestor
 {
-	private SecureRandom random = new SecureRandom();
+    private SecureRandom random = new SecureRandom();
 
     protected abstract byte[] send(byte[] request, URL responderUrl) throws IOException;
 
     protected AbstractOCSPRequestor()
     {
     }
-    
+
     @Override
     public BasicOCSPResp ask(X509Certificate cacert, X509Certificate cert, URL responderUrl,
-    		RequestOptions requestOptions)
+            RequestOptions requestOptions)
     throws OCSPRequestorException
     {
-    	if(! cacert.getSubjectX500Principal().equals(cert.getIssuerX500Principal()))
-    	{
-    		throw new IllegalArgumentException("cert and cacert do not match");
-    	}
-    	
-    	return ask(cacert, cert.getSerialNumber(), responderUrl, requestOptions);
+        if(! cacert.getSubjectX500Principal().equals(cert.getIssuerX500Principal()))
+        {
+            throw new IllegalArgumentException("cert and cacert do not match");
+        }
+
+        return ask(cacert, cert.getSerialNumber(), responderUrl, requestOptions);
     }
 
     @Override
     public BasicOCSPResp ask(X509Certificate caCert, BigInteger serialNumber, URL responderUrl,
-    		RequestOptions requestOptions)
+            RequestOptions requestOptions)
     throws OCSPRequestorException
     {
-    	if(requestOptions == null)
-    	{
-    		throw new IllegalArgumentException("requestOptions could not be null");
-    	}
-    	
-    	byte[] nonce = null;
-    	if(requestOptions.isUseNonce())
-    	{
-    		nonce = nextNonce();
-    	}
-    	
-    	OCSPReq ocspReq = buildRequest(caCert, serialNumber, nonce, requestOptions.getHashAlgorithmId());
-    	OCSPResp response;
-    	try{
-	    	byte[] encodedReq = ocspReq.getEncoded();
-	    	byte[] encodedResp = send(encodedReq, responderUrl);
-	    	response = new OCSPResp(encodedResp);
-		} catch (IOException e) {
-			throw new OCSPRequestorException(e);
-		}
-    	
-    	int statusCode = response.getStatus(); 
-    	if(statusCode == 0)
-    	{
-    		BasicOCSPResp basicOCSPResp;
-			try {
-				basicOCSPResp = (BasicOCSPResp) response.getResponseObject();
-			} catch (OCSPException e) {
-				throw new OCSPRequestorException(e);
-			}
-    		Extension nonceExtn = basicOCSPResp.getExtension(OCSPObjectIdentifiers.id_pkix_ocsp_nonce);
-    		
-    		if(nonce != null)
-    		{
-	    		if(nonceExtn == null)
-	    		{
-	    			throw new OCSPRequestorException("No nonce is contained in response");
-	    		}
-	    		if(Arrays.equals(nonce, nonceExtn.getExtnValue().getOctets()) == false)
-	    		{
-	    			throw new OCSPRequestorException("The nonce in response does not match the one in request");
-	    		}
-    		}
-    		
-    		return basicOCSPResp;
-    	}
-    	else
-    	{
-    		throw new OCSPRequestorException("OCSP responder could not process the request. stauts is " +
-    				statusCode + " (" + getOCSPResponseStatus(statusCode) + ")");
-    	}
-    	
-    }   
-    
-	private OCSPReq buildRequest(X509Certificate caCert, BigInteger serialNumber, byte[] nonce,
-			ASN1ObjectIdentifier hashAlgId)
-	throws OCSPRequestorException
-	{
-		DigestCalculator digestCalculator;
-    	if(NISTObjectIdentifiers.id_sha224.equals(hashAlgId))
-    	{
-    		digestCalculator = new SHA224DigestCalculator();
-    	}
-    	else if(NISTObjectIdentifiers.id_sha256.equals(hashAlgId))
-    	{
-    		digestCalculator = new SHA256DigestCalculator();
-    	}
-    	else if(NISTObjectIdentifiers.id_sha384.equals(hashAlgId))
-    	{
-    		digestCalculator = new SHA384DigestCalculator();
-    	}
-    	else if(NISTObjectIdentifiers.id_sha512.equals(hashAlgId))
-    	{
-    		digestCalculator = new SHA512DigestCalculator();
-    	}
-    	else 
-    	{
-    		digestCalculator = new SHA1DigestCalculator();
-    	}
+        if(requestOptions == null)
+        {
+            throw new IllegalArgumentException("requestOptions could not be null");
+        }
 
-    	OCSPReqBuilder reqBuilder = new OCSPReqBuilder();
-    	if(nonce != null)
-    	{
-    		Extension nonceExtn = new Extension(OCSPObjectIdentifiers.id_pkix_ocsp_nonce, false,
-    				new DEROctetString(nonce));
-    		Extensions extensions = new Extensions(nonceExtn);
-    		reqBuilder.setRequestExtensions(extensions);
-    	}
-    	
-    	try{
-			CertificateID certID = new CertificateID(
-					digestCalculator, 
-					new X509CertificateHolder(caCert.getEncoded()),
-					serialNumber);
-			
-			reqBuilder.addRequest(certID);
-			return reqBuilder.build();
-    	} catch (OCSPException e)
-    	{
-    		throw new OCSPRequestorException(e);
-    	} catch (CertificateEncodingException e) {
-    		throw new OCSPRequestorException(e);
-		} catch (IOException e) {
-    		throw new OCSPRequestorException(e);
-		}
-	}
+        byte[] nonce = null;
+        if(requestOptions.isUseNonce())
+        {
+            nonce = nextNonce();
+        }
 
-	private byte[] nextNonce()
-	{
-    	byte[] nonce = new byte[20];
-    	random.nextBytes(nonce);
-    	return nonce;
-	}
-	
-	private static String getOCSPResponseStatus(int statusCode)
-	{
-		switch(statusCode)
-		{
-		case 0:
-			return "successfull";
-		case 1: 
-			return "malformedRequest";
-		case 2:
-			return "internalError";
-		case 3:
-			return "tryLater";
-		case 5:
-			return "sigRequired";
-		case 6:
-			return "unauthorized";
-		default:
-			return "undefined";
-		}
-	}
+        OCSPReq ocspReq = buildRequest(caCert, serialNumber, nonce, requestOptions.getHashAlgorithmId());
+        OCSPResp response;
+        try{
+            byte[] encodedReq = ocspReq.getEncoded();
+            byte[] encodedResp = send(encodedReq, responderUrl);
+            response = new OCSPResp(encodedResp);
+        } catch (IOException e) {
+            throw new OCSPRequestorException(e);
+        }
+
+        int statusCode = response.getStatus();
+        if(statusCode == 0)
+        {
+            BasicOCSPResp basicOCSPResp;
+            try {
+                basicOCSPResp = (BasicOCSPResp) response.getResponseObject();
+            } catch (OCSPException e) {
+                throw new OCSPRequestorException(e);
+            }
+            Extension nonceExtn = basicOCSPResp.getExtension(OCSPObjectIdentifiers.id_pkix_ocsp_nonce);
+
+            if(nonce != null)
+            {
+                if(nonceExtn == null)
+                {
+                    throw new OCSPRequestorException("No nonce is contained in response");
+                }
+                if(Arrays.equals(nonce, nonceExtn.getExtnValue().getOctets()) == false)
+                {
+                    throw new OCSPRequestorException("The nonce in response does not match the one in request");
+                }
+            }
+
+            return basicOCSPResp;
+        }
+        else
+        {
+            throw new OCSPRequestorException("OCSP responder could not process the request. stauts is " +
+                    statusCode + " (" + getOCSPResponseStatus(statusCode) + ")");
+        }
+
+    }
+
+    private OCSPReq buildRequest(X509Certificate caCert, BigInteger serialNumber, byte[] nonce,
+            ASN1ObjectIdentifier hashAlgId)
+    throws OCSPRequestorException
+    {
+        DigestCalculator digestCalculator;
+        if(NISTObjectIdentifiers.id_sha224.equals(hashAlgId))
+        {
+            digestCalculator = new SHA224DigestCalculator();
+        }
+        else if(NISTObjectIdentifiers.id_sha256.equals(hashAlgId))
+        {
+            digestCalculator = new SHA256DigestCalculator();
+        }
+        else if(NISTObjectIdentifiers.id_sha384.equals(hashAlgId))
+        {
+            digestCalculator = new SHA384DigestCalculator();
+        }
+        else if(NISTObjectIdentifiers.id_sha512.equals(hashAlgId))
+        {
+            digestCalculator = new SHA512DigestCalculator();
+        }
+        else
+        {
+            digestCalculator = new SHA1DigestCalculator();
+        }
+
+        OCSPReqBuilder reqBuilder = new OCSPReqBuilder();
+        if(nonce != null)
+        {
+            Extension nonceExtn = new Extension(OCSPObjectIdentifiers.id_pkix_ocsp_nonce, false,
+                    new DEROctetString(nonce));
+            Extensions extensions = new Extensions(nonceExtn);
+            reqBuilder.setRequestExtensions(extensions);
+        }
+
+        try{
+            CertificateID certID = new CertificateID(
+                    digestCalculator,
+                    new X509CertificateHolder(caCert.getEncoded()),
+                    serialNumber);
+
+            reqBuilder.addRequest(certID);
+            return reqBuilder.build();
+        } catch (OCSPException e)
+        {
+            throw new OCSPRequestorException(e);
+        } catch (CertificateEncodingException e) {
+            throw new OCSPRequestorException(e);
+        } catch (IOException e) {
+            throw new OCSPRequestorException(e);
+        }
+    }
+
+    private byte[] nextNonce()
+    {
+        byte[] nonce = new byte[20];
+        random.nextBytes(nonce);
+        return nonce;
+    }
+
+    private static String getOCSPResponseStatus(int statusCode)
+    {
+        switch(statusCode)
+        {
+        case 0:
+            return "successfull";
+        case 1:
+            return "malformedRequest";
+        case 2:
+            return "internalError";
+        case 3:
+            return "tryLater";
+        case 5:
+            return "sigRequired";
+        case 6:
+            return "unauthorized";
+        default:
+            return "undefined";
+        }
+    }
 }

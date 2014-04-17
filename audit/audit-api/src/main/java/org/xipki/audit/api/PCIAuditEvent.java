@@ -25,7 +25,7 @@ import java.util.Map;
 
 /**
  * Provides a default implementation of {@link PCIAuditEvent}  that is logged or to be logged in the future.
- * 
+ *
  * {@link PCIAuditEvent} provides support for audit trails defined by section
  * 10.3 of the PCI Data Security Standard (PCI DSS) version 3.0 Nov. 2013.
  *
@@ -35,9 +35,9 @@ import java.util.Map;
  *
  * <p>The PCI DSS specification is Copyright 2006-2013 PCI Security Standards
  * Council LLC.</p>
- * 
+ *
  * $Id$
- * 
+ *
  */
 public class PCIAuditEvent extends AuditEvent
 {
@@ -48,32 +48,32 @@ public class PCIAuditEvent extends AuditEvent
     public static final String STATUS               = "status";
     public static final String ORIGINATION          = "origination";
     public static final String AFFECTED_RESOURCE    = "affectedResource";
-    
+
     public static final String AUDIT_LEVEL          = "level";
     public static final String APPLICATION_NAME     = "applicationName";
     public static final String EVENT_DATA           = "eventData";
     public static final String EVENT_NAME           = "eventName";
-    
+
     public static final String SYSTEM_USER          = "SYSTEM";
 
     // 10.3.1 "User Identification"
     protected String          userId           = UNDEFINED;
-    
+
     // 10.3.2 "Type of event"
     protected String          eventType        = UNDEFINED;
-    
+
     // 10.3.3 "Date and time" (date)
     protected String          date             = null;
-    
+
     // 10.3.3 "Date and time" (time)
     protected String          time             = null;
-    
+
     // 10.3.4 "Success or failure indication"
     protected String          status           = UNDEFINED;
-    
+
     // 10.3.5 "Origination of Event"
     protected String          origination      = null;
-    
+
     // 10.3.6 "Identity or name of affected data, system component, or resource"
     protected String          affectedResource = UNDEFINED;
 
@@ -84,20 +84,20 @@ public class PCIAuditEvent extends AuditEvent
     {
         id.getAndIncrement();
     }
- 
-    public PCIAuditEvent(PCIAuditEvent event) 
+
+    public PCIAuditEvent(PCIAuditEvent event)
     {
         init(event);
     }
 
-    public PCIAuditEvent(Map<String, Serializable> fields) 
+    public PCIAuditEvent(Map<String, Serializable> fields)
     {
         init(fields);
     }
-    
+
     /**
      * Constructor for setting initial parameters.
-     *    
+     *
      * @param name
      *            Event name.
      * @param applicationName
@@ -116,9 +116,9 @@ public class PCIAuditEvent extends AuditEvent
         setTimeStamp(timeStamp);
         setEventDatas(eventDatas);
     }
-    
-    
-    public PCIAuditEvent(String userId, String eventType, String status, String affectedResource) 
+
+
+    public PCIAuditEvent(String userId, String eventType, String status, String affectedResource)
     {
         this.userId = userId;
         this.eventType = eventType;
@@ -127,7 +127,7 @@ public class PCIAuditEvent extends AuditEvent
     }
 
     public PCIAuditEvent(String userId, String eventType, String status, String origination,
-            String affectedResource) 
+            String affectedResource)
     {
         this.userId = userId;
         this.eventType = eventType;
@@ -137,7 +137,7 @@ public class PCIAuditEvent extends AuditEvent
     }
 
     public PCIAuditEvent(String userId, String eventType, String date, String time,
-            String status, String affectedResource) 
+            String status, String affectedResource)
     {
         this.userId = userId;
         this.eventType = eventType;
@@ -148,7 +148,7 @@ public class PCIAuditEvent extends AuditEvent
     }
 
     public PCIAuditEvent(String userId, String eventType, String date, String time,
-            String status, String origination, String affectedResource) 
+            String status, String origination, String affectedResource)
     {
         this.userId = userId;
         this.eventType = eventType;
@@ -160,7 +160,7 @@ public class PCIAuditEvent extends AuditEvent
     }
 
     public PCIAuditEvent(String userId, String eventType, Date date, String status,
-            String affectedResource) 
+            String affectedResource)
     {
         this.userId = userId;
         this.eventType = eventType;
@@ -174,9 +174,9 @@ public class PCIAuditEvent extends AuditEvent
     }
 
     public PCIAuditEvent(String userId, String eventType, Date date, String status,
-            String origination, String affectedResource) 
+            String origination, String affectedResource)
     {
-        
+
         this.userId = userId;
         this.eventType = eventType;
 
@@ -188,14 +188,14 @@ public class PCIAuditEvent extends AuditEvent
         this.origination = origination;
         this.affectedResource = affectedResource;
     }
-    
 
-    protected void init(PCIAuditEvent event) 
+
+    protected void init(PCIAuditEvent event)
     {
         id.getAndIncrement();
-        
+
         setUserId(event.getUserId());
-        setEventType(event.getEventType());     
+        setEventType(event.getEventType());
         setDate(event.getDate());
         setTime(event.getTime());
         setStatus(event.getStatus());
@@ -206,32 +206,32 @@ public class PCIAuditEvent extends AuditEvent
         setApplicationName(event.getApplicationName());
         setEventDatas(eventDatas);
     }
-    
-    
+
+
     protected void init(Map<String, Serializable> fields)
     {
         id.getAndIncrement();
-        
+
         if (fields.containsKey(APPLICATION_NAME))
         {
             this.applicationName = (String) fields.get(APPLICATION_NAME);
         }
-        
+
         if (fields.containsKey(EVENT_NAME))
         {
             this.name = (String) fields.get(EVENT_NAME);
         }
-        
+
         if (fields.containsKey(EVENT_DATA) && fields.get(EVENT_DATA) instanceof AuditEventData[])
         {
             setEventDatas((AuditEventData[]) fields.get(EVENT_DATA));
         }
-        
+
         if (fields.containsKey(AUDIT_LEVEL) && fields.get(AUDIT_LEVEL) instanceof AuditLevel)
         {
             this.level = (AuditLevel) fields.get(AUDIT_LEVEL);
         }
-               
+
         if (fields.containsKey(USER_ID))
         {
             this.userId = (String) fields.get(USER_ID);
@@ -395,19 +395,19 @@ public class PCIAuditEvent extends AuditEvent
     public String toString()
     {
         final int maxLen = 10;
-    	List<AuditEventData> eventDatasText; 
-    	if(eventDatas != null)
-    	{
-    		eventDatasText = Arrays.asList(eventDatas).subList(0, Math.min(eventDatas.length, maxLen));
-    	}
-    	else
-    	{
-    		eventDatasText = null;
-    	}
-    	
+        List<AuditEventData> eventDatasText;
+        if(eventDatas != null)
+        {
+            eventDatasText = Arrays.asList(eventDatas).subList(0, Math.min(eventDatas.length, maxLen));
+        }
+        else
+        {
+            eventDatasText = null;
+        }
+
         StringBuilder builder = new StringBuilder();
         builder.append("PCIAuditEvent ")
-        		.append("[userId=").append(userId)
+                .append("[userId=").append(userId)
                 .append(", eventType=").append(eventType)
                 .append(", date=").append(date)
                 .append(", time=").append(time)

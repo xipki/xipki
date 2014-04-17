@@ -27,7 +27,7 @@ import org.bouncycastle.crypto.digests.SHA1Digest;
 import org.bouncycastle.operator.DigestCalculator;
 
 public class SHA1DigestCalculator implements DigestCalculator
-{	
+{
     private ByteArrayOutputStream bOut = new ByteArrayOutputStream();
 
     public AlgorithmIdentifier getAlgorithmIdentifier()

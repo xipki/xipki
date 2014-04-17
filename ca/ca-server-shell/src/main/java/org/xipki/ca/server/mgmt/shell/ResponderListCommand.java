@@ -24,8 +24,8 @@ import org.xipki.ca.server.mgmt.CmpResponderEntry;
 public class ResponderListCommand extends CaCommand {
     @Override
     protected Object doExecute() throws Exception {
-		CmpResponderEntry responder = caManager.getCmpResponder();
-		System.out.println(responder);		
+        CmpResponderEntry responder = caManager.getCmpResponder();
+        System.out.println(responder);
         return null;
     }
 }
