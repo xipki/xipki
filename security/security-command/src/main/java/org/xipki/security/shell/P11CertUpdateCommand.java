@@ -46,7 +46,8 @@ import org.xipki.security.p11.iaik.IaikP11CryptService;
 import org.xipki.security.p11.iaik.IaikP11ModulePool;
 
 @Command(scope = "keytool", name = "update-cert", description="Update certificate in PKCS#11 device")
-public class P11CertUpdateCommand extends OsgiCommandSupport {
+public class P11CertUpdateCommand extends OsgiCommandSupport
+{
 
     @Option(name = "-slot",
             required = true, description = "Required. Slot index")
@@ -70,12 +71,14 @@ public class P11CertUpdateCommand extends OsgiCommandSupport {
 
     private SecurityFactory securityFactory;
 
-    public void setSecurityFactory(SecurityFactory securityFactory) {
+    public void setSecurityFactory(SecurityFactory securityFactory)
+    {
         this.securityFactory = securityFactory;
     }
 
     @Override
-    protected Object doExecute() throws Exception {
+    protected Object doExecute() throws Exception
+    {
         Pkcs11KeyIdentifier keyIdentifier;
         if(keyId != null && keyLabel == null)
         {
@@ -94,7 +97,8 @@ public class P11CertUpdateCommand extends OsgiCommandSupport {
                 securityFactory.getPkcs11Module());
 
         IaikExtendedSlot slot = null;
-        try{
+        try
+        {
             slot = module.getSlot(new PKCS11SlotIdentifier(slotIndex, null), password);
         }catch(SignerException e)
         {
@@ -119,7 +123,8 @@ public class P11CertUpdateCommand extends OsgiCommandSupport {
         assertMatch(newCert);
 
         Session session = slot.borrowWritableSession();
-        try{
+        try
+        {
             X509PublicKeyCertificate newCertTemp;
 
             newCertTemp = new X509PublicKeyCertificate();

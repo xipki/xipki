@@ -27,7 +27,8 @@ import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.bouncycastle.cert.X509CertificateHolder;
 import org.bouncycastle.operator.ContentVerifierProvider;
 
-public interface SecurityFactory {
+public interface SecurityFactory
+{
     String getPkcs11Provider();
     String getPkcs11Module();
 

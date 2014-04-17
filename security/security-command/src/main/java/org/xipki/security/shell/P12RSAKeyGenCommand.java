@@ -29,7 +29,8 @@ import org.xipki.security.common.IoCertUtil;
 import org.xipki.security.p10.P12KeypairGenerator;
 
 @Command(scope = "keytool", name = "rsa-p12", description="Generate RSA keypair in PKCS#12 keystore")
-public class P12RSAKeyGenCommand extends OsgiCommandSupport {
+public class P12RSAKeyGenCommand extends OsgiCommandSupport
+{
     @Option(name = "-keysize",
             description = "Keysize in bit, the default is 2048",
             required = false)
@@ -53,16 +54,19 @@ public class P12RSAKeyGenCommand extends OsgiCommandSupport {
 
     private SecurityFactory securityFactory;
 
-    public SecurityFactory getSecurityFactory() {
+    public SecurityFactory getSecurityFactory()
+    {
         return securityFactory;
     }
 
-    public void setSecurityFactory(SecurityFactory securityFactory) {
+    public void setSecurityFactory(SecurityFactory securityFactory)
+    {
         this.securityFactory = securityFactory;
     }
 
     @Override
-    protected Object doExecute() throws Exception {
+    protected Object doExecute() throws Exception
+    {
         if(keysize == null)
         {
             keysize = 2048;

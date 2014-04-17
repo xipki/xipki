@@ -49,7 +49,8 @@ import org.xipki.security.common.IoCertUtil;
 import org.xipki.security.p10.Pkcs10RequestGenerator;
 
 @Command(scope = "keytool", name = "req-p12", description="Generate PKCS#10 request with PKCS#12 keystore")
-public class P12CertRequestGenCommand extends OsgiCommandSupport {
+public class P12CertRequestGenCommand extends OsgiCommandSupport
+{
     @Option(name = "-subject",
             required = false,
             description = "Subject in the PKCS#10 request. The default is the subject of self-signed certifite.")
@@ -73,16 +74,19 @@ public class P12CertRequestGenCommand extends OsgiCommandSupport {
 
     private SecurityFactory securityFactory;
 
-    public SecurityFactory getSecurityFactory() {
+    public SecurityFactory getSecurityFactory()
+    {
         return securityFactory;
     }
 
-    public void setSecurityFactory(SecurityFactory securityFactory) {
+    public void setSecurityFactory(SecurityFactory securityFactory)
+    {
         this.securityFactory = securityFactory;
     }
 
     @Override
-    protected Object doExecute() throws Exception {
+    protected Object doExecute() throws Exception
+    {
         Pkcs10RequestGenerator p10Gen = new Pkcs10RequestGenerator();
 
         if(hashAlgo == null)
@@ -134,7 +138,8 @@ public class P12CertRequestGenCommand extends OsgiCommandSupport {
         ContentSigner signer = identifiedSigner.borrowContentSigner();
 
         PKCS10CertificationRequest p10Req;
-        try{
+        try
+        {
             p10Req  = p10Gen.generateRequest(signer, subjectPublicKeyInfo, subjectDN);
         }finally
         {
@@ -153,7 +158,8 @@ public class P12CertRequestGenCommand extends OsgiCommandSupport {
     {
         FileInputStream fIn = new FileInputStream(p12File);
 
-        try{
+        try
+        {
             KeyStore ks = KeyStore.getInstance("PKCS12", "BC");
             ks.load(fIn, password);
 
@@ -178,22 +184,28 @@ public class P12CertRequestGenCommand extends OsgiCommandSupport {
         }catch(KeyStoreException e)
         {
             throw new SignerException(e);
-        } catch (NoSuchProviderException e) {
+        } catch (NoSuchProviderException e)
+        {
             throw new SignerException(e);
-        } catch (NoSuchAlgorithmException e) {
+        } catch (NoSuchAlgorithmException e)
+        {
             throw new SignerException(e);
-        } catch (CertificateException e) {
+        } catch (CertificateException e)
+        {
             throw new SignerException(e);
-        } catch (IOException e) {
+        } catch (IOException e)
+        {
             throw new SignerException(e);
         } catch (ClassCastException e)
         {
             throw new SignerException(e);
         } finally
         {
-            try {
+            try
+            {
                 fIn.close();
-            } catch (IOException e) {
+            } catch (IOException e)
+            {
             }
         }
     }

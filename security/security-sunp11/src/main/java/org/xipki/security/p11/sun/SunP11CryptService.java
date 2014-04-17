@@ -66,7 +66,8 @@ public final class SunP11CryptService implements P11CryptService
     {
         SunNamedCurveExtender.addNamedCurves();
 
-        synchronized (instances) {
+        synchronized (instances)
+        {
             SunP11CryptService instance = instances.get(pkcs11Module);
             if(instance == null)
             {
@@ -137,7 +138,8 @@ public final class SunP11CryptService implements P11CryptService
     }
 
     @Override
-    public synchronized void refresh() throws SignerException {
+    public synchronized void refresh() throws SignerException
+    {
 
         Set<SunP11Identity> currentIdentifies = new HashSet<SunP11Identity>();
 
@@ -148,7 +150,8 @@ public final class SunP11CryptService implements P11CryptService
 
         for(int i = 0; i < slotList.length; i++)
         {
-            try{
+            try
+            {
                 Provider provider;
                 if(i == 0)
                 {
@@ -163,9 +166,11 @@ public final class SunP11CryptService implements P11CryptService
 
                 KeyStore keystore = KeyStore.getInstance("PKCS11", provider);
 
-                try {
+                try
+                {
                     keystore.load(null, password);
-                } catch (Exception e) {
+                } catch (Exception e)
+                {
                     throw new SignerException(e);
                 }
 
@@ -173,7 +178,8 @@ public final class SunP11CryptService implements P11CryptService
                 while(aliases.hasMoreElements())
                 {
                     String alias = aliases.nextElement();
-                    try{
+                    try
+                    {
                         if(keystore.isKeyEntry(alias) == false)
                         {
                             continue;
@@ -286,19 +292,24 @@ public final class SunP11CryptService implements P11CryptService
         boolean omitInitialize = true;
 
         sun.security.pkcs11.wrapper.PKCS11 pkcs11;
-        try {
+        try
+        {
             pkcs11 = sun.security.pkcs11.wrapper.PKCS11.getInstance(
                     pkcs11Module, functionList, pInitArgs, omitInitialize);
-        } catch (IOException e) {
+        } catch (IOException e)
+        {
             throw new SignerException("IOException: " + e.getMessage(), e);
-        } catch (PKCS11Exception e) {
+        } catch (PKCS11Exception e)
+        {
             throw new SignerException("PKCS11Exception: " + e.getMessage(), e);
         }
 
         long[] slotList;
-        try {
+        try
+        {
             slotList = pkcs11.C_GetSlotList(false);
-        } catch (PKCS11Exception e) {
+        } catch (PKCS11Exception e)
+        {
             throw new SignerException("PKCS11Exception: " + e.getMessage(), e);
         }
         return slotList;

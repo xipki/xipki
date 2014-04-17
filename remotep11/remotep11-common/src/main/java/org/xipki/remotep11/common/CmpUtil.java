@@ -25,7 +25,8 @@ import org.bouncycastle.asn1.cmp.PKIFreeText;
 import org.bouncycastle.asn1.cmp.PKIStatus;
 import org.bouncycastle.asn1.cmp.PKIStatusInfo;
 
-public class CmpUtil {
+public class CmpUtil
+{
     public static final Map<Integer, String> statusTextMap = new HashMap<Integer, String>();
     public static final Map<Integer, String> failureInfoTextMap = new HashMap<Integer, String>();
 

@@ -81,33 +81,40 @@ public class P11RSAContentSigner implements ContentSigner
     }
 
     @Override
-    public AlgorithmIdentifier getAlgorithmIdentifier() {
+    public AlgorithmIdentifier getAlgorithmIdentifier()
+    {
         return algorithmIdentifier;
     }
 
     @Override
-    public OutputStream getOutputStream() {
+    public OutputStream getOutputStream()
+    {
         outputStream.reset();
         return outputStream;
     }
 
     @Override
-    public byte[] getSignature() {
+    public byte[] getSignature()
+    {
         byte[] hashValue = outputStream.digest();
         DigestInfo digestInfo = new DigestInfo(digAlgId, hashValue);
         byte[] encodedDigestInfo;
 
-        try {
+        try
+        {
             encodedDigestInfo = digestInfo.getEncoded();
-        } catch (IOException e) {
+        } catch (IOException e)
+        {
             LOG.warn("IOException: {}", e.getMessage());
             LOG.debug("IOException", e);
             throw new RuntimeCryptoException("IOException: " + e.getMessage());
         }
 
-        try {
+        try
+        {
             return cryptService.CKM_RSA_PKCS(encodedDigestInfo, slot, keyId);
-        } catch (SignerException e) {
+        } catch (SignerException e)
+        {
             LOG.warn("SignerException: {}", e.getMessage());
             LOG.debug("SignerException", e);
             throw new RuntimeCryptoException("SignerException: " + e.getMessage());

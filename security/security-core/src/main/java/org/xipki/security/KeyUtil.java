@@ -79,7 +79,8 @@ import org.xipki.security.api.SignerException;
 import org.xipki.security.bcext.BcRSAContentVerifierProviderBuilder;
 import org.xipki.security.bcext.ECDSAContentVerifierProviderBuilder;
 
-public class KeyUtil {
+public class KeyUtil
+{
     private static final DefaultDigestAlgorithmIdentifierFinder dfltDigesAlgIdentifierFinder =
             new DefaultDigestAlgorithmIdentifierFinder();
 
@@ -194,15 +195,19 @@ public class KeyUtil {
     private static KeyFactory getKeyFactory(String algorithm)
             throws InvalidKeySpecException
     {
-        synchronized (keyFactories) {
+        synchronized (keyFactories)
+        {
             KeyFactory kf = keyFactories.get(algorithm);
             if(kf == null)
             {
-                try {
+                try
+                {
                     kf = KeyFactory.getInstance(algorithm, "BC");
-                } catch (NoSuchAlgorithmException e) {
+                } catch (NoSuchAlgorithmException e)
+                {
                     throw new InvalidKeySpecException("Could not find KeyFactory for " + algorithm + ": " + e.getMessage());
-                } catch (NoSuchProviderException e) {
+                } catch (NoSuchProviderException e)
+                {
                     throw new InvalidKeySpecException("Could not find KeyFactory for " + algorithm + ": " + e.getMessage());
                 }
                 keyFactories.put(algorithm, kf);
@@ -240,7 +245,8 @@ public class KeyUtil {
     {
         RSAPublicKeySpec keySpec = new RSAPublicKeySpec(modulus, publicExponent);
         KeyFactory kf = getKeyFactory("RSA");
-        synchronized (kf) {
+        synchronized (kf)
+        {
             return (RSAPublicKey) kf.generatePublic(keySpec);
         }
     }
@@ -253,7 +259,8 @@ public class KeyUtil {
         ECPublicKeySpec keySpec = new ECPublicKeySpec(q, spec);
 
         KeyFactory kf = getKeyFactory("EC");
-        synchronized (kf) {
+        synchronized (kf)
+        {
             return (ECPublicKey) kf.generatePublic(keySpec);
         }
     }
@@ -322,7 +329,8 @@ public class KeyUtil {
     {
         final String provider = "BC";
 
-        try{
+        try
+        {
             X500Name subjectDN = new X500Name(subject);
             KeyPair keypair = KeyUtil.generateRSAKeypair(keysize, publicExponent);
             SubjectPublicKeyInfo pkInfo = SubjectPublicKeyInfoFactory.createSubjectPublicKeyInfo(
@@ -350,7 +358,8 @@ public class KeyUtil {
 
             ContentSigner signer = concurrentSigner.borrowContentSigner();
             X509CertificateObject cert;
-            try{
+            try
+            {
                 cert = new X509CertificateObject(
                     certBuilder.build(signer).toASN1Structure());
             }finally

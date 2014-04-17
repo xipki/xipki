@@ -100,7 +100,8 @@ public class P11ContentSignerBuilder
         List<ContentSigner> signers = new ArrayList<ContentSigner>(parallelism);
 
         PublicKey publicKey = cert.getPublicKey();
-        try{
+        try
+        {
             for(int i = 0; i < parallelism; i++)
             {
                 ContentSigner signer;
@@ -125,14 +126,17 @@ public class P11ContentSignerBuilder
                 }
                 signers.add(signer);
             }
-        } catch (NoSuchAlgorithmException e) {
+        } catch (NoSuchAlgorithmException e)
+        {
             throw new OperatorCreationException("no such algorithm", e);
         }
 
         PrivateKey privateKey;
-        try {
+        try
+        {
             privateKey = new P11PrivateKey(cryptService, slot, keyId);
-        } catch (InvalidKeyException e) {
+        } catch (InvalidKeyException e)
+        {
             throw new OperatorCreationException("Could not construct P11PrivateKey: " + e.getMessage(), e);
         }
 

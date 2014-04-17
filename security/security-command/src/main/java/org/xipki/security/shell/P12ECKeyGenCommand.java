@@ -29,7 +29,8 @@ import org.xipki.security.p10.P12KeypairGenerator;
 import org.xipki.security.p10.P12KeypairGenerator.ECDSAIdentityGenerator;
 
 @Command(scope = "keytool", name = "ec-p12", description="Generate EC keypair in PKCS#12 keystore")
-public class P12ECKeyGenCommand extends OsgiCommandSupport {
+public class P12ECKeyGenCommand extends OsgiCommandSupport
+{
     @Option(name = "-curve",
             description = "Required. EC Curve name or OID",
             required = true)
@@ -53,16 +54,19 @@ public class P12ECKeyGenCommand extends OsgiCommandSupport {
 
     private SecurityFactory securityFactory;
 
-    public SecurityFactory getSecurityFactory() {
+    public SecurityFactory getSecurityFactory()
+    {
         return securityFactory;
     }
 
-    public void setSecurityFactory(SecurityFactory securityFactory) {
+    public void setSecurityFactory(SecurityFactory securityFactory)
+    {
         this.securityFactory = securityFactory;
     }
 
     @Override
-    protected Object doExecute() throws Exception {
+    protected Object doExecute() throws Exception
+    {
         ECDSAIdentityGenerator gen = new P12KeypairGenerator.ECDSAIdentityGenerator(
                 curveName, password.toCharArray(), subject);
 

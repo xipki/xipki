@@ -25,7 +25,8 @@ import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.PBEParameterSpec;
 
-public class PasswordBasedEncryption {
+public class PasswordBasedEncryption
+{
     private static final String CIPHER_ALGO = "PBEWITHSHA256AND256BITAES-CBC-BC";
 
     public static byte[] encrypt(byte[] plaintext, char[] password, int iterationCount, byte[] salt)

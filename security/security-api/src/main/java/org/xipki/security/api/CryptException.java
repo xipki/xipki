@@ -17,23 +17,28 @@
 
 package org.xipki.security.api;
 
-public class CryptException extends Exception {
+public class CryptException extends Exception
+{
 
     private static final long serialVersionUID = 1L;
 
-    public CryptException() {
+    public CryptException()
+    {
         super();
     }
 
-    public CryptException(String message, Throwable cause) {
+    public CryptException(String message, Throwable cause)
+    {
         super(message, cause);
     }
 
-    public CryptException(String message) {
+    public CryptException(String message)
+    {
         super(message);
     }
 
-    public CryptException(Throwable cause) {
+    public CryptException(Throwable cause)
+    {
         super(cause);
     }
 }

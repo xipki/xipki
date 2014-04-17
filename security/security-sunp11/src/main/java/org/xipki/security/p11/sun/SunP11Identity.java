@@ -82,16 +82,21 @@ class SunP11Identity implements Comparable<SunP11Identity>
             signatureKeyBitLength = ((RSAPublicKey) this.publicKey).getModulus().bitLength();
             String algorithm = "RSA/ECB/NoPadding";
             this.ecdsaSignature = null;
-            try {
+            try
+            {
                 this.rsaCipher = Cipher.getInstance(algorithm, p11Provider);
-            } catch (NoSuchAlgorithmException e) {
+            } catch (NoSuchAlgorithmException e)
+            {
                 throw new SignerException("NoSuchAlgorithmException: " + e.getMessage(), e);
-            } catch (NoSuchPaddingException e) {
+            } catch (NoSuchPaddingException e)
+            {
                 throw new SignerException("NoSuchPaddingException: " + e.getMessage(), e);
             }
-            try {
+            try
+            {
                 this.rsaCipher.init(Cipher.ENCRYPT_MODE, privateKey);
-            } catch (InvalidKeyException e) {
+            } catch (InvalidKeyException e)
+            {
                 throw new SignerException("InvalidKeyException: " + e.getMessage(), e);
             }
         }
@@ -99,14 +104,18 @@ class SunP11Identity implements Comparable<SunP11Identity>
         {
             signatureKeyBitLength = ((ECPublicKey) this.publicKey).getParams().getCurve().getField().getFieldSize();
             String algorithm = "NONEwithECDSA";
-            try {
+            try
+            {
                 this.ecdsaSignature = Signature.getInstance(algorithm, p11Provider);
-            } catch (NoSuchAlgorithmException e) {
+            } catch (NoSuchAlgorithmException e)
+            {
                 throw new SignerException("NoSuchAlgorithmException: " + e.getMessage(), e);
             }
-            try {
+            try
+            {
                 this.ecdsaSignature.initSign(privateKey);
-            } catch (InvalidKeyException e) {
+            } catch (InvalidKeyException e)
+            {
                 throw new SignerException("InvalidKeyException: " + e.getMessage(), e);
             }
             this.rsaCipher = null;
@@ -118,23 +127,28 @@ class SunP11Identity implements Comparable<SunP11Identity>
         }
     }
 
-    public String getKeyLabel() {
+    public String getKeyLabel()
+    {
         return keyLabel;
     }
 
-    public PrivateKey getPrivateKey() {
+    public PrivateKey getPrivateKey()
+    {
         return privateKey;
     }
 
-    public X509Certificate getCertificate() {
+    public X509Certificate getCertificate()
+    {
         return certificate;
     }
 
-    public PublicKey getPublicKey() {
+    public PublicKey getPublicKey()
+    {
         return publicKey == null ? certificate.getPublicKey() : publicKey;
     }
 
-    public PKCS11SlotIdentifier getSlotId() {
+    public PKCS11SlotIdentifier getSlotId()
+    {
         return slotId;
     }
 
@@ -182,13 +196,17 @@ class SunP11Identity implements Comparable<SunP11Identity>
             throw new SignerException("Operation CKM_RSA_X_509 is not allowed for " + publicKey.getAlgorithm() + " public key");
         }
 
-        synchronized (rsaCipher) {
-            try {
+        synchronized (rsaCipher)
+        {
+            try
+            {
                 rsaCipher.update(hash);
                 return rsaCipher.doFinal();
-            } catch (IllegalBlockSizeException e) {
+            } catch (IllegalBlockSizeException e)
+            {
                 throw new SignerException("IllegalBlockSizeException: " + e.getMessage(), e);
-            } catch (BadPaddingException e) {
+            } catch (BadPaddingException e)
+            {
                 throw new SignerException("BadPaddingException: " + e.getMessage(), e);
             }
         }
@@ -204,11 +222,14 @@ class SunP11Identity implements Comparable<SunP11Identity>
 
         byte[] truncatedDigest = leftmost(hash, signatureKeyBitLength);
 
-        synchronized (ecdsaSignature) {
-            try {
+        synchronized (ecdsaSignature)
+        {
+            try
+            {
                 ecdsaSignature.update(truncatedDigest);
                 return ecdsaSignature.sign();
-            } catch (SignatureException e) {
+            } catch (SignatureException e)
+            {
                 throw new SignerException(e.getMessage(), e);
             }
         }
@@ -249,7 +270,8 @@ class SunP11Identity implements Comparable<SunP11Identity>
     }
 
     @Override
-    public int compareTo(SunP11Identity o) {
+    public int compareTo(SunP11Identity o)
+    {
         return this.keyLabel.compareTo(o.keyLabel);
     }
 }

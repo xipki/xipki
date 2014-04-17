@@ -77,19 +77,23 @@ class IaikP11Identity implements Comparable<IaikP11Identity>
         }
     }
 
-    public Pkcs11KeyIdentifier getKeyId() {
+    public Pkcs11KeyIdentifier getKeyId()
+    {
         return keyId;
     }
 
-    public X509Certificate getCertificate() {
+    public X509Certificate getCertificate()
+    {
         return certificate;
     }
 
-    public PublicKey getPublicKey() {
+    public PublicKey getPublicKey()
+    {
         return publicKey == null ? certificate.getPublicKey() : publicKey;
     }
 
-    public PKCS11SlotIdentifier getSlotId() {
+    public PKCS11SlotIdentifier getSlotId()
+    {
         return slotId;
     }
 
@@ -183,9 +187,11 @@ class IaikP11Identity implements Comparable<IaikP11Identity>
         sigder.add(new DERInteger(new BigInteger(1, ba)));
 
         DERSequence seq = new DERSequence(sigder);
-        try {
+        try
+        {
             return seq.getEncoded();
-        } catch (IOException e) {
+        } catch (IOException e)
+        {
             throw new SignerException("IOException, message: " + e.getMessage(), e);
         }
     }
@@ -224,7 +230,8 @@ class IaikP11Identity implements Comparable<IaikP11Identity>
     }
 
     @Override
-    public int compareTo(IaikP11Identity o) {
+    public int compareTo(IaikP11Identity o)
+    {
         return keyId.compareTo(o.keyId);
     }
 

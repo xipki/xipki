@@ -29,7 +29,8 @@ import org.xipki.security.api.PKCS11SlotIdentifier;
 import org.xipki.security.api.Pkcs11KeyIdentifier;
 import org.xipki.security.api.SignerException;
 
-public class P11PrivateKey implements PrivateKey {
+public class P11PrivateKey implements PrivateKey
+{
 
     private static final long serialVersionUID = 1L;
 
@@ -60,9 +61,11 @@ public class P11PrivateKey implements PrivateKey {
         this.slotId = slotId;
         this.keyId = keyId;
         PublicKey publicKey;
-        try {
+        try
+        {
             publicKey = p11CryptService.getPublicKey(slotId, keyId);
-        } catch (SignerException e) {
+        } catch (SignerException e)
+        {
             throw new InvalidKeyException(e);
         }
 
@@ -83,21 +86,25 @@ public class P11PrivateKey implements PrivateKey {
     }
 
     @Override
-    public String getFormat() {
+    public String getFormat()
+    {
         return null;
     }
 
     @Override
-    public byte[] getEncoded() {
+    public byte[] getEncoded()
+    {
         return null;
     }
 
     @Override
-    public String getAlgorithm() {
+    public String getAlgorithm()
+    {
         return algorithm;
     }
 
-    public int getKeysize() {
+    public int getKeysize()
+    {
         return keysize;
     }
 
@@ -108,9 +115,11 @@ public class P11PrivateKey implements PrivateKey {
             throw new SignatureException("Could not compute RSA signature with " + algorithm + " key");
         }
 
-        try {
+        try
+        {
             return p11CryptService.CKM_RSA_PKCS(encodedDigestInfo, slotId, keyId);
-        } catch (SignerException e) {
+        } catch (SignerException e)
+        {
             throw new SignatureException("SignatureException: " + e.getMessage(), e);
         }
     }
@@ -122,9 +131,11 @@ public class P11PrivateKey implements PrivateKey {
             throw new SignatureException("Could not compute RSA signature with " + algorithm + " key");
         }
 
-        try {
+        try
+        {
             return p11CryptService.CKM_RSA_X509(hash, slotId, keyId);
-        } catch (SignerException e) {
+        } catch (SignerException e)
+        {
             throw new SignatureException("SignatureException: " + e.getMessage(), e);
         }
     }
@@ -136,22 +147,27 @@ public class P11PrivateKey implements PrivateKey {
             throw new SignatureException("Could not compute ECDSA signature with " + algorithm + " key");
         }
 
-        try {
+        try
+        {
             return p11CryptService.CKM_ECDSA(hash, slotId, keyId);
-        } catch (SignerException e) {
+        } catch (SignerException e)
+        {
             throw new SignatureException("SignatureException: " + e.getMessage(), e);
         }
     }
 
-    P11CryptService getP11CryptService() {
+    P11CryptService getP11CryptService()
+    {
         return p11CryptService;
     }
 
-    PKCS11SlotIdentifier getSlotId() {
+    PKCS11SlotIdentifier getSlotId()
+    {
         return slotId;
     }
 
-    Pkcs11KeyIdentifier getKeyId() {
+    Pkcs11KeyIdentifier getKeyId()
+    {
         return keyId;
     }
 

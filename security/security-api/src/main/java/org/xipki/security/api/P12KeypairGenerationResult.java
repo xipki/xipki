@@ -31,7 +31,8 @@ public class P12KeypairGenerationResult extends KeypairGenerationResult
         this.keystore = keystore;
     }
 
-    public byte[] getKeystore() {
+    public byte[] getKeystore()
+    {
         return keystore;
     }
 

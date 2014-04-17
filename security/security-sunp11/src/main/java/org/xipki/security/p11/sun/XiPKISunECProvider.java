@@ -38,8 +38,10 @@ public class XiPKISunECProvider
         NAME + " (version " + VERSION + ")"
     );
 
-    AccessController.doPrivileged(new PrivilegedAction<Object>() {
-        public Object run() {
+    AccessController.doPrivileged(new PrivilegedAction<Object>()
+    {
+        public Object run()
+        {
             put("AlgorithmParameters.EC", ECParameters.class.getName());
             return null;
           }

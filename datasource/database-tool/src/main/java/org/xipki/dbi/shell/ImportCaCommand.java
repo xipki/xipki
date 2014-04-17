@@ -25,7 +25,8 @@ import org.xipki.dbi.CaDbImporter;
 import org.xipki.security.api.PasswordResolver;
 
 @Command(scope = "dbtool", name = "import-ca", description="Import CA database")
-public class ImportCaCommand extends OsgiCommandSupport {
+public class ImportCaCommand extends OsgiCommandSupport
+{
     @Option(name = "-dbconf",
             description = "Required. Database configuration file",
             required = true)
@@ -40,17 +41,20 @@ public class ImportCaCommand extends OsgiCommandSupport {
     private PasswordResolver passwordResolver;
 
     @Override
-    protected Object doExecute() throws Exception {
+    protected Object doExecute() throws Exception
+    {
         CaDbImporter importer = new CaDbImporter(dataSourceFactory, passwordResolver, dbconfFile);
         importer.importDatabase(indir);
         return null;
     }
 
-    public void setDataSourceFactory(DataSourceFactory dataSourceFactory) {
+    public void setDataSourceFactory(DataSourceFactory dataSourceFactory)
+    {
         this.dataSourceFactory = dataSourceFactory;
     }
 
-    public void setPasswordResolver(PasswordResolver passwordResolver) {
+    public void setPasswordResolver(PasswordResolver passwordResolver)
+    {
         this.passwordResolver = passwordResolver;
     }
 }

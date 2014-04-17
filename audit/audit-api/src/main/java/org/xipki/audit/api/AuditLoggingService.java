@@ -21,7 +21,7 @@ package org.xipki.audit.api;
 public interface AuditLoggingService
 {
     void logEvent(AuditEvent event);
-    
+
     /**
      * Logging an PCI audit event.
      *

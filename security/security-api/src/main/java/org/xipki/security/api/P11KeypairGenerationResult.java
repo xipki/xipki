@@ -35,11 +35,13 @@ public class P11KeypairGenerationResult extends KeypairGenerationResult
         this.label = label;
     }
 
-    public byte[] getId() {
+    public byte[] getId()
+    {
         return Arrays.copyOf(id, id.length);
     }
 
-    public String getLabel() {
+    public String getLabel()
+    {
         return label;
     }
 

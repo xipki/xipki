@@ -87,7 +87,8 @@ public abstract class RemoteP11CryptService implements P11CryptService
         ASN1Encodable result = send(itv);
 
         DERInteger derInt;
-        try{
+        try
+        {
             derInt = DERInteger.getInstance(result);
         }catch(IllegalArgumentException e)
         {
@@ -141,11 +142,14 @@ public abstract class RemoteP11CryptService implements P11CryptService
             throw new SignerException("Received no certificate from server for " + keyId);
         }
 
-        try {
+        try
+        {
             return IoCertUtil.parseCert(certBytes);
-        } catch (CertificateException e) {
+        } catch (CertificateException e)
+        {
             throw new SignerException("CertificateException: " + e.getMessage(), e);
-        } catch (IOException e) {
+        } catch (IOException e)
+        {
             throw new SignerException("IOException: " + e.getMessage(), e);
         }
     }
@@ -175,7 +179,8 @@ public abstract class RemoteP11CryptService implements P11CryptService
         ASN1Encodable result = send(itv);
 
         ASN1OctetString octetString;
-        try{
+        try
+        {
             octetString = DEROctetString.getInstance(result);
         }catch(IllegalArgumentException e)
         {
@@ -196,7 +201,8 @@ public abstract class RemoteP11CryptService implements P11CryptService
         ASN1Encodable result = send(itv);
 
         ASN1OctetString octetString;
-        try{
+        try
+        {
             octetString = DEROctetString.getInstance(result);
         }catch(IllegalArgumentException e)
         {
@@ -223,25 +229,31 @@ public abstract class RemoteP11CryptService implements P11CryptService
         PKIMessage request = new PKIMessage(header, body);
 
         byte[] encodedRequest;
-        try {
+        try
+        {
             encodedRequest = request.getEncoded();
-        } catch (IOException e) {
+        } catch (IOException e)
+        {
             LOG.error("Error while encode the PKI request {}", request);
             throw new SignerException(e.getMessage(), e);
         }
 
         byte[] encodedResponse;
-        try {
+        try
+        {
             encodedResponse = send(encodedRequest);
-        } catch (IOException e) {
+        } catch (IOException e)
+        {
             LOG.error("Error while send the PKI request {} to server", request);
             throw new SignerException(e.getMessage(), e);
         }
 
         GeneralPKIMessage response;
-        try {
+        try
+        {
             response = new GeneralPKIMessage(encodedResponse);
-        } catch (IOException e) {
+        } catch (IOException e)
+        {
             LOG.error("Error while decode the received PKI message: {}", Hex.toHexString(encodedResponse));
             throw new SignerException(e.getMessage(), e);
         }
@@ -323,7 +335,8 @@ public abstract class RemoteP11CryptService implements P11CryptService
     private byte[] randomTransactionId()
     {
         byte[] tid = new byte[20];
-        synchronized (random) {
+        synchronized (random)
+        {
             random.nextBytes(tid);
         }
         return tid;
@@ -339,7 +352,8 @@ public abstract class RemoteP11CryptService implements P11CryptService
 
         KeyFactory kf;
 
-        try{
+        try
+        {
             if(PKCSObjectIdentifiers.rsaEncryption.equals(aid))
             {
                 kf = KeyFactory.getInstance("RSA");
@@ -352,19 +366,23 @@ public abstract class RemoteP11CryptService implements P11CryptService
             {
                 throw new SignerException("unsupported key algorithm: " + aid);
             }
-        } catch (NoSuchAlgorithmException e) {
+        } catch (NoSuchAlgorithmException e)
+        {
             throw new SignerException("NoSuchAlgorithmException: " + e.getMessage(), e);
         }
 
-        try {
+        try
+        {
             return kf.generatePublic(keyspec);
-        } catch (InvalidKeySpecException e) {
+        } catch (InvalidKeySpecException e)
+        {
             throw new SignerException("InvalidKeySpecException: " + e.getMessage(), e);
         }
     }
 
     @Override
-    public PKCS11SlotIdentifier[] getSlotIdentifiers() throws SignerException {
+    public PKCS11SlotIdentifier[] getSlotIdentifiers() throws SignerException
+    {
         InfoTypeAndValue itv = new InfoTypeAndValue(RemoteP11Constants.id_list_slots, null);
         ASN1Encodable resp = send(itv);
         if(resp instanceof ASN1Sequence == false)
@@ -379,7 +397,8 @@ public abstract class RemoteP11CryptService implements P11CryptService
         for(int i = 0; i < n; i++)
         {
             SlotIdentifier asn1SlotId;
-            try{
+            try
+            {
                 ASN1Encodable obj = seq.getObjectAt(i);
                 asn1SlotId = SlotIdentifier.getInstance(obj);
             }catch(Exception e)
