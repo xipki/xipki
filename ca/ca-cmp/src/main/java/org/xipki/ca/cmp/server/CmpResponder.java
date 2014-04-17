@@ -168,18 +168,30 @@ public abstract class CmpResponder {
 		
 		boolean isProtected = message.hasProtection();
 		ProtectionVerificationResult verificationResult = null;
-		String errorStatus = null;
 		
+		String errorStatus;
+
 		if(isProtected)
 		{			
 			try {
 				verificationResult = verifyProtection(tidStr, message);
 				ProtectionResult pr = verificationResult.getProtectionResult();
-				if(pr != ProtectionResult.VALID)
+				switch(pr)
 				{
-					errorStatus = pr == ProtectionResult.NOT_SIGNATURE_BASED ? 
-							"Request has invalid signature based protection" :
-							"Request has protection but is not signature based";
+				case VALID:
+					errorStatus = null;
+					break;
+				case INVALID:
+					errorStatus = "Request is protected by signature but invalid";
+					break;
+				case NOT_SIGNATURE_BASED:
+					errorStatus = "Request is not protected by signature";
+					break;
+				case SENDER_NOT_AUTHORIZED:
+					errorStatus = "Request is protected by signature but the requestor is not authorized";
+					break;
+				default:
+					throw new RuntimeException("Should not reach here");
 				}
 			} catch (Exception e) {
 				LOG.error("tid=" + tidStr + ": error while verifying the signature", e);
