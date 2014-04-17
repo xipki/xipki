@@ -21,19 +21,23 @@ public class CmpRequestorException extends Exception
 {
     private static final long serialVersionUID = 1L;
 
-    public CmpRequestorException() {
+    public CmpRequestorException()
+    {
         super();
     }
 
-    public CmpRequestorException(String message, Throwable cause) {
+    public CmpRequestorException(String message, Throwable cause)
+    {
         super(message, cause);
     }
 
-    public CmpRequestorException(String message) {
+    public CmpRequestorException(String message)
+    {
         super(message);
     }
 
-    public CmpRequestorException(Throwable cause) {
+    public CmpRequestorException(Throwable cause)
+    {
         super(cause);
     }
 

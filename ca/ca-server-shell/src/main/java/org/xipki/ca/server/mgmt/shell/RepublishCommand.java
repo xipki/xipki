@@ -23,7 +23,8 @@ import org.apache.felix.gogo.commands.Command;
 import org.apache.felix.gogo.commands.Option;
 
 @Command(scope = "ca", name = "republish", description="Republish certificates")
-public class RepublishCommand extends CaCommand {
+public class RepublishCommand extends CaCommand
+{
     @Option(name = "-ca",
             description = "Required. CA name",
             required = true)
@@ -34,7 +35,8 @@ public class RepublishCommand extends CaCommand {
     protected List<String>     publisherNames;
 
     @Override
-    protected Object doExecute() throws Exception {
+    protected Object doExecute() throws Exception
+    {
         for(String publisherName : publisherNames)
         {
             boolean successfull = caManager.republishCertificates(caName, publisherName);

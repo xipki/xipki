@@ -22,7 +22,8 @@ import org.apache.felix.gogo.commands.Option;
 import org.xipki.ca.cmp.server.CmpControl;
 
 @Command(scope = "ca", name = "cmpcontrol-set", description="Set CMP control")
-public class CmpControlSetCommand extends CaCommand {
+public class CmpControlSetCommand extends CaCommand
+{
     @Option(name = "-ecc", aliases = { "--enableConfirmCert" },
             description = "Confirm of certificate is required, the default is not required")
     protected Boolean           enabledConfirmCert;
@@ -48,7 +49,8 @@ public class CmpControlSetCommand extends CaCommand {
     protected Integer            confirmWaitTime;
 
     @Override
-    protected Object doExecute() throws Exception {
+    protected Object doExecute() throws Exception
+    {
         CmpControl entry = new CmpControl();
 
         if(enabledConfirmCert != null && disableConfirmCert != null )

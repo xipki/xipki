@@ -54,7 +54,8 @@ public class Rfc6712Servlet extends HttpServlet
     public void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException
     {
-        try{
+        try
+        {
             if(localP11CryptService == null)
             {
                 LOG.error("localP11CryptService in servlet not configured");
@@ -102,16 +103,20 @@ public class Rfc6712Servlet extends HttpServlet
     {
         ASN1InputStream asn1Stream = new ASN1InputStream(is);
 
-        try{
+        try
+        {
             return PKIMessage.getInstance(asn1Stream.readObject());
-        }finally{
-            try{
+        }finally
+        {
+            try
+            {
                 asn1Stream.close();
             }catch(IOException e){}
         }
     }
 
-    public void setLocalP11CryptService(LocalP11CryptService localP11CryptService) {
+    public void setLocalP11CryptService(LocalP11CryptService localP11CryptService)
+    {
         this.localP11CryptService = localP11CryptService;
     }
 }

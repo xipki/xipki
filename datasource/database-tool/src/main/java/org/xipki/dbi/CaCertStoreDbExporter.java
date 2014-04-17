@@ -56,7 +56,8 @@ import org.xipki.security.api.PasswordResolverException;
 import org.xipki.security.common.IoCertUtil;
 import org.xipki.security.common.ParamChecker;
 
-class CaCertStoreDbExporter extends DbPorter{
+class CaCertStoreDbExporter extends DbPorter
+{
 
     private static final Logger LOG = LoggerFactory.getLogger(CaCertStoreDbExporter.class);
     private final Marshaller marshaller;
@@ -93,13 +94,15 @@ class CaCertStoreDbExporter extends DbPorter{
     {
         Crls crls = new Crls();
         Statement stmt = null;
-        try{
+        try
+        {
             stmt = createStatement();
             String sql = "SELECT id, cainfo_id, crl FROM crl";
             ResultSet rs = stmt.executeQuery(sql);
 
             File crlDir = new File(baseDir + File.separator + DIRNAME_CRL);
-            while(rs.next()){
+            while(rs.next())
+            {
                 int id = rs.getInt("id");
                 int cainfo_id = rs.getInt("cainfo_id");
                 Blob blob = rs.getBlob("crl");
@@ -134,12 +137,14 @@ class CaCertStoreDbExporter extends DbPorter{
         Cainfos cainfos = new Cainfos();
 
         Statement stmt = null;
-        try{
+        try
+        {
             stmt = createStatement();
             String sql = "SELECT id, cert FROM cainfo";
             ResultSet rs = stmt.executeQuery(sql);
 
-            while(rs.next()){
+            while(rs.next())
+            {
                 int id = rs.getInt("id");
                 String cert = rs.getString("cert");
 
@@ -166,12 +171,14 @@ class CaCertStoreDbExporter extends DbPorter{
         Requestorinfos infos = new Requestorinfos();
 
         Statement stmt = null;
-        try{
+        try
+        {
             stmt = createStatement();
             String sql = "SELECT id, cert FROM requestorinfo";
             ResultSet rs = stmt.executeQuery(sql);
 
-            while(rs.next()){
+            while(rs.next())
+            {
                 int id = rs.getInt("id");
                 String cert = rs.getString("cert");
 
@@ -198,12 +205,14 @@ class CaCertStoreDbExporter extends DbPorter{
         Users users = new Users();
 
         Statement stmt = null;
-        try{
+        try
+        {
             stmt = createStatement();
             String sql = "SELECT id, name FROM user";
             ResultSet rs = stmt.executeQuery(sql);
 
-            while(rs.next()){
+            while(rs.next())
+            {
                 int id = rs.getInt("id");
                 String name = rs.getString("name");
 
@@ -230,12 +239,14 @@ class CaCertStoreDbExporter extends DbPorter{
         Certprofileinfos infos = new Certprofileinfos();
 
         Statement stmt = null;
-        try{
+        try
+        {
             stmt = createStatement();
             String sql = "SELECT id, name FROM certprofileinfo";
             ResultSet rs = stmt.executeQuery(sql);
 
-            while(rs.next()){
+            while(rs.next())
+            {
                 int id = rs.getInt("id");
                 String name = rs.getString("name");
 
@@ -284,7 +295,8 @@ class CaCertStoreDbExporter extends DbPorter{
         CertsType certsInCurrentFile = new CertsType();
 
         final int n = 100;
-        try{
+        try
+        {
             for(int i = minCertId; i <= maxCertId; i += n)
             {
                 ps.setInt(1, i - 1);
@@ -292,7 +304,8 @@ class CaCertStoreDbExporter extends DbPorter{
 
                 ResultSet rs = ps.executeQuery();
 
-                while(rs.next()){
+                while(rs.next())
+                {
                     int id = rs.getInt("id");
                     String cainfo_id = rs.getString("cainfo_id");
                     String certprofileinfo_id = rs.getString("certprofileinfo_id");
@@ -307,7 +320,8 @@ class CaCertStoreDbExporter extends DbPorter{
                     String sha1_fp_cert;
                     rawCertPs.setInt(1, id);
                     ResultSet rawCertRs = rawCertPs.executeQuery();
-                    try{
+                    try
+                    {
                         rawCertRs.next();
                         String b64Cert = rawCertRs.getString("cert");
                         byte[] cert = Base64.decode(b64Cert);
@@ -375,7 +389,8 @@ class CaCertStoreDbExporter extends DbPorter{
     throws SQLException
     {
         Statement stmt = null;
-        try{
+        try
+        {
             stmt = createStatement();
             final String sql = "SELECT min(id) FROM cert";
             ResultSet rs = stmt.executeQuery(sql);
@@ -397,7 +412,8 @@ class CaCertStoreDbExporter extends DbPorter{
     throws SQLException
     {
         Statement stmt = null;
-        try{
+        try
+        {
             stmt = createStatement();
             final String sql = "SELECT max(id) FROM cert";
             ResultSet rs = stmt.executeQuery(sql);
@@ -417,7 +433,8 @@ class CaCertStoreDbExporter extends DbPorter{
 
     private String fp(byte[] data)
     {
-        synchronized (sha1md) {
+        synchronized (sha1md)
+        {
             sha1md.reset();
             sha1md.update(data, 0, data.length);
             byte[] digestValue = new byte[20];
@@ -429,21 +446,25 @@ class CaCertStoreDbExporter extends DbPorter{
     private static byte[] readBlob(Blob blob)
     {
         InputStream is;
-        try {
+        try
+        {
             is = blob.getBinaryStream();
-        } catch (SQLException e) {
+        } catch (SQLException e)
+        {
             String msg = "Could not getBinaryStream from Blob";
             LOG.warn(msg + " {}", e.getMessage());
             LOG.debug(msg, e);
             return null;
         }
-        try{
+        try
+        {
             ByteArrayOutputStream out = new ByteArrayOutputStream();
 
             byte[] buffer = new byte[2048];
             int readed;
 
-            try {
+            try
+            {
                 while((readed = is.read(buffer)) != -1)
                 {
                     if(readed > 0)
@@ -451,7 +472,8 @@ class CaCertStoreDbExporter extends DbPorter{
                         out.write(buffer, 0, readed);
                     }
                 }
-            } catch (IOException e) {
+            } catch (IOException e)
+            {
                 String msg = "Could not read CRL from Blob";
                 LOG.warn(msg + " {}", e.getMessage());
                 LOG.debug(msg, e);
@@ -459,8 +481,10 @@ class CaCertStoreDbExporter extends DbPorter{
             }
 
             return out.toByteArray();
-        }finally{
-            try{
+        }finally
+        {
+            try
+            {
                 is.close();
             }catch(IOException e)
             {

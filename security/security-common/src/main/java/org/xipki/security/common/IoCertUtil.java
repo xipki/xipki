@@ -44,43 +44,55 @@ import org.bouncycastle.asn1.x500.style.IETFUtils;
 import org.bouncycastle.crypto.digests.SHA1Digest;
 import org.bouncycastle.util.encoders.Hex;
 
-public class IoCertUtil {
+public class IoCertUtil
+{
     private static final SHA1Digest sha1 = new SHA1Digest();
 
-    public static byte[] read(String fileName) throws IOException {
+    public static byte[] read(String fileName) throws IOException
+    {
         FileInputStream in = null;
 
-        try {
+        try
+        {
             in = new FileInputStream(fileName);
             ByteArrayOutputStream bout = new ByteArrayOutputStream();
             int readed = 0;
             byte[] buffer = new byte[2048];
-            while ((readed = in.read(buffer)) != -1) {
+            while ((readed = in.read(buffer)) != -1)
+            {
                 bout.write(buffer, 0, readed);
             }
 
             return bout.toByteArray();
-        } finally {
-            if (in != null) {
-                try {
+        } finally
+        {
+            if (in != null)
+            {
+                try
+                {
                     in.close();
-                } catch (IOException e) {
+                } catch (IOException e)
+                {
                 }
             }
         }
     }
 
     public static void save(File file, byte[] encoded)
-            throws IOException {
+            throws IOException
+            {
         File parent = file.getParentFile();
-        if (parent != null && parent.exists() == false) {
+        if (parent != null && parent.exists() == false)
+        {
             parent.mkdirs();
         }
 
         FileOutputStream out = new FileOutputStream(file);
-        try {
+        try
+        {
             out.write(encoded);
-        } finally {
+        } finally
+        {
             out.close();
         }
     }
@@ -88,21 +100,28 @@ public class IoCertUtil {
     private static CertificateFactory certFact;
     private static Object certFactLock = new Object();
 
-    public static X509Certificate parseCert(String f) throws IOException, CertificateException {
+    public static X509Certificate parseCert(String f) throws IOException, CertificateException
+    {
         return parseCert(new FileInputStream(f));
 
     }
 
-    public static X509Certificate parseCert(byte[] certBytes) throws IOException, CertificateException {
+    public static X509Certificate parseCert(byte[] certBytes) throws IOException, CertificateException
+    {
         return parseCert(new ByteArrayInputStream(certBytes));
     }
 
-    public static X509Certificate parseCert(InputStream certStream) throws IOException, CertificateException {
-        synchronized (certFactLock) {
-            if (certFact == null) {
-                try {
+    public static X509Certificate parseCert(InputStream certStream) throws IOException, CertificateException
+    {
+        synchronized (certFactLock)
+        {
+            if (certFact == null)
+            {
+                try
+                {
                     certFact = CertificateFactory.getInstance("X.509", "BC");
-                } catch (NoSuchProviderException e) {
+                } catch (NoSuchProviderException e)
+                {
                     throw new IOException("NoSuchProviderException: " + e.getMessage());
                 }
             }
@@ -117,23 +136,27 @@ public class IoCertUtil {
 
     public static X509CRL parseCRL(InputStream crlStream) throws IOException, CertificateException, CRLException
     {
-        try{
+        try
+        {
             if(certFact == null)
             {
                 certFact = CertificateFactory.getInstance("X.509", "BC");
             }
             return (X509CRL) certFact.generateCRL(crlStream);
-        } catch (NoSuchProviderException e) {
+        } catch (NoSuchProviderException e)
+        {
             throw new IOException("NoSuchProviderException: " + e.getMessage());
         }
     }
 
     public static String canonicalizeName(X500Name name)
     {
-        try {
+        try
+        {
             X500Principal prin = new X500Principal(name.getEncoded());
             return prin.getName();
-        } catch (Exception e) {
+        } catch (Exception e)
+        {
             throw new IllegalArgumentException("invalid name " + name);
         }
     }
@@ -185,9 +208,11 @@ public class IoCertUtil {
 
         String canonicalizedName = sb.toString();
         byte[] encoded;
-        try {
+        try
+        {
             encoded = canonicalizedName.getBytes("UTF-8");
-        } catch (UnsupportedEncodingException e) {
+        } catch (UnsupportedEncodingException e)
+        {
             encoded = canonicalizedName.getBytes();
         }
         return sha1sum(encoded);
@@ -195,7 +220,8 @@ public class IoCertUtil {
 
     public static String sha1sum(byte[] data)
     {
-        synchronized (sha1) {
+        synchronized (sha1)
+        {
             sha1.reset();
             sha1.update(data, 0, data.length);
             byte[] hashValue = new byte[20];

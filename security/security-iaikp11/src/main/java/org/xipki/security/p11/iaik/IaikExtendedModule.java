@@ -31,7 +31,8 @@ import org.xipki.security.api.PKCS11SlotIdentifier;
 import org.xipki.security.api.SignerException;
 import org.xipki.security.common.ParamChecker;
 
-public class IaikExtendedModule{
+public class IaikExtendedModule
+{
     private static final Logger LOG = LoggerFactory.getLogger(IaikExtendedModule.class);
 
     private Module module;
@@ -46,10 +47,12 @@ public class IaikExtendedModule{
         this.module = module;
 
         Slot[] slotList;
-        try {
+        try
+        {
             boolean cardPresent = true;
             slotList = module.getSlotList(cardPresent);
-        } catch (Throwable t) {
+        } catch (Throwable t)
+        {
             LOG.error("module.getSlotList(). {}: {}", t.getClass().getName(), t.getMessage());
             LOG.debug("module.getSlotList()", t);
             throw new SignerException("TokenException in module.getSlotList(): " + t.getMessage());
@@ -69,16 +72,19 @@ public class IaikExtendedModule{
 
         if(LOG.isDebugEnabled())
         {
-            try{
+            try
+            {
                 StringBuilder msg = new StringBuilder();
                 for (int i=0; i<slotList.length; i++)
                 {
                     Slot slot = slotList[i];
                     msg.append("------------------------Slot ").append(i+1).append("-------------------------\n");
                     msg.append(slot.getSlotID()).append("\n");
-                    try {
+                    try
+                    {
                         msg.append(slot.getSlotInfo().toString()).append("\n");
-                    } catch (TokenException e) {
+                    } catch (TokenException e)
+                    {
                         msg.append("error: " + e.getMessage());
                     }
                 }
@@ -136,7 +142,8 @@ public class IaikExtendedModule{
     {
         for(PKCS11SlotIdentifier slotId : slots.keySet())
         {
-            try{
+            try
+            {
                 slots.get(slotId).close();
             }catch(Throwable t)
             {
@@ -150,7 +157,8 @@ public class IaikExtendedModule{
 
         for(PKCS11SlotIdentifier slotId : availableSlots.keySet())
         {
-            try{
+            try
+            {
                 availableSlots.get(slotId).getToken().closeAllSessions();
             }catch(Throwable t)
             {

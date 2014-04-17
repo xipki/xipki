@@ -27,7 +27,8 @@ import org.xipki.ca.client.api.RAWorker;
 import org.xipki.security.common.IoCertUtil;
 
 @Command(scope = "caclient", name = "ra-getcrl", description="Download CRL")
-public class RAGetCRLCommand extends ClientCommand {
+public class RAGetCRLCommand extends ClientCommand
+{
 
     @Option(name = "-ca",
             required = false, description = "Required if multiple CAs are configured. CA name")
@@ -41,7 +42,8 @@ public class RAGetCRLCommand extends ClientCommand {
     private RAWorker             raWorker;
 
     @Override
-    protected Object doExecute() throws Exception {
+    protected Object doExecute() throws Exception
+    {
         Set<String> caNames = raWorker.getCaNames();
         if(caNames.isEmpty())
         {
@@ -78,7 +80,8 @@ public class RAGetCRLCommand extends ClientCommand {
         return null;
     }
 
-    public void setRaWorker(RAWorker raWorker) {
+    public void setRaWorker(RAWorker raWorker)
+    {
         this.raWorker = raWorker;
     }
 

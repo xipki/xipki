@@ -22,7 +22,8 @@ import java.security.cert.X509Certificate;
 
 import org.bouncycastle.operator.ContentSigner;
 
-public interface ConcurrentContentSigner {
+public interface ConcurrentContentSigner
+{
 
     /**
      *

@@ -40,23 +40,28 @@ public class EnrollCertRequestEntryType extends IdentifiedObject
         this.popo = popo;
     }
 
-    public String getCertProfile() {
+    public String getCertProfile()
+    {
         return certProfile;
     }
 
-    public CertRequest getCertReq() {
+    public CertRequest getCertReq()
+    {
         return certReq;
     }
 
-    public ProofOfPossession getPopo() {
+    public ProofOfPossession getPopo()
+    {
         return popo;
     }
 
-    public String getOrigCertProfile() {
+    public String getOrigCertProfile()
+    {
         return origCertProfile;
     }
 
-    public void setOrigCertProfile(String origCertProfile) {
+    public void setOrigCertProfile(String origCertProfile)
+    {
         this.origCertProfile = origCertProfile;
     }
 

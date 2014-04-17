@@ -23,7 +23,8 @@ import org.apache.karaf.shell.console.OsgiCommandSupport;
 import org.xipki.ca.client.api.RAWorker;
 
 @Command(scope = "caclient", name = "enroll-loadtest", description="CA Client Enroll Load test")
-public class CALoadTestCommand extends OsgiCommandSupport {
+public class CALoadTestCommand extends OsgiCommandSupport
+{
 
     @Option(name = "-profile",
             required = true,
@@ -53,7 +54,8 @@ public class CALoadTestCommand extends OsgiCommandSupport {
     private RAWorker             raWorker;
 
     @Override
-    protected Object doExecute() throws Exception {
+    protected Object doExecute() throws Exception
+    {
         if(numThreads == null)
         {
             numThreads = 5;
@@ -81,7 +83,8 @@ public class CALoadTestCommand extends OsgiCommandSupport {
         return null;
     }
 
-    public void setRaWorker(RAWorker raWorker) {
+    public void setRaWorker(RAWorker raWorker)
+    {
         this.raWorker = raWorker;
     }
 }

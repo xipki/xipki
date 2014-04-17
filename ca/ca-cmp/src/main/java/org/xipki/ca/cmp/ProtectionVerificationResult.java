@@ -19,22 +19,26 @@ package org.xipki.ca.cmp;
 
 import org.xipki.security.common.ParamChecker;
 
-public class ProtectionVerificationResult {
+public class ProtectionVerificationResult
+{
     private final Object requestor;
     private final ProtectionResult protectionResult;
 
-    public ProtectionVerificationResult(Object requestor, ProtectionResult protectionResult) {
+    public ProtectionVerificationResult(Object requestor, ProtectionResult protectionResult)
+    {
         ParamChecker.assertNotNull("protectionResult", protectionResult);
 
         this.requestor = requestor;
         this.protectionResult = protectionResult;
     }
 
-    public Object getRequestor() {
+    public Object getRequestor()
+    {
         return requestor;
     }
 
-    public ProtectionResult getProtectionResult() {
+    public ProtectionResult getProtectionResult()
+    {
         return protectionResult;
     }
 

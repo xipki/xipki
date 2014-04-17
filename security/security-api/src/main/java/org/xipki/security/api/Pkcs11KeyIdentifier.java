@@ -61,15 +61,18 @@ public class Pkcs11KeyIdentifier implements Comparable<Pkcs11KeyIdentifier>
         this.keyLabel = keyLabel;
     }
 
-    public byte[] getKeyId() {
+    public byte[] getKeyId()
+    {
         return keyId;
     }
 
-    public String getKeyIdHex() {
+    public String getKeyIdHex()
+    {
         return keyIdHex;
     }
 
-    public String getKeyLabel() {
+    public String getKeyLabel()
+    {
         return keyLabel;
     }
 
@@ -108,7 +111,8 @@ public class Pkcs11KeyIdentifier implements Comparable<Pkcs11KeyIdentifier>
     }
 
     @Override
-    public int compareTo(Pkcs11KeyIdentifier o) {
+    public int compareTo(Pkcs11KeyIdentifier o)
+    {
         if(this == o)
         {
             return 0;

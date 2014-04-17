@@ -34,7 +34,8 @@ import org.xipki.security.common.ConfigurationException;
 import org.xipki.security.common.IoCertUtil;
 
 @Command(scope = "ca", name = "ca-add", description="Add CA")
-public class CaAddCommand extends CaCommand {
+public class CaAddCommand extends CaCommand
+{
     @Option(name = "-name",
             required = true, description = "Required. CA name")
     protected String            caName;
@@ -109,7 +110,8 @@ public class CaAddCommand extends CaCommand {
     private PasswordResolver passwordResolver;
 
     @Override
-    protected Object doExecute() throws Exception {
+    protected Object doExecute() throws Exception
+    {
         CAStatus status = CAStatus.ACTIVE;
         if(caStatus != null)
         {
@@ -173,11 +175,13 @@ public class CaAddCommand extends CaCommand {
         return null;
     }
 
-    public void setSecurityFactory(SecurityFactory securityFactory) {
+    public void setSecurityFactory(SecurityFactory securityFactory)
+    {
         this.securityFactory = securityFactory;
     }
 
-    public void setPasswordResolver(PasswordResolver passwordResolver) {
+    public void setPasswordResolver(PasswordResolver passwordResolver)
+    {
         this.passwordResolver = passwordResolver;
     }
 }

@@ -17,7 +17,8 @@
 
 package org.xipki.ca.cmp.client;
 
-public class ClientErrorCode {
+public class ClientErrorCode
+{
     /**
      * Intern status to indicate that there are errors in the response
      */

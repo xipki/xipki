@@ -40,7 +40,8 @@ public class P10EnrollCertRequestType extends IdentifiedObject
         return p10Req;
     }
 
-    public String getCertProfile() {
+    public String getCertProfile()
+    {
         return certProfile;
     }
 }

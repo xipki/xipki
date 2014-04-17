@@ -118,7 +118,8 @@ abstract class X509CmpRequestor extends CmpRequestor
 
     protected abstract byte[] send(byte[] request) throws IOException;
 
-    public X509Certificate getCaCert() {
+    public X509Certificate getCaCert()
+    {
         return caCert;
     }
 
@@ -188,9 +189,11 @@ abstract class X509CmpRequestor extends CmpRequestor
         CertificateList certList = CertificateList.getInstance(itvCurrentCRL.getInfoValue());
 
         X509CRL crl;
-        try {
+        try
+        {
             crl = new X509CRLObject(certList);
-        } catch (CRLException e) {
+        } catch (CRLException e)
+        {
             throw new CmpRequestorException("Returned CRL is invalid: " + e.getMessage());
         }
 
@@ -446,7 +449,8 @@ abstract class X509CmpRequestor extends CmpRequestor
                 {
                     requireConfirm = true;
                     X509CertificateHolder certHolder = null;
-                    try{
+                    try
+                    {
                         certHolder = new X509CertificateHolder(cmpCert.getEncoded());
                     }catch(IOException e)
                     {
@@ -513,9 +517,11 @@ abstract class X509CmpRequestor extends CmpRequestor
     {
         PKIHeader header = buildPKIHeader(implicitConfirm, tid, null);
         CertificateConfirmationContent certConfirm;
-        try {
+        try
+        {
             certConfirm = certConfirmBuilder.build(digesetCalculatorProvider);
-        } catch (CMPException e) {
+        } catch (CMPException e)
+        {
             throw new CmpRequestorException(e);
         }
         PKIBody body = new PKIBody(PKIBody.TYPE_CERT_CONFIRM, certConfirm.toASN1Structure());
@@ -551,7 +557,8 @@ abstract class X509CmpRequestor extends CmpRequestor
 
             ASN1GeneralizedTime time = new ASN1GeneralizedTime(requestEntry.getInvalidityDate());
 
-            try{
+            try
+            {
                 DEREnumerated reason = new DEREnumerated(requestEntry.getReason());
                 extensions[0] = new Extension(org.bouncycastle.asn1.x509.X509Extension.reasonCode,
                         true, new DEROctetString(reason.getEncoded()));

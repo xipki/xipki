@@ -30,7 +30,8 @@ import org.xipki.security.api.SecurityFactory;
 import org.xipki.security.api.SignerException;
 import org.xipki.security.common.IoCertUtil;
 
-public class Pkcs10RequestGenerator {
+public class Pkcs10RequestGenerator
+{
 
     public PKCS10CertificationRequest generateRequest(
             SecurityFactory securityFactory,
@@ -53,12 +54,15 @@ public class Pkcs10RequestGenerator {
         ConcurrentContentSigner signer =
                 securityFactory.createSigner(signerType, signerConf, null, NopPasswordResolver.INSTANCE);
         ContentSigner contentSigner;
-        try {
+        try
+        {
             contentSigner = signer.borrowContentSigner();
-        } catch (NoIdleSignerException e) {
+        } catch (NoIdleSignerException e)
+        {
             throw new SignerException(e);
         }
-        try{
+        try
+        {
             return generateRequest(contentSigner, subjectPublicKeyInfo, subjectDN);
         }finally
         {

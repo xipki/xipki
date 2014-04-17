@@ -18,7 +18,8 @@
 package org.xipki.ca.common;
 
 
-public class PKIStatusInfo {
+public class PKIStatusInfo
+{
     private final int status;
     private final int pkiFailureInfo;
     private final String statusMessage;
@@ -37,15 +38,18 @@ public class PKIStatusInfo {
         this.statusMessage = null;
     }
 
-    public int getStatus() {
+    public int getStatus()
+    {
         return status;
     }
 
-    public int getPkiFailureInfo() {
+    public int getPkiFailureInfo()
+    {
         return pkiFailureInfo;
     }
 
-    public String getStatusMessage() {
+    public String getStatusMessage()
+    {
         return statusMessage;
     }
 }

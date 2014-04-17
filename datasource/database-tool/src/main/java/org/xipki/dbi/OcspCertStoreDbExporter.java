@@ -43,7 +43,8 @@ import org.xipki.security.api.PasswordResolverException;
 import org.xipki.security.common.IoCertUtil;
 import org.xipki.security.common.ParamChecker;
 
-class OcspCertStoreDbExporter extends DbPorter{
+class OcspCertStoreDbExporter extends DbPorter
+{
     private final Marshaller marshaller;
     private final int COUNT_CERTS_IN_ONE_FILE  = 1000;
 
@@ -74,14 +75,16 @@ class OcspCertStoreDbExporter extends DbPorter{
         Issuers issuers = new Issuers();
 
         Statement stmt = null;
-        try{
+        try
+        {
             stmt = createStatement();
 
             String sql = "SELECT id, cert FROM issuer";
 
             ResultSet rs = stmt.executeQuery(sql);
 
-            while(rs.next()){
+            while(rs.next())
+            {
                 int id = rs.getInt("id");
                 String cert = rs.getString("cert");
 
@@ -108,12 +111,14 @@ class OcspCertStoreDbExporter extends DbPorter{
         Certprofiles certprofiles = new Certprofiles();
 
         Statement stmt = null;
-        try{
+        try
+        {
             stmt = createStatement();
             String sql = "SELECT id, name FROM certprofile";
             ResultSet rs = stmt.executeQuery(sql);
 
-            while(rs.next()){
+            while(rs.next())
+            {
                 int id = rs.getInt("id");
                 String name = rs.getString("name");
 
@@ -161,7 +166,8 @@ class OcspCertStoreDbExporter extends DbPorter{
         CertsType certsInCurrentFile = new CertsType();
 
         final int n = 100;
-        try{
+        try
+        {
             for(int i = minCertId; i <= maxCertId; i += n)
             {
                 certPs.setInt(1, i - 1);
@@ -169,7 +175,8 @@ class OcspCertStoreDbExporter extends DbPorter{
 
                 ResultSet rs = certPs.executeQuery();
 
-                while(rs.next()){
+                while(rs.next())
+                {
                     int id = rs.getInt("id");
                     int issuer_id = rs.getInt("issuer_id");
                     int certprofile_id = rs.getInt("certprofile_id");
@@ -184,7 +191,8 @@ class OcspCertStoreDbExporter extends DbPorter{
                     String sha1_fp_cert;
 
                     ResultSet rawCertRs = rawCertPs.executeQuery();
-                    try{
+                    try
+                    {
                         rawCertRs.next();
                         String b64Cert = rawCertRs.getString("cert");
                         byte[] cert = Base64.decode(b64Cert);
@@ -251,7 +259,8 @@ class OcspCertStoreDbExporter extends DbPorter{
     throws SQLException
     {
         Statement stmt = null;
-        try{
+        try
+        {
             stmt = createStatement();
             final String sql = "SELECT min(id) FROM cert";
             ResultSet rs = stmt.executeQuery(sql);
@@ -273,7 +282,8 @@ class OcspCertStoreDbExporter extends DbPorter{
     throws SQLException
     {
         Statement stmt = null;
-        try{
+        try
+        {
             stmt = createStatement();
             final String sql = "SELECT max(id) FROM cert";
             ResultSet rs = stmt.executeQuery(sql);

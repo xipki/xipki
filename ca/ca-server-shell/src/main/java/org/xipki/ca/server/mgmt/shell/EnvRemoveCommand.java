@@ -21,7 +21,8 @@ import org.apache.felix.gogo.commands.Command;
 import org.apache.felix.gogo.commands.Option;
 
 @Command(scope = "ca", name = "env-rm", description="Remove environment parameter")
-public class EnvRemoveCommand extends CaCommand {
+public class EnvRemoveCommand extends CaCommand
+{
 
     @Option(name = "-name",
                 description = "Required. Parameter Name",
@@ -29,7 +30,8 @@ public class EnvRemoveCommand extends CaCommand {
     protected String            name;
 
     @Override
-    protected Object doExecute() throws Exception {
+    protected Object doExecute() throws Exception
+    {
         caManager.removeEnvParam(name);
         return null;
     }

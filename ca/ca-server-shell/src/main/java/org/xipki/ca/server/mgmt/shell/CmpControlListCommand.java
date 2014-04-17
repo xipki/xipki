@@ -21,9 +21,11 @@ import org.apache.felix.gogo.commands.Command;
 import org.xipki.ca.cmp.server.CmpControl;
 
 @Command(scope = "ca", name = "cmpcontrol-list", description="List CMP control")
-public class CmpControlListCommand extends CaCommand {
+public class CmpControlListCommand extends CaCommand
+{
     @Override
-    protected Object doExecute() throws Exception {
+    protected Object doExecute() throws Exception
+    {
         CmpControl cmpcontrol = caManager.getCmpControl();
         System.out.println(cmpcontrol);
         return null;

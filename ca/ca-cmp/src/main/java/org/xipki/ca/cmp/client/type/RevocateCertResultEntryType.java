@@ -29,7 +29,8 @@ public class RevocateCertResultEntryType extends ResultEntryType
         this.certID = certID;
     }
 
-    public CertId getCertID() {
+    public CertId getCertID()
+    {
         return certID;
     }
 }

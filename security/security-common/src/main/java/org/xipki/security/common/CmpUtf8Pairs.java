@@ -24,7 +24,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-public class CmpUtf8Pairs {
+public class CmpUtf8Pairs
+{
     public static final String KEY_CERT_PROFILE = "cert_profile";
     public static final String KEY_ORIG_CERT_PROFILE = "orig_cert_profile";
 
@@ -192,7 +193,8 @@ public class CmpUtf8Pairs {
 
     public static void main(String[] args)
     {
-        try{
+        try
+        {
             CmpUtf8Pairs pairs = new CmpUtf8Pairs("key-a", "value-a");
             pairs.putUtf8Pair("key-b", "value-b");
 

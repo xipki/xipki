@@ -23,7 +23,8 @@ import org.apache.felix.gogo.commands.Command;
 import org.apache.felix.gogo.commands.Option;
 
 @Command(scope = "ca", name = "caprofile-add", description="Add profile to CA")
-public class CaProfileAddCommand extends CaCommand {
+public class CaProfileAddCommand extends CaCommand
+{
     @Option(name = "-ca",
             description = " Required. CA name",
             required = true)
@@ -35,7 +36,8 @@ public class CaProfileAddCommand extends CaCommand {
     protected List<String>            profileNames;
 
     @Override
-    protected Object doExecute() throws Exception {
+    protected Object doExecute() throws Exception
+    {
         for(String name : profileNames)
         {
             caManager.addCertProfileToCA(name, caName);

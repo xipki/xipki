@@ -17,20 +17,24 @@
 
 package org.xipki.security.api;
 
-public class PKCS11SlotIdentifier implements Comparable<PKCS11SlotIdentifier>{
+public class PKCS11SlotIdentifier implements Comparable<PKCS11SlotIdentifier>
+{
     private final Integer slotIndex;
     private final Long slotId;
 
-    public PKCS11SlotIdentifier(Integer slotIndex, Long slotId) {
+    public PKCS11SlotIdentifier(Integer slotIndex, Long slotId)
+    {
         this.slotIndex = slotIndex;
         this.slotId = slotId;
     }
 
-    public Integer getSlotIndex() {
+    public Integer getSlotIndex()
+    {
         return slotIndex;
     }
 
-    public Long getSlotId() {
+    public Long getSlotId()
+    {
         return slotId;
     }
 
@@ -63,7 +67,8 @@ public class PKCS11SlotIdentifier implements Comparable<PKCS11SlotIdentifier>{
     }
 
     @Override
-    public int compareTo(PKCS11SlotIdentifier o) {
+    public int compareTo(PKCS11SlotIdentifier o)
+    {
         if(this == o)
         {
             return 0;

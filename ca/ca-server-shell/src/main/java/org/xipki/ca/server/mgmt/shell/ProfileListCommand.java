@@ -24,7 +24,8 @@ import org.apache.felix.gogo.commands.Option;
 import org.xipki.ca.server.mgmt.CertProfileEntry;
 
 @Command(scope = "ca", name = "profile-list", description="List profiles")
-public class ProfileListCommand extends CaCommand {
+public class ProfileListCommand extends CaCommand
+{
 
     @Option(name = "-name",
             description = "Parameter Name",
@@ -32,7 +33,8 @@ public class ProfileListCommand extends CaCommand {
     protected String name;
 
     @Override
-    protected Object doExecute() throws Exception {
+    protected Object doExecute() throws Exception
+    {
         StringBuilder sb = new StringBuilder();
 
         if(name == null)

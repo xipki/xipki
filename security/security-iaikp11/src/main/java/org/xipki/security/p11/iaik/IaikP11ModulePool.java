@@ -30,7 +30,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.security.api.SignerException;
 
-public class IaikP11ModulePool {
+public class IaikP11ModulePool
+{
     private static final Logger LOG = LoggerFactory.getLogger(IaikP11ModulePool.class);
 
     private final Map<String, IaikExtendedModule> modules = new HashMap<String, IaikExtendedModule>();
@@ -50,7 +51,8 @@ public class IaikP11ModulePool {
             return;
         }
 
-        try{
+        try
+        {
             LOG.info("Removed module {}", pkcs11Lib);
             module.getModule().finalize();
             LOG.info("Finalized module {}", pkcs11Lib);
@@ -72,7 +74,8 @@ public class IaikP11ModulePool {
 
         Module module;
 
-        try{
+        try
+        {
             module=Module.getInstance(pkcs11Lib);
         }catch(IOException e)
         {
@@ -99,15 +102,18 @@ public class IaikP11ModulePool {
                 LOG.info("PKCS#11 module already initialized");
                 if(LOG.isInfoEnabled())
                 {
-                    try {
+                    try
+                    {
                         LOG.info("pkcs11.getInfo():\n{}", module.getInfo());
-                    } catch (TokenException e2) {
+                    } catch (TokenException e2)
+                    {
                         LOG.debug("module.getInfo()", e2);
                     }
                 }
             }
         }
-        catch (Throwable t) {
+        catch (Throwable t)
+        {
             LOG.error("Unexpected Exception. {}: {}", t.getClass().getName(), t.getMessage());
             LOG.debug("Unexpected Exception: ", t.getMessage(), t);
             close(module);
@@ -121,7 +127,8 @@ public class IaikP11ModulePool {
     }
 
     @Override
-    protected void finalize() throws Throwable {
+    protected void finalize() throws Throwable
+    {
         super.finalize();
         shutdown();
     }

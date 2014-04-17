@@ -19,7 +19,8 @@ package org.xipki.security.common;
 
 import java.util.Collection;
 
-public class ParamChecker {
+public class ParamChecker
+{
 
     public static void assertNotNull(String parameterName, Object parameter)
     {

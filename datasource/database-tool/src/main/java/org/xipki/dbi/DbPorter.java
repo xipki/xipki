@@ -25,7 +25,8 @@ import java.sql.Statement;
 import org.xipki.database.api.DataSource;
 import org.xipki.security.common.ParamChecker;
 
-class DbPorter {
+class DbPorter
+{
     public static final String FILENAME_CA_Configuration = "CA-Configuration.xml";
     public static final String FILENAME_CA_CertStore = "CA-CertStore.xml";
     public static final String FILENAME_OCSP_CertStore = "OCSP-CertStore.xml";
@@ -83,9 +84,11 @@ class DbPorter {
     {
         if(ps != null)
         {
-            try {
+            try
+            {
                 ps.close();
-            } catch (SQLException e) {
+            } catch (SQLException e)
+            {
             }
         }
     }

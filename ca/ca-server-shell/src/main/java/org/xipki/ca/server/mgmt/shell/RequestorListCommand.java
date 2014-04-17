@@ -24,7 +24,8 @@ import org.apache.felix.gogo.commands.Option;
 import org.xipki.ca.server.mgmt.CmpRequestorEntry;
 
 @Command(scope = "ca", name = "requestor-list", description="List requestors")
-public class RequestorListCommand extends CaCommand {
+public class RequestorListCommand extends CaCommand
+{
 
     @Option(name = "-name",
             description = "Requestor name",
@@ -32,7 +33,8 @@ public class RequestorListCommand extends CaCommand {
     protected String name;
 
     @Override
-    protected Object doExecute() throws Exception {
+    protected Object doExecute() throws Exception
+    {
         StringBuilder sb = new StringBuilder();
 
         if(name == null)

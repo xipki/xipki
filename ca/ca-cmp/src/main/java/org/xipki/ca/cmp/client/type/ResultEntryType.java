@@ -18,9 +18,11 @@
 package org.xipki.ca.cmp.client.type;
 
 
-public abstract class ResultEntryType extends IdentifiedObject{
+public abstract class ResultEntryType extends IdentifiedObject
+{
 
-    public ResultEntryType(String id) {
+    public ResultEntryType(String id)
+    {
         super(id);
     }
 

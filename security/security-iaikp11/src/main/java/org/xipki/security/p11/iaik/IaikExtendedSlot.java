@@ -48,7 +48,8 @@ import org.slf4j.LoggerFactory;
 import org.xipki.security.api.Pkcs11KeyIdentifier;
 import org.xipki.security.api.SignerException;
 
-public class IaikExtendedSlot{
+public class IaikExtendedSlot
+{
     private static final Logger LOG = LoggerFactory.getLogger(IaikExtendedSlot.class);
 
     private final static long DEFAULT_MAX_COUNT_SESSION = 20;
@@ -75,9 +76,11 @@ public class IaikExtendedSlot{
         this.password = password;
 
         Session session;
-        try {
+        try
+        {
             session = openSession();
-        } catch (TokenException e) {
+        } catch (TokenException e)
+        {
             LOG.warn("openSession, TokenException: {}", e.getMessage());
             LOG.debug("openSession", e);
             close();
@@ -85,9 +88,11 @@ public class IaikExtendedSlot{
             throw new SignerException(e);
         }
 
-        try {
+        try
+        {
             firstLogin(session, password);
-        } catch (TokenException e) {
+        } catch (TokenException e)
+        {
             LOG.warn("firstLogin, TokenException: {}", e.getMessage());
             LOG.debug("firstLogin", e);
             close();
@@ -96,9 +101,11 @@ public class IaikExtendedSlot{
         }
 
         long maxSessionCount2 = 1;
-        try {
+        try
+        {
             maxSessionCount2 = this.slot.getToken().getTokenInfo().getMaxSessionCount();
-        } catch (TokenException e) {
+        } catch (TokenException e)
+        {
             LOG.warn("TokenException {}", e.getMessage());
             LOG.debug("TokenException", e);
         }
@@ -135,7 +142,8 @@ public class IaikExtendedSlot{
             throw new SignerException("No idle session available");
         }
 
-        try{
+        try
+        {
             Mechanism algorithmId = Mechanism.get(PKCS11Constants.CKM_ECDSA);
 
             LOG.debug("sign with private key:\n{}", signatureKey);
@@ -148,7 +156,8 @@ public class IaikExtendedSlot{
                 if (LOG.isDebugEnabled()) LOG.debug("signature:\n{}", Hex.toHexString(signature));
                 return signature;
             }
-        } catch (TokenException e) {
+        } catch (TokenException e)
+        {
             throw new SignerException(e);
         }finally
         {
@@ -172,7 +181,8 @@ public class IaikExtendedSlot{
             throw new SignerException("No idle session available");
         }
 
-        try{
+        try
+        {
             Mechanism algorithmId = Mechanism.get(PKCS11Constants.CKM_RSA_PKCS);
 
             LOG.debug("sign with private key:\n{}", signatureKey);
@@ -185,7 +195,8 @@ public class IaikExtendedSlot{
                 if (LOG.isDebugEnabled()) LOG.debug("signature:\n{}", Hex.toHexString(signature));
                 return signature;
             }
-        } catch (TokenException e) {
+        } catch (TokenException e)
+        {
             throw new SignerException(e);
         }finally
         {
@@ -209,7 +220,8 @@ public class IaikExtendedSlot{
             throw new SignerException("No idle session available");
         }
 
-        try{
+        try
+        {
             Mechanism algorithmId = Mechanism.get(PKCS11Constants.CKM_RSA_X_509);
 
             LOG.debug("sign with private key:\n{}", signatureKey);
@@ -222,7 +234,8 @@ public class IaikExtendedSlot{
                 if (LOG.isDebugEnabled()) LOG.debug("signature:\n{}", Hex.toHexString(signature));
                 return signature;
             }
-        } catch (TokenException e) {
+        } catch (TokenException e)
+        {
             throw new SignerException(e);
         }finally
         {
@@ -232,7 +245,8 @@ public class IaikExtendedSlot{
 
     private PrivateKey getSigningKey(Pkcs11KeyIdentifier keyId) throws SignerException
     {
-        synchronized (keyId) {
+        synchronized (keyId)
+        {
             PrivateKey signingKey;
             if(keyId.getKeyId() != null)
             {
@@ -280,9 +294,11 @@ public class IaikExtendedSlot{
 
     private void closeSession(Session session) throws TokenException
     {
-        try {
+        try
+        {
             session.closeSession();
-        } finally {
+        } finally
+        {
             countSessions.decrementAndGet();
         }
     }
@@ -291,9 +307,11 @@ public class IaikExtendedSlot{
     {
         if(writableSession == null)
         {
-            try {
+            try
+            {
                 writableSession = openSession(true);
-            } catch (TokenException e) {
+            } catch (TokenException e)
+            {
                 throw new SignerException("Could not open writable session", e);
             }
         }
@@ -325,9 +343,11 @@ public class IaikExtendedSlot{
             if(session == null)
             {
                 // create new session
-                try {
+                try
+                {
                     session = openSession();
-                } catch (TokenException e) {
+                } catch (TokenException e)
+                {
                     LOG.error("openSession(), TokenException: {}", e.getMessage());
                     LOG.debug("openSession()", e);
                 }
@@ -336,9 +356,11 @@ public class IaikExtendedSlot{
             if(session != null) return session;
         }
 
-        try {
+        try
+        {
             return idleSessions.poll(timeOutWaitNewSession, TimeUnit.MILLISECONDS);
-        } catch (InterruptedException e) {
+        } catch (InterruptedException e)
+        {
         }
 
         throw new SignerException("No idle session");
@@ -350,14 +372,17 @@ public class IaikExtendedSlot{
 
         for(int i = 0; i < 3; i++)
         {
-            try {
+            try
+            {
                 idleSessions.put(session);
                 return;
-            } catch (InterruptedException e) {
+            } catch (InterruptedException e)
+            {
             }
         }
 
-        try{
+        try
+        {
             closeSession(session);
         }catch(TokenException e)
         {
@@ -372,7 +397,8 @@ public class IaikExtendedSlot{
            boolean isProtectedAuthenticationPath =
                    session.getToken().getTokenInfo().isProtectedAuthenticationPath();
 
-           try{
+           try
+           {
             if (isProtectedAuthenticationPath)
             {
                 LOG.info("verify on PKCS11Module with PROTECTED_AUTHENTICATION_PATH");
@@ -400,7 +426,8 @@ public class IaikExtendedSlot{
             throws SignerException
     {
         Session session = borrowIdleSession();
-        try{
+        try
+        {
             login(session);
         }finally
         {
@@ -411,7 +438,8 @@ public class IaikExtendedSlot{
     private void login(Session session)
             throws SignerException
     {
-        try{
+        try
+        {
                boolean isSessionLoggedIn = checkSessionLoggedIn(session);
                if (isSessionLoggedIn) return;
 
@@ -421,7 +449,8 @@ public class IaikExtendedSlot{
                if (!loginRequired) return;
 
             session.login( Session.UserType.USER, password);
-        } catch (TokenException e) {
+        } catch (TokenException e)
+        {
             throw new SignerException(e);
         }
     }
@@ -430,9 +459,11 @@ public class IaikExtendedSlot{
                 throws SignerException
       {
           SessionInfo info;
-        try {
+        try
+        {
             info = session.getSessionInfo();
-        } catch (TokenException e) {
+        } catch (TokenException e)
+        {
             throw new SignerException(e);
         }
           LOG.debug("SessionInfo: {}", info);
@@ -480,7 +511,8 @@ public class IaikExtendedSlot{
     {
         Session session = borrowIdleSession();
 
-        try{
+        try
+        {
             if(LOG.isDebugEnabled())
             {
                 String info = listPrivateKeyObjects(session, forSigning, forDecrypting);
@@ -554,7 +586,8 @@ public class IaikExtendedSlot{
     {
         Session session = borrowIdleSession();
 
-        try{
+        try
+        {
             if(LOG.isDebugEnabled())
             {
                 String info = listPrivateKeyObjects(session, forSigning, forDecrypting);
@@ -601,13 +634,16 @@ public class IaikExtendedSlot{
     public String listPrivateKeyObjects()
     {
         Session session;
-        try {
+        try
+        {
             session = borrowIdleSession();
-        } catch (SignerException e) {
+        } catch (SignerException e)
+        {
             return "Exception: " + e.getMessage();
         }
 
-        try{
+        try
+        {
             return listPrivateKeyObjects(session, null, null);
         }
         finally
@@ -618,7 +654,8 @@ public class IaikExtendedSlot{
 
     private String listPrivateKeyObjects(Session session, Boolean forSigning, Boolean forDecrypting)
     {
-        try{
+        try
+        {
             StringBuilder msg = new StringBuilder();
             msg.append("Available private keys: ");
             msg.append("forSigning: ").append(forSigning);
@@ -675,7 +712,8 @@ public class IaikExtendedSlot{
     {
         Session session = borrowIdleSession();
 
-        try{
+        try
+        {
             if(LOG.isDebugEnabled())
             {
                 String info = listPublicKeyObjects(session, forSignature, forCipher);
@@ -743,16 +781,20 @@ public class IaikExtendedSlot{
                     break;
                 }
 
-                for (iaik.pkcs.pkcs11.objects.Object object : foundObjects) {
+                for (iaik.pkcs.pkcs11.objects.Object object : foundObjects)
+                {
                     LOG.debug("foundObject: {}", object);
                     objList.add(object);
                 }
             }
-        } catch (TokenException e) {
+        } catch (TokenException e)
+        {
             throw new SignerException(e);
         }
-        finally{
-            try{
+        finally
+        {
+            try
+            {
                 session.findObjectsFinal();
             }catch(Exception e){}
         }
@@ -766,7 +808,8 @@ public class IaikExtendedSlot{
     {
         Session session = borrowIdleSession();
 
-        try{
+        try
+        {
             if(LOG.isDebugEnabled())
             {
                 String info = listCertificateObjects(session);
@@ -807,13 +850,16 @@ public class IaikExtendedSlot{
     public String listCertificateObjects()
     {
         Session session;
-        try {
+        try
+        {
             session = borrowIdleSession();
-        } catch (SignerException e) {
+        } catch (SignerException e)
+        {
             return "Exception: " + e.getMessage();
         }
 
-        try{
+        try
+        {
             return listCertificateObjects(session);
         }
         finally
@@ -824,7 +870,8 @@ public class IaikExtendedSlot{
 
     private String listCertificateObjects(Session session)
     {
-        try{
+        try
+        {
             StringBuilder msg = new StringBuilder();
             msg.append("Available certificates: ");
 
@@ -869,13 +916,16 @@ public class IaikExtendedSlot{
     public String listPublicKeyObjects()
     {
         Session session;
-        try {
+        try
+        {
             session = borrowIdleSession();
-        } catch (SignerException e) {
+        } catch (SignerException e)
+        {
             return "Exception: " + e.getMessage();
         }
 
-        try{
+        try
+        {
             return listPublicKeyObjects(session, null, null);
         }
         finally
@@ -887,7 +937,8 @@ public class IaikExtendedSlot{
 
     private String listPublicKeyObjects(Session session, Boolean forSignature, Boolean forCipher)
     {
-        try{
+        try
+        {
             StringBuilder msg = new StringBuilder();
             msg.append("Available public keys: ");
             msg.append("forSignature: ").append(forSignature);

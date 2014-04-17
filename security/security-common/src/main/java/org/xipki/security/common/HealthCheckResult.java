@@ -22,14 +22,17 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class HealthCheckResult {
+public class HealthCheckResult
+{
     private boolean healthy = false;
     private Map<String, Object> statuses = new ConcurrentHashMap<String, Object>();
 
-    public HealthCheckResult() {
+    public HealthCheckResult()
+    {
     }
 
-    public void setHealthy(boolean healthy) {
+    public void setHealthy(boolean healthy)
+    {
         this.healthy = healthy;
     }
 
@@ -38,7 +41,8 @@ public class HealthCheckResult {
         this.statuses.clear();
     }
 
-    public void putStatus(String statusName, Object statusValue) {
+    public void putStatus(String statusName, Object statusValue)
+    {
         this.statuses.put(statusName, statusValue);
     }
 
@@ -52,11 +56,13 @@ public class HealthCheckResult {
         return statuses.keySet();
     }
 
-    public boolean isHealthy() {
+    public boolean isHealthy()
+    {
         return healthy;
     }
 
-    public Map<String, Object> getStatuses() {
+    public Map<String, Object> getStatuses()
+    {
         return Collections.unmodifiableMap(statuses);
     }
 

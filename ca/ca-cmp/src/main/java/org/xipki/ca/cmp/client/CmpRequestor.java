@@ -103,11 +103,14 @@ public abstract class CmpRequestor
     protected PKIMessage sign(PKIMessage request)
     throws CmpRequestorException
     {
-        try {
+        try
+        {
             request = CmpUtil.addProtection(request, requestor, sender, signserviceTimeout);
-        } catch (CMPException e) {
+        } catch (CMPException e)
+        {
             throw new CmpRequestorException("Could not sign the request", e);
-        } catch (NoIdleSignerException e) {
+        } catch (NoIdleSignerException e)
+        {
             throw new CmpRequestorException("Could not sign the request", e);
         }
         return request;
@@ -119,25 +122,31 @@ public abstract class CmpRequestor
         request = sign(request);
 
         byte[] encodedRequest;
-        try {
+        try
+        {
             encodedRequest = request.getEncoded();
-        } catch (IOException e) {
+        } catch (IOException e)
+        {
             LOG.error("Error while encode the PKI request {}", request);
             throw new CmpRequestorException(e);
         }
 
         byte[] encodedResponse;
-        try {
+        try
+        {
             encodedResponse = send(encodedRequest);
-        } catch (IOException e) {
+        } catch (IOException e)
+        {
             LOG.error("Error while send the PKI request {} to server", request);
             throw new CmpRequestorException(e);
         }
 
         GeneralPKIMessage response;
-        try {
+        try
+        {
             response = new GeneralPKIMessage(encodedResponse);
-        } catch (IOException e) {
+        } catch (IOException e)
+        {
             LOG.error("Error while decode the received PKI message: {}", Hex.toHexString(encodedResponse));
             throw new CmpRequestorException(e);
         }
@@ -153,14 +162,18 @@ public abstract class CmpRequestor
         PKIResponse ret = new PKIResponse(response);
         if(response.hasProtection())
         {
-            try {
+            try
+            {
                 ProtectionVerificationResult verifyProtection = verifyProtection(Hex.toHexString(tid.getOctets()), response);
                 ret.setProtectionVerificationResult(verifyProtection);
-            } catch (InvalidKeyException e) {
+            } catch (InvalidKeyException e)
+            {
                 throw new CmpRequestorException(e);
-            } catch (OperatorCreationException e) {
+            } catch (OperatorCreationException e)
+            {
                 throw new CmpRequestorException(e);
-            } catch (CMPException e) {
+            } catch (CMPException e)
+            {
                 throw new CmpRequestorException(e);
             }
         }
@@ -177,7 +190,8 @@ public abstract class CmpRequestor
         return ret;
     }
 
-    public X509Certificate getResponderCert() {
+    public X509Certificate getResponderCert()
+    {
         return responderCert;
     }
 
@@ -223,7 +237,8 @@ public abstract class CmpRequestor
     private byte[] randomTransactionId()
     {
         byte[] tid = new byte[20];
-        synchronized (random) {
+        synchronized (random)
+        {
             random.nextBytes(tid);
         }
         return tid;

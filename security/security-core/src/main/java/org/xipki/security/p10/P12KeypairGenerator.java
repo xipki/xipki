@@ -65,7 +65,8 @@ import org.xipki.security.KeyUtil;
 import org.xipki.security.api.P12KeypairGenerationResult;
 import org.xipki.security.bcext.ECDSAContentSignerBuilder;
 
-public abstract class P12KeypairGenerator {
+public abstract class P12KeypairGenerator
+{
     private static final long MIN = 60L * 1000;
     private static final long DAY = 24L * 60 * 60 * 1000;
 
@@ -124,9 +125,11 @@ public abstract class P12KeypairGenerator {
          ks.setKeyEntry("main", identity.getKey(), password, new Certificate[]{identity.getJceCert()});
 
          ByteArrayOutputStream ksStream = new ByteArrayOutputStream();
-         try{
+         try
+         {
              ks.store(ksStream, password);
-         }finally{
+         }finally
+         {
              ksStream.flush();
          }
 
@@ -206,17 +209,20 @@ public abstract class P12KeypairGenerator {
         private SubjectPublicKeyInfo subjectPublicKeyInfo;
 
         public KeyPairWithSubjectPublicKeyInfo(KeyPair keypair,
-                SubjectPublicKeyInfo subjectPublicKeyInfo) {
+                SubjectPublicKeyInfo subjectPublicKeyInfo)
+                {
             super();
             this.keypair = keypair;
             this.subjectPublicKeyInfo = subjectPublicKeyInfo;
         }
 
-        public KeyPair getKeypair() {
+        public KeyPair getKeypair()
+        {
             return keypair;
         }
 
-        public SubjectPublicKeyInfo getSubjectPublicKeyInfo() {
+        public SubjectPublicKeyInfo getSubjectPublicKeyInfo()
+        {
             return subjectPublicKeyInfo;
         }
     }
@@ -234,24 +240,29 @@ public abstract class P12KeypairGenerator {
              this.key = key;
              // Due to bug in BC we must reparse the certificate from ByteArray
              org.bouncycastle.asn1.x509.Certificate cert2;
-            try {
+            try
+            {
                 cert2 = org.bouncycastle.asn1.x509.Certificate.getInstance(cert.getEncoded());
-            } catch (IOException e) {
+            } catch (IOException e)
+            {
                 throw new CertificateParsingException(e);
             }
              this.jceCert = new X509CertificateObject(cert2);
          }
 
-        public X509CertificateHolder getCert() {
+        public X509CertificateHolder getCert()
+        {
             return cert;
         }
 
-        public Certificate getJceCert() {
+        public Certificate getJceCert()
+        {
             return jceCert;
         }
 
 
-        public PrivateKey getKey() {
+        public PrivateKey getKey()
+        {
             return key;
         }
      }
@@ -268,7 +279,8 @@ public abstract class P12KeypairGenerator {
                 super(password, subject);
 
                 boolean isOid;
-                try{
+                try
+                {
                     new ASN1ObjectIdentifier(curveNameOrOid);
                     isOid = true;
                 }catch(Exception e)
@@ -293,7 +305,8 @@ public abstract class P12KeypairGenerator {
             }
 
             @Override
-            protected KeyPairWithSubjectPublicKeyInfo genKeypair() throws Exception {
+            protected KeyPairWithSubjectPublicKeyInfo genKeypair() throws Exception
+            {
                 KeyPairGenerator kpgen = KeyPairGenerator.getInstance("ECDSA", "BC");
                 ECNamedCurveParameterSpec spec = ECNamedCurveTable.getParameterSpec(curveName);
                 kpgen.initialize(spec);
@@ -311,7 +324,8 @@ public abstract class P12KeypairGenerator {
             }
 
             @Override
-            protected String getKeyAlgorithm() {
+            protected String getKeyAlgorithm()
+            {
                 return "ECDSA";
             }
 
@@ -355,7 +369,8 @@ public abstract class P12KeypairGenerator {
 
      }
 
-     public static class RSAIdentityGenerator extends P12KeypairGenerator {
+     public static class RSAIdentityGenerator extends P12KeypairGenerator
+     {
             private int keysize;
             private BigInteger publicExponent;
 
@@ -371,7 +386,8 @@ public abstract class P12KeypairGenerator {
             }
 
             @Override
-            protected KeyPairWithSubjectPublicKeyInfo genKeypair() throws Exception {
+            protected KeyPairWithSubjectPublicKeyInfo genKeypair() throws Exception
+            {
                 KeyPairGenerator kpgen = KeyPairGenerator.getInstance("RSA", "BC");
                 RSAKeyGenParameterSpec spec = new RSAKeyGenParameterSpec(keysize, publicExponent);
                 kpgen.initialize(spec);
@@ -383,7 +399,8 @@ public abstract class P12KeypairGenerator {
             }
 
             @Override
-            protected String getKeyAlgorithm() {
+            protected String getKeyAlgorithm()
+            {
                 return "RSA";
             }
     }

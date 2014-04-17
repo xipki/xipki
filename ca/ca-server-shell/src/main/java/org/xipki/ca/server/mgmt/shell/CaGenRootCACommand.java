@@ -39,7 +39,8 @@ import org.xipki.security.common.ConfigurationException;
 import org.xipki.security.common.IoCertUtil;
 
 @Command(scope = "ca", name = "gen-rca", description="Generate selfsigned root CA")
-public class CaGenRootCACommand extends CaCommand {
+public class CaGenRootCACommand extends CaCommand
+{
     @Option(name = "-name",
             description = "Required. CA name",
             required = true)
@@ -125,7 +126,8 @@ public class CaGenRootCACommand extends CaCommand {
     private SecurityFactory securityFactory;
 
     @Override
-    protected Object doExecute() throws Exception {
+    protected Object doExecute() throws Exception
+    {
         CAStatus status = CAStatus.ACTIVE;
         if(caStatus != null)
         {
@@ -203,11 +205,13 @@ public class CaGenRootCACommand extends CaCommand {
         return null;
     }
 
-    public void setPasswordResolver(PasswordResolver passwordResolver) {
+    public void setPasswordResolver(PasswordResolver passwordResolver)
+    {
         this.passwordResolver = passwordResolver;
     }
 
-    public void setSecurityFactory(SecurityFactory securityFactory) {
+    public void setSecurityFactory(SecurityFactory securityFactory)
+    {
         this.securityFactory = securityFactory;
     }
 }

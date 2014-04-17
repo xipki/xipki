@@ -32,7 +32,8 @@ import org.xipki.security.common.ConfigurationException;
 import org.xipki.security.common.IoCertUtil;
 
 @Command(scope = "ca", name = "ca-update", description="Update CA")
-public class CaUpdateCommand extends CaCommand {
+public class CaUpdateCommand extends CaCommand
+{
     @Option(name = "-name",
             required = true, description = "Required. CA name")
     protected String            caName;
@@ -102,7 +103,8 @@ public class CaUpdateCommand extends CaCommand {
     protected Boolean           disableDuplicateSubject;
 
     @Override
-    protected Object doExecute() throws Exception {
+    protected Object doExecute() throws Exception
+    {
         CAStatus status = null;
         if(caStatus != null)
         {

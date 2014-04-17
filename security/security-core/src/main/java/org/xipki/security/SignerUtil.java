@@ -99,9 +99,11 @@ public class SignerUtil
 
         BcDigestProvider digestProvider = BcDefaultDigestProvider.INSTANCE;
         AlgorithmIdentifier digAlgId;
-        try {
+        try
+        {
             digAlgId = SignerUtil.extractDigesetAlgorithmIdentifier(sigAlgId);
-        } catch (NoSuchAlgorithmException e) {
+        } catch (NoSuchAlgorithmException e)
+        {
             throw new OperatorCreationException(e.getMessage(), e);
         }
         Digest dig = digestProvider.get(digAlgId);
@@ -280,23 +282,30 @@ public class SignerUtil
 
     public static  boolean verifyPOP(PKCS10CertificationRequest p10Request)
     {
-        try {
+        try
+        {
             SubjectPublicKeyInfo pkInfo = p10Request.getSubjectPublicKeyInfo();
             PublicKey pk = KeyUtil.generatePublicKey(pkInfo);
 
             ContentVerifierProvider cvp = KeyUtil.getContentVerifierProvider(pk);
             return p10Request.isSignatureValid(cvp);
-        } catch (OperatorCreationException e) {
+        } catch (OperatorCreationException e)
+        {
             return false;
-        } catch (InvalidKeyException e) {
+        } catch (InvalidKeyException e)
+        {
             return false;
-        } catch (PKCSException e) {
+        } catch (PKCSException e)
+        {
             return false;
-        } catch (NoSuchAlgorithmException e) {
+        } catch (NoSuchAlgorithmException e)
+        {
             return false;
-        } catch (InvalidKeySpecException e) {
+        } catch (InvalidKeySpecException e)
+        {
             return false;
-        } catch (IOException e) {
+        } catch (IOException e)
+        {
             return false;
         }
     }

@@ -19,7 +19,8 @@ package org.xipki.ca.cmp.client.type;
 
 import org.xipki.security.common.ParamChecker;
 
-public class IdentifiedObject {
+public class IdentifiedObject
+{
     private final String id;
 
     public IdentifiedObject(String id)

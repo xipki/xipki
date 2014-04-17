@@ -23,7 +23,8 @@ import org.xipki.ca.server.mgmt.PublisherEntry;
 import org.xipki.security.common.IoCertUtil;
 
 @Command(scope = "ca", name = "publisher-add", description="Add publisher")
-public class PublisherAddCommand extends CaCommand {
+public class PublisherAddCommand extends CaCommand
+{
 
     @Option(name = "-name",
                 description = "Required. Publisher Name",
@@ -44,7 +45,8 @@ public class PublisherAddCommand extends CaCommand {
     protected String            confFile;
 
     @Override
-    protected Object doExecute() throws Exception {
+    protected Object doExecute() throws Exception
+    {
         PublisherEntry entry = new PublisherEntry(name);
         entry.setType(type);
 

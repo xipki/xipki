@@ -21,7 +21,8 @@ import org.apache.felix.gogo.commands.Command;
 import org.apache.felix.gogo.commands.Option;
 
 @Command(scope = "ca", name = "capub-remove", description="Remove publisher in given CA")
-public class CaPublisherRemoveCommand extends CaCommand {
+public class CaPublisherRemoveCommand extends CaCommand
+{
     @Option(name = "-ca",
             description = "Required. CA name",
             required = true)
@@ -32,7 +33,8 @@ public class CaPublisherRemoveCommand extends CaCommand {
     protected String            publisherName;
 
     @Override
-    protected Object doExecute() throws Exception {
+    protected Object doExecute() throws Exception
+    {
         caManager.removePublisherFromCA(publisherName, caName);
         return null;
     }

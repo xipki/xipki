@@ -38,11 +38,13 @@ public class RemoteP11CryptServiceFactory implements P11CryptServiceFactory
     public P11CryptService createP11CryptService(String pkcs11Module, char[] password)
             throws SignerException
     {
-        synchronized (services) {
+        synchronized (services)
+        {
             RemoteP11CryptService service = services.get(pkcs11Module);
             if(service == null)
             {
-                try{
+                try
+                {
                     CmpUtf8Pairs conf = new CmpUtf8Pairs(pkcs11Module);
                     String url = conf.getValue("url");
                     if(url == null || url.isEmpty())
@@ -81,9 +83,11 @@ public class RemoteP11CryptServiceFactory implements P11CryptServiceFactory
         sb.append(", user=").append(user).append(")\n");
 
         PKCS11SlotIdentifier[] slotIds;
-        try {
+        try
+        {
             slotIds = service.getSlotIdentifiers();
-        } catch (SignerException e) {
+        } catch (SignerException e)
+        {
             LOG.warn("RemoteP11CryptService.getSlotIdentifiers(); SignerException: "
                     + "url={}, user={}, message={}",
                     new Object[]{url, user, e.getMessage()});
@@ -101,9 +105,11 @@ public class RemoteP11CryptServiceFactory implements P11CryptServiceFactory
         for(PKCS11SlotIdentifier slotId : slotIds)
         {
             String[] keyLabels;
-            try {
+            try
+            {
                 keyLabels = service.getKeyLabels(slotId);
-            } catch (SignerException e) {
+            } catch (SignerException e)
+            {
                 LOG.warn("RemoteP11CryptService.getKeyLabels(); SignerException: "
                         + "url={}, user={}, slot={}, message={}",
                         new Object[]{url, user, slotId, e.getMessage()});

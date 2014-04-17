@@ -89,11 +89,13 @@ public abstract class AbstractOCSPRequestor implements OCSPRequestor
 
         OCSPReq ocspReq = buildRequest(caCert, serialNumber, nonce, requestOptions.getHashAlgorithmId());
         OCSPResp response;
-        try{
+        try
+        {
             byte[] encodedReq = ocspReq.getEncoded();
             byte[] encodedResp = send(encodedReq, responderUrl);
             response = new OCSPResp(encodedResp);
-        } catch (IOException e) {
+        } catch (IOException e)
+        {
             throw new OCSPRequestorException(e);
         }
 
@@ -101,9 +103,11 @@ public abstract class AbstractOCSPRequestor implements OCSPRequestor
         if(statusCode == 0)
         {
             BasicOCSPResp basicOCSPResp;
-            try {
+            try
+            {
                 basicOCSPResp = (BasicOCSPResp) response.getResponseObject();
-            } catch (OCSPException e) {
+            } catch (OCSPException e)
+            {
                 throw new OCSPRequestorException(e);
             }
             Extension nonceExtn = basicOCSPResp.getExtension(OCSPObjectIdentifiers.id_pkix_ocsp_nonce);
@@ -165,7 +169,8 @@ public abstract class AbstractOCSPRequestor implements OCSPRequestor
             reqBuilder.setRequestExtensions(extensions);
         }
 
-        try{
+        try
+        {
             CertificateID certID = new CertificateID(
                     digestCalculator,
                     new X509CertificateHolder(caCert.getEncoded()),
@@ -176,9 +181,11 @@ public abstract class AbstractOCSPRequestor implements OCSPRequestor
         } catch (OCSPException e)
         {
             throw new OCSPRequestorException(e);
-        } catch (CertificateEncodingException e) {
+        } catch (CertificateEncodingException e)
+        {
             throw new OCSPRequestorException(e);
-        } catch (IOException e) {
+        } catch (IOException e)
+        {
             throw new OCSPRequestorException(e);
         }
     }

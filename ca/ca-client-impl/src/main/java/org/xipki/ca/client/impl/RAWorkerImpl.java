@@ -185,10 +185,13 @@ public final class RAWorkerImpl extends AbstractRAWorker implements RAWorker
 
         Properties props = new Properties();
         FileInputStream configStream = new FileInputStream(confFile);
-        try{
+        try
+        {
             props.load(configStream);
-        }finally{
-            try{
+        }finally
+        {
+            try
+            {
                 configStream.close();
             }catch(IOException e)
             {}
@@ -200,9 +203,11 @@ public final class RAWorkerImpl extends AbstractRAWorker implements RAWorker
         String s = props.getProperty(REQUESTOR_CERT);
         if(!isEmpty(s))
         {
-            try {
+            try
+            {
                 requestorCert = IoCertUtil.parseCert(s);
-            } catch (Exception e) {
+            } catch (Exception e)
+            {
                 throw new ConfigurationException(e);
             }
         }
@@ -244,7 +249,8 @@ public final class RAWorkerImpl extends AbstractRAWorker implements RAWorker
         Set<CAConf> cas = new HashSet<CAConf>();
         for(String caname : canames)
         {
-            try{
+            try
+            {
                 String _serviceUrl = props.getProperty(CA_PREFIX + caname + CA_URL_SUFFIX);
                 String _cacertFile = props.getProperty(CA_PREFIX + caname + CA_CERT_SUFFIX);
                 String _responderFile = props.getProperty(CA_PREFIX + caname + CA_RESPONDER_SUFFIX);
@@ -319,7 +325,8 @@ public final class RAWorkerImpl extends AbstractRAWorker implements RAWorker
             if(type.toLowerCase().startsWith("java:"))
             {
                 String className = type.substring("java:".length());
-                try{
+                try
+                {
                     Class<?> clazz = Class.forName(className);
                     underlyingCertProfile = (CertProfile) clazz.newInstance();
                 }catch(Exception e)
@@ -333,9 +340,11 @@ public final class RAWorkerImpl extends AbstractRAWorker implements RAWorker
             }
 
             IdentifiedCertProfile certProfile = new IdentifiedCertProfile(name, underlyingCertProfile);
-            try {
+            try
+            {
                 certProfile.initialize(conf);
-            } catch (CertProfileException e) {
+            } catch (CertProfileException e)
+            {
                 throw new ConfigurationException("invalid for certprofile name = " + name + ", message: " + e.getMessage());
             }
             certProfile.setEnvironmentParamterResolver(envParamsResolver);
@@ -384,12 +393,15 @@ public final class RAWorkerImpl extends AbstractRAWorker implements RAWorker
 
         // ------------------------------------------------
         ConcurrentContentSigner requestorSigner;
-        try {
+        try
+        {
             requestorSigner = securityFactory.createSigner(
                     requestorSignerType, requestorSignerConf, requestorCert, passwordResolver);
-        } catch (SignerException e) {
+        } catch (SignerException e)
+        {
             throw new ConfigurationException(e);
-        } catch (PasswordResolverException e) {
+        } catch (PasswordResolverException e)
+        {
             throw new ConfigurationException(e);
         }
 
@@ -497,9 +509,11 @@ public final class RAWorkerImpl extends AbstractRAWorker implements RAWorker
         X509CmpRequestor cmpRequestor = getCmpRequestor(request, caName);
 
         CmpResultType result;
-        try {
+        try
+        {
             result = cmpRequestor.requestCertificate(request, extCertReqId);
-        } catch (CmpRequestorException e) {
+        } catch (CmpRequestorException e)
+        {
             throw new RAWorkerException(e);
         }
 
@@ -520,7 +534,8 @@ public final class RAWorkerImpl extends AbstractRAWorker implements RAWorker
     @Override
     public CertReqMsg getCertReqMsgWithAppliedCertProfile(CertRequest request,
             String profileName, ProofOfPossession popo)
-    throws RAWorkerException {
+    throws RAWorkerException
+    {
         boolean shouldApplyCertProfile = false;
 
         String caName;
@@ -559,7 +574,8 @@ public final class RAWorkerImpl extends AbstractRAWorker implements RAWorker
 
     private CertReqMsg applyCertProfile(
             String profileName, CertRequest origCertRequest, ProofOfPossession popo)
-    throws RAWorkerException {
+    throws RAWorkerException
+    {
         CertRequest newCertRequest = applyCertProfile(origCertRequest, profileName);
 
         if(popo != null)
@@ -592,11 +608,14 @@ public final class RAWorkerImpl extends AbstractRAWorker implements RAWorker
 
         X500Name requestedSubject = origCertTemp.getSubject();
         X500Name newSubject;
-        try {
+        try
+        {
             newSubject = certProfile.getSubject(requestedSubject).getGrantedSubject();
-        } catch (CertProfileException e) {
+        } catch (CertProfileException e)
+        {
             throw new RAWorkerException(e);
-        } catch (BadCertTemplateException e) {
+        } catch (BadCertTemplateException e)
+        {
             throw new RAWorkerException(e);
         }
         builder.setSubject(newSubject);
@@ -612,11 +631,14 @@ public final class RAWorkerImpl extends AbstractRAWorker implements RAWorker
         }
 
         List<ExtensionTuple> extensionTuples;
-        try {
+        try
+        {
             extensionTuples = certProfile.getExtensions(requestedSubject, origCertTemp.getExtensions()).getExtensions();
-        } catch (CertProfileException e) {
+        } catch (CertProfileException e)
+        {
             throw new RAWorkerException(e);
-        } catch (BadCertTemplateException e) {
+        } catch (BadCertTemplateException e)
+        {
             throw new RAWorkerException(e);
         }
 
@@ -625,9 +647,11 @@ public final class RAWorkerImpl extends AbstractRAWorker implements RAWorker
         for(ExtensionTuple extension : extensionTuples)
         {
             byte[] encodedValue;
-            try {
+            try
+            {
                 encodedValue = extension.getValue().toASN1Primitive().getEncoded();
-            } catch (IOException e) {
+            } catch (IOException e)
+            {
                 throw new RAWorkerException("Error while decode the extension " + extension.getType().getId());
             }
             Extension newExtension = new Extension(
@@ -707,9 +731,11 @@ public final class RAWorkerImpl extends AbstractRAWorker implements RAWorker
         }
 
         CmpResultType result;
-        try {
+        try
+        {
             result = cmpRequestor.requestCertificate(request);
-        } catch (CmpRequestorException e) {
+        } catch (CmpRequestorException e)
+        {
             throw new RAWorkerException(e);
         }
 
@@ -770,7 +796,8 @@ public final class RAWorkerImpl extends AbstractRAWorker implements RAWorker
     private void checkCertProfileSupportInCA(String certProfile, String caname)
     throws RAWorkerException
     {
-        if(caname == null){
+        if(caname == null)
+        {
             for(CAConf ca : casMap.values())
             {
                 if(ca.getProfiles().contains(certProfile))
@@ -866,9 +893,11 @@ public final class RAWorkerImpl extends AbstractRAWorker implements RAWorker
         X509CmpRequestor cmpRequestor = cmpRequestorsMap.get(caname);
 
         CmpResultType result;
-        try {
+        try
+        {
             result = cmpRequestor.revocateCertificate(request);
-        } catch (CmpRequestorException e) {
+        } catch (CmpRequestorException e)
+        {
             throw new RAWorkerException(e);
         }
 
@@ -926,9 +955,11 @@ public final class RAWorkerImpl extends AbstractRAWorker implements RAWorker
     }
 
     @Override
-    public String getCaNameByIssuer(final X500Name issuer) throws RAWorkerException {
+    public String getCaNameByIssuer(final X500Name issuer) throws RAWorkerException
+    {
 
-        if(issuer ==null ){
+        if(issuer ==null )
+        {
             throw new RAWorkerException("Invalid issuer");
         }
 
@@ -956,9 +987,11 @@ public final class RAWorkerImpl extends AbstractRAWorker implements RAWorker
 
         X509CmpRequestor requestor = cmpRequestorsMap.get(caname);
         CmpResultType result;
-        try {
+        try
+        {
             result = generateCRL ? requestor.generateCRL() : requestor.downloadCurrentCRL();
-        } catch (CmpRequestorException e) {
+        } catch (CmpRequestorException e)
+        {
             throw new RAWorkerException(e);
         }
 
@@ -1013,11 +1046,13 @@ public final class RAWorkerImpl extends AbstractRAWorker implements RAWorker
         return s == null || s.isEmpty();
     }
 
-    public String getConfFile() {
+    public String getConfFile()
+    {
         return confFile;
     }
 
-    public void setConfFile(String confFile) {
+    public void setConfFile(String confFile)
+    {
         this.confFile = confFile;
     }
 
@@ -1033,11 +1068,14 @@ public final class RAWorkerImpl extends AbstractRAWorker implements RAWorker
     {
         ParamChecker.assertNotNull("request", certReqMsg);
         X509CmpRequestor cmpRequestor = getCmpRequestor(certReqMsg, caName);
-        try {
+        try
+        {
             return cmpRequestor.envelope(certReqMsg).getEncoded();
-        } catch (IOException e) {
+        } catch (IOException e)
+        {
             throw new RAWorkerException("IOException: " + e.getMessage(), e);
-        } catch (CmpRequestorException e) {
+        } catch (CmpRequestorException e)
+        {
             throw new RAWorkerException("CmpRequestorException: " + e.getMessage(), e);
         }
     }
@@ -1112,18 +1150,23 @@ public final class RAWorkerImpl extends AbstractRAWorker implements RAWorker
             return false;
         }
 
-        try{
+        try
+        {
             _cert.verify(_caCert.getPublicKey());
         }catch(SignatureException e)
         {
             return false;
-        } catch (InvalidKeyException e) {
+        } catch (InvalidKeyException e)
+        {
             return false;
-        } catch (CertificateException e) {
+        } catch (CertificateException e)
+        {
             return false;
-        } catch (NoSuchAlgorithmException e) {
+        } catch (NoSuchAlgorithmException e)
+        {
             return false;
-        } catch (NoSuchProviderException e) {
+        } catch (NoSuchProviderException e)
+        {
             return false;
         }
 

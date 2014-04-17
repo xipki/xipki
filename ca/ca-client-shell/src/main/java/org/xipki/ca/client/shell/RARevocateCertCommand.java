@@ -29,7 +29,8 @@ import org.xipki.ca.common.PKIStatusInfo;
 import org.xipki.security.common.IoCertUtil;
 
 @Command(scope = "caclient", name = "ra-rev", description="Revocate certificate")
-public class RARevocateCertCommand extends ClientCommand {
+public class RARevocateCertCommand extends ClientCommand
+{
 
     @Option(name = "-cert",
             description = "Certificate file")
@@ -50,7 +51,8 @@ public class RARevocateCertCommand extends ClientCommand {
     private RAWorker             raWorker;
 
     @Override
-    protected Object doExecute() throws Exception {
+    protected Object doExecute() throws Exception
+    {
         if(certFile == null && (cacertFile == null && serialNumber == null))
         {
             System.err.println("either cert or (cacert, serialNumber) must be specified");
@@ -89,7 +91,8 @@ public class RARevocateCertCommand extends ClientCommand {
         return null;
     }
 
-    public void setRaWorker(RAWorker raWorker) {
+    public void setRaWorker(RAWorker raWorker)
+    {
         this.raWorker = raWorker;
     }
 

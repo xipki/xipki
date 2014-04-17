@@ -31,7 +31,8 @@ import org.xipki.ca.api.profile.BadCertTemplateException;
 import org.xipki.ca.api.profile.ExtensionOccurrence;
 import org.xipki.ca.api.profile.KeyUsage;
 
-public class CertProfile_CMP extends AbstractEECertProfile {
+public class CertProfile_CMP extends AbstractEECertProfile
+{
     private final Set<KeyUsage> keyUsages;
     private final Map<ASN1ObjectIdentifier, ExtensionOccurrence> extensionOccurences;
 
@@ -53,7 +54,8 @@ public class CertProfile_CMP extends AbstractEECertProfile {
     }
 
     @Override
-    public Integer getValidity() {
+    public Integer getValidity()
+    {
         return 5 * 365;
     }
 
@@ -63,12 +65,14 @@ public class CertProfile_CMP extends AbstractEECertProfile {
     }
 
     @Override
-    protected Set<KeyUsage> getKeyUsage() {
+    protected Set<KeyUsage> getKeyUsage()
+    {
         return keyUsages;
     }
 
     @Override
-    protected Map<ASN1ObjectIdentifier, ExtensionOccurrence> getAdditionalExtensionOccurences() {
+    protected Map<ASN1ObjectIdentifier, ExtensionOccurrence> getAdditionalExtensionOccurences()
+    {
         return extensionOccurences;
     }
 

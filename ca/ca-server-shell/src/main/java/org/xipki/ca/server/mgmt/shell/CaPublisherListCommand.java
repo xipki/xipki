@@ -24,14 +24,16 @@ import org.apache.felix.gogo.commands.Option;
 import org.xipki.ca.server.mgmt.PublisherEntry;
 
 @Command(scope = "ca", name = "capub-list", description="List publishers in given CA")
-public class CaPublisherListCommand extends CaCommand {
+public class CaPublisherListCommand extends CaCommand
+{
     @Option(name = "-ca",
             description = "Required. CA name",
             required = true)
     protected String           caName;
 
     @Override
-    protected Object doExecute() throws Exception {
+    protected Object doExecute() throws Exception
+    {
         StringBuilder sb = new StringBuilder();
 
         List<PublisherEntry> entries = caManager.getPublishersForCA(caName);

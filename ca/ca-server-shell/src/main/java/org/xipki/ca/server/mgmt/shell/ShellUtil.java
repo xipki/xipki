@@ -23,7 +23,8 @@ import org.bouncycastle.util.encoders.Base64;
 import org.xipki.security.common.CmpUtf8Pairs;
 import org.xipki.security.common.IoCertUtil;
 
-class ShellUtil {
+class ShellUtil
+{
     static String replaceFileInSignerConf(String signerConf) throws IOException
     {
         if(signerConf.contains("file:") == false)

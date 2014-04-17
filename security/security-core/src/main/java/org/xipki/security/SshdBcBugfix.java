@@ -23,7 +23,8 @@ import java.lang.reflect.Method;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class SshdBcBugfix {
+public class SshdBcBugfix
+{
     private static final Logger LOG = LoggerFactory.getLogger(SshdBcBugfix.class);
 
     private final static String classname_SecurityUtils = "org.apache.sshd.common.util.SecurityUtils";
@@ -31,7 +32,8 @@ public class SshdBcBugfix {
     public SshdBcBugfix()
     {
         Class<?> clazz = null;
-        try{
+        try
+        {
             clazz = Class.forName(classname_SecurityUtils);
         }catch(ClassNotFoundException e)
         {
@@ -47,13 +49,17 @@ public class SshdBcBugfix {
 
         String errorMsgPrefix = "SecurityUtils.setRegisterBouncyCastle(false): ";
 
-        try {
+        try
+        {
             method.invoke(null, new Object[]{false});
-        } catch (IllegalArgumentException e) {
+        } catch (IllegalArgumentException e)
+        {
             LOG.warn(errorMsgPrefix + "IllegalArgumentException {}", e.getMessage());
-        } catch (IllegalAccessException e) {
+        } catch (IllegalAccessException e)
+        {
             LOG.warn(errorMsgPrefix + "IllegalAccessException {}", e.getMessage());
-        } catch (InvocationTargetException e) {
+        } catch (InvocationTargetException e)
+        {
             LOG.warn(errorMsgPrefix + "InvocationTargetException {}", e.getMessage());
         }
 
@@ -68,7 +74,8 @@ public class SshdBcBugfix {
         Method serviceMethod=null;
         final String desc = "Method " + clz.getName() + "." + methodName;
 
-        try{
+        try
+        {
             if(params == null)
             {
                 serviceMethod = clz.getDeclaredMethod(methodName);
@@ -79,10 +86,12 @@ public class SshdBcBugfix {
             }
             serviceMethod.setAccessible(true);
             return serviceMethod;
-        } catch (SecurityException e) {
+        } catch (SecurityException e)
+        {
             LOG.warn("Could not get " + desc + ", SecuirtyException: {}", e.getMessage());
             LOG.debug("Could not get " + desc, e);
-        } catch (NoSuchMethodException e) {
+        } catch (NoSuchMethodException e)
+        {
             LOG.warn("Could not get " + desc + ", NoSuchMethodException: {}", e.getMessage());
             LOG.debug("Could not get " + desc, e);
         }

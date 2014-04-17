@@ -60,7 +60,8 @@ public class XiPKIProvider extends Provider
            }
 
            @Override
-           public Object run() {
+           public Object run()
+           {
                provider.put("KeyStore.PKCS11", XiPKIKeyStoreSpi.class.getName());
 
                provider.put("Signature.NONEwithRSA", RSADigestSignatureSpi.noneRSA.class.getName());

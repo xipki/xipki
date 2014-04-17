@@ -25,7 +25,8 @@ import org.xipki.security.api.PKCS11SlotIdentifier;
 import org.xipki.security.api.Pkcs11KeyIdentifier;
 import org.xipki.security.common.ParamChecker;
 
-public class P11ECDSAKeyParameter extends AsymmetricKeyParameter {
+public class P11ECDSAKeyParameter extends AsymmetricKeyParameter
+{
     private final P11CryptService p11CryptService;
 
     private final PKCS11SlotIdentifier slot;
@@ -55,11 +56,13 @@ public class P11ECDSAKeyParameter extends AsymmetricKeyParameter {
         return new P11ECDSAKeyParameter(p11CryptService, slot, keyId);
     }
 
-    public P11CryptService getP11CryptService() {
+    public P11CryptService getP11CryptService()
+    {
         return p11CryptService;
     }
 
-    public PKCS11SlotIdentifier getSlot() {
+    public PKCS11SlotIdentifier getSlot()
+    {
         return slot;
     }
 

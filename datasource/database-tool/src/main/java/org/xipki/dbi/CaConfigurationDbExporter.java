@@ -57,7 +57,8 @@ import org.xipki.dbi.ca.jaxb.ResponderType;
 import org.xipki.security.api.PasswordResolverException;
 import org.xipki.security.common.ParamChecker;
 
-class CaConfigurationDbExporter extends DbPorter{
+class CaConfigurationDbExporter extends DbPorter
+{
     private final Marshaller marshaller;
 
     CaConfigurationDbExporter(DataSource dataSource, Marshaller marshaller, String destDir)
@@ -106,14 +107,16 @@ class CaConfigurationDbExporter extends DbPorter{
     {
         Cmpcontrols cmpcontrols = new Cmpcontrols();
         Statement stmt = null;
-        try{
+        try
+        {
             stmt = createStatement();
             String sql = "SELECT name, require_confirm_cert, send_ca_cert, "
                     + " message_time_bias, confirm_wait_time"
                     + " FROM cmpcontrol";
             ResultSet rs = stmt.executeQuery(sql);
 
-            while(rs.next()){
+            while(rs.next())
+            {
                 String name = rs.getString("name");
                 boolean requireConfirmCert = rs.getBoolean("require_confirm_cert");
                 boolean sendCaCert = rs.getBoolean("send_ca_cert");
@@ -146,12 +149,14 @@ class CaConfigurationDbExporter extends DbPorter{
         Environments environments = new Environments();
 
         Statement stmt = null;
-        try{
+        try
+        {
             stmt = createStatement();
             String sql = "SELECT name, value FROM environment";
             ResultSet rs = stmt.executeQuery(sql);
 
-            while(rs.next()){
+            while(rs.next())
+            {
                 String name = rs.getString("name");
                 String value = rs.getString("value");
 
@@ -177,14 +182,16 @@ class CaConfigurationDbExporter extends DbPorter{
         Crlsigners crlsigners = new Crlsigners();
 
         Statement stmt = null;
-        try{
+        try
+        {
             stmt = createStatement();
             String sql = "SELECT name, signer_type, signer_conf, signer_cert, period,"
                     + " overlap, include_certs_in_crl"
                     + " FROM crlsigner";
             ResultSet rs = stmt.executeQuery(sql);
 
-            while(rs.next()){
+            while(rs.next())
+            {
                 String name = rs.getString("name");
                 String signer_type = rs.getString("signer_type");
                 String signer_conf = rs.getString("signer_conf");
@@ -221,12 +228,14 @@ class CaConfigurationDbExporter extends DbPorter{
         Caaliases caaliases = new Caaliases();
 
         Statement stmt = null;
-        try{
+        try
+        {
             stmt = createStatement();
             String sql = "SELECT name, ca_name FROM caalias";
             ResultSet rs = stmt.executeQuery(sql);
 
-            while(rs.next()){
+            while(rs.next())
+            {
                 String name = rs.getString("name");
                 String caName = rs.getString("ca_name");
 
@@ -253,12 +262,14 @@ class CaConfigurationDbExporter extends DbPorter{
         Requestors requestors = new Requestors();
 
         Statement stmt = null;
-        try{
+        try
+        {
             stmt = createStatement();
             String sql = "SELECT name, cert FROM requestor";
             ResultSet rs = stmt.executeQuery(sql);
 
-            while(rs.next()){
+            while(rs.next())
+            {
                 String name = rs.getString("name");
                 String cert = rs.getString("cert");
 
@@ -285,12 +296,14 @@ class CaConfigurationDbExporter extends DbPorter{
         Responders responders = new Responders();
 
         Statement stmt = null;
-        try{
+        try
+        {
             stmt = createStatement();
             String sql = "SELECT name, type, cert, conf FROM responder";
             ResultSet rs = stmt.executeQuery(sql);
 
-            while(rs.next()){
+            while(rs.next())
+            {
                 String name = rs.getString("name");
                 String type = rs.getString("type");
                 String conf = rs.getString("conf");
@@ -321,12 +334,14 @@ class CaConfigurationDbExporter extends DbPorter{
         Publishers publishers = new Publishers();
 
         Statement stmt = null;
-        try{
+        try
+        {
             stmt = createStatement();
             String sql = "SELECT name, type, conf FROM publisher";
             ResultSet rs = stmt.executeQuery(sql);
 
-            while(rs.next()){
+            while(rs.next())
+            {
                 String name = rs.getString("name");
                 String type = rs.getString("type");
                 String conf = rs.getString("conf");
@@ -355,12 +370,14 @@ class CaConfigurationDbExporter extends DbPorter{
         Certprofiles certprofiles = new Certprofiles();
 
         Statement stmt = null;
-        try{
+        try
+        {
             stmt = createStatement();
             String sql = "SELECT name, type, conf FROM certprofile";
             ResultSet rs = stmt.executeQuery(sql);
 
-            while(rs.next()){
+            while(rs.next())
+            {
                 String name = rs.getString("name");
                 String type = rs.getString("type");
                 String conf = rs.getString("conf");
@@ -389,7 +406,8 @@ class CaConfigurationDbExporter extends DbPorter{
         Cas cas = new Cas();
 
         Statement stmt = null;
-        try{
+        try
+        {
             stmt = createStatement();
 
             String sqlPart1 = "SELECT name, next_serial, status, crl_uris, ocsp_uris, max_validity, "
@@ -399,7 +417,8 @@ class CaConfigurationDbExporter extends DbPorter{
 
             ResultSet rs;
             boolean sqlWith_num_crls = true;
-            try{
+            try
+            {
                 String sql = sqlPart1 + ", num_crls" + sqlPart2;
                 rs = stmt.executeQuery(sql);
             }catch(SQLException e)
@@ -466,13 +485,15 @@ class CaConfigurationDbExporter extends DbPorter{
         CaHasRequestors ca_has_requestors = new CaHasRequestors();
 
         Statement stmt = null;
-        try{
+        try
+        {
             stmt = createStatement();
 
             String sql = "SELECT ca_name, requestor_name, ra, permissions, profiles FROM ca_has_requestor";
             ResultSet rs = stmt.executeQuery(sql);
 
-            while(rs.next()){
+            while(rs.next())
+            {
                 String ca_name = rs.getString("ca_name");
                 String requestor_name = rs.getString("requestor_name");
                 boolean ra = rs.getBoolean("ra");
@@ -505,13 +526,15 @@ class CaConfigurationDbExporter extends DbPorter{
         CaHasPublishers ca_has_publishers = new CaHasPublishers();
 
         Statement stmt = null;
-        try{
+        try
+        {
             stmt = createStatement();
 
             String sql = "SELECT ca_name, publisher_name FROM ca_has_publisher";
             ResultSet rs = stmt.executeQuery(sql);
 
-            while(rs.next()){
+            while(rs.next())
+            {
                 String ca_name = rs.getString("ca_name");
                 String publisher_name = rs.getString("publisher_name");
 
@@ -539,13 +562,15 @@ class CaConfigurationDbExporter extends DbPorter{
         CaHasCertprofiles ca_has_certprofiles = new CaHasCertprofiles();
 
         Statement stmt = null;
-        try{
+        try
+        {
             stmt = createStatement();
 
             String sql = "SELECT ca_name, certprofile_name FROM ca_has_certprofile";
             ResultSet rs = stmt.executeQuery(sql);
 
-            while(rs.next()){
+            while(rs.next())
+            {
                 String ca_name = rs.getString("ca_name");
                 String certprofile_name = rs.getString("certprofile_name");
 
