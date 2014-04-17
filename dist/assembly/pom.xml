@@ -28,6 +28,8 @@
 	<name>${project.groupId}.${project.artifactId}</name>
 	<properties>
 		<features.repo>${project.build.directory}/features-repo</features.repo>
+		<mysql-jdbc.version>5.1.27</mysql-jdbc.version>
+		<liquibase.version>3.0.7</liquibase.version>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -108,6 +110,24 @@
 							</artifactItems>
 						</configuration>
 					</execution>
+                                        <execution>
+                                                <id>copy-jdbcs</id>
+                                                <phase>generate-resources</phase>
+                                                <goals>
+                                                        <goal>copy</goal>
+                                                </goals>
+                                                <configuration>
+							<outputDirectory>target/jdbc</outputDirectory>
+                                                        <!-- Define here the JDBC drivers -->
+                                                        <artifactItems>
+                                                                <artifactItem>
+                                                                        <groupId>mysql</groupId>
+                                                                        <artifactId>mysql-connector-java</artifactId>
+                                                                        <version>${mysql-jdbc.version}</version>
+                                                                </artifactItem>
+                                                        </artifactItems>
+                                                </configuration>
+                                        </execution>
 				</executions>
 			</plugin>
 			<plugin>

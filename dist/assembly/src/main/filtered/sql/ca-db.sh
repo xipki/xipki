@@ -4,7 +4,7 @@ COMMAND=$1
 
 PROP_FILE=ca-db.properties
 CHANGELOG_FILE=ca-init.xml
-JDBC_CP=../system/mysql/mysql-connector-java/${mysql-jdbc.version}/mysql-connector-java-${mysql-jdbc.version}.jar
+JDBC_CP=$( echo ../lib/ext/*.jar | sed 's/ /:/g')
 
 # retrieve the database configuration
 cat ../ca-config/$PROP_FILE | sed 's/\./_/' > .$PROP_FILE
