@@ -19,21 +19,21 @@ package org.xipki.ca.api.profile;
 
 public class CertProfileException extends Exception {
 
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	public CertProfileException() {
-	}
+    public CertProfileException() {
+    }
 
-	public CertProfileException(String message) {
-		super(message);
-	}
+    public CertProfileException(String message) {
+        super(message);
+    }
 
-	public CertProfileException(Throwable cause) {
-		super(cause);
-	}
+    public CertProfileException(Throwable cause) {
+        super(cause);
+    }
 
-	public CertProfileException(String message, Throwable cause) {
-		super(message, cause);
-	}
+    public CertProfileException(String message, Throwable cause) {
+        super(message, cause);
+    }
 
 }

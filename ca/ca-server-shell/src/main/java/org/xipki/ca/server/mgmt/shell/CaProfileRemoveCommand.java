@@ -22,18 +22,18 @@ import org.apache.felix.gogo.commands.Option;
 
 @Command(scope = "ca", name = "caprofile-rm", description="Remove certificate profile in given CA")
 public class CaProfileRemoveCommand extends CaCommand {
-	@Option(name = "-ca",
+    @Option(name = "-ca",
             description = "Required. CA name",
             required = true)
     protected String           caName;
-	
-	@Option(name = "-profile",
-			required = true, description = "Required. Certificate profile name")
-	protected String            profileName;
-	
+
+    @Option(name = "-profile",
+            required = true, description = "Required. Certificate profile name")
+    protected String            profileName;
+
     @Override
     protected Object doExecute() throws Exception {
-    	caManager.removeCertProfileFromCA(profileName, caName);
-    	return null;
+        caManager.removeCertProfileFromCA(profileName, caName);
+        return null;
     }
 }

@@ -38,91 +38,91 @@ import org.xipki.security.common.IoCertUtil;
 
 @Command(scope = "ca", name = "enroll", description="Enroll certificate")
 public class EnrollCertCommand extends CaCommand {
-	private static final Logger LOG = LoggerFactory.getLogger(EnrollCertCommand.class);
-	
-	@Option(name = "-ca",
-			required = true, description = "Required. CA name")
+    private static final Logger LOG = LoggerFactory.getLogger(EnrollCertCommand.class);
+
+    @Option(name = "-ca",
+            required = true, description = "Required. CA name")
     protected String            caName;
 
-	@Option(name = "-p10",
-			required = true, description = "Required. PKCS-10 request file")
+    @Option(name = "-p10",
+            required = true, description = "Required. PKCS-10 request file")
     protected String            p10File;
 
-	@Option(name = "-out", 
-			description = "Required. Where to save the certificate",
-			required = true)
+    @Option(name = "-out",
+            description = "Required. Where to save the certificate",
+            required = true)
     protected String            outFile;
 
-	@Option(name = "-profile",
-			required = true, description = "Required. Profile name")
+    @Option(name = "-profile",
+            required = true, description = "Required. Profile name")
     protected String            profileName;
 
-	private SecurityFactory securityFactory;
-	
-	public SecurityFactory getSecurityFactory() {
-		return securityFactory;
-	}
+    private SecurityFactory securityFactory;
 
-	public void setSecurityFactory(SecurityFactory securityFactory) {
-		this.securityFactory = securityFactory;
-	}
+    public SecurityFactory getSecurityFactory() {
+        return securityFactory;
+    }
 
-	@Override
-	protected Object doExecute() throws Exception {	
-		X509CA ca = caManager.getX509CA(caName);
-		if(ca == null)
-		{
-			System.err.println("CA " + caName + " not available");
-			return null;
-		}
-		
-		CertificationRequest p10cr;
-		try{
-			byte[] encodedP10Request = IoCertUtil.read(p10File);
-			p10cr = CertificationRequest.getInstance(encodedP10Request);
-		}catch(Exception e)
-		{
-			System.err.println("Parsing PKCS#10 request. ERROR: " + e.getMessage());
-			return null;
-		}
-		
-		if(! securityFactory.verifyPOPO(p10cr))
-		{
-			System.err.print("could not validate POP for the pkcs#10 requst");
-			return null;
-		}
-		else
-		{
-			CertificationRequestInfo certTemp = p10cr.getCertificationRequestInfo();
-			Extensions extensions = null;
-			ASN1Set attrs = certTemp.getAttributes();
-			for(int i=0; i<attrs.size(); i++)
-			{
-				Attribute attr = (Attribute) attrs.getObjectAt(i);
-				if(PKCSObjectIdentifiers.pkcs_9_at_extensionRequest.equals(attr.getAttrType()))
-				{
-					extensions = (Extensions) attr.getAttributeValues()[0];
-				}
-			}
-			
-			X500Name subject = certTemp.getSubject();
-			SubjectPublicKeyInfo publicKeyInfo = certTemp.getSubjectPublicKeyInfo();
+    public void setSecurityFactory(SecurityFactory securityFactory) {
+        this.securityFactory = securityFactory;
+    }
 
-			CertificateInfo certInfo;
-			try {
-				certInfo = ca.generateCertificate(false, profileName, null, subject, publicKeyInfo, 
-						null, null, extensions);
-				ca.publishCertificate(certInfo);
-				IoCertUtil.save(new File(outFile), certInfo.getCert().getEncodedCert());
-			} catch (Exception e) {
-				LOG.warn("Exception: {}", e.getMessage());
-				LOG.debug("Exception", e);
-				System.err.println("ERROR: " + e.getMessage());
-				return null;
-			}
-		}
-		
-		return null;
-	}
-	
+    @Override
+    protected Object doExecute() throws Exception {
+        X509CA ca = caManager.getX509CA(caName);
+        if(ca == null)
+        {
+            System.err.println("CA " + caName + " not available");
+            return null;
+        }
+
+        CertificationRequest p10cr;
+        try{
+            byte[] encodedP10Request = IoCertUtil.read(p10File);
+            p10cr = CertificationRequest.getInstance(encodedP10Request);
+        }catch(Exception e)
+        {
+            System.err.println("Parsing PKCS#10 request. ERROR: " + e.getMessage());
+            return null;
+        }
+
+        if(! securityFactory.verifyPOPO(p10cr))
+        {
+            System.err.print("could not validate POP for the pkcs#10 requst");
+            return null;
+        }
+        else
+        {
+            CertificationRequestInfo certTemp = p10cr.getCertificationRequestInfo();
+            Extensions extensions = null;
+            ASN1Set attrs = certTemp.getAttributes();
+            for(int i=0; i<attrs.size(); i++)
+            {
+                Attribute attr = (Attribute) attrs.getObjectAt(i);
+                if(PKCSObjectIdentifiers.pkcs_9_at_extensionRequest.equals(attr.getAttrType()))
+                {
+                    extensions = (Extensions) attr.getAttributeValues()[0];
+                }
+            }
+
+            X500Name subject = certTemp.getSubject();
+            SubjectPublicKeyInfo publicKeyInfo = certTemp.getSubjectPublicKeyInfo();
+
+            CertificateInfo certInfo;
+            try {
+                certInfo = ca.generateCertificate(false, profileName, null, subject, publicKeyInfo,
+                        null, null, extensions);
+                ca.publishCertificate(certInfo);
+                IoCertUtil.save(new File(outFile), certInfo.getCert().getEncodedCert());
+            } catch (Exception e) {
+                LOG.warn("Exception: {}", e.getMessage());
+                LOG.debug("Exception", e);
+                System.err.println("ERROR: " + e.getMessage());
+                return null;
+            }
+        }
+
+        return null;
+    }
+
 }

@@ -24,26 +24,26 @@ import org.xipki.security.common.CmpUtf8Pairs;
 import org.xipki.security.common.IoCertUtil;
 
 class ShellUtil {
-	static String replaceFileInSignerConf(String signerConf) throws IOException
-	{
-		if(signerConf.contains("file:") == false)
-		{
-			return signerConf;
-		}
-		
-		CmpUtf8Pairs utf8Pairs = new CmpUtf8Pairs(signerConf);
-		for(String name : utf8Pairs.getNames())
-		{
-			String value = utf8Pairs.getValue(name);
-			if(value.startsWith("file:"))
-			{
-				String fn = value.substring("file:".length());
-				byte[] fileContent = IoCertUtil.read(fn);
-				value = Base64.toBase64String(fileContent);
-				utf8Pairs.putUtf8Pair(name, "base64:" + value);
-			}
-		}
-		
-		return utf8Pairs.getEncoded();
-	}
+    static String replaceFileInSignerConf(String signerConf) throws IOException
+    {
+        if(signerConf.contains("file:") == false)
+        {
+            return signerConf;
+        }
+
+        CmpUtf8Pairs utf8Pairs = new CmpUtf8Pairs(signerConf);
+        for(String name : utf8Pairs.getNames())
+        {
+            String value = utf8Pairs.getValue(name);
+            if(value.startsWith("file:"))
+            {
+                String fn = value.substring("file:".length());
+                byte[] fileContent = IoCertUtil.read(fn);
+                value = Base64.toBase64String(fileContent);
+                utf8Pairs.putUtf8Pair(name, "base64:" + value);
+            }
+        }
+
+        return utf8Pairs.getEncoded();
+    }
 }

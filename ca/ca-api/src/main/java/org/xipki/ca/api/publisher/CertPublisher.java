@@ -30,21 +30,21 @@ import org.xipki.security.api.PasswordResolver;
 import org.xipki.security.common.EnvironmentParameterResolver;
 
 public interface CertPublisher{
-	void initialize(String conf, PasswordResolver passwordResolver,
-			DataSourceFactory dataSourceFactory) 
-			throws CertPublisherException;
-	
-	void setEnvironmentParamterResolver(EnvironmentParameterResolver paramterResolver);
-	
-	void certificateAdded(CertificateInfo certInfo);
+    void initialize(String conf, PasswordResolver passwordResolver,
+            DataSourceFactory dataSourceFactory)
+            throws CertPublisherException;
 
-	void certificateRevoked(X509Certificate cert, 
-			int reason, Date invalidityTime);
+    void setEnvironmentParamterResolver(EnvironmentParameterResolver paramterResolver);
 
-	void certificateRevoked(X500Principal issuer, BigInteger serialNumber,
-			int reason, Date invalidityTime);	
-	
-	void crlAdded(X509CertificateWithMetaInfo cacert, X509CRL crl);
-	
-	boolean isHealthy();
+    void certificateAdded(CertificateInfo certInfo);
+
+    void certificateRevoked(X509Certificate cert,
+            int reason, Date invalidityTime);
+
+    void certificateRevoked(X500Principal issuer, BigInteger serialNumber,
+            int reason, Date invalidityTime);
+
+    void crlAdded(X509CertificateWithMetaInfo cacert, X509CRL crl);
+
+    boolean isHealthy();
 }

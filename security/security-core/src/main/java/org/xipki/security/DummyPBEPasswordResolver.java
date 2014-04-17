@@ -23,19 +23,19 @@ package org.xipki.security;
  */
 public class DummyPBEPasswordResolver extends PBEPasswordResolver {
 
-	private char[] masterPassword;
-	
-	protected char[] getMasterPassword()
-	{
-		if(masterPassword != null)
-		{
-			return masterPassword;
-		}
-		
-		return super.getMasterPassword();
-	}
-	public void setMasterPassword(char[] masterPassword) {
-		this.masterPassword = masterPassword;
-	}
+    private char[] masterPassword;
+
+    protected char[] getMasterPassword()
+    {
+        if(masterPassword != null)
+        {
+            return masterPassword;
+        }
+
+        return super.getMasterPassword();
+    }
+    public void setMasterPassword(char[] masterPassword) {
+        this.masterPassword = masterPassword;
+    }
 
 }

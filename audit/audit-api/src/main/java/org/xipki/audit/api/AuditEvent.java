@@ -31,7 +31,7 @@ public class AuditEvent extends AbstractAuditEvent
      * The data array belonging to the event.
      */
     protected AuditEventData[] eventDatas;
-    
+
 
     /**
      * Default constructor for jaxb.
@@ -62,20 +62,20 @@ public class AuditEvent extends AbstractAuditEvent
      */
     public AuditEvent(final String name, final String applicationName, final Date timeStamp,
                  final AuditEventData[] eventDatas, final AuditLevel auditLevel)
-    {      
+    {
         id.getAndIncrement();
         setName(name);
         setApplicationName(applicationName);
         setTimeStamp(timeStamp);
         setEventDatas(eventDatas);
-        setLevel(auditLevel);     
+        setLevel(auditLevel);
     }
 
     public String getApplicationName()
     {
         return applicationName;
     }
-    
+
     public void setApplicationName(final String applicationName)
     {
         this.applicationName = applicationName;
@@ -85,7 +85,7 @@ public class AuditEvent extends AbstractAuditEvent
     {
         return  Arrays.copyOf(eventDatas, eventDatas.length);
     }
-    
+
     public void setEventDatas(final AuditEventData[] eventDataArray)
     {
         this.eventDatas =  Arrays.copyOf(eventDataArray, eventDataArray.length);
@@ -96,7 +96,7 @@ public class AuditEvent extends AbstractAuditEvent
     {
         StringBuilder builder = new StringBuilder();
         builder.append("AuditEvent ")
-        		.append("[applicationName=").append(applicationName)
+                .append("[applicationName=").append(applicationName)
                 .append(", eventDatas=").append(Arrays.toString(eventDatas))
                 .append(", id=").append(getId())
                 .append(", name=").append(name)

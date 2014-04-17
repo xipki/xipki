@@ -20,59 +20,59 @@ package org.xipki.ca.server.mgmt;
 import java.security.cert.X509Certificate;
 
 public class CmpResponderEntry {
-	public static final String name = "default";
-	private String type;
-	private String conf;
-	private X509Certificate cert;
-	
-	public CmpResponderEntry() {
-	}
+    public static final String name = "default";
+    private String type;
+    private String conf;
+    private X509Certificate cert;
 
-	public String getType() {
-		return type;
-	}
+    public CmpResponderEntry() {
+    }
 
-	public void setType(String type) {
-		this.type = type;
-	}
+    public String getType() {
+        return type;
+    }
 
-	public String getConf() {
-		return conf;
-	}
+    public void setType(String type) {
+        this.type = type;
+    }
 
-	public void setConf(String conf) {
-		this.conf = conf;
-	}
+    public String getConf() {
+        return conf;
+    }
 
-	public X509Certificate getCertificate() {
-		return cert;
-	}
+    public void setConf(String conf) {
+        this.conf = conf;
+    }
 
-	public void setCertificate(X509Certificate cert) {
-		this.cert = cert;
-	}
-	
-	@Override
-	public String toString()
-	{
-		StringBuilder sb = new StringBuilder();
-		sb.append("name: ").append(name).append('\n');
-		sb.append("type: ").append(type).append('\n');
-		sb.append("conf: ").append(conf).append('\n');
-		sb.append("cert: ").append("\n");
-		if(cert != null)
-		{
-			sb.append("\tissuer: ").append(
-					cert.getIssuerX500Principal().getName()).append("\n");
-			sb.append("\tserialNumber: ").append(cert.getSerialNumber()).append("\n");
-			sb.append("\tsubject: ").append(
-					cert.getSubjectX500Principal().getName());
-		}
-		else
-		{
-			sb.append("null");
-		}
-		return sb.toString();
-	}
-	
+    public X509Certificate getCertificate() {
+        return cert;
+    }
+
+    public void setCertificate(X509Certificate cert) {
+        this.cert = cert;
+    }
+
+    @Override
+    public String toString()
+    {
+        StringBuilder sb = new StringBuilder();
+        sb.append("name: ").append(name).append('\n');
+        sb.append("type: ").append(type).append('\n');
+        sb.append("conf: ").append(conf).append('\n');
+        sb.append("cert: ").append("\n");
+        if(cert != null)
+        {
+            sb.append("\tissuer: ").append(
+                    cert.getIssuerX500Principal().getName()).append("\n");
+            sb.append("\tserialNumber: ").append(cert.getSerialNumber()).append("\n");
+            sb.append("\tsubject: ").append(
+                    cert.getSubjectX500Principal().getName());
+        }
+        else
+        {
+            sb.append("null");
+        }
+        return sb.toString();
+    }
+
 }

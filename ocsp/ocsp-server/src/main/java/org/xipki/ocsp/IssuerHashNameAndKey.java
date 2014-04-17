@@ -23,35 +23,35 @@ import org.xipki.ocsp.api.HashAlgoType;
 import org.xipki.security.common.ParamChecker;
 
 public class IssuerHashNameAndKey {
-	private final HashAlgoType algo;
-	private final byte[] issuerNameHash;
-	private final byte[] issuerKeyHash;
-	
-	public IssuerHashNameAndKey(HashAlgoType algo, byte[] issuerNameHash, byte[] issuerKeyHash)
-	{
-		ParamChecker.assertNotNull("algo", algo);
-		
-		int len = algo.getLength();
-		if(issuerNameHash == null || issuerNameHash.length != len)
-		{
-			throw new IllegalArgumentException("issuerNameash is invalid");
-		}
+    private final HashAlgoType algo;
+    private final byte[] issuerNameHash;
+    private final byte[] issuerKeyHash;
 
-		if(issuerKeyHash == null || issuerKeyHash.length != len)
-		{
-			throw new IllegalArgumentException("issuerKeyHash is invalid");
-		}
+    public IssuerHashNameAndKey(HashAlgoType algo, byte[] issuerNameHash, byte[] issuerKeyHash)
+    {
+        ParamChecker.assertNotNull("algo", algo);
 
-		this.algo = algo;
-		this.issuerNameHash = Arrays.copyOf(issuerNameHash, len);
-		this.issuerKeyHash = Arrays.copyOf(issuerKeyHash, len);
-	}
-	
-	public boolean match(HashAlgoType algo, byte[] issuerNameHash, byte[] issuerKeyHash)
-	{
-		return this.algo == algo && 
-				Arrays.equals(this.issuerNameHash, issuerNameHash) && 
-				Arrays.equals(this.issuerKeyHash, issuerKeyHash);
-	}
+        int len = algo.getLength();
+        if(issuerNameHash == null || issuerNameHash.length != len)
+        {
+            throw new IllegalArgumentException("issuerNameash is invalid");
+        }
+
+        if(issuerKeyHash == null || issuerKeyHash.length != len)
+        {
+            throw new IllegalArgumentException("issuerKeyHash is invalid");
+        }
+
+        this.algo = algo;
+        this.issuerNameHash = Arrays.copyOf(issuerNameHash, len);
+        this.issuerKeyHash = Arrays.copyOf(issuerKeyHash, len);
+    }
+
+    public boolean match(HashAlgoType algo, byte[] issuerNameHash, byte[] issuerKeyHash)
+    {
+        return this.algo == algo &&
+                Arrays.equals(this.issuerNameHash, issuerNameHash) &&
+                Arrays.equals(this.issuerKeyHash, issuerKeyHash);
+    }
 
 }

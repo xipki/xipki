@@ -35,140 +35,140 @@ import org.xipki.security.api.SignerException;
 import org.xipki.security.common.ParamChecker;
 
 public class DefaultConcurrentContentSigner implements ConcurrentContentSigner{
-	private static final Logger LOG = LoggerFactory.getLogger(DefaultConcurrentContentSigner.class);
-	
-	private final BlockingQueue<ContentSigner> idleSigners = new LinkedBlockingQueue<ContentSigner>();
-	private final BlockingQueue<ContentSigner> busySigners = new LinkedBlockingQueue<ContentSigner>();
-	private final PrivateKey privateKey;
-	
-	private X509Certificate certificate;
-	
-	public DefaultConcurrentContentSigner(List<ContentSigner> signers)
-	{
-		this(signers, null);
-	}	
-	
-	public DefaultConcurrentContentSigner(List<ContentSigner> signers, PrivateKey privateKey)
-	{
-		ParamChecker.assertNotEmpty("signers", signers);
-		
-		for(ContentSigner signer : signers)
-		{
-			idleSigners.add(signer);
-		}		
-		
-		this.privateKey = privateKey;
-	}
+    private static final Logger LOG = LoggerFactory.getLogger(DefaultConcurrentContentSigner.class);
 
-	public ContentSigner borrowContentSigner() throws NoIdleSignerException
-	{
-		ContentSigner signer = idleSigners.poll();
-		if(signer == null)
-		{
-			throw new NoIdleSignerException("No idle signer available");
-		}
-		
-		busySigners.add(signer);
-		return signer;
-	}
+    private final BlockingQueue<ContentSigner> idleSigners = new LinkedBlockingQueue<ContentSigner>();
+    private final BlockingQueue<ContentSigner> busySigners = new LinkedBlockingQueue<ContentSigner>();
+    private final PrivateKey privateKey;
 
-	@Override
-	public ContentSigner borrowContentSigner(int soTimeout) throws NoIdleSignerException	
-	{
-		if(soTimeout == 0)
-		{
-			return borrowContentSigner();
-		}
-		
-		long till = System.currentTimeMillis() + soTimeout;
-		long timeout = soTimeout;
-		
-		ContentSigner signer = null;
-		while(timeout > 0)
-		{
-			try{
-				signer = idleSigners.poll(timeout, TimeUnit.MILLISECONDS);
-			}catch(InterruptedException e)
-			{
-				LOG.trace("interrupted");
-			}
-			
-			if(signer != null)
-			{
-				break;
-			}
-			
-			timeout = till - System.currentTimeMillis();
-		}				
+    private X509Certificate certificate;
 
-		if(signer == null)
-		{
-			throw new NoIdleSignerException("No idle signer available");
-		}
-		
-		busySigners.add(signer);
-		return signer;
-	}
+    public DefaultConcurrentContentSigner(List<ContentSigner> signers)
+    {
+        this(signers, null);
+    }
 
-	@Override
-	public void returnContentSigner(ContentSigner signer)
-	{
-		ParamChecker.assertNotNull("signer", signer);
+    public DefaultConcurrentContentSigner(List<ContentSigner> signers, PrivateKey privateKey)
+    {
+        ParamChecker.assertNotEmpty("signers", signers);
 
-	    boolean isBusySigner = busySigners.remove(signer);
-	    if(isBusySigner)
-	    {
-    		idleSigners.add(signer);
-    	}
-    	else
-    	{
-	    	final String msg = "signer has not been borrowed before or has been returned more than once: " + signer;
-		    LOG.error(msg);
-		    throw new IllegalStateException(msg);
-	    }
-	}
+        for(ContentSigner signer : signers)
+        {
+            idleSigners.add(signer);
+        }
 
-	@Override
-	public void initialize(String conf, PasswordResolver passwordResolver)
-			throws SignerException 
-	{		
-	}
+        this.privateKey = privateKey;
+    }
 
-	@Override
-	public PrivateKey getPrivateKey() {
-		return privateKey;
-	}
+    public ContentSigner borrowContentSigner() throws NoIdleSignerException
+    {
+        ContentSigner signer = idleSigners.poll();
+        if(signer == null)
+        {
+            throw new NoIdleSignerException("No idle signer available");
+        }
 
-	@Override
-	public void setCertificate(X509Certificate certificate) {
-		this.certificate = certificate;
-	}
+        busySigners.add(signer);
+        return signer;
+    }
 
-	@Override
-	public X509Certificate getCertificate() {
-		return certificate;
-	}
+    @Override
+    public ContentSigner borrowContentSigner(int soTimeout) throws NoIdleSignerException
+    {
+        if(soTimeout == 0)
+        {
+            return borrowContentSigner();
+        }
 
-	@Override
-	public boolean isHealthy() {
-		ContentSigner signer = null;
-		try{			
-			signer = borrowContentSigner(60000); // wait for maximal 60 seconds
-			OutputStream stream = signer.getOutputStream();
-			stream.write(new byte[]{1,2,3,4});
-			byte[] signature = signer.getSignature();
-			return signature != null && signature.length > 0;
-		} catch(Exception e)
-		{
-			LOG.error("healthCheck(). {}: {}", e.getClass().getName(), e.getMessage());
-			LOG.debug("healthCheck()", e);
-			return false;
-		}		
-		finally{
-			if(signer != null)
-			{
-				returnContentSigner(signer);
-			}
-		}
-	}
+        long till = System.currentTimeMillis() + soTimeout;
+        long timeout = soTimeout;
+
+        ContentSigner signer = null;
+        while(timeout > 0)
+        {
+            try{
+                signer = idleSigners.poll(timeout, TimeUnit.MILLISECONDS);
+            }catch(InterruptedException e)
+            {
+                LOG.trace("interrupted");
+            }
+
+            if(signer != null)
+            {
+                break;
+            }
+
+            timeout = till - System.currentTimeMillis();
+        }
+
+        if(signer == null)
+        {
+            throw new NoIdleSignerException("No idle signer available");
+        }
+
+        busySigners.add(signer);
+        return signer;
+    }
+
+    @Override
+    public void returnContentSigner(ContentSigner signer)
+    {
+        ParamChecker.assertNotNull("signer", signer);
+
+        boolean isBusySigner = busySigners.remove(signer);
+        if(isBusySigner)
+        {
+            idleSigners.add(signer);
+        }
+        else
+        {
+            final String msg = "signer has not been borrowed before or has been returned more than once: " + signer;
+            LOG.error(msg);
+            throw new IllegalStateException(msg);
+        }
+    }
+
+    @Override
+    public void initialize(String conf, PasswordResolver passwordResolver)
+            throws SignerException
+    {
+    }
+
+    @Override
+    public PrivateKey getPrivateKey() {
+        return privateKey;
+    }
+
+    @Override
+    public void setCertificate(X509Certificate certificate) {
+        this.certificate = certificate;
+    }
+
+    @Override
+    public X509Certificate getCertificate() {
+        return certificate;
+    }
+
+    @Override
+    public boolean isHealthy() {
+        ContentSigner signer = null;
+        try{
+            signer = borrowContentSigner(60000); // wait for maximal 60 seconds
+            OutputStream stream = signer.getOutputStream();
+            stream.write(new byte[]{1,2,3,4});
+            byte[] signature = signer.getSignature();
+            return signature != null && signature.length > 0;
+        } catch(Exception e)
+        {
+            LOG.error("healthCheck(). {}: {}", e.getClass().getName(), e.getMessage());
+            LOG.debug("healthCheck()", e);
+            return false;
+        }
+        finally{
+            if(signer != null)
+            {
+                returnContentSigner(signer);
+            }
+        }
+    }
 }

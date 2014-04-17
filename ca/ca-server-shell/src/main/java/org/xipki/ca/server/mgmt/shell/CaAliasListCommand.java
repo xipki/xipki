@@ -24,42 +24,42 @@ import org.apache.felix.gogo.commands.Option;
 
 @Command(scope = "ca", name = "caalias-list", description="List CA aliases")
 public class CaAliasListCommand extends CaCommand {
-	@Option(name = "-alias",
-	        description = "CA alias",
-	        required = false)
-	protected String            caAlias;
+    @Option(name = "-alias",
+            description = "CA alias",
+            required = false)
+    protected String            caAlias;
 
     @Override
     protected Object doExecute() throws Exception {
-		Set<String> aliasNames = caManager.getCaAliasNames();
-		
-		StringBuilder sb = new StringBuilder();
-		
-		if(caAlias == null)
-		{
-			int n = aliasNames.size();
-			
-			sb.append(n + " CA aliases are configured:\n");		
-			for(String aliasName : aliasNames)
-			{
-				sb.append("\t").append(aliasName).append("\n");
-			}
-		}
-		else
-		{
-			if(aliasNames.contains(caAlias))
-			{
-				String paramValue = caManager.getCaName(caAlias);
-				sb.append(caAlias).append("\n\t").append(paramValue);
-			}
-			else
-			{
-				sb.append("Could not find CA alias '" + caAlias + "'");
-			}
-		}
-		
-		System.out.println(sb.toString());
-		
+        Set<String> aliasNames = caManager.getCaAliasNames();
+
+        StringBuilder sb = new StringBuilder();
+
+        if(caAlias == null)
+        {
+            int n = aliasNames.size();
+
+            sb.append(n + " CA aliases are configured:\n");
+            for(String aliasName : aliasNames)
+            {
+                sb.append("\t").append(aliasName).append("\n");
+            }
+        }
+        else
+        {
+            if(aliasNames.contains(caAlias))
+            {
+                String paramValue = caManager.getCaName(caAlias);
+                sb.append(caAlias).append("\n\t").append(paramValue);
+            }
+            else
+            {
+                sb.append("Could not find CA alias '" + caAlias + "'");
+            }
+        }
+
+        System.out.println(sb.toString());
+
         return null;
     }
 }

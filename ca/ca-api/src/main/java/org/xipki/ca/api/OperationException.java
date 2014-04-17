@@ -18,45 +18,45 @@
 package org.xipki.ca.api;
 
 public class OperationException extends Exception {
-	public static enum ErrorCode
-	{
-		UNKNOWN_ISSUER,
-		UNKNOWN_CERT_PROFILE,
-		NO_PERMISSION_OF_CERT_PROFILE,
-		EMPTY_SUBJECT,
-		CERT_REVOKED,
-		UNKNOWN_CERT,
-		System_Failure,
-		ALREADY_ISSUED,
-		BAD_CERT_TEMPLATE
-	} 
+    public static enum ErrorCode
+    {
+        UNKNOWN_ISSUER,
+        UNKNOWN_CERT_PROFILE,
+        NO_PERMISSION_OF_CERT_PROFILE,
+        EMPTY_SUBJECT,
+        CERT_REVOKED,
+        UNKNOWN_CERT,
+        System_Failure,
+        ALREADY_ISSUED,
+        BAD_CERT_TEMPLATE
+    }
 
-	private static final long serialVersionUID = 1L;	
-	
-	private final ErrorCode errorCode;
-	private final String errorMessage;
+    private static final long serialVersionUID = 1L;
 
-	public OperationException(ErrorCode errorCode) {
-		super("error code: " + errorCode);
-		this.errorCode = errorCode;
-		this.errorMessage = null;
-	}
+    private final ErrorCode errorCode;
+    private final String errorMessage;
 
-	public OperationException(ErrorCode errorCode, String errorMessage) {		
-		super("error code: " + errorCode + "\nerror message: " + errorMessage);
-		this.errorCode = errorCode;
-		this.errorMessage = errorMessage;
-	}
-	
-	public ErrorCode getErrorCode()
-	{
-		return errorCode;
-	}
-	
-	public String getErrorMessage()
-	{
-		return errorMessage;
-	}
-	
-	
+    public OperationException(ErrorCode errorCode) {
+        super("error code: " + errorCode);
+        this.errorCode = errorCode;
+        this.errorMessage = null;
+    }
+
+    public OperationException(ErrorCode errorCode, String errorMessage) {
+        super("error code: " + errorCode + "\nerror message: " + errorMessage);
+        this.errorCode = errorCode;
+        this.errorMessage = errorMessage;
+    }
+
+    public ErrorCode getErrorCode()
+    {
+        return errorCode;
+    }
+
+    public String getErrorMessage()
+    {
+        return errorMessage;
+    }
+
+
 }

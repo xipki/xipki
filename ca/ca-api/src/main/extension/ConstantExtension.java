@@ -18,19 +18,19 @@
 package lca.ca.profile.extension;
 
 public class ConstantExtension extends ExtensionConf {
-	private String extensionType;
-	private byte[] extensionValue;
-	
-	public String getExtensionType() {
-		return extensionType;
-	}
-	public void setExtensionType(String extensionType) {
-		this.extensionType = extensionType;
-	}
-	public byte[] getExtensionValue() {
-		return extensionValue;
-	}
-	public void setExtensionValue(byte[] extensionValue) {
-		this.extensionValue = extensionValue;
-	}
+    private String extensionType;
+    private byte[] extensionValue;
+
+    public String getExtensionType() {
+        return extensionType;
+    }
+    public void setExtensionType(String extensionType) {
+        this.extensionType = extensionType;
+    }
+    public byte[] getExtensionValue() {
+        return extensionValue;
+    }
+    public void setExtensionValue(byte[] extensionValue) {
+        this.extensionValue = extensionValue;
+    }
 }

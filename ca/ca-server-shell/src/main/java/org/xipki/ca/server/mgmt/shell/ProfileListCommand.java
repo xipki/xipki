@@ -26,33 +26,33 @@ import org.xipki.ca.server.mgmt.CertProfileEntry;
 @Command(scope = "ca", name = "profile-list", description="List profiles")
 public class ProfileListCommand extends CaCommand {
 
-	@Option(name = "-name",
-        	description = "Parameter Name",
+    @Option(name = "-name",
+            description = "Parameter Name",
             required = false, multiValued = false)
-	protected String name;
+    protected String name;
 
     @Override
     protected Object doExecute() throws Exception {
-		StringBuilder sb = new StringBuilder();
-		
-		if(name == null)
-		{
-			Set<String> names = caManager.getCertProfileNames();			
-			int n = names.size();
-			
-			sb.append(n + " profiles are configured:\n");		
-			for(String paramName : names)
-			{
-				sb.append("\t").append(paramName).append("\n");
-			}
-		}
-		else
-		{
-			CertProfileEntry entry = caManager.getCertProfile(name);
-			sb.append(entry.toString());
-		}
-		
-		System.out.println(sb.toString());
+        StringBuilder sb = new StringBuilder();
+
+        if(name == null)
+        {
+            Set<String> names = caManager.getCertProfileNames();
+            int n = names.size();
+
+            sb.append(n + " profiles are configured:\n");
+            for(String paramName : names)
+            {
+                sb.append("\t").append(paramName).append("\n");
+            }
+        }
+        else
+        {
+            CertProfileEntry entry = caManager.getCertProfile(name);
+            sb.append(entry.toString());
+        }
+
+        System.out.println(sb.toString());
         return null;
     }
 }

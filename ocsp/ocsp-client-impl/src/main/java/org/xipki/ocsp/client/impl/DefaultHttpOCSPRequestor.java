@@ -26,66 +26,66 @@ import java.net.URL;
 
 public class DefaultHttpOCSPRequestor extends AbstractOCSPRequestor
 {
-	private static final String CT_REQUEST  = "application/ocsp-request";
-	private static final String CT_RESPONSE = "application/ocsp-response";	
+    private static final String CT_REQUEST  = "application/ocsp-request";
+    private static final String CT_RESPONSE = "application/ocsp-response";
 
-	public DefaultHttpOCSPRequestor() 
-	{
-	}
-    
-	@Override
+    public DefaultHttpOCSPRequestor()
+    {
+    }
+
+    @Override
     protected byte[] send(byte[] request, URL responderURL) throws IOException
     {
-		HttpURLConnection httpUrlConnection = (HttpURLConnection) responderURL.openConnection();
-    	httpUrlConnection.setDoOutput(true);
-		httpUrlConnection.setUseCaches(false);
-	
-    	int size = request.length;
-    	
-    	httpUrlConnection.setRequestMethod("POST");
-    	httpUrlConnection.setRequestProperty("Content-Type", CT_REQUEST);
-    	httpUrlConnection.setRequestProperty("Content-Length", java.lang.Integer.toString(size));
-    	OutputStream outputstream = httpUrlConnection.getOutputStream();
-    	outputstream.write(request);
-    	outputstream.flush();
-    	InputStream inputstream = httpUrlConnection.getInputStream();
-    	try{
-	    	if (httpUrlConnection.getResponseCode() != HttpURLConnection.HTTP_OK) 
-	    	{
-	    	    throw new IOException("Bad Response: "
-	    	            + httpUrlConnection.getResponseCode() + "  "
-	    	            + httpUrlConnection.getResponseMessage());
-	    	}
-	    	String responseContentType=httpUrlConnection.getContentType();
-	    	boolean isValidContentType = false;
-	    	if (responseContentType != null)
-	    	{
-	   	        if (responseContentType.equalsIgnoreCase(CT_RESPONSE))
-	   	        {
-	   	        	isValidContentType = true;
-	    	    }
-	    	}
-	    	if (! isValidContentType)
-	    	{
-	    	    throw new IOException("Bad Response: Mime type " + responseContentType + " not supported!");
-	    	}
-	
-	    	byte[] buf = new byte[4096];
-	    	ByteArrayOutputStream bytearrayoutputstream = new ByteArrayOutputStream();
-	    	do 
-	    	{
-	    	    int j = inputstream.read(buf);
-	    	    if (j == -1) 
-	    	    {
-	    	        break;
-	    	    }
-	    	    bytearrayoutputstream.write(buf, 0, j);
-	    	} while (true);
+        HttpURLConnection httpUrlConnection = (HttpURLConnection) responderURL.openConnection();
+        httpUrlConnection.setDoOutput(true);
+        httpUrlConnection.setUseCaches(false);
 
-	    	return bytearrayoutputstream.toByteArray();
-    	}finally{
-    		inputstream.close();
-    	}
+        int size = request.length;
+
+        httpUrlConnection.setRequestMethod("POST");
+        httpUrlConnection.setRequestProperty("Content-Type", CT_REQUEST);
+        httpUrlConnection.setRequestProperty("Content-Length", java.lang.Integer.toString(size));
+        OutputStream outputstream = httpUrlConnection.getOutputStream();
+        outputstream.write(request);
+        outputstream.flush();
+        InputStream inputstream = httpUrlConnection.getInputStream();
+        try{
+            if (httpUrlConnection.getResponseCode() != HttpURLConnection.HTTP_OK)
+            {
+                throw new IOException("Bad Response: "
+                        + httpUrlConnection.getResponseCode() + "  "
+                        + httpUrlConnection.getResponseMessage());
+            }
+            String responseContentType=httpUrlConnection.getContentType();
+            boolean isValidContentType = false;
+            if (responseContentType != null)
+            {
+                   if (responseContentType.equalsIgnoreCase(CT_RESPONSE))
+                   {
+                       isValidContentType = true;
+                }
+            }
+            if (! isValidContentType)
+            {
+                throw new IOException("Bad Response: Mime type " + responseContentType + " not supported!");
+            }
+
+            byte[] buf = new byte[4096];
+            ByteArrayOutputStream bytearrayoutputstream = new ByteArrayOutputStream();
+            do
+            {
+                int j = inputstream.read(buf);
+                if (j == -1)
+                {
+                    break;
+                }
+                bytearrayoutputstream.write(buf, 0, j);
+            } while (true);
+
+            return bytearrayoutputstream.toByteArray();
+        }finally{
+            inputstream.close();
+        }
     }
 
 }

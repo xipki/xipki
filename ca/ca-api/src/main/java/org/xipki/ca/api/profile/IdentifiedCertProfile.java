@@ -26,95 +26,95 @@ import org.xipki.security.common.EnvironmentParameterResolver;
 import org.xipki.security.common.ParamChecker;
 
 public class IdentifiedCertProfile implements CertProfile {
-	private final String name;
-	private final CertProfile certProfile;
-	
-	public IdentifiedCertProfile(String name, CertProfile certProfile)
-	{
-		ParamChecker.assertNotEmpty("name", name);
-		ParamChecker.assertNotNull("certProfile", certProfile);
-		
-		this.name = name;
-		this.certProfile = certProfile;
-	}
+    private final String name;
+    private final CertProfile certProfile;
 
-	public String getName()
-	{
-		return name;
-	}
-	
-	@Override
-	public void initialize(String data) throws CertProfileException {
-		certProfile.initialize(data);		
-	}
+    public IdentifiedCertProfile(String name, CertProfile certProfile)
+    {
+        ParamChecker.assertNotEmpty("name", name);
+        ParamChecker.assertNotNull("certProfile", certProfile);
 
-	@Override
-	public void setEnvironmentParamterResolver(
-			EnvironmentParameterResolver paramterResolver) 
-	{
-		certProfile.setEnvironmentParamterResolver(paramterResolver);
-	}
+        this.name = name;
+        this.certProfile = certProfile;
+    }
 
-	@Override
-	public Date getNotBefore(Date notBefore){
-		return certProfile.getNotBefore(notBefore);
-	}
-	
-	@Override
-	public Integer getValidity() {
-		return certProfile.getValidity();
-	}
+    public String getName()
+    {
+        return name;
+    }
 
-	@Override
-	public SubjectInfo getSubject(X500Name requestedSubject)
-			throws CertProfileException, BadCertTemplateException
-	{
-		return certProfile.getSubject(requestedSubject);
-	}
+    @Override
+    public void initialize(String data) throws CertProfileException {
+        certProfile.initialize(data);
+    }
 
-	@Override
-	public ExtensionTuples getExtensions(X500Name requestedSubject,
-			Extensions requestedExtensions)
-	throws CertProfileException, BadCertTemplateException 
-	{
-		return certProfile.getExtensions(requestedSubject, requestedExtensions);
-	}
+    @Override
+    public void setEnvironmentParamterResolver(
+            EnvironmentParameterResolver paramterResolver)
+    {
+        certProfile.setEnvironmentParamterResolver(paramterResolver);
+    }
 
-	@Override
-	public boolean isOnlyForRA() {
-		return certProfile.isOnlyForRA();
-	}
+    @Override
+    public Date getNotBefore(Date notBefore){
+        return certProfile.getNotBefore(notBefore);
+    }
 
-	@Override
-	public ExtensionOccurrence getOccurenceOfAuthorityKeyIdentifier() {
-		return certProfile.getOccurenceOfAuthorityKeyIdentifier();
-	}
+    @Override
+    public Integer getValidity() {
+        return certProfile.getValidity();
+    }
 
-	@Override
-	public ExtensionOccurrence getOccurenceOfSubjectKeyIdentifier() {
-		return certProfile.getOccurenceOfSubjectKeyIdentifier();
-	}
+    @Override
+    public SubjectInfo getSubject(X500Name requestedSubject)
+            throws CertProfileException, BadCertTemplateException
+    {
+        return certProfile.getSubject(requestedSubject);
+    }
 
-	@Override
-	public ExtensionOccurrence getOccurenceOfCRLDistributinPoints() {
-		return certProfile.getOccurenceOfCRLDistributinPoints();
-	}
+    @Override
+    public ExtensionTuples getExtensions(X500Name requestedSubject,
+            Extensions requestedExtensions)
+    throws CertProfileException, BadCertTemplateException
+    {
+        return certProfile.getExtensions(requestedSubject, requestedExtensions);
+    }
 
-	@Override
-	public ExtensionOccurrence getOccurenceOfAuthorityInfoAccess() {
-		return certProfile.getOccurenceOfAuthorityInfoAccess();
-	}
+    @Override
+    public boolean isOnlyForRA() {
+        return certProfile.isOnlyForRA();
+    }
 
-	@Override
-	public void checkPublicKey(SubjectPublicKeyInfo publicKey)
-			throws BadCertTemplateException
-	{
-		certProfile.checkPublicKey(publicKey);
-	}
+    @Override
+    public ExtensionOccurrence getOccurenceOfAuthorityKeyIdentifier() {
+        return certProfile.getOccurenceOfAuthorityKeyIdentifier();
+    }
 
-	@Override
-	public boolean incSerialNumberIfSubjectExists() {
-		return certProfile.incSerialNumberIfSubjectExists();
-	}
+    @Override
+    public ExtensionOccurrence getOccurenceOfSubjectKeyIdentifier() {
+        return certProfile.getOccurenceOfSubjectKeyIdentifier();
+    }
+
+    @Override
+    public ExtensionOccurrence getOccurenceOfCRLDistributinPoints() {
+        return certProfile.getOccurenceOfCRLDistributinPoints();
+    }
+
+    @Override
+    public ExtensionOccurrence getOccurenceOfAuthorityInfoAccess() {
+        return certProfile.getOccurenceOfAuthorityInfoAccess();
+    }
+
+    @Override
+    public void checkPublicKey(SubjectPublicKeyInfo publicKey)
+            throws BadCertTemplateException
+    {
+        certProfile.checkPublicKey(publicKey);
+    }
+
+    @Override
+    public boolean incSerialNumberIfSubjectExists() {
+        return certProfile.incSerialNumberIfSubjectExists();
+    }
 
 }

@@ -24,21 +24,21 @@ import org.apache.felix.gogo.commands.Option;
 
 @Command(scope = "ca", name = "capub-add", description="Add publisher to CA")
 public class CaPublisherAddCommand extends CaCommand {
-	@Option(name = "-ca",
+    @Option(name = "-ca",
             description = "Required. CA name",
             required = true)
     protected String           caName;
 
-	@Option(name = "-publisher",
-		required = true, multiValued = true, description = "Required. Publisher name. Multivalued")
-	protected List<String>     publisherNames;
+    @Option(name = "-publisher",
+        required = true, multiValued = true, description = "Required. Publisher name. Multivalued")
+    protected List<String>     publisherNames;
 
     @Override
     protected Object doExecute() throws Exception {
-    	for(String publisherName : publisherNames)
-    	{
-    		caManager.addPublisherToCA(publisherName, caName);
-    	}
-    	return null;
+        for(String publisherName : publisherNames)
+        {
+            caManager.addPublisherToCA(publisherName, caName);
+        }
+        return null;
     }
 }

@@ -30,88 +30,88 @@ import org.xipki.security.common.IoCertUtil;
 
 @Command(scope = "ocsp", name = "status-loadtest", description="OCSP Load test")
 public class OCSPStatusLoadTestCommand extends OsgiCommandSupport {
-	private static final String DFLT_URL = "http://localhost:8080/ocsp";
-	@Option(name = "-url",
-			description = "Server URL, the default is " + DFLT_URL)
+    private static final String DFLT_URL = "http://localhost:8080/ocsp";
+    @Option(name = "-url",
+            description = "Server URL, the default is " + DFLT_URL)
     protected String            serverURL;
 
-	@Option(name = "-ca",
-			required = true, description = "Required. CA certificate file")
+    @Option(name = "-ca",
+            required = true, description = "Required. CA certificate file")
     protected String            cacertFile;
 
-	@Option(name = "-ss",
-			required = true, 
-			description = "Required. Start Serial number")
+    @Option(name = "-ss",
+            required = true,
+            description = "Required. Start Serial number")
     protected Long              startSerialNumber;
 
-	@Option(name = "-es",
-			required = true, 
-			description = "Required. End Serial number")
+    @Option(name = "-es",
+            required = true,
+            description = "Required. End Serial number")
     protected Long              endSerialNumber;
 
-	@Option(name = "-duration",
-			required = true, 
-			description = "Required. Duration in seconds")
+    @Option(name = "-duration",
+            required = true,
+            description = "Required. Duration in seconds")
     protected int              durationInSecond;
 
-	@Option(name = "-thread",
-			required = false, 
-			description = "Number of threads, the default is 5")
+    @Option(name = "-thread",
+            required = false,
+            description = "Number of threads, the default is 5")
     protected Integer          numThreads;
 
-	private OCSPRequestor	  requestor;
-    	
-	@Override
-	protected Object doExecute() throws Exception {
-		if(numThreads == null)
-		{
-			numThreads = 5;
-		}
-		
-		if(startSerialNumber < 1 || endSerialNumber < 1 || startSerialNumber >= endSerialNumber)
-		{
-			System.err.println("invalid serial number");
-			return null;
-		}
+    private OCSPRequestor      requestor;
 
-		if(numThreads < 1)
-		{
-			System.err.println("Invalid number of threads " + numThreads);
-			return null;
-		}
+    @Override
+    protected Object doExecute() throws Exception {
+        if(numThreads == null)
+        {
+            numThreads = 5;
+        }
 
-		URL serverUrl = new URL(serverURL == null ? DFLT_URL : serverURL);
-		
-		StringBuilder startMsg = new StringBuilder();
-		
-		startMsg.append("Threads:      " + numThreads).append("\n");
-		startMsg.append("Duration:     " + durationInSecond + " s").append("\n");
-		startMsg.append("Start Serial: " + startSerialNumber).append("\n");
-		startMsg.append("End Serial:   " + endSerialNumber).append("\n");
-		startMsg.append("CA cert:      " + cacertFile).append("\n");
-		startMsg.append("Server URL:   " + serverUrl.toString()).append("\n");	
-		System.out.print(startMsg.toString());
-		
-		X509Certificate caCert = IoCertUtil.parseCert(cacertFile);
-		
-		RequestOptions options = new RequestOptions();
-		options.setUseNonce(true);	
-		options.setHashAlgorithmId(NISTObjectIdentifiers.id_sha256);
-		
-		OcspLoadTest loadTest = new OcspLoadTest(requestor, startSerialNumber, endSerialNumber,
-				caCert, serverUrl, options);
-		loadTest.setDuration(durationInSecond);
-		loadTest.setThreads(numThreads);
-		loadTest.test();
-		
-		return null;
-	}
+        if(startSerialNumber < 1 || endSerialNumber < 1 || startSerialNumber >= endSerialNumber)
+        {
+            System.err.println("invalid serial number");
+            return null;
+        }
 
-	public OCSPRequestor getRequestor() {
-		return requestor;
-	}
+        if(numThreads < 1)
+        {
+            System.err.println("Invalid number of threads " + numThreads);
+            return null;
+        }
 
-	public void setRequestor(OCSPRequestor requestor) {
-		this.requestor = requestor;
-	}
+        URL serverUrl = new URL(serverURL == null ? DFLT_URL : serverURL);
+
+        StringBuilder startMsg = new StringBuilder();
+
+        startMsg.append("Threads:      " + numThreads).append("\n");
+        startMsg.append("Duration:     " + durationInSecond + " s").append("\n");
+        startMsg.append("Start Serial: " + startSerialNumber).append("\n");
+        startMsg.append("End Serial:   " + endSerialNumber).append("\n");
+        startMsg.append("CA cert:      " + cacertFile).append("\n");
+        startMsg.append("Server URL:   " + serverUrl.toString()).append("\n");
+        System.out.print(startMsg.toString());
+
+        X509Certificate caCert = IoCertUtil.parseCert(cacertFile);
+
+        RequestOptions options = new RequestOptions();
+        options.setUseNonce(true);
+        options.setHashAlgorithmId(NISTObjectIdentifiers.id_sha256);
+
+        OcspLoadTest loadTest = new OcspLoadTest(requestor, startSerialNumber, endSerialNumber,
+                caCert, serverUrl, options);
+        loadTest.setDuration(durationInSecond);
+        loadTest.setThreads(numThreads);
+        loadTest.test();
+
+        return null;
+    }
+
+    public OCSPRequestor getRequestor() {
+        return requestor;
+    }
+
+    public void setRequestor(OCSPRequestor requestor) {
+        this.requestor = requestor;
+    }
 }

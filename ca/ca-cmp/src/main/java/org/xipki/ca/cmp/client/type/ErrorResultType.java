@@ -21,34 +21,34 @@ package org.xipki.ca.cmp.client.type;
 
 
 public class ErrorResultType implements CmpResultType{
-	private final int status;
-	private final int pkiFailureInfo;
-	private final String statusMessage;
-	
-	public ErrorResultType(int status, int pkiFailureInfo, String statusMessage)
-	{
-		this.status = status;
-		this.pkiFailureInfo = pkiFailureInfo;
-		this.statusMessage = statusMessage;
-	}
+    private final int status;
+    private final int pkiFailureInfo;
+    private final String statusMessage;
 
-	public ErrorResultType(int status)
-	{
-		this.status = status;
-		this.pkiFailureInfo = 0;
-		this.statusMessage = null;
-	}
+    public ErrorResultType(int status, int pkiFailureInfo, String statusMessage)
+    {
+        this.status = status;
+        this.pkiFailureInfo = pkiFailureInfo;
+        this.statusMessage = statusMessage;
+    }
 
-	public int getStatus() {
-		return status;
-	}
+    public ErrorResultType(int status)
+    {
+        this.status = status;
+        this.pkiFailureInfo = 0;
+        this.statusMessage = null;
+    }
 
-	public int getPkiFailureInfo() {
-		return pkiFailureInfo;
-	}
+    public int getStatus() {
+        return status;
+    }
 
-	public String getStatusMessage() {
-		return statusMessage;
-	}
-	
+    public int getPkiFailureInfo() {
+        return pkiFailureInfo;
+    }
+
+    public String getStatusMessage() {
+        return statusMessage;
+    }
+
 }

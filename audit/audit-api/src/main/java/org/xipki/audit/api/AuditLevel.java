@@ -30,7 +30,7 @@ public enum AuditLevel
 
     private final int value;
 
-    private AuditLevel(int value) 
+    private AuditLevel(int value)
     {
         this.value = value;
     }

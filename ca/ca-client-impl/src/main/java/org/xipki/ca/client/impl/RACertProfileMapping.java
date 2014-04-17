@@ -20,31 +20,31 @@ package org.xipki.ca.client.impl;
 import org.xipki.security.common.ParamChecker;
 
 class RACertProfileMapping {
-	private final String requestedProfile;
-	private final String destProfile;
-	private final String destCA;
-	
-	RACertProfileMapping(String requestedProfile, String destProfile, String destCA) 
-	{
-		ParamChecker.assertNotNull("requestedProfile", requestedProfile);
-		ParamChecker.assertNotNull("destProfile", destProfile);
-		ParamChecker.assertNotNull("destCA", destCA);
+    private final String requestedProfile;
+    private final String destProfile;
+    private final String destCA;
 
-		this.requestedProfile = requestedProfile;
-		this.destProfile = destProfile;
-		this.destCA = destCA;
-	}
+    RACertProfileMapping(String requestedProfile, String destProfile, String destCA)
+    {
+        ParamChecker.assertNotNull("requestedProfile", requestedProfile);
+        ParamChecker.assertNotNull("destProfile", destProfile);
+        ParamChecker.assertNotNull("destCA", destCA);
 
-	public String getRequestedProfile() {
-		return requestedProfile;
-	}
+        this.requestedProfile = requestedProfile;
+        this.destProfile = destProfile;
+        this.destCA = destCA;
+    }
 
-	public String getDestProfile() {
-		return destProfile;
-	}
+    public String getRequestedProfile() {
+        return requestedProfile;
+    }
 
-	public String getDestCA() {
-		return destCA;
-	}	
+    public String getDestProfile() {
+        return destProfile;
+    }
+
+    public String getDestCA() {
+        return destCA;
+    }
 
 }

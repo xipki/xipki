@@ -18,41 +18,41 @@
 package org.xipki.ca.api.profile;
 
 public class CertificatePolicyQualifier{
-	private final String cpsUri;
-	private final String userNotice;
+    private final String cpsUri;
+    private final String userNotice;
 
-	private CertificatePolicyQualifier(String cpsUri, String userNotice)
-	{
-		this.cpsUri = cpsUri;
-		this.userNotice = userNotice;
-	}
-	
-	public static CertificatePolicyQualifier getInstanceForUserNotice(String userNotice)
-	{
-		if(userNotice == null || userNotice.isEmpty())
-		{
-			throw new IllegalArgumentException("userNotice is empty");			
-		}
-		
-		return new CertificatePolicyQualifier(null, userNotice);
-	}
-	
-	public static CertificatePolicyQualifier getInstanceForCpsUri(String cpsUri)
-	{
-		if(cpsUri == null || cpsUri.isEmpty())
-		{
-			throw new IllegalArgumentException("cpsUri is empty");			
-		}
-		
-		return new CertificatePolicyQualifier(cpsUri, null);
-	}
+    private CertificatePolicyQualifier(String cpsUri, String userNotice)
+    {
+        this.cpsUri = cpsUri;
+        this.userNotice = userNotice;
+    }
 
-	public String getCpsUri() {
-		return cpsUri;
-	}
+    public static CertificatePolicyQualifier getInstanceForUserNotice(String userNotice)
+    {
+        if(userNotice == null || userNotice.isEmpty())
+        {
+            throw new IllegalArgumentException("userNotice is empty");
+        }
 
-	public String getUserNotice() {
-		return userNotice;
-	}
+        return new CertificatePolicyQualifier(null, userNotice);
+    }
+
+    public static CertificatePolicyQualifier getInstanceForCpsUri(String cpsUri)
+    {
+        if(cpsUri == null || cpsUri.isEmpty())
+        {
+            throw new IllegalArgumentException("cpsUri is empty");
+        }
+
+        return new CertificatePolicyQualifier(cpsUri, null);
+    }
+
+    public String getCpsUri() {
+        return cpsUri;
+    }
+
+    public String getUserNotice() {
+        return userNotice;
+    }
 
 }

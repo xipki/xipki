@@ -24,86 +24,127 @@ import java.io.FileReader;
 import java.io.FileWriter;
 
 public class AddLicense {
-	
-	private final static String licenseText =
-	 "/*\n" +
-	 " * Copyright 2014 xipki.org\n" +
-	 " *\n" +
-	 " * Licensed under the Apache License, Version 2.0 (the \"License\");\n" +
-	 " * you may not use this file except in compliance with the License.\n" +
-	 " * You may obtain a copy of the License at\n" +
-	 " *\n" +
-	 " *         http://www.apache.org/licenses/LICENSE-2.0\n" +
-	 " *\n" +
-	 " * Unless required by applicable law or agreed to in writing, software\n" +
-	 " * distributed under the License is distributed on an \"AS IS\" BASIS,\n" +
-	 " * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\n" +
-	 " * See the License for the specific language governing permissions and\n" +
-	 " * limitations under the License\n" +
-	 " *\n" +
-	 " */\n\n";
-	
-	public static void main(String[] args) {
-		try{
-			String dirName = args[0];
-			
-			File dir = new File(dirName);
-			addLicenseToDir(dir);			
-		}catch(Exception e)
-		{
-			e.printStackTrace();
-		}
-	}
 
-	private static void addLicenseToDir(File dir) throws Exception
-	{
-		File[] files = dir.listFiles();
-		for(File file : files)
-		{
-			if(file.isDirectory())
-			{
-				addLicenseToDir(file);
-			}
-			else if(file.isFile() && file.getName().endsWith(".java"))
-			{
-				addLicenseToFile(file);
-			}
-		}
-	}
-	
-	private static void addLicenseToFile(File file) throws Exception
-	{
-		System.out.println(file.getPath());
-		BufferedReader reader = new BufferedReader(new FileReader(file));
-		
-		File newFile = new File(file.getPath() + "-new");
-		BufferedWriter writer = new BufferedWriter(new FileWriter(newFile));
-		
-		try{
-			String line;
-			boolean skip = true;
-			while((line = reader.readLine()) != null)
-			{
-				if(line.trim().startsWith("package "))
-				{
-					writer.write(licenseText);
-					skip = false;
-				}
-				
-				if(!skip)
-				{
-					writer.write(line);
-					writer.write('\n');
-				}
-			}
-		}finally
-		{
-			writer.close();
-			reader.close();
-		}
-		
-		newFile.renameTo(file);
-		
-	}
+    private final static String licenseText =
+     "/*\n" +
+     " * Copyright 2014 xipki.org\n" +
+     " *\n" +
+     " * Licensed under the Apache License, Version 2.0 (the \"License\");\n" +
+     " * you may not use this file except in compliance with the License.\n" +
+     " * You may obtain a copy of the License at\n" +
+     " *\n" +
+     " *         http://www.apache.org/licenses/LICENSE-2.0\n" +
+     " *\n" +
+     " * Unless required by applicable law or agreed to in writing, software\n" +
+     " * distributed under the License is distributed on an \"AS IS\" BASIS,\n" +
+     " * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\n" +
+     " * See the License for the specific language governing permissions and\n" +
+     " * limitations under the License\n" +
+     " *\n" +
+     " */\n\n";
+
+    public static void main(String[] args) {
+        try{
+            String dirName = args[0];
+
+            File dir = new File(dirName);
+            addLicenseToDir(dir);
+        }catch(Exception e)
+        {
+            e.printStackTrace();
+        }
+    }
+
+    private static void addLicenseToDir(File dir) throws Exception
+    {
+        File[] files = dir.listFiles();
+        for(File file : files)
+        {
+            if(file.isDirectory())
+            {
+                addLicenseToDir(file);
+            }
+            else if(file.isFile() && file.getName().endsWith(".java"))
+            {
+                addLicenseToFile(file);
+            }
+        }
+    }
+
+    private static void addLicenseToFile(File file) throws Exception
+    {
+        System.out.println(file.getPath());
+        BufferedReader reader = new BufferedReader(new FileReader(file));
+
+        File newFile = new File(file.getPath() + "-new");
+        BufferedWriter writer = new BufferedWriter(new FileWriter(newFile));
+
+        try{
+            String line;
+            boolean skip = true;
+            while((line = reader.readLine()) != null)
+            {
+                if(line.trim().startsWith("package "))
+                {
+                    writer.write(licenseText);
+                    skip = false;
+                }
+
+                if(!skip)
+                {
+                    writer.write(canonicalizeLine(line));
+                    writer.write('\n');
+                }
+            }
+        }finally
+        {
+            writer.close();
+            reader.close();
+        }
+
+        newFile.renameTo(file);
+
+    }
+    /**
+     * replace tab by 4 spaces, delete white spaces at the end
+     * @param line
+     * @return
+     */
+    private static String canonicalizeLine(String line)
+    {
+        StringBuilder sb = new StringBuilder();
+        int len = line.length();
+
+        int lastNonSpaceCharIndex = 0;
+        int index = 0;
+        for(int i = 0; i < len; i++)
+        {
+            char c = line.charAt(i);
+            if(c == '\t')
+            {
+                sb.append("    ");
+                index += 4;
+            }
+            else if(c == ' ')
+            {
+                sb.append(c);
+                index++;
+            }
+            else
+            {
+                sb.append(c);
+                index++;
+                lastNonSpaceCharIndex = index;
+            }
+        }
+
+        int numSpacesAtEnd = sb.length() - lastNonSpaceCharIndex;
+        if(numSpacesAtEnd > 0)
+        {
+            sb.delete(lastNonSpaceCharIndex, sb.length());
+        }
+
+        return sb.toString();
+    }
 
 }

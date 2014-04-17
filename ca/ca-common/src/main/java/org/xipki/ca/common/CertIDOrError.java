@@ -21,30 +21,30 @@ import org.bouncycastle.asn1.crmf.CertId;
 import org.xipki.security.common.ParamChecker;
 
 public class CertIDOrError {
-	private final CertId certId;
-	private final PKIStatusInfo error;
-	
-	public CertIDOrError(CertId certId) {
-		ParamChecker.assertNotNull("certId", certId);
+    private final CertId certId;
+    private final PKIStatusInfo error;
 
-		this.certId = certId;
-		this.error = null;
-	}
+    public CertIDOrError(CertId certId) {
+        ParamChecker.assertNotNull("certId", certId);
 
-	public CertIDOrError(PKIStatusInfo error) {
-		ParamChecker.assertNotNull("error", error);
+        this.certId = certId;
+        this.error = null;
+    }
 
-		this.certId = null;
-		this.error = error;
-	}
+    public CertIDOrError(PKIStatusInfo error) {
+        ParamChecker.assertNotNull("error", error);
 
-	public CertId getCertId() {
-		return certId;
-	}
+        this.certId = null;
+        this.error = error;
+    }
 
-	public PKIStatusInfo getError() {
-		return error;
-	}
+    public CertId getCertId() {
+        return certId;
+    }
 
-	
+    public PKIStatusInfo getError() {
+        return error;
+    }
+
+
 }

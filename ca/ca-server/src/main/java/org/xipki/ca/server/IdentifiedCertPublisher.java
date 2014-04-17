@@ -34,56 +34,56 @@ import org.xipki.security.common.EnvironmentParameterResolver;
 import org.xipki.security.common.ParamChecker;
 
 public class IdentifiedCertPublisher implements CertPublisher {
-	private final String name;
-	private final CertPublisher certPublisher;
-	
-	public IdentifiedCertPublisher(String name, CertPublisher certPublisher)
-	{
-		ParamChecker.assertNotEmpty("name", name);
-		ParamChecker.assertNotNull("certPublisher", certPublisher);
-		
-		this.name = name;
-		this.certPublisher = certPublisher;		
-	}
+    private final String name;
+    private final CertPublisher certPublisher;
 
-	@Override
-	public void initialize(String conf, PasswordResolver passwordResolver, 
-			DataSourceFactory dataSourceFactory) 
-	throws CertPublisherException {
-		certPublisher.initialize(conf, passwordResolver, dataSourceFactory);
-	}
+    public IdentifiedCertPublisher(String name, CertPublisher certPublisher)
+    {
+        ParamChecker.assertNotEmpty("name", name);
+        ParamChecker.assertNotNull("certPublisher", certPublisher);
 
-	@Override
-	public void setEnvironmentParamterResolver(EnvironmentParameterResolver paramterResolver) {
-		certPublisher.setEnvironmentParamterResolver(paramterResolver);		
-	}
+        this.name = name;
+        this.certPublisher = certPublisher;
+    }
 
-	@Override
-	public void certificateAdded(CertificateInfo certInfo) {
-		certPublisher.certificateAdded(certInfo);
-	}
+    @Override
+    public void initialize(String conf, PasswordResolver passwordResolver,
+            DataSourceFactory dataSourceFactory)
+    throws CertPublisherException {
+        certPublisher.initialize(conf, passwordResolver, dataSourceFactory);
+    }
 
-	@Override
-	public void certificateRevoked(X509Certificate cert, int reason, Date invalidityTime) {
-		certPublisher.certificateRevoked(cert, reason, invalidityTime);
-	}
+    @Override
+    public void setEnvironmentParamterResolver(EnvironmentParameterResolver paramterResolver) {
+        certPublisher.setEnvironmentParamterResolver(paramterResolver);
+    }
 
-	@Override
-	public void certificateRevoked(X500Principal issuer, BigInteger serialNumber, int reason, Date invalidityTime) {
-		certPublisher.certificateRevoked(issuer, serialNumber, reason, invalidityTime);
-	}
+    @Override
+    public void certificateAdded(CertificateInfo certInfo) {
+        certPublisher.certificateAdded(certInfo);
+    }
 
-	@Override
-	public void crlAdded(X509CertificateWithMetaInfo cacert, X509CRL crl) {
-		certPublisher.crlAdded(cacert, crl);
-	}
+    @Override
+    public void certificateRevoked(X509Certificate cert, int reason, Date invalidityTime) {
+        certPublisher.certificateRevoked(cert, reason, invalidityTime);
+    }
 
-	public String getName() {
-		return name;
-	}
+    @Override
+    public void certificateRevoked(X500Principal issuer, BigInteger serialNumber, int reason, Date invalidityTime) {
+        certPublisher.certificateRevoked(issuer, serialNumber, reason, invalidityTime);
+    }
 
-	@Override
-	public boolean isHealthy() {
-		return certPublisher.isHealthy();
-	}
+    @Override
+    public void crlAdded(X509CertificateWithMetaInfo cacert, X509CRL crl) {
+        certPublisher.crlAdded(cacert, crl);
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    @Override
+    public boolean isHealthy() {
+        return certPublisher.isHealthy();
+    }
 }

@@ -20,38 +20,38 @@ package org.xipki.ca.common;
 
 public class PKIErrorException extends Exception
 {
-	private static final long serialVersionUID = 1L;
-	
-	private final int status;
-	private final int pkiFailureInfo;
-	private final String statusMessage;
-	
-	public PKIErrorException(int status, int pkiFailureInfo, String statusMessage)
-	{
-		super("PKIError: Status = " + status + 
-				", PKIFailureInfo = " + pkiFailureInfo + ", statusMessage = " + statusMessage);
-		this.status = status;
-		this.pkiFailureInfo = pkiFailureInfo;
-		this.statusMessage = statusMessage;
-	}
+    private static final long serialVersionUID = 1L;
 
-	public PKIErrorException(int status)
-	{
-		this.status = status;
-		this.pkiFailureInfo = 0;
-		this.statusMessage = null;
-	}
+    private final int status;
+    private final int pkiFailureInfo;
+    private final String statusMessage;
 
-	public int getStatus() {
-		return status;
-	}
+    public PKIErrorException(int status, int pkiFailureInfo, String statusMessage)
+    {
+        super("PKIError: Status = " + status +
+                ", PKIFailureInfo = " + pkiFailureInfo + ", statusMessage = " + statusMessage);
+        this.status = status;
+        this.pkiFailureInfo = pkiFailureInfo;
+        this.statusMessage = statusMessage;
+    }
 
-	public int getPkiFailureInfo() {
-		return pkiFailureInfo;
-	}
+    public PKIErrorException(int status)
+    {
+        this.status = status;
+        this.pkiFailureInfo = 0;
+        this.statusMessage = null;
+    }
 
-	public String getStatusMessage() {
-		return statusMessage;
-	}
-	
+    public int getStatus() {
+        return status;
+    }
+
+    public int getPkiFailureInfo() {
+        return pkiFailureInfo;
+    }
+
+    public String getStatusMessage() {
+        return statusMessage;
+    }
+
 }

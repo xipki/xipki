@@ -20,16 +20,16 @@ package org.xipki.ca.cmp.client.type;
 import org.xipki.security.common.ParamChecker;
 
 public class IdentifiedObject {
-	private final String id;
+    private final String id;
 
-	public IdentifiedObject(String id)
-	{
-		ParamChecker.assertNotEmpty("id", id);
-		this.id = id;
-	}
-	
-	public String getId()
-	{
-		return id;
-	}
+    public IdentifiedObject(String id)
+    {
+        ParamChecker.assertNotEmpty("id", id);
+        this.id = id;
+    }
+
+    public String getId()
+    {
+        return id;
+    }
 }

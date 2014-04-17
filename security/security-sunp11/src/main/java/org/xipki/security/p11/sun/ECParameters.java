@@ -75,8 +75,8 @@ import org.bouncycastle.math.ec.ECCurve;
  */
 public final class ECParameters extends AlgorithmParametersSpi {
 
-	
-	
+
+
     // used by ECPublicKeyImpl and ECPrivateKeyImpl
     static AlgorithmParameters getAlgorithmParameters(ECParameterSpec spec)
             throws InvalidKeyException {
@@ -133,11 +133,11 @@ public final class ECParameters extends AlgorithmParametersSpi {
         }
     }
 
-    protected void engineInit(byte[] params) throws IOException { 
-    	if(params.length < 30)
-    	{
-    		try{
-    			ASN1ObjectIdentifier oid = (ASN1ObjectIdentifier) ASN1ObjectIdentifier.fromByteArray(params);
+    protected void engineInit(byte[] params) throws IOException {
+        if(params.length < 30)
+        {
+            try{
+                ASN1ObjectIdentifier oid = (ASN1ObjectIdentifier) ASN1ObjectIdentifier.fromByteArray(params);
                 ECParameterSpec spec = SunNamedCurveExtender.lookupCurve(oid.getId());
                 if (spec == null) {
                     throw new IOException("Unknown named curve: " + oid);
@@ -145,29 +145,29 @@ public final class ECParameters extends AlgorithmParametersSpi {
 
                 namedCurve = spec;
                 return;
-    		}catch(IllegalArgumentException e)
-    		{
-    		}
-    	}
+            }catch(IllegalArgumentException e)
+            {
+            }
+        }
 
         // The code below is incomplete.
         // It is left as a starting point for a complete parsing implementation.
         X9ECParameters x9EcParams = X9ECParameters.getInstance(params);
         ECCurve curve = x9EcParams.getCurve();
-        
+
         ECNamedCurveSpec ecNamedCurveSpec = new ECNamedCurveSpec(
-        		"dummy", curve, x9EcParams.getG(), x9EcParams.getN(), x9EcParams.getH());
+                "dummy", curve, x9EcParams.getG(), x9EcParams.getN(), x9EcParams.getH());
 
         ECParameterSpec spec = new ECParameterSpec(
-        		ecNamedCurveSpec.getCurve(), 
-        		ecNamedCurveSpec.getGenerator(), 
-        		ecNamedCurveSpec.getOrder(), 
-        		ecNamedCurveSpec.getCofactor());
+                ecNamedCurveSpec.getCurve(),
+                ecNamedCurveSpec.getGenerator(),
+                ecNamedCurveSpec.getOrder(),
+                ecNamedCurveSpec.getCofactor());
         try {
-			engineInit(spec);
-		} catch (InvalidParameterSpecException e) {
-			throw new IOException("InvalidParameterSpecException: " + e.getMessage(), e);
-		}
+            engineInit(spec);
+        } catch (InvalidParameterSpecException e) {
+            throw new IOException("InvalidParameterSpecException: " + e.getMessage(), e);
+        }
     }
 
     protected void engineInit(byte[] params, String decodingMethod)

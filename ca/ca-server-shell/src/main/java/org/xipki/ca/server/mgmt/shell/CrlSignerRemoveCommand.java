@@ -23,14 +23,14 @@ import org.apache.felix.gogo.commands.Option;
 @Command(scope = "ca", name = "crlsigner-rm", description="Remove CRL signer")
 public class CrlSignerRemoveCommand extends CaCommand {
 
-	@Option(name = "-name",
+    @Option(name = "-name",
             description = "Required. CRL signer name",
-	        required = true, multiValued = false)
-	protected String            name;
+            required = true, multiValued = false)
+    protected String            name;
 
     @Override
     protected Object doExecute() throws Exception {
-    	caManager.removeCrlSigner(name);
-    	return null;
+        caManager.removeCrlSigner(name);
+        return null;
     }
 }

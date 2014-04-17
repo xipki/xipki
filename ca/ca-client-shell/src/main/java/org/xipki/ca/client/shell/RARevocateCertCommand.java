@@ -31,67 +31,67 @@ import org.xipki.security.common.IoCertUtil;
 @Command(scope = "caclient", name = "ra-rev", description="Revocate certificate")
 public class RARevocateCertCommand extends ClientCommand {
 
-	@Option(name = "-cert",
-			description = "Certificate file")
+    @Option(name = "-cert",
+            description = "Certificate file")
     protected String            certFile;
 
-	@Option(name = "-cacert",
-			description = "CA Certificate file")
+    @Option(name = "-cacert",
+            description = "CA Certificate file")
     protected String            cacertFile;
 
-	@Option(name = "-sn", aliases = {"--serialNumber"},
-			description = "Serial number")
+    @Option(name = "-sn", aliases = {"--serialNumber"},
+            description = "Serial number")
     protected String            serialNumber;
-	
-	@Option(name = "-reason",
-			description = "Reason, valid values are 0,1,2,3,4,5,6,8,9,10. The default is 0")
-    protected Integer           reason;
-	
-    private RAWorker   		  raWorker;
-    	
-	@Override
-	protected Object doExecute() throws Exception {
-		if(certFile == null && (cacertFile == null && serialNumber == null))
-		{
-			System.err.println("either cert or (cacert, serialNumber) must be specified");
-			return null;
-		}
-		
-		if(reason == null)
-		{
-			reason = 0;
-		}
-		
-		CertIDOrError certIdOrError;
-		if(certFile != null)
-		{
-			X509Certificate cert = IoCertUtil.parseCert(certFile);
-			certIdOrError = raWorker.revocateCert(cert, reason);
-		}
-		else
-		{
-			X509Certificate cacert = IoCertUtil.parseCert(cacertFile);
-			X500Name issuer = X500Name.getInstance(cacert.getSubjectX500Principal().getEncoded());
-			certIdOrError = raWorker.revocateCert(issuer, new BigInteger(serialNumber), reason);
-		}
-		
-		// TODO: check whether the returned one match the requested one
-		if(certIdOrError.getError() != null)
-		{
-			PKIStatusInfo error = certIdOrError.getError();
-			System.err.println("Revocation failed: status=" + error.getStatus()+ 
-					", failureInfo=" + error.getPkiFailureInfo() + ", message=" + error.getStatusMessage());
-		}
-		else
-		{
-			System.out.println("Revocated certificate");
-		}
-		return null;
-	}
 
-	public void setRaWorker(RAWorker raWorker) {
-		this.raWorker = raWorker;
-	}
+    @Option(name = "-reason",
+            description = "Reason, valid values are 0,1,2,3,4,5,6,8,9,10. The default is 0")
+    protected Integer           reason;
+
+    private RAWorker             raWorker;
+
+    @Override
+    protected Object doExecute() throws Exception {
+        if(certFile == null && (cacertFile == null && serialNumber == null))
+        {
+            System.err.println("either cert or (cacert, serialNumber) must be specified");
+            return null;
+        }
+
+        if(reason == null)
+        {
+            reason = 0;
+        }
+
+        CertIDOrError certIdOrError;
+        if(certFile != null)
+        {
+            X509Certificate cert = IoCertUtil.parseCert(certFile);
+            certIdOrError = raWorker.revocateCert(cert, reason);
+        }
+        else
+        {
+            X509Certificate cacert = IoCertUtil.parseCert(cacertFile);
+            X500Name issuer = X500Name.getInstance(cacert.getSubjectX500Principal().getEncoded());
+            certIdOrError = raWorker.revocateCert(issuer, new BigInteger(serialNumber), reason);
+        }
+
+        // TODO: check whether the returned one match the requested one
+        if(certIdOrError.getError() != null)
+        {
+            PKIStatusInfo error = certIdOrError.getError();
+            System.err.println("Revocation failed: status=" + error.getStatus()+
+                    ", failureInfo=" + error.getPkiFailureInfo() + ", message=" + error.getStatusMessage());
+        }
+        else
+        {
+            System.out.println("Revocated certificate");
+        }
+        return null;
+    }
+
+    public void setRaWorker(RAWorker raWorker) {
+        this.raWorker = raWorker;
+    }
 
 
 }

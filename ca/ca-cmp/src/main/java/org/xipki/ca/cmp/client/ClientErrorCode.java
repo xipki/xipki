@@ -18,14 +18,14 @@
 package org.xipki.ca.cmp.client;
 
 public class ClientErrorCode {
-	/**
-	 * Intern status to indicate that there are errors in the response
-	 */
-	public static final int PKIStatus_RESPONSE_ERROR = -1; 
+    /**
+     * Intern status to indicate that there are errors in the response
+     */
+    public static final int PKIStatus_RESPONSE_ERROR = -1;
 
-	public static final int PKIStatus_NO_ANSWER = -2;
-	
-	public static final int PKIFailureInfo_CERT_ENCODING_ERROR = -100;
-	
+    public static final int PKIStatus_NO_ANSWER = -2;
+
+    public static final int PKIFailureInfo_CERT_ENCODING_ERROR = -100;
+
 
 }

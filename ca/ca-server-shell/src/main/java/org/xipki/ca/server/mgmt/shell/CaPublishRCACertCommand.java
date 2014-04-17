@@ -22,14 +22,14 @@ import org.apache.felix.gogo.commands.Option;
 
 @Command(scope = "ca", name = "publish-self", description="Publish the certificate of root CA")
 public class CaPublishRCACertCommand extends CaCommand {
-	@Option(name = "-ca",
+    @Option(name = "-ca",
             description = "CA name",
             required = false)
     protected String           caName;
-	
+
     @Override
     protected Object doExecute() throws Exception {
-    	caManager.publishRootCA(caName);
+        caManager.publishRootCA(caName);
         return null;
     }
 }

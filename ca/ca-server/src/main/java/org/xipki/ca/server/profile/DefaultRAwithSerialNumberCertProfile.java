@@ -19,16 +19,16 @@ package org.xipki.ca.server.profile;
 
 
 /**
- * This profile will be used if the requestor is registered as RA. It will be accepted by all 
- * CAs without explicit configuration. It accepts all from the request except the 
+ * This profile will be used if the requestor is registered as RA. It will be accepted by all
+ * CAs without explicit configuration. It accepts all from the request except the
  * extensions AuthorityKeyIdentifier, SubjectKeyIdentifier, CRLDistributionPoint and AuthorityInfoAccess.
  * It adds or increases the RDN serialNumber to the Subject with unique number if the same subject already exists.
  *
  */
 public class DefaultRAwithSerialNumberCertProfile extends DefaultRACertProfile
 {
-	@Override
-	public boolean incSerialNumberIfSubjectExists() {
-		return true;
-	}
+    @Override
+    public boolean incSerialNumberIfSubjectExists() {
+        return true;
+    }
 }

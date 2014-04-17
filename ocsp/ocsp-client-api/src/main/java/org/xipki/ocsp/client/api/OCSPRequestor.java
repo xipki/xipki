@@ -24,11 +24,11 @@ import java.security.cert.X509Certificate;
 import org.bouncycastle.cert.ocsp.BasicOCSPResp;
 
 public interface OCSPRequestor {
-	BasicOCSPResp ask(X509Certificate cacert, X509Certificate cert, 
-			URL responderUrl, RequestOptions requestOptions)
+    BasicOCSPResp ask(X509Certificate cacert, X509Certificate cert,
+            URL responderUrl, RequestOptions requestOptions)
     throws OCSPRequestorException;
 
-	BasicOCSPResp ask(X509Certificate caCert, BigInteger serialNumber,
-			URL responderUrl, RequestOptions requestOptions)
+    BasicOCSPResp ask(X509Certificate caCert, BigInteger serialNumber,
+            URL responderUrl, RequestOptions requestOptions)
     throws OCSPRequestorException;
 }

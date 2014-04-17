@@ -25,49 +25,49 @@ import org.bouncycastle.asn1.x500.X500Name;
 
 public class RevocateCertRequestEntryType extends ResultEntryType
 {
-	private final int reason;
-	private final Date invalidityDate;
-	
-	private final X500Name issuer;
-	private final BigInteger serialNumber;
-	
-	public RevocateCertRequestEntryType(String id, X509Certificate cert, 
-			int reason, Date invalidityDate)
-	{
-		this(id, X500Name.getInstance(cert.getIssuerX500Principal().getEncoded()), cert.getSerialNumber(),
-				reason, invalidityDate);
-	}
+    private final int reason;
+    private final Date invalidityDate;
 
-	public RevocateCertRequestEntryType(String id, X500Name issuer, BigInteger serialNumber, 
-			int reason, Date invalidityDate)
-	{
-		super(id);
-		
-		if(! (reason >= 0 && reason <= 10 && reason != 7))
-		{
-			throw new IllegalArgumentException("invalid reason: " + reason);
-		}
+    private final X500Name issuer;
+    private final BigInteger serialNumber;
 
-		this.reason = reason;
-		this.invalidityDate = invalidityDate;
-		this.serialNumber = serialNumber;
-		this.issuer = issuer;
-	}
+    public RevocateCertRequestEntryType(String id, X509Certificate cert,
+            int reason, Date invalidityDate)
+    {
+        this(id, X500Name.getInstance(cert.getIssuerX500Principal().getEncoded()), cert.getSerialNumber(),
+                reason, invalidityDate);
+    }
 
-	public X500Name getIssuer() {
-		return issuer;
-	}
+    public RevocateCertRequestEntryType(String id, X500Name issuer, BigInteger serialNumber,
+            int reason, Date invalidityDate)
+    {
+        super(id);
 
-	public BigInteger getSerialNumber() {
-		return serialNumber;
-	}
+        if(! (reason >= 0 && reason <= 10 && reason != 7))
+        {
+            throw new IllegalArgumentException("invalid reason: " + reason);
+        }
 
-	public int getReason() {
-		return reason;
-	}
+        this.reason = reason;
+        this.invalidityDate = invalidityDate;
+        this.serialNumber = serialNumber;
+        this.issuer = issuer;
+    }
 
-	public Date getInvalidityDate() {
-		return invalidityDate;
-	}
+    public X500Name getIssuer() {
+        return issuer;
+    }
+
+    public BigInteger getSerialNumber() {
+        return serialNumber;
+    }
+
+    public int getReason() {
+        return reason;
+    }
+
+    public Date getInvalidityDate() {
+        return invalidityDate;
+    }
 
 }

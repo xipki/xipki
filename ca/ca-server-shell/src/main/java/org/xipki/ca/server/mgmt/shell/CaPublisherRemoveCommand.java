@@ -22,18 +22,18 @@ import org.apache.felix.gogo.commands.Option;
 
 @Command(scope = "ca", name = "capub-remove", description="Remove publisher in given CA")
 public class CaPublisherRemoveCommand extends CaCommand {
-	@Option(name = "-ca",
+    @Option(name = "-ca",
             description = "Required. CA name",
             required = true)
     protected String           caName;
-	
-	@Option(name = "-publisher",
-			required = true, description = "Publisher name")
-	protected String            publisherName;
-	
+
+    @Option(name = "-publisher",
+            required = true, description = "Publisher name")
+    protected String            publisherName;
+
     @Override
     protected Object doExecute() throws Exception {
-    	caManager.removePublisherFromCA(publisherName, caName);
-    	return null;
+        caManager.removePublisherFromCA(publisherName, caName);
+        return null;
     }
 }

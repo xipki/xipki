@@ -18,46 +18,46 @@
 package org.xipki.ca.server.mgmt;
 
 public enum Permission {
-	ALL("all"),
-	CERT_REQ ("cert-req"),
-	CERT_REV ("cert-rev"),
-	KEY_UPDATE ("key-update"),
-	CRL_GEN ("CRL-gen"),
-	CRL_DOWNLOAD ("CRL-download"),
-	CROSS_CERT_REQ ("cross-cert-req");
-	
-	private String permission;
-	private Permission(String permission)
-	{
-		this.permission = permission;
-	}
-	
-	public String getPermission()
-	{
-		return permission;
-	}
-	
-	public static Permission getPermission(String permission)
-	{
-		for(Permission p : values())
-		{
-			if(p.permission.equals(permission))
-			{
-				return p;
-			}
-		}
-		
-		return null;
-	}
-	
-	public static String allPermissionsAsText()
-	{
-		StringBuilder sb = new StringBuilder();
-		for(Permission p : values())
-		{
-			sb.append(",").append(p.getPermission());
-		}
-		
-		return sb.substring(1);
-	}
+    ALL("all"),
+    CERT_REQ ("cert-req"),
+    CERT_REV ("cert-rev"),
+    KEY_UPDATE ("key-update"),
+    CRL_GEN ("CRL-gen"),
+    CRL_DOWNLOAD ("CRL-download"),
+    CROSS_CERT_REQ ("cross-cert-req");
+
+    private String permission;
+    private Permission(String permission)
+    {
+        this.permission = permission;
+    }
+
+    public String getPermission()
+    {
+        return permission;
+    }
+
+    public static Permission getPermission(String permission)
+    {
+        for(Permission p : values())
+        {
+            if(p.permission.equals(permission))
+            {
+                return p;
+            }
+        }
+
+        return null;
+    }
+
+    public static String allPermissionsAsText()
+    {
+        StringBuilder sb = new StringBuilder();
+        for(Permission p : values())
+        {
+            sb.append(",").append(p.getPermission());
+        }
+
+        return sb.substring(1);
+    }
 }

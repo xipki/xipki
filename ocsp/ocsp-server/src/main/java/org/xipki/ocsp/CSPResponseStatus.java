@@ -28,24 +28,24 @@ public enum CSPResponseStatus {
     private final int status;
     private CSPResponseStatus(int status)
     {
-    	this.status = status;
+        this.status = status;
     }
-    
+
     public static CSPResponseStatus getOCSPResponseStatus(int status)
     {
-    	for(CSPResponseStatus entry : values())
-    	{
-    		if(entry.status == status)
-    		{
-    			return entry;
-    		}
-    	}
-    	
-    	return null;
+        for(CSPResponseStatus entry : values())
+        {
+            if(entry.status == status)
+            {
+                return entry;
+            }
+        }
+
+        return null;
     }
-    
+
     public int getStatus()
     {
-    	return status;
+        return status;
     }
 }

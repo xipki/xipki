@@ -61,17 +61,17 @@ public class SyslogAuditLoggingServiceImpl implements AuditLoggingService
      * The default ip is localhost.
      */
     public static final String DEFAULT_SYSLOG_HOST = "localhost";
-    
+
     /**
-     * The syslog4j client instance 
+     * The syslog4j client instance
      */
     protected SyslogIF syslog = null;
-    
+
     private String host = DEFAULT_SYSLOG_HOST;
     private int port = DEFAULT_SYSLOG_PORT;
     private String protocol = DEFAULT_SYSLOG_PROTOCOL;
     private String facility = DEFAULT_SYSLOG_FACILITY;
-    
+
     private boolean               useThreading            = false;
     private boolean               useStructuredData       = false;
     private boolean               useSequenceNumbers      = false;
@@ -89,33 +89,33 @@ public class SyslogAuditLoggingServiceImpl implements AuditLoggingService
     private String                splitMessageEndText     = null;
 
     protected boolean             initialized             = false;
-    
-    
-    public SyslogAuditLoggingServiceImpl() 
+
+
+    public SyslogAuditLoggingServiceImpl()
     {
     }
-    
+
     @Override
-    public void logEvent(final AuditEvent event) 
-    {   
-    	if(event == null)
-    	{
-    		return;
-    	}
-    	init();
+    public void logEvent(final AuditEvent event)
+    {
+        if(event == null)
+        {
+            return;
+        }
+        init();
 
         syslog.log(SyslogLevel.forValue(event.getLevel().getValue()), loggingCompatibleEvent(event));
     }
 
     public void logEvent(final PCIAuditEvent event)
     {
-    	if(event == null)
-    	{
-    		return;
-    	}
-    	init();
-    	
-        PCISyslogMessage pciMessage = new PCISyslogMessage();        
+        if(event == null)
+        {
+            return;
+        }
+        init();
+
+        PCISyslogMessage pciMessage = new PCISyslogMessage();
         pciMessage.setUserId(event.getUserId());
         pciMessage.setDate(event.getDate());
         pciMessage.setTime(event.getTime());
@@ -123,13 +123,13 @@ public class SyslogAuditLoggingServiceImpl implements AuditLoggingService
         pciMessage.setOrigination(event.getOrigination());
         pciMessage.setStatus(event.getStatus());
         pciMessage.setAffectedResource(event.getAffectedResource());
-        
+
         this.syslog.log(SyslogLevel.forValue(event.getLevel().getValue()), pciMessage);
     }
 
     /**
      * The event to be logged has to be transformed to a human readable format.
-     * 
+     *
      * @param event
      *            The event to be transformed.
      * @return The string representation of the event.
@@ -138,13 +138,13 @@ public class SyslogAuditLoggingServiceImpl implements AuditLoggingService
     {
         StringBuilder sb = new StringBuilder();
         sb.append(event.getApplicationName()).append(" - ").append(event.getName());
-        
+
         AuditEventData[] eventDataArray = event.getEventDatas();
-        
+
         if ((eventDataArray != null) && (eventDataArray.length > 0))
         {
             sb.append(":");
-            
+
             for (AuditEventData element : eventDataArray)
             {
                 sb.append("\t");
@@ -171,21 +171,21 @@ public class SyslogAuditLoggingServiceImpl implements AuditLoggingService
         }
         return sb.toString();
     }
-     
+
     public void init()
-    {        
-    	if(initialized)
-    	{
-    		return;
-    	}
-    	
-        LOG.info("Initializing: {}", SyslogAuditLoggingServiceImpl.class);      
+    {
+        if(initialized)
+        {
+            return;
+        }
+
+        LOG.info("Initializing: {}", SyslogAuditLoggingServiceImpl.class);
 
         try
         {
             syslog = Syslog.getInstance(this.protocol);
             SyslogConfigIF config = syslog.getConfig();
-            
+
             if (notEmpty(host))
             {
                 config.setHost(host);
@@ -194,13 +194,13 @@ public class SyslogAuditLoggingServiceImpl implements AuditLoggingService
 
             if (notEmpty(facility))
             {
-            	SyslogFacility sysFacility = SyslogFacility.valueOf(facility);
-            	if(sysFacility != null)
-            	{
-            		config.setFacility(sysFacility);
-            	}
+                SyslogFacility sysFacility = SyslogFacility.valueOf(facility);
+                if(sysFacility != null)
+                {
+                    config.setFacility(sysFacility);
+                }
             }
-            
+
             if (notEmpty(charSet))
             {
                 this.syslog.getConfig().setCharSet(Charset.forName(charSet));
@@ -220,13 +220,13 @@ public class SyslogAuditLoggingServiceImpl implements AuditLoggingService
             config.setMaxMessageLength(maxMessageLength);
 
             config.setUseStructuredData(useStructuredData);
-             
+
             if (useSequenceNumbers)
             {
                 SequentialSyslogMessageModifier sequentialModifier = SequentialSyslogMessageModifier.createDefault();
                 config.addMessageModifier(sequentialModifier);
             }
-            
+
             if (config instanceof AbstractSyslogConfigIF)
             {
                 AbstractSyslogConfigIF abstractSyslogConfig = (AbstractSyslogConfigIF) config;
@@ -241,13 +241,13 @@ public class SyslogAuditLoggingServiceImpl implements AuditLoggingService
                 if (splitMessageBeginText != null)
                 {
                     abstractSyslogConfig.setSplitMessageBeginText(
-                    		SyslogUtility.getBytes(abstractSyslogConfig, splitMessageBeginText));
+                            SyslogUtility.getBytes(abstractSyslogConfig, splitMessageBeginText));
                 }
 
                 if (splitMessageEndText != null)
                 {
                     abstractSyslogConfig.setSplitMessageEndText(
-                    		SyslogUtility.getBytes(abstractSyslogConfig, splitMessageEndText));
+                            SyslogUtility.getBytes(abstractSyslogConfig, splitMessageEndText));
                 }
 
                 if (maxShutdownWait > 0)
@@ -263,22 +263,22 @@ public class SyslogAuditLoggingServiceImpl implements AuditLoggingService
 
             // after we're finished set initialized to true
             this.initialized = true;
-            LOG.info("Initialized: {}", SyslogAuditLoggingServiceImpl.class);      
+            LOG.info("Initialized: {}", SyslogAuditLoggingServiceImpl.class);
         }
         catch (SyslogRuntimeException sre)
         {
             LOG.error(sre.toString());
         }
-        
+
     }
-    
+
     public void destroy()
     {
         LOG.info("Destroying: {}", SyslogAuditLoggingServiceImpl.class);
         try
-        {         
+        {
             if (syslog != null)
-            {              
+            {
                 syslog.flush();
                 syslog.getConfig().removeAllMessageModifiers();
                 syslog.shutdown();
@@ -305,7 +305,7 @@ public class SyslogAuditLoggingServiceImpl implements AuditLoggingService
     {
         this.host = host;
     }
-    
+
     public void setPort(int port)
     {
         this.port = port;
@@ -382,23 +382,23 @@ public class SyslogAuditLoggingServiceImpl implements AuditLoggingService
     {
         this.truncateMessage = truncateMessage;
     }
-    
+
     private static boolean notEmpty(String text)
     {
-    	return text != null && text.isEmpty() == false;
+        return text != null && text.isEmpty() == false;
     }
-    
+
     private static final char[] HEX_CHAR_TABLE = "0123456789ABCDEF".toCharArray();
     private static String getHexString(final byte[] raw)
     {
-    	StringBuilder sb = new StringBuilder();    	
+        StringBuilder sb = new StringBuilder();
         for (byte b : raw)
         {
-        	int v = (b < 0) ? 256 + b : b;
-        	sb.append(HEX_CHAR_TABLE[v >>> 4]);
-        	sb.append(HEX_CHAR_TABLE[v & 0x0F]);        	
-        	sb.append(" ");
-        }        
+            int v = (b < 0) ? 256 + b : b;
+            sb.append(HEX_CHAR_TABLE[v >>> 4]);
+            sb.append(HEX_CHAR_TABLE[v & 0x0F]);
+            sb.append(" ");
+        }
         return sb.toString();
     }
 }

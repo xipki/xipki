@@ -30,65 +30,65 @@ import org.xipki.security.p10.P12KeypairGenerator;
 
 @Command(scope = "keytool", name = "rsa-p12", description="Generate RSA keypair in PKCS#12 keystore")
 public class P12RSAKeyGenCommand extends OsgiCommandSupport {
-	@Option(name = "-keysize",
-			description = "Keysize in bit, the default is 2048",
-			required = false)
+    @Option(name = "-keysize",
+            description = "Keysize in bit, the default is 2048",
+            required = false)
     protected Integer            keysize;
-	
-	@Option(name = "-subject",
-			required = true, description = "Required. Subject in the self-signed certificate")
+
+    @Option(name = "-subject",
+            required = true, description = "Required. Subject in the self-signed certificate")
     protected String            subject;
-	
-	@Option(name = "-pwd", aliases = { "--password" },
-			required = true, description = "Required. Password of the PKCS#12 file")
+
+    @Option(name = "-pwd", aliases = { "--password" },
+            required = true, description = "Required. Password of the PKCS#12 file")
     protected String            password;
-	
-	@Option(name = "-out",
-			required = true, description = "Required. Where to saven the key")
+
+    @Option(name = "-out",
+            required = true, description = "Required. Where to saven the key")
     protected String            keyOutFile;
 
-	@Option(name = "-certout",
-			required = false, description = "Where to saven the self-signed certificate")
+    @Option(name = "-certout",
+            required = false, description = "Where to saven the self-signed certificate")
     protected String            certOutFile;
 
-	private SecurityFactory securityFactory;
-	
-	public SecurityFactory getSecurityFactory() {
-		return securityFactory;
-	}
+    private SecurityFactory securityFactory;
 
-	public void setSecurityFactory(SecurityFactory securityFactory) {
-		this.securityFactory = securityFactory;
-	}
-	
+    public SecurityFactory getSecurityFactory() {
+        return securityFactory;
+    }
+
+    public void setSecurityFactory(SecurityFactory securityFactory) {
+        this.securityFactory = securityFactory;
+    }
+
     @Override
     protected Object doExecute() throws Exception {
-    	if(keysize == null)
-    	{
-    		keysize = 2048;
-    	}
-    	else if(keysize % 1024 != 0)
-    	{
-    		System.err.println("Keysize is not multiple of 1024: " + keysize);
-    		return null;
-    	}
-    	
-    	P12KeypairGenerator gen = new P12KeypairGenerator.RSAIdentityGenerator(
-    			keysize, BigInteger.valueOf(0x10001), password.toCharArray(), subject);
-    	
-    	P12KeypairGenerationResult keyAndCert = gen.generateIentity();
-    	
-    	File p12File = new File(keyOutFile);
-    	System.out.println("Saved PKCS#12 keystore in " + p12File.getPath());
-    	IoCertUtil.save(p12File, keyAndCert.getKeystore());
-    	if(certOutFile != null)
-    	{
-    		File certFile = new File(certOutFile);
-    		IoCertUtil.save(certFile, keyAndCert.getCertificate().getEncoded());
-    		System.out.println("Saved self-signed certificate in " + certFile.getPath());
-    	}
-    	
-    	return null;
+        if(keysize == null)
+        {
+            keysize = 2048;
+        }
+        else if(keysize % 1024 != 0)
+        {
+            System.err.println("Keysize is not multiple of 1024: " + keysize);
+            return null;
+        }
+
+        P12KeypairGenerator gen = new P12KeypairGenerator.RSAIdentityGenerator(
+                keysize, BigInteger.valueOf(0x10001), password.toCharArray(), subject);
+
+        P12KeypairGenerationResult keyAndCert = gen.generateIentity();
+
+        File p12File = new File(keyOutFile);
+        System.out.println("Saved PKCS#12 keystore in " + p12File.getPath());
+        IoCertUtil.save(p12File, keyAndCert.getKeystore());
+        if(certOutFile != null)
+        {
+            File certFile = new File(certOutFile);
+            IoCertUtil.save(certFile, keyAndCert.getCertificate().getEncoded());
+            System.out.println("Saved self-signed certificate in " + certFile.getPath());
+        }
+
+        return null;
     }
 
 }

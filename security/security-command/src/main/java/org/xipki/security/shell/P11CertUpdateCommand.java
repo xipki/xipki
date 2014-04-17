@@ -48,146 +48,146 @@ import org.xipki.security.p11.iaik.IaikP11ModulePool;
 @Command(scope = "keytool", name = "update-cert", description="Update certificate in PKCS#11 device")
 public class P11CertUpdateCommand extends OsgiCommandSupport {
 
-	@Option(name = "-slot",
-			required = true, description = "Required. Slot index")
+    @Option(name = "-slot",
+            required = true, description = "Required. Slot index")
     protected Integer           slotIndex;
-	
-	@Option(name = "-key-id",
-			required = false, description = "Id of the private key in the PKCS#11 token. Either keyId or keyLabel must be specified")
+
+    @Option(name = "-key-id",
+            required = false, description = "Id of the private key in the PKCS#11 token. Either keyId or keyLabel must be specified")
     protected String            keyId;
-	
-	@Option(name = "-key-label",
-			required = false, description = "Label of the private key in the PKCS#11 token. Either keyId or keyLabel must be specified")
+
+    @Option(name = "-key-label",
+            required = false, description = "Label of the private key in the PKCS#11 token. Either keyId or keyLabel must be specified")
     protected String            keyLabel;
-	
-	@Option(name = "-cert",
-			required = true, description = "Required. Certificate file")
+
+    @Option(name = "-cert",
+            required = true, description = "Required. Certificate file")
     protected String            certFile;
 
-	@Option(name = "-pwd", aliases = { "--password" },
-			required = false, description = "Password of the PKCS#11 device")
+    @Option(name = "-pwd", aliases = { "--password" },
+            required = false, description = "Password of the PKCS#11 device")
     protected char[]            password;
-	
-	private SecurityFactory securityFactory;
-	
-	public void setSecurityFactory(SecurityFactory securityFactory) {
-		this.securityFactory = securityFactory;
-	}
-	
-	@Override
+
+    private SecurityFactory securityFactory;
+
+    public void setSecurityFactory(SecurityFactory securityFactory) {
+        this.securityFactory = securityFactory;
+    }
+
+    @Override
     protected Object doExecute() throws Exception {
-    	Pkcs11KeyIdentifier keyIdentifier;
-    	if(keyId != null && keyLabel == null)
-    	{    		
-    		keyIdentifier = new Pkcs11KeyIdentifier(Hex.decode(keyId));
-    	}
-    	else if(keyId == null && keyLabel != null)
-    	{
-    		keyIdentifier = new Pkcs11KeyIdentifier(keyLabel);
-    	}
-    	else
-    	{
-    		throw new Exception("Exactly one of keyId or keyLabel should be specified");
-    	}    	
-    	
-		IaikExtendedModule module = IaikP11ModulePool.getInstance().getModule(
-				securityFactory.getPkcs11Module());
-		
-		IaikExtendedSlot slot = null;
-		try{
-			slot = module.getSlot(new PKCS11SlotIdentifier(slotIndex, null), password);
-		}catch(SignerException e)
-		{
-			System.err.println("ERROR:  " + e.getMessage());
-			return null;
-		}
-		
-		char[] keyLabelChars = (keyLabel == null) ?
-				null : keyLabel.toCharArray();
-		
-		PrivateKey privKey = slot.getPrivateObject(null, null, keyIdentifier.getKeyId(), keyLabelChars);
-		
-		if(privKey == null)
-		{
-			System.err.println("Could not find private key " + keyIdentifier);
-			return null;
-		}
-				
-		X509PublicKeyCertificate existingCert = slot.getCertificateObject(privKey.getId().getByteArrayValue(), null);
-		X509Certificate newCert = IoCertUtil.parseCert(certFile);
-		
-		assertMatch(newCert);
-		
-		Session session = slot.borrowWritableSession();
-		try{
-	        X509PublicKeyCertificate newCertTemp;
-	        
-			newCertTemp = new X509PublicKeyCertificate();
-	        newCertTemp.getId().setByteArrayValue(
-	        		privKey.getId().getByteArrayValue());
-	        newCertTemp.getLabel().setCharArrayValue(
-	        		privKey.getLabel().getCharArrayValue());
-	        newCertTemp.getToken().setBooleanValue(true);
-	        newCertTemp.getCertificateType().setLongValue(
-	        		CertificateType.X_509_PUBLIC_KEY);
+        Pkcs11KeyIdentifier keyIdentifier;
+        if(keyId != null && keyLabel == null)
+        {
+            keyIdentifier = new Pkcs11KeyIdentifier(Hex.decode(keyId));
+        }
+        else if(keyId == null && keyLabel != null)
+        {
+            keyIdentifier = new Pkcs11KeyIdentifier(keyLabel);
+        }
+        else
+        {
+            throw new Exception("Exactly one of keyId or keyLabel should be specified");
+        }
 
-			newCertTemp.getSubject().setByteArrayValue(
-	        		newCert.getSubjectX500Principal().getEncoded());
-	        newCertTemp.getIssuer().setByteArrayValue(
-	        		newCert.getIssuerX500Principal().getEncoded());
-	        newCertTemp.getSerialNumber().setByteArrayValue(
-	        		newCert.getSerialNumber().toByteArray());
-	        newCertTemp.getValue().setByteArrayValue(
-	        		newCert.getEncoded());
-			
-			if(existingCert != null)
-			{
-				session.destroyObject(existingCert);
-				Thread.sleep(1000);
-			}			
+        IaikExtendedModule module = IaikP11ModulePool.getInstance().getModule(
+                securityFactory.getPkcs11Module());
 
-			session.createObject(newCertTemp);
-		}finally
-		{
-			slot.returnWritableSession(session);
-		}		
-		
-		IaikP11CryptService.getInstance(securityFactory.getPkcs11Module(), password).refresh();
-		System.out.println("Updated certificate");
+        IaikExtendedSlot slot = null;
+        try{
+            slot = module.getSlot(new PKCS11SlotIdentifier(slotIndex, null), password);
+        }catch(SignerException e)
+        {
+            System.err.println("ERROR:  " + e.getMessage());
+            return null;
+        }
+
+        char[] keyLabelChars = (keyLabel == null) ?
+                null : keyLabel.toCharArray();
+
+        PrivateKey privKey = slot.getPrivateObject(null, null, keyIdentifier.getKeyId(), keyLabelChars);
+
+        if(privKey == null)
+        {
+            System.err.println("Could not find private key " + keyIdentifier);
+            return null;
+        }
+
+        X509PublicKeyCertificate existingCert = slot.getCertificateObject(privKey.getId().getByteArrayValue(), null);
+        X509Certificate newCert = IoCertUtil.parseCert(certFile);
+
+        assertMatch(newCert);
+
+        Session session = slot.borrowWritableSession();
+        try{
+            X509PublicKeyCertificate newCertTemp;
+
+            newCertTemp = new X509PublicKeyCertificate();
+            newCertTemp.getId().setByteArrayValue(
+                    privKey.getId().getByteArrayValue());
+            newCertTemp.getLabel().setCharArrayValue(
+                    privKey.getLabel().getCharArrayValue());
+            newCertTemp.getToken().setBooleanValue(true);
+            newCertTemp.getCertificateType().setLongValue(
+                    CertificateType.X_509_PUBLIC_KEY);
+
+            newCertTemp.getSubject().setByteArrayValue(
+                    newCert.getSubjectX500Principal().getEncoded());
+            newCertTemp.getIssuer().setByteArrayValue(
+                    newCert.getIssuerX500Principal().getEncoded());
+            newCertTemp.getSerialNumber().setByteArrayValue(
+                    newCert.getSerialNumber().toByteArray());
+            newCertTemp.getValue().setByteArrayValue(
+                    newCert.getEncoded());
+
+            if(existingCert != null)
+            {
+                session.destroyObject(existingCert);
+                Thread.sleep(1000);
+            }
+
+            session.createObject(newCertTemp);
+        }finally
+        {
+            slot.returnWritableSession(session);
+        }
+
+        IaikP11CryptService.getInstance(securityFactory.getPkcs11Module(), password).refresh();
+        System.out.println("Updated certificate");
         return null;
-    }    
-    
+    }
+
     private void assertMatch(X509Certificate cert) throws SignerException, PasswordResolverException
-    {    	
-    	CmpUtf8Pairs pairs = new CmpUtf8Pairs("slot", slotIndex.toString());
-    	if(password != null)
-    	{
-    		pairs.putUtf8Pair("password", new String(password));
-    	}
-    	if(keyId != null)
-    	{
-    		pairs.putUtf8Pair("key-id", keyId);
-    	}
-    	if(keyLabel != null)
-    	{
-    		pairs.putUtf8Pair("key-label", keyLabel);
-    	}
-    	
-    	PublicKey pubKey = cert.getPublicKey();
-    	if(pubKey instanceof RSAPublicKey)
-    	{
-    		pairs.putUtf8Pair("algo", "SHA1withRSA");
-    	}
-    	else if(pubKey instanceof ECPublicKey)
-    	{
-    		pairs.putUtf8Pair("algo", "SHA1withECDSA");
-    	}
-    	else
-    	{
-    		throw new SignerException("Unknown key type: " + pubKey.getClass().getName());
-    	}
-    	
-   		securityFactory.createSigner("PKCS11", pairs.getEncoded(), cert, NopPasswordResolver.INSTANCE);
+    {
+        CmpUtf8Pairs pairs = new CmpUtf8Pairs("slot", slotIndex.toString());
+        if(password != null)
+        {
+            pairs.putUtf8Pair("password", new String(password));
+        }
+        if(keyId != null)
+        {
+            pairs.putUtf8Pair("key-id", keyId);
+        }
+        if(keyLabel != null)
+        {
+            pairs.putUtf8Pair("key-label", keyLabel);
+        }
+
+        PublicKey pubKey = cert.getPublicKey();
+        if(pubKey instanceof RSAPublicKey)
+        {
+            pairs.putUtf8Pair("algo", "SHA1withRSA");
+        }
+        else if(pubKey instanceof ECPublicKey)
+        {
+            pairs.putUtf8Pair("algo", "SHA1withECDSA");
+        }
+        else
+        {
+            throw new SignerException("Unknown key type: " + pubKey.getClass().getName());
+        }
+
+           securityFactory.createSigner("PKCS11", pairs.getEncoded(), cert, NopPasswordResolver.INSTANCE);
     }
 
 }

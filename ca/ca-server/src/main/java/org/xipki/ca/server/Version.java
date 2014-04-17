@@ -17,15 +17,15 @@
 
 package org.xipki.ca.server;
 
-final public class Version 
+final public class Version
 {
     public static String PRODUCT_NAME = "XiPKI CA";
 
     public static void main(String []argv)
     {
-    	System.out.println(getVersion());
+        System.out.println(getVersion());
     }
-    
+
     /**
      * @return the Maven Version, SVN Revision and Build timestamp as a human-readable String.
      */

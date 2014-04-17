@@ -28,59 +28,59 @@ import org.xipki.security.common.ConfigurationException;
 
 @Command(scope = "ca", name = "careq-add", description="Add requestor to CA")
 public class CaRequestorAddCommand extends CaCommand {
-	@Option(name = "-ca",
+    @Option(name = "-ca",
             description = "Required. CA name",
             required = true)
     protected String           caName;
 
-	@Option(name = "-requestor",
-			required = true, description = "Required. Requestor name")
+    @Option(name = "-requestor",
+            required = true, description = "Required. Requestor name")
     protected String            requestorName;
-	
-	@Option(name = "-era",
-			description = "Requestor as RA, the default is not as RA")
+
+    @Option(name = "-era",
+            description = "Requestor as RA, the default is not as RA")
     protected Boolean            era;
 
-	@Option(name = "-dra",
-			description = "Requestor not as RA")
+    @Option(name = "-dra",
+            description = "Requestor not as RA")
     protected Boolean            dra;
 
-	@Option(name = "-permission",
-			description = "Required. Permission, multi options is allowed. allowed values are " + permissionsText, 
-			required = true, multiValued = true)
-	protected Set<String> permissions;	
+    @Option(name = "-permission",
+            description = "Required. Permission, multi options is allowed. allowed values are " + permissionsText,
+            required = true, multiValued = true)
+    protected Set<String> permissions;
 
-	@Option(name = "-profile",
-			description = "Required. Profile name or 'all' for all profiles, multi options is allowed", 
-			required = true, multiValued = true)
-	protected Set<String> profiles;	
+    @Option(name = "-profile",
+            description = "Required. Profile name or 'all' for all profiles, multi options is allowed",
+            required = true, multiValued = true)
+    protected Set<String> profiles;
 
     @Override
     protected Object doExecute() throws Exception {
-    	if(era != null && dra != null )
-    	{
-    		System.err.println("RA mode could not be enabled and disabled at the same time");
-    	}
-    	
-    	boolean ra = isEnabled(era, dra, false);
-    	
-    	CAHasRequestorEntry entry = new CAHasRequestorEntry(requestorName);
-    	entry.setRa(ra);
-    	entry.setProfiles(profiles);
-    	Set<Permission> _permissions = new HashSet<Permission>();
-    	for(String permission : permissions)
-    	{
-    		Permission _permission = Permission.getPermission(permission);
-    		if(_permission == null)
-    		{
-    			throw new ConfigurationException("Invalid permission: " + permission);
-    		}
-    		_permissions.add(_permission);
-    	}
-    	entry.setPermissions(_permissions);
-    	
-    	caManager.addCmpRequestorToCA(entry, caName);
-    	
-    	return null;
+        if(era != null && dra != null )
+        {
+            System.err.println("RA mode could not be enabled and disabled at the same time");
+        }
+
+        boolean ra = isEnabled(era, dra, false);
+
+        CAHasRequestorEntry entry = new CAHasRequestorEntry(requestorName);
+        entry.setRa(ra);
+        entry.setProfiles(profiles);
+        Set<Permission> _permissions = new HashSet<Permission>();
+        for(String permission : permissions)
+        {
+            Permission _permission = Permission.getPermission(permission);
+            if(_permission == null)
+            {
+                throw new ConfigurationException("Invalid permission: " + permission);
+            }
+            _permissions.add(_permission);
+        }
+        entry.setPermissions(_permissions);
+
+        caManager.addCmpRequestorToCA(entry, caName);
+
+        return null;
     }
 }

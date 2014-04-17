@@ -35,111 +35,111 @@ import org.xipki.ca.api.profile.SubjectInfo;
 import org.xipki.security.common.EnvironmentParameterResolver;
 
 /**
- * This profile will be used if the requestor is registered as RA. It will be accepted by all 
- * CAs without explicit configuration. It accepts all from the request except the 
+ * This profile will be used if the requestor is registered as RA. It will be accepted by all
+ * CAs without explicit configuration. It accepts all from the request except the
  * extensions AuthorityKeyIdentifier, SubjectKeyIdentifier, CRLDistributionPoint and AuthorityInfoAccess.
  *
  */
 public class DefaultRACertProfile implements CertProfile
 {
-	private static final Set<ASN1ObjectIdentifier> extensionsProcessedByCA = new HashSet<ASN1ObjectIdentifier>();
-	static
-	{
-		extensionsProcessedByCA.add(org.bouncycastle.asn1.x509.Extension.subjectKeyIdentifier);
-		extensionsProcessedByCA.add(org.bouncycastle.asn1.x509.Extension.authorityKeyIdentifier);
-		extensionsProcessedByCA.add(org.bouncycastle.asn1.x509.Extension.authorityInfoAccess);
-		extensionsProcessedByCA.add(org.bouncycastle.asn1.x509.Extension.cRLDistributionPoints);
-	}
-	
-	public DefaultRACertProfile() {
-	}
+    private static final Set<ASN1ObjectIdentifier> extensionsProcessedByCA = new HashSet<ASN1ObjectIdentifier>();
+    static
+    {
+        extensionsProcessedByCA.add(org.bouncycastle.asn1.x509.Extension.subjectKeyIdentifier);
+        extensionsProcessedByCA.add(org.bouncycastle.asn1.x509.Extension.authorityKeyIdentifier);
+        extensionsProcessedByCA.add(org.bouncycastle.asn1.x509.Extension.authorityInfoAccess);
+        extensionsProcessedByCA.add(org.bouncycastle.asn1.x509.Extension.cRLDistributionPoints);
+    }
 
-	@Override
-	public void initialize(String data) throws CertProfileException {
-	}
+    public DefaultRACertProfile() {
+    }
 
-	@Override
-	public void setEnvironmentParamterResolver(
-			EnvironmentParameterResolver paramterResolver) 
-	{
-	}
+    @Override
+    public void initialize(String data) throws CertProfileException {
+    }
 
-	@Override
-	public Date getNotBefore(Date notBefore){
-		return notBefore;
-	}
+    @Override
+    public void setEnvironmentParamterResolver(
+            EnvironmentParameterResolver paramterResolver)
+    {
+    }
 
-	@Override
-	public Integer getValidity() {
-		return null;
-	}
+    @Override
+    public Date getNotBefore(Date notBefore){
+        return notBefore;
+    }
 
-	@Override
-	public SubjectInfo getSubject(X500Name requestedSubject)
-			throws CertProfileException, BadCertTemplateException 
-	{
-		return new SubjectInfo(requestedSubject, (String) null);
-	}
+    @Override
+    public Integer getValidity() {
+        return null;
+    }
 
-	@Override
-	public ExtensionTuples getExtensions(X500Name requestedSubject,
-			Extensions requestedExtensions) 
-	throws CertProfileException, BadCertTemplateException 
-	{
-		ExtensionTuples tuples = new ExtensionTuples();
-		if(requestedExtensions != null)
-		{
-			ASN1ObjectIdentifier[] types = requestedExtensions.getExtensionOIDs();
-			for(ASN1ObjectIdentifier type : types)
-			{
-				if(extensionsProcessedByCA.contains(type))
-				{
-					continue;
-				}
-				
-				org.bouncycastle.asn1.x509.Extension extension = requestedExtensions.getExtension(type);
-				
-				ExtensionTuple extensionTuple = new ExtensionTuple(type, extension.isCritical(), extension.getParsedValue());
-				tuples.addExtension(extensionTuple);
-			}
-		}
-		
-		return tuples;
-	}
+    @Override
+    public SubjectInfo getSubject(X500Name requestedSubject)
+            throws CertProfileException, BadCertTemplateException
+    {
+        return new SubjectInfo(requestedSubject, (String) null);
+    }
 
-	@Override
-	public boolean isOnlyForRA() {
-		return true;
-	}
+    @Override
+    public ExtensionTuples getExtensions(X500Name requestedSubject,
+            Extensions requestedExtensions)
+    throws CertProfileException, BadCertTemplateException
+    {
+        ExtensionTuples tuples = new ExtensionTuples();
+        if(requestedExtensions != null)
+        {
+            ASN1ObjectIdentifier[] types = requestedExtensions.getExtensionOIDs();
+            for(ASN1ObjectIdentifier type : types)
+            {
+                if(extensionsProcessedByCA.contains(type))
+                {
+                    continue;
+                }
 
-	@Override
-	public ExtensionOccurrence getOccurenceOfAuthorityKeyIdentifier() {
-		return ExtensionOccurrence.NONCRITICAL_OPTIONAL;
-	}
+                org.bouncycastle.asn1.x509.Extension extension = requestedExtensions.getExtension(type);
 
-	@Override
-	public ExtensionOccurrence getOccurenceOfSubjectKeyIdentifier() {
-		return ExtensionOccurrence.NONCRITICAL_REQUIRED;
-	}
+                ExtensionTuple extensionTuple = new ExtensionTuple(type, extension.isCritical(), extension.getParsedValue());
+                tuples.addExtension(extensionTuple);
+            }
+        }
 
-	@Override
-	public ExtensionOccurrence getOccurenceOfCRLDistributinPoints() {
-		return ExtensionOccurrence.NONCRITICAL_OPTIONAL;
-	}
+        return tuples;
+    }
 
-	@Override
-	public ExtensionOccurrence getOccurenceOfAuthorityInfoAccess() {
-		return ExtensionOccurrence.NONCRITICAL_OPTIONAL;
-	}
+    @Override
+    public boolean isOnlyForRA() {
+        return true;
+    }
 
-	@Override
-	public void checkPublicKey(SubjectPublicKeyInfo publicKey)
-			throws BadCertTemplateException
-	{		
-	}
+    @Override
+    public ExtensionOccurrence getOccurenceOfAuthorityKeyIdentifier() {
+        return ExtensionOccurrence.NONCRITICAL_OPTIONAL;
+    }
 
-	@Override
-	public boolean incSerialNumberIfSubjectExists() {
-		return false;
-	}
+    @Override
+    public ExtensionOccurrence getOccurenceOfSubjectKeyIdentifier() {
+        return ExtensionOccurrence.NONCRITICAL_REQUIRED;
+    }
+
+    @Override
+    public ExtensionOccurrence getOccurenceOfCRLDistributinPoints() {
+        return ExtensionOccurrence.NONCRITICAL_OPTIONAL;
+    }
+
+    @Override
+    public ExtensionOccurrence getOccurenceOfAuthorityInfoAccess() {
+        return ExtensionOccurrence.NONCRITICAL_OPTIONAL;
+    }
+
+    @Override
+    public void checkPublicKey(SubjectPublicKeyInfo publicKey)
+            throws BadCertTemplateException
+    {
+    }
+
+    @Override
+    public boolean incSerialNumberIfSubjectExists() {
+        return false;
+    }
 }

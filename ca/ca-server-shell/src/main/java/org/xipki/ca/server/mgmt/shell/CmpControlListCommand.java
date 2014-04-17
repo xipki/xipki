@@ -24,8 +24,8 @@ import org.xipki.ca.cmp.server.CmpControl;
 public class CmpControlListCommand extends CaCommand {
     @Override
     protected Object doExecute() throws Exception {
-		CmpControl cmpcontrol = caManager.getCmpControl();
-		System.out.println(cmpcontrol);
+        CmpControl cmpcontrol = caManager.getCmpControl();
+        System.out.println(cmpcontrol);
         return null;
     }
 }

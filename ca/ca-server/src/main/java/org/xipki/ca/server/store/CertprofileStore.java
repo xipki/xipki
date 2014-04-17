@@ -23,65 +23,65 @@ import java.util.Map;
 import org.xipki.security.common.ParamChecker;
 
 class CertprofileStore {
-	private final Map<String, Integer> entries;
-	private int nextFreeId;
-	
-	CertprofileStore(Map<String, Integer> entries)
-	{
-		this.entries = new HashMap<String, Integer>();
-		
-		for(String name : entries.keySet()) {
-			addProfileEntry(name, entries.get(name));
-		}
-		
-		if(nextFreeId < 1)
-		{
-			nextFreeId = 1;
-		}
-	}
-	
-	synchronized void addProfileEntry(String name, Integer id)
-	{
-		ParamChecker.assertNotEmpty("name", name);
-		ParamChecker.assertNotNull("id", id);
-		
-		if(entries.containsKey(name))
-		{
-			throw new IllegalArgumentException("certprofile with the same name " + name + " already available");
-		}
-		
-		if(entries.containsValue(id))
-		{
-			throw new IllegalArgumentException("certprofile with the same id " + id + " already available");
-		}
-		
-		if(nextFreeId <= id) {
-			nextFreeId = id + 1;
-		}
-		
-		entries.put(name, id);
-	}
-	
-	synchronized String getName(Integer id)
-	{
-		for(String name : entries.keySet())
-		{
-			if(id == entries.get(name))
-			{
-				return name;
-			}
-		}
-		
-		return null;
-	}
-	
-	synchronized Integer getId(String name)
-	{
-		return entries.get(name);
-	}
+    private final Map<String, Integer> entries;
+    private int nextFreeId;
 
-	synchronized int getNextFreeId(){
-		return nextFreeId++;
-	}
+    CertprofileStore(Map<String, Integer> entries)
+    {
+        this.entries = new HashMap<String, Integer>();
+
+        for(String name : entries.keySet()) {
+            addProfileEntry(name, entries.get(name));
+        }
+
+        if(nextFreeId < 1)
+        {
+            nextFreeId = 1;
+        }
+    }
+
+    synchronized void addProfileEntry(String name, Integer id)
+    {
+        ParamChecker.assertNotEmpty("name", name);
+        ParamChecker.assertNotNull("id", id);
+
+        if(entries.containsKey(name))
+        {
+            throw new IllegalArgumentException("certprofile with the same name " + name + " already available");
+        }
+
+        if(entries.containsValue(id))
+        {
+            throw new IllegalArgumentException("certprofile with the same id " + id + " already available");
+        }
+
+        if(nextFreeId <= id) {
+            nextFreeId = id + 1;
+        }
+
+        entries.put(name, id);
+    }
+
+    synchronized String getName(Integer id)
+    {
+        for(String name : entries.keySet())
+        {
+            if(id == entries.get(name))
+            {
+                return name;
+            }
+        }
+
+        return null;
+    }
+
+    synchronized Integer getId(String name)
+    {
+        return entries.get(name);
+    }
+
+    synchronized int getNextFreeId(){
+        return nextFreeId++;
+    }
 
 }

@@ -19,22 +19,22 @@ package org.xipki.ca.cmp.client;
 
 public class CmpRequestorException extends Exception
 {
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	public CmpRequestorException() {
-		super();
-	}
+    public CmpRequestorException() {
+        super();
+    }
 
-	public CmpRequestorException(String message, Throwable cause) {
-		super(message, cause);
-	}
+    public CmpRequestorException(String message, Throwable cause) {
+        super(message, cause);
+    }
 
-	public CmpRequestorException(String message) {
-		super(message);
-	}
+    public CmpRequestorException(String message) {
+        super(message);
+    }
 
-	public CmpRequestorException(Throwable cause) {
-		super(cause);
-	}
-	
+    public CmpRequestorException(Throwable cause) {
+        super(cause);
+    }
+
 }

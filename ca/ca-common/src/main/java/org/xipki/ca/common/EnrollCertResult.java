@@ -23,27 +23,27 @@ import java.util.Set;
 
 public class EnrollCertResult {
 
-	private final Certificate caCertificate;
-	private final Map<String, CertificateOrError> certificatesOrErrors;
-	
-	public EnrollCertResult(Certificate caCertificate,
-			Map<String, CertificateOrError> certificatesOrErrors)
-	{
-		this.caCertificate = caCertificate;
-		this.certificatesOrErrors = certificatesOrErrors;
-	}
+    private final Certificate caCertificate;
+    private final Map<String, CertificateOrError> certificatesOrErrors;
 
-	public Certificate getCaCertificate() {
-		return caCertificate;
-	}
+    public EnrollCertResult(Certificate caCertificate,
+            Map<String, CertificateOrError> certificatesOrErrors)
+    {
+        this.caCertificate = caCertificate;
+        this.certificatesOrErrors = certificatesOrErrors;
+    }
 
-	public CertificateOrError getCertificateOrError(String id) {
-		return certificatesOrErrors.get(id);
-	}
-	
-	public Set<String> getAllIds()
-	{
-		return certificatesOrErrors.keySet();
-	}
+    public Certificate getCaCertificate() {
+        return caCertificate;
+    }
+
+    public CertificateOrError getCertificateOrError(String id) {
+        return certificatesOrErrors.get(id);
+    }
+
+    public Set<String> getAllIds()
+    {
+        return certificatesOrErrors.keySet();
+    }
 
 }

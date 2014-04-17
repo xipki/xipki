@@ -20,14 +20,14 @@ package lca.ca.profile.extension;
 import java.util.Set;
 
 public class KeyUsageExtension extends ExtensionConf {
-	private Set<KeyUsage> keyUsages;	
-	
-	public Set<KeyUsage> getKeyUsages() {
-		return keyUsages;
-	}
+    private Set<KeyUsage> keyUsages;
 
-	public void setKeyUsages(Set<KeyUsage> keyUsages) {
-		this.keyUsages = keyUsages;
-	}
+    public Set<KeyUsage> getKeyUsages() {
+        return keyUsages;
+    }
+
+    public void setKeyUsages(Set<KeyUsage> keyUsages) {
+        this.keyUsages = keyUsages;
+    }
 
 }

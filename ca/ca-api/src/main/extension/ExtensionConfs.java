@@ -21,87 +21,87 @@ import java.util.List;
 
 public class ExtensionConfs {
 
-	private boolean useSubjectKeyIdentifier = false;
-	
-	public void setUseSubjectKeyIdentifier(boolean useSubjectKeyIdentifier)
-	{
-		this.useSubjectKeyIdentifier = useSubjectKeyIdentifier;
-	}	
+    private boolean useSubjectKeyIdentifier = false;
 
-	public boolean isUseSubjectKeyIdentifier() {
-		return useSubjectKeyIdentifier;
-	}
-	
-	private boolean useAuthorityKeyIdentifier = false;
+    public void setUseSubjectKeyIdentifier(boolean useSubjectKeyIdentifier)
+    {
+        this.useSubjectKeyIdentifier = useSubjectKeyIdentifier;
+    }
 
-	public void setUseAuthorityKeyIdentifier(boolean useAuthorityKeyIdentifier) {
-		this.useAuthorityKeyIdentifier = useAuthorityKeyIdentifier;
-	}
-	
-	public boolean isUseAuthorityKeyIdentifier() {
-		return useAuthorityKeyIdentifier;
-	}
+    public boolean isUseSubjectKeyIdentifier() {
+        return useSubjectKeyIdentifier;
+    }
 
-	private KeyUsageExtension keyUsage;
+    private boolean useAuthorityKeyIdentifier = false;
 
-	public void setKeyUsage(KeyUsageExtension keyUsage) {
-		this.keyUsage = keyUsage;
-	}
+    public void setUseAuthorityKeyIdentifier(boolean useAuthorityKeyIdentifier) {
+        this.useAuthorityKeyIdentifier = useAuthorityKeyIdentifier;
+    }
 
-	public KeyUsageExtension getKeyUsage() {
-		return keyUsage;
-	}
+    public boolean isUseAuthorityKeyIdentifier() {
+        return useAuthorityKeyIdentifier;
+    }
 
-	private ExtendedKeyUsageExtension extendedKeyUsage;
-	
-	public void setExtendedKeyUsage(ExtendedKeyUsageExtension extendedKeyUsage) {
-		this.extendedKeyUsage = extendedKeyUsage;
-	}
+    private KeyUsageExtension keyUsage;
 
-	public ExtendedKeyUsageExtension getExtendedKeyUsage() {
-		return extendedKeyUsage;
-	}
+    public void setKeyUsage(KeyUsageExtension keyUsage) {
+        this.keyUsage = keyUsage;
+    }
 
-	private AuthorityInformationAccessExtension authorityInformationAccess;
-	
-	public void setAuthorityInformationAccess(AuthorityInformationAccessExtension authorityInformationAccess) {
-		this.authorityInformationAccess = authorityInformationAccess;
-	}
+    public KeyUsageExtension getKeyUsage() {
+        return keyUsage;
+    }
 
-	public AuthorityInformationAccessExtension getAuthorityInformationAccess() {
-		return authorityInformationAccess;
-	}
+    private ExtendedKeyUsageExtension extendedKeyUsage;
 
-	private BasicConstraintsExtension basicConstraints;
-	
-	public void setBasicConstraints(BasicConstraintsExtension basicConstraints) {
-		this.basicConstraints = basicConstraints;
-	}
-	
-	public BasicConstraintsExtension getBasicConstraints() {
-		return basicConstraints;
-	}
+    public void setExtendedKeyUsage(ExtendedKeyUsageExtension extendedKeyUsage) {
+        this.extendedKeyUsage = extendedKeyUsage;
+    }
 
-	private CertificatePoliciesExtension certificatePolicies;
-	
-	public void setCertificatePolicies(CertificatePoliciesExtension certificatePolicies) {
-		this.certificatePolicies = certificatePolicies;
-	}
+    public ExtendedKeyUsageExtension getExtendedKeyUsage() {
+        return extendedKeyUsage;
+    }
 
-	public CertificatePoliciesExtension getCertificatePolicies() {
-		return certificatePolicies;
-	}
-	
-	private List<ConstantExtension> constantExtensions;
-	
-	public void setConstantExtensions(List<ConstantExtension> constantExtensions)
-	{
-		this.constantExtensions = constantExtensions;
-	}
-	
-	public List<ConstantExtension> getConstantExtensions()
-	{
-		return constantExtensions;
-	}
+    private AuthorityInformationAccessExtension authorityInformationAccess;
+
+    public void setAuthorityInformationAccess(AuthorityInformationAccessExtension authorityInformationAccess) {
+        this.authorityInformationAccess = authorityInformationAccess;
+    }
+
+    public AuthorityInformationAccessExtension getAuthorityInformationAccess() {
+        return authorityInformationAccess;
+    }
+
+    private BasicConstraintsExtension basicConstraints;
+
+    public void setBasicConstraints(BasicConstraintsExtension basicConstraints) {
+        this.basicConstraints = basicConstraints;
+    }
+
+    public BasicConstraintsExtension getBasicConstraints() {
+        return basicConstraints;
+    }
+
+    private CertificatePoliciesExtension certificatePolicies;
+
+    public void setCertificatePolicies(CertificatePoliciesExtension certificatePolicies) {
+        this.certificatePolicies = certificatePolicies;
+    }
+
+    public CertificatePoliciesExtension getCertificatePolicies() {
+        return certificatePolicies;
+    }
+
+    private List<ConstantExtension> constantExtensions;
+
+    public void setConstantExtensions(List<ConstantExtension> constantExtensions)
+    {
+        this.constantExtensions = constantExtensions;
+    }
+
+    public List<ConstantExtension> getConstantExtensions()
+    {
+        return constantExtensions;
+    }
 
 }

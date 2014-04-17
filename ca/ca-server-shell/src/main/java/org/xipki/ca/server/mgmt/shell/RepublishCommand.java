@@ -24,31 +24,31 @@ import org.apache.felix.gogo.commands.Option;
 
 @Command(scope = "ca", name = "republish", description="Republish certificates")
 public class RepublishCommand extends CaCommand {
-	@Option(name = "-ca",
+    @Option(name = "-ca",
             description = "Required. CA name",
             required = true)
     protected String           caName;
 
-	@Option(name = "-publisher",
-		required = true, multiValued = true, description = "Required. Publisher name. Multivalued")
-	protected List<String>     publisherNames;
+    @Option(name = "-publisher",
+        required = true, multiValued = true, description = "Required. Publisher name. Multivalued")
+    protected List<String>     publisherNames;
 
     @Override
     protected Object doExecute() throws Exception {
-    	for(String publisherName : publisherNames)
-    	{
-    		boolean successfull = caManager.republishCertificates(caName, publisherName);
-    		if(successfull)
-    		{
-    			System.out.println("CA '" + caName + 
-    					"' has published certificates to publisher '" + publisherName + "'");
-    		}
-    		else
-    		{
-    			System.err.println("CA '" + caName + 
-    					"' could not publish all certificates to publisher '" + publisherName + "'");
-    		}
-    	}
-    	return null;
+        for(String publisherName : publisherNames)
+        {
+            boolean successfull = caManager.republishCertificates(caName, publisherName);
+            if(successfull)
+            {
+                System.out.println("CA '" + caName +
+                        "' has published certificates to publisher '" + publisherName + "'");
+            }
+            else
+            {
+                System.err.println("CA '" + caName +
+                        "' could not publish all certificates to publisher '" + publisherName + "'");
+            }
+        }
+        return null;
     }
 }

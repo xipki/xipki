@@ -23,24 +23,24 @@ import org.xipki.security.common.ParamChecker;
 
 public class CertBasedRequestorInfo implements RequestorInfo
 {
-	private final X509CertificateWithMetaInfo certificate;
-	private final boolean ra;
-	
-	public CertBasedRequestorInfo(X509CertificateWithMetaInfo certificate, boolean ra) {
-		ParamChecker.assertNotNull("certificate", certificate);
-		
-		this.certificate = certificate;
-		this.ra = ra;
-	}
-	
-	public X509CertificateWithMetaInfo getCertificate()
-	{
-		return certificate;
-	}
+    private final X509CertificateWithMetaInfo certificate;
+    private final boolean ra;
 
-	@Override
-	public boolean isRA() {
-		return ra;
-	}
-	
+    public CertBasedRequestorInfo(X509CertificateWithMetaInfo certificate, boolean ra) {
+        ParamChecker.assertNotNull("certificate", certificate);
+
+        this.certificate = certificate;
+        this.ra = ra;
+    }
+
+    public X509CertificateWithMetaInfo getCertificate()
+    {
+        return certificate;
+    }
+
+    @Override
+    public boolean isRA() {
+        return ra;
+    }
+
 }

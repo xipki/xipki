@@ -30,55 +30,55 @@ import org.xipki.security.p10.P12KeypairGenerator.ECDSAIdentityGenerator;
 
 @Command(scope = "keytool", name = "ec-p12", description="Generate EC keypair in PKCS#12 keystore")
 public class P12ECKeyGenCommand extends OsgiCommandSupport {
-	@Option(name = "-curve",
-			description = "Required. EC Curve name or OID",
-			required = true)
+    @Option(name = "-curve",
+            description = "Required. EC Curve name or OID",
+            required = true)
     protected String            curveName;
-	
-	@Option(name = "-subject",
-			required = true, description = "Required. Subject in the self-signed certificate")
+
+    @Option(name = "-subject",
+            required = true, description = "Required. Subject in the self-signed certificate")
     protected String            subject;
-	
-	@Option(name = "-pwd", aliases = { "--password" },
-			required = true, description = "Required. Password of the PKCS#12 file")
+
+    @Option(name = "-pwd", aliases = { "--password" },
+            required = true, description = "Required. Password of the PKCS#12 file")
     protected String            password;
-	
-	@Option(name = "-out",
-			required = true, description = "Required. Where to saven the key")
+
+    @Option(name = "-out",
+            required = true, description = "Required. Where to saven the key")
     protected String            keyOutFile;
 
-	@Option(name = "-certout",
-			required = false, description = "Where to saven the self-signed certificate")
+    @Option(name = "-certout",
+            required = false, description = "Where to saven the self-signed certificate")
     protected String            certOutFile;
-	
-	private SecurityFactory securityFactory;
-	
-	public SecurityFactory getSecurityFactory() {
-		return securityFactory;
-	}
 
-	public void setSecurityFactory(SecurityFactory securityFactory) {
-		this.securityFactory = securityFactory;
-	}
-	
+    private SecurityFactory securityFactory;
+
+    public SecurityFactory getSecurityFactory() {
+        return securityFactory;
+    }
+
+    public void setSecurityFactory(SecurityFactory securityFactory) {
+        this.securityFactory = securityFactory;
+    }
+
     @Override
     protected Object doExecute() throws Exception {
-    	ECDSAIdentityGenerator gen = new P12KeypairGenerator.ECDSAIdentityGenerator(
-    			curveName, password.toCharArray(), subject);
-    	
-    	P12KeypairGenerationResult keyAndCert = gen.generateIentity();
-    	
-    	File p12File = new File(keyOutFile);
-    	System.out.println("Saved PKCS#12 keystore in " + p12File.getPath());
-    	IoCertUtil.save(p12File, keyAndCert.getKeystore());
-    	if(certOutFile != null)
-    	{
-    		File certFile = new File(certOutFile);
-    		IoCertUtil.save(certFile, keyAndCert.getCertificate().getEncoded());
-    		System.out.println("Saved self-signed certificate in " + certFile.getPath());
-    	}
+        ECDSAIdentityGenerator gen = new P12KeypairGenerator.ECDSAIdentityGenerator(
+                curveName, password.toCharArray(), subject);
 
-    	return null;
+        P12KeypairGenerationResult keyAndCert = gen.generateIentity();
+
+        File p12File = new File(keyOutFile);
+        System.out.println("Saved PKCS#12 keystore in " + p12File.getPath());
+        IoCertUtil.save(p12File, keyAndCert.getKeystore());
+        if(certOutFile != null)
+        {
+            File certFile = new File(certOutFile);
+            IoCertUtil.save(certFile, keyAndCert.getCertificate().getEncoded());
+            System.out.println("Saved self-signed certificate in " + certFile.getPath());
+        }
+
+        return null;
     }
 
 }

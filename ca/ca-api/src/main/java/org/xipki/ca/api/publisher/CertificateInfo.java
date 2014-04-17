@@ -26,114 +26,114 @@ import org.xipki.security.common.ParamChecker;
 
 public class CertificateInfo
 {
-	private final byte[] subjectPublicKey;
-	private final X509CertificateWithMetaInfo cert;
-	private final X509CertificateWithMetaInfo issuerCert;
-	private final String profileName;
-	
-	private RequestorInfo requestor;
-	private String user;
-	
-	private String warningMessage;
-	
-	private boolean revocated;
-	private Integer revocationReason;
-	private Date revocationTime;
-	private Date invalidityTime;
-	
-	public CertificateInfo(X509CertificateWithMetaInfo cert, 
-			X509CertificateWithMetaInfo issuerCert,
-			byte[] subjectPublicKey,
-			String profileName)
-		throws CertificateEncodingException
-	{
-		super();
-		ParamChecker.assertNotNull("cert", cert);
-		ParamChecker.assertNotNull("issuerCert", issuerCert);
-		ParamChecker.assertNotEmpty("profileName", profileName);
-		ParamChecker.assertNotNull("subjectPublicKey", subjectPublicKey);
-		
-		this.cert = cert;
-		this.subjectPublicKey = subjectPublicKey;
-		
-		this.issuerCert = issuerCert;
-		this.profileName = profileName;
-	}
+    private final byte[] subjectPublicKey;
+    private final X509CertificateWithMetaInfo cert;
+    private final X509CertificateWithMetaInfo issuerCert;
+    private final String profileName;
 
-	public byte[] getSubjectPublicKey()
-	{
-		return subjectPublicKey;
-	}
-	
-	public X509CertificateWithMetaInfo getCert() 
-	{
-		return cert;
-	}
+    private RequestorInfo requestor;
+    private String user;
 
-	public X509CertificateWithMetaInfo getIssuerCert() 
-	{
-		return issuerCert;
-	}
+    private String warningMessage;
 
-	public String getProfileName() 
-	{
-		return profileName;
-	}
+    private boolean revocated;
+    private Integer revocationReason;
+    private Date revocationTime;
+    private Date invalidityTime;
 
-	public String getWarningMessage() {
-		return warningMessage;
-	}
+    public CertificateInfo(X509CertificateWithMetaInfo cert,
+            X509CertificateWithMetaInfo issuerCert,
+            byte[] subjectPublicKey,
+            String profileName)
+        throws CertificateEncodingException
+    {
+        super();
+        ParamChecker.assertNotNull("cert", cert);
+        ParamChecker.assertNotNull("issuerCert", issuerCert);
+        ParamChecker.assertNotEmpty("profileName", profileName);
+        ParamChecker.assertNotNull("subjectPublicKey", subjectPublicKey);
 
-	public void setWarningMessage(String warningMessage) {
-		this.warningMessage = warningMessage;
-	}
+        this.cert = cert;
+        this.subjectPublicKey = subjectPublicKey;
 
-	public RequestorInfo getRequestor() {
-		return requestor;
-	}
+        this.issuerCert = issuerCert;
+        this.profileName = profileName;
+    }
 
-	public void setRequestor(RequestorInfo requestor) {
-		this.requestor = requestor;
-	}
+    public byte[] getSubjectPublicKey()
+    {
+        return subjectPublicKey;
+    }
 
-	public String getUser() {
-		return user;
-	}
+    public X509CertificateWithMetaInfo getCert()
+    {
+        return cert;
+    }
 
-	public void setUser(String user) {
-		this.user = user;
-	}
+    public X509CertificateWithMetaInfo getIssuerCert()
+    {
+        return issuerCert;
+    }
 
-	public boolean isRevocated() {
-		return revocated;
-	}
+    public String getProfileName()
+    {
+        return profileName;
+    }
 
-	public void setRevocated(boolean revocated) {
-		this.revocated = revocated;
-	}
+    public String getWarningMessage() {
+        return warningMessage;
+    }
 
-	public Integer getRevocationReason() {
-		return revocationReason;
-	}
+    public void setWarningMessage(String warningMessage) {
+        this.warningMessage = warningMessage;
+    }
 
-	public void setRevocationReason(Integer revocationReason) {
-		this.revocationReason = revocationReason;
-	}
+    public RequestorInfo getRequestor() {
+        return requestor;
+    }
 
-	public Date getRevocationTime() {
-		return revocationTime;
-	}
+    public void setRequestor(RequestorInfo requestor) {
+        this.requestor = requestor;
+    }
 
-	public void setRevocationTime(Date revocationTime) {
-		this.revocationTime = revocationTime;
-	}
+    public String getUser() {
+        return user;
+    }
 
-	public Date getInvalidityTime() {
-		return invalidityTime;
-	}
+    public void setUser(String user) {
+        this.user = user;
+    }
 
-	public void setInvalidityTime(Date invalidityTime) {
-		this.invalidityTime = invalidityTime;
-	}
-	
+    public boolean isRevocated() {
+        return revocated;
+    }
+
+    public void setRevocated(boolean revocated) {
+        this.revocated = revocated;
+    }
+
+    public Integer getRevocationReason() {
+        return revocationReason;
+    }
+
+    public void setRevocationReason(Integer revocationReason) {
+        this.revocationReason = revocationReason;
+    }
+
+    public Date getRevocationTime() {
+        return revocationTime;
+    }
+
+    public void setRevocationTime(Date revocationTime) {
+        this.revocationTime = revocationTime;
+    }
+
+    public Date getInvalidityTime() {
+        return invalidityTime;
+    }
+
+    public void setInvalidityTime(Date invalidityTime) {
+        this.invalidityTime = invalidityTime;
+    }
+
 }

@@ -37,130 +37,130 @@ import org.xipki.ca.server.mgmt.CAManager;
 
 public class Rfc6712Servlet extends HttpServlet
 {
-	private static final Logger LOG = LoggerFactory.getLogger(Rfc6712Servlet.class);
-	
-	private static final long serialVersionUID = 1L;
-	
-	private static final String CT_REQUEST  = "application/pkixcmp";
-	private static final String CT_RESPONSE = "application/pkixcmp";
-	
-	private CAManager caManager;	
-	
-	public Rfc6712Servlet()
-	{
-	}
-	
-	@Override
-	public void doPost(HttpServletRequest request, HttpServletResponse response)
-			throws ServletException, IOException
-	{
-		try{
-			if(caManager == null)
-			{
-				LOG.error("caManager in servlet not configured");			
-				response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-				response.setContentLength(0);
-				return;
-			}		
+    private static final Logger LOG = LoggerFactory.getLogger(Rfc6712Servlet.class);
 
-			if (! CT_REQUEST.equalsIgnoreCase(request.getContentType()))
-			{
-				response.setContentLength(0);
-				response.setStatus(HttpServletResponse.SC_UNSUPPORTED_MEDIA_TYPE);
-				response.flushBuffer();
-				return;
-			}
+    private static final long serialVersionUID = 1L;
 
-			String encodedUrl = request.getRequestURI();
-			String constructedPath = null;
-			if (encodedUrl != null)
-			{
-				constructedPath = URLDecoder.decode(encodedUrl, "UTF-8");
-				String servletPath = request.getServletPath();
-				if(! servletPath.endsWith("/"))
-				{
-					servletPath += "/";
-				}
-				
-				int indexOf = constructedPath.indexOf(servletPath);
-				if (indexOf >= 0) {
-					constructedPath = constructedPath.substring(indexOf+servletPath.length());
-				}
-			}
+    private static final String CT_REQUEST  = "application/pkixcmp";
+    private static final String CT_RESPONSE = "application/pkixcmp";
 
-			int caAlias_end_index = constructedPath.indexOf('/');
-			String caAlias = (caAlias_end_index == -1) ?
-					constructedPath : constructedPath.substring(0, caAlias_end_index);
+    private CAManager caManager;
 
-			String caName = caManager.getCaName(caAlias);
-			if(caName == null)
-			{
-				caName = caAlias;
-			}
-			
-			X509CACmpResponder responder = caManager.getX509CACmpResponder(caName);
-			if(responder == null || responder.isCAInService() == false)
-			{
-				if(responder == null)
-				{
-					LOG.warn("Unknown CA {}", caName);
-				}
-				else
-				{
-					LOG.warn("CA {} is out of service", caName);
-				}
-				
-				response.setContentLength(0);
-				response.setStatus(HttpServletResponse.SC_NOT_FOUND);
-				response.flushBuffer();
-				return;
-			}
+    public Rfc6712Servlet()
+    {
+    }
 
-			PKIMessage pkiReq = generatePKIMessage(request.getInputStream());
-			
-			PKIHeader reqHeader = pkiReq.getHeader();
-			ASN1OctetString tid = reqHeader.getTransactionID();
-			
-			PKIHeaderBuilder respHeader = new PKIHeaderBuilder(reqHeader.getPvno().getValue().intValue(),
-					reqHeader.getRecipient(), reqHeader.getSender());
-			respHeader.setTransactionID(tid);
-		
-			PKIMessage pkiResp = responder.processPKIMessage(pkiReq);
-			byte[] pkiRespBytes = pkiResp.getEncoded("DER");
+    @Override
+    public void doPost(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException
+    {
+        try{
+            if(caManager == null)
+            {
+                LOG.error("caManager in servlet not configured");
+                response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                response.setContentLength(0);
+                return;
+            }
 
-			response.setContentType(Rfc6712Servlet.CT_RESPONSE);
+            if (! CT_REQUEST.equalsIgnoreCase(request.getContentType()))
+            {
+                response.setContentLength(0);
+                response.setStatus(HttpServletResponse.SC_UNSUPPORTED_MEDIA_TYPE);
+                response.flushBuffer();
+                return;
+            }
+
+            String encodedUrl = request.getRequestURI();
+            String constructedPath = null;
+            if (encodedUrl != null)
+            {
+                constructedPath = URLDecoder.decode(encodedUrl, "UTF-8");
+                String servletPath = request.getServletPath();
+                if(! servletPath.endsWith("/"))
+                {
+                    servletPath += "/";
+                }
+
+                int indexOf = constructedPath.indexOf(servletPath);
+                if (indexOf >= 0) {
+                    constructedPath = constructedPath.substring(indexOf+servletPath.length());
+                }
+            }
+
+            int caAlias_end_index = constructedPath.indexOf('/');
+            String caAlias = (caAlias_end_index == -1) ?
+                    constructedPath : constructedPath.substring(0, caAlias_end_index);
+
+            String caName = caManager.getCaName(caAlias);
+            if(caName == null)
+            {
+                caName = caAlias;
+            }
+
+            X509CACmpResponder responder = caManager.getX509CACmpResponder(caName);
+            if(responder == null || responder.isCAInService() == false)
+            {
+                if(responder == null)
+                {
+                    LOG.warn("Unknown CA {}", caName);
+                }
+                else
+                {
+                    LOG.warn("CA {} is out of service", caName);
+                }
+
+                response.setContentLength(0);
+                response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+                response.flushBuffer();
+                return;
+            }
+
+            PKIMessage pkiReq = generatePKIMessage(request.getInputStream());
+
+            PKIHeader reqHeader = pkiReq.getHeader();
+            ASN1OctetString tid = reqHeader.getTransactionID();
+
+            PKIHeaderBuilder respHeader = new PKIHeaderBuilder(reqHeader.getPvno().getValue().intValue(),
+                    reqHeader.getRecipient(), reqHeader.getSender());
+            respHeader.setTransactionID(tid);
+
+            PKIMessage pkiResp = responder.processPKIMessage(pkiReq);
+            byte[] pkiRespBytes = pkiResp.getEncoded("DER");
+
+            response.setContentType(Rfc6712Servlet.CT_RESPONSE);
             response.setStatus(HttpServletResponse.SC_OK);
-			response.setContentLength(pkiRespBytes.length);
-			response.getOutputStream().write(pkiRespBytes);
-			
-		}catch(Throwable t)
-		{
-			LOG.error("Throwable thrown, this should not happen!", t);
-			response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-			response.setContentLength(0);
-		}
-		
-		response.flushBuffer();
-	}
+            response.setContentLength(pkiRespBytes.length);
+            response.getOutputStream().write(pkiRespBytes);
 
-	protected PKIMessage generatePKIMessage(InputStream is) throws IOException
-	{
-		ASN1InputStream asn1Stream = new ASN1InputStream(is);
-		
-		try{
-			return PKIMessage.getInstance(asn1Stream.readObject());
-		}finally{
-			try{
-				asn1Stream.close();
-			}catch(IOException e){}
-		}
-	}
-	
-	public CAManager getCaManager() {
-		return caManager;
-	}
+        }catch(Throwable t)
+        {
+            LOG.error("Throwable thrown, this should not happen!", t);
+            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            response.setContentLength(0);
+        }
 
-	public void setCaManager(CAManager caManager) {
-		this.caManager = caManager;
-	}
+        response.flushBuffer();
+    }
+
+    protected PKIMessage generatePKIMessage(InputStream is) throws IOException
+    {
+        ASN1InputStream asn1Stream = new ASN1InputStream(is);
+
+        try{
+            return PKIMessage.getInstance(asn1Stream.readObject());
+        }finally{
+            try{
+                asn1Stream.close();
+            }catch(IOException e){}
+        }
+    }
+
+    public CAManager getCaManager() {
+        return caManager;
+    }
+
+    public void setCaManager(CAManager caManager) {
+        this.caManager = caManager;
+    }
 }

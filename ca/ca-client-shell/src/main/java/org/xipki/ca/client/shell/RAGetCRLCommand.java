@@ -29,57 +29,57 @@ import org.xipki.security.common.IoCertUtil;
 @Command(scope = "caclient", name = "ra-getcrl", description="Download CRL")
 public class RAGetCRLCommand extends ClientCommand {
 
-	@Option(name = "-ca",  
-			required = false, description = "Required if multiple CAs are configured. CA name")
+    @Option(name = "-ca",
+            required = false, description = "Required if multiple CAs are configured. CA name")
     protected String            caName;
 
-	@Option(name = "-out", 
-			description = "Required. Where to save the CRL",
-			required = true)
+    @Option(name = "-out",
+            description = "Required. Where to save the CRL",
+            required = true)
     protected String            outFile;
 
-    private RAWorker   		  raWorker;
-    	
-	@Override
-	protected Object doExecute() throws Exception {		
-		Set<String> caNames = raWorker.getCaNames();
-		if(caNames.isEmpty())
-		{
-			System.out.println("No CA is configured");
-			return  null;
-		}
-		
-		if(caName != null && ! caNames.contains(caName))
-		{
-			System.err.println("CA " + caName + " is not within the configured CAs " + caNames);
-			return null;
-		}
-		
-		if(caName == null)
-		{
-			if(caNames.size() == 1)
-			{
-				caName = caNames.iterator().next();
-			}
-			else
-			{
-				System.err.println("caName, one of " + caNames + ", is required");
-			}
-		}
-		
-		X509CRL crl = raWorker.downloadCRL(caName);
-		if(crl == null)
-		{
-			System.err.println("Received no CRL from server");
-			return null;
-		}
-		
-		IoCertUtil.save(new File(outFile), crl.getEncoded());
-		return null;
-	}
+    private RAWorker             raWorker;
 
-	public void setRaWorker(RAWorker raWorker) {
-		this.raWorker = raWorker;
-	}
+    @Override
+    protected Object doExecute() throws Exception {
+        Set<String> caNames = raWorker.getCaNames();
+        if(caNames.isEmpty())
+        {
+            System.out.println("No CA is configured");
+            return  null;
+        }
+
+        if(caName != null && ! caNames.contains(caName))
+        {
+            System.err.println("CA " + caName + " is not within the configured CAs " + caNames);
+            return null;
+        }
+
+        if(caName == null)
+        {
+            if(caNames.size() == 1)
+            {
+                caName = caNames.iterator().next();
+            }
+            else
+            {
+                System.err.println("caName, one of " + caNames + ", is required");
+            }
+        }
+
+        X509CRL crl = raWorker.downloadCRL(caName);
+        if(crl == null)
+        {
+            System.err.println("Received no CRL from server");
+            return null;
+        }
+
+        IoCertUtil.save(new File(outFile), crl.getEncoded());
+        return null;
+    }
+
+    public void setRaWorker(RAWorker raWorker) {
+        this.raWorker = raWorker;
+    }
 
 }

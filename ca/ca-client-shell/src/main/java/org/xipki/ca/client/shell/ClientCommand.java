@@ -19,6 +19,6 @@ package org.xipki.ca.client.shell;
 
 import org.apache.karaf.shell.console.OsgiCommandSupport;
 
-public abstract class ClientCommand extends OsgiCommandSupport 
+public abstract class ClientCommand extends OsgiCommandSupport
 {
 }

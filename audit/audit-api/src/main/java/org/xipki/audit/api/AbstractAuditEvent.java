@@ -37,27 +37,27 @@ public abstract class AbstractAuditEvent
 
     public static final char    DEFAULT_DELIMITER = ' ';
     public static final String  DEFAULT_REPLACE_DELIMITER = "_";
-   
+
     /**
      * The ID of the event type.
      */
     protected static final AtomicLong id = new AtomicLong(0L);
-     
+
     /**
      * The name of the event type.
      */
     protected String            name;
-    
+
     /**
      * The AuditLevel this Event belongs to.
      */
     protected AuditLevel        level = AuditLevel.INFO;
-    
+
     /**
      * Timestamp when the event was saved.
      */
     protected Date timeStamp;
-    
+
     protected char getDelimiter()
     {
         return DEFAULT_DELIMITER;
@@ -132,17 +132,17 @@ public abstract class AbstractAuditEvent
 
         return newFieldValue;
     }
- 
+
     public long getId()
     {
-        return id.longValue();         
+        return id.longValue();
     }
 
     public String getName()
     {
         return name;
     }
-    
+
     public void setName(final String name)
     {
         this.name = name;
@@ -152,12 +152,12 @@ public abstract class AbstractAuditEvent
     {
         return timeStamp == null ? null : (Date) timeStamp.clone();
     }
-    
+
     public void setTimeStamp(final Date timeStamp)
     {
         this.timeStamp = timeStamp == null ? null : (Date) timeStamp.clone();
     }
-    
+
     public AuditLevel getLevel()
     {
         return level;
@@ -167,7 +167,7 @@ public abstract class AbstractAuditEvent
     {
         this.level = level;
     }
-    
+
     /**
      * <p>Checks if a CharSequence is whitespace, empty ("") or null.</p>
      *

@@ -25,33 +25,33 @@ import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.xipki.security.common.EnvironmentParameterResolver;
 
 public interface CertProfile {
-	
-	boolean isOnlyForRA();
 
-	boolean incSerialNumberIfSubjectExists();
+    boolean isOnlyForRA();
 
-	void initialize(String data) throws CertProfileException;
-	
-	void setEnvironmentParamterResolver(EnvironmentParameterResolver paramterResolver);
+    boolean incSerialNumberIfSubjectExists();
 
-	Date getNotBefore(Date notBefore);
-	
-	Integer getValidity();
-	
-	void checkPublicKey(SubjectPublicKeyInfo publicKey) throws BadCertTemplateException;
+    void initialize(String data) throws CertProfileException;
 
-	SubjectInfo getSubject(X500Name requestedSubject) throws CertProfileException, BadCertTemplateException;
-	
-	ExtensionOccurrence getOccurenceOfAuthorityKeyIdentifier();
-	
-	ExtensionOccurrence getOccurenceOfSubjectKeyIdentifier();
-	
-	ExtensionOccurrence getOccurenceOfCRLDistributinPoints();
-	
-	ExtensionOccurrence getOccurenceOfAuthorityInfoAccess();
-	
-	ExtensionTuples getExtensions(
-			X500Name requestedSubject,
-			Extensions requestedExtensions)
-	throws CertProfileException, BadCertTemplateException;
+    void setEnvironmentParamterResolver(EnvironmentParameterResolver paramterResolver);
+
+    Date getNotBefore(Date notBefore);
+
+    Integer getValidity();
+
+    void checkPublicKey(SubjectPublicKeyInfo publicKey) throws BadCertTemplateException;
+
+    SubjectInfo getSubject(X500Name requestedSubject) throws CertProfileException, BadCertTemplateException;
+
+    ExtensionOccurrence getOccurenceOfAuthorityKeyIdentifier();
+
+    ExtensionOccurrence getOccurenceOfSubjectKeyIdentifier();
+
+    ExtensionOccurrence getOccurenceOfCRLDistributinPoints();
+
+    ExtensionOccurrence getOccurenceOfAuthorityInfoAccess();
+
+    ExtensionTuples getExtensions(
+            X500Name requestedSubject,
+            Extensions requestedExtensions)
+    throws CertProfileException, BadCertTemplateException;
 }

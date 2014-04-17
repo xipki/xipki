@@ -20,27 +20,27 @@ package org.xipki.ocsp.api;
 import java.util.Date;
 
 public class CertRevocationInfo {
-	private final int reason;
-	private final Date revocationTime;
-	private final Date invalidityTime;
-	
-	public CertRevocationInfo(int reason, Date revocationTime, Date invalidityTime) 
-	{
-		this.reason = reason;
-		this.revocationTime = revocationTime;
-		this.invalidityTime = invalidityTime;
-	}
+    private final int reason;
+    private final Date revocationTime;
+    private final Date invalidityTime;
 
-	public int getReason() {
-		return reason;
-	}
+    public CertRevocationInfo(int reason, Date revocationTime, Date invalidityTime)
+    {
+        this.reason = reason;
+        this.revocationTime = revocationTime;
+        this.invalidityTime = invalidityTime;
+    }
 
-	public Date getRevocationTime() {
-		return revocationTime;
-	}
+    public int getReason() {
+        return reason;
+    }
 
-	public Date getInvalidityTime() {
-		return invalidityTime;
-	}
-	
+    public Date getRevocationTime() {
+        return revocationTime;
+    }
+
+    public Date getInvalidityTime() {
+        return invalidityTime;
+    }
+
 }

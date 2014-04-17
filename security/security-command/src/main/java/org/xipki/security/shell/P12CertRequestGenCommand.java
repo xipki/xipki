@@ -50,153 +50,153 @@ import org.xipki.security.p10.Pkcs10RequestGenerator;
 
 @Command(scope = "keytool", name = "req-p12", description="Generate PKCS#10 request with PKCS#12 keystore")
 public class P12CertRequestGenCommand extends OsgiCommandSupport {
-	@Option(name = "-subject",
-			required = false, 
-			description = "Subject in the PKCS#10 request. The default is the subject of self-signed certifite.")
+    @Option(name = "-subject",
+            required = false,
+            description = "Subject in the PKCS#10 request. The default is the subject of self-signed certifite.")
     protected String            subject;
 
-	@Option(name = "-p12",
-			required = true, description = "Required. PKCS#12 keystore file")
+    @Option(name = "-p12",
+            required = true, description = "Required. PKCS#12 keystore file")
     protected String            p12File;
 
-	@Option(name = "-pwd", aliases = { "--password" },
-			required = true, description = "Required. Password of the PKCS#12 file")
+    @Option(name = "-pwd", aliases = { "--password" },
+            required = true, description = "Required. Password of the PKCS#12 file")
     protected String            password;
-	
-	@Option(name = "-hash",
-			required = false, description = "Hash algorithm name. The default is SHA256")
+
+    @Option(name = "-hash",
+            required = false, description = "Hash algorithm name. The default is SHA256")
     protected String            hashAlgo;
 
-	@Option(name = "-out",
-			required = true, description = "Required. Output file name")
+    @Option(name = "-out",
+            required = true, description = "Required. Output file name")
     protected String            outputFilename;
-	
-	private SecurityFactory securityFactory;
-	
-	public SecurityFactory getSecurityFactory() {
-		return securityFactory;
-	}
 
-	public void setSecurityFactory(SecurityFactory securityFactory) {
-		this.securityFactory = securityFactory;
-	}
-	
+    private SecurityFactory securityFactory;
+
+    public SecurityFactory getSecurityFactory() {
+        return securityFactory;
+    }
+
+    public void setSecurityFactory(SecurityFactory securityFactory) {
+        this.securityFactory = securityFactory;
+    }
+
     @Override
     protected Object doExecute() throws Exception {
-    	Pkcs10RequestGenerator p10Gen = new Pkcs10RequestGenerator();
-    	
-    	if(hashAlgo == null)
-    	{
-    		hashAlgo = "SHA256";
-    	}
-    	
-    	ASN1ObjectIdentifier sigAlgOid;
-    	
-    	boolean ec = isEcKey(p12File, password.toCharArray());
-    	
-    	hashAlgo = hashAlgo.trim().toUpperCase();
-    	
-    	if("SHA256".equalsIgnoreCase(hashAlgo) || "SHA-256".equalsIgnoreCase(hashAlgo))
-    	{
-    		sigAlgOid = ec ? X9ObjectIdentifiers.ecdsa_with_SHA256 : PKCSObjectIdentifiers.sha256WithRSAEncryption;
-    	}
-    	else if("SHA384".equalsIgnoreCase(hashAlgo) || "SHA-384".equalsIgnoreCase(hashAlgo))
-    	{
-    		sigAlgOid = ec ? X9ObjectIdentifiers.ecdsa_with_SHA384 : PKCSObjectIdentifiers.sha384WithRSAEncryption;
-    	}
-    	else if("SHA512".equalsIgnoreCase(hashAlgo) || "SHA-512".equalsIgnoreCase(hashAlgo))
-    	{
-    		sigAlgOid = ec ? X9ObjectIdentifiers.ecdsa_with_SHA512 : PKCSObjectIdentifiers.sha512WithRSAEncryption;
-    	}
-    	else
-    	{
-    		throw new Exception("Unsupported hash algorithm " + hashAlgo);
-    	}
-    	
-    	String signerConf = SecurityFactoryImpl.getKeystoreSignerConf(p12File, password, sigAlgOid.getId(), 1);
-		ConcurrentContentSigner identifiedSigner = 
-				securityFactory.createSigner("PKCS12", signerConf, null, NopPasswordResolver.INSTANCE); 
-    	
-		Certificate cert = Certificate.getInstance(identifiedSigner.getCertificate().getEncoded());    	
-		
-    	X500Name subjectDN;
-    	if(subject != null)
-    	{
-    		subjectDN = new X500Name(subject);
-    	}
-    	else
-    	{
-    		subjectDN = cert.getSubject();
-    	}
-    	
-    	SubjectPublicKeyInfo subjectPublicKeyInfo = cert.getSubjectPublicKeyInfo();
-		
-		ContentSigner signer = identifiedSigner.borrowContentSigner();
-		
-		PKCS10CertificationRequest p10Req;
-		try{
-			p10Req  = p10Gen.generateRequest(signer, subjectPublicKeyInfo, subjectDN);
-		}finally
-		{
-			identifiedSigner.returnContentSigner(signer);
-		}
-    	
-		File file = new File(outputFilename);
-    	IoCertUtil.save(file, p10Req.getEncoded());
-    	System.out.println("Saved PKCS#10 request in " + file.getPath());
-    	
-    	return null;
+        Pkcs10RequestGenerator p10Gen = new Pkcs10RequestGenerator();
+
+        if(hashAlgo == null)
+        {
+            hashAlgo = "SHA256";
+        }
+
+        ASN1ObjectIdentifier sigAlgOid;
+
+        boolean ec = isEcKey(p12File, password.toCharArray());
+
+        hashAlgo = hashAlgo.trim().toUpperCase();
+
+        if("SHA256".equalsIgnoreCase(hashAlgo) || "SHA-256".equalsIgnoreCase(hashAlgo))
+        {
+            sigAlgOid = ec ? X9ObjectIdentifiers.ecdsa_with_SHA256 : PKCSObjectIdentifiers.sha256WithRSAEncryption;
+        }
+        else if("SHA384".equalsIgnoreCase(hashAlgo) || "SHA-384".equalsIgnoreCase(hashAlgo))
+        {
+            sigAlgOid = ec ? X9ObjectIdentifiers.ecdsa_with_SHA384 : PKCSObjectIdentifiers.sha384WithRSAEncryption;
+        }
+        else if("SHA512".equalsIgnoreCase(hashAlgo) || "SHA-512".equalsIgnoreCase(hashAlgo))
+        {
+            sigAlgOid = ec ? X9ObjectIdentifiers.ecdsa_with_SHA512 : PKCSObjectIdentifiers.sha512WithRSAEncryption;
+        }
+        else
+        {
+            throw new Exception("Unsupported hash algorithm " + hashAlgo);
+        }
+
+        String signerConf = SecurityFactoryImpl.getKeystoreSignerConf(p12File, password, sigAlgOid.getId(), 1);
+        ConcurrentContentSigner identifiedSigner =
+                securityFactory.createSigner("PKCS12", signerConf, null, NopPasswordResolver.INSTANCE);
+
+        Certificate cert = Certificate.getInstance(identifiedSigner.getCertificate().getEncoded());
+
+        X500Name subjectDN;
+        if(subject != null)
+        {
+            subjectDN = new X500Name(subject);
+        }
+        else
+        {
+            subjectDN = cert.getSubject();
+        }
+
+        SubjectPublicKeyInfo subjectPublicKeyInfo = cert.getSubjectPublicKeyInfo();
+
+        ContentSigner signer = identifiedSigner.borrowContentSigner();
+
+        PKCS10CertificationRequest p10Req;
+        try{
+            p10Req  = p10Gen.generateRequest(signer, subjectPublicKeyInfo, subjectDN);
+        }finally
+        {
+            identifiedSigner.returnContentSigner(signer);
+        }
+
+        File file = new File(outputFilename);
+        IoCertUtil.save(file, p10Req.getEncoded());
+        System.out.println("Saved PKCS#10 request in " + file.getPath());
+
+        return null;
     }
-    
+
     private static boolean isEcKey(String p12File, char[] password)
-		throws SignerException, FileNotFoundException
-	{
-    	FileInputStream fIn = new FileInputStream(p12File);
-    	
-		try{
-			KeyStore ks = KeyStore.getInstance("PKCS12", "BC");
-			ks.load(fIn, password);
+        throws SignerException, FileNotFoundException
+    {
+        FileInputStream fIn = new FileInputStream(p12File);
 
-			String keyname = null;
-			Enumeration<String> aliases = ks.aliases();
-			while(aliases.hasMoreElements())
-			{
-				String alias = aliases.nextElement();
-				if(ks.isKeyEntry(alias))
-				{
-					keyname = alias;
-					break;
-				}
-			}
-			
-			if(keyname == null)
-			{
-				throw new SignerException("Could not find private key");
-			}
+        try{
+            KeyStore ks = KeyStore.getInstance("PKCS12", "BC");
+            ks.load(fIn, password);
 
-			return ks.getCertificate(keyname).getPublicKey() instanceof ECPublicKey;
-		}catch(KeyStoreException e)
-		{
-			throw new SignerException(e);
-		} catch (NoSuchProviderException e) {
-			throw new SignerException(e);
-		} catch (NoSuchAlgorithmException e) {
-			throw new SignerException(e);
-		} catch (CertificateException e) {
-			throw new SignerException(e);
-		} catch (IOException e) {
-			throw new SignerException(e);
-		} catch (ClassCastException e)
-		{
-			throw new SignerException(e);
-		} finally
-		{
-			try {
-				fIn.close();
-			} catch (IOException e) {
-			}
-		}
-	}
+            String keyname = null;
+            Enumeration<String> aliases = ks.aliases();
+            while(aliases.hasMoreElements())
+            {
+                String alias = aliases.nextElement();
+                if(ks.isKeyEntry(alias))
+                {
+                    keyname = alias;
+                    break;
+                }
+            }
+
+            if(keyname == null)
+            {
+                throw new SignerException("Could not find private key");
+            }
+
+            return ks.getCertificate(keyname).getPublicKey() instanceof ECPublicKey;
+        }catch(KeyStoreException e)
+        {
+            throw new SignerException(e);
+        } catch (NoSuchProviderException e) {
+            throw new SignerException(e);
+        } catch (NoSuchAlgorithmException e) {
+            throw new SignerException(e);
+        } catch (CertificateException e) {
+            throw new SignerException(e);
+        } catch (IOException e) {
+            throw new SignerException(e);
+        } catch (ClassCastException e)
+        {
+            throw new SignerException(e);
+        } finally
+        {
+            try {
+                fIn.close();
+            } catch (IOException e) {
+            }
+        }
+    }
 
 
 }

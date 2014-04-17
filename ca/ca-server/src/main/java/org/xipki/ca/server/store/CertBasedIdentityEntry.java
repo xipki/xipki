@@ -22,38 +22,38 @@ import java.util.Arrays;
 import org.bouncycastle.util.encoders.Base64;
 import org.bouncycastle.util.encoders.Hex;
 
-class CertBasedIdentityEntry 
+class CertBasedIdentityEntry
 {
-	private final int id;
-	private final String subject;
-	private final byte[] sha1Fp;
-	private final byte[] cert;
-	
-	CertBasedIdentityEntry(int id, String subject, String hexSha1Fp,
-			String b64Cert)
-	{
-		super();
-		this.id = id;
-		this.subject = subject;
-		this.sha1Fp = Hex.decode(hexSha1Fp);
-		this.cert = Base64.decode(b64Cert);
-	}
+    private final int id;
+    private final String subject;
+    private final byte[] sha1Fp;
+    private final byte[] cert;
 
-	int getId() {
-		return id;
-	}
+    CertBasedIdentityEntry(int id, String subject, String hexSha1Fp,
+            String b64Cert)
+    {
+        super();
+        this.id = id;
+        this.subject = subject;
+        this.sha1Fp = Hex.decode(hexSha1Fp);
+        this.cert = Base64.decode(b64Cert);
+    }
 
-	String getSubject() {
-		return subject;
-	}
+    int getId() {
+        return id;
+    }
 
-	boolean matchSha1Fp(byte[] sha1Fp)
-	{
-		return Arrays.equals(this.sha1Fp, sha1Fp);
-	}
+    String getSubject() {
+        return subject;
+    }
 
-	boolean matchCert(byte[] encodedCert)
-	{
-		return Arrays.equals(this.cert, encodedCert);
-	}
+    boolean matchSha1Fp(byte[] sha1Fp)
+    {
+        return Arrays.equals(this.sha1Fp, sha1Fp);
+    }
+
+    boolean matchCert(byte[] encodedCert)
+    {
+        return Arrays.equals(this.cert, encodedCert);
+    }
 }

@@ -23,29 +23,29 @@ import java.util.Set;
 
 
 public abstract class AbstractCACertProfile extends AbstractCertProfile {
-	protected Set<KeyUsage> keyUsages;
-	
-	public AbstractCACertProfile()
-	{
-		Set<KeyUsage> keyUsages = new HashSet<KeyUsage>();
-		keyUsages.add(KeyUsage.keyCertSign);
-		keyUsages.add(KeyUsage.cRLSign);
-		this.keyUsages = Collections.unmodifiableSet(keyUsages);
-	}
-	
-	@Override
-	protected boolean isCa() {
-		return true;
-	}
+    protected Set<KeyUsage> keyUsages;
 
-	@Override
-	protected Set<KeyUsage> getKeyUsage() {
-		return keyUsages;
-	}
-	
-	@Override
-	public ExtensionOccurrence getOccurenceOfAuthorityKeyIdentifier() {
-		return ExtensionOccurrence.CRITICAL_REQUIRED;
-	}
+    public AbstractCACertProfile()
+    {
+        Set<KeyUsage> keyUsages = new HashSet<KeyUsage>();
+        keyUsages.add(KeyUsage.keyCertSign);
+        keyUsages.add(KeyUsage.cRLSign);
+        this.keyUsages = Collections.unmodifiableSet(keyUsages);
+    }
+
+    @Override
+    protected boolean isCa() {
+        return true;
+    }
+
+    @Override
+    protected Set<KeyUsage> getKeyUsage() {
+        return keyUsages;
+    }
+
+    @Override
+    public ExtensionOccurrence getOccurenceOfAuthorityKeyIdentifier() {
+        return ExtensionOccurrence.CRITICAL_REQUIRED;
+    }
 
 }

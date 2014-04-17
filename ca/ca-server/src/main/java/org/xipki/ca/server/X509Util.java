@@ -51,203 +51,203 @@ import org.xipki.ca.api.profile.KeyUsage;
 
 public class X509Util {
 
-	public static BasicConstraints createBasicConstraints(boolean isCa, Integer pathLen)
-	{
-		BasicConstraints basicConstraints;
-		if(isCa)
-		{
-			if(pathLen != null)
-			{
-				basicConstraints = new BasicConstraints(pathLen);
-			}
-			else
-			{
-				basicConstraints = new BasicConstraints(true);
-			}
-		}
-		else
-		{
-			basicConstraints = new BasicConstraints(false);
-		}
-		return basicConstraints;
-	}
-	
-	public static org.bouncycastle.asn1.x509.KeyUsage createKeyUsage(Set<KeyUsage> keyUsages)
-	{
-		if(keyUsages == null || keyUsages.isEmpty())
-		{
-			return null;
-		}
-		
-		int usage = 0;				
-		for (KeyUsage keyUsage : keyUsages) 
-		{
-			switch (keyUsage) {
-				case contentCommitment:
-					usage |= org.bouncycastle.asn1.x509.KeyUsage.nonRepudiation;
-					break;
-				case cRLSign:
-					usage |= org.bouncycastle.asn1.x509.KeyUsage.cRLSign;
-					break;
-				case dataEncipherment:
-					usage |= org.bouncycastle.asn1.x509.KeyUsage.dataEncipherment;
-					break;
-				case decipherOnly:
-					usage |= org.bouncycastle.asn1.x509.KeyUsage.decipherOnly;
-					break;
-				case digitalSignature:
-					usage |= org.bouncycastle.asn1.x509.KeyUsage.digitalSignature;
-					break;
-				case encipherOnly:
-					usage |= org.bouncycastle.asn1.x509.KeyUsage.encipherOnly;
-					break;
-				case keyAgreement:
-					usage |= org.bouncycastle.asn1.x509.KeyUsage.keyAgreement;
-					break;
-				case keyCertSign:
-					usage |= org.bouncycastle.asn1.x509.KeyUsage.keyCertSign;
-					break;
-				case keyEncipherment:
-					usage |= org.bouncycastle.asn1.x509.KeyUsage.keyEncipherment;
-					break;
-				default:
-					break;
-			}
-		}
-				
-		return new org.bouncycastle.asn1.x509.KeyUsage(usage);
-	}
-	
-	public static ExtendedKeyUsage createExtendedUsage(Set<String> keyUsages)
-	{		
-		if(keyUsages == null || keyUsages.isEmpty())
-		{
-			return null;
-		}
-		
-		KeyPurposeId[] kps = new KeyPurposeId[keyUsages.size()];
-		
-		int i = 0;
-		for (String oid : keyUsages) {
-			kps[i++] = KeyPurposeId.getInstance(new ASN1ObjectIdentifier(oid));
-		}
-		
-		return new ExtendedKeyUsage(kps);
-	}
-	
-	public static AuthorityInformationAccess createAuthorityInformationAccess(List<String> ocspUris)
-	{		
-		if(ocspUris == null || ocspUris.isEmpty())
-		{
-			return null;
-		}
-		
-		List<AccessDescription> accessDescriptions = new ArrayList<AccessDescription>(ocspUris.size());
-		for(String uri : ocspUris)
-		{
-			GeneralName gn = new GeneralName(GeneralName.uniformResourceIdentifier, uri);
-			accessDescriptions.add(new AccessDescription(X509ObjectIdentifiers.id_ad_ocsp, gn));
-		}
+    public static BasicConstraints createBasicConstraints(boolean isCa, Integer pathLen)
+    {
+        BasicConstraints basicConstraints;
+        if(isCa)
+        {
+            if(pathLen != null)
+            {
+                basicConstraints = new BasicConstraints(pathLen);
+            }
+            else
+            {
+                basicConstraints = new BasicConstraints(true);
+            }
+        }
+        else
+        {
+            basicConstraints = new BasicConstraints(false);
+        }
+        return basicConstraints;
+    }
 
-		DERSequence seq = new DERSequence(accessDescriptions.toArray(new AccessDescription[0]));
-		return AuthorityInformationAccess.getInstance(seq);
-	}
-	
-	public static CRLDistPoint createCRLDistributionPoints(List<String> crlUris,
-			X500Principal caSubject, X500Principal crlSignerSubject)
-	throws IOException, CertProfileException
-	{
-		if(crlUris == null || crlUris.isEmpty())
-		{
-			return null;
-		}
-		
-		int n = crlUris.size();
-		DistributionPoint[] points = new DistributionPoint[n];
-		
-		for(int i = 0; i < n; i++)
-		{
-			// Distribution Point
-			GeneralNames gns = new GeneralNames(new GeneralName(GeneralName.uniformResourceIdentifier, crlUris.get(i)));
-			DistributionPointName pointName = new DistributionPointName(gns);		
-			
-			GeneralNames crlIssuer = null;
-			if(crlSignerSubject != null && !crlSignerSubject.equals(caSubject))
-			{
-				X500Name bcCrlSignerSubject = X500Name.getInstance(crlSignerSubject.getEncoded());
-				GeneralName crlIssuerName = new GeneralName(bcCrlSignerSubject);
-				crlIssuer = new GeneralNames(crlIssuerName);
-			}
-			
-			points[i++] = new DistributionPoint(pointName, null, crlIssuer);
-		}
-		
-		return new CRLDistPoint(points);
-	}
-	
-	public static CertificatePolicies createCertificatePolicies(List<CertificatePolicyInformation> policyInfos)
-			throws CertProfileException
-	{	
-		if(policyInfos == null || policyInfos.isEmpty())
-		{
-			return null;
-		}
-		
-		int n = policyInfos.size();		
-		PolicyInformation[] pInfos = new PolicyInformation[n];
-		
-		int i = 0;
-		for(CertificatePolicyInformation policyInfo : policyInfos)
-		{
-			String policyId = policyInfo.getCertPolicyId();
-			List<CertificatePolicyQualifier> qualifiers = policyInfo.getQualifiers();
-			
-			ASN1Sequence policyQualifiers = null;
-			if(qualifiers != null)
-			{
-				List<PolicyQualifierInfo> qualifierInfos = new ArrayList<PolicyQualifierInfo>(qualifiers.size());
-				for(CertificatePolicyQualifier qualifier : qualifiers)
-				{
-					PolicyQualifierInfo qualifierInfo ;
-					if(qualifier.getCpsUri() != null)
-					{
-						qualifierInfo = new PolicyQualifierInfo(qualifier.getCpsUri());	
-					}
-					else if(qualifier.getUserNotice() != null)
-					{
-						UserNotice userNotice = new UserNotice(null, qualifier.getUserNotice());
-						qualifierInfo = new PolicyQualifierInfo(PKCSObjectIdentifiers.id_spq_ets_unotice,
-								userNotice);
-					}
-					else
-					{
-						qualifierInfo = null;
-					}
-					
-					if(qualifierInfo != null)
-					{
-						qualifierInfos.add(qualifierInfo);
-					}
-					//PolicyQualifierId qualifierId	
-				}
-				
-				policyQualifiers = new DERSequence(qualifierInfos.toArray(new PolicyQualifierInfo[0]));
-				
-			}
-				
-			ASN1ObjectIdentifier policyOid = new ASN1ObjectIdentifier(policyId);
-			if(policyQualifiers == null)
-			{
-				pInfos[i] = new PolicyInformation(policyOid);
-			}
-			else
-			{
-				pInfos[i] = new PolicyInformation(policyOid, policyQualifiers);
-			}
-			i++;
-		}
-		
-		return new CertificatePolicies(pInfos);
-	}
+    public static org.bouncycastle.asn1.x509.KeyUsage createKeyUsage(Set<KeyUsage> keyUsages)
+    {
+        if(keyUsages == null || keyUsages.isEmpty())
+        {
+            return null;
+        }
+
+        int usage = 0;
+        for (KeyUsage keyUsage : keyUsages)
+        {
+            switch (keyUsage) {
+                case contentCommitment:
+                    usage |= org.bouncycastle.asn1.x509.KeyUsage.nonRepudiation;
+                    break;
+                case cRLSign:
+                    usage |= org.bouncycastle.asn1.x509.KeyUsage.cRLSign;
+                    break;
+                case dataEncipherment:
+                    usage |= org.bouncycastle.asn1.x509.KeyUsage.dataEncipherment;
+                    break;
+                case decipherOnly:
+                    usage |= org.bouncycastle.asn1.x509.KeyUsage.decipherOnly;
+                    break;
+                case digitalSignature:
+                    usage |= org.bouncycastle.asn1.x509.KeyUsage.digitalSignature;
+                    break;
+                case encipherOnly:
+                    usage |= org.bouncycastle.asn1.x509.KeyUsage.encipherOnly;
+                    break;
+                case keyAgreement:
+                    usage |= org.bouncycastle.asn1.x509.KeyUsage.keyAgreement;
+                    break;
+                case keyCertSign:
+                    usage |= org.bouncycastle.asn1.x509.KeyUsage.keyCertSign;
+                    break;
+                case keyEncipherment:
+                    usage |= org.bouncycastle.asn1.x509.KeyUsage.keyEncipherment;
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        return new org.bouncycastle.asn1.x509.KeyUsage(usage);
+    }
+
+    public static ExtendedKeyUsage createExtendedUsage(Set<String> keyUsages)
+    {
+        if(keyUsages == null || keyUsages.isEmpty())
+        {
+            return null;
+        }
+
+        KeyPurposeId[] kps = new KeyPurposeId[keyUsages.size()];
+
+        int i = 0;
+        for (String oid : keyUsages) {
+            kps[i++] = KeyPurposeId.getInstance(new ASN1ObjectIdentifier(oid));
+        }
+
+        return new ExtendedKeyUsage(kps);
+    }
+
+    public static AuthorityInformationAccess createAuthorityInformationAccess(List<String> ocspUris)
+    {
+        if(ocspUris == null || ocspUris.isEmpty())
+        {
+            return null;
+        }
+
+        List<AccessDescription> accessDescriptions = new ArrayList<AccessDescription>(ocspUris.size());
+        for(String uri : ocspUris)
+        {
+            GeneralName gn = new GeneralName(GeneralName.uniformResourceIdentifier, uri);
+            accessDescriptions.add(new AccessDescription(X509ObjectIdentifiers.id_ad_ocsp, gn));
+        }
+
+        DERSequence seq = new DERSequence(accessDescriptions.toArray(new AccessDescription[0]));
+        return AuthorityInformationAccess.getInstance(seq);
+    }
+
+    public static CRLDistPoint createCRLDistributionPoints(List<String> crlUris,
+            X500Principal caSubject, X500Principal crlSignerSubject)
+    throws IOException, CertProfileException
+    {
+        if(crlUris == null || crlUris.isEmpty())
+        {
+            return null;
+        }
+
+        int n = crlUris.size();
+        DistributionPoint[] points = new DistributionPoint[n];
+
+        for(int i = 0; i < n; i++)
+        {
+            // Distribution Point
+            GeneralNames gns = new GeneralNames(new GeneralName(GeneralName.uniformResourceIdentifier, crlUris.get(i)));
+            DistributionPointName pointName = new DistributionPointName(gns);
+
+            GeneralNames crlIssuer = null;
+            if(crlSignerSubject != null && !crlSignerSubject.equals(caSubject))
+            {
+                X500Name bcCrlSignerSubject = X500Name.getInstance(crlSignerSubject.getEncoded());
+                GeneralName crlIssuerName = new GeneralName(bcCrlSignerSubject);
+                crlIssuer = new GeneralNames(crlIssuerName);
+            }
+
+            points[i++] = new DistributionPoint(pointName, null, crlIssuer);
+        }
+
+        return new CRLDistPoint(points);
+    }
+
+    public static CertificatePolicies createCertificatePolicies(List<CertificatePolicyInformation> policyInfos)
+            throws CertProfileException
+    {
+        if(policyInfos == null || policyInfos.isEmpty())
+        {
+            return null;
+        }
+
+        int n = policyInfos.size();
+        PolicyInformation[] pInfos = new PolicyInformation[n];
+
+        int i = 0;
+        for(CertificatePolicyInformation policyInfo : policyInfos)
+        {
+            String policyId = policyInfo.getCertPolicyId();
+            List<CertificatePolicyQualifier> qualifiers = policyInfo.getQualifiers();
+
+            ASN1Sequence policyQualifiers = null;
+            if(qualifiers != null)
+            {
+                List<PolicyQualifierInfo> qualifierInfos = new ArrayList<PolicyQualifierInfo>(qualifiers.size());
+                for(CertificatePolicyQualifier qualifier : qualifiers)
+                {
+                    PolicyQualifierInfo qualifierInfo ;
+                    if(qualifier.getCpsUri() != null)
+                    {
+                        qualifierInfo = new PolicyQualifierInfo(qualifier.getCpsUri());
+                    }
+                    else if(qualifier.getUserNotice() != null)
+                    {
+                        UserNotice userNotice = new UserNotice(null, qualifier.getUserNotice());
+                        qualifierInfo = new PolicyQualifierInfo(PKCSObjectIdentifiers.id_spq_ets_unotice,
+                                userNotice);
+                    }
+                    else
+                    {
+                        qualifierInfo = null;
+                    }
+
+                    if(qualifierInfo != null)
+                    {
+                        qualifierInfos.add(qualifierInfo);
+                    }
+                    //PolicyQualifierId qualifierId
+                }
+
+                policyQualifiers = new DERSequence(qualifierInfos.toArray(new PolicyQualifierInfo[0]));
+
+            }
+
+            ASN1ObjectIdentifier policyOid = new ASN1ObjectIdentifier(policyId);
+            if(policyQualifiers == null)
+            {
+                pInfos[i] = new PolicyInformation(policyOid);
+            }
+            else
+            {
+                pInfos[i] = new PolicyInformation(policyOid, policyQualifiers);
+            }
+            i++;
+        }
+
+        return new CertificatePolicies(pInfos);
+    }
 
 }
