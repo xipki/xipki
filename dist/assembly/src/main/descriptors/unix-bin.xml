@@ -84,6 +84,14 @@
             <directoryMode>0755</directoryMode>
         </fileSet>
 
+        <!-- JDBC drivers -->
+        <fileSet>
+            <directory>${project.build.directory}/jdbc</directory>
+            <outputDirectory>/lib/ext</outputDirectory>
+            <fileMode>0644</fileMode>
+            <directoryMode>0755</directoryMode>
+        </fileSet>
+
         <!-- native libraries -->
         <fileSet>
             <directory>${project.build.directory}/native-lib</directory>
@@ -135,6 +143,7 @@
                 -->
                 <exclude>**/demos/**</exclude>
                 <exclude>deploy/README</exclude>
+		<exclude>README</exclude>
                 <exclude>LICENSE</exclude>
                 <exclude>NOTICE</exclude>
                 <exclude>RELEASE-NOTES</exclude>
@@ -143,6 +152,7 @@
             <fileMode>0644</fileMode>
             <directoryMode>0755</directoryMode>
         </fileSet>
+
     </fileSets>
 
     <files>
@@ -150,6 +160,13 @@
             <source>${project.basedir}/../../LICENSE</source>
             <outputDirectory>/</outputDirectory>
             <destName>LICENSE</destName>
+            <fileMode>0644</fileMode>
+            <lineEnding>unix</lineEnding>
+        </file>
+        <file>
+            <source>${project.basedir}/../../README.md</source>
+            <outputDirectory>/</outputDirectory>
+            <destName>README.md</destName>
             <fileMode>0644</fileMode>
             <lineEnding>unix</lineEnding>
         </file>
