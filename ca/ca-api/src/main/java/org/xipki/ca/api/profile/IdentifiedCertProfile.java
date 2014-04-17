@@ -112,4 +112,9 @@ public class IdentifiedCertProfile implements CertProfile {
 		certProfile.checkPublicKey(publicKey);
 	}
 
+	@Override
+	public boolean incSerialNumberIfSubjectExists() {
+		return certProfile.incSerialNumberIfSubjectExists();
+	}
+
 }

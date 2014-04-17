@@ -42,8 +42,11 @@ import org.bouncycastle.asn1.ASN1GeneralizedTime;
 import org.bouncycastle.asn1.ASN1Integer;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.ASN1OctetString;
+import org.bouncycastle.asn1.DERPrintableString;
 import org.bouncycastle.asn1.DERSet;
+import org.bouncycastle.asn1.x500.RDN;
 import org.bouncycastle.asn1.x500.X500Name;
+import org.bouncycastle.asn1.x500.style.IETFUtils;
 import org.bouncycastle.asn1.x509.AuthorityInformationAccess;
 import org.bouncycastle.asn1.x509.AuthorityKeyIdentifier;
 import org.bouncycastle.asn1.x509.CRLDistPoint;
@@ -938,9 +941,20 @@ public class X509CA
 			if(caInfo.isAllowDuplicateSubject() == false)
 			{
 				boolean b = certstore.certIssued(this.caInfo.getCertificate(), sha1FpSubject);
+
 				if(b)
 				{
-					throw new CertAlreadyIssuedException("Certificate for the given subject " + grandtedSubjectText + " already issued");
+					if(certProfile.incSerialNumberIfSubjectExists())
+					{
+						do
+						{
+							grantedSubject = incSerialNumber(grantedSubject);
+						}while(certstore.certIssued(this.caInfo.getCertificate(), grantedSubject.toString()));
+					}
+					else if(! caInfo.isAllowDuplicateSubject())
+					{
+						throw new CertAlreadyIssuedException("Certificate for the given subject " + grandtedSubjectText + " already issued");
+					}
 				}
 			}
 		}
@@ -1357,5 +1371,63 @@ public class X509CA
 			return "UNDEF";
 		}
 	}
-	
+
+	private static X500Name incSerialNumber(X500Name origName)
+	{
+		RDN[] rdns = origName.getRDNs();
+
+		int commonNameIndex = -1;
+		int serialNumberIndex = -1;
+		for(int i = 0; i < rdns.length; i++)
+		{
+			RDN rdn = rdns[i];
+			ASN1ObjectIdentifier type = rdn.getFirst().getType();
+			if(ObjectIdentifiers.id_at_commonName.equals(type))
+			{
+				commonNameIndex = i;
+			}
+			else if(ObjectIdentifiers.id_at_serialNumber.equals(type))
+			{
+				serialNumberIndex = i;
+			}
+		}
+
+		int serialNumber = 1;
+		if(serialNumberIndex != -1)
+		{
+			String s = IETFUtils.valueToString(rdns[serialNumberIndex].getFirst().getValue());
+			serialNumber = Integer.parseInt(s);
+			serialNumber++;
+		}
+
+		RDN serialNumberRdn = new RDN(ObjectIdentifiers.id_at_serialNumber,
+				new DERPrintableString(Integer.toString(serialNumber)));
+
+		if(serialNumberIndex != -1)
+		{
+			rdns[serialNumberIndex] = serialNumberRdn;
+			return new X500Name(rdns);
+		}
+		else
+		{
+			List<RDN> newRdns = new ArrayList<RDN>(rdns.length+1);
+
+			if(commonNameIndex == -1)
+			{
+				newRdns.add(serialNumberRdn);
+			}
+
+			for(int i = 0; i < rdns.length; i++)
+			{
+				newRdns.add(rdns[i]);
+				if(i == commonNameIndex)
+				{
+					newRdns.add(serialNumberRdn);
+				}
+			}
+
+			return new X500Name(newRdns.toArray(new RDN[0]));
+		}
+	}
+
 }

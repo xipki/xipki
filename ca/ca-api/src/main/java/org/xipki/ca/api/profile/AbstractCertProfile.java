@@ -296,6 +296,11 @@ public abstract class AbstractCertProfile implements CertProfile {
 	}
 	
 	@Override
+	public boolean incSerialNumberIfSubjectExists() {
+		return false;
+	}
+
+	@Override
 	public ExtensionOccurrence getOccurenceOfSubjectKeyIdentifier() {
 		return ExtensionOccurrence.NONCRITICAL_REQUIRED;
 	}
