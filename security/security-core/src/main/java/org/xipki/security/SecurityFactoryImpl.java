@@ -65,12 +65,14 @@ import org.xipki.security.common.CmpUtf8Pairs;
 import org.xipki.security.common.ParamChecker;
 import org.xipki.security.p11.P11ContentSignerBuilder;
 
-public class SecurityFactoryImpl implements SecurityFactory {
+public class SecurityFactoryImpl implements SecurityFactory
+{
 
     private String pkcs11Provider;
     private String pkcs11Module;
 
-    public SecurityFactoryImpl() {
+    public SecurityFactoryImpl()
+    {
         if(Security.getProvider("BC") == null)
         {
             Security.addProvider(new BouncyCastleProvider());
@@ -98,13 +100,16 @@ public class SecurityFactoryImpl implements SecurityFactory {
         }
 
         ContentSigner csigner;
-        try {
+        try
+        {
             csigner = signer.borrowContentSigner();
-        } catch (NoIdleSignerException e) {
+        } catch (NoIdleSignerException e)
+        {
             throw new SignerException(e);
         }
 
-        try{
+        try
+        {
             byte[] dummyContent = new byte[]{1,2,3,4,5,6,7,8,9,10};
 
             CmpUtf8Pairs keyValues = new CmpUtf8Pairs(conf);
@@ -136,18 +141,24 @@ public class SecurityFactoryImpl implements SecurityFactory {
 
                 throw new SignerException(sb.toString());
             }
-        } catch (IOException e) {
+        } catch (IOException e)
+        {
             throw new SignerException(e.getMessage(), e);
-        } catch (NoSuchAlgorithmException e) {
+        } catch (NoSuchAlgorithmException e)
+        {
             throw new SignerException(e.getMessage(), e);
-        } catch (InvalidKeyException e) {
+        } catch (InvalidKeyException e)
+        {
             throw new SignerException(e.getMessage(), e);
-        } catch (SignatureException e) {
+        } catch (SignatureException e)
+        {
             throw new SignerException(e.getMessage(), e);
-        } catch (NoSuchProviderException e) {
+        } catch (NoSuchProviderException e)
+        {
             throw new SignerException(e.getMessage(), e);
         }
-        finally{
+        finally
+        {
             if(csigner != null)
             {
                 signer.returnContentSigner(csigner);
@@ -171,7 +182,8 @@ public class SecurityFactoryImpl implements SecurityFactory {
             int parallelism = 10;
             if(s != null)
             {
-                try{
+                try
+                {
                     parallelism = Integer.parseInt(s);
                 }catch(NumberFormatException e)
                 {
@@ -244,41 +256,51 @@ public class SecurityFactoryImpl implements SecurityFactory {
             }
             else if("SHA1withRSAandMGF1".equalsIgnoreCase(algoS))
             {
-                try {
+                try
+                {
                     signatureAlgId = SignerUtil.buildRSAPSSAlgorithmIdentifier(X509ObjectIdentifiers.id_SHA1);
-                } catch (NoSuchAlgorithmException e) {
+                } catch (NoSuchAlgorithmException e)
+                {
                     throw new SignerException(e.getMessage(), e);
                 }
             }
             else if("SHA224withRSAandMGF1".equalsIgnoreCase(algoS))
             {
-                try {
+                try
+                {
                     signatureAlgId = SignerUtil.buildRSAPSSAlgorithmIdentifier(NISTObjectIdentifiers.id_sha224);
-                } catch (NoSuchAlgorithmException e) {
+                } catch (NoSuchAlgorithmException e)
+                {
                     throw new SignerException(e.getMessage(), e);
                 }
             }
             else if("SHA256withRSAandMGF1".equalsIgnoreCase(algoS))
             {
-                try {
+                try
+                {
                     signatureAlgId = SignerUtil.buildRSAPSSAlgorithmIdentifier(NISTObjectIdentifiers.id_sha256);
-                } catch (NoSuchAlgorithmException e) {
+                } catch (NoSuchAlgorithmException e)
+                {
                     throw new SignerException(e.getMessage(), e);
                 }
             }
             else if("SHA384withRSAandMGF1".equalsIgnoreCase(algoS))
             {
-                try {
+                try
+                {
                     signatureAlgId = SignerUtil.buildRSAPSSAlgorithmIdentifier(NISTObjectIdentifiers.id_sha384);
-                } catch (NoSuchAlgorithmException e) {
+                } catch (NoSuchAlgorithmException e)
+                {
                     throw new SignerException(e.getMessage(), e);
                 }
             }
             else if("SHA512withRSAandMGF1".equalsIgnoreCase(algoS))
             {
-                try {
+                try
+                {
                     signatureAlgId = SignerUtil.buildRSAPSSAlgorithmIdentifier(NISTObjectIdentifiers.id_sha512);
-                } catch (NoSuchAlgorithmException e) {
+                } catch (NoSuchAlgorithmException e)
+                {
                     throw new SignerException(e.getMessage(), e);
                 }
             }
@@ -346,7 +368,8 @@ public class SecurityFactoryImpl implements SecurityFactory {
                 }
 
                 Object p11Provider;
-                try{
+                try
+                {
                     Class<?> clazz = Class.forName(pkcs11Provider);
                     p11Provider = clazz.newInstance();
                 }catch(Exception e)
@@ -361,11 +384,14 @@ public class SecurityFactoryImpl implements SecurityFactory {
                     P11ContentSignerBuilder signerBuilder = new P11ContentSignerBuilder(
                                 p11CryptService, slot, password, keyIdentifier, cert);
 
-                    try {
+                    try
+                    {
                         return  signerBuilder.createSigner(signatureAlgId, parallelism);
-                    } catch (OperatorCreationException e) {
+                    } catch (OperatorCreationException e)
+                    {
                         throw new SignerException(e.getMessage());
-                    } catch (NoSuchPaddingException e) {
+                    } catch (NoSuchPaddingException e)
+                    {
                         throw new SignerException(e.getMessage());
                     }
                 }
@@ -387,9 +413,11 @@ public class SecurityFactoryImpl implements SecurityFactory {
                 else if(s.startsWith("file:"))
                 {
                     String fn = s.substring("file:".length());
-                    try {
+                    try
+                    {
                         keystoreStream = new FileInputStream(fn);
-                    } catch (FileNotFoundException e) {
+                    } catch (FileNotFoundException e)
+                    {
                         throw new SignerException("File not found: " + fn);
                     }
                 }
@@ -399,19 +427,24 @@ public class SecurityFactoryImpl implements SecurityFactory {
                 }
 
                 SoftTokenContentSignerBuilder signerBuilder;
-                try {
+                try
+                {
                     signerBuilder = new SoftTokenContentSignerBuilder(
                             type, keystoreStream, password, keyLabel, password, cert);
-                } catch (SignerException e) {
+                } catch (SignerException e)
+                {
                     throw new SignerException(e.getMessage());
                 }
 
-                try {
+                try
+                {
                     return signerBuilder.createSigner(
                             signatureAlgId, parallelism);
-                } catch (OperatorCreationException e) {
+                } catch (OperatorCreationException e)
+                {
                     throw new SignerException(e.getMessage());
-                } catch (NoSuchPaddingException e) {
+                } catch (NoSuchPaddingException e)
+                {
                     throw new SignerException(e.getMessage());
                 }
             }
@@ -420,7 +453,8 @@ public class SecurityFactoryImpl implements SecurityFactory {
         {
             ConcurrentContentSigner contentSigner;
             String classname = type.substring("java:".length());
-            try{
+            try
+            {
                 Class<?> clazz = Class.forName(classname);
                 contentSigner = (ConcurrentContentSigner) clazz.newInstance();
             }catch(Exception e)
@@ -444,10 +478,13 @@ public class SecurityFactoryImpl implements SecurityFactory {
 
     @Override
     public ContentVerifierProvider getContentVerifierProvider(
-            PublicKey publicKey) throws InvalidKeyException {
-        try {
+            PublicKey publicKey) throws InvalidKeyException
+            {
+        try
+        {
             return KeyUtil.getContentVerifierProvider(publicKey);
-        } catch (OperatorCreationException e) {
+        } catch (OperatorCreationException e)
+        {
             throw new InvalidKeyException(e);
         }
     }
@@ -456,9 +493,11 @@ public class SecurityFactoryImpl implements SecurityFactory {
     public ContentVerifierProvider getContentVerifierProvider(
             X509Certificate cert) throws InvalidKeyException
     {
-        try {
+        try
+        {
             return KeyUtil.getContentVerifierProvider(cert);
-        } catch (OperatorCreationException e) {
+        } catch (OperatorCreationException e)
+        {
             throw new InvalidKeyException(e);
         }
     }
@@ -467,16 +506,21 @@ public class SecurityFactoryImpl implements SecurityFactory {
     public ContentVerifierProvider getContentVerifierProvider(
             X509CertificateHolder cert) throws InvalidKeyException
     {
-        try {
+        try
+        {
             PublicKey pk = KeyUtil.generatePublicKey(cert.getSubjectPublicKeyInfo());
             return KeyUtil.getContentVerifierProvider(pk);
-        } catch (OperatorCreationException e) {
+        } catch (OperatorCreationException e)
+        {
             throw new InvalidKeyException(e);
-        } catch (NoSuchAlgorithmException e) {
+        } catch (NoSuchAlgorithmException e)
+        {
             throw new InvalidKeyException(e);
-        } catch (InvalidKeySpecException e) {
+        } catch (InvalidKeySpecException e)
+        {
             throw new InvalidKeyException(e);
-        } catch (IOException e) {
+        } catch (IOException e)
+        {
             throw new InvalidKeyException(e);
         }
     }
@@ -485,19 +529,24 @@ public class SecurityFactoryImpl implements SecurityFactory {
     public PublicKey generatePublicKey(SubjectPublicKeyInfo subjectPublicKeyInfo)
             throws InvalidKeyException
     {
-        try {
+        try
+        {
             return KeyUtil.generatePublicKey(subjectPublicKeyInfo);
-        } catch (NoSuchAlgorithmException e) {
+        } catch (NoSuchAlgorithmException e)
+        {
             throw new InvalidKeyException(e);
-        } catch (InvalidKeySpecException e) {
+        } catch (InvalidKeySpecException e)
+        {
             throw new InvalidKeyException(e);
-        } catch (IOException e) {
+        } catch (IOException e)
+        {
             throw new InvalidKeyException(e);
         }
     }
 
     @Override
-    public boolean verifyPOPO(CertificationRequest p10Req) {
+    public boolean verifyPOPO(CertificationRequest p10Req)
+    {
         return SignerUtil.verifyPOP(p10Req);
     }
 
@@ -512,11 +561,13 @@ public class SecurityFactoryImpl implements SecurityFactory {
     }
 
     @Override
-    public String getPkcs11Provider() {
+    public String getPkcs11Provider()
+    {
         return pkcs11Provider;
     }
 
-    public void setPkcs11Provider(String pkcs11Provider) {
+    public void setPkcs11Provider(String pkcs11Provider)
+    {
         this.pkcs11Provider = pkcs11Provider;
     }
 
@@ -589,11 +640,13 @@ public class SecurityFactoryImpl implements SecurityFactory {
     }
 
     @Override
-    public String getPkcs11Module() {
+    public String getPkcs11Module()
+    {
         return pkcs11Module;
     }
 
-    public void setPkcs11Module(String pkcs11Module) {
+    public void setPkcs11Module(String pkcs11Module)
+    {
         this.pkcs11Module = pkcs11Module;
     }
 

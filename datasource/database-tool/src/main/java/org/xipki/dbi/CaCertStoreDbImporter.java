@@ -62,7 +62,8 @@ import org.xipki.security.common.HashCalculator;
 import org.xipki.security.common.IoCertUtil;
 import org.xipki.security.common.ParamChecker;
 
-class CaCertStoreDbImporter extends DbPorter{
+class CaCertStoreDbImporter extends DbPorter
+{
     private static final Logger LOG = LoggerFactory.getLogger(CaConfigurationDbImporter.class);
 
     private final Unmarshaller unmarshaller;
@@ -102,16 +103,19 @@ class CaCertStoreDbImporter extends DbPorter{
 
         PreparedStatement ps = prepareStatement(SQL_ADD_CAINFO);
 
-        try{
+        try
+        {
             for(CainfoType info : cainfos.getCainfo())
             {
                 String b64Cert = info.getCert();
                 byte[] encodedCert = Base64.decode(b64Cert);
 
                 X509Certificate c;
-                try{
+                try
+                {
                     c = IoCertUtil.parseCert(encodedCert);
-                } catch (Exception e) {
+                } catch (Exception e)
+                {
                     LOG.error("could not parse certificate of cainfo {}", info.getId());
                     LOG.debug("could not parse certificate of cainfo " + info.getId(), e);
                     if(e instanceof CertificateException)
@@ -134,7 +138,8 @@ class CaCertStoreDbImporter extends DbPorter{
 
                 ps.execute();
             }
-        }finally {
+        }finally
+        {
             closeStatement(ps);
         }
     }
@@ -146,7 +151,8 @@ class CaCertStoreDbImporter extends DbPorter{
 
         PreparedStatement ps = prepareStatement(sql);
 
-        try{
+        try
+        {
             for(RequestorinfoType info : requestorinfos.getRequestorinfo())
             {
                 String b64Cert = info.getCert();
@@ -162,7 +168,8 @@ class CaCertStoreDbImporter extends DbPorter{
 
                 ps.execute();
             }
-        }finally {
+        }finally
+        {
             closeStatement(ps);
         }
     }
@@ -174,7 +181,8 @@ class CaCertStoreDbImporter extends DbPorter{
 
         PreparedStatement ps = prepareStatement(sql);
 
-        try{
+        try
+        {
             for(CertprofileinfoType info : certprofileinfos.getCertprofileinfo())
             {
                 int idx = 1;
@@ -183,7 +191,8 @@ class CaCertStoreDbImporter extends DbPorter{
 
                 ps.execute();
             }
-        }finally {
+        }finally
+        {
             closeStatement(ps);
         }
     }
@@ -195,7 +204,8 @@ class CaCertStoreDbImporter extends DbPorter{
 
         PreparedStatement ps = prepareStatement(sql);
 
-        try{
+        try
+        {
             for(UserType user : users.getUser())
             {
                 int idx = 1;
@@ -204,7 +214,8 @@ class CaCertStoreDbImporter extends DbPorter{
 
                 ps.execute();
             }
-        }finally {
+        }finally
+        {
             closeStatement(ps);
         }
     }
@@ -216,20 +227,24 @@ class CaCertStoreDbImporter extends DbPorter{
 
         PreparedStatement ps = prepareStatement(sql);
 
-        try{
+        try
+        {
             for(CrlType crl : crls.getCrl())
             {
                 String filename = baseDir + File.separator + crl.getCrlFile();
                 byte[] encodedCrl = IoCertUtil.read(filename);
 
                 X509CRL c;
-                try {
+                try
+                {
                     c = IoCertUtil.parseCRL(new ByteArrayInputStream(encodedCrl));
-                } catch (CertificateException e) {
+                } catch (CertificateException e)
+                {
                     LOG.error("could not parse CRL in file {}", filename);
                     LOG.debug("could not parse CRL in file " + filename, e);
                     throw e;
-                } catch (CRLException e) {
+                } catch (CRLException e)
+                {
                     LOG.error("could not parse CRL in file {}", filename);
                     LOG.debug("could not parse CRL in file " + filename, e);
                     throw e;
@@ -250,7 +265,8 @@ class CaCertStoreDbImporter extends DbPorter{
 
                 ps.executeUpdate();
             }
-        }finally {
+        }finally
+        {
             closeStatement(ps);
         }
     }
@@ -283,7 +299,8 @@ class CaCertStoreDbImporter extends DbPorter{
         PreparedStatement ps_cert = prepareStatement(SQL_ADD_CERT);
         PreparedStatement ps_rawcert = prepareStatement(SQL_ADD_RAWCERT);
 
-        try{
+        try
+        {
             for(CertType cert : certs.getCert())
             {
                 // rawcert
@@ -291,9 +308,11 @@ class CaCertStoreDbImporter extends DbPorter{
                 byte[] encodedCert = IoCertUtil.read(filename);
 
                 Certificate c;
-                try {
+                try
+                {
                     c = Certificate.getInstance(encodedCert);
-                } catch (Exception e) {
+                } catch (Exception e)
+                {
                     LOG.error("could not parse certificate in file {}", filename);
                     LOG.debug("could not parse certificate in file " + filename, e);
                     throw new CertificateException(e);
@@ -332,7 +351,8 @@ class CaCertStoreDbImporter extends DbPorter{
 
                 ps_rawcert.executeUpdate();
             }
-        }finally {
+        }finally
+        {
             closeStatement(ps_cert);
             closeStatement(ps_rawcert);
         }

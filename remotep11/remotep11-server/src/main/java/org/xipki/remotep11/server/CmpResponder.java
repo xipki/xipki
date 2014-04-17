@@ -53,10 +53,12 @@ import org.xipki.security.api.P11CryptService;
 import org.xipki.security.api.PKCS11SlotIdentifier;
 import org.xipki.security.api.Pkcs11KeyIdentifier;
 
-class CmpResponder {
+class CmpResponder
+{
     private static final Logger LOG = LoggerFactory.getLogger(CmpResponder.class);
 
-    private static final ASN1ObjectIdentifier[] knownTypes = new ASN1ObjectIdentifier[]{
+    private static final ASN1ObjectIdentifier[] knownTypes = new ASN1ObjectIdentifier[]
+    {
             RemoteP11Constants.id_version,
             RemoteP11Constants.id_pso_ecdsa,
             RemoteP11Constants.id_pso_rsa_x509,
@@ -161,7 +163,8 @@ class CmpResponder {
 
 
             ASN1Encodable respItvInfoValue = null;
-            try {
+            try
+            {
                 if(RemoteP11Constants.id_version.equals(itvType))
                 {
                     respItvInfoValue = new DERInteger(localP11CryptService.getVersion());
@@ -247,7 +250,8 @@ class CmpResponder {
                     GenRepContent genRepContent = new GenRepContent(itv);
                     respBody = new PKIBody(PKIBody.TYPE_GEN_REP, genRepContent);
                 }
-            } catch (Throwable t) {
+            } catch (Throwable t)
+            {
                 LOG.error("Error while processing CMP message {}, message: {}", tidStr, t.getMessage());
                 LOG.debug("Error while processing CMP message " + tidStr, t);
                 failureInfo = PKIFailureInfo.systemFailure;
@@ -270,7 +274,8 @@ class CmpResponder {
     private byte[] randomTransactionId()
     {
         byte[] b = new byte[10];
-        synchronized (random) {
+        synchronized (random)
+        {
             random.nextBytes(b);
         }
         return  b;

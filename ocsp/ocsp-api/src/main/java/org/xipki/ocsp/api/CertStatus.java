@@ -17,7 +17,8 @@
 
 package org.xipki.ocsp.api;
 
-public enum CertStatus {
+public enum CertStatus
+{
     GOOD,
     REVOCATED,
     UNKNOWN,

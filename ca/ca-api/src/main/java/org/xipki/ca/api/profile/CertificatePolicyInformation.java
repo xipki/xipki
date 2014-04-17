@@ -34,11 +34,13 @@ public class CertificatePolicyInformation
         this.qualifiers = qualifiers == null ? null : Collections.unmodifiableList(qualifiers);
     }
 
-    public String getCertPolicyId() {
+    public String getCertPolicyId()
+    {
         return certPolicyId;
     }
 
-    public List<CertificatePolicyQualifier> getQualifiers() {
+    public List<CertificatePolicyQualifier> getQualifiers()
+    {
         return qualifiers;
     }
 

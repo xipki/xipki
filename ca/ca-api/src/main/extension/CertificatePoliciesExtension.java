@@ -23,11 +23,13 @@ public class CertificatePoliciesExtension extends ExtensionConf
 {
     private List<CertificatePolicyInformation> policies;
 
-    public List<CertificatePolicyInformation> getPolicies() {
+    public List<CertificatePolicyInformation> getPolicies()
+    {
         return policies;
     }
 
-    public void setPolicies(List<CertificatePolicyInformation> policies) {
+    public void setPolicies(List<CertificatePolicyInformation> policies)
+    {
         this.policies = policies;
     }
 

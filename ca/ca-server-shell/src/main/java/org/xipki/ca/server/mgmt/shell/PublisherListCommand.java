@@ -24,7 +24,8 @@ import org.apache.felix.gogo.commands.Option;
 import org.xipki.ca.server.mgmt.PublisherEntry;
 
 @Command(scope = "ca", name = "publisher-list", description="List publishers")
-public class PublisherListCommand extends CaCommand {
+public class PublisherListCommand extends CaCommand
+{
 
     @Option(name = "-name",
             description = "Publisher Name",
@@ -32,7 +33,8 @@ public class PublisherListCommand extends CaCommand {
     protected String name;
 
     @Override
-    protected Object doExecute() throws Exception {
+    protected Object doExecute() throws Exception
+    {
         StringBuilder sb = new StringBuilder();
 
         if(name == null)

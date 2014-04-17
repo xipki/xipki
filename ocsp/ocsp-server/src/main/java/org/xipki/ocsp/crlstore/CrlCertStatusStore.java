@@ -67,7 +67,8 @@ public class CrlCertStatusStore implements CertStatusStore
     private class StoreUpdateService implements Runnable
     {
         @Override
-        public void run() {
+        public void run()
+        {
             initializeStore(false);
         }
     }
@@ -124,7 +125,8 @@ public class CrlCertStatusStore implements CertStatusStore
 
     private synchronized void initializeStore(boolean force)
     {
-        try{
+        try
+        {
             File f = new File(crlFile);
             if(f.exists() == false)
             {
@@ -149,13 +151,15 @@ public class CrlCertStatusStore implements CertStatusStore
             }
 
             byte[] newFp = null;
-            synchronized (sha1) {
+            synchronized (sha1)
+            {
                 sha1.reset();
                 FileInputStream in = new FileInputStream(f);
                 byte[] buffer = new byte[1024];
                 int readed;
 
-                try{
+                try
+                {
                     while((readed = in.read(buffer)) != -1)
                     {
                         if(readed > 0)
@@ -165,7 +169,8 @@ public class CrlCertStatusStore implements CertStatusStore
                     }
                 }finally
                 {
-                    try{
+                    try
+                    {
                         in.close();
                     }catch(IOException e)
                     {
@@ -204,7 +209,8 @@ public class CrlCertStatusStore implements CertStatusStore
                 }
             }
 
-            try{
+            try
+            {
                 crl.verify((caAsCrlIssuer ? caCert : issuerCert).getPublicKey());
             }catch(Exception e)
             {
@@ -215,24 +221,30 @@ public class CrlCertStatusStore implements CertStatusStore
             Date newNextUpdate = crl.getNextUpdate();
 
             HashCalculator hashCalculator;
-            try {
+            try
+            {
                 hashCalculator = new HashCalculator();
-            } catch (NoSuchAlgorithmException e) {
+            } catch (NoSuchAlgorithmException e)
+            {
                 throw new CertStatusStoreException(e);
             }
 
             byte[] encodedCaCert;
-            try {
+            try
+            {
                 encodedCaCert = caCert.getEncoded();
-            } catch (CertificateEncodingException e) {
+            } catch (CertificateEncodingException e)
+            {
                 throw new CertStatusStoreException(e);
             }
 
             Certificate bcCaCert = Certificate.getInstance(encodedCaCert);
             byte[] encodedName;
-            try {
+            try
+            {
                 encodedName = bcCaCert.getSubject().getEncoded("DER");
-            } catch (IOException e) {
+            } catch (IOException e)
+            {
                 throw new CertStatusStoreException(e);
             }
 
@@ -306,9 +318,11 @@ public class CrlCertStatusStore implements CertStatusStore
                     {
                         extnValue = removingTagAndLenFromExtensionValue(extnValue);
                         DERGeneralizedTime gTime = DERGeneralizedTime.getInstance(extnValue);
-                        try {
+                        try
+                        {
                             invalidityTime = gTime.getDate();
-                        } catch (ParseException e) {
+                        } catch (ParseException e)
+                        {
                             throw new CertStatusStoreException(e);
                         }
                     }
@@ -361,7 +375,8 @@ public class CrlCertStatusStore implements CertStatusStore
             this.nextUpdate = newNextUpdate;
             this.initialized = true;
             LOG.info("Updated CertStore {}", name);
-        } catch (Exception e) {
+        } catch (Exception e)
+        {
             LOG.error("Could not executing initializeStore() for {},  {}: {}",
                     new Object[]{name, e.getClass().getName(), e.getMessage()});
             LOG.error("Could not executing initializeStore()", e);
@@ -372,9 +387,11 @@ public class CrlCertStatusStore implements CertStatusStore
     throws CertStatusStoreException
     {
         byte[] encodedCert;
-        try {
+        try
+        {
             encodedCert = cert.getEncoded();
-        } catch (IOException e) {
+        } catch (IOException e)
+        {
             throw new CertStatusStoreException(e);
         }
 
@@ -400,7 +417,8 @@ public class CrlCertStatusStore implements CertStatusStore
         int n = 5;
         while(initialized == false && (n-- > 0))
         {
-            try{
+            try
+            {
                 Thread.sleep(100);
             }catch(InterruptedException e)
             {
@@ -463,17 +481,20 @@ public class CrlCertStatusStore implements CertStatusStore
         return derOctet.getOctets();
     }
 
-    public X509Certificate getCaCert() {
+    public X509Certificate getCaCert()
+    {
         return caCert;
     }
 
     @Override
-    public boolean isHealthy() {
+    public boolean isHealthy()
+    {
         return true;
     }
 
     @Override
-    public String getName() {
+    public String getName()
+    {
         return name;
     }
 

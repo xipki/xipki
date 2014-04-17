@@ -41,7 +41,8 @@ public class IssuerEntry
         this.encodedCert = encodedCert;
     }
 
-    public int getId() {
+    public int getId()
+    {
         return id;
     }
 

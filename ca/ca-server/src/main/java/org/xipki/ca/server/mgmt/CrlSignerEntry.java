@@ -22,7 +22,8 @@ import java.security.cert.X509Certificate;
 import org.xipki.security.common.ConfigurationException;
 import org.xipki.security.common.ParamChecker;
 
-public class CrlSignerEntry {
+public class CrlSignerEntry
+{
     private final String name;
     private String type;
     private String conf;
@@ -31,37 +32,45 @@ public class CrlSignerEntry {
     private int overlap; // in minutes
     private boolean includeCertsInCrl;
 
-    public CrlSignerEntry(String name) {
+    public CrlSignerEntry(String name)
+    {
         ParamChecker.assertNotEmpty("name", name);
 
         this.name = name;
     }
 
-    public String getName() {
+    public String getName()
+    {
         return name;
     }
 
-    public String getType() {
+    public String getType()
+    {
         return type;
     }
 
-    public void setType(String type) {
+    public void setType(String type)
+    {
         this.type = type;
     }
 
-    public String getConf() {
+    public String getConf()
+    {
         return conf;
     }
 
-    public void setConf(String conf) {
+    public void setConf(String conf)
+    {
         this.conf = conf;
     }
 
-    public X509Certificate getCertificate() {
+    public X509Certificate getCertificate()
+    {
         return cert;
     }
 
-    public void setCertificate(X509Certificate cert) {
+    public void setCertificate(X509Certificate cert)
+    {
         this.cert = cert;
     }
 
@@ -84,23 +93,28 @@ public class CrlSignerEntry {
         return sb.toString();
     }
 
-    public int getPeriod() {
+    public int getPeriod()
+    {
         return period;
     }
 
-    public void setPeriod(int period) {
+    public void setPeriod(int period)
+    {
         this.period = period;
     }
 
-    public int getOverlap() {
+    public int getOverlap()
+    {
         return overlap;
     }
 
-    public void setOverlap(int overlap) {
+    public void setOverlap(int overlap)
+    {
         this.overlap = overlap;
     }
 
-    public boolean includeCertsInCRL() {
+    public boolean includeCertsInCRL()
+    {
         return includeCertsInCrl;
     }
 

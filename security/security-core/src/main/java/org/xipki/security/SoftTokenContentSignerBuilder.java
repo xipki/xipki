@@ -82,7 +82,8 @@ public class SoftTokenContentSignerBuilder
         if(keyPassword == null)
             throw new IllegalArgumentException("keyPassword is null");
 
-        try{
+        try
+        {
             KeyStore ks = KeyStore.getInstance(keystoreType, "BC");
             ks.load(keystoreStream, keystorePassword);
 
@@ -122,15 +123,20 @@ public class SoftTokenContentSignerBuilder
         }catch(KeyStoreException e)
         {
             throw new SignerException(e);
-        } catch (NoSuchProviderException e) {
+        } catch (NoSuchProviderException e)
+        {
             throw new SignerException(e);
-        } catch (NoSuchAlgorithmException e) {
+        } catch (NoSuchAlgorithmException e)
+        {
             throw new SignerException(e);
-        } catch (CertificateException e) {
+        } catch (CertificateException e)
+        {
             throw new SignerException(e);
-        } catch (IOException e) {
+        } catch (IOException e)
+        {
             throw new SignerException(e);
-        } catch (UnrecoverableKeyException e) {
+        } catch (UnrecoverableKeyException e)
+        {
             throw new SignerException(e);
         } catch (ClassCastException e)
         {
@@ -150,7 +156,8 @@ public class SoftTokenContentSignerBuilder
 
         BcContentSignerBuilder signerBuilder;
         AsymmetricKeyParameter keyparam;
-        try{
+        try
+        {
             if(key instanceof RSAPrivateKey)
             {
                 keyparam = SignerUtil.generateRSAPrivateKeyParameter((RSAPrivateKey) key);
@@ -170,9 +177,11 @@ public class SoftTokenContentSignerBuilder
             {
                 throw new OperatorCreationException("Unsupported key " + key.getClass().getName());
             }
-        } catch (InvalidKeyException e) {
+        } catch (InvalidKeyException e)
+        {
             throw new OperatorCreationException("invalid key", e);
-        } catch (NoSuchAlgorithmException e) {
+        } catch (NoSuchAlgorithmException e)
+        {
             throw new OperatorCreationException("no such algorithm", e);
         }
 
@@ -195,7 +204,8 @@ public class SoftTokenContentSignerBuilder
         return cert;
     }
 
-    public PrivateKey getKey() {
+    public PrivateKey getKey()
+    {
         return key;
     }
 

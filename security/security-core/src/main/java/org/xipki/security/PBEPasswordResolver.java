@@ -31,7 +31,8 @@ import org.bouncycastle.util.encoders.Base64;
 import org.xipki.security.api.PasswordResolverException;
 import org.xipki.security.api.SinglePasswordResolver;
 
-public class PBEPasswordResolver implements SinglePasswordResolver {
+public class PBEPasswordResolver implements SinglePasswordResolver
+{
 
     private static final int iterationCount = 2000;
 
@@ -40,7 +41,8 @@ public class PBEPasswordResolver implements SinglePasswordResolver {
 
     protected char[] getMasterPassword()
     {
-        synchronized (masterPasswordLock) {
+        synchronized (masterPasswordLock)
+        {
             if(masterPassword == null)
             {
                 Console console = System.console();
@@ -79,11 +81,13 @@ public class PBEPasswordResolver implements SinglePasswordResolver {
         masterPassword = null;
     }
 
-    public PBEPasswordResolver() {
+    public PBEPasswordResolver()
+    {
     }
 
     @Override
-    public boolean canResolveProtocol(String protocol) {
+    public boolean canResolveProtocol(String protocol)
+    {
         return "PBE".equalsIgnoreCase(protocol);
     }
 
@@ -108,9 +112,11 @@ public class PBEPasswordResolver implements SinglePasswordResolver {
         byte[] cipherText = Arrays.copyOfRange(bytes, 16, n);
 
         byte[] pwd;
-        try {
+        try
+        {
             pwd = PasswordBasedEncryption.decrypt(cipherText, masterPassword, iterationCount, salt);
-        } catch (GeneralSecurityException e) {
+        } catch (GeneralSecurityException e)
+        {
             throw new PasswordResolverException("could not decrypt the password: " + e.getMessage());
         }
 
@@ -130,10 +136,12 @@ public class PBEPasswordResolver implements SinglePasswordResolver {
         byte[] salt = new byte[16];
         random.nextBytes(salt);
         byte[] encrypted;
-        try {
+        try
+        {
             encrypted = PasswordBasedEncryption.encrypt(new String(password).getBytes(),
                     masterPassword, iterationCount, salt);
-        } catch (GeneralSecurityException e) {
+        } catch (GeneralSecurityException e)
+        {
             throw new PasswordResolverException("could not encrypt the password: " + e.getMessage());
         }
 

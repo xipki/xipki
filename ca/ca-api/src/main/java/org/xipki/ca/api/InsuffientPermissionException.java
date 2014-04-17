@@ -17,11 +17,13 @@
 
 package org.xipki.ca.api;
 
-public class InsuffientPermissionException extends Exception {
+public class InsuffientPermissionException extends Exception
+{
 
     private static final long serialVersionUID = 1L;
 
-    public InsuffientPermissionException(String message) {
+    public InsuffientPermissionException(String message)
+    {
         super(message);
     }
 }

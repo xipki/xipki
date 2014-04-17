@@ -23,14 +23,16 @@ import org.apache.felix.gogo.commands.Command;
 import org.apache.felix.gogo.commands.Option;
 
 @Command(scope = "ca", name = "caalias-list", description="List CA aliases")
-public class CaAliasListCommand extends CaCommand {
+public class CaAliasListCommand extends CaCommand
+{
     @Option(name = "-alias",
             description = "CA alias",
             required = false)
     protected String            caAlias;
 
     @Override
-    protected Object doExecute() throws Exception {
+    protected Object doExecute() throws Exception
+    {
         Set<String> aliasNames = caManager.getCaAliasNames();
 
         StringBuilder sb = new StringBuilder();

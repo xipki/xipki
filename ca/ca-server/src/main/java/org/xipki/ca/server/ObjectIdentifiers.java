@@ -19,7 +19,8 @@ package org.xipki.ca.server;
 
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 
-public class ObjectIdentifiers {
+public class ObjectIdentifiers
+{
     private static final ASN1ObjectIdentifier id_at = new ASN1ObjectIdentifier("2.5.4");
 
     public static final ASN1ObjectIdentifier id_at_commonName = id_at.branch("3");

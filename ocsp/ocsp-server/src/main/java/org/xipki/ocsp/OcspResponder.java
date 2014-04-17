@@ -80,7 +80,8 @@ import org.xipki.security.api.SignerException;
 import org.xipki.security.common.HealthCheckResult;
 import org.xipki.security.common.IoCertUtil;
 
-public class OcspResponder {
+public class OcspResponder
+{
     public static final String signer_type = "signer.type";
     public static final String signer_conf = "signer.conf";
     public static final String signer_cert = "signer.cert";
@@ -122,7 +123,8 @@ public class OcspResponder {
 
     private String confFile;
 
-    static{
+    static
+    {
         supportedHashAlgorithms.add(HashAlgoType.SHA1);
         supportedHashAlgorithms.add(HashAlgoType.SHA224);
         supportedHashAlgorithms.add(HashAlgoType.SHA256);
@@ -161,17 +163,22 @@ public class OcspResponder {
 
         Properties props = new Properties();
         FileInputStream configStream = null;
-        try {
+        try
+        {
             configStream = new FileInputStream(confFile);
             props.load(configStream);
-        } catch (FileNotFoundException e) {
+        } catch (FileNotFoundException e)
+        {
             throw new OCSPResponderException(e);
-        } catch (IOException e) {
+        } catch (IOException e)
+        {
             throw new OCSPResponderException(e);
-        }finally{
+        }finally
+        {
             if(configStream != null)
             {
-                try{
+                try
+                {
                     configStream.close();
                 }catch(IOException e)
                 {}
@@ -242,20 +249,26 @@ public class OcspResponder {
         String requestorSignerConf = props.getProperty(signer_conf);
 
         ConcurrentContentSigner requestorSigner;
-        try {
+        try
+        {
             requestorSigner = securityFactory.createSigner(
                     requestorSignerType, requestorSignerConf, requestorCert, passwordResolver);
-        } catch (SignerException e) {
+        } catch (SignerException e)
+        {
             throw new OCSPResponderException(e);
-        } catch (PasswordResolverException e) {
+        } catch (PasswordResolverException e)
+        {
             throw new OCSPResponderException(e);
         }
 
-        try {
+        try
+        {
             responder = new ResponderSigner(requestorSigner);
-        } catch (CertificateEncodingException e) {
+        } catch (CertificateEncodingException e)
+        {
             throw new OCSPResponderException(e);
-        } catch (IOException e) {
+        } catch (IOException e)
+        {
             throw new OCSPResponderException(e);
         }
 
@@ -319,20 +332,25 @@ public class OcspResponder {
 
                 String dbConfFile = props.getProperty(dbstore_prefix + storeName + conffile_suffix);
                 DataSource dataSource;
-                try {
+                try
+                {
                     confStream = new FileInputStream(dbConfFile);
                     dataSource = dataSourceFactory.createDataSource(confStream, passwordResolver);
-                } catch (IOException e) {
+                } catch (IOException e)
+                {
                         throw new OCSPResponderException(e);
-                } catch (SQLException e) {
+                } catch (SQLException e)
+                {
                         throw new OCSPResponderException(e);
-                } catch (PasswordResolverException e) {
+                } catch (PasswordResolverException e)
+                {
                         throw new OCSPResponderException(e);
                 } finally
                 {
                     if(confStream != null)
                     {
-                        try{
+                        try
+                        {
                             confStream.close();
                         }catch(IOException e){}
                     }
@@ -381,7 +399,8 @@ public class OcspResponder {
 
     public OCSPResp answer(OCSPReq request)
     {
-        try{
+        try
+        {
             if(request.isSigned())
             {
                 if(checkReqSignature)
@@ -394,7 +413,8 @@ public class OcspResponder {
                     }
 
                     ContentVerifierProvider cvp;
-                    try{
+                    try
+                    {
                         cvp = securityFactory.getContentVerifierProvider(certs[0]);
                     }catch(InvalidKeyException e)
                     {
@@ -469,7 +489,8 @@ public class OcspResponder {
                         certHashAlgo = (respHashAlgo != null) ? respHashAlgo : reqHashAlgo;
                     }
 
-                    try {
+                    try
+                    {
                         certStatusInfo = store.getCertStatus(
                                 reqHashAlgo, certID.getIssuerNameHash(), certID.getIssuerKeyHash(),
                                 certID.getSerialNumber(), includeCertHash, certHashAlgo);
@@ -477,7 +498,8 @@ public class OcspResponder {
                         {
                             break;
                         }
-                    } catch (CertStatusStoreException e) {
+                    } catch (CertStatusStoreException e)
+                    {
                         LOG.error("answer() queryExecutor.getCertStatus", e);
                         return createUnsuccessfullOCSPResp(CSPResponseStatus.tryLater);
                     }
@@ -518,9 +540,11 @@ public class OcspResponder {
                     CertHash bcCertHash = new CertHash(aId, certHash);
 
                     byte[] encodedCertHash;
-                    try {
+                    try
+                    {
                         encodedCertHash = bcCertHash.getEncoded();
-                    } catch (IOException e) {
+                    } catch (IOException e)
+                    {
                         LOG.error("answer() bcCertHash.getEncoded", e);
                         return createUnsuccessfullOCSPResp(CSPResponseStatus.internalError);
                     }
@@ -537,21 +561,26 @@ public class OcspResponder {
             ConcurrentContentSigner concurrentSigner = responder.getSigner();
             ContentSigner signer = concurrentSigner.borrowContentSigner();
             BasicOCSPResp basicOcspResp;
-            try {
+            try
+            {
                 basicOcspResp = basicOcspBuilder.build(signer,
                         new X509CertificateHolder[]{responder.getCertificate()}, new Date());
-            } catch (OCSPException e) {
+            } catch (OCSPException e)
+            {
                 LOG.error("answer() basicOcspBuilder.build. OCSPException: {}", e.getMessage());
                 LOG.debug("answer() basicOcspBuilder.build", e);
                 return createUnsuccessfullOCSPResp(CSPResponseStatus.internalError);
-            } finally {
+            } finally
+            {
                 concurrentSigner.returnContentSigner(signer);
             }
 
             OCSPRespBuilder ocspRespBuilder = new OCSPRespBuilder();
-            try{
+            try
+            {
                 return ocspRespBuilder.build(CSPResponseStatus.successfull.getStatus(), basicOcspResp);
-            } catch (OCSPException e) {
+            } catch (OCSPException e)
+            {
                 LOG.error("answer() ocspRespBuilder.build. OCSPException: {}", e.getMessage());
                 LOG.debug("answer() ocspRespBuilder.build", e);
                 return createUnsuccessfullOCSPResp(CSPResponseStatus.internalError);
@@ -570,45 +599,54 @@ public class OcspResponder {
         return new OCSPResp(new OCSPResponse(new OCSPResponseStatus(status.getStatus()), null));
     }
 
-    public void setIncludeCertHash(boolean includeCertHash) {
+    public void setIncludeCertHash(boolean includeCertHash)
+    {
         this.includeCertHash = includeCertHash;
     }
 
-    public void setRequireReqSigned(boolean requireReqSigned) {
+    public void setRequireReqSigned(boolean requireReqSigned)
+    {
         this.requireReqSigned = requireReqSigned;
     }
 
-    public void setCheckReqSignature(boolean checkReqSignature) {
+    public void setCheckReqSignature(boolean checkReqSignature)
+    {
         this.checkReqSignature = checkReqSignature;
     }
 
-    public void setSecurityFactory(SecurityFactory securityFactory) {
+    public void setSecurityFactory(SecurityFactory securityFactory)
+    {
         this.securityFactory = securityFactory;
     }
 
 
 
-    public void setDataSourceFactory(DataSourceFactory dataSourceFactory) {
+    public void setDataSourceFactory(DataSourceFactory dataSourceFactory)
+    {
         this.dataSourceFactory = dataSourceFactory;
     }
 
-    public void setPasswordResolver(PasswordResolver passwordResolver) {
+    public void setPasswordResolver(PasswordResolver passwordResolver)
+    {
         this.passwordResolver = passwordResolver;
     }
 
     private static X509Certificate parseCert(String f) throws OCSPResponderException
     {
-        try{
+        try
+        {
             return IoCertUtil.parseCert(f);
         }catch(IOException e)
         {
             throw new OCSPResponderException(e);
-        } catch (CertificateException e) {
+        } catch (CertificateException e)
+        {
             throw new OCSPResponderException(e);
         }
     }
 
-    public void setConfFile(String confFile) {
+    public void setConfFile(String confFile)
+    {
         this.confFile = confFile;
     }
 

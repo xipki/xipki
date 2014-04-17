@@ -84,22 +84,27 @@ class CertStoreQueryExecutor
     throws SQLException
     {
         this.dataSource = dataSource;
-        try {
+        try
+        {
             this.sha1md = MessageDigest.getInstance("SHA-1");
-        } catch (NoSuchAlgorithmException e) {
+        } catch (NoSuchAlgorithmException e)
+        {
             throw new RuntimeException("Should not reach here. Error message: " + e.getMessage());
         }
 
         String sql = "SELECT MAX(id) FROM cert";
         PreparedStatement ps = borrowPreparedStatement(sql);
         ResultSet rs = null;
-        try{
+        try
+        {
             rs = ps.executeQuery();
             rs.next();
             cert_id = new AtomicInteger(rs.getInt(1) + 1);
-        } finally {
+        } finally
+        {
             returnPreparedStatement(ps);
-            if(rs != null) {
+            if(rs != null)
+            {
                 rs.close();
                 rs = null;
             }
@@ -118,10 +123,12 @@ class CertStoreQueryExecutor
         PreparedStatement ps = borrowPreparedStatement(SQL_GET_CAINFO);
 
         ResultSet rs = null;
-        try{
+        try
+        {
             rs = ps.executeQuery();
             List<CertBasedIdentityEntry> caInfos = new LinkedList<CertBasedIdentityEntry>();
-            while(rs.next()) {
+            while(rs.next())
+            {
                 int id = rs.getInt("id");
                 String subject = rs.getString("subject");
                 String hexSha1Fp = rs.getString("sha1_fp_cert");
@@ -132,9 +139,11 @@ class CertStoreQueryExecutor
             }
 
             return new CertBasedIdentityStore(table, caInfos);
-        }finally {
+        }finally
+        {
             returnPreparedStatement(ps);
-            if(rs != null) {
+            if(rs != null)
+            {
                 rs.close();
                 rs = null;
             }
@@ -149,20 +158,24 @@ class CertStoreQueryExecutor
         PreparedStatement ps = borrowPreparedStatement(sql);
 
         ResultSet rs = null;
-        try{
+        try
+        {
             rs = ps.executeQuery();
             Map<String, Integer> entries = new HashMap<String, Integer>();
 
-            while(rs.next()) {
+            while(rs.next())
+            {
                 int id = rs.getInt("id");
                 String name = rs.getString("name");
                 entries.put(name, id);
             }
 
             return new CertprofileStore(entries);
-        }finally {
+        }finally
+        {
             returnPreparedStatement(ps);
-            if(rs != null) {
+            if(rs != null)
+            {
                 rs.close();
                 rs = null;
             }
@@ -191,13 +204,15 @@ class CertStoreQueryExecutor
                 " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
         PreparedStatement ps = borrowPreparedStatement(SQL_ADD_CERT);
-        if(ps == null) {
+        if(ps == null)
+        {
             throw new SQLException("Cannot create prepared incert_cert statement");
         }
 
         int certId = cert_id.getAndAdd(1);
 
-        try{
+        try
+        {
             int caId = getCaId(issuer);
             int certprofileId = getCertprofileId(certprofileName);
 
@@ -215,28 +230,35 @@ class CertStoreQueryExecutor
 
             Integer requestorId = null;
             Integer userId = null;
-            if(requestor instanceof CertBasedRequestorInfo) {
+            if(requestor instanceof CertBasedRequestorInfo)
+            {
                 CertBasedRequestorInfo cmpRequestorInfo = (CertBasedRequestorInfo) requestor;
-                if(cmpRequestorInfo.getCertificate() != null) {
+                if(cmpRequestorInfo.getCertificate() != null)
+                {
                     requestorId = getRequestorId(cmpRequestorInfo.getCertificate());
                 }
 
-                if(user != null) {
+                if(user != null)
+                {
                     userId = getUserId(user);
                 }
             }
 
-            if(requestorId != null)    {
+            if(requestorId != null)
+            {
                 ps.setInt(idx++, requestorId.intValue());
             }
-            else {
+            else
+            {
                 ps.setNull(idx++, Types.INTEGER);
             }
 
-            if(userId != null) {
+            if(userId != null)
+            {
                 ps.setInt(idx++, userId.intValue());
             }
-            else {
+            else
+            {
                 ps.setNull(idx++, Types.INTEGER);
             }
 
@@ -244,26 +266,30 @@ class CertStoreQueryExecutor
             String sha1_fp_subject = IoCertUtil.sha1sum_canonicalized_name(cert.getSubjectX500Principal());
             ps.setString(idx++, sha1_fp_subject);
             ps.executeUpdate();
-        }finally {
+        }finally
+        {
             returnPreparedStatement(ps);
         }
 
         final String SQL_ADD_RAWCERT = "INSERT INTO rawcert (cert_id, sha1_fp, cert) VALUES (?, ?, ?)";
 
         ps = borrowPreparedStatement(SQL_ADD_RAWCERT);
-        if(ps == null) {
+        if(ps == null)
+        {
             throw new SQLException("Cannot create prepared insert_raw_cert statement");
         }
 
         String sha1_fp = fp(certificate.getEncodedCert());
 
-        try{
+        try
+        {
             int idx = 1;
             ps.setInt(idx++, certId);
             ps.setString(idx++, sha1_fp);
             ps.setString(idx++, Base64.toBase64String(certificate.getEncodedCert()));
             ps.executeUpdate();
-        }finally {
+        }finally
+        {
             returnPreparedStatement(ps);
         }
     }
@@ -274,16 +300,19 @@ class CertStoreQueryExecutor
         final String SQL = "SELECT max(crl_number) FROM crl WHERE cainfo_id=?";
 
         PreparedStatement ps = borrowPreparedStatement(SQL);
-        if(ps == null) {
+        if(ps == null)
+        {
             throw new SQLException("Cannot create prepared select_from_crl statement");
         }
 
-        try{
+        try
+        {
             int caId = getCaId(cacert);
             ps.setInt(1, caId);
 
             ResultSet rs = ps.executeQuery();
-            try{
+            try
+            {
                 int maxCrlNumber = 0;
                 if(rs.next())
                 {
@@ -295,11 +324,13 @@ class CertStoreQueryExecutor
                 }
 
                 return maxCrlNumber + 1;
-            }finally{
+            }finally
+            {
                 rs.close();
                 rs = null;
             }
-        }finally {
+        }finally
+        {
             returnPreparedStatement(ps);
         }
     }
@@ -309,16 +340,19 @@ class CertStoreQueryExecutor
         final String SQL = "SELECT max(thisUpdate) FROM crl WHERE cainfo_id=?";
 
         PreparedStatement ps = borrowPreparedStatement(SQL);
-        if(ps == null) {
+        if(ps == null)
+        {
             throw new SQLException("Cannot create prepared select_from_crl statement");
         }
 
-        try{
+        try
+        {
             int caId = getCaId(cacert);
             ps.setInt(1, caId);
 
             ResultSet rs = ps.executeQuery();
-            try{
+            try
+            {
                 long thisUpdateOfCurrentCRL = 0;
                 if(rs.next())
                 {
@@ -326,11 +360,13 @@ class CertStoreQueryExecutor
                 }
 
                 return thisUpdateOfCurrentCRL;
-            }finally{
+            }finally
+            {
                 rs.close();
                 rs = null;
             }
-        }finally {
+        }finally
+        {
             returnPreparedStatement(ps);
         }
     }
@@ -350,11 +386,13 @@ class CertStoreQueryExecutor
         final String SQL = "INSERT INTO crl (cainfo_id, crl_number, thisUpdate, nextUpdate, crl) VALUES (?, ?, ?, ?, ?)";
 
         PreparedStatement ps = borrowPreparedStatement(SQL);
-        if(ps == null) {
+        if(ps == null)
+        {
             throw new SQLException("Cannot create prepared incert_cert statement");
         }
 
-        try{
+        try
+        {
             int caId = getCaId(cacert);
             int idx = 1;
 
@@ -370,10 +408,12 @@ class CertStoreQueryExecutor
             Date d = crl.getThisUpdate();
             ps.setLong(idx++, d.getTime()/1000);
             d = crl.getNextUpdate();
-            if(d != null) {
+            if(d != null)
+            {
                 ps.setLong(idx++, d.getTime()/1000);
             }
-            else {
+            else
+            {
                 ps.setNull(idx++, Types.BIGINT);
             }
 
@@ -382,7 +422,8 @@ class CertStoreQueryExecutor
             ps.setBlob(idx++, is);
 
             ps.executeUpdate();
-        }finally {
+        }finally
+        {
             returnPreparedStatement(ps);
         }
     }
@@ -401,7 +442,8 @@ class CertStoreQueryExecutor
     {
         String issuer = x500Issuer.getName();
         Integer cainfo_id = caInfoStore.getIdForSubject(issuer);
-        if(cainfo_id == null) {
+        if(cainfo_id == null)
+        {
             LOG.warn("Could find the cainfo.id for the CA " + issuer);
             return false;
         }
@@ -412,18 +454,22 @@ class CertStoreQueryExecutor
                 " WHERE cainfo_id = ? AND serial = ?";
 
         PreparedStatement ps = borrowPreparedStatement(SQL_REVOCATE_CERT);
-        if(ps == null) {
+        if(ps == null)
+        {
             throw new SQLException("Cannot create prepared insert_raw_cert statement");
         }
 
-        try{
+        try
+        {
             int idx = 1;
             ps.setLong(idx++, new Date().getTime()/1000);
             ps.setBoolean(idx++, true);
             ps.setLong(idx++, revocationTime.getTime()/1000);
-            if(invalidityTime != null) {
+            if(invalidityTime != null)
+            {
                 ps.setLong(idx++, invalidityTime.getTime()/1000);
-            }else {
+            }else
+            {
                 ps.setNull(idx++, Types.BIGINT);
             }
 
@@ -431,7 +477,8 @@ class CertStoreQueryExecutor
             ps.setInt(idx++, cainfo_id.intValue());
             ps.setLong(idx++, serial.intValue());
             return ps.executeUpdate() > 0;
-        }finally {
+        }finally
+        {
             returnPreparedStatement(ps);
         }
     }
@@ -439,12 +486,14 @@ class CertStoreQueryExecutor
     Long getGreatestSerialNumber(X509CertificateWithMetaInfo caCert)
     throws SQLException, OperationException
     {
-        if(caCert == null) {
+        if(caCert == null)
+        {
             throw new IllegalArgumentException("caCert is null");
         }
 
         Integer caId = getCaId(caCert);
-        if(caId == null) {
+        if(caId == null)
+        {
             return null;
         }
 
@@ -453,13 +502,16 @@ class CertStoreQueryExecutor
         ps.setInt(1, caId);
 
         ResultSet rs = null;
-        try{
+        try
+        {
             rs = ps.executeQuery();
             rs.next();
             return rs.getLong(1);
-        } finally {
+        } finally
+        {
             returnPreparedStatement(ps);
-            if(rs != null) {
+            if(rs != null)
+            {
                 rs.close();
                 rs = null;
             }
@@ -470,16 +522,19 @@ class CertStoreQueryExecutor
             Date notExpiredAt, BigInteger startSerial, int numEntries)
     throws SQLException, OperationException
     {
-        if(caCert == null) {
+        if(caCert == null)
+        {
             throw new IllegalArgumentException("caCert is null");
         }
 
-        else if(numEntries < 1) {
+        else if(numEntries < 1)
+        {
             throw new IllegalArgumentException("numSerials is not positive");
         }
 
         Integer caId = getCaId(caCert);
-        if(caId == null) {
+        if(caId == null)
+        {
             return Collections.emptyList();
         }
 
@@ -495,7 +550,8 @@ class CertStoreQueryExecutor
         PreparedStatement ps = borrowPreparedStatement(sql);
 
         ResultSet rs = null;
-        try{
+        try
+        {
             int idx = 1;
             ps.setInt(idx++, caId.intValue());
             ps.setLong(idx++, (startSerial == null)? 0 : startSerial.longValue()-1);
@@ -506,15 +562,18 @@ class CertStoreQueryExecutor
             rs = ps.executeQuery();
 
             List<BigInteger> ret = new ArrayList<BigInteger>();
-            while(rs.next() && ret.size() < numEntries) {
+            while(rs.next() && ret.size() < numEntries)
+            {
                 long serial = rs.getLong("serial");
                 ret.add(BigInteger.valueOf(serial));
             }
 
             return ret;
-        }finally {
+        }finally
+        {
             returnPreparedStatement(ps);
-            if(rs != null) {
+            if(rs != null)
+            {
                 rs.close();
                 rs = null;
             }
@@ -527,7 +586,8 @@ class CertStoreQueryExecutor
         ParamChecker.assertNotNull("caCert", caCert);
 
         Integer caId = getCaId(caCert);
-        if(caId == null) {
+        if(caId == null)
+        {
             return null;
         }
 
@@ -536,7 +596,8 @@ class CertStoreQueryExecutor
         PreparedStatement ps = borrowPreparedStatement(sql);
 
         ResultSet rs = null;
-        try{
+        try
+        {
             int idx = 1;
             ps.setInt(idx++, caId.intValue());
             rs = ps.executeQuery();
@@ -545,7 +606,8 @@ class CertStoreQueryExecutor
 
             long current_thisUpdate = 0;
             // iterate all entries to make sure that the latest CRL will be returned
-            while(rs.next()) {
+            while(rs.next())
+            {
                 long thisUpdate = rs.getLong("thisUpdate");
                 if(thisUpdate >= current_thisUpdate)
                 {
@@ -556,9 +618,11 @@ class CertStoreQueryExecutor
             }
 
             return encodedCrl;
-        }finally {
+        }finally
+        {
             returnPreparedStatement(ps);
-            if(rs != null) {
+            if(rs != null)
+            {
                 rs.close();
                 rs = null;
             }
@@ -568,13 +632,15 @@ class CertStoreQueryExecutor
     public int cleanupCRLs(X509CertificateWithMetaInfo caCert, int numCRLs)
     throws SQLException, OperationException
     {
-        if(numCRLs < 1) {
+        if(numCRLs < 1)
+        {
             throw new IllegalArgumentException("numCRLs is not positive");
         }
 
         ParamChecker.assertNotNull("caCert", caCert);
         Integer caId = getCaId(caCert);
-        if(caId == null) {
+        if(caId == null)
+        {
             return 0;
         }
 
@@ -584,18 +650,22 @@ class CertStoreQueryExecutor
         List<Integer> crlNumbers = new LinkedList<Integer>();
 
         ResultSet rs = null;
-        try{
+        try
+        {
             int idx = 1;
             ps.setInt(idx++, caId.intValue());
             rs = ps.executeQuery();
 
-            while(rs.next()) {
+            while(rs.next())
+            {
                 int crlNumber = rs.getInt("crl_number");
                 crlNumbers.add(crlNumber);
             }
-        }finally {
+        }finally
+        {
             returnPreparedStatement(ps);
-            if(rs != null) {
+            if(rs != null)
+            {
                 rs.close();
                 rs = null;
             }
@@ -614,12 +684,14 @@ class CertStoreQueryExecutor
         sql = "DELETE FROM crl WHERE cainfo_id=? AND crl_number<?";
         ps = borrowPreparedStatement(sql);
 
-        try{
+        try
+        {
             int idx = 1;
             ps.setInt(idx++, caId.intValue());
             ps.setInt(idx++, crlNumber + 1);
             ps.executeUpdate();
-        }finally {
+        }finally
+        {
             returnPreparedStatement(ps);
         }
 
@@ -628,21 +700,25 @@ class CertStoreQueryExecutor
     private static byte[] readBlob(Blob blob)
     {
         InputStream is;
-        try {
+        try
+        {
             is = blob.getBinaryStream();
-        } catch (SQLException e) {
+        } catch (SQLException e)
+        {
             String msg = "Could not getBinaryStream from Blob";
             LOG.warn(msg + " {}", e.getMessage());
             LOG.debug(msg, e);
             return null;
         }
-        try{
+        try
+        {
             ByteArrayOutputStream out = new ByteArrayOutputStream();
 
             byte[] buffer = new byte[2048];
             int readed;
 
-            try {
+            try
+            {
                 while((readed = is.read(buffer)) != -1)
                 {
                     if(readed > 0)
@@ -650,7 +726,8 @@ class CertStoreQueryExecutor
                         out.write(buffer, 0, readed);
                     }
                 }
-            } catch (IOException e) {
+            } catch (IOException e)
+            {
                 String msg = "Could not read CRL from Blob";
                 LOG.warn(msg + " {}", e.getMessage());
                 LOG.debug(msg, e);
@@ -658,8 +735,10 @@ class CertStoreQueryExecutor
             }
 
             return out.toByteArray();
-        }finally{
-            try{
+        }finally
+        {
+            try
+            {
                 is.close();
             }catch(IOException e)
             {
@@ -674,7 +753,8 @@ class CertStoreQueryExecutor
         ParamChecker.assertNotNull("serial", serial);
 
         Integer caId = getCaId(caCert);
-        if(caId == null) {
+        if(caId == null)
+        {
             return null;
         }
 
@@ -686,19 +766,23 @@ class CertStoreQueryExecutor
         PreparedStatement ps = borrowPreparedStatement(sql);
 
         ResultSet rs = null;
-        try{
+        try
+        {
             int idx = 1;
             ps.setInt(idx++, caId.intValue());
             ps.setLong(idx++, serial.longValue());
             rs = ps.executeQuery();
 
-            if(rs.next()) {
+            if(rs.next())
+            {
                 String b64Cert = rs.getString("cert");
                 return b64Cert == null ? null : Base64.decode(b64Cert);
             }
-        }finally {
+        }finally
+        {
             returnPreparedStatement(ps);
-            if(rs != null) {
+            if(rs != null)
+            {
                 rs.close();
                 rs = null;
             }
@@ -715,7 +799,8 @@ class CertStoreQueryExecutor
         ParamChecker.assertNotNull("serial", serial);
 
         Integer caId = getCaId(caCert);
-        if(caId == null) {
+        if(caId == null)
+        {
             return null;
         }
 
@@ -739,13 +824,15 @@ class CertStoreQueryExecutor
         PreparedStatement ps = borrowPreparedStatement(sql);
 
         ResultSet rs = null;
-        try{
+        try
+        {
             int idx = 1;
             ps.setInt(idx++, caId.intValue());
             ps.setLong(idx++, serial.longValue());
             rs = ps.executeQuery();
 
-            if(rs.next()) {
+            if(rs.next())
+            {
                 String b64Cert = rs.getString(col_cert);
                 byte[] encodedCert = Base64.decode(b64Cert);
                 X509Certificate cert = IoCertUtil.parseCert(encodedCert);
@@ -775,11 +862,14 @@ class CertStoreQueryExecutor
 
                 return certInfo;
             }
-        } catch (IOException e) {
+        } catch (IOException e)
+        {
             throw new OperationException(ErrorCode.System_Failure, "IOException: " + e.getMessage());
-        }finally {
+        }finally
+        {
             returnPreparedStatement(ps);
-            if(rs != null) {
+            if(rs != null)
+            {
                 rs.close();
                 rs = null;
             }
@@ -796,12 +886,14 @@ class CertStoreQueryExecutor
         ParamChecker.assertNotNull("caCert", caCert);
         ParamChecker.assertNotNull("notExpiredAt", notExpiredAt);
 
-        if(numEntries < 1) {
+        if(numEntries < 1)
+        {
             throw new IllegalArgumentException("numSerials is not positive");
         }
 
         Integer caId = getCaId(caCert);
-        if(caId == null) {
+        if(caId == null)
+        {
             return Collections.emptyList();
         }
 
@@ -814,7 +906,8 @@ class CertStoreQueryExecutor
         PreparedStatement ps = borrowPreparedStatement(sql);
 
         ResultSet rs = null;
-        try{
+        try
+        {
             int idx = 1;
             ps.setInt(idx++, caId.intValue());
             ps.setBoolean(idx++, true);
@@ -823,7 +916,8 @@ class CertStoreQueryExecutor
             rs = ps.executeQuery();
 
             List<CertRevocationInfo> ret = new ArrayList<CertRevocationInfo>();
-            while(rs.next() && ret.size() < numEntries) {
+            while(rs.next() && ret.size() < numEntries)
+            {
                 long serial = rs.getLong("serial");
                 int rev_reason = rs.getInt("rev_reason");
                 long rev_time = rs.getLong("rev_time");
@@ -834,9 +928,11 @@ class CertStoreQueryExecutor
             }
 
             return ret;
-        }finally {
+        }finally
+        {
             returnPreparedStatement(ps);
-            if(rs != null) {
+            if(rs != null)
+            {
                 rs.close();
                 rs = null;
             }
@@ -869,17 +965,20 @@ class CertStoreQueryExecutor
         sql = createFetchFirstSelectSQL(sql, 1);
 
         PreparedStatement ps = borrowPreparedStatement(sql);
-        if(ps == null) {
+        if(ps == null)
+        {
             throw new SQLException("Cannot create prepared statement");
         }
 
-        try{
+        try
+        {
             int idx = 1;
             ps.setInt(idx++, caId);
             ps.setString(idx++, subject);
 
             ResultSet rs = ps.executeQuery();
-            try{
+            try
+            {
 
                 if(rs.next())
                 {
@@ -889,11 +988,13 @@ class CertStoreQueryExecutor
                 {
                     return CertStatus.Unknown;
                 }
-            }finally{
+            }finally
+            {
                 rs.close();
                 rs = null;
             }
-        }finally {
+        }finally
+        {
             returnPreparedStatement(ps);
         }
     }
@@ -913,27 +1014,32 @@ class CertStoreQueryExecutor
         sql = createFetchFirstSelectSQL(sql, 1);
 
         PreparedStatement ps = borrowPreparedStatement(sql);
-        if(ps == null) {
+        if(ps == null)
+        {
             throw new SQLException("Cannot create prepared statement");
         }
 
-        try{
+        try
+        {
             int idx = 1;
             ps.setInt(idx++, caId);
             ps.setString(idx++, sha1FpSubject);
 
             ResultSet rs = ps.executeQuery();
-            try{
+            try
+            {
 
                 if(rs.next())
                 {
                     return rs.getInt(1) > 0;
                 }
-            }finally{
+            }finally
+            {
                 rs.close();
                 rs = null;
             }
-        }finally {
+        }finally
+        {
             returnPreparedStatement(ps);
         }
 
@@ -960,27 +1066,32 @@ class CertStoreQueryExecutor
         sql = createFetchFirstSelectSQL(sql, 1);
 
         PreparedStatement ps = borrowPreparedStatement(sql);
-        if(ps == null) {
+        if(ps == null)
+        {
             throw new SQLException("Cannot create prepared statement");
         }
 
-        try{
+        try
+        {
             int idx = 1;
             ps.setInt(idx++, caId);
             ps.setString(idx++, sha1FpPk);
 
             ResultSet rs = ps.executeQuery();
-            try{
+            try
+            {
 
                 if(rs.next())
                 {
                     return rs.getInt(1) > 0;
                 }
-            }finally{
+            }finally
+            {
                 rs.close();
                 rs = null;
             }
-        }finally {
+        }finally
+        {
             returnPreparedStatement(ps);
         }
 
@@ -993,7 +1104,8 @@ class CertStoreQueryExecutor
         String prefix = "SELECT";
         String suffix = "";
 
-        switch(dataSource.getDatabaseType()) {
+        switch(dataSource.getDatabaseType())
+        {
             case DB2:
                 suffix = "FETCH FIRST " + rows + " ROWS ONLY";
                 break;
@@ -1021,7 +1133,8 @@ class CertStoreQueryExecutor
 
     private String fp(byte[] data)
     {
-        synchronized (sha1md) {
+        synchronized (sha1md)
+        {
             sha1md.reset();
             return Hex.toHexString(sha1md.digest(data)).toUpperCase();
         }
@@ -1033,7 +1146,8 @@ class CertStoreQueryExecutor
         byte[] encodedCert = identityCert.getEncodedCert();
         Integer id =  store.getCaIdForCert(encodedCert);
 
-        if(id != null) {
+        if(id != null)
+        {
             return id.intValue();
         }
 
@@ -1046,12 +1160,14 @@ class CertStoreQueryExecutor
 
 
         PreparedStatement ps = borrowPreparedStatement(SQL_ADD_CAINFO);
-        if(ps == null) {
+        if(ps == null)
+        {
             throw new SQLException("Cannot create prepared insert_ca_info statement");
         }
 
         id = store.getNextFreeId();
-        try{
+        try
+        {
             String b64Cert = Base64.toBase64String(encodedCert);
             String subject = identityCert.getSubject();
             int idx = 1;
@@ -1064,7 +1180,8 @@ class CertStoreQueryExecutor
 
             CertBasedIdentityEntry newInfo = new CertBasedIdentityEntry(id.intValue(), subject, hexSha1Fp, b64Cert);
             store.addIdentityEntry(newInfo);
-        }finally {
+        }finally
+        {
             returnPreparedStatement(ps);
         }
 
@@ -1105,19 +1222,22 @@ class CertStoreQueryExecutor
         final String sql = "INSERT INTO certprofileinfo (id, name) VALUES (?, ?)";
 
         PreparedStatement ps = borrowPreparedStatement(sql);
-        if(ps == null) {
+        if(ps == null)
+        {
             throw new SQLException("Cannot create prepared insert_certprofileinfo statement");
         }
 
         id = certprofileStore.getNextFreeId();
-        try{
+        try
+        {
             int idx = 1;
             ps.setInt(idx++, id.intValue());
             ps.setString(idx++, certprofileName);
 
             ps.execute();
             certprofileStore.addProfileEntry(certprofileName, id);
-        }finally {
+        }finally
+        {
             returnPreparedStatement(ps);
         }
 
@@ -1134,7 +1254,8 @@ class CertStoreQueryExecutor
     {
         PreparedStatement ps = null;
         Connection c = dataSource.getConnection(5000);
-        if(c != null) {
+        if(c != null)
+        {
             ps = c.prepareStatement(sqlQuery);
         }
         return ps;
@@ -1142,11 +1263,13 @@ class CertStoreQueryExecutor
 
     private void returnPreparedStatement(PreparedStatement ps)
     {
-        try{
+        try
+        {
             Connection conn = ps.getConnection();
             ps.close();
             dataSource.returnConnection(conn);
-        }catch(Throwable t) {
+        }catch(Throwable t)
+        {
             LOG.warn("Cannot return prepared statement and connection", t);
         }
     }
@@ -1155,15 +1278,19 @@ class CertStoreQueryExecutor
     {
         final String sql = "SELECT id FROM cainfo";
 
-        try{
+        try
+        {
             PreparedStatement ps = borrowPreparedStatement(sql);
 
             ResultSet rs = null;
-            try{
+            try
+            {
                 rs = ps.executeQuery();
-            }finally {
+            }finally
+            {
                 returnPreparedStatement(ps);
-                if(rs != null) {
+                if(rs != null)
+                {
                     rs.close();
                     rs = null;
                 }

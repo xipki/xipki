@@ -27,7 +27,8 @@ import org.xipki.ca.api.OperationException;
 import org.xipki.ca.api.OperationException.ErrorCode;
 import org.xipki.security.api.ConcurrentContentSigner;
 
-public class CrlSigner {
+public class CrlSigner
+{
     private final ConcurrentContentSigner signer;
     private final byte[] subjectKeyIdentifier;
 
@@ -57,28 +58,34 @@ public class CrlSigner {
                         "CA certificate does not have required extension SubjectKeyIdentifier");
             }
             ASN1OctetString ski;
-            try {
+            try
+            {
                 ski = (ASN1OctetString) X509ExtensionUtil.fromExtensionValue(encodedSkiValue);
-            } catch (IOException e) {
+            } catch (IOException e)
+            {
                 throw new OperationException(ErrorCode.System_Failure, e.getMessage());
             }
             this.subjectKeyIdentifier = ski.getOctets();
         }
     }
 
-    public ConcurrentContentSigner getSigner() {
+    public ConcurrentContentSigner getSigner()
+    {
         return signer;
     }
 
-    public int getPeriod() {
+    public int getPeriod()
+    {
         return period;
     }
 
-    public int getOverlap() {
+    public int getOverlap()
+    {
         return overlap;
     }
 
-    public boolean includeCertsInCrl() {
+    public boolean includeCertsInCrl()
+    {
         return includeCertsInCrl;
     }
 
@@ -87,7 +94,8 @@ public class CrlSigner {
         this.includeCertsInCrl = includeCertsInCrl;
     }
 
-    public byte[] getSubjectKeyIdentifier() {
+    public byte[] getSubjectKeyIdentifier()
+    {
         return subjectKeyIdentifier == null ? null : Arrays.clone(subjectKeyIdentifier);
     }
 

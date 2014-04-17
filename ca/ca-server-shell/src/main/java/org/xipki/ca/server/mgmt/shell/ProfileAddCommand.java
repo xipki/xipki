@@ -23,7 +23,8 @@ import org.xipki.ca.server.mgmt.CertProfileEntry;
 import org.xipki.security.common.IoCertUtil;
 
 @Command(scope = "ca", name = "profile-add", description="Add certificate profile")
-public class ProfileAddCommand extends CaCommand {
+public class ProfileAddCommand extends CaCommand
+{
 
     @Option(name = "-name",
                 description = "Required. Profile name",
@@ -44,7 +45,8 @@ public class ProfileAddCommand extends CaCommand {
     protected String            confFile;
 
     @Override
-    protected Object doExecute() throws Exception {
+    protected Object doExecute() throws Exception
+    {
         CertProfileEntry entry = new CertProfileEntry(name);
         entry.setType(type);
 

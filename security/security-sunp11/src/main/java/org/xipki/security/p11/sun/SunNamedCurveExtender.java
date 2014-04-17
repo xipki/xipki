@@ -44,7 +44,8 @@ import org.bouncycastle.math.ec.ECCurve;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class SunNamedCurveExtender {
+public class SunNamedCurveExtender
+{
     private static Logger LOG = LoggerFactory.getLogger(SunNamedCurveExtender.class);
 
     private final static int P  = 1; // prime curve
@@ -66,7 +67,8 @@ public class SunNamedCurveExtender {
     static
     {
         boolean _jdk18On;
-        try{
+        try
+        {
             class_CurveDB = Class.forName("sun.security.ec.CurveDB");
             _jdk18On = true;
         }catch(ClassNotFoundException e)
@@ -77,7 +79,8 @@ public class SunNamedCurveExtender {
         jdk18on = _jdk18On;
 
         final String classname_NamedCurve = "sun.security.ec.NamedCurve";
-        try{
+        try
+        {
             class_NamedCurve = Class.forName(classname_NamedCurve);
         }catch(ClassNotFoundException e)
         {
@@ -134,7 +137,8 @@ public class SunNamedCurveExtender {
 
     public static void addNamedCurves()
     {
-        synchronized (EXECUTED) {
+        synchronized (EXECUTED)
+        {
             if(successfull == false)
             {
                 LOG.warn("Could not initialize");
@@ -147,7 +151,8 @@ public class SunNamedCurveExtender {
             }
             EXECUTED = Boolean.TRUE;
 
-            try{
+            try
+            {
                 if(jdk18on)
                 {
                     addNamedCurves_jdk18on();
@@ -167,7 +172,8 @@ public class SunNamedCurveExtender {
 
     private static void addNamedCurves_jdk17()
     {
-        final Class<?>[] Param_NamedCurve_add = new Class[]{
+        final Class<?>[] Param_NamedCurve_add = new Class[]
+        {
             String.class, String.class, int.class, String.class,
             String.class, String.class, String.class, String.class, String.class, int.class
         };
@@ -191,13 +197,16 @@ public class SunNamedCurveExtender {
             return;
         }
 
-        try {
+        try
+        {
             field_SPLIT_PATTERN.set(null, SPLIT_PATTERN);
-        } catch (IllegalArgumentException e) {
+        } catch (IllegalArgumentException e)
+        {
             LOG.warn("Could not set Field SPLIT_PATTERN. IllegalArgumentException: {}", e.getMessage());
             LOG.debug("Could not set Field SPLIT_PATTERN", e);
             return;
-        } catch (IllegalAccessException e) {
+        } catch (IllegalAccessException e)
+        {
             LOG.warn("Could not set Field SPLIT_PATTERN. IllegalAccessException: {}", e.getMessage());
             LOG.debug("Could not set Field SPLIT_PATTERN", e);
             return;
@@ -259,13 +268,16 @@ public class SunNamedCurveExtender {
             }
         }
 
-        try {
+        try
+        {
             field_SPLIT_PATTERN.set(null, null);
-        } catch (IllegalArgumentException e) {
+        } catch (IllegalArgumentException e)
+        {
             LOG.warn("Could not set Field SPLIT_PATTERN. IllegalArgumentException: {}", e.getMessage());
             LOG.debug("Could not set Field SPLIT_PATTERN", e);
             return;
-        } catch (IllegalAccessException e) {
+        } catch (IllegalAccessException e)
+        {
             LOG.warn("Could not set Field SPLIT_PATTERN. IllegalAccessException: {}", e.getMessage());
             LOG.debug("Could not set Field SPLIT_PATTERN", e);
             return;
@@ -278,7 +290,8 @@ public class SunNamedCurveExtender {
 
     private static void addNamedCurves_jdk18on()
     {
-        final Class<?>[] Param_CurveDB_add = new Class[]{
+        final Class<?>[] Param_CurveDB_add = new Class[]
+        {
             String.class, String.class, int.class, String.class,
             String.class, String.class, String.class, String.class, String.class, int.class,
             Pattern.class
@@ -363,15 +376,18 @@ public class SunNamedCurveExtender {
             }
         }
 
-        try {
+        try
+        {
             Map<?,?> oidMap = (Map<?, ?>) field_oidMap.get(null);
             Collection<?> namedCurves = Collections.unmodifiableCollection(oidMap.values());
 
             field_specCollection.set(null, namedCurves);
-        } catch (IllegalArgumentException e) {
+        } catch (IllegalArgumentException e)
+        {
             LOG.warn("Could not update change the value of field CurveDB.specCollection. IllegalArgumentException {}", e.getMessage());
             LOG.debug("Could not update change the value of field CurveDB.specCollection.", e);
-        } catch (IllegalAccessException e) {
+        } catch (IllegalAccessException e)
+        {
             LOG.warn("Could not update change the value of field CurveDB.specCollection. IllegalArgumentException {}", e.getMessage());
             LOG.debug("Could not update change the value of field CurveDB.specCollection.", e);
         } catch (ClassCastException e)
@@ -409,14 +425,18 @@ public class SunNamedCurveExtender {
             Method method_lookup,
             ASN1ObjectIdentifier curveId)
     {
-        try {
+        try
+        {
             Object curve = method_lookup.invoke(null, new Object[]{curveId.getId()});
             return curve != null;
-        } catch (IllegalArgumentException e) {
+        } catch (IllegalArgumentException e)
+        {
             LOG.warn("IllegalArgumentException " + e.getMessage());
-        } catch (IllegalAccessException e) {
+        } catch (IllegalAccessException e)
+        {
             LOG.warn("IllegalAccessException " + e.getMessage());
-        } catch (InvocationTargetException e) {
+        } catch (InvocationTargetException e)
+        {
             LOG.warn("InvocationTargetException " + e.getMessage());
         }
 
@@ -428,15 +448,19 @@ public class SunNamedCurveExtender {
             String name, String soid, int type, String sfield,
             String a, String b, String x, String y, String n, int h)
     {
-        try {
+        try
+        {
             method_add.invoke(null, new Object[]{name, soid, type, sfield, a, b, x, y, n, h, SPLIT_PATTERN});
-        } catch (IllegalArgumentException e) {
+        } catch (IllegalArgumentException e)
+        {
             LOG.warn("IllegalArgumentException " + e.getMessage());
             return false;
-        } catch (IllegalAccessException e) {
+        } catch (IllegalAccessException e)
+        {
             LOG.warn("IllegalAccessException " + e.getMessage());
             return false;
-        } catch (InvocationTargetException e) {
+        } catch (InvocationTargetException e)
+        {
             LOG.warn("InvocationTargetException " + e.getMessage());
             return false;
         }
@@ -449,15 +473,19 @@ public class SunNamedCurveExtender {
             String name, String soid, int type, String sfield,
             String a, String b, String x, String y, String n, int h)
     {
-        try {
+        try
+        {
             method_add.invoke(null, new Object[]{name, soid, type, sfield, a, b, x, y, n, h});
-        } catch (IllegalArgumentException e) {
+        } catch (IllegalArgumentException e)
+        {
             LOG.warn("IllegalArgumentException " + e.getMessage());
             return false;
-        } catch (IllegalAccessException e) {
+        } catch (IllegalAccessException e)
+        {
             LOG.warn("IllegalAccessException " + e.getMessage());
             return false;
-        } catch (InvocationTargetException e) {
+        } catch (InvocationTargetException e)
+        {
             LOG.warn("InvocationTargetException " + e.getMessage());
             return false;
         }
@@ -473,7 +501,8 @@ public class SunNamedCurveExtender {
         Method serviceMethod=null;
         final String desc = "Method " + clz.getName() + "." + methodName;
 
-        try{
+        try
+        {
             if(params == null)
             {
                 serviceMethod = clz.getDeclaredMethod(methodName);
@@ -484,10 +513,12 @@ public class SunNamedCurveExtender {
             }
             serviceMethod.setAccessible(true);
             return serviceMethod;
-        } catch (SecurityException e) {
+        } catch (SecurityException e)
+        {
             LOG.warn("Could not get " + desc + ", SecuirtyException: {}", e.getMessage());
             LOG.debug("Could not get " + desc, e);
-        } catch (NoSuchMethodException e) {
+        } catch (NoSuchMethodException e)
+        {
             LOG.warn("Could not get " + desc + ", NoSuchMethodException: {}", e.getMessage());
             LOG.debug("Could not get " + desc, e);
         }
@@ -501,11 +532,13 @@ public class SunNamedCurveExtender {
             String fieldName)
     {
         String desc = "Field " + fieldName;
-        try{
+        try
+        {
             Field field = clazz.getDeclaredField(fieldName);
             field.setAccessible(true);
             return field;
-        } catch (NoSuchFieldException e) {
+        } catch (NoSuchFieldException e)
+        {
             LOG.warn("Could not get " + desc + ". NoSuchFieldException: {}", e.getMessage());
             LOG.debug("Could not get " + desc, e);
         }
@@ -557,7 +590,8 @@ public class SunNamedCurveExtender {
                 BigInteger rp = BigInteger.ONE;
                 rp = rp.setBit(m);
 
-                for (int j = 0; j < ks.length; j++) {
+                for (int j = 0; j < ks.length; j++)
+                {
                     if(ks[0] > 0)
                     {
                         rp = rp.setBit(ks[j]);
@@ -591,15 +625,19 @@ public class SunNamedCurveExtender {
 
     static byte[] getNamedCurveEncoded(ECParameterSpec namedCurve)
     {
-        try {
+        try
+        {
             return (byte[]) method_NamedCurve_getEncoded.invoke(namedCurve, (Object) null);
-        } catch (IllegalArgumentException e) {
+        } catch (IllegalArgumentException e)
+        {
             LOG.warn("IllegalArgumentException " + e.getMessage());
             return null;
-        } catch (IllegalAccessException e) {
+        } catch (IllegalAccessException e)
+        {
             LOG.warn("IllegalAccessException " + e.getMessage());
             return null;
-        } catch (InvocationTargetException e) {
+        } catch (InvocationTargetException e)
+        {
             LOG.warn("InvocationTargetException " + e.getMessage());
             return null;
         }
@@ -607,15 +645,19 @@ public class SunNamedCurveExtender {
 
     static String getNamedCurveObjectId(ECParameterSpec namedCurve)
     {
-        try {
+        try
+        {
             return (String) method_NamedCurve_getObjectId.invoke(namedCurve, (Object)null);
-        } catch (IllegalArgumentException e) {
+        } catch (IllegalArgumentException e)
+        {
             LOG.warn("IllegalArgumentException " + e.getMessage());
             return null;
-        } catch (IllegalAccessException e) {
+        } catch (IllegalAccessException e)
+        {
             LOG.warn("IllegalAccessException " + e.getMessage());
             return null;
-        } catch (InvocationTargetException e) {
+        } catch (InvocationTargetException e)
+        {
             LOG.warn("InvocationTargetException " + e.getMessage());
             return null;
         }
@@ -623,15 +665,19 @@ public class SunNamedCurveExtender {
 
     static ECParameterSpec lookupCurve(String name)
     {
-        try {
+        try
+        {
             return (ECParameterSpec) method_CurveDB_lookup_name.invoke(null, name);
-        } catch (IllegalArgumentException e) {
+        } catch (IllegalArgumentException e)
+        {
             LOG.warn("IllegalArgumentException " + e.getMessage());
             return null;
-        } catch (IllegalAccessException e) {
+        } catch (IllegalAccessException e)
+        {
             LOG.warn("IllegalAccessException " + e.getMessage());
             return null;
-        } catch (InvocationTargetException e) {
+        } catch (InvocationTargetException e)
+        {
             LOG.warn("InvocationTargetException " + e.getMessage());
             return null;
         }
@@ -639,15 +685,19 @@ public class SunNamedCurveExtender {
 
     static ECParameterSpec lookupCurve(ECParameterSpec paramSpec)
     {
-        try {
+        try
+        {
             return (ECParameterSpec) method_CurveDB_lookup_paramSpec.invoke(null, paramSpec);
-        } catch (IllegalArgumentException e) {
+        } catch (IllegalArgumentException e)
+        {
             LOG.warn("IllegalArgumentException " + e.getMessage());
             return null;
-        } catch (IllegalAccessException e) {
+        } catch (IllegalAccessException e)
+        {
             LOG.warn("IllegalAccessException " + e.getMessage());
             return null;
-        } catch (InvocationTargetException e) {
+        } catch (InvocationTargetException e)
+        {
             LOG.warn("InvocationTargetException " + e.getMessage());
             return null;
         }

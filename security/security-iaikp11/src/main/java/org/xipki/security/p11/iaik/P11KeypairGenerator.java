@@ -165,7 +165,8 @@ public class P11KeypairGenerator
         IaikExtendedSlot slot = getSlot(pkcs11Lib, slotId, password);
 
         Session session = slot.borrowWritableSession();
-        try{
+        try
+        {
             if(labelExists(session, label))
             {
                 throw new IllegalArgumentException("Label " + label + " exists, please specify another one");
@@ -271,7 +272,8 @@ public class P11KeypairGenerator
         IaikExtendedSlot slot = getSlot(pkcs11Lib, slotId, password);
 
         Session session = slot.borrowWritableSession();
-        try{
+        try
+        {
             if(labelExists(session, label))
             {
                 throw new IllegalArgumentException("Label " + label + " exists, please specify another one");
@@ -322,7 +324,8 @@ public class P11KeypairGenerator
     {
         ASN1ObjectIdentifier curveId;
 
-        try{
+        try
+        {
             curveId = new ASN1ObjectIdentifier(curveNameOrOid);
             return curveId;
         } catch(Exception e)
@@ -356,7 +359,8 @@ public class P11KeypairGenerator
     {
         KeyPair kp = null;
 
-        try{
+        try
+        {
             kp = generateNamedECDSAKeyPair(session, curveId, id, label);
         }catch(TokenException e)
         {
@@ -536,21 +540,25 @@ public class P11KeypairGenerator
         return keyID;
     }
 
-    private static class PrivateKeyAndPKInfo {
+    private static class PrivateKeyAndPKInfo
+    {
         private final PrivateKey privateKey;
         private final SubjectPublicKeyInfo publicKeyInfo;
 
-        public PrivateKeyAndPKInfo(PrivateKey privateKey, SubjectPublicKeyInfo publicKeyInfo) {
+        public PrivateKeyAndPKInfo(PrivateKey privateKey, SubjectPublicKeyInfo publicKeyInfo)
+        {
             super();
             this.privateKey = privateKey;
             this.publicKeyInfo = publicKeyInfo;
         }
 
-        public PrivateKey getPrivateKey() {
+        public PrivateKey getPrivateKey()
+        {
             return privateKey;
         }
 
-        public SubjectPublicKeyInfo getPublicKeyInfo() {
+        public SubjectPublicKeyInfo getPublicKeyInfo()
+        {
             return publicKeyInfo;
         }
     }

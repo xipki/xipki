@@ -23,7 +23,8 @@ import java.security.NoSuchAlgorithmException;
 import org.bouncycastle.util.encoders.Hex;
 import org.xipki.ocsp.api.HashAlgoType;
 
-class HashCalculator {
+class HashCalculator
+{
     private MessageDigest sha1;
     private MessageDigest sha224;
     private MessageDigest sha256;
@@ -69,7 +70,8 @@ class HashCalculator {
                 throw new RuntimeException("should not reach here");
         }
 
-        synchronized (md) {
+        synchronized (md)
+        {
             md.reset();
             return md.digest(data);
         }

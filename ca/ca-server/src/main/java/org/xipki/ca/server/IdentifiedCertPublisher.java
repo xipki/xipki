@@ -33,7 +33,8 @@ import org.xipki.security.api.PasswordResolver;
 import org.xipki.security.common.EnvironmentParameterResolver;
 import org.xipki.security.common.ParamChecker;
 
-public class IdentifiedCertPublisher implements CertPublisher {
+public class IdentifiedCertPublisher implements CertPublisher
+{
     private final String name;
     private final CertPublisher certPublisher;
 
@@ -49,41 +50,49 @@ public class IdentifiedCertPublisher implements CertPublisher {
     @Override
     public void initialize(String conf, PasswordResolver passwordResolver,
             DataSourceFactory dataSourceFactory)
-    throws CertPublisherException {
+    throws CertPublisherException
+    {
         certPublisher.initialize(conf, passwordResolver, dataSourceFactory);
     }
 
     @Override
-    public void setEnvironmentParamterResolver(EnvironmentParameterResolver paramterResolver) {
+    public void setEnvironmentParamterResolver(EnvironmentParameterResolver paramterResolver)
+    {
         certPublisher.setEnvironmentParamterResolver(paramterResolver);
     }
 
     @Override
-    public void certificateAdded(CertificateInfo certInfo) {
+    public void certificateAdded(CertificateInfo certInfo)
+    {
         certPublisher.certificateAdded(certInfo);
     }
 
     @Override
-    public void certificateRevoked(X509Certificate cert, int reason, Date invalidityTime) {
+    public void certificateRevoked(X509Certificate cert, int reason, Date invalidityTime)
+    {
         certPublisher.certificateRevoked(cert, reason, invalidityTime);
     }
 
     @Override
-    public void certificateRevoked(X500Principal issuer, BigInteger serialNumber, int reason, Date invalidityTime) {
+    public void certificateRevoked(X500Principal issuer, BigInteger serialNumber, int reason, Date invalidityTime)
+    {
         certPublisher.certificateRevoked(issuer, serialNumber, reason, invalidityTime);
     }
 
     @Override
-    public void crlAdded(X509CertificateWithMetaInfo cacert, X509CRL crl) {
+    public void crlAdded(X509CertificateWithMetaInfo cacert, X509CRL crl)
+    {
         certPublisher.crlAdded(cacert, crl);
     }
 
-    public String getName() {
+    public String getName()
+    {
         return name;
     }
 
     @Override
-    public boolean isHealthy() {
+    public boolean isHealthy()
+    {
         return certPublisher.isHealthy();
     }
 }

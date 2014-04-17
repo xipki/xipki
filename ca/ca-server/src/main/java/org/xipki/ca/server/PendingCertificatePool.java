@@ -27,7 +27,8 @@ import org.bouncycastle.util.encoders.Hex;
 import org.xipki.ca.api.publisher.CertificateInfo;
 import org.xipki.security.common.ParamChecker;
 
-class PendingCertificatePool {
+class PendingCertificatePool
+{
     private static class MyEntry
     {
         private final BigInteger certReqId;
@@ -36,7 +37,8 @@ class PendingCertificatePool {
 
         public MyEntry(BigInteger certReqId,
                 long waitForConfirmTill,
-                CertificateInfo certInfo) {
+                CertificateInfo certInfo)
+                {
             super();
             ParamChecker.assertNotNull("certReqId", certReqId);
             ParamChecker.assertNotNull("certInfo", certInfo);

@@ -25,7 +25,8 @@ import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.xipki.security.common.EnvironmentParameterResolver;
 import org.xipki.security.common.ParamChecker;
 
-public class IdentifiedCertProfile implements CertProfile {
+public class IdentifiedCertProfile implements CertProfile
+{
     private final String name;
     private final CertProfile certProfile;
 
@@ -44,7 +45,8 @@ public class IdentifiedCertProfile implements CertProfile {
     }
 
     @Override
-    public void initialize(String data) throws CertProfileException {
+    public void initialize(String data) throws CertProfileException
+    {
         certProfile.initialize(data);
     }
 
@@ -56,12 +58,14 @@ public class IdentifiedCertProfile implements CertProfile {
     }
 
     @Override
-    public Date getNotBefore(Date notBefore){
+    public Date getNotBefore(Date notBefore)
+    {
         return certProfile.getNotBefore(notBefore);
     }
 
     @Override
-    public Integer getValidity() {
+    public Integer getValidity()
+    {
         return certProfile.getValidity();
     }
 
@@ -81,27 +85,32 @@ public class IdentifiedCertProfile implements CertProfile {
     }
 
     @Override
-    public boolean isOnlyForRA() {
+    public boolean isOnlyForRA()
+    {
         return certProfile.isOnlyForRA();
     }
 
     @Override
-    public ExtensionOccurrence getOccurenceOfAuthorityKeyIdentifier() {
+    public ExtensionOccurrence getOccurenceOfAuthorityKeyIdentifier()
+    {
         return certProfile.getOccurenceOfAuthorityKeyIdentifier();
     }
 
     @Override
-    public ExtensionOccurrence getOccurenceOfSubjectKeyIdentifier() {
+    public ExtensionOccurrence getOccurenceOfSubjectKeyIdentifier()
+    {
         return certProfile.getOccurenceOfSubjectKeyIdentifier();
     }
 
     @Override
-    public ExtensionOccurrence getOccurenceOfCRLDistributinPoints() {
+    public ExtensionOccurrence getOccurenceOfCRLDistributinPoints()
+    {
         return certProfile.getOccurenceOfCRLDistributinPoints();
     }
 
     @Override
-    public ExtensionOccurrence getOccurenceOfAuthorityInfoAccess() {
+    public ExtensionOccurrence getOccurenceOfAuthorityInfoAccess()
+    {
         return certProfile.getOccurenceOfAuthorityInfoAccess();
     }
 
@@ -113,7 +122,8 @@ public class IdentifiedCertProfile implements CertProfile {
     }
 
     @Override
-    public boolean incSerialNumberIfSubjectExists() {
+    public boolean incSerialNumberIfSubjectExists()
+    {
         return certProfile.incSerialNumberIfSubjectExists();
     }
 

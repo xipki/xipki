@@ -55,27 +55,33 @@ class CAConf
         this.responder = responder;
     }
 
-    public String getName() {
+    public String getName()
+    {
         return name;
     }
 
-    public String getUrl() {
+    public String getUrl()
+    {
         return url;
     }
 
-    public X509Certificate getCert() {
+    public X509Certificate getCert()
+    {
         return cert;
     }
 
-    public X500Name getSubject() {
+    public X500Name getSubject()
+    {
         return subject;
     }
 
-    public Set<String> getProfiles() {
+    public Set<String> getProfiles()
+    {
         return profiles;
     }
 
-    public X509Certificate getResponder() {
+    public X509Certificate getResponder()
+    {
         return responder;
     }
 }

@@ -20,9 +20,11 @@ package org.xipki.ca.server.mgmt.shell;
 import org.apache.felix.gogo.commands.Command;
 
 @Command(scope = "ca", name = "responder-rm", description="Remove responder")
-public class ResponderRemoveCommand extends CaCommand {
+public class ResponderRemoveCommand extends CaCommand
+{
     @Override
-    protected Object doExecute() throws Exception {
+    protected Object doExecute() throws Exception
+    {
         caManager.removeCmpResponder();
         return null;
     }

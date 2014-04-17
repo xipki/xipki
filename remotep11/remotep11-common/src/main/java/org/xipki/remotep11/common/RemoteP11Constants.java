@@ -20,7 +20,8 @@ package org.xipki.remotep11.common;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.x509.GeneralName;
 
-public class RemoteP11Constants {
+public class RemoteP11Constants
+{
     // just dummy, for intern purpose
     private static final ASN1ObjectIdentifier id_remotep11      = new ASN1ObjectIdentifier("1.2.3.4.5.6");
 

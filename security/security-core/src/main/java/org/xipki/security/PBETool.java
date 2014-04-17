@@ -29,7 +29,8 @@ import javax.swing.JPasswordField;
 
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
-public class PBETool {
+public class PBETool
+{
 
     public static void main(String[] args)
     {
@@ -52,7 +53,8 @@ public class PBETool {
             Security.addProvider(new BouncyCastleProvider());
         }
 
-        try {
+        try
+        {
             if("enc".equalsIgnoreCase(cmd))
             {
                 char[] masterPassword = getPassword("Please enter the master password");
@@ -78,7 +80,8 @@ public class PBETool {
                  String msg = "unknown command: " + cmd;
                  printUsageAndExit(msg);
             }
-        } catch (Exception e) {
+        } catch (Exception e)
+        {
             System.err.println("ERROR: " + e.getMessage());
             System.exit(1);
         }
@@ -140,7 +143,8 @@ public class PBETool {
     {
         Map<String, String> ret = new HashMap<String, String>();
 
-        for (int i = startIndex; i < params.length;i++) {
+        for (int i = startIndex; i < params.length;i++)
+        {
             String arg = params[i];
 
             if(i+1 >= params.length)

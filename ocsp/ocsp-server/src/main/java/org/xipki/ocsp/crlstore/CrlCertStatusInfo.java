@@ -26,7 +26,8 @@ import org.xipki.ocsp.api.CertStatusInfo;
 import org.xipki.ocsp.api.HashAlgoType;
 import org.xipki.security.common.ParamChecker;
 
-class CrlCertStatusInfo {
+class CrlCertStatusInfo
+{
     private final CertStatus certStatus;
     private final CertRevocationInfo revocationInfo;
     private final Map<HashAlgoType, byte[]> certHashes;
@@ -61,15 +62,18 @@ class CrlCertStatusInfo {
         return new CrlCertStatusInfo(CertStatus.REVOCATED, revocationInfo, certHashes);
     }
 
-    CertStatus getCertStatus() {
+    CertStatus getCertStatus()
+    {
         return certStatus;
     }
 
-    CertRevocationInfo getRevocationInfo() {
+    CertRevocationInfo getRevocationInfo()
+    {
         return revocationInfo;
     }
 
-    byte[] getCertHash(HashAlgoType hashAlgo) {
+    byte[] getCertHash(HashAlgoType hashAlgo)
+    {
         return certHashes == null ? null : certHashes.get(hashAlgo);
     }
 

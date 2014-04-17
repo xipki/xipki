@@ -23,7 +23,8 @@ import org.xipki.ca.server.mgmt.CmpRequestorEntry;
 import org.xipki.security.common.IoCertUtil;
 
 @Command(scope = "ca", name = "requestor-add", description="Add requestor")
-public class RequestorAddCommand extends CaCommand {
+public class RequestorAddCommand extends CaCommand
+{
     @Option(name = "-name",
             description = "Required. Requestor name",
             required = true, multiValued = false)
@@ -35,7 +36,8 @@ public class RequestorAddCommand extends CaCommand {
     protected String            certFile;
 
 @Override
-protected Object doExecute() throws Exception {
+protected Object doExecute() throws Exception
+{
     CmpRequestorEntry entry = new CmpRequestorEntry(name);
     entry.setCert(IoCertUtil.parseCert(certFile));
     caManager.addCmpRequestor(entry);

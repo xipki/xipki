@@ -28,7 +28,8 @@ import java.net.URL;
 import org.xipki.security.api.SignerException;
 import org.xipki.security.common.ParamChecker;
 
-class DefaultRemoteP11CryptService extends RemoteP11CryptService {
+class DefaultRemoteP11CryptService extends RemoteP11CryptService
+{
     private static final String CMP_REQUEST_MIMETYPE = "application/pkixcmp";
     private static final String CMP_RESPONSE_MIMETYPE = "application/pkixcmp";
 
@@ -46,9 +47,11 @@ class DefaultRemoteP11CryptService extends RemoteP11CryptService {
         this.user = user;
         this.password = password;
 
-        try {
+        try
+        {
             this.serverUrl = new URL(url);
-        } catch (MalformedURLException e) {
+        } catch (MalformedURLException e)
+        {
             throw new IllegalArgumentException("Invalid url: " + serverUrl);
         }
     }
@@ -70,7 +73,8 @@ class DefaultRemoteP11CryptService extends RemoteP11CryptService {
         outputstream.write(request);
         outputstream.flush();
         InputStream inputstream = httpUrlConnection.getInputStream();
-        try{
+        try
+        {
             if (httpUrlConnection.getResponseCode() != HttpURLConnection.HTTP_OK)
             {
                 throw new IOException("Bad Response: "
@@ -106,13 +110,15 @@ class DefaultRemoteP11CryptService extends RemoteP11CryptService {
             } while (true);
 
             return bytearrayoutputstream.toByteArray();
-        }finally{
+        }finally
+        {
             inputstream.close();
         }
     }
 
     @Override
-    public void refresh() throws SignerException {
+    public void refresh() throws SignerException
+    {
     }
 
 }

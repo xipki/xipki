@@ -19,7 +19,8 @@ package org.xipki.ca.certprofile.example;
 
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 
-public class ObjectIdentifiers {
+public class ObjectIdentifiers
+{
     public static final ASN1ObjectIdentifier id_extension_admission = new ASN1ObjectIdentifier("1.3.36.8.3.3");
 
     public static final ASN1ObjectIdentifier id_tsl_kp_tslSigning    = new ASN1ObjectIdentifier("0.4.0.2231.3.0");

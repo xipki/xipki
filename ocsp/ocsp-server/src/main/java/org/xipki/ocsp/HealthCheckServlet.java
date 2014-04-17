@@ -50,7 +50,8 @@ public class HealthCheckServlet extends HttpServlet
     protected void doGet(HttpServletRequest request,
             HttpServletResponse response) throws ServletException, IOException
     {
-        try{
+        try
+        {
             if(responder == null)
             {
                 LOG.error("responder in servlet not configured");
@@ -60,9 +61,11 @@ public class HealthCheckServlet extends HttpServlet
             }
 
             HealthCheckResult healthResult = responder.healthCheck();
-            if (healthResult.isHealthy()) {
+            if (healthResult.isHealthy())
+            {
                 response.setStatus(HttpServletResponse.SC_OK);
-            } else {
+            } else
+            {
                 response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             }
 

@@ -48,23 +48,27 @@ import org.xipki.security.p11.iaik.IaikExtendedSlot;
 import org.xipki.security.p11.iaik.IaikP11ModulePool;
 
 @Command(scope = "keytool", name = "list", description="List PKCS#11 device objects")
-public class P11ListSlotCommand extends OsgiCommandSupport {
+public class P11ListSlotCommand extends OsgiCommandSupport
+{
     @Option(name = "-pwd", aliases = { "--password" },
             required = false, description = "Password of the PKCS#11 token")
     protected char[]            password;
 
     private SecurityFactory securityFactory;
 
-    public SecurityFactory getSecurityFactory() {
+    public SecurityFactory getSecurityFactory()
+    {
         return securityFactory;
     }
 
-    public void setSecurityFactory(SecurityFactory securityFactory) {
+    public void setSecurityFactory(SecurityFactory securityFactory)
+    {
         this.securityFactory = securityFactory;
     }
 
     @Override
-    protected Object doExecute() throws Exception {
+    protected Object doExecute() throws Exception
+    {
         IaikExtendedModule module = IaikP11ModulePool.getInstance().getModule(
                 securityFactory.getPkcs11Module());
         List<PKCS11SlotIdentifier> slotIds = new ArrayList<PKCS11SlotIdentifier>(module.getAllSlotIds());
@@ -84,7 +88,8 @@ public class P11ListSlotCommand extends OsgiCommandSupport {
             sb.append("\nslot[").append(slotId.getSlotIndex()).append("]: ").append(slotId.getSlotId()).append("\n");
 
             IaikExtendedSlot slot = null;
-            try{
+            try
+            {
                 slot = module.getSlot(slotId, password);
             }catch(SignerException e)
             {
@@ -149,7 +154,8 @@ public class P11ListSlotCommand extends OsgiCommandSupport {
                 {
                     byte[] bytes = cert.getSubject().getByteArrayValue();
                     String subject;
-                    try{
+                    try
+                    {
                         X500Principal x500Prin = new X500Principal(bytes);
                         subject = x500Prin.getName();
                     }catch(Exception e)
@@ -159,7 +165,8 @@ public class P11ListSlotCommand extends OsgiCommandSupport {
 
                     bytes = cert.getIssuer().getByteArrayValue();
                     String issuer;
-                    try{
+                    try
+                    {
                         X500Principal x500Prin = new X500Principal(bytes);
                         issuer = x500Prin.getName();
                     }catch(Exception e)
@@ -198,7 +205,8 @@ public class P11ListSlotCommand extends OsgiCommandSupport {
             byte[] paramBytes = ((ECDSAPublicKey) key).getEcdsaParams().getByteArrayValue();
             if(paramBytes.length < 50)
             {
-                try{
+                try
+                {
                     ASN1ObjectIdentifier curveId = (ASN1ObjectIdentifier) ASN1ObjectIdentifier.fromByteArray(paramBytes);
                     String curveName = getCurveName(curveId);
                     return "EC (named curve " + curveName + ")";
@@ -250,14 +258,16 @@ public class P11ListSlotCommand extends OsgiCommandSupport {
         private final char[] keyLabel;
         private final PrivateKey privateKey;
 
-        public ComparablePrivateKey(byte[] keyId, char[] keyLabel, PrivateKey privateKey) {
+        public ComparablePrivateKey(byte[] keyId, char[] keyLabel, PrivateKey privateKey)
+        {
             this.keyId = keyId;
             this.keyLabel = keyLabel;
             this.privateKey = privateKey;
         }
 
         @Override
-        public int compareTo(ComparablePrivateKey o) {
+        public int compareTo(ComparablePrivateKey o)
+        {
             if(keyLabel == null)
             {
                 if(o.keyLabel == null)
@@ -282,20 +292,24 @@ public class P11ListSlotCommand extends OsgiCommandSupport {
             }
         }
 
-        public byte[] getKeyId() {
+        public byte[] getKeyId()
+        {
             return keyId;
         }
 
-        public char[] getKeyLabel() {
+        public char[] getKeyLabel()
+        {
             return keyLabel;
         }
 
-        public String getKeyLabelAsText() {
+        public String getKeyLabelAsText()
+        {
             return keyLabel == null ? null : new String(keyLabel);
         }
 
         @SuppressWarnings("unused")
-        public PrivateKey getPrivateKey() {
+        public PrivateKey getPrivateKey()
+        {
             return privateKey;
         }
     }

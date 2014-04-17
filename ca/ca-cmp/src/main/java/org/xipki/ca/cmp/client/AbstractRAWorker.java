@@ -58,7 +58,8 @@ public abstract class AbstractRAWorker
     {
     }
 
-    public void setPasswordResolver(PasswordResolver passwordResolver) {
+    public void setPasswordResolver(PasswordResolver passwordResolver)
+    {
         this.passwordResolver = passwordResolver;
     }
 
@@ -73,10 +74,12 @@ public abstract class AbstractRAWorker
             if(resultEntry instanceof EnrollCertResultEntryType)
             {
                 EnrollCertResultEntryType entry = (EnrollCertResultEntryType) resultEntry;
-                try {
+                try
+                {
                     Certificate cert = getCertificate(entry.getCert());
                     certOrError = new CertificateOrError(cert);
-                } catch (CertificateException e) {
+                } catch (CertificateException e)
+                {
                     throw new RAWorkerException(
                             "CertificateParsingException for request (id=" + entry.getId()+"): " + e.getMessage());
                 }
@@ -103,9 +106,11 @@ public abstract class AbstractRAWorker
             List<Certificate> caPubs = new ArrayList<Certificate>(cmpCaPubs.size());
             for(CMPCertificate cmpCaPub : cmpCaPubs)
             {
-                try {
+                try
+                {
                     caPubs.add(getCertificate(cmpCaPub));
-                } catch (CertificateException e) {
+                } catch (CertificateException e)
+                {
                     LOG.error("Could not extract the caPub from CMPCertificate");
                 }
             }
@@ -146,7 +151,8 @@ public abstract class AbstractRAWorker
                 errResult.getPkiFailureInfo(), errResult.getStatusMessage());
     }
 
-    public void setSecurityFactory(SecurityFactory securityFactory) {
+    public void setSecurityFactory(SecurityFactory securityFactory)
+    {
         this.securityFactory = securityFactory;
     }
 

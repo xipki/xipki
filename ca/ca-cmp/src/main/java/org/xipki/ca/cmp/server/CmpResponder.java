@@ -57,7 +57,8 @@ import org.xipki.security.api.ConcurrentContentSigner;
 import org.xipki.security.api.SecurityFactory;
 import org.xipki.security.common.ParamChecker;
 
-public abstract class CmpResponder {
+public abstract class CmpResponder
+{
     private static final Logger LOG = LoggerFactory.getLogger(CmpResponder.class);
 
     private final SecureRandom random = new SecureRandom();
@@ -134,7 +135,8 @@ public abstract class CmpResponder {
         }
         else
         {
-            try {
+            try
+            {
                 long messageTimeBias = cmpControl.getMessageTimeBias();
                 if(messageTimeBias < 0)
                 {
@@ -155,7 +157,8 @@ public abstract class CmpResponder {
                     failureCode = PKIFailureInfo.badTime;
                     statusText = "message too old";
                 }
-            } catch (ParseException e) {
+            } catch (ParseException e)
+            {
                 failureCode = PKIFailureInfo.badRequest;
                 statusText = "invalid message time format";
             }
@@ -173,7 +176,8 @@ public abstract class CmpResponder {
 
         if(isProtected)
         {
-            try {
+            try
+            {
                 verificationResult = verifyProtection(tidStr, message);
                 ProtectionResult pr = verificationResult.getProtectionResult();
                 switch(pr)
@@ -193,7 +197,8 @@ public abstract class CmpResponder {
                 default:
                     throw new RuntimeException("Should not reach here");
                 }
-            } catch (Exception e) {
+            } catch (Exception e)
+            {
                 LOG.error("tid=" + tidStr + ": error while verifying the signature", e);
                 errorStatus = "Request has invalid signature based protection";
             }
@@ -219,7 +224,8 @@ public abstract class CmpResponder {
     protected byte[] randomTransactionId()
     {
         byte[] b = new byte[10];
-        synchronized (random) {
+        synchronized (random)
+        {
             random.nextBytes(b);
         }
         return  b;
@@ -259,9 +265,11 @@ public abstract class CmpResponder {
 
     private PKIMessage addProtection(PKIMessage pkiMessage)
     {
-        try {
+        try
+        {
             return CmpUtil.addProtection(pkiMessage, responder, sender, signserviceTimeout);
-        } catch (Exception e) {
+        } catch (Exception e)
+        {
             LOG.error("error while add protection to the PKI message: {}", e.getMessage());
             LOG.debug("error while add protection to the PKI message", e);
 

@@ -24,7 +24,8 @@ import org.apache.felix.gogo.commands.Option;
 import org.xipki.security.common.EnvironmentParameterResolver;
 
 @Command(scope = "ca", name = "env-list", description="List environment parameters")
-public class EnvListCommand extends CaCommand {
+public class EnvListCommand extends CaCommand
+{
 
     @Option(name = "-name",
             description = "Parameter Name",
@@ -32,7 +33,8 @@ public class EnvListCommand extends CaCommand {
     protected String name;
 
     @Override
-    protected Object doExecute() throws Exception {
+    protected Object doExecute() throws Exception
+    {
         EnvironmentParameterResolver envParameterResolver = caManager.getEnvParameterResolver();
 
         StringBuilder sb = new StringBuilder();

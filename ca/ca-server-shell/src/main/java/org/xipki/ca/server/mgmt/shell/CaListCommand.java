@@ -24,14 +24,16 @@ import org.apache.felix.gogo.commands.Option;
 import org.xipki.ca.server.mgmt.CAEntry;
 
 @Command(scope = "ca", name = "ca-list", description="List CAs")
-public class CaListCommand extends CaCommand {
+public class CaListCommand extends CaCommand
+{
     @Option(name = "-name",
             description = "CA name",
             required = false)
     protected String           caName;
 
     @Override
-    protected Object doExecute() throws Exception {
+    protected Object doExecute() throws Exception
+    {
         StringBuilder sb = new StringBuilder();
 
         if(caName == null)

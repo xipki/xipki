@@ -20,7 +20,8 @@ package org.xipki.ocsp;
 import java.util.HashMap;
 import java.util.Map;
 
-public class CertprofileStore {
+public class CertprofileStore
+{
     private final Map<String, Integer> nameIdMap;
     private final Map<Integer, String> idNameMap;
 
@@ -29,7 +30,8 @@ public class CertprofileStore {
         this.nameIdMap = new HashMap<String, Integer>();
         this.idNameMap = new HashMap<Integer, String>();
 
-        for(Integer id : entries.keySet()) {
+        for(Integer id : entries.keySet())
+        {
             String name = entries.get(id);
 
             if(idNameMap.containsKey(id))

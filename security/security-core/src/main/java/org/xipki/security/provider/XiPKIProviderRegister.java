@@ -19,7 +19,8 @@ package org.xipki.security.provider;
 
 import java.security.Security;
 
-public class XiPKIProviderRegister {
+public class XiPKIProviderRegister
+{
     public void regist()
     {
         if(Security.getProperty(XiPKIProvider.PROVIDER_NAME) == null)

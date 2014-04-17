@@ -17,23 +17,28 @@
 
 package org.xipki.security.api;
 
-public class SignerException extends Exception {
+public class SignerException extends Exception
+{
 
     private static final long serialVersionUID = 1L;
 
-    public SignerException() {
+    public SignerException()
+    {
         super();
     }
 
-    public SignerException(String message, Throwable cause) {
+    public SignerException(String message, Throwable cause)
+    {
         super(message, cause);
     }
 
-    public SignerException(String message) {
+    public SignerException(String message)
+    {
         super(message);
     }
 
-    public SignerException(Throwable cause) {
+    public SignerException(Throwable cause)
+    {
         super(cause);
     }
 }

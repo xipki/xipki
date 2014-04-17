@@ -39,7 +39,8 @@ import org.xipki.security.common.CmpUtf8Pairs;
 import org.xipki.security.common.IoCertUtil;
 
 @Command(scope = "keytool", name = "update-cert-p12", description="Update certificate in PKCS#12 keystore")
-public class P12CertUpdateCommand extends OsgiCommandSupport {
+public class P12CertUpdateCommand extends OsgiCommandSupport
+{
     @Option(name = "-p12",
             required = true, description = "Required. PKCS#12 keystore file")
     protected String            p12File;
@@ -54,7 +55,8 @@ public class P12CertUpdateCommand extends OsgiCommandSupport {
 
     private SecurityFactory securityFactory;
 
-    public void setSecurityFactory(SecurityFactory securityFactory) {
+    public void setSecurityFactory(SecurityFactory securityFactory)
+    {
         this.securityFactory = securityFactory;
     }
 
@@ -66,11 +68,13 @@ public class P12CertUpdateCommand extends OsgiCommandSupport {
         char[] pwd = password.toCharArray();
 
         FileInputStream fIn = null;
-        try{
+        try
+        {
             fIn = new FileInputStream(p12File);
             ks = KeyStore.getInstance("PKCS12", "BC");
             ks.load(fIn, pwd);
-        }finally{
+        }finally
+        {
             if(fIn != null)
             {
                 fIn.close();
@@ -103,7 +107,8 @@ public class P12CertUpdateCommand extends OsgiCommandSupport {
         ks.setKeyEntry(keyname, key, pwd, chain);
 
         FileOutputStream fOut = null;
-        try{
+        try
+        {
             fOut = new FileOutputStream(p12File);
             ks.store(fOut, pwd);
             System.out.println("Updated certificate");

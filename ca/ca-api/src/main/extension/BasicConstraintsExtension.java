@@ -18,24 +18,29 @@
 package lca.ca.profile.extension;
 
 
-public class BasicConstraintsExtension extends ExtensionConf {
+public class BasicConstraintsExtension extends ExtensionConf
+{
     private boolean ca;
     private int pathLenConstraint;
 
 
-    public void setCa(boolean ca) {
+    public void setCa(boolean ca)
+    {
         this.ca = ca;
     }
 
-    public void setPathLenConstraint(int pathLenConstraint) {
+    public void setPathLenConstraint(int pathLenConstraint)
+    {
         this.pathLenConstraint = pathLenConstraint;
     }
 
-    public boolean isCa() {
+    public boolean isCa()
+    {
         return ca;
     }
 
-    public int getPathLenConstraint() {
+    public int getPathLenConstraint()
+    {
         return pathLenConstraint;
     }
 

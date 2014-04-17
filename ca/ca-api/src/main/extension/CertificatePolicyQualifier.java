@@ -17,23 +17,28 @@
 
 package lca.ca.profile.extension;
 
-public class CertificatePolicyQualifier{
+public class CertificatePolicyQualifier
+{
     private String cpsUri;
     private String userNotice;
 
-    public void setCpsUri(String cpsUri) {
+    public void setCpsUri(String cpsUri)
+    {
         this.cpsUri = cpsUri;
     }
 
-    public void setUserNotice(String userNotice) {
+    public void setUserNotice(String userNotice)
+    {
         this.userNotice = userNotice;
     }
 
-    public String getCpsUri() {
+    public String getCpsUri()
+    {
         return cpsUri;
     }
 
-    public String getUserNotice() {
+    public String getUserNotice()
+    {
         return userNotice;
     }
 

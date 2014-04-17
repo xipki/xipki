@@ -54,7 +54,8 @@ public class Rfc6712Servlet extends HttpServlet
     public void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException
     {
-        try{
+        try
+        {
             if(caManager == null)
             {
                 LOG.error("caManager in servlet not configured");
@@ -83,7 +84,8 @@ public class Rfc6712Servlet extends HttpServlet
                 }
 
                 int indexOf = constructedPath.indexOf(servletPath);
-                if (indexOf >= 0) {
+                if (indexOf >= 0)
+                {
                     constructedPath = constructedPath.substring(indexOf+servletPath.length());
                 }
             }
@@ -147,20 +149,25 @@ public class Rfc6712Servlet extends HttpServlet
     {
         ASN1InputStream asn1Stream = new ASN1InputStream(is);
 
-        try{
+        try
+        {
             return PKIMessage.getInstance(asn1Stream.readObject());
-        }finally{
-            try{
+        }finally
+        {
+            try
+            {
                 asn1Stream.close();
             }catch(IOException e){}
         }
     }
 
-    public CAManager getCaManager() {
+    public CAManager getCaManager()
+    {
         return caManager;
     }
 
-    public void setCaManager(CAManager caManager) {
+    public void setCaManager(CAManager caManager)
+    {
         this.caManager = caManager;
     }
 }

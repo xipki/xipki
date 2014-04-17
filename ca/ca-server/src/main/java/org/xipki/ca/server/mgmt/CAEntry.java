@@ -87,10 +87,12 @@ public class CAEntry
         this.nextSerial = initialSerial;
 
         Certificate bcCert;
-        try {
+        try
+        {
             bcCert = Certificate.getInstance(cert.getEncoded());
             this.cert = new X509CertificateWithMetaInfo(cert, cert.getEncoded());
-        } catch (CertificateEncodingException e) {
+        } catch (CertificateEncodingException e)
+        {
             throw new CAMgmtException("could not encode the CA certificate");
         }
 
@@ -131,31 +133,38 @@ public class CAEntry
         return publicCAInfo;
     }
 
-    public List<String> getCrlUris() {
+    public List<String> getCrlUris()
+    {
         return crlUris;
     }
 
-    public String getCrlUrisAsString() {
+    public String getCrlUrisAsString()
+    {
         return toString(crlUris);
     }
 
-    public List<String> getOcspUris() {
+    public List<String> getOcspUris()
+    {
         return ocspUris;
     }
 
-    public String getOcspUrisAsString() {
+    public String getOcspUrisAsString()
+    {
         return toString(ocspUris);
     }
 
-    public int getMaxValidity() {
+    public int getMaxValidity()
+    {
         return maxValidity;
     }
 
-    public void setMaxValidity(int maxValidity) {
+    public void setMaxValidity(int maxValidity)
+    {
         this.maxValidity = maxValidity;
     }
 
-    public X509CertificateWithMetaInfo getCertificate() {
+    public X509CertificateWithMetaInfo getCertificate()
+    {
         return cert;
     }
 
@@ -164,11 +173,13 @@ public class CAEntry
         return subject;
     }
 
-    public String getSignerConf() {
+    public String getSignerConf()
+    {
         return signerConf;
     }
 
-    public String getCrlSignerName() {
+    public String getCrlSignerName()
+    {
         return crlSignerName;
     }
 
@@ -177,18 +188,22 @@ public class CAEntry
         return numCrls;
     }
 
-    public void setCrlSignerName(String crlSignerName) {
+    public void setCrlSignerName(String crlSignerName)
+    {
         this.crlSignerName = crlSignerName;
     }
 
-    public CAStatus getStatus() {
+    public CAStatus getStatus()
+    {
         return status;
     }
-    public void setStatus(CAStatus status) {
+    public void setStatus(CAStatus status)
+    {
         this.status = status;
     }
 
-    public String getSignerType() {
+    public String getSignerType()
+    {
         return signerType;
     }
 
@@ -246,19 +261,23 @@ public class CAEntry
         return sb.toString();
     }
 
-    public boolean isAllowDuplicateKey() {
+    public boolean isAllowDuplicateKey()
+    {
         return allowDuplicateKey;
     }
 
-    public void setAllowDuplicateKey(boolean allowDuplicateKey) {
+    public void setAllowDuplicateKey(boolean allowDuplicateKey)
+    {
         this.allowDuplicateKey = allowDuplicateKey;
     }
 
-    public boolean isAllowDuplicateSubject() {
+    public boolean isAllowDuplicateSubject()
+    {
         return allowDuplicateSubject;
     }
 
-    public void setAllowDuplicateSubject(boolean allowDuplicateSubject) {
+    public void setAllowDuplicateSubject(boolean allowDuplicateSubject)
+    {
         this.allowDuplicateSubject = allowDuplicateSubject;
     }
 
@@ -272,15 +291,18 @@ public class CAEntry
         this.permissions = (permissions == null) ? null : Collections.unmodifiableSet(permissions);
     }
 
-    public long getLastCommittedNextSerial() {
+    public long getLastCommittedNextSerial()
+    {
         return lastCommittedNextSerial;
     }
 
-    public void setLastCommittedNextSerial(long lastCommittedNextSerial) {
+    public void setLastCommittedNextSerial(long lastCommittedNextSerial)
+    {
         this.lastCommittedNextSerial = lastCommittedNextSerial;
     }
 
-    public CMPCertificate getCertInCMPFormat() {
+    public CMPCertificate getCertInCMPFormat()
+    {
         return certInCMPFormat;
     }
 

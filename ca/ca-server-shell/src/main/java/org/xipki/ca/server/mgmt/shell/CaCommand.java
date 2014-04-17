@@ -27,14 +27,16 @@ public abstract class CaCommand extends OsgiCommandSupport
 
     protected CAManager caManager;
 
-    public void setCaManager(CAManager caManager) {
+    public void setCaManager(CAManager caManager)
+    {
         this.caManager = caManager;
     }
 
     protected boolean isEnabled(Boolean enabled, Boolean disabled, boolean defaultEnabled)
     {
         boolean b = defaultEnabled;
-        if(enabled != null){
+        if(enabled != null)
+        {
             b = enabled.booleanValue();
         }
         else if(disabled != null)

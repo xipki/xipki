@@ -80,59 +80,73 @@ public class CertificateInfo
         return profileName;
     }
 
-    public String getWarningMessage() {
+    public String getWarningMessage()
+    {
         return warningMessage;
     }
 
-    public void setWarningMessage(String warningMessage) {
+    public void setWarningMessage(String warningMessage)
+    {
         this.warningMessage = warningMessage;
     }
 
-    public RequestorInfo getRequestor() {
+    public RequestorInfo getRequestor()
+    {
         return requestor;
     }
 
-    public void setRequestor(RequestorInfo requestor) {
+    public void setRequestor(RequestorInfo requestor)
+    {
         this.requestor = requestor;
     }
 
-    public String getUser() {
+    public String getUser()
+    {
         return user;
     }
 
-    public void setUser(String user) {
+    public void setUser(String user)
+    {
         this.user = user;
     }
 
-    public boolean isRevocated() {
+    public boolean isRevocated()
+    {
         return revocated;
     }
 
-    public void setRevocated(boolean revocated) {
+    public void setRevocated(boolean revocated)
+    {
         this.revocated = revocated;
     }
 
-    public Integer getRevocationReason() {
+    public Integer getRevocationReason()
+    {
         return revocationReason;
     }
 
-    public void setRevocationReason(Integer revocationReason) {
+    public void setRevocationReason(Integer revocationReason)
+    {
         this.revocationReason = revocationReason;
     }
 
-    public Date getRevocationTime() {
+    public Date getRevocationTime()
+    {
         return revocationTime;
     }
 
-    public void setRevocationTime(Date revocationTime) {
+    public void setRevocationTime(Date revocationTime)
+    {
         this.revocationTime = revocationTime;
     }
 
-    public Date getInvalidityTime() {
+    public Date getInvalidityTime()
+    {
         return invalidityTime;
     }
 
-    public void setInvalidityTime(Date invalidityTime) {
+    public void setInvalidityTime(Date invalidityTime)
+    {
         this.invalidityTime = invalidityTime;
     }
 

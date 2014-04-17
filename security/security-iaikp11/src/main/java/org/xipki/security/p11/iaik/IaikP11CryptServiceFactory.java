@@ -21,7 +21,8 @@ import org.xipki.security.api.P11CryptService;
 import org.xipki.security.api.P11CryptServiceFactory;
 import org.xipki.security.api.SignerException;
 
-public class IaikP11CryptServiceFactory implements P11CryptServiceFactory {
+public class IaikP11CryptServiceFactory implements P11CryptServiceFactory
+{
 
     @Override
     public P11CryptService createP11CryptService(String pkcs11Module,

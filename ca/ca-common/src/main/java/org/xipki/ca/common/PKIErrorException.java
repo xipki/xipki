@@ -42,15 +42,18 @@ public class PKIErrorException extends Exception
         this.statusMessage = null;
     }
 
-    public int getStatus() {
+    public int getStatus()
+    {
         return status;
     }
 
-    public int getPkiFailureInfo() {
+    public int getPkiFailureInfo()
+    {
         return pkiFailureInfo;
     }
 
-    public String getStatusMessage() {
+    public String getStatusMessage()
+    {
         return statusMessage;
     }
 

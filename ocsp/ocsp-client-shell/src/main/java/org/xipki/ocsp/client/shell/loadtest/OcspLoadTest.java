@@ -48,7 +48,8 @@ public class OcspLoadTest extends AbstractLoadTest
     private RequestOptions options;
 
     @Override
-    protected Runnable getTestor() throws Exception {
+    protected Runnable getTestor() throws Exception
+    {
         return new Testor();
     }
 
@@ -84,7 +85,8 @@ public class OcspLoadTest extends AbstractLoadTest
     {
 
         @Override
-        public void run() {
+        public void run()
+        {
             while(stop() == false && getErrorAccout() < 10)
             {
                 long sn = nextSerialNumber();
@@ -95,9 +97,11 @@ public class OcspLoadTest extends AbstractLoadTest
         private boolean testNext(long sn)
         {
             BasicOCSPResp basicResp;
-            try {
+            try
+            {
                 basicResp = requestor.ask(caCert, BigInteger.valueOf(serial++), serverUrl, options);
-            } catch (OCSPRequestorException e) {
+            } catch (OCSPRequestorException e)
+            {
                 LOG.warn("OCSPRequestorException: {}", e.getMessage());
                 return false;
             }

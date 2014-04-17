@@ -21,9 +21,11 @@ import org.apache.felix.gogo.commands.Command;
 import org.xipki.ca.server.mgmt.CmpResponderEntry;
 
 @Command(scope = "ca", name = "responder-list", description="List responder")
-public class ResponderListCommand extends CaCommand {
+public class ResponderListCommand extends CaCommand
+{
     @Override
-    protected Object doExecute() throws Exception {
+    protected Object doExecute() throws Exception
+    {
         CmpResponderEntry responder = caManager.getCmpResponder();
         System.out.println(responder);
         return null;

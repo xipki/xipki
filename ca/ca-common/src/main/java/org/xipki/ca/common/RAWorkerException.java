@@ -17,22 +17,27 @@
 
 package org.xipki.ca.common;
 
-public class RAWorkerException extends Exception {
+public class RAWorkerException extends Exception
+{
 
     private static final long serialVersionUID = 1L;
 
-    public RAWorkerException() {
+    public RAWorkerException()
+    {
     }
 
-    public RAWorkerException(String message) {
+    public RAWorkerException(String message)
+    {
         super(message);
     }
 
-    public RAWorkerException(Throwable cause) {
+    public RAWorkerException(Throwable cause)
+    {
         super(cause);
     }
 
-    public RAWorkerException(String message, Throwable cause) {
+    public RAWorkerException(String message, Throwable cause)
+    {
         super(message, cause);
     }
 

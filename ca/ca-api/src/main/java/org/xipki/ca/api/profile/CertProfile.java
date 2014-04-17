@@ -24,7 +24,8 @@ import org.bouncycastle.asn1.x509.Extensions;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.xipki.security.common.EnvironmentParameterResolver;
 
-public interface CertProfile {
+public interface CertProfile
+{
 
     boolean isOnlyForRA();
 

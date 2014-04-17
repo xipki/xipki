@@ -65,12 +65,14 @@ public class P11PlainRSASigner implements AsymmetricBlockCipher
         byte[] content = new byte[getInputBlockSize()];
         System.arraycopy(in, inOff, content, content.length-len, len);
 
-        try {
+        try
+        {
             return param.getP11CryptService().CKM_RSA_X509(
                     content,
                     param.getSlot(),
                     param.getKeyId());
-        } catch (SignerException e) {
+        } catch (SignerException e)
+        {
             throw new InvalidCipherTextException(e.getMessage(), e);
         }
     }

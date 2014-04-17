@@ -48,7 +48,8 @@ import org.xipki.security.p11.iaik.IaikExtendedSlot;
 import org.xipki.security.p11.iaik.IaikP11ModulePool;
 
 @Command(scope = "keytool", name = "req", description="Generate PKCS#10 request with PKCS#11 device")
-public class P11CertRequestGenCommand extends OsgiCommandSupport {
+public class P11CertRequestGenCommand extends OsgiCommandSupport
+{
     @Option(name = "-subject",
             required = false,
             description = "Subject in the PKCS#10 request. The default is the subject of self-signed certifite.")
@@ -80,12 +81,14 @@ public class P11CertRequestGenCommand extends OsgiCommandSupport {
 
     private SecurityFactory securityFactory;
 
-    public void setSecurityFactory(SecurityFactory securityFactory) {
+    public void setSecurityFactory(SecurityFactory securityFactory)
+    {
         this.securityFactory = securityFactory;
     }
 
     @Override
-    protected Object doExecute() throws Exception {
+    protected Object doExecute() throws Exception
+    {
         if(hashAlgo == null)
         {
             hashAlgo = "SHA256";
@@ -109,7 +112,8 @@ public class P11CertRequestGenCommand extends OsgiCommandSupport {
                 securityFactory.getPkcs11Module());
 
         IaikExtendedSlot slot = null;
-        try{
+        try
+        {
             slot = module.getSlot(new PKCS11SlotIdentifier(slotIndex, null),
                     password == null ? null : password.toCharArray());
         }catch(SignerException e)
@@ -179,7 +183,8 @@ public class P11CertRequestGenCommand extends OsgiCommandSupport {
         ContentSigner signer = identifiedSigner.borrowContentSigner();
 
         PKCS10CertificationRequest p10Req;
-        try{
+        try
+        {
             p10Req  = p10Gen.generateRequest(signer, subjectPublicKeyInfo, subjectDN);
         }finally
         {

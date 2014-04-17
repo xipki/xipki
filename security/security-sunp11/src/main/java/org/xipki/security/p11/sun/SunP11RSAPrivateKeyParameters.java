@@ -21,10 +21,12 @@ import java.security.PrivateKey;
 
 import org.bouncycastle.crypto.params.AsymmetricKeyParameter;
 
-public class SunP11RSAPrivateKeyParameters extends AsymmetricKeyParameter {
+public class SunP11RSAPrivateKeyParameters extends AsymmetricKeyParameter
+{
     private PrivateKey privateKey;
 
-    public SunP11RSAPrivateKeyParameters(PrivateKey privateKey) {
+    public SunP11RSAPrivateKeyParameters(PrivateKey privateKey)
+    {
         super(true);
         this.privateKey = privateKey;
     }

@@ -17,7 +17,8 @@
 
 package org.xipki.ca.api.profile;
 
-public class CertificatePolicyQualifier{
+public class CertificatePolicyQualifier
+{
     private final String cpsUri;
     private final String userNotice;
 
@@ -47,11 +48,13 @@ public class CertificatePolicyQualifier{
         return new CertificatePolicyQualifier(cpsUri, null);
     }
 
-    public String getCpsUri() {
+    public String getCpsUri()
+    {
         return cpsUri;
     }
 
-    public String getUserNotice() {
+    public String getUserNotice()
+    {
         return userNotice;
     }
 

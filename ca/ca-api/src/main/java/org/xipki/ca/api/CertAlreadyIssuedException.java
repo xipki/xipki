@@ -17,22 +17,27 @@
 
 package org.xipki.ca.api;
 
-public class CertAlreadyIssuedException extends Exception {
+public class CertAlreadyIssuedException extends Exception
+{
 
     private static final long serialVersionUID = 1L;
 
-    public CertAlreadyIssuedException() {
+    public CertAlreadyIssuedException()
+    {
     }
 
-    public CertAlreadyIssuedException(String message) {
+    public CertAlreadyIssuedException(String message)
+    {
         super(message);
     }
 
-    public CertAlreadyIssuedException(Throwable cause) {
+    public CertAlreadyIssuedException(Throwable cause)
+    {
         super(cause);
     }
 
-    public CertAlreadyIssuedException(String message, Throwable cause) {
+    public CertAlreadyIssuedException(String message, Throwable cause)
+    {
         super(message, cause);
     }
 }

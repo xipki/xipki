@@ -23,23 +23,27 @@ import org.xipki.ca.api.profile.IdentifiedCertProfile;
 import org.xipki.security.common.EnvironmentParameterResolver;
 import org.xipki.security.common.ParamChecker;
 
-public class CertProfileEntry{
+public class CertProfileEntry
+{
     private final String name;
     private String type;
     private String conf;
     private IdentifiedCertProfile certProfile;
     private EnvironmentParameterResolver envParamResolver;
 
-    public CertProfileEntry(String name) {
+    public CertProfileEntry(String name)
+    {
         ParamChecker.assertNotEmpty("name", name);
         this.name = name;
     }
 
-    public String getName() {
+    public String getName()
+    {
         return name;
     }
 
-    public String getType() {
+    public String getType()
+    {
         return type;
     }
 
@@ -75,15 +79,18 @@ public class CertProfileEntry{
         if(type.toLowerCase().startsWith("java:"))
         {
             String className = type.substring("java:".length());
-            try{
+            try
+            {
                 Class<?> clazz = Class.forName(className);
                 underlyingCertProfile = (CertProfile) clazz.newInstance();
             }catch(ClassNotFoundException e)
             {
                 throw new CertProfileException("invalid type " + type + ", ClassNotFoundException: " + e.getMessage());
-            } catch (InstantiationException e) {
+            } catch (InstantiationException e)
+            {
                 throw new CertProfileException("invalid type " + type + ", InstantiationException: " + e.getMessage());
-            } catch (IllegalAccessException e) {
+            } catch (IllegalAccessException e)
+            {
                 throw new CertProfileException("invalid type " + type + ", IllegalAccessException: " + e.getMessage());
             } catch(ClassCastException e)
             {
@@ -102,7 +109,8 @@ public class CertProfileEntry{
         return this.certProfile;
     }
 
-    public String getConf() {
+    public String getConf()
+    {
         return conf;
     }
 

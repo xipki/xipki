@@ -29,7 +29,8 @@ import org.xipki.database.api.DataSourceFactory;
 import org.xipki.security.api.PasswordResolver;
 import org.xipki.security.common.EnvironmentParameterResolver;
 
-public interface CertPublisher{
+public interface CertPublisher
+{
     void initialize(String conf, PasswordResolver passwordResolver,
             DataSourceFactory dataSourceFactory)
             throws CertPublisherException;

@@ -19,7 +19,8 @@ package org.xipki.ocsp.api;
 
 import java.util.Date;
 
-public class CertStatusInfo {
+public class CertStatusInfo
+{
 
     private final CertStatus certStatus;
 
@@ -81,19 +82,23 @@ public class CertStatusInfo {
         return nextUpdate;
     }
 
-    public CertStatus getCertStatus() {
+    public CertStatus getCertStatus()
+    {
         return certStatus;
     }
 
-    public CertRevocationInfo getRevocationInfo() {
+    public CertRevocationInfo getRevocationInfo()
+    {
         return revocationInfo;
     }
 
-    public HashAlgoType getCertHashAlgo() {
+    public HashAlgoType getCertHashAlgo()
+    {
         return certHashAlgo;
     }
 
-    public byte[] getCertHash() {
+    public byte[] getCertHash()
+    {
         return certHash;
     }
 

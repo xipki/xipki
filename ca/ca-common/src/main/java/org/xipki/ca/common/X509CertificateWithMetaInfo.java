@@ -23,7 +23,8 @@ import java.security.cert.X509Certificate;
 import org.bouncycastle.crypto.RuntimeCryptoException;
 import org.xipki.security.common.ParamChecker;
 
-public class X509CertificateWithMetaInfo {
+public class X509CertificateWithMetaInfo
+{
     private final X509Certificate cert;
     private final String subject;
     private final byte[] encodedCert;
@@ -43,9 +44,11 @@ public class X509CertificateWithMetaInfo {
 
         if(encodedCert == null)
         {
-            try {
+            try
+            {
                 this.encodedCert = cert.getEncoded();
-            } catch (CertificateEncodingException e) {
+            } catch (CertificateEncodingException e)
+            {
                 throw new RuntimeCryptoException("could not encode certificate: " + e.getMessage());
             }
         }
@@ -55,11 +58,13 @@ public class X509CertificateWithMetaInfo {
         }
     }
 
-    public X509Certificate getCert() {
+    public X509Certificate getCert()
+    {
         return cert;
     }
 
-    public byte[] getEncodedCert() {
+    public byte[] getEncodedCert()
+    {
         return encodedCert;
     }
 

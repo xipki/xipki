@@ -27,7 +27,8 @@ import org.xipki.ca.server.mgmt.Permission;
 import org.xipki.security.common.ConfigurationException;
 
 @Command(scope = "ca", name = "careq-add", description="Add requestor to CA")
-public class CaRequestorAddCommand extends CaCommand {
+public class CaRequestorAddCommand extends CaCommand
+{
     @Option(name = "-ca",
             description = "Required. CA name",
             required = true)
@@ -56,7 +57,8 @@ public class CaRequestorAddCommand extends CaCommand {
     protected Set<String> profiles;
 
     @Override
-    protected Object doExecute() throws Exception {
+    protected Object doExecute() throws Exception
+    {
         if(era != null && dra != null )
         {
             System.err.println("RA mode could not be enabled and disabled at the same time");

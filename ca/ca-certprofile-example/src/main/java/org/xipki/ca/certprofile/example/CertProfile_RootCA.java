@@ -30,7 +30,8 @@ import org.xipki.ca.api.profile.BadCertTemplateException;
 import org.xipki.ca.api.profile.ExtensionOccurrence;
 import org.xipki.ca.api.profile.KeyUsage;
 
-public class CertProfile_RootCA extends AbstractCACertProfile {
+public class CertProfile_RootCA extends AbstractCACertProfile
+{
     private final Map<ASN1ObjectIdentifier, ExtensionOccurrence> extensionOccurences;
 
     public CertProfile_RootCA()
@@ -44,12 +45,14 @@ public class CertProfile_RootCA extends AbstractCACertProfile {
     }
 
     @Override
-    public ExtensionOccurrence getOccurenceOfAuthorityKeyIdentifier() {
+    public ExtensionOccurrence getOccurenceOfAuthorityKeyIdentifier()
+    {
         return null;
     }
 
     @Override
-    public Integer getValidity() {
+    public Integer getValidity()
+    {
         return 5 * 365;
     }
 
@@ -59,17 +62,20 @@ public class CertProfile_RootCA extends AbstractCACertProfile {
     }
 
     @Override
-    protected Integer getPathLenBasicConstraint() {
+    protected Integer getPathLenBasicConstraint()
+    {
         return null;
     }
 
     @Override
-    protected Set<KeyUsage> getKeyUsage() {
+    protected Set<KeyUsage> getKeyUsage()
+    {
         return keyUsages;
     }
 
     @Override
-    protected Map<ASN1ObjectIdentifier, ExtensionOccurrence> getAdditionalExtensionOccurences() {
+    protected Map<ASN1ObjectIdentifier, ExtensionOccurrence> getAdditionalExtensionOccurences()
+    {
         return extensionOccurences;
     }
 }

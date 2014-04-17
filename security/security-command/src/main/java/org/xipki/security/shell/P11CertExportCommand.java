@@ -36,7 +36,8 @@ import org.xipki.security.p11.iaik.IaikExtendedSlot;
 import org.xipki.security.p11.iaik.IaikP11ModulePool;
 
 @Command(scope = "keytool", name = "export-cert", description="Export certificate from PKCS#11 device")
-public class P11CertExportCommand extends OsgiCommandSupport {
+public class P11CertExportCommand extends OsgiCommandSupport
+{
 
     @Option(name = "-slot",
             required = true, description = "Required. Slot index")
@@ -60,16 +61,19 @@ public class P11CertExportCommand extends OsgiCommandSupport {
 
     private SecurityFactory securityFactory;
 
-    public SecurityFactory getSecurityFactory() {
+    public SecurityFactory getSecurityFactory()
+    {
         return securityFactory;
     }
 
-    public void setSecurityFactory(SecurityFactory securityFactory) {
+    public void setSecurityFactory(SecurityFactory securityFactory)
+    {
         this.securityFactory = securityFactory;
     }
 
     @Override
-    protected Object doExecute() throws Exception {
+    protected Object doExecute() throws Exception
+    {
         Pkcs11KeyIdentifier keyIdentifier;
         if(keyId != null && keyLabel == null)
         {
@@ -88,7 +92,8 @@ public class P11CertExportCommand extends OsgiCommandSupport {
                 securityFactory.getPkcs11Module());
 
         IaikExtendedSlot slot = null;
-        try{
+        try
+        {
             slot = module.getSlot(new PKCS11SlotIdentifier(slotIndex, null), password);
         }catch(SignerException e)
         {

@@ -21,7 +21,8 @@ import java.security.cert.X509Certificate;
 import java.util.Collections;
 import java.util.List;
 
-public class PublicCAInfo {
+public class PublicCAInfo
+{
     private final X509Certificate caCertificate;
     private X509Certificate crlSignerCertificate;
     private final List<String> ocspUris;
@@ -63,7 +64,8 @@ public class PublicCAInfo {
         return crlSignerCertificate;
     }
 
-    public void setCrlSignerCertificate(X509Certificate crlSignerCert) {
+    public void setCrlSignerCertificate(X509Certificate crlSignerCert)
+    {
         if(caCertificate.equals(crlSignerCert))
         {
             this.crlSignerCertificate = null;

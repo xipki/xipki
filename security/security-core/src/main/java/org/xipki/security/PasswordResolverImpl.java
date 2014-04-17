@@ -24,10 +24,12 @@ import org.xipki.security.api.PasswordResolver;
 import org.xipki.security.api.PasswordResolverException;
 import org.xipki.security.api.SinglePasswordResolver;
 
-public class PasswordResolverImpl implements PasswordResolver {
+public class PasswordResolverImpl implements PasswordResolver
+{
     private ConcurrentLinkedQueue<SinglePasswordResolver> resolvers = new ConcurrentLinkedQueue<SinglePasswordResolver>();
 
-    public PasswordResolverImpl() {
+    public PasswordResolverImpl()
+    {
     }
 
     public void setPasswordResolvers(List<SinglePasswordResolver> resolvers)

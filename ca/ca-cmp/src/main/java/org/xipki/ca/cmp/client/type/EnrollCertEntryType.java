@@ -34,11 +34,13 @@ public class EnrollCertEntryType
         this.profile = profile;
     }
 
-    public CertificationRequest getP10Request() {
+    public CertificationRequest getP10Request()
+    {
         return p10Request;
     }
 
-    public String getProfile() {
+    public String getProfile()
+    {
         return profile;
     }
 

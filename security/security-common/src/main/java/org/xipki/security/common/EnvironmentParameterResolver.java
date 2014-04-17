@@ -19,7 +19,8 @@ package org.xipki.security.common;
 
 import java.util.Set;
 
-public interface EnvironmentParameterResolver {
+public interface EnvironmentParameterResolver
+{
 
     Set<String> getAllParameterNames();
     String getParameterValue(String parameterName);

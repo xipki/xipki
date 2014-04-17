@@ -21,7 +21,8 @@ import org.apache.felix.gogo.commands.Command;
 import org.apache.felix.gogo.commands.Option;
 
 @Command(scope = "ca", name = "profile-rm", description="Remove Profile")
-public class ProfileRemoveCommand extends CaCommand {
+public class ProfileRemoveCommand extends CaCommand
+{
 
     @Option(name = "-name",
                 description = "Required. Parameter Name",
@@ -29,7 +30,8 @@ public class ProfileRemoveCommand extends CaCommand {
     protected String            name;
 
     @Override
-    protected Object doExecute() throws Exception {
+    protected Object doExecute() throws Exception
+    {
         caManager.removeCertProfile(name);
         return null;
     }

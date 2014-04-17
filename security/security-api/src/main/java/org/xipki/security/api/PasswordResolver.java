@@ -19,6 +19,7 @@ package org.xipki.security.api;
 
 
 
-public interface PasswordResolver {
+public interface PasswordResolver
+{
     char[] resolvePassword(String passwordHint) throws PasswordResolverException;
 }

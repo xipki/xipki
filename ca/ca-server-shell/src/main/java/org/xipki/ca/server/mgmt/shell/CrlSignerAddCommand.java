@@ -27,7 +27,8 @@ import org.xipki.security.api.SecurityFactory;
 import org.xipki.security.common.IoCertUtil;
 
 @Command(scope = "ca", name = "crlsigner-add", description="Add CRL signer")
-public class CrlSignerAddCommand extends CaCommand {
+public class CrlSignerAddCommand extends CaCommand
+{
     @Option( name = "-name",
              description = "Required. CRL signer name",
              required = true, multiValued = false)
@@ -66,7 +67,8 @@ public class CrlSignerAddCommand extends CaCommand {
     private PasswordResolver passwordResolver;
 
     @Override
-    protected Object doExecute() throws Exception {
+    protected Object doExecute() throws Exception
+    {
         CrlSignerEntry entry = new CrlSignerEntry(name);
 
         entry.setType(signerType);
@@ -105,11 +107,13 @@ public class CrlSignerAddCommand extends CaCommand {
         return null;
     }
 
-    public void setSecurityFactory(SecurityFactory securityFactory) {
+    public void setSecurityFactory(SecurityFactory securityFactory)
+    {
         this.securityFactory = securityFactory;
     }
 
-    public void setPasswordResolver(PasswordResolver passwordResolver) {
+    public void setPasswordResolver(PasswordResolver passwordResolver)
+    {
         this.passwordResolver = passwordResolver;
     }
 

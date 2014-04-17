@@ -26,7 +26,8 @@ public class CertBasedRequestorInfo implements RequestorInfo
     private final X509CertificateWithMetaInfo certificate;
     private final boolean ra;
 
-    public CertBasedRequestorInfo(X509CertificateWithMetaInfo certificate, boolean ra) {
+    public CertBasedRequestorInfo(X509CertificateWithMetaInfo certificate, boolean ra)
+    {
         ParamChecker.assertNotNull("certificate", certificate);
 
         this.certificate = certificate;
@@ -39,7 +40,8 @@ public class CertBasedRequestorInfo implements RequestorInfo
     }
 
     @Override
-    public boolean isRA() {
+    public boolean isRA()
+    {
         return ra;
     }
 

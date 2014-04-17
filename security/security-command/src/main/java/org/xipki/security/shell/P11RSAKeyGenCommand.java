@@ -32,7 +32,8 @@ import org.xipki.security.p11.iaik.IaikP11CryptService;
 import org.xipki.security.p11.iaik.P11KeypairGenerator;
 
 @Command(scope = "keytool", name = "rsa", description="Generate RSA keypair via PKCS#11")
-public class P11RSAKeyGenCommand extends OsgiCommandSupport {
+public class P11RSAKeyGenCommand extends OsgiCommandSupport
+{
     @Option(name = "-keysize",
             description = "Keysize in bit, the default is 2048",
             required = false)
@@ -61,16 +62,19 @@ public class P11RSAKeyGenCommand extends OsgiCommandSupport {
 
     private SecurityFactory securityFactory;
 
-    public SecurityFactory getSecurityFactory() {
+    public SecurityFactory getSecurityFactory()
+    {
         return securityFactory;
     }
 
-    public void setSecurityFactory(SecurityFactory securityFactory) {
+    public void setSecurityFactory(SecurityFactory securityFactory)
+    {
         this.securityFactory = securityFactory;
     }
 
     @Override
-    protected Object doExecute() throws Exception {
+    protected Object doExecute() throws Exception
+    {
         if(keysize == null)
         {
             keysize = 2048;

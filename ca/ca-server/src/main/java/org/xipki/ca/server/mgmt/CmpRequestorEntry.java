@@ -21,24 +21,29 @@ import java.security.cert.X509Certificate;
 
 import org.xipki.security.common.ParamChecker;
 
-public class CmpRequestorEntry {
+public class CmpRequestorEntry
+{
     private final String name;
     private X509Certificate cert;
 
-    public CmpRequestorEntry(String name) {
+    public CmpRequestorEntry(String name)
+    {
         ParamChecker.assertNotEmpty("name", name);
         this.name = name;
     }
 
-    public String getName() {
+    public String getName()
+    {
         return name;
     }
 
-    public X509Certificate getCert() {
+    public X509Certificate getCert()
+    {
         return cert;
     }
 
-    public void setCert(X509Certificate cert) {
+    public void setCert(X509Certificate cert)
+    {
         this.cert = cert;
     }
 

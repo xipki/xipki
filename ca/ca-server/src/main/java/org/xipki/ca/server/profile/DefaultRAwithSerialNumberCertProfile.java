@@ -28,7 +28,8 @@ package org.xipki.ca.server.profile;
 public class DefaultRAwithSerialNumberCertProfile extends DefaultRACertProfile
 {
     @Override
-    public boolean incSerialNumberIfSubjectExists() {
+    public boolean incSerialNumberIfSubjectExists()
+    {
         return true;
     }
 }

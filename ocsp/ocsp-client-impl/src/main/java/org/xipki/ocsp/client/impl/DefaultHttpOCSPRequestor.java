@@ -49,7 +49,8 @@ public class DefaultHttpOCSPRequestor extends AbstractOCSPRequestor
         outputstream.write(request);
         outputstream.flush();
         InputStream inputstream = httpUrlConnection.getInputStream();
-        try{
+        try
+        {
             if (httpUrlConnection.getResponseCode() != HttpURLConnection.HTTP_OK)
             {
                 throw new IOException("Bad Response: "
@@ -83,7 +84,8 @@ public class DefaultHttpOCSPRequestor extends AbstractOCSPRequestor
             } while (true);
 
             return bytearrayoutputstream.toByteArray();
-        }finally{
+        }finally
+        {
             inputstream.close();
         }
     }

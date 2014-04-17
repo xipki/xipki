@@ -35,7 +35,8 @@ import org.xipki.security.api.SecurityFactory;
 import org.xipki.security.common.CmpUtf8Pairs;
 import org.xipki.security.common.IoCertUtil;
 
-public abstract class Pkcs12_RSA_Test {
+public abstract class Pkcs12_RSA_Test
+{
     protected abstract ASN1ObjectIdentifier getSignatureAlgorithm();
 
     private static final SecurityFactory securityFactory = new SecurityFactoryImpl();
@@ -105,7 +106,8 @@ public abstract class Pkcs12_RSA_Test {
     {
         ConcurrentContentSigner signer = getSigner();
         ContentSigner cSigner = signer.borrowContentSigner();
-        try{
+        try
+        {
             OutputStream signatureStream = cSigner.getOutputStream();
             signatureStream.write(data);
             return cSigner.getSignature();

@@ -25,7 +25,8 @@ import org.xipki.dbi.OcspDbExporter;
 import org.xipki.security.api.PasswordResolver;
 
 @Command(scope = "dbtool", name = "export-ocsp", description="Export OCSP database")
-public class ExportOcspCommand extends OsgiCommandSupport {
+public class ExportOcspCommand extends OsgiCommandSupport
+{
     @Option(name = "-dbconf",
             description = "Required. Database configuration file",
             required = true)
@@ -40,17 +41,20 @@ public class ExportOcspCommand extends OsgiCommandSupport {
     private PasswordResolver passwordResolver;
 
     @Override
-    protected Object doExecute() throws Exception {
+    protected Object doExecute() throws Exception
+    {
         OcspDbExporter exporter = new OcspDbExporter(dataSourceFactory, passwordResolver, dbconfFile);
         exporter.exportDatabase(outdir);
         return null;
     }
 
-    public void setDataSourceFactory(DataSourceFactory dataSourceFactory) {
+    public void setDataSourceFactory(DataSourceFactory dataSourceFactory)
+    {
         this.dataSourceFactory = dataSourceFactory;
     }
 
-    public void setPasswordResolver(PasswordResolver passwordResolver) {
+    public void setPasswordResolver(PasswordResolver passwordResolver)
+    {
         this.passwordResolver = passwordResolver;
     }
 }

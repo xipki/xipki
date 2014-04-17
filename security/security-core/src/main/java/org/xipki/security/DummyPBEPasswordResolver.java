@@ -21,7 +21,8 @@ package org.xipki.security;
 /**
  * SHOULD NOT BE USED IN PRODUCTION ENVIRONMENT. ONLY FOR TEST PURPOSE
  */
-public class DummyPBEPasswordResolver extends PBEPasswordResolver {
+public class DummyPBEPasswordResolver extends PBEPasswordResolver
+{
 
     private char[] masterPassword;
 
@@ -34,7 +35,8 @@ public class DummyPBEPasswordResolver extends PBEPasswordResolver {
 
         return super.getMasterPassword();
     }
-    public void setMasterPassword(char[] masterPassword) {
+    public void setMasterPassword(char[] masterPassword)
+    {
         this.masterPassword = masterPassword;
     }
 

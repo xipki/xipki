@@ -19,36 +19,44 @@ package lca.ca.profile.extension;
 
 import java.util.Set;
 
-public class CRLDistributionPoint extends ExtensionConf {
+public class CRLDistributionPoint extends ExtensionConf
+{
     private String distributionPoint;
     private String crlIssuer;
     private Set<java.security.cert.CRLReason> crlReasons;
 
-    public Set<java.security.cert.CRLReason> getCrlReasons() {
+    public Set<java.security.cert.CRLReason> getCrlReasons()
+    {
         return crlReasons;
     }
 
-    public void setCrlReasons(Set<java.security.cert.CRLReason> crlReasons) {
+    public void setCrlReasons(Set<java.security.cert.CRLReason> crlReasons)
+    {
         this.crlReasons = crlReasons;
     }
 
-    public void setDistributionPoint(String distributionPoint) {
+    public void setDistributionPoint(String distributionPoint)
+    {
         this.distributionPoint = distributionPoint;
     }
 
-    public void setCrlIssuer(String crlIssuer) {
+    public void setCrlIssuer(String crlIssuer)
+    {
         this.crlIssuer = crlIssuer;
     }
 
-    public String getDistributionPoint() {
+    public String getDistributionPoint()
+    {
         return distributionPoint;
     }
 
-    public Set<java.security.cert.CRLReason> getReasons() {
+    public Set<java.security.cert.CRLReason> getReasons()
+    {
         return crlReasons;
     }
 
-    public String getCrlIssuer() {
+    public String getCrlIssuer()
+    {
         return crlIssuer;
     }
 

@@ -17,7 +17,8 @@
 
 package org.xipki.ca.server.mgmt;
 
-public enum Permission {
+public enum Permission
+{
     ALL("all"),
     CERT_REQ ("cert-req"),
     CERT_REV ("cert-rev"),

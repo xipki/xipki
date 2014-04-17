@@ -20,7 +20,8 @@ package org.xipki.ca.cmp.client.type;
 
 
 
-public class ErrorResultType implements CmpResultType{
+public class ErrorResultType implements CmpResultType
+{
     private final int status;
     private final int pkiFailureInfo;
     private final String statusMessage;
@@ -39,15 +40,18 @@ public class ErrorResultType implements CmpResultType{
         this.statusMessage = null;
     }
 
-    public int getStatus() {
+    public int getStatus()
+    {
         return status;
     }
 
-    public int getPkiFailureInfo() {
+    public int getPkiFailureInfo()
+    {
         return pkiFailureInfo;
     }
 
-    public String getStatusMessage() {
+    public String getStatusMessage()
+    {
         return statusMessage;
     }
 

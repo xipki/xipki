@@ -17,22 +17,27 @@
 
 package org.xipki.ocsp.client.api;
 
-public class OCSPRequestorException extends Exception {
+public class OCSPRequestorException extends Exception
+{
 
     private static final long serialVersionUID = 1L;
 
-    public OCSPRequestorException() {
+    public OCSPRequestorException()
+    {
     }
 
-    public OCSPRequestorException(String message) {
+    public OCSPRequestorException(String message)
+    {
         super(message);
     }
 
-    public OCSPRequestorException(Throwable cause) {
+    public OCSPRequestorException(Throwable cause)
+    {
         super(cause);
     }
 
-    public OCSPRequestorException(String message, Throwable cause) {
+    public OCSPRequestorException(String message, Throwable cause)
+    {
         super(message, cause);
     }
 

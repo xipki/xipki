@@ -37,7 +37,8 @@ import org.xipki.security.api.SecurityFactory;
 import org.xipki.security.common.IoCertUtil;
 
 @Command(scope = "ca", name = "enroll", description="Enroll certificate")
-public class EnrollCertCommand extends CaCommand {
+public class EnrollCertCommand extends CaCommand
+{
     private static final Logger LOG = LoggerFactory.getLogger(EnrollCertCommand.class);
 
     @Option(name = "-ca",
@@ -59,16 +60,19 @@ public class EnrollCertCommand extends CaCommand {
 
     private SecurityFactory securityFactory;
 
-    public SecurityFactory getSecurityFactory() {
+    public SecurityFactory getSecurityFactory()
+    {
         return securityFactory;
     }
 
-    public void setSecurityFactory(SecurityFactory securityFactory) {
+    public void setSecurityFactory(SecurityFactory securityFactory)
+    {
         this.securityFactory = securityFactory;
     }
 
     @Override
-    protected Object doExecute() throws Exception {
+    protected Object doExecute() throws Exception
+    {
         X509CA ca = caManager.getX509CA(caName);
         if(ca == null)
         {
@@ -77,7 +81,8 @@ public class EnrollCertCommand extends CaCommand {
         }
 
         CertificationRequest p10cr;
-        try{
+        try
+        {
             byte[] encodedP10Request = IoCertUtil.read(p10File);
             p10cr = CertificationRequest.getInstance(encodedP10Request);
         }catch(Exception e)
@@ -109,12 +114,14 @@ public class EnrollCertCommand extends CaCommand {
             SubjectPublicKeyInfo publicKeyInfo = certTemp.getSubjectPublicKeyInfo();
 
             CertificateInfo certInfo;
-            try {
+            try
+            {
                 certInfo = ca.generateCertificate(false, profileName, null, subject, publicKeyInfo,
                         null, null, extensions);
                 ca.publishCertificate(certInfo);
                 IoCertUtil.save(new File(outFile), certInfo.getCert().getEncodedCert());
-            } catch (Exception e) {
+            } catch (Exception e)
+            {
                 LOG.warn("Exception: {}", e.getMessage());
                 LOG.debug("Exception", e);
                 System.err.println("ERROR: " + e.getMessage());
