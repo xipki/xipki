@@ -64,16 +64,17 @@ Installation
     ```
     The following steps use $XIPKI_HOME to point to the unpacked folder
 
+  * Copy the JDBC drivers to folder, currently only databas types MySQL, DB2, Oracle and PostgreSQL 
+    are configured. The JDBC driver of MySQL is contained and this step can be skipped.
+
+    ```sh
+    $XIPKI_HOME/lib/ext
+    ```
+
   * Configure one database for the CA (required) and one for the OCSP responder (optional)
-  * Adapt the database configuration
-  
-    For CA, access right read and write of database is required
+  * Adapt the database configuration (access rights read and write of database are required)
     ```sh
     $XIPKI_HOME/ca-config/ca-db.properties
-    $XIPKI_HOME/ca-demo/ocsp-db.properties
-    ```
-    For OCSP responder, access right read of database is required
-    ```sh
     $XIPKI_HOME/ocsp-config/ocsp-db.properties
     ```
   * Initialize the dabases
@@ -135,6 +136,6 @@ Installation
       ```sh
       ca-demo/hsm-ec-demo.script
       ```
-    The generated keys, certificates, CRLs are saved in folder $XIPKI/output  
+    The generated keys, certificates, CRLs are saved in folder $XIPKI_HOME/output  
   
 
