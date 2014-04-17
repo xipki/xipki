@@ -21,29 +21,34 @@ import java.security.cert.Certificate;
 
 import org.xipki.security.common.ParamChecker;
 
-public class CertificateOrError {
+public class CertificateOrError
+{
     private final Certificate certificate;
     private final PKIStatusInfo error;
 
-    public CertificateOrError(Certificate certificate) {
+    public CertificateOrError(Certificate certificate)
+    {
         ParamChecker.assertNotNull("certificate", certificate);
 
         this.certificate = certificate;
         this.error = null;
     }
 
-    public CertificateOrError(PKIStatusInfo error) {
+    public CertificateOrError(PKIStatusInfo error)
+    {
         ParamChecker.assertNotNull("error", error);
 
         this.certificate = null;
         this.error = error;
     }
 
-    public Certificate getCertificate() {
+    public Certificate getCertificate()
+    {
         return certificate;
     }
 
-    public PKIStatusInfo getError() {
+    public PKIStatusInfo getError()
+    {
         return error;
     }
 

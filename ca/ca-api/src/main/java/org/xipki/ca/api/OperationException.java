@@ -17,7 +17,8 @@
 
 package org.xipki.ca.api;
 
-public class OperationException extends Exception {
+public class OperationException extends Exception
+{
     public static enum ErrorCode
     {
         UNKNOWN_ISSUER,
@@ -36,13 +37,15 @@ public class OperationException extends Exception {
     private final ErrorCode errorCode;
     private final String errorMessage;
 
-    public OperationException(ErrorCode errorCode) {
+    public OperationException(ErrorCode errorCode)
+    {
         super("error code: " + errorCode);
         this.errorCode = errorCode;
         this.errorMessage = null;
     }
 
-    public OperationException(ErrorCode errorCode, String errorMessage) {
+    public OperationException(ErrorCode errorCode, String errorMessage)
+    {
         super("error code: " + errorCode + "\nerror message: " + errorMessage);
         this.errorCode = errorCode;
         this.errorMessage = errorMessage;

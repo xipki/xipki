@@ -23,10 +23,12 @@ import java.util.Set;
 import org.apache.felix.gogo.commands.Command;
 
 @Command(scope = "ca", name = "ca-restart", description="Restart CA system")
-public class CaRestartCommand extends CaCommand {
+public class CaRestartCommand extends CaCommand
+{
 
     @Override
-    protected Object doExecute() throws Exception {
+    protected Object doExecute() throws Exception
+    {
         boolean successfull = caManager.restartCaSystem();
         if(successfull == false)
         {

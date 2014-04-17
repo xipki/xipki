@@ -28,7 +28,8 @@ import org.xipki.security.api.PasswordResolver;
 import org.xipki.security.common.EnvironmentParameterResolver;
 import org.xipki.security.common.ParamChecker;
 
-public class PublisherEntry{
+public class PublisherEntry
+{
     private static final Map<String, IdentifiedCertPublisher> publisherPool
         = new HashMap<String, IdentifiedCertPublisher>();
 
@@ -41,7 +42,8 @@ public class PublisherEntry{
     private DataSourceFactory dataSourceFactory;
     private IdentifiedCertPublisher certPublisher;
 
-    public PublisherEntry(String name) {
+    public PublisherEntry(String name)
+    {
         if(name == null || name.isEmpty())
         {
             throw new IllegalArgumentException("name could not be null");
@@ -49,11 +51,13 @@ public class PublisherEntry{
         this.name = name;
     }
 
-    public String getName() {
+    public String getName()
+    {
         return name;
     }
 
-    public String getType() {
+    public String getType()
+    {
         return type;
     }
 
@@ -98,15 +102,18 @@ public class PublisherEntry{
         if(type.toLowerCase().startsWith("java:"))
         {
             String className = type.substring("java:".length());
-            try{
+            try
+            {
                 Class<?> clazz = Class.forName(className);
                 realPublisher = (CertPublisher) clazz.newInstance();
             }catch(ClassNotFoundException e)
             {
                 throw new CertPublisherException("invalid type " + type + ", " + e.getMessage());
-            } catch (InstantiationException e) {
+            } catch (InstantiationException e)
+            {
                 throw new CertPublisherException("invalid type " + type + ", " + e.getMessage());
-            } catch (IllegalAccessException e) {
+            } catch (IllegalAccessException e)
+            {
                 throw new CertPublisherException("invalid type " + type + ", " + e.getMessage());
             } catch(ClassCastException e)
             {
@@ -125,7 +132,8 @@ public class PublisherEntry{
         return this.certPublisher;
     }
 
-    public String getConf() {
+    public String getConf()
+    {
         return conf;
     }
 
@@ -148,19 +156,23 @@ public class PublisherEntry{
         return sb.toString();
     }
 
-    public PasswordResolver getPasswordResolver() {
+    public PasswordResolver getPasswordResolver()
+    {
         return passwordResolver;
     }
 
-    public void setPasswordResolver(PasswordResolver passwordResolver) {
+    public void setPasswordResolver(PasswordResolver passwordResolver)
+    {
         this.passwordResolver = passwordResolver;
     }
 
-    public DataSourceFactory getDataSourceFactory() {
+    public DataSourceFactory getDataSourceFactory()
+    {
         return dataSourceFactory;
     }
 
-    public void setDataSourceFactory(DataSourceFactory dataSourceFactory) {
+    public void setDataSourceFactory(DataSourceFactory dataSourceFactory)
+    {
         this.dataSourceFactory = dataSourceFactory;
     }
 }

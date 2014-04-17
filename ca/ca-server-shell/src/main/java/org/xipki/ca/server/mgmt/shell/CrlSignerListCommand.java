@@ -24,7 +24,8 @@ import org.apache.felix.gogo.commands.Option;
 import org.xipki.ca.server.mgmt.CrlSignerEntry;
 
 @Command(scope = "ca", name = "crlsigner-list", description="List CRL signers")
-public class CrlSignerListCommand extends CaCommand {
+public class CrlSignerListCommand extends CaCommand
+{
 
     @Option(name = "-name",
             description = "CRL signer name",
@@ -32,7 +33,8 @@ public class CrlSignerListCommand extends CaCommand {
     protected String name;
 
     @Override
-    protected Object doExecute() throws Exception {
+    protected Object doExecute() throws Exception
+    {
         StringBuilder sb = new StringBuilder();
 
         if(name == null)

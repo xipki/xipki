@@ -63,12 +63,14 @@ public class XiPKIKeyStoreSpi extends KeyStoreSpi
         }
 
         @Override
-        public boolean hasMoreElements() {
+        public boolean hasMoreElements()
+        {
             return iter.hasNext();
         }
 
         @Override
-        public E nextElement() {
+        public E nextElement()
+        {
             return iter.next();
         }
     }
@@ -148,7 +150,8 @@ public class XiPKIKeyStoreSpi extends KeyStoreSpi
         }
 
         Object p11Provider;
-        try{
+        try
+        {
             Class<?> clazz = Class.forName(pkcs11Provider);
             p11Provider = clazz.newInstance();
         }catch(Exception e)
@@ -162,7 +165,8 @@ public class XiPKIKeyStoreSpi extends KeyStoreSpi
                     P11CryptServiceFactory.class.getName());
         }
 
-        try {
+        try
+        {
             P11CryptService p11Servcie = ((P11CryptServiceFactory) p11Provider).createP11CryptService(pkcs11Module, password);
             PKCS11SlotIdentifier[] slotIds = p11Servcie.getSlotIdentifiers();
 
@@ -206,9 +210,11 @@ public class XiPKIKeyStoreSpi extends KeyStoreSpi
                 }
             }
 
-        } catch (SignerException e) {
+        } catch (SignerException e)
+        {
             throw new IllegalArgumentException("SignerException: " + e.getMessage(), e);
-        } catch (InvalidKeyException e) {
+        } catch (InvalidKeyException e)
+        {
             throw new IllegalArgumentException("InvalidKeyException: " + e.getMessage(), e);
         }
     }

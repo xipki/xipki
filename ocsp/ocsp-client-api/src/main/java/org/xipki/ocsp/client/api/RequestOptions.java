@@ -20,26 +20,32 @@ package org.xipki.ocsp.client.api;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.nist.NISTObjectIdentifiers;
 
-public class RequestOptions {
+public class RequestOptions
+{
     private boolean useNonce = true;
     private ASN1ObjectIdentifier hashAlgorithmId = NISTObjectIdentifiers.id_sha256;
 
-    public RequestOptions() {
+    public RequestOptions()
+    {
     }
 
-    public boolean isUseNonce() {
+    public boolean isUseNonce()
+    {
         return useNonce;
     }
 
-    public void setUseNonce(boolean useNonce) {
+    public void setUseNonce(boolean useNonce)
+    {
         this.useNonce = useNonce;
     }
 
-    public ASN1ObjectIdentifier getHashAlgorithmId() {
+    public ASN1ObjectIdentifier getHashAlgorithmId()
+    {
         return hashAlgorithmId;
     }
 
-    public void setHashAlgorithmId(ASN1ObjectIdentifier hashAlgorithmId) {
+    public void setHashAlgorithmId(ASN1ObjectIdentifier hashAlgorithmId)
+    {
         this.hashAlgorithmId = hashAlgorithmId;
     }
 

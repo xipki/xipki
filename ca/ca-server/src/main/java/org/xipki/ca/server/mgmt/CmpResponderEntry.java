@@ -19,36 +19,44 @@ package org.xipki.ca.server.mgmt;
 
 import java.security.cert.X509Certificate;
 
-public class CmpResponderEntry {
+public class CmpResponderEntry
+{
     public static final String name = "default";
     private String type;
     private String conf;
     private X509Certificate cert;
 
-    public CmpResponderEntry() {
+    public CmpResponderEntry()
+    {
     }
 
-    public String getType() {
+    public String getType()
+    {
         return type;
     }
 
-    public void setType(String type) {
+    public void setType(String type)
+    {
         this.type = type;
     }
 
-    public String getConf() {
+    public String getConf()
+    {
         return conf;
     }
 
-    public void setConf(String conf) {
+    public void setConf(String conf)
+    {
         this.conf = conf;
     }
 
-    public X509Certificate getCertificate() {
+    public X509Certificate getCertificate()
+    {
         return cert;
     }
 
-    public void setCertificate(X509Certificate cert) {
+    public void setCertificate(X509Certificate cert)
+    {
         this.cert = cert;
     }
 

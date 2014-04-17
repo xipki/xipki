@@ -22,7 +22,8 @@ import java.util.Arrays;
 import org.xipki.ocsp.api.HashAlgoType;
 import org.xipki.security.common.ParamChecker;
 
-public class IssuerHashNameAndKey {
+public class IssuerHashNameAndKey
+{
     private final HashAlgoType algo;
     private final byte[] issuerNameHash;
     private final byte[] issuerKeyHash;

@@ -22,7 +22,8 @@ import org.apache.felix.gogo.commands.Option;
 import org.xipki.security.common.IoCertUtil;
 
 @Command(scope = "ca", name = "profile-update", description="Update certificate profile")
-public class ProfileUpdateCommand extends CaCommand {
+public class ProfileUpdateCommand extends CaCommand
+{
 
     @Option(name = "-name",
                 description = "Required. Profile name",
@@ -43,7 +44,8 @@ public class ProfileUpdateCommand extends CaCommand {
     protected String            confFile;
 
     @Override
-    protected Object doExecute() throws Exception {
+    protected Object doExecute() throws Exception
+    {
         if(conf == null && confFile != null)
         {
             conf = new String(IoCertUtil.read(confFile));

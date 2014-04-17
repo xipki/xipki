@@ -18,7 +18,8 @@
 package org.xipki.ca.cmp.server;
 
 
-public class CmpControl {
+public class CmpControl
+{
     private static final int DFLT_messageTimeBias = 300; // 300 seconds
     private static final int DFLT_confirmWaitTime = 300; // 300 seconds
 
@@ -30,7 +31,8 @@ public class CmpControl {
     private int confirmWaitTime = DFLT_confirmWaitTime;
 
     private static final CmpControl defaultInstance;
-    static{
+    static
+    {
         defaultInstance = new CmpControl();
         defaultInstance.setRequireConfirmCert(false);
     }
@@ -40,39 +42,48 @@ public class CmpControl {
         return defaultInstance;
     }
 
-    public CmpControl() {
+    public CmpControl()
+    {
     }
 
-    public boolean isRequireConfirmCert() {
+    public boolean isRequireConfirmCert()
+    {
         return requireConfirmCert;
     }
 
-    public void setRequireConfirmCert(boolean requireConfirmCert) {
+    public void setRequireConfirmCert(boolean requireConfirmCert)
+    {
         this.requireConfirmCert = requireConfirmCert;
     }
 
-    public int getMessageTimeBias() {
+    public int getMessageTimeBias()
+    {
         return messageTimeBias;
     }
 
-    public void setMessageBias(int messageTimeBias) {
+    public void setMessageBias(int messageTimeBias)
+    {
         this.messageTimeBias = messageTimeBias;
     }
 
 
-    public int getConfirmWaitTime() {
+    public int getConfirmWaitTime()
+    {
         return confirmWaitTime;
     }
 
-    public void setConfirmWaitTime(int confirmWaitTime) {
+    public void setConfirmWaitTime(int confirmWaitTime)
+    {
         this.confirmWaitTime = confirmWaitTime;
     }
 
-    public boolean isSendCaCert() {
+    public boolean isSendCaCert()
+    {
         return sendCaCert;
     }
 
-    public void setSendCaCert(boolean sendCaCert) {
+    public void setSendCaCert(boolean sendCaCert)
+    {
         this.sendCaCert = sendCaCert;
     }
 

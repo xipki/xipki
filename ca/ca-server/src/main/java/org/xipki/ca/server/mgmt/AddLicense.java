@@ -23,7 +23,8 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 
-public class AddLicense {
+public class AddLicense
+{
 
     private final static String licenseText =
      "/*\n" +
@@ -43,8 +44,10 @@ public class AddLicense {
      " *\n" +
      " */\n\n";
 
-    public static void main(String[] args) {
-        try{
+    public static void main(String[] args)
+    {
+        try
+        {
             String dirName = args[0];
 
             File dir = new File(dirName);
@@ -79,7 +82,8 @@ public class AddLicense {
         File newFile = new File(file.getPath() + "-new");
         BufferedWriter writer = new BufferedWriter(new FileWriter(newFile));
 
-        try{
+        try
+        {
             String line;
             boolean skip = true;
             while((line = reader.readLine()) != null)
@@ -105,6 +109,7 @@ public class AddLicense {
         newFile.renameTo(file);
 
     }
+
     /**
      * replace tab by 4 spaces, delete white spaces at the end
      * @param line
@@ -143,6 +148,48 @@ public class AddLicense {
         {
             sb.delete(lastNonSpaceCharIndex, sb.length());
         }
+
+        boolean addNewLine = false;
+
+        len = sb.length();
+        if(len > 0 && sb.charAt(len-1) == '{')
+        {
+            for(int i = 0; i < len - 1; i++)
+            {
+                if(sb.charAt(i) != ' ')
+                {
+                    addNewLine = true;
+                    break;
+                }
+            }
+        }
+
+        if(addNewLine == false)
+        {
+            return sb.toString();
+        }
+
+        sb.deleteCharAt(sb.length() - 1);
+        while(sb.length() > 0 && sb.charAt(sb.length() - 1) == ' ')
+        {
+            sb.deleteCharAt(sb.length() - 1);
+        }
+
+        sb.append('\n');
+
+        len = sb.length();
+        for(int i = 0; i < len; i++)
+        {
+            if(sb.charAt(i) == ' ')
+            {
+                sb.append(' ');
+            }
+            else
+            {
+                break;
+            }
+        }
+        sb.append('{');
 
         return sb.toString();
     }

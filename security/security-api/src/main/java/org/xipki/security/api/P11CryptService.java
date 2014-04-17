@@ -20,7 +20,8 @@ package org.xipki.security.api;
 import java.security.PublicKey;
 import java.security.cert.X509Certificate;
 
-public interface P11CryptService {
+public interface P11CryptService
+{
     public void refresh()
             throws SignerException;
 

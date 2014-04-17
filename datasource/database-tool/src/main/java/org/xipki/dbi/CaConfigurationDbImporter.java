@@ -60,7 +60,8 @@ import org.xipki.security.api.PasswordResolverException;
 import org.xipki.security.common.IoCertUtil;
 import org.xipki.security.common.ParamChecker;
 
-class CaConfigurationDbImporter extends DbPorter{
+class CaConfigurationDbImporter extends DbPorter
+{
     private static final Logger LOG = LoggerFactory.getLogger(CaConfigurationDbImporter.class);
 
     private final Unmarshaller unmarshaller;
@@ -98,7 +99,8 @@ class CaConfigurationDbImporter extends DbPorter{
     throws SQLException
     {
         PreparedStatement ps = null;
-        try{
+        try
+        {
             ps = prepareStatement(
                     "INSERT INTO cmpcontrol (name, require_confirm_cert, send_ca_cert, "
                     + " message_time_bias, confirm_wait_time)"
@@ -125,7 +127,8 @@ class CaConfigurationDbImporter extends DbPorter{
     throws SQLException
     {
         PreparedStatement ps = null;
-        try{
+        try
+        {
             ps = prepareStatement("INSERT INTO responder (name, type, conf, cert) VALUES (?, ?, ?, ?)");
 
             for(ResponderType responder : responders.getResponder())
@@ -148,7 +151,8 @@ class CaConfigurationDbImporter extends DbPorter{
     throws SQLException
     {
         PreparedStatement ps = null;
-        try{
+        try
+        {
             ps = prepareStatement("INSERT INTO environment (name, value) VALUES (?, ?)");
             for(EnvironmentType environment : environments.getEnvironment())
             {
@@ -167,7 +171,8 @@ class CaConfigurationDbImporter extends DbPorter{
     throws SQLException
     {
         PreparedStatement ps = null;
-        try{
+        try
+        {
             ps = prepareStatement(
                     "INSERT INTO crlsigner (name, signer_type, signer_conf, signer_cert, period, overlap, include_certs_in_crl)"
                     + " VALUES (?, ?, ?, ?, ?, ?, ?)");
@@ -195,7 +200,8 @@ class CaConfigurationDbImporter extends DbPorter{
     throws SQLException
     {
         PreparedStatement ps = null;
-        try{
+        try
+        {
             ps = prepareStatement("INSERT INTO requestor (name, cert) VALUES (?, ?)");
 
             for(RequestorType requestor : requestors.getRequestor())
@@ -216,7 +222,8 @@ class CaConfigurationDbImporter extends DbPorter{
     throws SQLException
     {
         PreparedStatement ps = null;
-        try{
+        try
+        {
             ps = prepareStatement("INSERT INTO publisher (name, type, conf) VALUES (?, ?, ?)");
             for(PublisherType publisher : publishers.getPublisher())
             {
@@ -237,7 +244,8 @@ class CaConfigurationDbImporter extends DbPorter{
     throws SQLException
     {
         PreparedStatement ps = null;
-        try{
+        try
+        {
             ps = prepareStatement("INSERT INTO certprofile (name, type, conf) VALUES (?, ?, ?)");
             for(CertprofileType certprofile : certprofiles.getCertprofile())
             {
@@ -258,7 +266,8 @@ class CaConfigurationDbImporter extends DbPorter{
     throws SQLException, CertificateException
     {
         PreparedStatement ps = null;
-        try{
+        try
+        {
             ps = prepareStatement(
                     "INSERT INTO ca (name, subject, next_serial, status, crl_uris, ocsp_uris, max_validity, "
                     + "cert, signer_type, signer_conf, crlsigner_name, "
@@ -269,9 +278,11 @@ class CaConfigurationDbImporter extends DbPorter{
             {
                 String b64Cert = ca.getCert();
                 X509Certificate c;
-                try {
+                try
+                {
                     c = IoCertUtil.parseCert(Base64.decode(b64Cert));
-                } catch (Exception e) {
+                } catch (Exception e)
+                {
                     LOG.error("could not parse certificate of CA {}", ca.getName());
                     LOG.debug("could not parse certificate of CA " + ca.getName(), e);
                     if(e instanceof CertificateException)
@@ -315,7 +326,8 @@ class CaConfigurationDbImporter extends DbPorter{
     throws SQLException
     {
         PreparedStatement ps = null;
-        try{
+        try
+        {
             ps = prepareStatement("INSERT INTO caalias (name, ca_name) VALUES (?, ?)");
             for(CaaliasType caalias : caaliases.getCaalias())
             {
@@ -334,7 +346,8 @@ class CaConfigurationDbImporter extends DbPorter{
     throws SQLException
     {
         PreparedStatement ps = null;
-        try{
+        try
+        {
             ps = prepareStatement("INSERT INTO ca_has_requestor "
                     + "(ca_name, requestor_name, ra, permissions, profiles) VALUES (?, ?, ?, ?, ?)");
 
@@ -359,7 +372,8 @@ class CaConfigurationDbImporter extends DbPorter{
     throws SQLException
     {
         PreparedStatement ps = null;
-        try{
+        try
+        {
             ps = prepareStatement("INSERT INTO ca_has_publisher (ca_name, publisher_name) VALUES (?, ?)");
             for(CaHasPublisherType entry : ca_has_publishers.getCaHasPublisher())
             {
@@ -378,7 +392,8 @@ class CaConfigurationDbImporter extends DbPorter{
     throws SQLException
     {
         PreparedStatement ps = null;
-        try{
+        try
+        {
             ps = prepareStatement("INSERT INTO ca_has_certprofile (ca_name, certprofile_name) VALUES (?, ?)");
             for(CaHasCertprofileType entry : ca_has_certprofiles.getCaHasCertprofile())
             {

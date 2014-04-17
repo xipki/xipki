@@ -40,7 +40,8 @@ import org.bouncycastle.operator.ContentSigner;
 import org.xipki.security.api.ConcurrentContentSigner;
 import org.xipki.security.api.NoIdleSignerException;
 
-public class CmpUtil {
+public class CmpUtil
+{
     public static final Map<Integer, String> statusTextMap = new HashMap<Integer, String>();
     public static final Map<Integer, String> failureInfoTextMap = new HashMap<Integer, String>();
 
@@ -150,7 +151,8 @@ public class CmpUtil {
         builder.setBody(pkiMessage.getBody());
 
         ContentSigner realSigner = signer.borrowContentSigner(signServiceTimeout);
-        try{
+        try
+        {
              ProtectedPKIMessage signedMessage = builder.build(realSigner);
              return signedMessage.toASN1Structure();
         }finally
@@ -164,7 +166,8 @@ public class CmpUtil {
         InfoTypeAndValue[] regInfos = header.getGeneralInfo();
         if(regInfos != null)
         {
-            for (InfoTypeAndValue regInfo : regInfos) {
+            for (InfoTypeAndValue regInfo : regInfos)
+            {
                 if(CMPObjectIdentifiers.it_implicitConfirm.equals(regInfo.getInfoType()))
                 {
                     return true;

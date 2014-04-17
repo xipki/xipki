@@ -31,7 +31,8 @@ import org.xipki.dbi.ca.jaxb.ObjectFactory;
 import org.xipki.security.api.PasswordResolver;
 import org.xipki.security.api.PasswordResolverException;
 
-public class CaDbExporter {
+public class CaDbExporter
+{
 
     private final DataSource dataSource;
     private final Marshaller marshaller;

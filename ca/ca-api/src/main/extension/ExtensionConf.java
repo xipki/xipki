@@ -17,7 +17,8 @@
 
 package lca.ca.profile.extension;
 
-public class ExtensionConf {
+public class ExtensionConf
+{
     private Boolean critical;
 
     public Boolean isCritical()
@@ -25,7 +26,8 @@ public class ExtensionConf {
         return critical;
     }
 
-    public void setCritical(Boolean critical) {
+    public void setCritical(Boolean critical)
+    {
         this.critical = critical;
     }
 

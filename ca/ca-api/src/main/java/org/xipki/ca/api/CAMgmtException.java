@@ -17,23 +17,28 @@
 
 package org.xipki.ca.api;
 
-public class CAMgmtException extends Exception{
+public class CAMgmtException extends Exception
+{
 
     private static final long serialVersionUID = 1L;
 
-    public CAMgmtException() {
+    public CAMgmtException()
+    {
         super();
     }
 
-    public CAMgmtException(String message, Throwable cause) {
+    public CAMgmtException(String message, Throwable cause)
+    {
         super(message, cause);
     }
 
-    public CAMgmtException(String message) {
+    public CAMgmtException(String message)
+    {
         super(message);
     }
 
-    public CAMgmtException(Throwable cause) {
+    public CAMgmtException(Throwable cause)
+    {
         super(cause);
     }
 

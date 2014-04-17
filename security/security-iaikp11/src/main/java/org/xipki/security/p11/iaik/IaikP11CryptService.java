@@ -67,7 +67,8 @@ public final class IaikP11CryptService implements P11CryptService
     public synchronized static IaikP11CryptService getInstance(String pkcs11Module, char[] password)
     throws SignerException
     {
-        synchronized (instances) {
+        synchronized (instances)
+        {
             IaikP11CryptService instance = instances.get(pkcs11Module);
             if(instance == null)
             {
@@ -111,7 +112,8 @@ public final class IaikP11CryptService implements P11CryptService
     {
         LOG.info("Refreshing PKCS#11 module {}", pkcs11Module);
         lastRefreshSuccessfull = false;
-        try{
+        try
+        {
             this.extModule = IaikP11ModulePool.getInstance().getModule(pkcs11Module);
         }catch(SignerException e)
         {
@@ -127,14 +129,16 @@ public final class IaikP11CryptService implements P11CryptService
         for(PKCS11SlotIdentifier slotId : slotIds)
         {
             IaikExtendedSlot slot;
-            try {
+            try
+            {
                 slot = extModule.getSlot(slotId, password);
                 if(slot == null)
                 {
                     LOG.warn("Could not initialize slot " + slotId);
                     continue;
                 }
-            } catch (SignerException e) {
+            } catch (SignerException e)
+            {
                 LOG.warn("SignerException while initializing slot {}, message: {}", slotId, e.getMessage());
                 LOG.debug("SignerException while initializing slot " + slotId, e);
                 continue;
@@ -161,7 +165,8 @@ public final class IaikP11CryptService implements P11CryptService
                     continue;
                 }
 
-                try{
+                try
+                {
                     X509PublicKeyCertificate certificateObject = slot.getCertificateObject(
                             keyId, null);
 
@@ -171,10 +176,12 @@ public final class IaikP11CryptService implements P11CryptService
                     if(certificateObject != null)
                     {
                         byte[] encoded = certificateObject.getValue().getByteArrayValue();
-                        try {
+                        try
+                        {
                             signatureCert = (X509Certificate) IoCertUtil.parseCert(
                                         new ByteArrayInputStream(encoded));
-                        } catch (Exception e) {
+                        } catch (Exception e)
+                        {
                             String keyIdStr = hex(keyId);
                             LOG.warn("Could not parse certificate with id {}, message: {}", keyIdStr, e.getMessage());
                             LOG.debug("Could not parse certificate with id " + keyIdStr, e);
@@ -259,7 +266,8 @@ public final class IaikP11CryptService implements P11CryptService
             throw new SignerException("Found no identity with " + keyId + " in slot " + slotId);
         }
 
-        try{
+        try
+        {
             return identity.CKM_RSA_PKCS(extModule, password, encodedDigestInfo);
         }catch(PKCS11RuntimeException pre)
         {
@@ -300,7 +308,8 @@ public final class IaikP11CryptService implements P11CryptService
             throw new SignerException("Found no identity with " + keyId + " in slot " + slotId);
         }
 
-        try{
+        try
+        {
             return identity.CKM_RSA_X_509(extModule, password, hash);
         }catch(PKCS11RuntimeException pre)
         {
@@ -341,7 +350,8 @@ public final class IaikP11CryptService implements P11CryptService
             throw new SignerException("Found no identity with " + keyId + " in slot " + slotId);
         }
 
-        try{
+        try
+        {
             return identity.CKM_ECDSA(extModule, password, hash);
         }catch(PKCS11RuntimeException pre)
         {
@@ -446,13 +456,15 @@ public final class IaikP11CryptService implements P11CryptService
                 LOG.debug("Modulus:\n {}", Hex.toHexString(modBytes));
             }
             RSAPublicKeySpec keySpec = new RSAPublicKeySpec(mod,exp);
-            try{
+            try
+            {
                 KeyFactory keyFactory=KeyFactory.getInstance("RSA");
                 return keyFactory.generatePublic(keySpec);
             }catch(NoSuchAlgorithmException e)
             {
                 throw new SignerException(e);
-            } catch (InvalidKeySpecException e) {
+            } catch (InvalidKeySpecException e)
+            {
                 throw new SignerException(e);
             }
         }

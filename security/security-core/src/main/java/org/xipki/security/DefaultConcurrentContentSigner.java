@@ -34,7 +34,8 @@ import org.xipki.security.api.PasswordResolver;
 import org.xipki.security.api.SignerException;
 import org.xipki.security.common.ParamChecker;
 
-public class DefaultConcurrentContentSigner implements ConcurrentContentSigner{
+public class DefaultConcurrentContentSigner implements ConcurrentContentSigner
+{
     private static final Logger LOG = LoggerFactory.getLogger(DefaultConcurrentContentSigner.class);
 
     private final BlockingQueue<ContentSigner> idleSigners = new LinkedBlockingQueue<ContentSigner>();
@@ -86,7 +87,8 @@ public class DefaultConcurrentContentSigner implements ConcurrentContentSigner{
         ContentSigner signer = null;
         while(timeout > 0)
         {
-            try{
+            try
+            {
                 signer = idleSigners.poll(timeout, TimeUnit.MILLISECONDS);
             }catch(InterruptedException e)
             {
@@ -135,24 +137,29 @@ public class DefaultConcurrentContentSigner implements ConcurrentContentSigner{
     }
 
     @Override
-    public PrivateKey getPrivateKey() {
+    public PrivateKey getPrivateKey()
+    {
         return privateKey;
     }
 
     @Override
-    public void setCertificate(X509Certificate certificate) {
+    public void setCertificate(X509Certificate certificate)
+    {
         this.certificate = certificate;
     }
 
     @Override
-    public X509Certificate getCertificate() {
+    public X509Certificate getCertificate()
+    {
         return certificate;
     }
 
     @Override
-    public boolean isHealthy() {
+    public boolean isHealthy()
+    {
         ContentSigner signer = null;
-        try{
+        try
+        {
             signer = borrowContentSigner(60000); // wait for maximal 60 seconds
             OutputStream stream = signer.getOutputStream();
             stream.write(new byte[]{1,2,3,4});
@@ -164,7 +171,8 @@ public class DefaultConcurrentContentSigner implements ConcurrentContentSigner{
             LOG.debug("healthCheck()", e);
             return false;
         }
-        finally{
+        finally
+        {
             if(signer != null)
             {
                 returnContentSigner(signer);

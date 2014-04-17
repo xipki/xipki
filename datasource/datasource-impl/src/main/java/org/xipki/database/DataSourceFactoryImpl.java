@@ -45,13 +45,16 @@ public class DataSourceFactoryImpl implements DataSourceFactory
 
         FileInputStream fIn = null;
 
-        try{
+        try
+        {
             fIn = new FileInputStream(confFile);
             return createDataSource(fIn, passwordResolver);
-        }finally{
+        }finally
+        {
             if(fIn != null)
             {
-                try{
+                try
+                {
                     fIn.close();
                 }catch(IOException e){};
             }
@@ -248,7 +251,8 @@ public class DataSourceFactoryImpl implements DataSourceFactory
         String prop = props.getProperty(key);
         if(prop != null && !prop.isEmpty())
         {
-            try{
+            try
+            {
                 return Integer.parseInt(prop.trim());
             }catch(NumberFormatException e)
             {
@@ -263,7 +267,8 @@ public class DataSourceFactoryImpl implements DataSourceFactory
         String prop = props.getProperty(key);
         if(prop != null && !prop.isEmpty())
         {
-            try{
+            try
+            {
                 return Long.parseLong(prop.trim());
             }catch(NumberFormatException e)
             {

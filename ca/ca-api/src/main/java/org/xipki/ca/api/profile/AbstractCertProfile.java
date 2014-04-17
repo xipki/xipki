@@ -42,7 +42,8 @@ import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.xipki.ca.api.profile.internal.X509Util;
 import org.xipki.security.common.EnvironmentParameterResolver;
 
-public abstract class AbstractCertProfile implements CertProfile {
+public abstract class AbstractCertProfile implements CertProfile
+{
     private final List<ASN1ObjectIdentifier> forwardDNs;
 
     protected abstract Set<KeyUsage> getKeyUsage();
@@ -93,7 +94,8 @@ public abstract class AbstractCertProfile implements CertProfile {
     }
 
     @Override
-    public Date getNotBefore(Date notBefore) {
+    public Date getNotBefore(Date notBefore)
+    {
         Date now = new Date();
         if(notBefore != null && notBefore.after(now))
         {
@@ -107,7 +109,8 @@ public abstract class AbstractCertProfile implements CertProfile {
 
 
     @Override
-    public boolean isOnlyForRA() {
+    public boolean isOnlyForRA()
+    {
         return false;
     }
 
@@ -296,26 +299,31 @@ public abstract class AbstractCertProfile implements CertProfile {
     }
 
     @Override
-    public boolean incSerialNumberIfSubjectExists() {
+    public boolean incSerialNumberIfSubjectExists()
+    {
         return false;
     }
 
     @Override
-    public ExtensionOccurrence getOccurenceOfSubjectKeyIdentifier() {
+    public ExtensionOccurrence getOccurenceOfSubjectKeyIdentifier()
+    {
         return ExtensionOccurrence.NONCRITICAL_REQUIRED;
     }
 
     @Override
-    public ExtensionOccurrence getOccurenceOfCRLDistributinPoints() {
+    public ExtensionOccurrence getOccurenceOfCRLDistributinPoints()
+    {
         return ExtensionOccurrence.NONCRITICAL_OPTIONAL;
     }
 
     @Override
-    public ExtensionOccurrence getOccurenceOfAuthorityInfoAccess() {
+    public ExtensionOccurrence getOccurenceOfAuthorityInfoAccess()
+    {
         return ExtensionOccurrence.NONCRITICAL_OPTIONAL;
     }
 
-    protected Set<ASN1ObjectIdentifier> getExtendedKeyUsages() {
+    protected Set<ASN1ObjectIdentifier> getExtendedKeyUsages()
+    {
         return null;
     }
 
@@ -326,7 +334,8 @@ public abstract class AbstractCertProfile implements CertProfile {
     }
 
     @Override
-    public void initialize(String data) throws CertProfileException {
+    public void initialize(String data) throws CertProfileException
+    {
     }
 
     private void verifySubjectDNOccurence(X500Name requestedSubject) throws BadCertTemplateException

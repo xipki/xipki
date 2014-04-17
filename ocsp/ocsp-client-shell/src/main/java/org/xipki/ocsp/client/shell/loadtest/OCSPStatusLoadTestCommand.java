@@ -29,7 +29,8 @@ import org.xipki.ocsp.client.api.RequestOptions;
 import org.xipki.security.common.IoCertUtil;
 
 @Command(scope = "ocsp", name = "status-loadtest", description="OCSP Load test")
-public class OCSPStatusLoadTestCommand extends OsgiCommandSupport {
+public class OCSPStatusLoadTestCommand extends OsgiCommandSupport
+{
     private static final String DFLT_URL = "http://localhost:8080/ocsp";
     @Option(name = "-url",
             description = "Server URL, the default is " + DFLT_URL)
@@ -62,7 +63,8 @@ public class OCSPStatusLoadTestCommand extends OsgiCommandSupport {
     private OCSPRequestor      requestor;
 
     @Override
-    protected Object doExecute() throws Exception {
+    protected Object doExecute() throws Exception
+    {
         if(numThreads == null)
         {
             numThreads = 5;
@@ -107,11 +109,13 @@ public class OCSPStatusLoadTestCommand extends OsgiCommandSupport {
         return null;
     }
 
-    public OCSPRequestor getRequestor() {
+    public OCSPRequestor getRequestor()
+    {
         return requestor;
     }
 
-    public void setRequestor(OCSPRequestor requestor) {
+    public void setRequestor(OCSPRequestor requestor)
+    {
         this.requestor = requestor;
     }
 }

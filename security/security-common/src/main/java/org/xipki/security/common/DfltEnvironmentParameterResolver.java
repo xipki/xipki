@@ -26,11 +26,13 @@ public class DfltEnvironmentParameterResolver implements
 {
     private final Map<String, String> envParameters = new ConcurrentHashMap<String, String>();
 
-    public DfltEnvironmentParameterResolver() {
+    public DfltEnvironmentParameterResolver()
+    {
     }
 
     @Override
-    public String getParameterValue(String parameterName) {
+    public String getParameterValue(String parameterName)
+    {
         return envParameters.get(parameterName);
     }
 

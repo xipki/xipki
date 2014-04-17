@@ -19,7 +19,8 @@ package lca.ca.profile.extension;
 
 import java.util.List;
 
-public class ExtensionConfs {
+public class ExtensionConfs
+{
 
     private boolean useSubjectKeyIdentifier = false;
 
@@ -28,67 +29,80 @@ public class ExtensionConfs {
         this.useSubjectKeyIdentifier = useSubjectKeyIdentifier;
     }
 
-    public boolean isUseSubjectKeyIdentifier() {
+    public boolean isUseSubjectKeyIdentifier()
+    {
         return useSubjectKeyIdentifier;
     }
 
     private boolean useAuthorityKeyIdentifier = false;
 
-    public void setUseAuthorityKeyIdentifier(boolean useAuthorityKeyIdentifier) {
+    public void setUseAuthorityKeyIdentifier(boolean useAuthorityKeyIdentifier)
+    {
         this.useAuthorityKeyIdentifier = useAuthorityKeyIdentifier;
     }
 
-    public boolean isUseAuthorityKeyIdentifier() {
+    public boolean isUseAuthorityKeyIdentifier()
+    {
         return useAuthorityKeyIdentifier;
     }
 
     private KeyUsageExtension keyUsage;
 
-    public void setKeyUsage(KeyUsageExtension keyUsage) {
+    public void setKeyUsage(KeyUsageExtension keyUsage)
+    {
         this.keyUsage = keyUsage;
     }
 
-    public KeyUsageExtension getKeyUsage() {
+    public KeyUsageExtension getKeyUsage()
+    {
         return keyUsage;
     }
 
     private ExtendedKeyUsageExtension extendedKeyUsage;
 
-    public void setExtendedKeyUsage(ExtendedKeyUsageExtension extendedKeyUsage) {
+    public void setExtendedKeyUsage(ExtendedKeyUsageExtension extendedKeyUsage)
+    {
         this.extendedKeyUsage = extendedKeyUsage;
     }
 
-    public ExtendedKeyUsageExtension getExtendedKeyUsage() {
+    public ExtendedKeyUsageExtension getExtendedKeyUsage()
+    {
         return extendedKeyUsage;
     }
 
     private AuthorityInformationAccessExtension authorityInformationAccess;
 
-    public void setAuthorityInformationAccess(AuthorityInformationAccessExtension authorityInformationAccess) {
+    public void setAuthorityInformationAccess(AuthorityInformationAccessExtension authorityInformationAccess)
+    {
         this.authorityInformationAccess = authorityInformationAccess;
     }
 
-    public AuthorityInformationAccessExtension getAuthorityInformationAccess() {
+    public AuthorityInformationAccessExtension getAuthorityInformationAccess()
+    {
         return authorityInformationAccess;
     }
 
     private BasicConstraintsExtension basicConstraints;
 
-    public void setBasicConstraints(BasicConstraintsExtension basicConstraints) {
+    public void setBasicConstraints(BasicConstraintsExtension basicConstraints)
+    {
         this.basicConstraints = basicConstraints;
     }
 
-    public BasicConstraintsExtension getBasicConstraints() {
+    public BasicConstraintsExtension getBasicConstraints()
+    {
         return basicConstraints;
     }
 
     private CertificatePoliciesExtension certificatePolicies;
 
-    public void setCertificatePolicies(CertificatePoliciesExtension certificatePolicies) {
+    public void setCertificatePolicies(CertificatePoliciesExtension certificatePolicies)
+    {
         this.certificatePolicies = certificatePolicies;
     }
 
-    public CertificatePoliciesExtension getCertificatePolicies() {
+    public CertificatePoliciesExtension getCertificatePolicies()
+    {
         return certificatePolicies;
     }
 

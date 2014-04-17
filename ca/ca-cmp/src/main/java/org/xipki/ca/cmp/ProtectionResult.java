@@ -17,7 +17,8 @@
 
 package org.xipki.ca.cmp;
 
-public enum ProtectionResult {
+public enum ProtectionResult
+{
     VALID,
     INVALID,
     NOT_SIGNATURE_BASED,

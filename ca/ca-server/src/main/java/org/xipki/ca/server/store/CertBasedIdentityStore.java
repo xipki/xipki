@@ -22,7 +22,8 @@ import java.util.List;
 
 import org.xipki.security.common.ParamChecker;
 
-class CertBasedIdentityStore {
+class CertBasedIdentityStore
+{
     private final String table;
     private final List<CertBasedIdentityEntry> entries;
     private int nextFreeId;
@@ -32,7 +33,8 @@ class CertBasedIdentityStore {
         this.table = table;
         this.entries = new ArrayList<CertBasedIdentityEntry>(entries.size());
 
-        for(CertBasedIdentityEntry entry : entries) {
+        for(CertBasedIdentityEntry entry : entries)
+        {
             addIdentityEntry(entry);
         }
 
@@ -46,13 +48,16 @@ class CertBasedIdentityStore {
     {
         ParamChecker.assertNotNull("entry", entry);
 
-        for(CertBasedIdentityEntry existingEntry : entries) {
-            if(existingEntry.getId() == entry.getId()) {
+        for(CertBasedIdentityEntry existingEntry : entries)
+        {
+            if(existingEntry.getId() == entry.getId())
+            {
                 throw new IllegalArgumentException(table + " with the same id " + entry.getId() + " already available");
             }
         }
 
-        if(nextFreeId <= entry.getId()) {
+        if(nextFreeId <= entry.getId())
+        {
             nextFreeId = entry.getId() + 1;
         }
 
@@ -61,8 +66,10 @@ class CertBasedIdentityStore {
 
     synchronized Integer getIdForSubject(String subject)
     {
-        for(CertBasedIdentityEntry entry : entries) {
-            if(entry.getSubject().equals(subject)) {
+        for(CertBasedIdentityEntry entry : entries)
+        {
+            if(entry.getSubject().equals(subject))
+            {
                 return entry.getId();
             }
         }
@@ -72,8 +79,10 @@ class CertBasedIdentityStore {
 
     synchronized Integer getCaIdForSha1Fp(byte[] sha1Fp_cert)
     {
-        for(CertBasedIdentityEntry entry : entries) {
-            if(entry.matchSha1Fp(sha1Fp_cert)) {
+        for(CertBasedIdentityEntry entry : entries)
+        {
+            if(entry.matchSha1Fp(sha1Fp_cert))
+            {
                 return entry.getId();
             }
         }
@@ -83,8 +92,10 @@ class CertBasedIdentityStore {
 
     synchronized Integer getCaIdForCert(byte[] encodedCert)
     {
-        for(CertBasedIdentityEntry entry : entries) {
-            if(entry.matchCert(encodedCert)) {
+        for(CertBasedIdentityEntry entry : entries)
+        {
+            if(entry.matchCert(encodedCert))
+            {
                 return entry.getId();
             }
         }
@@ -92,7 +103,8 @@ class CertBasedIdentityStore {
         return null;
     }
 
-    synchronized int getNextFreeId(){
+    synchronized int getNextFreeId()
+    {
         return nextFreeId++;
     }
 

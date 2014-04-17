@@ -37,7 +37,8 @@ import org.xipki.security.p11.iaik.IaikP11CryptService;
 import org.xipki.security.p11.iaik.IaikP11ModulePool;
 
 @Command(scope = "keytool", name = "delete-key", description="Generate EC keypair in PKCS#11 device")
-public class P11KeyDeleteCommand extends OsgiCommandSupport {
+public class P11KeyDeleteCommand extends OsgiCommandSupport
+{
     @Option(name = "-slot",
             required = true, description = "Required. Slot index")
     protected Integer           slotIndex;
@@ -56,16 +57,19 @@ public class P11KeyDeleteCommand extends OsgiCommandSupport {
 
     private SecurityFactory securityFactory;
 
-    public SecurityFactory getSecurityFactory() {
+    public SecurityFactory getSecurityFactory()
+    {
         return securityFactory;
     }
 
-    public void setSecurityFactory(SecurityFactory securityFactory) {
+    public void setSecurityFactory(SecurityFactory securityFactory)
+    {
         this.securityFactory = securityFactory;
     }
 
     @Override
-    protected Object doExecute() throws Exception {
+    protected Object doExecute() throws Exception
+    {
         Pkcs11KeyIdentifier keyIdentifier;
         if(keyId != null && keyLabel == null)
         {
@@ -84,7 +88,8 @@ public class P11KeyDeleteCommand extends OsgiCommandSupport {
                 securityFactory.getPkcs11Module());
 
         IaikExtendedSlot slot = null;
-        try{
+        try
+        {
             slot = module.getSlot(new PKCS11SlotIdentifier(slotIndex, null), password);
         }catch(SignerException e)
         {
@@ -103,8 +108,10 @@ public class P11KeyDeleteCommand extends OsgiCommandSupport {
         }
 
         Session session = slot.borrowWritableSession();
-        try{
-            try{
+        try
+        {
+            try
+            {
                 session.destroyObject(privKey);
                 System.out.println("Deleted private key");
             }catch(TokenException e)
@@ -116,7 +123,8 @@ public class P11KeyDeleteCommand extends OsgiCommandSupport {
                     privKey.getId().getByteArrayValue(), null);
             if(pubKey != null)
             {
-                try{
+                try
+                {
                     session.destroyObject(pubKey);
                     System.out.println("Deleted public key");
                 }catch(TokenException e)
@@ -128,7 +136,8 @@ public class P11KeyDeleteCommand extends OsgiCommandSupport {
             X509PublicKeyCertificate cert = slot.getCertificateObject(privKey.getId().getByteArrayValue(), null);
             if(cert != null)
             {
-                try{
+                try
+                {
                     session.destroyObject(cert);
                     System.out.println("Deleted certificate");
                 }catch(TokenException e)

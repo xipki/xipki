@@ -48,7 +48,8 @@ import org.xipki.security.common.HashCalculator;
 import org.xipki.security.common.IoCertUtil;
 import org.xipki.security.common.ParamChecker;
 
-class OcspCertStoreDbImporter extends DbPorter{
+class OcspCertStoreDbImporter extends DbPorter
+{
     private static final Logger LOG = LoggerFactory.getLogger(OcspCertStoreDbImporter.class);
 
     private final Unmarshaller unmarshaller;
@@ -91,7 +92,8 @@ class OcspCertStoreDbImporter extends DbPorter{
 
         PreparedStatement ps = prepareStatement(SQL_ADD_CAINFO);
 
-        try{
+        try
+        {
             for(IssuerType issuer : issuers.getIssuer())
             {
                 String b64Cert = issuer.getCert();
@@ -99,10 +101,12 @@ class OcspCertStoreDbImporter extends DbPorter{
 
                 Certificate c;
                 byte[] encodedName;
-                try {
+                try
+                {
                     c = Certificate.getInstance(encodedCert);
                     encodedName = c.getSubject().getEncoded("DER");
-                } catch (Exception e) {
+                } catch (Exception e)
+                {
                     LOG.error("could not parse certificate of issuer {}", issuer.getId());
                     LOG.debug("could not parse certificate of issuer " + issuer.getId(), e);
                     if(e instanceof CertificateException)
@@ -134,7 +138,8 @@ class OcspCertStoreDbImporter extends DbPorter{
 
                 ps.execute();
             }
-        }finally {
+        }finally
+        {
             closeStatement(ps);
         }
     }
@@ -146,7 +151,8 @@ class OcspCertStoreDbImporter extends DbPorter{
 
         PreparedStatement ps = prepareStatement(sql);
 
-        try{
+        try
+        {
             for(CertprofileType info : certprofiles.getCertprofile())
             {
                 int idx = 1;
@@ -155,7 +161,8 @@ class OcspCertStoreDbImporter extends DbPorter{
 
                 ps.execute();
             }
-        }finally {
+        }finally
+        {
             closeStatement(ps);
         }
     }
@@ -192,16 +199,19 @@ class OcspCertStoreDbImporter extends DbPorter{
         PreparedStatement ps_certhash = prepareStatement(SQL_ADD_CERTHASH);
         PreparedStatement ps_rawcert = prepareStatement(SQL_ADD_RAWCERT);
 
-        try{
+        try
+        {
             for(CertType cert : certs.getCert())
             {
                 // rawcert
                 String filename = baseDir + File.separator + cert.getCertFile();
                 byte[] encodedCert = IoCertUtil.read(filename);
                 X509Certificate c;
-                try {
+                try
+                {
                     c = IoCertUtil.parseCert(encodedCert);
-                } catch (Exception e) {
+                } catch (Exception e)
+                {
                     LOG.error("could not parse certificate in file {}", filename);
                     LOG.debug("could not parse certificate in file " + filename, e);
                     if(e instanceof CertificateException)
@@ -248,7 +258,8 @@ class OcspCertStoreDbImporter extends DbPorter{
 
                 ps_rawcert.executeUpdate();
             }
-        }finally {
+        }finally
+        {
             closeStatement(ps_cert);
             closeStatement(ps_rawcert);
         }

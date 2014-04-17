@@ -17,7 +17,8 @@
 
 package org.xipki.ocsp.api;
 
-public enum HashAlgoType {
+public enum HashAlgoType
+{
     SHA1  (20, "1.3.14.3.2.26", "SHA1"),
     SHA224(28, "2.16.840.1.101.3.4.2.4", "SHA224"),
     SHA256(32, "2.16.840.1.101.3.4.2.1", "SHA256"),

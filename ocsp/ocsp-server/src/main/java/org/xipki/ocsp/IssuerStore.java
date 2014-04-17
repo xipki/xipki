@@ -25,7 +25,8 @@ import java.util.Set;
 
 import org.xipki.ocsp.api.HashAlgoType;
 
-public class IssuerStore {
+public class IssuerStore
+{
     private final Set<Integer> ids;
     private final List<IssuerEntry> entries;
 
@@ -34,9 +35,12 @@ public class IssuerStore {
         this.entries = new ArrayList<IssuerEntry>(entries.size());
         Set<Integer> ids = new HashSet<Integer>(entries.size());
 
-        for(IssuerEntry entry : entries) {
-            for(IssuerEntry existingEntry : this.entries) {
-                if(existingEntry.getId() == entry.getId()) {
+        for(IssuerEntry entry : entries)
+        {
+            for(IssuerEntry existingEntry : this.entries)
+            {
+                if(existingEntry.getId() == entry.getId())
+                {
                     throw new IllegalArgumentException("issuer with the same id " + entry.getId() + " already available");
                 }
             }
@@ -60,7 +64,8 @@ public class IssuerStore {
 
     public IssuerEntry getIssuerForFp( HashAlgoType hashAlgo, byte[] issuerNameHash, byte[] issuerKeyHash)
     {
-        for(IssuerEntry entry : entries) {
+        for(IssuerEntry entry : entries)
+        {
             if(entry.matchHash(hashAlgo, issuerNameHash, issuerKeyHash))
             {
                 return entry;

@@ -49,7 +49,8 @@ import org.xipki.ca.api.profile.CertificatePolicyInformation;
 import org.xipki.ca.api.profile.CertificatePolicyQualifier;
 import org.xipki.ca.api.profile.KeyUsage;
 
-public class X509Util {
+public class X509Util
+{
 
     public static BasicConstraints createBasicConstraints(boolean isCa, Integer pathLen)
     {
@@ -82,7 +83,8 @@ public class X509Util {
         int usage = 0;
         for (KeyUsage keyUsage : keyUsages)
         {
-            switch (keyUsage) {
+            switch (keyUsage)
+            {
                 case contentCommitment:
                     usage |= org.bouncycastle.asn1.x509.KeyUsage.nonRepudiation;
                     break;
@@ -128,7 +130,8 @@ public class X509Util {
         KeyPurposeId[] kps = new KeyPurposeId[keyUsages.size()];
 
         int i = 0;
-        for (String oid : keyUsages) {
+        for (String oid : keyUsages)
+        {
             kps[i++] = KeyPurposeId.getInstance(new ASN1ObjectIdentifier(oid));
         }
 

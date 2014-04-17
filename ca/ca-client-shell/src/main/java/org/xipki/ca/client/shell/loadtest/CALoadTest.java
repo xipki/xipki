@@ -57,7 +57,8 @@ public class CALoadTest extends AbstractLoadTest
     private final BigInteger baseN;
 
     @Override
-    protected Runnable getTestor() throws Exception {
+    protected Runnable getTestor() throws Exception
+    {
         return new Testor();
     }
 
@@ -107,15 +108,18 @@ public class CALoadTest extends AbstractLoadTest
         BigInteger modulus = baseN.add(BigInteger.valueOf(thisIndex));
 
         SubjectPublicKeyInfo spki;
-        try {
+        try
+        {
             spki = SubjectPublicKeyInfoFactory.createSubjectPublicKeyInfo(
                     SignerUtil.generateRSAPublicKeyParameter(
                             org.xipki.security.KeyUtil.generateRSAPublicKey(modulus,
                                     BigInteger.valueOf(65535))));
-        } catch (InvalidKeySpecException e) {
+        } catch (InvalidKeySpecException e)
+        {
             LOG.warn("InvalidKeySpecException: {}", e.getMessage());
             return null;
-        } catch (IOException e) {
+        } catch (IOException e)
+        {
             LOG.warn("IOException: {}", e.getMessage());
             return null;
         }
@@ -129,7 +133,8 @@ public class CALoadTest extends AbstractLoadTest
     {
 
         @Override
-        public void run() {
+        public void run()
+        {
             while(stop() == false && getErrorAccout() < 10)
             {
                 CertRequest certReq = nextCertRequest();
@@ -147,7 +152,8 @@ public class CALoadTest extends AbstractLoadTest
         private boolean testNext(CertRequest certRequest)
         {
             EnrollCertResult result;
-            try {
+            try
+            {
                 EnrollCertRequestEntryType requestEntry = new EnrollCertRequestEntryType
                         ("id-1", certProfile, certRequest, new ProofOfPossession());
 
@@ -155,10 +161,12 @@ public class CALoadTest extends AbstractLoadTest
                 request.addRequestEntry(requestEntry);
 
                 result = raWorker.requestCerts(request, null);
-            } catch (RAWorkerException e) {
+            } catch (RAWorkerException e)
+            {
                 LOG.warn("RAWorkerException: {}", e.getMessage());
                 return false;
-            } catch (PKIErrorException e) {
+            } catch (PKIErrorException e)
+            {
                 LOG.warn("PKIErrorException: {}", e.getMessage());
                 return false;
             }

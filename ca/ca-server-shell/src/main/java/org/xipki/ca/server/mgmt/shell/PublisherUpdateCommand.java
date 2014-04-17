@@ -22,7 +22,8 @@ import org.apache.felix.gogo.commands.Option;
 import org.xipki.security.common.IoCertUtil;
 
 @Command(scope = "ca", name = "publisher-update", description="Update publisher")
-public class PublisherUpdateCommand extends CaCommand {
+public class PublisherUpdateCommand extends CaCommand
+{
 
     @Option(name = "-name",
                 description = "Required. Publisher Name",
@@ -43,7 +44,8 @@ public class PublisherUpdateCommand extends CaCommand {
     protected String            confFile;
 
     @Override
-    protected Object doExecute() throws Exception {
+    protected Object doExecute() throws Exception
+    {
         if(conf == null && confFile != null)
         {
             conf = new String(IoCertUtil.read(confFile));

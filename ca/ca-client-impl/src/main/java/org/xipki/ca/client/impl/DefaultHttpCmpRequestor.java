@@ -30,7 +30,8 @@ import org.xipki.security.api.ConcurrentContentSigner;
 import org.xipki.security.api.SecurityFactory;
 import org.xipki.security.common.ParamChecker;
 
-class DefaultHttpCmpRequestor extends X509CmpRequestor {
+class DefaultHttpCmpRequestor extends X509CmpRequestor
+{
     private static final String CMP_REQUEST_MIMETYPE = "application/pkixcmp";
     private static final String CMP_RESPONSE_MIMETYPE = "application/pkixcmp";
 
@@ -45,9 +46,11 @@ class DefaultHttpCmpRequestor extends X509CmpRequestor {
         super(requestor, responderCert, caCert, securityFactory);
         ParamChecker.assertNotNull("serverUrl", serverUrl);
 
-        try {
+        try
+        {
             this.serverUrl = new URL(serverUrl);
-        } catch (MalformedURLException e) {
+        } catch (MalformedURLException e)
+        {
             throw new IllegalArgumentException("Invalid url: " + serverUrl);
         }
     }
@@ -69,7 +72,8 @@ class DefaultHttpCmpRequestor extends X509CmpRequestor {
         outputstream.write(request);
         outputstream.flush();
         InputStream inputstream = httpUrlConnection.getInputStream();
-        try{
+        try
+        {
             if (httpUrlConnection.getResponseCode() != HttpURLConnection.HTTP_OK)
             {
                 throw new IOException("Bad Response: "
@@ -105,7 +109,8 @@ class DefaultHttpCmpRequestor extends X509CmpRequestor {
             } while (true);
 
             return bytearrayoutputstream.toByteArray();
-        }finally{
+        }finally
+        {
             inputstream.close();
         }
     }

@@ -17,6 +17,7 @@
 
 package org.xipki.ca.cmp.client.type;
 
-public interface CmpResultType {
+public interface CmpResultType
+{
 
 }

@@ -29,14 +29,16 @@ import org.bouncycastle.asn1.DERSequence;
 /**
  *
  * <pre>
- * PSOTemplate ::= SEQUENCE {
+ * PSOTemplate ::= SEQUENCE
+ {
  *     slotAndKeyIdentifier   SlotAndKeyIdentifer
  *     message                OCTET STRING,
  * }
  * </pre>
  *
  */
-public class PSOTemplate extends ASN1Object {
+public class PSOTemplate extends ASN1Object
+{
     private SlotAndKeyIdentifer slotAndKeyIdentifier;
     private byte[] message;
 
@@ -53,7 +55,8 @@ public class PSOTemplate extends ASN1Object {
     }
 
 
-    public PSOTemplate(SlotAndKeyIdentifer slotAndKeyIdentifier, byte[] message) {
+    public PSOTemplate(SlotAndKeyIdentifer slotAndKeyIdentifier, byte[] message)
+    {
         if(slotAndKeyIdentifier == null)
         {
             throw new IllegalArgumentException("slotAndKeyIdentifier could not be null");
@@ -98,7 +101,8 @@ public class PSOTemplate extends ASN1Object {
     }
 
     @Override
-    public ASN1Primitive toASN1Primitive() {
+    public ASN1Primitive toASN1Primitive()
+    {
         ASN1EncodableVector vector = new ASN1EncodableVector();
         vector.add(slotAndKeyIdentifier.toASN1Primitive());
         vector.add(new DEROctetString(message));
@@ -106,12 +110,14 @@ public class PSOTemplate extends ASN1Object {
     }
 
 
-    public byte[] getMessage() {
+    public byte[] getMessage()
+    {
         return message;
     }
 
 
-    public SlotAndKeyIdentifer getSlotAndKeyIdentifer() {
+    public SlotAndKeyIdentifer getSlotAndKeyIdentifer()
+    {
         return slotAndKeyIdentifier;
     }
 }

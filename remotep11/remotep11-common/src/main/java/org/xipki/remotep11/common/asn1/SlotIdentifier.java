@@ -34,7 +34,8 @@ import org.xipki.security.api.PKCS11SlotIdentifier;
 /**
  *
  * <pre>
- * SlotIdentifier ::= SEQUENCE {
+ * SlotIdentifier ::= SEQUENCE
+ {
  *     slotIndex   INTEGER OPTIONAL, -- At least one of slotIndex and slotId must present.
  *     slotId      [1] EXPLICIT INTEGER OPTIONAL
  * }
@@ -131,7 +132,8 @@ public class SlotIdentifier extends ASN1Object
     }
 
     @Override
-    public ASN1Primitive toASN1Primitive() {
+    public ASN1Primitive toASN1Primitive()
+    {
         ASN1EncodableVector vector = new ASN1EncodableVector();
         if(slotId.getSlotIndex() != null)
         {
@@ -147,7 +149,8 @@ public class SlotIdentifier extends ASN1Object
         return new DERSequence(vector);
     }
 
-    public PKCS11SlotIdentifier getSlotId() {
+    public PKCS11SlotIdentifier getSlotId()
+    {
         return slotId;
     }
 

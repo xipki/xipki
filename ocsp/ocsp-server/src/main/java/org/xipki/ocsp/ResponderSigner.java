@@ -25,7 +25,8 @@ import org.bouncycastle.cert.X509CertificateHolder;
 import org.xipki.security.api.ConcurrentContentSigner;
 import org.xipki.security.common.ParamChecker;
 
-public class ResponderSigner {
+public class ResponderSigner
+{
     private final ConcurrentContentSigner signer;
 
     private final X509CertificateHolder certificate;
@@ -42,11 +43,13 @@ public class ResponderSigner {
         this.responderId = this.certificate.getSubject();
     }
 
-    public ConcurrentContentSigner getSigner() {
+    public ConcurrentContentSigner getSigner()
+    {
         return signer;
     }
 
-    public X500Name getResponderId() {
+    public X500Name getResponderId()
+    {
         return responderId;
     }
 

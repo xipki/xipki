@@ -57,7 +57,8 @@ public class Rfc2560Servlet extends HttpServlet
     public void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException
     {
-        try{
+        try
+        {
             if(responder == null)
             {
                 LOG.error("responder in servlet not configured");
@@ -116,11 +117,13 @@ public class Rfc2560Servlet extends HttpServlet
         response.flushBuffer();
     }
 
-    public int getMaxRequestLength() {
+    public int getMaxRequestLength()
+    {
         return maxRequestLength;
     }
 
-    public void setMaxRequestLength(int maxRequestLength) {
+    public void setMaxRequestLength(int maxRequestLength)
+    {
         this.maxRequestLength = maxRequestLength;
     }
 

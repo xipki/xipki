@@ -27,7 +27,8 @@ import org.bouncycastle.operator.ContentSigner;
 import org.bouncycastle.operator.RuntimeOperatorException;
 import org.xipki.security.common.ParamChecker;
 
-public class SignatureSigner implements ContentSigner {
+public class SignatureSigner implements ContentSigner
+{
     private final AlgorithmIdentifier sigAlgId;
     private final Signature signer;
     private final SignatureStream stream = new SignatureStream();
@@ -42,17 +43,20 @@ public class SignatureSigner implements ContentSigner {
     }
 
     @Override
-    public AlgorithmIdentifier getAlgorithmIdentifier() {
+    public AlgorithmIdentifier getAlgorithmIdentifier()
+    {
         return sigAlgId;
     }
 
     @Override
-    public OutputStream getOutputStream() {
+    public OutputStream getOutputStream()
+    {
         return stream;
     }
 
     @Override
-    public byte[] getSignature() {
+    public byte[] getSignature()
+    {
         try
         {
             return stream.getSignature();
@@ -71,8 +75,10 @@ public class SignatureSigner implements ContentSigner {
         }
 
         @Override
-        public void write(int b) throws IOException {
-            try{
+        public void write(int b) throws IOException
+        {
+            try
+            {
                 signer.update((byte) b);
             }catch(SignatureException e)
             {
@@ -81,8 +87,10 @@ public class SignatureSigner implements ContentSigner {
         }
 
         @Override
-        public void write(byte[] b) throws IOException {
-            try{
+        public void write(byte[] b) throws IOException
+        {
+            try
+            {
                 signer.update(b);
             }catch(SignatureException e)
             {
@@ -91,8 +99,10 @@ public class SignatureSigner implements ContentSigner {
         }
 
         @Override
-        public void write(byte[] b, int off, int len) throws IOException {
-            try{
+        public void write(byte[] b, int off, int len) throws IOException
+        {
+            try
+            {
                 signer.update(b, off, len);
             }catch(SignatureException e)
             {

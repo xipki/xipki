@@ -27,7 +27,8 @@ import org.xipki.security.api.SecurityFactory;
 import org.xipki.security.common.IoCertUtil;
 
 @Command(scope = "ca", name = "responder-set", description="Set responder")
-public class ResponderSetCommand extends CaCommand {
+public class ResponderSetCommand extends CaCommand
+{
     @Option(name = "-signerType",
             description = "Required. Type of the responder signer",
             required = true)
@@ -45,7 +46,8 @@ public class ResponderSetCommand extends CaCommand {
     private PasswordResolver passwordResolver;
 
     @Override
-    protected Object doExecute() throws Exception {
+    protected Object doExecute() throws Exception
+    {
         CmpResponderEntry entry = new CmpResponderEntry();
         X509Certificate signerCert = null;
         if(certFile != null)
@@ -71,11 +73,13 @@ public class ResponderSetCommand extends CaCommand {
     }
 
 
-    public void setSecurityFactory(SecurityFactory securityFactory) {
+    public void setSecurityFactory(SecurityFactory securityFactory)
+    {
         this.securityFactory = securityFactory;
     }
 
-    public void setPasswordResolver(PasswordResolver passwordResolver) {
+    public void setPasswordResolver(PasswordResolver passwordResolver)
+    {
         this.passwordResolver = passwordResolver;
     }
 }

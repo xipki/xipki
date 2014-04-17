@@ -20,7 +20,8 @@ package org.xipki.security;
 import org.xipki.security.api.PasswordResolver;
 import org.xipki.security.api.PasswordResolverException;
 
-public class NopPasswordResolver implements PasswordResolver {
+public class NopPasswordResolver implements PasswordResolver
+{
 
     public static NopPasswordResolver INSTANCE = new NopPasswordResolver();
 

@@ -42,7 +42,8 @@ public class LocalP11CryptService
     {
     }
 
-    public void setPkcs11Provider(String pkcs11Provider) {
+    public void setPkcs11Provider(String pkcs11Provider)
+    {
         if(pkcs11Provider != null && pkcs11Provider.equals(this.pkcs11Provider) == false)
         {
             p11CryptService = null;
@@ -51,7 +52,8 @@ public class LocalP11CryptService
         this.pkcs11Provider = pkcs11Provider;
     }
 
-    public void setPkcs11Module(String pkcs11Module) {
+    public void setPkcs11Module(String pkcs11Module)
+    {
         if(pkcs11Module != null && pkcs11Module.equals(this.pkcs11Module) == false)
         {
             p11CryptService = null;
@@ -59,7 +61,8 @@ public class LocalP11CryptService
         this.pkcs11Module = pkcs11Module;
     }
 
-    public void setPkcs11Password(String pkcs11Password) {
+    public void setPkcs11Password(String pkcs11Password)
+    {
         this.pkcs11Password = pkcs11Password;
     }
 
@@ -76,7 +79,8 @@ public class LocalP11CryptService
             Security.addProvider(new BouncyCastleProvider());
         }
 
-        try{
+        try
+        {
             if(pkcs11Module == null)
             {
                 throw new IllegalStateException("pkcs11Module is not configured");
@@ -86,7 +90,8 @@ public class LocalP11CryptService
                     "dummy".toCharArray() : pkcs11Password.toCharArray();
 
             Object p11Provider;
-            try{
+            try
+            {
                 Class<?> clazz = Class.forName(pkcs11Provider);
                 p11Provider = clazz.newInstance();
             }catch(Exception e)

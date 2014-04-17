@@ -27,7 +27,8 @@ import org.bouncycastle.crypto.Signer;
 import org.xipki.security.api.SignerException;
 import org.xipki.security.common.ParamChecker;
 
-public class P11ECDSASigner implements Signer {
+public class P11ECDSASigner implements Signer
+{
     private final Digest digest;
     private P11ECDSAKeyParameter param;
 
@@ -38,7 +39,8 @@ public class P11ECDSASigner implements Signer {
     }
 
     @Override
-    public void init(boolean forSigning, CipherParameters param) {
+    public void init(boolean forSigning, CipherParameters param)
+    {
         if(forSigning == false)
         {
             throw new RuntimeCryptoException("Verification mode not supported.");
@@ -53,12 +55,14 @@ public class P11ECDSASigner implements Signer {
     }
 
     @Override
-    public void update(byte b) {
+    public void update(byte b)
+    {
         digest.update(b);
     }
 
     @Override
-    public void update(byte[] in, int off, int len) {
+    public void update(byte[] in, int off, int len)
+    {
         digest.update(in, off, len);
     }
 
@@ -72,18 +76,21 @@ public class P11ECDSASigner implements Signer {
         try
         {
             return param.getP11CryptService().CKM_ECDSA(digestValue, param.getSlot(), param.getKeyId());
-        } catch (SignerException e) {
+        } catch (SignerException e)
+        {
             throw new InvalidCipherTextException("SignerException: " + e.getMessage());
         }
     }
 
     @Override
-    public boolean verifySignature(byte[] signature) {
+    public boolean verifySignature(byte[] signature)
+    {
         throw new UnsupportedOperationException("verifySignature not supported");
     }
 
     @Override
-    public void reset() {
+    public void reset()
+    {
         digest.reset();
     }
 

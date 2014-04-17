@@ -23,14 +23,16 @@ import org.apache.felix.gogo.commands.Command;
 import org.apache.felix.gogo.commands.Option;
 
 @Command(scope = "ca", name = "caprofile-list", description="List certificate profiles in given CA")
-public class CaProfileListCommand extends CaCommand {
+public class CaProfileListCommand extends CaCommand
+{
     @Option(name = "-ca",
             description = "Required. CA name",
             required = true)
     protected String           caName;
 
     @Override
-    protected Object doExecute() throws Exception {
+    protected Object doExecute() throws Exception
+    {
         StringBuilder sb = new StringBuilder();
         if(caManager.getCA(caName) == null)
         {

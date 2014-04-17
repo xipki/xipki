@@ -44,7 +44,8 @@ public class ErrorResultEntryType extends ResultEntryType
         this.statusInfo = new PKIStatusInfo(status);
     }
 
-    public PKIStatusInfo getStatusInfo() {
+    public PKIStatusInfo getStatusInfo()
+    {
         return statusInfo;
     }
 }

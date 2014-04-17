@@ -127,7 +127,8 @@ public class X509CACmpResponder extends CmpResponder
     }
 
     @Override
-    public boolean isCAInService() {
+    public boolean isCAInService()
+    {
         return CAStatus.ACTIVE == ca.getCAInfo().getStatus();
     }
 
@@ -175,7 +176,8 @@ public class X509CACmpResponder extends CmpResponder
         }
         confirmWaitTime *= 1000; // second to millisecond
 
-        try{
+        try
+        {
             switch(type)
             {
                 case PKIBody.TYPE_CERT_REQ:
@@ -304,7 +306,8 @@ public class X509CACmpResponder extends CmpResponder
                         ASN1ObjectIdentifier infoType = itvCRL.getInfoType();
 
                         CertificateList crl = null;
-                        try {
+                        try
+                        {
                             if(CMPObjectIdentifiers.it_currentCRL.equals(infoType))
                             {
                                 checkPermission(_requestor, Permission.CRL_DOWNLOAD);
@@ -337,9 +340,11 @@ public class X509CACmpResponder extends CmpResponder
                                 GenRepContent genRepContent = new GenRepContent(itv);
                                 respBody = new PKIBody(PKIBody.TYPE_GEN_REP, genRepContent);
                             }
-                        } catch (OperationException e) {
+                        } catch (OperationException e)
+                        {
                             failureInfo = PKIFailureInfo.systemFailure;
-                        } catch (CRLException e) {
+                        } catch (CRLException e)
+                        {
                             failureInfo = PKIFailureInfo.systemFailure;
                         }
                     }
@@ -454,7 +459,8 @@ public class X509CACmpResponder extends CmpResponder
             SubjectPublicKeyInfo publicKeyInfo = certTemp.getPublicKey();
             OptionalValidity validity = certTemp.getValidity();
 
-            try {
+            try
+            {
                 String certProfileName = getCertProfileName(reqMsg);
                 checkPermission(_requestor, certProfileName);
                 OriginalProfileConf originalProfileConf = getOrigCertProfileConf(reqMsg);
@@ -463,12 +469,14 @@ public class X509CACmpResponder extends CmpResponder
                         subject, publicKeyInfo,validity, extensions,
                         certProfileName, originalProfileConf,
                         keyUpdate, confirmWaitTime);
-            } catch (CMPException e) {
+            } catch (CMPException e)
+            {
                 LOG.warn("generateCertificate, CMPException: {}", e.getMessage());
                 LOG.debug("generateCertificate", e);
                 certResponses[i] = new CertResponse(certReqId,
                         generateCmpRejectionStatus(PKIFailureInfo.badCertTemplate, e.getMessage()));
-            } catch (ParseException e) {
+            } catch (ParseException e)
+            {
                 LOG.warn("generateCertificate, ParseException: {}", e.getMessage());
                 LOG.debug("generateCertificate", e);
                 certResponses[i] = new CertResponse(certReqId,
@@ -486,7 +494,8 @@ public class X509CACmpResponder extends CmpResponder
         InfoTypeAndValue[] regInfos = pkiHeader.getGeneralInfo();
         if(regInfos != null)
         {
-            for (InfoTypeAndValue regInfo : regInfos) {
+            for (InfoTypeAndValue regInfo : regInfos)
+            {
                 if(CMPObjectIdentifiers.regInfo_utf8Pairs.equals(regInfo.getInfoType()))
                 {
                     String regInfoValue = ((DERUTF8String) regInfo.getInfoValue()).getString();
@@ -508,7 +517,8 @@ public class X509CACmpResponder extends CmpResponder
         AttributeTypeAndValue[] regInfos = reqMsg.getRegInfo();
         if(regInfos != null)
         {
-            for (AttributeTypeAndValue regInfo : regInfos) {
+            for (AttributeTypeAndValue regInfo : regInfos)
+            {
                 if(CMPObjectIdentifiers.regInfo_utf8Pairs.equals(regInfo.getType()))
                 {
                     String regInfoValue = ((DERUTF8String) regInfo.getValue()).getString();
@@ -532,7 +542,8 @@ public class X509CACmpResponder extends CmpResponder
         AttributeTypeAndValue[] regInfos = reqMsg.getRegInfo();
         if(regInfos != null)
         {
-            for (AttributeTypeAndValue regInfo : regInfos) {
+            for (AttributeTypeAndValue regInfo : regInfos)
+            {
                 if(CMPObjectIdentifiers.regInfo_utf8Pairs.equals(regInfo.getType()))
                 {
                     String regInfoValue = ((DERUTF8String) regInfo.getValue()).getString();
@@ -593,7 +604,8 @@ public class X509CACmpResponder extends CmpResponder
             X500Name subject = certTemp.getSubject();
             SubjectPublicKeyInfo publicKeyInfo = certTemp.getSubjectPublicKeyInfo();
 
-            try{
+            try
+            {
                 String certProfileName = getCertProfileName(reqHeader);
                 checkPermission(requestor, certProfileName);
 
@@ -645,7 +657,8 @@ public class X509CACmpResponder extends CmpResponder
             }
         }
 
-        try{
+        try
+        {
             CertificateInfo certInfo;
             if(keyUpdate)
             {
@@ -728,7 +741,8 @@ public class X509CACmpResponder extends CmpResponder
 
         RevRepContentBuilder repContentBuilder = new RevRepContentBuilder();
 
-        for (RevDetails revDetails : revContent) {
+        for (RevDetails revDetails : revContent)
+        {
             CertTemplate certDetails = revDetails.getCertDetails();
             ASN1Integer serialNumber = certDetails.getSerialNumber();
             Extensions crlDetails = revDetails.getCrlEntryDetails();
@@ -742,9 +756,11 @@ public class X509CACmpResponder extends CmpResponder
             extValue = crlDetails.getExtensionParsedValue(extId);
 
             Date invalidityDate;
-            try {
+            try
+            {
                 invalidityDate = ((ASN1GeneralizedTime) extValue).getDate();
-            } catch (ParseException e) {
+            } catch (ParseException e)
+            {
                 String errMsg = "invalid extension " + extId.getId();
                 LOG.warn(errMsg);
                 PKIStatusInfo status = generateCmpRejectionStatus(PKIFailureInfo.unacceptedExtension, errMsg);
@@ -909,17 +925,21 @@ public class X509CACmpResponder extends CmpResponder
             return false;
         }
 
-        try {
+        try
+        {
             PublicKey publicKey = securityFactory.generatePublicKey(certRequest.getCertTemplate().getPublicKey());
             ContentVerifierProvider cvp = securityFactory.getContentVerifierProvider(publicKey);
             return certRequest.isValidSigningKeyPOP(cvp);
-        } catch (InvalidKeyException e) {
+        } catch (InvalidKeyException e)
+        {
             LOG.error("verifyPOP, InvalidKeyException: {}" , e.getMessage());
             LOG.debug("verifyPOP" , e);
-        } catch (IllegalStateException e) {
+        } catch (IllegalStateException e)
+        {
             LOG.error("verifyPOP, IllegalStateException: {}" , e.getMessage());
             LOG.debug("verifyPOP" , e);
-        } catch (CRMFException e) {
+        } catch (CRMFException e)
+        {
             LOG.error("verifyPOP, CRMFException: {}" , e.getMessage());
             LOG.debug("verifyPOP" , e);
         }
@@ -927,7 +947,8 @@ public class X509CACmpResponder extends CmpResponder
     }
 
     @Override
-    protected CmpControl getCmpControl() {
+    protected CmpControl getCmpControl()
+    {
         return ca.getCAManager().getCmpControl();
     }
 
@@ -935,7 +956,8 @@ public class X509CACmpResponder extends CmpResponder
     {
 
         @Override
-        public void run() {
+        public void run()
+        {
             Set<CertificateInfo> remainingCerts = pendingCertPool.removeConfirmTimeoutedCertificates();
 
             if(remainingCerts != null && !remainingCerts.isEmpty())

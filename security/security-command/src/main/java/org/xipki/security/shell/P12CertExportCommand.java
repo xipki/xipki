@@ -30,7 +30,8 @@ import org.xipki.security.api.SignerException;
 import org.xipki.security.common.IoCertUtil;
 
 @Command(scope = "keytool", name = "export-cert-p12", description="Export certificate from PKCS#12 keystore")
-public class P12CertExportCommand extends OsgiCommandSupport {
+public class P12CertExportCommand extends OsgiCommandSupport
+{
     @Option(name = "-p12",
             required = true, description = "Required. PKCS#12 keystore file")
     protected String            p12File;
@@ -51,11 +52,13 @@ public class P12CertExportCommand extends OsgiCommandSupport {
         char[] pwd = password.toCharArray();
 
         FileInputStream fIn = null;
-        try{
+        try
+        {
             fIn = new FileInputStream(p12File);
             ks = KeyStore.getInstance("PKCS12", "BC");
             ks.load(fIn, pwd);
-        }finally{
+        }finally
+        {
             if(fIn != null)
             {
                 fIn.close();

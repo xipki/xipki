@@ -19,7 +19,8 @@ package org.xipki.ca.client.impl;
 
 import org.xipki.security.common.ParamChecker;
 
-class RACertProfileMapping {
+class RACertProfileMapping
+{
     private final String requestedProfile;
     private final String destProfile;
     private final String destCA;
@@ -35,15 +36,18 @@ class RACertProfileMapping {
         this.destCA = destCA;
     }
 
-    public String getRequestedProfile() {
+    public String getRequestedProfile()
+    {
         return requestedProfile;
     }
 
-    public String getDestProfile() {
+    public String getDestProfile()
+    {
         return destProfile;
     }
 
-    public String getDestCA() {
+    public String getDestCA()
+    {
         return destCA;
     }
 

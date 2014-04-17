@@ -24,7 +24,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
-public abstract class AbstractLoadTest {
+public abstract class AbstractLoadTest
+{
     protected abstract Runnable getTestor() throws Exception;
 
     public void test()
@@ -33,11 +34,14 @@ public abstract class AbstractLoadTest {
         resetStartTime();
 
         ExecutorService executor = Executors.newFixedThreadPool(threads);
-        for (int i = 0; i < threads; i++) {
+        for (int i = 0; i < threads; i++)
+        {
             Runnable runnable;
-            try {
+            try
+            {
                 runnable = getTestor();
-            } catch (Exception e) {
+            } catch (Exception e)
+            {
                 System.err.println("Cannot initialize Testor\nError message: " + e.getMessage());
                 return;
             }
@@ -50,7 +54,8 @@ public abstract class AbstractLoadTest {
         while(true)
         {
             printStatus();
-            try{
+            try
+            {
                 boolean terminated = executor.awaitTermination(1, TimeUnit.SECONDS);
                 if(terminated)
                 {
@@ -122,7 +127,8 @@ public abstract class AbstractLoadTest {
         StringBuilder sb = new StringBuilder("\r");
 
         // 10 characters for processed accout
-        for (int i = 0; i < 10 -accountS.length(); i++) {
+        for (int i = 0; i < 10 -accountS.length(); i++)
+        {
             sb.append(" ");
         }
         sb.append(currentAccount);
@@ -207,7 +213,8 @@ public abstract class AbstractLoadTest {
      */
     protected static void saveToFile(String filename, byte[] content)
     {
-        try{
+        try
+        {
             File f = new File(filename);
             File p = f.getParentFile();
             if(p != null && ! p.exists())

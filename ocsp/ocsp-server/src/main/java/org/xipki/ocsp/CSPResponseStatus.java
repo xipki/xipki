@@ -17,7 +17,8 @@
 
 package org.xipki.ocsp;
 
-public enum CSPResponseStatus {
+public enum CSPResponseStatus
+{
     successfull(0),
     malformedRequest(1),
     internalError(2),

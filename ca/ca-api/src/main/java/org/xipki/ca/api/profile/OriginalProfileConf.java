@@ -24,7 +24,8 @@ import java.util.StringTokenizer;
 
 import org.xipki.security.common.ParamChecker;
 
-public class OriginalProfileConf {
+public class OriginalProfileConf
+{
     private static final String SubjectKeyIdentifier = "SubjectKeyIdentifier";
     private static final String AuthorityKeyIdentifier = "AuthorityKeyIdentifier";
     private static final String AuthorityInfoAccess = "AuthorityInfoAccess";
@@ -51,22 +52,26 @@ public class OriginalProfileConf {
         this.profileName = profileName;
     }
 
-    public void setSubjectKeyIdentifier(ExtensionOccurrence subjectKeyIdentifier) {
+    public void setSubjectKeyIdentifier(ExtensionOccurrence subjectKeyIdentifier)
+    {
         this.subjectKeyIdentifier = subjectKeyIdentifier;
         this.subjectKeyIdentifierSpecified = true;
     }
 
-    public void setAuthorityKeyIdentifier(ExtensionOccurrence authorityKeyIdentifier) {
+    public void setAuthorityKeyIdentifier(ExtensionOccurrence authorityKeyIdentifier)
+    {
         this.authorityKeyIdentifier = authorityKeyIdentifier;
         this.authorityKeyIdentifierSpecified = true;
     }
 
-    public void setAuthorityInfoAccess(ExtensionOccurrence authorityInfoAccess) {
+    public void setAuthorityInfoAccess(ExtensionOccurrence authorityInfoAccess)
+    {
         this.authorityInfoAccess = authorityInfoAccess;
         this.authorityInfoAccessSpecified = true;
     }
 
-    public void setCRLDisributionPoints(ExtensionOccurrence cRLDisributionPoints) {
+    public void setCRLDisributionPoints(ExtensionOccurrence cRLDisributionPoints)
+    {
         this.cRLDisributionPoints = cRLDisributionPoints;
         this.cRLDisributionPointsSpecified = true;
     }
@@ -74,7 +79,8 @@ public class OriginalProfileConf {
     public static OriginalProfileConf getInstance(String encoded)
     throws ParseException
     {
-        try{
+        try
+        {
             StringTokenizer st = new StringTokenizer(encoded, ";");
             Map<String, String> keyValues = new HashMap<String, String>();
             while(st.hasMoreTokens())
@@ -220,39 +226,48 @@ public class OriginalProfileConf {
         sb.append(";");
     }
 
-    public String getProfileName() {
+    public String getProfileName()
+    {
         return profileName;
     }
 
-    public ExtensionOccurrence getSubjectKeyIdentifier() {
+    public ExtensionOccurrence getSubjectKeyIdentifier()
+    {
         return subjectKeyIdentifier;
     }
 
-    public ExtensionOccurrence getAuthorityKeyIdentifier() {
+    public ExtensionOccurrence getAuthorityKeyIdentifier()
+    {
         return authorityKeyIdentifier;
     }
 
-    public ExtensionOccurrence getAuthorityInfoAccess() {
+    public ExtensionOccurrence getAuthorityInfoAccess()
+    {
         return authorityInfoAccess;
     }
 
-    public ExtensionOccurrence getCRLDisributionPoints() {
+    public ExtensionOccurrence getCRLDisributionPoints()
+    {
         return cRLDisributionPoints;
     }
 
-    public boolean isSubjectKeyIdentifierSpecified() {
+    public boolean isSubjectKeyIdentifierSpecified()
+    {
         return subjectKeyIdentifierSpecified;
     }
 
-    public boolean isAuthorityKeyIdentifierSpecified() {
+    public boolean isAuthorityKeyIdentifierSpecified()
+    {
         return authorityKeyIdentifierSpecified;
     }
 
-    public boolean isAuthorityInfoAccessSpecified() {
+    public boolean isAuthorityInfoAccessSpecified()
+    {
         return authorityInfoAccessSpecified;
     }
 
-    public boolean iscRLDisributionPointsSpecified() {
+    public boolean iscRLDisributionPointsSpecified()
+    {
         return cRLDisributionPointsSpecified;
     }
 

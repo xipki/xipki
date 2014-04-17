@@ -26,7 +26,8 @@ import org.xipki.ca.server.mgmt.CAManager;
 import org.xipki.security.common.IoCertUtil;
 
 @Command(scope = "ca", name = "responder-update", description="Update responder")
-public class ResponderUpdateCommand extends CaCommand {
+public class ResponderUpdateCommand extends CaCommand
+{
     @Option(name = "-signerType",
             description = "Type of the responder signer",
             required = true)
@@ -41,7 +42,8 @@ public class ResponderUpdateCommand extends CaCommand {
     protected String            certFile;
 
     @Override
-    protected Object doExecute() throws Exception {
+    protected Object doExecute() throws Exception
+    {
         String cert = null;
         if(CAManager.NULL.equalsIgnoreCase(certFile))
         {

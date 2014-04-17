@@ -74,22 +74,26 @@ import org.xipki.security.api.SignerException;
 import org.xipki.security.common.CmpUtf8Pairs;
 import org.xipki.security.common.ConfigurationException;
 
-class SelfSignedCertBuilder {
+class SelfSignedCertBuilder
+{
     static class GenerateSelfSignedResult
     {
         private final String signerConf;
         private final X509Certificate cert;
 
-        GenerateSelfSignedResult(String signerConf, X509Certificate cert) {
+        GenerateSelfSignedResult(String signerConf, X509Certificate cert)
+        {
             this.signerConf = signerConf;
             this.cert = cert;
         }
 
-        String getSignerConf() {
+        String getSignerConf()
+        {
             return signerConf;
         }
 
-        X509Certificate getCert() {
+        X509Certificate getCert()
+        {
             return cert;
         }
     }
@@ -136,10 +140,12 @@ class SelfSignedCertBuilder {
                     s = keyStoreKeyValues.get("exponent");
                     BigInteger exponent = (s == null) ? BigInteger.valueOf(65535) : new BigInteger(s);
 
-                    try {
+                    try
+                    {
                         keystoreBytes = securityFactory.generateSelfSignedRSAKeyStore(BigInteger.ONE,
                                 subject, signerType, password, keyLabel, keysize, exponent);
-                    } catch (Exception e) {
+                    } catch (Exception e)
+                    {
                         throw new OperationException(ErrorCode.System_Failure, e.getMessage());
                     }
                 }
@@ -157,19 +163,24 @@ class SelfSignedCertBuilder {
         }
 
         ConcurrentContentSigner signer;
-        try {
+        try
+        {
             signer = securityFactory.createSigner(signerType, signerConf, null, passwordResolver);
-        } catch (PasswordResolverException e) {
+        } catch (PasswordResolverException e)
+        {
             throw new OperationException(ErrorCode.System_Failure, "PasswordResolverException: " + e.getMessage());
-        } catch (SignerException e) {
+        } catch (SignerException e)
+        {
             throw new OperationException(ErrorCode.System_Failure, "SignerException: " + e.getMessage());
         }
 
         // this certificate is the dummy one which can be considered only as public key container
         Certificate bcCert;
-        try {
+        try
+        {
             bcCert = Certificate.getInstance(signer.getCertificate().getEncoded());
-        } catch (Exception e) {
+        } catch (Exception e)
+        {
             throw new OperationException(ErrorCode.System_Failure, "Could not reparse certificate: " + e.getMessage());
         }
         SubjectPublicKeyInfo publicKeyInfo = bcCert.getSubjectPublicKeyInfo();
@@ -193,20 +204,24 @@ class SelfSignedCertBuilder {
     {
         String certProfileName = certProfile.getName();
 
-        try{
+        try
+        {
             certProfile.checkPublicKey(publicKeyInfo);
-        } catch (BadCertTemplateException e) {
+        } catch (BadCertTemplateException e)
+        {
             throw new OperationException(ErrorCode.BAD_CERT_TEMPLATE, e.getMessage());
         }
 
         SubjectInfo subjectInfo;
         // subject
-        try{
+        try
+        {
             subjectInfo = certProfile.getSubject(requestedSubject);
         }catch(CertProfileException e)
         {
             throw new OperationException(ErrorCode.System_Failure, "exception in cert profile " + certProfileName);
-        } catch (BadCertTemplateException e) {
+        } catch (BadCertTemplateException e)
+        {
             throw new OperationException(ErrorCode.BAD_CERT_TEMPLATE, e.getMessage());
         }
 
@@ -237,7 +252,8 @@ class SelfSignedCertBuilder {
         PublicCAInfo publicCaInfo = new PublicCAInfo(
                 null, ocspUris, crlUris, null);
 
-        try{
+        try
+        {
             addExtensions(
                     certBuilder,
                     certProfile,
@@ -250,7 +266,8 @@ class SelfSignedCertBuilder {
             ContentSigner contentSigner = signer.borrowContentSigner();
 
             Certificate bcCert;
-            try{
+            try
+            {
                 bcCert= certBuilder.build(contentSigner).toASN1Structure();
             }finally
             {
@@ -261,19 +278,26 @@ class SelfSignedCertBuilder {
 
             CertificateFactory cf = CertificateFactory.getInstance("X.509", "BC");
             return (X509Certificate) cf.generateCertificate(new ByteArrayInputStream(encodedCert));
-        } catch (NoIdleSignerException e) {
+        } catch (NoIdleSignerException e)
+        {
             throw new OperationException(ErrorCode.System_Failure, "NoIdleSignerException: " + e.getMessage());
-        } catch (CertificateException e) {
+        } catch (CertificateException e)
+        {
             throw new OperationException(ErrorCode.System_Failure, "CertificateException: " + e.getMessage());
-        } catch (IOException e) {
+        } catch (IOException e)
+        {
             throw new OperationException(ErrorCode.System_Failure, "IOException: " + e.getMessage());
-        } catch (CertProfileException e) {
+        } catch (CertProfileException e)
+        {
             throw new OperationException(ErrorCode.System_Failure, "CertProfileException: " + e.getMessage());
-        } catch (BadCertTemplateException e) {
+        } catch (BadCertTemplateException e)
+        {
             throw new OperationException(ErrorCode.BAD_CERT_TEMPLATE, e.getMessage());
-        } catch (NoSuchAlgorithmException e) {
+        } catch (NoSuchAlgorithmException e)
+        {
             throw new OperationException(ErrorCode.System_Failure, "NoSuchAlgorithmException: " + e.getMessage());
-        } catch (NoSuchProviderException e) {
+        } catch (NoSuchProviderException e)
+        {
             throw new OperationException(ErrorCode.System_Failure, "NoSuchProviderException: " + e.getMessage());
         }
     }

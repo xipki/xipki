@@ -19,14 +19,17 @@ package lca.ca.profile.extension;
 
 import java.util.Set;
 
-public class ExtendedKeyUsageExtension extends ExtensionConf {
+public class ExtendedKeyUsageExtension extends ExtensionConf
+{
     private Set<String> extKeyUsages;
 
-    public Set<String> getExtKeyUsages() {
+    public Set<String> getExtKeyUsages()
+    {
         return extKeyUsages;
     }
 
-    public void setExtKeyUsages(Set<String> extKeyUsages) {
+    public void setExtKeyUsages(Set<String> extKeyUsages)
+    {
         this.extKeyUsages = extKeyUsages;
     }
 

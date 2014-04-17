@@ -18,7 +18,8 @@
 package org.xipki.ca.api.profile;
 
 
-public class ExtensionOccurrence {
+public class ExtensionOccurrence
+{
     public static final ExtensionOccurrence CRITICAL_REQUIRED    = new ExtensionOccurrence(true, true);
     public static final ExtensionOccurrence CRITICAL_OPTIONAL    = new ExtensionOccurrence(true, false);
     public static final ExtensionOccurrence NONCRITICAL_REQUIRED = new ExtensionOccurrence(false, true);
@@ -46,11 +47,13 @@ public class ExtensionOccurrence {
         this.required = required;
     }
 
-    public boolean isCritical() {
+    public boolean isCritical()
+    {
         return critical;
     }
 
-    public boolean isRequired() {
+    public boolean isRequired()
+    {
         return required;
     }
 

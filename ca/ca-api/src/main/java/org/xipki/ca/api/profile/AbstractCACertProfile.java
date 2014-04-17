@@ -22,7 +22,8 @@ import java.util.HashSet;
 import java.util.Set;
 
 
-public abstract class AbstractCACertProfile extends AbstractCertProfile {
+public abstract class AbstractCACertProfile extends AbstractCertProfile
+{
     protected Set<KeyUsage> keyUsages;
 
     public AbstractCACertProfile()
@@ -34,17 +35,20 @@ public abstract class AbstractCACertProfile extends AbstractCertProfile {
     }
 
     @Override
-    protected boolean isCa() {
+    protected boolean isCa()
+    {
         return true;
     }
 
     @Override
-    protected Set<KeyUsage> getKeyUsage() {
+    protected Set<KeyUsage> getKeyUsage()
+    {
         return keyUsages;
     }
 
     @Override
-    public ExtensionOccurrence getOccurenceOfAuthorityKeyIdentifier() {
+    public ExtensionOccurrence getOccurenceOfAuthorityKeyIdentifier()
+    {
         return ExtensionOccurrence.CRITICAL_REQUIRED;
     }
 

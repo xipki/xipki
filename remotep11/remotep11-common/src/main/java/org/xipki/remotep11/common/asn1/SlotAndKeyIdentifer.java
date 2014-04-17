@@ -28,14 +28,16 @@ import org.bouncycastle.asn1.DERSequence;
 /**
  *
  * <pre>
- * SlotAndKeyIdentifer ::= SEQUENCE {
+ * SlotAndKeyIdentifer ::= SEQUENCE
+ {
  *     slotIdentifier   SlotIdentifier,
  *     keyIdentifier    KeyIdentifier,
  * }
  * </pre>
  *
  */
-public class SlotAndKeyIdentifer extends ASN1Object {
+public class SlotAndKeyIdentifer extends ASN1Object
+{
     private SlotIdentifier slotIdentifier;
     private KeyIdentifier keyIdentifier;
 
@@ -96,19 +98,22 @@ public class SlotAndKeyIdentifer extends ASN1Object {
     }
 
     @Override
-    public ASN1Primitive toASN1Primitive() {
+    public ASN1Primitive toASN1Primitive()
+    {
         ASN1EncodableVector vector = new ASN1EncodableVector();
         vector.add(slotIdentifier.toASN1Primitive());
         vector.add(keyIdentifier.toASN1Primitive());
         return new DERSequence(vector);
     }
 
-    public SlotIdentifier getSlotIdentifier() {
+    public SlotIdentifier getSlotIdentifier()
+    {
         return slotIdentifier;
     }
 
 
-    public KeyIdentifier getKeyIdentifier() {
+    public KeyIdentifier getKeyIdentifier()
+    {
         return keyIdentifier;
     }
 

@@ -20,7 +20,8 @@ package org.xipki.ca.api.profile;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.xipki.security.common.ParamChecker;
 
-public class SubjectInfo {
+public class SubjectInfo
+{
     private final X500Name grantedSubject;
     private final String warning;
 
@@ -33,11 +34,13 @@ public class SubjectInfo {
         this.warning = warning;
     }
 
-    public X500Name getGrantedSubject() {
+    public X500Name getGrantedSubject()
+    {
         return grantedSubject;
     }
 
-    public String getWarning() {
+    public String getWarning()
+    {
         return warning;
     }
 

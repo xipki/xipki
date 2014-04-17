@@ -21,7 +21,8 @@ import org.apache.felix.gogo.commands.Command;
 import org.apache.felix.gogo.commands.Option;
 
 @Command(scope = "ca", name = "cmpcontrol-update", description="Update CMP control")
-public class CmpControlUpdateCommand extends CaCommand {
+public class CmpControlUpdateCommand extends CaCommand
+{
     @Option(name = "-ecc", aliases = { "--enableConfirmCert" },
             description = "Confirm of certificate is required, the default is not required")
     protected Boolean           enabledConfirmCert;
@@ -47,7 +48,8 @@ public class CmpControlUpdateCommand extends CaCommand {
     protected Integer            confirmWaitTime;
 
     @Override
-    protected Object doExecute() throws Exception {
+    protected Object doExecute() throws Exception
+    {
         Boolean requireConfirmCert = null;
         if(enabledConfirmCert != null || disableConfirmCert != null )
         {

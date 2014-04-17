@@ -128,14 +128,19 @@ public class CAManagerImpl implements CAManager
         }
 
         CertificateFactory cf;
-        try {
+        try
+        {
             cf = CertificateFactory.getInstance("X.509", "BC");
-        } catch (CertificateException e) {
+        } catch (CertificateException e)
+        {
             throw new ConfigurationException(e);
-        } catch (NoSuchProviderException e) {
-            try {
+        } catch (NoSuchProviderException e)
+        {
+            try
+            {
                 cf = CertificateFactory.getInstance("X.509");
-            } catch (CertificateException e1) {
+            } catch (CertificateException e1)
+            {
                 throw new ConfigurationException(e);
             }
         }
@@ -165,18 +170,24 @@ public class CAManagerImpl implements CAManager
 
         if(this.dataSource == null)
         {
-            try {
+            try
+            {
                 this.dataSource = dataSourceFactory.createDataSourceForFile(caConfFile, passwordResolver);
-            } catch (SQLException e) {
+            } catch (SQLException e)
+            {
                 throw new CAMgmtException(e);
-            } catch (PasswordResolverException e) {
+            } catch (PasswordResolverException e)
+            {
                 throw new CAMgmtException(e);
-            } catch (IOException e) {
+            } catch (IOException e)
+            {
                 throw new CAMgmtException(e);
             }
-            try {
+            try
+            {
                 this.certstore = new CertificateStore(dataSource);
-            } catch (SQLException e) {
+            } catch (SQLException e)
+            {
                 throw new CAMgmtException(e);
             }
         }
@@ -187,7 +198,8 @@ public class CAManagerImpl implements CAManager
         String sql = "SELECT locked FROM lock";
         ResultSet sqlResult = stmt.executeQuery(sql);
 
-        if(sqlResult.next()){
+        if(sqlResult.next())
+        {
             boolean locked = sqlResult.getBoolean("locked");
             if(locked)
             {
@@ -237,7 +249,8 @@ public class CAManagerImpl implements CAManager
     public boolean restartCaSystem()
     {
         reset();
-        try{
+        try
+        {
             initDataObjects();
         }catch(Exception e)
         {
@@ -276,7 +289,8 @@ public class CAManagerImpl implements CAManager
 
         LOG.info("Starting CA system");
 
-        try {
+        try
+        {
             init();
         }catch(Exception e)
         {
@@ -294,9 +308,11 @@ public class CAManagerImpl implements CAManager
         // check the configuration of certificate profiles
         for(CertProfileEntry entry : certProfiles.values())
         {
-            try {
+            try
+            {
                 entry.getCertProfile();
-            } catch (CertProfileException e) {
+            } catch (CertProfileException e)
+            {
                 LOG.error("Invalid configuration for the certProfile " + entry.getName()
                         + ",  message: " + e.getMessage());
                 return false;
@@ -306,11 +322,13 @@ public class CAManagerImpl implements CAManager
         // check the configuration of certificate publishers
         for(PublisherEntry entry : publishers.values())
         {
-            try {
+            try
+            {
                 entry.setPasswordResolver(passwordResolver);
                 entry.setDataSourceFactory(dataSourceFactory);
                 entry.getCertPublisher();
-            } catch (CertPublisherException e) {
+            } catch (CertPublisherException e)
+            {
                 LOG.error("Invalid configuration for the certPublisher " + entry.getName()
                         + ",  message: " + e.getMessage());
                 return false;
@@ -336,7 +354,8 @@ public class CAManagerImpl implements CAManager
                 }
                 else
                 {
-                    try{
+                    try
+                    {
                         X509Certificate crlSignerCert = crlSignerEntry.getCertificate();
                         identifiedSigner = securityFactory.createSigner(
                                 signerType, crlSignerEntry.getConf(), crlSignerCert,
@@ -345,7 +364,8 @@ public class CAManagerImpl implements CAManager
                         {
                             crlSignerEntry.setCertificate(identifiedSigner.getCertificate());
                         }
-                    } catch (PasswordResolverException e) {
+                    } catch (PasswordResolverException e)
+                    {
                         LOG.error("security.createSigner crlSigner (ca=" + caName + ")", e);
                         return false;
                     } catch (SignerException e)
@@ -356,9 +376,11 @@ public class CAManagerImpl implements CAManager
                     caEntry.getPublicCAInfo().setCrlSignerCertificate(identifiedSigner.getCertificate());
                 }
 
-                try {
+                try
+                {
                     crlSigner = new CrlSigner(identifiedSigner, crlSignerEntry.getPeriod(), crlSignerEntry.getOverlap());
-                } catch (OperationException e) {
+                } catch (OperationException e)
+                {
                     LOG.error("CrlSigner.<init> (ca=" + caName + "): {}", e.getMessage());
                     LOG.debug("CrlSigner.<init> (ca=" + caName + ")", e);
                     return false;
@@ -367,12 +389,14 @@ public class CAManagerImpl implements CAManager
             }
 
             ConcurrentContentSigner caSigner;
-            try {
+            try
+            {
                 caSigner = securityFactory.createSigner(
                         caEntry.getSignerType(), caEntry.getSignerConf(),
                         caEntry.getCertificate().getCert(),
                         passwordResolver);
-            } catch (PasswordResolverException e) {
+            } catch (PasswordResolverException e)
+            {
                 LOG.error("security.createSigner caSigner (ca=" + caName + "): {}", e.getMessage());
                 LOG.debug("security.createSigner caSigner (ca=" + caName + ")", e);
                 return false;
@@ -384,9 +408,11 @@ public class CAManagerImpl implements CAManager
             }
 
             X509CA ca;
-            try {
+            try
+            {
                 ca = new X509CA(this, caEntry, caSigner, certstore, crlSigner);
-            } catch (OperationException e) {
+            } catch (OperationException e)
+            {
                 LOG.error("X509CA.<init> (ca=" + caName + "): {}", e.getMessage());
                 LOG.debug("X509CA.<init> (ca=" + caName + ")", e);
                 return false;
@@ -397,7 +423,8 @@ public class CAManagerImpl implements CAManager
             if(responder != null)
             {
                 ConcurrentContentSigner cmpSigner = null;
-                try {
+                try
+                {
                     X509Certificate responderCert = responder.getCertificate();
                     cmpSigner = securityFactory.createSigner(
                             responder.getType(), responder.getConf(), responderCert,
@@ -406,7 +433,8 @@ public class CAManagerImpl implements CAManager
                     {
                         responder.setCertificate(cmpSigner.getCertificate());
                     }
-                } catch (PasswordResolverException e) {
+                } catch (PasswordResolverException e)
+                {
                     LOG.error("X509CA.<init>: {}", e.getMessage());
                     LOG.debug("X509CA.<init>", e);
                     return false;
@@ -486,9 +514,11 @@ public class CAManagerImpl implements CAManager
         for(String caName : x509cas.keySet())
         {
             X509CA ca = x509cas.get(caName);
-            try {
+            try
+            {
                 ca.commitNextSerial();
-            } catch (CAMgmtException e) {
+            } catch (CAMgmtException e)
+            {
                 LOG.info("Exception while calling ca.commitNextSerial for ca {}: {}", caName, e.getMessage());
             }
         }
@@ -506,7 +536,8 @@ public class CAManagerImpl implements CAManager
         return responders.get(caname);
     }
 
-    public ScheduledThreadPoolExecutor getScheduledThreadPoolExecutor() {
+    public ScheduledThreadPoolExecutor getScheduledThreadPoolExecutor()
+    {
         return scheduledThreadPoolExecutor;
     }
 
@@ -548,12 +579,14 @@ public class CAManagerImpl implements CAManager
         requestors.clear();
 
         Statement stmt = null;
-        try{
+        try
+        {
             stmt = createStatement();
             ResultSet rs = stmt.executeQuery(
                     "SELECT name, cert FROM requestor");
 
-            try{
+            try
+            {
                 while(rs.next())
                 {
                     String name = rs.getString("name");
@@ -586,7 +619,8 @@ public class CAManagerImpl implements CAManager
         this.responder = null;
 
         Statement stmt = null;
-        try{
+        try
+        {
             stmt = createStatement();
             ResultSet sqlResult = stmt.executeQuery("SELECT type, conf, cert FROM responder");
 
@@ -633,9 +667,11 @@ public class CAManagerImpl implements CAManager
         }
 
         byte[] encodedCert = Base64.decode(b64Cert);
-        try {
+        try
+        {
             return (X509Certificate) certFact.generateCertificate(new ByteArrayInputStream(encodedCert));
-        } catch (CertificateException e) {
+        } catch (CertificateException e)
+        {
             throw new CAMgmtException(e);
         }
     }
@@ -647,12 +683,14 @@ public class CAManagerImpl implements CAManager
         envParameterResolver.clear();
 
         Statement stmt = null;
-        try{
+        try
+        {
             stmt = createStatement();
             String sql = "SELECT name, value FROM environment";
             ResultSet rs = stmt.executeQuery(sql);
 
-            while(rs.next()){
+            while(rs.next())
+            {
                 String name = rs.getString("name");
                 String value = rs.getString("value");
 
@@ -679,12 +717,14 @@ public class CAManagerImpl implements CAManager
         caAliases.clear();
 
         Statement stmt = null;
-        try{
+        try
+        {
             stmt = createStatement();
             String sql = "SELECT name, ca_name FROM caalias";
             ResultSet rs = stmt.executeQuery(sql);
 
-            while(rs.next()){
+            while(rs.next())
+            {
                 String name = rs.getString("name");
                 String caName = rs.getString("ca_name");
 
@@ -711,12 +751,14 @@ public class CAManagerImpl implements CAManager
         certProfiles.clear();
 
         Statement stmt = null;
-        try{
+        try
+        {
             stmt = createStatement();
             String sql = "SELECT name, type, conf FROM certprofile";
             ResultSet rs = stmt.executeQuery(sql);
 
-            while(rs.next()){
+            while(rs.next())
+            {
                 String name = rs.getString("name");
                 String type = rs.getString("type");
                 String conf = rs.getString("conf");
@@ -748,12 +790,14 @@ public class CAManagerImpl implements CAManager
         publishers.clear();
 
         Statement stmt = null;
-        try{
+        try
+        {
             stmt = createStatement();
             String sql = "SELECT name, type, conf FROM publisher";
             ResultSet rs = stmt.executeQuery(sql);
 
-            while(rs.next()){
+            while(rs.next())
+            {
                 String name = rs.getString("name");
                 String type = rs.getString("type");
                 String conf = rs.getString("conf");
@@ -787,7 +831,8 @@ public class CAManagerImpl implements CAManager
         crlSigners.clear();
 
         Statement stmt = null;
-        try{
+        try
+        {
             stmt = createStatement();
 
             String sql = "SELECT name, signer_type, signer_conf, signer_cert, period,"
@@ -795,7 +840,8 @@ public class CAManagerImpl implements CAManager
                     + " FROM crlsigner";
             ResultSet rs = stmt.executeQuery(sql);
 
-            while(rs.next()){
+            while(rs.next())
+            {
                 String name = rs.getString("name");
                 String signer_type = rs.getString("signer_type");
                 String signer_conf = rs.getString("signer_conf");
@@ -825,7 +871,8 @@ public class CAManagerImpl implements CAManager
         }catch(SQLException e)
         {
             throw new CAMgmtException(e);
-        } catch (ConfigurationException e) {
+        } catch (ConfigurationException e)
+        {
             throw new CAMgmtException(e);
         }finally
         {
@@ -844,7 +891,8 @@ public class CAManagerImpl implements CAManager
         cmpControl = null;
 
         Statement stmt = null;
-        try{
+        try
+        {
             stmt = createStatement();
             String sql = "SELECT require_confirm_cert, send_ca_cert, "
                     + " message_time_bias, confirm_wait_time"
@@ -852,7 +900,8 @@ public class CAManagerImpl implements CAManager
 
             ResultSet rs = stmt.executeQuery(sql);
 
-            if(rs.next()){
+            if(rs.next())
+            {
                 boolean requireConfirmCert = rs.getBoolean("require_confirm_cert");
                 boolean sendCaCert = rs.getBoolean("send_ca_cert");
                 int messageTimeBias = rs.getInt("message_time_bias");
@@ -898,7 +947,8 @@ public class CAManagerImpl implements CAManager
         ca_has_profiles.clear();
 
         Statement stmt = null;
-        try{
+        try
+        {
             stmt = createStatement();
 
             ResultSet rs = stmt.executeQuery(
@@ -1049,7 +1099,8 @@ public class CAManagerImpl implements CAManager
 
         // insert to table ca
         PreparedStatement ps = null;
-        try{
+        try
+        {
             ps = prepareStatement(
                     "INSERT INTO ca (name, subject, next_serial, status, crl_uris, ocsp_uris, max_validity, "
                     + "cert, signer_type, signer_conf, crlsigner_name, "
@@ -1225,7 +1276,8 @@ public class CAManagerImpl implements CAManager
         int iName = i;
 
         PreparedStatement ps = null;
-        try{
+        try
+        {
             ps = prepareStatement(sb.toString());
 
             if(iStatus != null)
@@ -1301,7 +1353,8 @@ public class CAManagerImpl implements CAManager
         }catch(SQLException e)
         {
             throw new CAMgmtException(e);
-        } catch (CertificateEncodingException e) {
+        } catch (CertificateEncodingException e)
+        {
             throw new CAMgmtException(e);
         }finally
         {
@@ -1320,7 +1373,8 @@ public class CAManagerImpl implements CAManager
         }
 
         PreparedStatement ps = null;
-        try{
+        try
+        {
             ps = prepareStatement("UPDATE ca SET next_serial=? WHERE name=?");
             ps.setLong(1, nextSerial);
             ps.setString(2, caName);
@@ -1350,7 +1404,8 @@ public class CAManagerImpl implements CAManager
         }
 
         PreparedStatement ps = null;
-        try{
+        try
+        {
             ps = prepareStatement("DELETE FROM ca_has_certprofile WHERE ca_name=? AND certprofile_name=?");
             ps.setString(1, caName);
             ps.setString(2, profileName);
@@ -1386,7 +1441,8 @@ public class CAManagerImpl implements CAManager
         profileNames.add(profileName);
 
         PreparedStatement ps = null;
-        try{
+        try
+        {
             ps = prepareStatement("INSERT INTO ca_has_certprofile (ca_name, certprofile_name) VALUES (?, ?)");
             ps.setString(1, caName);
             ps.setString(2, profileName);
@@ -1416,7 +1472,8 @@ public class CAManagerImpl implements CAManager
         }
 
         PreparedStatement ps = null;
-        try{
+        try
+        {
             ps = prepareStatement("DELETE FROM ca_has_publisher WHERE ca_name=? AND publisher_name=?");
             ps.setString(1, caName);
             ps.setString(2, publisherName);
@@ -1452,7 +1509,8 @@ public class CAManagerImpl implements CAManager
         publisherNames.add(publisherName);
 
         PreparedStatement ps = null;
-        try{
+        try
+        {
             ps = prepareStatement("INSERT INTO ca_has_publisher (ca_name, publisher_name) VALUES (?, ?)");
             ps.setString(1, caName);
             ps.setString(2, publisherName);
@@ -1470,9 +1528,11 @@ public class CAManagerImpl implements CAManager
     {
         if(ps != null)
         {
-            try {
+            try
+            {
                 ps.close();
-            } catch (SQLException e) {
+            } catch (SQLException e)
+            {
             }
         }
     }
@@ -1506,7 +1566,8 @@ public class CAManagerImpl implements CAManager
         }
 
         PreparedStatement ps = null;
-        try{
+        try
+        {
             ps = prepareStatement("INSERT INTO requestor (name, cert) VALUES (?, ?)");
             int idx = 1;
             ps.setString(idx++, name);
@@ -1516,7 +1577,8 @@ public class CAManagerImpl implements CAManager
         }catch(SQLException e)
         {
             throw new CAMgmtException(e);
-        } catch (CertificateEncodingException e) {
+        } catch (CertificateEncodingException e)
+        {
             throw new CAMgmtException(e);
         }finally
         {
@@ -1535,12 +1597,14 @@ public class CAManagerImpl implements CAManager
             return;
         }
 
-        for(String caName : ca_has_requestors.keySet()){
+        for(String caName : ca_has_requestors.keySet())
+        {
             removeCmpRequestorFromCA(requestorName, caName);
         }
 
         PreparedStatement ps = null;
-        try{
+        try
+        {
             ps = prepareStatement("DELETE FROM requestor WHERE name=?");
             ps.setString(1, requestorName);
             int rows = ps.executeUpdate();
@@ -1575,7 +1639,8 @@ public class CAManagerImpl implements CAManager
 
         String sql = "UPDATE requestor SET cert=? WHERE name=?";
         PreparedStatement ps = null;
-        try{
+        try
+        {
             ps = prepareStatement(sql);
             ps.setString(1, getRealString(cert));
             ps.setString(2, name);
@@ -1614,7 +1679,8 @@ public class CAManagerImpl implements CAManager
         }
 
         PreparedStatement ps = null;
-        try{
+        try
+        {
             ps = prepareStatement("DELETE FROM ca_has_requestor WHERE ca_name=? AND requestor_name=?");
             ps.setString(1, caName);
             ps.setString(2, requestorName);
@@ -1664,7 +1730,8 @@ public class CAManagerImpl implements CAManager
         cmpRequestors.add(requestor);
 
         PreparedStatement ps = null;
-        try{
+        try
+        {
             ps = prepareStatement("INSERT INTO ca_has_requestor "
                     + "(ca_name, requestor_name, ra, permissions, profiles) VALUES (?, ?, ?, ?, ?)");
             int idx = 1;
@@ -1702,12 +1769,14 @@ public class CAManagerImpl implements CAManager
             return;
         }
 
-        for(String caName : ca_has_profiles.keySet()){
+        for(String caName : ca_has_profiles.keySet())
+        {
             removeCertProfileFromCA(profileName, caName);
         }
 
         PreparedStatement ps = null;
-        try{
+        try
+        {
             ps = prepareStatement("DELETE FROM certprofile WHERE name=?");
             ps.setString(1, profileName);
             ps.executeUpdate();
@@ -1759,7 +1828,8 @@ public class CAManagerImpl implements CAManager
         sb.append(" WHERE name=?");
 
         PreparedStatement ps = null;
-        try{
+        try
+        {
             ps = prepareStatement(sb.toString());
             if(iType != null)
             {
@@ -1792,7 +1862,8 @@ public class CAManagerImpl implements CAManager
         }
 
         PreparedStatement ps = null;
-        try{
+        try
+        {
             ps = prepareStatement("INSERT INTO certprofile (name, type, conf) VALUES (?, ?, ?)");
             ps.setString(1, name);
             ps.setString(2, dbEntry.getType());
@@ -1824,7 +1895,8 @@ public class CAManagerImpl implements CAManager
         responder = dbEntry;
 
         PreparedStatement ps = null;
-        try{
+        try
+        {
             ps = prepareStatement("INSERT INTO responder (name, type, conf, cert) VALUES (?, ?, ?, ?)");
             int idx = 1;
             ps.setString(idx++, CmpResponderEntry.name);
@@ -1843,7 +1915,8 @@ public class CAManagerImpl implements CAManager
         }catch(SQLException e)
         {
             throw new CAMgmtException(e);
-        } catch (CertificateEncodingException e) {
+        } catch (CertificateEncodingException e)
+        {
             throw new CAMgmtException(e);
         }finally
         {
@@ -1861,10 +1934,12 @@ public class CAManagerImpl implements CAManager
         }
 
         Statement stmt = null;
-        try {
+        try
+        {
             stmt = createStatement();
             stmt.execute("DELETE FROM responder");
-        } catch (SQLException e) {
+        } catch (SQLException e)
+        {
             throw new CAMgmtException(e);
         }finally
         {
@@ -1916,7 +1991,8 @@ public class CAManagerImpl implements CAManager
         sb.append(" WHERE name=?");
 
         PreparedStatement ps = null;
-        try{
+        try
+        {
             ps = prepareStatement(sb.toString());
             if(iType != null)
             {
@@ -1961,7 +2037,8 @@ public class CAManagerImpl implements CAManager
         }
 
         PreparedStatement ps = null;
-        try{
+        try
+        {
             ps = prepareStatement(
                     "INSERT INTO crlsigner (name, signer_type, signer_conf, signer_cert, period, overlap, include_certs_in_crl)"
                     + " VALUES (?, ?, ?, ?, ?, ?, ?)");
@@ -1979,7 +2056,8 @@ public class CAManagerImpl implements CAManager
         }catch(SQLException e)
         {
             throw new CAMgmtException(e);
-        } catch (CertificateEncodingException e) {
+        } catch (CertificateEncodingException e)
+        {
             throw new CAMgmtException(e);
         }finally
         {
@@ -1998,7 +2076,8 @@ public class CAManagerImpl implements CAManager
             return;
         }
 
-        for(String caName : cas.keySet()){
+        for(String caName : cas.keySet())
+        {
             CAEntry caInfo = cas.get(caName);
             if(crlSignerName.equals(caInfo.getCrlSignerName()))
             {
@@ -2007,7 +2086,8 @@ public class CAManagerImpl implements CAManager
         }
 
         PreparedStatement ps = null;
-        try{
+        try
+        {
             ps = prepareStatement("DELETE FROM crlsigner WHERE name=?");
             ps.setString(1, crlSignerName);
             ps.executeUpdate();
@@ -2089,7 +2169,8 @@ public class CAManagerImpl implements CAManager
         int iName = i;
 
         PreparedStatement ps = null;
-        try{
+        try
+        {
             ps = prepareStatement(sb.toString());
 
             if(iSigner_type != null)
@@ -2162,7 +2243,8 @@ public class CAManagerImpl implements CAManager
         }
 
         PreparedStatement ps = null;
-        try{
+        try
+        {
             ps = prepareStatement("UPDATE ca SET crlsigner_name=? WHERE name=?");
             ps.setString(1, crlSignerName);
             ps.setString(2, caName);
@@ -2187,7 +2269,8 @@ public class CAManagerImpl implements CAManager
         }
 
         PreparedStatement ps = null;
-        try{
+        try
+        {
             ps = prepareStatement("INSERT INTO publisher (name, type, conf) VALUES (?, ?, ?)");
             ps.setString(1, name);
             ps.setString(2, dbEntry.getType());
@@ -2247,12 +2330,14 @@ public class CAManagerImpl implements CAManager
             return;
         }
 
-        for(String caName : ca_has_publishers.keySet()){
+        for(String caName : ca_has_publishers.keySet())
+        {
             removePublisherFromCA(publisherName, caName);
         }
 
         PreparedStatement ps = null;
-        try{
+        try
+        {
             ps = prepareStatement("DELETE FROM publisher WHERE name=?");
             ps.setString(1, publisherName);
             ps.executeUpdate();
@@ -2304,7 +2389,8 @@ public class CAManagerImpl implements CAManager
         int iName = i;
 
         PreparedStatement ps = null;
-        try{
+        try
+        {
             ps = prepareStatement(sb.toString());
             if(iType != null)
             {
@@ -2345,7 +2431,8 @@ public class CAManagerImpl implements CAManager
         cmpControl = dbEntry;
 
         PreparedStatement ps = null;
-        try{
+        try
+        {
             ps = prepareStatement(
                     "INSERT INTO cmpcontrol (name, require_confirm_cert, send_ca_cert, "
                     + " message_time_bias, confirm_wait_time)"
@@ -2378,7 +2465,8 @@ public class CAManagerImpl implements CAManager
         }
 
         Statement stmt = null;
-        try{
+        try
+        {
             stmt = createStatement();
             stmt.execute("DELETE FROM cmpcontrol");
         }catch(SQLException e)
@@ -2442,7 +2530,8 @@ public class CAManagerImpl implements CAManager
         sb.append(" WHERE name=?");
 
         PreparedStatement ps = null;
-        try{
+        try
+        {
             ps = prepareStatement(sb.toString());
             if(iConfirmCert != null)
             {
@@ -2490,7 +2579,8 @@ public class CAManagerImpl implements CAManager
         }
 
         PreparedStatement ps = null;
-        try{
+        try
+        {
             ps = prepareStatement("INSERT INTO environment (name, value) VALUES (?, ?)");
             ps.setString(1, name);
             ps.setString(2, value);
@@ -2516,7 +2606,8 @@ public class CAManagerImpl implements CAManager
         }
 
         PreparedStatement ps = null;
-        try{
+        try
+        {
             ps = prepareStatement("DELETE FROM environment WHERE name=?");
             ps.setString(1, envParamName);
             ps.executeUpdate();
@@ -2544,7 +2635,8 @@ public class CAManagerImpl implements CAManager
         }
 
         PreparedStatement ps = null;
-        try{
+        try
+        {
             ps = prepareStatement("UPDATE environment SET value=? WHERE name=?");
             ps.setString(1, getRealString(value));
             ps.setString(2, name);
@@ -2633,11 +2725,13 @@ public class CAManagerImpl implements CAManager
         return permissions;
     }
 
-    public PasswordResolver getPasswordResolver() {
+    public PasswordResolver getPasswordResolver()
+    {
         return passwordResolver;
     }
 
-    public void setPasswordResolver(PasswordResolver passwordResolver) {
+    public void setPasswordResolver(PasswordResolver passwordResolver)
+    {
         this.passwordResolver = passwordResolver;
     }
 
@@ -2646,40 +2740,48 @@ public class CAManagerImpl implements CAManager
         return NULL.equalsIgnoreCase(s) ? null : s;
     }
 
-    public SecurityFactory getSecurityFactory() {
+    public SecurityFactory getSecurityFactory()
+    {
         return securityFactory;
     }
 
-    public void setSecurityFactory(SecurityFactory securityFactory) {
+    public void setSecurityFactory(SecurityFactory securityFactory)
+    {
         this.securityFactory = securityFactory;
     }
 
-    public DataSourceFactory getDataSourceFactory() {
+    public DataSourceFactory getDataSourceFactory()
+    {
         return dataSourceFactory;
     }
 
-    public void setDataSourceFactory(DataSourceFactory dataSourceFactory) {
+    public void setDataSourceFactory(DataSourceFactory dataSourceFactory)
+    {
         this.dataSourceFactory = dataSourceFactory;
     }
 
-    public String getCaConfFile() {
+    public String getCaConfFile()
+    {
         return caConfFile;
     }
 
-    public void setCaConfFile(String caConfFile) {
+    public void setCaConfFile(String caConfFile)
+    {
         this.caConfFile = caConfFile;
     }
 
     @Override
     public void addCaAlias(String aliasName, String caName)
-            throws CAMgmtException {
+            throws CAMgmtException
+            {
         if(caAliases.get(aliasName) != null)
         {
             throw new CAMgmtException("CA alias " + aliasName + " exists");
         }
 
         PreparedStatement ps = null;
-        try{
+        try
+        {
             ps = prepareStatement("INSERT INTO caalias (name, ca_name) VALUES (?, ?)");
             ps.setString(1, aliasName);
             ps.setString(2, caName);
@@ -2704,7 +2806,8 @@ public class CAManagerImpl implements CAManager
         }
 
         PreparedStatement ps = null;
-        try{
+        try
+        {
             ps = prepareStatement("DELETE FROM caalias WHERE name=?");
             ps.setString(1, aliasName);
             ps.executeUpdate();
@@ -2720,7 +2823,8 @@ public class CAManagerImpl implements CAManager
     }
 
     @Override
-    public String getCaName(String aliasName) {
+    public String getCaName(String aliasName)
+    {
         return caAliases.get(aliasName);
     }
 
@@ -2740,19 +2844,22 @@ public class CAManagerImpl implements CAManager
     }
 
     @Override
-    public Set<String> getCaAliasNames() {
+    public Set<String> getCaAliasNames()
+    {
         return caAliases.keySet();
     }
 
     @Override
-    public void removeCA(String caname) throws CAMgmtException {
+    public void removeCA(String caname) throws CAMgmtException
+    {
         if(cas.containsKey(caname) == false)
         {
             return;
         }
 
         PreparedStatement ps = null;
-        try{
+        try
+        {
             ps = prepareStatement("DELETE FROM ca WHERE name=?");
             ps.setString(1, caname);
             ps.executeUpdate();
@@ -2768,7 +2875,8 @@ public class CAManagerImpl implements CAManager
     }
 
     @Override
-    public void publishRootCA(String caname) throws CAMgmtException {
+    public void publishRootCA(String caname) throws CAMgmtException
+    {
         X509CA ca = x509cas.get(caname);
         if(ca == null)
         {
@@ -2784,10 +2892,12 @@ public class CAManagerImpl implements CAManager
 
         byte[] encodedSubjectPublicKey = certInfo.getCert().getPublicKey().getEncoded();
         CertificateInfo ci;
-        try {
+        try
+        {
             ci = new CertificateInfo(
                     certInfo, certInfo, encodedSubjectPublicKey, "UNKNOWN-Profile");
-        } catch (CertificateEncodingException e) {
+        } catch (CertificateEncodingException e)
+        {
             throw new CAMgmtException(e);
         }
         ca.publishCertificate(ci);
@@ -2804,7 +2914,8 @@ public class CAManagerImpl implements CAManager
 
     private Statement createStatement() throws CAMgmtException
     {
-        try{
+        try
+        {
             if(dsConnection == null || dsConnection.isClosed())
             {
                 dsConnection = dataSource.getConnection(0);
@@ -2824,7 +2935,8 @@ public class CAManagerImpl implements CAManager
 
     private PreparedStatement prepareStatement(String sql) throws CAMgmtException
     {
-        try{
+        try
+        {
             if(dsConnection == null || dsConnection.isClosed())
             {
                 dsConnection = dataSource.getConnection(0);

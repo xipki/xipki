@@ -69,9 +69,11 @@ public class P11RSAPSSContentSigner implements ContentSigner
         AsymmetricBlockCipher cipher = new P11PlainRSASigner();
 
         P11RSAKeyParameter keyParam;
-        try {
+        try
+        {
             keyParam = P11RSAKeyParameter.getInstance(cryptService, slot, keyId);
-        } catch (InvalidKeyException e) {
+        } catch (InvalidKeyException e)
+        {
             throw new OperatorCreationException(e.getMessage(), e);
         }
 
@@ -83,21 +85,26 @@ public class P11RSAPSSContentSigner implements ContentSigner
     }
 
     @Override
-    public AlgorithmIdentifier getAlgorithmIdentifier() {
+    public AlgorithmIdentifier getAlgorithmIdentifier()
+    {
         return algorithmIdentifier;
     }
 
     @Override
-    public OutputStream getOutputStream() {
+    public OutputStream getOutputStream()
+    {
         pssSigner.reset();
         return outputStream;
     }
 
     @Override
-    public byte[] getSignature() {
-        try {
+    public byte[] getSignature()
+    {
+        try
+        {
             return pssSigner.generateSignature();
-        } catch (CryptoException e) {
+        } catch (CryptoException e)
+        {
             LOG.warn("SignerException: {}", e.getMessage());
             LOG.debug("SignerException", e);
             throw new RuntimeCryptoException("SignerException: " + e.getMessage());
@@ -108,27 +115,32 @@ public class P11RSAPSSContentSigner implements ContentSigner
     {
 
         @Override
-        public void write(int b) throws IOException {
+        public void write(int b) throws IOException
+        {
             pssSigner.update((byte) b);
         }
 
         @Override
-        public void write(byte[] b) throws IOException {
+        public void write(byte[] b) throws IOException
+        {
             pssSigner.update(b, 0, b.length);
         }
 
         @Override
-        public void write(byte[] b, int off, int len) throws IOException {
+        public void write(byte[] b, int off, int len) throws IOException
+        {
             pssSigner.update(b, off, len);
         }
 
         @Override
-        public void flush() throws IOException {
+        public void flush() throws IOException
+        {
             ;
         }
 
         @Override
-        public void close() throws IOException {
+        public void close() throws IOException
+        {
         }
     }
 

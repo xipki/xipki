@@ -21,7 +21,8 @@ import org.apache.felix.gogo.commands.Command;
 import org.apache.felix.gogo.commands.Option;
 
 @Command(scope = "ca", name = "env-update", description="Update environment parameter")
-public class EnvUpdateCommand extends CaCommand {
+public class EnvUpdateCommand extends CaCommand
+{
 
     @Option(name = "-name",
                 description = "Required. Parameter Name",
@@ -35,7 +36,8 @@ public class EnvUpdateCommand extends CaCommand {
 
 
     @Override
-    protected Object doExecute() throws Exception {
+    protected Object doExecute() throws Exception
+    {
         caManager.changeEnvParam(name, value);
         System.out.println("Update the environment " + name + "=" + getRealString(value));
         return null;

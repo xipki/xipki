@@ -51,11 +51,13 @@ public class DefaultRACertProfile implements CertProfile
         extensionsProcessedByCA.add(org.bouncycastle.asn1.x509.Extension.cRLDistributionPoints);
     }
 
-    public DefaultRACertProfile() {
+    public DefaultRACertProfile()
+    {
     }
 
     @Override
-    public void initialize(String data) throws CertProfileException {
+    public void initialize(String data) throws CertProfileException
+    {
     }
 
     @Override
@@ -65,12 +67,14 @@ public class DefaultRACertProfile implements CertProfile
     }
 
     @Override
-    public Date getNotBefore(Date notBefore){
+    public Date getNotBefore(Date notBefore)
+    {
         return notBefore;
     }
 
     @Override
-    public Integer getValidity() {
+    public Integer getValidity()
+    {
         return null;
     }
 
@@ -108,27 +112,32 @@ public class DefaultRACertProfile implements CertProfile
     }
 
     @Override
-    public boolean isOnlyForRA() {
+    public boolean isOnlyForRA()
+    {
         return true;
     }
 
     @Override
-    public ExtensionOccurrence getOccurenceOfAuthorityKeyIdentifier() {
+    public ExtensionOccurrence getOccurenceOfAuthorityKeyIdentifier()
+    {
         return ExtensionOccurrence.NONCRITICAL_OPTIONAL;
     }
 
     @Override
-    public ExtensionOccurrence getOccurenceOfSubjectKeyIdentifier() {
+    public ExtensionOccurrence getOccurenceOfSubjectKeyIdentifier()
+    {
         return ExtensionOccurrence.NONCRITICAL_REQUIRED;
     }
 
     @Override
-    public ExtensionOccurrence getOccurenceOfCRLDistributinPoints() {
+    public ExtensionOccurrence getOccurenceOfCRLDistributinPoints()
+    {
         return ExtensionOccurrence.NONCRITICAL_OPTIONAL;
     }
 
     @Override
-    public ExtensionOccurrence getOccurenceOfAuthorityInfoAccess() {
+    public ExtensionOccurrence getOccurenceOfAuthorityInfoAccess()
+    {
         return ExtensionOccurrence.NONCRITICAL_OPTIONAL;
     }
 
@@ -139,7 +148,8 @@ public class DefaultRACertProfile implements CertProfile
     }
 
     @Override
-    public boolean incSerialNumberIfSubjectExists() {
+    public boolean incSerialNumberIfSubjectExists()
+    {
         return false;
     }
 }

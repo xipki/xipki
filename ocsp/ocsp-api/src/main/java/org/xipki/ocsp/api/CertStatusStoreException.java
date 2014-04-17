@@ -17,22 +17,27 @@
 
 package org.xipki.ocsp.api;
 
-public class CertStatusStoreException extends Exception {
+public class CertStatusStoreException extends Exception
+{
 
     private static final long serialVersionUID = 1L;
 
-    public CertStatusStoreException() {
+    public CertStatusStoreException()
+    {
     }
 
-    public CertStatusStoreException(String message) {
+    public CertStatusStoreException(String message)
+    {
         super(message);
     }
 
-    public CertStatusStoreException(Throwable cause) {
+    public CertStatusStoreException(Throwable cause)
+    {
         super(cause);
     }
 
-    public CertStatusStoreException(String message, Throwable cause) {
+    public CertStatusStoreException(String message, Throwable cause)
+    {
         super(message, cause);
     }
 

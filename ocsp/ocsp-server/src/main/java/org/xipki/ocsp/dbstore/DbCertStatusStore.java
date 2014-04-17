@@ -51,7 +51,8 @@ public class DbCertStatusStore implements CertStatusStore
     private class StoreUpdateService implements Runnable
     {
         @Override
-        public void run() {
+        public void run()
+        {
             initIssuerStore();
         }
     }
@@ -84,18 +85,21 @@ public class DbCertStatusStore implements CertStatusStore
 
     private synchronized void initIssuerStore()
     {
-        try{
+        try
+        {
             if(initialized)
             {
                 String sql = "SELECT id FROM issuer";
                 PreparedStatement ps = borrowPreparedStatement(sql);
 
                 ResultSet rs = null;
-                try{
+                try
+                {
                     Set<Integer> newIds = new HashSet<Integer>();
 
                     rs = ps.executeQuery();
-                    while(rs.next()) {
+                    while(rs.next())
+                    {
                         int id = rs.getInt("id");
                         newIds.add(id);
                     }
@@ -106,9 +110,11 @@ public class DbCertStatusStore implements CertStatusStore
                     {
                         return;
                     }
-                }finally {
+                }finally
+                {
                     returnPreparedStatement(ps);
-                    if(rs != null) {
+                    if(rs != null)
+                    {
                         rs.close();
                         rs = null;
                     }
@@ -132,10 +138,12 @@ public class DbCertStatusStore implements CertStatusStore
             PreparedStatement ps = borrowPreparedStatement(sql);
 
             ResultSet rs = null;
-            try{
+            try
+            {
                 rs = ps.executeQuery();
                 List<IssuerEntry> caInfos = new LinkedList<IssuerEntry>();
-                while(rs.next()) {
+                while(rs.next())
+                {
                     int id = rs.getInt("id");
 
                     Map<HashAlgoType, IssuerHashNameAndKey> hashes = new HashMap<HashAlgoType, IssuerHashNameAndKey>();
@@ -157,9 +165,11 @@ public class DbCertStatusStore implements CertStatusStore
                 this.issuerStore = new IssuerStore(caInfos);
                 LOG.info("Updated CertStore: {}", name);
                 initialized = true;
-            }finally {
+            }finally
+            {
                 returnPreparedStatement(ps);
-                if(rs != null) {
+                if(rs != null)
+                {
                     rs.close();
                     rs = null;
                 }
@@ -184,7 +194,8 @@ public class DbCertStatusStore implements CertStatusStore
         int n = 5;
         while(initialized == false && (n-- > 0))
         {
-            try{
+            try
+            {
                 Thread.sleep(100);
             }catch(InterruptedException e)
             {
@@ -201,7 +212,8 @@ public class DbCertStatusStore implements CertStatusStore
             certHashAlgo = hashAlgo;
         }
 
-        try{
+        try
+        {
             Date thisUpdate = new Date();
 
             IssuerEntry issuer = issuerStore.getIssuerForFp(hashAlgo, issuerNameHash, issuerKeyHash);
@@ -220,7 +232,8 @@ public class DbCertStatusStore implements CertStatusStore
             ps.setLong(2, serialNumber.longValue());
             ResultSet rs = ps.executeQuery();
 
-            try{
+            try
+            {
                 if(rs.next())
                 {
                     byte[] certHash = null;
@@ -274,7 +287,8 @@ public class DbCertStatusStore implements CertStatusStore
         ps.setInt(1, certId);
         ResultSet rs = ps.executeQuery();
 
-        try{
+        try
+        {
             if(rs.next())
             {
                 String hexHash = rs.getString(1);
@@ -295,7 +309,8 @@ public class DbCertStatusStore implements CertStatusStore
         String prefix = "SELECT";
         String suffix = "";
 
-        switch(dataSource.getDatabaseType()) {
+        switch(dataSource.getDatabaseType())
+        {
             case DB2:
                 suffix = "FETCH FIRST " + rows + " ROWS ONLY";
                 break;
@@ -331,7 +346,8 @@ public class DbCertStatusStore implements CertStatusStore
     {
         PreparedStatement ps = null;
         Connection c = dataSource.getConnection(5000);
-        if(c != null) {
+        if(c != null)
+        {
             LOG.debug("no idle PreparedStatement, create new instance");
             ps = c.prepareStatement(sqlQuery);
         }
@@ -340,28 +356,35 @@ public class DbCertStatusStore implements CertStatusStore
 
     private void returnPreparedStatement(PreparedStatement ps)
     {
-        try{
+        try
+        {
             Connection conn = ps.getConnection();
             dataSource.returnConnection(conn);
-        }catch(Throwable t) {
+        }catch(Throwable t)
+        {
             LOG.warn("Cannot return prepared statement and connection", t);
         }
     }
 
     @Override
-    public boolean isHealthy() {
+    public boolean isHealthy()
+    {
         final String sql = "SELECT id FROM issuer";
 
-        try{
+        try
+        {
             PreparedStatement ps = borrowPreparedStatement(sql);
 
             ResultSet rs = null;
-            try{
+            try
+            {
                 rs = ps.executeQuery();
                 return true;
-            }finally {
+            }finally
+            {
                 returnPreparedStatement(ps);
-                if(rs != null) {
+                if(rs != null)
+                {
                     rs.close();
                     rs = null;
                 }
@@ -375,7 +398,8 @@ public class DbCertStatusStore implements CertStatusStore
     }
 
     @Override
-    public String getName() {
+    public String getName()
+    {
         return name;
     }
 }

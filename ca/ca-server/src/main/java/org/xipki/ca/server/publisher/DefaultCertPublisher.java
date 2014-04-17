@@ -43,7 +43,8 @@ import org.xipki.security.api.PasswordResolverException;
 import org.xipki.security.common.EnvironmentParameterResolver;
 import org.xipki.security.common.ParamChecker;
 
-public class DefaultCertPublisher implements CertPublisher {
+public class DefaultCertPublisher implements CertPublisher
+{
     private static final Logger LOG = LoggerFactory.getLogger(DefaultCertPublisher.class);
 
     @SuppressWarnings("unused")
@@ -74,21 +75,28 @@ public class DefaultCertPublisher implements CertPublisher {
         InputStream confStream = new ByteArrayInputStream(confBytes);
 
         DataSource dataSource;
-        try {
+        try
+        {
             dataSource = dataSourceFactory.createDataSource(confStream, passwordResolver);
-        } catch (IOException e) {
+        } catch (IOException e)
+        {
             throw new CertPublisherException(e);
-        } catch (SQLException e) {
+        } catch (SQLException e)
+        {
             throw new CertPublisherException(e);
-        } catch (PasswordResolverException e) {
+        } catch (PasswordResolverException e)
+        {
             throw new CertPublisherException(e);
         }
 
-        try {
+        try
+        {
             queryExecutor = new CertStatusStoreQueryExecutor(dataSource);
-        } catch (NoSuchAlgorithmException e) {
+        } catch (NoSuchAlgorithmException e)
+        {
             throw new CertPublisherException(e);
-        } catch (SQLException e) {
+        } catch (SQLException e)
+        {
             throw new CertPublisherException(e);
         }
     }
@@ -103,7 +111,8 @@ public class DefaultCertPublisher implements CertPublisher {
     @Override
     public void certificateAdded(CertificateInfo certInfo)
     {
-        try {
+        try
+        {
             if(certInfo.isRevocated())
             {
                 queryExecutor.addCert(certInfo.getIssuerCert(),
@@ -120,7 +129,8 @@ public class DefaultCertPublisher implements CertPublisher {
                         certInfo.getCert(),
                         certInfo.getProfileName());
             }
-        } catch (Exception e) {
+        } catch (Exception e)
+        {
             LOG.error("Could not save certificate {}: {}. Message: {}",
                     new Object[]{certInfo.getCert().getSubject(),
                     Base64.toBase64String(certInfo.getCert().getEncodedCert()), e.getMessage()});
@@ -132,9 +142,11 @@ public class DefaultCertPublisher implements CertPublisher {
     public void certificateRevoked(X509Certificate cert, int reason,
             Date invalidityTime)
     {
-        try {
+        try
+        {
             queryExecutor.revocateCert(cert, new Date(), reason, invalidityTime);
-        } catch (SQLException e) {
+        } catch (SQLException e)
+        {
             LOG.error("Could not revocate certificate {}: {}",
                     cert.getSubjectX500Principal(),
                     e.getMessage());
@@ -145,9 +157,11 @@ public class DefaultCertPublisher implements CertPublisher {
     public void certificateRevoked(X500Principal issuer, BigInteger serialNumber,
             int reason, Date invalidityTime)
     {
-        try {
+        try
+        {
             queryExecutor.revocateCert(issuer, serialNumber, new Date(), reason, invalidityTime);
-        } catch (SQLException e) {
+        } catch (SQLException e)
+        {
             LOG.error("Could not revocate certificate issuer={}, serial={}: {}",
                     new Object[]{issuer, serialNumber, e.getMessage()});
         }
@@ -159,7 +173,8 @@ public class DefaultCertPublisher implements CertPublisher {
     }
 
     @Override
-    public boolean isHealthy() {
+    public boolean isHealthy()
+    {
         return queryExecutor.isHealthy();
     }
 

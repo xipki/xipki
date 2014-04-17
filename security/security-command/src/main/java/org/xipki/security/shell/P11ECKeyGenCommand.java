@@ -31,7 +31,8 @@ import org.xipki.security.p11.iaik.IaikP11CryptService;
 import org.xipki.security.p11.iaik.P11KeypairGenerator;
 
 @Command(scope = "keytool", name = "ec", description="Generate EC keypair in PKCS#11 device")
-public class P11ECKeyGenCommand extends OsgiCommandSupport {
+public class P11ECKeyGenCommand extends OsgiCommandSupport
+{
     @Option(name = "-curve",
             description = "EC Curve name, the default is brainpoolP256r1",
             required = false)
@@ -55,16 +56,19 @@ public class P11ECKeyGenCommand extends OsgiCommandSupport {
 
     private SecurityFactory securityFactory;
 
-    public SecurityFactory getSecurityFactory() {
+    public SecurityFactory getSecurityFactory()
+    {
         return securityFactory;
     }
 
-    public void setSecurityFactory(SecurityFactory securityFactory) {
+    public void setSecurityFactory(SecurityFactory securityFactory)
+    {
         this.securityFactory = securityFactory;
     }
 
     @Override
-    protected Object doExecute() throws Exception {
+    protected Object doExecute() throws Exception
+    {
         if(curveName == null)
         {
             curveName = "brainpoolP256r1";

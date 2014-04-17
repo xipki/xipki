@@ -182,13 +182,17 @@ public abstract class AbstractAuditEvent
      * @param cs  the CharSequence to check, may be null
      * @return {@code true} if the CharSequence is null, empty or whitespace
      */
-    public static boolean isBlank(CharSequence cs) {
+    public static boolean isBlank(CharSequence cs)
+    {
         int strLen;
-        if (cs == null || (strLen = cs.length()) == 0) {
+        if (cs == null || (strLen = cs.length()) == 0)
+        {
             return true;
         }
-        for (int i = 0; i < strLen; i++) {
-            if (Character.isWhitespace(cs.charAt(i)) == false) {
+        for (int i = 0; i < strLen; i++)
+        {
+            if (Character.isWhitespace(cs.charAt(i)) == false)
+            {
                 return false;
             }
         }

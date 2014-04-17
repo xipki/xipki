@@ -21,7 +21,8 @@ import java.security.cert.Certificate;
 import java.util.Map;
 import java.util.Set;
 
-public class EnrollCertResult {
+public class EnrollCertResult
+{
 
     private final Certificate caCertificate;
     private final Map<String, CertificateOrError> certificatesOrErrors;
@@ -33,11 +34,13 @@ public class EnrollCertResult {
         this.certificatesOrErrors = certificatesOrErrors;
     }
 
-    public Certificate getCaCertificate() {
+    public Certificate getCaCertificate()
+    {
         return caCertificate;
     }
 
-    public CertificateOrError getCertificateOrError(String id) {
+    public CertificateOrError getCertificateOrError(String id)
+    {
         return certificatesOrErrors.get(id);
     }
 

@@ -54,19 +54,23 @@ public class RevocateCertRequestEntryType extends ResultEntryType
         this.issuer = issuer;
     }
 
-    public X500Name getIssuer() {
+    public X500Name getIssuer()
+    {
         return issuer;
     }
 
-    public BigInteger getSerialNumber() {
+    public BigInteger getSerialNumber()
+    {
         return serialNumber;
     }
 
-    public int getReason() {
+    public int getReason()
+    {
         return reason;
     }
 
-    public Date getInvalidityDate() {
+    public Date getInvalidityDate()
+    {
         return invalidityDate;
     }
 

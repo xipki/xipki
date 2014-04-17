@@ -71,26 +71,32 @@ public class P11ECDSAContentSigner implements ContentSigner
     }
 
     @Override
-    public AlgorithmIdentifier getAlgorithmIdentifier() {
+    public AlgorithmIdentifier getAlgorithmIdentifier()
+    {
         return algorithmIdentifier;
     }
 
     @Override
-    public OutputStream getOutputStream() {
+    public OutputStream getOutputStream()
+    {
         outputStream.reset();
         return outputStream;
     }
 
     @Override
-    public byte[] getSignature() {
+    public byte[] getSignature()
+    {
         byte[] hashValue = outputStream.digest();
-        try {
+        try
+        {
             return cryptService.CKM_ECDSA(hashValue, slot, keyId);
-        } catch (SignerException e) {
+        } catch (SignerException e)
+        {
             LOG.warn("SignerException: {}", e.getMessage());
             LOG.debug("SignerException", e);
             throw new RuntimeCryptoException("SignerException: " + e.getMessage());
-        } catch (Throwable t) {
+        } catch (Throwable t)
+        {
             LOG.warn("Throwable: {}", t.getMessage());
             LOG.debug("Throwable", t);
             throw new RuntimeCryptoException("IOException: " + t.getMessage());

@@ -20,7 +20,8 @@ package org.xipki.ca.server;
 import java.math.BigInteger;
 import java.util.Date;
 
-public class CertRevocationInfo {
+public class CertRevocationInfo
+{
     private final BigInteger serial;
     private final int reason;
     private final Date revocationTime;
@@ -35,19 +36,23 @@ public class CertRevocationInfo {
         this.invalidityTime = invalidityTime;
     }
 
-    public BigInteger getSerial() {
+    public BigInteger getSerial()
+    {
         return serial;
     }
 
-    public int getReason() {
+    public int getReason()
+    {
         return reason;
     }
 
-    public Date getRevocationTime() {
+    public Date getRevocationTime()
+    {
         return revocationTime;
     }
 
-    public Date getInvalidityTime() {
+    public Date getInvalidityTime()
+    {
         return invalidityTime;
     }
 

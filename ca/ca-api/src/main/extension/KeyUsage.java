@@ -18,7 +18,8 @@
 package lca.ca.profile.extension;
 
 
-public enum KeyUsage {
+public enum KeyUsage
+{
     digitalSignature (0, "digitalSignature"),
     contentCommitment (1, "contentCommitment", "nonRepudiation"),
     keyEncipherment (2, "keyEncipherment"),

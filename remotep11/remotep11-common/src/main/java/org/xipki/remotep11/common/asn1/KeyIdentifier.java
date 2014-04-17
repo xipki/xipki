@@ -29,7 +29,8 @@ import org.xipki.security.api.Pkcs11KeyIdentifier;
 /**
  *
  * <pre>
- * SlotIdentifier ::= CHOICE {
+ * SlotIdentifier ::= CHOICE
+ {
  *     keyLabel   UTF8STRING,
  *     keyId      OCTET STRING
  * }
@@ -88,7 +89,8 @@ public class KeyIdentifier extends ASN1Object
     }
 
     @Override
-    public ASN1Primitive toASN1Primitive() {
+    public ASN1Primitive toASN1Primitive()
+    {
         if (keyId.getKeyLabel() != null)
         {
             return new DERUTF8String(keyId.getKeyLabel());
@@ -99,7 +101,8 @@ public class KeyIdentifier extends ASN1Object
         }
     }
 
-    public Pkcs11KeyIdentifier getKeyId() {
+    public Pkcs11KeyIdentifier getKeyId()
+    {
         return keyId;
     }
 

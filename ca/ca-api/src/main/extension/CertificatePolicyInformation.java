@@ -25,19 +25,23 @@ public class CertificatePolicyInformation
     private List<CertificatePolicyQualifier> qualifiers;
 
 
-    public void setPolicyId(String policyId) {
+    public void setPolicyId(String policyId)
+    {
         this.policyId = policyId;
     }
 
-    public void setQualifiers(List<CertificatePolicyQualifier> qualifiers) {
+    public void setQualifiers(List<CertificatePolicyQualifier> qualifiers)
+    {
         this.qualifiers = qualifiers;
     }
 
-    public String getPolicyId() {
+    public String getPolicyId()
+    {
         return policyId;
     }
 
-    public List<CertificatePolicyQualifier> getQualifiers() {
+    public List<CertificatePolicyQualifier> getQualifiers()
+    {
         return qualifiers;
     }
 

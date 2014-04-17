@@ -28,7 +28,8 @@ import org.xipki.ca.api.profile.AbstractCACertProfile;
 import org.xipki.ca.api.profile.BadCertTemplateException;
 import org.xipki.ca.api.profile.ExtensionOccurrence;
 
-public class CertProfile_SubCA extends AbstractCACertProfile {
+public class CertProfile_SubCA extends AbstractCACertProfile
+{
     private final Map<ASN1ObjectIdentifier, ExtensionOccurrence> extensionOccurences;
 
     public CertProfile_SubCA()
@@ -42,7 +43,8 @@ public class CertProfile_SubCA extends AbstractCACertProfile {
     }
 
     @Override
-    public Integer getValidity() {
+    public Integer getValidity()
+    {
         return 5 * 365;
     }
 
@@ -52,12 +54,14 @@ public class CertProfile_SubCA extends AbstractCACertProfile {
     }
 
     @Override
-    protected Integer getPathLenBasicConstraint() {
+    protected Integer getPathLenBasicConstraint()
+    {
         return 0;
     }
 
     @Override
-    protected Map<ASN1ObjectIdentifier, ExtensionOccurrence> getAdditionalExtensionOccurences() {
+    protected Map<ASN1ObjectIdentifier, ExtensionOccurrence> getAdditionalExtensionOccurences()
+    {
         return extensionOccurences;
     }
 

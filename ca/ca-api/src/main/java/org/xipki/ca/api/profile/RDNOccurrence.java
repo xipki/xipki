@@ -20,7 +20,8 @@ package org.xipki.ca.api.profile;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.xipki.security.common.ParamChecker;
 
-public class RDNOccurrence {
+public class RDNOccurrence
+{
     private final int minOccurs;
     private final int maxOccurs;
     private final ASN1ObjectIdentifier type;
@@ -30,15 +31,18 @@ public class RDNOccurrence {
         this(type, 1, 1);
     }
 
-    public int getMinOccurs() {
+    public int getMinOccurs()
+    {
         return minOccurs;
     }
 
-    public int getMaxOccurs() {
+    public int getMaxOccurs()
+    {
         return maxOccurs;
     }
 
-    public ASN1ObjectIdentifier getType() {
+    public ASN1ObjectIdentifier getType()
+    {
         return type;
     }
 

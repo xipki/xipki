@@ -22,38 +22,46 @@ import java.util.Set;
 
 import org.xipki.security.common.ParamChecker;
 
-public class CAHasRequestorEntry {
+public class CAHasRequestorEntry
+{
     private final String requestorName;
     private boolean ra;
     private Set<Permission> permissions;
     private Set<String> profiles;
 
-    public CAHasRequestorEntry(String requestorName) {
+    public CAHasRequestorEntry(String requestorName)
+    {
         ParamChecker.assertNotEmpty("requestorName", requestorName);
         this.requestorName = requestorName;
     }
 
-    public boolean isRa() {
+    public boolean isRa()
+    {
         return ra;
     }
 
-    public void setRa(boolean ra) {
+    public void setRa(boolean ra)
+    {
         this.ra = ra;
     }
 
-    public Set<Permission> getPermissions() {
+    public Set<Permission> getPermissions()
+    {
         return permissions;
     }
 
-    public void setPermissions(Set<Permission> permissions) {
+    public void setPermissions(Set<Permission> permissions)
+    {
         this.permissions = Collections.unmodifiableSet(permissions);
     }
 
-    public String getRequestorName() {
+    public String getRequestorName()
+    {
         return requestorName;
     }
 
-    public void setProfiles(Set<String> profiles) {
+    public void setProfiles(Set<String> profiles)
+    {
         this.profiles = Collections.unmodifiableSet(profiles);
     }
 

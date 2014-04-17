@@ -24,14 +24,16 @@ import org.apache.felix.gogo.commands.Option;
 import org.xipki.ca.server.mgmt.CAHasRequestorEntry;
 
 @Command(scope = "ca", name = "careq-list", description="List requestors in given CA")
-public class CaRequestorListCommand extends CaCommand {
+public class CaRequestorListCommand extends CaCommand
+{
     @Option(name = "-ca",
             description = "Required. CA name",
             required = true)
     protected String           caName;
 
     @Override
-    protected Object doExecute() throws Exception {
+    protected Object doExecute() throws Exception
+    {
         StringBuilder sb = new StringBuilder();
 
         Set<CAHasRequestorEntry> entries = caManager.getCmpRequestorsForCA(caName);

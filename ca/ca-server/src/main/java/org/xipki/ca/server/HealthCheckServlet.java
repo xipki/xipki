@@ -48,7 +48,8 @@ public class HealthCheckServlet extends HttpServlet
     protected void doGet(HttpServletRequest request,
             HttpServletResponse response) throws ServletException, IOException
     {
-        try{
+        try
+        {
             if(caManager == null)
             {
                 LOG.error("caManager in servlet not configured");
@@ -69,7 +70,8 @@ public class HealthCheckServlet extends HttpServlet
                 }
 
                 int indexOf = constructedPath.indexOf(servletPath);
-                if (indexOf >= 0) {
+                if (indexOf >= 0)
+                {
                     constructedPath = constructedPath.substring(indexOf+servletPath.length());
                 }
             }
@@ -103,9 +105,11 @@ public class HealthCheckServlet extends HttpServlet
             }
 
             HealthCheckResult healthResult = responder.healthCheck();
-            if (healthResult.isHealthy()) {
+            if (healthResult.isHealthy())
+            {
                 response.setStatus(HttpServletResponse.SC_OK);
-            } else {
+            } else
+            {
                 response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             }
 
@@ -123,7 +127,8 @@ public class HealthCheckServlet extends HttpServlet
         response.flushBuffer();
     }
 
-    public void setCaManager(CAManager caManager) {
+    public void setCaManager(CAManager caManager)
+    {
         this.caManager = caManager;
     }
 }

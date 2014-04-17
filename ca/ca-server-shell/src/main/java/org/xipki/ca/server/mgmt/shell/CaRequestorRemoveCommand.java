@@ -21,7 +21,8 @@ import org.apache.felix.gogo.commands.Command;
 import org.apache.felix.gogo.commands.Option;
 
 @Command(scope = "ca", name = "careq-rm", description="Remove requestor in given CA")
-public class CaRequestorRemoveCommand extends CaCommand {
+public class CaRequestorRemoveCommand extends CaCommand
+{
     @Option(name = "-ca",
             description = "Required. CA name",
             required = true)
@@ -32,7 +33,8 @@ public class CaRequestorRemoveCommand extends CaCommand {
     protected String            requestorName;
 
     @Override
-    protected Object doExecute() throws Exception {
+    protected Object doExecute() throws Exception
+    {
         caManager.removeCmpRequestorFromCA(requestorName, caName);
         return null;
     }

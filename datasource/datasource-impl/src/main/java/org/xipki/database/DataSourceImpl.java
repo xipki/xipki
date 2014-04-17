@@ -232,7 +232,8 @@ public class DataSourceImpl implements DataSource
 
     }
 
-    public final Connection getConnection(int timeout) throws SQLException {
+    public final Connection getConnection(int timeout) throws SQLException
+    {
         if(timeout <= 0)
         {
             timeout = 5000; // default
@@ -245,9 +246,11 @@ public class DataSourceImpl implements DataSource
         while(true)
         {
             c = idleConnections.poll();
-            try {
+            try
+            {
                 valid = !(c == null || c.isClosed());
-            } catch (SQLException e2) {
+            } catch (SQLException e2)
+            {
                 valid = false;
             }
 
@@ -260,16 +263,20 @@ public class DataSourceImpl implements DataSource
 
         if(! valid)
         {
-            try {
+            try
+            {
                 c = service.getConnection();
                 LOG.debug("no idle connection, create new instance");
-            } catch (SQLException e) {
+            } catch (SQLException e)
+            {
                 LOG.debug("cannot get new connection, wait for next idle connection");
                 // datasource cannot create any new connection
                 // wait for next idle connection for 5 seconds
-                try {
+                try
+                {
                     c = idleConnections.poll(timeout, TimeUnit.MILLISECONDS);
-                } catch (InterruptedException e1) {
+                } catch (InterruptedException e1)
+                {
                 }
             }
         }
@@ -284,10 +291,12 @@ public class DataSourceImpl implements DataSource
 
     public void returnConnection(Connection conn)
     {
-        try{
+        try
+        {
             if(!conn.isClosed())
             {
-                synchronized (idleConnections) {
+                synchronized (idleConnections)
+                {
                     if(! idleConnections.contains(conn))
                     {
                         idleConnections.add(conn);
@@ -301,19 +310,23 @@ public class DataSourceImpl implements DataSource
     }
 
 
-    public final PrintWriter getLogWriter() throws SQLException {
+    public final PrintWriter getLogWriter() throws SQLException
+    {
         return service.getLogWriter();
     }
 
-    public final void setLogWriter(PrintWriter out) throws SQLException {
+    public final void setLogWriter(PrintWriter out) throws SQLException
+    {
         service.setLogWriter(out);
     }
 
-    public final void setLoginTimeout(int seconds) throws SQLException {
+    public final void setLoginTimeout(int seconds) throws SQLException
+    {
         this.loginTimeout = seconds;
     }
 
-    public void setDriverClassName(String driverClassName) {
+    public void setDriverClassName(String driverClassName)
+    {
         this.driverClassName = driverClassName;
         this.databaseType = DatabaseType.getDataSourceForDriver(driverClassName);
     }
@@ -369,7 +382,8 @@ public class DataSourceImpl implements DataSource
         this.removeAbandoned = removeAbandoned;
     }
 
-    public void setRemoveAbandonedTimeout(int removeAbandonedTimeout){
+    public void setRemoveAbandonedTimeout(int removeAbandonedTimeout)
+    {
         this.removeAbandonedTimeout = removeAbandonedTimeout;
     }
 
@@ -428,15 +442,18 @@ public class DataSourceImpl implements DataSource
         this.defaultTransactionIsolation = defaultTransactionIsolation;
     }
 
-    public final DatabaseType getDatabaseType() {
+    public final DatabaseType getDatabaseType()
+    {
         return databaseType;
     }
 
-    public void setConnectionProperties(String connectionProperties) {
+    public void setConnectionProperties(String connectionProperties)
+    {
         this.connectionProperties = getString(connectionProperties);
     }
 
-    public void setPasswordResolver(PasswordResolver passwordResolver) {
+    public void setPasswordResolver(PasswordResolver passwordResolver)
+    {
         this.passwordResolver = passwordResolver;
     }
 

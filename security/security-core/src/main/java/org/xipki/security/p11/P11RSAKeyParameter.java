@@ -28,7 +28,8 @@ import org.xipki.security.api.Pkcs11KeyIdentifier;
 import org.xipki.security.api.SignerException;
 import org.xipki.security.common.ParamChecker;
 
-public class P11RSAKeyParameter extends RSAKeyParameters {
+public class P11RSAKeyParameter extends RSAKeyParameters
+{
     private final P11CryptService p11CryptService;
 
     private final PKCS11SlotIdentifier slot;
@@ -60,9 +61,11 @@ public class P11RSAKeyParameter extends RSAKeyParameters {
         ParamChecker.assertNotNull("keyId", keyId);
 
         RSAPublicKey key;
-        try {
+        try
+        {
             key = (RSAPublicKey) p11CryptService.getPublicKey(slot, keyId);
-        } catch (SignerException e) {
+        } catch (SignerException e)
+        {
             throw new InvalidKeyException(e.getMessage(), e);
         }
 
@@ -76,11 +79,13 @@ public class P11RSAKeyParameter extends RSAKeyParameters {
         return keysize;
     }
 
-    public P11CryptService getP11CryptService() {
+    public P11CryptService getP11CryptService()
+    {
         return p11CryptService;
     }
 
-    public PKCS11SlotIdentifier getSlot() {
+    public PKCS11SlotIdentifier getSlot()
+    {
         return slot;
     }
 
