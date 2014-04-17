@@ -21,19 +21,19 @@ import java.security.cert.X509CRL;
 
 public class CRLResultType implements CmpResultType
 {
-	private X509CRL crl;
-	
-	public CRLResultType()
-	{
-	}
-	
-	public void setCRL(X509CRL crl)
-	{
-		this.crl = crl;
-	}
-		
-	public X509CRL getCRL()
-	{
-		return crl;
-	}
+    private X509CRL crl;
+
+    public CRLResultType()
+    {
+    }
+
+    public void setCRL(X509CRL crl)
+    {
+        this.crl = crl;
+    }
+
+    public X509CRL getCRL()
+    {
+        return crl;
+    }
 }

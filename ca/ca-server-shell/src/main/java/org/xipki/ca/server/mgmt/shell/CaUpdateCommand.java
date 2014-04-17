@@ -33,192 +33,192 @@ import org.xipki.security.common.IoCertUtil;
 
 @Command(scope = "ca", name = "ca-update", description="Update CA")
 public class CaUpdateCommand extends CaCommand {
-	@Option(name = "-name",
-			required = true, description = "Required. CA name")
+    @Option(name = "-name",
+            required = true, description = "Required. CA name")
     protected String            caName;
-	
-	@Option(name = "-status",
+
+    @Option(name = "-status",
             description = "CA status, active|pending|deactivated")
     protected String            caStatus;
 
-	@Option(name = "-ocspUri",
-			description = "OCSP URI or 'NULL', multi options is allowed",
-			multiValued = true)
-	protected List<String> ocspUris;
+    @Option(name = "-ocspUri",
+            description = "OCSP URI or 'NULL', multi options is allowed",
+            multiValued = true)
+    protected List<String> ocspUris;
 
-	@Option(name = "-crlUri",
-			description = "CRL URI or 'NULL', multi options is allowed", 
-			multiValued = true)
-	protected List<String> crlUris;	
+    @Option(name = "-crlUri",
+            description = "CRL URI or 'NULL', multi options is allowed",
+            multiValued = true)
+    protected List<String> crlUris;
 
-	@Option(name = "-permission",
-			description = "Permission, multi options is allowed. allowed values are " + permissionsText, 
-			multiValued = true)
-	protected Set<String> permissions;	
+    @Option(name = "-permission",
+            description = "Permission, multi options is allowed. allowed values are " + permissionsText,
+            multiValued = true)
+    protected Set<String> permissions;
 
-	@Option(name = "-nextSerial",
+    @Option(name = "-nextSerial",
             description = "Serial number for the next certificate, "
-            		+ "must be greater than the current nextSerial")
+                    + "must be greater than the current nextSerial")
     protected Long            nextSerial;
-	
-	@Option(name = "-maxValidity",
+
+    @Option(name = "-maxValidity",
             description = "Maximal validity in days")
     protected Integer            maxValidity;
-	
-	@Option(name = "-crlSigner",
+
+    @Option(name = "-crlSigner",
             description = "CRL signer name or 'NULL'")
     protected String            crlSignerName;
 
-	@Option(name = "-numCrls",
+    @Option(name = "-numCrls",
             description = "Number of CRLs to be kept in database")
     protected Integer           numCrls;
-	
-	@Option(name = "-cert",
+
+    @Option(name = "-cert",
             description = "CA certificate file")
     protected String            certFile;
 
-	@Option(name = "-signerType",
+    @Option(name = "-signerType",
             description = "CA signer type")
     protected String            signerType;
 
-	@Option(name = "-signerConf",
+    @Option(name = "-signerConf",
             description = "CA signer configuration or 'NULL'")
     protected String            signerConf;
 
-	@Option(name = "-edk", aliases = { "--enableDuplicateKey" },
+    @Option(name = "-edk", aliases = { "--enableDuplicateKey" },
             description = "Allow duplicate key, the default is not allowed")
     protected Boolean           enableDuplicateKey;
 
-	@Option(name = "-ddk", aliases = { "--disableDuplicateKey" },
+    @Option(name = "-ddk", aliases = { "--disableDuplicateKey" },
             description = "Duplicate key is not allowed")
     protected Boolean           disableDuplicateKey;
-	
-	@Option(name = "-eds", aliases = { "--enableDuplicateSubject" },
+
+    @Option(name = "-eds", aliases = { "--enableDuplicateSubject" },
             description = "Allow duplicate subject, the default is not allowed")
     protected Boolean           enableDuplicateSubject;
-    
-	@Option(name = "-dds", aliases = { "--disableDuplicateSubject" },
+
+    @Option(name = "-dds", aliases = { "--disableDuplicateSubject" },
             description = "Duplicate subject is not allowed")
     protected Boolean           disableDuplicateSubject;
-   
+
     @Override
     protected Object doExecute() throws Exception {
-		CAStatus status = null;
-		if(caStatus != null)
-		{
-			status = CAStatus.getCAStatus(caStatus);
-		}		
-		
-		X509Certificate caCert = null;
-		if(certFile != null)
-		{
-			caCert = IoCertUtil.parseCert(certFile);
-		}
-		
-		if(signerConf != null)
-		{
-			 if("PKCS12".equalsIgnoreCase(signerType) || "JKS".equalsIgnoreCase(signerType))
-			 {
-				 signerConf = ShellUtil.replaceFileInSignerConf(signerConf);
-			 }
-		}
-		
-		Boolean allowDuplicateKey = null;
-		if(enableDuplicateKey != null || disableDuplicateKey != null)
-		{
-			allowDuplicateKey = isEnabled(enableDuplicateKey, disableDuplicateKey, false);
-		}
-		
-		Boolean allowDuplicateSubject = null;
-		if(enableDuplicateSubject != null || disableDuplicateSubject != null)
-		{
-			allowDuplicateSubject = isEnabled(enableDuplicateSubject, disableDuplicateSubject, false);
-		}
-		
-		Set<Permission> _permissions = null;
-		if (permissions != null && permissions.size() > 0)
-		{
-			_permissions = new HashSet<Permission>();
-	    	for(String permission : permissions)
-	    	{
-	    		Permission _permission = Permission.getPermission(permission);
-	    		if(_permission == null)
-	    		{
-	    			throw new ConfigurationException("Invalid permission: " + permission);
-	    		}
-	    		_permissions.add(_permission);
-	    	}
-		}
-		
-    	boolean clearCrlUris = false;
-    	if(crlUris != null)
-    	{
-    		for(String uri : crlUris)
-    		{
-    			if(CAManager.NULL.equalsIgnoreCase(uri))
-    			{
-    				clearCrlUris = true;
-    				break;
-    			}
-    		}
-    	}
-    	
-    	Set<String> _crlUris = null;
-    	
-    	if(clearCrlUris)
-    	{
-    		_crlUris = Collections.emptySet();
-    	}
-    	else
-    	{
-    		if(crlUris != null )
-    		{
-    			_crlUris = new HashSet<String>(crlUris);
-    		}
-    	}
-    	
-    	boolean clearOcspUris = false;
-    	if(ocspUris != null)
-    	{
-    		for(String uri : ocspUris)
-    		{
-    			if(CAManager.NULL.equalsIgnoreCase(uri))
-    			{
-    				clearOcspUris = true;
-    				break;
-    			}
-    		}
-    	}
-    	
-    	Set<String> _ocspUris = null;
-    	if(clearOcspUris)
-    	{
-    		_ocspUris = Collections.emptySet();
-    	}
-    	else
-    	{	
-    		if (ocspUris != null)
-    		{
-    			_ocspUris = new HashSet<String>(ocspUris);
-    		}
-    	}
-		
-		caManager.changeCA(
-				caName,
-				status,
-				nextSerial,
-				caCert, 
-				_crlUris,
-				_ocspUris,
-				maxValidity,
-				signerType,
-				signerConf,
-				crlSignerName,
-				allowDuplicateKey,
-				allowDuplicateSubject,
-				_permissions,
-				numCrls);
-    	
-    	return null;
+        CAStatus status = null;
+        if(caStatus != null)
+        {
+            status = CAStatus.getCAStatus(caStatus);
+        }
+
+        X509Certificate caCert = null;
+        if(certFile != null)
+        {
+            caCert = IoCertUtil.parseCert(certFile);
+        }
+
+        if(signerConf != null)
+        {
+             if("PKCS12".equalsIgnoreCase(signerType) || "JKS".equalsIgnoreCase(signerType))
+             {
+                 signerConf = ShellUtil.replaceFileInSignerConf(signerConf);
+             }
+        }
+
+        Boolean allowDuplicateKey = null;
+        if(enableDuplicateKey != null || disableDuplicateKey != null)
+        {
+            allowDuplicateKey = isEnabled(enableDuplicateKey, disableDuplicateKey, false);
+        }
+
+        Boolean allowDuplicateSubject = null;
+        if(enableDuplicateSubject != null || disableDuplicateSubject != null)
+        {
+            allowDuplicateSubject = isEnabled(enableDuplicateSubject, disableDuplicateSubject, false);
+        }
+
+        Set<Permission> _permissions = null;
+        if (permissions != null && permissions.size() > 0)
+        {
+            _permissions = new HashSet<Permission>();
+            for(String permission : permissions)
+            {
+                Permission _permission = Permission.getPermission(permission);
+                if(_permission == null)
+                {
+                    throw new ConfigurationException("Invalid permission: " + permission);
+                }
+                _permissions.add(_permission);
+            }
+        }
+
+        boolean clearCrlUris = false;
+        if(crlUris != null)
+        {
+            for(String uri : crlUris)
+            {
+                if(CAManager.NULL.equalsIgnoreCase(uri))
+                {
+                    clearCrlUris = true;
+                    break;
+                }
+            }
+        }
+
+        Set<String> _crlUris = null;
+
+        if(clearCrlUris)
+        {
+            _crlUris = Collections.emptySet();
+        }
+        else
+        {
+            if(crlUris != null )
+            {
+                _crlUris = new HashSet<String>(crlUris);
+            }
+        }
+
+        boolean clearOcspUris = false;
+        if(ocspUris != null)
+        {
+            for(String uri : ocspUris)
+            {
+                if(CAManager.NULL.equalsIgnoreCase(uri))
+                {
+                    clearOcspUris = true;
+                    break;
+                }
+            }
+        }
+
+        Set<String> _ocspUris = null;
+        if(clearOcspUris)
+        {
+            _ocspUris = Collections.emptySet();
+        }
+        else
+        {
+            if (ocspUris != null)
+            {
+                _ocspUris = new HashSet<String>(ocspUris);
+            }
+        }
+
+        caManager.changeCA(
+                caName,
+                status,
+                nextSerial,
+                caCert,
+                _crlUris,
+                _ocspUris,
+                maxValidity,
+                signerType,
+                signerConf,
+                crlSignerName,
+                allowDuplicateKey,
+                allowDuplicateSubject,
+                _permissions,
+                numCrls);
+
+        return null;
     }
 }

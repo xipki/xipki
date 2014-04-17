@@ -34,36 +34,36 @@ public class DigestOutputStream
 
     public void reset()
     {
-    	digest.reset();
+        digest.reset();
     }
-    
+
     @Override
     public void write(byte[] bytes, int off, int len)
         throws IOException
     {
-    	digest.update(bytes, off, len);
+        digest.update(bytes, off, len);
     }
 
-    @Override    
+    @Override
     public void write(byte[] bytes)
         throws IOException
     {
-    	digest.update(bytes, 0, bytes.length);
+        digest.update(bytes, 0, bytes.length);
     }
 
     @Override
     public void write(int b)
         throws IOException
     {
-    	digest.update((byte)b);
+        digest.update((byte)b);
     }
-    
+
     public byte[] digest()
     {
-    	byte[] result = new byte[digest.getDigestSize()];
-    	digest.doFinal(result, 0);
-    	reset();
-    	return result;
+        byte[] result = new byte[digest.getDigestSize()];
+        digest.doFinal(result, 0);
+        reset();
+        return result;
     }
 
 }

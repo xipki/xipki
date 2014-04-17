@@ -18,15 +18,15 @@
 package lca.ca.profile.extension;
 
 public class ExtensionConf {
-	private Boolean critical;		
-	
-	public Boolean isCritical()
-	{
-		return critical;
-	}
-	
-	public void setCritical(Boolean critical) {
-		this.critical = critical;
-	}
+    private Boolean critical;
+
+    public Boolean isCritical()
+    {
+        return critical;
+    }
+
+    public void setCritical(Boolean critical) {
+        this.critical = critical;
+    }
 
 }

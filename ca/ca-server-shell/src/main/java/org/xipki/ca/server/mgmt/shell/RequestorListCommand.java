@@ -26,34 +26,34 @@ import org.xipki.ca.server.mgmt.CmpRequestorEntry;
 @Command(scope = "ca", name = "requestor-list", description="List requestors")
 public class RequestorListCommand extends CaCommand {
 
-	@Option(name = "-name",
-        	description = "Requestor name",
+    @Option(name = "-name",
+            description = "Requestor name",
             required = false, multiValued = false)
-	protected String name;
+    protected String name;
 
     @Override
     protected Object doExecute() throws Exception {
-		StringBuilder sb = new StringBuilder();
-		
-		if(name == null)
-		{
-			Set<String> names = caManager.getCmpRequestorNames();			
-			int n = names.size();
-			
-			sb.append(n + " CMP requestors are configured:\n");		
-			for(String paramName : names)
-			{
-				sb.append("\t").append(paramName).append("\n");
-			}
-		}
-		else
-		{
-			CmpRequestorEntry entry = caManager.getCmpRequestor(name);
-			sb.append(entry.toString());
-		}
-		
-		System.out.println(sb.toString());
-		
+        StringBuilder sb = new StringBuilder();
+
+        if(name == null)
+        {
+            Set<String> names = caManager.getCmpRequestorNames();
+            int n = names.size();
+
+            sb.append(n + " CMP requestors are configured:\n");
+            for(String paramName : names)
+            {
+                sb.append("\t").append(paramName).append("\n");
+            }
+        }
+        else
+        {
+            CmpRequestorEntry entry = caManager.getCmpRequestor(name);
+            sb.append(entry.toString());
+        }
+
+        System.out.println(sb.toString());
+
         return null;
     }
 }

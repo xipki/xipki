@@ -23,7 +23,7 @@ import org.apache.felix.gogo.commands.Command;
 public class ResponderRemoveCommand extends CaCommand {
     @Override
     protected Object doExecute() throws Exception {
-    	caManager.removeCmpResponder();
+        caManager.removeCmpResponder();
         return null;
     }
 }

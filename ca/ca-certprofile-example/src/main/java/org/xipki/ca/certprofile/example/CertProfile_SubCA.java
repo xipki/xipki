@@ -28,37 +28,37 @@ import org.xipki.ca.api.profile.AbstractCACertProfile;
 import org.xipki.ca.api.profile.BadCertTemplateException;
 import org.xipki.ca.api.profile.ExtensionOccurrence;
 
-public class CertProfile_SubCA extends AbstractCACertProfile {	
-	private final Map<ASN1ObjectIdentifier, ExtensionOccurrence> extensionOccurences;
-	
-	public CertProfile_SubCA()
-	{
-		// Extensions
-		Map<ASN1ObjectIdentifier, ExtensionOccurrence> _extensionOccurences = 
-				new HashMap<ASN1ObjectIdentifier, ExtensionOccurrence>();
-		_extensionOccurences.put(Extension.keyUsage, ExtensionOccurrence.CRITICAL_REQUIRED);
-		_extensionOccurences.put(Extension.basicConstraints, ExtensionOccurrence.CRITICAL_REQUIRED);
-		extensionOccurences = Collections.unmodifiableMap(_extensionOccurences);
-	}	
-	
-	@Override
-	public Integer getValidity() {
-		return 5 * 365;
-	}
-	
-	@Override
-	protected void checkSubjectContent(X500Name requestedSubject) throws BadCertTemplateException
-	{
-	}
+public class CertProfile_SubCA extends AbstractCACertProfile {
+    private final Map<ASN1ObjectIdentifier, ExtensionOccurrence> extensionOccurences;
 
-	@Override
-	protected Integer getPathLenBasicConstraint() {
-		return 0;
-	}
+    public CertProfile_SubCA()
+    {
+        // Extensions
+        Map<ASN1ObjectIdentifier, ExtensionOccurrence> _extensionOccurences =
+                new HashMap<ASN1ObjectIdentifier, ExtensionOccurrence>();
+        _extensionOccurences.put(Extension.keyUsage, ExtensionOccurrence.CRITICAL_REQUIRED);
+        _extensionOccurences.put(Extension.basicConstraints, ExtensionOccurrence.CRITICAL_REQUIRED);
+        extensionOccurences = Collections.unmodifiableMap(_extensionOccurences);
+    }
 
-	@Override
-	protected Map<ASN1ObjectIdentifier, ExtensionOccurrence> getAdditionalExtensionOccurences() {
-		return extensionOccurences;
-	}
+    @Override
+    public Integer getValidity() {
+        return 5 * 365;
+    }
+
+    @Override
+    protected void checkSubjectContent(X500Name requestedSubject) throws BadCertTemplateException
+    {
+    }
+
+    @Override
+    protected Integer getPathLenBasicConstraint() {
+        return 0;
+    }
+
+    @Override
+    protected Map<ASN1ObjectIdentifier, ExtensionOccurrence> getAdditionalExtensionOccurences() {
+        return extensionOccurences;
+    }
 
 }

@@ -28,67 +28,67 @@ import org.xipki.ca.api.OperationException.ErrorCode;
 import org.xipki.security.api.ConcurrentContentSigner;
 
 public class CrlSigner {
-	private final ConcurrentContentSigner signer;
-	private final byte[] subjectKeyIdentifier;
+    private final ConcurrentContentSigner signer;
+    private final byte[] subjectKeyIdentifier;
 
-	private final int period;
-	private final int overlap;	
-	private boolean includeCertsInCrl;
-	
-	public CrlSigner(ConcurrentContentSigner signer, int period, int overlap) 
-		throws OperationException
-	{
-		super();
-		this.signer = signer;
-		this.period = period;
-		this.overlap = overlap;
-		
-		if(signer == null)
-		{
-			subjectKeyIdentifier = null;
-		}
-		else
-		{
-			byte[] encodedSkiValue = signer.getCertificate().getExtensionValue(
-					Extension.subjectKeyIdentifier.getId());
-			if(encodedSkiValue == null)
-			{
-				throw new OperationException(ErrorCode.System_Failure, 
-						"CA certificate does not have required extension SubjectKeyIdentifier");
-			}
-			ASN1OctetString ski;
-			try {
-				ski = (ASN1OctetString) X509ExtensionUtil.fromExtensionValue(encodedSkiValue);
-			} catch (IOException e) {
-				throw new OperationException(ErrorCode.System_Failure, e.getMessage());
-			}		
-			this.subjectKeyIdentifier = ski.getOctets();
-		}
-	}
+    private final int period;
+    private final int overlap;
+    private boolean includeCertsInCrl;
 
-	public ConcurrentContentSigner getSigner() {
-		return signer;
-	}
+    public CrlSigner(ConcurrentContentSigner signer, int period, int overlap)
+        throws OperationException
+    {
+        super();
+        this.signer = signer;
+        this.period = period;
+        this.overlap = overlap;
 
-	public int getPeriod() {
-		return period;
-	}
+        if(signer == null)
+        {
+            subjectKeyIdentifier = null;
+        }
+        else
+        {
+            byte[] encodedSkiValue = signer.getCertificate().getExtensionValue(
+                    Extension.subjectKeyIdentifier.getId());
+            if(encodedSkiValue == null)
+            {
+                throw new OperationException(ErrorCode.System_Failure,
+                        "CA certificate does not have required extension SubjectKeyIdentifier");
+            }
+            ASN1OctetString ski;
+            try {
+                ski = (ASN1OctetString) X509ExtensionUtil.fromExtensionValue(encodedSkiValue);
+            } catch (IOException e) {
+                throw new OperationException(ErrorCode.System_Failure, e.getMessage());
+            }
+            this.subjectKeyIdentifier = ski.getOctets();
+        }
+    }
 
-	public int getOverlap() {
-		return overlap;
-	}
+    public ConcurrentContentSigner getSigner() {
+        return signer;
+    }
 
-	public boolean includeCertsInCrl() {
-		return includeCertsInCrl;
-	}
+    public int getPeriod() {
+        return period;
+    }
 
-	public void setIncludeCertsInCrl(boolean includeCertsInCrl) 
-	{
-		this.includeCertsInCrl = includeCertsInCrl;		
-	}
+    public int getOverlap() {
+        return overlap;
+    }
 
-	public byte[] getSubjectKeyIdentifier() {
-		return subjectKeyIdentifier == null ? null : Arrays.clone(subjectKeyIdentifier);
-	}
+    public boolean includeCertsInCrl() {
+        return includeCertsInCrl;
+    }
+
+    public void setIncludeCertsInCrl(boolean includeCertsInCrl)
+    {
+        this.includeCertsInCrl = includeCertsInCrl;
+    }
+
+    public byte[] getSubjectKeyIdentifier() {
+        return subjectKeyIdentifier == null ? null : Arrays.clone(subjectKeyIdentifier);
+    }
 
 }

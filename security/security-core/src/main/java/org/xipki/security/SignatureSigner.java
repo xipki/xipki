@@ -28,31 +28,31 @@ import org.bouncycastle.operator.RuntimeOperatorException;
 import org.xipki.security.common.ParamChecker;
 
 public class SignatureSigner implements ContentSigner {
-	private final AlgorithmIdentifier sigAlgId;
-	private final Signature signer;
-	private final SignatureStream stream = new SignatureStream();
-	
-	public SignatureSigner(AlgorithmIdentifier sigAlgId, Signature signer)
-	{
-		ParamChecker.assertNotNull("sigAlgId", sigAlgId);
-		ParamChecker.assertNotNull("signer", signer);
-		
-		this.sigAlgId = sigAlgId;
-		this.signer = signer;
-	}
+    private final AlgorithmIdentifier sigAlgId;
+    private final Signature signer;
+    private final SignatureStream stream = new SignatureStream();
 
-	@Override
-	public AlgorithmIdentifier getAlgorithmIdentifier() {
-		return sigAlgId;
-	}
+    public SignatureSigner(AlgorithmIdentifier sigAlgId, Signature signer)
+    {
+        ParamChecker.assertNotNull("sigAlgId", sigAlgId);
+        ParamChecker.assertNotNull("signer", signer);
 
-	@Override
-	public OutputStream getOutputStream() {
-		return stream;
-	}
+        this.sigAlgId = sigAlgId;
+        this.signer = signer;
+    }
 
-	@Override
-	public byte[] getSignature() {
+    @Override
+    public AlgorithmIdentifier getAlgorithmIdentifier() {
+        return sigAlgId;
+    }
+
+    @Override
+    public OutputStream getOutputStream() {
+        return stream;
+    }
+
+    @Override
+    public byte[] getSignature() {
         try
         {
             return stream.getSignature();
@@ -61,44 +61,44 @@ public class SignatureSigner implements ContentSigner {
         {
             throw new RuntimeOperatorException("exception obtaining signature: " + e.getMessage(), e);
         }
-	}
-	
-	private class SignatureStream extends OutputStream
-	{
-		public byte[] getSignature() throws SignatureException
-		{
-			return signer.sign();
-		}
-		
-		@Override
-		public void write(int b) throws IOException {
-			try{
-				signer.update((byte) b);
-			}catch(SignatureException e)
-			{
-				throw new IOException(e);
-			}
-		}
+    }
 
-		@Override
-		public void write(byte[] b) throws IOException {
-			try{
-				signer.update(b);
-			}catch(SignatureException e)
-			{
-				throw new IOException(e);
-			}
-		}
+    private class SignatureStream extends OutputStream
+    {
+        public byte[] getSignature() throws SignatureException
+        {
+            return signer.sign();
+        }
 
-		@Override
-		public void write(byte[] b, int off, int len) throws IOException {
-			try{
-				signer.update(b, off, len);
-			}catch(SignatureException e)
-			{
-				throw new IOException(e);
-			}
-		}		
-	}
+        @Override
+        public void write(int b) throws IOException {
+            try{
+                signer.update((byte) b);
+            }catch(SignatureException e)
+            {
+                throw new IOException(e);
+            }
+        }
+
+        @Override
+        public void write(byte[] b) throws IOException {
+            try{
+                signer.update(b);
+            }catch(SignatureException e)
+            {
+                throw new IOException(e);
+            }
+        }
+
+        @Override
+        public void write(byte[] b, int off, int len) throws IOException {
+            try{
+                signer.update(b, off, len);
+            }catch(SignatureException e)
+            {
+                throw new IOException(e);
+            }
+        }
+    }
 
 }

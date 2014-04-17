@@ -46,16 +46,16 @@ public class BcRSAContentVerifierProviderBuilder
         throws OperatorCreationException
     {
         AlgorithmIdentifier digAlgId = digestAlgorithmFinder.find(sigAlgId);
-		Digest dig = digestProvider.get(digAlgId);
-    	
-    	if(PKCSObjectIdentifiers.id_RSASSA_PSS.equals(sigAlgId.getAlgorithm()))
-    	{
-    		return SignerUtil.createPSSRSASigner(sigAlgId);
-    	}
-    	else
-    	{
-    		return new RSADigestSigner(dig);
-    	}
+        Digest dig = digestProvider.get(digAlgId);
+
+        if(PKCSObjectIdentifiers.id_RSASSA_PSS.equals(sigAlgId.getAlgorithm()))
+        {
+            return SignerUtil.createPSSRSASigner(sigAlgId);
+        }
+        else
+        {
+            return new RSADigestSigner(dig);
+        }
     }
 
     protected AsymmetricKeyParameter extractKeyParameters(SubjectPublicKeyInfo publicKeyInfo)

@@ -20,8 +20,8 @@ package org.xipki.security.common;
 import java.util.Set;
 
 public interface EnvironmentParameterResolver {
-	
-	Set<String> getAllParameterNames(); 
-	String getParameterValue(String parameterName);
+
+    Set<String> getAllParameterNames();
+    String getParameterValue(String parameterName);
 
 }

@@ -24,22 +24,22 @@ import org.apache.felix.gogo.commands.Option;
 
 @Command(scope = "ca", name = "caprofile-add", description="Add profile to CA")
 public class CaProfileAddCommand extends CaCommand {
-	@Option(name = "-ca",
+    @Option(name = "-ca",
             description = " Required. CA name",
             required = true)
     protected String           caName;
 
-	@Option(name = "-profile",
-		description = "Required. Profile profileNames, multi values allowed",
-		required = true, multiValued = true)
-	protected List<String>            profileNames;
+    @Option(name = "-profile",
+        description = "Required. Profile profileNames, multi values allowed",
+        required = true, multiValued = true)
+    protected List<String>            profileNames;
 
     @Override
     protected Object doExecute() throws Exception {
-    	for(String name : profileNames)
-    	{
-    		caManager.addCertProfileToCA(name, caName);
-    	}
-    	return null;
+        for(String name : profileNames)
+        {
+            caManager.addCertProfileToCA(name, caName);
+        }
+        return null;
     }
 }

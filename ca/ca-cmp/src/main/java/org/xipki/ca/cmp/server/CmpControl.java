@@ -19,73 +19,73 @@ package org.xipki.ca.cmp.server;
 
 
 public class CmpControl {
-	private static final int DFLT_messageTimeBias = 300; // 300 seconds
-	private static final int DFLT_confirmWaitTime = 300; // 300 seconds
-	
-	public static final String name = "default";
-	private boolean requireConfirmCert;
-	private boolean sendCaCert;
+    private static final int DFLT_messageTimeBias = 300; // 300 seconds
+    private static final int DFLT_confirmWaitTime = 300; // 300 seconds
 
-	private int messageTimeBias = DFLT_messageTimeBias;
-	private int confirmWaitTime = DFLT_confirmWaitTime;
+    public static final String name = "default";
+    private boolean requireConfirmCert;
+    private boolean sendCaCert;
 
-	private static final CmpControl defaultInstance;
-	static{
-		defaultInstance = new CmpControl();
-		defaultInstance.setRequireConfirmCert(false);
-	}
-	
-	public static CmpControl getDefaultCmpControlEntry()
-	{
-		return defaultInstance;
-	}
-	
-	public CmpControl() {
-	}
+    private int messageTimeBias = DFLT_messageTimeBias;
+    private int confirmWaitTime = DFLT_confirmWaitTime;
 
-	public boolean isRequireConfirmCert() {
-		return requireConfirmCert;
-	}
+    private static final CmpControl defaultInstance;
+    static{
+        defaultInstance = new CmpControl();
+        defaultInstance.setRequireConfirmCert(false);
+    }
 
-	public void setRequireConfirmCert(boolean requireConfirmCert) {
-		this.requireConfirmCert = requireConfirmCert;
-	}
+    public static CmpControl getDefaultCmpControlEntry()
+    {
+        return defaultInstance;
+    }
 
-	public int getMessageTimeBias() {
-		return messageTimeBias;
-	}
+    public CmpControl() {
+    }
 
-	public void setMessageBias(int messageTimeBias) {
-		this.messageTimeBias = messageTimeBias;
-	}
+    public boolean isRequireConfirmCert() {
+        return requireConfirmCert;
+    }
+
+    public void setRequireConfirmCert(boolean requireConfirmCert) {
+        this.requireConfirmCert = requireConfirmCert;
+    }
+
+    public int getMessageTimeBias() {
+        return messageTimeBias;
+    }
+
+    public void setMessageBias(int messageTimeBias) {
+        this.messageTimeBias = messageTimeBias;
+    }
 
 
-	public int getConfirmWaitTime() {
-		return confirmWaitTime;
-	}
+    public int getConfirmWaitTime() {
+        return confirmWaitTime;
+    }
 
-	public void setConfirmWaitTime(int confirmWaitTime) {
-		this.confirmWaitTime = confirmWaitTime;
-	}
-	
-	public boolean isSendCaCert() {
-		return sendCaCert;
-	}
+    public void setConfirmWaitTime(int confirmWaitTime) {
+        this.confirmWaitTime = confirmWaitTime;
+    }
 
-	public void setSendCaCert(boolean sendCaCert) {
-		this.sendCaCert = sendCaCert;
-	}
+    public boolean isSendCaCert() {
+        return sendCaCert;
+    }
 
-	@Override
-	public String toString()
-	{
-		StringBuilder sb = new StringBuilder();
-		sb.append("name: ").append(name).append('\n');
-		sb.append("requireConfirmCert: ").append(requireConfirmCert ? "yes" : "no").append('\n');
-		sb.append("sendCaCert: ").append(sendCaCert ? "yes" : "no").append("\n");
-		sb.append("messageTimeBias: ").append(messageTimeBias).append(" s").append('\n');
-		sb.append("confirmWaitTime: ").append(confirmWaitTime).append(" s");
-		
-		return sb.toString();
-	}
+    public void setSendCaCert(boolean sendCaCert) {
+        this.sendCaCert = sendCaCert;
+    }
+
+    @Override
+    public String toString()
+    {
+        StringBuilder sb = new StringBuilder();
+        sb.append("name: ").append(name).append('\n');
+        sb.append("requireConfirmCert: ").append(requireConfirmCert ? "yes" : "no").append('\n');
+        sb.append("sendCaCert: ").append(sendCaCert ? "yes" : "no").append("\n");
+        sb.append("messageTimeBias: ").append(messageTimeBias).append(" s").append('\n');
+        sb.append("confirmWaitTime: ").append(confirmWaitTime).append(" s");
+
+        return sb.toString();
+    }
 }

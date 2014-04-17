@@ -23,91 +23,91 @@ import org.xipki.security.common.ConfigurationException;
 import org.xipki.security.common.ParamChecker;
 
 public class CrlSignerEntry {
-	private final String name;
-	private String type;
-	private String conf;
-	private X509Certificate cert;
-	private int period; // in minutes
-	private int overlap; // in minutes
-	private boolean includeCertsInCrl;
-	
-	public CrlSignerEntry(String name) {
-		ParamChecker.assertNotEmpty("name", name);
-		
-		this.name = name;
-	}
+    private final String name;
+    private String type;
+    private String conf;
+    private X509Certificate cert;
+    private int period; // in minutes
+    private int overlap; // in minutes
+    private boolean includeCertsInCrl;
 
-	public String getName() {
-		return name;
-	}
+    public CrlSignerEntry(String name) {
+        ParamChecker.assertNotEmpty("name", name);
 
-	public String getType() {
-		return type;
-	}
+        this.name = name;
+    }
 
-	public void setType(String type) {
-		this.type = type;
-	}
+    public String getName() {
+        return name;
+    }
 
-	public String getConf() {
-		return conf;
-	}
+    public String getType() {
+        return type;
+    }
 
-	public void setConf(String conf) {
-		this.conf = conf;
-	}
+    public void setType(String type) {
+        this.type = type;
+    }
 
-	public X509Certificate getCertificate() {
-		return cert;
-	}
+    public String getConf() {
+        return conf;
+    }
 
-	public void setCertificate(X509Certificate cert) {
-		this.cert = cert;
-	}	
-	
-	@Override
-	public String toString()
-	{
-		StringBuilder sb = new StringBuilder();
-		sb.append("name: ").append(name).append('\n');
-		sb.append("type: ").append(type).append('\n');
-		sb.append("conf: ").append(conf).append('\n');
-		sb.append("period: ").append(getPeriod()).append(" minutes\n");
-		sb.append("overlap: ").append(getOverlap()).append(" minutes\n");
-		sb.append("includeCertsInCrl: ").append(includeCertsInCrl).append("\n");
-		sb.append("cert: ").append("\n");
-		sb.append("\tissuer: ").append(
-				cert.getIssuerX500Principal().getName()).append("\n");
-		sb.append("\tserialNumber: ").append(cert.getSerialNumber()).append("\n");
-		sb.append("\tsubject: ").append(
-				cert.getSubjectX500Principal().getName());
-		return sb.toString();
-	}
+    public void setConf(String conf) {
+        this.conf = conf;
+    }
 
-	public int getPeriod() {
-		return period;
-	}
+    public X509Certificate getCertificate() {
+        return cert;
+    }
 
-	public void setPeriod(int period) {
-		this.period = period;
-	}
+    public void setCertificate(X509Certificate cert) {
+        this.cert = cert;
+    }
 
-	public int getOverlap() {
-		return overlap;
-	}
+    @Override
+    public String toString()
+    {
+        StringBuilder sb = new StringBuilder();
+        sb.append("name: ").append(name).append('\n');
+        sb.append("type: ").append(type).append('\n');
+        sb.append("conf: ").append(conf).append('\n');
+        sb.append("period: ").append(getPeriod()).append(" minutes\n");
+        sb.append("overlap: ").append(getOverlap()).append(" minutes\n");
+        sb.append("includeCertsInCrl: ").append(includeCertsInCrl).append("\n");
+        sb.append("cert: ").append("\n");
+        sb.append("\tissuer: ").append(
+                cert.getIssuerX500Principal().getName()).append("\n");
+        sb.append("\tserialNumber: ").append(cert.getSerialNumber()).append("\n");
+        sb.append("\tsubject: ").append(
+                cert.getSubjectX500Principal().getName());
+        return sb.toString();
+    }
 
-	public void setOverlap(int overlap) {
-		this.overlap = overlap;
-	}
+    public int getPeriod() {
+        return period;
+    }
 
-	public boolean includeCertsInCRL() {
-		return includeCertsInCrl;
-	}
+    public void setPeriod(int period) {
+        this.period = period;
+    }
 
-	public void setIncludeCertsInCrl(boolean includeCertsInCrl)
-			throws ConfigurationException
-	{
-		this.includeCertsInCrl = includeCertsInCrl;
-	}
+    public int getOverlap() {
+        return overlap;
+    }
+
+    public void setOverlap(int overlap) {
+        this.overlap = overlap;
+    }
+
+    public boolean includeCertsInCRL() {
+        return includeCertsInCrl;
+    }
+
+    public void setIncludeCertsInCrl(boolean includeCertsInCrl)
+            throws ConfigurationException
+    {
+        this.includeCertsInCrl = includeCertsInCrl;
+    }
 
 }

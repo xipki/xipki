@@ -26,33 +26,33 @@ import org.xipki.security.api.ConcurrentContentSigner;
 import org.xipki.security.common.ParamChecker;
 
 public class ResponderSigner {
-	private final ConcurrentContentSigner signer;
-	
-	private final X509CertificateHolder certificate;
-	
-	private final X500Name responderId;
-	
-	public ResponderSigner(ConcurrentContentSigner signer)
-			throws CertificateEncodingException, IOException
-	{
-		ParamChecker.assertNotNull("signer", signer);
-		
-		this.signer = signer;		
-		this.certificate = new X509CertificateHolder(signer.getCertificate().getEncoded());
-		this.responderId = this.certificate.getSubject();
-	}	
+    private final ConcurrentContentSigner signer;
 
-	public ConcurrentContentSigner getSigner() {
-		return signer;
-	}
+    private final X509CertificateHolder certificate;
 
-	public X500Name getResponderId() {
-		return responderId;
-	}
-	
-	public X509CertificateHolder getCertificate()
-	{
-		return certificate;
-	}
-	
+    private final X500Name responderId;
+
+    public ResponderSigner(ConcurrentContentSigner signer)
+            throws CertificateEncodingException, IOException
+    {
+        ParamChecker.assertNotNull("signer", signer);
+
+        this.signer = signer;
+        this.certificate = new X509CertificateHolder(signer.getCertificate().getEncoded());
+        this.responderId = this.certificate.getSubject();
+    }
+
+    public ConcurrentContentSigner getSigner() {
+        return signer;
+    }
+
+    public X500Name getResponderId() {
+        return responderId;
+    }
+
+    public X509CertificateHolder getCertificate()
+    {
+        return certificate;
+    }
+
 }

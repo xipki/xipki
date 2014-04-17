@@ -22,14 +22,14 @@ import org.apache.felix.gogo.commands.Option;
 
 @Command(scope = "ca", name = "caalias-rm", description="Remove CA alias")
 public class CaAliasRemoveCommand extends CaCommand {
-	@Option(name = "-alias",
-	        description = "Required. CA alias",
-	        required = true)
-	protected String            caAlias;
-    
+    @Option(name = "-alias",
+            description = "Required. CA alias",
+            required = true)
+    protected String            caAlias;
+
     @Override
     protected Object doExecute() throws Exception {
-    	caManager.removeCaAlias(caAlias);	
+        caManager.removeCaAlias(caAlias);
         return null;
     }
 }

@@ -37,33 +37,33 @@ import org.xipki.ca.common.PKIErrorException;
 import org.xipki.ca.common.RAWorkerException;
 
 public interface RAWorker
-{	
-	Set<String> getCaNames();
-	
-	EnrollCertResult requestCert(CertificationRequest p10Request, String profile, String caName)
-	throws RAWorkerException, PKIErrorException;
+{
+    Set<String> getCaNames();
 
-	EnrollCertResult requestCerts(EnrollCertRequestType.Type type, 
-			Map<String, EnrollCertEntryType> enrollCertEntries, String caName)
-	throws RAWorkerException, PKIErrorException;
+    EnrollCertResult requestCert(CertificationRequest p10Request, String profile, String caName)
+    throws RAWorkerException, PKIErrorException;
 
-	EnrollCertResult requestCerts(EnrollCertRequestType request, String caName)
-	throws RAWorkerException, PKIErrorException;
-	
-	CertIDOrError revocateCert(X500Name issuer, BigInteger serial, int reason)
-	throws RAWorkerException, PKIErrorException;
-	
-	CertIDOrError revocateCert(X509Certificate cert, int reason)
-	throws RAWorkerException, PKIErrorException;
+    EnrollCertResult requestCerts(EnrollCertRequestType.Type type,
+            Map<String, EnrollCertEntryType> enrollCertEntries, String caName)
+    throws RAWorkerException, PKIErrorException;
 
-	Map<String, CertIDOrError> revocateCerts(RevocateCertRequestType request)
-	throws RAWorkerException, PKIErrorException;
-	
-	X509CRL downloadCRL(String caName)
-	throws RAWorkerException, PKIErrorException;
+    EnrollCertResult requestCerts(EnrollCertRequestType request, String caName)
+    throws RAWorkerException, PKIErrorException;
 
-	X509CRL generateCRL(String caName)
-	throws RAWorkerException, PKIErrorException;
+    CertIDOrError revocateCert(X500Name issuer, BigInteger serial, int reason)
+    throws RAWorkerException, PKIErrorException;
+
+    CertIDOrError revocateCert(X509Certificate cert, int reason)
+    throws RAWorkerException, PKIErrorException;
+
+    Map<String, CertIDOrError> revocateCerts(RevocateCertRequestType request)
+    throws RAWorkerException, PKIErrorException;
+
+    X509CRL downloadCRL(String caName)
+    throws RAWorkerException, PKIErrorException;
+
+    X509CRL generateCRL(String caName)
+    throws RAWorkerException, PKIErrorException;
 
     /**
      * Gets ca name by issuer.
@@ -75,13 +75,13 @@ public interface RAWorker
     String getCaNameByIssuer(X500Name issuer)
     throws RAWorkerException;
 
-	EnrollCertResult requestCert(CertReqMsg certReqMsg, String extCertReqId, String caName)
-	throws RAWorkerException, PKIErrorException;
-	
-	CertReqMsg getCertReqMsgWithAppliedCertProfile(CertRequest request, String certProfile,
-			ProofOfPossession popo)
-	throws RAWorkerException;
-	
-	byte[] envelope(CertReqMsg certReqMsg, String caName) throws RAWorkerException;
+    EnrollCertResult requestCert(CertReqMsg certReqMsg, String extCertReqId, String caName)
+    throws RAWorkerException, PKIErrorException;
+
+    CertReqMsg getCertReqMsgWithAppliedCertProfile(CertRequest request, String certProfile,
+            ProofOfPossession popo)
+    throws RAWorkerException;
+
+    byte[] envelope(CertReqMsg certReqMsg, String caName) throws RAWorkerException;
 
 }

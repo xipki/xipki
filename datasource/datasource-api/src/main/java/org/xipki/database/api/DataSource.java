@@ -21,10 +21,10 @@ import java.sql.Connection;
 import java.sql.SQLException;
 
 public interface DataSource
-{	
-	Connection getConnection(int timeout) throws SQLException;
-	
-	void returnConnection(Connection conn);
-	DatabaseType getDatabaseType();
+{
+    Connection getConnection(int timeout) throws SQLException;
+
+    void returnConnection(Connection conn);
+    DatabaseType getDatabaseType();
 
 }

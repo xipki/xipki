@@ -25,41 +25,41 @@ import org.xipki.security.common.IoCertUtil;
 @Command(scope = "ca", name = "publisher-add", description="Add publisher")
 public class PublisherAddCommand extends CaCommand {
 
-	@Option(name = "-name",
-	            description = "Required. Publisher Name",
-	            required = true, multiValued = false)
-	protected String            name;
+    @Option(name = "-name",
+                description = "Required. Publisher Name",
+                required = true, multiValued = false)
+    protected String            name;
 
-	@Option(name = "-type",
+    @Option(name = "-type",
             description = "Required. Publisher type",
             required = true)
     protected String            type;
 
-	@Option(name = "-conf",
+    @Option(name = "-conf",
             description = "Publisher configuration")
     protected String            conf;
 
-	@Option(name = "-confFile",
+    @Option(name = "-confFile",
             description = "Publisher configuration file")
     protected String            confFile;
-	
+
     @Override
     protected Object doExecute() throws Exception {
-    	PublisherEntry entry = new PublisherEntry(name);			
-    	entry.setType(type);
-    	
-    	if(conf == null && confFile != null)
-    	{
-    		conf = new String(IoCertUtil.read(confFile));
-    	}
-    	
-    	if(conf != null)
-    	{
-    		entry.setConf(conf);
-    	}
-    	
-    	caManager.addPublisher(entry);
-    	
-    	return null;
+        PublisherEntry entry = new PublisherEntry(name);
+        entry.setType(type);
+
+        if(conf == null && confFile != null)
+        {
+            conf = new String(IoCertUtil.read(confFile));
+        }
+
+        if(conf != null)
+        {
+            entry.setConf(conf);
+        }
+
+        caManager.addPublisher(entry);
+
+        return null;
     }
 }

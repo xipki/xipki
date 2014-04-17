@@ -25,47 +25,47 @@ import org.xipki.ca.server.mgmt.CAEntry;
 
 @Command(scope = "ca", name = "ca-list", description="List CAs")
 public class CaListCommand extends CaCommand {
-	@Option(name = "-name",
+    @Option(name = "-name",
             description = "CA name",
             required = false)
     protected String           caName;
-	
+
     @Override
     protected Object doExecute() throws Exception {
-		StringBuilder sb = new StringBuilder();
-		
-		if(caName == null)
-		{
-			Set<String> names = caManager.getCANames();			
-			int n = names.size();
-			
-			sb.append(n + " CAs are configured:\n");		
-			for(String paramName : names)
-			{
-				sb.append("\t").append(paramName);
-				String alias = caManager.getAliasName(paramName);
-				if(alias != null)
-				{
-					sb.append(" (alias: ").append(alias).append(")");
-				}
-				sb.append("\n");
-			}
-		}
-		else
-		{
-			CAEntry entry = caManager.getCA(caName);
-			if(entry == null)
-			{
-				sb.append("Could not find CA '" + caName + "'");
-			}
-			else
-			{
-				sb.append(entry);
-			}
-		}
-		
-		System.out.println(sb.toString());
-		
+        StringBuilder sb = new StringBuilder();
+
+        if(caName == null)
+        {
+            Set<String> names = caManager.getCANames();
+            int n = names.size();
+
+            sb.append(n + " CAs are configured:\n");
+            for(String paramName : names)
+            {
+                sb.append("\t").append(paramName);
+                String alias = caManager.getAliasName(paramName);
+                if(alias != null)
+                {
+                    sb.append(" (alias: ").append(alias).append(")");
+                }
+                sb.append("\n");
+            }
+        }
+        else
+        {
+            CAEntry entry = caManager.getCA(caName);
+            if(entry == null)
+            {
+                sb.append("Could not find CA '" + caName + "'");
+            }
+            else
+            {
+                sb.append(entry);
+            }
+        }
+
+        System.out.println(sb.toString());
+
         return null;
     }
 }

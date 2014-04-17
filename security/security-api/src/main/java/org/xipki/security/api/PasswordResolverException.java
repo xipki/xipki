@@ -19,21 +19,21 @@ package org.xipki.security.api;
 
 public class PasswordResolverException extends Exception {
 
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	public PasswordResolverException() {
-	}
+    public PasswordResolverException() {
+    }
 
-	public PasswordResolverException(String message) {
-		super(message);
-	}
+    public PasswordResolverException(String message) {
+        super(message);
+    }
 
-	public PasswordResolverException(Throwable cause) {
-		super(cause);
-	}
+    public PasswordResolverException(Throwable cause) {
+        super(cause);
+    }
 
-	public PasswordResolverException(String message, Throwable cause) {
-		super(message, cause);
-	}
+    public PasswordResolverException(String message, Throwable cause) {
+        super(message, cause);
+    }
 
 }

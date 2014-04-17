@@ -18,8 +18,8 @@
 package org.xipki.ocsp.api;
 
 public enum CertStatus {
-	GOOD,
-	REVOCATED,
-	UNKNOWN,
-	ISSUER_UNKNOWN
+    GOOD,
+    REVOCATED,
+    UNKNOWN,
+    ISSUER_UNKNOWN
 }

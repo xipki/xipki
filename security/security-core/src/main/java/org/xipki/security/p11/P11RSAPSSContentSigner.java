@@ -42,94 +42,94 @@ import org.xipki.security.common.ParamChecker;
 
 public class P11RSAPSSContentSigner implements ContentSigner
 {
-	private static final Logger LOG = LoggerFactory.getLogger(P11RSAPSSContentSigner.class);
-	private final AlgorithmIdentifier algorithmIdentifier;
-	private final PSSSigner pssSigner;
-	private final OutputStream outputStream;	
+    private static final Logger LOG = LoggerFactory.getLogger(P11RSAPSSContentSigner.class);
+    private final AlgorithmIdentifier algorithmIdentifier;
+    private final PSSSigner pssSigner;
+    private final OutputStream outputStream;
 
-	public P11RSAPSSContentSigner(
-			P11CryptService cryptService,
-			PKCS11SlotIdentifier slot,
-			Pkcs11KeyIdentifier keyId,
-			AlgorithmIdentifier signatureAlgId) 
-			throws NoSuchAlgorithmException, NoSuchPaddingException, OperatorCreationException
-	{
-		ParamChecker.assertNotNull("slot", slot);
-		ParamChecker.assertNotNull("cryptService", cryptService);		
-		ParamChecker.assertNotNull("signatureAlgId", signatureAlgId);
-		ParamChecker.assertNotNull("keyId", keyId);
-		
-    	if(PKCSObjectIdentifiers.id_RSASSA_PSS.equals(signatureAlgId.getAlgorithm()) == false)
-    	{
-    		throw new IllegalArgumentException("Unsupported signature algorithm " + signatureAlgId.getAlgorithm());
-    	}
-		
-		this.algorithmIdentifier = signatureAlgId;	
-		
-		AsymmetricBlockCipher cipher = new P11PlainRSASigner();
-		
-		P11RSAKeyParameter keyParam;
-		try {
-			keyParam = P11RSAKeyParameter.getInstance(cryptService, slot, keyId);
-		} catch (InvalidKeyException e) {
-			throw new OperatorCreationException(e.getMessage(), e);
-		}
-		
-		
-		this.pssSigner = SignerUtil.createPSSRSASigner(signatureAlgId, cipher);
-		this.pssSigner.init(true, keyParam);
-		
-		this.outputStream = new PSSSignerOutputStream();
-	}
+    public P11RSAPSSContentSigner(
+            P11CryptService cryptService,
+            PKCS11SlotIdentifier slot,
+            Pkcs11KeyIdentifier keyId,
+            AlgorithmIdentifier signatureAlgId)
+            throws NoSuchAlgorithmException, NoSuchPaddingException, OperatorCreationException
+    {
+        ParamChecker.assertNotNull("slot", slot);
+        ParamChecker.assertNotNull("cryptService", cryptService);
+        ParamChecker.assertNotNull("signatureAlgId", signatureAlgId);
+        ParamChecker.assertNotNull("keyId", keyId);
 
-	@Override
-	public AlgorithmIdentifier getAlgorithmIdentifier() {
-		return algorithmIdentifier;
-	}
+        if(PKCSObjectIdentifiers.id_RSASSA_PSS.equals(signatureAlgId.getAlgorithm()) == false)
+        {
+            throw new IllegalArgumentException("Unsupported signature algorithm " + signatureAlgId.getAlgorithm());
+        }
 
-	@Override
-	public OutputStream getOutputStream() {
-		pssSigner.reset();
-		return outputStream;
-	}
+        this.algorithmIdentifier = signatureAlgId;
 
-	@Override
-	public byte[] getSignature() {
-		try {
-			return pssSigner.generateSignature();
-		} catch (CryptoException e) {
-			LOG.warn("SignerException: {}", e.getMessage());
-			LOG.debug("SignerException", e);
-			throw new RuntimeCryptoException("SignerException: " + e.getMessage());
-		}
-	}
-	
-	private class PSSSignerOutputStream extends OutputStream
-	{
+        AsymmetricBlockCipher cipher = new P11PlainRSASigner();
 
-		@Override
-		public void write(int b) throws IOException {
-			pssSigner.update((byte) b); 
-		}
+        P11RSAKeyParameter keyParam;
+        try {
+            keyParam = P11RSAKeyParameter.getInstance(cryptService, slot, keyId);
+        } catch (InvalidKeyException e) {
+            throw new OperatorCreationException(e.getMessage(), e);
+        }
 
-		@Override
-		public void write(byte[] b) throws IOException {
-			pssSigner.update(b, 0, b.length);
-		}
 
-		@Override
-		public void write(byte[] b, int off, int len) throws IOException {
-			pssSigner.update(b, off, len);
-		}
+        this.pssSigner = SignerUtil.createPSSRSASigner(signatureAlgId, cipher);
+        this.pssSigner.init(true, keyParam);
 
-		@Override
-		public void flush() throws IOException {
-			;
-		}
+        this.outputStream = new PSSSignerOutputStream();
+    }
 
-		@Override
-		public void close() throws IOException {
-		}		
-	}
-		
+    @Override
+    public AlgorithmIdentifier getAlgorithmIdentifier() {
+        return algorithmIdentifier;
+    }
+
+    @Override
+    public OutputStream getOutputStream() {
+        pssSigner.reset();
+        return outputStream;
+    }
+
+    @Override
+    public byte[] getSignature() {
+        try {
+            return pssSigner.generateSignature();
+        } catch (CryptoException e) {
+            LOG.warn("SignerException: {}", e.getMessage());
+            LOG.debug("SignerException", e);
+            throw new RuntimeCryptoException("SignerException: " + e.getMessage());
+        }
+    }
+
+    private class PSSSignerOutputStream extends OutputStream
+    {
+
+        @Override
+        public void write(int b) throws IOException {
+            pssSigner.update((byte) b);
+        }
+
+        @Override
+        public void write(byte[] b) throws IOException {
+            pssSigner.update(b, 0, b.length);
+        }
+
+        @Override
+        public void write(byte[] b, int off, int len) throws IOException {
+            pssSigner.update(b, off, len);
+        }
+
+        @Override
+        public void flush() throws IOException {
+            ;
+        }
+
+        @Override
+        public void close() throws IOException {
+        }
+    }
+
 }

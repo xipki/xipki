@@ -50,7 +50,7 @@ class RSAPSSSignatureSpi
     private int saltLength;
     private byte trailer;
     private boolean isRaw;
-    
+
     private P11PrivateKey signingKey;
 
     private org.bouncycastle.crypto.signers.PSSSigner pss;
@@ -62,7 +62,7 @@ class RSAPSSSignatureSpi
         {
             return org.bouncycastle.crypto.signers.PSSSigner.TRAILER_IMPLICIT;
         }
-        
+
         throw new IllegalArgumentException("unknown trailer field");
     }
 
@@ -89,7 +89,7 @@ class RSAPSSSignatureSpi
         boolean isRaw)
     {
         this.originalSpec = baseParamSpec;
-        
+
         if (baseParamSpec == null)
         {
             this.paramSpec = PSSParameterSpec.DEFAULT;
@@ -106,12 +106,12 @@ class RSAPSSSignatureSpi
 
         setupContentDigest();
     }
-    
+
     protected void engineInitVerify(
         PublicKey publicKey)
         throws InvalidKeyException
     {
-    	throw new UnsupportedOperationException("engineInitVerify unsupported");
+        throw new UnsupportedOperationException("engineInitVerify unsupported");
     }
 
     protected void engineInitSign(
@@ -119,32 +119,32 @@ class RSAPSSSignatureSpi
         SecureRandom random)
         throws InvalidKeyException
     {
-    	if(privateKey instanceof P11PrivateKey == false)
-    	{
-    		throw new InvalidKeyException("privateKey is not instanceof " + P11PrivateKey.class.getName());
-    	}
-    	
-    	String algo = privateKey.getAlgorithm();
-    	if("RSA".equals(algo) == false)
-    	{
-    		throw new InvalidKeyException("privateKey is not an RSA private key: " + algo);
-    	}
-    	
-    	this.signingKey = (P11PrivateKey) privateKey;
-    	
+        if(privateKey instanceof P11PrivateKey == false)
+        {
+            throw new InvalidKeyException("privateKey is not instanceof " + P11PrivateKey.class.getName());
+        }
+
+        String algo = privateKey.getAlgorithm();
+        if("RSA".equals(algo) == false)
+        {
+            throw new InvalidKeyException("privateKey is not an RSA private key: " + algo);
+        }
+
+        this.signingKey = (P11PrivateKey) privateKey;
+
         pss = new org.bouncycastle.crypto.signers.PSSSigner(
-        		signer, contentDigest, mgfDigest, saltLength, trailer);
-        
+                signer, contentDigest, mgfDigest, saltLength, trailer);
+
         P11RSAKeyParameter p11RSAKeyParam = P11RSAKeyParameter.getInstance(signingKey.getP11CryptService(),
-        		signingKey.getSlotId(), signingKey.getKeyId());
-       	pss.init(true, p11RSAKeyParam);
+                signingKey.getSlotId(), signingKey.getKeyId());
+           pss.init(true, p11RSAKeyParam);
     }
 
     protected void engineInitSign(
         PrivateKey privateKey)
         throws InvalidKeyException
     {
-    	engineInitSign(privateKey, null);
+        engineInitSign(privateKey, null);
     }
 
     protected void engineUpdate(
@@ -157,7 +157,7 @@ class RSAPSSSignatureSpi
     protected void engineUpdate(
         byte[]  b,
         int     off,
-        int     len) 
+        int     len)
         throws SignatureException
     {
         pss.update(b, off, len);
@@ -177,10 +177,10 @@ class RSAPSSSignatureSpi
     }
 
     protected boolean engineVerify(
-        byte[]  sigBytes) 
+        byte[]  sigBytes)
         throws SignatureException
     {
-    	throw new UnsupportedOperationException("engineVerify unsupported");
+        throw new UnsupportedOperationException("engineVerify unsupported");
     }
 
     protected void engineSetParameter(
@@ -190,7 +190,7 @@ class RSAPSSSignatureSpi
         if (params instanceof PSSParameterSpec)
         {
             PSSParameterSpec newParamSpec = (PSSParameterSpec)params;
-            
+
             if (originalSpec != null)
             {
                 if (!DigestFactory.isSameDigest(originalSpec.getDigestAlgorithm(), newParamSpec.getDigestAlgorithm()))
@@ -202,21 +202,21 @@ class RSAPSSSignatureSpi
             {
                 throw new InvalidParameterException("unknown mask generation function specified");
             }
-            
+
             if (!(newParamSpec.getMGFParameters() instanceof MGF1ParameterSpec))
             {
                 throw new InvalidParameterException("unkown MGF parameters");
             }
-            
+
             MGF1ParameterSpec mgfParams = (MGF1ParameterSpec)newParamSpec.getMGFParameters();
-            
+
             if (!DigestFactory.isSameDigest(mgfParams.getDigestAlgorithm(), newParamSpec.getDigestAlgorithm()))
             {
                 throw new InvalidParameterException("digest algorithm for MGF should be the same as for PSS parameters.");
             }
-            
+
             Digest newDigest = DigestFactory.getDigest(mgfParams.getDigestAlgorithm());
-            
+
             if (newDigest == null)
             {
                 throw new InvalidParameterException("no match on MGF digest algorithm: "+ mgfParams.getDigestAlgorithm());
@@ -256,7 +256,7 @@ class RSAPSSSignatureSpi
 
         return engineParams;
     }
-    
+
     /**
      * @deprecated replaced with <a href = "#engineSetParameter(java.security.spec.AlgorithmParameterSpec)">
      */
@@ -266,7 +266,7 @@ class RSAPSSSignatureSpi
     {
         throw new UnsupportedOperationException("engineSetParameter unsupported");
     }
-    
+
     protected Object engineGetParameter(
         String param)
     {
@@ -290,7 +290,7 @@ class RSAPSSSignatureSpi
             super(null);
         }
     }
-    
+
     static public class SHA1withRSA
         extends RSAPSSSignatureSpi
     {
@@ -308,7 +308,7 @@ class RSAPSSSignatureSpi
             super(new PSSParameterSpec("SHA-224", "MGF1", new MGF1ParameterSpec("SHA-224"), 28, 1));
         }
     }
-    
+
     static public class SHA256withRSA
         extends RSAPSSSignatureSpi
     {

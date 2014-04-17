@@ -24,33 +24,33 @@ import org.xipki.security.common.IoCertUtil;
 @Command(scope = "ca", name = "profile-update", description="Update certificate profile")
 public class ProfileUpdateCommand extends CaCommand {
 
-	@Option(name = "-name",
-	            description = "Required. Profile name",
-	            required = true, multiValued = false)
-	protected String            name;
+    @Option(name = "-name",
+                description = "Required. Profile name",
+                required = true, multiValued = false)
+    protected String            name;
 
-	@Option(name = "-type",
+    @Option(name = "-type",
             description = "Profile type",
             required = true)
     protected String            type;
 
-	@Option(name = "-conf",
+    @Option(name = "-conf",
             description = "Profile configuration or 'NULL'")
     protected String            conf;
 
-	@Option(name = "-confFile",
+    @Option(name = "-confFile",
             description = "Profile configuration file")
     protected String            confFile;
-	
+
     @Override
     protected Object doExecute() throws Exception {
-    	if(conf == null && confFile != null)
-    	{
-    		conf = new String(IoCertUtil.read(confFile));
-    	}
+        if(conf == null && confFile != null)
+        {
+            conf = new String(IoCertUtil.read(confFile));
+        }
 
-    	caManager.changeCertProfile(name, type, conf);
-    	
-    	return null;
+        caManager.changeCertProfile(name, type, conf);
+
+        return null;
     }
 }

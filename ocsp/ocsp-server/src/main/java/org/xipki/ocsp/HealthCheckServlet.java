@@ -30,54 +30,54 @@ import org.xipki.security.common.HealthCheckResult;
 
 public class HealthCheckServlet extends HttpServlet
 {
-	private static final Logger LOG = LoggerFactory.getLogger(HealthCheckServlet.class);
-	
-	private static final long serialVersionUID = 1L;
-	
-	private static final String CT_RESPONSE = "application/json";
-	
-	private OcspResponder responder;
-	
-	public HealthCheckServlet()
-	{
-	}
+    private static final Logger LOG = LoggerFactory.getLogger(HealthCheckServlet.class);
 
-	public void setResponder(OcspResponder responder)
-	{
-		this.responder = responder;
-	}
-	@Override
-    protected void doGet(HttpServletRequest request,
-            HttpServletResponse response) throws ServletException, IOException 
+    private static final long serialVersionUID = 1L;
+
+    private static final String CT_RESPONSE = "application/json";
+
+    private OcspResponder responder;
+
+    public HealthCheckServlet()
     {
-		try{
-			if(responder == null)
-			{
-				LOG.error("responder in servlet not configured");			
-				response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-				response.setContentLength(0);
-				return;
-			}		
+    }
 
-			HealthCheckResult healthResult = responder.healthCheck();
-			if (healthResult.isHealthy()) {
-				response.setStatus(HttpServletResponse.SC_OK);
-			} else {
-				response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-			}
+    public void setResponder(OcspResponder responder)
+    {
+        this.responder = responder;
+    }
+    @Override
+    protected void doGet(HttpServletRequest request,
+            HttpServletResponse response) throws ServletException, IOException
+    {
+        try{
+            if(responder == null)
+            {
+                LOG.error("responder in servlet not configured");
+                response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                response.setContentLength(0);
+                return;
+            }
 
-			response.setContentType(HealthCheckServlet.CT_RESPONSE);
-			byte[] respBytes = healthResult.toJsonMessage(true).getBytes();
-			response.setContentLength(respBytes.length);
-			response.getOutputStream().write(respBytes);
-		}catch(Throwable t)
-		{
-			LOG.error("Throwable thrown, this should not happen!", t);
-			response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-			response.setContentLength(0);
-		}
-		
-		response.flushBuffer();
-	}
+            HealthCheckResult healthResult = responder.healthCheck();
+            if (healthResult.isHealthy()) {
+                response.setStatus(HttpServletResponse.SC_OK);
+            } else {
+                response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            }
+
+            response.setContentType(HealthCheckServlet.CT_RESPONSE);
+            byte[] respBytes = healthResult.toJsonMessage(true).getBytes();
+            response.setContentLength(respBytes.length);
+            response.getOutputStream().write(respBytes);
+        }catch(Throwable t)
+        {
+            LOG.error("Throwable thrown, this should not happen!", t);
+            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            response.setContentLength(0);
+        }
+
+        response.flushBuffer();
+    }
 
 }

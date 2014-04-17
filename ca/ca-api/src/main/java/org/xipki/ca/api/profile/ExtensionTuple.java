@@ -22,29 +22,29 @@ import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.xipki.security.common.ParamChecker;
 
 public class ExtensionTuple {
-	private final ASN1ObjectIdentifier type;
-	private final boolean critical;
-	private final ASN1Encodable value;
-	
-	public ExtensionTuple(ASN1ObjectIdentifier type, boolean critical, ASN1Encodable value) 
-	{
-		ParamChecker.assertNotNull("type", type);
-		ParamChecker.assertNotNull("value", value);
-		
-		this.type = type;
-		this.critical = critical;
-		this.value = value;
-	}
+    private final ASN1ObjectIdentifier type;
+    private final boolean critical;
+    private final ASN1Encodable value;
 
-	public ASN1ObjectIdentifier getType() {
-		return type;
-	}
+    public ExtensionTuple(ASN1ObjectIdentifier type, boolean critical, ASN1Encodable value)
+    {
+        ParamChecker.assertNotNull("type", type);
+        ParamChecker.assertNotNull("value", value);
 
-	public boolean isCritical() {
-		return critical;
-	}
+        this.type = type;
+        this.critical = critical;
+        this.value = value;
+    }
 
-	public ASN1Encodable getValue() {
-		return value;
-	}	
+    public ASN1ObjectIdentifier getType() {
+        return type;
+    }
+
+    public boolean isCritical() {
+        return critical;
+    }
+
+    public ASN1Encodable getValue() {
+        return value;
+    }
 }

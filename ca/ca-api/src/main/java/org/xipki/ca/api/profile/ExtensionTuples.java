@@ -22,30 +22,30 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class ExtensionTuples {
-	private String warning;
-	private List<ExtensionTuple> extensions = new LinkedList<ExtensionTuple>();
-	
-	public void addExtension(ExtensionTuple extension)
-	{
-		if(extension != null)
-		{
-			extensions.add(extension);
-		}
-	}
-	
-	public List<ExtensionTuple> getExtensions()
-	{
-		return Collections.unmodifiableList(extensions);
-	}
-	
-	public void setWarning(String warning)
-	{
-		this.warning = warning;
-	}
-	
-	public String getWarning()
-	{
-		return warning;
-	}
+    private String warning;
+    private List<ExtensionTuple> extensions = new LinkedList<ExtensionTuple>();
+
+    public void addExtension(ExtensionTuple extension)
+    {
+        if(extension != null)
+        {
+            extensions.add(extension);
+        }
+    }
+
+    public List<ExtensionTuple> getExtensions()
+    {
+        return Collections.unmodifiableList(extensions);
+    }
+
+    public void setWarning(String warning)
+    {
+        this.warning = warning;
+    }
+
+    public String getWarning()
+    {
+        return warning;
+    }
 
 }

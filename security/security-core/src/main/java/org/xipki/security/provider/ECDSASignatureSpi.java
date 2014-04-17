@@ -39,33 +39,33 @@ class ECDSASignatureSpi
     private Digest digest;
 
     private P11PrivateKey signingKey;
-    
+
     ECDSASignatureSpi(Digest digest)
     {
-    	this.digest = digest;
+        this.digest = digest;
     }
 
     protected void engineInitVerify(PublicKey publicKey)
         throws InvalidKeyException
     {
-    	throw new UnsupportedOperationException("engineInitVerify unsupported");
+        throw new UnsupportedOperationException("engineInitVerify unsupported");
     }
 
     protected void engineInitSign(
         PrivateKey privateKey)
         throws InvalidKeyException
     {
-    	if(privateKey instanceof P11PrivateKey == false)
-    	{
-    		throw new InvalidKeyException("privateKey is not instanceof " + P11PrivateKey.class.getName());
-    	}
-    	
-    	String algo = privateKey.getAlgorithm();
-    	if(("EC".equals(algo) || "ECDSA".equals(algo)) == false)
-    	{
-    		throw new InvalidKeyException("privateKey is not a EC private key: " + algo);
-    	}
-    	
+        if(privateKey instanceof P11PrivateKey == false)
+        {
+            throw new InvalidKeyException("privateKey is not instanceof " + P11PrivateKey.class.getName());
+        }
+
+        String algo = privateKey.getAlgorithm();
+        if(("EC".equals(algo) || "ECDSA".equals(algo)) == false)
+        {
+            throw new InvalidKeyException("privateKey is not a EC private key: " + algo);
+        }
+
         digest.reset();
         this.signingKey = (P11PrivateKey) signingKey;
     }
@@ -143,7 +143,7 @@ class ECDSASignatureSpi
         protected void engineUpdate(
             byte[]  b,
             int     off,
-            int     len) 
+            int     len)
             throws SignatureException
         {
             digest.update(b, off, len);
@@ -162,7 +162,7 @@ class ECDSASignatureSpi
             }
             catch(SignatureException e)
             {
-            	throw e;
+                throw e;
             }
             catch (Exception e)
             {
@@ -196,9 +196,9 @@ class ECDSASignatureSpi
         }
 
     protected boolean engineVerify(
-            byte[]  sigBytes) 
+            byte[]  sigBytes)
             throws SignatureException
     {
-    	throw new UnsupportedOperationException("engineVerify unsupported");
+        throw new UnsupportedOperationException("engineVerify unsupported");
     }
 }

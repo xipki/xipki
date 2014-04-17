@@ -43,124 +43,124 @@ import org.xipki.security.api.PasswordResolverException;
 import org.xipki.security.common.EnvironmentParameterResolver;
 import org.xipki.security.common.ParamChecker;
 
-public class DefaultCertPublisher implements CertPublisher {	
-	private static final Logger LOG = LoggerFactory.getLogger(DefaultCertPublisher.class);
-	
-	@SuppressWarnings("unused")
-	private EnvironmentParameterResolver envParamterResolver;
-	private CertStatusStoreQueryExecutor queryExecutor;
-	
-	public DefaultCertPublisher()
-	{		
-	}
-	
-	@Override
-	public void initialize(String conf, PasswordResolver passwordResolver, 
-			DataSourceFactory dataSourceFactory)
-			throws CertPublisherException
-	{
-		ParamChecker.assertNotNull("dataSourceFactory", dataSourceFactory);
-		
-		byte[] confBytes;
-		if(conf.startsWith("base64:"))
-		{
-			String b64Conf = conf.substring("base64:".length());
-			confBytes = Base64.decode(b64Conf);
-		}
-		else
-		{
-			confBytes = conf.getBytes();
-		}
-		InputStream confStream = new ByteArrayInputStream(confBytes);
-		
-		DataSource dataSource;
-		try {
-			dataSource = dataSourceFactory.createDataSource(confStream, passwordResolver);
-		} catch (IOException e) {
-			throw new CertPublisherException(e);
-		} catch (SQLException e) {
-			throw new CertPublisherException(e);
-		} catch (PasswordResolverException e) {
-			throw new CertPublisherException(e);
-		}
-		
-		try {
-			queryExecutor = new CertStatusStoreQueryExecutor(dataSource);
-		} catch (NoSuchAlgorithmException e) {
-			throw new CertPublisherException(e);
-		} catch (SQLException e) {
-			throw new CertPublisherException(e);
-		}
-	}
+public class DefaultCertPublisher implements CertPublisher {
+    private static final Logger LOG = LoggerFactory.getLogger(DefaultCertPublisher.class);
 
-	@Override
-	public void setEnvironmentParamterResolver(
-			EnvironmentParameterResolver paramterResolver)
-	{
-		this.envParamterResolver = paramterResolver;
-	}
+    @SuppressWarnings("unused")
+    private EnvironmentParameterResolver envParamterResolver;
+    private CertStatusStoreQueryExecutor queryExecutor;
 
-	@Override
-	public void certificateAdded(CertificateInfo certInfo)
-	{
-		try {
-			if(certInfo.isRevocated())
-			{
-				queryExecutor.addCert(certInfo.getIssuerCert(), 
-						certInfo.getCert(),
-						certInfo.getProfileName(),
-						certInfo.isRevocated(),
-						certInfo.getRevocationTime(),
-						certInfo.getRevocationReason(),
-						certInfo.getInvalidityTime());
-			}
-			else
-			{
-				queryExecutor.addCert(certInfo.getIssuerCert(), 
-						certInfo.getCert(),
-						certInfo.getProfileName());
-			}
-		} catch (Exception e) {			
-			LOG.error("Could not save certificate {}: {}. Message: {}",
-					new Object[]{certInfo.getCert().getSubject(),
-					Base64.toBase64String(certInfo.getCert().getEncodedCert()), e.getMessage()});
-			LOG.error("error", e);
-		}
-	}
+    public DefaultCertPublisher()
+    {
+    }
 
-	@Override
-	public void certificateRevoked(X509Certificate cert, int reason,
-			Date invalidityTime)
-	{
-		try {
-			queryExecutor.revocateCert(cert, new Date(), reason, invalidityTime);
-		} catch (SQLException e) {
-			LOG.error("Could not revocate certificate {}: {}",
-					cert.getSubjectX500Principal(),
-					e.getMessage());
-		}
-	}
+    @Override
+    public void initialize(String conf, PasswordResolver passwordResolver,
+            DataSourceFactory dataSourceFactory)
+            throws CertPublisherException
+    {
+        ParamChecker.assertNotNull("dataSourceFactory", dataSourceFactory);
 
-	@Override
-	public void certificateRevoked(X500Principal issuer, BigInteger serialNumber,
-			int reason, Date invalidityTime)
-	{
-		try {
-			queryExecutor.revocateCert(issuer, serialNumber, new Date(), reason, invalidityTime);
-		} catch (SQLException e) {
-			LOG.error("Could not revocate certificate issuer={}, serial={}: {}",
-					new Object[]{issuer, serialNumber, e.getMessage()});
-		}
-	}
+        byte[] confBytes;
+        if(conf.startsWith("base64:"))
+        {
+            String b64Conf = conf.substring("base64:".length());
+            confBytes = Base64.decode(b64Conf);
+        }
+        else
+        {
+            confBytes = conf.getBytes();
+        }
+        InputStream confStream = new ByteArrayInputStream(confBytes);
 
-	@Override
-	public void crlAdded(X509CertificateWithMetaInfo cacert, X509CRL crl)
-	{
-	}
+        DataSource dataSource;
+        try {
+            dataSource = dataSourceFactory.createDataSource(confStream, passwordResolver);
+        } catch (IOException e) {
+            throw new CertPublisherException(e);
+        } catch (SQLException e) {
+            throw new CertPublisherException(e);
+        } catch (PasswordResolverException e) {
+            throw new CertPublisherException(e);
+        }
 
-	@Override
-	public boolean isHealthy() {
-		return queryExecutor.isHealthy();
-	}
+        try {
+            queryExecutor = new CertStatusStoreQueryExecutor(dataSource);
+        } catch (NoSuchAlgorithmException e) {
+            throw new CertPublisherException(e);
+        } catch (SQLException e) {
+            throw new CertPublisherException(e);
+        }
+    }
+
+    @Override
+    public void setEnvironmentParamterResolver(
+            EnvironmentParameterResolver paramterResolver)
+    {
+        this.envParamterResolver = paramterResolver;
+    }
+
+    @Override
+    public void certificateAdded(CertificateInfo certInfo)
+    {
+        try {
+            if(certInfo.isRevocated())
+            {
+                queryExecutor.addCert(certInfo.getIssuerCert(),
+                        certInfo.getCert(),
+                        certInfo.getProfileName(),
+                        certInfo.isRevocated(),
+                        certInfo.getRevocationTime(),
+                        certInfo.getRevocationReason(),
+                        certInfo.getInvalidityTime());
+            }
+            else
+            {
+                queryExecutor.addCert(certInfo.getIssuerCert(),
+                        certInfo.getCert(),
+                        certInfo.getProfileName());
+            }
+        } catch (Exception e) {
+            LOG.error("Could not save certificate {}: {}. Message: {}",
+                    new Object[]{certInfo.getCert().getSubject(),
+                    Base64.toBase64String(certInfo.getCert().getEncodedCert()), e.getMessage()});
+            LOG.error("error", e);
+        }
+    }
+
+    @Override
+    public void certificateRevoked(X509Certificate cert, int reason,
+            Date invalidityTime)
+    {
+        try {
+            queryExecutor.revocateCert(cert, new Date(), reason, invalidityTime);
+        } catch (SQLException e) {
+            LOG.error("Could not revocate certificate {}: {}",
+                    cert.getSubjectX500Principal(),
+                    e.getMessage());
+        }
+    }
+
+    @Override
+    public void certificateRevoked(X500Principal issuer, BigInteger serialNumber,
+            int reason, Date invalidityTime)
+    {
+        try {
+            queryExecutor.revocateCert(issuer, serialNumber, new Date(), reason, invalidityTime);
+        } catch (SQLException e) {
+            LOG.error("Could not revocate certificate issuer={}, serial={}: {}",
+                    new Object[]{issuer, serialNumber, e.getMessage()});
+        }
+    }
+
+    @Override
+    public void crlAdded(X509CertificateWithMetaInfo cacert, X509CRL crl)
+    {
+    }
+
+    @Override
+    public boolean isHealthy() {
+        return queryExecutor.isHealthy();
+    }
 
 }

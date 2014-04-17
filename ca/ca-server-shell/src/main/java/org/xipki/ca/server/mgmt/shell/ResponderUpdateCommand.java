@@ -27,40 +27,40 @@ import org.xipki.security.common.IoCertUtil;
 
 @Command(scope = "ca", name = "responder-update", description="Update responder")
 public class ResponderUpdateCommand extends CaCommand {
-	@Option(name = "-signerType",
+    @Option(name = "-signerType",
             description = "Type of the responder signer",
             required = true)
     protected String            signerType;
 
-	@Option(name = "-signerConf",
+    @Option(name = "-signerConf",
             description = "Conf of the responder signer or 'NULL'")
     protected String            signerConf;
 
-	@Option(name = "-cert",
+    @Option(name = "-cert",
             description = "Requestor certificate file or 'NULL'")
     protected String            certFile;
 
     @Override
     protected Object doExecute() throws Exception {
-    	String cert = null;
-    	if(CAManager.NULL.equalsIgnoreCase(certFile))
-    	{
-    		cert = CAManager.NULL;
-    	}
-    	else if(certFile != null)
-    	{
-    		byte[] certBytes = IoCertUtil.read(certFile);
-    		IoCertUtil.parseCert(new ByteArrayInputStream(certBytes));
-    		cert = Base64.toBase64String(certBytes);
-    	}
-		
-		if("PKCS12".equalsIgnoreCase(signerType) || "JKS".equalsIgnoreCase(signerType))
-		{
-			signerConf = ShellUtil.replaceFileInSignerConf(signerConf);
-		}
-		
-		caManager.changeCmpResponder(signerType, signerConf, cert);
-		
-    	return null;
+        String cert = null;
+        if(CAManager.NULL.equalsIgnoreCase(certFile))
+        {
+            cert = CAManager.NULL;
+        }
+        else if(certFile != null)
+        {
+            byte[] certBytes = IoCertUtil.read(certFile);
+            IoCertUtil.parseCert(new ByteArrayInputStream(certBytes));
+            cert = Base64.toBase64String(certBytes);
+        }
+
+        if("PKCS12".equalsIgnoreCase(signerType) || "JKS".equalsIgnoreCase(signerType))
+        {
+            signerConf = ShellUtil.replaceFileInSignerConf(signerConf);
+        }
+
+        caManager.changeCmpResponder(signerType, signerConf, cert);
+
+        return null;
     }
 }

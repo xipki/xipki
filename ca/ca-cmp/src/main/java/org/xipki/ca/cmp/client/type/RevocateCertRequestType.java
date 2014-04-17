@@ -21,26 +21,26 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
-public class RevocateCertRequestType 
+public class RevocateCertRequestType
 {
-	private final List<RevocateCertRequestEntryType> requestEntries = new LinkedList<RevocateCertRequestEntryType>();
+    private final List<RevocateCertRequestEntryType> requestEntries = new LinkedList<RevocateCertRequestEntryType>();
 
-	public boolean addRequestEntry(RevocateCertRequestEntryType requestEntry)
-	{
-		for(RevocateCertRequestEntryType re : requestEntries)
-		{
-			if(re.getId().equals(requestEntry.getId()))
-			{
-				return false;
-			}
-		}
-		
-		requestEntries.add(requestEntry);
-		return true;
-	}
-	
-	public List<RevocateCertRequestEntryType> getRequestEntries()
-	{
-		return Collections.unmodifiableList(requestEntries);
-	}
+    public boolean addRequestEntry(RevocateCertRequestEntryType requestEntry)
+    {
+        for(RevocateCertRequestEntryType re : requestEntries)
+        {
+            if(re.getId().equals(requestEntry.getId()))
+            {
+                return false;
+            }
+        }
+
+        requestEntries.add(requestEntry);
+        return true;
+    }
+
+    public List<RevocateCertRequestEntryType> getRequestEntries()
+    {
+        return Collections.unmodifiableList(requestEntries);
+    }
 }

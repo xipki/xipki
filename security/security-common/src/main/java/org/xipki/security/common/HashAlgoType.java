@@ -18,9 +18,9 @@
 package org.xipki.security.common;
 
 public enum HashAlgoType {
-	SHA1,
-	SHA224,
-	SHA256,
-	SHA384,
-	SHA512
+    SHA1,
+    SHA224,
+    SHA256,
+    SHA384,
+    SHA512
 }

@@ -21,24 +21,24 @@ import java.util.List;
 
 public class CertificatePolicyInformation
 {
-	private String policyId;
-	private List<CertificatePolicyQualifier> qualifiers;
-	
-	
-	public void setPolicyId(String policyId) {
-		this.policyId = policyId;
-	}
+    private String policyId;
+    private List<CertificatePolicyQualifier> qualifiers;
 
-	public void setQualifiers(List<CertificatePolicyQualifier> qualifiers) {
-		this.qualifiers = qualifiers;
-	}
 
-	public String getPolicyId() {
-		return policyId;
-	}
+    public void setPolicyId(String policyId) {
+        this.policyId = policyId;
+    }
 
-	public List<CertificatePolicyQualifier> getQualifiers() {
-		return qualifiers;
-	}
+    public void setQualifiers(List<CertificatePolicyQualifier> qualifiers) {
+        this.qualifiers = qualifiers;
+    }
+
+    public String getPolicyId() {
+        return policyId;
+    }
+
+    public List<CertificatePolicyQualifier> getQualifiers() {
+        return qualifiers;
+    }
 
 }

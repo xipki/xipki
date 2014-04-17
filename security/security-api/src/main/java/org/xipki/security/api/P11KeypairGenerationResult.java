@@ -23,25 +23,25 @@ import org.bouncycastle.cert.X509CertificateHolder;
 
 public class P11KeypairGenerationResult extends KeypairGenerationResult
 {
-	private final byte[] id;
-	private final String label;
-	
-	public P11KeypairGenerationResult(
-			byte[] id, String label, 
-			X509CertificateHolder certificate) 
-	{
-		super(certificate);
-		this.id = id;
-		this.label = label;
-	}
+    private final byte[] id;
+    private final String label;
 
-	public byte[] getId() {
-		return Arrays.copyOf(id, id.length);
-	}
+    public P11KeypairGenerationResult(
+            byte[] id, String label,
+            X509CertificateHolder certificate)
+    {
+        super(certificate);
+        this.id = id;
+        this.label = label;
+    }
 
-	public String getLabel() {
-		return label;
-	}
+    public byte[] getId() {
+        return Arrays.copyOf(id, id.length);
+    }
 
-	
+    public String getLabel() {
+        return label;
+    }
+
+
 }

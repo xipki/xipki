@@ -18,40 +18,40 @@
 package org.xipki.ca.api.profile;
 
 
-public class ExtensionOccurrence {	
-	public static final ExtensionOccurrence CRITICAL_REQUIRED    = new ExtensionOccurrence(true, true);
-	public static final ExtensionOccurrence CRITICAL_OPTIONAL    = new ExtensionOccurrence(true, false);
-	public static final ExtensionOccurrence NONCRITICAL_REQUIRED = new ExtensionOccurrence(false, true);
-	public static final ExtensionOccurrence NONCRITICAL_OPTIONAL = new ExtensionOccurrence(false, false);
-	
-	private final boolean critical;
-	private final boolean required;	
-	
-	public static ExtensionOccurrence getInstance(boolean required, boolean critical)
-	{
-		if(critical)
-		{
-			return required ? CRITICAL_REQUIRED : CRITICAL_OPTIONAL; 
-		}
-		else
-		{
-			return required ? NONCRITICAL_REQUIRED : NONCRITICAL_OPTIONAL;
-		}
-	}
-	
-	private ExtensionOccurrence(boolean critical,
-			boolean required) 
-	{
-		this.critical = critical;
-		this.required = required;
-	}
-	
-	public boolean isCritical() {
-		return critical;
-	}
-	
-	public boolean isRequired() {
-		return required;
-	}	
-	
+public class ExtensionOccurrence {
+    public static final ExtensionOccurrence CRITICAL_REQUIRED    = new ExtensionOccurrence(true, true);
+    public static final ExtensionOccurrence CRITICAL_OPTIONAL    = new ExtensionOccurrence(true, false);
+    public static final ExtensionOccurrence NONCRITICAL_REQUIRED = new ExtensionOccurrence(false, true);
+    public static final ExtensionOccurrence NONCRITICAL_OPTIONAL = new ExtensionOccurrence(false, false);
+
+    private final boolean critical;
+    private final boolean required;
+
+    public static ExtensionOccurrence getInstance(boolean required, boolean critical)
+    {
+        if(critical)
+        {
+            return required ? CRITICAL_REQUIRED : CRITICAL_OPTIONAL;
+        }
+        else
+        {
+            return required ? NONCRITICAL_REQUIRED : NONCRITICAL_OPTIONAL;
+        }
+    }
+
+    private ExtensionOccurrence(boolean critical,
+            boolean required)
+    {
+        this.critical = critical;
+        this.required = required;
+    }
+
+    public boolean isCritical() {
+        return critical;
+    }
+
+    public boolean isRequired() {
+        return required;
+    }
+
 }

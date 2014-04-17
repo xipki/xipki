@@ -57,416 +57,416 @@ import org.xipki.security.common.IoCertUtil;
 import org.xipki.security.common.ParamChecker;
 
 class CaCertStoreDbExporter extends DbPorter{
-	
-	private static final Logger LOG = LoggerFactory.getLogger(CaCertStoreDbExporter.class);
-	private final Marshaller marshaller;
-	private final SHA1Digest sha1md = new SHA1Digest();
 
-	private final int COUNT_CERTS_IN_ONE_FILE  = 1000;
+    private static final Logger LOG = LoggerFactory.getLogger(CaCertStoreDbExporter.class);
+    private final Marshaller marshaller;
+    private final SHA1Digest sha1md = new SHA1Digest();
 
-	CaCertStoreDbExporter(DataSource dataSource, Marshaller marshaller, String baseDir) 
-			throws SQLException, PasswordResolverException, IOException
-	{
-		super(dataSource, baseDir);
-		ParamChecker.assertNotNull("marshaller", marshaller);
-		this.marshaller = marshaller;
-	}
-	
-	public void export() throws Exception
-	{
-		CertStoreType certstore = new CertStoreType();
-		certstore.setVersion(VERSION);
+    private final int COUNT_CERTS_IN_ONE_FILE  = 1000;
 
-		certstore.setCainfos(export_cainfo());
-		certstore.setRequestorinfos(export_requestorinfo());
-		certstore.setCertprofileinfos(export_certprofileinfo());
-		certstore.setUsers(export_user());
-		certstore.setCrls(export_crl());
-		certstore.setCertsFiles(export_cert());
-		
-		JAXBElement<CertStoreType> root = new ObjectFactory().createCertStore(certstore);
-		marshaller.marshal(root, new File(baseDir + File.separator + FILENAME_CA_CertStore));
-	}
+    CaCertStoreDbExporter(DataSource dataSource, Marshaller marshaller, String baseDir)
+            throws SQLException, PasswordResolverException, IOException
+    {
+        super(dataSource, baseDir);
+        ParamChecker.assertNotNull("marshaller", marshaller);
+        this.marshaller = marshaller;
+    }
 
-	private Crls export_crl()
-	throws SQLException, IOException
-	{
-		Crls crls = new Crls();
-		Statement stmt = null;
-		try{
-			stmt = createStatement();
-			String sql = "SELECT id, cainfo_id, crl FROM crl";
-			ResultSet rs = stmt.executeQuery(sql);		
+    public void export() throws Exception
+    {
+        CertStoreType certstore = new CertStoreType();
+        certstore.setVersion(VERSION);
 
-			File crlDir = new File(baseDir + File.separator + DIRNAME_CRL);
-			while(rs.next()){
-				int id = rs.getInt("id");
-				int cainfo_id = rs.getInt("cainfo_id");
-				Blob blob = rs.getBlob("crl");					
+        certstore.setCainfos(export_cainfo());
+        certstore.setRequestorinfos(export_requestorinfo());
+        certstore.setCertprofileinfos(export_certprofileinfo());
+        certstore.setUsers(export_user());
+        certstore.setCrls(export_crl());
+        certstore.setCertsFiles(export_cert());
 
-				byte[] encodedCrl = readBlob(blob);
-				String fp = fp(encodedCrl);
-				File f = new File(crlDir, fp);
-				IoCertUtil.save(f, encodedCrl);
+        JAXBElement<CertStoreType> root = new ObjectFactory().createCertStore(certstore);
+        marshaller.marshal(root, new File(baseDir + File.separator + FILENAME_CA_CertStore));
+    }
 
-				CrlType crl = new CrlType();
-				
-				crl.setId(id);
-				crl.setCainfoId(cainfo_id);
-				crl.setCrlFile("CRL/" + fp);
-				
-				crls.getCrl().add(crl);
-			}
-			
-			rs.close();
-			rs = null;
-		}finally
-		{
-			closeStatement(stmt);
-		}
+    private Crls export_crl()
+    throws SQLException, IOException
+    {
+        Crls crls = new Crls();
+        Statement stmt = null;
+        try{
+            stmt = createStatement();
+            String sql = "SELECT id, cainfo_id, crl FROM crl";
+            ResultSet rs = stmt.executeQuery(sql);
 
-		return crls;
-	}
+            File crlDir = new File(baseDir + File.separator + DIRNAME_CRL);
+            while(rs.next()){
+                int id = rs.getInt("id");
+                int cainfo_id = rs.getInt("cainfo_id");
+                Blob blob = rs.getBlob("crl");
 
-	private Cainfos export_cainfo()
-	throws SQLException
-	{
-		Cainfos cainfos = new Cainfos();
-				
-		Statement stmt = null;
-		try{
-			stmt = createStatement();
-			String sql = "SELECT id, cert FROM cainfo";
-			ResultSet rs = stmt.executeQuery(sql);		
+                byte[] encodedCrl = readBlob(blob);
+                String fp = fp(encodedCrl);
+                File f = new File(crlDir, fp);
+                IoCertUtil.save(f, encodedCrl);
 
-			while(rs.next()){
-				int id = rs.getInt("id");
-				String cert = rs.getString("cert");
+                CrlType crl = new CrlType();
 
-				CainfoType cainfo = new CainfoType();
-				cainfo.setId(id);
-				cainfo.setCert(cert);
-				
-				cainfos.getCainfo().add(cainfo);
-			}
-			
-			rs.close();
-			rs = null;
-		}finally
-		{
-			closeStatement(stmt);
-		}
+                crl.setId(id);
+                crl.setCainfoId(cainfo_id);
+                crl.setCrlFile("CRL/" + fp);
 
-		return cainfos;
-	}
+                crls.getCrl().add(crl);
+            }
 
-	private Requestorinfos export_requestorinfo()
-	throws SQLException
-	{
-		Requestorinfos infos = new Requestorinfos();
-				
-		Statement stmt = null;
-		try{
-			stmt = createStatement();
-			String sql = "SELECT id, cert FROM requestorinfo";
-			ResultSet rs = stmt.executeQuery(sql);		
+            rs.close();
+            rs = null;
+        }finally
+        {
+            closeStatement(stmt);
+        }
 
-			while(rs.next()){
-				int id = rs.getInt("id");
-				String cert = rs.getString("cert");
+        return crls;
+    }
 
-				RequestorinfoType info = new RequestorinfoType();
-				info.setId(id);
-				info.setCert(cert);
-				
-				infos.getRequestorinfo().add(info);
-			}
-			
-			rs.close();
-			rs = null;
-		}finally
-		{
-			closeStatement(stmt);
-		}
+    private Cainfos export_cainfo()
+    throws SQLException
+    {
+        Cainfos cainfos = new Cainfos();
 
-		return infos;
-	}
+        Statement stmt = null;
+        try{
+            stmt = createStatement();
+            String sql = "SELECT id, cert FROM cainfo";
+            ResultSet rs = stmt.executeQuery(sql);
 
-	private Users export_user()
-	throws SQLException
-	{
-		Users users = new Users();
-				
-		Statement stmt = null;
-		try{
-			stmt = createStatement();
-			String sql = "SELECT id, name FROM user";
-			ResultSet rs = stmt.executeQuery(sql);		
+            while(rs.next()){
+                int id = rs.getInt("id");
+                String cert = rs.getString("cert");
 
-			while(rs.next()){
-				int id = rs.getInt("id");
-				String name = rs.getString("name");
+                CainfoType cainfo = new CainfoType();
+                cainfo.setId(id);
+                cainfo.setCert(cert);
 
-				UserType user = new UserType();
-				user.setId(id);
-				user.setName(name);
-				
-				users.getUser().add(user);
-			}
-			
-			rs.close();
-			rs = null;
-		}finally
-		{
-			closeStatement(stmt);
-		}
+                cainfos.getCainfo().add(cainfo);
+            }
 
-		return users;
-	}
+            rs.close();
+            rs = null;
+        }finally
+        {
+            closeStatement(stmt);
+        }
 
-	private Certprofileinfos export_certprofileinfo()
-	throws SQLException
-	{
-		Certprofileinfos infos = new Certprofileinfos();
-				
-		Statement stmt = null;
-		try{
-			stmt = createStatement();
-			String sql = "SELECT id, name FROM certprofileinfo";
-			ResultSet rs = stmt.executeQuery(sql);		
+        return cainfos;
+    }
 
-			while(rs.next()){
-				int id = rs.getInt("id");
-				String name = rs.getString("name");
+    private Requestorinfos export_requestorinfo()
+    throws SQLException
+    {
+        Requestorinfos infos = new Requestorinfos();
 
-				CertprofileinfoType info = new CertprofileinfoType();
-				info.setId(id);
-				info.setName(name);
-				
-				infos.getCertprofileinfo().add(info);
-			}
-			
-			rs.close();
-			rs = null;
-		}finally
-		{
-			closeStatement(stmt);
-		}
+        Statement stmt = null;
+        try{
+            stmt = createStatement();
+            String sql = "SELECT id, cert FROM requestorinfo";
+            ResultSet rs = stmt.executeQuery(sql);
 
-		return infos;
-	}
+            while(rs.next()){
+                int id = rs.getInt("id");
+                String cert = rs.getString("cert");
 
-	private CertsFiles export_cert()
-	throws SQLException, IOException, JAXBException
-	{	
-		CertsFiles certsFiles = new CertsFiles();
-	
-		String certSql = "SELECT id, cainfo_id, certprofileinfo_id," +
-				" requestorinfo_id, last_update," +
-				" revocated, rev_reason, rev_time, rev_invalidity_time, user_id" +
-				" FROM cert" +
-				" WHERE id > ? AND id < ?";		
-		
-		PreparedStatement ps = prepareStatement(certSql);
-		
-		String rawCertSql = "SELECT cert FROM rawcert WHERE cert_id = ?";
-		PreparedStatement rawCertPs = prepareStatement(rawCertSql);
-		
-		File certDir = new File(baseDir, "CERT");
-		
-		final int minCertId = getMinCertId();
-		final int maxCertId = getMaxCertId();
-		
-		final ObjectFactory objFact = new ObjectFactory();
-		
-		int numCertInCurrentFile = 0;
-		int startIdInCurrentFile = minCertId;
-		CertsType certsInCurrentFile = new CertsType();
-		
-		final int n = 100;
-		try{
-			for(int i = minCertId; i <= maxCertId; i += n)
-			{
-				ps.setInt(1, i - 1);
-				ps.setInt(2, i + n + 1);
+                RequestorinfoType info = new RequestorinfoType();
+                info.setId(id);
+                info.setCert(cert);
 
-				ResultSet rs = ps.executeQuery();		
+                infos.getRequestorinfo().add(info);
+            }
 
-				while(rs.next()){
-					int id = rs.getInt("id");
-					String cainfo_id = rs.getString("cainfo_id");
-					String certprofileinfo_id = rs.getString("certprofileinfo_id");
-					String requestorinfo_id = rs.getString("requestorinfo_id");
-					String last_update = rs.getString("last_update");
-					boolean revocated = rs.getBoolean("revocated");
-					String rev_reason = rs.getString("rev_reason");
-					String rev_time = rs.getString("rev_time");
-					String rev_invalidity_time = rs.getString("rev_invalidity_time");
-					String user_id = rs.getString("user_id");
+            rs.close();
+            rs = null;
+        }finally
+        {
+            closeStatement(stmt);
+        }
 
-					String sha1_fp_cert;
-					rawCertPs.setInt(1, id);
-					ResultSet rawCertRs = rawCertPs.executeQuery();
-					try{
-						rawCertRs.next();
-						String b64Cert = rawCertRs.getString("cert");
-						byte[] cert = Base64.decode(b64Cert);
-						sha1_fp_cert = IoCertUtil.sha1sum(cert);
-						IoCertUtil.save(new File(certDir, sha1_fp_cert), cert);
-					}finally
-					{
-						rawCertRs.close();
-					}
+        return infos;
+    }
 
-					CertType cert = new CertType();
-					cert.setId(id);
-					cert.setCainfoId(cainfo_id);
-					cert.setCertprofileinfoId(certprofileinfo_id);
-					cert.setRequestorinfoId(requestorinfo_id);
-					cert.setLastUpdate(last_update);
-					cert.setRevocated(revocated);
-					cert.setRevReason(rev_reason);
-					cert.setRevTime(rev_time);
-					cert.setRevInvalidityTime(rev_invalidity_time);
-					cert.setUserId(user_id);
-					cert.setCertFile(DIRNAME_CERT + File.separator + sha1_fp_cert);
+    private Users export_user()
+    throws SQLException
+    {
+        Users users = new Users();
 
-					if(certsInCurrentFile.getCert().isEmpty())
-					{
-						startIdInCurrentFile = id;
-					}
-					
-					certsInCurrentFile.getCert().add(cert);
-					numCertInCurrentFile ++;
-					
-					if(numCertInCurrentFile == COUNT_CERTS_IN_ONE_FILE)
-					{
-						String fn = PREFIX_FILENAME_CERTS + startIdInCurrentFile + ".xml";						
-						marshaller.marshal(objFact.createCerts(certsInCurrentFile), 
-								new File(baseDir + File.separator + fn));
-						
-						certsFiles.getCertsFile().add(fn);
-						
-						certsInCurrentFile = new CertsType();
-						numCertInCurrentFile = 0;
-					}
-				}
-			}
-			
-			if(numCertInCurrentFile > 0)
-			{
-				String fn = "certs-" + startIdInCurrentFile + ".xml";						
-				marshaller.marshal(objFact.createCerts(certsInCurrentFile), 
-						new File(baseDir + File.separator + fn));
-				
-				certsFiles.getCertsFile().add(fn);
-			}
+        Statement stmt = null;
+        try{
+            stmt = createStatement();
+            String sql = "SELECT id, name FROM user";
+            ResultSet rs = stmt.executeQuery(sql);
 
-		}finally
-		{
-			closeStatement(ps);
-		}
+            while(rs.next()){
+                int id = rs.getInt("id");
+                String name = rs.getString("name");
 
-		
-		return certsFiles;
-	}
+                UserType user = new UserType();
+                user.setId(id);
+                user.setName(name);
 
-	private int getMinCertId()
-	throws SQLException
-	{
-		Statement stmt = null;
-		try{
-			stmt = createStatement();
-			final String sql = "SELECT min(id) FROM cert";
-			ResultSet rs = stmt.executeQuery(sql);
-			
-			rs.next();
-			int minCertId = rs.getInt(1);
-			
-			rs.close();
-			rs = null;
-			
-			return minCertId;
-		}finally
-		{
-			closeStatement(stmt);
-		}
-	}
+                users.getUser().add(user);
+            }
 
-	private int getMaxCertId()
-	throws SQLException
-	{
-		Statement stmt = null;
-		try{
-			stmt = createStatement();
-			final String sql = "SELECT max(id) FROM cert";
-			ResultSet rs = stmt.executeQuery(sql);
-			
-			rs.next();
-			int maxCertId = rs.getInt(1);
-			
-			rs.close();
-			rs = null;
-			
-			return maxCertId;
-		}finally
-		{
-			closeStatement(stmt);
-		}
-	}
+            rs.close();
+            rs = null;
+        }finally
+        {
+            closeStatement(stmt);
+        }
 
-	private String fp(byte[] data)
-	{
-		synchronized (sha1md) {
-			sha1md.reset();
-			sha1md.update(data, 0, data.length);
-			byte[] digestValue = new byte[20];
-			sha1md.doFinal(digestValue, 0);
-			return Hex.toHexString(digestValue).toUpperCase();
-		}
-	}
-	
-	private static byte[] readBlob(Blob blob)
-	{
-		InputStream is;
-		try {
-			is = blob.getBinaryStream();
-		} catch (SQLException e) {
-			String msg = "Could not getBinaryStream from Blob"; 
-			LOG.warn(msg + " {}", e.getMessage());
-			LOG.debug(msg, e);
-			return null;
-		}
-		try{
-			ByteArrayOutputStream out = new ByteArrayOutputStream();
-			
-			byte[] buffer = new byte[2048];
-			int readed;
-			
-			try {
-				while((readed = is.read(buffer)) != -1)
-				{				
-					if(readed > 0)
-					{
-						out.write(buffer, 0, readed);
-					}
-				}
-			} catch (IOException e) {
-				String msg = "Could not read CRL from Blob"; 
-				LOG.warn(msg + " {}", e.getMessage());
-				LOG.debug(msg, e);
-				return null;
-			}
-			
-			return out.toByteArray();
-		}finally{
-			try{
-				is.close();
-			}catch(IOException e)
-			{				
-			}
-		}
-	}
+        return users;
+    }
 
-	
+    private Certprofileinfos export_certprofileinfo()
+    throws SQLException
+    {
+        Certprofileinfos infos = new Certprofileinfos();
+
+        Statement stmt = null;
+        try{
+            stmt = createStatement();
+            String sql = "SELECT id, name FROM certprofileinfo";
+            ResultSet rs = stmt.executeQuery(sql);
+
+            while(rs.next()){
+                int id = rs.getInt("id");
+                String name = rs.getString("name");
+
+                CertprofileinfoType info = new CertprofileinfoType();
+                info.setId(id);
+                info.setName(name);
+
+                infos.getCertprofileinfo().add(info);
+            }
+
+            rs.close();
+            rs = null;
+        }finally
+        {
+            closeStatement(stmt);
+        }
+
+        return infos;
+    }
+
+    private CertsFiles export_cert()
+    throws SQLException, IOException, JAXBException
+    {
+        CertsFiles certsFiles = new CertsFiles();
+
+        String certSql = "SELECT id, cainfo_id, certprofileinfo_id," +
+                " requestorinfo_id, last_update," +
+                " revocated, rev_reason, rev_time, rev_invalidity_time, user_id" +
+                " FROM cert" +
+                " WHERE id > ? AND id < ?";
+
+        PreparedStatement ps = prepareStatement(certSql);
+
+        String rawCertSql = "SELECT cert FROM rawcert WHERE cert_id = ?";
+        PreparedStatement rawCertPs = prepareStatement(rawCertSql);
+
+        File certDir = new File(baseDir, "CERT");
+
+        final int minCertId = getMinCertId();
+        final int maxCertId = getMaxCertId();
+
+        final ObjectFactory objFact = new ObjectFactory();
+
+        int numCertInCurrentFile = 0;
+        int startIdInCurrentFile = minCertId;
+        CertsType certsInCurrentFile = new CertsType();
+
+        final int n = 100;
+        try{
+            for(int i = minCertId; i <= maxCertId; i += n)
+            {
+                ps.setInt(1, i - 1);
+                ps.setInt(2, i + n + 1);
+
+                ResultSet rs = ps.executeQuery();
+
+                while(rs.next()){
+                    int id = rs.getInt("id");
+                    String cainfo_id = rs.getString("cainfo_id");
+                    String certprofileinfo_id = rs.getString("certprofileinfo_id");
+                    String requestorinfo_id = rs.getString("requestorinfo_id");
+                    String last_update = rs.getString("last_update");
+                    boolean revocated = rs.getBoolean("revocated");
+                    String rev_reason = rs.getString("rev_reason");
+                    String rev_time = rs.getString("rev_time");
+                    String rev_invalidity_time = rs.getString("rev_invalidity_time");
+                    String user_id = rs.getString("user_id");
+
+                    String sha1_fp_cert;
+                    rawCertPs.setInt(1, id);
+                    ResultSet rawCertRs = rawCertPs.executeQuery();
+                    try{
+                        rawCertRs.next();
+                        String b64Cert = rawCertRs.getString("cert");
+                        byte[] cert = Base64.decode(b64Cert);
+                        sha1_fp_cert = IoCertUtil.sha1sum(cert);
+                        IoCertUtil.save(new File(certDir, sha1_fp_cert), cert);
+                    }finally
+                    {
+                        rawCertRs.close();
+                    }
+
+                    CertType cert = new CertType();
+                    cert.setId(id);
+                    cert.setCainfoId(cainfo_id);
+                    cert.setCertprofileinfoId(certprofileinfo_id);
+                    cert.setRequestorinfoId(requestorinfo_id);
+                    cert.setLastUpdate(last_update);
+                    cert.setRevocated(revocated);
+                    cert.setRevReason(rev_reason);
+                    cert.setRevTime(rev_time);
+                    cert.setRevInvalidityTime(rev_invalidity_time);
+                    cert.setUserId(user_id);
+                    cert.setCertFile(DIRNAME_CERT + File.separator + sha1_fp_cert);
+
+                    if(certsInCurrentFile.getCert().isEmpty())
+                    {
+                        startIdInCurrentFile = id;
+                    }
+
+                    certsInCurrentFile.getCert().add(cert);
+                    numCertInCurrentFile ++;
+
+                    if(numCertInCurrentFile == COUNT_CERTS_IN_ONE_FILE)
+                    {
+                        String fn = PREFIX_FILENAME_CERTS + startIdInCurrentFile + ".xml";
+                        marshaller.marshal(objFact.createCerts(certsInCurrentFile),
+                                new File(baseDir + File.separator + fn));
+
+                        certsFiles.getCertsFile().add(fn);
+
+                        certsInCurrentFile = new CertsType();
+                        numCertInCurrentFile = 0;
+                    }
+                }
+            }
+
+            if(numCertInCurrentFile > 0)
+            {
+                String fn = "certs-" + startIdInCurrentFile + ".xml";
+                marshaller.marshal(objFact.createCerts(certsInCurrentFile),
+                        new File(baseDir + File.separator + fn));
+
+                certsFiles.getCertsFile().add(fn);
+            }
+
+        }finally
+        {
+            closeStatement(ps);
+        }
+
+
+        return certsFiles;
+    }
+
+    private int getMinCertId()
+    throws SQLException
+    {
+        Statement stmt = null;
+        try{
+            stmt = createStatement();
+            final String sql = "SELECT min(id) FROM cert";
+            ResultSet rs = stmt.executeQuery(sql);
+
+            rs.next();
+            int minCertId = rs.getInt(1);
+
+            rs.close();
+            rs = null;
+
+            return minCertId;
+        }finally
+        {
+            closeStatement(stmt);
+        }
+    }
+
+    private int getMaxCertId()
+    throws SQLException
+    {
+        Statement stmt = null;
+        try{
+            stmt = createStatement();
+            final String sql = "SELECT max(id) FROM cert";
+            ResultSet rs = stmt.executeQuery(sql);
+
+            rs.next();
+            int maxCertId = rs.getInt(1);
+
+            rs.close();
+            rs = null;
+
+            return maxCertId;
+        }finally
+        {
+            closeStatement(stmt);
+        }
+    }
+
+    private String fp(byte[] data)
+    {
+        synchronized (sha1md) {
+            sha1md.reset();
+            sha1md.update(data, 0, data.length);
+            byte[] digestValue = new byte[20];
+            sha1md.doFinal(digestValue, 0);
+            return Hex.toHexString(digestValue).toUpperCase();
+        }
+    }
+
+    private static byte[] readBlob(Blob blob)
+    {
+        InputStream is;
+        try {
+            is = blob.getBinaryStream();
+        } catch (SQLException e) {
+            String msg = "Could not getBinaryStream from Blob";
+            LOG.warn(msg + " {}", e.getMessage());
+            LOG.debug(msg, e);
+            return null;
+        }
+        try{
+            ByteArrayOutputStream out = new ByteArrayOutputStream();
+
+            byte[] buffer = new byte[2048];
+            int readed;
+
+            try {
+                while((readed = is.read(buffer)) != -1)
+                {
+                    if(readed > 0)
+                    {
+                        out.write(buffer, 0, readed);
+                    }
+                }
+            } catch (IOException e) {
+                String msg = "Could not read CRL from Blob";
+                LOG.warn(msg + " {}", e.getMessage());
+                LOG.debug(msg, e);
+                return null;
+            }
+
+            return out.toByteArray();
+        }finally{
+            try{
+                is.close();
+            }catch(IOException e)
+            {
+            }
+        }
+    }
+
+
 }

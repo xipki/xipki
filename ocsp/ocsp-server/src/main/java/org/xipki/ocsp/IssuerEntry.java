@@ -22,42 +22,42 @@ import java.util.Map;
 
 import org.xipki.ocsp.api.HashAlgoType;
 
-public class IssuerEntry 
+public class IssuerEntry
 {
-	private final int id;
-	private final Map<HashAlgoType, IssuerHashNameAndKey> issuerHashMap;
-	private final byte[] encodedCert;
-	
-	public IssuerEntry(int id, Map<HashAlgoType, IssuerHashNameAndKey> issuerHashMap,
-			byte[] encodedCert)
-	{
-		if(issuerHashMap == null || issuerHashMap.isEmpty())
-		{
-			throw new IllegalArgumentException("issuerHashMap is empty");
-		}
-		
-		this.id = id;
-		this.issuerHashMap = issuerHashMap;
-		this.encodedCert = encodedCert;
-	}
+    private final int id;
+    private final Map<HashAlgoType, IssuerHashNameAndKey> issuerHashMap;
+    private final byte[] encodedCert;
 
-	public int getId() {
-		return id;
-	}
+    public IssuerEntry(int id, Map<HashAlgoType, IssuerHashNameAndKey> issuerHashMap,
+            byte[] encodedCert)
+    {
+        if(issuerHashMap == null || issuerHashMap.isEmpty())
+        {
+            throw new IllegalArgumentException("issuerHashMap is empty");
+        }
 
-	public boolean matchCert(byte[] encodedCert)
-	{
-		if(encodedCert == null)
-		{
-			return false;
-		}
-		
-		return Arrays.equals(this.encodedCert, encodedCert);
-	}
-	
-	public boolean matchHash(HashAlgoType hashAlgo, byte[] issuerNameHash, byte[] issuerKeyHash)
-	{
-		IssuerHashNameAndKey issuerHash = issuerHashMap.get(hashAlgo);
-		return issuerHash == null ? false : issuerHash.match(hashAlgo, issuerNameHash, issuerKeyHash);
-	}
+        this.id = id;
+        this.issuerHashMap = issuerHashMap;
+        this.encodedCert = encodedCert;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public boolean matchCert(byte[] encodedCert)
+    {
+        if(encodedCert == null)
+        {
+            return false;
+        }
+
+        return Arrays.equals(this.encodedCert, encodedCert);
+    }
+
+    public boolean matchHash(HashAlgoType hashAlgo, byte[] issuerNameHash, byte[] issuerKeyHash)
+    {
+        IssuerHashNameAndKey issuerHash = issuerHashMap.get(hashAlgo);
+        return issuerHash == null ? false : issuerHash.match(hashAlgo, issuerNameHash, issuerKeyHash);
+    }
 }

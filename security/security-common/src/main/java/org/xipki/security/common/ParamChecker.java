@@ -21,38 +21,38 @@ import java.util.Collection;
 
 public class ParamChecker {
 
-	public static void assertNotNull(String parameterName, Object parameter)
-	{
-		if(parameter == null)
-		{
-			throw new IllegalArgumentException(parameterName + " could not be null");
-		}
-	}
+    public static void assertNotNull(String parameterName, Object parameter)
+    {
+        if(parameter == null)
+        {
+            throw new IllegalArgumentException(parameterName + " could not be null");
+        }
+    }
 
-	public static void assertNotEmpty(String parameterName, String parameter)
-	{
-		if(parameter == null)
-		{
-			throw new IllegalArgumentException(parameterName + " could not be null");
-		}
-		
-		if(parameter.isEmpty())
-		{
-			throw new IllegalArgumentException(parameterName + " could not be empty");
-		}
-	}
-	
-	public static void assertNotEmpty(String parameterName, Collection<?> parameter)
-	{
-		if(parameter == null)
-		{
-			throw new IllegalArgumentException(parameterName + " could not be null");
-		}
-		
-		if(parameter.isEmpty())
-		{
-			throw new IllegalArgumentException(parameterName + " could not be empty");
-		}
-	}
+    public static void assertNotEmpty(String parameterName, String parameter)
+    {
+        if(parameter == null)
+        {
+            throw new IllegalArgumentException(parameterName + " could not be null");
+        }
+
+        if(parameter.isEmpty())
+        {
+            throw new IllegalArgumentException(parameterName + " could not be empty");
+        }
+    }
+
+    public static void assertNotEmpty(String parameterName, Collection<?> parameter)
+    {
+        if(parameter == null)
+        {
+            throw new IllegalArgumentException(parameterName + " could not be null");
+        }
+
+        if(parameter.isEmpty())
+        {
+            throw new IllegalArgumentException(parameterName + " could not be empty");
+        }
+    }
 
 }

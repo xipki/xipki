@@ -24,28 +24,28 @@ import org.xipki.security.common.ParamChecker;
 
 public class RevocateCertResultType implements CmpResultType
 {
-	private List<ResultEntryType> resultEntries;
-	
-	public List<ResultEntryType> getResultEntries()
-	{
-		return resultEntries;
-	}
-	
-	public void addResultEntry(ResultEntryType resultEntry)
-	{
-		ParamChecker.assertNotNull("resultEntry", resultEntry);
-		
-		if(!(resultEntry instanceof RevocateCertResultEntryType || resultEntry instanceof ErrorResultEntryType))
-		{
-			throw new IllegalArgumentException("Unaccepted parameter of class " + resultEntry.getClass().getCanonicalName());
-		}
-		
-		if(resultEntries == null)
-		{
-			resultEntries = new ArrayList<ResultEntryType>(1);
-		}
-		
-		resultEntries.add(resultEntry);
-	}
+    private List<ResultEntryType> resultEntries;
+
+    public List<ResultEntryType> getResultEntries()
+    {
+        return resultEntries;
+    }
+
+    public void addResultEntry(ResultEntryType resultEntry)
+    {
+        ParamChecker.assertNotNull("resultEntry", resultEntry);
+
+        if(!(resultEntry instanceof RevocateCertResultEntryType || resultEntry instanceof ErrorResultEntryType))
+        {
+            throw new IllegalArgumentException("Unaccepted parameter of class " + resultEntry.getClass().getCanonicalName());
+        }
+
+        if(resultEntries == null)
+        {
+            resultEntries = new ArrayList<ResultEntryType>(1);
+        }
+
+        resultEntries.add(resultEntry);
+    }
 
 }

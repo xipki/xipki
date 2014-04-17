@@ -18,6 +18,6 @@
 package org.xipki.ocsp.api;
 
 public interface CertStatusStoreFactory
-{	
-	CertStatusStore generateCertStatusStore();
+{
+    CertStatusStore generateCertStatusStore();
 }

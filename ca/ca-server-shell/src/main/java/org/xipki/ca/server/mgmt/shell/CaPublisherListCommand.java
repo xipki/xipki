@@ -25,31 +25,31 @@ import org.xipki.ca.server.mgmt.PublisherEntry;
 
 @Command(scope = "ca", name = "capub-list", description="List publishers in given CA")
 public class CaPublisherListCommand extends CaCommand {
-	@Option(name = "-ca",
+    @Option(name = "-ca",
             description = "Required. CA name",
             required = true)
     protected String           caName;
 
     @Override
     protected Object doExecute() throws Exception {
-		StringBuilder sb = new StringBuilder();		
-		
-		List<PublisherEntry> entries = caManager.getPublishersForCA(caName);
-		if(entries != null && entries.isEmpty() == false)
-		{
-			sb.append("Publishers for CA " + caName).append("\n");
-			for(PublisherEntry entry  : entries)
-			{
-				sb.append("\t").append(entry.getName()).append("\n");
-			}
-		}
-		else
-		{
-			sb.append("\tNo publisher for CA " + caName + " is configured");
-		}
-		
-		System.out.println(sb.toString());
-		
-    	return null;
+        StringBuilder sb = new StringBuilder();
+
+        List<PublisherEntry> entries = caManager.getPublishersForCA(caName);
+        if(entries != null && entries.isEmpty() == false)
+        {
+            sb.append("Publishers for CA " + caName).append("\n");
+            for(PublisherEntry entry  : entries)
+            {
+                sb.append("\t").append(entry.getName()).append("\n");
+            }
+        }
+        else
+        {
+            sb.append("\tNo publisher for CA " + caName + " is configured");
+        }
+
+        System.out.println(sb.toString());
+
+        return null;
     }
 }

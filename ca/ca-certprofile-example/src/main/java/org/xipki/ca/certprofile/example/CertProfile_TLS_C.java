@@ -32,54 +32,54 @@ import org.xipki.ca.api.profile.ExtensionOccurrence;
 import org.xipki.ca.api.profile.KeyUsage;
 
 public class CertProfile_TLS_C extends AbstractEECertProfile {
-	private final Set<KeyUsage> keyUsages;
-	private final Set<ASN1ObjectIdentifier> extendedKeyUsages;
-	private final Map<ASN1ObjectIdentifier, ExtensionOccurrence> extensionOccurences;
-	
-	public CertProfile_TLS_C()
-	{
-		// KeyUsages
-		Set<KeyUsage> _keyUsages = new HashSet<KeyUsage>();
-		_keyUsages.add(KeyUsage.contentCommitment);
-		keyUsages = Collections.unmodifiableSet(_keyUsages);
-		
-		// extended KeyUsages
-		Set<ASN1ObjectIdentifier> _extendedKeyUsages = new HashSet<ASN1ObjectIdentifier>();
+    private final Set<KeyUsage> keyUsages;
+    private final Set<ASN1ObjectIdentifier> extendedKeyUsages;
+    private final Map<ASN1ObjectIdentifier, ExtensionOccurrence> extensionOccurences;
+
+    public CertProfile_TLS_C()
+    {
+        // KeyUsages
+        Set<KeyUsage> _keyUsages = new HashSet<KeyUsage>();
+        _keyUsages.add(KeyUsage.contentCommitment);
+        keyUsages = Collections.unmodifiableSet(_keyUsages);
+
+        // extended KeyUsages
+        Set<ASN1ObjectIdentifier> _extendedKeyUsages = new HashSet<ASN1ObjectIdentifier>();
         _extendedKeyUsages.add(ObjectIdentifiers.id_kp_clientAuth);
         extendedKeyUsages = Collections.unmodifiableSet(_extendedKeyUsages);
-		
-		// Extensions
-		Map<ASN1ObjectIdentifier, ExtensionOccurrence> _extensionOccurences =
-				new HashMap<ASN1ObjectIdentifier, ExtensionOccurrence>();
-		_extensionOccurences.put(Extension.keyUsage, ExtensionOccurrence.CRITICAL_REQUIRED);
-		_extensionOccurences.put(Extension.basicConstraints, ExtensionOccurrence.CRITICAL_REQUIRED);
-		_extensionOccurences.put(Extension.extendedKeyUsage, ExtensionOccurrence.NONCRITICAL_REQUIRED);
-		extensionOccurences = Collections.unmodifiableMap(_extensionOccurences);
-	}
-	
-	@Override
-	public Integer getValidity() {
-		return 5 * 365;
-	}
 
-	@Override
-	protected void checkSubjectContent(X500Name requestedSubject) throws BadCertTemplateException
-	{
-	}
+        // Extensions
+        Map<ASN1ObjectIdentifier, ExtensionOccurrence> _extensionOccurences =
+                new HashMap<ASN1ObjectIdentifier, ExtensionOccurrence>();
+        _extensionOccurences.put(Extension.keyUsage, ExtensionOccurrence.CRITICAL_REQUIRED);
+        _extensionOccurences.put(Extension.basicConstraints, ExtensionOccurrence.CRITICAL_REQUIRED);
+        _extensionOccurences.put(Extension.extendedKeyUsage, ExtensionOccurrence.NONCRITICAL_REQUIRED);
+        extensionOccurences = Collections.unmodifiableMap(_extensionOccurences);
+    }
 
-	@Override
-	protected Set<KeyUsage> getKeyUsage() {
-		return keyUsages;
-	}
+    @Override
+    public Integer getValidity() {
+        return 5 * 365;
+    }
 
-	@Override
-	protected Set<ASN1ObjectIdentifier> getExtendedKeyUsages() {
-		return extendedKeyUsages;
-	}
+    @Override
+    protected void checkSubjectContent(X500Name requestedSubject) throws BadCertTemplateException
+    {
+    }
 
-	@Override
-	protected Map<ASN1ObjectIdentifier, ExtensionOccurrence> getAdditionalExtensionOccurences() {
-		return extensionOccurences;
-	}
+    @Override
+    protected Set<KeyUsage> getKeyUsage() {
+        return keyUsages;
+    }
+
+    @Override
+    protected Set<ASN1ObjectIdentifier> getExtendedKeyUsages() {
+        return extendedKeyUsages;
+    }
+
+    @Override
+    protected Map<ASN1ObjectIdentifier, ExtensionOccurrence> getAdditionalExtensionOccurences() {
+        return extensionOccurences;
+    }
 
 }

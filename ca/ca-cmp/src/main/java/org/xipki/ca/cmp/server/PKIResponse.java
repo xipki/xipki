@@ -21,29 +21,29 @@ import org.bouncycastle.cert.cmp.GeneralPKIMessage;
 import org.xipki.ca.cmp.ProtectionVerificationResult;
 
 public class PKIResponse {
-	private final GeneralPKIMessage pkiMessage;
-	private ProtectionVerificationResult protectionVerificationResult;
-	
-	public PKIResponse(GeneralPKIMessage pkiMessage)
-	{
-		this.pkiMessage = pkiMessage;
-	}
+    private final GeneralPKIMessage pkiMessage;
+    private ProtectionVerificationResult protectionVerificationResult;
 
-	public boolean hasProtection() {
-		return pkiMessage.hasProtection();
-	}
+    public PKIResponse(GeneralPKIMessage pkiMessage)
+    {
+        this.pkiMessage = pkiMessage;
+    }
 
-	public GeneralPKIMessage getPkiMessage() {
-		return pkiMessage;
-	}
+    public boolean hasProtection() {
+        return pkiMessage.hasProtection();
+    }
 
-	public ProtectionVerificationResult getProtectionVerificationResult() {
-		return protectionVerificationResult;
-	}
+    public GeneralPKIMessage getPkiMessage() {
+        return pkiMessage;
+    }
 
-	public void setProtectionVerificationResult(
-			ProtectionVerificationResult protectionVerificationResult) {
-		this.protectionVerificationResult = protectionVerificationResult;
-	}	
+    public ProtectionVerificationResult getProtectionVerificationResult() {
+        return protectionVerificationResult;
+    }
+
+    public void setProtectionVerificationResult(
+            ProtectionVerificationResult protectionVerificationResult) {
+        this.protectionVerificationResult = protectionVerificationResult;
+    }
 
 }

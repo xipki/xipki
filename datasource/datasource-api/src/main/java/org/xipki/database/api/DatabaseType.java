@@ -30,7 +30,7 @@ public enum DatabaseType
     SAPDB,
     SYBASE,
     UNKNOWN;
-    
+
     public static DatabaseType getDataSourceForDriver(String driverClass)
     {
         DatabaseType type = null;
@@ -60,7 +60,7 @@ public enum DatabaseType
         }
         else if (driverClass.indexOf("mysql") >= 0)
         {
-        	type = DatabaseType.MYSQL;
+            type = DatabaseType.MYSQL;
         }
         else
         {

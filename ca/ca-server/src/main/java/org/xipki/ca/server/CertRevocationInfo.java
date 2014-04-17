@@ -21,34 +21,34 @@ import java.math.BigInteger;
 import java.util.Date;
 
 public class CertRevocationInfo {
-	private final BigInteger serial;
-	private final int reason;
-	private final Date revocationTime;
-	private final Date invalidityTime;
-	
-	public CertRevocationInfo(BigInteger serial, int reason,
-			Date revocationTime, Date invalidityTime) 
-	{
-		this.serial = serial;
-		this.reason = reason;
-		this.revocationTime = revocationTime;
-		this.invalidityTime = invalidityTime;
-	}
+    private final BigInteger serial;
+    private final int reason;
+    private final Date revocationTime;
+    private final Date invalidityTime;
 
-	public BigInteger getSerial() {
-		return serial;
-	}
+    public CertRevocationInfo(BigInteger serial, int reason,
+            Date revocationTime, Date invalidityTime)
+    {
+        this.serial = serial;
+        this.reason = reason;
+        this.revocationTime = revocationTime;
+        this.invalidityTime = invalidityTime;
+    }
 
-	public int getReason() {
-		return reason;
-	}
+    public BigInteger getSerial() {
+        return serial;
+    }
 
-	public Date getRevocationTime() {
-		return revocationTime;
-	}
+    public int getReason() {
+        return reason;
+    }
 
-	public Date getInvalidityTime() {
-		return invalidityTime;
-	}
-	
+    public Date getRevocationTime() {
+        return revocationTime;
+    }
+
+    public Date getInvalidityTime() {
+        return invalidityTime;
+    }
+
 }

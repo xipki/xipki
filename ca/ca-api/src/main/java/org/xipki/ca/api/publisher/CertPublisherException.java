@@ -19,21 +19,21 @@ package org.xipki.ca.api.publisher;
 
 public class CertPublisherException extends Exception {
 
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	public CertPublisherException() {
-	}
+    public CertPublisherException() {
+    }
 
-	public CertPublisherException(String message) {
-		super(message);
-	}
+    public CertPublisherException(String message) {
+        super(message);
+    }
 
-	public CertPublisherException(Throwable cause) {
-		super(cause);
-	}
+    public CertPublisherException(Throwable cause) {
+        super(cause);
+    }
 
-	public CertPublisherException(String message, Throwable cause) {
-		super(message, cause);
-	}
+    public CertPublisherException(String message, Throwable cause) {
+        super(message, cause);
+    }
 
 }

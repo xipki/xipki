@@ -27,65 +27,65 @@ import org.xipki.security.common.IoCertUtil;
 
 @Command(scope = "ca", name = "crlsigner-update", description="Update CRL signer")
 public class CrlSignerUpdateCommand extends CaCommand {
-	@Option( name = "-name",
-	         description = "Required. CRL signer name",
-	         required = true, multiValued = false)
-	protected String            name;
+    @Option( name = "-name",
+             description = "Required. CRL signer name",
+             required = true, multiValued = false)
+    protected String            name;
 
-	@Option(name = "-signerType",
+    @Option(name = "-signerType",
             description = "CRL signer type, use 'CA' to sign the CRL by the CA itself")
     protected String            signerType;
 
-	@Option(name = "-signerConf",
+    @Option(name = "-signerConf",
             description = "CRL signer configuration")
     protected String            signerConf;
 
-	@Option(name = "-cert",
+    @Option(name = "-cert",
             description = "CRL signer's certificate file or 'NULL'")
     protected String            signerCert;
-	
-	@Option(name = "-period",
+
+    @Option(name = "-period",
             description = "Interval in minutes of two CRLs, set to 0 to generate CRL on demand")
     protected Integer            period;
-	
-	@Option(name = "-overlap",
+
+    @Option(name = "-overlap",
             description = "Overlap of CRL")
     protected Integer            overlap;
-	
-	@Option(name = "-ewc", aliases = { "--enableWithCerts" },
+
+    @Option(name = "-ewc", aliases = { "--enableWithCerts" },
             description = "Certificates are contained in the CRL, the default is not")
     protected Boolean            enableWithCerts;
-	
-	@Option(name = "-dwc", aliases = { "--disableWithCerts" },
+
+    @Option(name = "-dwc", aliases = { "--disableWithCerts" },
             description = "Certificates are not contained in the CRL, the default is not")
     protected Boolean            disableWithCerts;
-	
+
     @Override
     protected Object doExecute() throws Exception {
-    	String signerCertConf = null;
-    	if(CAManager.NULL.equalsIgnoreCase(signerCert))
-    	{
-    		signerCertConf = CAManager.NULL;
-    	}
-    	else if(signerCert != null)
-    	{
-    		byte[] certBytes = IoCertUtil.read(signerCert);
-    		IoCertUtil.parseCert(new ByteArrayInputStream(certBytes));
-    		signerCertConf = Base64.toBase64String(certBytes);
-    	}
-    	
-    	if(enableWithCerts != null && disableWithCerts != null )
-    	{
-    		System.err.println("Containing certificates in CRL could not be enabled and disabled at the same time");
-    	}
-    	
-    	Boolean includeCerts = null;
-    	if(enableWithCerts != null || disableWithCerts != null)
-    	{
-    		includeCerts = isEnabled(enableWithCerts, disableWithCerts, false);
-    	}
-    	
-    	caManager.changeCrlSigner(name, signerType, signerConf, signerCertConf, period, overlap, includeCerts);
-    	return null;
+        String signerCertConf = null;
+        if(CAManager.NULL.equalsIgnoreCase(signerCert))
+        {
+            signerCertConf = CAManager.NULL;
+        }
+        else if(signerCert != null)
+        {
+            byte[] certBytes = IoCertUtil.read(signerCert);
+            IoCertUtil.parseCert(new ByteArrayInputStream(certBytes));
+            signerCertConf = Base64.toBase64String(certBytes);
+        }
+
+        if(enableWithCerts != null && disableWithCerts != null )
+        {
+            System.err.println("Containing certificates in CRL could not be enabled and disabled at the same time");
+        }
+
+        Boolean includeCerts = null;
+        if(enableWithCerts != null || disableWithCerts != null)
+        {
+            includeCerts = isEnabled(enableWithCerts, disableWithCerts, false);
+        }
+
+        caManager.changeCrlSigner(name, signerType, signerConf, signerCertConf, period, overlap, includeCerts);
+        return null;
     }
 }

@@ -24,54 +24,54 @@ import org.bouncycastle.crypto.RuntimeCryptoException;
 import org.xipki.security.common.ParamChecker;
 
 public class X509CertificateWithMetaInfo {
-	private final X509Certificate cert;
-	private final String subject;
-	private final byte[] encodedCert;
-	
-	public X509CertificateWithMetaInfo(X509Certificate cert)
-	{
-		this(cert, null);
-	}
-	
-	public X509CertificateWithMetaInfo(X509Certificate cert, byte[] encodedCert)
-	{
-		ParamChecker.assertNotNull("cert", cert);
+    private final X509Certificate cert;
+    private final String subject;
+    private final byte[] encodedCert;
 
-		this.cert = cert;
-		
-		this.subject = cert.getSubjectX500Principal().getName();
-				
-		if(encodedCert == null)
-		{
-			try {
-				this.encodedCert = cert.getEncoded();
-			} catch (CertificateEncodingException e) {
-				throw new RuntimeCryptoException("could not encode certificate: " + e.getMessage());
-			}
-		}
-		else
-		{
-			this.encodedCert = encodedCert;
-		}
-	}
+    public X509CertificateWithMetaInfo(X509Certificate cert)
+    {
+        this(cert, null);
+    }
 
-	public X509Certificate getCert() {
-		return cert;
-	}
+    public X509CertificateWithMetaInfo(X509Certificate cert, byte[] encodedCert)
+    {
+        ParamChecker.assertNotNull("cert", cert);
 
-	public byte[] getEncodedCert() {
-		return encodedCert;
-	}	
-	
-	public String getSubject()
-	{
-		return subject;
-	}
-	
-	@Override
-	public String toString()
-	{
-		return cert.toString();
-	}
+        this.cert = cert;
+
+        this.subject = cert.getSubjectX500Principal().getName();
+
+        if(encodedCert == null)
+        {
+            try {
+                this.encodedCert = cert.getEncoded();
+            } catch (CertificateEncodingException e) {
+                throw new RuntimeCryptoException("could not encode certificate: " + e.getMessage());
+            }
+        }
+        else
+        {
+            this.encodedCert = encodedCert;
+        }
+    }
+
+    public X509Certificate getCert() {
+        return cert;
+    }
+
+    public byte[] getEncodedCert() {
+        return encodedCert;
+    }
+
+    public String getSubject()
+    {
+        return subject;
+    }
+
+    @Override
+    public String toString()
+    {
+        return cert.toString();
+    }
 
 }

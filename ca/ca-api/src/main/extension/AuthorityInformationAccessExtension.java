@@ -20,15 +20,15 @@ package lca.ca.profile.extension;
 import java.util.Set;
 
 public class AuthorityInformationAccessExtension extends ExtensionConf {
-	private Set<String> accessMethods;
-	
-	public Set<String> getAccessMethods()
-	{
-		return accessMethods;
-	}
-	
-	public void setAccessMethods(Set<String> accessMethods) {
-		this.accessMethods = accessMethods;
-	}
+    private Set<String> accessMethods;
+
+    public Set<String> getAccessMethods()
+    {
+        return accessMethods;
+    }
+
+    public void setAccessMethods(Set<String> accessMethods) {
+        this.accessMethods = accessMethods;
+    }
 
 }

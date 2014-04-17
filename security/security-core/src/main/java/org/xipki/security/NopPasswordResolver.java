@@ -21,15 +21,15 @@ import org.xipki.security.api.PasswordResolver;
 import org.xipki.security.api.PasswordResolverException;
 
 public class NopPasswordResolver implements PasswordResolver {
-	
-	public static NopPasswordResolver INSTANCE = new NopPasswordResolver();
-	
-	private NopPasswordResolver()
-	{		
-	}
-	
-	public char[] resolvePassword(String passwordHint) throws PasswordResolverException
-	{
-		return passwordHint.toCharArray();
-	}
+
+    public static NopPasswordResolver INSTANCE = new NopPasswordResolver();
+
+    private NopPasswordResolver()
+    {
+    }
+
+    public char[] resolvePassword(String passwordHint) throws PasswordResolverException
+    {
+        return passwordHint.toCharArray();
+    }
 }
