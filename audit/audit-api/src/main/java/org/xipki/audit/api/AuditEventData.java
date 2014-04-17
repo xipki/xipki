@@ -22,8 +22,8 @@ import java.util.Date;
 
 public class AuditEventData
 {
-	public static final int STRING_MAX_LENGTH = 255;
-    
+    public static final int STRING_MAX_LENGTH = 255;
+
     private final String name;
 
     private final AuditEventDataType eventDataType;
@@ -38,17 +38,17 @@ public class AuditEventData
 
     public AuditEventData(final String name, final byte[] value)
     {
-    	if(name == null || name.isEmpty())
-    	{
-    		throw new IllegalArgumentException("name could not be null");
-    	}
-    	if(value == null)
-    	{
-    		throw new IllegalArgumentException("value could not be null");
-    	}
-    	
-        eventDataType = AuditEventDataType.BINARY;        
-        
+        if(name == null || name.isEmpty())
+        {
+            throw new IllegalArgumentException("name could not be null");
+        }
+        if(value == null)
+        {
+            throw new IllegalArgumentException("value could not be null");
+        }
+
+        eventDataType = AuditEventDataType.BINARY;
+
         this.name = name;
         this.numberValue = null;
         this.textValue = null;
@@ -58,16 +58,16 @@ public class AuditEventData
 
     public AuditEventData(final String name, final Date value)
     {
-    	if(name == null || name.isEmpty())
-    	{
-    		throw new IllegalArgumentException("name could not be null");
-    	}
-    	if(value == null)
-    	{
-    		throw new IllegalArgumentException("value could not be null");
-    	}
+        if(name == null || name.isEmpty())
+        {
+            throw new IllegalArgumentException("name could not be null");
+        }
+        if(value == null)
+        {
+            throw new IllegalArgumentException("value could not be null");
+        }
 
-    	eventDataType = AuditEventDataType.TIMESTAMP;
+        eventDataType = AuditEventDataType.TIMESTAMP;
 
         this.name = name;
         this.numberValue = null;
@@ -78,14 +78,14 @@ public class AuditEventData
 
     public AuditEventData(final String name, final Double value)
     {
-    	if(name == null || name.isEmpty())
-    	{
-    		throw new IllegalArgumentException("name could not be null");
-    	}
-    	if(value == null)
-    	{
-    		throw new IllegalArgumentException("value could not be null");
-    	}
+        if(name == null || name.isEmpty())
+        {
+            throw new IllegalArgumentException("name could not be null");
+        }
+        if(value == null)
+        {
+            throw new IllegalArgumentException("value could not be null");
+        }
 
         eventDataType = AuditEventDataType.NUMBER;
         this.name = name;
@@ -97,14 +97,14 @@ public class AuditEventData
 
     public AuditEventData(final String name, final String value)
     {
-    	if(name == null || name.isEmpty())
-    	{
-    		throw new IllegalArgumentException("name could not be null");
-    	}
-    	if(value == null)
-    	{
-    		throw new IllegalArgumentException("value could not be null");
-    	}
+        if(name == null || name.isEmpty())
+        {
+            throw new IllegalArgumentException("name could not be null");
+        }
+        if(value == null)
+        {
+            throw new IllegalArgumentException("value could not be null");
+        }
 
         eventDataType = AuditEventDataType.TEXT;
         this.name = name;

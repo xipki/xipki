@@ -19,21 +19,21 @@ package org.xipki.security.api;
 
 public class CryptException extends Exception {
 
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	public CryptException() {
-		super();
-	}
+    public CryptException() {
+        super();
+    }
 
-	public CryptException(String message, Throwable cause) {
-		super(message, cause);
-	}
+    public CryptException(String message, Throwable cause) {
+        super(message, cause);
+    }
 
-	public CryptException(String message) {
-		super(message);
-	}
+    public CryptException(String message) {
+        super(message);
+    }
 
-	public CryptException(Throwable cause) {
-		super(cause);
-	}
+    public CryptException(Throwable cause) {
+        super(cause);
+    }
 }

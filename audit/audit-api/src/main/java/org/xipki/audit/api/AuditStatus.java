@@ -19,17 +19,17 @@ package org.xipki.audit.api;
 
 public enum AuditStatus
 {
-    SUCCESSFUL(0), 
-    FAILED(1), 
-    OK(2), 
-    ERROR(3), 
-    DENIED(4), 
-    GRANTED(5), 
+    SUCCESSFUL(0),
+    FAILED(1),
+    OK(2),
+    ERROR(3),
+    DENIED(4),
+    GRANTED(5),
     UNDEFINED(6);
 
     private final int value;
 
-    private AuditStatus(final int value) 
+    private AuditStatus(final int value)
     {
         this.value = value;
     }

@@ -72,24 +72,24 @@ class RSADigestSignatureSpi
         PublicKey publicKey)
         throws InvalidKeyException
     {
-    	throw new UnsupportedOperationException("engineVerify unsupported");
+        throw new UnsupportedOperationException("engineVerify unsupported");
     }
 
     protected void engineInitSign(
         PrivateKey privateKey)
         throws InvalidKeyException
     {
-    	if(privateKey instanceof P11PrivateKey == false)
-    	{
-    		throw new InvalidKeyException("privateKey is not instanceof " + P11PrivateKey.class.getName());
-    	}
-    	
-    	String algo = privateKey.getAlgorithm();
-    	if("RSA".equals(algo) == false)
-    	{
-    		throw new InvalidKeyException("privateKey is not an RSA private key: " + algo);
-    	}
-    	
+        if(privateKey instanceof P11PrivateKey == false)
+        {
+            throw new InvalidKeyException("privateKey is not instanceof " + P11PrivateKey.class.getName());
+        }
+
+        String algo = privateKey.getAlgorithm();
+        if("RSA".equals(algo) == false)
+        {
+            throw new InvalidKeyException("privateKey is not an RSA private key: " + algo);
+        }
+
         digest.reset();
         this.signingKey = (P11PrivateKey) privateKey;
     }
@@ -104,7 +104,7 @@ class RSADigestSignatureSpi
     protected void engineUpdate(
         byte[]  b,
         int     off,
-        int     len) 
+        int     len)
         throws SignatureException
     {
         digest.update(b, off, len);
@@ -134,10 +134,10 @@ class RSADigestSignatureSpi
     }
 
     protected boolean engineVerify(
-        byte[]  sigBytes) 
+        byte[]  sigBytes)
         throws SignatureException
     {
-    	throw new UnsupportedOperationException("engineVerify unsupported");
+        throw new UnsupportedOperationException("engineVerify unsupported");
     }
 
     protected void engineSetParameter(

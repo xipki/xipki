@@ -28,23 +28,23 @@ public class XiPKISunECProvider
 {
   public static final String NAME = "XiPKI-SunEC";
   public static final double VERSION = 1.0;
-  
+
 
   public XiPKISunECProvider()
   {
     super(
-    	NAME,
-    	VERSION,
-    	NAME + " (version " + VERSION + ")"
+        NAME,
+        VERSION,
+        NAME + " (version " + VERSION + ")"
     );
 
     AccessController.doPrivileged(new PrivilegedAction<Object>() {
         public Object run() {
-        	put("AlgorithmParameters.EC", ECParameters.class.getName());
+            put("AlgorithmParameters.EC", ECParameters.class.getName());
             return null;
           }
         }
       );
   }  // constructor
 
-} 
+}

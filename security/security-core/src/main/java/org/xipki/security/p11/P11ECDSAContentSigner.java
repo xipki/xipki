@@ -37,64 +37,64 @@ import org.xipki.security.common.ParamChecker;
 
 public class P11ECDSAContentSigner implements ContentSigner
 {
-	private static final Logger LOG = LoggerFactory.getLogger(P11ECDSAContentSigner.class);
-	
-	private final AlgorithmIdentifier algorithmIdentifier;
-	private final DigestOutputStream outputStream;
-	
-	private final P11CryptService cryptService;
-	private final PKCS11SlotIdentifier slot;
-	private final Pkcs11KeyIdentifier keyId;
-	
-	public P11ECDSAContentSigner(
-			P11CryptService cryptService,
-			PKCS11SlotIdentifier slot,
-			Pkcs11KeyIdentifier keyId,
-			AlgorithmIdentifier signatureAlgId)
-	throws NoSuchAlgorithmException, OperatorCreationException 
-	{
-		ParamChecker.assertNotNull("slot", slot);
-		ParamChecker.assertNotNull("cryptService", cryptService);
-		ParamChecker.assertNotNull("keyId", keyId);
-		ParamChecker.assertNotNull("signatureAlgId", signatureAlgId);
-		
-		this.slot = slot;
-		this.algorithmIdentifier = signatureAlgId;
-		this.keyId = keyId;
-		this.cryptService = cryptService;
-		
-		AlgorithmIdentifier digAlgId = SignerUtil.extractDigesetAlgorithmIdentifier(signatureAlgId);
-		
-		Digest digest = BcDefaultDigestProvider.INSTANCE.get(digAlgId);
-		
-		this.outputStream = new DigestOutputStream(digest);
-	}
+    private static final Logger LOG = LoggerFactory.getLogger(P11ECDSAContentSigner.class);
 
-	@Override
-	public AlgorithmIdentifier getAlgorithmIdentifier() {
-		return algorithmIdentifier;
-	}
+    private final AlgorithmIdentifier algorithmIdentifier;
+    private final DigestOutputStream outputStream;
 
-	@Override
-	public OutputStream getOutputStream() {
-		outputStream.reset();
-		return outputStream;
-	}
+    private final P11CryptService cryptService;
+    private final PKCS11SlotIdentifier slot;
+    private final Pkcs11KeyIdentifier keyId;
 
-	@Override
-	public byte[] getSignature() {
-		byte[] hashValue = outputStream.digest();
-		try {
-			return cryptService.CKM_ECDSA(hashValue, slot, keyId);
-		} catch (SignerException e) {
-			LOG.warn("SignerException: {}", e.getMessage());
-			LOG.debug("SignerException", e);
-			throw new RuntimeCryptoException("SignerException: " + e.getMessage());
-		} catch (Throwable t) {
-			LOG.warn("Throwable: {}", t.getMessage());
-			LOG.debug("Throwable", t);
-			throw new RuntimeCryptoException("IOException: " + t.getMessage());
-		}
-	}
+    public P11ECDSAContentSigner(
+            P11CryptService cryptService,
+            PKCS11SlotIdentifier slot,
+            Pkcs11KeyIdentifier keyId,
+            AlgorithmIdentifier signatureAlgId)
+    throws NoSuchAlgorithmException, OperatorCreationException
+    {
+        ParamChecker.assertNotNull("slot", slot);
+        ParamChecker.assertNotNull("cryptService", cryptService);
+        ParamChecker.assertNotNull("keyId", keyId);
+        ParamChecker.assertNotNull("signatureAlgId", signatureAlgId);
+
+        this.slot = slot;
+        this.algorithmIdentifier = signatureAlgId;
+        this.keyId = keyId;
+        this.cryptService = cryptService;
+
+        AlgorithmIdentifier digAlgId = SignerUtil.extractDigesetAlgorithmIdentifier(signatureAlgId);
+
+        Digest digest = BcDefaultDigestProvider.INSTANCE.get(digAlgId);
+
+        this.outputStream = new DigestOutputStream(digest);
+    }
+
+    @Override
+    public AlgorithmIdentifier getAlgorithmIdentifier() {
+        return algorithmIdentifier;
+    }
+
+    @Override
+    public OutputStream getOutputStream() {
+        outputStream.reset();
+        return outputStream;
+    }
+
+    @Override
+    public byte[] getSignature() {
+        byte[] hashValue = outputStream.digest();
+        try {
+            return cryptService.CKM_ECDSA(hashValue, slot, keyId);
+        } catch (SignerException e) {
+            LOG.warn("SignerException: {}", e.getMessage());
+            LOG.debug("SignerException", e);
+            throw new RuntimeCryptoException("SignerException: " + e.getMessage());
+        } catch (Throwable t) {
+            LOG.warn("Throwable: {}", t.getMessage());
+            LOG.debug("Throwable", t);
+            throw new RuntimeCryptoException("IOException: " + t.getMessage());
+        }
+    }
 
 }

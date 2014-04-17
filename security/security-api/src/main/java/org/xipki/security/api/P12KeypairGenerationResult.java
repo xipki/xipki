@@ -21,18 +21,18 @@ import org.bouncycastle.cert.X509CertificateHolder;
 
 public class P12KeypairGenerationResult extends KeypairGenerationResult
 {
-	private final byte[] keystore;
-	
-	public P12KeypairGenerationResult(
-			byte[] keystore, 
-			X509CertificateHolder certificate) 
-	{
-		super(certificate);
-		this.keystore = keystore;
-	}
+    private final byte[] keystore;
 
-	public byte[] getKeystore() {
-		return keystore;
-	}
-	
+    public P12KeypairGenerationResult(
+            byte[] keystore,
+            X509CertificateHolder certificate)
+    {
+        super(certificate);
+        this.keystore = keystore;
+    }
+
+    public byte[] getKeystore() {
+        return keystore;
+    }
+
 }
