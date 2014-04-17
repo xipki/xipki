@@ -861,12 +861,7 @@ public final class RAWorkerImpl extends AbstractRAWorker implements RAWorker
             }
         }
 
-
-
-
         final String caname = getCaNameByIssuer(issuer);
-
-
 
         X509CmpRequestor cmpRequestor = cmpRequestorsMap.get(caname);
 
