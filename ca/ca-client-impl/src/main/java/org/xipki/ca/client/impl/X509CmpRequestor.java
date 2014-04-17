@@ -229,7 +229,7 @@ abstract class X509CmpRequestor extends CmpRequestor
         RevRepContent content = (RevRepContent) respBody.getContent();
         PKIStatusInfo[] statuses = content.getStatus();
         CertId[] revCerts = content.getRevCerts();
-        if(statuses.length < revCerts.length)
+        if(revCerts != null && statuses.length < revCerts.length)
         {
             LOG.warn("Status.length (" + statuses.length + ") < " + "RevCerts.length (" + revCerts.length + "), ignore the revCerts");
         }
