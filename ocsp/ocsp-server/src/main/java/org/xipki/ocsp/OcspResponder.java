@@ -637,16 +637,16 @@ public class OcspResponder
                 }
                 else
                 {
-                	certStatusText = "should-not-happen";
+                    certStatusText = "should-not-happen";
                 }
 
                 if(childAuditEvent != null)
                 {
-                	childAuditEvent.setLevel(AuditLevel.INFO);
-                	childAuditEvent.setStatus(AuditStatus.successfull);
-                	childAuditEvent.addEventData(new AuditEventData("certStatus", certStatusText));
+                    childAuditEvent.setLevel(AuditLevel.INFO);
+                    childAuditEvent.setStatus(AuditStatus.successfull);
+                    childAuditEvent.addEventData(new AuditEventData("certStatus", certStatusText));
                 }
-                
+
                 if(LOG.isDebugEnabled())
                 {
                     StringBuilder sb = new StringBuilder();
