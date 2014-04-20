@@ -72,6 +72,10 @@ public class AuditEvent
     public void setLevel(AuditLevel level)
     {
         this.level = level;
+        for(ChildAuditEvent cae : childAuditEvents)
+        {
+            cae.setLevel(null);
+        }
     }
 
     public String getName()
@@ -123,6 +127,12 @@ public class AuditEvent
             ret = eventDatas.get(idx);
         }
         eventDatas.add(eventData);
+
+        for(ChildAuditEvent cae : childAuditEvents)
+        {
+            cae.removeEventData(eventData.getName());
+        }
+
         return ret;
     }
 
@@ -134,6 +144,10 @@ public class AuditEvent
     public void setStatus(AuditStatus status)
     {
         this.status = status;
+        for(ChildAuditEvent cae : childAuditEvents)
+        {
+            cae.setStatus(null);
+        }
     }
 
     public void addChildAuditEvent(ChildAuditEvent childAuditEvent)
@@ -144,36 +158,6 @@ public class AuditEvent
     public boolean containsChildAuditEvents()
     {
         return childAuditEvents.isEmpty() == false;
-    }
-
-    public void cleanChildAuditEvents(boolean cleanAuditLevel, boolean cleanAuditStatus, String... eventDataNames)
-    {
-        if(cleanAuditLevel)
-        {
-            for(ChildAuditEvent childAuditEvent : childAuditEvents)
-            {
-                childAuditEvent.setLevel(null);
-            }
-        }
-
-        if(cleanAuditStatus)
-        {
-            for(ChildAuditEvent childAuditEvent : childAuditEvents)
-            {
-                childAuditEvent.setStatus(null);
-            }
-        }
-
-        if(eventDataNames != null && eventDataNames.length > 0)
-        {
-            for(String eventDataName : eventDataNames)
-            {
-                for(ChildAuditEvent cae : childAuditEvents)
-                {
-                    cae.removeEventData(eventDataName);
-                }
-            }
-        }
     }
 
     public List<AuditEvent> expandAuditEvents()
