@@ -859,7 +859,7 @@ public final class RAWorkerImpl extends AbstractRAWorker implements RAWorker
     {
         final String id = "revcert-1";
         RevocateCertRequestEntryType entry =
-                new RevocateCertRequestEntryType(id, issuer, serial, reason, new Date());
+                new RevocateCertRequestEntryType(id, issuer, serial, reason, null);
         RevocateCertRequestType request = new RevocateCertRequestType();
         request.addRequestEntry(entry);
         Map<String, CertIDOrError> result = revocateCerts(request);

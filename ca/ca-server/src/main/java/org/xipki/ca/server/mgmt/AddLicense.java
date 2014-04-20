@@ -22,6 +22,9 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
+import java.util.Arrays;
+
+import org.xipki.security.common.IoCertUtil;
 
 public class AddLicense
 {
@@ -65,7 +68,10 @@ public class AddLicense
         {
             if(file.isDirectory())
             {
-                addLicenseToDir(file);
+                if(file.getName().equals("target") == false)
+                {
+                    addLicenseToDir(file);
+                }
             }
             else if(file.isFile() && file.getName().endsWith(".java"))
             {
@@ -76,7 +82,6 @@ public class AddLicense
 
     private static void addLicenseToFile(File file) throws Exception
     {
-        System.out.println(file.getPath());
         BufferedReader reader = new BufferedReader(new FileReader(file));
 
         File newFile = new File(file.getPath() + "-new");
@@ -106,7 +111,17 @@ public class AddLicense
             reader.close();
         }
 
-        newFile.renameTo(file);
+        byte[] oldBytes = IoCertUtil.read(file);
+        byte[] newBytes = IoCertUtil.read(newFile);
+        if(Arrays.equals(oldBytes, newBytes) == false)
+        {
+            System.out.println(file.getPath());
+            newFile.renameTo(file);
+        }
+        else
+        {
+            newFile.delete();
+        }
 
     }
 

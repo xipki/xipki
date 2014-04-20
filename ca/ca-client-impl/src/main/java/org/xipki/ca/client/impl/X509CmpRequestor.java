@@ -23,6 +23,7 @@ import java.security.cert.CRLException;
 import java.security.cert.X509CRL;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -553,9 +554,8 @@ abstract class X509CmpRequestor extends CmpRequestor
             certTempBuilder.setIssuer(requestEntry.getIssuer());
             certTempBuilder.setSerialNumber(new ASN1Integer(requestEntry.getSerialNumber()));
 
-            Extension[] extensions = new Extension[2];
-
-            ASN1GeneralizedTime time = new ASN1GeneralizedTime(requestEntry.getInvalidityDate());
+            Date invalidityDate = requestEntry.getInvalidityDate();
+            Extension[] extensions = new Extension[invalidityDate == null ? 1 : 2];
 
             try
             {
@@ -563,8 +563,12 @@ abstract class X509CmpRequestor extends CmpRequestor
                 extensions[0] = new Extension(org.bouncycastle.asn1.x509.X509Extension.reasonCode,
                         true, new DEROctetString(reason.getEncoded()));
 
-                extensions[1] = new Extension(org.bouncycastle.asn1.x509.X509Extension.invalidityDate,
+                if(invalidityDate != null)
+                {
+                    ASN1GeneralizedTime time = new ASN1GeneralizedTime(invalidityDate);
+                    extensions[1] = new Extension(org.bouncycastle.asn1.x509.X509Extension.invalidityDate,
                         true, new DEROctetString(time.getEncoded()));
+                }
             }catch(IOException e)
             {
                 throw new CmpRequestorException(e);

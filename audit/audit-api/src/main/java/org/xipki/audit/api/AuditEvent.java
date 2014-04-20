@@ -17,58 +17,71 @@
 
 package org.xipki.audit.api;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
+import java.util.LinkedList;
+import java.util.List;
 
-public class AuditEvent extends AbstractAuditEvent
+public class AuditEvent
 {
     /**
      * The name of the application the event belongs to.
      */
-    protected String applicationName;
+    private String applicationName;
 
     /**
      * The data array belonging to the event.
      */
-    protected AuditEventData[] eventDatas;
+    private final List<AuditEventData> eventDatas = new LinkedList<AuditEventData>();
 
+    /**
+     * The name of the event type.
+     */
+    private String name;
+
+    /**
+     * The AuditLevel this Event belongs to.
+     */
+    private AuditLevel level;
+
+    /**
+     * Timestamp when the event was saved.
+     */
+    private final Date timestamp;
+
+    private AuditStatus status;
+
+    private final List<ChildAuditEvent> childAuditEvents = new LinkedList<ChildAuditEvent>();
 
     /**
      * Default constructor for jaxb.
      */
-    public AuditEvent()
+    public AuditEvent(Date timestamp)
     {
-        // increment ID counter;
-        id.getAndIncrement();
-        setName(UNDEFINED);
-        setApplicationName(UNDEFINED);
-        setTimeStamp(new Date());
-        setLevel(AuditLevel.INFO);
+        this.timestamp = (timestamp == null) ? new Date() : timestamp;
+        this.level = AuditLevel.INFO;
     }
 
-    /**
-     * Constructor for setting initial parameters.
-     *
-     * @param id
-     *            Event id.
-     * @param name
-     *            Event name.
-     * @param applicationName
-     *            Application name.
-     * @param timeStamp
-     *            Timestamp when the event was saved.
-     * @param eventDatas
-     *            The event data array for this event.
-     */
-    public AuditEvent(final String name, final String applicationName, final Date timeStamp,
-                 final AuditEventData[] eventDatas, final AuditLevel auditLevel)
+    public AuditLevel getLevel()
     {
-        id.getAndIncrement();
-        setName(name);
-        setApplicationName(applicationName);
-        setTimeStamp(timeStamp);
-        setEventDatas(eventDatas);
-        setLevel(auditLevel);
+        return level;
+    }
+
+    public void setLevel(AuditLevel level)
+    {
+        this.level = level;
+    }
+
+    public String getName()
+    {
+        return name;
+    }
+
+    public void setName(final String name)
+    {
+        this.name = name;
     }
 
     public String getApplicationName()
@@ -81,27 +94,126 @@ public class AuditEvent extends AbstractAuditEvent
         this.applicationName = applicationName;
     }
 
-    public AuditEventData[] getEventDatas()
+    public Date getTimestamp()
     {
-        return  Arrays.copyOf(eventDatas, eventDatas.length);
+        return timestamp;
     }
 
-    public void setEventDatas(final AuditEventData[] eventDataArray)
+    public List<AuditEventData> getEventDatas()
     {
-        this.eventDatas =  Arrays.copyOf(eventDataArray, eventDataArray.length);
+        return Collections.unmodifiableList(eventDatas);
     }
 
-    @Override
-    public String toString()
+    public AuditEventData addEventData(AuditEventData eventData)
     {
-        StringBuilder builder = new StringBuilder();
-        builder.append("AuditEvent ")
-                .append("[applicationName=").append(applicationName)
-                .append(", eventDatas=").append(Arrays.toString(eventDatas))
-                .append(", id=").append(getId())
-                .append(", name=").append(name)
-                .append(", timeStamp=").append(timeStamp)
-                .append(", level=").append(level).append("]");
-        return builder.toString();
+        int idx = -1;
+        for(int i = 0; i < eventDatas.size(); i++)
+        {
+            AuditEventData ed = eventDatas.get(i);
+            if(ed.getName().equals(eventData.getName()))
+            {
+                idx = i;
+                break;
+            }
+        }
+
+        AuditEventData ret = null;
+        if(idx != -1)
+        {
+            ret = eventDatas.get(idx);
+        }
+        eventDatas.add(eventData);
+        return ret;
+    }
+
+    public AuditStatus getStatus()
+    {
+        return status;
+    }
+
+    public void setStatus(AuditStatus status)
+    {
+        this.status = status;
+    }
+
+    public void addChildAuditEvent(ChildAuditEvent childAuditEvent)
+    {
+        childAuditEvents.add(childAuditEvent);
+    }
+
+    public boolean containsChildAuditEvents()
+    {
+        return childAuditEvents.isEmpty() == false;
+    }
+
+    public void cleanChildAuditEvents(boolean cleanAuditLevel, boolean cleanAuditStatus, String... eventDataNames)
+    {
+        if(cleanAuditLevel)
+        {
+            for(ChildAuditEvent childAuditEvent : childAuditEvents)
+            {
+                childAuditEvent.setLevel(null);
+            }
+        }
+
+        if(cleanAuditStatus)
+        {
+            for(ChildAuditEvent childAuditEvent : childAuditEvents)
+            {
+                childAuditEvent.setStatus(null);
+            }
+        }
+
+        if(eventDataNames != null && eventDataNames.length > 0)
+        {
+            for(String eventDataName : eventDataNames)
+            {
+                for(ChildAuditEvent cae : childAuditEvents)
+                {
+                    cae.removeEventData(eventDataName);
+                }
+            }
+        }
+    }
+
+    public List<AuditEvent> expandAuditEvents()
+    {
+        int size = childAuditEvents.size();
+        if(size == 0)
+        {
+            return Arrays.asList(this);
+        }
+
+        List<AuditEvent> expandedEvents = new ArrayList<AuditEvent>(size);
+        for(int i = 0; i < size; i++)
+        {
+            ChildAuditEvent child = childAuditEvents.get(i);
+            AuditEvent event = new AuditEvent(timestamp);
+            event.setApplicationName(applicationName);
+            event.setName(name);
+            if(child.getLevel() != null)
+            {
+                event.setLevel(child.getLevel());
+            }
+
+            if(child.getStatus() != null)
+            {
+                event.setStatus(child.getStatus());
+            }
+
+            for(AuditEventData eventData : eventDatas)
+            {
+                event.addEventData(eventData);
+            }
+
+            for(AuditEventData eventData : child.getEventDatas())
+            {
+                event.addEventData(eventData);
+            }
+
+            expandedEvents.add(event);
+        }
+
+        return expandedEvents;
     }
 }

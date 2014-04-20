@@ -32,13 +32,10 @@
 		<bundle>mvn:org.bouncycastle/bcprov-jdk15on/${bc.version}</bundle>
 		<bundle>mvn:org.bouncycastle/bcpkix-jdk15on/${bc.version}</bundle>
 	</feature>
-	<feature name="commons-dbcp" version="${project.version}" resolver="(obr)">
+	<feature name="xipki-datasource" version="${project.version}" resolver="(obr)">
 		<bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.commons-pool/1.5.4_4</bundle>
 		<bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.commons-dbcp/1.4_3</bundle>
 		<bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.commons-lang/2.4_6</bundle>
-	</feature>
-	<feature name="xipki-datasource" version="${project.version}" resolver="(obr)">
-		<feature>commons-dbcp</feature>
 		<bundle>mvn:org.xipki/security-common/${project.version}</bundle>
 		<bundle>mvn:org.xipki/datasource-api/${project.version}</bundle>
 		<bundle>mvn:org.xipki/datasource-impl/${project.version}</bundle>
@@ -72,6 +69,7 @@
 		<feature>xipki-datasource</feature>
 		<feature>xipki-security</feature>
 		<feature>xipki-ca-api</feature>
+		<bundle>mvn:org.xipki/audit-api/${project.version}</bundle>
 		<bundle>mvn:org.xipki/ca-cmp/${project.version}</bundle>
 		<bundle>mvn:org.xipki/ca-server/${project.version}</bundle>
 	</feature>
@@ -81,6 +79,7 @@
 	</feature>
 	<feature name="xipki-caclient" version="${project.version}" resolver="(obr)">
 		<feature>xipki-security</feature>
+		<bundle>mvn:org.xipki/audit-api/${project.version}</bundle>
 		<bundle>mvn:org.xipki/ca-cmp/${project.version}</bundle>
 		<bundle>mvn:org.xipki/ca-common/${project.version}</bundle>
 		<bundle>mvn:org.xipki/ca-api/${project.version}</bundle>
@@ -101,6 +100,7 @@
 		<feature>xipki-datasource</feature>
 		<feature>xipki-security</feature>
 		<bundle>mvn:org.xipki/ocsp-api/${project.version}</bundle>
+		<bundle>mvn:org.xipki/audit-api/${project.version}</bundle>
 		<bundle>mvn:org.xipki/ocsp-server/${project.version}</bundle>
 	</feature>
 	<feature name="xipki-ocspclient" version="${project.version}" resolver="(obr)">
@@ -117,5 +117,10 @@
 		<feature>xipki-datasource</feature>
 		<bundle>mvn:org.xipki/database-tool/${project.version}</bundle>
 	</feature>
+
+        <feature name="xipki-audit-slf4j" version="${project.version}" resolver="(obr)">
+                <bundle>mvn:org.xipki/audit-api/${project.version}</bundle>
+                <bundle>mvn:org.xipki/slf4j-audit-impl/${project.version}</bundle>
+        </feature>
 
 </features>
