@@ -88,6 +88,7 @@ public class Rfc6712Servlet extends HttpServlet
             {
                 response.setContentLength(0);
                 response.setStatus(HttpServletResponse.SC_UNSUPPORTED_MEDIA_TYPE);
+
                 auditStatus = AuditStatus.failed;
                 auditMessage = "unsupporte media type " + request.getContentType();
                 return;
