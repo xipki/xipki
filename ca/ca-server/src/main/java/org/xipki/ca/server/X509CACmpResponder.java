@@ -113,7 +113,7 @@ public class X509CACmpResponder extends CmpResponder
     private final PendingCertificatePool pendingCertPool;
 
     private final X509CA ca;
-    
+
     private static final String[] crlreasonString =
     {
         "unspecified", "keyCompromise", "cACompromise", "affiliationChanged",
@@ -580,7 +580,7 @@ public class X509CACmpResponder extends CmpResponder
                         if(childAuditEvent != null && originalProfileConf != null)
                         {
                             childAuditEvent.addEventData(new AuditEventData("origCertprofile",
-                            		originalProfileConf.getProfileName()));
+                                    originalProfileConf.getProfileName()));
                         }
 
                         certResponses[i] = generateCertificate(_requestor, user, tid, certReqId,
@@ -969,22 +969,22 @@ public class X509CACmpResponder extends CmpResponder
             extValue = crlDetails.getExtensionParsedValue(extId);
             if(extValue != null)
             {
-	            try
-	            {
-	                invalidityDate = ((ASN1GeneralizedTime) extValue).getDate();
-	            } catch (ParseException e)
-	            {
-	                String errMsg = "invalid extension " + extId.getId();
-	                LOG.warn(errMsg);
-	                PKIStatusInfo status = generateCmpRejectionStatus(PKIFailureInfo.unacceptedExtension, errMsg);
-	                repContentBuilder.add(status);
-	                continue;
-	            }
+                try
+                {
+                    invalidityDate = ((ASN1GeneralizedTime) extValue).getDate();
+                } catch (ParseException e)
+                {
+                    String errMsg = "invalid extension " + extId.getId();
+                    LOG.warn(errMsg);
+                    PKIStatusInfo status = generateCmpRejectionStatus(PKIFailureInfo.unacceptedExtension, errMsg);
+                    repContentBuilder.add(status);
+                    continue;
+                }
 
-	            if(childAuditEvent != null)
-	            {
-	                childAuditEvent.addEventData(new AuditEventData("invalidityDate", invalidityDate));
-	            }
+                if(childAuditEvent != null)
+                {
+                    childAuditEvent.addEventData(new AuditEventData("invalidityDate", invalidityDate));
+                }
             }
 
             int revocationResult = ca.revocateCertificate(
