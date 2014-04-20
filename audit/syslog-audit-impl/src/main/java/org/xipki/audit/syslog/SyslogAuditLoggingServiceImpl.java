@@ -20,6 +20,7 @@ package org.xipki.audit.syslog;
 import java.nio.charset.Charset;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,6 +28,7 @@ import org.xipki.audit.api.AuditEvent;
 import org.xipki.audit.api.AuditEventData;
 import org.xipki.audit.api.AuditEventDataType;
 import org.xipki.audit.api.AuditLoggingService;
+import org.xipki.audit.api.AuditStatus;
 import org.xipki.audit.api.PCIAuditEvent;
 
 import com.nesscomputing.syslog4j.Syslog;
@@ -43,6 +45,7 @@ import com.nesscomputing.syslog4j.util.SyslogUtility;
 public class SyslogAuditLoggingServiceImpl implements AuditLoggingService
 {
     private static final Logger LOG = LoggerFactory.getLogger(SyslogAuditLoggingServiceImpl.class);
+
     private static final DateFormat df = new SimpleDateFormat("yyyy.MM.dd '-' HH:mm:ss.SSS z");
 
     /**
@@ -72,24 +75,24 @@ public class SyslogAuditLoggingServiceImpl implements AuditLoggingService
     private String protocol = DEFAULT_SYSLOG_PROTOCOL;
     private String facility = DEFAULT_SYSLOG_FACILITY;
 
-    private boolean               useThreading            = false;
-    private boolean               useStructuredData       = false;
-    private boolean               useSequenceNumbers      = false;
-    private boolean               truncateMessage         = false;
+    private boolean useThreading;
+    private boolean useStructuredData;
+    private boolean useSequenceNumbers;
+    private boolean truncateMessage;
 
-    private int                   threadLoopInterval;
-    private int                   writeRetries;
-    private int                   maxMessageLength;
-    private int                   maxShutdownWait;
+    private int threadLoopInterval;
+    private int writeRetries;
+    private int maxMessageLength;
+    private int maxShutdownWait;
 
-    private String                ident                   = null;
-    private String                localName               = null;
-    private String                charSet                 = null;
-    private String                splitMessageBeginText   = null;
-    private String                splitMessageEndText     = null;
+    private String ident;
+    private String localName;
+    private String charSet;
+    private String splitMessageBeginText;
+    private String splitMessageEndText;
 
-    protected boolean             initialized             = false;
-
+   // private String
+    private boolean initialized;
 
     public SyslogAuditLoggingServiceImpl()
     {
@@ -104,47 +107,19 @@ public class SyslogAuditLoggingServiceImpl implements AuditLoggingService
         }
         init();
 
-        syslog.log(SyslogLevel.forValue(event.getLevel().getValue()), loggingCompatibleEvent(event));
-    }
-
-    public void logEvent(final PCIAuditEvent event)
-    {
-        if(event == null)
-        {
-            return;
-        }
-        init();
-
-        PCISyslogMessage pciMessage = new PCISyslogMessage();
-        pciMessage.setUserId(event.getUserId());
-        pciMessage.setDate(event.getDate());
-        pciMessage.setTime(event.getTime());
-        pciMessage.setEventType(event.getEventType());
-        pciMessage.setOrigination(event.getOrigination());
-        pciMessage.setStatus(event.getStatus());
-        pciMessage.setAffectedResource(event.getAffectedResource());
-
-        this.syslog.log(SyslogLevel.forValue(event.getLevel().getValue()), pciMessage);
-    }
-
-    /**
-     * The event to be logged has to be transformed to a human readable format.
-     *
-     * @param event
-     *            The event to be transformed.
-     * @return The string representation of the event.
-     */
-    private String loggingCompatibleEvent(final AuditEvent event)
-    {
         StringBuilder sb = new StringBuilder();
         sb.append(event.getApplicationName()).append(" - ").append(event.getName());
-
-        AuditEventData[] eventDataArray = event.getEventDatas();
-
-        if ((eventDataArray != null) && (eventDataArray.length > 0))
+        AuditStatus status = event.getStatus();
+        if(status == null)
         {
-            sb.append(":");
+        	status = AuditStatus.undefined;
+        }
+        sb.append(":\tstatus: ").append(status.name());
 
+        List<AuditEventData> eventDataArray = event.getEventDatas();
+
+        if ((eventDataArray != null) && (eventDataArray.size() > 0))
+        {
             for (AuditEventData element : eventDataArray)
             {
                 sb.append("\t");
@@ -155,7 +130,7 @@ public class SyslogAuditLoggingServiceImpl implements AuditLoggingService
                 switch(eventDataType)
                 {
                 case BINARY:
-                    sb.append(getHexString(element.getBinaryValue()));
+                    sb.append(toHexString(element.getBinaryValue()));
                     break;
                 case NUMBER:
                     sb.append(element.getNumberValue());
@@ -169,7 +144,63 @@ public class SyslogAuditLoggingServiceImpl implements AuditLoggingService
                 }
             }
         }
-        return sb.toString();
+
+        String msg = sb.toString();
+        syslog.log(SyslogLevel.forValue(event.getLevel().getValue()), msg);
+    }
+
+    public void logEvent(final PCIAuditEvent event)
+    {
+        if(event == null)
+        {
+            return;
+        }
+        init();
+
+        PCISyslogMessage pciMessage = new PCISyslogMessage();
+        String s = event.getUserId();
+        if(s != null)
+        {
+            pciMessage.setUserId(s);
+        }
+
+        s = event.getDate();
+        if(s != null)
+        {
+            pciMessage.setDate(s);
+        }
+
+        s = event.getTime();
+        if(s != null)
+        {
+            pciMessage.setTime(s);
+        }
+
+        s = event.getEventType();
+        if(s != null)
+        {
+            pciMessage.setEventType(s);
+        }
+
+        s = event.getOrigination();
+        if(s != null)
+        {
+            pciMessage.setOrigination(s);
+        }
+
+        s = event.getStatus();
+        if(s != null)
+        {
+            pciMessage.setStatus(s);
+        }
+
+        s = event.getAffectedResource();
+        if(s != null)
+        {
+            pciMessage.setAffectedResource(s);
+        }
+
+        this.syslog.log(SyslogLevel.forValue(event.getLevel().getValue()), pciMessage);
     }
 
     public void init()
@@ -389,7 +420,7 @@ public class SyslogAuditLoggingServiceImpl implements AuditLoggingService
     }
 
     private static final char[] HEX_CHAR_TABLE = "0123456789ABCDEF".toCharArray();
-    private static String getHexString(final byte[] raw)
+    private static String toHexString(byte[] raw)
     {
         StringBuilder sb = new StringBuilder();
         for (byte b : raw)

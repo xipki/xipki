@@ -17,269 +17,86 @@
 
 package org.xipki.audit.api;
 
-import java.io.Serializable;
-import java.util.Arrays;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.List;
-import java.util.Map;
 
 /**
- * Provides a default implementation of {@link PCIAuditEvent}  that is logged or to be logged in the future.
+ * This file is copied from PCSSyslogMessage from syslog4j.org
  *
- * {@link PCIAuditEvent} provides support for audit trails defined by section
- * 10.3 of the PCI Data Security Standard (PCI DSS) version 3.0 Nov. 2013.
- *
- * <p>More information on the PCI DSS specification is available here:</p>
- *
- * <p><a href="https://www.pcisecuritystandards.org/security_standards/pci_dss.shtml">PCI_DSS</a></p>
- *
- * <p>The PCI DSS specification is Copyright 2006-2013 PCI Security Standards
- * Council LLC.</p>
- *
- * $Id$
- *
- */
-public class PCIAuditEvent extends AuditEvent
+* PCISyslogMessage provides support for audit trails defined by section
+* 10.3 of the PCI Data Security Standard (PCI DSS) versions 1.1 and 1.2.
+*
+* <p>More information on the PCI DSS specification is available here:</p>
+*
+* <p>https://www.pcisecuritystandards.org/security_standards/pci_dss.shtml</p>
+*
+* <p>The PCI DSS specification is Copyright 2008 PCI Security Standards
+* Council LLC.</p>
+*
+* <p>Syslog4j is licensed under the Lesser GNU Public License v2.1.  A copy
+* of the LGPL license is available in the META-INF folder in all
+* distributions of Syslog4j and in the base directory of the "doc" ZIP.</p>
+*
+* @author &lt;syslog4j@productivity.org&gt;
+* @version $Id: PCISyslogMessage.java,v 1.3 2008/11/14 04:32:00 cvs Exp $
+*/
+public class PCIAuditEvent
 {
-    public static final String USER_ID              = "userId";
-    public static final String EVENT_TYPE           = "eventType";
-    public static final String DATE                 = "date";
-    public static final String TIME                 = "time";
-    public static final String STATUS               = "status";
-    public static final String ORIGINATION          = "origination";
+    public static final String UNDEFINED = "undefined";
+
+    public static final String DEFAULT_DATE_FORMAT = "yyyy/MM/dd";
+    public static final String DEFAULT_TIME_FORMAT = "HH:mm:ss";
+
+    public static final char DEFAULT_DELIMITER = ' ';
+    public static final String DEFAULT_REPLACE_DELIMITER = "_";
+
+    public static final String USER_ID                = "userId";
+    public static final String EVENT_TYPE            = "eventType";
+    public static final String DATE                    = "date";
+    public static final String TIME                    = "time";
+    public static final String STATUS                = "status";
+    public static final String ORIGINATION            = "origination";
     public static final String AFFECTED_RESOURCE    = "affectedResource";
 
-    public static final String AUDIT_LEVEL          = "level";
-    public static final String APPLICATION_NAME     = "applicationName";
-    public static final String EVENT_DATA           = "eventData";
-    public static final String EVENT_NAME           = "eventName";
-
-    public static final String SYSTEM_USER          = "SYSTEM";
-
-    // 10.3.1 "User Identification"
-    protected String          userId           = UNDEFINED;
-
-    // 10.3.2 "Type of event"
-    protected String          eventType        = UNDEFINED;
-
-    // 10.3.3 "Date and time" (date)
-    protected String          date             = null;
-
-    // 10.3.3 "Date and time" (time)
-    protected String          time             = null;
-
-    // 10.3.4 "Success or failure indication"
-    protected String          status           = UNDEFINED;
-
-    // 10.3.5 "Origination of Event"
-    protected String          origination      = null;
-
-    // 10.3.6 "Identity or name of affected data, system component, or resource"
-    protected String          affectedResource = UNDEFINED;
+    private String userId = UNDEFINED;            // 10.3.1 "User Identification"
+    private String eventType = UNDEFINED;        // 10.3.2 "Type of event"
+    private final String date;            // 10.3.3 "Date and time" (date)
+    private final String time;            // 10.3.3 "Date and time" (time)
+    private String status = UNDEFINED;            // 10.3.4 "Success or failure indication"
+    private String origination = null;            // 10.3.5 "Origination of Event"
+    private String affectedResource = UNDEFINED;    // 10.3.6 "Identity or name of affected data, system component, or resource"
 
     /**
-     * Default constructor for jaxb.
+     * The AuditLevel this Event belongs to.
      */
-    public PCIAuditEvent()
+    private AuditLevel level;
+
+    public PCIAuditEvent(Date date)
     {
-        id.getAndIncrement();
+        this.date = new SimpleDateFormat(DEFAULT_DATE_FORMAT).format(date);
+        this.time = new SimpleDateFormat(DEFAULT_TIME_FORMAT).format(date);
+        this.level = AuditLevel.INFO;
     }
 
-    public PCIAuditEvent(PCIAuditEvent event)
+    public AuditLevel getLevel()
     {
-        init(event);
+        return level;
     }
 
-    public PCIAuditEvent(Map<String, Serializable> fields)
+    public void setLevel(AuditLevel level)
     {
-        init(fields);
+        this.level = level;
     }
-
-    /**
-     * Constructor for setting initial parameters.
-     *
-     * @param name
-     *            Event name.
-     * @param applicationName
-     *            Application name.
-     * @param timeStamp
-     *            Timestamp when the event was saved.
-     * @param eventDatas
-     *            The event data array for this event.
-     */
-    public PCIAuditEvent(final String name, final String applicationName, final Date timeStamp,
-                 final AuditEventData[] eventDatas)
-    {
-        id.getAndIncrement();
-        setName(name);
-        setApplicationName(applicationName);
-        setTimeStamp(timeStamp);
-        setEventDatas(eventDatas);
-    }
-
-
-    public PCIAuditEvent(String userId, String eventType, String status, String affectedResource)
-    {
-        this.userId = userId;
-        this.eventType = eventType;
-        this.status = status;
-        this.affectedResource = affectedResource;
-    }
-
-    public PCIAuditEvent(String userId, String eventType, String status, String origination,
-            String affectedResource)
-    {
-        this.userId = userId;
-        this.eventType = eventType;
-        this.status = status;
-        this.origination = origination;
-        this.affectedResource = affectedResource;
-    }
-
-    public PCIAuditEvent(String userId, String eventType, String date, String time,
-            String status, String affectedResource)
-    {
-        this.userId = userId;
-        this.eventType = eventType;
-        this.date = date;
-        this.time = time;
-        this.status = status;
-        this.affectedResource = affectedResource;
-    }
-
-    public PCIAuditEvent(String userId, String eventType, String date, String time,
-            String status, String origination, String affectedResource)
-    {
-        this.userId = userId;
-        this.eventType = eventType;
-        this.date = date;
-        this.time = time;
-        this.status = status;
-        this.origination = origination;
-        this.affectedResource = affectedResource;
-    }
-
-    public PCIAuditEvent(String userId, String eventType, Date date, String status,
-            String affectedResource)
-    {
-        this.userId = userId;
-        this.eventType = eventType;
-
-        String[] dateAndTime = generateDateAndTime(date);
-        this.date = dateAndTime[0];
-        this.time = dateAndTime[1];
-
-        this.status = status;
-        this.affectedResource = affectedResource;
-    }
-
-    public PCIAuditEvent(String userId, String eventType, Date date, String status,
-            String origination, String affectedResource)
-    {
-
-        this.userId = userId;
-        this.eventType = eventType;
-
-        String[] dateAndTime = generateDateAndTime(date);
-        this.date = dateAndTime[0];
-        this.time = dateAndTime[1];
-
-        this.status = status;
-        this.origination = origination;
-        this.affectedResource = affectedResource;
-    }
-
-
-    protected void init(PCIAuditEvent event)
-    {
-        id.getAndIncrement();
-
-        setUserId(event.getUserId());
-        setEventType(event.getEventType());
-        setDate(event.getDate());
-        setTime(event.getTime());
-        setStatus(event.getStatus());
-        setOrigination(event.getOrigination());
-        setAffectedResource(event.getAffectedResource());
-        setLevel(event.getLevel());
-        setName(event.getName());
-        setApplicationName(event.getApplicationName());
-        setEventDatas(eventDatas);
-    }
-
-
-    protected void init(Map<String, Serializable> fields)
-    {
-        id.getAndIncrement();
-
-        if (fields.containsKey(APPLICATION_NAME))
-        {
-            this.applicationName = (String) fields.get(APPLICATION_NAME);
-        }
-
-        if (fields.containsKey(EVENT_NAME))
-        {
-            this.name = (String) fields.get(EVENT_NAME);
-        }
-
-        if (fields.containsKey(EVENT_DATA) && fields.get(EVENT_DATA) instanceof AuditEventData[])
-        {
-            setEventDatas((AuditEventData[]) fields.get(EVENT_DATA));
-        }
-
-        if (fields.containsKey(AUDIT_LEVEL) && fields.get(AUDIT_LEVEL) instanceof AuditLevel)
-        {
-            this.level = (AuditLevel) fields.get(AUDIT_LEVEL);
-        }
-
-        if (fields.containsKey(USER_ID))
-        {
-            this.userId = (String) fields.get(USER_ID);
-        }
-
-        if (fields.containsKey(EVENT_TYPE))
-        {
-            this.eventType = (String) fields.get(EVENT_TYPE);
-        }
-
-        if (fields.containsKey(DATE) && fields.get(DATE) instanceof String)
-        {
-            this.date = (String) fields.get(DATE);
-        }
-
-        if (fields.containsKey(DATE) && fields.get(DATE) instanceof Date)
-        {
-            setDate((Date) fields.get(DATE));
-        }
-
-        if (fields.containsKey(TIME))
-        {
-            this.time = (String) fields.get(TIME);
-        }
-
-        if (fields.containsKey(STATUS))
-        {
-            this.status = (String) fields.get(STATUS);
-        }
-
-        if (fields.containsKey(ORIGINATION))
-        {
-            this.origination = (String) fields.get(ORIGINATION);
-        }
-
-        if (fields.containsKey(AFFECTED_RESOURCE))
-        {
-            this.affectedResource = (String) fields.get(AFFECTED_RESOURCE);
-        }
-    }
-
 
     public String getUserId()
     {
         if (isBlank(this.userId))
         {
-            return SYSTEM_USER;
+            return UNDEFINED;
         }
+
         return this.userId;
     }
 
@@ -305,43 +122,12 @@ public class PCIAuditEvent extends AuditEvent
 
     public String getDate()
     {
-        if (isBlank(this.date))
-        {
-            String dateNow = generateDate();
-            return dateNow;
-        }
-
-        return this.date;
-    }
-
-    public void setDate(String date)
-    {
-        this.date = date;
-    }
-
-    public void setDate(Date date)
-    {
-        String[] d = generateDateAndTime(date);
-
-        this.date = d[0];
-        this.time = d[1];
+        return date;
     }
 
     public String getTime()
     {
-        if (isBlank(this.time))
-        {
-            String timeNow = generateTime();
-
-            return timeNow;
-        }
-
-        return this.time;
-    }
-
-    public void setTime(String time)
-    {
-        this.time = time;
+        return time;
     }
 
     public String getStatus()
@@ -391,35 +177,73 @@ public class PCIAuditEvent extends AuditEvent
         this.affectedResource = affectedResource;
     }
 
-    @Override
-    public String toString()
+    public String createMessage()
     {
-        final int maxLen = 10;
-        List<AuditEventData> eventDatasText;
-        if(eventDatas != null)
+        StringBuffer buffer = new StringBuffer();
+
+        char delimiter = DEFAULT_DELIMITER;
+        String replaceDelimiter = DEFAULT_REPLACE_DELIMITER;
+
+        buffer.append(replaceDelimiter(USER_ID,getUserId(),delimiter,replaceDelimiter));
+        buffer.append(delimiter);
+        buffer.append(replaceDelimiter(EVENT_TYPE,getEventType(),delimiter,replaceDelimiter));
+        buffer.append(delimiter);
+        buffer.append(replaceDelimiter(DATE,getDate(),delimiter,replaceDelimiter));
+        buffer.append(delimiter);
+        buffer.append(replaceDelimiter(TIME,getTime(),delimiter,replaceDelimiter));
+        buffer.append(delimiter);
+        buffer.append(replaceDelimiter(STATUS,getStatus(),delimiter,replaceDelimiter));
+        buffer.append(delimiter);
+        buffer.append(replaceDelimiter(ORIGINATION,getOrigination(),delimiter,replaceDelimiter));
+        buffer.append(delimiter);
+        buffer.append(replaceDelimiter(AFFECTED_RESOURCE,getAffectedResource(),delimiter,replaceDelimiter));
+
+        return buffer.toString();
+    }
+
+    public static boolean isBlank(CharSequence cs)
+    {
+        int strLen;
+        if (cs == null || (strLen = cs.length()) == 0)
         {
-            eventDatasText = Arrays.asList(eventDatas).subList(0, Math.min(eventDatas.length, maxLen));
+            return true;
         }
-        else
+        for (int i = 0; i < strLen; i++)
         {
-            eventDatasText = null;
+            if (Character.isWhitespace(cs.charAt(i)) == false)
+            {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private String generateLocalHostName()
+    {
+        String localHostName = UNDEFINED;
+
+        try
+        {
+            localHostName = InetAddress.getLocalHost().getHostName();
+
+        } catch (UnknownHostException uhe)
+        {
+            throw new RuntimeException("While finding host name: ", uhe);
         }
 
-        StringBuilder builder = new StringBuilder();
-        builder.append("PCIAuditEvent ")
-                .append("[userId=").append(userId)
-                .append(", eventType=").append(eventType)
-                .append(", date=").append(date)
-                .append(", time=").append(time)
-                .append(", status=").append(status)
-                .append(", origination=").append(origination)
-                .append(", affectedResource=").append(affectedResource)
-                .append(", applicationName=").append(applicationName)
-                .append(", eventDatas=").append(eventDatasText)
-                .append(", name=").append(name)
-                .append(", level=").append(level)
-                .append(", timeStamp=").append(timeStamp)
-                .append(", id=").append(id).append("]");
-        return builder.toString();
+        return localHostName;
     }
+
+    private String replaceDelimiter(String fieldName, String fieldValue, char delimiter, String replaceDelimiter)
+    {
+        if (replaceDelimiter == null || replaceDelimiter.length() < 1 || fieldValue == null || fieldValue.length() < 1)
+        {
+            return fieldValue;
+        }
+
+        String newFieldValue = fieldValue.replaceAll("\\" + delimiter, replaceDelimiter);
+
+        return newFieldValue;
+    }
+
 }
