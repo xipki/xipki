@@ -18,6 +18,8 @@
 package org.xipki.ocsp;
 
 import java.io.IOException;
+import java.util.Date;
+import java.util.List;
 
 import javax.servlet.ServletException;
 import javax.servlet.ServletInputStream;
@@ -31,6 +33,11 @@ import org.bouncycastle.cert.ocsp.OCSPReq;
 import org.bouncycastle.cert.ocsp.OCSPResp;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xipki.audit.api.AuditEvent;
+import org.xipki.audit.api.AuditEventData;
+import org.xipki.audit.api.AuditLevel;
+import org.xipki.audit.api.AuditLoggingService;
+import org.xipki.audit.api.AuditStatus;
 
 public class Rfc2560Servlet extends HttpServlet
 {
@@ -43,7 +50,10 @@ public class Rfc2560Servlet extends HttpServlet
 
     private int maxRequestLength = 4096;
 
+    private AuditLoggingService auditLoggingService;
+
     private OcspResponder responder;
+
     public Rfc2560Servlet()
     {
     }
@@ -57,13 +67,31 @@ public class Rfc2560Servlet extends HttpServlet
     public void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException
     {
+        AuditEvent auditEvent = null;
+
+        AuditLevel auditLevel = AuditLevel.INFO;
+        AuditStatus auditStatus = AuditStatus.successfull;
+        String auditMessage = null;
+
+        if(auditLoggingService != null)
+        {
+            auditEvent = new AuditEvent(new Date());
+            auditEvent.setApplicationName("OCSP");
+            auditEvent.setName("SYSTEM");
+        }
+
         try
         {
             if(responder == null)
             {
-                LOG.error("responder in servlet not configured");
+                String message = "responder in servlet not configured";
+                LOG.error(message);
                 response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
                 response.setContentLength(0);
+
+                auditLevel = AuditLevel.ERROR;
+                auditStatus = AuditStatus.failed;
+                auditMessage = message;
                 return;
             }
 
@@ -72,7 +100,9 @@ public class Rfc2560Servlet extends HttpServlet
             {
                 response.setContentLength(0);
                 response.setStatus(HttpServletResponse.SC_UNSUPPORTED_MEDIA_TYPE);
-                response.flushBuffer();
+
+                auditStatus = AuditStatus.failed;
+                auditMessage = "unsupporte media type " + request.getContentType();
                 return;
             }
 
@@ -81,7 +111,9 @@ public class Rfc2560Servlet extends HttpServlet
             {
                 response.setContentLength(0);
                 response.setStatus(HttpServletResponse.SC_REQUEST_ENTITY_TOO_LARGE);
-                response.flushBuffer();
+
+                auditStatus = AuditStatus.failed;
+                auditMessage = "request too large";
                 return;
             }
 
@@ -92,12 +124,16 @@ public class Rfc2560Servlet extends HttpServlet
 
             response.setContentType(Rfc2560Servlet.CT_RESPONSE);
 
-            OCSPResp ocspResp = responder.answer(ocspReq);
+            OCSPResp ocspResp = responder.answer(ocspReq, auditEvent);
             if (ocspResp == null)
             {
                 LOG.error("processRequest returned null, this should not happen!");
                 response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
                 response.setContentLength(0);
+
+                auditLevel = AuditLevel.ERROR;
+                auditStatus = AuditStatus.error;
+                auditMessage = "processRequest returned null, this should not happen";
             }
             else
             {
@@ -112,9 +148,55 @@ public class Rfc2560Servlet extends HttpServlet
             LOG.debug("Throwable", t);
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             response.setContentLength(0);
+
+            auditLevel = AuditLevel.ERROR;
+            auditStatus = AuditStatus.error;
+            auditMessage = "internal error";
+        }
+        finally
+        {
+              try
+              {
+                response.flushBuffer();
+            }finally
+            {
+                if(auditEvent != null)
+                {
+                    if(auditLevel != null)
+                    {
+                        auditEvent.setLevel(auditLevel);
+                    }
+
+                    if(auditStatus != null)
+                    {
+                        auditEvent.setStatus(auditStatus);
+                    }
+
+                    if(auditMessage != null)
+                    {
+                        auditEvent.addEventData(new AuditEventData("message", auditMessage));
+                    }
+
+                    auditEvent.addEventData(new AuditEventData("duration",
+                            System.currentTimeMillis() - auditEvent.getTimestamp().getTime()));
+
+                    if(auditEvent.containsChildAuditEvents() == false)
+                    {
+                        auditLoggingService.logEvent(auditEvent);
+                    }
+                    else
+                    {
+                        List<AuditEvent> expandedAuditEvents = auditEvent.expandAuditEvents();
+                        for(AuditEvent event : expandedAuditEvents)
+                        {
+                            auditLoggingService.logEvent(event);
+                        }
+                    }
+                }
+            }
         }
 
-        response.flushBuffer();
+
     }
 
     public int getMaxRequestLength()
@@ -125,6 +207,12 @@ public class Rfc2560Servlet extends HttpServlet
     public void setMaxRequestLength(int maxRequestLength)
     {
         this.maxRequestLength = maxRequestLength;
+    }
+
+
+    public void setAuditLoggingService(AuditLoggingService auditLoggingService)
+    {
+        this.auditLoggingService = auditLoggingService;
     }
 
 }

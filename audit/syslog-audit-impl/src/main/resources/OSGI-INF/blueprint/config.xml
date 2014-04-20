@@ -44,7 +44,7 @@
         </cm:default-properties>
     </cm:property-placeholder>
  
-	<bean id="syslogAuditLoggingServiceImpl" class="org.xipki.audit.syslog.impl.SyslogAuditLoggingServiceImpl"
+	<bean id="syslogAuditLoggingServiceImpl" class="org.xipki.audit.syslog.SyslogAuditLoggingServiceImpl"
 		init-method="init" destroy-method="destroy">
         <property name="charSet" value="${charSet}" />
         <property name="facility" value="${facility}" />

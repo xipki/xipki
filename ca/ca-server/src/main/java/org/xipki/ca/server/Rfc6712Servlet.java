@@ -20,6 +20,8 @@ package org.xipki.ca.server;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URLDecoder;
+import java.util.Date;
+import java.util.List;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -33,6 +35,11 @@ import org.bouncycastle.asn1.cmp.PKIHeaderBuilder;
 import org.bouncycastle.asn1.cmp.PKIMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xipki.audit.api.AuditEvent;
+import org.xipki.audit.api.AuditEventData;
+import org.xipki.audit.api.AuditLevel;
+import org.xipki.audit.api.AuditLoggingService;
+import org.xipki.audit.api.AuditStatus;
 import org.xipki.ca.server.mgmt.CAManager;
 
 public class Rfc6712Servlet extends HttpServlet
@@ -45,6 +52,7 @@ public class Rfc6712Servlet extends HttpServlet
     private static final String CT_RESPONSE = "application/pkixcmp";
 
     private CAManager caManager;
+    private AuditLoggingService auditLoggingService;
 
     public Rfc6712Servlet()
     {
@@ -54,13 +62,25 @@ public class Rfc6712Servlet extends HttpServlet
     public void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException
     {
+        AuditEvent auditEvent = (auditLoggingService != null) ? new AuditEvent(new Date()) : null;
+        auditEvent.setApplicationName("CA");
+        auditEvent.setName("SYSTEM");
+
+        AuditLevel auditLevel = AuditLevel.INFO;
+        AuditStatus auditStatus = null;
+        String auditMessage = null;
         try
         {
             if(caManager == null)
             {
-                LOG.error("caManager in servlet not configured");
+                String message = "caManager in servlet not configured";
+                LOG.error(message);
                 response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
                 response.setContentLength(0);
+
+                auditLevel = AuditLevel.ERROR;
+                auditStatus = AuditStatus.failed;
+                auditMessage = message;
                 return;
             }
 
@@ -68,7 +88,8 @@ public class Rfc6712Servlet extends HttpServlet
             {
                 response.setContentLength(0);
                 response.setStatus(HttpServletResponse.SC_UNSUPPORTED_MEDIA_TYPE);
-                response.flushBuffer();
+                auditStatus = AuditStatus.failed;
+                auditMessage = "unsupporte media type " + request.getContentType();
                 return;
             }
 
@@ -105,18 +126,23 @@ public class Rfc6712Servlet extends HttpServlet
             {
                 if(responder == null)
                 {
-                    LOG.warn("Unknown CA {}", caName);
+                    auditMessage = "Unknown CA " + caName;
+                    LOG.warn(auditMessage);
                 }
                 else
                 {
-                    LOG.warn("CA {} is out of service", caName);
+                    auditMessage = "CA " + caName + " is out of service";
+                    LOG.warn(auditMessage);
                 }
 
                 response.setContentLength(0);
                 response.setStatus(HttpServletResponse.SC_NOT_FOUND);
-                response.flushBuffer();
+
+                auditStatus = AuditStatus.failed;
                 return;
             }
+
+            auditEvent.addEventData(new AuditEventData("CA", responder.getCA().getCAInfo().getName()));
 
             PKIMessage pkiReq = generatePKIMessage(request.getInputStream());
 
@@ -127,7 +153,7 @@ public class Rfc6712Servlet extends HttpServlet
                     reqHeader.getRecipient(), reqHeader.getSender());
             respHeader.setTransactionID(tid);
 
-            PKIMessage pkiResp = responder.processPKIMessage(pkiReq);
+            PKIMessage pkiResp = responder.processPKIMessage(pkiReq, auditEvent);
             byte[] pkiRespBytes = pkiResp.getEncoded("DER");
 
             response.setContentType(Rfc6712Servlet.CT_RESPONSE);
@@ -140,9 +166,52 @@ public class Rfc6712Servlet extends HttpServlet
             LOG.error("Throwable thrown, this should not happen!", t);
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             response.setContentLength(0);
+            auditLevel = AuditLevel.ERROR;
+            auditStatus = AuditStatus.error;
+            auditMessage = "internal error";
         }
+        finally
+        {
+            try
+            {
+                response.flushBuffer();
+            }finally
+            {
+                if(auditEvent != null)
+                {
+                    if(auditLevel != null)
+                    {
+                        auditEvent.setLevel(auditLevel);
+                    }
 
-        response.flushBuffer();
+                    if(auditStatus != null)
+                    {
+                        auditEvent.setStatus(auditStatus);
+                    }
+
+                    if(auditMessage != null)
+                    {
+                        auditEvent.addEventData(new AuditEventData("message", auditMessage));
+                    }
+
+                    auditEvent.addEventData(new AuditEventData("duration",
+                            System.currentTimeMillis() - auditEvent.getTimestamp().getTime()));
+
+                    if(auditEvent.containsChildAuditEvents() == false)
+                    {
+                        auditLoggingService.logEvent(auditEvent);
+                    }
+                    else
+                    {
+                        List<AuditEvent> expandedAuditEvents = auditEvent.expandAuditEvents();
+                        for(AuditEvent event : expandedAuditEvents)
+                        {
+                            auditLoggingService.logEvent(event);
+                        }
+                    }
+                }
+            }
+        }
     }
 
     protected PKIMessage generatePKIMessage(InputStream is) throws IOException
@@ -161,13 +230,13 @@ public class Rfc6712Servlet extends HttpServlet
         }
     }
 
-    public CAManager getCaManager()
-    {
-        return caManager;
-    }
-
     public void setCaManager(CAManager caManager)
     {
         this.caManager = caManager;
+    }
+
+    public void setAuditLoggingService(AuditLoggingService auditLoggingService)
+    {
+        this.auditLoggingService = auditLoggingService;
     }
 }

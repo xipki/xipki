@@ -60,8 +60,14 @@ import org.bouncycastle.cert.ocsp.UnknownStatus;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.operator.ContentSigner;
 import org.bouncycastle.operator.ContentVerifierProvider;
+import org.bouncycastle.util.encoders.Hex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xipki.audit.api.AuditEvent;
+import org.xipki.audit.api.AuditEventData;
+import org.xipki.audit.api.AuditLevel;
+import org.xipki.audit.api.AuditStatus;
+import org.xipki.audit.api.ChildAuditEvent;
 import org.xipki.database.api.DataSource;
 import org.xipki.database.api.DataSourceFactory;
 import org.xipki.ocsp.api.CertRevocationInfo;
@@ -397,7 +403,7 @@ public class OcspResponder
 
     }
 
-    public OCSPResp answer(OCSPReq request)
+    public OCSPResp answer(OCSPReq request, AuditEvent auditEvent)
     {
         try
         {
@@ -408,7 +414,12 @@ public class OcspResponder
                     X509CertificateHolder[] certs = request.getCerts();
                     if(certs == null || certs.length < 1)
                     {
-                        LOG.warn("no certificate found in request to verify the signature");
+                        String message = "no certificate found in request to verify the signature";
+                        LOG.warn(message);
+                        if(auditEvent != null)
+                        {
+                            fillAuditEvent(auditEvent, AuditLevel.INFO, AuditStatus.failed, message);
+                        }
                         return createUnsuccessfullOCSPResp(CSPResponseStatus.malformedRequest);
                     }
 
@@ -419,13 +430,22 @@ public class OcspResponder
                     }catch(InvalidKeyException e)
                     {
                         LOG.warn("securityFactory.getContentVerifierProvider, InvalidKeyException: {}", e.getMessage());
+                        if(auditEvent != null)
+                        {
+                            fillAuditEvent(auditEvent, AuditLevel.ERROR, AuditStatus.error, e.getMessage());
+                        }
                         return createUnsuccessfullOCSPResp(CSPResponseStatus.malformedRequest);
                     }
 
                     boolean sigValid = request.isSignatureValid(cvp);
                     if(!sigValid)
                     {
-                        LOG.warn("request signature is invalid");
+                        String message = "request signature is invalid";
+                        LOG.warn(message);
+                        if(auditEvent != null)
+                        {
+                            fillAuditEvent(auditEvent, AuditLevel.INFO, AuditStatus.failed, message);
+                        }
                         return createUnsuccessfullOCSPResp(CSPResponseStatus.malformedRequest);
                     }
                 }
@@ -434,6 +454,12 @@ public class OcspResponder
             {
                 if(requireReqSigned)
                 {
+                    String message = "signature in request required";
+                    LOG.warn(message);
+                    if(auditEvent != null)
+                    {
+                        fillAuditEvent(auditEvent, AuditLevel.INFO, AuditStatus.failed, message);
+                    }
                     return createUnsuccessfullOCSPResp(CSPResponseStatus.sigRequired);
                 }
             }
@@ -451,6 +477,13 @@ public class OcspResponder
                 if(len < reqNonceMinLen || len > reqNonceMaxLen)
                 {
                     LOG.warn("length of nonce {} not within [{},{}]", new Object[]{len, reqNonceMinLen, reqNonceMaxLen});
+                    if(auditEvent != null)
+                    {
+                        StringBuilder sb = new StringBuilder();
+                        sb.append("length of nonce ").append(len);
+                        sb.append(" not within [").append(reqNonceMinLen).append(", ").append(reqNonceMaxLen);
+                        fillAuditEvent(auditEvent, AuditLevel.INFO, AuditStatus.failed, sb.toString());
+                    }
                     return createUnsuccessfullOCSPResp(CSPResponseStatus.malformedRequest);
                 }
 
@@ -458,12 +491,24 @@ public class OcspResponder
             }
             else if(reqNonceRequired)
             {
-                LOG.warn("nonce required, but is not present in the request");
+                String message = "nonce required, but is not present in the request";
+                LOG.warn(message);
+                if(auditEvent != null)
+                {
+                    fillAuditEvent(auditEvent, AuditLevel.INFO, AuditStatus.failed, message);
+                }
                 return createUnsuccessfullOCSPResp(CSPResponseStatus.malformedRequest);
             }
 
             for(int i = 0; i < n; i++)
             {
+                ChildAuditEvent childAuditEvent = null;
+                if(auditEvent != null)
+                {
+                    childAuditEvent = new ChildAuditEvent();
+                    auditEvent.addChildAuditEvent(childAuditEvent);
+                }
+
                 Req req = requestList[i];
                 CertificateID certID =  req.getCertID();
                 String certIdHashAlgo = certID.getHashAlgOID().getId();
@@ -471,11 +516,21 @@ public class OcspResponder
                 if(reqHashAlgo == null)
                 {
                     LOG.warn("unknown CertID.hashAlgorithm {}", certIdHashAlgo);
+                    if(childAuditEvent != null)
+                    {
+                        fillAuditEvent(childAuditEvent, AuditLevel.INFO, AuditStatus.failed,
+                                "unknown CertID.hashAlgorithm " + certIdHashAlgo);
+                    }
                     return createUnsuccessfullOCSPResp(CSPResponseStatus.malformedRequest);
                 }
                 else if(reqHashAlgos.contains(reqHashAlgo) == false)
                 {
                     LOG.warn("CertID.hashAlgorithm {} not allowed", certIdHashAlgo);
+                    if(childAuditEvent != null)
+                    {
+                        fillAuditEvent(childAuditEvent, AuditLevel.INFO, AuditStatus.failed,
+                                "CertID.hashAlgorithm " + certIdHashAlgo + " not allowed");
+                    }
                     return createUnsuccessfullOCSPResp(CSPResponseStatus.malformedRequest);
                 }
 
@@ -500,7 +555,13 @@ public class OcspResponder
                         }
                     } catch (CertStatusStoreException e)
                     {
-                        LOG.error("answer() queryExecutor.getCertStatus", e);
+                        LOG.error("answer() CertStatusStore.getCertStatus. CertStatusStoreException: {}", e.getMessage());
+                        LOG.error("answer() CertStatusStore.getCertStatus", e);
+                        if(childAuditEvent != null)
+                        {
+                            fillAuditEvent(childAuditEvent, AuditLevel.ERROR, AuditStatus.error,
+                                    "CertStatusStore.getCertStatus() with CertStatusStoreException");
+                        }
                         return createUnsuccessfullOCSPResp(CSPResponseStatus.tryLater);
                     }
                 }
@@ -545,7 +606,13 @@ public class OcspResponder
                         encodedCertHash = bcCertHash.getEncoded();
                     } catch (IOException e)
                     {
+                        LOG.error("answer() bcCertHash.getEncoded. IOException: {}", e.getMessage());
                         LOG.error("answer() bcCertHash.getEncoded", e);
+                        if(childAuditEvent != null)
+                        {
+                            fillAuditEvent(childAuditEvent, AuditLevel.ERROR, AuditStatus.error,
+                                    "CertHash.getEncoded() with IOException");
+                        }
                         return createUnsuccessfullOCSPResp(CSPResponseStatus.internalError);
                     }
 
@@ -555,6 +622,51 @@ public class OcspResponder
                     extensions = new Extensions(certHashExtension);
                 }
 
+                String certStatusText;
+                if(bcCertStatus instanceof UnknownStatus)
+                {
+                    certStatusText = "unknown";
+                }
+                else if(bcCertStatus instanceof RevokedStatus)
+                {
+                    certStatusText = "revoked";
+                }
+                else if(bcCertStatus == null)
+                {
+                    certStatusText = "good";
+                }
+                else
+                {
+                	certStatusText = "should-not-happen";
+                }
+
+                if(childAuditEvent != null)
+                {
+                	childAuditEvent.setLevel(AuditLevel.INFO);
+                	childAuditEvent.setStatus(AuditStatus.successfull);
+                	childAuditEvent.addEventData(new AuditEventData("certStatus", certStatusText));
+                }
+                
+                if(LOG.isDebugEnabled())
+                {
+                    StringBuilder sb = new StringBuilder();
+                    sb.append("certHashAlgo: ").append(certID.getHashAlgOID().getId()).append(", ");
+
+                    String hexCertHash = null;
+                    if(certHash != null)
+                    {
+                        hexCertHash = Hex.toHexString(certHash).toUpperCase();
+                    }
+
+                    sb.append("issuerKeyHash: ") .append(Hex.toHexString(certID.getIssuerKeyHash()) .toUpperCase()).append(", ");
+                    sb.append("issuerNameHash: ").append(Hex.toHexString(certID.getIssuerNameHash()).toUpperCase()).append(", ");
+                    sb.append("serialNumber: ").append(certID.getSerialNumber()).append(", ");
+                    sb.append("certStatus: ").append(certStatusText).append(", ");
+                    sb.append("thisUpdate: ").append(thisUpdate).append(", ");
+                    sb.append("nextUpdate: ").append(nextUpdate).append(", ");
+                    sb.append("certHash: ").append(hexCertHash);
+                    LOG.debug(sb.toString());
+                }
                 basicOcspBuilder.addResponse(certID, bcCertStatus, thisUpdate, nextUpdate, extensions);
             }
 
@@ -569,6 +681,12 @@ public class OcspResponder
             {
                 LOG.error("answer() basicOcspBuilder.build. OCSPException: {}", e.getMessage());
                 LOG.debug("answer() basicOcspBuilder.build", e);
+                if(auditEvent != null)
+                {
+                    auditEvent.cleanChildAuditEvents(true, true, "message");
+                    fillAuditEvent(auditEvent, AuditLevel.ERROR, AuditStatus.error,
+                            "BasicOCSPRespBuilder.build() with OCSPException");
+                }
                 return createUnsuccessfullOCSPResp(CSPResponseStatus.internalError);
             } finally
             {
@@ -583,6 +701,12 @@ public class OcspResponder
             {
                 LOG.error("answer() ocspRespBuilder.build. OCSPException: {}", e.getMessage());
                 LOG.debug("answer() ocspRespBuilder.build", e);
+                if(auditEvent != null)
+                {
+                    auditEvent.cleanChildAuditEvents(true, true, "message");
+                    fillAuditEvent(auditEvent, AuditLevel.ERROR, AuditStatus.error,
+                            "OCSPRespBuilder.build() with OCSPException");
+                }
                 return createUnsuccessfullOCSPResp(CSPResponseStatus.internalError);
             }
 
@@ -590,6 +714,14 @@ public class OcspResponder
         {
             LOG.error("Throwable. {}: {}", t.getClass().getName(), t.getMessage());
             LOG.debug("Throwable", t);
+
+            if(auditEvent != null)
+            {
+                auditEvent.cleanChildAuditEvents(true, true, "message");
+                fillAuditEvent(auditEvent, AuditLevel.ERROR, AuditStatus.error,
+                        "internal error");
+            }
+
             return createUnsuccessfullOCSPResp(CSPResponseStatus.internalError);
         }
     }
@@ -667,5 +799,41 @@ public class OcspResponder
 
         result.setHealthy(healthy);
         return result;
+    }
+
+    private static void fillAuditEvent(AuditEvent auditEvent, AuditLevel level, AuditStatus status, String message)
+    {
+        if(level != null)
+        {
+            auditEvent.setLevel(level);
+        }
+
+        if(status != null)
+        {
+            auditEvent.setStatus(status);
+        }
+
+        if(message != null)
+        {
+            auditEvent.addEventData(new AuditEventData("messsage", message));
+        }
+    }
+
+    private static void fillAuditEvent(ChildAuditEvent auditEvent, AuditLevel level, AuditStatus status, String message)
+    {
+        if(level != null)
+        {
+            auditEvent.setLevel(level);
+        }
+
+        if(status != null)
+        {
+            auditEvent.setStatus(status);
+        }
+
+        if(message != null)
+        {
+            auditEvent.addEventData(new AuditEventData("messsage", message));
+        }
     }
 }
