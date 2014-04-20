@@ -683,7 +683,6 @@ public class OcspResponder
                 LOG.debug("answer() basicOcspBuilder.build", e);
                 if(auditEvent != null)
                 {
-                    auditEvent.cleanChildAuditEvents(true, true, "message");
                     fillAuditEvent(auditEvent, AuditLevel.ERROR, AuditStatus.error,
                             "BasicOCSPRespBuilder.build() with OCSPException");
                 }
@@ -703,7 +702,6 @@ public class OcspResponder
                 LOG.debug("answer() ocspRespBuilder.build", e);
                 if(auditEvent != null)
                 {
-                    auditEvent.cleanChildAuditEvents(true, true, "message");
                     fillAuditEvent(auditEvent, AuditLevel.ERROR, AuditStatus.error,
                             "OCSPRespBuilder.build() with OCSPException");
                 }
@@ -717,7 +715,6 @@ public class OcspResponder
 
             if(auditEvent != null)
             {
-                auditEvent.cleanChildAuditEvents(true, true, "message");
                 fillAuditEvent(auditEvent, AuditLevel.ERROR, AuditStatus.error,
                         "internal error");
             }
