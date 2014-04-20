@@ -48,6 +48,10 @@ import org.bouncycastle.operator.OperatorCreationException;
 import org.bouncycastle.util.encoders.Hex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xipki.audit.api.AuditEvent;
+import org.xipki.audit.api.AuditEventData;
+import org.xipki.audit.api.AuditLevel;
+import org.xipki.audit.api.AuditStatus;
 import org.xipki.ca.cmp.CmpUtil;
 import org.xipki.ca.cmp.ProtectionResult;
 import org.xipki.ca.cmp.ProtectionVerificationResult;
@@ -80,7 +84,7 @@ public abstract class CmpResponder
     protected abstract CmpControl getCmpControl();
 
     protected abstract PKIMessage intern_processPKIMessage(RequestorInfo requestor, String user,
-            ASN1OctetString transactionId, GeneralPKIMessage pkiMessage);
+            ASN1OctetString transactionId, GeneralPKIMessage pkiMessage, AuditEvent auditEvent);
 
     protected CmpResponder(ConcurrentContentSigner responder, SecurityFactory securityFactory)
     {
@@ -102,17 +106,12 @@ public abstract class CmpResponder
         this.signserviceTimeout = signserviceTimeout;
     }
 
-    public PKIMessage processPKIMessage(PKIMessage pkiMessage)
+    public PKIMessage processPKIMessage(PKIMessage pkiMessage, AuditEvent auditEvent)
     {
         GeneralPKIMessage message = new GeneralPKIMessage(pkiMessage);
 
         PKIHeader reqHeader = message.getHeader();
         ASN1OctetString tid = reqHeader.getTransactionID();
-
-        if(isCAInService() == false)
-        {
-            return buildErrorPkiMessage(tid, reqHeader, PKIFailureInfo.systemUnavail, "CA is out of service");
-        }
 
         checkRequestRecipient(reqHeader);
 
@@ -122,6 +121,10 @@ public abstract class CmpResponder
             tid = new DEROctetString(randomBytes);
         }
         String tidStr = Hex.toHexString(tid.getOctets());
+        if(auditEvent != null)
+        {
+            auditEvent.addEventData(new AuditEventData("tid", tidStr));
+        }
 
         CmpControl cmpControl = getCmpControl();
 
@@ -129,9 +132,11 @@ public abstract class CmpResponder
         String statusText = null;
 
         DERGeneralizedTime messageTime = reqHeader.getMessageTime();
+
         if(messageTime == null)
         {
             failureCode = PKIFailureInfo.missingTimeStamp;
+            statusText = "missing timestamp";
         }
         else
         {
@@ -166,6 +171,12 @@ public abstract class CmpResponder
 
         if(failureCode != null)
         {
+            if(auditEvent != null)
+            {
+                auditEvent.setLevel(AuditLevel.INFO);
+                auditEvent.setStatus(AuditStatus.failed);
+                auditEvent.addEventData(new AuditEventData("message", statusText));
+            }
             return buildErrorPkiMessage(tid, reqHeader, failureCode, statusText);
         }
 
@@ -210,13 +221,19 @@ public abstract class CmpResponder
 
         if(errorStatus != null)
         {
+            if(auditEvent != null)
+            {
+                auditEvent.setLevel(AuditLevel.INFO);
+                auditEvent.setStatus(AuditStatus.failed);
+                auditEvent.addEventData(new AuditEventData("message", errorStatus));
+            }
             return buildErrorPkiMessage(tid, reqHeader, PKIFailureInfo.badMessageCheck, errorStatus);
         }
 
         CertBasedRequestorInfo requestor = verificationResult == null ? null :
             (CertBasedRequestorInfo) verificationResult.getRequestor();
-        PKIMessage resp = intern_processPKIMessage(requestor, null, tid, message);
-        resp = addProtection(resp);
+        PKIMessage resp = intern_processPKIMessage(requestor, null, tid, message, auditEvent);
+        resp = addProtection(resp, auditEvent);
 
         return resp;
     }
@@ -263,7 +280,7 @@ public abstract class CmpResponder
                 signatureValid ? ProtectionResult.VALID : ProtectionResult.INVALID);
     }
 
-    private PKIMessage addProtection(PKIMessage pkiMessage)
+    private PKIMessage addProtection(PKIMessage pkiMessage, AuditEvent auditEvent)
     {
         try
         {
@@ -277,6 +294,13 @@ public abstract class CmpResponder
                     PKIFailureInfo.systemFailure, "could not sign the PKIMessage");
             PKIBody body = new PKIBody(PKIBody.TYPE_ERROR, new ErrorMsgContent(status));
 
+            if(auditEvent !=  null)
+            {
+                auditEvent.cleanChildAuditEvents(true, true, "message");
+                auditEvent.setLevel(AuditLevel.ERROR);
+                auditEvent.setStatus(AuditStatus.error);
+                auditEvent.addEventData(new AuditEventData("message", "could not sign the PKIMessage"));
+            }
             return new PKIMessage(pkiMessage.getHeader(), body);
         }
     }

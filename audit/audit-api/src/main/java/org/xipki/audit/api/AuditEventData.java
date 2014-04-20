@@ -28,7 +28,7 @@ public class AuditEventData
 
     private final AuditEventDataType eventDataType;
 
-    private final Double numberValue;
+    private final Number numberValue;
 
     private final String textValue;
 
@@ -76,7 +76,7 @@ public class AuditEventData
         this.binaryValue = null;
     }
 
-    public AuditEventData(final String name, final Double value)
+    public AuditEventData(final String name, final Number value)
     {
         if(name == null || name.isEmpty())
         {
@@ -124,7 +124,7 @@ public class AuditEventData
         return name;
     }
 
-    public Double getNumberValue()
+    public Number getNumberValue()
     {
         return numberValue;
     }

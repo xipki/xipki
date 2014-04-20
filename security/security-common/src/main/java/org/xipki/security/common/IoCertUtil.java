@@ -50,11 +50,16 @@ public class IoCertUtil
 
     public static byte[] read(String fileName) throws IOException
     {
+        return read(new File(fileName));
+    }
+
+    public static byte[] read(File file) throws IOException
+    {
         FileInputStream in = null;
 
         try
         {
-            in = new FileInputStream(fileName);
+            in = new FileInputStream(file);
             ByteArrayOutputStream bout = new ByteArrayOutputStream();
             int readed = 0;
             byte[] buffer = new byte[2048];

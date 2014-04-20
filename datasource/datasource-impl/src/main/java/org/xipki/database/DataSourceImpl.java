@@ -269,9 +269,9 @@ public class DataSourceImpl implements DataSource
                 LOG.debug("no idle connection, create new instance");
             } catch (SQLException e)
             {
-            	LOG.warn("cannot get new connection. {}: {}", e.getClass().getName(), e.getMessage());
-            	LOG.debug("cannot get new connection", e);
-            	LOG.info("wait for next idle connection");
+                LOG.warn("cannot get new connection. {}: {}", e.getClass().getName(), e.getMessage());
+                LOG.debug("cannot get new connection", e);
+                LOG.info("wait for next idle connection");
                 // datasource cannot create any new connection
                 // wait for next idle connection for 5 seconds
                 try
@@ -285,8 +285,8 @@ public class DataSourceImpl implements DataSource
 
         if(c == null)
         {
-            throw new SQLException("Could not create connection to database " + url + 
-            		" with the user " + username + ", and jdbc driver " + driverClassName);
+            throw new SQLException("Could not create connection to database " + url +
+                    " with the user " + username + ", and jdbc driver " + driverClassName);
         }
 
         return c;
