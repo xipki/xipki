@@ -20,6 +20,7 @@ package org.xipki.audit.syslog;
 import java.nio.charset.Charset;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -109,12 +110,17 @@ public class SyslogAuditLoggingServiceImpl implements AuditLoggingService
 
         StringBuilder sb = new StringBuilder();
         sb.append(event.getApplicationName()).append(" - ").append(event.getName());
+        
+        Date timestamp = event.getTimestamp();        
+        String timestampText = (timestamp == null) ? "undefined" : df.format(timestamp);
+        sb.append(":\ttimestamp: ").append(timestampText);
+        
         AuditStatus status = event.getStatus();
         if(status == null)
         {
         	status = AuditStatus.undefined;
         }
-        sb.append(":\tstatus: ").append(status.name());
+        sb.append("\tstatus: ").append(status.name());
 
         List<AuditEventData> eventDataArray = event.getEventDatas();
 
