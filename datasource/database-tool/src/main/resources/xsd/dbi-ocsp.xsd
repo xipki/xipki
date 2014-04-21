@@ -24,13 +24,6 @@
 					</xs:sequence>
 				</xs:complexType>
 			</xs:element>
-			<xs:element name="certprofiles">
-				<xs:complexType>
-					<xs:sequence>
-						<xs:element ref="certprofile" minOccurs="0" maxOccurs="unbounded"/>
-					</xs:sequence>
-				</xs:complexType>
-			</xs:element>
 			<xs:element name="certsFiles">
 				<xs:complexType>
 					<xs:sequence>
@@ -50,14 +43,6 @@
 		</xs:all>
 	</xs:complexType>
 
-	<xs:element name="certprofile" type="certprofileType"/>
-	<xs:complexType name="certprofileType">
-		<xs:all>
-			<xs:element name="id" type="xs:int" />
-			<xs:element name="name" type="xs:string" />
-		</xs:all>
-	</xs:complexType>
-
 	<xs:element name="certs" type="certsType"/>
 	<xs:complexType name="certsType">
 		<xs:sequence>
@@ -70,7 +55,6 @@
 		<xs:all>
 			<xs:element name="id" type="xs:int" />
 			<xs:element name="issuer_id" type="xs:int"/>
-			<xs:element name="certprofile_id" type="xs:int"/>
 			<xs:element name="last_update" type="xs:string"/>
 			<xs:element name="revocated" type="xs:boolean"/>
 			<xs:element name="rev_reason" type="xs:string" minOccurs="0"/>

@@ -35,11 +35,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.database.api.DataSource;
 import org.xipki.dbi.ocsp.jaxb.CertStoreType;
-import org.xipki.dbi.ocsp.jaxb.CertStoreType.Certprofiles;
 import org.xipki.dbi.ocsp.jaxb.CertStoreType.CertsFiles;
 import org.xipki.dbi.ocsp.jaxb.CertStoreType.Issuers;
 import org.xipki.dbi.ocsp.jaxb.CertType;
-import org.xipki.dbi.ocsp.jaxb.CertprofileType;
 import org.xipki.dbi.ocsp.jaxb.CertsType;
 import org.xipki.dbi.ocsp.jaxb.IssuerType;
 import org.xipki.security.api.PasswordResolverException;
@@ -72,7 +70,6 @@ class OcspCertStoreDbImporter extends DbPorter
         CertStoreType certstore = root.getValue();
 
         import_issuer(certstore.getIssuers());
-        import_certprofile(certstore.getCertprofiles());
         import_cert(certstore.getCertsFiles());
     }
 
@@ -144,29 +141,6 @@ class OcspCertStoreDbImporter extends DbPorter
         }
     }
 
-    private void import_certprofile(Certprofiles certprofiles)
-            throws SQLException
-    {
-        final String sql = "INSERT INTO certprofile (id, name) VALUES (?, ?)";
-
-        PreparedStatement ps = prepareStatement(sql);
-
-        try
-        {
-            for(CertprofileType info : certprofiles.getCertprofile())
-            {
-                int idx = 1;
-                ps.setInt   (idx++, info.getId());
-                ps.setString(idx++, info.getName());
-
-                ps.execute();
-            }
-        }finally
-        {
-            closeStatement(ps);
-        }
-    }
-
     private void import_cert(CertsFiles certsfiles)
             throws SQLException, JAXBException, IOException, CertificateException
     {
@@ -184,10 +158,10 @@ class OcspCertStoreDbImporter extends DbPorter
     {
         final String SQL_ADD_CERT =
                 "INSERT INTO cert (" +
-                " id, issuer_id, serial, certprofile_id," +
+                " id, issuer_id, serial, " +
                 " subject, last_update, notbefore, notafter," +
                 " revocated, rev_reason, rev_time, rev_invalidity_time)" +
-                " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
         final String SQL_ADD_CERTHASH = "INSERT INTO certhash (" +
                 "cert_id, sha1_fp, sha224_fp, sha256_fp, sha384_fp, sha512_fp)" +
@@ -229,7 +203,6 @@ class OcspCertStoreDbImporter extends DbPorter
                 ps_cert.setInt   (idx++, cert.getId());
                 ps_cert.setInt   (idx++, cert.getIssuerId());
                 ps_cert.setString(idx++, c.getSerialNumber().toString());
-                ps_cert.setInt   (idx++, cert.getCertprofileId());
                 ps_cert.setString(idx++, c.getSubjectX500Principal().getName());
                 ps_cert.setString(idx++, cert.getLastUpdate());
                 ps_cert.setLong  (idx++, c.getNotBefore().getTime() / 1000);
