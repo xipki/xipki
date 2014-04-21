@@ -123,16 +123,16 @@ public class AuditEventData
 
     public byte[] getBinaryValue()
     {
-    	byte[] binaryValue = (byte[]) value;
+        byte[] binaryValue = (byte[]) value;
         return Arrays.copyOf(binaryValue, binaryValue.length);
     }
-    
+
     @Override
     public String toString()
     {
-    	StringBuilder sb = new StringBuilder();
-    	sb.append(name).append("=").append(value);
-    	return sb.toString();
+        StringBuilder sb = new StringBuilder();
+        sb.append(name).append("=").append(value);
+        return sb.toString();
     }
 
 }

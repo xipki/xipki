@@ -427,9 +427,9 @@ class CertStoreQueryExecutor
             returnPreparedStatement(ps);
         }
     }
-    
-    byte[] revocateCert(X509CertificateWithMetaInfo caCert, BigInteger serialNumber, 
-    		Date revocationTime, CRLReason revocationReason,
+
+    byte[] revocateCert(X509CertificateWithMetaInfo caCert, BigInteger serialNumber,
+            Date revocationTime, CRLReason revocationReason,
             Date invalidityTime)
     throws OperationException, SQLException
     {
@@ -441,7 +441,7 @@ class CertStoreQueryExecutor
         }
 
         Integer caId = getCaId(caCert); // could not be null
-        
+
         final String SQL_REVOCATE_CERT =
                 "UPDATE cert" +
                 " SET last_update=?, revocated = ?, rev_time = ?, rev_invalidity_time=?, rev_reason = ?" +
@@ -474,7 +474,7 @@ class CertStoreQueryExecutor
         {
             returnPreparedStatement(ps);
         }
-        
+
         return encodedCert;
     }
 

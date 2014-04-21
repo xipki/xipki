@@ -68,42 +68,43 @@ public class OCSPStatusLoadTestCommand extends OsgiCommandSupport
         }
 
         List<Long> serialNumbers = new LinkedList<Long>();
-        
-        try{
-	        StringTokenizer tokens = new StringTokenizer(this.serialNumbers, ",");
-	        while(tokens.hasMoreTokens())
-	        {
-	        	String token = tokens.nextToken().trim();
-	        	StringTokenizer subtokens = new StringTokenizer(token, "- ");
-	        	int countTokens = subtokens.countTokens();        	
-	        	if(countTokens == 1)
-	        	{
-	        		serialNumbers.add(Long.parseLong(subtokens.nextToken().trim()));
-	        	}
-	        	if(countTokens == 2)
-	        	{
-	        		int startSerial = Integer.parseInt(subtokens.nextToken().trim());
-	        		int endSerial = Integer.parseInt(subtokens.nextToken().trim());
-	                if(startSerial < 1 || endSerial < 1 || startSerial > endSerial)
-	                {
-	                    System.err.println("invalid serial number " + this.serialNumbers);
-	                    return null;
-	                }
-	                for(long i = startSerial; i <= endSerial; i++)
-	                {
-	                	serialNumbers.add(i);
-	                }
-	        	}
-	        	else
-	        	{
+
+        try
+        {
+            StringTokenizer tokens = new StringTokenizer(this.serialNumbers, ",");
+            while(tokens.hasMoreTokens())
+            {
+                String token = tokens.nextToken().trim();
+                StringTokenizer subtokens = new StringTokenizer(token, "- ");
+                int countTokens = subtokens.countTokens();
+                if(countTokens == 1)
+                {
+                    serialNumbers.add(Long.parseLong(subtokens.nextToken().trim()));
+                }
+                if(countTokens == 2)
+                {
+                    int startSerial = Integer.parseInt(subtokens.nextToken().trim());
+                    int endSerial = Integer.parseInt(subtokens.nextToken().trim());
+                    if(startSerial < 1 || endSerial < 1 || startSerial > endSerial)
+                    {
+                        System.err.println("invalid serial number " + this.serialNumbers);
+                        return null;
+                    }
+                    for(long i = startSerial; i <= endSerial; i++)
+                    {
+                        serialNumbers.add(i);
+                    }
+                }
+                else
+                {
                     System.err.println("invalid serial number " + this.serialNumbers);
                     return null;
-	        	}
-	        }
+                }
+            }
         }catch(Exception e)
         {
-        	System.err.println("invalid serial numbers " + this.serialNumbers);
-        	return null;
+            System.err.println("invalid serial numbers " + this.serialNumbers);
+            return null;
         }
 
         if(numThreads < 1)

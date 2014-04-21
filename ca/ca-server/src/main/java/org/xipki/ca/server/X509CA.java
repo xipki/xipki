@@ -872,29 +872,31 @@ public class X509CA
         numActiveRevocations.addAndGet(1);
 
         X509Certificate revokedCert;
-        
+
         try
         {
             byte[] revokedCertBytes= certstore.revocateCertificate(
-            		caInfo.getCertificate(), 
-            		serialNumber, reason, invalidityTime);
+                    caInfo.getCertificate(),
+                    serialNumber, reason, invalidityTime);
             if(revokedCertBytes == null)
             {
-            	return null;
+                return null;
             }
-            
-			try {
-				revokedCert = IoCertUtil.parseCert(revokedCertBytes);
-			} catch (Exception e) {
-				LOG.error("Could not parse revoked certificate with ca={} and serialNumber={}",
-						caInfo.getName(), serialNumber);
-				throw new OperationException(ErrorCode.System_Failure, e.getMessage());
-			}
-			
+
+            try
+            {
+                revokedCert = IoCertUtil.parseCert(revokedCertBytes);
+            } catch (Exception e)
+            {
+                LOG.error("Could not parse revoked certificate with ca={} and serialNumber={}",
+                        caInfo.getName(), serialNumber);
+                throw new OperationException(ErrorCode.System_Failure, e.getMessage());
+            }
+
             X509CertificateWithMetaInfo revokedCertWithInfo = new X509CertificateWithMetaInfo(revokedCert);
-            
+
             Date revocationTime = new Date();
-            
+
             if(revokedCert != null)
             {
                 for(IdentifiedCertPublisher publisher : getPublishers())
@@ -902,8 +904,8 @@ public class X509CA
                     try
                     {
                         publisher.certificateRevoked(caInfo.getCertificate(),
-                        		revokedCertWithInfo,
-                        		revocationTime, reason.getValue().intValue(), invalidityTime);
+                                revokedCertWithInfo,
+                                revocationTime, reason.getValue().intValue(), invalidityTime);
                     }
                     catch (RuntimeException re)
                     {
@@ -911,7 +913,7 @@ public class X509CA
                     }
                 }
             }
-            
+
         }finally
         {
             numActiveRevocations.addAndGet(-1);
@@ -919,7 +921,7 @@ public class X509CA
 
         String resultText = revokedCert == null ? "CERT_NOT_EXIST" : "REVOKED";
         LOG.info("SUCCESSFULL revocateCertificate: ca={}, serialNumber={}, reason={}, invalidityTime={}, revocationResult={}",
-        		new Object[]{caInfo.getName(), serialNumber, reason.getValue(), invalidityTime, resultText});
+                new Object[]{caInfo.getName(), serialNumber, reason.getValue(), invalidityTime, resultText});
 
         return revokedCert;
     }
@@ -1025,30 +1027,30 @@ public class X509CA
 
                 if(certWithSameSubjectIssued)
                 {
-                	boolean incSerialNumberAllowed = certProfile.incSerialNumberIfSubjectExists();
-                	if(incSerialNumberAllowed && origCertProfileConf != null)
-                	{
-	                	if(origCertProfileConf.isIncSerialNumberSpecified() &&
-	                			origCertProfileConf.getIncSerialNumber().booleanValue() == false)
-	                	{
-	                		incSerialNumberAllowed = false;
-	                	}
-                	}
-                	
-                	if(incSerialNumberAllowed == false)
-                	{
+                    boolean incSerialNumberAllowed = certProfile.incSerialNumberIfSubjectExists();
+                    if(incSerialNumberAllowed && origCertProfileConf != null)
+                    {
+                        if(origCertProfileConf.isIncSerialNumberSpecified() &&
+                                origCertProfileConf.getIncSerialNumber().booleanValue() == false)
+                        {
+                            incSerialNumberAllowed = false;
+                        }
+                    }
+
+                    if(incSerialNumberAllowed == false)
+                    {
                         throw new CertAlreadyIssuedException("Certificate for the given subject " + grandtedSubjectText + " already issued");
-                	}
-                		
+                    }
+
                     do
                     {
                         try
                         {
-							grantedSubject = incSerialNumber(certProfile, grantedSubject);
-						} catch (BadCertTemplateException e)
-				        {
-				            throw new OperationException(ErrorCode.BAD_CERT_TEMPLATE, e.getMessage());
-						}
+                            grantedSubject = incSerialNumber(certProfile, grantedSubject);
+                        } catch (BadCertTemplateException e)
+                        {
+                            throw new OperationException(ErrorCode.BAD_CERT_TEMPLATE, e.getMessage());
+                        }
                     }while(certstore.certIssuedForSubject(this.caInfo.getCertificate(), grantedSubject.toString()));
                 }
             }
@@ -1477,7 +1479,7 @@ public class X509CA
     }
 
     private static X500Name incSerialNumber(CertProfile profile, X500Name origName)
-    	throws BadCertTemplateException
+        throws BadCertTemplateException
     {
         RDN[] rdns = origName.getRDNs();
 
@@ -1497,10 +1499,10 @@ public class X509CA
             }
         }
 
-    	String currentSerialNumber = null;
+        String currentSerialNumber = null;
         if(serialNumberIndex != -1)
         {
-        	currentSerialNumber = IETFUtils.valueToString(rdns[serialNumberIndex].getFirst().getValue());
+            currentSerialNumber = IETFUtils.valueToString(rdns[serialNumberIndex].getFirst().getValue());
         }
         String newSerialNumber = profile.incSerialNumber(currentSerialNumber);
         RDN serialNumberRdn = new RDN(ObjectIdentifiers.id_at_serialNumber,

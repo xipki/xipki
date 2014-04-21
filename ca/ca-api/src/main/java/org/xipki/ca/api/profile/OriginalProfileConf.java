@@ -46,7 +46,7 @@ public class OriginalProfileConf
 
     private boolean cRLDisributionPointsSpecified = false;
     private ExtensionOccurrence cRLDisributionPoints;
-    
+
     private boolean incSerialNumberSpecified = false;
     private Boolean incSerialNumber;
 
@@ -55,12 +55,12 @@ public class OriginalProfileConf
         ParamChecker.assertNotEmpty("profileName", profileName);
         this.profileName = profileName;
     }
-    
+
     public OriginalProfileConf(String profileName, CertProfile certProfile)
     {
         ParamChecker.assertNotEmpty("profileName", profileName);
         ParamChecker.assertNotNull("certProfile", certProfile);
-        
+
         this.profileName = profileName;
 
         setAuthorityInfoAccess(certProfile.getOccurenceOfAuthorityInfoAccess());
@@ -94,16 +94,18 @@ public class OriginalProfileConf
         this.cRLDisributionPointsSpecified = true;
     }
 
-	public Boolean getIncSerialNumber() {
-		return incSerialNumber;
-	}
+    public Boolean getIncSerialNumber()
+    {
+        return incSerialNumber;
+    }
 
-	public void setIncSerialNumber(Boolean incSerialNumber) {
-		this.incSerialNumber = incSerialNumber;
-		this.incSerialNumberSpecified = true; 
-	}
+    public void setIncSerialNumber(Boolean incSerialNumber)
+    {
+        this.incSerialNumber = incSerialNumber;
+        this.incSerialNumberSpecified = true;
+    }
 
-	public static OriginalProfileConf getInstance(String encoded)
+    public static OriginalProfileConf getInstance(String encoded)
     throws ParseException
     {
         try
@@ -154,12 +156,12 @@ public class OriginalProfileConf
                 ExtensionOccurrence occurence = extractExtensionControl(control);
                 conf.setCRLDisributionPoints(occurence);
             }
-            
+
             control = keyValues.get(IncSerialNumber);
             if(control != null)
             {
-            	boolean b = Boolean.parseBoolean(control);
-            	conf.setIncSerialNumber(b);
+                boolean b = Boolean.parseBoolean(control);
+                conf.setIncSerialNumber(b);
             }
 
             return conf;
@@ -239,12 +241,12 @@ public class OriginalProfileConf
         {
             addExtensionControl(sb, CRLDisributionPoints, cRLDisributionPoints);
         }
-        
+
         if(incSerialNumberSpecified)
         {
-        	sb.append(IncSerialNumber).append("=").append(incSerialNumber).append(";");
+            sb.append(IncSerialNumber).append("=").append(incSerialNumber).append(";");
         }
-        
+
         return sb.substring(0, sb.length()-1);
     }
 
@@ -315,7 +317,7 @@ public class OriginalProfileConf
     {
         return incSerialNumberSpecified;
     }
-    
+
     @Override
     public String toString()
     {
