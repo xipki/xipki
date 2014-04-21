@@ -49,66 +49,67 @@ public class Slf4jAuditLoggingServiceImpl implements AuditLoggingService
             return;
         }
 
-        try{
-	        switch(event.getLevel())
-	        {
-	            case EMERGENCY:
-	            case ALERT:
-	            case CRITICAL:
-	            case ERROR:
-	                if(LOG.isErrorEnabled())
-	                {
-	                    LOG.error("{}", createMessage(event));
-	                }
-	                break;
-	            case WARN:
-	            case NOTICE:
-	                if(LOG.isWarnEnabled())
-	                {
-	                    LOG.warn("{}", createMessage(event));
-	                }
-	                break;
-	            case INFO:
-	                if(LOG.isInfoEnabled())
-	                {
-	                    LOG.info("{}", createMessage(event));
-	                }
-	                break;
-	            case DEBUG:
-	                if(LOG.isDebugEnabled())
-	                {
-	                    LOG.debug("{}", createMessage(event));
-	                }
-	                break;
-	        }
+        try
+        {
+            switch(event.getLevel())
+            {
+                case EMERGENCY:
+                case ALERT:
+                case CRITICAL:
+                case ERROR:
+                    if(LOG.isErrorEnabled())
+                    {
+                        LOG.error("{}", createMessage(event));
+                    }
+                    break;
+                case WARN:
+                case NOTICE:
+                    if(LOG.isWarnEnabled())
+                    {
+                        LOG.warn("{}", createMessage(event));
+                    }
+                    break;
+                case INFO:
+                    if(LOG.isInfoEnabled())
+                    {
+                        LOG.info("{}", createMessage(event));
+                    }
+                    break;
+                case DEBUG:
+                    if(LOG.isDebugEnabled())
+                    {
+                        LOG.debug("{}", createMessage(event));
+                    }
+                    break;
+            }
         }catch(Throwable t)
         {
-        	LOG.error("LOG - SYSTEM\tstatus: failed\tmessage: {}", t.getMessage());
+            LOG.error("LOG - SYSTEM\tstatus: failed\tmessage: {}", t.getMessage());
         }
     }
 
     private static String createMessage(AuditEvent event)
     {
         StringBuilder sb = new StringBuilder();
-        
+
         String applicationName = event.getApplicationName();
         if(applicationName == null)
         {
-        	applicationName = "undefined";
+            applicationName = "undefined";
         }
-        
+
         String name = event.getName();
         if(name == null)
         {
-        	name = "undefined";
+            name = "undefined";
         }
-        
+
         sb.append(applicationName).append(" - ").append(name);
-        
+
         AuditStatus status = event.getStatus();
         if(status == null)
         {
-        	status = AuditStatus.undefined;
+            status = AuditStatus.undefined;
         }
         sb.append(":\tstatus: ").append(status.name());
         List<AuditEventData> eventDataArray = event.getEventDatas();
@@ -134,7 +135,7 @@ public class Slf4jAuditLoggingServiceImpl implements AuditLoggingService
                     sb.append(element.getTextValue());
                     break;
                 case TIMESTAMP:
-                	Date t = element.getTimestampValue();
+                    Date t = element.getTimestampValue();
                     sb.append(t == null ? "undefined" : df.format(element.getTimestampValue()));
                     break;
                 }
@@ -151,54 +152,55 @@ public class Slf4jAuditLoggingServiceImpl implements AuditLoggingService
             return;
         }
 
-        try{
-	        switch(event.getLevel())
-	        {
-	            case EMERGENCY:
-	            case ALERT:
-	            case CRITICAL:
-	            case ERROR:
-	                if(LOG.isErrorEnabled())
-	                {
-	                    LOG.error("{}", event.createMessage());
-	                }
-	                break;
-	            case WARN:
-	            case NOTICE:
-	                if(LOG.isWarnEnabled())
-	                {
-	                    LOG.warn("{}", event.createMessage());
-	                }
-	                break;
-	            case INFO:
-	                if(LOG.isInfoEnabled())
-	                {
-	                    LOG.info("{}", event.createMessage());
-	                }
-	                break;
-	            case DEBUG:
-	                if(LOG.isDebugEnabled())
-	                {
-	                    LOG.debug("{}", event.createMessage());
-	                }
-	                break;
-	        }
-	
-	        event.createMessage();
+        try
+        {
+            switch(event.getLevel())
+            {
+                case EMERGENCY:
+                case ALERT:
+                case CRITICAL:
+                case ERROR:
+                    if(LOG.isErrorEnabled())
+                    {
+                        LOG.error("{}", event.createMessage());
+                    }
+                    break;
+                case WARN:
+                case NOTICE:
+                    if(LOG.isWarnEnabled())
+                    {
+                        LOG.warn("{}", event.createMessage());
+                    }
+                    break;
+                case INFO:
+                    if(LOG.isInfoEnabled())
+                    {
+                        LOG.info("{}", event.createMessage());
+                    }
+                    break;
+                case DEBUG:
+                    if(LOG.isDebugEnabled())
+                    {
+                        LOG.debug("{}", event.createMessage());
+                    }
+                    break;
+            }
+
+            event.createMessage();
         }catch(Throwable t)
-        {        
-        	LOG.error("LOG - SYSTEM\tstatus: failed\tmessage: {}", t.getMessage());
+        {
+            LOG.error("LOG - SYSTEM\tstatus: failed\tmessage: {}", t.getMessage());
         }
     }
 
     private static final char[] HEX_CHAR_TABLE = "0123456789ABCDEF".toCharArray();
     private static String toHexString(byte[] raw)
     {
-    	if(raw == null)
-    	{
-    		return "";
-    	}
-    	
+        if(raw == null)
+        {
+            return "";
+        }
+
         StringBuilder sb = new StringBuilder();
         for (byte b : raw)
         {
