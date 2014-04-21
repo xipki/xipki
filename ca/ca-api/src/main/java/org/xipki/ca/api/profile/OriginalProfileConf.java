@@ -30,6 +30,7 @@ public class OriginalProfileConf
     private static final String AuthorityKeyIdentifier = "AuthorityKeyIdentifier";
     private static final String AuthorityInfoAccess = "AuthorityInfoAccess";
     private static final String CRLDisributionPoints = "CRLDisributionPoints";
+    private static final String IncSerialNumber = "IncSerialNumber";
 
     private final String profileName;
 
@@ -45,11 +46,28 @@ public class OriginalProfileConf
 
     private boolean cRLDisributionPointsSpecified = false;
     private ExtensionOccurrence cRLDisributionPoints;
+    
+    private boolean incSerialNumberSpecified = false;
+    private Boolean incSerialNumber;
 
     public OriginalProfileConf(String profileName)
     {
         ParamChecker.assertNotEmpty("profileName", profileName);
         this.profileName = profileName;
+    }
+    
+    public OriginalProfileConf(String profileName, CertProfile certProfile)
+    {
+        ParamChecker.assertNotEmpty("profileName", profileName);
+        ParamChecker.assertNotNull("certProfile", certProfile);
+        
+        this.profileName = profileName;
+
+        setAuthorityInfoAccess(certProfile.getOccurenceOfAuthorityInfoAccess());
+        setAuthorityKeyIdentifier(certProfile.getOccurenceOfAuthorityKeyIdentifier());
+        setCRLDisributionPoints(certProfile.getOccurenceOfCRLDistributinPoints());
+        setIncSerialNumber(certProfile.incSerialNumberIfSubjectExists());
+        setSubjectKeyIdentifier(certProfile.getOccurenceOfSubjectKeyIdentifier());
     }
 
     public void setSubjectKeyIdentifier(ExtensionOccurrence subjectKeyIdentifier)
@@ -76,7 +94,16 @@ public class OriginalProfileConf
         this.cRLDisributionPointsSpecified = true;
     }
 
-    public static OriginalProfileConf getInstance(String encoded)
+	public Boolean getIncSerialNumber() {
+		return incSerialNumber;
+	}
+
+	public void setIncSerialNumber(Boolean incSerialNumber) {
+		this.incSerialNumber = incSerialNumber;
+		this.incSerialNumberSpecified = true; 
+	}
+
+	public static OriginalProfileConf getInstance(String encoded)
     throws ParseException
     {
         try
@@ -126,6 +153,13 @@ public class OriginalProfileConf
             {
                 ExtensionOccurrence occurence = extractExtensionControl(control);
                 conf.setCRLDisributionPoints(occurence);
+            }
+            
+            control = keyValues.get(IncSerialNumber);
+            if(control != null)
+            {
+            	boolean b = Boolean.parseBoolean(control);
+            	conf.setIncSerialNumber(b);
             }
 
             return conf;
@@ -205,6 +239,12 @@ public class OriginalProfileConf
         {
             addExtensionControl(sb, CRLDisributionPoints, cRLDisributionPoints);
         }
+        
+        if(incSerialNumberSpecified)
+        {
+        	sb.append(IncSerialNumber).append("=").append(incSerialNumber).append(";");
+        }
+        
         return sb.substring(0, sb.length()-1);
     }
 
@@ -266,11 +306,16 @@ public class OriginalProfileConf
         return authorityInfoAccessSpecified;
     }
 
-    public boolean iscRLDisributionPointsSpecified()
+    public boolean isCRLDisributionPointsSpecified()
     {
         return cRLDisributionPointsSpecified;
     }
 
+    public boolean isIncSerialNumberSpecified()
+    {
+        return incSerialNumberSpecified;
+    }
+    
     @Override
     public String toString()
     {

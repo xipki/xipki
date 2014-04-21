@@ -20,14 +20,11 @@ package org.xipki.ca.server.publisher;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.math.BigInteger;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.X509CRL;
-import java.security.cert.X509Certificate;
 import java.sql.SQLException;
 import java.util.Date;
-
-import javax.security.auth.x500.X500Principal;
+import java.util.Properties;
 
 import org.bouncycastle.util.encoders.Base64;
 import org.slf4j.Logger;
@@ -43,14 +40,15 @@ import org.xipki.security.api.PasswordResolverException;
 import org.xipki.security.common.EnvironmentParameterResolver;
 import org.xipki.security.common.ParamChecker;
 
-public class DefaultCertPublisher implements CertPublisher
+public class DefaultCertPublisher extends CertPublisher
 {
     private static final Logger LOG = LoggerFactory.getLogger(DefaultCertPublisher.class);
 
     @SuppressWarnings("unused")
     private EnvironmentParameterResolver envParamterResolver;
     private CertStatusStoreQueryExecutor queryExecutor;
-
+    private boolean publishGoodCerts = true;
+    
     public DefaultCertPublisher()
     {
     }
@@ -73,7 +71,25 @@ public class DefaultCertPublisher implements CertPublisher
             confBytes = conf.getBytes();
         }
         InputStream confStream = new ByteArrayInputStream(confBytes);
+        Properties props = new Properties();
+        
+        try{
+        	props.load(confStream);
+        }catch(IOException e)
+        {
+        	throw new CertPublisherException("IOException while loading configuration: " + e.getMessage());
+        }
+        
+        String propValue = props.getProperty("publish.goodcerts", "true");
+        publishGoodCerts = Boolean.parseBoolean(propValue);
 
+        try{
+        	confStream.reset();
+        }catch(IOException e)
+        {
+        	throw new CertPublisherException("IOException while loading configuration: " + e.getMessage());
+        }
+        
         DataSource dataSource;
         try
         {
@@ -81,7 +97,7 @@ public class DefaultCertPublisher implements CertPublisher
         } catch (IOException e)
         {
             throw new CertPublisherException(e);
-        } catch (SQLException e)
+       } catch (SQLException e)
         {
             throw new CertPublisherException(e);
         } catch (PasswordResolverException e)
@@ -117,17 +133,15 @@ public class DefaultCertPublisher implements CertPublisher
             {
                 queryExecutor.addCert(certInfo.getIssuerCert(),
                         certInfo.getCert(),
-                        certInfo.getProfileName(),
                         certInfo.isRevocated(),
                         certInfo.getRevocationTime(),
                         certInfo.getRevocationReason(),
                         certInfo.getInvalidityTime());
             }
-            else
+            else if(publishGoodCerts)
             {
                 queryExecutor.addCert(certInfo.getIssuerCert(),
-                        certInfo.getCert(),
-                        certInfo.getProfileName());
+                        certInfo.getCert());
             }
         } catch (Exception e)
         {
@@ -139,31 +153,20 @@ public class DefaultCertPublisher implements CertPublisher
     }
 
     @Override
-    public void certificateRevoked(X509Certificate cert, int reason,
-            Date invalidityTime)
+    public void certificateRevoked(X509CertificateWithMetaInfo caCert, 
+    		X509CertificateWithMetaInfo cert, 
+    		Date revocationTime,
+    		int revocationReason, 
+    		Date invalidityTime)
     {
         try
         {
-            queryExecutor.revocateCert(cert, new Date(), reason, invalidityTime);
-        } catch (SQLException e)
+        	queryExecutor.revocateCert(caCert, cert, revocationTime, revocationReason, invalidityTime);
+        } catch (Exception e)
         {
-            LOG.error("Could not revocate certificate {}: {}",
-                    cert.getSubjectX500Principal(),
-                    e.getMessage());
-        }
-    }
-
-    @Override
-    public void certificateRevoked(X500Principal issuer, BigInteger serialNumber,
-            int reason, Date invalidityTime)
-    {
-        try
-        {
-            queryExecutor.revocateCert(issuer, serialNumber, new Date(), reason, invalidityTime);
-        } catch (SQLException e)
-        {
-            LOG.error("Could not revocate certificate issuer={}, serial={}: {}",
-                    new Object[]{issuer, serialNumber, e.getMessage()});
+            LOG.error("Could not publish revocated certificate (issuser={}: subject={}, serialNumber={}). Message: {}",
+                    new Object[]{caCert.getSubject(), cert.getSubject(), cert.getCert().getSerialNumber(), e.getMessage()});
+            LOG.error("error", e);
         }
     }
 

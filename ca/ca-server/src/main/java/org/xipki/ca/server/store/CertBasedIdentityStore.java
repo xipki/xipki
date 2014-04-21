@@ -64,7 +64,7 @@ class CertBasedIdentityStore
         entries.add(entry);
     }
 
-    synchronized Integer getIdForSubject(String subject)
+    synchronized Integer getCaIdForSubject(String subject)
     {
         for(CertBasedIdentityEntry entry : entries)
         {

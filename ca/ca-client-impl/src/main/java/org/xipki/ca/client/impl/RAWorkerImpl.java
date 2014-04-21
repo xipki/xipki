@@ -837,12 +837,7 @@ public final class RAWorkerImpl extends AbstractRAWorker implements RAWorker
     private OriginalProfileConf buildOriginalProfileConf(String profileName)
     {
         CertProfile certProfile = raProfilesMaps.get(profileName);
-        OriginalProfileConf origProfileConf = new OriginalProfileConf(profileName);
-        origProfileConf.setAuthorityInfoAccess(certProfile.getOccurenceOfAuthorityInfoAccess());
-        origProfileConf.setAuthorityKeyIdentifier(certProfile.getOccurenceOfAuthorityKeyIdentifier());
-        origProfileConf.setCRLDisributionPoints(certProfile.getOccurenceOfCRLDistributinPoints());
-        origProfileConf.setSubjectKeyIdentifier(certProfile.getOccurenceOfSubjectKeyIdentifier());
-        return origProfileConf;
+        return new OriginalProfileConf(profileName, certProfile);
     }
 
     @Override

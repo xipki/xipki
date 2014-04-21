@@ -223,7 +223,7 @@ public class DbCertStatusStore implements CertStatusStore
             }
 
             final String sql =
-                    "id, revocated, rev_reason, rev_time, rev_invalidity_time, certprofile_id" +
+                    "id, revocated, rev_reason, rev_time, rev_invalidity_time" +
                     " FROM cert" +
                     " WHERE issuer_id=? AND serial=?";
 

@@ -24,35 +24,51 @@ import org.bouncycastle.asn1.x509.Extensions;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.xipki.security.common.EnvironmentParameterResolver;
 
-public interface CertProfile
+public abstract class CertProfile
 {
 
-    boolean isOnlyForRA();
+    public abstract boolean isOnlyForRA();
 
-    boolean incSerialNumberIfSubjectExists();
+    public abstract void initialize(String data)
+    		throws CertProfileException;
 
-    void initialize(String data) throws CertProfileException;
+    public abstract void setEnvironmentParamterResolver(
+    		EnvironmentParameterResolver paramterResolver);
 
-    void setEnvironmentParamterResolver(EnvironmentParameterResolver paramterResolver);
+    public abstract Date getNotBefore(Date notBefore);
 
-    Date getNotBefore(Date notBefore);
+    public abstract Integer getValidity();
 
-    Integer getValidity();
+    public abstract void checkPublicKey(SubjectPublicKeyInfo publicKey)
+    		throws BadCertTemplateException;
 
-    void checkPublicKey(SubjectPublicKeyInfo publicKey) throws BadCertTemplateException;
+    public abstract SubjectInfo getSubject(X500Name requestedSubject)
+    		throws CertProfileException, BadCertTemplateException;
 
-    SubjectInfo getSubject(X500Name requestedSubject) throws CertProfileException, BadCertTemplateException;
+    public abstract ExtensionOccurrence getOccurenceOfAuthorityKeyIdentifier();
 
-    ExtensionOccurrence getOccurenceOfAuthorityKeyIdentifier();
+    public abstract ExtensionOccurrence getOccurenceOfSubjectKeyIdentifier();
 
-    ExtensionOccurrence getOccurenceOfSubjectKeyIdentifier();
+    public abstract ExtensionOccurrence getOccurenceOfCRLDistributinPoints();
 
-    ExtensionOccurrence getOccurenceOfCRLDistributinPoints();
+    public abstract ExtensionOccurrence getOccurenceOfAuthorityInfoAccess();
 
-    ExtensionOccurrence getOccurenceOfAuthorityInfoAccess();
-
-    ExtensionTuples getExtensions(
+    public abstract ExtensionTuples getExtensions(
             X500Name requestedSubject,
             Extensions requestedExtensions)
-    throws CertProfileException, BadCertTemplateException;
+            throws CertProfileException, BadCertTemplateException;
+    
+    public abstract boolean incSerialNumberIfSubjectExists();
+    
+    public String incSerialNumber(String currentSerialNumber)
+    		throws BadCertTemplateException
+    {
+    	try{
+    		int currentSN = currentSerialNumber == null ? 0 : Integer.parseInt(currentSerialNumber.trim());
+    		return Integer.toString(currentSN+1);
+    	}catch(NumberFormatException e)
+    	{
+    		throw new BadCertTemplateException("invalid serialNumber attribute " + currentSerialNumber);
+    	}
+    }
 }

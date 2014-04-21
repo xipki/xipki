@@ -46,15 +46,6 @@
 				<constraints nullable="false"/>
 			</column>
 		</createTable>
-		<!-- table certprofile -->
-		<createTable tableName="certprofile">
-			<column name="id" type="INT(10)">
-				<constraints primaryKey="true" unique="true" nullable="false"/>
-			</column>
-			<column name="name" type="VARCHAR(45)">
-				<constraints nullable="false"/>
-			</column>
-		</createTable>
 		<!-- table cert -->
 		<createTable tableName="cert">
 			<column name="id" type="INT(10)">
@@ -64,9 +55,6 @@
 				<constraints nullable="false"/>
 			</column>
 			<column name="serial" type="INT">
-				<constraints nullable="false"/>
-			</column>
-			<column name="certprofile_id" type="INT(10)">
 				<constraints nullable="false"/>
 			</column>
 			<column name="subject" type="VARCHAR(200)">
@@ -122,7 +110,6 @@
 	<!-- foreign key -->
 	<changeSet author="xipki" id="2">
 		<addForeignKeyConstraint deferrable="false" initiallyDeferred="false" onDelete="CASCADE" onUpdate="NO ACTION" baseColumnNames="issuer_id" baseTableName="cert" constraintName="fk_cert_cainfo1" referencedColumnNames="id" referencedTableName="issuer"/>
-		<addForeignKeyConstraint deferrable="false" initiallyDeferred="false" onDelete="CASCADE" onUpdate="NO ACTION" baseColumnNames="certprofile_id" baseTableName="cert" constraintName="fk_cert_certprofile1" referencedColumnNames="id" referencedTableName="certprofile"/>
 		<addForeignKeyConstraint deferrable="false" initiallyDeferred="false" onDelete="CASCADE" onUpdate="NO ACTION" baseColumnNames="cert_id" baseTableName="certhash" constraintName="fk_certhash_cert1" referencedColumnNames="id" referencedTableName="cert"/>
 		<addForeignKeyConstraint deferrable="false" initiallyDeferred="false" onDelete="CASCADE" onUpdate="NO ACTION" baseColumnNames="cert_id" baseTableName="rawcert" constraintName="fk_rawcert_cert1" referencedColumnNames="id" referencedTableName="cert"/>
 	</changeSet>

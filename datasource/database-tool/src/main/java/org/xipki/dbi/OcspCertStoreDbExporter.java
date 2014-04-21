@@ -31,11 +31,9 @@ import javax.xml.bind.Marshaller;
 import org.bouncycastle.util.encoders.Base64;
 import org.xipki.database.api.DataSource;
 import org.xipki.dbi.ocsp.jaxb.CertStoreType;
-import org.xipki.dbi.ocsp.jaxb.CertStoreType.Certprofiles;
 import org.xipki.dbi.ocsp.jaxb.CertStoreType.CertsFiles;
 import org.xipki.dbi.ocsp.jaxb.CertStoreType.Issuers;
 import org.xipki.dbi.ocsp.jaxb.CertType;
-import org.xipki.dbi.ocsp.jaxb.CertprofileType;
 import org.xipki.dbi.ocsp.jaxb.CertsType;
 import org.xipki.dbi.ocsp.jaxb.IssuerType;
 import org.xipki.dbi.ocsp.jaxb.ObjectFactory;
@@ -62,7 +60,6 @@ class OcspCertStoreDbExporter extends DbPorter
         certstore.setVersion(VERSION);
 
         certstore.setIssuers(export_issuer());
-        certstore.setCertprofiles(export_certprofile());
         certstore.setCertsFiles(export_cert());
 
         JAXBElement<CertStoreType> root = new ObjectFactory().createCertStore(certstore);
@@ -105,46 +102,12 @@ class OcspCertStoreDbExporter extends DbPorter
         return issuers;
     }
 
-    private Certprofiles export_certprofile()
-    throws SQLException
-    {
-        Certprofiles certprofiles = new Certprofiles();
-
-        Statement stmt = null;
-        try
-        {
-            stmt = createStatement();
-            String sql = "SELECT id, name FROM certprofile";
-            ResultSet rs = stmt.executeQuery(sql);
-
-            while(rs.next())
-            {
-                int id = rs.getInt("id");
-                String name = rs.getString("name");
-
-                CertprofileType info = new CertprofileType();
-                info.setId(id);
-                info.setName(name);
-
-                certprofiles.getCertprofile().add(info);
-            }
-
-            rs.close();
-            rs = null;
-        }finally
-        {
-            closeStatement(stmt);
-        }
-
-        return certprofiles;
-    }
-
     private CertsFiles export_cert()
     throws SQLException, IOException, JAXBException
     {
         CertsFiles certsFiles = new CertsFiles();
 
-        String certSql = "SELECT id, issuer_id, certprofile_id, last_update," +
+        String certSql = "SELECT id, issuer_id, last_update," +
                 " revocated, rev_reason, rev_time, rev_invalidity_time " +
                 " FROM cert" +
                 " WHERE id > ? AND id < ?";
@@ -179,7 +142,6 @@ class OcspCertStoreDbExporter extends DbPorter
                 {
                     int id = rs.getInt("id");
                     int issuer_id = rs.getInt("issuer_id");
-                    int certprofile_id = rs.getInt("certprofile_id");
                     String last_update = rs.getString("last_update");
                     boolean revocated = rs.getBoolean("revocated");
                     String rev_reason = rs.getString("rev_reason");
@@ -207,7 +169,6 @@ class OcspCertStoreDbExporter extends DbPorter
 
                     cert.setId(id);
                     cert.setIssuerId(issuer_id);
-                    cert.setCertprofileId(certprofile_id);
                     cert.setLastUpdate(last_update);
                     cert.setRevocated(revocated);
                     cert.setRevReason(rev_reason);

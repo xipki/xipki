@@ -2,7 +2,7 @@
 
 COMMAND=$1
 
-PROP_FILE=ocsp-db.properties
+PROP_FILE=ocsp-publisher.properties
 CHANGELOG_FILE=ocsp-init.xml
 JDBC_CP=$( echo ../lib/ext/*.jar | sed 's/ /:/g')
 

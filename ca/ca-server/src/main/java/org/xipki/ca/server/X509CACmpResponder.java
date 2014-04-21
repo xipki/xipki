@@ -17,10 +17,12 @@
 
 package org.xipki.ca.server;
 
+import java.math.BigInteger;
 import java.security.InvalidKeyException;
 import java.security.PublicKey;
 import java.security.cert.CRLException;
 import java.security.cert.X509CRL;
+import java.security.cert.X509Certificate;
 import java.text.ParseException;
 import java.util.Date;
 import java.util.Set;
@@ -987,21 +989,33 @@ public class X509CACmpResponder extends CmpResponder
                 }
             }
 
-            int revocationResult = ca.revocateCertificate(
-                    ca.getCAInfo().getCertificate().getCert().getSubjectX500Principal(),
-                    serialNumber.getPositiveValue(), reason, invalidityDate);
-
-            if(revocationResult == X509CA.CERT_REVOCATED)
-            {
-                PKIStatusInfo status = new PKIStatusInfo(PKIStatus.granted);
-                CertId certId = new CertId(new GeneralName(ca.getCASubjectX500Name()), serialNumber);
-                repContentBuilder.add(status, certId);
-                if(childAuditEvent != null)
-                {
-                    childAuditEvent.setStatus(AuditStatus.successfull);
-                }
-            }
-            else if(revocationResult == X509CA.CERT_REVOCATION_EXCEPTION)
+            try{
+	            X509Certificate revokedCert = ca.revocateCertificate(
+	                    serialNumber.getPositiveValue(), reason, invalidityDate);
+	
+	            if(revokedCert != null)
+	            {
+	                PKIStatusInfo status = new PKIStatusInfo(PKIStatus.granted);
+	                CertId certId = new CertId(new GeneralName(ca.getCASubjectX500Name()), serialNumber);
+	                repContentBuilder.add(status, certId);
+	                if(childAuditEvent != null)
+	                {
+	                    childAuditEvent.setStatus(AuditStatus.successfull);
+	                }
+	            }
+	            else
+	            {
+	                PKIStatusInfo status = new PKIStatusInfo(
+	                        PKIStatus.rejection, new PKIFreeText("The given certificate does not exist,"),
+	                        new PKIFailureInfo(PKIFailureInfo.incorrectData));
+	                repContentBuilder.add(status);
+	                if(childAuditEvent != null)
+	                {
+	                    childAuditEvent.setStatus(AuditStatus.failed);
+	                    childAuditEvent.addEventData(new AuditEventData("message", "cert not exists"));
+	                }
+	            }
+            } catch(OperationException e)
             {
                 PKIStatusInfo status = new PKIStatusInfo(
                         PKIStatus.rejection, null, new PKIFailureInfo(PKIFailureInfo.systemFailure));
@@ -1010,18 +1024,6 @@ public class X509CACmpResponder extends CmpResponder
                 {
                     childAuditEvent.setStatus(AuditStatus.error);
                     childAuditEvent.addEventData(new AuditEventData("message", "internal error"));
-                }
-            }
-            else if(revocationResult == X509CA.CERT_NOT_EXISTS)
-            {
-                PKIStatusInfo status = new PKIStatusInfo(
-                        PKIStatus.rejection, new PKIFreeText("The given certificate does not exist,"),
-                        new PKIFailureInfo(PKIFailureInfo.incorrectData));
-                repContentBuilder.add(status);
-                if(childAuditEvent != null)
-                {
-                    childAuditEvent.setStatus(AuditStatus.failed);
-                    childAuditEvent.addEventData(new AuditEventData("message", "cert not exists"));
                 }
             }
         }
@@ -1069,10 +1071,14 @@ public class X509CACmpResponder extends CmpResponder
             }
             else
             {
-                ca.revocateCertificate(
-                        certInfo.getIssuerCert().getCert().getSubjectX500Principal(),
-                        certInfo.getCert().getCert().getSerialNumber(),
-                        CRLReason_cessationOfOperation, new Date());
+            	BigInteger serialNumber = certInfo.getCert().getCert().getSerialNumber();
+                try {
+					ca.revocateCertificate(
+					        serialNumber,
+					        CRLReason_cessationOfOperation, new Date());
+				} catch (OperationException e) {
+					LOG.warn("Could not revocated certificate ca={}, serialNumber={}", ca.getCAInfo().getName(), serialNumber);
+				}
 
                 successfull = false;
             }
@@ -1129,13 +1135,12 @@ public class X509CACmpResponder extends CmpResponder
             Date invalidityDate = new Date();
             for(CertificateInfo remainingCert : remainingCerts)
             {
-                int revocationResult = ca.revocateCertificate(
-                        remainingCert.getIssuerCert().getCert().getSubjectX500Principal(),
+            	try{
+            		ca.revocateCertificate(
                         remainingCert.getCert().getCert().getSerialNumber(),
                         CRLReason_cessationOfOperation, invalidityDate);
-
-                if(revocationResult == X509CA.CERT_REVOCATION_EXCEPTION)
-                {
+            	}catch(OperationException e)
+            	{
                     successfull = false;
                 }
             }
@@ -1198,10 +1203,13 @@ public class X509CACmpResponder extends CmpResponder
                 Date invalidityDate = new Date();
                 for(CertificateInfo remainingCert : remainingCerts)
                 {
-                    ca.revocateCertificate(
-                            remainingCert.getIssuerCert().getCert().getSubjectX500Principal(),
+                	try{
+                		ca.revocateCertificate(
                             remainingCert.getCert().getCert().getSerialNumber(),
                             CRLReason_cessationOfOperation, invalidityDate);
+                	}catch(Throwable t)
+                	{                		
+                	}
                 }
             }
         }

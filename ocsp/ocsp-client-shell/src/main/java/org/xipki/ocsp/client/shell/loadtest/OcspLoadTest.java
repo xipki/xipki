@@ -21,6 +21,7 @@ import java.math.BigInteger;
 import java.net.URL;
 import java.security.cert.X509Certificate;
 import java.util.Date;
+import java.util.List;
 
 import org.bouncycastle.cert.ocsp.BasicOCSPResp;
 import org.bouncycastle.cert.ocsp.CertificateStatus;
@@ -39,9 +40,9 @@ public class OcspLoadTest extends AbstractLoadTest
     private static final Logger LOG = LoggerFactory.getLogger(OcspLoadTest.class);
 
     private final OCSPRequestor requestor;
-    private final long startSerial;
-    private final long endSerial;
-    private long serial;
+    private final List<Long> serials;
+    private final int numSerials;
+    private int serialIndex;
 
     private X509Certificate caCert;
     private URL serverUrl;
@@ -53,32 +54,33 @@ public class OcspLoadTest extends AbstractLoadTest
         return new Testor();
     }
 
-    public OcspLoadTest(OCSPRequestor requestor, long startSerial, long endSerial,
+    public OcspLoadTest(OCSPRequestor requestor, List<Long> serials,
             X509Certificate caCert, URL serverUrl, RequestOptions options)
     {
         ParamChecker.assertNotNull("requestor", requestor);
+        ParamChecker.assertNotEmpty("serials", serials);
         ParamChecker.assertNotNull("caCert", caCert);
         ParamChecker.assertNotNull("serverUrl", serverUrl);
         ParamChecker.assertNotNull("options", options);
 
         this.requestor = requestor;
-        this.startSerial = startSerial;
-        this.endSerial = endSerial;
+        this.serials = serials;
+        this.numSerials = serials.size();
         this.caCert = caCert;
         this.serverUrl = serverUrl;
         this.options = options;
 
-        this.serial = this.endSerial;
+        this.serialIndex = 0;
     }
 
     private synchronized long nextSerialNumber()
     {
-        serial++;
-        if(serial > endSerial)
+        serialIndex++;
+        if(serialIndex >= numSerials)
         {
-            serial = startSerial;
+            serialIndex = 0;
         }
-        return serial;
+        return this.serials.get(serialIndex);
     }
 
     class Testor implements Runnable
@@ -99,7 +101,7 @@ public class OcspLoadTest extends AbstractLoadTest
             BasicOCSPResp basicResp;
             try
             {
-                basicResp = requestor.ask(caCert, BigInteger.valueOf(serial++), serverUrl, options);
+                basicResp = requestor.ask(caCert, BigInteger.valueOf(serialIndex++), serverUrl, options);
             } catch (OCSPRequestorException e)
             {
                 LOG.warn("OCSPRequestorException: {}", e.getMessage());

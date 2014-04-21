@@ -19,6 +19,9 @@ package org.xipki.ocsp.client.shell.loadtest;
 
 import java.net.URL;
 import java.security.cert.X509Certificate;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.StringTokenizer;
 
 import org.apache.felix.gogo.commands.Command;
 import org.apache.felix.gogo.commands.Option;
@@ -40,21 +43,15 @@ public class OCSPStatusLoadTestCommand extends OsgiCommandSupport
             required = true, description = "Required. CA certificate file")
     protected String            cacertFile;
 
-    @Option(name = "-ss",
+    @Option(name = "-serial",
             required = true,
-            description = "Required. Start Serial number")
-    protected Long              startSerialNumber;
-
-    @Option(name = "-es",
-            required = true,
-            description = "Required. End Serial number")
-    protected Long              endSerialNumber;
+            description = "Required. Serial numbers. Comma-seperated serial numbers or ranges")
+    protected String           serialNumbers;
 
     @Option(name = "-duration",
             required = true,
             description = "Required. Duration in seconds")
     protected int              durationInSecond;
-
     @Option(name = "-thread",
             required = false,
             description = "Number of threads, the default is 5")
@@ -70,10 +67,43 @@ public class OCSPStatusLoadTestCommand extends OsgiCommandSupport
             numThreads = 5;
         }
 
-        if(startSerialNumber < 1 || endSerialNumber < 1 || startSerialNumber >= endSerialNumber)
+        List<Long> serialNumbers = new LinkedList<Long>();
+        
+        try{
+	        StringTokenizer tokens = new StringTokenizer(this.serialNumbers, ",");
+	        while(tokens.hasMoreTokens())
+	        {
+	        	String token = tokens.nextToken().trim();
+	        	StringTokenizer subtokens = new StringTokenizer(token, "- ");
+	        	int countTokens = subtokens.countTokens();        	
+	        	if(countTokens == 1)
+	        	{
+	        		serialNumbers.add(Long.parseLong(subtokens.nextToken().trim()));
+	        	}
+	        	if(countTokens == 2)
+	        	{
+	        		int startSerial = Integer.parseInt(subtokens.nextToken().trim());
+	        		int endSerial = Integer.parseInt(subtokens.nextToken().trim());
+	                if(startSerial < 1 || endSerial < 1 || startSerial > endSerial)
+	                {
+	                    System.err.println("invalid serial number " + this.serialNumbers);
+	                    return null;
+	                }
+	                for(long i = startSerial; i <= endSerial; i++)
+	                {
+	                	serialNumbers.add(i);
+	                }
+	        	}
+	        	else
+	        	{
+                    System.err.println("invalid serial number " + this.serialNumbers);
+                    return null;
+	        	}
+	        }
+        }catch(Exception e)
         {
-            System.err.println("invalid serial number");
-            return null;
+        	System.err.println("invalid serial numbers " + this.serialNumbers);
+        	return null;
         }
 
         if(numThreads < 1)
@@ -86,12 +116,11 @@ public class OCSPStatusLoadTestCommand extends OsgiCommandSupport
 
         StringBuilder startMsg = new StringBuilder();
 
-        startMsg.append("Threads:      " + numThreads).append("\n");
-        startMsg.append("Duration:     " + durationInSecond + " s").append("\n");
-        startMsg.append("Start Serial: " + startSerialNumber).append("\n");
-        startMsg.append("End Serial:   " + endSerialNumber).append("\n");
-        startMsg.append("CA cert:      " + cacertFile).append("\n");
-        startMsg.append("Server URL:   " + serverUrl.toString()).append("\n");
+        startMsg.append("Threads:        " + numThreads).append("\n");
+        startMsg.append("Duration:       " + durationInSecond + " s").append("\n");
+        startMsg.append("Serial numbers: " + this.serialNumbers).append("\n");
+        startMsg.append("CA cert:        " + cacertFile).append("\n");
+        startMsg.append("Server URL:     " + serverUrl.toString()).append("\n");
         System.out.print(startMsg.toString());
 
         X509Certificate caCert = IoCertUtil.parseCert(cacertFile);
@@ -100,7 +129,7 @@ public class OCSPStatusLoadTestCommand extends OsgiCommandSupport
         options.setUseNonce(true);
         options.setHashAlgorithmId(NISTObjectIdentifiers.id_sha256);
 
-        OcspLoadTest loadTest = new OcspLoadTest(requestor, startSerialNumber, endSerialNumber,
+        OcspLoadTest loadTest = new OcspLoadTest(requestor, serialNumbers,
                 caCert, serverUrl, options);
         loadTest.setDuration(durationInSecond);
         loadTest.setThreads(numThreads);

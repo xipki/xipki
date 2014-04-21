@@ -123,10 +123,11 @@
 			<column name="permissions" type="VARCHAR(100)">
 				<constraints nullable="false"/>
 			</column>
-                        <column defaultValueNumeric="30" name="num_crls" type="INT">
-                                <constraints nullable="false"/>
-                        </column>
+			<column defaultValueNumeric="30" name="num_crls" type="INT">
+				<constraints nullable="false"/>
+			</column>
 		</createTable>
+
 		<!-- table caalias -->
 		<createTable tableName="caalias">
 			<column name="name" type="VARCHAR(45)">
@@ -235,6 +236,9 @@
 				<constraints nullable="false"/>
 			</column>
 		</createTable>
+
+		<addUniqueConstraint tableName="crl" columnNames="cainfo_id, crl_number" constraintName="const_ca_crlnumer"/>
+
 		<!-- table cert -->
 		<createTable tableName="cert">
 			<column name="id" type="INT(10)">
@@ -276,6 +280,17 @@
 				<constraints nullable="false"/>
 			</column>
 		</createTable>
+
+		<addUniqueConstraint tableName="cert" columnNames="cainfo_id, serial" constraintName="const_ca_serial"/>
+
+		<createIndex tableName="cert" unique="false" indexName="idx_fp_pk">
+			<column name="sha1_fp_pk"/>
+		</createIndex>
+
+		<createIndex tableName="cert" unique="false" indexName="idx_fp_subject">
+			<column name="sha1_fp_subject"/>
+		</createIndex>
+
 		<!-- table rawcert -->
 		<createTable tableName="rawcert">
 			<column name="cert_id" type="INT(10)">
@@ -289,6 +304,7 @@
 			</column>
 		</createTable>
 	</changeSet>
+
 	<!-- CA Configuration :: foreign key -->
 	<changeSet author="xipki" id="3">
 		<addForeignKeyConstraint deferrable="false" initiallyDeferred="false" onDelete="CASCADE" onUpdate="NO ACTION" baseColumnNames="crlsigner_name" baseTableName="ca" constraintName="fk_ca_crlsigner1" referencedColumnNames="name" referencedTableName="crlsigner"/>

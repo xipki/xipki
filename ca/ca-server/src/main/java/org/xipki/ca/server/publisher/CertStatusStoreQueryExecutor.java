@@ -18,7 +18,6 @@
 package org.xipki.ca.server.publisher;
 
 import java.io.IOException;
-import java.math.BigInteger;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
@@ -28,13 +27,9 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
-
-import javax.security.auth.x500.X500Principal;
 
 import org.bouncycastle.asn1.x509.Certificate;
 import org.bouncycastle.util.encoders.Base64;
@@ -54,7 +49,6 @@ class CertStatusStoreQueryExecutor
     private final DataSource dataSource;
 
     private final IssuerStore issuerStore;
-    private final CertprofileStore certprofileStore;
 
     private final HashCalculator hashCalculator;
 
@@ -83,7 +77,6 @@ class CertStatusStoreQueryExecutor
         }
 
         this.issuerStore = initIssuerStore();
-        this.certprofileStore = initCertprofileStore();
     }
 
     private IssuerStore initIssuerStore()
@@ -121,59 +114,32 @@ class CertStatusStoreQueryExecutor
         }
     }
 
-    private CertprofileStore initCertprofileStore()
-    throws SQLException
-    {
-        final String sql = "SELECT id, name FROM certprofile";
-
-        PreparedStatement ps = borrowPreparedStatement(sql);
-
-        ResultSet rs = null;
-        try
-        {
-            rs = ps.executeQuery();
-            Map<String, Integer> entries = new HashMap<String, Integer>();
-
-            while(rs.next())
-            {
-                int id = rs.getInt("id");
-                String name = rs.getString("name");
-                entries.put(name, id);
-            }
-
-            return new CertprofileStore(entries);
-        }finally
-        {
-            returnPreparedStatement(ps);
-            if(rs != null)
-            {
-                rs.close();
-                rs = null;
-            }
-        }
-    }
-
     /**
      * @throws SQLException if there is problem while accessing database.
      * @throws NoSuchAlgorithmException
      * @throws CertificateEncodingException
      */
     void addCert(X509CertificateWithMetaInfo issuer,
-            X509CertificateWithMetaInfo certificate,
-            String certprofileName)
+            X509CertificateWithMetaInfo certificate)
             throws SQLException, CertificateEncodingException
     {
-        addCert(issuer, certificate, certprofileName, false, null, null, null);
+        addCert(issuer, certificate, false, null, null, null);
     }
 
-    /**
-     * @throws SQLException if there is problem while accessing database.
-     * @throws NoSuchAlgorithmException
-     * @throws CertificateEncodingException
-     */
     void addCert(X509CertificateWithMetaInfo issuer,
             X509CertificateWithMetaInfo certificate,
-            String certprofileName,
+            boolean revocated,
+            Date revocationTime,
+            Integer revocationReason,
+            Date invalidityTime)
+            throws SQLException, CertificateEncodingException
+    {
+    	addOrUpdateCert(issuer, certificate, revocated,
+    			revocationTime, revocationReason, invalidityTime);
+    }
+    
+    private void addOrUpdateCert(X509CertificateWithMetaInfo issuer,
+            X509CertificateWithMetaInfo certificate,
             boolean revocated,
             Date revocationTime,
             Integer revocationReason,
@@ -191,212 +157,168 @@ class CertStatusStoreQueryExecutor
         byte[] encodedCert = certificate.getEncodedCert();
         String sha1FpCert = hashCalculator.hexHash(HashAlgoType.SHA1, encodedCert);
         boolean certRegistered = certRegistered(sha1FpCert);
+ 
         if(certRegistered)
-        {
-            LOG.info("Certificate (issuer={}, serialNumber={}, subject={} already in the database, ignore it",
-                    new Object[]{issuer.getSubject(), certificate.getCert().getSerialNumber(), certificate.getSubject()});
-            return;
-        }
-
-        StringBuilder sb = new StringBuilder();
-        sb.append("INSERT INTO cert ");
-        sb.append("(id, last_update, serial, subject");
-        sb.append(", notbefore, notafter, revocated, certprofile_id, issuer_id");
-        if(revocated)
-        {
-            sb.append(", rev_time, rev_invalidity_time, rev_reason");
-        }
-        sb.append(")");
-        sb.append(" VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?");
-        if(revocated)
-        {
-            sb.append(", ?, ?, ?");
-        }
-        sb.append(")");
-
-        final String SQL_ADD_CERT = sb.toString();
-
-        PreparedStatement ps = borrowPreparedStatement(SQL_ADD_CERT);
-        if(ps == null)
-        {
-            throw new SQLException("Cannot create prepared incert_cert statement");
-        }
-
-        int certId = cert_id.getAndAdd(1);
-        int certprofileId = getCertprofileId(certprofileName);
-
-        try
         {
             int issuerId = getIssuerId(issuer);
 
-            X509Certificate cert = certificate.getCert();
-            int idx = 1;
-            ps.setInt(idx++, certId);
-            ps.setLong(idx++, System.currentTimeMillis()/1000);
-            ps.setString(idx++, cert.getSerialNumber().toString());
-            ps.setString(idx++, cert.getSubjectX500Principal().getName());
-            ps.setLong(idx++, cert.getNotBefore().getTime()/1000);
-            ps.setLong(idx++, cert.getNotAfter().getTime()/1000);
-            ps.setBoolean(idx++, revocated);
-            ps.setInt(idx++, certprofileId);
-            ps.setInt(idx++, issuerId);
+            final String sql = "UPDATE cert" +
+                    " SET last_update = ?, revocated = ?, rev_time = ?, rev_invalidity_time = ?, rev_reason = ?" +
+                    " WHERE issuer_id = ? AND serial = ?";
 
-            if(revocated)
+            PreparedStatement ps = borrowPreparedStatement(sql);
+            if(ps == null)
             {
-                ps.setLong(idx++, revocationTime.getTime()/1000);
-                if(invalidityTime != null)
+                throw new SQLException("Cannot create prepared statement " + sql);
+            }
+
+            try
+            {
+                int idx = 1;
+                ps.setLong(idx++, new Date().getTime()/1000);
+                ps.setBoolean(idx++, revocated);
+                if(revocated)
                 {
-                    ps.setLong(idx++, invalidityTime.getTime()/1000);
-                }else
-                {
-                    ps.setNull(idx++, Types.BIGINT);
+	                ps.setLong(idx++, revocationTime.getTime()/1000);
+	                if(invalidityTime != null)
+	                {
+	                    ps.setLong(idx++, invalidityTime.getTime()/1000);
+	                }else
+	                {
+	                    ps.setNull(idx++, Types.INTEGER);
+	                }
+	                ps.setInt(idx++, revocationReason);
                 }
-                ps.setInt(idx++, revocationReason == null? 0 : revocationReason.intValue());
-            }
-
-            ps.executeUpdate();
-        }finally
-        {
-            returnPreparedStatement(ps);
-        }
-
-        final String SQL_ADD_RAWCERT = "INSERT INTO rawcert (cert_id, cert) VALUES (?, ?)";
-
-        ps = borrowPreparedStatement(SQL_ADD_RAWCERT);
-        if(ps == null)
-        {
-            throw new SQLException("Cannot create prepared insert_raw_cert statement");
-        }
-
-        try
-        {
-            int idx = 1;
-            ps.setInt(idx++, certId);
-            ps.setString(idx++, Base64.toBase64String(encodedCert));
-            ps.executeUpdate();
-        }finally
-        {
-            returnPreparedStatement(ps);
-        }
-
-        final String SQL_ADD_CERTHASH = "INSERT INTO certhash "
-                + " (cert_id, sha1_fp, sha224_fp, sha256_fp, sha384_fp, sha512_fp)"
-                + " VALUES (?, ?, ?, ?, ?, ?)";
-
-        ps = borrowPreparedStatement(SQL_ADD_CERTHASH);
-        if(ps == null)
-        {
-            throw new SQLException("Cannot create prepared insert_certhash statement");
-        }
-
-        try
-        {
-            int idx = 1;
-            ps.setInt(idx++, certId);
-            ps.setString(idx++, sha1FpCert);
-            ps.setString(idx++, hashCalculator.hexHash(HashAlgoType.SHA224, encodedCert));
-            ps.setString(idx++, hashCalculator.hexHash(HashAlgoType.SHA256, encodedCert));
-            ps.setString(idx++, hashCalculator.hexHash(HashAlgoType.SHA384, encodedCert));
-            ps.setString(idx++, hashCalculator.hexHash(HashAlgoType.SHA512, encodedCert));
-            ps.executeUpdate();
-        }finally
-        {
-            returnPreparedStatement(ps);
-        }
-    }
-
-    boolean revocateCert(X509Certificate cert, Date revocationTime, int revocationReason,
-            Date invalidityTime)
-    throws SQLException
-    {
-        return revocateCert(cert.getIssuerX500Principal(), cert.getSerialNumber(), revocationTime,
-                revocationReason, invalidityTime);
-    }
-
-    boolean revocateCert(X500Principal x500Issuer, BigInteger serial, Date revocationTime,
-            int revocationReason, Date invalidityTime)
-        throws SQLException
-    {
-        String issuer = x500Issuer.getName();
-        Integer issuer_id = issuerStore.getIdForSubject(issuer);
-        if(issuer_id == null)
-        {
-            LOG.warn("Could find the issuer.id for the issuer " + issuer);
-            return false;
-        }
-
-        final String sql = "UPDATE cert" +
-                " SET last_update = ?, revocated = ?, rev_time = ?, rev_invalidity_time = ?, rev_reason = ?" +
-                " WHERE issuer_id = ? AND serial = ?";
-
-        PreparedStatement ps = borrowPreparedStatement(sql);
-        if(ps == null)
-        {
-            throw new SQLException("Cannot create prepared insert_raw_cert statement");
-        }
-
-        try
-        {
-            int idx = 1;
-            ps.setLong(idx++, new Date().getTime()/1000);
-            ps.setBoolean(idx++, true);
-            ps.setLong(idx++, revocationTime.getTime()/1000);
-            if(invalidityTime != null)
+                else
+                {
+	                ps.setNull(idx++, Types.INTEGER); // rev_time
+                    ps.setNull(idx++, Types.INTEGER); // rev_invalidity_time
+                    ps.setNull(idx++, Types.INTEGER); // rev_reason
+                }
+                ps.setInt(idx++, issuerId);
+                ps.setLong(idx++, certificate.getCert().getSerialNumber().intValue());
+                ps.executeUpdate();
+            }finally
             {
-                ps.setLong(idx++, invalidityTime.getTime()/1000);
-            }else
-            {
-                ps.setNull(idx++, Types.BIGINT);
+                returnPreparedStatement(ps);
             }
-            ps.setInt(idx++, revocationReason);
-            ps.setInt(idx++, issuer_id.intValue());
-            ps.setLong(idx++, serial.intValue());
-            ps.executeUpdate();
-
-            return true;
-        }finally
+        }
+        else
         {
-            returnPreparedStatement(ps);
+	        StringBuilder sb = new StringBuilder();
+	        sb.append("INSERT INTO cert ");
+	        sb.append("(id, last_update, serial, subject");
+	        sb.append(", notbefore, notafter, revocated, issuer_id");
+	        if(revocated)
+	        {
+	            sb.append(", rev_time, rev_invalidity_time, rev_reason");
+	        }
+	        sb.append(")");
+	        sb.append(" VALUES (?, ?, ?, ?, ?, ?, ?, ?");
+	        if(revocated)
+	        {
+	            sb.append(", ?, ?, ?");
+	        }
+	        sb.append(")");
+	
+	        final String SQL_ADD_CERT = sb.toString();
+	
+	        PreparedStatement ps = borrowPreparedStatement(SQL_ADD_CERT);
+	        if(ps == null)
+	        {
+	            throw new SQLException("Cannot create prepared statement " + SQL_ADD_CERT);
+	        }
+	
+	        int certId = cert_id.getAndAdd(1);
+	
+	        try
+	        {
+	            int issuerId = getIssuerId(issuer);
+	
+	            X509Certificate cert = certificate.getCert();
+	            int idx = 1;
+	            ps.setInt(idx++, certId);
+	            ps.setLong(idx++, System.currentTimeMillis()/1000);
+	            ps.setString(idx++, cert.getSerialNumber().toString());
+	            ps.setString(idx++, cert.getSubjectX500Principal().getName());
+	            ps.setLong(idx++, cert.getNotBefore().getTime()/1000);
+	            ps.setLong(idx++, cert.getNotAfter().getTime()/1000);
+	            ps.setBoolean(idx++, revocated);
+	            ps.setInt(idx++, issuerId);
+	
+	            if(revocated)
+	            {
+	                ps.setLong(idx++, revocationTime.getTime()/1000);
+	                if(invalidityTime != null)
+	                {
+	                    ps.setLong(idx++, invalidityTime.getTime()/1000);
+	                }else
+	                {
+	                    ps.setNull(idx++, Types.BIGINT);
+	                }
+	                ps.setInt(idx++, revocationReason == null? 0 : revocationReason.intValue());
+	            }
+	
+	            ps.executeUpdate();
+	        }finally
+	        {
+	            returnPreparedStatement(ps);
+	        }
+	
+	        final String SQL_ADD_RAWCERT = "INSERT INTO rawcert (cert_id, cert) VALUES (?, ?)";
+	
+	        ps = borrowPreparedStatement(SQL_ADD_RAWCERT);
+	        if(ps == null)
+	        {
+	            throw new SQLException("Cannot create prepared insert_raw_cert statement");
+	        }
+	
+	        try
+	        {
+	            int idx = 1;
+	            ps.setInt(idx++, certId);
+	            ps.setString(idx++, Base64.toBase64String(encodedCert));
+	            ps.executeUpdate();
+	        }finally
+	        {
+	            returnPreparedStatement(ps);
+	        }
+	
+	        final String SQL_ADD_CERTHASH = "INSERT INTO certhash "
+	                + " (cert_id, sha1_fp, sha224_fp, sha256_fp, sha384_fp, sha512_fp)"
+	                + " VALUES (?, ?, ?, ?, ?, ?)";
+	
+	        ps = borrowPreparedStatement(SQL_ADD_CERTHASH);
+	        if(ps == null)
+	        {
+	            throw new SQLException("Cannot create prepared insert_certhash statement");
+	        }
+	
+	        try
+	        {
+	            int idx = 1;
+	            ps.setInt(idx++, certId);
+	            ps.setString(idx++, sha1FpCert);
+	            ps.setString(idx++, hashCalculator.hexHash(HashAlgoType.SHA224, encodedCert));
+	            ps.setString(idx++, hashCalculator.hexHash(HashAlgoType.SHA256, encodedCert));
+	            ps.setString(idx++, hashCalculator.hexHash(HashAlgoType.SHA384, encodedCert));
+	            ps.setString(idx++, hashCalculator.hexHash(HashAlgoType.SHA512, encodedCert));
+	            ps.executeUpdate();
+	        }finally
+	        {
+	            returnPreparedStatement(ps);
+	        }
         }
     }
 
-    private int getCertprofileId(String certprofileName)
-    throws SQLException
+    void revocateCert(X509CertificateWithMetaInfo caCert, 
+    		X509CertificateWithMetaInfo cert, 
+    		Date revocationTime,
+    		int revocationReason, 
+    		Date invalidityTime)
+        throws SQLException, CertificateEncodingException
     {
-        if(certprofileName == null)
-        {
-            return -1;
-        }
-
-        Integer id = certprofileStore.getId(certprofileName);
-        if(id != null)
-        {
-            return id.intValue();
-        }
-
-        final String sql = "INSERT INTO certprofile (id, name) VALUES (?, ?)";
-
-        PreparedStatement ps = borrowPreparedStatement(sql);
-        if(ps == null)
-        {
-            throw new SQLException("Cannot create prepared insert_certprofile statement");
-        }
-
-        id = certprofileStore.getNextFreeId();
-        try
-        {
-            int idx = 1;
-            ps.setInt(idx++, id.intValue());
-            ps.setString(idx++, certprofileName);
-
-            ps.execute();
-            certprofileStore.addProfileEntry(certprofileName, id);
-        }finally
-        {
-            returnPreparedStatement(ps);
-        }
-
-        return id.intValue();
+    	addOrUpdateCert(caCert, cert, true, revocationTime, revocationReason, invalidityTime);
     }
 
     private int getIssuerId(X509CertificateWithMetaInfo issuerCert)

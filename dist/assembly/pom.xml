@@ -249,7 +249,7 @@
                                                                                         <version>${project.version}</version>
                                                                                         <type>jar</type>
 											<includes>*.xml</includes>
-                                                                                        <outputDirectory>target/classes/sql</outputDirectory>
+                                                                                        <outputDirectory>target/sql</outputDirectory>
                                                                                 </artifactItem>
                                                                         </artifactItems>
                                                                 </configuration>

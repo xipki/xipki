@@ -73,9 +73,10 @@ Installation
 
   * Configure one database for the CA (required) and one for the OCSP responder (optional)
   * Adapt the database configuration (access rights read and write of database are required)
+
     ```sh
     $XIPKI_HOME/ca-config/ca-db.properties
-    $XIPKI_HOME/ocsp-config/ocsp-db.properties
+    $XIPKI_HOME/ocsp-config/ocsp-publisher.properties
     ```
   * Initialize the dabases
 
