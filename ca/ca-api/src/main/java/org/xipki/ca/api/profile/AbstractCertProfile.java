@@ -42,7 +42,7 @@ import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.xipki.ca.api.profile.internal.X509Util;
 import org.xipki.security.common.EnvironmentParameterResolver;
 
-public abstract class AbstractCertProfile implements CertProfile
+public abstract class AbstractCertProfile extends CertProfile
 {
     private final List<ASN1ObjectIdentifier> forwardDNs;
 

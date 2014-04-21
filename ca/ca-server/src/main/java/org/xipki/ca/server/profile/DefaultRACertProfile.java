@@ -40,7 +40,7 @@ import org.xipki.security.common.EnvironmentParameterResolver;
  * extensions AuthorityKeyIdentifier, SubjectKeyIdentifier, CRLDistributionPoint and AuthorityInfoAccess.
  *
  */
-public class DefaultRACertProfile implements CertProfile
+public class DefaultRACertProfile extends CertProfile
 {
     private static final Set<ASN1ObjectIdentifier> extensionsProcessedByCA = new HashSet<ASN1ObjectIdentifier>();
     static
@@ -150,6 +150,6 @@ public class DefaultRACertProfile implements CertProfile
     @Override
     public boolean incSerialNumberIfSubjectExists()
     {
-        return false;
+        return true;
     }
 }

@@ -20,7 +20,6 @@ package org.xipki.ca.server.store;
 import java.math.BigInteger;
 import java.security.cert.CertificateException;
 import java.security.cert.X509CRL;
-import java.security.cert.X509Certificate;
 import java.sql.SQLException;
 import java.util.Date;
 import java.util.List;
@@ -37,7 +36,6 @@ import org.xipki.ca.api.publisher.CertificateInfo;
 import org.xipki.ca.common.X509CertificateWithMetaInfo;
 import org.xipki.ca.server.CertRevocationInfo;
 import org.xipki.ca.server.CertStatus;
-import org.xipki.ca.server.X509CA;
 import org.xipki.database.api.DataSource;
 
 public class CertificateStore
@@ -55,7 +53,7 @@ public class CertificateStore
     }
 
 
-    public boolean certificateAdded(CertificateInfo certInfo)
+    public boolean addCertificate(CertificateInfo certInfo)
     {
         try
         {
@@ -77,39 +75,31 @@ public class CertificateStore
         return true;
     }
 
-    public int certificateRevoked(X509Certificate cert, CRLReason reason,
-            Date invalidityTime)
+    public byte[] revocateCertificate(X509CertificateWithMetaInfo caCert, BigInteger serialNumber,
+            CRLReason reason, Date invalidityTime) throws OperationException
     {
-        BigInteger serialNumber = cert.getSerialNumber();
+    	try{
+	        byte[] revocatedCert = queryExecutor.revocateCert(caCert, serialNumber, new Date(), reason, invalidityTime);
+	        if(revocatedCert == null)
+	        {
+	            LOG.info("Could not revocate non-existing certificate issuer={}, serialNumber={}", caCert.getSubject(), serialNumber);
+	        }
+	        else
+	        {
+	            LOG.info("revocated certificate issuer={}, serialNumber={}", caCert.getSubject(), serialNumber);
+	        }
 
-        return certificateRevoked(cert.getIssuerX500Principal(), serialNumber, reason, invalidityTime);
-    }
-
-    public int certificateRevoked(X500Principal issuer, BigInteger serialNumber,
-            CRLReason reason, Date invalidityTime)
-    {
-        try
-        {
-            boolean revocated = queryExecutor.revocateCert(issuer, serialNumber, new Date(), reason, invalidityTime);
-            if(revocated)
-            {
-                LOG.info("Could not revocate non-existing certificate issuer={}, serialNumber={}", issuer, serialNumber);
-            }
-            else
-            {
-                LOG.info("revocated certificate issuer={}, serialNumber={}", issuer, serialNumber);
-            }
-
-            return revocated ? X509CA.CERT_REVOCATED : X509CA.CERT_NOT_EXISTS;
-        } catch (SQLException e)
-        {
-            LOG.error("Could not revocate certificate issuer={}, serial={}: {}",
-                    new Object[]{issuer, serialNumber, e.getMessage()});
-            return X509CA.CERT_REVOCATION_EXCEPTION;
+	        return revocatedCert;
+        } catch (Exception e)
+        {        	
+            LOG.error("Could not revocate certificate issuer={} and serialNumber={}. {} Message: {}",
+                    new Object[]{caCert.getSubject(), serialNumber, e.getClass().getName(), e.getMessage()});
+            LOG.debug("error", e);
+            return null;
         }
     }
 
-    public boolean crlAdded(X509CertificateWithMetaInfo cacert, X509CRL crl)
+    public boolean addCRL(X509CertificateWithMetaInfo cacert, X509CRL crl)
     {
         try
         {
@@ -165,7 +155,7 @@ public class CertificateStore
         }
     }
 
-    public boolean certIssued(X509CertificateWithMetaInfo caCert,
+    public boolean certIssuedForSubject(X509CertificateWithMetaInfo caCert,
             String sha1FpSubject)
     {
         try
@@ -182,7 +172,7 @@ public class CertificateStore
         }
     }
 
-    public boolean certIssued(X509CertificateWithMetaInfo caCert, byte[] encodedSubjectPublicKey)
+    public boolean certIssuedForPublicKey(X509CertificateWithMetaInfo caCert, byte[] encodedSubjectPublicKey)
     {
         try
         {

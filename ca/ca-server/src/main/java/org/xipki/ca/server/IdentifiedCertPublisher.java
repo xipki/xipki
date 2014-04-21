@@ -17,12 +17,8 @@
 
 package org.xipki.ca.server;
 
-import java.math.BigInteger;
 import java.security.cert.X509CRL;
-import java.security.cert.X509Certificate;
 import java.util.Date;
-
-import javax.security.auth.x500.X500Principal;
 
 import org.xipki.ca.api.publisher.CertPublisher;
 import org.xipki.ca.api.publisher.CertPublisherException;
@@ -33,7 +29,7 @@ import org.xipki.security.api.PasswordResolver;
 import org.xipki.security.common.EnvironmentParameterResolver;
 import org.xipki.security.common.ParamChecker;
 
-public class IdentifiedCertPublisher implements CertPublisher
+public class IdentifiedCertPublisher extends CertPublisher
 {
     private final String name;
     private final CertPublisher certPublisher;
@@ -67,18 +63,14 @@ public class IdentifiedCertPublisher implements CertPublisher
         certPublisher.certificateAdded(certInfo);
     }
 
-    @Override
-    public void certificateRevoked(X509Certificate cert, int reason, Date invalidityTime)
-    {
-        certPublisher.certificateRevoked(cert, reason, invalidityTime);
-    }
-
-    @Override
-    public void certificateRevoked(X500Principal issuer, BigInteger serialNumber, int reason, Date invalidityTime)
-    {
-        certPublisher.certificateRevoked(issuer, serialNumber, reason, invalidityTime);
-    }
-
+	@Override
+	public void certificateRevoked(X509CertificateWithMetaInfo issuerCert,
+			X509CertificateWithMetaInfo cert, Date revocationTime,
+			int revocationReason, Date invalidityTime) 
+	{
+		certPublisher.certificateRevoked(issuerCert, cert, revocationTime, revocationReason, invalidityTime);
+	}
+	
     @Override
     public void crlAdded(X509CertificateWithMetaInfo cacert, X509CRL crl)
     {
@@ -95,4 +87,5 @@ public class IdentifiedCertPublisher implements CertPublisher
     {
         return certPublisher.isHealthy();
     }
+
 }

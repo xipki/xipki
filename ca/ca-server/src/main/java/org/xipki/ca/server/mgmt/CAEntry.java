@@ -97,6 +97,7 @@ public class CAEntry
         }
 
         this.subject = cert.getSubjectX500Principal().getName();
+        
         this.certInCMPFormat = new CMPCertificate(bcCert);
 
         this.signerType = signerType;

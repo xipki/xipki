@@ -17,35 +17,32 @@
 
 package org.xipki.ca.api.publisher;
 
-import java.math.BigInteger;
 import java.security.cert.X509CRL;
-import java.security.cert.X509Certificate;
 import java.util.Date;
-
-import javax.security.auth.x500.X500Principal;
 
 import org.xipki.ca.common.X509CertificateWithMetaInfo;
 import org.xipki.database.api.DataSourceFactory;
 import org.xipki.security.api.PasswordResolver;
 import org.xipki.security.common.EnvironmentParameterResolver;
 
-public interface CertPublisher
+public abstract class CertPublisher
 {
-    void initialize(String conf, PasswordResolver passwordResolver,
+    public abstract void initialize(String conf,
+    		PasswordResolver passwordResolver,
             DataSourceFactory dataSourceFactory)
             throws CertPublisherException;
 
-    void setEnvironmentParamterResolver(EnvironmentParameterResolver paramterResolver);
+    public abstract void setEnvironmentParamterResolver(EnvironmentParameterResolver paramterResolver);
 
-    void certificateAdded(CertificateInfo certInfo);
+    public abstract void certificateAdded(CertificateInfo certInfo);
 
-    void certificateRevoked(X509Certificate cert,
-            int reason, Date invalidityTime);
+    public abstract void certificateRevoked(X509CertificateWithMetaInfo issuerCert, 
+    		X509CertificateWithMetaInfo cert, 
+    		Date revocationTime,
+    		int revocationReason, 
+    		Date invalidityTime);
 
-    void certificateRevoked(X500Principal issuer, BigInteger serialNumber,
-            int reason, Date invalidityTime);
+    public abstract void crlAdded(X509CertificateWithMetaInfo cacert, X509CRL crl);
 
-    void crlAdded(X509CertificateWithMetaInfo cacert, X509CRL crl);
-
-    boolean isHealthy();
+    public abstract boolean isHealthy();
 }

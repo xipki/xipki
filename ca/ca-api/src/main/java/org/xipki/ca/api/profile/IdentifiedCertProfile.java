@@ -25,7 +25,7 @@ import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.xipki.security.common.EnvironmentParameterResolver;
 import org.xipki.security.common.ParamChecker;
 
-public class IdentifiedCertProfile implements CertProfile
+public class IdentifiedCertProfile extends CertProfile
 {
     private final String name;
     private final CertProfile certProfile;

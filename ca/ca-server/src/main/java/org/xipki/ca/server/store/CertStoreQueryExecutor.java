@@ -427,27 +427,21 @@ class CertStoreQueryExecutor
             returnPreparedStatement(ps);
         }
     }
-
-    boolean revocateCert(X509Certificate cert, Date revocationTime, CRLReason revocationReason,
+    
+    byte[] revocateCert(X509CertificateWithMetaInfo caCert, BigInteger serialNumber, 
+    		Date revocationTime, CRLReason revocationReason,
             Date invalidityTime)
-    throws SQLException
+    throws OperationException, SQLException
     {
-        return revocateCert(cert.getIssuerX500Principal(), cert.getSerialNumber(), revocationTime,
-                revocationReason, invalidityTime);
-    }
-
-    boolean revocateCert(X500Principal x500Issuer, BigInteger serial, Date revocationTime,
-            CRLReason revocationReason, Date invalidityTime)
-        throws SQLException
-    {
-        String issuer = x500Issuer.getName();
-        Integer cainfo_id = caInfoStore.getIdForSubject(issuer);
-        if(cainfo_id == null)
+        byte[] encodedCert = getEncodedCertificate(caCert, serialNumber);
+        if(encodedCert == null)
         {
-            LOG.warn("Could find the cainfo.id for the CA " + issuer);
-            return false;
+            LOG.warn("Certificate with issuer={} and serialNumber={} does not exist", caCert.getSubject(), serialNumber);
+            return null;
         }
 
+        Integer caId = getCaId(caCert); // could not be null
+        
         final String SQL_REVOCATE_CERT =
                 "UPDATE cert" +
                 " SET last_update=?, revocated = ?, rev_time = ?, rev_invalidity_time=?, rev_reason = ?" +
@@ -474,13 +468,14 @@ class CertStoreQueryExecutor
             }
 
             ps.setInt(idx++, revocationReason.getValue().intValue());
-            ps.setInt(idx++, cainfo_id.intValue());
-            ps.setLong(idx++, serial.intValue());
-            return ps.executeUpdate() > 0;
+            ps.setInt(idx++, caId.intValue());
+            ps.setLong(idx++, serialNumber.longValue());
         }finally
         {
             returnPreparedStatement(ps);
         }
+        
+        return encodedCert;
     }
 
     Long getGreatestSerialNumber(X509CertificateWithMetaInfo caCert)

@@ -46,31 +46,23 @@
             <directoryMode>0755</directoryMode>
         </fileSet>
 
+        <!-- Copy over everything unfiltered ressources -->
         <fileSet>
-            <directory>${project.build.directory}/classes/sql</directory>
+            <directory>${project.basedir}/src/main/unfiltered</directory>
             <includes>
                 <include>**/*.sh</include>
             </includes>
-            <outputDirectory>sql</outputDirectory>
+            <outputDirectory>/</outputDirectory>
             <filtered>false</filtered>
             <fileMode>0755</fileMode>
             <directoryMode>0755</directoryMode>
         </fileSet>
 
         <fileSet>
-            <directory>${project.build.directory}/classes/sql</directory>
+            <directory>${project.basedir}/src/main/unfiltered</directory>
             <excludes>
                 <exclude>**/*.sh</exclude>
-            </excludes>            
-            <outputDirectory>sql</outputDirectory>
-            <filtered>false</filtered>
-            <fileMode>0644</fileMode>
-            <directoryMode>0755</directoryMode>
-        </fileSet>
-
-        <!-- Copy over everything unfiltered ressources -->
-        <fileSet>
-            <directory>${project.basedir}/src/main/unfiltered</directory>
+            </excludes>
             <outputDirectory>/</outputDirectory>
             <filtered>false</filtered>
             <fileMode>0644</fileMode>

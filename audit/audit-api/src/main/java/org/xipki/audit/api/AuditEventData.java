@@ -28,13 +28,7 @@ public class AuditEventData
 
     private final AuditEventDataType eventDataType;
 
-    private final Number numberValue;
-
-    private final String textValue;
-
-    private final Date timestampValue;
-
-    private final byte[] binaryValue;
+    private final Object value;
 
     public AuditEventData(final String name, final byte[] value)
     {
@@ -50,10 +44,7 @@ public class AuditEventData
         eventDataType = AuditEventDataType.BINARY;
 
         this.name = name;
-        this.numberValue = null;
-        this.textValue = null;
-        this.timestampValue = null;
-        this.binaryValue = value;
+        this.value = value;
     }
 
     public AuditEventData(final String name, final Date value)
@@ -70,10 +61,7 @@ public class AuditEventData
         eventDataType = AuditEventDataType.TIMESTAMP;
 
         this.name = name;
-        this.numberValue = null;
-        this.textValue = null;
-        this.timestampValue = value;
-        this.binaryValue = null;
+        this.value = value;
     }
 
     public AuditEventData(final String name, final Number value)
@@ -89,10 +77,7 @@ public class AuditEventData
 
         eventDataType = AuditEventDataType.NUMBER;
         this.name = name;
-        this.numberValue = value;
-        this.textValue = null;
-        this.timestampValue = null;
-        this.binaryValue = null;
+        this.value = value;
     }
 
     public AuditEventData(final String name, final String value)
@@ -108,10 +93,7 @@ public class AuditEventData
 
         eventDataType = AuditEventDataType.TEXT;
         this.name = name;
-        this.numberValue = null;
-        this.textValue = value;
-        this.timestampValue = null;
-        this.binaryValue = null;
+        this.value = value;
     }
 
     public AuditEventDataType getEventDataType()
@@ -126,22 +108,31 @@ public class AuditEventData
 
     public Number getNumberValue()
     {
-        return numberValue;
+        return (Number) value;
     }
 
     public String getTextValue()
     {
-        return textValue;
+        return (String) value;
     }
 
     public Date getTimestampValue()
     {
-        return timestampValue;
+        return (Date) value;
     }
 
     public byte[] getBinaryValue()
     {
+    	byte[] binaryValue = (byte[]) value;
         return Arrays.copyOf(binaryValue, binaryValue.length);
+    }
+    
+    @Override
+    public String toString()
+    {
+    	StringBuilder sb = new StringBuilder();
+    	sb.append(name).append("=").append(value);
+    	return sb.toString();
     }
 
 }

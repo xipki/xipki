@@ -623,7 +623,7 @@ public class X509CA
                 boolean b;
                 try
                 {
-                    b = certstore.certIssued(this.caInfo.getCertificate(), publicKeyInfo.getEncoded());
+                    b = certstore.certIssuedForPublicKey(this.caInfo.getCertificate(), publicKeyInfo.getEncoded());
                 } catch (IOException e)
                 {
                     throw new OperationException(ErrorCode.BAD_CERT_TEMPLATE, "could not encode public key");
@@ -709,7 +709,7 @@ public class X509CA
 
     public boolean publishCertificate(CertificateInfo certInfo)
     {
-        if(! certstore.certificateAdded(certInfo))
+        if(! certstore.addCertificate(certInfo))
         {
             return false;
         }
@@ -843,7 +843,7 @@ public class X509CA
     private boolean publishCRL(X509CRL crl)
     {
         X509CertificateWithMetaInfo cacert = caInfo.getCertificate();
-        if(! certstore.crlAdded(cacert, crl))
+        if(! certstore.addCRL(cacert, crl))
         {
             return false;
         }
@@ -863,34 +863,47 @@ public class X509CA
         return true;
     }
 
-
-    public int revocateCertificate(X509Certificate cert,
-            CRLReason reason, Date invalidityTime)
+    public X509Certificate revocateCertificate(BigInteger serialNumber,
+            CRLReason reason, Date invalidityTime) throws OperationException
     {
-        BigInteger serialNumber = cert.getSerialNumber();
-        return revocateCertificate(cert.getIssuerX500Principal(), serialNumber, reason, invalidityTime);
-    }
-
-    public int revocateCertificate(X500Principal issuer, BigInteger serialNumber,
-            CRLReason reason, Date invalidityTime)
-    {
-        String issuerName = issuer.getName();
-        LOG.info("START revocateCertificate: ca={}, issuer={}, serialNumber={}, reason={}, invalidityTime={}",
-                new Object[]{caInfo.getName(), issuerName, serialNumber, reason.getValue(), invalidityTime});
+        LOG.info("START revocateCertificate: ca={}, serialNumber={}, reason={}, invalidityTime={}",
+                new Object[]{caInfo.getName(), serialNumber, reason.getValue(), invalidityTime});
 
         numActiveRevocations.addAndGet(1);
-        int revocationResult;
+
+        X509Certificate revokedCert;
+        
         try
         {
-            revocationResult = certstore.certificateRevoked(issuer, serialNumber, reason, invalidityTime);
-
-            if(CERT_REVOCATED == revocationResult)
+            byte[] revokedCertBytes= certstore.revocateCertificate(
+            		caInfo.getCertificate(), 
+            		serialNumber, reason, invalidityTime);
+            if(revokedCertBytes == null)
+            {
+            	return null;
+            }
+            
+			try {
+				revokedCert = IoCertUtil.parseCert(revokedCertBytes);
+			} catch (Exception e) {
+				LOG.error("Could not parse revoked certificate with ca={} and serialNumber={}",
+						caInfo.getName(), serialNumber);
+				throw new OperationException(ErrorCode.System_Failure, e.getMessage());
+			}
+			
+            X509CertificateWithMetaInfo revokedCertWithInfo = new X509CertificateWithMetaInfo(revokedCert);
+            
+            Date revocationTime = new Date();
+            
+            if(revokedCert != null)
             {
                 for(IdentifiedCertPublisher publisher : getPublishers())
                 {
                     try
                     {
-                        publisher.certificateRevoked(issuer, serialNumber, reason.getValue().intValue(), invalidityTime);
+                        publisher.certificateRevoked(caInfo.getCertificate(),
+                        		revokedCertWithInfo,
+                        		revocationTime, reason.getValue().intValue(), invalidityTime);
                     }
                     catch (RuntimeException re)
                     {
@@ -898,15 +911,17 @@ public class X509CA
                     }
                 }
             }
+            
         }finally
         {
             numActiveRevocations.addAndGet(-1);
         }
 
-        LOG.info("SUCCESSFULL revocateCertificate: ca={}, issuer={}, serialNumber={}, reason={}, invalidityTime={}, revocationResult={} ({})",
-                new Object[]{caInfo.getName(), issuerName, serialNumber, reason.getValue(), invalidityTime, revocationResult, getRevocationResultText(revocationResult)});
+        String resultText = revokedCert == null ? "CERT_NOT_EXIST" : "REVOKED";
+        LOG.info("SUCCESSFULL revocateCertificate: ca={}, serialNumber={}, reason={}, invalidityTime={}, revocationResult={}",
+        		new Object[]{caInfo.getName(), serialNumber, reason.getValue(), invalidityTime, resultText});
 
-        return revocationResult;
+        return revokedCert;
     }
 
     private List<IdentifiedCertPublisher> getPublishers()
@@ -1006,21 +1021,35 @@ public class X509CA
         {
             if(caInfo.isAllowDuplicateSubject() == false)
             {
-                boolean b = certstore.certIssued(this.caInfo.getCertificate(), sha1FpSubject);
+                boolean certWithSameSubjectIssued = certstore.certIssuedForSubject(this.caInfo.getCertificate(), sha1FpSubject);
 
-                if(b)
+                if(certWithSameSubjectIssued)
                 {
-                    if(certProfile.incSerialNumberIfSubjectExists())
-                    {
-                        do
-                        {
-                            grantedSubject = incSerialNumber(grantedSubject);
-                        }while(certstore.certIssued(this.caInfo.getCertificate(), grantedSubject.toString()));
-                    }
-                    else if(! caInfo.isAllowDuplicateSubject())
-                    {
+                	boolean incSerialNumberAllowed = certProfile.incSerialNumberIfSubjectExists();
+                	if(incSerialNumberAllowed && origCertProfileConf != null)
+                	{
+	                	if(origCertProfileConf.isIncSerialNumberSpecified() &&
+	                			origCertProfileConf.getIncSerialNumber().booleanValue() == false)
+	                	{
+	                		incSerialNumberAllowed = false;
+	                	}
+                	}
+                	
+                	if(incSerialNumberAllowed == false)
+                	{
                         throw new CertAlreadyIssuedException("Certificate for the given subject " + grandtedSubjectText + " already issued");
-                    }
+                	}
+                		
+                    do
+                    {
+                        try
+                        {
+							grantedSubject = incSerialNumber(certProfile, grantedSubject);
+						} catch (BadCertTemplateException e)
+				        {
+				            throw new OperationException(ErrorCode.BAD_CERT_TEMPLATE, e.getMessage());
+						}
+                    }while(certstore.certIssuedForSubject(this.caInfo.getCertificate(), grantedSubject.toString()));
                 }
             }
         }
@@ -1323,7 +1352,7 @@ public class X509CA
             throws IOException, CertProfileException
     {
         ExtensionOccurrence extOccurrence;
-        if(originalProfileConf != null && originalProfileConf.iscRLDisributionPointsSpecified())
+        if(originalProfileConf != null && originalProfileConf.isCRLDisributionPointsSpecified())
         {
             extOccurrence = originalProfileConf.getCRLDisributionPoints();
         }
@@ -1447,27 +1476,8 @@ public class X509CA
         return result;
     }
 
-    private static String getRevocationResultText(int code)
-    {
-        if(code == CERT_REVOCATED)
-        {
-            return "revocated";
-        }
-        else if(code == CERT_NOT_EXISTS)
-        {
-            return "cert_not_exists";
-        }
-        else if(code == CERT_REVOCATION_EXCEPTION)
-        {
-            return "exception";
-        }
-        else
-        {
-            return "UNDEF";
-        }
-    }
-
-    private static X500Name incSerialNumber(X500Name origName)
+    private static X500Name incSerialNumber(CertProfile profile, X500Name origName)
+    	throws BadCertTemplateException
     {
         RDN[] rdns = origName.getRDNs();
 
@@ -1487,16 +1497,14 @@ public class X509CA
             }
         }
 
-        int serialNumber = 1;
+    	String currentSerialNumber = null;
         if(serialNumberIndex != -1)
         {
-            String s = IETFUtils.valueToString(rdns[serialNumberIndex].getFirst().getValue());
-            serialNumber = Integer.parseInt(s);
-            serialNumber++;
+        	currentSerialNumber = IETFUtils.valueToString(rdns[serialNumberIndex].getFirst().getValue());
         }
-
+        String newSerialNumber = profile.incSerialNumber(currentSerialNumber);
         RDN serialNumberRdn = new RDN(ObjectIdentifiers.id_at_serialNumber,
-                new DERPrintableString(Integer.toString(serialNumber)));
+                new DERPrintableString(newSerialNumber));
 
         if(serialNumberIndex != -1)
         {
