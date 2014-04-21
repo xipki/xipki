@@ -19,6 +19,7 @@ package org.xipki.audit.slf4j;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -27,6 +28,7 @@ import org.xipki.audit.api.AuditEvent;
 import org.xipki.audit.api.AuditEventData;
 import org.xipki.audit.api.AuditEventDataType;
 import org.xipki.audit.api.AuditLoggingService;
+import org.xipki.audit.api.AuditStatus;
 import org.xipki.audit.api.PCIAuditEvent;
 
 public class Slf4jAuditLoggingServiceImpl implements AuditLoggingService
@@ -47,45 +49,68 @@ public class Slf4jAuditLoggingServiceImpl implements AuditLoggingService
             return;
         }
 
-        switch(event.getLevel())
+        try{
+	        switch(event.getLevel())
+	        {
+	            case EMERGENCY:
+	            case ALERT:
+	            case CRITICAL:
+	            case ERROR:
+	                if(LOG.isErrorEnabled())
+	                {
+	                    LOG.error("{}", createMessage(event));
+	                }
+	                break;
+	            case WARN:
+	            case NOTICE:
+	                if(LOG.isWarnEnabled())
+	                {
+	                    LOG.warn("{}", createMessage(event));
+	                }
+	                break;
+	            case INFO:
+	                if(LOG.isInfoEnabled())
+	                {
+	                    LOG.info("{}", createMessage(event));
+	                }
+	                break;
+	            case DEBUG:
+	                if(LOG.isDebugEnabled())
+	                {
+	                    LOG.debug("{}", createMessage(event));
+	                }
+	                break;
+	        }
+        }catch(Throwable t)
         {
-            case EMERGENCY:
-            case ALERT:
-            case CRITICAL:
-            case ERROR:
-                if(LOG.isErrorEnabled())
-                {
-                    LOG.error("{}", createMessage(event));
-                }
-                break;
-            case WARN:
-            case NOTICE:
-                if(LOG.isWarnEnabled())
-                {
-                    LOG.warn("{}", createMessage(event));
-                }
-                break;
-            case INFO:
-                if(LOG.isInfoEnabled())
-                {
-                    LOG.info("{}", createMessage(event));
-                }
-                break;
-            case DEBUG:
-                if(LOG.isDebugEnabled())
-                {
-                    LOG.debug("{}", createMessage(event));
-                }
-                break;
+        	LOG.error("LOG - SYSTEM\tstatus: failed\tmessage: {}", t.getMessage());
         }
     }
 
     private static String createMessage(AuditEvent event)
     {
         StringBuilder sb = new StringBuilder();
-        sb.append(event.getApplicationName()).append(" - ").append(event.getName());
-
-        sb.append(":\tstatus: ").append(event.getStatus().name());
+        
+        String applicationName = event.getApplicationName();
+        if(applicationName == null)
+        {
+        	applicationName = "undefined";
+        }
+        
+        String name = event.getName();
+        if(name == null)
+        {
+        	name = "undefined";
+        }
+        
+        sb.append(applicationName).append(" - ").append(name);
+        
+        AuditStatus status = event.getStatus();
+        if(status == null)
+        {
+        	status = AuditStatus.undefined;
+        }
+        sb.append(":\tstatus: ").append(status.name());
         List<AuditEventData> eventDataArray = event.getEventDatas();
 
         if ((eventDataArray != null) && (eventDataArray.size() > 0))
@@ -109,7 +134,8 @@ public class Slf4jAuditLoggingServiceImpl implements AuditLoggingService
                     sb.append(element.getTextValue());
                     break;
                 case TIMESTAMP:
-                    sb.append(df.format(element.getTimestampValue()));
+                	Date t = element.getTimestampValue();
+                    sb.append(t == null ? "undefined" : df.format(element.getTimestampValue()));
                     break;
                 }
             }
@@ -125,44 +151,54 @@ public class Slf4jAuditLoggingServiceImpl implements AuditLoggingService
             return;
         }
 
-        switch(event.getLevel())
-        {
-            case EMERGENCY:
-            case ALERT:
-            case CRITICAL:
-            case ERROR:
-                if(LOG.isErrorEnabled())
-                {
-                    LOG.error("{}", event.createMessage());
-                }
-                break;
-            case WARN:
-            case NOTICE:
-                if(LOG.isWarnEnabled())
-                {
-                    LOG.warn("{}", event.createMessage());
-                }
-                break;
-            case INFO:
-                if(LOG.isInfoEnabled())
-                {
-                    LOG.info("{}", event.createMessage());
-                }
-                break;
-            case DEBUG:
-                if(LOG.isDebugEnabled())
-                {
-                    LOG.debug("{}", event.createMessage());
-                }
-                break;
+        try{
+	        switch(event.getLevel())
+	        {
+	            case EMERGENCY:
+	            case ALERT:
+	            case CRITICAL:
+	            case ERROR:
+	                if(LOG.isErrorEnabled())
+	                {
+	                    LOG.error("{}", event.createMessage());
+	                }
+	                break;
+	            case WARN:
+	            case NOTICE:
+	                if(LOG.isWarnEnabled())
+	                {
+	                    LOG.warn("{}", event.createMessage());
+	                }
+	                break;
+	            case INFO:
+	                if(LOG.isInfoEnabled())
+	                {
+	                    LOG.info("{}", event.createMessage());
+	                }
+	                break;
+	            case DEBUG:
+	                if(LOG.isDebugEnabled())
+	                {
+	                    LOG.debug("{}", event.createMessage());
+	                }
+	                break;
+	        }
+	
+	        event.createMessage();
+        }catch(Throwable t)
+        {        
+        	LOG.error("LOG - SYSTEM\tstatus: failed\tmessage: {}", t.getMessage());
         }
-
-        event.createMessage();
     }
 
     private static final char[] HEX_CHAR_TABLE = "0123456789ABCDEF".toCharArray();
     private static String toHexString(byte[] raw)
     {
+    	if(raw == null)
+    	{
+    		return "";
+    	}
+    	
         StringBuilder sb = new StringBuilder();
         for (byte b : raw)
         {
