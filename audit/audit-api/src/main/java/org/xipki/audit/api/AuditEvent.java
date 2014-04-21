@@ -175,14 +175,14 @@ public class AuditEvent
             AuditEvent event = new AuditEvent(timestamp);
             event.setApplicationName(applicationName);
             event.setName(name);
-            
+
             if(child.getLevel() != null)
             {
                 event.setLevel(child.getLevel());
             }
             else
             {
-            	event.setLevel(level);
+                event.setLevel(level);
             }
 
             if(child.getStatus() != null)
@@ -191,9 +191,9 @@ public class AuditEvent
             }
             else
             {
-            	event.setStatus(status);
+                event.setStatus(status);
             }
-            
+
             for(AuditEventData eventData : eventDatas)
             {
                 event.addEventData(eventData);
