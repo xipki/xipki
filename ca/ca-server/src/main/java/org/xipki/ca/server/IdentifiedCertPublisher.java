@@ -63,14 +63,14 @@ public class IdentifiedCertPublisher extends CertPublisher
         certPublisher.certificateAdded(certInfo);
     }
 
-	@Override
-	public void certificateRevoked(X509CertificateWithMetaInfo issuerCert,
-			X509CertificateWithMetaInfo cert, Date revocationTime,
-			int revocationReason, Date invalidityTime) 
-	{
-		certPublisher.certificateRevoked(issuerCert, cert, revocationTime, revocationReason, invalidityTime);
-	}
-	
+    @Override
+    public void certificateRevoked(X509CertificateWithMetaInfo issuerCert,
+            X509CertificateWithMetaInfo cert, Date revocationTime,
+            int revocationReason, Date invalidityTime)
+    {
+        certPublisher.certificateRevoked(issuerCert, cert, revocationTime, revocationReason, invalidityTime);
+    }
+
     @Override
     public void crlAdded(X509CertificateWithMetaInfo cacert, X509CRL crl)
     {

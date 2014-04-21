@@ -78,20 +78,21 @@ public class CertificateStore
     public byte[] revocateCertificate(X509CertificateWithMetaInfo caCert, BigInteger serialNumber,
             CRLReason reason, Date invalidityTime) throws OperationException
     {
-    	try{
-	        byte[] revocatedCert = queryExecutor.revocateCert(caCert, serialNumber, new Date(), reason, invalidityTime);
-	        if(revocatedCert == null)
-	        {
-	            LOG.info("Could not revocate non-existing certificate issuer={}, serialNumber={}", caCert.getSubject(), serialNumber);
-	        }
-	        else
-	        {
-	            LOG.info("revocated certificate issuer={}, serialNumber={}", caCert.getSubject(), serialNumber);
-	        }
+        try
+        {
+            byte[] revocatedCert = queryExecutor.revocateCert(caCert, serialNumber, new Date(), reason, invalidityTime);
+            if(revocatedCert == null)
+            {
+                LOG.info("Could not revocate non-existing certificate issuer={}, serialNumber={}", caCert.getSubject(), serialNumber);
+            }
+            else
+            {
+                LOG.info("revocated certificate issuer={}, serialNumber={}", caCert.getSubject(), serialNumber);
+            }
 
-	        return revocatedCert;
+            return revocatedCert;
         } catch (Exception e)
-        {        	
+        {
             LOG.error("Could not revocate certificate issuer={} and serialNumber={}. {} Message: {}",
                     new Object[]{caCert.getSubject(), serialNumber, e.getClass().getName(), e.getMessage()});
             LOG.debug("error", e);

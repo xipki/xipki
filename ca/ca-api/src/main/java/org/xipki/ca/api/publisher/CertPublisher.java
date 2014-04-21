@@ -28,7 +28,7 @@ import org.xipki.security.common.EnvironmentParameterResolver;
 public abstract class CertPublisher
 {
     public abstract void initialize(String conf,
-    		PasswordResolver passwordResolver,
+            PasswordResolver passwordResolver,
             DataSourceFactory dataSourceFactory)
             throws CertPublisherException;
 
@@ -36,11 +36,11 @@ public abstract class CertPublisher
 
     public abstract void certificateAdded(CertificateInfo certInfo);
 
-    public abstract void certificateRevoked(X509CertificateWithMetaInfo issuerCert, 
-    		X509CertificateWithMetaInfo cert, 
-    		Date revocationTime,
-    		int revocationReason, 
-    		Date invalidityTime);
+    public abstract void certificateRevoked(X509CertificateWithMetaInfo issuerCert,
+            X509CertificateWithMetaInfo cert,
+            Date revocationTime,
+            int revocationReason,
+            Date invalidityTime);
 
     public abstract void crlAdded(X509CertificateWithMetaInfo cacert, X509CRL crl);
 

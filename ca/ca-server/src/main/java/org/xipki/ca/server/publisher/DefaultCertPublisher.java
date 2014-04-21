@@ -48,7 +48,7 @@ public class DefaultCertPublisher extends CertPublisher
     private EnvironmentParameterResolver envParamterResolver;
     private CertStatusStoreQueryExecutor queryExecutor;
     private boolean publishGoodCerts = true;
-    
+
     public DefaultCertPublisher()
     {
     }
@@ -72,24 +72,26 @@ public class DefaultCertPublisher extends CertPublisher
         }
         InputStream confStream = new ByteArrayInputStream(confBytes);
         Properties props = new Properties();
-        
-        try{
-        	props.load(confStream);
+
+        try
+        {
+            props.load(confStream);
         }catch(IOException e)
         {
-        	throw new CertPublisherException("IOException while loading configuration: " + e.getMessage());
+            throw new CertPublisherException("IOException while loading configuration: " + e.getMessage());
         }
-        
+
         String propValue = props.getProperty("publish.goodcerts", "true");
         publishGoodCerts = Boolean.parseBoolean(propValue);
 
-        try{
-        	confStream.reset();
+        try
+        {
+            confStream.reset();
         }catch(IOException e)
         {
-        	throw new CertPublisherException("IOException while loading configuration: " + e.getMessage());
+            throw new CertPublisherException("IOException while loading configuration: " + e.getMessage());
         }
-        
+
         DataSource dataSource;
         try
         {
@@ -153,15 +155,15 @@ public class DefaultCertPublisher extends CertPublisher
     }
 
     @Override
-    public void certificateRevoked(X509CertificateWithMetaInfo caCert, 
-    		X509CertificateWithMetaInfo cert, 
-    		Date revocationTime,
-    		int revocationReason, 
-    		Date invalidityTime)
+    public void certificateRevoked(X509CertificateWithMetaInfo caCert,
+            X509CertificateWithMetaInfo cert,
+            Date revocationTime,
+            int revocationReason,
+            Date invalidityTime)
     {
         try
         {
-        	queryExecutor.revocateCert(caCert, cert, revocationTime, revocationReason, invalidityTime);
+            queryExecutor.revocateCert(caCert, cert, revocationTime, revocationReason, invalidityTime);
         } catch (Exception e)
         {
             LOG.error("Could not publish revocated certificate (issuser={}: subject={}, serialNumber={}). Message: {}",

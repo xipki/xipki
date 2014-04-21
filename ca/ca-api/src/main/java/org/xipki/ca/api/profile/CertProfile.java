@@ -30,20 +30,20 @@ public abstract class CertProfile
     public abstract boolean isOnlyForRA();
 
     public abstract void initialize(String data)
-    		throws CertProfileException;
+            throws CertProfileException;
 
     public abstract void setEnvironmentParamterResolver(
-    		EnvironmentParameterResolver paramterResolver);
+            EnvironmentParameterResolver paramterResolver);
 
     public abstract Date getNotBefore(Date notBefore);
 
     public abstract Integer getValidity();
 
     public abstract void checkPublicKey(SubjectPublicKeyInfo publicKey)
-    		throws BadCertTemplateException;
+            throws BadCertTemplateException;
 
     public abstract SubjectInfo getSubject(X500Name requestedSubject)
-    		throws CertProfileException, BadCertTemplateException;
+            throws CertProfileException, BadCertTemplateException;
 
     public abstract ExtensionOccurrence getOccurenceOfAuthorityKeyIdentifier();
 
@@ -57,18 +57,19 @@ public abstract class CertProfile
             X500Name requestedSubject,
             Extensions requestedExtensions)
             throws CertProfileException, BadCertTemplateException;
-    
+
     public abstract boolean incSerialNumberIfSubjectExists();
-    
+
     public String incSerialNumber(String currentSerialNumber)
-    		throws BadCertTemplateException
+            throws BadCertTemplateException
     {
-    	try{
-    		int currentSN = currentSerialNumber == null ? 0 : Integer.parseInt(currentSerialNumber.trim());
-    		return Integer.toString(currentSN+1);
-    	}catch(NumberFormatException e)
-    	{
-    		throw new BadCertTemplateException("invalid serialNumber attribute " + currentSerialNumber);
-    	}
+        try
+        {
+            int currentSN = currentSerialNumber == null ? 0 : Integer.parseInt(currentSerialNumber.trim());
+            return Integer.toString(currentSN+1);
+        }catch(NumberFormatException e)
+        {
+            throw new BadCertTemplateException("invalid serialNumber attribute " + currentSerialNumber);
+        }
     }
 }
