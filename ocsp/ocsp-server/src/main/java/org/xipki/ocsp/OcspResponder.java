@@ -438,7 +438,7 @@ public class OcspResponder
                     }
 
                     boolean sigValid = request.isSignatureValid(cvp);
-                    if(!sigValid)
+                    if(sigValid == false)
                     {
                         String message = "request signature is invalid";
                         LOG.warn(message);

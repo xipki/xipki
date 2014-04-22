@@ -419,7 +419,7 @@ public final class IaikP11CryptService implements P11CryptService
             }
         }
 
-        if(! lastRefreshSuccessfull)
+        if(lastRefreshSuccessfull == false)
         {
             throw new SignerException("PKCS#11 module is not initialized");
         }

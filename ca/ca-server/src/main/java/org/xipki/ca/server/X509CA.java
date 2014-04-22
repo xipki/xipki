@@ -387,7 +387,7 @@ public class X509CA
                         Date revocationTime = revInfo.getRevocationTime();
                         Date invalidityTime = revInfo.getInvalidityTime();
 
-                        if(directCRL || ! isFirstCRLEntry)
+                        if(directCRL || isFirstCRLEntry == false)
                         {
                             crlBuilder.addCRLEntry(revInfo.getSerial(), revocationTime, reason, invalidityTime);
                         }
@@ -615,7 +615,7 @@ public class X509CA
 
         try
         {
-            if(! caInfo.isAllowDuplicateKey())
+            if(caInfo.isAllowDuplicateKey() == false)
             {
                 boolean b;
                 try
@@ -706,7 +706,7 @@ public class X509CA
 
     public boolean publishCertificate(CertificateInfo certInfo)
     {
-        if(! certstore.addCertificate(certInfo))
+        if(certstore.addCertificate(certInfo) == false)
         {
             return false;
         }
@@ -838,7 +838,7 @@ public class X509CA
     private boolean publishCRL(X509CRL crl)
     {
         X509CertificateWithMetaInfo cacert = caInfo.getCertificate();
-        if(! certstore.addCRL(cacert, crl))
+        if(certstore.addCRL(cacert, crl) == false)
         {
             return false;
         }
@@ -961,7 +961,7 @@ public class X509CA
             throw new OperationException(ErrorCode.UNKNOWN_CERT_PROFILE, "unknown cert profile " + certProfileName);
         }
 
-        if(certProfile.isOnlyForRA() && !requestedByRA)
+        if(certProfile.isOnlyForRA() && requestedByRA == false)
         {
             throw new OperationException(ErrorCode.NO_PERMISSION_OF_CERT_PROFILE,
                     "Profile " + certProfileName + " not applied to non-RA");
@@ -1116,7 +1116,7 @@ public class X509CA
                         publicKeyInfo,
                         extensions,
                         caInfo.getPublicCAInfo());
-                if(warningMsg != null && !warningMsg.isEmpty())
+                if(warningMsg != null && warningMsg.isEmpty() == false)
                 {
                     msgBuilder.append(", ").append(warningMsg);
                 }

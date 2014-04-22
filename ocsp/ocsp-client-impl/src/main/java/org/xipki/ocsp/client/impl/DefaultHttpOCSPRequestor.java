@@ -66,7 +66,7 @@ public class DefaultHttpOCSPRequestor extends AbstractOCSPRequestor
                        isValidContentType = true;
                 }
             }
-            if (! isValidContentType)
+            if (isValidContentType == false)
             {
                 throw new IOException("Bad Response: Mime type " + responseContentType + " not supported!");
             }

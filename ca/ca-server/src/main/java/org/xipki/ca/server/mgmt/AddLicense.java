@@ -100,7 +100,7 @@ public class AddLicense
                     skip = false;
                 }
 
-                if(!skip)
+                if(skip == false)
                 {
                     String canonicalizedLine = canonicalizeLine(line);
                     boolean addThisLine = true;

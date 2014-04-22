@@ -259,7 +259,7 @@ public abstract class RemoteP11CryptService implements P11CryptService
         PKIHeader respHeader = response.getHeader();
         ASN1OctetString tid = respHeader.getTransactionID();
         GeneralName recipient = respHeader.getRecipient();
-        if(! sender.equals(recipient))
+        if(sender.equals(recipient) == false)
         {
             LOG.warn("tid={}: Unknown CMP requestor '{}'", tid, recipient);
         }

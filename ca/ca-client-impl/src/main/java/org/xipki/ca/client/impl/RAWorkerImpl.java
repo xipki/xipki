@@ -202,7 +202,7 @@ public final class RAWorkerImpl extends AbstractRAWorker implements RAWorker
 
         X509Certificate requestorCert = null;
         String s = props.getProperty(REQUESTOR_CERT);
-        if(!isEmpty(s))
+        if(isEmpty(s) == false)
         {
             try
             {
@@ -436,7 +436,7 @@ public final class RAWorkerImpl extends AbstractRAWorker implements RAWorker
             String requestedProfile = mapping.getRequestedProfile();
             String destProfile = mapping.getDestProfile();
 
-            if(! this.raProfilesMaps.containsKey(requestedProfile))
+            if(this.raProfilesMaps.containsKey(requestedProfile) == false)
             {
                 throw new ConfigurationException(
                         "RAClient requested profile " + requestedProfile + " not configured");
@@ -444,7 +444,7 @@ public final class RAWorkerImpl extends AbstractRAWorker implements RAWorker
 
             boolean destProfileSupported = this.casMap.get(mapping.getDestCA()).getProfiles().contains(destProfile);
 
-            if(! destProfileSupported)
+            if(destProfileSupported == false)
             {
                 throw new ConfigurationException("RAClient dest profile " + destProfile +
                         " not supported by CA " + ca);
@@ -709,7 +709,7 @@ public final class RAWorkerImpl extends AbstractRAWorker implements RAWorker
             {
                 shouldApplyCertProfile = true;
                 RACertProfileMapping raProfileMapping = raProfileMappingsMap.get(profile);
-                if(! raProfileMapping.getDestCA().equals(caname))
+                if(raProfileMapping.getDestCA().equals(caname) == false)
                 {
                     throw new RAWorkerException("Not all requests are targeted on the same CA");
                 }
@@ -821,14 +821,14 @@ public final class RAWorkerImpl extends AbstractRAWorker implements RAWorker
             }
         }
 
-        else if(!casMap.containsKey(caname))
+        else if(casMap.containsKey(caname) == false)
         {
             throw new RAWorkerException("unknown ca: " + caname);
         }
         else
         {
             CAConf ca = casMap.get(caname);
-            if(! ca.getProfiles().contains(certProfile))
+            if(ca.getProfiles().contains(certProfile) == false)
             {
                 throw new RAWorkerException("cert profile " + certProfile + " is not supported by the CA " + caname);
             }
@@ -976,7 +976,7 @@ public final class RAWorkerImpl extends AbstractRAWorker implements RAWorker
     {
         ParamChecker.assertNotNull("caname", caname);
 
-        if(! casMap.containsKey(caname))
+        if(casMap.containsKey(caname) == false)
         {
             throw new IllegalArgumentException("Unknown CAConf " + caname);
         }

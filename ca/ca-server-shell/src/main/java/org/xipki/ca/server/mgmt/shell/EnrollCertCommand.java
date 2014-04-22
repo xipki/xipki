@@ -91,7 +91,7 @@ public class EnrollCertCommand extends CaCommand
             return null;
         }
 
-        if(! securityFactory.verifyPOPO(p10cr))
+        if(securityFactory.verifyPOPO(p10cr) == false)
         {
             System.err.print("could not validate POP for the pkcs#10 requst");
             return null;

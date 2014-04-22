@@ -414,7 +414,7 @@ public class IaikExtendedSlot
            }
         catch (PKCS11Exception p11e)
         {
-            if(p11e.getErrorCode()!=0x100)// user already logged in
+            if(p11e.getErrorCode() != 0x100)// user already logged in
             {
                 throw p11e;
             }
@@ -439,13 +439,18 @@ public class IaikExtendedSlot
     {
         try
         {
-               boolean isSessionLoggedIn = checkSessionLoggedIn(session);
-               if (isSessionLoggedIn) return;
+            boolean isSessionLoggedIn = checkSessionLoggedIn(session);
+            if (isSessionLoggedIn)
+            {
+                return;
+            }
+            boolean loginRequired = session.getToken().getTokenInfo().isLoginRequired();
 
-               boolean loginRequired = session.getToken().getTokenInfo().isLoginRequired();
-
-               LOG.debug("loginRequired: {}", loginRequired);
-               if (!loginRequired) return;
+            LOG.debug("loginRequired: {}", loginRequired);
+            if (loginRequired == false)
+            {
+                return;
+            }
 
             session.login( Session.UserType.USER, password);
         } catch (TokenException e)
@@ -454,10 +459,10 @@ public class IaikExtendedSlot
         }
     }
 
-      private static boolean checkSessionLoggedIn(Session session)
-                throws SignerException
-      {
-          SessionInfo info;
+    private static boolean checkSessionLoggedIn(Session session)
+            throws SignerException
+    {
+        SessionInfo info;
         try
         {
             info = session.getSessionInfo();
@@ -465,20 +470,20 @@ public class IaikExtendedSlot
         {
             throw new SignerException(e);
         }
-          LOG.debug("SessionInfo: {}", info);
+        LOG.debug("SessionInfo: {}", info);
 
-            State state=info.getState();
-            long deviceError = info.getDeviceError();
+        State state=info.getState();
+        long deviceError = info.getDeviceError();
 
-          LOG.debug("to be verified PKCS11Module: state = {}, deviceError: {}", state, deviceError);
+        LOG.debug("to be verified PKCS11Module: state = {}, deviceError: {}", state, deviceError);
 
-          boolean isRwSessionLoggedIn = state.equals(State.RW_USER_FUNCTIONS);
-          boolean isRoSessionLoggedIn = state.equals(State.RO_USER_FUNCTIONS);
+        boolean isRwSessionLoggedIn = state.equals(State.RW_USER_FUNCTIONS);
+        boolean isRoSessionLoggedIn = state.equals(State.RO_USER_FUNCTIONS);
 
-          boolean sessionSessionLoggedIn = ((isRoSessionLoggedIn || isRwSessionLoggedIn) && deviceError == 0);
-          LOG.debug("sessionSessionLoggedIn: {}", sessionSessionLoggedIn);
-          return sessionSessionLoggedIn;
-       }
+        boolean sessionSessionLoggedIn = ((isRoSessionLoggedIn || isRwSessionLoggedIn) && deviceError == 0);
+        LOG.debug("sessionSessionLoggedIn: {}", sessionSessionLoggedIn);
+        return sessionSessionLoggedIn;
+    }
 
     public void close()
     {

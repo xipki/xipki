@@ -248,8 +248,8 @@ public class DataSourceImpl implements DataSource
             c = idleConnections.poll();
             try
             {
-                valid = !(c == null || c.isClosed());
-            } catch (SQLException e2)
+                valid = (c != null) && c.isClosed()) == false;
+            } catch (SQLException e)
             {
                 valid = false;
             }
@@ -261,7 +261,7 @@ public class DataSourceImpl implements DataSource
             }
         }
 
-        if(! valid)
+        if(valid == false)
         {
             try
             {
@@ -296,11 +296,11 @@ public class DataSourceImpl implements DataSource
     {
         try
         {
-            if(!conn.isClosed())
+            if(conn.isClosed() == false)
             {
                 synchronized (idleConnections)
                 {
-                    if(! idleConnections.contains(conn))
+                    if(idleConnections.contains(conn) == false)
                     {
                         idleConnections.add(conn);
                     }
