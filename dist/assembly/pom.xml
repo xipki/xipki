@@ -248,7 +248,7 @@
                                                                                         <artifactId>ca-sql</artifactId>
                                                                                         <version>${project.version}</version>
                                                                                         <type>jar</type>
-											<includes>*.xml</includes>
+											<excludes>META-INF/**</excludes>
                                                                                         <outputDirectory>target/sql</outputDirectory>
                                                                                 </artifactItem>
                                                                         </artifactItems>

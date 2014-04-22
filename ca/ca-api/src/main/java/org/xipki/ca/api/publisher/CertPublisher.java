@@ -20,6 +20,7 @@ package org.xipki.ca.api.publisher;
 import java.security.cert.X509CRL;
 import java.util.Date;
 
+import org.xipki.audit.api.AuditLoggingService;
 import org.xipki.ca.common.X509CertificateWithMetaInfo;
 import org.xipki.database.api.DataSourceFactory;
 import org.xipki.security.api.PasswordResolver;
@@ -45,4 +46,6 @@ public abstract class CertPublisher
     public abstract void crlAdded(X509CertificateWithMetaInfo cacert, X509CRL crl);
 
     public abstract boolean isHealthy();
+
+    public abstract void setAuditLoggingService(AuditLoggingService auditLoggingService);
 }

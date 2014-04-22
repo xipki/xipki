@@ -59,6 +59,7 @@
 	<feature name="xipki-ca-api" version="${project.version}" resolver="(obr)">
 		<bundle>mvn:org.xipki/security-common/${project.version}</bundle>
 		<bundle>mvn:org.xipki/ca-common/${project.version}</bundle>
+		<bundle>mvn:org.xipki/audit-api/${project.version}</bundle>		
 		<bundle>mvn:org.xipki/ca-api/${project.version}</bundle>
 	</feature>
 	<feature name="certprofile-example" version="${project.version}" resolver="(obr)">
@@ -69,7 +70,6 @@
 		<feature>xipki-datasource</feature>
 		<feature>xipki-security</feature>
 		<feature>xipki-ca-api</feature>
-		<bundle>mvn:org.xipki/audit-api/${project.version}</bundle>
 		<bundle>mvn:org.xipki/ca-cmp/${project.version}</bundle>
 		<bundle>mvn:org.xipki/ca-server/${project.version}</bundle>
 	</feature>
@@ -99,8 +99,8 @@
 	<feature name="xipki-ocspserver" version="${project.version}" resolver="(obr)">
 		<feature>xipki-datasource</feature>
 		<feature>xipki-security</feature>
-		<bundle>mvn:org.xipki/ocsp-api/${project.version}</bundle>
 		<bundle>mvn:org.xipki/audit-api/${project.version}</bundle>
+		<bundle>mvn:org.xipki/ocsp-api/${project.version}</bundle>
 		<bundle>mvn:org.xipki/ocsp-server/${project.version}</bundle>
 	</feature>
 	<feature name="xipki-ocspclient" version="${project.version}" resolver="(obr)">

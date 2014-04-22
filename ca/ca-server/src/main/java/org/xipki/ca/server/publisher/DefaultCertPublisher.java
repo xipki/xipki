@@ -29,6 +29,11 @@ import java.util.Properties;
 import org.bouncycastle.util.encoders.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xipki.audit.api.AuditEvent;
+import org.xipki.audit.api.AuditEventData;
+import org.xipki.audit.api.AuditLevel;
+import org.xipki.audit.api.AuditLoggingService;
+import org.xipki.audit.api.AuditStatus;
 import org.xipki.ca.api.publisher.CertPublisher;
 import org.xipki.ca.api.publisher.CertPublisherException;
 import org.xipki.ca.api.publisher.CertificateInfo;
@@ -48,6 +53,8 @@ public class DefaultCertPublisher extends CertPublisher
     private EnvironmentParameterResolver envParamterResolver;
     private CertStatusStoreQueryExecutor queryExecutor;
     private boolean publishGoodCerts = true;
+
+    private AuditLoggingService auditLoggingService;
 
     public DefaultCertPublisher()
     {
@@ -129,12 +136,15 @@ public class DefaultCertPublisher extends CertPublisher
     @Override
     public void certificateAdded(CertificateInfo certInfo)
     {
+        X509CertificateWithMetaInfo caCert = certInfo.getIssuerCert();
+        X509CertificateWithMetaInfo cert = certInfo.getCert();
+
         try
         {
             if(certInfo.isRevocated())
             {
-                queryExecutor.addCert(certInfo.getIssuerCert(),
-                        certInfo.getCert(),
+                queryExecutor.addCert(caCert,
+                        cert,
                         certInfo.isRevocated(),
                         certInfo.getRevocationTime(),
                         certInfo.getRevocationReason(),
@@ -147,10 +157,7 @@ public class DefaultCertPublisher extends CertPublisher
             }
         } catch (Exception e)
         {
-            LOG.error("Could not save certificate {}: {}. Message: {}",
-                    new Object[]{certInfo.getCert().getSubject(),
-                    Base64.toBase64String(certInfo.getCert().getEncodedCert()), e.getMessage()});
-            LOG.error("error", e);
+            logAndAudit(caCert, cert, e, "could not save certificate");
         }
     }
 
@@ -166,9 +173,33 @@ public class DefaultCertPublisher extends CertPublisher
             queryExecutor.revocateCert(caCert, cert, revocationTime, revocationReason, invalidityTime);
         } catch (Exception e)
         {
-            LOG.error("Could not publish revocated certificate (issuser={}: subject={}, serialNumber={}). Message: {}",
-                    new Object[]{caCert.getSubject(), cert.getSubject(), cert.getCert().getSerialNumber(), e.getMessage()});
-            LOG.error("error", e);
+            logAndAudit(caCert, cert, e, "could not publish revocated certificate");
+        }
+    }
+
+    private void logAndAudit(X509CertificateWithMetaInfo caCert, X509CertificateWithMetaInfo cert, Exception e,
+            String messagePrefix)
+    {
+        String issuerText = caCert.getSubject();
+        String subjectText = cert.getSubject();
+        String serialText = cert.getCert().getSerialNumber().toString();
+
+        LOG.error("{} (issuser={}: subject={}, serialNumber={}). Message: {}",
+                new Object[]{messagePrefix, issuerText, subjectText, serialText, e.getMessage()});
+        LOG.debug("error", e);
+
+        if(auditLoggingService != null)
+        {
+            AuditEvent auditEvent = new AuditEvent(new Date());
+            auditEvent.setApplicationName("CAPublisher");
+            auditEvent.setName("SYSTEM");
+            auditEvent.setLevel(AuditLevel.ERROR);
+            auditEvent.setStatus(AuditStatus.failed);
+            auditEvent.addEventData(new AuditEventData("issuer", issuerText));
+            auditEvent.addEventData(new AuditEventData("subject", subjectText));
+            auditEvent.addEventData(new AuditEventData("issuer", serialText));
+            auditEvent.addEventData(new AuditEventData("message", messagePrefix));
+            auditLoggingService.logEvent(auditEvent);
         }
     }
 
@@ -181,6 +212,12 @@ public class DefaultCertPublisher extends CertPublisher
     public boolean isHealthy()
     {
         return queryExecutor.isHealthy();
+    }
+
+    @Override
+    public void setAuditLoggingService(AuditLoggingService auditLoggingService)
+    {
+        this.auditLoggingService = auditLoggingService;
     }
 
 }

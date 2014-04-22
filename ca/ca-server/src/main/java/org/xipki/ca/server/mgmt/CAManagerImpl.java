@@ -44,6 +44,7 @@ import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.util.encoders.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xipki.audit.api.AuditLoggingService;
 import org.xipki.ca.api.CAMgmtException;
 import org.xipki.ca.api.CAStatus;
 import org.xipki.ca.api.OperationException;
@@ -119,6 +120,8 @@ public class CAManagerImpl implements CAManager
     private boolean cmpControlInitialized = false;
     private boolean cAsInitialized = false;
     private boolean environmentParametersInitialized = false;
+
+    private AuditLoggingService auditLoggingService;
 
     public CAManagerImpl() throws ConfigurationException
     {
@@ -2967,4 +2970,20 @@ public class CAManagerImpl implements CAManager
         return ca.republishCertificates(publisherName);
     }
 
+
+    public AuditLoggingService getAuditLoggingService()
+    {
+        return auditLoggingService;
+    }
+
+    public void setAuditLoggingService(AuditLoggingService auditLoggingService)
+    {
+        this.auditLoggingService = auditLoggingService;
+
+        for(String name : publishers.keySet())
+        {
+            PublisherEntry publisherEntry = publishers.get(name);
+            publisherEntry.setAuditLoggingService(auditLoggingService);
+        }
+    }
 }
