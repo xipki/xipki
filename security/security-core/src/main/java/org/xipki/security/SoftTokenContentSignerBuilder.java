@@ -70,7 +70,7 @@ public class SoftTokenContentSignerBuilder
             char[] keystorePassword, String keyname, char[] keyPassword, X509Certificate cert)
         throws SignerException
     {
-        if(! ("PKCS12".equalsIgnoreCase(keystoreType) || "JKS".equalsIgnoreCase(keystoreType)))
+        if(("PKCS12".equalsIgnoreCase(keystoreType) || "JKS".equalsIgnoreCase(keystoreType)) == false)
         {
             throw new IllegalArgumentException("Unsupported keystore type: " + keystoreType);
         }
@@ -102,7 +102,7 @@ public class SoftTokenContentSignerBuilder
             }
             else
             {
-                if(!ks.isKeyEntry(keyname))
+                if(ks.isKeyEntry(keyname) == false)
                 {
                     throw new SignerException("unknown key named " + keyname);
                 }
@@ -110,7 +110,7 @@ public class SoftTokenContentSignerBuilder
 
             this.key = (PrivateKey) ks.getKey(keyname, keyPassword);
 
-            if( !(key instanceof RSAPrivateKey || key instanceof DSAPrivateKey || key instanceof ECPrivateKey))
+            if( (key instanceof RSAPrivateKey || key instanceof DSAPrivateKey || key instanceof ECPrivateKey) == false)
             {
                 throw new SignerException("Unsupported key " + key.getClass().getName());
             }
