@@ -52,7 +52,6 @@ public class PasswordResolverImpl implements PasswordResolver
 
         String protocol = passwordHint.substring(0, index);
 
-
         for(SinglePasswordResolver resolver : resolvers)
         {
             if(resolver.canResolveProtocol(protocol))

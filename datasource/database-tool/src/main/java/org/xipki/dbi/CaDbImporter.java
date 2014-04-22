@@ -58,5 +58,4 @@ public class CaDbImporter
         certStoreImporter.importToDB();
     }
 
-
 }

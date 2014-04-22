@@ -96,5 +96,4 @@ public class RARevocateCertCommand extends ClientCommand
         this.raWorker = raWorker;
     }
 
-
 }

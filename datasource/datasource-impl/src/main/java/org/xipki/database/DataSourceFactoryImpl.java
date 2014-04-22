@@ -306,5 +306,4 @@ public class DataSourceFactoryImpl implements DataSourceFactory
     public final static String POOL_PREPARED_STATMENTS = P + "poolPreparedStatements";
     public final static String MAX_OPEN_PREPARED_STATEMENTS = P + "maxOpenPreparedStatements";
 
-
 }

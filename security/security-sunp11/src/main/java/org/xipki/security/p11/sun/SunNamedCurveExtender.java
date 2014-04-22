@@ -286,8 +286,6 @@ public class SunNamedCurveExtender
         logAddedCurves(addedCurves);
     }
 
-
-
     private static void addNamedCurves_jdk18on()
     {
         final Class<?>[] Param_CurveDB_add = new Class[]
@@ -525,7 +523,6 @@ public class SunNamedCurveExtender
 
         return null;
     }
-
 
     private static final Field getField(
             Class<?> clazz,

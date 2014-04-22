@@ -161,7 +161,6 @@ class CmpResponder
 
             ASN1ObjectIdentifier itvType = itvP11.getInfoType();
 
-
             ASN1Encodable respItvInfoValue = null;
             try
             {

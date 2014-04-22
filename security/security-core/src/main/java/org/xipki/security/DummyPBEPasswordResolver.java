@@ -17,7 +17,6 @@
 
 package org.xipki.security;
 
-
 /**
  * SHOULD NOT BE USED IN PRODUCTION ENVIRONMENT. ONLY FOR TEST PURPOSE
  */

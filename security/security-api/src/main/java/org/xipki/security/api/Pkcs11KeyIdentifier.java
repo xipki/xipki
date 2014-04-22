@@ -21,7 +21,6 @@ import java.util.Arrays;
 
 import org.bouncycastle.util.encoders.Hex;
 
-
 public class Pkcs11KeyIdentifier implements Comparable<Pkcs11KeyIdentifier>
 {
     private final byte[] keyId;

@@ -118,7 +118,6 @@ public class CmpUtil
             builder.setRecipKID(octet.getOctets());
         }
 
-
         octet = header.getRecipNonce();
         if(octet != null)
         {
@@ -130,7 +129,6 @@ public class CmpUtil
         {
             builder.setSenderKID(octet.getOctets());
         }
-
 
         octet = header.getSenderNonce();
         if(octet != null)

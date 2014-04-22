@@ -138,14 +138,12 @@ public class HealthCheckResult
         checkResult.putStatus("Double", Double.valueOf(100.1));
         System.out.println(checkResult.toJsonMessage(true));
 
-
         System.out.println(checkResult.toJsonMessage(false));
 
         checkResult = new HealthCheckResult();
         checkResult.setHealthy(true);
         System.out.println(checkResult.toJsonMessage(true));
         System.out.println(checkResult.toJsonMessage(false));
-
 
     }
 }

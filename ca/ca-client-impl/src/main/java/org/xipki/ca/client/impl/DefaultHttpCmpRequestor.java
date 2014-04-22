@@ -84,10 +84,10 @@ class DefaultHttpCmpRequestor extends X509CmpRequestor
             boolean isValidContentType=false;
             if (responseContentType!=null)
             {
-                   if (responseContentType.equalsIgnoreCase(CMP_RESPONSE_MIMETYPE))
-                   {
-                       isValidContentType=true;
-                }
+               if (responseContentType.equalsIgnoreCase(CMP_RESPONSE_MIMETYPE))
+               {
+                   isValidContentType=true;
+               }
             }
             if (isValidContentType==false)
             {

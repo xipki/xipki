@@ -36,7 +36,6 @@ public class CertProfile_CMP extends AbstractEECertProfile
     private final Set<KeyUsage> keyUsages;
     private final Map<ASN1ObjectIdentifier, ExtensionOccurrence> extensionOccurences;
 
-
     public CertProfile_CMP()
     {
         // KeyUsages

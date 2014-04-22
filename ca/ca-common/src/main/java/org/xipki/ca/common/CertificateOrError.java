@@ -52,5 +52,4 @@ public class CertificateOrError
         return error;
     }
 
-
 }

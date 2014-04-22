@@ -390,7 +390,6 @@ public class IaikExtendedSlot
         }
     }
 
-
     private void firstLogin(Session session, char[] password)
             throws TokenException
     {
@@ -761,7 +760,6 @@ public class IaikExtendedSlot
         }
     }
 
-
     private static List<iaik.pkcs.pkcs11.objects.Object> getObjects(
             Session session,
             iaik.pkcs.pkcs11.objects.Object template)
@@ -912,7 +910,6 @@ public class IaikExtendedSlot
         }
     }
 
-
     public String listPublicKeyObjects()
     {
         Session session;
@@ -933,7 +930,6 @@ public class IaikExtendedSlot
             returnIdleSession(session);
         }
     }
-
 
     private String listPublicKeyObjects(Session session, Boolean forSignature, Boolean forCipher)
     {
