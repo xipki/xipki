@@ -73,8 +73,11 @@ public class Rfc2560Servlet extends HttpServlet
         AuditStatus auditStatus = AuditStatus.successfull;
         String auditMessage = null;
 
+        long startInUs = 0;
+
         if(auditLoggingService != null)
         {
+            startInUs = System.nanoTime()/1000;
             auditEvent = new AuditEvent(new Date());
             auditEvent.setApplicationName("OCSP");
             auditEvent.setName("SYSTEM");
@@ -177,8 +180,19 @@ public class Rfc2560Servlet extends HttpServlet
                         auditEvent.addEventData(new AuditEventData("message", auditMessage));
                     }
 
+                    long durationInUs = System.nanoTime() / 1000 - startInUs;
+                    String durationText;
+                    if(durationInUs > 5000)
+                    {
+                        durationText = Long.toString(durationInUs / 1000);
+                    }
+                    else
+                    {
+                        durationText = Double.toString(Double.valueOf(durationInUs) / 1000);
+                    }
+
                     auditEvent.addEventData(new AuditEventData("duration",
-                            System.currentTimeMillis() - auditEvent.getTimestamp().getTime()));
+                            durationText));
 
                     if(auditEvent.containsChildAuditEvents() == false)
                     {
