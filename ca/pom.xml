@@ -36,5 +36,6 @@
 		<module>ca-server</module>
 		<module>ca-server-shell</module>
 		<module>ca-certprofile-example</module>
+		<module>ca-sql</module>
 	</modules>
 </project>
