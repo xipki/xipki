@@ -470,6 +470,21 @@ class CertStoreQueryExecutor
             ps.setInt(idx++, revocationReason.getValue().intValue());
             ps.setInt(idx++, caId.intValue());
             ps.setLong(idx++, serialNumber.longValue());
+
+            int count = ps.executeUpdate();
+            if(count != 1)
+            {
+                String message;
+                if(count > 1)
+                {
+                    message = count + " rows modified, but exactly one is expected";
+                }
+                else
+                {
+                    message = "no row is modified, but exactly one is expected";
+                }
+                throw new OperationException(ErrorCode.System_Failure, message);
+            }
         }finally
         {
             returnPreparedStatement(ps);
