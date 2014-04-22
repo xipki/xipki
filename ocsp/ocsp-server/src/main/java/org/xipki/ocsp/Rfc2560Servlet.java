@@ -127,13 +127,13 @@ public class Rfc2560Servlet extends HttpServlet
             OCSPResp ocspResp = responder.answer(ocspReq, auditEvent);
             if (ocspResp == null)
             {
-                LOG.error("processRequest returned null, this should not happen!");
+                auditMessage = "processRequest returned null, this should not happen";
+                LOG.error(auditMessage);
                 response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
                 response.setContentLength(0);
 
                 auditLevel = AuditLevel.ERROR;
                 auditStatus = AuditStatus.error;
-                auditMessage = "processRequest returned null, this should not happen";
             }
             else
             {
@@ -155,8 +155,8 @@ public class Rfc2560Servlet extends HttpServlet
         }
         finally
         {
-              try
-              {
+            try
+            {
                 response.flushBuffer();
             }finally
             {
