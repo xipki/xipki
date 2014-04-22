@@ -81,8 +81,9 @@ class CaConfigurationDbImporter extends DbPorter
                 unmarshaller.unmarshal(new File(baseDir + File.separator + FILENAME_CA_Configuration));
         CAConfigurationType caconf = root.getValue();
 
-           import_cmpcontrol(caconf.getCmpcontrols());
-           import_responder(caconf.getResponders());
+        System.out.println("Importing CA configuration to database");
+        import_cmpcontrol(caconf.getCmpcontrols());
+        import_responder(caconf.getResponders());
         import_environment(caconf.getEnvironments());
         import_requestor(caconf.getRequestors());
         import_publisher(caconf.getPublishers());
@@ -93,11 +94,13 @@ class CaConfigurationDbImporter extends DbPorter
         import_ca_has_requestor(caconf.getCaHasRequestors());
         import_ca_has_publisher(caconf.getCaHasPublishers());
         import_ca_has_certprofile(caconf.getCaHasCertprofiles());
+        System.out.println("Imported CA configuration to database");
     }
 
     private void import_cmpcontrol(Cmpcontrols controls)
     throws SQLException
     {
+        System.out.println("Importing table cmpcontrol");
         PreparedStatement ps = null;
         try
         {
@@ -121,11 +124,13 @@ class CaConfigurationDbImporter extends DbPorter
         {
             closeStatement(ps);
         }
+        System.out.println("Imported table cmpcontrol");
     }
 
     private void import_responder(Responders responders)
     throws SQLException
     {
+        System.out.println("Importing table responder");
         PreparedStatement ps = null;
         try
         {
@@ -145,11 +150,13 @@ class CaConfigurationDbImporter extends DbPorter
         {
             closeStatement(ps);
         }
+        System.out.println("Imported table responder");
     }
 
     private void import_environment(Environments environments)
     throws SQLException
     {
+        System.out.println("Importing table environment");
         PreparedStatement ps = null;
         try
         {
@@ -165,11 +172,13 @@ class CaConfigurationDbImporter extends DbPorter
         {
             closeStatement(ps);
         }
+        System.out.println("Imported table environment");
     }
 
     private void import_crlsigner(Crlsigners crlsigners)
     throws SQLException
     {
+        System.out.println("Importing table crlsigner");
         PreparedStatement ps = null;
         try
         {
@@ -194,11 +203,13 @@ class CaConfigurationDbImporter extends DbPorter
         {
             closeStatement(ps);
         }
+        System.out.println("Imported table crlsigner");
     }
 
     private void import_requestor(Requestors requestors)
     throws SQLException
     {
+        System.out.println("Importing table requestor");
         PreparedStatement ps = null;
         try
         {
@@ -216,11 +227,13 @@ class CaConfigurationDbImporter extends DbPorter
         {
             closeStatement(ps);
         }
+        System.out.println("Imported table requestor");
     }
 
     private void import_publisher(Publishers publishers)
     throws SQLException
     {
+        System.out.println("Importing table publisher");
         PreparedStatement ps = null;
         try
         {
@@ -238,11 +251,13 @@ class CaConfigurationDbImporter extends DbPorter
         {
             closeStatement(ps);
         }
+        System.out.println("Imported table publisher");
     }
 
     private void import_certprofile(Certprofiles certprofiles)
     throws SQLException
     {
+        System.out.println("Importing table certprofile");
         PreparedStatement ps = null;
         try
         {
@@ -260,11 +275,13 @@ class CaConfigurationDbImporter extends DbPorter
         {
             closeStatement(ps);
         }
+        System.out.println("Imported table certprofile");
     }
 
     private void import_ca(Cas cas)
     throws SQLException, CertificateException
     {
+        System.out.println("Importing table ca");
         PreparedStatement ps = null;
         try
         {
@@ -320,11 +337,14 @@ class CaConfigurationDbImporter extends DbPorter
         {
             closeStatement(ps);
         }
+
+        System.out.println("Importing table ca");
     }
 
     private void import_caalias(Caaliases caaliases)
     throws SQLException
     {
+        System.out.println("Importing table caalias");
         PreparedStatement ps = null;
         try
         {
@@ -340,11 +360,13 @@ class CaConfigurationDbImporter extends DbPorter
         {
             closeStatement(ps);
         }
+        System.out.println("Importing table caalias");
     }
 
     private void import_ca_has_requestor(CaHasRequestors ca_has_requestors)
     throws SQLException
     {
+        System.out.println("Importing table ca_has_requestor");
         PreparedStatement ps = null;
         try
         {
@@ -366,11 +388,13 @@ class CaConfigurationDbImporter extends DbPorter
         {
             closeStatement(ps);
         }
+        System.out.println("Imported table ca_has_requestor");
     }
 
     private void import_ca_has_publisher(CaHasPublishers ca_has_publishers)
     throws SQLException
     {
+        System.out.println("Importing table ca_has_publisher");
         PreparedStatement ps = null;
         try
         {
@@ -386,11 +410,13 @@ class CaConfigurationDbImporter extends DbPorter
         {
             closeStatement(ps);
         }
+        System.out.println("Imported table ca_has_publisher");
     }
 
     private void import_ca_has_certprofile(CaHasCertprofiles ca_has_certprofiles)
     throws SQLException
     {
+        System.out.println("Importing table ca_has_certprofile");
         PreparedStatement ps = null;
         try
         {
@@ -406,7 +432,7 @@ class CaConfigurationDbImporter extends DbPorter
         {
             closeStatement(ps);
         }
+        System.out.println("Imported table ca_has_certprofile");
     }
-
 
 }

@@ -77,7 +77,7 @@ class CaCertStoreDbExporter extends DbPorter
     {
         CertStoreType certstore = new CertStoreType();
         certstore.setVersion(VERSION);
-
+        System.out.println("Exporting CA certstore from database");
         certstore.setCainfos(export_cainfo());
         certstore.setRequestorinfos(export_requestorinfo());
         certstore.setCertprofileinfos(export_certprofileinfo());
@@ -87,11 +87,13 @@ class CaCertStoreDbExporter extends DbPorter
 
         JAXBElement<CertStoreType> root = new ObjectFactory().createCertStore(certstore);
         marshaller.marshal(root, new File(baseDir + File.separator + FILENAME_CA_CertStore));
+        System.out.println("Exported CA certstore from database");
     }
 
     private Crls export_crl()
     throws SQLException, IOException
     {
+        System.out.println("Exporting table crl");
         Crls crls = new Crls();
         Statement stmt = null;
         try
@@ -128,12 +130,14 @@ class CaCertStoreDbExporter extends DbPorter
             closeStatement(stmt);
         }
 
+        System.out.println("Exported table crl");
         return crls;
     }
 
     private Cainfos export_cainfo()
     throws SQLException
     {
+        System.out.println("Exporting table cainfo");
         Cainfos cainfos = new Cainfos();
 
         Statement stmt = null;
@@ -162,12 +166,14 @@ class CaCertStoreDbExporter extends DbPorter
             closeStatement(stmt);
         }
 
+        System.out.println("Exported table cainfo");
         return cainfos;
     }
 
     private Requestorinfos export_requestorinfo()
     throws SQLException
     {
+        System.out.println("Exporting table requestorinfo");
         Requestorinfos infos = new Requestorinfos();
 
         Statement stmt = null;
@@ -196,12 +202,14 @@ class CaCertStoreDbExporter extends DbPorter
             closeStatement(stmt);
         }
 
+        System.out.println("Exported table cainfo");
         return infos;
     }
 
     private Users export_user()
     throws SQLException
     {
+        System.out.println("Exporting table user");
         Users users = new Users();
 
         Statement stmt = null;
@@ -230,12 +238,14 @@ class CaCertStoreDbExporter extends DbPorter
             closeStatement(stmt);
         }
 
+        System.out.println("Exported table user");
         return users;
     }
 
     private Certprofileinfos export_certprofileinfo()
     throws SQLException
     {
+        System.out.println("Exporting table certprofileinfo");
         Certprofileinfos infos = new Certprofileinfos();
 
         Statement stmt = null;
@@ -264,12 +274,14 @@ class CaCertStoreDbExporter extends DbPorter
             closeStatement(stmt);
         }
 
+        System.out.println("Exported table certprofileinfo");
         return infos;
     }
 
     private CertsFiles export_cert()
     throws SQLException, IOException, JAXBException
     {
+        System.out.println("Exporting tables cert and rawcert");
         CertsFiles certsFiles = new CertsFiles();
 
         String certSql = "SELECT id, cainfo_id, certprofileinfo_id," +
@@ -294,6 +306,7 @@ class CaCertStoreDbExporter extends DbPorter
         int startIdInCurrentFile = minCertId;
         CertsType certsInCurrentFile = new CertsType();
 
+        int sum = 0;
         final int n = 100;
         try
         {
@@ -352,6 +365,7 @@ class CaCertStoreDbExporter extends DbPorter
 
                     certsInCurrentFile.getCert().add(cert);
                     numCertInCurrentFile ++;
+                    sum ++;
 
                     if(numCertInCurrentFile == COUNT_CERTS_IN_ONE_FILE)
                     {
@@ -363,6 +377,9 @@ class CaCertStoreDbExporter extends DbPorter
 
                         certsInCurrentFile = new CertsType();
                         numCertInCurrentFile = 0;
+
+                        System.out.println("Exported " + numCertInCurrentFile + " certificates specified in " + fn);
+                        System.out.println("Exported " + sum + " certificates ...");
                     }
                 }
             }
@@ -374,6 +391,8 @@ class CaCertStoreDbExporter extends DbPorter
                         new File(baseDir + File.separator + fn));
 
                 certsFiles.getCertsFile().add(fn);
+
+                System.out.println("Exported " + numCertInCurrentFile + " certificates specified in " + fn);
             }
 
         }finally
@@ -381,7 +400,7 @@ class CaCertStoreDbExporter extends DbPorter
             closeStatement(ps);
         }
 
-
+        System.out.println("Exported " + sum + " certificates from tables cert and rawcert");
         return certsFiles;
     }
 
