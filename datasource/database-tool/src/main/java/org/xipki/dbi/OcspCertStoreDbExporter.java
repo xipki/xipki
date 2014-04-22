@@ -58,17 +58,19 @@ class OcspCertStoreDbExporter extends DbPorter
     {
         CertStoreType certstore = new CertStoreType();
         certstore.setVersion(VERSION);
-
+        System.out.println("Exporting OCSP certstore from database");
         certstore.setIssuers(export_issuer());
         certstore.setCertsFiles(export_cert());
 
         JAXBElement<CertStoreType> root = new ObjectFactory().createCertStore(certstore);
         marshaller.marshal(root, new File(baseDir + File.separator + FILENAME_OCSP_CertStore));
+        System.out.println("Exported OCSP certstore from database");
     }
 
     private Issuers export_issuer()
     throws SQLException
     {
+        System.out.println("Exporting table issuer");
         Issuers issuers = new Issuers();
 
         Statement stmt = null;
@@ -99,12 +101,14 @@ class OcspCertStoreDbExporter extends DbPorter
             closeStatement(stmt);
         }
 
+        System.out.println("Exported table issuer");
         return issuers;
     }
 
     private CertsFiles export_cert()
     throws SQLException, IOException, JAXBException
     {
+        System.out.println("Exporting tables cert, certhash and rawcert");
         CertsFiles certsFiles = new CertsFiles();
 
         String certSql = "SELECT id, issuer_id, last_update," +
@@ -213,6 +217,7 @@ class OcspCertStoreDbExporter extends DbPorter
             closeStatement(rawCertPs);
         }
 
+        System.out.println("Exported tables cert, certhash and rawcert");
         return certsFiles;
     }
 

@@ -74,6 +74,8 @@ class CaConfigurationDbExporter extends DbPorter
         CAConfigurationType caconf = new CAConfigurationType();
         caconf.setVersion(VERSION);
 
+        System.out.println("Exporting CA configuration to database");
+
         caconf.setCmpcontrols(export_cmpcontrol());
 
         caconf.setResponders(export_responder());
@@ -100,11 +102,14 @@ class CaConfigurationDbExporter extends DbPorter
 
         JAXBElement<CAConfigurationType> root = new ObjectFactory().createCAConfiguration(caconf);
         marshaller.marshal(root, new File(baseDir + File.separator + FILENAME_CA_Configuration));
+
+        System.out.println("Exporting CA configuration to database");
     }
 
     private Cmpcontrols export_cmpcontrol()
     throws SQLException
     {
+        System.out.println("Exporting table cmpcontrol");
         Cmpcontrols cmpcontrols = new Cmpcontrols();
         Statement stmt = null;
         try
@@ -140,12 +145,14 @@ class CaConfigurationDbExporter extends DbPorter
             closeStatement(stmt);
         }
 
+        System.out.println("Exported table cmpcontrol");
         return cmpcontrols;
     }
 
     private Environments export_environment()
     throws SQLException
     {
+        System.out.println("Exporting table environment");
         Environments environments = new Environments();
 
         Statement stmt = null;
@@ -173,12 +180,14 @@ class CaConfigurationDbExporter extends DbPorter
             closeStatement(stmt);
         }
 
+        System.out.println("Exported table environment");
         return environments;
     }
 
     private Crlsigners export_crlsigner()
     throws XMLStreamException, SQLException
     {
+        System.out.println("Exporting table crlsigner");
         Crlsigners crlsigners = new Crlsigners();
 
         Statement stmt = null;
@@ -219,12 +228,14 @@ class CaConfigurationDbExporter extends DbPorter
             closeStatement(stmt);
         }
 
+        System.out.println("Exported table crlsigner");
         return crlsigners;
     }
 
     private Caaliases export_caalias()
     throws XMLStreamException, SQLException
     {
+        System.out.println("Exporting table caalias");
         Caaliases caaliases = new Caaliases();
 
         Statement stmt = null;
@@ -253,12 +264,14 @@ class CaConfigurationDbExporter extends DbPorter
             closeStatement(stmt);
         }
 
+        System.out.println("Exported table caalias");
         return caaliases;
     }
 
     private Requestors export_requestor()
     throws XMLStreamException, SQLException
     {
+        System.out.println("Exporting table requestor");
         Requestors requestors = new Requestors();
 
         Statement stmt = null;
@@ -287,12 +300,14 @@ class CaConfigurationDbExporter extends DbPorter
             closeStatement(stmt);
         }
 
+        System.out.println("Exported table requestor");
         return requestors;
     }
 
     private Responders export_responder()
     throws XMLStreamException, SQLException
     {
+        System.out.println("Exporting table responder");
         Responders responders = new Responders();
 
         Statement stmt = null;
@@ -325,12 +340,14 @@ class CaConfigurationDbExporter extends DbPorter
             closeStatement(stmt);
         }
 
+        System.out.println("Exported table responder");
         return responders;
     }
 
     private Publishers export_publisher()
     throws XMLStreamException, SQLException
     {
+        System.out.println("Exporting table publisher");
         Publishers publishers = new Publishers();
 
         Statement stmt = null;
@@ -360,13 +377,14 @@ class CaConfigurationDbExporter extends DbPorter
         {
             closeStatement(stmt);
         }
-
+        System.out.println("Exported table publisher");
         return publishers;
     }
 
     private Certprofiles export_certprofile()
     throws XMLStreamException, SQLException
     {
+        System.out.println("Exporting table certprofile");
         Certprofiles certprofiles = new Certprofiles();
 
         Statement stmt = null;
@@ -397,12 +415,14 @@ class CaConfigurationDbExporter extends DbPorter
             closeStatement(stmt);
         }
 
+        System.out.println("Exported table certprofile");
         return certprofiles;
     }
 
     private Cas export_ca()
     throws XMLStreamException, SQLException
     {
+        System.out.println("Exporting table ca");
         Cas cas = new Cas();
 
         Statement stmt = null;
@@ -476,12 +496,14 @@ class CaConfigurationDbExporter extends DbPorter
             closeStatement(stmt);
         }
 
+        System.out.println("Exporting table ca");
         return cas;
     }
 
     private CaHasRequestors export_ca_has_requestor()
     throws XMLStreamException, SQLException
     {
+        System.out.println("Exporting table ca_has_requestor");
         CaHasRequestors ca_has_requestors = new CaHasRequestors();
 
         Statement stmt = null;
@@ -517,12 +539,14 @@ class CaConfigurationDbExporter extends DbPorter
             closeStatement(stmt);
         }
 
+        System.out.println("Exported table ca_has_requestor");
         return ca_has_requestors;
     }
 
     private CaHasPublishers export_ca_has_publisher()
     throws XMLStreamException, SQLException
     {
+        System.out.println("Exporting table ca_has_publisher");
         CaHasPublishers ca_has_publishers = new CaHasPublishers();
 
         Statement stmt = null;
@@ -552,6 +576,7 @@ class CaConfigurationDbExporter extends DbPorter
             closeStatement(stmt);
         }
 
+        System.out.println("Exported table ca_has_publisher");
         return ca_has_publishers;
     }
 
@@ -559,6 +584,7 @@ class CaConfigurationDbExporter extends DbPorter
     private CaHasCertprofiles export_ca_has_certprofile()
     throws XMLStreamException, SQLException
     {
+        System.out.println("Exporting table ca_has_certprofile");
         CaHasCertprofiles ca_has_certprofiles = new CaHasCertprofiles();
 
         Statement stmt = null;
@@ -588,6 +614,7 @@ class CaConfigurationDbExporter extends DbPorter
             closeStatement(stmt);
         }
 
+        System.out.println("Exported table ca_has_certprofile");
         return ca_has_certprofiles;
     }
 
