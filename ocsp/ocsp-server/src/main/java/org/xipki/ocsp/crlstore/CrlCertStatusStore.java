@@ -193,12 +193,12 @@ public class CrlCertStatusStore implements CertStatusStore
             X500Principal issuer = crl.getIssuerX500Principal();
 
             boolean caAsCrlIssuer = true;
-            if(! caCert.getSubjectX500Principal().equals(issuer))
+            if(caCert.getSubjectX500Principal().equals(issuer) == false)
             {
                 caAsCrlIssuer = false;
                 if(issuerCert != null)
                 {
-                    if(! issuerCert.getSubjectX500Principal().equals(issuer))
+                    if(issuerCert.getSubjectX500Principal().equals(issuer) == false)
                     {
                         throw new IllegalArgumentException("The issuerCert and crl do not match");
                     }
@@ -278,7 +278,7 @@ public class CrlCertStatusStore implements CertStatusStore
                 {
                     ASN1Encodable asn1 = asn1Set.getObjectAt(i);
                     Certificate bcCert = Certificate.getInstance(asn1);
-                    if(! caName.equals(bcCert.getIssuer()))
+                    if(caName.equals(bcCert.getIssuer()) == false)
                     {
                         throw new CertStatusStoreException("Invalid entry in CRL Extension certs");
                     }

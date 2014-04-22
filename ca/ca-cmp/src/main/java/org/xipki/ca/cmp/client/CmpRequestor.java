@@ -154,7 +154,7 @@ public abstract class CmpRequestor
         PKIHeader respHeader = response.getHeader();
         ASN1OctetString tid = respHeader.getTransactionID();
         GeneralName recipient = respHeader.getRecipient();
-        if(! sender.equals(recipient))
+        if(sender.equals(recipient) == false)
         {
             LOG.warn("tid={}: Unknown CMP requestor '{}'", tid, recipient);
         }
@@ -277,7 +277,7 @@ public abstract class CmpRequestor
     protected ErrorResultType checkAndBuildErrorResultIfRequired(PKIResponse response)
     {
         ProtectionVerificationResult protectionVerificationResult = response.getProtectionVerificationResult();
-        if(! response.hasProtection())
+        if(response.hasProtection() == false)
         {
             return null;
         }

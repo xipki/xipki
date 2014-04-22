@@ -293,7 +293,7 @@ abstract class X509CmpRequestor extends CmpRequestor
             result.addResultEntry(resultEntry);
         }
 
-        if(!requestEntries.isEmpty())
+        if(requestEntries.isEmpty() == false)
         {
             for(RevocateCertRequestEntryType re : requestEntries)
             {
@@ -316,16 +316,16 @@ abstract class X509CmpRequestor extends CmpRequestor
 
     public CmpResultType requestCertificate(CertReqMsg req, String extCertReqId)
             throws CmpRequestorException
-        {
-            PKIMessage request = buildPKIMessage(req);
-            Map<BigInteger, String> reqIdIdMap = new HashMap<BigInteger, String>();
+    {
+        PKIMessage request = buildPKIMessage(req);
+        Map<BigInteger, String> reqIdIdMap = new HashMap<BigInteger, String>();
 
-            reqIdIdMap.put(req.getCertReq().getCertReqId().getValue(), extCertReqId);
+        reqIdIdMap.put(req.getCertReq().getCertReqId().getValue(), extCertReqId);
 
-            int exptectedBodyType = PKIBody.TYPE_CERT_REP;
+        int exptectedBodyType = PKIBody.TYPE_CERT_REP;
 
-            return intern_requestCertificate(request, reqIdIdMap, exptectedBodyType);
-        }
+        return intern_requestCertificate(request, reqIdIdMap, exptectedBodyType);
+    }
 
     public CmpResultType requestCertificate(EnrollCertRequestType req)
         throws CmpRequestorException
@@ -446,7 +446,7 @@ abstract class X509CmpRequestor extends CmpRequestor
 
                 resultEntry = new EnrollCertResultEntryType(thisId, cmpCert, status);
 
-                if(! isImplicitConfirm)
+                if(isImplicitConfirm == false)
                 {
                     requireConfirm = true;
                     X509CertificateHolder certHolder = null;
@@ -476,7 +476,7 @@ abstract class X509CmpRequestor extends CmpRequestor
             result.addResultEntry(resultEntry);
         }
 
-        if(! reqIdIdMap.isEmpty())
+        if(reqIdIdMap.isEmpty() == false)
         {
             for(BigInteger reqId : reqIdIdMap.keySet())
             {
@@ -485,7 +485,7 @@ abstract class X509CmpRequestor extends CmpRequestor
             }
         }
 
-        if(!requireConfirm)
+        if(requireConfirm == false)
         {
             return result;
         }

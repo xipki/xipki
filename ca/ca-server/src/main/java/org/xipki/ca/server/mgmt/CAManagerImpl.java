@@ -854,7 +854,7 @@ public class CAManagerImpl implements CAManager
 
                 CrlSignerEntry entry = new CrlSignerEntry(name);
                 entry.setType(signer_type);
-                if(!"CA".equalsIgnoreCase(signer_type))
+                if("CA".equalsIgnoreCase(signer_type) == false)
                 {
                     entry.setConf(signer_conf);
                     if(signer_cert != null)
@@ -975,13 +975,13 @@ public class CAManagerImpl implements CAManager
                 Set<Permission> permissions = getPermissions(s);
 
                 List<String> lCrlUris = null;
-                if(crl_uris != null && !crl_uris.isEmpty())
+                if(crl_uris != null && crl_uris.isEmpty() == false)
                 {
                     lCrlUris = tokensAsList(crl_uris, " \t");
                 }
 
                 List<String> lOcspUris = null;
-                if(ocsp_uris != null && !ocsp_uris.isEmpty())
+                if(ocsp_uris != null && ocsp_uris.isEmpty() == false)
                 {
                     lOcspUris = tokensAsList(ocsp_uris, " \t");
                 }
@@ -1672,7 +1672,7 @@ public class CAManagerImpl implements CAManager
                 break;
             }
         }
-        if(! foundEntry)
+        if(foundEntry == false)
         {
             return;
         }

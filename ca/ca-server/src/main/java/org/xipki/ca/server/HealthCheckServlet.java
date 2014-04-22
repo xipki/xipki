@@ -64,7 +64,7 @@ public class HealthCheckServlet extends HttpServlet
             {
                 constructedPath = URLDecoder.decode(encodedUrl, "UTF-8");
                 String servletPath = request.getServletPath();
-                if(! servletPath.endsWith("/"))
+                if(servletPath.endsWith("/") == false)
                 {
                     servletPath += "/";
                 }

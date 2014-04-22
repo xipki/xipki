@@ -84,7 +84,7 @@ public class Rfc6712Servlet extends HttpServlet
                 return;
             }
 
-            if (! CT_REQUEST.equalsIgnoreCase(request.getContentType()))
+            if (CT_REQUEST.equalsIgnoreCase(request.getContentType()) == false)
             {
                 response.setContentLength(0);
                 response.setStatus(HttpServletResponse.SC_UNSUPPORTED_MEDIA_TYPE);
@@ -100,7 +100,7 @@ public class Rfc6712Servlet extends HttpServlet
             {
                 constructedPath = URLDecoder.decode(encodedUrl, "UTF-8");
                 String servletPath = request.getServletPath();
-                if(! servletPath.endsWith("/"))
+                if(servletPath.endsWith("/") == false)
                 {
                     servletPath += "/";
                 }

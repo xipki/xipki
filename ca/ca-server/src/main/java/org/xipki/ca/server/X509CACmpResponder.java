@@ -233,7 +233,7 @@ public class X509CACmpResponder extends CmpResponder
 
                     InfoTypeAndValue tv = null;
 
-                    if(! cmpControl.isRequireConfirmCert() && CmpUtil.isImplictConfirm(reqHeader))
+                    if(cmpControl.isRequireConfirmCert() == false && CmpUtil.isImplictConfirm(reqHeader))
                     {
                         successfull = publishPendingCertificates(tid);
                         if(successfull)
@@ -254,7 +254,7 @@ public class X509CACmpResponder extends CmpResponder
                         respHeader.setGeneralInfo(tv);
                     }
 
-                    if(!successfull)
+                    if(successfull == false)
                     {
                         ErrorMsgContent emc = new ErrorMsgContent(
                                 new PKIStatusInfo(PKIStatus.rejection,
@@ -723,7 +723,7 @@ public class X509CACmpResponder extends CmpResponder
             auditEvent.addChildAuditEvent(childAuditEvent);
         }
 
-        if(! securityFactory.verifyPOPO(p10cr))
+        if(securityFactory.verifyPOPO(p10cr) == false)
         {
             LOG.warn("could not validate POP for the pkcs#10 requst");
             PKIStatusInfo status = generateCmpRejectionStatus(PKIFailureInfo.badPOP, null);
@@ -1114,11 +1114,11 @@ public class X509CACmpResponder extends CmpResponder
                 transactionId.getOctets());
 
         boolean successfull = true;
-        if(remainingCerts != null && !remainingCerts.isEmpty())
+        if(remainingCerts != null && remainingCerts.isEmpty() == false)
         {
             for(CertificateInfo remainingCert : remainingCerts)
             {
-                if(! ca.publishCertificate(remainingCert))
+                if(ca.publishCertificate(remainingCert) == false)
                 {
                     successfull = false;
                 }
@@ -1133,7 +1133,7 @@ public class X509CACmpResponder extends CmpResponder
         Set<CertificateInfo> remainingCerts = pendingCertPool.removeCertificates(transactionId.getOctets());
 
         boolean successfull = true;
-        if(remainingCerts != null && !remainingCerts.isEmpty())
+        if(remainingCerts != null && remainingCerts.isEmpty() == false)
         {
             Date invalidityDate = new Date();
             for(CertificateInfo remainingCert : remainingCerts)
@@ -1202,7 +1202,7 @@ public class X509CACmpResponder extends CmpResponder
         {
             Set<CertificateInfo> remainingCerts = pendingCertPool.removeConfirmTimeoutedCertificates();
 
-            if(remainingCerts != null && !remainingCerts.isEmpty())
+            if(remainingCerts != null && remainingCerts.isEmpty() == false)
             {
                 Date invalidityDate = new Date();
                 for(CertificateInfo remainingCert : remainingCerts)
@@ -1251,7 +1251,7 @@ public class X509CACmpResponder extends CmpResponder
             }
         }
 
-        if(! granted)
+        if(granted == false)
         {
             String msg = requiredPermission.getPermission() + " is not allowed";
             LOG.warn(msg);

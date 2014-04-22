@@ -243,7 +243,7 @@ public abstract class AbstractCertProfile extends CertProfile
             checkAndAddExtension(extensionType, occurence, extension, tuples);
         }
 
-        if(! occurences.isEmpty())
+        if(occurences.isEmpty() == false)
         {
             StringBuilder sb = new StringBuilder("Extensions with the following types are not processed: ");
             for(ASN1ObjectIdentifier extnType : occurences.keySet())
@@ -387,7 +387,7 @@ public abstract class AbstractCertProfile extends CertProfile
                 }
             }
 
-            if(!present)
+            if(present == false)
             {
                 throw new BadCertTemplateException("Requied subject DN of type " + occurence.getType() + " is not present");
             }

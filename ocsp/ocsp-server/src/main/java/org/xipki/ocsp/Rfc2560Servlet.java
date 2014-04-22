@@ -99,7 +99,7 @@ public class Rfc2560Servlet extends HttpServlet
             }
 
             // accept only "application/ocsp-request" as content type
-            if (! CT_REQUEST.equalsIgnoreCase(request.getContentType()))
+            if (CT_REQUEST.equalsIgnoreCase(request.getContentType()) == false)
             {
                 response.setContentLength(0);
                 response.setStatus(HttpServletResponse.SC_UNSUPPORTED_MEDIA_TYPE);

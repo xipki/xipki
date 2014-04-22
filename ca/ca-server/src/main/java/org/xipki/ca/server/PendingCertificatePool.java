@@ -51,7 +51,7 @@ class PendingCertificatePool
         @Override
         public boolean equals(Object b)
         {
-            if(! (b instanceof MyEntry))
+            if(b instanceof MyEntry == false)
             {
                 return false;
             }

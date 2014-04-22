@@ -51,7 +51,7 @@ public class CertProfileEntry
     {
         ParamChecker.assertNotEmpty("type", type);
 
-        if(! type.equals(this.type))
+        if(type.equals(this.type) == false)
         {
             this.type = type;
             this.certProfile = null;
@@ -61,7 +61,7 @@ public class CertProfileEntry
     public void setConf(String conf)
     {
         boolean same = (conf == null) ? this.conf == null : conf.equals(this.conf);
-        if(! same)
+        if(same == false)
         {
             this.conf = conf;
             this.certProfile = null;

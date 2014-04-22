@@ -43,7 +43,7 @@ public class RevocateCertRequestEntryType extends ResultEntryType
     {
         super(id);
 
-        if(! (reason >= 0 && reason <= 10 && reason != 7))
+        if((reason >= 0 && reason <= 10 && reason != 7) == false)
         {
             throw new IllegalArgumentException("invalid reason: " + reason);
         }
