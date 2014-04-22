@@ -86,12 +86,14 @@ class CaCertStoreDbImporter extends DbPorter
                 unmarshaller.unmarshal(new File(baseDir + File.separator + FILENAME_CA_CertStore));
         CertStoreType certstore = root.getValue();
 
+        System.out.println("Importing CA certstore to database");
         import_cainfo(certstore.getCainfos());
         import_requestorinfo(certstore.getRequestorinfos());
         import_certprofileinfo(certstore.getCertprofileinfos());
         import_user(certstore.getUsers());
         import_crl(certstore.getCrls());
         import_cert(certstore.getCertsFiles());
+        System.out.println("Imported CA certstore to database");
     }
 
     private void import_cainfo(Cainfos cainfos)
@@ -102,6 +104,7 @@ class CaCertStoreDbImporter extends DbPorter
                 " (id, subject, sha1_fp_cert, cert)" +
                 " VALUES (?, ?, ?, ?)";
 
+        System.out.println("Importing table cainfo");
         PreparedStatement ps = prepareStatement(SQL_ADD_CAINFO);
 
         try
@@ -143,12 +146,16 @@ class CaCertStoreDbImporter extends DbPorter
         {
             closeStatement(ps);
         }
+
+        System.out.println("Imported table cainfo");
     }
 
     private void import_requestorinfo(Requestorinfos requestorinfos)
             throws SQLException, CertificateException, IOException
     {
         final String sql = "INSERT INTO requestorinfo (id, subject, sha1_fp_cert, cert) VALUES (?, ?, ?, ?)";
+
+        System.out.println("Importing table requestorinfo");
 
         PreparedStatement ps = prepareStatement(sql);
 
@@ -173,12 +180,16 @@ class CaCertStoreDbImporter extends DbPorter
         {
             closeStatement(ps);
         }
+
+        System.out.println("Imported table requestorinfo");
     }
 
     private void import_certprofileinfo(Certprofileinfos certprofileinfos)
             throws SQLException
     {
         final String sql = "INSERT INTO certprofileinfo (id, name) VALUES (?, ?)";
+
+        System.out.println("Importing table certprofileinfo");
 
         PreparedStatement ps = prepareStatement(sql);
 
@@ -196,12 +207,16 @@ class CaCertStoreDbImporter extends DbPorter
         {
             closeStatement(ps);
         }
+
+        System.out.println("Imported table certprofileinfo");
     }
 
     private void import_user(Users users)
             throws SQLException
     {
         final String sql = "INSERT INTO user (id, name) VALUES (?, ?)";
+
+        System.out.println("Importing table user");
 
         PreparedStatement ps = prepareStatement(sql);
 
@@ -219,12 +234,16 @@ class CaCertStoreDbImporter extends DbPorter
         {
             closeStatement(ps);
         }
+
+        System.out.println("Imported table user");
     }
 
     private void import_crl(Crls crls)
             throws SQLException, IOException, CertificateException, CRLException
     {
         final String sql = "INSERT INTO crl (cainfo_id, crl_number, thisUpdate, nextUpdate, crl) VALUES (?, ?, ?, ?, ?)";
+
+        System.out.println("Importing table crl");
 
         PreparedStatement ps = prepareStatement(sql);
 
@@ -235,7 +254,7 @@ class CaCertStoreDbImporter extends DbPorter
                 String filename = baseDir + File.separator + crl.getCrlFile();
                 byte[] encodedCrl = IoCertUtil.read(filename);
 
-                X509CRL c;
+                X509CRL c = null;
                 try
                 {
                     c = IoCertUtil.parseCRL(new ByteArrayInputStream(encodedCrl));
@@ -243,12 +262,17 @@ class CaCertStoreDbImporter extends DbPorter
                 {
                     LOG.error("could not parse CRL in file {}", filename);
                     LOG.debug("could not parse CRL in file " + filename, e);
-                    throw e;
+                    //throw e;
                 } catch (CRLException e)
                 {
                     LOG.error("could not parse CRL in file {}", filename);
                     LOG.debug("could not parse CRL in file " + filename, e);
-                    throw e;
+                    //throw e;
+                }
+
+                if(c == null)
+                {
+                    continue;
                 }
 
                 byte[] octetString = c.getExtensionValue(Extension.cRLNumber.getId());
@@ -277,21 +301,28 @@ class CaCertStoreDbImporter extends DbPorter
         {
             closeStatement(ps);
         }
+
+        System.out.println("Imported table crl");
     }
 
     private void import_cert(CertsFiles certsfiles)
             throws SQLException, JAXBException, IOException, CertificateException
     {
+        int sum = 0;
         for(String certsFile : certsfiles.getCertsFile())
         {
+            System.out.println("Importing certificates specified in file " + certsFile);
             @SuppressWarnings("unchecked")
             JAXBElement<CertsType> root = (JAXBElement<CertsType>)
                     unmarshaller.unmarshal(new File(baseDir + File.separator + certsFile));
-            do_import_cert(root.getValue());
+            sum += do_import_cert(root.getValue());
+            System.out.println("Imported certificates specified in file " + certsFile);
+            System.out.println("Imported " + sum + " certificates ...");
         }
+        System.out.println("Imported " + sum + " certificates");
     }
 
-    private void do_import_cert(CertsType certs)
+    private int do_import_cert(CertsType certs)
         throws SQLException, IOException, CertificateException
     {
         final String SQL_ADD_CERT =
@@ -307,6 +338,7 @@ class CaCertStoreDbImporter extends DbPorter
         PreparedStatement ps_cert = prepareStatement(SQL_ADD_CERT);
         PreparedStatement ps_rawcert = prepareStatement(SQL_ADD_RAWCERT);
 
+        int sum = 0;
         try
         {
             for(CertType cert : certs.getCert())
@@ -358,12 +390,15 @@ class CaCertStoreDbImporter extends DbPorter
                 ps_rawcert.setString(3, Base64.toBase64String(encodedCert));
 
                 ps_rawcert.executeUpdate();
+                sum++;
             }
         }finally
         {
             closeStatement(ps_cert);
             closeStatement(ps_rawcert);
         }
+
+        return sum;
     }
 
 }
