@@ -69,8 +69,10 @@ class OcspCertStoreDbImporter extends DbPorter
                 unmarshaller.unmarshal(new File(baseDir + File.separator + FILENAME_OCSP_CertStore));
         CertStoreType certstore = root.getValue();
 
+        System.out.println("Importing OCSP certstore to database");
         import_issuer(certstore.getIssuers());
         import_cert(certstore.getCertsFiles());
+        System.out.println("Imported OCSP certstore to database");
     }
 
     private void import_issuer(Issuers issuers)
@@ -87,6 +89,7 @@ class OcspCertStoreDbImporter extends DbPorter
                 " sha1_fp_cert, cert" +
                 " ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
+        System.out.println("Importing table issuer");
         PreparedStatement ps = prepareStatement(SQL_ADD_CAINFO);
 
         try
@@ -139,21 +142,29 @@ class OcspCertStoreDbImporter extends DbPorter
         {
             closeStatement(ps);
         }
+        System.out.println("Imported table issuer");
     }
 
     private void import_cert(CertsFiles certsfiles)
             throws SQLException, JAXBException, IOException, CertificateException
     {
+        int sum = 0;
+
         for(String certsFile : certsfiles.getCertsFile())
         {
+            System.out.println("Importing certificates specified in file " + certsFile);
             @SuppressWarnings("unchecked")
             JAXBElement<CertsType> root = (JAXBElement<CertsType>)
-                    unmarshaller.unmarshal(new File(baseDir + File.separator + certsFile));
-            do_import_cert(root.getValue());
+                        unmarshaller.unmarshal(new File(baseDir + File.separator + certsFile));
+            sum += do_import_cert(root.getValue());
+
+            System.out.println("Imported certificates specified in file " + certsFile);
+            System.out.println("Imported " + sum + " certificates ...");
         }
+        System.out.println("Imported " + sum + " certificates");
     }
 
-    private void do_import_cert(CertsType certs)
+    private int do_import_cert(CertsType certs)
         throws SQLException, IOException, CertificateException
     {
         final String SQL_ADD_CERT =
@@ -172,6 +183,8 @@ class OcspCertStoreDbImporter extends DbPorter
         PreparedStatement ps_cert = prepareStatement(SQL_ADD_CERT);
         PreparedStatement ps_certhash = prepareStatement(SQL_ADD_CERTHASH);
         PreparedStatement ps_rawcert = prepareStatement(SQL_ADD_RAWCERT);
+
+        int sum = 0;
 
         try
         {
@@ -230,12 +243,16 @@ class OcspCertStoreDbImporter extends DbPorter
                 ps_rawcert.setString(2, Base64.toBase64String(encodedCert));
 
                 ps_rawcert.executeUpdate();
+
+                sum++;
             }
         }finally
         {
             closeStatement(ps_cert);
             closeStatement(ps_rawcert);
         }
+
+        return sum;
     }
 
 }
