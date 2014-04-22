@@ -29,6 +29,7 @@ import java.security.cert.X509CRL;
 import java.security.cert.X509Certificate;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.sql.Types;
 
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
@@ -258,7 +259,14 @@ class CaCertStoreDbImporter extends DbPorter
                 ps.setInt   (idx++, crl.getCainfoId());
                 ps.setString(idx++, crlNumber.toString());
                 ps.setLong(idx++, c.getThisUpdate().getTime() / 1000);
-                ps.setLong(idx++, c.getNextUpdate().getTime() / 1000);
+                if(c.getNextUpdate() != null)
+                {
+                    ps.setLong(idx++, c.getNextUpdate().getTime() / 1000);
+                }
+                else
+                {
+                    ps.setNull(idx++, Types.INTEGER);
+                }
 
                 InputStream is = new ByteArrayInputStream(encodedCrl);
                 ps.setBlob(idx++, is);

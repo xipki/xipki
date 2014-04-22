@@ -130,7 +130,7 @@ class OcspCertStoreDbImporter extends DbPorter
                 ps.setString(idx++, hashCalculator.hexHash(HashAlgoType.SHA384, encodedKey));
                 ps.setString(idx++, hashCalculator.hexHash(HashAlgoType.SHA512, encodedName));
                 ps.setString(idx++, hashCalculator.hexHash(HashAlgoType.SHA512, encodedKey));
-                ps.setString(idx++, hashCalculator.hexHash(HashAlgoType.SHA512, encodedCert));
+                ps.setString(idx++, hashCalculator.hexHash(HashAlgoType.SHA1, encodedCert));
                 ps.setString(idx++, b64Cert);
 
                 ps.execute();
