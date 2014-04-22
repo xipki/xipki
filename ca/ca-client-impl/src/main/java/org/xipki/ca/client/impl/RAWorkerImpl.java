@@ -194,7 +194,8 @@ public final class RAWorkerImpl extends AbstractRAWorker implements RAWorker
             {
                 configStream.close();
             }catch(IOException e)
-            {}
+            {
+            }
         }
 
         boolean dev_mode = Boolean.parseBoolean(props.getProperty(DEV_MODE, "false"));

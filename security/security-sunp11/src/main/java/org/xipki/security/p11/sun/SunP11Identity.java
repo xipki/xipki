@@ -37,7 +37,6 @@ import org.xipki.security.api.PKCS11SlotIdentifier;
 import org.xipki.security.api.SignerException;
 import org.xipki.security.common.ParamChecker;
 
-
 class SunP11Identity implements Comparable<SunP11Identity>
 {
     private final Cipher rsaCipher;
@@ -234,7 +233,6 @@ class SunP11Identity implements Comparable<SunP11Identity>
             }
         }
     }
-
 
     private static byte[] leftmost(byte[] bytes, int bitCount)
     {

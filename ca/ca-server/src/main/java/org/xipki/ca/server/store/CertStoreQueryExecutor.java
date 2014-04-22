@@ -801,7 +801,6 @@ class CertStoreQueryExecutor
         return null;
     }
 
-
     CertificateInfo getCertificateInfo(X509CertificateWithMetaInfo caCert, BigInteger serial)
     throws SQLException, OperationException, CertificateException
     {
@@ -887,7 +886,6 @@ class CertStoreQueryExecutor
 
         return null;
     }
-
 
     List<CertRevocationInfo> getRevocatedCertificates(X509CertificateWithMetaInfo caCert,
             Date notExpiredAt, BigInteger startSerial, int numEntries)
@@ -1056,7 +1054,6 @@ class CertStoreQueryExecutor
         return false;
     }
 
-
     boolean certIssued(X509CertificateWithMetaInfo caCert, byte[] encodedSubjectPublicKey)
             throws OperationException, SQLException
     {
@@ -1107,7 +1104,6 @@ class CertStoreQueryExecutor
 
         return false;
     }
-
 
     private String createFetchFirstSelectSQL(String coreSql, int rows)
     {
@@ -1167,7 +1163,6 @@ class CertStoreQueryExecutor
                 "INSERT INTO " + store.getTable() +
                 " (id, subject, sha1_fp_cert, cert)" +
                 " VALUES (?, ?, ?, ?)";
-
 
         PreparedStatement ps = borrowPreparedStatement(SQL_ADD_CAINFO);
         if(ps == null)

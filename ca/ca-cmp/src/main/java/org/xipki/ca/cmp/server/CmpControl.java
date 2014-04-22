@@ -17,7 +17,6 @@
 
 package org.xipki.ca.cmp.server;
 
-
 public class CmpControl
 {
     private static final int DFLT_messageTimeBias = 300; // 300 seconds
@@ -65,7 +64,6 @@ public class CmpControl
     {
         this.messageTimeBias = messageTimeBias;
     }
-
 
     public int getConfirmWaitTime()
     {

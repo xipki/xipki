@@ -20,7 +20,6 @@ package org.xipki.ca.cmp.client.type;
 import org.xipki.ca.common.PKIStatusInfo;
 import org.xipki.security.common.ParamChecker;
 
-
 public class ErrorResultEntryType extends ResultEntryType
 {
     private final PKIStatusInfo statusInfo;

@@ -49,5 +49,4 @@ public class RequestOptions
         this.hashAlgorithmId = hashAlgorithmId;
     }
 
-
 }

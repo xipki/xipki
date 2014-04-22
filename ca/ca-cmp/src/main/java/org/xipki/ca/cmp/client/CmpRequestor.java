@@ -223,7 +223,6 @@ public abstract class CmpRequestor
         return hBuilder.build();
     }
 
-
     protected ErrorResultType buildErrorResult(ErrorMsgContent bodyContent)
     {
         PKIStatusInfo statusInfo = bodyContent.getPKIStatusInfo();

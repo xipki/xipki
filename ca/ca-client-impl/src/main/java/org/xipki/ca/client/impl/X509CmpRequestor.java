@@ -476,7 +476,6 @@ abstract class X509CmpRequestor extends CmpRequestor
             result.addResultEntry(resultEntry);
         }
 
-
         if(! reqIdIdMap.isEmpty())
         {
             for(BigInteger reqId : reqIdIdMap.keySet())
@@ -586,7 +585,6 @@ abstract class X509CmpRequestor extends CmpRequestor
         PKIMessage pkiMessage = new PKIMessage(header, body);
         return pkiMessage;
     }
-
 
     private PKIMessage buildPKIMessage(P10EnrollCertRequestType p10Req)
     {

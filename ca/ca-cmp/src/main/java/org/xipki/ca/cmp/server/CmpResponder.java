@@ -304,7 +304,6 @@ public abstract class CmpResponder
         }
     }
 
-
     private void checkRequestRecipient(PKIHeader reqHeader)
     {
         ASN1OctetString tid = reqHeader.getTransactionID();
@@ -353,7 +352,6 @@ public abstract class CmpResponder
 
         return requestor;
     }
-
 
     protected PKIStatusInfo generateCmpRejectionStatus(
             Integer info, String errorMessage)

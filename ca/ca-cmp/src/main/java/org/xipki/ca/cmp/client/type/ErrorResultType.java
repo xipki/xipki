@@ -17,9 +17,6 @@
 
 package org.xipki.ca.cmp.client.type;
 
-
-
-
 public class ErrorResultType implements CmpResultType
 {
     private final int status;

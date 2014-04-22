@@ -17,7 +17,6 @@
 
 package lca.ca.profile.extension;
 
-
 public enum KeyUsage
 {
     digitalSignature (0, "digitalSignature"),

@@ -17,12 +17,10 @@
 
 package lca.ca.profile.extension;
 
-
 public class BasicConstraintsExtension extends ExtensionConf
 {
     private boolean ca;
     private int pathLenConstraint;
-
 
     public void setCa(boolean ca)
     {

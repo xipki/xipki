@@ -42,5 +42,4 @@ public class ProtectionVerificationResult
         return protectionResult;
     }
 
-
 }

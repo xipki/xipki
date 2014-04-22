@@ -107,7 +107,6 @@ public abstract class AbstractCertProfile extends CertProfile
         }
     }
 
-
     @Override
     public boolean isOnlyForRA()
     {

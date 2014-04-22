@@ -19,8 +19,6 @@ package org.xipki.ca.common;
 
 import org.xipki.security.common.ParamChecker;
 
-
-
 public class CertBasedRequestorInfo implements RequestorInfo
 {
     private final X509CertificateWithMetaInfo certificate;

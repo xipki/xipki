@@ -71,7 +71,6 @@ public class CertStatusInfo
         return ret;
     }
 
-
     public Date getThisUpdate()
     {
         return thisUpdate;

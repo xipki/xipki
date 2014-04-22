@@ -106,5 +106,4 @@ public class KeyIdentifier extends ASN1Object
         return keyId;
     }
 
-
 }

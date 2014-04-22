@@ -153,7 +153,6 @@ public class X509CA
         this.caSubjectX500Name = X500Name.getInstance(
                 caCert.getCert().getSubjectX500Principal().getEncoded());
 
-
         byte[] encodedSkiValue = caCert.getCert().getExtensionValue(Extension.subjectKeyIdentifier.getId());
         if(encodedSkiValue == null)
         {
@@ -169,7 +168,6 @@ public class X509CA
             throw new OperationException(ErrorCode.System_Failure, e.getMessage());
         }
         this.caSKI = ski.getOctets();
-
 
         this.cf = new CertificateFactory();
 
@@ -599,7 +597,6 @@ public class X509CA
         }
     }
 
-
     public CertificateInfo generateCertificate(
             boolean requestedByRA,
             String certProfileName,
@@ -780,7 +777,6 @@ public class X509CA
 
             do
             {
-
                 try
                 {
                     serials = certstore.getCertSerials(cacert, notExpiredAt, startSerial, numEntries);
@@ -838,7 +834,6 @@ public class X509CA
         }
         return true;
     }
-
 
     private boolean publishCRL(X509CRL crl)
     {
@@ -1158,7 +1153,6 @@ public class X509CA
 
                 X509CertificateWithMetaInfo certWithMeta =
                         new X509CertificateWithMetaInfo(cert, encodedCert);
-
 
                 ret = new CertificateInfo(certWithMeta,
                         caInfo.getCertificate(), publicKeyInfo.getEncoded(),

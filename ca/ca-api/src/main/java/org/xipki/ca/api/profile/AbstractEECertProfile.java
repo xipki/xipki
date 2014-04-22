@@ -17,7 +17,6 @@
 
 package org.xipki.ca.api.profile;
 
-
 public abstract class AbstractEECertProfile extends AbstractCertProfile
 {
     @Override

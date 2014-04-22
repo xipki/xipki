@@ -45,5 +45,4 @@ public class P11KeypairGenerationResult extends KeypairGenerationResult
         return label;
     }
 
-
 }

@@ -173,7 +173,6 @@ public class OriginalProfileConf
             throw new ParseException("invalid configuration " + encoded, 0);
         }
 
-
     }
 
     private static ExtensionOccurrence extractExtensionControl(String control)
@@ -323,6 +322,5 @@ public class OriginalProfileConf
     {
         return getEncoded();
     }
-
 
 }

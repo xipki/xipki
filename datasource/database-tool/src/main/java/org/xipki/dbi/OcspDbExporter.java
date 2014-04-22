@@ -79,5 +79,4 @@ public class OcspDbExporter
         certStoreExporter.export();
     }
 
-
 }

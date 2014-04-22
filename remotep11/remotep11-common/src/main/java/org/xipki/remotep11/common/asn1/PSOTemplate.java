@@ -54,7 +54,6 @@ public class PSOTemplate extends ASN1Object
         this.message = octetString.getOctets();
     }
 
-
     public PSOTemplate(SlotAndKeyIdentifer slotAndKeyIdentifier, byte[] message)
     {
         if(slotAndKeyIdentifier == null)
@@ -69,8 +68,6 @@ public class PSOTemplate extends ASN1Object
         this.slotAndKeyIdentifier = slotAndKeyIdentifier;
         this.message = message;
     }
-
-
 
     public static PSOTemplate getInstance(
             Object obj)
@@ -109,12 +106,10 @@ public class PSOTemplate extends ASN1Object
         return new DERSequence(vector);
     }
 
-
     public byte[] getMessage()
     {
         return message;
     }
-
 
     public SlotAndKeyIdentifer getSlotAndKeyIdentifer()
     {

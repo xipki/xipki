@@ -67,7 +67,6 @@ public class OCSPStatusCommand extends OsgiCommandSupport
             description = "Use nonce")
     protected Boolean            useNonce;
 
-
     private OCSPRequestor      requestor;
 
     @Override

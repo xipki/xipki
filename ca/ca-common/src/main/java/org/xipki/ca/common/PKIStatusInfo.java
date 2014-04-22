@@ -17,7 +17,6 @@
 
 package org.xipki.ca.common;
 
-
 public class PKIStatusInfo
 {
     private final int status;

@@ -32,7 +32,6 @@ import org.bouncycastle.asn1.x9.X9ECParameters;
 import org.bouncycastle.jce.spec.ECNamedCurveSpec;
 import org.bouncycastle.math.ec.ECCurve;
 
-
 /**
  * This class implements encoding and decoding of Elliptic Curve parameters
  * as specified in RFC 3279.
@@ -78,8 +77,6 @@ import org.bouncycastle.math.ec.ECCurve;
  */
 public final class ECParameters extends AlgorithmParametersSpi
 {
-
-
 
     // used by ECPublicKeyImpl and ECPrivateKeyImpl
     static AlgorithmParameters getAlgorithmParameters(ECParameterSpec spec)

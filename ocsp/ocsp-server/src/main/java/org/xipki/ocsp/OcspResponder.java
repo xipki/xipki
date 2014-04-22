@@ -748,8 +748,6 @@ public class OcspResponder
         this.securityFactory = securityFactory;
     }
 
-
-
     public void setDataSourceFactory(DataSourceFactory dataSourceFactory)
     {
         this.dataSourceFactory = dataSourceFactory;

@@ -214,7 +214,6 @@ public class CAManagerImpl implements CAManager
         initDataObjects();
     }
 
-
     private void reset()
     {
         caSystemSetuped = false;
@@ -885,8 +884,6 @@ public class CAManagerImpl implements CAManager
         crlSignersInitialized = true;
     }
 
-
-
     private void initCmpControl() throws CAMgmtException
     {
         if(cmpControlInitialized) return;
@@ -938,7 +935,6 @@ public class CAManagerImpl implements CAManager
 
         cmpControlInitialized = true;
     }
-
 
     private void initCAs() throws CAMgmtException
     {
@@ -2914,7 +2910,6 @@ public class CAManagerImpl implements CAManager
         }
     }
 
-
     private Statement createStatement() throws CAMgmtException
     {
         try
@@ -2969,7 +2964,6 @@ public class CAManagerImpl implements CAManager
 
         return ca.republishCertificates(publisherName);
     }
-
 
     public AuditLoggingService getAuditLoggingService()
     {

@@ -51,5 +51,4 @@ public class CertIDOrError
         return error;
     }
 
-
 }

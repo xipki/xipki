@@ -17,7 +17,6 @@
 
 package org.xipki.ca.api.profile;
 
-
 public enum KeyUsage
 {
     digitalSignature (0, "digitalSignature"),
@@ -32,6 +31,7 @@ public enum KeyUsage
 
     private int bit;
     private String[] names;
+
     private KeyUsage(int bit, String... names)
     {
         this.bit = bit;

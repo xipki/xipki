@@ -72,7 +72,6 @@ public class ResponderSetCommand extends CaCommand
         return null;
     }
 
-
     public void setSecurityFactory(SecurityFactory securityFactory)
     {
         this.securityFactory = securityFactory;

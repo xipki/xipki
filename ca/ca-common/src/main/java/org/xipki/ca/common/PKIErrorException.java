@@ -17,7 +17,6 @@
 
 package org.xipki.ca.common;
 
-
 public class PKIErrorException extends Exception
 {
     private static final long serialVersionUID = 1L;
