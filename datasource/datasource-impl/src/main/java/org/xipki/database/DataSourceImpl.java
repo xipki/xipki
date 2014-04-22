@@ -248,7 +248,7 @@ public class DataSourceImpl implements DataSource
             c = idleConnections.poll();
             try
             {
-                valid = (c != null) && c.isClosed()) == false;
+                valid = (c != null) && c.isClosed() == false;
             } catch (SQLException e)
             {
                 valid = false;
