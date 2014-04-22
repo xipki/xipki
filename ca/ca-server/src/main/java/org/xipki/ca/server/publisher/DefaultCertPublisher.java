@@ -150,10 +150,15 @@ public class DefaultCertPublisher extends CertPublisher
                         certInfo.getRevocationReason(),
                         certInfo.getInvalidityTime());
             }
-            else if(publishGoodCerts)
+            else
             {
-                queryExecutor.addCert(certInfo.getIssuerCert(),
-                        certInfo.getCert());
+                if(publishGoodCerts)
+                {
+                    queryExecutor.addCert(caCert, cert);
+                }else
+                {
+                    queryExecutor.addIssuer(caCert);
+                }
             }
         } catch (Exception e)
         {

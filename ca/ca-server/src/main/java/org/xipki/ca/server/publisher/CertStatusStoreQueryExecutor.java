@@ -114,6 +114,12 @@ class CertStatusStoreQueryExecutor
         }
     }
 
+    void addIssuer(X509CertificateWithMetaInfo issuer)
+            throws CertificateEncodingException, SQLException
+    {
+        getIssuerId(issuer);
+    }
+
     /**
      * @throws SQLException if there is problem while accessing database.
      * @throws NoSuchAlgorithmException
