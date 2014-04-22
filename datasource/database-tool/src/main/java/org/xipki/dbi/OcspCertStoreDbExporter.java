@@ -267,5 +267,4 @@ class OcspCertStoreDbExporter extends DbPorter
         }
     }
 
-
 }

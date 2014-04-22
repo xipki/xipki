@@ -91,6 +91,7 @@ public class AddLicense
         {
             String line;
             boolean skip = true;
+            boolean lastLineEmpty = false;
             while((line = reader.readLine()) != null)
             {
                 if(line.trim().startsWith("package "))
@@ -101,8 +102,29 @@ public class AddLicense
 
                 if(!skip)
                 {
-                    writer.write(canonicalizeLine(line));
-                    writer.write('\n');
+                    String canonicalizedLine = canonicalizeLine(line);
+                    boolean addThisLine = true;
+                    if(canonicalizedLine.isEmpty())
+                    {
+                        if(lastLineEmpty == false)
+                        {
+                            lastLineEmpty = true;
+                        }
+                        else
+                        {
+                            addThisLine = false;
+                        }
+                    }
+                    else
+                    {
+                        lastLineEmpty = false;
+                    }
+
+                    if(addThisLine)
+                    {
+                        writer.write(canonicalizedLine);
+                        writer.write('\n');
+                    }
                 }
             }
         }finally

@@ -52,7 +52,6 @@ public class CertificateStore
         this.queryExecutor = new CertStoreQueryExecutor(dataSource);
     }
 
-
     public boolean addCertificate(CertificateInfo certInfo)
     {
         try

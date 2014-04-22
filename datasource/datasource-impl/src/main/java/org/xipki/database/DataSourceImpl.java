@@ -312,7 +312,6 @@ public class DataSourceImpl implements DataSource
         }
     }
 
-
     public final PrintWriter getLogWriter() throws SQLException
     {
         return service.getLogWriter();
@@ -338,7 +337,6 @@ public class DataSourceImpl implements DataSource
     {
         this.maxActive = maxActive;
     }
-
 
     public void setMaxIdle(int maxIdle)
     {

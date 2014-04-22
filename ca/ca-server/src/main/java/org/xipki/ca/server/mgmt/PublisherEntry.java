@@ -84,7 +84,6 @@ public class PublisherEntry
         }
     }
 
-
     public synchronized IdentifiedCertPublisher getCertPublisher()
     throws CertPublisherException
     {

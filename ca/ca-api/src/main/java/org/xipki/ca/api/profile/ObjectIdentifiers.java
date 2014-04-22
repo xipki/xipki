@@ -106,7 +106,6 @@ public class ObjectIdentifiers
     public static final ASN1ObjectIdentifier DN_PSEUDONYM = new ASN1ObjectIdentifier(
         "2.5.4.65");
 
-
     /**
      * RFC 3039 DateOfBirth - GeneralizedTime - YYYYMMDD000000Z
      */
@@ -138,7 +137,6 @@ public class ObjectIdentifiers
      */
     public static final ASN1ObjectIdentifier DN_COUNTRY_OF_RESIDENCE = new ASN1ObjectIdentifier(
         "1.3.6.1.5.5.7.9.5");
-
 
     /**
      * ISIS-MTT NameAtBirth - DirectoryString(SIZE(1..64)

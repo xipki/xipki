@@ -111,7 +111,6 @@ public class SlotAndKeyIdentifer extends ASN1Object
         return slotIdentifier;
     }
 
-
     public KeyIdentifier getKeyIdentifier()
     {
         return keyIdentifier;

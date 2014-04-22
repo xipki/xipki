@@ -24,7 +24,6 @@ public class CertificatePolicyInformation
     private String policyId;
     private List<CertificatePolicyQualifier> qualifiers;
 
-
     public void setPolicyId(String policyId)
     {
         this.policyId = policyId;

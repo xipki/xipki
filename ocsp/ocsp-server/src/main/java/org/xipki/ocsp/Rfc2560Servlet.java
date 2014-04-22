@@ -196,7 +196,6 @@ public class Rfc2560Servlet extends HttpServlet
             }
         }
 
-
     }
 
     public int getMaxRequestLength()
@@ -208,7 +207,6 @@ public class Rfc2560Servlet extends HttpServlet
     {
         this.maxRequestLength = maxRequestLength;
     }
-
 
     public void setAuditLoggingService(AuditLoggingService auditLoggingService)
     {

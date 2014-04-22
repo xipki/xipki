@@ -61,5 +61,4 @@ public class OperationException extends Exception
         return errorMessage;
     }
 
-
 }

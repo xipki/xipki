@@ -21,7 +21,6 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
-
 public abstract class AbstractCACertProfile extends AbstractCertProfile
 {
     protected Set<KeyUsage> keyUsages;

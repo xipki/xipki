@@ -239,7 +239,6 @@ public class CAEntry
         return sb.toString();
     }
 
-
     private static String toString(Collection<String> tokens)
     {
         if(tokens == null || tokens.isEmpty())

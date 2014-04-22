@@ -156,6 +156,4 @@ public abstract class AbstractRAWorker
         this.securityFactory = securityFactory;
     }
 
-
-
 }

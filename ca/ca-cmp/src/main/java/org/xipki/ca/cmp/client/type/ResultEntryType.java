@@ -17,7 +17,6 @@
 
 package org.xipki.ca.cmp.client.type;
 
-
 public abstract class ResultEntryType extends IdentifiedObject
 {
 

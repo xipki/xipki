@@ -38,7 +38,7 @@ class PendingCertificatePool
         public MyEntry(BigInteger certReqId,
                 long waitForConfirmTill,
                 CertificateInfo certInfo)
-                {
+        {
             super();
             ParamChecker.assertNotNull("certReqId", certReqId);
             ParamChecker.assertNotNull("certInfo", certInfo);
@@ -62,7 +62,7 @@ class PendingCertificatePool
         }
     }
 
-    private final Map<String, Set<MyEntry>> map = new ConcurrentHashMap<String,    Set<MyEntry>>();
+    private final Map<String, Set<MyEntry>> map = new ConcurrentHashMap<String, Set<MyEntry>>();
 
     PendingCertificatePool()
     {

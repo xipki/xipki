@@ -40,7 +40,6 @@ public class P11PrivateKey implements PrivateKey
     private final String algorithm;
     private final int keysize;
 
-
     public P11PrivateKey(P11CryptService p11CryptService, PKCS11SlotIdentifier slotId,
             Pkcs11KeyIdentifier keyId) throws InvalidKeyException
     {
@@ -170,8 +169,5 @@ public class P11PrivateKey implements PrivateKey
     {
         return keyId;
     }
-
-
-
 
 }

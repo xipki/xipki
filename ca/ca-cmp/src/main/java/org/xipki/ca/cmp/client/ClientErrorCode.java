@@ -28,5 +28,4 @@ public class ClientErrorCode
 
     public static final int PKIFailureInfo_CERT_ENCODING_ERROR = -100;
 
-
 }

@@ -17,7 +17,6 @@
 
 package org.xipki.ca.api.profile;
 
-
 public class ExtensionOccurrence
 {
     public static final ExtensionOccurrence CRITICAL_REQUIRED    = new ExtensionOccurrence(true, true);

@@ -19,7 +19,7 @@ package org.xipki.ca.server;
 
 final public class Version
 {
-    public static String PRODUCT_NAME = "XiPKI CA";
+    public static String PRODUCT_NAME = "XiPKI";
 
     public static void main(String []argv)
     {

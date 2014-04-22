@@ -138,7 +138,6 @@ public abstract class P12KeypairGenerator
                 identity.getCert());
     }
 
-
     private ContentSigner getContentSigner(PrivateKey key)
     throws Exception
     {
@@ -259,7 +258,6 @@ public abstract class P12KeypairGenerator
         {
             return jceCert;
         }
-
 
         public PrivateKey getKey()
         {

@@ -28,5 +28,4 @@ public class Pkcs12_SHA256withRSA_Test extends Pkcs12_RSA_Test
         return PKCSObjectIdentifiers.sha256WithRSAEncryption;
     }
 
-
 }
