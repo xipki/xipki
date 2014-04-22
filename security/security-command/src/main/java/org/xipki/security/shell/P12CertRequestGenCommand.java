@@ -210,5 +210,4 @@ public class P12CertRequestGenCommand extends OsgiCommandSupport
         }
     }
 
-
 }

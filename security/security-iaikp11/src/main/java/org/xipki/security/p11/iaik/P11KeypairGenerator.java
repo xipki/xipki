@@ -217,7 +217,6 @@ public class P11KeypairGenerator
 
         publicKey = (RSAPublicKey) kp.getPublicKey();
 
-
         BigInteger modulus = new BigInteger(1, publicKey.getModulus().getByteArrayValue());
         publicExponent = new BigInteger(1, publicKey.getPublicExponent().getByteArrayValue());
         RSAKeyParameters keyParams = new RSAKeyParameters(false, modulus, publicExponent);

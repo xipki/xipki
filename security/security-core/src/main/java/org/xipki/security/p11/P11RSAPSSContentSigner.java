@@ -77,7 +77,6 @@ public class P11RSAPSSContentSigner implements ContentSigner
             throw new OperatorCreationException(e.getMessage(), e);
         }
 
-
         this.pssSigner = SignerUtil.createPSSRSASigner(signatureAlgId, cipher);
         this.pssSigner.init(true, keyParam);
 

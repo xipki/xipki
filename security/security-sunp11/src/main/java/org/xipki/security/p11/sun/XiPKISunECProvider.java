@@ -21,14 +21,12 @@ import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.security.Provider;
 
-
 @SuppressWarnings("serial")
 public class XiPKISunECProvider
   extends Provider
 {
   public static final String NAME = "XiPKI-SunEC";
   public static final double VERSION = 1.0;
-
 
   public XiPKISunECProvider()
   {

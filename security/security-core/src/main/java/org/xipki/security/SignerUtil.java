@@ -273,7 +273,6 @@ public class SignerUtil
         return new AlgorithmIdentifier(digestAlgOid, DERNull.INSTANCE);
     }
 
-
     public static  boolean verifyPOP(CertificationRequest p10Request)
     {
         PKCS10CertificationRequest p10Req = new PKCS10CertificationRequest(p10Request);

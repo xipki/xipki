@@ -580,7 +580,6 @@ class CaConfigurationDbExporter extends DbPorter
         return ca_has_publishers;
     }
 
-
     private CaHasCertprofiles export_ca_has_certprofile()
     throws XMLStreamException, SQLException
     {

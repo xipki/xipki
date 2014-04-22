@@ -17,7 +17,6 @@
 
 package org.xipki.database.api;
 
-
 public enum DatabaseType
 {
     DB2,

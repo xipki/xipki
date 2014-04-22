@@ -37,7 +37,6 @@ public class LocalP11CryptService
     private String pkcs11Password;
     private P11CryptService p11CryptService;
 
-
     public LocalP11CryptService()
     {
     }

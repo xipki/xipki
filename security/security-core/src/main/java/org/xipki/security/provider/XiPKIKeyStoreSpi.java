@@ -355,7 +355,6 @@ public class XiPKIKeyStoreSpi extends KeyStoreSpi
         defaultPkcs11Module = pkcs11Module;
     }
 
-
     public static void setDefaultPkcs11Provider(String pkcs11Provider)
     {
         defaultPkcs11Provider = pkcs11Provider;

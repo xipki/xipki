@@ -511,5 +511,4 @@ class CaCertStoreDbExporter extends DbPorter
         }
     }
 
-
 }

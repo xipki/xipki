@@ -154,7 +154,6 @@ public abstract class RemoteP11CryptService implements P11CryptService
         }
     }
 
-
     @Override
     public X509Certificate[] getCertificates(PKCS11SlotIdentifier slotId,
             Pkcs11KeyIdentifier keyId) throws SignerException
@@ -189,7 +188,6 @@ public abstract class RemoteP11CryptService implements P11CryptService
 
         return (octetString == null) ? null : octetString.getOctets();
     }
-
 
     private byte[] getCertOrKey(ASN1ObjectIdentifier type,
             PKCS11SlotIdentifier slotId, Pkcs11KeyIdentifier keyId)

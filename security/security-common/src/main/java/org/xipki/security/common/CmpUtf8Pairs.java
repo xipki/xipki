@@ -145,7 +145,6 @@ public class CmpUtf8Pairs
         return newS.toString();
     }
 
-
     public void putUtf8Pair(String name, String value)
     {
         if(name == null || name.isEmpty())
