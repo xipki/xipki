@@ -193,24 +193,25 @@ class RSAPSSSignatureSpi
 
             if (originalSpec != null)
             {
-                if (!DigestFactory.isSameDigest(originalSpec.getDigestAlgorithm(), newParamSpec.getDigestAlgorithm()))
+                if (DigestFactory.isSameDigest(originalSpec.getDigestAlgorithm(), newParamSpec.getDigestAlgorithm()) == false)
                 {
                     throw new InvalidParameterException("parameter must be using " + originalSpec.getDigestAlgorithm());
                 }
             }
-            if (!newParamSpec.getMGFAlgorithm().equalsIgnoreCase("MGF1") && !newParamSpec.getMGFAlgorithm().equals(PKCSObjectIdentifiers.id_mgf1.getId()))
+            if ((newParamSpec.getMGFAlgorithm().equalsIgnoreCase("MGF1") == false) &&
+                 (newParamSpec.getMGFAlgorithm().equals(PKCSObjectIdentifiers.id_mgf1.getId()) == false))
             {
                 throw new InvalidParameterException("unknown mask generation function specified");
             }
 
-            if (!(newParamSpec.getMGFParameters() instanceof MGF1ParameterSpec))
+            if ((newParamSpec.getMGFParameters() instanceof MGF1ParameterSpec) == false)
             {
                 throw new InvalidParameterException("unkown MGF parameters");
             }
 
             MGF1ParameterSpec mgfParams = (MGF1ParameterSpec)newParamSpec.getMGFParameters();
 
-            if (!DigestFactory.isSameDigest(mgfParams.getDigestAlgorithm(), newParamSpec.getDigestAlgorithm()))
+            if (DigestFactory.isSameDigest(mgfParams.getDigestAlgorithm(), newParamSpec.getDigestAlgorithm()) == false)
             {
                 throw new InvalidParameterException("digest algorithm for MGF should be the same as for PSS parameters.");
             }

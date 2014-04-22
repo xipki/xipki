@@ -309,7 +309,7 @@ public abstract class CmpResponder
         ASN1OctetString tid = reqHeader.getTransactionID();
         GeneralName recipient = reqHeader.getRecipient();
 
-        if(!sender.equals(recipient))
+        if(sender.equals(recipient) == false)
         {
             LOG.warn("tid={}: Unknown Recipient '{}'", tid, recipient);
         }

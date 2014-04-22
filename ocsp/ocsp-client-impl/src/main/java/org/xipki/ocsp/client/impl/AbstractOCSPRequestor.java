@@ -63,7 +63,7 @@ public abstract class AbstractOCSPRequestor implements OCSPRequestor
             RequestOptions requestOptions)
     throws OCSPRequestorException
     {
-        if(! cacert.getSubjectX500Principal().equals(cert.getIssuerX500Principal()))
+        if(cacert.getSubjectX500Principal().equals(cert.getIssuerX500Principal()) == false)
         {
             throw new IllegalArgumentException("cert and cacert do not match");
         }

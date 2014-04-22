@@ -35,7 +35,7 @@ public class RevocateCertResultType implements CmpResultType
     {
         ParamChecker.assertNotNull("resultEntry", resultEntry);
 
-        if(!(resultEntry instanceof RevocateCertResultEntryType || resultEntry instanceof ErrorResultEntryType))
+        if((resultEntry instanceof RevocateCertResultEntryType || resultEntry instanceof ErrorResultEntryType) == false)
         {
             throw new IllegalArgumentException("Unaccepted parameter of class " + resultEntry.getClass().getCanonicalName());
         }

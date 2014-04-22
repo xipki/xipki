@@ -171,7 +171,7 @@ public class CmpUtf8Pairs
         boolean isFirst = true;
         for(String name : pairs.keySet())
         {
-            if(! isFirst)
+            if(isFirst == false)
             {
                 sb.append(TOKEN_TERM);
             }
