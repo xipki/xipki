@@ -241,7 +241,7 @@ public final class RAWorkerImpl extends AbstractRAWorker implements RAWorker
 
         if(canames.isEmpty())
         {
-            throw new ConfigurationException("No CAConf configured");
+            LOG.warn("No CA configured");
         }
 
         Set<String> configuredCaNames = new HashSet<String>();
