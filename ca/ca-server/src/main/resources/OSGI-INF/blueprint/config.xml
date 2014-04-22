@@ -31,6 +31,7 @@
         <property name="securityFactory" ref="securityFactory"/>
         <property name="dataSourceFactory" ref="dataSourceFactory"/>
         <property name="caConfFile" value="${caConfFile}"/>
+        <property name="auditLoggingService" ref="auditLoggingService" />
     </bean>
     
     <service ref="caManager" interface="org.xipki.ca.server.mgmt.CAManager" />

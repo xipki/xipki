@@ -20,6 +20,7 @@ package org.xipki.ca.server;
 import java.security.cert.X509CRL;
 import java.util.Date;
 
+import org.xipki.audit.api.AuditLoggingService;
 import org.xipki.ca.api.publisher.CertPublisher;
 import org.xipki.ca.api.publisher.CertPublisherException;
 import org.xipki.ca.api.publisher.CertificateInfo;
@@ -86,6 +87,12 @@ public class IdentifiedCertPublisher extends CertPublisher
     public boolean isHealthy()
     {
         return certPublisher.isHealthy();
+    }
+
+    @Override
+    public void setAuditLoggingService(AuditLoggingService auditLoggingService)
+    {
+        certPublisher.setAuditLoggingService(auditLoggingService);
     }
 
 }

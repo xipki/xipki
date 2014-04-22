@@ -20,6 +20,7 @@ package org.xipki.ca.server.mgmt;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.xipki.audit.api.AuditLoggingService;
 import org.xipki.ca.api.publisher.CertPublisher;
 import org.xipki.ca.api.publisher.CertPublisherException;
 import org.xipki.ca.server.IdentifiedCertPublisher;
@@ -41,6 +42,7 @@ public class PublisherEntry
     private PasswordResolver passwordResolver;
     private DataSourceFactory dataSourceFactory;
     private IdentifiedCertPublisher certPublisher;
+    private AuditLoggingService auditLoggingService;
 
     public PublisherEntry(String name)
     {
@@ -128,6 +130,7 @@ public class PublisherEntry
         this.certPublisher = new IdentifiedCertPublisher(name, realPublisher);
         this.certPublisher.initialize(conf, passwordResolver, dataSourceFactory);
         this.certPublisher.setEnvironmentParamterResolver(envParamResolver);
+        this.certPublisher.setAuditLoggingService(auditLoggingService);
 
         return this.certPublisher;
     }
@@ -174,5 +177,11 @@ public class PublisherEntry
     public void setDataSourceFactory(DataSourceFactory dataSourceFactory)
     {
         this.dataSourceFactory = dataSourceFactory;
+    }
+
+    public void setAuditLoggingService(AuditLoggingService auditLoggingService)
+    {
+        this.auditLoggingService = auditLoggingService;
+        certPublisher.setAuditLoggingService(auditLoggingService);
     }
 }
