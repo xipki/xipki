@@ -289,7 +289,7 @@ class CaCertStoreDbExporter extends DbPorter
                 " requestorinfo_id, last_update," +
                 " revocated, rev_reason, rev_time, rev_invalidity_time, user_id" +
                 " FROM cert" +
-                " WHERE id > ? AND id < ?";
+                " WHERE id >= ? AND id < ?";
 
         PreparedStatement ps = prepareStatement(certSql);
 
@@ -313,8 +313,8 @@ class CaCertStoreDbExporter extends DbPorter
         {
             for(int i = minCertId; i <= maxCertId; i += n)
             {
-                ps.setInt(1, i - 1);
-                ps.setInt(2, i + n + 1);
+                ps.setInt(1, i);
+                ps.setInt(2, i + n);
 
                 ResultSet rs = ps.executeQuery();
 
