@@ -53,7 +53,8 @@ public class IoCertUtil
         return read(new File(fileName));
     }
 
-    public static byte[] read(File file) throws IOException
+    public static byte[] read(File file)
+    throws IOException
     {
         FileInputStream in = null;
 
@@ -84,8 +85,8 @@ public class IoCertUtil
     }
 
     public static void save(File file, byte[] encoded)
-            throws IOException
-            {
+    throws IOException
+    {
         File parent = file.getParentFile();
         if (parent != null && parent.exists() == false)
         {
@@ -105,18 +106,21 @@ public class IoCertUtil
     private static CertificateFactory certFact;
     private static Object certFactLock = new Object();
 
-    public static X509Certificate parseCert(String f) throws IOException, CertificateException
+    public static X509Certificate parseCert(String f)
+    throws IOException, CertificateException
     {
         return parseCert(new FileInputStream(f));
 
     }
 
-    public static X509Certificate parseCert(byte[] certBytes) throws IOException, CertificateException
+    public static X509Certificate parseCert(byte[] certBytes)
+    throws IOException, CertificateException
     {
         return parseCert(new ByteArrayInputStream(certBytes));
     }
 
-    public static X509Certificate parseCert(InputStream certStream) throws IOException, CertificateException
+    public static X509Certificate parseCert(InputStream certStream)
+    throws IOException, CertificateException
     {
         synchronized (certFactLock)
         {
@@ -134,12 +138,14 @@ public class IoCertUtil
         }
     }
 
-    public static X509CRL parseCRL(String f) throws IOException, CertificateException, CRLException
+    public static X509CRL parseCRL(String f)
+    throws IOException, CertificateException, CRLException
     {
         return parseCRL(new FileInputStream(f));
     }
 
-    public static X509CRL parseCRL(InputStream crlStream) throws IOException, CertificateException, CRLException
+    public static X509CRL parseCRL(InputStream crlStream)
+    throws IOException, CertificateException, CRLException
     {
         try
         {

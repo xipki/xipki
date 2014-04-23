@@ -71,7 +71,7 @@ class CaCertStoreDbImporter extends DbPorter
     private final HashCalculator hashCalculator;
 
     CaCertStoreDbImporter(DataSource dataSource, Unmarshaller unmarshaller, String srcDir)
-            throws SQLException, PasswordResolverException, IOException, NoSuchAlgorithmException
+    throws SQLException, PasswordResolverException, IOException, NoSuchAlgorithmException
     {
         super(dataSource, srcDir);
         ParamChecker.assertNotNull("unmarshaller", unmarshaller);
@@ -79,7 +79,8 @@ class CaCertStoreDbImporter extends DbPorter
         this.hashCalculator = new HashCalculator();
     }
 
-    public void importToDB() throws Exception
+    public void importToDB()
+    throws Exception
     {
         @SuppressWarnings("unchecked")
         JAXBElement<CertStoreType> root = (JAXBElement<CertStoreType>)
@@ -97,7 +98,7 @@ class CaCertStoreDbImporter extends DbPorter
     }
 
     private void import_cainfo(Cainfos cainfos)
-            throws SQLException, CertificateException, IOException
+    throws SQLException, CertificateException, IOException
     {
         final String SQL_ADD_CAINFO =
                 "INSERT INTO cainfo" +
@@ -151,7 +152,7 @@ class CaCertStoreDbImporter extends DbPorter
     }
 
     private void import_requestorinfo(Requestorinfos requestorinfos)
-            throws SQLException, CertificateException, IOException
+    throws SQLException, CertificateException, IOException
     {
         final String sql = "INSERT INTO requestorinfo (id, subject, sha1_fp_cert, cert) VALUES (?, ?, ?, ?)";
 
@@ -185,7 +186,7 @@ class CaCertStoreDbImporter extends DbPorter
     }
 
     private void import_certprofileinfo(Certprofileinfos certprofileinfos)
-            throws SQLException
+    throws SQLException
     {
         final String sql = "INSERT INTO certprofileinfo (id, name) VALUES (?, ?)";
 
@@ -212,7 +213,7 @@ class CaCertStoreDbImporter extends DbPorter
     }
 
     private void import_user(Users users)
-            throws SQLException
+    throws SQLException
     {
         final String sql = "INSERT INTO user (id, name) VALUES (?, ?)";
 
@@ -239,7 +240,7 @@ class CaCertStoreDbImporter extends DbPorter
     }
 
     private void import_crl(Crls crls)
-            throws SQLException, IOException, CertificateException, CRLException
+    throws SQLException, IOException, CertificateException, CRLException
     {
         final String sql = "INSERT INTO crl (cainfo_id, crl_number, thisUpdate, nextUpdate, crl) VALUES (?, ?, ?, ?, ?)";
 
@@ -306,7 +307,7 @@ class CaCertStoreDbImporter extends DbPorter
     }
 
     private void import_cert(CertsFiles certsfiles)
-            throws SQLException, JAXBException, IOException, CertificateException
+    throws SQLException, JAXBException, IOException, CertificateException
     {
         int sum = 0;
         for(String certsFile : certsfiles.getCertsFile())
@@ -323,7 +324,7 @@ class CaCertStoreDbImporter extends DbPorter
     }
 
     private int do_import_cert(CertsType certs)
-        throws SQLException, IOException, CertificateException
+    throws SQLException, IOException, CertificateException
     {
         final String SQL_ADD_CERT =
                 "INSERT INTO cert " +

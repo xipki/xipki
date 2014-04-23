@@ -62,14 +62,15 @@ class CaConfigurationDbExporter extends DbPorter
     private final Marshaller marshaller;
 
     CaConfigurationDbExporter(DataSource dataSource, Marshaller marshaller, String destDir)
-            throws SQLException, PasswordResolverException, IOException
+    throws SQLException, PasswordResolverException, IOException
     {
         super(dataSource, destDir);
         ParamChecker.assertNotNull("marshaller", marshaller);
         this.marshaller = marshaller;
     }
 
-    public void export() throws Exception
+    public void export()
+    throws Exception
     {
         CAConfigurationType caconf = new CAConfigurationType();
         caconf.setVersion(VERSION);

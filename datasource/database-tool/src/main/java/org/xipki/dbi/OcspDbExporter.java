@@ -39,7 +39,7 @@ public class OcspDbExporter
 
     public OcspDbExporter(DataSourceFactory dataSourceFactory,
             PasswordResolver passwordResolver, String dbConfFile)
-            throws SQLException, PasswordResolverException, IOException, JAXBException
+    throws SQLException, PasswordResolverException, IOException, JAXBException
     {
         this.dataSource = dataSourceFactory.createDataSourceForFile(dbConfFile, passwordResolver);
         JAXBContext jaxbContext = JAXBContext.newInstance(ObjectFactory.class);

@@ -52,7 +52,7 @@ public class Rfc6712Servlet extends HttpServlet
 
     @Override
     public void doPost(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException
+    throws ServletException, IOException
     {
         try
         {
@@ -99,7 +99,8 @@ public class Rfc6712Servlet extends HttpServlet
         response.flushBuffer();
     }
 
-    protected PKIMessage generatePKIMessage(InputStream is) throws IOException
+    protected PKIMessage generatePKIMessage(InputStream is)
+    throws IOException
     {
         ASN1InputStream asn1Stream = new ASN1InputStream(is);
 
@@ -111,7 +112,9 @@ public class Rfc6712Servlet extends HttpServlet
             try
             {
                 asn1Stream.close();
-            }catch(IOException e){}
+            }catch(IOException e)
+            {
+            }
         }
     }
 

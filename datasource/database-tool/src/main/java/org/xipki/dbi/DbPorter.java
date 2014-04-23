@@ -52,20 +52,21 @@ class DbPorter
 
     protected Statement createStatement() throws SQLException
     {
-            if(dsConnection == null || dsConnection.isClosed())
-            {
-                dsConnection = dataSource.getConnection(0);
-            }
+        if(dsConnection == null || dsConnection.isClosed())
+        {
+            dsConnection = dataSource.getConnection(0);
+        }
 
-            if(dsConnection == null || dsConnection.isClosed())
-            {
-                throw new SQLException("Could not get connection");
-            }
+        if(dsConnection == null || dsConnection.isClosed())
+        {
+            throw new SQLException("Could not get connection");
+        }
 
-            return dsConnection.createStatement();
+        return dsConnection.createStatement();
     }
 
-    protected PreparedStatement prepareStatement(String sql) throws SQLException
+    protected PreparedStatement prepareStatement(String sql)
+    throws SQLException
     {
         if(dsConnection == null || dsConnection.isClosed())
         {

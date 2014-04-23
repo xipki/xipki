@@ -32,7 +32,7 @@ public class DataSourceFactoryImpl implements DataSourceFactory
 {
     @Override
     public DataSource createDataSourceForFile(String confFile, PasswordResolver passwordResolver)
-            throws SQLException, PasswordResolverException, IOException
+    throws SQLException, PasswordResolverException, IOException
     {
         if(confFile == null)
         {

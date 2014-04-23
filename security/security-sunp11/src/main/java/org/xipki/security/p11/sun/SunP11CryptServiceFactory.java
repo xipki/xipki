@@ -26,7 +26,8 @@ public class SunP11CryptServiceFactory implements P11CryptServiceFactory
 
     @Override
     public P11CryptService createP11CryptService(String pkcs11Module,
-            char[] password) throws SignerException
+            char[] password)
+    throws SignerException
     {
         return SunP11CryptService.getInstance(pkcs11Module, password);
     }

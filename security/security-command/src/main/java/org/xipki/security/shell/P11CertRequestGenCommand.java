@@ -87,7 +87,8 @@ public class P11CertRequestGenCommand extends OsgiCommandSupport
     }
 
     @Override
-    protected Object doExecute() throws Exception
+    protected Object doExecute()
+    throws Exception
     {
         if(hashAlgo == null)
         {

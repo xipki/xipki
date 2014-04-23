@@ -47,14 +47,15 @@ class OcspCertStoreDbExporter extends DbPorter
     private final int COUNT_CERTS_IN_ONE_FILE  = 1000;
 
     OcspCertStoreDbExporter(DataSource dataSource, Marshaller marshaller, String baseDir)
-            throws SQLException, PasswordResolverException, IOException
+    throws SQLException, PasswordResolverException, IOException
     {
         super(dataSource, baseDir);
         ParamChecker.assertNotNull("marshaller", marshaller);
         this.marshaller = marshaller;
     }
 
-    public void export() throws Exception
+    public void export()
+    throws Exception
     {
         CertStoreType certstore = new CertStoreType();
         certstore.setVersion(VERSION);

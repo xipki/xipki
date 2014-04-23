@@ -81,7 +81,7 @@ public abstract class RemoteP11CryptService implements P11CryptService
     protected abstract byte[] send(byte[] request) throws IOException;
 
     public int getServerVersion()
-            throws SignerException
+    throws SignerException
     {
         InfoTypeAndValue itv = new InfoTypeAndValue(RemoteP11Constants.id_version, DERNull.INSTANCE);
         ASN1Encodable result = send(itv);
@@ -100,28 +100,28 @@ public abstract class RemoteP11CryptService implements P11CryptService
 
     @Override
     public byte[] CKM_RSA_PKCS(byte[] encodedDigestInfo, PKCS11SlotIdentifier slotId, Pkcs11KeyIdentifier keyId)
-            throws SignerException
+    throws SignerException
     {
         return pso(RemoteP11Constants.id_pso_rsa_pkcs, encodedDigestInfo, slotId, keyId);
     }
 
     @Override
     public byte[] CKM_RSA_X509(byte[] hash, PKCS11SlotIdentifier slotId, Pkcs11KeyIdentifier keyId)
-            throws SignerException
+    throws SignerException
     {
         return pso(RemoteP11Constants.id_pso_rsa_x509, hash, slotId, keyId);
     }
 
     @Override
     public byte[] CKM_ECDSA(byte[] hash, PKCS11SlotIdentifier slotId, Pkcs11KeyIdentifier keyId)
-            throws SignerException
+    throws SignerException
     {
         return pso(RemoteP11Constants.id_pso_ecdsa, hash, slotId, keyId);
     }
 
     @Override
     public PublicKey getPublicKey(PKCS11SlotIdentifier slotId, Pkcs11KeyIdentifier keyId)
-            throws SignerException
+    throws SignerException
     {
         byte[] keyBytes = getCertOrKey(RemoteP11Constants.id_get_publickey, slotId, keyId);
         if(keyBytes == null)
@@ -134,7 +134,7 @@ public abstract class RemoteP11CryptService implements P11CryptService
 
     @Override
     public X509Certificate getCertificate(PKCS11SlotIdentifier slotId, Pkcs11KeyIdentifier keyId)
-            throws SignerException
+    throws SignerException
     {
         byte[] certBytes = getCertOrKey(RemoteP11Constants.id_get_certificate, slotId, keyId);
         if(certBytes == null)
@@ -156,7 +156,8 @@ public abstract class RemoteP11CryptService implements P11CryptService
 
     @Override
     public X509Certificate[] getCertificates(PKCS11SlotIdentifier slotId,
-            Pkcs11KeyIdentifier keyId) throws SignerException
+            Pkcs11KeyIdentifier keyId)
+    throws SignerException
     {
         X509Certificate cert = getCertificate(slotId, keyId);
         if(cert == null)
@@ -169,7 +170,7 @@ public abstract class RemoteP11CryptService implements P11CryptService
 
     private byte[] pso(ASN1ObjectIdentifier type, byte[] message,
             PKCS11SlotIdentifier slotId, Pkcs11KeyIdentifier keyId)
-            throws SignerException
+    throws SignerException
     {
         SlotAndKeyIdentifer slotAndKeyIdentifier = buildSlotAndKeyIdentifier(slotId, keyId);
         PSOTemplate psoTemplate = new PSOTemplate(slotAndKeyIdentifier, message);
@@ -191,7 +192,7 @@ public abstract class RemoteP11CryptService implements P11CryptService
 
     private byte[] getCertOrKey(ASN1ObjectIdentifier type,
             PKCS11SlotIdentifier slotId, Pkcs11KeyIdentifier keyId)
-            throws SignerException
+    throws SignerException
     {
         SlotAndKeyIdentifer slotAndKeyIdentifier = buildSlotAndKeyIdentifier(slotId, keyId);
 
@@ -268,7 +269,7 @@ public abstract class RemoteP11CryptService implements P11CryptService
     }
 
     private static ASN1Encodable extractItvInfoValue(GeneralPKIMessage response, ASN1ObjectIdentifier exepectedType)
-            throws SignerException
+    throws SignerException
     {
         PKIBody respBody = response.getBody();
         int bodyType = respBody.getType();
@@ -341,7 +342,7 @@ public abstract class RemoteP11CryptService implements P11CryptService
     }
 
     private static PublicKey generatePublicKey(byte[] encodedSubjectPublicKeyInfo)
-            throws SignerException
+    throws SignerException
     {
         SubjectPublicKeyInfo pkInfo = SubjectPublicKeyInfo.getInstance(encodedSubjectPublicKeyInfo);
 
@@ -379,7 +380,8 @@ public abstract class RemoteP11CryptService implements P11CryptService
     }
 
     @Override
-    public PKCS11SlotIdentifier[] getSlotIdentifiers() throws SignerException
+    public PKCS11SlotIdentifier[] getSlotIdentifiers()
+    throws SignerException
     {
         InfoTypeAndValue itv = new InfoTypeAndValue(RemoteP11Constants.id_list_slots, null);
         ASN1Encodable resp = send(itv);
@@ -411,7 +413,7 @@ public abstract class RemoteP11CryptService implements P11CryptService
 
     @Override
     public String[] getKeyLabels(PKCS11SlotIdentifier slotId)
-            throws SignerException
+    throws SignerException
     {
         InfoTypeAndValue itv = new InfoTypeAndValue(RemoteP11Constants.id_list_keylabels,
                 new SlotIdentifier(slotId));

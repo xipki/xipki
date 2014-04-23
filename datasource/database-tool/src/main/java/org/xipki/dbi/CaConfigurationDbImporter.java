@@ -67,7 +67,7 @@ class CaConfigurationDbImporter extends DbPorter
     private final Unmarshaller unmarshaller;
 
     CaConfigurationDbImporter(DataSource dataSource, Unmarshaller unmarshaller, String srcDir)
-            throws SQLException, PasswordResolverException, IOException
+    throws SQLException, PasswordResolverException, IOException
     {
         super(dataSource, srcDir);
         ParamChecker.assertNotNull("unmarshaller", unmarshaller);

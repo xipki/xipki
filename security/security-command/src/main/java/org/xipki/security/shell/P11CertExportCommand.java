@@ -72,7 +72,8 @@ public class P11CertExportCommand extends OsgiCommandSupport
     }
 
     @Override
-    protected Object doExecute() throws Exception
+    protected Object doExecute()
+    throws Exception
     {
         Pkcs11KeyIdentifier keyIdentifier;
         if(keyId != null && keyLabel == null)

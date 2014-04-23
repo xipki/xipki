@@ -41,7 +41,8 @@ public class ExportOcspCommand extends OsgiCommandSupport
     private PasswordResolver passwordResolver;
 
     @Override
-    protected Object doExecute() throws Exception
+    protected Object doExecute()
+    throws Exception
     {
         OcspDbExporter exporter = new OcspDbExporter(dataSourceFactory, passwordResolver, dbconfFile);
         exporter.exportDatabase(outdir);
