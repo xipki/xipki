@@ -70,9 +70,10 @@ import org.xipki.security.common.DfltEnvironmentParameterResolver;
 import org.xipki.security.common.EnvironmentParameterResolver;
 import org.xipki.security.common.ParamChecker;
 
-// TODO: add mechanism to lock and unlock the CA to prevent from accessing to the database by more than one CA instance.
 public class CAManagerImpl implements CAManager
 {
+    public static final String ENVIRONMENT_NAME_LOCK = "lock";
+
     private static final Logger LOG = LoggerFactory.getLogger(CAManagerImpl.class);
 
     private final CertificateFactory certFact;
@@ -152,6 +153,47 @@ public class CAManagerImpl implements CAManager
         this.certFact = cf;
     }
 
+    private void initializeDatasource() throws CAMgmtException
+    {
+        if(this.dataSource != null)
+        {
+            return;
+        }
+        if(passwordResolver == null)
+        {
+            throw new IllegalStateException("passwordResolver is not set");
+        }
+        if(dataSourceFactory == null)
+        {
+            throw new IllegalStateException("dataSourceFactory is not set");
+        }
+        if(caConfFile == null)
+        {
+            throw new IllegalStateException("caConfFile is not set");
+        }
+
+        try
+        {
+            this.dataSource = dataSourceFactory.createDataSourceForFile(caConfFile, passwordResolver);
+        } catch (SQLException e)
+        {
+            throw new CAMgmtException(e);
+        } catch (PasswordResolverException e)
+        {
+            throw new CAMgmtException(e);
+        } catch (IOException e)
+        {
+            throw new CAMgmtException(e);
+        }
+        try
+        {
+            this.certstore = new CertificateStore(dataSource);
+        } catch (SQLException e)
+        {
+            throw new CAMgmtException(e);
+        }
+    }
+
     private void init()
     throws CAMgmtException
     {
@@ -159,60 +201,102 @@ public class CAManagerImpl implements CAManager
         {
             throw new IllegalStateException("securityFactory is not set");
         }
-        if(dataSourceFactory == null)
-        {
-            throw new IllegalStateException("dataSourceFactory is not set");
-        }
-        if(passwordResolver == null)
-        {
-            throw new IllegalStateException("passwordResolver is not set");
-        }
-        if(caConfFile == null)
-        {
-            throw new IllegalStateException("caConfFile is not set");
-        }
 
-        if(this.dataSource == null)
-        {
-            try
-            {
-                this.dataSource = dataSourceFactory.createDataSourceForFile(caConfFile, passwordResolver);
-            } catch (SQLException e)
-            {
-                throw new CAMgmtException(e);
-            } catch (PasswordResolverException e)
-            {
-                throw new CAMgmtException(e);
-            } catch (IOException e)
-            {
-                throw new CAMgmtException(e);
-            }
-            try
-            {
-                this.certstore = new CertificateStore(dataSource);
-            } catch (SQLException e)
-            {
-                throw new CAMgmtException(e);
-            }
-        }
-
-        /*
-        Connection conn = getDataSourceConnection();
-        Statement stmt = conn.createStatement();
-        String sql = "SELECT locked FROM lock";
-        ResultSet sqlResult = stmt.executeQuery(sql);
-
-        if(sqlResult.next())
-        {
-            boolean locked = sqlResult.getBoolean("locked");
-            if(locked)
-            {
-                throw new Error("The database is locked. Exit the CA");
-            }
-        }
-        */
-
+        initializeDatasource();
         initDataObjects();
+    }
+
+    private boolean lockCA() throws CAMgmtException
+    {
+        Statement stmt = null;
+        try
+        {
+            stmt = createStatement();
+            String sql = "SELECT value FROM environment WHERE name='lock'";
+            ResultSet rs = stmt.executeQuery(sql);
+
+            boolean alreadyLocked = false;
+
+            String lockSql = null;
+            if(rs.next())
+            {
+                String value = rs.getString("value");
+                alreadyLocked = (value != null) && (value.trim().equals("0") == false);
+                lockSql = "UPDATE environment SET value='1' WHERE name='lock'";
+            }
+            else
+            {
+                lockSql = "INSERT INTO environment (name, value) VALUES ('lock', '1')";
+            }
+            rs.close();
+            rs = null;
+
+            if(alreadyLocked)
+            {
+                return false;
+            }
+
+            int numColumns = stmt.executeUpdate(lockSql);
+            return numColumns > 0;
+        }catch(SQLException e)
+        {
+            throw new CAMgmtException(e);
+        }finally
+        {
+            closeStatement(stmt);
+        }
+    }
+
+    @Override
+    public boolean unlockCA()
+    {
+        Statement stmt = null;
+        try
+        {
+            try
+            {
+                stmt = createStatement();
+            } catch (CAMgmtException e)
+            {
+                LOG.warn("Error in unlockCA(), SQLException: {}", e.getMessage());
+                LOG.debug("Error in unlockCA()", e);
+                return false;
+            }
+            String sql = "SELECT value FROM environment WHERE name='lock'";
+            ResultSet rs = stmt.executeQuery(sql);
+
+            boolean alreadyLocked = false;
+
+            String lockSql = null;
+            if(rs.next())
+            {
+                String value = rs.getString("value");
+                alreadyLocked = (value != null) && (value.trim().equals("0") == false);
+                lockSql = "UPDATE environment SET value='0' WHERE name='lock'";
+            }
+            else
+            {
+                lockSql = "INSERT INTO environment (name, value) VALUES ('lock', '0')";
+            }
+            rs.close();
+            rs = null;
+
+            if(alreadyLocked == false)
+            {
+                return true;
+            }
+
+            int numColumns = stmt.executeUpdate(lockSql);
+            return numColumns > 0;
+        }catch(SQLException e)
+        {
+            LOG.warn("Error in unlockCA(), SQLException: {}", e.getMessage());
+            LOG.debug("Error in unlockCA()", e);
+            return false;
+        }finally
+        {
+            closeStatement(stmt);
+        }
     }
 
     private void reset()
@@ -273,14 +357,39 @@ public class CAManagerImpl implements CAManager
 
     public void startCaSystem()
     {
+        try
+        {
+            initializeDatasource();
+
+            boolean successfull = lockCA();
+            if(successfull == false)
+            {
+                String msg = "Database is locked by another CA, could not start CA system.";
+                LOG.error(msg);
+                System.err.println(msg);
+                return;
+            }
+        }catch(CAMgmtException e)
+        {
+            LOG.error("Error while locking CA. SQLException: {}", e.getMessage());
+            LOG.debug("Error while locking CA", e);
+            String msg = "Could not start CA system";
+            LOG.error(msg);
+            System.err.println(msg);
+        }
+
         boolean caSystemStarted = intern_startCaSystem();
         if(caSystemStarted)
         {
-            LOG.info("Started CA system");
+            String msg = "Started CA system";
+            LOG.info(msg);
+            System.out.println();
         }
         else
         {
-            LOG.error("Starting CA system FAILED");
+            String msg = "Could not start CA system";
+            LOG.error(msg);
+            System.err.println(msg);
         }
     }
 
@@ -521,11 +630,13 @@ public class CAManagerImpl implements CAManager
             try
             {
                 ca.commitNextSerial();
-            } catch (CAMgmtException e)
+            } catch (Throwable t)
             {
-                LOG.info("Exception while calling ca.commitNextSerial for ca {}: {}", caName, e.getMessage());
+                LOG.info("Exception while calling ca.commitNextSerial for ca {}: {}", caName, t.getMessage());
             }
         }
+
+        unlockCA();
     }
 
     @Override
@@ -700,8 +811,10 @@ public class CAManagerImpl implements CAManager
             {
                 String name = rs.getString("name");
                 String value = rs.getString("value");
-
-                envParameterResolver.addEnvParam(name, value);
+                if(ENVIRONMENT_NAME_LOCK.equals(name) == false)
+                {
+                    envParameterResolver.addEnvParam(name, value);
+                }
             }
 
             rs.close();
@@ -2620,6 +2733,11 @@ public class CAManagerImpl implements CAManager
             return;
         }
 
+        if(ENVIRONMENT_NAME_LOCK.equals(envParamName))
+        {
+            return;
+        }
+
         PreparedStatement ps = null;
         try
         {
@@ -2641,7 +2759,18 @@ public class CAManagerImpl implements CAManager
     public void changeEnvParam(String name, String value)
     throws CAMgmtException
     {
-        ParamChecker.assertNotEmpty("value", value);
+        if(ENVIRONMENT_NAME_LOCK.equals(name))
+        {
+            return;
+        }
+
+        do_changeEnvParam(name, value);
+    }
+
+    private void do_changeEnvParam(String name, String value)
+    throws CAMgmtException
+    {
+        ParamChecker.assertNotEmpty("name", name);
         assertNotNULL("value", value);
 
         if(envParameterResolver.getAllParameterNames().contains(name) == false)

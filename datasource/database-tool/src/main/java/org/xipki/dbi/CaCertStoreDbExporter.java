@@ -79,22 +79,23 @@ class CaCertStoreDbExporter extends DbPorter
         CertStoreType certstore = new CertStoreType();
         certstore.setVersion(VERSION);
         System.out.println("Exporting CA certstore from database");
-        try{
-	        certstore.setCainfos(export_cainfo());
-	        certstore.setRequestorinfos(export_requestorinfo());
-	        certstore.setCertprofileinfos(export_certprofileinfo());
-	        certstore.setUsers(export_user());
-	        certstore.setCrls(export_crl());
-	        certstore.setCertsFiles(export_cert());
-	
-	        JAXBElement<CertStoreType> root = new ObjectFactory().createCertStore(certstore);
-	        marshaller.marshal(root, new File(baseDir + File.separator + FILENAME_CA_CertStore));
-        }catch(Exception e)        
+        try
         {
-        	System.err.println("Error while exporting CA certstore from database");
-        	throw e;
+            certstore.setCainfos(export_cainfo());
+            certstore.setRequestorinfos(export_requestorinfo());
+            certstore.setCertprofileinfos(export_certprofileinfo());
+            certstore.setUsers(export_user());
+            certstore.setCrls(export_crl());
+            certstore.setCertsFiles(export_cert());
+
+            JAXBElement<CertStoreType> root = new ObjectFactory().createCertStore(certstore);
+            marshaller.marshal(root, new File(baseDir + File.separator + FILENAME_CA_CertStore));
+        }catch(Exception e)
+        {
+            System.err.println("Error while exporting CA certstore from database");
+            throw e;
         }
-	    System.out.println("Exported CA certstore from database");
+        System.out.println("Exported CA certstore from database");
     }
 
     private Crls export_crl()
