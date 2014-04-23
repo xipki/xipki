@@ -32,6 +32,8 @@ public interface CAManager
 {
     public static final String NULL = "NULL";
 
+    boolean unlockCA();
+
     void publishRootCA(String caname)
     throws CAMgmtException;
 
