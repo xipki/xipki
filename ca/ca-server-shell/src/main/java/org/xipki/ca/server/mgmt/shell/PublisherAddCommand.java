@@ -45,7 +45,8 @@ public class PublisherAddCommand extends CaCommand
     protected String            confFile;
 
     @Override
-    protected Object doExecute() throws Exception
+    protected Object doExecute()
+    throws Exception
     {
         PublisherEntry entry = new PublisherEntry(name);
         entry.setType(type);

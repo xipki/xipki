@@ -598,7 +598,8 @@ public final class RAWorkerImpl extends AbstractRAWorker implements RAWorker
         return new CertReqMsg(newCertRequest, popo, new AttributeTypeAndValue[] { certProfileInfo });
     }
 
-    private CertRequest applyCertProfile(CertRequest origCertRequest, String profileName) throws RAWorkerException
+    private CertRequest applyCertProfile(CertRequest origCertRequest, String profileName)
+    throws RAWorkerException
     {
         CertProfile certProfile = raProfilesMaps.get(profileName);
 
@@ -755,7 +756,7 @@ public final class RAWorkerImpl extends AbstractRAWorker implements RAWorker
     }
 
     private EnrollCertRequestType applyCertProfiles(EnrollCertRequestType request)
-            throws RAWorkerException
+    throws RAWorkerException
     {
         EnrollCertRequestType ret = new EnrollCertRequestType(request.getType());
 
@@ -843,7 +844,7 @@ public final class RAWorkerImpl extends AbstractRAWorker implements RAWorker
 
     @Override
     public CertIDOrError revocateCert(X509Certificate cert, int reason)
-            throws RAWorkerException, PKIErrorException
+    throws RAWorkerException, PKIErrorException
     {
         X500Name issuer = X500Name.getInstance(cert.getIssuerX500Principal().getEncoded());
         return revocateCert(issuer, cert.getSerialNumber(), reason);
@@ -951,7 +952,8 @@ public final class RAWorkerImpl extends AbstractRAWorker implements RAWorker
     }
 
     @Override
-    public String getCaNameByIssuer(final X500Name issuer) throws RAWorkerException
+    public String getCaNameByIssuer(final X500Name issuer)
+    throws RAWorkerException
     {
 
         if(issuer ==null )
@@ -1031,7 +1033,8 @@ public final class RAWorkerImpl extends AbstractRAWorker implements RAWorker
 
     @Override
     protected java.security.cert.Certificate getCertificate(
-            CMPCertificate cmpCert) throws CertificateException
+            CMPCertificate cmpCert)
+    throws CertificateException
     {
         Certificate bcCert = cmpCert.getX509v3PKCert();
         return (bcCert == null) ? null : new X509CertificateObject(bcCert);
@@ -1060,7 +1063,7 @@ public final class RAWorkerImpl extends AbstractRAWorker implements RAWorker
 
     @Override
     public byte[] envelope(CertReqMsg certReqMsg, String caName)
-        throws RAWorkerException
+    throws RAWorkerException
     {
         ParamChecker.assertNotNull("request", certReqMsg);
         X509CmpRequestor cmpRequestor = getCmpRequestor(certReqMsg, caName);

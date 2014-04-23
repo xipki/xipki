@@ -67,7 +67,8 @@ public class P11ECKeyGenCommand extends OsgiCommandSupport
     }
 
     @Override
-    protected Object doExecute() throws Exception
+    protected Object doExecute()
+    throws Exception
     {
         if(curveName == null)
         {
@@ -85,9 +86,9 @@ public class P11ECKeyGenCommand extends OsgiCommandSupport
         System.out.println("key label: " + keyAndCert.getLabel());
         if(outputFilename != null)
         {
-               File certFile = new File(outputFilename);
-               IoCertUtil.save(certFile, keyAndCert.getCertificate().getEncoded());
-               System.out.println("Saved self-signed certificate in " + certFile.getPath());
+            File certFile = new File(outputFilename);
+            IoCertUtil.save(certFile, keyAndCert.getCertificate().getEncoded());
+            System.out.println("Saved self-signed certificate in " + certFile.getPath());
         }
 
         IaikP11CryptService.getInstance(securityFactory.getPkcs11Module(), pwd).refresh();

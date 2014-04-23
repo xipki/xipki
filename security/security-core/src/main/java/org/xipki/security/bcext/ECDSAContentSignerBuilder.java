@@ -34,7 +34,7 @@ public class ECDSAContentSignerBuilder
     }
 
     protected Signer createSigner(AlgorithmIdentifier sigAlgId, AlgorithmIdentifier digAlgId)
-        throws OperatorCreationException
+    throws OperatorCreationException
     {
         Digest dig = digestProvider.get(digAlgId);
 

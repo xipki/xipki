@@ -34,7 +34,8 @@ public class CaAliasAddCommand extends CaCommand
     protected String            caAlias;
 
     @Override
-    protected Object doExecute() throws Exception
+    protected Object doExecute()
+    throws Exception
     {
         caManager.addCaAlias(caAlias, caName);
         return null;

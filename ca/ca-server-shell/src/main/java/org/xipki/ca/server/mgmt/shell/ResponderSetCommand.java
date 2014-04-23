@@ -46,7 +46,8 @@ public class ResponderSetCommand extends CaCommand
     private PasswordResolver passwordResolver;
 
     @Override
-    protected Object doExecute() throws Exception
+    protected Object doExecute()
+    throws Exception
     {
         CmpResponderEntry entry = new CmpResponderEntry();
         X509Certificate signerCert = null;

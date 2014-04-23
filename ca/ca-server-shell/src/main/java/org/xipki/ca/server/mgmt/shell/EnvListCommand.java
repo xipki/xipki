@@ -33,7 +33,8 @@ public class EnvListCommand extends CaCommand
     protected String name;
 
     @Override
-    protected Object doExecute() throws Exception
+    protected Object doExecute()
+    throws Exception
     {
         EnvironmentParameterResolver envParameterResolver = caManager.getEnvParameterResolver();
 

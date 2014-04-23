@@ -67,7 +67,8 @@ public class BatchOCSPStatusCommand extends OsgiCommandSupport
     private OCSPRequestor      requestor;
 
     @Override
-    protected Object doExecute() throws Exception
+    protected Object doExecute()
+    throws Exception
     {
         if(intervalInMs == null)
         {

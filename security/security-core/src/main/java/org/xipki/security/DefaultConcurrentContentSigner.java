@@ -61,7 +61,8 @@ public class DefaultConcurrentContentSigner implements ConcurrentContentSigner
         this.privateKey = privateKey;
     }
 
-    public ContentSigner borrowContentSigner() throws NoIdleSignerException
+    public ContentSigner borrowContentSigner()
+    throws NoIdleSignerException
     {
         ContentSigner signer = idleSigners.poll();
         if(signer == null)
@@ -74,7 +75,8 @@ public class DefaultConcurrentContentSigner implements ConcurrentContentSigner
     }
 
     @Override
-    public ContentSigner borrowContentSigner(int soTimeout) throws NoIdleSignerException
+    public ContentSigner borrowContentSigner(int soTimeout)
+    throws NoIdleSignerException
     {
         if(soTimeout == 0)
         {
@@ -132,7 +134,7 @@ public class DefaultConcurrentContentSigner implements ConcurrentContentSigner
 
     @Override
     public void initialize(String conf, PasswordResolver passwordResolver)
-            throws SignerException
+    throws SignerException
     {
     }
 

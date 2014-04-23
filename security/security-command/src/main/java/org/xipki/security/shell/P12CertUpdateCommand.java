@@ -61,7 +61,8 @@ public class P12CertUpdateCommand extends OsgiCommandSupport
     }
 
     @Override
-    protected Object doExecute() throws Exception
+    protected Object doExecute()
+    throws Exception
     {
         KeyStore ks;
 
@@ -144,7 +145,7 @@ public class P12CertUpdateCommand extends OsgiCommandSupport
             throw new SignerException("Unknown key type: " + pubKey.getClass().getName());
         }
 
-           securityFactory.createSigner("PKCS12", pairs.getEncoded(), cert, NopPasswordResolver.INSTANCE);
+        securityFactory.createSigner("PKCS12", pairs.getEncoded(), cert, NopPasswordResolver.INSTANCE);
     }
 
 }

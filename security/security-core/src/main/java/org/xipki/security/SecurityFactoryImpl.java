@@ -82,7 +82,7 @@ public class SecurityFactoryImpl implements SecurityFactory
     @Override
     public ConcurrentContentSigner createSigner(
             String type, String conf, X509Certificate cert, PasswordResolver passwordResolver)
-            throws SignerException, PasswordResolverException
+    throws SignerException, PasswordResolverException
     {
         ConcurrentContentSigner signer = doCreateSigner(type, conf, cert, passwordResolver);
 
@@ -170,7 +170,7 @@ public class SecurityFactoryImpl implements SecurityFactory
 
     private ConcurrentContentSigner doCreateSigner(
             String type, String conf, X509Certificate cert, PasswordResolver passwordResolver)
-            throws SignerException, PasswordResolverException
+    throws SignerException, PasswordResolverException
     {
         if("PKCS11".equalsIgnoreCase(type) || "PKCS12".equalsIgnoreCase(type) || "JKS".equalsIgnoreCase(type))
         {
@@ -478,8 +478,9 @@ public class SecurityFactoryImpl implements SecurityFactory
 
     @Override
     public ContentVerifierProvider getContentVerifierProvider(
-            PublicKey publicKey) throws InvalidKeyException
-            {
+            PublicKey publicKey)
+    throws InvalidKeyException
+    {
         try
         {
             return KeyUtil.getContentVerifierProvider(publicKey);
@@ -491,7 +492,8 @@ public class SecurityFactoryImpl implements SecurityFactory
 
     @Override
     public ContentVerifierProvider getContentVerifierProvider(
-            X509Certificate cert) throws InvalidKeyException
+            X509Certificate cert)
+    throws InvalidKeyException
     {
         try
         {
@@ -504,7 +506,8 @@ public class SecurityFactoryImpl implements SecurityFactory
 
     @Override
     public ContentVerifierProvider getContentVerifierProvider(
-            X509CertificateHolder cert) throws InvalidKeyException
+            X509CertificateHolder cert)
+    throws InvalidKeyException
     {
         try
         {
@@ -527,7 +530,7 @@ public class SecurityFactoryImpl implements SecurityFactory
 
     @Override
     public PublicKey generatePublicKey(SubjectPublicKeyInfo subjectPublicKeyInfo)
-            throws InvalidKeyException
+    throws InvalidKeyException
     {
         try
         {
@@ -554,7 +557,7 @@ public class SecurityFactoryImpl implements SecurityFactory
     public byte[] generateSelfSignedRSAKeyStore(BigInteger serial,
             String subject, String keystoreType, char[] password,
             String keyLabel, int keysize, BigInteger publicExponent)
-            throws SignerException
+    throws SignerException
     {
         return KeyUtil.generateSelfSignedRSAKeyStore(serial, subject, keystoreType,
                 password, keyLabel, keysize, publicExponent);

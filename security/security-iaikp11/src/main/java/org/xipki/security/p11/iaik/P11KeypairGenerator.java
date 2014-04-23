@@ -82,7 +82,7 @@ public class P11KeypairGenerator
     public static final long YEAR = 365L * 24 * 60 * 60 * 1000; // milliseconds of one day
 
     private static IaikExtendedSlot getSlot(String pkcs11Lib, PKCS11SlotIdentifier slotId, char[] password)
-            throws SignerException
+    throws SignerException
     {
         if(pkcs11Lib == null)
         {
@@ -98,7 +98,8 @@ public class P11KeypairGenerator
         return slot;
     }
 
-    private boolean idExists(Session session, byte[] keyID) throws Exception
+    private boolean idExists(Session session, byte[] keyID)
+    throws Exception
     {
         Key k = new Key();
         k.getId().setByteArrayValue(keyID);
@@ -121,7 +122,8 @@ public class P11KeypairGenerator
         return objects.length > 0;
     }
 
-    private boolean labelExists(Session session, String keyLabel) throws Exception
+    private boolean labelExists(Session session, String keyLabel)
+    throws Exception
     {
         Key k = new Key();
         k.getLabel().setCharArrayValue(keyLabel.toCharArray());
@@ -197,7 +199,7 @@ public class P11KeypairGenerator
             Session session,
             int keySize, BigInteger publicExponent,
             byte[] id, String label)
-            throws Exception
+    throws Exception
     {
         if(publicExponent == null)
         {
@@ -354,7 +356,8 @@ public class P11KeypairGenerator
     private PrivateKeyAndPKInfo generateECDSAKeyPair(
             Session session,
             ASN1ObjectIdentifier curveId, X9ECParameters ecParams,
-            byte[] id, String label) throws Exception
+            byte[] id, String label)
+    throws Exception
     {
         KeyPair kp = null;
 
@@ -379,7 +382,7 @@ public class P11KeypairGenerator
 
     private KeyPair generateNamedECDSAKeyPair(
             Session session, ASN1ObjectIdentifier curveId, byte[] id, String label)
-        throws TokenException, IOException
+    throws TokenException, IOException
     {
         ECDSAPrivateKey privateKeyTemplate = new ECDSAPrivateKey();
         ECDSAPublicKey publicKeyTemplate = new ECDSAPublicKey();
@@ -394,7 +397,7 @@ public class P11KeypairGenerator
 
     private KeyPair generateSpecifiedECDSAKeyPair(
             Session session, ASN1ObjectIdentifier curveId, X9ECParameters ecParams, byte[] id, String label)
-        throws TokenException, IOException
+    throws TokenException, IOException
     {
         ECDSAPrivateKey privateKeyTemplate = new ECDSAPrivateKey();
         ECDSAPublicKey publicKeyTemplate = new ECDSAPublicKey();
@@ -511,7 +514,8 @@ public class P11KeypairGenerator
         return new X509CertificateHolder(Certificate.getInstance(cert));
     }
 
-    private static byte[] convertToX962Signature(byte[] signature) throws IOException
+    private static byte[] convertToX962Signature(byte[] signature)
+    throws IOException
     {
         int n = signature.length / 2;
         byte[] x = Arrays.copyOfRange(signature, 0, n);
@@ -526,7 +530,8 @@ public class P11KeypairGenerator
         return new DERSequence(sigder).getEncoded();
     }
 
-    private byte[] generateKeyID(Session session) throws Exception
+    private byte[] generateKeyID(Session session)
+    throws Exception
     {
         SecureRandom random = new SecureRandom();
         byte[] keyID = null;

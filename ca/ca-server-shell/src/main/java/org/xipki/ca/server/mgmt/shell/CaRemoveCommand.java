@@ -30,7 +30,8 @@ public class CaRemoveCommand extends CaCommand
     protected String            name;
 
     @Override
-    protected Object doExecute() throws Exception
+    protected Object doExecute()
+    throws Exception
     {
         caManager.removeCA(name);
         return null;

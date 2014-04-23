@@ -77,7 +77,8 @@ public class P11CertUpdateCommand extends OsgiCommandSupport
     }
 
     @Override
-    protected Object doExecute() throws Exception
+    protected Object doExecute()
+    throws Exception
     {
         Pkcs11KeyIdentifier keyIdentifier;
         if(keyId != null && keyLabel == null)
@@ -192,7 +193,7 @@ public class P11CertUpdateCommand extends OsgiCommandSupport
             throw new SignerException("Unknown key type: " + pubKey.getClass().getName());
         }
 
-           securityFactory.createSigner("PKCS11", pairs.getEncoded(), cert, NopPasswordResolver.INSTANCE);
+        securityFactory.createSigner("PKCS11", pairs.getEncoded(), cert, NopPasswordResolver.INSTANCE);
     }
 
 }

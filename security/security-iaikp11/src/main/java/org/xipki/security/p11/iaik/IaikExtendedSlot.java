@@ -70,7 +70,7 @@ public class IaikExtendedSlot
     private Session writableSession;
 
     IaikExtendedSlot(Slot slot, char[] password)
-            throws SignerException
+    throws SignerException
     {
         this.slot = slot;
         this.password = password;
@@ -128,7 +128,7 @@ public class IaikExtendedSlot
     }
 
     public byte[] CKM_ECDSA(byte[] hash, Pkcs11KeyIdentifier keyId)
-            throws SignerException
+    throws SignerException
     {
         PrivateKey signatureKey = getSigningKey(keyId);
         if(signatureKey == null)
@@ -166,7 +166,7 @@ public class IaikExtendedSlot
     }
 
     public byte[] CKM_RSA_PKCS(byte[] encodedDigestInfo, Pkcs11KeyIdentifier keyId)
-            throws SignerException
+    throws SignerException
     {
         PrivateKey signatureKey = getSigningKey(keyId);
 
@@ -205,7 +205,7 @@ public class IaikExtendedSlot
     }
 
     public byte[] CKM_RSA_X509(byte[] hash, Pkcs11KeyIdentifier keyId)
-            throws SignerException
+    throws SignerException
     {
         PrivateKey signatureKey = getSigningKey(keyId);
 
@@ -243,7 +243,8 @@ public class IaikExtendedSlot
         }
     }
 
-    private PrivateKey getSigningKey(Pkcs11KeyIdentifier keyId) throws SignerException
+    private PrivateKey getSigningKey(Pkcs11KeyIdentifier keyId)
+    throws SignerException
     {
         synchronized (keyId)
         {
@@ -279,12 +280,14 @@ public class IaikExtendedSlot
         }
     }
 
-    private Session openSession() throws TokenException
+    private Session openSession()
+    throws TokenException
     {
         return openSession(false);
     }
 
-    private Session openSession(boolean rwSession) throws TokenException
+    private Session openSession(boolean rwSession)
+    throws TokenException
     {
         Session session = slot.getToken().openSession(
                 Token.SessionType.SERIAL_SESSION, rwSession, null, null);
@@ -292,7 +295,8 @@ public class IaikExtendedSlot
         return session;
     }
 
-    private void closeSession(Session session) throws TokenException
+    private void closeSession(Session session)
+    throws TokenException
     {
         try
         {
@@ -303,7 +307,8 @@ public class IaikExtendedSlot
         }
     }
 
-    public synchronized Session borrowWritableSession() throws SignerException
+    public synchronized Session borrowWritableSession()
+    throws SignerException
     {
         if(writableSession == null)
         {
@@ -326,7 +331,7 @@ public class IaikExtendedSlot
     }
 
     public synchronized void returnWritableSession(Session session)
-            throws SignerException
+    throws SignerException
     {
         if(session != writableSession)
         {
@@ -335,7 +340,8 @@ public class IaikExtendedSlot
         this.writableSessionInUse = false;
     }
 
-    public Session borrowIdleSession() throws SignerException
+    public Session borrowIdleSession()
+    throws SignerException
     {
         if(countSessions.get() < maxSessionCount)
         {
@@ -391,7 +397,7 @@ public class IaikExtendedSlot
     }
 
     private void firstLogin(Session session, char[] password)
-            throws TokenException
+    throws TokenException
     {
            boolean isProtectedAuthenticationPath =
                    session.getToken().getTokenInfo().isProtectedAuthenticationPath();
@@ -422,7 +428,7 @@ public class IaikExtendedSlot
     }
 
     public void login()
-            throws SignerException
+    throws SignerException
     {
         Session session = borrowIdleSession();
         try
@@ -435,7 +441,7 @@ public class IaikExtendedSlot
     }
 
     private void login(Session session)
-            throws SignerException
+    throws SignerException
     {
         try
         {
@@ -460,7 +466,7 @@ public class IaikExtendedSlot
     }
 
     private static boolean checkSessionLoggedIn(Session session)
-            throws SignerException
+    throws SignerException
     {
         SessionInfo info;
         try
@@ -511,7 +517,7 @@ public class IaikExtendedSlot
 
     public List<PrivateKey> getAllPrivateObjects(
             Boolean forSigning, Boolean forDecrypting)
-        throws SignerException
+    throws SignerException
     {
         Session session = borrowIdleSession();
 
@@ -586,7 +592,7 @@ public class IaikExtendedSlot
 
     public PrivateKey getPrivateObject(
             Boolean forSigning, Boolean forDecrypting, byte[] keyId, char[] keyLabel)
-        throws SignerException
+    throws SignerException
     {
         Session session = borrowIdleSession();
 
@@ -712,7 +718,7 @@ public class IaikExtendedSlot
 
     public PublicKey getPublicKeyObject(Boolean forSignature,
             Boolean forCipher, byte[] keyId, char[] keyLabel)
-            throws SignerException
+    throws SignerException
     {
         Session session = borrowIdleSession();
 
@@ -768,7 +774,7 @@ public class IaikExtendedSlot
     private static List<iaik.pkcs.pkcs11.objects.Object> getObjects(
             Session session,
             iaik.pkcs.pkcs11.objects.Object template)
-            throws SignerException
+    throws SignerException
     {
         List<iaik.pkcs.pkcs11.objects.Object> objList = new LinkedList<iaik.pkcs.pkcs11.objects.Object>();
 
@@ -807,7 +813,7 @@ public class IaikExtendedSlot
 
     public X509PublicKeyCertificate getCertificateObject(byte[] keyId,
             char[] keyLabel)
-            throws SignerException
+    throws SignerException
     {
         Session session = borrowIdleSession();
 

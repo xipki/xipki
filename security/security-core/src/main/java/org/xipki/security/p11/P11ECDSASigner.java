@@ -67,8 +67,8 @@ public class P11ECDSASigner implements Signer
     }
 
     @Override
-    public byte[] generateSignature() throws CryptoException,
-            DataLengthException
+    public byte[] generateSignature()
+    throws CryptoException, DataLengthException
     {
         byte[] digestValue = new byte[digest.getDigestSize()];
         digest.doFinal(digestValue, 0);

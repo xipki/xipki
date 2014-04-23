@@ -69,13 +69,15 @@ public class SignatureSigner implements ContentSigner
 
     private class SignatureStream extends OutputStream
     {
-        public byte[] getSignature() throws SignatureException
+        public byte[] getSignature()
+        throws SignatureException
         {
             return signer.sign();
         }
 
         @Override
-        public void write(int b) throws IOException
+        public void write(int b)
+        throws IOException
         {
             try
             {
@@ -87,7 +89,8 @@ public class SignatureSigner implements ContentSigner
         }
 
         @Override
-        public void write(byte[] b) throws IOException
+        public void write(byte[] b)
+        throws IOException
         {
             try
             {
@@ -99,7 +102,8 @@ public class SignatureSigner implements ContentSigner
         }
 
         @Override
-        public void write(byte[] b, int off, int len) throws IOException
+        public void write(byte[] b, int off, int len)
+        throws IOException
         {
             try
             {

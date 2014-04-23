@@ -29,7 +29,8 @@ public class CaAliasRemoveCommand extends CaCommand
     protected String            caAlias;
 
     @Override
-    protected Object doExecute() throws Exception
+    protected Object doExecute()
+    throws Exception
     {
         caManager.removeCaAlias(caAlias);
         return null;

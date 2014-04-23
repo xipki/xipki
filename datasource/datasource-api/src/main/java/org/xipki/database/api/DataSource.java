@@ -22,9 +22,11 @@ import java.sql.SQLException;
 
 public interface DataSource
 {
-    Connection getConnection(int timeout) throws SQLException;
+    Connection getConnection(int timeout)
+    throws SQLException;
 
     void returnConnection(Connection conn);
+
     DatabaseType getDatabaseType();
 
 }

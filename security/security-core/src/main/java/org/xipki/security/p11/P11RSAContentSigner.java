@@ -57,7 +57,7 @@ public class P11RSAContentSigner implements ContentSigner
             PKCS11SlotIdentifier slot,
             Pkcs11KeyIdentifier keyId,
             AlgorithmIdentifier signatureAlgId)
-            throws NoSuchAlgorithmException, NoSuchPaddingException, OperatorCreationException
+    throws NoSuchAlgorithmException, NoSuchPaddingException, OperatorCreationException
     {
         ParamChecker.assertNotNull("slot", slot);
         ParamChecker.assertNotNull("cryptService", cryptService);

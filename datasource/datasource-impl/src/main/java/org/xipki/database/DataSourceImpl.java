@@ -77,7 +77,8 @@ public class DataSourceImpl implements DataSource
     {
     }
 
-    public void init() throws SQLException, PasswordResolverException
+    public void init()
+    throws SQLException, PasswordResolverException
     {
         if(driverClassName == null)
         {
@@ -232,7 +233,8 @@ public class DataSourceImpl implements DataSource
 
     }
 
-    public final Connection getConnection(int timeout) throws SQLException
+    public final Connection getConnection(int timeout)
+    throws SQLException
     {
         if(timeout <= 0)
         {
@@ -312,17 +314,20 @@ public class DataSourceImpl implements DataSource
         }
     }
 
-    public final PrintWriter getLogWriter() throws SQLException
+    public final PrintWriter getLogWriter()
+    throws SQLException
     {
         return service.getLogWriter();
     }
 
-    public final void setLogWriter(PrintWriter out) throws SQLException
+    public final void setLogWriter(PrintWriter out)
+    throws SQLException
     {
         service.setLogWriter(out);
     }
 
-    public final void setLoginTimeout(int seconds) throws SQLException
+    public final void setLoginTimeout(int seconds)
+    throws SQLException
     {
         this.loginTimeout = seconds;
     }

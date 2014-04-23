@@ -26,6 +26,7 @@ import java.util.List;
 
 public class AuditEvent
 {
+
     /**
      * The name of the application the event belongs to.
      */

@@ -21,5 +21,6 @@ public interface SinglePasswordResolver
 {
     boolean canResolveProtocol(String protocol);
 
-    char[] resolvePassword(String passwordHint) throws PasswordResolverException;
+    char[] resolvePassword(String passwordHint)
+    throws PasswordResolverException;
 }

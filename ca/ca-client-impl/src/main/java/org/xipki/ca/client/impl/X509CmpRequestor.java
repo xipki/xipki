@@ -125,7 +125,7 @@ abstract class X509CmpRequestor extends CmpRequestor
     }
 
     public CmpResultType generateCRL()
-        throws CmpRequestorException
+    throws CmpRequestorException
     {
         ASN1ObjectIdentifier type = new ASN1ObjectIdentifier(CustomObjectIdentifiers.id_cmp_generateCRL);
         PKIMessage request = buildMessageWithGeneralMsgContent(type);
@@ -134,7 +134,7 @@ abstract class X509CmpRequestor extends CmpRequestor
     }
 
     public CmpResultType downloadCurrentCRL()
-            throws CmpRequestorException
+    throws CmpRequestorException
     {
         ASN1ObjectIdentifier type = CMPObjectIdentifiers.it_currentCRL;
         PKIMessage request = buildMessageWithGeneralMsgContent(type);
@@ -143,7 +143,7 @@ abstract class X509CmpRequestor extends CmpRequestor
     }
 
     private CmpResultType evaluateCRLResponse(PKIResponse response, ASN1ObjectIdentifier exepectedType)
-        throws CmpRequestorException
+    throws CmpRequestorException
     {
         ErrorResultType errorResult = checkAndBuildErrorResultIfRequired(response);
         if(errorResult != null)
@@ -204,7 +204,7 @@ abstract class X509CmpRequestor extends CmpRequestor
     }
 
     public CmpResultType revocateCertificate(RevocateCertRequestType request)
-            throws CmpRequestorException
+    throws CmpRequestorException
     {
         PKIMessage reqMessage = buildRevocateCertRequest(request);
         PKIResponse response = signAndSend(reqMessage);
@@ -306,7 +306,7 @@ abstract class X509CmpRequestor extends CmpRequestor
     }
 
     public CmpResultType requestCertificate(P10EnrollCertRequestType p10Req)
-        throws CmpRequestorException
+    throws CmpRequestorException
     {
         PKIMessage request = buildPKIMessage(p10Req);
         Map<BigInteger, String> reqIdIdMap = new HashMap<BigInteger, String>();
@@ -315,7 +315,7 @@ abstract class X509CmpRequestor extends CmpRequestor
     }
 
     public CmpResultType requestCertificate(CertReqMsg req, String extCertReqId)
-            throws CmpRequestorException
+    throws CmpRequestorException
     {
         PKIMessage request = buildPKIMessage(req);
         Map<BigInteger, String> reqIdIdMap = new HashMap<BigInteger, String>();
@@ -328,7 +328,7 @@ abstract class X509CmpRequestor extends CmpRequestor
     }
 
     public CmpResultType requestCertificate(EnrollCertRequestType req)
-        throws CmpRequestorException
+    throws CmpRequestorException
     {
         PKIMessage request = buildPKIMessage(req);
         Map<BigInteger, String> reqIdIdMap = new HashMap<BigInteger, String>();
@@ -357,7 +357,7 @@ abstract class X509CmpRequestor extends CmpRequestor
 
     private CmpResultType intern_requestCertificate(
             PKIMessage reqMessage, Map<BigInteger, String> reqIdIdMap, int expectedBodyType)
-        throws CmpRequestorException
+    throws CmpRequestorException
     {
         PKIResponse response = signAndSend(reqMessage);
 

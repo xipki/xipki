@@ -54,7 +54,7 @@ class OcspCertStoreDbImporter extends DbPorter
     private final HashCalculator hashCalculator;
 
     OcspCertStoreDbImporter(DataSource dataSource, Unmarshaller unmarshaller, String srcDir)
-            throws SQLException, PasswordResolverException, NoSuchAlgorithmException
+    throws SQLException, PasswordResolverException, NoSuchAlgorithmException
     {
         super(dataSource, srcDir);
         ParamChecker.assertNotNull("unmarshaller", unmarshaller);
@@ -62,7 +62,8 @@ class OcspCertStoreDbImporter extends DbPorter
         this.hashCalculator = new HashCalculator();
     }
 
-    public void importToDB() throws Exception
+    public void importToDB()
+    throws Exception
     {
         @SuppressWarnings("unchecked")
         JAXBElement<CertStoreType> root = (JAXBElement<CertStoreType>)
@@ -76,7 +77,7 @@ class OcspCertStoreDbImporter extends DbPorter
     }
 
     private void import_issuer(Issuers issuers)
-            throws SQLException, CertificateException
+    throws SQLException, CertificateException
     {
         final String SQL_ADD_CAINFO =
                 "INSERT INTO issuer (" +
@@ -146,7 +147,7 @@ class OcspCertStoreDbImporter extends DbPorter
     }
 
     private void import_cert(CertsFiles certsfiles)
-            throws SQLException, JAXBException, IOException, CertificateException
+    throws SQLException, JAXBException, IOException, CertificateException
     {
         int sum = 0;
 
@@ -165,7 +166,7 @@ class OcspCertStoreDbImporter extends DbPorter
     }
 
     private int do_import_cert(CertsType certs)
-        throws SQLException, IOException, CertificateException
+    throws SQLException, IOException, CertificateException
     {
         final String SQL_ADD_CERT =
                 "INSERT INTO cert (" +

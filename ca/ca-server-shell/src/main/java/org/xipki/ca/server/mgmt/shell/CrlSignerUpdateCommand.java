@@ -62,7 +62,8 @@ public class CrlSignerUpdateCommand extends CaCommand
     protected Boolean            disableWithCerts;
 
     @Override
-    protected Object doExecute() throws Exception
+    protected Object doExecute()
+    throws Exception
     {
         String signerCertConf = null;
         if(CAManager.NULL.equalsIgnoreCase(signerCert))

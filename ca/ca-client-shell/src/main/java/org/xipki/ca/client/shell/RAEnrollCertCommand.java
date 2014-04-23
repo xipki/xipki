@@ -47,7 +47,8 @@ public class RAEnrollCertCommand extends ClientCommand
     private RAWorker             raWorker;
 
     @Override
-    protected Object doExecute() throws Exception
+    protected Object doExecute()
+    throws Exception
     {
         CertificationRequest p10Req = CertificationRequest.getInstance(
                 IoCertUtil.read(p10File));

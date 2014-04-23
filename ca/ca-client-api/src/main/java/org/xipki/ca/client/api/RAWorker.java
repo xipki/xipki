@@ -82,6 +82,7 @@ public interface RAWorker
             ProofOfPossession popo)
     throws RAWorkerException;
 
-    byte[] envelope(CertReqMsg certReqMsg, String caName) throws RAWorkerException;
+    byte[] envelope(CertReqMsg certReqMsg, String caName)
+    throws RAWorkerException;
 
 }

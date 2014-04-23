@@ -48,7 +48,8 @@ public class CmpControlUpdateCommand extends CaCommand
     protected Integer            confirmWaitTime;
 
     @Override
-    protected Object doExecute() throws Exception
+    protected Object doExecute()
+    throws Exception
     {
         Boolean requireConfirmCert = null;
         if(enabledConfirmCert != null || disableConfirmCert != null )

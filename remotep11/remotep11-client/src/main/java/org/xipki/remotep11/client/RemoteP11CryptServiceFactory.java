@@ -36,7 +36,7 @@ public class RemoteP11CryptServiceFactory implements P11CryptServiceFactory
 
     @Override
     public P11CryptService createP11CryptService(String pkcs11Module, char[] password)
-            throws SignerException
+    throws SignerException
     {
         synchronized (services)
         {

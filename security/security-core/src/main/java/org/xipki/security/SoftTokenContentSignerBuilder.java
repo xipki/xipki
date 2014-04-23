@@ -60,7 +60,7 @@ public class SoftTokenContentSignerBuilder
     private final X509Certificate cert;
 
     public SoftTokenContentSignerBuilder(PrivateKey privateKey)
-        throws SignerException
+    throws SignerException
     {
         this.key = privateKey;
         this.cert = null;
@@ -68,7 +68,7 @@ public class SoftTokenContentSignerBuilder
 
     public SoftTokenContentSignerBuilder(String keystoreType, InputStream keystoreStream,
             char[] keystorePassword, String keyname, char[] keyPassword, X509Certificate cert)
-        throws SignerException
+    throws SignerException
     {
         if(("PKCS12".equalsIgnoreCase(keystoreType) || "JKS".equalsIgnoreCase(keystoreType)) == false)
         {
@@ -147,7 +147,7 @@ public class SoftTokenContentSignerBuilder
     public ConcurrentContentSigner createSigner(
             AlgorithmIdentifier signatureAlgId,
             int parallelism)
-            throws OperatorCreationException, NoSuchPaddingException
+    throws OperatorCreationException, NoSuchPaddingException
     {
         if(parallelism < 1)
         {
@@ -218,7 +218,7 @@ public class SoftTokenContentSignerBuilder
         }
 
         protected Signer createSigner(AlgorithmIdentifier sigAlgId, AlgorithmIdentifier digAlgId)
-            throws OperatorCreationException
+        throws OperatorCreationException
         {
             if(PKCSObjectIdentifiers.id_RSASSA_PSS.equals(sigAlgId.getAlgorithm()))
             {
@@ -242,7 +242,7 @@ public class SoftTokenContentSignerBuilder
         }
 
         protected Signer createSigner(AlgorithmIdentifier sigAlgId, AlgorithmIdentifier digAlgId)
-            throws OperatorCreationException
+        throws OperatorCreationException
         {
             Digest dig = digestProvider.get(digAlgId);
                return new DSADigestSigner(new DSASigner(), dig);
@@ -258,7 +258,7 @@ public class SoftTokenContentSignerBuilder
         }
 
         protected Signer createSigner(AlgorithmIdentifier sigAlgId, AlgorithmIdentifier digAlgId)
-            throws OperatorCreationException
+        throws OperatorCreationException
         {
             Digest dig = digestProvider.get(digAlgId);
                return new DSADigestSigner(new ECDSASigner(), dig);
