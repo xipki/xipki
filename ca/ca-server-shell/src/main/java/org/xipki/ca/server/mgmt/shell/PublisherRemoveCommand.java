@@ -30,7 +30,8 @@ public class PublisherRemoveCommand extends CaCommand
     protected String            name;
 
     @Override
-    protected Object doExecute() throws Exception
+    protected Object doExecute()
+    throws Exception
     {
         caManager.removePublisher(name);
         return null;

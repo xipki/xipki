@@ -41,7 +41,8 @@ public class ExportCaCommand extends OsgiCommandSupport
     private PasswordResolver passwordResolver;
 
     @Override
-    protected Object doExecute() throws Exception
+    protected Object doExecute()
+    throws Exception
     {
         CaDbExporter exporter = new CaDbExporter(dataSourceFactory, passwordResolver, dbconfFile);
         exporter.exportDatabase(outdir);

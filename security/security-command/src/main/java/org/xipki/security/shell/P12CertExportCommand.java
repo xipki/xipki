@@ -45,7 +45,8 @@ public class P12CertExportCommand extends OsgiCommandSupport
     protected String            outFile;
 
     @Override
-    protected Object doExecute() throws Exception
+    protected Object doExecute()
+    throws Exception
     {
         KeyStore ks;
 

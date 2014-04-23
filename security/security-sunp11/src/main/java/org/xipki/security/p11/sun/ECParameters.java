@@ -80,8 +80,8 @@ public final class ECParameters extends AlgorithmParametersSpi
 
     // used by ECPublicKeyImpl and ECPrivateKeyImpl
     static AlgorithmParameters getAlgorithmParameters(ECParameterSpec spec)
-            throws InvalidKeyException
-            {
+    throws InvalidKeyException
+    {
         try
         {
             AlgorithmParameters params =
@@ -109,9 +109,8 @@ public final class ECParameters extends AlgorithmParametersSpi
     // AlgorithmParameterSpi methods
 
     protected void engineInit(AlgorithmParameterSpec paramSpec)
-            throws InvalidParameterSpecException
-            {
-
+    throws InvalidParameterSpecException
+    {
         if (paramSpec == null)
         {
             throw new InvalidParameterSpecException
@@ -144,7 +143,8 @@ public final class ECParameters extends AlgorithmParametersSpi
         }
     }
 
-    protected void engineInit(byte[] params) throws IOException
+    protected void engineInit(byte[] params)
+    throws IOException
     {
         if(params.length < 30)
         {
@@ -187,15 +187,15 @@ public final class ECParameters extends AlgorithmParametersSpi
     }
 
     protected void engineInit(byte[] params, String decodingMethod)
-            throws IOException
-            {
+    throws IOException
+    {
         engineInit(params);
     }
 
     protected <T extends AlgorithmParameterSpec> T
             engineGetParameterSpec(Class<T> spec)
-            throws InvalidParameterSpecException
-            {
+    throws InvalidParameterSpecException
+    {
 
         if (spec.isAssignableFrom(ECParameterSpec.class))
         {
@@ -213,14 +213,15 @@ public final class ECParameters extends AlgorithmParametersSpi
             "Only ECParameterSpec and ECGenParameterSpec supported");
     }
 
-    protected byte[] engineGetEncoded() throws IOException
+    protected byte[] engineGetEncoded()
+    throws IOException
     {
         return SunNamedCurveExtender.getNamedCurveEncoded(namedCurve);
     }
 
     protected byte[] engineGetEncoded(String encodingMethod)
-            throws IOException
-            {
+    throws IOException
+    {
         return engineGetEncoded();
     }
 

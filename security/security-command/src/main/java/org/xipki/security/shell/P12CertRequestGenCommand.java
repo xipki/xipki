@@ -85,7 +85,8 @@ public class P12CertRequestGenCommand extends OsgiCommandSupport
     }
 
     @Override
-    protected Object doExecute() throws Exception
+    protected Object doExecute()
+    throws Exception
     {
         Pkcs10RequestGenerator p10Gen = new Pkcs10RequestGenerator();
 

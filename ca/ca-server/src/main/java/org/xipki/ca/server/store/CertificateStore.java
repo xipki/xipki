@@ -75,7 +75,8 @@ public class CertificateStore
     }
 
     public byte[] revocateCertificate(X509CertificateWithMetaInfo caCert, BigInteger serialNumber,
-            CRLReason reason, Date invalidityTime) throws OperationException
+            CRLReason reason, Date invalidityTime)
+    throws OperationException
     {
         try
         {
@@ -115,12 +116,14 @@ public class CertificateStore
         }
     }
 
-    public int getNextFreeCRLNumber(X509CertificateWithMetaInfo cacert) throws SQLException, OperationException
+    public int getNextFreeCRLNumber(X509CertificateWithMetaInfo cacert)
+    throws SQLException, OperationException
     {
         return queryExecutor.getNextFreeCrlNumber(cacert);
     }
 
-    public long getThisUpdateOfCurrentCRL(X509CertificateWithMetaInfo cacert) throws SQLException, OperationException
+    public long getThisUpdateOfCurrentCRL(X509CertificateWithMetaInfo cacert)
+    throws SQLException, OperationException
     {
         return queryExecutor.getThisUpdateOfCurrentCRL(cacert);
     }
@@ -254,13 +257,13 @@ public class CertificateStore
     }
 
     public CertificateInfo getCertificateInfo(X509CertificateWithMetaInfo caCert, BigInteger serial)
-            throws SQLException, OperationException, CertificateException
+    throws SQLException, OperationException, CertificateException
     {
         return queryExecutor.getCertificateInfo(caCert, serial);
     }
 
     public Long getGreatestSerialNumber(X509CertificateWithMetaInfo caCert)
-            throws SQLException, OperationException
+    throws SQLException, OperationException
     {
         return queryExecutor.getGreatestSerialNumber(caCert);
     }

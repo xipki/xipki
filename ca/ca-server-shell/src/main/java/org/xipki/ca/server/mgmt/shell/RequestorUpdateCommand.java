@@ -38,7 +38,8 @@ public class RequestorUpdateCommand extends CaCommand
     protected String            certFile;
 
     @Override
-    protected Object doExecute() throws Exception
+    protected Object doExecute()
+    throws Exception
     {
         // check if the certificate is valid
         byte[] certBytes = IoCertUtil.read(certFile);

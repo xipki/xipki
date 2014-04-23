@@ -35,9 +35,11 @@ public interface ConcurrentContentSigner
 
     public X509Certificate getCertificate();
 
-    void initialize(String conf, PasswordResolver passwordResolver) throws SignerException;
+    void initialize(String conf, PasswordResolver passwordResolver)
+    throws SignerException;
 
-    public ContentSigner borrowContentSigner() throws NoIdleSignerException;
+    public ContentSigner borrowContentSigner()
+    throws NoIdleSignerException;
 
     /**
      *
@@ -46,7 +48,7 @@ public interface ConcurrentContentSigner
      * @throws InterruptedException
      */
     public ContentSigner borrowContentSigner(int timeout)
-            throws NoIdleSignerException;
+    throws NoIdleSignerException;
 
     public void returnContentSigner(ContentSigner signer);
 

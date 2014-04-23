@@ -48,7 +48,8 @@ public class HealthCheckServlet extends HttpServlet
     }
     @Override
     protected void doGet(HttpServletRequest request,
-            HttpServletResponse response) throws ServletException, IOException
+            HttpServletResponse response)
+    throws ServletException, IOException
     {
         try
         {
@@ -75,7 +76,8 @@ public class HealthCheckServlet extends HttpServlet
             response.getOutputStream().write(respBytes);
         }catch(Throwable t)
         {
-            LOG.error("Throwable thrown, this should not happen!", t);
+            LOG.error("Throwable thrown, this should not happen. {}: {}", t.getClass().getName(), t.getMessage());
+            LOG.debug("Throwable thrown, this should not happen", t);
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             response.setContentLength(0);
         }

@@ -36,13 +36,17 @@ public interface SecurityFactory
             String type, String conf, X509Certificate cert, PasswordResolver passwordResolver)
     throws SignerException, PasswordResolverException;
 
-    ContentVerifierProvider getContentVerifierProvider(PublicKey publicKey) throws InvalidKeyException;
+    ContentVerifierProvider getContentVerifierProvider(PublicKey publicKey)
+    throws InvalidKeyException;
 
-    ContentVerifierProvider getContentVerifierProvider(X509Certificate cert) throws InvalidKeyException;
+    ContentVerifierProvider getContentVerifierProvider(X509Certificate cert)
+    throws InvalidKeyException;
 
-    ContentVerifierProvider getContentVerifierProvider(X509CertificateHolder cert) throws InvalidKeyException;
+    ContentVerifierProvider getContentVerifierProvider(X509CertificateHolder cert)
+    throws InvalidKeyException;
 
-    PublicKey generatePublicKey(SubjectPublicKeyInfo subjectPublicKeyInfo) throws InvalidKeyException;
+    PublicKey generatePublicKey(SubjectPublicKeyInfo subjectPublicKeyInfo)
+    throws InvalidKeyException;
 
     byte[] generateSelfSignedRSAKeyStore(
             BigInteger serial, String subject, String keystoreType, char[] password, String keyLabel,

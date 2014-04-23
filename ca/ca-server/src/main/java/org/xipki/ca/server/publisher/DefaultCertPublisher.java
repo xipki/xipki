@@ -63,7 +63,7 @@ public class DefaultCertPublisher extends CertPublisher
     @Override
     public void initialize(String conf, PasswordResolver passwordResolver,
             DataSourceFactory dataSourceFactory)
-            throws CertPublisherException
+    throws CertPublisherException
     {
         ParamChecker.assertNotNull("dataSourceFactory", dataSourceFactory);
 

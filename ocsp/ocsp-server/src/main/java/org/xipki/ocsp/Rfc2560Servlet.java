@@ -65,7 +65,7 @@ public class Rfc2560Servlet extends HttpServlet
 
     @Override
     public void doPost(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException
+    throws ServletException, IOException
     {
         AuditEvent auditEvent = null;
 

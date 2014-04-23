@@ -163,13 +163,13 @@ public class KeyUtil
     }
 
     public static KeyPair generateRSAKeypair(int keySize)
-            throws Exception
+    throws Exception
     {
         return generateRSAKeypair(keySize, null);
     }
 
     public static KeyPair generateRSAKeypair(int keySize, BigInteger publicExponent)
-            throws Exception
+    throws Exception
     {
         KeyPairGenerator kpGen = KeyPairGenerator.getInstance("RSA", "BC");
 
@@ -183,7 +183,7 @@ public class KeyUtil
     }
 
     public static KeyPair generateECKeypair(ASN1ObjectIdentifier curveId, char[] password)
-            throws Exception
+    throws Exception
     {
         KeyPairGenerator kpGen = KeyPairGenerator.getInstance("ECDSA", "BC");
         ECNamedCurveParameterSpec spec = ECNamedCurveTable.getParameterSpec(curveId.getId());
@@ -192,7 +192,7 @@ public class KeyUtil
     }
 
     private static KeyFactory getKeyFactory(String algorithm)
-            throws InvalidKeySpecException
+    throws InvalidKeySpecException
     {
         synchronized (keyFactories)
         {
@@ -217,7 +217,7 @@ public class KeyUtil
     }
 
     public static PublicKey generatePublicKey(SubjectPublicKeyInfo pkInfo)
-            throws IOException, NoSuchAlgorithmException, InvalidKeySpecException
+    throws IOException, NoSuchAlgorithmException, InvalidKeySpecException
     {
         X509EncodedKeySpec keyspec = new X509EncodedKeySpec(pkInfo.getEncoded());
         ASN1ObjectIdentifier aid = pkInfo.getAlgorithm().getAlgorithm();
@@ -240,7 +240,7 @@ public class KeyUtil
     }
 
     public static RSAPublicKey generateRSAPublicKey(BigInteger modulus, BigInteger publicExponent)
-            throws InvalidKeySpecException
+    throws InvalidKeySpecException
     {
         RSAPublicKeySpec keySpec = new RSAPublicKeySpec(modulus, publicExponent);
         KeyFactory kf = getKeyFactory("RSA");
@@ -251,7 +251,7 @@ public class KeyUtil
     }
 
     public static ECPublicKey generateECPublicKey(String curveOid, byte[] encodedQ)
-            throws InvalidKeySpecException
+    throws InvalidKeySpecException
     {
         ECNamedCurveParameterSpec spec = ECNamedCurveTable.getParameterSpec(curveOid);
         ECPoint q = spec.getCurve().decodePoint(encodedQ);

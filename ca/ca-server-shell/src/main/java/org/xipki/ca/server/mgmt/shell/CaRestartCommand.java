@@ -27,7 +27,8 @@ public class CaRestartCommand extends CaCommand
 {
 
     @Override
-    protected Object doExecute() throws Exception
+    protected Object doExecute()
+    throws Exception
     {
         boolean successfull = caManager.restartCaSystem();
         if(successfull == false)

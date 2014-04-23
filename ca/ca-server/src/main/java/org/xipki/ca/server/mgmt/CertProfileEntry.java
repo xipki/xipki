@@ -68,7 +68,8 @@ public class CertProfileEntry
         }
     }
 
-    public synchronized IdentifiedCertProfile getCertProfile() throws CertProfileException
+    public synchronized IdentifiedCertProfile getCertProfile()
+    throws CertProfileException
     {
         if(this.certProfile != null)
         {

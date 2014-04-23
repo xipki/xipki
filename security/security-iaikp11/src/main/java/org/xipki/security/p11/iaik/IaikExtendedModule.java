@@ -98,7 +98,7 @@ public class IaikExtendedModule
     }
 
     public IaikExtendedSlot getSlot(PKCS11SlotIdentifier slotId, char[] password)
-            throws SignerException
+    throws SignerException
     {
         IaikExtendedSlot extSlot = slots.get(slotId);
         if(extSlot != null)

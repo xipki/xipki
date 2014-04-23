@@ -61,7 +61,8 @@ public class AddLicense
         }
     }
 
-    private static void addLicenseToDir(File dir) throws Exception
+    private static void addLicenseToDir(File dir)
+    throws Exception
     {
         File[] files = dir.listFiles();
         for(File file : files)
@@ -80,7 +81,8 @@ public class AddLicense
         }
     }
 
-    private static void addLicenseToFile(File file) throws Exception
+    private static void addLicenseToFile(File file)
+    throws Exception
     {
         BufferedReader reader = new BufferedReader(new FileReader(file));
 

@@ -27,9 +27,9 @@ import org.xipki.security.api.PasswordResolverException;
 public interface DataSourceFactory
 {
     DataSource createDataSource(InputStream conf, PasswordResolver passwordResolver)
-            throws SQLException, PasswordResolverException, IOException;
+    throws SQLException, PasswordResolverException, IOException;
 
     DataSource createDataSourceForFile(String confFile, PasswordResolver passwordResolver)
-            throws SQLException, PasswordResolverException, IOException;
+    throws SQLException, PasswordResolverException, IOException;
 
 }

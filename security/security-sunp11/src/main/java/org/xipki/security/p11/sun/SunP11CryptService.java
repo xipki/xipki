@@ -138,9 +138,9 @@ public final class SunP11CryptService implements P11CryptService
     }
 
     @Override
-    public synchronized void refresh() throws SignerException
+    public synchronized void refresh()
+    throws SignerException
     {
-
         Set<SunP11Identity> currentIdentifies = new HashSet<SunP11Identity>();
 
         // try to initialize with the slot 0
@@ -285,7 +285,7 @@ public final class SunP11CryptService implements P11CryptService
     }
 
     private static long[] allSlots(String pkcs11Module)
-            throws SignerException
+    throws SignerException
     {
         String functionList = null;
         sun.security.pkcs11.wrapper.CK_C_INITIALIZE_ARGS pInitArgs = null;
@@ -317,7 +317,8 @@ public final class SunP11CryptService implements P11CryptService
 
     @Override
     public byte[] CKM_RSA_PKCS(byte[] encodedDigestInfo, PKCS11SlotIdentifier slotId,
-            Pkcs11KeyIdentifier keyId) throws SignerException
+            Pkcs11KeyIdentifier keyId)
+    throws SignerException
     {
         ensureResource();
 
@@ -332,7 +333,8 @@ public final class SunP11CryptService implements P11CryptService
 
     @Override
     public byte[] CKM_RSA_X509(byte[] hash, PKCS11SlotIdentifier slotId,
-            Pkcs11KeyIdentifier keyId) throws SignerException
+            Pkcs11KeyIdentifier keyId)
+    throws SignerException
     {
         ensureResource();
 
@@ -347,7 +349,7 @@ public final class SunP11CryptService implements P11CryptService
 
     @Override
     public byte[] CKM_ECDSA(byte[] hash, PKCS11SlotIdentifier slotId, Pkcs11KeyIdentifier keyId)
-            throws SignerException
+    throws SignerException
     {
         ensureResource();
 
@@ -362,7 +364,7 @@ public final class SunP11CryptService implements P11CryptService
 
     @Override
     public PublicKey getPublicKey(PKCS11SlotIdentifier slotId, Pkcs11KeyIdentifier keyId)
-            throws SignerException
+    throws SignerException
     {
         SunP11Identity identity = getIdentity(slotId, keyId);
         return identity == null ? null : identity.getPublicKey();
@@ -370,14 +372,15 @@ public final class SunP11CryptService implements P11CryptService
 
     @Override
     public X509Certificate getCertificate(PKCS11SlotIdentifier slotId,
-            Pkcs11KeyIdentifier keyId) throws SignerException
+            Pkcs11KeyIdentifier keyId)
+    throws SignerException
     {
         SunP11Identity identity = getIdentity(slotId, keyId);
         return identity == null ? null : identity.getCertificate();
     }
 
     private SunP11Identity getIdentity(PKCS11SlotIdentifier slotId, Pkcs11KeyIdentifier keyId)
-            throws SignerException
+    throws SignerException
     {
         if(keyId.getKeyLabel() == null)
         {
@@ -406,7 +409,8 @@ public final class SunP11CryptService implements P11CryptService
 
     @Override
     public X509Certificate[] getCertificates(PKCS11SlotIdentifier slotId,
-            Pkcs11KeyIdentifier keyId) throws SignerException
+            Pkcs11KeyIdentifier keyId)
+    throws SignerException
     {
         X509Certificate cert = getCertificate(slotId, keyId);
         if(cert == null)
@@ -418,7 +422,8 @@ public final class SunP11CryptService implements P11CryptService
     }
 
     @Override
-    public PKCS11SlotIdentifier[] getSlotIdentifiers() throws SignerException
+    public PKCS11SlotIdentifier[] getSlotIdentifiers()
+    throws SignerException
     {
         List<PKCS11SlotIdentifier> slotIds = new LinkedList<PKCS11SlotIdentifier>();
         for(SunP11Identity identity : identities)
@@ -435,7 +440,7 @@ public final class SunP11CryptService implements P11CryptService
 
     @Override
     public String[] getKeyLabels(PKCS11SlotIdentifier slotId)
-            throws SignerException
+    throws SignerException
     {
         List<String> keyLabels = new LinkedList<String>();
         for(SunP11Identity identity : identities)

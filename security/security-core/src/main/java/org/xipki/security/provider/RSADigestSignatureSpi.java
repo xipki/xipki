@@ -70,14 +70,14 @@ class RSADigestSignatureSpi
 
     protected void engineInitVerify(
         PublicKey publicKey)
-        throws InvalidKeyException
+    throws InvalidKeyException
     {
         throw new UnsupportedOperationException("engineVerify unsupported");
     }
 
     protected void engineInitSign(
         PrivateKey privateKey)
-        throws InvalidKeyException
+    throws InvalidKeyException
     {
         if(privateKey instanceof P11PrivateKey == false)
         {
@@ -96,7 +96,7 @@ class RSADigestSignatureSpi
 
     protected void engineUpdate(
         byte    b)
-        throws SignatureException
+    throws SignatureException
     {
         digest.update(b);
     }
@@ -105,7 +105,7 @@ class RSADigestSignatureSpi
         byte[]  b,
         int     off,
         int     len)
-        throws SignatureException
+    throws SignatureException
     {
         digest.update(b, off, len);
     }
@@ -135,7 +135,7 @@ class RSADigestSignatureSpi
 
     protected boolean engineVerify(
         byte[]  sigBytes)
-        throws SignatureException
+    throws SignatureException
     {
         throw new UnsupportedOperationException("engineVerify unsupported");
     }
@@ -172,7 +172,7 @@ class RSADigestSignatureSpi
 
     private byte[] derEncode(
         byte[]  hash)
-        throws IOException
+    throws IOException
     {
         if (algId == null)
         {

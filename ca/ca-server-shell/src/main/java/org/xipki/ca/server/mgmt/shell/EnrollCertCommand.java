@@ -71,7 +71,8 @@ public class EnrollCertCommand extends CaCommand
     }
 
     @Override
-    protected Object doExecute() throws Exception
+    protected Object doExecute()
+    throws Exception
     {
         X509CA ca = caManager.getX509CA(caName);
         if(ca == null)

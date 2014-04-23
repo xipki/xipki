@@ -45,7 +45,8 @@ public class ProfileAddCommand extends CaCommand
     protected String            confFile;
 
     @Override
-    protected Object doExecute() throws Exception
+    protected Object doExecute()
+    throws Exception
     {
         CertProfileEntry entry = new CertProfileEntry(name);
         entry.setType(type);

@@ -623,7 +623,8 @@ public class X509CACmpResponder extends CmpResponder
         return new CertRepMessage(caPubs, certResponses);
     }
 
-    private static String getCertProfileName(PKIHeader pkiHeader) throws CMPException
+    private static String getCertProfileName(PKIHeader pkiHeader)
+    throws CMPException
     {
         InfoTypeAndValue[] regInfos = pkiHeader.getGeneralInfo();
         if(regInfos != null)
@@ -646,7 +647,8 @@ public class X509CACmpResponder extends CmpResponder
         return null;
     }
 
-    private static String getCertProfileName(CertReqMsg reqMsg) throws CMPException
+    private static String getCertProfileName(CertReqMsg reqMsg)
+    throws CMPException
     {
         AttributeTypeAndValue[] regInfos = reqMsg.getRegInfo();
         if(regInfos != null)
@@ -670,7 +672,7 @@ public class X509CACmpResponder extends CmpResponder
     }
 
     private static OriginalProfileConf getOrigCertProfileConf(CertReqMsg reqMsg)
-            throws CMPException, ParseException
+    throws CMPException, ParseException
     {
         String origCertProfileConf = null;
         AttributeTypeAndValue[] regInfos = reqMsg.getRegInfo();
@@ -801,7 +803,7 @@ public class X509CACmpResponder extends CmpResponder
             boolean keyUpdate,
             long confirmWaitTime,
             ChildAuditEvent childAuditEvent)
-            throws InsuffientPermissionException
+    throws InsuffientPermissionException
     {
         checkPermission(requestor, certProfileName);
 
@@ -1221,7 +1223,7 @@ public class X509CACmpResponder extends CmpResponder
     }
 
     private void checkPermission(CmpRequestorInfo requestor, String certProfile)
-            throws InsuffientPermissionException
+    throws InsuffientPermissionException
     {
         Set<String> profiles = requestor.getProfiles();
         if(profiles != null)

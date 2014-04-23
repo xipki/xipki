@@ -115,7 +115,7 @@ public abstract class AbstractCertProfile extends CertProfile
 
     @Override
     public SubjectInfo getSubject(X500Name requestedSubject)
-            throws CertProfileException, BadCertTemplateException
+    throws CertProfileException, BadCertTemplateException
     {
         verifySubjectDNOccurence(requestedSubject);
         checkSubjectContent(requestedSubject);
@@ -278,14 +278,14 @@ public abstract class AbstractCertProfile extends CertProfile
     }
 
     private ExtensionTuple createKeyUsage(boolean critical)
-            throws CertProfileException
+    throws CertProfileException
     {
         org.bouncycastle.asn1.x509.KeyUsage value = X509Util.createKeyUsage(getKeyUsage());
         return createExtension(Extension.keyUsage, critical, value);
     }
 
     private ExtensionTuple createExtendedKeyUsage(boolean critical)
-            throws CertProfileException
+    throws CertProfileException
     {
         ExtendedKeyUsage value = X509Util.createExtendedUsage(getExtendedKeyUsages());
         return createExtension(Extension.extendedKeyUsage, critical, value);
@@ -337,7 +337,8 @@ public abstract class AbstractCertProfile extends CertProfile
     {
     }
 
-    private void verifySubjectDNOccurence(X500Name requestedSubject) throws BadCertTemplateException
+    private void verifySubjectDNOccurence(X500Name requestedSubject)
+    throws BadCertTemplateException
     {
         Set<RDNOccurrence> occurences = getSubjectDNSequence();
         if(occurences == null)

@@ -118,7 +118,8 @@ class IaikP11Identity implements Comparable<IaikP11Identity>
     }
 
     public byte[] CKM_RSA_PKCS(IaikExtendedModule module, char[] password,
-            byte[] encodedDigestInfo) throws SignerException
+            byte[] encodedDigestInfo)
+    throws SignerException
     {
         if(publicKey instanceof RSAPublicKey == false)
         {
@@ -136,7 +137,8 @@ class IaikP11Identity implements Comparable<IaikP11Identity>
     }
 
     public byte[] CKM_RSA_X_509(IaikExtendedModule module, char[] password,
-            byte[] hash) throws SignerException
+            byte[] hash)
+    throws SignerException
     {
         if(publicKey instanceof RSAPublicKey == false)
         {
@@ -155,7 +157,7 @@ class IaikP11Identity implements Comparable<IaikP11Identity>
 
     public byte[] CKM_ECDSA(IaikExtendedModule module, char[] password,
             byte[] hash)
-            throws SignerException
+    throws SignerException
     {
         if(publicKey instanceof ECPublicKey == false)
         {
@@ -174,7 +176,8 @@ class IaikP11Identity implements Comparable<IaikP11Identity>
         return convertToX962Signature(signature);
     }
 
-    private static byte[] convertToX962Signature(byte[] signature) throws SignerException
+    private static byte[] convertToX962Signature(byte[] signature)
+    throws SignerException
     {
         byte[] ba = new byte[signature.length/2];
         ASN1EncodableVector sigder = new ASN1EncodableVector();

@@ -47,7 +47,7 @@ public class PKIResponse
 
     public void setProtectionVerificationResult(
             ProtectionVerificationResult protectionVerificationResult)
-            {
+    {
         this.protectionVerificationResult = protectionVerificationResult;
     }
 

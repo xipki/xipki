@@ -44,7 +44,8 @@ public class ProfileUpdateCommand extends CaCommand
     protected String            confFile;
 
     @Override
-    protected Object doExecute() throws Exception
+    protected Object doExecute()
+    throws Exception
     {
         if(conf == null && confFile != null)
         {

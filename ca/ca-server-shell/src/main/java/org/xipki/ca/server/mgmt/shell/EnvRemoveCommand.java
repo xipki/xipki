@@ -25,12 +25,13 @@ public class EnvRemoveCommand extends CaCommand
 {
 
     @Option(name = "-name",
-                description = "Required. Parameter Name",
-                required = true, multiValued = false)
+            description = "Required. Parameter Name",
+            required = true, multiValued = false)
     protected String            name;
 
     @Override
-    protected Object doExecute() throws Exception
+    protected Object doExecute()
+    throws Exception
     {
         caManager.removeEnvParam(name);
         return null;

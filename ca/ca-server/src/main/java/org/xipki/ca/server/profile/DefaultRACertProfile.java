@@ -56,7 +56,8 @@ public class DefaultRACertProfile extends CertProfile
     }
 
     @Override
-    public void initialize(String data) throws CertProfileException
+    public void initialize(String data)
+    throws CertProfileException
     {
     }
 
@@ -80,7 +81,7 @@ public class DefaultRACertProfile extends CertProfile
 
     @Override
     public SubjectInfo getSubject(X500Name requestedSubject)
-            throws CertProfileException, BadCertTemplateException
+    throws CertProfileException, BadCertTemplateException
     {
         return new SubjectInfo(requestedSubject, (String) null);
     }

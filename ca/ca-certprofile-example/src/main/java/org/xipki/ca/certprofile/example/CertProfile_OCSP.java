@@ -65,7 +65,8 @@ public class CertProfile_OCSP extends AbstractEECertProfile
     }
 
     @Override
-    protected void checkSubjectContent(X500Name requestedSubject) throws BadCertTemplateException
+    protected void checkSubjectContent(X500Name requestedSubject)
+    throws BadCertTemplateException
     {
     }
 

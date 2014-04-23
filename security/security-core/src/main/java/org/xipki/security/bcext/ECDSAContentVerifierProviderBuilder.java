@@ -42,7 +42,7 @@ public class ECDSAContentVerifierProviderBuilder
     }
 
     protected Signer createSigner(AlgorithmIdentifier sigAlgId)
-        throws OperatorCreationException
+    throws OperatorCreationException
     {
         AlgorithmIdentifier digAlg = digestAlgorithmFinder.find(sigAlgId);
         Digest dig = digestProvider.get(digAlg);
@@ -51,7 +51,7 @@ public class ECDSAContentVerifierProviderBuilder
     }
 
     protected AsymmetricKeyParameter extractKeyParameters(SubjectPublicKeyInfo publicKeyInfo)
-        throws IOException
+    throws IOException
     {
         return PublicKeyFactory.createKey(publicKeyInfo);
     }

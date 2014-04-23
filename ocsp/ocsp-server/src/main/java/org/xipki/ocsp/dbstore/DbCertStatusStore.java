@@ -178,7 +178,7 @@ public class DbCertStatusStore implements CertStatusStore
         {
             LOG.error("Could not executing initIssurStore() for {},  {}: {}",
                     new Object[]{name, e.getClass().getName(), e.getMessage()});
-            LOG.error("Could not executing initIssurStore()", e);
+            LOG.debug("Could not executing initIssurStore()", e);
         }
     }
 
@@ -342,7 +342,8 @@ public class DbCertStatusStore implements CertStatusStore
      *         if no PreparedStament can be created within 5 seconds
      * @throws SQLException
      */
-    private PreparedStatement borrowPreparedStatement(String sqlQuery) throws SQLException
+    private PreparedStatement borrowPreparedStatement(String sqlQuery)
+    throws SQLException
     {
         PreparedStatement ps = null;
         Connection c = dataSource.getConnection(5000);

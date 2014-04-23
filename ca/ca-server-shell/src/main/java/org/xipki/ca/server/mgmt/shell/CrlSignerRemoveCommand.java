@@ -30,7 +30,8 @@ public class CrlSignerRemoveCommand extends CaCommand
     protected String            name;
 
     @Override
-    protected Object doExecute() throws Exception
+    protected Object doExecute()
+    throws Exception
     {
         caManager.removeCrlSigner(name);
         return null;

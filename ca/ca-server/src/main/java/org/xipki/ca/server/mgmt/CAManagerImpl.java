@@ -123,7 +123,8 @@ public class CAManagerImpl implements CAManager
 
     private AuditLoggingService auditLoggingService;
 
-    public CAManagerImpl() throws ConfigurationException
+    public CAManagerImpl()
+    throws ConfigurationException
     {
         if(Security.getProvider("BC") == null)
         {
@@ -234,7 +235,8 @@ public class CAManagerImpl implements CAManager
         }
     }
 
-    private void initDataObjects() throws CAMgmtException
+    private void initDataObjects()
+    throws CAMgmtException
     {
         initEnvironemtParamters();
         initCaAliases();
@@ -437,13 +439,13 @@ public class CAManagerImpl implements CAManager
                     }
                 } catch (PasswordResolverException e)
                 {
-                    LOG.error("X509CA.<init>: {}", e.getMessage());
-                    LOG.debug("X509CA.<init>", e);
+                    LOG.error("security.createSigner cmpResponder: {}", e.getMessage());
+                    LOG.debug("security.createSigner cmpResponder", e);
                     return false;
                 } catch (SignerException e)
                 {
-                    LOG.error("X509CA.<init>: {}", e.getMessage());
-                    LOG.debug("X509CA.<init>", e);
+                    LOG.error("security.createSigner cmpResponder: {}", e.getMessage());
+                    LOG.debug("security.createSigner cmpResponder", e);
                     return false;
                 }
 
@@ -574,7 +576,7 @@ public class CAManagerImpl implements CAManager
     }
 
     private void initRequestors()
-            throws CAMgmtException
+    throws CAMgmtException
     {
         if(requestorsInitialized) return;
 
@@ -614,7 +616,8 @@ public class CAManagerImpl implements CAManager
         requestorsInitialized = true;
     }
 
-    private void initResponder() throws CAMgmtException
+    private void initResponder()
+    throws CAMgmtException
     {
         if(responderInitialized) return;
 
@@ -661,7 +664,8 @@ public class CAManagerImpl implements CAManager
         responderInitialized = true;
     }
 
-    private X509Certificate generateCert(String b64Cert) throws CAMgmtException
+    private X509Certificate generateCert(String b64Cert)
+    throws CAMgmtException
     {
         if(b64Cert == null)
         {
@@ -678,7 +682,8 @@ public class CAManagerImpl implements CAManager
         }
     }
 
-    private void initEnvironemtParamters() throws CAMgmtException
+    private void initEnvironemtParamters()
+    throws CAMgmtException
     {
         if(environmentParametersInitialized) return;
 
@@ -712,7 +717,8 @@ public class CAManagerImpl implements CAManager
         environmentParametersInitialized = true;
     }
 
-    private void initCaAliases() throws CAMgmtException
+    private void initCaAliases()
+    throws CAMgmtException
     {
         if(caAliasesInitialized) return;
 
@@ -746,7 +752,8 @@ public class CAManagerImpl implements CAManager
         caAliasesInitialized = true;
     }
 
-    private void initCertProfiles() throws CAMgmtException
+    private void initCertProfiles()
+    throws CAMgmtException
     {
         if(certProfilesInitialized) return;
 
@@ -785,7 +792,8 @@ public class CAManagerImpl implements CAManager
         certProfilesInitialized = true;
     }
 
-    private void initPublishers() throws CAMgmtException
+    private void initPublishers()
+    throws CAMgmtException
     {
         if(publishersInitialized) return;
 
@@ -826,7 +834,8 @@ public class CAManagerImpl implements CAManager
         publishersInitialized = true;
     }
 
-    private void initCrlSigners() throws CAMgmtException
+    private void initCrlSigners()
+    throws CAMgmtException
     {
         if(crlSignersInitialized) return;
 
@@ -884,7 +893,8 @@ public class CAManagerImpl implements CAManager
         crlSignersInitialized = true;
     }
 
-    private void initCmpControl() throws CAMgmtException
+    private void initCmpControl()
+    throws CAMgmtException
     {
         if(cmpControlInitialized) return;
 
@@ -936,7 +946,8 @@ public class CAManagerImpl implements CAManager
         cmpControlInitialized = true;
     }
 
-    private void initCAs() throws CAMgmtException
+    private void initCAs()
+    throws CAMgmtException
     {
         if(cAsInitialized) return;
 
@@ -1087,7 +1098,8 @@ public class CAManagerImpl implements CAManager
     }
 
     @Override
-    public void addCA(CAEntry newCaDbEntry) throws CAMgmtException
+    public void addCA(CAEntry newCaDbEntry)
+    throws CAMgmtException
     {
         String name = newCaDbEntry.getName();
 
@@ -1363,7 +1375,8 @@ public class CAManagerImpl implements CAManager
     }
 
     @Override
-    public void setCANextSerial(String caName, long nextSerial) throws CAMgmtException
+    public void setCANextSerial(String caName, long nextSerial)
+    throws CAMgmtException
     {
         CAEntry caInfo = cas.get(caName);
         if(caInfo == null)
@@ -1852,7 +1865,8 @@ public class CAManagerImpl implements CAManager
     }
 
     @Override
-    public void addCertProfile(CertProfileEntry dbEntry) throws CAMgmtException
+    public void addCertProfile(CertProfileEntry dbEntry)
+    throws CAMgmtException
     {
         String name = dbEntry.getName();
         if(certProfiles.containsKey(name))
@@ -2259,7 +2273,8 @@ public class CAManagerImpl implements CAManager
     }
 
     @Override
-    public void addPublisher(PublisherEntry dbEntry) throws CAMgmtException
+    public void addPublisher(PublisherEntry dbEntry)
+    throws CAMgmtException
     {
         String name = dbEntry.getName();
         if(publishers.containsKey(name))
@@ -2570,7 +2585,8 @@ public class CAManagerImpl implements CAManager
     }
 
     @Override
-    public void addEnvParam(String name, String value) throws CAMgmtException
+    public void addEnvParam(String name, String value)
+    throws CAMgmtException
     {
         if(envParameterResolver.getEnvParam(name) != null)
         {
@@ -2693,7 +2709,7 @@ public class CAManagerImpl implements CAManager
     }
 
     public static Set<Permission> getPermissions(String permissionsText)
-            throws CAMgmtException
+    throws CAMgmtException
     {
         if(permissionsText == null)
         {
@@ -2771,8 +2787,8 @@ public class CAManagerImpl implements CAManager
 
     @Override
     public void addCaAlias(String aliasName, String caName)
-            throws CAMgmtException
-            {
+    throws CAMgmtException
+    {
         if(caAliases.get(aliasName) != null)
         {
             throw new CAMgmtException("CA alias " + aliasName + " exists");
@@ -2797,7 +2813,8 @@ public class CAManagerImpl implements CAManager
     }
 
     @Override
-    public void removeCaAlias(String aliasName) throws CAMgmtException
+    public void removeCaAlias(String aliasName)
+    throws CAMgmtException
     {
         if(caAliases.containsKey(aliasName) == false)
         {
@@ -2849,7 +2866,8 @@ public class CAManagerImpl implements CAManager
     }
 
     @Override
-    public void removeCA(String caname) throws CAMgmtException
+    public void removeCA(String caname)
+    throws CAMgmtException
     {
         if(cas.containsKey(caname) == false)
         {
@@ -2874,7 +2892,8 @@ public class CAManagerImpl implements CAManager
     }
 
     @Override
-    public void publishRootCA(String caname) throws CAMgmtException
+    public void publishRootCA(String caname)
+    throws CAMgmtException
     {
         X509CA ca = x509cas.get(caname);
         if(ca == null)
@@ -2910,7 +2929,8 @@ public class CAManagerImpl implements CAManager
         }
     }
 
-    private Statement createStatement() throws CAMgmtException
+    private Statement createStatement()
+    throws CAMgmtException
     {
         try
         {
@@ -2931,7 +2951,8 @@ public class CAManagerImpl implements CAManager
         }
     }
 
-    private PreparedStatement prepareStatement(String sql) throws CAMgmtException
+    private PreparedStatement prepareStatement(String sql)
+    throws CAMgmtException
     {
         try
         {
@@ -2954,7 +2975,7 @@ public class CAManagerImpl implements CAManager
 
     @Override
     public boolean republishCertificates(String caname, String publisherName)
-            throws CAMgmtException
+    throws CAMgmtException
     {
         X509CA ca = x509cas.get(caname);
         if(ca == null)

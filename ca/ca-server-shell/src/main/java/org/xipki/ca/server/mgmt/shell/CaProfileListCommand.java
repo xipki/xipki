@@ -31,7 +31,8 @@ public class CaProfileListCommand extends CaCommand
     protected String           caName;
 
     @Override
-    protected Object doExecute() throws Exception
+    protected Object doExecute()
+    throws Exception
     {
         StringBuilder sb = new StringBuilder();
         if(caManager.getCA(caName) == null)

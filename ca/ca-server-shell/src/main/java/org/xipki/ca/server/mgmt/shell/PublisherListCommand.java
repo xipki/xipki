@@ -33,7 +33,8 @@ public class PublisherListCommand extends CaCommand
     protected String name;
 
     @Override
-    protected Object doExecute() throws Exception
+    protected Object doExecute()
+    throws Exception
     {
         StringBuilder sb = new StringBuilder();
 

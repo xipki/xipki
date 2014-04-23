@@ -65,7 +65,8 @@ public class P12RSAKeyGenCommand extends OsgiCommandSupport
     }
 
     @Override
-    protected Object doExecute() throws Exception
+    protected Object doExecute()
+    throws Exception
     {
         if(keysize == null)
         {

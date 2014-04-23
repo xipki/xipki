@@ -22,6 +22,7 @@ import java.util.Date;
 
 public class AuditEventData
 {
+
     public static final int STRING_MAX_LENGTH = 255;
 
     private final String name;

@@ -57,7 +57,8 @@ public class CertProfile_RootCA extends AbstractCACertProfile
     }
 
     @Override
-    protected void checkSubjectContent(X500Name requestedSubject) throws BadCertTemplateException
+    protected void checkSubjectContent(X500Name requestedSubject)
+    throws BadCertTemplateException
     {
     }
 

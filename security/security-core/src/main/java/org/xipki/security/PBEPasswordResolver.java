@@ -93,13 +93,13 @@ public class PBEPasswordResolver implements SinglePasswordResolver
 
     @Override
     public char[] resolvePassword(String passwordHint)
-            throws PasswordResolverException
+    throws PasswordResolverException
     {
         return resolvePassword(getMasterPassword(), passwordHint);
     }
 
     public static char[] resolvePassword(char[] masterPassword, String passwordHint)
-            throws PasswordResolverException
+    throws PasswordResolverException
     {
         byte[] bytes = Base64.decode(passwordHint.substring("PBE:".length()));
         int n = bytes.length;
@@ -130,7 +130,7 @@ public class PBEPasswordResolver implements SinglePasswordResolver
     }
 
     public static String encryptPassword(char[] masterPassword, char[] password)
-            throws PasswordResolverException
+    throws PasswordResolverException
     {
         SecureRandom random = new SecureRandom();
         byte[] salt = new byte[16];

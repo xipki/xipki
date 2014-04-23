@@ -31,7 +31,7 @@ public abstract class CertPublisher
     public abstract void initialize(String conf,
             PasswordResolver passwordResolver,
             DataSourceFactory dataSourceFactory)
-            throws CertPublisherException;
+    throws CertPublisherException;
 
     public abstract void setEnvironmentParamterResolver(EnvironmentParameterResolver paramterResolver);
 

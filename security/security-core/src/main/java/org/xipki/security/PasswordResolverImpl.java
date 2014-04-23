@@ -42,7 +42,8 @@ public class PasswordResolverImpl implements PasswordResolver
         resolvers.remove(resolver);
     }
 
-    public char[] resolvePassword(String passwordHint) throws PasswordResolverException
+    public char[] resolvePassword(String passwordHint)
+    throws PasswordResolverException
     {
         int index = passwordHint.indexOf(':');
         if(index == -1)

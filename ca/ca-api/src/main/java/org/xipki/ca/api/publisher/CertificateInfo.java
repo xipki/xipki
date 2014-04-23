@@ -45,7 +45,7 @@ public class CertificateInfo
             X509CertificateWithMetaInfo issuerCert,
             byte[] subjectPublicKey,
             String profileName)
-        throws CertificateEncodingException
+    throws CertificateEncodingException
     {
         super();
         ParamChecker.assertNotNull("cert", cert);

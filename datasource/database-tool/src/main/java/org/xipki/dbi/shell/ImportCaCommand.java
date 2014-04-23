@@ -41,7 +41,8 @@ public class ImportCaCommand extends OsgiCommandSupport
     private PasswordResolver passwordResolver;
 
     @Override
-    protected Object doExecute() throws Exception
+    protected Object doExecute()
+    throws Exception
     {
         CaDbImporter importer = new CaDbImporter(dataSourceFactory, passwordResolver, dbconfFile);
         importer.importDatabase(indir);
