@@ -115,7 +115,7 @@ class OcspCertStoreDbExporter extends DbPorter
         String certSql = "SELECT id, issuer_id, last_update," +
                 " revocated, rev_reason, rev_time, rev_invalidity_time " +
                 " FROM cert" +
-                " WHERE id > ? AND id < ?";
+                " WHERE id >= ? AND id < ?";
 
         String rawCertSql = "SELECT cert FROM rawcert WHERE cert_id = ?";
 
@@ -138,8 +138,8 @@ class OcspCertStoreDbExporter extends DbPorter
         {
             for(int i = minCertId; i <= maxCertId; i += n)
             {
-                certPs.setInt(1, i - 1);
-                certPs.setInt(2, i + n + 1);
+                certPs.setInt(1, i);
+                certPs.setInt(2, i + n);
 
                 ResultSet rs = certPs.executeQuery();
 
