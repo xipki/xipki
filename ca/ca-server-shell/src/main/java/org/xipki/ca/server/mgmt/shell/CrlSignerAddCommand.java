@@ -67,7 +67,8 @@ public class CrlSignerAddCommand extends CaCommand
     private PasswordResolver passwordResolver;
 
     @Override
-    protected Object doExecute() throws Exception
+    protected Object doExecute()
+    throws Exception
     {
         CrlSignerEntry entry = new CrlSignerEntry(name);
 

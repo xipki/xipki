@@ -33,7 +33,8 @@ public class CaProfileRemoveCommand extends CaCommand
     protected String            profileName;
 
     @Override
-    protected Object doExecute() throws Exception
+    protected Object doExecute()
+    throws Exception
     {
         caManager.removeCertProfileFromCA(profileName, caName);
         return null;

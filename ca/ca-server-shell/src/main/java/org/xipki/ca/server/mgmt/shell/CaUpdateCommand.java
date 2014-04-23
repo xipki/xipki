@@ -103,7 +103,8 @@ public class CaUpdateCommand extends CaCommand
     protected Boolean           disableDuplicateSubject;
 
     @Override
-    protected Object doExecute() throws Exception
+    protected Object doExecute()
+    throws Exception
     {
         CAStatus status = null;
         if(caStatus != null)

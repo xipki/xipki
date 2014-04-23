@@ -156,7 +156,8 @@ class SunP11Identity implements Comparable<SunP11Identity>
         return this.slotId.equals(slotId) && this.keyLabel.equals(keyLabel);
     }
 
-    public byte[] CKM_RSA_PKCS(byte[] encodedDigestInfo) throws SignerException
+    public byte[] CKM_RSA_PKCS(byte[] encodedDigestInfo)
+    throws SignerException
     {
         byte[] padded = pkcs1padding(encodedDigestInfo, (signatureKeyBitLength + 7)/8);
         return CKM_RSA_X_509(padded);
@@ -188,7 +189,8 @@ class SunP11Identity implements Comparable<SunP11Identity>
         return block;
     }
 
-    public byte[] CKM_RSA_X_509(byte[] hash) throws SignerException
+    public byte[] CKM_RSA_X_509(byte[] hash)
+    throws SignerException
     {
         if(publicKey instanceof RSAPublicKey == false)
         {
@@ -212,7 +214,7 @@ class SunP11Identity implements Comparable<SunP11Identity>
     }
 
     public byte[] CKM_ECDSA(byte[] hash)
-            throws SignerException
+    throws SignerException
     {
         if(publicKey instanceof ECPublicKey == false)
         {

@@ -71,7 +71,7 @@ public class IdentifiedCertProfile extends CertProfile
 
     @Override
     public SubjectInfo getSubject(X500Name requestedSubject)
-            throws CertProfileException, BadCertTemplateException
+    throws CertProfileException, BadCertTemplateException
     {
         return certProfile.getSubject(requestedSubject);
     }
@@ -116,7 +116,7 @@ public class IdentifiedCertProfile extends CertProfile
 
     @Override
     public void checkPublicKey(SubjectPublicKeyInfo publicKey)
-            throws BadCertTemplateException
+    throws BadCertTemplateException
     {
         certProfile.checkPublicKey(publicKey);
     }

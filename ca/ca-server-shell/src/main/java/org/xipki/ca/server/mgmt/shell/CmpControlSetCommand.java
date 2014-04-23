@@ -49,7 +49,8 @@ public class CmpControlSetCommand extends CaCommand
     protected Integer            confirmWaitTime;
 
     @Override
-    protected Object doExecute() throws Exception
+    protected Object doExecute()
+    throws Exception
     {
         CmpControl entry = new CmpControl();
 

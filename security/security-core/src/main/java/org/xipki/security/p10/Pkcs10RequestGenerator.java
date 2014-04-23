@@ -28,7 +28,6 @@ import org.xipki.security.api.NoIdleSignerException;
 import org.xipki.security.api.PasswordResolverException;
 import org.xipki.security.api.SecurityFactory;
 import org.xipki.security.api.SignerException;
-import org.xipki.security.common.IoCertUtil;
 
 public class Pkcs10RequestGenerator
 {

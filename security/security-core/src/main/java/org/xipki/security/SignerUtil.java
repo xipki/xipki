@@ -84,13 +84,13 @@ public class SignerUtil
     }
 
     static public PSSSigner createPSSRSASigner(AlgorithmIdentifier sigAlgId)
-            throws OperatorCreationException
+    throws OperatorCreationException
     {
         return createPSSRSASigner(sigAlgId, null);
     }
 
     static public PSSSigner createPSSRSASigner(AlgorithmIdentifier sigAlgId, AsymmetricBlockCipher cipher)
-            throws OperatorCreationException
+    throws OperatorCreationException
     {
         if(PKCSObjectIdentifiers.id_RSASSA_PSS.equals(sigAlgId.getAlgorithm()) == false)
         {
@@ -136,7 +136,7 @@ public class SignerUtil
     }
 
     static public RSASSAPSSparams createPSSRSAParams(ASN1ObjectIdentifier digestAlgOID)
-            throws NoSuchAlgorithmException
+    throws NoSuchAlgorithmException
     {
         int saltSize;
         if(X509ObjectIdentifiers.id_SHA1.equals(digestAlgOID))

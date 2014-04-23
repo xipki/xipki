@@ -109,7 +109,7 @@ class RSAPSSSignatureSpi
 
     protected void engineInitVerify(
         PublicKey publicKey)
-        throws InvalidKeyException
+    throws InvalidKeyException
     {
         throw new UnsupportedOperationException("engineInitVerify unsupported");
     }
@@ -117,7 +117,7 @@ class RSAPSSSignatureSpi
     protected void engineInitSign(
         PrivateKey privateKey,
         SecureRandom random)
-        throws InvalidKeyException
+    throws InvalidKeyException
     {
         if(privateKey instanceof P11PrivateKey == false)
         {
@@ -142,14 +142,14 @@ class RSAPSSSignatureSpi
 
     protected void engineInitSign(
         PrivateKey privateKey)
-        throws InvalidKeyException
+    throws InvalidKeyException
     {
         engineInitSign(privateKey, null);
     }
 
     protected void engineUpdate(
         byte    b)
-        throws SignatureException
+    throws SignatureException
     {
         pss.update(b);
     }
@@ -158,13 +158,13 @@ class RSAPSSSignatureSpi
         byte[]  b,
         int     off,
         int     len)
-        throws SignatureException
+    throws SignatureException
     {
         pss.update(b, off, len);
     }
 
     protected byte[] engineSign()
-        throws SignatureException
+    throws SignatureException
     {
         try
         {
@@ -178,14 +178,14 @@ class RSAPSSSignatureSpi
 
     protected boolean engineVerify(
         byte[]  sigBytes)
-        throws SignatureException
+    throws SignatureException
     {
         throw new UnsupportedOperationException("engineVerify unsupported");
     }
 
     protected void engineSetParameter(
         AlgorithmParameterSpec params)
-        throws InvalidParameterException
+    throws InvalidParameterException
     {
         if (params instanceof PSSParameterSpec)
         {

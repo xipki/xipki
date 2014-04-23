@@ -189,7 +189,7 @@ public class X509Util
     }
 
     public static CertificatePolicies createCertificatePolicies(List<CertificatePolicyInformation> policyInfos)
-            throws CertProfileException
+    throws CertProfileException
     {
         if(policyInfos == null || policyInfos.isEmpty())
         {

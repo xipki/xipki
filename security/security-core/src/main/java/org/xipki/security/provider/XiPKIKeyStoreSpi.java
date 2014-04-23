@@ -114,7 +114,7 @@ public class XiPKIKeyStoreSpi extends KeyStoreSpi
 
     @Override
     public void engineLoad(InputStream stream, char[] password)
-            throws IOException, NoSuchAlgorithmException, CertificateException
+    throws IOException, NoSuchAlgorithmException, CertificateException
     {
         this.creationDate = new Date();
 
@@ -221,13 +221,13 @@ public class XiPKIKeyStoreSpi extends KeyStoreSpi
 
     @Override
     public void engineStore(OutputStream stream, char[] password)
-            throws IOException, NoSuchAlgorithmException, CertificateException
+    throws IOException, NoSuchAlgorithmException, CertificateException
     {
     }
 
     @Override
     public Key engineGetKey(String alias, char[] password)
-            throws NoSuchAlgorithmException, UnrecoverableKeyException
+    throws NoSuchAlgorithmException, UnrecoverableKeyException
     {
         if(keyCerts.containsKey(alias) == false)
         {
@@ -271,27 +271,29 @@ public class XiPKIKeyStoreSpi extends KeyStoreSpi
 
     @Override
     public void engineSetKeyEntry(String alias, Key key, char[] password,
-            Certificate[] chain) throws KeyStoreException
+            Certificate[] chain)
+    throws KeyStoreException
     {
         throw new KeyStoreException("Keystore is read only");
     }
 
     @Override
     public void engineSetKeyEntry(String alias, byte[] key, Certificate[] chain)
-            throws KeyStoreException
+    throws KeyStoreException
     {
         throw new KeyStoreException("Keystore is read only");
     }
 
     @Override
     public void engineSetCertificateEntry(String alias, Certificate cert)
-            throws KeyStoreException
+    throws KeyStoreException
     {
         throw new KeyStoreException("Keystore is read only");
     }
 
     @Override
-    public void engineDeleteEntry(String alias) throws KeyStoreException
+    public void engineDeleteEntry(String alias)
+    throws KeyStoreException
     {
         throw new KeyStoreException("Keystore is read only");
     }

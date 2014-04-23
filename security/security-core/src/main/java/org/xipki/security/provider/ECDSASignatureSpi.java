@@ -46,14 +46,14 @@ class ECDSASignatureSpi
     }
 
     protected void engineInitVerify(PublicKey publicKey)
-        throws InvalidKeyException
+    throws InvalidKeyException
     {
         throw new UnsupportedOperationException("engineInitVerify unsupported");
     }
 
     protected void engineInitSign(
         PrivateKey privateKey)
-        throws InvalidKeyException
+    throws InvalidKeyException
     {
         if(privateKey instanceof P11PrivateKey == false)
         {
@@ -134,70 +134,70 @@ class ECDSASignatureSpi
     }
 
     protected void engineUpdate(
-            byte    b)
-            throws SignatureException
+        byte    b)
+    throws SignatureException
+    {
+        digest.update(b);
+    }
+
+   protected void engineUpdate(
+        byte[]  b,
+        int     off,
+        int     len)
+        throws SignatureException
+    {
+        digest.update(b, off, len);
+    }
+
+    protected byte[] engineSign()
+    throws SignatureException
+    {
+        byte[]  hash = new byte[digest.getDigestSize()];
+
+        digest.doFinal(hash, 0);
+
+        try
         {
-            digest.update(b);
+            return signingKey.CKM_ECDSA(hash);
         }
-
-        protected void engineUpdate(
-            byte[]  b,
-            int     off,
-            int     len)
-            throws SignatureException
+        catch(SignatureException e)
         {
-            digest.update(b, off, len);
+            throw e;
         }
-
-        protected byte[] engineSign()
-            throws SignatureException
+        catch (Exception e)
         {
-            byte[]  hash = new byte[digest.getDigestSize()];
-
-            digest.doFinal(hash, 0);
-
-            try
-            {
-                return signingKey.CKM_ECDSA(hash);
-            }
-            catch(SignatureException e)
-            {
-                throw e;
-            }
-            catch (Exception e)
-            {
-                throw new SignatureException(e.toString());
-            }
+            throw new SignatureException(e.toString());
         }
+    }
 
-        protected void engineSetParameter(
-            AlgorithmParameterSpec params)
-        {
-            throw new UnsupportedOperationException("engineSetParameter unsupported");
-        }
+    protected void engineSetParameter(
+        AlgorithmParameterSpec params)
+    {
+        throw new UnsupportedOperationException("engineSetParameter unsupported");
+    }
 
-        /**
-         * @deprecated replaced with <a href = "#engineSetParameter(java.security.spec.AlgorithmParameterSpec)">
-         */
-        protected void engineSetParameter(
-            String  param,
-            Object  value)
-        {
-            throw new UnsupportedOperationException("engineSetParameter unsupported");
-        }
+    /**
+     * @deprecated replaced with <a href = "#engineSetParameter(java.security.spec.AlgorithmParameterSpec)">
+     */
+    protected void engineSetParameter(
+        String  param,
+        Object  value)
+    {
+        throw new UnsupportedOperationException("engineSetParameter unsupported");
+    }
 
-        /**
-         * @deprecated
-         */
-        protected Object engineGetParameter(
-            String      param)
-        {
-            throw new UnsupportedOperationException("engineSetParameter unsupported");
-        }
+    /**
+     * @deprecated
+     */
+    protected Object engineGetParameter(
+        String      param)
+    {
+        throw new UnsupportedOperationException("engineSetParameter unsupported");
+    }
 
     protected boolean engineVerify(
-            byte[]  sigBytes)
-            throws SignatureException
+        byte[]  sigBytes)
+        throws SignatureException
     {
         throw new UnsupportedOperationException("engineVerify unsupported");
     }

@@ -70,7 +70,8 @@ public class OCSPStatusCommand extends OsgiCommandSupport
     private OCSPRequestor      requestor;
 
     @Override
-    protected Object doExecute() throws Exception
+    protected Object doExecute()
+    throws Exception
     {
         if(serialNumber == null && certFile == null)
         {

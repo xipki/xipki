@@ -66,7 +66,8 @@ public class LocalP11CryptService
     }
 
     private boolean initialized = false;
-    public void init() throws Exception
+    public void init()
+    throws Exception
     {
         if(initialized)
         {

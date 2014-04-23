@@ -41,7 +41,8 @@ public class ImportOcspCommand extends OsgiCommandSupport
     private PasswordResolver passwordResolver;
 
     @Override
-    protected Object doExecute() throws Exception
+    protected Object doExecute()
+    throws Exception
     {
         OcspDbImporter importer = new OcspDbImporter(dataSourceFactory, passwordResolver, dbconfFile);
         importer.importDatabase(indir);

@@ -54,7 +54,8 @@ public class CALoadTestCommand extends OsgiCommandSupport
     private RAWorker             raWorker;
 
     @Override
-    protected Object doExecute() throws Exception
+    protected Object doExecute()
+    throws Exception
     {
         if(numThreads == null)
         {

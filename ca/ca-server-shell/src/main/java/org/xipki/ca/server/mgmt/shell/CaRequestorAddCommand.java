@@ -57,7 +57,8 @@ public class CaRequestorAddCommand extends CaCommand
     protected Set<String> profiles;
 
     @Override
-    protected Object doExecute() throws Exception
+    protected Object doExecute()
+    throws Exception
     {
         if(era != null && dra != null )
         {

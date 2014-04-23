@@ -115,7 +115,7 @@ class CertStatusStoreQueryExecutor
     }
 
     void addIssuer(X509CertificateWithMetaInfo issuer)
-            throws CertificateEncodingException, SQLException
+    throws CertificateEncodingException, SQLException
     {
         getIssuerId(issuer);
     }
@@ -127,7 +127,7 @@ class CertStatusStoreQueryExecutor
      */
     void addCert(X509CertificateWithMetaInfo issuer,
             X509CertificateWithMetaInfo certificate)
-            throws SQLException, CertificateEncodingException
+    throws SQLException, CertificateEncodingException
     {
         addCert(issuer, certificate, false, null, null, null);
     }
@@ -138,7 +138,7 @@ class CertStatusStoreQueryExecutor
             Date revocationTime,
             Integer revocationReason,
             Date invalidityTime)
-            throws SQLException, CertificateEncodingException
+    throws SQLException, CertificateEncodingException
     {
         addOrUpdateCert(issuer, certificate, revocated,
                 revocationTime, revocationReason, invalidityTime);
@@ -150,7 +150,7 @@ class CertStatusStoreQueryExecutor
             Date revocationTime,
             Integer revocationReason,
             Date invalidityTime)
-            throws SQLException, CertificateEncodingException
+    throws SQLException, CertificateEncodingException
     {
         if(revocated)
         {
@@ -322,13 +322,13 @@ class CertStatusStoreQueryExecutor
             Date revocationTime,
             int revocationReason,
             Date invalidityTime)
-        throws SQLException, CertificateEncodingException
+    throws SQLException, CertificateEncodingException
     {
         addOrUpdateCert(caCert, cert, true, revocationTime, revocationReason, invalidityTime);
     }
 
     private int getIssuerId(X509CertificateWithMetaInfo issuerCert)
-            throws SQLException, CertificateEncodingException
+    throws SQLException, CertificateEncodingException
     {
         Integer id =  issuerStore.getIdForCert(issuerCert.getEncodedCert());
 
@@ -406,7 +406,8 @@ class CertStatusStoreQueryExecutor
      *         if no PreparedStament can be created within 5 seconds
      * @throws SQLException
      */
-    private PreparedStatement borrowPreparedStatement(String sqlQuery) throws SQLException
+    private PreparedStatement borrowPreparedStatement(String sqlQuery)
+    throws SQLException
     {
         PreparedStatement ps = null;
         Connection c = dataSource.getConnection(5000);
@@ -431,7 +432,7 @@ class CertStatusStoreQueryExecutor
     }
 
     private boolean certRegistered(String sha1FpCert)
-            throws SQLException
+    throws SQLException
     {
         String sql = "count(*) FROM certhash WHERE sha1_fp=?";
         sql = createFetchFirstSelectSQL(sql, 1);

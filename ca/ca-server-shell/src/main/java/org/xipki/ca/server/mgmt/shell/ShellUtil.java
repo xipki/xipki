@@ -25,7 +25,8 @@ import org.xipki.security.common.IoCertUtil;
 
 class ShellUtil
 {
-    static String replaceFileInSignerConf(String signerConf) throws IOException
+    static String replaceFileInSignerConf(String signerConf)
+    throws IOException
     {
         if(signerConf.contains("file:") == false)
         {

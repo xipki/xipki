@@ -42,7 +42,8 @@ public class RAGetCRLCommand extends ClientCommand
     private RAWorker             raWorker;
 
     @Override
-    protected Object doExecute() throws Exception
+    protected Object doExecute()
+    throws Exception
     {
         Set<String> caNames = raWorker.getCaNames();
         if(caNames.isEmpty())

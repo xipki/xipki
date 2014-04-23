@@ -200,7 +200,7 @@ class SelfSignedCertBuilder
             SubjectPublicKeyInfo publicKeyInfo,
             List<String> ocspUris,
             List<String> crlUris)
-        throws OperationException
+    throws OperationException
     {
         String certProfileName = certProfile.getName();
 

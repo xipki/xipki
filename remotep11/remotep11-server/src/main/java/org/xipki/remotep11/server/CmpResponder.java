@@ -67,6 +67,7 @@ class CmpResponder
             RemoteP11Constants.id_get_publickey,
             RemoteP11Constants.id_list_slots,
             RemoteP11Constants.id_list_keylabels};
+
     private static final String UNKOWNTYPE_MSG = "PKIBody type %s is only supported with the sub-knownTypes " +
             RemoteP11Constants.id_version.getId() + ", " +
             RemoteP11Constants.id_pso_ecdsa.getId() + ", " +

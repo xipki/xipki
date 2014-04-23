@@ -379,7 +379,7 @@ public class CrlCertStatusStore implements CertStatusStore
         {
             LOG.error("Could not executing initializeStore() for {},  {}: {}",
                     new Object[]{name, e.getClass().getName(), e.getMessage()});
-            LOG.error("Could not executing initializeStore()", e);
+            LOG.debug("Could not executing initializeStore()", e);
         }
     }
 

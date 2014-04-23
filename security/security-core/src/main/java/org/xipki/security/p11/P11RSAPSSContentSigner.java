@@ -52,7 +52,7 @@ public class P11RSAPSSContentSigner implements ContentSigner
             PKCS11SlotIdentifier slot,
             Pkcs11KeyIdentifier keyId,
             AlgorithmIdentifier signatureAlgId)
-            throws NoSuchAlgorithmException, NoSuchPaddingException, OperatorCreationException
+    throws NoSuchAlgorithmException, NoSuchPaddingException, OperatorCreationException
     {
         ParamChecker.assertNotNull("slot", slot);
         ParamChecker.assertNotNull("cryptService", cryptService);
@@ -114,31 +114,35 @@ public class P11RSAPSSContentSigner implements ContentSigner
     {
 
         @Override
-        public void write(int b) throws IOException
+        public void write(int b)
+        throws IOException
         {
             pssSigner.update((byte) b);
         }
 
         @Override
-        public void write(byte[] b) throws IOException
+        public void write(byte[] b)
+        throws IOException
         {
             pssSigner.update(b, 0, b.length);
         }
 
         @Override
-        public void write(byte[] b, int off, int len) throws IOException
+        public void write(byte[] b, int off, int len)
+        throws IOException
         {
             pssSigner.update(b, off, len);
         }
 
         @Override
-        public void flush() throws IOException
+        public void flush()
+        throws IOException
         {
-            ;
         }
 
         @Override
-        public void close() throws IOException
+        public void close()
+        throws IOException
         {
         }
     }

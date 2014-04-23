@@ -33,7 +33,8 @@ public class CaRequestorRemoveCommand extends CaCommand
     protected String            requestorName;
 
     @Override
-    protected Object doExecute() throws Exception
+    protected Object doExecute()
+    throws Exception
     {
         caManager.removeCmpRequestorFromCA(requestorName, caName);
         return null;

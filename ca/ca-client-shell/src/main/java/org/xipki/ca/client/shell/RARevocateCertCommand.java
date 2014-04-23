@@ -51,7 +51,8 @@ public class RARevocateCertCommand extends ClientCommand
     private RAWorker             raWorker;
 
     @Override
-    protected Object doExecute() throws Exception
+    protected Object doExecute()
+    throws Exception
     {
         if(certFile == null && (cacertFile == null && serialNumber == null))
         {

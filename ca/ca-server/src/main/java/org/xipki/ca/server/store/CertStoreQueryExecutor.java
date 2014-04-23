@@ -193,7 +193,7 @@ class CertStoreQueryExecutor
             String certprofileName,
             RequestorInfo requestor,
             String user)
-            throws SQLException, OperationException
+    throws SQLException, OperationException
     {
         final String SQL_ADD_CERT =
                 "INSERT INTO cert " +
@@ -295,7 +295,7 @@ class CertStoreQueryExecutor
     }
 
     int getNextFreeCrlNumber(X509CertificateWithMetaInfo cacert)
-            throws SQLException, OperationException
+    throws SQLException, OperationException
     {
         final String SQL = "SELECT max(crl_number) FROM crl WHERE cainfo_id=?";
 
@@ -335,7 +335,8 @@ class CertStoreQueryExecutor
         }
     }
 
-    Long getThisUpdateOfCurrentCRL(X509CertificateWithMetaInfo cacert) throws SQLException, OperationException
+    Long getThisUpdateOfCurrentCRL(X509CertificateWithMetaInfo cacert)
+    throws SQLException, OperationException
     {
         final String SQL = "SELECT max(thisUpdate) FROM crl WHERE cainfo_id=?";
 
@@ -373,7 +374,7 @@ class CertStoreQueryExecutor
 
     void addCRL(X509CertificateWithMetaInfo cacert,
             X509CRL crl)
-            throws SQLException, CRLException, OperationException
+    throws SQLException, CRLException, OperationException
     {
         byte[] encodedExtnValue = crl.getExtensionValue(Extension.cRLNumber.getId());
         Integer crlNumber = null;
@@ -1008,7 +1009,7 @@ class CertStoreQueryExecutor
     }
 
     boolean certIssued(X509CertificateWithMetaInfo caCert, String sha1FpSubject)
-            throws OperationException, SQLException
+    throws OperationException, SQLException
     {
         byte[] encodedCert = caCert.getEncodedCert();
         Integer caId =  caInfoStore.getCaIdForCert(encodedCert);
@@ -1055,7 +1056,7 @@ class CertStoreQueryExecutor
     }
 
     boolean certIssued(X509CertificateWithMetaInfo caCert, byte[] encodedSubjectPublicKey)
-            throws OperationException, SQLException
+    throws OperationException, SQLException
     {
         byte[] encodedCert = caCert.getEncodedCert();
         Integer caId =  caInfoStore.getCaIdForCert(encodedCert);
@@ -1147,7 +1148,7 @@ class CertStoreQueryExecutor
     }
 
     private int getCertBasedIdentityId(X509CertificateWithMetaInfo identityCert, CertBasedIdentityStore store)
-            throws SQLException, OperationException
+    throws SQLException, OperationException
     {
         byte[] encodedCert = identityCert.getEncodedCert();
         Integer id =  store.getCaIdForCert(encodedCert);
@@ -1194,13 +1195,13 @@ class CertStoreQueryExecutor
     }
 
     private int getCaId(X509CertificateWithMetaInfo caCert)
-            throws SQLException, OperationException
+    throws SQLException, OperationException
     {
         return getCertBasedIdentityId(caCert, caInfoStore);
     }
 
     private int getRequestorId(X509CertificateWithMetaInfo requestorCert)
-            throws SQLException, OperationException
+    throws SQLException, OperationException
     {
         return getCertBasedIdentityId(requestorCert, requestorInfoStore);
     }

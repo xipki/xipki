@@ -43,7 +43,7 @@ public class BcRSAContentVerifierProviderBuilder
     }
 
     protected Signer createSigner(AlgorithmIdentifier sigAlgId)
-        throws OperatorCreationException
+    throws OperatorCreationException
     {
         AlgorithmIdentifier digAlgId = digestAlgorithmFinder.find(sigAlgId);
         Digest dig = digestProvider.get(digAlgId);
@@ -59,7 +59,7 @@ public class BcRSAContentVerifierProviderBuilder
     }
 
     protected AsymmetricKeyParameter extractKeyParameters(SubjectPublicKeyInfo publicKeyInfo)
-        throws IOException
+    throws IOException
     {
         return PublicKeyFactory.createKey(publicKeyInfo);
     }

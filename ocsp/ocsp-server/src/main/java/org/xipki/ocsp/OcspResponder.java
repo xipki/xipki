@@ -143,7 +143,7 @@ public class OcspResponder
     }
 
     public void init()
-        throws OCSPResponderException
+    throws OCSPResponderException
     {
         if(confFile == null)
         {
@@ -758,7 +758,8 @@ public class OcspResponder
         this.passwordResolver = passwordResolver;
     }
 
-    private static X509Certificate parseCert(String f) throws OCSPResponderException
+    private static X509Certificate parseCert(String f)
+    throws OCSPResponderException
     {
         try
         {

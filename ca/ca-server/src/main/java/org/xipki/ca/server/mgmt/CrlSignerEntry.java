@@ -119,7 +119,7 @@ public class CrlSignerEntry
     }
 
     public void setIncludeCertsInCrl(boolean includeCertsInCrl)
-            throws ConfigurationException
+    throws ConfigurationException
     {
         this.includeCertsInCrl = includeCertsInCrl;
     }

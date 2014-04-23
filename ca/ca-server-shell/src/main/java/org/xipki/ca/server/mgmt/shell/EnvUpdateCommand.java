@@ -35,7 +35,8 @@ public class EnvUpdateCommand extends CaCommand
     protected String            value;
 
     @Override
-    protected Object doExecute() throws Exception
+    protected Object doExecute()
+    throws Exception
     {
         caManager.changeEnvParam(name, value);
         System.out.println("Update the environment " + name + "=" + getRealString(value));

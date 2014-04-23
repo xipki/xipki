@@ -31,7 +31,8 @@ public class CaAliasListCommand extends CaCommand
     protected String            caAlias;
 
     @Override
-    protected Object doExecute() throws Exception
+    protected Object doExecute()
+    throws Exception
     {
         Set<String> aliasNames = caManager.getCaAliasNames();
 

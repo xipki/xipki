@@ -117,7 +117,8 @@ class DefaultRemoteP11CryptService extends RemoteP11CryptService
     }
 
     @Override
-    public void refresh() throws SignerException
+    public void refresh()
+    throws SignerException
     {
     }
 

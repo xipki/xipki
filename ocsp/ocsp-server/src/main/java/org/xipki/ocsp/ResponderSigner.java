@@ -34,7 +34,7 @@ public class ResponderSigner
     private final X500Name responderId;
 
     public ResponderSigner(ConcurrentContentSigner signer)
-            throws CertificateEncodingException, IOException
+    throws CertificateEncodingException, IOException
     {
         ParamChecker.assertNotNull("signer", signer);
 

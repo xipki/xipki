@@ -110,7 +110,8 @@ public class CaAddCommand extends CaCommand
     private PasswordResolver passwordResolver;
 
     @Override
-    protected Object doExecute() throws Exception
+    protected Object doExecute()
+    throws Exception
     {
         CAStatus status = CAStatus.ACTIVE;
         if(caStatus != null)

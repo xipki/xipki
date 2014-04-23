@@ -30,7 +30,7 @@ public abstract class CertProfile
     public abstract boolean isOnlyForRA();
 
     public abstract void initialize(String data)
-            throws CertProfileException;
+    throws CertProfileException;
 
     public abstract void setEnvironmentParamterResolver(
             EnvironmentParameterResolver paramterResolver);
@@ -40,10 +40,10 @@ public abstract class CertProfile
     public abstract Integer getValidity();
 
     public abstract void checkPublicKey(SubjectPublicKeyInfo publicKey)
-            throws BadCertTemplateException;
+    throws BadCertTemplateException;
 
     public abstract SubjectInfo getSubject(X500Name requestedSubject)
-            throws CertProfileException, BadCertTemplateException;
+    throws CertProfileException, BadCertTemplateException;
 
     public abstract ExtensionOccurrence getOccurenceOfAuthorityKeyIdentifier();
 
@@ -56,12 +56,12 @@ public abstract class CertProfile
     public abstract ExtensionTuples getExtensions(
             X500Name requestedSubject,
             Extensions requestedExtensions)
-            throws CertProfileException, BadCertTemplateException;
+    throws CertProfileException, BadCertTemplateException;
 
     public abstract boolean incSerialNumberIfSubjectExists();
 
     public String incSerialNumber(String currentSerialNumber)
-            throws BadCertTemplateException
+    throws BadCertTemplateException
     {
         try
         {

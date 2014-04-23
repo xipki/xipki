@@ -55,7 +55,7 @@ public class P11ContentSignerBuilder
             PKCS11SlotIdentifier slot, char[] password,
             Pkcs11KeyIdentifier keyId,
             X509Certificate cert)
-            throws SignerException
+    throws SignerException
     {
         ParamChecker.assertNotNull("cryptService", cryptService);
         ParamChecker.assertNotNull("slot", slot);
@@ -90,7 +90,7 @@ public class P11ContentSignerBuilder
     public ConcurrentContentSigner createSigner(
             AlgorithmIdentifier signatureAlgId,
             int parallelism)
-            throws OperatorCreationException, NoSuchPaddingException
+    throws OperatorCreationException, NoSuchPaddingException
     {
         if(parallelism < 1)
         {
