@@ -35,6 +35,7 @@ import java.util.concurrent.TimeUnit;
 import org.bouncycastle.util.encoders.Hex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xipki.audit.api.AuditLoggingService;
 import org.xipki.database.api.DataSource;
 import org.xipki.ocsp.IssuerEntry;
 import org.xipki.ocsp.IssuerHashNameAndKey;
@@ -64,6 +65,8 @@ public class DbCertStatusStore implements CertStatusStore
     private final boolean unknownSerialAsGood;
 
     private IssuerStore issuerStore;
+    private AuditLoggingService auditLoggingService;
+
     private boolean initialized = false;
 
     public DbCertStatusStore(String name, DataSource dataSource, boolean unknownSerialAsGood)
@@ -403,4 +406,17 @@ public class DbCertStatusStore implements CertStatusStore
     {
         return name;
     }
+    
+    @Override
+    public AuditLoggingService getAuditLoggingService()
+    {
+    	return auditLoggingService;
+    }
+    
+    @Override
+    public void setAuditLoggingService(AuditLoggingService auditLoggingService)
+    {
+        this.auditLoggingService = auditLoggingService;
+    }
+
 }

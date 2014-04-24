@@ -19,6 +19,8 @@ package org.xipki.ocsp.api;
 
 import java.math.BigInteger;
 
+import org.xipki.audit.api.AuditLoggingService;
+
 public interface CertStatusStore
 {
     CertStatusInfo getCertStatus(HashAlgoType hashAlgo, byte[] issuerNameHash,
@@ -28,4 +30,8 @@ public interface CertStatusStore
     boolean isHealthy();
 
     String getName();
+    
+    void setAuditLoggingService(AuditLoggingService auditLoggingService);
+    
+    AuditLoggingService getAuditLoggingService();
 }
