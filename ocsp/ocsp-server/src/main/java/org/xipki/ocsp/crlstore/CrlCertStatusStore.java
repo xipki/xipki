@@ -131,8 +131,8 @@ public class CrlCertStatusStore implements CertStatusStore
 
     private synchronized void initializeStore(boolean force)
     {
-    	Boolean updateCRLSuccessfull = null;
-    	
+        Boolean updateCRLSuccessfull = null;
+
         try
         {
             File f = new File(crlFile);
@@ -191,14 +191,14 @@ public class CrlCertStatusStore implements CertStatusStore
 
             if(Arrays.equals(newFp, fpOfCrlFile))
             {
-            	auditLogPCIEvent(AuditLevel.INFO, "UPDATE_CERTSTORE", "current CRL is still up-to-date");
+                auditLogPCIEvent(AuditLevel.INFO, "UPDATE_CERTSTORE", "current CRL is still up-to-date");
                 return;
             }
 
             LOG.info("CRL file {} has changed, updating of the CertStore required", crlFile);
-        	auditLogPCIEvent(AuditLevel.INFO, "UPDATE_CERTSTORE", "a newer version of CRL is available");
-        	updateCRLSuccessfull = false;
-        	
+            auditLogPCIEvent(AuditLevel.INFO, "UPDATE_CERTSTORE", "a newer version of CRL is available");
+            updateCRLSuccessfull = false;
+
             X509CRL crl = IoCertUtil.parseCRL(crlFile);
 
             X500Principal issuer = crl.getIssuerX500Principal();
@@ -386,7 +386,7 @@ public class CrlCertStatusStore implements CertStatusStore
             this.nextUpdate = newNextUpdate;
             this.initialized = true;
             updateCRLSuccessfull = true;
-            LOG.info("Updated CertStore {}", name);            
+            LOG.info("Updated CertStore {}", name);
         } catch (Exception e)
         {
             LOG.error("Could not executing initializeStore() for {},  {}: {}",
@@ -394,24 +394,24 @@ public class CrlCertStatusStore implements CertStatusStore
             LOG.debug("Could not executing initializeStore()", e);
         } finally
         {
-        	if(updateCRLSuccessfull != null)
-        	{
-        		AuditLevel auditLevel;
-        		AuditStatus auditStatus;
-        		String eventType = "UPDATE_CRL";
-        		if(updateCRLSuccessfull)
-        		{
-        			auditLevel = AuditLevel.INFO;
-        			auditStatus = AuditStatus.FAILED;
-        		}
-        		else
-        		{
-        			auditLevel = AuditLevel.ERROR;
-        			auditStatus = AuditStatus.SUCCSEEFULL;
-        		}
-        		
-        		auditLogPCIEvent(auditLevel, eventType, auditStatus.name());
-        	}
+            if(updateCRLSuccessfull != null)
+            {
+                AuditLevel auditLevel;
+                AuditStatus auditStatus;
+                String eventType = "UPDATE_CRL";
+                if(updateCRLSuccessfull)
+                {
+                    auditLevel = AuditLevel.INFO;
+                    auditStatus = AuditStatus.FAILED;
+                }
+                else
+                {
+                    auditLevel = AuditLevel.ERROR;
+                    auditStatus = AuditStatus.SUCCSEEFULL;
+                }
+
+                auditLogPCIEvent(auditLevel, eventType, auditStatus.name());
+            }
         }
     }
 
@@ -533,9 +533,9 @@ public class CrlCertStatusStore implements CertStatusStore
     @Override
     public AuditLoggingService getAuditLoggingService()
     {
-    	return auditLoggingService;
+        return auditLoggingService;
     }
-    
+
     @Override
     public void setAuditLoggingService(AuditLoggingService auditLoggingService)
     {

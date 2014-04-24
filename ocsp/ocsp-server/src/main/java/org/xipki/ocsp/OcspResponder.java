@@ -872,7 +872,7 @@ public class OcspResponder
         this.auditLoggingService = auditLoggingService;
         for(CertStatusStore store : certStatusStores)
         {
-        	store.setAuditLoggingService(auditLoggingService);
+            store.setAuditLoggingService(auditLoggingService);
         }
     }
 
