@@ -30,6 +30,8 @@ import java.security.cert.X509Certificate;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Types;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
 
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.Unmarshaller;
@@ -100,7 +102,7 @@ class CaCertStoreDbImporter extends DbPorter
             System.err.println("Error while importing CA certstore to database");
             throw e;
         }
-        System.out.println("Imported CA certstore to database");
+        System.out.println(" Imported CA certstore to database");
     }
 
     private void import_cainfo(Cainfos cainfos)
@@ -145,7 +147,7 @@ class CaCertStoreDbImporter extends DbPorter
             closeStatement(ps);
         }
 
-        System.out.println("Imported table cainfo");
+        System.out.println(" Imported table cainfo");
     }
 
     private void import_requestorinfo(Requestorinfos requestorinfos)
@@ -186,7 +188,7 @@ class CaCertStoreDbImporter extends DbPorter
             closeStatement(ps);
         }
 
-        System.out.println("Imported table requestorinfo");
+        System.out.println(" Imported table requestorinfo");
     }
 
     private void import_certprofileinfo(Certprofileinfos certprofileinfos)
@@ -220,7 +222,7 @@ class CaCertStoreDbImporter extends DbPorter
             closeStatement(ps);
         }
 
-        System.out.println("Imported table certprofileinfo");
+        System.out.println(" Imported table certprofileinfo");
     }
 
     private void import_user(Users users)
@@ -254,7 +256,7 @@ class CaCertStoreDbImporter extends DbPorter
             closeStatement(ps);
         }
 
-        System.out.println("Imported table user");
+        System.out.println(" Imported table user");
     }
 
     private void import_crl(Crls crls)
@@ -328,7 +330,7 @@ class CaCertStoreDbImporter extends DbPorter
             closeStatement(ps);
         }
 
-        System.out.println("Imported table crl");
+        System.out.println(" Imported table crl");
     }
 
     private void import_cert(CertsFiles certsfiles)
@@ -337,26 +339,23 @@ class CaCertStoreDbImporter extends DbPorter
         int sum = 0;
         for(String certsFile : certsfiles.getCertsFile())
         {
-            System.out.println("Importing certificates specified in file " + certsFile);
+            System.out.println("Importing certificates from file " + certsFile);
 
             try
             {
-                @SuppressWarnings("unchecked")
-                JAXBElement<CertsType> root = (JAXBElement<CertsType>)
-                        unmarshaller.unmarshal(new File(baseDir + File.separator + certsFile));
-                sum += do_import_cert(root.getValue());
-                System.out.println("Imported certificates specified in file " + certsFile);
-                System.out.println("Imported " + sum + " certificates ...");
+                sum += do_import_cert(certsFile);
+                System.out.println(" Imported certificates specified in file " + certsFile);
+                System.out.println(" Imported " + sum + " certificates ...");
             }catch(Exception e)
             {
-                System.err.println("Error while importing certificates specified in file " + certsFile);
+                System.err.println("Error while importing certificates from file " + certsFile);
                 throw e;
             }
         }
-        System.out.println("Imported " + sum + " certificates");
+        System.out.println(" Imported " + sum + " certificates");
     }
 
-    private int do_import_cert(CertsType certs)
+    private int do_import_cert(String certsZipFile)
     throws Exception
     {
         final String SQL_ADD_CERT =
@@ -372,6 +371,14 @@ class CaCertStoreDbImporter extends DbPorter
         PreparedStatement ps_cert = prepareStatement(SQL_ADD_CERT);
         PreparedStatement ps_rawcert = prepareStatement(SQL_ADD_RAWCERT);
 
+        ZipFile zipFile = new ZipFile(new File(baseDir, certsZipFile));
+        ZipEntry certsXmlEntry = zipFile.getEntry("certs.xml");
+
+        @SuppressWarnings("unchecked")
+        JAXBElement<CertsType> rootElement = (JAXBElement<CertsType>)
+                unmarshaller.unmarshal(zipFile.getInputStream(certsXmlEntry));
+        CertsType certs = rootElement.getValue();
+
         int sum = 0;
         try
         {
@@ -379,11 +386,31 @@ class CaCertStoreDbImporter extends DbPorter
             {
                 try
                 {
-                    // rawcert
-                    String filename = baseDir + File.separator + cert.getCertFile();
-                    byte[] encodedCert = IoCertUtil.read(filename);
+                    String filename = cert.getCertFile();
 
-                    Certificate c = Certificate.getInstance(encodedCert);
+                    // rawcert
+                    ZipEntry certZipEnty = zipFile.getEntry(filename);
+
+                    // rawcert
+                    byte[] encodedCert = DbiUtil.read(zipFile.getInputStream(certZipEnty));
+
+                    Certificate c;
+                    try
+                    {
+                        c = Certificate.getInstance(encodedCert);
+                    } catch (Exception e)
+                    {
+                        LOG.error("could not parse certificate in file {}", filename);
+                        LOG.debug("could not parse certificate in file " + filename, e);
+                        if(e instanceof CertificateException)
+                        {
+                            throw (CertificateException) e;
+                        }
+                        else
+                        {
+                            throw new CertificateException(e);
+                        }
+                    }
 
                     byte[] encodedKey = c.getSubjectPublicKeyInfo().getPublicKeyData().getBytes();
 

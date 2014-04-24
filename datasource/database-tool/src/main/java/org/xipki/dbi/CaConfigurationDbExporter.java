@@ -170,9 +170,9 @@ class CaConfigurationDbExporter extends DbPorter
 
                 if("lock".equals(name))
                 {
-                	continue;
+                    continue;
                 }
-                
+
                 EnvironmentType environment = new EnvironmentType();
                 environment.setName(name);
                 environment.setValue(value);
