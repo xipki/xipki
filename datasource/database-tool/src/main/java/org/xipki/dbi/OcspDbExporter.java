@@ -47,7 +47,7 @@ public class OcspDbExporter
         marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
     }
 
-    public void exportDatabase(String destFolder)
+    public void exportDatabase(String destFolder, int numCertsInBundle)
     throws Exception
     {
         File f = new File(destFolder);
@@ -75,7 +75,8 @@ public class OcspDbExporter
         }
 
         // CertStore
-        OcspCertStoreDbExporter certStoreExporter = new OcspCertStoreDbExporter(dataSource, marshaller, destFolder);
+        OcspCertStoreDbExporter certStoreExporter = new OcspCertStoreDbExporter(
+                dataSource, marshaller, destFolder, numCertsInBundle);
         certStoreExporter.export();
     }
 
