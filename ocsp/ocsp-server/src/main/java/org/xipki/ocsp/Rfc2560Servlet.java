@@ -70,7 +70,7 @@ public class Rfc2560Servlet extends HttpServlet
         AuditEvent auditEvent = null;
 
         AuditLevel auditLevel = AuditLevel.INFO;
-        AuditStatus auditStatus = AuditStatus.successfull;
+        AuditStatus auditStatus = AuditStatus.SUCCSEEFULL;
         String auditMessage = null;
 
         long startInUs = 0;
@@ -93,7 +93,7 @@ public class Rfc2560Servlet extends HttpServlet
                 response.setContentLength(0);
 
                 auditLevel = AuditLevel.ERROR;
-                auditStatus = AuditStatus.failed;
+                auditStatus = AuditStatus.FAILED;
                 auditMessage = message;
                 return;
             }
@@ -104,7 +104,7 @@ public class Rfc2560Servlet extends HttpServlet
                 response.setContentLength(0);
                 response.setStatus(HttpServletResponse.SC_UNSUPPORTED_MEDIA_TYPE);
 
-                auditStatus = AuditStatus.failed;
+                auditStatus = AuditStatus.FAILED;
                 auditMessage = "unsupporte media type " + request.getContentType();
                 return;
             }
@@ -115,7 +115,7 @@ public class Rfc2560Servlet extends HttpServlet
                 response.setContentLength(0);
                 response.setStatus(HttpServletResponse.SC_REQUEST_ENTITY_TOO_LARGE);
 
-                auditStatus = AuditStatus.failed;
+                auditStatus = AuditStatus.FAILED;
                 auditMessage = "request too large";
                 return;
             }
@@ -136,7 +136,7 @@ public class Rfc2560Servlet extends HttpServlet
                 response.setContentLength(0);
 
                 auditLevel = AuditLevel.ERROR;
-                auditStatus = AuditStatus.error;
+                auditStatus = AuditStatus.ERROR;
             }
             else
             {
@@ -153,7 +153,7 @@ public class Rfc2560Servlet extends HttpServlet
             response.setContentLength(0);
 
             auditLevel = AuditLevel.ERROR;
-            auditStatus = AuditStatus.error;
+            auditStatus = AuditStatus.ERROR;
             auditMessage = "internal error";
         }
         finally

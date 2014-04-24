@@ -79,7 +79,7 @@ public class Rfc6712Servlet extends HttpServlet
                 response.setContentLength(0);
 
                 auditLevel = AuditLevel.ERROR;
-                auditStatus = AuditStatus.failed;
+                auditStatus = AuditStatus.FAILED;
                 auditMessage = message;
                 return;
             }
@@ -89,7 +89,7 @@ public class Rfc6712Servlet extends HttpServlet
                 response.setContentLength(0);
                 response.setStatus(HttpServletResponse.SC_UNSUPPORTED_MEDIA_TYPE);
 
-                auditStatus = AuditStatus.failed;
+                auditStatus = AuditStatus.FAILED;
                 auditMessage = "unsupporte media type " + request.getContentType();
                 return;
             }
@@ -139,7 +139,7 @@ public class Rfc6712Servlet extends HttpServlet
                 response.setContentLength(0);
                 response.setStatus(HttpServletResponse.SC_NOT_FOUND);
 
-                auditStatus = AuditStatus.failed;
+                auditStatus = AuditStatus.FAILED;
                 return;
             }
 
@@ -168,7 +168,7 @@ public class Rfc6712Servlet extends HttpServlet
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             response.setContentLength(0);
             auditLevel = AuditLevel.ERROR;
-            auditStatus = AuditStatus.error;
+            auditStatus = AuditStatus.ERROR;
             auditMessage = "internal error";
         }
         finally

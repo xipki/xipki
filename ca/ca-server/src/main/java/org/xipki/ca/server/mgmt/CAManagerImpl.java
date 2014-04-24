@@ -32,6 +32,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -44,7 +45,10 @@ import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.util.encoders.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xipki.audit.api.AuditLevel;
 import org.xipki.audit.api.AuditLoggingService;
+import org.xipki.audit.api.AuditStatus;
+import org.xipki.audit.api.PCIAuditEvent;
 import org.xipki.ca.api.CAMgmtException;
 import org.xipki.ca.api.CAStatus;
 import org.xipki.ca.api.OperationException;
@@ -262,6 +266,13 @@ public class CAManagerImpl implements CAManager
     @Override
     public boolean unlockCA()
     {
+        boolean successfull = do_unlockCA();
+        auditLogPCIEvent(successfull, "UNLOCK");
+        return successfull;
+    }
+
+    private boolean do_unlockCA()
+    {
         Statement stmt = null;
         try
         {
@@ -360,6 +371,7 @@ public class CAManagerImpl implements CAManager
         reset();
 
         boolean caSystemStarted = do_startCaSystem();
+
         if(caSystemStarted)
         {
             String msg = "Restarted CA system";
@@ -370,6 +382,8 @@ public class CAManagerImpl implements CAManager
             String msg = "Could not restart CA system";
             LOG.error(msg);
         }
+
+        auditLogPCIEvent(caSystemStarted, "RESTART");
 
         return caSystemStarted;
     }
@@ -387,6 +401,8 @@ public class CAManagerImpl implements CAManager
             String msg = "Could not start CA system";
             LOG.error(msg);
         }
+
+        auditLogPCIEvent(caSystemStarted, "START");
     }
 
     private boolean do_startCaSystem()
@@ -628,6 +644,8 @@ public class CAManagerImpl implements CAManager
 
     public void shutdown()
     {
+        LOG.info("Stopping CA system");
+
         if(scheduledThreadPoolExecutor != null)
         {
             scheduledThreadPoolExecutor.shutdown();
@@ -649,6 +667,9 @@ public class CAManagerImpl implements CAManager
         {
             unlockCA();
         }
+
+        LOG.info("Stopped CA system");
+        auditLogPCIEvent(true, "SHUTDOWN");
     }
 
     @Override
@@ -3140,6 +3161,28 @@ public class CAManagerImpl implements CAManager
         {
             PublisherEntry publisherEntry = publishers.get(name);
             publisherEntry.setAuditLoggingService(auditLoggingService);
+        }
+    }
+
+    private void auditLogPCIEvent(boolean successfull, String eventType)
+    {
+        if(auditLoggingService != null)
+        {
+            PCIAuditEvent auditEvent = new PCIAuditEvent(new Date());
+            auditEvent.setUserId("SYSTEM");
+            auditEvent.setEventType(eventType);
+            auditEvent.setAffectedResource("CORE");
+            if(successfull)
+            {
+                auditEvent.setStatus(AuditStatus.SUCCSEEFULL.name());
+                auditEvent.setLevel(AuditLevel.INFO);
+            }
+            else
+            {
+                auditEvent.setStatus(AuditStatus.ERROR.name());
+                auditEvent.setLevel(AuditLevel.ERROR);
+            }
+            auditLoggingService.logEvent(auditEvent);
         }
     }
 }

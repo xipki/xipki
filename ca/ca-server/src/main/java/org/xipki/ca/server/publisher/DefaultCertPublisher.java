@@ -199,7 +199,7 @@ public class DefaultCertPublisher extends CertPublisher
             auditEvent.setApplicationName("CAPublisher");
             auditEvent.setName("SYSTEM");
             auditEvent.setLevel(AuditLevel.ERROR);
-            auditEvent.setStatus(AuditStatus.failed);
+            auditEvent.setStatus(AuditStatus.FAILED);
             auditEvent.addEventData(new AuditEventData("issuer", issuerText));
             auditEvent.addEventData(new AuditEventData("subject", subjectText));
             auditEvent.addEventData(new AuditEventData("issuer", serialText));
