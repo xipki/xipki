@@ -180,11 +180,11 @@ class CaConfigurationDbImporter extends DbPorter
             ps = prepareStatement("INSERT INTO environment (name, value) VALUES (?, ?)");
             for(EnvironmentType environment : environments.getEnvironment())
             {
-            	if("lock".equals(environment.getName()))
-            	{
-            		continue;
-            	}
-            	
+                if("lock".equals(environment.getName()))
+                {
+                    continue;
+                }
+
                 try
                 {
                     int idx = 1;
