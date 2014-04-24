@@ -54,7 +54,7 @@ public class CALoadTest extends AbstractLoadTest
     private final String otherPartOfSubject;
 
     private long index;
-    private final BigInteger baseN;
+    private BigInteger baseN;
 
     @Override
     protected Runnable getTestor()
@@ -78,10 +78,10 @@ public class CALoadTest extends AbstractLoadTest
         this.otherPartOfSubject = otherPartOfSubject;
 
         this.baseN = BigInteger.valueOf(0);
-        this.baseN.setBit(2047);
+        this.baseN = this.baseN.setBit(2047);
         for(int i = 32; i < 2047; i+= 2)
         {
-            this.baseN.setBit(i);
+            this.baseN = this.baseN.setBit(i);
         }
 
         Calendar baseTime = Calendar.getInstance(Locale.UK);
