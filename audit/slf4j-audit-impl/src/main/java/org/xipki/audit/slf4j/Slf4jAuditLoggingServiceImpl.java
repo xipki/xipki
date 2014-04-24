@@ -109,7 +109,7 @@ public class Slf4jAuditLoggingServiceImpl implements AuditLoggingService
         AuditStatus status = event.getStatus();
         if(status == null)
         {
-            status = AuditStatus.undefined;
+            status = AuditStatus.UNDEFINED;
         }
         sb.append(":\tstatus: ").append(status.name());
         List<AuditEventData> eventDataArray = event.getEventDatas();
