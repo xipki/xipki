@@ -47,7 +47,7 @@ public class CaDbExporter
         marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
     }
 
-    public void exportDatabase(String destFolder)
+    public void exportDatabase(String destFolder, int numCertsInBundle)
     throws Exception
     {
         File f = new File(destFolder);
@@ -79,7 +79,8 @@ public class CaDbExporter
         caConfExporter.export();
 
         // CertStore
-        CaCertStoreDbExporter certStoreExporter = new CaCertStoreDbExporter(dataSource, marshaller, destFolder);
+        CaCertStoreDbExporter certStoreExporter = new CaCertStoreDbExporter(
+                dataSource, marshaller, destFolder, numCertsInBundle);
         certStoreExporter.export();
     }
 

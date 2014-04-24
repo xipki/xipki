@@ -17,12 +17,16 @@
 
 package org.xipki.dbi;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
@@ -44,13 +48,20 @@ import org.xipki.security.common.ParamChecker;
 class OcspCertStoreDbExporter extends DbPorter
 {
     private final Marshaller marshaller;
-    private final int COUNT_CERTS_IN_ONE_FILE  = 1000;
 
-    OcspCertStoreDbExporter(DataSource dataSource, Marshaller marshaller, String baseDir)
+    private final ObjectFactory objFact = new ObjectFactory();
+    private final int numCertsInBundle;
+
+    OcspCertStoreDbExporter(DataSource dataSource, Marshaller marshaller, String baseDir, int numCertsInBundle)
     throws SQLException, PasswordResolverException, IOException
     {
         super(dataSource, baseDir);
         ParamChecker.assertNotNull("marshaller", marshaller);
+        if(numCertsInBundle < 1)
+        {
+            numCertsInBundle = 1;
+        }
+        this.numCertsInBundle = numCertsInBundle;
         this.marshaller = marshaller;
     }
 
@@ -65,7 +76,7 @@ class OcspCertStoreDbExporter extends DbPorter
 
         JAXBElement<CertStoreType> root = new ObjectFactory().createCertStore(certstore);
         marshaller.marshal(root, new File(baseDir + File.separator + FILENAME_OCSP_CertStore));
-        System.out.println("Exported OCSP certstore from database");
+        System.out.println(" Exported OCSP certstore from database");
     }
 
     private Issuers export_issuer()
@@ -102,7 +113,7 @@ class OcspCertStoreDbExporter extends DbPorter
             closeStatement(stmt);
         }
 
-        System.out.println("Exported table issuer");
+        System.out.println(" Exported table issuer");
         return issuers;
     }
 
@@ -122,18 +133,23 @@ class OcspCertStoreDbExporter extends DbPorter
         PreparedStatement certPs = prepareStatement(certSql);
         PreparedStatement rawCertPs = prepareStatement(rawCertSql);
 
-        File certDir = new File(baseDir, "CERT");
-
         final int minCertId = getMinCertId();
         final int maxCertId = getMaxCertId();
 
-        final ObjectFactory objFact = new ObjectFactory();
-
         int numCertInCurrentFile = 0;
-        int startIdInCurrentFile = minCertId;
+
         CertsType certsInCurrentFile = new CertsType();
 
+        int sum = 0;
         final int n = 100;
+
+        File currentCertsZipFile = new File(baseDir, "tmp-certs-" + System.currentTimeMillis() + ".zip");
+        FileOutputStream out = new FileOutputStream(currentCertsZipFile);
+        ZipOutputStream currentCertsZip = new ZipOutputStream(out);
+
+        int minCertIdOfCurrentFile = -1;
+        int maxCertIdOfCurrentFile = -1;
+
         try
         {
             for(int i = minCertId; i <= maxCertId; i += n)
@@ -146,6 +162,25 @@ class OcspCertStoreDbExporter extends DbPorter
                 while(rs.next())
                 {
                     int id = rs.getInt("id");
+
+                    if(minCertIdOfCurrentFile == -1)
+                    {
+                        minCertIdOfCurrentFile = id;
+                    }
+                    else if(minCertIdOfCurrentFile > id)
+                    {
+                        minCertIdOfCurrentFile = id;
+                    }
+
+                    if(maxCertIdOfCurrentFile == -1)
+                    {
+                        maxCertIdOfCurrentFile = id;
+                    }
+                    else if(maxCertIdOfCurrentFile < id)
+                    {
+                        maxCertIdOfCurrentFile = id;
+                    }
+
                     int issuer_id = rs.getInt("issuer_id");
                     String last_update = rs.getString("last_update");
                     boolean revocated = rs.getBoolean("revocated");
@@ -164,7 +199,16 @@ class OcspCertStoreDbExporter extends DbPorter
                         String b64Cert = rawCertRs.getString("cert");
                         byte[] cert = Base64.decode(b64Cert);
                         sha1_fp_cert = IoCertUtil.sha1sum(cert);
-                        IoCertUtil.save(new File(certDir, sha1_fp_cert), cert);
+
+                        ZipEntry certZipEntry = new ZipEntry(sha1_fp_cert + ".der");
+                        currentCertsZip.putNextEntry(certZipEntry);
+                        try
+                        {
+                            currentCertsZip.write(cert);
+                        }finally
+                        {
+                            currentCertsZip.closeEntry();
+                        }
                     }finally
                     {
                         rawCertRs.close();
@@ -179,37 +223,53 @@ class OcspCertStoreDbExporter extends DbPorter
                     cert.setRevReason(rev_reason);
                     cert.setRevTime(rev_time);
                     cert.setRevInvalidityTime(rev_invalidity_time);
-                    cert.setCertFile(DIRNAME_CERT + File.separator + sha1_fp_cert);
-
-                    if(certsInCurrentFile.getCert().isEmpty())
-                    {
-                        startIdInCurrentFile = id;
-                    }
+                    cert.setCertFile(sha1_fp_cert + ".der");
 
                     certsInCurrentFile.getCert().add(cert);
                     numCertInCurrentFile ++;
+                    sum ++;
 
-                    if(numCertInCurrentFile == COUNT_CERTS_IN_ONE_FILE)
+                    if(numCertInCurrentFile == numCertsInBundle)
                     {
-                        String fn = PREFIX_FILENAME_CERTS + startIdInCurrentFile + ".xml";
-                        marshaller.marshal(objFact.createCerts(certsInCurrentFile),
-                                new File(baseDir + File.separator + fn));
+                        finalizeZip(currentCertsZip, certsInCurrentFile);
 
-                        certsFiles.getCertsFile().add(fn);
+                        String curentCertsFilename = DbiUtil.buildFilename("certs_", ".zip",
+                                minCertIdOfCurrentFile, maxCertIdOfCurrentFile, maxCertId);
+                        currentCertsZipFile.renameTo(new File(baseDir, curentCertsFilename));
 
+                        certsFiles.getCertsFile().add(curentCertsFilename);
+
+                        System.out.println(" Exported " + numCertInCurrentFile + " certificates in " + curentCertsFilename);
+                        System.out.println(" Exported " + sum + " certificates ...");
+
+                        // reset
                         certsInCurrentFile = new CertsType();
                         numCertInCurrentFile = 0;
+                        minCertIdOfCurrentFile = -1;
+                        maxCertIdOfCurrentFile = -1;
+                        currentCertsZipFile = new File(baseDir, "tmp-certs-" + System.currentTimeMillis() + ".zip");
+                        out = new FileOutputStream(currentCertsZipFile);
+                        currentCertsZip = new ZipOutputStream(out);
                     }
                 }
             }
 
             if(numCertInCurrentFile > 0)
             {
-                String fn = "certs-" + startIdInCurrentFile + ".xml";
-                marshaller.marshal(objFact.createCerts(certsInCurrentFile),
-                        new File(baseDir + File.separator + fn));
+                finalizeZip(currentCertsZip, certsInCurrentFile);
 
-                certsFiles.getCertsFile().add(fn);
+                String curentCertsFilename = DbiUtil.buildFilename("certs_", ".zip",
+                        minCertIdOfCurrentFile, maxCertIdOfCurrentFile, maxCertId);
+                currentCertsZipFile.renameTo(new File(baseDir, curentCertsFilename));
+
+                certsFiles.getCertsFile().add(curentCertsFilename);
+
+                System.out.println(" Exported " + numCertInCurrentFile + " certificates in " + curentCertsFilename);
+            }
+            else
+            {
+                currentCertsZip.close();
+                currentCertsZipFile.delete();
             }
 
         }finally
@@ -218,7 +278,7 @@ class OcspCertStoreDbExporter extends DbPorter
             closeStatement(rawCertPs);
         }
 
-        System.out.println("Exported tables cert, certhash and rawcert");
+        System.out.println(" Exported " + sum + " certificates from tables cert, certhash and rawcert");
         return certsFiles;
     }
 
@@ -266,6 +326,26 @@ class OcspCertStoreDbExporter extends DbPorter
         {
             closeStatement(stmt);
         }
+    }
+
+    private void finalizeZip(ZipOutputStream zipOutStream, CertsType certsType)
+    throws JAXBException, IOException
+    {
+        ByteArrayOutputStream bout = new ByteArrayOutputStream();
+        marshaller.marshal(objFact.createCerts(certsType), bout);
+        bout.flush();
+
+        ZipEntry certZipEntry = new ZipEntry("certs.xml");
+        zipOutStream.putNextEntry(certZipEntry);
+        try
+        {
+            zipOutStream.write(bout.toByteArray());
+        }finally
+        {
+            zipOutStream.closeEntry();
+        }
+
+        zipOutStream.close();
     }
 
 }
