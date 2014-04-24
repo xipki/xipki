@@ -34,7 +34,8 @@ public class DefaultHttpOCSPRequestor extends AbstractOCSPRequestor
     }
 
     @Override
-    protected byte[] send(byte[] request, URL responderURL) throws IOException
+    protected byte[] send(byte[] request, URL responderURL)
+    throws IOException
     {
         HttpURLConnection httpUrlConnection = (HttpURLConnection) responderURL.openConnection();
         httpUrlConnection.setDoOutput(true);

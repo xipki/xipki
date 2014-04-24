@@ -606,7 +606,7 @@ public class X509CA
             Date notBefore,
             Date notAfter,
             Extensions extensions)
-            throws OperationException, CertAlreadyIssuedException
+    throws OperationException, CertAlreadyIssuedException
     {
         LOG.info("START generateCertificate: CA={}, profile={}, origProfile={}, subject={}",
                 new Object[]{caInfo.getName(), certProfileName, origCertProfile, subject});
@@ -668,7 +668,7 @@ public class X509CA
             Date notBefore,
             Date notAfter,
             Extensions extensions)
-            throws OperationException
+    throws OperationException
     {
         LOG.info("START regenerateCertificate: CA={}, profile={}, origProfile={}, subject={}",
                 new Object[]{caInfo.getName(), certProfileName, origCertProfile, subject});
@@ -859,7 +859,8 @@ public class X509CA
     }
 
     public X509Certificate revocateCertificate(BigInteger serialNumber,
-            CRLReason reason, Date invalidityTime) throws OperationException
+            CRLReason reason, Date invalidityTime)
+    throws OperationException
     {
         LOG.info("START revocateCertificate: ca={}, serialNumber={}, reason={}, invalidityTime={}",
                 new Object[]{caInfo.getName(), serialNumber, reason.getValue(), invalidityTime});
@@ -952,7 +953,7 @@ public class X509CA
             Date notAfter,
             org.bouncycastle.asn1.x509.Extensions extensions,
             boolean keyUpdate)
-        throws OperationException, CertAlreadyIssuedException
+    throws OperationException, CertAlreadyIssuedException
     {
         IdentifiedCertProfile certProfile = getX509CertProfile(certProfileName);
 
@@ -1345,7 +1346,7 @@ public class X509CA
 
     private void addCRLDistributionPoints(X509v3CertificateBuilder certBuilder, CertProfile profile,
             OriginalProfileConf originalProfileConf)
-            throws IOException, CertProfileException
+    throws IOException, CertProfileException
     {
         ExtensionOccurrence extOccurrence;
         if(originalProfileConf != null && originalProfileConf.isCRLDisributionPointsSpecified())
@@ -1426,7 +1427,8 @@ public class X509CA
         }
     }
 
-    public synchronized void commitNextSerial() throws CAMgmtException
+    public synchronized void commitNextSerial()
+    throws CAMgmtException
     {
         long nextSerial = caInfo.getNextSerial();
         long lastCommittedNextSerial = caInfo.getLastCommittedNextSerial();
@@ -1473,7 +1475,7 @@ public class X509CA
     }
 
     private static X500Name incSerialNumber(CertProfile profile, X500Name origName)
-        throws BadCertTemplateException
+    throws BadCertTemplateException
     {
         RDN[] rdns = origName.getRDNs();
 

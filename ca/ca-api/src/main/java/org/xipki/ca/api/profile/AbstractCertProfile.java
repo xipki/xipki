@@ -51,7 +51,8 @@ public abstract class AbstractCertProfile extends CertProfile
 
     protected abstract Integer getPathLenBasicConstraint();
 
-    protected abstract void checkSubjectContent(X500Name requestedSubject) throws BadCertTemplateException;
+    protected abstract void checkSubjectContent(X500Name requestedSubject)
+    throws BadCertTemplateException;
 
     protected abstract Map<ASN1ObjectIdentifier, ExtensionOccurrence> getAdditionalExtensionOccurences();
 
@@ -327,12 +328,13 @@ public abstract class AbstractCertProfile extends CertProfile
 
     @Override
     public void checkPublicKey(SubjectPublicKeyInfo publicKey)
-            throws BadCertTemplateException
+    throws BadCertTemplateException
     {
     }
 
     @Override
-    public void initialize(String data) throws CertProfileException
+    public void initialize(String data)
+    throws CertProfileException
     {
     }
 

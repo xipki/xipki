@@ -126,7 +126,8 @@ public class CaGenRootCACommand extends CaCommand
     private SecurityFactory securityFactory;
 
     @Override
-    protected Object doExecute() throws Exception
+    protected Object doExecute()
+    throws Exception
     {
         CAStatus status = CAStatus.ACTIVE;
         if(caStatus != null)

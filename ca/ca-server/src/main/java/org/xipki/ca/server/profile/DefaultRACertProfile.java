@@ -144,7 +144,7 @@ public class DefaultRACertProfile extends CertProfile
 
     @Override
     public void checkPublicKey(SubjectPublicKeyInfo publicKey)
-            throws BadCertTemplateException
+    throws BadCertTemplateException
     {
     }
 

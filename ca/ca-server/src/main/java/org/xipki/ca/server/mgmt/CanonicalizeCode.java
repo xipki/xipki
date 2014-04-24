@@ -23,10 +23,12 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
 
 import org.xipki.security.common.IoCertUtil;
 
-public class AddLicense
+public class CanonicalizeCode
 {
 
     private final static String licenseText =
@@ -47,6 +49,8 @@ public class AddLicense
      " *\n" +
      " */\n\n";
 
+    private final static String THROWS_PREFIX = "    ";
+
     public static void main(String[] args)
     {
         try
@@ -54,14 +58,16 @@ public class AddLicense
             String dirName = args[0];
 
             File dir = new File(dirName);
-            addLicenseToDir(dir);
+            canonicalizeDir(dir);
+
+            checkWarningsInDir(dir);
         }catch(Exception e)
         {
             e.printStackTrace();
         }
     }
 
-    private static void addLicenseToDir(File dir)
+    private static void canonicalizeDir(File dir)
     throws Exception
     {
         File[] files = dir.listFiles();
@@ -71,17 +77,17 @@ public class AddLicense
             {
                 if(file.getName().equals("target") == false)
                 {
-                    addLicenseToDir(file);
+                    canonicalizeDir(file);
                 }
             }
             else if(file.isFile() && file.getName().endsWith(".java"))
             {
-                addLicenseToFile(file);
+                canonicalizeFile(file);
             }
         }
     }
 
-    private static void addLicenseToFile(File file)
+    private static void canonicalizeFile(File file)
     throws Exception
     {
         BufferedReader reader = new BufferedReader(new FileReader(file));
@@ -231,6 +237,87 @@ public class AddLicense
         sb.append('{');
 
         return sb.toString();
+    }
+
+    private static void checkWarningsInDir(File dir)
+    throws Exception
+    {
+        File[] files = dir.listFiles();
+        for(File file : files)
+        {
+            if(file.isDirectory())
+            {
+                if(file.getName().equals("target") == false)
+                {
+                    checkWarningsInDir(file);
+                }
+            }
+            else if(file.isFile() && file.getName().endsWith(".java"))
+            {
+                checkWarningsInFile(file);
+            }
+        }
+    }
+
+    private static void checkWarningsInFile(File file)
+    throws Exception
+    {
+        BufferedReader reader = new BufferedReader(new FileReader(file));
+
+        List<Integer> lineNumbers = new LinkedList<Integer>();
+
+        int lineNumber = 0;
+        try
+        {
+            String lastLine = null;
+            String line;
+            while((line = reader.readLine()) != null)
+            {
+                lineNumber++;
+                int idx = line.indexOf("throws");
+                if(idx == -1)
+                {
+                    lastLine = line;
+                    continue;
+                }
+
+                if(idx > 0 && line.charAt(idx-1) == '@' || line.charAt(idx-1) == '"' )
+                {
+                    lastLine = line;
+                    continue;
+                }
+
+                String prefix = line.substring(0, idx);
+
+                if(prefix.equals(THROWS_PREFIX) == false)
+                {
+                    // consider inner-class
+                    if(prefix.equals(THROWS_PREFIX + THROWS_PREFIX))
+                    {
+                        if(lastLine != null)
+                        {
+                            String trimmedLastLine = lastLine.trim();
+                            if(lastLine.indexOf(trimmedLastLine) == 2 * THROWS_PREFIX.length())
+                            {
+                                continue;
+                            }
+                        }
+                    }
+                    lineNumbers.add(lineNumber);
+                }
+
+                lastLine = line;
+            }
+        }finally
+        {
+            reader.close();
+        }
+
+        if(lineNumbers.isEmpty() == false)
+        {
+            System.out.println("Please check file " + file.getPath() +
+                ": lines " + Arrays.toString(lineNumbers.toArray(new Integer[0])));
+        }
     }
 
 }

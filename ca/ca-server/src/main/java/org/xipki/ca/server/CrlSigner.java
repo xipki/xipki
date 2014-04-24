@@ -37,7 +37,7 @@ public class CrlSigner
     private boolean includeCertsInCrl;
 
     public CrlSigner(ConcurrentContentSigner signer, int period, int overlap)
-        throws OperationException
+    throws OperationException
     {
         super();
         this.signer = signer;

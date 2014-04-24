@@ -89,7 +89,8 @@ public abstract class CmpRequestor
         this.sender = new GeneralName(x500Name);
     }
 
-    protected abstract byte[] send(byte[] request) throws IOException;
+    protected abstract byte[] send(byte[] request)
+    throws IOException;
 
     public void setSignserviceTimeout(int signserviceTimeout)
     {

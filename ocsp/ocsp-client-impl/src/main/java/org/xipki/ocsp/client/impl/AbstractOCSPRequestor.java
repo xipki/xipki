@@ -52,7 +52,8 @@ public abstract class AbstractOCSPRequestor implements OCSPRequestor
 {
     private SecureRandom random = new SecureRandom();
 
-    protected abstract byte[] send(byte[] request, URL responderUrl) throws IOException;
+    protected abstract byte[] send(byte[] request, URL responderUrl)
+    throws IOException;
 
     protected AbstractOCSPRequestor()
     {

@@ -57,7 +57,8 @@ public class CALoadTest extends AbstractLoadTest
     private final BigInteger baseN;
 
     @Override
-    protected Runnable getTestor() throws Exception
+    protected Runnable getTestor()
+    throws Exception
     {
         return new Testor();
     }
