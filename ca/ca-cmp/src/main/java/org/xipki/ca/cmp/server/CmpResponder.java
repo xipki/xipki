@@ -174,7 +174,7 @@ public abstract class CmpResponder
             if(auditEvent != null)
             {
                 auditEvent.setLevel(AuditLevel.INFO);
-                auditEvent.setStatus(AuditStatus.failed);
+                auditEvent.setStatus(AuditStatus.FAILED);
                 auditEvent.addEventData(new AuditEventData("message", statusText));
             }
             return buildErrorPkiMessage(tid, reqHeader, failureCode, statusText);
@@ -224,7 +224,7 @@ public abstract class CmpResponder
             if(auditEvent != null)
             {
                 auditEvent.setLevel(AuditLevel.INFO);
-                auditEvent.setStatus(AuditStatus.failed);
+                auditEvent.setStatus(AuditStatus.FAILED);
                 auditEvent.addEventData(new AuditEventData("message", errorStatus));
             }
             return buildErrorPkiMessage(tid, reqHeader, PKIFailureInfo.badMessageCheck, errorStatus);
@@ -297,7 +297,7 @@ public abstract class CmpResponder
             if(auditEvent !=  null)
             {
                 auditEvent.setLevel(AuditLevel.ERROR);
-                auditEvent.setStatus(AuditStatus.error);
+                auditEvent.setStatus(AuditStatus.ERROR);
                 auditEvent.addEventData(new AuditEventData("message", "could not sign the PKIMessage"));
             }
             return new PKIMessage(pkiMessage.getHeader(), body);

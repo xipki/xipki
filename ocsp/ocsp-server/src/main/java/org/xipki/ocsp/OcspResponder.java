@@ -66,8 +66,10 @@ import org.slf4j.LoggerFactory;
 import org.xipki.audit.api.AuditEvent;
 import org.xipki.audit.api.AuditEventData;
 import org.xipki.audit.api.AuditLevel;
+import org.xipki.audit.api.AuditLoggingService;
 import org.xipki.audit.api.AuditStatus;
 import org.xipki.audit.api.ChildAuditEvent;
+import org.xipki.audit.api.PCIAuditEvent;
 import org.xipki.database.api.DataSource;
 import org.xipki.database.api.DataSourceFactory;
 import org.xipki.ocsp.api.CertRevocationInfo;
@@ -129,6 +131,8 @@ public class OcspResponder
 
     private String confFile;
 
+    private AuditLoggingService auditLoggingService;
+
     static
     {
         supportedHashAlgorithms.add(HashAlgoType.SHA1);
@@ -143,6 +147,31 @@ public class OcspResponder
     }
 
     public void init()
+    throws OCSPResponderException
+    {
+        boolean successfull = false;
+        try
+        {
+            do_init();
+            successfull = true;
+        }catch(OCSPResponderException e)
+        {
+            throw e;
+        }finally
+        {
+            if(successfull)
+            {
+                LOG.info("Started OCSP Responder");
+            }
+            else
+            {
+                LOG.error("Could not start OCSP Responder");
+            }
+            auditLogPCIEvent(successfull, "START");
+        }
+    }
+
+    private void do_init()
     throws OCSPResponderException
     {
         if(confFile == null)
@@ -400,7 +429,12 @@ public class OcspResponder
                 this.certStatusStores.add(certStatusStore);
             }
         }
+    }
 
+    public void shutdown()
+    {
+        LOG.info("Stopped OCSP Responder");
+        auditLogPCIEvent(true, "SHUTDOWN");
     }
 
     public OCSPResp answer(OCSPReq request, AuditEvent auditEvent)
@@ -418,7 +452,7 @@ public class OcspResponder
                         LOG.warn(message);
                         if(auditEvent != null)
                         {
-                            fillAuditEvent(auditEvent, AuditLevel.INFO, AuditStatus.failed, message);
+                            fillAuditEvent(auditEvent, AuditLevel.INFO, AuditStatus.FAILED, message);
                         }
                         return createUnsuccessfullOCSPResp(CSPResponseStatus.malformedRequest);
                     }
@@ -432,7 +466,7 @@ public class OcspResponder
                         LOG.warn("securityFactory.getContentVerifierProvider, InvalidKeyException: {}", e.getMessage());
                         if(auditEvent != null)
                         {
-                            fillAuditEvent(auditEvent, AuditLevel.ERROR, AuditStatus.error, e.getMessage());
+                            fillAuditEvent(auditEvent, AuditLevel.ERROR, AuditStatus.ERROR, e.getMessage());
                         }
                         return createUnsuccessfullOCSPResp(CSPResponseStatus.malformedRequest);
                     }
@@ -444,7 +478,7 @@ public class OcspResponder
                         LOG.warn(message);
                         if(auditEvent != null)
                         {
-                            fillAuditEvent(auditEvent, AuditLevel.INFO, AuditStatus.failed, message);
+                            fillAuditEvent(auditEvent, AuditLevel.INFO, AuditStatus.FAILED, message);
                         }
                         return createUnsuccessfullOCSPResp(CSPResponseStatus.malformedRequest);
                     }
@@ -458,7 +492,7 @@ public class OcspResponder
                     LOG.warn(message);
                     if(auditEvent != null)
                     {
-                        fillAuditEvent(auditEvent, AuditLevel.INFO, AuditStatus.failed, message);
+                        fillAuditEvent(auditEvent, AuditLevel.INFO, AuditStatus.FAILED, message);
                     }
                     return createUnsuccessfullOCSPResp(CSPResponseStatus.sigRequired);
                 }
@@ -482,7 +516,7 @@ public class OcspResponder
                         StringBuilder sb = new StringBuilder();
                         sb.append("length of nonce ").append(len);
                         sb.append(" not within [").append(reqNonceMinLen).append(", ").append(reqNonceMaxLen);
-                        fillAuditEvent(auditEvent, AuditLevel.INFO, AuditStatus.failed, sb.toString());
+                        fillAuditEvent(auditEvent, AuditLevel.INFO, AuditStatus.FAILED, sb.toString());
                     }
                     return createUnsuccessfullOCSPResp(CSPResponseStatus.malformedRequest);
                 }
@@ -495,7 +529,7 @@ public class OcspResponder
                 LOG.warn(message);
                 if(auditEvent != null)
                 {
-                    fillAuditEvent(auditEvent, AuditLevel.INFO, AuditStatus.failed, message);
+                    fillAuditEvent(auditEvent, AuditLevel.INFO, AuditStatus.FAILED, message);
                 }
                 return createUnsuccessfullOCSPResp(CSPResponseStatus.malformedRequest);
             }
@@ -518,7 +552,7 @@ public class OcspResponder
                     LOG.warn("unknown CertID.hashAlgorithm {}", certIdHashAlgo);
                     if(childAuditEvent != null)
                     {
-                        fillAuditEvent(childAuditEvent, AuditLevel.INFO, AuditStatus.failed,
+                        fillAuditEvent(childAuditEvent, AuditLevel.INFO, AuditStatus.FAILED,
                                 "unknown CertID.hashAlgorithm " + certIdHashAlgo);
                     }
                     return createUnsuccessfullOCSPResp(CSPResponseStatus.malformedRequest);
@@ -528,7 +562,7 @@ public class OcspResponder
                     LOG.warn("CertID.hashAlgorithm {} not allowed", certIdHashAlgo);
                     if(childAuditEvent != null)
                     {
-                        fillAuditEvent(childAuditEvent, AuditLevel.INFO, AuditStatus.failed,
+                        fillAuditEvent(childAuditEvent, AuditLevel.INFO, AuditStatus.FAILED,
                                 "CertID.hashAlgorithm " + certIdHashAlgo + " not allowed");
                     }
                     return createUnsuccessfullOCSPResp(CSPResponseStatus.malformedRequest);
@@ -559,7 +593,7 @@ public class OcspResponder
                         LOG.error("answer() CertStatusStore.getCertStatus", e);
                         if(childAuditEvent != null)
                         {
-                            fillAuditEvent(childAuditEvent, AuditLevel.ERROR, AuditStatus.error,
+                            fillAuditEvent(childAuditEvent, AuditLevel.ERROR, AuditStatus.ERROR,
                                     "CertStatusStore.getCertStatus() with CertStatusStoreException");
                         }
                         return createUnsuccessfullOCSPResp(CSPResponseStatus.tryLater);
@@ -610,7 +644,7 @@ public class OcspResponder
                         LOG.error("answer() bcCertHash.getEncoded", e);
                         if(childAuditEvent != null)
                         {
-                            fillAuditEvent(childAuditEvent, AuditLevel.ERROR, AuditStatus.error,
+                            fillAuditEvent(childAuditEvent, AuditLevel.ERROR, AuditStatus.ERROR,
                                     "CertHash.getEncoded() with IOException");
                         }
                         return createUnsuccessfullOCSPResp(CSPResponseStatus.internalError);
@@ -643,7 +677,7 @@ public class OcspResponder
                 if(childAuditEvent != null)
                 {
                     childAuditEvent.setLevel(AuditLevel.INFO);
-                    childAuditEvent.setStatus(AuditStatus.successfull);
+                    childAuditEvent.setStatus(AuditStatus.SUCCSEEFULL);
                     childAuditEvent.addEventData(new AuditEventData("certStatus", certStatusText));
                 }
 
@@ -683,7 +717,7 @@ public class OcspResponder
                 LOG.debug("answer() basicOcspBuilder.build", e);
                 if(auditEvent != null)
                 {
-                    fillAuditEvent(auditEvent, AuditLevel.ERROR, AuditStatus.error,
+                    fillAuditEvent(auditEvent, AuditLevel.ERROR, AuditStatus.ERROR,
                             "BasicOCSPRespBuilder.build() with OCSPException");
                 }
                 return createUnsuccessfullOCSPResp(CSPResponseStatus.internalError);
@@ -702,7 +736,7 @@ public class OcspResponder
                 LOG.debug("answer() ocspRespBuilder.build", e);
                 if(auditEvent != null)
                 {
-                    fillAuditEvent(auditEvent, AuditLevel.ERROR, AuditStatus.error,
+                    fillAuditEvent(auditEvent, AuditLevel.ERROR, AuditStatus.ERROR,
                             "OCSPRespBuilder.build() with OCSPException");
                 }
                 return createUnsuccessfullOCSPResp(CSPResponseStatus.internalError);
@@ -715,7 +749,7 @@ public class OcspResponder
 
             if(auditEvent != null)
             {
-                fillAuditEvent(auditEvent, AuditLevel.ERROR, AuditStatus.error,
+                fillAuditEvent(auditEvent, AuditLevel.ERROR, AuditStatus.ERROR,
                         "internal error");
             }
 
@@ -830,6 +864,33 @@ public class OcspResponder
         if(message != null)
         {
             auditEvent.addEventData(new AuditEventData("messsage", message));
+        }
+    }
+
+    public void setAuditLoggingService(AuditLoggingService auditLoggingService)
+    {
+        this.auditLoggingService = auditLoggingService;
+    }
+
+    private void auditLogPCIEvent(boolean successfull, String eventType)
+    {
+        if(auditLoggingService != null)
+        {
+            PCIAuditEvent auditEvent = new PCIAuditEvent(new Date());
+            auditEvent.setUserId("SYSTEM");
+            auditEvent.setEventType(eventType);
+            auditEvent.setAffectedResource("CORE");
+            if(successfull)
+            {
+                auditEvent.setStatus(AuditStatus.SUCCSEEFULL.name());
+                auditEvent.setLevel(AuditLevel.INFO);
+            }
+            else
+            {
+                auditEvent.setStatus(AuditStatus.ERROR.name());
+                auditEvent.setLevel(AuditLevel.ERROR);
+            }
+            auditLoggingService.logEvent(auditEvent);
         }
     }
 }
