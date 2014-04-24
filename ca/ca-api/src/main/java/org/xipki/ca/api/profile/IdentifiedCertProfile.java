@@ -45,7 +45,8 @@ public class IdentifiedCertProfile extends CertProfile
     }
 
     @Override
-    public void initialize(String data) throws CertProfileException
+    public void initialize(String data)
+    throws CertProfileException
     {
         certProfile.initialize(data);
     }

@@ -26,7 +26,8 @@ import java.util.concurrent.TimeUnit;
 
 public abstract class AbstractLoadTest
 {
-    protected abstract Runnable getTestor() throws Exception;
+    protected abstract Runnable getTestor()
+    throws Exception;
 
     public void test()
     {

@@ -60,7 +60,7 @@ public class Rfc6712Servlet extends HttpServlet
 
     @Override
     public void doPost(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException
+    throws ServletException, IOException
     {
         AuditEvent auditEvent = (auditLoggingService != null) ? new AuditEvent(new Date()) : null;
         auditEvent.setApplicationName("CA");
@@ -215,7 +215,8 @@ public class Rfc6712Servlet extends HttpServlet
         }
     }
 
-    protected PKIMessage generatePKIMessage(InputStream is) throws IOException
+    protected PKIMessage generatePKIMessage(InputStream is)
+    throws IOException
     {
         ASN1InputStream asn1Stream = new ASN1InputStream(is);
 

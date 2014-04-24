@@ -1256,7 +1256,8 @@ class CertStoreQueryExecutor
      *         if no PreparedStament can be created within 5 seconds
      * @throws SQLException
      */
-    private PreparedStatement borrowPreparedStatement(String sqlQuery) throws SQLException
+    private PreparedStatement borrowPreparedStatement(String sqlQuery)
+    throws SQLException
     {
         PreparedStatement ps = null;
         Connection c = dataSource.getConnection(5000);

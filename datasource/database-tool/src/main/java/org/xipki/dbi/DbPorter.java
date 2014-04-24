@@ -50,7 +50,8 @@ class DbPorter
         this.baseDir = baseDir;
     }
 
-    protected Statement createStatement() throws SQLException
+    protected Statement createStatement()
+    throws SQLException
     {
         if(dsConnection == null || dsConnection.isClosed())
         {

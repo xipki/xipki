@@ -211,7 +211,7 @@ public class SoftTokenContentSignerBuilder
 
     private static class RSAContentSignerBuilder extends BcContentSignerBuilder
     {
-        RSAContentSignerBuilder(AlgorithmIdentifier signatureAlgId)
+        private RSAContentSignerBuilder(AlgorithmIdentifier signatureAlgId)
         throws NoSuchAlgorithmException, NoSuchPaddingException
         {
             super(signatureAlgId, SignerUtil.extractDigesetAlgorithmIdentifier(signatureAlgId));
@@ -235,7 +235,7 @@ public class SoftTokenContentSignerBuilder
 
     private static class DSAContentSignerBuilder extends BcContentSignerBuilder
     {
-        DSAContentSignerBuilder(AlgorithmIdentifier signatureAlgId)
+        private DSAContentSignerBuilder(AlgorithmIdentifier signatureAlgId)
         throws NoSuchAlgorithmException
         {
             super(signatureAlgId, SignerUtil.extractDigesetAlgorithmIdentifier(signatureAlgId));
@@ -251,7 +251,7 @@ public class SoftTokenContentSignerBuilder
 
     private static class ECDSAContentSignerBuilder extends BcContentSignerBuilder
     {
-        ECDSAContentSignerBuilder(AlgorithmIdentifier signatureAlgId)
+        private ECDSAContentSignerBuilder(AlgorithmIdentifier signatureAlgId)
         throws NoSuchAlgorithmException
         {
             super(signatureAlgId, SignerUtil.extractDigesetAlgorithmIdentifier(signatureAlgId));

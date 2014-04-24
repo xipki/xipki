@@ -35,14 +35,14 @@ public class RequestorAddCommand extends CaCommand
             required = true)
     protected String            certFile;
 
-@Override
-protected Object doExecute()
-throws Exception
-{
-    CmpRequestorEntry entry = new CmpRequestorEntry(name);
-    entry.setCert(IoCertUtil.parseCert(certFile));
-    caManager.addCmpRequestor(entry);
+    @Override
+    protected Object doExecute()
+    throws Exception
+    {
+        CmpRequestorEntry entry = new CmpRequestorEntry(name);
+        entry.setCert(IoCertUtil.parseCert(certFile));
+        caManager.addCmpRequestor(entry);
 
-    return null;
-}
+        return null;
+    }
 }

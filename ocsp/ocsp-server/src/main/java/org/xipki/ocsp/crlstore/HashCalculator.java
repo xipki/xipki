@@ -31,7 +31,8 @@ class HashCalculator
     private MessageDigest sha384;
     private MessageDigest sha512;
 
-    HashCalculator() throws NoSuchAlgorithmException
+    HashCalculator()
+    throws NoSuchAlgorithmException
     {
         sha1   = MessageDigest.getInstance("SHA-1");
         sha224 = MessageDigest.getInstance("SHA-224");
