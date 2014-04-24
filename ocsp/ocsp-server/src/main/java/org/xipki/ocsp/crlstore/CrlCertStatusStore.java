@@ -50,6 +50,10 @@ import org.bouncycastle.asn1.x509.Extension;
 import org.bouncycastle.crypto.digests.SHA1Digest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xipki.audit.api.AuditLevel;
+import org.xipki.audit.api.AuditLoggingService;
+import org.xipki.audit.api.AuditStatus;
+import org.xipki.audit.api.PCIAuditEvent;
 import org.xipki.ocsp.IssuerHashNameAndKey;
 import org.xipki.ocsp.api.CertRevocationInfo;
 import org.xipki.ocsp.api.CertStatusInfo;
@@ -92,6 +96,8 @@ public class CrlCertStatusStore implements CertStatusStore
     private final Map<HashAlgoType, IssuerHashNameAndKey> issuerHashMap =
             new ConcurrentHashMap<HashAlgoType, IssuerHashNameAndKey>();
 
+    private AuditLoggingService auditLoggingService;
+
     private boolean initialized = false;
 
     public CrlCertStatusStore(String name, String crlFile, X509Certificate caCert, boolean useUpdateDatesFromCRL,
@@ -125,6 +131,8 @@ public class CrlCertStatusStore implements CertStatusStore
 
     private synchronized void initializeStore(boolean force)
     {
+    	Boolean updateCRLSuccessfull = null;
+    	
         try
         {
             File f = new File(crlFile);
@@ -183,11 +191,14 @@ public class CrlCertStatusStore implements CertStatusStore
 
             if(Arrays.equals(newFp, fpOfCrlFile))
             {
+            	auditLogPCIEvent(AuditLevel.INFO, "UPDATE_CERTSTORE", "current CRL is still up-to-date");
                 return;
             }
 
             LOG.info("CRL file {} has changed, updating of the CertStore required", crlFile);
-
+        	auditLogPCIEvent(AuditLevel.INFO, "UPDATE_CERTSTORE", "a newer version of CRL is available");
+        	updateCRLSuccessfull = false;
+        	
             X509CRL crl = IoCertUtil.parseCRL(crlFile);
 
             X500Principal issuer = crl.getIssuerX500Principal();
@@ -374,12 +385,33 @@ public class CrlCertStatusStore implements CertStatusStore
             this.thisUpdate = newThisUpdate;
             this.nextUpdate = newNextUpdate;
             this.initialized = true;
-            LOG.info("Updated CertStore {}", name);
+            updateCRLSuccessfull = true;
+            LOG.info("Updated CertStore {}", name);            
         } catch (Exception e)
         {
             LOG.error("Could not executing initializeStore() for {},  {}: {}",
                     new Object[]{name, e.getClass().getName(), e.getMessage()});
             LOG.debug("Could not executing initializeStore()", e);
+        } finally
+        {
+        	if(updateCRLSuccessfull != null)
+        	{
+        		AuditLevel auditLevel;
+        		AuditStatus auditStatus;
+        		String eventType = "UPDATE_CRL";
+        		if(updateCRLSuccessfull)
+        		{
+        			auditLevel = AuditLevel.INFO;
+        			auditStatus = AuditStatus.FAILED;
+        		}
+        		else
+        		{
+        			auditLevel = AuditLevel.ERROR;
+        			auditStatus = AuditStatus.SUCCSEEFULL;
+        		}
+        		
+        		auditLogPCIEvent(auditLevel, eventType, auditStatus.name());
+        	}
         }
     }
 
@@ -498,4 +530,29 @@ public class CrlCertStatusStore implements CertStatusStore
         return name;
     }
 
+    @Override
+    public AuditLoggingService getAuditLoggingService()
+    {
+    	return auditLoggingService;
+    }
+    
+    @Override
+    public void setAuditLoggingService(AuditLoggingService auditLoggingService)
+    {
+        this.auditLoggingService = auditLoggingService;
+    }
+
+    private void auditLogPCIEvent(AuditLevel auditLevel, String eventType, String auditStatus)
+    {
+        if(auditLoggingService != null)
+        {
+            PCIAuditEvent auditEvent = new PCIAuditEvent(new Date());
+            auditEvent.setUserId("SYSTEM");
+            auditEvent.setEventType(eventType);
+            auditEvent.setAffectedResource("CRL-Updater");
+            auditEvent.setStatus(auditStatus);
+            auditEvent.setLevel(auditLevel);
+            auditLoggingService.logEvent(auditEvent);
+        }
+    }
 }

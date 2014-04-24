@@ -870,6 +870,10 @@ public class OcspResponder
     public void setAuditLoggingService(AuditLoggingService auditLoggingService)
     {
         this.auditLoggingService = auditLoggingService;
+        for(CertStatusStore store : certStatusStores)
+        {
+        	store.setAuditLoggingService(auditLoggingService);
+        }
     }
 
     private void auditLogPCIEvent(boolean successfull, String eventType)
