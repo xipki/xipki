@@ -117,7 +117,8 @@ abstract class X509CmpRequestor extends CmpRequestor
         this.caCert = caCert;
     }
 
-    protected abstract byte[] send(byte[] request) throws IOException;
+    protected abstract byte[] send(byte[] request)
+    throws IOException;
 
     public X509Certificate getCaCert()
     {
@@ -664,7 +665,7 @@ abstract class X509CmpRequestor extends CmpRequestor
     }
 
     public PKIMessage envelope(CertReqMsg req)
-            throws CmpRequestorException
+    throws CmpRequestorException
     {
         PKIMessage request = buildPKIMessage(req);
         return sign(request);

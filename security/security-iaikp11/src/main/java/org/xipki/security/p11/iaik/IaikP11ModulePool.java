@@ -127,7 +127,8 @@ public class IaikP11ModulePool
     }
 
     @Override
-    protected void finalize() throws Throwable
+    protected void finalize()
+    throws Throwable
     {
         super.finalize();
         shutdown();

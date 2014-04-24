@@ -69,7 +69,8 @@ class CaConfigurationDbImporter extends DbPorter
         this.unmarshaller = unmarshaller;
     }
 
-    public void importToDB() throws Exception
+    public void importToDB()
+    throws Exception
     {
         @SuppressWarnings("unchecked")
         JAXBElement<CAConfigurationType> root = (JAXBElement<CAConfigurationType>)

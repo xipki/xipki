@@ -77,7 +77,9 @@ public abstract class P12KeypairGenerator
     private final int serialNumber = 1;
     private final int validity = 3650;
 
-    protected abstract KeyPairWithSubjectPublicKeyInfo genKeypair() throws Exception;
+    protected abstract KeyPairWithSubjectPublicKeyInfo genKeypair()
+    throws Exception;
+
     protected abstract String getKeyAlgorithm();
 
     public P12KeypairGenerator(char[] password, String subject)
@@ -226,19 +228,19 @@ public abstract class P12KeypairGenerator
         }
     }
 
-     static class KeyAndCertPair
-     {
-         private final X509CertificateHolder cert;
-         private final X509Certificate jceCert;
-         private final PrivateKey key;
+    static class KeyAndCertPair
+    {
+        private final X509CertificateHolder cert;
+        private final X509Certificate jceCert;
+        private final PrivateKey key;
 
-         KeyAndCertPair(X509CertificateHolder cert, PrivateKey key)
-         throws CertificateParsingException
-         {
-             this.cert = cert;
-             this.key = key;
-             // Due to bug in BC we must reparse the certificate from ByteArray
-             org.bouncycastle.asn1.x509.Certificate cert2;
+        KeyAndCertPair(X509CertificateHolder cert, PrivateKey key)
+        throws CertificateParsingException
+        {
+            this.cert = cert;
+            this.key = key;
+            // Due to bug in BC we must reparse the certificate from ByteArray
+            org.bouncycastle.asn1.x509.Certificate cert2;
             try
             {
                 cert2 = org.bouncycastle.asn1.x509.Certificate.getInstance(cert.getEncoded());
@@ -246,8 +248,8 @@ public abstract class P12KeypairGenerator
             {
                 throw new CertificateParsingException(e);
             }
-             this.jceCert = new X509CertificateObject(cert2);
-         }
+            this.jceCert = new X509CertificateObject(cert2);
+        }
 
         public X509CertificateHolder getCert()
         {
@@ -263,146 +265,143 @@ public abstract class P12KeypairGenerator
         {
             return key;
         }
-     }
+    }
 
-     public static class ECDSAIdentityGenerator extends P12KeypairGenerator
-     {
-         private String curveName;
-         private ASN1ObjectIdentifier curveOid;
+    public static class ECDSAIdentityGenerator extends P12KeypairGenerator
+    {
+        private String curveName;
+        private ASN1ObjectIdentifier curveOid;
 
-         public ECDSAIdentityGenerator(String curveNameOrOid, char[] password,
-                 String subject)
-         throws Exception
-         {
-             super(password, subject);
+        public ECDSAIdentityGenerator(String curveNameOrOid, char[] password, String subject)
+        throws Exception
+        {
+            super(password, subject);
 
-             boolean isOid;
-             try
-             {
-                 new ASN1ObjectIdentifier(curveNameOrOid);
-                 isOid = true;
-             }catch(Exception e)
-             {
-                 isOid = false;
-             }
+            boolean isOid;
+            try
+            {
+                new ASN1ObjectIdentifier(curveNameOrOid);
+                isOid = true;
+            }catch(Exception e)
+            {
+                isOid = false;
+            }
 
-             if(isOid)
-             {
-                 this.curveOid = new ASN1ObjectIdentifier(curveNameOrOid);
-                 this.curveName = getCurveName(this.curveOid);
-             }
-             else
-             {
-                 this.curveName = curveNameOrOid;
-                 this.curveOid = getCurveOID(this.curveName);
-                 if(this.curveOid == null)
-                 {
-                     throw new IllegalArgumentException("No OID is defined for the curve " + this.curveName);
-                 }
-             }
-         }
+            if(isOid)
+            {
+                this.curveOid = new ASN1ObjectIdentifier(curveNameOrOid);
+                this.curveName = getCurveName(this.curveOid);
+            }
+            else
+            {
+                this.curveName = curveNameOrOid;
+                this.curveOid = getCurveOID(this.curveName);
+                if(this.curveOid == null)
+                {
+                    throw new IllegalArgumentException("No OID is defined for the curve " + this.curveName);
+                }
+            }
+        }
 
-         @Override
-         protected KeyPairWithSubjectPublicKeyInfo genKeypair()
-         throws Exception
-         {
-             KeyPairGenerator kpgen = KeyPairGenerator.getInstance("ECDSA", "BC");
-             ECNamedCurveParameterSpec spec = ECNamedCurveTable.getParameterSpec(curveName);
-             kpgen.initialize(spec);
-             KeyPair kp = kpgen.generateKeyPair();
+        @Override
+        protected KeyPairWithSubjectPublicKeyInfo genKeypair()
+        throws Exception
+        {
+            KeyPairGenerator kpgen = KeyPairGenerator.getInstance("ECDSA", "BC");
+            ECNamedCurveParameterSpec spec = ECNamedCurveTable.getParameterSpec(curveName);
+            kpgen.initialize(spec);
+            KeyPair kp = kpgen.generateKeyPair();
 
-             AlgorithmIdentifier algId = new AlgorithmIdentifier(X9ObjectIdentifiers.id_ecPublicKey,
+            AlgorithmIdentifier algId = new AlgorithmIdentifier(X9ObjectIdentifiers.id_ecPublicKey,
                      this.curveOid);
 
-             BCECPublicKey pub = (BCECPublicKey) kp.getPublic();
+            BCECPublicKey pub = (BCECPublicKey) kp.getPublic();
 
-             ASN1OctetString p = (ASN1OctetString)new X9ECPoint(pub.getQ()).toASN1Primitive();
-             SubjectPublicKeyInfo subjectPublicKeyInfo = new SubjectPublicKeyInfo(algId, p.getOctets());
+            ASN1OctetString p = (ASN1OctetString)new X9ECPoint(pub.getQ()).toASN1Primitive();
+            SubjectPublicKeyInfo subjectPublicKeyInfo = new SubjectPublicKeyInfo(algId, p.getOctets());
 
-             return new KeyPairWithSubjectPublicKeyInfo(kp, subjectPublicKeyInfo);
-         }
+            return new KeyPairWithSubjectPublicKeyInfo(kp, subjectPublicKeyInfo);
+        }
 
-         @Override
-         protected String getKeyAlgorithm()
-         {
-                return "ECDSA";
-         }
+        @Override
+        protected String getKeyAlgorithm()
+        {
+            return "ECDSA";
+        }
 
-         public static ASN1ObjectIdentifier getCurveOID(String curveName)
-         {
-             ASN1ObjectIdentifier curveOID = X962NamedCurves.getOID(curveName);
-             if(curveOID == null)
-             {
-                 curveOID = SECNamedCurves.getOID(curveName);
-             }
-             if(curveOID == null)
-             {
-                 curveOID = TeleTrusTNamedCurves.getOID(curveName);
-             }
-             if(curveOID == null)
-             {
-                 curveOID = NISTNamedCurves.getOID(curveName);
-             }
+        public static ASN1ObjectIdentifier getCurveOID(String curveName)
+        {
+            ASN1ObjectIdentifier curveOID = X962NamedCurves.getOID(curveName);
+            if(curveOID == null)
+            {
+                curveOID = SECNamedCurves.getOID(curveName);
+            }
+            if(curveOID == null)
+            {
+                curveOID = TeleTrusTNamedCurves.getOID(curveName);
+            }
+            if(curveOID == null)
+            {
+                curveOID = NISTNamedCurves.getOID(curveName);
+            }
 
-             return curveOID;
-         }
+            return curveOID;
+        }
 
-         public static String getCurveName(ASN1ObjectIdentifier curveOID)
-         {
-             String curveName = X962NamedCurves.getName(curveOID);
-             if(curveName == null)
-             {
-                 curveName = SECNamedCurves.getName(curveOID);
-             }
-             if(curveName == null)
-             {
-                 curveName = TeleTrusTNamedCurves.getName(curveOID);
-             }
-             if(curveName == null)
-             {
-                 curveName = NISTNamedCurves.getName(curveOID);
-             }
+        public static String getCurveName(ASN1ObjectIdentifier curveOID)
+        {
+            String curveName = X962NamedCurves.getName(curveOID);
+            if(curveName == null)
+            {
+                curveName = SECNamedCurves.getName(curveOID);
+            }
+            if(curveName == null)
+            {
+                curveName = TeleTrusTNamedCurves.getName(curveOID);
+            }
+            if(curveName == null)
+            {
+                curveName = NISTNamedCurves.getName(curveOID);
+            }
 
-             return curveName;
-         }
+            return curveName;
+        }
 
-     }
+    }
 
-     public static class RSAIdentityGenerator extends P12KeypairGenerator
-     {
-         private int keysize;
-         private BigInteger publicExponent;
+    public static class RSAIdentityGenerator extends P12KeypairGenerator
+    {
+        private int keysize;
+        private BigInteger publicExponent;
 
-         public RSAIdentityGenerator(
-                 int keysize, BigInteger publicExponent,
-                 char[] password, String subject)
-         throws Exception
-         {
-             super(password, subject);
+        public RSAIdentityGenerator(int keysize, BigInteger publicExponent, char[] password, String subject)
+        throws Exception
+        {
+            super(password, subject);
 
-             this.keysize = keysize;
-             this.publicExponent = publicExponent;
-         }
+            this.keysize = keysize;
+            this.publicExponent = publicExponent;
+        }
 
-         @Override
-         protected KeyPairWithSubjectPublicKeyInfo genKeypair()
-         throws Exception
-         {
-             KeyPairGenerator kpgen = KeyPairGenerator.getInstance("RSA", "BC");
-             RSAKeyGenParameterSpec spec = new RSAKeyGenParameterSpec(keysize, publicExponent);
-             kpgen.initialize(spec);
-             KeyPair kp =  kpgen.generateKeyPair();
+        @Override
+        protected KeyPairWithSubjectPublicKeyInfo genKeypair()
+        throws Exception
+        {
+            KeyPairGenerator kpgen = KeyPairGenerator.getInstance("RSA", "BC");
+            RSAKeyGenParameterSpec spec = new RSAKeyGenParameterSpec(keysize, publicExponent);
+            kpgen.initialize(spec);
+            KeyPair kp =  kpgen.generateKeyPair();
 
-             SubjectPublicKeyInfo spki = SubjectPublicKeyInfoFactory.createSubjectPublicKeyInfo(
-                     KeyUtil.generatePublicKeyParameter(kp.getPublic()));
-             return new KeyPairWithSubjectPublicKeyInfo(kp, spki);
-         }
+            SubjectPublicKeyInfo spki = SubjectPublicKeyInfoFactory.createSubjectPublicKeyInfo(
+                    KeyUtil.generatePublicKeyParameter(kp.getPublic()));
+            return new KeyPairWithSubjectPublicKeyInfo(kp, spki);
+        }
 
-         @Override
-         protected String getKeyAlgorithm()
-         {
-             return "RSA";
-         }
+        @Override
+        protected String getKeyAlgorithm()
+        {
+            return "RSA";
+        }
     }
 
 }

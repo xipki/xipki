@@ -488,7 +488,8 @@ public final class IaikP11CryptService implements P11CryptService
 
     @Override
     public X509Certificate[] getCertificates(PKCS11SlotIdentifier slotId,
-            Pkcs11KeyIdentifier keyId) throws SignerException
+            Pkcs11KeyIdentifier keyId)
+    throws SignerException
     {
         X509Certificate cert = getCertificate(slotId, keyId);
         if(cert == null)

@@ -123,7 +123,8 @@ public class P12CertUpdateCommand extends OsgiCommandSupport
         }
     }
 
-    private void assertMatch(X509Certificate cert) throws SignerException, PasswordResolverException
+    private void assertMatch(X509Certificate cert)
+    throws SignerException, PasswordResolverException
     {
         CmpUtf8Pairs pairs = new CmpUtf8Pairs("keystore", "file:" + p12File);
         if(password != null)

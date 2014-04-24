@@ -155,7 +155,7 @@ public class P12CertRequestGenCommand extends OsgiCommandSupport
     }
 
     private static boolean isEcKey(String p12File, char[] password)
-        throws SignerException, FileNotFoundException
+    throws SignerException, FileNotFoundException
     {
         FileInputStream fIn = new FileInputStream(p12File);
 
