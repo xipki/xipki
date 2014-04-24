@@ -111,7 +111,7 @@ class RSADigestSignatureSpi
     }
 
     protected byte[] engineSign()
-        throws SignatureException
+    throws SignatureException
     {
         byte[]  hash = new byte[digest.getDigestSize()];
 

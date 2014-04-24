@@ -144,7 +144,7 @@ class ECDSASignatureSpi
         byte[]  b,
         int     off,
         int     len)
-        throws SignatureException
+    throws SignatureException
     {
         digest.update(b, off, len);
     }
@@ -197,7 +197,7 @@ class ECDSASignatureSpi
 
     protected boolean engineVerify(
         byte[]  sigBytes)
-        throws SignatureException
+    throws SignatureException
     {
         throw new UnsupportedOperationException("engineVerify unsupported");
     }

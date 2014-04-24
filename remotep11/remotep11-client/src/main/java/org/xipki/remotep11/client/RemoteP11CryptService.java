@@ -78,7 +78,8 @@ public abstract class RemoteP11CryptService implements P11CryptService
     {
     }
 
-    protected abstract byte[] send(byte[] request) throws IOException;
+    protected abstract byte[] send(byte[] request)
+    throws IOException;
 
     public int getServerVersion()
     throws SignerException

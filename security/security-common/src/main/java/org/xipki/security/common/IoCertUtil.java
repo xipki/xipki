@@ -48,7 +48,8 @@ public class IoCertUtil
 {
     private static final SHA1Digest sha1 = new SHA1Digest();
 
-    public static byte[] read(String fileName) throws IOException
+    public static byte[] read(String fileName)
+    throws IOException
     {
         return read(new File(fileName));
     }

@@ -163,7 +163,8 @@ public class P11CertUpdateCommand extends OsgiCommandSupport
         return null;
     }
 
-    private void assertMatch(X509Certificate cert) throws SignerException, PasswordResolverException
+    private void assertMatch(X509Certificate cert)
+    throws SignerException, PasswordResolverException
     {
         CmpUtf8Pairs pairs = new CmpUtf8Pairs("slot", slotIndex.toString());
         if(password != null)
