@@ -30,8 +30,8 @@ public interface CertStatusStore
     boolean isHealthy();
 
     String getName();
-    
+
     void setAuditLoggingService(AuditLoggingService auditLoggingService);
-    
+
     AuditLoggingService getAuditLoggingService();
 }

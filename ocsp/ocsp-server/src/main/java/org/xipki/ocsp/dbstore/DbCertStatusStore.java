@@ -406,13 +406,13 @@ public class DbCertStatusStore implements CertStatusStore
     {
         return name;
     }
-    
+
     @Override
     public AuditLoggingService getAuditLoggingService()
     {
-    	return auditLoggingService;
+        return auditLoggingService;
     }
-    
+
     @Override
     public void setAuditLoggingService(AuditLoggingService auditLoggingService)
     {

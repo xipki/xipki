@@ -70,6 +70,7 @@
 		<feature>xipki-datasource</feature>
 		<feature>xipki-security</feature>
 		<feature>xipki-ca-api</feature>
+		<feature>xipki-audit-slf4j</feature>
 		<bundle>mvn:org.xipki/ca-cmp/${project.version}</bundle>
 		<bundle>mvn:org.xipki/ca-server/${project.version}</bundle>
 	</feature>
@@ -99,6 +100,7 @@
 	<feature name="xipki-ocspserver" version="${project.version}" resolver="(obr)">
 		<feature>xipki-datasource</feature>
 		<feature>xipki-security</feature>
+		<feature>xipki-audit-slf4j</feature>
 		<bundle>mvn:org.xipki/audit-api/${project.version}</bundle>
 		<bundle>mvn:org.xipki/ocsp-api/${project.version}</bundle>
 		<bundle>mvn:org.xipki/ocsp-server/${project.version}</bundle>
@@ -118,9 +120,9 @@
 		<bundle>mvn:org.xipki/database-tool/${project.version}</bundle>
 	</feature>
 
-        <feature name="xipki-audit-slf4j" version="${project.version}" resolver="(obr)">
-                <bundle>mvn:org.xipki/audit-api/${project.version}</bundle>
-                <bundle>mvn:org.xipki/slf4j-audit-impl/${project.version}</bundle>
-        </feature>
+    <feature name="xipki-audit-slf4j" version="${project.version}" resolver="(obr)">
+        <bundle>mvn:org.xipki/audit-api/${project.version}</bundle>
+        <bundle>mvn:org.xipki/slf4j-audit-impl/${project.version}</bundle>
+    </feature>
 
 </features>
