@@ -118,7 +118,7 @@ public class SyslogAuditLoggingServiceImpl implements AuditLoggingService
         AuditStatus status = event.getStatus();
         if(status == null)
         {
-            status = AuditStatus.undefined;
+            status = AuditStatus.UNDEFINED;
         }
         sb.append("\tstatus: ").append(status.name());
 
