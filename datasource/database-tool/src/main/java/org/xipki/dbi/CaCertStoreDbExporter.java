@@ -27,6 +27,12 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -68,8 +74,10 @@ class CaCertStoreDbExporter extends DbPorter
     private final ObjectFactory objFact = new ObjectFactory();
 
     private final int numCertsInBundle;
+    private final int numCrls;
 
-    CaCertStoreDbExporter(DataSource dataSource, Marshaller marshaller, String baseDir, int numCertsInBundle)
+    CaCertStoreDbExporter(DataSource dataSource, Marshaller marshaller, String baseDir,
+            int numCertsInBundle, int numCrls)
     throws SQLException, PasswordResolverException, IOException
     {
         super(dataSource, baseDir);
@@ -79,6 +87,12 @@ class CaCertStoreDbExporter extends DbPorter
             numCertsInBundle = 1;
         }
         this.numCertsInBundle = numCertsInBundle;
+
+        if(numCrls < 1)
+        {
+            numCrls = 1;
+        }
+        this.numCrls = numCrls;
 
         this.marshaller = marshaller;
     }
@@ -117,31 +131,62 @@ class CaCertStoreDbExporter extends DbPorter
         try
         {
             stmt = createStatement();
-            String sql = "SELECT id, cainfo_id, crl FROM crl";
+            String sql = "SELECT id, cainfo_id FROM crl";
             ResultSet rs = stmt.executeQuery(sql);
 
-            File crlDir = new File(baseDir + File.separator + DIRNAME_CRL);
+            Map<Integer, List<Integer>> idMap = new HashMap<Integer, List<Integer>>();
+
             while(rs.next())
             {
                 int id = rs.getInt("id");
                 int cainfo_id = rs.getInt("cainfo_id");
-                Blob blob = rs.getBlob("crl");
-
-                byte[] encodedCrl = readBlob(blob);
-                String fp = fp(encodedCrl);
-                File f = new File(crlDir, fp);
-                IoCertUtil.save(f, encodedCrl);
-
-                CrlType crl = new CrlType();
-
-                crl.setId(id);
-                crl.setCainfoId(cainfo_id);
-                crl.setCrlFile("CRL/" + fp);
-
-                crls.getCrl().add(crl);
+                List<Integer> ids = idMap.get(cainfo_id);
+                if(ids == null)
+                {
+                    ids = new LinkedList<Integer>();
+                    idMap.put(cainfo_id, ids);
+                }
+                ids.add(id);
             }
-
             rs.close();
+
+            Set<Integer> cainfo_ids = idMap.keySet();
+            for(Integer cainfo_id : cainfo_ids)
+            {
+                List<Integer> ids = idMap.get(cainfo_id);
+                if(ids.isEmpty())
+                {
+                    continue;
+                }
+
+                Collections.sort(ids);
+                int startIndex = Math.max(0, ids.size() - numCrls);
+                for(int i = startIndex; i < ids.size(); i++)
+                {
+                    int id = ids.get(i);
+                    rs = stmt.executeQuery("SELECT crl FROM crl WHERE id=" + id);
+                    if(rs.next() == false)
+                    {
+                        continue;
+                    }
+
+                    Blob blob = rs.getBlob("crl");
+                    byte[] encodedCrl = readBlob(blob);
+                    rs.close();
+
+                    String fp = fp(encodedCrl);
+                    File f = new File(baseDir, "CRL" + File.separator + fp + ".crl");
+                    IoCertUtil.save(f, encodedCrl);
+
+                    CrlType crl = new CrlType();
+
+                    crl.setId(id);
+                    crl.setCainfoId(cainfo_id);
+                    crl.setCrlFile("CRL/" + fp + ".crl");
+
+                    crls.getCrl().add(crl);
+                }
+            }
             rs = null;
         }finally
         {
