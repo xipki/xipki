@@ -35,12 +35,10 @@ import org.xipki.dbi.ca.jaxb.CAConfigurationType.CaHasRequestors;
 import org.xipki.dbi.ca.jaxb.CAConfigurationType.Caaliases;
 import org.xipki.dbi.ca.jaxb.CAConfigurationType.Cas;
 import org.xipki.dbi.ca.jaxb.CAConfigurationType.Certprofiles;
-import org.xipki.dbi.ca.jaxb.CAConfigurationType.Cmpcontrols;
 import org.xipki.dbi.ca.jaxb.CAConfigurationType.Crlsigners;
 import org.xipki.dbi.ca.jaxb.CAConfigurationType.Environments;
 import org.xipki.dbi.ca.jaxb.CAConfigurationType.Publishers;
 import org.xipki.dbi.ca.jaxb.CAConfigurationType.Requestors;
-import org.xipki.dbi.ca.jaxb.CAConfigurationType.Responders;
 import org.xipki.dbi.ca.jaxb.CaHasCertprofileType;
 import org.xipki.dbi.ca.jaxb.CaHasPublisherType;
 import org.xipki.dbi.ca.jaxb.CaHasRequestorType;
@@ -77,9 +75,17 @@ class CaConfigurationDbExporter extends DbPorter
 
         System.out.println("Exporting CA configuration to database");
 
-        caconf.setCmpcontrols(export_cmpcontrol());
+        CmpcontrolType cmpcontrol = export_cmpcontrol();
+        if(cmpcontrol != null)
+        {
+            caconf.setCmpcontrol(cmpcontrol);
+        }
 
-        caconf.setResponders(export_responder());
+        ResponderType responder = export_responder();
+        if(responder != null)
+        {
+            caconf.setResponder(responder);
+        }
 
         caconf.setEnvironments(export_environment());
 
@@ -107,32 +113,28 @@ class CaConfigurationDbExporter extends DbPorter
         System.out.println("Exporting CA configuration to database");
     }
 
-    private Cmpcontrols export_cmpcontrol()
+    private CmpcontrolType export_cmpcontrol()
     throws SQLException
     {
+        CmpcontrolType cmpcontrol = null;
         System.out.println("Exporting table cmpcontrol");
-        Cmpcontrols cmpcontrols = new Cmpcontrols();
         Statement stmt = null;
         try
         {
             stmt = createStatement();
-            String sql = "SELECT name, require_confirm_cert, send_ca_cert, "
+            String sql = "SELECT require_confirm_cert, send_ca_cert, "
                     + " message_time_bias, confirm_wait_time"
                     + " FROM cmpcontrol";
             ResultSet rs = stmt.executeQuery(sql);
 
-            while(rs.next())
+            if(rs.next())
             {
-                String name = rs.getString("name");
                 boolean requireConfirmCert = rs.getBoolean("require_confirm_cert");
                 boolean sendCaCert = rs.getBoolean("send_ca_cert");
                 int messageTimeBias = rs.getInt("message_time_bias");
                 int confirmWaitTime = rs.getInt("confirm_wait_time");
 
-                CmpcontrolType cmpcontrol = new CmpcontrolType();
-                cmpcontrols.getCmpcontrol().add(cmpcontrol);
-
-                cmpcontrol.setName(name);
+                cmpcontrol = new CmpcontrolType();
                 cmpcontrol.setRequireConfirmCert(requireConfirmCert);
                 cmpcontrol.setSendCaCert(sendCaCert);
                 cmpcontrol.setMessageTimeBias(messageTimeBias);
@@ -147,7 +149,7 @@ class CaConfigurationDbExporter extends DbPorter
         }
 
         System.out.println("Exported table cmpcontrol");
-        return cmpcontrols;
+        return cmpcontrol;
     }
 
     private Environments export_environment()
@@ -310,33 +312,29 @@ class CaConfigurationDbExporter extends DbPorter
         return requestors;
     }
 
-    private Responders export_responder()
+    private ResponderType export_responder()
     throws XMLStreamException, SQLException
     {
         System.out.println("Exporting table responder");
-        Responders responders = new Responders();
+        ResponderType responder = null;
 
         Statement stmt = null;
         try
         {
             stmt = createStatement();
-            String sql = "SELECT name, type, cert, conf FROM responder";
+            String sql = "SELECT type, cert, conf FROM responder";
             ResultSet rs = stmt.executeQuery(sql);
 
             while(rs.next())
             {
-                String name = rs.getString("name");
                 String type = rs.getString("type");
                 String conf = rs.getString("conf");
                 String cert = rs.getString("cert");
 
-                ResponderType responder = new ResponderType();
-                responder.setName(name);
+                responder = new ResponderType();
                 responder.setType(type);
                 responder.setConf(conf);
                 responder.setCert(cert);
-
-                responders.getResponder().add(responder);
             }
 
             rs.close();
@@ -347,7 +345,7 @@ class CaConfigurationDbExporter extends DbPorter
         }
 
         System.out.println("Exported table responder");
-        return responders;
+        return responder;
     }
 
     private Publishers export_publisher()

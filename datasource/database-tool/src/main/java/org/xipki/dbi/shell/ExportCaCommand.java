@@ -41,6 +41,10 @@ public class ExportCaCommand extends OsgiCommandSupport
             description = "Number of certificates in one zip file. Default is 500")
     protected Integer           numCertsInBundle;
 
+    @Option(name = "-numcrls",
+            description = "Number of certificates in one zip file. Default is 30")
+    protected Integer           numCrls;
+
     private DataSourceFactory dataSourceFactory;
     private PasswordResolver passwordResolver;
 
@@ -52,8 +56,12 @@ public class ExportCaCommand extends OsgiCommandSupport
         {
             numCertsInBundle = 500;
         }
+        if(numCrls == null)
+        {
+            numCrls = 30;
+        }
         CaDbExporter exporter = new CaDbExporter(dataSourceFactory, passwordResolver, dbconfFile);
-        exporter.exportDatabase(outdir, numCertsInBundle);
+        exporter.exportDatabase(outdir, numCertsInBundle, numCrls);
         return null;
     }
 

@@ -35,12 +35,10 @@ import org.xipki.dbi.ca.jaxb.CAConfigurationType.CaHasRequestors;
 import org.xipki.dbi.ca.jaxb.CAConfigurationType.Caaliases;
 import org.xipki.dbi.ca.jaxb.CAConfigurationType.Cas;
 import org.xipki.dbi.ca.jaxb.CAConfigurationType.Certprofiles;
-import org.xipki.dbi.ca.jaxb.CAConfigurationType.Cmpcontrols;
 import org.xipki.dbi.ca.jaxb.CAConfigurationType.Crlsigners;
 import org.xipki.dbi.ca.jaxb.CAConfigurationType.Environments;
 import org.xipki.dbi.ca.jaxb.CAConfigurationType.Publishers;
 import org.xipki.dbi.ca.jaxb.CAConfigurationType.Requestors;
-import org.xipki.dbi.ca.jaxb.CAConfigurationType.Responders;
 import org.xipki.dbi.ca.jaxb.CaHasCertprofileType;
 import org.xipki.dbi.ca.jaxb.CaHasPublisherType;
 import org.xipki.dbi.ca.jaxb.CaHasRequestorType;
@@ -80,8 +78,8 @@ class CaConfigurationDbImporter extends DbPorter
         System.out.println("Importing CA configuration to database");
         try
         {
-            import_cmpcontrol(caconf.getCmpcontrols());
-            import_responder(caconf.getResponders());
+            import_cmpcontrol(caconf.getCmpcontrol());
+            import_responder(caconf.getResponder());
             import_environment(caconf.getEnvironments());
             import_requestor(caconf.getRequestors());
             import_publisher(caconf.getPublishers());
@@ -100,10 +98,16 @@ class CaConfigurationDbImporter extends DbPorter
         System.out.println("Imported CA configuration to database");
     }
 
-    private void import_cmpcontrol(Cmpcontrols controls)
+    private void import_cmpcontrol(CmpcontrolType control)
     throws Exception
     {
         System.out.println("Importing table cmpcontrol");
+        if(control == null)
+        {
+            System.out.println("Imported table cmpcontrol: nothing to import");
+            return;
+        }
+
         PreparedStatement ps = null;
         try
         {
@@ -112,23 +116,20 @@ class CaConfigurationDbImporter extends DbPorter
                     + " message_time_bias, confirm_wait_time)"
                     + " VALUES (?, ?, ?, ?, ?)");
 
-            for(CmpcontrolType control : controls.getCmpcontrol())
+            try
             {
-                try
-                {
-                    int idx = 1;
-                    ps.setString(idx++, control.getName());
-                    ps.setBoolean(idx++, control.isRequireConfirmCert());
-                    ps.setBoolean(idx++, control.isSendCaCert());
-                    ps.setInt(idx++, control.getMessageTimeBias());
-                    ps.setInt(idx++, control.getConfirmWaitTime());
+                int idx = 1;
+                ps.setString(idx++, "default");
+                ps.setBoolean(idx++, control.isRequireConfirmCert());
+                ps.setBoolean(idx++, control.isSendCaCert());
+                ps.setInt(idx++, control.getMessageTimeBias());
+                ps.setInt(idx++, control.getConfirmWaitTime());
 
-                    ps.executeUpdate();
-                }catch(Exception e)
-                {
-                    System.err.println("Error while importing cmpcontrol with name=" + control.getName());
-                    throw e;
-                }
+                ps.executeUpdate();
+            }catch(Exception e)
+            {
+                System.err.println("Error while importing cmpcontrol");
+                throw e;
             }
         }finally
         {
@@ -137,31 +138,34 @@ class CaConfigurationDbImporter extends DbPorter
         System.out.println("Imported table cmpcontrol");
     }
 
-    private void import_responder(Responders responders)
+    private void import_responder(ResponderType responder)
     throws Exception
     {
         System.out.println("Importing table responder");
+        if(responder == null)
+        {
+            System.out.println("Imported table responder: nothing to import");
+            return;
+        }
+
         PreparedStatement ps = null;
         try
         {
             ps = prepareStatement("INSERT INTO responder (name, type, conf, cert) VALUES (?, ?, ?, ?)");
 
-            for(ResponderType responder : responders.getResponder())
+            try
             {
-                try
-                {
-                    int idx = 1;
-                    ps.setString(idx++, responder.getName());
-                    ps.setString(idx++, responder.getType());
-                    ps.setString(idx++, responder.getConf());
-                    ps.setString(idx++, responder.getCert());
+                int idx = 1;
+                ps.setString(idx++, "default");
+                ps.setString(idx++, responder.getType());
+                ps.setString(idx++, responder.getConf());
+                ps.setString(idx++, responder.getCert());
 
-                    ps.executeUpdate();
-                }catch(Exception e)
-                {
-                    System.err.println("Error while importing responder with name=" + responder.getName());
-                    throw e;
-                }
+                ps.executeUpdate();
+            }catch(Exception e)
+            {
+                System.err.println("Error while importing responder");
+                throw e;
             }
         }finally
         {

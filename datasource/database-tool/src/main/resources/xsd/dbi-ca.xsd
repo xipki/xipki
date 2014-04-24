@@ -17,20 +17,8 @@
 	
 	<xs:complexType name="CAConfigurationType">
 		<xs:all>
-			<xs:element name="cmpcontrols">
-				<xs:complexType>
-					<xs:sequence>
-						<xs:element ref="cmpcontrol" minOccurs="0" maxOccurs="unbounded"/>
-					</xs:sequence>
-				</xs:complexType>
-			</xs:element>
-			<xs:element name="responders">
-				<xs:complexType>
-					<xs:sequence>
-						<xs:element ref="responder" minOccurs="0" maxOccurs="unbounded"/>
-					</xs:sequence>
-				</xs:complexType>
-			</xs:element>
+			<xs:element ref="cmpcontrol" minOccurs="0"/>
+			<xs:element ref="responder" minOccurs="0"/>
 			<xs:element name="environments">
 				<xs:complexType>
 					<xs:sequence>
@@ -108,7 +96,6 @@
 	<xs:element name="cmpcontrol" type="cmpcontrolType"/>
 	<xs:complexType name="cmpcontrolType">
 		<xs:all>
-			<xs:element name="name" type="xs:string"/>
 			<xs:element name="require_confirm_cert" type="xs:boolean" />
 			<xs:element name="send_ca_cert" type="xs:boolean" />
 			<xs:element name="message_time_bias" type="xs:int" />
@@ -120,7 +107,6 @@
 	<xs:element name="responder" type="responderType"/>
 	<xs:complexType name="responderType">
 		<xs:all>
-			<xs:element name="name" type="xs:string"/>
 			<xs:element name="type" type="xs:string" />
 			<xs:element name="conf" type="xs:string" minOccurs="0"/>
 			<xs:element name="cert" type="xs:string" minOccurs="0"/>
