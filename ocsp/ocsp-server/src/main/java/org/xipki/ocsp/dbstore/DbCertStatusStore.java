@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 xipki.org
+ * Copyright (c) 2014 xipki.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -95,7 +95,7 @@ public class DbCertStatusStore implements CertStatusStore
                 String sql = "SELECT id FROM issuer";
                 PreparedStatement ps = borrowPreparedStatement(sql);
                 ResultSet rs = null;
-                
+
                 try
                 {
                     Set<Integer> newIds = new HashSet<Integer>();
@@ -115,7 +115,7 @@ public class DbCertStatusStore implements CertStatusStore
                     }
                 }finally
                 {
-                	releaseDbResources(ps, rs);
+                    releaseDbResources(ps, rs);
                 }
             }
 
@@ -165,7 +165,7 @@ public class DbCertStatusStore implements CertStatusStore
                 initialized = true;
             }finally
             {
-            	releaseDbResources(ps, rs);
+                releaseDbResources(ps, rs);
             }
         }catch(Exception e)
         {
@@ -266,7 +266,7 @@ public class DbCertStatusStore implements CertStatusStore
                 }
             }finally
             {
-            	releaseDbResources(ps, rs);
+                releaseDbResources(ps, rs);
             }
         }catch(SQLException e)
         {
@@ -297,7 +297,7 @@ public class DbCertStatusStore implements CertStatusStore
             }
         }finally
         {
-        	releaseDbResources(ps, rs);
+            releaseDbResources(ps, rs);
         }
     }
 
@@ -371,7 +371,7 @@ public class DbCertStatusStore implements CertStatusStore
                 return true;
             }finally
             {
-            	releaseDbResources(ps, rs);
+                releaseDbResources(ps, rs);
             }
         }catch(Exception e)
         {
@@ -397,8 +397,8 @@ public class DbCertStatusStore implements CertStatusStore
     public void setAuditLoggingService(AuditLoggingService auditLoggingService)
     {
         this.auditLoggingService = auditLoggingService;
-    }    
-    
+    }
+
     private void releaseDbResources(PreparedStatement ps, ResultSet rs)
     {
         if(rs != null)

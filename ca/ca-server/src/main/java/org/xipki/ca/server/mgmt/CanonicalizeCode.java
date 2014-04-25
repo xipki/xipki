@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 xipki.org
+ * Copyright (c) 2014 xipki.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,7 +33,7 @@ public class CanonicalizeCode
 
     private final static String licenseText =
      "/*\n" +
-     " * Copyright 2014 xipki.org\n" +
+     " * Copyright (c) 2014 xipki.org\n" +
      " *\n" +
      " * Licensed under the Apache License, Version 2.0 (the \"License\");\n" +
      " * you may not use this file except in compliance with the License.\n" +

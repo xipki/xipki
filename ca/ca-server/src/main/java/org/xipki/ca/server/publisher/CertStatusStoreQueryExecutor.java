@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 xipki.org
+ * Copyright (c) 2014 xipki.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -61,7 +61,7 @@ class CertStatusStoreQueryExecutor
         final String sql = "SELECT MAX(id) FROM cert";
         PreparedStatement ps = borrowPreparedStatement(sql);
         ResultSet rs = null;
-        
+
         try
         {
             rs = ps.executeQuery();
@@ -69,7 +69,7 @@ class CertStatusStoreQueryExecutor
             cert_id = new AtomicInteger(rs.getInt(1) + 1);
         } finally
         {
-        	releaseDbResources(ps, rs);
+            releaseDbResources(ps, rs);
         }
 
         this.issuerStore = initIssuerStore();
@@ -81,7 +81,7 @@ class CertStatusStoreQueryExecutor
         final String sql = "SELECT id, subject, sha1_fp_cert, cert FROM issuer";
         PreparedStatement ps = borrowPreparedStatement(sql);
         ResultSet rs = null;
-        
+
         try
         {
             rs = ps.executeQuery();
@@ -100,7 +100,7 @@ class CertStatusStoreQueryExecutor
             return new IssuerStore(caInfos);
         }finally
         {
-        	releaseDbResources(ps, rs);
+            releaseDbResources(ps, rs);
         }
     }
 
@@ -393,7 +393,7 @@ class CertStatusStoreQueryExecutor
         sql = createFetchFirstSelectSQL(sql, 1);
         PreparedStatement ps = borrowPreparedStatement(sql);
         ResultSet rs = null;
-        
+
         try
         {
             int idx = 1;
@@ -452,13 +452,13 @@ class CertStatusStoreQueryExecutor
         {
             PreparedStatement ps = borrowPreparedStatement(sql);
             ResultSet rs = null;
-            
+
             try
             {
                 rs = ps.executeQuery();
             }finally
             {
-            	releaseDbResources(ps, rs);
+                releaseDbResources(ps, rs);
             }
             return true;
         }catch(Exception e)
@@ -468,7 +468,7 @@ class CertStatusStoreQueryExecutor
             return false;
         }
     }
-    
+
     private void releaseDbResources(PreparedStatement ps, ResultSet rs)
     {
         if(rs != null)
