@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 xipki.org
+ * Copyright (c) 2014 xipki.org
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -102,7 +102,7 @@ class CertStoreQueryExecutor
             cert_id = new AtomicInteger(rs.getInt(1) + 1);
         } finally
         {
-        	releaseDbResources(ps, rs);
+            releaseDbResources(ps, rs);
         }
 
         this.caInfoStore = initCertBasedIdentyStore("cainfo");
@@ -135,7 +135,7 @@ class CertStoreQueryExecutor
             return new CertBasedIdentityStore(table, caInfos);
         }finally
         {
-        	releaseDbResources(ps, rs);
+            releaseDbResources(ps, rs);
         }
     }
 
@@ -161,7 +161,7 @@ class CertStoreQueryExecutor
             return new CertprofileStore(entries);
         }finally
         {
-        	releaseDbResources(ps, rs);
+            releaseDbResources(ps, rs);
         }
     }
 
@@ -246,7 +246,7 @@ class CertStoreQueryExecutor
             ps.executeUpdate();
         }finally
         {
-        	releaseDbResources(ps, null);
+            releaseDbResources(ps, null);
         }
 
         final String SQL_ADD_RAWCERT = "INSERT INTO rawcert (cert_id, sha1_fp, cert) VALUES (?, ?, ?)";
@@ -263,7 +263,7 @@ class CertStoreQueryExecutor
             ps.executeUpdate();
         }finally
         {
-        	releaseDbResources(ps, null);
+            releaseDbResources(ps, null);
         }
     }
 
@@ -273,7 +273,7 @@ class CertStoreQueryExecutor
         final String SQL = "SELECT max(crl_number) FROM crl WHERE cainfo_id=?";
         PreparedStatement ps = borrowPreparedStatement(SQL);
         ResultSet rs = null;
-        
+
         try
         {
             int caId = getCaId(cacert);
@@ -293,7 +293,7 @@ class CertStoreQueryExecutor
             return maxCrlNumber + 1;
         }finally
         {
-        	releaseDbResources(ps, rs);
+            releaseDbResources(ps, rs);
         }
     }
 
@@ -303,7 +303,7 @@ class CertStoreQueryExecutor
         final String SQL = "SELECT max(thisUpdate) FROM crl WHERE cainfo_id=?";
         PreparedStatement ps = borrowPreparedStatement(SQL);
         ResultSet rs = null;
-        
+
         try
         {
             int caId = getCaId(cacert);
@@ -319,7 +319,7 @@ class CertStoreQueryExecutor
             return thisUpdateOfCurrentCRL;
         }finally
         {
-        	releaseDbResources(ps, rs);
+            releaseDbResources(ps, rs);
         }
     }
 
@@ -371,7 +371,7 @@ class CertStoreQueryExecutor
             ps.executeUpdate();
         }finally
         {
-        	releaseDbResources(ps, null);
+            releaseDbResources(ps, null);
         }
     }
 
@@ -429,7 +429,7 @@ class CertStoreQueryExecutor
             }
         }finally
         {
-        	releaseDbResources(ps, null);
+            releaseDbResources(ps, null);
         }
 
         return encodedCert;
@@ -453,7 +453,7 @@ class CertStoreQueryExecutor
         PreparedStatement ps = borrowPreparedStatement(sql);
         ps.setInt(1, caId);
         ResultSet rs = null;
-        
+
         try
         {
             rs = ps.executeQuery();
@@ -461,7 +461,7 @@ class CertStoreQueryExecutor
             return rs.getLong(1);
         } finally
         {
-        	releaseDbResources(ps, rs);
+            releaseDbResources(ps, rs);
         }
     }
 
@@ -518,7 +518,7 @@ class CertStoreQueryExecutor
             return ret;
         }finally
         {
-        	releaseDbResources(ps, rs);
+            releaseDbResources(ps, rs);
         }
     }
 
@@ -562,7 +562,7 @@ class CertStoreQueryExecutor
             return encodedCrl;
         }finally
         {
-        	releaseDbResources(ps, rs);
+            releaseDbResources(ps, rs);
         }
     }
 
@@ -600,7 +600,7 @@ class CertStoreQueryExecutor
             }
         }finally
         {
-        	releaseDbResources(ps, rs);
+            releaseDbResources(ps, rs);
         }
 
         int n = crlNumbers.size();
@@ -624,7 +624,7 @@ class CertStoreQueryExecutor
             ps.executeUpdate();
         }finally
         {
-        	releaseDbResources(ps, null);
+            releaseDbResources(ps, null);
         }
 
         return numCrlsToDelete;
@@ -712,7 +712,7 @@ class CertStoreQueryExecutor
             }
         }finally
         {
-        	releaseDbResources(ps, null);
+            releaseDbResources(ps, null);
         }
 
         return null;
@@ -793,7 +793,7 @@ class CertStoreQueryExecutor
             throw new OperationException(ErrorCode.System_Failure, "IOException: " + e.getMessage());
         }finally
         {
-        	releaseDbResources(ps, rs);
+            releaseDbResources(ps, rs);
         }
 
         return null;
@@ -850,7 +850,7 @@ class CertStoreQueryExecutor
             return ret;
         }finally
         {
-        	releaseDbResources(ps, rs);
+            releaseDbResources(ps, rs);
         }
     }
 
@@ -880,7 +880,7 @@ class CertStoreQueryExecutor
         sql = createFetchFirstSelectSQL(sql, 1);
         PreparedStatement ps = borrowPreparedStatement(sql);
         ResultSet rs = null;
-        
+
         try
         {
             int idx = 1;
@@ -898,7 +898,7 @@ class CertStoreQueryExecutor
             }
         }finally
         {
-        	releaseDbResources(ps, rs);
+            releaseDbResources(ps, rs);
         }
     }
 
@@ -932,7 +932,7 @@ class CertStoreQueryExecutor
             }
         }finally
         {
-        	releaseDbResources(ps, rs);
+            releaseDbResources(ps, rs);
         }
 
         return false;
@@ -970,7 +970,7 @@ class CertStoreQueryExecutor
             }
         }finally
         {
-        	releaseDbResources(ps, rs);
+            releaseDbResources(ps, rs);
         }
 
         return false;
@@ -1053,7 +1053,7 @@ class CertStoreQueryExecutor
             store.addIdentityEntry(newInfo);
         }finally
         {
-        	releaseDbResources(ps, null);
+            releaseDbResources(ps, null);
         }
 
         return id.intValue();
@@ -1104,7 +1104,7 @@ class CertStoreQueryExecutor
             certprofileStore.addProfileEntry(certprofileName, id);
         }finally
         {
-        	releaseDbResources(ps, null);
+            releaseDbResources(ps, null);
         }
 
         return id.intValue();
@@ -1172,7 +1172,7 @@ class CertStoreQueryExecutor
                 rs = ps.executeQuery();
             }finally
             {
-            	releaseDbResources(ps, rs);
+                releaseDbResources(ps, rs);
             }
             return true;
         }catch(Exception e)
