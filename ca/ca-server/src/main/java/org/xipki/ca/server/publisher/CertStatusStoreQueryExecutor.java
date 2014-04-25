@@ -61,6 +61,7 @@ class CertStatusStoreQueryExecutor
         final String sql = "SELECT MAX(id) FROM cert";
         PreparedStatement ps = borrowPreparedStatement(sql);
         ResultSet rs = null;
+        
         try
         {
             rs = ps.executeQuery();
@@ -68,12 +69,7 @@ class CertStatusStoreQueryExecutor
             cert_id = new AtomicInteger(rs.getInt(1) + 1);
         } finally
         {
-            returnPreparedStatement(ps);
-            if(rs != null)
-            {
-                rs.close();
-                rs = null;
-            }
+        	releaseDbResources(ps, rs);
         }
 
         this.issuerStore = initIssuerStore();
@@ -83,10 +79,9 @@ class CertStatusStoreQueryExecutor
     throws SQLException
     {
         final String sql = "SELECT id, subject, sha1_fp_cert, cert FROM issuer";
-
         PreparedStatement ps = borrowPreparedStatement(sql);
-
         ResultSet rs = null;
+        
         try
         {
             rs = ps.executeQuery();
@@ -105,12 +100,7 @@ class CertStatusStoreQueryExecutor
             return new IssuerStore(caInfos);
         }finally
         {
-            returnPreparedStatement(ps);
-            if(rs != null)
-            {
-                rs.close();
-                rs = null;
-            }
+        	releaseDbResources(ps, rs);
         }
     }
 
@@ -171,12 +161,7 @@ class CertStatusStoreQueryExecutor
             final String sql = "UPDATE cert" +
                     " SET last_update = ?, revocated = ?, rev_time = ?, rev_invalidity_time = ?, rev_reason = ?" +
                     " WHERE issuer_id = ? AND serial = ?";
-
             PreparedStatement ps = borrowPreparedStatement(sql);
-            if(ps == null)
-            {
-                throw new SQLException("Cannot create prepared statement " + sql);
-            }
 
             try
             {
@@ -206,7 +191,7 @@ class CertStatusStoreQueryExecutor
                 ps.executeUpdate();
             }finally
             {
-                returnPreparedStatement(ps);
+                releaseDbResources(ps, null);
             }
         }
         else
@@ -228,12 +213,7 @@ class CertStatusStoreQueryExecutor
             sb.append(")");
 
             final String SQL_ADD_CERT = sb.toString();
-
             PreparedStatement ps = borrowPreparedStatement(SQL_ADD_CERT);
-            if(ps == null)
-            {
-                throw new SQLException("Cannot create prepared statement " + SQL_ADD_CERT);
-            }
 
             int certId = cert_id.getAndAdd(1);
 
@@ -268,16 +248,11 @@ class CertStatusStoreQueryExecutor
                 ps.executeUpdate();
             }finally
             {
-                returnPreparedStatement(ps);
+                releaseDbResources(ps, null);
             }
 
             final String SQL_ADD_RAWCERT = "INSERT INTO rawcert (cert_id, cert) VALUES (?, ?)";
-
             ps = borrowPreparedStatement(SQL_ADD_RAWCERT);
-            if(ps == null)
-            {
-                throw new SQLException("Cannot create prepared insert_raw_cert statement");
-            }
 
             try
             {
@@ -287,18 +262,13 @@ class CertStatusStoreQueryExecutor
                 ps.executeUpdate();
             }finally
             {
-                returnPreparedStatement(ps);
+                releaseDbResources(ps, null);
             }
 
             final String SQL_ADD_CERTHASH = "INSERT INTO certhash "
                     + " (cert_id, sha1_fp, sha224_fp, sha256_fp, sha384_fp, sha512_fp)"
                     + " VALUES (?, ?, ?, ?, ?, ?)";
-
             ps = borrowPreparedStatement(SQL_ADD_CERTHASH);
-            if(ps == null)
-            {
-                throw new SQLException("Cannot create prepared insert_certhash statement");
-            }
 
             try
             {
@@ -312,7 +282,7 @@ class CertStatusStoreQueryExecutor
                 ps.executeUpdate();
             }finally
             {
-                returnPreparedStatement(ps);
+                releaseDbResources(ps, null);
             }
         }
     }
@@ -331,7 +301,6 @@ class CertStatusStoreQueryExecutor
     throws SQLException, CertificateEncodingException
     {
         Integer id =  issuerStore.getIdForCert(issuerCert.getEncodedCert());
-
         if(id != null)
         {
             return id.intValue();
@@ -347,14 +316,9 @@ class CertStatusStoreQueryExecutor
                 + "sha512_fp_name, sha512_fp_key,"
                 + "sha1_fp_cert, cert)" +
                 " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        PreparedStatement ps = borrowPreparedStatement(sql);
 
         String hexSha1FpCert = hashCalculator.hexHash(HashAlgoType.SHA1, issuerCert.getEncodedCert());
-
-        PreparedStatement ps = borrowPreparedStatement(sql);
-        if(ps == null)
-        {
-            throw new SQLException("Cannot create prepared insert_issuer statement");
-        }
 
         Certificate bcCert = Certificate.getInstance(issuerCert.getEncodedCert());
         byte[] encodedName;
@@ -394,7 +358,7 @@ class CertStatusStoreQueryExecutor
             issuerStore.addIdentityEntry(newInfo);
         }finally
         {
-            returnPreparedStatement(ps);
+            releaseDbResources(ps, null);
         }
 
         return id.intValue();
@@ -415,20 +379,11 @@ class CertStatusStoreQueryExecutor
         {
             ps = c.prepareStatement(sqlQuery);
         }
-        return ps;
-    }
-
-    private void returnPreparedStatement(PreparedStatement ps)
-    {
-        try
+        if(ps == null)
         {
-            Connection conn = ps.getConnection();
-            ps.close();
-            dataSource.returnConnection(conn);
-        }catch(Throwable t)
-        {
-            LOG.warn("Cannot return prepared statement and connection", t);
+            throw new SQLException("Cannot create prepared statement for " + sqlQuery);
         }
+        return ps;
     }
 
     private boolean certRegistered(String sha1FpCert)
@@ -436,34 +391,22 @@ class CertStatusStoreQueryExecutor
     {
         String sql = "count(*) FROM certhash WHERE sha1_fp=?";
         sql = createFetchFirstSelectSQL(sql, 1);
-
         PreparedStatement ps = borrowPreparedStatement(sql);
-        if(ps == null)
-        {
-            throw new SQLException("Cannot create prepared statement");
-        }
-
+        ResultSet rs = null;
+        
         try
         {
             int idx = 1;
             ps.setString(idx++, sha1FpCert);
 
-            ResultSet rs = ps.executeQuery();
-            try
+            rs = ps.executeQuery();
+            if(rs.next())
             {
-
-                if(rs.next())
-                {
-                    return rs.getInt(1) > 0;
-                }
-            }finally
-            {
-                rs.close();
-                rs = null;
+                return rs.getInt(1) > 0;
             }
         }finally
         {
-            returnPreparedStatement(ps);
+            releaseDbResources(ps, rs);
         }
 
         return false;
@@ -508,19 +451,14 @@ class CertStatusStoreQueryExecutor
         try
         {
             PreparedStatement ps = borrowPreparedStatement(sql);
-
             ResultSet rs = null;
+            
             try
             {
                 rs = ps.executeQuery();
             }finally
             {
-                returnPreparedStatement(ps);
-                if(rs != null)
-                {
-                    rs.close();
-                    rs = null;
-                }
+            	releaseDbResources(ps, rs);
             }
             return true;
         }catch(Exception e)
@@ -530,4 +468,29 @@ class CertStatusStoreQueryExecutor
             return false;
         }
     }
+    
+    private void releaseDbResources(PreparedStatement ps, ResultSet rs)
+    {
+        if(rs != null)
+        {
+            try
+            {
+                rs.close();
+            }catch(Throwable t)
+            {
+                LOG.warn("Cannot return close ResultSet", t);
+            }
+        }
+
+        try
+        {
+            Connection conn = ps.getConnection();
+            ps.close();
+            dataSource.returnConnection(conn);
+        }catch(Throwable t)
+        {
+            LOG.warn("Cannot return prepared statement and connection", t);
+        }
+    }
+
 }

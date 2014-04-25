@@ -1683,7 +1683,7 @@ public class CAManagerImpl implements CAManager
     }
 
     private static void closeStatement(Statement ps)
-    {
+    {    	
         if(ps != null)
         {
             try
