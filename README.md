@@ -78,7 +78,7 @@ Installation
     $XIPKI_HOME/ca-config/ca-db.properties
     $XIPKI_HOME/ocsp-config/ocsp-publisher.properties
     ```
-  * Initialize the dabases
+  * Initialize the databases
 
     In folder $XIPKI_HOME/sql
     ```sh
