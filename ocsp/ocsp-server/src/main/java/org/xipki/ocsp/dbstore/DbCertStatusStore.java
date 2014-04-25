@@ -94,8 +94,8 @@ public class DbCertStatusStore implements CertStatusStore
             {
                 String sql = "SELECT id FROM issuer";
                 PreparedStatement ps = borrowPreparedStatement(sql);
-
                 ResultSet rs = null;
+                
                 try
                 {
                     Set<Integer> newIds = new HashSet<Integer>();
@@ -115,12 +115,7 @@ public class DbCertStatusStore implements CertStatusStore
                     }
                 }finally
                 {
-                    returnPreparedStatement(ps);
-                    if(rs != null)
-                    {
-                        rs.close();
-                        rs = null;
-                    }
+                	releaseDbResources(ps, rs);
                 }
             }
 
@@ -170,12 +165,7 @@ public class DbCertStatusStore implements CertStatusStore
                 initialized = true;
             }finally
             {
-                returnPreparedStatement(ps);
-                if(rs != null)
-                {
-                    rs.close();
-                    rs = null;
-                }
+            	releaseDbResources(ps, rs);
             }
         }catch(Exception e)
         {
@@ -231,12 +221,15 @@ public class DbCertStatusStore implements CertStatusStore
                     " WHERE issuer_id=? AND serial=?";
 
             PreparedStatement ps = borrowPreparedStatement(createFetchFirstSelectSQL(sql, 1));
-            ps.setInt(1, issuer.getId());
-            ps.setLong(2, serialNumber.longValue());
-            ResultSet rs = ps.executeQuery();
+            ResultSet rs = null;
 
             try
             {
+                ps.setInt(1, issuer.getId());
+                ps.setLong(2, serialNumber.longValue());
+
+                rs = ps.executeQuery();
+
                 if(rs.next())
                 {
                     byte[] certHash = null;
@@ -273,7 +266,7 @@ public class DbCertStatusStore implements CertStatusStore
                 }
             }finally
             {
-                rs.close();
+            	releaseDbResources(ps, rs);
             }
         }catch(SQLException e)
         {
@@ -287,11 +280,12 @@ public class DbCertStatusStore implements CertStatusStore
         final String sql = hashAlgo.name().toLowerCase() + "_fp" +
                 " FROM certhash WHERE cert_id=?";
         PreparedStatement ps = borrowPreparedStatement(createFetchFirstSelectSQL(sql, 1));
-        ps.setInt(1, certId);
-        ResultSet rs = ps.executeQuery();
-
+        ResultSet rs = null;
         try
         {
+            ps.setInt(1, certId);
+            rs = ps.executeQuery();
+
             if(rs.next())
             {
                 String hexHash = rs.getString(1);
@@ -303,7 +297,7 @@ public class DbCertStatusStore implements CertStatusStore
             }
         }finally
         {
-            rs.close();
+        	releaseDbResources(ps, rs);
         }
     }
 
@@ -355,19 +349,11 @@ public class DbCertStatusStore implements CertStatusStore
             LOG.debug("no idle PreparedStatement, create new instance");
             ps = c.prepareStatement(sqlQuery);
         }
-        return ps;
-    }
-
-    private void returnPreparedStatement(PreparedStatement ps)
-    {
-        try
+        if(ps == null)
         {
-            Connection conn = ps.getConnection();
-            dataSource.returnConnection(conn);
-        }catch(Throwable t)
-        {
-            LOG.warn("Cannot return prepared statement and connection", t);
+            throw new SQLException("Cannot create prepared statement for " + sqlQuery);
         }
+        return ps;
     }
 
     @Override
@@ -378,7 +364,6 @@ public class DbCertStatusStore implements CertStatusStore
         try
         {
             PreparedStatement ps = borrowPreparedStatement(sql);
-
             ResultSet rs = null;
             try
             {
@@ -386,12 +371,7 @@ public class DbCertStatusStore implements CertStatusStore
                 return true;
             }finally
             {
-                returnPreparedStatement(ps);
-                if(rs != null)
-                {
-                    rs.close();
-                    rs = null;
-                }
+            	releaseDbResources(ps, rs);
             }
         }catch(Exception e)
         {
@@ -417,6 +397,30 @@ public class DbCertStatusStore implements CertStatusStore
     public void setAuditLoggingService(AuditLoggingService auditLoggingService)
     {
         this.auditLoggingService = auditLoggingService;
+    }    
+    
+    private void releaseDbResources(PreparedStatement ps, ResultSet rs)
+    {
+        if(rs != null)
+        {
+            try
+            {
+                rs.close();
+            }catch(Throwable t)
+            {
+                LOG.warn("Cannot return close ResultSet", t);
+            }
+        }
+
+        try
+        {
+            Connection conn = ps.getConnection();
+            ps.close();
+            dataSource.returnConnection(conn);
+        }catch(Throwable t)
+        {
+            LOG.warn("Cannot return prepared statement and connection", t);
+        }
     }
 
 }
