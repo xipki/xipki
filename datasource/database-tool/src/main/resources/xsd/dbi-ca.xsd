@@ -101,7 +101,6 @@
 			<xs:element name="message_time_bias" type="xs:int" />
 			<xs:element name="confirm_wait_time" type="xs:int" />			
 		</xs:all>
-		<xs:attribute name="version" type="xs:string" use="required"/>
 	</xs:complexType>
 	
 	<xs:element name="responder" type="responderType"/>
@@ -194,7 +193,7 @@
 			<xs:element name="ca_name" type="xs:string"/>
 			<xs:element name="requestor_name" type="xs:string" />
 			<xs:element name="ra" type="xs:boolean" />
-			<xs:element name="permissionts" type="xs:string" minOccurs="0"/>
+			<xs:element name="permissions" type="xs:string" minOccurs="0"/>
 			<xs:element name="profiles" type="xs:string" minOccurs="0"/>
 		</xs:all>
 	</xs:complexType>
