@@ -440,7 +440,7 @@ class CaConfigurationDbImporter extends DbPorter
                     ps.setString(idx++, entry.getCaName());
                     ps.setString(idx++, entry.getRequestorName());
                     ps.setBoolean(idx++, entry.isRa());
-                    ps.setString(idx++, entry.getPermissionts());
+                    ps.setString(idx++, entry.getPermissions());
                     ps.setString(idx++, entry.getProfiles());
 
                     ps.executeUpdate();
