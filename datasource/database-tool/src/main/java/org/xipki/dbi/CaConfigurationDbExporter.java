@@ -25,7 +25,6 @@ import java.sql.Statement;
 
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.Marshaller;
-import javax.xml.stream.XMLStreamException;
 
 import org.xipki.database.api.DataSource;
 import org.xipki.dbi.ca.jaxb.CAConfigurationType;
@@ -193,7 +192,7 @@ class CaConfigurationDbExporter extends DbPorter
     }
 
     private Crlsigners export_crlsigner()
-    throws XMLStreamException, SQLException
+    throws SQLException
     {
         System.out.println("Exporting table crlsigner");
         Crlsigners crlsigners = new Crlsigners();
@@ -241,7 +240,7 @@ class CaConfigurationDbExporter extends DbPorter
     }
 
     private Caaliases export_caalias()
-    throws XMLStreamException, SQLException
+    throws SQLException
     {
         System.out.println("Exporting table caalias");
         Caaliases caaliases = new Caaliases();
@@ -277,7 +276,7 @@ class CaConfigurationDbExporter extends DbPorter
     }
 
     private Requestors export_requestor()
-    throws XMLStreamException, SQLException
+    throws SQLException
     {
         System.out.println("Exporting table requestor");
         Requestors requestors = new Requestors();
@@ -313,7 +312,7 @@ class CaConfigurationDbExporter extends DbPorter
     }
 
     private ResponderType export_responder()
-    throws XMLStreamException, SQLException
+    throws SQLException
     {
         System.out.println("Exporting table responder");
         ResponderType responder = null;
@@ -349,7 +348,7 @@ class CaConfigurationDbExporter extends DbPorter
     }
 
     private Publishers export_publisher()
-    throws XMLStreamException, SQLException
+    throws SQLException
     {
         System.out.println("Exporting table publisher");
         Publishers publishers = new Publishers();
@@ -386,7 +385,7 @@ class CaConfigurationDbExporter extends DbPorter
     }
 
     private Certprofiles export_certprofile()
-    throws XMLStreamException, SQLException
+    throws SQLException
     {
         System.out.println("Exporting table certprofile");
         Certprofiles certprofiles = new Certprofiles();
@@ -424,7 +423,7 @@ class CaConfigurationDbExporter extends DbPorter
     }
 
     private Cas export_ca()
-    throws XMLStreamException, SQLException
+    throws SQLException
     {
         System.out.println("Exporting table ca");
         Cas cas = new Cas();
@@ -505,7 +504,7 @@ class CaConfigurationDbExporter extends DbPorter
     }
 
     private CaHasRequestors export_ca_has_requestor()
-    throws XMLStreamException, SQLException
+    throws SQLException
     {
         System.out.println("Exporting table ca_has_requestor");
         CaHasRequestors ca_has_requestors = new CaHasRequestors();
@@ -530,7 +529,7 @@ class CaConfigurationDbExporter extends DbPorter
                 ca_has_requestor.setCaName(ca_name);
                 ca_has_requestor.setRequestorName(requestor_name);
                 ca_has_requestor.setRa(ra);
-                ca_has_requestor.setPermissionts(permissions);
+                ca_has_requestor.setPermissions(permissions);
                 ca_has_requestor.setProfiles(profiles);
 
                 ca_has_requestors.getCaHasRequestor().add(ca_has_requestor);
@@ -548,7 +547,7 @@ class CaConfigurationDbExporter extends DbPorter
     }
 
     private CaHasPublishers export_ca_has_publisher()
-    throws XMLStreamException, SQLException
+    throws SQLException
     {
         System.out.println("Exporting table ca_has_publisher");
         CaHasPublishers ca_has_publishers = new CaHasPublishers();
@@ -585,7 +584,7 @@ class CaConfigurationDbExporter extends DbPorter
     }
 
     private CaHasCertprofiles export_ca_has_certprofile()
-    throws XMLStreamException, SQLException
+    throws SQLException
     {
         System.out.println("Exporting table ca_has_certprofile");
         CaHasCertprofiles ca_has_certprofiles = new CaHasCertprofiles();

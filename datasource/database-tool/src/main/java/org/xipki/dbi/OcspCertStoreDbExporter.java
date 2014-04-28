@@ -233,13 +233,13 @@ class OcspCertStoreDbExporter extends DbPorter
                     {
                         finalizeZip(currentCertsZip, certsInCurrentFile);
 
-                        String curentCertsFilename = DbiUtil.buildFilename("certs_", ".zip",
+                        String currentCertsFilename = DbiUtil.buildFilename("certs_", ".zip",
                                 minCertIdOfCurrentFile, maxCertIdOfCurrentFile, maxCertId);
-                        currentCertsZipFile.renameTo(new File(baseDir, curentCertsFilename));
+                        currentCertsZipFile.renameTo(new File(baseDir, currentCertsFilename));
 
-                        certsFiles.getCertsFile().add(curentCertsFilename);
+                        certsFiles.getCertsFile().add(currentCertsFilename);
 
-                        System.out.println(" Exported " + numCertInCurrentFile + " certificates in " + curentCertsFilename);
+                        System.out.println(" Exported " + numCertInCurrentFile + " certificates in " + currentCertsFilename);
                         System.out.println(" Exported " + sum + " certificates ...");
 
                         // reset
@@ -258,13 +258,13 @@ class OcspCertStoreDbExporter extends DbPorter
             {
                 finalizeZip(currentCertsZip, certsInCurrentFile);
 
-                String curentCertsFilename = DbiUtil.buildFilename("certs_", ".zip",
+                String currentCertsFilename = DbiUtil.buildFilename("certs_", ".zip",
                         minCertIdOfCurrentFile, maxCertIdOfCurrentFile, maxCertId);
-                currentCertsZipFile.renameTo(new File(baseDir, curentCertsFilename));
+                currentCertsZipFile.renameTo(new File(baseDir, currentCertsFilename));
 
-                certsFiles.getCertsFile().add(curentCertsFilename);
+                certsFiles.getCertsFile().add(currentCertsFilename);
 
-                System.out.println(" Exported " + numCertInCurrentFile + " certificates in " + curentCertsFilename);
+                System.out.println(" Exported " + numCertInCurrentFile + " certificates in " + currentCertsFilename);
             }
             else
             {
