@@ -455,6 +455,7 @@ class CaCertStoreDbImporter extends DbPorter
         {
             closeStatement(ps_cert);
             closeStatement(ps_rawcert);
+            zipFile.close();
         }
 
         return sum;

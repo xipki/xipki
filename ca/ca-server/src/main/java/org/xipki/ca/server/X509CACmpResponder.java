@@ -429,16 +429,18 @@ public class X509CACmpResponder extends CmpResponder
             if(respBody.getType() == PKIBody.TYPE_ERROR)
             {
                 ErrorMsgContent errorMsgContent = (ErrorMsgContent) respBody.getContent();
-                int pkiErrorCode = errorMsgContent.getErrorCode().getPositiveValue().intValue();
 
-                if(pkiErrorCode == PKIFailureInfo.systemFailure)
+                AuditStatus auditStatus = AuditStatus.FAILED;
+                if(errorMsgContent.getErrorCode() != null)
                 {
-                    auditEvent.setStatus(AuditStatus.ERROR);
+                    int pkiErrorCode = errorMsgContent.getErrorCode().getPositiveValue().intValue();
+
+                    if(pkiErrorCode == PKIFailureInfo.systemFailure)
+                    {
+                        auditStatus = AuditStatus.ERROR;
+                    }
                 }
-                else
-                {
-                    auditEvent.setStatus(AuditStatus.FAILED);
-                }
+                auditEvent.setStatus(auditStatus);
 
                 String statusString = null;
 
