@@ -92,7 +92,7 @@ class CertStoreQueryExecutor
             throw new RuntimeException("Should not reach here. Error message: " + e.getMessage());
         }
 
-        String sql = "SELECT MAX(id) FROM cert";
+        String sql = "SELECT MAX(ID) FROM CERT";
         PreparedStatement ps = borrowPreparedStatement(sql);
         ResultSet rs = null;
         try
@@ -105,15 +105,15 @@ class CertStoreQueryExecutor
             releaseDbResources(ps, rs);
         }
 
-        this.caInfoStore = initCertBasedIdentyStore("cainfo");
-        this.requestorInfoStore = initCertBasedIdentyStore("requestorinfo");
+        this.caInfoStore = initCertBasedIdentyStore("CAINFO");
+        this.requestorInfoStore = initCertBasedIdentyStore("REQUESTORINFO");
         this.certprofileStore = initCertprofileStore();
     }
 
     private CertBasedIdentityStore initCertBasedIdentyStore(String table)
     throws SQLException
     {
-        final String SQL_GET_CAINFO = "SELECT id, subject, sha1_fp_cert, cert FROM " + table;
+        final String SQL_GET_CAINFO = "SELECT ID, SUBJECT, SHA1_FP_CERT, CERT FROM " + table;
         PreparedStatement ps = borrowPreparedStatement(SQL_GET_CAINFO);
 
         ResultSet rs = null;
@@ -123,10 +123,10 @@ class CertStoreQueryExecutor
             List<CertBasedIdentityEntry> caInfos = new LinkedList<CertBasedIdentityEntry>();
             while(rs.next())
             {
-                int id = rs.getInt("id");
-                String subject = rs.getString("subject");
-                String hexSha1Fp = rs.getString("sha1_fp_cert");
-                String b64Cert = rs.getString("cert");
+                int id = rs.getInt("ID");
+                String subject = rs.getString("SUBJECT");
+                String hexSha1Fp = rs.getString("SHA1_FP_CERT");
+                String b64Cert = rs.getString("CERT");
 
                 CertBasedIdentityEntry caInfoEntry = new CertBasedIdentityEntry(id, subject, hexSha1Fp, b64Cert);
                 caInfos.add(caInfoEntry);
@@ -142,7 +142,7 @@ class CertStoreQueryExecutor
     private CertprofileStore initCertprofileStore()
     throws SQLException
     {
-        final String sql = "SELECT id, name FROM certprofileinfo";
+        final String sql = "SELECT ID, NAME FROM CERTPROFILEINFO";
         PreparedStatement ps = borrowPreparedStatement(sql);
 
         ResultSet rs = null;
@@ -153,8 +153,8 @@ class CertStoreQueryExecutor
 
             while(rs.next())
             {
-                int id = rs.getInt("id");
-                String name = rs.getString("name");
+                int id = rs.getInt("ID");
+                String name = rs.getString("NAME");
                 entries.put(name, id);
             }
 
@@ -179,11 +179,11 @@ class CertStoreQueryExecutor
     throws SQLException, OperationException
     {
         final String SQL_ADD_CERT =
-                "INSERT INTO cert " +
-                "(id, last_update, serial, subject,"
-                + " notbefore, notafter, revocated,"
-                + " certprofileinfo_id, cainfo_id,"
-                + " requestorinfo_id, user_id, sha1_fp_pk, sha1_fp_subject)" +
+                "INSERT INTO CERT " +
+                "(ID, LAST_UPDATE, SERIAL, SUBJECT,"
+                + " NOTBEFORE, NOTAFTER, REVOCATED,"
+                + " CERTPROFILEINFO_ID, CAINFO_ID,"
+                + " REQUESTORINFO_ID, USER_ID, SHA1_FP_PK, SHA1_FP_SUBJECT)" +
                 " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         PreparedStatement ps = borrowPreparedStatement(SQL_ADD_CERT);
 
@@ -249,7 +249,7 @@ class CertStoreQueryExecutor
             releaseDbResources(ps, null);
         }
 
-        final String SQL_ADD_RAWCERT = "INSERT INTO rawcert (cert_id, sha1_fp, cert) VALUES (?, ?, ?)";
+        final String SQL_ADD_RAWCERT = "INSERT INTO RAWCERT (CERT_ID, SHA1_FP, CERT) VALUES (?, ?, ?)";
         ps = borrowPreparedStatement(SQL_ADD_RAWCERT);
 
         String sha1_fp = fp(certificate.getEncodedCert());
@@ -270,7 +270,7 @@ class CertStoreQueryExecutor
     int getNextFreeCrlNumber(X509CertificateWithMetaInfo cacert)
     throws SQLException, OperationException
     {
-        final String SQL = "SELECT max(crl_number) FROM crl WHERE cainfo_id=?";
+        final String SQL = "SELECT MAX(CRL_NUMBER) FROM CRL WHERE CAINFO_ID=?";
         PreparedStatement ps = borrowPreparedStatement(SQL);
         ResultSet rs = null;
 
@@ -300,7 +300,7 @@ class CertStoreQueryExecutor
     Long getThisUpdateOfCurrentCRL(X509CertificateWithMetaInfo cacert)
     throws SQLException, OperationException
     {
-        final String SQL = "SELECT max(thisUpdate) FROM crl WHERE cainfo_id=?";
+        final String SQL = "SELECT MAX(THISUPDATE) FROM CRL WHERE CAINFO_ID=?";
         PreparedStatement ps = borrowPreparedStatement(SQL);
         ResultSet rs = null;
 
@@ -335,7 +335,7 @@ class CertStoreQueryExecutor
             crlNumber = ASN1Integer.getInstance(extnValue).getPositiveValue().intValue();
         }
 
-        final String SQL = "INSERT INTO crl (cainfo_id, crl_number, thisUpdate, nextUpdate, crl) VALUES (?, ?, ?, ?, ?)";
+        final String SQL = "INSERT INTO CRL (CAINFO_ID, CRL_NUMBER, THISUPDATE, NEXTUPDATE, CRL) VALUES (?, ?, ?, ?, ?)";
         PreparedStatement ps = borrowPreparedStatement(SQL);
 
         try
@@ -390,9 +390,9 @@ class CertStoreQueryExecutor
         Integer caId = getCaId(caCert); // could not be null
 
         final String SQL_REVOCATE_CERT =
-                "UPDATE cert" +
-                " SET last_update=?, revocated = ?, rev_time = ?, rev_invalidity_time=?, rev_reason = ?" +
-                " WHERE cainfo_id = ? AND serial = ?";
+                "UPDATE CERT" +
+                " SET LAST_UPDATE=?, REVOCATED = ?, REV_TIME = ?, REV_INVALIDITY_TIME=?, REV_REASON = ?" +
+                " WHERE CAINFO_ID = ? AND SERIAL = ?";
         PreparedStatement ps = borrowPreparedStatement(SQL_REVOCATE_CERT);
 
         try
@@ -449,7 +449,7 @@ class CertStoreQueryExecutor
             return null;
         }
 
-        String sql = "SELECT MAX(serial) FROM cert WHERE cainfo_id=?";
+        String sql = "SELECT MAX(SERIAL) FROM CERT WHERE CAINFO_ID=?";
         PreparedStatement ps = borrowPreparedStatement(sql);
         ps.setInt(1, caId);
         ResultSet rs = null;
@@ -485,13 +485,13 @@ class CertStoreQueryExecutor
             return Collections.emptyList();
         }
 
-        StringBuilder sb = new StringBuilder("serial FROM cert ");
-        sb.append(" WHERE cainfo_id=? AND serial>?");
+        StringBuilder sb = new StringBuilder("SERIAL FROM CERT ");
+        sb.append(" WHERE CAINFO_ID=? AND SERIAL>?");
         if(notExpiredAt != null)
         {
-            sb.append(" AND notafter>?");
+            sb.append(" AND NOTAFTER>?");
         }
-        sb.append(" ORDER BY serial ASC");
+        sb.append(" ORDER BY SERIAL ASC");
 
         final String sql = createFetchFirstSelectSQL(sb.toString(), numEntries);
         PreparedStatement ps = borrowPreparedStatement(sql);
@@ -511,7 +511,7 @@ class CertStoreQueryExecutor
             List<BigInteger> ret = new ArrayList<BigInteger>();
             while(rs.next() && ret.size() < numEntries)
             {
-                long serial = rs.getLong("serial");
+                long serial = rs.getLong("SERIAL");
                 ret.add(BigInteger.valueOf(serial));
             }
 
@@ -533,7 +533,7 @@ class CertStoreQueryExecutor
             return null;
         }
 
-        String sql = "thisUpdate, crl FROM crl WHERE cainfo_id=? ORDER BY thisUpdate DESC";
+        String sql = "THISUPDATE, CRL FROM CRL WHERE CAINFO_ID=? ORDER BY THISUPDATE DESC";
         sql = createFetchFirstSelectSQL(sql, 1);
         PreparedStatement ps = borrowPreparedStatement(sql);
 
@@ -550,10 +550,10 @@ class CertStoreQueryExecutor
             // iterate all entries to make sure that the latest CRL will be returned
             while(rs.next())
             {
-                long thisUpdate = rs.getLong("thisUpdate");
+                long thisUpdate = rs.getLong("THISUPDATE");
                 if(thisUpdate >= current_thisUpdate)
                 {
-                    Blob blob = rs.getBlob("crl");
+                    Blob blob = rs.getBlob("CRL");
                     encodedCrl = readBlob(blob);
                     current_thisUpdate = thisUpdate;
                 }
@@ -581,7 +581,7 @@ class CertStoreQueryExecutor
             return 0;
         }
 
-        String sql = "SELECT crl_number FROM crl WHERE cainfo_id=?";
+        String sql = "SELECT CRL_NUMBER FROM CRL WHERE CAINFO_ID=?";
         PreparedStatement ps = borrowPreparedStatement(sql);
 
         List<Integer> crlNumbers = new LinkedList<Integer>();
@@ -595,7 +595,7 @@ class CertStoreQueryExecutor
 
             while(rs.next())
             {
-                int crlNumber = rs.getInt("crl_number");
+                int crlNumber = rs.getInt("CRL_NUMBER");
                 crlNumbers.add(crlNumber);
             }
         }finally
@@ -613,7 +613,7 @@ class CertStoreQueryExecutor
         }
 
         int crlNumber = crlNumbers.get(numCrlsToDelete - 1);
-        sql = "DELETE FROM crl WHERE cainfo_id=? AND crl_number<?";
+        sql = "DELETE FROM CRL WHERE CAINFO_ID=? AND CRL_NUMBER<?";
         ps = borrowPreparedStatement(sql);
 
         try
@@ -690,9 +690,9 @@ class CertStoreQueryExecutor
             return null;
         }
 
-        String sql = "t2.cert cert"
-                + " FROM cert t1, rawcert t2"
-                + " WHERE t1.cainfo_id=? AND t1.serial=? AND t2.cert_id=t1.id";
+        String sql = "T2.CERT CERT"
+                + " FROM CERT T1, RAWCERT T2"
+                + " WHERE T1.CAINFO_ID=? AND T1.SERIAL=? AND T2.CERT_ID=T1.ID";
 
         sql = createFetchFirstSelectSQL(sql, 1);
         PreparedStatement ps = borrowPreparedStatement(sql);
@@ -730,21 +730,21 @@ class CertStoreQueryExecutor
             return null;
         }
 
-        final String col_certprofileinfo_id = "certprofileinfo_id";
-        final String col_revocated = "revocated";
-        final String col_rev_reason = "rev_reason";
-        final String col_rev_time = "rev_time";
-        final String col_rev_invalidity_time = "rev_invalidity_time";
-        final String col_cert = "cert";
+        final String col_certprofileinfo_id = "CERTPROFILEINFO_ID";
+        final String col_revocated = "REVOCATED";
+        final String col_rev_reason = "REV_REASON";
+        final String col_rev_time = "REV_TIME";
+        final String col_rev_invalidity_time = "REV_INVALIDITY_TIME";
+        final String col_cert = "CERT";
 
-        String sql = "t1." + col_certprofileinfo_id + " " + col_certprofileinfo_id +
-                ", t1." + col_revocated + " " + col_revocated +
-                ", t1." + col_rev_reason + " " + col_rev_reason +
-                ", t1." + col_rev_time + " " + col_rev_time +
-                ", t1." + col_rev_invalidity_time + " " + col_rev_invalidity_time +
-                ", t2." + col_cert + " " + col_cert +
-                " FROM cert t1, rawcert t2" +
-                " WHERE t1.cainfo_id=? AND t1.serial=? AND t2.cert_id=t1.id";
+        String sql = "T1." + col_certprofileinfo_id + " " + col_certprofileinfo_id +
+                ", T1." + col_revocated + " " + col_revocated +
+                ", T1." + col_rev_reason + " " + col_rev_reason +
+                ", T1." + col_rev_time + " " + col_rev_time +
+                ", T1." + col_rev_invalidity_time + " " + col_rev_invalidity_time +
+                ", T2." + col_cert + " " + col_cert +
+                " FROM CERT T1, RAWCERT T2" +
+                " WHERE T1.CAINFO_ID=? AND T1.SERIAL=? AND T2.CERT_ID=T1.ID";
 
         sql = createFetchFirstSelectSQL(sql, 1);
         PreparedStatement ps = borrowPreparedStatement(sql);
@@ -817,10 +817,10 @@ class CertStoreQueryExecutor
             return Collections.emptyList();
         }
 
-        String sql = "serial, rev_reason, rev_time, rev_invalidity_time"
-                + " FROM cert"
-                + " WHERE cainfo_id=? AND revocated=? AND serial>? AND notafter>?"
-                + " ORDER BY serial ASC";
+        String sql = "SERIAL, REV_REASON, REV_TIME, REV_INVALIDITY_TIME"
+                + " FROM CERT"
+                + " WHERE CAINFO_ID=? AND REVOCATED=? AND SERIAL>? AND NOTAFTER>?"
+                + " ORDER BY SERIAL ASC";
 
         sql = createFetchFirstSelectSQL(sql, numEntries);
         PreparedStatement ps = borrowPreparedStatement(sql);
@@ -838,10 +838,10 @@ class CertStoreQueryExecutor
             List<CertRevocationInfo> ret = new ArrayList<CertRevocationInfo>();
             while(rs.next() && ret.size() < numEntries)
             {
-                long serial = rs.getLong("serial");
-                int rev_reason = rs.getInt("rev_reason");
-                long rev_time = rs.getLong("rev_time");
-                long rev_invalidity_time = rs.getLong("rev_invalidity_time");
+                long serial = rs.getLong("SERIAL");
+                int rev_reason = rs.getInt("REV_REASON");
+                long rev_time = rs.getLong("REV_TIME");
+                long rev_invalidity_time = rs.getLong("REV_INVALIDITY_TIME");
                 CertRevocationInfo revInfo = new CertRevocationInfo(BigInteger.valueOf(serial),
                         rev_reason, new Date(1000 * rev_time), new Date(1000 * rev_invalidity_time));
                 ret.add(revInfo);
@@ -876,7 +876,7 @@ class CertStoreQueryExecutor
             return CertStatus.Unknown;
         }
 
-        String sql = "revocated FROM cert WHERE cainfo_id=? AND subject=?";
+        String sql = "REVOCATED FROM CERT WHERE CAINFO_ID=? AND SUBJECT=?";
         sql = createFetchFirstSelectSQL(sql, 1);
         PreparedStatement ps = borrowPreparedStatement(sql);
         ResultSet rs = null;
@@ -890,7 +890,7 @@ class CertStoreQueryExecutor
             rs = ps.executeQuery();
             if(rs.next())
             {
-                return rs.getBoolean("revocated") ? CertStatus.Revocated : CertStatus.Good;
+                return rs.getBoolean("REVOCATED") ? CertStatus.Revocated : CertStatus.Good;
             }
             else
             {
@@ -913,7 +913,7 @@ class CertStoreQueryExecutor
             return false;
         }
 
-        String sql = "count(*) FROM cert WHERE cainfo_id=? AND sha1_fp_subject=?";
+        String sql = "COUNT(*) FROM CERT WHERE CAINFO_ID=? AND SHA1_FP_SUBJECT=?";
         sql = createFetchFirstSelectSQL(sql, 1);
 
         PreparedStatement ps = borrowPreparedStatement(sql);
@@ -951,8 +951,8 @@ class CertStoreQueryExecutor
 
         String sha1FpPk = fp(encodedSubjectPublicKey);
 
-        String sql = "count(*) FROM cert"
-                + " WHERE cainfo_id=? AND sha1_fp_pk=?";
+        String sql = "COUNT(*) FROM CERT"
+                + " WHERE CAINFO_ID=? AND SHA1_FP_PK=?";
         sql = createFetchFirstSelectSQL(sql, 1);
         PreparedStatement ps = borrowPreparedStatement(sql);
 
@@ -1032,7 +1032,7 @@ class CertStoreQueryExecutor
 
         final String SQL_ADD_CAINFO =
                 "INSERT INTO " + store.getTable() +
-                " (id, subject, sha1_fp_cert, cert)" +
+                " (ID, SUBJECT, SHA1_FP_CERT, CERT)" +
                 " VALUES (?, ?, ?, ?)";
         PreparedStatement ps = borrowPreparedStatement(SQL_ADD_CAINFO);
 
@@ -1090,7 +1090,7 @@ class CertStoreQueryExecutor
             return id.intValue();
         }
 
-        final String sql = "INSERT INTO certprofileinfo (id, name) VALUES (?, ?)";
+        final String sql = "INSERT INTO CERTPROFILEINFO (ID, NAME) VALUES (?, ?)";
         PreparedStatement ps = borrowPreparedStatement(sql);
 
         id = certprofileStore.getNextFreeId();
@@ -1160,7 +1160,7 @@ class CertStoreQueryExecutor
 
     boolean isHealthy()
     {
-        final String sql = "SELECT id FROM cainfo";
+        final String sql = "SELECT ID FROM CAINFO";
 
         try
         {

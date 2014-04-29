@@ -93,7 +93,7 @@ public class DbCertStatusStore implements CertStatusStore
         {
             if(initialized)
             {
-                String sql = "SELECT id FROM issuer";
+                String sql = "SELECT ID FROM ISSUER";
                 PreparedStatement ps = borrowPreparedStatement(sql);
                 ResultSet rs = null;
 
@@ -104,7 +104,7 @@ public class DbCertStatusStore implements CertStatusStore
                     rs = ps.executeQuery();
                     while(rs.next())
                     {
-                        int id = rs.getInt("id");
+                        int id = rs.getInt("ID");
                         newIds.add(id);
                     }
 
@@ -124,14 +124,14 @@ public class DbCertStatusStore implements CertStatusStore
                     HashAlgoType.SHA384, HashAlgoType.SHA512};
 
             StringBuilder sb = new StringBuilder();
-            sb.append("SELECT id");
+            sb.append("SELECT ID");
             for(HashAlgoType hashAlgoType : hashAlgoTypes)
             {
-                String hashAlgo = hashAlgoType.name().toLowerCase();
-                sb.append(", ").append(hashAlgo).append("_fp_name");
-                sb.append(", ").append(hashAlgo).append("_fp_key");
+                String hashAlgo = hashAlgoType.name().toUpperCase();
+                sb.append(", ").append(hashAlgo).append("_FP_NAME");
+                sb.append(", ").append(hashAlgo).append("_FP_KEY");
             };
-            sb.append(" FROM issuer");
+            sb.append(" FROM ISSUER");
 
             String sql = sb.toString();
             PreparedStatement ps = borrowPreparedStatement(sql);
@@ -143,14 +143,14 @@ public class DbCertStatusStore implements CertStatusStore
                 List<IssuerEntry> caInfos = new LinkedList<IssuerEntry>();
                 while(rs.next())
                 {
-                    int id = rs.getInt("id");
+                    int id = rs.getInt("ID");
 
                     Map<HashAlgoType, IssuerHashNameAndKey> hashes = new HashMap<HashAlgoType, IssuerHashNameAndKey>();
                     for(HashAlgoType hashAlgoType : hashAlgoTypes)
                     {
-                        String hashAlgo = hashAlgoType.name().toLowerCase();
-                        String hash_name = rs.getString(hashAlgo + "_fp_name");
-                        String hash_key = rs.getString(hashAlgo + "_fp_key");
+                        String hashAlgo = hashAlgoType.name().toUpperCase();
+                        String hash_name = rs.getString(hashAlgo + "_FP_NAME");
+                        String hash_key = rs.getString(hashAlgo + "_FP_KEY");
                         IssuerHashNameAndKey hash = new IssuerHashNameAndKey(
                                 hashAlgoType, Hex.decode(hash_name), Hex.decode(hash_key));
                         hashes.put(hashAlgoType, hash);
@@ -225,9 +225,9 @@ public class DbCertStatusStore implements CertStatusStore
             }
 
             final String sql =
-                    "id, revocated, rev_reason, rev_time, rev_invalidity_time" +
-                    " FROM cert" +
-                    " WHERE issuer_id=? AND serial=?";
+                    "ID, REVOCATED, REV_REASON, REV_TIME, REV_INVALIDITY_TIME" +
+                    " FROM CERT" +
+                    " WHERE ISSUER_ID=? AND SERIAL=?";
 
             PreparedStatement ps = borrowPreparedStatement(createFetchFirstSelectSQL(sql, 1));
             ResultSet rs = null;
@@ -244,17 +244,17 @@ public class DbCertStatusStore implements CertStatusStore
                     byte[] certHash = null;
                     if(includeCertHash)
                     {
-                        int certId = rs.getInt("id");
+                        int certId = rs.getInt("ID");
                         certHash = getCertHash(certId, certHashAlgo);
                     }
 
                     CertStatusInfo certStatusInfo;
-                    boolean revocated = rs.getBoolean("revocated");
+                    boolean revocated = rs.getBoolean("REVOCATED");
                     if(revocated)
                     {
-                        int reason = rs.getInt("rev_reason");
-                        long revocationTime = rs.getLong("rev_time");
-                        long invalidatityTime = rs.getLong("rev_invalidity_time");
+                        int reason = rs.getInt("REV_REASON");
+                        long revocationTime = rs.getLong("REV_TIME");
+                        long invalidatityTime = rs.getLong("REV_INVALIDITY_TIME");
                         CertRevocationInfo revInfo = new CertRevocationInfo(reason, new Date(revocationTime * 1000),
                                 new Date(invalidatityTime * 1000));
                         certStatusInfo = CertStatusInfo.getRevocatedCertStatusInfo(revInfo, certHashAlgo, certHash,
@@ -286,8 +286,8 @@ public class DbCertStatusStore implements CertStatusStore
     private byte[] getCertHash(int certId, HashAlgoType hashAlgo)
     throws SQLException
     {
-        final String sql = hashAlgo.name().toLowerCase() + "_fp" +
-                " FROM certhash WHERE cert_id=?";
+        final String sql = hashAlgo.name().toUpperCase() + "_FP" +
+                " FROM CERTHASH WHERE CERT_ID=?";
         PreparedStatement ps = borrowPreparedStatement(createFetchFirstSelectSQL(sql, 1));
         ResultSet rs = null;
         try
@@ -367,7 +367,7 @@ public class DbCertStatusStore implements CertStatusStore
     @Override
     public boolean isHealthy()
     {
-        final String sql = "SELECT id FROM issuer";
+        final String sql = "SELECT ID FROM ISSUER";
 
         try
         {

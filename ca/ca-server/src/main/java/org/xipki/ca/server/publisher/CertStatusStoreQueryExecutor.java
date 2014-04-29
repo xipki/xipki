@@ -58,7 +58,7 @@ class CertStatusStoreQueryExecutor
         this.dataSource = dataSource;
         this.hashCalculator = new HashCalculator();
 
-        final String sql = "SELECT MAX(id) FROM cert";
+        final String sql = "SELECT MAX(ID) FROM CERT";
         PreparedStatement ps = borrowPreparedStatement(sql);
         ResultSet rs = null;
 
@@ -78,7 +78,7 @@ class CertStatusStoreQueryExecutor
     private IssuerStore initIssuerStore()
     throws SQLException
     {
-        final String sql = "SELECT id, subject, sha1_fp_cert, cert FROM issuer";
+        final String sql = "SELECT ID, SUBJECT, SHA1_FP_CERT, CERT FROM ISSUER";
         PreparedStatement ps = borrowPreparedStatement(sql);
         ResultSet rs = null;
 
@@ -88,10 +88,10 @@ class CertStatusStoreQueryExecutor
             List<IssuerEntry> caInfos = new LinkedList<IssuerEntry>();
             while(rs.next())
             {
-                int id = rs.getInt("id");
-                String subject = rs.getString("subject");
-                String hexSha1Fp = rs.getString("sha1_fp_cert");
-                String b64Cert = rs.getString("cert");
+                int id = rs.getInt("ID");
+                String subject = rs.getString("SUBJECT");
+                String hexSha1Fp = rs.getString("SHA1_FP_CERT");
+                String b64Cert = rs.getString("CERT");
 
                 IssuerEntry caInfoEntry = new IssuerEntry(id, subject, hexSha1Fp, b64Cert);
                 caInfos.add(caInfoEntry);
@@ -158,9 +158,9 @@ class CertStatusStoreQueryExecutor
         {
             int issuerId = getIssuerId(issuer);
 
-            final String sql = "UPDATE cert" +
-                    " SET last_update = ?, revocated = ?, rev_time = ?, rev_invalidity_time = ?, rev_reason = ?" +
-                    " WHERE issuer_id = ? AND serial = ?";
+            final String sql = "UPDATE CERT" +
+                    " SET LAST_UPDATE = ?, REVOCATED = ?, REV_TIME = ?, REV_INVALIDITY_TIME = ?, REV_REASON = ?" +
+                    " WHERE ISSUER_ID = ? AND SERIAL = ?";
             PreparedStatement ps = borrowPreparedStatement(sql);
 
             try
@@ -197,12 +197,12 @@ class CertStatusStoreQueryExecutor
         else
         {
             StringBuilder sb = new StringBuilder();
-            sb.append("INSERT INTO cert ");
-            sb.append("(id, last_update, serial, subject");
-            sb.append(", notbefore, notafter, revocated, issuer_id");
+            sb.append("INSERT INTO CERT ");
+            sb.append("(ID, LAST_UPDATE, SERIAL, SUBJECT");
+            sb.append(", NOTBEFORE, NOTAFTER, REVOCATED, ISSUER_ID");
             if(revocated)
             {
-                sb.append(", rev_time, rev_invalidity_time, rev_reason");
+                sb.append(", REV_TIME, REV_INVALIDITY_TIME, REV_REASON");
             }
             sb.append(")");
             sb.append(" VALUES (?, ?, ?, ?, ?, ?, ?, ?");
@@ -251,7 +251,7 @@ class CertStatusStoreQueryExecutor
                 releaseDbResources(ps, null);
             }
 
-            final String SQL_ADD_RAWCERT = "INSERT INTO rawcert (cert_id, cert) VALUES (?, ?)";
+            final String SQL_ADD_RAWCERT = "INSERT INTO RAWCERT (CERT_ID, CERT) VALUES (?, ?)";
             ps = borrowPreparedStatement(SQL_ADD_RAWCERT);
 
             try
@@ -265,8 +265,8 @@ class CertStatusStoreQueryExecutor
                 releaseDbResources(ps, null);
             }
 
-            final String SQL_ADD_CERTHASH = "INSERT INTO certhash "
-                    + " (cert_id, sha1_fp, sha224_fp, sha256_fp, sha384_fp, sha512_fp)"
+            final String SQL_ADD_CERTHASH = "INSERT INTO CERTHASH "
+                    + " (CERT_ID, SHA1_FP, SHA224_FP, SHA256_FP, SHA384_FP, SHA512_FP)"
                     + " VALUES (?, ?, ?, ?, ?, ?)";
             ps = borrowPreparedStatement(SQL_ADD_CERTHASH);
 
@@ -307,14 +307,14 @@ class CertStatusStoreQueryExecutor
         }
 
         final String sql =
-                "INSERT INTO issuer" +
-                " (id, subject, "
-                + "sha1_fp_name, sha1_fp_key, "
-                + "sha224_fp_name, sha224_fp_key, "
-                + "sha256_fp_name, sha256_fp_key, "
-                + "sha384_fp_name, sha384_fp_key, "
-                + "sha512_fp_name, sha512_fp_key,"
-                + "sha1_fp_cert, cert)" +
+                "INSERT INTO ISSUER" +
+                " (ID, SUBJECT, "
+                + "SHA1_FP_NAME, SHA1_FP_KEY, "
+                + "SHA224_FP_NAME, SHA224_FP_KEY, "
+                + "SHA256_FP_NAME, SHA256_FP_KEY, "
+                + "SHA384_FP_NAME, SHA384_FP_KEY, "
+                + "SHA512_FP_NAME, SHA512_FP_KEY,"
+                + "SHA1_FP_CERT, CERT)" +
                 " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         PreparedStatement ps = borrowPreparedStatement(sql);
 
@@ -389,7 +389,7 @@ class CertStatusStoreQueryExecutor
     private boolean certRegistered(String sha1FpCert)
     throws SQLException
     {
-        String sql = "count(*) FROM certhash WHERE sha1_fp=?";
+        String sql = "count(*) FROM CERTHASH WHERE SHA1_FP=?";
         sql = createFetchFirstSelectSQL(sql, 1);
         PreparedStatement ps = borrowPreparedStatement(sql);
         ResultSet rs = null;
@@ -446,7 +446,7 @@ class CertStatusStoreQueryExecutor
 
     boolean isHealthy()
     {
-        final String sql = "SELECT id FROM issuer";
+        final String sql = "SELECT ID FROM ISSUER";
 
         try
         {
