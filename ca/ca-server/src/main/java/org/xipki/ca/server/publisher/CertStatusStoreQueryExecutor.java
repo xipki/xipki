@@ -377,7 +377,7 @@ class CertStatusStoreQueryExecutor
         Connection c = dataSource.getConnection(5000);
         if(c != null)
         {
-            ps = c.prepareStatement(sqlQuery);
+            ps = dataSource.prepareStatement(c,sqlQuery);
         }
         if(ps == null)
         {

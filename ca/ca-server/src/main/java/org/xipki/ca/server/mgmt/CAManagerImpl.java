@@ -3106,7 +3106,7 @@ public class CAManagerImpl implements CAManager
                 throw new CAMgmtException("Could not get connection");
             }
 
-            return dsConnection.createStatement();
+            return dataSource.createStatement(dsConnection);
         }catch(SQLException e)
         {
             throw new CAMgmtException(e);
@@ -3128,7 +3128,7 @@ public class CAManagerImpl implements CAManager
                 throw new CAMgmtException("Could not get connection");
             }
 
-            return dsConnection.prepareStatement(sql);
+            return dataSource.prepareStatement(dsConnection, sql);
         }catch(SQLException e)
         {
             throw new CAMgmtException(e);
