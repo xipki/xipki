@@ -110,24 +110,6 @@
 							</artifactItems>
 						</configuration>
 					</execution>
-                                        <execution>
-                                                <id>copy-jdbcs</id>
-                                                <phase>generate-resources</phase>
-                                                <goals>
-                                                        <goal>copy</goal>
-                                                </goals>
-                                                <configuration>
-							<outputDirectory>target/jdbc</outputDirectory>
-                                                        <!-- Define here the JDBC drivers -->
-                                                        <artifactItems>
-                                                                <artifactItem>
-                                                                        <groupId>mysql</groupId>
-                                                                        <artifactId>mysql-connector-java</artifactId>
-                                                                        <version>${mysql-jdbc.version}</version>
-                                                                </artifactItem>
-                                                        </artifactItems>
-                                                </configuration>
-                                        </execution>
 				</executions>
 			</plugin>
 			<plugin>
