@@ -28,6 +28,7 @@ import java.security.SignatureException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509CRL;
 import java.security.cert.X509Certificate;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -1084,39 +1085,58 @@ public final class RAWorkerImpl extends AbstractRAWorker implements RAWorker
     {
         ParamChecker.assertNotNull("request", request);
 
-        AttributeTypeAndValue[] regInfo = request.getRegInfo();
-
-        CmpUtf8Pairs utf8Pairs = null;
-        if (regInfo != null)
-        {
-            for(AttributeTypeAndValue atv : regInfo)
-            {
-                if(atv.getType().equals(CMPObjectIdentifiers.regInfo_utf8Pairs))
-                {
-                    String atvValue = DERUTF8String.getInstance(atv.getValue()).getString();
-                    utf8Pairs = new CmpUtf8Pairs(atvValue);
-                    break;
-                }
-            }
-        }
-
-        String profileName = (utf8Pairs == null) ? null : utf8Pairs.getValue(CmpUtf8Pairs.KEY_CERT_PROFILE);
-        if(profileName == null)
-        {
-            throw new RAWorkerException("No CertProfile is specified in the request");
-        }
-
         if(caName == null)
         {
-            caName = getCANameForProfile(profileName);
-            if(caName == null)
+            AttributeTypeAndValue[] regInfo = request.getRegInfo();
+
+            CmpUtf8Pairs utf8Pairs = null;
+            if (regInfo != null)
             {
-                throw new RAWorkerException("CertProfile " + profileName + " is not supported by any CA");
+                for(AttributeTypeAndValue atv : regInfo)
+                {
+                    if(atv.getType().equals(CMPObjectIdentifiers.regInfo_utf8Pairs))
+                    {
+                        String atvValue = DERUTF8String.getInstance(atv.getValue()).getString();
+                        utf8Pairs = new CmpUtf8Pairs(atvValue);
+                        break;
+                    }
+                }
             }
-        }
-        else
-        {
-            checkCertProfileSupportInCA(profileName, caName);
+
+            String origCertProfileInfo = utf8Pairs.getValue(CmpUtf8Pairs.KEY_ORIG_CERT_PROFILE);
+
+            // detect the CA name
+            if(origCertProfileInfo != null)
+            {
+                OriginalProfileConf origCertProfile;
+                try
+                {
+                    origCertProfile = OriginalProfileConf.getInstance(origCertProfileInfo);
+                } catch (ParseException e)
+                {
+                    throw new RAWorkerException("Invalid OriginalProfileConf: " + origCertProfileInfo +
+                            ". Message: " + e.getMessage());
+                }
+                String origCertProfileName = origCertProfile.getProfileName();
+                if(raProfileMappingsMap.containsKey(origCertProfileName))
+                {
+                    caName = raProfileMappingsMap.get(origCertProfileName).getDestCA();
+                }
+                else
+                {
+                    throw new RAWorkerException("Original CertProfile " + origCertProfileName + " is not supported by any CA");
+                }
+            }
+            else
+            {
+                String certProfileName = utf8Pairs.getValue(CmpUtf8Pairs.KEY_CERT_PROFILE);
+                caName = getCANameForProfile(certProfileName);
+
+                if(caName == null)
+                {
+                    throw new RAWorkerException("CertProfile " + certProfileName + " is not supported by any CA");
+                }
+            }
         }
 
         X509CmpRequestor cmpRequestor = cmpRequestorsMap.get(caName);
