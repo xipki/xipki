@@ -424,7 +424,8 @@ public class X509CA
                     crlNumber = certstore.getNextFreeCRLNumber(cacert);
                 }catch(SQLException e)
                 {
-                    LOG.error("getNextFreeCRLNumber", e);
+                    LOG.error("getNextFreeCRLNumber. {}: {}", e.getClass().getName(), e.getMessage());
+                    LOG.debug("getNextFreeCRLNumber", e);
                     throw new OperationException(ErrorCode.System_Failure, e.getMessage());
                 }
 
@@ -451,7 +452,9 @@ public class X509CA
                     crlBuilder.addExtension(Extension.issuingDistributionPoint, true, idp);
                 } catch (CertIOException e)
                 {
-                    LOG.error("crlBuilder.addExtension", e);
+                    LOG.error("crlBuilder.addExtension. {}: {}", e.getClass().getName(), e.getMessage());
+                    LOG.debug("crlBuilder.addExtension", e);
+
                     throw new OperationException(ErrorCode.System_Failure, e.getMessage());
                 }
 
@@ -719,7 +722,9 @@ public class X509CA
             }
             catch (RuntimeException re)
             {
-                LOG.error("Error while publish certificate to the publisher " + publisher.getName(), re);
+                String msg = "Error while publish certificate to the publisher " + publisher.getName();
+                LOG.error(msg);
+                LOG.debug(msg, re);
             }
         }
 
@@ -851,7 +856,9 @@ public class X509CA
             }
             catch (RuntimeException re)
             {
-                LOG.error("Error while publish CRL to the publisher " + publisher.getName(), re);
+                LOG.error("Error while publish CRL to the publisher {}. {}: {}",
+                        new Object[]{publisher.getName(), re.getClass().getName(), re.getMessage()});
+                LOG.debug("Error while publish CRL to the publisher " + publisher.getName(), re);
             }
         }
 
@@ -884,8 +891,11 @@ public class X509CA
                 revokedCert = IoCertUtil.parseCert(revokedCertBytes);
             } catch (Exception e)
             {
-                LOG.error("Could not parse revoked certificate with ca={} and serialNumber={}",
-                        caInfo.getName(), serialNumber);
+                StringBuilder sb = new StringBuilder("Could not parse revoked certificate with ca=");
+                sb.append(caInfo.getNextSerial()).append(" and serialNumber=").append(serialNumber);
+                String msg = sb.toString();
+                LOG.error(msg);
+                LOG.debug(msg, e);
                 throw new OperationException(ErrorCode.System_Failure, e.getMessage());
             }
 
@@ -905,7 +915,9 @@ public class X509CA
                     }
                     catch (RuntimeException re)
                     {
-                        LOG.error("Error while publish certificate to the publisher " + publisher.getName(), re);
+                        String msg = "Error while publish certificate to the publisher " + publisher.getName();
+                        LOG.error(msg);
+                        LOG.debug(msg, re);
                     }
                 }
             }

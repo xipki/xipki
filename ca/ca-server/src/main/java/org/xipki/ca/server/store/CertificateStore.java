@@ -67,7 +67,7 @@ public class CertificateStore
             LOG.error("Could not save certificate {}: {}. Message: {}",
                     new Object[]{certInfo.getCert().getCert().getSubjectX500Principal(),
                     Base64.toBase64String(certInfo.getCert().getEncodedCert()), e.getMessage()});
-            LOG.error("error", e);
+            LOG.debug("error", e);
             return false;
         }
 
@@ -111,7 +111,7 @@ public class CertificateStore
             LOG.error("Could not add CRL ca={}, thisUpdate={}: {}, ",
                 new Object[]{cacert.getCert().getSubjectX500Principal().getName(),
                     crl.getThisUpdate(), e.getMessage()});
-            LOG.error("Exception", e);
+            LOG.debug("Exception", e);
             return false;
         }
     }
@@ -138,7 +138,7 @@ public class CertificateStore
             LOG.error("Could not get CRL ca={}: error message: {}",
                     cacert.getCert().getSubjectX500Principal().getName(),
                     e.getMessage());
-            LOG.error("Exception", e);
+            LOG.debug("Exception", e);
             return null;
         }
     }
@@ -153,7 +153,7 @@ public class CertificateStore
             LOG.error("Could not cleanup CRLs ca={}: error message: {}",
                     cacert.getCert().getSubjectX500Principal().getName(),
                     e.getMessage());
-            LOG.error("Exception", e);
+            LOG.debug("Exception", e);
             return 0;
         }
     }
@@ -166,11 +166,13 @@ public class CertificateStore
             return queryExecutor.certIssued(caCert, sha1FpSubject);
         } catch (OperationException e)
         {
-            LOG.error("queryExecutor.certIssued", e);
+            LOG.error("queryExecutor.certIssued. OperationException: {}", e.getMessage());
+            LOG.debug("queryExecutor.certIssued", e);
             return false;
         } catch (SQLException e)
         {
-            LOG.error("queryExecutor.certIssued", e);
+            LOG.error("queryExecutor.certIssued. SQLException: {}", e.getMessage());
+            LOG.debug("queryExecutor.certIssued", e);
             return false;
         }
     }
@@ -182,11 +184,13 @@ public class CertificateStore
             return queryExecutor.certIssued(caCert, encodedSubjectPublicKey);
         } catch (OperationException e)
         {
-            LOG.error("queryExecutor.certIssued", e);
+            LOG.error("queryExecutor.certIssued. OperationException: {}", e.getMessage());
+            LOG.debug("queryExecutor.certIssued", e);
             return false;
         } catch (SQLException e)
         {
-            LOG.error("queryExecutor.certIssued", e);
+            LOG.error("queryExecutor.certIssued. SQLException: {}", e.getMessage());
+            LOG.debug("queryExecutor.certIssued", e);
             return false;
         }
     }
@@ -198,7 +202,8 @@ public class CertificateStore
             return queryExecutor.getCertStatusForSubject(caCert, subject);
         } catch (SQLException e)
         {
-            LOG.error("queryExecutor.getCertStatusForSubject", e);
+            LOG.error("queryExecutor.getCertStatusForSubject. SQLException: {}", e.getMessage());
+            LOG.debug("queryExecutor.getCertStatusForSubject", e);
             return CertStatus.Unknown;
         }
     }
@@ -210,7 +215,8 @@ public class CertificateStore
             return queryExecutor.getCertStatusForSubject(caCert, subject);
         } catch (SQLException e)
         {
-            LOG.error("queryExecutor.getCertStatusForSubject", e);
+            LOG.error("queryExecutor.getCertStatusForSubject. SQLException: {}", e.getMessage());
+            LOG.debug("queryExecutor.getCertStatusForSubject", e);
             return CertStatus.Unknown;
         }
     }
