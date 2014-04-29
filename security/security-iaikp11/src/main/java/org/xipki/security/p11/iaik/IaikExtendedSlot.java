@@ -392,7 +392,8 @@ public class IaikExtendedSlot
             closeSession(session);
         }catch(TokenException e)
         {
-            LOG.error("closeSession", e);
+            LOG.error("closeSession.{}: {}", e.getClass().getName(), e.getMessage());
+            LOG.debug("closeSession", e);
         }
     }
 

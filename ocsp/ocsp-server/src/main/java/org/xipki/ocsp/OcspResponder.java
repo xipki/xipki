@@ -590,7 +590,7 @@ public class OcspResponder
                     } catch (CertStatusStoreException e)
                     {
                         LOG.error("answer() CertStatusStore.getCertStatus. CertStatusStoreException: {}", e.getMessage());
-                        LOG.error("answer() CertStatusStore.getCertStatus", e);
+                        LOG.debug("answer() CertStatusStore.getCertStatus", e);
                         if(childAuditEvent != null)
                         {
                             fillAuditEvent(childAuditEvent, AuditLevel.ERROR, AuditStatus.ERROR,
@@ -641,7 +641,7 @@ public class OcspResponder
                     } catch (IOException e)
                     {
                         LOG.error("answer() bcCertHash.getEncoded. IOException: {}", e.getMessage());
-                        LOG.error("answer() bcCertHash.getEncoded", e);
+                        LOG.debug("answer() bcCertHash.getEncoded", e);
                         if(childAuditEvent != null)
                         {
                             fillAuditEvent(childAuditEvent, AuditLevel.ERROR, AuditStatus.ERROR,
