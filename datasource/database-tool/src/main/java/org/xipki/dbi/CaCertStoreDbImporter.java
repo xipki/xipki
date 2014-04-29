@@ -109,11 +109,11 @@ class CaCertStoreDbImporter extends DbPorter
     throws Exception
     {
         final String SQL_ADD_CAINFO =
-                "INSERT INTO cainfo" +
-                " (id, subject, sha1_fp_cert, cert)" +
+                "INSERT INTO CAINFO" +
+                " (ID, SUBJECT, SHA1_FP_CERT, CERT)" +
                 " VALUES (?, ?, ?, ?)";
 
-        System.out.println("Importing table cainfo");
+        System.out.println("Importing table CAINFO");
         PreparedStatement ps = prepareStatement(SQL_ADD_CAINFO);
 
         try
@@ -138,7 +138,7 @@ class CaCertStoreDbImporter extends DbPorter
                     ps.execute();
                 }catch(Exception e)
                 {
-                    System.err.println("Error while imporing cainfo with id=" + info.getId() + ", message: " + e.getMessage());
+                    System.err.println("Error while imporing cainfo with ID=" + info.getId() + ", message: " + e.getMessage());
                     throw e;
                 }
             }
@@ -147,15 +147,15 @@ class CaCertStoreDbImporter extends DbPorter
             closeStatement(ps);
         }
 
-        System.out.println(" Imported table cainfo");
+        System.out.println(" Imported table CAINFO");
     }
 
     private void import_requestorinfo(Requestorinfos requestorinfos)
     throws Exception
     {
-        final String sql = "INSERT INTO requestorinfo (id, subject, sha1_fp_cert, cert) VALUES (?, ?, ?, ?)";
+        final String sql = "INSERT INTO REQUESTORINFO (ID, SUBJECT, SHA1_FP_CERT, CERT) VALUES (?, ?, ?, ?)";
 
-        System.out.println("Importing table requestorinfo");
+        System.out.println("Importing table REQUESTORINFO");
 
         PreparedStatement ps = prepareStatement(sql);
 
@@ -179,7 +179,7 @@ class CaCertStoreDbImporter extends DbPorter
                     ps.execute();
                 }catch(Exception e)
                 {
-                    System.err.println("Error while imporing requestorinfo with id=" + info.getId() + ", message: " + e.getMessage());
+                    System.err.println("Error while imporing requestorinfo with ID=" + info.getId() + ", message: " + e.getMessage());
                     throw e;
                 }
             }
@@ -188,15 +188,15 @@ class CaCertStoreDbImporter extends DbPorter
             closeStatement(ps);
         }
 
-        System.out.println(" Imported table requestorinfo");
+        System.out.println(" Imported table REQUESTORINFO");
     }
 
     private void import_certprofileinfo(Certprofileinfos certprofileinfos)
     throws Exception
     {
-        final String sql = "INSERT INTO certprofileinfo (id, name) VALUES (?, ?)";
+        final String sql = "INSERT INTO CERTPROFILEINFO (ID, NAME) VALUES (?, ?)";
 
-        System.out.println("Importing table certprofileinfo");
+        System.out.println("Importing table CERTPROFILEINFO");
 
         PreparedStatement ps = prepareStatement(sql);
 
@@ -213,7 +213,7 @@ class CaCertStoreDbImporter extends DbPorter
                     ps.execute();
                 }catch(Exception e)
                 {
-                    System.err.println("Error while imporing certprofileinfo with id=" + info.getId() + ", message: " + e.getMessage());
+                    System.err.println("Error while imporing CERTPROFILEINFO with ID=" + info.getId() + ", message: " + e.getMessage());
                     throw e;
                 }
             }
@@ -228,9 +228,9 @@ class CaCertStoreDbImporter extends DbPorter
     private void import_user(Users users)
     throws Exception
     {
-        final String sql = "INSERT INTO user (id, name) VALUES (?, ?)";
+        final String sql = "INSERT INTO USER (ID, NAME) VALUES (?, ?)";
 
-        System.out.println("Importing table user");
+        System.out.println("Importing table USER");
 
         PreparedStatement ps = prepareStatement(sql);
 
@@ -247,7 +247,7 @@ class CaCertStoreDbImporter extends DbPorter
                     ps.execute();
                 }catch(Exception e)
                 {
-                    System.err.println("Error while imporing user with id=" + user.getId() + ", message: " + e.getMessage());
+                    System.err.println("Error while imporing USER with ID=" + user.getId() + ", message: " + e.getMessage());
                     throw e;
                 }
             }
@@ -256,15 +256,15 @@ class CaCertStoreDbImporter extends DbPorter
             closeStatement(ps);
         }
 
-        System.out.println(" Imported table user");
+        System.out.println(" Imported table USER");
     }
 
     private void import_crl(Crls crls)
     throws Exception
     {
-        final String sql = "INSERT INTO crl (cainfo_id, crl_number, thisUpdate, nextUpdate, crl) VALUES (?, ?, ?, ?, ?)";
+        final String sql = "INSERT INTO CRL (CAINFO_ID, CRL_NUMBER, THISUPDATE, NEXTUPDATE, CRL) VALUES (?, ?, ?, ?, ?)";
 
-        System.out.println("Importing table crl");
+        System.out.println("Importing table CRL");
 
         PreparedStatement ps = prepareStatement(sql);
 
@@ -321,7 +321,7 @@ class CaCertStoreDbImporter extends DbPorter
                     ps.executeUpdate();
                 }catch(Exception e)
                 {
-                    System.err.println("Error while imporing crl with id=" + crl.getId() + ", message: " + e.getMessage());
+                    System.err.println("Error while imporing CRL with ID=" + crl.getId() + ", message: " + e.getMessage());
                     throw e;
                 }
             }
@@ -330,7 +330,7 @@ class CaCertStoreDbImporter extends DbPorter
             closeStatement(ps);
         }
 
-        System.out.println(" Imported table crl");
+        System.out.println(" Imported table CRL");
     }
 
     private void import_cert(CertsFiles certsfiles)
@@ -359,14 +359,14 @@ class CaCertStoreDbImporter extends DbPorter
     throws Exception
     {
         final String SQL_ADD_CERT =
-                "INSERT INTO cert " +
-                "(id, last_update, serial, subject,"
-                + " notbefore, notafter, revocated, rev_reason, rev_time, rev_invalidity_time,"
-                + " certprofileinfo_id, cainfo_id,"
-                + " requestorinfo_id, user_id, sha1_fp_pk, sha1_fp_subject)" +
+                "INSERT INTO CERT " +
+                "(ID, LAST_UPDATE, SERIAL, SUBJECT,"
+                + " NOTBEFORE, NOTAFTER, REVOCATED, REV_REASON, REV_TIME, REV_INVALIDITY_TIME,"
+                + " CERTPROFILEINFO_ID, CAINFO_ID,"
+                + " REQUESTORINFO_ID, USER_ID, SHA1_FP_PK, SHA1_FP_SUBJECT)" +
                 " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
-        final String SQL_ADD_RAWCERT = "INSERT INTO rawcert (cert_id, sha1_fp, cert) VALUES (?, ?, ?)";
+        final String SQL_ADD_RAWCERT = "INSERT INTO RAWCERT (CERT_ID, SHA1_FP, CERT) VALUES (?, ?, ?)";
 
         PreparedStatement ps_cert = prepareStatement(SQL_ADD_CERT);
         PreparedStatement ps_rawcert = prepareStatement(SQL_ADD_RAWCERT);
@@ -447,7 +447,7 @@ class CaCertStoreDbImporter extends DbPorter
                     sum++;
                 }catch(Exception e)
                 {
-                    System.err.println("Error while importing certificate with id=" + cert.getId());
+                    System.err.println("Error while importing certificate with ID=" + cert.getId());
                     throw e;
                 }
             }
