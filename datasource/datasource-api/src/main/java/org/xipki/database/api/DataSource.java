@@ -18,7 +18,9 @@
 package org.xipki.database.api;
 
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.sql.Statement;
 
 public interface DataSource
 {
@@ -28,5 +30,11 @@ public interface DataSource
     void returnConnection(Connection conn);
 
     DatabaseType getDatabaseType();
+
+    Statement createStatement(Connection conn)
+    throws SQLException;
+
+    PreparedStatement prepareStatement(Connection conn, String sqlQuery)
+    throws SQLException;
 
 }
