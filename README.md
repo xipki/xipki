@@ -64,8 +64,7 @@ Installation
     ```
     The following steps use $XIPKI_HOME to point to the unpacked folder
 
-  * Copy the JDBC drivers to folder, currently only database types MySQL, DB2, Oracle and PostgreSQL 
-    are configured. The JDBC driver of MySQL is contained and this step can be skipped.
+  * Copy the license jars if required (e.g. db2jcc_license_cu.jar for DB2) to.
 
     ```sh
     $XIPKI_HOME/lib/ext
