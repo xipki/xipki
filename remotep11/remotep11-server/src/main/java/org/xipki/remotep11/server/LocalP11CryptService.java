@@ -112,7 +112,8 @@ public class LocalP11CryptService
             initialized = true;
         }catch(Exception e)
         {
-            LOG.error("Exception " + e.getMessage(), e);
+            LOG.error("Exception thrown. {}: {}", e.getClass().getName(), e.getMessage());
+            LOG.debug("Exception thrown", e);
             throw e;
         }
     }

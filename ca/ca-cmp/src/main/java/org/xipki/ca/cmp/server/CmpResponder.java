@@ -210,7 +210,8 @@ public abstract class CmpResponder
                 }
             } catch (Exception e)
             {
-                LOG.error("tid=" + tidStr + ": error while verifying the signature", e);
+                LOG.error("tid=" + tidStr + ": error while verifying the signature: {}", e.getMessage());
+                LOG.debug("tid=" + tidStr + ": error while verifying the signature", e);
                 errorStatus = "Request has invalid signature based protection";
             }
         }
