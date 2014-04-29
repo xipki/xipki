@@ -19,12 +19,15 @@ package org.xipki.database;
 
 import java.io.PrintWriter;
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.dbcp.BasicDataSource;
+import org.apache.commons.dbcp.SQLNestedException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.database.api.DataSource;
@@ -466,6 +469,49 @@ public class DataSourceImpl implements DataSource
     private static String getString(String str)
     {
         return (str == null || str.isEmpty()) ? null : str;
+    }
+
+    @Override
+    public Statement createStatement(Connection conn)
+    throws SQLException
+    {
+        try
+        {
+            return conn.createStatement();
+        }catch (@SuppressWarnings("deprecation") SQLNestedException e)
+        {
+            Throwable cause = e.getCause();
+            if(cause instanceof SQLException)
+            {
+                throw (SQLException) e;
+            }
+            else
+            {
+                throw e;
+            }
+        }
+    }
+
+    @Override
+    public PreparedStatement prepareStatement(Connection conn,
+            String sqlQuery)
+    throws SQLException
+    {
+        try
+        {
+            return conn.prepareStatement(sqlQuery);
+        }catch (@SuppressWarnings("deprecation") SQLNestedException e)
+        {
+            Throwable cause = e.getCause();
+            if(cause instanceof SQLException)
+            {
+                throw (SQLException) cause;
+            }
+            else
+            {
+                throw e;
+            }
+        }
     }
 
 }

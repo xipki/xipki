@@ -68,6 +68,7 @@ public class DbCertStatusStore implements CertStatusStore
     private AuditLoggingService auditLoggingService;
 
     private boolean initialized = false;
+    private boolean initializationFailed = false;
 
     public DbCertStatusStore(String name, DataSource dataSource, boolean unknownSerialAsGood)
     {
@@ -172,6 +173,9 @@ public class DbCertStatusStore implements CertStatusStore
             LOG.error("Could not executing initIssurStore() for {},  {}: {}",
                     new Object[]{name, e.getClass().getName(), e.getMessage()});
             LOG.debug("Could not executing initIssurStore()", e);
+
+            initializationFailed = true;
+            initialized = true;
         }
     }
 
@@ -198,6 +202,11 @@ public class DbCertStatusStore implements CertStatusStore
         if(initialized == false)
         {
             throw new CertStatusStoreException("Initialization of CertStore is still in process");
+        }
+
+        if(initializationFailed)
+        {
+            throw new CertStatusStoreException("Initialization of CertStore failed");
         }
 
         if(includeCertHash && certHashAlgo == null)
@@ -346,8 +355,7 @@ public class DbCertStatusStore implements CertStatusStore
         Connection c = dataSource.getConnection(5000);
         if(c != null)
         {
-            LOG.debug("no idle PreparedStatement, create new instance");
-            ps = c.prepareStatement(sqlQuery);
+            ps = dataSource.prepareStatement(c, sqlQuery);
         }
         if(ps == null)
         {
