@@ -99,7 +99,8 @@ public class CrlCertStatusStore implements CertStatusStore
     private AuditLoggingService auditLoggingService;
 
     private boolean initialized = false;
-
+    private boolean initializationFailed = false;
+    
     public CrlCertStatusStore(String name, String crlFile, X509Certificate caCert, boolean useUpdateDatesFromCRL,
             boolean unknownSerialAsGood)
     {
@@ -384,6 +385,7 @@ public class CrlCertStatusStore implements CertStatusStore
             this.certStatusInfoMap.putAll(newCertStatusInfoMap);
             this.thisUpdate = newThisUpdate;
             this.nextUpdate = newNextUpdate;
+            this.initializationFailed = false;
             this.initialized = true;
             updateCRLSuccessfull = true;
             LOG.info("Updated CertStore {}", name);
@@ -392,6 +394,9 @@ public class CrlCertStatusStore implements CertStatusStore
             LOG.error("Could not executing initializeStore() for {},  {}: {}",
                     new Object[]{name, e.getClass().getName(), e.getMessage()});
             LOG.debug("Could not executing initializeStore()", e);
+            
+            initializationFailed = true;
+            initialized = true;
         } finally
         {
             if(updateCRLSuccessfull != null)
@@ -460,6 +465,11 @@ public class CrlCertStatusStore implements CertStatusStore
         if(initialized == false)
         {
             throw new CertStatusStoreException("Initialization of CertStore is still in process");
+        }
+
+        if(initializationFailed)
+        {
+            throw new CertStatusStoreException("Initialization of CertStore failed");
         }
 
         if(includeCertHash && certHashAlgo == null)

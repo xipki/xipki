@@ -163,6 +163,7 @@ public class DbCertStatusStore implements CertStatusStore
                 initialized = false;
                 this.issuerStore = new IssuerStore(caInfos);
                 LOG.info("Updated CertStore: {}", name);
+                initializationFailed =false;
                 initialized = true;
             }finally
             {
