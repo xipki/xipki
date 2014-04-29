@@ -78,7 +78,8 @@
 
         <!-- JDBC drivers -->
         <fileSet>
-            <directory>${project.build.directory}/jdbc</directory>
+            <!--directory>${project.build.directory}/jdbc</directory-->
+            <directory>../jdbc</directory>
             <outputDirectory>/lib/ext</outputDirectory>
             <fileMode>0644</fileMode>
             <directoryMode>0755</directoryMode>
