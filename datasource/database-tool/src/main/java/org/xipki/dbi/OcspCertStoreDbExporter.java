@@ -82,7 +82,7 @@ class OcspCertStoreDbExporter extends DbPorter
     private Issuers export_issuer()
     throws SQLException
     {
-        System.out.println("Exporting table issuer");
+        System.out.println("Exporting table ISSUER");
         Issuers issuers = new Issuers();
 
         Statement stmt = null;
@@ -90,14 +90,14 @@ class OcspCertStoreDbExporter extends DbPorter
         {
             stmt = createStatement();
 
-            String sql = "SELECT id, cert FROM issuer";
+            String sql = "SELECT ID, CERT FROM ISSUER";
 
             ResultSet rs = stmt.executeQuery(sql);
 
             while(rs.next())
             {
-                int id = rs.getInt("id");
-                String cert = rs.getString("cert");
+                int id = rs.getInt("ID");
+                String cert = rs.getString("CERT");
 
                 IssuerType issuer = new IssuerType();
                 issuer.setId(id);
@@ -113,22 +113,22 @@ class OcspCertStoreDbExporter extends DbPorter
             closeStatement(stmt);
         }
 
-        System.out.println(" Exported table issuer");
+        System.out.println(" Exported table ISSUER");
         return issuers;
     }
 
     private CertsFiles export_cert()
     throws SQLException, IOException, JAXBException
     {
-        System.out.println("Exporting tables cert, certhash and rawcert");
+        System.out.println("Exporting tables CERT, CERTHASH and RAWCERT");
         CertsFiles certsFiles = new CertsFiles();
 
-        String certSql = "SELECT id, issuer_id, last_update," +
-                " revocated, rev_reason, rev_time, rev_invalidity_time " +
-                " FROM cert" +
-                " WHERE id >= ? AND id < ?";
+        String certSql = "SELECT ID, ISSUER_ID, LAST_UPDATE," +
+                " REVOCATED, REV_REASON, REV_TIME, REV_INVALIDITY_TIME " +
+                " FROM CERT" +
+                " WHERE ID >= ? AND ID < ?";
 
-        String rawCertSql = "SELECT cert FROM rawcert WHERE cert_id = ?";
+        String rawCertSql = "SELECT CERT FROM RAWCERT WHERE CERT_ID = ?";
 
         PreparedStatement certPs = prepareStatement(certSql);
         PreparedStatement rawCertPs = prepareStatement(rawCertSql);
@@ -161,7 +161,7 @@ class OcspCertStoreDbExporter extends DbPorter
 
                 while(rs.next())
                 {
-                    int id = rs.getInt("id");
+                    int id = rs.getInt("ID");
 
                     if(minCertIdOfCurrentFile == -1)
                     {
@@ -181,12 +181,12 @@ class OcspCertStoreDbExporter extends DbPorter
                         maxCertIdOfCurrentFile = id;
                     }
 
-                    int issuer_id = rs.getInt("issuer_id");
-                    String last_update = rs.getString("last_update");
-                    boolean revocated = rs.getBoolean("revocated");
-                    String rev_reason = rs.getString("rev_reason");
-                    String rev_time = rs.getString("rev_time");
-                    String rev_invalidity_time = rs.getString("rev_invalidity_time");
+                    int issuer_id = rs.getInt("ISSUER_ID");
+                    String last_update = rs.getString("LAST_UPDATE");
+                    boolean revocated = rs.getBoolean("REVOCATED");
+                    String rev_reason = rs.getString("REV_REASON");
+                    String rev_time = rs.getString("REV_TIME");
+                    String rev_invalidity_time = rs.getString("REV_INVALIDITY_TIME");
 
                     rawCertPs.setInt(1, id);
 
@@ -196,7 +196,7 @@ class OcspCertStoreDbExporter extends DbPorter
                     try
                     {
                         rawCertRs.next();
-                        String b64Cert = rawCertRs.getString("cert");
+                        String b64Cert = rawCertRs.getString("CERT");
                         byte[] cert = Base64.decode(b64Cert);
                         sha1_fp_cert = IoCertUtil.sha1sum(cert);
 
@@ -289,7 +289,7 @@ class OcspCertStoreDbExporter extends DbPorter
         try
         {
             stmt = createStatement();
-            final String sql = "SELECT min(id) FROM cert";
+            final String sql = "SELECT MIN(ID) FROM CERT";
             ResultSet rs = stmt.executeQuery(sql);
 
             rs.next();
@@ -312,7 +312,7 @@ class OcspCertStoreDbExporter extends DbPorter
         try
         {
             stmt = createStatement();
-            final String sql = "SELECT max(id) FROM cert";
+            final String sql = "SELECT MAX(ID) FROM CERT";
             ResultSet rs = stmt.executeQuery(sql);
 
             rs.next();

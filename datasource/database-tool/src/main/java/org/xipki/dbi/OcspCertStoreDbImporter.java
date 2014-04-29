@@ -87,17 +87,17 @@ class OcspCertStoreDbImporter extends DbPorter
     throws Exception
     {
         final String SQL_ADD_CAINFO =
-                "INSERT INTO issuer (" +
-                " id, subject," +
-                " sha1_fp_name, sha1_fp_key," +
-                " sha224_fp_name, sha224_fp_key," +
-                " sha256_fp_name, sha256_fp_key," +
-                " sha384_fp_name, sha384_fp_key," +
-                " sha512_fp_name, sha512_fp_key," +
-                " sha1_fp_cert, cert" +
+                "INSERT INTO ISSUER (" +
+                " ID, SUBJECT," +
+                " SHA1_FP_NAME, SHA1_FP_KEY," +
+                " SHA224_FP_NAME, SHA224_FP_KEY," +
+                " SHA256_FP_NAME, SHA256_FP_KEY," +
+                " SHA384_FP_NAME, SHA384_FP_KEY," +
+                " SHA512_FP_NAME, SHA512_FP_KEY," +
+                " SHA1_fp_cert, cert" +
                 " ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
-        System.out.println("Importing table issuer");
+        System.out.println("Importing table ISSUER");
         PreparedStatement ps = prepareStatement(SQL_ADD_CAINFO);
 
         try
@@ -157,7 +157,7 @@ class OcspCertStoreDbImporter extends DbPorter
         {
             closeStatement(ps);
         }
-        System.out.println(" Imported table issuer");
+        System.out.println(" Imported table ISSUER");
     }
 
     private void import_cert(CertsFiles certsfiles)
@@ -188,17 +188,17 @@ class OcspCertStoreDbImporter extends DbPorter
     throws Exception
     {
         final String SQL_ADD_CERT =
-                "INSERT INTO cert (" +
-                " id, issuer_id, serial, " +
-                " subject, last_update, notbefore, notafter," +
-                " revocated, rev_reason, rev_time, rev_invalidity_time)" +
+                "INSERT INTO CERT (" +
+                " ID, ISSUER_ID, SERIAL, " +
+                " SUBJECT, LAST_UPDATE, NOTBEFORE, NOTAFTER," +
+                " REVOCATED, REV_REASON, REV_TIME, REV_INVALIDITY_TIME)" +
                 " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
-        final String SQL_ADD_CERTHASH = "INSERT INTO certhash (" +
-                "cert_id, sha1_fp, sha224_fp, sha256_fp, sha384_fp, sha512_fp)" +
+        final String SQL_ADD_CERTHASH = "INSERT INTO CERTHASH (" +
+                "CERT_ID, SHA1_FP, SHA224_FP, SHA256_FP, SHA384_FP, SHA512_FP)" +
                 " VALUES (?, ?, ?, ?, ?, ?)";
 
-        final String SQL_ADD_RAWCERT = "INSERT INTO rawcert (cert_id, cert) VALUES (?, ?)";
+        final String SQL_ADD_RAWCERT = "INSERT INTO RAWCERT (CERT_ID, CERT) VALUES (?, ?)";
 
         PreparedStatement ps_cert = prepareStatement(SQL_ADD_CERT);
         PreparedStatement ps_certhash = prepareStatement(SQL_ADD_CERTHASH);
@@ -281,7 +281,7 @@ class OcspCertStoreDbImporter extends DbPorter
                     sum++;
                 }catch(Exception e)
                 {
-                    System.err.println("Error while importing certificate with id=" + cert.getId());
+                    System.err.println("Error while importing certificate with ID=" + cert.getId());
                     throw e;
                 }
             }
