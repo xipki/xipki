@@ -1,6 +1,7 @@
 #!/bin/sh
 
-LIQUIBASE_HOME=liquibase
+# Log level of liquibase: debug, info, warning, severe, off
+LOG_LEVEL=off
 
 COMMAND=$1
 
@@ -38,12 +39,12 @@ fi
 
 liquibase ()
 {
-   CMD="liquibase/liquibase --driver=$DRIVER --classpath=$JDBC_CP --changeLogFile=$CHANGELOG_FILE $DFLT_SCHEMA --url=$db_url --username=$db_username --password=$db_password $COMMAND"
+   CMD="liquibase/liquibase --driver=$DRIVER --classpath=$JDBC_CP --changeLogFile=$CHANGELOG_FILE $DFLT_SCHEMA --url=$db_url --username=$db_username --password=$db_password --logLevel=$LOG_LEVEL $COMMAND"
    #echo "$CMD"
    $CMD
 }
 
-if [ $# == 1 ]; then
+if [ $# = 1 ]; then
   while true; do
     read -p "Do you wish to $COMMAND database? y/n " RESP
     if [ "$RESP" = "y" ]; then
