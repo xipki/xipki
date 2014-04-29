@@ -323,13 +323,13 @@
 		<addForeignKeyConstraint deferrable="false" initiallyDeferred="false"
 			onDelete="CASCADE" onUpdate="NO ACTION"
 			baseColumnNames="REQUESTOR_NAME" baseTableName="CA_HAS_REQUESTOR"
-			constraintName="FK_CA_HAS_CMPREQUESTOR_CMPREQUESTOR1"
+			constraintName="FK_CA_HAS_REQUESTOR_REQUESTOR1"
 			referencedColumnNames="NAME" referencedTableName="REQUESTOR"/>
 			
 		<addForeignKeyConstraint deferrable="false" initiallyDeferred="false"
 			onDelete="CASCADE" onUpdate="NO ACTION"
 			baseColumnNames="CA_NAME" baseTableName="CA_HAS_REQUESTOR"
-			constraintName="FK_CA_HAS_CMPREQUESTOR1_CA1"
+			constraintName="FK_CA_HAS_REQUESTOR1_CA1"
 			referencedColumnNames="NAME" referencedTableName="CA"/>
 
 		<!-- ca_has_publisher -->
