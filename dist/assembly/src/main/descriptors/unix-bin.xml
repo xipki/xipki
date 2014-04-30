@@ -41,6 +41,9 @@
         <fileSet>
             <directory>${project.build.directory}/classes/etc</directory>
             <outputDirectory>/etc/</outputDirectory>
+            <excludes>
+                <exclude>**/*.formatted</exclude>
+            </excludes>
             <lineEnding>unix</lineEnding>
             <fileMode>0644</fileMode>
             <directoryMode>0755</directoryMode>
@@ -160,6 +163,13 @@
             <source>${project.basedir}/../../README.md</source>
             <outputDirectory>/</outputDirectory>
             <destName>README.md</destName>
+            <fileMode>0644</fileMode>
+            <lineEnding>unix</lineEnding>
+        </file>
+       <file>
+            <source>${project.build.directory}/dependencies/apache-karaf-${karaf.version}/LICENSE</source>
+            <outputDirectory>Licenses</outputDirectory>
+            <destName>karaf-LICENSE.txt</destName>
             <fileMode>0644</fileMode>
             <lineEnding>unix</lineEnding>
         </file>

@@ -25,6 +25,10 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 
+import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLSession;
+
 import org.xipki.security.api.SignerException;
 import org.xipki.security.common.ParamChecker;
 
@@ -39,7 +43,16 @@ class DefaultRemoteP11CryptService extends RemoteP11CryptService
     private String user;
     @SuppressWarnings("unused")
     private char[] password;
-
+    
+    static{
+    	HttpsURLConnection.setDefaultHostnameVerifier(new HostnameVerifier() {			
+			@Override
+			public boolean verify(String s, SSLSession sslSession) {
+				return true;
+			}
+		});
+    }
+    
     DefaultRemoteP11CryptService(String url, String user, char[] password)
     {
         ParamChecker.assertNotEmpty("url", url);
