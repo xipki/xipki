@@ -40,14 +40,17 @@ class DefaultHttpCmpRequestor extends X509CmpRequestor
     private static final String CMP_RESPONSE_MIMETYPE = "application/pkixcmp";
 
     private final URL serverUrl;
-    
-    static{
-    	HttpsURLConnection.setDefaultHostnameVerifier(new HostnameVerifier() {			
-			@Override
-			public boolean verify(String s, SSLSession sslSession) {
-				return true;
-			}
-		});
+
+    static
+    {
+        HttpsURLConnection.setDefaultHostnameVerifier(new HostnameVerifier()
+        {
+            @Override
+            public boolean verify(String s, SSLSession sslSession)
+            {
+                return true;
+            }
+        });
     }
 
     DefaultHttpCmpRequestor(ConcurrentContentSigner requestor,
