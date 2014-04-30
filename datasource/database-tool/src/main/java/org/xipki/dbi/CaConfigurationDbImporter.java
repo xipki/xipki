@@ -175,7 +175,7 @@ class CaConfigurationDbImporter extends DbPorter
     }
 
     @SuppressWarnings("resource")
-	private void import_environment(Environments environments)
+    private void import_environment(Environments environments)
     throws Exception
     {
         System.out.println("Importing table ENVIRONMENT");
@@ -210,7 +210,7 @@ class CaConfigurationDbImporter extends DbPorter
     }
 
     @SuppressWarnings("resource")
-	private void import_crlsigner(Crlsigners crlsigners)
+    private void import_crlsigner(Crlsigners crlsigners)
     throws Exception
     {
         System.out.println("Importing table CRLSIGNER");
@@ -249,7 +249,7 @@ class CaConfigurationDbImporter extends DbPorter
     }
 
     @SuppressWarnings("resource")
-	private void import_requestor(Requestors requestors)
+    private void import_requestor(Requestors requestors)
     throws Exception
     {
         System.out.println("Importing table REQUESTOR");
@@ -281,7 +281,7 @@ class CaConfigurationDbImporter extends DbPorter
     }
 
     @SuppressWarnings("resource")
-	private void import_publisher(Publishers publishers)
+    private void import_publisher(Publishers publishers)
     throws Exception
     {
         System.out.println("Importing table PUBLISHER");
@@ -313,7 +313,7 @@ class CaConfigurationDbImporter extends DbPorter
     }
 
     @SuppressWarnings("resource")
-	private void import_certprofile(Certprofiles certprofiles)
+    private void import_certprofile(Certprofiles certprofiles)
     throws Exception
     {
         System.out.println("Importing table CERTPROFILE");
@@ -345,7 +345,7 @@ class CaConfigurationDbImporter extends DbPorter
     }
 
     @SuppressWarnings("resource")
-	private void import_ca(Cas cas)
+    private void import_ca(Cas cas)
     throws Exception
     {
         System.out.println("Importing table CA");
@@ -400,7 +400,7 @@ class CaConfigurationDbImporter extends DbPorter
     }
 
     @SuppressWarnings("resource")
-	private void import_caalias(Caaliases caaliases)
+    private void import_caalias(Caaliases caaliases)
     throws Exception
     {
         System.out.println("Importing table CAALIAS");
@@ -430,7 +430,7 @@ class CaConfigurationDbImporter extends DbPorter
     }
 
     @SuppressWarnings("resource")
-	private void import_ca_has_requestor(CaHasRequestors ca_has_requestors)
+    private void import_ca_has_requestor(CaHasRequestors ca_has_requestors)
     throws Exception
     {
         System.out.println("Importing table CA_HAS_REQUESTOR");
@@ -467,7 +467,7 @@ class CaConfigurationDbImporter extends DbPorter
     }
 
     @SuppressWarnings("resource")
-	private void import_ca_has_publisher(CaHasPublishers ca_has_publishers)
+    private void import_ca_has_publisher(CaHasPublishers ca_has_publishers)
     throws Exception
     {
         System.out.println("Importing table CA_HAS_PUBLISHER");
@@ -498,7 +498,7 @@ class CaConfigurationDbImporter extends DbPorter
     }
 
     @SuppressWarnings("resource")
-	private void import_ca_has_certprofile(CaHasCertprofiles ca_has_certprofiles)
+    private void import_ca_has_certprofile(CaHasCertprofiles ca_has_certprofiles)
     throws Exception
     {
         System.out.println("Importing table CA_HAS_CERTPROFILE");
