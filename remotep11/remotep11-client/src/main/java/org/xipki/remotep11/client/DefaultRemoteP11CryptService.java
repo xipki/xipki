@@ -43,16 +43,19 @@ class DefaultRemoteP11CryptService extends RemoteP11CryptService
     private String user;
     @SuppressWarnings("unused")
     private char[] password;
-    
-    static{
-    	HttpsURLConnection.setDefaultHostnameVerifier(new HostnameVerifier() {			
-			@Override
-			public boolean verify(String s, SSLSession sslSession) {
-				return true;
-			}
-		});
+
+    static
+    {
+        HttpsURLConnection.setDefaultHostnameVerifier(new HostnameVerifier()
+        {
+            @Override
+            public boolean verify(String s, SSLSession sslSession)
+            {
+                return true;
+            }
+        });
     }
-    
+
     DefaultRemoteP11CryptService(String url, String user, char[] password)
     {
         ParamChecker.assertNotEmpty("url", url);

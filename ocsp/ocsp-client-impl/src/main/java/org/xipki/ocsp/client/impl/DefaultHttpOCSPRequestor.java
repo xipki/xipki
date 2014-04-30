@@ -33,15 +33,18 @@ public class DefaultHttpOCSPRequestor extends AbstractOCSPRequestor
     private static final String CT_REQUEST  = "application/ocsp-request";
     private static final String CT_RESPONSE = "application/ocsp-response";
 
-    static{
-    	HttpsURLConnection.setDefaultHostnameVerifier(new HostnameVerifier() {			
-			@Override
-			public boolean verify(String s, SSLSession sslSession) {
-				return true;
-			}
-		});
+    static
+    {
+        HttpsURLConnection.setDefaultHostnameVerifier(new HostnameVerifier()
+        {
+            @Override
+            public boolean verify(String s, SSLSession sslSession)
+            {
+                return true;
+            }
+        });
     }
-    
+
     public DefaultHttpOCSPRequestor()
     {
     }
