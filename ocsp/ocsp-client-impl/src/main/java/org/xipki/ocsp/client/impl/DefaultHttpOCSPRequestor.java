@@ -24,11 +24,24 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
+import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLSession;
+
 public class DefaultHttpOCSPRequestor extends AbstractOCSPRequestor
 {
     private static final String CT_REQUEST  = "application/ocsp-request";
     private static final String CT_RESPONSE = "application/ocsp-response";
 
+    static{
+    	HttpsURLConnection.setDefaultHostnameVerifier(new HostnameVerifier() {			
+			@Override
+			public boolean verify(String s, SSLSession sslSession) {
+				return true;
+			}
+		});
+    }
+    
     public DefaultHttpOCSPRequestor()
     {
     }
