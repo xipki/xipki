@@ -50,6 +50,7 @@ final public class Version
             version.append(jattr.getValue("Implementation-Build")).append(" ");
             version.append("Build at: ");
             version.append(jattr.getValue("Implementation-Build-Timestamp")).append(" ");
+            jfile.close();
         }
         catch (Exception e)
         {
