@@ -117,9 +117,9 @@
 		<bundle>mvn:org.xipki/database-tool/${project.version}</bundle>
 	</feature>
 
-    <feature name="xipki-audit-slf4j" version="${project.version}" resolver="(obr)">
-        <bundle>mvn:org.xipki/audit-api/${project.version}</bundle>
-        <bundle>mvn:org.xipki/slf4j-audit-impl/${project.version}</bundle>
-    </feature>
+	<feature name="xipki-audit-slf4j" version="${project.version}" resolver="(obr)">
+		<bundle>mvn:org.xipki/audit-api/${project.version}</bundle>
+		<bundle>mvn:org.xipki/slf4j-audit-impl/${project.version}</bundle>
+	</feature>
 
 </features>

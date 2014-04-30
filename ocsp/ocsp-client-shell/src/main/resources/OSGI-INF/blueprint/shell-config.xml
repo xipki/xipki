@@ -13,12 +13,6 @@
             </action>
         </command>
 
-        <command name="ocsp/batch-status">
-            <action class="org.xipki.ocsp.client.shell.BatchOCSPStatusCommand">
-            	<property name="requestor" ref="ocspRequestor" />
-            </action>
-        </command>
-        
         <command name="ocsp/status-loadtest">
             <action class="org.xipki.ocsp.client.shell.loadtest.OCSPStatusLoadTestCommand">
             	<property name="requestor" ref="ocspRequestor" />
