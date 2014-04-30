@@ -35,6 +35,7 @@ import org.xipki.database.api.DatabaseType;
 import org.xipki.security.api.PasswordResolver;
 import org.xipki.security.api.PasswordResolverException;
 
+@SuppressWarnings("deprecation")
 public class DataSourceImpl implements DataSource
 {
     private static final Logger LOG = LoggerFactory.getLogger(DataSourceImpl.class);
@@ -478,7 +479,7 @@ public class DataSourceImpl implements DataSource
         try
         {
             return conn.createStatement();
-        }catch (@SuppressWarnings("deprecation") SQLNestedException e)
+        }catch (SQLNestedException e)
         {
             Throwable cause = e.getCause();
             if(cause instanceof SQLException)
@@ -500,7 +501,7 @@ public class DataSourceImpl implements DataSource
         try
         {
             return conn.prepareStatement(sqlQuery);
-        }catch (@SuppressWarnings("deprecation") SQLNestedException e)
+        }catch (SQLNestedException e)
         {
             Throwable cause = e.getCause();
             if(cause instanceof SQLException)
