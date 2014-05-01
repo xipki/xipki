@@ -41,6 +41,7 @@ import org.bouncycastle.cert.ocsp.OCSPResp;
 import org.bouncycastle.operator.DigestCalculator;
 import org.xipki.ocsp.client.api.OCSPRequestor;
 import org.xipki.ocsp.client.api.OCSPRequestorException;
+import org.xipki.ocsp.client.api.OCSPResponseNotSuccessfullException;
 import org.xipki.ocsp.client.api.RequestOptions;
 import org.xipki.ocsp.client.impl.digest.SHA1DigestCalculator;
 import org.xipki.ocsp.client.impl.digest.SHA224DigestCalculator;
@@ -129,8 +130,7 @@ public abstract class AbstractOCSPRequestor implements OCSPRequestor
         }
         else
         {
-            throw new OCSPRequestorException("OCSP responder could not process the request. stauts is " +
-                    statusCode + " (" + getOCSPResponseStatus(statusCode) + ")");
+            throw new OCSPResponseNotSuccessfullException(statusCode);
         }
 
     }
@@ -198,24 +198,4 @@ public abstract class AbstractOCSPRequestor implements OCSPRequestor
         return nonce;
     }
 
-    private static String getOCSPResponseStatus(int statusCode)
-    {
-        switch(statusCode)
-        {
-        case 0:
-            return "successfull";
-        case 1:
-            return "malformedRequest";
-        case 2:
-            return "internalError";
-        case 3:
-            return "tryLater";
-        case 5:
-            return "sigRequired";
-        case 6:
-            return "unauthorized";
-        default:
-            return "undefined";
-        }
-    }
 }

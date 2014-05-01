@@ -40,6 +40,7 @@ import org.bouncycastle.cert.ocsp.SingleResp;
 import org.bouncycastle.cert.ocsp.UnknownStatus;
 import org.bouncycastle.util.encoders.Hex;
 import org.xipki.ocsp.client.api.OCSPRequestor;
+import org.xipki.ocsp.client.api.OCSPResponseNotSuccessfullException;
 import org.xipki.ocsp.client.api.RequestOptions;
 import org.xipki.security.common.IoCertUtil;
 
@@ -100,7 +101,15 @@ public class OCSPStatusCommand extends OsgiCommandSupport
         options.setUseNonce(useNonce == null ? false : useNonce.booleanValue());
         options.setHashAlgorithmId(NISTObjectIdentifiers.id_sha256);
 
-        BasicOCSPResp basicResp = requestor.ask(caCert, sn, serverUrl, options);
+        BasicOCSPResp basicResp;
+        try
+        {
+            basicResp = requestor.ask(caCert, sn, serverUrl, options);
+        }catch(OCSPResponseNotSuccessfullException e)
+        {
+            System.err.println(e.getMessage());
+            return null;
+        }
 
         SingleResp[] singleResponses = basicResp.getResponses();
 
