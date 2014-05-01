@@ -156,7 +156,7 @@ public class X509CA
         byte[] encodedSkiValue = caCert.getCert().getExtensionValue(Extension.subjectKeyIdentifier.getId());
         if(encodedSkiValue == null)
         {
-            throw new OperationException(ErrorCode.System_Failure,
+            throw new OperationException(ErrorCode.INVALID_EXTENSION,
                     "CA certificate does not have required extension SubjectKeyIdentifier");
         }
         ASN1OctetString ski;
@@ -165,7 +165,7 @@ public class X509CA
             ski = (ASN1OctetString) X509ExtensionUtil.fromExtensionValue(encodedSkiValue);
         } catch (IOException e)
         {
-            throw new OperationException(ErrorCode.System_Failure, e.getMessage());
+            throw new OperationException(ErrorCode.INVALID_EXTENSION, e.getMessage());
         }
         this.caSKI = ski.getOctets();
 
@@ -188,7 +188,7 @@ public class X509CA
                 lastThisUpdate = certstore.getThisUpdateOfCurrentCRL(caCert);
             } catch (SQLException e)
             {
-                throw new OperationException(ErrorCode.System_Failure, "SQLException: " + e.getMessage());
+                throw new OperationException(ErrorCode.DATABASE_FAILURE, "SQLException: " + e.getMessage());
             }
 
             long period = crlSigner.getPeriod();
@@ -217,12 +217,12 @@ public class X509CA
             greatestSerialNumber = certstore.getGreatestSerialNumber(caCert);
         } catch (SQLException e)
         {
-            throw new OperationException(ErrorCode.System_Failure, "SQLException: " + e.getMessage());
+            throw new OperationException(ErrorCode.DATABASE_FAILURE, "SQLException: " + e.getMessage());
         }
 
         if(greatestSerialNumber == null)
         {
-            throw new OperationException(ErrorCode.System_Failure,
+            throw new OperationException(ErrorCode.DATABASE_FAILURE,
                     "Could not retrieve the greated serial number for ca " + caInfo.getName());
         }
         if(caInfo.getNextSerial() < greatestSerialNumber + 1)
@@ -337,7 +337,7 @@ public class X509CA
         {
             if(crlSigner == null)
             {
-                throw new OperationException(ErrorCode.System_Failure, "CRL generation is not allowed");
+                throw new OperationException(ErrorCode.INSUFFICIENT_PERMISSION, "CRL generation is not allowed");
             }
 
             synchronized (crlLock)
@@ -371,7 +371,7 @@ public class X509CA
                         revInfos = certstore.getRevocatedCertificates(cacert, thisUpdate, startSerial, numEntries);
                     } catch (SQLException e)
                     {
-                        throw new OperationException(ErrorCode.System_Failure, "SQLException: " + e.getMessage());
+                        throw new OperationException(ErrorCode.DATABASE_FAILURE, "SQLException: " + e.getMessage());
                     }
 
                     BigInteger maxSerial = BigInteger.ONE;
@@ -426,7 +426,7 @@ public class X509CA
                 {
                     LOG.error("getNextFreeCRLNumber. {}: {}", e.getClass().getName(), e.getMessage());
                     LOG.debug("getNextFreeCRLNumber", e);
-                    throw new OperationException(ErrorCode.System_Failure, e.getMessage());
+                    throw new OperationException(ErrorCode.DATABASE_FAILURE, e.getMessage());
                 }
 
                 try
@@ -455,7 +455,7 @@ public class X509CA
                     LOG.error("crlBuilder.addExtension. {}: {}", e.getClass().getName(), e.getMessage());
                     LOG.debug("crlBuilder.addExtension", e);
 
-                    throw new OperationException(ErrorCode.System_Failure, e.getMessage());
+                    throw new OperationException(ErrorCode.INVALID_EXTENSION, e.getMessage());
                 }
 
                 startSerial = BigInteger.ONE;
@@ -475,7 +475,7 @@ public class X509CA
                             serials = certstore.getCertSerials(cacert, thisUpdate, startSerial, numEntries);
                         } catch (SQLException e)
                         {
-                            throw new OperationException(ErrorCode.System_Failure, "SQLException: " + e.getMessage());
+                            throw new OperationException(ErrorCode.DATABASE_FAILURE, "SQLException: " + e.getMessage());
                         }
 
                         BigInteger maxSerial = BigInteger.ONE;
@@ -492,7 +492,7 @@ public class X509CA
                                 encodedCert = certstore.getEncodedCertificate(cacert, serial);
                             } catch (SQLException e)
                             {
-                                throw new OperationException(ErrorCode.System_Failure, "SQLException: " + e.getMessage());
+                                throw new OperationException(ErrorCode.DATABASE_FAILURE, "SQLException: " + e.getMessage());
                             }
 
                             Certificate cert = Certificate.getInstance(encodedCert);
@@ -508,7 +508,7 @@ public class X509CA
                                 false, new DERSet(vector));
                     } catch (CertIOException e)
                     {
-                        throw new OperationException(ErrorCode.System_Failure, "CertIOException: " + e.getMessage());
+                        throw new OperationException(ErrorCode.INVALID_EXTENSION, "CertIOException: " + e.getMessage());
                     }
                 }
 
@@ -542,7 +542,7 @@ public class X509CA
                     return crl;
                 } catch (CRLException e)
                 {
-                    throw new OperationException(ErrorCode.System_Failure, "CRLException: " + e.getMessage());
+                    throw new OperationException(ErrorCode.CRL_FAILURE, "CRLException: " + e.getMessage());
                 }
             }// end synchronized crlLock
         }finally
@@ -696,7 +696,7 @@ public class X509CA
         } catch (CertAlreadyIssuedException e)
         {
             LOG.warn("CertAlreadyIssuedException in regenerateCertificate(), should not reach here", e);
-            throw new OperationException(ErrorCode.System_Failure, "CertAlreadyIssuedException:  " + e.getMessage());
+            throw new OperationException(ErrorCode.ALREADY_ISSUED, "CertAlreadyIssuedException:  " + e.getMessage());
         } finally
         {
             if(successfull == false)
@@ -976,7 +976,7 @@ public class X509CA
 
         if(certProfile.isOnlyForRA() && requestedByRA == false)
         {
-            throw new OperationException(ErrorCode.NO_PERMISSION_OF_CERT_PROFILE,
+            throw new OperationException(ErrorCode.INSUFFICIENT_PERMISSION,
                     "Profile " + certProfileName + " not applied to non-RA");
         }
 
