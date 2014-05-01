@@ -22,8 +22,8 @@
             <cm:property name="ident" value="IDENT" />
             <!-- enable this if the default hostname of the sending side should be avoided. -->
             <cm:property name="localName" value="" />
-<!-- maxMessageLength -->
-<!-- axShutdownWait -->
+			<cm:property name="maxMessageLength" value="1024"/>
+<!-- maxShutdownWait -->
             <!-- the default port for the syslog host -->
             <cm:property name="port" value="514" /> 
             <!--  the default protocol for the syslog host -->
@@ -51,6 +51,7 @@
 	    <property name="host" value="${host}" />
 	    <property name="ident" value="${ident}" />
 	    <property name="localName" value="${localName}" />
+	    <property name="maxMessageLength" value="${maxMessageLength}"/>
 	    <property name="port" value="${port}" />
 	    <property name="protocol" value="${protocol}" />	  
         <property name="threadLoopInterval" value="${threadLoopInterval}" />
