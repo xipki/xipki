@@ -236,6 +236,7 @@ features:uninstall xipki-security-shell
 #################################################################
 #                              OCSP                             #
 #################################################################
+features:uninstall xipki-ocspserver
 features:install xipki-ocspserver
 features:install xipki-ocspclient-shell
 
