@@ -41,9 +41,6 @@
         <fileSet>
             <directory>${project.build.directory}/classes/etc</directory>
             <outputDirectory>/etc/</outputDirectory>
-            <excludes>
-                <exclude>**/*.formatted</exclude>
-            </excludes>
             <lineEnding>unix</lineEnding>
             <fileMode>0644</fileMode>
             <directoryMode>0755</directoryMode>

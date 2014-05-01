@@ -256,7 +256,7 @@ public class SyslogAuditLoggingServiceImpl implements AuditLoggingService
             config.setTruncateMessage(truncateMessage);
             if(maxMessageLength > 0)
             {
-            	config.setMaxMessageLength(maxMessageLength);
+                config.setMaxMessageLength(maxMessageLength);
             }
 
             config.setUseStructuredData(useStructuredData);
