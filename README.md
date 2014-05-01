@@ -28,6 +28,7 @@ Apache License 2.0
 Prerequisite
 ------------
 * JRE / JDK 1.7+
+* For Oracle: Java Cryptography Extension (JCE) Unlimited Strength Jurisdiction Policy Files
 
 Build and Assembly
 ------------------
@@ -37,7 +38,7 @@ Build and Assembly
   ```
 
 * Prepare
-  * Install the third party artifacts that are not availablle in maven repositories    
+  * Install the third party artifacts that are not availablle in maven repositories
     
     In folder xipki/ext
     ```sh
@@ -83,7 +84,7 @@ Install
     $XIPKI_HOME/ca-config/ca-db.properties
     $XIPKI_HOME/ocsp-config/ocsp-publisher.properties
     ```
-* If you use keys in PKCS#11 device 
+* If you use keys in PKCS#11 device
 
     Generate keypair with self-signed certificate in PKCS#11 device
     ```sh
