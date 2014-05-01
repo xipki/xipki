@@ -62,13 +62,18 @@
 		<bundle>mvn:org.xipki/audit-api/${project.version}</bundle>		
 		<bundle>mvn:org.xipki/ca-api/${project.version}</bundle>
 	</feature>
-	<feature name="xipki-caserver" version="${project.version}" resolver="(obr)">
-		<feature>xipki-datasource</feature>
+	<feature name="xipki-cabase" version="${project.version}" resolver="(obr)">
 		<feature>xipki-security</feature>
 		<feature>xipki-ca-api</feature>
+		<bundle>mvn:org.xipki/audit-api/${project.version}</bundle>
+		<bundle>mvn:org.xipki/ca-cmp/${project.version}</bundle>
+		<bundle>mvn:org.xipki/datasource-api/${project.version}</bundle>
+	</feature>
+	<feature name="xipki-caserver" version="${project.version}" resolver="(obr)">
+		<feature>xipki-datasource</feature>
+		<feature>xipki-cabase</feature>
 		<feature>xipki-audit-slf4j</feature>
 		<bundle>mvn:org.xipki/ca-certprofile-example/${project.version}</bundle>
-		<bundle>mvn:org.xipki/ca-cmp/${project.version}</bundle>
 		<bundle>mvn:org.xipki/ca-server/${project.version}</bundle>
 	</feature>
 	<feature name="xipki-caserver-shell" version="${project.version}" resolver="(obr)">
@@ -76,12 +81,7 @@
 		<bundle>mvn:org.xipki/ca-server-shell/${project.version}</bundle>
 	</feature>
 	<feature name="xipki-caclient" version="${project.version}" resolver="(obr)">
-		<feature>xipki-security</feature>
-		<bundle>mvn:org.xipki/audit-api/${project.version}</bundle>
-		<bundle>mvn:org.xipki/ca-cmp/${project.version}</bundle>
-		<bundle>mvn:org.xipki/ca-common/${project.version}</bundle>
-		<bundle>mvn:org.xipki/ca-api/${project.version}</bundle>
-		<bundle>mvn:org.xipki/datasource-api/${project.version}</bundle>
+		<feature>xipki-cabase</feature>
 		<bundle>mvn:org.xipki/ca-client-api/${project.version}</bundle>
 		<bundle>mvn:org.xipki/ca-client-impl/${project.version}</bundle>
 	</feature>
