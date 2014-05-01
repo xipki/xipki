@@ -18,15 +18,19 @@ eXtensible sImple Public Key Infrastructure
 Version
 ----
 
-1.0.0
+1.0
 
 License
 -----------
 
 Apache License 2.0
 
-Installation
+Prerequisite
 ------------
+* JRE / JDK 1.7+
+
+Build and Assembly
+------------------
 * Get a copy of XiPKI code
   ```sh
   git clone git://github.com/xipki/xipki xipki
@@ -55,8 +59,10 @@ Installation
     mvn clean install
     ```
 
-* Install
-  * Unpack the assembled file
+Install
+-------
+
+* Unpack the assembled file
  
     In destination folder of the installation
     ```sh
@@ -64,50 +70,56 @@ Installation
     ```
     The following steps use $XIPKI_HOME to point to the unpacked folder
 
-  * Copy the license jars if required (e.g. db2jcc_license_cu.jar for DB2) to.
+* Copy the license jars if required (e.g. db2jcc_license_cu.jar for DB2) to.
 
     ```sh
     $XIPKI_HOME/lib/ext
     ```
 
-  * Configure one database for the CA (required) and one for the OCSP responder (optional)
-  * Adapt the database configuration (access rights read and write of database are required)
+* Configure one database for the CA and one for the OCSP responder
+* Adapt the database configuration (access rights read and write of database are required)
 
     ```sh
     $XIPKI_HOME/ca-config/ca-db.properties
     $XIPKI_HOME/ocsp-config/ocsp-publisher.properties
     ```
-  * Initialize the databases
+* If you use keys in PKCS#11 device 
+
+    Generate keypair with self-signed certificate in PKCS#11 device
+    ```sh
+    features:install xipki-security-shell
+    # RSA key, the default label for demo is RCA1, and default slot is 1
+    keytool:rsa -slot <slot index> -key-label <label> [-pwd <password>]
+    # EC key, the default label for demo is RCA1-EC, and default slot is 1
+    keytool:ec  -slot <slot index> -key-label <label> -curve secp256r1 [-pwd <password>]
+    ```
+
+Run Demo
+-----
+
+* Initialize the databases
 
     In folder $XIPKI_HOME/sql
     ```sh
     ./reset.sh
     ```
+* Delete folders $XIPKI_HOME/data and $XIPKI_HOME/output
 
-  * Start XiPKI as daemon
+* Start XiPKI
   
     In folder $XIPKI_HOME
     ```sh
-    bin/start    
+    bin/karaf
     ```
-    If you have changed the content within folder $XIPKI_HOME/etc or $XIPKI_HOME/system, please delete the folder $XIPKI_HOME/data before starting XiPKI.
-  * Log into the XiPKI via SSH
-    ```sh
-    ssh -p 8101 admin@localhost
-    ```
-    with username 'admin' and password 'admin'. SSH users are configured in $XIPKI_HOME/etc/users.properties
 
-  * If you use keys in PKCS#11 device
-  
-    Generate keypair with self-signed certificate in PKCS#11 device
+    HSM devices of Thales, e.g. nCipher, uses preload to manage the PKCS#11 session. In this case, XiPKI should be started as follows
     ```sh
-    features:install xipki-security-shell
-    # RSA key, the default label for demo is RCA1, and default slot is 1
-    keytool:rsa -slot <slot index> -key-label <label> 
-    # EC key, the default label for demo is RCA1-EC, and default slot is 1
-    keytool:ec  -slot <slot index> -key-label <label> -curve secp256r1
+    preload bin/karaf
     ```
-  * Run the demo
+
+    If you have changed the content within folder $XIPKI_HOME/etc or $XIPKI_HOME/system, please delete the folder $XIPKI_HOME/data before starting XiPKI.
+
+* Run the pre-configured OSGi-commandds
   
     ```sh
     source <OSGi batch script file>
@@ -136,6 +148,6 @@ Installation
       ```sh
       ca-demo/hsm-ec-demo.script
       ```
-    The generated keys, certificates, CRLs are saved in folder $XIPKI_HOME/output  
+    The generated keys, certificates, CRLs are saved in folder $XIPKI_HOME/output
   
 
