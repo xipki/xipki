@@ -156,6 +156,7 @@
 								<feature>xipki-remotep11</feature>
 								<feature>xipki-database-tool</feature>
 								<feature>xipki-audit-slf4j</feature>
+								<feature>xipki-audit-syslog</feature>
 							</features>
 						</configuration>
 					</execution>
