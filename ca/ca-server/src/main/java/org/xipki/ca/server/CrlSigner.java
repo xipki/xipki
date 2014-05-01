@@ -54,7 +54,7 @@ public class CrlSigner
                     Extension.subjectKeyIdentifier.getId());
             if(encodedSkiValue == null)
             {
-                throw new OperationException(ErrorCode.System_Failure,
+                throw new OperationException(ErrorCode.INVALID_EXTENSION,
                         "CA certificate does not have required extension SubjectKeyIdentifier");
             }
             ASN1OctetString ski;
@@ -63,7 +63,7 @@ public class CrlSigner
                 ski = (ASN1OctetString) X509ExtensionUtil.fromExtensionValue(encodedSkiValue);
             } catch (IOException e)
             {
-                throw new OperationException(ErrorCode.System_Failure, e.getMessage());
+                throw new OperationException(ErrorCode.INVALID_EXTENSION, e.getMessage());
             }
             this.subjectKeyIdentifier = ski.getOctets();
         }

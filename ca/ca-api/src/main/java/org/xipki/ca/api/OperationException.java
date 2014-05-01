@@ -21,15 +21,18 @@ public class OperationException extends Exception
 {
     public static enum ErrorCode
     {
-        UNKNOWN_ISSUER,
         UNKNOWN_CERT_PROFILE,
-        NO_PERMISSION_OF_CERT_PROFILE,
-        EMPTY_SUBJECT,
+//        NO_PERMISSION_OF_CERT_PROFILE,
+//        EMPTY_SUBJECT,
         CERT_REVOKED,
         UNKNOWN_CERT,
         System_Failure,
+        INSUFFICIENT_PERMISSION,
         ALREADY_ISSUED,
-        BAD_CERT_TEMPLATE
+        BAD_CERT_TEMPLATE, 
+        INVALID_EXTENSION,
+        DATABASE_FAILURE,
+        CRL_FAILURE
     }
 
     private static final long serialVersionUID = 1L;

@@ -888,36 +888,56 @@ public class X509CACmpResponder extends CmpResponder
             int failureInfo;
             switch(ce.getErrorCode())
             {
-                case CERT_REVOKED:
-                    failureInfo = PKIFailureInfo.certRevoked;
-                    auditStatus = AuditStatus.FAILED;
-                    auditMessage = "CERT_REVOKED";
-                    break;
-                case UNKNOWN_CERT:
-                    failureInfo = PKIFailureInfo.badCertId;
-                    auditStatus = AuditStatus.FAILED;
-                    auditMessage = "UNKNOWN_CERT";
-                    break;
-                case UNKNOWN_CERT_PROFILE:
-                    failureInfo = PKIFailureInfo.badCertTemplate;
-                    auditStatus = AuditStatus.FAILED;
-                    auditMessage = "UNKNOWN_CERT_PROFILE";
-                    break;
-                case EMPTY_SUBJECT:
-                    failureInfo = PKIFailureInfo.badCertTemplate;
-                    auditStatus = AuditStatus.FAILED;
-                    auditMessage = "EMPTY_SUBJECT";
-                    break;
-                case BAD_CERT_TEMPLATE:
-                    failureInfo = PKIFailureInfo.badCertTemplate;
-                    auditStatus = AuditStatus.FAILED;
-                    auditMessage = "BAD_CERT_TEMPLATE";
-                    break;
-                case System_Failure:
-                    failureInfo = PKIFailureInfo.systemFailure;
-                    auditStatus = AuditStatus.ERROR;
-                    auditMessage = "System_Failure";
-                    break;
+	            case ALREADY_ISSUED:
+	                failureInfo = PKIFailureInfo.badRequest;
+	                auditStatus = AuditStatus.FAILED;
+	                auditMessage = "ALREADY_ISSUED";
+	                break;
+	            case BAD_CERT_TEMPLATE:
+	                failureInfo = PKIFailureInfo.badCertTemplate;
+	                auditStatus = AuditStatus.FAILED;
+	                auditMessage = "BAD_CERT_TEMPLATE";
+	                break;
+	            case CERT_REVOKED:
+	                failureInfo = PKIFailureInfo.certRevoked;
+	                auditStatus = AuditStatus.FAILED;
+	                auditMessage = "CERT_REVOKED";
+	                break;
+	            case CRL_FAILURE:
+	                failureInfo = PKIFailureInfo.systemFailure;
+	                auditStatus = AuditStatus.ERROR;
+	                auditMessage = "CRL_FAILURE";
+	                break;
+	            case DATABASE_FAILURE:
+	                failureInfo = PKIFailureInfo.systemFailure;
+	                auditStatus = AuditStatus.ERROR;
+	                auditMessage = "DATABASE_FAILURE";
+	                break;
+	            case INSUFFICIENT_PERMISSION:
+	                failureInfo = PKIFailureInfo.notAuthorized;
+	                auditStatus = AuditStatus.ERROR;
+	                auditMessage = "INSUFFICIENT_PERMISSION";
+	                break;
+	            case INVALID_EXTENSION:
+	                failureInfo = PKIFailureInfo.systemFailure;
+	                auditStatus = AuditStatus.ERROR;
+	                auditMessage = "INVALID_EXTENSION";
+	                break;
+	            case System_Failure:
+	                failureInfo = PKIFailureInfo.systemFailure;
+	                auditStatus = AuditStatus.ERROR;
+	                auditMessage = "System_Failure";
+	                break;
+	            case UNKNOWN_CERT:
+	                failureInfo = PKIFailureInfo.badCertId;
+	                auditStatus = AuditStatus.FAILED;
+	                auditMessage = "UNKNOWN_CERT";
+	                break;
+	            case UNKNOWN_CERT_PROFILE:
+	                failureInfo = PKIFailureInfo.badCertTemplate;
+	                auditStatus = AuditStatus.FAILED;
+	                auditMessage = "UNKNOWN_CERT_PROFILE";
+	                break;
                 default:
                     failureInfo = PKIFailureInfo.systemFailure;
                     auditStatus = AuditStatus.ERROR;
