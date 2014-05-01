@@ -71,7 +71,7 @@ Install
     ```
     The following steps use $XIPKI_HOME to point to the unpacked folder
 
-* Copy the license jars if required (e.g. db2jcc_license_cu.jar for DB2) to.
+* Copy the license jars if required (e.g. db2jcc_license_cu.jar for DB2) to
 
     ```sh
     $XIPKI_HOME/lib/ext
@@ -83,16 +83,6 @@ Install
     ```sh
     $XIPKI_HOME/ca-config/ca-db.properties
     $XIPKI_HOME/ocsp-config/ocsp-publisher.properties
-    ```
-* If you use keys in PKCS#11 device
-
-    Generate keypair with self-signed certificate in PKCS#11 device
-    ```sh
-    features:install xipki-security-shell
-    # RSA key, the default label for demo is RCA1, and default slot is 1
-    keytool:rsa -slot <slot index> -key-label <label> [-pwd <password>]
-    # EC key, the default label for demo is RCA1-EC, and default slot is 1
-    keytool:ec  -slot <slot index> -key-label <label> -curve secp256r1 [-pwd <password>]
     ```
 
 Run Demo
@@ -120,7 +110,17 @@ Run Demo
 
     If you have changed the content within folder $XIPKI_HOME/etc or $XIPKI_HOME/system, please delete the folder $XIPKI_HOME/data before starting XiPKI.
 
-* Run the pre-configured OSGi-commandds
+* If you use keys in PKCS#11 device
+
+    Generate keypair with self-signed certificate in PKCS#11 device in karaf terminal
+    ```sh
+    features:install xipki-security-shell
+    # RSA key, the default label for demo is RCA1, and default slot is 1
+    keytool:rsa -slot <slot index> -key-label <label> [-pwd <password>]
+    # EC key, the default label for demo is RCA1-EC, and default slot is 1
+    keytool:ec  -slot <slot index> -key-label <label> -curve secp256r1 [-pwd <password>]
+    ```
+* Run the pre-configured OSGi-commands in karaf terminal
   
     ```sh
     source <OSGi batch script file>
