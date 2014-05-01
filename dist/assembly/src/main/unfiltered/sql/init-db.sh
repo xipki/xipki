@@ -24,10 +24,8 @@ cat $PROP_FILE | sed 's/\./_/' > .tmp-db.properties
 . ./.tmp-db.properties
 rm -f .tmp-db.properties
 
-echo db.driverClassName=$db_driverClassName
-echo db.username=$db_username
-#echo db.password=$db_password
-
+echo "db.driver   = $db_driverClassName"
+echo "db.username = $db_username"
 
 DRIVER=$db_driverClassName
 
@@ -39,13 +37,11 @@ if [ "$DRIVER" = "com.ibm.db2.jcc.DB2Driver" ]; then
         db_url=${db_url%$SEP*}
         DFLT_SCHEMA="--defaultSchemaName=$db_schema"
 
-        echo db.schema=$db_schema
-        echo db.url=$db_url
-else
-        echo db.url=$db_url
+        echo "db.schema   = $db_schema"
 fi
 
-echo "changelog: $CHANGELOG_FILE"
+echo "db.url      = $db_url"
+echo "changelog   = $CHANGELOG_FILE"
 
 liquibase ()
 {
