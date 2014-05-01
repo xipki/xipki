@@ -29,7 +29,7 @@ public class OperationException extends Exception
         System_Failure,
         INSUFFICIENT_PERMISSION,
         ALREADY_ISSUED,
-        BAD_CERT_TEMPLATE, 
+        BAD_CERT_TEMPLATE,
         INVALID_EXTENSION,
         DATABASE_FAILURE,
         CRL_FAILURE
