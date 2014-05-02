@@ -82,7 +82,7 @@ public class OCSPStatusLoadTestCommand extends OsgiCommandSupport
                 {
                     serialNumbers.add(Long.parseLong(subtokens.nextToken().trim()));
                 }
-                if(countTokens == 2)
+                else if(countTokens == 2)
                 {
                     int startSerial = Integer.parseInt(subtokens.nextToken().trim());
                     int endSerial = Integer.parseInt(subtokens.nextToken().trim());
