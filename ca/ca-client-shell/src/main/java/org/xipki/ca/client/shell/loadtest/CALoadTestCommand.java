@@ -41,7 +41,7 @@ public class CALoadTestCommand extends OsgiCommandSupport
             description = "Required. Subject without common name")
     protected String           subjectNoCN;
 
-    @Option(name = "-d",
+    @Option(name = "-duration",
             required = true,
             description = "Required. Duration in seconds")
     protected int              durationInSecond;
