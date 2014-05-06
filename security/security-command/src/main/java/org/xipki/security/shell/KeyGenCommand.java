@@ -33,7 +33,7 @@ abstract class KeyGenCommand extends OsgiCommandSupport
     public static final ASN1ObjectIdentifier id_kp_clientAuth        = id_kp.branch("2");
 
     protected abstract String getCertType();
-    
+
     protected SecurityFactory securityFactory;
 
     public SecurityFactory getSecurityFactory()
@@ -45,48 +45,48 @@ abstract class KeyGenCommand extends OsgiCommandSupport
     {
         this.securityFactory = securityFactory;
     }
-    
+
     protected Integer getKeyUsage()
     throws Exception
     {
-    	String certType =getCertType();    	
-    	if(null == certType)
-    	{
-    		return null;
-    	}
-    	else if("TLS".equalsIgnoreCase(certType) || "TLS-C".equalsIgnoreCase(certType) || "TLS-S".equalsIgnoreCase(certType))
-    	{
-	    	return KeyUsage.digitalSignature | KeyUsage.keyEncipherment; 
-    	}
-    	else
-    	{
-    		throw new Exception("Unknown certType " + certType);
-    	}
+        String certType =getCertType();
+        if(null == certType)
+        {
+            return null;
+        }
+        else if("TLS".equalsIgnoreCase(certType) || "TLS-C".equalsIgnoreCase(certType) || "TLS-S".equalsIgnoreCase(certType))
+        {
+            return KeyUsage.digitalSignature | KeyUsage.keyEncipherment;
+        }
+        else
+        {
+            throw new Exception("Unknown certType " + certType);
+        }
     }
-    
+
     protected List<ASN1ObjectIdentifier> getExtendedKeyUsage()
     throws Exception
     {
-    	String certType = getCertType();
-    	if(null == certType)
-    	{
-    		return null;
-    	}    	
-    	else if("TLS".equalsIgnoreCase(certType))
-    	{
-    		return Arrays.asList(id_kp_clientAuth, id_kp_serverAuth);
-    	}
-    	else if("TLS-C".equalsIgnoreCase(certType))
-    	{
-    		return Arrays.asList(id_kp_clientAuth);
-    	}
-    	else if("TLS-S".equalsIgnoreCase(certType))
-    	{
-    		return Arrays.asList(id_kp_serverAuth);
-    	}
-    	else
-    	{
-    		throw new Exception("Unknown certType " + certType);
-    	}
+        String certType = getCertType();
+        if(null == certType)
+        {
+            return null;
+        }
+        else if("TLS".equalsIgnoreCase(certType))
+        {
+            return Arrays.asList(id_kp_clientAuth, id_kp_serverAuth);
+        }
+        else if("TLS-C".equalsIgnoreCase(certType))
+        {
+            return Arrays.asList(id_kp_clientAuth);
+        }
+        else if("TLS-S".equalsIgnoreCase(certType))
+        {
+            return Arrays.asList(id_kp_serverAuth);
+        }
+        else
+        {
+            throw new Exception("Unknown certType " + certType);
+        }
     }
 }

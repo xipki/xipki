@@ -60,8 +60,8 @@ public class P11RSAKeyGenCommand extends KeyGenCommand
     protected String            outputFilename;
 
     @Option(name = "-cert-type",
-    		required = false, description = "Certificate type of the self signed certificate."
-    				+ " Currently only TLS, TLS-C or TLS-S are supported")
+            required = false, description = "Certificate type of the self signed certificate."
+                    + " Currently only TLS, TLS-C or TLS-S are supported")
     protected String            certType;
 
     private SecurityFactory securityFactory;
@@ -130,9 +130,10 @@ public class P11RSAKeyGenCommand extends KeyGenCommand
         return null;
     }
 
-	@Override
-	protected String getCertType() {
-		return certType;
-	}
+    @Override
+    protected String getCertType()
+    {
+        return certType;
+    }
 
 }

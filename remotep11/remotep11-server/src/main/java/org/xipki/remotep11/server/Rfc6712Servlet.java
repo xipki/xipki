@@ -19,7 +19,6 @@ package org.xipki.remotep11.server;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.security.cert.X509Certificate;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -55,21 +54,7 @@ public class Rfc6712Servlet extends HttpServlet
     public void doPost(HttpServletRequest request, HttpServletResponse response)
     throws ServletException, IOException
     {
-    	Object attrObject = request.getAttribute("javax.servlet.request.X509Certificate");
-    	if(attrObject != null)
-    	{
-    		X509Certificate[] clientCerts = (X509Certificate[]) attrObject;
-    		for(int i = 0; i < clientCerts.length; i++)
-    		{
-    			LOG.info("------ CERT " + i + " -------: {}", clientCerts[i].getSubjectX500Principal().getName());
-    		}
-    	}
-    	else
-    	{
-    		LOG.info("no client certificates");
-    	}
-    	
-    	try
+        try
         {
             if(localP11CryptService == null)
             {
