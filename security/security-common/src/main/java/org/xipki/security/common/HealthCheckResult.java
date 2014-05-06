@@ -31,11 +31,11 @@ public class HealthCheckResult
     private Map<String, Object> statuses = new ConcurrentHashMap<>();
     private List<HealthCheckResult> childChecks = new LinkedList<>();
     
-    /*public HealthCheckResult()
+    public HealthCheckResult()
     {
     	this.name = "UNDEF";
     }
-    */
+    
     /**
      * Name of the check result
      * @param name
@@ -59,10 +59,10 @@ public class HealthCheckResult
         this.statuses.clear();
     }
 
-    /*public void putStatus(String statusName, Object statusValue)
+    public void putStatus(String statusName, Object statusValue)
     {
         this.statuses.put(statusName, statusValue);
-    }*/
+    }
 
     public Object getStatus(String statusName)
     {
@@ -223,7 +223,7 @@ public class HealthCheckResult
     	}
     	return sb.toString();
     }
-/*    
+    
     public static void main(String[] args)
     {
         HealthCheckResult checkResult = new HealthCheckResult("mycheck-negative");
@@ -273,5 +273,5 @@ public class HealthCheckResult
         
         System.out.println();
         System.out.println(checkResult.toJsonMessage(false));
-    }*/
+    }
 }
