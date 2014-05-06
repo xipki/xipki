@@ -83,7 +83,7 @@ public abstract class P12KeypairGenerator
 
     private final Integer keyUsage;
     private List<ASN1ObjectIdentifier> extendedKeyUsage;
-    
+
     protected abstract KeyPairWithSubjectPublicKeyInfo genKeypair()
     throws Exception;
 
@@ -124,15 +124,15 @@ public abstract class P12KeypairGenerator
         X509KeyUsage ku;
         if(keyUsage == null)
         {
-        	ku = new X509KeyUsage(
+            ku = new X509KeyUsage(
                  X509KeyUsage.nonRepudiation | X509KeyUsage.digitalSignature |
                  X509KeyUsage.keyCertSign | X509KeyUsage.cRLSign);
         }
         else
         {
-        	ku = new X509KeyUsage(keyUsage);
+            ku = new X509KeyUsage(keyUsage);
         }
-        
+
         certGenerator.addExtension(
                  X509Extension.keyUsage, true, ku);
 
@@ -146,10 +146,10 @@ public abstract class P12KeypairGenerator
                 kps[i++] = KeyPurposeId.getInstance(oid);
             }
 
-            certGenerator.addExtension(X509Extension.extendedKeyUsage, false, 
-            		new ExtendedKeyUsage(kps));  
+            certGenerator.addExtension(X509Extension.extendedKeyUsage, false,
+                    new ExtendedKeyUsage(kps));
         }
-        
+
         KeyAndCertPair identity = new KeyAndCertPair(
              certGenerator.build(contentSigner),
              kp.getKeypair().getPrivate());
@@ -306,8 +306,7 @@ public abstract class P12KeypairGenerator
         private ASN1ObjectIdentifier curveOid;
 
         public ECDSAIdentityGenerator(String curveNameOrOid, char[] password, String subject,
-        		Integer keyUsage,
-        		List<ASN1ObjectIdentifier> extendedKeyUsage)
+        Integer keyUsage, List<ASN1ObjectIdentifier> extendedKeyUsage)
         throws Exception
         {
             super(password, subject, keyUsage, extendedKeyUsage);
@@ -409,9 +408,8 @@ public abstract class P12KeypairGenerator
         private int keysize;
         private BigInteger publicExponent;
 
-        public RSAIdentityGenerator(int keysize, BigInteger publicExponent, char[] password, String subject,
-        		Integer keyUsage,
-        		List<ASN1ObjectIdentifier> extendedKeyUsage)
+        public RSAIdentityGenerator(int keysize, BigInteger publicExponent, char[] password,
+        String subject, Integer keyUsage, List<ASN1ObjectIdentifier> extendedKeyUsage)
         throws Exception
         {
             super(password, subject, keyUsage, extendedKeyUsage);

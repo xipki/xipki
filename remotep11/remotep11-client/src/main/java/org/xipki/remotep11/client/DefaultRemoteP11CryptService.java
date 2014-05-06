@@ -88,21 +88,23 @@ class DefaultRemoteP11CryptService extends RemoteP11CryptService
         OutputStream outputstream = httpUrlConnection.getOutputStream();
         outputstream.write(request);
         outputstream.flush();
-        
+
         InputStream inputstream = null;
-        try{
-        	inputstream = httpUrlConnection.getInputStream();
+        try
+        {
+            inputstream = httpUrlConnection.getInputStream();
         }catch(IOException e)
         {
-        	InputStream errStream = httpUrlConnection.getErrorStream();
-        	if(errStream != null)
-        	{
-        		errStream.close();
-        	}
-        	throw e;
+            InputStream errStream = httpUrlConnection.getErrorStream();
+            if(errStream != null)
+            {
+                errStream.close();
+            }
+            throw e;
         }
 
-        try{
+        try
+        {
             String responseContentType=httpUrlConnection.getContentType();
             boolean isValidContentType=false;
             if (responseContentType!=null)

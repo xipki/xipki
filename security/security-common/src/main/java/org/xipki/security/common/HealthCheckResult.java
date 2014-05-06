@@ -26,27 +26,27 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class HealthCheckResult
 {
-	private String name;
+    private String name;
     private boolean healthy = false;
     private Map<String, Object> statuses = new ConcurrentHashMap<>();
     private List<HealthCheckResult> childChecks = new LinkedList<>();
-    
-    public HealthCheckResult()
+
+    /*public HealthCheckResult()
     {
-    	this.name = "UNDEF";
-    }
-    
+        this.name = "UNDEF";
+    }*/
+
     /**
      * Name of the check result
      * @param name
      */
     public HealthCheckResult(String name)
     {
-    	if(name == null || name.isEmpty())
-    	{
-    		throw new IllegalArgumentException("name could not be null");
-    	}
-    	this.name = name;
+        if(name == null || name.isEmpty())
+        {
+            throw new IllegalArgumentException("name could not be null");
+        }
+        this.name = name;
     }
 
     public void setHealthy(boolean healthy)
@@ -59,24 +59,24 @@ public class HealthCheckResult
         this.statuses.clear();
     }
 
-    public void putStatus(String statusName, Object statusValue)
+    /*public void putStatus(String statusName, Object statusValue)
     {
         this.statuses.put(statusName, statusValue);
-    }
+    }*/
 
     public Object getStatus(String statusName)
     {
         return statusName == null ? null : statuses.get(statusName);
     }
-    
+
     public void clearChildChecks()
     {
         this.childChecks.clear();
     }
-    
+
     public void addChildCheck(HealthCheckResult childCheck)
     {
-    	this.childChecks.add(childCheck);
+        this.childChecks.add(childCheck);
     }
 
     public Set<String> getStatusNames()
@@ -96,31 +96,31 @@ public class HealthCheckResult
 
     public String toJsonMessage(boolean pretty)
     {
-    	return toJsonMessage(0, pretty);
+        return toJsonMessage(0, pretty);
     }
 
     private String toJsonMessage(int level, boolean pretty)
     {
-    	// Non root check requires always a name
+        // Non root check requires always a name
         StringBuilder sb = new StringBuilder();
         if(pretty)
         {
-        	sb.append(getIndent(level));
+            sb.append(getIndent(level));
         }
         if(level > 0)
         {
-        	sb.append("\"").append(name).append("\":");
+            sb.append("\"").append(name).append("\":");
         }
         sb.append("{");
-        
+
         boolean lastElement = true;
         if(lastElement && statuses.isEmpty() == false)
         {
-        	lastElement = false;        	 
+            lastElement = false;
         }
         if(lastElement && childChecks.isEmpty() == false)
         {
-        	lastElement = false;
+            lastElement = false;
         }
         append(sb, "healthy", healthy, level + 1,pretty, lastElement);
 
@@ -129,47 +129,47 @@ public class HealthCheckResult
         int count = 0;
         for(String name : names)
         {
-        	count++;
-        	append(sb, name, statuses.get(name), level + 1, pretty, childChecks.isEmpty() && count == size);
+            count++;
+            append(sb, name, statuses.get(name), level + 1, pretty, childChecks.isEmpty() && count == size);
         }
 
         if(childChecks.isEmpty() == false)
         {
-        	if(pretty)
-            {
-                sb.append("\n");
-            	sb.append(getIndent(level+1));
-            }
-
-        	sb.append("\"checks\":{");
-            if(pretty)
-            {
-                sb.append("\n");
-            }
-            
-            int n = childChecks.size();
-            for(int i = 0; i < n; i++)
-            {
-            	HealthCheckResult childCheck = childChecks.get(i);
-            	if(i > 0)
-            	{
-            		sb.append("\n");
-            	}
-            	sb.append(childCheck.toJsonMessage(level+2, pretty));
-            	if(i < n-1)
-            	{
-            		sb.append(",");
-            	}
-            }
-            
             if(pretty)
             {
                 sb.append("\n");
                 sb.append(getIndent(level+1));
             }
-        	sb.append("}");
+
+            sb.append("\"checks\":{");
+            if(pretty)
+            {
+                sb.append("\n");
+            }
+
+            int n = childChecks.size();
+            for(int i = 0; i < n; i++)
+            {
+                HealthCheckResult childCheck = childChecks.get(i);
+                if(i > 0)
+                {
+                    sb.append("\n");
+                }
+                sb.append(childCheck.toJsonMessage(level+2, pretty));
+                if(i < n-1)
+                {
+                    sb.append(",");
+                }
+            }
+
+            if(pretty)
+            {
+                sb.append("\n");
+                sb.append(getIndent(level+1));
+            }
+            sb.append("}");
         }
-        
+
         if(pretty)
         {
             sb.append("\n");
@@ -205,25 +205,25 @@ public class HealthCheckResult
         }
         if(lastElement == false)
         {
-        	sb.append(",");
+            sb.append(",");
         }
     }
 
     private static String getIndent(int level)
     {
-    	if(level == 0)
-    	{
-    		return "";
-    	}
-    	
-    	StringBuilder sb = new StringBuilder();
-    	for(int i = 0; i < level; i++)
-    	{
-    		sb.append("  ");
-    	}
-    	return sb.toString();
+        if(level == 0)
+        {
+            return "";
+        }
+
+        StringBuilder sb = new StringBuilder();
+        for(int i = 0; i < level; i++)
+        {
+            sb.append("  ");
+        }
+        return sb.toString();
     }
-    
+    /*
     public static void main(String[] args)
     {
         HealthCheckResult checkResult = new HealthCheckResult("mycheck-negative");
@@ -234,7 +234,7 @@ public class HealthCheckResult
         checkResult.putStatus("long", Long.valueOf(100));
         checkResult.putStatus("int", Integer.valueOf(100));
         checkResult.putStatus("Double", Double.valueOf(100.1));
-        
+
         System.out.println();
         System.out.println(checkResult.toJsonMessage(true));
 
@@ -249,7 +249,7 @@ public class HealthCheckResult
 
         System.out.println();
         System.out.println(checkResult.toJsonMessage(false));
-        
+
         HealthCheckResult childCheck = new HealthCheckResult("childcheck");
         checkResult.addChildCheck(childCheck);
         childCheck.setHealthy(false);
@@ -267,11 +267,11 @@ public class HealthCheckResult
         childChildCheck.setHealthy(false);
         childChildCheck.putStatus("boolean-true", true);
         childChildCheck.putStatus("boolean-false", false);
-        
+
         System.out.println();
         System.out.println(checkResult.toJsonMessage(true));
-        
+
         System.out.println();
         System.out.println(checkResult.toJsonMessage(false));
-    }
+    }*/
 }
