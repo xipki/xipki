@@ -21,7 +21,6 @@ import java.io.File;
 
 import org.apache.felix.gogo.commands.Command;
 import org.apache.felix.gogo.commands.Option;
-import org.apache.karaf.shell.console.OsgiCommandSupport;
 import org.xipki.security.api.P12KeypairGenerationResult;
 import org.xipki.security.api.SecurityFactory;
 import org.xipki.security.common.IoCertUtil;
@@ -29,7 +28,7 @@ import org.xipki.security.p10.P12KeypairGenerator;
 import org.xipki.security.p10.P12KeypairGenerator.ECDSAIdentityGenerator;
 
 @Command(scope = "keytool", name = "ec-p12", description="Generate EC keypair in PKCS#12 keystore")
-public class P12ECKeyGenCommand extends OsgiCommandSupport
+public class P12ECKeyGenCommand extends KeyGenCommand
 {
     @Option(name = "-curve",
             description = "Required. EC Curve name or OID",
@@ -52,6 +51,11 @@ public class P12ECKeyGenCommand extends OsgiCommandSupport
             required = false, description = "Where to saven the self-signed certificate")
     protected String            certOutFile;
 
+    @Option(name = "-cert-type",
+    		required = false, description = "Certificate type of the self signed certificate."
+    				+ " Currently only TLS, TLS-C or TLS-S are supported")
+    protected String            certType;
+
     private SecurityFactory securityFactory;
 
     public SecurityFactory getSecurityFactory()
@@ -69,9 +73,9 @@ public class P12ECKeyGenCommand extends OsgiCommandSupport
     throws Exception
     {
         ECDSAIdentityGenerator gen = new P12KeypairGenerator.ECDSAIdentityGenerator(
-                curveName, password.toCharArray(), subject);
+                curveName, password.toCharArray(), subject, getKeyUsage(), getExtendedKeyUsage());
 
-        P12KeypairGenerationResult keyAndCert = gen.generateIentity();
+        P12KeypairGenerationResult keyAndCert = gen.generateIdentity();
 
         File p12File = new File(keyOutFile);
         System.out.println("Saved PKCS#12 keystore in " + p12File.getPath());
@@ -85,5 +89,10 @@ public class P12ECKeyGenCommand extends OsgiCommandSupport
 
         return null;
     }
+
+	@Override
+	protected String getCertType() {
+		return certType;
+	}
 
 }

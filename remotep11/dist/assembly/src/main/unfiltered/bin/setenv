@@ -49,7 +49,8 @@ UNAME=`echo $UNAME | tr '[:upper:]' '[:lower:]'`
 
 NATIVE_LIB="native-lib/unix/$UNAME"
 
-JAVA_OPTS="$JAVA_OPTS -Djava.library.path=$NATIVE_LIB"
+KARAF_OPTS="$KARAF_OPTS -Djava.library.path=$NATIVE_LIB"
+#KARAF_OPTS="$KARAF_OPTS -Djavax.net.debug=all"
 
 export LD_LIBRARY_PATH=$NATIVE_LIB:$LD_LIBRARY_PATH
-export JAVA_OPTS
+export KARAF_OPTS

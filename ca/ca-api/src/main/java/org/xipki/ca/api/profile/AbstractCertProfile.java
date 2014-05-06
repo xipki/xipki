@@ -40,6 +40,7 @@ import org.bouncycastle.asn1.x509.Extension;
 import org.bouncycastle.asn1.x509.Extensions;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.xipki.security.common.EnvironmentParameterResolver;
+import org.xipki.security.common.ObjectIdentifiers;
 
 public abstract class AbstractCertProfile extends CertProfile
 {

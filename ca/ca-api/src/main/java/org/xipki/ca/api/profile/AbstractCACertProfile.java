@@ -48,7 +48,7 @@ public abstract class AbstractCACertProfile extends AbstractCertProfile
     @Override
     public ExtensionOccurrence getOccurenceOfAuthorityKeyIdentifier()
     {
-        return ExtensionOccurrence.CRITICAL_REQUIRED;
+        return ExtensionOccurrence.NONCRITICAL_REQUIRED;
     }
 
 }

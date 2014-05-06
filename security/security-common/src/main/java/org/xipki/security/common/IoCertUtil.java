@@ -33,11 +33,15 @@ import java.security.cert.X509CRL;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 
 import javax.security.auth.x500.X500Principal;
 
+import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
+import org.bouncycastle.asn1.DERPrintableString;
+import org.bouncycastle.asn1.DERUTF8String;
 import org.bouncycastle.asn1.x500.RDN;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x500.style.IETFUtils;
@@ -47,7 +51,98 @@ import org.bouncycastle.util.encoders.Hex;
 public class IoCertUtil
 {
     private static final SHA1Digest sha1 = new SHA1Digest();
+    private static final ASN1ObjectIdentifier[] forwardDNs = new ASN1ObjectIdentifier[]{
+    	ObjectIdentifiers.DN_DC,
+        ObjectIdentifiers.DN_ST,
+        ObjectIdentifiers.DN_L,
+        ObjectIdentifiers.DN_O,
+        ObjectIdentifiers.DN_OU,
+        ObjectIdentifiers.DN_T,
+        ObjectIdentifiers.DN_SURNAME,
+        ObjectIdentifiers.DN_INITIALS,
+        ObjectIdentifiers.DN_GIVENNAME,
+        ObjectIdentifiers.DN_SERIALNUMBER,
+        ObjectIdentifiers.DN_NAME,
+        ObjectIdentifiers.DN_CN,
+        ObjectIdentifiers.DN_UID,
+        ObjectIdentifiers.DN_DMD_NAME,
+        ObjectIdentifiers.DN_EmailAddress,
+        ObjectIdentifiers.DN_UnstructuredName,
+        ObjectIdentifiers.DN_UnstructuredAddress,
+        ObjectIdentifiers.DN_POSTAL_CODE,
+        ObjectIdentifiers.DN_BUSINESS_CATEGORY,
+        ObjectIdentifiers.DN_POSTAL_ADDRESS,
+        ObjectIdentifiers.DN_TELEPHONE_NUMBER,
+        ObjectIdentifiers.DN_PSEUDONYM,
+        ObjectIdentifiers.DN_STREET
+    };
 
+    public static X500Name sortX509Name(X500Name name)
+    {
+        RDN[] requstedRDNs = name.getRDNs();
+
+        List<RDN> rdns = new LinkedList<RDN>();
+
+        for(ASN1ObjectIdentifier type : forwardDNs)
+        {
+            RDN[] thisRDNs = getRDNs(requstedRDNs, type);
+            int n = thisRDNs == null ? 0 : thisRDNs.length;
+            if(n == 0)
+            {
+                continue;
+            }
+
+            for(RDN thisRDN : thisRDNs)
+            {
+                String text = IETFUtils.valueToString(thisRDN.getFirst().getValue());
+                rdns.add(createSubjectRDN(text, type));
+            }
+        }
+
+        return new X500Name(rdns.toArray(new RDN[0]));
+    }
+    
+
+    private static RDN[] getRDNs(RDN[] rdns, ASN1ObjectIdentifier type)
+    {
+        List<RDN> ret = new ArrayList<RDN>(1);
+        for(int i = 0; i < rdns.length; i++)
+        {
+            RDN rdn = rdns[i];
+            if(rdn.getFirst().getType().equals(type))
+            {
+                ret.add(rdn);
+            }
+        }
+
+        if(ret.isEmpty())
+        {
+            return null;
+        }
+        else
+        {
+            return ret.toArray(new RDN[0]);
+        }
+    }
+
+    private static RDN createSubjectRDN(String text, ASN1ObjectIdentifier type)
+    {
+        ASN1Encodable dnValue;
+        if(ObjectIdentifiers.DN_SERIALNUMBER.equals(type) ||
+           ObjectIdentifiers.DN_C.equals(type))
+        {
+            dnValue = new DERPrintableString(text);
+        }
+        else
+        {
+            dnValue = new DERUTF8String(text);
+        }
+
+        RDN rdn = new RDN(type, dnValue);
+
+        return rdn;
+    }
+    
     public static byte[] read(String fileName)
     throws IOException
     {
