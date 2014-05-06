@@ -26,10 +26,6 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.security.cert.X509Certificate;
 
-import javax.net.ssl.HostnameVerifier;
-import javax.net.ssl.HttpsURLConnection;
-import javax.net.ssl.SSLSession;
-
 import org.xipki.security.api.ConcurrentContentSigner;
 import org.xipki.security.api.SecurityFactory;
 import org.xipki.security.common.ParamChecker;
@@ -40,18 +36,6 @@ class DefaultHttpCmpRequestor extends X509CmpRequestor
     private static final String CMP_RESPONSE_MIMETYPE = "application/pkixcmp";
 
     private final URL serverUrl;
-
-    static
-    {
-        HttpsURLConnection.setDefaultHostnameVerifier(new HostnameVerifier()
-        {
-            @Override
-            public boolean verify(String s, SSLSession sslSession)
-            {
-                return true;
-            }
-        });
-    }
 
     DefaultHttpCmpRequestor(ConcurrentContentSigner requestor,
             X509Certificate responderCert,
