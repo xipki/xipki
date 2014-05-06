@@ -29,10 +29,10 @@ DTD Configure//EN" "http://jetty.mortbay.org/configure.dtd">
     <New id="sslContextFactory" class="org.eclipse.jetty.util.ssl.SslContextFactory">
         <Set name="KeyStore">etc/tls-server-keystore.jks</Set>
         <Set name="KeyStoreType">JKS</Set>
-        <Set name="KeyStorePassword">storepwd</Set>
-        <Set name="KeyManagerPassword">keypwd</Set>
-        <Set name="TrustStore">etc/tls-client-truststore.jks</Set>
-        <Set name="TrustStorePassword">storepwd</Set>
+        <Set name="KeyStorePassword">1234</Set>
+        <Set name="KeyManagerPassword">1234</Set>
+        <Set name="TrustStore">etc/tls-truststore.jks</Set>
+        <Set name="TrustStorePassword">1234</Set>
         <Set name="IncludeProtocols">
             <Array type="java.lang.String">
                 <Item>TLSv1.2</Item>

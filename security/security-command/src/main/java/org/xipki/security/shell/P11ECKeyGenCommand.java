@@ -21,7 +21,6 @@ import java.io.File;
 
 import org.apache.felix.gogo.commands.Command;
 import org.apache.felix.gogo.commands.Option;
-import org.apache.karaf.shell.console.OsgiCommandSupport;
 import org.bouncycastle.util.encoders.Hex;
 import org.xipki.security.api.P11KeypairGenerationResult;
 import org.xipki.security.api.PKCS11SlotIdentifier;
@@ -31,7 +30,7 @@ import org.xipki.security.p11.iaik.IaikP11CryptService;
 import org.xipki.security.p11.iaik.P11KeypairGenerator;
 
 @Command(scope = "keytool", name = "ec", description="Generate EC keypair in PKCS#11 device")
-public class P11ECKeyGenCommand extends OsgiCommandSupport
+public class P11ECKeyGenCommand extends KeyGenCommand
 {
     @Option(name = "-curve",
             description = "EC Curve name, the default is brainpoolP256r1",
@@ -53,6 +52,11 @@ public class P11ECKeyGenCommand extends OsgiCommandSupport
     @Option(name = "-out",
             required = false, description = "Output file name of certificate")
     protected String            outputFilename;
+
+    @Option(name = "-cert-type",
+    		required = false, description = "Certificate type of the self signed certificate."
+    				+ " Currently only TLS, TLS-C or TLS-S are supported")
+    protected String            certType;
 
     private SecurityFactory securityFactory;
 
@@ -80,7 +84,8 @@ public class P11ECKeyGenCommand extends OsgiCommandSupport
         P11KeypairGenerator gen = new P11KeypairGenerator();
         P11KeypairGenerationResult keyAndCert = gen.generateECDSAKeypairAndCert(
                 securityFactory.getPkcs11Module(), new PKCS11SlotIdentifier(slotIndex, null), pwd,
-                curveName, label, "CN=" + label);
+                curveName, label, "CN=" + label,
+                getKeyUsage(), getExtendedKeyUsage());
 
         System.out.println("key id: " + Hex.toHexString(keyAndCert.getId()));
         System.out.println("key label: " + keyAndCert.getLabel());
@@ -95,5 +100,10 @@ public class P11ECKeyGenCommand extends OsgiCommandSupport
 
         return null;
     }
+
+	@Override
+	protected String getCertType() {
+		return certType;
+	}
 
 }

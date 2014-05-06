@@ -15,7 +15,7 @@
  *
  */
 
-package org.xipki.ca.api.profile;
+package org.xipki.security.common;
 
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;

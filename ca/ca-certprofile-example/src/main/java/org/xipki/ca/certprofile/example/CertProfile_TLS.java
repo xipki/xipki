@@ -41,7 +41,8 @@ public class CertProfile_TLS extends AbstractEECertProfile
     {
         // KeyUsages
         Set<KeyUsage> _keyUsages = new HashSet<KeyUsage>();
-        _keyUsages.add(KeyUsage.contentCommitment);
+        _keyUsages.add(KeyUsage.digitalSignature);
+        _keyUsages.add(KeyUsage.keyEncipherment);
         keyUsages = Collections.unmodifiableSet(_keyUsages);
 
         // extended KeyUsages

@@ -18,17 +18,35 @@
 package org.xipki.security.common;
 
 import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class HealthCheckResult
 {
+	private String name;
     private boolean healthy = false;
-    private Map<String, Object> statuses = new ConcurrentHashMap<String, Object>();
-
-    public HealthCheckResult()
+    private Map<String, Object> statuses = new ConcurrentHashMap<>();
+    private List<HealthCheckResult> childChecks = new LinkedList<>();
+    
+    /*public HealthCheckResult()
     {
+    	this.name = "UNDEF";
+    }
+    */
+    /**
+     * Name of the check result
+     * @param name
+     */
+    public HealthCheckResult(String name)
+    {
+    	if(name == null || name.isEmpty())
+    	{
+    		throw new IllegalArgumentException("name could not be null");
+    	}
+    	this.name = name;
     }
 
     public void setHealthy(boolean healthy)
@@ -36,19 +54,29 @@ public class HealthCheckResult
         this.healthy = healthy;
     }
 
-    public void cleanStatuses()
+    public void clearStatuses()
     {
         this.statuses.clear();
     }
 
-    public void putStatus(String statusName, Object statusValue)
+    /*public void putStatus(String statusName, Object statusValue)
     {
         this.statuses.put(statusName, statusValue);
-    }
+    }*/
 
     public Object getStatus(String statusName)
     {
         return statusName == null ? null : statuses.get(statusName);
+    }
+    
+    public void clearChildChecks()
+    {
+        this.childChecks.clear();
+    }
+    
+    public void addChildCheck(HealthCheckResult childCheck)
+    {
+    	this.childChecks.add(childCheck);
     }
 
     public Set<String> getStatusNames()
@@ -68,43 +96,95 @@ public class HealthCheckResult
 
     public String toJsonMessage(boolean pretty)
     {
+    	return toJsonMessage(0, pretty);
+    }
+
+    private String toJsonMessage(int level, boolean pretty)
+    {
+    	// Non root check requires always a name
         StringBuilder sb = new StringBuilder();
-        sb.append("{\"healthcheck\":{");
-        append(sb, "healthy", healthy, pretty);
+        if(pretty)
+        {
+        	sb.append(getIndent(level));
+        }
+        if(level > 0)
+        {
+        	sb.append("\"").append(name).append("\":");
+        }
+        sb.append("{");
+        
+        boolean lastElement = true;
+        if(lastElement && statuses.isEmpty() == false)
+        {
+        	lastElement = false;        	 
+        }
+        if(lastElement && childChecks.isEmpty() == false)
+        {
+        	lastElement = false;
+        }
+        append(sb, "healthy", healthy, level + 1,pretty, lastElement);
 
-        String message = null;
         Set<String> names = statuses.keySet();
-        if(names == null || names.isEmpty() == false)
+        int size = names.size();
+        int count = 0;
+        for(String name : names)
         {
-            StringBuilder msgBuilder = new StringBuilder();
+        	count++;
+        	append(sb, name, statuses.get(name), level + 1, pretty, childChecks.isEmpty() && count == size);
+        }
 
-            for(String name : names)
+        if(childChecks.isEmpty() == false)
+        {
+        	if(pretty)
             {
-                msgBuilder.append(name).append(": ").append(statuses.get(name));
-                msgBuilder.append(", ");
+                sb.append("\n");
+            	sb.append(getIndent(level+1));
             }
-            message = msgBuilder.substring(0, msgBuilder.length() - 2);
-        }
 
-        if(message != null)
-        {
-            append(sb, "message", message.toString(), pretty);
+        	sb.append("\"checks\":{");
+            if(pretty)
+            {
+                sb.append("\n");
+            }
+            
+            int n = childChecks.size();
+            for(int i = 0; i < n; i++)
+            {
+            	HealthCheckResult childCheck = childChecks.get(i);
+            	if(i > 0)
+            	{
+            		sb.append("\n");
+            	}
+            	sb.append(childCheck.toJsonMessage(level+2, pretty));
+            	if(i < n-1)
+            	{
+            		sb.append(",");
+            	}
+            }
+            
+            if(pretty)
+            {
+                sb.append("\n");
+                sb.append(getIndent(level+1));
+            }
+        	sb.append("}");
         }
-
-        sb.deleteCharAt(sb.length()-1);
+        
         if(pretty)
         {
             sb.append("\n");
+            sb.append(getIndent(level));
         }
-        sb.append("}}");
+        sb.append("}");
         return sb.toString();
     }
 
-    private static void append(StringBuilder sb, String name, Object value, boolean pretty)
+    private static void append(StringBuilder sb, String name, Object value, int level, boolean pretty, boolean lastElement)
     {
         if(pretty)
         {
-            sb.append("\n  ");
+            sb.append("\n");
+            sb.append(getIndent(level));
         }
         sb.append("\"").append(name).append("\":");
         if(value == null)
@@ -123,12 +203,30 @@ public class HealthCheckResult
         {
             sb.append("\"").append(value).append("\"");
         }
-        sb.append(",");
+        if(lastElement == false)
+        {
+        	sb.append(",");
+        }
     }
 
+    private static String getIndent(int level)
+    {
+    	if(level == 0)
+    	{
+    		return "";
+    	}
+    	
+    	StringBuilder sb = new StringBuilder();
+    	for(int i = 0; i < level; i++)
+    	{
+    		sb.append("  ");
+    	}
+    	return sb.toString();
+    }
+/*    
     public static void main(String[] args)
     {
-        HealthCheckResult checkResult = new HealthCheckResult();
+        HealthCheckResult checkResult = new HealthCheckResult("mycheck-negative");
         checkResult.setHealthy(false);
         checkResult.putStatus("boolean-true", true);
         checkResult.putStatus("boolean-false", false);
@@ -136,14 +234,44 @@ public class HealthCheckResult
         checkResult.putStatus("long", Long.valueOf(100));
         checkResult.putStatus("int", Integer.valueOf(100));
         checkResult.putStatus("Double", Double.valueOf(100.1));
+        
+        System.out.println();
         System.out.println(checkResult.toJsonMessage(true));
 
+        System.out.println();
         System.out.println(checkResult.toJsonMessage(false));
 
-        checkResult = new HealthCheckResult();
+        checkResult = new HealthCheckResult("mycheck-positive");
         checkResult.setHealthy(true);
-        System.out.println(checkResult.toJsonMessage(true));
-        System.out.println(checkResult.toJsonMessage(false));
 
-    }
+        System.out.println();
+        System.out.println(checkResult.toJsonMessage(true));
+
+        System.out.println();
+        System.out.println(checkResult.toJsonMessage(false));
+        
+        HealthCheckResult childCheck = new HealthCheckResult("childcheck");
+        checkResult.addChildCheck(childCheck);
+        childCheck.setHealthy(false);
+        childCheck.putStatus("boolean-true", true);
+        childCheck.putStatus("boolean-false", false);
+
+        HealthCheckResult childCheck2 = new HealthCheckResult("childcheck2");
+        checkResult.addChildCheck(childCheck2);
+        childCheck.setHealthy(false);
+        childCheck.putStatus("boolean-true", true);
+        childCheck.putStatus("boolean-false", false);
+
+        HealthCheckResult childChildCheck = new HealthCheckResult("childChildCheck");
+        childCheck.addChildCheck(childChildCheck);
+        childChildCheck.setHealthy(false);
+        childChildCheck.putStatus("boolean-true", true);
+        childChildCheck.putStatus("boolean-false", false);
+        
+        System.out.println();
+        System.out.println(checkResult.toJsonMessage(true));
+        
+        System.out.println();
+        System.out.println(checkResult.toJsonMessage(false));
+    }*/
 }

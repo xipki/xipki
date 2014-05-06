@@ -49,10 +49,14 @@ UNAME=`echo $UNAME | tr '[:upper:]' '[:lower:]'`
 
 NATIVE_LIB="native-lib/unix/$UNAME"
 
-JAVA_OPTS="$JAVA_OPTS -Djava.library.path=$NATIVE_LIB"
-JAVA_OPTS="$JAVA_OPTS -Dhttps.protocols=TLSv1.2,TLSv1.1,TLSv1"
-JAVA_OPTS="$JAVA_OPTS -Djavax.net.ssl.trustStore=etc/tls-client-truststore.jks"
-JAVA_OPTS="$JAVA_OPTS -Djavax.net.ssl.trustStorePassword=storepwd"
+KARAF_OPTS="$KARAF_OPTS -Djava.library.path=$NATIVE_LIB"
+KARAF_OPTS="$KARAF_OPTS -Dhttps.protocols=TLSv1.2,TLSv1.1,TLSv1"
+KARAF_OPTS="$KARAF_OPTS -Djavax.net.ssl.trustStore=etc/tls-truststore.jks"
+KARAF_OPTS="$KARAF_OPTS -Djavax.net.ssl.trustStorePassword=1234"
+KARAF_OPTS="$KARAF_OPTS -Djavax.net.ssl.keyStore=etc/tls-p11client-keystore.jks"
+KARAF_OPTS="$KARAF_OPTS -Djavax.net.ssl.keyStorePassword=1234"
+KARAF_OPTS="$KARAF_OPTS -Dsun.net.http.errorstream.enableBuffering=true"
+#KARAF_OPTS="$KARAF_OPTS -Djavax.net.debug=all"
 
 export LD_LIBRARY_PATH=$NATIVE_LIB:$LD_LIBRARY_PATH
-export JAVA_OPTS
+export KARAF_OPTS

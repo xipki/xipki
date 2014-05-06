@@ -32,6 +32,7 @@ import java.security.interfaces.ECPrivateKey;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.spec.RSAKeyGenParameterSpec;
 import java.util.Date;
+import java.util.List;
 
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.ASN1OctetString;
@@ -43,6 +44,8 @@ import org.bouncycastle.asn1.sec.SECNamedCurves;
 import org.bouncycastle.asn1.teletrust.TeleTrusTNamedCurves;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
+import org.bouncycastle.asn1.x509.ExtendedKeyUsage;
+import org.bouncycastle.asn1.x509.KeyPurposeId;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.bouncycastle.asn1.x509.X509Extension;
 import org.bouncycastle.asn1.x509.X509ObjectIdentifiers;
@@ -64,6 +67,7 @@ import org.bouncycastle.operator.bc.BcRSAContentSignerBuilder;
 import org.xipki.security.KeyUtil;
 import org.xipki.security.api.P12KeypairGenerationResult;
 import org.xipki.security.bcext.ECDSAContentSignerBuilder;
+import org.xipki.security.common.IoCertUtil;
 
 public abstract class P12KeypairGenerator
 {
@@ -77,12 +81,15 @@ public abstract class P12KeypairGenerator
     private final int serialNumber = 1;
     private final int validity = 3650;
 
+    private final Integer keyUsage;
+    private List<ASN1ObjectIdentifier> extendedKeyUsage;
+    
     protected abstract KeyPairWithSubjectPublicKeyInfo genKeypair()
     throws Exception;
 
     protected abstract String getKeyAlgorithm();
 
-    public P12KeypairGenerator(char[] password, String subject)
+    public P12KeypairGenerator(char[] password, String subject, Integer keyUsage, List<ASN1ObjectIdentifier> extendedKeyUsage)
     throws Exception
     {
         if(Security.getProvider("BC") == null)
@@ -92,9 +99,11 @@ public abstract class P12KeypairGenerator
 
         this.password = password;
         this.subject = subject;
+        this.keyUsage = keyUsage;
+        this.extendedKeyUsage = extendedKeyUsage;
     }
 
-    public P12KeypairGenerationResult generateIentity()
+    public P12KeypairGenerationResult generateIdentity()
     throws Exception
     {
         KeyPairWithSubjectPublicKeyInfo kp = genKeypair();
@@ -104,6 +113,7 @@ public abstract class P12KeypairGenerator
         Date notAfter = new Date(notBefore.getTime() + validity * DAY );
 
         X500Name subjectDN = new X500Name(subject);
+        subjectDN = IoCertUtil.sortX509Name(subjectDN);
         SubjectPublicKeyInfo subjectPublicKeyInfo = kp.getSubjectPublicKeyInfo();
         ContentSigner contentSigner = getContentSigner(kp.getKeypair().getPrivate());
 
@@ -111,12 +121,35 @@ public abstract class P12KeypairGenerator
         X509v3CertificateBuilder certGenerator = new X509v3CertificateBuilder(
                 subjectDN, BigInteger.valueOf(serialNumber), notBefore, notAfter, subjectDN, subjectPublicKeyInfo);
 
-        X509KeyUsage ku = new X509KeyUsage(
-                 X509KeyUsage.nonRepudiation + X509KeyUsage.digitalSignature +
-                 X509KeyUsage.keyCertSign + X509KeyUsage.cRLSign);
+        X509KeyUsage ku;
+        if(keyUsage == null)
+        {
+        	ku = new X509KeyUsage(
+                 X509KeyUsage.nonRepudiation | X509KeyUsage.digitalSignature |
+                 X509KeyUsage.keyCertSign | X509KeyUsage.cRLSign);
+        }
+        else
+        {
+        	ku = new X509KeyUsage(keyUsage);
+        }
+        
         certGenerator.addExtension(
                  X509Extension.keyUsage, true, ku);
 
+        if(extendedKeyUsage != null && extendedKeyUsage.isEmpty() == false)
+        {
+            KeyPurposeId[] kps = new KeyPurposeId[extendedKeyUsage.size()];
+
+            int i = 0;
+            for (ASN1ObjectIdentifier oid : extendedKeyUsage)
+            {
+                kps[i++] = KeyPurposeId.getInstance(oid);
+            }
+
+            certGenerator.addExtension(X509Extension.extendedKeyUsage, false, 
+            		new ExtendedKeyUsage(kps));  
+        }
+        
         KeyAndCertPair identity = new KeyAndCertPair(
              certGenerator.build(contentSigner),
              kp.getKeypair().getPrivate());
@@ -272,10 +305,12 @@ public abstract class P12KeypairGenerator
         private String curveName;
         private ASN1ObjectIdentifier curveOid;
 
-        public ECDSAIdentityGenerator(String curveNameOrOid, char[] password, String subject)
+        public ECDSAIdentityGenerator(String curveNameOrOid, char[] password, String subject,
+        		Integer keyUsage,
+        		List<ASN1ObjectIdentifier> extendedKeyUsage)
         throws Exception
         {
-            super(password, subject);
+            super(password, subject, keyUsage, extendedKeyUsage);
 
             boolean isOid;
             try
@@ -374,10 +409,12 @@ public abstract class P12KeypairGenerator
         private int keysize;
         private BigInteger publicExponent;
 
-        public RSAIdentityGenerator(int keysize, BigInteger publicExponent, char[] password, String subject)
+        public RSAIdentityGenerator(int keysize, BigInteger publicExponent, char[] password, String subject,
+        		Integer keyUsage,
+        		List<ASN1ObjectIdentifier> extendedKeyUsage)
         throws Exception
         {
-            super(password, subject);
+            super(password, subject, keyUsage, extendedKeyUsage);
 
             this.keysize = keysize;
             this.publicExponent = publicExponent;

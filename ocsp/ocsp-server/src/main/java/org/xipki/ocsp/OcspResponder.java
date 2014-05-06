@@ -814,18 +814,24 @@ public class OcspResponder
 
     public HealthCheckResult healthCheck()
     {
-        HealthCheckResult result = new HealthCheckResult();
+        HealthCheckResult result = new HealthCheckResult("OCSPResponder");
         boolean healthy = true;
         for(CertStatusStore store : certStatusStores)
         {
             boolean storeHealthy = store.isHealthy();
             healthy &= storeHealthy;
-            result.putStatus("CertStatusStore." + store.getName() + ".healthy", storeHealthy);
+            
+            HealthCheckResult storeHealth = new HealthCheckResult("CertStatusStore." + store.getName());
+            storeHealth.setHealthy(storeHealthy);
+            result.addChildCheck(storeHealth);
         }
 
         boolean signerHealthy = responder.getSigner().isHealthy();
         healthy &= signerHealthy;
-        result.putStatus("Signer.healthy", signerHealthy);
+        
+        HealthCheckResult signerHealth = new HealthCheckResult("Signer");
+        signerHealth.setHealthy(signerHealthy);
+        result.addChildCheck(signerHealth);
 
         result.setHealthy(healthy);
         return result;

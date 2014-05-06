@@ -1455,30 +1455,42 @@ public class X509CA
 
     public HealthCheckResult healthCheck()
     {
-        HealthCheckResult result = new HealthCheckResult();
+        HealthCheckResult result = new HealthCheckResult("X509CA");
 
         boolean healthy = true;
 
         boolean caSignerHealthy = caSigner.isHealthy();
         healthy &= caSignerHealthy;
-        result.putStatus("Signer.healthy", caSignerHealthy);
-
+        
+        HealthCheckResult signerHealth = new HealthCheckResult("Signer");
+        signerHealth.setHealthy(caSignerHealthy);
+        result.addChildCheck(signerHealth);
+        
         boolean databaseHealthy = certstore.isHealthy();
         healthy &= databaseHealthy;
-        result.putStatus("Database.healthy", databaseHealthy);
+        
+        HealthCheckResult databaseHealth = new HealthCheckResult("Database");
+        databaseHealth.setHealthy(databaseHealthy);
+        result.addChildCheck(databaseHealth);
 
         if(crlSigner != null && crlSigner.getSigner() != null)
         {
             boolean crlSignerHealthy = crlSigner.getSigner().isHealthy();
             healthy &= crlSignerHealthy;
-            result.putStatus("CRLSigner.healthy", crlSignerHealthy);
+            
+            HealthCheckResult crlSignerHealth = new HealthCheckResult("CRLSigner");
+            crlSignerHealth.setHealthy(crlSignerHealthy);
+            result.addChildCheck(crlSignerHealth);
         }
 
         for(IdentifiedCertPublisher publisher : getPublishers())
         {
             boolean ph = publisher.isHealthy();
             healthy &= ph;
-            result.putStatus("Publisher." + publisher.getName() + ".healthy", ph);
+            
+            HealthCheckResult publisherHealth = new HealthCheckResult("Publisher");
+            publisherHealth.setHealthy(publisher.isHealthy());
+            result.addChildCheck(publisherHealth);
         }
 
         result.setHealthy(healthy);
