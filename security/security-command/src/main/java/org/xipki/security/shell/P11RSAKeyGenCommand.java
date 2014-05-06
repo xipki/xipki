@@ -22,7 +22,6 @@ import java.math.BigInteger;
 
 import org.apache.felix.gogo.commands.Command;
 import org.apache.felix.gogo.commands.Option;
-import org.apache.karaf.shell.console.OsgiCommandSupport;
 import org.bouncycastle.util.encoders.Hex;
 import org.xipki.security.api.P11KeypairGenerationResult;
 import org.xipki.security.api.PKCS11SlotIdentifier;
@@ -32,7 +31,7 @@ import org.xipki.security.p11.iaik.IaikP11CryptService;
 import org.xipki.security.p11.iaik.P11KeypairGenerator;
 
 @Command(scope = "keytool", name = "rsa", description="Generate RSA keypair via PKCS#11")
-public class P11RSAKeyGenCommand extends OsgiCommandSupport
+public class P11RSAKeyGenCommand extends KeyGenCommand
 {
     @Option(name = "-keysize",
             description = "Keysize in bit, the default is 2048",
@@ -59,6 +58,11 @@ public class P11RSAKeyGenCommand extends OsgiCommandSupport
     @Option(name = "-out",
             required = false, description = "Output file name of certificate")
     protected String            outputFilename;
+
+    @Option(name = "-cert-type",
+    		required = false, description = "Certificate type of the self signed certificate."
+    				+ " Currently only TLS, TLS-C or TLS-S are supported")
+    protected String            certType;
 
     private SecurityFactory securityFactory;
 
@@ -108,7 +112,9 @@ public class P11RSAKeyGenCommand extends OsgiCommandSupport
         P11KeypairGenerationResult keyAndCert = gen.generateRSAKeypairAndCert(
                 securityFactory.getPkcs11Module(), slotId, pwd,
                 keysize, _publicExponent,
-                label, "CN=" + label);
+                label, "CN=" + label,
+                getKeyUsage(),
+                getExtendedKeyUsage());
 
         System.out.println("key id: " + Hex.toHexString(keyAndCert.getId()));
         System.out.println("key label: " + keyAndCert.getLabel());
@@ -123,5 +129,10 @@ public class P11RSAKeyGenCommand extends OsgiCommandSupport
 
         return null;
     }
+
+	@Override
+	protected String getCertType() {
+		return certType;
+	}
 
 }
