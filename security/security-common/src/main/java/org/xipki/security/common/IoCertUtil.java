@@ -78,6 +78,16 @@ public class IoCertUtil
         ObjectIdentifiers.DN_STREET
     };
 
+    public static String getCommonName(X500Name name)
+    {
+        RDN[] rdns = name.getRDNs(ObjectIdentifiers.DN_CN);
+        if(rdns != null && rdns.length > 0)
+        {
+            return IETFUtils.valueToString(rdns[0].getFirst().getValue());
+        }
+        return null;
+    }
+
     public static X500Name sortX509Name(X500Name name)
     {
         RDN[] requstedRDNs = name.getRDNs();
