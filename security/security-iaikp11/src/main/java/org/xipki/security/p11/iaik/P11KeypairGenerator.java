@@ -445,7 +445,7 @@ public class P11KeypairGenerator
 
         X500Name x500Name_subject = new X500Name(subject);
         x500Name_subject = IoCertUtil.sortX509Name(x500Name_subject);
-        
+
         V3TBSCertificateGenerator tbsGen = new V3TBSCertificateGenerator();
         tbsGen.setSerialNumber(new ASN1Integer(serialNumber));
         tbsGen.setSignature(signatureAlgId);
@@ -458,12 +458,12 @@ public class P11KeypairGenerator
         List<Extension> extensions = new ArrayList<Extension>(2);
         if(keyUsage == null)
         {
-        	keyUsage = KeyUsage.keyCertSign | KeyUsage.cRLSign |
+            keyUsage = KeyUsage.keyCertSign | KeyUsage.cRLSign |
                     KeyUsage.digitalSignature | KeyUsage.keyEncipherment;
         }
         extensions.add(new Extension(X509Extension.keyUsage, true,
                 new DEROctetString(new KeyUsage(keyUsage))));
-        
+
         if(extendedKeyUsage != null && extendedKeyUsage.isEmpty() == false)
         {
             KeyPurposeId[] kps = new KeyPurposeId[extendedKeyUsage.size()];
@@ -474,10 +474,10 @@ public class P11KeypairGenerator
                 kps[i++] = KeyPurposeId.getInstance(oid);
             }
 
-            extensions.add(new Extension(X509Extension.extendedKeyUsage, false, 
-            		new DEROctetString(new ExtendedKeyUsage(kps))));        	
+            extensions.add(new Extension(X509Extension.extendedKeyUsage, false,
+                    new DEROctetString(new ExtendedKeyUsage(kps))));
         }
-        
+
         Extensions paramX509Extensions = new Extensions(extensions.toArray(new Extension[0]));
         tbsGen.setExtensions(paramX509Extensions);
 
