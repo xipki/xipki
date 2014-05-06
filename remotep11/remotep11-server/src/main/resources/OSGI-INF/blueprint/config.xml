@@ -11,16 +11,16 @@
 	</cm:property-placeholder>
 	
 		 
-    <!-- bean id="localP11CryptService" class="org.xipki.remotep11.server.LocalP11CryptService"
+    <bean id="localP11CryptService" class="org.xipki.remotep11.server.LocalP11CryptService"
 			init-method="init">
         <property name="pkcs11Provider" value="${pkcs11.provider}" />
         <property name="pkcs11Module" value="${pkcs11.module}" />
         <property name="pkcs11Password" value="${pkcs11.password}" />
-    </bean-->
+    </bean>
     
 	<!-- create the servlet and inject our own app factory -->
     <bean id="serverServlet" class="org.xipki.remotep11.server.Rfc6712Servlet">
-    	<!-- property name="localP11CryptService" ref="localP11CryptService"/-->
+        <property name="localP11CryptService" ref="localP11CryptService"/>
      </bean>
 
     <!-- register it as a servlet service for the web extender -->
