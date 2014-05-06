@@ -34,7 +34,9 @@ import iaik.pkcs.pkcs11.wrapper.PKCS11Constants;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.security.SecureRandom;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import org.bouncycastle.asn1.ASN1EncodableVector;
 import org.bouncycastle.asn1.ASN1Integer;
@@ -51,8 +53,10 @@ import org.bouncycastle.asn1.teletrust.TeleTrusTNamedCurves;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.asn1.x509.Certificate;
+import org.bouncycastle.asn1.x509.ExtendedKeyUsage;
 import org.bouncycastle.asn1.x509.Extension;
 import org.bouncycastle.asn1.x509.Extensions;
+import org.bouncycastle.asn1.x509.KeyPurposeId;
 import org.bouncycastle.asn1.x509.KeyUsage;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.bouncycastle.asn1.x509.TBSCertificate;
@@ -75,6 +79,7 @@ import org.bouncycastle.util.Arrays;
 import org.xipki.security.api.P11KeypairGenerationResult;
 import org.xipki.security.api.PKCS11SlotIdentifier;
 import org.xipki.security.api.SignerException;
+import org.xipki.security.common.IoCertUtil;
 import org.xipki.security.common.ParamChecker;
 
 public class P11KeypairGenerator
@@ -149,7 +154,9 @@ public class P11KeypairGenerator
     public P11KeypairGenerationResult generateRSAKeypairAndCert(
             String pkcs11Lib, PKCS11SlotIdentifier slotId, char[] password,
             int keySize, BigInteger publicExponent,
-            String label, String subject)
+            String label, String subject,
+            Integer keyUsage,
+            List<ASN1ObjectIdentifier> extendedKeyusage)
     throws Exception
     {
         ParamChecker.assertNotEmpty("label", label);
@@ -186,7 +193,9 @@ public class P11KeypairGenerator
             X509CertificateHolder certificate = generateCertificate(
                     session,
                     id, label, subject,
-                    signatureAlgId, privateKeyAndPKInfo);
+                    signatureAlgId, privateKeyAndPKInfo,
+                    keyUsage,
+                    extendedKeyusage);
             return new P11KeypairGenerationResult(id, label, certificate);
         }
         finally
@@ -255,7 +264,9 @@ public class P11KeypairGenerator
 
     public P11KeypairGenerationResult generateECDSAKeypairAndCert(
             String pkcs11Lib, PKCS11SlotIdentifier slotId, char[] password,
-            String curveNameOrOid, String label, String subject)
+            String curveNameOrOid, String label, String subject,
+            Integer keyUsage,
+            List<ASN1ObjectIdentifier> extendedKeyusage)
     throws Exception
     {
         ASN1ObjectIdentifier curveId = getCurveId(curveNameOrOid);
@@ -312,7 +323,9 @@ public class P11KeypairGenerator
             X509CertificateHolder certificate = generateCertificate(
                     session, id, label, subject,
                     new AlgorithmIdentifier(sigAlgOid, DERNull.INSTANCE),
-                    privateKeyAndPKInfo);
+                    privateKeyAndPKInfo,
+                    keyUsage,
+                    extendedKeyusage);
 
             return new P11KeypairGenerationResult(id, label, certificate);
         }finally
@@ -422,7 +435,8 @@ public class P11KeypairGenerator
 
     private X509CertificateHolder generateCertificate(
             Session session, byte[] id, String label, String subject,
-            AlgorithmIdentifier signatureAlgId, PrivateKeyAndPKInfo privateKeyAndPkInfo)
+            AlgorithmIdentifier signatureAlgId, PrivateKeyAndPKInfo privateKeyAndPkInfo,
+            Integer keyUsage, List<ASN1ObjectIdentifier> extendedKeyUsage)
     throws Exception
     {
         BigInteger serialNumber = BigInteger.ONE;
@@ -430,6 +444,8 @@ public class P11KeypairGenerator
         Date endDate = new Date(startDate.getTime() + 20 * YEAR);
 
         X500Name x500Name_subject = new X500Name(subject);
+        x500Name_subject = IoCertUtil.sortX509Name(x500Name_subject);
+        
         V3TBSCertificateGenerator tbsGen = new V3TBSCertificateGenerator();
         tbsGen.setSerialNumber(new ASN1Integer(serialNumber));
         tbsGen.setSignature(signatureAlgId);
@@ -439,12 +455,30 @@ public class P11KeypairGenerator
         tbsGen.setSubject(x500Name_subject);
         tbsGen.setSubjectPublicKeyInfo(privateKeyAndPkInfo.getPublicKeyInfo());
 
-        KeyUsage keyUsage = new KeyUsage(KeyUsage.keyCertSign | KeyUsage.cRLSign |
-                KeyUsage.digitalSignature | KeyUsage.keyEncipherment);
-        Extension extensionKeyUsage = new Extension(X509Extension.keyUsage, true,
-                new DEROctetString(keyUsage));
+        List<Extension> extensions = new ArrayList<Extension>(2);
+        if(keyUsage == null)
+        {
+        	keyUsage = KeyUsage.keyCertSign | KeyUsage.cRLSign |
+                    KeyUsage.digitalSignature | KeyUsage.keyEncipherment;
+        }
+        extensions.add(new Extension(X509Extension.keyUsage, true,
+                new DEROctetString(new KeyUsage(keyUsage))));
+        
+        if(extendedKeyUsage != null && extendedKeyUsage.isEmpty() == false)
+        {
+            KeyPurposeId[] kps = new KeyPurposeId[extendedKeyUsage.size()];
 
-        Extensions paramX509Extensions = new Extensions(extensionKeyUsage);
+            int i = 0;
+            for (ASN1ObjectIdentifier oid : extendedKeyUsage)
+            {
+                kps[i++] = KeyPurposeId.getInstance(oid);
+            }
+
+            extensions.add(new Extension(X509Extension.extendedKeyUsage, false, 
+            		new DEROctetString(new ExtendedKeyUsage(kps))));        	
+        }
+        
+        Extensions paramX509Extensions = new Extensions(extensions.toArray(new Extension[0]));
         tbsGen.setExtensions(paramX509Extensions);
 
         TBSCertificate tbsCertificate = tbsGen.generateTBSCertificate();

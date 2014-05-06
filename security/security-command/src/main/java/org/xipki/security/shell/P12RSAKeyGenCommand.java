@@ -22,14 +22,13 @@ import java.math.BigInteger;
 
 import org.apache.felix.gogo.commands.Command;
 import org.apache.felix.gogo.commands.Option;
-import org.apache.karaf.shell.console.OsgiCommandSupport;
 import org.xipki.security.api.P12KeypairGenerationResult;
 import org.xipki.security.api.SecurityFactory;
 import org.xipki.security.common.IoCertUtil;
 import org.xipki.security.p10.P12KeypairGenerator;
 
 @Command(scope = "keytool", name = "rsa-p12", description="Generate RSA keypair in PKCS#12 keystore")
-public class P12RSAKeyGenCommand extends OsgiCommandSupport
+public class P12RSAKeyGenCommand extends KeyGenCommand
 {
     @Option(name = "-keysize",
             description = "Keysize in bit, the default is 2048",
@@ -51,6 +50,11 @@ public class P12RSAKeyGenCommand extends OsgiCommandSupport
     @Option(name = "-certout",
             required = false, description = "Where to saven the self-signed certificate")
     protected String            certOutFile;
+
+    @Option(name = "-cert-type",
+    		required = false, description = "Certificate type of the self signed certificate."
+    				+ " Currently only TLS, TLS-C or TLS-S are supported")
+    protected String            certType;
 
     private SecurityFactory securityFactory;
 
@@ -79,9 +83,10 @@ public class P12RSAKeyGenCommand extends OsgiCommandSupport
         }
 
         P12KeypairGenerator gen = new P12KeypairGenerator.RSAIdentityGenerator(
-                keysize, BigInteger.valueOf(0x10001), password.toCharArray(), subject);
+                keysize, BigInteger.valueOf(0x10001), password.toCharArray(), subject,
+                getKeyUsage(), getExtendedKeyUsage());
 
-        P12KeypairGenerationResult keyAndCert = gen.generateIentity();
+        P12KeypairGenerationResult keyAndCert = gen.generateIdentity();
 
         File p12File = new File(keyOutFile);
         System.out.println("Saved PKCS#12 keystore in " + p12File.getPath());
@@ -95,5 +100,10 @@ public class P12RSAKeyGenCommand extends OsgiCommandSupport
 
         return null;
     }
+
+	@Override
+	protected String getCertType() {
+		return certType;
+	}
 
 }
