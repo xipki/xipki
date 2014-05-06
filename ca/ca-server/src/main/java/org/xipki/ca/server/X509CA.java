@@ -1461,14 +1461,14 @@ public class X509CA
 
         boolean caSignerHealthy = caSigner.isHealthy();
         healthy &= caSignerHealthy;
-        
+
         HealthCheckResult signerHealth = new HealthCheckResult("Signer");
         signerHealth.setHealthy(caSignerHealthy);
         result.addChildCheck(signerHealth);
-        
+
         boolean databaseHealthy = certstore.isHealthy();
         healthy &= databaseHealthy;
-        
+
         HealthCheckResult databaseHealth = new HealthCheckResult("Database");
         databaseHealth.setHealthy(databaseHealthy);
         result.addChildCheck(databaseHealth);
@@ -1477,7 +1477,7 @@ public class X509CA
         {
             boolean crlSignerHealthy = crlSigner.getSigner().isHealthy();
             healthy &= crlSignerHealthy;
-            
+
             HealthCheckResult crlSignerHealth = new HealthCheckResult("CRLSigner");
             crlSignerHealth.setHealthy(crlSignerHealthy);
             result.addChildCheck(crlSignerHealth);
@@ -1487,7 +1487,7 @@ public class X509CA
         {
             boolean ph = publisher.isHealthy();
             healthy &= ph;
-            
+
             HealthCheckResult publisherHealth = new HealthCheckResult("Publisher");
             publisherHealth.setHealthy(publisher.isHealthy());
             result.addChildCheck(publisherHealth);

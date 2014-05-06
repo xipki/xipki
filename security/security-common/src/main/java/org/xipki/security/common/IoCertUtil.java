@@ -51,8 +51,9 @@ import org.bouncycastle.util.encoders.Hex;
 public class IoCertUtil
 {
     private static final SHA1Digest sha1 = new SHA1Digest();
-    private static final ASN1ObjectIdentifier[] forwardDNs = new ASN1ObjectIdentifier[]{
-    	ObjectIdentifiers.DN_DC,
+    private static final ASN1ObjectIdentifier[] forwardDNs = new ASN1ObjectIdentifier[]
+    {
+        ObjectIdentifiers.DN_DC,
         ObjectIdentifiers.DN_ST,
         ObjectIdentifiers.DN_L,
         ObjectIdentifiers.DN_O,
@@ -101,7 +102,6 @@ public class IoCertUtil
 
         return new X500Name(rdns.toArray(new RDN[0]));
     }
-    
 
     private static RDN[] getRDNs(RDN[] rdns, ASN1ObjectIdentifier type)
     {
@@ -142,7 +142,7 @@ public class IoCertUtil
 
         return rdn;
     }
-    
+
     public static byte[] read(String fileName)
     throws IOException
     {

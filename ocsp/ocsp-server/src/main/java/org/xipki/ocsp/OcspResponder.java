@@ -820,7 +820,7 @@ public class OcspResponder
         {
             boolean storeHealthy = store.isHealthy();
             healthy &= storeHealthy;
-            
+
             HealthCheckResult storeHealth = new HealthCheckResult("CertStatusStore." + store.getName());
             storeHealth.setHealthy(storeHealthy);
             result.addChildCheck(storeHealth);
@@ -828,7 +828,7 @@ public class OcspResponder
 
         boolean signerHealthy = responder.getSigner().isHealthy();
         healthy &= signerHealthy;
-        
+
         HealthCheckResult signerHealth = new HealthCheckResult("Signer");
         signerHealth.setHealthy(signerHealthy);
         result.addChildCheck(signerHealth);
