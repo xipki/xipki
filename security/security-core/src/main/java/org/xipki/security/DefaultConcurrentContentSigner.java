@@ -21,8 +21,8 @@ import java.io.OutputStream;
 import java.security.PrivateKey;
 import java.security.cert.X509Certificate;
 import java.util.List;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.BlockingDeque;
+import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.TimeUnit;
 
 import org.bouncycastle.operator.ContentSigner;
@@ -38,11 +38,31 @@ public class DefaultConcurrentContentSigner implements ConcurrentContentSigner
 {
     private static final Logger LOG = LoggerFactory.getLogger(DefaultConcurrentContentSigner.class);
 
-    private final BlockingQueue<ContentSigner> idleSigners = new LinkedBlockingQueue<ContentSigner>();
-    private final BlockingQueue<ContentSigner> busySigners = new LinkedBlockingQueue<ContentSigner>();
+    private static int defaultSignServiceTimeout = 10000; // 10 seconds 
+    
+    private final BlockingDeque<ContentSigner> idleSigners = new LinkedBlockingDeque<ContentSigner>();
+    private final BlockingDeque<ContentSigner> busySigners = new LinkedBlockingDeque<ContentSigner>();
     private final PrivateKey privateKey;
 
     private X509Certificate certificate;
+    
+    static
+    {
+    	String v = System.getProperty("org.xipki.signservice.timeout");
+    	if(v != null)
+    	{
+    		int vi =Integer.parseInt(v);
+    		// valid value is between 0 and 60 seconds
+    		if(vi < 0 || vi > 60 * 1000) 
+    		{
+    			LOG.error("invalid org.xipki.signservice.timeout: {}", v);
+    		}
+    		else
+    		{
+    			defaultSignServiceTimeout = vi;
+    		}
+    	}
+    }
 
     public DefaultConcurrentContentSigner(List<ContentSigner> signers)
     {
@@ -55,7 +75,7 @@ public class DefaultConcurrentContentSigner implements ConcurrentContentSigner
 
         for(ContentSigner signer : signers)
         {
-            idleSigners.add(signer);
+            idleSigners.addLast(signer);
         }
 
         this.privateKey = privateKey;
@@ -64,14 +84,7 @@ public class DefaultConcurrentContentSigner implements ConcurrentContentSigner
     public ContentSigner borrowContentSigner()
     throws NoIdleSignerException
     {
-        ContentSigner signer = idleSigners.poll();
-        if(signer == null)
-        {
-            throw new NoIdleSignerException("No idle signer available");
-        }
-
-        busySigners.add(signer);
-        return signer;
+    	return borrowContentSigner(defaultSignServiceTimeout);
     }
 
     @Override
@@ -80,29 +93,29 @@ public class DefaultConcurrentContentSigner implements ConcurrentContentSigner
     {
         if(soTimeout == 0)
         {
-            return borrowContentSigner();
+       		ContentSigner signer = null;
+			try {
+				signer = idleSigners.takeFirst();
+			} catch (InterruptedException e) {
+				LOG.info("interruppted");
+			}
+        	
+            if(signer == null)
+            {
+                throw new NoIdleSignerException("No idle signer available");
+            }
+
+            busySigners.addLast(signer);
+            return signer;
         }
 
-        long till = System.currentTimeMillis() + soTimeout;
-        long timeout = soTimeout;
-
         ContentSigner signer = null;
-        while(timeout > 0)
+        try
         {
-            try
-            {
-                signer = idleSigners.poll(timeout, TimeUnit.MILLISECONDS);
-            }catch(InterruptedException e)
-            {
-                LOG.trace("interrupted");
-            }
-
-            if(signer != null)
-            {
-                break;
-            }
-
-            timeout = till - System.currentTimeMillis();
+            signer = idleSigners.pollFirst(soTimeout, TimeUnit.MILLISECONDS);
+        }catch(InterruptedException e)
+        {
+            LOG.trace("interrupted");
         }
 
         if(signer == null)
@@ -110,7 +123,7 @@ public class DefaultConcurrentContentSigner implements ConcurrentContentSigner
             throw new NoIdleSignerException("No idle signer available");
         }
 
-        busySigners.add(signer);
+        busySigners.addLast(signer);
         return signer;
     }
 
@@ -122,7 +135,7 @@ public class DefaultConcurrentContentSigner implements ConcurrentContentSigner
         boolean isBusySigner = busySigners.remove(signer);
         if(isBusySigner)
         {
-            idleSigners.add(signer);
+            idleSigners.addLast(signer);
         }
         else
         {
@@ -162,7 +175,7 @@ public class DefaultConcurrentContentSigner implements ConcurrentContentSigner
         ContentSigner signer = null;
         try
         {
-            signer = borrowContentSigner(60000); // wait for maximal 60 seconds
+            signer = borrowContentSigner();
             OutputStream stream = signer.getOutputStream();
             stream.write(new byte[]{1,2,3,4});
             byte[] signature = signer.getSignature();

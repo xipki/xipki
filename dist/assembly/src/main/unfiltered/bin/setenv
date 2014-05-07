@@ -50,6 +50,7 @@ UNAME=`echo $UNAME | tr '[:upper:]' '[:lower:]'`
 NATIVE_LIB="native-lib/unix/$UNAME"
 
 KARAF_OPTS="$KARAF_OPTS -Djava.library.path=$NATIVE_LIB"
+#KARAF_OPTS="$KARAF_OPTS -Dorg.xipki.signservice.timeout=10000"
 KARAF_OPTS="$KARAF_OPTS -Dhttps.protocols=TLSv1.2,TLSv1.1,TLSv1"
 KARAF_OPTS="$KARAF_OPTS -Djavax.net.ssl.trustStore=etc/tls-truststore.jks"
 KARAF_OPTS="$KARAF_OPTS -Djavax.net.ssl.trustStorePassword=1234"

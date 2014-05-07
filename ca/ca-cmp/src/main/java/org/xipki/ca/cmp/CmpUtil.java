@@ -85,8 +85,7 @@ public class CmpUtil
     }
 
     public static PKIMessage addProtection(PKIMessage pkiMessage,
-            ConcurrentContentSigner signer, GeneralName signerName,
-            int signServiceTimeout)
+            ConcurrentContentSigner signer, GeneralName signerName)
     throws CMPException, NoIdleSignerException
     {
         if(signerName == null)
@@ -148,7 +147,7 @@ public class CmpUtil
         }
         builder.setBody(pkiMessage.getBody());
 
-        ContentSigner realSigner = signer.borrowContentSigner(signServiceTimeout);
+        ContentSigner realSigner = signer.borrowContentSigner();
         try
         {
              ProtectedPKIMessage signedMessage = builder.build(realSigner);

@@ -122,7 +122,6 @@ public class X509CA
     private final CertificateStore certstore;
     private final CrlSigner crlSigner;
 
-    private int signserviceTimeout = 5000; // 5 seconds
     private final CAManagerImpl caManager;
     private final Object nextSerialLock = new Object();
     private final Object crlLock = new Object();
@@ -235,15 +234,6 @@ public class X509CA
         ScheduledNextSerialCommitService nextSerialCommitService = new ScheduledNextSerialCommitService();
         caManager.getScheduledThreadPoolExecutor().scheduleAtFixedRate(
                 nextSerialCommitService, 5, 5, TimeUnit.SECONDS); // commit the next_serial every 5 seconds
-    }
-
-    public void setSignserviceTimeout(int signserviceTimeout)
-    {
-        if(signserviceTimeout < 0)
-        {
-            throw new IllegalArgumentException("negative signserviceTimeout is not allowed: " + signserviceTimeout);
-        }
-        this.signserviceTimeout = signserviceTimeout;
     }
 
     public CAEntry getCAInfo()
@@ -516,7 +506,7 @@ public class X509CA
                 ContentSigner contentSigner;
                 try
                 {
-                    contentSigner = concurrentSigner.borrowContentSigner(signserviceTimeout);
+                    contentSigner = concurrentSigner.borrowContentSigner();
                 } catch (NoIdleSignerException e)
                 {
                     throw new OperationException(ErrorCode.System_Failure, "NoIdleSignerException: " + e.getMessage());
@@ -1137,7 +1127,7 @@ public class X509CA
                 ContentSigner contentSigner;
                 try
                 {
-                    contentSigner = caSigner.borrowContentSigner(signserviceTimeout);
+                    contentSigner = caSigner.borrowContentSigner();
                 } catch (NoIdleSignerException e)
                 {
                     throw new OperationException(ErrorCode.System_Failure, "NoIdleSignerException: " + e.getMessage());
