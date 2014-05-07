@@ -285,7 +285,7 @@ public abstract class CmpResponder
     {
         try
         {
-            return CmpUtil.addProtection(pkiMessage, responder, sender, signserviceTimeout);
+            return CmpUtil.addProtection(pkiMessage, responder, sender);
         } catch (Exception e)
         {
             LOG.error("error while add protection to the PKI message: {}", e.getMessage());

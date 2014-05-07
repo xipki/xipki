@@ -66,7 +66,6 @@ public abstract class CmpRequestor
 
     private final X509Certificate responderCert;
 
-    private int signserviceTimeout = 5000; // 5 seconds
     protected final SecurityFactory securityFactory;
 
     public CmpRequestor(
@@ -92,21 +91,12 @@ public abstract class CmpRequestor
     protected abstract byte[] send(byte[] request)
     throws IOException;
 
-    public void setSignserviceTimeout(int signserviceTimeout)
-    {
-        if(signserviceTimeout < 0)
-        {
-            throw new IllegalArgumentException("negative signserviceTimeout is not allowed: " + signserviceTimeout);
-        }
-        this.signserviceTimeout = signserviceTimeout;
-    }
-
     protected PKIMessage sign(PKIMessage request)
     throws CmpRequestorException
     {
         try
         {
-            request = CmpUtil.addProtection(request, requestor, sender, signserviceTimeout);
+            request = CmpUtil.addProtection(request, requestor, sender);
         } catch (CMPException e)
         {
             throw new CmpRequestorException("Could not sign the request", e);
