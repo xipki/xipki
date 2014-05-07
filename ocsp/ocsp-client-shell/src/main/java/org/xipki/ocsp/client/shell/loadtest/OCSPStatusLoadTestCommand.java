@@ -26,7 +26,9 @@ import java.util.StringTokenizer;
 import org.apache.felix.gogo.commands.Command;
 import org.apache.felix.gogo.commands.Option;
 import org.apache.karaf.shell.console.OsgiCommandSupport;
+import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.nist.NISTObjectIdentifiers;
+import org.bouncycastle.asn1.x509.X509ObjectIdentifiers;
 import org.xipki.ocsp.client.api.OCSPRequestor;
 import org.xipki.ocsp.client.api.RequestOptions;
 import org.xipki.security.common.IoCertUtil;
@@ -52,10 +54,19 @@ public class OCSPStatusLoadTestCommand extends OsgiCommandSupport
             required = true,
             description = "Required. Duration in seconds")
     protected int              durationInSecond;
+
     @Option(name = "-thread",
             required = false,
             description = "Number of threads, the default is 5")
     protected Integer          numThreads;
+
+    @Option(name = "-nonce",
+            description = "Use nonce")
+    protected Boolean            useNonce;
+    
+    @Option(name = "-hash",
+            required = false, description = "Hash algorithm name. The default is SHA256")
+    protected String            hashAlgo;
 
     private OCSPRequestor      requestor;
 
@@ -66,6 +77,36 @@ public class OCSPStatusLoadTestCommand extends OsgiCommandSupport
         if(numThreads == null)
         {
             numThreads = 5;
+        }
+
+        if(hashAlgo == null)
+        {
+        	hashAlgo = "SHA256";
+        }
+        
+        ASN1ObjectIdentifier hashAlgoOid;
+
+        hashAlgo = hashAlgo.trim().toUpperCase();
+
+        if("SHA1".equalsIgnoreCase(hashAlgo) || "SHA-1".equalsIgnoreCase(hashAlgo))
+        {
+        	hashAlgoOid = X509ObjectIdentifiers.id_SHA1;
+        }
+        else if("SHA256".equalsIgnoreCase(hashAlgo) || "SHA-256".equalsIgnoreCase(hashAlgo))
+        {
+        	hashAlgoOid = NISTObjectIdentifiers.id_sha256;
+        }
+        else if("SHA384".equalsIgnoreCase(hashAlgo) || "SHA-384".equalsIgnoreCase(hashAlgo))
+        {
+        	hashAlgoOid = NISTObjectIdentifiers.id_sha384;
+        }
+        else if("SHA512".equalsIgnoreCase(hashAlgo) || "SHA-512".equalsIgnoreCase(hashAlgo))
+        {
+        	hashAlgoOid = NISTObjectIdentifiers.id_sha512;
+        }
+        else
+        {
+            throw new Exception("Unsupported hash algorithm " + hashAlgo);
         }
 
         List<Long> serialNumbers = new LinkedList<Long>();
@@ -123,13 +164,14 @@ public class OCSPStatusLoadTestCommand extends OsgiCommandSupport
         startMsg.append("Serial numbers: " + this.serialNumbers).append("\n");
         startMsg.append("CA cert:        " + cacertFile).append("\n");
         startMsg.append("Server URL:     " + serverUrl.toString()).append("\n");
+        startMsg.append("Hash:           " + hashAlgo).append("\n");
         System.out.print(startMsg.toString());
 
         X509Certificate caCert = IoCertUtil.parseCert(cacertFile);
 
         RequestOptions options = new RequestOptions();
-        options.setUseNonce(true);
-        options.setHashAlgorithmId(NISTObjectIdentifiers.id_sha256);
+        options.setUseNonce(useNonce == null ? false : useNonce.booleanValue());
+        options.setHashAlgorithmId(hashAlgoOid);
 
         OcspLoadTest loadTest = new OcspLoadTest(requestor, serialNumbers,
                 caCert, serverUrl, options);

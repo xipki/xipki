@@ -33,6 +33,7 @@ import org.bouncycastle.asn1.isismtt.ISISMTTObjectIdentifiers;
 import org.bouncycastle.asn1.isismtt.ocsp.CertHash;
 import org.bouncycastle.asn1.nist.NISTObjectIdentifiers;
 import org.bouncycastle.asn1.x509.Extension;
+import org.bouncycastle.asn1.x509.X509ObjectIdentifiers;
 import org.bouncycastle.cert.ocsp.BasicOCSPResp;
 import org.bouncycastle.cert.ocsp.CertificateStatus;
 import org.bouncycastle.cert.ocsp.RevokedStatus;
@@ -67,6 +68,10 @@ public class OCSPStatusCommand extends OsgiCommandSupport
     @Option(name = "-nonce",
             description = "Use nonce")
     protected Boolean            useNonce;
+    
+    @Option(name = "-hash",
+            required = false, description = "Hash algorithm name. The default is SHA256")
+    protected String            hashAlgo;
 
     private OCSPRequestor      requestor;
 
@@ -78,6 +83,36 @@ public class OCSPStatusCommand extends OsgiCommandSupport
         {
             System.out.println("Neither serialNumber nor certFile is not set");
             return null;
+        }
+        
+        if(hashAlgo == null)
+        {
+        	hashAlgo = "SHA256";
+        }
+        
+        ASN1ObjectIdentifier hashAlgoOid;
+
+        hashAlgo = hashAlgo.trim().toUpperCase();
+
+        if("SHA1".equalsIgnoreCase(hashAlgo) || "SHA-1".equalsIgnoreCase(hashAlgo))
+        {
+        	hashAlgoOid = X509ObjectIdentifiers.id_SHA1;
+        }
+        else if("SHA256".equalsIgnoreCase(hashAlgo) || "SHA-256".equalsIgnoreCase(hashAlgo))
+        {
+        	hashAlgoOid = NISTObjectIdentifiers.id_sha256;
+        }
+        else if("SHA384".equalsIgnoreCase(hashAlgo) || "SHA-384".equalsIgnoreCase(hashAlgo))
+        {
+        	hashAlgoOid = NISTObjectIdentifiers.id_sha384;
+        }
+        else if("SHA512".equalsIgnoreCase(hashAlgo) || "SHA-512".equalsIgnoreCase(hashAlgo))
+        {
+        	hashAlgoOid = NISTObjectIdentifiers.id_sha512;
+        }
+        else
+        {
+            throw new Exception("Unsupported hash algorithm " + hashAlgo);
         }
 
         X509Certificate caCert = IoCertUtil.parseCert(cacertFile);
@@ -99,7 +134,7 @@ public class OCSPStatusCommand extends OsgiCommandSupport
 
         RequestOptions options = new RequestOptions();
         options.setUseNonce(useNonce == null ? false : useNonce.booleanValue());
-        options.setHashAlgorithmId(NISTObjectIdentifiers.id_sha256);
+        options.setHashAlgorithmId(hashAlgoOid);
 
         BasicOCSPResp basicResp;
         try
