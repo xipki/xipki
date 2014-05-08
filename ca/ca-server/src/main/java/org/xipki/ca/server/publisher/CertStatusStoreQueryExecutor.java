@@ -18,6 +18,7 @@
 package org.xipki.ca.server.publisher;
 
 import java.io.IOException;
+import java.math.BigInteger;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
@@ -150,14 +151,12 @@ class CertStatusStoreQueryExecutor
             }
         }
 
-        byte[] encodedCert = certificate.getEncodedCert();
-        String sha1FpCert = hashCalculator.hexHash(HashAlgoType.SHA1, encodedCert);
-        boolean certRegistered = certRegistered(sha1FpCert);
+        int issuerId = getIssuerId(issuer);
+        BigInteger serialNumber = certificate.getCert().getSerialNumber();
+        boolean certRegistered = certRegistered(issuerId, serialNumber);
 
         if(certRegistered)
         {
-            int issuerId = getIssuerId(issuer);
-
             final String sql = "UPDATE CERT" +
                     " SET LAST_UPDATE = ?, REVOCATED = ?, REV_TIME = ?, REV_INVALIDITY_TIME = ?, REV_REASON = ?" +
                     " WHERE ISSUER_ID = ? AND SERIAL = ?";
@@ -187,7 +186,7 @@ class CertStatusStoreQueryExecutor
                     ps.setNull(idx++, Types.INTEGER); // rev_reason
                 }
                 ps.setInt(idx++, issuerId);
-                ps.setLong(idx++, certificate.getCert().getSerialNumber().intValue());
+                ps.setLong(idx++, serialNumber.longValue());
                 ps.executeUpdate();
             }finally
             {
@@ -219,13 +218,11 @@ class CertStatusStoreQueryExecutor
 
             try
             {
-                int issuerId = getIssuerId(issuer);
-
                 X509Certificate cert = certificate.getCert();
                 int idx = 1;
                 ps.setInt(idx++, certId);
                 ps.setLong(idx++, System.currentTimeMillis()/1000);
-                ps.setString(idx++, cert.getSerialNumber().toString());
+                ps.setLong(idx++, serialNumber.longValue());
                 ps.setString(idx++, cert.getSubjectX500Principal().getName());
                 ps.setLong(idx++, cert.getNotBefore().getTime()/1000);
                 ps.setLong(idx++, cert.getNotAfter().getTime()/1000);
@@ -251,6 +248,8 @@ class CertStatusStoreQueryExecutor
                 releaseDbResources(ps, null);
             }
 
+            byte[] encodedCert = certificate.getEncodedCert();
+
             final String SQL_ADD_RAWCERT = "INSERT INTO RAWCERT (CERT_ID, CERT) VALUES (?, ?)";
             ps = borrowPreparedStatement(SQL_ADD_RAWCERT);
 
@@ -274,7 +273,7 @@ class CertStatusStoreQueryExecutor
             {
                 int idx = 1;
                 ps.setInt(idx++, certId);
-                ps.setString(idx++, sha1FpCert);
+                ps.setString(idx++, hashCalculator.hexHash(HashAlgoType.SHA1, encodedCert));
                 ps.setString(idx++, hashCalculator.hexHash(HashAlgoType.SHA224, encodedCert));
                 ps.setString(idx++, hashCalculator.hexHash(HashAlgoType.SHA256, encodedCert));
                 ps.setString(idx++, hashCalculator.hexHash(HashAlgoType.SHA384, encodedCert));
@@ -386,10 +385,11 @@ class CertStatusStoreQueryExecutor
         return ps;
     }
 
-    private boolean certRegistered(String sha1FpCert)
+    private boolean certRegistered(int issuerId,
+            BigInteger serialNumber)
     throws SQLException
     {
-        String sql = "count(*) FROM CERTHASH WHERE SHA1_FP=?";
+        String sql = "count(*) FROM CERT WHERE ISSUER_ID = ? AND SERIAL = ?";
         sql = createFetchFirstSelectSQL(sql, 1);
         PreparedStatement ps = borrowPreparedStatement(sql);
         ResultSet rs = null;
@@ -397,7 +397,8 @@ class CertStatusStoreQueryExecutor
         try
         {
             int idx = 1;
-            ps.setString(idx++, sha1FpCert);
+            ps.setInt(idx++, issuerId);
+            ps.setLong(idx++, serialNumber.longValue());
 
             rs = ps.executeQuery();
             if(rs.next())
