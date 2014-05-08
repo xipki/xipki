@@ -72,8 +72,6 @@ public abstract class CmpResponder
     private final Map<GeneralName, CertBasedRequestorInfo> authorizatedRequestors =
             new HashMap<GeneralName, CertBasedRequestorInfo>();
 
-    private int signserviceTimeout = 5000; // 5 seconds
-
     protected final SecurityFactory securityFactory;
 
     public abstract boolean isCAInService();
@@ -97,16 +95,12 @@ public abstract class CmpResponder
         this.sender = new GeneralName(x500Name);
     }
 
-    public void setSignserviceTimeout(int signserviceTimeout)
+    public PKIMessage processPKIMessage(PKIMessage pkiMessage, AuditEvent auditEvent)
     {
-        if(signserviceTimeout < 0)
-        {
-            throw new IllegalArgumentException("negative signserviceTimeout is not allowed: " + signserviceTimeout);
-        }
-        this.signserviceTimeout = signserviceTimeout;
+        return processPKIMessage(pkiMessage, null, auditEvent);
     }
 
-    public PKIMessage processPKIMessage(PKIMessage pkiMessage, AuditEvent auditEvent)
+    public PKIMessage processPKIMessage(PKIMessage pkiMessage, X509Certificate tlsClientCert, AuditEvent auditEvent)
     {
         GeneralPKIMessage message = new GeneralPKIMessage(pkiMessage);
 
@@ -215,6 +209,29 @@ public abstract class CmpResponder
                 errorStatus = "Request has invalid signature based protection";
             }
         }
+        else if(tlsClientCert != null)
+        {
+            boolean authorized = false;
+            for(CertBasedRequestorInfo authorizatedRequestor : authorizatedRequestors.values())
+            {
+                if(tlsClientCert.equals(authorizatedRequestor))
+                {
+                    authorized = true;
+                    break;
+                }
+            }
+            if(authorized)
+            {
+                errorStatus = null;
+            }
+            else
+            {
+                LOG.warn("tid={}: not authorized requestor (TLS client {})",
+                        tid, tlsClientCert.getSubjectX500Principal().getName());
+                errorStatus = "Requestor (TLS client certificate) is not authorized";
+            }
+
+        }
         else
         {
             errorStatus = "Request has no protection";
@@ -234,7 +251,14 @@ public abstract class CmpResponder
         CertBasedRequestorInfo requestor = verificationResult == null ? null :
             (CertBasedRequestorInfo) verificationResult.getRequestor();
         PKIMessage resp = intern_processPKIMessage(requestor, null, tid, message, auditEvent);
-        resp = addProtection(resp, auditEvent);
+        if(isProtected)
+        {
+            resp = addProtection(resp, auditEvent);
+        }
+        else
+        {
+            // protected by TLS connection
+        }
 
         return resp;
     }
