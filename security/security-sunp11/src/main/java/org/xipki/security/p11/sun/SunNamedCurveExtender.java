@@ -589,7 +589,7 @@ public class SunNamedCurveExtender
 
                 for (int j = 0; j < ks.length; j++)
                 {
-                    if(ks[0] > 0)
+                    if(ks[j] > 0)
                     {
                         rp = rp.setBit(ks[j]);
                     }

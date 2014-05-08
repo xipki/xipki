@@ -25,11 +25,9 @@ import iaik.pkcs.pkcs11.objects.X509PublicKeyCertificate;
 
 import org.apache.felix.gogo.commands.Command;
 import org.apache.felix.gogo.commands.Option;
-import org.apache.karaf.shell.console.OsgiCommandSupport;
 import org.bouncycastle.util.encoders.Hex;
 import org.xipki.security.api.PKCS11SlotIdentifier;
 import org.xipki.security.api.Pkcs11KeyIdentifier;
-import org.xipki.security.api.SecurityFactory;
 import org.xipki.security.api.SignerException;
 import org.xipki.security.p11.iaik.IaikExtendedModule;
 import org.xipki.security.p11.iaik.IaikExtendedSlot;
@@ -37,7 +35,7 @@ import org.xipki.security.p11.iaik.IaikP11CryptService;
 import org.xipki.security.p11.iaik.IaikP11ModulePool;
 
 @Command(scope = "keytool", name = "delete-key", description="Generate EC keypair in PKCS#11 device")
-public class P11KeyDeleteCommand extends OsgiCommandSupport
+public class P11KeyDeleteCommand extends SecurityCommand
 {
     @Option(name = "-slot",
             required = true, description = "Required. Slot index")
@@ -54,18 +52,6 @@ public class P11KeyDeleteCommand extends OsgiCommandSupport
     @Option(name = "-pwd", aliases = { "--password" },
             required = false, description = "Password of the PKCS#11 device")
     protected char[]            password;
-
-    private SecurityFactory securityFactory;
-
-    public SecurityFactory getSecurityFactory()
-    {
-        return securityFactory;
-    }
-
-    public void setSecurityFactory(SecurityFactory securityFactory)
-    {
-        this.securityFactory = securityFactory;
-    }
 
     @Override
     protected Object doExecute()
