@@ -77,6 +77,9 @@
 			<column name="REV_INVALIDITY_TIME" type="INT" remarks="seconds since January 1, 1970, 00:00:00 GMT"/>
 		</createTable>
 		
+		<addUniqueConstraint tableName="CERT" columnNames="ISSUER_ID, SERIAL"
+			constraintName="CONST_ISSUER_SERIAL"/>
+		
 		<!-- table CERThash -->
 		<createTable tableName="CERTHASH">
 			<column name="CERT_ID" type="INT(10)">
