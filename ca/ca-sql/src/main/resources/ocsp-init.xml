@@ -6,7 +6,7 @@
 			<column name="ID" type="INT(10)">
 				<constraints primaryKey="true" unique="true" nullable="false"/>
 			</column>
-			<column name="SUBJECT" type="VARCHAR(200)">
+			<column name="SUBJECT" type="VARCHAR(300)">
 				<constraints nullable="false"/>
 			</column>
 			<column name="SHA1_FP_NAME" type="CHAR(40)">
@@ -57,7 +57,7 @@
 			<column name="SERIAL" type="INT">
 				<constraints nullable="false"/>
 			</column>
-			<column name="SUBJECT" type="VARCHAR(200)">
+			<column name="SUBJECT" type="VARCHAR(300)">
 				<constraints nullable="false"/>
 			</column>
 			<column name="LAST_UPDATE" type="INT" remarks="seconds since January 1, 1970, 00:00:00 GMT">
@@ -76,6 +76,7 @@
 			<column name="REV_TIME" type="INT" remarks="seconds since January 1, 1970, 00:00:00 GMT"/>
 			<column name="REV_INVALIDITY_TIME" type="INT" remarks="seconds since January 1, 1970, 00:00:00 GMT"/>
 		</createTable>
+		
 		<!-- table CERThash -->
 		<createTable tableName="CERTHASH">
 			<column name="CERT_ID" type="INT(10)">
