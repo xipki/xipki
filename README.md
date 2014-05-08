@@ -71,12 +71,6 @@ Install
     ```
     The following steps use $XIPKI_HOME to point to the unpacked folder
 
-* Copy the license jars if required (e.g. db2jcc_license_cu.jar for DB2) to
-
-    ```sh
-    $XIPKI_HOME/lib/ext
-    ```
-
 * Configure one database for the CA and one for the OCSP responder
 * Adapt the database configuration (access rights read and write of database are required)
 
