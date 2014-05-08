@@ -110,9 +110,10 @@ abstract class X509CmpRequestor extends CmpRequestor
             ConcurrentContentSigner requestor,
             X509Certificate responderCert,
             X509Certificate caCert,
-            SecurityFactory securityFactory)
+            SecurityFactory securityFactory,
+            boolean signRequest)
     {
-        super(requestor, responderCert, securityFactory);
+        super(requestor, responderCert, securityFactory, signRequest);
         ParamChecker.assertNotNull("caCert", caCert);
         this.caCert = caCert;
     }

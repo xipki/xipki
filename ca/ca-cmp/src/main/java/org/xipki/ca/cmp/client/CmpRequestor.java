@@ -67,11 +67,21 @@ public abstract class CmpRequestor
     private final X509Certificate responderCert;
 
     protected final SecurityFactory securityFactory;
+    protected boolean signRequest;
 
     public CmpRequestor(
             ConcurrentContentSigner requestor,
             X509Certificate responderCert,
             SecurityFactory securityFactory)
+    {
+        this(requestor,responderCert, securityFactory, true);
+    }
+
+    public CmpRequestor(
+            ConcurrentContentSigner requestor,
+            X509Certificate responderCert,
+            SecurityFactory securityFactory,
+            boolean signRequest)
     {
         ParamChecker.assertNotNull("requestor", requestor);
         ParamChecker.assertNotNull("responderCert", responderCert);
@@ -80,6 +90,7 @@ public abstract class CmpRequestor
         this.requestor = requestor;
         this.responderCert = responderCert;
         this.securityFactory = securityFactory;
+        this.signRequest = signRequest;
 
         X500Name subject = X500Name.getInstance(responderCert.getSubjectX500Principal().getEncoded());
         this.recipient = new GeneralName(subject);
@@ -110,7 +121,10 @@ public abstract class CmpRequestor
     protected PKIResponse signAndSend(PKIMessage request)
     throws CmpRequestorException
     {
-        request = sign(request);
+        if(signRequest)
+        {
+            request = sign(request);
+        }
 
         byte[] encodedRequest;
         try
@@ -168,7 +182,7 @@ public abstract class CmpRequestor
                 throw new CmpRequestorException(e);
             }
         }
-        else
+        else if(signRequest)
         {
             PKIBody respBody = response.getBody();
             int bodyType = respBody.getType();
