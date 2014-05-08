@@ -20,6 +20,7 @@ package org.xipki.ca.server;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URLDecoder;
+import java.security.cert.X509Certificate;
 import java.util.Date;
 import java.util.List;
 
@@ -62,6 +63,9 @@ public class Rfc6712Servlet extends HttpServlet
     public void doPost(HttpServletRequest request, HttpServletResponse response)
     throws ServletException, IOException
     {
+        X509Certificate[] certs = (X509Certificate[]) request.getAttribute("javax.servlet.request.X509Certificate");
+        X509Certificate clientCert = (certs == null || certs.length < 1)? null : certs[0];
+
         AuditEvent auditEvent = (auditLoggingService != null) ? new AuditEvent(new Date()) : null;
         auditEvent.setApplicationName("CA");
         auditEvent.setName("SYSTEM");
@@ -154,7 +158,7 @@ public class Rfc6712Servlet extends HttpServlet
                     reqHeader.getRecipient(), reqHeader.getSender());
             respHeader.setTransactionID(tid);
 
-            PKIMessage pkiResp = responder.processPKIMessage(pkiReq, auditEvent);
+            PKIMessage pkiResp = responder.processPKIMessage(pkiReq, clientCert, auditEvent);
             byte[] pkiRespBytes = pkiResp.getEncoded("DER");
 
             response.setContentType(Rfc6712Servlet.CT_RESPONSE);
