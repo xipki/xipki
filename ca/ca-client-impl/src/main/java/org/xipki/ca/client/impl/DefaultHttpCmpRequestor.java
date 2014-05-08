@@ -41,9 +41,10 @@ class DefaultHttpCmpRequestor extends X509CmpRequestor
             X509Certificate responderCert,
             X509Certificate caCert,
             String serverUrl,
-            SecurityFactory securityFactory)
+            SecurityFactory securityFactory,
+            boolean signRequest)
     {
-        super(requestor, responderCert, caCert, securityFactory);
+        super(requestor, responderCert, caCert, securityFactory, signRequest);
         ParamChecker.assertNotNull("serverUrl", serverUrl);
 
         try

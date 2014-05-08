@@ -101,6 +101,8 @@ public final class RAWorkerImpl extends AbstractRAWorker implements RAWorker
 {
     public static final String DEV_MODE = "dev.mode";
 
+    public static final String SIGN_REQUEST = "sign.request";
+
     /**
      * The certificate of the responder.
      */
@@ -200,6 +202,8 @@ public final class RAWorkerImpl extends AbstractRAWorker implements RAWorker
         }
 
         boolean dev_mode = Boolean.parseBoolean(props.getProperty(DEV_MODE, "false"));
+
+        boolean signRequest = Boolean.parseBoolean(props.getProperty(SIGN_REQUEST, "true"));
 
         X509Certificate requestorCert = null;
         String s = props.getProperty(REQUESTOR_CERT);
@@ -416,7 +420,7 @@ public final class RAWorkerImpl extends AbstractRAWorker implements RAWorker
 
             X509CmpRequestor cmpRequestor = new DefaultHttpCmpRequestor(
                     requestorSigner, ca.getResponder(), ca.getCert(), ca.getUrl(),
-                    securityFactory);
+                    securityFactory, signRequest);
 
             cmpRequestorsMap.put(ca.getName(), cmpRequestor);
         }
