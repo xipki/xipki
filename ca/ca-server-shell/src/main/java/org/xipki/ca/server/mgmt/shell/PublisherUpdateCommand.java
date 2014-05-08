@@ -31,8 +31,7 @@ public class PublisherUpdateCommand extends CaCommand
     protected String            name;
 
     @Option(name = "-type",
-            description = "Required. Publisher type",
-            required = true)
+            description = "Publisher type")
     protected String            type;
 
     @Option(name = "-conf",
@@ -47,6 +46,12 @@ public class PublisherUpdateCommand extends CaCommand
     protected Object doExecute()
     throws Exception
     {
+        if(type == null && conf == null && confFile == null)
+        {
+            System.out.println("Nothing to update");
+            return null;
+        }
+
         if(conf == null && confFile != null)
         {
             conf = new String(IoCertUtil.read(confFile));
