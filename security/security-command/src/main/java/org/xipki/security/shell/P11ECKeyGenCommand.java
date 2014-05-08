@@ -24,7 +24,6 @@ import org.apache.felix.gogo.commands.Option;
 import org.bouncycastle.util.encoders.Hex;
 import org.xipki.security.api.P11KeypairGenerationResult;
 import org.xipki.security.api.PKCS11SlotIdentifier;
-import org.xipki.security.api.SecurityFactory;
 import org.xipki.security.common.IoCertUtil;
 import org.xipki.security.p11.iaik.IaikP11CryptService;
 import org.xipki.security.p11.iaik.P11KeypairGenerator;
@@ -49,26 +48,14 @@ public class P11ECKeyGenCommand extends KeyGenCommand
             required = false, description = "Password of the PKCS#11 token")
     protected String            password;
 
-    @Option(name = "-out",
-            required = false, description = "Output file name of certificate")
+    @Option(name = "-certout",
+            required = false, description = "Where to saven the self-signed certificate")
     protected String            outputFilename;
 
     @Option(name = "-cert-type",
             required = false, description = "Certificate type of the self signed certificate."
                     + " Currently only TLS, TLS-C or TLS-S are supported")
     protected String            certType;
-
-    private SecurityFactory securityFactory;
-
-    public SecurityFactory getSecurityFactory()
-    {
-        return securityFactory;
-    }
-
-    public void setSecurityFactory(SecurityFactory securityFactory)
-    {
-        this.securityFactory = securityFactory;
-    }
 
     @Override
     protected Object doExecute()

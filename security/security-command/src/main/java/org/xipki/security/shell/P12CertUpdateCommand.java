@@ -30,16 +30,14 @@ import java.util.Enumeration;
 
 import org.apache.felix.gogo.commands.Command;
 import org.apache.felix.gogo.commands.Option;
-import org.apache.karaf.shell.console.OsgiCommandSupport;
 import org.xipki.security.NopPasswordResolver;
 import org.xipki.security.api.PasswordResolverException;
-import org.xipki.security.api.SecurityFactory;
 import org.xipki.security.api.SignerException;
 import org.xipki.security.common.CmpUtf8Pairs;
 import org.xipki.security.common.IoCertUtil;
 
 @Command(scope = "keytool", name = "update-cert-p12", description="Update certificate in PKCS#12 keystore")
-public class P12CertUpdateCommand extends OsgiCommandSupport
+public class P12CertUpdateCommand extends SecurityCommand
 {
     @Option(name = "-p12",
             required = true, description = "Required. PKCS#12 keystore file")
@@ -52,13 +50,6 @@ public class P12CertUpdateCommand extends OsgiCommandSupport
     @Option(name = "-cert",
             required = true, description = "Required. Certificate file")
     protected String            certFile;
-
-    private SecurityFactory securityFactory;
-
-    public void setSecurityFactory(SecurityFactory securityFactory)
-    {
-        this.securityFactory = securityFactory;
-    }
 
     @Override
     protected Object doExecute()

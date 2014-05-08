@@ -23,7 +23,6 @@ import java.math.BigInteger;
 import org.apache.felix.gogo.commands.Command;
 import org.apache.felix.gogo.commands.Option;
 import org.xipki.security.api.P12KeypairGenerationResult;
-import org.xipki.security.api.SecurityFactory;
 import org.xipki.security.common.IoCertUtil;
 import org.xipki.security.p10.P12KeypairGenerator;
 
@@ -55,18 +54,6 @@ public class P12RSAKeyGenCommand extends KeyGenCommand
             required = false, description = "Certificate type of the self signed certificate."
                     + " Currently only TLS, TLS-C or TLS-S are supported")
     protected String            certType;
-
-    private SecurityFactory securityFactory;
-
-    public SecurityFactory getSecurityFactory()
-    {
-        return securityFactory;
-    }
-
-    public void setSecurityFactory(SecurityFactory securityFactory)
-    {
-        this.securityFactory = securityFactory;
-    }
 
     @Override
     protected Object doExecute()
