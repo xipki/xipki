@@ -20,6 +20,7 @@ package org.xipki.security.common;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -71,6 +72,8 @@ public abstract class AbstractLoadTest
         printSummary();
     }
 
+    private final ConcurrentLinkedDeque<MeasurePoint> measureDeque = new ConcurrentLinkedDeque<>();
+
     private static int DEFAULT_DURATION = 30; // 30 seconds
     private int duration = DEFAULT_DURATION; // in seconds
     public void setDuration(int duration)
@@ -91,7 +94,6 @@ public abstract class AbstractLoadTest
         }
     }
 
-    private long lastAccout = 0;
     private int account = 0;
     private int errorAccount = 0;
 
@@ -106,12 +108,11 @@ public abstract class AbstractLoadTest
         errorAccount += failed;
     }
 
-    private long lastMeasureTime = 0;
     private long startTime = 0;
     protected void resetStartTime()
     {
         startTime = System.currentTimeMillis();
-        lastMeasureTime = startTime;
+        measureDeque.add(new MeasurePoint(startTime, 0));
     }
 
     protected synchronized boolean stop()
@@ -127,6 +128,8 @@ public abstract class AbstractLoadTest
     protected void printStatus()
     {
         int currentAccount = account;
+        long now = System.currentTimeMillis();
+        measureDeque.addLast(new MeasurePoint(now, currentAccount));
 
         String accountS = Integer.toString(currentAccount);
         StringBuilder sb = new StringBuilder("\r");
@@ -138,18 +141,26 @@ public abstract class AbstractLoadTest
         }
         sb.append(currentAccount);
 
-        long now = System.currentTimeMillis();
         long t = (now - startTime)/1000;  // in s
         String time = formatTime(t);
         sb.append("  ");
         sb.append(time);
 
-        long t2inms = now - lastMeasureTime; // in ms
+        MeasurePoint referenceMeasurePoint;
+        int numMeasurePoints = measureDeque.size();
+        if(numMeasurePoints > 5)
+        {
+            referenceMeasurePoint = measureDeque.removeFirst();
+        }
+        else
+        {
+            referenceMeasurePoint = measureDeque.getFirst();
+        }
+
+        long t2inms = now - referenceMeasurePoint.measureTime; // in ms
         if(t2inms > 0)
         {
-            long average = (currentAccount - lastAccout) * 1000 / t2inms;
-            lastMeasureTime = now;
-            lastAccout = currentAccount;
+            long average = (currentAccount - referenceMeasurePoint.measureAccount) * 1000 / t2inms;
 
             String averageS = Long.toString(average);
             for (int i = 0; i < 10 -averageS.length(); i++)
@@ -249,6 +260,18 @@ public abstract class AbstractLoadTest
             fout.close();
         }catch(IOException e)
         {
+        }
+    }
+
+    private static class MeasurePoint
+    {
+        private long measureTime;
+        private int measureAccount;
+
+        public MeasurePoint(long measureTime, int measureAccount)
+        {
+            this.measureTime = measureTime;
+            this.measureAccount = measureAccount;
         }
     }
 }
