@@ -25,12 +25,11 @@ import java.util.Enumeration;
 
 import org.apache.felix.gogo.commands.Command;
 import org.apache.felix.gogo.commands.Option;
-import org.apache.karaf.shell.console.OsgiCommandSupport;
 import org.xipki.security.api.SignerException;
 import org.xipki.security.common.IoCertUtil;
 
 @Command(scope = "keytool", name = "export-cert-p12", description="Export certificate from PKCS#12 keystore")
-public class P12CertExportCommand extends OsgiCommandSupport
+public class P12CertExportCommand extends SecurityCommand
 {
     @Option(name = "-p12",
             required = true, description = "Required. PKCS#12 keystore file")

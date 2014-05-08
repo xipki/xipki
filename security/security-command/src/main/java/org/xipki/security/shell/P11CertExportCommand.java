@@ -24,11 +24,9 @@ import java.io.File;
 
 import org.apache.felix.gogo.commands.Command;
 import org.apache.felix.gogo.commands.Option;
-import org.apache.karaf.shell.console.OsgiCommandSupport;
 import org.bouncycastle.util.encoders.Hex;
 import org.xipki.security.api.PKCS11SlotIdentifier;
 import org.xipki.security.api.Pkcs11KeyIdentifier;
-import org.xipki.security.api.SecurityFactory;
 import org.xipki.security.api.SignerException;
 import org.xipki.security.common.IoCertUtil;
 import org.xipki.security.p11.iaik.IaikExtendedModule;
@@ -36,7 +34,7 @@ import org.xipki.security.p11.iaik.IaikExtendedSlot;
 import org.xipki.security.p11.iaik.IaikP11ModulePool;
 
 @Command(scope = "keytool", name = "export-cert", description="Export certificate from PKCS#11 device")
-public class P11CertExportCommand extends OsgiCommandSupport
+public class P11CertExportCommand extends SecurityCommand
 {
 
     @Option(name = "-slot",
@@ -58,18 +56,6 @@ public class P11CertExportCommand extends OsgiCommandSupport
     @Option(name = "-pwd", aliases = { "--password" },
             required = false, description = "Password of the PKCS#11 device")
     protected char[]            password;
-
-    private SecurityFactory securityFactory;
-
-    public SecurityFactory getSecurityFactory()
-    {
-        return securityFactory;
-    }
-
-    public void setSecurityFactory(SecurityFactory securityFactory)
-    {
-        this.securityFactory = securityFactory;
-    }
 
     @Override
     protected Object doExecute()

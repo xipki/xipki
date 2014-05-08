@@ -20,12 +20,10 @@ package org.xipki.security.shell;
 import java.util.Arrays;
 import java.util.List;
 
-import org.apache.karaf.shell.console.OsgiCommandSupport;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.x509.KeyUsage;
-import org.xipki.security.api.SecurityFactory;
 
-abstract class KeyGenCommand extends OsgiCommandSupport
+abstract class KeyGenCommand extends SecurityCommand
 {
     private static final ASN1ObjectIdentifier id_pkix = new ASN1ObjectIdentifier("1.3.6.1.5.5.7");
     private static final ASN1ObjectIdentifier id_kp                  = id_pkix.branch("3");
@@ -33,18 +31,6 @@ abstract class KeyGenCommand extends OsgiCommandSupport
     public static final ASN1ObjectIdentifier id_kp_clientAuth        = id_kp.branch("2");
 
     protected abstract String getCertType();
-
-    protected SecurityFactory securityFactory;
-
-    public SecurityFactory getSecurityFactory()
-    {
-        return securityFactory;
-    }
-
-    public void setSecurityFactory(SecurityFactory securityFactory)
-    {
-        this.securityFactory = securityFactory;
-    }
 
     protected Integer getKeyUsage()
     throws Exception

@@ -33,7 +33,6 @@ import javax.security.auth.x500.X500Principal;
 
 import org.apache.felix.gogo.commands.Command;
 import org.apache.felix.gogo.commands.Option;
-import org.apache.karaf.shell.console.OsgiCommandSupport;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.nist.NISTNamedCurves;
 import org.bouncycastle.asn1.sec.SECNamedCurves;
@@ -41,30 +40,17 @@ import org.bouncycastle.asn1.teletrust.TeleTrusTNamedCurves;
 import org.bouncycastle.asn1.x9.X962NamedCurves;
 import org.bouncycastle.util.encoders.Hex;
 import org.xipki.security.api.PKCS11SlotIdentifier;
-import org.xipki.security.api.SecurityFactory;
 import org.xipki.security.api.SignerException;
 import org.xipki.security.p11.iaik.IaikExtendedModule;
 import org.xipki.security.p11.iaik.IaikExtendedSlot;
 import org.xipki.security.p11.iaik.IaikP11ModulePool;
 
 @Command(scope = "keytool", name = "list", description="List PKCS#11 device objects")
-public class P11ListSlotCommand extends OsgiCommandSupport
+public class P11ListSlotCommand extends SecurityCommand
 {
     @Option(name = "-pwd", aliases = { "--password" },
             required = false, description = "Password of the PKCS#11 token")
     protected char[]            password;
-
-    private SecurityFactory securityFactory;
-
-    public SecurityFactory getSecurityFactory()
-    {
-        return securityFactory;
-    }
-
-    public void setSecurityFactory(SecurityFactory securityFactory)
-    {
-        this.securityFactory = securityFactory;
-    }
 
     @Override
     protected Object doExecute()
