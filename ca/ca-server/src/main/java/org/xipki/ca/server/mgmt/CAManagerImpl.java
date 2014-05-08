@@ -1959,7 +1959,7 @@ public class CAManagerImpl implements CAManager
         }
         assertNotNULL("type", type);
 
-        if(certProfiles.containsKey(name))
+        if(certProfiles.containsKey(name) == false)
         {
             throw new CAMgmtException("Could not find certificate profile " + name);
         }
@@ -2516,7 +2516,7 @@ public class CAManagerImpl implements CAManager
     public void changePublisher(String name, String type, String conf)
     throws CAMgmtException
     {
-        if(publishers.containsKey(name))
+        if(publishers.containsKey(name) == false)
         {
             throw new CAMgmtException("Could not find publisher " + name);
         }
