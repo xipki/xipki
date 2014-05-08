@@ -42,6 +42,7 @@ import org.xipki.ca.common.EnrollCertResult;
 import org.xipki.ca.common.PKIErrorException;
 import org.xipki.ca.common.RAWorkerException;
 import org.xipki.security.SignerUtil;
+import org.xipki.security.common.AbstractLoadTest;
 import org.xipki.security.common.ParamChecker;
 
 public class CALoadTest extends AbstractLoadTest
