@@ -63,7 +63,7 @@ public class OCSPStatusLoadTestCommand extends OsgiCommandSupport
     @Option(name = "-nonce",
             description = "Use nonce")
     protected Boolean            useNonce;
-    
+
     @Option(name = "-hash",
             required = false, description = "Hash algorithm name. The default is SHA256")
     protected String            hashAlgo;
@@ -81,28 +81,28 @@ public class OCSPStatusLoadTestCommand extends OsgiCommandSupport
 
         if(hashAlgo == null)
         {
-        	hashAlgo = "SHA256";
+            hashAlgo = "SHA256";
         }
-        
+
         ASN1ObjectIdentifier hashAlgoOid;
 
         hashAlgo = hashAlgo.trim().toUpperCase();
 
         if("SHA1".equalsIgnoreCase(hashAlgo) || "SHA-1".equalsIgnoreCase(hashAlgo))
         {
-        	hashAlgoOid = X509ObjectIdentifiers.id_SHA1;
+            hashAlgoOid = X509ObjectIdentifiers.id_SHA1;
         }
         else if("SHA256".equalsIgnoreCase(hashAlgo) || "SHA-256".equalsIgnoreCase(hashAlgo))
         {
-        	hashAlgoOid = NISTObjectIdentifiers.id_sha256;
+            hashAlgoOid = NISTObjectIdentifiers.id_sha256;
         }
         else if("SHA384".equalsIgnoreCase(hashAlgo) || "SHA-384".equalsIgnoreCase(hashAlgo))
         {
-        	hashAlgoOid = NISTObjectIdentifiers.id_sha384;
+            hashAlgoOid = NISTObjectIdentifiers.id_sha384;
         }
         else if("SHA512".equalsIgnoreCase(hashAlgo) || "SHA-512".equalsIgnoreCase(hashAlgo))
         {
-        	hashAlgoOid = NISTObjectIdentifiers.id_sha512;
+            hashAlgoOid = NISTObjectIdentifiers.id_sha512;
         }
         else
         {

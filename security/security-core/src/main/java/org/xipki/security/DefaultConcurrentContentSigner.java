@@ -38,30 +38,30 @@ public class DefaultConcurrentContentSigner implements ConcurrentContentSigner
 {
     private static final Logger LOG = LoggerFactory.getLogger(DefaultConcurrentContentSigner.class);
 
-    private static int defaultSignServiceTimeout = 10000; // 10 seconds 
-    
+    private static int defaultSignServiceTimeout = 10000; // 10 seconds
+
     private final BlockingDeque<ContentSigner> idleSigners = new LinkedBlockingDeque<ContentSigner>();
     private final BlockingDeque<ContentSigner> busySigners = new LinkedBlockingDeque<ContentSigner>();
     private final PrivateKey privateKey;
 
     private X509Certificate certificate;
-    
+
     static
     {
-    	String v = System.getProperty("org.xipki.signservice.timeout");
-    	if(v != null)
-    	{
-    		int vi =Integer.parseInt(v);
-    		// valid value is between 0 and 60 seconds
-    		if(vi < 0 || vi > 60 * 1000) 
-    		{
-    			LOG.error("invalid org.xipki.signservice.timeout: {}", v);
-    		}
-    		else
-    		{
-    			defaultSignServiceTimeout = vi;
-    		}
-    	}
+        String v = System.getProperty("org.xipki.signservice.timeout");
+        if(v != null)
+        {
+            int vi =Integer.parseInt(v);
+            // valid value is between 0 and 60 seconds
+            if(vi < 0 || vi > 60 * 1000)
+            {
+                LOG.error("invalid org.xipki.signservice.timeout: {}", v);
+            }
+            else
+            {
+                defaultSignServiceTimeout = vi;
+            }
+        }
     }
 
     public DefaultConcurrentContentSigner(List<ContentSigner> signers)
@@ -84,7 +84,7 @@ public class DefaultConcurrentContentSigner implements ConcurrentContentSigner
     public ContentSigner borrowContentSigner()
     throws NoIdleSignerException
     {
-    	return borrowContentSigner(defaultSignServiceTimeout);
+        return borrowContentSigner(defaultSignServiceTimeout);
     }
 
     @Override
@@ -93,13 +93,15 @@ public class DefaultConcurrentContentSigner implements ConcurrentContentSigner
     {
         if(soTimeout == 0)
         {
-       		ContentSigner signer = null;
-			try {
-				signer = idleSigners.takeFirst();
-			} catch (InterruptedException e) {
-				LOG.info("interruppted");
-			}
-        	
+               ContentSigner signer = null;
+            try
+            {
+                signer = idleSigners.takeFirst();
+            } catch (InterruptedException e)
+            {
+                LOG.info("interruppted");
+            }
+
             if(signer == null)
             {
                 throw new NoIdleSignerException("No idle signer available");
