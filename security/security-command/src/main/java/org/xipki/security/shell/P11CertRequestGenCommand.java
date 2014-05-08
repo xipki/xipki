@@ -24,7 +24,6 @@ import java.io.File;
 
 import org.apache.felix.gogo.commands.Command;
 import org.apache.felix.gogo.commands.Option;
-import org.apache.karaf.shell.console.OsgiCommandSupport;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 import org.bouncycastle.asn1.x500.X500Name;
@@ -39,7 +38,6 @@ import org.xipki.security.SecurityFactoryImpl;
 import org.xipki.security.api.ConcurrentContentSigner;
 import org.xipki.security.api.PKCS11SlotIdentifier;
 import org.xipki.security.api.Pkcs11KeyIdentifier;
-import org.xipki.security.api.SecurityFactory;
 import org.xipki.security.api.SignerException;
 import org.xipki.security.common.IoCertUtil;
 import org.xipki.security.p10.Pkcs10RequestGenerator;
@@ -48,7 +46,7 @@ import org.xipki.security.p11.iaik.IaikExtendedSlot;
 import org.xipki.security.p11.iaik.IaikP11ModulePool;
 
 @Command(scope = "keytool", name = "req", description="Generate PKCS#10 request with PKCS#11 device")
-public class P11CertRequestGenCommand extends OsgiCommandSupport
+public class P11CertRequestGenCommand extends SecurityCommand
 {
     @Option(name = "-subject",
             required = false,
@@ -78,13 +76,6 @@ public class P11CertRequestGenCommand extends OsgiCommandSupport
     @Option(name = "-out",
             required = true, description = "Required. Output file name")
     protected String            outputFilename;
-
-    private SecurityFactory securityFactory;
-
-    public void setSecurityFactory(SecurityFactory securityFactory)
-    {
-        this.securityFactory = securityFactory;
-    }
 
     @Override
     protected Object doExecute()
