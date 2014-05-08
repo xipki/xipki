@@ -60,7 +60,7 @@ public class HttpsHostnameVerifier implements HostnameVerifier
 
     public void shutdown()
     {
-        if(meAsDefaultHostnameVerifier)
+        if(meAsDefaultHostnameVerifier && HttpsURLConnection.getDefaultHostnameVerifier() == this)
         {
             LOG.info("Unregister me as DefaultHostnameVerifier, and reuse the old one " + oldHostnameVerifier);
             HttpsURLConnection.setDefaultHostnameVerifier(oldHostnameVerifier);
