@@ -15,7 +15,7 @@
  *
  */
 
-package org.xipki.ca.client.shell.loadtest;
+package org.xipki.security.common;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -57,7 +57,7 @@ public abstract class AbstractLoadTest
             printStatus();
             try
             {
-                boolean terminated = executor.awaitTermination(1, TimeUnit.SECONDS);
+                boolean terminated = executor.awaitTermination(2, TimeUnit.SECONDS);
                 if(terminated)
                 {
                     break;
@@ -91,6 +91,7 @@ public abstract class AbstractLoadTest
         }
     }
 
+    private long lastAccout = 0;
     private int account = 0;
     private int errorAccount = 0;
 
@@ -105,10 +106,12 @@ public abstract class AbstractLoadTest
         errorAccount += failed;
     }
 
+    private long lastMeasureTime = 0;
     private long startTime = 0;
     protected void resetStartTime()
     {
         startTime = System.currentTimeMillis();
+        lastMeasureTime = startTime;
     }
 
     protected synchronized boolean stop()
@@ -118,12 +121,13 @@ public abstract class AbstractLoadTest
 
     protected static void printHeader()
     {
-        System.out.println("  processed       time");
+        System.out.println(" processed      time   average");
     }
 
     protected void printStatus()
     {
         int currentAccount = account;
+
         String accountS = Integer.toString(currentAccount);
         StringBuilder sb = new StringBuilder("\r");
 
@@ -134,12 +138,29 @@ public abstract class AbstractLoadTest
         }
         sb.append(currentAccount);
 
-        long t = (System.currentTimeMillis() - startTime)/1000;  // in s
+        long now = System.currentTimeMillis();
+        long t = (now - startTime)/1000;  // in s
         String time = formatTime(t);
-        sb.append("    ");
+        sb.append("  ");
         sb.append(time);
 
+        long t2inms = now - lastMeasureTime; // in ms
+        if(t2inms > 0)
+        {
+            long average = (currentAccount - lastAccout) * 1000 / t2inms;
+            lastMeasureTime = now;
+            lastAccout = currentAccount;
+
+            String averageS = Long.toString(average);
+            for (int i = 0; i < 10 -averageS.length(); i++)
+            {
+                sb.append(" ");
+            }
+            sb.append(average);
+        }
+
         System.out.print(sb.toString());
+        System.out.flush();
     }
 
     private String unit = "";

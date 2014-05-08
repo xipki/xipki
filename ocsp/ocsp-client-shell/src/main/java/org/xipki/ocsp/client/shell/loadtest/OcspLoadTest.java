@@ -33,6 +33,7 @@ import org.slf4j.LoggerFactory;
 import org.xipki.ocsp.client.api.OCSPRequestor;
 import org.xipki.ocsp.client.api.OCSPRequestorException;
 import org.xipki.ocsp.client.api.RequestOptions;
+import org.xipki.security.common.AbstractLoadTest;
 import org.xipki.security.common.ParamChecker;
 
 public class OcspLoadTest extends AbstractLoadTest
