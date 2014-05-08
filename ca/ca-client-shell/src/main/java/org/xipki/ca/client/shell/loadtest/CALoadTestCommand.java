@@ -51,6 +51,21 @@ public class CALoadTestCommand extends OsgiCommandSupport
             description = "Number of threads, the default is 5")
     protected Integer          numThreads;
 
+    @Option(name="-ec",
+    		required = false,
+    		description = "Generate certificate for ECC key")
+    private Boolean ecc;
+
+    @Option(name="-keysize",
+    		required =false,
+    		description = "Key size of RSA key, the default is 2048.")
+    private Integer keysize;
+    
+    @Option(name = "-curve",
+            description = "ECC curve name or OID, the default is brainpoolP256r1",
+            required = false)
+    protected String curveName;
+    
     private RAWorker             raWorker;
 
     @Override
@@ -76,7 +91,24 @@ public class CALoadTestCommand extends OsgiCommandSupport
         startMsg.append("Profile:      " + certProfile).append("\n");
         System.out.print(startMsg.toString());
 
-        CALoadTest loadTest = new CALoadTest(raWorker, certProfile, commonNamePrefix, subjectNoCN);
+        CALoadTest loadTest;
+        if(ecc != null && ecc.booleanValue())
+        {
+        	if(curveName == null)
+        	{
+        		curveName = "brainpoolP256r1";
+        	}
+        	loadTest = new CALoadTest.ECCALoadTest(raWorker, certProfile, commonNamePrefix, subjectNoCN, curveName);
+        }
+        else
+        {
+        	if(keysize == null)
+        	{
+        		keysize = 2048;
+        	}
+        	loadTest =new CALoadTest.RSACALoadTest(raWorker, certProfile, commonNamePrefix, subjectNoCN, keysize.intValue());
+        }
+        
         loadTest.setDuration(durationInSecond);
         loadTest.setThreads(numThreads);
         loadTest.test();
