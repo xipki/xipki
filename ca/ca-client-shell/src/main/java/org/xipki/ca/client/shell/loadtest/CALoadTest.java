@@ -61,61 +61,61 @@ import org.xipki.security.p10.P12KeypairGenerator;
 
 abstract class CALoadTest extends AbstractLoadTest
 {
-	static class RSACALoadTest extends CALoadTest
-	{
-	    private BigInteger baseN;
-	
-		public RSACALoadTest(RAWorker raWorker, String certProfile,
-				String commonNamePrefix, String otherPartOfSubject, int keysize)
-		{
-			super(raWorker, certProfile, commonNamePrefix, otherPartOfSubject);
-			if(keysize % 1024 != 0)
-			{
-				throw new IllegalArgumentException("invalid RSA keysize " + keysize);
-			}
-			
-	        this.baseN = BigInteger.valueOf(0);
-	        this.baseN = this.baseN.setBit(keysize - 1);
-	        for(int i = 32; i < keysize - 1; i+= 2)
-	        {
-	            this.baseN = this.baseN.setBit(i);
-	        }
-		}
+    static class RSACALoadTest extends CALoadTest
+    {
+        private BigInteger baseN;
 
-		@Override
-		protected SubjectPublicKeyInfo getSubjectPublicKeyInfo(long index)
-		{
-	        BigInteger modulus = baseN.add(BigInteger.valueOf(index));
+        public RSACALoadTest(RAWorker raWorker, String certProfile,
+                String commonNamePrefix, String otherPartOfSubject, int keysize)
+        {
+            super(raWorker, certProfile, commonNamePrefix, otherPartOfSubject);
+            if(keysize % 1024 != 0)
+            {
+                throw new IllegalArgumentException("invalid RSA keysize " + keysize);
+            }
 
-	        try
-	        {
-	            return SubjectPublicKeyInfoFactory.createSubjectPublicKeyInfo(
-	                    SignerUtil.generateRSAPublicKeyParameter(
-	                            org.xipki.security.KeyUtil.generateRSAPublicKey(modulus,
-	                                    BigInteger.valueOf(65535))));
-	        } catch (InvalidKeySpecException e)
-	        {
-	            LOG.warn("InvalidKeySpecException: {}", e.getMessage());
-	            return null;
-	        } catch (IOException e)
-	        {
-	            LOG.warn("IOException: {}", e.getMessage());
-	            return null;
-	        }
-		}
-	}
+            this.baseN = BigInteger.valueOf(0);
+            this.baseN = this.baseN.setBit(keysize - 1);
+            for(int i = 32; i < keysize - 1; i+= 2)
+            {
+                this.baseN = this.baseN.setBit(i);
+            }
+        }
 
-	static class ECCALoadTest extends CALoadTest
-	{
-		private ASN1ObjectIdentifier curveOid;
-		private String curveName;
-		private ECPoint baseQ; 
-		
-		public ECCALoadTest(RAWorker raWorker, String certProfile,
-				String commonNamePrefix, String otherPartOfSubject, String curveNameOrOid)
-		throws Exception
-		{
-			super(raWorker, certProfile, commonNamePrefix, otherPartOfSubject);			
+        @Override
+        protected SubjectPublicKeyInfo getSubjectPublicKeyInfo(long index)
+        {
+            BigInteger modulus = baseN.add(BigInteger.valueOf(index));
+
+            try
+            {
+                return SubjectPublicKeyInfoFactory.createSubjectPublicKeyInfo(
+                        SignerUtil.generateRSAPublicKeyParameter(
+                                org.xipki.security.KeyUtil.generateRSAPublicKey(modulus,
+                                        BigInteger.valueOf(65535))));
+            } catch (InvalidKeySpecException e)
+            {
+                LOG.warn("InvalidKeySpecException: {}", e.getMessage());
+                return null;
+            } catch (IOException e)
+            {
+                LOG.warn("IOException: {}", e.getMessage());
+                return null;
+            }
+        }
+    }
+
+    static class ECCALoadTest extends CALoadTest
+    {
+        private ASN1ObjectIdentifier curveOid;
+        private String curveName;
+        private ECPoint baseQ;
+
+        public ECCALoadTest(RAWorker raWorker, String certProfile,
+        String commonNamePrefix, String otherPartOfSubject, String curveNameOrOid)
+        throws Exception
+        {
+            super(raWorker, certProfile, commonNamePrefix, otherPartOfSubject);
             boolean isOid;
             try
             {
@@ -146,38 +146,38 @@ abstract class CALoadTest extends AbstractLoadTest
             kpgen.initialize(spec);
             KeyPair kp = kpgen.generateKeyPair();
             this.baseQ = ((BCECPublicKey) kp.getPublic()).getQ();
-		}
+        }
 
-		@Override
-		protected SubjectPublicKeyInfo getSubjectPublicKeyInfo(long index) 
-		{
+        @Override
+        protected SubjectPublicKeyInfo getSubjectPublicKeyInfo(long index)
+        {
             AlgorithmIdentifier algId = new AlgorithmIdentifier(X9ObjectIdentifiers.id_ecPublicKey,
                     this.curveOid);
-            
+
             ECPoint q;
             if(baseQ instanceof ECPoint.F2m)
             {
-            	ECFieldElement.F2m basePointX = (ECFieldElement.F2m) ((ECPoint.F2m) baseQ).getX();
+                ECFieldElement.F2m basePointX = (ECFieldElement.F2m) ((ECPoint.F2m) baseQ).getX();
                 BigInteger x = basePointX.toBigInteger().add(BigInteger.valueOf(index));
-            	
+
                 ECFieldElement.F2m pointX = new F2m(basePointX.getM(),basePointX.getK1(),
-                		basePointX.getK2(), basePointX.getK3(), x);
-            	q = new ECPoint.F2m(baseQ.getCurve(), pointX, baseQ.getY());
+                        basePointX.getK2(), basePointX.getK3(), x);
+                q = new ECPoint.F2m(baseQ.getCurve(), pointX, baseQ.getY());
             }
             else //if(baseQ instanceof ECPoint.Fp)
             {
-            	ECFieldElement.Fp basePointX = (ECFieldElement.Fp) ((ECPoint.Fp) baseQ).getX();
-            	BigInteger x = basePointX.toBigInteger().add(BigInteger.valueOf(index));
-            	ECFieldElement.Fp pointX = new ECFieldElement.Fp(basePointX.getQ(), x);
-            	
-            	q = new ECPoint.Fp(baseQ.getCurve(), pointX, baseQ.getY());
+                ECFieldElement.Fp basePointX = (ECFieldElement.Fp) ((ECPoint.Fp) baseQ).getX();
+                BigInteger x = basePointX.toBigInteger().add(BigInteger.valueOf(index));
+                ECFieldElement.Fp pointX = new ECFieldElement.Fp(basePointX.getQ(), x);
+
+                q = new ECPoint.Fp(baseQ.getCurve(), pointX, baseQ.getY());
             }
-            
+
            ASN1OctetString p = (ASN1OctetString)new X9ECPoint(q).toASN1Primitive();
            return new SubjectPublicKeyInfo(algId, p.getOctets());
-		}
-	}
-	
+        }
+    }
+
     private static final Logger LOG = LoggerFactory.getLogger(CALoadTest.class);
 
     private final RAWorker raWorker;
@@ -186,9 +186,9 @@ abstract class CALoadTest extends AbstractLoadTest
     private final String otherPartOfSubject;
 
     private long index;
-    
+
     protected abstract SubjectPublicKeyInfo getSubjectPublicKeyInfo(long index);
-    
+
     @Override
     protected Runnable getTestor()
     throws Exception
@@ -235,9 +235,9 @@ abstract class CALoadTest extends AbstractLoadTest
         SubjectPublicKeyInfo spki = getSubjectPublicKeyInfo(index);
         if(spki == null)
         {
-        	return null;
+            return null;
         }
-        
+
         certTempBuilder.setPublicKey(spki);
 
         CertTemplate certTemplate = certTempBuilder.build();

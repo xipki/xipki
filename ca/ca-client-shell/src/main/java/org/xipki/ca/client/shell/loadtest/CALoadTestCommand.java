@@ -52,20 +52,20 @@ public class CALoadTestCommand extends OsgiCommandSupport
     protected Integer          numThreads;
 
     @Option(name="-ec",
-    		required = false,
-    		description = "Generate certificate for ECC key")
+            required = false,
+            description = "Generate certificate for ECC key")
     private Boolean ecc;
 
     @Option(name="-keysize",
-    		required =false,
-    		description = "Key size of RSA key, the default is 2048.")
+            required =false,
+            description = "Key size of RSA key, the default is 2048.")
     private Integer keysize;
-    
+
     @Option(name = "-curve",
             description = "ECC curve name or OID, the default is brainpoolP256r1",
             required = false)
     protected String curveName;
-    
+
     private RAWorker             raWorker;
 
     @Override
@@ -94,21 +94,21 @@ public class CALoadTestCommand extends OsgiCommandSupport
         CALoadTest loadTest;
         if(ecc != null && ecc.booleanValue())
         {
-        	if(curveName == null)
-        	{
-        		curveName = "brainpoolP256r1";
-        	}
-        	loadTest = new CALoadTest.ECCALoadTest(raWorker, certProfile, commonNamePrefix, subjectNoCN, curveName);
+            if(curveName == null)
+            {
+                curveName = "brainpoolP256r1";
+            }
+            loadTest = new CALoadTest.ECCALoadTest(raWorker, certProfile, commonNamePrefix, subjectNoCN, curveName);
         }
         else
         {
-        	if(keysize == null)
-        	{
-        		keysize = 2048;
-        	}
-        	loadTest =new CALoadTest.RSACALoadTest(raWorker, certProfile, commonNamePrefix, subjectNoCN, keysize.intValue());
+            if(keysize == null)
+            {
+                keysize = 2048;
+            }
+            loadTest =new CALoadTest.RSACALoadTest(raWorker, certProfile, commonNamePrefix, subjectNoCN, keysize.intValue());
         }
-        
+
         loadTest.setDuration(durationInSecond);
         loadTest.setThreads(numThreads);
         loadTest.test();
