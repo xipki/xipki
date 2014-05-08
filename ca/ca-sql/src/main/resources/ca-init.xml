@@ -178,7 +178,7 @@
 			<column name="ID" type="INT(10)">
 				<constraints primaryKey="true" unique="true" nullable="false"/>
 			</column>
-			<column name="SUBJECT" type="VARCHAR(200)">
+			<column name="SUBJECT" type="VARCHAR(300)">
 				<constraints nullable="false"/>
 			</column>
 			<column name="CERT" type="VARCHAR(2000)">
@@ -193,7 +193,7 @@
 			<column name="ID" type="INT(10)">
 				<constraints primaryKey="true" unique="true" nullable="false"/>
 			</column>
-			<column name="SUBJECT" type="VARCHAR(200)">
+			<column name="SUBJECT" type="VARCHAR(300)">
 				<constraints nullable="false"/>
 			</column>
 			<column name="CERT" type="VARCHAR(2000)"/>
@@ -254,7 +254,7 @@
 				<constraints nullable="false"/>
 			</column>
 			<column name="REQUESTORINFO_ID" type="INT(10)"/>
-			<column name="SUBJECT" type="VARCHAR(200)">
+			<column name="SUBJECT" type="VARCHAR(300)">
 				<constraints nullable="false"/>
 			</column>
 			<column name="LAST_UPDATE" remarks="seconds since January 1, 1970, 00:00:00 GMT" type="INT">
