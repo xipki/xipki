@@ -30,41 +30,43 @@ public class CertStatusInfo
 
     private final Date thisUpdate;
     private final Date nextUpdate;
+    private final String certProfile;
 
-    private CertStatusInfo(CertStatus certStatus, Date thisUpdate, Date nextUpdate)
+    private CertStatusInfo(CertStatus certStatus, Date thisUpdate, Date nextUpdate, String certProfile)
     {
         this.certStatus = certStatus;
         this.thisUpdate = thisUpdate;
         this.nextUpdate = nextUpdate;
+        this.certProfile = certProfile;
     }
 
     public static CertStatusInfo getUnknownCertStatusInfo(Date thisUpdate, Date nextUpdate)
     {
-        return new CertStatusInfo(CertStatus.UNKNOWN, thisUpdate, nextUpdate);
+        return new CertStatusInfo(CertStatus.UNKNOWN, thisUpdate, nextUpdate, null);
     }
 
     public static CertStatusInfo getIssuerUnknownCertStatusInfo(Date thisUpdate, Date nextUpdate)
     {
-        return new CertStatusInfo(CertStatus.ISSUER_UNKNOWN, thisUpdate, nextUpdate);
+        return new CertStatusInfo(CertStatus.ISSUER_UNKNOWN, thisUpdate, nextUpdate, null);
     }
 
     public static CertStatusInfo getGoodCertStatusInfo(
-            HashAlgoType certHashAlgo, byte[] certHash, Date thisUpdate, Date nextUpdate)
+            HashAlgoType certHashAlgo, byte[] certHash, Date thisUpdate, Date nextUpdate, String certProfile)
     {
-        CertStatusInfo ret = new CertStatusInfo(CertStatus.GOOD, thisUpdate, nextUpdate);
+        CertStatusInfo ret = new CertStatusInfo(CertStatus.GOOD, thisUpdate, nextUpdate, certProfile);
         ret.certHashAlgo = certHashAlgo;
         ret.certHash = certHash;
         return ret;
     }
 
     public static CertStatusInfo getRevocatedCertStatusInfo(CertRevocationInfo revocationInfo,
-            HashAlgoType certHashAlgo, byte[] certHash, Date thisUpdate, Date nextUpdate)
+            HashAlgoType certHashAlgo, byte[] certHash, Date thisUpdate, Date nextUpdate, String certProfile)
     {
         if(revocationInfo == null)
         {
             throw new IllegalArgumentException("revocationInfo could not be null");
         }
-        CertStatusInfo ret = new CertStatusInfo(CertStatus.REVOCATED, thisUpdate, nextUpdate);
+        CertStatusInfo ret = new CertStatusInfo(CertStatus.REVOCATED, thisUpdate, nextUpdate, certProfile);
         ret.revocationInfo = revocationInfo;
         ret.certHashAlgo = certHashAlgo;
         ret.certHash = certHash;
@@ -99,6 +101,11 @@ public class CertStatusInfo
     public byte[] getCertHash()
     {
         return certHash;
+    }
+
+    public String getCertProfile()
+    {
+        return certProfile;
     }
 
 }

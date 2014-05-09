@@ -28,6 +28,7 @@ import org.apache.felix.gogo.commands.Option;
 import org.xipki.ca.api.CAStatus;
 import org.xipki.ca.server.mgmt.CAManager;
 import org.xipki.ca.server.mgmt.Permission;
+import org.xipki.security.api.PasswordResolver;
 import org.xipki.security.common.ConfigurationException;
 import org.xipki.security.common.IoCertUtil;
 
@@ -102,6 +103,8 @@ public class CaUpdateCommand extends CaCommand
             description = "Duplicate subject is not allowed")
     protected Boolean           disableDuplicateSubject;
 
+    private PasswordResolver passwordResolver;
+
     @Override
     protected Object doExecute()
     throws Exception
@@ -122,7 +125,7 @@ public class CaUpdateCommand extends CaCommand
         {
              if("PKCS12".equalsIgnoreCase(signerType) || "JKS".equalsIgnoreCase(signerType))
              {
-                 signerConf = ShellUtil.replaceFileInSignerConf(signerConf);
+                 signerConf = ShellUtil.replaceFileInSignerConf(signerType, signerConf, passwordResolver);
              }
         }
 
@@ -223,5 +226,10 @@ public class CaUpdateCommand extends CaCommand
                 numCrls);
 
         return null;
+    }
+
+    public void setPasswordResolver(PasswordResolver passwordResolver)
+    {
+        this.passwordResolver = passwordResolver;
     }
 }

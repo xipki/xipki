@@ -226,7 +226,7 @@ public class DbCertStatusStore implements CertStatusStore
             }
 
             final String sql =
-                    "ID, REVOCATED, REV_REASON, REV_TIME, REV_INVALIDITY_TIME" +
+                    "ID, REVOCATED, REV_REASON, REV_TIME, REV_INVALIDITY_TIME, PROFILE" +
                     " FROM CERT" +
                     " WHERE ISSUER_ID=? AND SERIAL=?";
 
@@ -242,6 +242,7 @@ public class DbCertStatusStore implements CertStatusStore
 
                 if(rs.next())
                 {
+                    String certprofile = rs.getString("PROFILE");
                     byte[] certHash = null;
                     if(includeCertHash)
                     {
@@ -259,11 +260,12 @@ public class DbCertStatusStore implements CertStatusStore
                         CertRevocationInfo revInfo = new CertRevocationInfo(reason, new Date(revocationTime * 1000),
                                 new Date(invalidatityTime * 1000));
                         certStatusInfo = CertStatusInfo.getRevocatedCertStatusInfo(revInfo, certHashAlgo, certHash,
-                                thisUpdate, null);
+                                thisUpdate, null, certprofile);
                     }
                     else
                     {
-                        certStatusInfo = CertStatusInfo.getGoodCertStatusInfo(certHashAlgo, certHash, thisUpdate, null);
+                        certStatusInfo = CertStatusInfo.getGoodCertStatusInfo(certHashAlgo, certHash, thisUpdate,
+                                null, certprofile);
                     }
 
                     return certStatusInfo;
@@ -271,7 +273,7 @@ public class DbCertStatusStore implements CertStatusStore
                 else
                 {
                     return unknownSerialAsGood ?
-                            CertStatusInfo.getGoodCertStatusInfo(certHashAlgo, null, thisUpdate, null) :
+                            CertStatusInfo.getGoodCertStatusInfo(certHashAlgo, null, thisUpdate, null, null) :
                             CertStatusInfo.getUnknownCertStatusInfo(thisUpdate, null);
                 }
             }finally

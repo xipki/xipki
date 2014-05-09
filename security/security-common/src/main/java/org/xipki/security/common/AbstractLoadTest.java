@@ -122,7 +122,7 @@ public abstract class AbstractLoadTest
 
     protected static void printHeader()
     {
-        System.out.println(" processed      time   average");
+        System.out.println(" processed      time       #/s");
     }
 
     protected void printStatus()

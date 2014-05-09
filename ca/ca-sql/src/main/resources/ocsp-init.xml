@@ -75,6 +75,7 @@
 			<column name="REV_REASON" type="INT"/>
 			<column name="REV_TIME" type="INT" remarks="seconds since January 1, 1970, 00:00:00 GMT"/>
 			<column name="REV_INVALIDITY_TIME" type="INT" remarks="seconds since January 1, 1970, 00:00:00 GMT"/>
+			<column name="PROFILE" type="VARCHAR(45)"/>
 		</createTable>
 		
 		<addUniqueConstraint tableName="CERT" columnNames="ISSUER_ID, SERIAL"
