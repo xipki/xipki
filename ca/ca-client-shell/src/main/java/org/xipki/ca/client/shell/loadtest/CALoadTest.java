@@ -25,6 +25,7 @@ import java.security.cert.X509Certificate;
 import java.security.spec.InvalidKeySpecException;
 import java.util.Calendar;
 import java.util.Locale;
+import java.util.concurrent.atomic.AtomicLong;
 
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.ASN1OctetString;
@@ -110,6 +111,7 @@ abstract class CALoadTest extends AbstractLoadTest
         private ASN1ObjectIdentifier curveOid;
         private String curveName;
         private ECPoint baseQ;
+        private BigInteger baseQx;
 
         public ECCALoadTest(RAWorker raWorker, String certProfile,
         String commonNamePrefix, String otherPartOfSubject, String curveNameOrOid)
@@ -146,6 +148,22 @@ abstract class CALoadTest extends AbstractLoadTest
             kpgen.initialize(spec);
             KeyPair kp = kpgen.generateKeyPair();
             this.baseQ = ((BCECPublicKey) kp.getPublic()).getQ();
+
+            if(baseQ instanceof ECPoint.F2m)
+            {
+                ECFieldElement.F2m basePointX = (ECFieldElement.F2m) ((ECPoint.F2m) baseQ).getX();
+                baseQx = basePointX.toBigInteger();
+            }
+            else //if(baseQ instanceof ECPoint.Fp)
+            {
+                ECFieldElement.Fp basePointX = (ECFieldElement.Fp) ((ECPoint.Fp) baseQ).getX();
+                baseQx = basePointX.toBigInteger();
+            }
+            
+            for(int i = 0; i < 32; i++)
+            {
+            	baseQx = baseQx.clearBit(i);
+            }
         }
 
         @Override
@@ -158,7 +176,7 @@ abstract class CALoadTest extends AbstractLoadTest
             if(baseQ instanceof ECPoint.F2m)
             {
                 ECFieldElement.F2m basePointX = (ECFieldElement.F2m) ((ECPoint.F2m) baseQ).getX();
-                BigInteger x = basePointX.toBigInteger().add(BigInteger.valueOf(index));
+                BigInteger x = baseQx.add(BigInteger.valueOf(index));
 
                 ECFieldElement.F2m pointX = new F2m(basePointX.getM(),basePointX.getK1(),
                         basePointX.getK2(), basePointX.getK3(), x);
@@ -167,7 +185,7 @@ abstract class CALoadTest extends AbstractLoadTest
             else //if(baseQ instanceof ECPoint.Fp)
             {
                 ECFieldElement.Fp basePointX = (ECFieldElement.Fp) ((ECPoint.Fp) baseQ).getX();
-                BigInteger x = basePointX.toBigInteger().add(BigInteger.valueOf(index));
+                BigInteger x = baseQx.add(BigInteger.valueOf(index));
                 ECFieldElement.Fp pointX = new ECFieldElement.Fp(basePointX.getQ(), x);
 
                 q = new ECPoint.Fp(baseQ.getCurve(), pointX, baseQ.getY());
@@ -185,7 +203,7 @@ abstract class CALoadTest extends AbstractLoadTest
     private final String commonNamePrefix;
     private final String otherPartOfSubject;
 
-    private long index;
+    private AtomicLong index;
 
     protected abstract SubjectPublicKeyInfo getSubjectPublicKeyInfo(long index);
 
@@ -215,24 +233,19 @@ abstract class CALoadTest extends AbstractLoadTest
         baseTime.set(Calendar.MONTH, 0);
         baseTime.set(Calendar.DAY_OF_MONTH, 1);
 
-        this.index = System.nanoTime() / 10000L - baseTime.getTimeInMillis() * 10L;
-    }
-
-    private synchronized long nextIndex()
-    {
-        return index++;
+        this.index = new AtomicLong(System.nanoTime() / 10000L - baseTime.getTimeInMillis() * 10L);
     }
 
     private CertRequest nextCertRequest()
     {
         CertTemplateBuilder certTempBuilder = new CertTemplateBuilder();
 
-        long thisIndex = nextIndex();
+        long thisIndex = index.getAndIncrement();
 
         X500Name subject = new X500Name("CN=" + commonNamePrefix + thisIndex + "," + otherPartOfSubject);
         certTempBuilder.setSubject(subject);
 
-        SubjectPublicKeyInfo spki = getSubjectPublicKeyInfo(index);
+        SubjectPublicKeyInfo spki = getSubjectPublicKeyInfo(thisIndex);
         if(spki == null)
         {
             return null;
