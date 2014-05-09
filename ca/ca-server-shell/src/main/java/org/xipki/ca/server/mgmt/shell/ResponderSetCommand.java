@@ -60,7 +60,7 @@ public class ResponderSetCommand extends CaCommand
 
         if("PKCS12".equalsIgnoreCase(signerType) || "JKS".equalsIgnoreCase(signerType))
         {
-            signerConf = ShellUtil.replaceFileInSignerConf(signerConf);
+            signerConf = ShellUtil.replaceFileInSignerConf(signerType, signerConf, passwordResolver);
         }
 
         entry.setConf(signerConf);

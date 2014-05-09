@@ -124,7 +124,7 @@ class OcspCertStoreDbExporter extends DbPorter
         CertsFiles certsFiles = new CertsFiles();
 
         String certSql = "SELECT ID, ISSUER_ID, LAST_UPDATE," +
-                " REVOCATED, REV_REASON, REV_TIME, REV_INVALIDITY_TIME " +
+                " REVOCATED, REV_REASON, REV_TIME, REV_INVALIDITY_TIME, PROFILE " +
                 " FROM CERT" +
                 " WHERE ID >= ? AND ID < ?";
 
@@ -187,7 +187,8 @@ class OcspCertStoreDbExporter extends DbPorter
                     String rev_reason = rs.getString("REV_REASON");
                     String rev_time = rs.getString("REV_TIME");
                     String rev_invalidity_time = rs.getString("REV_INVALIDITY_TIME");
-
+                    String profile = rs.getString("PROFILE");
+                    
                     rawCertPs.setInt(1, id);
 
                     String sha1_fp_cert;
@@ -224,7 +225,8 @@ class OcspCertStoreDbExporter extends DbPorter
                     cert.setRevTime(rev_time);
                     cert.setRevInvalidityTime(rev_invalidity_time);
                     cert.setCertFile(sha1_fp_cert + ".der");
-
+                    cert.setProfile(profile);
+                    
                     certsInCurrentFile.getCert().add(cert);
                     numCertInCurrentFile ++;
                     sum ++;

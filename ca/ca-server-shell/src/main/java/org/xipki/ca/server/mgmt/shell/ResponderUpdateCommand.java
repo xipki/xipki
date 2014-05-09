@@ -23,6 +23,7 @@ import org.apache.felix.gogo.commands.Command;
 import org.apache.felix.gogo.commands.Option;
 import org.bouncycastle.util.encoders.Base64;
 import org.xipki.ca.server.mgmt.CAManager;
+import org.xipki.security.api.PasswordResolver;
 import org.xipki.security.common.IoCertUtil;
 
 @Command(scope = "ca", name = "responder-update", description="Update responder")
@@ -40,6 +41,8 @@ public class ResponderUpdateCommand extends CaCommand
     @Option(name = "-cert",
             description = "Requestor certificate file or 'NULL'")
     protected String            certFile;
+
+    private PasswordResolver passwordResolver;
 
     @Override
     protected Object doExecute()
@@ -59,11 +62,17 @@ public class ResponderUpdateCommand extends CaCommand
 
         if("PKCS12".equalsIgnoreCase(signerType) || "JKS".equalsIgnoreCase(signerType))
         {
-            signerConf = ShellUtil.replaceFileInSignerConf(signerConf);
+            signerConf = ShellUtil.replaceFileInSignerConf(signerType, signerConf, passwordResolver);
         }
 
         caManager.changeCmpResponder(signerType, signerConf, cert);
 
         return null;
     }
+
+    public void setPasswordResolver(PasswordResolver passwordResolver)
+    {
+        this.passwordResolver = passwordResolver;
+    }
+
 }

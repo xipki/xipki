@@ -60,7 +60,8 @@
 			<xs:element name="rev_reason" type="xs:string" minOccurs="0"/>
 			<xs:element name="rev_time" type="xs:string" minOccurs="0"/>
 			<xs:element name="rev_invalidity_time" type="xs:string" minOccurs="0"/>
-			<xs:element name="certFile" type="xs:string"/>		
+			<xs:element name="profile" type="xs:string"/>		
+			<xs:element name="certFile" type="xs:string"/>
 		</xs:all>		
 	</xs:complexType>
 </xs:schema>

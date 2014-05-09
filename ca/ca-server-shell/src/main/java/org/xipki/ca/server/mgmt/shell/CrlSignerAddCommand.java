@@ -81,13 +81,19 @@ public class CrlSignerAddCommand extends CaCommand
                 signerCert = IoCertUtil.parseCert(signerCertFile);
                 entry.setCertificate(signerCert);
             }
+
+            if(signerConf != null)
+            {
+                if("PKCS12".equalsIgnoreCase(signerType) || "JKS".equalsIgnoreCase(signerType))
+                {
+                    signerConf = ShellUtil.replaceFileInSignerConf(signerType,
+                            signerConf, passwordResolver);
+                }
+                entry.setConf(signerConf);
+            }
+
             // check whether we can initialize the signer
             securityFactory.createSigner(signerType, signerConf, signerCert, passwordResolver);
-        }
-
-        if(signerConf != null)
-        {
-            entry.setConf(signerConf);
         }
 
         entry.setPeriod(period);
