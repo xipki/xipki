@@ -191,8 +191,8 @@ class OcspCertStoreDbImporter extends DbPorter
                 "INSERT INTO CERT (" +
                 " ID, ISSUER_ID, SERIAL, " +
                 " SUBJECT, LAST_UPDATE, NOTBEFORE, NOTAFTER," +
-                " REVOCATED, REV_REASON, REV_TIME, REV_INVALIDITY_TIME)" +
-                " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                " REVOCATED, REV_REASON, REV_TIME, REV_INVALIDITY_TIME, PROFILE)" +
+                " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
         final String SQL_ADD_CERTHASH = "INSERT INTO CERTHASH (" +
                 "CERT_ID, SHA1_FP, SHA224_FP, SHA256_FP, SHA384_FP, SHA512_FP)" +
@@ -258,7 +258,7 @@ class OcspCertStoreDbImporter extends DbPorter
                     ps_cert.setString(idx++, cert.getRevReason());
                     ps_cert.setString(idx++, cert.getRevTime());
                     ps_cert.setString(idx++, cert.getRevInvalidityTime());
-
+                    ps_cert.setString(idx++, cert.getProfile());
                     ps_cert.executeUpdate();
 
                     // certhash

@@ -84,7 +84,15 @@ public class SoftTokenContentSignerBuilder
 
         try
         {
-            KeyStore ks = KeyStore.getInstance(keystoreType, "BC");
+            KeyStore ks;
+            if("JKS".equalsIgnoreCase(keystoreType))
+            {
+                ks = KeyStore.getInstance(keystoreType);
+            }
+            else
+            {
+                ks = KeyStore.getInstance(keystoreType, "BC");
+            }
             ks.load(keystoreStream, keystorePassword);
 
             if(keyname == null)
