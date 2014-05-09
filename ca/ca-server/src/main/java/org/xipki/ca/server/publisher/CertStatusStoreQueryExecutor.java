@@ -117,26 +117,29 @@ class CertStatusStoreQueryExecutor
      * @throws CertificateEncodingException
      */
     void addCert(X509CertificateWithMetaInfo issuer,
-            X509CertificateWithMetaInfo certificate)
+            X509CertificateWithMetaInfo certificate,
+            String certProfile)
     throws SQLException, CertificateEncodingException
     {
-        addCert(issuer, certificate, false, null, null, null);
+        addCert(issuer, certificate, certProfile, false, null, null, null);
     }
 
     void addCert(X509CertificateWithMetaInfo issuer,
             X509CertificateWithMetaInfo certificate,
+            String certProfile,
             boolean revocated,
             Date revocationTime,
             Integer revocationReason,
             Date invalidityTime)
     throws SQLException, CertificateEncodingException
     {
-        addOrUpdateCert(issuer, certificate, revocated,
+        addOrUpdateCert(issuer, certificate, certProfile, revocated,
                 revocationTime, revocationReason, invalidityTime);
     }
 
     private void addOrUpdateCert(X509CertificateWithMetaInfo issuer,
             X509CertificateWithMetaInfo certificate,
+            String certProfile,
             boolean revocated,
             Date revocationTime,
             Integer revocationReason,
@@ -198,13 +201,13 @@ class CertStatusStoreQueryExecutor
             StringBuilder sb = new StringBuilder();
             sb.append("INSERT INTO CERT ");
             sb.append("(ID, LAST_UPDATE, SERIAL, SUBJECT");
-            sb.append(", NOTBEFORE, NOTAFTER, REVOCATED, ISSUER_ID");
+            sb.append(", NOTBEFORE, NOTAFTER, REVOCATED, ISSUER_ID, PROFILE");
             if(revocated)
             {
                 sb.append(", REV_TIME, REV_INVALIDITY_TIME, REV_REASON");
             }
             sb.append(")");
-            sb.append(" VALUES (?, ?, ?, ?, ?, ?, ?, ?");
+            sb.append(" VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?");
             if(revocated)
             {
                 sb.append(", ?, ?, ?");
@@ -228,6 +231,7 @@ class CertStatusStoreQueryExecutor
                 ps.setLong(idx++, cert.getNotAfter().getTime()/1000);
                 ps.setBoolean(idx++, revocated);
                 ps.setInt(idx++, issuerId);
+                ps.setString(idx++, certProfile);
 
                 if(revocated)
                 {
@@ -293,7 +297,7 @@ class CertStatusStoreQueryExecutor
             Date invalidityTime)
     throws SQLException, CertificateEncodingException
     {
-        addOrUpdateCert(caCert, cert, true, revocationTime, revocationReason, invalidityTime);
+        addOrUpdateCert(caCert, cert, null, true, revocationTime, revocationReason, invalidityTime);
     }
 
     private int getIssuerId(X509CertificateWithMetaInfo issuerCert)

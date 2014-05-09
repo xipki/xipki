@@ -28,16 +28,8 @@
             Copy TLS keys
         -->
         <fileSet>
-            <directory>${project.basedir}/../../demo-tslkeys</directory>
-            <includes>
-                <!-- required by both server and client -->
-                <include>tls-truststore.jks</include>
-                <!-- required by server -->
-                <include>tls-server-keystore.jks</include>
-                <!-- required by client -->
-                <include>tls-p11client-keystore.jks</include>
-            </includes>
-            <outputDirectory>/etc/</outputDirectory>
+            <directory>${project.basedir}/../../demo-tlskeys</directory>
+            <outputDirectory>/etc/tlskeys</outputDirectory>
             <fileMode>0644</fileMode>
             <directoryMode>0755</directoryMode>
         </fileSet>

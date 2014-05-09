@@ -39,11 +39,13 @@ import java.util.concurrent.TimeUnit;
 import javax.security.auth.x500.X500Principal;
 
 import org.bouncycastle.asn1.ASN1Encodable;
+import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.ASN1Set;
 import org.bouncycastle.asn1.DEREnumerated;
 import org.bouncycastle.asn1.DERGeneralizedTime;
 import org.bouncycastle.asn1.DEROctetString;
 import org.bouncycastle.asn1.DERSet;
+import org.bouncycastle.asn1.DERUTF8String;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.Certificate;
 import org.bouncycastle.asn1.x509.Extension;
@@ -67,6 +69,18 @@ import org.xipki.security.common.ParamChecker;
 public class CrlCertStatusStore implements CertStatusStore
 {
     private static final Logger LOG = LoggerFactory.getLogger(CrlCertStatusStore.class);
+
+    private static class CertWithInfo
+    {
+        private Certificate cert;
+        private String profileName;
+
+        public CertWithInfo(Certificate cert, String profileName)
+        {
+            this.cert = cert;
+            this.profileName = profileName;
+        }
+    }
 
     private class StoreUpdateService implements Runnable
     {
@@ -277,7 +291,7 @@ public class CrlCertStatusStore implements CertStatusStore
 
             // extract the certificate
             boolean certsIncluded = false;
-            Set<Certificate> certs = new HashSet<Certificate>();
+            Set<CertWithInfo> certs = new HashSet<CertWithInfo>();
             String oidExtnCerts = CustomObjectIdentifiers.id_crl_certset;
             byte[] extnValue = crl.getExtensionValue(oidExtnCerts);
             if(extnValue != null)
@@ -289,13 +303,29 @@ public class CrlCertStatusStore implements CertStatusStore
                 for(int i = 0; i < n; i++)
                 {
                     ASN1Encodable asn1 = asn1Set.getObjectAt(i);
-                    Certificate bcCert = Certificate.getInstance(asn1);
+                    Certificate bcCert;
+                    String profileName = null;
+
+                    try
+                    {
+                        ASN1Sequence seq = ASN1Sequence.getInstance(asn1);
+                        bcCert = Certificate.getInstance(seq.getObjectAt(0));
+                        if(seq.size() > 1)
+                        {
+                            profileName = DERUTF8String.getInstance(seq.getObjectAt(1)).getString();
+                        }
+                    }catch(IllegalArgumentException e)
+                    {
+                        // backwards compatibility
+                        bcCert = Certificate.getInstance(asn1);
+                    }
+
                     if(caName.equals(bcCert.getIssuer()) == false)
                     {
                         throw new CertStatusStoreException("Invalid entry in CRL Extension certs");
                     }
 
-                    certs.add(bcCert);
+                    certs.add(new CertWithInfo(bcCert, profileName));
                 }
             }
 
@@ -339,13 +369,13 @@ public class CrlCertStatusStore implements CertStatusStore
                         }
                     }
 
-                    Certificate cert = null;
+                    CertWithInfo cert = null;
                     if(certsIncluded)
                     {
-                        for(Certificate bcCert : certs)
+                        for(CertWithInfo bcCert : certs)
                         {
-                            if(bcCert.getIssuer().equals(caName) &&
-                                    bcCert.getSerialNumber().getPositiveValue().equals(serialNumber))
+                            if(bcCert.cert.getIssuer().equals(caName) &&
+                                    bcCert.cert.getSerialNumber().getPositiveValue().equals(serialNumber))
                             {
                                 cert = bcCert;
                                 break;
@@ -360,20 +390,21 @@ public class CrlCertStatusStore implements CertStatusStore
                         certs.remove(cert);
                     }
 
-                    Map<HashAlgoType, byte[]> certHashes = (cert == null) ? null : getCertHashes(hashCalculator, cert);
+                    Map<HashAlgoType, byte[]> certHashes = (cert == null) ? null : getCertHashes(hashCalculator, cert.cert);
 
                     CertRevocationInfo revocationInfo = new CertRevocationInfo(reasonCode, revTime, invalidityTime);
                     CrlCertStatusInfo crlCertStatusInfo = CrlCertStatusInfo.getRevocatedCertStatusInfo(
-                            revocationInfo, certHashes);
+                            revocationInfo, cert.profileName, certHashes);
                     newCertStatusInfoMap.put(serialNumber, crlCertStatusInfo);
                 }
             }
 
-            for(Certificate cert : certs)
+            for(CertWithInfo cert : certs)
             {
                 CrlCertStatusInfo crlCertStatusInfo = CrlCertStatusInfo.getGoodCertStatusInfo(
-                        getCertHashes(hashCalculator, cert));
-                newCertStatusInfoMap.put(cert.getSerialNumber().getPositiveValue(), crlCertStatusInfo);
+                        cert.profileName,
+                        getCertHashes(hashCalculator, cert.cert));
+                newCertStatusInfoMap.put(cert.cert.getSerialNumber().getPositiveValue(), crlCertStatusInfo);
             }
 
             this.initialized = false;
@@ -510,7 +541,7 @@ public class CrlCertStatusStore implements CertStatusStore
         if(certStatusInfo == null)
         {
             return unknownSerialAsGood ?
-                    CertStatusInfo.getGoodCertStatusInfo(certHashAlgo, null, thisUpdate, nextUpdate) :
+                    CertStatusInfo.getGoodCertStatusInfo(certHashAlgo, null, thisUpdate, nextUpdate, null) :
                     CertStatusInfo.getUnknownCertStatusInfo(thisUpdate, nextUpdate);
         }
 

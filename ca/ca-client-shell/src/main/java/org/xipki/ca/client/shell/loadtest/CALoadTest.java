@@ -159,10 +159,10 @@ abstract class CALoadTest extends AbstractLoadTest
                 ECFieldElement.Fp basePointX = (ECFieldElement.Fp) ((ECPoint.Fp) baseQ).getX();
                 baseQx = basePointX.toBigInteger();
             }
-            
+
             for(int i = 0; i < 32; i++)
             {
-            	baseQx = baseQx.clearBit(i);
+                baseQx = baseQx.clearBit(i);
             }
         }
 

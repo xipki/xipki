@@ -412,6 +412,7 @@ public abstract class AbstractCertProfile extends CertProfile
     private RDN createSubjectRDN(String text, ASN1ObjectIdentifier type)
     throws BadCertTemplateException
     {
+        text = text.trim();
         ASN1Encodable dnValue;
         if(ObjectIdentifiers.DN_SERIALNUMBER.equals(type) ||
            ObjectIdentifiers.DN_C.equals(type))

@@ -42,8 +42,11 @@ import org.bouncycastle.asn1.ASN1GeneralizedTime;
 import org.bouncycastle.asn1.ASN1Integer;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.ASN1OctetString;
+import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.DERPrintableString;
+import org.bouncycastle.asn1.DERSequence;
 import org.bouncycastle.asn1.DERSet;
+import org.bouncycastle.asn1.DERUTF8String;
 import org.bouncycastle.asn1.x500.RDN;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x500.style.IETFUtils;
@@ -451,9 +454,6 @@ public class X509CA
                 startSerial = BigInteger.ONE;
                 if(crlSigner.includeCertsInCrl())
                 {
-                    /*
-                     * extValue is of type CertificateSet defined in RFC 5652 - Cryptographic Message Syntax
-                     */
                     ASN1EncodableVector vector = new ASN1EncodableVector();
 
                     List<BigInteger> serials;
@@ -476,17 +476,30 @@ public class X509CA
                                 maxSerial = serial;
                             }
 
-                            byte[] encodedCert;
+                            CertificateInfo certInfo;
                             try
                             {
-                                encodedCert = certstore.getEncodedCertificate(cacert, serial);
+                                certInfo = certstore.getCertificateInfo(cacert, serial);
                             } catch (SQLException e)
                             {
                                 throw new OperationException(ErrorCode.DATABASE_FAILURE, "SQLException: " + e.getMessage());
+                            } catch (CertificateException e)
+                            {
+                                throw new OperationException(ErrorCode.System_Failure, "CertificateException: " + e.getMessage());
                             }
 
-                            Certificate cert = Certificate.getInstance(encodedCert);
-                            vector.add(cert);
+                            Certificate cert = Certificate.getInstance(certInfo.getCert().getEncodedCert());
+
+                            ASN1EncodableVector v = new ASN1EncodableVector();
+                            v.add(cert);
+                            String profileName = certInfo.getProfileName();
+                            if(profileName != null && profileName.isEmpty() == false)
+                            {
+                                v.add(new DERUTF8String(certInfo.getProfileName()));
+                            }
+                            ASN1Sequence certWithInfo = new DERSequence(v);
+
+                            vector.add(certWithInfo);
                         }
 
                         startSerial = maxSerial.add(BigInteger.ONE);

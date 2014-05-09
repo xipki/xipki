@@ -30,9 +30,11 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 import java.util.StringTokenizer;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.DERNull;
@@ -85,6 +87,7 @@ import org.xipki.security.api.PasswordResolver;
 import org.xipki.security.api.PasswordResolverException;
 import org.xipki.security.api.SecurityFactory;
 import org.xipki.security.api.SignerException;
+import org.xipki.security.common.CmpUtf8Pairs;
 import org.xipki.security.common.HealthCheckResult;
 import org.xipki.security.common.IoCertUtil;
 
@@ -106,6 +109,7 @@ public class OcspResponder
     public static final String req_nonce_len_min = "req.nonce.minlen";
     public static final String req_nonce_len_max = "req.nonce.maxlen";
     public static final String req_hash_algos = "req.hashalgos";
+    public static final String audit_certprofile_mapping = "audit.certprofile.mapping";
     public static final String resp_certhash_algo = "resp.certhash.algo";
 
     private static final Set<HashAlgoType> supportedHashAlgorithms = new HashSet<HashAlgoType>();
@@ -130,6 +134,8 @@ public class OcspResponder
     private PasswordResolver passwordResolver;
 
     private String confFile;
+
+    private Map<String, String> auditCertprofileMapping = new ConcurrentHashMap<String, String>();
 
     private AuditLoggingService auditLoggingService;
 
@@ -270,6 +276,16 @@ public class OcspResponder
                 {
                     throw new OCSPResponderException("Hash algorithm " +token + " is unsupported");
                 }
+            }
+        }
+
+        s = props.getProperty(audit_certprofile_mapping);
+        if(s != null)
+        {
+            CmpUtf8Pairs pairs = new CmpUtf8Pairs(s.trim());
+            for(String key : pairs.getNames())
+            {
+                auditCertprofileMapping.put(key, pairs.getValue(key));
             }
         }
 
@@ -598,6 +614,17 @@ public class OcspResponder
                         }
                         return createUnsuccessfullOCSPResp(CSPResponseStatus.tryLater);
                     }
+                }
+
+                String certProfile = certStatusInfo.getCertProfile();
+                if(certProfile != null)
+                {
+                    String auditCertType = auditCertprofileMapping.get(certProfile);
+                    if(auditCertType == null)
+                    {
+                        auditCertType = certProfile;
+                    }
+                    childAuditEvent.addEventData(new AuditEventData("certType", auditCertType));
                 }
 
                 // certStatusInfo could not be null in any case, since at least one store is configured

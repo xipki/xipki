@@ -175,7 +175,7 @@ public abstract class CmpResponder
         }
 
         boolean isProtected = message.hasProtection();
-        ProtectionVerificationResult verificationResult = null;
+        CertBasedRequestorInfo requestor = null;
 
         String errorStatus;
 
@@ -183,7 +183,7 @@ public abstract class CmpResponder
         {
             try
             {
-                verificationResult = verifyProtection(tidStr, message);
+                ProtectionVerificationResult verificationResult = verifyProtection(tidStr, message);
                 ProtectionResult pr = verificationResult.getProtectionResult();
                 switch(pr)
                 {
@@ -202,6 +202,7 @@ public abstract class CmpResponder
                 default:
                     throw new RuntimeException("Should not reach here");
                 }
+                requestor = (CertBasedRequestorInfo) verificationResult.getRequestor();
             } catch (Exception e)
             {
                 LOG.error("tid=" + tidStr + ": error while verifying the signature: {}", e.getMessage());
@@ -214,8 +215,9 @@ public abstract class CmpResponder
             boolean authorized = false;
             for(CertBasedRequestorInfo authorizatedRequestor : authorizatedRequestors.values())
             {
-                if(tlsClientCert.equals(authorizatedRequestor))
+                if(tlsClientCert.equals(authorizatedRequestor.getCertificate().getCert()))
                 {
+                    requestor = authorizatedRequestor;
                     authorized = true;
                     break;
                 }
@@ -235,6 +237,7 @@ public abstract class CmpResponder
         else
         {
             errorStatus = "Request has no protection";
+            requestor = null;
         }
 
         if(errorStatus != null)
@@ -248,8 +251,6 @@ public abstract class CmpResponder
             return buildErrorPkiMessage(tid, reqHeader, PKIFailureInfo.badMessageCheck, errorStatus);
         }
 
-        CertBasedRequestorInfo requestor = verificationResult == null ? null :
-            (CertBasedRequestorInfo) verificationResult.getRequestor();
         PKIMessage resp = intern_processPKIMessage(requestor, null, tid, message, auditEvent);
         if(isProtected)
         {

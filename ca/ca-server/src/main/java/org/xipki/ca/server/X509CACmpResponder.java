@@ -534,7 +534,7 @@ public class X509CACmpResponder extends CmpResponder
             ASN1Integer certReqId = reqMsg.getCertReq().getCertReqId();
             if(childAuditEvent != null)
             {
-                childAuditEvent.addEventData(new AuditEventData("CertReqId", certReqId.getPositiveValue().intValue()));
+                childAuditEvent.addEventData(new AuditEventData("certReqId", certReqId.getPositiveValue().intValue()));
             }
 
             if(req.hasProofOfPossession() == false)
@@ -578,14 +578,14 @@ public class X509CACmpResponder extends CmpResponder
                         String certProfileName = getCertProfileName(reqMsg);
                         if(childAuditEvent != null)
                         {
-                            childAuditEvent.addEventData(new AuditEventData("certprofile", certProfileName));
+                            childAuditEvent.addEventData(new AuditEventData("certProfile", certProfileName));
                         }
 
                         checkPermission(_requestor, certProfileName);
                         OriginalProfileConf originalProfileConf = getOrigCertProfileConf(reqMsg);
                         if(childAuditEvent != null && originalProfileConf != null)
                         {
-                            childAuditEvent.addEventData(new AuditEventData("origCertprofile",
+                            childAuditEvent.addEventData(new AuditEventData("origCertProfile",
                                     originalProfileConf.getProfileName()));
                         }
 
@@ -767,7 +767,7 @@ public class X509CACmpResponder extends CmpResponder
                 String certProfileName = getCertProfileName(reqHeader);
                 if(childAuditEvent != null)
                 {
-                    childAuditEvent.addEventData(new AuditEventData("certprofile", certProfileName));
+                    childAuditEvent.addEventData(new AuditEventData("certProfile", certProfileName));
                 }
                 checkPermission(requestor, certProfileName);
 

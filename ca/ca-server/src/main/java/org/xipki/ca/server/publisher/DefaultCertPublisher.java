@@ -145,6 +145,7 @@ public class DefaultCertPublisher extends CertPublisher
             {
                 queryExecutor.addCert(caCert,
                         cert,
+                        certInfo.getProfileName(),
                         certInfo.isRevocated(),
                         certInfo.getRevocationTime(),
                         certInfo.getRevocationReason(),
@@ -154,7 +155,7 @@ public class DefaultCertPublisher extends CertPublisher
             {
                 if(publishGoodCerts)
                 {
-                    queryExecutor.addCert(caCert, cert);
+                    queryExecutor.addCert(caCert, cert, certInfo.getProfileName());
                 }else
                 {
                     queryExecutor.addIssuer(caCert);
