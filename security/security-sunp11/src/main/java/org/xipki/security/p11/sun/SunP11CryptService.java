@@ -91,10 +91,10 @@ public final class SunP11CryptService implements P11CryptService
 
         // Keystore does not allow emptry pin
         this.password = (password == null) ? "dummy".toCharArray() : password;
-        this.includeSlotIndexes = includeSlotIndexes == null ? 
-        		null : new HashSet<Integer>(includeSlotIndexes);
+        this.includeSlotIndexes = includeSlotIndexes == null ?
+                null : new HashSet<Integer>(includeSlotIndexes);
         this.excludeSlotIndexes = excludeSlotIndexes == null ?
-        		null : new HashSet<Integer>(excludeSlotIndexes);
+                null : new HashSet<Integer>(excludeSlotIndexes);
 
         int idx_sunec = -1;
         int idx_xipki = -1;
