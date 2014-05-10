@@ -33,6 +33,9 @@ import java.security.Signature;
 import java.security.SignatureException;
 import java.security.cert.X509Certificate;
 import java.security.spec.InvalidKeySpecException;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.StringTokenizer;
 
 import javax.crypto.NoSuchPaddingException;
 
@@ -67,9 +70,10 @@ import org.xipki.security.p11.P11ContentSignerBuilder;
 
 public class SecurityFactoryImpl implements SecurityFactory
 {
-
     private String pkcs11Provider;
     private String pkcs11Module;
+    private Set<Integer> pkcs11IncludeSlots;
+    private Set<Integer> pkcs11ExcludeSlots;
 
     public SecurityFactoryImpl()
     {
@@ -380,7 +384,8 @@ public class SecurityFactoryImpl implements SecurityFactory
                 if(p11Provider instanceof P11CryptServiceFactory)
                 {
                     P11CryptServiceFactory p11CryptServiceFact = (P11CryptServiceFactory) p11Provider;
-                    P11CryptService p11CryptService = p11CryptServiceFact.createP11CryptService(pkcs11Module, password);
+                    P11CryptService p11CryptService = p11CryptServiceFact.createP11CryptService(
+                    		pkcs11Module, password, pkcs11IncludeSlots,pkcs11ExcludeSlots);
                     P11ContentSignerBuilder signerBuilder = new P11ContentSignerBuilder(
                                 p11CryptService, slot, password, keyIdentifier, cert);
 
@@ -572,6 +577,36 @@ public class SecurityFactoryImpl implements SecurityFactory
     public void setPkcs11Provider(String pkcs11Provider)
     {
         this.pkcs11Provider = pkcs11Provider;
+    }
+    
+    public void setPkcs11IncludeSlots(String indexes)
+    {
+        if(indexes == null || indexes.trim().isEmpty())
+        {
+            this.pkcs11IncludeSlots = null;
+        }
+
+        StringTokenizer st = new StringTokenizer(indexes.trim(), ", ");
+        this.pkcs11IncludeSlots = new HashSet<Integer>();
+        while(st.hasMoreTokens())
+        {
+            this.pkcs11IncludeSlots.add(Integer.parseInt(st.nextToken()));
+        }
+    }
+    
+    public void setPkcs11ExcludeSlots(String indexes)
+    {
+        if(indexes == null || indexes.trim().isEmpty())
+        {
+            this.pkcs11ExcludeSlots = null;
+        }
+
+        StringTokenizer st = new StringTokenizer(indexes.trim(), ", ");
+        this.pkcs11ExcludeSlots = new HashSet<Integer>();
+        while(st.hasMoreTokens())
+        {
+            this.pkcs11ExcludeSlots.add(Integer.parseInt(st.nextToken()));
+        }    	
     }
 
     public static String getKeystoreSignerConf(String keystoreFile, String password,
