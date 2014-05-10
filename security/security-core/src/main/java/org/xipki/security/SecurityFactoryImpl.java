@@ -74,6 +74,7 @@ public class SecurityFactoryImpl implements SecurityFactory
     private String pkcs11Module;
     private Set<Integer> pkcs11IncludeSlots;
     private Set<Integer> pkcs11ExcludeSlots;
+    private int defaultParallelism = 20;
 
     public SecurityFactoryImpl()
     {
@@ -183,7 +184,7 @@ public class SecurityFactoryImpl implements SecurityFactory
             String passwordHint = keyValues.getValue("password");
 
             String s = keyValues.getValue("parallelism");
-            int parallelism = 10;
+            int parallelism = defaultParallelism;
             if(s != null)
             {
                 try
@@ -587,6 +588,14 @@ public class SecurityFactoryImpl implements SecurityFactory
     public void setPkcs11ExcludeSlots(String indexes)
     {
         this.pkcs11ExcludeSlots = getSlotIndexes(indexes);
+    }
+
+    public void setDefaultParallelism(int defaultParallelism)
+    {
+        if(defaultParallelism > 0)
+        {
+            this.defaultParallelism = defaultParallelism;
+        }
     }
 
     private static Set<Integer> getSlotIndexes(String indexes)
