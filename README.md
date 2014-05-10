@@ -123,7 +123,7 @@ Run Demo
      * For RSA key in PKCS#12 file
      
       ```sh
-      ca-demo/demo.script
+      ca-demo/rsa-demo.script
       ```
        
      * For EC key in PKCS#12 file
@@ -135,7 +135,7 @@ Run Demo
      * For RSA key in PKCS#11 device
      
       ```sh
-      ca-demo/hsm-demo.script
+      ca-demo/hsm-rsa-demo.script
       ```
        
      * For EC key in PKCS#11 device
