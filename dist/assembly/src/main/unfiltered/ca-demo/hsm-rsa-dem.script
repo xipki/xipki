@@ -1,0 +1,9 @@
+CA_SIGNER_ALGO = SHA256withRSA
+#CA_SIGNER_ALGO = SHA256withRSAandMGF1
+
+RCA_KEY_LABEL = RCA1
+SubCA_KEY_LABEL = SubCA1
+SubCAwithCRL_KEY_LABEL = SubCAwithCRL1
+
+source ./ca-demo/hsm.script
+
