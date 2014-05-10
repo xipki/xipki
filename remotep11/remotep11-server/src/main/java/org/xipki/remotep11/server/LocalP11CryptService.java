@@ -39,8 +39,8 @@ public class LocalP11CryptService
     private String pkcs11Module;
     private String pkcs11Password;
     private P11CryptService p11CryptService;
-    private Set<Integer> includeSlotIndexes;
-    private Set<Integer> excludeSlotIndexes;
+    private Set<Integer> pkcs11IncludeSlots;
+    private Set<Integer> pkcs11ExcludeSlots;
 
     public LocalP11CryptService()
     {
@@ -108,7 +108,7 @@ public class LocalP11CryptService
             {
                 P11CryptServiceFactory p11CryptServiceFact = (P11CryptServiceFactory) p11Provider;
                 p11CryptService = p11CryptServiceFact.createP11CryptService(pkcs11Module, password,
-                        includeSlotIndexes, excludeSlotIndexes);
+                        pkcs11IncludeSlots, pkcs11ExcludeSlots);
             }
             else
             {
@@ -134,32 +134,35 @@ public class LocalP11CryptService
         return version;
     }
 
-    public void setIncludeSlotIndexes(String indexes)
+    public void setPkcs11IncludeSlots(String indexes)
     {
-        if(indexes == null || indexes.isEmpty())
+        if(indexes == null || indexes.trim().isEmpty())
         {
-            this.includeSlotIndexes = null;
+            this.pkcs11IncludeSlots = null;
         }
 
-        StringTokenizer st = new StringTokenizer(indexes, ", ");
-        this.includeSlotIndexes = new HashSet<Integer>();
+        StringTokenizer st = new StringTokenizer(indexes.trim(), ", ");
+        this.pkcs11IncludeSlots = new HashSet<Integer>();
         while(st.hasMoreTokens())
         {
-            this.includeSlotIndexes.add(Integer.parseInt(st.nextToken()));
+            this.pkcs11IncludeSlots.add(Integer.parseInt(st.nextToken()));
         }
+    }
+    
+    public void setPkcs11ExcludeSlots(String indexes)
+    {
+        if(indexes == null || indexes.trim().isEmpty())
+        {
+            this.pkcs11ExcludeSlots = null;
+        }
+
+        StringTokenizer st = new StringTokenizer(indexes.trim(), ", ");
+        this.pkcs11ExcludeSlots = new HashSet<Integer>();
+        while(st.hasMoreTokens())
+        {
+            this.pkcs11ExcludeSlots.add(Integer.parseInt(st.nextToken()));
+        }    	
     }
 
-    public void setexcludeSlotIndexes(String indexes)
-    {
-        if(indexes == null || indexes.isEmpty())
-        {
-            this.excludeSlotIndexes = null;
-        }
-        StringTokenizer st = new StringTokenizer(indexes, ", ");
-        this.excludeSlotIndexes = new HashSet<Integer>();
-        while(st.hasMoreTokens())
-        {
-            this.excludeSlotIndexes.add(Integer.parseInt(st.nextToken()));
-        }
-    }
+
 }

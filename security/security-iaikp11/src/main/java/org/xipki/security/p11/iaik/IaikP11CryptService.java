@@ -96,8 +96,10 @@ public final class IaikP11CryptService implements P11CryptService
         ParamChecker.assertNotEmpty("pkcs11Module", pkcs11Module);
         this.pkcs11Module = pkcs11Module;
         this.password = (password == null) ? "dummy".toCharArray() : password;
-        this.includeSlotIndexes = new HashSet<Integer>(includeSlotIndexes);
-        this.excludeSlotIndexes = new HashSet<Integer>(excludeSlotIndexes);
+        this.includeSlotIndexes = includeSlotIndexes == null ? 
+        		null : new HashSet<Integer>(includeSlotIndexes);
+        this.excludeSlotIndexes = excludeSlotIndexes == null ?
+        		null : new HashSet<Integer>(excludeSlotIndexes);
         refresh();
     }
 

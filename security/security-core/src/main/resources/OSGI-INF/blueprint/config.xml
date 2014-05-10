@@ -5,6 +5,8 @@
 			<cm:property name="hostnameVerifier.enabled" value="false"/>
 			<cm:property name="hostnameVerifier.trustAll" value="false"/>
 			<cm:property name="hostnameVerifier.commonnameHostMap" value=""/>
+			<cm:property name="pkcs11.includeSlots" value=""/>
+			<cm:property name="pkcs11.excludeSlots" value=""/>
 		</cm:default-properties>
 	</cm:property-placeholder>
 	<bean id="sshBcBugfix" class="org.xipki.security.SshdBcBugfix">
@@ -12,6 +14,8 @@
 	<bean id="securityFactoryImpl" class="org.xipki.security.SecurityFactoryImpl">
 		<property name="pkcs11Provider" value="${pkcs11.provider}"/>
 		<property name="pkcs11Module" value="${pkcs11.module}"/>
+		<property name="pkcs11IncludeSlots" value="${pkcs11.includeSlots}"/>
+		<property name="pkcs11ExcludeSlots" value="${pkcs11.excludeSlots}"/>
 	</bean>
 	<service ref="securityFactoryImpl" interface="org.xipki.security.api.SecurityFactory"/>
 	<bean id="pbePasswordResolver" class="org.xipki.security.PBEPasswordResolver">
