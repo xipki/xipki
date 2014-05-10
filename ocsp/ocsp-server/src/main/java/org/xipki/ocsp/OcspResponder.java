@@ -282,7 +282,7 @@ public class OcspResponder
 
         s = props.getProperty(audit_certprofile_enabled, "false");
         auditCertprofile = Boolean.valueOf(s);
-        
+
         s = props.getProperty(audit_certprofile_mapping);
         if(s != null)
         {
@@ -622,16 +622,16 @@ public class OcspResponder
 
                 if(auditCertprofile)
                 {
-	                String certProfile = certStatusInfo.getCertProfile();
-	                if(certProfile != null)
-	                {
-	                    String auditCertType = auditCertprofileMapping.get(certProfile);
-	                    if(auditCertType == null)
-	                    {
-	                        auditCertType = certProfile;
-	                    }
-	                    childAuditEvent.addEventData(new AuditEventData("certType", auditCertType));
-	                }
+                    String certProfile = certStatusInfo.getCertProfile();
+                    if(certProfile != null)
+                    {
+                        String auditCertType = auditCertprofileMapping.get(certProfile);
+                        if(auditCertType == null)
+                        {
+                            auditCertType = certProfile;
+                        }
+                        childAuditEvent.addEventData(new AuditEventData("certType", auditCertType));
+                    }
                 }
 
                 // certStatusInfo could not be null in any case, since at least one store is configured
@@ -794,7 +794,7 @@ public class OcspResponder
     private static OCSPResp createUnsuccessfullOCSPResp(OcspResponseStatus status)
     {
         return new OCSPResp(new OCSPResponse(
-        		new org.bouncycastle.asn1.ocsp.OCSPResponseStatus(status.getStatus()), null));
+                new org.bouncycastle.asn1.ocsp.OCSPResponseStatus(status.getStatus()), null));
     }
 
     public void setIncludeCertHash(boolean includeCertHash)

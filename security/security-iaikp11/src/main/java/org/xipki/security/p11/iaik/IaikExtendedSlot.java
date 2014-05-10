@@ -110,7 +110,6 @@ public class IaikExtendedSlot
             LOG.debug("TokenException", e);
         }
 
-        LOG.info("maxSessionCount: {}", this.maxSessionCount);
         if(maxSessionCount2 == 0)
         {
             maxSessionCount2 = DEFAULT_MAX_COUNT_SESSION;

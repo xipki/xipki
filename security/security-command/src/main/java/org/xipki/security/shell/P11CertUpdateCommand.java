@@ -27,6 +27,7 @@ import java.security.PublicKey;
 import java.security.cert.X509Certificate;
 import java.security.interfaces.ECPublicKey;
 import java.security.interfaces.RSAPublicKey;
+import java.util.Arrays;
 
 import org.apache.felix.gogo.commands.Command;
 import org.apache.felix.gogo.commands.Option;
@@ -109,7 +110,8 @@ public class P11CertUpdateCommand extends SecurityCommand
             return null;
         }
 
-        X509PublicKeyCertificate existingCert = slot.getCertificateObject(privKey.getId().getByteArrayValue(), null);
+        byte[] keyId = privKey.getId().getByteArrayValue();
+        X509PublicKeyCertificate existingCert = slot.getCertificateObject(keyId, null);
         X509Certificate newCert = IoCertUtil.parseCert(certFile);
 
         assertMatch(newCert);
@@ -120,8 +122,7 @@ public class P11CertUpdateCommand extends SecurityCommand
             X509PublicKeyCertificate newCertTemp;
 
             newCertTemp = new X509PublicKeyCertificate();
-            newCertTemp.getId().setByteArrayValue(
-                    privKey.getId().getByteArrayValue());
+            newCertTemp.getId().setByteArrayValue(keyId);
             newCertTemp.getLabel().setCharArrayValue(
                     privKey.getLabel().getCharArrayValue());
             newCertTemp.getToken().setBooleanValue(true);
@@ -149,7 +150,8 @@ public class P11CertUpdateCommand extends SecurityCommand
             slot.returnWritableSession(session);
         }
 
-        IaikP11CryptService.getInstance(securityFactory.getPkcs11Module(), password).refresh();
+        IaikP11CryptService.getInstance(securityFactory.getPkcs11Module(), password).refresh(
+                Arrays.asList(keyId));
         System.out.println("Updated certificate");
         return null;
     }

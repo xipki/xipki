@@ -227,6 +227,7 @@ public class X509CA
             throw new OperationException(ErrorCode.DATABASE_FAILURE,
                     "Could not retrieve the greated serial number for ca " + caInfo.getName());
         }
+
         if(caInfo.getNextSerial() < greatestSerialNumber + 1)
         {
             LOG.warn("Corrected the next_serial of {} from {} to {}",
