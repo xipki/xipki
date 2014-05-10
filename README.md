@@ -71,7 +71,6 @@ Install
     ```
     The following steps use $XIPKI_HOME to point to the unpacked folder
 
-* Configure one database for the CA and one for the OCSP responder
 * Adapt the database configuration (access rights read and write of database are required)
 
     ```sh
@@ -109,9 +108,9 @@ Run Demo
     Generate keypair with self-signed certificate in PKCS#11 device in karaf terminal
     ```sh
     features:install xipki-security-shell
-    # RSA key, the default label for demo is RCA1, and default slot is 1
+    # RSA key, the default labels for demo are RCA1, SubCA1 and SubCAwithCRL1, and the default slot is 1
     keytool:rsa -slot <slot index> -key-label <label> [-pwd <password>]
-    # EC key, the default label for demo is RCA1-EC, and default slot is 1
+    # EC key, the default labels for demo are RCA1-EC, SubCA1-EC and SubCAwithCRL1-EC, and the default slot is 1
     keytool:ec  -slot <slot index> -key-label <label> -curve secp256r1 [-pwd <password>]
     ```
 * Run the pre-configured OSGi-commands in karaf terminal
