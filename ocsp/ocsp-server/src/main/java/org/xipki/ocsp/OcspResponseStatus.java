@@ -17,7 +17,7 @@
 
 package org.xipki.ocsp;
 
-public enum CSPResponseStatus
+public enum OcspResponseStatus
 {
     successfull(0),
     malformedRequest(1),
@@ -27,14 +27,14 @@ public enum CSPResponseStatus
     unauthorized(6);
 
     private final int status;
-    private CSPResponseStatus(int status)
+    private OcspResponseStatus(int status)
     {
         this.status = status;
     }
 
-    public static CSPResponseStatus getOCSPResponseStatus(int status)
+    public static OcspResponseStatus getOCSPResponseStatus(int status)
     {
-        for(CSPResponseStatus entry : values())
+        for(OcspResponseStatus entry : values())
         {
             if(entry.status == status)
             {
