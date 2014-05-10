@@ -75,7 +75,7 @@ public class Rfc2560Servlet extends HttpServlet
 
         long startInUs = 0;
 
-        if(auditLoggingService != null)
+        if(auditLoggingService != null && responder.isAuditRequest())
         {
             startInUs = System.nanoTime()/1000;
             auditEvent = new AuditEvent(new Date());

@@ -7,6 +7,8 @@
 		<cm:default-properties>
 			<cm:property name="urlPatterns" value="/p11/*"/>
 			<cm:property name="pkcs11.password" value="" />
+			<cm:property name="pkcs11.includeSlots" value=""/>
+			<cm:property name="pkcs11.excludeSlots" value=""/>			
 		</cm:default-properties>
 	</cm:property-placeholder>
 	
@@ -16,6 +18,8 @@
         <property name="pkcs11Provider" value="${pkcs11.provider}" />
         <property name="pkcs11Module" value="${pkcs11.module}" />
         <property name="pkcs11Password" value="${pkcs11.password}" />
+        <property name="pkcs11IncludeSlots" value="${pkcs11.includeSlots}"/>
+        <property name="pkcs11ExcludeSlots" value="${pkcs11.excludeSlots}"/>        
     </bean>
     
 	<!-- create the servlet and inject our own app factory -->
