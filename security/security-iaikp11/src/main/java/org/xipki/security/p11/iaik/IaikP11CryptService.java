@@ -31,6 +31,7 @@ import java.security.PublicKey;
 import java.security.cert.X509Certificate;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.RSAPublicKeySpec;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -111,6 +112,12 @@ public final class IaikP11CryptService implements P11CryptService
     public synchronized void refresh()
     throws SignerException
     {
+        refresh(null);
+    }
+
+    public synchronized void refresh(List<byte[]> forceRefereshKeyIds)
+    throws SignerException
+    {
         LOG.info("Refreshing PKCS#11 module {}", pkcs11Module);
         lastRefreshSuccessfull = false;
         try
@@ -159,11 +166,28 @@ public final class IaikP11CryptService implements P11CryptService
                     continue;
                 }
 
-                IaikP11Identity oldIdentity = getIdentity(slotId, new Pkcs11KeyIdentifier(keyId));
-                if(oldIdentity != null)
+                Pkcs11KeyIdentifier p11KeyId = new Pkcs11KeyIdentifier(keyId);
+                boolean forceRefereshing = false;
+                if(forceRefereshKeyIds != null)
                 {
-                    currentIdentifies.add(oldIdentity);
-                    continue;
+                    for(byte[] id : forceRefereshKeyIds)
+                    {
+                        if(Arrays.equals(id, keyId))
+                        {
+                            forceRefereshing = true;
+                            break;
+                        }
+                    }
+                }
+
+                if(forceRefereshing == false)
+                {
+                    IaikP11Identity oldIdentity = getIdentity(slotId, p11KeyId);
+                    if(oldIdentity != null)
+                    {
+                        currentIdentifies.add(oldIdentity);
+                        continue;
+                    }
                 }
 
                 try
@@ -227,7 +251,6 @@ public final class IaikP11CryptService implements P11CryptService
                     LOG.debug("Unexpected exception while initializing key with key-id " + keyIdStr, t);
                     continue;
                 }
-
             }
         }
 

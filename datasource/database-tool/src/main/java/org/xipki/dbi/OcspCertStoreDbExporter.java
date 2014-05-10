@@ -188,7 +188,7 @@ class OcspCertStoreDbExporter extends DbPorter
                     String rev_time = rs.getString("REV_TIME");
                     String rev_invalidity_time = rs.getString("REV_INVALIDITY_TIME");
                     String profile = rs.getString("PROFILE");
-                    
+
                     rawCertPs.setInt(1, id);
 
                     String sha1_fp_cert;
@@ -226,7 +226,7 @@ class OcspCertStoreDbExporter extends DbPorter
                     cert.setRevInvalidityTime(rev_invalidity_time);
                     cert.setCertFile(sha1_fp_cert + ".der");
                     cert.setProfile(profile);
-                    
+
                     certsInCurrentFile.getCert().add(cert);
                     numCertInCurrentFile ++;
                     sum ++;
