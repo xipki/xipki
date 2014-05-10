@@ -136,33 +136,34 @@ public class LocalP11CryptService
 
     public void setPkcs11IncludeSlots(String indexes)
     {
-        if(indexes == null || indexes.trim().isEmpty())
-        {
-            this.pkcs11IncludeSlots = null;
-        }
-
-        StringTokenizer st = new StringTokenizer(indexes.trim(), ", ");
-        this.pkcs11IncludeSlots = new HashSet<Integer>();
-        while(st.hasMoreTokens())
-        {
-            this.pkcs11IncludeSlots.add(Integer.parseInt(st.nextToken()));
-        }
+        this.pkcs11IncludeSlots = getSlotIndexes(indexes);
     }
-    
+
     public void setPkcs11ExcludeSlots(String indexes)
+    {
+        this.pkcs11ExcludeSlots = getSlotIndexes(indexes);
+    }
+
+    private static Set<Integer> getSlotIndexes(String indexes)
     {
         if(indexes == null || indexes.trim().isEmpty())
         {
-            this.pkcs11ExcludeSlots = null;
+            return null;
         }
 
         StringTokenizer st = new StringTokenizer(indexes.trim(), ", ");
-        this.pkcs11ExcludeSlots = new HashSet<Integer>();
+        if(st.countTokens() == 0)
+        {
+            return null;
+        }
+
+        Set<Integer> slotIndexes = new HashSet<Integer>();
         while(st.hasMoreTokens())
         {
-            this.pkcs11ExcludeSlots.add(Integer.parseInt(st.nextToken()));
-        }    	
-    }
+            slotIndexes.add(Integer.parseInt(st.nextToken()));
+        }
 
+        return slotIndexes;
+    }
 
 }
