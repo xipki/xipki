@@ -183,12 +183,12 @@ public class OCSPStatusCommand extends OsgiCommandSupport
             }
 
             StringBuilder msg = new StringBuilder("Certificate status: ");
-            msg.append(status).append("\n");
+            msg.append(status);
 
             Extension certHashExtension = singleResp.getExtension(ISISMTTObjectIdentifiers.id_isismtt_at_certHash);
             if(certHashExtension != null)
             {
-                msg.append("CertHash is provided:\n");
+                msg.append("\nCertHash is provided:\n");
                 ASN1Encodable extensionValue = certHashExtension.getParsedValue();
                 CertHash certHash = CertHash.getInstance(extensionValue);
                 ASN1ObjectIdentifier hashAlgOid = certHash.getHashAlgorithm().getAlgorithm();
