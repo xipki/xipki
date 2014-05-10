@@ -17,26 +17,26 @@
 
 package org.xipki.ocsp;
 
-public class OCSPResponderException extends Exception
+public class OcspResponderException extends Exception
 {
 
     private static final long serialVersionUID = 1L;
 
-    public OCSPResponderException()
+    public OcspResponderException()
     {
     }
 
-    public OCSPResponderException(String message)
+    public OcspResponderException(String message)
     {
         super(message);
     }
 
-    public OCSPResponderException(Throwable cause)
+    public OcspResponderException(Throwable cause)
     {
         super(cause);
     }
 
-    public OCSPResponderException(String message, Throwable cause)
+    public OcspResponderException(String message, Throwable cause)
     {
         super(message, cause);
     }
