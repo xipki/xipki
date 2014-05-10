@@ -69,13 +69,19 @@ ca:publish-self -ca RCA1
 features:install xipki-caclient-shell
 
 ## Generate keys and PKCS#10 request for SubCA1
-keytool:req -slot 1 -key-label SubCA1 -out output/SubCA1.p10
+keytool:req -slot 1 -key-label SubCA1 -out output/SubCA1.p10 \
+  -subject "CN=SubCA1,O=XiPKI,C=DE"
+
 caclient:ra-enroll -p10 output/SubCA1.p10 -out output/SubCA1.der -profile SubCA
+
 keytool:update-cert -slot 1 -key-label $SubCA_KEY_LABEL -cert output/SubCA1.der
 
 ## Generate keys and PKCS#10 request for SubCAwithCRL1
-keytool:req -slot 1 -key-label SubCAwithCRL1 -out output/SubCAwithCRL1.p10
+keytool:req -slot 1 -key-label SubCAwithCRL1 -out output/SubCAwithCRL1.p10 \
+  -subject "CN=SubCAwithCRL1,O=XiPKI,C=DE"
+
 caclient:ra-enroll -p10 output/SubCAwithCRL1.p10 -out output/SubCAwithCRL1.der -profile SubCA
+
 keytool:update-cert -slot 1 -key-label $SubCAwithCRL_KEY_LABEL -cert output/SubCAwithCRL1.der
 
 features:uninstall xipki-caclient-shell

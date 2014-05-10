@@ -8,13 +8,13 @@ CA_SIGNER_ALGO = SHA256withRSAandMGF1
 features:install xipki-security-shell
 
 keytool:rsa-p12 -pwd 1234 -keysize $KEYSIZE -out output/RCA1.p12 \
-  -subject "CN=RCA1,O=xipki,C=DE"
+  -subject "CN=RCA1"
 
 keytool:rsa-p12 -pwd 1234 -keysize $KEYSIZE -out output/SubCA1.p12 \
-  -subject "CN=SubCA1,O=xipki,C=DE"
+  -subject "CN=SubCA1"
 
 keytool:rsa-p12 -pwd 1234 -keysize $KEYSIZE -out output/SubCAwithCRL1.p12 \
-  -subject "CN=SubCAwithCRL1,O=xipki,C=DE"
+  -subject "CN=SubCAwithCRL1"
 
 source ./ca-demo/p12.script
 

@@ -576,19 +576,14 @@ public class X509CACmpResponder extends CmpResponder
                     try
                     {
                         String certProfileName = getCertProfileName(reqMsg);
+                        OriginalProfileConf originalProfileConf = getOrigCertProfileConf(reqMsg);
                         if(childAuditEvent != null)
                         {
-                            childAuditEvent.addEventData(new AuditEventData("certProfile", certProfileName));
+                            childAuditEvent.addEventData(new AuditEventData("certProfile",
+                                    originalProfileConf == null ? certProfileName : originalProfileConf.getProfileName()));
                         }
 
                         checkPermission(_requestor, certProfileName);
-                        OriginalProfileConf originalProfileConf = getOrigCertProfileConf(reqMsg);
-                        if(childAuditEvent != null && originalProfileConf != null)
-                        {
-                            childAuditEvent.addEventData(new AuditEventData("origCertProfile",
-                                    originalProfileConf.getProfileName()));
-                        }
-
                         certResponses[i] = generateCertificate(_requestor, user, tid, certReqId,
                                 subject, publicKeyInfo,validity, extensions,
                                 certProfileName, originalProfileConf,
