@@ -230,7 +230,7 @@ public class X509CA
 
         if(caInfo.getNextSerial() < greatestSerialNumber + 1)
         {
-            LOG.warn("Corrected the next_serial of {} from {} to {}",
+            LOG.info("Corrected the next_serial of {} from {} to {}",
                     new Object[]{caInfo.getName(), caInfo.getNextSerial(), greatestSerialNumber + 1});
             caInfo.setNextSerial(greatestSerialNumber + 1);
         }
@@ -1452,7 +1452,7 @@ public class X509CA
         {
             caManager.setCANextSerial(caInfo.getName(), nextSerial);
             caInfo.setLastCommittedNextSerial(nextSerial);
-            LOG.info("Committed next_serial of ca {} from {} to {}",
+            LOG.debug("Committed next_serial of ca {} from {} to {}",
                     new Object[]{caInfo.getName(), lastCommittedNextSerial, nextSerial});
         }
     }

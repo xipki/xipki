@@ -18,6 +18,9 @@
 package org.xipki.remotep11.server;
 
 import java.security.Security;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.StringTokenizer;
 
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.slf4j.Logger;
@@ -36,6 +39,8 @@ public class LocalP11CryptService
     private String pkcs11Module;
     private String pkcs11Password;
     private P11CryptService p11CryptService;
+    private Set<Integer> includeSlotIndexes;
+    private Set<Integer> excludeSlotIndexes;
 
     public LocalP11CryptService()
     {
@@ -102,7 +107,8 @@ public class LocalP11CryptService
             if(p11Provider instanceof P11CryptServiceFactory)
             {
                 P11CryptServiceFactory p11CryptServiceFact = (P11CryptServiceFactory) p11Provider;
-                p11CryptService = p11CryptServiceFact.createP11CryptService(pkcs11Module, password);
+                p11CryptService = p11CryptServiceFact.createP11CryptService(pkcs11Module, password,
+                        includeSlotIndexes, excludeSlotIndexes);
             }
             else
             {
@@ -128,4 +134,32 @@ public class LocalP11CryptService
         return version;
     }
 
+    public void setIncludeSlotIndexes(String indexes)
+    {
+        if(indexes == null || indexes.isEmpty())
+        {
+            this.includeSlotIndexes = null;
+        }
+
+        StringTokenizer st = new StringTokenizer(indexes, ", ");
+        this.includeSlotIndexes = new HashSet<Integer>();
+        while(st.hasMoreTokens())
+        {
+            this.includeSlotIndexes.add(Integer.parseInt(st.nextToken()));
+        }
+    }
+
+    public void setexcludeSlotIndexes(String indexes)
+    {
+        if(indexes == null || indexes.isEmpty())
+        {
+            this.excludeSlotIndexes = null;
+        }
+        StringTokenizer st = new StringTokenizer(indexes, ", ");
+        this.excludeSlotIndexes = new HashSet<Integer>();
+        while(st.hasMoreTokens())
+        {
+            this.excludeSlotIndexes.add(Integer.parseInt(st.nextToken()));
+        }
+    }
 }

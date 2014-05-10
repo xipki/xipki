@@ -35,17 +35,9 @@ class DefaultRemoteP11CryptService extends RemoteP11CryptService
 
     private URL serverUrl;
 
-    @SuppressWarnings("unused")
-    private String user;
-    @SuppressWarnings("unused")
-    private char[] password;
-
-    DefaultRemoteP11CryptService(String url, String user, char[] password)
+    DefaultRemoteP11CryptService(String url)
     {
         ParamChecker.assertNotEmpty("url", url);
-
-        this.user = user;
-        this.password = password;
 
         try
         {

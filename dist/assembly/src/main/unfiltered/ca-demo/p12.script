@@ -70,7 +70,7 @@ features:install xipki-caclient-shell
 
 ## Generate keys and PKCS#10 request for SubCA1
 keytool:req-p12 -p12 output/SubCA1.p12 -pwd 1234 -out output/SubCA1.p10 \
-  -subject "CN=SubCA1,O=XiPKI,C=DE"
+  -subject "CN=SubCA1,O=xipki,C=DE"
 
 caclient:ra-enroll -p10 output/SubCA1.p10 -out output/SubCA1.der -profile SubCA
 
@@ -78,7 +78,7 @@ keytool:update-cert-p12 -p12 output/SubCA1.p12 -pwd 1234 -cert output/SubCA1.der
 
 ## Generate keys and PKCS#10 request for SubCAwithCRL1
 keytool:req-p12 -p12 output/SubCAwithCRL1.p12 -pwd 1234 -out output/SubCAwithCRL1.p10 \
-  -subject "CN=SubCAwithCRL1,O=XiPKI,C=DE"
+  -subject "CN=SubCAwithCRL1,O=xipki,C=DE"
 
 caclient:ra-enroll -p10 output/SubCAwithCRL1.p10 -out output/SubCAwithCRL1.der -profile SubCA
 

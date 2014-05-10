@@ -57,11 +57,14 @@ public final class SunP11CryptService implements P11CryptService
 
     private String pkcs11Module;
     private char[] password;
+    private Set<Integer> includeSlotIndexes;
+    private Set<Integer> excludeSlotIndexes;
 
     private static final Map<String, SunP11CryptService> instances =
             new HashMap<String, SunP11CryptService>();
 
-    public static SunP11CryptService getInstance(String pkcs11Module, char[] password)
+    public static SunP11CryptService getInstance(String pkcs11Module, char[] password,
+            Set<Integer> includeSlotIndexes, Set<Integer> excludeSlotIndexes)
     throws SignerException
     {
         SunNamedCurveExtender.addNamedCurves();
@@ -71,7 +74,7 @@ public final class SunP11CryptService implements P11CryptService
             SunP11CryptService instance = instances.get(pkcs11Module);
             if(instance == null)
             {
-                instance = new SunP11CryptService(pkcs11Module, password);
+                instance = new SunP11CryptService(pkcs11Module, password, includeSlotIndexes, excludeSlotIndexes);
                 instances.put(pkcs11Module, instance);
             }
 
@@ -79,7 +82,8 @@ public final class SunP11CryptService implements P11CryptService
         }
     }
 
-    private SunP11CryptService(String pkcs11Module, char[] password)
+    private SunP11CryptService(String pkcs11Module, char[] password,
+            Set<Integer> includeSlotIndexes, Set<Integer> excludeSlotIndexes)
     throws SignerException
     {
         ParamChecker.assertNotEmpty("pkcs11Module", pkcs11Module);
@@ -87,6 +91,8 @@ public final class SunP11CryptService implements P11CryptService
 
         // Keystore does not allow emptry pin
         this.password = (password == null) ? "dummy".toCharArray() : password;
+        this.includeSlotIndexes = new HashSet<Integer>(includeSlotIndexes);
+        this.excludeSlotIndexes = new HashSet<Integer>(excludeSlotIndexes);
 
         int idx_sunec = -1;
         int idx_xipki = -1;
@@ -150,6 +156,16 @@ public final class SunP11CryptService implements P11CryptService
 
         for(int i = 0; i < slotList.length; i++)
         {
+            if(excludeSlotIndexes != null && excludeSlotIndexes.contains(i))
+            {
+                continue;
+            }
+
+            if(includeSlotIndexes != null && includeSlotIndexes.contains(i) == false)
+            {
+                continue;
+            }
+
             try
             {
                 Provider provider;
