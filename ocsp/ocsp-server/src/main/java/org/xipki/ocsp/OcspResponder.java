@@ -108,7 +108,7 @@ public class OcspResponder
     public static final String req_nonce_len_min = "req.nonce.minlen";
     public static final String req_nonce_len_max = "req.nonce.maxlen";
     public static final String req_hash_algos = "req.hashalgos";
-    public static final String audit_certprofile_enabled = "audit.certprofile.enabled";
+    public static final String audit_request_enabled = "audit.request.enabled";
     public static final String audit_certprofile_mapping = "audit.certprofile.mapping";
     public static final String resp_certhash_algo = "resp.certhash.algo";
 
@@ -135,7 +135,7 @@ public class OcspResponder
 
     private String confFile;
 
-    private boolean auditCertprofile = false;
+    private boolean auditRequest = false;
     private Map<String, String> auditCertprofileMapping = new ConcurrentHashMap<String, String>();
 
     private AuditLoggingService auditLoggingService;
@@ -280,8 +280,8 @@ public class OcspResponder
             }
         }
 
-        s = props.getProperty(audit_certprofile_enabled, "false");
-        auditCertprofile = Boolean.valueOf(s);
+        s = props.getProperty(audit_request_enabled, "false");
+        auditRequest = Boolean.valueOf(s);
 
         s = props.getProperty(audit_certprofile_mapping);
         if(s != null)
@@ -620,7 +620,7 @@ public class OcspResponder
                     }
                 }
 
-                if(auditCertprofile)
+                if(childAuditEvent != null)
                 {
                     String certProfile = certStatusInfo.getCertProfile();
                     if(certProfile != null)
@@ -938,4 +938,10 @@ public class OcspResponder
             auditLoggingService.logEvent(auditEvent);
         }
     }
+
+    public boolean isAuditRequest()
+    {
+        return auditRequest;
+    }
+
 }

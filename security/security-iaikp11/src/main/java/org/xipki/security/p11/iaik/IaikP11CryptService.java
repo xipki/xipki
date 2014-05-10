@@ -31,7 +31,6 @@ import java.security.PublicKey;
 import java.security.cert.X509Certificate;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.RSAPublicKeySpec;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -61,6 +60,8 @@ public final class IaikP11CryptService implements P11CryptService
 
     private String pkcs11Module;
     private char[] password;
+    private Set<Integer> includeSlotIndexes;
+    private Set<Integer> excludeSlotIndexes;
 
     private static final Map<String, IaikP11CryptService> instances =
             new HashMap<String, IaikP11CryptService>();
@@ -68,12 +69,19 @@ public final class IaikP11CryptService implements P11CryptService
     public synchronized static IaikP11CryptService getInstance(String pkcs11Module, char[] password)
     throws SignerException
     {
+        return getInstance(pkcs11Module, password, null, null);
+    }
+
+    public synchronized static IaikP11CryptService getInstance(String pkcs11Module, char[] password,
+            Set<Integer> includeSlotIndexes, Set<Integer> excludeSlotIndexes)
+    throws SignerException
+    {
         synchronized (instances)
         {
             IaikP11CryptService instance = instances.get(pkcs11Module);
             if(instance == null)
             {
-                instance = new IaikP11CryptService(pkcs11Module, password);
+                instance = new IaikP11CryptService(pkcs11Module, password, includeSlotIndexes, excludeSlotIndexes);
                 instances.put(pkcs11Module, instance);
             }
 
@@ -81,12 +89,15 @@ public final class IaikP11CryptService implements P11CryptService
         }
     }
 
-    private IaikP11CryptService(String pkcs11Module, char[] password)
+    private IaikP11CryptService(String pkcs11Module, char[] password,
+            Set<Integer> includeSlotIndexes, Set<Integer> excludeSlotIndexes)
     throws SignerException
     {
         ParamChecker.assertNotEmpty("pkcs11Module", pkcs11Module);
         this.pkcs11Module = pkcs11Module;
         this.password = (password == null) ? "dummy".toCharArray() : password;
+        this.includeSlotIndexes = new HashSet<Integer>(includeSlotIndexes);
+        this.excludeSlotIndexes = new HashSet<Integer>(excludeSlotIndexes);
         refresh();
     }
 
@@ -112,12 +123,6 @@ public final class IaikP11CryptService implements P11CryptService
     public synchronized void refresh()
     throws SignerException
     {
-        refresh(null);
-    }
-
-    public synchronized void refresh(List<byte[]> forceRefereshKeyIds)
-    throws SignerException
-    {
         LOG.info("Refreshing PKCS#11 module {}", pkcs11Module);
         lastRefreshSuccessfull = false;
         try
@@ -136,6 +141,16 @@ public final class IaikP11CryptService implements P11CryptService
         Set<PKCS11SlotIdentifier> slotIds = extModule.getAllSlotIds();
         for(PKCS11SlotIdentifier slotId : slotIds)
         {
+            if(excludeSlotIndexes != null && excludeSlotIndexes.contains(slotId.getSlotIndex()))
+            {
+                continue;
+            }
+
+            if(includeSlotIndexes != null && includeSlotIndexes.contains(slotId.getSlotIndex()) == false)
+            {
+                continue;
+            }
+
             IaikExtendedSlot slot;
             try
             {
@@ -164,30 +179,6 @@ public final class IaikP11CryptService implements P11CryptService
                 if(keyId == null || keyId.length == 0)
                 {
                     continue;
-                }
-
-                Pkcs11KeyIdentifier p11KeyId = new Pkcs11KeyIdentifier(keyId);
-                boolean forceRefereshing = false;
-                if(forceRefereshKeyIds != null)
-                {
-                    for(byte[] id : forceRefereshKeyIds)
-                    {
-                        if(Arrays.equals(id, keyId))
-                        {
-                            forceRefereshing = true;
-                            break;
-                        }
-                    }
-                }
-
-                if(forceRefereshing == false)
-                {
-                    IaikP11Identity oldIdentity = getIdentity(slotId, p11KeyId);
-                    if(oldIdentity != null)
-                    {
-                        currentIdentifies.add(oldIdentity);
-                        continue;
-                    }
                 }
 
                 try
