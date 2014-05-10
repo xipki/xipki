@@ -19,6 +19,7 @@ package org.xipki.remotep11.client;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -52,16 +53,8 @@ public class RemoteP11CryptServiceFactory implements P11CryptServiceFactory
                         throw new IllegalArgumentException("url is not specified");
                     }
 
-                    String user = conf.getValue("user");
-
-                    String pwd = conf.getValue("password");
-                    if(pwd != null)
-                    {
-                        password = pwd.toCharArray();
-                    }
-
-                    service = new DefaultRemoteP11CryptService(url, user, password);
-                    logServiceInfo(url, user, service);
+                    service = new DefaultRemoteP11CryptService(url);
+                    logServiceInfo(url, service);
                     services.put(pkcs11Module, service);
                 }catch(Exception e)
                 {
@@ -75,12 +68,11 @@ public class RemoteP11CryptServiceFactory implements P11CryptServiceFactory
         }
     }
 
-    private static void logServiceInfo(String url, String user, RemoteP11CryptService service)
+    private static void logServiceInfo(String url, RemoteP11CryptService service)
     {
         StringBuilder sb = new StringBuilder();
 
-        sb.append("Initialized RemoteP11CryptService (url=").append(url);
-        sb.append(", user=").append(user).append(")\n");
+        sb.append("Initialized RemoteP11CryptService (url=").append(url).append(")\n");
 
         PKCS11SlotIdentifier[] slotIds;
         try
@@ -89,8 +81,8 @@ public class RemoteP11CryptServiceFactory implements P11CryptServiceFactory
         } catch (SignerException e)
         {
             LOG.warn("RemoteP11CryptService.getSlotIdentifiers(); SignerException: "
-                    + "url={}, user={}, message={}",
-                    new Object[]{url, user, e.getMessage()});
+                    + "url={}, message={}",
+                    url, e.getMessage());
             LOG.debug("RemoteP11CryptService.getSlotIdentifiers(); SignerException", e);
             return;
         }
@@ -111,8 +103,8 @@ public class RemoteP11CryptServiceFactory implements P11CryptServiceFactory
             } catch (SignerException e)
             {
                 LOG.warn("RemoteP11CryptService.getKeyLabels(); SignerException: "
-                        + "url={}, user={}, slot={}, message={}",
-                        new Object[]{url, user, slotId, e.getMessage()});
+                        + "url={}, slot={}, message={}",
+                        new Object[]{url, slotId, e.getMessage()});
                 LOG.debug("RemoteP11CryptService.getKeyLabels(); SignerException", e);
                 continue;
             }
@@ -128,6 +120,14 @@ public class RemoteP11CryptServiceFactory implements P11CryptServiceFactory
         }
 
         LOG.info("{}", sb);
+    }
+
+    @Override
+    public P11CryptService createP11CryptService(String pkcs11Module,
+            char[] password, Set<Integer> includeSlotIndexes, Set<Integer> excludeSlotIndexes)
+    throws SignerException
+    {
+        return createP11CryptService(pkcs11Module, password);
     }
 
 }
