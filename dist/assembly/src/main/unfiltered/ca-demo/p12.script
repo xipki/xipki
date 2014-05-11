@@ -19,7 +19,7 @@ ca:profile-add -name TLS_C -type java:org.xipki.ca.certprofile.example.CertProfi
 
 ## Publishers
 ca:publisher-add -name OCSP.PUBLISHER -type java:org.xipki.ca.server.publisher.DefaultCertPublisher \
-  -confFile ocsp-config/ocsp-publisher.properties
+  -conf datasource?ocsp%publish.goodcerts?true
 
 # CMP Responder
 ca:responder-set -signerType JKS \
@@ -64,7 +64,7 @@ ca:careq-add -requestor requestor -permission all -era -profile all -ca RCA1
 ca:ca-restart
 
 ## Publish the self-signed certificate
-ca:publish-self -ca RCA1
+ca:publish-self -ca RCA1 -profile RCA
 
 features:install xipki-caclient-shell
 

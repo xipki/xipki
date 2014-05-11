@@ -15,7 +15,7 @@
 	<cm:property-placeholder persistent-id="org.xipki.ca.server" update-strategy="reload">
 		<cm:default-properties>
 			<cm:property name="urlPatterns"  value="/cmp/*"/>
-			<cm:property name="caConfFile" value="ca-config/ca-db.properties" />
+			<cm:property name="caConfFile" value="ca-config/ca.properties" />
 			<cm:property name="healthUrlPatterns" value="/health/cmp/*"/>
 		</cm:default-properties>
 	</cm:property-placeholder>

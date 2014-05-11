@@ -24,9 +24,8 @@ import org.xipki.audit.api.AuditLoggingService;
 import org.xipki.ca.api.publisher.CertPublisher;
 import org.xipki.ca.api.publisher.CertPublisherException;
 import org.xipki.ca.server.IdentifiedCertPublisher;
-import org.xipki.database.api.DataSourceFactory;
+import org.xipki.database.api.DataSource;
 import org.xipki.security.api.PasswordResolver;
-import org.xipki.security.common.EnvironmentParameterResolver;
 import org.xipki.security.common.ParamChecker;
 
 public class PublisherEntry
@@ -38,9 +37,8 @@ public class PublisherEntry
     private String type;
     private String conf;
 
-    private EnvironmentParameterResolver envParamResolver;
     private PasswordResolver passwordResolver;
-    private DataSourceFactory dataSourceFactory;
+    private DataSource dataSource;
     private IdentifiedCertPublisher certPublisher;
     private AuditLoggingService auditLoggingService;
 
@@ -127,8 +125,7 @@ public class PublisherEntry
         }
 
         this.certPublisher = new IdentifiedCertPublisher(name, realPublisher);
-        this.certPublisher.initialize(conf, passwordResolver, dataSourceFactory);
-        this.certPublisher.setEnvironmentParamterResolver(envParamResolver);
+        this.certPublisher.initialize(conf, passwordResolver, dataSource);
         this.certPublisher.setAuditLoggingService(auditLoggingService);
 
         return this.certPublisher;
@@ -137,15 +134,6 @@ public class PublisherEntry
     public String getConf()
     {
         return conf;
-    }
-
-    public void setEnvironmentParamterResolver(EnvironmentParameterResolver envParamResolver)
-    {
-        this.envParamResolver = envParamResolver;
-        if(certPublisher != null)
-        {
-            certPublisher.setEnvironmentParamterResolver(envParamResolver);
-        }
     }
 
     @Override
@@ -168,14 +156,14 @@ public class PublisherEntry
         this.passwordResolver = passwordResolver;
     }
 
-    public DataSourceFactory getDataSourceFactory()
+    public DataSource getDataSource()
     {
-        return dataSourceFactory;
+        return dataSource;
     }
 
-    public void setDataSourceFactory(DataSourceFactory dataSourceFactory)
+    public void setDataSource(DataSource dataSource)
     {
-        this.dataSourceFactory = dataSourceFactory;
+        this.dataSource = dataSource;
     }
 
     public void setAuditLoggingService(AuditLoggingService auditLoggingService)

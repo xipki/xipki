@@ -25,7 +25,7 @@ import org.xipki.ca.api.publisher.CertPublisher;
 import org.xipki.ca.api.publisher.CertPublisherException;
 import org.xipki.ca.api.publisher.CertificateInfo;
 import org.xipki.ca.common.X509CertificateWithMetaInfo;
-import org.xipki.database.api.DataSourceFactory;
+import org.xipki.database.api.DataSource;
 import org.xipki.security.api.PasswordResolver;
 import org.xipki.security.common.EnvironmentParameterResolver;
 import org.xipki.security.common.ParamChecker;
@@ -46,10 +46,10 @@ public class IdentifiedCertPublisher extends CertPublisher
 
     @Override
     public void initialize(String conf, PasswordResolver passwordResolver,
-            DataSourceFactory dataSourceFactory)
+            DataSource dataSource)
     throws CertPublisherException
     {
-        certPublisher.initialize(conf, passwordResolver, dataSourceFactory);
+        certPublisher.initialize(conf, passwordResolver, dataSource);
     }
 
     @Override

@@ -22,7 +22,7 @@ import java.util.Date;
 
 import org.xipki.audit.api.AuditLoggingService;
 import org.xipki.ca.common.X509CertificateWithMetaInfo;
-import org.xipki.database.api.DataSourceFactory;
+import org.xipki.database.api.DataSource;
 import org.xipki.security.api.PasswordResolver;
 import org.xipki.security.common.EnvironmentParameterResolver;
 
@@ -30,7 +30,7 @@ public abstract class CertPublisher
 {
     public abstract void initialize(String conf,
             PasswordResolver passwordResolver,
-            DataSourceFactory dataSourceFactory)
+            DataSource dataSource)
     throws CertPublisherException;
 
     public abstract void setEnvironmentParamterResolver(EnvironmentParameterResolver paramterResolver);
