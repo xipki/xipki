@@ -17,16 +17,11 @@
 
 package org.xipki.ca.server.publisher;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.X509CRL;
 import java.sql.SQLException;
 import java.util.Date;
-import java.util.Properties;
 
-import org.bouncycastle.util.encoders.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.audit.api.AuditEvent;
@@ -39,9 +34,8 @@ import org.xipki.ca.api.publisher.CertPublisherException;
 import org.xipki.ca.api.publisher.CertificateInfo;
 import org.xipki.ca.common.X509CertificateWithMetaInfo;
 import org.xipki.database.api.DataSource;
-import org.xipki.database.api.DataSourceFactory;
 import org.xipki.security.api.PasswordResolver;
-import org.xipki.security.api.PasswordResolverException;
+import org.xipki.security.common.CmpUtf8Pairs;
 import org.xipki.security.common.EnvironmentParameterResolver;
 import org.xipki.security.common.ParamChecker;
 
@@ -62,57 +56,15 @@ public class DefaultCertPublisher extends CertPublisher
 
     @Override
     public void initialize(String conf, PasswordResolver passwordResolver,
-            DataSourceFactory dataSourceFactory)
+            DataSource dataSource)
     throws CertPublisherException
     {
-        ParamChecker.assertNotNull("dataSourceFactory", dataSourceFactory);
+        ParamChecker.assertNotNull("conf", conf);
+        ParamChecker.assertNotNull("dataSource", dataSource);
 
-        byte[] confBytes;
-        if(conf.startsWith("base64:"))
-        {
-            String b64Conf = conf.substring("base64:".length());
-            confBytes = Base64.decode(b64Conf);
-        }
-        else
-        {
-            confBytes = conf.getBytes();
-        }
-        InputStream confStream = new ByteArrayInputStream(confBytes);
-        Properties props = new Properties();
-
-        try
-        {
-            props.load(confStream);
-        }catch(IOException e)
-        {
-            throw new CertPublisherException("IOException while loading configuration: " + e.getMessage());
-        }
-
-        String propValue = props.getProperty("publish.goodcerts", "true");
-        publishGoodCerts = Boolean.parseBoolean(propValue);
-
-        try
-        {
-            confStream.reset();
-        }catch(IOException e)
-        {
-            throw new CertPublisherException("IOException while loading configuration: " + e.getMessage());
-        }
-
-        DataSource dataSource;
-        try
-        {
-            dataSource = dataSourceFactory.createDataSource(confStream, passwordResolver);
-        } catch (IOException e)
-        {
-            throw new CertPublisherException(e);
-       } catch (SQLException e)
-        {
-            throw new CertPublisherException(e);
-        } catch (PasswordResolverException e)
-        {
-            throw new CertPublisherException(e);
-        }
+        CmpUtf8Pairs utf8pairs = new CmpUtf8Pairs(conf);
+        String v = utf8pairs.getValue("publish.goodcerts");
+        this.publishGoodCerts = (v == null) ? true : Boolean.parseBoolean(v);
 
         try
         {

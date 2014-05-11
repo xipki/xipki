@@ -34,7 +34,7 @@ public interface CAManager
 
     boolean unlockCA();
 
-    void publishRootCA(String caname)
+    void publishRootCA(String caname, String certprofile)
     throws CAMgmtException;
 
     boolean republishCertificates(String caname, String publisherName)

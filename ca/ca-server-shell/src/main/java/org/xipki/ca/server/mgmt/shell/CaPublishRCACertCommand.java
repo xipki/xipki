@@ -24,15 +24,20 @@ import org.apache.felix.gogo.commands.Option;
 public class CaPublishRCACertCommand extends CaCommand
 {
     @Option(name = "-ca",
-            description = "CA name",
-            required = false)
+            description = "Required. CA name",
+            required = true)
     protected String           caName;
+
+    @Option(name = "-profile",
+            description = "Required. Certificate profile name",
+            required = true)
+    protected String           certprofile;
 
     @Override
     protected Object doExecute()
     throws Exception
     {
-        caManager.publishRootCA(caName);
+        caManager.publishRootCA(caName, certprofile);
         return null;
     }
 }

@@ -18,6 +18,8 @@
 package org.xipki.ca.server.mgmt;
 
 import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.security.NoSuchProviderException;
 import java.security.Security;
@@ -36,6 +38,7 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.concurrent.ConcurrentHashMap;
@@ -69,6 +72,7 @@ import org.xipki.security.api.PasswordResolver;
 import org.xipki.security.api.PasswordResolverException;
 import org.xipki.security.api.SecurityFactory;
 import org.xipki.security.api.SignerException;
+import org.xipki.security.common.CmpUtf8Pairs;
 import org.xipki.security.common.ConfigurationException;
 import org.xipki.security.common.DfltEnvironmentParameterResolver;
 import org.xipki.security.common.EnvironmentParameterResolver;
@@ -86,6 +90,8 @@ public class CAManagerImpl implements CAManager
     private DataSource dataSource;
     private CmpResponderEntry responder;
     private boolean caLockedByMe = false;
+
+    private Map<String, DataSource> dataSources = null;
 
     private final Map<String, CAEntry> cas = new ConcurrentHashMap<String, CAEntry>();
     private final Map<String, CertProfileEntry> certProfiles = new ConcurrentHashMap<String, CertProfileEntry>();
@@ -178,21 +184,62 @@ public class CAManagerImpl implements CAManager
             throw new IllegalStateException("caConfFile is not set");
         }
 
+        if(this.dataSources == null)
+        {
+            Properties caConfProps = new Properties();
+            if(caConfFile.equals("ca-config/ca-db.properties"))
+            {
+                // backwards compatibility
+                caConfProps.put("datasource.ca", "ca-config/ca-db.properties");
+                final String fn = "ca-config/ocsp-db.properties";
+                File f = new File(fn);
+                if(f.exists() && f.isFile())
+                {
+                    caConfProps.put("datasource.ocsp", fn);
+                }
+            }
+            else
+            {
+                try
+                {
+                    caConfProps.load(new FileInputStream(caConfFile));
+                } catch (IOException e)
+                {
+                    throw new CAMgmtException("IOException while paring ca configuration" + caConfFile, e);
+                }
+            }
+
+            this.dataSources = new ConcurrentHashMap<String, DataSource>();
+            for(Object objKey : caConfProps.keySet())
+            {
+                String key = (String) objKey;
+                if(key.startsWith("datasource."))
+                {
+                    String datasourceFile = caConfProps.getProperty(key);
+                    try
+                    {
+                        String datasourceName = key.substring("datasource.".length());
+                        DataSource datasource = dataSourceFactory.createDataSourceForFile(datasourceFile, passwordResolver);
+                        this.dataSources.put(datasourceName, datasource);
+                    } catch (SQLException e)
+                    {
+                        throw new CAMgmtException("SQLException while paring datasoure " + datasourceFile, e);
+                    } catch (PasswordResolverException e)
+                    {
+                        throw new CAMgmtException("PasswordResolverException while paring datasoure " + datasourceFile, e);
+                    } catch (IOException e)
+                    {
+                        throw new CAMgmtException("IOException while paring datasoure " + datasourceFile, e);
+                    }
+                }
+            }
+
+            this.dataSource = this.dataSources.get("ca");
+        }
+
         if(this.dataSource == null)
         {
-            try
-            {
-                this.dataSource = dataSourceFactory.createDataSourceForFile(caConfFile, passwordResolver);
-            } catch (SQLException e)
-            {
-                throw new CAMgmtException(e);
-            } catch (PasswordResolverException e)
-            {
-                throw new CAMgmtException(e);
-            } catch (IOException e)
-            {
-                throw new CAMgmtException(e);
-            }
+            throw new CAMgmtException("no datasource configured with name 'ca'");
         }
 
         boolean successfull = lockCA();
@@ -451,8 +498,6 @@ public class CAManagerImpl implements CAManager
         {
             try
             {
-                entry.setPasswordResolver(passwordResolver);
-                entry.setDataSourceFactory(dataSourceFactory);
                 entry.getCertPublisher();
             } catch (CertPublisherException e)
             {
@@ -958,12 +1003,32 @@ public class CAManagerImpl implements CAManager
                 String type = rs.getString("TYPE");
                 String conf = rs.getString("CONF");
 
+                String datasourceName = null;
+                CmpUtf8Pairs confPairs = null;
+                try
+                {
+                    confPairs = new CmpUtf8Pairs(conf);
+                    datasourceName = confPairs.getValue("datasource");
+                }catch(Exception e)
+                {
+                }
+
+                if(datasourceName == null &&
+                        "java:org.xipki.ca.server.publisher.DefaultCertPublisher".equals(type))
+                {
+                    // backwards compatibility
+                    datasourceName = "ocsp";
+                    confPairs = new CmpUtf8Pairs();
+                    confPairs.putUtf8Pair("datasource", datasourceName);
+                    do_changePublisher(name, null, confPairs.getEncoded());
+                }
+
+                DataSource ocspDataSource = dataSources.get(datasourceName);
                 PublisherEntry entry = new PublisherEntry(name);
                 entry.setType(type);
-                entry.setConf(conf);
+                entry.setConf(confPairs.getEncoded());
                 entry.setPasswordResolver(passwordResolver);
-                entry.setDataSourceFactory(dataSourceFactory);
-                entry.setEnvironmentParamterResolver(envParameterResolver);
+                entry.setDataSource(ocspDataSource);
                 publishers.put(entry.getName(), entry);
             }
 
@@ -2446,7 +2511,6 @@ public class CAManagerImpl implements CAManager
             closeStatement(ps);
         }
 
-        dbEntry.setEnvironmentParamterResolver(envParameterResolver);
         dbEntry.setPasswordResolver(passwordResolver);
 
         publishers.put(name, dbEntry);
@@ -2520,7 +2584,12 @@ public class CAManagerImpl implements CAManager
         {
             throw new CAMgmtException("Could not find publisher " + name);
         }
+        do_changePublisher(name, type, conf);
+    }
 
+    private void do_changePublisher(String name, String type, String conf)
+    throws CAMgmtException
+    {
         StringBuilder sb = new StringBuilder();
         sb.append("UPDATE PUBLISHER SET ");
 
@@ -2945,6 +3014,7 @@ public class CAManagerImpl implements CAManager
     public void setCaConfFile(String caConfFile)
     {
         this.caConfFile = caConfFile;
+
     }
 
     @Override
@@ -3054,7 +3124,7 @@ public class CAManagerImpl implements CAManager
     }
 
     @Override
-    public void publishRootCA(String caname)
+    public void publishRootCA(String caname, String certprofile)
     throws CAMgmtException
     {
         X509CA ca = x509cas.get(caname);
@@ -3075,7 +3145,8 @@ public class CAManagerImpl implements CAManager
         try
         {
             ci = new CertificateInfo(
-                    certInfo, certInfo, encodedSubjectPublicKey, "UNKNOWN-Profile");
+                    certInfo, certInfo, encodedSubjectPublicKey,
+                    certprofile == null ? "UNKNOWN" : certprofile);
         } catch (CertificateEncodingException e)
         {
             throw new CAMgmtException(e);

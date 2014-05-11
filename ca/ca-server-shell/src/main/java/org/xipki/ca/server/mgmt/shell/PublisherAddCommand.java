@@ -20,7 +20,6 @@ package org.xipki.ca.server.mgmt.shell;
 import org.apache.felix.gogo.commands.Command;
 import org.apache.felix.gogo.commands.Option;
 import org.xipki.ca.server.mgmt.PublisherEntry;
-import org.xipki.security.common.IoCertUtil;
 
 @Command(scope = "ca", name = "publisher-add", description="Add publisher")
 public class PublisherAddCommand extends CaCommand
@@ -40,21 +39,12 @@ public class PublisherAddCommand extends CaCommand
             description = "Publisher configuration")
     protected String            conf;
 
-    @Option(name = "-confFile",
-            description = "Publisher configuration file")
-    protected String            confFile;
-
     @Override
     protected Object doExecute()
     throws Exception
     {
         PublisherEntry entry = new PublisherEntry(name);
         entry.setType(type);
-
-        if(conf == null && confFile != null)
-        {
-            conf = new String(IoCertUtil.read(confFile));
-        }
 
         if(conf != null)
         {
