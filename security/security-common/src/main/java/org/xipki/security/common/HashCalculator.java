@@ -19,25 +19,40 @@ package org.xipki.security.common;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.concurrent.BlockingDeque;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.LinkedBlockingDeque;
+import java.util.concurrent.TimeUnit;
 
+import org.bouncycastle.operator.RuntimeOperatorException;
 import org.bouncycastle.util.encoders.Hex;
 
 public class HashCalculator
 {
-    private MessageDigest sha1;
-    private MessageDigest sha224;
-    private MessageDigest sha256;
-    private MessageDigest sha384;
-    private MessageDigest sha512;
+    private final static int parallelism = 50;
+    private final ConcurrentHashMap<HashAlgoType, BlockingDeque<MessageDigest>> mdsMap =
+            new ConcurrentHashMap<>();
 
     public HashCalculator()
     throws NoSuchAlgorithmException
     {
-        sha1   = MessageDigest.getInstance("SHA-1");
-        sha224 = MessageDigest.getInstance("SHA-224");
-        sha256 = MessageDigest.getInstance("SHA-256");
-        sha384 = MessageDigest.getInstance("SHA-384");
-        sha512 = MessageDigest.getInstance("SHA-512");
+        mdsMap.put(HashAlgoType.SHA1, getMessageDigests("SHA-1"));
+        mdsMap.put(HashAlgoType.SHA224, getMessageDigests("SHA-224"));
+        mdsMap.put(HashAlgoType.SHA256, getMessageDigests("SHA-256"));
+        mdsMap.put(HashAlgoType.SHA384, getMessageDigests("SHA-384"));
+        mdsMap.put(HashAlgoType.SHA512, getMessageDigests("SHA-512"));
+    }
+
+    private BlockingDeque<MessageDigest> getMessageDigests(String hashAlgo)
+    throws NoSuchAlgorithmException
+    {
+        BlockingDeque<MessageDigest> mds = new LinkedBlockingDeque<MessageDigest>();
+        for(int i = 0; i < parallelism; i++)
+        {
+            MessageDigest md = MessageDigest.getInstance(hashAlgo);
+            mds.addLast(md);
+        }
+        return mds;
     }
 
     public String hexHash(HashAlgoType hashAlgoType, byte[] data)
@@ -48,32 +63,41 @@ public class HashCalculator
 
     public byte[] hash(HashAlgoType hashAlgoType, byte[] data)
     {
-        MessageDigest md;
-        switch(hashAlgoType)
+        if(hashAlgoType == null)
         {
-            case SHA1:
-                md = sha1;
-                break;
-            case SHA224:
-                md = sha224;
-                break;
-            case SHA256:
-                md = sha256;
-                break;
-            case SHA384:
-                md = sha384;
-                break;
-            case SHA512:
-                md = sha512;
-                break;
-            default:
-                throw new RuntimeException("should not reach here");
+             throw new IllegalArgumentException("hashAlgoType is null");
+        }
+        if(mdsMap.containsKey(hashAlgoType) == false)
+        {
+             throw new IllegalArgumentException("Unknown hash algo " + hashAlgoType);
         }
 
-        synchronized (md)
+        BlockingDeque<MessageDigest> mds = mdsMap.get(hashAlgoType);
+
+        MessageDigest md = null;
+        for(int i = 0; i < 3; i++)
+        {
+            try
+            {
+                md = mds.poll(10, TimeUnit.SECONDS);
+                break;
+            } catch (InterruptedException e)
+            {
+            }
+        }
+
+        if(md == null)
+        {
+            throw new RuntimeOperatorException("Could not get idle MessageDigest");
+        }
+
+        try
         {
             md.reset();
             return md.digest(data);
+        }finally
+        {
+            mds.addLast(md);
         }
     }
 }

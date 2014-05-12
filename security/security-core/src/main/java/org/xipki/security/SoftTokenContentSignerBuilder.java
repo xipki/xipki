@@ -25,6 +25,8 @@ import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.PrivateKey;
+import java.security.Signature;
+import java.security.SignatureException;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
@@ -37,8 +39,10 @@ import java.util.List;
 
 import javax.crypto.NoSuchPaddingException;
 
+import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
+import org.bouncycastle.asn1.x9.X9ObjectIdentifiers;
 import org.bouncycastle.crypto.Digest;
 import org.bouncycastle.crypto.Signer;
 import org.bouncycastle.crypto.params.AsymmetricKeyParameter;
@@ -51,11 +55,15 @@ import org.bouncycastle.jcajce.provider.asymmetric.util.ECUtil;
 import org.bouncycastle.operator.ContentSigner;
 import org.bouncycastle.operator.OperatorCreationException;
 import org.bouncycastle.operator.bc.BcContentSignerBuilder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xipki.security.api.ConcurrentContentSigner;
 import org.xipki.security.api.SignerException;
 
 public class SoftTokenContentSignerBuilder
 {
+    private static final Logger LOG = LoggerFactory.getLogger(SoftTokenContentSignerBuilder.class);
+
     private final PrivateKey key;
     private final X509Certificate cert;
 
@@ -162,44 +170,96 @@ public class SoftTokenContentSignerBuilder
             throw new IllegalArgumentException("non-positive parallelism is not allowed: " + parallelism);
         }
 
-        BcContentSignerBuilder signerBuilder;
-        AsymmetricKeyParameter keyparam;
-        try
+        List<ContentSigner> signers = new ArrayList<ContentSigner>(parallelism);
+
+        if(key instanceof ECPrivateKey)
         {
-            if(key instanceof RSAPrivateKey)
+            final String provider = "SunEC";
+            ASN1ObjectIdentifier algOid = signatureAlgId.getAlgorithm();
+            String algoName;
+
+            if(X9ObjectIdentifiers.ecdsa_with_SHA1.equals(algOid))
             {
-                keyparam = SignerUtil.generateRSAPrivateKeyParameter((RSAPrivateKey) key);
-                signerBuilder = new RSAContentSignerBuilder(signatureAlgId);
+                algoName = "SHA1withECDSA";
             }
-            else if(key instanceof DSAPrivateKey)
+            else if(X9ObjectIdentifiers.ecdsa_with_SHA224.equals(algOid))
             {
-                keyparam = DSAUtil.generatePrivateKeyParameter(key);
-                signerBuilder = new DSAContentSignerBuilder(signatureAlgId);
+                algoName = "SHA224withECDSA";
             }
-            else if(key instanceof ECPrivateKey)
+            else if(X9ObjectIdentifiers.ecdsa_with_SHA256.equals(algOid))
             {
-                 keyparam = ECUtil.generatePrivateKeyParameter(key);
-                 signerBuilder = new ECDSAContentSignerBuilder(signatureAlgId);
+                algoName = "SHA256withECDSA";
+            }
+            else if(X9ObjectIdentifiers.ecdsa_with_SHA384.equals(algOid))
+            {
+                algoName = "SHA384withECDSA";
+            }
+            else if(X9ObjectIdentifiers.ecdsa_with_SHA512.equals(algOid))
+            {
+                algoName = "SHA512withECDSA";
             }
             else
             {
-                throw new OperatorCreationException("Unsupported key " + key.getClass().getName());
+                throw new OperatorCreationException("Unsupported ECDSA signature algorithm " + algOid.getId());
             }
-        } catch (InvalidKeyException e)
-        {
-            throw new OperatorCreationException("invalid key", e);
-        } catch (NoSuchAlgorithmException e)
-        {
-            throw new OperatorCreationException("no such algorithm", e);
+
+            for(int i = 0; i < parallelism; i++)
+            {
+                try
+                {
+                    Signature signature = Signature.getInstance(algoName, provider);
+                    signature.initSign(key);
+                    signature.update(new byte[]{1,2,3,4});
+                    signature.sign();
+                    ContentSigner signer = new SignatureSigner(signatureAlgId, signature, key);
+                    signers.add(signer);
+                } catch (Exception e)
+                {
+                    LOG.warn("Could not use {} for {}", provider, algoName);
+                    signers.clear();
+                    break;
+                }
+            }
         }
 
-        List<ContentSigner> signers =
-                new ArrayList<ContentSigner>(parallelism);
-
-        for(int i = 0; i < parallelism; i++)
+        if(signers.isEmpty())
         {
-            ContentSigner signer = signerBuilder.build(keyparam);
-            signers.add(signer);
+            BcContentSignerBuilder signerBuilder;
+            AsymmetricKeyParameter keyparam;
+            try
+            {
+                if(key instanceof RSAPrivateKey)
+                {
+                    keyparam = SignerUtil.generateRSAPrivateKeyParameter((RSAPrivateKey) key);
+                    signerBuilder = new RSAContentSignerBuilder(signatureAlgId);
+                }
+                else if(key instanceof DSAPrivateKey)
+                {
+                    keyparam = DSAUtil.generatePrivateKeyParameter(key);
+                    signerBuilder = new DSAContentSignerBuilder(signatureAlgId);
+                }
+                else if(key instanceof ECPrivateKey)
+                {
+                     keyparam = ECUtil.generatePrivateKeyParameter(key);
+                     signerBuilder = new ECDSAContentSignerBuilder(signatureAlgId);
+                }
+                else
+                {
+                    throw new OperatorCreationException("Unsupported key " + key.getClass().getName());
+                }
+            } catch (InvalidKeyException e)
+            {
+                throw new OperatorCreationException("invalid key", e);
+            } catch (NoSuchAlgorithmException e)
+            {
+                throw new OperatorCreationException("no such algorithm", e);
+            }
+
+            for(int i = 0; i < parallelism; i++)
+            {
+                ContentSigner signer = signerBuilder.build(keyparam);
+                signers.add(signer);
+            }
         }
 
         ConcurrentContentSigner concurrentSigner = new DefaultConcurrentContentSigner(signers, key);

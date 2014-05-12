@@ -19,6 +19,8 @@ package org.xipki.security;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.security.InvalidKeyException;
+import java.security.PrivateKey;
 import java.security.Signature;
 import java.security.SignatureException;
 
@@ -32,14 +34,17 @@ public class SignatureSigner implements ContentSigner
     private final AlgorithmIdentifier sigAlgId;
     private final Signature signer;
     private final SignatureStream stream = new SignatureStream();
+    private final PrivateKey key;
 
-    public SignatureSigner(AlgorithmIdentifier sigAlgId, Signature signer)
+    public SignatureSigner(AlgorithmIdentifier sigAlgId, Signature signer, PrivateKey key)
     {
         ParamChecker.assertNotNull("sigAlgId", sigAlgId);
         ParamChecker.assertNotNull("signer", signer);
+        ParamChecker.assertNotNull("key", key);
 
         this.sigAlgId = sigAlgId;
         this.signer = signer;
+        this.key = key;
     }
 
     @Override
@@ -51,6 +56,13 @@ public class SignatureSigner implements ContentSigner
     @Override
     public OutputStream getOutputStream()
     {
+        try
+        {
+            signer.initSign(key);
+        } catch (InvalidKeyException e)
+        {
+            throw new RuntimeOperatorException("Could not initSign", e);
+        }
         return stream;
     }
 

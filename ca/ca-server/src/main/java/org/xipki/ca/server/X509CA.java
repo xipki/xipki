@@ -20,12 +20,18 @@ package org.xipki.ca.server;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.math.BigInteger;
+import java.security.InvalidKeyException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
+import java.security.PublicKey;
+import java.security.Signature;
+import java.security.SignatureException;
 import java.security.cert.CRLException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509CRL;
 import java.security.cert.X509Certificate;
+import java.security.interfaces.ECPublicKey;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
@@ -128,6 +134,7 @@ public class X509CA
     private final CAManagerImpl caManager;
     private final Object nextSerialLock = new Object();
     private final Object crlLock = new Object();
+    private Boolean trySunECtoVerify;
 
     private final ConcurrentSkipListSet<String> pendingSubjectSha1Fps = new ConcurrentSkipListSet<String>();
     private final AtomicInteger numActiveRevocations = new AtomicInteger(0);
@@ -1159,13 +1166,10 @@ public class X509CA
                 byte[] encodedCert = bcCert.getEncoded();
 
                 X509Certificate cert = (X509Certificate) cf.engineGenerateCertificate(new ByteArrayInputStream(encodedCert));
-
-                try
+                if(verifySignature(cert) == false)
                 {
-                    cert.verify(caInfo.getCertificate().getCert().getPublicKey());
-                } catch (Exception e)
-                {
-                    throw new OperationException(ErrorCode.System_Failure, "Signature of created certificate is invalid");
+                     throw new OperationException(ErrorCode.System_Failure,
+                             "Could not verify the signature of generated certificate");
                 }
 
                 X509CertificateWithMetaInfo certWithMeta =
@@ -1556,6 +1560,68 @@ public class X509CA
             }
 
             return new X500Name(newRdns.toArray(new RDN[0]));
+        }
+    }
+
+    private boolean verifySignature(X509Certificate cert)
+    {
+        PublicKey caPublicKey = caInfo.getCertificate().getCert().getPublicKey();
+        try
+        {
+            if(trySunECtoVerify == null)
+            {
+                byte[] tbs = cert.getTBSCertificate();
+                byte[] signatureValue = cert.getSignature();
+                String sigAlgName = cert.getSigAlgName();
+                try
+                {
+                    Signature verifier = Signature.getInstance(sigAlgName, "SunEC");
+                    verifier.initVerify(caPublicKey);
+                    verifier.update(tbs);
+                    boolean sigValid = verifier.verify(signatureValue);
+                    trySunECtoVerify = Boolean.TRUE;
+                    return sigValid;
+                }catch(Exception e)
+                {
+                    trySunECtoVerify = Boolean.FALSE;
+                }
+            }
+
+            if(trySunECtoVerify && (caPublicKey instanceof ECPublicKey))
+            {
+                byte[] tbs = cert.getTBSCertificate();
+                byte[] signatureValue = cert.getSignature();
+                String sigAlgName = cert.getSigAlgName();
+                Signature verifier = Signature.getInstance(sigAlgName, "SunEC");
+                verifier.initVerify(caPublicKey);
+                verifier.update(tbs);
+                return verifier.verify(signatureValue);
+            }
+            else
+            {
+                cert.verify(caPublicKey);
+                return true;
+            }
+        } catch (SignatureException e)
+        {
+            LOG.debug("SignatureException while verifying signature: {}", e.getMessage());
+            return false;
+        } catch (InvalidKeyException e)
+        {
+            LOG.debug("InvalidKeyException while verifying signature: {}", e.getMessage());
+            return false;
+        } catch (CertificateException e)
+        {
+            LOG.debug("CertificateException while verifying signature: {}", e.getMessage());
+            return false;
+        } catch (NoSuchAlgorithmException e)
+        {
+            LOG.debug("NoSuchAlgorithmException while verifying signature: {}", e.getMessage());
+            return false;
+        } catch (NoSuchProviderException e)
+        {
+            LOG.debug("NoSuchProviderException while verifying signature: {}", e.getMessage());
+            return false;
         }
     }
 

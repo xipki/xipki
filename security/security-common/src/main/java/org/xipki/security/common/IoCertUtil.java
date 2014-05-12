@@ -53,6 +53,7 @@ public class IoCertUtil
     private static final SHA1Digest sha1 = new SHA1Digest();
     private static final ASN1ObjectIdentifier[] forwardDNs = new ASN1ObjectIdentifier[]
     {
+        ObjectIdentifiers.DN_C,
         ObjectIdentifiers.DN_DC,
         ObjectIdentifiers.DN_ST,
         ObjectIdentifiers.DN_L,
