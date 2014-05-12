@@ -18,7 +18,6 @@
 package org.xipki.ca.server.mgmt;
 
 import java.io.ByteArrayInputStream;
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.security.NoSuchProviderException;
@@ -187,26 +186,12 @@ public class CAManagerImpl implements CAManager
         if(this.dataSources == null)
         {
             Properties caConfProps = new Properties();
-            if(caConfFile.equals("ca-config/ca-db.properties"))
+            try
             {
-                // backwards compatibility
-                caConfProps.put("datasource.ca", "ca-config/ca-db.properties");
-                final String fn = "ca-config/ocsp-db.properties";
-                File f = new File(fn);
-                if(f.exists() && f.isFile())
-                {
-                    caConfProps.put("datasource.ocsp", fn);
-                }
-            }
-            else
+                caConfProps.load(new FileInputStream(caConfFile));
+            } catch (IOException e)
             {
-                try
-                {
-                    caConfProps.load(new FileInputStream(caConfFile));
-                } catch (IOException e)
-                {
-                    throw new CAMgmtException("IOException while paring ca configuration" + caConfFile, e);
-                }
+                throw new CAMgmtException("IOException while paring ca configuration" + caConfFile, e);
             }
 
             this.dataSources = new ConcurrentHashMap<String, DataSource>();
@@ -1013,17 +998,16 @@ public class CAManagerImpl implements CAManager
                 {
                 }
 
-                if(datasourceName == null &&
-                        "java:org.xipki.ca.server.publisher.DefaultCertPublisher".equals(type))
+                DataSource ocspDataSource = null;
+                if(datasourceName != null)
                 {
-                    // backwards compatibility
-                    datasourceName = "ocsp";
-                    confPairs = new CmpUtf8Pairs();
-                    confPairs.putUtf8Pair("datasource", datasourceName);
-                    do_changePublisher(name, null, confPairs.getEncoded());
+                    ocspDataSource = dataSources.get(datasourceName);
+                    if(ocspDataSource == null)
+                    {
+                        throw new CAMgmtException("Cound not find datasource named '" + datasourceName + "'");
+                    }
                 }
 
-                DataSource ocspDataSource = dataSources.get(datasourceName);
                 PublisherEntry entry = new PublisherEntry(name);
                 entry.setType(type);
                 entry.setConf(confPairs.getEncoded());
@@ -1373,13 +1357,13 @@ public class CAManagerImpl implements CAManager
             Integer numCrls)
     throws CAMgmtException
     {
-        if(cas.containsKey(name) == false)
-        {
-            throw new CAMgmtException("Could not find CA named " + name);
-        }
-
         if(nextSerial != null)
         {
+            if(cas.containsKey(name) == false)
+            {
+                throw new CAMgmtException("Could not find CA named " + name);
+            }
+
             CAEntry caEntry = cas.get(name);
             if(caEntry.getNextSerial() > nextSerial + 1) // 1 as buffer
             {
@@ -1616,15 +1600,6 @@ public class CAManagerImpl implements CAManager
     throws CAMgmtException
     {
         Set<String> profileNames = ca_has_profiles.get(caName);
-        if(profileNames == null)
-        {
-            return;
-        }
-
-        if(profileNames.contains(profileName))
-        {
-            return;
-        }
 
         PreparedStatement ps = null;
         try
@@ -1641,7 +1616,10 @@ public class CAManagerImpl implements CAManager
             closeStatement(ps);
         }
 
-        profileNames.remove(profileName);
+        if(profileNames != null)
+        {
+            profileNames.remove(profileName);
+        }
     }
 
     @Override
@@ -1684,16 +1662,6 @@ public class CAManagerImpl implements CAManager
     throws CAMgmtException
     {
         Set<String> publisherNames = ca_has_publishers.get(caName);
-        if(publisherNames == null)
-        {
-            return;
-        }
-
-        if(publisherNames.contains(publisherName) == false)
-        {
-            return;
-        }
-
         PreparedStatement ps = null;
         try
         {
@@ -1709,7 +1677,10 @@ public class CAManagerImpl implements CAManager
             closeStatement(ps);
         }
 
-        publisherNames.remove(publisherName);
+        if(publisherNames != null)
+        {
+            publisherNames.remove(publisherName);
+        }
     }
 
     @Override
@@ -1815,11 +1786,6 @@ public class CAManagerImpl implements CAManager
     public void removeCmpRequestor(String requestorName)
     throws CAMgmtException
     {
-        if(requestors.containsKey(requestorName) == false)
-        {
-            return;
-        }
-
         for(String caName : ca_has_requestors.keySet())
         {
             removeCmpRequestorFromCA(requestorName, caName);
@@ -1855,11 +1821,6 @@ public class CAManagerImpl implements CAManager
             return;
         }
 
-        if(requestors.containsKey(name) == false)
-        {
-            throw new CAMgmtException("Could not find requestor " + name);
-        }
-
         String sql = "UPDATE REQUESTOR SET CERT=? WHERE NAME=?";
         PreparedStatement ps = null;
         try
@@ -1882,25 +1843,6 @@ public class CAManagerImpl implements CAManager
     throws CAMgmtException
     {
         Set<CAHasRequestorEntry> requestors = ca_has_requestors.get(caName);
-        if(requestors == null)
-        {
-            return;
-        }
-
-        boolean foundEntry = false;
-        for(CAHasRequestorEntry entry : requestors)
-        {
-            if(entry.getRequestorName().equals(requestorName))
-            {
-                foundEntry = true;
-                break;
-            }
-        }
-        if(foundEntry == false)
-        {
-            return;
-        }
-
         PreparedStatement ps = null;
         try
         {
@@ -1909,7 +1851,10 @@ public class CAManagerImpl implements CAManager
             ps.setString(2, requestorName);
             ps.executeUpdate();
 
-            requestors.remove(requestorName);
+            if(requestors != null)
+            {
+                requestors.remove(requestorName);
+            }
         }catch(SQLException e)
         {
             throw new CAMgmtException(e);
@@ -1987,11 +1932,6 @@ public class CAManagerImpl implements CAManager
     public void removeCertProfile(String profileName)
     throws CAMgmtException
     {
-        if(certProfiles.containsKey(profileName) == false)
-        {
-            return;
-        }
-
         for(String caName : ca_has_profiles.keySet())
         {
             removeCertProfileFromCA(profileName, caName);
@@ -2023,11 +1963,6 @@ public class CAManagerImpl implements CAManager
             throw new IllegalArgumentException("at least one of type and conf should not be null");
         }
         assertNotNULL("type", type);
-
-        if(certProfiles.containsKey(name) == false)
-        {
-            throw new CAMgmtException("Could not find certificate profile " + name);
-        }
 
         StringBuilder sb = new StringBuilder();
         sb.append("UPDATE ENVIRONMENT SET ");
@@ -2152,11 +2087,6 @@ public class CAManagerImpl implements CAManager
     public void removeCmpResponder()
     throws CAMgmtException
     {
-        if(responder == null)
-        {
-            return;
-        }
-
         Statement stmt = null;
         try
         {
@@ -2180,11 +2110,6 @@ public class CAManagerImpl implements CAManager
         if(type == null && conf == null && cert == null)
         {
             return;
-        }
-
-        if(responder == null)
-        {
-            throw new CAMgmtException("No CMP responder is configured");
         }
 
         StringBuilder sb = new StringBuilder();
@@ -2295,11 +2220,6 @@ public class CAManagerImpl implements CAManager
     public void removeCrlSigner(String crlSignerName)
     throws CAMgmtException
     {
-        if(crlSigners.containsKey(crlSignerName) == false)
-        {
-            return;
-        }
-
         for(String caName : cas.keySet())
         {
             CAEntry caInfo = cas.get(caName);
@@ -2331,11 +2251,6 @@ public class CAManagerImpl implements CAManager
             Integer period, Integer overlap, Boolean includeCerts)
     throws CAMgmtException
     {
-        if(crlSigners.containsKey(name) == false)
-        {
-            throw new CAMgmtException("Unknown CRL signer " + name);
-        }
-
         StringBuilder sb = new StringBuilder();
         sb.append("UPDATE CRLSIGNER SET ");
 
@@ -2549,11 +2464,6 @@ public class CAManagerImpl implements CAManager
     public void removePublisher(String publisherName)
     throws CAMgmtException
     {
-        if(publishers.containsKey(publisherName) == false)
-        {
-            return;
-        }
-
         for(String caName : ca_has_publishers.keySet())
         {
             removePublisherFromCA(publisherName, caName);
@@ -2578,16 +2488,6 @@ public class CAManagerImpl implements CAManager
 
     @Override
     public void changePublisher(String name, String type, String conf)
-    throws CAMgmtException
-    {
-        if(publishers.containsKey(name) == false)
-        {
-            throw new CAMgmtException("Could not find publisher " + name);
-        }
-        do_changePublisher(name, type, conf);
-    }
-
-    private void do_changePublisher(String name, String type, String conf)
     throws CAMgmtException
     {
         StringBuilder sb = new StringBuilder();
@@ -2688,11 +2588,6 @@ public class CAManagerImpl implements CAManager
     public void removeCmpControl()
     throws CAMgmtException
     {
-        if(cmpControl == null)
-        {
-            return;
-        }
-
         Statement stmt = null;
         try
         {
@@ -2718,11 +2613,6 @@ public class CAManagerImpl implements CAManager
                 && sendCaCert == null)
         {
             return;
-        }
-
-        if(cmpControl == null)
-        {
-            throw new CAMgmtException("cmpControl is not initialized");
         }
 
         StringBuilder sb = new StringBuilder();
@@ -2830,11 +2720,6 @@ public class CAManagerImpl implements CAManager
     public void removeEnvParam(String envParamName)
     throws CAMgmtException
     {
-        if(envParameterResolver.getEnvParam(envParamName) == null)
-        {
-            return;
-        }
-
         if(ENVIRONMENT_NAME_LOCK.equals(envParamName))
         {
             return;
@@ -3048,11 +2933,6 @@ public class CAManagerImpl implements CAManager
     public void removeCaAlias(String aliasName)
     throws CAMgmtException
     {
-        if(caAliases.containsKey(aliasName) == false)
-        {
-            return;
-        }
-
         PreparedStatement ps = null;
         try
         {
@@ -3101,11 +2981,6 @@ public class CAManagerImpl implements CAManager
     public void removeCA(String caname)
     throws CAMgmtException
     {
-        if(cas.containsKey(caname) == false)
-        {
-            return;
-        }
-
         PreparedStatement ps = null;
         try
         {
