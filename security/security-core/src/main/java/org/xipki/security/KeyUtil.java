@@ -149,6 +149,7 @@ public class KeyUtil
             }
             else if("ECDSA".equals(keyAlg))
             {
+                // TODO: use SunEC implementation
                 builder = new ECDSAContentVerifierProviderBuilder(dfltDigesAlgIdentifierFinder);
             }
             else

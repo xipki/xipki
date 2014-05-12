@@ -566,10 +566,6 @@ public class X509CACmpResponder extends CmpResponder
                     CertTemplate certTemp = req.getCertTemplate();
                     Extensions extensions = certTemp.getExtensions();
                     X500Name subject = certTemp.getSubject();
-                    if(childAuditEvent != null)
-                    {
-                        childAuditEvent.addEventData(new AuditEventData("subject", IoCertUtil.canonicalizeName(subject)));
-                    }
                     SubjectPublicKeyInfo publicKeyInfo = certTemp.getPublicKey();
                     OptionalValidity validity = certTemp.getValidity();
 
@@ -840,6 +836,12 @@ public class X509CACmpResponder extends CmpResponder
             certInfo.setRequestor(requestor);
             certInfo.setUser(user);
 
+            if(childAuditEvent != null)
+            {
+                childAuditEvent.addEventData(new AuditEventData("subject",
+                        certInfo.getCert().getSubject()));
+            }
+
             pendingCertPool.addCertificate(tid.getOctets(), certReqId.getPositiveValue(),
                     certInfo, System.currentTimeMillis() + confirmWaitTime);
             String warningMsg = certInfo.getWarningMessage();
@@ -942,8 +944,8 @@ public class X509CACmpResponder extends CmpResponder
                     break;
             }
 
-               childAuditEvent.setStatus(auditStatus);
-               childAuditEvent.addEventData(new AuditEventData("message", auditMessage));
+            childAuditEvent.setStatus(auditStatus);
+            childAuditEvent.addEventData(new AuditEventData("message", auditMessage));
             PKIStatusInfo status = generateCmpRejectionStatus(failureInfo, ce.getErrorMessage());
             return new CertResponse(certReqId, status);
         }
