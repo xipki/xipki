@@ -57,7 +57,7 @@ public class OCSPStatusCommand extends OsgiCommandSupport
             required = true, description = "Required. CA certificate file")
     protected String            cacertFile;
 
-    @Option(name = "-sn", aliases = { "--serialNumber" },
+    @Option(name = "-serial",
             description = "Serial number")
     protected String            serialNumber;
 
