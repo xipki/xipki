@@ -26,7 +26,6 @@ import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.PrivateKey;
 import java.security.Signature;
-import java.security.SignatureException;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
@@ -203,6 +202,7 @@ public class SoftTokenContentSignerBuilder
                 throw new OperatorCreationException("Unsupported ECDSA signature algorithm " + algOid.getId());
             }
 
+            boolean useGivenProvider = true;
             for(int i = 0; i < parallelism; i++)
             {
                 try
@@ -215,10 +215,19 @@ public class SoftTokenContentSignerBuilder
                     signers.add(signer);
                 } catch (Exception e)
                 {
-                    LOG.warn("Could not use {} for {}", provider, algoName);
+                    useGivenProvider = false;
                     signers.clear();
                     break;
                 }
+            }
+
+            if(useGivenProvider)
+            {
+                LOG.info("Use {} to sign {} signature", provider, algoName);
+            }
+            else
+            {
+                LOG.warn("Could not use {} to sign {} signature", provider, algoName);
             }
         }
 
