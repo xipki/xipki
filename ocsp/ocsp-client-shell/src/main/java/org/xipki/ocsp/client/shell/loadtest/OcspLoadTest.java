@@ -103,7 +103,7 @@ public class OcspLoadTest extends AbstractLoadTest
             BasicOCSPResp basicResp;
             try
             {
-                basicResp = requestor.ask(caCert, BigInteger.valueOf(serialIndex++), serverUrl, options);
+                basicResp = requestor.ask(caCert, BigInteger.valueOf(sn), serverUrl, options);
             } catch (OCSPRequestorException e)
             {
                 LOG.warn("OCSPRequestorException: {}", e.getMessage());
