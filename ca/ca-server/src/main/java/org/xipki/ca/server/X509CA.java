@@ -1570,19 +1570,23 @@ public class X509CA
         {
             if(trySunECtoVerify == null)
             {
+                final String provider = "SunEC";
                 byte[] tbs = cert.getTBSCertificate();
                 byte[] signatureValue = cert.getSignature();
                 String sigAlgName = cert.getSigAlgName();
                 try
                 {
-                    Signature verifier = Signature.getInstance(sigAlgName, "SunEC");
+                    Signature verifier = Signature.getInstance(sigAlgName, provider);
                     verifier.initVerify(caPublicKey);
                     verifier.update(tbs);
                     boolean sigValid = verifier.verify(signatureValue);
+
+                    LOG.info("Use {} to verify {} signature", provider, sigAlgName);
                     trySunECtoVerify = Boolean.TRUE;
                     return sigValid;
                 }catch(Exception e)
                 {
+                    LOG.warn("Could not use {} to verify {} signature", provider, sigAlgName);
                     trySunECtoVerify = Boolean.FALSE;
                 }
             }
