@@ -29,7 +29,7 @@ $THIS_HOME/init-db.sh update $DBCONF_FILE $CHANGELOG_FILE
 echo ""
 echo ""
 
-DBCONF_FILE=$XIPKI_HOME/ocsp-config/ocsp-publisher.properties
+DBCONF_FILE=$XIPKI_HOME/ocsp-config/ocsp-db.properties
 CHANGELOG_FILE=$XIPKI_HOME/sql/ocsp-init.xml
 
 $THIS_HOME/init-db.sh dropAll $DBCONF_FILE $CHANGELOG_FILE
