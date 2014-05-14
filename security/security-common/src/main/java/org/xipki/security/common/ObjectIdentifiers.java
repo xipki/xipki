@@ -177,7 +177,7 @@ public class ObjectIdentifiers
     public static final ASN1ObjectIdentifier DN_UnstructuredAddress = PKCSObjectIdentifiers.pkcs_9_at_unstructuredAddress;
 
     /**
-     * email address in Verisign certificates
+     * email address in certificates
      */
     public static final ASN1ObjectIdentifier DN_E = DN_EmailAddress;
 
