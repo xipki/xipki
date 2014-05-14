@@ -59,6 +59,7 @@ public final class IaikP11CryptService implements P11CryptService
     private IaikExtendedModule extModule;
 
     private String pkcs11Module;
+    private String pkcs11ModuleOmitSensitiveInfo;
     private char[] password;
     private Set<Integer> includeSlotIndexes;
     private Set<Integer> excludeSlotIndexes;
@@ -95,6 +96,11 @@ public final class IaikP11CryptService implements P11CryptService
     {
         ParamChecker.assertNotEmpty("pkcs11Module", pkcs11Module);
         this.pkcs11Module = pkcs11Module;
+
+        int index = pkcs11Module.toLowerCase().indexOf("password");
+        this.pkcs11ModuleOmitSensitiveInfo = (index == -1) ?
+                pkcs11Module : pkcs11Module.substring(0, index);
+
         this.password = (password == null) ? "dummy".toCharArray() : password;
         this.includeSlotIndexes = includeSlotIndexes == null ?
                 null : new HashSet<Integer>(includeSlotIndexes);
@@ -125,7 +131,7 @@ public final class IaikP11CryptService implements P11CryptService
     public synchronized void refresh()
     throws SignerException
     {
-        LOG.info("Refreshing PKCS#11 module {}", pkcs11Module);
+        LOG.info("Refreshing PKCS#11 module {}", pkcs11ModuleOmitSensitiveInfo);
         lastRefreshSuccessfull = false;
         try
         {
@@ -133,8 +139,8 @@ public final class IaikP11CryptService implements P11CryptService
         }catch(SignerException e)
         {
             LOG.error("Could not initialize the PKCS#11 Module for {}: SignerException: {}",
-                    pkcs11Module, e.getMessage());
-            LOG.debug("Could not initialize the PKCS#11 Module for " + pkcs11Module, e);
+                    pkcs11ModuleOmitSensitiveInfo, e.getMessage());
+            LOG.debug("Could not initialize the PKCS#11 Module for " + pkcs11ModuleOmitSensitiveInfo, e);
             throw e;
         }
 
@@ -268,7 +274,7 @@ public final class IaikP11CryptService implements P11CryptService
             LOG.info(sb.toString());
         }
 
-        LOG.info("Refreshed PKCS#11 module {}", pkcs11Module);
+        LOG.info("Refreshed PKCS#11 module {}", pkcs11ModuleOmitSensitiveInfo);
     }
 
     @Override
@@ -453,7 +459,7 @@ public final class IaikP11CryptService implements P11CryptService
     {
         StringBuilder sb = new StringBuilder();
         sb.append("IaikP11CryptService\n");
-        sb.append("\tModule: ").append(pkcs11Module).append("\n");
+        sb.append("\tModule: ").append(pkcs11ModuleOmitSensitiveInfo).append("\n");
         return sb.toString();
     }
 
