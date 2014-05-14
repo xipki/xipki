@@ -1177,7 +1177,7 @@ public final class RAWorkerImpl extends AbstractRAWorker implements RAWorker
             return false;
         }
 
-        boolean inLoadTest = Boolean.getBoolean("org.xipki.caclient.loadtest");
+        boolean inLoadTest = Boolean.getBoolean("org.xipki.loadtest");
         if(inLoadTest)
         {
             return true;
