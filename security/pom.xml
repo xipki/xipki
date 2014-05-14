@@ -30,7 +30,6 @@
 		<module>security-common</module>
 		<module>security-api</module>
 		<module>security-core</module>
-		<module>security-command</module>
 		<module>security-shell</module>
 		<module>security-sunp11</module>
 		<module>security-iaikp11</module>
