@@ -27,7 +27,7 @@ import java.util.concurrent.TimeUnit;
 
 public abstract class AbstractLoadTest
 {
-    private static final String PROPKEY_LOADTEST = "org.xipki.caclient.loadtest";
+    private static final String PROPKEY_LOADTEST = "org.xipki.loadtest";
 
     protected abstract Runnable getTestor()
     throws Exception;
