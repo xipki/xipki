@@ -52,11 +52,6 @@ public class P11ECKeyGenCommand extends KeyGenCommand
             required = false, description = "Where to save the self-signed certificate")
     protected String            outputFilename;
 
-    @Option(name = "-cert-type",
-            required = false, description = "Certificate type of the self signed certificate."
-                    + " Currently only TLS, TLS-C or TLS-S are supported")
-    protected String            certType;
-
     @Override
     protected Object doExecute()
     throws Exception
@@ -86,12 +81,6 @@ public class P11ECKeyGenCommand extends KeyGenCommand
         IaikP11CryptService.getInstance(securityFactory.getPkcs11Module(), pwd).refresh();
 
         return null;
-    }
-
-    @Override
-    protected String getCertType()
-    {
-        return certType;
     }
 
 }

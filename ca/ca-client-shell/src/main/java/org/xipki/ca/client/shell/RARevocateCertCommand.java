@@ -40,7 +40,7 @@ public class RARevocateCertCommand extends ClientCommand
             description = "CA Certificate file")
     protected String            cacertFile;
 
-    @Option(name = "-sn", aliases = {"--serialNumber"},
+    @Option(name = "-serial",
             description = "Serial number")
     protected String            serialNumber;
 
