@@ -41,7 +41,7 @@ public class DataSourceImpl implements DataSource
     private static final Logger LOG = LoggerFactory.getLogger(DataSourceImpl.class);
     private PasswordResolver passwordResolver;
 
-	private Integer loginTimeout;
+    private Integer loginTimeout;
     private String driverClassName;
     private Integer maxActive;
     private Integer minIdle;
@@ -54,7 +54,7 @@ public class DataSourceImpl implements DataSource
     private Boolean defaultReadOnly;
     private String defaultTransactionIsolation;
     @SuppressWarnings("unused")
-	private String connectionProperties;
+    private String connectionProperties;
 
     /**
      * References the real data source implementation this class acts as pure
@@ -120,12 +120,12 @@ public class DataSourceImpl implements DataSource
 
         if(maxActive != null)
         {
-        	conf.setMaximumPoolSize(maxActive);
+            conf.setMaximumPoolSize(maxActive);
         }
 
         if(minIdle != null)
         {
-        	conf.setMinimumIdle(minIdle);
+            conf.setMinimumIdle(minIdle);
         }
 
         if(validationQuery != null)
@@ -135,7 +135,7 @@ public class DataSourceImpl implements DataSource
 
         if(validationQueryTimeout != null)
         {
-        }        
+        }
 
         if(defaultAutoCommit != null)
         {
@@ -144,7 +144,7 @@ public class DataSourceImpl implements DataSource
 
         if(defaultReadOnly != null)
         {
-        	conf.setReadOnly(defaultReadOnly);
+            conf.setReadOnly(defaultReadOnly);
         }
 
         if(defaultTransactionIsolation != null)
@@ -157,11 +157,11 @@ public class DataSourceImpl implements DataSource
         {
             service.setLoginTimeout(loginTimeout);
         }
-        
+
     }
 
     @SuppressWarnings("resource")
-	public final Connection getConnection(int timeout)
+    public final Connection getConnection(int timeout)
     throws SQLException
     {
         if(timeout <= 0)
