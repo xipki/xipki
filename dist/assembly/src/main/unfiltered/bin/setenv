@@ -57,6 +57,8 @@ KARAF_OPTS="$KARAF_OPTS -Djavax.net.ssl.trustStorePassword=1234"
 KARAF_OPTS="$KARAF_OPTS -Djavax.net.ssl.keyStore=etc/tlskeys/tls-client-keystore.jks"
 KARAF_OPTS="$KARAF_OPTS -Djavax.net.ssl.keyStorePassword=1234"
 KARAF_OPTS="$KARAF_OPTS -Dsun.net.http.errorstream.enableBuffering=true"
+KARAF_OPTS="$KARAF_OPTS -Dsun.net.client.defaultConnectTimeout=30000"
+KARAF_OPTS="$KARAF_OPTS -Dsun.net.client.defaultReadTimeout=30000"
 #KARAF_OPTS="$KARAF_OPTS -Djavax.net.debug=all"
 
 export LD_LIBRARY_PATH=$NATIVE_LIB:$LD_LIBRARY_PATH
