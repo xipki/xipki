@@ -50,11 +50,6 @@ public class P12RSAKeyGenCommand extends KeyGenCommand
             required = false, description = "Where to saven the self-signed certificate")
     protected String            certOutFile;
 
-    @Option(name = "-cert-type",
-            required = false, description = "Certificate type of the self signed certificate."
-                    + " Currently only TLS, TLS-C or TLS-S are supported")
-    protected String            certType;
-
     @Override
     protected Object doExecute()
     throws Exception
@@ -86,12 +81,6 @@ public class P12RSAKeyGenCommand extends KeyGenCommand
         }
 
         return null;
-    }
-
-    @Override
-    protected String getCertType()
-    {
-        return certType;
     }
 
 }
