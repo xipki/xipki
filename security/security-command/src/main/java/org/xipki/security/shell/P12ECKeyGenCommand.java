@@ -30,8 +30,8 @@ import org.xipki.security.p10.P12KeypairGenerator.ECDSAIdentityGenerator;
 public class P12ECKeyGenCommand extends KeyGenCommand
 {
     @Option(name = "-curve",
-            description = "Required. EC Curve name or OID",
-            required = true)
+            description = "EC Curve name, the default is brainpoolP256r1",
+            required = false)
     protected String            curveName;
 
     @Option(name = "-subject",
@@ -43,11 +43,11 @@ public class P12ECKeyGenCommand extends KeyGenCommand
     protected String            password;
 
     @Option(name = "-out",
-            required = true, description = "Required. Where to saven the key")
+            required = true, description = "Required. Where to save the key")
     protected String            keyOutFile;
 
     @Option(name = "-certout",
-            required = false, description = "Where to saven the self-signed certificate")
+            required = false, description = "Where to save the self-signed certificate")
     protected String            certOutFile;
 
     @Option(name = "-cert-type",
@@ -59,6 +59,11 @@ public class P12ECKeyGenCommand extends KeyGenCommand
     protected Object doExecute()
     throws Exception
     {
+        if(curveName == null)
+        {
+            curveName = "brainpoolP256r1";
+        }
+
         ECDSAIdentityGenerator gen = new P12KeypairGenerator.ECDSAIdentityGenerator(
                 curveName, password.toCharArray(), subject, getKeyUsage(), getExtendedKeyUsage());
 
