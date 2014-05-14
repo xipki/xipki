@@ -27,14 +27,14 @@ import java.util.concurrent.TimeUnit;
 
 public abstract class AbstractLoadTest
 {
-	private static final String PROPKEY_LOADTEST = "org.xipki.caclient.loadtest";
-	
+    private static final String PROPKEY_LOADTEST = "org.xipki.caclient.loadtest";
+
     protected abstract Runnable getTestor()
     throws Exception;
 
     public void test()
     {
-    	System.getProperties().setProperty(PROPKEY_LOADTEST, "true");
+        System.getProperties().setProperty(PROPKEY_LOADTEST, "true");
         System.out.println("Testing using " + threads + " threads.");
         resetStartTime();
 
@@ -73,7 +73,7 @@ public abstract class AbstractLoadTest
         }
 
         printSummary();
-        
+
         System.getProperties().remove(PROPKEY_LOADTEST);
     }
 
