@@ -138,14 +138,9 @@
 							<features>
 								<!-- karaf boot features (see etc/org.apache.karaf.features.cfg) -->
 								<feature>karaf-framework</feature>
-								<feature>config</feature>
-								<feature>ssh</feature>
-								<feature>management</feature>
-								<!-- transitive: http, jetty -->
-								<feature>http-whiteboard</feature>
-								<!-- service/daemon wrapper support -->
-								<feature>wrapper</feature>
 								<!-- project-core features -->
+								<feature>xipki-datasource-hikaricp</feature>
+								<feature>xipki-datasource</feature>
 								<feature>xipki-caserver</feature>
 								<feature>xipki-caserver-shell</feature>
 								<feature>xipki-caclient-shell</feature>
