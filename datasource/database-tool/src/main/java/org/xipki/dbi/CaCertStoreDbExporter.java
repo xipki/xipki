@@ -423,19 +423,28 @@ class CaCertStoreDbExporter extends DbPorter
                     ResultSet rawCertRs = rawCertPs.executeQuery();
                     try
                     {
-                        rawCertRs.next();
-                        String b64Cert = rawCertRs.getString("CERT");
-                        byte[] cert = Base64.decode(b64Cert);
-                        sha1_fp_cert = IoCertUtil.sha1sum(cert);
+                        if(rawCertRs.next())
+                        {
+                            String b64Cert = rawCertRs.getString("CERT");
+                            byte[] cert = Base64.decode(b64Cert);
+                            sha1_fp_cert = IoCertUtil.sha1sum(cert);
 
-                        ZipEntry certZipEntry = new ZipEntry(sha1_fp_cert + ".der");
-                        currentCertsZip.putNextEntry(certZipEntry);
-                        try
+                            ZipEntry certZipEntry = new ZipEntry(sha1_fp_cert + ".der");
+                            currentCertsZip.putNextEntry(certZipEntry);
+                            try
+                            {
+                                currentCertsZip.write(cert);
+                            }finally
+                            {
+                                currentCertsZip.closeEntry();
+                            }
+                        }
+                        else
                         {
-                            currentCertsZip.write(cert);
-                        }finally
-                        {
-                            currentCertsZip.closeEntry();
+                            String msg = "Found no certificate in table RAWCERT for cert_id '" + id + "'";
+                            LOG.error(msg);
+                            System.out.println(msg);
+                            continue;
                         }
                     }finally
                     {
