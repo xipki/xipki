@@ -23,11 +23,14 @@ import java.math.BigInteger;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
+import java.security.PublicKey;
 import java.security.Security;
+import java.security.Signature;
 import java.security.SignatureException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509CRL;
 import java.security.cert.X509Certificate;
+import java.security.interfaces.ECPublicKey;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -169,7 +172,8 @@ public final class RAWorkerImpl extends AbstractRAWorker implements RAWorker
             = new ConcurrentHashMap<String, RACertProfileMapping>();
 
     private String            confFile;
-
+    private Map<X509Certificate, Boolean> trySunECtoVerifyMap = new ConcurrentHashMap<>();
+    
     public RAWorkerImpl()
     {
     }
@@ -1173,27 +1177,76 @@ public final class RAWorkerImpl extends AbstractRAWorker implements RAWorker
             return false;
         }
 
+        boolean inLoadTest = Boolean.getBoolean("org.xipki.caclient.loadtest");
+        if(inLoadTest)
+        {
+        	return true;
+        }
+        
+    	Boolean trySunECtoVerify = trySunECtoVerifyMap.get(_caCert);
+        PublicKey caPublicKey = _caCert.getPublicKey();
         try
         {
-            _cert.verify(_caCert.getPublicKey());
-        }catch(SignatureException e)
+            if(trySunECtoVerify == null)
+            {
+                final String provider = "SunEC";
+                byte[] tbs = _cert.getTBSCertificate();
+                byte[] signatureValue = _cert.getSignature();
+                String sigAlgName = _cert.getSigAlgName();
+                try
+                {
+                    Signature verifier = Signature.getInstance(sigAlgName, provider);
+                    verifier.initVerify(caPublicKey);
+                    verifier.update(tbs);
+                    boolean sigValid = verifier.verify(signatureValue);
+
+                    LOG.info("Use {} to verify {} signature", provider, sigAlgName);
+                    trySunECtoVerify = Boolean.TRUE;
+                    return sigValid;
+                }catch(Exception e)
+                {
+                    LOG.warn("Could not use {} to verify {} signature", provider, sigAlgName);
+                    trySunECtoVerify = Boolean.FALSE;
+                }
+                
+                trySunECtoVerifyMap.put(_caCert, trySunECtoVerify);
+            }
+
+            if(trySunECtoVerify && (caPublicKey instanceof ECPublicKey))
+            {
+                byte[] tbs = _cert.getTBSCertificate();
+                byte[] signatureValue = _cert.getSignature();
+                String sigAlgName = _cert.getSigAlgName();
+                Signature verifier = Signature.getInstance(sigAlgName, "SunEC");
+                verifier.initVerify(caPublicKey);
+                verifier.update(tbs);
+                return verifier.verify(signatureValue);
+            }
+            else
+            {
+                _cert.verify(caPublicKey);
+                return true;
+            }
+        } catch (SignatureException e)
         {
+            LOG.debug("SignatureException while verifying signature: {}", e.getMessage());
             return false;
         } catch (InvalidKeyException e)
         {
+            LOG.debug("InvalidKeyException while verifying signature: {}", e.getMessage());
             return false;
         } catch (CertificateException e)
         {
+            LOG.debug("CertificateException while verifying signature: {}", e.getMessage());
             return false;
         } catch (NoSuchAlgorithmException e)
         {
+            LOG.debug("NoSuchAlgorithmException while verifying signature: {}", e.getMessage());
             return false;
         } catch (NoSuchProviderException e)
         {
+            LOG.debug("NoSuchProviderException while verifying signature: {}", e.getMessage());
             return false;
         }
-
-        return true;
     }
-
 }
