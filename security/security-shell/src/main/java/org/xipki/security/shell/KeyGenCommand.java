@@ -29,50 +29,22 @@ abstract class KeyGenCommand extends SecurityCommand
     private static final ASN1ObjectIdentifier id_kp                  = id_pkix.branch("3");
     public static final ASN1ObjectIdentifier id_kp_serverAuth        = id_kp.branch("1");
     public static final ASN1ObjectIdentifier id_kp_clientAuth        = id_kp.branch("2");
-
-    protected abstract String getCertType();
+    public static final ASN1ObjectIdentifier id_kp_emailProtection   = id_kp.branch("3");
 
     protected Integer getKeyUsage()
     throws Exception
     {
-        String certType =getCertType();
-        if(null == certType)
-        {
-            return null;
-        }
-        else if("TLS".equalsIgnoreCase(certType) || "TLS-C".equalsIgnoreCase(certType) || "TLS-S".equalsIgnoreCase(certType))
-        {
-            return KeyUsage.digitalSignature | KeyUsage.keyEncipherment;
-        }
-        else
-        {
-            throw new Exception("Unknown certType " + certType);
-        }
+        return KeyUsage.cRLSign |
+                KeyUsage.dataEncipherment |
+                KeyUsage.digitalSignature |
+                KeyUsage.keyAgreement |
+                KeyUsage.keyCertSign |
+                KeyUsage.keyEncipherment;
     }
 
     protected List<ASN1ObjectIdentifier> getExtendedKeyUsage()
     throws Exception
     {
-        String certType = getCertType();
-        if(null == certType)
-        {
-            return null;
-        }
-        else if("TLS".equalsIgnoreCase(certType))
-        {
-            return Arrays.asList(id_kp_clientAuth, id_kp_serverAuth);
-        }
-        else if("TLS-C".equalsIgnoreCase(certType))
-        {
-            return Arrays.asList(id_kp_clientAuth);
-        }
-        else if("TLS-S".equalsIgnoreCase(certType))
-        {
-            return Arrays.asList(id_kp_serverAuth);
-        }
-        else
-        {
-            throw new Exception("Unknown certType " + certType);
-        }
+        return Arrays.asList(id_kp_clientAuth, id_kp_serverAuth, id_kp_emailProtection);
     }
 }
