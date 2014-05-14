@@ -173,7 +173,7 @@ public final class RAWorkerImpl extends AbstractRAWorker implements RAWorker
 
     private String            confFile;
     private Map<X509Certificate, Boolean> trySunECtoVerifyMap = new ConcurrentHashMap<>();
-    
+
     public RAWorkerImpl()
     {
     }
@@ -1180,10 +1180,10 @@ public final class RAWorkerImpl extends AbstractRAWorker implements RAWorker
         boolean inLoadTest = Boolean.getBoolean("org.xipki.caclient.loadtest");
         if(inLoadTest)
         {
-        	return true;
+            return true;
         }
-        
-    	Boolean trySunECtoVerify = trySunECtoVerifyMap.get(_caCert);
+
+        Boolean trySunECtoVerify = trySunECtoVerifyMap.get(_caCert);
         PublicKey caPublicKey = _caCert.getPublicKey();
         try
         {
@@ -1208,7 +1208,7 @@ public final class RAWorkerImpl extends AbstractRAWorker implements RAWorker
                     LOG.warn("Could not use {} to verify {} signature", provider, sigAlgName);
                     trySunECtoVerify = Boolean.FALSE;
                 }
-                
+
                 trySunECtoVerifyMap.put(_caCert, trySunECtoVerify);
             }
 
