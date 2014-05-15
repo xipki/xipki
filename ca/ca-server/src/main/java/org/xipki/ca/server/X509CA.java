@@ -629,22 +629,6 @@ public class X509CA
 
         try
         {
-            if(caInfo.isAllowDuplicateKey() == false)
-            {
-                boolean b;
-                try
-                {
-                    b = certstore.certIssuedForPublicKey(this.caInfo.getCertificate(), publicKeyInfo.getEncoded());
-                } catch (IOException e)
-                {
-                    throw new OperationException(ErrorCode.BAD_CERT_TEMPLATE, "could not encode public key");
-                }
-                if(b)
-                {
-                    throw new CertAlreadyIssuedException("Certificate for the given public key already issued");
-                }
-            }
-
             try
             {
                 CertificateInfo ret = intern_generateCertificate(requestedByRA, certProfileName, origCertProfile,
@@ -720,6 +704,11 @@ public class X509CA
 
     public boolean publishCertificate(CertificateInfo certInfo)
     {
+        if(certInfo.isAlreadyIssued())
+        {
+            return true;
+        }
+
         if(certstore.addCertificate(certInfo) == false)
         {
             return false;
@@ -1040,6 +1029,44 @@ public class X509CA
         }
         else
         {
+            if(caInfo.isAllowDuplicateKey() == false)
+            {
+                try
+                {
+                    byte[] subjectPublicKey =  publicKeyInfo.getEncoded();
+                    List<Integer> certIds = certstore.getCertIdsForPublicKey(this.caInfo.getCertificate(), subjectPublicKey);
+
+                    if(certIds != null && certIds.isEmpty() == false)
+                    {
+                        // return issued certificate if all of requested public key, certProfile and subject match
+                        byte[] encodedCert = certstore.getEncodedCertificate(certIds, sha1FpSubject, certProfileName);
+                        if(encodedCert == null)
+                        {
+                            throw new CertAlreadyIssuedException("Certificate for the given public key already issued");
+                        }
+                        else
+                        {
+                            X509Certificate cert = IoCertUtil.parseCert(encodedCert);
+                            CertificateInfo certInfo = new CertificateInfo(
+                                    new X509CertificateWithMetaInfo(cert),
+                                    this.caInfo.getCertificate(),
+                                    subjectPublicKey, certProfileName);
+                            certInfo.setAlreadyIssued(true);
+                            return certInfo;
+                        }
+                    }
+                } catch (IOException e)
+                {
+                    throw new OperationException(ErrorCode.System_Failure, e.getMessage());
+                } catch (SQLException e)
+                {
+                    throw new OperationException(ErrorCode.DATABASE_FAILURE, e.getMessage());
+                } catch (CertificateException e)
+                {
+                    throw new OperationException(ErrorCode.System_Failure, e.getMessage());
+                }
+            }
+
             if(caInfo.isAllowDuplicateSubject() == false)
             {
                 boolean certWithSameSubjectIssued = certstore.certIssuedForSubject(this.caInfo.getCertificate(), sha1FpSubject);

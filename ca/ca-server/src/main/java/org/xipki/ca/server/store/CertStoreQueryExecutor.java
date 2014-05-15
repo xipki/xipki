@@ -17,6 +17,7 @@
 
 package org.xipki.ca.server.store;
 
+import java.beans.FeatureDescriptor;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -678,6 +679,79 @@ class CertStoreQueryExecutor
         }
     }
 
+    byte[] getEncodedCertificate(List<Integer> certIds, String sha1FpSubject, String certProfile)
+    throws SQLException, OperationException
+    {
+        ParamChecker.assertNotEmpty("certIds", certIds);
+        ParamChecker.assertNotNull("sha1FpSubject", sha1FpSubject);
+        ParamChecker.assertNotEmpty("certProfile", certProfile);
+
+        Integer profileId = getCertprofileId(certProfile);
+        if(profileId == null)
+        {
+            return null;
+        }
+
+        String sql = "COUNT(*) FROM CERT WHERE ID=? AND SHA1_FP_SUBJECT=? AND CERTPROFILEINFO_ID=?";
+        sql = createFetchFirstSelectSQL(sql, 1);
+        PreparedStatement ps = borrowPreparedStatement(sql);
+
+        Integer certId = null;
+        try
+        {
+            for(Integer _certId : certIds)
+            {
+                ResultSet rs = null;
+                try
+                {
+                    int idx = 1;
+                    ps.setInt(idx++, _certId.intValue());
+                    ps.setString(idx++, sha1FpSubject);
+                    ps.setInt(idx++, profileId);
+                    rs = ps.executeQuery();
+                    if(rs.next() && rs.getInt(1) > 0)
+                    {
+                        certId = _certId;
+                        break;
+                    }
+                }finally
+                {
+                    releaseDbResources(null, rs);
+                }
+            }
+        }finally
+        {
+            releaseDbResources(ps, null);
+        }
+
+        if(certId == null)
+        {
+            return null;
+        }
+
+        sql = "CERT FROM RAWCERT WHERE CERT_ID=?";
+        sql = createFetchFirstSelectSQL(sql, 1);
+        ps = borrowPreparedStatement(sql);
+        ResultSet rs = null;
+
+        try
+        {
+            ps.setInt(1, certId.intValue());
+            rs = ps.executeQuery();
+
+            if(rs.next())
+            {
+                String b64Cert = rs.getString("CERT");
+                return b64Cert == null ? null : Base64.decode(b64Cert);
+            }
+        }finally
+        {
+            releaseDbResources(ps, rs);
+        }
+
+        return null;
+    }
+
     byte[] getEncodedCertificate(X509CertificateWithMetaInfo caCert, BigInteger serial)
     throws SQLException, OperationException
     {
@@ -707,7 +781,7 @@ class CertStoreQueryExecutor
 
             if(rs.next())
             {
-                String b64Cert = rs.getString("cert");
+                String b64Cert = rs.getString("CERT");
                 return b64Cert == null ? null : Base64.decode(b64Cert);
             }
         }finally
@@ -876,7 +950,7 @@ class CertStoreQueryExecutor
             return CertStatus.Unknown;
         }
 
-        String sql = "REVOCATED FROM CERT WHERE CAINFO_ID=? AND SUBJECT=?";
+        String sql = "REVOCATED FROM CERT WHERE SUBJECT=? AND CAINFO_ID=?";
         sql = createFetchFirstSelectSQL(sql, 1);
         PreparedStatement ps = borrowPreparedStatement(sql);
         ResultSet rs = null;
@@ -884,8 +958,8 @@ class CertStoreQueryExecutor
         try
         {
             int idx = 1;
-            ps.setInt(idx++, caId);
             ps.setString(idx++, subject);
+            ps.setInt(idx++, caId);
 
             rs = ps.executeQuery();
             if(rs.next())
@@ -913,7 +987,7 @@ class CertStoreQueryExecutor
             return false;
         }
 
-        String sql = "COUNT(*) FROM CERT WHERE CAINFO_ID=? AND SHA1_FP_SUBJECT=?";
+        String sql = "COUNT(*) FROM CERT WHERE SHA1_FP_SUBJECT=? AND CAINFO_ID=?";
         sql = createFetchFirstSelectSQL(sql, 1);
 
         PreparedStatement ps = borrowPreparedStatement(sql);
@@ -922,8 +996,8 @@ class CertStoreQueryExecutor
         try
         {
             int idx = 1;
-            ps.setInt(idx++, caId);
             ps.setString(idx++, sha1FpSubject);
+            ps.setInt(idx++, caId);
 
             rs = ps.executeQuery();
             if(rs.next())
@@ -938,7 +1012,7 @@ class CertStoreQueryExecutor
         return false;
     }
 
-    boolean certIssued(X509CertificateWithMetaInfo caCert, byte[] encodedSubjectPublicKey)
+    List<Integer> getCertIdsForPublicKey(X509CertificateWithMetaInfo caCert, byte[] encodedSubjectPublicKey)
     throws OperationException, SQLException
     {
         byte[] encodedCert = caCert.getEncodedCert();
@@ -946,34 +1020,33 @@ class CertStoreQueryExecutor
 
         if(caId == null)
         {
-            return false;
+            return Collections.emptyList();
         }
 
         String sha1FpPk = fp(encodedSubjectPublicKey);
 
-        String sql = "COUNT(*) FROM CERT"
-                + " WHERE CAINFO_ID=? AND SHA1_FP_PK=?";
-        sql = createFetchFirstSelectSQL(sql, 1);
+        String sql = "SELECT ID FROM CERT"
+                + " WHERE SHA1_FP_PK=? AND CAINFO_ID=?";
         PreparedStatement ps = borrowPreparedStatement(sql);
 
         ResultSet rs = null;
         try
         {
             int idx = 1;
-            ps.setInt(idx++, caId);
             ps.setString(idx++, sha1FpPk);
+            ps.setInt(idx++, caId);
 
             rs = ps.executeQuery();
-            if(rs.next())
+            List<Integer> ids = new ArrayList<Integer>(1);
+            while(rs.next())
             {
-                return rs.getInt(1) > 0;
+                ids.add(rs.getInt("ID"));
             }
+            return ids;
         }finally
         {
             releaseDbResources(ps, rs);
         }
-
-        return false;
     }
 
     private String createFetchFirstSelectSQL(String coreSql, int rows)
@@ -1147,14 +1220,17 @@ class CertStoreQueryExecutor
             }
         }
 
-        try
+        if(ps != null)
         {
-            Connection conn = ps.getConnection();
-            ps.close();
-            dataSource.returnConnection(conn);
-        }catch(Throwable t)
-        {
-            LOG.warn("Cannot return prepared statement and connection", t);
+            try
+            {
+                Connection conn = ps.getConnection();
+                ps.close();
+                dataSource.returnConnection(conn);
+            }catch(Throwable t)
+            {
+                LOG.warn("Cannot return prepared statement and connection", t);
+            }
         }
     }
 

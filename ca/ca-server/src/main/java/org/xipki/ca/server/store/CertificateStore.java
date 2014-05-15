@@ -32,6 +32,7 @@ import org.bouncycastle.util.encoders.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.ca.api.OperationException;
+import org.xipki.ca.api.OperationException.ErrorCode;
 import org.xipki.ca.api.publisher.CertificateInfo;
 import org.xipki.ca.common.X509CertificateWithMetaInfo;
 import org.xipki.ca.server.CertRevocationInfo;
@@ -160,38 +161,28 @@ public class CertificateStore
 
     public boolean certIssuedForSubject(X509CertificateWithMetaInfo caCert,
             String sha1FpSubject)
+    throws OperationException
     {
         try
         {
             return queryExecutor.certIssued(caCert, sha1FpSubject);
-        } catch (OperationException e)
-        {
-            LOG.error("queryExecutor.certIssued. OperationException: {}", e.getMessage());
-            LOG.debug("queryExecutor.certIssued", e);
-            return false;
         } catch (SQLException e)
         {
-            LOG.error("queryExecutor.certIssued. SQLException: {}", e.getMessage());
-            LOG.debug("queryExecutor.certIssued", e);
-            return false;
+            LOG.debug("SQLException", e);
+            throw new OperationException(ErrorCode.DATABASE_FAILURE, e.getMessage());
         }
     }
 
-    public boolean certIssuedForPublicKey(X509CertificateWithMetaInfo caCert, byte[] encodedSubjectPublicKey)
+    public List<Integer> getCertIdsForPublicKey(X509CertificateWithMetaInfo caCert, byte[] encodedSubjectPublicKey)
+    throws OperationException
     {
         try
         {
-            return queryExecutor.certIssued(caCert, encodedSubjectPublicKey);
-        } catch (OperationException e)
-        {
-            LOG.error("queryExecutor.certIssued. OperationException: {}", e.getMessage());
-            LOG.debug("queryExecutor.certIssued", e);
-            return false;
+            return queryExecutor.getCertIdsForPublicKey(caCert, encodedSubjectPublicKey);
         } catch (SQLException e)
         {
-            LOG.error("queryExecutor.certIssued. SQLException: {}", e.getMessage());
-            LOG.debug("queryExecutor.certIssued", e);
-            return false;
+            LOG.debug("SQLException", e);
+            throw new OperationException(ErrorCode.DATABASE_FAILURE, e.getMessage());
         }
     }
 
@@ -260,6 +251,12 @@ public class CertificateStore
     throws SQLException, OperationException
     {
         return queryExecutor.getEncodedCertificate(caCert, serial);
+    }
+
+    public byte[] getEncodedCertificate(List<Integer> certIds, String sha1FpSubject, String certProfile)
+    throws SQLException, OperationException
+    {
+        return queryExecutor.getEncodedCertificate(certIds, sha1FpSubject, certProfile);
     }
 
     public CertificateInfo getCertificateInfo(X509CertificateWithMetaInfo caCert, BigInteger serial)

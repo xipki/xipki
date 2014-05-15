@@ -40,6 +40,7 @@ public class CertificateInfo
     private Integer revocationReason;
     private Date revocationTime;
     private Date invalidityTime;
+    private boolean alreadyIssued;
 
     public CertificateInfo(X509CertificateWithMetaInfo cert,
             X509CertificateWithMetaInfo issuerCert,
@@ -148,6 +149,16 @@ public class CertificateInfo
     public void setInvalidityTime(Date invalidityTime)
     {
         this.invalidityTime = invalidityTime;
+    }
+
+    public boolean isAlreadyIssued()
+    {
+        return alreadyIssued;
+    }
+
+    public void setAlreadyIssued(boolean alreadyIssued)
+    {
+        this.alreadyIssued = alreadyIssued;
     }
 
 }

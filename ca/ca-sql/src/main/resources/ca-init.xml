@@ -231,7 +231,7 @@
 			<column name="THISUPDATE" type="INT">
 				<constraints nullable="false"/>
 			</column>
-			<column name="NEXtUPDATE" type="INT"/>
+			<column name="NEXTUPDATE" type="INT"/>
 			<column name="CRL" type="LONGBLOB">
 				<constraints nullable="false"/>
 			</column>
