@@ -61,7 +61,7 @@ public abstract class AbstractLoadTest
             printStatus();
             try
             {
-                boolean terminated = executor.awaitTermination(2, TimeUnit.SECONDS);
+                boolean terminated = executor.awaitTermination(1, TimeUnit.SECONDS);
                 if(terminated)
                 {
                     break;
