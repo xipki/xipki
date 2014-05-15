@@ -22,9 +22,6 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.TimeUnit;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -64,8 +61,6 @@ public class DataSourceImpl implements DataSource
 
     private DatabaseType databaseType;
 
-    private final BlockingQueue<Connection> idleConnections = new LinkedBlockingQueue<Connection>();
-
     public DataSourceImpl()
     {
     }
@@ -102,7 +97,6 @@ public class DataSourceImpl implements DataSource
             }
         }
 
-        idleConnections.clear();
         if(service != null)
         {
             service.close();
@@ -160,86 +154,21 @@ public class DataSourceImpl implements DataSource
 
     }
 
-    @SuppressWarnings("resource")
     public final Connection getConnection(int timeout)
     throws SQLException
     {
-        if(timeout <= 0)
+    	try{
+    		return service.getConnection();
+        } catch(SQLException e)
         {
-            timeout = 5000; // default
+        	LOG.error("Could not create connection to database {} with the user {} and jdbc driver {}", 
+        			new String[]{url, username, driverClassName});
+            throw e;
         }
-
-        Connection c = null;
-
-        boolean valid;
-        // get next active cached connection
-        while(true)
-        {
-            c = idleConnections.poll();
-            try
-            {
-                valid = (c != null) && c.isClosed() == false;
-            } catch (SQLException e)
-            {
-                valid = false;
-            }
-
-            // found one or there is no more connection
-            if(c == null || valid)
-            {
-                break;
-            }
-        }
-
-        if(valid == false)
-        {
-            try
-            {
-                c = service.getConnection();
-                LOG.debug("no idle connection, create new instance");
-            } catch (SQLException e)
-            {
-                LOG.warn("cannot get new connection. {}: {}", e.getClass().getName(), e.getMessage());
-                LOG.debug("cannot get new connection", e);
-                LOG.info("wait for next idle connection");
-                // datasource cannot create any new connection
-                // wait for next idle connection for 5 seconds
-                try
-                {
-                    c = idleConnections.poll(timeout, TimeUnit.MILLISECONDS);
-                } catch (InterruptedException e1)
-                {
-                }
-            }
-        }
-
-        if(c == null)
-        {
-            throw new SQLException("Could not create connection to database " + url +
-                    " with the user " + username + ", and jdbc driver " + driverClassName);
-        }
-
-        return c;
     }
 
     public void returnConnection(Connection conn)
     {
-        try
-        {
-            if(conn.isClosed() == false)
-            {
-                synchronized (idleConnections)
-                {
-                    if(idleConnections.contains(conn) == false)
-                    {
-                        idleConnections.add(conn);
-                    }
-                }
-            }
-        }catch(Throwable t)
-        {
-            LOG.warn("Cannot return connection " + conn, t);
-        }
     }
 
     public final PrintWriter getLogWriter()
