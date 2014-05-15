@@ -157,12 +157,13 @@ public class DataSourceImpl implements DataSource
     public final Connection getConnection(int timeout)
     throws SQLException
     {
-    	try{
-    		return service.getConnection();
+        try
+        {
+            return service.getConnection();
         } catch(SQLException e)
         {
-        	LOG.error("Could not create connection to database {} with the user {} and jdbc driver {}", 
-        			new String[]{url, username, driverClassName});
+            LOG.error("Could not create connection to database {} with the user {} and jdbc driver {}",
+                    new String[]{url, username, driverClassName});
             throw e;
         }
     }
