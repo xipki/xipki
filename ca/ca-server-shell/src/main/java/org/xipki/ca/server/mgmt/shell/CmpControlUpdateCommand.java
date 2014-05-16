@@ -24,7 +24,7 @@ import org.apache.felix.gogo.commands.Option;
 public class CmpControlUpdateCommand extends CaCommand
 {
     @Option(name = "-ecc", aliases = { "--enableConfirmCert" },
-            description = "Confirm of certificate is required, the default is not required")
+            description = "Confirm of certificate is required")
     protected Boolean           enabledConfirmCert;
 
     @Option(name = "-dcc", aliases = { "--disableConfirmCert" },
@@ -32,7 +32,7 @@ public class CmpControlUpdateCommand extends CaCommand
     protected Boolean           disableConfirmCert;
 
     @Option(name = "-esc", aliases = { "--enableSendCaCert" },
-            description = "Enable sending CA certificate in the response, the default is disabled")
+            description = "Enable sending CA certificate in the response")
     protected Boolean            enableSendCaCert;
 
     @Option(name = "-dsc", aliases = { "--disableSendCaCert" },

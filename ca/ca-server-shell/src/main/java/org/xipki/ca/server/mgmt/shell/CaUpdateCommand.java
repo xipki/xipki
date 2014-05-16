@@ -88,7 +88,7 @@ public class CaUpdateCommand extends CaCommand
     protected String            signerConf;
 
     @Option(name = "-edk", aliases = { "--enableDuplicateKey" },
-            description = "Allow duplicate key, the default is not allowed")
+            description = "Allow duplicate key")
     protected Boolean           enableDuplicateKey;
 
     @Option(name = "-ddk", aliases = { "--disableDuplicateKey" },
@@ -96,7 +96,7 @@ public class CaUpdateCommand extends CaCommand
     protected Boolean           disableDuplicateKey;
 
     @Option(name = "-eds", aliases = { "--enableDuplicateSubject" },
-            description = "Allow duplicate subject, the default is not allowed")
+            description = "Allow duplicate subject")
     protected Boolean           enableDuplicateSubject;
 
     @Option(name = "-dds", aliases = { "--disableDuplicateSubject" },
