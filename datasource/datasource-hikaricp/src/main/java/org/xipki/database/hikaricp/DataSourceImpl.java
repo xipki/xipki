@@ -170,12 +170,14 @@ public class DataSourceImpl implements DataSource
 
     public void returnConnection(Connection conn)
     {
-    	try {
-			conn.close();
-		} catch (SQLException e) {
-			LOG.warn("Could not close connection: {}", e.getMessage());
-			LOG.debug("Could not close connection", e);
-		}
+        try
+        {
+            conn.close();
+        } catch (SQLException e)
+        {
+            LOG.warn("Could not close connection: {}", e.getMessage());
+            LOG.debug("Could not close connection", e);
+        }
     }
 
     public final PrintWriter getLogWriter()
