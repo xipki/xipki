@@ -22,8 +22,6 @@ public class OperationException extends Exception
     public static enum ErrorCode
     {
         UNKNOWN_CERT_PROFILE,
-//        NO_PERMISSION_OF_CERT_PROFILE,
-//        EMPTY_SUBJECT,
         CERT_REVOKED,
         UNKNOWN_CERT,
         System_Failure,
