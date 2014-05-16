@@ -93,6 +93,7 @@ import org.xipki.ca.api.CAStatus;
 import org.xipki.ca.api.CertAlreadyIssuedException;
 import org.xipki.ca.api.InsuffientPermissionException;
 import org.xipki.ca.api.OperationException;
+import org.xipki.ca.api.OperationException.ErrorCode;
 import org.xipki.ca.api.profile.OriginalProfileConf;
 import org.xipki.ca.api.publisher.CertificateInfo;
 import org.xipki.ca.cmp.CmpUtil;
@@ -880,12 +881,14 @@ public class X509CACmpResponder extends CmpResponder
             return new CertResponse(certReqId, status);
         }catch(OperationException ce)
         {
-            LOG.warn("geneate certificate, OperationException: {}", ce.getMessage());
+            ErrorCode code = ce.getErrorCode();
+            LOG.warn("geneate certificate, OperationException: code={}, message={}",
+                    code.name(), ce.getMessage());
 
             AuditStatus auditStatus;
             String auditMessage;
             int failureInfo;
-            switch(ce.getErrorCode())
+            switch(code)
             {
                 case ALREADY_ISSUED:
                     failureInfo = PKIFailureInfo.badRequest;
@@ -944,8 +947,11 @@ public class X509CACmpResponder extends CmpResponder
                     break;
             }
 
-            childAuditEvent.setStatus(auditStatus);
-            childAuditEvent.addEventData(new AuditEventData("message", auditMessage));
+            if(childAuditEvent != null)
+            {
+                childAuditEvent.setStatus(auditStatus);
+                childAuditEvent.addEventData(new AuditEventData("message", auditMessage));
+            }
             PKIStatusInfo status = generateCmpRejectionStatus(failureInfo, ce.getErrorMessage());
             return new CertResponse(certReqId, status);
         }

@@ -17,7 +17,6 @@
 
 package org.xipki.ca.server.store;
 
-import java.beans.FeatureDescriptor;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
