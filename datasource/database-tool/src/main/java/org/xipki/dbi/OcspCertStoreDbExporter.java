@@ -33,6 +33,8 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 
 import org.bouncycastle.util.encoders.Base64;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xipki.database.api.DataSource;
 import org.xipki.dbi.ocsp.jaxb.CertStoreType;
 import org.xipki.dbi.ocsp.jaxb.CertStoreType.CertsFiles;
@@ -47,6 +49,8 @@ import org.xipki.security.common.ParamChecker;
 
 class OcspCertStoreDbExporter extends DbPorter
 {
+	private static final Logger LOG = LoggerFactory.getLogger(OcspCertStoreDbExporter.class);
+	
     private final Marshaller marshaller;
 
     private final ObjectFactory objFact = new ObjectFactory();
@@ -196,19 +200,28 @@ class OcspCertStoreDbExporter extends DbPorter
                     ResultSet rawCertRs = rawCertPs.executeQuery();
                     try
                     {
-                        rawCertRs.next();
-                        String b64Cert = rawCertRs.getString("CERT");
-                        byte[] cert = Base64.decode(b64Cert);
-                        sha1_fp_cert = IoCertUtil.sha1sum(cert);
-
-                        ZipEntry certZipEntry = new ZipEntry(sha1_fp_cert + ".der");
-                        currentCertsZip.putNextEntry(certZipEntry);
-                        try
+                        if(rawCertRs.next())
                         {
-                            currentCertsZip.write(cert);
-                        }finally
+	                        String b64Cert = rawCertRs.getString("CERT");
+	                        byte[] cert = Base64.decode(b64Cert);
+	                        sha1_fp_cert = IoCertUtil.sha1sum(cert);
+	
+	                        ZipEntry certZipEntry = new ZipEntry(sha1_fp_cert + ".der");
+	                        currentCertsZip.putNextEntry(certZipEntry);
+	                        try
+	                        {
+	                            currentCertsZip.write(cert);
+	                        }finally
+	                        {
+	                            currentCertsZip.closeEntry();
+	                        }
+                        }
+                        else
                         {
-                            currentCertsZip.closeEntry();
+                            String msg = "Found no certificate in table RAWCERT for cert_id '" + id + "'";
+                            LOG.error(msg);
+                            System.out.println(msg);
+                            continue;
                         }
                     }finally
                     {
