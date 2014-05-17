@@ -30,12 +30,10 @@ import org.bouncycastle.util.encoders.Hex;
 public class HashCalculator
 {
     private final static int parallelism = 50;
-    private final ConcurrentHashMap<HashAlgoType, BlockingDeque<MessageDigest>> mdsMap =
+    private final static ConcurrentHashMap<HashAlgoType, BlockingDeque<MessageDigest>> mdsMap =
             new ConcurrentHashMap<>();
 
-    public HashCalculator()
-    throws NoSuchAlgorithmException
-    {
+    static{
         mdsMap.put(HashAlgoType.SHA1, getMessageDigests("SHA-1"));
         mdsMap.put(HashAlgoType.SHA224, getMessageDigests("SHA-224"));
         mdsMap.put(HashAlgoType.SHA256, getMessageDigests("SHA-256"));
@@ -43,25 +41,29 @@ public class HashCalculator
         mdsMap.put(HashAlgoType.SHA512, getMessageDigests("SHA-512"));
     }
 
-    private BlockingDeque<MessageDigest> getMessageDigests(String hashAlgo)
-    throws NoSuchAlgorithmException
+    private static BlockingDeque<MessageDigest> getMessageDigests(String hashAlgo)
     {
         BlockingDeque<MessageDigest> mds = new LinkedBlockingDeque<MessageDigest>();
         for(int i = 0; i < parallelism; i++)
         {
-            MessageDigest md = MessageDigest.getInstance(hashAlgo);
+            MessageDigest md;
+			try {
+				md = MessageDigest.getInstance(hashAlgo);
+			} catch (NoSuchAlgorithmException e) {
+				throw new RuntimeException("No such hash algorithm " + hashAlgo);
+			}
             mds.addLast(md);
         }
         return mds;
     }
 
-    public String hexHash(HashAlgoType hashAlgoType, byte[] data)
+    public static String hexHash(HashAlgoType hashAlgoType, byte[] data)
     {
         byte[] bytes = hash(hashAlgoType, data);
         return bytes == null ? null : Hex.toHexString(bytes).toUpperCase();
     }
 
-    public byte[] hash(HashAlgoType hashAlgoType, byte[] data)
+    public static byte[] hash(HashAlgoType hashAlgoType, byte[] data)
     {
         if(hashAlgoType == null)
         {

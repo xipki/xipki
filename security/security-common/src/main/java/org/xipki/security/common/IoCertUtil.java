@@ -45,12 +45,9 @@ import org.bouncycastle.asn1.DERUTF8String;
 import org.bouncycastle.asn1.x500.RDN;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x500.style.IETFUtils;
-import org.bouncycastle.crypto.digests.SHA1Digest;
-import org.bouncycastle.util.encoders.Hex;
 
 public class IoCertUtil
 {
-    private static final SHA1Digest sha1 = new SHA1Digest();
     private static final ASN1ObjectIdentifier[] forwardDNs = new ASN1ObjectIdentifier[]
     {
         ObjectIdentifiers.DN_C,
@@ -241,8 +238,9 @@ public class IoCertUtil
                     throw new IOException("NoSuchProviderException: " + e.getMessage());
                 }
             }
-            return (X509Certificate) certFact.generateCertificate(certStream);
         }
+        
+        return (X509Certificate) certFact.generateCertificate(certStream);
     }
 
     public static X509CRL parseCRL(String f)
@@ -338,13 +336,6 @@ public class IoCertUtil
 
     public static String sha1sum(byte[] data)
     {
-        synchronized (sha1)
-        {
-            sha1.reset();
-            sha1.update(data, 0, data.length);
-            byte[] hashValue = new byte[20];
-            sha1.doFinal(hashValue, 0);
-            return Hex.toHexString(hashValue).toUpperCase();
-        }
+    	return HashCalculator.hexHash(HashAlgoType.SHA1, data);
     }
 }
