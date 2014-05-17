@@ -23,7 +23,7 @@ import java.util.Map;
 import org.xipki.ocsp.api.CertRevocationInfo;
 import org.xipki.ocsp.api.CertStatus;
 import org.xipki.ocsp.api.CertStatusInfo;
-import org.xipki.ocsp.api.HashAlgoType;
+import org.xipki.security.common.HashAlgoType;
 import org.xipki.security.common.ParamChecker;
 
 class CrlCertStatusInfo

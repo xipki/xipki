@@ -19,6 +19,8 @@ package org.xipki.ocsp.api;
 
 import java.util.Date;
 
+import org.xipki.security.common.HashAlgoType;
+
 public class CertStatusInfo
 {
 

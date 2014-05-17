@@ -44,7 +44,7 @@ import org.xipki.ocsp.api.CertRevocationInfo;
 import org.xipki.ocsp.api.CertStatusInfo;
 import org.xipki.ocsp.api.CertStatusStore;
 import org.xipki.ocsp.api.CertStatusStoreException;
-import org.xipki.ocsp.api.HashAlgoType;
+import org.xipki.security.common.HashAlgoType;
 import org.xipki.security.common.ParamChecker;
 
 public class DbCertStatusStore implements CertStatusStore

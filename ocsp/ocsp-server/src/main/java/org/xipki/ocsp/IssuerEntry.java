@@ -20,7 +20,7 @@ package org.xipki.ocsp;
 import java.util.Arrays;
 import java.util.Map;
 
-import org.xipki.ocsp.api.HashAlgoType;
+import org.xipki.security.common.HashAlgoType;
 
 public class IssuerEntry
 {

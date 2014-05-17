@@ -78,7 +78,6 @@ import org.xipki.ocsp.api.CertStatus;
 import org.xipki.ocsp.api.CertStatusInfo;
 import org.xipki.ocsp.api.CertStatusStore;
 import org.xipki.ocsp.api.CertStatusStoreException;
-import org.xipki.ocsp.api.HashAlgoType;
 import org.xipki.ocsp.crlstore.CrlCertStatusStore;
 import org.xipki.ocsp.dbstore.DbCertStatusStore;
 import org.xipki.security.api.ConcurrentContentSigner;
@@ -87,6 +86,7 @@ import org.xipki.security.api.PasswordResolverException;
 import org.xipki.security.api.SecurityFactory;
 import org.xipki.security.api.SignerException;
 import org.xipki.security.common.CmpUtf8Pairs;
+import org.xipki.security.common.HashAlgoType;
 import org.xipki.security.common.HealthCheckResult;
 import org.xipki.security.common.IoCertUtil;
 

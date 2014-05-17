@@ -73,7 +73,6 @@ class CertStoreQueryExecutor
 
     private AtomicInteger cert_id;
 
-    private final MessageDigest sha1md;
     private final DataSource dataSource;
 
     private final CertBasedIdentityStore caInfoStore;
@@ -84,13 +83,6 @@ class CertStoreQueryExecutor
     throws SQLException
     {
         this.dataSource = dataSource;
-        try
-        {
-            this.sha1md = MessageDigest.getInstance("SHA-1");
-        } catch (NoSuchAlgorithmException e)
-        {
-            throw new RuntimeException("Should not reach here. Error message: " + e.getMessage());
-        }
 
         String sql = "SELECT MAX(ID) FROM CERT";
         PreparedStatement ps = borrowPreparedStatement(sql);
@@ -1082,11 +1074,7 @@ class CertStoreQueryExecutor
 
     private String fp(byte[] data)
     {
-        synchronized (sha1md)
-        {
-            sha1md.reset();
-            return Hex.toHexString(sha1md.digest(data)).toUpperCase();
-        }
+    	return IoCertUtil.sha1sum(data);
     }
 
     private int getCertBasedIdentityId(X509CertificateWithMetaInfo identityCert, CertBasedIdentityStore store)

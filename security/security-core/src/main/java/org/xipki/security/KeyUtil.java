@@ -245,10 +245,7 @@ public class KeyUtil
     {
         RSAPublicKeySpec keySpec = new RSAPublicKeySpec(modulus, publicExponent);
         KeyFactory kf = getKeyFactory("RSA");
-        synchronized (kf)
-        {
-            return (RSAPublicKey) kf.generatePublic(keySpec);
-        }
+        return (RSAPublicKey) kf.generatePublic(keySpec);
     }
 
     public static ECPublicKey generateECPublicKey(String curveOid, byte[] encodedQ)
@@ -259,10 +256,7 @@ public class KeyUtil
         ECPublicKeySpec keySpec = new ECPublicKeySpec(q, spec);
 
         KeyFactory kf = getKeyFactory("EC");
-        synchronized (kf)
-        {
-            return (ECPublicKey) kf.generatePublic(keySpec);
-        }
+        return (ECPublicKey) kf.generatePublic(keySpec);
     }
 
     public static AsymmetricKeyParameter generatePrivateKeyParameter(
