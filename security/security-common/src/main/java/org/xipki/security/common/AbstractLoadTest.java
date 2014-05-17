@@ -24,6 +24,7 @@ import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public abstract class AbstractLoadTest
 {
@@ -99,18 +100,18 @@ public abstract class AbstractLoadTest
         }
     }
 
-    private int account = 0;
-    private int errorAccount = 0;
+    private AtomicInteger account = new AtomicInteger(0);
+    private AtomicInteger errorAccount = new AtomicInteger(0);
 
     public int getErrorAccout()
     {
-        return errorAccount;
+        return errorAccount.get();
     }
 
-    protected synchronized void account(int all, int failed)
+    protected void account(int all, int failed)
     {
-        account += all;
-        errorAccount += failed;
+        account.addAndGet(all);
+        errorAccount.addAndGet(failed);
     }
 
     private long startTime = 0;
@@ -120,9 +121,9 @@ public abstract class AbstractLoadTest
         measureDeque.add(new MeasurePoint(startTime, 0));
     }
 
-    protected synchronized boolean stop()
+    protected boolean stop()
     {
-        return errorAccount > 0 || System.currentTimeMillis() - startTime >= duration * 1000L;
+        return errorAccount.get() > 0 || System.currentTimeMillis() - startTime >= duration * 1000L;
     }
 
     protected static void printHeader()
@@ -132,7 +133,7 @@ public abstract class AbstractLoadTest
 
     protected void printStatus()
     {
-        int currentAccount = account;
+        int currentAccount = account.get();
         long now = System.currentTimeMillis();
         measureDeque.addLast(new MeasurePoint(now, currentAccount));
 
@@ -192,9 +193,9 @@ public abstract class AbstractLoadTest
         StringBuilder sb = new StringBuilder();
         long ms = (System.currentTimeMillis() - startTime);
         sb.append("\nFinished in " + ms/1000f + " s\n");
-        sb.append("Account: " + account + " " + unit + "\n");
-        sb.append(" Failed: " + errorAccount + " " + unit + "\n");
-        sb.append("Average: " + (account * 1000 / ms) + " " + unit + "/s\n");
+        sb.append("Account: " + account.get() + " " + unit + "\n");
+        sb.append(" Failed: " + errorAccount.get() + " " + unit + "\n");
+        sb.append("Average: " + (account.get() * 1000 / ms) + " " + unit + "/s\n");
         System.out.println(sb.toString());
     }
 
