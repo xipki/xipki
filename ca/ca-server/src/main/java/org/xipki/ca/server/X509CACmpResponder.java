@@ -90,7 +90,6 @@ import org.xipki.audit.api.AuditEventData;
 import org.xipki.audit.api.AuditStatus;
 import org.xipki.audit.api.ChildAuditEvent;
 import org.xipki.ca.api.CAStatus;
-import org.xipki.ca.api.CertAlreadyIssuedException;
 import org.xipki.ca.api.InsuffientPermissionException;
 import org.xipki.ca.api.OperationException;
 import org.xipki.ca.api.OperationException.ErrorCode;
@@ -868,25 +867,15 @@ public class X509CACmpResponder extends CmpResponder
             CertifiedKeyPair kp = new CertifiedKeyPair(cec);
             CertResponse certResp = new CertResponse(certReqId, statusInfo, kp, null);
             return certResp;
-        }catch (CertAlreadyIssuedException e)
-        {
-            LOG.warn("geneate certificate, CertAlreadyIssuedException: {}", e.getMessage());
-            int failureInfo = PKIFailureInfo.incorrectData;
-            PKIStatusInfo status = generateCmpRejectionStatus(failureInfo, e.getMessage());
-            if(childAuditEvent != null)
-            {
-                childAuditEvent.setStatus(AuditStatus.FAILED);
-                childAuditEvent.addEventData(new AuditEventData("message", "cert already issued"));
-            }
-            return new CertResponse(certReqId, status);
         }catch(OperationException ce)
         {
             ErrorCode code = ce.getErrorCode();
             LOG.warn("geneate certificate, OperationException: code={}, message={}",
-                    code.name(), ce.getMessage());
+                    code.name(), ce.getErrorMessage());
 
             AuditStatus auditStatus;
             String auditMessage;
+
             int failureInfo;
             switch(code)
             {
@@ -952,7 +941,9 @@ public class X509CACmpResponder extends CmpResponder
                 childAuditEvent.setStatus(auditStatus);
                 childAuditEvent.addEventData(new AuditEventData("message", auditMessage));
             }
-            PKIStatusInfo status = generateCmpRejectionStatus(failureInfo, ce.getErrorMessage());
+            
+            String errorMessage = auditMessage;
+            PKIStatusInfo status = generateCmpRejectionStatus(failureInfo, errorMessage);
             return new CertResponse(certReqId, status);
         }
     }

@@ -19,7 +19,7 @@ package org.xipki.ocsp;
 
 import java.util.Arrays;
 
-import org.xipki.ocsp.api.HashAlgoType;
+import org.xipki.security.common.HashAlgoType;
 import org.xipki.security.common.ParamChecker;
 
 public class IssuerHashNameAndKey

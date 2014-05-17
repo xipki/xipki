@@ -20,6 +20,7 @@ package org.xipki.ocsp.api;
 import java.math.BigInteger;
 
 import org.xipki.audit.api.AuditLoggingService;
+import org.xipki.security.common.HashAlgoType;
 
 public interface CertStatusStore
 {

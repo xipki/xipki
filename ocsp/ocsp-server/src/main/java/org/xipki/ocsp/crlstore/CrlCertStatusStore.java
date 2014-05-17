@@ -21,7 +21,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.math.BigInteger;
-import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509CRL;
 import java.security.cert.X509CRLEntry;
@@ -61,8 +60,9 @@ import org.xipki.ocsp.api.CertRevocationInfo;
 import org.xipki.ocsp.api.CertStatusInfo;
 import org.xipki.ocsp.api.CertStatusStore;
 import org.xipki.ocsp.api.CertStatusStoreException;
-import org.xipki.ocsp.api.HashAlgoType;
 import org.xipki.security.common.CustomObjectIdentifiers;
+import org.xipki.security.common.HashAlgoType;
+import org.xipki.security.common.HashCalculator;
 import org.xipki.security.common.IoCertUtil;
 import org.xipki.security.common.ParamChecker;
 
@@ -246,15 +246,6 @@ public class CrlCertStatusStore implements CertStatusStore
             Date newThisUpdate = crl.getThisUpdate();
             Date newNextUpdate = crl.getNextUpdate();
 
-            HashCalculator hashCalculator;
-            try
-            {
-                hashCalculator = new HashCalculator();
-            } catch (NoSuchAlgorithmException e)
-            {
-                throw new CertStatusStoreException(e);
-            }
-
             byte[] encodedCaCert;
             try
             {
@@ -281,8 +272,8 @@ public class CrlCertStatusStore implements CertStatusStore
 
             for(HashAlgoType hashAlgo : HashAlgoType.values())
             {
-                byte[] issuerNameHash = hashCalculator.hash(hashAlgo, encodedName);
-                byte[] issuerKeyHash = hashCalculator.hash(hashAlgo, encodedKey);
+                byte[] issuerNameHash = HashCalculator.hash(hashAlgo, encodedName);
+                byte[] issuerKeyHash = HashCalculator.hash(hashAlgo, encodedKey);
                 IssuerHashNameAndKey issuerHash = new IssuerHashNameAndKey(hashAlgo, issuerNameHash, issuerKeyHash);
                 newIssuerHashMap.put(hashAlgo, issuerHash);
             }
@@ -390,7 +381,7 @@ public class CrlCertStatusStore implements CertStatusStore
                         certs.remove(cert);
                     }
 
-                    Map<HashAlgoType, byte[]> certHashes = (cert == null) ? null : getCertHashes(hashCalculator, cert.cert);
+                    Map<HashAlgoType, byte[]> certHashes = (cert == null) ? null : getCertHashes(cert.cert);
 
                     CertRevocationInfo revocationInfo = new CertRevocationInfo(reasonCode, revTime, invalidityTime);
                     CrlCertStatusInfo crlCertStatusInfo = CrlCertStatusInfo.getRevocatedCertStatusInfo(
@@ -403,7 +394,7 @@ public class CrlCertStatusStore implements CertStatusStore
             {
                 CrlCertStatusInfo crlCertStatusInfo = CrlCertStatusInfo.getGoodCertStatusInfo(
                         cert.profileName,
-                        getCertHashes(hashCalculator, cert.cert));
+                        getCertHashes(cert.cert));
                 newCertStatusInfoMap.put(cert.cert.getSerialNumber().getPositiveValue(), crlCertStatusInfo);
             }
 
@@ -451,7 +442,7 @@ public class CrlCertStatusStore implements CertStatusStore
         }
     }
 
-    private static Map<HashAlgoType, byte[]> getCertHashes(HashCalculator hashCalculator, Certificate cert)
+    private static Map<HashAlgoType, byte[]> getCertHashes(Certificate cert)
     throws CertStatusStoreException
     {
         byte[] encodedCert;
@@ -466,7 +457,7 @@ public class CrlCertStatusStore implements CertStatusStore
         Map<HashAlgoType, byte[]> certHashes = new ConcurrentHashMap<HashAlgoType, byte[]>();
         for(HashAlgoType hashAlgo : HashAlgoType.values())
         {
-            byte[] certHash = hashCalculator.hash(hashAlgo, encodedCert);
+            byte[] certHash = HashCalculator.hash(hashAlgo, encodedCert);
             certHashes.put(hashAlgo, certHash);
         }
 

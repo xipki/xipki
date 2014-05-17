@@ -23,7 +23,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.xipki.ocsp.api.HashAlgoType;
+import org.xipki.security.common.HashAlgoType;
 
 public class IssuerStore
 {
@@ -56,7 +56,7 @@ public class IssuerStore
         return ids;
     }
 
-    public Integer getIssuerIdForFp( HashAlgoType hashAlgo, byte[] issuerNameHash, byte[] issuerKeyHash)
+    public Integer getIssuerIdForFp(HashAlgoType hashAlgo, byte[] issuerNameHash, byte[] issuerKeyHash)
     {
         IssuerEntry issuerEntry = getIssuerForFp(hashAlgo, issuerNameHash, issuerKeyHash);
         return issuerEntry == null ? null : issuerEntry.getId();

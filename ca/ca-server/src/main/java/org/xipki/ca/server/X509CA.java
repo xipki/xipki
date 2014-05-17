@@ -21,7 +21,6 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.security.InvalidKeyException;
-import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.PublicKey;
@@ -83,7 +82,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.ca.api.CAMgmtException;
 import org.xipki.ca.api.CAStatus;
-import org.xipki.ca.api.CertAlreadyIssuedException;
 import org.xipki.ca.api.OperationException;
 import org.xipki.ca.api.OperationException.ErrorCode;
 import org.xipki.ca.api.profile.BadCertTemplateException;
@@ -106,6 +104,8 @@ import org.xipki.ca.server.store.CertificateStore;
 import org.xipki.security.api.ConcurrentContentSigner;
 import org.xipki.security.api.NoIdleSignerException;
 import org.xipki.security.common.CustomObjectIdentifiers;
+import org.xipki.security.common.HashAlgoType;
+import org.xipki.security.common.HashCalculator;
 import org.xipki.security.common.HealthCheckResult;
 import org.xipki.security.common.IoCertUtil;
 import org.xipki.security.common.ParamChecker;
@@ -127,7 +127,6 @@ public class X509CA
     private final ConcurrentContentSigner caSigner;
     private final X500Name caSubjectX500Name;
     private final byte[] caSKI;
-    private final MessageDigest sha1;
     private final CertificateStore certstore;
     private final CrlSigner crlSigner;
 
@@ -179,14 +178,6 @@ public class X509CA
         this.caSKI = ski.getOctets();
 
         this.cf = new CertificateFactory();
-
-        try
-        {
-            sha1 = MessageDigest.getInstance("SHA-1");
-        } catch (NoSuchAlgorithmException e)
-        {
-            throw new OperationException(ErrorCode.System_Failure, "NoSuchAlgorithmException: " + e.getMessage());
-        }
 
         if(crlSigner != null && crlSigner.getPeriod() > 0)
         {
@@ -555,7 +546,7 @@ public class X509CA
                 {
                     throw new OperationException(ErrorCode.CRL_FAILURE, "CRLException: " + e.getMessage());
                 }
-            }// end synchronized crlLock
+            }
         }finally
         {
             if(successfull == false)
@@ -620,7 +611,7 @@ public class X509CA
             Date notBefore,
             Date notAfter,
             Extensions extensions)
-    throws OperationException, CertAlreadyIssuedException
+    throws OperationException
     {
         LOG.info("START generateCertificate: CA={}, profile={}, origProfile={}, subject={}",
                 new Object[]{caInfo.getName(), certProfileName, origCertProfile, subject});
@@ -688,10 +679,6 @@ public class X509CA
         {
             LOG.warn("RuntimeException in regenerateCertificate()", e);
             throw new OperationException(ErrorCode.System_Failure, "RuntimeException:  " + e.getMessage());
-        } catch (CertAlreadyIssuedException e)
-        {
-            LOG.warn("CertAlreadyIssuedException in regenerateCertificate(), should not reach here", e);
-            throw new OperationException(ErrorCode.ALREADY_ISSUED, "CertAlreadyIssuedException:  " + e.getMessage());
         } finally
         {
             if(successfull == false)
@@ -965,7 +952,7 @@ public class X509CA
             Date notAfter,
             org.bouncycastle.asn1.x509.Extensions extensions,
             boolean keyUpdate)
-    throws OperationException, CertAlreadyIssuedException
+    throws OperationException
     {
         IdentifiedCertProfile certProfile = getX509CertProfile(certProfileName);
 
@@ -1007,7 +994,7 @@ public class X509CA
         // make sure that the grantedSubject does not equal the CA's subject
         if(grantedSubject.equals(caSubjectX500Name))
         {
-            throw new CertAlreadyIssuedException("Certificate with the same subject as CA is not allowed");
+            throw new OperationException(ErrorCode.ALREADY_ISSUED, "Certificate with the same subject as CA is not allowed");
         }
 
         String sha1FpSubject = IoCertUtil.sha1sum_canonicalized_name(grantedSubject);
@@ -1042,7 +1029,7 @@ public class X509CA
                         byte[] encodedCert = certstore.getEncodedCertificate(certIds, sha1FpSubject, certProfileName);
                         if(encodedCert == null)
                         {
-                            throw new CertAlreadyIssuedException("Certificate for the given public key already issued");
+                            throw new OperationException(ErrorCode.ALREADY_ISSUED, "Certificate for the given public key already issued");
                         }
                         else
                         {
@@ -1085,7 +1072,7 @@ public class X509CA
 
                     if(incSerialNumberAllowed == false)
                     {
-                        throw new CertAlreadyIssuedException("Certificate for the given subject " + grandtedSubjectText + " already issued");
+                        throw new OperationException(ErrorCode.ALREADY_ISSUED, "Certificate for the given subject " + grandtedSubjectText + " already issued");
                     }
 
                     do
@@ -1107,7 +1094,7 @@ public class X509CA
         {
             if(pendingSubjectSha1Fps.contains(sha1FpSubject))
             {
-                throw new CertAlreadyIssuedException("Certificate for the given subject " + grandtedSubjectText + " already in process");
+                throw new OperationException(ErrorCode.ALREADY_ISSUED, "Certificate for the given subject " + grandtedSubjectText + " already in process");
             }
             pendingSubjectSha1Fps.add(sha1FpSubject);
         }
@@ -1316,11 +1303,8 @@ public class X509CA
             return;
         }
 
-        byte[] skiValue;
-        synchronized (sha1)
-        {
-            skiValue = sha1.digest(publicKeyInfo.getEncoded());
-        }
+        byte[] data = publicKeyInfo.getEncoded();
+        byte[] skiValue = HashCalculator.hash(HashAlgoType.SHA1, data);
         SubjectKeyIdentifier value = new SubjectKeyIdentifier(skiValue);
 
         certBuilder.addExtension(Extension.subjectKeyIdentifier, extOccurrence.isCritical(), value);
