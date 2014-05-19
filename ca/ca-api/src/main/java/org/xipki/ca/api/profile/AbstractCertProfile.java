@@ -42,7 +42,8 @@ import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.xipki.security.common.EnvironmentParameterResolver;
 import org.xipki.security.common.ObjectIdentifiers;
 
-public abstract class AbstractCertProfile extends CertProfile
+public abstract class AbstractCertProfile
+extends CertProfile implements SubjectDNSubset
 {
     private final List<ASN1ObjectIdentifier> forwardDNs;
 
@@ -89,7 +90,8 @@ public abstract class AbstractCertProfile extends CertProfile
         forwardDNs = Collections.unmodifiableList(_forwardDNs);
     }
 
-    protected Set<RDNOccurrence> getSubjectDNSequence()
+    @Override
+    public List<RDNOccurrence> getSubjectDNSubset()
     {
         return null;
     }
@@ -123,7 +125,7 @@ public abstract class AbstractCertProfile extends CertProfile
 
         RDN[] requstedRDNs = requestedSubject.getRDNs();
 
-        Set<RDNOccurrence> occurences = getSubjectDNSequence();
+        List<RDNOccurrence> occurences = getSubjectDNSubset();
 
         List<RDN> rdns = new LinkedList<RDN>();
 
@@ -163,7 +165,7 @@ public abstract class AbstractCertProfile extends CertProfile
         return new SubjectInfo(grantedSubject, null);
     }
 
-    private static RDNOccurrence getRDNOccurrence(Set<RDNOccurrence> occurences, ASN1ObjectIdentifier type)
+    private static RDNOccurrence getRDNOccurrence(List<RDNOccurrence> occurences, ASN1ObjectIdentifier type)
     {
         for(RDNOccurrence occurence : occurences)
         {
@@ -197,8 +199,7 @@ public abstract class AbstractCertProfile extends CertProfile
         }
     }
 
-    @SuppressWarnings("unused")
-    private EnvironmentParameterResolver paramterResolver;
+    protected EnvironmentParameterResolver paramterResolver;
     @Override
     public void setEnvironmentParamterResolver(
             EnvironmentParameterResolver paramterResolver)
@@ -222,7 +223,8 @@ public abstract class AbstractCertProfile extends CertProfile
         ExtensionOccurrence occurence = occurences.remove(extensionType);
         if(occurence != null)
         {
-            ExtensionTuple extension = createBasicConstraints(occurence.isCritical());
+            BasicConstraints value = X509Util.createBasicConstraints(isCa(), getPathLenBasicConstraint());
+            ExtensionTuple extension = createExtension(Extension.basicConstraints, occurence.isCritical(), value);
             checkAndAddExtension(extensionType, occurence, extension, tuples);
         }
 
@@ -231,7 +233,8 @@ public abstract class AbstractCertProfile extends CertProfile
         occurence = occurences.remove(extensionType);
         if(occurence != null)
         {
-            ExtensionTuple extension = createKeyUsage(occurence.isCritical());
+            org.bouncycastle.asn1.x509.KeyUsage value = X509Util.createKeyUsage(getKeyUsage());
+            ExtensionTuple extension = createExtension(Extension.keyUsage, occurence.isCritical(), value);
             checkAndAddExtension(extensionType, occurence, extension, tuples);
         }
 
@@ -240,24 +243,15 @@ public abstract class AbstractCertProfile extends CertProfile
         occurence = occurences.remove(extensionType);
         if(occurence != null)
         {
-            ExtensionTuple extension = createExtendedKeyUsage(occurence.isCritical());
+            ExtendedKeyUsage value = X509Util.createExtendedUsage(getExtendedKeyUsages());
+            ExtensionTuple extension = createExtension(Extension.extendedKeyUsage, occurence.isCritical(), value);
             checkAndAddExtension(extensionType, occurence, extension, tuples);
-        }
-
-        if(occurences.isEmpty() == false)
-        {
-            StringBuilder sb = new StringBuilder("Extensions with the following types are not processed: ");
-            for(ASN1ObjectIdentifier extnType : occurences.keySet())
-            {
-                sb.append(extnType.getId()).append(", ");
-            }
-            throw new CertProfileException(sb.substring(0, sb.length() - 2));
         }
 
         return tuples;
     }
 
-    private static void checkAndAddExtension(ASN1ObjectIdentifier type, ExtensionOccurrence occurence,
+    protected static void checkAndAddExtension(ASN1ObjectIdentifier type, ExtensionOccurrence occurence,
             ExtensionTuple extension, ExtensionTuples tuples)
     throws CertProfileException
     {
@@ -271,28 +265,7 @@ public abstract class AbstractCertProfile extends CertProfile
         }
     }
 
-    private ExtensionTuple createBasicConstraints(boolean critical)
-    throws CertProfileException
-    {
-        BasicConstraints value = X509Util.createBasicConstraints(isCa(), getPathLenBasicConstraint());
-        return createExtension(Extension.basicConstraints, critical, value);
-    }
-
-    private ExtensionTuple createKeyUsage(boolean critical)
-    throws CertProfileException
-    {
-        org.bouncycastle.asn1.x509.KeyUsage value = X509Util.createKeyUsage(getKeyUsage());
-        return createExtension(Extension.keyUsage, critical, value);
-    }
-
-    private ExtensionTuple createExtendedKeyUsage(boolean critical)
-    throws CertProfileException
-    {
-        ExtendedKeyUsage value = X509Util.createExtendedUsage(getExtendedKeyUsages());
-        return createExtension(Extension.extendedKeyUsage, critical, value);
-    }
-
-    private static ExtensionTuple createExtension(ASN1ObjectIdentifier type, boolean critical, ASN1Object value)
+    protected static ExtensionTuple createExtension(ASN1ObjectIdentifier type, boolean critical, ASN1Object value)
     throws CertProfileException
     {
         return (value == null) ? null : new ExtensionTuple(type, critical, value);
@@ -342,7 +315,7 @@ public abstract class AbstractCertProfile extends CertProfile
     private void verifySubjectDNOccurence(X500Name requestedSubject)
     throws BadCertTemplateException
     {
-        Set<RDNOccurrence> occurences = getSubjectDNSequence();
+    	List<RDNOccurrence> occurences = getSubjectDNSubset();
         if(occurences == null)
         {
             return;
@@ -409,7 +382,7 @@ public abstract class AbstractCertProfile extends CertProfile
         return IETFUtils.valueToString(rdn.getFirst().getValue());
     }
 
-    private RDN createSubjectRDN(String text, ASN1ObjectIdentifier type)
+    protected RDN createSubjectRDN(String text, ASN1ObjectIdentifier type)
     throws BadCertTemplateException
     {
         text = text.trim();

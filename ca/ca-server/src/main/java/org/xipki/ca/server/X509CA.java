@@ -1025,8 +1025,10 @@ public class X509CA
 
                     if(certIds != null && certIds.isEmpty() == false)
                     {
+                    	String origCertProfileName = origCertProfileConf == null ?
+                    			certProfileName : origCertProfileConf.getProfileName();
                         // return issued certificate if all of requested public key, certProfile and subject match
-                        byte[] encodedCert = certstore.getEncodedCertificate(certIds, sha1FpSubject, certProfileName);
+                        byte[] encodedCert = certstore.getEncodedCertificate(certIds, sha1FpSubject, origCertProfileName);
                         if(encodedCert == null)
                         {
                             throw new OperationException(ErrorCode.ALREADY_ISSUED, "Certificate for the given public key already issued");
@@ -1037,7 +1039,7 @@ public class X509CA
                             CertificateInfo certInfo = new CertificateInfo(
                                     new X509CertificateWithMetaInfo(cert),
                                     this.caInfo.getCertificate(),
-                                    subjectPublicKey, certProfileName);
+                                    subjectPublicKey, origCertProfileName);
                             certInfo.setAlreadyIssued(true);
                             return certInfo;
                         }
