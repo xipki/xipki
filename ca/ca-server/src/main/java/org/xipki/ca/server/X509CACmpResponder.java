@@ -941,7 +941,7 @@ public class X509CACmpResponder extends CmpResponder
                 childAuditEvent.setStatus(auditStatus);
                 childAuditEvent.addEventData(new AuditEventData("message", auditMessage));
             }
-            
+
             String errorMessage = auditMessage;
             PKIStatusInfo status = generateCmpRejectionStatus(failureInfo, errorMessage);
             return new CertResponse(certReqId, status);

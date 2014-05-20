@@ -30,7 +30,6 @@ import java.security.cert.CRLException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509CRL;
 import java.security.cert.X509Certificate;
-import java.security.interfaces.ECPublicKey;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
@@ -133,7 +132,7 @@ public class X509CA
     private final CAManagerImpl caManager;
     private final Object nextSerialLock = new Object();
     private final Object crlLock = new Object();
-    private Boolean trySunECtoVerify;
+    private Boolean tryXipkiNSStoVerify;
 
     private final ConcurrentSkipListSet<String> pendingSubjectSha1Fps = new ConcurrentSkipListSet<String>();
     private final AtomicInteger numActiveRevocations = new AtomicInteger(0);
@@ -1025,8 +1024,8 @@ public class X509CA
 
                     if(certIds != null && certIds.isEmpty() == false)
                     {
-                    	String origCertProfileName = origCertProfileConf == null ?
-                    			certProfileName : origCertProfileConf.getProfileName();
+                        String origCertProfileName = origCertProfileConf == null ?
+                                certProfileName : origCertProfileConf.getProfileName();
                         // return issued certificate if all of requested public key, certProfile and subject match
                         byte[] encodedCert = certstore.getEncodedCertificate(certIds, sha1FpSubject, origCertProfileName);
                         if(encodedCert == null)
@@ -1581,9 +1580,9 @@ public class X509CA
         PublicKey caPublicKey = caInfo.getCertificate().getCert().getPublicKey();
         try
         {
-            if(trySunECtoVerify == null)
+            final String provider = "XipkiNSS";
+            if(tryXipkiNSStoVerify == null)
             {
-                final String provider = "SunEC";
                 byte[] tbs = cert.getTBSCertificate();
                 byte[] signatureValue = cert.getSignature();
                 String sigAlgName = cert.getSigAlgName();
@@ -1595,21 +1594,21 @@ public class X509CA
                     boolean sigValid = verifier.verify(signatureValue);
 
                     LOG.info("Use {} to verify {} signature", provider, sigAlgName);
-                    trySunECtoVerify = Boolean.TRUE;
+                    tryXipkiNSStoVerify = Boolean.TRUE;
                     return sigValid;
                 }catch(Exception e)
                 {
-                    LOG.warn("Could not use {} to verify {} signature", provider, sigAlgName);
-                    trySunECtoVerify = Boolean.FALSE;
+                    LOG.info("Cannot use {} to verify {} signature", provider, sigAlgName);
+                    tryXipkiNSStoVerify = Boolean.FALSE;
                 }
             }
 
-            if(trySunECtoVerify && (caPublicKey instanceof ECPublicKey))
+            if(tryXipkiNSStoVerify)
             {
                 byte[] tbs = cert.getTBSCertificate();
                 byte[] signatureValue = cert.getSignature();
                 String sigAlgName = cert.getSigAlgName();
-                Signature verifier = Signature.getInstance(sigAlgName, "SunEC");
+                Signature verifier = Signature.getInstance(sigAlgName, provider);
                 verifier.initVerify(caPublicKey);
                 verifier.update(tbs);
                 return verifier.verify(signatureValue);

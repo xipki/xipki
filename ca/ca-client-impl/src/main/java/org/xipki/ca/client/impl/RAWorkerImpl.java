@@ -1189,34 +1189,34 @@ public final class RAWorkerImpl extends AbstractRAWorker implements RAWorker
         {
             if(trySunECtoVerify == null)
             {
-            	if(caPublicKey instanceof ECPublicKey)
-            	{
-	                final String provider = "SunEC";
-	                byte[] tbs = _cert.getTBSCertificate();
-	                byte[] signatureValue = _cert.getSignature();
-	                String sigAlgName = _cert.getSigAlgName();
-	                try
-	                {
-	                    Signature verifier = Signature.getInstance(sigAlgName, provider);
-	                    verifier.initVerify(caPublicKey);
-	                    verifier.update(tbs);
-	                    boolean sigValid = verifier.verify(signatureValue);
-	
-	                    LOG.info("Use {} to verify {} signature", provider, sigAlgName);
-	                    trySunECtoVerify = Boolean.TRUE;
-	                    return sigValid;
-	                }catch(Exception e)
-	                {
-	                    LOG.warn("Could not use {} to verify {} signature", provider, sigAlgName);
-	                    trySunECtoVerify = Boolean.FALSE;
-	                }
-	
-	                trySunECtoVerifyMap.put(_caCert, trySunECtoVerify);
-            	}
-            	else
-            	{
-            		trySunECtoVerify = false;
-            	}
+                if(caPublicKey instanceof ECPublicKey)
+                {
+                    final String provider = "SunEC";
+                    byte[] tbs = _cert.getTBSCertificate();
+                    byte[] signatureValue = _cert.getSignature();
+                    String sigAlgName = _cert.getSigAlgName();
+                    try
+                    {
+                        Signature verifier = Signature.getInstance(sigAlgName, provider);
+                        verifier.initVerify(caPublicKey);
+                        verifier.update(tbs);
+                        boolean sigValid = verifier.verify(signatureValue);
+
+                        LOG.info("Use {} to verify {} signature", provider, sigAlgName);
+                        trySunECtoVerify = Boolean.TRUE;
+                        return sigValid;
+                    }catch(Exception e)
+                    {
+                        LOG.warn("Could not use {} to verify {} signature", provider, sigAlgName);
+                        trySunECtoVerify = Boolean.FALSE;
+                    }
+
+                    trySunECtoVerifyMap.put(_caCert, trySunECtoVerify);
+                }
+                else
+                {
+                    trySunECtoVerify = false;
+                }
             }
 
             if(trySunECtoVerify && (caPublicKey instanceof ECPublicKey))
