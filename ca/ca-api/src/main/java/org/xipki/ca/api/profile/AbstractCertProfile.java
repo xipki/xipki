@@ -89,10 +89,10 @@ extends CertProfile implements SubjectDNSubset
 
         forwardDNs = Collections.unmodifiableList(_forwardDNs);
     }
-    
+
     protected String[] sortRDNs(ASN1ObjectIdentifier type, String[] values)
     {
-    	return values;
+        return values;
     }
 
     @Override
@@ -153,7 +153,7 @@ extends CertProfile implements SubjectDNSubset
                 throw new BadCertTemplateException("Number of SubjectDN field " + type.getId() +
                         " not within [" + occurrence.getMinOccurs() + ", " + occurrence.getMaxOccurs() + "]");
             }
-            
+
             if(thisRDNs == null || thisRDNs.length < 1)
             {
                 continue;
@@ -167,17 +167,17 @@ extends CertProfile implements SubjectDNSubset
             }
             else
             {
-	            String[] values = new String[size];
-	            for(int i = 0; i < size; i++)
-	            {
-	            	values[i] = IETFUtils.valueToString(thisRDNs[i].getFirst().getValue());
-	            }
-	            values = sortRDNs(type, values);
-	            
-	            for(String value : values)
-	            {
-	                rdns.add(createSubjectRDN(value, type));
-	            }
+                String[] values = new String[size];
+                for(int i = 0; i < size; i++)
+                {
+                    values[i] = IETFUtils.valueToString(thisRDNs[i].getFirst().getValue());
+                }
+                values = sortRDNs(type, values);
+
+                for(String value : values)
+                {
+                    rdns.add(createSubjectRDN(value, type));
+                }
             }
         }
 
