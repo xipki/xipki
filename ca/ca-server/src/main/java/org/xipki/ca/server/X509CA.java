@@ -27,6 +27,7 @@ import java.security.PublicKey;
 import java.security.Signature;
 import java.security.SignatureException;
 import java.security.cert.CRLException;
+import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509CRL;
 import java.security.cert.X509Certificate;
@@ -99,6 +100,7 @@ import org.xipki.ca.server.mgmt.CAEntry;
 import org.xipki.ca.server.mgmt.CAManagerImpl;
 import org.xipki.ca.server.mgmt.CertProfileEntry;
 import org.xipki.ca.server.mgmt.PublisherEntry;
+import org.xipki.ca.server.store.CertWithRevocationInfo;
 import org.xipki.ca.server.store.CertificateStore;
 import org.xipki.security.api.ConcurrentContentSigner;
 import org.xipki.security.api.NoIdleSignerException;
@@ -907,8 +909,7 @@ public class X509CA
                     }
                 }
             }
-
-        }finally
+        } finally
         {
             numActiveRevocations.addAndGet(-1);
         }
@@ -1015,44 +1016,52 @@ public class X509CA
         }
         else
         {
-            if(caInfo.isAllowDuplicateKey() == false)
+            /*
+             * If there exists a certificate whose public key, subject and profile match the request,
+             * returns the certificate if it is not revoked, otherwise OperationException with
+             * ErrorCode CERT_REVOKED will be thrown
+             */
+            try
             {
-                try
-                {
-                    byte[] subjectPublicKey =  publicKeyInfo.getEncoded();
-                    List<Integer> certIds = certstore.getCertIdsForPublicKey(this.caInfo.getCertificate(), subjectPublicKey);
+                byte[] subjectPublicKey =  publicKeyInfo.getEncoded();
+                List<Integer> certIds = certstore.getCertIdsForPublicKey(this.caInfo.getCertificate(), subjectPublicKey);
 
-                    if(certIds != null && certIds.isEmpty() == false)
+                if(certIds != null && certIds.isEmpty() == false)
+                {
+                    String origCertProfileName = origCertProfileConf == null ?
+                            certProfileName : origCertProfileConf.getProfileName();
+                    // return issued certificate if all of requested public key, certProfile and subject match
+                    CertWithRevocationInfo issuedCert = certstore.getCertificate(certIds, sha1FpSubject, origCertProfileName);
+                    if(issuedCert == null)
                     {
-                        String origCertProfileName = origCertProfileConf == null ?
-                                certProfileName : origCertProfileConf.getProfileName();
-                        // return issued certificate if all of requested public key, certProfile and subject match
-                        byte[] encodedCert = certstore.getEncodedCertificate(certIds, sha1FpSubject, origCertProfileName);
-                        if(encodedCert == null)
+                        if(caInfo.isAllowDuplicateKey() == false)
                         {
-                            throw new OperationException(ErrorCode.ALREADY_ISSUED, "Certificate for the given public key already issued");
-                        }
-                        else
-                        {
-                            X509Certificate cert = IoCertUtil.parseCert(encodedCert);
-                            CertificateInfo certInfo = new CertificateInfo(
-                                    new X509CertificateWithMetaInfo(cert),
-                                    this.caInfo.getCertificate(),
-                                    subjectPublicKey, origCertProfileName);
-                            certInfo.setAlreadyIssued(true);
-                            return certInfo;
+                            throw new OperationException(ErrorCode.ALREADY_ISSUED,
+                                    "Certificate for the given public key already issued");
                         }
                     }
-                } catch (IOException e)
-                {
-                    throw new OperationException(ErrorCode.System_Failure, e.getMessage());
-                } catch (SQLException e)
-                {
-                    throw new OperationException(ErrorCode.DATABASE_FAILURE, e.getMessage());
-                } catch (CertificateException e)
-                {
-                    throw new OperationException(ErrorCode.System_Failure, e.getMessage());
+                    else if(issuedCert.isRevoked())
+                    {
+                         throw new OperationException(ErrorCode.CERT_REVOKED);
+                    }
+                    else
+                    {
+                        return new CertificateInfo(
+                                issuedCert.getCert(),
+                                caInfo.getCertificate(),
+                                subjectPublicKey,
+                                certProfileName);
+                    }
                 }
+            } catch (IOException e)
+            {
+                throw new OperationException(ErrorCode.System_Failure, e.getMessage());
+            } catch (SQLException e)
+            {
+                throw new OperationException(ErrorCode.DATABASE_FAILURE, e.getMessage());
+            } catch (CertificateEncodingException e)
+            {
+                 throw new OperationException(ErrorCode.System_Failure, e.getMessage());
             }
 
             if(caInfo.isAllowDuplicateSubject() == false)
@@ -1081,7 +1090,7 @@ public class X509CA
                         try
                         {
                             grantedSubject = incSerialNumber(certProfile, grantedSubject);
-                        } catch (BadCertTemplateException e)
+                        }catch (BadCertTemplateException e)
                         {
                             throw new OperationException(ErrorCode.BAD_CERT_TEMPLATE, e.getMessage());
                         }

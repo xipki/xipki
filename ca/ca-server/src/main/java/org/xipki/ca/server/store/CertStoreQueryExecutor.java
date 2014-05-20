@@ -668,7 +668,7 @@ class CertStoreQueryExecutor
         }
     }
 
-    byte[] getEncodedCertificate(List<Integer> certIds, String sha1FpSubject, String certProfile)
+    CertWithRevocationInfo getCertificate(List<Integer> certIds, String sha1FpSubject, String certProfile)
     throws SQLException, OperationException
     {
         ParamChecker.assertNotEmpty("certIds", certIds);
@@ -681,10 +681,11 @@ class CertStoreQueryExecutor
             return null;
         }
 
-        String sql = "COUNT(*) FROM CERT WHERE ID=? AND SHA1_FP_SUBJECT=? AND CERTPROFILEINFO_ID=?";
+        String sql = "REVOCATED FROM CERT WHERE ID=? AND SHA1_FP_SUBJECT=? AND CERTPROFILEINFO_ID=?";
         sql = createFetchFirstSelectSQL(sql, 1);
         PreparedStatement ps = borrowPreparedStatement(sql);
 
+        Boolean revoked = null;
         Integer certId = null;
         try
         {
@@ -698,8 +699,9 @@ class CertStoreQueryExecutor
                     ps.setString(idx++, sha1FpSubject);
                     ps.setInt(idx++, profileId);
                     rs = ps.executeQuery();
-                    if(rs.next() && rs.getInt(1) > 0)
+                    if(rs.next())
                     {
+                        revoked = rs.getBoolean("REVOCATED");
                         certId = _certId;
                         break;
                     }
@@ -731,7 +733,25 @@ class CertStoreQueryExecutor
             if(rs.next())
             {
                 String b64Cert = rs.getString("CERT");
-                return b64Cert == null ? null : Base64.decode(b64Cert);
+                if(b64Cert == null)
+                {
+                    return null;
+                }
+
+                byte[] encodedCert = Base64.decode(b64Cert);
+                X509Certificate cert;
+                try
+                {
+                    cert = IoCertUtil.parseCert(encodedCert);
+                } catch (CertificateException e)
+                {
+                    throw new OperationException(ErrorCode.System_Failure, "CertificateException: " + e.getMessage());
+                } catch (IOException e)
+                {
+                    throw new OperationException(ErrorCode.System_Failure, "IOException: " + e.getMessage());
+                }
+                X509CertificateWithMetaInfo certWithMeta = new X509CertificateWithMetaInfo(cert, encodedCert);
+                return new CertWithRevocationInfo(certWithMeta, revoked);
             }
         }finally
         {
@@ -976,7 +996,7 @@ class CertStoreQueryExecutor
             return false;
         }
 
-        String sql = "COUNT(*) FROM CERT WHERE SHA1_FP_SUBJECT=? AND CAINFO_ID=?";
+        String sql = "COUNT(ID) FROM CERT WHERE SHA1_FP_SUBJECT=? AND CAINFO_ID=?";
         sql = createFetchFirstSelectSQL(sql, 1);
 
         PreparedStatement ps = borrowPreparedStatement(sql);
