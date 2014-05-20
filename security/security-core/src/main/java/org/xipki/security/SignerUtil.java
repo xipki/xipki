@@ -213,6 +213,60 @@ public class SignerUtil
         return new AlgorithmIdentifier(sid, DERNull.INSTANCE);
     }
 
+    static public String getSignatureAlgoName(AlgorithmIdentifier sigAlgId)
+    {
+        ASN1ObjectIdentifier algOid = sigAlgId.getAlgorithm();
+
+        if(X9ObjectIdentifiers.ecdsa_with_SHA1.equals(algOid))
+        {
+            return "SHA1withECDSA";
+        }
+        else if(X9ObjectIdentifiers.ecdsa_with_SHA224.equals(algOid))
+        {
+            return "SHA224withECDSA";
+        }
+        else if(X9ObjectIdentifiers.ecdsa_with_SHA256.equals(algOid))
+        {
+            return "SHA256withECDSA";
+        }
+        else if(X9ObjectIdentifiers.ecdsa_with_SHA384.equals(algOid))
+        {
+            return "SHA384withECDSA";
+        }
+        else if(X9ObjectIdentifiers.ecdsa_with_SHA512.equals(algOid))
+        {
+            return "SHA512withECDSA";
+        }
+        else if(PKCSObjectIdentifiers.sha1WithRSAEncryption.equals(algOid))
+        {
+            return "SHA1withRSA";
+        }
+        else if(PKCSObjectIdentifiers.sha224WithRSAEncryption.equals(algOid))
+        {
+            return "SHA224withRSA";
+        }
+        else if(PKCSObjectIdentifiers.sha256WithRSAEncryption.equals(algOid))
+        {
+            return "SHA256withRSA";
+        }
+        else if(PKCSObjectIdentifiers.sha384WithRSAEncryption.equals(algOid))
+        {
+            return "SHA384withRSA";
+        }
+        else if(PKCSObjectIdentifiers.sha512WithRSAEncryption.equals(algOid))
+        {
+            return "SHA512withRSA";
+        }
+        else if(PKCSObjectIdentifiers.id_RSASSA_PSS.equals(algOid))
+        {
+            return null;
+        }
+        else
+        {
+            return null;
+        }
+    }
+
     static public AlgorithmIdentifier extractDigesetAlgorithmIdentifier(AlgorithmIdentifier sigAlgId)
     throws NoSuchAlgorithmException
     {

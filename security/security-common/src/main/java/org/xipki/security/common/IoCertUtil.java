@@ -239,7 +239,7 @@ public class IoCertUtil
                 }
             }
         }
-        
+
         return (X509Certificate) certFact.generateCertificate(certStream);
     }
 
@@ -336,6 +336,6 @@ public class IoCertUtil
 
     public static String sha1sum(byte[] data)
     {
-    	return HashCalculator.hexHash(HashAlgoType.SHA1, data);
+        return HashCalculator.hexHash(HashAlgoType.SHA1, data);
     }
 }
