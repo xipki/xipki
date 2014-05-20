@@ -2,8 +2,8 @@ KEYSIZE = 2048
 
 # Valid signer algos are SHA<n>withRSA and SHA<n>withRSAandMGF1, where n is 1, 256, 384 and 512
 #
-#CA_SIGNER_ALGO = SHA256withRSA
-CA_SIGNER_ALGO = SHA256withRSAandMGF1
+CA_SIGNER_ALGO = SHA256withRSA
+#CA_SIGNER_ALGO = SHA256withRSAandMGF1
 
 features:install xipki-security-shell
 
