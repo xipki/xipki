@@ -33,7 +33,8 @@ public class HashCalculator
     private final static ConcurrentHashMap<HashAlgoType, BlockingDeque<MessageDigest>> mdsMap =
             new ConcurrentHashMap<>();
 
-    static{
+    static
+    {
         mdsMap.put(HashAlgoType.SHA1, getMessageDigests("SHA-1"));
         mdsMap.put(HashAlgoType.SHA224, getMessageDigests("SHA-224"));
         mdsMap.put(HashAlgoType.SHA256, getMessageDigests("SHA-256"));
@@ -47,11 +48,13 @@ public class HashCalculator
         for(int i = 0; i < parallelism; i++)
         {
             MessageDigest md;
-			try {
-				md = MessageDigest.getInstance(hashAlgo);
-			} catch (NoSuchAlgorithmException e) {
-				throw new RuntimeException("No such hash algorithm " + hashAlgo);
-			}
+            try
+            {
+                md = MessageDigest.getInstance(hashAlgo);
+            } catch (NoSuchAlgorithmException e)
+            {
+                throw new RuntimeException("No such hash algorithm " + hashAlgo);
+            }
             mds.addLast(md);
         }
         return mds;
