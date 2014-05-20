@@ -49,8 +49,8 @@ import org.xipki.security.common.ParamChecker;
 
 class OcspCertStoreDbExporter extends DbPorter
 {
-	private static final Logger LOG = LoggerFactory.getLogger(OcspCertStoreDbExporter.class);
-	
+    private static final Logger LOG = LoggerFactory.getLogger(OcspCertStoreDbExporter.class);
+
     private final Marshaller marshaller;
 
     private final ObjectFactory objFact = new ObjectFactory();
@@ -202,19 +202,19 @@ class OcspCertStoreDbExporter extends DbPorter
                     {
                         if(rawCertRs.next())
                         {
-	                        String b64Cert = rawCertRs.getString("CERT");
-	                        byte[] cert = Base64.decode(b64Cert);
-	                        sha1_fp_cert = IoCertUtil.sha1sum(cert);
-	
-	                        ZipEntry certZipEntry = new ZipEntry(sha1_fp_cert + ".der");
-	                        currentCertsZip.putNextEntry(certZipEntry);
-	                        try
-	                        {
-	                            currentCertsZip.write(cert);
-	                        }finally
-	                        {
-	                            currentCertsZip.closeEntry();
-	                        }
+                            String b64Cert = rawCertRs.getString("CERT");
+                            byte[] cert = Base64.decode(b64Cert);
+                            sha1_fp_cert = IoCertUtil.sha1sum(cert);
+
+                            ZipEntry certZipEntry = new ZipEntry(sha1_fp_cert + ".der");
+                            currentCertsZip.putNextEntry(certZipEntry);
+                            try
+                            {
+                                currentCertsZip.write(cert);
+                            }finally
+                            {
+                                currentCertsZip.closeEntry();
+                            }
                         }
                         else
                         {

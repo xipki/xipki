@@ -51,13 +51,10 @@ class CertStatusStoreQueryExecutor
 
     private final IssuerStore issuerStore;
 
-    private final HashCalculator hashCalculator;
-
     CertStatusStoreQueryExecutor(DataSource dataSource)
     throws SQLException, NoSuchAlgorithmException
     {
         this.dataSource = dataSource;
-        this.hashCalculator = new HashCalculator();
 
         final String sql = "SELECT MAX(ID) FROM CERT";
         PreparedStatement ps = borrowPreparedStatement(sql);
@@ -277,11 +274,11 @@ class CertStatusStoreQueryExecutor
             {
                 int idx = 1;
                 ps.setInt(idx++, certId);
-                ps.setString(idx++, hashCalculator.hexHash(HashAlgoType.SHA1, encodedCert));
-                ps.setString(idx++, hashCalculator.hexHash(HashAlgoType.SHA224, encodedCert));
-                ps.setString(idx++, hashCalculator.hexHash(HashAlgoType.SHA256, encodedCert));
-                ps.setString(idx++, hashCalculator.hexHash(HashAlgoType.SHA384, encodedCert));
-                ps.setString(idx++, hashCalculator.hexHash(HashAlgoType.SHA512, encodedCert));
+                ps.setString(idx++, HashCalculator.hexHash(HashAlgoType.SHA1, encodedCert));
+                ps.setString(idx++, HashCalculator.hexHash(HashAlgoType.SHA224, encodedCert));
+                ps.setString(idx++, HashCalculator.hexHash(HashAlgoType.SHA256, encodedCert));
+                ps.setString(idx++, HashCalculator.hexHash(HashAlgoType.SHA384, encodedCert));
+                ps.setString(idx++, HashCalculator.hexHash(HashAlgoType.SHA512, encodedCert));
                 ps.executeUpdate();
             }finally
             {
@@ -321,7 +318,7 @@ class CertStatusStoreQueryExecutor
                 " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         PreparedStatement ps = borrowPreparedStatement(sql);
 
-        String hexSha1FpCert = hashCalculator.hexHash(HashAlgoType.SHA1, issuerCert.getEncodedCert());
+        String hexSha1FpCert = HashCalculator.hexHash(HashAlgoType.SHA1, issuerCert.getEncodedCert());
 
         Certificate bcCert = Certificate.getInstance(issuerCert.getEncodedCert());
         byte[] encodedName;
@@ -342,16 +339,16 @@ class CertStatusStoreQueryExecutor
             int idx = 1;
             ps.setInt(idx++, id.intValue());
             ps.setString(idx++, subject);
-            ps.setString(idx++, hashCalculator.hexHash(HashAlgoType.SHA1, encodedName));
-            ps.setString(idx++, hashCalculator.hexHash(HashAlgoType.SHA1, encodedKey));
-            ps.setString(idx++, hashCalculator.hexHash(HashAlgoType.SHA224, encodedName));
-            ps.setString(idx++, hashCalculator.hexHash(HashAlgoType.SHA224, encodedKey));
-            ps.setString(idx++, hashCalculator.hexHash(HashAlgoType.SHA256, encodedName));
-            ps.setString(idx++, hashCalculator.hexHash(HashAlgoType.SHA256, encodedKey));
-            ps.setString(idx++, hashCalculator.hexHash(HashAlgoType.SHA384, encodedName));
-            ps.setString(idx++, hashCalculator.hexHash(HashAlgoType.SHA384, encodedKey));
-            ps.setString(idx++, hashCalculator.hexHash(HashAlgoType.SHA512, encodedName));
-            ps.setString(idx++, hashCalculator.hexHash(HashAlgoType.SHA512, encodedKey));
+            ps.setString(idx++, HashCalculator.hexHash(HashAlgoType.SHA1, encodedName));
+            ps.setString(idx++, HashCalculator.hexHash(HashAlgoType.SHA1, encodedKey));
+            ps.setString(idx++, HashCalculator.hexHash(HashAlgoType.SHA224, encodedName));
+            ps.setString(idx++, HashCalculator.hexHash(HashAlgoType.SHA224, encodedKey));
+            ps.setString(idx++, HashCalculator.hexHash(HashAlgoType.SHA256, encodedName));
+            ps.setString(idx++, HashCalculator.hexHash(HashAlgoType.SHA256, encodedKey));
+            ps.setString(idx++, HashCalculator.hexHash(HashAlgoType.SHA384, encodedName));
+            ps.setString(idx++, HashCalculator.hexHash(HashAlgoType.SHA384, encodedKey));
+            ps.setString(idx++, HashCalculator.hexHash(HashAlgoType.SHA512, encodedName));
+            ps.setString(idx++, HashCalculator.hexHash(HashAlgoType.SHA512, encodedKey));
             ps.setString(idx++, hexSha1FpCert);
             ps.setString(idx++, b64Cert);
 

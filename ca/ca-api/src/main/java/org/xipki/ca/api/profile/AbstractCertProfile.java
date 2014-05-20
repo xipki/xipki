@@ -315,7 +315,7 @@ extends CertProfile implements SubjectDNSubset
     private void verifySubjectDNOccurence(X500Name requestedSubject)
     throws BadCertTemplateException
     {
-    	List<RDNOccurrence> occurences = getSubjectDNSubset();
+        List<RDNOccurrence> occurences = getSubjectDNSubset();
         if(occurences == null)
         {
             return;

@@ -25,6 +25,7 @@ import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.PrivateKey;
+import java.security.Security;
 import java.security.Signature;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
@@ -36,15 +37,24 @@ import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
 
+import javax.crypto.BadPaddingException;
+import javax.crypto.Cipher;
+import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
-import org.bouncycastle.asn1.x9.X9ObjectIdentifiers;
+import org.bouncycastle.crypto.AsymmetricBlockCipher;
+import org.bouncycastle.crypto.CipherParameters;
 import org.bouncycastle.crypto.Digest;
+import org.bouncycastle.crypto.InvalidCipherTextException;
+import org.bouncycastle.crypto.RuntimeCryptoException;
 import org.bouncycastle.crypto.Signer;
 import org.bouncycastle.crypto.params.AsymmetricKeyParameter;
+import org.bouncycastle.crypto.params.ParametersWithRandom;
+import org.bouncycastle.crypto.params.RSAKeyParameters;
+import org.bouncycastle.crypto.params.RSAPrivateCrtKeyParameters;
 import org.bouncycastle.crypto.signers.DSADigestSigner;
 import org.bouncycastle.crypto.signers.DSASigner;
 import org.bouncycastle.crypto.signers.ECDSASigner;
@@ -58,10 +68,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.security.api.ConcurrentContentSigner;
 import org.xipki.security.api.SignerException;
+import org.xipki.security.bcext.BCRSAPrivateCrtKey;
+import org.xipki.security.bcext.BCRSAPrivateKey;
 
 public class SoftTokenContentSignerBuilder
 {
     private static final Logger LOG = LoggerFactory.getLogger(SoftTokenContentSignerBuilder.class);
+    private static final String PROVIDER_XIPKI_NSS = "XipkiNSS";
+    private static final String PROVIDER_XIPKI_NSS_CIPHER = "SunPKCS11-XipkiNSS";
 
     private final PrivateKey key;
     private final X509Certificate cert;
@@ -171,35 +185,14 @@ public class SoftTokenContentSignerBuilder
 
         List<ContentSigner> signers = new ArrayList<ContentSigner>(parallelism);
 
-        if(key instanceof ECPrivateKey)
-        {
-            final String provider = "SunEC";
-            ASN1ObjectIdentifier algOid = signatureAlgId.getAlgorithm();
-            String algoName;
+        ASN1ObjectIdentifier algOid = signatureAlgId.getAlgorithm();
 
-            if(X9ObjectIdentifiers.ecdsa_with_SHA1.equals(algOid))
+        if(Security.getProvider(PROVIDER_XIPKI_NSS) != null && algOid.equals(PKCSObjectIdentifiers.id_RSASSA_PSS) == false)
+        {
+            String algoName = SignerUtil.getSignatureAlgoName(signatureAlgId);
+            if(algoName == null)
             {
-                algoName = "SHA1withECDSA";
-            }
-            else if(X9ObjectIdentifiers.ecdsa_with_SHA224.equals(algOid))
-            {
-                algoName = "SHA224withECDSA";
-            }
-            else if(X9ObjectIdentifiers.ecdsa_with_SHA256.equals(algOid))
-            {
-                algoName = "SHA256withECDSA";
-            }
-            else if(X9ObjectIdentifiers.ecdsa_with_SHA384.equals(algOid))
-            {
-                algoName = "SHA384withECDSA";
-            }
-            else if(X9ObjectIdentifiers.ecdsa_with_SHA512.equals(algOid))
-            {
-                algoName = "SHA512withECDSA";
-            }
-            else
-            {
-                throw new OperatorCreationException("Unsupported ECDSA signature algorithm " + algOid.getId());
+                throw new OperatorCreationException("Unsupported signature algorithm " + algOid.getId());
             }
 
             boolean useGivenProvider = true;
@@ -207,7 +200,7 @@ public class SoftTokenContentSignerBuilder
             {
                 try
                 {
-                    Signature signature = Signature.getInstance(algoName, provider);
+                    Signature signature = Signature.getInstance(algoName, PROVIDER_XIPKI_NSS);
                     signature.initSign(key);
                     signature.update(new byte[]{1,2,3,4});
                     signature.sign();
@@ -223,11 +216,11 @@ public class SoftTokenContentSignerBuilder
 
             if(useGivenProvider)
             {
-                LOG.info("Use {} to sign {} signature", provider, algoName);
+                LOG.info("Use {} to sign {} signature", PROVIDER_XIPKI_NSS, algoName);
             }
             else
             {
-                LOG.warn("Could not use {} to sign {} signature", provider, algoName);
+                LOG.info("Could not use {} to sign {} signature", PROVIDER_XIPKI_NSS, algoName);
             }
         }
 
@@ -240,7 +233,7 @@ public class SoftTokenContentSignerBuilder
                 if(key instanceof RSAPrivateKey)
                 {
                     keyparam = SignerUtil.generateRSAPrivateKeyParameter((RSAPrivateKey) key);
-                    signerBuilder = new RSAContentSignerBuilder(signatureAlgId);
+                       signerBuilder = new RSAContentSignerBuilder(signatureAlgId);
                 }
                 else if(key instanceof DSAPrivateKey)
                 {
@@ -299,7 +292,28 @@ public class SoftTokenContentSignerBuilder
         {
             if(PKCSObjectIdentifiers.id_RSASSA_PSS.equals(sigAlgId.getAlgorithm()))
             {
-                return SignerUtil.createPSSRSASigner(sigAlgId);
+                if(Security.getProvider(PROVIDER_XIPKI_NSS_CIPHER) != null)
+                {
+                    NssPlainRSASigner plainRSASigner;
+                    try
+                    {
+                        plainRSASigner = new NssPlainRSASigner();
+                    } catch (NoSuchAlgorithmException e)
+                    {
+                        throw new OperatorCreationException(e.getMessage(), e);
+                    } catch (NoSuchProviderException e)
+                    {
+                        throw new OperatorCreationException(e.getMessage(), e);
+                    } catch (NoSuchPaddingException e)
+                    {
+                        throw new OperatorCreationException(e.getMessage(), e);
+                    }
+                    return SignerUtil.createPSSRSASigner(sigAlgId, plainRSASigner);
+                }
+                else
+                {
+                    return SignerUtil.createPSSRSASigner(sigAlgId);
+                }
             }
             else
             {
@@ -341,4 +355,85 @@ public class SoftTokenContentSignerBuilder
                return new DSADigestSigner(new ECDSASigner(), dig);
         }
     } // ECDSAContentSignerBuilder
+
+    private static class NssPlainRSASigner implements AsymmetricBlockCipher
+    {
+        private static final String algorithm = "RSA/ECB/NoPadding";
+        private Cipher cipher;
+        private RSAKeyParameters key;
+
+        public NssPlainRSASigner()
+        throws NoSuchAlgorithmException, NoSuchProviderException, NoSuchPaddingException
+        {
+                 cipher = Cipher.getInstance(algorithm, "SunPKCS11-XipkiNSS");
+        }
+
+        @Override
+        public void init(boolean forEncryption, CipherParameters param)
+        {
+            if(forEncryption == false)
+            {
+                throw new RuntimeCryptoException("Verification mode not supported.");
+            }
+
+            if (param instanceof ParametersWithRandom)
+            {
+                ParametersWithRandom    rParam = (ParametersWithRandom)param;
+
+                key = (RSAKeyParameters)rParam.getParameters();
+            }
+            else
+            {
+                key = (RSAKeyParameters)param;
+            }
+
+            RSAPrivateKey signingKey;
+            if(key instanceof RSAPrivateCrtKeyParameters)
+            {
+                signingKey = new BCRSAPrivateCrtKey((RSAPrivateCrtKeyParameters) key);
+            }
+            else
+            {
+                signingKey = new BCRSAPrivateKey(key);
+            }
+
+            try
+            {
+                cipher.init(Cipher.ENCRYPT_MODE, signingKey);
+            } catch (InvalidKeyException e)
+            {
+                e.printStackTrace();
+                throw new RuntimeCryptoException("Could not initialize the cipher: " + e.getMessage());
+            }
+        }
+
+        @Override
+        public int getInputBlockSize()
+        {
+            return (key.getModulus().bitLength() + 7) / 8;
+        }
+
+        @Override
+        public int getOutputBlockSize()
+        {
+            return (key.getModulus().bitLength() + 7) / 8;
+        }
+
+        @Override
+        public byte[] processBlock(byte[] in, int inOff, int len)
+        throws InvalidCipherTextException
+        {
+            try
+            {
+                return cipher.doFinal(in, 0, in.length);
+            } catch (IllegalBlockSizeException e)
+            {
+                throw new InvalidCipherTextException(e.getMessage(), e);
+            } catch (BadPaddingException e)
+            {
+                throw new InvalidCipherTextException(e.getMessage(), e);
+            }
+        }
+    }
+
 }
