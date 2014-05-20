@@ -253,10 +253,10 @@ public class CertificateStore
         return queryExecutor.getEncodedCertificate(caCert, serial);
     }
 
-    public byte[] getEncodedCertificate(List<Integer> certIds, String sha1FpSubject, String certProfile)
+    public CertWithRevocationInfo getCertificate(List<Integer> certIds, String sha1FpSubject, String certProfile)
     throws SQLException, OperationException
     {
-        return queryExecutor.getEncodedCertificate(certIds, sha1FpSubject, certProfile);
+        return queryExecutor.getCertificate(certIds, sha1FpSubject, certProfile);
     }
 
     public CertificateInfo getCertificateInfo(X509CertificateWithMetaInfo caCert, BigInteger serial)
