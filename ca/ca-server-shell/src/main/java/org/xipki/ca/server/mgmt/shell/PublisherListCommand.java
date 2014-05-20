@@ -52,7 +52,10 @@ public class PublisherListCommand extends CaCommand
         else
         {
             PublisherEntry entry = caManager.getPublisher(name);
-            sb.append(entry.toString());
+            if(entry != null)
+            {
+                sb.append(entry.toString());
+            }
         }
 
         System.out.println(sb.toString());

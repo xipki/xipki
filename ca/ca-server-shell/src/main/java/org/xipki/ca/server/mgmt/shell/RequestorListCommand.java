@@ -52,7 +52,10 @@ public class RequestorListCommand extends CaCommand
         else
         {
             CmpRequestorEntry entry = caManager.getCmpRequestor(name);
-            sb.append(entry.toString());
+            if(entry != null)
+            {
+                sb.append(entry.toString());
+            }
         }
 
         System.out.println(sb.toString());
