@@ -38,7 +38,6 @@ class DbPorter
 
     protected final DataSource dataSource;
     protected final String baseDir;
-    protected Connection dsConnection;
 
     DbPorter(DataSource dataSource, String baseDir)
     {
@@ -53,42 +52,31 @@ class DbPorter
     protected Statement createStatement()
     throws SQLException
     {
-        if(dsConnection == null || dsConnection.isClosed())
-        {
-            dsConnection = dataSource.getConnection(0);
-        }
-
-        if(dsConnection == null || dsConnection.isClosed())
-        {
-            throw new SQLException("Could not get connection");
-        }
-
-        return dsConnection.createStatement();
+        Connection dsConnection = dataSource.getConnection();
+        return dataSource.createStatement(dsConnection);
     }
 
     protected PreparedStatement prepareStatement(String sql)
     throws SQLException
     {
-        if(dsConnection == null || dsConnection.isClosed())
-        {
-            dsConnection = dataSource.getConnection(0);
-        }
-
-        if(dsConnection == null || dsConnection.isClosed())
-        {
-            throw new SQLException("Could not get connection");
-        }
-
-        return dsConnection.prepareStatement(sql);
+        Connection dsConnection = dataSource.getConnection();
+        return dataSource.prepareStatement(dsConnection, sql);
     }
 
-    protected static void closeStatement(Statement ps)
+    protected void closeStatement(Statement ps)
     {
         if(ps != null)
         {
             try
             {
                 ps.close();
+            } catch (SQLException e)
+            {
+            }
+
+            try
+            {
+                dataSource.returnConnection(ps.getConnection());
             } catch (SQLException e)
             {
             }

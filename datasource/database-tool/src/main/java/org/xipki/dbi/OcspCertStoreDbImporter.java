@@ -51,7 +51,6 @@ class OcspCertStoreDbImporter extends DbPorter
     private static final Logger LOG = LoggerFactory.getLogger(OcspCertStoreDbImporter.class);
 
     private final Unmarshaller unmarshaller;
-    private final HashCalculator hashCalculator;
 
     OcspCertStoreDbImporter(DataSource dataSource, Unmarshaller unmarshaller, String srcDir)
     throws SQLException, PasswordResolverException, NoSuchAlgorithmException
@@ -59,7 +58,6 @@ class OcspCertStoreDbImporter extends DbPorter
         super(dataSource, srcDir);
         ParamChecker.assertNotNull("unmarshaller", unmarshaller);
         this.unmarshaller = unmarshaller;
-        this.hashCalculator = new HashCalculator();
     }
 
     public void importToDB()
@@ -133,17 +131,17 @@ class OcspCertStoreDbImporter extends DbPorter
                     int idx = 1;
                     ps.setInt   (idx++, issuer.getId());
                     ps.setString(idx++, IoCertUtil.canonicalizeName(c.getSubject()));
-                    ps.setString(idx++, hashCalculator.hexHash(HashAlgoType.SHA1, encodedName));
-                    ps.setString(idx++, hashCalculator.hexHash(HashAlgoType.SHA1, encodedKey));
-                    ps.setString(idx++, hashCalculator.hexHash(HashAlgoType.SHA224, encodedName));
-                    ps.setString(idx++, hashCalculator.hexHash(HashAlgoType.SHA224, encodedKey));
-                    ps.setString(idx++, hashCalculator.hexHash(HashAlgoType.SHA256, encodedName));
-                    ps.setString(idx++, hashCalculator.hexHash(HashAlgoType.SHA256, encodedKey));
-                    ps.setString(idx++, hashCalculator.hexHash(HashAlgoType.SHA384, encodedName));
-                    ps.setString(idx++, hashCalculator.hexHash(HashAlgoType.SHA384, encodedKey));
-                    ps.setString(idx++, hashCalculator.hexHash(HashAlgoType.SHA512, encodedName));
-                    ps.setString(idx++, hashCalculator.hexHash(HashAlgoType.SHA512, encodedKey));
-                    ps.setString(idx++, hashCalculator.hexHash(HashAlgoType.SHA1, encodedCert));
+                    ps.setString(idx++, HashCalculator.hexHash(HashAlgoType.SHA1, encodedName));
+                    ps.setString(idx++, HashCalculator.hexHash(HashAlgoType.SHA1, encodedKey));
+                    ps.setString(idx++, HashCalculator.hexHash(HashAlgoType.SHA224, encodedName));
+                    ps.setString(idx++, HashCalculator.hexHash(HashAlgoType.SHA224, encodedKey));
+                    ps.setString(idx++, HashCalculator.hexHash(HashAlgoType.SHA256, encodedName));
+                    ps.setString(idx++, HashCalculator.hexHash(HashAlgoType.SHA256, encodedKey));
+                    ps.setString(idx++, HashCalculator.hexHash(HashAlgoType.SHA384, encodedName));
+                    ps.setString(idx++, HashCalculator.hexHash(HashAlgoType.SHA384, encodedKey));
+                    ps.setString(idx++, HashCalculator.hexHash(HashAlgoType.SHA512, encodedName));
+                    ps.setString(idx++, HashCalculator.hexHash(HashAlgoType.SHA512, encodedKey));
+                    ps.setString(idx++, HashCalculator.hexHash(HashAlgoType.SHA1, encodedCert));
                     ps.setString(idx++, b64Cert);
 
                     ps.execute();
@@ -264,11 +262,11 @@ class OcspCertStoreDbImporter extends DbPorter
                     // certhash
                     idx = 1;
                     ps_certhash.setInt(idx++, cert.getId());
-                    ps_certhash.setString(idx++, hashCalculator.hexHash(HashAlgoType.SHA1, encodedCert));
-                    ps_certhash.setString(idx++, hashCalculator.hexHash(HashAlgoType.SHA224, encodedCert));
-                    ps_certhash.setString(idx++, hashCalculator.hexHash(HashAlgoType.SHA256, encodedCert));
-                    ps_certhash.setString(idx++, hashCalculator.hexHash(HashAlgoType.SHA384, encodedCert));
-                    ps_certhash.setString(idx++, hashCalculator.hexHash(HashAlgoType.SHA512, encodedCert));
+                    ps_certhash.setString(idx++, HashCalculator.hexHash(HashAlgoType.SHA1, encodedCert));
+                    ps_certhash.setString(idx++, HashCalculator.hexHash(HashAlgoType.SHA224, encodedCert));
+                    ps_certhash.setString(idx++, HashCalculator.hexHash(HashAlgoType.SHA256, encodedCert));
+                    ps_certhash.setString(idx++, HashCalculator.hexHash(HashAlgoType.SHA384, encodedCert));
+                    ps_certhash.setString(idx++, HashCalculator.hexHash(HashAlgoType.SHA512, encodedCert));
 
                     ps_certhash.executeUpdate();
 

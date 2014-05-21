@@ -114,8 +114,6 @@ public class CAManagerImpl implements CAManager
     private static final Map<String, X509CA> x509cas =
             new ConcurrentHashMap<String, X509CA>();
 
-    private Connection dsConnection;
-
     private PasswordResolver passwordResolver;
     private SecurityFactory securityFactory;
     private DataSourceFactory dataSourceFactory;
@@ -1718,13 +1716,20 @@ public class CAManagerImpl implements CAManager
         }
     }
 
-    private static void closeStatement(Statement ps)
+    private void closeStatement(Statement ps)
     {
         if(ps != null)
         {
             try
             {
                 ps.close();
+            } catch (SQLException e)
+            {
+            }
+
+            try
+            {
+                dataSource.returnConnection(ps.getConnection());
             } catch (SQLException e)
             {
             }
@@ -3040,44 +3045,42 @@ public class CAManagerImpl implements CAManager
     private Statement createStatement()
     throws CAMgmtException
     {
+        Connection dsConnection;
         try
         {
-            if(dsConnection == null || dsConnection.isClosed())
-            {
-                dsConnection = dataSource.getConnection(0);
-            }
+            dsConnection = dataSource.getConnection();
+        } catch (SQLException e)
+        {
+            throw new CAMgmtException("Could not get connection", e);
+        }
 
-            if(dsConnection == null || dsConnection.isClosed())
-            {
-                throw new CAMgmtException("Could not get connection");
-            }
-
-            return dataSource.createStatement(dsConnection);
+        try
+        {
+           return dataSource.createStatement(dsConnection);
         }catch(SQLException e)
         {
-            throw new CAMgmtException(e);
+            throw new CAMgmtException("Could not create statement", e);
         }
     }
 
     private PreparedStatement prepareStatement(String sql)
     throws CAMgmtException
     {
+        Connection dsConnection;
         try
         {
-            if(dsConnection == null || dsConnection.isClosed())
-            {
-                dsConnection = dataSource.getConnection(0);
-            }
+            dsConnection = dataSource.getConnection();
+        } catch (SQLException e)
+        {
+            throw new CAMgmtException("Could not get connection", e);
+        }
 
-            if(dsConnection == null || dsConnection.isClosed())
-            {
-                throw new CAMgmtException("Could not get connection");
-            }
-
+        try
+        {
             return dataSource.prepareStatement(dsConnection, sql);
         }catch(SQLException e)
         {
-            throw new CAMgmtException(e);
+            throw new CAMgmtException("Could not get connection", e);
         }
     }
 
