@@ -24,7 +24,7 @@ import java.sql.Statement;
 
 public interface DataSource
 {
-    Connection getConnection(int timeout)
+    Connection getConnection()
     throws SQLException;
 
     void returnConnection(Connection conn);
