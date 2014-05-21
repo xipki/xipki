@@ -154,7 +154,8 @@ public class DataSourceImpl implements DataSource
 
     }
 
-    public final Connection getConnection(int timeout)
+    @Override
+    public final Connection getConnection()
     throws SQLException
     {
         try
@@ -168,6 +169,7 @@ public class DataSourceImpl implements DataSource
         }
     }
 
+    @Override
     public void returnConnection(Connection conn)
     {
         try
@@ -254,6 +256,7 @@ public class DataSourceImpl implements DataSource
         this.defaultTransactionIsolation = defaultTransactionIsolation;
     }
 
+    @Override
     public final DatabaseType getDatabaseType()
     {
         return databaseType;

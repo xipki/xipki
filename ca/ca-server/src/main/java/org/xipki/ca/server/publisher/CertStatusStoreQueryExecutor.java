@@ -374,7 +374,7 @@ class CertStatusStoreQueryExecutor
     throws SQLException
     {
         PreparedStatement ps = null;
-        Connection c = dataSource.getConnection(5000);
+        Connection c = dataSource.getConnection();
         if(c != null)
         {
             ps = dataSource.prepareStatement(c,sqlQuery);
