@@ -139,8 +139,6 @@
 								<!-- karaf boot features (see etc/org.apache.karaf.features.cfg) -->
 								<feature>karaf-framework</feature>
 								<!-- project-core features -->
-								<feature>xipki-datasource-hikaricp</feature>
-								<feature>xipki-datasource</feature>
 								<feature>xipki-caserver</feature>
 								<feature>xipki-caserver-shell</feature>
 								<feature>xipki-caclient-shell</feature>
