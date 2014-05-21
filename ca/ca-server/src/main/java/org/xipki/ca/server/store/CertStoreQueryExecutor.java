@@ -1230,7 +1230,6 @@ class CertStoreQueryExecutor
             try
             {
                 Connection conn = ps.getConnection();
-                ps.close();
                 dataSource.returnConnection(conn);
             }catch(Throwable t)
             {
