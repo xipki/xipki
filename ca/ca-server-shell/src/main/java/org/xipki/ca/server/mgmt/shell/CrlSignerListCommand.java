@@ -52,7 +52,10 @@ public class CrlSignerListCommand extends CaCommand
         else
         {
             CrlSignerEntry entry = caManager.getCrlSigner(name);
-            sb.append(entry.toString());
+            if(entry != null)
+            {
+                sb.append(entry.toString());
+            }
         }
 
         System.out.println(sb.toString());
