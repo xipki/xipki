@@ -672,4 +672,12 @@ abstract class X509CmpRequestor extends CmpRequestor
         return sign(request);
     }
 
+    public PKIMessage envelopeRevocation(RevocateCertRequestType request)
+    throws CmpRequestorException
+    {
+        PKIMessage reqMessage = buildRevocateCertRequest(request);
+        reqMessage = sign(reqMessage);
+        return reqMessage;
+    }
+
 }

@@ -85,4 +85,10 @@ public interface RAWorker
     byte[] envelope(CertReqMsg certReqMsg, String caName)
     throws RAWorkerException;
 
+    byte[] envelopeRevocation(X500Name issuer, BigInteger serial, int reason)
+    throws RAWorkerException;
+
+    byte[] envelopeRevocation(X509Certificate cert, int reason)
+    throws RAWorkerException;
+
 }
