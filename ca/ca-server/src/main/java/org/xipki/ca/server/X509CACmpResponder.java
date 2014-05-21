@@ -849,7 +849,14 @@ public class X509CACmpResponder extends CmpResponder
             PKIStatusInfo statusInfo;
             if(warningMsg == null || warningMsg.isEmpty())
             {
-                statusInfo = new PKIStatusInfo(PKIStatus.granted);
+                if(certInfo.isAlreadyIssued())
+                {
+                    statusInfo = new PKIStatusInfo(PKIStatus.grantedWithMods, new PKIFreeText("ALREADY_ISSUED"));
+                }
+                else
+                {
+                    statusInfo = new PKIStatusInfo(PKIStatus.granted);
+                }
             }
             else
             {

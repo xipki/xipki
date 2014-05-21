@@ -1046,11 +1046,13 @@ public class X509CA
                     }
                     else
                     {
-                        return new CertificateInfo(
+                        CertificateInfo certInfo = new CertificateInfo(
                                 issuedCert.getCert(),
                                 caInfo.getCertificate(),
                                 subjectPublicKey,
                                 certProfileName);
+                        certInfo.setAlreadyIssued(true);
+                        return certInfo;
                     }
                 }
             } catch (IOException e)

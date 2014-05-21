@@ -71,6 +71,11 @@ class PendingCertificatePool
     synchronized void addCertificate(
             byte[] tid, BigInteger certReqId, CertificateInfo certInfo, long waitForConfirmTill)
     {
+        if(certInfo.isAlreadyIssued())
+        {
+            return;
+        }
+
         String hexTid = Hex.toHexString(tid);
         Set<MyEntry> entries = map.get(hexTid);
         if(entries == null)
