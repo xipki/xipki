@@ -30,7 +30,6 @@ import java.security.SignatureException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509CRL;
 import java.security.cert.X509Certificate;
-import java.security.interfaces.ECPublicKey;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -47,6 +46,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.bouncycastle.asn1.DERUTF8String;
 import org.bouncycastle.asn1.cmp.CMPCertificate;
 import org.bouncycastle.asn1.cmp.CMPObjectIdentifiers;
+import org.bouncycastle.asn1.cmp.PKIMessage;
 import org.bouncycastle.asn1.crmf.AttributeTypeAndValue;
 import org.bouncycastle.asn1.crmf.CertReqMsg;
 import org.bouncycastle.asn1.crmf.CertRequest;
@@ -172,7 +172,7 @@ public final class RAWorkerImpl extends AbstractRAWorker implements RAWorker
             = new ConcurrentHashMap<String, RACertProfileMapping>();
 
     private String            confFile;
-    private Map<X509Certificate, Boolean> trySunECtoVerifyMap = new ConcurrentHashMap<>();
+    private Map<X509Certificate, Boolean> tryXipkiNSStoVerifyMap = new ConcurrentHashMap<>();
 
     public RAWorkerImpl()
     {
@@ -1183,48 +1183,41 @@ public final class RAWorkerImpl extends AbstractRAWorker implements RAWorker
             return true;
         }
 
-        Boolean trySunECtoVerify = trySunECtoVerifyMap.get(_caCert);
+        final String provider = "XipkiNSS";
+        Boolean tryXipkiNSStoVerify = tryXipkiNSStoVerifyMap.get(_caCert);
         PublicKey caPublicKey = _caCert.getPublicKey();
         try
         {
-            if(trySunECtoVerify == null)
-            {
-                if(caPublicKey instanceof ECPublicKey)
-                {
-                    final String provider = "SunEC";
-                    byte[] tbs = _cert.getTBSCertificate();
-                    byte[] signatureValue = _cert.getSignature();
-                    String sigAlgName = _cert.getSigAlgName();
-                    try
-                    {
-                        Signature verifier = Signature.getInstance(sigAlgName, provider);
-                        verifier.initVerify(caPublicKey);
-                        verifier.update(tbs);
-                        boolean sigValid = verifier.verify(signatureValue);
-
-                        LOG.info("Use {} to verify {} signature", provider, sigAlgName);
-                        trySunECtoVerify = Boolean.TRUE;
-                        return sigValid;
-                    }catch(Exception e)
-                    {
-                        LOG.warn("Could not use {} to verify {} signature", provider, sigAlgName);
-                        trySunECtoVerify = Boolean.FALSE;
-                    }
-
-                    trySunECtoVerifyMap.put(_caCert, trySunECtoVerify);
-                }
-                else
-                {
-                    trySunECtoVerify = false;
-                }
-            }
-
-            if(trySunECtoVerify && (caPublicKey instanceof ECPublicKey))
+            if(tryXipkiNSStoVerify == null)
             {
                 byte[] tbs = _cert.getTBSCertificate();
                 byte[] signatureValue = _cert.getSignature();
                 String sigAlgName = _cert.getSigAlgName();
-                Signature verifier = Signature.getInstance(sigAlgName, "SunEC");
+                try
+                {
+                    Signature verifier = Signature.getInstance(sigAlgName, provider);
+                    verifier.initVerify(caPublicKey);
+                    verifier.update(tbs);
+                    boolean sigValid = verifier.verify(signatureValue);
+
+                    LOG.info("Use {} to verify {} signature", provider, sigAlgName);
+                    tryXipkiNSStoVerify = Boolean.TRUE;
+                    return sigValid;
+                }catch(Exception e)
+                {
+                    LOG.warn("Could not use {} to verify {} signature", provider, sigAlgName);
+                    tryXipkiNSStoVerify = Boolean.FALSE;
+                }
+
+                tryXipkiNSStoVerifyMap.put(_caCert, tryXipkiNSStoVerify);
+            }
+
+            if(tryXipkiNSStoVerify)
+            {
+                byte[] tbs = _cert.getTBSCertificate();
+                byte[] signatureValue = _cert.getSignature();
+                String sigAlgName = _cert.getSigAlgName();
+                Signature verifier = Signature.getInstance(sigAlgName, provider);
                 verifier.initVerify(caPublicKey);
                 verifier.update(tbs);
                 return verifier.verify(signatureValue);
@@ -1255,5 +1248,39 @@ public final class RAWorkerImpl extends AbstractRAWorker implements RAWorker
             LOG.debug("NoSuchProviderException while verifying signature: {}", e.getMessage());
             return false;
         }
+    }
+
+    @Override
+    public byte[] envelopeRevocation(X500Name issuer, BigInteger serial, int reason)
+    throws RAWorkerException
+    {
+        final String id = "revcert-1";
+        RevocateCertRequestEntryType entry =
+                new RevocateCertRequestEntryType(id, issuer, serial, reason, null);
+        RevocateCertRequestType request = new RevocateCertRequestType();
+        request.addRequestEntry(entry);
+
+        String caname = getCaNameByIssuer(issuer);
+        X509CmpRequestor cmpRequestor = cmpRequestorsMap.get(caname);
+
+        try
+        {
+            PKIMessage pkiMessage = cmpRequestor.envelopeRevocation(request);
+            return pkiMessage.getEncoded();
+        } catch (CmpRequestorException e)
+        {
+            throw new RAWorkerException(e);
+        } catch (IOException e)
+        {
+            throw new RAWorkerException(e);
+        }
+    }
+
+    @Override
+    public byte[] envelopeRevocation(X509Certificate cert, int reason)
+    throws RAWorkerException
+    {
+        X500Name issuer = X500Name.getInstance(cert.getIssuerX500Principal().getEncoded());
+        return envelopeRevocation(issuer, cert.getSerialNumber(), reason);
     }
 }
