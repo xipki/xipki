@@ -69,7 +69,6 @@ class CaCertStoreDbImporter extends DbPorter
     private static final Logger LOG = LoggerFactory.getLogger(CaConfigurationDbImporter.class);
 
     private final Unmarshaller unmarshaller;
-    private final HashCalculator hashCalculator;
 
     CaCertStoreDbImporter(DataSource dataSource, Unmarshaller unmarshaller, String srcDir)
     throws SQLException, PasswordResolverException, IOException, NoSuchAlgorithmException
@@ -77,7 +76,6 @@ class CaCertStoreDbImporter extends DbPorter
         super(dataSource, srcDir);
         ParamChecker.assertNotNull("unmarshaller", unmarshaller);
         this.unmarshaller = unmarshaller;
-        this.hashCalculator = new HashCalculator();
     }
 
     public void importToDB()
@@ -127,7 +125,7 @@ class CaCertStoreDbImporter extends DbPorter
 
                     X509Certificate c = IoCertUtil.parseCert(encodedCert);
 
-                    String hexSha1FpCert = hashCalculator.hexHash(HashAlgoType.SHA1, encodedCert);
+                    String hexSha1FpCert = HashCalculator.hexHash(HashAlgoType.SHA1, encodedCert);
 
                     int idx = 1;
                     ps.setInt   (idx++, info.getId());
@@ -168,7 +166,7 @@ class CaCertStoreDbImporter extends DbPorter
                     String b64Cert = info.getCert();
                     byte[] encodedCert = Base64.decode(b64Cert);
                     X509Certificate cert = IoCertUtil.parseCert(encodedCert);
-                    String hexSha1FpCert = hashCalculator.hexHash(HashAlgoType.SHA1, encodedCert);
+                    String hexSha1FpCert = HashCalculator.hexHash(HashAlgoType.SHA1, encodedCert);
 
                     int idx = 1;
                     ps.setInt   (idx++, info.getId());
@@ -414,7 +412,7 @@ class CaCertStoreDbImporter extends DbPorter
 
                     byte[] encodedKey = c.getSubjectPublicKeyInfo().getPublicKeyData().getBytes();
 
-                    String hexSha1FpCert = hashCalculator.hexHash(HashAlgoType.SHA1, encodedCert);
+                    String hexSha1FpCert = HashCalculator.hexHash(HashAlgoType.SHA1, encodedCert);
 
                     // cert
                     int idx = 1;
@@ -433,7 +431,7 @@ class CaCertStoreDbImporter extends DbPorter
                     ps_cert.setString(idx++, cert.getRequestorinfoId());
                     ps_cert.setString(idx++, cert.getUserId());
 
-                    ps_cert.setString(idx++, hashCalculator.hexHash(HashAlgoType.SHA1, encodedKey));
+                    ps_cert.setString(idx++, HashCalculator.hexHash(HashAlgoType.SHA1, encodedKey));
                     String sha1FpSubject = IoCertUtil.sha1sum_canonicalized_name(c.getSubject());
                     ps_cert.setString(idx++, sha1FpSubject);
 
