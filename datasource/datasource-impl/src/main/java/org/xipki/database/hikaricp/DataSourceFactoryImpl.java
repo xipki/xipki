@@ -110,32 +110,25 @@ public class DataSourceFactoryImpl implements DataSourceFactory
             ds.setUrl(s.trim());
         }
 
-        // connectionProperties
-        s = config.getProperty(CONNECTION_PROPERTIES);
-        if(s != null)
-        {
-            ds.setConnectionProperties(s.trim());
-        }
-
         // defaultAutoCommit
         b = getBooleanValue(config, DEFAULT_AUTOCOMMIT);
         if(b != null)
         {
-            ds.setDefaultAutoCommit(b);
+            ds.setAutoCommit(b);
         }
 
         // defaultReadOnly
         b = getBooleanValue(config, DEFAULT_READONLY);
         if(b != null)
         {
-            ds.setDefaultReadOnly(b);
+            ds.setReadOnly(b);
         }
 
         // defaultTransactionIsolation
-        s  = config.getProperty(DEFAULT_TRANSACTION_ISOLATION);
-        if(s != null)
+        i  = getIntValue(config, DEFAULT_TRANSACTION_ISOLATION);
+        if(i != null)
         {
-            ds.setDefaultTransactionIsolation(s);
+            ds.setTransactionIsolation(i);
         }
 
         // maxActive
@@ -149,14 +142,26 @@ public class DataSourceFactoryImpl implements DataSourceFactory
         i = getIntValue(config, MIN_IDLE);
         if(i != null)
         {
-            ds.setMinIdle(i);
+            ds.setMinimumIdle(i);
         }
 
-        // validationQuery
-        s = config.getProperty(VALIDATION_QUERY);
-        if(s != null)
+        // connectionTimeout
+        i = getIntValue(config, MAX_WAIT);
+        if(i != null)
         {
-            ds.setValidationQuery(s);
+            ds.setConnectionTimeout(i);
+        }
+
+        i = getIntValue(config,MAX_LIFETIME);
+        if(i != null)
+        {
+            ds.setMaxActive(i);
+        }
+
+        i = getIntValue(config, IDLE_TIMEOUT);
+        if(i != null)
+        {
+            ds.setIdleTimeout(i);
         }
 
         ds.setPasswordResolver(passwordResolver);
@@ -187,36 +192,24 @@ public class DataSourceFactoryImpl implements DataSourceFactory
             {
             }
         }
-
         return null;
     }
 
     private final static String P = "db.";
-    public final static String DRIVER_CLASSNAME = P + "driverClassName";
-    public final static String URL = P + "url";
-    public final static String USERNAME = P + "username";
-    public final static String PASSWORD = P + "password";
-    public final static String CONNECTION_PROPERTIES = P + "connectionProperties";
+    private final static String DRIVER_CLASSNAME = P + "driverClassName";
+    private final static String URL = P + "url";
+    private final static String USERNAME = P + "username";
+    private final static String PASSWORD = P + "password";
 
-    public final static String DEFAULT_AUTOCOMMIT = "defaultAutoCommit";
-    public final static String DEFAULT_READONLY = "defaultReadOnly";
-    public final static String DEFAULT_TRANSACTION_ISOLATION = "defaultTransactionIsolation";
+    private final static String DEFAULT_AUTOCOMMIT = "defaultAutoCommit";
+    private final static String DEFAULT_READONLY = "defaultReadOnly";
+    private final static String DEFAULT_TRANSACTION_ISOLATION = "defaultTransactionIsolation";
 
-    public final static String MAX_ACTIVE = P + "maxActive";
-    public final static String MIN_IDLE = P + "minIdle";
-    public final static String MAX_IDLE = P + "maxIdle";
-    public final static String MAX_WAIT = P + "maxWait";
+    private final static String MAX_ACTIVE = P + "maxActive";
+    private final static String MIN_IDLE = P + "minIdle";
+    private final static String MAX_WAIT = P + "maxWait";
 
-    public final static String VALIDATION_QUERY = P + "validationQuery";
-    public final static String TEST_ON_BORROW = P + "testOnBorrow";
-    public final static String TEST_ON_RETURN = P + "testOnReturn";
-    public final static String TEST_WHILE_IDLE = P + "testWhileIdle";
-
-    public final static String NUM_TESTS_PER_EVICTION_RUN = P + "numTestsPerEvictionRun";
-    public final static String TIME_BETWEEN_EVICTION_RUNS_MILLIS = P + "timeBetweenEvictionRunsMillis";
-    public final static String MIN_EVICTABLE_IDLE_TIME_MILLIS = P + "minEvictableIdleTimeMillis";
-
-    public final static String POOL_PREPARED_STATMENTS = P + "poolPreparedStatements";
-    public final static String MAX_OPEN_PREPARED_STATEMENTS = P + "maxOpenPreparedStatements";
+    private final static String IDLE_TIMEOUT = P + "idleTimeout";
+    private final static String MAX_LIFETIME = P + "maxLifetime";
 
 }
