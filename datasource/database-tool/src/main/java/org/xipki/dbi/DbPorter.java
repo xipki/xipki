@@ -65,21 +65,6 @@ class DbPorter
 
     protected void closeStatement(Statement ps)
     {
-        if(ps != null)
-        {
-            try
-            {
-                ps.close();
-            } catch (SQLException e)
-            {
-            }
-
-            try
-            {
-                dataSource.returnConnection(ps.getConnection());
-            } catch (SQLException e)
-            {
-            }
-        }
+        dataSource.releaseResources(ps, null);
     }
 }

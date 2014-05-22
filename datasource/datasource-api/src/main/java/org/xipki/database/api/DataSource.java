@@ -19,6 +19,7 @@ package org.xipki.database.api;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
@@ -37,4 +38,5 @@ public interface DataSource
     PreparedStatement prepareStatement(Connection conn, String sqlQuery)
     throws SQLException;
 
+    void releaseResources(Statement ps, ResultSet rs);
 }
