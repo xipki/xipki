@@ -26,6 +26,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.sql.Types;
 import java.util.Date;
 import java.util.LinkedList;
@@ -471,28 +472,9 @@ class CertStatusStoreQueryExecutor
         }
     }
 
-    private void releaseDbResources(PreparedStatement ps, ResultSet rs)
+    private void releaseDbResources(Statement ps, ResultSet rs)
     {
-        if(rs != null)
-        {
-            try
-            {
-                rs.close();
-            }catch(Throwable t)
-            {
-                LOG.warn("Cannot return close ResultSet", t);
-            }
-        }
-
-        try
-        {
-            Connection conn = ps.getConnection();
-            ps.close();
-            dataSource.returnConnection(conn);
-        }catch(Throwable t)
-        {
-            LOG.warn("Cannot return prepared statement and connection", t);
-        }
+        dataSource.releaseResources(ps, rs);
     }
 
 }
