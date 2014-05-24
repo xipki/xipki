@@ -1313,7 +1313,14 @@ public class CAManagerImpl implements CAManager
             int idx = 1;
             ps.setString(idx++, name);
             ps.setString(idx++, newCaDbEntry.getSubject());
-            ps.setLong(idx++, newCaDbEntry.getNextSerial());
+
+            long nextSerial = newCaDbEntry.getNextSerial();
+            if(nextSerial < 0)
+            {
+                nextSerial = 0;
+            }
+            ps.setLong(idx++, nextSerial);
+
             ps.setString(idx++, newCaDbEntry.getStatus().getStatus());
             ps.setString(idx++, newCaDbEntry.getCrlUrisAsString());
             ps.setString(idx++, newCaDbEntry.getOcspUrisAsString());
@@ -1355,7 +1362,7 @@ public class CAManagerImpl implements CAManager
             Integer numCrls)
     throws CAMgmtException
     {
-        if(nextSerial != null)
+        if(nextSerial != null && nextSerial > 0) // 0 for random serial
         {
             if(cas.containsKey(name) == false)
             {
@@ -1367,6 +1374,11 @@ public class CAManagerImpl implements CAManager
             {
                 throw new CAMgmtException("the nextSerial " + nextSerial + " is not allowed");
             }
+        }
+
+        if(nextSerial != null && nextSerial < 0)
+        {
+            nextSerial = 0L;
         }
 
         StringBuilder sb = new StringBuilder();

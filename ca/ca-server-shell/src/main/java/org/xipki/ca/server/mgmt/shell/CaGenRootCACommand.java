@@ -29,6 +29,7 @@ import org.xipki.ca.api.CAStatus;
 import org.xipki.ca.api.OperationException;
 import org.xipki.ca.api.OperationException.ErrorCode;
 import org.xipki.ca.api.profile.IdentifiedCertProfile;
+import org.xipki.ca.server.RandomSerialNumberGenerator;
 import org.xipki.ca.server.mgmt.CAEntry;
 import org.xipki.ca.server.mgmt.CertProfileEntry;
 import org.xipki.ca.server.mgmt.Permission;
@@ -80,7 +81,7 @@ public class CaGenRootCACommand extends CaCommand
     protected Set<String> permissions;
 
     @Option(name = "-nextSerial",
-            description = "Required. Serial number for the next certificate",
+            description = "Required. Serial number for the next certificate, 0 for random serial number",
             required = true)
     protected Long            nextSerial;
 
@@ -129,6 +130,12 @@ public class CaGenRootCACommand extends CaCommand
     protected Object doExecute()
     throws Exception
     {
+        if(nextSerial < 0)
+        {
+            System.err.println("invalid serial number: " + nextSerial);
+            return null;
+        }
+
         CAStatus status = CAStatus.ACTIVE;
         if(caStatus != null)
         {
@@ -147,14 +154,24 @@ public class CaGenRootCACommand extends CaCommand
                     "unknown cert profile " + rcaProfile);
         }
 
+        long serialOfThisCert;
+        if(nextSerial > 0)
+        {
+            serialOfThisCert = nextSerial;
+            nextSerial ++;
+        }
+        else
+        {
+            serialOfThisCert = RandomSerialNumberGenerator.getInstance().getSerialNumber().longValue();
+        }
+
         IdentifiedCertProfile certProfile = certProfileEntry.getCertProfile();
         GenerateSelfSignedResult result = SelfSignedCertBuilder.generateSelfSigned(
                 securityFactory, passwordResolver, signerType, signerConf,
-                certProfile, rcaSubject, nextSerial, ocspUris, crlUris);
+                certProfile, rcaSubject, serialOfThisCert, ocspUris, crlUris);
 
         signerConf = result.getSignerConf();
         X509Certificate caCert = result.getCert();
-        nextSerial++;
 
         if("PKCS12".equalsIgnoreCase(signerType) || "JKS".equalsIgnoreCase(signerType))
         {
