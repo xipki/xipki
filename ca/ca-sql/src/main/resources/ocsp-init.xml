@@ -54,7 +54,7 @@
 			<column name="ISSUER_ID" type="INT(10)">
 				<constraints nullable="false"/>
 			</column>
-			<column name="SERIAL" type="INT">
+			<column name="SERIAL" type="BIGINT">
 				<constraints nullable="false"/>
 			</column>
 			<column name="SUBJECT" type="VARCHAR(300)">
