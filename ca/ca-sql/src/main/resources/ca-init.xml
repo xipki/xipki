@@ -92,7 +92,7 @@
 			<column name="NAME" type="VARCHAR(45)">
 				<constraints primaryKey="true" unique="true" nullable="false"/>
 			</column>
-			<column name="NEXT_SERIAL" type="INT(10)"/>
+			<column name="NEXT_SERIAL" type="BIGINT"/>
 			<column name="STATUS" remarks="valid values: pending, enabled, disabled" type="VARCHAR(10)">
 				<constraints nullable="false"/>
 			</column>
@@ -247,7 +247,7 @@
 			<column name="CAINFO_ID" type="INT(10)">
 				<constraints nullable="false"/>
 			</column>
-			<column name="SERIAL" type="INT">
+			<column name="SERIAL" type="BIGINT">
 				<constraints nullable="false"/>
 			</column>
 			<column name="CERTPROFILEINFO_ID" type="INT(10)">

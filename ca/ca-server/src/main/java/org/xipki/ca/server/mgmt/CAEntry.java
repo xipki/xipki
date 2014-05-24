@@ -65,9 +65,9 @@ public class CAEntry
         ParamChecker.assertNotEmpty("signerType", signerType);
         ParamChecker.assertNotNull("cert", cert);
 
-        if(initialSerial < 1)
+        if(initialSerial < 0)
         {
-            throw new IllegalArgumentException("initialSerial is not positive (" + initialSerial + " < 1");
+            throw new IllegalArgumentException("initialSerial is negative (" + initialSerial + " < 0)");
         }
 
         if(numCrls == null)
