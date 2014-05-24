@@ -60,7 +60,7 @@ public class CaUpdateCommand extends CaCommand
 
     @Option(name = "-nextSerial",
             description = "Serial number for the next certificate, "
-                    + "must be greater than the current nextSerial")
+                    + "must be greater than the current nextSerial or 0 for random serial number")
     protected Long            nextSerial;
 
     @Option(name = "-maxValidity",
