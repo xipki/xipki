@@ -60,7 +60,7 @@ public class CaAddCommand extends CaCommand
     protected Set<String> permissions;
 
     @Option(name = "-nextSerial",
-            description = "Required. Serial number for the next certificate",
+            description = "Required. Serial number for the next certificate, 0 for random serial number",
             required = true)
     protected Long            nextSerial;
 
@@ -113,6 +113,12 @@ public class CaAddCommand extends CaCommand
     protected Object doExecute()
     throws Exception
     {
+        if(nextSerial < 0)
+        {
+            System.err.println("invalid serial number: " + nextSerial);
+            return null;
+        }
+
         CAStatus status = CAStatus.ACTIVE;
         if(caStatus != null)
         {

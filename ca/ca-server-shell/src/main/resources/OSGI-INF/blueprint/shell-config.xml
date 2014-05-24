@@ -332,6 +332,15 @@
             </action>
         </command>
         
+        <!-- Misc -->
+        <command name="ca/gen-selfsign-cert">
+            <action class="org.xipki.ca.server.mgmt.shell.GenSelfSignedCertCommand">
+            	<property name="caManager" ref="caManager" />
+            	<property name="passwordResolver" ref="passwordResolver"/>
+       			<property name="securityFactory" ref="securityFactory"/>
+            </action>
+        </command>
+
     </command-bundle>
 
 </blueprint>

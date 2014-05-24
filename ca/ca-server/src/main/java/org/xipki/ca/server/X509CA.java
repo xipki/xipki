@@ -124,6 +124,8 @@ public class X509CA
 
     private final CertificateFactory cf;
 
+    private final boolean useRandomSerialNumber;
+    private final RandomSerialNumberGenerator randomSNGenerator;
     private final CAEntry caInfo;
     private final ConcurrentContentSigner caSigner;
     private final X500Name caSubjectX500Name;
@@ -210,6 +212,13 @@ public class X509CA
             ScheduledCRLGenerationService crlGenerationService = new ScheduledCRLGenerationService();
             caManager.getScheduledThreadPoolExecutor().scheduleAtFixedRate(
                     crlGenerationService, initialDelay, crlSigner.getPeriod(), TimeUnit.MINUTES);
+        }
+
+        useRandomSerialNumber = caInfo.getNextSerial() < 1;
+        randomSNGenerator = useRandomSerialNumber ? RandomSerialNumberGenerator.getInstance() : null;
+        if(useRandomSerialNumber)
+        {
+            return;
         }
 
         Long greatestSerialNumber;
@@ -1238,10 +1247,17 @@ public class X509CA
     {
         synchronized (nextSerialLock)
         {
-            long thisSerial = caInfo.getNextSerial();
-            long nextSerial = thisSerial + 1;
-            caInfo.setNextSerial(nextSerial);
-            return BigInteger.valueOf(thisSerial);
+            if(useRandomSerialNumber)
+            {
+                return randomSNGenerator.getSerialNumber();
+            }
+            else
+            {
+                long thisSerial = caInfo.getNextSerial();
+                long nextSerial = thisSerial + 1;
+                caInfo.setNextSerial(nextSerial);
+                return BigInteger.valueOf(thisSerial);
+            }
         }
     }
 
@@ -1473,6 +1489,10 @@ public class X509CA
     public synchronized void commitNextSerial()
     throws CAMgmtException
     {
+        if(useRandomSerialNumber)
+        {
+            return;
+        }
         long nextSerial = caInfo.getNextSerial();
         long lastCommittedNextSerial = caInfo.getLastCommittedNextSerial();
         if(nextSerial > lastCommittedNextSerial)
