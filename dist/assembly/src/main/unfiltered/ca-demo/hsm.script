@@ -156,7 +156,7 @@ caclient:ra-enroll -p10 output/OCSP2.p10 -out output/OCSP2.der -profile OCSP
 keytool:update-cert-p12 -p12 output/OCSP2.p12 -pwd 1234 -cert output/OCSP2.der
 
 ## Revocate certificates
-caclient:ra-rev -cert output/OCSP2.der -reason 1
+caclient:ra-revoke -cert output/OCSP2.der -reason 1
 
 # Certificate TLS1
 keytool:rsa-p12 -pwd 1234 -out output/TLS1.p12 -subject "CN=TSL1,O=xipki,C=DE"
@@ -177,7 +177,7 @@ caclient:ra-enroll -p10 output/TLS2.p10 -out output/TLS2.der -profile TLS
 keytool:update-cert-p12 -p12 output/TLS2.p12 -pwd 1234 -cert output/TLS2.der
 
 ## Revocate certificates
-caclient:ra-rev -cert output/TLS2.der -reason 2
+caclient:ra-revoke -cert output/TLS2.der -reason 2
 
 ## Enroll certificates
 # Certificate TLS_C1
@@ -199,13 +199,13 @@ caclient:ra-enroll -p10 output/TLS_C2.p10 -out output/TLS_C2.der -profile TLS_C
 keytool:update-cert-p12 -p12 output/TLS_C2.p12 -pwd 1234 -cert output/TLS_C2.der
 
 ## Revocate certificates
-caclient:ra-rev -cert output/TLS_C2.der -reason 3
+caclient:ra-revoke -cert output/TLS_C2.der -reason 3
 
 ## Generate CRL
 caclient:ra-gencrl -ca SubCAwithCRL1 -out output/SubCAwithCRL1.crl
 
 #################################################################
-#              UNINSTALL UNNEEDED FEATURES                       #
+#              UNINSTALL UNNEEDED FEATURES                      #
 #################################################################
 features:uninstall xipki-caclient-shell
 features:uninstall xipki-caclient

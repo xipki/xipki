@@ -279,7 +279,7 @@ public class X509CACmpResponder extends CmpResponder
                     eventType = "CERT_REV";
                     checkPermission(_requestor, Permission.CERT_REV);
                     RevReqContent rr = (RevReqContent) reqBody.getContent();
-                    respBody = revocateCertificates(rr, auditEvent);
+                    respBody = revokeCertificates(rr, auditEvent);
                     break;
                 }
                 case PKIBody.TYPE_CONFIRM:
@@ -290,7 +290,7 @@ public class X509CACmpResponder extends CmpResponder
                 case PKIBody.TYPE_ERROR:
                 {
                     eventType = "ERROR";
-                    revocatePendingCertificates(tid);
+                    revokePendingCertificates(tid);
                     respBody = new PKIBody(PKIBody.TYPE_CONFIRM, DERNull.INSTANCE);
                     break;
                 }
@@ -955,7 +955,7 @@ public class X509CACmpResponder extends CmpResponder
         }
     }
 
-    private PKIBody revocateCertificates(RevReqContent rr, AuditEvent auditEvent)
+    private PKIBody revokeCertificates(RevReqContent rr, AuditEvent auditEvent)
     {
         RevDetails[] revContent = rr.toRevDetailsArray();
 
@@ -1018,7 +1018,7 @@ public class X509CACmpResponder extends CmpResponder
 
             try
             {
-                X509Certificate revokedCert = ca.revocateCertificate(
+                X509Certificate revokedCert = ca.revokeCertificate(
                         serialNumber.getPositiveValue(), reason, invalidityDate);
 
                 if(revokedCert != null)
@@ -1102,20 +1102,20 @@ public class X509CACmpResponder extends CmpResponder
                 BigInteger serialNumber = certInfo.getCert().getCert().getSerialNumber();
                 try
                 {
-                    ca.revocateCertificate(
+                    ca.revokeCertificate(
                             serialNumber,
                             CRLReason_cessationOfOperation, new Date());
                 } catch (OperationException e)
                 {
-                    LOG.warn("Could not revocated certificate ca={}, serialNumber={}", ca.getCAInfo().getName(), serialNumber);
+                    LOG.warn("Could not revoke certificate ca={}, serialNumber={}", ca.getCAInfo().getName(), serialNumber);
                 }
 
                 successfull = false;
             }
         }
 
-        // all other certificates should be revocated
-        if(revocatePendingCertificates(transactionId))
+        // all other certificates should be revoked
+        if(revokePendingCertificates(transactionId))
         {
             successfull = false;
         }
@@ -1155,7 +1155,7 @@ public class X509CACmpResponder extends CmpResponder
         return successfull;
     }
 
-    private boolean revocatePendingCertificates(ASN1OctetString transactionId)
+    private boolean revokePendingCertificates(ASN1OctetString transactionId)
     {
         Set<CertificateInfo> remainingCerts = pendingCertPool.removeCertificates(transactionId.getOctets());
 
@@ -1167,7 +1167,7 @@ public class X509CACmpResponder extends CmpResponder
             {
                 try
                 {
-                    ca.revocateCertificate(
+                    ca.revokeCertificate(
                         remainingCert.getCert().getCert().getSerialNumber(),
                         CRLReason_cessationOfOperation, invalidityDate);
                 }catch(OperationException e)
@@ -1236,7 +1236,7 @@ public class X509CACmpResponder extends CmpResponder
                 {
                     try
                     {
-                        ca.revocateCertificate(
+                        ca.revokeCertificate(
                             remainingCert.getCert().getCert().getSerialNumber(),
                             CRLReason_cessationOfOperation, invalidityDate);
                     }catch(Throwable t)

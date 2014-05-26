@@ -83,10 +83,10 @@ import org.xipki.ca.cmp.client.type.EnrollCertResultType;
 import org.xipki.ca.cmp.client.type.ErrorResultEntryType;
 import org.xipki.ca.cmp.client.type.ErrorResultType;
 import org.xipki.ca.cmp.client.type.ResultEntryType;
-import org.xipki.ca.cmp.client.type.RevocateCertRequestEntryType;
-import org.xipki.ca.cmp.client.type.RevocateCertRequestType;
-import org.xipki.ca.cmp.client.type.RevocateCertResultEntryType;
-import org.xipki.ca.cmp.client.type.RevocateCertResultType;
+import org.xipki.ca.cmp.client.type.RevokeCertRequestEntryType;
+import org.xipki.ca.cmp.client.type.RevokeCertRequestType;
+import org.xipki.ca.cmp.client.type.RevokeCertResultEntryType;
+import org.xipki.ca.cmp.client.type.RevokeCertResultType;
 import org.xipki.ca.common.CertIDOrError;
 import org.xipki.ca.common.EnrollCertResult;
 import org.xipki.ca.common.PKIErrorException;
@@ -852,33 +852,33 @@ public final class RAWorkerImpl extends AbstractRAWorker implements RAWorker
     }
 
     @Override
-    public CertIDOrError revocateCert(X509Certificate cert, int reason)
+    public CertIDOrError revokeCert(X509Certificate cert, int reason)
     throws RAWorkerException, PKIErrorException
     {
         X500Name issuer = X500Name.getInstance(cert.getIssuerX500Principal().getEncoded());
-        return revocateCert(issuer, cert.getSerialNumber(), reason);
+        return revokeCert(issuer, cert.getSerialNumber(), reason);
     }
 
     @Override
-    public CertIDOrError revocateCert(X500Name issuer, BigInteger serial, int reason)
+    public CertIDOrError revokeCert(X500Name issuer, BigInteger serial, int reason)
     throws RAWorkerException, PKIErrorException
     {
         final String id = "revcert-1";
-        RevocateCertRequestEntryType entry =
-                new RevocateCertRequestEntryType(id, issuer, serial, reason, null);
-        RevocateCertRequestType request = new RevocateCertRequestType();
+        RevokeCertRequestEntryType entry =
+                new RevokeCertRequestEntryType(id, issuer, serial, reason, null);
+        RevokeCertRequestType request = new RevokeCertRequestType();
         request.addRequestEntry(entry);
-        Map<String, CertIDOrError> result = revocateCerts(request);
+        Map<String, CertIDOrError> result = revokeCerts(request);
         return result == null ? null : result.get(id);
     }
 
     @Override
-    public Map<String, CertIDOrError> revocateCerts(RevocateCertRequestType request)
+    public Map<String, CertIDOrError> revokeCerts(RevokeCertRequestType request)
     throws RAWorkerException, PKIErrorException
     {
         ParamChecker.assertNotNull("request", request);
 
-        List<RevocateCertRequestEntryType> requestEntries = request.getRequestEntries();
+        List<RevokeCertRequestEntryType> requestEntries = request.getRequestEntries();
         if(requestEntries.isEmpty())
         {
             return Collections.emptyMap();
@@ -901,7 +901,7 @@ public final class RAWorkerImpl extends AbstractRAWorker implements RAWorker
         CmpResultType result;
         try
         {
-            result = cmpRequestor.revocateCertificate(request);
+            result = cmpRequestor.revokeCertificate(request);
         } catch (CmpRequestorException e)
         {
             throw new RAWorkerException(e);
@@ -911,17 +911,17 @@ public final class RAWorkerImpl extends AbstractRAWorker implements RAWorker
         {
             throw createPKIErrorException((ErrorResultType) result);
         }
-        else if(result instanceof RevocateCertResultType)
+        else if(result instanceof RevokeCertResultType)
         {
             Map<String, CertIDOrError> ret = new HashMap<String, CertIDOrError>();
 
-            RevocateCertResultType _result = (RevocateCertResultType) result;
+            RevokeCertResultType _result = (RevokeCertResultType) result;
             for(ResultEntryType _entry : _result.getResultEntries())
             {
                 CertIDOrError certIdOrError;
-                if(_entry instanceof RevocateCertResultEntryType)
+                if(_entry instanceof RevokeCertResultEntryType)
                 {
-                    RevocateCertResultEntryType entry = (RevocateCertResultEntryType) _entry;
+                    RevokeCertResultEntryType entry = (RevokeCertResultEntryType) _entry;
                     certIdOrError = new CertIDOrError(entry.getCertID());
                 }
                 else if(_entry instanceof ErrorResultEntryType)
@@ -1255,9 +1255,9 @@ public final class RAWorkerImpl extends AbstractRAWorker implements RAWorker
     throws RAWorkerException
     {
         final String id = "revcert-1";
-        RevocateCertRequestEntryType entry =
-                new RevocateCertRequestEntryType(id, issuer, serial, reason, null);
-        RevocateCertRequestType request = new RevocateCertRequestType();
+        RevokeCertRequestEntryType entry =
+                new RevokeCertRequestEntryType(id, issuer, serial, reason, null);
+        RevokeCertRequestType request = new RevokeCertRequestType();
         request.addRequestEntry(entry);
 
         String caname = getCaNameByIssuer(issuer);

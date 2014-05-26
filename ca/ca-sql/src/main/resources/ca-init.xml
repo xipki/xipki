@@ -266,7 +266,7 @@
 			<column name="NOTAFTER" remarks="seconds since January 1, 1970, 00:00:00 GMT" type="INT">
 				<constraints nullable="false"/>
 			</column>
-			<column name="REVOCATED" type="INT">
+			<column name="REVOKED" type="INT">
 				<constraints nullable="false"/>
 			</column>
 			<column name="REV_REASON" type="INT"/>

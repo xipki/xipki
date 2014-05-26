@@ -114,7 +114,7 @@ import org.xipki.security.common.ParamChecker;
 public class X509CA
 {
     public static final long MINUTE = 60L * 1000;
-    public static final int CERT_REVOCATED = 1;
+    public static final int CERT_REVOKED = 1;
     public static final int CERT_NOT_EXISTS = 2;
     public static final int CERT_REVOCATION_EXCEPTION = 3;
 
@@ -370,7 +370,7 @@ public class X509CA
                 {
                     try
                     {
-                        revInfos = certstore.getRevocatedCertificates(cacert, thisUpdate, startSerial, numEntries);
+                        revInfos = certstore.getRevokedCertificates(cacert, thisUpdate, startSerial, numEntries);
                     } catch (SQLException e)
                     {
                         throw new OperationException(ErrorCode.DATABASE_FAILURE, "SQLException: " + e.getMessage());
@@ -862,11 +862,11 @@ public class X509CA
         return true;
     }
 
-    public X509Certificate revocateCertificate(BigInteger serialNumber,
+    public X509Certificate revokeCertificate(BigInteger serialNumber,
             CRLReason reason, Date invalidityTime)
     throws OperationException
     {
-        LOG.info("START revocateCertificate: ca={}, serialNumber={}, reason={}, invalidityTime={}",
+        LOG.info("START revokeCertificate: ca={}, serialNumber={}, reason={}, invalidityTime={}",
                 new Object[]{caInfo.getName(), serialNumber, reason.getValue(), invalidityTime});
 
         numActiveRevocations.addAndGet(1);
@@ -875,7 +875,7 @@ public class X509CA
 
         try
         {
-            byte[] revokedCertBytes= certstore.revocateCertificate(
+            byte[] revokedCertBytes= certstore.revokeCertificate(
                     caInfo.getCertificate(),
                     serialNumber, reason, invalidityTime);
             if(revokedCertBytes == null)
@@ -924,7 +924,7 @@ public class X509CA
         }
 
         String resultText = revokedCert == null ? "CERT_NOT_EXIST" : "REVOKED";
-        LOG.info("SUCCESSFULL revocateCertificate: ca={}, serialNumber={}, reason={}, invalidityTime={}, revocationResult={}",
+        LOG.info("SUCCESSFULL revokeCertificate: ca={}, serialNumber={}, reason={}, invalidityTime={}, revocationResult={}",
                 new Object[]{caInfo.getName(), serialNumber, reason.getValue(), invalidityTime, resultText});
 
         return revokedCert;
@@ -1014,7 +1014,7 @@ public class X509CA
             CertStatus certStatus = certstore.getCertStatusForSubject(
                     caInfo.getCertificate(), grantedSubject);
 
-            if(certStatus == CertStatus.Revocated)
+            if(certStatus == CertStatus.Revoked)
             {
                 throw new OperationException(ErrorCode.CERT_REVOKED);
             }

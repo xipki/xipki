@@ -36,7 +36,7 @@ public class CertificateInfo
 
     private String warningMessage;
 
-    private boolean revocated;
+    private boolean revoked;
     private Integer revocationReason;
     private Date revocationTime;
     private Date invalidityTime;
@@ -111,14 +111,14 @@ public class CertificateInfo
         this.user = user;
     }
 
-    public boolean isRevocated()
+    public boolean isRevoked()
     {
-        return revocated;
+        return revoked;
     }
 
-    public void setRevocated(boolean revocated)
+    public void setRevoked(boolean revoked)
     {
-        this.revocated = revocated;
+        this.revoked = revoked;
     }
 
     public Integer getRevocationReason()

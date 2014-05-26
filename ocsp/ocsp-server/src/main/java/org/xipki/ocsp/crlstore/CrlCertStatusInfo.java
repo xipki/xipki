@@ -59,13 +59,13 @@ class CrlCertStatusInfo
         return new CrlCertStatusInfo(CertStatus.GOOD, null, certProfile, certHashes);
     }
 
-    static CrlCertStatusInfo getRevocatedCertStatusInfo(
+    static CrlCertStatusInfo getRevokedCertStatusInfo(
             CertRevocationInfo revocationInfo,
             String certProfile,
             Map<HashAlgoType, byte[]> certHashes)
     {
         ParamChecker.assertNotNull("revocationInfo", revocationInfo);
-        return new CrlCertStatusInfo(CertStatus.REVOCATED, revocationInfo, certProfile, certHashes);
+        return new CrlCertStatusInfo(CertStatus.REVOKED, revocationInfo, certProfile, certHashes);
     }
 
     CertStatus getCertStatus()
@@ -96,7 +96,7 @@ class CrlCertStatusInfo
         case UNKNOWN:
             return CertStatusInfo.getUnknownCertStatusInfo(thisUpdate, nextUpdate);
         case GOOD:
-        case REVOCATED:
+        case REVOKED:
             byte[] certHash = null;
             if(hashAlgo != null)
             {
@@ -108,7 +108,7 @@ class CrlCertStatusInfo
             }
             else
             {
-                return CertStatusInfo.getRevocatedCertStatusInfo(revocationInfo, hashAlgo,
+                return CertStatusInfo.getRevokedCertStatusInfo(revocationInfo, hashAlgo,
                         certHash, thisUpdate, nextUpdate, certProfile);
             }
         }

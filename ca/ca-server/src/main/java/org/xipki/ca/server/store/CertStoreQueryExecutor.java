@@ -172,7 +172,7 @@ class CertStoreQueryExecutor
         final String SQL_ADD_CERT =
                 "INSERT INTO CERT " +
                 "(ID, LAST_UPDATE, SERIAL, SUBJECT,"
-                + " NOTBEFORE, NOTAFTER, REVOCATED,"
+                + " NOTBEFORE, NOTAFTER, REVOKED,"
                 + " CERTPROFILEINFO_ID, CAINFO_ID,"
                 + " REQUESTORINFO_ID, USER_ID, SHA1_FP_PK, SHA1_FP_SUBJECT)" +
                 " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
@@ -366,7 +366,7 @@ class CertStoreQueryExecutor
         }
     }
 
-    byte[] revocateCert(X509CertificateWithMetaInfo caCert, BigInteger serialNumber,
+    byte[] revokeCert(X509CertificateWithMetaInfo caCert, BigInteger serialNumber,
             Date revocationTime, CRLReason revocationReason,
             Date invalidityTime)
     throws OperationException, SQLException
@@ -380,11 +380,11 @@ class CertStoreQueryExecutor
 
         Integer caId = getCaId(caCert); // could not be null
 
-        final String SQL_REVOCATE_CERT =
+        final String SQL_REVOKE_CERT =
                 "UPDATE CERT" +
-                " SET LAST_UPDATE=?, REVOCATED = ?, REV_TIME = ?, REV_INVALIDITY_TIME=?, REV_REASON = ?" +
+                " SET LAST_UPDATE=?, REVOKED = ?, REV_TIME = ?, REV_INVALIDITY_TIME=?, REV_REASON = ?" +
                 " WHERE CAINFO_ID = ? AND SERIAL = ?";
-        PreparedStatement ps = borrowPreparedStatement(SQL_REVOCATE_CERT);
+        PreparedStatement ps = borrowPreparedStatement(SQL_REVOKE_CERT);
 
         try
         {
@@ -682,7 +682,7 @@ class CertStoreQueryExecutor
             return null;
         }
 
-        String sql = "REVOCATED FROM CERT WHERE ID=? AND SHA1_FP_SUBJECT=? AND CERTPROFILEINFO_ID=?";
+        String sql = "REVOKED FROM CERT WHERE ID=? AND SHA1_FP_SUBJECT=? AND CERTPROFILEINFO_ID=?";
         sql = createFetchFirstSelectSQL(sql, 1);
         PreparedStatement ps = borrowPreparedStatement(sql);
 
@@ -702,7 +702,7 @@ class CertStoreQueryExecutor
                     rs = ps.executeQuery();
                     if(rs.next())
                     {
-                        revoked = rs.getBoolean("REVOCATED");
+                        revoked = rs.getBoolean("REVOKED");
                         certId = _certId;
                         break;
                     }
@@ -815,14 +815,14 @@ class CertStoreQueryExecutor
         }
 
         final String col_certprofileinfo_id = "CERTPROFILEINFO_ID";
-        final String col_revocated = "REVOCATED";
+        final String col_revoked = "REVOKED";
         final String col_rev_reason = "REV_REASON";
         final String col_rev_time = "REV_TIME";
         final String col_rev_invalidity_time = "REV_INVALIDITY_TIME";
         final String col_cert = "CERT";
 
         String sql = "T1." + col_certprofileinfo_id + " " + col_certprofileinfo_id +
-                ", T1." + col_revocated + " " + col_revocated +
+                ", T1." + col_revoked + " " + col_revoked +
                 ", T1." + col_rev_reason + " " + col_rev_reason +
                 ", T1." + col_rev_time + " " + col_rev_time +
                 ", T1." + col_rev_invalidity_time + " " + col_rev_invalidity_time +
@@ -855,10 +855,10 @@ class CertStoreQueryExecutor
                 CertificateInfo certInfo = new CertificateInfo(certWithMeta,
                         caCert, cert.getPublicKey().getEncoded(), certProfileName);
 
-                boolean revocated = rs.getBoolean(col_revocated);
-                certInfo.setRevocated(revocated);
+                boolean revoked = rs.getBoolean(col_revoked);
+                certInfo.setRevoked(revoked);
 
-                if(revocated)
+                if(revoked)
                 {
                     int rev_reason = rs.getInt(col_rev_reason);
                     certInfo.setRevocationReason(rev_reason);
@@ -883,7 +883,7 @@ class CertStoreQueryExecutor
         return null;
     }
 
-    List<CertRevocationInfo> getRevocatedCertificates(X509CertificateWithMetaInfo caCert,
+    List<CertRevocationInfo> getRevokedCertificates(X509CertificateWithMetaInfo caCert,
             Date notExpiredAt, BigInteger startSerial, int numEntries)
     throws SQLException, OperationException
     {
@@ -903,7 +903,7 @@ class CertStoreQueryExecutor
 
         String sql = "SERIAL, REV_REASON, REV_TIME, REV_INVALIDITY_TIME"
                 + " FROM CERT"
-                + " WHERE CAINFO_ID=? AND REVOCATED=? AND SERIAL>? AND NOTAFTER>?"
+                + " WHERE CAINFO_ID=? AND REVOKED=? AND SERIAL>? AND NOTAFTER>?"
                 + " ORDER BY SERIAL ASC";
 
         sql = createFetchFirstSelectSQL(sql, numEntries);
@@ -960,7 +960,7 @@ class CertStoreQueryExecutor
             return CertStatus.Unknown;
         }
 
-        String sql = "REVOCATED FROM CERT WHERE SUBJECT=? AND CAINFO_ID=?";
+        String sql = "REVOKED FROM CERT WHERE SUBJECT=? AND CAINFO_ID=?";
         sql = createFetchFirstSelectSQL(sql, 1);
         PreparedStatement ps = borrowPreparedStatement(sql);
         ResultSet rs = null;
@@ -974,7 +974,7 @@ class CertStoreQueryExecutor
             rs = ps.executeQuery();
             if(rs.next())
             {
-                return rs.getBoolean("REVOCATED") ? CertStatus.Revocated : CertStatus.Good;
+                return rs.getBoolean("REVOKED") ? CertStatus.Revoked : CertStatus.Good;
             }
             else
             {

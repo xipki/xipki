@@ -75,26 +75,26 @@ public class CertificateStore
         return true;
     }
 
-    public byte[] revocateCertificate(X509CertificateWithMetaInfo caCert, BigInteger serialNumber,
+    public byte[] revokeCertificate(X509CertificateWithMetaInfo caCert, BigInteger serialNumber,
             CRLReason reason, Date invalidityTime)
     throws OperationException
     {
         try
         {
-            byte[] revocatedCert = queryExecutor.revocateCert(caCert, serialNumber, new Date(), reason, invalidityTime);
-            if(revocatedCert == null)
+            byte[] revokedCert = queryExecutor.revokeCert(caCert, serialNumber, new Date(), reason, invalidityTime);
+            if(revokedCert == null)
             {
-                LOG.info("Could not revocate non-existing certificate issuer={}, serialNumber={}", caCert.getSubject(), serialNumber);
+                LOG.info("Could not revoke non-existing certificate issuer={}, serialNumber={}", caCert.getSubject(), serialNumber);
             }
             else
             {
-                LOG.info("revocated certificate issuer={}, serialNumber={}", caCert.getSubject(), serialNumber);
+                LOG.info("revoked certificate issuer={}, serialNumber={}", caCert.getSubject(), serialNumber);
             }
 
-            return revocatedCert;
+            return revokedCert;
         } catch (Exception e)
         {
-            LOG.error("Could not revocate certificate issuer={} and serialNumber={}. {} Message: {}",
+            LOG.error("Could not revoke certificate issuer={} and serialNumber={}. {} Message: {}",
                     new Object[]{caCert.getSubject(), serialNumber, e.getClass().getName(), e.getMessage()});
             LOG.debug("error", e);
             return null;
@@ -213,7 +213,7 @@ public class CertificateStore
     }
 
     /**
-     * Returns the first serial number ascend sorted {@code numEntries} revocated certificates
+     * Returns the first serial number ascend sorted {@code numEntries} revoked certificates
      * which are not expired at {@code notExpiredAt} and their serial numbers are not less than
      * {@code startSerial}.
      * @param caCert
@@ -223,11 +223,11 @@ public class CertificateStore
      * @return
      * @throws SQLException
      */
-    public List<CertRevocationInfo> getRevocatedCertificates(X509CertificateWithMetaInfo caCert,
+    public List<CertRevocationInfo> getRevokedCertificates(X509CertificateWithMetaInfo caCert,
             Date notExpiredAt, BigInteger startSerial, int numEntries)
     throws SQLException, OperationException
     {
-        return queryExecutor.getRevocatedCertificates(caCert, notExpiredAt, startSerial, numEntries);
+        return queryExecutor.getRevokedCertificates(caCert, notExpiredAt, startSerial, numEntries);
     }
 
     /**

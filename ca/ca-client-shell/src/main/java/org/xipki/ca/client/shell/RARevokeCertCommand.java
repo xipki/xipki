@@ -28,8 +28,8 @@ import org.xipki.ca.common.CertIDOrError;
 import org.xipki.ca.common.PKIStatusInfo;
 import org.xipki.security.common.IoCertUtil;
 
-@Command(scope = "caclient", name = "ra-rev", description="Revocate certificate")
-public class RARevocateCertCommand extends ClientCommand
+@Command(scope = "caclient", name = "ra-revoke", description="Revoke certificate")
+public class RARevokeCertCommand extends ClientCommand
 {
 
     @Option(name = "-cert",
@@ -69,13 +69,13 @@ public class RARevocateCertCommand extends ClientCommand
         if(certFile != null)
         {
             X509Certificate cert = IoCertUtil.parseCert(certFile);
-            certIdOrError = raWorker.revocateCert(cert, reason);
+            certIdOrError = raWorker.revokeCert(cert, reason);
         }
         else
         {
             X509Certificate cacert = IoCertUtil.parseCert(cacertFile);
             X500Name issuer = X500Name.getInstance(cacert.getSubjectX500Principal().getEncoded());
-            certIdOrError = raWorker.revocateCert(issuer, new BigInteger(serialNumber), reason);
+            certIdOrError = raWorker.revokeCert(issuer, new BigInteger(serialNumber), reason);
         }
 
         // TODO: check whether the returned one match the requested one
@@ -87,7 +87,7 @@ public class RARevocateCertCommand extends ClientCommand
         }
         else
         {
-            System.out.println("Revocated certificate");
+            System.out.println("Revoked certificate");
         }
         return null;
     }
