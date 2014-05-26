@@ -127,8 +127,26 @@ class OcspCertStoreDbExporter extends DbPorter
         System.out.println("Exporting tables CERT, CERTHASH and RAWCERT");
         CertsFiles certsFiles = new CertsFiles();
 
-        String certSql = "SELECT ID, ISSUER_ID, LAST_UPDATE," +
-                " REVOCATED, REV_REASON, REV_TIME, REV_INVALIDITY_TIME, PROFILE " +
+        String revokedColName = "REVOKED";
+
+        PreparedStatement ps = null;
+        try
+        {
+            ps = prepareStatement("SELECT REVOKED FROM CERT WHERE ID=?");
+            ps.setInt(1, 1);
+            ResultSet rs = ps.executeQuery();
+            rs.close();
+        } catch(SQLException e)
+        {
+            revokedColName = "REVOCATED";
+        } finally
+        {
+            closeStatement(ps);
+        }
+
+        String certSql = "SELECT ID, ISSUER_ID, LAST_UPDATE, " +
+                revokedColName +
+                ", REV_REASON, REV_TIME, REV_INVALIDITY_TIME, PROFILE " +
                 " FROM CERT" +
                 " WHERE ID >= ? AND ID < ?";
 
@@ -187,7 +205,7 @@ class OcspCertStoreDbExporter extends DbPorter
 
                     int issuer_id = rs.getInt("ISSUER_ID");
                     String last_update = rs.getString("LAST_UPDATE");
-                    boolean revocated = rs.getBoolean("REVOCATED");
+                    boolean revoked = rs.getBoolean(revokedColName);
                     String rev_reason = rs.getString("REV_REASON");
                     String rev_time = rs.getString("REV_TIME");
                     String rev_invalidity_time = rs.getString("REV_INVALIDITY_TIME");
@@ -233,7 +251,7 @@ class OcspCertStoreDbExporter extends DbPorter
                     cert.setId(id);
                     cert.setIssuerId(issuer_id);
                     cert.setLastUpdate(last_update);
-                    cert.setRevocated(revocated);
+                    cert.setRevoked(revoked);
                     cert.setRevReason(rev_reason);
                     cert.setRevTime(rev_time);
                     cert.setRevInvalidityTime(rev_invalidity_time);

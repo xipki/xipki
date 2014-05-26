@@ -347,14 +347,32 @@ class CaCertStoreDbExporter extends DbPorter
         System.out.println("Exporting tables CERT and RAWCERT");
         CertsFiles certsFiles = new CertsFiles();
 
+        String revokedColName = "REVOKED";
+
+        PreparedStatement ps = null;
+        try
+        {
+            ps = prepareStatement("SELECT REVOKED FROM CERT WHERE ID=?");
+            ps.setInt(1, 1);
+            ResultSet rs = ps.executeQuery();
+            rs.close();
+        } catch(SQLException e)
+        {
+            revokedColName = "REVOCATED";
+        } finally
+        {
+            closeStatement(ps);
+        }
+
         String certSql = "SELECT ID, CAINFO_ID, CERTPROFILEINFO_ID," +
                 " REQUESTORINFO_ID, LAST_UPDATE," +
-                " REVOCATED, REV_REASON, REV_TIME, REV_INVALIDITY_TIME, USER_ID" +
+                revokedColName +
+                ", REV_REASON, REV_TIME, REV_INVALIDITY_TIME, USER_ID" +
                 " FROM CERT" +
                 " WHERE ID >= ? AND ID < ?" +
                 " ORDER BY ID ASC";
 
-        PreparedStatement ps = prepareStatement(certSql);
+        ps = prepareStatement(certSql);
 
         String rawCertSql = "SELECT CERT FROM RAWCERT WHERE CERT_ID = ?";
         PreparedStatement rawCertPs = prepareStatement(rawCertSql);
@@ -412,7 +430,7 @@ class CaCertStoreDbExporter extends DbPorter
                     String certprofileinfo_id = rs.getString("CERTPROFILEINFO_ID");
                     String requestorinfo_id = rs.getString("REQUESTORINFO_ID");
                     String last_update = rs.getString("LAST_UPDATE");
-                    boolean revocated = rs.getBoolean("REVOCATED");
+                    boolean revoked = rs.getBoolean(revokedColName);
                     String rev_reason = rs.getString("REV_REASON");
                     String rev_time = rs.getString("REV_TIME");
                     String rev_invalidity_time = rs.getString("REV_INVALIDITY_TIME");
@@ -457,7 +475,7 @@ class CaCertStoreDbExporter extends DbPorter
                     cert.setCertprofileinfoId(certprofileinfo_id);
                     cert.setRequestorinfoId(requestorinfo_id);
                     cert.setLastUpdate(last_update);
-                    cert.setRevocated(revocated);
+                    cert.setRevoked(revoked);
                     cert.setRevReason(rev_reason);
                     cert.setRevTime(rev_time);
                     cert.setRevInvalidityTime(rev_invalidity_time);

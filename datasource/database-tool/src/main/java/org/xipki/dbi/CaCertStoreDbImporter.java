@@ -359,7 +359,7 @@ class CaCertStoreDbImporter extends DbPorter
         final String SQL_ADD_CERT =
                 "INSERT INTO CERT " +
                 "(ID, LAST_UPDATE, SERIAL, SUBJECT,"
-                + " NOTBEFORE, NOTAFTER, REVOCATED, REV_REASON, REV_TIME, REV_INVALIDITY_TIME,"
+                + " NOTBEFORE, NOTAFTER, REVOKED, REV_REASON, REV_TIME, REV_INVALIDITY_TIME,"
                 + " CERTPROFILEINFO_ID, CAINFO_ID,"
                 + " REQUESTORINFO_ID, USER_ID, SHA1_FP_PK, SHA1_FP_SUBJECT)" +
                 " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
@@ -422,7 +422,7 @@ class CaCertStoreDbImporter extends DbPorter
                     ps_cert.setString(idx++, IoCertUtil.canonicalizeName(c.getSubject()));
                     ps_cert.setLong(idx++, c.getTBSCertificate().getStartDate().getDate().getTime() / 1000);
                     ps_cert.setLong(idx++, c.getTBSCertificate().getEndDate().getDate().getTime() / 1000);
-                    ps_cert.setBoolean(idx++, cert.isRevocated());
+                    ps_cert.setBoolean(idx++, cert.isRevoked());
                     ps_cert.setString(idx++, cert.getRevReason());
                     ps_cert.setString(idx++, cert.getRevTime());
                     ps_cert.setString(idx++, cert.getRevInvalidityTime());
