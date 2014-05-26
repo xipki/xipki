@@ -47,6 +47,16 @@ public abstract class CertProfile
 
     public abstract ExtensionOccurrence getOccurenceOfAuthorityKeyIdentifier();
 
+    /**
+     * Whether include subject and serial number of the issuer certificate in the
+     * AuthorityKeyIdentifier extension.
+     * @return
+     */
+    public boolean includeIssuerAndSerialInAKI()
+    {
+        return false;
+    }
+
     public abstract ExtensionOccurrence getOccurenceOfSubjectKeyIdentifier();
 
     public abstract ExtensionOccurrence getOccurenceOfCRLDistributinPoints();
