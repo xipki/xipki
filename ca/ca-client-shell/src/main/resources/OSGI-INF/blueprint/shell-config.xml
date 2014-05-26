@@ -13,8 +13,8 @@
             </action>
         </command>
 
-        <command name="caclient/ra-rev">
-            <action class="org.xipki.ca.client.shell.RARevocateCertCommand">
+        <command name="caclient/ra-revoke">
+            <action class="org.xipki.ca.client.shell.RARevokeCertCommand">
             	<property name="raWorker" ref="raWorker" />
             </action>
         </command>

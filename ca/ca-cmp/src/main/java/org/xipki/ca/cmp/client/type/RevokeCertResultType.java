@@ -22,7 +22,7 @@ import java.util.List;
 
 import org.xipki.security.common.ParamChecker;
 
-public class RevocateCertResultType implements CmpResultType
+public class RevokeCertResultType implements CmpResultType
 {
     private List<ResultEntryType> resultEntries;
 
@@ -35,7 +35,7 @@ public class RevocateCertResultType implements CmpResultType
     {
         ParamChecker.assertNotNull("resultEntry", resultEntry);
 
-        if((resultEntry instanceof RevocateCertResultEntryType || resultEntry instanceof ErrorResultEntryType) == false)
+        if((resultEntry instanceof RevokeCertResultEntryType || resultEntry instanceof ErrorResultEntryType) == false)
         {
             throw new IllegalArgumentException("Unaccepted parameter of class " + resultEntry.getClass().getCanonicalName());
         }
