@@ -30,7 +30,7 @@ import org.bouncycastle.asn1.pkcs.CertificationRequest;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.xipki.ca.cmp.client.type.EnrollCertEntryType;
 import org.xipki.ca.cmp.client.type.EnrollCertRequestType;
-import org.xipki.ca.cmp.client.type.RevocateCertRequestType;
+import org.xipki.ca.cmp.client.type.RevokeCertRequestType;
 import org.xipki.ca.common.CertIDOrError;
 import org.xipki.ca.common.EnrollCertResult;
 import org.xipki.ca.common.PKIErrorException;
@@ -50,13 +50,13 @@ public interface RAWorker
     EnrollCertResult requestCerts(EnrollCertRequestType request, String caName)
     throws RAWorkerException, PKIErrorException;
 
-    CertIDOrError revocateCert(X500Name issuer, BigInteger serial, int reason)
+    CertIDOrError revokeCert(X500Name issuer, BigInteger serial, int reason)
     throws RAWorkerException, PKIErrorException;
 
-    CertIDOrError revocateCert(X509Certificate cert, int reason)
+    CertIDOrError revokeCert(X509Certificate cert, int reason)
     throws RAWorkerException, PKIErrorException;
 
-    Map<String, CertIDOrError> revocateCerts(RevocateCertRequestType request)
+    Map<String, CertIDOrError> revokeCerts(RevokeCertRequestType request)
     throws RAWorkerException, PKIErrorException;
 
     X509CRL downloadCRL(String caName)

@@ -651,7 +651,7 @@ public class OcspResponder
                     case UNKNOWN:
                         bcCertStatus = new UnknownStatus();
                         break;
-                    case REVOCATED:
+                    case REVOKED:
                         CertRevocationInfo revInfo = certStatusInfo.getRevocationInfo();
                         bcCertStatus = new RevokedStatus(revInfo.getRevocationTime(), revInfo.getReason());
                         break;

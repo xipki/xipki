@@ -20,7 +20,7 @@ package org.xipki.ca.server;
 public enum CertStatus
 {
     Unknown,
-    Revocated,
+    Revoked,
     Good
 }
 

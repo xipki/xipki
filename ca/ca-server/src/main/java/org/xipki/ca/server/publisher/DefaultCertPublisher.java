@@ -93,12 +93,12 @@ public class DefaultCertPublisher extends CertPublisher
 
         try
         {
-            if(certInfo.isRevocated())
+            if(certInfo.isRevoked())
             {
                 queryExecutor.addCert(caCert,
                         cert,
                         certInfo.getProfileName(),
-                        certInfo.isRevocated(),
+                        certInfo.isRevoked(),
                         certInfo.getRevocationTime(),
                         certInfo.getRevocationReason(),
                         certInfo.getInvalidityTime());
@@ -128,10 +128,10 @@ public class DefaultCertPublisher extends CertPublisher
     {
         try
         {
-            queryExecutor.revocateCert(caCert, cert, revocationTime, revocationReason, invalidityTime);
+            queryExecutor.revokeCert(caCert, cert, revocationTime, revocationReason, invalidityTime);
         } catch (Exception e)
         {
-            logAndAudit(caCert, cert, e, "could not publish revocated certificate");
+            logAndAudit(caCert, cert, e, "could not publish revoked certificate");
         }
     }
 

@@ -227,7 +227,7 @@ public class DbCertStatusStore implements CertStatusStore
             }
 
             final String sql =
-                    "ID, REVOCATED, REV_REASON, REV_TIME, REV_INVALIDITY_TIME, PROFILE" +
+                    "ID, REVOKED, REV_REASON, REV_TIME, REV_INVALIDITY_TIME, PROFILE" +
                     " FROM CERT" +
                     " WHERE ISSUER_ID=? AND SERIAL=?";
 
@@ -252,15 +252,15 @@ public class DbCertStatusStore implements CertStatusStore
                     }
 
                     CertStatusInfo certStatusInfo;
-                    boolean revocated = rs.getBoolean("REVOCATED");
-                    if(revocated)
+                    boolean revoked = rs.getBoolean("REVOKED");
+                    if(revoked)
                     {
                         int reason = rs.getInt("REV_REASON");
                         long revocationTime = rs.getLong("REV_TIME");
                         long invalidatityTime = rs.getLong("REV_INVALIDITY_TIME");
                         CertRevocationInfo revInfo = new CertRevocationInfo(reason, new Date(revocationTime * 1000),
                                 new Date(invalidatityTime * 1000));
-                        certStatusInfo = CertStatusInfo.getRevocatedCertStatusInfo(revInfo, certHashAlgo, certHash,
+                        certStatusInfo = CertStatusInfo.getRevokedCertStatusInfo(revInfo, certHashAlgo, certHash,
                                 thisUpdate, null, certprofile);
                     }
                     else

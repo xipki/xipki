@@ -61,14 +61,14 @@ public class CertStatusInfo
         return ret;
     }
 
-    public static CertStatusInfo getRevocatedCertStatusInfo(CertRevocationInfo revocationInfo,
+    public static CertStatusInfo getRevokedCertStatusInfo(CertRevocationInfo revocationInfo,
             HashAlgoType certHashAlgo, byte[] certHash, Date thisUpdate, Date nextUpdate, String certProfile)
     {
         if(revocationInfo == null)
         {
             throw new IllegalArgumentException("revocationInfo could not be null");
         }
-        CertStatusInfo ret = new CertStatusInfo(CertStatus.REVOCATED, thisUpdate, nextUpdate, certProfile);
+        CertStatusInfo ret = new CertStatusInfo(CertStatus.REVOKED, thisUpdate, nextUpdate, certProfile);
         ret.revocationInfo = revocationInfo;
         ret.certHashAlgo = certHashAlgo;
         ret.certHash = certHash;

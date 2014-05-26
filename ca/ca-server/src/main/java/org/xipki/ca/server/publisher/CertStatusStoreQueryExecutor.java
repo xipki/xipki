@@ -125,26 +125,26 @@ class CertStatusStoreQueryExecutor
     void addCert(X509CertificateWithMetaInfo issuer,
             X509CertificateWithMetaInfo certificate,
             String certProfile,
-            boolean revocated,
+            boolean revoked,
             Date revocationTime,
             Integer revocationReason,
             Date invalidityTime)
     throws SQLException, CertificateEncodingException
     {
-        addOrUpdateCert(issuer, certificate, certProfile, revocated,
+        addOrUpdateCert(issuer, certificate, certProfile, revoked,
                 revocationTime, revocationReason, invalidityTime);
     }
 
     private void addOrUpdateCert(X509CertificateWithMetaInfo issuer,
             X509CertificateWithMetaInfo certificate,
             String certProfile,
-            boolean revocated,
+            boolean revoked,
             Date revocationTime,
             Integer revocationReason,
             Date invalidityTime)
     throws SQLException, CertificateEncodingException
     {
-        if(revocated)
+        if(revoked)
         {
             if(revocationTime == null)
             {
@@ -159,7 +159,7 @@ class CertStatusStoreQueryExecutor
         if(certRegistered)
         {
             final String sql = "UPDATE CERT" +
-                    " SET LAST_UPDATE = ?, REVOCATED = ?, REV_TIME = ?, REV_INVALIDITY_TIME = ?, REV_REASON = ?" +
+                    " SET LAST_UPDATE = ?, REVOKED = ?, REV_TIME = ?, REV_INVALIDITY_TIME = ?, REV_REASON = ?" +
                     " WHERE ISSUER_ID = ? AND SERIAL = ?";
             PreparedStatement ps = borrowPreparedStatement(sql);
 
@@ -167,8 +167,8 @@ class CertStatusStoreQueryExecutor
             {
                 int idx = 1;
                 ps.setLong(idx++, new Date().getTime()/1000);
-                ps.setBoolean(idx++, revocated);
-                if(revocated)
+                ps.setBoolean(idx++, revoked);
+                if(revoked)
                 {
                     ps.setLong(idx++, revocationTime.getTime()/1000);
                     if(invalidityTime != null)
@@ -199,14 +199,14 @@ class CertStatusStoreQueryExecutor
             StringBuilder sb = new StringBuilder();
             sb.append("INSERT INTO CERT ");
             sb.append("(ID, LAST_UPDATE, SERIAL, SUBJECT");
-            sb.append(", NOTBEFORE, NOTAFTER, REVOCATED, ISSUER_ID, PROFILE");
-            if(revocated)
+            sb.append(", NOTBEFORE, NOTAFTER, REVOKED, ISSUER_ID, PROFILE");
+            if(revoked)
             {
                 sb.append(", REV_TIME, REV_INVALIDITY_TIME, REV_REASON");
             }
             sb.append(")");
             sb.append(" VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?");
-            if(revocated)
+            if(revoked)
             {
                 sb.append(", ?, ?, ?");
             }
@@ -227,11 +227,11 @@ class CertStatusStoreQueryExecutor
                 ps.setString(idx++, cert.getSubjectX500Principal().getName());
                 ps.setLong(idx++, cert.getNotBefore().getTime()/1000);
                 ps.setLong(idx++, cert.getNotAfter().getTime()/1000);
-                ps.setBoolean(idx++, revocated);
+                ps.setBoolean(idx++, revoked);
                 ps.setInt(idx++, issuerId);
                 ps.setString(idx++, certProfile);
 
-                if(revocated)
+                if(revoked)
                 {
                     ps.setLong(idx++, revocationTime.getTime()/1000);
                     if(invalidityTime != null)
@@ -288,7 +288,7 @@ class CertStatusStoreQueryExecutor
         }
     }
 
-    void revocateCert(X509CertificateWithMetaInfo caCert,
+    void revokeCert(X509CertificateWithMetaInfo caCert,
             X509CertificateWithMetaInfo cert,
             Date revocationTime,
             int revocationReason,

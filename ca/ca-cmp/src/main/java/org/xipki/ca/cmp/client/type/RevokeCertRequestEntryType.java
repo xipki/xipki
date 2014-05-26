@@ -23,7 +23,7 @@ import java.util.Date;
 
 import org.bouncycastle.asn1.x500.X500Name;
 
-public class RevocateCertRequestEntryType extends ResultEntryType
+public class RevokeCertRequestEntryType extends ResultEntryType
 {
     private final int reason;
     private final Date invalidityDate;
@@ -31,14 +31,14 @@ public class RevocateCertRequestEntryType extends ResultEntryType
     private final X500Name issuer;
     private final BigInteger serialNumber;
 
-    public RevocateCertRequestEntryType(String id, X509Certificate cert,
+    public RevokeCertRequestEntryType(String id, X509Certificate cert,
             int reason, Date invalidityDate)
     {
         this(id, X500Name.getInstance(cert.getIssuerX500Principal().getEncoded()), cert.getSerialNumber(),
                 reason, invalidityDate);
     }
 
-    public RevocateCertRequestEntryType(String id, X500Name issuer, BigInteger serialNumber,
+    public RevokeCertRequestEntryType(String id, X500Name issuer, BigInteger serialNumber,
             int reason, Date invalidityDate)
     {
         super(id);

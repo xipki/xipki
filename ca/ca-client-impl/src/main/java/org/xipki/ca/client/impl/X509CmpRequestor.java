@@ -84,10 +84,10 @@ import org.xipki.ca.cmp.client.type.ErrorResultEntryType;
 import org.xipki.ca.cmp.client.type.ErrorResultType;
 import org.xipki.ca.cmp.client.type.P10EnrollCertRequestType;
 import org.xipki.ca.cmp.client.type.ResultEntryType;
-import org.xipki.ca.cmp.client.type.RevocateCertRequestEntryType;
-import org.xipki.ca.cmp.client.type.RevocateCertRequestType;
-import org.xipki.ca.cmp.client.type.RevocateCertResultEntryType;
-import org.xipki.ca.cmp.client.type.RevocateCertResultType;
+import org.xipki.ca.cmp.client.type.RevokeCertRequestEntryType;
+import org.xipki.ca.cmp.client.type.RevokeCertRequestType;
+import org.xipki.ca.cmp.client.type.RevokeCertResultEntryType;
+import org.xipki.ca.cmp.client.type.RevokeCertResultType;
 import org.xipki.ca.cmp.server.PKIResponse;
 import org.xipki.security.api.ConcurrentContentSigner;
 import org.xipki.security.api.SecurityFactory;
@@ -205,10 +205,10 @@ abstract class X509CmpRequestor extends CmpRequestor
         return result;
     }
 
-    public CmpResultType revocateCertificate(RevocateCertRequestType request)
+    public CmpResultType revokeCertificate(RevokeCertRequestType request)
     throws CmpRequestorException
     {
-        PKIMessage reqMessage = buildRevocateCertRequest(request);
+        PKIMessage reqMessage = buildRevokeCertRequest(request);
         PKIResponse response = signAndSend(reqMessage);
 
         ErrorResultType errorResult = checkAndBuildErrorResultIfRequired(response);
@@ -240,10 +240,10 @@ abstract class X509CmpRequestor extends CmpRequestor
             LOG.warn("Status.length (" + statuses.length + ") < " + "RevCerts.length (" + revCerts.length + "), ignore the revCerts");
         }
 
-        List<RevocateCertRequestEntryType> requestEntries = new ArrayList<RevocateCertRequestEntryType>(
+        List<RevokeCertRequestEntryType> requestEntries = new ArrayList<RevokeCertRequestEntryType>(
                 request.getRequestEntries());
 
-        RevocateCertResultType result = new RevocateCertResultType();
+        RevokeCertResultType result = new RevokeCertResultType();
         for(int i = 0; i < statuses.length; i++)
         {
             CertId certId = null;
@@ -252,9 +252,9 @@ abstract class X509CmpRequestor extends CmpRequestor
                 certId = revCerts[i];
             }
 
-            RevocateCertRequestEntryType requestEntry = null;
+            RevokeCertRequestEntryType requestEntry = null;
             // find the id
-            for(RevocateCertRequestEntryType re : requestEntries)
+            for(RevokeCertRequestEntryType re : requestEntries)
             {
                 if(re.getIssuer().equals(certId.getIssuer().getName()) &&
                   re.getSerialNumber().equals(certId.getSerialNumber().getValue()))
@@ -266,7 +266,7 @@ abstract class X509CmpRequestor extends CmpRequestor
 
             if(requestEntry == null)
             {
-                LOG.error("The revocated cert (issuer={}, serial={}] is not requested", certId.getIssuer().getName(),
+                LOG.error("The revoked cert (issuer={}, serial={}] is not requested", certId.getIssuer().getName(),
                         certId.getSerialNumber().getValue());
                 continue;
             }
@@ -281,7 +281,7 @@ abstract class X509CmpRequestor extends CmpRequestor
             ResultEntryType resultEntry;
             if(status == PKIStatus.GRANTED || status == PKIStatus.GRANTED_WITH_MODS)
             {
-                resultEntry = new RevocateCertResultEntryType(id, certId);
+                resultEntry = new RevokeCertResultEntryType(id, certId);
             }
             else
             {
@@ -297,7 +297,7 @@ abstract class X509CmpRequestor extends CmpRequestor
 
         if(requestEntries.isEmpty() == false)
         {
-            for(RevocateCertRequestEntryType re : requestEntries)
+            for(RevokeCertRequestEntryType re : requestEntries)
             {
                 ErrorResultEntryType ere = new ErrorResultEntryType(re.getId(), ClientErrorCode.PKIStatus_NO_ANSWER);
                 result.addResultEntry(ere);
@@ -542,14 +542,14 @@ abstract class X509CmpRequestor extends CmpRequestor
         return pkiMessage;
     }
 
-    private PKIMessage buildRevocateCertRequest(RevocateCertRequestType request)
+    private PKIMessage buildRevokeCertRequest(RevokeCertRequestType request)
     throws CmpRequestorException
     {
         PKIHeader header = buildPKIHeader(null);
 
-        List<RevocateCertRequestEntryType> requestEntries = request.getRequestEntries();
+        List<RevokeCertRequestEntryType> requestEntries = request.getRequestEntries();
         List<RevDetails> revDetailsArray = new ArrayList<RevDetails>(requestEntries.size());
-        for(RevocateCertRequestEntryType requestEntry : requestEntries)
+        for(RevokeCertRequestEntryType requestEntry : requestEntries)
         {
             CertTemplateBuilder certTempBuilder = new CertTemplateBuilder();
             certTempBuilder.setIssuer(requestEntry.getIssuer());
@@ -672,10 +672,10 @@ abstract class X509CmpRequestor extends CmpRequestor
         return sign(request);
     }
 
-    public PKIMessage envelopeRevocation(RevocateCertRequestType request)
+    public PKIMessage envelopeRevocation(RevokeCertRequestType request)
     throws CmpRequestorException
     {
-        PKIMessage reqMessage = buildRevocateCertRequest(request);
+        PKIMessage reqMessage = buildRevokeCertRequest(request);
         reqMessage = sign(reqMessage);
         return reqMessage;
     }

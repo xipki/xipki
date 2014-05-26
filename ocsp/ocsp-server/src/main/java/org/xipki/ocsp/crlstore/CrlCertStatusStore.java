@@ -384,7 +384,7 @@ public class CrlCertStatusStore implements CertStatusStore
                     Map<HashAlgoType, byte[]> certHashes = (cert == null) ? null : getCertHashes(cert.cert);
 
                     CertRevocationInfo revocationInfo = new CertRevocationInfo(reasonCode, revTime, invalidityTime);
-                    CrlCertStatusInfo crlCertStatusInfo = CrlCertStatusInfo.getRevocatedCertStatusInfo(
+                    CrlCertStatusInfo crlCertStatusInfo = CrlCertStatusInfo.getRevokedCertStatusInfo(
                             revocationInfo, cert.profileName, certHashes);
                     newCertStatusInfoMap.put(serialNumber, crlCertStatusInfo);
                 }
