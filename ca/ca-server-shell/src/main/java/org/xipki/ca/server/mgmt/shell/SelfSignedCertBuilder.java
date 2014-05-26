@@ -43,6 +43,8 @@ import org.bouncycastle.asn1.x509.AuthorityKeyIdentifier;
 import org.bouncycastle.asn1.x509.CRLDistPoint;
 import org.bouncycastle.asn1.x509.Certificate;
 import org.bouncycastle.asn1.x509.Extension;
+import org.bouncycastle.asn1.x509.GeneralName;
+import org.bouncycastle.asn1.x509.GeneralNames;
 import org.bouncycastle.asn1.x509.SubjectKeyIdentifier;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.bouncycastle.cert.X509v3CertificateBuilder;
@@ -327,11 +329,16 @@ class SelfSignedCertBuilder
         extOccurrence = profile.getOccurenceOfAuthorityKeyIdentifier();
         if(extOccurrence != null)
         {
-            /*
-            GeneralNames caSubject = new GeneralNames(new GeneralName(subject));
-            AuthorityKeyIdentifier value = new AuthorityKeyIdentifier(skiValue, caSubject, serialNumber);
-            */
-            AuthorityKeyIdentifier value = new AuthorityKeyIdentifier(skiValue);
+            AuthorityKeyIdentifier value;
+            if(profile.includeIssuerAndSerialInAKI())
+            {
+                GeneralNames caSubject = new GeneralNames(new GeneralName(subject));
+                value = new AuthorityKeyIdentifier(skiValue, caSubject, serialNumber);
+            }
+            else
+            {
+                value = new AuthorityKeyIdentifier(skiValue);
+            }
             certBuilder.addExtension(Extension.authorityKeyIdentifier, extOccurrence.isCritical(), value);
         }
 
