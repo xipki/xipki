@@ -1357,14 +1357,17 @@ public class X509CA
             return;
         }
 
-        /*
-         * TODO: make it configurable
-        GeneralNames caSubject = new GeneralNames(new GeneralName(caSubjectX500Name));
-        BigInteger caSN = caInfo.getCertificate().getCert().getSerialNumber();
-        AuthorityKeyIdentifier value = new AuthorityKeyIdentifier(caSki, caSubject, caSN);
-        */
-
-        AuthorityKeyIdentifier value = new AuthorityKeyIdentifier(this.caSKI);
+        AuthorityKeyIdentifier value;
+        if(profile.includeIssuerAndSerialInAKI())
+        {
+            GeneralNames caSubject = new GeneralNames(new GeneralName(caSubjectX500Name));
+            BigInteger caSN = caInfo.getCertificate().getCert().getSerialNumber();
+            value = new AuthorityKeyIdentifier(this.caSKI, caSubject, caSN);
+        }
+        else
+        {
+            value = new AuthorityKeyIdentifier(this.caSKI);
+        }
 
         certBuilder.addExtension(Extension.authorityKeyIdentifier, extOccurrence.isCritical(), value);
     }
