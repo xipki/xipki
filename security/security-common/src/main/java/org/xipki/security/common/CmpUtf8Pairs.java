@@ -155,12 +155,11 @@ public class CmpUtf8Pairs
         pairs.put(name, value);
     }
 
-    
     public void removeUtf8Pair(String name)
     {
-    	pairs.remove(name);
+        pairs.remove(name);
     }
-    
+
     public String getValue(String name)
     {
         return pairs.get(name);
