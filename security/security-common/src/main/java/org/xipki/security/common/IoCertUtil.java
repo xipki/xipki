@@ -50,7 +50,6 @@ import org.bouncycastle.asn1.DERUTF8String;
 import org.bouncycastle.asn1.x500.RDN;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x500.style.IETFUtils;
-import org.bouncycastle.util.encoders.Base64;
 
 public class IoCertUtil
 {
@@ -344,7 +343,7 @@ public class IoCertUtil
     {
         return HashCalculator.hexHash(HashAlgoType.SHA1, data);
     }
-    
+
     public static byte[] extractMinimalKeyStore(String keystoreType, byte[] keystoreBytes,
             String keyname, char[] password)
     throws Exception
@@ -381,8 +380,16 @@ public class IoCertUtil
             }
         }
 
+        Enumeration<String> aliases = ks.aliases();
+        int numAliases = 0;
+        while(aliases.hasMoreElements())
+        {
+            aliases.nextElement();
+            numAliases++;
+        }
+
         Certificate[] certs = ks.getCertificateChain(keyname);
-        if(certs == null || certs.length == 1)
+        if(certs == null || certs.length == 1 && numAliases == 1)
         {
             return keystoreBytes;
         }
