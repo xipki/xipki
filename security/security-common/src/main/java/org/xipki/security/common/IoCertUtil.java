@@ -25,14 +25,19 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
+import java.security.KeyStore;
+import java.security.KeyStoreException;
 import java.security.NoSuchProviderException;
+import java.security.PrivateKey;
 import java.security.cert.CRLException;
+import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509CRL;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Enumeration;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -45,6 +50,7 @@ import org.bouncycastle.asn1.DERUTF8String;
 import org.bouncycastle.asn1.x500.RDN;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x500.style.IETFUtils;
+import org.bouncycastle.util.encoders.Base64;
 
 public class IoCertUtil
 {
@@ -337,5 +343,67 @@ public class IoCertUtil
     public static String sha1sum(byte[] data)
     {
         return HashCalculator.hexHash(HashAlgoType.SHA1, data);
+    }
+    
+    public static byte[] extractMinimalKeyStore(String keystoreType, byte[] keystoreBytes,
+            String keyname, char[] password)
+    throws Exception
+    {
+        KeyStore ks;
+        if("JKS".equalsIgnoreCase(keystoreType))
+        {
+            ks = KeyStore.getInstance(keystoreType);
+        }
+        else
+        {
+             ks = KeyStore.getInstance(keystoreType, "BC");
+        }
+        ks.load(new ByteArrayInputStream(keystoreBytes), password);
+
+        if(keyname == null)
+        {
+            Enumeration<String> aliases = ks.aliases();
+            while(aliases.hasMoreElements())
+            {
+                String alias = aliases.nextElement();
+                if(ks.isKeyEntry(alias))
+                {
+                    keyname = alias;
+                    break;
+                }
+            }
+        }
+        else
+        {
+            if(ks.isKeyEntry(keyname) == false)
+            {
+                throw new KeyStoreException("unknown key named " + keyname);
+            }
+        }
+
+        Certificate[] certs = ks.getCertificateChain(keyname);
+        if(certs == null || certs.length == 1)
+        {
+            return keystoreBytes;
+        }
+
+        PrivateKey key = (PrivateKey) ks.getKey(keyname, password);
+
+        KeyStore ks2;
+        if("JKS".equalsIgnoreCase(keystoreType))
+        {
+            ks2 = KeyStore.getInstance(keystoreType);
+        }
+        else
+        {
+             ks2 = KeyStore.getInstance(keystoreType, "BC");
+        }
+        ks2.load(null, password);
+        ks.setKeyEntry(keyname, key, password, new Certificate[]{certs[0]});
+        ByteArrayOutputStream bout = new ByteArrayOutputStream();
+        ks.store(bout, password);
+        byte[] bytes = bout.toByteArray();
+        bout.close();
+        return bytes;
     }
 }

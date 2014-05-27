@@ -175,7 +175,7 @@ public class CaGenRootCACommand extends CaCommand
 
         if("PKCS12".equalsIgnoreCase(signerType) || "JKS".equalsIgnoreCase(signerType))
         {
-            signerConf = ShellUtil.replaceFileInSignerConf(signerType, signerConf, passwordResolver);
+            signerConf = ShellUtil.canonicalizeSignerConf(signerType, signerConf, passwordResolver);
         }
 
         CAEntry entry = new CAEntry(caName, nextSerial, signerType, signerConf, caCert,

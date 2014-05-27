@@ -72,7 +72,7 @@ class CaConfigurationDbExporter extends DbPorter
         CAConfigurationType caconf = new CAConfigurationType();
         caconf.setVersion(VERSION);
 
-        System.out.println("Exporting CA configuration to database");
+        System.out.println("Exporting CA configuration from database");
 
         CmpcontrolType cmpcontrol = export_cmpcontrol();
         if(cmpcontrol != null)
@@ -109,7 +109,7 @@ class CaConfigurationDbExporter extends DbPorter
         JAXBElement<CAConfigurationType> root = new ObjectFactory().createCAConfiguration(caconf);
         marshaller.marshal(root, new File(baseDir + File.separator + FILENAME_CA_Configuration));
 
-        System.out.println("Exporting CA configuration to database");
+        System.out.println(" Exported CA configuration from database");
     }
 
     private CmpcontrolType export_cmpcontrol()

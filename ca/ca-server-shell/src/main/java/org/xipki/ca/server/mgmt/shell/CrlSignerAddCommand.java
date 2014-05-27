@@ -86,7 +86,7 @@ public class CrlSignerAddCommand extends CaCommand
             {
                 if("PKCS12".equalsIgnoreCase(signerType) || "JKS".equalsIgnoreCase(signerType))
                 {
-                    signerConf = ShellUtil.replaceFileInSignerConf(signerType,
+                    signerConf = ShellUtil.canonicalizeSignerConf(signerType,
                             signerConf, passwordResolver);
                 }
                 entry.setConf(signerConf);
