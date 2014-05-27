@@ -136,7 +136,7 @@ class CaCertStoreDbImporter extends DbPorter
                     ps.execute();
                 }catch(Exception e)
                 {
-                    System.err.println("Error while imporing cainfo with ID=" + info.getId() + ", message: " + e.getMessage());
+                    System.err.println("Error while importing cainfo with ID=" + info.getId() + ", message: " + e.getMessage());
                     throw e;
                 }
             }
@@ -177,7 +177,7 @@ class CaCertStoreDbImporter extends DbPorter
                     ps.execute();
                 }catch(Exception e)
                 {
-                    System.err.println("Error while imporing requestorinfo with ID=" + info.getId() + ", message: " + e.getMessage());
+                    System.err.println("Error while importing requestorinfo with ID=" + info.getId() + ", message: " + e.getMessage());
                     throw e;
                 }
             }
@@ -211,7 +211,7 @@ class CaCertStoreDbImporter extends DbPorter
                     ps.execute();
                 }catch(Exception e)
                 {
-                    System.err.println("Error while imporing CERTPROFILEINFO with ID=" + info.getId() + ", message: " + e.getMessage());
+                    System.err.println("Error while importing CERTPROFILEINFO with ID=" + info.getId() + ", message: " + e.getMessage());
                     throw e;
                 }
             }
@@ -245,7 +245,7 @@ class CaCertStoreDbImporter extends DbPorter
                     ps.execute();
                 }catch(Exception e)
                 {
-                    System.err.println("Error while imporing USER with ID=" + user.getId() + ", message: " + e.getMessage());
+                    System.err.println("Error while importing USER with ID=" + user.getId() + ", message: " + e.getMessage());
                     throw e;
                 }
             }
@@ -319,7 +319,7 @@ class CaCertStoreDbImporter extends DbPorter
                     ps.executeUpdate();
                 }catch(Exception e)
                 {
-                    System.err.println("Error while imporing CRL with ID=" + crl.getId() + ", message: " + e.getMessage());
+                    System.err.println("Error while importing CRL with ID=" + crl.getId() + ", message: " + e.getMessage());
                     throw e;
                 }
             }
