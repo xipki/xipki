@@ -265,7 +265,7 @@ class CaCertStoreDbExporter extends DbPorter
             closeStatement(stmt);
         }
 
-        System.out.println(" Exported table CAINFO");
+        System.out.println(" Exported table REQUESTORINFO");
         return infos;
     }
 

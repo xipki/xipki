@@ -138,7 +138,7 @@ public class CaAddCommand extends CaCommand
 
         if("PKCS12".equalsIgnoreCase(signerType) || "JKS".equalsIgnoreCase(signerType))
         {
-            signerConf = ShellUtil.replaceFileInSignerConf(signerType, signerConf, passwordResolver);
+            signerConf = ShellUtil.canonicalizeSignerConf(signerType, signerConf, passwordResolver);
         }
 
         // check whether the signer and certificate match
