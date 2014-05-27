@@ -92,10 +92,10 @@ class CaConfigurationDbImporter extends DbPorter
             import_ca_has_certprofile(caconf.getCaHasCertprofiles());
         }catch(Exception e)
         {
-            System.err.println("Error while imporing CA configuration to database. message: " + e.getMessage());
+            System.err.println("Error while importing CA configuration to database. message: " + e.getMessage());
             throw e;
         }
-        System.out.println("Imported CA configuration to database");
+        System.out.println(" Imported CA configuration to database");
     }
 
     private void import_cmpcontrol(CmpcontrolType control)
