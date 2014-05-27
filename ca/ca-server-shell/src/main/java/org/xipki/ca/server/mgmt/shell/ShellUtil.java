@@ -17,14 +17,6 @@
 
 package org.xipki.ca.server.mgmt.shell;
 
-import java.io.ByteArrayOutputStream;
-import java.io.FileInputStream;
-import java.security.KeyStore;
-import java.security.KeyStoreException;
-import java.security.PrivateKey;
-import java.security.cert.Certificate;
-import java.util.Enumeration;
-
 import org.bouncycastle.util.encoders.Base64;
 import org.xipki.security.api.PasswordResolver;
 import org.xipki.security.common.CmpUtf8Pairs;
