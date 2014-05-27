@@ -384,7 +384,7 @@ public class IoCertUtil
         int numAliases = 0;
         while(aliases.hasMoreElements())
         {
-            aliases.nextElement();
+        	aliases.nextElement();
             numAliases++;
         }
 
@@ -395,17 +395,17 @@ public class IoCertUtil
         }
 
         PrivateKey key = (PrivateKey) ks.getKey(keyname, password);
+        ks = null;
 
-        KeyStore ks2;
         if("JKS".equalsIgnoreCase(keystoreType))
         {
-            ks2 = KeyStore.getInstance(keystoreType);
+            ks = KeyStore.getInstance(keystoreType);
         }
         else
         {
-             ks2 = KeyStore.getInstance(keystoreType, "BC");
+             ks = KeyStore.getInstance(keystoreType, "BC");
         }
-        ks2.load(null, password);
+        ks.load(null, password);
         ks.setKeyEntry(keyname, key, password, new Certificate[]{certs[0]});
         ByteArrayOutputStream bout = new ByteArrayOutputStream();
         ks.store(bout, password);
