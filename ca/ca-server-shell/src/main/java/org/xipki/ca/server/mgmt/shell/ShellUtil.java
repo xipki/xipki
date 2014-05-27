@@ -54,15 +54,15 @@ class ShellUtil
         }
         else if(keystoreConf.startsWith("base64:"))
         {
-        	keystoreBytes = Base64.decode(keystoreConf.substring("base64:".length()));
+            keystoreBytes = Base64.decode(keystoreConf.substring("base64:".length()));
         }
         else
         {
-        	return signerConf;
+            return signerConf;
         }
 
-        keystoreBytes = IoCertUtil.extractMinimalKeyStore(keystoreType, 
-        		keystoreBytes, keyLabel,
+        keystoreBytes = IoCertUtil.extractMinimalKeyStore(keystoreType,
+                keystoreBytes, keyLabel,
                 passwordResolver.resolvePassword(passwordHint));
 
         utf8Pairs.putUtf8Pair("keystore", "base64:" + Base64.toBase64String(keystoreBytes));
