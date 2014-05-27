@@ -384,7 +384,7 @@ public class IoCertUtil
         int numAliases = 0;
         while(aliases.hasMoreElements())
         {
-        	aliases.nextElement();
+            aliases.nextElement();
             numAliases++;
         }
 

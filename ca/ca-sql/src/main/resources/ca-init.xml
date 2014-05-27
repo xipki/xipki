@@ -46,7 +46,7 @@
 			<column name="SIGNER_TYPE" type="VARCHAR(100)">
 				<constraints nullable="false"/>
 			</column>
-			<column name="SIGNER_CONF" type="VARCHAR(4000)"/>
+			<column name="SIGNER_CONF" type="VARCHAR(6000)"/>
 			<column name="SIGNER_CERT" type="VARCHAR(2000)"/>
 			<column name="PERIOD" remarks="minutes. 0 indicates no CRL will be generated automatically." type="INT">
 				<constraints nullable="false"/>
@@ -110,7 +110,7 @@
 			<column name="SIGNER_TYPE" type="VARCHAR(100)">
 				<constraints nullable="false"/>
 			</column>
-			<column name="SIGNER_CONF" type="VARCHAR(4000)">
+			<column name="SIGNER_CONF" type="VARCHAR(6000)">
 				<constraints nullable="false"/>
 			</column>
 			<column name="CRLSIGNER_NAME" type="VARCHAR(45)"/>
