@@ -129,7 +129,7 @@ class CaCertStoreDbImporter extends DbPorter
 
                     int idx = 1;
                     ps.setInt   (idx++, info.getId());
-                    ps.setString(idx++, c.getSubjectX500Principal().getName());
+                    ps.setString(idx++, IoCertUtil.canonicalizeName(c.getSubjectX500Principal()));
                     ps.setString(idx++, hexSha1FpCert);
                     ps.setString(idx++, b64Cert);
 
@@ -170,7 +170,7 @@ class CaCertStoreDbImporter extends DbPorter
 
                     int idx = 1;
                     ps.setInt   (idx++, info.getId());
-                    ps.setString(idx++, cert.getSubjectX500Principal().getName());
+                    ps.setString(idx++, IoCertUtil.canonicalizeName(cert.getSubjectX500Principal()));
                     ps.setString(idx++, hexSha1FpCert);
                     ps.setString(idx++, b64Cert);
 
@@ -342,7 +342,7 @@ class CaCertStoreDbImporter extends DbPorter
             try
             {
                 sum += do_import_cert(certsFile);
-                System.out.println(" Imported certificates specified in file " + certsFile);
+                System.out.println(" Imported certificates from file " + certsFile);
                 System.out.println(" Imported " + sum + " certificates ...");
             }catch(Exception e)
             {
