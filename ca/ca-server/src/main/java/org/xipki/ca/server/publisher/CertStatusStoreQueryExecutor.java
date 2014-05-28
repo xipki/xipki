@@ -224,7 +224,7 @@ class CertStatusStoreQueryExecutor
                 ps.setInt(idx++, certId);
                 ps.setLong(idx++, System.currentTimeMillis()/1000);
                 ps.setLong(idx++, serialNumber.longValue());
-                ps.setString(idx++, cert.getSubjectX500Principal().getName());
+                ps.setString(idx++, certificate.getSubject());
                 ps.setLong(idx++, cert.getNotBefore().getTime()/1000);
                 ps.setLong(idx++, cert.getNotAfter().getTime()/1000);
                 ps.setBoolean(idx++, revoked);
@@ -336,7 +336,7 @@ class CertStatusStoreQueryExecutor
         try
         {
             String b64Cert = Base64.toBase64String(issuerCert.getEncodedCert());
-            String subject = issuerCert.getCert().getSubjectX500Principal().getName();
+            String subject = issuerCert.getSubject();
             int idx = 1;
             ps.setInt(idx++, id.intValue());
             ps.setString(idx++, subject);

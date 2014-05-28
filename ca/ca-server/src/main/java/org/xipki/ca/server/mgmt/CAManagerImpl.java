@@ -75,6 +75,7 @@ import org.xipki.security.common.CmpUtf8Pairs;
 import org.xipki.security.common.ConfigurationException;
 import org.xipki.security.common.DfltEnvironmentParameterResolver;
 import org.xipki.security.common.EnvironmentParameterResolver;
+import org.xipki.security.common.IoCertUtil;
 import org.xipki.security.common.ParamChecker;
 
 public class CAManagerImpl implements CAManager
@@ -1508,7 +1509,7 @@ public class CAManagerImpl implements CAManager
 
             if(iCert != null)
             {
-                ps.setString(iSubject, cert.getSubjectX500Principal().getName());
+                ps.setString(iSubject, IoCertUtil.canonicalizeName(cert.getSubjectX500Principal()));
 
                 String base64Cert = Base64.toBase64String(cert.getEncoded());
                 ps.setString(iCert, base64Cert);

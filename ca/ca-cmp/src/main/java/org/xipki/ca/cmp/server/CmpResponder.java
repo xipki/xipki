@@ -59,6 +59,7 @@ import org.xipki.ca.common.CertBasedRequestorInfo;
 import org.xipki.ca.common.RequestorInfo;
 import org.xipki.security.api.ConcurrentContentSigner;
 import org.xipki.security.api.SecurityFactory;
+import org.xipki.security.common.IoCertUtil;
 import org.xipki.security.common.ParamChecker;
 
 public abstract class CmpResponder
@@ -229,7 +230,7 @@ public abstract class CmpResponder
             else
             {
                 LOG.warn("tid={}: not authorized requestor (TLS client {})",
-                        tid, tlsClientCert.getSubjectX500Principal().getName());
+                        tid, IoCertUtil.canonicalizeName(tlsClientCert.getSubjectX500Principal()));
                 errorStatus = "Requestor (TLS client certificate) is not authorized";
             }
 

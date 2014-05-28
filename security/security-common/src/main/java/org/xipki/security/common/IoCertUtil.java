@@ -50,6 +50,7 @@ import org.bouncycastle.asn1.DERUTF8String;
 import org.bouncycastle.asn1.x500.RDN;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x500.style.IETFUtils;
+import org.bouncycastle.asn1.x500.style.RFC4519Style;
 
 public class IoCertUtil
 {
@@ -96,9 +97,36 @@ public class IoCertUtil
         RDN[] requstedRDNs = name.getRDNs();
 
         List<RDN> rdns = new LinkedList<RDN>();
-
-        for(ASN1ObjectIdentifier type : forwardDNs)
+        int size = forwardDNs.length;
+        for(int i = 0; i < size; i++)
         {
+            ASN1ObjectIdentifier type = forwardDNs[i];
+            RDN[] thisRDNs = getRDNs(requstedRDNs, type);
+            int n = thisRDNs == null ? 0 : thisRDNs.length;
+            if(n == 0)
+            {
+                continue;
+            }
+
+            for(RDN thisRDN : thisRDNs)
+            {
+                String text = IETFUtils.valueToString(thisRDN.getFirst().getValue());
+                rdns.add(createSubjectRDN(text, type));
+            }
+        }
+
+        return new X500Name(rdns.toArray(new RDN[0]));
+    }
+
+    public static X500Name backwardSortX509Name(X500Name name)
+    {
+        RDN[] requstedRDNs = name.getRDNs();
+
+        List<RDN> rdns = new LinkedList<RDN>();
+        int size = forwardDNs.length;
+        for(int i = size-1; i >= 0; i--)
+        {
+            ASN1ObjectIdentifier type = forwardDNs[i];
             RDN[] thisRDNs = getRDNs(requstedRDNs, type);
             int n = thisRDNs == null ? 0 : thisRDNs.length;
             if(n == 0)
@@ -270,16 +298,15 @@ public class IoCertUtil
         }
     }
 
+    public static String canonicalizeName(X500Principal name)
+    {
+        X500Name rfc4519Name = X500Name.getInstance(RFC4519Style.INSTANCE, name.getEncoded());
+        return canonicalizeName(rfc4519Name);
+    }
+
     public static String canonicalizeName(X500Name name)
     {
-        try
-        {
-            X500Principal prin = new X500Principal(name.getEncoded());
-            return prin.getName();
-        } catch (Exception e)
-        {
-            throw new IllegalArgumentException("invalid name " + name);
-        }
+           return RFC4519Style.INSTANCE.toString(name);
     }
 
     /**
