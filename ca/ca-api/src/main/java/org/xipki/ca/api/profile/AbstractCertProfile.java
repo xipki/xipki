@@ -46,6 +46,7 @@ public abstract class AbstractCertProfile
 extends CertProfile implements SubjectDNSubset
 {
     private final List<ASN1ObjectIdentifier> forwardDNs;
+    private final List<ASN1ObjectIdentifier> backwardDNs;
 
     protected abstract Set<KeyUsage> getKeyUsage();
 
@@ -88,6 +89,20 @@ extends CertProfile implements SubjectDNSubset
         _forwardDNs.add(ObjectIdentifiers.DN_STREET);
 
         forwardDNs = Collections.unmodifiableList(_forwardDNs);
+
+        List<ASN1ObjectIdentifier> _backwardDNs = new ArrayList<ASN1ObjectIdentifier>(25);
+        int size = _forwardDNs.size();
+        for(int i = size-1; i >= 0; i--)
+        {
+            _backwardDNs.add(_forwardDNs.get(i));
+        }
+
+        backwardDNs = Collections.unmodifiableList(_backwardDNs);
+    }
+
+    public boolean backwardsSubject()
+    {
+        return false;
     }
 
     protected String[] sortRDNs(ASN1ObjectIdentifier type, String[] values)
@@ -134,7 +149,9 @@ extends CertProfile implements SubjectDNSubset
 
         List<RDN> rdns = new LinkedList<RDN>();
 
-        for(ASN1ObjectIdentifier type : forwardDNs)
+        List<ASN1ObjectIdentifier> types = backwardsSubject() ? backwardDNs : forwardDNs;
+
+        for(ASN1ObjectIdentifier type : types)
         {
             RDNOccurrence occurrence = null;
             if(occurences != null)
