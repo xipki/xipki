@@ -20,6 +20,7 @@ package org.xipki.ca.server.mgmt;
 import java.security.cert.X509Certificate;
 
 import org.xipki.security.common.ConfigurationException;
+import org.xipki.security.common.IoCertUtil;
 import org.xipki.security.common.ParamChecker;
 
 public class CrlSignerEntry
@@ -86,10 +87,10 @@ public class CrlSignerEntry
         sb.append("includeCertsInCrl: ").append(includeCertsInCrl).append("\n");
         sb.append("cert: ").append("\n");
         sb.append("\tissuer: ").append(
-                cert.getIssuerX500Principal().getName()).append("\n");
+                IoCertUtil.canonicalizeName(cert.getIssuerX500Principal())).append("\n");
         sb.append("\tserialNumber: ").append(cert.getSerialNumber()).append("\n");
         sb.append("\tsubject: ").append(
-                cert.getSubjectX500Principal().getName());
+                IoCertUtil.canonicalizeName(cert.getSubjectX500Principal()));
         return sb.toString();
     }
 

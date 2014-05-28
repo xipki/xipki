@@ -21,6 +21,7 @@ import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
 
 import org.bouncycastle.crypto.RuntimeCryptoException;
+import org.xipki.security.common.IoCertUtil;
 import org.xipki.security.common.ParamChecker;
 
 public class X509CertificateWithMetaInfo
@@ -40,7 +41,7 @@ public class X509CertificateWithMetaInfo
 
         this.cert = cert;
 
-        this.subject = cert.getSubjectX500Principal().getName();
+        this.subject = IoCertUtil.canonicalizeName(cert.getSubjectX500Principal());
 
         if(encodedCert == null)
         {

@@ -1007,7 +1007,7 @@ public class X509CA
         }
 
         String sha1FpSubject = IoCertUtil.sha1sum_canonicalized_name(grantedSubject);
-        String grandtedSubjectText = grantedSubject.toString();
+        String grandtedSubjectText = IoCertUtil.canonicalizeName(grantedSubject);
 
         if(keyUpdate)
         {

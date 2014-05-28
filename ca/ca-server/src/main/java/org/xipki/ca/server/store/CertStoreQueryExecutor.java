@@ -941,16 +941,19 @@ class CertStoreQueryExecutor
     CertStatus getCertStatusForSubject(X509CertificateWithMetaInfo caCert, X500Principal subject)
     throws SQLException
     {
-        return getCertStatusForSubject(caCert, subject.getName());
+        String subjectFp = IoCertUtil.sha1sum_canonicalized_name(subject);
+        return getCertStatusForSubjectFp(caCert, subjectFp);
     }
 
     CertStatus getCertStatusForSubject(X509CertificateWithMetaInfo caCert, X500Name subject)
     throws SQLException
     {
-        return getCertStatusForSubject(caCert, subject.toString());
+        String subjectFp = IoCertUtil.sha1sum_canonicalized_name(subject);
+        return getCertStatusForSubjectFp(caCert, subjectFp);
     }
 
-    private CertStatus getCertStatusForSubject(X509CertificateWithMetaInfo caCert, String subject)
+    private CertStatus getCertStatusForSubjectFp(
+            X509CertificateWithMetaInfo caCert, String subjectFp)
     throws SQLException
     {
         byte[] encodedCert = caCert.getEncodedCert();
@@ -960,7 +963,7 @@ class CertStoreQueryExecutor
             return CertStatus.Unknown;
         }
 
-        String sql = "REVOKED FROM CERT WHERE SUBJECT=? AND CAINFO_ID=?";
+        String sql = "REVOKED FROM CERT WHERE SHA1_FP_SUBJECT=? AND CAINFO_ID=?";
         sql = createFetchFirstSelectSQL(sql, 1);
         PreparedStatement ps = borrowPreparedStatement(sql);
         ResultSet rs = null;
@@ -968,7 +971,7 @@ class CertStoreQueryExecutor
         try
         {
             int idx = 1;
-            ps.setString(idx++, subject);
+            ps.setString(idx++, subjectFp);
             ps.setInt(idx++, caId);
 
             rs = ps.executeQuery();

@@ -66,7 +66,7 @@ public class CertificateStore
         } catch (Exception e)
         {
             LOG.error("Could not save certificate {}: {}. Message: {}",
-                    new Object[]{certInfo.getCert().getCert().getSubjectX500Principal(),
+                    new Object[]{certInfo.getCert().getSubject(),
                     Base64.toBase64String(certInfo.getCert().getEncodedCert()), e.getMessage()});
             LOG.debug("error", e);
             return false;
@@ -110,7 +110,7 @@ public class CertificateStore
         } catch (Exception e)
         {
             LOG.error("Could not add CRL ca={}, thisUpdate={}: {}, ",
-                new Object[]{cacert.getCert().getSubjectX500Principal().getName(),
+                new Object[]{cacert.getSubject(),
                     crl.getThisUpdate(), e.getMessage()});
             LOG.debug("Exception", e);
             return false;
@@ -137,7 +137,7 @@ public class CertificateStore
         } catch (Exception e)
         {
             LOG.error("Could not get CRL ca={}: error message: {}",
-                    cacert.getCert().getSubjectX500Principal().getName(),
+                    cacert.getSubject(),
                     e.getMessage());
             LOG.debug("Exception", e);
             return null;
@@ -152,7 +152,7 @@ public class CertificateStore
         } catch (Exception e)
         {
             LOG.error("Could not cleanup CRLs ca={}: error message: {}",
-                    cacert.getCert().getSubjectX500Principal().getName(),
+                    cacert.getSubject(),
                     e.getMessage());
             LOG.debug("Exception", e);
             return 0;

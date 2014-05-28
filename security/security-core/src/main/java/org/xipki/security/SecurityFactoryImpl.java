@@ -65,6 +65,7 @@ import org.xipki.security.api.Pkcs11KeyIdentifier;
 import org.xipki.security.api.SecurityFactory;
 import org.xipki.security.api.SignerException;
 import org.xipki.security.common.CmpUtf8Pairs;
+import org.xipki.security.common.IoCertUtil;
 import org.xipki.security.common.ParamChecker;
 import org.xipki.security.p11.P11ContentSignerBuilder;
 
@@ -130,7 +131,7 @@ public class SecurityFactoryImpl implements SecurityFactory
             boolean valid = verifier.verify(signatureValue);
             if(valid == false)
             {
-                String subject = cert.getSubjectX500Principal().getName();
+                String subject = IoCertUtil.canonicalizeName(cert.getSubjectX500Principal());
 
                 StringBuilder sb = new StringBuilder();
                 sb.append("key and certificate not match. ");

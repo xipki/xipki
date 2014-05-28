@@ -31,6 +31,7 @@ import org.xipki.ca.api.CAMgmtException;
 import org.xipki.ca.api.CAStatus;
 import org.xipki.ca.common.X509CertificateWithMetaInfo;
 import org.xipki.ca.server.PublicCAInfo;
+import org.xipki.security.common.IoCertUtil;
 import org.xipki.security.common.ParamChecker;
 
 public class CAEntry
@@ -96,7 +97,7 @@ public class CAEntry
             throw new CAMgmtException("could not encode the CA certificate");
         }
 
-        this.subject = cert.getSubjectX500Principal().getName();
+        this.subject = IoCertUtil.canonicalizeName(cert.getSubjectX500Principal());
 
         this.certInCMPFormat = new CMPCertificate(bcCert);
 
@@ -227,11 +228,9 @@ public class CAEntry
         sb.append("signer_conf: ").append(signerConf).append('\n');
         sb.append("cert: ").append("\n");
         sb.append("\tissuer: ").append(
-                cert.getCert().getIssuerX500Principal().getName()).append("\n");
+                IoCertUtil.canonicalizeName(cert.getCert().getIssuerX500Principal())).append("\n");
         sb.append("\tserialNumber: ").append(cert.getCert().getSerialNumber()).append("\n");
-        sb.append("\tsubject: ").append(
-                subject).append("\n");
-
+        sb.append("\tsubject: ").append(subject).append("\n");
         sb.append("crlsigner_name: ").append(crlSignerName).append('\n');
         sb.append("allowDuplicateKey: ").append(allowDuplicateKey).append('\n');
         sb.append("allowDuplicateSubject: ").append(allowDuplicateSubject);
