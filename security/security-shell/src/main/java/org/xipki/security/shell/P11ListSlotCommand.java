@@ -41,6 +41,7 @@ import org.bouncycastle.asn1.x9.X962NamedCurves;
 import org.bouncycastle.util.encoders.Hex;
 import org.xipki.security.api.PKCS11SlotIdentifier;
 import org.xipki.security.api.SignerException;
+import org.xipki.security.common.IoCertUtil;
 import org.xipki.security.p11.iaik.IaikExtendedModule;
 import org.xipki.security.p11.iaik.IaikExtendedSlot;
 import org.xipki.security.p11.iaik.IaikP11ModulePool;
@@ -144,7 +145,7 @@ public class P11ListSlotCommand extends SecurityCommand
                     try
                     {
                         X500Principal x500Prin = new X500Principal(bytes);
-                        subject = x500Prin.getName();
+                        subject = IoCertUtil.canonicalizeName(x500Prin);
                     }catch(Exception e)
                     {
                         subject = new String(bytes);
@@ -155,7 +156,7 @@ public class P11ListSlotCommand extends SecurityCommand
                     try
                     {
                         X500Principal x500Prin = new X500Principal(bytes);
-                        issuer = x500Prin.getName();
+                        issuer = IoCertUtil.canonicalizeName(x500Prin);
                     }catch(Exception e)
                     {
                         issuer = new String(bytes);

@@ -38,7 +38,7 @@ public class ExportOcspCommand extends OsgiCommandSupport
     protected String            outdir;
 
     @Option(name = "-n",
-            description = "Number of certificates in one zip file. Default is 500")
+            description = "Number of certificates in one zip file. Default is 1000")
     protected Integer           numCertsInBundle;
 
     private DataSourceFactory dataSourceFactory;
@@ -50,7 +50,7 @@ public class ExportOcspCommand extends OsgiCommandSupport
     {
         if(numCertsInBundle == null)
         {
-            numCertsInBundle = 500;
+            numCertsInBundle = 1000;
         }
         OcspDbExporter exporter = new OcspDbExporter(dataSourceFactory, passwordResolver, dbconfFile);
         exporter.exportDatabase(outdir, numCertsInBundle);

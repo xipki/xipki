@@ -248,7 +248,7 @@ class OcspCertStoreDbImporter extends DbPorter
                     ps_cert.setInt   (idx++, cert.getId());
                     ps_cert.setInt   (idx++, cert.getIssuerId());
                     ps_cert.setString(idx++, c.getSerialNumber().toString());
-                    ps_cert.setString(idx++, c.getSubjectX500Principal().getName());
+                    ps_cert.setString(idx++, IoCertUtil.canonicalizeName(c.getSubjectX500Principal()));
                     ps_cert.setString(idx++, cert.getLastUpdate());
                     ps_cert.setLong  (idx++, c.getNotBefore().getTime() / 1000);
                     ps_cert.setLong  (idx++, c.getNotAfter().getTime() / 1000);
