@@ -259,7 +259,28 @@ public class SignerUtil
         }
         else if(PKCSObjectIdentifiers.id_RSASSA_PSS.equals(algOid))
         {
-            return null;
+            RSASSAPSSparams param = RSASSAPSSparams.getInstance(sigAlgId.getParameters());
+            ASN1ObjectIdentifier digestAlgOid = param.getHashAlgorithm().getAlgorithm();
+            if(X509ObjectIdentifiers.id_SHA1.equals(digestAlgOid))
+            {
+                return "SHA1withRSAandMGF1";
+            }
+            else if(NISTObjectIdentifiers.id_sha256.equals(digestAlgOid))
+            {
+                return "SHA256withRSAandMGF1";
+            }
+            else if(NISTObjectIdentifiers.id_sha384.equals(digestAlgOid))
+            {
+                return "SHA384withRSAandMGF1";
+            }
+            else if(NISTObjectIdentifiers.id_sha512.equals(digestAlgOid))
+            {
+                return "SHA512withRSAandMGF1";
+            }
+            else
+            {
+                return null;
+            }
         }
         else
         {

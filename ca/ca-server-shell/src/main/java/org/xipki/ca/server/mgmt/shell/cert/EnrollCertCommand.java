@@ -15,7 +15,7 @@
  *
  */
 
-package org.xipki.ca.server.mgmt.shell;
+package org.xipki.ca.server.mgmt.shell.cert;
 
 import java.io.File;
 
@@ -33,10 +33,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.ca.api.publisher.CertificateInfo;
 import org.xipki.ca.server.X509CA;
+import org.xipki.ca.server.mgmt.shell.CaCommand;
 import org.xipki.security.api.SecurityFactory;
 import org.xipki.security.common.IoCertUtil;
 
-@Command(scope = "ca", name = "enroll", description="Enroll certificate")
+@Command(scope = "ca", name = "enroll-cert", description="Enroll certificate")
 public class EnrollCertCommand extends CaCommand
 {
     private static final Logger LOG = LoggerFactory.getLogger(EnrollCertCommand.class);

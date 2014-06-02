@@ -35,8 +35,10 @@ import org.xipki.ca.api.publisher.CertificateInfo;
 import org.xipki.ca.common.X509CertificateWithMetaInfo;
 import org.xipki.database.api.DataSource;
 import org.xipki.security.api.PasswordResolver;
+import org.xipki.security.common.CertRevocationInfo;
 import org.xipki.security.common.CmpUtf8Pairs;
 import org.xipki.security.common.EnvironmentParameterResolver;
+import org.xipki.security.common.IoCertUtil;
 import org.xipki.security.common.ParamChecker;
 
 public class DefaultCertPublisher extends CertPublisher
@@ -98,10 +100,7 @@ public class DefaultCertPublisher extends CertPublisher
                 queryExecutor.addCert(caCert,
                         cert,
                         certInfo.getProfileName(),
-                        certInfo.isRevoked(),
-                        certInfo.getRevocationTime(),
-                        certInfo.getRevocationReason(),
-                        certInfo.getInvalidityTime());
+                        certInfo.getRevocationInfo());
             }
             else
             {
@@ -115,35 +114,45 @@ public class DefaultCertPublisher extends CertPublisher
             }
         } catch (Exception e)
         {
-            logAndAudit(caCert, cert, e, "could not save certificate");
+            logAndAudit(caCert.getSubject(), cert, e, "could not save certificate");
         }
     }
 
     @Override
     public void certificateRevoked(X509CertificateWithMetaInfo caCert,
             X509CertificateWithMetaInfo cert,
-            Date revocationTime,
-            int revocationReason,
-            Date invalidityTime)
+            CertRevocationInfo revInfo)
     {
         try
         {
-            queryExecutor.revokeCert(caCert, cert, revocationTime, revocationReason, invalidityTime);
+            queryExecutor.revokeCert(caCert, cert, revInfo);
         } catch (Exception e)
         {
-            logAndAudit(caCert, cert, e, "could not publish revoked certificate");
+            logAndAudit(caCert.getSubject(), cert, e, "could not publish revoked certificate");
         }
     }
 
-    private void logAndAudit(X509CertificateWithMetaInfo caCert, X509CertificateWithMetaInfo cert, Exception e,
+    @Override
+    public void certificateUnrevoked(X509CertificateWithMetaInfo caCert,
+            X509CertificateWithMetaInfo cert)
+    {
+        try
+        {
+            queryExecutor.unrevokeCert(caCert, cert);
+        } catch (Exception e)
+        {
+            logAndAudit(caCert.getSubject(), cert, e, "could not publish unrevocation of certificate");
+        }
+    }
+
+    private void logAndAudit(String issuer, X509CertificateWithMetaInfo cert, Exception e,
             String messagePrefix)
     {
-        String issuerText = caCert.getSubject();
         String subjectText = cert.getSubject();
         String serialText = cert.getCert().getSerialNumber().toString();
 
         LOG.error("{} (issuser={}: subject={}, serialNumber={}). Message: {}",
-                new Object[]{messagePrefix, issuerText, subjectText, serialText, e.getMessage()});
+                new Object[]{messagePrefix, issuer, subjectText, serialText, e.getMessage()});
         LOG.debug("error", e);
 
         if(auditLoggingService != null)
@@ -153,9 +162,9 @@ public class DefaultCertPublisher extends CertPublisher
             auditEvent.setName("SYSTEM");
             auditEvent.setLevel(AuditLevel.ERROR);
             auditEvent.setStatus(AuditStatus.FAILED);
-            auditEvent.addEventData(new AuditEventData("issuer", issuerText));
+            auditEvent.addEventData(new AuditEventData("issuer", issuer));
             auditEvent.addEventData(new AuditEventData("subject", subjectText));
-            auditEvent.addEventData(new AuditEventData("issuer", serialText));
+            auditEvent.addEventData(new AuditEventData("serialNumber", serialText));
             auditEvent.addEventData(new AuditEventData("message", messagePrefix));
             auditLoggingService.logEvent(auditEvent);
         }
@@ -176,6 +185,46 @@ public class DefaultCertPublisher extends CertPublisher
     public void setAuditLoggingService(AuditLoggingService auditLoggingService)
     {
         this.auditLoggingService = auditLoggingService;
+    }
+
+    @Override
+    public void caRevoked(X509CertificateWithMetaInfo cacert, CertRevocationInfo revocationInfo)
+    {
+        try
+        {
+            queryExecutor.revokeCa(cacert, revocationInfo);
+        } catch (Exception e)
+        {
+            String issuerText = IoCertUtil.canonicalizeName(cacert.getCert().getIssuerX500Principal());
+            logAndAudit(issuerText, cacert, e, "Could not publish revocation of CA");
+        }
+    }
+
+    @Override
+    public void caUnrevoked(X509CertificateWithMetaInfo cacert)
+    {
+        try
+        {
+            queryExecutor.unrevokeCa(cacert);
+        } catch (Exception e)
+        {
+            String issuerText = IoCertUtil.canonicalizeName(cacert.getCert().getIssuerX500Principal());
+            logAndAudit(issuerText, cacert, e, "Could not publish unrevocation of CA");
+        }
+    }
+
+    @Override
+    public void certificateRemoved(X509CertificateWithMetaInfo issuerCert,
+            X509CertificateWithMetaInfo cert)
+    {
+        try
+        {
+            queryExecutor.removeCert(issuerCert, cert);
+        } catch (Exception e)
+        {
+            String issuerText = IoCertUtil.canonicalizeName(issuerCert.getCert().getIssuerX500Principal());
+            logAndAudit(issuerText, issuerCert, e, "Could not publish removal of certificate");
+        }
     }
 
 }

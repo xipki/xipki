@@ -30,6 +30,12 @@
             </action>
         </command>
 
+        <command name="ca/ca-revoke">
+            <action class="org.xipki.ca.server.mgmt.shell.CaRevokeCommand">
+            	<property name="caManager" ref="caManager" />
+            </action>
+        </command>
+
         <command name="ca/ca-rm">
             <action class="org.xipki.ca.server.mgmt.shell.CaRemoveCommand">
             	<property name="caManager" ref="caManager" />
@@ -190,14 +196,6 @@
             </action>
         </command>
                 
-        <!-- Enroll Certificate -->
-		<command name="ca/enroll">
-            <action class="org.xipki.ca.server.mgmt.shell.EnrollCertCommand">
-            	<property name="caManager" ref="caManager" />
-            	<property name="securityFactory" ref="securityFactory"/>
-            </action>
-        </command>
-        
 		<!-- Environment -->
         <command name="ca/env-add">
             <action class="org.xipki.ca.server.mgmt.shell.EnvAddCommand">
@@ -331,7 +329,37 @@
             	<property name="passwordResolver" ref="passwordResolver"/>
             </action>
         </command>
+
+		<!-- Certificate management -->
+		<!-- Enroll Certificate -->
+		<command name="ca/enroll-cert">
+            <action class="org.xipki.ca.server.mgmt.shell.cert.EnrollCertCommand">
+            	<property name="caManager" ref="caManager" />
+            	<property name="securityFactory" ref="securityFactory"/>
+            </action>
+        </command>
         
+		<!-- Enroll Certificate -->
+		<command name="ca/revoke-cert">
+            <action class="org.xipki.ca.server.mgmt.shell.cert.RevokeCertCommand">
+            	<property name="caManager" ref="caManager" />
+            </action>
+        </command>
+
+		<!-- Enroll Certificate -->
+		<command name="ca/unrevoke-cert">
+            <action class="org.xipki.ca.server.mgmt.shell.cert.UnrevokeCertCommand">
+            	<property name="caManager" ref="caManager" />
+            </action>
+        </command>
+
+		<!-- Remove Certificate -->
+		<command name="ca/remove-cert">
+            <action class="org.xipki.ca.server.mgmt.shell.cert.RemoveCertCommand">
+            	<property name="caManager" ref="caManager" />
+            </action>
+        </command>
+		        
         <!-- Misc -->
         <command name="ca/gen-selfsign-cert">
             <action class="org.xipki.ca.server.mgmt.shell.GenSelfSignedCertCommand">

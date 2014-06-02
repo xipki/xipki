@@ -18,10 +18,10 @@
 package org.xipki.ca.api.publisher;
 
 import java.security.cert.CertificateEncodingException;
-import java.util.Date;
 
 import org.xipki.ca.common.RequestorInfo;
 import org.xipki.ca.common.X509CertificateWithMetaInfo;
+import org.xipki.security.common.CertRevocationInfo;
 import org.xipki.security.common.ParamChecker;
 
 public class CertificateInfo
@@ -36,10 +36,7 @@ public class CertificateInfo
 
     private String warningMessage;
 
-    private boolean revoked;
-    private Integer revocationReason;
-    private Date revocationTime;
-    private Date invalidityTime;
+    private CertRevocationInfo revInfo;
     private boolean alreadyIssued;
 
     public CertificateInfo(X509CertificateWithMetaInfo cert,
@@ -113,42 +110,17 @@ public class CertificateInfo
 
     public boolean isRevoked()
     {
-        return revoked;
+        return revInfo != null;
     }
 
-    public void setRevoked(boolean revoked)
+    public CertRevocationInfo getRevocationInfo()
     {
-        this.revoked = revoked;
+        return revInfo;
     }
 
-    public Integer getRevocationReason()
+    public void setRevocationInfo(CertRevocationInfo revInfo)
     {
-        return revocationReason;
-    }
-
-    public void setRevocationReason(Integer revocationReason)
-    {
-        this.revocationReason = revocationReason;
-    }
-
-    public Date getRevocationTime()
-    {
-        return revocationTime;
-    }
-
-    public void setRevocationTime(Date revocationTime)
-    {
-        this.revocationTime = revocationTime;
-    }
-
-    public Date getInvalidityTime()
-    {
-        return invalidityTime;
-    }
-
-    public void setInvalidityTime(Date invalidityTime)
-    {
-        this.invalidityTime = invalidityTime;
+        this.revInfo = revInfo;
     }
 
     public boolean isAlreadyIssued()

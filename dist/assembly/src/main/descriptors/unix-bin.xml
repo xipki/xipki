@@ -107,7 +107,7 @@
             <directory>${project.build.directory}/sql</directory>
             <includes>
                 <include>liquibase/liquibase</include>
-		<include>**/*.sh</include>
+                <include>**/*.sh</include>
             </includes>
             <outputDirectory>sql</outputDirectory>
             <fileMode>0755</fileMode>
@@ -119,13 +119,21 @@
             <excludes>
                 <exclude>liquibase/liquibase</exclude>
                 <exclude>liquibase/javadoc/**</exclude>
-		<exclude>**/*.sh</exclude>
+                <exclude>**/*.sh</exclude>
             </excludes>
             <outputDirectory>sql</outputDirectory>
             <fileMode>0644</fileMode>
             <directoryMode>0755</directoryMode>
         </fileSet>
-
+        
+        <!-- OCSP configuration -->
+        <fileSet>
+            <directory>${project.build.directory}/ocsp-config</directory>
+            <outputDirectory>ocsp-config</outputDirectory>
+            <fileMode>0644</fileMode>
+            <directoryMode>0755</directoryMode>
+        </fileSet>
+        
         <!-- Copy over start scripts -->
         <fileSet>
             <!-- in case we replace them with updated scripts
@@ -148,7 +156,7 @@
                 -->
                 <exclude>**/demos/**</exclude>
                 <exclude>deploy/README</exclude>
-		<exclude>README</exclude>
+                <exclude>README</exclude>
                 <exclude>LICENSE</exclude>
                 <exclude>NOTICE</exclude>
                 <exclude>RELEASE-NOTES</exclude>

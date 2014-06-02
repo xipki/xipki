@@ -18,7 +18,6 @@
 package org.xipki.ca.server;
 
 import java.security.cert.X509CRL;
-import java.util.Date;
 
 import org.xipki.audit.api.AuditLoggingService;
 import org.xipki.ca.api.publisher.CertPublisher;
@@ -27,6 +26,7 @@ import org.xipki.ca.api.publisher.CertificateInfo;
 import org.xipki.ca.common.X509CertificateWithMetaInfo;
 import org.xipki.database.api.DataSource;
 import org.xipki.security.api.PasswordResolver;
+import org.xipki.security.common.CertRevocationInfo;
 import org.xipki.security.common.EnvironmentParameterResolver;
 import org.xipki.security.common.ParamChecker;
 
@@ -66,10 +66,9 @@ public class IdentifiedCertPublisher extends CertPublisher
 
     @Override
     public void certificateRevoked(X509CertificateWithMetaInfo issuerCert,
-            X509CertificateWithMetaInfo cert, Date revocationTime,
-            int revocationReason, Date invalidityTime)
+            X509CertificateWithMetaInfo cert, CertRevocationInfo revInfo)
     {
-        certPublisher.certificateRevoked(issuerCert, cert, revocationTime, revocationReason, invalidityTime);
+        certPublisher.certificateRevoked(issuerCert, cert, revInfo);
     }
 
     @Override
@@ -93,6 +92,32 @@ public class IdentifiedCertPublisher extends CertPublisher
     public void setAuditLoggingService(AuditLoggingService auditLoggingService)
     {
         certPublisher.setAuditLoggingService(auditLoggingService);
+    }
+
+    @Override
+    public void caRevoked(X509CertificateWithMetaInfo cacert, CertRevocationInfo revocationInfo)
+    {
+        certPublisher.caRevoked(cacert, revocationInfo);
+    }
+
+    @Override
+    public void caUnrevoked(X509CertificateWithMetaInfo cacert)
+    {
+        certPublisher.caUnrevoked(cacert);
+    }
+
+    @Override
+    public void certificateUnrevoked(X509CertificateWithMetaInfo issuerCert,
+            X509CertificateWithMetaInfo cert)
+    {
+        certPublisher.certificateUnrevoked(issuerCert, cert);
+    }
+
+    @Override
+    public void certificateRemoved(X509CertificateWithMetaInfo issuerCert,
+            X509CertificateWithMetaInfo cert)
+    {
+        certPublisher.certificateRemoved(issuerCert, cert);
     }
 
 }

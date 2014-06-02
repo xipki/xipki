@@ -31,6 +31,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.sql.Types;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -71,6 +72,8 @@ import org.xipki.security.api.PasswordResolver;
 import org.xipki.security.api.PasswordResolverException;
 import org.xipki.security.api.SecurityFactory;
 import org.xipki.security.api.SignerException;
+import org.xipki.security.common.CRLReason;
+import org.xipki.security.common.CertRevocationInfo;
 import org.xipki.security.common.CmpUtf8Pairs;
 import org.xipki.security.common.ConfigurationException;
 import org.xipki.security.common.DfltEnvironmentParameterResolver;
@@ -620,6 +623,7 @@ public class CAManagerImpl implements CAManager
                     {
                         CmpRequestorEntry cmpRequestorEntry = getCmpRequestor(entry.getRequestorName());
                         CmpRequestorInfo requestorInfo = new CmpRequestorInfo(
+                                cmpRequestorEntry.getName(),
                                 new X509CertificateWithMetaInfo(cmpRequestorEntry.getCert()),
                                 entry.isRa());
                         requestorInfo.setPermissions(entry.getPermissions());
@@ -1158,7 +1162,8 @@ public class CAManagerImpl implements CAManager
             ResultSet rs = stmt.executeQuery(
                     "SELECT NAME, NEXT_SERIAL, STATUS, CRL_URIS, OCSP_URIS, MAX_VALIDITY, "
                     + "CERT, SIGNER_TYPE, SIGNER_CONF, CRLSIGNER_NAME, "
-                    + "ALLOW_DUPLICATE_KEY, ALLOW_DUPLICATE_SUBJECT, PERMISSIONS, NUM_CRLS FROM CA");
+                    + "ALLOW_DUPLICATE_KEY, ALLOW_DUPLICATE_SUBJECT, PERMISSIONS, NUM_CRLS, "
+                    + "REVOKED, REV_REASON, REV_TIME, REV_INVALIDITY_TIME FROM CA");
 
             while(rs.next())
             {
@@ -1175,6 +1180,16 @@ public class CAManagerImpl implements CAManager
                 boolean allowDuplicateKey = rs.getBoolean("ALLOW_DUPLICATE_KEY");
                 boolean allowDuplicateSubject = rs.getBoolean("ALLOW_DUPLICATE_SUBJECT");
                 int numCrls = rs.getInt("NUM_CRLS");
+                CertRevocationInfo revocationInfo = null;
+                boolean revoked = rs.getBoolean("REVOKED");
+                if(revoked)
+                {
+                    int rev_reason = rs.getInt("REV_REASON");
+                    long rev_time = rs.getInt("REV_TIME");
+                    long rev_invalidity_time = rs.getInt("REV_INVALIDITY_TIME");
+                    revocationInfo = new CertRevocationInfo(rev_reason, new Date(rev_time * 1000),
+                            rev_invalidity_time == 0 ? null : new Date(rev_invalidity_time * 1000));
+                }
 
                 String s = rs.getString("PERMISSIONS");
                 Set<Permission> permissions = getPermissions(s);
@@ -1214,6 +1229,7 @@ public class CAManagerImpl implements CAManager
                 entry.setAllowDuplicateKey(allowDuplicateKey);
                 entry.setAllowDuplicateSubject(allowDuplicateSubject);
                 entry.setPermissions(permissions);
+                entry.setRevocationInfo(revocationInfo);
 
                 cas.put(entry.getName(), entry);
             }
@@ -1577,7 +1593,6 @@ public class CAManagerImpl implements CAManager
         {
             closeStatement(ps);
         }
-
     }
 
     @Override
@@ -3095,6 +3110,124 @@ public class CAManagerImpl implements CAManager
         return ca.republishCertificates(publisherName);
     }
 
+    @Override
+    public void revokeCa(String caName, CertRevocationInfo revocationInfo)
+    throws CAMgmtException
+    {
+        ParamChecker.assertNotEmpty("caName", caName);
+        ParamChecker.assertNotNull("revocationInfo", revocationInfo);
+        if(x509cas.containsKey(caName) == false)
+        {
+            throw new CAMgmtException("Could not find CA named " + caName);
+        }
+
+        LOG.info("Revoking CA {}", caName);
+        X509CA ca = x509cas.get(caName);
+
+        CRLReason currentReason = null;
+        CertRevocationInfo currentRevInfo = ca.getCAInfo().getRevocationInfo();
+        if(currentRevInfo != null)
+        {
+            currentReason = currentRevInfo.getReason();
+        }
+
+        PreparedStatement ps = null;
+        try
+        {
+            if(currentReason == CRLReason.CERTIFICATE_HOLD || currentReason == CRLReason.SUPERSEDED)
+            {
+                String sql = "UPDATE CA SET REV_REASON=? WHERE NAME=?";
+                ps = prepareStatement(sql);
+                int i = 1;
+                ps.setInt(i++, revocationInfo.getReason().getCode());
+                ps.setString(i++, caName);
+                ps.executeUpdate();
+
+                revocationInfo.setRevocationTime(currentRevInfo.getRevocationTime());
+                revocationInfo.setInvalidityTime(currentRevInfo.getInvalidityTime());
+            }
+            else
+            {
+                if(revocationInfo.getInvalidityTime() == null)
+                {
+                    revocationInfo.setInvalidityTime(revocationInfo.getRevocationTime());
+                }
+
+                String sql = "UPDATE CA SET REVOKED=?, REV_REASON=?, REV_TIME=?, REV_INVALIDITY_TIME=? WHERE NAME=?";
+                ps = prepareStatement(sql);
+                int i = 1;
+                ps.setBoolean(i++, true);
+                ps.setInt(i++, revocationInfo.getReason().getCode());
+                ps.setLong(i++, revocationInfo.getRevocationTime().getTime() / 1000);
+                ps.setLong(i++, revocationInfo.getInvalidityTime().getTime() / 1000);
+                ps.setString(i++, caName);
+                ps.executeUpdate();
+            }
+        }catch(SQLException e)
+        {
+            throw new CAMgmtException(e);
+        }finally
+        {
+            closeStatement(ps);
+        }
+
+        try
+        {
+            ca.revoke(revocationInfo);
+        } catch (OperationException e)
+        {
+            throw new CAMgmtException("Error while revoking CA " + e.getMessage(), e);
+        }
+        LOG.info("Revoked CA {}", caName);
+
+        auditLogPCIEvent(true, "REVOKE CA " + caName);
+    }
+
+    @Override
+    public void unrevokeCa(String caName)
+    throws CAMgmtException
+    {
+        ParamChecker.assertNotEmpty("caName", caName);
+        if(x509cas.containsKey(caName) == false)
+        {
+            throw new CAMgmtException("Could not find CA named " + caName);
+        }
+
+        LOG.info("Unrevoking of CA {}", caName);
+
+        String sql = "UPDATE CA SET REVOKED=?, REV_REASON, REV_TIME=?, REV_INVALIDITY_TIME=? WHERE NAME=?";
+        PreparedStatement ps = null;
+        try
+        {
+            ps = prepareStatement(sql);
+            int i = 1;
+            ps.setBoolean(i++, false);
+            ps.setNull(i++, Types.INTEGER);
+            ps.setNull(i++, Types.INTEGER);
+            ps.setNull(i++, Types.INTEGER);
+            ps.setString(i++, caName);
+            ps.executeUpdate();
+        }catch(SQLException e)
+        {
+            throw new CAMgmtException(e);
+        }finally
+        {
+            closeStatement(ps);
+        }
+
+        X509CA ca = x509cas.get(caName);
+        try
+        {
+            ca.unrevoke();
+        } catch (OperationException e)
+        {
+            throw new CAMgmtException("Error while unrevoking of CA " + e.getMessage(), e);
+        }
+        LOG.info("Unrevoked CA {}", caName);
+
+        auditLogPCIEvent(true, "UNREVOKE CA " + caName);
+    }
+
     public AuditLoggingService getAuditLoggingService()
     {
         return auditLoggingService;
@@ -3132,4 +3265,5 @@ public class CAManagerImpl implements CAManager
             auditLoggingService.logEvent(auditEvent);
         }
     }
+
 }

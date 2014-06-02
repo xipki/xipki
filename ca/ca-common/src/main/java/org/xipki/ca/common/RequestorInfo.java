@@ -19,5 +19,6 @@ package org.xipki.ca.common;
 
 public interface RequestorInfo
 {
+    String getName();
     boolean isRA();
 }

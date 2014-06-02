@@ -27,7 +27,6 @@ import java.util.List;
 import javax.security.auth.x500.X500Principal;
 
 import org.bouncycastle.asn1.x500.X500Name;
-import org.bouncycastle.asn1.x509.CRLReason;
 import org.bouncycastle.util.encoders.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,9 +34,10 @@ import org.xipki.ca.api.OperationException;
 import org.xipki.ca.api.OperationException.ErrorCode;
 import org.xipki.ca.api.publisher.CertificateInfo;
 import org.xipki.ca.common.X509CertificateWithMetaInfo;
-import org.xipki.ca.server.CertRevocationInfo;
+import org.xipki.ca.server.CertRevocationInfoWithSerial;
 import org.xipki.ca.server.CertStatus;
 import org.xipki.database.api.DataSource;
+import org.xipki.security.common.CertRevocationInfo;
 
 public class CertificateStore
 {
@@ -75,16 +75,17 @@ public class CertificateStore
         return true;
     }
 
-    public byte[] revokeCertificate(X509CertificateWithMetaInfo caCert, BigInteger serialNumber,
-            CRLReason reason, Date invalidityTime)
+    public CertWithRevocationInfo revokeCertificate(X509CertificateWithMetaInfo caCert,
+            BigInteger serialNumber, CertRevocationInfo revInfo, boolean force)
     throws OperationException
     {
         try
         {
-            byte[] revokedCert = queryExecutor.revokeCert(caCert, serialNumber, new Date(), reason, invalidityTime);
+            CertWithRevocationInfo revokedCert = queryExecutor.revokeCert(caCert, serialNumber, revInfo, force);
             if(revokedCert == null)
             {
-                LOG.info("Could not revoke non-existing certificate issuer={}, serialNumber={}", caCert.getSubject(), serialNumber);
+                LOG.info("Could not revoke non-existing certificate issuer={}, serialNumber={}",
+                    caCert.getSubject(), serialNumber);
             }
             else
             {
@@ -92,12 +93,60 @@ public class CertificateStore
             }
 
             return revokedCert;
-        } catch (Exception e)
+        } catch (SQLException e)
         {
-            LOG.error("Could not revoke certificate issuer={} and serialNumber={}. {} Message: {}",
-                    new Object[]{caCert.getSubject(), serialNumber, e.getClass().getName(), e.getMessage()});
-            LOG.debug("error", e);
-            return null;
+            LOG.debug("SQLException", e);
+            throw new OperationException(ErrorCode.DATABASE_FAILURE, e.getMessage());
+        }
+    }
+
+    public X509CertificateWithMetaInfo unrevokeCertificate(X509CertificateWithMetaInfo caCert,
+            BigInteger serialNumber, boolean force)
+    throws OperationException
+    {
+        try
+        {
+            X509CertificateWithMetaInfo unrevokedCert = queryExecutor.unrevokeCert(caCert, serialNumber, force);
+            if(unrevokedCert == null)
+            {
+                LOG.info("Could not unrevoke non-existing certificate issuer={}, serialNumber={}",
+                    caCert.getSubject(), serialNumber);
+            }
+            else
+            {
+                LOG.info("revoked certificate issuer={}, serialNumber={}", caCert.getSubject(), serialNumber);
+            }
+
+            return unrevokedCert;
+        } catch (SQLException e)
+        {
+            LOG.debug("SQLException", e);
+            throw new OperationException(ErrorCode.DATABASE_FAILURE, e.getMessage());
+        }
+    }
+
+    public X509CertificateWithMetaInfo removeCertificate(X509CertificateWithMetaInfo caCert,
+            BigInteger serialNumber)
+    throws OperationException
+    {
+        try
+        {
+            X509CertificateWithMetaInfo removedCert = queryExecutor.removeCert(caCert, serialNumber);
+            if(removedCert == null)
+            {
+                LOG.info("Could not remove non-existing certificate issuer={}, serialNumber={}",
+                    caCert.getSubject(), serialNumber);
+            }
+            else
+            {
+                LOG.info("revoked certificate issuer={}, serialNumber={}", caCert.getSubject(), serialNumber);
+            }
+
+            return removedCert;
+        } catch (SQLException e)
+        {
+            LOG.debug("SQLException", e);
+            throw new OperationException(ErrorCode.DATABASE_FAILURE, e.getMessage());
         }
     }
 
@@ -173,7 +222,8 @@ public class CertificateStore
         }
     }
 
-    public List<Integer> getCertIdsForPublicKey(X509CertificateWithMetaInfo caCert, byte[] encodedSubjectPublicKey)
+    public List<Integer> getCertIdsForPublicKey(X509CertificateWithMetaInfo caCert,
+            byte[] encodedSubjectPublicKey)
     throws OperationException
     {
         try
@@ -223,7 +273,7 @@ public class CertificateStore
      * @return
      * @throws SQLException
      */
-    public List<CertRevocationInfo> getRevokedCertificates(X509CertificateWithMetaInfo caCert,
+    public List<CertRevocationInfoWithSerial> getRevokedCertificates(X509CertificateWithMetaInfo caCert,
             Date notExpiredAt, BigInteger startSerial, int numEntries)
     throws SQLException, OperationException
     {
@@ -247,13 +297,14 @@ public class CertificateStore
         return queryExecutor.getSerialNumbers(caCert, notExpiredAt, startSerial, numEntries);
     }
 
-    public byte[] getEncodedCertificate(X509CertificateWithMetaInfo caCert, BigInteger serial)
+    public CertWithRevocationInfo getCertWithRevocationInfo(X509CertificateWithMetaInfo caCert,
+            BigInteger serial)
     throws SQLException, OperationException
     {
-        return queryExecutor.getEncodedCertificate(caCert, serial);
+        return queryExecutor.getCertWithRevocationInfo(caCert, serial);
     }
 
-    public CertWithRevocationInfo getCertificate(List<Integer> certIds, String sha1FpSubject, String certProfile)
+    public CertWithRevokedInfo getCertificate(List<Integer> certIds, String sha1FpSubject, String certProfile)
     throws SQLException, OperationException
     {
         return queryExecutor.getCertificate(certIds, sha1FpSubject, certProfile);

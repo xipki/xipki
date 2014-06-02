@@ -201,10 +201,22 @@ class CaConfigurationDbExporter extends DbPorter
         try
         {
             stmt = createStatement();
-            String sql = "SELECT NAME, SIGNER_TYPE, SIGNER_CONF, SIGNER_CERT, PERIOD,"
-                    + " OVERLAP, INCLUDE_CERTS_IN_CRL"
-                    + " FROM CRLSIGNER";
-            ResultSet rs = stmt.executeQuery(sql);
+
+            String sqlPart1 = "SELECT NAME, SIGNER_TYPE, SIGNER_CONF, SIGNER_CERT, PERIOD,"
+                    + " OVERLAP, INCLUDE_CERTS_IN_CRL";
+            String sqlPart2 = " FROM CRLSIGNER";
+
+            ResultSet rs;
+            boolean fieldIncludeExpiredCertsUsed;
+            try
+            {
+                rs = stmt.executeQuery(sqlPart1 + ", INCLUDE_EXPIRED_CERTS" + sqlPart2);
+                fieldIncludeExpiredCertsUsed = true;
+            }catch (SQLException e)
+            {
+                fieldIncludeExpiredCertsUsed = false;
+                rs = stmt.executeQuery(sqlPart1 + sqlPart2);
+            }
 
             while(rs.next())
             {
@@ -224,6 +236,17 @@ class CaConfigurationDbExporter extends DbPorter
                 crlsigner.setPeriod(period);
                 crlsigner.setOverlap(overlap);
                 crlsigner.setIncludeCertsInCrl(include_certs_in_crl);
+
+                boolean includeExpiredCerts;
+                if(fieldIncludeExpiredCertsUsed)
+                {
+                    includeExpiredCerts = rs.getBoolean("INCLUDE_EXPIRED_CERTS");
+                }
+                else
+                {
+                    includeExpiredCerts = include_certs_in_crl;
+                }
+                crlsigner.setIncludeExpiredCerts(includeExpiredCerts);
 
                 crlsigners.getCrlsigner().add(crlsigner);
             }
@@ -438,17 +461,32 @@ class CaConfigurationDbExporter extends DbPorter
                     + "ALLOW_DUPLICATE_KEY, ALLOW_DUPLICATE_SUBJECT, PERMISSIONS";
             String sqlPart2 = " FROM CA";
 
+            String fields1 = "NUM_CRLS";
+            String fields2 = "REVOKED, REV_REASON, REV_TIME, REV_INVALIDITY_TIME";
+
             ResultSet rs;
-            boolean sqlWith_num_crls = true;
+            boolean sqlWithFields1;
+            boolean sqlWithFields2;
             try
             {
-                String sql = sqlPart1 + ", NUM_CRLS" + sqlPart2;
+                String sql = sqlPart1 + ", " + fields1 + ", " + fields2 + sqlPart2;
                 rs = stmt.executeQuery(sql);
+                sqlWithFields1 = true;
+                sqlWithFields2 = true;
             }catch(SQLException e)
             {
-                sqlWith_num_crls = false;
-                String sql = sqlPart1 + sqlPart2;
-                rs = stmt.executeQuery(sql);
+                sqlWithFields2 = false;
+                try
+                {
+                    String sql = sqlPart1 + ", " + fields1 + sqlPart2;
+                    rs = stmt.executeQuery(sql);
+                    sqlWithFields1 = true;
+                }catch(SQLException e2)
+                {
+                    sqlWithFields1 = false;
+                    String sql = sqlPart1 + sqlPart2;
+                    rs = stmt.executeQuery(sql);
+                }
             }
 
             while(rs.next())
@@ -465,11 +503,6 @@ class CaConfigurationDbExporter extends DbPorter
                 String crlsigner_name = rs.getString("CRLSIGNER_NAME");
                 boolean allowDuplicateKey = rs.getBoolean("ALLOW_DUPLICATE_KEY");
                 boolean allowDuplicateSubject = rs.getBoolean("ALLOW_DUPLICATE_SUBJECT");
-                Integer numCrls = null;
-                if(sqlWith_num_crls)
-                {
-                    numCrls = rs.getInt("num_crls");
-                }
 
                 String permissions = rs.getString("PERMISSIONS");
 
@@ -487,7 +520,24 @@ class CaConfigurationDbExporter extends DbPorter
                 ca.setAllowDuplicateKey(allowDuplicateKey);
                 ca.setAllowDuplicateSubject(allowDuplicateSubject);
                 ca.setPermissions(permissions);
-                ca.setNumCrls(numCrls);
+
+                if(sqlWithFields1)
+                {
+                    int numCrls = rs.getInt("num_crls");
+                    ca.setNumCrls(numCrls);
+                }
+
+                if(sqlWithFields2)
+                {
+                    boolean revoked = rs.getBoolean("REVOKED");
+                    String reason = rs.getString("REV_REASON");
+                    String rev_time = rs.getString("REV_TIME");
+                    String rev_invalidity_time = rs.getString("REV_INVALIDITY_TIME");
+                    ca.setRevoked(revoked);
+                    ca.setRevReason(reason);
+                    ca.setRevTime(rev_time);
+                    ca.setRevInvalidityTime(rev_invalidity_time);
+                }
 
                 cas.getCa().add(ca);
             }

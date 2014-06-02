@@ -82,12 +82,14 @@ import org.xipki.ca.cmp.client.type.EnrollCertResultEntryType;
 import org.xipki.ca.cmp.client.type.EnrollCertResultType;
 import org.xipki.ca.cmp.client.type.ErrorResultEntryType;
 import org.xipki.ca.cmp.client.type.ErrorResultType;
+import org.xipki.ca.cmp.client.type.IssuerSerialEntryType;
 import org.xipki.ca.cmp.client.type.P10EnrollCertRequestType;
 import org.xipki.ca.cmp.client.type.ResultEntryType;
 import org.xipki.ca.cmp.client.type.RevokeCertRequestEntryType;
 import org.xipki.ca.cmp.client.type.RevokeCertRequestType;
 import org.xipki.ca.cmp.client.type.RevokeCertResultEntryType;
 import org.xipki.ca.cmp.client.type.RevokeCertResultType;
+import org.xipki.ca.cmp.client.type.UnrevokeOrRemoveCertRequestType;
 import org.xipki.ca.cmp.server.PKIResponse;
 import org.xipki.security.api.ConcurrentContentSigner;
 import org.xipki.security.api.SecurityFactory;
@@ -97,6 +99,9 @@ import org.xipki.security.common.ParamChecker;
 
 abstract class X509CmpRequestor extends CmpRequestor
 {
+    public static final int XiPKI_CRL_REASON_UNREVOKE = 100;
+    public static final int XiPKI_CRL_REASON_REMOVE = 101;
+
     private final static DigestCalculatorProvider digesetCalculatorProvider =
             new BcDigestCalculatorProvider();
     private static final BigInteger MINUS_ONE = BigInteger.valueOf(-1);
@@ -210,6 +215,29 @@ abstract class X509CmpRequestor extends CmpRequestor
     {
         PKIMessage reqMessage = buildRevokeCertRequest(request);
         PKIResponse response = signAndSend(reqMessage);
+        return parse(response, request.getRequestEntries());
+    }
+
+    public CmpResultType unrevokeCertificate(UnrevokeOrRemoveCertRequestType request)
+    throws CmpRequestorException
+    {
+        PKIMessage reqMessage = buildUnrevokeOrRemoveCertRequest(request, XiPKI_CRL_REASON_UNREVOKE);
+        PKIResponse response = signAndSend(reqMessage);
+        return parse(response, request.getRequestEntries());
+    }
+
+    public CmpResultType removeCertificate(UnrevokeOrRemoveCertRequestType request)
+    throws CmpRequestorException
+    {
+        PKIMessage reqMessage = buildUnrevokeOrRemoveCertRequest(request, XiPKI_CRL_REASON_REMOVE);
+        PKIResponse response = signAndSend(reqMessage);
+        return parse(response, request.getRequestEntries());
+    }
+
+    private CmpResultType parse(PKIResponse response, List<? extends IssuerSerialEntryType> reqEntries)
+    throws CmpRequestorException
+    {
+        List<IssuerSerialEntryType> requestEntries = new ArrayList<IssuerSerialEntryType>(reqEntries);
 
         ErrorResultType errorResult = checkAndBuildErrorResultIfRequired(response);
         if(errorResult != null)
@@ -240,21 +268,18 @@ abstract class X509CmpRequestor extends CmpRequestor
             LOG.warn("Status.length (" + statuses.length + ") < " + "RevCerts.length (" + revCerts.length + "), ignore the revCerts");
         }
 
-        List<RevokeCertRequestEntryType> requestEntries = new ArrayList<RevokeCertRequestEntryType>(
-                request.getRequestEntries());
-
         RevokeCertResultType result = new RevokeCertResultType();
         for(int i = 0; i < statuses.length; i++)
         {
-            CertId certId = null;
-            if(i < revCerts.length)
+            if(revCerts == null || i >= revCerts.length)
             {
-                certId = revCerts[i];
+                continue;
             }
 
-            RevokeCertRequestEntryType requestEntry = null;
+            CertId certId = revCerts[i];
+            IssuerSerialEntryType requestEntry = null;
             // find the id
-            for(RevokeCertRequestEntryType re : requestEntries)
+            for(IssuerSerialEntryType re : requestEntries)
             {
                 if(re.getIssuer().equals(certId.getIssuer().getName()) &&
                   re.getSerialNumber().equals(certId.getSerialNumber().getValue()))
@@ -297,7 +322,7 @@ abstract class X509CmpRequestor extends CmpRequestor
 
         if(requestEntries.isEmpty() == false)
         {
-            for(RevokeCertRequestEntryType re : requestEntries)
+            for(IssuerSerialEntryType re : requestEntries)
             {
                 ErrorResultEntryType ere = new ErrorResultEntryType(re.getId(), ClientErrorCode.PKIStatus_NO_ANSWER);
                 result.addResultEntry(ere);
@@ -570,6 +595,45 @@ abstract class X509CmpRequestor extends CmpRequestor
                     extensions[1] = new Extension(org.bouncycastle.asn1.x509.X509Extension.invalidityDate,
                         true, new DEROctetString(time.getEncoded()));
                 }
+            }catch(IOException e)
+            {
+                throw new CmpRequestorException(e);
+            }
+            Extensions exts = new Extensions(extensions);
+
+            RevDetails revDetails = new RevDetails(certTempBuilder.build(), exts);
+            revDetailsArray.add(revDetails);
+        }
+
+        RevReqContent content = new RevReqContent(revDetailsArray.toArray(new RevDetails[0]));
+
+        PKIBody body = new PKIBody(PKIBody.TYPE_REVOCATION_REQ, content);
+
+        PKIMessage pkiMessage = new PKIMessage(header, body);
+        return pkiMessage;
+    }
+
+    private PKIMessage buildUnrevokeOrRemoveCertRequest(
+            UnrevokeOrRemoveCertRequestType request, int reasonCode)
+    throws CmpRequestorException
+    {
+        PKIHeader header = buildPKIHeader(null);
+
+        List<IssuerSerialEntryType> requestEntries = request.getRequestEntries();
+        List<RevDetails> revDetailsArray = new ArrayList<RevDetails>(requestEntries.size());
+        for(IssuerSerialEntryType requestEntry : requestEntries)
+        {
+            CertTemplateBuilder certTempBuilder = new CertTemplateBuilder();
+            certTempBuilder.setIssuer(requestEntry.getIssuer());
+            certTempBuilder.setSerialNumber(new ASN1Integer(requestEntry.getSerialNumber()));
+
+            Extension[] extensions = new Extension[1];
+
+            try
+            {
+                DEREnumerated reason = new DEREnumerated(reasonCode);
+                extensions[0] = new Extension(org.bouncycastle.asn1.x509.X509Extension.reasonCode,
+                        true, new DEROctetString(reason.getEncoded()));
             }catch(IOException e)
             {
                 throw new CmpRequestorException(e);

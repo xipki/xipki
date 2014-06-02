@@ -151,7 +151,7 @@ class CaCertStoreDbImporter extends DbPorter
     private void import_requestorinfo(Requestorinfos requestorinfos)
     throws Exception
     {
-        final String sql = "INSERT INTO REQUESTORINFO (ID, SUBJECT, SHA1_FP_CERT, CERT) VALUES (?, ?, ?, ?)";
+        final String sql = "INSERT INTO REQUESTORINFO (ID, NAME) VALUES (?, ?)";
 
         System.out.println("Importing table REQUESTORINFO");
 
@@ -163,16 +163,11 @@ class CaCertStoreDbImporter extends DbPorter
             {
                 try
                 {
-                    String b64Cert = info.getCert();
-                    byte[] encodedCert = Base64.decode(b64Cert);
-                    X509Certificate cert = IoCertUtil.parseCert(encodedCert);
-                    String hexSha1FpCert = HashCalculator.hexHash(HashAlgoType.SHA1, encodedCert);
+                    String name = info.getName();
 
                     int idx = 1;
                     ps.setInt   (idx++, info.getId());
-                    ps.setString(idx++, IoCertUtil.canonicalizeName(cert.getSubjectX500Principal()));
-                    ps.setString(idx++, hexSha1FpCert);
-                    ps.setString(idx++, b64Cert);
+                    ps.setString(idx++, name);
 
                     ps.execute();
                 }catch(Exception e)

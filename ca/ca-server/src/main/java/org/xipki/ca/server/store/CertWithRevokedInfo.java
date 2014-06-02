@@ -18,17 +18,16 @@
 package org.xipki.ca.server.store;
 
 import org.xipki.ca.common.X509CertificateWithMetaInfo;
-import org.xipki.security.common.CertRevocationInfo;
 
-public class CertWithRevocationInfo
+public class CertWithRevokedInfo
 {
-    private X509CertificateWithMetaInfo cert;
-    private CertRevocationInfo revInfo;
+    private final X509CertificateWithMetaInfo cert;
+    private final boolean revoked;
 
-    public CertWithRevocationInfo(X509CertificateWithMetaInfo cert, CertRevocationInfo revInfo)
+    public CertWithRevokedInfo(X509CertificateWithMetaInfo cert, boolean revoked)
     {
         this.cert = cert;
-        this.revInfo = revInfo;
+        this.revoked = revoked;
     }
 
     public X509CertificateWithMetaInfo getCert()
@@ -38,22 +37,7 @@ public class CertWithRevocationInfo
 
     public boolean isRevoked()
     {
-        return revInfo != null;
-    }
-
-    public CertRevocationInfo getRevInfo()
-    {
-        return revInfo;
-    }
-
-    public void setCert(X509CertificateWithMetaInfo cert)
-    {
-        this.cert = cert;
-    }
-
-    public void setRevInfo(CertRevocationInfo revInfo)
-    {
-        this.revInfo = revInfo;
+        return revoked;
     }
 
 }

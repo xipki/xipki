@@ -20,40 +20,30 @@ package org.xipki.ca.server;
 import java.math.BigInteger;
 import java.util.Date;
 
-public class CertRevocationInfo
+import org.xipki.security.common.CRLReason;
+import org.xipki.security.common.CertRevocationInfo;
+
+public class CertRevocationInfoWithSerial extends CertRevocationInfo
 {
     private final BigInteger serial;
-    private final int reason;
-    private final Date revocationTime;
-    private final Date invalidityTime;
 
-    public CertRevocationInfo(BigInteger serial, int reason,
+    public CertRevocationInfoWithSerial(BigInteger serial, CRLReason reason,
             Date revocationTime, Date invalidityTime)
     {
+        super(reason, revocationTime, invalidityTime);
         this.serial = serial;
-        this.reason = reason;
-        this.revocationTime = revocationTime;
-        this.invalidityTime = invalidityTime;
+    }
+
+    public CertRevocationInfoWithSerial(BigInteger serial, int reasonCode,
+            Date revocationTime, Date invalidityTime)
+    {
+        super(reasonCode, revocationTime, invalidityTime);
+        this.serial = serial;
     }
 
     public BigInteger getSerial()
     {
         return serial;
-    }
-
-    public int getReason()
-    {
-        return reason;
-    }
-
-    public Date getRevocationTime()
-    {
-        return revocationTime;
-    }
-
-    public Date getInvalidityTime()
-    {
-        return invalidityTime;
     }
 
 }

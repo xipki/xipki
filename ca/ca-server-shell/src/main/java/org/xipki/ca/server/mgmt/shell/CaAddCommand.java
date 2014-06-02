@@ -55,7 +55,7 @@ public class CaAddCommand extends CaCommand
     protected List<String> crlUris;
 
     @Option(name = "-permission",
-            description = "Required. Permission, multi options is allowed. allowed values are " + permissionsText,
+            description = "Required. Permission, multi options is allowed. allowed values are\n" + permissionsText,
             required = true, multiValued = true)
     protected Set<String> permissions;
 

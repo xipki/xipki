@@ -19,13 +19,15 @@ package org.xipki.ca.server.mgmt;
 
 public enum Permission
 {
-    ALL("all"),
-    CERT_REQ ("cert-req"),
-    CERT_REV ("cert-rev"),
+    ENROLL_CERT ("enroll"),
+    REVOKE_CERT ("revoke"),
+    UNREVOKE_CERT ("unrevoke"),
+    REMOVE_CERT ("remove"),
     KEY_UPDATE ("key-update"),
-    CRL_GEN ("CRL-gen"),
-    CRL_DOWNLOAD ("CRL-download"),
-    CROSS_CERT_REQ ("cross-cert-req");
+    GEN_CRL ("gen-crl"),
+    GET_CRL ("get-crl"),
+    CROSS_CERT_ENROLL ("enroll-cross"),
+    ALL("all");
 
     private String permission;
     private Permission(String permission)
@@ -42,23 +44,12 @@ public enum Permission
     {
         for(Permission p : values())
         {
-            if(p.permission.equals(permission))
+            if(p.permission.equalsIgnoreCase(permission))
             {
                 return p;
             }
         }
 
         return null;
-    }
-
-    public static String allPermissionsAsText()
-    {
-        StringBuilder sb = new StringBuilder();
-        for(Permission p : values())
-        {
-            sb.append(",").append(p.getPermission());
-        }
-
-        return sb.substring(1);
     }
 }
