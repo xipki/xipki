@@ -22,7 +22,6 @@ import java.security.InvalidKeyException;
 import java.security.PublicKey;
 import java.security.cert.CRLException;
 import java.security.cert.X509CRL;
-import java.security.cert.X509Certificate;
 import java.text.ParseException;
 import java.util.Date;
 import java.util.Set;
@@ -71,7 +70,6 @@ import org.bouncycastle.asn1.pkcs.CertificationRequest;
 import org.bouncycastle.asn1.pkcs.CertificationRequestInfo;
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 import org.bouncycastle.asn1.x500.X500Name;
-import org.bouncycastle.asn1.x509.CRLReason;
 import org.bouncycastle.asn1.x509.CertificateList;
 import org.bouncycastle.asn1.x509.Extensions;
 import org.bouncycastle.asn1.x509.GeneralName;
@@ -102,6 +100,7 @@ import org.xipki.ca.common.RequestorInfo;
 import org.xipki.ca.server.mgmt.Permission;
 import org.xipki.security.api.ConcurrentContentSigner;
 import org.xipki.security.api.SecurityFactory;
+import org.xipki.security.common.CRLReason;
 import org.xipki.security.common.CmpUtf8Pairs;
 import org.xipki.security.common.CustomObjectIdentifiers;
 import org.xipki.security.common.HealthCheckResult;
@@ -109,8 +108,10 @@ import org.xipki.security.common.IoCertUtil;
 
 public class X509CACmpResponder extends CmpResponder
 {
+    public static final int XiPKI_CRL_REASON_UNREVOKE = 100;
+    public static final int XiPKI_CRL_REASON_REMOVE = 101;
+
     private static final Logger LOG = LoggerFactory.getLogger(X509CACmpResponder.class);
-    private static final CRLReason CRLReason_cessationOfOperation = CRLReason.lookup(CRLReason.cessationOfOperation);
 
     private final PendingCertificatePool pendingCertPool;
 
@@ -207,7 +208,7 @@ public class X509CACmpResponder extends CmpResponder
                     {
                         case PKIBody.TYPE_CERT_REQ:
                             eventType = "CERT_REQ";
-                            checkPermission(_requestor, Permission.CERT_REQ);
+                            checkPermission(_requestor, Permission.ENROLL_CERT);
                             respBody = processCr(_requestor, user, tid, reqHeader,
                                     (CertReqMessages) reqBody.getContent(), confirmWaitTime, sendCaCert, auditEvent);
                             break;
@@ -219,13 +220,14 @@ public class X509CACmpResponder extends CmpResponder
                             break;
                         case PKIBody.TYPE_P10_CERT_REQ:
                             eventType = "CERT_REQ";
-                            checkPermission(_requestor, Permission.CERT_REQ);
+                            checkPermission(_requestor, Permission.ENROLL_CERT);
                             respBody = processP10cr(_requestor, user, tid, reqHeader,
                                     (CertificationRequest) reqBody.getContent(), confirmWaitTime, sendCaCert, auditEvent);
                             break;
-                        default: // PKIBody.TYPE_CROSS_CERT_REQ
+                        //case PKIBody.TYPE_CROSS_CERT_REQ:
+                        default:
                             eventType = "CROSS_CERT_REQ";
-                            checkPermission(_requestor, Permission.CROSS_CERT_REQ);
+                            checkPermission(_requestor, Permission.CROSS_CERT_ENROLL);
                             respBody = processCcp(_requestor, user, tid, reqHeader,
                                     (CertReqMessages) reqBody.getContent(), confirmWaitTime, sendCaCert, auditEvent);
                             break;
@@ -276,10 +278,76 @@ public class X509CACmpResponder extends CmpResponder
                 }
                 case PKIBody.TYPE_REVOCATION_REQ:
                 {
-                    eventType = "CERT_REV";
-                    checkPermission(_requestor, Permission.CERT_REV);
+                    Permission requiredPermission = null;
+                    boolean allRevdetailsOfSameType = true;
+
                     RevReqContent rr = (RevReqContent) reqBody.getContent();
-                    respBody = revokeCertificates(rr, auditEvent);
+                    RevDetails[] revContent = rr.toRevDetailsArray();
+
+                    int n = revContent.length;
+                    for (int i = 0; i < n; i++)
+                    {
+                        RevDetails revDetails = revContent[i];
+                        Extensions crlDetails = revDetails.getCrlEntryDetails();
+                        ASN1ObjectIdentifier extId = X509Extension.reasonCode;
+                        ASN1Encodable extValue = crlDetails.getExtensionParsedValue(extId);
+                        int reasonCode = ((ASN1Enumerated) extValue).getValue().intValue();
+                        if(reasonCode == XiPKI_CRL_REASON_REMOVE)
+                        {
+                            if(requiredPermission == null)
+                            {
+                                eventType = "CERT_REVOKE";
+                                requiredPermission = Permission.REMOVE_CERT;
+                            }
+                            else if(requiredPermission != Permission.REMOVE_CERT)
+                            {
+                                allRevdetailsOfSameType = false;
+                                break;
+                            }
+                        }
+                        else if(reasonCode == XiPKI_CRL_REASON_UNREVOKE)
+                        {
+                            if(requiredPermission == null)
+                            {
+                                eventType = "CERT_UNREVOKE";
+                                requiredPermission = Permission.UNREVOKE_CERT;
+                            }
+                            else if(requiredPermission != Permission.UNREVOKE_CERT)
+                            {
+                                allRevdetailsOfSameType = false;
+                                break;
+                            }
+                        }
+                        else
+                        {
+                            if(requiredPermission == null)
+                            {
+                                eventType = "CERT_REMOVE";
+                                requiredPermission = Permission.REVOKE_CERT;
+                            }
+                            else if(requiredPermission != Permission.REVOKE_CERT)
+                            {
+                                allRevdetailsOfSameType = false;
+                                break;
+                            }
+                        }
+                    }
+
+                    if(allRevdetailsOfSameType == false)
+                    {
+                        ErrorMsgContent emc = new ErrorMsgContent(
+                                new PKIStatusInfo(PKIStatus.rejection,
+                                        new PKIFreeText("Not all revDetails are of the same type"),
+                                        new PKIFailureInfo(PKIFailureInfo.badRequest)));
+
+                        respBody = new PKIBody(PKIBody.TYPE_ERROR, emc);
+                    }
+                    else
+                    {
+                        checkPermission(_requestor, requiredPermission);
+                        respBody = revokeOrUnrevokeOrRemoveCertificates(rr, auditEvent, requiredPermission);
+                    }
+
                     break;
                 }
                 case PKIBody.TYPE_CONFIRM:
@@ -338,7 +406,7 @@ public class X509CACmpResponder extends CmpResponder
                             if(CMPObjectIdentifiers.it_currentCRL.equals(infoType))
                             {
                                 eventType = "CRL_DOWNLOAD";
-                                checkPermission(_requestor, Permission.CRL_DOWNLOAD);
+                                checkPermission(_requestor, Permission.GET_CRL);
                                 crl = ca.getCurrentCRL();
                                 if(crl == null)
                                 {
@@ -349,7 +417,7 @@ public class X509CACmpResponder extends CmpResponder
                             else
                             {
                                 eventType = "CRL_GEN";
-                                checkPermission(_requestor, Permission.CRL_GEN);
+                                checkPermission(_requestor, Permission.GEN_CRL);
                                 X509CRL _crl = ca.generateCRL();
                                 if(_crl == null)
                                 {
@@ -955,7 +1023,7 @@ public class X509CACmpResponder extends CmpResponder
         }
     }
 
-    private PKIBody revokeCertificates(RevReqContent rr, AuditEvent auditEvent)
+    private PKIBody revokeOrUnrevokeOrRemoveCertificates(RevReqContent rr, AuditEvent auditEvent, Permission permission)
     {
         RevDetails[] revContent = rr.toRevDetailsArray();
 
@@ -980,48 +1048,64 @@ public class X509CACmpResponder extends CmpResponder
                 childAuditEvent.addEventData(new AuditEventData("serialNumber", serialNumber.getPositiveValue()));
             }
 
-            Extensions crlDetails = revDetails.getCrlEntryDetails();
-
-            ASN1ObjectIdentifier extId = X509Extension.reasonCode;
-            ASN1Encodable extValue = crlDetails.getExtensionParsedValue(extId);
-            int reasonCode = ((ASN1Enumerated) extValue).getValue().intValue();
-            CRLReason reason = CRLReason.lookup(reasonCode);
-            if(childAuditEvent != null)
-            {
-                childAuditEvent.addEventData(new AuditEventData("reason",
-                        reason == null ? Integer.toString(reasonCode) : crlreasonString[reasonCode]));
-            }
-
+            CRLReason reason = null;
             Date invalidityDate = null;
 
-            extId = X509Extension.invalidityDate;
-            extValue = crlDetails.getExtensionParsedValue(extId);
-            if(extValue != null)
+            if(Permission.REVOKE_CERT == permission)
             {
-                try
-                {
-                    invalidityDate = ((ASN1GeneralizedTime) extValue).getDate();
-                } catch (ParseException e)
-                {
-                    String errMsg = "invalid extension " + extId.getId();
-                    LOG.warn(errMsg);
-                    PKIStatusInfo status = generateCmpRejectionStatus(PKIFailureInfo.unacceptedExtension, errMsg);
-                    repContentBuilder.add(status);
-                    continue;
-                }
+                Extensions crlDetails = revDetails.getCrlEntryDetails();
 
+                ASN1ObjectIdentifier extId = X509Extension.reasonCode;
+                ASN1Encodable extValue = crlDetails.getExtensionParsedValue(extId);
+                int reasonCode = ((ASN1Enumerated) extValue).getValue().intValue();
+                reason = CRLReason.forReasonCode(reasonCode);
                 if(childAuditEvent != null)
                 {
-                    childAuditEvent.addEventData(new AuditEventData("invalidityDate", invalidityDate));
+                    childAuditEvent.addEventData(new AuditEventData("reason",
+                            reason == null ? Integer.toString(reasonCode) : crlreasonString[reasonCode]));
+                }
+
+                extId = X509Extension.invalidityDate;
+                extValue = crlDetails.getExtensionParsedValue(extId);
+                if(extValue != null)
+                {
+                    try
+                    {
+                        invalidityDate = ((ASN1GeneralizedTime) extValue).getDate();
+                    } catch (ParseException e)
+                    {
+                        String errMsg = "invalid extension " + extId.getId();
+                        LOG.warn(errMsg);
+                        PKIStatusInfo status = generateCmpRejectionStatus(PKIFailureInfo.unacceptedExtension, errMsg);
+                        repContentBuilder.add(status);
+                        continue;
+                    }
+
+                    if(childAuditEvent != null)
+                    {
+                        childAuditEvent.addEventData(new AuditEventData("invalidityDate", invalidityDate));
+                    }
                 }
             }
 
             try
             {
-                X509Certificate revokedCert = ca.revokeCertificate(
-                        serialNumber.getPositiveValue(), reason, invalidityDate);
+                Object returnedObj = null;
+                if(Permission.UNREVOKE_CERT == permission)
+                {
+                    returnedObj = ca.unrevokeCertificate(serialNumber.getPositiveValue());
+                }
+                else if(Permission.REMOVE_CERT == permission)
+                {
+                    returnedObj = ca.removeCertificate(serialNumber.getPositiveValue());
+                }
+                else
+                {
+                    returnedObj = ca.revokeCertificate(
+                            serialNumber.getPositiveValue(), reason, invalidityDate);
+                }
 
-                if(revokedCert != null)
+                if(returnedObj != null)
                 {
                     PKIStatusInfo status = new PKIStatusInfo(PKIStatus.granted);
                     CertId certId = new CertId(new GeneralName(ca.getCASubjectX500Name()), serialNumber);
@@ -1104,7 +1188,7 @@ public class X509CACmpResponder extends CmpResponder
                 {
                     ca.revokeCertificate(
                             serialNumber,
-                            CRLReason_cessationOfOperation, new Date());
+                            CRLReason.CESSATION_OF_OPERATION, new Date());
                 } catch (OperationException e)
                 {
                     LOG.warn("Could not revoke certificate ca={}, serialNumber={}", ca.getCAInfo().getName(), serialNumber);
@@ -1169,7 +1253,7 @@ public class X509CACmpResponder extends CmpResponder
                 {
                     ca.revokeCertificate(
                         remainingCert.getCert().getCert().getSerialNumber(),
-                        CRLReason_cessationOfOperation, invalidityDate);
+                        CRLReason.CESSATION_OF_OPERATION, invalidityDate);
                 }catch(OperationException e)
                 {
                     successfull = false;
@@ -1238,7 +1322,7 @@ public class X509CACmpResponder extends CmpResponder
                     {
                         ca.revokeCertificate(
                             remainingCert.getCert().getCert().getSerialNumber(),
-                            CRLReason_cessationOfOperation, invalidityDate);
+                            CRLReason.CESSATION_OF_OPERATION, invalidityDate);
                     }catch(Throwable t)
                     {
                     }

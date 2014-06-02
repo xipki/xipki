@@ -210,26 +210,46 @@
 									</artifactItems>
 								</configuration>
 							</execution>
-                                                        <execution>
-                                                                <!-- Extract the SQL scripts -->
-                                                                <id>unpack-sql</id>
-                                                                <phase>generate-resources</phase>
-                                                                <goals>
-                                                                        <goal>unpack</goal>
-                                                                </goals>
-                                                                <configuration>
-                                                                        <artifactItems>
-                                                                                <artifactItem>
-                                                                                        <groupId>org.xipki</groupId>
-                                                                                        <artifactId>ca-sql</artifactId>
-                                                                                        <version>${project.version}</version>
-                                                                                        <type>jar</type>
+							<execution>
+								<!-- Extract the SQL scripts -->
+								<id>unpack-sql</id>
+								<phase>generate-resources</phase>
+								<goals>
+									<goal>unpack</goal>
+								</goals>
+								<configuration>
+									<artifactItems>
+										<artifactItem>
+											<groupId>org.xipki</groupId>
+											<artifactId>ca-sql</artifactId>
+											<version>${project.version}</version>
+											<type>jar</type>
 											<excludes>META-INF/**</excludes>
-                                                                                        <outputDirectory>target/sql</outputDirectory>
-                                                                                </artifactItem>
-                                                                        </artifactItems>
-                                                                </configuration>
-                                                        </execution>
+											<outputDirectory>target/sql</outputDirectory>
+										</artifactItem>
+									</artifactItems>
+								</configuration>
+							</execution>
+							<execution>
+								<!-- Extract the SQL scripts -->
+								<id>unpack-ocspserver-xsd</id>
+								<phase>generate-resources</phase>
+								<goals>
+									<goal>unpack</goal>
+								</goals>
+								<configuration>
+									<artifactItems>
+										<artifactItem>
+											<groupId>org.xipki</groupId>
+											<artifactId>ocsp-server</artifactId>
+											<version>${project.version}</version>
+											<type>jar</type>
+											<includes>xsd/**</includes>
+											<outputDirectory>target/ocsp-config</outputDirectory>
+										</artifactItem>
+									</artifactItems>
+								</configuration>
+							</execution>							
 							<execution>
 								<id>unpack-liquibase</id>
 								<phase>generate-resources</phase>

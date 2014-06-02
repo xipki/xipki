@@ -31,6 +31,7 @@ import org.bouncycastle.asn1.x500.X500Name;
 import org.xipki.ca.cmp.client.type.EnrollCertEntryType;
 import org.xipki.ca.cmp.client.type.EnrollCertRequestType;
 import org.xipki.ca.cmp.client.type.RevokeCertRequestType;
+import org.xipki.ca.cmp.client.type.UnrevokeOrRemoveCertRequestType;
 import org.xipki.ca.common.CertIDOrError;
 import org.xipki.ca.common.EnrollCertResult;
 import org.xipki.ca.common.PKIErrorException;
@@ -90,5 +91,23 @@ public interface RAWorker
 
     byte[] envelopeRevocation(X509Certificate cert, int reason)
     throws RAWorkerException;
+
+    CertIDOrError unrevokeCert(X500Name issuer, BigInteger serial)
+    throws RAWorkerException, PKIErrorException;
+
+    CertIDOrError unrevokeCert(X509Certificate cert)
+    throws RAWorkerException, PKIErrorException;
+
+    Map<String, CertIDOrError> unrevokeCerts(UnrevokeOrRemoveCertRequestType request)
+    throws RAWorkerException, PKIErrorException;
+
+    CertIDOrError removeCert(X500Name issuer, BigInteger serial)
+    throws RAWorkerException, PKIErrorException;
+
+    CertIDOrError removeCert(X509Certificate cert)
+    throws RAWorkerException, PKIErrorException;
+
+    Map<String, CertIDOrError> removeCerts(UnrevokeOrRemoveCertRequestType request)
+    throws RAWorkerException, PKIErrorException;
 
 }

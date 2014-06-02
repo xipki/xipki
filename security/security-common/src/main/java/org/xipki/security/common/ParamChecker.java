@@ -18,6 +18,7 @@
 package org.xipki.security.common;
 
 import java.util.Collection;
+import java.util.Map;
 
 public class ParamChecker
 {
@@ -44,6 +45,19 @@ public class ParamChecker
     }
 
     public static void assertNotEmpty(String parameterName, Collection<?> parameter)
+    {
+        if(parameter == null)
+        {
+            throw new IllegalArgumentException(parameterName + " could not be null");
+        }
+
+        if(parameter.isEmpty())
+        {
+            throw new IllegalArgumentException(parameterName + " could not be empty");
+        }
+    }
+
+    public static void assertNotEmpty(String parameterName, Map<?, ?> parameter)
     {
         if(parameter == null)
         {

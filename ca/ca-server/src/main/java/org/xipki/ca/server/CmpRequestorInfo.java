@@ -28,9 +28,9 @@ public class CmpRequestorInfo extends CertBasedRequestorInfo
     private Set<Permission> permissions;
     private Set<String> profiles;
 
-    public CmpRequestorInfo(X509CertificateWithMetaInfo certificate, boolean ra)
+    public CmpRequestorInfo(String name, X509CertificateWithMetaInfo certificate, boolean ra)
     {
-        super(certificate, ra);
+        super(name, certificate, ra);
     }
 
     public Set<Permission> getPermissions()

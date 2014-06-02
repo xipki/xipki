@@ -18,6 +18,7 @@
 package org.xipki.security.common;
 
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
+import org.bouncycastle.asn1.ocsp.OCSPObjectIdentifiers;
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 import org.bouncycastle.asn1.x509.X509ObjectIdentifiers;
 
@@ -257,4 +258,9 @@ public class ObjectIdentifiers
      * IP security user
      */
     public static final ASN1ObjectIdentifier id_kp_ipsecUser  = id_kp.branch("7");
+
+    // OCSP
+    public static final ASN1ObjectIdentifier id_pkix_ocsp_prefSigAlgs = OCSPObjectIdentifiers.id_pkix_ocsp.branch("8");
+    public static final ASN1ObjectIdentifier id_pkix_ocsp_extendedRevoke = OCSPObjectIdentifiers.id_pkix_ocsp.branch("9");
+
 }

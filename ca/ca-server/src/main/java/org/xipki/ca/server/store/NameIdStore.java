@@ -22,18 +22,20 @@ import java.util.Map;
 
 import org.xipki.security.common.ParamChecker;
 
-class CertprofileStore
+class NameIdStore
 {
+    private final String table;
     private final Map<String, Integer> entries;
     private int nextFreeId;
 
-    CertprofileStore(Map<String, Integer> entries)
+    NameIdStore(String table, Map<String, Integer> entries)
     {
+        this.table = table;
         this.entries = new HashMap<String, Integer>();
 
         for(String name : entries.keySet())
         {
-            addProfileEntry(name, entries.get(name));
+            addEntry(name, entries.get(name));
         }
 
         if(nextFreeId < 1)
@@ -42,19 +44,19 @@ class CertprofileStore
         }
     }
 
-    synchronized void addProfileEntry(String name, Integer id)
+    synchronized void addEntry(String name, Integer id)
     {
         ParamChecker.assertNotEmpty("name", name);
         ParamChecker.assertNotNull("id", id);
 
         if(entries.containsKey(name))
         {
-            throw new IllegalArgumentException("certprofile with the same name " + name + " already available");
+            throw new IllegalArgumentException("entry with the same name " + name + " already available");
         }
 
         if(entries.containsValue(id))
         {
-            throw new IllegalArgumentException("certprofile with the same id " + id + " already available");
+            throw new IllegalArgumentException("entry with the same id " + id + " already available");
         }
 
         if(nextFreeId <= id)
@@ -86,6 +88,11 @@ class CertprofileStore
     synchronized int getNextFreeId()
     {
         return nextFreeId++;
+    }
+
+    public String getTable()
+    {
+        return table;
     }
 
 }

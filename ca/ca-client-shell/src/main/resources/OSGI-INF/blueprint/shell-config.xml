@@ -7,25 +7,37 @@
 	
     <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
 
-        <command name="caclient/ra-enroll">
+        <command name="caclient/enroll">
             <action class="org.xipki.ca.client.shell.RAEnrollCertCommand">
             	<property name="raWorker" ref="raWorker" />
             </action>
         </command>
 
-        <command name="caclient/ra-revoke">
+        <command name="caclient/revoke">
             <action class="org.xipki.ca.client.shell.RARevokeCertCommand">
             	<property name="raWorker" ref="raWorker" />
             </action>
         </command>
         
-        <command name="caclient/ra-gencrl">
+        <command name="caclient/unrevoke">
+            <action class="org.xipki.ca.client.shell.RAUnrevokeCertCommand">
+            	<property name="raWorker" ref="raWorker" />
+            </action>
+        </command>
+        
+        <command name="caclient/remove">
+            <action class="org.xipki.ca.client.shell.RARemoveCertCommand">
+            	<property name="raWorker" ref="raWorker" />
+            </action>
+        </command>
+        
+        <command name="caclient/gencrl">
             <action class="org.xipki.ca.client.shell.RAGenCRLCommand">
             	<property name="raWorker" ref="raWorker" />
             </action>
         </command>
         
-        <command name="caclient/ra-getcrl">
+        <command name="caclient/getcrl">
             <action class="org.xipki.ca.client.shell.RAGetCRLCommand">
             	<property name="raWorker" ref="raWorker" />
             </action>

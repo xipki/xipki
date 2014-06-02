@@ -265,7 +265,10 @@ public class SoftTokenContentSignerBuilder
         }
 
         ConcurrentContentSigner concurrentSigner = new DefaultConcurrentContentSigner(signers, key);
-        concurrentSigner.setCertificate(cert);
+        if(cert != null)
+        {
+            concurrentSigner.setCertificate(cert);
+        }
         return concurrentSigner;
     }
 

@@ -23,7 +23,7 @@ import org.xipki.ca.server.mgmt.CAManager;
 public abstract class CaCommand extends OsgiCommandSupport
 {
     protected final static String permissionsText =
-            "all|cert-req|cert-rev|key-update|CRL-gen|CRL-download|cross-cert-req";
+            "enroll, revoke, unrevoke, remove, key-update, gen-crl, get-crl, enroll-cross, all";
 
     protected CAManager caManager;
 

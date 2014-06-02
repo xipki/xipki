@@ -18,12 +18,12 @@
 package org.xipki.ca.api.publisher;
 
 import java.security.cert.X509CRL;
-import java.util.Date;
 
 import org.xipki.audit.api.AuditLoggingService;
 import org.xipki.ca.common.X509CertificateWithMetaInfo;
 import org.xipki.database.api.DataSource;
 import org.xipki.security.api.PasswordResolver;
+import org.xipki.security.common.CertRevocationInfo;
 import org.xipki.security.common.EnvironmentParameterResolver;
 
 public abstract class CertPublisher
@@ -39,11 +39,19 @@ public abstract class CertPublisher
 
     public abstract void certificateRevoked(X509CertificateWithMetaInfo issuerCert,
             X509CertificateWithMetaInfo cert,
-            Date revocationTime,
-            int revocationReason,
-            Date invalidityTime);
+            CertRevocationInfo revInfo);
+
+    public abstract void certificateUnrevoked(X509CertificateWithMetaInfo issuerCert,
+            X509CertificateWithMetaInfo cert);
+
+    public abstract void certificateRemoved(X509CertificateWithMetaInfo issuerCert,
+            X509CertificateWithMetaInfo cert);
 
     public abstract void crlAdded(X509CertificateWithMetaInfo cacert, X509CRL crl);
+
+    public abstract void caRevoked(X509CertificateWithMetaInfo cacert, CertRevocationInfo revocationInfo);
+
+    public abstract void caUnrevoked(X509CertificateWithMetaInfo cacert);
 
     public abstract boolean isHealthy();
 

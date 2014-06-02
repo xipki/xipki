@@ -28,8 +28,8 @@ import org.xipki.ca.common.CertIDOrError;
 import org.xipki.ca.common.PKIStatusInfo;
 import org.xipki.security.common.IoCertUtil;
 
-@Command(scope = "caclient", name = "revoke", description="Revoke certificate")
-public class RARevokeCertCommand extends ClientCommand
+@Command(scope = "caclient", name = "remove", description="Remove certificate")
+public class RARemoveCertCommand extends ClientCommand
 {
     @Option(name = "-cert",
             description = "Certificate file")
@@ -43,18 +43,6 @@ public class RARevokeCertCommand extends ClientCommand
             description = "Serial number")
     protected String            serialNumber;
 
-    @Option(name = "-reason",
-            required=true,
-            description = "Required. Reason, valid values are \n" +
-                    "0: unspecified\n" +
-                    "1: keyCompromise\n" +
-                    "3: affiliationChanged\n" +
-                    "4: superseded\n" +
-                    "5: cessationOfOperation\n" +
-                    "6: certificateHold\n" +
-                    "9: privilegeWithdrawn")
-    protected Integer           reason;
-
     private RAWorker             raWorker;
 
     @Override
@@ -67,35 +55,29 @@ public class RARevokeCertCommand extends ClientCommand
             return null;
         }
 
-        if(reason != 0 && reason != 1 && reason != 3 && reason != 4 && reason != 5 && reason != 6 && reason != 9)
-        {
-            System.err.println("invalid reason " + reason);
-            return null;
-        }
-
         CertIDOrError certIdOrError;
         if(certFile != null)
         {
             X509Certificate cert = IoCertUtil.parseCert(certFile);
-            certIdOrError = raWorker.revokeCert(cert, reason);
+            certIdOrError = raWorker.removeCert(cert);
         }
         else
         {
             X509Certificate cacert = IoCertUtil.parseCert(cacertFile);
             X500Name issuer = X500Name.getInstance(cacert.getSubjectX500Principal().getEncoded());
-            certIdOrError = raWorker.revokeCert(issuer, new BigInteger(serialNumber), reason);
+            certIdOrError = raWorker.removeCert(issuer, new BigInteger(serialNumber));
         }
 
         // TODO: check whether the returned one match the requested one
         if(certIdOrError.getError() != null)
         {
             PKIStatusInfo error = certIdOrError.getError();
-            System.err.println("Revocation failed: status=" + error.getStatus()+
+            System.err.println("Removing certificate failed: status=" + error.getStatus()+
                     ", failureInfo=" + error.getPkiFailureInfo() + ", message=" + error.getStatusMessage());
         }
         else
         {
-            System.out.println("Revoked certificate");
+            System.out.println("Removed certificate");
         }
         return null;
     }

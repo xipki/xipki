@@ -147,6 +147,7 @@ public class HttpsClientTestor
 
    }
 
+   @SuppressWarnings("unused")
    private void print_content(HttpsURLConnection con)
    {
     if(con!=null)

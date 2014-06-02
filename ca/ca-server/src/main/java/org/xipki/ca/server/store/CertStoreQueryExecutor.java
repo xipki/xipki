@@ -49,7 +49,6 @@ import javax.security.auth.x500.X500Principal;
 import org.bouncycastle.asn1.ASN1Integer;
 import org.bouncycastle.asn1.DEROctetString;
 import org.bouncycastle.asn1.x500.X500Name;
-import org.bouncycastle.asn1.x509.CRLReason;
 import org.bouncycastle.asn1.x509.Extension;
 import org.bouncycastle.util.encoders.Base64;
 import org.slf4j.Logger;
@@ -60,9 +59,11 @@ import org.xipki.ca.api.publisher.CertificateInfo;
 import org.xipki.ca.common.CertBasedRequestorInfo;
 import org.xipki.ca.common.RequestorInfo;
 import org.xipki.ca.common.X509CertificateWithMetaInfo;
-import org.xipki.ca.server.CertRevocationInfo;
+import org.xipki.ca.server.CertRevocationInfoWithSerial;
 import org.xipki.ca.server.CertStatus;
 import org.xipki.database.api.DataSource;
+import org.xipki.security.common.CRLReason;
+import org.xipki.security.common.CertRevocationInfo;
 import org.xipki.security.common.IoCertUtil;
 import org.xipki.security.common.ParamChecker;
 
@@ -75,8 +76,8 @@ class CertStoreQueryExecutor
     private final DataSource dataSource;
 
     private final CertBasedIdentityStore caInfoStore;
-    private final CertBasedIdentityStore requestorInfoStore;
-    private final CertprofileStore certprofileStore;
+    private final NameIdStore requestorInfoStore;
+    private final NameIdStore certprofileStore;
 
     CertStoreQueryExecutor(DataSource dataSource)
     throws SQLException
@@ -97,8 +98,8 @@ class CertStoreQueryExecutor
         }
 
         this.caInfoStore = initCertBasedIdentyStore("CAINFO");
-        this.requestorInfoStore = initCertBasedIdentyStore("REQUESTORINFO");
-        this.certprofileStore = initCertprofileStore();
+        this.requestorInfoStore = initNameIdStore("REQUESTORINFO");
+        this.certprofileStore = initNameIdStore("CERTPROFILEINFO");
     }
 
     private CertBasedIdentityStore initCertBasedIdentyStore(String table)
@@ -130,10 +131,10 @@ class CertStoreQueryExecutor
         }
     }
 
-    private CertprofileStore initCertprofileStore()
+    private NameIdStore initNameIdStore(String tableName)
     throws SQLException
     {
-        final String sql = "SELECT ID, NAME FROM CERTPROFILEINFO";
+        final String sql = "SELECT ID, NAME FROM " + tableName;
         PreparedStatement ps = borrowPreparedStatement(sql);
 
         ResultSet rs = null;
@@ -149,7 +150,7 @@ class CertStoreQueryExecutor
                 entries.put(name, id);
             }
 
-            return new CertprofileStore(entries);
+            return new NameIdStore(tableName, entries);
         }finally
         {
             releaseDbResources(ps, rs);
@@ -204,7 +205,7 @@ class CertStoreQueryExecutor
                 CertBasedRequestorInfo cmpRequestorInfo = (CertBasedRequestorInfo) requestor;
                 if(cmpRequestorInfo.getCertificate() != null)
                 {
-                    requestorId = getRequestorId(cmpRequestorInfo.getCertificate());
+                    requestorId = getRequestorId(cmpRequestorInfo.getName());
                 }
 
                 if(user != null)
@@ -366,16 +367,32 @@ class CertStoreQueryExecutor
         }
     }
 
-    byte[] revokeCert(X509CertificateWithMetaInfo caCert, BigInteger serialNumber,
-            Date revocationTime, CRLReason revocationReason,
-            Date invalidityTime)
+    CertWithRevocationInfo revokeCert(X509CertificateWithMetaInfo caCert, BigInteger serialNumber,
+            CertRevocationInfo revInfo, boolean force)
     throws OperationException, SQLException
     {
-        byte[] encodedCert = getEncodedCertificate(caCert, serialNumber);
-        if(encodedCert == null)
+        CertWithRevocationInfo certWithRevInfo = getCertWithRevocationInfo(caCert, serialNumber);
+        if(certWithRevInfo == null)
         {
-            LOG.warn("Certificate with issuer={} and serialNumber={} does not exist", caCert.getSubject(), serialNumber);
+            LOG.warn("Certificate with issuer={} and serialNumber={} does not exist",
+                    caCert.getSubject(), serialNumber);
             return null;
+        }
+
+        CertRevocationInfo currentRevInfo = certWithRevInfo.getRevInfo();
+        if(currentRevInfo != null)
+        {
+            CRLReason currentReason = currentRevInfo.getReason();
+            if(currentReason == CRLReason.CERTIFICATE_HOLD || currentReason == CRLReason.SUPERSEDED)
+            {
+                revInfo.setRevocationTime(currentRevInfo.getRevocationTime());
+                revInfo.setInvalidityTime(currentRevInfo.getInvalidityTime());
+            }
+            else if(force == false)
+            {
+                throw new OperationException(ErrorCode.CERT_REVOKED,
+                        "certificate already issued with reason " + currentReason.getDescription());
+            }
         }
 
         Integer caId = getCaId(caCert); // could not be null
@@ -391,16 +408,16 @@ class CertStoreQueryExecutor
             int idx = 1;
             ps.setLong(idx++, new Date().getTime()/1000);
             ps.setBoolean(idx++, true);
-            ps.setLong(idx++, revocationTime.getTime()/1000);
-            if(invalidityTime != null)
+            ps.setLong(idx++, revInfo.getRevocationTime().getTime()/1000);
+            if(revInfo.getInvalidityTime() != null)
             {
-                ps.setLong(idx++, invalidityTime.getTime()/1000);
+                ps.setLong(idx++, revInfo.getInvalidityTime().getTime()/1000);
             }else
             {
                 ps.setNull(idx++, Types.BIGINT);
             }
 
-            ps.setInt(idx++, revocationReason.getValue().intValue());
+            ps.setInt(idx++, revInfo.getReason().getCode());
             ps.setInt(idx++, caId.intValue());
             ps.setLong(idx++, serialNumber.longValue());
 
@@ -423,7 +440,123 @@ class CertStoreQueryExecutor
             releaseDbResources(ps, null);
         }
 
-        return encodedCert;
+        certWithRevInfo.setRevInfo(revInfo);
+        return certWithRevInfo;
+    }
+
+    X509CertificateWithMetaInfo unrevokeCert(X509CertificateWithMetaInfo caCert, BigInteger serialNumber,
+            boolean force)
+    throws OperationException, SQLException
+    {
+        CertWithRevocationInfo certWithRevInfo = getCertWithRevocationInfo(caCert, serialNumber);
+        if(certWithRevInfo == null)
+        {
+            LOG.warn("Certificate with issuer={} and serialNumber={} does not exist",
+                    caCert.getSubject(), serialNumber);
+            return null;
+        }
+
+        CertRevocationInfo currentRevInfo = certWithRevInfo.getRevInfo();
+        if(currentRevInfo == null)
+        {
+            return certWithRevInfo.getCert();
+        }
+
+        CRLReason currentReason = currentRevInfo.getReason();
+        if(force == false)
+        {
+            if(currentReason != CRLReason.CERTIFICATE_HOLD && currentReason != CRLReason.SUPERSEDED)
+            {
+                throw new OperationException(ErrorCode.CERT_REVOKED,
+                        "could not unrevoke certificate revoked with reason " + currentReason.getDescription());
+            }
+        }
+
+        Integer caId = getCaId(caCert); // could not be null
+
+        final String SQL_REVOKE_CERT =
+                "UPDATE CERT" +
+                " SET LAST_UPDATE=?, REVOKED = ?, REV_TIME = ?, REV_INVALIDITY_TIME=?, REV_REASON = ?" +
+                " WHERE CAINFO_ID = ? AND SERIAL = ?";
+        PreparedStatement ps = borrowPreparedStatement(SQL_REVOKE_CERT);
+
+        try
+        {
+            int idx = 1;
+            ps.setLong(idx++, new Date().getTime()/1000);
+            ps.setBoolean(idx++, false);
+            ps.setNull(idx++, Types.INTEGER);
+            ps.setNull(idx++, Types.INTEGER);
+            ps.setNull(idx++, Types.INTEGER);
+            ps.setInt(idx++, caId.intValue());
+            ps.setLong(idx++, serialNumber.longValue());
+
+            int count = ps.executeUpdate();
+            if(count != 1)
+            {
+                String message;
+                if(count > 1)
+                {
+                    message = count + " rows modified, but exactly one is expected";
+                }
+                else
+                {
+                    message = "no row is modified, but exactly one is expected";
+                }
+                throw new OperationException(ErrorCode.System_Failure, message);
+            }
+        }finally
+        {
+            releaseDbResources(ps, null);
+        }
+
+        return certWithRevInfo.getCert();
+    }
+
+    X509CertificateWithMetaInfo removeCert(X509CertificateWithMetaInfo caCert, BigInteger serialNumber)
+    throws OperationException, SQLException
+    {
+        CertWithRevocationInfo certWithRevInfo = getCertWithRevocationInfo(caCert, serialNumber);
+        if(certWithRevInfo == null)
+        {
+            LOG.warn("Certificate with issuer={} and serialNumber={} does not exist",
+                    caCert.getSubject(), serialNumber);
+            return null;
+        }
+
+        Integer caId = getCaId(caCert); // could not be null
+
+        final String SQL_REVOKE_CERT =
+                "DELETE FROM CERT" +
+                " WHERE CAINFO_ID = ? AND SERIAL = ?";
+        PreparedStatement ps = borrowPreparedStatement(SQL_REVOKE_CERT);
+
+        try
+        {
+            int idx = 1;
+            ps.setInt(idx++, caId.intValue());
+            ps.setLong(idx++, serialNumber.longValue());
+
+            int count = ps.executeUpdate();
+            if(count != 1)
+            {
+                String message;
+                if(count > 1)
+                {
+                    message = count + " rows modified, but exactly one is expected";
+                }
+                else
+                {
+                    message = "no row is modified, but exactly one is expected";
+                }
+                throw new OperationException(ErrorCode.System_Failure, message);
+            }
+        }finally
+        {
+            releaseDbResources(ps, null);
+        }
+
+        return certWithRevInfo.getCert();
     }
 
     Long getGreatestSerialNumber(X509CertificateWithMetaInfo caCert)
@@ -669,7 +802,7 @@ class CertStoreQueryExecutor
         }
     }
 
-    CertWithRevocationInfo getCertificate(List<Integer> certIds, String sha1FpSubject, String certProfile)
+    CertWithRevokedInfo getCertificate(List<Integer> certIds, String sha1FpSubject, String certProfile)
     throws SQLException, OperationException
     {
         ParamChecker.assertNotEmpty("certIds", certIds);
@@ -752,7 +885,7 @@ class CertStoreQueryExecutor
                     throw new OperationException(ErrorCode.System_Failure, "IOException: " + e.getMessage());
                 }
                 X509CertificateWithMetaInfo certWithMeta = new X509CertificateWithMetaInfo(cert, encodedCert);
-                return new CertWithRevocationInfo(certWithMeta, revoked);
+                return new CertWithRevokedInfo(certWithMeta, revoked);
             }
         }finally
         {
@@ -762,7 +895,7 @@ class CertStoreQueryExecutor
         return null;
     }
 
-    byte[] getEncodedCertificate(X509CertificateWithMetaInfo caCert, BigInteger serial)
+    CertWithRevocationInfo getCertWithRevocationInfo(X509CertificateWithMetaInfo caCert, BigInteger serial)
     throws SQLException, OperationException
     {
         ParamChecker.assertNotNull("caCert", caCert);
@@ -774,7 +907,11 @@ class CertStoreQueryExecutor
             return null;
         }
 
-        String sql = "T2.CERT CERT"
+        String sql = "T1.REVOKED REVOKED,"
+                + " T1.REV_REASON REV_REASON,"
+                + " T1.REV_TIME REV_TIME,"
+                + " T1.REV_INVALIDITY_TIME REV_INVALIDITY_TIME,"
+                + " T2.CERT CERT"
                 + " FROM CERT T1, RAWCERT T2"
                 + " WHERE T1.CAINFO_ID=? AND T1.SERIAL=? AND T2.CERT_ID=T1.ID";
 
@@ -792,7 +929,34 @@ class CertStoreQueryExecutor
             if(rs.next())
             {
                 String b64Cert = rs.getString("CERT");
-                return b64Cert == null ? null : Base64.decode(b64Cert);
+                byte[] certBytes = (b64Cert == null) ? null : Base64.decode(b64Cert);
+                X509Certificate cert;
+                try
+                {
+                    cert = IoCertUtil.parseCert(certBytes);
+                } catch (CertificateException e)
+                {
+                    throw new OperationException(ErrorCode.System_Failure, "CertificateException: " + e.getMessage());
+                } catch (IOException e)
+                {
+                    throw new OperationException(ErrorCode.System_Failure, "IOException: " + e.getMessage());
+                }
+
+                CertRevocationInfo revInfo = null;
+                boolean revoked = rs.getBoolean("REVOKED");
+                if(revoked)
+                {
+                    int rev_reason = rs.getInt("REV_REASON");
+                    long rev_time = rs.getLong("REV_TIME");
+                    long rev_invalidity_time = rs.getLong("REV_INVALIDITY_TIME");
+                    revInfo = new CertRevocationInfo(CRLReason.forReasonCode(rev_reason),
+                            new Date(1000 * rev_time),
+                            new Date(1000 * rev_invalidity_time));
+                }
+
+                return new CertWithRevocationInfo(
+                        new X509CertificateWithMetaInfo(cert, certBytes),
+                        revInfo);
             }
         }finally
         {
@@ -856,18 +1020,17 @@ class CertStoreQueryExecutor
                         caCert, cert.getPublicKey().getEncoded(), certProfileName);
 
                 boolean revoked = rs.getBoolean(col_revoked);
-                certInfo.setRevoked(revoked);
 
                 if(revoked)
                 {
-                    int rev_reason = rs.getInt(col_rev_reason);
-                    certInfo.setRevocationReason(rev_reason);
-
+                    int rev_reasonCode = rs.getInt(col_rev_reason);
+                    CRLReason rev_reason = CRLReason.forReasonCode(rev_reasonCode);
                     long rev_time = rs.getLong(col_rev_time);
-                    certInfo.setRevocationTime(new Date(rev_time * 1000));
-
                     long invalidity_time = rs.getLong(col_rev_invalidity_time);
-                    certInfo.setInvalidityTime(new Date(invalidity_time * 1000));
+
+                    CertRevocationInfo revInfo = new CertRevocationInfo(rev_reason,
+                            new Date(rev_time * 1000), new Date(invalidity_time * 1000));
+                    certInfo.setRevocationInfo(revInfo);
                 }
 
                 return certInfo;
@@ -883,7 +1046,7 @@ class CertStoreQueryExecutor
         return null;
     }
 
-    List<CertRevocationInfo> getRevokedCertificates(X509CertificateWithMetaInfo caCert,
+    List<CertRevocationInfoWithSerial> getRevokedCertificates(X509CertificateWithMetaInfo caCert,
             Date notExpiredAt, BigInteger startSerial, int numEntries)
     throws SQLException, OperationException
     {
@@ -919,14 +1082,15 @@ class CertStoreQueryExecutor
             ps.setLong(idx++, notExpiredAt.getTime()/1000 + 1);
             rs = ps.executeQuery();
 
-            List<CertRevocationInfo> ret = new ArrayList<CertRevocationInfo>();
+            List<CertRevocationInfoWithSerial> ret = new ArrayList<CertRevocationInfoWithSerial>();
             while(rs.next() && ret.size() < numEntries)
             {
                 long serial = rs.getLong("SERIAL");
                 int rev_reason = rs.getInt("REV_REASON");
                 long rev_time = rs.getLong("REV_TIME");
                 long rev_invalidity_time = rs.getLong("REV_INVALIDITY_TIME");
-                CertRevocationInfo revInfo = new CertRevocationInfo(BigInteger.valueOf(serial),
+                CertRevocationInfoWithSerial revInfo = new CertRevocationInfoWithSerial(
+                        BigInteger.valueOf(serial),
                         rev_reason, new Date(1000 * rev_time), new Date(1000 * rev_invalidity_time));
                 ret.add(revInfo);
             }
@@ -1147,43 +1311,49 @@ class CertStoreQueryExecutor
         return getCertBasedIdentityId(caCert, caInfoStore);
     }
 
-    private int getRequestorId(X509CertificateWithMetaInfo requestorCert)
-    throws SQLException, OperationException
-    {
-        return getCertBasedIdentityId(requestorCert, requestorInfoStore);
-    }
-
     private int getUserId(String user)
     {
         return 0; // FIXME: implement me
     }
 
+    private int getRequestorId(String requestorName)
+    throws SQLException
+    {
+        return getIdForName(requestorName, requestorInfoStore);
+    }
+
     private int getCertprofileId(String certprofileName)
     throws SQLException
     {
-        if(certprofileName == null)
+        return getIdForName(certprofileName, certprofileStore);
+    }
+
+    private int getIdForName(String name, NameIdStore store)
+    throws SQLException
+    {
+        if(name == null)
         {
             return -1;
         }
 
-        Integer id = certprofileStore.getId(certprofileName);
+        Integer id = store.getId(name);
         if(id != null)
         {
             return id.intValue();
         }
 
-        final String sql = "INSERT INTO CERTPROFILEINFO (ID, NAME) VALUES (?, ?)";
+        final String sql = "INSERT INTO " + store.getTable() + " (ID, NAME) VALUES (?, ?)";
         PreparedStatement ps = borrowPreparedStatement(sql);
 
-        id = certprofileStore.getNextFreeId();
+        id = store.getNextFreeId();
         try
         {
             int idx = 1;
             ps.setInt(idx++, id.intValue());
-            ps.setString(idx++, certprofileName);
+            ps.setString(idx++, name);
 
             ps.execute();
-            certprofileStore.addProfileEntry(certprofileName, id);
+            store.addEntry(name, id);
         }finally
         {
             releaseDbResources(ps, null);

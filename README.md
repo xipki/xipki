@@ -3,10 +3,11 @@ XiPKI
 
 eXtensible sImple Public Key Infrastructure
 
-  - Certificate Authority
-  - OCSP Responder
+  - Certificate Authority (RFC 5280)
+  - OCSP Responder (RFC 2560 and RFC 6960)
+  - CMP (RFC 4210 and RFC 4211)
   - Support of direct and inderect CRL
-  - Support of PKCS#12 and PKCS#11 devices
+  - Support of PKCS#12 and PKCS#11 devices, e.g. HSM
   - API to use customized key types, e.g. smartcard
   - API to specify customized certificate profiles
   - API to specify customized publisher, e.g. for LDAP and OCSP responder

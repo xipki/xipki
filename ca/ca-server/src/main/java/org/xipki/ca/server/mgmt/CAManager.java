@@ -26,6 +26,7 @@ import org.xipki.ca.api.CAStatus;
 import org.xipki.ca.cmp.server.CmpControl;
 import org.xipki.ca.server.X509CA;
 import org.xipki.ca.server.X509CACmpResponder;
+import org.xipki.security.common.CertRevocationInfo;
 import org.xipki.security.common.EnvironmentParameterResolver;
 
 public interface CAManager
@@ -191,5 +192,11 @@ public interface CAManager
     throws CAMgmtException;
 
     void changeEnvParam(String name, String value)
+    throws CAMgmtException;
+
+    void revokeCa(String caName, CertRevocationInfo revocationInfo)
+    throws CAMgmtException;
+
+    void unrevokeCa(String caName)
     throws CAMgmtException;
 }

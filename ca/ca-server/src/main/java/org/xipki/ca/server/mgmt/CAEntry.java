@@ -17,6 +17,7 @@
 
 package org.xipki.ca.server.mgmt;
 
+import java.math.BigInteger;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
@@ -31,12 +32,15 @@ import org.xipki.ca.api.CAMgmtException;
 import org.xipki.ca.api.CAStatus;
 import org.xipki.ca.common.X509CertificateWithMetaInfo;
 import org.xipki.ca.server.PublicCAInfo;
+import org.xipki.security.common.CertRevocationInfo;
 import org.xipki.security.common.IoCertUtil;
 import org.xipki.security.common.ParamChecker;
 
 public class CAEntry
 {
     private final String name;
+    private final boolean selfSigned;
+    private final BigInteger serialNumber;
     private final String subject;
     private CAStatus status;
     private final List<String> crlUris;
@@ -54,12 +58,14 @@ public class CAEntry
     private boolean allowDuplicateSubject;
     private Set<Permission> permissions;
     private int numCrls;
+    private CertRevocationInfo revocationInfo;
 
     private PublicCAInfo publicCAInfo;
 
     public CAEntry(String name, long initialSerial,
             String signerType, String signerConf, X509Certificate cert,
-            List<String> ocspUris, List<String> crlUris, List<String> issuerLocations, Integer numCrls)
+            List<String> ocspUris, List<String> crlUris,
+            List<String> issuerLocations, Integer numCrls)
     throws CAMgmtException
     {
         ParamChecker.assertNotEmpty("name", name);
@@ -98,7 +104,8 @@ public class CAEntry
         }
 
         this.subject = IoCertUtil.canonicalizeName(cert.getSubjectX500Principal());
-
+        this.serialNumber = cert.getSerialNumber();
+        this.selfSigned = cert.getIssuerX500Principal().equals(cert.getSubjectX500Principal());
         this.certInCMPFormat = new CMPCertificate(bcCert);
 
         this.signerType = signerType;
@@ -173,6 +180,16 @@ public class CAEntry
     public String getSubject()
     {
         return subject;
+    }
+
+    public BigInteger getSerialNumber()
+    {
+        return serialNumber;
+    }
+
+    public boolean isSelfSigned()
+    {
+        return selfSigned;
     }
 
     public String getSignerConf()
@@ -303,6 +320,16 @@ public class CAEntry
     public CMPCertificate getCertInCMPFormat()
     {
         return certInCMPFormat;
+    }
+
+    public CertRevocationInfo getRevocationInfo()
+    {
+        return revocationInfo;
+    }
+
+    public void setRevocationInfo(CertRevocationInfo revocationInfo)
+    {
+        this.revocationInfo = revocationInfo;
     }
 
 }
