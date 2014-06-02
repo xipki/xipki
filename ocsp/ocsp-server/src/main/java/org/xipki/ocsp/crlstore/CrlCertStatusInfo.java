@@ -20,9 +20,9 @@ package org.xipki.ocsp.crlstore;
 import java.util.Date;
 import java.util.Map;
 
-import org.xipki.ocsp.api.CertRevocationInfo;
 import org.xipki.ocsp.api.CertStatus;
 import org.xipki.ocsp.api.CertStatusInfo;
+import org.xipki.security.common.CertRevocationInfo;
 import org.xipki.security.common.HashAlgoType;
 import org.xipki.security.common.ParamChecker;
 

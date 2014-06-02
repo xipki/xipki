@@ -19,11 +19,12 @@ package org.xipki.ocsp.api;
 
 import java.util.Date;
 
+import org.bouncycastle.asn1.ocsp.CrlID;
+import org.xipki.security.common.CertRevocationInfo;
 import org.xipki.security.common.HashAlgoType;
 
 public class CertStatusInfo
 {
-
     private final CertStatus certStatus;
 
     private CertRevocationInfo revocationInfo;
@@ -33,6 +34,9 @@ public class CertStatusInfo
     private final Date thisUpdate;
     private final Date nextUpdate;
     private final String certProfile;
+
+    private CrlID crlID;
+    private Date archiveCutOff;
 
     private CertStatusInfo(CertStatus certStatus, Date thisUpdate, Date nextUpdate, String certProfile)
     {
@@ -53,7 +57,8 @@ public class CertStatusInfo
     }
 
     public static CertStatusInfo getGoodCertStatusInfo(
-            HashAlgoType certHashAlgo, byte[] certHash, Date thisUpdate, Date nextUpdate, String certProfile)
+            HashAlgoType certHashAlgo, byte[] certHash,
+            Date thisUpdate, Date nextUpdate, String certProfile)
     {
         CertStatusInfo ret = new CertStatusInfo(CertStatus.GOOD, thisUpdate, nextUpdate, certProfile);
         ret.certHashAlgo = certHashAlgo;
@@ -62,7 +67,8 @@ public class CertStatusInfo
     }
 
     public static CertStatusInfo getRevokedCertStatusInfo(CertRevocationInfo revocationInfo,
-            HashAlgoType certHashAlgo, byte[] certHash, Date thisUpdate, Date nextUpdate, String certProfile)
+            HashAlgoType certHashAlgo, byte[] certHash,
+            Date thisUpdate, Date nextUpdate, String certProfile)
     {
         if(revocationInfo == null)
         {
@@ -108,6 +114,26 @@ public class CertStatusInfo
     public String getCertProfile()
     {
         return certProfile;
+    }
+
+    public CrlID getCrlID()
+    {
+        return crlID;
+    }
+
+    public void setCrlID(CrlID crlID)
+    {
+        this.crlID = crlID;
+    }
+
+    public Date getArchiveCutOff()
+    {
+        return archiveCutOff;
+    }
+
+    public void setArchiveCutOff(Date archiveCutOff)
+    {
+        this.archiveCutOff = archiveCutOff;
     }
 
 }

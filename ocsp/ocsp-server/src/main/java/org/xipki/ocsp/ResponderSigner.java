@@ -19,33 +19,93 @@ package org.xipki.ocsp;
 
 import java.io.IOException;
 import java.security.cert.CertificateEncodingException;
+import java.security.cert.X509Certificate;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
+import org.bouncycastle.asn1.ASN1Encodable;
+import org.bouncycastle.asn1.ASN1ObjectIdentifier;
+import org.bouncycastle.asn1.ASN1Sequence;
+import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
+import org.bouncycastle.asn1.pkcs.RSASSAPSSparams;
 import org.bouncycastle.asn1.x500.X500Name;
+import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.cert.X509CertificateHolder;
 import org.xipki.security.api.ConcurrentContentSigner;
 import org.xipki.security.common.ParamChecker;
 
-public class ResponderSigner
+class ResponderSigner
 {
-    private final ConcurrentContentSigner signer;
+    private final Map<String, ConcurrentContentSigner> algoSignerMap;
+    private final List<ConcurrentContentSigner> signers;
 
-    private final X509CertificateHolder certificate;
+    private final X509CertificateHolder certificateHolder;
+    private final X509Certificate certificate;
 
     private final X500Name responderId;
 
-    public ResponderSigner(ConcurrentContentSigner signer)
+    public ResponderSigner(List<ConcurrentContentSigner> signers)
     throws CertificateEncodingException, IOException
     {
-        ParamChecker.assertNotNull("signer", signer);
+        ParamChecker.assertNotEmpty("signers", signers);
 
-        this.signer = signer;
-        this.certificate = new X509CertificateHolder(signer.getCertificate().getEncoded());
-        this.responderId = this.certificate.getSubject();
+        this.signers = signers;
+        this.certificate = signers.get(0).getCertificate();
+        this.certificateHolder = new X509CertificateHolder(this.certificate.getEncoded());
+        this.responderId = this.certificateHolder.getSubject();
+
+        algoSignerMap = new HashMap<String, ConcurrentContentSigner>();
+        for(ConcurrentContentSigner signer : signers)
+        {
+            String algoName = getSignatureAlgorithmName(signer.getAlgorithmIdentifier());
+            algoSignerMap.put(algoName, signer);
+        }
     }
 
-    public ConcurrentContentSigner getSigner()
+    public ConcurrentContentSigner getFirstSigner()
     {
-        return signer;
+        return signers.get(0);
+    }
+
+    public ConcurrentContentSigner getSigner(ASN1Sequence preferredSigAlgs)
+    {
+        if(preferredSigAlgs == null)
+        {
+            return signers.get(0);
+        }
+
+        int size = preferredSigAlgs.size();
+        for(int i = 0; i < size; i++)
+        {
+            ASN1Sequence algObj = (ASN1Sequence) preferredSigAlgs.getObjectAt(i);
+            AlgorithmIdentifier sigAlgId = AlgorithmIdentifier.getInstance(algObj.getObjectAt(0));
+            String algoName = getSignatureAlgorithmName(sigAlgId);
+            if(algoSignerMap.containsKey(algoName))
+            {
+                return algoSignerMap.get(algoName);
+            }
+        }
+        return null;
+    }
+
+    private static String getSignatureAlgorithmName(AlgorithmIdentifier sigAlgId)
+    {
+        String algoName;
+        ASN1ObjectIdentifier algOid = sigAlgId.getAlgorithm();
+        if(PKCSObjectIdentifiers.id_RSASSA_PSS.equals(algOid))
+        {
+            ASN1Encodable asn1Encodable = sigAlgId.getParameters();
+            RSASSAPSSparams param = RSASSAPSSparams.getInstance(asn1Encodable);
+            ASN1ObjectIdentifier digestAlgOid = param.getHashAlgorithm().getAlgorithm();
+            algoName = digestAlgOid.getId() + "WITHRSAANDMGF1";
+        }
+        else
+        {
+            algoName = algOid.getId();
+        }
+
+        return algoName;
     }
 
     public X500Name getResponderId()
@@ -53,9 +113,27 @@ public class ResponderSigner
         return responderId;
     }
 
-    public X509CertificateHolder getCertificate()
+    public X509Certificate getCertificate()
     {
         return certificate;
+    }
+
+    public X509CertificateHolder getCertificateHolder()
+    {
+        return certificateHolder;
+    }
+
+    public boolean isHealthy()
+    {
+        for(ConcurrentContentSigner signer : signers)
+        {
+            if(signer.isHealthy() == false)
+            {
+                return false;
+            }
+        }
+
+        return true;
     }
 
 }

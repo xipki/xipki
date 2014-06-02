@@ -31,6 +31,7 @@ import org.bouncycastle.asn1.ASN1StreamParser;
 import org.bouncycastle.asn1.ocsp.OCSPRequest;
 import org.bouncycastle.cert.ocsp.OCSPReq;
 import org.bouncycastle.cert.ocsp.OCSPResp;
+import org.bouncycastle.util.encoders.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.audit.api.AuditEvent;
@@ -48,6 +49,8 @@ public class Rfc2560Servlet extends HttpServlet
     private static final String CT_REQUEST  = "application/ocsp-request";
     private static final String CT_RESPONSE = "application/ocsp-response";
 
+    private static final int maxGetRequestLen = 255;
+
     private int maxRequestLength = 4096;
 
     private AuditLoggingService auditLoggingService;
@@ -64,7 +67,20 @@ public class Rfc2560Servlet extends HttpServlet
     }
 
     @Override
-    public void doPost(HttpServletRequest request, HttpServletResponse response)
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+    throws ServletException, IOException
+    {
+        processRequest(request, response, true);
+    }
+
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+    throws ServletException, IOException
+    {
+        processRequest(request, response, false);
+    }
+
+    private void processRequest(HttpServletRequest request, HttpServletResponse response, boolean getMethod)
     throws ServletException, IOException
     {
         AuditEvent auditEvent = null;
@@ -75,7 +91,7 @@ public class Rfc2560Servlet extends HttpServlet
 
         long startInUs = 0;
 
-        if(auditLoggingService != null && responder.isAuditRequest())
+        if(auditLoggingService != null && responder.isAuditResponse())
         {
             startInUs = System.nanoTime()/1000;
             auditEvent = new AuditEvent(new Date());
@@ -98,31 +114,68 @@ public class Rfc2560Servlet extends HttpServlet
                 return;
             }
 
-            // accept only "application/ocsp-request" as content type
-            if (CT_REQUEST.equalsIgnoreCase(request.getContentType()) == false)
+            OCSPRequest ocspRequest;
+            if(getMethod)
             {
-                response.setContentLength(0);
-                response.setStatus(HttpServletResponse.SC_UNSUPPORTED_MEDIA_TYPE);
+                String requestURI = request.getRequestURI();
+                String servletPath = request.getServletPath();
+                if(servletPath.endsWith("/") == false)
+                {
+                    servletPath += "/";
+                }
 
-                auditStatus = AuditStatus.FAILED;
-                auditMessage = "unsupporte media type " + request.getContentType();
-                return;
+                if(requestURI.length() > maxGetRequestLen + servletPath.length())
+                {
+                    response.setContentLength(0);
+                    response.setStatus(HttpServletResponse.SC_REQUEST_ENTITY_TOO_LARGE);
+
+                    auditStatus = AuditStatus.FAILED;
+                    auditMessage = "request too large";
+                    return;
+                }
+
+                int indexOf = requestURI.indexOf(servletPath);
+
+                String b64Request;
+                if (indexOf >= 0)
+                {
+                    b64Request = requestURI.substring(indexOf+servletPath.length());
+                }
+                else
+                {
+                    b64Request = requestURI;
+                }
+
+                ocspRequest = OCSPRequest.getInstance(Base64.decode(b64Request));
+            }
+            else
+            {
+                // accept only "application/ocsp-request" as content type
+                if (CT_REQUEST.equalsIgnoreCase(request.getContentType()) == false)
+                {
+                    response.setContentLength(0);
+                    response.setStatus(HttpServletResponse.SC_UNSUPPORTED_MEDIA_TYPE);
+
+                    auditStatus = AuditStatus.FAILED;
+                    auditMessage = "unsupporte media type " + request.getContentType();
+                    return;
+                }
+
+                // request too long
+                if(request.getContentLength() > maxRequestLength)
+                {
+                    response.setContentLength(0);
+                    response.setStatus(HttpServletResponse.SC_REQUEST_ENTITY_TOO_LARGE);
+
+                    auditStatus = AuditStatus.FAILED;
+                    auditMessage = "request too large";
+                    return;
+                }
+                ServletInputStream in = request.getInputStream();
+                ASN1StreamParser parser = new ASN1StreamParser(in);
+                ocspRequest = OCSPRequest.getInstance(parser.readObject());
             }
 
-            // request too long
-            if(request.getContentLength() > maxRequestLength)
-            {
-                response.setContentLength(0);
-                response.setStatus(HttpServletResponse.SC_REQUEST_ENTITY_TOO_LARGE);
-
-                auditStatus = AuditStatus.FAILED;
-                auditMessage = "request too large";
-                return;
-            }
-
-            ServletInputStream in = request.getInputStream();
-            ASN1StreamParser parser = new ASN1StreamParser(in);
-            OCSPRequest ocspRequest = OCSPRequest.getInstance(parser.readObject());
             OCSPReq ocspReq = new OCSPReq(ocspRequest);
 
             response.setContentType(Rfc2560Servlet.CT_RESPONSE);

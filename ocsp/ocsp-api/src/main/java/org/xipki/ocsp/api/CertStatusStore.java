@@ -20,19 +20,129 @@ package org.xipki.ocsp.api;
 import java.math.BigInteger;
 
 import org.xipki.audit.api.AuditLoggingService;
+import org.xipki.database.api.DataSourceFactory;
+import org.xipki.security.api.PasswordResolver;
 import org.xipki.security.common.HashAlgoType;
 
-public interface CertStatusStore
+public abstract class CertStatusStore
 {
-    CertStatusInfo getCertStatus(HashAlgoType hashAlgo, byte[] issuerNameHash,
-            byte[] issuerKeyHash, BigInteger serialNumber, boolean includeCertHash, HashAlgoType certHashAlgo)
+    public abstract CertStatusInfo getCertStatus(HashAlgoType hashAlgo, byte[] issuerNameHash,
+            byte[] issuerKeyHash, BigInteger serialNumber)
     throws CertStatusStoreException;
 
-    boolean isHealthy();
+    public abstract void init(String conf, DataSourceFactory datasourceFactory, PasswordResolver passwordResolver)
+    throws CertStatusStoreException;
 
-    String getName();
+    public abstract void shutdown()
+    throws CertStatusStoreException;
 
-    void setAuditLoggingService(AuditLoggingService auditLoggingService);
+    public abstract boolean isHealthy();
 
-    AuditLoggingService getAuditLoggingService();
+    protected static final long DAY = 24L * 60 * 60 * 1000;
+
+    private String name;
+    protected boolean unknownSerialAsGood;
+    protected int retentionInterval;
+    protected boolean inheritCaRevocation;
+    protected boolean includeArchiveCutoff;
+    protected boolean includeCrlID;
+    protected boolean includeCertHash;
+    protected HashAlgoType certHashAlgorithm;
+
+    protected AuditLoggingService auditLoggingService;
+
+    protected CertStatusStore()
+    {
+    }
+
+    public void setName(String name)
+    {
+        this.name = name;
+    }
+
+    public String getName()
+    {
+        return name;
+    }
+
+    public void setAuditLoggingService(AuditLoggingService auditLoggingService)
+    {
+        this.auditLoggingService = auditLoggingService;
+    }
+
+    public AuditLoggingService getAuditLoggingService()
+    {
+        return auditLoggingService;
+    }
+
+    public boolean isUnknownSerialAsGood()
+    {
+        return unknownSerialAsGood;
+    }
+
+    public void setUnknownSerialAsGood(boolean unknownSerialAsGood)
+    {
+        this.unknownSerialAsGood = unknownSerialAsGood;
+    }
+
+    public boolean isIncludeArchiveCutoff()
+    {
+        return includeArchiveCutoff;
+    }
+
+    public void setIncludeArchiveCutoff(boolean includeArchiveCutoff)
+    {
+        this.includeArchiveCutoff = includeArchiveCutoff;
+    }
+
+    public int getRetentionInterval()
+    {
+        return retentionInterval;
+    }
+
+    public void setRetentionInterval(int retentionInterval)
+    {
+        this.retentionInterval = retentionInterval;
+    }
+
+    public boolean isInheritCaRevocation()
+    {
+        return inheritCaRevocation;
+    }
+
+    public void setInheritCaRevocation(boolean inheritCaRevocation)
+    {
+        this.inheritCaRevocation = inheritCaRevocation;
+    }
+
+    public boolean isIncludeCrlID()
+    {
+        return includeCrlID;
+    }
+
+    public void setIncludeCrlID(boolean includeCrlID)
+    {
+        this.includeCrlID = includeCrlID;
+    }
+
+    public boolean isIncludeCertHash()
+    {
+        return includeCertHash;
+    }
+
+    public void setIncludeCertHash(boolean includeCertHash)
+    {
+        this.includeCertHash = includeCertHash;
+    }
+
+    public HashAlgoType getCertHashAlgorithm()
+    {
+        return certHashAlgorithm;
+    }
+
+    public void setCertHashAlgorithm(HashAlgoType algorithm)
+    {
+        this.certHashAlgorithm = algorithm;
+    }
+
 }

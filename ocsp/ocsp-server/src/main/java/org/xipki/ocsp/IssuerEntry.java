@@ -17,28 +17,29 @@
 
 package org.xipki.ocsp;
 
-import java.util.Arrays;
+import java.util.Date;
 import java.util.Map;
 
 import org.xipki.security.common.HashAlgoType;
+import org.xipki.security.common.ParamChecker;
 
 public class IssuerEntry
 {
     private final int id;
     private final Map<HashAlgoType, IssuerHashNameAndKey> issuerHashMap;
-    private final byte[] encodedCert;
+    private final Date caNotBefore;
 
-    public IssuerEntry(int id, Map<HashAlgoType, IssuerHashNameAndKey> issuerHashMap,
-            byte[] encodedCert)
+    private boolean revoked;
+    private Date revocationTime;
+
+    public IssuerEntry(int id, Map<HashAlgoType, IssuerHashNameAndKey> issuerHashMap, Date caNotBefore)
     {
-        if(issuerHashMap == null || issuerHashMap.isEmpty())
-        {
-            throw new IllegalArgumentException("issuerHashMap is empty");
-        }
+        ParamChecker.assertNotEmpty("issuerHashMap", issuerHashMap);
+        ParamChecker.assertNotNull("caNotBefore", caNotBefore);
 
         this.id = id;
         this.issuerHashMap = issuerHashMap;
-        this.encodedCert = encodedCert;
+        this.caNotBefore = caNotBefore;
     }
 
     public int getId()
@@ -46,19 +47,34 @@ public class IssuerEntry
         return id;
     }
 
-    public boolean matchCert(byte[] encodedCert)
-    {
-        if(encodedCert == null)
-        {
-            return false;
-        }
-
-        return Arrays.equals(this.encodedCert, encodedCert);
-    }
-
     public boolean matchHash(HashAlgoType hashAlgo, byte[] issuerNameHash, byte[] issuerKeyHash)
     {
         IssuerHashNameAndKey issuerHash = issuerHashMap.get(hashAlgo);
         return issuerHash == null ? false : issuerHash.match(hashAlgo, issuerNameHash, issuerKeyHash);
+    }
+
+    public boolean isRevoked()
+    {
+        return revoked;
+    }
+
+    public void setRevoked(boolean revoked)
+    {
+        this.revoked = revoked;
+    }
+
+    public Date getRevocationTime()
+    {
+        return revocationTime;
+    }
+
+    public void setRevocationTime(Date revocationTime)
+    {
+        this.revocationTime = revocationTime;
+    }
+
+    public Date getCaNotBefore()
+    {
+        return caNotBefore;
     }
 }

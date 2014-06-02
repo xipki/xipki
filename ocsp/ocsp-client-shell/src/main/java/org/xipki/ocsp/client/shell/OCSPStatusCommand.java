@@ -21,8 +21,13 @@ import java.math.BigInteger;
 import java.net.URL;
 import java.security.MessageDigest;
 import java.security.cert.X509Certificate;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.StringTokenizer;
 
 import org.apache.felix.gogo.commands.Command;
 import org.apache.felix.gogo.commands.Option;
@@ -32,6 +37,10 @@ import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.isismtt.ISISMTTObjectIdentifiers;
 import org.bouncycastle.asn1.isismtt.ocsp.CertHash;
 import org.bouncycastle.asn1.nist.NISTObjectIdentifiers;
+import org.bouncycastle.asn1.ocsp.BasicOCSPResponse;
+import org.bouncycastle.asn1.ocsp.OCSPObjectIdentifiers;
+import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
+import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.asn1.x509.Extension;
 import org.bouncycastle.asn1.x509.X509ObjectIdentifiers;
 import org.bouncycastle.cert.ocsp.BasicOCSPResp;
@@ -43,6 +52,8 @@ import org.bouncycastle.util.encoders.Hex;
 import org.xipki.ocsp.client.api.OCSPRequestor;
 import org.xipki.ocsp.client.api.OCSPResponseNotSuccessfullException;
 import org.xipki.ocsp.client.api.RequestOptions;
+import org.xipki.security.SignerUtil;
+import org.xipki.security.common.CRLReason;
 import org.xipki.security.common.IoCertUtil;
 
 @Command(scope = "ocsp", name = "status", description="Request certificate status")
@@ -53,7 +64,7 @@ public class OCSPStatusCommand extends OsgiCommandSupport
             description = "Server URL, the default is " + DFLT_URL)
     protected String            serverURL;
 
-    @Option(name = "-ca",
+    @Option(name = "-cacert",
             required = true, description = "Required. CA certificate file")
     protected String            cacertFile;
 
@@ -72,6 +83,27 @@ public class OCSPStatusCommand extends OsgiCommandSupport
     @Option(name = "-hash",
             required = false, description = "Hash algorithm name. The default is SHA256")
     protected String            hashAlgo;
+
+    @Option(name = "-sigalgs",
+            required = false, description = "comma-seperated preferred signature algorithms")
+    protected String           prefSigAlgs;
+
+    @Option(name = "-httpget",
+            required = false, description = "use HTTP GET for small request")
+    protected Boolean          useHttpGetForSmallRequest;
+
+    @Option(name = "-v", aliases="--verbose",
+            required = false, description = "Show status verbosely")
+    protected Boolean          verbose;
+
+    private static final Map<ASN1ObjectIdentifier, String> extensionOidNameMap = new HashMap<>();
+    static
+    {
+        extensionOidNameMap.put(OCSPObjectIdentifiers.id_pkix_ocsp_archive_cutoff, "ArchiveCutoff");
+        extensionOidNameMap.put(OCSPObjectIdentifiers.id_pkix_ocsp_crl, "CrlID");
+        extensionOidNameMap.put(OCSPObjectIdentifiers.id_pkix_ocsp_nonce, "Nonce");
+        extensionOidNameMap.put(OCSPRequestor.id_pkix_ocsp_extendedRevoke, "ExtendedRevoke");
+    }
 
     private OCSPRequestor      requestor;
 
@@ -136,6 +168,23 @@ public class OCSPStatusCommand extends OsgiCommandSupport
         options.setUseNonce(useNonce == null ? false : useNonce.booleanValue());
         options.setHashAlgorithmId(hashAlgoOid);
 
+        if(useHttpGetForSmallRequest != null)
+        {
+            options.setUseHttpGetForRequest(useHttpGetForSmallRequest.booleanValue());
+        }
+
+        if(prefSigAlgs != null)
+        {
+            StringTokenizer st = new StringTokenizer(prefSigAlgs, ",;: \t");
+            List<String> sortedList = new ArrayList<>(st.countTokens());
+            while(st.hasMoreTokens())
+            {
+                sortedList.add(st.nextToken());
+            }
+
+            options.setPreferredSignatureAlgorithms2(sortedList);
+        }
+
         BasicOCSPResp basicResp;
         try
         {
@@ -145,6 +194,8 @@ public class OCSPStatusCommand extends OsgiCommandSupport
             System.err.println(e.getMessage());
             return null;
         }
+
+        boolean extendedRevoke = basicResp.getExtension(OCSPRequestor.id_pkix_ocsp_extendedRevoke) != null;
 
         SingleResp[] singleResponses = basicResp.getResponses();
 
@@ -171,11 +222,20 @@ public class OCSPStatusCommand extends OsgiCommandSupport
             {
                 int reason = ((RevokedStatus) singleCertStatus).getRevocationReason();
                 Date revTime = ((RevokedStatus) singleCertStatus).getRevocationTime();
-                status = "Revoked, reason = "+ reason + ", revocationTime = " + revTime;
+                if(extendedRevoke &&
+                        reason == CRLReason.CERTIFICATE_HOLD.getCode() &&
+                        revTime.getTime() == 0)
+                {
+                    status = "Unknown (RFC6960)";
+                }
+                else
+                {
+                    status = "Revoked, reason = "+ reason + ", revocationTime = " + revTime;
+                }
             }
             else if(singleCertStatus instanceof UnknownStatus)
             {
-                status = "Unknown";
+                status = "Unknown (RFC2560)";
             }
             else
             {
@@ -207,6 +267,57 @@ public class OCSPStatusCommand extends OsgiCommandSupport
                     else
                     {
                         msg.append("\tThis differs from the requested certificate");
+                    }
+                }
+            }
+
+            if(verbose != null && verbose.booleanValue())
+            {
+                ASN1ObjectIdentifier sigAlgOid = basicResp.getSignatureAlgOID();
+                if(sigAlgOid == null)
+                {
+                    msg.append(("\nresponse is not signed"));
+                }
+                else
+                {
+                    String sigAlgName;
+                    if(PKCSObjectIdentifiers.id_RSASSA_PSS.equals(sigAlgOid))
+                    {
+                        BasicOCSPResponse asn1BasicOCSPResp = BasicOCSPResponse.getInstance(basicResp.getEncoded());
+                        sigAlgName = SignerUtil.getSignatureAlgoName(
+                                asn1BasicOCSPResp.getSignatureAlgorithm());
+                    }
+                    else
+                    {
+                        sigAlgName = SignerUtil.getSignatureAlgoName(new AlgorithmIdentifier(sigAlgOid));
+                    }
+                    if(sigAlgName == null)
+                    {
+                        sigAlgName = "UNKNOWN";
+                    }
+                    msg.append("\nresponse is signed with ").append(sigAlgName);
+                }
+
+                // extensions
+                msg.append("\nExtensions: ");
+
+                List<?> extensionOIDs = basicResp.getExtensionOIDs();
+                if(extensionOIDs == null || extensionOIDs.size() == 0)
+                {
+                    msg.append("-");
+                }
+                else
+                {
+                    int size = extensionOIDs.size();
+                    for(int i = 0; i < size; i++)
+                    {
+                        ASN1ObjectIdentifier extensionOID = (ASN1ObjectIdentifier) extensionOIDs.get(i);
+                        String name = extensionOidNameMap.get(extensionOID);
+                        msg.append(name == null ? extensionOID.getId() : name);
+                        if(i != size - 1)
+                        {
+                            msg.append(", ");
+                        }
                     }
                 }
             }
