@@ -54,7 +54,10 @@
 			<column name="OVERLAP" remarks="minutes" type="INT">
 				<constraints nullable="false"/>
 			</column>
-			<column defaultValueNumeric="0" name="INCLUDE_CERTS_IN_CRL" type="INT">
+			<column defaultValueBoolean="false" name="INCLUDE_CERTS_IN_CRL" type="INT">
+				<constraints nullable="false"/>
+			</column>
+			<column defaultValueBoolean="false" name="INCLUDE_EXPIRED_CERTS" type="INT">
 				<constraints nullable="false"/>
 			</column>
 		</createTable>
@@ -120,12 +123,18 @@
 			<column defaultValueNumeric="1" name="ALLOW_DUPLICATE_SUBJECT" type="INT">
 				<constraints nullable="false"/>
 			</column>
-			<column name="PERMISSIONS" type="VARCHAR(100)">
+			<column name="PERMISSIONS" type="VARCHAR(200)">
 				<constraints nullable="false"/>
 			</column>
 			<column defaultValueNumeric="30" name="NUM_CRLS" type="INT">
 				<constraints nullable="false"/>
 			</column>
+			<column defaultValueBoolean="false" name="REVOKED" type="INT">
+				<constraints nullable="false"/>
+			</column>
+			<column name="REV_REASON" type="INT"/>
+			<column name="REV_TIME" remarks="seconds since January 1, 1970, 00:00:00 GMT" type="INT"/>
+			<column name="REV_INVALIDITY_TIME" remarks="seconds since January 1, 1970, 00:00:00 GMT" type="INT"/>
 		</createTable>
 
 		<!-- table caalias -->
@@ -149,7 +158,7 @@
 			<column name="RA" type="INT">
 				<constraints nullable="false"/>
 			</column>
-			<column name="PERMISSIONS" type="VARCHAR(100)"/>
+			<column name="PERMISSIONS" type="VARCHAR(200)"/>
 			<column name="PROFILES" type="VARCHAR(200)"/>
 		</createTable>
 		<!-- table ca_has_publisher -->
@@ -193,11 +202,9 @@
 			<column name="ID" type="INT(10)">
 				<constraints primaryKey="true" unique="true" nullable="false"/>
 			</column>
-			<column name="SUBJECT" type="VARCHAR(300)">
+			<column name="NAME" type="VARCHAR(45)">
 				<constraints nullable="false"/>
 			</column>
-			<column name="CERT" type="VARCHAR(2000)"/>
-			<column name="SHA1_FP_CERT" type="CHAR(40)"/>
 		</createTable>
 		<!-- table user -->
 		<createTable tableName="USER">

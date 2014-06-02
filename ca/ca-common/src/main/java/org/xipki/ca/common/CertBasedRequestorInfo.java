@@ -21,13 +21,16 @@ import org.xipki.security.common.ParamChecker;
 
 public class CertBasedRequestorInfo implements RequestorInfo
 {
+    private final String name;
     private final X509CertificateWithMetaInfo certificate;
     private final boolean ra;
 
-    public CertBasedRequestorInfo(X509CertificateWithMetaInfo certificate, boolean ra)
+    public CertBasedRequestorInfo(String name, X509CertificateWithMetaInfo certificate, boolean ra)
     {
+        ParamChecker.assertNotEmpty("name", name);
         ParamChecker.assertNotNull("certificate", certificate);
 
+        this.name = name;
         this.certificate = certificate;
         this.ra = ra;
     }
@@ -41,6 +44,12 @@ public class CertBasedRequestorInfo implements RequestorInfo
     public boolean isRA()
     {
         return ra;
+    }
+
+    @Override
+    public String getName()
+    {
+        return name;
     }
 
 }

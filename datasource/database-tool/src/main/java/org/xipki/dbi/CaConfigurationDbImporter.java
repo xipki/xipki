@@ -218,8 +218,9 @@ class CaConfigurationDbImporter extends DbPorter
         try
         {
             ps = prepareStatement(
-                    "INSERT INTO CRLSIGNER (NAME, SIGNER_TYPE, SIGNER_CONF, SIGNER_CERT, PERIOD, OVERLAP, INCLUDE_CERTS_IN_CRL)"
-                    + " VALUES (?, ?, ?, ?, ?, ?, ?)");
+                    "INSERT INTO CRLSIGNER (NAME, SIGNER_TYPE, SIGNER_CONF, SIGNER_CERT, PERIOD, OVERLAP,"
+                    + " INCLUDE_CERTS_IN_CRL, INCLUDE_EXPIRED_CERTS)"
+                    + " VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
 
             for(CrlsignerType crlsigner : crlsigners.getCrlsigner())
             {
@@ -233,7 +234,7 @@ class CaConfigurationDbImporter extends DbPorter
                     ps.setInt(idx++, crlsigner.getPeriod());
                     ps.setInt(idx++, crlsigner.getOverlap());
                     ps.setBoolean(idx++, crlsigner.isIncludeCertsInCrl());
-
+                    ps.setBoolean(idx++, crlsigner.isIncludeExpiredCerts());
                     ps.executeUpdate();
                 }catch(Exception e)
                 {
@@ -355,8 +356,9 @@ class CaConfigurationDbImporter extends DbPorter
             ps = prepareStatement(
                     "INSERT INTO CA (NAME, SUBJECT, NEXT_SERIAL, STATUS, CRL_URIS, OCSP_URIS, MAX_VALIDITY, "
                     + "CERT, SIGNER_TYPE, SIGNER_CONF, CRLSIGNER_NAME, "
-                    + "ALLOW_DUPLICATE_KEY, ALLOW_DUPLICATE_SUBJECT, PERMISSIONS, NUM_CRLS) "
-                    + "VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+                    + "ALLOW_DUPLICATE_KEY, ALLOW_DUPLICATE_SUBJECT, PERMISSIONS, NUM_CRLS, "
+                    + "REVOKED, REV_REASON, REV_TIME, REV_INVALIDITY_TIME) "
+                    + "VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
 
             for(CaType ca : cas.getCa())
             {
@@ -380,9 +382,12 @@ class CaConfigurationDbImporter extends DbPorter
                     ps.setBoolean(idx++, ca.isAllowDuplicateKey());
                     ps.setBoolean(idx++, ca.isAllowDuplicateSubject());
                     ps.setString(idx++, ca.getPermissions());
-
                     Integer numCrls = ca.getNumCrls();
                     ps.setInt(idx++, numCrls == null ? 30 : numCrls.intValue());
+                    ps.setBoolean(idx++, ca.isRevoked());
+                    ps.setString(idx++, ca.getRevReason());
+                    ps.setString(idx++, ca.getRevTime());
+                    ps.setString(idx++, ca.getRevInvalidityTime());
 
                     ps.executeUpdate();
                 }catch(Exception e)

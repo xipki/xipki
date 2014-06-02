@@ -87,13 +87,15 @@ class OcspCertStoreDbImporter extends DbPorter
         final String SQL_ADD_CAINFO =
                 "INSERT INTO ISSUER (" +
                 " ID, SUBJECT," +
+                " NOTBEFORE, NOTAFTER," +
                 " SHA1_FP_NAME, SHA1_FP_KEY," +
                 " SHA224_FP_NAME, SHA224_FP_KEY," +
                 " SHA256_FP_NAME, SHA256_FP_KEY," +
                 " SHA384_FP_NAME, SHA384_FP_KEY," +
                 " SHA512_FP_NAME, SHA512_FP_KEY," +
-                " SHA1_fp_cert, cert" +
-                " ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                " SHA1_fp_cert, cert," +
+                " REVOKED, REV_REASON, REV_TIME, REV_INVALIDITY_TIME" +
+                " ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
         System.out.println("Importing table ISSUER");
         PreparedStatement ps = prepareStatement(SQL_ADD_CAINFO);
@@ -131,6 +133,8 @@ class OcspCertStoreDbImporter extends DbPorter
                     int idx = 1;
                     ps.setInt   (idx++, issuer.getId());
                     ps.setString(idx++, IoCertUtil.canonicalizeName(c.getSubject()));
+                    ps.setLong  (idx++, c.getTBSCertificate().getStartDate().getDate().getTime() / 1000);
+                    ps.setLong  (idx++, c.getTBSCertificate().getEndDate().getDate().getTime() / 1000);
                     ps.setString(idx++, HashCalculator.hexHash(HashAlgoType.SHA1, encodedName));
                     ps.setString(idx++, HashCalculator.hexHash(HashAlgoType.SHA1, encodedKey));
                     ps.setString(idx++, HashCalculator.hexHash(HashAlgoType.SHA224, encodedName));
@@ -143,6 +147,10 @@ class OcspCertStoreDbImporter extends DbPorter
                     ps.setString(idx++, HashCalculator.hexHash(HashAlgoType.SHA512, encodedKey));
                     ps.setString(idx++, HashCalculator.hexHash(HashAlgoType.SHA1, encodedCert));
                     ps.setString(idx++, b64Cert);
+                    ps.setBoolean(idx++, issuer.isRevoked());
+                    ps.setString(idx++, issuer.getRevReason());
+                    ps.setString(idx++, issuer.getRevTime());
+                    ps.setString(idx++, issuer.getRevInvalidityTime());
 
                     ps.execute();
                 }catch(Exception e)

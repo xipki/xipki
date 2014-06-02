@@ -28,7 +28,7 @@ import org.xipki.ca.common.CertificateOrError;
 import org.xipki.ca.common.EnrollCertResult;
 import org.xipki.security.common.IoCertUtil;
 
-@Command(scope = "caclient", name = "ra-enroll", description="Enroll certificate")
+@Command(scope = "caclient", name = "enroll", description="Enroll certificate")
 public class RAEnrollCertCommand extends ClientCommand
 {
 

@@ -26,7 +26,7 @@ import org.apache.felix.gogo.commands.Option;
 import org.xipki.ca.client.api.RAWorker;
 import org.xipki.security.common.IoCertUtil;
 
-@Command(scope = "caclient", name = "ra-getcrl", description="Download CRL")
+@Command(scope = "caclient", name = "getcrl", description="Download CRL")
 public class RAGetCRLCommand extends ClientCommand
 {
 

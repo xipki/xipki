@@ -67,7 +67,6 @@ import org.xipki.security.common.ParamChecker;
 
 class CaCertStoreDbExporter extends DbPorter
 {
-
     private static final Logger LOG = LoggerFactory.getLogger(CaCertStoreDbExporter.class);
     private final Marshaller marshaller;
     private final SHA1Digest sha1md = new SHA1Digest();
@@ -243,17 +242,45 @@ class CaCertStoreDbExporter extends DbPorter
         try
         {
             stmt = createStatement();
-            String sql = "SELECT ID, CERT FROM REQUESTORINFO";
-            ResultSet rs = stmt.executeQuery(sql);
+            String sql = "SELECT ID, NAME FROM REQUESTORINFO";
+
+            boolean nameSqlUsed;
+            ResultSet rs;
+            try
+            {
+                rs = stmt.executeQuery(sql);
+                nameSqlUsed = true;
+            }catch(SQLException e)
+            {
+                nameSqlUsed = false;
+                sql = "SELECT ID, SHA1_FP_CERT FROM REQUESTORINFO";
+                rs = stmt.executeQuery(sql);
+            }
+
+            Map<String, String> requestorsMap = null;
+            if(nameSqlUsed == false)
+            {
+                requestorsMap = getCARequestorsMap();
+            }
 
             while(rs.next())
             {
                 int id = rs.getInt("ID");
-                String cert = rs.getString("CERT");
+
+                String name;
+                if(nameSqlUsed)
+                {
+                    name = rs.getString("NAME");
+                }
+                else
+                {
+                    String sha1FpCert = rs.getString("SHA1_FP_CERT");
+                    name = requestorsMap.get(sha1FpCert.toUpperCase());
+                }
 
                 RequestorinfoType info = new RequestorinfoType();
                 info.setId(id);
-                info.setCert(cert);
+                info.setName(name);
 
                 infos.getRequestorinfo().add(info);
             }
@@ -267,6 +294,36 @@ class CaCertStoreDbExporter extends DbPorter
 
         System.out.println(" Exported table REQUESTORINFO");
         return infos;
+    }
+
+    private Map<String, String> getCARequestorsMap()
+    throws SQLException
+    {
+        Map<String, String> requestorsMap = new HashMap<>();
+        Statement stmt = null;
+        try
+        {
+            stmt = createStatement();
+            String sql = "SELECT NAME, CERT FROM REQUESTOR";
+            ResultSet rs = stmt.executeQuery(sql);
+
+            while(rs.next())
+            {
+                String name = rs.getString("NAME");
+                String b64Cert = rs.getString("CERT");
+                byte[] certBytes = Base64.decode(b64Cert);
+                String sha1FpCert = IoCertUtil.sha1sum(certBytes).toUpperCase();
+                requestorsMap.put(sha1FpCert, name);
+            }
+
+            rs.close();
+            rs = null;
+        }finally
+        {
+            closeStatement(stmt);
+        }
+
+        return requestorsMap;
     }
 
     private Users export_user()

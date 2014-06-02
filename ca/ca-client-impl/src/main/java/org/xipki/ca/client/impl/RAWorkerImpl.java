@@ -82,11 +82,13 @@ import org.xipki.ca.cmp.client.type.EnrollCertRequestType;
 import org.xipki.ca.cmp.client.type.EnrollCertResultType;
 import org.xipki.ca.cmp.client.type.ErrorResultEntryType;
 import org.xipki.ca.cmp.client.type.ErrorResultType;
+import org.xipki.ca.cmp.client.type.IssuerSerialEntryType;
 import org.xipki.ca.cmp.client.type.ResultEntryType;
 import org.xipki.ca.cmp.client.type.RevokeCertRequestEntryType;
 import org.xipki.ca.cmp.client.type.RevokeCertRequestType;
 import org.xipki.ca.cmp.client.type.RevokeCertResultEntryType;
 import org.xipki.ca.cmp.client.type.RevokeCertResultType;
+import org.xipki.ca.cmp.client.type.UnrevokeOrRemoveCertRequestType;
 import org.xipki.ca.common.CertIDOrError;
 import org.xipki.ca.common.EnrollCertResult;
 import org.xipki.ca.common.PKIErrorException;
@@ -863,7 +865,7 @@ public final class RAWorkerImpl extends AbstractRAWorker implements RAWorker
     public CertIDOrError revokeCert(X500Name issuer, BigInteger serial, int reason)
     throws RAWorkerException, PKIErrorException
     {
-        final String id = "revcert-1";
+        final String id = "cert-1";
         RevokeCertRequestEntryType entry =
                 new RevokeCertRequestEntryType(id, issuer, serial, reason, null);
         RevokeCertRequestType request = new RevokeCertRequestType();
@@ -885,19 +887,17 @@ public final class RAWorkerImpl extends AbstractRAWorker implements RAWorker
         }
 
         X500Name issuer = requestEntries.get(0).getIssuer();
-
         for(int i = 1; i < requestEntries.size(); i++)
         {
             if(issuer.equals(requestEntries.get(i).getIssuer()))
             {
-                throw new IllegalArgumentException("Revocating certificates issued by more than one CA is not allowed");
+                throw new IllegalArgumentException(
+                        "Revocating certificates issued by more than one CA is not allowed");
             }
         }
 
         final String caname = getCaNameByIssuer(issuer);
-
         X509CmpRequestor cmpRequestor = cmpRequestorsMap.get(caname);
-
         CmpResultType result;
         try
         {
@@ -907,6 +907,12 @@ public final class RAWorkerImpl extends AbstractRAWorker implements RAWorker
             throw new RAWorkerException(e);
         }
 
+        return parseRevokeCertResult(result);
+    }
+
+    private Map<String, CertIDOrError> parseRevokeCertResult(CmpResultType result)
+    throws RAWorkerException, PKIErrorException
+    {
         if(result instanceof ErrorResultType)
         {
             throw createPKIErrorException((ErrorResultType) result);
@@ -1254,7 +1260,7 @@ public final class RAWorkerImpl extends AbstractRAWorker implements RAWorker
     public byte[] envelopeRevocation(X500Name issuer, BigInteger serial, int reason)
     throws RAWorkerException
     {
-        final String id = "revcert-1";
+        final String id = "cert-1";
         RevokeCertRequestEntryType entry =
                 new RevokeCertRequestEntryType(id, issuer, serial, reason, null);
         RevokeCertRequestType request = new RevokeCertRequestType();
@@ -1282,5 +1288,119 @@ public final class RAWorkerImpl extends AbstractRAWorker implements RAWorker
     {
         X500Name issuer = X500Name.getInstance(cert.getIssuerX500Principal().getEncoded());
         return envelopeRevocation(issuer, cert.getSerialNumber(), reason);
+    }
+
+    @Override
+    public CertIDOrError unrevokeCert(X500Name issuer, BigInteger serial)
+    throws RAWorkerException, PKIErrorException
+    {
+        final String id = "cert-1";
+        IssuerSerialEntryType entry =
+                new IssuerSerialEntryType(id, issuer, serial);
+        UnrevokeOrRemoveCertRequestType request = new UnrevokeOrRemoveCertRequestType();
+        request.addRequestEntry(entry);
+        Map<String, CertIDOrError> result = unrevokeCerts(request);
+        return result == null ? null : result.get(id);
+    }
+
+    @Override
+    public CertIDOrError unrevokeCert(X509Certificate cert)
+    throws RAWorkerException, PKIErrorException
+    {
+        X500Name issuer = X500Name.getInstance(cert.getIssuerX500Principal().getEncoded());
+        return unrevokeCert(issuer, cert.getSerialNumber());
+    }
+
+    @Override
+    public Map<String, CertIDOrError> unrevokeCerts(UnrevokeOrRemoveCertRequestType request)
+    throws RAWorkerException, PKIErrorException
+    {
+        ParamChecker.assertNotNull("request", request);
+
+        List<IssuerSerialEntryType> requestEntries = request.getRequestEntries();
+        if(requestEntries.isEmpty())
+        {
+            return Collections.emptyMap();
+        }
+
+        X500Name issuer = requestEntries.get(0).getIssuer();
+        for(int i = 1; i < requestEntries.size(); i++)
+        {
+            if(issuer.equals(requestEntries.get(i).getIssuer()))
+            {
+                throw new IllegalArgumentException(
+                        "Revocating certificates issued by more than one CA is not allowed");
+            }
+        }
+
+        final String caname = getCaNameByIssuer(issuer);
+        X509CmpRequestor cmpRequestor = cmpRequestorsMap.get(caname);
+        CmpResultType result;
+        try
+        {
+            result = cmpRequestor.unrevokeCertificate(request);
+        } catch (CmpRequestorException e)
+        {
+            throw new RAWorkerException(e);
+        }
+
+        return parseRevokeCertResult(result);
+    }
+
+    @Override
+    public CertIDOrError removeCert(X500Name issuer, BigInteger serial)
+    throws RAWorkerException, PKIErrorException
+    {
+        final String id = "cert-1";
+        IssuerSerialEntryType entry =
+                new IssuerSerialEntryType(id, issuer, serial);
+        UnrevokeOrRemoveCertRequestType request = new UnrevokeOrRemoveCertRequestType();
+        request.addRequestEntry(entry);
+        Map<String, CertIDOrError> result = removeCerts(request);
+        return result == null ? null : result.get(id);
+    }
+
+    @Override
+    public CertIDOrError removeCert(X509Certificate cert)
+    throws RAWorkerException, PKIErrorException
+    {
+        X500Name issuer = X500Name.getInstance(cert.getIssuerX500Principal().getEncoded());
+        return removeCert(issuer, cert.getSerialNumber());
+    }
+
+    @Override
+    public Map<String, CertIDOrError> removeCerts(UnrevokeOrRemoveCertRequestType request)
+    throws RAWorkerException, PKIErrorException
+    {
+        ParamChecker.assertNotNull("request", request);
+
+        List<IssuerSerialEntryType> requestEntries = request.getRequestEntries();
+        if(requestEntries.isEmpty())
+        {
+            return Collections.emptyMap();
+        }
+
+        X500Name issuer = requestEntries.get(0).getIssuer();
+        for(int i = 1; i < requestEntries.size(); i++)
+        {
+            if(issuer.equals(requestEntries.get(i).getIssuer()))
+            {
+                throw new IllegalArgumentException(
+                        "Revocating certificates issued by more than one CA is not allowed");
+            }
+        }
+
+        final String caname = getCaNameByIssuer(issuer);
+        X509CmpRequestor cmpRequestor = cmpRequestorsMap.get(caname);
+        CmpResultType result;
+        try
+        {
+            result = cmpRequestor.removeCertificate(request);
+        } catch (CmpRequestorException e)
+        {
+            throw new RAWorkerException(e);
+        }
+
+        return parseRevokeCertResult(result);
     }
 }
