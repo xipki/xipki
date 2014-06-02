@@ -91,7 +91,8 @@ public class Rfc6712Servlet extends HttpServlet
 
         }catch(Throwable t)
         {
-            LOG.error("Throwable thrown, this should not happen!", t);
+            LOG.error("Throwable thrown, this should not happen. {}: {}", t.getClass().getName(), t.getMessage());
+            LOG.debug("Throwable thrown, this should not happen.", t);
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             response.setContentLength(0);
         }

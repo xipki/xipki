@@ -40,6 +40,10 @@
 		<xs:all>
 			<xs:element name="id" type="xs:int" />
 			<xs:element name="cert" type="xs:string" />
+			<xs:element name="revoked" type="xs:boolean"/>
+			<xs:element name="rev_reason" type="xs:string"/>
+			<xs:element name="rev_time" type="xs:string" minOccurs="0"/>
+			<xs:element name="rev_invalidity_time" type="xs:string" minOccurs="0"/>			
 		</xs:all>
 	</xs:complexType>
 

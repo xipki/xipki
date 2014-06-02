@@ -25,6 +25,7 @@ import java.util.concurrent.BlockingDeque;
 import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.TimeUnit;
 
+import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.operator.ContentSigner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,6 +41,7 @@ public class DefaultConcurrentContentSigner implements ConcurrentContentSigner
 
     private static int defaultSignServiceTimeout = 10000; // 10 seconds
 
+    private final AlgorithmIdentifier algorithmIdentifier;
     private final BlockingDeque<ContentSigner> idleSigners = new LinkedBlockingDeque<ContentSigner>();
     private final BlockingDeque<ContentSigner> busySigners = new LinkedBlockingDeque<ContentSigner>();
     private final PrivateKey privateKey;
@@ -73,6 +75,7 @@ public class DefaultConcurrentContentSigner implements ConcurrentContentSigner
     {
         ParamChecker.assertNotEmpty("signers", signers);
 
+        this.algorithmIdentifier = signers.get(0).getAlgorithmIdentifier();
         for(ContentSigner signer : signers)
         {
             idleSigners.addLast(signer);
@@ -195,5 +198,11 @@ public class DefaultConcurrentContentSigner implements ConcurrentContentSigner
                 returnContentSigner(signer);
             }
         }
+    }
+
+    @Override
+    public AlgorithmIdentifier getAlgorithmIdentifier()
+    {
+        return algorithmIdentifier;
     }
 }
