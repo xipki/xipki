@@ -14,11 +14,8 @@
 	-->
 	<cm:property-placeholder persistent-id="org.xipki.ocsp.server" update-strategy="reload">
 		<cm:default-properties>
-			<cm:property name="confFile" value="ocsp-config/ocsp-responder.properties"/>
+			<cm:property name="confFile" value="ocsp-config/ocsp-responder.xml"/>
 			<cm:property name="urlPatterns" value="/ocsp/*"/>
-			<cm:property name="includeCertHash" value="false"/>
-			<cm:property name="requireReqSigned" value="false"/>
-			<cm:property name="checkReqSignature" value="false"/>
 			<cm:property name="healthUrlPatterns" value="/health/ocsp/*"/>
 		</cm:default-properties>
 	</cm:property-placeholder>
@@ -31,9 +28,6 @@
     <bean id="ocspResponder" class="org.xipki.ocsp.OcspResponder"
 			init-method="init" destroy-method="shutdown">
         <property name="confFile" value="${confFile}"/>
-        <property name="includeCertHash" value="${includeCertHash}"/>
-        <property name="requireReqSigned" value="${requireReqSigned}"/>
-        <property name="checkReqSignature" value="${checkReqSignature}"/>
         <property name="dataSourceFactory" ref="dataSourceFactory"/>
         <property name="securityFactory" ref="securityFactory"/>
         <property name="passwordResolver" ref="passwordResolver"/>

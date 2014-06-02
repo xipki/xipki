@@ -24,11 +24,17 @@ import java.security.SecureRandom;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
 import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
 
+import org.bouncycastle.asn1.ASN1EncodableVector;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
+import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.DEROctetString;
+import org.bouncycastle.asn1.DERSequence;
 import org.bouncycastle.asn1.nist.NISTObjectIdentifiers;
 import org.bouncycastle.asn1.ocsp.OCSPObjectIdentifiers;
+import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.asn1.x509.Extension;
 import org.bouncycastle.asn1.x509.Extensions;
 import org.bouncycastle.cert.X509CertificateHolder;
@@ -53,7 +59,7 @@ public abstract class AbstractOCSPRequestor implements OCSPRequestor
 {
     private SecureRandom random = new SecureRandom();
 
-    protected abstract byte[] send(byte[] request, URL responderUrl)
+    protected abstract byte[] send(byte[] request, URL responderUrl, RequestOptions requestOptions)
     throws IOException;
 
     protected AbstractOCSPRequestor()
@@ -89,12 +95,13 @@ public abstract class AbstractOCSPRequestor implements OCSPRequestor
             nonce = nextNonce();
         }
 
-        OCSPReq ocspReq = buildRequest(caCert, serialNumber, nonce, requestOptions.getHashAlgorithmId());
+        OCSPReq ocspReq = buildRequest(caCert, serialNumber, nonce,
+                requestOptions);
         OCSPResp response;
         try
         {
             byte[] encodedReq = ocspReq.getEncoded();
-            byte[] encodedResp = send(encodedReq, responderUrl);
+            byte[] encodedResp = send(encodedReq, responderUrl, requestOptions);
             response = new OCSPResp(encodedResp);
         } catch (IOException e)
         {
@@ -136,9 +143,12 @@ public abstract class AbstractOCSPRequestor implements OCSPRequestor
     }
 
     private OCSPReq buildRequest(X509Certificate caCert, BigInteger serialNumber, byte[] nonce,
-            ASN1ObjectIdentifier hashAlgId)
+            RequestOptions requestOptions)
     throws OCSPRequestorException
     {
+        ASN1ObjectIdentifier hashAlgId = requestOptions.getHashAlgorithmId();
+        List<AlgorithmIdentifier> prefSigAlgs = requestOptions.getPreferredSignatureAlgorithms();
+
         DigestCalculator digestCalculator;
         if(NISTObjectIdentifiers.id_sha224.equals(hashAlgId))
         {
@@ -162,12 +172,39 @@ public abstract class AbstractOCSPRequestor implements OCSPRequestor
         }
 
         OCSPReqBuilder reqBuilder = new OCSPReqBuilder();
+        List<Extension> extensions = new LinkedList<>();
         if(nonce != null)
         {
-            Extension nonceExtn = new Extension(OCSPObjectIdentifiers.id_pkix_ocsp_nonce, false,
+            Extension extn = new Extension(OCSPObjectIdentifiers.id_pkix_ocsp_nonce, false,
                     new DEROctetString(nonce));
-            Extensions extensions = new Extensions(nonceExtn);
-            reqBuilder.setRequestExtensions(extensions);
+            extensions.add(extn);
+        }
+
+        if(prefSigAlgs != null && prefSigAlgs.size() > 0)
+        {
+            ASN1EncodableVector v = new ASN1EncodableVector();
+            for(AlgorithmIdentifier algId : prefSigAlgs)
+            {
+                ASN1Sequence prefSigAlgObj = new DERSequence(algId);
+                v.add(prefSigAlgObj);
+            }
+
+            ASN1Sequence extnValue = new DERSequence(v);
+            Extension extn;
+            try
+            {
+                extn = new Extension(id_pkix_ocsp_prefSigAlgs, false, new DEROctetString(extnValue));
+            } catch (IOException e)
+            {
+                 throw new OCSPRequestorException(e);
+            }
+            extensions.add(extn);
+        }
+
+        if(extensions.isEmpty() == false)
+        {
+            reqBuilder.setRequestExtensions(
+                    new Extensions(extensions.toArray(new Extension[0])));
         }
 
         try

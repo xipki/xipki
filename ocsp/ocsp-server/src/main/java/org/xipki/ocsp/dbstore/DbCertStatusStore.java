@@ -18,6 +18,7 @@
 package org.xipki.ocsp.dbstore;
 
 import java.math.BigInteger;
+import java.security.cert.X509Certificate;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -36,20 +37,68 @@ import java.util.concurrent.TimeUnit;
 import org.bouncycastle.util.encoders.Hex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.audit.api.AuditLoggingService;
 import org.xipki.database.api.DataSource;
+import org.xipki.database.api.DataSourceFactory;
 import org.xipki.ocsp.IssuerEntry;
 import org.xipki.ocsp.IssuerHashNameAndKey;
 import org.xipki.ocsp.IssuerStore;
-import org.xipki.ocsp.api.CertRevocationInfo;
 import org.xipki.ocsp.api.CertStatusInfo;
 import org.xipki.ocsp.api.CertStatusStore;
 import org.xipki.ocsp.api.CertStatusStoreException;
+import org.xipki.security.api.PasswordResolver;
+import org.xipki.security.common.CRLReason;
+import org.xipki.security.common.CertRevocationInfo;
 import org.xipki.security.common.HashAlgoType;
 import org.xipki.security.common.ParamChecker;
 
-public class DbCertStatusStore implements CertStatusStore
+public class DbCertStatusStore extends CertStatusStore
 {
+    private static final Logger LOG = LoggerFactory.getLogger(DbCertStatusStore.class);
+
+    private static class SimpleIssuerEntry
+    {
+        private final int id;
+        private final boolean revoked;
+        private final long revocationTimeInMs;
+
+        public SimpleIssuerEntry(int id, boolean revoked, long revocationTimeInMs)
+        {
+            this.id = id;
+            this.revoked = revoked;
+            this.revocationTimeInMs = revocationTimeInMs;
+        }
+
+        public boolean match(IssuerEntry issuer)
+        {
+            if(id != issuer.getId())
+            {
+                return false;
+            }
+
+            if(revoked != issuer.isRevoked())
+            {
+                return false;
+            }
+
+            if(revocationTimeInMs == 0)
+            {
+                return issuer.getRevocationTime() == null;
+            }
+            else
+            {
+                Date issuerRevTime = issuer.getRevocationTime();
+                if(issuerRevTime == null)
+                {
+                    return false;
+                }
+                else
+                {
+                    return revocationTimeInMs == issuerRevTime.getTime();
+                }
+            }
+        }
+    }
+
     private class StoreUpdateService implements Runnable
     {
         @Override
@@ -59,31 +108,29 @@ public class DbCertStatusStore implements CertStatusStore
         }
     }
 
-    private static final Logger LOG = LoggerFactory.getLogger(DbCertStatusStore.class);
-
-    private final String name;
     private final DataSource dataSource;
-    private final boolean unknownSerialAsGood;
+    private Set<String> issuerSHA1FPs;
 
     private IssuerStore issuerStore;
-    private AuditLoggingService auditLoggingService;
 
     private boolean initialized = false;
     private boolean initializationFailed = false;
 
-    public DbCertStatusStore(String name, DataSource dataSource, boolean unknownSerialAsGood)
-    {
-        ParamChecker.assertNotEmpty("name", name);
-        ParamChecker.assertNotNull("dataSource", dataSource);
+    private ScheduledThreadPoolExecutor scheduledThreadPoolExecutor;
 
-        this.name = name;
+    public DbCertStatusStore(DataSource dataSource, Set<X509Certificate> issuers)
+    {
+        ParamChecker.assertNotNull("dataSource", dataSource);
         this.dataSource = dataSource;
-        this.unknownSerialAsGood = unknownSerialAsGood;
+        if(issuers != null)
+        {
+            this.issuerSHA1FPs = new HashSet<>();
+        }
 
         initIssuerStore();
 
         StoreUpdateService storeUpdateService = new StoreUpdateService();
-        ScheduledThreadPoolExecutor scheduledThreadPoolExecutor = new ScheduledThreadPoolExecutor(1);
+        scheduledThreadPoolExecutor = new ScheduledThreadPoolExecutor(1);
         scheduledThreadPoolExecutor.scheduleAtFixedRate(
                 storeUpdateService, 60, 60, TimeUnit.SECONDS);
     }
@@ -94,24 +141,57 @@ public class DbCertStatusStore implements CertStatusStore
         {
             if(initialized)
             {
-                String sql = "SELECT ID FROM ISSUER";
+                String sql = "SELECT ID, REVOKED, REV_TIME, SHA1_FP_CERT FROM ISSUER";
                 PreparedStatement ps = borrowPreparedStatement(sql);
                 ResultSet rs = null;
 
                 try
                 {
-                    Set<Integer> newIds = new HashSet<Integer>();
+                    Map<Integer, SimpleIssuerEntry> newIssuers = new HashMap<Integer, SimpleIssuerEntry>();
 
                     rs = ps.executeQuery();
                     while(rs.next())
                     {
+                        if(issuerSHA1FPs != null)
+                        {
+                            String sha1Fp = rs.getString("SHA1_FP_CERT");
+                            if(issuerSHA1FPs.contains(sha1Fp) == false)
+                            {
+                                continue;
+                            }
+                        }
+
                         int id = rs.getInt("ID");
-                        newIds.add(id);
+                        boolean revoked = rs.getBoolean("REVOKED");
+                        long revTime = rs.getLong("REV_TIME");
+
+                        SimpleIssuerEntry issuerEntry = new SimpleIssuerEntry(id, revoked, revTime * 1000);
+                        newIssuers.put(id, issuerEntry);
                     }
 
                     // no change in the issuerStore
+                    Set<Integer> newIds = newIssuers.keySet();
                     Set<Integer> ids = issuerStore.getIds();
-                    if(ids.size() == newIds.size() && ids.containsAll(newIds) && newIds.containsAll(ids))
+                    boolean issuersUnchanged =
+                            ids.size() == newIds.size()
+                            && ids.containsAll(newIds)
+                            && newIds.containsAll(ids);
+
+                    if(issuersUnchanged)
+                    {
+                        for(Integer id : newIds)
+                        {
+                            IssuerEntry entry = issuerStore.getIssuerForId(id);
+                            SimpleIssuerEntry newEntry = newIssuers.get(id);
+                            if(newEntry.match(entry))
+                            {
+                                issuersUnchanged = false;
+                                break;
+                            }
+                        }
+                    }
+
+                    if(issuersUnchanged)
                     {
                         return;
                     }
@@ -125,7 +205,7 @@ public class DbCertStatusStore implements CertStatusStore
                     HashAlgoType.SHA384, HashAlgoType.SHA512};
 
             StringBuilder sb = new StringBuilder();
-            sb.append("SELECT ID");
+            sb.append("SELECT ID, NOTBEFORE, REVOKED, REV_TIME, SHA1_FP_CERT");
             for(HashAlgoType hashAlgoType : hashAlgoTypes)
             {
                 String hashAlgo = hashAlgoType.name().toUpperCase();
@@ -144,7 +224,14 @@ public class DbCertStatusStore implements CertStatusStore
                 List<IssuerEntry> caInfos = new LinkedList<IssuerEntry>();
                 while(rs.next())
                 {
+                    String sha1Fp = rs.getString("SHA1_FP_CERT");
+                    if(issuerSHA1FPs != null &&issuerSHA1FPs.contains(sha1Fp) == false)
+                    {
+                        continue;
+                    }
+
                     int id = rs.getInt("ID");
+                    long notBeforeInSecond = rs.getLong("NOTBEFORE");
 
                     Map<HashAlgoType, IssuerHashNameAndKey> hashes = new HashMap<HashAlgoType, IssuerHashNameAndKey>();
                     for(HashAlgoType hashAlgoType : hashAlgoTypes)
@@ -157,13 +244,21 @@ public class DbCertStatusStore implements CertStatusStore
                         hashes.put(hashAlgoType, hash);
                     }
 
-                    IssuerEntry caInfoEntry = new IssuerEntry(id, hashes, null);
+                    IssuerEntry caInfoEntry = new IssuerEntry(id, hashes, new Date(notBeforeInSecond * 1000));
+                    boolean revoked = rs.getBoolean("REVOKED");
+                    caInfoEntry.setRevoked(revoked);
+                    if(revoked)
+                    {
+                        long l = rs.getLong("REV_TIME");
+                        caInfoEntry.setRevocationTime(new Date(l * 1000));
+                    }
+
                     caInfos.add(caInfoEntry);
                 }
 
                 initialized = false;
                 this.issuerStore = new IssuerStore(caInfos);
-                LOG.info("Updated CertStore: {}", name);
+                LOG.info("Updated CertStore: {}", getName());
                 initializationFailed =false;
                 initialized = true;
             }finally
@@ -173,7 +268,7 @@ public class DbCertStatusStore implements CertStatusStore
         }catch(Exception e)
         {
             LOG.error("Could not executing initIssurStore() for {},  {}: {}",
-                    new Object[]{name, e.getClass().getName(), e.getMessage()});
+                    new Object[]{getName(), e.getClass().getName(), e.getMessage()});
             LOG.debug("Could not executing initIssurStore()", e);
 
             initializationFailed = true;
@@ -184,9 +279,7 @@ public class DbCertStatusStore implements CertStatusStore
     @Override
     public CertStatusInfo getCertStatus(
             HashAlgoType hashAlgo, byte[] issuerNameHash, byte[] issuerKeyHash,
-            BigInteger serialNumber,
-            boolean includeCertHash,
-            HashAlgoType certHashAlgo)
+            BigInteger serialNumber)
     throws CertStatusStoreException
     {
         // wait for max. 0.5 second
@@ -211,9 +304,10 @@ public class DbCertStatusStore implements CertStatusStore
             throw new CertStatusStoreException("Initialization of CertStore failed");
         }
 
-        if(includeCertHash && certHashAlgo == null)
+        HashAlgoType certHashAlgo = null;
+        if(includeCertHash)
         {
-            certHashAlgo = hashAlgo;
+            certHashAlgo = certHashAlgorithm == null ? hashAlgo : certHashAlgorithm;
         }
 
         try
@@ -227,7 +321,7 @@ public class DbCertStatusStore implements CertStatusStore
             }
 
             final String sql =
-                    "ID, REVOKED, REV_REASON, REV_TIME, REV_INVALIDITY_TIME, PROFILE" +
+                    "ID, NOTBEFORE, REVOKED, REV_REASON, REV_TIME, REV_INVALIDITY_TIME, PROFILE" +
                     " FROM CERT" +
                     " WHERE ISSUER_ID=? AND SERIAL=?";
 
@@ -241,6 +335,7 @@ public class DbCertStatusStore implements CertStatusStore
 
                 rs = ps.executeQuery();
 
+                CertStatusInfo certStatusInfo;
                 if(rs.next())
                 {
                     String certprofile = rs.getString("PROFILE");
@@ -251,7 +346,6 @@ public class DbCertStatusStore implements CertStatusStore
                         certHash = getCertHash(certId, certHashAlgo);
                     }
 
-                    CertStatusInfo certStatusInfo;
                     boolean revoked = rs.getBoolean("REVOKED");
                     if(revoked)
                     {
@@ -273,10 +367,48 @@ public class DbCertStatusStore implements CertStatusStore
                 }
                 else
                 {
-                    return unknownSerialAsGood ?
-                            CertStatusInfo.getGoodCertStatusInfo(certHashAlgo, null, thisUpdate, null, null) :
-                            CertStatusInfo.getUnknownCertStatusInfo(thisUpdate, null);
+                    if(unknownSerialAsGood)
+                    {
+                        if(inheritCaRevocation && issuer.isRevoked())
+                        {
+                            CertRevocationInfo revocationInfo = new CertRevocationInfo(
+                                    CRLReason.CA_COMPROMISE.getCode(), issuer.getRevocationTime(), null);
+                            certStatusInfo = CertStatusInfo.getRevokedCertStatusInfo(revocationInfo,
+                                    null, null, thisUpdate, null, null);
+                        }
+                        else
+                        {
+                            certStatusInfo = CertStatusInfo.getGoodCertStatusInfo(certHashAlgo, null, thisUpdate, null, null);
+                        }
+                    }
+                    else
+                    {
+                        certStatusInfo = CertStatusInfo.getUnknownCertStatusInfo(thisUpdate, null);
+                    }
                 }
+
+                if(includeArchiveCutoff)
+                {
+                    Date t;
+                    if(retentionInterval != 0)
+                    {
+                        // expired certificate remains in status store for ever
+                        if(retentionInterval < 0)
+                        {
+                            t = issuer.getCaNotBefore();
+                        }
+                        else
+                        {
+                            long nowÍnMs = System.currentTimeMillis();
+                            long tInMs = Math.max(issuer.getCaNotBefore().getTime(), nowÍnMs - DAY * retentionInterval);
+                            t = new Date(tInMs);
+                        }
+
+                        certStatusInfo.setArchiveCutOff(t);
+                    }
+                }
+
+                return certStatusInfo;
             }finally
             {
                 releaseDbResources(ps, rs);
@@ -393,27 +525,36 @@ public class DbCertStatusStore implements CertStatusStore
         }
     }
 
-    @Override
-    public String getName()
-    {
-        return name;
-    }
-
-    @Override
-    public AuditLoggingService getAuditLoggingService()
-    {
-        return auditLoggingService;
-    }
-
-    @Override
-    public void setAuditLoggingService(AuditLoggingService auditLoggingService)
-    {
-        this.auditLoggingService = auditLoggingService;
-    }
-
     private void releaseDbResources(Statement ps, ResultSet rs)
     {
         dataSource.releaseResources(ps, rs);
+    }
+
+    public boolean isIncludeArchiveCutoff()
+    {
+        return includeArchiveCutoff;
+    }
+
+    public void setIncludeArchiveCutoff(boolean includeArchiveCutoff)
+    {
+        this.includeArchiveCutoff = includeArchiveCutoff;
+    }
+
+    @Override
+    public void init(String conf, DataSourceFactory datasourceFactory, PasswordResolver passwordResolver)
+    throws CertStatusStoreException
+    {
+    }
+
+    @Override
+    public void shutdown()
+    throws CertStatusStoreException
+    {
+        if(scheduledThreadPoolExecutor != null)
+        {
+            scheduledThreadPoolExecutor.shutdown();
+            scheduledThreadPoolExecutor = null;
+        }
     }
 
 }

@@ -19,6 +19,7 @@ package org.xipki.ocsp.client.shell.loadtest;
 
 import java.net.URL;
 import java.security.cert.X509Certificate;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.StringTokenizer;
@@ -41,7 +42,7 @@ public class OCSPStatusLoadTestCommand extends OsgiCommandSupport
             description = "Server URL, the default is " + DFLT_URL)
     protected String            serverURL;
 
-    @Option(name = "-ca",
+    @Option(name = "-cacert",
             required = true, description = "Required. CA certificate file")
     protected String            cacertFile;
 
@@ -67,6 +68,14 @@ public class OCSPStatusLoadTestCommand extends OsgiCommandSupport
     @Option(name = "-hash",
             required = false, description = "Hash algorithm name. The default is SHA256")
     protected String            hashAlgo;
+
+    @Option(name = "-sigalgs",
+            required = false, description = "comma-seperated preferred signature algorithms")
+    protected String           prefSigAlgs;
+
+    @Option(name = "-httpget",
+            required = false, description = "use HTTP GET for small request")
+    protected Boolean          useHttpGetForSmallRequest;
 
     private OCSPRequestor      requestor;
 
@@ -172,6 +181,23 @@ public class OCSPStatusLoadTestCommand extends OsgiCommandSupport
         RequestOptions options = new RequestOptions();
         options.setUseNonce(useNonce == null ? false : useNonce.booleanValue());
         options.setHashAlgorithmId(hashAlgoOid);
+
+        if(useHttpGetForSmallRequest != null)
+        {
+            options.setUseHttpGetForRequest(useHttpGetForSmallRequest.booleanValue());
+        }
+
+        if(prefSigAlgs != null)
+        {
+            StringTokenizer st = new StringTokenizer(prefSigAlgs, ",;: \t");
+            List<String> sortedList = new ArrayList<>(st.countTokens());
+            while(st.hasMoreTokens())
+            {
+                sortedList.add(st.nextToken());
+            }
+
+            options.setPreferredSignatureAlgorithms2(sortedList);
+        }
 
         OcspLoadTest loadTest = new OcspLoadTest(requestor, serialNumbers,
                 caCert, serverUrl, options);

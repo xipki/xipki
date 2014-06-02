@@ -38,13 +38,19 @@ import java.util.concurrent.TimeUnit;
 import javax.security.auth.x500.X500Principal;
 
 import org.bouncycastle.asn1.ASN1Encodable;
+import org.bouncycastle.asn1.ASN1EncodableVector;
+import org.bouncycastle.asn1.ASN1Integer;
 import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.ASN1Set;
 import org.bouncycastle.asn1.DEREnumerated;
 import org.bouncycastle.asn1.DERGeneralizedTime;
+import org.bouncycastle.asn1.DERIA5String;
 import org.bouncycastle.asn1.DEROctetString;
+import org.bouncycastle.asn1.DERSequence;
 import org.bouncycastle.asn1.DERSet;
+import org.bouncycastle.asn1.DERTaggedObject;
 import org.bouncycastle.asn1.DERUTF8String;
+import org.bouncycastle.asn1.ocsp.CrlID;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.Certificate;
 import org.bouncycastle.asn1.x509.Extension;
@@ -52,21 +58,23 @@ import org.bouncycastle.crypto.digests.SHA1Digest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.audit.api.AuditLevel;
-import org.xipki.audit.api.AuditLoggingService;
 import org.xipki.audit.api.AuditStatus;
 import org.xipki.audit.api.PCIAuditEvent;
+import org.xipki.database.api.DataSourceFactory;
 import org.xipki.ocsp.IssuerHashNameAndKey;
-import org.xipki.ocsp.api.CertRevocationInfo;
 import org.xipki.ocsp.api.CertStatusInfo;
 import org.xipki.ocsp.api.CertStatusStore;
 import org.xipki.ocsp.api.CertStatusStoreException;
+import org.xipki.security.api.PasswordResolver;
+import org.xipki.security.common.CRLReason;
+import org.xipki.security.common.CertRevocationInfo;
 import org.xipki.security.common.CustomObjectIdentifiers;
 import org.xipki.security.common.HashAlgoType;
 import org.xipki.security.common.HashCalculator;
 import org.xipki.security.common.IoCertUtil;
 import org.xipki.security.common.ParamChecker;
 
-public class CrlCertStatusStore implements CertStatusStore
+public class CrlCertStatusStore extends CertStatusStore
 {
     private static final Logger LOG = LoggerFactory.getLogger(CrlCertStatusStore.class);
 
@@ -94,13 +102,18 @@ public class CrlCertStatusStore implements CertStatusStore
     private final Map<BigInteger, CrlCertStatusInfo> certStatusInfoMap
         = new ConcurrentHashMap<BigInteger, CrlCertStatusInfo>();
 
-    private final boolean unknownSerialAsGood;
     private final X509Certificate caCert;
     private final X509Certificate issuerCert;
-    private final boolean useUpdateDatesFromCRL;
-    private final String name;
     private final String crlFile;
     private final SHA1Digest sha1;
+    private final String crlUrl;
+    private final Date caNotBefore;
+
+    private boolean useUpdateDatesFromCRL;
+    private boolean caRevoked;
+    private Date caRevocationTime;
+
+    private CrlID crlID;
 
     private byte[] fpOfCrlFile;
     private long   lastmodifiedOfCrlFile = 0;
@@ -110,36 +123,39 @@ public class CrlCertStatusStore implements CertStatusStore
     private final Map<HashAlgoType, IssuerHashNameAndKey> issuerHashMap =
             new ConcurrentHashMap<HashAlgoType, IssuerHashNameAndKey>();
 
-    private AuditLoggingService auditLoggingService;
+    private ScheduledThreadPoolExecutor scheduledThreadPoolExecutor;
 
     private boolean initialized = false;
     private boolean initializationFailed = false;
 
-    public CrlCertStatusStore(String name, String crlFile, X509Certificate caCert, boolean useUpdateDatesFromCRL,
-            boolean unknownSerialAsGood)
+    public CrlCertStatusStore(
+            String crlFile,
+            X509Certificate caCert,
+            String crlUrl)
     {
-        this(name, crlFile, caCert, null, useUpdateDatesFromCRL, unknownSerialAsGood);
+        this(crlFile, caCert, null, crlUrl);
     }
 
-    public CrlCertStatusStore(String name, String crlFile, X509Certificate caCert, X509Certificate issuerCert,
-            boolean useUpdateDatesFromCRL, boolean unknownSerialAsGood)
+    public CrlCertStatusStore(
+            String crlFile,
+            X509Certificate caCert,
+            X509Certificate issuerCert,
+            String crlUrl)
     {
-        ParamChecker.assertNotEmpty("name", name);
         ParamChecker.assertNotEmpty("crlFile", crlFile);
         ParamChecker.assertNotNull("caCert", caCert);
 
-        this.name = name;
         this.crlFile = crlFile;
         this.caCert = caCert;
         this.issuerCert = issuerCert;
-        this.unknownSerialAsGood = unknownSerialAsGood;
-        this.useUpdateDatesFromCRL = useUpdateDatesFromCRL;
+        this.crlUrl = crlUrl;
+        this.caNotBefore = caCert.getNotBefore();
 
         this.sha1 = new SHA1Digest();
         initializeStore(true);
 
         StoreUpdateService storeUpdateService = new StoreUpdateService();
-        ScheduledThreadPoolExecutor scheduledThreadPoolExecutor = new ScheduledThreadPoolExecutor(1);
+        scheduledThreadPoolExecutor = new ScheduledThreadPoolExecutor(1);
         scheduledThreadPoolExecutor.scheduleAtFixedRate(
                 storeUpdateService, 60, 60, TimeUnit.SECONDS);
     }
@@ -246,6 +262,22 @@ public class CrlCertStatusStore implements CertStatusStore
             Date newThisUpdate = crl.getThisUpdate();
             Date newNextUpdate = crl.getNextUpdate();
 
+            // Construct CrlID
+            ASN1EncodableVector v = new ASN1EncodableVector();
+            if(crlUrl != null && crlUrl.isEmpty() == false)
+            {
+                v.add(new DERTaggedObject(true, 0, new DERIA5String(crlUrl, true)));
+            }
+            byte[] extValue = crl.getExtensionValue(Extension.cRLNumber.getId());
+            if(extValue != null)
+            {
+                ASN1Integer crlNumber = ASN1Integer.getInstance(
+                        removingTagAndLenFromExtensionValue(extValue));
+                v.add(new DERTaggedObject(true, 1, crlNumber));
+            }
+            v.add(new DERTaggedObject(true, 2, new DERGeneralizedTime(newThisUpdate)));
+            this.crlID = CrlID.getInstance(new DERSequence(v));
+
             byte[] encodedCaCert;
             try
             {
@@ -339,9 +371,19 @@ public class CrlCertStatusStore implements CertStatusStore
 
                     BigInteger serialNumber = revokedCert.getSerialNumber();
                     byte[] encodedExtnValue = revokedCert.getExtensionValue(Extension.reasonCode.getId());
-                    DEREnumerated enumerated = DEREnumerated.getInstance(
-                            DEROctetString.getInstance(encodedExtnValue).getOctets());
-                    int reasonCode = enumerated.getValue().intValue();
+
+                    int reasonCode;
+                    if(encodedExtnValue != null)
+                    {
+                        DEREnumerated enumerated = DEREnumerated.getInstance(
+                                removingTagAndLenFromExtensionValue(encodedExtnValue));
+                        reasonCode = enumerated.getValue().intValue();
+                    }
+                    else
+                    {
+                        reasonCode = CRLReason.UNSPECIFIED.getCode();
+                    }
+
                     Date revTime = revokedCert.getRevocationDate();
 
                     Date invalidityTime = null;
@@ -383,18 +425,45 @@ public class CrlCertStatusStore implements CertStatusStore
 
                     Map<HashAlgoType, byte[]> certHashes = (cert == null) ? null : getCertHashes(cert.cert);
 
+                    if(caRevoked && inheritCaRevocation)
+                    {
+                        if(revTime.after(caRevocationTime))
+                        {
+                            revTime = caRevocationTime;
+                            reasonCode = CRLReason.CA_COMPROMISE.getCode();
+                        }
+                        if(invalidityTime != null && invalidityTime.after(caRevocationTime))
+                        {
+                            invalidityTime = null;
+                            reasonCode = CRLReason.CA_COMPROMISE.getCode();
+                        }
+                    }
+
                     CertRevocationInfo revocationInfo = new CertRevocationInfo(reasonCode, revTime, invalidityTime);
                     CrlCertStatusInfo crlCertStatusInfo = CrlCertStatusInfo.getRevokedCertStatusInfo(
-                            revocationInfo, cert.profileName, certHashes);
+                            revocationInfo,
+                            (cert == null) ? null : cert.profileName,
+                            certHashes);
                     newCertStatusInfoMap.put(serialNumber, crlCertStatusInfo);
                 }
             }
 
             for(CertWithInfo cert : certs)
             {
-                CrlCertStatusInfo crlCertStatusInfo = CrlCertStatusInfo.getGoodCertStatusInfo(
-                        cert.profileName,
-                        getCertHashes(cert.cert));
+                Map<HashAlgoType, byte[]> certHashes = getCertHashes(cert.cert);
+                CrlCertStatusInfo crlCertStatusInfo;
+                if(caRevoked && inheritCaRevocation)
+                {
+                    CertRevocationInfo revocationInfo = new CertRevocationInfo(
+                            CRLReason.CA_COMPROMISE.getCode(), caRevocationTime, null);
+                    crlCertStatusInfo = CrlCertStatusInfo.getRevokedCertStatusInfo(
+                            revocationInfo, cert.profileName, certHashes);
+                }
+                else
+                {
+                    crlCertStatusInfo = CrlCertStatusInfo.getGoodCertStatusInfo(
+                            cert.profileName, certHashes);
+                }
                 newCertStatusInfoMap.put(cert.cert.getSerialNumber().getPositiveValue(), crlCertStatusInfo);
             }
 
@@ -407,14 +476,15 @@ public class CrlCertStatusStore implements CertStatusStore
             this.certStatusInfoMap.putAll(newCertStatusInfoMap);
             this.thisUpdate = newThisUpdate;
             this.nextUpdate = newNextUpdate;
+
             this.initializationFailed = false;
             this.initialized = true;
             updateCRLSuccessfull = true;
-            LOG.info("Updated CertStore {}", name);
+            LOG.info("Updated CertStore {}", getName());
         } catch (Exception e)
         {
             LOG.error("Could not executing initializeStore() for {},  {}: {}",
-                    new Object[]{name, e.getClass().getName(), e.getMessage()});
+                    new Object[]{getName(), e.getClass().getName(), e.getMessage()});
             LOG.debug("Could not executing initializeStore()", e);
 
             initializationFailed = true;
@@ -467,9 +537,7 @@ public class CrlCertStatusStore implements CertStatusStore
     @Override
     public CertStatusInfo getCertStatus(
             HashAlgoType hashAlgo, byte[] issuerNameHash, byte[] issuerKeyHash,
-            BigInteger serialNumber,
-            boolean includeCertHash,
-            HashAlgoType certHashAlgo)
+            BigInteger serialNumber)
     throws CertStatusStoreException
     {
         // wait for max. 0.5 second
@@ -494,9 +562,10 @@ public class CrlCertStatusStore implements CertStatusStore
             throw new CertStatusStoreException("Initialization of CertStore failed");
         }
 
-        if(includeCertHash && certHashAlgo == null)
+        HashAlgoType certHashAlgo = null;
+        if(includeCertHash)
         {
-            certHashAlgo = hashAlgo;
+            certHashAlgo = certHashAlgorithm == null ? hashAlgo : certHashAlgorithm;
         }
 
         Date thisUpdate;
@@ -521,22 +590,70 @@ public class CrlCertStatusStore implements CertStatusStore
         }
 
         IssuerHashNameAndKey issuerHashNameAndKey = issuerHashMap.get(hashAlgo);
+
         if(issuerHashNameAndKey.match(hashAlgo, issuerNameHash, issuerKeyHash) == false)
         {
             return CertStatusInfo.getIssuerUnknownCertStatusInfo(thisUpdate, nextUpdate);
         }
 
-        CrlCertStatusInfo certStatusInfo = certStatusInfoMap.get(serialNumber);
+        CertStatusInfo certStatusInfo;
 
+        CrlCertStatusInfo crlCertStatusInfo = certStatusInfoMap.get(serialNumber);
         // SerialNumber is unknown
-        if(certStatusInfo == null)
+        if(crlCertStatusInfo == null)
         {
-            return unknownSerialAsGood ?
-                    CertStatusInfo.getGoodCertStatusInfo(certHashAlgo, null, thisUpdate, nextUpdate, null) :
-                    CertStatusInfo.getUnknownCertStatusInfo(thisUpdate, nextUpdate);
+            if(unknownSerialAsGood)
+            {
+                if(caRevoked && inheritCaRevocation)
+                {
+                    CertRevocationInfo revocationInfo = new CertRevocationInfo(
+                            CRLReason.CA_COMPROMISE.getCode(), caRevocationTime, null);
+                    certStatusInfo = CertStatusInfo.getRevokedCertStatusInfo(revocationInfo,
+                            null, null, thisUpdate, nextUpdate, null);
+                }
+                else
+                {
+                    certStatusInfo = CertStatusInfo.getGoodCertStatusInfo(
+                            certHashAlgo, null, thisUpdate, nextUpdate, null);
+                }
+            }
+            else
+            {
+                certStatusInfo = CertStatusInfo.getUnknownCertStatusInfo(thisUpdate, nextUpdate);
+            }
+        }
+        else
+        {
+            certStatusInfo = crlCertStatusInfo.getCertStatusInfo(certHashAlgo, thisUpdate, nextUpdate);
         }
 
-        return certStatusInfo.getCertStatusInfo(certHashAlgo, thisUpdate, nextUpdate);
+        if(includeCrlID)
+        {
+            certStatusInfo.setCrlID(crlID);
+        }
+
+        if(includeArchiveCutoff)
+        {
+            Date t;
+            if(retentionInterval != 0)
+            {
+                // expired certificate remains in status store for ever
+                if(retentionInterval < 0)
+                {
+                    t = caNotBefore;
+                }
+                else
+                {
+                    long nowÍnMs = System.currentTimeMillis();
+                    long tInMs = Math.max(caNotBefore.getTime(), nowÍnMs - DAY * retentionInterval);
+                    t = new Date(tInMs);
+                }
+
+                certStatusInfo.setArchiveCutOff(t);
+            }
+        }
+
+        return certStatusInfo;
     }
 
     private static byte[] removingTagAndLenFromExtensionValue(byte[] encodedExtensionValue)
@@ -556,24 +673,6 @@ public class CrlCertStatusStore implements CertStatusStore
         return true;
     }
 
-    @Override
-    public String getName()
-    {
-        return name;
-    }
-
-    @Override
-    public AuditLoggingService getAuditLoggingService()
-    {
-        return auditLoggingService;
-    }
-
-    @Override
-    public void setAuditLoggingService(AuditLoggingService auditLoggingService)
-    {
-        this.auditLoggingService = auditLoggingService;
-    }
-
     private void auditLogPCIEvent(AuditLevel auditLevel, String eventType, String auditStatus)
     {
         if(auditLoggingService != null)
@@ -587,4 +686,52 @@ public class CrlCertStatusStore implements CertStatusStore
             auditLoggingService.logEvent(auditEvent);
         }
     }
+
+    @Override
+    public void init(String conf, DataSourceFactory datasourceFactory, PasswordResolver passwordResolver)
+    throws CertStatusStoreException
+    {
+    }
+
+    @Override
+    public void shutdown()
+    throws CertStatusStoreException
+    {
+        if(scheduledThreadPoolExecutor != null)
+        {
+            scheduledThreadPoolExecutor.shutdown();
+            scheduledThreadPoolExecutor = null;
+        }
+    }
+
+    public boolean isUseUpdateDatesFromCRL()
+    {
+        return useUpdateDatesFromCRL;
+    }
+
+    public void setUseUpdateDatesFromCRL(boolean useUpdateDatesFromCRL)
+    {
+        this.useUpdateDatesFromCRL = useUpdateDatesFromCRL;
+    }
+
+    public boolean isCaRevoked()
+    {
+        return caRevoked;
+    }
+
+    public void setCaRevoked(boolean caRevoked)
+    {
+        this.caRevoked = caRevoked;
+    }
+
+    public Date getCaRevocationTime()
+    {
+        return caRevocationTime;
+    }
+
+    public void setCaRevocationTime(Date caRevocationTime)
+    {
+        this.caRevocationTime = caRevocationTime;
+    }
+
 }

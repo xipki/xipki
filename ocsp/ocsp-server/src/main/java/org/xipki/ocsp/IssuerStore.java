@@ -62,6 +62,19 @@ public class IssuerStore
         return issuerEntry == null ? null : issuerEntry.getId();
     }
 
+    public IssuerEntry getIssuerForId(int id)
+    {
+        for(IssuerEntry entry : entries)
+        {
+            if(entry.getId() == id)
+            {
+                return entry;
+            }
+        }
+
+        return null;
+    }
+
     public IssuerEntry getIssuerForFp( HashAlgoType hashAlgo, byte[] issuerNameHash, byte[] issuerKeyHash)
     {
         for(IssuerEntry entry : entries)
