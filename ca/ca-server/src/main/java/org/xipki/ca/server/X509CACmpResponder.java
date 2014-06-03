@@ -296,7 +296,7 @@ public class X509CACmpResponder extends CmpResponder
                         {
                             if(requiredPermission == null)
                             {
-                                eventType = "CERT_REVOKE";
+                                eventType = "CERT_REMOVE";
                                 requiredPermission = Permission.REMOVE_CERT;
                             }
                             else if(requiredPermission != Permission.REMOVE_CERT)
@@ -322,7 +322,7 @@ public class X509CACmpResponder extends CmpResponder
                         {
                             if(requiredPermission == null)
                             {
-                                eventType = "CERT_REMOVE";
+                                eventType = "CERT_REVOKE";
                                 requiredPermission = Permission.REVOKE_CERT;
                             }
                             else if(requiredPermission != Permission.REVOKE_CERT)
@@ -1129,14 +1129,57 @@ public class X509CACmpResponder extends CmpResponder
                 }
             } catch(OperationException e)
             {
-                PKIStatusInfo status = new PKIStatusInfo(
-                        PKIStatus.rejection, null, new PKIFailureInfo(PKIFailureInfo.systemFailure));
-                repContentBuilder.add(status);
+                ErrorCode code = e.getErrorCode();
+                LOG.warn("{} certificate, OperationException: code={}, message={}",
+                        new Object[]{permission.name(), code.name(), e.getErrorMessage()});
+
+                AuditStatus auditStatus;
+                String auditMessage;
+
+                int failureInfo;
+                switch(code)
+                {
+                    case CERT_REVOKED:
+                        failureInfo = PKIFailureInfo.certRevoked;
+                        auditStatus = AuditStatus.FAILED;
+                        auditMessage = "CERT_REVOKED";
+                        break;
+                    case DATABASE_FAILURE:
+                        failureInfo = PKIFailureInfo.systemFailure;
+                        auditStatus = AuditStatus.ERROR;
+                        auditMessage = "DATABASE_FAILURE";
+                        break;
+                    case INSUFFICIENT_PERMISSION:
+                        failureInfo = PKIFailureInfo.notAuthorized;
+                        auditStatus = AuditStatus.ERROR;
+                        auditMessage = "INSUFFICIENT_PERMISSION";
+                        break;
+                    case System_Failure:
+                        failureInfo = PKIFailureInfo.systemFailure;
+                        auditStatus = AuditStatus.ERROR;
+                        auditMessage = "System_Failure";
+                        break;
+                    case UNKNOWN_CERT:
+                        failureInfo = PKIFailureInfo.badCertId;
+                        auditStatus = AuditStatus.FAILED;
+                        auditMessage = "UNKNOWN_CERT";
+                        break;
+                    default:
+                        failureInfo = PKIFailureInfo.systemFailure;
+                        auditStatus = AuditStatus.ERROR;
+                        auditMessage = "InternalErrorCode " + e.getErrorCode();
+                        break;
+                }
+
                 if(childAuditEvent != null)
                 {
-                    childAuditEvent.setStatus(AuditStatus.ERROR);
-                    childAuditEvent.addEventData(new AuditEventData("message", "internal error"));
+                    childAuditEvent.setStatus(auditStatus);
+                    childAuditEvent.addEventData(new AuditEventData("message", auditMessage));
                 }
+
+                String errorMessage = auditMessage;
+                PKIStatusInfo status = generateCmpRejectionStatus(failureInfo, errorMessage);
+                repContentBuilder.add(status);
             }
         }
 
