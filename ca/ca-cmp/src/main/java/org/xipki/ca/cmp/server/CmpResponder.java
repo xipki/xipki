@@ -130,8 +130,11 @@ public abstract class CmpResponder
 
         if(messageTime == null)
         {
-            failureCode = PKIFailureInfo.missingTimeStamp;
-            statusText = "missing timestamp";
+            if(cmpControl.isMessageTimeRequired())
+            {
+                failureCode = PKIFailureInfo.missingTimeStamp;
+                statusText = "missing timestamp";
+            }
         }
         else
         {
@@ -142,11 +145,10 @@ public abstract class CmpResponder
                 {
                     messageTimeBias *= -1;
                 }
-                messageTimeBias *= 1000; // second to millisecond
 
                 long msgTimeMs = messageTime.getDate().getTime();
                 long currentTimeMs = System.currentTimeMillis();
-                long bias = msgTimeMs - currentTimeMs;
+                long bias = (msgTimeMs - currentTimeMs)/ 1000L;
                 if(bias > messageTimeBias)
                 {
                     failureCode = PKIFailureInfo.badTime;
