@@ -54,12 +54,20 @@ public class CrlSignerUpdateCommand extends CaCommand
     protected Integer            overlap;
 
     @Option(name = "-ewc", aliases = { "--enableWithCerts" },
-            description = "Certificates are contained in the CRL, the default is not")
+            description = "Certificates are contained in the CRL")
     protected Boolean            enableWithCerts;
 
     @Option(name = "-dwc", aliases = { "--disableWithCerts" },
-            description = "Certificates are not contained in the CRL, the default is not")
+            description = "Certificates are not contained in the CRL")
     protected Boolean            disableWithCerts;
+
+    @Option(name = "-eec", aliases = { "--enableExpiredCerts" },
+            description = "Include revocation information of expired certificates")
+    protected Boolean            enableExpiredCerts;
+
+    @Option(name = "-dec", aliases = { "--disableExpiredCerts" },
+            description = "Do not include revocation information of expired certificates,")
+    protected Boolean            disableExpiredCerts;
 
     @Override
     protected Object doExecute()
@@ -88,7 +96,14 @@ public class CrlSignerUpdateCommand extends CaCommand
             includeCerts = isEnabled(enableWithCerts, disableWithCerts, false);
         }
 
-        caManager.changeCrlSigner(name, signerType, signerConf, signerCertConf, period, overlap, includeCerts);
+        Boolean includeExpiredCerts = null;
+        if(enableExpiredCerts != null || disableExpiredCerts != null)
+        {
+            includeExpiredCerts = isEnabled(enableExpiredCerts, disableExpiredCerts, false);
+        }
+
+        caManager.changeCrlSigner(name, signerType, signerConf, signerCertConf, period, overlap,
+                includeCerts, includeExpiredCerts);
         return null;
     }
 }

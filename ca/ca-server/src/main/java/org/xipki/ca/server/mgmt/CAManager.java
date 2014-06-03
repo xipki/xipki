@@ -152,7 +152,7 @@ public interface CAManager
     throws CAMgmtException;
 
     void changeCrlSigner(String name, String signer_type, String signer_conf, String signer_cert,
-            Integer period, Integer overlap, Boolean includeCerts)
+            Integer period, Integer overlap, Boolean includeCerts, Boolean includeExpiredCerts)
     throws CAMgmtException;
 
     CrlSignerEntry getCrlSigner(String name);
