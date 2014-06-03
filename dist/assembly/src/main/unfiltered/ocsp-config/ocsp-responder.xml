@@ -13,7 +13,6 @@
 		</algorithms>
 		<includeSignerCertInResp>true</includeSignerCertInResp>				
 		<includeSignerCACertsInResp>true</includeSignerCACertsInResp>
-		<certFile>output/OCSP1.der</certFile> 
 		<caCertFiles>
 			<caCertFile>output/SubCAwithCRL1.der</caCertFile>
 			<caCertFile>output/RCA1.der</caCertFile>
