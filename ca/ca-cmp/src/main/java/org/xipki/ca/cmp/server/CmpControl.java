@@ -26,6 +26,18 @@ public class CmpControl
     private boolean requireConfirmCert;
     private boolean sendCaCert;
 
+    private boolean messageTimeRequired = true;
+
+    public boolean isMessageTimeRequired()
+    {
+        return messageTimeRequired;
+    }
+
+    public void setMessageTimeRequired(boolean messageTimeRequired)
+    {
+        this.messageTimeRequired = messageTimeRequired;
+    }
+
     private int messageTimeBias = DFLT_messageTimeBias;
     private int confirmWaitTime = DFLT_confirmWaitTime;
 
