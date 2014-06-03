@@ -328,6 +328,8 @@ public class DbCertStatusStore extends CertStatusStore
             PreparedStatement ps = borrowPreparedStatement(createFetchFirstSelectSQL(sql, 1));
             ResultSet rs = null;
 
+            CertStatusInfo certStatusInfo = null;
+
             try
             {
                 ps.setInt(1, issuer.getId());
@@ -335,7 +337,6 @@ public class DbCertStatusStore extends CertStatusStore
 
                 rs = ps.executeQuery();
 
-                CertStatusInfo certStatusInfo;
                 if(rs.next())
                 {
                     String certprofile = rs.getString("PROFILE");
@@ -362,8 +363,6 @@ public class DbCertStatusStore extends CertStatusStore
                         certStatusInfo = CertStatusInfo.getGoodCertStatusInfo(certHashAlgo, certHash, thisUpdate,
                                 null, certprofile);
                     }
-
-                    return certStatusInfo;
                 }
                 else
                 {
@@ -386,33 +385,33 @@ public class DbCertStatusStore extends CertStatusStore
                         certStatusInfo = CertStatusInfo.getUnknownCertStatusInfo(thisUpdate, null);
                     }
                 }
-
-                if(includeArchiveCutoff)
-                {
-                    Date t;
-                    if(retentionInterval != 0)
-                    {
-                        // expired certificate remains in status store for ever
-                        if(retentionInterval < 0)
-                        {
-                            t = issuer.getCaNotBefore();
-                        }
-                        else
-                        {
-                            long nowÍnMs = System.currentTimeMillis();
-                            long tInMs = Math.max(issuer.getCaNotBefore().getTime(), nowÍnMs - DAY * retentionInterval);
-                            t = new Date(tInMs);
-                        }
-
-                        certStatusInfo.setArchiveCutOff(t);
-                    }
-                }
-
-                return certStatusInfo;
             }finally
             {
                 releaseDbResources(ps, rs);
             }
+            
+            if(includeArchiveCutoff)
+            {
+                Date t;
+                if(retentionInterval != 0)
+                {
+                    // expired certificate remains in status store for ever
+                    if(retentionInterval < 0)
+                    {
+                        t = issuer.getCaNotBefore();
+                    }
+                    else
+                    {
+                        long nowÍnMs = System.currentTimeMillis();
+                        long tInMs = Math.max(issuer.getCaNotBefore().getTime(), nowÍnMs - DAY * retentionInterval);
+                        t = new Date(tInMs);
+                    }
+
+                    certStatusInfo.setArchiveCutOff(t);
+                }
+            }
+
+            return certStatusInfo;
         }catch(SQLException e)
         {
             throw new CertStatusStoreException(e);
@@ -528,16 +527,6 @@ public class DbCertStatusStore extends CertStatusStore
     private void releaseDbResources(Statement ps, ResultSet rs)
     {
         dataSource.releaseResources(ps, rs);
-    }
-
-    public boolean isIncludeArchiveCutoff()
-    {
-        return includeArchiveCutoff;
-    }
-
-    public void setIncludeArchiveCutoff(boolean includeArchiveCutoff)
-    {
-        this.includeArchiveCutoff = includeArchiveCutoff;
     }
 
     @Override

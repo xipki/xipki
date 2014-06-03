@@ -42,6 +42,7 @@ import javax.xml.bind.Unmarshaller;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 
+import org.bouncycastle.asn1.ASN1GeneralizedTime;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.DERNull;
@@ -782,9 +783,7 @@ public class OcspResponder
                         break;
                 }
 
-                Extension certHashExtension = null;
-
-                Extensions extensions = null;
+                List<Extension> extensions = new LinkedList<>();
                 byte[] certHash = certStatusInfo.getCertHash();
                 if(certHash != null)
                 {
@@ -809,10 +808,17 @@ public class OcspResponder
                         return createUnsuccessfullOCSPResp(OcspResponseStatus.internalError);
                     }
 
-                    certHashExtension = new Extension(ISISMTTObjectIdentifiers.id_isismtt_at_certHash,
+                    Extension extension = new Extension(ISISMTTObjectIdentifiers.id_isismtt_at_certHash,
                             false, encodedCertHash);
 
-                    extensions = new Extensions(certHashExtension);
+                    extensions.add(extension);
+                }
+
+                if(certStatusInfo.getArchiveCutOff() != null)
+                {
+                    Extension extension = new Extension(OCSPObjectIdentifiers.id_pkix_ocsp_archive_cutoff,
+                            false, new ASN1GeneralizedTime(certStatusInfo.getArchiveCutOff()).getEncoded());
+                    extensions.add(extension);
                 }
 
                 String certStatusText;
@@ -862,7 +868,8 @@ public class OcspResponder
                     sb.append("certHash: ").append(hexCertHash);
                     LOG.debug(sb.toString());
                 }
-                basicOcspBuilder.addResponse(certID, bcCertStatus, thisUpdate, nextUpdate, extensions);
+                basicOcspBuilder.addResponse(certID, bcCertStatus, thisUpdate, nextUpdate,
+                        extensions.isEmpty() ? null : new Extensions(extensions.toArray(new Extension[0])));
             }
 
             if(includeExtendedRevokeExtension)
