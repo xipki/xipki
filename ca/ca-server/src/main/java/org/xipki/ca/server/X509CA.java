@@ -1520,7 +1520,7 @@ public class X509CA
             return;
         }
 
-        byte[] data = publicKeyInfo.getEncoded();
+        byte[] data = publicKeyInfo.getPublicKeyData().getBytes();
         byte[] skiValue = HashCalculator.hash(HashAlgoType.SHA1, data);
         SubjectKeyIdentifier value = new SubjectKeyIdentifier(skiValue);
 
