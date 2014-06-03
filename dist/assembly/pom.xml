@@ -231,7 +231,7 @@
 								</configuration>
 							</execution>
 							<execution>
-								<!-- Extract the SQL scripts -->
+								<!-- Extract the OCSP XSD -->
 								<id>unpack-ocspserver-xsd</id>
 								<phase>generate-resources</phase>
 								<goals>
