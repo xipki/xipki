@@ -33,7 +33,9 @@ import org.apache.felix.gogo.commands.Command;
 import org.apache.felix.gogo.commands.Option;
 import org.apache.karaf.shell.console.OsgiCommandSupport;
 import org.bouncycastle.asn1.ASN1Encodable;
+import org.bouncycastle.asn1.ASN1GeneralizedTime;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
+import org.bouncycastle.asn1.DERGeneralizedTime;
 import org.bouncycastle.asn1.isismtt.ISISMTTObjectIdentifiers;
 import org.bouncycastle.asn1.isismtt.ocsp.CertHash;
 import org.bouncycastle.asn1.nist.NISTObjectIdentifiers;
@@ -206,7 +208,8 @@ public class OCSPStatusCommand extends OsgiCommandSupport
         }
         else if(n != 1)
         {
-            System.err.println("Received status with " + n + " single responses from server, but 1 was requested");
+            System.err.println("Received status with " + n +
+                    " single responses from server, but 1 was requested");
         }
         else
         {
@@ -245,11 +248,12 @@ public class OCSPStatusCommand extends OsgiCommandSupport
             StringBuilder msg = new StringBuilder("Certificate status: ");
             msg.append(status);
 
-            Extension certHashExtension = singleResp.getExtension(ISISMTTObjectIdentifiers.id_isismtt_at_certHash);
-            if(certHashExtension != null)
+            Extension extension = singleResp.getExtension(
+                    ISISMTTObjectIdentifiers.id_isismtt_at_certHash);
+            if(extension != null)
             {
                 msg.append("\nCertHash is provided:\n");
-                ASN1Encodable extensionValue = certHashExtension.getParsedValue();
+                ASN1Encodable extensionValue = extension.getParsedValue();
                 CertHash certHash = CertHash.getInstance(extensionValue);
                 ASN1ObjectIdentifier hashAlgOid = certHash.getHashAlgorithm().getAlgorithm();
                 byte[] hashValue = certHash.getCertificateHash();
@@ -271,6 +275,16 @@ public class OCSPStatusCommand extends OsgiCommandSupport
                 }
             }
 
+            extension = singleResp.getExtension(
+                    OCSPObjectIdentifiers.id_pkix_ocsp_archive_cutoff);
+            if(extension != null)
+            {
+                ASN1Encodable extensionValue = extension.getParsedValue();
+                ASN1GeneralizedTime time = ASN1GeneralizedTime.getInstance(extensionValue);
+                msg.append("\nArchive-CutOff: ");
+                msg.append(time.getTime());
+            }
+
             if(verbose != null && verbose.booleanValue())
             {
                 ASN1ObjectIdentifier sigAlgOid = basicResp.getSignatureAlgOID();
@@ -283,7 +297,8 @@ public class OCSPStatusCommand extends OsgiCommandSupport
                     String sigAlgName;
                     if(PKCSObjectIdentifiers.id_RSASSA_PSS.equals(sigAlgOid))
                     {
-                        BasicOCSPResponse asn1BasicOCSPResp = BasicOCSPResponse.getInstance(basicResp.getEncoded());
+                        BasicOCSPResponse asn1BasicOCSPResp =
+                                BasicOCSPResponse.getInstance(basicResp.getEncoded());
                         sigAlgName = SignerUtil.getSignatureAlgoName(
                                 asn1BasicOCSPResp.getSignatureAlgorithm());
                     }
