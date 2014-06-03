@@ -316,7 +316,7 @@ class SelfSignedCertBuilder
     {
         // SubjectKeyIdentifier
         MessageDigest sha1 = MessageDigest.getInstance("SHA-1");
-        byte[] skiValue = sha1.digest(requestedPublicKeyInfo.getEncoded());
+        byte[] skiValue = sha1.digest(requestedPublicKeyInfo.getPublicKeyData().getBytes());
 
         ExtensionOccurrence extOccurrence = profile.getOccurenceOfSubjectKeyIdentifier();
         if(extOccurrence != null)
