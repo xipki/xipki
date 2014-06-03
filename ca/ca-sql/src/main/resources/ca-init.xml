@@ -54,10 +54,10 @@
 			<column name="OVERLAP" remarks="minutes" type="INT">
 				<constraints nullable="false"/>
 			</column>
-			<column defaultValueBoolean="false" name="INCLUDE_CERTS_IN_CRL" type="INT">
+			<column defaultValueNumeric="0" name="INCLUDE_CERTS_IN_CRL" type="INT">
 				<constraints nullable="false"/>
 			</column>
-			<column defaultValueBoolean="false" name="INCLUDE_EXPIRED_CERTS" type="INT">
+			<column defaultValueNumeric="0" name="INCLUDE_EXPIRED_CERTS" type="INT">
 				<constraints nullable="false"/>
 			</column>
 		</createTable>
@@ -129,7 +129,7 @@
 			<column defaultValueNumeric="30" name="NUM_CRLS" type="INT">
 				<constraints nullable="false"/>
 			</column>
-			<column defaultValueBoolean="false" name="REVOKED" type="INT">
+			<column defaultValueNumeric="0" name="REVOKED" type="INT">
 				<constraints nullable="false"/>
 			</column>
 			<column name="REV_REASON" type="INT"/>
