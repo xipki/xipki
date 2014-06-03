@@ -48,7 +48,8 @@ public class CrlSignerAddCommand extends CaCommand
     protected String            signerCertFile;
 
     @Option(name = "-period",
-            required=true, description = "Required. Interval in minutes of two CRLs, set to 0 to generate CRL on demand")
+            required=true, description = "Required. Interval in minutes of two CRLs,\n"
+                    + "set to 0 to generate CRL on demand")
     protected Integer            period;
 
     @Option(name = "-overlap",
@@ -62,6 +63,16 @@ public class CrlSignerAddCommand extends CaCommand
     @Option(name = "-dwc", aliases = { "--disableWithCerts" },
             description = "Certificates are not contained in the CRL, the default is not")
     protected Boolean            disableWithCerts;
+
+    @Option(name = "-eec", aliases = { "--enableExpiredCerts" },
+            description = "Include revocation information of expired certificates.\n"
+                    + "The default is not included")
+    protected Boolean            enableExpiredCerts;
+
+    @Option(name = "-dec", aliases = { "--disableExpiredCerts" },
+            description = "Do not include revocation information of expired certificates.\n"
+                    + "The default is not included")
+    protected Boolean            disableExpiredCerts;
 
     private SecurityFactory securityFactory;
     private PasswordResolver passwordResolver;
@@ -105,10 +116,15 @@ public class CrlSignerAddCommand extends CaCommand
 
         if(enableWithCerts != null && disableWithCerts != null )
         {
-            System.err.println("Containing certificates in CRL could not be enabled and disabled at the same time");
+            System.err.println(
+                    "Containing certificates in CRL could not be enabled and disabled at the same time");
         }
         boolean withCerts = isEnabled(enableWithCerts, disableWithCerts, false);
         entry.setIncludeCertsInCrl(withCerts);
+
+        boolean withExpiredCerts = isEnabled(enableExpiredCerts, disableExpiredCerts, false);
+        entry.setIncludeExpiredCerts(withExpiredCerts);
+
         caManager.addCrlSigner(entry);
 
         return null;

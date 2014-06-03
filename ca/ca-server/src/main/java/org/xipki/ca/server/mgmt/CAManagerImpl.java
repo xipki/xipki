@@ -551,6 +551,7 @@ public class CAManagerImpl implements CAManager
                     return false;
                 }
                 crlSigner.setIncludeCertsInCrl(crlSignerEntry.includeCertsInCRL());
+                crlSigner.setIncluedExpiredCerts(crlSignerEntry.includeExpiredCerts());
             }
 
             ConcurrentContentSigner caSigner;
@@ -1045,7 +1046,7 @@ public class CAManagerImpl implements CAManager
             stmt = createStatement();
 
             String sql = "SELECT NAME, SIGNER_TYPE, SIGNER_CONF, SIGNER_CERT, PERIOD,"
-                    + " OVERLAP, INCLUDE_CERTS_IN_CRL"
+                    + " OVERLAP, INCLUDE_CERTS_IN_CRL, INCLUDE_EXPIRED_CERTS"
                     + " FROM CRLSIGNER";
             ResultSet rs = stmt.executeQuery(sql);
 
@@ -1058,6 +1059,7 @@ public class CAManagerImpl implements CAManager
                 int period = rs.getInt("PERIOD");
                 int overlap = rs.getInt("OVERLAP");
                 boolean include_certs_in_crl = rs.getBoolean("INCLUDE_CERTS_IN_CRL");
+                boolean include_expired_certs = rs.getBoolean("INCLUDE_EXPIRED_CERTS");
 
                 CrlSignerEntry entry = new CrlSignerEntry(name);
                 entry.setType(signer_type);
@@ -1072,6 +1074,7 @@ public class CAManagerImpl implements CAManager
                 entry.setPeriod(period);
                 entry.setOverlap(overlap);
                 entry.setIncludeCertsInCrl(include_certs_in_crl);
+                entry.setIncludeExpiredCerts(include_expired_certs);
                 crlSigners.put(entry.getName(), entry);
             }
 
@@ -2207,8 +2210,9 @@ public class CAManagerImpl implements CAManager
         try
         {
             ps = prepareStatement(
-                    "INSERT INTO CRLSIGNER (NAME, SIGNER_TYPE, SIGNER_CONF, SIGNER_CERT, PERIOD, OVERLAP, INCLUDE_CERTS_IN_CRL)"
-                    + " VALUES (?, ?, ?, ?, ?, ?, ?)");
+                    "INSERT INTO CRLSIGNER (NAME, SIGNER_TYPE, SIGNER_CONF, SIGNER_CERT,"
+                    + " PERIOD, OVERLAP, INCLUDE_CERTS_IN_CRL, INCLUDE_EXPIRED_CERTS)"
+                    + " VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
             int idx = 1;
             ps.setString(idx++, name);
             ps.setString(idx++, dbEntry.getType());
@@ -2218,6 +2222,7 @@ public class CAManagerImpl implements CAManager
             ps.setInt(idx++, dbEntry.getPeriod());
             ps.setInt(idx++, dbEntry.getOverlap());
             ps.setBoolean(idx++, dbEntry.includeCertsInCRL());
+            ps.setBoolean(idx++, dbEntry.includeExpiredCerts());
 
             ps.executeUpdate();
         }catch(SQLException e)
@@ -2266,7 +2271,7 @@ public class CAManagerImpl implements CAManager
 
     @Override
     public void changeCrlSigner(String name, String signer_type, String signer_conf, String signer_cert,
-            Integer period, Integer overlap, Boolean includeCerts)
+            Integer period, Integer overlap, Boolean includeCerts, Boolean includeExpiredCerts)
     throws CAMgmtException
     {
         StringBuilder sb = new StringBuilder();
@@ -2316,6 +2321,13 @@ public class CAManagerImpl implements CAManager
             iIncludeCerts = i++;
         }
 
+        Integer iIncludeExpiredCerts = null;
+        if(includeExpiredCerts != null)
+        {
+            sb.append("INCLUDE_EXPIRED_CERTS=?,");
+            iIncludeExpiredCerts = i++;
+        }
+
         sb.deleteCharAt(sb.length() - 1);
         sb.append(" WHERE NAME=?");
 
@@ -2358,6 +2370,11 @@ public class CAManagerImpl implements CAManager
             if(iIncludeCerts != null)
             {
                 ps.setBoolean(iIncludeCerts, includeCerts);
+            }
+
+            if(iIncludeExpiredCerts != null)
+            {
+                ps.setBoolean(iIncludeExpiredCerts, includeExpiredCerts);
             }
 
             ps.setString(iName, name);

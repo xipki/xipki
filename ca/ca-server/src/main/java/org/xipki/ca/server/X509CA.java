@@ -371,11 +371,22 @@ public class X509CA
                 List<CertRevocationInfoWithSerial> revInfos;
                 boolean isFirstCRLEntry = true;
 
+                Date notExpireAt;
+                if(crlSigner.incluedExpiredCerts())
+                {
+                    notExpireAt = new Date(0);
+                }
+                else
+                {
+                    // 10 minutes buffer
+                    notExpireAt = new Date(thisUpdate.getTime() - 600L * 1000);
+                }
+
                 do
                 {
                     try
                     {
-                        revInfos = certstore.getRevokedCertificates(cacert, thisUpdate,
+                        revInfos = certstore.getRevokedCertificates(cacert, notExpireAt,
                                 startSerial, numEntries);
                     } catch (SQLException e)
                     {
@@ -479,7 +490,7 @@ public class X509CA
                     {
                         try
                         {
-                            serials = certstore.getCertSerials(cacert, thisUpdate, startSerial, numEntries);
+                            serials = certstore.getCertSerials(cacert, notExpireAt, startSerial, numEntries);
                         } catch (SQLException e)
                         {
                             throw new OperationException(ErrorCode.DATABASE_FAILURE,

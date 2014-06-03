@@ -32,6 +32,7 @@ public class CrlSignerEntry
     private int period; // in minutes
     private int overlap; // in minutes
     private boolean includeCertsInCrl;
+    private boolean includeExpiredCerts;
 
     public CrlSignerEntry(String name)
     {
@@ -85,6 +86,7 @@ public class CrlSignerEntry
         sb.append("period: ").append(getPeriod()).append(" minutes\n");
         sb.append("overlap: ").append(getOverlap()).append(" minutes\n");
         sb.append("includeCertsInCrl: ").append(includeCertsInCrl).append("\n");
+        sb.append("includeExpiredCerts: ").append(includeExpiredCerts).append("\n");
         sb.append("cert: ").append("\n");
         sb.append("\tissuer: ").append(
                 IoCertUtil.canonicalizeName(cert.getIssuerX500Principal())).append("\n");
@@ -123,6 +125,16 @@ public class CrlSignerEntry
     throws ConfigurationException
     {
         this.includeCertsInCrl = includeCertsInCrl;
+    }
+
+    public boolean includeExpiredCerts()
+    {
+        return includeExpiredCerts;
+    }
+
+    public void setIncludeExpiredCerts(boolean includeExpiredCerts)
+    {
+        this.includeExpiredCerts = includeExpiredCerts;
     }
 
 }
