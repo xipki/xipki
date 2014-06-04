@@ -24,6 +24,7 @@ import org.apache.felix.gogo.commands.Command;
 import org.apache.felix.gogo.commands.Option;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.xipki.ca.client.api.RAWorker;
+import org.xipki.ca.cmp.CmpUtil;
 import org.xipki.ca.common.CertIDOrError;
 import org.xipki.ca.common.PKIStatusInfo;
 import org.xipki.security.common.IoCertUtil;
@@ -86,12 +87,10 @@ public class RARevokeCertCommand extends ClientCommand
             certIdOrError = raWorker.revokeCert(issuer, new BigInteger(serialNumber), reason);
         }
 
-        // TODO: check whether the returned one match the requested one
         if(certIdOrError.getError() != null)
         {
             PKIStatusInfo error = certIdOrError.getError();
-            System.err.println("Revocation failed: status=" + error.getStatus()+
-                    ", failureInfo=" + error.getPkiFailureInfo() + ", message=" + error.getStatusMessage());
+            System.err.println("Revocation failed: " + CmpUtil.formatPKIStatusInfo(error));
         }
         else
         {
