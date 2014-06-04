@@ -129,6 +129,7 @@ public class OcspResponder
     private OCSPResponderType conf;
     private RequestOptions requestOptions;
     private boolean auditResponse = false;
+    private boolean supportsHttpGet = false;
     private Map<String, String> auditCertprofileMapping = new ConcurrentHashMap<String, String>();
 
     private AuditLoggingService auditLoggingService;
@@ -220,6 +221,8 @@ public class OcspResponder
         {
             throw new OcspResponderException("Invalid OCSP mode '" + s + "'");
         }
+
+        supportsHttpGet = getBoolean(conf.isSupportsHttpGet(), false);
 
         // RequestOptions
         this.requestOptions = new RequestOptions(conf.getRequest());
@@ -1087,6 +1090,11 @@ public class OcspResponder
     public boolean isAuditResponse()
     {
         return auditResponse;
+    }
+
+    public boolean supportsHttpGet()
+    {
+        return supportsHttpGet;
     }
 
     private static boolean getBoolean(Boolean b, boolean defaultValue)

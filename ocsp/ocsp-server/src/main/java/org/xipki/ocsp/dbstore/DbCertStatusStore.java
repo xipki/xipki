@@ -389,7 +389,7 @@ public class DbCertStatusStore extends CertStatusStore
             {
                 releaseDbResources(ps, rs);
             }
-            
+
             if(includeArchiveCutoff)
             {
                 Date t;
