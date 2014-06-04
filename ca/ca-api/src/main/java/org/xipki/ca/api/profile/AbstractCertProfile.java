@@ -438,10 +438,9 @@ extends CertProfile implements SubjectDNSubset
 
         return rdn;
     }
-    
-    
+
     protected static String oidToDisplayName(ASN1ObjectIdentifier type)
     {
-    	return org.xipki.security.common.ObjectIdentifiers.oidToDisplayName(type);
+        return org.xipki.security.common.ObjectIdentifiers.oidToDisplayName(type);
     }
 }

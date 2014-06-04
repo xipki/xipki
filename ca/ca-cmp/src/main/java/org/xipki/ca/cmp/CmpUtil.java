@@ -17,6 +17,7 @@
 
 package org.xipki.ca.cmp;
 
+import java.math.BigInteger;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -37,16 +38,28 @@ import org.bouncycastle.cert.cmp.CMPException;
 import org.bouncycastle.cert.cmp.ProtectedPKIMessage;
 import org.bouncycastle.cert.cmp.ProtectedPKIMessageBuilder;
 import org.bouncycastle.operator.ContentSigner;
+import org.xipki.ca.cmp.client.ClientErrorCode;
 import org.xipki.security.api.ConcurrentContentSigner;
 import org.xipki.security.api.NoIdleSignerException;
 
 public class CmpUtil
 {
     public static final Map<Integer, String> statusTextMap = new HashMap<Integer, String>();
-    public static final Map<Integer, String> failureInfoTextMap = new HashMap<Integer, String>();
+    public static final String[] failureInfoTexts = new String[]
+    {
+        "incorrectData", "wrongAuthority", "badDataFormat", "badCertId", // 0 - 3
+        "badTime", "badRequest", "badMessageCheck", "badAlg", // 4 - 7
+        "unacceptedPolicy", "timeNotAvailable", "badRecipientNonce", "wrongIntegrity", // 8 - 11
+        "certConfirmed", "certRevoked", "badPOP", "missingTimeStamp", // 12 - 15
+        "notAuthorized", "unsupportedVersion", "transactionIdInUse", "signerNotTrusted", // 16 - 19
+        "badCertTemplate", "badSenderNonce", "addInfoNotAvailable", "unacceptedExtension", // 20 - 23
+        "-", "-", "-", "-", // 24 -27
+        "-", "duplicateCertReq", "systemFailure", "systemUnavail"}; // 28 - 31
 
     static
     {
+        statusTextMap.put(ClientErrorCode.PKIStatus_NO_ANSWER, "xipki_noAnswer");
+        statusTextMap.put(ClientErrorCode.PKIStatus_RESPONSE_ERROR, "xipki_responseError");
         statusTextMap.put(PKIStatus.GRANTED, "accepted");
         statusTextMap.put(PKIStatus.GRANTED_WITH_MODS, "grantedWithMods");
         statusTextMap.put(PKIStatus.REJECTION, "rejection");
@@ -54,34 +67,6 @@ public class CmpUtil
         statusTextMap.put(PKIStatus.REVOCATION_WARNING, "revocationWarning");
         statusTextMap.put(PKIStatus.REVOCATION_NOTIFICATION, "revocationNotification");
         statusTextMap.put(PKIStatus.KEY_UPDATE_WARNING, "keyUpdateWarning");
-
-        failureInfoTextMap.put(PKIFailureInfo.badAlg, "badAlg");
-        failureInfoTextMap.put(PKIFailureInfo.badMessageCheck, "badMessageCheck");
-        failureInfoTextMap.put(PKIFailureInfo.badRequest, "badRequest");
-        failureInfoTextMap.put(PKIFailureInfo.badTime, "badTime");
-        failureInfoTextMap.put(PKIFailureInfo.badCertId, "badCertId");
-        failureInfoTextMap.put(PKIFailureInfo.badDataFormat, "badDataFormat");
-        failureInfoTextMap.put(PKIFailureInfo.wrongAuthority, "wrongAuthority");
-        failureInfoTextMap.put(PKIFailureInfo.incorrectData, "incorrectData");
-        failureInfoTextMap.put(PKIFailureInfo.missingTimeStamp, "missingTimeStamp");
-        failureInfoTextMap.put(PKIFailureInfo.badPOP, "badPOP");
-        failureInfoTextMap.put(PKIFailureInfo.certRevoked, "certRevoked");
-        failureInfoTextMap.put(PKIFailureInfo.certConfirmed, "certConfirmed");
-        failureInfoTextMap.put(PKIFailureInfo.wrongIntegrity, "wrongIntegrity");
-        failureInfoTextMap.put(PKIFailureInfo.badRecipientNonce, "badRecipientNonce");
-        failureInfoTextMap.put(PKIFailureInfo.timeNotAvailable, "timeNotAvailable");
-        failureInfoTextMap.put(PKIFailureInfo.unacceptedPolicy, "unacceptedPolicy");
-        failureInfoTextMap.put(PKIFailureInfo.unacceptedExtension, "unacceptedExtension");
-        failureInfoTextMap.put(PKIFailureInfo.addInfoNotAvailable, "addInfoNotAvailable");
-        failureInfoTextMap.put(PKIFailureInfo.badSenderNonce, "badSenderNonce");
-        failureInfoTextMap.put(PKIFailureInfo.badCertTemplate, "badCertTemplate");
-        failureInfoTextMap.put(PKIFailureInfo.signerNotTrusted, "signerNotTrusted");
-        failureInfoTextMap.put(PKIFailureInfo.transactionIdInUse, "transactionIdInUse");
-        failureInfoTextMap.put(PKIFailureInfo.unsupportedVersion, "unsupportedVersion");
-        failureInfoTextMap.put(PKIFailureInfo.notAuthorized, "notAuthorized");
-        failureInfoTextMap.put(PKIFailureInfo.systemUnavail, "systemUnavail");
-        failureInfoTextMap.put(PKIFailureInfo.systemFailure, "systemFailure");
-        failureInfoTextMap.put(PKIFailureInfo.duplicateCertReq, "duplicateCertReq");
     }
 
     public static PKIMessage addProtection(PKIMessage pkiMessage,
@@ -179,6 +164,14 @@ public class CmpUtil
         return new InfoTypeAndValue(CMPObjectIdentifiers.it_implicitConfirm, DERNull.INSTANCE);
     }
 
+    public static String formatPKIStatusInfo(org.xipki.ca.common.PKIStatusInfo pkiStatusInfo)
+    {
+        int status = pkiStatusInfo.getStatus();
+        int failureInfo = pkiStatusInfo.getPkiFailureInfo();
+        String statusMessage = pkiStatusInfo.getStatusMessage();
+        return formatPKIStatusInfo(status, failureInfo, statusMessage);
+    }
+
     public static String formatPKIStatusInfo(PKIStatusInfo pkiStatusInfo)
     {
         int status = pkiStatusInfo.getStatus().intValue();
@@ -192,13 +185,31 @@ public class CmpUtil
     public static String formatPKIStatusInfo(int status, int failureInfo, String statusMessage)
     {
         StringBuilder sb = new StringBuilder("PKIStatusInfo {");
-        String s = statusTextMap.get(status);
-        sb.append("status = ").append(status).append(" (").append(s).append("), ");
-        s = failureInfoTextMap.get(status);
-        sb.append("failureInfo = ").append(failureInfo).append(" (").append(s).append("), ");
+        sb.append("status = ");
+        sb.append(status);
+        sb.append(" (").append(statusTextMap.get(status)).append("), ");
+        sb.append("failureInfo = ");
+        sb.append(failureInfo).append(" (").append(getFailureInfoText(failureInfo)).append("), ");
         sb.append("statusMessage = ").append(statusMessage);
         sb.append("}");
         return sb.toString();
+    }
+
+    public static String getFailureInfoText(int failureInfo)
+    {
+        BigInteger b = BigInteger.valueOf(failureInfo);
+        final int n = Math.min(b.bitLength(), failureInfoTexts.length);
+
+        StringBuilder sb = new StringBuilder();
+        for(int i = 0; i < n; i++)
+        {
+            if(b.testBit(i))
+            {
+                sb.append(", ").append(failureInfoTexts[i]);
+            }
+        }
+
+        return sb.length() < 3 ? "" : sb.substring(2);
     }
 
 }
