@@ -24,6 +24,14 @@
 						RFC2560 mode will be applied.
 					</xs:documentation>
 				</xs:annotation>
+			</xs:element>			
+			<xs:element name="supportsHttpGet" type="xs:boolean" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>
+						Whether to support HTTP GET for small request.
+						The default is false.
+					</xs:documentation>
+				</xs:annotation>
 			</xs:element>
 			<xs:element name="signer" type="signerType"/>
 			<xs:element name="request" type="requestType"/>

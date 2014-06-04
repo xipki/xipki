@@ -70,7 +70,14 @@ public class Rfc2560Servlet extends HttpServlet
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
     throws ServletException, IOException
     {
-        processRequest(request, response, true);
+        if(responder != null || responder.supportsHttpGet())
+        {
+            processRequest(request, response, true);
+        }
+        else
+        {
+            super.doGet(request, response);
+        }
     }
 
     @Override
