@@ -35,7 +35,6 @@ import org.apache.karaf.shell.console.OsgiCommandSupport;
 import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1GeneralizedTime;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
-import org.bouncycastle.asn1.DERGeneralizedTime;
 import org.bouncycastle.asn1.isismtt.ISISMTTObjectIdentifiers;
 import org.bouncycastle.asn1.isismtt.ocsp.CertHash;
 import org.bouncycastle.asn1.nist.NISTObjectIdentifiers;
@@ -282,7 +281,7 @@ public class OCSPStatusCommand extends OsgiCommandSupport
                 ASN1Encodable extensionValue = extension.getParsedValue();
                 ASN1GeneralizedTime time = ASN1GeneralizedTime.getInstance(extensionValue);
                 msg.append("\nArchive-CutOff: ");
-                msg.append(time.getTime());
+                msg.append(time.getTimeString());
             }
 
             if(verbose != null && verbose.booleanValue())
