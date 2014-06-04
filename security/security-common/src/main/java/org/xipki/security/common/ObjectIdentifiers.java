@@ -20,6 +20,7 @@ package org.xipki.security.common;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.ocsp.OCSPObjectIdentifiers;
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
+import org.bouncycastle.asn1.x500.style.BCStyle;
 import org.bouncycastle.asn1.x509.X509ObjectIdentifiers;
 
 public class ObjectIdentifiers
@@ -262,5 +263,12 @@ public class ObjectIdentifiers
     // OCSP
     public static final ASN1ObjectIdentifier id_pkix_ocsp_prefSigAlgs = OCSPObjectIdentifiers.id_pkix_ocsp.branch("8");
     public static final ASN1ObjectIdentifier id_pkix_ocsp_extendedRevoke = OCSPObjectIdentifiers.id_pkix_ocsp.branch("9");
+    
+
+    public static String oidToDisplayName(ASN1ObjectIdentifier type)
+    {
+    	String displayName = BCStyle.INSTANCE.oidToDisplayName(type);
+    	return displayName == null ? type.getId() : displayName;
+    }
 
 }

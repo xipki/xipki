@@ -167,7 +167,7 @@ extends CertProfile implements SubjectDNSubset
             int n = thisRDNs == null ? 0 : thisRDNs.length;
             if(occurrence != null && (n < occurrence.getMinOccurs() || n > occurrence.getMaxOccurs()))
             {
-                throw new BadCertTemplateException("Number of SubjectDN field " + type.getId() +
+                throw new BadCertTemplateException("Number of SubjectDN field " + oidToDisplayName(type) +
                         " not within [" + occurrence.getMinOccurs() + ", " + occurrence.getMaxOccurs() + "]");
             }
 
@@ -372,13 +372,13 @@ extends CertProfile implements SubjectDNSubset
             }
             if(occu == null)
             {
-                throw new BadCertTemplateException("Subject DN of type " + type.getId() + " is not allowed");
+                throw new BadCertTemplateException("Subject DN of type " + oidToDisplayName(type) + " is not allowed");
             }
 
             RDN[] rdns = requestedSubject.getRDNs(type);
             if(rdns.length > occu.getMaxOccurs() || rdns.length < occu.getMinOccurs())
             {
-                throw new BadCertTemplateException("Occurrence of subject DN of type " + type.getId() +
+                throw new BadCertTemplateException("Occurrence of subject DN of type " + oidToDisplayName(type) +
                         " not within the allowed range. " + rdns.length +
                         " is not within [" +occu.getMinOccurs() + ", " + occu.getMaxOccurs() + "]");
             }
@@ -402,7 +402,7 @@ extends CertProfile implements SubjectDNSubset
 
             if(present == false)
             {
-                throw new BadCertTemplateException("Requied subject DN of type " + occurence.getType() + " is not present");
+                throw new BadCertTemplateException("Requied subject DN of type " + oidToDisplayName(occurence.getType()) + " is not present");
             }
         }
     }
@@ -437,5 +437,11 @@ extends CertProfile implements SubjectDNSubset
         RDN rdn = new RDN(type, dnValue);
 
         return rdn;
+    }
+    
+    
+    protected static String oidToDisplayName(ASN1ObjectIdentifier type)
+    {
+    	return org.xipki.security.common.ObjectIdentifiers.oidToDisplayName(type);
     }
 }
