@@ -25,7 +25,4 @@ public class ClientErrorCode
     public static final int PKIStatus_RESPONSE_ERROR = -1;
 
     public static final int PKIStatus_NO_ANSWER = -2;
-
-    public static final int PKIFailureInfo_CERT_ENCODING_ERROR = -100;
-
 }

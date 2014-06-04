@@ -45,6 +45,7 @@ import org.bouncycastle.asn1.cmp.GenMsgContent;
 import org.bouncycastle.asn1.cmp.GenRepContent;
 import org.bouncycastle.asn1.cmp.InfoTypeAndValue;
 import org.bouncycastle.asn1.cmp.PKIBody;
+import org.bouncycastle.asn1.cmp.PKIFailureInfo;
 import org.bouncycastle.asn1.cmp.PKIFreeText;
 import org.bouncycastle.asn1.cmp.PKIHeader;
 import org.bouncycastle.asn1.cmp.PKIMessage;
@@ -61,6 +62,7 @@ import org.bouncycastle.asn1.crmf.CertTemplateBuilder;
 import org.bouncycastle.asn1.x509.CertificateList;
 import org.bouncycastle.asn1.x509.Extension;
 import org.bouncycastle.asn1.x509.Extensions;
+import org.bouncycastle.asn1.x509.GeneralName;
 import org.bouncycastle.cert.X509CertificateHolder;
 import org.bouncycastle.cert.cmp.CMPException;
 import org.bouncycastle.cert.cmp.CertificateConfirmationContent;
@@ -95,6 +97,7 @@ import org.xipki.security.api.ConcurrentContentSigner;
 import org.xipki.security.api.SecurityFactory;
 import org.xipki.security.common.CmpUtf8Pairs;
 import org.xipki.security.common.CustomObjectIdentifiers;
+import org.xipki.security.common.IoCertUtil;
 import org.xipki.security.common.ParamChecker;
 
 abstract class X509CmpRequestor extends CmpRequestor
@@ -237,8 +240,6 @@ abstract class X509CmpRequestor extends CmpRequestor
     private CmpResultType parse(PKIResponse response, List<? extends IssuerSerialEntryType> reqEntries)
     throws CmpRequestorException
     {
-        List<IssuerSerialEntryType> requestEntries = new ArrayList<IssuerSerialEntryType>(reqEntries);
-
         ErrorResultType errorResult = checkAndBuildErrorResultIfRequired(response);
         if(errorResult != null)
         {
@@ -262,70 +263,57 @@ abstract class X509CmpRequestor extends CmpRequestor
 
         RevRepContent content = (RevRepContent) respBody.getContent();
         PKIStatusInfo[] statuses = content.getStatus();
-        CertId[] revCerts = content.getRevCerts();
-        if(revCerts != null && statuses.length < revCerts.length)
+        if(statuses.length != reqEntries.size())
         {
-            LOG.warn("Status.length (" + statuses.length + ") < " + "RevCerts.length (" + revCerts.length + "), ignore the revCerts");
+            throw new CmpRequestorException("Incorrect number of status entries in response '" + statuses.length +
+                    "' instead the exceptected '" + reqEntries.size() + "'");
         }
+
+        CertId[] revCerts = content.getRevCerts();
 
         RevokeCertResultType result = new RevokeCertResultType();
         for(int i = 0; i < statuses.length; i++)
         {
-            if(revCerts == null || i >= revCerts.length)
-            {
-                continue;
-            }
-
-            CertId certId = revCerts[i];
-            IssuerSerialEntryType requestEntry = null;
-            // find the id
-            for(IssuerSerialEntryType re : requestEntries)
-            {
-                if(re.getIssuer().equals(certId.getIssuer().getName()) &&
-                  re.getSerialNumber().equals(certId.getSerialNumber().getValue()))
-                {
-                    requestEntry = re;
-                    break;
-                }
-            }
-
-            if(requestEntry == null)
-            {
-                LOG.error("The revoked cert (issuer={}, serial={}] is not requested", certId.getIssuer().getName(),
-                        certId.getSerialNumber().getValue());
-                continue;
-            }
-
-            requestEntries.remove(requestEntry);
-            String id = requestEntry.getId();
-
             PKIStatusInfo statusInfo = statuses[i];
-
             int status = statusInfo.getStatus().intValue();
+            IssuerSerialEntryType re = reqEntries.get(i);
 
-            ResultEntryType resultEntry;
             if(status == PKIStatus.GRANTED || status == PKIStatus.GRANTED_WITH_MODS)
             {
-                resultEntry = new RevokeCertResultEntryType(id, certId);
+                CertId certId = null;
+                if(revCerts != null)
+                {
+                    for(CertId _certId : revCerts)
+                    {
+                        if(re.getIssuer().equals(_certId.getIssuer().getName()) &&
+                          re.getSerialNumber().equals(_certId.getSerialNumber().getValue()))
+                        {
+                            certId = _certId;
+                            break;
+                        }
+                    }
+                }
+
+                if(certId == null)
+                {
+                    LOG.warn("certId is not present in response for (issuer={}, serialNumber={})",
+                            IoCertUtil.canonicalizeName(re.getIssuer()), re.getSerialNumber());
+                    certId = new CertId(new GeneralName(re.getIssuer()), re.getSerialNumber());
+                    continue;
+                }
+
+                ResultEntryType resultEntry = new RevokeCertResultEntryType(re.getId(), certId);
+                result.addResultEntry(resultEntry);
             }
             else
             {
                 PKIFreeText text = statusInfo.getStatusString();
                 String statusString = text == null ? null : text.getStringAt(0).getString();
-                resultEntry = new ErrorResultEntryType(id, status,
-                        statusInfo.getFailInfo().intValue(),
-                        statusString);
-            }
 
-            result.addResultEntry(resultEntry);
-        }
-
-        if(requestEntries.isEmpty() == false)
-        {
-            for(IssuerSerialEntryType re : requestEntries)
-            {
-                ErrorResultEntryType ere = new ErrorResultEntryType(re.getId(), ClientErrorCode.PKIStatus_NO_ANSWER);
-                result.addResultEntry(ere);
+                ResultEntryType resultEntry = new ErrorResultEntryType(re.getId(), status,
+                            statusInfo.getFailInfo().intValue(),
+                            statusString);
+                result.addResultEntry(resultEntry);
             }
         }
 
@@ -483,7 +471,7 @@ abstract class X509CmpRequestor extends CmpRequestor
                     }catch(IOException e)
                     {
                         resultEntry = new ErrorResultEntryType(thisId, ClientErrorCode.PKIStatus_RESPONSE_ERROR,
-                                ClientErrorCode.PKIFailureInfo_CERT_ENCODING_ERROR, "error while decode the certificate");
+                                PKIFailureInfo.systemFailure, "error while decode the certificate");
                     }
 
                     if(certHolder != null)

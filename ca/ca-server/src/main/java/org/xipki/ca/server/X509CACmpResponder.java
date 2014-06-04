@@ -1123,7 +1123,7 @@ public class X509CACmpResponder extends CmpResponder
                 else
                 {
                     PKIStatusInfo status = new PKIStatusInfo(
-                            PKIStatus.rejection, new PKIFreeText("The given certificate does not exist,"),
+                            PKIStatus.rejection, new PKIFreeText("cert not exists"),
                             new PKIFailureInfo(PKIFailureInfo.incorrectData));
                     repContentBuilder.add(status);
                     if(childAuditEvent != null)

@@ -145,10 +145,6 @@ public class AuditEvent
     public void setStatus(AuditStatus status)
     {
         this.status = status;
-        for(ChildAuditEvent cae : childAuditEvents)
-        {
-            cae.setStatus(null);
-        }
     }
 
     public void addChildAuditEvent(ChildAuditEvent childAuditEvent)
