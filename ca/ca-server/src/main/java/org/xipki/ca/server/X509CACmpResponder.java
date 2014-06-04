@@ -979,6 +979,11 @@ public class X509CACmpResponder extends CmpResponder
                     auditStatus = AuditStatus.ERROR;
                     auditMessage = "DATABASE_FAILURE";
                     break;
+                case NOT_PERMITTED:
+                    failureInfo = PKIFailureInfo.notAuthorized;
+                    auditStatus = AuditStatus.FAILED;
+                    auditMessage = "NOT_PERMITTED";
+                    break;
                 case INSUFFICIENT_PERMISSION:
                     failureInfo = PKIFailureInfo.notAuthorized;
                     auditStatus = AuditStatus.ERROR;
@@ -1148,6 +1153,11 @@ public class X509CACmpResponder extends CmpResponder
                         failureInfo = PKIFailureInfo.systemFailure;
                         auditStatus = AuditStatus.ERROR;
                         auditMessage = "DATABASE_FAILURE";
+                        break;
+                    case NOT_PERMITTED:
+                        failureInfo = PKIFailureInfo.notAuthorized;
+                        auditStatus = AuditStatus.FAILED;
+                        auditMessage = "NOT_PERMITTED";
                         break;
                     case INSUFFICIENT_PERMISSION:
                         failureInfo = PKIFailureInfo.notAuthorized;
