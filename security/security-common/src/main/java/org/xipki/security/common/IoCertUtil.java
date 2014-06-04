@@ -300,13 +300,12 @@ public class IoCertUtil
 
     public static String canonicalizeName(X500Principal name)
     {
-        X500Name rfc4519Name = X500Name.getInstance(RFC4519Style.INSTANCE, name.getEncoded());
-        return canonicalizeName(rfc4519Name);
+        return canonicalizeName(X500Name.getInstance(name.getEncoded()));
     }
 
     public static String canonicalizeName(X500Name name)
     {
-           return RFC4519Style.INSTANCE.toString(name);
+        return RFC4519Style.INSTANCE.toString(name);
     }
 
     /**
