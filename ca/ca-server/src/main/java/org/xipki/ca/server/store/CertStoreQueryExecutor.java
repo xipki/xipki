@@ -383,10 +383,17 @@ class CertStoreQueryExecutor
         if(currentRevInfo != null)
         {
             CRLReason currentReason = currentRevInfo.getReason();
-            if(currentReason == CRLReason.CERTIFICATE_HOLD || currentReason == CRLReason.SUPERSEDED)
+            if(currentReason == CRLReason.CERTIFICATE_HOLD)
             {
-                revInfo.setRevocationTime(currentRevInfo.getRevocationTime());
-                revInfo.setInvalidityTime(currentRevInfo.getInvalidityTime());
+                if(revInfo.getReason() == CRLReason.CERTIFICATE_HOLD)
+                {
+                    return certWithRevInfo;
+                }
+                else
+                {
+                    revInfo.setRevocationTime(currentRevInfo.getRevocationTime());
+                    revInfo.setInvalidityTime(currentRevInfo.getInvalidityTime());
+                }
             }
             else if(force == false)
             {
@@ -465,9 +472,9 @@ class CertStoreQueryExecutor
         CRLReason currentReason = currentRevInfo.getReason();
         if(force == false)
         {
-            if(currentReason != CRLReason.CERTIFICATE_HOLD && currentReason != CRLReason.SUPERSEDED)
+            if(currentReason != CRLReason.CERTIFICATE_HOLD)
             {
-                throw new OperationException(ErrorCode.CERT_REVOKED,
+                throw new OperationException(ErrorCode.NOT_PERMITTED,
                         "could not unrevoke certificate revoked with reason " + currentReason.getDescription());
             }
         }
