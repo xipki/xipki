@@ -213,7 +213,7 @@ public class OcspResponder
         {
             ocspMode = OCSPMode.RFC6960;
         }
-        else if("RFC6960".equalsIgnoreCase(s))
+        else if("RFC2560".equalsIgnoreCase(s))
         {
             ocspMode = OCSPMode.RFC2560;
         }
