@@ -1226,7 +1226,7 @@ public class X509CA
              */
             try
             {
-                byte[] subjectPublicKey =  publicKeyInfo.getEncoded();
+                byte[] subjectPublicKey =  publicKeyInfo.getPublicKeyData().getBytes();
                 List<Integer> certIds = certstore.getCertIdsForPublicKey(
                         this.caInfo.getCertificate(), subjectPublicKey);
 
@@ -1260,9 +1260,6 @@ public class X509CA
                         return certInfo;
                     }
                 }
-            } catch (IOException e)
-            {
-                throw new OperationException(ErrorCode.System_Failure, e.getMessage());
             } catch (SQLException e)
             {
                 throw new OperationException(ErrorCode.DATABASE_FAILURE, e.getMessage());

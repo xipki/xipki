@@ -267,7 +267,7 @@ public class ObjectIdentifiers
     public static String oidToDisplayName(ASN1ObjectIdentifier type)
     {
         String displayName = RFC4519Style.INSTANCE.oidToDisplayName(type);
-        return displayName == null ? type.getId() : displayName;
+        return type.getId() + (displayName == null ? "" : " (" + displayName + ")");
     }
 
 }
