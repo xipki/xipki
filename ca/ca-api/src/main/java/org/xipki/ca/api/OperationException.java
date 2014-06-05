@@ -23,6 +23,7 @@ public class OperationException extends Exception
     {
         UNKNOWN_CERT_PROFILE,
         CERT_REVOKED,
+        CERT_UNREVOKED,
         NOT_PERMITTED,
         UNKNOWN_CERT,
         System_Failure,
