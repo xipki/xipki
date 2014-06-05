@@ -62,7 +62,7 @@ public class RARevokeCertCommand extends ClientCommand
     protected Object doExecute()
     throws Exception
     {
-        if(certFile == null && (cacertFile == null && serialNumber == null))
+        if(certFile == null && (cacertFile == null || serialNumber == null))
         {
             System.err.println("either cert or (cacert, serialNumber) must be specified");
             return null;
