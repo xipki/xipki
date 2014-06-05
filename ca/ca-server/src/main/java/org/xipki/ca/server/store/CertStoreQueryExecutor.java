@@ -387,7 +387,8 @@ class CertStoreQueryExecutor
             {
                 if(revInfo.getReason() == CRLReason.CERTIFICATE_HOLD)
                 {
-                    return certWithRevInfo;
+                    throw new OperationException(ErrorCode.CERT_REVOKED,
+                            "certificate already issued with the requested reason " + currentReason.getDescription());
                 }
                 else
                 {
@@ -466,7 +467,8 @@ class CertStoreQueryExecutor
         CertRevocationInfo currentRevInfo = certWithRevInfo.getRevInfo();
         if(currentRevInfo == null)
         {
-            return certWithRevInfo.getCert();
+            throw new OperationException(ErrorCode.CERT_UNREVOKED,
+                    "certificate is not revoked");
         }
 
         CRLReason currentReason = currentRevInfo.getReason();

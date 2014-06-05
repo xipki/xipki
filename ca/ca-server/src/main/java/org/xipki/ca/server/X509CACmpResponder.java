@@ -1149,6 +1149,11 @@ public class X509CACmpResponder extends CmpResponder
                         auditStatus = AuditStatus.FAILED;
                         auditMessage = "CERT_REVOKED";
                         break;
+                    case CERT_UNREVOKED:
+                        failureInfo = PKIFailureInfo.notAuthorized;
+                        auditStatus = AuditStatus.FAILED;
+                        auditMessage = "CERT_UNREVOKED";
+                        break;
                     case DATABASE_FAILURE:
                         failureInfo = PKIFailureInfo.systemFailure;
                         auditStatus = AuditStatus.ERROR;
