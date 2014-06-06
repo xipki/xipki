@@ -54,12 +54,12 @@ public class CaUpdateCommand extends CaCommand
     protected List<String> crlUris;
 
     @Option(name = "-permission",
-            description = "Permission, multi options is allowed. allowed values are " + permissionsText,
+            description = "Permission, multi options is allowed. allowed values are\n" + permissionsText,
             multiValued = true)
     protected Set<String> permissions;
 
     @Option(name = "-nextSerial",
-            description = "Serial number for the next certificate, "
+            description = "Serial number for the next certificate,\n"
                     + "must be greater than the current nextSerial or 0 for random serial number")
     protected Long            nextSerial;
 
