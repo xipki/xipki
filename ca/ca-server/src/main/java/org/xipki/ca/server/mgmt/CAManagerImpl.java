@@ -1239,7 +1239,8 @@ public class CAManagerImpl implements CAManager
 
             rs.close();
 
-            rs = stmt.executeQuery("SELECT CA_NAME, REQUESTOR_NAME, RA, PERMISSIONS, PROFILES FROM CA_HAS_REQUESTOR");
+            rs = stmt.executeQuery("SELECT CA_NAME, REQUESTOR_NAME, RA, PERMISSIONS, PROFILES"
+            		+ " FROM CA_HAS_REQUESTOR");
             while(rs.next())
             {
                 String ca_name = rs.getString("CA_NAME");
@@ -1351,7 +1352,7 @@ public class CAManagerImpl implements CAManager
             ps.setString(idx++, newCaDbEntry.getCrlSignerName());
             ps.setBoolean(idx++, newCaDbEntry.isAllowDuplicateKey());
             ps.setBoolean(idx++, newCaDbEntry.isAllowDuplicateSubject());
-            ps.setString(idx++, toString(newCaDbEntry.getPermissions()));
+            ps.setString(idx++, Permission.toString(newCaDbEntry.getPermissions()));
             ps.setInt(idx++, newCaDbEntry.getNumCrls());
 
             ps.executeUpdate();
@@ -1576,7 +1577,7 @@ public class CAManagerImpl implements CAManager
 
             if(iPermissions != null)
             {
-                ps.setString(iPermissions, toString(permissions));
+                ps.setString(iPermissions, Permission.toString(permissions));
             }
 
             if(iNum_crls != null)
@@ -1927,7 +1928,7 @@ public class CAManagerImpl implements CAManager
             ps.setString(idx++, caName);
             ps.setString(idx++, requestorName);
             ps.setBoolean(idx++, requestor.isRa());
-            ps.setString(idx++, toString(requestor.getPermissions()));
+            ps.setString(idx++, Permission.toString(requestor.getPermissions()));
 
             Set<String> profiles = requestor.getProfiles();
             ps.setString(idx++, toString(profiles, ","));
@@ -2825,22 +2826,6 @@ public class CAManagerImpl implements CAManager
             ret.add(st.nextToken());
         }
         return ret;
-    }
-
-    private static String toString(Set<Permission> permissions)
-    {
-        if(permissions == null || permissions.isEmpty())
-        {
-            return null;
-        }
-
-        StringBuilder sb = new StringBuilder();
-        for(Permission p : permissions)
-        {
-            sb.append(",");
-            sb.append(p.getPermission());
-        }
-        return sb.substring(1); // remove the leading ",".
     }
 
     private static String toString(Set<String> tokens, String seperator)

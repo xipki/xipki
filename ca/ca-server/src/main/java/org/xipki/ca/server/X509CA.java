@@ -649,8 +649,9 @@ public class X509CA
             Extensions extensions)
     throws OperationException
     {
+    	final String subjectText = IoCertUtil.canonicalizeName(subject);
         LOG.info("START generateCertificate: CA={}, profile={}, origProfile={}, subject={}",
-                new Object[]{caInfo.getName(), certProfileName, origCertProfile, subject});
+                new Object[]{caInfo.getName(), certProfileName, origCertProfile, subjectText});
 
         boolean successfull = false;
 
@@ -682,7 +683,7 @@ public class X509CA
             if(successfull == false)
             {
                 LOG.warn("FAILED generateCertificate: CA={}, profile={}, origProfile={}, subject={}",
-                        new Object[]{caInfo.getName(), certProfileName, origCertProfile, subject});
+                        new Object[]{caInfo.getName(), certProfileName, origCertProfile, subjectText});
             }
         }
     }
@@ -698,8 +699,9 @@ public class X509CA
             Extensions extensions)
     throws OperationException
     {
+    	final String subjectText = IoCertUtil.canonicalizeName(subject);
         LOG.info("START regenerateCertificate: CA={}, profile={}, origProfile={}, subject={}",
-                new Object[]{caInfo.getName(), certProfileName, origCertProfile, subject});
+                new Object[]{caInfo.getName(), certProfileName, origCertProfile, subjectText});
 
         boolean successfull = false;
 
@@ -724,7 +726,7 @@ public class X509CA
             if(successfull == false)
             {
                 LOG.warn("FAILED regenerateCertificate: CA={}, profile={}, origProfile={}, subject={}",
-                        new Object[]{caInfo.getName(), certProfileName, origCertProfile, subject});
+                        new Object[]{caInfo.getName(), certProfileName, origCertProfile, subjectText});
             }
         }
     }

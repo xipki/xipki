@@ -251,6 +251,7 @@ public class CAEntry
         sb.append("crlsigner_name: ").append(crlSignerName).append('\n');
         sb.append("allowDuplicateKey: ").append(allowDuplicateKey).append('\n');
         sb.append("allowDuplicateSubject: ").append(allowDuplicateSubject);
+        sb.append("permissions: ").append(Permission.toString(permissions));
 
         return sb.toString();
     }

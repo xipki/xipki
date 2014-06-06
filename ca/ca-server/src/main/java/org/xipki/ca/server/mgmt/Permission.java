@@ -17,6 +17,8 @@
 
 package org.xipki.ca.server.mgmt;
 
+import java.util.Set;
+
 public enum Permission
 {
     ENROLL_CERT ("enroll"),
@@ -52,4 +54,22 @@ public enum Permission
 
         return null;
     }
+    
+
+    public static String toString(Set<Permission> permissions)
+    {
+        if(permissions == null || permissions.isEmpty())
+        {
+            return null;
+        }
+
+        StringBuilder sb = new StringBuilder();
+        for(Permission p : permissions)
+        {
+            sb.append(",");
+            sb.append(p.getPermission());
+        }
+        return sb.substring(1); // remove the leading ",".
+    }
+
 }
