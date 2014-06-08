@@ -79,6 +79,7 @@ import org.bouncycastle.cert.cmp.GeneralPKIMessage;
 import org.bouncycastle.cert.crmf.CRMFException;
 import org.bouncycastle.cert.crmf.CertificateRequestMessage;
 import org.bouncycastle.operator.ContentVerifierProvider;
+import org.bouncycastle.util.encoders.Hex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.audit.api.AuditEvent;
@@ -113,13 +114,6 @@ public class X509CACmpResponder extends CmpResponder
     private final PendingCertificatePool pendingCertPool;
 
     private final X509CA ca;
-
-    private static final String[] crlreasonString =
-    {
-        "unspecified", "keyCompromise", "cACompromise", "affiliationChanged",
-        "superseded", "cessationOfOperation", "certificateHold", "unknown",
-        "removeFromCRL", "privilegeWithdrawn", "aACompromise"
-    };
 
     public X509CACmpResponder(X509CA ca, ConcurrentContentSigner responder, SecurityFactory securityFactory)
     {
@@ -977,7 +971,7 @@ public class X509CACmpResponder extends CmpResponder
                 if(childAuditEvent != null)
                 {
                     childAuditEvent.addEventData(new AuditEventData("reason",
-                            reason == null ? Integer.toString(reasonCode) : crlreasonString[reasonCode]));
+                            reason == null ? Integer.toString(reasonCode) : reason.getDescription()));
                 }
 
                 extId = X509Extension.invalidityDate;
@@ -1005,19 +999,19 @@ public class X509CACmpResponder extends CmpResponder
 
             try
             {
+            	BigInteger snBigInt = serialNumber.getPositiveValue();
                 Object returnedObj = null;
                 if(Permission.UNREVOKE_CERT == permission)
                 {
-                    returnedObj = ca.unrevokeCertificate(serialNumber.getPositiveValue());
+                    returnedObj = ca.unrevokeCertificate(snBigInt);
                 }
                 else if(Permission.REMOVE_CERT == permission)
                 {
-                    returnedObj = ca.removeCertificate(serialNumber.getPositiveValue());
+                    returnedObj = ca.removeCertificate(snBigInt);
                 }
                 else
                 {
-                    returnedObj = ca.revokeCertificate(
-                            serialNumber.getPositiveValue(), reason, invalidityDate);
+                    returnedObj = ca.revokeCertificate(snBigInt, reason, invalidityDate);
                 }
 
                 if(returnedObj != null)
@@ -1111,9 +1105,7 @@ public class X509CACmpResponder extends CmpResponder
         return new PKIBody(PKIBody.TYPE_REVOCATION_REP, repContentBuilder.build());
     }
 
-    private PKIBody confirmCertificates(
-            ASN1OctetString transactionId,
-            CertConfirmContent certConf)
+    private PKIBody confirmCertificates(ASN1OctetString transactionId, CertConfirmContent certConf)
     {
         CertStatus[] certStatuses = certConf.toCertStatusArray();
 
@@ -1126,8 +1118,8 @@ public class X509CACmpResponder extends CmpResponder
                     transactionId.getOctets(), certReqId.getPositiveValue(), certHash);
             if(certInfo == null)
             {
-                LOG.warn("no cert under transactionId={}, certReqId={} and certHash={}",
-                        new Object[]{transactionId, certReqId, certStatus.getCertHash()});
+                LOG.warn("no cert under transactionId={}, certReqId={} and certHash=0X{}",
+                        new Object[]{transactionId, certReqId.getPositiveValue(), Hex.toHexString(certHash)});
                 continue;
             }
 
@@ -1154,9 +1146,7 @@ public class X509CACmpResponder extends CmpResponder
                 BigInteger serialNumber = certInfo.getCert().getCert().getSerialNumber();
                 try
                 {
-                    ca.revokeCertificate(
-                            serialNumber,
-                            CRLReason.CESSATION_OF_OPERATION, new Date());
+                    ca.revokeCertificate(serialNumber, CRLReason.CESSATION_OF_OPERATION, new Date());
                 } catch (OperationException e)
                 {
                     LOG.warn("Could not revoke certificate ca={}, serialNumber={}", ca.getCAInfo().getName(), serialNumber);
@@ -1179,18 +1169,15 @@ public class X509CACmpResponder extends CmpResponder
         else
         {
             ErrorMsgContent emc = new ErrorMsgContent(
-                    new PKIStatusInfo(PKIStatus.rejection,
-                            null,
-                            new PKIFailureInfo(PKIFailureInfo.systemFailure)));
-
+                    new PKIStatusInfo(PKIStatus.rejection, null, new PKIFailureInfo(PKIFailureInfo.systemFailure)));
+            
             return new PKIBody(PKIBody.TYPE_ERROR, emc);
         }
     }
 
     private boolean publishPendingCertificates(ASN1OctetString transactionId)
     {
-        Set<CertificateInfo> remainingCerts = pendingCertPool.removeCertificates(
-                transactionId.getOctets());
+        Set<CertificateInfo> remainingCerts = pendingCertPool.removeCertificates(transactionId.getOctets());
 
         boolean successfull = true;
         if(remainingCerts != null && remainingCerts.isEmpty() == false)
@@ -1219,8 +1206,7 @@ public class X509CACmpResponder extends CmpResponder
             {
                 try
                 {
-                    ca.revokeCertificate(
-                        remainingCert.getCert().getCert().getSerialNumber(),
+                    ca.revokeCertificate(remainingCert.getCert().getCert().getSerialNumber(),
                         CRLReason.CESSATION_OF_OPERATION, invalidityDate);
                 }catch(OperationException e)
                 {
@@ -1288,8 +1274,7 @@ public class X509CACmpResponder extends CmpResponder
                 {
                     try
                     {
-                        ca.revokeCertificate(
-                            remainingCert.getCert().getCert().getSerialNumber(),
+                        ca.revokeCertificate(remainingCert.getCert().getCert().getSerialNumber(),
                             CRLReason.CESSATION_OF_OPERATION, invalidityDate);
                     }catch(Throwable t)
                     {

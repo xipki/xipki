@@ -263,7 +263,7 @@ abstract class CALoadTest extends AbstractLoadTest
         @Override
         public void run()
         {
-            while(stop() == false && getErrorAccout() < 10)
+            while(stop() == false && getErrorAccout() < 1)
             {
                 CertRequest certReq = nextCertRequest();
                 if(certReq != null)

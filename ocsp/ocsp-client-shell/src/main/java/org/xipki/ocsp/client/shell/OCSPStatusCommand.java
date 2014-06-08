@@ -67,7 +67,7 @@ public class OCSPStatusCommand extends OsgiCommandSupport
 
     @Option(name = "-cacert",
             required = true, description = "Required. CA certificate file")
-    protected String            cacertFile;
+    protected String            caCertFile;
 
     @Option(name = "-serial",
             description = "Serial number")
@@ -148,7 +148,7 @@ public class OCSPStatusCommand extends OsgiCommandSupport
             throw new Exception("Unsupported hash algorithm " + hashAlgo);
         }
 
-        X509Certificate caCert = IoCertUtil.parseCert(cacertFile);
+        X509Certificate caCert = IoCertUtil.parseCert(caCertFile);
 
         byte[] encodedCert = null;
         BigInteger sn;

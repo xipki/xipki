@@ -23,8 +23,6 @@ import java.security.cert.X509Certificate;
 import org.apache.felix.gogo.commands.Command;
 import org.apache.felix.gogo.commands.Option;
 import org.bouncycastle.asn1.x500.X500Name;
-import org.xipki.ca.client.api.RAWorker;
-import org.xipki.ca.cmp.CmpUtil;
 import org.xipki.ca.common.CertIDOrError;
 import org.xipki.ca.common.PKIStatusInfo;
 import org.xipki.security.common.IoCertUtil;
@@ -38,21 +36,19 @@ public class RARemoveCertCommand extends ClientCommand
 
     @Option(name = "-cacert",
             description = "CA Certificate file")
-    protected String            cacertFile;
+    protected String            caCertFile;
 
     @Option(name = "-serial",
             description = "Serial number")
     protected String            serialNumber;
 
-    private RAWorker             raWorker;
-
     @Override
     protected Object doExecute()
     throws Exception
     {
-        if(certFile == null && (cacertFile == null || serialNumber == null))
+        if(certFile == null && (caCertFile == null || serialNumber == null))
         {
-            System.err.println("either cert or (cacert, serialNumber) must be specified");
+            System.err.println("either cert or (cacert, serial) must be specified");
             return null;
         }
 
@@ -64,26 +60,21 @@ public class RARemoveCertCommand extends ClientCommand
         }
         else
         {
-            X509Certificate cacert = IoCertUtil.parseCert(cacertFile);
-            X500Name issuer = X500Name.getInstance(cacert.getSubjectX500Principal().getEncoded());
+            X509Certificate caCert = IoCertUtil.parseCert(caCertFile);
+            X500Name issuer = X500Name.getInstance(caCert.getSubjectX500Principal().getEncoded());
             certIdOrError = raWorker.removeCert(issuer, new BigInteger(serialNumber));
         }
 
         if(certIdOrError.getError() != null)
         {
             PKIStatusInfo error = certIdOrError.getError();
-            System.err.println("Removing certificate failed: " + CmpUtil.formatPKIStatusInfo(error));
+            System.err.println("Removing certificate failed: " + error);
         }
         else
         {
             System.out.println("Removed certificate");
         }
         return null;
-    }
-
-    public void setRaWorker(RAWorker raWorker)
-    {
-        this.raWorker = raWorker;
     }
 
 }

@@ -39,8 +39,7 @@ public class ExtensionOccurrence
         }
     }
 
-    private ExtensionOccurrence(boolean critical,
-            boolean required)
+    private ExtensionOccurrence(boolean critical, boolean required)
     {
         this.critical = critical;
         this.required = required;

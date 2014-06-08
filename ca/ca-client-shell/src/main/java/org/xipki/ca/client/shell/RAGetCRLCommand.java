@@ -23,7 +23,6 @@ import java.util.Set;
 
 import org.apache.felix.gogo.commands.Command;
 import org.apache.felix.gogo.commands.Option;
-import org.xipki.ca.client.api.RAWorker;
 import org.xipki.security.common.IoCertUtil;
 
 @Command(scope = "caclient", name = "getcrl", description="Download CRL")
@@ -38,8 +37,6 @@ public class RAGetCRLCommand extends ClientCommand
             description = "Required. Where to save the CRL",
             required = true)
     protected String            outFile;
-
-    private RAWorker             raWorker;
 
     @Override
     protected Object doExecute()
@@ -66,7 +63,7 @@ public class RAGetCRLCommand extends ClientCommand
             }
             else
             {
-                System.err.println("caName, one of " + caNames + ", is required");
+                System.err.println("no caname is specified, one of " + caNames + ", is required");
             }
         }
 
@@ -79,11 +76,6 @@ public class RAGetCRLCommand extends ClientCommand
 
         IoCertUtil.save(new File(outFile), crl.getEncoded());
         return null;
-    }
-
-    public void setRaWorker(RAWorker raWorker)
-    {
-        this.raWorker = raWorker;
     }
 
 }

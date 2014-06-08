@@ -30,7 +30,7 @@ public interface OCSPRequestor
     public static final ASN1ObjectIdentifier id_pkix_ocsp_prefSigAlgs = OCSPObjectIdentifiers.id_pkix_ocsp.branch("8");
     public static final ASN1ObjectIdentifier id_pkix_ocsp_extendedRevoke = OCSPObjectIdentifiers.id_pkix_ocsp.branch("9");
 
-    BasicOCSPResp ask(X509Certificate cacert, X509Certificate cert,
+    BasicOCSPResp ask(X509Certificate caCert, X509Certificate cert,
             URL responderUrl, RequestOptions requestOptions)
     throws OCSPRequestorException;
 

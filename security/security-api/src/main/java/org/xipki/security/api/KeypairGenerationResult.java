@@ -23,8 +23,7 @@ public abstract class KeypairGenerationResult
 {
     private final X509CertificateHolder certificate;
 
-    protected KeypairGenerationResult(
-            X509CertificateHolder certificate)
+    protected KeypairGenerationResult(X509CertificateHolder certificate)
     {
         this.certificate = certificate;
     }

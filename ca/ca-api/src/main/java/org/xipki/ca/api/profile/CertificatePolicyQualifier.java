@@ -17,6 +17,8 @@
 
 package org.xipki.ca.api.profile;
 
+import org.xipki.security.common.ParamChecker;
+
 public class CertificatePolicyQualifier
 {
     private final String cpsUri;
@@ -30,21 +32,13 @@ public class CertificatePolicyQualifier
 
     public static CertificatePolicyQualifier getInstanceForUserNotice(String userNotice)
     {
-        if(userNotice == null || userNotice.isEmpty())
-        {
-            throw new IllegalArgumentException("userNotice is empty");
-        }
-
+    	ParamChecker.assertNotEmpty("userNotice", userNotice);
         return new CertificatePolicyQualifier(null, userNotice);
     }
 
     public static CertificatePolicyQualifier getInstanceForCpsUri(String cpsUri)
     {
-        if(cpsUri == null || cpsUri.isEmpty())
-        {
-            throw new IllegalArgumentException("cpsUri is empty");
-        }
-
+    	ParamChecker.assertNotEmpty("cpsUri", cpsUri);
         return new CertificatePolicyQualifier(cpsUri, null);
     }
 

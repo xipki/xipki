@@ -253,8 +253,7 @@ public class RequestOptions
         }
         else
         {
-            throw new RuntimeException(
-                    "Unknown digest algorithm " + digestAlgOID);
+            throw new RuntimeException("Unknown digest algorithm " + digestAlgOID);
         }
 
         AlgorithmIdentifier digAlgId = new AlgorithmIdentifier(digestAlgOID, DERNull.INSTANCE);

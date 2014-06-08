@@ -30,6 +30,10 @@ public class CaListCommand extends CaCommand
             description = "CA name",
             required = false)
     protected String           caName;
+    
+    @Option(name = "-v", aliases="--verbose",
+            required = false, description = "Show CA information verbosely")
+    protected Boolean          verbose;
 
     @Override
     protected Object doExecute()
@@ -63,7 +67,7 @@ public class CaListCommand extends CaCommand
             }
             else
             {
-                sb.append(entry);
+                sb.append(entry.toString(verbose == null ? false : verbose.booleanValue()));
             }
         }
 

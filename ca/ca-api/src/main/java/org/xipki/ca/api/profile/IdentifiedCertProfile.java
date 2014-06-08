@@ -52,10 +52,10 @@ public class IdentifiedCertProfile extends CertProfile
     }
 
     @Override
-    public void setEnvironmentParamterResolver(
-            EnvironmentParameterResolver paramterResolver)
+    public void setEnvironmentParameterResolver(
+            EnvironmentParameterResolver parameterResolver)
     {
-        certProfile.setEnvironmentParamterResolver(paramterResolver);
+        certProfile.setEnvironmentParameterResolver(parameterResolver);
     }
 
     @Override

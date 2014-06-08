@@ -35,22 +35,22 @@ public interface CAManager
 
     boolean unlockCA();
 
-    void publishRootCA(String caname, String certprofile)
+    void publishRootCA(String caName, String certprofile)
     throws CAMgmtException;
 
-    boolean republishCertificates(String caname, String publisherName)
+    boolean republishCertificates(String caName, String publisherName)
     throws CAMgmtException;
 
-    void removeCA(String caname)
+    void removeCA(String caName)
     throws CAMgmtException;
 
     boolean restartCaSystem();
 
     EnvironmentParameterResolver getEnvParameterResolver();
 
-    X509CA getX509CA(String caname);
+    X509CA getX509CA(String caName);
 
-    X509CACmpResponder getX509CACmpResponder(String caname);
+    X509CACmpResponder getX509CACmpResponder(String caName);
 
     void addCaAlias(String aliasName, String caName)
     throws CAMgmtException;

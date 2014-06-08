@@ -83,9 +83,9 @@ import org.xipki.security.common.ParamChecker;
 
 public class CAManagerImpl implements CAManager
 {
-    public static final String ENVIRONMENT_NAME_LOCK = "lock";
-
     private static final Logger LOG = LoggerFactory.getLogger(CAManagerImpl.class);
+
+    private static final String ENVIRONMENT_NAME_LOCK = "lock";
 
     private final CertificateFactory certFact;
 
@@ -193,7 +193,7 @@ public class CAManagerImpl implements CAManager
                 caConfProps.load(new FileInputStream(caConfFile));
             } catch (IOException e)
             {
-                throw new CAMgmtException("IOException while paring ca configuration" + caConfFile, e);
+                throw new CAMgmtException("IOException while parsing ca configuration" + caConfFile, e);
             }
 
             this.dataSources = new ConcurrentHashMap<String, DataSource>();
@@ -256,14 +256,14 @@ public class CAManagerImpl implements CAManager
         }
 
         Statement stmt = null;
+        ResultSet rs =null;
         try
         {
             stmt = createStatement();
             String sql = "SELECT VALUE FROM ENVIRONMENT WHERE NAME='" + ENVIRONMENT_NAME_LOCK + "'";
-            ResultSet rs = stmt.executeQuery(sql);
+            rs = stmt.executeQuery(sql);
 
             boolean alreadyLocked = false;
-
             String lockSql = null;
             if(rs.next())
             {
@@ -275,8 +275,6 @@ public class CAManagerImpl implements CAManager
             {
                 lockSql = "INSERT INTO ENVIRONMENT (NAME, VALUE) VALUES ('" + ENVIRONMENT_NAME_LOCK + "', '1')";
             }
-            rs.close();
-            rs = null;
 
             if(alreadyLocked)
             {
@@ -293,7 +291,7 @@ public class CAManagerImpl implements CAManager
             return false;
         }finally
         {
-            closeStatement(stmt);
+        	dataSource.releaseResources(stmt, rs);
         }
     }
 
@@ -308,6 +306,7 @@ public class CAManagerImpl implements CAManager
     private boolean do_unlockCA()
     {
         Statement stmt = null;
+        ResultSet rs =null;
         try
         {
             try
@@ -320,7 +319,7 @@ public class CAManagerImpl implements CAManager
                 return false;
             }
             String sql = "SELECT VALUE FROM ENVIRONMENT WHERE NAME='" + ENVIRONMENT_NAME_LOCK + "'";
-            ResultSet rs = stmt.executeQuery(sql);
+            rs = stmt.executeQuery(sql);
 
             boolean alreadyLocked = false;
 
@@ -335,8 +334,6 @@ public class CAManagerImpl implements CAManager
             {
                 lockSql = "INSERT INTO ENVIRONMENT (NAME, VALUE) VALUES ('" + ENVIRONMENT_NAME_LOCK + "', '0')";
             }
-            rs.close();
-            rs = null;
 
             if(alreadyLocked == false)
             {
@@ -361,7 +358,7 @@ public class CAManagerImpl implements CAManager
             return false;
         }finally
         {
-            closeStatement(stmt);
+        	dataSource.releaseResources(stmt, rs);
         }
     }
 
@@ -403,7 +400,6 @@ public class CAManagerImpl implements CAManager
     public boolean restartCaSystem()
     {
         reset();
-
         boolean caSystemStarted = do_startCaSystem();
 
         if(caSystemStarted)
@@ -418,7 +414,6 @@ public class CAManagerImpl implements CAManager
         }
 
         auditLogPCIEvent(caSystemStarted, "RESTART");
-
         return caSystemStarted;
     }
 
@@ -447,7 +442,6 @@ public class CAManagerImpl implements CAManager
         }
 
         LOG.info("Starting CA system");
-
         try
         {
             init();
@@ -551,7 +545,7 @@ public class CAManagerImpl implements CAManager
                     return false;
                 }
                 crlSigner.setIncludeCertsInCrl(crlSignerEntry.includeCertsInCRL());
-                crlSigner.setIncluedExpiredCerts(crlSignerEntry.includeExpiredCerts());
+                crlSigner.setIncludeExpiredCerts(crlSignerEntry.includeExpiredCerts());
             }
 
             ConcurrentContentSigner caSigner;
@@ -638,11 +632,8 @@ public class CAManagerImpl implements CAManager
         }
 
         scheduledThreadPoolExecutor = new ScheduledThreadPoolExecutor(10);
-
         caSystemSetuped = true;
-
         StringBuilder sb = new StringBuilder();
-
         sb.append("Started CA system");
         Set<String> names = new HashSet<String>(getCANames());
 
@@ -707,15 +698,15 @@ public class CAManagerImpl implements CAManager
     }
 
     @Override
-    public X509CA getX509CA(String caname)
+    public X509CA getX509CA(String caName)
     {
-        return x509cas.get(caname);
+        return x509cas.get(caName);
     }
 
     @Override
-    public X509CACmpResponder getX509CACmpResponder(String caname)
+    public X509CACmpResponder getX509CACmpResponder(String caName)
     {
-        return responders.get(caname);
+        return responders.get(caName);
     }
 
     public ScheduledThreadPoolExecutor getScheduledThreadPoolExecutor()
@@ -756,73 +747,72 @@ public class CAManagerImpl implements CAManager
     private void initRequestors()
     throws CAMgmtException
     {
-        if(requestorsInitialized) return;
+        if(requestorsInitialized)
+        {
+        	return;
+        }
 
         requestors.clear();
-
         Statement stmt = null;
+        ResultSet rs = null;
+        
         try
         {
             stmt = createStatement();
-            ResultSet rs = stmt.executeQuery(
-                    "SELECT NAME, CERT FROM REQUESTOR");
+            rs = stmt.executeQuery("SELECT NAME, CERT FROM REQUESTOR");
 
-            try
+            while(rs.next())
             {
-                while(rs.next())
-                {
-                    String name = rs.getString("NAME");
-                    String b64Cert = rs.getString("CERT");
-                    X509Certificate cert = generateCert(b64Cert);
-                    CmpRequestorEntry entry = new CmpRequestorEntry(name);
-                    entry.setCert(cert);
-                    requestors.put(entry.getName(), entry);
-                }
-            }finally
-            {
-                rs.close();
-                rs = null;
+                String name = rs.getString("NAME");
+                String b64Cert = rs.getString("CERT");
+                X509Certificate cert = generateCert(b64Cert);
+                CmpRequestorEntry entry = new CmpRequestorEntry(name);
+                entry.setCert(cert);
+                requestors.put(entry.getName(), entry);
             }
         }catch(SQLException e)
         {
             throw new CAMgmtException(e);
         }finally
         {
-            closeStatement(stmt);
+        	dataSource.releaseResources(stmt, rs);
         }
 
         requestorsInitialized = true;
     }
 
-    private void initResponder()
+	private void initResponder()
     throws CAMgmtException
     {
         if(responderInitialized) return;
 
         this.responder = null;
-
         Statement stmt = null;
+        ResultSet rs = null;
+        
         try
         {
             stmt = createStatement();
-            ResultSet sqlResult = stmt.executeQuery("SELECT TYPE, CONF, CERT FROM RESPONDER");
+            rs = stmt.executeQuery("SELECT TYPE, CONF, CERT FROM RESPONDER");
 
-            while(sqlResult.next())
+            String errorMsg = null;
+            while(rs.next())
             {
                 if(this.responder != null)
                 {
-                    throw new CAMgmtException("More than one CMPResponder is configured, but maximal one is allowed");
+                    errorMsg = "More than one CMPResponder is configured, but maximal one is allowed";
+                    break;
                 }
 
                 CmpResponderEntry entry = new CmpResponderEntry();
 
-                String type = sqlResult.getString("TYPE");
+                String type = rs.getString("TYPE");
                 entry.setType(type);
 
-                String conf = sqlResult.getString("CONF");
+                String conf = rs.getString("CONF");
                 entry.setConf(conf);
 
-                String b64Cert = sqlResult.getString("CERT");
+                String b64Cert = rs.getString("CERT");
                 if(b64Cert != null)
                 {
                     X509Certificate cert = generateCert(b64Cert);
@@ -831,12 +821,18 @@ public class CAManagerImpl implements CAManager
 
                 this.responder = entry;
             }
+            
+            if(errorMsg != null)
+            {
+            	throw new CAMgmtException(errorMsg);
+            }
+            
         }catch(SQLException e)
         {
             throw new CAMgmtException(e);
         }finally
         {
-            closeStatement(stmt);
+        	dataSource.releaseResources(stmt, rs);
         }
 
         responderInitialized = true;
@@ -868,11 +864,13 @@ public class CAManagerImpl implements CAManager
         envParameterResolver.clear();
 
         Statement stmt = null;
+        ResultSet rs = null;
+        
         try
         {
             stmt = createStatement();
             String sql = "SELECT NAME, VALUE FROM ENVIRONMENT";
-            ResultSet rs = stmt.executeQuery(sql);
+            rs = stmt.executeQuery(sql);
 
             while(rs.next())
             {
@@ -883,15 +881,12 @@ public class CAManagerImpl implements CAManager
                     envParameterResolver.addEnvParam(name, value);
                 }
             }
-
-            rs.close();
-            rs = null;
         }catch(SQLException e)
         {
             throw new CAMgmtException(e);
         }finally
         {
-            closeStatement(stmt);
+        	dataSource.releaseResources(stmt, rs);
         }
 
         environmentParametersInitialized = true;
@@ -905,11 +900,13 @@ public class CAManagerImpl implements CAManager
         caAliases.clear();
 
         Statement stmt = null;
+        ResultSet rs = null;
+
         try
         {
             stmt = createStatement();
             String sql = "SELECT NAME, CA_NAME FROM CAALIAS";
-            ResultSet rs = stmt.executeQuery(sql);
+            rs = stmt.executeQuery(sql);
 
             while(rs.next())
             {
@@ -918,15 +915,12 @@ public class CAManagerImpl implements CAManager
 
                 caAliases.put(name, caName);
             }
-
-            rs.close();
-            rs = null;
         }catch(SQLException e)
         {
             throw new CAMgmtException(e);
         }finally
         {
-            closeStatement(stmt);
+        	dataSource.releaseResources(stmt, rs);
         }
 
         caAliasesInitialized = true;
@@ -940,11 +934,13 @@ public class CAManagerImpl implements CAManager
         certProfiles.clear();
 
         Statement stmt = null;
+        ResultSet rs = null;
+
         try
         {
             stmt = createStatement();
             String sql = "SELECT NAME, TYPE, CONF FROM CERTPROFILE";
-            ResultSet rs = stmt.executeQuery(sql);
+            rs = stmt.executeQuery(sql);
 
             while(rs.next())
             {
@@ -958,15 +954,12 @@ public class CAManagerImpl implements CAManager
                 entry.setConf(conf);
                 certProfiles.put(entry.getName(), entry);
             }
-
-            rs.close();
-            rs = null;
         }catch(SQLException e)
         {
             throw new CAMgmtException(e);
         } finally
         {
-            closeStatement(stmt);
+        	dataSource.releaseResources(stmt, rs);
         }
 
         certProfilesInitialized = true;
@@ -980,12 +973,16 @@ public class CAManagerImpl implements CAManager
         publishers.clear();
 
         Statement stmt = null;
+        ResultSet rs = null;
+
         try
         {
             stmt = createStatement();
             String sql = "SELECT NAME, TYPE, CONF FROM PUBLISHER";
-            ResultSet rs = stmt.executeQuery(sql);
+            rs = stmt.executeQuery(sql);
 
+            String errorMsg = null;
+            
             while(rs.next())
             {
                 String name = rs.getString("NAME");
@@ -1008,7 +1005,8 @@ public class CAManagerImpl implements CAManager
                     ocspDataSource = dataSources.get(datasourceName);
                     if(ocspDataSource == null)
                     {
-                        throw new CAMgmtException("Cound not find datasource named '" + datasourceName + "'");
+                        errorMsg = "Cound not find datasource named '" + datasourceName + "'";
+                        break;
                     }
                 }
 
@@ -1019,15 +1017,17 @@ public class CAManagerImpl implements CAManager
                 entry.setDataSource(ocspDataSource);
                 publishers.put(entry.getName(), entry);
             }
-
-            rs.close();
-            rs = null;
+            
+            if(errorMsg != null)
+            {
+            	throw new CAMgmtException(errorMsg);
+            }
         }catch(SQLException e)
         {
             throw new CAMgmtException(e);
         }finally
         {
-            closeStatement(stmt);
+        	dataSource.releaseResources(stmt, rs);
         }
 
         publishersInitialized = true;
@@ -1041,6 +1041,8 @@ public class CAManagerImpl implements CAManager
         crlSigners.clear();
 
         Statement stmt = null;
+        ResultSet rs = null;
+
         try
         {
             stmt = createStatement();
@@ -1048,7 +1050,7 @@ public class CAManagerImpl implements CAManager
             String sql = "SELECT NAME, SIGNER_TYPE, SIGNER_CONF, SIGNER_CERT, PERIOD,"
                     + " OVERLAP, INCLUDE_CERTS_IN_CRL, INCLUDE_EXPIRED_CERTS"
                     + " FROM CRLSIGNER";
-            ResultSet rs = stmt.executeQuery(sql);
+            rs = stmt.executeQuery(sql);
 
             while(rs.next())
             {
@@ -1077,9 +1079,6 @@ public class CAManagerImpl implements CAManager
                 entry.setIncludeExpiredCerts(include_expired_certs);
                 crlSigners.put(entry.getName(), entry);
             }
-
-            rs.close();
-            rs = null;
         }catch(SQLException e)
         {
             throw new CAMgmtException(e);
@@ -1088,7 +1087,7 @@ public class CAManagerImpl implements CAManager
             throw new CAMgmtException(e);
         }finally
         {
-            closeStatement(stmt);
+        	dataSource.releaseResources(stmt, rs);
         }
 
         crlSignersInitialized = true;
@@ -1102,6 +1101,8 @@ public class CAManagerImpl implements CAManager
         cmpControl = null;
 
         Statement stmt = null;
+        ResultSet rs = null;
+
         try
         {
             stmt = createStatement();
@@ -1109,7 +1110,7 @@ public class CAManagerImpl implements CAManager
                     + " MESSAGE_TIME_BIAS, CONFIRM_WAIT_TIME"
                     + " FROM CMPCONTROL";
 
-            ResultSet rs = stmt.executeQuery(sql);
+            rs = stmt.executeQuery(sql);
 
             if(rs.next())
             {
@@ -1133,15 +1134,12 @@ public class CAManagerImpl implements CAManager
 
                 cmpControl = entry;
             }
-
-            rs.close();
-            rs = null;
         }catch(SQLException e)
         {
             throw new CAMgmtException(e);
         }finally
         {
-            closeStatement(stmt);
+        	dataSource.releaseResources(stmt, rs);
         }
 
         cmpControlInitialized = true;
@@ -1305,7 +1303,7 @@ public class CAManagerImpl implements CAManager
             throw new CAMgmtException(e);
         }finally
         {
-            closeStatement(stmt);
+            dataSource.releaseResources(stmt, null);
         }
 
         cAsInitialized = true;
@@ -1361,7 +1359,7 @@ public class CAManagerImpl implements CAManager
             throw new CAMgmtException(e);
         }finally
         {
-            closeStatement(ps);
+        	dataSource.releaseResources(ps, null);
         }
 
         cas.put(newCaDbEntry.getName(), newCaDbEntry);
@@ -1595,7 +1593,7 @@ public class CAManagerImpl implements CAManager
             throw new CAMgmtException(e);
         }finally
         {
-            closeStatement(ps);
+            dataSource.releaseResources(ps, null);
         }
     }
 
@@ -1621,7 +1619,7 @@ public class CAManagerImpl implements CAManager
             throw new CAMgmtException(e);
         }finally
         {
-            closeStatement(ps);
+            dataSource.releaseResources(ps, null);
         }
     }
 
@@ -1643,7 +1641,7 @@ public class CAManagerImpl implements CAManager
             throw new CAMgmtException(e);
         }finally
         {
-            closeStatement(ps);
+            dataSource.releaseResources(ps, null);
         }
 
         if(profileNames != null)
@@ -1683,7 +1681,7 @@ public class CAManagerImpl implements CAManager
             throw new CAMgmtException(e);
         }finally
         {
-            closeStatement(ps);
+            dataSource.releaseResources(ps, null);
         }
     }
 
@@ -1704,7 +1702,7 @@ public class CAManagerImpl implements CAManager
             throw new CAMgmtException(e);
         }finally
         {
-            closeStatement(ps);
+            dataSource.releaseResources(ps, null);
         }
 
         if(publisherNames != null)
@@ -1744,13 +1742,8 @@ public class CAManagerImpl implements CAManager
             throw new CAMgmtException(e);
         }finally
         {
-            closeStatement(ps);
+            dataSource.releaseResources(ps, null);
         }
-    }
-
-    private void closeStatement(Statement ps)
-    {
-        dataSource.releaseResources(ps, null);
     }
 
     @Override
@@ -1798,7 +1791,7 @@ public class CAManagerImpl implements CAManager
             throw new CAMgmtException(e);
         }finally
         {
-            closeStatement(ps);
+            dataSource.releaseResources(ps, null);
         }
 
         requestors.put(name, dbEntry);
@@ -1828,7 +1821,7 @@ public class CAManagerImpl implements CAManager
             throw new CAMgmtException(e);
         }finally
         {
-            closeStatement(ps);
+            dataSource.releaseResources(ps, null);
         }
 
         requestors.remove(requestorName);
@@ -1856,7 +1849,7 @@ public class CAManagerImpl implements CAManager
             throw new CAMgmtException(e);
         }finally
         {
-            closeStatement(ps);
+            dataSource.releaseResources(ps, null);
         }
     }
 
@@ -1882,7 +1875,7 @@ public class CAManagerImpl implements CAManager
             throw new CAMgmtException(e);
         }finally
         {
-            closeStatement(ps);
+            dataSource.releaseResources(ps, null);
         }
     }
 
@@ -1939,7 +1932,7 @@ public class CAManagerImpl implements CAManager
             throw new CAMgmtException(e);
         }finally
         {
-            closeStatement(ps);
+            dataSource.releaseResources(ps, null);
         }
 
     }
@@ -1970,7 +1963,7 @@ public class CAManagerImpl implements CAManager
             throw new CAMgmtException(e);
         }finally
         {
-            closeStatement(ps);
+            dataSource.releaseResources(ps, null);
         }
 
         certProfiles.remove(profileName);
@@ -2028,7 +2021,7 @@ public class CAManagerImpl implements CAManager
             throw new CAMgmtException(e);
         }finally
         {
-            closeStatement(ps);
+            dataSource.releaseResources(ps, null);
         }
     }
 
@@ -2057,7 +2050,7 @@ public class CAManagerImpl implements CAManager
             throw new CAMgmtException(e);
         }finally
         {
-            closeStatement(ps);
+            dataSource.releaseResources(ps, null);
         }
 
         dbEntry.setEnvironmentParamterResolver(envParameterResolver);
@@ -2101,7 +2094,7 @@ public class CAManagerImpl implements CAManager
             throw new CAMgmtException(e);
         }finally
         {
-            closeStatement(ps);
+            dataSource.releaseResources(ps, null);
         }
     }
 
@@ -2119,7 +2112,7 @@ public class CAManagerImpl implements CAManager
             throw new CAMgmtException(e);
         }finally
         {
-            closeStatement(stmt);
+            dataSource.releaseResources(stmt, null);
         }
 
         responder = null;
@@ -2187,7 +2180,7 @@ public class CAManagerImpl implements CAManager
             throw new CAMgmtException(e);
         }finally
         {
-            closeStatement(ps);
+            dataSource.releaseResources(ps, null);
         }
     }
 
@@ -2234,7 +2227,7 @@ public class CAManagerImpl implements CAManager
             throw new CAMgmtException(e);
         }finally
         {
-            closeStatement(ps);
+            dataSource.releaseResources(ps, null);
         }
 
         crlSigners.put(name, dbEntry);
@@ -2264,7 +2257,7 @@ public class CAManagerImpl implements CAManager
             throw new CAMgmtException(e);
         }finally
         {
-            closeStatement(ps);
+            dataSource.releaseResources(ps, null);
         }
 
         crlSigners.remove(crlSignerName);
@@ -2386,7 +2379,7 @@ public class CAManagerImpl implements CAManager
             throw new CAMgmtException(e);
         }finally
         {
-            closeStatement(ps);
+            dataSource.releaseResources(ps, null);
         }
     }
 
@@ -2430,7 +2423,7 @@ public class CAManagerImpl implements CAManager
             throw new CAMgmtException(e);
         }finally
         {
-            closeStatement(ps);
+            dataSource.releaseResources(ps, null);
         }
     }
 
@@ -2459,7 +2452,7 @@ public class CAManagerImpl implements CAManager
             throw new CAMgmtException(e);
         }finally
         {
-            closeStatement(ps);
+            dataSource.releaseResources(ps, null);
         }
 
         dbEntry.setPasswordResolver(passwordResolver);
@@ -2516,7 +2509,7 @@ public class CAManagerImpl implements CAManager
             throw new CAMgmtException(e);
         }finally
         {
-            closeStatement(ps);
+            dataSource.releaseResources(ps, null);
         }
 
         publishers.remove(publisherName);
@@ -2574,7 +2567,7 @@ public class CAManagerImpl implements CAManager
             throw new CAMgmtException(e);
         }finally
         {
-            closeStatement(ps);
+            dataSource.releaseResources(ps, null);
         }
     }
 
@@ -2616,7 +2609,7 @@ public class CAManagerImpl implements CAManager
             throw new CAMgmtException(e);
         }finally
         {
-            closeStatement(ps);
+            dataSource.releaseResources(ps, null);
         }
     }
 
@@ -2634,7 +2627,7 @@ public class CAManagerImpl implements CAManager
             throw new CAMgmtException(e);
         }finally
         {
-            closeStatement(stmt);
+            dataSource.releaseResources(stmt, null);
         }
 
         cmpControl = null;
@@ -2715,7 +2708,7 @@ public class CAManagerImpl implements CAManager
             throw new CAMgmtException(e);
         }finally
         {
-            closeStatement(ps);
+            dataSource.releaseResources(ps, null);
         }
     }
 
@@ -2746,7 +2739,7 @@ public class CAManagerImpl implements CAManager
             throw new CAMgmtException(e);
         }finally
         {
-            closeStatement(ps);
+            dataSource.releaseResources(ps, null);
         }
 
         envParameterResolver.addEnvParam(name, value);
@@ -2772,7 +2765,7 @@ public class CAManagerImpl implements CAManager
             throw new CAMgmtException(e);
         }finally
         {
-            closeStatement(ps);
+            dataSource.releaseResources(ps, null);
         }
 
         envParameterResolver.removeEnvParam(envParamName);
@@ -2813,7 +2806,7 @@ public class CAManagerImpl implements CAManager
             throw new CAMgmtException(e);
         }finally
         {
-            closeStatement(ps);
+            dataSource.releaseResources(ps, null);
         }
     }
 
@@ -2943,7 +2936,7 @@ public class CAManagerImpl implements CAManager
             throw new CAMgmtException(e);
         }finally
         {
-            closeStatement(ps);
+            dataSource.releaseResources(ps, null);
         }
 
         caAliases.put(aliasName, caName);
@@ -2964,7 +2957,7 @@ public class CAManagerImpl implements CAManager
             throw new CAMgmtException(e);
         }finally
         {
-            closeStatement(ps);
+            dataSource.releaseResources(ps, null);
         }
 
         caAliases.remove(aliasName);
@@ -2998,41 +2991,41 @@ public class CAManagerImpl implements CAManager
     }
 
     @Override
-    public void removeCA(String caname)
+    public void removeCA(String caName)
     throws CAMgmtException
     {
         PreparedStatement ps = null;
         try
         {
             ps = prepareStatement("DELETE FROM CA WHERE NAME=?");
-            ps.setString(1, caname);
+            ps.setString(1, caName);
             ps.executeUpdate();
         }catch(SQLException e)
         {
             throw new CAMgmtException(e);
         }finally
         {
-            closeStatement(ps);
+            dataSource.releaseResources(ps, null);
         }
 
-        cas.remove(caname);
+        cas.remove(caName);
     }
 
     @Override
-    public void publishRootCA(String caname, String certprofile)
+    public void publishRootCA(String caName, String certprofile)
     throws CAMgmtException
     {
-        X509CA ca = x509cas.get(caname);
+        X509CA ca = x509cas.get(caName);
         if(ca == null)
         {
-            throw new CAMgmtException("Cannot find CA named " + caname);
+            throw new CAMgmtException("Cannot find CA named " + caName);
         }
 
         X509CertificateWithMetaInfo certInfo = ca.getCAInfo().getCertificate();
         if(certInfo.getCert().getSubjectX500Principal().equals(
                 certInfo.getCert().getIssuerX500Principal()) == false)
         {
-            throw new CAMgmtException("CA named " + caname + " is not a self-signed CA");
+            throw new CAMgmtException("CA named " + caName + " is not a self-signed CA");
         }
 
         byte[] encodedSubjectPublicKey = certInfo.getCert().getPublicKey().getEncoded();
@@ -3100,13 +3093,13 @@ public class CAManagerImpl implements CAManager
     }
 
     @Override
-    public boolean republishCertificates(String caname, String publisherName)
+    public boolean republishCertificates(String caName, String publisherName)
     throws CAMgmtException
     {
-        X509CA ca = x509cas.get(caname);
+        X509CA ca = x509cas.get(caName);
         if(ca == null)
         {
-            throw new CAMgmtException("Cannot find CA named " + caname);
+            throw new CAMgmtException("Cannot find CA named " + caName);
         }
 
         return ca.republishCertificates(publisherName);
@@ -3170,7 +3163,7 @@ public class CAManagerImpl implements CAManager
             throw new CAMgmtException(e);
         }finally
         {
-            closeStatement(ps);
+            dataSource.releaseResources(ps, null);
         }
 
         try
@@ -3214,7 +3207,7 @@ public class CAManagerImpl implements CAManager
             throw new CAMgmtException(e);
         }finally
         {
-            closeStatement(ps);
+            dataSource.releaseResources(ps, null);
         }
 
         X509CA ca = x509cas.get(caName);

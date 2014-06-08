@@ -437,13 +437,13 @@ public class OcspResponder
             else if(storeConf.getCrlStore() != null)
             {
                 CrlStoreType crlStoreConf = storeConf.getCrlStore();
-                String cacertFile = crlStoreConf.getCaCertFile();
-                String issuercertFile = crlStoreConf.getIssuerCertFile();
+                String caCertFile = crlStoreConf.getCaCertFile();
+                String issuerCertFile = crlStoreConf.getIssuerCertFile();
                 String crlUrl = crlStoreConf.getCrlUrl();
                 String crlFile = crlStoreConf.getCrlFile();
 
-                X509Certificate caCert = parseCert(cacertFile);
-                X509Certificate crlIssuerCert = issuercertFile == null ? null : parseCert(issuercertFile);
+                X509Certificate caCert = parseCert(caCertFile);
+                X509Certificate crlIssuerCert = issuerCertFile == null ? null : parseCert(issuerCertFile);
 
                 CrlCertStatusStore crlStore = new CrlCertStatusStore(crlFile, caCert, crlIssuerCert, crlUrl);
                 store = crlStore;

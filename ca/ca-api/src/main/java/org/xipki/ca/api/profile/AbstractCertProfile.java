@@ -92,7 +92,7 @@ extends CertProfile implements SubjectDNSubset
 
         List<ASN1ObjectIdentifier> _backwardDNs = new ArrayList<ASN1ObjectIdentifier>(25);
         int size = _forwardDNs.size();
-        for(int i = size-1; i >= 0; i--)
+        for(int i = size - 1; i >= 0; i--)
         {
             _backwardDNs.add(_forwardDNs.get(i));
         }
@@ -144,11 +144,8 @@ extends CertProfile implements SubjectDNSubset
         checkSubjectContent(requestedSubject);
 
         RDN[] requstedRDNs = requestedSubject.getRDNs();
-
         List<RDNOccurrence> occurences = getSubjectDNSubset();
-
         List<RDN> rdns = new LinkedList<RDN>();
-
         List<ASN1ObjectIdentifier> types = backwardsSubject() ? backwardDNs : forwardDNs;
 
         for(ASN1ObjectIdentifier type : types)
@@ -226,22 +223,14 @@ extends CertProfile implements SubjectDNSubset
             }
         }
 
-        if(ret.isEmpty())
-        {
-            return null;
-        }
-        else
-        {
-            return ret.toArray(new RDN[0]);
-        }
+        return ret.isEmpty() ? null : ret.toArray(new RDN[0]);
     }
 
-    protected EnvironmentParameterResolver paramterResolver;
+    protected EnvironmentParameterResolver parameterResolver;
     @Override
-    public void setEnvironmentParamterResolver(
-            EnvironmentParameterResolver paramterResolver)
+    public void setEnvironmentParameterResolver(EnvironmentParameterResolver parameterResolver)
     {
-        this.paramterResolver = paramterResolver;
+        this.parameterResolver = parameterResolver;
     }
 
     @Override
@@ -256,12 +245,11 @@ extends CertProfile implements SubjectDNSubset
 
         // BasicConstraints
         ASN1ObjectIdentifier extensionType = Extension.basicConstraints;
-
         ExtensionOccurrence occurence = occurences.remove(extensionType);
         if(occurence != null)
         {
             BasicConstraints value = X509Util.createBasicConstraints(isCa(), getPathLenBasicConstraint());
-            ExtensionTuple extension = createExtension(Extension.basicConstraints, occurence.isCritical(), value);
+            ExtensionTuple extension = createExtension(extensionType, occurence.isCritical(), value);
             checkAndAddExtension(extensionType, occurence, extension, tuples);
         }
 
@@ -271,7 +259,7 @@ extends CertProfile implements SubjectDNSubset
         if(occurence != null)
         {
             org.bouncycastle.asn1.x509.KeyUsage value = X509Util.createKeyUsage(getKeyUsage());
-            ExtensionTuple extension = createExtension(Extension.keyUsage, occurence.isCritical(), value);
+            ExtensionTuple extension = createExtension(extensionType, occurence.isCritical(), value);
             checkAndAddExtension(extensionType, occurence, extension, tuples);
         }
 
@@ -281,7 +269,7 @@ extends CertProfile implements SubjectDNSubset
         if(occurence != null)
         {
             ExtendedKeyUsage value = X509Util.createExtendedUsage(getExtendedKeyUsages());
-            ExtensionTuple extension = createExtension(Extension.extendedKeyUsage, occurence.isCritical(), value);
+            ExtensionTuple extension = createExtension(extensionType, occurence.isCritical(), value);
             checkAndAddExtension(extensionType, occurence, extension, tuples);
         }
 
@@ -434,9 +422,7 @@ extends CertProfile implements SubjectDNSubset
             dnValue = new DERUTF8String(text);
         }
 
-        RDN rdn = new RDN(type, dnValue);
-
-        return rdn;
+        return new RDN(type, dnValue);
     }
 
     protected static String oidToDisplayName(ASN1ObjectIdentifier type)

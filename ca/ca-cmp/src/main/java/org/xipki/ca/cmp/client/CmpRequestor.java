@@ -72,16 +72,14 @@ public abstract class CmpRequestor
     protected final SecurityFactory securityFactory;
     protected boolean signRequest;
 
-    public CmpRequestor(
-            ConcurrentContentSigner requestor,
+    public CmpRequestor(ConcurrentContentSigner requestor,
             X509Certificate responderCert,
             SecurityFactory securityFactory)
     {
         this(requestor,responderCert, securityFactory, true);
     }
 
-    public CmpRequestor(
-            ConcurrentContentSigner requestor,
+    public CmpRequestor(ConcurrentContentSigner requestor,
             X509Certificate responderCert,
             SecurityFactory securityFactory,
             boolean signRequest)
@@ -172,7 +170,8 @@ public abstract class CmpRequestor
         {
             try
             {
-                ProtectionVerificationResult verifyProtection = verifyProtection(Hex.toHexString(tid.getOctets()), response);
+                ProtectionVerificationResult verifyProtection = verifyProtection(
+                		Hex.toHexString(tid.getOctets()), response);
                 ret.setProtectionVerificationResult(verifyProtection);
             } catch (InvalidKeyException e)
             {
@@ -283,8 +282,8 @@ public abstract class CmpRequestor
             return new ProtectionVerificationResult(null, ProtectionResult.SENDER_NOT_AUTHORIZED);
         }
 
-        ContentVerifierProvider verifierProvider = securityFactory.getContentVerifierProvider(
-                responderCert);
+        ContentVerifierProvider verifierProvider = 
+        		securityFactory.getContentVerifierProvider(responderCert);
         if(verifierProvider == null)
         {
             LOG.warn("tid={}: not authorized requestor {}", tid, h.getSender());
