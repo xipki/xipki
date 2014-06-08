@@ -25,7 +25,7 @@ import java.sql.Statement;
 import org.xipki.database.api.DataSource;
 import org.xipki.security.common.ParamChecker;
 
-class DbPorter
+public class DbPorter
 {
     public static final String FILENAME_CA_Configuration = "CA-Configuration.xml";
     public static final String FILENAME_CA_CertStore = "CA-CertStore.xml";
@@ -39,7 +39,7 @@ class DbPorter
     protected final DataSource dataSource;
     protected final String baseDir;
 
-    DbPorter(DataSource dataSource, String baseDir)
+    public DbPorter(DataSource dataSource, String baseDir)
     {
         super();
         ParamChecker.assertNotNull("dataSource", dataSource);
