@@ -78,7 +78,7 @@ import org.xipki.security.common.ConfigurationException;
 class SelfSignedCertBuilder
 {
     private static long DAY = 24L * 60 * 60 * 1000;
-    
+
     static class GenerateSelfSignedResult
     {
         private final String signerConf;

@@ -63,33 +63,33 @@ public class PCIAuditEvent
     /**
      * 10.3.1 "User Identification"
      */
-    private String userId           = UNDEFINED;    
-    
+    private String userId           = UNDEFINED;
+
     /**
      * 10.3.2 "Type of event"
      */
-    private String eventType        = UNDEFINED;     
-    
+    private String eventType        = UNDEFINED;
+
     /**
      * 10.3.3 "Date and time" (date)
      */
-    private final String date;                     
-    
+    private final String date;
+
     /**
      * 10.3.3 "Date and time" (time)
      */
-    private final String time;                     
-    
+    private final String time;
+
     /**
      * 10.3.4 "Success or failure indication"
      */
-    private String status           = UNDEFINED; 
-    
+    private String status           = UNDEFINED;
+
     /**
      * 10.3.5 "Origination of Event"
      */
     private String origination      = null;
-    
+
     /**
      * 10.3.6 "Identity or name of affected data, system component, or resource"
      */
@@ -262,10 +262,10 @@ public class PCIAuditEvent
     }
 
     private String replaceDelimiter(String fieldName, String fieldValue,
-    		char delimiter, String replaceDelimiter)
+            char delimiter, String replaceDelimiter)
     {
         if (replaceDelimiter == null || replaceDelimiter.length() < 1 ||
-        		fieldValue == null || fieldValue.length() < 1)
+                fieldValue == null || fieldValue.length() < 1)
         {
             return fieldValue;
         }
