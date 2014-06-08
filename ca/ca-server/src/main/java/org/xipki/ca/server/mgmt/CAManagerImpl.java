@@ -1240,7 +1240,7 @@ public class CAManagerImpl implements CAManager
             rs.close();
 
             rs = stmt.executeQuery("SELECT CA_NAME, REQUESTOR_NAME, RA, PERMISSIONS, PROFILES"
-            		+ " FROM CA_HAS_REQUESTOR");
+                    + " FROM CA_HAS_REQUESTOR");
             while(rs.next())
             {
                 String ca_name = rs.getString("CA_NAME");
@@ -1987,7 +1987,7 @@ public class CAManagerImpl implements CAManager
         assertNotNULL("type", type);
 
         StringBuilder sb = new StringBuilder();
-        sb.append("UPDATE ENVIRONMENT SET ");
+        sb.append("UPDATE CERTPROFILE SET ");
 
         Integer iType = null;
         Integer iConf = null;

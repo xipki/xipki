@@ -2,7 +2,7 @@
 <databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog dbchangelog-3.0.xsd" logicalFilePath="ca-init.xml">
 	<!-- CA configuration :: create table -->
 	<changeSet author="xipki" id="1">
-		<!-- table cmpcontrol -->
+		<!-- table CMPCONTROL -->
 		<createTable tableName="CMPCONTROL">
 			<column name="NAME" type="VARCHAR(45)">
 				<constraints primaryKey="true" unique="true" nullable="false"/>
@@ -20,7 +20,8 @@
 				<constraints nullable="false"/>
 			</column>
 		</createTable>
-		<!-- table responder -->
+
+		<!-- table RESPONDER -->
 		<createTable tableName="RESPONDER">
 			<column name="NAME" type="VARCHAR(45)">
 				<constraints primaryKey="true" unique="true" nullable="false"/>
@@ -31,14 +32,16 @@
 			<column name="CONF" type="VARCHAR(4000)"/>
 			<column name="CERT" type="VARCHAR(2000)"/>
 		</createTable>
-		<!-- table environment -->
+
+		<!-- table ENVIRONMENT -->
 		<createTable tableName="ENVIRONMENT">
 			<column name="NAME" type="VARCHAR(45)">
 				<constraints primaryKey="true" unique="true" nullable="false"/>
 			</column>
 			<column name="VALUE" type="VARCHAR(200)"/>
 		</createTable>
-		<!-- table crlsigner -->
+
+		<!-- table CRLSIGNER -->
 		<createTable tableName="CRLSIGNER">
 			<column name="NAME" type="VARCHAR(45)">
 				<constraints primaryKey="true" unique="true" nullable="false"/>
@@ -61,7 +64,8 @@
 				<constraints nullable="false"/>
 			</column>
 		</createTable>
-		<!-- table requestor -->
+
+		<!-- table REQUESTOR -->
 		<createTable tableName="REQUESTOR">
 			<column name="NAME" type="VARCHAR(45)">
 				<constraints primaryKey="true" unique="true" nullable="false"/>
@@ -70,7 +74,8 @@
 				<constraints nullable="false"/>
 			</column>
 		</createTable>
-		<!-- table publisher -->
+
+		<!-- table PUBLISHER -->
 		<createTable tableName="PUBLISHER">
 			<column name="NAME" type="VARCHAR(45)">
 				<constraints primaryKey="true" unique="true" nullable="false"/>
@@ -80,7 +85,8 @@
 			</column>
 			<column name="CONF" type="VARCHAR(5000)"/>
 		</createTable>
-		<!-- table certprofile -->
+
+		<!-- table "CERTPROFILE" -->
 		<createTable tableName="CERTPROFILE">
 			<column name="NAME" type="VARCHAR(45)">
 				<constraints primaryKey="true" unique="true" nullable="false"/>
@@ -90,7 +96,8 @@
 			</column>
 			<column name="CONF" remarks="profile data, depends on the type" type="VARCHAR(4000)"/>
 		</createTable>
-		<!-- table ca -->
+
+		<!-- table CA -->
 		<createTable tableName="CA">
 			<column name="NAME" type="VARCHAR(45)">
 				<constraints primaryKey="true" unique="true" nullable="false"/>
@@ -137,7 +144,7 @@
 			<column name="REV_INVALIDITY_TIME" remarks="seconds since January 1, 1970, 00:00:00 GMT" type="INT"/>
 		</createTable>
 
-		<!-- table caalias -->
+		<!-- table CAALIAS -->
 		<createTable tableName="CAALIAS">
 			<column name="NAME" type="VARCHAR(45)">
 				<constraints primaryKey="true" unique="true" nullable="false"/>
@@ -147,7 +154,7 @@
 			</column>
 		</createTable>
 
-		<!-- table ca_has_requestor -->
+		<!-- table CA_HAS_REQUESTOR -->
 		<createTable tableName="CA_HAS_REQUESTOR">
 			<column name="CA_NAME" type="VARCHAR(45)">
 				<constraints primaryKey="true" nullable="false"/>
@@ -161,7 +168,8 @@
 			<column name="PERMISSIONS" type="VARCHAR(200)"/>
 			<column name="PROFILES" type="VARCHAR(200)"/>
 		</createTable>
-		<!-- table ca_has_publisher -->
+
+		<!-- table CA_HAS_PUBLISHER -->
 		<createTable tableName="CA_HAS_PUBLISHER">
 			<column name="CA_NAME" type="VARCHAR(45)">
 				<constraints primaryKey="true" nullable="false"/>
@@ -170,7 +178,8 @@
 				<constraints primaryKey="true" nullable="false"/>
 			</column>
 		</createTable>
-		<!-- table ca_has_profile -->
+
+		<!-- table CA_HAS_CERTPROFILE -->
 		<createTable tableName="CA_HAS_CERTPROFILE">
 			<column name="CA_NAME" type="VARCHAR(45)">
 				<constraints primaryKey="true" nullable="false"/>
@@ -180,9 +189,10 @@
 			</column>
 		</createTable>
 	</changeSet>
+	
 	<!-- CertStore :: create table -->
 	<changeSet author="xipki" id="2">
-		<!-- table cainfo -->
+		<!-- table CAINFO -->
 		<createTable tableName="CAINFO">
 			<column name="ID" type="INT(10)">
 				<constraints primaryKey="true" unique="true" nullable="false"/>
@@ -197,7 +207,8 @@
 				<constraints nullable="false"/>
 			</column>
 		</createTable>
-		<!-- table requestorinfo -->
+
+		<!-- table REQUESTORINFO -->
 		<createTable tableName="REQUESTORINFO">
 			<column name="ID" type="INT(10)">
 				<constraints primaryKey="true" unique="true" nullable="false"/>
@@ -206,7 +217,8 @@
 				<constraints nullable="false"/>
 			</column>
 		</createTable>
-		<!-- table user -->
+
+		<!-- table USER -->
 		<createTable tableName="USER">
 			<column name="ID" type="INT(10)">
 				<constraints primaryKey="true" unique="true" nullable="false"/>
@@ -215,7 +227,8 @@
 				<constraints nullable="false"/>
 			</column>
 		</createTable>
-		<!-- table certprofileinfo -->
+
+		<!-- table CERTPROFILEINFO -->
 		<createTable tableName="CERTPROFILEINFO">
 			<column name="ID" type="INT(10)">
 				<constraints primaryKey="true" unique="true" nullable="false"/>
@@ -224,7 +237,8 @@
 				<constraints nullable="false"/>
 			</column>
 		</createTable>
-		<!-- table crl -->
+
+		<!-- table CRL -->
 		<createTable tableName="CRL">
 			<column autoIncrement="true" name="ID" type="INT(10)">
 				<constraints primaryKey="true" unique="true"/>
@@ -246,7 +260,7 @@
 
 		<addUniqueConstraint tableName="CRL" columnNames="CAINFO_ID, CRL_NUMBER" constraintName="CONST_CA_CRLNUMBER"/>
 
-		<!-- table cert -->
+		<!-- table CERT -->
 		<createTable tableName="CERT">
 			<column name="ID" type="INT(10)">
 				<constraints primaryKey="true" unique="true" nullable="false"/>
@@ -298,7 +312,7 @@
 			<column name="SHA1_FP_SUBJECT"/>
 		</createIndex>
 
-		<!-- table rawcert -->
+		<!-- table RAWCERT -->
 		<createTable tableName="RAWCERT">
 			<column name="CERT_ID" type="INT(10)">
 				<constraints primaryKey="true" nullable="false"/>

@@ -1,0 +1,18 @@
+#################################################################
+#                              OCSP                             #
+#################################################################
+features:install xipki-ocspserver
+features:install xipki-ocspclient-shell
+
+ocsp:status -cacert output/RCA1.der -cert output/SubCA1.der
+
+ocsp:status -cacert output/SubCA1.der -cert output/TLS1.der
+ocsp:status -cacert output/SubCA1.der -cert output/TLS2.der
+ocsp:status -cacert output/SubCA1.der -cert output/TLS_C1.der
+ocsp:status -cacert output/SubCA1.der -cert output/TLS_C2.der
+
+ocsp:status -cacert output/SubCAwithCRL1.der -cert output/OCSP1.der
+ocsp:status -cacert output/SubCAwithCRL1.der -cert output/OCSP2.der
+
+features:uninstall xipki-ocspclient-shell
+features:uninstall xipki-ocspclient

@@ -59,6 +59,10 @@ public class EnrollCertCommand extends CaCommand
             required = true, description = "Required. Profile name")
     protected String            profileName;
 
+    @Option(name = "-user",
+            required = false, description = "Username")
+    protected String            user;
+
     private SecurityFactory securityFactory;
 
     public SecurityFactory getSecurityFactory()
@@ -118,7 +122,7 @@ public class EnrollCertCommand extends CaCommand
             CertificateInfo certInfo;
             try
             {
-                certInfo = ca.generateCertificate(false, profileName, null, subject, publicKeyInfo,
+                certInfo = ca.generateCertificate(false, profileName, user, subject, publicKeyInfo,
                         null, null, extensions);
                 ca.publishCertificate(certInfo);
                 IoCertUtil.save(new File(outFile), certInfo.getCert().getEncodedCert());

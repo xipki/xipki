@@ -23,7 +23,6 @@ import org.xipki.security.common.ParamChecker;
 
 public class EnrollCertRequestEntryType extends IdentifiedObject
 {
-    private String origCertProfile;
     private final String certProfile;
 
     private final CertRequest certReq;
@@ -34,6 +33,7 @@ public class EnrollCertRequestEntryType extends IdentifiedObject
     {
         super(id);
         ParamChecker.assertNotNull("certReq", certReq);
+        ParamChecker.assertNotNull("certProfile", certProfile);
 
         this.certProfile = certProfile;
         this.certReq = certReq;
@@ -53,16 +53,6 @@ public class EnrollCertRequestEntryType extends IdentifiedObject
     public ProofOfPossession getPopo()
     {
         return popo;
-    }
-
-    public String getOrigCertProfile()
-    {
-        return origCertProfile;
-    }
-
-    public void setOrigCertProfile(String origCertProfile)
-    {
-        this.origCertProfile = origCertProfile;
     }
 
 }

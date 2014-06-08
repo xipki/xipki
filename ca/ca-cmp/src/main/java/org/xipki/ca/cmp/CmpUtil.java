@@ -24,14 +24,15 @@ import java.util.Map;
 
 import org.bouncycastle.asn1.ASN1OctetString;
 import org.bouncycastle.asn1.DERNull;
+import org.bouncycastle.asn1.DERUTF8String;
 import org.bouncycastle.asn1.cmp.CMPObjectIdentifiers;
 import org.bouncycastle.asn1.cmp.InfoTypeAndValue;
-import org.bouncycastle.asn1.cmp.PKIFailureInfo;
 import org.bouncycastle.asn1.cmp.PKIFreeText;
 import org.bouncycastle.asn1.cmp.PKIHeader;
 import org.bouncycastle.asn1.cmp.PKIMessage;
 import org.bouncycastle.asn1.cmp.PKIStatus;
 import org.bouncycastle.asn1.cmp.PKIStatusInfo;
+import org.bouncycastle.asn1.crmf.AttributeTypeAndValue;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.GeneralName;
 import org.bouncycastle.cert.cmp.CMPException;
@@ -41,6 +42,7 @@ import org.bouncycastle.operator.ContentSigner;
 import org.xipki.ca.cmp.client.ClientErrorCode;
 import org.xipki.security.api.ConcurrentContentSigner;
 import org.xipki.security.api.NoIdleSignerException;
+import org.xipki.security.common.CmpUtf8Pairs;
 
 public class CmpUtil
 {
@@ -210,6 +212,52 @@ public class CmpUtil
         }
 
         return sb.length() < 3 ? "" : sb.substring(2);
+    }
+
+    public static CmpUtf8Pairs extract(InfoTypeAndValue[] regInfos)
+    {
+        if(regInfos != null)
+        {
+            for (InfoTypeAndValue regInfo : regInfos)
+            {
+                if(CMPObjectIdentifiers.regInfo_utf8Pairs.equals(regInfo.getInfoType()))
+                {
+                    String regInfoValue = ((DERUTF8String) regInfo.getInfoValue()).getString();
+                    return new CmpUtf8Pairs(regInfoValue);
+                }
+            }
+        }
+
+        return null;
+    }
+
+    public static CmpUtf8Pairs extract(AttributeTypeAndValue[] atvs)
+    {
+        if(atvs != null)
+        {
+            for (AttributeTypeAndValue atv : atvs)
+            {
+                if(CMPObjectIdentifiers.regInfo_utf8Pairs.equals(atv.getType()))
+                {
+                    String regInfoValue = ((DERUTF8String) atv.getValue()).getString();
+                    return new CmpUtf8Pairs(regInfoValue);
+                }
+            }
+        }
+
+        return null;
+    }
+
+    public static InfoTypeAndValue buildInfoTypeAndValue(CmpUtf8Pairs utf8Pairs)
+    {
+        return new InfoTypeAndValue(CMPObjectIdentifiers.regInfo_utf8Pairs,
+                new DERUTF8String(utf8Pairs.getEncoded()));
+    }
+
+    public static AttributeTypeAndValue buildAttributeTypeAndValue(CmpUtf8Pairs utf8Pairs)
+    {
+        return new AttributeTypeAndValue(CMPObjectIdentifiers.regInfo_utf8Pairs,
+                new DERUTF8String(utf8Pairs.getEncoded()));
     }
 
 }

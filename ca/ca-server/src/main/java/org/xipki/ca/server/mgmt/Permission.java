@@ -54,7 +54,6 @@ public enum Permission
 
         return null;
     }
-    
 
     public static String toString(Set<Permission> permissions)
     {

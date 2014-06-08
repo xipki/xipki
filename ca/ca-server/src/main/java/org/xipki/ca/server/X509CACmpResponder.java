@@ -35,7 +35,6 @@ import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.ASN1OctetString;
 import org.bouncycastle.asn1.ASN1Set;
 import org.bouncycastle.asn1.DERNull;
-import org.bouncycastle.asn1.DERUTF8String;
 import org.bouncycastle.asn1.cmp.CMPCertificate;
 import org.bouncycastle.asn1.cmp.CMPObjectIdentifiers;
 import org.bouncycastle.asn1.cmp.CertConfirmContent;
@@ -59,7 +58,6 @@ import org.bouncycastle.asn1.cmp.PKIStatusInfo;
 import org.bouncycastle.asn1.cmp.RevDetails;
 import org.bouncycastle.asn1.cmp.RevRepContentBuilder;
 import org.bouncycastle.asn1.cmp.RevReqContent;
-import org.bouncycastle.asn1.crmf.AttributeTypeAndValue;
 import org.bouncycastle.asn1.crmf.CertId;
 import org.bouncycastle.asn1.crmf.CertReqMessages;
 import org.bouncycastle.asn1.crmf.CertReqMsg;
@@ -91,7 +89,6 @@ import org.xipki.ca.api.CAStatus;
 import org.xipki.ca.api.InsuffientPermissionException;
 import org.xipki.ca.api.OperationException;
 import org.xipki.ca.api.OperationException.ErrorCode;
-import org.xipki.ca.api.profile.OriginalProfileConf;
 import org.xipki.ca.api.publisher.CertificateInfo;
 import org.xipki.ca.cmp.CmpUtil;
 import org.xipki.ca.cmp.server.CmpControl;
@@ -491,11 +488,6 @@ public class X509CACmpResponder extends CmpResponder
                 auditEvent.addEventData(new AuditEventData("requestor", _requestor.getCertificate().getSubject()));
             }
 
-            if(user != null)
-            {
-                auditEvent.addEventData(new AuditEventData("user", user));
-            }
-
             if(respBody.getType() == PKIBody.TYPE_ERROR)
             {
                 ErrorMsgContent errorMsgContent = (ErrorMsgContent) respBody.getContent();
@@ -639,19 +631,22 @@ public class X509CACmpResponder extends CmpResponder
 
                     try
                     {
-                        String certProfileName = getCertProfileName(reqMsg);
-                        OriginalProfileConf originalProfileConf = getOrigCertProfileConf(reqMsg);
+                        CmpUtf8Pairs keyvalues  = CmpUtil.extract(reqMsg.getRegInfo());
+                        String certProfileName = keyvalues == null ? null : keyvalues.getValue(CmpUtf8Pairs.KEY_CERT_PROFILE);
+                        if(certProfileName == null)
+                        {
+                            throw new CMPException("no certificate profile is specified");
+                        }
+
                         if(childAuditEvent != null)
                         {
-                            childAuditEvent.addEventData(new AuditEventData("certProfile",
-                                    originalProfileConf == null ? certProfileName : originalProfileConf.getProfileName()));
+                            childAuditEvent.addEventData(new AuditEventData("certProfile", certProfileName));
                         }
 
                         checkPermission(_requestor, certProfileName);
                         certResponses[i] = generateCertificate(_requestor, user, tid, certReqId,
                                 subject, publicKeyInfo,validity, extensions,
-                                certProfileName, originalProfileConf,
-                                keyUpdate, confirmWaitTime, childAuditEvent);
+                                certProfileName, keyUpdate, confirmWaitTime, childAuditEvent);
                     } catch (CMPException e)
                     {
                         LOG.warn("generateCertificate, CMPException: {}", e.getMessage());
@@ -665,17 +660,6 @@ public class X509CACmpResponder extends CmpResponder
                             childAuditEvent.setStatus(AuditStatus.ERROR);
                             childAuditEvent.addEventData(new AuditEventData("message", "badCertTemplate"));
                         }
-                    } catch (ParseException e)
-                    {
-                        LOG.warn("generateCertificate, ParseException: {}", e.getMessage());
-                        LOG.debug("generateCertificate", e);
-                        certResponses[i] = new CertResponse(certReqId,
-                                generateCmpRejectionStatus(PKIFailureInfo.badCertTemplate, e.getMessage()));
-                        if(childAuditEvent != null)
-                        {
-                            childAuditEvent.setStatus(AuditStatus.ERROR);
-                            childAuditEvent.addEventData(new AuditEventData("message", "badCertTemplate"));
-                        }
                     }
                 }
             }
@@ -684,86 +668,6 @@ public class X509CACmpResponder extends CmpResponder
         CMPCertificate[] caPubs = sendCaCert ?
                 new CMPCertificate[]{ca.getCAInfo().getCertInCMPFormat()} : null;
         return new CertRepMessage(caPubs, certResponses);
-    }
-
-    private static String getCertProfileName(PKIHeader pkiHeader)
-    throws CMPException
-    {
-        InfoTypeAndValue[] regInfos = pkiHeader.getGeneralInfo();
-        if(regInfos != null)
-        {
-            for (InfoTypeAndValue regInfo : regInfos)
-            {
-                if(CMPObjectIdentifiers.regInfo_utf8Pairs.equals(regInfo.getInfoType()))
-                {
-                    String regInfoValue = ((DERUTF8String) regInfo.getInfoValue()).getString();
-                    CmpUtf8Pairs utf8Pairs = new CmpUtf8Pairs(regInfoValue);
-                    String certProfile = utf8Pairs.getValue(CmpUtf8Pairs.KEY_CERT_PROFILE);
-                    if(certProfile != null)
-                    {
-                        return certProfile;
-                    }
-                }
-            }
-        }
-
-        return null;
-    }
-
-    private static String getCertProfileName(CertReqMsg reqMsg)
-    throws CMPException
-    {
-        AttributeTypeAndValue[] regInfos = reqMsg.getRegInfo();
-        if(regInfos != null)
-        {
-            for (AttributeTypeAndValue regInfo : regInfos)
-            {
-                if(CMPObjectIdentifiers.regInfo_utf8Pairs.equals(regInfo.getType()))
-                {
-                    String regInfoValue = ((DERUTF8String) regInfo.getValue()).getString();
-                    CmpUtf8Pairs utf8Pairs = new CmpUtf8Pairs(regInfoValue);
-                    String certProfile = utf8Pairs.getValue(CmpUtf8Pairs.KEY_CERT_PROFILE);
-                    if(certProfile != null)
-                    {
-                        return certProfile;
-                    }
-                }
-            }
-        }
-
-        return null;
-    }
-
-    private static OriginalProfileConf getOrigCertProfileConf(CertReqMsg reqMsg)
-    throws CMPException, ParseException
-    {
-        String origCertProfileConf = null;
-        AttributeTypeAndValue[] regInfos = reqMsg.getRegInfo();
-        if(regInfos != null)
-        {
-            for (AttributeTypeAndValue regInfo : regInfos)
-            {
-                if(CMPObjectIdentifiers.regInfo_utf8Pairs.equals(regInfo.getType()))
-                {
-                    String regInfoValue = ((DERUTF8String) regInfo.getValue()).getString();
-                    CmpUtf8Pairs utf8Pairs = new CmpUtf8Pairs(regInfoValue);
-                    String certProfile = utf8Pairs.getValue(CmpUtf8Pairs.KEY_ORIG_CERT_PROFILE);
-                    if(certProfile != null)
-                    {
-                        origCertProfileConf = certProfile;
-                        break;
-                    }
-                }
-            }
-        }
-
-        if(origCertProfileConf == null || origCertProfileConf.isEmpty())
-        {
-            return null;
-        }
-
-        OriginalProfileConf origCertProfile = OriginalProfileConf.getInstance(origCertProfileConf);
-        return origCertProfile;
     }
 
     /**
@@ -823,15 +727,22 @@ public class X509CACmpResponder extends CmpResponder
 
             try
             {
-                String certProfileName = getCertProfileName(reqHeader);
+                CmpUtf8Pairs keyvalues = CmpUtil.extract(reqHeader.getGeneralInfo());
+                String certProfileName = keyvalues == null ? null : keyvalues.getValue(CmpUtf8Pairs.KEY_CERT_PROFILE);
+                if(certProfileName == null)
+                {
+                    throw new CMPException("no certificate profile is specified");
+                }
+
                 if(childAuditEvent != null)
                 {
                     childAuditEvent.addEventData(new AuditEventData("certProfile", certProfileName));
                 }
+
                 checkPermission(requestor, certProfileName);
 
                 certResp = generateCertificate(requestor, user, tid, certReqId,
-                    subject, publicKeyInfo, null, extensions, certProfileName, null,
+                    subject, publicKeyInfo, null, extensions, certProfileName,
                     false, confirmWaitTime, childAuditEvent);
             }catch(CMPException e)
             {
@@ -862,7 +773,6 @@ public class X509CACmpResponder extends CmpResponder
             OptionalValidity validity,
             Extensions extensions,
             String certProfileName,
-            OriginalProfileConf origCertProfile,
             boolean keyUpdate,
             long confirmWaitTime,
             ChildAuditEvent childAuditEvent)
@@ -891,13 +801,13 @@ public class X509CACmpResponder extends CmpResponder
             CertificateInfo certInfo;
             if(keyUpdate)
             {
-                certInfo = ca.regenerateCertificate(requestor.isRA(), certProfileName, origCertProfile,
+                certInfo = ca.regenerateCertificate(requestor.isRA(), certProfileName, user,
                         subject, publicKeyInfo,
                         notBefore, notAfter, extensions);
             }
             else
             {
-                certInfo = ca.generateCertificate(requestor.isRA(), certProfileName, origCertProfile,
+                certInfo = ca.generateCertificate(requestor.isRA(), certProfileName, user,
                         subject, publicKeyInfo,
                         notBefore, notAfter, extensions);
             }

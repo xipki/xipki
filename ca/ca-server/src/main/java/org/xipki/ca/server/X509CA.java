@@ -90,7 +90,6 @@ import org.xipki.ca.api.profile.ExtensionOccurrence;
 import org.xipki.ca.api.profile.ExtensionTuple;
 import org.xipki.ca.api.profile.ExtensionTuples;
 import org.xipki.ca.api.profile.IdentifiedCertProfile;
-import org.xipki.ca.api.profile.OriginalProfileConf;
 import org.xipki.ca.api.profile.SubjectInfo;
 import org.xipki.ca.api.publisher.CertPublisherException;
 import org.xipki.ca.api.publisher.CertificateInfo;
@@ -641,7 +640,7 @@ public class X509CA
     public CertificateInfo generateCertificate(
             boolean requestedByRA,
             String certProfileName,
-            OriginalProfileConf origCertProfile,
+            String user,
             X500Name subject,
             SubjectPublicKeyInfo publicKeyInfo,
             Date notBefore,
@@ -649,9 +648,9 @@ public class X509CA
             Extensions extensions)
     throws OperationException
     {
-    	final String subjectText = IoCertUtil.canonicalizeName(subject);
-        LOG.info("START generateCertificate: CA={}, profile={}, origProfile={}, subject={}",
-                new Object[]{caInfo.getName(), certProfileName, origCertProfile, subjectText});
+        final String subjectText = IoCertUtil.canonicalizeName(subject);
+        LOG.info("START generateCertificate: CA={}, profile={}, subject={}",
+                new Object[]{caInfo.getName(), certProfileName, subjectText});
 
         boolean successfull = false;
 
@@ -660,15 +659,14 @@ public class X509CA
             try
             {
                 CertificateInfo ret = intern_generateCertificate(requestedByRA,
-                        certProfileName,
-                        origCertProfile,
+                        certProfileName, user,
                         subject, publicKeyInfo,
                         notBefore, notAfter, extensions, false);
                 successfull = true;
 
-                LOG.info("SUCCESSFULL generateCertificate: CA={}, profile={}, origProfile={},"
+                LOG.info("SUCCESSFULL generateCertificate: CA={}, profile={},"
                         + " subject={}, serialNumber={}",
-                        new Object[]{caInfo.getName(), certProfileName, origCertProfile,
+                        new Object[]{caInfo.getName(), certProfileName,
                             ret.getCert().getSubject(), ret.getCert().getCert().getSerialNumber()});
 
                 return ret;
@@ -682,8 +680,8 @@ public class X509CA
         {
             if(successfull == false)
             {
-                LOG.warn("FAILED generateCertificate: CA={}, profile={}, origProfile={}, subject={}",
-                        new Object[]{caInfo.getName(), certProfileName, origCertProfile, subjectText});
+                LOG.warn("FAILED generateCertificate: CA={}, profile={}, subject={}",
+                        new Object[]{caInfo.getName(), certProfileName, subjectText});
             }
         }
     }
@@ -691,7 +689,7 @@ public class X509CA
     public CertificateInfo regenerateCertificate(
             boolean requestedByRA,
             String certProfileName,
-            OriginalProfileConf origCertProfile,
+            String user,
             X500Name subject,
             SubjectPublicKeyInfo publicKeyInfo,
             Date notBefore,
@@ -699,21 +697,21 @@ public class X509CA
             Extensions extensions)
     throws OperationException
     {
-    	final String subjectText = IoCertUtil.canonicalizeName(subject);
-        LOG.info("START regenerateCertificate: CA={}, profile={}, origProfile={}, subject={}",
-                new Object[]{caInfo.getName(), certProfileName, origCertProfile, subjectText});
+        final String subjectText = IoCertUtil.canonicalizeName(subject);
+        LOG.info("START regenerateCertificate: CA={}, profile={}, subject={}",
+                new Object[]{caInfo.getName(), certProfileName, subjectText});
 
         boolean successfull = false;
 
         try
         {
-            CertificateInfo ret = intern_generateCertificate(requestedByRA, certProfileName, origCertProfile,
+            CertificateInfo ret = intern_generateCertificate(requestedByRA, certProfileName, user,
                     subject, publicKeyInfo,
                     notBefore, notAfter, extensions, false);
             successfull = true;
-            LOG.info("SUCCESSFULL generateCertificate: CA={}, profile={}, origProfile={},"
+            LOG.info("SUCCESSFULL generateCertificate: CA={}, profile={},"
                     + " subject={}, serialNumber={}",
-                    new Object[]{caInfo.getName(), certProfileName, origCertProfile,
+                    new Object[]{caInfo.getName(), certProfileName,
                         ret.getCert().getSubject(), ret.getCert().getCert().getSerialNumber()});
 
             return ret;
@@ -725,8 +723,8 @@ public class X509CA
         {
             if(successfull == false)
             {
-                LOG.warn("FAILED regenerateCertificate: CA={}, profile={}, origProfile={}, subject={}",
-                        new Object[]{caInfo.getName(), certProfileName, origCertProfile, subjectText});
+                LOG.warn("FAILED regenerateCertificate: CA={}, profile={}, subject={}",
+                        new Object[]{caInfo.getName(), certProfileName, subjectText});
             }
         }
     }
@@ -1147,7 +1145,7 @@ public class X509CA
     private CertificateInfo intern_generateCertificate(
             boolean requestedByRA,
             String certProfileName,
-            OriginalProfileConf origCertProfileConf,
+            String user,
             X500Name requestedSubject,
             SubjectPublicKeyInfo publicKeyInfo,
             Date notBefore,
@@ -1234,11 +1232,9 @@ public class X509CA
 
                 if(certIds != null && certIds.isEmpty() == false)
                 {
-                    String origCertProfileName = origCertProfileConf == null ?
-                            certProfileName : origCertProfileConf.getProfileName();
                     // return issued certificate if all of requested public key, certProfile and subject match
                     CertWithRevokedInfo issuedCert = certstore.getCertificate(certIds, sha1FpSubject,
-                            origCertProfileName);
+                            certProfileName);
                     if(issuedCert == null)
                     {
                         if(caInfo.isAllowDuplicateKey() == false)
@@ -1278,14 +1274,6 @@ public class X509CA
                 if(certWithSameSubjectIssued)
                 {
                     boolean incSerialNumberAllowed = certProfile.incSerialNumberIfSubjectExists();
-                    if(incSerialNumberAllowed && origCertProfileConf != null)
-                    {
-                        if(origCertProfileConf.isIncSerialNumberSpecified() &&
-                                origCertProfileConf.getIncSerialNumber().booleanValue() == false)
-                        {
-                            incSerialNumberAllowed = false;
-                        }
-                    }
 
                     if(incSerialNumberAllowed == false)
                     {
@@ -1369,7 +1357,6 @@ public class X509CA
                 String warningMsg = addExtensions(
                         certBuilder,
                         certProfile,
-                        origCertProfileConf,
                         requestedSubject,
                         publicKeyInfo,
                         extensions,
@@ -1411,7 +1398,7 @@ public class X509CA
 
                 ret = new CertificateInfo(certWithMeta,
                         caInfo.getCertificate(), publicKeyInfo.getEncoded(),
-                        origCertProfileConf == null ? certProfileName : origCertProfileConf.getProfileName());
+                        certProfileName);
             } catch (CertificateException e)
             {
                 throw new OperationException(ErrorCode.System_Failure, "CertificateException: " + e.getMessage());
@@ -1462,17 +1449,16 @@ public class X509CA
 
     private String addExtensions(X509v3CertificateBuilder certBuilder,
             CertProfile certProfile,
-            OriginalProfileConf origCertProfileConf,
             X500Name requestedSubject,
             SubjectPublicKeyInfo requestedPublicKeyInfo,
             org.bouncycastle.asn1.x509.Extensions requestedExtensions,
             PublicCAInfo publicCaInfo)
     throws CertProfileException, BadCertTemplateException, IOException
     {
-        addSubjectKeyIdentifier(certBuilder, requestedPublicKeyInfo, certProfile, origCertProfileConf);
-        addAuthorityKeyIdentifier(certBuilder, certProfile, origCertProfileConf);
-        addAuthorityInformationAccess(certBuilder, certProfile, origCertProfileConf);
-        addCRLDistributionPoints(certBuilder, certProfile, origCertProfileConf);
+        addSubjectKeyIdentifier(certBuilder, requestedPublicKeyInfo, certProfile);
+        addAuthorityKeyIdentifier(certBuilder, certProfile);
+        addAuthorityInformationAccess(certBuilder, certProfile);
+        addCRLDistributionPoints(certBuilder, certProfile);
 
         ExtensionTuples extensionTuples = certProfile.getExtensions(
                 requestedSubject, requestedExtensions);
@@ -1512,18 +1498,10 @@ public class X509CA
 
     private void addSubjectKeyIdentifier(
             X509v3CertificateBuilder certBuilder, SubjectPublicKeyInfo publicKeyInfo,
-            CertProfile profile, OriginalProfileConf originalProfileConf)
+            CertProfile profile)
     throws IOException
     {
-        ExtensionOccurrence extOccurrence;
-        if(originalProfileConf != null && originalProfileConf.isSubjectKeyIdentifierSpecified())
-        {
-            extOccurrence = originalProfileConf.getSubjectKeyIdentifier();
-        }
-        else
-        {
-            extOccurrence = profile.getOccurenceOfSubjectKeyIdentifier();
-        }
+        ExtensionOccurrence extOccurrence = profile.getOccurenceOfSubjectKeyIdentifier();
 
         if(extOccurrence == null)
         {
@@ -1537,19 +1515,10 @@ public class X509CA
         certBuilder.addExtension(Extension.subjectKeyIdentifier, extOccurrence.isCritical(), value);
     }
 
-    private void addAuthorityKeyIdentifier(X509v3CertificateBuilder certBuilder, CertProfile profile,
-            OriginalProfileConf originalProfileConf)
+    private void addAuthorityKeyIdentifier(X509v3CertificateBuilder certBuilder, CertProfile profile)
     throws IOException
     {
-        ExtensionOccurrence extOccurrence;
-        if(originalProfileConf != null && originalProfileConf.isAuthorityKeyIdentifierSpecified())
-        {
-            extOccurrence = originalProfileConf.getAuthorityKeyIdentifier();
-        }
-        else
-        {
-            extOccurrence = profile.getOccurenceOfAuthorityKeyIdentifier();
-        }
+        ExtensionOccurrence extOccurrence = profile.getOccurenceOfAuthorityKeyIdentifier();
 
         if(extOccurrence == null)
         {
@@ -1571,20 +1540,10 @@ public class X509CA
         certBuilder.addExtension(Extension.authorityKeyIdentifier, extOccurrence.isCritical(), value);
     }
 
-    private void addAuthorityInformationAccess(X509v3CertificateBuilder certBuilder, CertProfile profile,
-            OriginalProfileConf originalProfileConf)
+    private void addAuthorityInformationAccess(X509v3CertificateBuilder certBuilder, CertProfile profile)
     throws IOException, CertProfileException
     {
-        ExtensionOccurrence extOccurrence;
-        if(originalProfileConf != null && originalProfileConf.isAuthorityInfoAccessSpecified())
-        {
-            extOccurrence = originalProfileConf.getAuthorityInfoAccess();
-        }
-        else
-        {
-            extOccurrence = profile.getOccurenceOfAuthorityInfoAccess();
-        }
-
+        ExtensionOccurrence extOccurrence = profile.getOccurenceOfAuthorityInfoAccess();
         if(extOccurrence == null)
         {
             return;
@@ -1605,20 +1564,10 @@ public class X509CA
         }
     }
 
-    private void addCRLDistributionPoints(X509v3CertificateBuilder certBuilder, CertProfile profile,
-            OriginalProfileConf originalProfileConf)
+    private void addCRLDistributionPoints(X509v3CertificateBuilder certBuilder, CertProfile profile)
     throws IOException, CertProfileException
     {
-        ExtensionOccurrence extOccurrence;
-        if(originalProfileConf != null && originalProfileConf.isCRLDisributionPointsSpecified())
-        {
-            extOccurrence = originalProfileConf.getCRLDisributionPoints();
-        }
-        else
-        {
-            extOccurrence = profile.getOccurenceOfCRLDistributinPoints();
-        }
-
+        ExtensionOccurrence extOccurrence = profile.getOccurenceOfCRLDistributinPoints();
         if(extOccurrence == null)
         {
             return;

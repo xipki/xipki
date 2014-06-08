@@ -52,16 +52,25 @@ public class CmpControlUpdateCommand extends CaCommand
     throws Exception
     {
         Boolean requireConfirmCert = null;
-        if(enabledConfirmCert != null || disableConfirmCert != null )
+        if(enabledConfirmCert != null && disableConfirmCert != null )
+        {
+            System.err.println("Confirming certificates can not be enabled and disabled at the same time");
+            return null;
+        }
+        else if(enabledConfirmCert != null || disableConfirmCert != null )
         {
             requireConfirmCert = isEnabled(enabledConfirmCert, disableConfirmCert, false);
         }
 
         Boolean sendCaCert = null;
-        if(enableSendCaCert != null || disableSendCaCert != null )
+        if(enableSendCaCert != null && disableSendCaCert != null )
+        {
+            System.err.println("Sending CA certificate can not be enabled and disabled at the same time");
+            return null;
+        }
+        else if(enableSendCaCert != null || disableSendCaCert != null )
         {
             sendCaCert = isEnabled(enableSendCaCert, disableSendCaCert, false);
-            System.err.println("Sending CA certificate could not be enabled and disabled at the same time");
         }
 
         caManager.changeCmpControl(requireConfirmCert, messageTimeBias, confirmWaitTime, sendCaCert);
