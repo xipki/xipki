@@ -232,7 +232,7 @@ public class OCSPStatusCommand extends OsgiCommandSupport
                 }
                 else
                 {
-                    status = "Revoked, reason = "+ reason + ", revocationTime = " + revTime;
+                    status = "Revoked, reason = "+ CRLReason.forReasonCode(reason).getDescription() + ", revocationTime = " + revTime;
                 }
             }
             else if(singleCertStatus instanceof UnknownStatus)
