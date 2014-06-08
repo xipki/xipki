@@ -90,7 +90,7 @@
 				</xs:complexType>
 			</xs:element>
 		</xs:all>
-		<xs:attribute name="version" type="xs:string" use="required"/>
+		<xs:attribute name="version" type="xs:int" use="required"/>
 	</xs:complexType>
 
 	<xs:element name="cmpcontrol" type="cmpcontrolType"/>
@@ -267,7 +267,7 @@
 				</xs:complexType>
 			</xs:element>
 		</xs:all>
-		<xs:attribute name="version" type="xs:string" use="required"/>
+		<xs:attribute name="version" type="xs:int" use="required"/>
 	</xs:complexType>
 
 	<xs:element name="cainfo" type="cainfoType"/>
