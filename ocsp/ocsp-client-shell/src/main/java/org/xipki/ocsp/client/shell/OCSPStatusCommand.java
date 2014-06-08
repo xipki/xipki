@@ -274,18 +274,18 @@ public class OCSPStatusCommand extends OsgiCommandSupport
                 }
             }
 
-            extension = singleResp.getExtension(
-                    OCSPObjectIdentifiers.id_pkix_ocsp_archive_cutoff);
-            if(extension != null)
-            {
-                ASN1Encodable extensionValue = extension.getParsedValue();
-                ASN1GeneralizedTime time = ASN1GeneralizedTime.getInstance(extensionValue);
-                msg.append("\nArchive-CutOff: ");
-                msg.append(time.getTimeString());
-            }
-
             if(verbose != null && verbose.booleanValue())
             {
+                extension = singleResp.getExtension(
+                        OCSPObjectIdentifiers.id_pkix_ocsp_archive_cutoff);
+                if(extension != null)
+                {
+                    ASN1Encodable extensionValue = extension.getParsedValue();
+                    ASN1GeneralizedTime time = ASN1GeneralizedTime.getInstance(extensionValue);
+                    msg.append("\nArchive-CutOff: ");
+                    msg.append(time.getTimeString());
+                }
+
                 ASN1ObjectIdentifier sigAlgOid = basicResp.getSignatureAlgOID();
                 if(sigAlgOid == null)
                 {

@@ -65,6 +65,7 @@ import org.xipki.database.api.DataSource;
 import org.xipki.security.common.CRLReason;
 import org.xipki.security.common.CertRevocationInfo;
 import org.xipki.security.common.IoCertUtil;
+import org.xipki.security.common.LruCache;
 import org.xipki.security.common.ParamChecker;
 
 class CertStoreQueryExecutor
@@ -72,12 +73,15 @@ class CertStoreQueryExecutor
     private static final Logger LOG = LoggerFactory.getLogger(CertStoreQueryExecutor.class);
 
     private AtomicInteger cert_id;
+    private AtomicInteger user_id;
 
     private final DataSource dataSource;
 
     private final CertBasedIdentityStore caInfoStore;
     private final NameIdStore requestorInfoStore;
     private final NameIdStore certprofileStore;
+
+    private final LruCache<String, Integer> usernameIdCache = new LruCache<String, Integer>(100);
 
     CertStoreQueryExecutor(DataSource dataSource)
     throws SQLException
@@ -92,6 +96,19 @@ class CertStoreQueryExecutor
             rs = ps.executeQuery();
             rs.next();
             cert_id = new AtomicInteger(rs.getInt(1) + 1);
+        } finally
+        {
+            releaseDbResources(ps, rs);
+        }
+
+        sql = "SELECT MAX(ID) FROM USER";
+        ps = borrowPreparedStatement(sql);
+        rs = null;
+        try
+        {
+            rs = ps.executeQuery();
+            rs.next();
+            user_id = new AtomicInteger(rs.getInt(1) + 1);
         } finally
         {
             releaseDbResources(ps, rs);
@@ -1306,7 +1323,7 @@ class CertStoreQueryExecutor
 
             CertBasedIdentityEntry newInfo = new CertBasedIdentityEntry(id.intValue(), subject, hexSha1Fp, b64Cert);
             store.addIdentityEntry(newInfo);
-        }finally
+        } finally
         {
             releaseDbResources(ps, null);
         }
@@ -1321,8 +1338,52 @@ class CertStoreQueryExecutor
     }
 
     private int getUserId(String user)
+    throws SQLException
     {
-        return 0; // FIXME: implement me
+        Integer id = usernameIdCache.get(user);
+        if(id != null)
+        {
+            return id.intValue();
+        }
+
+        String sql = "ID FROM USER WHERE NAME=?";
+        sql = createFetchFirstSelectSQL(sql, 1);
+        PreparedStatement ps = borrowPreparedStatement(sql);
+        ResultSet rs = null;
+
+        try
+        {
+            int idx = 1;
+            ps.setString(idx++, user);
+            rs = ps.executeQuery();
+            if(rs.next())
+            {
+                id = rs.getInt("ID");
+            }
+        } finally
+        {
+            releaseDbResources(ps, rs);
+        }
+
+        if(id == null)
+        {
+            int userId = user_id.getAndAdd(1);
+            final String SQL_ADD_USER = "INSERT INTO USER (ID, NAME) VALUES (?, ?)";
+            try
+            {
+                ps = borrowPreparedStatement(SQL_ADD_USER);
+                ps.setInt(1, userId);
+                ps.setString(2, user);
+                ps.executeUpdate();
+                id = userId;
+            } finally
+            {
+                releaseDbResources(ps, null);
+            }
+        }
+
+        usernameIdCache.put(user, id);
+        return id;
     }
 
     private int getRequestorId(String requestorName)

@@ -5,3 +5,7 @@ SubCAwithCRL_KEY_LABEL = SubCAwithCRL1-EC
 
 source ./ca-demo/hsm.script
 
+source ./ca-demo/ra.script
+
+source ./ca-demo/ocsp.script
+

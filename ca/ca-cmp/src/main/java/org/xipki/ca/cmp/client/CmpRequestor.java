@@ -20,7 +20,9 @@ package org.xipki.ca.cmp.client;
 import java.io.IOException;
 import java.security.InvalidKeyException;
 import java.security.cert.X509Certificate;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Random;
 
 import org.bouncycastle.asn1.ASN1GeneralizedTime;
@@ -53,6 +55,7 @@ import org.xipki.ca.cmp.server.PKIResponse;
 import org.xipki.security.api.ConcurrentContentSigner;
 import org.xipki.security.api.NoIdleSignerException;
 import org.xipki.security.api.SecurityFactory;
+import org.xipki.security.common.CmpUtf8Pairs;
 import org.xipki.security.common.ParamChecker;
 
 public abstract class CmpRequestor
@@ -202,11 +205,17 @@ public abstract class CmpRequestor
 
     protected PKIHeader buildPKIHeader(ASN1OctetString tid)
     {
-        return buildPKIHeader(false, tid, null);
+        return buildPKIHeader(false, tid, null, null);
+    }
+
+    protected PKIHeader buildPKIHeader(ASN1OctetString tid, String username)
+    {
+        return buildPKIHeader(false, tid, username, null);
     }
 
     protected PKIHeader buildPKIHeader(boolean addImplictConfirm,
-            ASN1OctetString tid, InfoTypeAndValue generalInfo, InfoTypeAndValue... additionalGeneralInfos)
+            ASN1OctetString tid, String username,
+            InfoTypeAndValue generalInfo, InfoTypeAndValue... additionalGeneralInfos)
     {
         PKIHeaderBuilder hBuilder = new PKIHeaderBuilder(
                 PKIHeader.CMP_2000,
@@ -220,9 +229,20 @@ public abstract class CmpRequestor
         }
         hBuilder.setTransactionID(tid);
 
+        List<InfoTypeAndValue> itvs = new ArrayList<InfoTypeAndValue>(2);
         if(addImplictConfirm)
         {
-            hBuilder.setGeneralInfo(CmpUtil.getImplictConfirmGeneralInfo());
+            itvs.add(CmpUtil.getImplictConfirmGeneralInfo());
+        }
+        if(username != null && username.isEmpty() == false)
+        {
+            CmpUtf8Pairs utf8Pairs = new CmpUtf8Pairs(CmpUtf8Pairs.KEY_USER, username);
+            itvs.add(CmpUtil.buildInfoTypeAndValue(utf8Pairs));
+        }
+
+        if(itvs.isEmpty() == false)
+        {
+            hBuilder.setGeneralInfo(itvs.toArray(new InfoTypeAndValue[0]));
         }
 
         return hBuilder.build();

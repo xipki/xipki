@@ -59,6 +59,7 @@ import org.xipki.ca.common.CertBasedRequestorInfo;
 import org.xipki.ca.common.RequestorInfo;
 import org.xipki.security.api.ConcurrentContentSigner;
 import org.xipki.security.api.SecurityFactory;
+import org.xipki.security.common.CmpUtf8Pairs;
 import org.xipki.security.common.IoCertUtil;
 import org.xipki.security.common.ParamChecker;
 
@@ -254,7 +255,10 @@ public abstract class CmpResponder
             return buildErrorPkiMessage(tid, reqHeader, PKIFailureInfo.badMessageCheck, errorStatus);
         }
 
-        PKIMessage resp = intern_processPKIMessage(requestor, null, tid, message, auditEvent);
+        CmpUtf8Pairs keyvalues = CmpUtil.extract(reqHeader.getGeneralInfo());
+        String username = keyvalues == null ? null : keyvalues.getValue(CmpUtf8Pairs.KEY_USER);
+
+        PKIMessage resp = intern_processPKIMessage(requestor, username, tid, message, auditEvent);
         if(isProtected)
         {
             resp = addProtection(resp, auditEvent);

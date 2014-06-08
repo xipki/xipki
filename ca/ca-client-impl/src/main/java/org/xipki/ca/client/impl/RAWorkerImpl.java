@@ -30,10 +30,7 @@ import java.security.SignatureException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509CRL;
 import java.security.cert.X509Certificate;
-import java.text.ParseException;
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -52,26 +49,17 @@ import org.bouncycastle.asn1.crmf.CertReqMsg;
 import org.bouncycastle.asn1.crmf.CertRequest;
 import org.bouncycastle.asn1.crmf.CertTemplate;
 import org.bouncycastle.asn1.crmf.CertTemplateBuilder;
-import org.bouncycastle.asn1.crmf.OptionalValidity;
 import org.bouncycastle.asn1.crmf.ProofOfPossession;
 import org.bouncycastle.asn1.pkcs.CertificationRequest;
 import org.bouncycastle.asn1.pkcs.CertificationRequestInfo;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.Certificate;
-import org.bouncycastle.asn1.x509.Extension;
-import org.bouncycastle.asn1.x509.Extensions;
-import org.bouncycastle.asn1.x509.Time;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.jce.provider.X509CertificateObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.ca.api.profile.BadCertTemplateException;
-import org.xipki.ca.api.profile.CertProfile;
-import org.xipki.ca.api.profile.CertProfileException;
-import org.xipki.ca.api.profile.ExtensionTuple;
-import org.xipki.ca.api.profile.IdentifiedCertProfile;
-import org.xipki.ca.api.profile.OriginalProfileConf;
 import org.xipki.ca.client.api.RAWorker;
+import org.xipki.ca.cmp.CmpUtil;
 import org.xipki.ca.cmp.client.AbstractRAWorker;
 import org.xipki.ca.cmp.client.CmpRequestorException;
 import org.xipki.ca.cmp.client.type.CRLResultType;
@@ -98,7 +86,6 @@ import org.xipki.security.api.PasswordResolverException;
 import org.xipki.security.api.SignerException;
 import org.xipki.security.common.CmpUtf8Pairs;
 import org.xipki.security.common.ConfigurationException;
-import org.xipki.security.common.DfltEnvironmentParameterResolver;
 import org.xipki.security.common.IoCertUtil;
 import org.xipki.security.common.ParamChecker;
 
@@ -144,34 +131,12 @@ public final class RAWorkerImpl extends AbstractRAWorker implements RAWorker
      */
     public static final String CA_PROFILES_SUFFIX = ".profiles";
 
-    /**
-     * Certificate Profiles definition
-     */
-    public static final String CERTPROFILE_PREFIX = "profile.";
-    public static final String CERTPROFILE_TYPE_SUFFIX = ".type";
-    public static final String CERTPROFILE_CONF_SUFFIX = ".conf";
-
-    /**
-     * Certificate Profiles of RA
-     */
-    public static final String RA_PROFILE_PREFIX = "ra.profile.";
-    public static final String RA_PROFILE_CA_SUFFIX = ".ca";
-    public static final String RA_PROFILE_TARGETPROFILE_SUFFIX = ".target";
-
-    /**
-     * Environment parameter
-     */
-    public static final String ENV_PREFIX = "env.";
-
     private static final Logger LOG = LoggerFactory.getLogger(RAWorkerImpl.class);
 
     public static long DAY = 24L * 60 * 60 * 1000;
 
     private final Map<String, CAConf> casMap = new HashMap<String, CAConf>();
     private final Map<String, X509CmpRequestor> cmpRequestorsMap = new ConcurrentHashMap<String, X509CmpRequestor>();
-    private final Map<String, IdentifiedCertProfile> raProfilesMaps = new ConcurrentHashMap<String, IdentifiedCertProfile>();
-    private final Map<String, RACertProfileMapping> raProfileMappingsMap
-            = new ConcurrentHashMap<String, RACertProfileMapping>();
 
     private String            confFile;
     private Map<X509Certificate, Boolean> tryXipkiNSStoVerifyMap = new ConcurrentHashMap<>();
@@ -271,7 +236,7 @@ public final class RAWorkerImpl extends AbstractRAWorker implements RAWorker
                 Set<String> profiles = null;
                 if(_profiles != null)
                 {
-                    StringTokenizer st = new StringTokenizer(_profiles, ",");
+                    StringTokenizer st = new StringTokenizer(_profiles, ", ");
                     profiles = new HashSet<String>(st.countTokens());
                     while(st.hasMoreTokens())
                     {
@@ -302,107 +267,6 @@ public final class RAWorkerImpl extends AbstractRAWorker implements RAWorker
             }
         }
 
-        // environment parameters
-        DfltEnvironmentParameterResolver envParamsResolver = new DfltEnvironmentParameterResolver();
-        for(Object _propKey : props.keySet())
-        {
-            String propKey = (String) _propKey;
-            if(propKey.startsWith(ENV_PREFIX))
-            {
-                String name = propKey.substring(ENV_PREFIX.length());
-                envParamsResolver.addEnvParam(name, props.getProperty(propKey));
-            }
-        }
-
-        // Certificate profiles
-        Set<String> certProfileNames = new HashSet<String>();
-        for(Object _propKey : props.keySet())
-        {
-            String propKey = (String) _propKey;
-            if(propKey.startsWith(CERTPROFILE_PREFIX) && propKey.endsWith(CERTPROFILE_TYPE_SUFFIX))
-            {
-                String name = propKey.substring(CERTPROFILE_PREFIX.length(),
-                        propKey.length() - CERTPROFILE_TYPE_SUFFIX.length());
-                certProfileNames.add(name);
-            }
-        }
-
-        Set<IdentifiedCertProfile> certProfiles = new HashSet<IdentifiedCertProfile>();
-        for(String name : certProfileNames)
-        {
-            String type = props.getProperty(CERTPROFILE_PREFIX + name + CERTPROFILE_TYPE_SUFFIX);
-            String conf = props.getProperty(CERTPROFILE_PREFIX + name + CERTPROFILE_CONF_SUFFIX);
-
-            CertProfile underlyingCertProfile = null;
-            if(type.toLowerCase().startsWith("java:"))
-            {
-                String className = type.substring("java:".length());
-                try
-                {
-                    Class<?> clazz = Class.forName(className);
-                    underlyingCertProfile = (CertProfile) clazz.newInstance();
-                }catch(Exception e)
-                {
-                    throw new ConfigurationException("invalid type " + type);
-                }
-            }
-            else
-            {
-                throw new ConfigurationException("invalid type " + type);
-            }
-
-            IdentifiedCertProfile certProfile = new IdentifiedCertProfile(name, underlyingCertProfile);
-            try
-            {
-                certProfile.initialize(conf);
-            } catch (CertProfileException e)
-            {
-                throw new ConfigurationException("invalid for certprofile name = " + name + ", message: " + e.getMessage());
-            }
-            certProfile.setEnvironmentParamterResolver(envParamsResolver);
-
-            certProfiles.add(certProfile);
-        }
-
-        Set<String> raProfileNames = new HashSet<String>();
-        for(Object _propKey : props.keySet())
-        {
-            String propKey = (String) _propKey;
-            if(propKey.startsWith(RA_PROFILE_PREFIX) && propKey.endsWith(RA_PROFILE_CA_SUFFIX))
-            {
-                String name = propKey.substring(RA_PROFILE_PREFIX.length(),
-                        propKey.length() - RA_PROFILE_CA_SUFFIX.length());
-                String destCA = props.getProperty(RA_PROFILE_PREFIX + name + RA_PROFILE_CA_SUFFIX);
-                if(canames.contains(destCA))
-                {
-                    if(configuredCaNames.contains(destCA))
-                    {
-                        raProfileNames.add(name);
-                    }
-                    else
-                    {
-                        LOG.info("destCA " + destCA + " could not be initialized, ignore cert profile " + name + "");
-                    }
-                }
-                else if(disabledCaNames.contains(destCA))
-                {
-                    LOG.info("destCA " + destCA + " is disabled, ignore cert profile " + name + "");
-                }
-                else
-                {
-                    throw new ConfigurationException("no CA " + destCA + " defined");
-                }
-            }
-        }
-
-        Set<RACertProfileMapping> raCertProfileMappings = new HashSet<RACertProfileMapping>();
-        for(String name : raProfileNames)
-        {
-            String ca = props.getProperty(RA_PROFILE_PREFIX + name + RA_PROFILE_CA_SUFFIX);
-            String targetProfile = props.getProperty(RA_PROFILE_PREFIX + name + RA_PROFILE_TARGETPROFILE_SUFFIX);
-            raCertProfileMappings.add(new RACertProfileMapping(name, targetProfile, ca));
-        }
-
         // ------------------------------------------------
         ConcurrentContentSigner requestorSigner;
         try
@@ -430,42 +294,18 @@ public final class RAWorkerImpl extends AbstractRAWorker implements RAWorker
 
             cmpRequestorsMap.put(ca.getName(), cmpRequestor);
         }
-
-        for(IdentifiedCertProfile profile : certProfiles)
-        {
-            String name = profile.getName();
-            if(this.raProfilesMaps.containsKey(name))
-            {
-                throw new IllegalArgumentException("Cert profile " + name + " defined duplicatedly");
-            }
-            this.raProfilesMaps.put(name, profile);
-        }
-
-        for(RACertProfileMapping mapping : raCertProfileMappings)
-        {
-            String ca = mapping.getDestCA();
-            String requestedProfile = mapping.getRequestedProfile();
-            String destProfile = mapping.getDestProfile();
-
-            if(this.raProfilesMaps.containsKey(requestedProfile) == false)
-            {
-                throw new ConfigurationException(
-                        "RAClient requested profile " + requestedProfile + " not configured");
-            }
-
-            boolean destProfileSupported = this.casMap.get(mapping.getDestCA()).getProfiles().contains(destProfile);
-
-            if(destProfileSupported == false)
-            {
-                throw new ConfigurationException("RAClient dest profile " + destProfile +
-                        " not supported by CA " + ca);
-            }
-            this.raProfileMappingsMap.put(requestedProfile, mapping);
-        }
     }
 
     @Override
     public EnrollCertResult requestCert(CertificationRequest p10Request, String profile, String caName)
+    throws RAWorkerException, PKIErrorException
+    {
+        return requestCert(p10Request, profile, caName, null);
+    }
+
+    @Override
+    public EnrollCertResult requestCert(CertificationRequest p10Request, String profile, String caName,
+            String username)
     throws RAWorkerException, PKIErrorException
     {
         EnrollCertEntryType entry = new EnrollCertEntryType(p10Request, profile);
@@ -473,13 +313,22 @@ public final class RAWorkerImpl extends AbstractRAWorker implements RAWorker
 
         final String id = "p10-1";
         entries.put(id, entry);
-        return requestCerts(EnrollCertRequestType.Type.CERT_REQ, entries, caName);
+        return requestCerts(EnrollCertRequestType.Type.CERT_REQ, entries, caName, username);
     }
 
     @Override
     public EnrollCertResult requestCerts(EnrollCertRequestType.Type type,
             Map<String, EnrollCertEntryType> enrollCertEntries,
             String caname)
+    throws RAWorkerException, PKIErrorException
+    {
+        return requestCerts(type, enrollCertEntries, caname, null);
+    }
+
+    @Override
+    public EnrollCertResult requestCerts(EnrollCertRequestType.Type type,
+            Map<String, EnrollCertEntryType> enrollCertEntries,
+            String caname, String username)
     throws RAWorkerException, PKIErrorException
     {
         ParamChecker.assertNotNull("enrollCertEntries", enrollCertEntries);
@@ -501,7 +350,6 @@ public final class RAWorkerImpl extends AbstractRAWorker implements RAWorker
             certTempBuilder.setPublicKey(p10ReqInfo.getSubjectPublicKeyInfo());
             certTempBuilder.setSubject(p10ReqInfo.getSubject());
 
-            // TODO: extract the extensions from the attributes
             CertTemplate certTemplate = certTempBuilder.build();
             CertRequest certReq = new CertRequest(1, certTemplate, null);
 
@@ -510,11 +358,19 @@ public final class RAWorkerImpl extends AbstractRAWorker implements RAWorker
             enrollCertRequest.addRequestEntry(requestEntry);
         }
 
-        return requestCerts(enrollCertRequest, caname);
+        return requestCerts(enrollCertRequest, caname, username);
     }
 
     @Override
     public EnrollCertResult requestCert(CertReqMsg request, String extCertReqId, String caName)
+    throws RAWorkerException, PKIErrorException
+    {
+        return requestCert(request, extCertReqId, caName, null);
+    }
+
+    @Override
+    public EnrollCertResult requestCert(CertReqMsg request, String extCertReqId, String caName,
+            String username)
     throws RAWorkerException, PKIErrorException
     {
         ParamChecker.assertNotNull("request", request);
@@ -523,7 +379,7 @@ public final class RAWorkerImpl extends AbstractRAWorker implements RAWorker
         CmpResultType result;
         try
         {
-            result = cmpRequestor.requestCertificate(request, extCertReqId);
+            result = cmpRequestor.requestCertificate(request, extCertReqId,username);
         } catch (CmpRequestorException e)
         {
             throw new RAWorkerException(e);
@@ -548,142 +404,22 @@ public final class RAWorkerImpl extends AbstractRAWorker implements RAWorker
             String profileName, ProofOfPossession popo)
     throws RAWorkerException
     {
-        boolean shouldApplyCertProfile = false;
-
-        String caName;
-        if(raProfileMappingsMap.containsKey(profileName))
-        {
-            caName = raProfileMappingsMap.get(profileName).getDestCA();
-            shouldApplyCertProfile = true;
-        }
-        else
-        {
-            caName = getCANameForProfile(profileName);
-            if(caName == null)
-            {
-                throw new RAWorkerException("CertProfile " + profileName + " is not supported by any CA");
-            }
-        }
-
-        if (shouldApplyCertProfile)
-        {
-            return applyCertProfile(profileName, request, popo);
-        }
-        else
-        {
-            AttributeTypeAndValue certProfileInfo = null;
-            if(profileName != null)
-            {
-                CmpUtf8Pairs utf8Pairs = new CmpUtf8Pairs(CmpUtf8Pairs.KEY_CERT_PROFILE, profileName);
-                certProfileInfo = new AttributeTypeAndValue(
-                        CMPObjectIdentifiers.regInfo_utf8Pairs, new DERUTF8String(utf8Pairs.getEncoded()));
-            }
-
-            return new CertReqMsg(request, popo, (certProfileInfo == null) ? null
-                    : new AttributeTypeAndValue[] { certProfileInfo });
-        }
-    }
-
-    private CertReqMsg applyCertProfile(
-            String profileName, CertRequest origCertRequest, ProofOfPossession popo)
-    throws RAWorkerException
-    {
-        CertRequest newCertRequest = applyCertProfile(origCertRequest, profileName);
-
-        if(popo != null)
-        {
-            popo = raVerified;
-        }
-
-        OriginalProfileConf origProfileConf = buildOriginalProfileConf(profileName);
-        String encodedOrigProfile = origProfileConf.getEncoded();
-
-        CmpUtf8Pairs utf8Pairs = new CmpUtf8Pairs(
-                CmpUtf8Pairs.KEY_CERT_PROFILE, raProfileMappingsMap.get(profileName).getDestProfile());
-           utf8Pairs.putUtf8Pair(CmpUtf8Pairs.KEY_ORIG_CERT_PROFILE, encodedOrigProfile);
-
+        ParamChecker.assertNotEmpty("profileName", profileName);
+        CmpUtf8Pairs utf8Pairs = new CmpUtf8Pairs(CmpUtf8Pairs.KEY_CERT_PROFILE, profileName);
         AttributeTypeAndValue certProfileInfo = new AttributeTypeAndValue(
-                    CMPObjectIdentifiers.regInfo_utf8Pairs,
-                    new DERUTF8String(utf8Pairs.getEncoded()));
-
-        return new CertReqMsg(newCertRequest, popo, new AttributeTypeAndValue[] { certProfileInfo });
-    }
-
-    private CertRequest applyCertProfile(CertRequest origCertRequest, String profileName)
-    throws RAWorkerException
-    {
-        CertProfile certProfile = raProfilesMaps.get(profileName);
-
-        CertTemplate origCertTemp = origCertRequest.getCertTemplate();
-
-        CertTemplateBuilder builder = new CertTemplateBuilder();
-        builder.setPublicKey(origCertTemp.getPublicKey());
-
-        X500Name requestedSubject = origCertTemp.getSubject();
-        X500Name newSubject;
-        try
-        {
-            newSubject = certProfile.getSubject(requestedSubject).getGrantedSubject();
-        } catch (CertProfileException e)
-        {
-            throw new RAWorkerException(e);
-        } catch (BadCertTemplateException e)
-        {
-            throw new RAWorkerException(e);
-        }
-        builder.setSubject(newSubject);
-
-        Integer validity = certProfile.getValidity();
-        if(validity != null)
-        {
-            Date notBefore = new Date();
-            Date notAfter = new Date(notBefore.getTime() + DAY * validity);
-
-            OptionalValidity optionalValidity = new OptionalValidity(new Time(notBefore), new Time(notAfter));
-            builder.setValidity(optionalValidity);
-        }
-
-        List<ExtensionTuple> extensionTuples;
-        try
-        {
-            extensionTuples = certProfile.getExtensions(requestedSubject, origCertTemp.getExtensions()).getExtensions();
-        } catch (CertProfileException e)
-        {
-            throw new RAWorkerException(e);
-        } catch (BadCertTemplateException e)
-        {
-            throw new RAWorkerException(e);
-        }
-
-        List<Extension> newExtensions = new ArrayList<Extension>(extensionTuples.size());
-
-        for(ExtensionTuple extension : extensionTuples)
-        {
-            byte[] encodedValue;
-            try
-            {
-                encodedValue = extension.getValue().toASN1Primitive().getEncoded();
-            } catch (IOException e)
-            {
-                throw new RAWorkerException("Error while decode the extension " + extension.getType().getId());
-            }
-            Extension newExtension = new Extension(
-                    extension.getType(),
-                    extension.isCritical(),
-                    encodedValue);
-            newExtensions.add(newExtension);
-        }
-
-        Extensions extensions = new Extensions(newExtensions.toArray(new Extension[0]));
-
-        builder.setExtensions(extensions);
-
-        return new CertRequest(origCertRequest.getCertReqId(),
-                builder.build(), origCertRequest.getControls());
+                CMPObjectIdentifiers.regInfo_utf8Pairs, new DERUTF8String(utf8Pairs.getEncoded()));
+        return new CertReqMsg(request, popo, new AttributeTypeAndValue[] { certProfileInfo });
     }
 
     @Override
     public EnrollCertResult requestCerts(EnrollCertRequestType request, String caname)
+    throws RAWorkerException, PKIErrorException
+    {
+        return requestCerts(request, caname, null);
+    }
+
+    @Override
+    public EnrollCertResult requestCerts(EnrollCertRequestType request, String caname, String username)
     throws RAWorkerException, PKIErrorException
     {
         ParamChecker.assertNotNull("request", request);
@@ -698,38 +434,18 @@ public final class RAWorkerImpl extends AbstractRAWorker implements RAWorker
         {
             // detect the CA name
             String profile = requestEntries.get(0).getCertProfile();
-            if(raProfileMappingsMap.containsKey(profile))
+            caname = getCANameForProfile(profile);
+            if(caname == null)
             {
-                caname = raProfileMappingsMap.get(profile).getDestCA();
-            }
-            else
-            {
-                caname = getCANameForProfile(profile);
-                if(caname == null)
-                {
-                    throw new RAWorkerException("CertProfile " + profile + " is not supported by any CA");
-                }
+                throw new RAWorkerException("CertProfile " + profile + " is not supported by any CA");
             }
         }
 
         // make sure that all requests are targeted on the same CA
-        boolean shouldApplyCertProfile = false;
         for(EnrollCertRequestEntryType entry : request.getRequestEntries())
         {
             String profile = entry.getCertProfile();
-            if(raProfileMappingsMap.containsKey(profile))
-            {
-                shouldApplyCertProfile = true;
-                RACertProfileMapping raProfileMapping = raProfileMappingsMap.get(profile);
-                if(raProfileMapping.getDestCA().equals(caname) == false)
-                {
-                    throw new RAWorkerException("Not all requests are targeted on the same CA");
-                }
-            }
-            else
-            {
-                checkCertProfileSupportInCA(profile, caname);
-            }
+            checkCertProfileSupportInCA(profile, caname);
         }
 
         X509CmpRequestor cmpRequestor = cmpRequestorsMap.get(caname);
@@ -738,15 +454,10 @@ public final class RAWorkerImpl extends AbstractRAWorker implements RAWorker
             throw new RAWorkerException("could not find CA named " + caname);
         }
 
-        if(shouldApplyCertProfile)
-        {
-            request = applyCertProfiles(request);
-        }
-
         CmpResultType result;
         try
         {
-            result = cmpRequestor.requestCertificate(request);
+            result = cmpRequestor.requestCertificate(request, username);
         } catch (CmpRequestorException e)
         {
             throw new RAWorkerException(e);
@@ -764,46 +475,6 @@ public final class RAWorkerImpl extends AbstractRAWorker implements RAWorker
         {
             throw new RuntimeException("Unknown result type: " + result.getClass().getName());
         }
-    }
-
-    private EnrollCertRequestType applyCertProfiles(EnrollCertRequestType request)
-    throws RAWorkerException
-    {
-        EnrollCertRequestType ret = new EnrollCertRequestType(request.getType());
-
-        for(EnrollCertRequestEntryType singleRequest : request.getRequestEntries())
-        {
-            String profileName = singleRequest.getCertProfile();
-            if(raProfilesMaps.containsKey(profileName))
-            {
-                singleRequest = applyCertProfile(profileName, singleRequest);
-            }
-            ret.addRequestEntry(singleRequest);
-        }
-
-        return ret;
-    }
-
-    private EnrollCertRequestEntryType applyCertProfile(
-            String profileName,
-            EnrollCertRequestEntryType singleRequest)
-    throws RAWorkerException
-    {
-        RACertProfileMapping raCertProfileMapping = raProfileMappingsMap.get(profileName);
-        ProofOfPossession popo = singleRequest.getPopo();
-        if(popo != null)
-        {
-            popo = raVerified;
-        }
-
-        CertRequest newCertRequest = applyCertProfile(singleRequest.getCertReq(), profileName);
-
-        EnrollCertRequestEntryType ret = new EnrollCertRequestEntryType(singleRequest.getId(),
-                raCertProfileMapping.getDestProfile(), newCertRequest, popo);
-
-        OriginalProfileConf origProfileConf = buildOriginalProfileConf(profileName);
-        ret.setOrigCertProfile(origProfileConf.getEncoded());
-        return ret;
     }
 
     private void checkCertProfileSupportInCA(String certProfile, String caname)
@@ -832,7 +503,6 @@ public final class RAWorkerImpl extends AbstractRAWorker implements RAWorker
                 throw new RAWorkerException("Unsupported certificate profile " + certProfile);
             }
         }
-
         else if(casMap.containsKey(caname) == false)
         {
             throw new RAWorkerException("unknown ca: " + caname);
@@ -845,12 +515,6 @@ public final class RAWorkerImpl extends AbstractRAWorker implements RAWorker
                 throw new RAWorkerException("cert profile " + certProfile + " is not supported by the CA " + caname);
             }
         }
-    }
-
-    private OriginalProfileConf buildOriginalProfileConf(String profileName)
-    {
-        CertProfile certProfile = raProfilesMaps.get(profileName);
-        return new OriginalProfileConf(profileName, certProfile);
     }
 
     @Override
@@ -1080,11 +744,18 @@ public final class RAWorkerImpl extends AbstractRAWorker implements RAWorker
     public byte[] envelope(CertReqMsg certReqMsg, String caName)
     throws RAWorkerException
     {
+        return envelope(certReqMsg, caName, null);
+    }
+
+    @Override
+    public byte[] envelope(CertReqMsg certReqMsg, String caName, String username)
+    throws RAWorkerException
+    {
         ParamChecker.assertNotNull("request", certReqMsg);
         X509CmpRequestor cmpRequestor = getCmpRequestor(certReqMsg, caName);
         try
         {
-            return cmpRequestor.envelope(certReqMsg).getEncoded();
+            return cmpRequestor.envelope(certReqMsg, username).getEncoded();
         } catch (IOException e)
         {
             throw new RAWorkerException("IOException: " + e.getMessage(), e);
@@ -1101,55 +772,13 @@ public final class RAWorkerImpl extends AbstractRAWorker implements RAWorker
 
         if(caName == null)
         {
-            AttributeTypeAndValue[] regInfo = request.getRegInfo();
+            CmpUtf8Pairs utf8Pairs = CmpUtil.extract(request.getRegInfo());
+            String certProfileName = utf8Pairs.getValue(CmpUtf8Pairs.KEY_CERT_PROFILE);
+            caName = getCANameForProfile(certProfileName);
 
-            CmpUtf8Pairs utf8Pairs = null;
-            if (regInfo != null)
+            if(caName == null)
             {
-                for(AttributeTypeAndValue atv : regInfo)
-                {
-                    if(atv.getType().equals(CMPObjectIdentifiers.regInfo_utf8Pairs))
-                    {
-                        String atvValue = DERUTF8String.getInstance(atv.getValue()).getString();
-                        utf8Pairs = new CmpUtf8Pairs(atvValue);
-                        break;
-                    }
-                }
-            }
-
-            String origCertProfileInfo = utf8Pairs.getValue(CmpUtf8Pairs.KEY_ORIG_CERT_PROFILE);
-
-            // detect the CA name
-            if(origCertProfileInfo != null)
-            {
-                OriginalProfileConf origCertProfile;
-                try
-                {
-                    origCertProfile = OriginalProfileConf.getInstance(origCertProfileInfo);
-                } catch (ParseException e)
-                {
-                    throw new RAWorkerException("Invalid OriginalProfileConf: " + origCertProfileInfo +
-                            ". Message: " + e.getMessage());
-                }
-                String origCertProfileName = origCertProfile.getProfileName();
-                if(raProfileMappingsMap.containsKey(origCertProfileName))
-                {
-                    caName = raProfileMappingsMap.get(origCertProfileName).getDestCA();
-                }
-                else
-                {
-                    throw new RAWorkerException("Original CertProfile " + origCertProfileName + " is not supported by any CA");
-                }
-            }
-            else
-            {
-                String certProfileName = utf8Pairs.getValue(CmpUtf8Pairs.KEY_CERT_PROFILE);
-                caName = getCANameForProfile(certProfileName);
-
-                if(caName == null)
-                {
-                    throw new RAWorkerException("CertProfile " + certProfileName + " is not supported by any CA");
-                }
+                throw new RAWorkerException("CertProfile " + certProfileName + " is not supported by any CA");
             }
         }
 
@@ -1403,4 +1032,5 @@ public final class RAWorkerImpl extends AbstractRAWorker implements RAWorker
 
         return parseRevokeCertResult(result);
     }
+
 }
