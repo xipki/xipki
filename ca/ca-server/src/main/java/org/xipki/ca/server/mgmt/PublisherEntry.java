@@ -44,7 +44,7 @@ public class PublisherEntry
 
     public PublisherEntry(String name)
     {
-    	ParamChecker.assertNotEmpty("name", name);
+        ParamChecker.assertNotEmpty("name", name);
         this.name = name;
     }
 

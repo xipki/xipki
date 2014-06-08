@@ -46,7 +46,7 @@ public class EnrollCertResultType implements CmpResultType
         ParamChecker.assertNotNull("resultEntry", resultEntry);
 
         if((resultEntry instanceof EnrollCertResultEntryType ||
-        		resultEntry instanceof ErrorResultEntryType) == false)
+                resultEntry instanceof ErrorResultEntryType) == false)
         {
             throw new IllegalArgumentException("Unaccepted parameter of class " + resultEntry.getClass().getName());
         }

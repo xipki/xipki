@@ -28,7 +28,7 @@ public abstract class CertProfile
 {
     public boolean isOnlyForRA()
     {
-    	return false;
+        return false;
     }
 
     public abstract void initialize(String data)
@@ -65,7 +65,7 @@ public abstract class CertProfile
     public abstract ExtensionOccurrence getOccurenceOfAuthorityInfoAccess();
 
     public abstract ExtensionTuples getExtensions(X500Name requestedSubject,
-    		Extensions requestedExtensions)
+            Extensions requestedExtensions)
     throws CertProfileException, BadCertTemplateException;
 
     public abstract boolean incSerialNumberIfSubjectExists();

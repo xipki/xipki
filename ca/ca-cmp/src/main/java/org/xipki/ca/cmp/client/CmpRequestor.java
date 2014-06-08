@@ -171,7 +171,7 @@ public abstract class CmpRequestor
             try
             {
                 ProtectionVerificationResult verifyProtection = verifyProtection(
-                		Hex.toHexString(tid.getOctets()), response);
+                        Hex.toHexString(tid.getOctets()), response);
                 ret.setProtectionVerificationResult(verifyProtection);
             } catch (InvalidKeyException e)
             {
@@ -282,8 +282,8 @@ public abstract class CmpRequestor
             return new ProtectionVerificationResult(null, ProtectionResult.SENDER_NOT_AUTHORIZED);
         }
 
-        ContentVerifierProvider verifierProvider = 
-        		securityFactory.getContentVerifierProvider(responderCert);
+        ContentVerifierProvider verifierProvider =
+                securityFactory.getContentVerifierProvider(responderCert);
         if(verifierProvider == null)
         {
             LOG.warn("tid={}: not authorized requestor {}", tid, h.getSender());

@@ -235,9 +235,9 @@ public class CAEntry
     @Override
     public String toString()
     {
-    	return toString(false);
+        return toString(false);
     }
-    
+
     public String toString(boolean verbose)
     {
         StringBuilder sb = new StringBuilder();
@@ -256,7 +256,7 @@ public class CAEntry
         sb.append("\tsubject: ").append(subject).append("\n");
         if(verbose)
         {
-        	sb.append("\tEncoded: ").append(Base64.toBase64String(cert.getEncodedCert())).append("\n");
+            sb.append("\tEncoded: ").append(Base64.toBase64String(cert.getEncodedCert())).append("\n");
         }
         sb.append("crlsigner_name: ").append(crlSignerName).append('\n');
         sb.append("allowDuplicateKey: ").append(allowDuplicateKey).append('\n');

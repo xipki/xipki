@@ -89,7 +89,7 @@ public class PKIStatusInfo
     {
         return formatPKIStatusInfo(status, pkiFailureInfo, statusMessage);
     }
-    
+
     public static String formatPKIStatusInfo(org.bouncycastle.asn1.cmp.PKIStatusInfo pkiStatusInfo)
     {
         int status = pkiStatusInfo.getStatus().intValue();

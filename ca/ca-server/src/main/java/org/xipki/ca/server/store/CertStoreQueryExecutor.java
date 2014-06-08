@@ -321,7 +321,7 @@ class CertStoreQueryExecutor
     throws SQLException, CRLException, OperationException
     {
         byte[] encodedExtnValue = crl.getExtensionValue(Extension.cRLNumber.getId());
-        Integer crlNumber = null; 
+        Integer crlNumber = null;
         if(encodedExtnValue != null)
         {
             byte[] extnValue = DEROctetString.getInstance(encodedExtnValue).getOctets();
@@ -329,7 +329,7 @@ class CertStoreQueryExecutor
         }
 
         final String SQL = "INSERT INTO CRL (CAINFO_ID, CRL_NUMBER, THISUPDATE, NEXTUPDATE, CRL)" +
-        		" VALUES (?, ?, ?, ?, ?)";
+                " VALUES (?, ?, ?, ?, ?)";
         PreparedStatement ps = borrowPreparedStatement(SQL);
 
         try

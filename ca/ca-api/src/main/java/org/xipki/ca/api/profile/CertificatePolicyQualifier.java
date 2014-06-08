@@ -32,13 +32,13 @@ public class CertificatePolicyQualifier
 
     public static CertificatePolicyQualifier getInstanceForUserNotice(String userNotice)
     {
-    	ParamChecker.assertNotEmpty("userNotice", userNotice);
+        ParamChecker.assertNotEmpty("userNotice", userNotice);
         return new CertificatePolicyQualifier(null, userNotice);
     }
 
     public static CertificatePolicyQualifier getInstanceForCpsUri(String cpsUri)
     {
-    	ParamChecker.assertNotEmpty("cpsUri", cpsUri);
+        ParamChecker.assertNotEmpty("cpsUri", cpsUri);
         return new CertificatePolicyQualifier(cpsUri, null);
     }
 

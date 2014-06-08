@@ -32,11 +32,10 @@ public class CrlSignerListCommand extends CaCommand
             required = false, multiValued = false)
     protected String name;
 
-    
     @Option(name = "-v", aliases="--verbose",
             required = false, description = "Show CA information verbosely")
     protected Boolean          verbose;
-    
+
     @Override
     protected Object doExecute()
     throws Exception

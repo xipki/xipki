@@ -755,7 +755,7 @@ public class X509CA
 
     public boolean republishCertificates(String publisherName)
     {
-    	ParamChecker.assertNotEmpty("publisherName", publisherName);
+        ParamChecker.assertNotEmpty("publisherName", publisherName);
 
         IdentifiedCertPublisher publisher = null;
         for(IdentifiedCertPublisher p : getPublishers())
@@ -992,7 +992,7 @@ public class X509CA
                 try
                 {
                     publisher.certificateRevoked(caInfo.getCertificate(),
-                    		revokedCert.getCert(), revokedCert.getRevInfo());
+                            revokedCert.getCert(), revokedCert.getRevInfo());
                 }
                 catch (RuntimeException re)
                 {
@@ -1151,7 +1151,7 @@ public class X509CA
         if(certProfile.isOnlyForRA() && requestedByRA == false)
         {
             throw new OperationException(ErrorCode.INSUFFICIENT_PERMISSION,
-            		"Profile " + certProfileName + " not applied to non-RA");
+                    "Profile " + certProfileName + " not applied to non-RA");
         }
 
         // public key
@@ -1182,7 +1182,7 @@ public class X509CA
         if(grantedSubject.equals(caSubjectX500Name))
         {
             throw new OperationException(ErrorCode.ALREADY_ISSUED,
-            		"Certificate with the same subject as CA is not allowed");
+                    "Certificate with the same subject as CA is not allowed");
         }
 
         String sha1FpSubject = IoCertUtil.sha1sum_canonicalized_name(grantedSubject);
@@ -1269,8 +1269,8 @@ public class X509CA
                         {
                             throw new OperationException(ErrorCode.BAD_CERT_TEMPLATE, e.getMessage());
                         }
-                    }while(certstore.certIssuedForSubject(caInfo.getCertificate(), 
-                    		IoCertUtil.sha1sum_canonicalized_name(grantedSubject)));
+                    }while(certstore.certIssuedForSubject(caInfo.getCertificate(),
+                            IoCertUtil.sha1sum_canonicalized_name(grantedSubject)));
                 }
             }
         }
@@ -1366,7 +1366,7 @@ public class X509CA
                 byte[] encodedCert = bcCert.getEncoded();
 
                 X509Certificate cert = (X509Certificate) cf.engineGenerateCertificate(
-                		new ByteArrayInputStream(encodedCert));
+                        new ByteArrayInputStream(encodedCert));
                 if(verifySignature(cert) == false)
                 {
                      throw new OperationException(ErrorCode.System_Failure,
@@ -1376,7 +1376,7 @@ public class X509CA
                 X509CertificateWithMetaInfo certWithMeta = new X509CertificateWithMetaInfo(cert, encodedCert);
 
                 ret = new CertificateInfo(certWithMeta, caInfo.getCertificate(),
-                		publicKeyInfo.getEncoded(), certProfileName);
+                        publicKeyInfo.getEncoded(), certProfileName);
             } catch (CertificateException e)
             {
                 throw new OperationException(ErrorCode.System_Failure, "CertificateException: " + e.getMessage());

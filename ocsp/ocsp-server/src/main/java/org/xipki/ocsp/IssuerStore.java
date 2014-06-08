@@ -42,7 +42,7 @@ public class IssuerStore
                 if(existingEntry.getId() == entry.getId())
                 {
                     throw new IllegalArgumentException(
-                    		"issuer with the same id " + entry.getId() + " already available");
+                            "issuer with the same id " + entry.getId() + " already available");
                 }
             }
             this.entries.add(entry);
