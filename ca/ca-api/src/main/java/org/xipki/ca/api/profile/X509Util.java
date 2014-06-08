@@ -136,7 +136,7 @@ public class X509Util
 
     public static AuthorityInformationAccess createAuthorityInformationAccess(List<String> ocspUris)
     {
-        if(ocspUris != null && ocspUris.isEmpty())
+        if(ocspUris == null || ocspUris.isEmpty())
         {
             return null;
         }

@@ -26,14 +26,15 @@ import org.xipki.security.common.EnvironmentParameterResolver;
 
 public abstract class CertProfile
 {
-
-    public abstract boolean isOnlyForRA();
+    public boolean isOnlyForRA()
+    {
+    	return false;
+    }
 
     public abstract void initialize(String data)
     throws CertProfileException;
 
-    public abstract void setEnvironmentParamterResolver(
-            EnvironmentParameterResolver paramterResolver);
+    public abstract void setEnvironmentParameterResolver(EnvironmentParameterResolver parameterResolver);
 
     public abstract Date getNotBefore(Date notBefore);
 
@@ -63,9 +64,8 @@ public abstract class CertProfile
 
     public abstract ExtensionOccurrence getOccurenceOfAuthorityInfoAccess();
 
-    public abstract ExtensionTuples getExtensions(
-            X500Name requestedSubject,
-            Extensions requestedExtensions)
+    public abstract ExtensionTuples getExtensions(X500Name requestedSubject,
+    		Extensions requestedExtensions)
     throws CertProfileException, BadCertTemplateException;
 
     public abstract boolean incSerialNumberIfSubjectExists();
@@ -76,7 +76,7 @@ public abstract class CertProfile
         try
         {
             int currentSN = currentSerialNumber == null ? 0 : Integer.parseInt(currentSerialNumber.trim());
-            return Integer.toString(currentSN+1);
+            return Integer.toString(currentSN + 1);
         }catch(NumberFormatException e)
         {
             throw new BadCertTemplateException("invalid serialNumber attribute " + currentSerialNumber);

@@ -63,8 +63,7 @@ public abstract class AbstractRAWorker
         this.passwordResolver = passwordResolver;
     }
 
-    protected EnrollCertResult parseEnrollCertResult(EnrollCertResultType result,
-            String caname)
+    protected EnrollCertResult parseEnrollCertResult(EnrollCertResultType result, String caName)
     throws RAWorkerException
     {
         Map<String, CertificateOrError> certOrErrors = new HashMap<String, CertificateOrError>();

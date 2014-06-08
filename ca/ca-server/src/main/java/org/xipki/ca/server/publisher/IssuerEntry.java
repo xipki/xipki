@@ -29,8 +29,7 @@ class IssuerEntry
     private final byte[] sha1Fp;
     private final byte[] cert;
 
-    IssuerEntry(int id, String subject, String hexSha1Fp,
-            String b64Cert)
+    IssuerEntry(int id, String subject, String hexSha1Fp, String b64Cert)
     {
         super();
         this.id = id;

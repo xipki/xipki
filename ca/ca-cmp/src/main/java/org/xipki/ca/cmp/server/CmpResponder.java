@@ -383,17 +383,10 @@ public abstract class CmpResponder
         return requestor;
     }
 
-    protected PKIStatusInfo generateCmpRejectionStatus(
-            Integer info, String errorMessage)
+    protected PKIStatusInfo generateCmpRejectionStatus(Integer info, String errorMessage)
     {
-        PKIFreeText statusMessage = errorMessage == null ?
-                null :
-                new PKIFreeText(errorMessage);
-
-        PKIFailureInfo failureInfo = info == null ?
-                null :
-                new PKIFailureInfo(info);
-
+        PKIFreeText statusMessage = (errorMessage == null) ? null : new PKIFreeText(errorMessage);
+        PKIFailureInfo failureInfo = (info == null) ? null : new PKIFailureInfo(info);
         return new PKIStatusInfo(PKIStatus.rejection, statusMessage, failureInfo);
     }
 

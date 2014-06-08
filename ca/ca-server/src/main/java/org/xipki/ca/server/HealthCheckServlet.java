@@ -73,7 +73,7 @@ public class HealthCheckServlet extends HttpServlet
                 int indexOf = constructedPath.indexOf(servletPath);
                 if (indexOf >= 0)
                 {
-                    constructedPath = constructedPath.substring(indexOf+servletPath.length());
+                    constructedPath = constructedPath.substring(indexOf + servletPath.length());
                 }
             }
 

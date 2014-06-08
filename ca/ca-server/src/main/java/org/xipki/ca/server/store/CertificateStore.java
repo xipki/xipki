@@ -67,7 +67,8 @@ public class CertificateStore
         {
             LOG.error("Could not save certificate {}: {}. Message: {}",
                     new Object[]{certInfo.getCert().getSubject(),
-                    Base64.toBase64String(certInfo.getCert().getEncodedCert()), e.getMessage()});
+            			Base64.toBase64String(certInfo.getCert().getEncodedCert()),
+            			e.getMessage()});
             LOG.debug("error", e);
             return false;
         }
@@ -150,58 +151,58 @@ public class CertificateStore
         }
     }
 
-    public boolean addCRL(X509CertificateWithMetaInfo cacert, X509CRL crl)
+    public boolean addCRL(X509CertificateWithMetaInfo caCert, X509CRL crl)
     {
         try
         {
-            queryExecutor.addCRL(cacert, crl);
+            queryExecutor.addCRL(caCert, crl);
             return true;
         } catch (Exception e)
         {
             LOG.error("Could not add CRL ca={}, thisUpdate={}: {}, ",
-                new Object[]{cacert.getSubject(),
+                new Object[]{caCert.getSubject(),
                     crl.getThisUpdate(), e.getMessage()});
             LOG.debug("Exception", e);
             return false;
         }
     }
 
-    public int getNextFreeCRLNumber(X509CertificateWithMetaInfo cacert)
+    public int getNextFreeCRLNumber(X509CertificateWithMetaInfo caCert)
     throws SQLException, OperationException
     {
-        return queryExecutor.getNextFreeCrlNumber(cacert);
+        return queryExecutor.getNextFreeCrlNumber(caCert);
     }
 
-    public long getThisUpdateOfCurrentCRL(X509CertificateWithMetaInfo cacert)
+    public long getThisUpdateOfCurrentCRL(X509CertificateWithMetaInfo caCert)
     throws SQLException, OperationException
     {
-        return queryExecutor.getThisUpdateOfCurrentCRL(cacert);
+        return queryExecutor.getThisUpdateOfCurrentCRL(caCert);
     }
 
-    public byte[] getEncodedCurrentCRL(X509CertificateWithMetaInfo cacert)
+    public byte[] getEncodedCurrentCRL(X509CertificateWithMetaInfo caCert)
     {
         try
         {
-            return queryExecutor.getEncodedCRL(cacert);
+            return queryExecutor.getEncodedCRL(caCert);
         } catch (Exception e)
         {
             LOG.error("Could not get CRL ca={}: error message: {}",
-                    cacert.getSubject(),
+                    caCert.getSubject(),
                     e.getMessage());
             LOG.debug("Exception", e);
             return null;
         }
     }
 
-    public int cleanupCRLs(X509CertificateWithMetaInfo cacert, int numCRLs)
+    public int cleanupCRLs(X509CertificateWithMetaInfo caCert, int numCRLs)
     {
         try
         {
-            return queryExecutor.cleanupCRLs(cacert, numCRLs);
+            return queryExecutor.cleanupCRLs(caCert, numCRLs);
         } catch (Exception e)
         {
             LOG.error("Could not cleanup CRLs ca={}: error message: {}",
-                    cacert.getSubject(),
+                    caCert.getSubject(),
                     e.getMessage());
             LOG.debug("Exception", e);
             return 0;

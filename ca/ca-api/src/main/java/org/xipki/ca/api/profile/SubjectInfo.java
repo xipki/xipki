@@ -25,8 +25,7 @@ public class SubjectInfo
     private final X500Name grantedSubject;
     private final String warning;
 
-    public SubjectInfo(X500Name grantedSubject,
-            String warning)
+    public SubjectInfo(X500Name grantedSubject, String warning)
     {
         ParamChecker.assertNotNull("grantedSubject", grantedSubject);
 

@@ -77,18 +77,7 @@ public class CAHasRequestorEntry
         sb.append("requestor: ").append(requestorName).append(", ");
         sb.append("ra: ").append(ra).append(", ");
         sb.append("profiles: ").append(profiles).append(", ");
-        sb.append("permissions: [");
-        boolean firstEntry = true;
-        for(Permission permission : permissions)
-        {
-            if(firstEntry == false)
-            {
-                sb.append(", ");
-            }
-            firstEntry = false;
-            sb.append(permission.getPermission());
-        }
-        sb.append("]");
+        sb.append("permissions: ").append(Permission.toString(permissions));
         return sb.toString();
     }
 }

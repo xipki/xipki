@@ -28,6 +28,7 @@ import java.util.Set;
 
 import org.bouncycastle.asn1.cmp.CMPCertificate;
 import org.bouncycastle.asn1.x509.Certificate;
+import org.bouncycastle.util.encoders.Base64;
 import org.xipki.ca.api.CAMgmtException;
 import org.xipki.ca.api.CAStatus;
 import org.xipki.ca.common.X509CertificateWithMetaInfo;
@@ -234,6 +235,11 @@ public class CAEntry
     @Override
     public String toString()
     {
+    	return toString(false);
+    }
+    
+    public String toString(boolean verbose)
+    {
         StringBuilder sb = new StringBuilder();
         sb.append("name: ").append(name).append('\n');
         sb.append("next_serial: ").append(nextSerial).append('\n');
@@ -248,6 +254,10 @@ public class CAEntry
                 IoCertUtil.canonicalizeName(cert.getCert().getIssuerX500Principal())).append("\n");
         sb.append("\tserialNumber: ").append(cert.getCert().getSerialNumber()).append("\n");
         sb.append("\tsubject: ").append(subject).append("\n");
+        if(verbose)
+        {
+        	sb.append("\tEncoded: ").append(Base64.toBase64String(cert.getEncodedCert())).append("\n");
+        }
         sb.append("crlsigner_name: ").append(crlSignerName).append('\n');
         sb.append("allowDuplicateKey: ").append(allowDuplicateKey).append('\n');
         sb.append("allowDuplicateSubject: ").append(allowDuplicateSubject);

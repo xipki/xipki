@@ -56,7 +56,6 @@ import org.slf4j.LoggerFactory;
 import org.xipki.ca.api.OperationException;
 import org.xipki.ca.api.OperationException.ErrorCode;
 import org.xipki.ca.api.publisher.CertificateInfo;
-import org.xipki.ca.common.CertBasedRequestorInfo;
 import org.xipki.ca.common.RequestorInfo;
 import org.xipki.ca.common.X509CertificateWithMetaInfo;
 import org.xipki.ca.server.CertRevocationInfoWithSerial;
@@ -215,22 +214,7 @@ class CertStoreQueryExecutor
             ps.setInt(idx++, certprofileId);
             ps.setInt(idx++, caId);
 
-            Integer requestorId = null;
-            Integer userId = null;
-            if(requestor instanceof CertBasedRequestorInfo)
-            {
-                CertBasedRequestorInfo cmpRequestorInfo = (CertBasedRequestorInfo) requestor;
-                if(cmpRequestorInfo.getCertificate() != null)
-                {
-                    requestorId = getRequestorId(cmpRequestorInfo.getName());
-                }
-
-                if(user != null)
-                {
-                    userId = getUserId(user);
-                }
-            }
-
+            Integer requestorId = (requestor == null) ? null : getRequestorId(requestor.getName());
             if(requestorId != null)
             {
                 ps.setInt(idx++, requestorId.intValue());
@@ -240,6 +224,7 @@ class CertStoreQueryExecutor
                 ps.setNull(idx++, Types.INTEGER);
             }
 
+            Integer userId = (user == null) ? null : getUserId(user);
             if(userId != null)
             {
                 ps.setInt(idx++, userId.intValue());
@@ -276,7 +261,7 @@ class CertStoreQueryExecutor
         }
     }
 
-    int getNextFreeCrlNumber(X509CertificateWithMetaInfo cacert)
+    int getNextFreeCrlNumber(X509CertificateWithMetaInfo caCert)
     throws SQLException, OperationException
     {
         final String SQL = "SELECT MAX(CRL_NUMBER) FROM CRL WHERE CAINFO_ID=?";
@@ -285,7 +270,7 @@ class CertStoreQueryExecutor
 
         try
         {
-            int caId = getCaId(cacert);
+            int caId = getCaId(caCert);
             ps.setInt(1, caId);
 
             rs = ps.executeQuery();
@@ -306,7 +291,7 @@ class CertStoreQueryExecutor
         }
     }
 
-    Long getThisUpdateOfCurrentCRL(X509CertificateWithMetaInfo cacert)
+    Long getThisUpdateOfCurrentCRL(X509CertificateWithMetaInfo caCert)
     throws SQLException, OperationException
     {
         final String SQL = "SELECT MAX(THISUPDATE) FROM CRL WHERE CAINFO_ID=?";
@@ -315,7 +300,7 @@ class CertStoreQueryExecutor
 
         try
         {
-            int caId = getCaId(cacert);
+            int caId = getCaId(caCert);
             ps.setInt(1, caId);
 
             rs = ps.executeQuery();
@@ -332,24 +317,24 @@ class CertStoreQueryExecutor
         }
     }
 
-    void addCRL(X509CertificateWithMetaInfo cacert,
-            X509CRL crl)
+    void addCRL(X509CertificateWithMetaInfo caCert, X509CRL crl)
     throws SQLException, CRLException, OperationException
     {
         byte[] encodedExtnValue = crl.getExtensionValue(Extension.cRLNumber.getId());
-        Integer crlNumber = null;
+        Integer crlNumber = null; 
         if(encodedExtnValue != null)
         {
             byte[] extnValue = DEROctetString.getInstance(encodedExtnValue).getOctets();
             crlNumber = ASN1Integer.getInstance(extnValue).getPositiveValue().intValue();
         }
 
-        final String SQL = "INSERT INTO CRL (CAINFO_ID, CRL_NUMBER, THISUPDATE, NEXTUPDATE, CRL) VALUES (?, ?, ?, ?, ?)";
+        final String SQL = "INSERT INTO CRL (CAINFO_ID, CRL_NUMBER, THISUPDATE, NEXTUPDATE, CRL)" +
+        		" VALUES (?, ?, ?, ?, ?)";
         PreparedStatement ps = borrowPreparedStatement(SQL);
 
         try
         {
-            int caId = getCaId(cacert);
+            int caId = getCaId(caCert);
             int idx = 1;
 
             ps.setInt(idx++, caId);

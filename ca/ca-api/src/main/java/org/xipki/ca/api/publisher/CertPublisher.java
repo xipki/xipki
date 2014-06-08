@@ -33,7 +33,7 @@ public abstract class CertPublisher
             DataSource dataSource)
     throws CertPublisherException;
 
-    public abstract void setEnvironmentParamterResolver(EnvironmentParameterResolver paramterResolver);
+    public abstract void setEnvironmentParameterResolver(EnvironmentParameterResolver parameterResolver);
 
     public abstract void certificateAdded(CertificateInfo certInfo);
 
@@ -47,11 +47,11 @@ public abstract class CertPublisher
     public abstract void certificateRemoved(X509CertificateWithMetaInfo issuerCert,
             X509CertificateWithMetaInfo cert);
 
-    public abstract void crlAdded(X509CertificateWithMetaInfo cacert, X509CRL crl);
+    public abstract void crlAdded(X509CertificateWithMetaInfo caCert, X509CRL crl);
 
-    public abstract void caRevoked(X509CertificateWithMetaInfo cacert, CertRevocationInfo revocationInfo);
+    public abstract void caRevoked(X509CertificateWithMetaInfo caCert, CertRevocationInfo revocationInfo);
 
-    public abstract void caUnrevoked(X509CertificateWithMetaInfo cacert);
+    public abstract void caUnrevoked(X509CertificateWithMetaInfo caCert);
 
     public abstract boolean isHealthy();
 

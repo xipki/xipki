@@ -21,18 +21,18 @@ public class OperationException extends Exception
 {
     public static enum ErrorCode
     {
-        UNKNOWN_CERT_PROFILE,
-        CERT_REVOKED,
-        CERT_UNREVOKED,
-        NOT_PERMITTED,
-        UNKNOWN_CERT,
-        System_Failure,
-        INSUFFICIENT_PERMISSION,
         ALREADY_ISSUED,
         BAD_CERT_TEMPLATE,
-        INVALID_EXTENSION,
+        CERT_REVOKED,
+        CERT_UNREVOKED,
+        CRL_FAILURE,
         DATABASE_FAILURE,
-        CRL_FAILURE
+        INSUFFICIENT_PERMISSION,
+        INVALID_EXTENSION,
+        NOT_PERMITTED,
+        System_Failure,
+        UNKNOWN_CERT,
+        UNKNOWN_CERT_PROFILE
     }
 
     private static final long serialVersionUID = 1L;
@@ -49,7 +49,7 @@ public class OperationException extends Exception
 
     public OperationException(ErrorCode errorCode, String errorMessage)
     {
-        super("error code: " + errorCode + "\nerror message: " + errorMessage);
+        super("error code: " + errorCode + ", error message: " + errorMessage);
         this.errorCode = errorCode;
         this.errorMessage = errorMessage;
     }

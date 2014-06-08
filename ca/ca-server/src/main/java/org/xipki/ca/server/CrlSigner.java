@@ -35,7 +35,7 @@ public class CrlSigner
     private final int period;
     private final int overlap;
     private boolean includeCertsInCrl;
-    private boolean incluedExpiredCerts;
+    private boolean includeExpiredCerts;
 
     public CrlSigner(ConcurrentContentSigner signer, int period, int overlap)
     throws OperationException
@@ -100,14 +100,14 @@ public class CrlSigner
         return subjectKeyIdentifier == null ? null : Arrays.clone(subjectKeyIdentifier);
     }
 
-    public boolean incluedExpiredCerts()
+    public boolean includeExpiredCerts()
     {
-        return incluedExpiredCerts;
+        return includeExpiredCerts;
     }
 
-    public void setIncluedExpiredCerts(boolean incluedExpiredCerts)
+    public void setIncludeExpiredCerts(boolean includeExpiredCerts)
     {
-        this.incluedExpiredCerts = incluedExpiredCerts;
+        this.includeExpiredCerts = includeExpiredCerts;
     }
 
 }

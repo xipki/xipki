@@ -44,10 +44,7 @@ public class PublisherEntry
 
     public PublisherEntry(String name)
     {
-        if(name == null || name.isEmpty())
-        {
-            throw new IllegalArgumentException("name could not be null");
-        }
+    	ParamChecker.assertNotEmpty("name", name);
         this.name = name;
     }
 
@@ -105,16 +102,7 @@ public class PublisherEntry
             {
                 Class<?> clazz = Class.forName(className);
                 realPublisher = (CertPublisher) clazz.newInstance();
-            }catch(ClassNotFoundException e)
-            {
-                throw new CertPublisherException("invalid type " + type + ", " + e.getMessage());
-            } catch (InstantiationException e)
-            {
-                throw new CertPublisherException("invalid type " + type + ", " + e.getMessage());
-            } catch (IllegalAccessException e)
-            {
-                throw new CertPublisherException("invalid type " + type + ", " + e.getMessage());
-            } catch(ClassCastException e)
+            }catch(Exception e)
             {
                 throw new CertPublisherException("invalid type " + type + ", " + e.getMessage());
             }

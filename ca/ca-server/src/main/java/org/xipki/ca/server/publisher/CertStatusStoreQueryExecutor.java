@@ -349,7 +349,7 @@ class CertStatusStoreQueryExecutor
         }
     }
 
-    void revokeCa(X509CertificateWithMetaInfo cacert, CertRevocationInfo revocationInfo)
+    void revokeCa(X509CertificateWithMetaInfo caCert, CertRevocationInfo revocationInfo)
     throws SQLException, CertificateEncodingException
     {
         Date revocationTime = revocationInfo.getRevocationTime();
@@ -359,7 +359,7 @@ class CertStatusStoreQueryExecutor
             invalidityTime = revocationTime;
         }
 
-        int issuerId = getIssuerId(cacert);
+        int issuerId = getIssuerId(caCert);
         final String sql = "UPDATE ISSUER" +
                     " SET REVOKED = ?, REV_TIME = ?, REV_INVALIDITY_TIME = ?, REV_REASON = ?" +
                     " WHERE ID = ?";
@@ -380,10 +380,10 @@ class CertStatusStoreQueryExecutor
         }
     }
 
-    void unrevokeCa(X509CertificateWithMetaInfo cacert)
+    void unrevokeCa(X509CertificateWithMetaInfo caCert)
     throws SQLException, CertificateEncodingException
     {
-        int issuerId = getIssuerId(cacert);
+        int issuerId = getIssuerId(caCert);
         final String sql = "UPDATE ISSUER" +
                     " SET REVOKED = ?, REV_TIME = ?, REV_INVALIDITY_TIME = ?, REV_REASON = ?" +
                     " WHERE ID = ?";
@@ -496,8 +496,7 @@ class CertStatusStoreQueryExecutor
         return ps;
     }
 
-    private boolean certRegistered(int issuerId,
-            BigInteger serialNumber)
+    private boolean certRegistered(int issuerId, BigInteger serialNumber)
     throws SQLException
     {
         String sql = "count(*) FROM CERT WHERE ISSUER_ID = ? AND SERIAL = ?";

@@ -37,7 +37,7 @@ public class RevokeCertResultType implements CmpResultType
 
         if((resultEntry instanceof RevokeCertResultEntryType || resultEntry instanceof ErrorResultEntryType) == false)
         {
-            throw new IllegalArgumentException("Unaccepted parameter of class " + resultEntry.getClass().getCanonicalName());
+            throw new IllegalArgumentException("Unaccepted parameter of class " + resultEntry.getClass().getName());
         }
 
         if(resultEntries == null)

@@ -105,7 +105,7 @@ public class CertProfileEntry
 
         this.certProfile = new IdentifiedCertProfile(name, underlyingCertProfile);
         this.certProfile.initialize(conf);
-        this.certProfile.setEnvironmentParamterResolver(envParamResolver);
+        this.certProfile.setEnvironmentParameterResolver(envParamResolver);
 
         return this.certProfile;
     }
@@ -121,7 +121,7 @@ public class CertProfileEntry
         this.envParamResolver = envParamResolver;
         if(certProfile != null)
         {
-            certProfile.setEnvironmentParamterResolver(envParamResolver);
+            certProfile.setEnvironmentParameterResolver(envParamResolver);
         }
     }
 

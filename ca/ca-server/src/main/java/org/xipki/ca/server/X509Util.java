@@ -231,7 +231,6 @@ public class X509Util
                     {
                         qualifierInfos.add(qualifierInfo);
                     }
-                    //PolicyQualifierId qualifierId
                 }
 
                 policyQualifiers = new DERSequence(qualifierInfos.toArray(new PolicyQualifierInfo[0]));

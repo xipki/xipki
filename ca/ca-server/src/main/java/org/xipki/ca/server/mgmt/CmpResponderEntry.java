@@ -17,8 +17,10 @@
 
 package org.xipki.ca.server.mgmt;
 
+import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
 
+import org.bouncycastle.util.encoders.Base64;
 import org.xipki.security.common.IoCertUtil;
 
 public class CmpResponderEntry
@@ -65,6 +67,11 @@ public class CmpResponderEntry
     @Override
     public String toString()
     {
+    	return toString(false);
+    }
+    
+    public String toString(boolean verbose)
+    {
         StringBuilder sb = new StringBuilder();
         sb.append("name: ").append(name).append('\n');
         sb.append("type: ").append(type).append('\n');
@@ -77,6 +84,15 @@ public class CmpResponderEntry
             sb.append("\tserialNumber: ").append(cert.getSerialNumber()).append("\n");
             sb.append("\tsubject: ").append(
                     IoCertUtil.canonicalizeName(cert.getSubjectX500Principal()));
+            if(verbose)
+            {
+            	sb.append("\tencoded: ");
+                try {
+    				sb.append(Base64.toBase64String(cert.getEncoded()));
+    			} catch (CertificateEncodingException e) {
+    				sb.append("ERROR");
+    			}
+            }
         }
         else
         {

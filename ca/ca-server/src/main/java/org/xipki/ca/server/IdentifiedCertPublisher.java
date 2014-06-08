@@ -53,9 +53,9 @@ public class IdentifiedCertPublisher extends CertPublisher
     }
 
     @Override
-    public void setEnvironmentParamterResolver(EnvironmentParameterResolver paramterResolver)
+    public void setEnvironmentParameterResolver(EnvironmentParameterResolver parameterResolver)
     {
-        certPublisher.setEnvironmentParamterResolver(paramterResolver);
+        certPublisher.setEnvironmentParameterResolver(parameterResolver);
     }
 
     @Override
@@ -72,9 +72,9 @@ public class IdentifiedCertPublisher extends CertPublisher
     }
 
     @Override
-    public void crlAdded(X509CertificateWithMetaInfo cacert, X509CRL crl)
+    public void crlAdded(X509CertificateWithMetaInfo caCert, X509CRL crl)
     {
-        certPublisher.crlAdded(cacert, crl);
+        certPublisher.crlAdded(caCert, crl);
     }
 
     public String getName()
@@ -95,15 +95,15 @@ public class IdentifiedCertPublisher extends CertPublisher
     }
 
     @Override
-    public void caRevoked(X509CertificateWithMetaInfo cacert, CertRevocationInfo revocationInfo)
+    public void caRevoked(X509CertificateWithMetaInfo caCert, CertRevocationInfo revocationInfo)
     {
-        certPublisher.caRevoked(cacert, revocationInfo);
+        certPublisher.caRevoked(caCert, revocationInfo);
     }
 
     @Override
-    public void caUnrevoked(X509CertificateWithMetaInfo cacert)
+    public void caUnrevoked(X509CertificateWithMetaInfo caCert)
     {
-        certPublisher.caUnrevoked(cacert);
+        certPublisher.caUnrevoked(caCert);
     }
 
     @Override

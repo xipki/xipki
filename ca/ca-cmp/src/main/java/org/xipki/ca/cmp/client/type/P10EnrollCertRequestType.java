@@ -18,6 +18,7 @@
 package org.xipki.ca.cmp.client.type;
 
 import org.bouncycastle.asn1.pkcs.CertificationRequest;
+import org.xipki.security.common.ParamChecker;
 
 public class P10EnrollCertRequestType extends IdentifiedObject
 {
@@ -27,11 +28,9 @@ public class P10EnrollCertRequestType extends IdentifiedObject
     public P10EnrollCertRequestType(String id, String certProfile, CertificationRequest p10Req)
     {
         super(id);
-        if(p10Req == null)
-            throw new IllegalArgumentException("p10Req is null");
+        ParamChecker.assertNotNull("p10Req", p10Req);
 
         this.certProfile = certProfile;
-
         this.p10Req = p10Req;
     }
 

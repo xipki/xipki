@@ -46,7 +46,7 @@ public class DefaultCertPublisher extends CertPublisher
     private static final Logger LOG = LoggerFactory.getLogger(DefaultCertPublisher.class);
 
     @SuppressWarnings("unused")
-    private EnvironmentParameterResolver envParamterResolver;
+    private EnvironmentParameterResolver envParameterResolver;
     private CertStatusStoreQueryExecutor queryExecutor;
     private boolean publishGoodCerts = true;
 
@@ -57,8 +57,7 @@ public class DefaultCertPublisher extends CertPublisher
     }
 
     @Override
-    public void initialize(String conf, PasswordResolver passwordResolver,
-            DataSource dataSource)
+    public void initialize(String conf, PasswordResolver passwordResolver, DataSource dataSource)
     throws CertPublisherException
     {
         ParamChecker.assertNotNull("conf", conf);
@@ -81,10 +80,9 @@ public class DefaultCertPublisher extends CertPublisher
     }
 
     @Override
-    public void setEnvironmentParamterResolver(
-            EnvironmentParameterResolver paramterResolver)
+    public void setEnvironmentParameterResolver(EnvironmentParameterResolver parameterResolver)
     {
-        this.envParamterResolver = paramterResolver;
+        this.envParameterResolver = parameterResolver;
     }
 
     @Override
@@ -171,7 +169,7 @@ public class DefaultCertPublisher extends CertPublisher
     }
 
     @Override
-    public void crlAdded(X509CertificateWithMetaInfo cacert, X509CRL crl)
+    public void crlAdded(X509CertificateWithMetaInfo caCert, X509CRL crl)
     {
     }
 
@@ -188,28 +186,28 @@ public class DefaultCertPublisher extends CertPublisher
     }
 
     @Override
-    public void caRevoked(X509CertificateWithMetaInfo cacert, CertRevocationInfo revocationInfo)
+    public void caRevoked(X509CertificateWithMetaInfo caCert, CertRevocationInfo revocationInfo)
     {
         try
         {
-            queryExecutor.revokeCa(cacert, revocationInfo);
+            queryExecutor.revokeCa(caCert, revocationInfo);
         } catch (Exception e)
         {
-            String issuerText = IoCertUtil.canonicalizeName(cacert.getCert().getIssuerX500Principal());
-            logAndAudit(issuerText, cacert, e, "Could not publish revocation of CA");
+            String issuerText = IoCertUtil.canonicalizeName(caCert.getCert().getIssuerX500Principal());
+            logAndAudit(issuerText, caCert, e, "Could not publish revocation of CA");
         }
     }
 
     @Override
-    public void caUnrevoked(X509CertificateWithMetaInfo cacert)
+    public void caUnrevoked(X509CertificateWithMetaInfo caCert)
     {
         try
         {
-            queryExecutor.unrevokeCa(cacert);
+            queryExecutor.unrevokeCa(caCert);
         } catch (Exception e)
         {
-            String issuerText = IoCertUtil.canonicalizeName(cacert.getCert().getIssuerX500Principal());
-            logAndAudit(issuerText, cacert, e, "Could not publish unrevocation of CA");
+            String issuerText = IoCertUtil.canonicalizeName(caCert.getCert().getIssuerX500Principal());
+            logAndAudit(issuerText, caCert, e, "Could not publish unrevocation of CA");
         }
     }
 

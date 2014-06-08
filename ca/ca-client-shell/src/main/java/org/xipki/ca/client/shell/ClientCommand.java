@@ -18,7 +18,15 @@
 package org.xipki.ca.client.shell;
 
 import org.apache.karaf.shell.console.OsgiCommandSupport;
+import org.xipki.ca.client.api.RAWorker;
 
 public abstract class ClientCommand extends OsgiCommandSupport
 {
+    protected RAWorker            raWorker;
+
+    public final void setRaWorker(RAWorker raWorker)
+    {
+        this.raWorker = raWorker;
+    }
+
 }
