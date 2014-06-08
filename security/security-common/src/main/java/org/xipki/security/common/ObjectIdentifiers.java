@@ -268,7 +268,7 @@ public class ObjectIdentifiers
 
     public static final ASN1ObjectIdentifier id_kp_ocsp              = id_pkix.branch("1.48.1");
     public static final ASN1ObjectIdentifier id_extension_pkix_ocsp_nocheck = id_pkix.branch("48.1.5");
-    
+
     public static String oidToDisplayName(ASN1ObjectIdentifier type)
     {
         String displayName = RFC4519Style.INSTANCE.oidToDisplayName(type);
