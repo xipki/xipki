@@ -67,16 +67,16 @@ public abstract class AbstractOCSPRequestor implements OCSPRequestor
     }
 
     @Override
-    public BasicOCSPResp ask(X509Certificate cacert, X509Certificate cert, URL responderUrl,
+    public BasicOCSPResp ask(X509Certificate caCert, X509Certificate cert, URL responderUrl,
             RequestOptions requestOptions)
     throws OCSPRequestorException
     {
-        if(cacert.getSubjectX500Principal().equals(cert.getIssuerX500Principal()) == false)
+        if(caCert.getSubjectX500Principal().equals(cert.getIssuerX500Principal()) == false)
         {
-            throw new IllegalArgumentException("cert and cacert do not match");
+            throw new IllegalArgumentException("cert and caCert do not match");
         }
 
-        return ask(cacert, cert.getSerialNumber(), responderUrl, requestOptions);
+        return ask(caCert, cert.getSerialNumber(), responderUrl, requestOptions);
     }
 
     @Override

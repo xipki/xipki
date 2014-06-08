@@ -26,9 +26,7 @@ public class P11KeypairGenerationResult extends KeypairGenerationResult
     private final byte[] id;
     private final String label;
 
-    public P11KeypairGenerationResult(
-            byte[] id, String label,
-            X509CertificateHolder certificate)
+    public P11KeypairGenerationResult(byte[] id, String label, X509CertificateHolder certificate)
     {
         super(certificate);
         this.id = id;

@@ -192,7 +192,7 @@ public final class RAWorkerImpl extends AbstractRAWorker implements RAWorker
         String requestorSignerType = props.getProperty(REQUESTOR_SIGNER_TYPE);
         String requestorSignerConf = props.getProperty(REQUESTOR_SIGNER_CONF);
 
-        Set<String> canames = new HashSet<String>();
+        Set<String> caNames = new HashSet<String>();
         Set<String> disabledCaNames = new HashSet<String>();
 
         for(Object _propKey : props.keySet())
@@ -200,23 +200,23 @@ public final class RAWorkerImpl extends AbstractRAWorker implements RAWorker
             String propKey = (String) _propKey;
             if(propKey.startsWith(CA_PREFIX) && propKey.endsWith(CA_CERT_SUFFIX))
             {
-                String caname = propKey.substring(CA_PREFIX.length(),
+                String caName = propKey.substring(CA_PREFIX.length(),
                         propKey.length() - CA_CERT_SUFFIX.length());
 
-                String enabled = props.getProperty(CA_PREFIX + caname + CA_ENABLED_SUFFIX, "true");
+                String enabled = props.getProperty(CA_PREFIX + caName + CA_ENABLED_SUFFIX, "true");
                 if(Boolean.parseBoolean(enabled))
                 {
-                    canames.add(caname);
+                    caNames.add(caName);
                 }
                 else
                 {
-                    LOG.info("CA " + caname + " is disabled");
-                    disabledCaNames.add(caname);
+                    LOG.info("CA " + caName + " is disabled");
+                    disabledCaNames.add(caName);
                 }
             }
         }
 
-        if(canames.isEmpty())
+        if(caNames.isEmpty())
         {
             LOG.warn("No CA configured");
         }
@@ -224,14 +224,14 @@ public final class RAWorkerImpl extends AbstractRAWorker implements RAWorker
         Set<String> configuredCaNames = new HashSet<String>();
 
         Set<CAConf> cas = new HashSet<CAConf>();
-        for(String caname : canames)
+        for(String caName : caNames)
         {
             try
             {
-                String _serviceUrl = props.getProperty(CA_PREFIX + caname + CA_URL_SUFFIX);
-                String _cacertFile = props.getProperty(CA_PREFIX + caname + CA_CERT_SUFFIX);
-                String _responderFile = props.getProperty(CA_PREFIX + caname + CA_RESPONDER_SUFFIX);
-                String _profiles = props.getProperty(CA_PREFIX + caname + CA_PROFILES_SUFFIX);
+                String _serviceUrl = props.getProperty(CA_PREFIX + caName + CA_URL_SUFFIX);
+                String _caCertFile = props.getProperty(CA_PREFIX + caName + CA_CERT_SUFFIX);
+                String _responderFile = props.getProperty(CA_PREFIX + caName + CA_RESPONDER_SUFFIX);
+                String _profiles = props.getProperty(CA_PREFIX + caName + CA_PROFILES_SUFFIX);
 
                 Set<String> profiles = null;
                 if(_profiles != null)
@@ -244,22 +244,22 @@ public final class RAWorkerImpl extends AbstractRAWorker implements RAWorker
                     }
                 }
 
-                CAConf ca = new CAConf(caname, _serviceUrl, IoCertUtil.parseCert(_cacertFile), profiles,
+                CAConf ca = new CAConf(caName, _serviceUrl, IoCertUtil.parseCert(_caCertFile), profiles,
                         IoCertUtil.parseCert(_responderFile));
                 cas.add(ca);
-                configuredCaNames.add(caname);
+                configuredCaNames.add(caName);
             }catch(IOException e)
             {
-                LOG.warn("Could not configure CA {}, IOException: {}", caname, e.getMessage());
-                LOG.debug("Could not configure CA " + caname, e);
+                LOG.warn("Could not configure CA {}, IOException: {}", caName, e.getMessage());
+                LOG.debug("Could not configure CA " + caName, e);
                 if(dev_mode == false)
                 {
                     throw e;
                 }
             }catch(CertificateException e)
             {
-                LOG.warn("Could not configure CA {}, CertificateException: {}", caname, e.getMessage());
-                LOG.debug("Could not configure CA " + caname, e);
+                LOG.warn("Could not configure CA {}, CertificateException: {}", caName, e.getMessage());
+                LOG.debug("Could not configure CA " + caName, e);
                 if(dev_mode == false)
                 {
                     throw new ConfigurationException(e);
@@ -319,16 +319,16 @@ public final class RAWorkerImpl extends AbstractRAWorker implements RAWorker
     @Override
     public EnrollCertResult requestCerts(EnrollCertRequestType.Type type,
             Map<String, EnrollCertEntryType> enrollCertEntries,
-            String caname)
+            String caName)
     throws RAWorkerException, PKIErrorException
     {
-        return requestCerts(type, enrollCertEntries, caname, null);
+        return requestCerts(type, enrollCertEntries, caName, null);
     }
 
     @Override
     public EnrollCertResult requestCerts(EnrollCertRequestType.Type type,
             Map<String, EnrollCertEntryType> enrollCertEntries,
-            String caname, String username)
+            String caName, String username)
     throws RAWorkerException, PKIErrorException
     {
         ParamChecker.assertNotNull("enrollCertEntries", enrollCertEntries);
@@ -358,7 +358,7 @@ public final class RAWorkerImpl extends AbstractRAWorker implements RAWorker
             enrollCertRequest.addRequestEntry(requestEntry);
         }
 
-        return requestCerts(enrollCertRequest, caname, username);
+        return requestCerts(enrollCertRequest, caName, username);
     }
 
     @Override
@@ -412,14 +412,14 @@ public final class RAWorkerImpl extends AbstractRAWorker implements RAWorker
     }
 
     @Override
-    public EnrollCertResult requestCerts(EnrollCertRequestType request, String caname)
+    public EnrollCertResult requestCerts(EnrollCertRequestType request, String caName)
     throws RAWorkerException, PKIErrorException
     {
-        return requestCerts(request, caname, null);
+        return requestCerts(request, caName, null);
     }
 
     @Override
-    public EnrollCertResult requestCerts(EnrollCertRequestType request, String caname, String username)
+    public EnrollCertResult requestCerts(EnrollCertRequestType request, String caName, String username)
     throws RAWorkerException, PKIErrorException
     {
         ParamChecker.assertNotNull("request", request);
@@ -430,12 +430,12 @@ public final class RAWorkerImpl extends AbstractRAWorker implements RAWorker
             return null;
         }
 
-        if(caname == null)
+        if(caName == null)
         {
             // detect the CA name
             String profile = requestEntries.get(0).getCertProfile();
-            caname = getCANameForProfile(profile);
-            if(caname == null)
+            caName = getCANameForProfile(profile);
+            if(caName == null)
             {
                 throw new RAWorkerException("CertProfile " + profile + " is not supported by any CA");
             }
@@ -445,13 +445,13 @@ public final class RAWorkerImpl extends AbstractRAWorker implements RAWorker
         for(EnrollCertRequestEntryType entry : request.getRequestEntries())
         {
             String profile = entry.getCertProfile();
-            checkCertProfileSupportInCA(profile, caname);
+            checkCertProfileSupportInCA(profile, caName);
         }
 
-        X509CmpRequestor cmpRequestor = cmpRequestorsMap.get(caname);
+        X509CmpRequestor cmpRequestor = cmpRequestorsMap.get(caName);
         if(cmpRequestor == null)
         {
-            throw new RAWorkerException("could not find CA named " + caname);
+            throw new RAWorkerException("could not find CA named " + caName);
         }
 
         CmpResultType result;
@@ -469,7 +469,7 @@ public final class RAWorkerImpl extends AbstractRAWorker implements RAWorker
         }
         else if(result instanceof EnrollCertResultType)
         {
-            return parseEnrollCertResult((EnrollCertResultType) result, caname);
+            return parseEnrollCertResult((EnrollCertResultType) result, caName);
         }
         else
         {
@@ -477,18 +477,18 @@ public final class RAWorkerImpl extends AbstractRAWorker implements RAWorker
         }
     }
 
-    private void checkCertProfileSupportInCA(String certProfile, String caname)
+    private void checkCertProfileSupportInCA(String certProfile, String caName)
     throws RAWorkerException
     {
-        if(caname == null)
+        if(caName == null)
         {
             for(CAConf ca : casMap.values())
             {
                 if(ca.getProfiles().contains(certProfile))
                 {
-                    if(caname == null)
+                    if(caName == null)
                     {
-                        caname = ca.getName();
+                        caName = ca.getName();
                     }
                     else
                     {
@@ -498,21 +498,21 @@ public final class RAWorkerImpl extends AbstractRAWorker implements RAWorker
                 }
             }
 
-            if(caname == null)
+            if(caName == null)
             {
                 throw new RAWorkerException("Unsupported certificate profile " + certProfile);
             }
         }
-        else if(casMap.containsKey(caname) == false)
+        else if(casMap.containsKey(caName) == false)
         {
-            throw new RAWorkerException("unknown ca: " + caname);
+            throw new RAWorkerException("unknown ca: " + caName);
         }
         else
         {
-            CAConf ca = casMap.get(caname);
+            CAConf ca = casMap.get(caName);
             if(ca.getProfiles().contains(certProfile) == false)
             {
-                throw new RAWorkerException("cert profile " + certProfile + " is not supported by the CA " + caname);
+                throw new RAWorkerException("cert profile " + certProfile + " is not supported by the CA " + caName);
             }
         }
     }
@@ -560,8 +560,8 @@ public final class RAWorkerImpl extends AbstractRAWorker implements RAWorker
             }
         }
 
-        final String caname = getCaNameByIssuer(issuer);
-        X509CmpRequestor cmpRequestor = cmpRequestorsMap.get(caname);
+        final String caName = getCaNameByIssuer(issuer);
+        X509CmpRequestor cmpRequestor = cmpRequestorsMap.get(caName);
         CmpResultType result;
         try
         {
@@ -617,17 +617,17 @@ public final class RAWorkerImpl extends AbstractRAWorker implements RAWorker
     }
 
     @Override
-    public X509CRL downloadCRL(String caname)
+    public X509CRL downloadCRL(String caName)
     throws RAWorkerException, PKIErrorException
     {
-        return requestCRL(caname, false);
+        return requestCRL(caName, false);
     }
 
     @Override
-    public X509CRL generateCRL(String caname)
+    public X509CRL generateCRL(String caName)
     throws RAWorkerException, PKIErrorException
     {
-        return requestCRL(caname, true);
+        return requestCRL(caName, true);
     }
 
     @Override
@@ -652,17 +652,17 @@ public final class RAWorkerImpl extends AbstractRAWorker implements RAWorker
         throw new RAWorkerException("Unknown CA for issuer: " + issuer);
     }
 
-    private X509CRL requestCRL(String caname, boolean generateCRL)
+    private X509CRL requestCRL(String caName, boolean generateCRL)
     throws RAWorkerException, PKIErrorException
     {
-        ParamChecker.assertNotNull("caname", caname);
+        ParamChecker.assertNotNull("caName", caName);
 
-        if(casMap.containsKey(caname) == false)
+        if(casMap.containsKey(caName) == false)
         {
-            throw new IllegalArgumentException("Unknown CAConf " + caname);
+            throw new IllegalArgumentException("Unknown CAConf " + caName);
         }
 
-        X509CmpRequestor requestor = cmpRequestorsMap.get(caname);
+        X509CmpRequestor requestor = cmpRequestorsMap.get(caName);
         CmpResultType result;
         try
         {
@@ -690,14 +690,14 @@ public final class RAWorkerImpl extends AbstractRAWorker implements RAWorker
     private String getCANameForProfile(String certProfile)
     throws RAWorkerException
     {
-        String caname = null;
+        String caName = null;
         for(CAConf ca : casMap.values())
         {
             if(ca.getProfiles().contains(certProfile))
             {
-                if(caname == null)
+                if(caName == null)
                 {
-                    caname = ca.getName();
+                    caName = ca.getName();
                 }
                 else
                 {
@@ -707,7 +707,7 @@ public final class RAWorkerImpl extends AbstractRAWorker implements RAWorker
             }
         }
 
-        return caname;
+        return caName;
     }
 
     @Override
@@ -895,8 +895,8 @@ public final class RAWorkerImpl extends AbstractRAWorker implements RAWorker
         RevokeCertRequestType request = new RevokeCertRequestType();
         request.addRequestEntry(entry);
 
-        String caname = getCaNameByIssuer(issuer);
-        X509CmpRequestor cmpRequestor = cmpRequestorsMap.get(caname);
+        String caName = getCaNameByIssuer(issuer);
+        X509CmpRequestor cmpRequestor = cmpRequestorsMap.get(caName);
 
         try
         {
@@ -962,8 +962,8 @@ public final class RAWorkerImpl extends AbstractRAWorker implements RAWorker
             }
         }
 
-        final String caname = getCaNameByIssuer(issuer);
-        X509CmpRequestor cmpRequestor = cmpRequestorsMap.get(caname);
+        final String caName = getCaNameByIssuer(issuer);
+        X509CmpRequestor cmpRequestor = cmpRequestorsMap.get(caName);
         CmpResultType result;
         try
         {
@@ -1019,8 +1019,8 @@ public final class RAWorkerImpl extends AbstractRAWorker implements RAWorker
             }
         }
 
-        final String caname = getCaNameByIssuer(issuer);
-        X509CmpRequestor cmpRequestor = cmpRequestorsMap.get(caname);
+        final String caName = getCaNameByIssuer(issuer);
+        X509CmpRequestor cmpRequestor = cmpRequestorsMap.get(caName);
         CmpResultType result;
         try
         {

@@ -19,11 +19,10 @@ package org.xipki.ca.client.shell.loadtest;
 
 import org.apache.felix.gogo.commands.Command;
 import org.apache.felix.gogo.commands.Option;
-import org.apache.karaf.shell.console.OsgiCommandSupport;
-import org.xipki.ca.client.api.RAWorker;
+import org.xipki.ca.client.shell.ClientCommand;
 
 @Command(scope = "caclient", name = "enroll-loadtest", description="CA Client Enroll Load test")
-public class CALoadTestCommand extends OsgiCommandSupport
+public class CALoadTestCommand extends ClientCommand
 {
 
     @Option(name = "-profile",
@@ -65,8 +64,6 @@ public class CALoadTestCommand extends OsgiCommandSupport
             description = "ECC curve name or OID, the default is brainpoolP256r1",
             required = false)
     protected String curveName;
-
-    private RAWorker             raWorker;
 
     @Override
     protected Object doExecute()
@@ -114,10 +111,5 @@ public class CALoadTestCommand extends OsgiCommandSupport
         loadTest.test();
 
         return null;
-    }
-
-    public void setRaWorker(RAWorker raWorker)
-    {
-        this.raWorker = raWorker;
     }
 }

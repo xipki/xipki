@@ -44,7 +44,7 @@ public class OCSPStatusLoadTestCommand extends OsgiCommandSupport
 
     @Option(name = "-cacert",
             required = true, description = "Required. CA certificate file")
-    protected String            cacertFile;
+    protected String            caCertFile;
 
     @Option(name = "-serial",
             required = true,
@@ -171,12 +171,12 @@ public class OCSPStatusLoadTestCommand extends OsgiCommandSupport
         startMsg.append("Threads:        " + numThreads).append("\n");
         startMsg.append("Duration:       " + durationInSecond + " s").append("\n");
         startMsg.append("Serial numbers: " + this.serialNumbers).append("\n");
-        startMsg.append("CA cert:        " + cacertFile).append("\n");
+        startMsg.append("CA cert:        " + caCertFile).append("\n");
         startMsg.append("Server URL:     " + serverUrl.toString()).append("\n");
         startMsg.append("Hash:           " + hashAlgo).append("\n");
         System.out.print(startMsg.toString());
 
-        X509Certificate caCert = IoCertUtil.parseCert(cacertFile);
+        X509Certificate caCert = IoCertUtil.parseCert(caCertFile);
 
         RequestOptions options = new RequestOptions();
         options.setUseNonce(useNonce == null ? false : useNonce.booleanValue());

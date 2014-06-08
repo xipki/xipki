@@ -23,7 +23,6 @@ import java.security.cert.X509Certificate;
 import org.apache.felix.gogo.commands.Command;
 import org.apache.felix.gogo.commands.Option;
 import org.bouncycastle.asn1.pkcs.CertificationRequest;
-import org.xipki.ca.client.api.RAWorker;
 import org.xipki.ca.common.CertificateOrError;
 import org.xipki.ca.common.EnrollCertResult;
 import org.xipki.security.common.IoCertUtil;
@@ -47,8 +46,6 @@ public class RAEnrollCertCommand extends ClientCommand
     @Option(name = "-user",
             required = false, description = "Username")
     protected String            user;
-
-    private RAWorker            raWorker;
 
     @Override
     protected Object doExecute()
@@ -85,11 +82,6 @@ public class RAEnrollCertCommand extends ClientCommand
         }
 
         return null;
-    }
-
-    public void setRaWorker(RAWorker raWorker)
-    {
-        this.raWorker = raWorker;
     }
 
 }

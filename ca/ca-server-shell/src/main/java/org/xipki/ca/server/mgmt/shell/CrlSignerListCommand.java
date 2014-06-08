@@ -32,6 +32,11 @@ public class CrlSignerListCommand extends CaCommand
             required = false, multiValued = false)
     protected String name;
 
+    
+    @Option(name = "-v", aliases="--verbose",
+            required = false, description = "Show CA information verbosely")
+    protected Boolean          verbose;
+    
     @Override
     protected Object doExecute()
     throws Exception
@@ -54,7 +59,7 @@ public class CrlSignerListCommand extends CaCommand
             CrlSignerEntry entry = caManager.getCrlSigner(name);
             if(entry != null)
             {
-                sb.append(entry.toString());
+                sb.append(entry.toString(verbose == null ? false :verbose.booleanValue()));
             }
         }
 
