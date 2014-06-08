@@ -27,7 +27,7 @@ import java.util.Set;
 public class CmpUtf8Pairs
 {
     public static final String KEY_CERT_PROFILE = "cert_profile";
-    public static final String KEY_ORIG_CERT_PROFILE = "orig_cert_profile";
+    public static final String KEY_USER = "user";
 
     private static final char NAME_TERM = '?';
     private static final String NAME_TERM_s = "?";
@@ -212,6 +212,6 @@ public class CmpUtf8Pairs
         {
             e.printStackTrace();
         }
-
     }
+
 }
