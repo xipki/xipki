@@ -34,7 +34,7 @@ public class DbPorter
     public static final String DIRNAME_CERT = "CERT";
     public static final String PREFIX_FILENAME_CERTS = "certs-";
 
-    public static final String VERSION = "1.0";
+    public static final int VERSION = 1;
 
     protected final DataSource dataSource;
     protected final String baseDir;
