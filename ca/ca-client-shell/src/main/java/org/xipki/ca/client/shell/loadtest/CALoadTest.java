@@ -288,7 +288,7 @@ abstract class CALoadTest extends AbstractLoadTest
                 EnrollCertRequestType request = new EnrollCertRequestType(Type.CERT_REQ);
                 request.addRequestEntry(requestEntry);
 
-                result = raWorker.requestCerts(request, null);
+                result = raWorker.requestCerts(request, null, null);
             } catch (RAWorkerException e)
             {
                 LOG.warn("RAWorkerException: {}", e.getMessage());

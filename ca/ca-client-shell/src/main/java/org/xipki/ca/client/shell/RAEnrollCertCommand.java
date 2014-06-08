@@ -44,7 +44,11 @@ public class RAEnrollCertCommand extends ClientCommand
             required = false, description = "Where to save the certificate")
     protected String            outputFile;
 
-    private RAWorker             raWorker;
+    @Option(name = "-user",
+            required = false, description = "Username")
+    protected String            user;
+
+    private RAWorker            raWorker;
 
     @Override
     protected Object doExecute()
@@ -53,7 +57,7 @@ public class RAEnrollCertCommand extends ClientCommand
         CertificationRequest p10Req = CertificationRequest.getInstance(
                 IoCertUtil.read(p10File));
         EnrollCertResult result = raWorker.requestCert(
-                p10Req, profile, null);
+                p10Req, profile, null, user);
 
         X509Certificate cert = null;
         if(result != null)
