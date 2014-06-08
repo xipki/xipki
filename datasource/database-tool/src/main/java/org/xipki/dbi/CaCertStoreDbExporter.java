@@ -104,12 +104,12 @@ class CaCertStoreDbExporter extends DbPorter
         System.out.println("Exporting CA certstore from database");
         try
         {
-            certstore.setCainfos(export_cainfo());
-            certstore.setRequestorinfos(export_requestorinfo());
-            certstore.setCertprofileinfos(export_certprofileinfo());
-            certstore.setUsers(export_user());
-            certstore.setCrls(export_crl());
-            certstore.setCertsFiles(export_cert());
+            export_cainfo(certstore);
+            export_requestorinfo(certstore);
+            export_certprofileinfo(certstore);
+            export_user(certstore);
+            export_crl(certstore);
+            export_cert(certstore);
 
             JAXBElement<CertStoreType> root = new ObjectFactory().createCertStore(certstore);
             marshaller.marshal(root, new File(baseDir + File.separator + FILENAME_CA_CertStore));
@@ -121,7 +121,7 @@ class CaCertStoreDbExporter extends DbPorter
         System.out.println(" Exported CA certstore from database");
     }
 
-    private Crls export_crl()
+    private void export_crl(CertStoreType certstore)
     throws Exception
     {
         System.out.println("Exporting table CRL");
@@ -192,11 +192,11 @@ class CaCertStoreDbExporter extends DbPorter
             closeStatement(stmt);
         }
 
+        certstore.setCrls(crls);
         System.out.println(" Exported table CRL");
-        return crls;
     }
 
-    private Cainfos export_cainfo()
+    private void export_cainfo(CertStoreType certstore)
     throws SQLException
     {
         System.out.println("Exporting table CAINFO");
@@ -228,11 +228,11 @@ class CaCertStoreDbExporter extends DbPorter
             closeStatement(stmt);
         }
 
+        certstore.setCainfos(cainfos);
         System.out.println(" Exported table CAINFO");
-        return cainfos;
     }
 
-    private Requestorinfos export_requestorinfo()
+    private void export_requestorinfo(CertStoreType certstore)
     throws SQLException
     {
         System.out.println("Exporting table REQUESTORINFO");
@@ -243,40 +243,12 @@ class CaCertStoreDbExporter extends DbPorter
         {
             stmt = createStatement();
             String sql = "SELECT ID, NAME FROM REQUESTORINFO";
-
-            boolean nameSqlUsed;
-            ResultSet rs;
-            try
-            {
-                rs = stmt.executeQuery(sql);
-                nameSqlUsed = true;
-            }catch(SQLException e)
-            {
-                nameSqlUsed = false;
-                sql = "SELECT ID, SHA1_FP_CERT FROM REQUESTORINFO";
-                rs = stmt.executeQuery(sql);
-            }
-
-            Map<String, String> requestorsMap = null;
-            if(nameSqlUsed == false)
-            {
-                requestorsMap = getCARequestorsMap();
-            }
+            ResultSet rs = stmt.executeQuery(sql);
 
             while(rs.next())
             {
                 int id = rs.getInt("ID");
-
-                String name;
-                if(nameSqlUsed)
-                {
-                    name = rs.getString("NAME");
-                }
-                else
-                {
-                    String sha1FpCert = rs.getString("SHA1_FP_CERT");
-                    name = requestorsMap.get(sha1FpCert.toUpperCase());
-                }
+                String name = rs.getString("NAME");
 
                 RequestorinfoType info = new RequestorinfoType();
                 info.setId(id);
@@ -292,41 +264,11 @@ class CaCertStoreDbExporter extends DbPorter
             closeStatement(stmt);
         }
 
+        certstore.setRequestorinfos(infos);
         System.out.println(" Exported table REQUESTORINFO");
-        return infos;
     }
 
-    private Map<String, String> getCARequestorsMap()
-    throws SQLException
-    {
-        Map<String, String> requestorsMap = new HashMap<>();
-        Statement stmt = null;
-        try
-        {
-            stmt = createStatement();
-            String sql = "SELECT NAME, CERT FROM REQUESTOR";
-            ResultSet rs = stmt.executeQuery(sql);
-
-            while(rs.next())
-            {
-                String name = rs.getString("NAME");
-                String b64Cert = rs.getString("CERT");
-                byte[] certBytes = Base64.decode(b64Cert);
-                String sha1FpCert = IoCertUtil.sha1sum(certBytes).toUpperCase();
-                requestorsMap.put(sha1FpCert, name);
-            }
-
-            rs.close();
-            rs = null;
-        }finally
-        {
-            closeStatement(stmt);
-        }
-
-        return requestorsMap;
-    }
-
-    private Users export_user()
+    private void export_user(CertStoreType certstore)
     throws SQLException
     {
         System.out.println("Exporting table USER");
@@ -358,11 +300,11 @@ class CaCertStoreDbExporter extends DbPorter
             closeStatement(stmt);
         }
 
+        certstore.setUsers(users);
         System.out.println(" Exported table USER");
-        return users;
     }
 
-    private Certprofileinfos export_certprofileinfo()
+    private void export_certprofileinfo(CertStoreType certstore)
     throws SQLException
     {
         System.out.println("Exporting table CERTPROFILEINFO");
@@ -394,47 +336,27 @@ class CaCertStoreDbExporter extends DbPorter
             closeStatement(stmt);
         }
 
+        certstore.setCertprofileinfos(infos);
         System.out.println(" Exported table CERTPROFILEINFO");
-        return infos;
     }
 
-    private CertsFiles export_cert()
+    private void export_cert(CertStoreType certstore)
     throws SQLException, IOException, JAXBException
     {
         System.out.println("Exporting tables CERT and RAWCERT");
         CertsFiles certsFiles = new CertsFiles();
 
-        String revokedColName = "REVOKED";
-
-        PreparedStatement ps = null;
-        try
-        {
-            ps = prepareStatement("SELECT REVOKED FROM CERT WHERE ID=?");
-            ps.setInt(1, 1);
-            ResultSet rs = ps.executeQuery();
-            rs.close();
-        } catch(SQLException e)
-        {
-            revokedColName = "REVOCATED";
-        } finally
-        {
-            closeStatement(ps);
-        }
-
         String certSql = "SELECT ID, CAINFO_ID, CERTPROFILEINFO_ID," +
-                " REQUESTORINFO_ID, LAST_UPDATE," +
-                revokedColName +
-                ", REV_REASON, REV_TIME, REV_INVALIDITY_TIME, USER_ID" +
+                " REQUESTORINFO_ID, LAST_UPDATE, REVOKED," +
+                " REV_REASON, REV_TIME, REV_INVALIDITY_TIME, USER_ID" +
                 " FROM CERT" +
                 " WHERE ID >= ? AND ID < ?" +
                 " ORDER BY ID ASC";
 
-        ps = prepareStatement(certSql);
+        PreparedStatement ps = prepareStatement(certSql);
 
         String rawCertSql = "SELECT CERT FROM RAWCERT WHERE CERT_ID = ?";
         PreparedStatement rawCertPs = prepareStatement(rawCertSql);
-
-        //File certDir = new File(baseDir, "CERT");
 
         final int minCertId = getMinCertId();
         final int maxCertId = getMaxCertId();
@@ -487,7 +409,7 @@ class CaCertStoreDbExporter extends DbPorter
                     String certprofileinfo_id = rs.getString("CERTPROFILEINFO_ID");
                     String requestorinfo_id = rs.getString("REQUESTORINFO_ID");
                     String last_update = rs.getString("LAST_UPDATE");
-                    boolean revoked = rs.getBoolean(revokedColName);
+                    boolean revoked = rs.getBoolean("REVOKED");
                     String rev_reason = rs.getString("REV_REASON");
                     String rev_time = rs.getString("REV_TIME");
                     String rev_invalidity_time = rs.getString("REV_INVALIDITY_TIME");
@@ -591,8 +513,8 @@ class CaCertStoreDbExporter extends DbPorter
             closeStatement(ps);
         }
 
+        certstore.setCertsFiles(certsFiles);
         System.out.println(" Exported " + sum + " certificates from tables CERT and RAWCERT");
-        return certsFiles;
     }
 
     private void finalizeZip(ZipOutputStream zipOutStream, CertsType certsType)

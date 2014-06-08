@@ -94,23 +94,10 @@ class OcspCertStoreDbExporter extends DbPorter
         {
             stmt = createStatement();
 
-            String sqlPart1 = "SELECT ID, CERT";
-            String sqlPart2 = " FROM ISSUER";
-            String fields1 = "REVOKED, REV_REASON, REV_TIME, REV_INVALIDITY_TIME";
+            String sql = "SELECT ID, CERT, REVOKED, REV_REASON, REV_TIME, REV_INVALIDITY_TIME" +
+                         " FROM ISSUER";
 
-            ResultSet rs;
-            boolean sqlWithFields1;
-            try
-            {
-                String sql = sqlPart1 + ", " + fields1 + sqlPart2;
-                rs = stmt.executeQuery(sql);
-                sqlWithFields1 = true;
-            }catch(SQLException e)
-            {
-                sqlWithFields1 = false;
-                String sql = sqlPart1 + sqlPart2;
-                rs = stmt.executeQuery(sql);
-            }
+            ResultSet rs = stmt.executeQuery(sql);
 
             while(rs.next())
             {
@@ -121,17 +108,14 @@ class OcspCertStoreDbExporter extends DbPorter
                 issuer.setId(id);
                 issuer.setCert(cert);
 
-                if(sqlWithFields1)
-                {
-                    boolean revoked = rs.getBoolean("REVOKED");
-                    String reason = rs.getString("REV_REASON");
-                    String rev_time = rs.getString("REV_TIME");
-                    String rev_invalidity_time = rs.getString("REV_INVALIDITY_TIME");
-                    issuer.setRevoked(revoked);
-                    issuer.setRevReason(reason);
-                    issuer.setRevTime(rev_time);
-                    issuer.setRevInvalidityTime(rev_invalidity_time);
-                }
+                boolean revoked = rs.getBoolean("REVOKED");
+                String reason = rs.getString("REV_REASON");
+                String rev_time = rs.getString("REV_TIME");
+                String rev_invalidity_time = rs.getString("REV_INVALIDITY_TIME");
+                issuer.setRevoked(revoked);
+                issuer.setRevReason(reason);
+                issuer.setRevTime(rev_time);
+                issuer.setRevInvalidityTime(rev_invalidity_time);
 
                 issuers.getIssuer().add(issuer);
             }
@@ -153,25 +137,7 @@ class OcspCertStoreDbExporter extends DbPorter
         System.out.println("Exporting tables CERT, CERTHASH and RAWCERT");
         CertsFiles certsFiles = new CertsFiles();
 
-        String revokedColName = "REVOKED";
-
-        PreparedStatement ps = null;
-        try
-        {
-            ps = prepareStatement("SELECT REVOKED FROM CERT WHERE ID=?");
-            ps.setInt(1, 1);
-            ResultSet rs = ps.executeQuery();
-            rs.close();
-        } catch(SQLException e)
-        {
-            revokedColName = "REVOCATED";
-        } finally
-        {
-            closeStatement(ps);
-        }
-
-        String certSql = "SELECT ID, ISSUER_ID, LAST_UPDATE, " +
-                revokedColName +
+        String certSql = "SELECT ID, ISSUER_ID, LAST_UPDATE, REVOKED " +
                 ", REV_REASON, REV_TIME, REV_INVALIDITY_TIME, PROFILE " +
                 " FROM CERT" +
                 " WHERE ID >= ? AND ID < ?";
@@ -231,7 +197,7 @@ class OcspCertStoreDbExporter extends DbPorter
 
                     int issuer_id = rs.getInt("ISSUER_ID");
                     String last_update = rs.getString("LAST_UPDATE");
-                    boolean revoked = rs.getBoolean(revokedColName);
+                    boolean revoked = rs.getBoolean("REVOKED");
                     String rev_reason = rs.getString("REV_REASON");
                     String rev_time = rs.getString("REV_TIME");
                     String rev_invalidity_time = rs.getString("REV_INVALIDITY_TIME");

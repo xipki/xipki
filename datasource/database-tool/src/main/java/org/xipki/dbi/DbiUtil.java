@@ -21,9 +21,9 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
-class DbiUtil
+public class DbiUtil
 {
-    static String buildFilename(String prefix, String suffix,
+    public static String buildFilename(String prefix, String suffix,
             int minCertIdOfCurrentFile, int maxCertIdOfCurrentFile, int maxCertId)
     {
         StringBuilder sb = new StringBuilder();
