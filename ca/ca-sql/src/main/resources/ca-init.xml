@@ -227,6 +227,10 @@
 				<constraints nullable="false"/>
 			</column>
 		</createTable>
+		
+		<createIndex tableName="USER" unique="false" indexName="IDX_USER_NAME">
+			<column name="NAME"/>
+		</createIndex>	
 
 		<!-- table CERTPROFILEINFO -->
 		<createTable tableName="CERTPROFILEINFO">
