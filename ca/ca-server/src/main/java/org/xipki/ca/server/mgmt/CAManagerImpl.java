@@ -291,7 +291,7 @@ public class CAManagerImpl implements CAManager
             return false;
         }finally
         {
-        	dataSource.releaseResources(stmt, rs);
+            dataSource.releaseResources(stmt, rs);
         }
     }
 
@@ -358,7 +358,7 @@ public class CAManagerImpl implements CAManager
             return false;
         }finally
         {
-        	dataSource.releaseResources(stmt, rs);
+            dataSource.releaseResources(stmt, rs);
         }
     }
 
@@ -749,13 +749,13 @@ public class CAManagerImpl implements CAManager
     {
         if(requestorsInitialized)
         {
-        	return;
+            return;
         }
 
         requestors.clear();
         Statement stmt = null;
         ResultSet rs = null;
-        
+
         try
         {
             stmt = createStatement();
@@ -775,13 +775,13 @@ public class CAManagerImpl implements CAManager
             throw new CAMgmtException(e);
         }finally
         {
-        	dataSource.releaseResources(stmt, rs);
+            dataSource.releaseResources(stmt, rs);
         }
 
         requestorsInitialized = true;
     }
 
-	private void initResponder()
+    private void initResponder()
     throws CAMgmtException
     {
         if(responderInitialized) return;
@@ -789,7 +789,7 @@ public class CAManagerImpl implements CAManager
         this.responder = null;
         Statement stmt = null;
         ResultSet rs = null;
-        
+
         try
         {
             stmt = createStatement();
@@ -821,18 +821,18 @@ public class CAManagerImpl implements CAManager
 
                 this.responder = entry;
             }
-            
+
             if(errorMsg != null)
             {
-            	throw new CAMgmtException(errorMsg);
+                throw new CAMgmtException(errorMsg);
             }
-            
+
         }catch(SQLException e)
         {
             throw new CAMgmtException(e);
         }finally
         {
-        	dataSource.releaseResources(stmt, rs);
+            dataSource.releaseResources(stmt, rs);
         }
 
         responderInitialized = true;
@@ -865,7 +865,7 @@ public class CAManagerImpl implements CAManager
 
         Statement stmt = null;
         ResultSet rs = null;
-        
+
         try
         {
             stmt = createStatement();
@@ -886,7 +886,7 @@ public class CAManagerImpl implements CAManager
             throw new CAMgmtException(e);
         }finally
         {
-        	dataSource.releaseResources(stmt, rs);
+            dataSource.releaseResources(stmt, rs);
         }
 
         environmentParametersInitialized = true;
@@ -920,7 +920,7 @@ public class CAManagerImpl implements CAManager
             throw new CAMgmtException(e);
         }finally
         {
-        	dataSource.releaseResources(stmt, rs);
+            dataSource.releaseResources(stmt, rs);
         }
 
         caAliasesInitialized = true;
@@ -959,7 +959,7 @@ public class CAManagerImpl implements CAManager
             throw new CAMgmtException(e);
         } finally
         {
-        	dataSource.releaseResources(stmt, rs);
+            dataSource.releaseResources(stmt, rs);
         }
 
         certProfilesInitialized = true;
@@ -982,7 +982,7 @@ public class CAManagerImpl implements CAManager
             rs = stmt.executeQuery(sql);
 
             String errorMsg = null;
-            
+
             while(rs.next())
             {
                 String name = rs.getString("NAME");
@@ -1017,17 +1017,17 @@ public class CAManagerImpl implements CAManager
                 entry.setDataSource(ocspDataSource);
                 publishers.put(entry.getName(), entry);
             }
-            
+
             if(errorMsg != null)
             {
-            	throw new CAMgmtException(errorMsg);
+                throw new CAMgmtException(errorMsg);
             }
         }catch(SQLException e)
         {
             throw new CAMgmtException(e);
         }finally
         {
-        	dataSource.releaseResources(stmt, rs);
+            dataSource.releaseResources(stmt, rs);
         }
 
         publishersInitialized = true;
@@ -1087,7 +1087,7 @@ public class CAManagerImpl implements CAManager
             throw new CAMgmtException(e);
         }finally
         {
-        	dataSource.releaseResources(stmt, rs);
+            dataSource.releaseResources(stmt, rs);
         }
 
         crlSignersInitialized = true;
@@ -1139,7 +1139,7 @@ public class CAManagerImpl implements CAManager
             throw new CAMgmtException(e);
         }finally
         {
-        	dataSource.releaseResources(stmt, rs);
+            dataSource.releaseResources(stmt, rs);
         }
 
         cmpControlInitialized = true;
@@ -1359,7 +1359,7 @@ public class CAManagerImpl implements CAManager
             throw new CAMgmtException(e);
         }finally
         {
-        	dataSource.releaseResources(ps, null);
+            dataSource.releaseResources(ps, null);
         }
 
         cas.put(newCaDbEntry.getName(), newCaDbEntry);

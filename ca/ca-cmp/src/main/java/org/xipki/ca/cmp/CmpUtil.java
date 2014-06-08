@@ -156,7 +156,7 @@ public class CmpUtil
     {
         if(atvs == null)
         {
-        	return null;
+            return null;
         }
 
         for (AttributeTypeAndValue atv : atvs)

@@ -24,11 +24,11 @@ import org.xipki.ca.server.mgmt.CmpResponderEntry;
 @Command(scope = "ca", name = "responder-list", description="List responder")
 public class ResponderListCommand extends CaCommand
 {
-    
+
     @Option(name = "-v", aliases="--verbose",
             required = false, description = "Show CA information verbosely")
     protected Boolean          verbose;
-    
+
     @Override
     protected Object doExecute()
     throws Exception

@@ -67,9 +67,9 @@ public class CmpResponderEntry
     @Override
     public String toString()
     {
-    	return toString(false);
+        return toString(false);
     }
-    
+
     public String toString(boolean verbose)
     {
         StringBuilder sb = new StringBuilder();
@@ -86,12 +86,14 @@ public class CmpResponderEntry
                     IoCertUtil.canonicalizeName(cert.getSubjectX500Principal()));
             if(verbose)
             {
-            	sb.append("\tencoded: ");
-                try {
-    				sb.append(Base64.toBase64String(cert.getEncoded()));
-    			} catch (CertificateEncodingException e) {
-    				sb.append("ERROR");
-    			}
+                sb.append("\tencoded: ");
+                try
+                {
+                    sb.append(Base64.toBase64String(cert.getEncoded()));
+                } catch (CertificateEncodingException e)
+                {
+                    sb.append("ERROR");
+                }
             }
         }
         else

@@ -999,7 +999,7 @@ public class X509CACmpResponder extends CmpResponder
 
             try
             {
-            	BigInteger snBigInt = serialNumber.getPositiveValue();
+                BigInteger snBigInt = serialNumber.getPositiveValue();
                 Object returnedObj = null;
                 if(Permission.UNREVOKE_CERT == permission)
                 {
@@ -1170,7 +1170,7 @@ public class X509CACmpResponder extends CmpResponder
         {
             ErrorMsgContent emc = new ErrorMsgContent(
                     new PKIStatusInfo(PKIStatus.rejection, null, new PKIFailureInfo(PKIFailureInfo.systemFailure)));
-            
+
             return new PKIBody(PKIBody.TYPE_ERROR, emc);
         }
     }

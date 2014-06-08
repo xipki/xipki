@@ -67,8 +67,8 @@ public class CertificateStore
         {
             LOG.error("Could not save certificate {}: {}. Message: {}",
                     new Object[]{certInfo.getCert().getSubject(),
-            			Base64.toBase64String(certInfo.getCert().getEncodedCert()),
-            			e.getMessage()});
+                        Base64.toBase64String(certInfo.getCert().getEncodedCert()),
+                        e.getMessage()});
             LOG.debug("error", e);
             return false;
         }
@@ -281,16 +281,6 @@ public class CertificateStore
         return queryExecutor.getRevokedCertificates(caCert, notExpiredAt, startSerial, numEntries);
     }
 
-    /**
-     *
-     * @param caCert
-     * @param notExpiredAt could be null.
-     * @param startSerial
-     * @param numEntries
-     * @return
-     * @throws SQLException
-     * @throws OperationException
-     */
     public List<BigInteger> getCertSerials(X509CertificateWithMetaInfo caCert,
             Date notExpiredAt, BigInteger startSerial, int numEntries)
     throws SQLException, OperationException
