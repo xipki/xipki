@@ -264,6 +264,11 @@ public class ObjectIdentifiers
     public static final ASN1ObjectIdentifier id_pkix_ocsp_prefSigAlgs = OCSPObjectIdentifiers.id_pkix_ocsp.branch("8");
     public static final ASN1ObjectIdentifier id_pkix_ocsp_extendedRevoke = OCSPObjectIdentifiers.id_pkix_ocsp.branch("9");
 
+    public static final ASN1ObjectIdentifier id_tsl_kp_tslSigning    = new ASN1ObjectIdentifier("0.4.0.2231.3.0");
+
+    public static final ASN1ObjectIdentifier id_kp_ocsp              = id_pkix.branch("1.48.1");
+    public static final ASN1ObjectIdentifier id_extension_pkix_ocsp_nocheck = id_pkix.branch("48.1.5");
+    
     public static String oidToDisplayName(ASN1ObjectIdentifier type)
     {
         String displayName = RFC4519Style.INSTANCE.oidToDisplayName(type);

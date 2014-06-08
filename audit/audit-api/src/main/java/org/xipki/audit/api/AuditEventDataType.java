@@ -19,8 +19,8 @@ package org.xipki.audit.api;
 
 public enum AuditEventDataType
 {
+    BINARY,
     NUMBER,
     TEXT,
-    BINARY,
     TIMESTAMP;
 }
