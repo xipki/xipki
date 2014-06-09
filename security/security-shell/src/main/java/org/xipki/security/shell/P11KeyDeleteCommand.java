@@ -53,7 +53,11 @@ public class P11KeyDeleteCommand extends SecurityCommand
 
     @Option(name = "-pwd", aliases = { "--password" },
             required = false, description = "Password of the PKCS#11 device")
-    protected char[]            password;
+    protected String            password;
+
+    @Option(name = "-p",
+            required = false, description = "Read password from console")
+    protected Boolean            readFromConsole;
 
     @Override
     protected Object doExecute()
@@ -73,13 +77,15 @@ public class P11KeyDeleteCommand extends SecurityCommand
             throw new Exception("Exactly one of keyId or keyLabel should be specified");
         }
 
+        char[] pwd = readPasswordIfNotSet(password, readFromConsole);
+        
         IaikExtendedModule module = IaikP11ModulePool.getInstance().getModule(
                 securityFactory.getPkcs11Module());
 
         IaikExtendedSlot slot = null;
         try
         {
-            slot = module.getSlot(new PKCS11SlotIdentifier(slotIndex, null), password);
+            slot = module.getSlot(new PKCS11SlotIdentifier(slotIndex, null), pwd);
         }catch(SignerException e)
         {
             System.err.println("ERROR:  " + e.getMessage());
@@ -136,7 +142,7 @@ public class P11KeyDeleteCommand extends SecurityCommand
             }
 
             IaikP11CryptService p11CryptService = IaikP11CryptService.getInstance(
-                    securityFactory.getPkcs11Module(), password);
+                    securityFactory.getPkcs11Module(), pwd);
             p11CryptService.refresh();
         }finally
         {

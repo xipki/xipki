@@ -52,6 +52,10 @@ public class P11ECKeyGenCommand extends KeyGenCommand
             required = false, description = "Where to save the self-signed certificate")
     protected String            outputFilename;
 
+    @Option(name = "-p",
+            required = false, description = "Read password from console")
+    protected Boolean            readFromConsole;
+
     @Override
     protected Object doExecute()
     throws Exception
@@ -61,7 +65,7 @@ public class P11ECKeyGenCommand extends KeyGenCommand
             curveName = "brainpoolP256r1";
         }
 
-        char[] pwd = (password == null) ? new char[]{'1', '2', '3', '4'} : password.toCharArray();
+        char[] pwd = readPasswordIfNotSet(password, readFromConsole);
 
         P11KeypairGenerator gen = new P11KeypairGenerator();
         P11KeypairGenerationResult keyAndCert = gen.generateECDSAKeypairAndCert(

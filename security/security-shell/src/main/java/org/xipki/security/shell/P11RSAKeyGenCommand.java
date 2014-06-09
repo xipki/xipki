@@ -58,6 +58,10 @@ public class P11RSAKeyGenCommand extends KeyGenCommand
             required = false, description = "Where to saven the self-signed certificate")
     protected String            outputFilename;
 
+    @Option(name = "-p",
+            required = false, description = "Read password from console")
+    protected Boolean            readFromConsole;
+
     @Override
     protected Object doExecute()
     throws Exception
@@ -82,11 +86,7 @@ public class P11RSAKeyGenCommand extends KeyGenCommand
             _publicExponent = new BigInteger(publicExponent);
         }
 
-        if(password == null)
-        {
-            password = "dummy";
-        }
-        char[] pwd = password.toCharArray();
+        char[] pwd = readPasswordIfNotSet(password, readFromConsole);
 
         P11KeypairGenerator gen = new P11KeypairGenerator();
         PKCS11SlotIdentifier slotId = new PKCS11SlotIdentifier(slotIndex, null);

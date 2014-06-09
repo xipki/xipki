@@ -74,11 +74,15 @@ public class P11CertUpdateCommand extends SecurityCommand
 
     @Option(name = "-pwd", aliases = { "--password" },
             required = false, description = "Password of the PKCS#11 device")
-    protected char[]            password;
+    protected String            password;
 
     @Option(name = "-cacert",
             required = false, multiValued = true, description = "CA Certificate files")
     protected Set<String>       caCertFiles;
+
+    @Option(name = "-p",
+            required = false, description = "Read password from console")
+    protected Boolean            readFromConsole;
 
     @Override
     protected Object doExecute()
@@ -101,10 +105,11 @@ public class P11CertUpdateCommand extends SecurityCommand
         IaikExtendedModule module = IaikP11ModulePool.getInstance().getModule(
                 securityFactory.getPkcs11Module());
 
+        char[] pwd = readPasswordIfNotSet(password, readFromConsole);
         IaikExtendedSlot slot = null;
         try
         {
-            slot = module.getSlot(new PKCS11SlotIdentifier(slotIndex, null), password);
+            slot = module.getSlot(new PKCS11SlotIdentifier(slotIndex, null), pwd);
         }catch(SignerException e)
         {
             System.err.println("ERROR:  " + e.getMessage());
@@ -126,7 +131,8 @@ public class P11CertUpdateCommand extends SecurityCommand
         X509PublicKeyCertificate existingCert = slot.getCertificateObject(keyId, null);
         X509Certificate newCert = IoCertUtil.parseCert(certFile);
 
-        assertMatch(newCert);
+        String pwdStr = pwd == null ? null : new String(pwd);
+        assertMatch(newCert, pwdStr);
 
         Set<X509Certificate> caCerts = new HashSet<>();
         if(caCertFiles != null && caCertFiles.isEmpty() == false)
@@ -185,12 +191,12 @@ public class P11CertUpdateCommand extends SecurityCommand
             slot.returnWritableSession(session);
         }
 
-        IaikP11CryptService.getInstance(securityFactory.getPkcs11Module(), password, null, null).refresh();
+        IaikP11CryptService.getInstance(securityFactory.getPkcs11Module(), pwd, null, null).refresh();
         System.out.println("Updated certificate");
         return null;
     }
 
-    private void assertMatch(X509Certificate cert)
+    private void assertMatch(X509Certificate cert, String password)
     throws SignerException, PasswordResolverException
     {
         CmpUtf8Pairs pairs = new CmpUtf8Pairs("slot", slotIndex.toString());
@@ -224,7 +230,7 @@ public class P11CertUpdateCommand extends SecurityCommand
         securityFactory.createSigner("PKCS11", pairs.getEncoded(), cert, NopPasswordResolver.INSTANCE);
     }
 
-    private static X509PublicKeyCertificate createPkcs11Template(
+    static X509PublicKeyCertificate createPkcs11Template(
             X509Certificate cert, byte[] encodedCert,
             byte[] keyId, char[] label)
     throws CertificateEncodingException
