@@ -168,7 +168,7 @@ class SelfSignedCertBuilder
         ConcurrentContentSigner signer;
         try
         {
-            signer = securityFactory.createSigner(signerType, signerConf, null, passwordResolver);
+            signer = securityFactory.createSigner(signerType, signerConf, (X509Certificate[]) null, passwordResolver);
         } catch (PasswordResolverException e)
         {
             throw new OperationException(ErrorCode.System_Failure, "PasswordResolverException: " + e.getMessage());
@@ -237,7 +237,8 @@ class SelfSignedCertBuilder
         Integer validity = certProfile.getValidity();
         if(validity == null)
         {
-            throw new OperationException(ErrorCode.BAD_CERT_TEMPLATE, "no validity specified in the profile " + certProfileName);
+            throw new OperationException(ErrorCode.BAD_CERT_TEMPLATE,
+                    "no validity specified in the profile " + certProfileName);
         }
 
         Date notAfter = new Date(notBefore.getTime() + DAY * validity);

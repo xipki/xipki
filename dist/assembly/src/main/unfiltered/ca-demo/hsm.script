@@ -74,7 +74,8 @@ keytool:req -slot 1 -key-label SubCA1 -out output/SubCA1.p10 \
 
 caclient:enroll -p10 output/SubCA1.p10 -out output/SubCA1.der -profile SubCA
 
-keytool:update-cert -slot 1 -key-label $SubCA_KEY_LABEL -cert output/SubCA1.der
+keytool:update-cert -slot 1 -key-label $SubCA_KEY_LABEL -cert output/SubCA1.der \
+  -cacert output/RCA1.der
 
 ## Generate keys and PKCS#10 request for SubCAwithCRL1
 keytool:req -slot 1 -key-label SubCAwithCRL1 -out output/SubCAwithCRL1.p10 \
@@ -82,7 +83,8 @@ keytool:req -slot 1 -key-label SubCAwithCRL1 -out output/SubCAwithCRL1.p10 \
 
 caclient:enroll -p10 output/SubCAwithCRL1.p10 -out output/SubCAwithCRL1.der -profile SubCA
 
-keytool:update-cert -slot 1 -key-label $SubCAwithCRL_KEY_LABEL -cert output/SubCAwithCRL1.der
+keytool:update-cert -slot 1 -key-label $SubCAwithCRL_KEY_LABEL -cert output/SubCAwithCRL1.der \
+  -cacert output/RCA1.der
 
 features:uninstall xipki-caclient-shell
 features:uninstall xipki-caclient

@@ -512,7 +512,8 @@ public class X509CA
                                         "SQLException: " + e.getMessage());
                             } catch (CertificateException e)
                             {
-                                throw new OperationException(ErrorCode.System_Failure, "CertificateException: " + e.getMessage());
+                                throw new OperationException(ErrorCode.System_Failure,
+                                        "CertificateException: " + e.getMessage());
                             }
 
                             Certificate cert = Certificate.getInstance(certInfo.getCert().getEncodedCert());

@@ -32,8 +32,13 @@ public interface SecurityFactory
     String getPkcs11Provider();
     String getPkcs11Module();
 
-    ConcurrentContentSigner createSigner(
-            String type, String conf, X509Certificate cert, PasswordResolver passwordResolver)
+    ConcurrentContentSigner createSigner(String type, String conf,
+            X509Certificate cert, PasswordResolver passwordResolver)
+    throws SignerException, PasswordResolverException;
+
+    ConcurrentContentSigner createSigner(String type, String conf,
+            X509Certificate[] certs,
+            PasswordResolver passwordResolver)
     throws SignerException, PasswordResolverException;
 
     ContentVerifierProvider getContentVerifierProvider(PublicKey publicKey)

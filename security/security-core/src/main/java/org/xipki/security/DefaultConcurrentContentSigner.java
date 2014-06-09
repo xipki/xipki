@@ -46,7 +46,7 @@ public class DefaultConcurrentContentSigner implements ConcurrentContentSigner
     private final BlockingDeque<ContentSigner> busySigners = new LinkedBlockingDeque<ContentSigner>();
     private final PrivateKey privateKey;
 
-    private X509Certificate certificate;
+    private X509Certificate[] certificateChain;
 
     static
     {
@@ -57,10 +57,11 @@ public class DefaultConcurrentContentSigner implements ConcurrentContentSigner
             // valid value is between 0 and 60 seconds
             if(vi < 0 || vi > 60 * 1000)
             {
-                LOG.error("invalid org.xipki.signservice.timeout: {}", v);
+                LOG.error("invalid org.xipki.signservice.timeout: {}", vi);
             }
             else
             {
+                LOG.info("Use org.xipki.signservice.timeout: {}", vi);
                 defaultSignServiceTimeout = vi;
             }
         }
@@ -163,15 +164,28 @@ public class DefaultConcurrentContentSigner implements ConcurrentContentSigner
     }
 
     @Override
-    public void setCertificate(X509Certificate certificate)
+    public void setCertificateChain(X509Certificate[] certificateChain)
     {
-        this.certificate = certificate;
+        this.certificateChain = certificateChain;
     }
 
     @Override
     public X509Certificate getCertificate()
     {
-        return certificate;
+        if(certificateChain != null && certificateChain.length > 0)
+        {
+            return certificateChain[0];
+        }
+        else
+        {
+            return null;
+        }
+    }
+
+    @Override
+    public X509Certificate[] getCertificateChain()
+    {
+        return certificateChain;
     }
 
     @Override
@@ -205,4 +219,5 @@ public class DefaultConcurrentContentSigner implements ConcurrentContentSigner
     {
         return algorithmIdentifier;
     }
+
 }
