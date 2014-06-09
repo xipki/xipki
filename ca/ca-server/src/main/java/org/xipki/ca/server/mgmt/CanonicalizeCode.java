@@ -278,6 +278,11 @@ public class CanonicalizeCode
                 if(idx == -1)
                 {
                     lastLine = line;
+
+                    if(line.length() > 128)
+                    {
+                        lineNumbers.add(lineNumber);
+                    }
                     continue;
                 }
 
