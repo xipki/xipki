@@ -29,6 +29,7 @@ import iaik.pkcs.pkcs11.objects.CharArrayAttribute;
 import iaik.pkcs.pkcs11.objects.PrivateKey;
 import iaik.pkcs.pkcs11.objects.PublicKey;
 import iaik.pkcs.pkcs11.objects.X509PublicKeyCertificate;
+import iaik.pkcs.pkcs11.objects.Certificate.CertificateType;
 import iaik.pkcs.pkcs11.wrapper.PKCS11Constants;
 import iaik.pkcs.pkcs11.wrapper.PKCS11Exception;
 
@@ -42,11 +43,14 @@ import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
+import javax.security.auth.x500.X500Principal;
+
 import org.bouncycastle.util.encoders.Hex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.security.api.Pkcs11KeyIdentifier;
 import org.xipki.security.api.SignerException;
+import org.xipki.security.common.IoCertUtil;
 
 public class IaikExtendedSlot
 {
@@ -116,7 +120,8 @@ public class IaikExtendedSlot
         }
         else
         {
-            maxSessionCount2 = maxSessionCount2 < 3 ? 1 : maxSessionCount2 - 2; // 2 sessions as buffer, they may be used elsewhere.
+            // 2 sessions as buffer, they may be used elsewhere.
+            maxSessionCount2 = maxSessionCount2 < 3 ? 1 : maxSessionCount2 - 2;
         }
 
         this.maxSessionCount = (int) maxSessionCount2;
@@ -152,7 +157,10 @@ public class IaikExtendedSlot
                 login(session);
                 session.signInit(algorithmId, signatureKey);
                 byte[] signature = session.sign(hash);
-                if (LOG.isDebugEnabled()) LOG.debug("signature:\n{}", Hex.toHexString(signature));
+                if (LOG.isDebugEnabled())
+                {
+                    LOG.debug("signature:\n{}", Hex.toHexString(signature));
+                }
                 return signature;
             }
         } catch (TokenException e)
@@ -191,7 +199,10 @@ public class IaikExtendedSlot
                 login(session);
                 session.signInit(algorithmId, signatureKey);
                 byte[] signature = session.sign(encodedDigestInfo);
-                if (LOG.isDebugEnabled()) LOG.debug("signature:\n{}", Hex.toHexString(signature));
+                if (LOG.isDebugEnabled())
+                {
+                    LOG.debug("signature:\n{}", Hex.toHexString(signature));
+                }
                 return signature;
             }
         } catch (TokenException e)
@@ -230,7 +241,10 @@ public class IaikExtendedSlot
                 login(session);
                 session.signInit(algorithmId, signatureKey);
                 byte[] signature = session.sign(hash);
-                if (LOG.isDebugEnabled()) LOG.debug("signature:\n{}", Hex.toHexString(signature));
+                if (LOG.isDebugEnabled())
+                {
+                    LOG.debug("signature:\n{}", Hex.toHexString(signature));
+                }
                 return signature;
             }
         } catch (TokenException e)
@@ -598,7 +612,7 @@ public class IaikExtendedSlot
 
         try
         {
-            if(LOG.isDebugEnabled())
+            if(LOG.isTraceEnabled())
             {
                 String info = listPrivateKeyObjects(session, forSigning, forDecrypting);
                 LOG.debug(info);
@@ -724,7 +738,7 @@ public class IaikExtendedSlot
 
         try
         {
-            if(LOG.isDebugEnabled())
+            if(LOG.isTraceEnabled())
             {
                 String info = listPublicKeyObjects(session, forSignature, forCipher);
                 LOG.debug(info);
@@ -811,15 +825,51 @@ public class IaikExtendedSlot
         return objList;
     }
 
-    public X509PublicKeyCertificate getCertificateObject(byte[] keyId,
-            char[] keyLabel)
+    public X509PublicKeyCertificate[] getCertificateObjects(X500Principal subject)
     throws SignerException
     {
         Session session = borrowIdleSession();
 
         try
         {
-            if(LOG.isDebugEnabled())
+            if(LOG.isTraceEnabled())
+            {
+                String info = listCertificateObjects(session);
+                LOG.debug(info);
+            }
+
+            X509PublicKeyCertificate template = new X509PublicKeyCertificate();
+            template.getCertificateType().setLongValue(CertificateType.X_509_PUBLIC_KEY);
+            template.getSubject().setByteArrayValue(subject.getEncoded());
+
+            List<iaik.pkcs.pkcs11.objects.Object> tmpObjects = getObjects(session, template);
+            int n = tmpObjects == null ? 0 : tmpObjects.size();
+            if(n == 0)
+            {
+                LOG.warn("found no certificate with subject {}", IoCertUtil.canonicalizeName(subject));
+                return null;
+            }
+
+            X509PublicKeyCertificate[] certs = new X509PublicKeyCertificate[n];
+            for(int i = 0; i < n; i++)
+            {
+                certs[i] = (X509PublicKeyCertificate) tmpObjects.get(i);
+            }
+            return certs;
+        }finally
+        {
+            returnIdleSession(session);
+        }
+    }
+
+    public X509PublicKeyCertificate getCertificateObject(byte[] keyId, char[] keyLabel)
+    throws SignerException
+    {
+        Session session = borrowIdleSession();
+
+        try
+        {
+            if(LOG.isTraceEnabled())
             {
                 String info = listCertificateObjects(session);
                 LOG.debug(info);

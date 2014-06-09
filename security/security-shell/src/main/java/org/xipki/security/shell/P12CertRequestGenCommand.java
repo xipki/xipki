@@ -26,6 +26,7 @@ import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
 import java.security.interfaces.ECPublicKey;
 import java.util.Enumeration;
 
@@ -105,8 +106,8 @@ public class P12CertRequestGenCommand extends SecurityCommand
         }
 
         String signerConf = SecurityFactoryImpl.getKeystoreSignerConf(p12File, password, sigAlgOid.getId(), 1);
-        ConcurrentContentSigner identifiedSigner =
-                securityFactory.createSigner("PKCS12", signerConf, null, NopPasswordResolver.INSTANCE);
+        ConcurrentContentSigner identifiedSigner = securityFactory.createSigner("PKCS12", signerConf,
+                (X509Certificate[]) null, NopPasswordResolver.INSTANCE);
 
         Certificate cert = Certificate.getInstance(identifiedSigner.getCertificate().getEncoded());
 

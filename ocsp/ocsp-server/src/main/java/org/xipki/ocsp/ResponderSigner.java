@@ -42,6 +42,7 @@ class ResponderSigner
 
     private final X509CertificateHolder certificateHolder;
     private final X509Certificate certificate;
+    private final X509Certificate[] certificateChain;
 
     private final X500Name responderId;
 
@@ -51,10 +52,11 @@ class ResponderSigner
         ParamChecker.assertNotEmpty("signers", signers);
 
         this.signers = signers;
-        this.certificate = signers.get(0).getCertificate();
+        this.certificateChain = signers.get(0).getCertificateChain();
+        this.certificate = certificateChain[0];
+
         this.certificateHolder = new X509CertificateHolder(this.certificate.getEncoded());
         this.responderId = this.certificateHolder.getSubject();
-
         algoSignerMap = new HashMap<String, ConcurrentContentSigner>();
         for(ConcurrentContentSigner signer : signers)
         {
@@ -116,6 +118,11 @@ class ResponderSigner
     public X509Certificate getCertificate()
     {
         return certificate;
+    }
+
+    public X509Certificate[] getCertificateChain()
+    {
+        return certificateChain;
     }
 
     public X509CertificateHolder getCertificateHolder()

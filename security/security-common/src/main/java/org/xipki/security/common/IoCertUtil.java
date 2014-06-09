@@ -40,6 +40,7 @@ import java.util.Collections;
 import java.util.Enumeration;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 import javax.security.auth.x500.X500Principal;
 
@@ -415,7 +416,7 @@ public class IoCertUtil
         }
 
         Certificate[] certs = ks.getCertificateChain(keyname);
-        if(certs == null || certs.length == 1 && numAliases == 1)
+        if(numAliases == 1)
         {
             return keystoreBytes;
         }
@@ -432,11 +433,62 @@ public class IoCertUtil
              ks = KeyStore.getInstance(keystoreType, "BC");
         }
         ks.load(null, password);
-        ks.setKeyEntry(keyname, key, password, new Certificate[]{certs[0]});
+        ks.setKeyEntry(keyname, key, password, certs);
         ByteArrayOutputStream bout = new ByteArrayOutputStream();
         ks.store(bout, password);
         byte[] bytes = bout.toByteArray();
         bout.close();
         return bytes;
+    }
+
+    public static X509Certificate[] buildCertPath(X509Certificate cert, Set<X509Certificate> certs)
+    {
+        List<X509Certificate> certChain = new LinkedList<>();
+        certChain.add(cert);
+        if(certs != null && isSelfSigned(cert) == false)
+        {
+            while(true)
+            {
+                X509Certificate caCert = getCaCertOf(certChain.get(certChain.size() - 1), certs);
+                if(caCert == null)
+                {
+                    break;
+                }
+                certChain.add(caCert);
+                if(isSelfSigned(caCert))
+                {
+                    // reaches root self-signed certificate
+                    break;
+                }
+            }
+        }
+
+        return certChain.toArray(new X509Certificate[0]);
+    }
+
+    private static X509Certificate getCaCertOf(X509Certificate cert, Set<X509Certificate> caCerts)
+    {
+        if(isSelfSigned(cert))
+        {
+            return null;
+        }
+
+        for(X509Certificate caCert : caCerts)
+        {
+            try
+            {
+                cert.verify(caCert.getPublicKey());
+                return caCert;
+            }catch(Exception e)
+            {
+            }
+        }
+
+        return null;
+    }
+
+    public static boolean isSelfSigned(X509Certificate cert)
+    {
+        return cert.getSubjectX500Principal().equals(cert.getIssuerX500Principal());
     }
 }

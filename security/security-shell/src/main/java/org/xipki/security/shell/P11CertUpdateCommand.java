@@ -24,12 +24,17 @@ import iaik.pkcs.pkcs11.objects.PrivateKey;
 import iaik.pkcs.pkcs11.objects.X509PublicKeyCertificate;
 
 import java.security.PublicKey;
+import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
 import java.security.interfaces.ECPublicKey;
 import java.security.interfaces.RSAPublicKey;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.apache.felix.gogo.commands.Command;
 import org.apache.felix.gogo.commands.Option;
+import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.util.encoders.Hex;
 import org.xipki.security.NopPasswordResolver;
 import org.xipki.security.api.PKCS11SlotIdentifier;
@@ -37,6 +42,8 @@ import org.xipki.security.api.PasswordResolverException;
 import org.xipki.security.api.Pkcs11KeyIdentifier;
 import org.xipki.security.api.SignerException;
 import org.xipki.security.common.CmpUtf8Pairs;
+import org.xipki.security.common.HashAlgoType;
+import org.xipki.security.common.HashCalculator;
 import org.xipki.security.common.IoCertUtil;
 import org.xipki.security.p11.iaik.IaikExtendedModule;
 import org.xipki.security.p11.iaik.IaikExtendedSlot;
@@ -52,11 +59,13 @@ public class P11CertUpdateCommand extends SecurityCommand
     protected Integer           slotIndex;
 
     @Option(name = "-key-id",
-            required = false, description = "Id of the private key in the PKCS#11 token. Either keyId or keyLabel must be specified")
+            required = false, description = "Id of the private key in the PKCS#11 token.\n"
+                    + "Either keyId or keyLabel must be specified")
     protected String            keyId;
 
     @Option(name = "-key-label",
-            required = false, description = "Label of the private key in the PKCS#11 token. Either keyId or keyLabel must be specified")
+            required = false, description = "Label of the private key in the PKCS#11 token.\n"
+                    + "Either keyId or keyLabel must be specified")
     protected String            keyLabel;
 
     @Option(name = "-cert",
@@ -66,6 +75,10 @@ public class P11CertUpdateCommand extends SecurityCommand
     @Option(name = "-pwd", aliases = { "--password" },
             required = false, description = "Password of the PKCS#11 device")
     protected char[]            password;
+
+    @Option(name = "-cacert",
+            required = false, multiValued = true, description = "CA Certificate files")
+    protected Set<String>       caCertFiles;
 
     @Override
     protected Object doExecute()
@@ -115,35 +128,58 @@ public class P11CertUpdateCommand extends SecurityCommand
 
         assertMatch(newCert);
 
+        Set<X509Certificate> caCerts = new HashSet<>();
+        if(caCertFiles != null && caCertFiles.isEmpty() == false)
+        {
+            for(String caCertFile : caCertFiles)
+            {
+                caCerts.add(IoCertUtil.parseCert(caCertFile));
+            }
+        }
+        X509Certificate[] certChain = IoCertUtil.buildCertPath(newCert, caCerts);
+
         Session session = slot.borrowWritableSession();
         try
         {
-            X509PublicKeyCertificate newCertTemp;
-
-            newCertTemp = new X509PublicKeyCertificate();
-            newCertTemp.getId().setByteArrayValue(keyId);
-            newCertTemp.getLabel().setCharArrayValue(
+            X509PublicKeyCertificate newCertTemp = createPkcs11Template(newCert, null, keyId,
                     privKey.getLabel().getCharArrayValue());
-            newCertTemp.getToken().setBooleanValue(true);
-            newCertTemp.getCertificateType().setLongValue(
-                    CertificateType.X_509_PUBLIC_KEY);
-
-            newCertTemp.getSubject().setByteArrayValue(
-                    newCert.getSubjectX500Principal().getEncoded());
-            newCertTemp.getIssuer().setByteArrayValue(
-                    newCert.getIssuerX500Principal().getEncoded());
-            newCertTemp.getSerialNumber().setByteArrayValue(
-                    newCert.getSerialNumber().toByteArray());
-            newCertTemp.getValue().setByteArrayValue(
-                    newCert.getEncoded());
-
             if(existingCert != null)
             {
                 session.destroyObject(existingCert);
                 Thread.sleep(1000);
             }
-
             session.createObject(newCertTemp);
+
+            if(certChain.length > 1)
+            {
+                for(int i = 1; i < certChain.length; i++)
+                {
+                    X509Certificate caCert = certChain[i];
+                    byte[] encodedCaCert = caCert.getEncoded();
+
+                    boolean alreadyExists = false;
+                    X509PublicKeyCertificate[] certObjs = slot.getCertificateObjects(caCert.getSubjectX500Principal());
+                    if(certObjs != null)
+                    {
+                        for(X509PublicKeyCertificate certObj : certObjs)
+                        {
+                            if(Arrays.equals(encodedCaCert, certObj.getValue().getByteArrayValue()))
+                            {
+                                alreadyExists = true;
+                                break;
+                            }
+                        }
+                    }
+
+                    if(alreadyExists)
+                    {
+                        continue;
+                    }
+
+                    X509PublicKeyCertificate newCaCertTemp = createPkcs11Template(caCert, encodedCaCert, null, null);
+                    session.createObject(newCaCertTemp);
+                }
+            }
         }finally
         {
             slot.returnWritableSession(session);
@@ -188,4 +224,41 @@ public class P11CertUpdateCommand extends SecurityCommand
         securityFactory.createSigner("PKCS11", pairs.getEncoded(), cert, NopPasswordResolver.INSTANCE);
     }
 
+    private static X509PublicKeyCertificate createPkcs11Template(
+            X509Certificate cert, byte[] encodedCert,
+            byte[] keyId, char[] label)
+    throws CertificateEncodingException
+    {
+        if(encodedCert == null)
+        {
+            encodedCert = cert.getEncoded();
+        }
+
+        if(keyId == null)
+        {
+            keyId = HashCalculator.hash(HashAlgoType.SHA1, encodedCert);
+        }
+
+        if(label == null)
+        {
+            X500Name x500Name = X500Name.getInstance(cert.getSubjectX500Principal().getEncoded());
+            label = IoCertUtil.getCommonName(x500Name).toCharArray();
+        }
+
+        X509PublicKeyCertificate newCertTemp = new X509PublicKeyCertificate();
+        newCertTemp.getId().setByteArrayValue(keyId);
+        newCertTemp.getLabel().setCharArrayValue(label);
+        newCertTemp.getToken().setBooleanValue(true);
+        newCertTemp.getCertificateType().setLongValue(
+                CertificateType.X_509_PUBLIC_KEY);
+
+        newCertTemp.getSubject().setByteArrayValue(
+                cert.getSubjectX500Principal().getEncoded());
+        newCertTemp.getIssuer().setByteArrayValue(
+                cert.getIssuerX500Principal().getEncoded());
+        newCertTemp.getSerialNumber().setByteArrayValue(
+                cert.getSerialNumber().toByteArray());
+        newCertTemp.getValue().setByteArrayValue(encodedCert);
+        return newCertTemp;
+    }
 }

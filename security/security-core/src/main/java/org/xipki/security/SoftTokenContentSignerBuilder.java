@@ -28,6 +28,7 @@ import java.security.PrivateKey;
 import java.security.Security;
 import java.security.Signature;
 import java.security.UnrecoverableKeyException;
+import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.security.interfaces.DSAPrivateKey;
@@ -70,6 +71,7 @@ import org.xipki.security.api.ConcurrentContentSigner;
 import org.xipki.security.api.SignerException;
 import org.xipki.security.bcext.BCRSAPrivateCrtKey;
 import org.xipki.security.bcext.BCRSAPrivateKey;
+import org.xipki.security.common.ParamChecker;
 
 public class SoftTokenContentSignerBuilder
 {
@@ -78,17 +80,18 @@ public class SoftTokenContentSignerBuilder
     private static final String PROVIDER_XIPKI_NSS_CIPHER = "SunPKCS11-XipkiNSS";
 
     private final PrivateKey key;
-    private final X509Certificate cert;
+    private final X509Certificate[] certificateChain;
 
     public SoftTokenContentSignerBuilder(PrivateKey privateKey)
     throws SignerException
     {
         this.key = privateKey;
-        this.cert = null;
+        this.certificateChain = null;
     }
 
     public SoftTokenContentSignerBuilder(String keystoreType, InputStream keystoreStream,
-            char[] keystorePassword, String keyname, char[] keyPassword, X509Certificate cert)
+            char[] keystorePassword, String keyname, char[] keyPassword,
+            X509Certificate[] certificateChain)
     throws SignerException
     {
         if(("PKCS12".equalsIgnoreCase(keystoreType) || "JKS".equalsIgnoreCase(keystoreType)) == false)
@@ -96,12 +99,9 @@ public class SoftTokenContentSignerBuilder
             throw new IllegalArgumentException("Unsupported keystore type: " + keystoreType);
         }
 
-        if(keystoreStream == null)
-            throw new IllegalArgumentException("keystoreStream is null");
-        if(keystorePassword == null)
-            throw new IllegalArgumentException("keystorePassword is null");
-        if(keyPassword == null)
-            throw new IllegalArgumentException("keyPassword is null");
+        ParamChecker.assertNotNull("keystoreStream", keystoreStream);
+        ParamChecker.assertNotNull("keystorePassword", keystorePassword);
+        ParamChecker.assertNotNull("keyPassword", keyPassword);
 
         try
         {
@@ -144,11 +144,19 @@ public class SoftTokenContentSignerBuilder
                 throw new SignerException("Unsupported key " + key.getClass().getName());
             }
 
-            if(cert == null)
+            if(certificateChain == null)
             {
-                cert = (X509Certificate) ks.getCertificate(keyname);
+                Certificate[] _certs = ks.getCertificateChain(keyname);
+                this.certificateChain = new X509Certificate[_certs.length];
+                for(int i = 0; i < _certs.length; i++)
+                {
+                    this.certificateChain[i] = (X509Certificate) _certs[i];
+                }
             }
-            this.cert = cert;
+            else
+            {
+                this.certificateChain = certificateChain;
+            }
         }catch(KeyStoreException e)
         {
             throw new SignerException(e);
@@ -187,7 +195,8 @@ public class SoftTokenContentSignerBuilder
 
         ASN1ObjectIdentifier algOid = signatureAlgId.getAlgorithm();
 
-        if(Security.getProvider(PROVIDER_XIPKI_NSS) != null && algOid.equals(PKCSObjectIdentifiers.id_RSASSA_PSS) == false)
+        if(Security.getProvider(PROVIDER_XIPKI_NSS) != null &&
+                algOid.equals(PKCSObjectIdentifiers.id_RSASSA_PSS) == false)
         {
             String algoName = SignerUtil.getSignatureAlgoName(signatureAlgId);
             if(algoName == null)
@@ -265,16 +274,28 @@ public class SoftTokenContentSignerBuilder
         }
 
         ConcurrentContentSigner concurrentSigner = new DefaultConcurrentContentSigner(signers, key);
-        if(cert != null)
+        if(certificateChain != null)
         {
-            concurrentSigner.setCertificate(cert);
+            concurrentSigner.setCertificateChain(certificateChain);
         }
         return concurrentSigner;
     }
 
     public X509Certificate getCert()
     {
-        return cert;
+        if(certificateChain != null && certificateChain.length > 0)
+        {
+            return certificateChain[0];
+        }
+        else
+        {
+            return null;
+        }
+    }
+
+    public X509Certificate[] getCertificateChain()
+    {
+        return certificateChain;
     }
 
     public PrivateKey getKey()

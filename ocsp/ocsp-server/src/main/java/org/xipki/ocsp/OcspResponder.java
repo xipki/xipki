@@ -267,12 +267,24 @@ public class OcspResponder
 
         // Signer
         SignerType signerConf = conf.getSigner();
+        X509Certificate[] explicitCertificateChain = null;
 
         X509Certificate explicitResponderCert = null;
         s = signerConf.getCertFile();
         if(s != null && s.isEmpty() == false)
         {
             explicitResponderCert = parseCert(s);
+        }
+
+        if(explicitResponderCert != null)
+        {
+            Set<X509Certificate> caCerts = new HashSet<>();
+            for(String certFile : signerConf.getCaCertFiles().getCaCertFile())
+            {
+                caCerts.add(parseCert(certFile));
+            }
+
+            explicitCertificateChain = IoCertUtil.buildCertPath(explicitResponderCert, caCerts);
         }
 
         String responderSignerType = signerConf.getType();
@@ -286,7 +298,7 @@ public class OcspResponder
             {
                 ConcurrentContentSigner requestorSigner = securityFactory.createSigner(
                         responderSignerType, "algo?" + sigAlgo + "%" + responderKeyConf,
-                        explicitResponderCert, passwordResolver);
+                        explicitCertificateChain, passwordResolver);
                 signers.add(requestorSigner);
             } catch (SignerException e)
             {
@@ -312,57 +324,21 @@ public class OcspResponder
         {
             if(signerConf.isIncludeSignerCACertsInResp())
             {
-                List<X509Certificate> certChain = new LinkedList<>();
-                certChain.add(responderSigner.getCertificate());
-
-                if(signerConf.getCaCertFiles() != null &&
-                        isSelfSigned(responderSigner.getCertificate()) == false)
-                {
-                    List<X509Certificate> certs = new LinkedList<>();
-                    for(String certFile : signerConf.getCaCertFiles().getCaCertFile())
-                    {
-                        try
-                        {
-                            certs.add(IoCertUtil.parseCert(certFile));
-                        } catch (Exception e)
-                        {
-                            throw new OcspResponderException("Error while parsing certificate file " + certFile +
-                                    ": " + e.getMessage(), e);
-                        }
-                    }
-
-                    while(true)
-                    {
-                        X509Certificate caCert = getCaCertOf(certChain.get(certChain.size() - 1), certs);
-                        if(caCert != null)
-                        {
-                            certChain.add(caCert);
-                            if(isSelfSigned(caCert))
-                            {
-                                // reaches root self-signed certificate
-                                break;
-                            }
-                        }
-                        else
-                        {
-                            break;
-                        }
-                    }
-                }
-
-                X509Certificate toplevelCaCert = certChain.get(certChain.size() - 1);
-                if(isSelfSigned(toplevelCaCert) == false)
+                X509Certificate[] certificateChain = responderSigner.getCertificateChain();
+                X509Certificate toplevelCaCert = certificateChain[certificateChain.length - 1];
+                if(IoCertUtil.isSelfSigned(toplevelCaCert) == false)
                 {
                     throw new OcspResponderException("Could not build certchain of signer up to root CA, but only to "
                             + IoCertUtil.canonicalizeName(toplevelCaCert.getSubjectX500Principal()));
                 }
-                certsInResp = new X509CertificateHolder[certChain.size()];
+
+                certsInResp = new X509CertificateHolder[certificateChain.length];
                 certsInResp[0] = responderSigner.getCertificateHolder();
                 if(certsInResp.length > 1)
                 {
                     for(int i = 1; i < certsInResp.length; i++)
                     {
-                        X509Certificate certInChain = certChain.get(i);
+                        X509Certificate certInChain = certificateChain[i];
                         try
                         {
                             certsInResp[i] = new X509CertificateHolder(certInChain.getEncoded());
@@ -516,32 +492,6 @@ public class OcspResponder
 
             this.certStatusStores.add(store);
         }
-    }
-
-    private static X509Certificate getCaCertOf(X509Certificate cert, List<X509Certificate> caCerts)
-    {
-        if(isSelfSigned(cert))
-        {
-            return null;
-        }
-
-        for(X509Certificate caCert : caCerts)
-        {
-            try
-            {
-                cert.verify(caCert.getPublicKey());
-                return caCert;
-            }catch(Exception e)
-            {
-            }
-        }
-
-        return null;
-    }
-
-    private static boolean isSelfSigned(X509Certificate cert)
-    {
-        return cert.getSubjectX500Principal().equals(cert.getIssuerX500Principal());
     }
 
     public void shutdown()
@@ -983,10 +933,10 @@ public class OcspResponder
             return IoCertUtil.parseCert(f);
         }catch(IOException e)
         {
-            throw new OcspResponderException(e);
+            throw new OcspResponderException("Could not parse cert " + f, e);
         } catch (CertificateException e)
         {
-            throw new OcspResponderException(e);
+            throw new OcspResponderException("Could not parse cert " + f, e);
         }
     }
 
