@@ -39,7 +39,7 @@ public class P12ECKeyGenCommand extends KeyGenCommand
     protected String            subject;
 
     @Option(name = "-pwd", aliases = { "--password" },
-            required = true, description = "Required. Password of the PKCS#12 file")
+            required = false, description = "Password of the PKCS#12 file")
     protected String            password;
 
     @Option(name = "-out",
@@ -59,8 +59,9 @@ public class P12ECKeyGenCommand extends KeyGenCommand
             curveName = "brainpoolP256r1";
         }
 
+        char[] pwd = readPasswordIfNotSet(password);        
         ECDSAIdentityGenerator gen = new P12KeypairGenerator.ECDSAIdentityGenerator(
-                curveName, password.toCharArray(), subject, getKeyUsage(), getExtendedKeyUsage());
+                curveName, pwd, subject, getKeyUsage(), getExtendedKeyUsage());
 
         P12KeypairGenerationResult keyAndCert = gen.generateIdentity();
 
