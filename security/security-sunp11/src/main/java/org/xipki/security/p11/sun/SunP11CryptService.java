@@ -222,29 +222,24 @@ public final class SunP11CryptService implements P11CryptService
                         PublicKey pubKey = signatureCert.getPublicKey();
 
                         Certificate[] certchain = keystore.getCertificateChain(alias);
-                        X509Certificate[] caCerts = null;
-                        int n = certchain.length;
-                        if(n > 1)
+                        X509Certificate[] x509Certchain = new X509Certificate[certchain.length];
+                        for(int j = 0; j < certchain.length; j++)
                         {
-                            caCerts = new X509Certificate[n - 1];
-                            for(int j = 1; j < n; j++)
-                            {
-                                caCerts[j - 1] = (X509Certificate) certchain[j];
-                            }
+                            x509Certchain[j] = (X509Certificate) certchain[j];
                         }
 
                         if("EC".equalsIgnoreCase(pubKey.getAlgorithm()))
                         {
                             if(pubKey instanceof ECPublicKey == false)
                             {
-                                // reparse the certificate
+                                // reparse the certificate due to bug in bcprov version 1.49
                                 signatureCert = IoCertUtil.parseCert(signatureCert.getEncoded());
                                 pubKey = signatureCert.getPublicKey();
                             }
                         }
 
                         SunP11Identity p11Identity = new SunP11Identity(provider, slotId, alias, signatureKey,
-                                signatureCert, pubKey, caCerts);
+                                x509Certchain, pubKey);
                         currentIdentifies.add(p11Identity);
                     }catch(SignerException e)
                     {
@@ -443,13 +438,8 @@ public final class SunP11CryptService implements P11CryptService
             Pkcs11KeyIdentifier keyId)
     throws SignerException
     {
-        X509Certificate cert = getCertificate(slotId, keyId);
-        if(cert == null)
-        {
-            return null;
-        }
-
-        return new X509Certificate[]{cert};
+        SunP11Identity identity = getIdentity(slotId, keyId);
+        return identity == null ? null : identity.getCertificateChain();
     }
 
     @Override
