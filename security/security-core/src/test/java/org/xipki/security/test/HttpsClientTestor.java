@@ -70,7 +70,8 @@ public class HttpsClientTestor
     throws NoSuchAlgorithmException
     {
         System.setProperty("https.protocols", "TLSv1.2,TLSv1.1,TLSv1");
-        //System.setProperty("javax.net.ssl.trustStore", "/home/lliao/Downloads/jetty-distribution-7.6.15.v20140411/etc/keystore");
+        //System.setProperty("javax.net.ssl.trustStore",
+        // "/home/lliao/Downloads/jetty-distribution-7.6.15.v20140411/etc/keystore");
         //System.setProperty("javax.net.ssl.trustStorePassword", "storepwd");
 
         javax.net.ssl.HttpsURLConnection.setDefaultHostnameVerifier(
