@@ -90,17 +90,22 @@ public class SecurityFactoryImpl implements SecurityFactory
             String type, String conf, X509Certificate cert, PasswordResolver passwordResolver)
     throws SignerException, PasswordResolverException
     {
-        ConcurrentContentSigner signer = doCreateSigner(type, conf, cert, passwordResolver);
+        return createSigner(type, conf,
+                (cert == null ? null : new X509Certificate[]{cert}),
+                passwordResolver);
+    }
 
-        if(cert == null)
-        {
-            if(signer.getCertificate() != null)
-            {
-                cert = signer.getCertificate();
-            }
-        }
+    @Override
+    public ConcurrentContentSigner createSigner(
+            String type, String conf,
+            X509Certificate[] certificateChain,
+            PasswordResolver passwordResolver)
+    throws SignerException, PasswordResolverException
+    {
+        ConcurrentContentSigner signer = doCreateSigner(type, conf, certificateChain, passwordResolver);
 
-        if(cert == null)
+        X509Certificate cert = signer.getCertificate();
+        if(certificateChain == null)
         {
             return signer;
         }
@@ -175,7 +180,9 @@ public class SecurityFactoryImpl implements SecurityFactory
     }
 
     private ConcurrentContentSigner doCreateSigner(
-            String type, String conf, X509Certificate cert, PasswordResolver passwordResolver)
+            String type, String conf,
+            X509Certificate[] certificateChain,
+            PasswordResolver passwordResolver)
     throws SignerException, PasswordResolverException
     {
         if("PKCS11".equalsIgnoreCase(type) || "PKCS12".equalsIgnoreCase(type) || "JKS".equalsIgnoreCase(type))
@@ -389,7 +396,7 @@ public class SecurityFactoryImpl implements SecurityFactory
                     P11CryptService p11CryptService = p11CryptServiceFact.createP11CryptService(
                             pkcs11Module, password, pkcs11IncludeSlots,pkcs11ExcludeSlots);
                     P11ContentSignerBuilder signerBuilder = new P11ContentSignerBuilder(
-                                p11CryptService, slot, password, keyIdentifier, cert);
+                                p11CryptService, slot, password, keyIdentifier, certificateChain);
 
                     try
                     {
@@ -437,7 +444,7 @@ public class SecurityFactoryImpl implements SecurityFactory
                 try
                 {
                     signerBuilder = new SoftTokenContentSignerBuilder(
-                            type, keystoreStream, password, keyLabel, password, cert);
+                            type, keystoreStream, password, keyLabel, password, certificateChain);
                 } catch (SignerException e)
                 {
                     throw new SignerException(e.getMessage());
@@ -470,9 +477,9 @@ public class SecurityFactoryImpl implements SecurityFactory
             }
             contentSigner.initialize(conf, passwordResolver);
 
-            if(cert != null)
+            if(certificateChain != null)
             {
-                contentSigner.setCertificate(cert);
+                contentSigner.setCertificateChain(certificateChain);
             }
 
             return contentSigner;

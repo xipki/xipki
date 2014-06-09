@@ -144,6 +144,8 @@ public final class IaikP11CryptService implements P11CryptService
             throw e;
         }
 
+        Map<String, Set<X509Certificate>> allCerts = new HashMap<String, Set<X509Certificate>>();
+
         Set<IaikP11Identity> currentIdentifies = new HashSet<IaikP11Identity>();
 
         Set<PKCS11SlotIdentifier> slotIds = extModule.getAllSlotIds();
@@ -191,8 +193,7 @@ public final class IaikP11CryptService implements P11CryptService
 
                 try
                 {
-                    X509PublicKeyCertificate certificateObject = slot.getCertificateObject(
-                            keyId, null);
+                    X509PublicKeyCertificate certificateObject = slot.getCertificateObject(keyId, null);
 
                     X509Certificate signatureCert = null;
                     PublicKey signaturePublicKey = null;
@@ -228,25 +229,78 @@ public final class IaikP11CryptService implements P11CryptService
                         signaturePublicKey = generatePublicKey(publicKeyObject);
                     }
 
+                    List<X509Certificate> certChain = new LinkedList<X509Certificate>();
+
+                    if(signatureCert != null)
+                    {
+                        certChain.add(signatureCert);
+                        while(true)
+                        {
+                            X509Certificate context = certChain.get(certChain.size() - 1);
+                            if(IoCertUtil.isSelfSigned(context))
+                            {
+                                break;
+                            }
+
+                            String issuerSubject = signatureCert.getIssuerX500Principal().getName();
+                            Set<X509Certificate> issuerCerts = allCerts.get(issuerSubject);
+                            if(issuerCerts == null)
+                            {
+                                issuerCerts= new HashSet<>();
+                                X509PublicKeyCertificate[] certObjects = slot.getCertificateObjects(
+                                        signatureCert.getIssuerX500Principal());
+                                if(certObjects != null && certObjects.length > 0)
+                                {
+                                    for(X509PublicKeyCertificate certObject : certObjects)
+                                    {
+                                        issuerCerts.add(IoCertUtil.parseCert(certObject.getValue().getByteArrayValue()));
+                                    }
+                                }
+
+                                if(issuerCerts.isEmpty() == false)
+                                {
+                                    allCerts.put(issuerSubject, issuerCerts);
+                                }
+                            }
+
+                            if(issuerCerts == null || issuerCerts.isEmpty())
+                            {
+                                break;
+                            }
+
+                            // find the certificate
+                            for(X509Certificate issuerCert : issuerCerts)
+                            {
+                                try
+                                {
+                                    context.verify(issuerCert.getPublicKey());
+                                    certChain.add(issuerCert);
+                                }catch(Exception e)
+                                {
+                                }
+                            }
+                        }
+                    }
+
                     Pkcs11KeyIdentifier tKeyId = new Pkcs11KeyIdentifier(
                             signatureKey.getId().getByteArrayValue(),
                             new String(signatureKey.getLabel().getCharArrayValue()));
 
-                    IaikP11Identity identity = new IaikP11Identity(
-                            slotId,
-                            tKeyId,
-                            signatureCert, signaturePublicKey);
+                    IaikP11Identity identity = new IaikP11Identity(slotId, tKeyId,
+                            certChain.toArray(new X509Certificate[0]), signaturePublicKey);
                     currentIdentifies.add(identity);
                 } catch (SignerException e)
                 {
                     String keyIdStr = hex(keyId);
-                    LOG.warn("SignerException while initializing key with key-id {}, message: {}", keyIdStr, e.getMessage());
+                    LOG.warn("SignerException while initializing key with key-id {}, message: {}",
+                            keyIdStr, e.getMessage());
                     LOG.debug("SignerException while initializing key with key-id " + keyIdStr, e);
                     continue;
                 } catch (Throwable t)
                 {
                     String keyIdStr = hex(keyId);
-                    LOG.warn("Unexpected exception while initializing key with key-id {}, message: {}", keyIdStr, t.getMessage());
+                    LOG.warn("Unexpected exception while initializing key with key-id {}, message: {}",
+                            keyIdStr, t.getMessage());
                     LOG.debug("Unexpected exception while initializing key with key-id " + keyIdStr, t);
                     continue;
                 }

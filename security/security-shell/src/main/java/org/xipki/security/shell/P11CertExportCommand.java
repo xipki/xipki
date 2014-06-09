@@ -42,11 +42,13 @@ public class P11CertExportCommand extends SecurityCommand
     protected Integer           slotIndex;
 
     @Option(name = "-key-id",
-            required = false, description = "Id of the private key in the PKCS#11 token. Either keyId or keyLabel must be specified")
+            required = false, description = "Id of the private key in the PKCS#11 token.\n"
+                    + "Either keyId or keyLabel must be specified")
     protected String            keyId;
 
     @Option(name = "-key-label",
-            required = false, description = "Label of the private key in the PKCS#11 token. Either keyId or keyLabel must be specified")
+            required = false, description = "Label of the private key in the PKCS#11 token.\n"
+                    + "Either keyId or keyLabel must be specified")
     protected String            keyLabel;
 
     @Option(name = "-out",

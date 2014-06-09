@@ -26,6 +26,7 @@ import java.security.PrivateKey;
 import java.security.Provider;
 import java.security.PublicKey;
 import java.security.Security;
+import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
 import java.security.interfaces.ECPublicKey;
 import java.util.Enumeration;
@@ -220,6 +221,18 @@ public final class SunP11CryptService implements P11CryptService
                         X509Certificate signatureCert = (X509Certificate) keystore.getCertificate(alias);
                         PublicKey pubKey = signatureCert.getPublicKey();
 
+                        Certificate[] certchain = keystore.getCertificateChain(alias);
+                        X509Certificate[] caCerts = null;
+                        int n = certchain.length;
+                        if(n > 1)
+                        {
+                            caCerts = new X509Certificate[n - 1];
+                            for(int j = 1; j < n; j++)
+                            {
+                                caCerts[j - 1] = (X509Certificate) certchain[j];
+                            }
+                        }
+
                         if("EC".equalsIgnoreCase(pubKey.getAlgorithm()))
                         {
                             if(pubKey instanceof ECPublicKey == false)
@@ -231,7 +244,7 @@ public final class SunP11CryptService implements P11CryptService
                         }
 
                         SunP11Identity p11Identity = new SunP11Identity(provider, slotId, alias, signatureKey,
-                                signatureCert, pubKey);
+                                signatureCert, pubKey, caCerts);
                         currentIdentifies.add(p11Identity);
                     }catch(SignerException e)
                     {

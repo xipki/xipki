@@ -44,7 +44,7 @@ import org.xipki.security.provider.P11PrivateKey;
 
 public class P11ContentSignerBuilder
 {
-    private final X509Certificate cert;
+    private final X509Certificate[] certificateChain;
 
     private final P11CryptService cryptService;
     private final PKCS11SlotIdentifier slot;
@@ -54,28 +54,14 @@ public class P11ContentSignerBuilder
             P11CryptService cryptService,
             PKCS11SlotIdentifier slot, char[] password,
             Pkcs11KeyIdentifier keyId,
-            X509Certificate cert)
+            X509Certificate[] certificateChain)
     throws SignerException
     {
         ParamChecker.assertNotNull("cryptService", cryptService);
         ParamChecker.assertNotNull("slot", slot);
         ParamChecker.assertNotNull("keyId", keyId);
 
-        this.cryptService = cryptService;
-        this.keyId = keyId;
-        this.slot = slot;
-
-        boolean keyExists = false;
-        if(cert != null)
-        {
-            this.cert = cert;
-        }
-        else
-        {
-            this.cert = this.cryptService.getCertificate(slot, keyId);
-            keyExists = (this.cert != null);
-        }
-
+        boolean keyExists = (cryptService.getCertificate(slot, keyId) != null);
         if(keyExists == false)
         {
             keyExists = (this.cryptService.getPublicKey(slot, keyId) != null);
@@ -85,6 +71,11 @@ public class P11ContentSignerBuilder
         {
             throw new SignerException("Key with " + keyId + " does not exist");
         }
+
+        this.cryptService = cryptService;
+        this.keyId = keyId;
+        this.slot = slot;
+        this.certificateChain = certificateChain;
     }
 
     public ConcurrentContentSigner createSigner(
@@ -99,7 +90,7 @@ public class P11ContentSignerBuilder
 
         List<ContentSigner> signers = new ArrayList<ContentSigner>(parallelism);
 
-        PublicKey publicKey = cert.getPublicKey();
+        PublicKey publicKey = certificateChain[0].getPublicKey();
         try
         {
             for(int i = 0; i < parallelism; i++)
@@ -141,7 +132,7 @@ public class P11ContentSignerBuilder
         }
 
         DefaultConcurrentContentSigner concurrentSigner = new DefaultConcurrentContentSigner(signers, privateKey);
-        concurrentSigner.setCertificate(cert);
+        concurrentSigner.setCertificateChain(certificateChain);
 
         return concurrentSigner;
     }

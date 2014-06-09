@@ -47,6 +47,7 @@ class SunP11Identity implements Comparable<SunP11Identity>
     private final PrivateKey privateKey;
     private final X509Certificate certificate;
     private final PublicKey publicKey;
+    private final X509Certificate[] caCertificates;
     private final int signatureKeyBitLength;
 
     public SunP11Identity(
@@ -54,7 +55,9 @@ class SunP11Identity implements Comparable<SunP11Identity>
             PKCS11SlotIdentifier slotId,
             String keyLabel,
             PrivateKey privateKey,
-            X509Certificate certificate, PublicKey publicKey)
+            X509Certificate certificate,
+            PublicKey publicKey,
+            X509Certificate[] caCertificates)
     throws SignerException
     {
         super();
@@ -73,6 +76,7 @@ class SunP11Identity implements Comparable<SunP11Identity>
         this.privateKey = privateKey;
         this.certificate = certificate;
         this.publicKey = publicKey == null ? certificate.getPublicKey() : publicKey;
+        this.caCertificates = caCertificates;
 
         this.keyLabel = keyLabel;
 
@@ -139,6 +143,11 @@ class SunP11Identity implements Comparable<SunP11Identity>
     public X509Certificate getCertificate()
     {
         return certificate;
+    }
+
+    public X509Certificate[] getCaCertificates()
+    {
+        return caCertificates;
     }
 
     public PublicKey getPublicKey()
@@ -266,7 +275,7 @@ class SunP11Identity implements Comparable<SunP11Identity>
 
     private static int byte2int(byte b)
     {
-            return b >= 0 ? b : 256 + b;
+        return b >= 0 ? b : 256 + b;
     }
 
     @Override

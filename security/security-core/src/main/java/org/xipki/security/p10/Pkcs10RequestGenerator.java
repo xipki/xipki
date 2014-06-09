@@ -17,6 +17,8 @@
 
 package org.xipki.security.p10;
 
+import java.security.cert.X509Certificate;
+
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.bouncycastle.operator.ContentSigner;
@@ -50,8 +52,8 @@ public class Pkcs10RequestGenerator
             X500Name subjectDN)
     throws PasswordResolverException, SignerException
     {
-        ConcurrentContentSigner signer =
-                securityFactory.createSigner(signerType, signerConf, null, NopPasswordResolver.INSTANCE);
+        ConcurrentContentSigner signer = securityFactory.createSigner(signerType, signerConf,
+                (X509Certificate[]) null, NopPasswordResolver.INSTANCE);
         ContentSigner contentSigner;
         try
         {
