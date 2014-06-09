@@ -49,11 +49,11 @@ public class P11CertAddCommand extends SecurityCommand
     @Option(name = "-pwd", aliases = { "--password" },
             required = false, description = "Password of the PKCS#11 device")
     protected String            password;
-    
+
     @Option(name = "-p",
             required = false, description = "Read password from console")
     protected Boolean            readFromConsole;
-    
+
     @Override
     protected Object doExecute()
     throws Exception
@@ -73,7 +73,7 @@ public class P11CertAddCommand extends SecurityCommand
         }
 
         X509Certificate cert = IoCertUtil.parseCert(certFile);
-        
+
         Session session = slot.borrowWritableSession();
         try
         {
@@ -96,7 +96,7 @@ public class P11CertAddCommand extends SecurityCommand
             if(alreadyExists == false)
             {
                 X509PublicKeyCertificate newCaCertTemp = P11CertUpdateCommand.createPkcs11Template(
-                		cert, encodedCert, null, null);
+                        cert, encodedCert, null, null);
                 session.createObject(newCaCertTemp);
             }
         }finally

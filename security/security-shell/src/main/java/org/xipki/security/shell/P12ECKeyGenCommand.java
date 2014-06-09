@@ -59,7 +59,7 @@ public class P12ECKeyGenCommand extends KeyGenCommand
             curveName = "brainpoolP256r1";
         }
 
-        char[] pwd = readPasswordIfNotSet(password);        
+        char[] pwd = readPasswordIfNotSet(password);
         ECDSAIdentityGenerator gen = new P12KeypairGenerator.ECDSAIdentityGenerator(
                 curveName, pwd, subject, getKeyUsage(), getExtendedKeyUsage());
 
