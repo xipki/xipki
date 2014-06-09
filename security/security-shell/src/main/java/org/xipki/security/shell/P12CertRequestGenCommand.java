@@ -60,7 +60,7 @@ public class P12CertRequestGenCommand extends SecurityCommand
     protected String            p12File;
 
     @Option(name = "-pwd", aliases = { "--password" },
-            required = true, description = "Required. Password of the PKCS#12 file")
+            required = false, description = "Password of the PKCS#12 file")
     protected String            password;
 
     @Option(name = "-hash",
@@ -82,9 +82,10 @@ public class P12CertRequestGenCommand extends SecurityCommand
             hashAlgo = "SHA256";
         }
 
+        char[] pwd = readPasswordIfNotSet(password);
         ASN1ObjectIdentifier sigAlgOid;
 
-        boolean ec = isEcKey(p12File, password.toCharArray());
+        boolean ec = isEcKey(p12File, pwd);
 
         hashAlgo = hashAlgo.trim().toUpperCase();
 
@@ -105,7 +106,7 @@ public class P12CertRequestGenCommand extends SecurityCommand
             throw new Exception("Unsupported hash algorithm " + hashAlgo);
         }
 
-        String signerConf = SecurityFactoryImpl.getKeystoreSignerConf(p12File, password, sigAlgOid.getId(), 1);
+        String signerConf = SecurityFactoryImpl.getKeystoreSignerConf(p12File, new String(pwd), sigAlgOid.getId(), 1);
         ConcurrentContentSigner identifiedSigner = securityFactory.createSigner("PKCS12", signerConf,
                 (X509Certificate[]) null, NopPasswordResolver.INSTANCE);
 

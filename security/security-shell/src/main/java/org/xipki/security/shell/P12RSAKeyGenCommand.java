@@ -39,7 +39,7 @@ public class P12RSAKeyGenCommand extends KeyGenCommand
     protected String            subject;
 
     @Option(name = "-pwd", aliases = { "--password" },
-            required = true, description = "Required. Password of the PKCS#12 file")
+            required = false, description = "Password of the PKCS#12 file")
     protected String            password;
 
     @Option(name = "-out",
@@ -64,8 +64,9 @@ public class P12RSAKeyGenCommand extends KeyGenCommand
             return null;
         }
 
+        char[] pwd = readPasswordIfNotSet(password);        
         P12KeypairGenerator gen = new P12KeypairGenerator.RSAIdentityGenerator(
-                keysize, BigInteger.valueOf(0x10001), password.toCharArray(), subject,
+                keysize, BigInteger.valueOf(0x10001), pwd, subject,
                 getKeyUsage(), getExtendedKeyUsage());
 
         P12KeypairGenerationResult keyAndCert = gen.generateIdentity();

@@ -17,6 +17,8 @@
 
 package org.xipki.security.shell;
 
+import java.io.Console;
+
 import org.apache.karaf.shell.console.OsgiCommandSupport;
 import org.xipki.security.api.SecurityFactory;
 
@@ -33,6 +35,37 @@ public abstract class SecurityCommand extends OsgiCommandSupport
     public void setSecurityFactory(SecurityFactory securityFactory)
     {
         this.securityFactory = securityFactory;
+    }
+    
+    protected char[] readPasswordIfNotSet(String password, Boolean readFromConsole)
+    {
+        if(password != null)
+        {
+        	return password.toCharArray();
+        }
+        
+        if(readFromConsole != null && readFromConsole.booleanValue())
+        {
+        	return readPassword();
+        }
+        
+        return null;
+    }
+
+    protected char[] readPasswordIfNotSet(String password)
+    {
+        if(password != null)
+        {
+        	return password.toCharArray();
+        }
+        
+      	return readPassword();
+    }
+
+    protected char[] readPassword()
+    {
+        Console console = System.console();
+        return console.readPassword("Please enter the master password\n");
     }
 
 }

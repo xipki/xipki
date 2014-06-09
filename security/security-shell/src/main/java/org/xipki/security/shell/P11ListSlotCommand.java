@@ -51,7 +51,11 @@ public class P11ListSlotCommand extends SecurityCommand
 {
     @Option(name = "-pwd", aliases = { "--password" },
             required = false, description = "Password of the PKCS#11 token")
-    protected char[]            password;
+    protected String            password;
+
+    @Option(name = "-p",
+            required = false, description = "Read password from console")
+    protected Boolean            readFromConsole;
 
     @Override
     protected Object doExecute()
@@ -70,6 +74,8 @@ public class P11ListSlotCommand extends SecurityCommand
         sb.append(n + " slots are configured\n");
         System.out.println(sb.toString());
 
+        char[] pwd = readPasswordIfNotSet(password, readFromConsole);            
+
         for(PKCS11SlotIdentifier slotId : slotIds)
         {
             sb = new StringBuilder();
@@ -78,7 +84,7 @@ public class P11ListSlotCommand extends SecurityCommand
             IaikExtendedSlot slot = null;
             try
             {
-                slot = module.getSlot(slotId, password);
+                slot = module.getSlot(slotId, pwd);
             }catch(SignerException e)
             {
                 sb.append("\tError:  ").append(e.getMessage()).append("\n");
