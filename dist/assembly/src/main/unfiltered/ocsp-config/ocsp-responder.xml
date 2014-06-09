@@ -14,10 +14,6 @@
 		</algorithms>
 		<includeSignerCertInResp>true</includeSignerCertInResp>				
 		<includeSignerCACertsInResp>true</includeSignerCACertsInResp>
-		<caCertFiles>
-			<caCertFile>output/SubCAwithCRL1.der</caCertFile>
-			<caCertFile>output/RCA1.der</caCertFile>
-		</caCertFiles>
 	</signer>
 	<request>
 		<nonce>
