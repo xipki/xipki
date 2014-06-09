@@ -34,9 +34,11 @@ public interface ConcurrentContentSigner
      */
     PrivateKey getPrivateKey();
 
-    public void setCertificate(X509Certificate certificate);
+    X509Certificate getCertificate();
 
-    public X509Certificate getCertificate();
+    void setCertificateChain(X509Certificate[] certchain);
+
+    X509Certificate[] getCertificateChain();
 
     void initialize(String conf, PasswordResolver passwordResolver)
     throws SignerException;

@@ -37,14 +37,14 @@ class IaikP11Identity implements Comparable<IaikP11Identity>
     private final PKCS11SlotIdentifier slotId;
     private final Pkcs11KeyIdentifier keyId;
 
-    private final X509Certificate certificate;
+    private final X509Certificate[] certificateChain;
     private final PublicKey publicKey;
     private final int signatureKeyBitLength;
 
     public IaikP11Identity(
             PKCS11SlotIdentifier slotId,
             Pkcs11KeyIdentifier keyId,
-            X509Certificate certificate,
+            X509Certificate[] certificateChain,
             PublicKey publicKey)
     {
         super();
@@ -52,15 +52,16 @@ class IaikP11Identity implements Comparable<IaikP11Identity>
         ParamChecker.assertNotNull("slotId", slotId);
         ParamChecker.assertNotNull("keyId", keyId);
 
-        if(certificate == null && publicKey == null)
+        if((certificateChain == null || certificateChain.length < 1 || certificateChain[0] == null)
+                && publicKey == null)
         {
             throw new IllegalArgumentException("Neither certificate nor publicKey is non-null");
         }
 
         this.slotId = slotId;
         this.keyId = keyId;
-        this.certificate = certificate;
-        this.publicKey = publicKey == null ? certificate.getPublicKey() : publicKey;
+        this.certificateChain = certificateChain;
+        this.publicKey = publicKey == null ? certificateChain[0].getPublicKey() : publicKey;
 
         if(this.publicKey instanceof RSAPublicKey)
         {
@@ -84,12 +85,17 @@ class IaikP11Identity implements Comparable<IaikP11Identity>
 
     public X509Certificate getCertificate()
     {
-        return certificate;
+        return certificateChain[0];
+    }
+
+    public X509Certificate[] getCertificateChain()
+    {
+        return certificateChain;
     }
 
     public PublicKey getPublicKey()
     {
-        return publicKey == null ? certificate.getPublicKey() : publicKey;
+        return publicKey == null ? certificateChain[0].getPublicKey() : publicKey;
     }
 
     public PKCS11SlotIdentifier getSlotId()

@@ -22,11 +22,12 @@ import java.io.FileOutputStream;
 import java.security.Key;
 import java.security.KeyStore;
 import java.security.PublicKey;
-import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
 import java.security.interfaces.ECPublicKey;
 import java.security.interfaces.RSAPublicKey;
 import java.util.Enumeration;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.apache.felix.gogo.commands.Command;
 import org.apache.felix.gogo.commands.Option;
@@ -50,6 +51,10 @@ public class P12CertUpdateCommand extends SecurityCommand
     @Option(name = "-cert",
             required = true, description = "Required. Certificate file")
     protected String            certFile;
+
+    @Option(name = "-cacert",
+            required = false, multiValued = true, description = "CA Certificate files")
+    protected Set<String>       caCertFiles;
 
     @Override
     protected Object doExecute()
@@ -95,8 +100,17 @@ public class P12CertUpdateCommand extends SecurityCommand
         }
 
         Key key = ks.getKey(keyname, pwd);
-        Certificate[] chain = new Certificate[]{newCert};
-        ks.setKeyEntry(keyname, key, pwd, chain);
+        Set<X509Certificate> caCerts = new HashSet<>();
+        if(caCertFiles != null && caCertFiles.isEmpty() == false)
+        {
+            for(String caCertFile : caCertFiles)
+            {
+                caCerts.add(IoCertUtil.parseCert(caCertFile));
+            }
+        }
+        X509Certificate[] certChain = IoCertUtil.buildCertPath(newCert, caCerts);
+
+        ks.setKeyEntry(keyname, key, pwd, certChain);
 
         FileOutputStream fOut = null;
         try

@@ -21,6 +21,7 @@ import iaik.pkcs.pkcs11.objects.ECDSAPrivateKey;
 import iaik.pkcs.pkcs11.objects.PrivateKey;
 
 import java.io.File;
+import java.security.cert.X509Certificate;
 
 import org.apache.felix.gogo.commands.Command;
 import org.apache.felix.gogo.commands.Option;
@@ -58,11 +59,13 @@ public class P11CertRequestGenCommand extends SecurityCommand
     protected Integer           slotIndex;
 
     @Option(name = "-key-id",
-            required = false, description = "Id of the private key in the PKCS#11 token. Either keyId or keyLabel must be specified")
+            required = false, description = "Id of the private key in the PKCS#11 token.\n"
+                    + "Either keyId or keyLabel must be specified")
     protected String            keyId;
 
     @Option(name = "-key-label",
-            required = false, description = "Label of the private key in the PKCS#11 token. Either keyId or keyLabel must be specified")
+            required = false, description = "Label of the private key in the PKCS#11 token.\n"
+                    + "Either keyId or keyLabel must be specified")
     protected String            keyLabel;
 
     @Option(name = "-pwd", aliases = { "--password" },
@@ -155,8 +158,8 @@ public class P11CertRequestGenCommand extends SecurityCommand
                         slotId, keyIdentifier, password,
                         sigAlgOid.getId(), 1);
 
-        ConcurrentContentSigner identifiedSigner =
-                securityFactory.createSigner("PKCS11", signerConf, null, NopPasswordResolver.INSTANCE);
+        ConcurrentContentSigner identifiedSigner = securityFactory.createSigner("PKCS11", signerConf,
+                (X509Certificate[]) null, NopPasswordResolver.INSTANCE);
 
         Certificate cert = Certificate.getInstance(identifiedSigner.getCertificate().getEncoded());
 
