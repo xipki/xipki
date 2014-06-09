@@ -45,9 +45,8 @@ class SunP11Identity implements Comparable<SunP11Identity>
 
     private final String keyLabel;
     private final PrivateKey privateKey;
-    private final X509Certificate certificate;
+    private final X509Certificate[] certificateChain;
     private final PublicKey publicKey;
-    private final X509Certificate[] caCertificates;
     private final int signatureKeyBitLength;
 
     public SunP11Identity(
@@ -55,9 +54,8 @@ class SunP11Identity implements Comparable<SunP11Identity>
             PKCS11SlotIdentifier slotId,
             String keyLabel,
             PrivateKey privateKey,
-            X509Certificate certificate,
-            PublicKey publicKey,
-            X509Certificate[] caCertificates)
+            X509Certificate[] certificateChain,
+            PublicKey publicKey)
     throws SignerException
     {
         super();
@@ -67,16 +65,16 @@ class SunP11Identity implements Comparable<SunP11Identity>
         ParamChecker.assertNotNull("privateKey", privateKey);
         ParamChecker.assertNotNull("keyLabel", keyLabel);
 
-        if(certificate == null && publicKey == null)
+        if((certificateChain == null || certificateChain.length == 0 || certificateChain[0] == null)
+                && publicKey == null)
         {
             throw new IllegalArgumentException("Neither certificate nor publicKey is non-null");
         }
 
         this.slotId = slotId;
         this.privateKey = privateKey;
-        this.certificate = certificate;
-        this.publicKey = publicKey == null ? certificate.getPublicKey() : publicKey;
-        this.caCertificates = caCertificates;
+        this.publicKey = publicKey == null ? certificateChain[0].getPublicKey() : publicKey;
+        this.certificateChain = certificateChain;
 
         this.keyLabel = keyLabel;
 
@@ -142,17 +140,17 @@ class SunP11Identity implements Comparable<SunP11Identity>
 
     public X509Certificate getCertificate()
     {
-        return certificate;
+        return (certificateChain != null && certificateChain.length > 0) ? certificateChain[0] : null;
     }
 
-    public X509Certificate[] getCaCertificates()
+    public X509Certificate[] getCertificateChain()
     {
-        return caCertificates;
+        return certificateChain;
     }
 
     public PublicKey getPublicKey()
     {
-        return publicKey == null ? certificate.getPublicKey() : publicKey;
+        return publicKey == null ? certificateChain[0].getPublicKey() : publicKey;
     }
 
     public PKCS11SlotIdentifier getSlotId()

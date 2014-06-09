@@ -21,11 +21,14 @@ import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
+import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
 import java.security.interfaces.ECPublicKey;
 import java.security.interfaces.RSAPublicKey;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.crypto.NoSuchPaddingException;
 
@@ -39,6 +42,7 @@ import org.xipki.security.api.P11CryptService;
 import org.xipki.security.api.PKCS11SlotIdentifier;
 import org.xipki.security.api.Pkcs11KeyIdentifier;
 import org.xipki.security.api.SignerException;
+import org.xipki.security.common.IoCertUtil;
 import org.xipki.security.common.ParamChecker;
 import org.xipki.security.provider.P11PrivateKey;
 
@@ -61,7 +65,8 @@ public class P11ContentSignerBuilder
         ParamChecker.assertNotNull("slot", slot);
         ParamChecker.assertNotNull("keyId", keyId);
 
-        boolean keyExists = (cryptService.getCertificate(slot, keyId) != null);
+        X509Certificate signerCertInP11 = cryptService.getCertificate(slot, keyId);
+        boolean keyExists = (signerCertInP11 != null);
         if(keyExists == false)
         {
             keyExists = (this.cryptService.getPublicKey(slot, keyId) != null);
@@ -75,7 +80,37 @@ public class P11ContentSignerBuilder
         this.cryptService = cryptService;
         this.keyId = keyId;
         this.slot = slot;
-        this.certificateChain = certificateChain;
+
+        Set<Certificate> caCerts = new HashSet<>();
+
+        X509Certificate cert;
+        int n = certificateChain == null ? 0 : certificateChain.length;
+        if(n > 0)
+        {
+            cert = certificateChain[0];
+            if(n > 1)
+            {
+                for(int i = 1; i < n; i++)
+                {
+                    caCerts.add(certificateChain[i]);
+                }
+            }
+        }
+        else
+        {
+            cert = signerCertInP11;
+        }
+
+        Certificate[] certsInKeystore = cryptService.getCertificates(slot, keyId);
+        if(certsInKeystore.length > 1)
+        {
+            for(int i = 1; i < certsInKeystore.length; i++)
+            {
+                caCerts.add(certsInKeystore[i]);
+            }
+        }
+
+        this.certificateChain = IoCertUtil.buildCertPath(cert, caCerts);
     }
 
     public ConcurrentContentSigner createSigner(

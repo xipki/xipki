@@ -36,7 +36,9 @@ import java.security.interfaces.ECPrivateKey;
 import java.security.interfaces.RSAPrivateKey;
 import java.util.ArrayList;
 import java.util.Enumeration;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
@@ -71,6 +73,7 @@ import org.xipki.security.api.ConcurrentContentSigner;
 import org.xipki.security.api.SignerException;
 import org.xipki.security.bcext.BCRSAPrivateCrtKey;
 import org.xipki.security.bcext.BCRSAPrivateKey;
+import org.xipki.security.common.IoCertUtil;
 import org.xipki.security.common.ParamChecker;
 
 public class SoftTokenContentSignerBuilder
@@ -144,19 +147,36 @@ public class SoftTokenContentSignerBuilder
                 throw new SignerException("Unsupported key " + key.getClass().getName());
             }
 
-            if(certificateChain == null)
+            Set<Certificate> caCerts = new HashSet<>();
+
+            X509Certificate cert;
+            int n = certificateChain == null ? 0 : certificateChain.length;
+            if(n > 0)
             {
-                Certificate[] _certs = ks.getCertificateChain(keyname);
-                this.certificateChain = new X509Certificate[_certs.length];
-                for(int i = 0; i < _certs.length; i++)
+                cert = certificateChain[0];
+                if(n > 1)
                 {
-                    this.certificateChain[i] = (X509Certificate) _certs[i];
+                    for(int i = 1; i < n; i++)
+                    {
+                        caCerts.add(certificateChain[i]);
+                    }
                 }
             }
             else
             {
-                this.certificateChain = certificateChain;
+                cert = (X509Certificate) ks.getCertificate(keyname);
             }
+
+            Certificate[] certsInKeystore = ks.getCertificateChain(keyname);
+            if(certsInKeystore.length > 1)
+            {
+                for(int i = 1; i < certsInKeystore.length; i++)
+                {
+                    caCerts.add(certsInKeystore[i]);
+                }
+            }
+
+            this.certificateChain = IoCertUtil.buildCertPath(cert, caCerts);
         }catch(KeyStoreException e)
         {
             throw new SignerException(e);

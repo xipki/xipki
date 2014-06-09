@@ -38,6 +38,7 @@ import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
@@ -441,7 +442,7 @@ public class IoCertUtil
         return bytes;
     }
 
-    public static X509Certificate[] buildCertPath(X509Certificate cert, Set<X509Certificate> certs)
+    public static X509Certificate[] buildCertPath(X509Certificate cert, Set<? extends Certificate> certs)
     {
         List<X509Certificate> certChain = new LinkedList<>();
         certChain.add(cert);
@@ -466,19 +467,35 @@ public class IoCertUtil
         return certChain.toArray(new X509Certificate[0]);
     }
 
-    private static X509Certificate getCaCertOf(X509Certificate cert, Set<X509Certificate> caCerts)
+    public static X509Certificate[] buildCertPath(X509Certificate cert, Certificate[] certs)
+    {
+        Set<Certificate> setOfCerts = new HashSet<>();
+        for(Certificate entry : certs)
+        {
+            setOfCerts.add(entry);
+        }
+
+        return buildCertPath(cert, setOfCerts);
+    }
+
+    private static X509Certificate getCaCertOf(X509Certificate cert, Set<? extends Certificate> caCerts)
     {
         if(isSelfSigned(cert))
         {
             return null;
         }
 
-        for(X509Certificate caCert : caCerts)
+        for(Certificate caCert : caCerts)
         {
+            if(caCert instanceof X509Certificate == false)
+            {
+                continue;
+            }
+
             try
             {
                 cert.verify(caCert.getPublicKey());
-                return caCert;
+                return (X509Certificate) caCert;
             }catch(Exception e)
             {
             }
