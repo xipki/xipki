@@ -567,13 +567,8 @@ public final class IaikP11CryptService implements P11CryptService
             Pkcs11KeyIdentifier keyId)
     throws SignerException
     {
-        X509Certificate cert = getCertificate(slotId, keyId);
-        if(cert == null)
-        {
-            return null;
-        }
-
-        return new X509Certificate[]{cert};
+        IaikP11Identity identity = getIdentity(slotId, keyId);
+        return identity == null ? null : identity.getCertificateChain();
     }
 
     @Override

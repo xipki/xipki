@@ -85,7 +85,7 @@ class IaikP11Identity implements Comparable<IaikP11Identity>
 
     public X509Certificate getCertificate()
     {
-        return certificateChain[0];
+        return (certificateChain != null && certificateChain.length > 0) ? certificateChain[0] : null;
     }
 
     public X509Certificate[] getCertificateChain()
