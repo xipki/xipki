@@ -36,19 +36,19 @@ public abstract class SecurityCommand extends OsgiCommandSupport
     {
         this.securityFactory = securityFactory;
     }
-    
+
     protected char[] readPasswordIfNotSet(String password, Boolean readFromConsole)
     {
         if(password != null)
         {
-        	return password.toCharArray();
+            return password.toCharArray();
         }
-        
+
         if(readFromConsole != null && readFromConsole.booleanValue())
         {
-        	return readPassword();
+            return readPassword();
         }
-        
+
         return null;
     }
 
@@ -56,10 +56,10 @@ public abstract class SecurityCommand extends OsgiCommandSupport
     {
         if(password != null)
         {
-        	return password.toCharArray();
+            return password.toCharArray();
         }
-        
-      	return readPassword();
+
+          return readPassword();
     }
 
     protected char[] readPassword()
