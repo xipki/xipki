@@ -74,7 +74,7 @@ public class P11ListSlotCommand extends SecurityCommand
         sb.append(n + " slots are configured\n");
         System.out.println(sb.toString());
 
-        char[] pwd = readPasswordIfNotSet(password, readFromConsole);            
+        char[] pwd = readPasswordIfNotSet(password, readFromConsole);
 
         for(PKCS11SlotIdentifier slotId : slotIds)
         {
