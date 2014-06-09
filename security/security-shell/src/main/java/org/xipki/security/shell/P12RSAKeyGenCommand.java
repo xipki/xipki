@@ -64,7 +64,7 @@ public class P12RSAKeyGenCommand extends KeyGenCommand
             return null;
         }
 
-        char[] pwd = readPasswordIfNotSet(password);        
+        char[] pwd = readPasswordIfNotSet(password);
         P12KeypairGenerator gen = new P12KeypairGenerator.RSAIdentityGenerator(
                 keysize, BigInteger.valueOf(0x10001), pwd, subject,
                 getKeyUsage(), getExtendedKeyUsage());

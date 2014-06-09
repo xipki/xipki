@@ -78,7 +78,7 @@ public class P11KeyDeleteCommand extends SecurityCommand
         }
 
         char[] pwd = readPasswordIfNotSet(password, readFromConsole);
-        
+
         IaikExtendedModule module = IaikP11ModulePool.getInstance().getModule(
                 securityFactory.getPkcs11Module());
 

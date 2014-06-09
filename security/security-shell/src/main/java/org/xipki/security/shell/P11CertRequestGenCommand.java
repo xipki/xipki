@@ -108,7 +108,7 @@ public class P11CertRequestGenCommand extends SecurityCommand
         }
 
         char[] pwd = readPasswordIfNotSet(password, readFromConsole);
-        
+
         IaikExtendedModule module = IaikP11ModulePool.getInstance().getModule(
                 securityFactory.getPkcs11Module());
 
@@ -162,7 +162,7 @@ public class P11CertRequestGenCommand extends SecurityCommand
         String pwdStr = pwd == null ? null : new String(pwd);
         String signerConf = SecurityFactoryImpl.getPkcs11SignerConf(
                         securityFactory.getPkcs11Module(),
-                        slotId, keyIdentifier, 
+                        slotId, keyIdentifier,
                         pwdStr,
                         sigAlgOid.getId(), 1);
 
