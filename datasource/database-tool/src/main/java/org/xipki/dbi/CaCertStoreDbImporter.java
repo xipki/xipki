@@ -172,7 +172,8 @@ class CaCertStoreDbImporter extends DbPorter
                     ps.execute();
                 }catch(Exception e)
                 {
-                    System.err.println("Error while importing requestorinfo with ID=" + info.getId() + ", message: " + e.getMessage());
+                    System.err.println("Error while importing requestorinfo with ID=" + info.getId() +
+                            ", message: " + e.getMessage());
                     throw e;
                 }
             }
@@ -206,7 +207,8 @@ class CaCertStoreDbImporter extends DbPorter
                     ps.execute();
                 }catch(Exception e)
                 {
-                    System.err.println("Error while importing CERTPROFILEINFO with ID=" + info.getId() + ", message: " + e.getMessage());
+                    System.err.println("Error while importing CERTPROFILEINFO with ID=" + info.getId() +
+                            ", message: " + e.getMessage());
                     throw e;
                 }
             }

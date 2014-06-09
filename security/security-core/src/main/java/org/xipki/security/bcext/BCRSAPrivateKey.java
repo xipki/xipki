@@ -94,7 +94,11 @@ public class BCRSAPrivateKey
 
     public byte[] getEncoded()
     {
-        return KeyUtil.getEncodedPrivateKeyInfo(new AlgorithmIdentifier(PKCSObjectIdentifiers.rsaEncryption, DERNull.INSTANCE), new org.bouncycastle.asn1.pkcs.RSAPrivateKey(getModulus(), ZERO, getPrivateExponent(), ZERO, ZERO, ZERO, ZERO, ZERO));
+        return KeyUtil.getEncodedPrivateKeyInfo(
+                new AlgorithmIdentifier(
+                        PKCSObjectIdentifiers.rsaEncryption, DERNull.INSTANCE),
+                        new org.bouncycastle.asn1.pkcs.RSAPrivateKey(getModulus(),
+                        ZERO, getPrivateExponent(), ZERO, ZERO, ZERO, ZERO, ZERO));
     }
 
     public boolean equals(Object o)

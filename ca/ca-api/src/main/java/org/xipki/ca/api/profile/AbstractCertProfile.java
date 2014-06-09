@@ -390,7 +390,8 @@ extends CertProfile implements SubjectDNSubset
 
             if(present == false)
             {
-                throw new BadCertTemplateException("Requied subject DN of type " + oidToDisplayName(occurence.getType()) + " is not present");
+                throw new BadCertTemplateException("Requied subject DN of type " +
+                        oidToDisplayName(occurence.getType()) + " is not present");
             }
         }
     }
