@@ -36,7 +36,7 @@ public class P12CertExportCommand extends SecurityCommand
     protected String            p12File;
 
     @Option(name = "-pwd", aliases = { "--password" },
-            required = true, description = "Required. Password of the PKCS#12 file")
+            required = false, description = "Password of the PKCS#12 file")
     protected String            password;
 
     @Option(name = "-out",
@@ -49,8 +49,7 @@ public class P12CertExportCommand extends SecurityCommand
     {
         KeyStore ks;
 
-        char[] pwd = password.toCharArray();
-
+        char[] pwd = readPasswordIfNotSet(password);
         FileInputStream fIn = null;
         try
         {

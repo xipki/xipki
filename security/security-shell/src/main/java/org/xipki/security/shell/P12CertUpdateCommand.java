@@ -45,7 +45,7 @@ public class P12CertUpdateCommand extends SecurityCommand
     protected String            p12File;
 
     @Option(name = "-pwd", aliases = { "--password" },
-            required = true, description = "Required. Password of the PKCS#12 file")
+            required = false, description = "Password of the PKCS#12 file")
     protected String            password;
 
     @Option(name = "-cert",
@@ -62,8 +62,7 @@ public class P12CertUpdateCommand extends SecurityCommand
     {
         KeyStore ks;
 
-        char[] pwd = password.toCharArray();
-
+        char[] pwd = readPasswordIfNotSet(password);
         FileInputStream fIn = null;
         try
         {
@@ -80,7 +79,7 @@ public class P12CertUpdateCommand extends SecurityCommand
 
         X509Certificate newCert = IoCertUtil.parseCert(certFile);
 
-        assertMatch(newCert);
+        assertMatch(newCert, new String(pwd));
 
         String keyname = null;
         Enumeration<String> aliases = ks.aliases();
@@ -128,7 +127,7 @@ public class P12CertUpdateCommand extends SecurityCommand
         }
     }
 
-    private void assertMatch(X509Certificate cert)
+    private void assertMatch(X509Certificate cert, String password)
     throws SignerException, PasswordResolverException
     {
         CmpUtf8Pairs pairs = new CmpUtf8Pairs("keystore", "file:" + p12File);

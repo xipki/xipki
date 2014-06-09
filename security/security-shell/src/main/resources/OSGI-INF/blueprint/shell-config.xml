@@ -65,6 +65,12 @@
             </action>
         </command>        
         
+        <command name="keytool/add-cert">
+            <action class="org.xipki.security.shell.P11CertAddCommand">
+            	<property name="securityFactory" ref="securityFactory" />
+            </action>
+        </command>        
+        
         <command name="keytool/update-cert-p12">
             <action class="org.xipki.security.shell.P12CertUpdateCommand">
             	<property name="securityFactory" ref="securityFactory" />
