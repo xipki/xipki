@@ -27,8 +27,7 @@ public class PKIErrorException extends Exception
 
     public PKIErrorException(int status, int pkiFailureInfo, String statusMessage)
     {
-        super("PKIError: Status = " + status +
-                ", PKIFailureInfo = " + pkiFailureInfo + ", statusMessage = " + statusMessage);
+        super(PKIStatusInfo.formatPKIStatusInfo(status, pkiFailureInfo, statusMessage));
         this.status = status;
         this.pkiFailureInfo = pkiFailureInfo;
         this.statusMessage = statusMessage;
