@@ -382,15 +382,18 @@ public class SunNamedCurveExtender
             field_specCollection.set(null, namedCurves);
         } catch (IllegalArgumentException e)
         {
-            LOG.warn("Could not update change the value of field CurveDB.specCollection. IllegalArgumentException {}", e.getMessage());
+            LOG.warn("Could not update change the value of field CurveDB.specCollection. IllegalArgumentException {}",
+                    e.getMessage());
             LOG.debug("Could not update change the value of field CurveDB.specCollection.", e);
         } catch (IllegalAccessException e)
         {
-            LOG.warn("Could not update change the value of field CurveDB.specCollection. IllegalArgumentException {}", e.getMessage());
+            LOG.warn("Could not update change the value of field CurveDB.specCollection. IllegalArgumentException {}",
+                    e.getMessage());
             LOG.debug("Could not update change the value of field CurveDB.specCollection.", e);
         } catch (ClassCastException e)
         {
-            LOG.warn("Could not update change the value of field CurveDB.specCollection. IllegalArgumentException {}", e);
+            LOG.warn("Could not update change the value of field CurveDB.specCollection. IllegalArgumentException {}",
+                    e.getMessage());
             LOG.debug("Could not update change the value of field CurveDB.specCollection.", e);
         }
 
