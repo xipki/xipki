@@ -26,7 +26,8 @@ import org.xipki.security.api.SinglePasswordResolver;
 
 public class PasswordResolverImpl implements PasswordResolver
 {
-    private ConcurrentLinkedQueue<SinglePasswordResolver> resolvers = new ConcurrentLinkedQueue<SinglePasswordResolver>();
+    private ConcurrentLinkedQueue<SinglePasswordResolver> resolvers =
+            new ConcurrentLinkedQueue<SinglePasswordResolver>();
 
     public PasswordResolverImpl()
     {

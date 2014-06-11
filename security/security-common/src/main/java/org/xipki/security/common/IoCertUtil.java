@@ -17,6 +17,7 @@
 
 package org.xipki.security.common;
 
+import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -24,6 +25,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
@@ -478,12 +480,15 @@ public class IoCertUtil
         return buildCertPath(cert, setOfCerts);
     }
 
-    private static X509Certificate getCaCertOf(X509Certificate cert, Set<? extends Certificate> caCerts)
+    private static X509Certificate getCaCertOf(X509Certificate cert,
+            Set<? extends Certificate> caCerts)
     {
         if(isSelfSigned(cert))
         {
             return null;
         }
+
+        X500Principal issuer = cert.getIssuerX500Principal();
 
         for(Certificate caCert : caCerts)
         {
@@ -492,11 +497,23 @@ public class IoCertUtil
                 continue;
             }
 
+            X509Certificate x509Cert = (X509Certificate) caCert;
+            if(issuer.equals(x509Cert.getSubjectX500Principal()) == false)
+            {
+                continue;
+            }
+
+            boolean isCACert = x509Cert.getBasicConstraints() >= 0;
+            if(isCACert == false)
+            {
+                continue;
+            }
+
             try
             {
-                cert.verify(caCert.getPublicKey());
-                return (X509Certificate) caCert;
-            }catch(Exception e)
+                cert.verify(x509Cert.getPublicKey());
+                return x509Cert;
+            } catch (Exception e)
             {
             }
         }
@@ -507,5 +524,44 @@ public class IoCertUtil
     public static boolean isSelfSigned(X509Certificate cert)
     {
         return cert.getSubjectX500Principal().equals(cert.getIssuerX500Principal());
+    }
+
+    public static char[] readPassword(String prompt)
+    {
+        // It is not possible to read password
+        // by System.console().readPassword method in Karaf 2.3.4
+        ConsoleEraser consoleEraser = new ConsoleEraser();
+        System.out.println(prompt);
+        BufferedReader stdin = new BufferedReader(new InputStreamReader(System.in));
+        consoleEraser.start();
+
+        String pwd;
+        try
+        {
+            pwd = stdin.readLine();
+        } catch (IOException e)
+        {
+            return null;
+        }
+
+        consoleEraser.halt();
+        return pwd.toCharArray();
+    }
+
+    private static class ConsoleEraser extends Thread
+    {
+        private boolean running = true;
+        public void run()
+        {
+            while (running)
+            {
+                System.out.print("\b ");
+            }
+        }
+
+        public synchronized void halt()
+        {
+            running = false;
+        }
     }
 }

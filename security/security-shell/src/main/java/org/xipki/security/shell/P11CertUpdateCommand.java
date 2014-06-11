@@ -24,7 +24,6 @@ import iaik.pkcs.pkcs11.objects.PrivateKey;
 import iaik.pkcs.pkcs11.objects.X509PublicKeyCertificate;
 
 import java.security.PublicKey;
-import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
 import java.security.interfaces.ECPublicKey;
 import java.security.interfaces.RSAPublicKey;
@@ -42,13 +41,12 @@ import org.xipki.security.api.PasswordResolverException;
 import org.xipki.security.api.Pkcs11KeyIdentifier;
 import org.xipki.security.api.SignerException;
 import org.xipki.security.common.CmpUtf8Pairs;
-import org.xipki.security.common.HashAlgoType;
-import org.xipki.security.common.HashCalculator;
 import org.xipki.security.common.IoCertUtil;
 import org.xipki.security.p11.iaik.IaikExtendedModule;
 import org.xipki.security.p11.iaik.IaikExtendedSlot;
 import org.xipki.security.p11.iaik.IaikP11CryptService;
 import org.xipki.security.p11.iaik.IaikP11ModulePool;
+import org.xipki.security.p11.iaik.IaikP11Util;
 
 @Command(scope = "keytool", name = "update-cert", description="Update certificate in PKCS#11 device")
 public class P11CertUpdateCommand extends SecurityCommand
@@ -128,7 +126,7 @@ public class P11CertUpdateCommand extends SecurityCommand
         }
 
         byte[] keyId = privKey.getId().getByteArrayValue();
-        X509PublicKeyCertificate existingCert = slot.getCertificateObject(keyId, null);
+        X509PublicKeyCertificate[] existingCerts = slot.getCertificateObjects(keyId, null);
         X509Certificate newCert = IoCertUtil.parseCert(certFile);
 
         String pwdStr = pwd == null ? null : new String(pwd);
@@ -149,13 +147,20 @@ public class P11CertUpdateCommand extends SecurityCommand
         {
             X509PublicKeyCertificate newCertTemp = createPkcs11Template(newCert, null, keyId,
                     privKey.getLabel().getCharArrayValue());
-            if(existingCert != null)
+            // delete existing signer certificate objects
+            if(existingCerts != null && existingCerts.length > 0)
             {
-                session.destroyObject(existingCert);
+                for(X509PublicKeyCertificate existingCert : existingCerts)
+                {
+                    session.destroyObject(existingCert);
+                }
                 Thread.sleep(1000);
             }
+
+            // create new signer certificate object
             session.createObject(newCertTemp);
 
+            // craete CA certificate objects
             if(certChain.length > 1)
             {
                 for(int i = 1; i < certChain.length; i++)
@@ -182,7 +187,9 @@ public class P11CertUpdateCommand extends SecurityCommand
                         continue;
                     }
 
-                    X509PublicKeyCertificate newCaCertTemp = createPkcs11Template(caCert, encodedCaCert, null, null);
+                    byte[] caCertKeyId = IaikP11Util.generateKeyID(session);
+                    X509PublicKeyCertificate newCaCertTemp = createPkcs11Template(
+                            caCert, encodedCaCert, caCertKeyId, null);
                     session.createObject(newCaCertTemp);
                 }
             }
@@ -233,16 +240,11 @@ public class P11CertUpdateCommand extends SecurityCommand
     static X509PublicKeyCertificate createPkcs11Template(
             X509Certificate cert, byte[] encodedCert,
             byte[] keyId, char[] label)
-    throws CertificateEncodingException
+    throws Exception
     {
         if(encodedCert == null)
         {
             encodedCert = cert.getEncoded();
-        }
-
-        if(keyId == null)
-        {
-            keyId = HashCalculator.hash(HashAlgoType.SHA1, encodedCert);
         }
 
         if(label == null)
