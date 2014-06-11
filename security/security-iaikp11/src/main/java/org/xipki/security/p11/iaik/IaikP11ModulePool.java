@@ -46,7 +46,7 @@ public class IaikP11ModulePool
     public synchronized void removeModule(String pkcs11Lib)
     {
         IaikExtendedModule module = modules.remove(pkcs11Lib);
-        if(pkcs11Lib == null)
+        if(module == null)
         {
             return;
         }
@@ -58,8 +58,9 @@ public class IaikP11ModulePool
             LOG.info("Finalized module {}", pkcs11Lib);
         }catch(Throwable t)
         {
-            LOG.warn("Could not finalize the module {}", pkcs11Lib);
-            LOG.debug("Could not finalize the module " + pkcs11Lib, t);
+            String text = IaikP11Util.eraseSensitiveInfo(pkcs11Lib);
+            LOG.warn("Could not finalize the module {}", text);
+            LOG.debug("Could not finalize the module " + text, t);
         }
     }
 
@@ -81,7 +82,8 @@ public class IaikP11ModulePool
         {
             LOG.error("IOException: {}", e.getMessage());
             LOG.debug("IOException: " + e.getMessage(), e);
-            throw new SignerException("Could not load the PKCS#11 library " + pkcs11Lib);
+            throw new SignerException("Could not load the PKCS#11 library " +
+                    IaikP11Util.eraseSensitiveInfo(pkcs11Lib));
         }
 
         try

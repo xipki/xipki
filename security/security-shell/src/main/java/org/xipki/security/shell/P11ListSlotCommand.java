@@ -24,8 +24,9 @@ import iaik.pkcs.pkcs11.objects.PublicKey;
 import iaik.pkcs.pkcs11.objects.RSAPublicKey;
 import iaik.pkcs.pkcs11.objects.X509PublicKeyCertificate;
 
-import java.math.BigInteger;
+import java.security.cert.X509Certificate;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -120,13 +121,16 @@ public class P11ListSlotCommand extends SecurityCommand
             Collections.sort(privateKeys);
             size = privateKeys.size();
 
+            List<X509PublicKeyCertificate> allCertObjects = slot.getAllCertificateObjects();
+
+            sb = new StringBuilder();
             for(int i = 0; i < size; i++)
             {
-                sb = new StringBuilder();
-
                 ComparablePrivateKey privKey = privateKeys.get(i);
+                byte[] keyId = privKey.getKeyId();
+                char[] keyLabel = privKey.getKeyLabel();
 
-                PublicKey pubKey = slot.getPublicKeyObject(null, null, privKey.getKeyId(), privKey.getKeyLabel());
+                PublicKey pubKey = slot.getPublicKeyObject(null, null, keyId, keyLabel);
                 sb.append("\t")
                     .append(i+1)
                     .append(". ")
@@ -139,53 +143,126 @@ public class P11ListSlotCommand extends SecurityCommand
                     .append(getKeyAlgorithm(pubKey))
                     .append("\n");
 
-                X509PublicKeyCertificate cert = slot.getCertificateObject(privKey.getKeyId(), privKey.getKeyLabel());
+                X509PublicKeyCertificate cert = removeCertificateObject(allCertObjects, keyId, keyLabel);
                 if(cert == null)
                 {
                     sb.append("\t\tCertificate: NONE\n");
                 }
                 else
                 {
-                    byte[] bytes = cert.getSubject().getByteArrayValue();
-                    String subject;
-                    try
-                    {
-                        X500Principal x500Prin = new X500Principal(bytes);
-                        subject = IoCertUtil.canonicalizeName(x500Prin);
-                    }catch(Exception e)
-                    {
-                        subject = new String(bytes);
-                    }
-
-                    bytes = cert.getIssuer().getByteArrayValue();
-                    String issuer;
-                    try
-                    {
-                        X500Principal x500Prin = new X500Principal(bytes);
-                        issuer = IoCertUtil.canonicalizeName(x500Prin);
-                    }catch(Exception e)
-                    {
-                        issuer = new String(bytes);
-                    }
-
-                    BigInteger serialNumber = new BigInteger(1, cert.getSerialNumber().getByteArrayValue());
-                    sb.append("\t\tCertificate:\n");
-                    sb.append("\t\t\tSubject: ")
-                        .append(subject)
-                        .append("\n");
-                    sb.append("\t\t\tIssuer: ")
-                        .append(issuer)
-                        .append("\n");
-                    sb.append("\t\t\tSerialNumber: ")
-                        .append(serialNumber)
-                        .append("\n");
+                    formatString(sb, cert);
                 }
+            }
 
+            for(int i = 0; i < allCertObjects.size(); i++)
+            {
+                X509PublicKeyCertificate certObj = allCertObjects.get(i);
+                sb.append("\tCert-")
+                    .append(i+1)
+                    .append(". ")
+                    .append(certObj.getLabel().getCharArrayValue())
+                    .append(" (").append("id: ")
+                    .append(Hex.toHexString(certObj.getId().getByteArrayValue()).toUpperCase())
+                    .append(")\n");
+
+                formatString(sb, certObj);
+            }
+
+            if(sb.length() > 0)
+            {
                 System.out.println(sb.toString());
             }
         }
 
         return null;
+    }
+
+    private static X509PublicKeyCertificate removeCertificateObject(List<X509PublicKeyCertificate> certificateObjects,
+            byte[] keyId, char[] keyLabel)
+    {
+        X509PublicKeyCertificate cert = null;
+        for(X509PublicKeyCertificate certObj : certificateObjects)
+        {
+            if(keyId != null &&
+                    (Arrays.equals(keyId, certObj.getId().getByteArrayValue()) == false))
+            {
+                continue;
+            }
+
+            if(keyLabel != null &&
+                    (Arrays.equals(keyLabel, certObj.getLabel().getCharArrayValue()) == false))
+            {
+                continue;
+            }
+
+            cert = certObj;
+            break;
+        }
+
+        if(cert != null)
+        {
+            certificateObjects.remove(cert);
+        }
+
+        return cert;
+    }
+
+    private void formatString(StringBuilder sb, X509PublicKeyCertificate cert)
+    {
+        byte[] bytes = cert.getSubject().getByteArrayValue();
+        String subject;
+        try
+        {
+            X500Principal x500Prin = new X500Principal(bytes);
+            subject = IoCertUtil.canonicalizeName(x500Prin);
+        }catch(Exception e)
+        {
+            subject = new String(bytes);
+        }
+
+        bytes = cert.getIssuer().getByteArrayValue();
+        String issuer;
+        try
+        {
+            X500Principal x500Prin = new X500Principal(bytes);
+            issuer = IoCertUtil.canonicalizeName(x500Prin);
+        }catch(Exception e)
+        {
+            issuer = new String(bytes);
+        }
+
+        byte[] certBytes = cert.getValue().getByteArrayValue();
+
+        sb.append("\t\tCertificate:\n");
+        sb.append("\t\t\tSubject:    ")
+            .append(subject)
+            .append("\n");
+        sb.append("\t\t\tIssuer:     ")
+            .append(issuer)
+            .append("\n");
+
+        X509Certificate x509Cert = null;
+        try
+        {
+            x509Cert = IoCertUtil.parseCert(certBytes);
+        } catch (Exception e)
+        {
+            sb.append("\t\t\tError: " + e.getMessage());
+            return;
+        }
+
+        sb.append("\t\t\tSerial:     ")
+            .append(x509Cert.getSerialNumber())
+            .append("\n");
+        sb.append("\t\t\tStart time: ")
+            .append(x509Cert.getNotBefore())
+            .append("\n");
+        sb.append("\t\t\tEnd time:   ")
+            .append(x509Cert.getNotAfter())
+            .append("\n");
+        sb.append("\t\t\tSHA1 Sum:   ")
+            .append(IoCertUtil.sha1sum(certBytes))
+            .append("\n");
     }
 
     private static String getKeyAlgorithm(PublicKey key)

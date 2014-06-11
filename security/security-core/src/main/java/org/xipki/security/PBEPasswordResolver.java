@@ -17,19 +17,14 @@
 
 package org.xipki.security;
 
-import java.io.Console;
 import java.security.GeneralSecurityException;
 import java.security.SecureRandom;
 import java.util.Arrays;
 
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JPasswordField;
-
 import org.bouncycastle.util.encoders.Base64;
 import org.xipki.security.api.PasswordResolverException;
 import org.xipki.security.api.SinglePasswordResolver;
+import org.xipki.security.common.IoCertUtil;
 
 public class PBEPasswordResolver implements SinglePasswordResolver
 {
@@ -45,33 +40,8 @@ public class PBEPasswordResolver implements SinglePasswordResolver
         {
             if(masterPassword == null)
             {
-                Console console = System.console();
-                if(console != null)
-                {
-                    this.masterPassword = console.readPassword("Please enter the master password\n");
-                }
-                else
-                {
-                    JPanel panel = new JPanel();
-                    JLabel label = new JLabel("Enter a password:");
-                    JPasswordField pass = new JPasswordField(10);
-                    panel.add(label);
-                    panel.add(pass);
-                    String[] options = new String[]{"OK"};
-                    int option = JOptionPane.showOptionDialog(null, panel, "Password requried",
-                                             JOptionPane.NO_OPTION, JOptionPane.PLAIN_MESSAGE,
-                                             null, options, options[0]);
-                    if(option == 0) // pressing OK button
-                    {
-                        this.masterPassword = pass.getPassword();
-                    }
-                    else
-                    {
-                        this.masterPassword = null;
-                    }
-                }
+                this.masterPassword = IoCertUtil.readPassword("Please enter the master password");
             }
-
             return masterPassword;
         }
     }
