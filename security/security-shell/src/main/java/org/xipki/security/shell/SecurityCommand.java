@@ -17,10 +17,9 @@
 
 package org.xipki.security.shell;
 
-import java.io.Console;
-
 import org.apache.karaf.shell.console.OsgiCommandSupport;
 import org.xipki.security.api.SecurityFactory;
+import org.xipki.security.common.IoCertUtil;
 
 public abstract class SecurityCommand extends OsgiCommandSupport
 {
@@ -64,8 +63,7 @@ public abstract class SecurityCommand extends OsgiCommandSupport
 
     protected char[] readPassword()
     {
-        Console console = System.console();
-        return console.readPassword("Please enter the master password\n");
+        return IoCertUtil.readPassword("Enter the password");
     }
 
 }

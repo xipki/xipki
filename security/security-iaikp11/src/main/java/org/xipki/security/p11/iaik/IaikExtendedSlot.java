@@ -150,7 +150,10 @@ public class IaikExtendedSlot
         {
             Mechanism algorithmId = Mechanism.get(PKCS11Constants.CKM_ECDSA);
 
-            LOG.debug("sign with private key:\n{}", signatureKey);
+            if(LOG.isTraceEnabled())
+            {
+                LOG.debug("sign with private key:\n{}", signatureKey);
+            }
 
             synchronized (session)
             {
@@ -234,7 +237,10 @@ public class IaikExtendedSlot
         {
             Mechanism algorithmId = Mechanism.get(PKCS11Constants.CKM_RSA_X_509);
 
-            LOG.debug("sign with private key:\n{}", signatureKey);
+            if(LOG.isTraceEnabled())
+            {
+                LOG.debug("sign with private key:\n{}", signatureKey);
+            }
 
             synchronized (session)
             {
@@ -490,7 +496,10 @@ public class IaikExtendedSlot
         {
             throw new SignerException(e);
         }
-        LOG.debug("SessionInfo: {}", info);
+        if(LOG.isTraceEnabled())
+        {
+            LOG.debug("SessionInfo: {}", info);
+        }
 
         State state=info.getState();
         long deviceError = info.getDeviceError();
@@ -537,7 +546,7 @@ public class IaikExtendedSlot
 
         try
         {
-            if(LOG.isDebugEnabled())
+            if(LOG.isTraceEnabled())
             {
                 String info = listPrivateKeyObjects(session, forSigning, forDecrypting);
                 LOG.debug(info);
@@ -571,6 +580,37 @@ public class IaikExtendedSlot
             }
 
             return privateKeys;
+        }finally
+        {
+            returnIdleSession(session);
+        }
+    }
+
+    public List<X509PublicKeyCertificate> getAllCertificateObjects()
+    throws SignerException
+    {
+        Session session = borrowIdleSession();
+
+        try
+        {
+            if(LOG.isTraceEnabled())
+            {
+                String info = listCertificateObjects(session);
+                LOG.debug(info);
+            }
+
+            X509PublicKeyCertificate template = new X509PublicKeyCertificate();
+            List<iaik.pkcs.pkcs11.objects.Object> tmpObjects = getObjects(session, template);
+            int n = tmpObjects.size();
+
+            List<X509PublicKeyCertificate> certs = new ArrayList<X509PublicKeyCertificate>(n);
+            for(iaik.pkcs.pkcs11.objects.Object tmpObject : tmpObjects)
+            {
+                X509PublicKeyCertificate cert = (X509PublicKeyCertificate) tmpObject;
+                certs.add(cert);
+            }
+
+            return certs;
         }finally
         {
             returnIdleSession(session);
@@ -806,7 +846,10 @@ public class IaikExtendedSlot
 
                 for (iaik.pkcs.pkcs11.objects.Object object : foundObjects)
                 {
-                    LOG.debug("foundObject: {}", object);
+                    if(LOG.isTraceEnabled())
+                    {
+                        LOG.debug("foundObject: {}", object);
+                    }
                     objList.add(object);
                 }
             }
@@ -865,6 +908,22 @@ public class IaikExtendedSlot
     public X509PublicKeyCertificate getCertificateObject(byte[] keyId, char[] keyLabel)
     throws SignerException
     {
+        X509PublicKeyCertificate[] certs = getCertificateObjects(keyId, keyLabel);
+        if(certs == null)
+        {
+            return null;
+        }
+        if(certs.length > 1)
+        {
+            LOG.warn("found {} public key identified by {}, use the first one",
+                    certs.length, getDescription(keyId, keyLabel));
+        }
+        return certs[0];
+    }
+
+    public X509PublicKeyCertificate[] getCertificateObjects(byte[] keyId, char[] keyLabel)
+    throws SignerException
+    {
         Session session = borrowIdleSession();
 
         try
@@ -893,13 +952,12 @@ public class IaikExtendedSlot
             }
 
             int size = tmpObjects.size();
-            if(size > 1)
+            X509PublicKeyCertificate[] certs = new X509PublicKeyCertificate[size];
+            for(int i = 0; i < size; i++)
             {
-                LOG.warn("found {} public key identified by {}, use the first one",
-                        size, getDescription(keyId, keyLabel));
+                certs[i] = (X509PublicKeyCertificate) tmpObjects.get(i);
             }
-
-            return (X509PublicKeyCertificate) tmpObjects.get(0);
+            return certs;
         }finally
         {
             returnIdleSession(session);
@@ -1049,14 +1107,10 @@ public class IaikExtendedSlot
     private static String getDescription(byte[] keyId, char[] keyLabel)
     {
         StringBuilder sb = new StringBuilder("identified by ");
-        if(keyId != null)
-        {
-            sb.append("id ").append(Hex.toHexString(keyId));
-        }
-        else
-        {
-            sb.append("label ").append(keyLabel);
-        }
+        sb.append("id ");
+        sb.append(keyId == null ? "null" : Hex.toHexString(keyId));
+        sb.append("label ");
+        sb.append(keyLabel == null ? "null" : new String(keyLabel));
         return sb.toString();
     }
 }
