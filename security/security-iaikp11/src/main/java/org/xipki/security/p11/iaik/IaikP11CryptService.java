@@ -96,11 +96,7 @@ public final class IaikP11CryptService implements P11CryptService
     {
         ParamChecker.assertNotEmpty("pkcs11Module", pkcs11Module);
         this.pkcs11Module = pkcs11Module;
-
-        int index = pkcs11Module.toLowerCase().indexOf("password");
-        this.pkcs11ModuleOmitSensitiveInfo = (index == -1) ?
-                pkcs11Module : pkcs11Module.substring(0, index);
-
+        this.pkcs11ModuleOmitSensitiveInfo = IaikP11Util.eraseSensitiveInfo(pkcs11Module);
         this.password = (password == null) ? "dummy".toCharArray() : password;
         this.includeSlotIndexes = includeSlotIndexes == null ?
                 null : new HashSet<Integer>(includeSlotIndexes);

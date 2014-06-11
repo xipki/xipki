@@ -128,16 +128,27 @@ public class P11KeyDeleteCommand extends SecurityCommand
                 }
             }
 
-            X509PublicKeyCertificate cert = slot.getCertificateObject(privKey.getId().getByteArrayValue(), null);
-            if(cert != null)
+            X509PublicKeyCertificate[] certs = slot.getCertificateObjects(privKey.getId().getByteArrayValue(), null);
+            if(certs != null && certs.length > 0)
             {
-                try
+                int nDeleted = 0;
+                for(int i = 0; i < certs.length; i++)
                 {
-                    session.destroyObject(cert);
-                    System.out.println("Deleted certificate");
-                }catch(TokenException e)
+                    try
+                    {
+                        session.destroyObject(certs[i]);
+                        nDeleted++;
+                    }catch(TokenException e)
+                    {
+                        System.err.println("Could not delete certificate at index " + i);
+                    }
+                }
+                if(nDeleted > 0)
                 {
-                    System.err.println("Could not delete certificate");
+                    StringBuilder sb = new StringBuilder("Deleted ");
+                    sb.append(nDeleted);
+                    sb.append(nDeleted == 1 ? " certificate" : " certificates");
+                    System.out.println(sb.toString());
                 }
             }
 

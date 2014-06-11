@@ -22,7 +22,6 @@ import iaik.pkcs.pkcs11.Session;
 import iaik.pkcs.pkcs11.TokenException;
 import iaik.pkcs.pkcs11.objects.ECDSAPrivateKey;
 import iaik.pkcs.pkcs11.objects.ECDSAPublicKey;
-import iaik.pkcs.pkcs11.objects.Key;
 import iaik.pkcs.pkcs11.objects.KeyPair;
 import iaik.pkcs.pkcs11.objects.PrivateKey;
 import iaik.pkcs.pkcs11.objects.PublicKey;
@@ -33,7 +32,6 @@ import iaik.pkcs.pkcs11.wrapper.PKCS11Constants;
 
 import java.io.IOException;
 import java.math.BigInteger;
-import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -103,54 +101,6 @@ public class P11KeypairGenerator
         return slot;
     }
 
-    private boolean idExists(Session session, byte[] keyID)
-    throws Exception
-    {
-        Key k = new Key();
-        k.getId().setByteArrayValue(keyID);
-
-        session.findObjectsInit(k);
-        Object[] objects = session.findObjects(1);
-        session.findObjectsFinal();
-        if (objects.length > 0)
-        {
-            return true;
-        }
-
-        X509PublicKeyCertificate c = new X509PublicKeyCertificate();
-        c.getId().setByteArrayValue(keyID);
-
-        session.findObjectsInit(c);
-        objects = session.findObjects(1);
-        session.findObjectsFinal();
-
-        return objects.length > 0;
-    }
-
-    private boolean labelExists(Session session, String keyLabel)
-    throws Exception
-    {
-        Key k = new Key();
-        k.getLabel().setCharArrayValue(keyLabel.toCharArray());
-
-        session.findObjectsInit(k);
-        Object[] objects = session.findObjects(1);
-        session.findObjectsFinal();
-        if (objects.length > 0)
-        {
-            return true;
-        }
-
-        X509PublicKeyCertificate c = new X509PublicKeyCertificate();
-        c.getLabel().setCharArrayValue(keyLabel.toCharArray());
-
-        session.findObjectsInit(c);
-        objects = session.findObjects(1);
-        session.findObjectsFinal();
-
-        return objects.length > 0;
-    }
-
     public P11KeypairGenerationResult generateRSAKeypairAndCert(
             String pkcs11Lib, PKCS11SlotIdentifier slotId, char[] password,
             int keySize, BigInteger publicExponent,
@@ -176,12 +126,12 @@ public class P11KeypairGenerator
         Session session = slot.borrowWritableSession();
         try
         {
-            if(labelExists(session, label))
+            if(IaikP11Util.labelExists(session, label))
             {
                 throw new IllegalArgumentException("Label " + label + " exists, please specify another one");
             }
 
-            byte[] id = generateKeyID(session);
+            byte[] id = IaikP11Util.generateKeyID(session);
 
             PrivateKeyAndPKInfo privateKeyAndPKInfo = generateRSAKeyPair(
                     session,
@@ -286,12 +236,12 @@ public class P11KeypairGenerator
         Session session = slot.borrowWritableSession();
         try
         {
-            if(labelExists(session, label))
+            if(IaikP11Util.labelExists(session, label))
             {
                 throw new IllegalArgumentException("Label " + label + " exists, please specify another one");
             }
 
-            byte[] id = generateKeyID(session);
+            byte[] id = IaikP11Util.generateKeyID(session);
 
             PrivateKeyAndPKInfo privateKeyAndPKInfo = generateECDSAKeyPair(
                     session, curveId, ecParams, id, label);
@@ -562,20 +512,6 @@ public class P11KeypairGenerator
                 new BigInteger(1, y)));
 
         return new DERSequence(sigder).getEncoded();
-    }
-
-    private byte[] generateKeyID(Session session)
-    throws Exception
-    {
-        SecureRandom random = new SecureRandom();
-        byte[] keyID = null;
-        do
-        {
-            keyID = new byte[8];
-            random.nextBytes(keyID);
-        } while(idExists(session, keyID));
-
-        return keyID;
     }
 
     private static class PrivateKeyAndPKInfo
