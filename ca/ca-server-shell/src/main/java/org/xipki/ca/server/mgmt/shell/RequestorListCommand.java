@@ -56,7 +56,11 @@ public class RequestorListCommand extends CaCommand
         else
         {
             CmpRequestorEntry entry = caManager.getCmpRequestor(name);
-            if(entry != null)
+            if(entry == null)
+            {
+                sb.append("Could not find CMP requestor '" + name + "'");
+            }
+            else
             {
                 sb.append(entry.toString(verbose == null ? false :verbose.booleanValue()));
             }
