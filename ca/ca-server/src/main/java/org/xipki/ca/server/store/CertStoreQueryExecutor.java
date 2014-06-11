@@ -817,7 +817,7 @@ class CertStoreQueryExecutor
     throws SQLException, OperationException
     {
         ParamChecker.assertNotEmpty("certIds", certIds);
-        ParamChecker.assertNotNull("sha1FpSubject", sha1FpSubject);
+        ParamChecker.assertNotEmpty("sha1FpSubject", sha1FpSubject);
         ParamChecker.assertNotEmpty("certProfile", certProfile);
 
         Integer profileId = getCertprofileId(certProfile);
