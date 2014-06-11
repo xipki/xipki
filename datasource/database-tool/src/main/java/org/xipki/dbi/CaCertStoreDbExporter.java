@@ -53,7 +53,7 @@ import org.xipki.dbi.ca.jaxb.CertStoreType.Certprofileinfos;
 import org.xipki.dbi.ca.jaxb.CertStoreType.CertsFiles;
 import org.xipki.dbi.ca.jaxb.CertStoreType.Crls;
 import org.xipki.dbi.ca.jaxb.CertStoreType.Requestorinfos;
-import org.xipki.dbi.ca.jaxb.CertStoreType.Users;
+import org.xipki.dbi.ca.jaxb.CertStoreType.UsersFiles;
 import org.xipki.dbi.ca.jaxb.CertType;
 import org.xipki.dbi.ca.jaxb.CertprofileinfoType;
 import org.xipki.dbi.ca.jaxb.CertsType;
@@ -61,6 +61,7 @@ import org.xipki.dbi.ca.jaxb.CrlType;
 import org.xipki.dbi.ca.jaxb.ObjectFactory;
 import org.xipki.dbi.ca.jaxb.RequestorinfoType;
 import org.xipki.dbi.ca.jaxb.UserType;
+import org.xipki.dbi.ca.jaxb.UsersType;
 import org.xipki.security.api.PasswordResolverException;
 import org.xipki.security.common.IoCertUtil;
 import org.xipki.security.common.ParamChecker;
@@ -269,39 +270,112 @@ class CaCertStoreDbExporter extends DbPorter
     }
 
     private void export_user(CertStoreType certstore)
-    throws SQLException
+    throws SQLException, JAXBException
     {
         System.out.println("Exporting table USER");
-        Users users = new Users();
+        UsersFiles usersFiles = new UsersFiles();
 
-        Statement stmt = null;
+        String sql = "SELECT ID, NAME FROM USER" +
+                " WHERE ID >= ? AND ID < ?" +
+                " ORDER BY ID ASC";
+
+        PreparedStatement ps = prepareStatement(sql);
+
+        final int minId = getMinCertId("USER");
+        final int maxId = getMaxCertId("USER");
+
+        int numUsersInCurrentFile = 0;
+        UsersType usersInCurrentFile = new UsersType();
+
+        int sum = 0;
+        final int n = 100;
+
+        int minIdOfCurrentFile = -1;
+        int maxIdOfCurrentFile = -1;
+
         try
         {
-            stmt = createStatement();
-            String sql = "SELECT ID, NAME FROM USER";
-            ResultSet rs = stmt.executeQuery(sql);
-
-            while(rs.next())
+            for(int i = minId; i <= maxId; i += n)
             {
-                int id = rs.getInt("ID");
-                String name = rs.getString("NAME");
+                ps.setInt(1, i);
+                ps.setInt(2, i + n);
 
-                UserType user = new UserType();
-                user.setId(id);
-                user.setName(name);
+                ResultSet rs = ps.executeQuery();
 
-                users.getUser().add(user);
+                while(rs.next())
+                {
+                    int id = rs.getInt("ID");
+
+                    if(minIdOfCurrentFile == -1)
+                    {
+                        minIdOfCurrentFile = id;
+                    }
+                    else if(minIdOfCurrentFile > id)
+                    {
+                        minIdOfCurrentFile = id;
+                    }
+
+                    if(maxIdOfCurrentFile == -1)
+                    {
+                        maxIdOfCurrentFile = id;
+                    }
+                    else if(maxIdOfCurrentFile < id)
+                    {
+                        maxIdOfCurrentFile = id;
+                    }
+
+                    String name = rs.getString("NAME");
+
+                    UserType user = new UserType();
+                    user.setId(id);
+                    user.setName(name);
+                    usersInCurrentFile.getUser().add(user);
+
+                    numUsersInCurrentFile ++;
+                    sum ++;
+
+                    if(numUsersInCurrentFile == numCertsInBundle * 10)
+                    {
+                        String currentCertsFilename = DbiUtil.buildFilename("users_", ".xml",
+                                minIdOfCurrentFile, maxIdOfCurrentFile, maxId);
+
+                        JAXBElement<UsersType> root = new ObjectFactory().createUsers(usersInCurrentFile);
+                        marshaller.marshal(root, new File(baseDir + File.separator + currentCertsFilename));
+
+                        usersFiles.getUsersFile().add(currentCertsFilename);
+
+                        System.out.println(" Exported " + numUsersInCurrentFile + " users in " + currentCertsFilename);
+                        System.out.println(" Exported " + sum + " users ...");
+
+                        // reset
+                        usersInCurrentFile = new UsersType();
+                        numUsersInCurrentFile = 0;
+                        minIdOfCurrentFile = -1;
+                        maxIdOfCurrentFile = -1;
+                    }
+                }
             }
 
-            rs.close();
-            rs = null;
+            if(numUsersInCurrentFile > 0)
+            {
+                String currentCertsFilename = DbiUtil.buildFilename("users_", ".xml",
+                        minIdOfCurrentFile, maxIdOfCurrentFile, maxId);
+
+                JAXBElement<UsersType> root = new ObjectFactory().createUsers(usersInCurrentFile);
+                marshaller.marshal(root, new File(baseDir + File.separator + currentCertsFilename));
+
+                usersFiles.getUsersFile().add(currentCertsFilename);
+
+                System.out.println(" Exported " + numUsersInCurrentFile + " certificates in " + currentCertsFilename);
+            }
+
         }finally
         {
-            closeStatement(stmt);
+            closeStatement(ps);
         }
 
-        certstore.setUsers(users);
-        System.out.println(" Exported table USER");
+        certstore.setUsersFiles(usersFiles);
+        System.out.println(" Exported " + sum + " users from table USER");
     }
 
     private void export_certprofileinfo(CertStoreType certstore)
@@ -358,10 +432,10 @@ class CaCertStoreDbExporter extends DbPorter
         String rawCertSql = "SELECT CERT FROM RAWCERT WHERE CERT_ID = ?";
         PreparedStatement rawCertPs = prepareStatement(rawCertSql);
 
-        final int minCertId = getMinCertId();
-        final int maxCertId = getMaxCertId();
+        final int minId = getMinCertId("CERT");
+        final int maxId = getMaxCertId("CERT");
 
-        int numCertInCurrentFile = 0;
+        int numCertsInCurrentFile = 0;
         CertsType certsInCurrentFile = new CertsType();
 
         int sum = 0;
@@ -371,12 +445,12 @@ class CaCertStoreDbExporter extends DbPorter
         FileOutputStream out = new FileOutputStream(currentCertsZipFile);
         ZipOutputStream currentCertsZip = new ZipOutputStream(out);
 
-        int minCertIdOfCurrentFile = -1;
-        int maxCertIdOfCurrentFile = -1;
+        int minIdOfCurrentFile = -1;
+        int maxIdOfCurrentFile = -1;
 
         try
         {
-            for(int i = minCertId; i <= maxCertId; i += n)
+            for(int i = minId; i <= maxId; i += n)
             {
                 ps.setInt(1, i);
                 ps.setInt(2, i + n);
@@ -387,22 +461,22 @@ class CaCertStoreDbExporter extends DbPorter
                 {
                     int id = rs.getInt("ID");
 
-                    if(minCertIdOfCurrentFile == -1)
+                    if(minIdOfCurrentFile == -1)
                     {
-                        minCertIdOfCurrentFile = id;
+                        minIdOfCurrentFile = id;
                     }
-                    else if(minCertIdOfCurrentFile > id)
+                    else if(minIdOfCurrentFile > id)
                     {
-                        minCertIdOfCurrentFile = id;
+                        minIdOfCurrentFile = id;
                     }
 
-                    if(maxCertIdOfCurrentFile == -1)
+                    if(maxIdOfCurrentFile == -1)
                     {
-                        maxCertIdOfCurrentFile = id;
+                        maxIdOfCurrentFile = id;
                     }
-                    else if(maxCertIdOfCurrentFile < id)
+                    else if(maxIdOfCurrentFile < id)
                     {
-                        maxCertIdOfCurrentFile = id;
+                        maxIdOfCurrentFile = id;
                     }
 
                     String cainfo_id = rs.getString("CAINFO_ID");
@@ -462,27 +536,27 @@ class CaCertStoreDbExporter extends DbPorter
                     cert.setCertFile(sha1_fp_cert + ".der");
 
                     certsInCurrentFile.getCert().add(cert);
-                    numCertInCurrentFile ++;
+                    numCertsInCurrentFile ++;
                     sum ++;
 
-                    if(numCertInCurrentFile == numCertsInBundle)
+                    if(numCertsInCurrentFile == numCertsInBundle)
                     {
                         finalizeZip(currentCertsZip, certsInCurrentFile);
 
                         String currentCertsFilename = DbiUtil.buildFilename("certs_", ".zip",
-                                minCertIdOfCurrentFile, maxCertIdOfCurrentFile, maxCertId);
+                                minIdOfCurrentFile, maxIdOfCurrentFile, maxId);
                         currentCertsZipFile.renameTo(new File(baseDir, currentCertsFilename));
 
                         certsFiles.getCertsFile().add(currentCertsFilename);
 
-                        System.out.println(" Exported " + numCertInCurrentFile + " certificates in " + currentCertsFilename);
+                        System.out.println(" Exported " + numCertsInCurrentFile + " certificates in " + currentCertsFilename);
                         System.out.println(" Exported " + sum + " certificates ...");
 
                         // reset
                         certsInCurrentFile = new CertsType();
-                        numCertInCurrentFile = 0;
-                        minCertIdOfCurrentFile = -1;
-                        maxCertIdOfCurrentFile = -1;
+                        numCertsInCurrentFile = 0;
+                        minIdOfCurrentFile = -1;
+                        maxIdOfCurrentFile = -1;
                         currentCertsZipFile = new File(baseDir, "tmp-certs-" + System.currentTimeMillis() + ".zip");
                         out = new FileOutputStream(currentCertsZipFile);
                         currentCertsZip = new ZipOutputStream(out);
@@ -490,17 +564,17 @@ class CaCertStoreDbExporter extends DbPorter
                 }
             }
 
-            if(numCertInCurrentFile > 0)
+            if(numCertsInCurrentFile > 0)
             {
                 finalizeZip(currentCertsZip, certsInCurrentFile);
 
                 String currentCertsFilename = DbiUtil.buildFilename("certs_", ".zip",
-                        minCertIdOfCurrentFile, maxCertIdOfCurrentFile, maxCertId);
+                        minIdOfCurrentFile, maxIdOfCurrentFile, maxId);
                 currentCertsZipFile.renameTo(new File(baseDir, currentCertsFilename));
 
                 certsFiles.getCertsFile().add(currentCertsFilename);
 
-                System.out.println(" Exported " + numCertInCurrentFile + " certificates in " + currentCertsFilename);
+                System.out.println(" Exported " + numCertsInCurrentFile + " certificates in " + currentCertsFilename);
             }
             else
             {
@@ -537,14 +611,14 @@ class CaCertStoreDbExporter extends DbPorter
         zipOutStream.close();
     }
 
-    private int getMinCertId()
+    private int getMinCertId(String table)
     throws SQLException
     {
         Statement stmt = null;
         try
         {
             stmt = createStatement();
-            final String sql = "SELECT MIN(ID) FROM CERT";
+            final String sql = "SELECT MIN(ID) FROM " + table;
             ResultSet rs = stmt.executeQuery(sql);
 
             rs.next();
@@ -560,14 +634,14 @@ class CaCertStoreDbExporter extends DbPorter
         }
     }
 
-    private int getMaxCertId()
+    private int getMaxCertId(String table)
     throws SQLException
     {
         Statement stmt = null;
         try
         {
             stmt = createStatement();
-            final String sql = "SELECT MAX(ID) FROM CERT";
+            final String sql = "SELECT MAX(ID) FROM " + table;
             ResultSet rs = stmt.executeQuery(sql);
 
             rs.next();

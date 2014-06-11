@@ -51,13 +51,14 @@ import org.xipki.dbi.ca.jaxb.CertStoreType.Certprofileinfos;
 import org.xipki.dbi.ca.jaxb.CertStoreType.CertsFiles;
 import org.xipki.dbi.ca.jaxb.CertStoreType.Crls;
 import org.xipki.dbi.ca.jaxb.CertStoreType.Requestorinfos;
-import org.xipki.dbi.ca.jaxb.CertStoreType.Users;
+import org.xipki.dbi.ca.jaxb.CertStoreType.UsersFiles;
 import org.xipki.dbi.ca.jaxb.CertType;
 import org.xipki.dbi.ca.jaxb.CertprofileinfoType;
 import org.xipki.dbi.ca.jaxb.CertsType;
 import org.xipki.dbi.ca.jaxb.CrlType;
 import org.xipki.dbi.ca.jaxb.RequestorinfoType;
 import org.xipki.dbi.ca.jaxb.UserType;
+import org.xipki.dbi.ca.jaxb.UsersType;
 import org.xipki.security.api.PasswordResolverException;
 import org.xipki.security.common.HashAlgoType;
 import org.xipki.security.common.HashCalculator;
@@ -92,7 +93,7 @@ class CaCertStoreDbImporter extends DbPorter
             import_cainfo(certstore.getCainfos());
             import_requestorinfo(certstore.getRequestorinfos());
             import_certprofileinfo(certstore.getCertprofileinfos());
-            import_user(certstore.getUsers());
+            import_user(certstore.getUsersFiles());
             import_crl(certstore.getCrls());
             import_cert(certstore.getCertsFiles());
         }catch(Exception e)
@@ -220,15 +221,43 @@ class CaCertStoreDbImporter extends DbPorter
         System.out.println(" Imported table certprofileinfo");
     }
 
-    private void import_user(Users users)
+    private void import_user(UsersFiles usersFiles)
+    throws Exception
+    {
+        int sum = 0;
+        for(String file : usersFiles.getUsersFile())
+        {
+            System.out.println("Importing users from file " + file);
+
+            try
+            {
+                sum += do_import_user(file);
+                System.out.println(" Imported users from file " + file);
+                System.out.println(" Imported " + sum + " users ...");
+            }catch(Exception e)
+            {
+                System.err.println("Error while importing users from file " + file);
+                throw e;
+            }
+        }
+        System.out.println(" Imported " + sum + " users");
+    }
+
+    private int do_import_user(String usersFile)
     throws Exception
     {
         final String sql = "INSERT INTO USER (ID, NAME) VALUES (?, ?)";
 
         System.out.println("Importing table USER");
 
+        @SuppressWarnings("unchecked")
+        JAXBElement<UsersType> rootElement = (JAXBElement<UsersType>)
+                unmarshaller.unmarshal(new File(usersFile));
+        UsersType users = rootElement.getValue();
+
         PreparedStatement ps = prepareStatement(sql);
 
+        int sum = 0;
         try
         {
             for(UserType user : users.getUser())
@@ -240,6 +269,7 @@ class CaCertStoreDbImporter extends DbPorter
                     ps.setString(idx++, user.getName());
 
                     ps.execute();
+                    sum ++;
                 }catch(Exception e)
                 {
                     System.err.println("Error while importing USER with ID=" + user.getId() + ", message: " + e.getMessage());
@@ -251,7 +281,7 @@ class CaCertStoreDbImporter extends DbPorter
             closeStatement(ps);
         }
 
-        System.out.println(" Imported table USER");
+        return sum;
     }
 
     private void import_crl(Crls crls)

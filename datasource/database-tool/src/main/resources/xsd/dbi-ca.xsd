@@ -245,10 +245,10 @@
 					</xs:sequence>
 				</xs:complexType>
 			</xs:element>
-			<xs:element name="users">
+			<xs:element name="usersFiles">
 				<xs:complexType>
 					<xs:sequence>
-						<xs:element ref="user" minOccurs="0" maxOccurs="unbounded"/>
+						<xs:element name="usersFile" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
 					</xs:sequence>
 				</xs:complexType>
 			</xs:element>
@@ -294,6 +294,13 @@
 		</xs:all>
 	</xs:complexType>
 
+	<xs:element name="users" type="usersType"/>
+	<xs:complexType name="usersType">
+		<xs:sequence>
+			<xs:element ref="user" minOccurs="0" maxOccurs="unbounded"/>
+		</xs:sequence>
+	</xs:complexType>
+	
 	<xs:element name="user" type="userType"/>
 	<xs:complexType name="userType">
 		<xs:all>
