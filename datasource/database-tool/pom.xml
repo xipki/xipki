@@ -39,11 +39,6 @@
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-api</artifactId>
 		</dependency>
-		<dependency>
-			<groupId>org.apache.karaf.shell</groupId>
-			<artifactId>org.apache.karaf.shell.console</artifactId>
-			<version>${karaf.version}</version>
-		</dependency>		
 	</dependencies>
 	<build>
 		<plugins>
@@ -83,20 +78,6 @@
 						</configuration>
 					</execution>
 				</executions>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.felix</groupId>
-				<artifactId>maven-bundle-plugin</artifactId>
-				<configuration>
-					<instructions>
-						<Import-Package>
-							org.apache.felix.service.command,
-							org.apache.felix.gogo.commands,
-							org.apache.karaf.shell.console,
-							*
-						</Import-Package>
-					</instructions>
-				</configuration>
 			</plugin>
 		</plugins>
 	</build>
