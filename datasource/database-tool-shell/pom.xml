@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!-- 
  Copyright 2014 xipki.org
  
@@ -18,17 +17,41 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
-		<artifactId>xipki-group</artifactId>
+		<artifactId>datasource-group</artifactId>
 		<groupId>org.xipki</groupId>
 		<version>1.0.0-SNAPSHOT</version>
 	</parent>
-	<artifactId>datasource-group</artifactId>
-	<packaging>pom</packaging>
+	<artifactId>database-tool-shell</artifactId>
+	<packaging>bundle</packaging>
 	<name>XiPKI :: ${project.artifactId}</name>
-	<modules>
-		<module>datasource-api</module>
-		<module>datasource-impl</module>
-		<module>database-tool</module>
-		<module>database-tool-shell</module>
-	</modules>
+	<dependencies>
+                <dependency>
+                        <groupId>${project.groupId}</groupId>
+                        <artifactId>database-tool</artifactId>
+                        <version>${project.version}</version>
+                </dependency>
+		<dependency>
+			<groupId>org.apache.karaf.shell</groupId>
+			<artifactId>org.apache.karaf.shell.console</artifactId>
+			<version>${karaf.version}</version>
+		</dependency>		
+	</dependencies>
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.felix</groupId>
+				<artifactId>maven-bundle-plugin</artifactId>
+				<configuration>
+					<instructions>
+						<Import-Package>
+							org.apache.felix.service.command,
+							org.apache.felix.gogo.commands,
+							org.apache.karaf.shell.console,
+							*
+						</Import-Package>
+					</instructions>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
 </project>
