@@ -115,6 +115,7 @@
 	<feature name="xipki-database-tool" version="${project.version}" resolver="(obr)">
 		<feature>xipki-datasource</feature>
 		<bundle>mvn:org.xipki/database-tool/${project.version}</bundle>
+		<bundle>mvn:org.xipki/database-tool-shell/${project.version}</bundle>
 	</feature>
 
 	<feature name="xipki-audit-slf4j" version="${project.version}" resolver="(obr)">
