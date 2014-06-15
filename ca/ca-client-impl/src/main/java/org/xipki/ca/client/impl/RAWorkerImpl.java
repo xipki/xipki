@@ -40,12 +40,8 @@ import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.bouncycastle.asn1.DERUTF8String;
 import org.bouncycastle.asn1.cmp.CMPCertificate;
-import org.bouncycastle.asn1.cmp.CMPObjectIdentifiers;
 import org.bouncycastle.asn1.cmp.PKIMessage;
-import org.bouncycastle.asn1.crmf.AttributeTypeAndValue;
-import org.bouncycastle.asn1.crmf.CertReqMsg;
 import org.bouncycastle.asn1.crmf.CertRequest;
 import org.bouncycastle.asn1.crmf.CertTemplate;
 import org.bouncycastle.asn1.crmf.CertTemplateBuilder;
@@ -59,7 +55,6 @@ import org.bouncycastle.jce.provider.X509CertificateObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.ca.client.api.RAWorker;
-import org.xipki.ca.cmp.CmpUtil;
 import org.xipki.ca.cmp.client.AbstractRAWorker;
 import org.xipki.ca.cmp.client.CmpRequestorException;
 import org.xipki.ca.cmp.client.type.CRLResultType;
@@ -84,7 +79,6 @@ import org.xipki.ca.common.RAWorkerException;
 import org.xipki.security.api.ConcurrentContentSigner;
 import org.xipki.security.api.PasswordResolverException;
 import org.xipki.security.api.SignerException;
-import org.xipki.security.common.CmpUtf8Pairs;
 import org.xipki.security.common.ConfigurationException;
 import org.xipki.security.common.IoCertUtil;
 import org.xipki.security.common.ParamChecker;
@@ -297,13 +291,6 @@ public final class RAWorkerImpl extends AbstractRAWorker implements RAWorker
     }
 
     @Override
-    public EnrollCertResult requestCert(CertificationRequest p10Request, String profile, String caName)
-    throws RAWorkerException, PKIErrorException
-    {
-        return requestCert(p10Request, profile, caName, null);
-    }
-
-    @Override
     public EnrollCertResult requestCert(CertificationRequest p10Request, String profile, String caName,
             String username)
     throws RAWorkerException, PKIErrorException
@@ -314,15 +301,6 @@ public final class RAWorkerImpl extends AbstractRAWorker implements RAWorker
         final String id = "p10-1";
         entries.put(id, entry);
         return requestCerts(EnrollCertRequestType.Type.CERT_REQ, entries, caName, username);
-    }
-
-    @Override
-    public EnrollCertResult requestCerts(EnrollCertRequestType.Type type,
-            Map<String, EnrollCertEntryType> enrollCertEntries,
-            String caName)
-    throws RAWorkerException, PKIErrorException
-    {
-        return requestCerts(type, enrollCertEntries, caName, null);
     }
 
     @Override
@@ -362,63 +340,6 @@ public final class RAWorkerImpl extends AbstractRAWorker implements RAWorker
     }
 
     @Override
-    public EnrollCertResult requestCert(CertReqMsg request, String extCertReqId, String caName)
-    throws RAWorkerException, PKIErrorException
-    {
-        return requestCert(request, extCertReqId, caName, null);
-    }
-
-    @Override
-    public EnrollCertResult requestCert(CertReqMsg request, String extCertReqId, String caName,
-            String username)
-    throws RAWorkerException, PKIErrorException
-    {
-        ParamChecker.assertNotNull("request", request);
-        X509CmpRequestor cmpRequestor = getCmpRequestor(request, caName);
-
-        CmpResultType result;
-        try
-        {
-            result = cmpRequestor.requestCertificate(request, extCertReqId,username);
-        } catch (CmpRequestorException e)
-        {
-            throw new RAWorkerException(e);
-        }
-
-        if(result instanceof ErrorResultType)
-        {
-            throw createPKIErrorException((ErrorResultType) result);
-        }
-        else if(result instanceof EnrollCertResultType)
-        {
-            return parseEnrollCertResult((EnrollCertResultType) result, caName);
-        }
-        else
-        {
-            throw new RuntimeException("Unknown result type: " + result.getClass().getName());
-        }
-    }
-
-    @Override
-    public CertReqMsg getCertReqMsgWithAppliedCertProfile(CertRequest request,
-            String profileName, ProofOfPossession popo)
-    throws RAWorkerException
-    {
-        ParamChecker.assertNotEmpty("profileName", profileName);
-        CmpUtf8Pairs utf8Pairs = new CmpUtf8Pairs(CmpUtf8Pairs.KEY_CERT_PROFILE, profileName);
-        AttributeTypeAndValue certProfileInfo = new AttributeTypeAndValue(
-                CMPObjectIdentifiers.regInfo_utf8Pairs, new DERUTF8String(utf8Pairs.getEncoded()));
-        return new CertReqMsg(request, popo, new AttributeTypeAndValue[] { certProfileInfo });
-    }
-
-    @Override
-    public EnrollCertResult requestCerts(EnrollCertRequestType request, String caName)
-    throws RAWorkerException, PKIErrorException
-    {
-        return requestCerts(request, caName, null);
-    }
-
-    @Override
     public EnrollCertResult requestCerts(EnrollCertRequestType request, String caName, String username)
     throws RAWorkerException, PKIErrorException
     {
@@ -430,6 +351,7 @@ public final class RAWorkerImpl extends AbstractRAWorker implements RAWorker
             return null;
         }
 
+        boolean b = (caName != null);
         if(caName == null)
         {
             // detect the CA name
@@ -441,11 +363,14 @@ public final class RAWorkerImpl extends AbstractRAWorker implements RAWorker
             }
         }
 
-        // make sure that all requests are targeted on the same CA
-        for(EnrollCertRequestEntryType entry : request.getRequestEntries())
+        if(b || request.getRequestEntries().size() > 1)
         {
-            String profile = entry.getCertProfile();
-            checkCertProfileSupportInCA(profile, caName);
+            // make sure that all requests are targeted on the same CA
+            for(EnrollCertRequestEntryType entry : request.getRequestEntries())
+            {
+                String profile = entry.getCertProfile();
+                checkCertProfileSupportInCA(profile, caName);
+            }
         }
 
         X509CmpRequestor cmpRequestor = cmpRequestorsMap.get(caName);
@@ -605,7 +530,6 @@ public final class RAWorkerImpl extends AbstractRAWorker implements RAWorker
                 }
 
                 ret.put(_entry.getId(), certIdOrError);
-                // TODO: check the whether the serial number and issuer match the requested ones.
             }
 
             return ret;
@@ -711,8 +635,7 @@ public final class RAWorkerImpl extends AbstractRAWorker implements RAWorker
     }
 
     @Override
-    protected java.security.cert.Certificate getCertificate(
-            CMPCertificate cmpCert)
+    protected java.security.cert.Certificate getCertificate(CMPCertificate cmpCert)
     throws CertificateException
     {
         Certificate bcCert = cmpCert.getX509v3PKCert();
@@ -741,54 +664,32 @@ public final class RAWorkerImpl extends AbstractRAWorker implements RAWorker
     }
 
     @Override
-    public byte[] envelope(CertReqMsg certReqMsg, String caName)
+    public byte[] envelope(CertRequest certRequest, ProofOfPossession pop, String profileName,
+            String caName, String username)
     throws RAWorkerException
     {
-        return envelope(certReqMsg, caName, null);
-    }
-
-    @Override
-    public byte[] envelope(CertReqMsg certReqMsg, String caName, String username)
-    throws RAWorkerException
-    {
-        ParamChecker.assertNotNull("request", certReqMsg);
-        X509CmpRequestor cmpRequestor = getCmpRequestor(certReqMsg, caName);
-        try
-        {
-            return cmpRequestor.envelope(certReqMsg, username).getEncoded();
-        } catch (IOException e)
-        {
-            throw new RAWorkerException("IOException: " + e.getMessage(), e);
-        } catch (CmpRequestorException e)
-        {
-            throw new RAWorkerException("CmpRequestorException: " + e.getMessage(), e);
-        }
-    }
-
-    private X509CmpRequestor getCmpRequestor(CertReqMsg request, String caName)
-    throws RAWorkerException
-    {
-        ParamChecker.assertNotNull("request", request);
-
-        if(caName == null)
-        {
-            CmpUtf8Pairs utf8Pairs = CmpUtil.extract(request.getRegInfo());
-            String certProfileName = utf8Pairs.getValue(CmpUtf8Pairs.KEY_CERT_PROFILE);
-            caName = getCANameForProfile(certProfileName);
-
-            if(caName == null)
-            {
-                throw new RAWorkerException("CertProfile " + certProfileName + " is not supported by any CA");
-            }
-        }
-
         X509CmpRequestor cmpRequestor = cmpRequestorsMap.get(caName);
         if(cmpRequestor == null)
         {
             throw new RAWorkerException("could not find CA named " + caName);
         }
 
-        return cmpRequestor;
+        PKIMessage pkiMessage;
+        try
+        {
+            pkiMessage = cmpRequestor.envelope(certRequest, pop, profileName, username);
+        } catch (CmpRequestorException e)
+        {
+            throw new RAWorkerException("CmpRequestorException: " + e.getMessage(), e);
+        }
+
+        try
+        {
+            return pkiMessage.getEncoded();
+        } catch (IOException e)
+        {
+            throw new RAWorkerException("IOException: " + e.getMessage(), e);
+        }
     }
 
     @Override
