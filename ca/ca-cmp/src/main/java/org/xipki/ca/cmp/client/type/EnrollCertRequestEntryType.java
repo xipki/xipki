@@ -33,7 +33,6 @@ public class EnrollCertRequestEntryType extends IdentifiedObject
     {
         super(id);
         ParamChecker.assertNotNull("certReq", certReq);
-        ParamChecker.assertNotNull("certProfile", certProfile);
 
         this.certProfile = certProfile;
         this.certReq = certReq;
