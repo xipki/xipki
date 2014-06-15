@@ -70,9 +70,10 @@ public abstract class CmpResponder
     private final SecureRandom random = new SecureRandom();
     protected final ConcurrentContentSigner responder;
     protected final GeneralName sender;
+    private final String c14nSenderName;
 
-    private final Map<GeneralName, CertBasedRequestorInfo> authorizatedRequestors =
-            new HashMap<GeneralName, CertBasedRequestorInfo>();
+    private final Map<String, CertBasedRequestorInfo> authorizatedRequestors =
+            new HashMap<String, CertBasedRequestorInfo>();
 
     protected final SecurityFactory securityFactory;
 
@@ -95,11 +96,7 @@ public abstract class CmpResponder
         this.securityFactory = securityFactory;
         X500Name x500Name = X500Name.getInstance(responder.getCertificate().getSubjectX500Principal().getEncoded());
         this.sender = new GeneralName(x500Name);
-    }
-
-    public PKIMessage processPKIMessage(PKIMessage pkiMessage, AuditEvent auditEvent)
-    {
-        return processPKIMessage(pkiMessage, null, auditEvent);
+        this.c14nSenderName = IoCertUtil.canonicalizeName(x500Name);
     }
 
     public PKIMessage processPKIMessage(PKIMessage pkiMessage, X509Certificate tlsClientCert, AuditEvent auditEvent)
@@ -339,10 +336,21 @@ public abstract class CmpResponder
         ASN1OctetString tid = reqHeader.getTransactionID();
         GeneralName recipient = reqHeader.getRecipient();
 
-        if(sender.equals(recipient) == false)
+        if(sender.equals(recipient))
         {
-            LOG.warn("tid={}: Unknown Recipient '{}'", tid, recipient);
+            return;
         }
+
+        if(recipient.getTagNo() == GeneralName.directoryName)
+        {
+            X500Name x500Name = X500Name.getInstance(recipient.getName());
+            if(IoCertUtil.canonicalizeName(x500Name).equals(this.c14nSenderName))
+            {
+                return;
+            }
+        }
+
+        LOG.warn("tid={}: Unknown Recipient '{}'", tid, recipient);
     }
 
     protected PKIMessage buildErrorPkiMessage(ASN1OctetString tid,
@@ -370,7 +378,13 @@ public abstract class CmpResponder
     private CertBasedRequestorInfo getRequestor(PKIHeader reqHeader)
     {
         GeneralName requestSender = reqHeader.getSender();
-        CertBasedRequestorInfo requestor = authorizatedRequestors.get(requestSender);
+        if(requestSender.getTagNo() != GeneralName.directoryName)
+        {
+            return null;
+        }
+
+        String c14nName = IoCertUtil.canonicalizeName((X500Name) requestSender.getName());
+        CertBasedRequestorInfo requestor = authorizatedRequestors.get(c14nName);
         if(requestor != null)
         {
             ASN1OctetString kid = reqHeader.getSenderKID();
@@ -392,10 +406,7 @@ public abstract class CmpResponder
 
     public void addAutorizatedRequestor(CertBasedRequestorInfo requestor)
     {
-        X500Name subject = X500Name.getInstance(
-                requestor.getCertificate().getCert().getSubjectX500Principal().getEncoded());
-        GeneralName name = new GeneralName(subject);
-        this.authorizatedRequestors.put(name, requestor);
+        this.authorizatedRequestors.put(requestor.getCertificate().getSubject(), requestor);
     }
 
     public X500Name getResponderName()
