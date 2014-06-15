@@ -23,9 +23,11 @@ import java.security.cert.X509Certificate;
 import java.util.Map;
 import java.util.Set;
 
-import org.bouncycastle.asn1.crmf.CertReqMsg;
 import org.bouncycastle.asn1.crmf.CertRequest;
 import org.bouncycastle.asn1.crmf.ProofOfPossession;
+//import org.bouncycastle.asn1.crmf.CertReqMsg;
+//import org.bouncycastle.asn1.crmf.CertRequest;
+//import org.bouncycastle.asn1.crmf.ProofOfPossession;
 import org.bouncycastle.asn1.pkcs.CertificationRequest;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.xipki.ca.cmp.client.type.EnrollCertEntryType;
@@ -45,21 +47,11 @@ public interface RAWorker
             String username)
     throws RAWorkerException, PKIErrorException;
 
-    EnrollCertResult requestCert(CertificationRequest p10Request, String profile, String caName)
-    throws RAWorkerException, PKIErrorException;
-
     EnrollCertResult requestCerts(EnrollCertRequestType.Type type,
             Map<String, EnrollCertEntryType> enrollCertEntries, String caName, String username)
     throws RAWorkerException, PKIErrorException;
 
-    EnrollCertResult requestCerts(EnrollCertRequestType.Type type,
-            Map<String, EnrollCertEntryType> enrollCertEntries, String caName)
-    throws RAWorkerException, PKIErrorException;
-
     EnrollCertResult requestCerts(EnrollCertRequestType request, String caName, String username)
-    throws RAWorkerException, PKIErrorException;
-
-    EnrollCertResult requestCerts(EnrollCertRequestType request, String caName)
     throws RAWorkerException, PKIErrorException;
 
     CertIDOrError revokeCert(X500Name issuer, BigInteger serial, int reason)
@@ -77,31 +69,11 @@ public interface RAWorker
     X509CRL generateCRL(String caName)
     throws RAWorkerException, PKIErrorException;
 
-    /**
-     * Gets ca name by issuer.
-     *
-     * @param issuer X500Name issuer
-     * @return ca name
-     * @throws RAWorkerException if ca name or issuer unknown or invalid.
-     */
     String getCaNameByIssuer(X500Name issuer)
     throws RAWorkerException;
 
-    EnrollCertResult requestCert(CertReqMsg certReqMsg, String extCertReqId, String caName,
-            String username)
-    throws RAWorkerException, PKIErrorException;
-
-    EnrollCertResult requestCert(CertReqMsg certReqMsg, String extCertReqId, String caName)
-    throws RAWorkerException, PKIErrorException;
-
-    CertReqMsg getCertReqMsgWithAppliedCertProfile(CertRequest request, String certProfile,
-            ProofOfPossession popo)
-    throws RAWorkerException;
-
-    byte[] envelope(CertReqMsg certReqMsg, String caName, String usename)
-    throws RAWorkerException;
-
-    byte[] envelope(CertReqMsg certReqMsg, String caName)
+    byte[] envelope(CertRequest certRequest, ProofOfPossession popo, String profileName,
+            String caName, String username)
     throws RAWorkerException;
 
     byte[] envelopeRevocation(X500Name issuer, BigInteger serial, int reason)

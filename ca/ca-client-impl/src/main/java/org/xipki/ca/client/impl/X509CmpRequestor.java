@@ -57,7 +57,9 @@ import org.bouncycastle.asn1.crmf.AttributeTypeAndValue;
 import org.bouncycastle.asn1.crmf.CertId;
 import org.bouncycastle.asn1.crmf.CertReqMessages;
 import org.bouncycastle.asn1.crmf.CertReqMsg;
+import org.bouncycastle.asn1.crmf.CertRequest;
 import org.bouncycastle.asn1.crmf.CertTemplateBuilder;
+import org.bouncycastle.asn1.crmf.ProofOfPossession;
 import org.bouncycastle.asn1.x509.CertificateList;
 import org.bouncycastle.asn1.x509.Extension;
 import org.bouncycastle.asn1.x509.Extensions;
@@ -326,19 +328,6 @@ abstract class X509CmpRequestor extends CmpRequestor
         Map<BigInteger, String> reqIdIdMap = new HashMap<BigInteger, String>();
         reqIdIdMap.put(MINUS_ONE, p10Req.getId());
         return intern_requestCertificate(request, reqIdIdMap, PKIBody.TYPE_CERT_REP);
-    }
-
-    public CmpResultType requestCertificate(CertReqMsg req, String extCertReqId, String username)
-    throws CmpRequestorException
-    {
-        PKIMessage request = buildPKIMessage(req, username);
-        Map<BigInteger, String> reqIdIdMap = new HashMap<BigInteger, String>();
-
-        reqIdIdMap.put(req.getCertReq().getCertReqId().getValue(), extCertReqId);
-
-        int exptectedBodyType = PKIBody.TYPE_CERT_REP;
-
-        return intern_requestCertificate(request, reqIdIdMap, exptectedBodyType);
     }
 
     public CmpResultType requestCertificate(EnrollCertRequestType req, String username)
@@ -655,18 +644,6 @@ abstract class X509CmpRequestor extends CmpRequestor
         return pkiMessage;
     }
 
-    private PKIMessage buildPKIMessage(CertReqMsg req, String username)
-    {
-        PKIHeader header = buildPKIHeader(implicitConfirm, null, username, null);
-
-        int bodyType = PKIBody.TYPE_CERT_REQ;
-
-        PKIBody body = new PKIBody(bodyType, new CertReqMessages(req));
-
-        PKIMessage pkiMessage = new PKIMessage(header, body);
-        return pkiMessage;
-    }
-
     private PKIMessage buildPKIMessage(EnrollCertRequestType req, String username)
     {
         PKIHeader header = buildPKIHeader(implicitConfirm, null, username, null);
@@ -677,15 +654,11 @@ abstract class X509CmpRequestor extends CmpRequestor
         for(int i=0; i<reqEntries.size(); i++)
         {
             EnrollCertRequestEntryType reqEntry = reqEntries.get(i);
-            AttributeTypeAndValue certProfileInfo = null;
-            if(reqEntry.getCertProfile() != null)
-            {
-                CmpUtf8Pairs utf8Pairs = new CmpUtf8Pairs(CmpUtf8Pairs.KEY_CERT_PROFILE, reqEntry.getCertProfile());
-                certProfileInfo = CmpUtil.buildAttributeTypeAndValue(utf8Pairs);
-            }
+            CmpUtf8Pairs utf8Pairs = new CmpUtf8Pairs(CmpUtf8Pairs.KEY_CERT_PROFILE, reqEntry.getCertProfile());
+            AttributeTypeAndValue certProfileInfo = CmpUtil.buildAttributeTypeAndValue(utf8Pairs);
 
             certReqMsgs[i] = new CertReqMsg(
-                    reqEntry.getCertReq(),reqEntry.getPopo(),
+                    reqEntry.getCertReq(), reqEntry.getPopo(),
                     (certProfileInfo == null) ? null : new AttributeTypeAndValue[]{certProfileInfo});
         }
 
@@ -708,10 +681,23 @@ abstract class X509CmpRequestor extends CmpRequestor
         return pkiMessage;
     }
 
-    public PKIMessage envelope(CertReqMsg req, String username)
+    private PKIMessage buildPKIMessage(CertRequest req, ProofOfPossession pop, String profileName, String username)
+    {
+        PKIHeader header = buildPKIHeader(implicitConfirm, null, username, null);
+
+        CmpUtf8Pairs utf8Pairs = new CmpUtf8Pairs(CmpUtf8Pairs.KEY_CERT_PROFILE, profileName);
+        AttributeTypeAndValue certProfileInfo = CmpUtil.buildAttributeTypeAndValue(utf8Pairs);
+        CertReqMsg[] certReqMsgs = new CertReqMsg[1];
+        certReqMsgs[0] = new CertReqMsg(req, pop, new AttributeTypeAndValue[]{certProfileInfo});
+        PKIBody body = new PKIBody(PKIBody.TYPE_CERT_REQ, new CertReqMessages(certReqMsgs));
+
+        return new PKIMessage(header, body);
+    }
+
+    public PKIMessage envelope(CertRequest req, ProofOfPossession pop, String profileName, String username)
     throws CmpRequestorException
     {
-        PKIMessage request = buildPKIMessage(req, username);
+        PKIMessage request = buildPKIMessage(req, pop, profileName, username);
         return sign(request);
     }
 
