@@ -491,36 +491,34 @@ public class CAManagerImpl implements CAManager
 
         x509cas.clear();
         responders.clear();
-        
+
         ConcurrentContentSigner cmpSigner = null;
         if(responder != null)
         {
-	        try
-	        {
-	            X509Certificate responderCert = responder.getCertificate();
-	            cmpSigner = securityFactory.createSigner(
-	                    responder.getType(), responder.getConf(), responderCert,
-	                    passwordResolver);
-	            if(responderCert == null)
-	            {
-	                responder.setCertificate(cmpSigner.getCertificate());
-	            }
-	        } catch (PasswordResolverException e)
-	        {
-	            String event = "security.createSigner cmpResponder";
-	            LOG.error("{}. {}, {}", new Object[]{event, e.getClass().getName(), e.getMessage()});
-	            LOG.debug(event, e);
-	            return false;
-	        } catch (SignerException e)
-	        {
-	            String event = "security.createSigner cmpResponder";
-	            LOG.error("{}. {}, {}", new Object[]{event, e.getClass().getName(), e.getMessage()});
-	            LOG.debug(event, e);
-	            return false;
-	        }
+            try
+            {
+                X509Certificate responderCert = responder.getCertificate();
+                cmpSigner = securityFactory.createSigner(
+                        responder.getType(), responder.getConf(), responderCert,
+                        passwordResolver);
+                if(responderCert == null)
+                {
+                    responder.setCertificate(cmpSigner.getCertificate());
+                }
+            } catch (PasswordResolverException e)
+            {
+                String event = "security.createSigner cmpResponder";
+                LOG.error("{}. {}, {}", new Object[]{event, e.getClass().getName(), e.getMessage()});
+                LOG.debug(event, e);
+                return false;
+            } catch (SignerException e)
+            {
+                String event = "security.createSigner cmpResponder";
+                LOG.error("{}. {}, {}", new Object[]{event, e.getClass().getName(), e.getMessage()});
+                LOG.debug(event, e);
+                return false;
+            }
         }
-
-
 
         // Add the CAs to the store
         for(String caName : cas.keySet())
