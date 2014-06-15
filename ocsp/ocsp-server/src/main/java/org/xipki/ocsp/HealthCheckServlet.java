@@ -51,6 +51,7 @@ public class HealthCheckServlet extends HttpServlet
             HttpServletResponse response)
     throws ServletException, IOException
     {
+        response.setHeader("Access-Control-Allow-Origin", "*");
         try
         {
             if(responder == null)
