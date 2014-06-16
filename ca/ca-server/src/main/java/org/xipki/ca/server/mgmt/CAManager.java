@@ -84,7 +84,7 @@ public interface CAManager
             Integer max_validity, String signer_type, String signer_conf,
             String crlsigner_name, Boolean allow_duplicate_key,
             Boolean allow_duplicate_subject, Set<Permission> permissions,
-            Integer numCrls)
+            Integer numCrls, Integer expirationPeriod)
     throws CAMgmtException;
 
     void setCANextSerial(String caName, long nextSerial)

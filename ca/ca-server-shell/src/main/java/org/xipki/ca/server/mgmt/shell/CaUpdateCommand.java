@@ -67,6 +67,10 @@ public class CaUpdateCommand extends CaCommand
             description = "Maximal validity in days")
     protected Integer            maxValidity;
 
+    @Option(name = "-expirationPeriod",
+            description = "Days before expiration time of CA to issue certificates")
+    protected Integer           expirationPeriod;
+
     @Option(name = "-crlSigner",
             description = "CRL signer name or 'NULL'")
     protected String            crlSignerName;
@@ -113,6 +117,12 @@ public class CaUpdateCommand extends CaCommand
         if(caStatus != null)
         {
             status = CAStatus.getCAStatus(caStatus);
+        }
+
+        if(expirationPeriod != null && expirationPeriod < 0)
+        {
+            System.err.println("invalid expirationPeriod: " + expirationPeriod);
+            return null;
         }
 
         X509Certificate caCert = null;
@@ -223,7 +233,8 @@ public class CaUpdateCommand extends CaCommand
                 allowDuplicateKey,
                 allowDuplicateSubject,
                 _permissions,
-                numCrls);
+                numCrls,
+                expirationPeriod);
 
         return null;
     }
