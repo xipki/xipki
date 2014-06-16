@@ -309,7 +309,7 @@ public class IoCertUtil
 
     public static String canonicalizeName(X500Name name)
     {
-        return RFC4519Style.INSTANCE.toString(name);
+        return RFC4519Style.INSTANCE.toString(sortX509Name(name));
     }
 
     /**
