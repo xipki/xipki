@@ -77,6 +77,11 @@ public class CaAddCommand extends CaCommand
             description = "Number of CRLs to be kept in database")
     protected Integer           numCrls;
 
+    @Option(name = "-expirationPeriod",
+            description = "Days before expiration time of CA to issue certificates\n"
+                    + "the default is 365")
+    protected Integer           expirationPeriod;
+
     @Option(name = "-cert",
             description = "CA certificate file")
     protected String            certFile;
@@ -119,6 +124,26 @@ public class CaAddCommand extends CaCommand
             return null;
         }
 
+        if(numCrls == null)
+        {
+            numCrls = 30;
+        }
+        else if(numCrls < 0)
+        {
+            System.err.println("invalid numCrls: " + numCrls);
+            return null;
+        }
+
+        if(expirationPeriod == null)
+        {
+            expirationPeriod = 365;
+        }
+        else if(expirationPeriod < 0)
+        {
+            System.err.println("invalid expirationPeriod: " + expirationPeriod);
+            return null;
+        }
+
         CAStatus status = CAStatus.ACTIVE;
         if(caStatus != null)
         {
@@ -150,7 +175,7 @@ public class CaAddCommand extends CaCommand
         }
 
         CAEntry entry = new CAEntry(caName, nextSerial, signerType, signerConf, caCert,
-                ocspUris, crlUris, null, numCrls);
+                ocspUris, crlUris, null, numCrls.intValue(), expirationPeriod.intValue());
         boolean allowDuplicateKey = isEnabled(enableDuplicateKey, disableDuplicateKey, false);
         entry.setAllowDuplicateKey(allowDuplicateKey);
 

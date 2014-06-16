@@ -1168,7 +1168,7 @@ public class CAManagerImpl implements CAManager
                     "SELECT NAME, NEXT_SERIAL, STATUS, CRL_URIS, OCSP_URIS, MAX_VALIDITY, "
                     + "CERT, SIGNER_TYPE, SIGNER_CONF, CRLSIGNER_NAME, "
                     + "ALLOW_DUPLICATE_KEY, ALLOW_DUPLICATE_SUBJECT, PERMISSIONS, NUM_CRLS, "
-                    + "REVOKED, REV_REASON, REV_TIME, REV_INVALIDITY_TIME FROM CA");
+                    + "EXPIRATION_PERIOD, REVOKED, REV_REASON, REV_TIME, REV_INVALIDITY_TIME FROM CA");
 
             while(rs.next())
             {
@@ -1185,6 +1185,8 @@ public class CAManagerImpl implements CAManager
                 boolean allowDuplicateKey = rs.getBoolean("ALLOW_DUPLICATE_KEY");
                 boolean allowDuplicateSubject = rs.getBoolean("ALLOW_DUPLICATE_SUBJECT");
                 int numCrls = rs.getInt("NUM_CRLS");
+                int expirationPeriod = rs.getInt("EXPIRATION_PERIOD");
+
                 CertRevocationInfo revocationInfo = null;
                 boolean revoked = rs.getBoolean("REVOKED");
                 if(revoked)
@@ -1214,7 +1216,7 @@ public class CAManagerImpl implements CAManager
                 X509Certificate cert = generateCert(b64cert);
 
                 CAEntry entry = new CAEntry(name, next_serial, signer_type, signer_conf, cert,
-                        lOcspUris, lCrlUris, null, numCrls);
+                        lOcspUris, lCrlUris, null, numCrls, expirationPeriod);
                 entry.setLastCommittedNextSerial(next_serial);
 
                 CAStatus caStatus = CAStatus.getCAStatus(status);
@@ -1331,8 +1333,8 @@ public class CAManagerImpl implements CAManager
             ps = prepareStatement(
                     "INSERT INTO CA (NAME, SUBJECT, NEXT_SERIAL, STATUS, CRL_URIS, OCSP_URIS, MAX_VALIDITY, "
                     + "CERT, SIGNER_TYPE, SIGNER_CONF, CRLSIGNER_NAME, "
-                    + "ALLOW_DUPLICATE_KEY, ALLOW_DUPLICATE_SUBJECT, PERMISSIONS, NUM_CRLS) "
-                    + "VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+                    + "ALLOW_DUPLICATE_KEY, ALLOW_DUPLICATE_SUBJECT, PERMISSIONS, NUM_CRLS, EXPIRATION_PERIOD) "
+                    + "VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
             int idx = 1;
             ps.setString(idx++, name);
             ps.setString(idx++, newCaDbEntry.getSubject());
@@ -1356,6 +1358,7 @@ public class CAManagerImpl implements CAManager
             ps.setBoolean(idx++, newCaDbEntry.isAllowDuplicateSubject());
             ps.setString(idx++, Permission.toString(newCaDbEntry.getPermissions()));
             ps.setInt(idx++, newCaDbEntry.getNumCrls());
+            ps.setInt(idx++, newCaDbEntry.getExpirationPeriod());
 
             ps.executeUpdate();
         }catch(SQLException e)
@@ -1382,7 +1385,7 @@ public class CAManagerImpl implements CAManager
             Integer max_validity, String signer_type, String signer_conf,
             String crlsigner_name, Boolean allow_duplicate_key,
             Boolean allow_duplicate_subject, Set<Permission> permissions,
-            Integer numCrls)
+            Integer numCrls, Integer expirationPeriod)
     throws CAMgmtException
     {
         if(nextSerial != null && nextSerial > 0) // 0 for random serial
@@ -1504,6 +1507,13 @@ public class CAManagerImpl implements CAManager
             iNum_crls = i++;
         }
 
+        Integer iExpiration_period = null;
+        if(expirationPeriod != null)
+        {
+            sb.append("EXPIRATION_PERIOD=?,");
+            iExpiration_period = i++;
+        }
+
         // delete the last ','
         sb.deleteCharAt(sb.length() - 1);
         sb.append(" WHERE NAME=?");
@@ -1585,6 +1595,11 @@ public class CAManagerImpl implements CAManager
             if(iNum_crls != null)
             {
                 ps.setInt(iNum_crls, numCrls);
+            }
+
+            if(iExpiration_period != null)
+            {
+                ps.setInt(iExpiration_period, expirationPeriod);
             }
 
             ps.setString(iName, name);

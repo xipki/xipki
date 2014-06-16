@@ -24,6 +24,7 @@ import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.PublicKey;
+import java.security.Security;
 import java.security.Signature;
 import java.security.SignatureException;
 import java.security.cert.CRLException;
@@ -1155,6 +1156,20 @@ public class X509CA
                     "Profile " + certProfileName + " not applied to non-RA");
         }
 
+        notBefore = certProfile.getNotBefore(notBefore);
+        Date now = new Date();
+        if(notBefore == null)
+        {
+            notBefore = now;
+        }
+
+        if(notBefore.getTime() >= caInfo.getNoNewCertificateAfter() ||
+                 now.getTime() >= caInfo.getNoNewCertificateAfter())
+        {
+            throw new OperationException(ErrorCode.NOT_PERMITTED,
+                    "CA will expire in " + caInfo.getExpirationPeriod() + " days, and cannot issue new certificates");
+        }
+
         // public key
         try
         {
@@ -1294,12 +1309,6 @@ public class X509CA
             if(subjectInfo.getWarning() != null)
             {
                 msgBuilder.append(", ").append(subjectInfo.getWarning());
-            }
-
-            notBefore = certProfile.getNotBefore(notBefore);
-            if(notBefore == null)
-            {
-                notBefore = new Date();
             }
 
             Integer validity = certProfile.getValidity();
@@ -1739,23 +1748,31 @@ public class X509CA
             final String provider = "XipkiNSS";
             if(tryXipkiNSStoVerify == null)
             {
-                byte[] tbs = cert.getTBSCertificate();
-                byte[] signatureValue = cert.getSignature();
-                String sigAlgName = cert.getSigAlgName();
-                try
+                if(Security.getProvider(provider) == null)
                 {
-                    Signature verifier = Signature.getInstance(sigAlgName, provider);
-                    verifier.initVerify(caPublicKey);
-                    verifier.update(tbs);
-                    boolean sigValid = verifier.verify(signatureValue);
-
-                    LOG.info("Use {} to verify {} signature", provider, sigAlgName);
-                    tryXipkiNSStoVerify = Boolean.TRUE;
-                    return sigValid;
-                }catch(Exception e)
-                {
-                    LOG.info("Cannot use {} to verify {} signature", provider, sigAlgName);
+                     LOG.info("Security provider {} is not registered", provider);
                     tryXipkiNSStoVerify = Boolean.FALSE;
+                }
+                else
+                {
+                    byte[] tbs = cert.getTBSCertificate();
+                    byte[] signatureValue = cert.getSignature();
+                    String sigAlgName = cert.getSigAlgName();
+                    try
+                    {
+                        Signature verifier = Signature.getInstance(sigAlgName, provider);
+                        verifier.initVerify(caPublicKey);
+                        verifier.update(tbs);
+                        boolean sigValid = verifier.verify(signatureValue);
+
+                        LOG.info("Use {} to verify {} signature", provider, sigAlgName);
+                        tryXipkiNSStoVerify = Boolean.TRUE;
+                        return sigValid;
+                    }catch(Exception e)
+                    {
+                        LOG.info("Cannot use {} to verify {} signature", provider, sigAlgName);
+                        tryXipkiNSStoVerify = Boolean.FALSE;
+                    }
                 }
             }
 

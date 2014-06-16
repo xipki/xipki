@@ -39,6 +39,8 @@ import org.xipki.security.common.ParamChecker;
 
 public class CAEntry
 {
+    private static long DAY = 24L * 60 * 60 * 1000;
+
     private final String name;
     private final boolean selfSigned;
     private final BigInteger serialNumber;
@@ -59,6 +61,8 @@ public class CAEntry
     private boolean allowDuplicateSubject;
     private Set<Permission> permissions;
     private int numCrls;
+    private final int expirationPeriod;
+    private final long noNewCertificateAfter;
     private CertRevocationInfo revocationInfo;
 
     private PublicCAInfo publicCAInfo;
@@ -66,7 +70,8 @@ public class CAEntry
     public CAEntry(String name, long initialSerial,
             String signerType, String signerConf, X509Certificate cert,
             List<String> ocspUris, List<String> crlUris,
-            List<String> issuerLocations, Integer numCrls)
+            List<String> issuerLocations, int numCrls,
+            int expirationPeriod)
     throws CAMgmtException
     {
         ParamChecker.assertNotEmpty("name", name);
@@ -78,18 +83,17 @@ public class CAEntry
             throw new IllegalArgumentException("initialSerial is negative (" + initialSerial + " < 0)");
         }
 
-        if(numCrls == null)
+        if(expirationPeriod < 0)
         {
-            this.numCrls = 30;
+            throw new IllegalArgumentException("expirationPeriod is negative (" + expirationPeriod + " < 0)");
         }
-        else if(numCrls >= 0)
-        {
-            this.numCrls = numCrls;
-        }
-        else
+        this.expirationPeriod = expirationPeriod;
+
+        if(numCrls < 0)
         {
             throw new IllegalArgumentException("numCrls could not be negative");
         }
+        this.numCrls = numCrls;
 
         this.name = name;
         this.nextSerial = initialSerial;
@@ -121,6 +125,8 @@ public class CAEntry
 
         this.publicCAInfo = new PublicCAInfo(this.cert.getCert(),
                 this.ocspUris, this.crlUris, this.issuerLocations);
+
+        this.noNewCertificateAfter = this.cert.getCert().getNotAfter().getTime() - DAY * expirationPeriod;
     }
 
     public String getName()
@@ -247,6 +253,7 @@ public class CAEntry
         sb.append("crl_uris: ").append(getCrlUrisAsString()).append('\n');
         sb.append("ocsp_uris: ").append(getOcspUrisAsString()).append('\n');
         sb.append("max_validity: ").append(maxValidity).append('\n');
+        sb.append("expirationPeriod: ").append(expirationPeriod).append('\n');
         sb.append("signer_type: ").append(signerType).append('\n');
         sb.append("signer_conf: ").append(signerConf).append('\n');
         sb.append("cert: ").append("\n");
@@ -341,6 +348,16 @@ public class CAEntry
     public void setRevocationInfo(CertRevocationInfo revocationInfo)
     {
         this.revocationInfo = revocationInfo;
+    }
+
+    public int getExpirationPeriod()
+    {
+        return expirationPeriod;
+    }
+
+    public long getNoNewCertificateAfter()
+    {
+        return noNewCertificateAfter;
     }
 
 }
