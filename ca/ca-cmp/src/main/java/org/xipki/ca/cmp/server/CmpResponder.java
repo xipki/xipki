@@ -311,7 +311,7 @@ public abstract class CmpResponder
     {
         try
         {
-            return CmpUtil.addProtection(pkiMessage, responder, sender);
+            return CmpUtil.addProtection(pkiMessage, responder, sender, getCmpControl().isSendResponderCert());
         } catch (Exception e)
         {
             LOG.error("error while add protection to the PKI message: {}", e.getMessage());

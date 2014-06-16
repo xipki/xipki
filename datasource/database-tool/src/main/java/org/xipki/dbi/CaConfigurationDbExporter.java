@@ -102,8 +102,8 @@ class CaConfigurationDbExporter extends DbPorter
         try
         {
             stmt = createStatement();
-            String sql = "SELECT REQUIRE_CONFIRM_CERT, SEND_CA_CERT, "
-                    + " MESSAGE_TIME_BIAS, CONFIRM_WAIT_TIME"
+            String sql = "SELECT REQUIRE_CONFIRM_CERT, SEND_CA_CERT, SEND_RESPONDER_CERT, "
+                    + " REQUIRE_MESSAGE_TIME, MESSAGE_TIME_BIAS, CONFIRM_WAIT_TIME"
                     + " FROM CMPCONTROL";
             ResultSet rs = stmt.executeQuery(sql);
 
@@ -111,12 +111,16 @@ class CaConfigurationDbExporter extends DbPorter
             {
                 boolean requireConfirmCert = rs.getBoolean("REQUIRE_CONFIRM_CERT");
                 boolean sendCaCert = rs.getBoolean("SEND_CA_CERT");
+                boolean sendResponderCert = rs.getBoolean("SEND_RESPONDER_CERT");
+                boolean requireMessageTime = rs.getBoolean("REQUIRE_MESSAGE_TIME");
                 int messageTimeBias = rs.getInt("MESSAGE_TIME_BIAS");
                 int confirmWaitTime = rs.getInt("CONFIRM_WAIT_TIME");
 
                 cmpcontrol = new CmpcontrolType();
                 cmpcontrol.setRequireConfirmCert(requireConfirmCert);
                 cmpcontrol.setSendCaCert(sendCaCert);
+                cmpcontrol.setSendResponderCert(sendResponderCert);
+                cmpcontrol.setRequireMessageTime(requireMessageTime);
                 cmpcontrol.setMessageTimeBias(messageTimeBias);
                 cmpcontrol.setConfirmWaitTime(confirmWaitTime);
             }

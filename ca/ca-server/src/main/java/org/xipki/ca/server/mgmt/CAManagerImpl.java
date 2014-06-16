@@ -1110,8 +1110,8 @@ public class CAManagerImpl implements CAManager
         try
         {
             stmt = createStatement();
-            String sql = "SELECT REQUIRE_CONFIRM_CERT, SEND_CA_CERT, "
-                    + " MESSAGE_TIME_BIAS, CONFIRM_WAIT_TIME"
+            String sql = "SELECT REQUIRE_CONFIRM_CERT, SEND_CA_CERT, SEND_RESPONDER_CERT"
+                    + " REQUIRE_MESSAGE_TIME, MESSAGE_TIME_BIAS, CONFIRM_WAIT_TIME"
                     + " FROM CMPCONTROL";
 
             rs = stmt.executeQuery(sql);
@@ -1120,13 +1120,16 @@ public class CAManagerImpl implements CAManager
             {
                 boolean requireConfirmCert = rs.getBoolean("REQUIRE_CONFIRM_CERT");
                 boolean sendCaCert = rs.getBoolean("SEND_CA_CERT");
+                boolean sendResponderCert = rs.getBoolean("SEND_RESPONDER_CERT");
+                boolean requireMessageTime = rs.getBoolean("REQUIRE_MESSAGE_TIME");
                 int messageTimeBias = rs.getInt("MESSAGE_TIME_BIAS");
                 int confirmWaitTime = rs.getInt("CONFIRM_WAIT_TIME");
 
                 CmpControl entry = new CmpControl();
                 entry.setRequireConfirmCert(requireConfirmCert);
                 entry.setSendCaCert(sendCaCert);
-
+                entry.setSendResponderCert(sendResponderCert);
+                entry.setMessageTimeRequired(requireMessageTime);
                 if(messageTimeBias != 0)
                 {
                     entry.setMessageBias(messageTimeBias);
@@ -2611,14 +2614,16 @@ public class CAManagerImpl implements CAManager
         try
         {
             ps = prepareStatement(
-                    "INSERT INTO CMPCONTROL (NAME, REQUIRE_CONFIRM_CERT, SEND_CA_CERT, "
-                    + " MESSAGE_TIME_BIAS, CONFIRM_WAIT_TIME)"
-                    + " VALUES (?, ?, ?, ?, ?)");
+                    "INSERT INTO CMPCONTROL (NAME, REQUIRE_CONFIRM_CERT, SEND_CA_CERT, SEND_RESPONDER_CERT,"
+                    + " REQUIRE_MESSAGE_TIME, MESSAGE_TIME_BIAS, CONFIRM_WAIT_TIME)"
+                    + " VALUES (?, ?, ?, ?, ?, ?, ?)");
 
             int idx = 1;
             ps.setString(idx++, CmpControl.name);
             ps.setBoolean(idx++, dbEntry.isRequireConfirmCert());
             ps.setBoolean(idx++, dbEntry.isSendCaCert());
+            ps.setBoolean(idx++, dbEntry.isSendResponderCert());
+            ps.setBoolean(idx++, dbEntry.isMessageTimeRequired());
             ps.setInt(idx++, dbEntry.getMessageTimeBias());
             ps.setInt(idx++, dbEntry.getConfirmWaitTime());
 
@@ -2653,12 +2658,13 @@ public class CAManagerImpl implements CAManager
     }
 
     @Override
-    public void changeCmpControl(Boolean requireConfirmCert, Integer messageTimeBias,
-            Integer confirmWaitTime, Boolean sendCaCert)
+    public void changeCmpControl(Boolean requireConfirmCert,
+            Boolean requireMessageTime, Integer messageTimeBias,
+            Integer confirmWaitTime, Boolean sendCaCert, Boolean sendResponderCert)
     throws CAMgmtException
     {
-        if(requireConfirmCert == null && messageTimeBias == null && confirmWaitTime == null
-                && sendCaCert == null)
+        if(requireConfirmCert == null && requireMessageTime == null && messageTimeBias == null
+                && confirmWaitTime == null && sendCaCert == null && sendResponderCert == null)
         {
             return;
         }
@@ -2667,9 +2673,6 @@ public class CAManagerImpl implements CAManager
         sb.append("UPDATE CMPCONTROL SET ");
 
         Integer iConfirmCert = null;
-        Integer iMessageTimeBias = null;
-        Integer iConfirmWaitTime = null;
-        Integer iSenderCaCert = null;
 
         int i = 1;
         if(requireConfirmCert != null)
@@ -2677,20 +2680,40 @@ public class CAManagerImpl implements CAManager
             sb.append("REQUIRE_CONFIRM_CERT=?,");
             iConfirmCert = i++;
         }
+
+        Integer iRequireMessageTime = null;
+        if(requireMessageTime != null)
+        {
+            sb.append("REQUIRE_MESSAGE_TIME=?,");
+            iRequireMessageTime = i++;
+        }
+
+        Integer iMessageTimeBias = null;
         if(messageTimeBias != null)
         {
             sb.append("MESSAGE_TIME_BIAS=?,");
             iMessageTimeBias = i++;
         }
+
+        Integer iConfirmWaitTime = null;
         if(confirmWaitTime != null)
         {
             sb.append("CONFIRM_WAIT_TIME=?,");
             iConfirmWaitTime = i++;
         }
+
+        Integer iSendCaCert = null;
         if(sendCaCert != null)
         {
             sb.append("SEND_CA_CERT=?,");
-            iSenderCaCert = i++;
+            iSendCaCert = i++;
+        }
+
+        Integer iSendResponderCert = null;
+        if(sendResponderCert != null)
+        {
+            sb.append("SEND_RESPONDER_CERT=?,");
+            iSendResponderCert = i++;
         }
 
         sb.deleteCharAt(sb.length() - 1);
@@ -2705,6 +2728,11 @@ public class CAManagerImpl implements CAManager
                 ps.setBoolean(iConfirmCert, requireConfirmCert);
             }
 
+            if(iRequireMessageTime != null)
+            {
+                ps.setBoolean(iRequireMessageTime, requireMessageTime);
+            }
+
             if(iMessageTimeBias != null)
             {
                 ps.setInt(iMessageTimeBias, messageTimeBias);
@@ -2715,9 +2743,14 @@ public class CAManagerImpl implements CAManager
                 ps.setInt(iConfirmWaitTime, confirmWaitTime);
             }
 
-            if(iSenderCaCert != null)
+            if(iSendCaCert != null)
             {
-                ps.setBoolean(iSenderCaCert, sendCaCert);
+                ps.setBoolean(iSendCaCert, sendCaCert);
+            }
+
+            if(iSendResponderCert != null)
+            {
+                ps.setBoolean(iSendResponderCert, sendResponderCert);
             }
 
             ps.setString(i, "default");
