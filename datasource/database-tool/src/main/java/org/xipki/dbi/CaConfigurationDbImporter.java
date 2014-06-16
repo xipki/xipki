@@ -357,8 +357,8 @@ class CaConfigurationDbImporter extends DbPorter
                     "INSERT INTO CA (NAME, SUBJECT, NEXT_SERIAL, STATUS, CRL_URIS, OCSP_URIS, MAX_VALIDITY, "
                     + "CERT, SIGNER_TYPE, SIGNER_CONF, CRLSIGNER_NAME, "
                     + "ALLOW_DUPLICATE_KEY, ALLOW_DUPLICATE_SUBJECT, PERMISSIONS, NUM_CRLS, "
-                    + "REVOKED, REV_REASON, REV_TIME, REV_INVALIDITY_TIME) "
-                    + "VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+                    + "EXPIRATION_PERIOD, REVOKED, REV_REASON, REV_TIME, REV_INVALIDITY_TIME) "
+                    + "VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
 
             for(CaType ca : cas.getCa())
             {
@@ -384,6 +384,7 @@ class CaConfigurationDbImporter extends DbPorter
                     ps.setString(idx++, ca.getPermissions());
                     Integer numCrls = ca.getNumCrls();
                     ps.setInt(idx++, numCrls == null ? 30 : numCrls.intValue());
+                    ps.setInt(idx++, ca.getExpirationPeriod());
                     ps.setBoolean(idx++, ca.isRevoked());
                     ps.setString(idx++, ca.getRevReason());
                     ps.setString(idx++, ca.getRevTime());

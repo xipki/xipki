@@ -423,7 +423,7 @@ class CaConfigurationDbExporter extends DbPorter
             String sql = "SELECT NAME, NEXT_SERIAL, STATUS, CRL_URIS, OCSP_URIS, MAX_VALIDITY, "
                     + "CERT, SIGNER_TYPE, SIGNER_CONF, CRLSIGNER_NAME, "
                     + "ALLOW_DUPLICATE_KEY, ALLOW_DUPLICATE_SUBJECT, PERMISSIONS, NUM_CRLS, "
-                    + "REVOKED, REV_REASON, REV_TIME, REV_INVALIDITY_TIME "
+                    + "EXPIRATION_PERIOD, REVOKED, REV_REASON, REV_TIME, REV_INVALIDITY_TIME "
                     + "FROM CA";
             ResultSet rs = stmt.executeQuery(sql);
 
@@ -443,6 +443,7 @@ class CaConfigurationDbExporter extends DbPorter
                 boolean allowDuplicateSubject = rs.getBoolean("ALLOW_DUPLICATE_SUBJECT");
 
                 String permissions = rs.getString("PERMISSIONS");
+                int expirationPeriod = rs.getInt("EXPIRATION_PERIOD");
 
                 CaType ca = new CaType();
                 ca.setName(name);
@@ -458,6 +459,7 @@ class CaConfigurationDbExporter extends DbPorter
                 ca.setAllowDuplicateKey(allowDuplicateKey);
                 ca.setAllowDuplicateSubject(allowDuplicateSubject);
                 ca.setPermissions(permissions);
+                ca.setExpirationPeriod(expirationPeriod);
 
                 int numCrls = rs.getInt("num_crls");
                 ca.setNumCrls(numCrls);
