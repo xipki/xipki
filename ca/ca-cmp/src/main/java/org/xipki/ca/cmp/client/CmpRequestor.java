@@ -108,7 +108,7 @@ public abstract class CmpRequestor
     {
         try
         {
-            request = CmpUtil.addProtection(request, requestor, sender);
+            request = CmpUtil.addProtection(request, requestor, sender, false);
         } catch (CMPException e)
         {
             throw new CmpRequestorException("Could not sign the request", e);

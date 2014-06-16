@@ -112,9 +112,9 @@ class CaConfigurationDbImporter extends DbPorter
         try
         {
             ps = prepareStatement(
-                    "INSERT INTO CMPCONTROL (NAME, REQUIRE_CONFIRM_CERT, SEND_CA_CERT, "
-                    + " MESSAGE_TIME_BIAS, CONFIRM_WAIT_TIME)"
-                    + " VALUES (?, ?, ?, ?, ?)");
+                    "INSERT INTO CMPCONTROL (NAME, REQUIRE_CONFIRM_CERT, SEND_CA_CERT, SEND_RESPONDER_CERT, "
+                    + " REQUIRE_MESSAGE_TIME, MESSAGE_TIME_BIAS, CONFIRM_WAIT_TIME)"
+                    + " VALUES (?, ?, ?, ?, ?, ?, ?)");
 
             try
             {
@@ -122,6 +122,8 @@ class CaConfigurationDbImporter extends DbPorter
                 ps.setString(idx++, "default");
                 ps.setBoolean(idx++, control.isRequireConfirmCert());
                 ps.setBoolean(idx++, control.isSendCaCert());
+                ps.setBoolean(idx++, control.isSendResponderCert());
+                ps.setBoolean(idx++, control.isRequireMessageTime());
                 ps.setInt(idx++, control.getMessageTimeBias());
                 ps.setInt(idx++, control.getConfirmWaitTime());
 

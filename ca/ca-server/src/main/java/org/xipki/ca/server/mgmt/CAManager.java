@@ -181,8 +181,9 @@ public interface CAManager
     void removeCmpControl()
     throws CAMgmtException;
 
-    void changeCmpControl(Boolean requireConfirmCert, Integer messageTimeBias,
-            Integer confirmWaitTime, Boolean sendCaCert)
+    void changeCmpControl(Boolean requireConfirmCert,
+            Boolean requireMessageTime, Integer messageTimeBias,
+            Integer confirmWaitTime, Boolean sendCaCert, Boolean sendResponderCert)
     throws CAMgmtException;
 
     void addEnvParam(String name, String value)

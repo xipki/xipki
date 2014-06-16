@@ -98,6 +98,8 @@
 		<xs:all>
 			<xs:element name="require_confirm_cert" type="xs:boolean" />
 			<xs:element name="send_ca_cert" type="xs:boolean" />
+			<xs:element name="send_responder_cert" type="xs:boolean" />
+			<xs:element name="require_message_time" type="xs:boolean" />
 			<xs:element name="message_time_bias" type="xs:int" />
 			<xs:element name="confirm_wait_time" type="xs:int" />			
 		</xs:all>

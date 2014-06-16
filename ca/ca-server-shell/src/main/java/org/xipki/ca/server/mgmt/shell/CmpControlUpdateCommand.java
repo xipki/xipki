@@ -39,6 +39,22 @@ public class CmpControlUpdateCommand extends CaCommand
             description = "Disable sending CA certificate in the responsed")
     protected Boolean            disableSendCaCert;
 
+    @Option(name = "-erc", aliases = { "--enableSendResponderCert" },
+            description = "Enable sending Responder certificate in the response")
+    protected Boolean            enableSendResponderCert;
+
+    @Option(name = "-drc", aliases = { "--disableSendResponderCert" },
+            description = "Disable sending Responder certificate in the response")
+    protected Boolean            disableSendResponderCert;
+
+    @Option(name = "-emt", aliases = { "--enableRequireMessageTime" },
+            description = "Enable sending Responder certificate in the response")
+    protected Boolean            enableRequireMessageTime;
+
+    @Option(name = "-dmt", aliases = { "--disableRequireMessageTime" },
+            description = "Disable requiring message time in request")
+    protected Boolean            disableRequireMesssageTime;
+
     @Option(name = "-mtb", aliases = { "--msgTimeBias" },
             description = "Message time bias in seconds")
     protected Integer            messageTimeBias;
@@ -73,7 +89,30 @@ public class CmpControlUpdateCommand extends CaCommand
             sendCaCert = isEnabled(enableSendCaCert, disableSendCaCert, false);
         }
 
-        caManager.changeCmpControl(requireConfirmCert, messageTimeBias, confirmWaitTime, sendCaCert);
+        Boolean sendResponderCert = null;
+        if(enableSendResponderCert != null && disableSendResponderCert != null)
+        {
+            System.err.println("Sending responder certificate could not be enabled and disabled at the same time");
+            return null;
+        }
+        else if(enableSendResponderCert != null || disableSendResponderCert != null)
+        {
+            sendResponderCert = isEnabled(enableSendResponderCert, disableSendResponderCert, true);
+        }
+
+        Boolean requireMessageTime = null;
+        if(enableRequireMessageTime != null && disableRequireMesssageTime != null)
+        {
+            System.err.println("Requiring message time could not be enabled and disabled at the same time");
+            return null;
+        }
+        else if(enableRequireMessageTime != null || disableRequireMesssageTime != null)
+        {
+             requireMessageTime = isEnabled(enableRequireMessageTime, disableRequireMesssageTime, true);
+        }
+
+        caManager.changeCmpControl(requireConfirmCert, requireMessageTime, messageTimeBias, confirmWaitTime,
+                sendCaCert, sendResponderCert);
 
         return null;
     }
