@@ -27,6 +27,7 @@ public class CmpControl
     private boolean sendCaCert;
 
     private boolean messageTimeRequired = true;
+    private boolean sendResponderCert = true;
 
     public boolean isMessageTimeRequired()
     {
@@ -104,9 +105,21 @@ public class CmpControl
         sb.append("name: ").append(name).append('\n');
         sb.append("requireConfirmCert: ").append(requireConfirmCert ? "yes" : "no").append('\n');
         sb.append("sendCaCert: ").append(sendCaCert ? "yes" : "no").append("\n");
+        sb.append("sendResponderCert: ").append(sendResponderCert ? "yes" : "no").append("\n");
+        sb.append("messageTimeRequired: ").append(messageTimeRequired ? "yes" : "no").append("\n");
         sb.append("messageTimeBias: ").append(messageTimeBias).append(" s").append('\n');
         sb.append("confirmWaitTime: ").append(confirmWaitTime).append(" s");
 
         return sb.toString();
+    }
+
+    public boolean isSendResponderCert()
+    {
+        return sendResponderCert;
+    }
+
+    public void setSendResponderCert(boolean sendResponderCert)
+    {
+        this.sendResponderCert = sendResponderCert;
     }
 }

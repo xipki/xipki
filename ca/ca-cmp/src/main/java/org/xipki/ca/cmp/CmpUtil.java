@@ -30,6 +30,7 @@ import org.bouncycastle.asn1.cmp.PKIMessage;
 import org.bouncycastle.asn1.crmf.AttributeTypeAndValue;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.GeneralName;
+import org.bouncycastle.cert.X509CertificateHolder;
 import org.bouncycastle.cert.cmp.CMPException;
 import org.bouncycastle.cert.cmp.ProtectedPKIMessage;
 import org.bouncycastle.cert.cmp.ProtectedPKIMessageBuilder;
@@ -42,6 +43,13 @@ public class CmpUtil
 {
     public static PKIMessage addProtection(PKIMessage pkiMessage,
             ConcurrentContentSigner signer, GeneralName signerName)
+    throws CMPException, NoIdleSignerException
+    {
+        return addProtection(pkiMessage, signer, signerName, true);
+    }
+
+    public static PKIMessage addProtection(PKIMessage pkiMessage,
+            ConcurrentContentSigner signer, GeneralName signerName, boolean addSignerCert)
     throws CMPException, NoIdleSignerException
     {
         if(signerName == null)
@@ -102,6 +110,12 @@ public class CmpUtil
             builder.setMessageTime(new Date());
         }
         builder.setBody(pkiMessage.getBody());
+
+        if(addSignerCert)
+        {
+            X509CertificateHolder signerCert = signer.getCertificateAsBCObject();
+            builder.addCMPCertificate(signerCert);
+        }
 
         ContentSigner realSigner = signer.borrowContentSigner();
         try

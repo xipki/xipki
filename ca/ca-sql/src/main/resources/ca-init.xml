@@ -10,6 +10,9 @@
 			<column name="REQUIRE_CONFIRM_CERT" type="INT">
 				<constraints nullable="false"/>
 			</column>
+			<column name="REQUIRE_MESSAGE_TIME" type="INT">
+				<constraints nullable="false"/>
+			</column>
 			<column name="MESSAGE_TIME_BIAS" remarks="seconds" type="INT">
 				<constraints nullable="false"/>
 			</column>
@@ -17,6 +20,9 @@
 				<constraints nullable="false"/>
 			</column>
 			<column name="SEND_CA_CERT" type="INT">
+				<constraints nullable="false"/>
+			</column>
+			<column name="SEND_RESPONDER_CERT" type="INT">
 				<constraints nullable="false"/>
 			</column>
 		</createTable>
