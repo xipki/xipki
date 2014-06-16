@@ -21,6 +21,7 @@ import java.security.PrivateKey;
 import java.security.cert.X509Certificate;
 
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
+import org.bouncycastle.cert.X509CertificateHolder;
 import org.bouncycastle.operator.ContentSigner;
 
 public interface ConcurrentContentSigner
@@ -36,9 +37,13 @@ public interface ConcurrentContentSigner
 
     X509Certificate getCertificate();
 
+    X509CertificateHolder getCertificateAsBCObject();
+
     void setCertificateChain(X509Certificate[] certchain);
 
     X509Certificate[] getCertificateChain();
+
+    X509CertificateHolder[] getCertificateChainAsBCObjects();
 
     void initialize(String conf, PasswordResolver passwordResolver)
     throws SignerException;

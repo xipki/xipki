@@ -17,8 +17,10 @@
 
 package org.xipki.security;
 
+import java.io.IOException;
 import java.io.OutputStream;
 import java.security.PrivateKey;
+import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
 import java.util.List;
 import java.util.concurrent.BlockingDeque;
@@ -26,6 +28,7 @@ import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.TimeUnit;
 
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
+import org.bouncycastle.cert.X509CertificateHolder;
 import org.bouncycastle.operator.ContentSigner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,6 +50,7 @@ public class DefaultConcurrentContentSigner implements ConcurrentContentSigner
     private final PrivateKey privateKey;
 
     private X509Certificate[] certificateChain;
+    private X509CertificateHolder[] certificateChainAsBCObjects;
 
     static
     {
@@ -167,6 +171,30 @@ public class DefaultConcurrentContentSigner implements ConcurrentContentSigner
     public void setCertificateChain(X509Certificate[] certificateChain)
     {
         this.certificateChain = certificateChain;
+        if(this.certificateChain == null)
+        {
+            this.certificateChainAsBCObjects = null;
+            return;
+        }
+
+        final int n = certificateChain.length;
+        this.certificateChainAsBCObjects = new X509CertificateHolder[n];
+        for(int i = 0; i < n; i++)
+        {
+            X509Certificate cert = this.certificateChain[i];
+            try
+            {
+                this.certificateChainAsBCObjects[i] = new X509CertificateHolder(cert.getEncoded());
+            } catch (CertificateEncodingException e)
+            {
+                throw new IllegalArgumentException("CertificateEncodingException occured while"
+                        + " parsing certificate at index " + i + ": " + e.getMessage(), e);
+            } catch (IOException e)
+            {
+                throw new IllegalArgumentException("IOException occured while"
+                        + " parsing certificate at index " + i + ": " + e.getMessage(), e);
+            }
+        }
     }
 
     @Override
@@ -183,9 +211,28 @@ public class DefaultConcurrentContentSigner implements ConcurrentContentSigner
     }
 
     @Override
+    public X509CertificateHolder getCertificateAsBCObject()
+    {
+        if(certificateChainAsBCObjects != null && certificateChainAsBCObjects.length > 0)
+        {
+            return certificateChainAsBCObjects[0];
+        }
+        else
+        {
+            return null;
+        }
+    }
+
+    @Override
     public X509Certificate[] getCertificateChain()
     {
         return certificateChain;
+    }
+
+    @Override
+    public X509CertificateHolder[] getCertificateChainAsBCObjects()
+    {
+        return certificateChainAsBCObjects;
     }
 
     @Override
