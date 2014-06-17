@@ -72,8 +72,7 @@ public abstract class CmpResponder
     protected final GeneralName sender;
     private final String c14nSenderName;
 
-    private final Map<String, CertBasedRequestorInfo> authorizatedRequestors =
-            new HashMap<String, CertBasedRequestorInfo>();
+    private final Map<String, CertBasedRequestorInfo> authorizatedRequestors = new HashMap<>();
 
     protected final SecurityFactory securityFactory;
 

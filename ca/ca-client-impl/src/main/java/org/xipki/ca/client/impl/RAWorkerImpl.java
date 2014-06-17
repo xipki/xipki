@@ -129,8 +129,8 @@ public final class RAWorkerImpl extends AbstractRAWorker implements RAWorker
 
     public static long DAY = 24L * 60 * 60 * 1000;
 
-    private final Map<String, CAConf> casMap = new HashMap<String, CAConf>();
-    private final Map<String, X509CmpRequestor> cmpRequestorsMap = new ConcurrentHashMap<String, X509CmpRequestor>();
+    private final Map<String, CAConf> casMap = new HashMap<>();
+    private final Map<String, X509CmpRequestor> cmpRequestorsMap = new ConcurrentHashMap<>();
 
     private String            confFile;
     private Map<X509Certificate, Boolean> tryXipkiNSStoVerifyMap = new ConcurrentHashMap<>();
@@ -186,8 +186,8 @@ public final class RAWorkerImpl extends AbstractRAWorker implements RAWorker
         String requestorSignerType = props.getProperty(REQUESTOR_SIGNER_TYPE);
         String requestorSignerConf = props.getProperty(REQUESTOR_SIGNER_CONF);
 
-        Set<String> caNames = new HashSet<String>();
-        Set<String> disabledCaNames = new HashSet<String>();
+        Set<String> caNames = new HashSet<>();
+        Set<String> disabledCaNames = new HashSet<>();
 
         for(Object _propKey : props.keySet())
         {
@@ -215,9 +215,9 @@ public final class RAWorkerImpl extends AbstractRAWorker implements RAWorker
             LOG.warn("No CA configured");
         }
 
-        Set<String> configuredCaNames = new HashSet<String>();
+        Set<String> configuredCaNames = new HashSet<>();
 
-        Set<CAConf> cas = new HashSet<CAConf>();
+        Set<CAConf> cas = new HashSet<>();
         for(String caName : caNames)
         {
             try
@@ -231,7 +231,7 @@ public final class RAWorkerImpl extends AbstractRAWorker implements RAWorker
                 if(_profiles != null)
                 {
                     StringTokenizer st = new StringTokenizer(_profiles, ", ");
-                    profiles = new HashSet<String>(st.countTokens());
+                    profiles = new HashSet<>(st.countTokens());
                     while(st.hasMoreTokens())
                     {
                         profiles.add(st.nextToken().trim());
@@ -296,7 +296,7 @@ public final class RAWorkerImpl extends AbstractRAWorker implements RAWorker
     throws RAWorkerException, PKIErrorException
     {
         EnrollCertEntryType entry = new EnrollCertEntryType(p10Request, profile);
-        Map<String, EnrollCertEntryType> entries = new HashMap<String, EnrollCertEntryType>();
+        Map<String, EnrollCertEntryType> entries = new HashMap<>();
 
         final String id = "p10-1";
         entries.put(id, entry);
@@ -508,7 +508,7 @@ public final class RAWorkerImpl extends AbstractRAWorker implements RAWorker
         }
         else if(result instanceof RevokeCertResultType)
         {
-            Map<String, CertIDOrError> ret = new HashMap<String, CertIDOrError>();
+            Map<String, CertIDOrError> ret = new HashMap<>();
 
             RevokeCertResultType _result = (RevokeCertResultType) result;
             for(ResultEntryType _entry : _result.getResultEntries())

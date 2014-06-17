@@ -52,8 +52,7 @@ public class IdentifiedCertProfile extends CertProfile
     }
 
     @Override
-    public void setEnvironmentParameterResolver(
-            EnvironmentParameterResolver parameterResolver)
+    public void setEnvironmentParameterResolver(EnvironmentParameterResolver parameterResolver)
     {
         certProfile.setEnvironmentParameterResolver(parameterResolver);
     }
@@ -78,8 +77,7 @@ public class IdentifiedCertProfile extends CertProfile
     }
 
     @Override
-    public ExtensionTuples getExtensions(X500Name requestedSubject,
-            Extensions requestedExtensions)
+    public ExtensionTuples getExtensions(X500Name requestedSubject, Extensions requestedExtensions)
     throws CertProfileException, BadCertTemplateException
     {
         return certProfile.getExtensions(requestedSubject, requestedExtensions);

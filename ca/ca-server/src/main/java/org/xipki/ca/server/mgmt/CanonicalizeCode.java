@@ -264,7 +264,7 @@ public class CanonicalizeCode
     {
         BufferedReader reader = new BufferedReader(new FileReader(file));
 
-        List<Integer> lineNumbers = new LinkedList<Integer>();
+        List<Integer> lineNumbers = new LinkedList<>();
 
         int lineNumber = 0;
         try

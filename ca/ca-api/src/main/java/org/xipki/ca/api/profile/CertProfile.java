@@ -64,8 +64,7 @@ public abstract class CertProfile
 
     public abstract ExtensionOccurrence getOccurenceOfAuthorityInfoAccess();
 
-    public abstract ExtensionTuples getExtensions(X500Name requestedSubject,
-            Extensions requestedExtensions)
+    public abstract ExtensionTuples getExtensions(X500Name requestedSubject, Extensions requestedExtensions)
     throws CertProfileException, BadCertTemplateException;
 
     public abstract boolean incSerialNumberIfSubjectExists();

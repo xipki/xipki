@@ -36,8 +36,8 @@ public class IaikExtendedModule
     private static final Logger LOG = LoggerFactory.getLogger(IaikExtendedModule.class);
 
     private Module module;
-    private Map<PKCS11SlotIdentifier, IaikExtendedSlot> slots = new HashMap<PKCS11SlotIdentifier, IaikExtendedSlot>();
-    private Map<PKCS11SlotIdentifier, Slot> availableSlots = new HashMap<PKCS11SlotIdentifier, Slot>();
+    private Map<PKCS11SlotIdentifier, IaikExtendedSlot> slots = new HashMap<>();
+    private Map<PKCS11SlotIdentifier, Slot> availableSlots = new HashMap<>();
 
     public IaikExtendedModule(Module module)
     throws SignerException

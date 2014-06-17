@@ -96,27 +96,24 @@ public class CAManagerImpl implements CAManager
 
     private Map<String, DataSource> dataSources = null;
 
-    private final Map<String, CAEntry> cas = new ConcurrentHashMap<String, CAEntry>();
-    private final Map<String, CertProfileEntry> certProfiles = new ConcurrentHashMap<String, CertProfileEntry>();
-    private final Map<String, PublisherEntry> publishers = new ConcurrentHashMap<String, PublisherEntry>();
-    private final Map<String, CmpRequestorEntry> requestors = new ConcurrentHashMap<String, CmpRequestorEntry>();
-    private final Map<String, CrlSignerEntry> crlSigners = new ConcurrentHashMap<String, CrlSignerEntry>();
-    private final Map<String, Set<String>> ca_has_profiles = new ConcurrentHashMap<String, Set<String>>();
-    private final Map<String, Set<String>> ca_has_publishers = new ConcurrentHashMap<String, Set<String>>();
-    private final Map<String, Set<CAHasRequestorEntry>> ca_has_requestors =
-            new ConcurrentHashMap<String, Set<CAHasRequestorEntry>>();
-    private final Map<String, String> caAliases = new ConcurrentHashMap<String, String>();
+    private final Map<String, CAEntry> cas = new ConcurrentHashMap<>();
+    private final Map<String, CertProfileEntry> certProfiles = new ConcurrentHashMap<>();
+    private final Map<String, PublisherEntry> publishers = new ConcurrentHashMap<>();
+    private final Map<String, CmpRequestorEntry> requestors = new ConcurrentHashMap<>();
+    private final Map<String, CrlSignerEntry> crlSigners = new ConcurrentHashMap<>();
+    private final Map<String, Set<String>> ca_has_profiles = new ConcurrentHashMap<>();
+    private final Map<String, Set<String>> ca_has_publishers = new ConcurrentHashMap<>();
+    private final Map<String, Set<CAHasRequestorEntry>> ca_has_requestors = new ConcurrentHashMap<>();
+    private final Map<String, String> caAliases = new ConcurrentHashMap<>();
 
     private final DfltEnvironmentParameterResolver envParameterResolver = new DfltEnvironmentParameterResolver();
 
     private CmpControl cmpControl;
 
     private ScheduledThreadPoolExecutor scheduledThreadPoolExecutor;
-    private static final Map<String, X509CACmpResponder> responders =
-            new ConcurrentHashMap<String, X509CACmpResponder>();
+    private static final Map<String, X509CACmpResponder> responders = new ConcurrentHashMap<>();
 
-    private static final Map<String, X509CA> x509cas =
-            new ConcurrentHashMap<String, X509CA>();
+    private static final Map<String, X509CA> x509cas = new ConcurrentHashMap<>();
 
     private PasswordResolver passwordResolver;
     private SecurityFactory securityFactory;
@@ -196,7 +193,7 @@ public class CAManagerImpl implements CAManager
                 throw new CAMgmtException("IOException while parsing ca configuration" + caConfFile, e);
             }
 
-            this.dataSources = new ConcurrentHashMap<String, DataSource>();
+            this.dataSources = new ConcurrentHashMap<>();
             for(Object objKey : caConfProps.keySet())
             {
                 String key = (String) objKey;
@@ -639,7 +636,7 @@ public class CAManagerImpl implements CAManager
         caSystemSetuped = true;
         StringBuilder sb = new StringBuilder();
         sb.append("Started CA system");
-        Set<String> names = new HashSet<String>(getCANames());
+        Set<String> names = new HashSet<>(getCANames());
 
         if(names.size() > 0)
         {
@@ -1258,12 +1255,12 @@ public class CAManagerImpl implements CAManager
 
                 s = rs.getString("PROFILES");
                 List<String> list = tokensAsList(s, ",");
-                Set<String> profiles = (list == null)? null : new HashSet<String>(list);
+                Set<String> profiles = (list == null)? null : new HashSet<>(list);
 
                 Set<CAHasRequestorEntry> requestors = ca_has_requestors.get(ca_name);
                 if(requestors == null)
                 {
-                    requestors = new HashSet<CAHasRequestorEntry>();
+                    requestors = new HashSet<>();
                     ca_has_requestors.put(ca_name, requestors);
                 }
 
@@ -1283,7 +1280,7 @@ public class CAManagerImpl implements CAManager
                 Set<String> certprofile_names = ca_has_profiles.get(ca_name);
                 if(certprofile_names == null)
                 {
-                    certprofile_names = new HashSet<String>();
+                    certprofile_names = new HashSet<>();
                     ca_has_profiles.put(ca_name, certprofile_names);
                 }
                 certprofile_names.add(certprofile_name);
@@ -1299,7 +1296,7 @@ public class CAManagerImpl implements CAManager
                 Set<String> publisher_names = ca_has_publishers.get(ca_name);
                 if(publisher_names == null)
                 {
-                    publisher_names = new HashSet<String>();
+                    publisher_names = new HashSet<>();
                     ca_has_publishers.put(ca_name, publisher_names);
                 }
                 publisher_names.add(publisher_name);
@@ -1679,7 +1676,7 @@ public class CAManagerImpl implements CAManager
         Set<String> profileNames = ca_has_profiles.get(caName);
         if(profileNames == null)
         {
-            profileNames = new HashSet<String>();
+            profileNames = new HashSet<>();
             ca_has_profiles.put(caName, profileNames);
         }
         else
@@ -1740,7 +1737,7 @@ public class CAManagerImpl implements CAManager
         Set<String> publisherNames = ca_has_publishers.get(caName);
         if(publisherNames == null)
         {
-            publisherNames = new HashSet<String>();
+            publisherNames = new HashSet<>();
             ca_has_publishers.put(caName, publisherNames);
         }
         else
@@ -1909,7 +1906,7 @@ public class CAManagerImpl implements CAManager
         Set<CAHasRequestorEntry> cmpRequestors = ca_has_requestors.get(caName);
         if(cmpRequestors == null)
         {
-            cmpRequestors = new HashSet<CAHasRequestorEntry>();
+            cmpRequestors = new HashSet<>();
             ca_has_requestors.put(caName, cmpRequestors);
         }
         else
@@ -2496,7 +2493,7 @@ public class CAManagerImpl implements CAManager
             return Collections.emptyList();
         }
 
-        List<PublisherEntry> ret = new ArrayList<PublisherEntry>(publisherNames.size());
+        List<PublisherEntry> ret = new ArrayList<>(publisherNames.size());
         for(String publisherName : publisherNames)
         {
             ret.add(publishers.get(publisherName));
@@ -2865,7 +2862,7 @@ public class CAManagerImpl implements CAManager
     static List<String> tokensAsList(String tokens, String seperator)
     {
         StringTokenizer st = new StringTokenizer(tokens, seperator);
-        List<String> ret = new ArrayList<String>(st.countTokens());
+        List<String> ret = new ArrayList<>(st.countTokens());
         while(st.hasMoreTokens())
         {
             ret.add(st.nextToken());
@@ -2898,7 +2895,7 @@ public class CAManagerImpl implements CAManager
         }
 
         List<String> l = tokensAsList(permissionsText, ", ");
-        Set<Permission> permissions = new HashSet<Permission>();
+        Set<Permission> permissions = new HashSet<>();
         for(String permissionText : l)
         {
             Permission p = Permission.getPermission(permissionText);

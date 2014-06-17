@@ -61,7 +61,7 @@ extends CertProfile implements SubjectDNSubset
 
     protected AbstractCertProfile()
     {
-        List<ASN1ObjectIdentifier> _forwardDNs = new ArrayList<ASN1ObjectIdentifier>(25);
+        List<ASN1ObjectIdentifier> _forwardDNs = new ArrayList<>(25);
 
         _forwardDNs.add(ObjectIdentifiers.DN_C);
         _forwardDNs.add(ObjectIdentifiers.DN_DC);
@@ -90,7 +90,7 @@ extends CertProfile implements SubjectDNSubset
 
         forwardDNs = Collections.unmodifiableList(_forwardDNs);
 
-        List<ASN1ObjectIdentifier> _backwardDNs = new ArrayList<ASN1ObjectIdentifier>(25);
+        List<ASN1ObjectIdentifier> _backwardDNs = new ArrayList<>(25);
         int size = _forwardDNs.size();
         for(int i = size - 1; i >= 0; i--)
         {
@@ -145,7 +145,7 @@ extends CertProfile implements SubjectDNSubset
 
         RDN[] requstedRDNs = requestedSubject.getRDNs();
         List<RDNOccurrence> occurences = getSubjectDNSubset();
-        List<RDN> rdns = new LinkedList<RDN>();
+        List<RDN> rdns = new LinkedList<>();
         List<ASN1ObjectIdentifier> types = backwardsSubject() ? backwardDNs : forwardDNs;
 
         for(ASN1ObjectIdentifier type : types)
@@ -213,7 +213,7 @@ extends CertProfile implements SubjectDNSubset
 
     private static RDN[] getRDNs(RDN[] rdns, ASN1ObjectIdentifier type)
     {
-        List<RDN> ret = new ArrayList<RDN>(1);
+        List<RDN> ret = new ArrayList<>(1);
         for(int i = 0; i < rdns.length; i++)
         {
             RDN rdn = rdns[i];
@@ -234,14 +234,12 @@ extends CertProfile implements SubjectDNSubset
     }
 
     @Override
-    public ExtensionTuples getExtensions(X500Name requestedSubject,
-            Extensions requestedExtensions)
+    public ExtensionTuples getExtensions(X500Name requestedSubject, Extensions requestedExtensions)
     throws CertProfileException, BadCertTemplateException
     {
         ExtensionTuples tuples = new ExtensionTuples();
 
-        Map<ASN1ObjectIdentifier, ExtensionOccurrence> occurences =
-                new HashMap<ASN1ObjectIdentifier, ExtensionOccurrence>(getAdditionalExtensionOccurences());
+        Map<ASN1ObjectIdentifier, ExtensionOccurrence> occurences = new HashMap<>(getAdditionalExtensionOccurences());
 
         // BasicConstraints
         ASN1ObjectIdentifier extensionType = Extension.basicConstraints;
@@ -428,6 +426,6 @@ extends CertProfile implements SubjectDNSubset
 
     protected static String oidToDisplayName(ASN1ObjectIdentifier type)
     {
-        return org.xipki.security.common.ObjectIdentifiers.oidToDisplayName(type);
+        return ObjectIdentifiers.oidToDisplayName(type);
     }
 }

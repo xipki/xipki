@@ -145,7 +145,7 @@ public class X509Util
             return null;
         }
 
-        List<AccessDescription> accessDescriptions = new ArrayList<AccessDescription>(ocspUris.size());
+        List<AccessDescription> accessDescriptions = new ArrayList<>(ocspUris.size());
         for(String uri : ocspUris)
         {
             GeneralName gn = new GeneralName(GeneralName.uniformResourceIdentifier, uri);
@@ -208,7 +208,7 @@ public class X509Util
             ASN1Sequence policyQualifiers = null;
             if(qualifiers != null)
             {
-                List<PolicyQualifierInfo> qualifierInfos = new ArrayList<PolicyQualifierInfo>(qualifiers.size());
+                List<PolicyQualifierInfo> qualifierInfos = new ArrayList<>(qualifiers.size());
                 for(CertificatePolicyQualifier qualifier : qualifiers)
                 {
                     PolicyQualifierInfo qualifierInfo ;

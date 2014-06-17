@@ -70,7 +70,7 @@ public class CaRequestorAddCommand extends CaCommand
         CAHasRequestorEntry entry = new CAHasRequestorEntry(requestorName);
         entry.setRa(ra);
         entry.setProfiles(profiles);
-        Set<Permission> _permissions = new HashSet<Permission>();
+        Set<Permission> _permissions = new HashSet<>();
         for(String permission : permissions)
         {
             Permission _permission = Permission.getPermission(permission);

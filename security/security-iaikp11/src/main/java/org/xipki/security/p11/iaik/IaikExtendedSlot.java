@@ -63,12 +63,10 @@ public class IaikExtendedSlot
 
     private long timeOutWaitNewSession = 10000; // maximal wait for 10 second
     private AtomicLong countSessions = new AtomicLong(0);
-    private BlockingQueue<Session> idleSessions = new LinkedBlockingDeque<Session>();
+    private BlockingQueue<Session> idleSessions = new LinkedBlockingDeque<>();
 
-    private ConcurrentHashMap<String, PrivateKey> signingKeysById =
-            new ConcurrentHashMap<String, PrivateKey>();
-    private ConcurrentHashMap<String, PrivateKey> signingKeysByLabel =
-            new ConcurrentHashMap<String, PrivateKey>();
+    private ConcurrentHashMap<String, PrivateKey> signingKeysById = new ConcurrentHashMap<>();
+    private ConcurrentHashMap<String, PrivateKey> signingKeysByLabel = new ConcurrentHashMap<>();
 
     private boolean writableSessionInUse = false;
     private Session writableSession;
@@ -571,7 +569,7 @@ public class IaikExtendedSlot
             int n = tmpObjects.size();
             LOG.info("found {} private keys", n);
 
-            List<PrivateKey> privateKeys = new ArrayList<PrivateKey>(n);
+            List<PrivateKey> privateKeys = new ArrayList<>(n);
             for(iaik.pkcs.pkcs11.objects.Object tmpObject : tmpObjects)
             {
                 PrivateKey privateKey = (PrivateKey) tmpObject;
@@ -603,7 +601,7 @@ public class IaikExtendedSlot
             List<iaik.pkcs.pkcs11.objects.Object> tmpObjects = getObjects(session, template);
             int n = tmpObjects.size();
 
-            List<X509PublicKeyCertificate> certs = new ArrayList<X509PublicKeyCertificate>(n);
+            List<X509PublicKeyCertificate> certs = new ArrayList<>(n);
             for(iaik.pkcs.pkcs11.objects.Object tmpObject : tmpObjects)
             {
                 X509PublicKeyCertificate cert = (X509PublicKeyCertificate) tmpObject;
@@ -830,7 +828,7 @@ public class IaikExtendedSlot
             iaik.pkcs.pkcs11.objects.Object template)
     throws SignerException
     {
-        List<iaik.pkcs.pkcs11.objects.Object> objList = new LinkedList<iaik.pkcs.pkcs11.objects.Object>();
+        List<iaik.pkcs.pkcs11.objects.Object> objList = new LinkedList<>();
 
         try
         {

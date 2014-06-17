@@ -39,14 +39,13 @@ public class CertProfile_CMP extends AbstractEECertProfile
     public CertProfile_CMP()
     {
         // KeyUsages
-        Set<KeyUsage> _keyUsages = new HashSet<KeyUsage>();
+        Set<KeyUsage> _keyUsages = new HashSet<>();
         _keyUsages.add(KeyUsage.digitalSignature);
         _keyUsages.add(KeyUsage.keyEncipherment);
         keyUsages = Collections.unmodifiableSet(_keyUsages);
 
         // Extensions
-        Map<ASN1ObjectIdentifier, ExtensionOccurrence> _extensionOccurences =
-                new HashMap<ASN1ObjectIdentifier, ExtensionOccurrence>();
+        Map<ASN1ObjectIdentifier, ExtensionOccurrence> _extensionOccurences = new HashMap<>();
         _extensionOccurences.put(Extension.keyUsage, ExtensionOccurrence.CRITICAL_REQUIRED);
         _extensionOccurences.put(Extension.basicConstraints, ExtensionOccurrence.CRITICAL_REQUIRED);
         extensionOccurences = Collections.unmodifiableMap(_extensionOccurences);

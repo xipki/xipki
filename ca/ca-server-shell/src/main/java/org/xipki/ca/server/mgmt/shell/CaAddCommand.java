@@ -189,7 +189,7 @@ public class CaAddCommand extends CaCommand
         }
         entry.setMaxValidity(maxValidity);
 
-        Set<Permission> _permissions = new HashSet<Permission>();
+        Set<Permission> _permissions = new HashSet<>();
         for(String permission : permissions)
         {
             Permission _permission = Permission.getPermission(permission);

@@ -118,10 +118,7 @@ public class X509CA
 {
     private static final long MINUTE = 60L * 1000;
     private static long DAY = 24L * 60 * 60 * 1000;
-/*    public static final int CERT_REVOKED = 1;
-    public static final int CERT_NOT_EXISTS = 2;
-    public static final int CERT_REVOCATION_EXCEPTION = 3;
-*/
+
     private static Logger LOG = LoggerFactory.getLogger(X509CA.class);
 
     private final CertificateFactory cf;
@@ -140,7 +137,7 @@ public class X509CA
     private final Object crlLock = new Object();
     private Boolean tryXipkiNSStoVerify;
 
-    private final ConcurrentSkipListSet<String> pendingSubjectSha1Fps = new ConcurrentSkipListSet<String>();
+    private final ConcurrentSkipListSet<String> pendingSubjectSha1Fps = new ConcurrentSkipListSet<>();
     private final AtomicInteger numActiveRevocations = new AtomicInteger(0);
 
     public X509CA(
@@ -413,7 +410,7 @@ public class X509CA
                         }
                         else
                         {
-                            List<Extension> extensions = new ArrayList<Extension>(3);
+                            List<Extension> extensions = new ArrayList<>(3);
                             if(reason != CRLReason.UNSPECIFIED)
                             {
                                 Extension ext = createReasonExtension(reason.getCode());
@@ -1115,7 +1112,7 @@ public class X509CA
     {
         List<PublisherEntry> dbEntries = caManager.getPublishersForCA(caInfo.getName());
 
-        List<IdentifiedCertPublisher> publishers = new ArrayList<IdentifiedCertPublisher>(dbEntries.size());
+        List<IdentifiedCertPublisher> publishers = new ArrayList<>(dbEntries.size());
         for(PublisherEntry dbEntry : dbEntries)
         {
             IdentifiedCertPublisher publisher = null;
@@ -1720,7 +1717,7 @@ public class X509CA
         }
         else
         {
-            List<RDN> newRdns = new ArrayList<RDN>(rdns.length + 1);
+            List<RDN> newRdns = new ArrayList<>(rdns.length + 1);
 
             if(commonNameIndex == -1)
             {

@@ -134,7 +134,7 @@ class CaCertStoreDbExporter extends DbPorter
             String sql = "SELECT ID, CAINFO_ID FROM CRL";
             ResultSet rs = stmt.executeQuery(sql);
 
-            Map<Integer, List<Integer>> idMap = new HashMap<Integer, List<Integer>>();
+            Map<Integer, List<Integer>> idMap = new HashMap<>();
 
             while(rs.next())
             {
@@ -143,7 +143,7 @@ class CaCertStoreDbExporter extends DbPorter
                 List<Integer> ids = idMap.get(cainfo_id);
                 if(ids == null)
                 {
-                    ids = new LinkedList<Integer>();
+                    ids = new LinkedList<>();
                     idMap.put(cainfo_id, ids);
                 }
                 ids.add(id);

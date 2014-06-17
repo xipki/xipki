@@ -228,7 +228,7 @@ public abstract class CmpRequestor
         }
         hBuilder.setTransactionID(tid);
 
-        List<InfoTypeAndValue> itvs = new ArrayList<InfoTypeAndValue>(2);
+        List<InfoTypeAndValue> itvs = new ArrayList<>(2);
         if(addImplictConfirm)
         {
             itvs.add(CmpUtil.getImplictConfirmGeneralInfo());

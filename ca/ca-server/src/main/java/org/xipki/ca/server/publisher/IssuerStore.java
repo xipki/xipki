@@ -29,7 +29,7 @@ class IssuerStore
 
     IssuerStore( List<IssuerEntry> entries)
     {
-        this.entries = new ArrayList<IssuerEntry>(entries.size());
+        this.entries = new ArrayList<>(entries.size());
 
         for(IssuerEntry entry : entries)
         {

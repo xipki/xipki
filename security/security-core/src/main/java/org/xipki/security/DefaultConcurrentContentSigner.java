@@ -45,8 +45,8 @@ public class DefaultConcurrentContentSigner implements ConcurrentContentSigner
     private static int defaultSignServiceTimeout = 10000; // 10 seconds
 
     private final AlgorithmIdentifier algorithmIdentifier;
-    private final BlockingDeque<ContentSigner> idleSigners = new LinkedBlockingDeque<ContentSigner>();
-    private final BlockingDeque<ContentSigner> busySigners = new LinkedBlockingDeque<ContentSigner>();
+    private final BlockingDeque<ContentSigner> idleSigners = new LinkedBlockingDeque<>();
+    private final BlockingDeque<ContentSigner> busySigners = new LinkedBlockingDeque<>();
     private final PrivateKey privateKey;
 
     private X509Certificate[] certificateChain;

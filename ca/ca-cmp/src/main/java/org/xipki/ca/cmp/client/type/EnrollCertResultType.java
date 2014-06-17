@@ -36,7 +36,7 @@ public class EnrollCertResultType implements CmpResultType
     {
         if(cACertificates == null)
         {
-            cACertificates = new ArrayList<CMPCertificate>(1);
+            cACertificates = new ArrayList<>(1);
         }
         cACertificates.add(cACertificate);
     }
@@ -53,7 +53,7 @@ public class EnrollCertResultType implements CmpResultType
 
         if(resultEntries == null)
         {
-            resultEntries = new ArrayList<ResultEntryType>(1);
+            resultEntries = new ArrayList<>(1);
         }
 
         resultEntries.add(resultEntry);

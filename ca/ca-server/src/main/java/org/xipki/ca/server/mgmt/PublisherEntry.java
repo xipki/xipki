@@ -30,8 +30,7 @@ import org.xipki.security.common.ParamChecker;
 
 public class PublisherEntry
 {
-    private static final Map<String, IdentifiedCertPublisher> publisherPool
-        = new HashMap<String, IdentifiedCertPublisher>();
+    private static final Map<String, IdentifiedCertPublisher> publisherPool = new HashMap<>();
 
     private final String name;
     private String type;

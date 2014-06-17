@@ -208,7 +208,7 @@ class IaikP11Identity implements Comparable<IaikP11Identity>
     {
         int byteLenKey = (bitCount + 7)/8;
 
-        if (bitCount >= (bytes.length<<3))
+        if (bitCount >= (bytes.length << 3))
         {
             return bytes;
         }
@@ -226,7 +226,7 @@ class IaikP11Identity implements Comparable<IaikP11Identity>
                                 (byte2int(truncatedBytes[i]) >>> shiftBits) |
                                 ((byte2int(truncatedBytes[i-1]) << (8-shiftBits)) & 0xFF));
             }
-            truncatedBytes[0] = (byte)(byte2int(truncatedBytes[0])>>>shiftBits);
+            truncatedBytes[0] = (byte)(byte2int(truncatedBytes[0]) >>> shiftBits);
         }
 
         return truncatedBytes;
@@ -234,7 +234,7 @@ class IaikP11Identity implements Comparable<IaikP11Identity>
 
     private static int byte2int(byte b)
     {
-            return b >= 0 ? b : 256 + b;
+        return b >= 0 ? b : 256 + b;
     }
 
     @Override
