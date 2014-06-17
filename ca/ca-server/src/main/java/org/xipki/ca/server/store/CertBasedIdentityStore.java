@@ -31,7 +31,7 @@ class CertBasedIdentityStore
     CertBasedIdentityStore(String table, List<CertBasedIdentityEntry> entries)
     {
         this.table = table;
-        this.entries = new ArrayList<CertBasedIdentityEntry>(entries.size());
+        this.entries = new ArrayList<>(entries.size());
 
         for(CertBasedIdentityEntry entry : entries)
         {

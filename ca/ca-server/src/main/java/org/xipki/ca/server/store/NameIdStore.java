@@ -31,7 +31,7 @@ class NameIdStore
     NameIdStore(String table, Map<String, Integer> entries)
     {
         this.table = table;
-        this.entries = new HashMap<String, Integer>();
+        this.entries = new HashMap<>();
 
         for(String name : entries.keySet())
         {

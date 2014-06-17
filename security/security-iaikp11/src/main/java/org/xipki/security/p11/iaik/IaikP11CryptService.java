@@ -54,7 +54,7 @@ public final class IaikP11CryptService implements P11CryptService
     private static final Logger LOG = LoggerFactory.getLogger(IaikP11CryptService.class);
     private static final long MIN_RECONNECT_INTERVAL = 60L * 1000;
 
-    private final ConcurrentSkipListSet<IaikP11Identity> identities = new ConcurrentSkipListSet<IaikP11Identity>();
+    private final ConcurrentSkipListSet<IaikP11Identity> identities = new ConcurrentSkipListSet<>();
 
     private IaikExtendedModule extModule;
 
@@ -64,8 +64,7 @@ public final class IaikP11CryptService implements P11CryptService
     private Set<Integer> includeSlotIndexes;
     private Set<Integer> excludeSlotIndexes;
 
-    private static final Map<String, IaikP11CryptService> instances =
-            new HashMap<String, IaikP11CryptService>();
+    private static final Map<String, IaikP11CryptService> instances = new HashMap<>();
 
     public synchronized static IaikP11CryptService getInstance(String pkcs11Module, char[] password)
     throws SignerException
@@ -99,9 +98,9 @@ public final class IaikP11CryptService implements P11CryptService
         this.pkcs11ModuleOmitSensitiveInfo = IaikP11Util.eraseSensitiveInfo(pkcs11Module);
         this.password = (password == null) ? "dummy".toCharArray() : password;
         this.includeSlotIndexes = includeSlotIndexes == null ?
-                null : new HashSet<Integer>(includeSlotIndexes);
+                null : new HashSet<>(includeSlotIndexes);
         this.excludeSlotIndexes = excludeSlotIndexes == null ?
-                null : new HashSet<Integer>(excludeSlotIndexes);
+                null : new HashSet<>(excludeSlotIndexes);
         refresh();
     }
 
@@ -140,9 +139,9 @@ public final class IaikP11CryptService implements P11CryptService
             throw e;
         }
 
-        Map<String, Set<X509Certificate>> allCerts = new HashMap<String, Set<X509Certificate>>();
+        Map<String, Set<X509Certificate>> allCerts = new HashMap<>();
 
-        Set<IaikP11Identity> currentIdentifies = new HashSet<IaikP11Identity>();
+        Set<IaikP11Identity> currentIdentifies = new HashSet<>();
 
         Set<PKCS11SlotIdentifier> slotIds = extModule.getAllSlotIds();
         for(PKCS11SlotIdentifier slotId : slotIds)
@@ -225,7 +224,7 @@ public final class IaikP11CryptService implements P11CryptService
                         signaturePublicKey = generatePublicKey(publicKeyObject);
                     }
 
-                    List<X509Certificate> certChain = new LinkedList<X509Certificate>();
+                    List<X509Certificate> certChain = new LinkedList<>();
 
                     if(signatureCert != null)
                     {
@@ -571,7 +570,7 @@ public final class IaikP11CryptService implements P11CryptService
     public PKCS11SlotIdentifier[] getSlotIdentifiers()
     throws SignerException
     {
-        List<PKCS11SlotIdentifier> slotIds = new LinkedList<PKCS11SlotIdentifier>();
+        List<PKCS11SlotIdentifier> slotIds = new LinkedList<>();
         for(IaikP11Identity identity : identities)
         {
             PKCS11SlotIdentifier slotId = identity.getSlotId();
@@ -588,7 +587,7 @@ public final class IaikP11CryptService implements P11CryptService
     public String[] getKeyLabels(PKCS11SlotIdentifier slotId)
     throws SignerException
     {
-        List<String> keyLabels = new LinkedList<String>();
+        List<String> keyLabels = new LinkedList<>();
         for(IaikP11Identity identity : identities)
         {
             if(slotId.equals(identity.getSlotId()))

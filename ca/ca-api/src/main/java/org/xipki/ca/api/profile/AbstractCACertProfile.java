@@ -27,7 +27,7 @@ public abstract class AbstractCACertProfile extends AbstractCertProfile
 
     public AbstractCACertProfile()
     {
-        Set<KeyUsage> keyUsages = new HashSet<KeyUsage>();
+        Set<KeyUsage> keyUsages = new HashSet<>();
         keyUsages.add(KeyUsage.keyCertSign);
         keyUsages.add(KeyUsage.cRLSign);
         this.keyUsages = Collections.unmodifiableSet(keyUsages);

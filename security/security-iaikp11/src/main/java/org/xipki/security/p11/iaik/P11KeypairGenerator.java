@@ -405,7 +405,7 @@ public class P11KeypairGenerator
         tbsGen.setSubject(x500Name_subject);
         tbsGen.setSubjectPublicKeyInfo(privateKeyAndPkInfo.getPublicKeyInfo());
 
-        List<Extension> extensions = new ArrayList<Extension>(2);
+        List<Extension> extensions = new ArrayList<>(2);
         if(keyUsage == null)
         {
             keyUsage = KeyUsage.keyCertSign | KeyUsage.cRLSign |

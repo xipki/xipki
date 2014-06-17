@@ -38,7 +38,7 @@ public class CaRestartCommand extends CaCommand
         }
 
         StringBuilder sb = new StringBuilder("Restarted CA system");
-        Set<String> names = new HashSet<String>(caManager.getCANames());
+        Set<String> names = new HashSet<>(caManager.getCANames());
 
         if(names.size() > 0)
         {

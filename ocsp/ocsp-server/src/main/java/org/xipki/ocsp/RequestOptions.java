@@ -27,7 +27,7 @@ import org.xipki.security.common.HashAlgoType;
 
 class RequestOptions
 {
-    static final Set<HashAlgoType> supportedHashAlgorithms = new HashSet<HashAlgoType>();
+    static final Set<HashAlgoType> supportedHashAlgorithms = new HashSet<>();
 
     static
     {
@@ -79,7 +79,7 @@ class RequestOptions
         this.nonceMaxLen = maxLen;
 
         // Request hash algorithms
-        hashAlgos = new HashSet<HashAlgoType>();
+        hashAlgos = new HashSet<>();
 
         HashAlgorithms reqHashAlgosConf = conf.getHashAlgorithms();
         if(reqHashAlgosConf != null)

@@ -117,11 +117,11 @@ public class CAEntry
         this.signerConf = signerConf;
 
         this.ocspUris = (ocspUris == null) ?
-                null : Collections.unmodifiableList(new ArrayList<String>(ocspUris));
+                null : Collections.unmodifiableList(new ArrayList<>(ocspUris));
         this.crlUris = (crlUris == null) ?
-                null : Collections.unmodifiableList(new ArrayList<String>(crlUris));
+                null : Collections.unmodifiableList(new ArrayList<>(crlUris));
         this.issuerLocations = (issuerLocations == null) ?
-                null : Collections.unmodifiableList(new ArrayList<String>(issuerLocations));
+                null : Collections.unmodifiableList(new ArrayList<>(issuerLocations));
 
         this.publicCAInfo = new PublicCAInfo(this.cert.getCert(),
                 this.ocspUris, this.crlUris, this.issuerLocations);

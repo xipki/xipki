@@ -99,8 +99,7 @@ public class CrlCertStatusStore extends CertStatusStore
         }
     }
 
-    private final Map<BigInteger, CrlCertStatusInfo> certStatusInfoMap
-        = new ConcurrentHashMap<BigInteger, CrlCertStatusInfo>();
+    private final Map<BigInteger, CrlCertStatusInfo> certStatusInfoMap = new ConcurrentHashMap<>();
 
     private final X509Certificate caCert;
     private final X509Certificate issuerCert;
@@ -120,8 +119,7 @@ public class CrlCertStatusStore extends CertStatusStore
 
     private Date thisUpdate;
     private Date nextUpdate;
-    private final Map<HashAlgoType, IssuerHashNameAndKey> issuerHashMap =
-            new ConcurrentHashMap<HashAlgoType, IssuerHashNameAndKey>();
+    private final Map<HashAlgoType, IssuerHashNameAndKey> issuerHashMap = new ConcurrentHashMap<>();
 
     private ScheduledThreadPoolExecutor scheduledThreadPoolExecutor;
 
@@ -299,8 +297,7 @@ public class CrlCertStatusStore extends CertStatusStore
 
             byte[] encodedKey = bcCaCert.getSubjectPublicKeyInfo().getPublicKeyData().getBytes();
 
-            Map<HashAlgoType, IssuerHashNameAndKey> newIssuerHashMap =
-                    new ConcurrentHashMap<HashAlgoType, IssuerHashNameAndKey>();
+            Map<HashAlgoType, IssuerHashNameAndKey> newIssuerHashMap = new ConcurrentHashMap<>();
 
             for(HashAlgoType hashAlgo : HashAlgoType.values())
             {
@@ -314,7 +311,7 @@ public class CrlCertStatusStore extends CertStatusStore
 
             // extract the certificate
             boolean certsIncluded = false;
-            Set<CertWithInfo> certs = new HashSet<CertWithInfo>();
+            Set<CertWithInfo> certs = new HashSet<>();
             String oidExtnCerts = CustomObjectIdentifiers.id_crl_certset;
             byte[] extnValue = crl.getExtensionValue(oidExtnCerts);
             if(extnValue != null)
@@ -352,8 +349,7 @@ public class CrlCertStatusStore extends CertStatusStore
                 }
             }
 
-            Map<BigInteger, CrlCertStatusInfo> newCertStatusInfoMap
-                = new ConcurrentHashMap<BigInteger, CrlCertStatusInfo>();
+            Map<BigInteger, CrlCertStatusInfo> newCertStatusInfoMap = new ConcurrentHashMap<>();
 
             Set<? extends X509CRLEntry> revokedCertList = crl.getRevokedCertificates();
             if(revokedCertList != null)
@@ -524,7 +520,7 @@ public class CrlCertStatusStore extends CertStatusStore
             throw new CertStatusStoreException(e);
         }
 
-        Map<HashAlgoType, byte[]> certHashes = new ConcurrentHashMap<HashAlgoType, byte[]>();
+        Map<HashAlgoType, byte[]> certHashes = new ConcurrentHashMap<>();
         for(HashAlgoType hashAlgo : HashAlgoType.values())
         {
             byte[] certHash = HashCalculator.hash(hashAlgo, encodedCert);

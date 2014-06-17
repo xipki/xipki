@@ -17,6 +17,8 @@
 
 package org.xipki.ca.common;
 
+import org.xipki.security.common.IoCertUtil;
+
 public class PKIErrorException extends Exception
 {
     private static final long serialVersionUID = 1L;
@@ -27,7 +29,7 @@ public class PKIErrorException extends Exception
 
     public PKIErrorException(int status, int pkiFailureInfo, String statusMessage)
     {
-        super(PKIStatusInfo.formatPKIStatusInfo(status, pkiFailureInfo, statusMessage));
+        super(IoCertUtil.formatPKIStatusInfo(status, pkiFailureInfo, statusMessage));
         this.status = status;
         this.pkiFailureInfo = pkiFailureInfo;
         this.statusMessage = statusMessage;

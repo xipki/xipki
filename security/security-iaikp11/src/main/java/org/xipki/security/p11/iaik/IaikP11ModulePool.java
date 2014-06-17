@@ -34,7 +34,7 @@ public class IaikP11ModulePool
 {
     private static final Logger LOG = LoggerFactory.getLogger(IaikP11ModulePool.class);
 
-    private final Map<String, IaikExtendedModule> modules = new HashMap<String, IaikExtendedModule>();
+    private final Map<String, IaikExtendedModule> modules = new HashMap<>();
 
     private static IaikP11ModulePool INSTANCE = new IaikP11ModulePool();
 

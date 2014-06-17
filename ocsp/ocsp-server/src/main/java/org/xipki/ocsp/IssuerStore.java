@@ -32,8 +32,8 @@ public class IssuerStore
 
     public IssuerStore(List<IssuerEntry> entries)
     {
-        this.entries = new ArrayList<IssuerEntry>(entries.size());
-        Set<Integer> ids = new HashSet<Integer>(entries.size());
+        this.entries = new ArrayList<>(entries.size());
+        Set<Integer> ids = new HashSet<>(entries.size());
 
         for(IssuerEntry entry : entries)
         {

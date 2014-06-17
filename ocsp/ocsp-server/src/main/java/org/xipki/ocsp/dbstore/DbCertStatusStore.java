@@ -147,7 +147,7 @@ public class DbCertStatusStore extends CertStatusStore
 
                 try
                 {
-                    Map<Integer, SimpleIssuerEntry> newIssuers = new HashMap<Integer, SimpleIssuerEntry>();
+                    Map<Integer, SimpleIssuerEntry> newIssuers = new HashMap<>();
 
                     rs = ps.executeQuery();
                     while(rs.next())
@@ -221,7 +221,7 @@ public class DbCertStatusStore extends CertStatusStore
             try
             {
                 rs = ps.executeQuery();
-                List<IssuerEntry> caInfos = new LinkedList<IssuerEntry>();
+                List<IssuerEntry> caInfos = new LinkedList<>();
                 while(rs.next())
                 {
                     String sha1Fp = rs.getString("SHA1_FP_CERT");
@@ -233,7 +233,7 @@ public class DbCertStatusStore extends CertStatusStore
                     int id = rs.getInt("ID");
                     long notBeforeInSecond = rs.getLong("NOTBEFORE");
 
-                    Map<HashAlgoType, IssuerHashNameAndKey> hashes = new HashMap<HashAlgoType, IssuerHashNameAndKey>();
+                    Map<HashAlgoType, IssuerHashNameAndKey> hashes = new HashMap<>();
                     for(HashAlgoType hashAlgoType : hashAlgoTypes)
                     {
                         String hashAlgo = hashAlgoType.name().toUpperCase();

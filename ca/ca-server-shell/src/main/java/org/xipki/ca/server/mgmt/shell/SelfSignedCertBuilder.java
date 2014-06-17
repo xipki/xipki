@@ -393,7 +393,7 @@ class SelfSignedCertBuilder
 
     private static Map<String, String> keyValues(String conf, String seperator)
     {
-        Map<String, String> ret = new HashMap<String, String>();
+        Map<String, String> ret = new HashMap<>();
         StringTokenizer tokens = new StringTokenizer(conf, seperator);
 
         while(tokens.hasMoreTokens())

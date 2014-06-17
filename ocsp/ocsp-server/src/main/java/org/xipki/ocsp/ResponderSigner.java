@@ -57,7 +57,7 @@ class ResponderSigner
 
         this.certificateHolder = new X509CertificateHolder(this.certificate.getEncoded());
         this.responderId = this.certificateHolder.getSubject();
-        algoSignerMap = new HashMap<String, ConcurrentContentSigner>();
+        algoSignerMap = new HashMap<>();
         for(ConcurrentContentSigner signer : signers)
         {
             String algoName = getSignatureAlgorithmName(signer.getAlgorithmIdentifier());

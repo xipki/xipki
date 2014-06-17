@@ -66,7 +66,7 @@ public abstract class AbstractRAWorker
     protected EnrollCertResult parseEnrollCertResult(EnrollCertResultType result, String caName)
     throws RAWorkerException
     {
-        Map<String, CertificateOrError> certOrErrors = new HashMap<String, CertificateOrError>();
+        Map<String, CertificateOrError> certOrErrors = new HashMap<>();
         for(ResultEntryType resultEntry : result.getResultEntries())
         {
             CertificateOrError certOrError;
@@ -102,7 +102,7 @@ public abstract class AbstractRAWorker
 
         if(cmpCaPubs != null && cmpCaPubs.isEmpty() == false)
         {
-            List<Certificate> caPubs = new ArrayList<Certificate>(cmpCaPubs.size());
+            List<Certificate> caPubs = new ArrayList<>(cmpCaPubs.size());
             for(CMPCertificate cmpCaPub : cmpCaPubs)
             {
                 try

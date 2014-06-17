@@ -62,7 +62,7 @@ class PendingCertificatePool
         }
     }
 
-    private final Map<String, Set<MyEntry>> map = new ConcurrentHashMap<String, Set<MyEntry>>();
+    private final Map<String, Set<MyEntry>> map = new ConcurrentHashMap<>();
 
     PendingCertificatePool()
     {
@@ -80,7 +80,7 @@ class PendingCertificatePool
         Set<MyEntry> entries = map.get(hexTid);
         if(entries == null)
         {
-            entries = new HashSet<PendingCertificatePool.MyEntry>();
+            entries = new HashSet<>();
             map.put(hexTid, entries);
         }
 
@@ -129,7 +129,7 @@ class PendingCertificatePool
             return null;
         }
 
-        Set<CertificateInfo> ret = new HashSet<CertificateInfo>();
+        Set<CertificateInfo> ret = new HashSet<>();
         for(MyEntry myEntry :entries)
         {
             ret.add(myEntry.certInfo);
@@ -146,7 +146,7 @@ class PendingCertificatePool
 
         long now = System.currentTimeMillis();
 
-        Set<CertificateInfo> ret = new HashSet<CertificateInfo>();
+        Set<CertificateInfo> ret = new HashSet<>();
 
         for(String tid : map.keySet())
         {

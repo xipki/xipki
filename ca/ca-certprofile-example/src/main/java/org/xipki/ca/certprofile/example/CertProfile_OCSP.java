@@ -40,18 +40,17 @@ public class CertProfile_OCSP extends AbstractEECertProfile
     public CertProfile_OCSP()
     {
         // KeyUsages
-        Set<KeyUsage> _keyUsages = new HashSet<KeyUsage>();
+        Set<KeyUsage> _keyUsages = new HashSet<>();
         _keyUsages.add(KeyUsage.contentCommitment);
         keyUsages = Collections.unmodifiableSet(_keyUsages);
 
         // extended KeyUsages
-        Set<ASN1ObjectIdentifier> _extendedKeyUsages = new HashSet<ASN1ObjectIdentifier>();
+        Set<ASN1ObjectIdentifier> _extendedKeyUsages = new HashSet<>();
         _extendedKeyUsages.add(ObjectIdentifiers.id_kp_ocsp);
         extendedKeyUsages = Collections.unmodifiableSet(_extendedKeyUsages);
 
         // Extensions
-        Map<ASN1ObjectIdentifier, ExtensionOccurrence> _extensionOccurences =
-                new HashMap<ASN1ObjectIdentifier, ExtensionOccurrence>();
+        Map<ASN1ObjectIdentifier, ExtensionOccurrence> _extensionOccurences = new HashMap<>();
         _extensionOccurences.put(Extension.keyUsage, ExtensionOccurrence.CRITICAL_REQUIRED);
         _extensionOccurences.put(Extension.basicConstraints, ExtensionOccurrence.CRITICAL_REQUIRED);
         _extensionOccurences.put(Extension.extendedKeyUsage, ExtensionOccurrence.NONCRITICAL_REQUIRED);

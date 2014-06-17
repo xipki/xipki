@@ -619,7 +619,7 @@ public class SecurityFactoryImpl implements SecurityFactory
             return null;
         }
 
-        Set<Integer> slotIndexes = new HashSet<Integer>();
+        Set<Integer> slotIndexes = new HashSet<>();
         while(st.hasMoreTokens())
         {
             slotIndexes.add(Integer.parseInt(st.nextToken()));

@@ -141,7 +141,7 @@ public class PBETool
 
     private static Map<String, String> parseParameters(String[] params, int startIndex)
     {
-        Map<String, String> ret = new HashMap<String, String>();
+        Map<String, String> ret = new HashMap<>();
 
         for (int i = startIndex; i < params.length;i++)
         {

@@ -33,7 +33,7 @@ public class RemoteP11CryptServiceFactory implements P11CryptServiceFactory
 {
     private static final Logger LOG = LoggerFactory.getLogger(RemoteP11CryptServiceFactory.class);
 
-    private final Map<String, RemoteP11CryptService> services = new HashMap<String, RemoteP11CryptService>();
+    private final Map<String, RemoteP11CryptService> services = new HashMap<>();
 
     @Override
     public P11CryptService createP11CryptService(String pkcs11Module, char[] password)

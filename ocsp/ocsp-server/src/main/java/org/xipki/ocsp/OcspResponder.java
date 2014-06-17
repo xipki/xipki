@@ -117,7 +117,7 @@ public class OcspResponder
     private ResponderSigner responderSigner;
     private X509CertificateHolder[] certsInResp;
 
-    private List<CertStatusStore> certStatusStores = new ArrayList<CertStatusStore>();
+    private List<CertStatusStore> certStatusStores = new ArrayList<>();
 
     private DataSourceFactory dataSourceFactory;
     private SecurityFactory securityFactory;
@@ -130,7 +130,7 @@ public class OcspResponder
     private RequestOptions requestOptions;
     private boolean auditResponse = false;
     private boolean supportsHttpGet = false;
-    private Map<String, String> auditCertprofileMapping = new ConcurrentHashMap<String, String>();
+    private Map<String, String> auditCertprofileMapping = new ConcurrentHashMap<>();
 
     private AuditLoggingService auditLoggingService;
 

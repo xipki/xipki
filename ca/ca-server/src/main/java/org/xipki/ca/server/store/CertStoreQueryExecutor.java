@@ -80,7 +80,7 @@ class CertStoreQueryExecutor
     private final NameIdStore requestorInfoStore;
     private final NameIdStore certprofileStore;
 
-    private final LruCache<String, Integer> usernameIdCache = new LruCache<String, Integer>(100);
+    private final LruCache<String, Integer> usernameIdCache = new LruCache<>(100);
 
     CertStoreQueryExecutor(DataSource dataSource)
     throws SQLException
@@ -128,7 +128,7 @@ class CertStoreQueryExecutor
         try
         {
             rs = ps.executeQuery();
-            List<CertBasedIdentityEntry> caInfos = new LinkedList<CertBasedIdentityEntry>();
+            List<CertBasedIdentityEntry> caInfos = new LinkedList<>();
             while(rs.next())
             {
                 int id = rs.getInt("ID");
@@ -157,7 +157,7 @@ class CertStoreQueryExecutor
         try
         {
             rs = ps.executeQuery();
-            Map<String, Integer> entries = new HashMap<String, Integer>();
+            Map<String, Integer> entries = new HashMap<>();
 
             while(rs.next())
             {
@@ -643,7 +643,7 @@ class CertStoreQueryExecutor
             }
             rs = ps.executeQuery();
 
-            List<BigInteger> ret = new ArrayList<BigInteger>();
+            List<BigInteger> ret = new ArrayList<>();
             while(rs.next() && ret.size() < numEntries)
             {
                 long serial = rs.getLong("SERIAL");
@@ -719,7 +719,7 @@ class CertStoreQueryExecutor
         String sql = "SELECT CRL_NUMBER FROM CRL WHERE CAINFO_ID=?";
         PreparedStatement ps = borrowPreparedStatement(sql);
 
-        List<Integer> crlNumbers = new LinkedList<Integer>();
+        List<Integer> crlNumbers = new LinkedList<>();
 
         ResultSet rs = null;
         try
@@ -1093,7 +1093,7 @@ class CertStoreQueryExecutor
             ps.setLong(idx++, notExpiredAt.getTime()/1000 + 1);
             rs = ps.executeQuery();
 
-            List<CertRevocationInfoWithSerial> ret = new ArrayList<CertRevocationInfoWithSerial>();
+            List<CertRevocationInfoWithSerial> ret = new ArrayList<>();
             while(rs.next() && ret.size() < numEntries)
             {
                 long serial = rs.getLong("SERIAL");
@@ -1225,7 +1225,7 @@ class CertStoreQueryExecutor
             ps.setInt(idx++, caId);
 
             rs = ps.executeQuery();
-            List<Integer> ids = new ArrayList<Integer>(1);
+            List<Integer> ids = new ArrayList<>(1);
             while(rs.next())
             {
                 ids.add(rs.getInt("ID"));

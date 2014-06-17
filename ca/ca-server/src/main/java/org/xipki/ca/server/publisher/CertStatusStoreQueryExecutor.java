@@ -85,7 +85,7 @@ class CertStatusStoreQueryExecutor
         try
         {
             rs = ps.executeQuery();
-            List<IssuerEntry> caInfos = new LinkedList<IssuerEntry>();
+            List<IssuerEntry> caInfos = new LinkedList<>();
             while(rs.next())
             {
                 int id = rs.getInt("ID");

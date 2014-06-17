@@ -84,10 +84,9 @@ public class KeyUtil
     private static final DefaultDigestAlgorithmIdentifierFinder dfltDigesAlgIdentifierFinder =
             new DefaultDigestAlgorithmIdentifierFinder();
 
-    private static final Map<String, BcContentVerifierProviderBuilder> verifierProviderBuilders =
-            new HashMap<String, BcContentVerifierProviderBuilder>();
+    private static final Map<String, BcContentVerifierProviderBuilder> verifierProviderBuilders = new HashMap<>();
 
-    private static final Map<String, KeyFactory> keyFactories = new HashMap<String, KeyFactory>();
+    private static final Map<String, KeyFactory> keyFactories = new HashMap<>();
 
     public static ContentVerifierProvider getContentVerifierProvider(
             X509Certificate verifierCert)

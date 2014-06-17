@@ -110,7 +110,7 @@ public class XiPKIKeyStoreSpi extends KeyStoreSpi
         }
     }
 
-    private Map<String, KeyCertEntry> keyCerts = new HashMap<String, KeyCertEntry>();
+    private Map<String, KeyCertEntry> keyCerts = new HashMap<>();
 
     @Override
     public void engineLoad(InputStream stream, char[] password)
@@ -170,10 +170,10 @@ public class XiPKIKeyStoreSpi extends KeyStoreSpi
             P11CryptService p11Servcie = ((P11CryptServiceFactory) p11Provider).createP11CryptService(pkcs11Module, password);
             PKCS11SlotIdentifier[] slotIds = p11Servcie.getSlotIdentifiers();
 
-            Map<PKCS11SlotIdentifier, String[]> keyLabelsMap = new HashMap<PKCS11SlotIdentifier, String[]>();
+            Map<PKCS11SlotIdentifier, String[]> keyLabelsMap = new HashMap<>();
 
-            Set<String> allKeyLabels = new HashSet<String>();
-            Set<String> duplicatedKeyLabels = new HashSet<String>();
+            Set<String> allKeyLabels = new HashSet<>();
+            Set<String> duplicatedKeyLabels = new HashSet<>();
 
             for(PKCS11SlotIdentifier slotId: slotIds)
             {
@@ -301,7 +301,7 @@ public class XiPKIKeyStoreSpi extends KeyStoreSpi
     @Override
     public Enumeration<String> engineAliases()
     {
-        return new MyEnumeration<String>(keyCerts.keySet().iterator());
+        return new MyEnumeration<>(keyCerts.keySet().iterator());
     }
 
     @Override
