@@ -34,7 +34,7 @@ public class CmpUtf8Pairs
     private static final char TOKEN_TERM = '%';
     private static final String TOKEN_TERM_s = "%";
 
-    private final Map<String, String> pairs = new HashMap<String, String>();
+    private final Map<String, String> pairs = new HashMap<>();
 
     public CmpUtf8Pairs(String name, String value)
     {
@@ -53,8 +53,7 @@ public class CmpUtf8Pairs
         }
 
         // find the position of terminators
-        List<Integer> positions = new LinkedList<Integer>();
-        //positions.add(0);
+        List<Integer> positions = new LinkedList<>();
 
         int idx = 1;
         while(idx < string.length())

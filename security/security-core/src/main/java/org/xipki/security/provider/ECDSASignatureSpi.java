@@ -33,8 +33,7 @@ import org.bouncycastle.crypto.digests.SHA256Digest;
 import org.bouncycastle.crypto.digests.SHA384Digest;
 import org.bouncycastle.crypto.digests.SHA512Digest;
 
-class ECDSASignatureSpi
-    extends SignatureSpi
+class ECDSASignatureSpi extends SignatureSpi
 {
     private Digest digest;
 

@@ -123,7 +123,7 @@ public class P11ContentSignerBuilder
             throw new IllegalArgumentException("non-positive parallelism is not allowed: " + parallelism);
         }
 
-        List<ContentSigner> signers = new ArrayList<ContentSigner>(parallelism);
+        List<ContentSigner> signers = new ArrayList<>(parallelism);
 
         PublicKey publicKey = certificateChain[0].getPublicKey();
         try

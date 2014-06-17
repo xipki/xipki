@@ -54,7 +54,6 @@ import org.bouncycastle.cert.cmp.GeneralPKIMessage;
 import org.bouncycastle.util.encoders.Hex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.remotep11.common.CmpUtil;
 import org.xipki.remotep11.common.RemoteP11Constants;
 import org.xipki.remotep11.common.asn1.KeyIdentifier;
 import org.xipki.remotep11.common.asn1.PSOTemplate;
@@ -279,7 +278,7 @@ public abstract class RemoteP11CryptService implements P11CryptService
         {
             ErrorMsgContent content = (ErrorMsgContent) respBody.getContent();
             PKIStatusInfo statusInfo = content.getPKIStatusInfo();
-            throw new SignerException("Server answers with ERROR: " + CmpUtil.formatPKIStatusInfo(statusInfo));
+            throw new SignerException("Server answers with ERROR: " + IoCertUtil.formatPKIStatusInfo(statusInfo));
         }
 
         else if(PKIBody.TYPE_GEN_REP != bodyType)

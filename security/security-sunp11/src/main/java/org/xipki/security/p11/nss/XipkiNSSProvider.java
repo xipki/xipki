@@ -98,7 +98,7 @@ extends Provider
     }
 
     // Map from mechanism to List of Descriptors that should be registered if the mechanism is supported
-    private final static Map<String, Descriptor> descriptors = new HashMap<String, Descriptor>();
+    private final static Map<String, Descriptor> descriptors = new HashMap<>();
 
     private synchronized static void init()
     {
@@ -175,7 +175,7 @@ extends Provider
         {
             if(aliasesWithOid == null)
             {
-                aliasesWithOid = new ArrayList<String>();
+                aliasesWithOid = new ArrayList<>();
                 if(aliases != null)
                 {
                     for (String alias : aliases)
