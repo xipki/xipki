@@ -96,7 +96,7 @@ public abstract class CmpResponder
         this.securityFactory = securityFactory;
         X500Name x500Name = X500Name.getInstance(responder.getCertificate().getSubjectX500Principal().getEncoded());
         this.sender = new GeneralName(x500Name);
-        this.c14nSenderName = IoCertUtil.canonicalizeName(x500Name);
+        this.c14nSenderName = canonicalizeSortedName(x500Name);
     }
 
     public PKIMessage processPKIMessage(PKIMessage pkiMessage, X509Certificate tlsClientCert, AuditEvent auditEvent)
@@ -344,7 +344,8 @@ public abstract class CmpResponder
         if(recipient.getTagNo() == GeneralName.directoryName)
         {
             X500Name x500Name = X500Name.getInstance(recipient.getName());
-            if(IoCertUtil.canonicalizeName(x500Name).equals(this.c14nSenderName))
+            String sortedName = canonicalizeSortedName(x500Name);
+            if(sortedName.equals(this.c14nSenderName))
             {
                 return;
             }
@@ -383,7 +384,7 @@ public abstract class CmpResponder
             return null;
         }
 
-        String c14nName = IoCertUtil.canonicalizeName((X500Name) requestSender.getName());
+        String c14nName = canonicalizeSortedName((X500Name) requestSender.getName());
         CertBasedRequestorInfo requestor = authorizatedRequestors.get(c14nName);
         if(requestor != null)
         {
@@ -417,6 +418,11 @@ public abstract class CmpResponder
     public X509Certificate getResponderCert()
     {
         return responder == null ? null : responder.getCertificate();
+    }
+    
+    private static String canonicalizeSortedName(X500Name name)
+    {
+    	return IoCertUtil.canonicalizeName(IoCertUtil.sortX509Name(name));
     }
 
 }
