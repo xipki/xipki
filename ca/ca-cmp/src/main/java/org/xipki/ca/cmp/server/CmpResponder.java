@@ -419,10 +419,10 @@ public abstract class CmpResponder
     {
         return responder == null ? null : responder.getCertificate();
     }
-    
+
     private static String canonicalizeSortedName(X500Name name)
     {
-    	return IoCertUtil.canonicalizeName(IoCertUtil.sortX509Name(name));
+        return IoCertUtil.canonicalizeName(IoCertUtil.sortX509Name(name));
     }
 
 }
