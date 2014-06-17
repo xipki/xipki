@@ -23,7 +23,7 @@ import java.util.List;
 
 public class RevokeCertRequestType
 {
-    private final List<RevokeCertRequestEntryType> requestEntries = new LinkedList<RevokeCertRequestEntryType>();
+    private final List<RevokeCertRequestEntryType> requestEntries = new LinkedList<>();
 
     public boolean addRequestEntry(RevokeCertRequestEntryType requestEntry)
     {

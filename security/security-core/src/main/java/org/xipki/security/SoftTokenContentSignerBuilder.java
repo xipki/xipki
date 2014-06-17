@@ -211,7 +211,7 @@ public class SoftTokenContentSignerBuilder
             throw new IllegalArgumentException("non-positive parallelism is not allowed: " + parallelism);
         }
 
-        List<ContentSigner> signers = new ArrayList<ContentSigner>(parallelism);
+        List<ContentSigner> signers = new ArrayList<>(parallelism);
 
         ASN1ObjectIdentifier algOid = signatureAlgId.getAlgorithm();
 

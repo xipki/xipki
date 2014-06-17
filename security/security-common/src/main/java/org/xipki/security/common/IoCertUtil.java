@@ -27,6 +27,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
+import java.math.BigInteger;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchProviderException;
@@ -40,9 +41,11 @@ import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.security.auth.x500.X500Principal;
@@ -51,6 +54,8 @@ import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.DERPrintableString;
 import org.bouncycastle.asn1.DERUTF8String;
+import org.bouncycastle.asn1.cmp.PKIFreeText;
+import org.bouncycastle.asn1.cmp.PKIStatus;
 import org.bouncycastle.asn1.x500.RDN;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x500.style.IETFUtils;
@@ -58,6 +63,31 @@ import org.bouncycastle.asn1.x500.style.RFC4519Style;
 
 public class IoCertUtil
 {
+    public static final Map<Integer, String> statusTextMap = new HashMap<>();
+    public static final String[] failureInfoTexts = new String[]
+    {
+        "incorrectData", "wrongAuthority", "badDataFormat", "badCertId", // 0 - 3
+        "badTime", "badRequest", "badMessageCheck", "badAlg", // 4 - 7
+        "unacceptedPolicy", "timeNotAvailable", "badRecipientNonce", "wrongIntegrity", // 8 - 11
+        "certConfirmed", "certRevoked", "badPOP", "missingTimeStamp", // 12 - 15
+        "notAuthorized", "unsupportedVersion", "transactionIdInUse", "signerNotTrusted", // 16 - 19
+        "badCertTemplate", "badSenderNonce", "addInfoNotAvailable", "unacceptedExtension", // 20 - 23
+        "-", "-", "-", "-", // 24 -27
+        "-", "duplicateCertReq", "systemFailure", "systemUnavail"}; // 28 - 31
+
+    static
+    {
+        statusTextMap.put(-2, "xipki_noAnswer");
+        statusTextMap.put(-1, "xipki_responseError");
+        statusTextMap.put(PKIStatus.GRANTED, "accepted");
+        statusTextMap.put(PKIStatus.GRANTED_WITH_MODS, "grantedWithMods");
+        statusTextMap.put(PKIStatus.REJECTION, "rejection");
+        statusTextMap.put(PKIStatus.WAITING, "waiting");
+        statusTextMap.put(PKIStatus.REVOCATION_WARNING, "revocationWarning");
+        statusTextMap.put(PKIStatus.REVOCATION_NOTIFICATION, "revocationNotification");
+        statusTextMap.put(PKIStatus.KEY_UPDATE_WARNING, "keyUpdateWarning");
+    }
+
     private static final ASN1ObjectIdentifier[] forwardDNs = new ASN1ObjectIdentifier[]
     {
         ObjectIdentifiers.DN_C,
@@ -100,7 +130,7 @@ public class IoCertUtil
     {
         RDN[] requstedRDNs = name.getRDNs();
 
-        List<RDN> rdns = new LinkedList<RDN>();
+        List<RDN> rdns = new LinkedList<>();
         int size = forwardDNs.length;
         for(int i = 0; i < size; i++)
         {
@@ -126,7 +156,7 @@ public class IoCertUtil
     {
         RDN[] requstedRDNs = name.getRDNs();
 
-        List<RDN> rdns = new LinkedList<RDN>();
+        List<RDN> rdns = new LinkedList<>();
         int size = forwardDNs.length;
         for(int i = size-1; i >= 0; i--)
         {
@@ -150,7 +180,7 @@ public class IoCertUtil
 
     private static RDN[] getRDNs(RDN[] rdns, ASN1ObjectIdentifier type)
     {
-        List<RDN> ret = new ArrayList<RDN>(1);
+        List<RDN> ret = new ArrayList<>(1);
         for(int i = 0; i < rdns.length; i++)
         {
             RDN rdn = rdns[i];
@@ -326,7 +356,7 @@ public class IoCertUtil
     {
         ASN1ObjectIdentifier[] _types = name.getAttributeTypes();
         int n = _types.length;
-        List<String> types = new ArrayList<String>(n);
+        List<String> types = new ArrayList<>(n);
         for(ASN1ObjectIdentifier type : _types)
         {
             types.add(type.getId());
@@ -519,6 +549,46 @@ public class IoCertUtil
         }
 
         return null;
+    }
+
+    public static String formatPKIStatusInfo(org.bouncycastle.asn1.cmp.PKIStatusInfo pkiStatusInfo)
+    {
+        int status = pkiStatusInfo.getStatus().intValue();
+        int failureInfo = pkiStatusInfo.getFailInfo().intValue();
+        PKIFreeText text = pkiStatusInfo.getStatusString();
+        String statusMessage = text == null ? null : text.getStringAt(0).getString();
+
+        return IoCertUtil.formatPKIStatusInfo(status, failureInfo, statusMessage);
+    }
+
+    public static String formatPKIStatusInfo(int status, int failureInfo, String statusMessage)
+    {
+        StringBuilder sb = new StringBuilder("PKIStatusInfo {");
+        sb.append("status = ");
+        sb.append(status);
+        sb.append(" (").append(statusTextMap.get(status)).append("), ");
+        sb.append("failureInfo = ");
+        sb.append(failureInfo).append(" (").append(getFailureInfoText(failureInfo)).append("), ");
+        sb.append("statusMessage = ").append(statusMessage);
+        sb.append("}");
+        return sb.toString();
+    }
+
+    public static String getFailureInfoText(int failureInfo)
+    {
+        BigInteger b = BigInteger.valueOf(failureInfo);
+        final int n = Math.min(b.bitLength(), failureInfoTexts.length);
+
+        StringBuilder sb = new StringBuilder();
+        for(int i = 0; i < n; i++)
+        {
+            if(b.testBit(i))
+            {
+                sb.append(", ").append(failureInfoTexts[i]);
+            }
+        }
+
+        return sb.length() < 3 ? "" : sb.substring(2);
     }
 
     public static boolean isSelfSigned(X509Certificate cert)

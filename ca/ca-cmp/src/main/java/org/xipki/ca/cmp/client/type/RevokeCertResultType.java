@@ -42,7 +42,7 @@ public class RevokeCertResultType implements CmpResultType
 
         if(resultEntries == null)
         {
-            resultEntries = new ArrayList<ResultEntryType>(1);
+            resultEntries = new ArrayList<>(1);
         }
 
         resultEntries.add(resultEntry);

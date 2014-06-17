@@ -23,7 +23,7 @@ import java.util.List;
 
 public class UnrevokeOrRemoveCertRequestType
 {
-    private final List<IssuerSerialEntryType> requestEntries = new LinkedList<IssuerSerialEntryType>();
+    private final List<IssuerSerialEntryType> requestEntries = new LinkedList<>();
 
     public boolean addRequestEntry(IssuerSerialEntryType requestEntry)
     {

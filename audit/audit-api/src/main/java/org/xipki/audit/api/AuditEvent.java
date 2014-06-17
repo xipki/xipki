@@ -35,7 +35,7 @@ public class AuditEvent
     /**
      * The data array belonging to the event.
      */
-    private final List<AuditEventData> eventDatas = new LinkedList<AuditEventData>();
+    private final List<AuditEventData> eventDatas = new LinkedList<>();
 
     /**
      * The name of the event type.
@@ -54,7 +54,7 @@ public class AuditEvent
 
     private AuditStatus status;
 
-    private final List<ChildAuditEvent> childAuditEvents = new LinkedList<ChildAuditEvent>();
+    private final List<ChildAuditEvent> childAuditEvents = new LinkedList<>();
 
     /**
      * Default constructor for jaxb.
@@ -165,7 +165,7 @@ public class AuditEvent
             return Arrays.asList(this);
         }
 
-        List<AuditEvent> expandedEvents = new ArrayList<AuditEvent>(size);
+        List<AuditEvent> expandedEvents = new ArrayList<>(size);
         for(int i = 0; i < size; i++)
         {
             ChildAuditEvent child = childAuditEvents.get(i);

@@ -118,7 +118,7 @@ public class OCSPStatusLoadTestCommand extends OsgiCommandSupport
             throw new Exception("Unsupported hash algorithm " + hashAlgo);
         }
 
-        List<Long> serialNumbers = new LinkedList<Long>();
+        List<Long> serialNumbers = new LinkedList<>();
 
         try
         {

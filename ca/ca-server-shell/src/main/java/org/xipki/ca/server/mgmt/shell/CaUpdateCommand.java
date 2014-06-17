@@ -154,7 +154,7 @@ public class CaUpdateCommand extends CaCommand
         Set<Permission> _permissions = null;
         if (permissions != null && permissions.size() > 0)
         {
-            _permissions = new HashSet<Permission>();
+            _permissions = new HashSet<>();
             for(String permission : permissions)
             {
                 Permission _permission = Permission.getPermission(permission);
@@ -189,7 +189,7 @@ public class CaUpdateCommand extends CaCommand
         {
             if(crlUris != null )
             {
-                _crlUris = new HashSet<String>(crlUris);
+                _crlUris = new HashSet<>(crlUris);
             }
         }
 
@@ -215,7 +215,7 @@ public class CaUpdateCommand extends CaCommand
         {
             if (ocspUris != null)
             {
-                _ocspUris = new HashSet<String>(ocspUris);
+                _ocspUris = new HashSet<>(ocspUris);
             }
         }
 

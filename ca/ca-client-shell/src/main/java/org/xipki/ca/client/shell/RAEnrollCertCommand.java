@@ -53,8 +53,7 @@ public class RAEnrollCertCommand extends ClientCommand
     {
         CertificationRequest p10Req = CertificationRequest.getInstance(
                 IoCertUtil.read(p10File));
-        EnrollCertResult result = raWorker.requestCert(
-                p10Req, profile, null, user);
+        EnrollCertResult result = raWorker.requestCert(p10Req, profile, null, user);
 
         X509Certificate cert = null;
         if(result != null)

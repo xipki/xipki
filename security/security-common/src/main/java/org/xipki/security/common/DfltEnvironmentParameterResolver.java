@@ -24,7 +24,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class DfltEnvironmentParameterResolver implements
         EnvironmentParameterResolver
 {
-    private final Map<String, String> envParameters = new ConcurrentHashMap<String, String>();
+    private final Map<String, String> envParameters = new ConcurrentHashMap<>();
 
     public DfltEnvironmentParameterResolver()
     {

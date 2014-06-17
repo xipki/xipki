@@ -54,15 +54,14 @@ public final class SunP11CryptService implements P11CryptService
 {
     private static final Logger LOG = LoggerFactory.getLogger(SunP11CryptService.class);
 
-    private final ConcurrentSkipListSet<SunP11Identity> identities = new ConcurrentSkipListSet<SunP11Identity>();
+    private final ConcurrentSkipListSet<SunP11Identity> identities = new ConcurrentSkipListSet<>();
 
     private String pkcs11Module;
     private char[] password;
     private Set<Integer> includeSlotIndexes;
     private Set<Integer> excludeSlotIndexes;
 
-    private static final Map<String, SunP11CryptService> instances =
-            new HashMap<String, SunP11CryptService>();
+    private static final Map<String, SunP11CryptService> instances = new HashMap<>();
 
     public static SunP11CryptService getInstance(String pkcs11Module, char[] password,
             Set<Integer> includeSlotIndexes, Set<Integer> excludeSlotIndexes)
@@ -93,9 +92,9 @@ public final class SunP11CryptService implements P11CryptService
         // Keystore does not allow emptry pin
         this.password = (password == null) ? "dummy".toCharArray() : password;
         this.includeSlotIndexes = includeSlotIndexes == null ?
-                null : new HashSet<Integer>(includeSlotIndexes);
+                null : new HashSet<>(includeSlotIndexes);
         this.excludeSlotIndexes = excludeSlotIndexes == null ?
-                null : new HashSet<Integer>(excludeSlotIndexes);
+                null : new HashSet<>(excludeSlotIndexes);
 
         int idx_sunec = -1;
         int idx_xipki = -1;
@@ -150,7 +149,7 @@ public final class SunP11CryptService implements P11CryptService
     public synchronized void refresh()
     throws SignerException
     {
-        Set<SunP11Identity> currentIdentifies = new HashSet<SunP11Identity>();
+        Set<SunP11Identity> currentIdentifies = new HashSet<>();
 
         // try to initialize with the slot 0
         Provider p11ProviderOfSlot0 = getPKCS11Provider(pkcs11Module, 0);
@@ -446,7 +445,7 @@ public final class SunP11CryptService implements P11CryptService
     public PKCS11SlotIdentifier[] getSlotIdentifiers()
     throws SignerException
     {
-        List<PKCS11SlotIdentifier> slotIds = new LinkedList<PKCS11SlotIdentifier>();
+        List<PKCS11SlotIdentifier> slotIds = new LinkedList<>();
         for(SunP11Identity identity : identities)
         {
             PKCS11SlotIdentifier slotId = identity.getSlotId();
@@ -463,7 +462,7 @@ public final class SunP11CryptService implements P11CryptService
     public String[] getKeyLabels(PKCS11SlotIdentifier slotId)
     throws SignerException
     {
-        List<String> keyLabels = new LinkedList<String>();
+        List<String> keyLabels = new LinkedList<>();
         for(SunP11Identity identity : identities)
         {
             if(slotId.equals(identity.getSlotId()))

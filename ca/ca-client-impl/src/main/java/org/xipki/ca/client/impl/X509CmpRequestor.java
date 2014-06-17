@@ -64,6 +64,7 @@ import org.bouncycastle.asn1.x509.CertificateList;
 import org.bouncycastle.asn1.x509.Extension;
 import org.bouncycastle.asn1.x509.Extensions;
 import org.bouncycastle.asn1.x509.GeneralName;
+import org.bouncycastle.asn1.x509.X509Extension;
 import org.bouncycastle.cert.X509CertificateHolder;
 import org.bouncycastle.cert.cmp.CMPException;
 import org.bouncycastle.cert.cmp.CertificateConfirmationContent;
@@ -106,8 +107,7 @@ abstract class X509CmpRequestor extends CmpRequestor
     public static final int XiPKI_CRL_REASON_UNREVOKE = 100;
     public static final int XiPKI_CRL_REASON_REMOVE = 101;
 
-    private final static DigestCalculatorProvider digesetCalculatorProvider =
-            new BcDigestCalculatorProvider();
+    private final static DigestCalculatorProvider digesetCalculatorProvider = new BcDigestCalculatorProvider();
     private static final BigInteger MINUS_ONE = BigInteger.valueOf(-1);
 
     private static final Logger LOG = LoggerFactory.getLogger(X509CmpRequestor.class);
@@ -115,8 +115,7 @@ abstract class X509CmpRequestor extends CmpRequestor
     private boolean implicitConfirm = true;
     private final X509Certificate caCert;
 
-    X509CmpRequestor(
-            ConcurrentContentSigner requestor,
+    X509CmpRequestor(ConcurrentContentSigner requestor,
             X509Certificate responderCert,
             X509Certificate caCert,
             SecurityFactory securityFactory,
@@ -325,7 +324,7 @@ abstract class X509CmpRequestor extends CmpRequestor
     throws CmpRequestorException
     {
         PKIMessage request = buildPKIMessage(p10Req, username);
-        Map<BigInteger, String> reqIdIdMap = new HashMap<BigInteger, String>();
+        Map<BigInteger, String> reqIdIdMap = new HashMap<>();
         reqIdIdMap.put(MINUS_ONE, p10Req.getId());
         return intern_requestCertificate(request, reqIdIdMap, PKIBody.TYPE_CERT_REP);
     }
@@ -334,7 +333,7 @@ abstract class X509CmpRequestor extends CmpRequestor
     throws CmpRequestorException
     {
         PKIMessage request = buildPKIMessage(req, username);
-        Map<BigInteger, String> reqIdIdMap = new HashMap<BigInteger, String>();
+        Map<BigInteger, String> reqIdIdMap = new HashMap<>();
         List<EnrollCertRequestEntryType> reqEntries = req.getRequestEntries();
 
         for(EnrollCertRequestEntryType reqEntry : reqEntries)
@@ -549,7 +548,7 @@ abstract class X509CmpRequestor extends CmpRequestor
         PKIHeader header = buildPKIHeader(null);
 
         List<RevokeCertRequestEntryType> requestEntries = request.getRequestEntries();
-        List<RevDetails> revDetailsArray = new ArrayList<RevDetails>(requestEntries.size());
+        List<RevDetails> revDetailsArray = new ArrayList<>(requestEntries.size());
         for(RevokeCertRequestEntryType requestEntry : requestEntries)
         {
             CertTemplateBuilder certTempBuilder = new CertTemplateBuilder();
@@ -562,13 +561,13 @@ abstract class X509CmpRequestor extends CmpRequestor
             try
             {
                 DEREnumerated reason = new DEREnumerated(requestEntry.getReason());
-                extensions[0] = new Extension(org.bouncycastle.asn1.x509.X509Extension.reasonCode,
+                extensions[0] = new Extension(X509Extension.reasonCode,
                         true, new DEROctetString(reason.getEncoded()));
 
                 if(invalidityDate != null)
                 {
                     ASN1GeneralizedTime time = new ASN1GeneralizedTime(invalidityDate);
-                    extensions[1] = new Extension(org.bouncycastle.asn1.x509.X509Extension.invalidityDate,
+                    extensions[1] = new Extension(X509Extension.invalidityDate,
                         true, new DEROctetString(time.getEncoded()));
                 }
             }catch(IOException e)
@@ -596,7 +595,7 @@ abstract class X509CmpRequestor extends CmpRequestor
         PKIHeader header = buildPKIHeader(null);
 
         List<IssuerSerialEntryType> requestEntries = request.getRequestEntries();
-        List<RevDetails> revDetailsArray = new ArrayList<RevDetails>(requestEntries.size());
+        List<RevDetails> revDetailsArray = new ArrayList<>(requestEntries.size());
         for(IssuerSerialEntryType requestEntry : requestEntries)
         {
             CertTemplateBuilder certTempBuilder = new CertTemplateBuilder();
@@ -608,7 +607,7 @@ abstract class X509CmpRequestor extends CmpRequestor
             try
             {
                 DEREnumerated reason = new DEREnumerated(reasonCode);
-                extensions[0] = new Extension(org.bouncycastle.asn1.x509.X509Extension.reasonCode,
+                extensions[0] = new Extension(X509Extension.reasonCode,
                         true, new DEROctetString(reason.getEncoded()));
             }catch(IOException e)
             {

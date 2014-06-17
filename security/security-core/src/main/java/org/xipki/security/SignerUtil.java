@@ -388,7 +388,7 @@ public class SignerUtil
     {
         int byteLenKey = (bitCount + 7)/8;
 
-        if (bitCount >= (bytes.length<<3))
+        if (bitCount >= (bytes.length << 3))
         {
             return bytes;
         }
@@ -406,7 +406,7 @@ public class SignerUtil
                         (byte2int(truncatedBytes[i]) >>> shiftBits) |
                         ((byte2int(truncatedBytes[i-1]) << (8-shiftBits)) & 0xFF));
             }
-            truncatedBytes[0] = (byte)(byte2int(truncatedBytes[0])>>>shiftBits);
+            truncatedBytes[0] = (byte)(byte2int(truncatedBytes[0]) >>> shiftBits);
         }
 
         return truncatedBytes;

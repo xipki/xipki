@@ -64,7 +64,7 @@ public class P11ListSlotCommand extends SecurityCommand
     {
         IaikExtendedModule module = IaikP11ModulePool.getInstance().getModule(
                 securityFactory.getPkcs11Module());
-        List<PKCS11SlotIdentifier> slotIds = new ArrayList<PKCS11SlotIdentifier>(module.getAllSlotIds());
+        List<PKCS11SlotIdentifier> slotIds = new ArrayList<>(module.getAllSlotIds());
         Collections.sort(slotIds);
 
         int n = slotIds.size();
@@ -101,8 +101,7 @@ public class P11ListSlotCommand extends SecurityCommand
             List<PrivateKey> allPrivateObjects = slot.getAllPrivateObjects(null, null);
             int size = allPrivateObjects.size();
 
-            List<ComparablePrivateKey> privateKeys =
-                    new ArrayList<P11ListSlotCommand.ComparablePrivateKey>(size);
+            List<ComparablePrivateKey> privateKeys = new ArrayList<>(size);
             for(int i = 0; i < size; i++)
             {
                 PrivateKey key = allPrivateObjects.get(i);

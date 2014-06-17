@@ -44,7 +44,7 @@ public class HashCalculator
 
     private static BlockingDeque<MessageDigest> getMessageDigests(String hashAlgo)
     {
-        BlockingDeque<MessageDigest> mds = new LinkedBlockingDeque<MessageDigest>();
+        BlockingDeque<MessageDigest> mds = new LinkedBlockingDeque<>();
         for(int i = 0; i < parallelism; i++)
         {
             MessageDigest md;

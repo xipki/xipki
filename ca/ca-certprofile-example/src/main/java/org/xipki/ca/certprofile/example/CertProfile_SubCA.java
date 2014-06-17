@@ -35,8 +35,7 @@ public class CertProfile_SubCA extends AbstractCACertProfile
     public CertProfile_SubCA()
     {
         // Extensions
-        Map<ASN1ObjectIdentifier, ExtensionOccurrence> _extensionOccurences =
-                new HashMap<ASN1ObjectIdentifier, ExtensionOccurrence>();
+        Map<ASN1ObjectIdentifier, ExtensionOccurrence> _extensionOccurences = new HashMap<>();
         _extensionOccurences.put(Extension.keyUsage, ExtensionOccurrence.CRITICAL_REQUIRED);
         _extensionOccurences.put(Extension.basicConstraints, ExtensionOccurrence.CRITICAL_REQUIRED);
         extensionOccurences = Collections.unmodifiableMap(_extensionOccurences);

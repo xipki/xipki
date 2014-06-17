@@ -34,7 +34,7 @@ public class EnrollCertRequestType
     }
 
     private final Type type;
-    private final List<EnrollCertRequestEntryType> requestEntries = new LinkedList<EnrollCertRequestEntryType>();
+    private final List<EnrollCertRequestEntryType> requestEntries = new LinkedList<>();
 
     public EnrollCertRequestType(Type type)
     {

@@ -212,8 +212,8 @@ public class SunNamedCurveExtender
             return;
         }
 
-        Set<String> processedCurveOids = new HashSet<String>();
-        Map<String, String> addedCurves = new HashMap<String, String>();
+        Set<String> processedCurveOids = new HashSet<>();
+        Map<String, String> addedCurves = new HashMap<>();
 
         Enumeration<?> curveNames = ECNamedCurveTable.getNames();
         while(curveNames.hasMoreElements())
@@ -320,8 +320,8 @@ public class SunNamedCurveExtender
             return;
         }
 
-        Set<String> processedCurveOids = new HashSet<String>();
-        Map<String, String> addedCurves = new HashMap<String, String>();
+        Set<String> processedCurveOids = new HashSet<>();
+        Map<String, String> addedCurves = new HashMap<>();
 
         Enumeration<?> curveNames = ECNamedCurveTable.getNames();
         while(curveNames.hasMoreElements())
@@ -607,7 +607,7 @@ public class SunNamedCurveExtender
         StringBuilder sb = new StringBuilder("The following named curves are added to the SUN's list of named curves:\n");
 
         Set<String> tmp = addedCurves.keySet();
-        List<String> names = new ArrayList<String>(tmp);
+        List<String> names = new ArrayList<>(tmp);
         Collections.sort(names);
 
         for(String name : names)

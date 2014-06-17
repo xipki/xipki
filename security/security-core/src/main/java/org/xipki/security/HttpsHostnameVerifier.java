@@ -41,7 +41,7 @@ public class HttpsHostnameVerifier implements HostnameVerifier
     private boolean enabled = false;
     private boolean trustAll = false;
 
-    private Map<String, Set<String>> hostnameMap = new ConcurrentHashMap<String, Set<String>>();
+    private Map<String, Set<String>> hostnameMap = new ConcurrentHashMap<>();
     private HostnameVerifier oldHostnameVerifier = null;
     private boolean meAsDefaultHostnameVerifier = false;
 
