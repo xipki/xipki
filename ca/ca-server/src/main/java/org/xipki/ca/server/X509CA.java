@@ -92,6 +92,7 @@ import org.xipki.ca.api.profile.ExtensionTuple;
 import org.xipki.ca.api.profile.ExtensionTuples;
 import org.xipki.ca.api.profile.IdentifiedCertProfile;
 import org.xipki.ca.api.profile.SubjectInfo;
+import org.xipki.ca.api.profile.X509Util;
 import org.xipki.ca.api.publisher.CertPublisherException;
 import org.xipki.ca.api.publisher.CertificateInfo;
 import org.xipki.ca.common.X509CertificateWithMetaInfo;
