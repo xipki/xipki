@@ -252,7 +252,7 @@ class CaCertStoreDbImporter extends DbPorter
 
         @SuppressWarnings("unchecked")
         JAXBElement<UsersType> rootElement = (JAXBElement<UsersType>)
-                unmarshaller.unmarshal(new File(usersFile));
+                unmarshaller.unmarshal(new File(baseDir, usersFile));
         UsersType users = rootElement.getValue();
 
         PreparedStatement ps = prepareStatement(sql);
