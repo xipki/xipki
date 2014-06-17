@@ -43,7 +43,7 @@ public class CaRequestorListCommand extends CaCommand
             sb.append("Requestors trusted by CA " + caName).append("\n");
             for(CAHasRequestorEntry entry  : entries)
             {
-                sb.append("\t").append(entry);
+                sb.append("\t").append(entry).append("\n");
             }
         }
         else
