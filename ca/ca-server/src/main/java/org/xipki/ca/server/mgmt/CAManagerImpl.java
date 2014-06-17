@@ -1110,7 +1110,7 @@ public class CAManagerImpl implements CAManager
         try
         {
             stmt = createStatement();
-            String sql = "SELECT REQUIRE_CONFIRM_CERT, SEND_CA_CERT, SEND_RESPONDER_CERT"
+            String sql = "SELECT REQUIRE_CONFIRM_CERT, SEND_CA_CERT, SEND_RESPONDER_CERT,"
                     + " REQUIRE_MESSAGE_TIME, MESSAGE_TIME_BIAS, CONFIRM_WAIT_TIME"
                     + " FROM CMPCONTROL";
 
