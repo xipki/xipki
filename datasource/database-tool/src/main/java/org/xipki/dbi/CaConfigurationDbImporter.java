@@ -104,7 +104,7 @@ class CaConfigurationDbImporter extends DbPorter
         System.out.println("Importing table CMPCONTROL");
         if(control == null)
         {
-            System.out.println("Imported table CMPCONTROL: nothing to import");
+            System.out.println(" Imported table CMPCONTROL: nothing to import");
             return;
         }
 
@@ -137,7 +137,7 @@ class CaConfigurationDbImporter extends DbPorter
         {
             closeStatement(ps);
         }
-        System.out.println("Imported table CMPCONTROL");
+        System.out.println(" Imported table CMPCONTROL");
     }
 
     private void import_responder(ResponderType responder)
@@ -173,7 +173,7 @@ class CaConfigurationDbImporter extends DbPorter
         {
             closeStatement(ps);
         }
-        System.out.println("Imported table RESPONDER");
+        System.out.println(" Imported table RESPONDER");
     }
 
     @SuppressWarnings("resource")
@@ -208,7 +208,7 @@ class CaConfigurationDbImporter extends DbPorter
         {
             closeStatement(ps);
         }
-        System.out.println("Imported table ENVIRONMENT");
+        System.out.println(" Imported table ENVIRONMENT");
     }
 
     @SuppressWarnings("resource")
@@ -248,7 +248,7 @@ class CaConfigurationDbImporter extends DbPorter
         {
             closeStatement(ps);
         }
-        System.out.println("Imported table CRLSIGNER");
+        System.out.println(" Imported table CRLSIGNER");
     }
 
     @SuppressWarnings("resource")
@@ -280,7 +280,7 @@ class CaConfigurationDbImporter extends DbPorter
         {
             closeStatement(ps);
         }
-        System.out.println("Imported table REQUESTOR");
+        System.out.println(" Imported table REQUESTOR");
     }
 
     @SuppressWarnings("resource")
@@ -312,7 +312,7 @@ class CaConfigurationDbImporter extends DbPorter
         {
             closeStatement(ps);
         }
-        System.out.println("Imported table PUBLISHER");
+        System.out.println(" Imported table PUBLISHER");
     }
 
     @SuppressWarnings("resource")
@@ -344,7 +344,7 @@ class CaConfigurationDbImporter extends DbPorter
         {
             closeStatement(ps);
         }
-        System.out.println("Imported table CERTPROFILE");
+        System.out.println(" Imported table CERTPROFILE");
     }
 
     @SuppressWarnings("resource")
@@ -404,7 +404,7 @@ class CaConfigurationDbImporter extends DbPorter
             closeStatement(ps);
         }
 
-        System.out.println("Importing table CA");
+        System.out.println(" Imported table CA");
     }
 
     @SuppressWarnings("resource")
@@ -434,7 +434,7 @@ class CaConfigurationDbImporter extends DbPorter
         {
             closeStatement(ps);
         }
-        System.out.println("Importing table CAALIAS");
+        System.out.println(" Imported table CAALIAS");
     }
 
     @SuppressWarnings("resource")
@@ -471,7 +471,7 @@ class CaConfigurationDbImporter extends DbPorter
         {
             closeStatement(ps);
         }
-        System.out.println("Imported table CA_HAS_REQUESTOR");
+        System.out.println(" Imported table CA_HAS_REQUESTOR");
     }
 
     @SuppressWarnings("resource")
@@ -502,7 +502,7 @@ class CaConfigurationDbImporter extends DbPorter
         {
             closeStatement(ps);
         }
-        System.out.println("Imported table CA_HAS_PUBLISHER");
+        System.out.println(" Imported table CA_HAS_PUBLISHER");
     }
 
     @SuppressWarnings("resource")
@@ -533,7 +533,7 @@ class CaConfigurationDbImporter extends DbPorter
         {
             closeStatement(ps);
         }
-        System.out.println("Imported table CA_HAS_CERTPROFILE");
+        System.out.println(" Imported table CA_HAS_CERTPROFILE");
     }
 
 }
