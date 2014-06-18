@@ -92,14 +92,14 @@ public class CrlSignerEntry
         sb.append("conf: ").append(conf).append('\n');
         sb.append("period: ").append(getPeriod()).append(" minutes\n");
         sb.append("overlap: ").append(getOverlap()).append(" minutes\n");
-        sb.append("includeCertsInCrl: ").append(includeCertsInCrl).append("\n");
-        sb.append("includeExpiredCerts: ").append(includeExpiredCerts).append("\n");
+        sb.append("includeCertsInCrl: ").append(includeCertsInCrl ? "yes" : "no").append("\n");
+        sb.append("includeExpiredCerts: ").append(includeExpiredCerts ? "yes" : "no").append('\n');
         sb.append("cert: ").append("\n");
         sb.append("\tissuer: ").append(
-                IoCertUtil.canonicalizeName(cert.getIssuerX500Principal())).append("\n");
-        sb.append("\tserialNumber: ").append(cert.getSerialNumber()).append("\n");
+                IoCertUtil.canonicalizeName(cert.getIssuerX500Principal())).append('\n');
+        sb.append("\tserialNumber: ").append(cert.getSerialNumber()).append('\n');
         sb.append("\tsubject: ").append(
-                IoCertUtil.canonicalizeName(cert.getSubjectX500Principal()));
+                IoCertUtil.canonicalizeName(cert.getSubjectX500Principal())).append('\n');
         if(verbose)
         {
             sb.append("\tencoded: ");

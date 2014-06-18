@@ -252,8 +252,8 @@ public class CAEntry
         sb.append("status: ").append(status.getStatus()).append('\n');
         sb.append("crl_uris: ").append(getCrlUrisAsString()).append('\n');
         sb.append("ocsp_uris: ").append(getOcspUrisAsString()).append('\n');
-        sb.append("max_validity: ").append(maxValidity).append('\n');
-        sb.append("expirationPeriod: ").append(expirationPeriod).append('\n');
+        sb.append("max_validity: ").append(maxValidity).append(" days\n");
+        sb.append("expirationPeriod: ").append(expirationPeriod).append(" days\n");
         sb.append("signer_type: ").append(signerType).append('\n');
         sb.append("signer_conf: ").append(signerConf).append('\n');
         sb.append("cert: ").append("\n");
@@ -266,8 +266,8 @@ public class CAEntry
             sb.append("\tEncoded: ").append(Base64.toBase64String(cert.getEncodedCert())).append("\n");
         }
         sb.append("crlsigner_name: ").append(crlSignerName).append('\n');
-        sb.append("allowDuplicateKey: ").append(allowDuplicateKey).append('\n');
-        sb.append("allowDuplicateSubject: ").append(allowDuplicateSubject);
+        sb.append("allowDuplicateKey: ").append(allowDuplicateKey ? "yes" : "no").append('\n');
+        sb.append("allowDuplicateSubject: ").append(allowDuplicateSubject ? "yes" : "no").append('\n');
         sb.append("permissions: ").append(Permission.toString(permissions));
 
         return sb.toString();
