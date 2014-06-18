@@ -32,7 +32,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.ocsp.client.api.OCSPRequestor;
 import org.xipki.ocsp.client.api.OCSPRequestorException;
-import org.xipki.ocsp.client.api.ClientRequestOptions;
+import org.xipki.ocsp.client.api.RequestOptions;
 import org.xipki.security.common.AbstractLoadTest;
 import org.xipki.security.common.ParamChecker;
 
@@ -47,7 +47,7 @@ public class OcspLoadTest extends AbstractLoadTest
 
     private X509Certificate caCert;
     private URL serverUrl;
-    private ClientRequestOptions options;
+    private RequestOptions options;
 
     @Override
     protected Runnable getTestor()
@@ -57,7 +57,7 @@ public class OcspLoadTest extends AbstractLoadTest
     }
 
     public OcspLoadTest(OCSPRequestor requestor, List<Long> serials,
-            X509Certificate caCert, URL serverUrl, ClientRequestOptions options)
+            X509Certificate caCert, URL serverUrl, RequestOptions options)
     {
         ParamChecker.assertNotNull("requestor", requestor);
         ParamChecker.assertNotEmpty("serials", serials);

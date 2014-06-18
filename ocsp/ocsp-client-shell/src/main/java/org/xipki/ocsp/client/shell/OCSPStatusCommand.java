@@ -52,7 +52,7 @@ import org.bouncycastle.cert.ocsp.UnknownStatus;
 import org.bouncycastle.util.encoders.Hex;
 import org.xipki.ocsp.client.api.OCSPRequestor;
 import org.xipki.ocsp.client.api.OCSPResponseNotSuccessfullException;
-import org.xipki.ocsp.client.api.ClientRequestOptions;
+import org.xipki.ocsp.client.api.RequestOptions;
 import org.xipki.security.SignerUtil;
 import org.xipki.security.common.CRLReason;
 import org.xipki.security.common.IoCertUtil;
@@ -165,7 +165,7 @@ public class OCSPStatusCommand extends OsgiCommandSupport
 
         URL serverUrl = new URL(serverURL == null ? DFLT_URL : serverURL);
 
-        ClientRequestOptions options = new ClientRequestOptions();
+        RequestOptions options = new RequestOptions();
         options.setUseNonce(useNonce == null ? false : useNonce.booleanValue());
         options.setHashAlgorithmId(hashAlgoOid);
 
