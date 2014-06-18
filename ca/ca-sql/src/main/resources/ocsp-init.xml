@@ -52,7 +52,7 @@
 			<column name="REV_REASON" type="INT"/>
 			<column name="REV_TIME" remarks="seconds since January 1, 1970, 00:00:00 GMT" type="INT"/>
 			<column name="REV_INVALIDITY_TIME" remarks="seconds since January 1, 1970, 00:00:00 GMT" type="INT"/>			
-			<column name="CERT" type="VARCHAR(2000)">
+			<column name="CERT" type="VARCHAR(3000)">
 				<constraints nullable="false"/>
 			</column>
 		</createTable>
@@ -117,7 +117,7 @@
 			<column name="CERT_ID" type="INT(10)">
 				<constraints primaryKey="true" nullable="false"/>
 			</column>
-			<column name="CERT" type="VARCHAR(2000)" remarks="Base64 encoded CERTificate">
+			<column name="CERT" type="VARCHAR(3000)" remarks="Base64 encoded CERTificate">
 				<constraints nullable="false"/>
 			</column>
 		</createTable>
