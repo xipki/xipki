@@ -80,10 +80,10 @@ public class CmpResponderEntry
         if(cert != null)
         {
             sb.append("\tissuer: ").append(
-                    IoCertUtil.canonicalizeName(cert.getIssuerX500Principal())).append("\n");
-            sb.append("\tserialNumber: ").append(cert.getSerialNumber()).append("\n");
+                    IoCertUtil.canonicalizeName(cert.getIssuerX500Principal())).append('\n');
+            sb.append("\tserialNumber: ").append(cert.getSerialNumber()).append('\n');
             sb.append("\tsubject: ").append(
-                    IoCertUtil.canonicalizeName(cert.getSubjectX500Principal()));
+                    IoCertUtil.canonicalizeName(cert.getSubjectX500Principal())).append('\n');
             if(verbose)
             {
                 sb.append("\tencoded: ");
