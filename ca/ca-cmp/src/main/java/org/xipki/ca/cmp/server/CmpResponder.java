@@ -408,9 +408,9 @@ public abstract class CmpResponder
 
     public void addAutorizatedRequestor(CertBasedRequestorInfo requestor)
     {
-    	X500Principal x500Prin = requestor.getCertificate().getCert().getSubjectX500Principal();
-    	X500Name x500Name = X500Name.getInstance(x500Prin.getEncoded());
-    	String c14nName = canonicalizeSortedName(x500Name);
+        X500Principal x500Prin = requestor.getCertificate().getCert().getSubjectX500Principal();
+        X500Name x500Name = X500Name.getInstance(x500Prin.getEncoded());
+        String c14nName = canonicalizeSortedName(x500Name);
         this.authorizatedRequestors.put(c14nName, requestor);
     }
 
