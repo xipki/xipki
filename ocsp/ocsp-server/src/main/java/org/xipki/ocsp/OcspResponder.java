@@ -278,10 +278,15 @@ public class OcspResponder
 
         if(explicitResponderCert != null)
         {
-            Set<X509Certificate> caCerts = new HashSet<>();
-            for(String certFile : signerConf.getCaCertFiles().getCaCertFile())
+            Set<X509Certificate> caCerts = null;
+            if(signerConf.getCaCertFiles() != null)
             {
-                caCerts.add(parseCert(certFile));
+                caCerts = new HashSet<>();
+
+                for(String certFile : signerConf.getCaCertFiles().getCaCertFile())
+                {
+                    caCerts.add(parseCert(certFile));
+                }
             }
 
             explicitCertificateChain = IoCertUtil.buildCertPath(explicitResponderCert, caCerts);
