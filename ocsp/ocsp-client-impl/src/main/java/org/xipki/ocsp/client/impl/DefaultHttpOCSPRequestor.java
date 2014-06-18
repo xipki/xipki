@@ -25,7 +25,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 
 import org.bouncycastle.util.encoders.Base64;
-import org.xipki.ocsp.client.api.ClientRequestOptions;
+import org.xipki.ocsp.client.api.RequestOptions;
 
 public class DefaultHttpOCSPRequestor extends AbstractOCSPRequestor
 {
@@ -40,7 +40,7 @@ public class DefaultHttpOCSPRequestor extends AbstractOCSPRequestor
     }
 
     @Override
-    protected byte[] send(byte[] request, URL responderURL, ClientRequestOptions requestOptions)
+    protected byte[] send(byte[] request, URL responderURL, RequestOptions requestOptions)
     throws IOException
     {
         int size = request.length;

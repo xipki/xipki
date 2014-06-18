@@ -48,7 +48,7 @@ import org.bouncycastle.operator.DigestCalculator;
 import org.xipki.ocsp.client.api.OCSPRequestor;
 import org.xipki.ocsp.client.api.OCSPRequestorException;
 import org.xipki.ocsp.client.api.OCSPResponseNotSuccessfullException;
-import org.xipki.ocsp.client.api.ClientRequestOptions;
+import org.xipki.ocsp.client.api.RequestOptions;
 import org.xipki.ocsp.client.impl.digest.SHA1DigestCalculator;
 import org.xipki.ocsp.client.impl.digest.SHA224DigestCalculator;
 import org.xipki.ocsp.client.impl.digest.SHA256DigestCalculator;
@@ -59,7 +59,7 @@ public abstract class AbstractOCSPRequestor implements OCSPRequestor
 {
     private SecureRandom random = new SecureRandom();
 
-    protected abstract byte[] send(byte[] request, URL responderUrl, ClientRequestOptions requestOptions)
+    protected abstract byte[] send(byte[] request, URL responderUrl, RequestOptions requestOptions)
     throws IOException;
 
     protected AbstractOCSPRequestor()
@@ -68,7 +68,7 @@ public abstract class AbstractOCSPRequestor implements OCSPRequestor
 
     @Override
     public BasicOCSPResp ask(X509Certificate caCert, X509Certificate cert, URL responderUrl,
-            ClientRequestOptions requestOptions)
+            RequestOptions requestOptions)
     throws OCSPRequestorException
     {
         if(caCert.getSubjectX500Principal().equals(cert.getIssuerX500Principal()) == false)
@@ -81,7 +81,7 @@ public abstract class AbstractOCSPRequestor implements OCSPRequestor
 
     @Override
     public BasicOCSPResp ask(X509Certificate caCert, BigInteger serialNumber, URL responderUrl,
-            ClientRequestOptions requestOptions)
+            RequestOptions requestOptions)
     throws OCSPRequestorException
     {
         if(requestOptions == null)
@@ -143,7 +143,7 @@ public abstract class AbstractOCSPRequestor implements OCSPRequestor
     }
 
     private OCSPReq buildRequest(X509Certificate caCert, BigInteger serialNumber, byte[] nonce,
-            ClientRequestOptions requestOptions)
+            RequestOptions requestOptions)
     throws OCSPRequestorException
     {
         ASN1ObjectIdentifier hashAlgId = requestOptions.getHashAlgorithmId();

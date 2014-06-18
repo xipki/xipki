@@ -33,7 +33,7 @@ import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.asn1.x509.X509ObjectIdentifiers;
 import org.bouncycastle.asn1.x9.X9ObjectIdentifiers;
 
-public class ClientRequestOptions
+public class RequestOptions
 {
     private static final Map<String, AlgorithmIdentifier> sigAlgsMap = new HashMap<>();
 
@@ -82,7 +82,7 @@ public class ClientRequestOptions
     private ASN1ObjectIdentifier hashAlgorithmId = NISTObjectIdentifiers.id_sha256;
     private List<AlgorithmIdentifier> preferredSignatureAlgorithms;
 
-    public ClientRequestOptions()
+    public RequestOptions()
     {
     }
 
