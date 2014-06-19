@@ -42,13 +42,11 @@ public class CaRequestorAddCommand extends CaCommand
             required = true, description = "Required. Requestor name")
     protected String            requestorName;
 
-    @Option(name = "-era",
-            description = "Requestor as RA, the default is not as RA")
-    protected Boolean            era;
-
-    @Option(name = "-dra",
-            description = "Requestor not as RA")
-    protected Boolean            dra;
+    @Option(name = "-ra",
+            description = "Whether as RA.\n"
+                    + "Valid values are 'yes' and 'no',\n"
+                    + "the default is 'no'")
+    protected String            raS;
 
     @Option(name = "-permission",
             description = "Required. Permission, multi options is allowed. allowed values are " + permissionsText,
@@ -64,12 +62,7 @@ public class CaRequestorAddCommand extends CaCommand
     protected Object doExecute()
     throws Exception
     {
-        if(era != null && dra != null )
-        {
-            System.err.println("RA mode could not be enabled and disabled at the same time");
-        }
-
-        boolean ra = isEnabled(era, dra, false);
+        boolean ra = isEnabled(raS, false, "ra");
 
         CAHasRequestorEntry entry = new CAHasRequestorEntry(requestorName);
         entry.setRa(ra);

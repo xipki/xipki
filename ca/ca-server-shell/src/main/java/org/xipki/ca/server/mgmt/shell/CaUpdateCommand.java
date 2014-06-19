@@ -95,21 +95,15 @@ public class CaUpdateCommand extends CaCommand
             description = "CA signer configuration or 'NULL'")
     protected String            signerConf;
 
-    @Option(name = "-edk", aliases = { "--enableDuplicateKey" },
-            description = "Allow duplicate key")
-    protected Boolean           enableDuplicateKey;
+    @Option(name = "-dk", aliases = { "--duplicateKey" },
+            description = "Whether duplicate key is allowed.\n"
+                    + "Valid values are 'yes' and 'no'")
+    protected String           duplicateKeyS;
 
-    @Option(name = "-ddk", aliases = { "--disableDuplicateKey" },
-            description = "Duplicate key is not allowed")
-    protected Boolean           disableDuplicateKey;
-
-    @Option(name = "-eds", aliases = { "--enableDuplicateSubject" },
-            description = "Allow duplicate subject")
-    protected Boolean           enableDuplicateSubject;
-
-    @Option(name = "-dds", aliases = { "--disableDuplicateSubject" },
-            description = "Duplicate subject is not allowed")
-    protected Boolean           disableDuplicateSubject;
+    @Option(name = "-ds", aliases = { "--duplicateSubject" },
+            description = "Whether duplicate subject is allowed.\n"
+                    + "Valid values are 'yes' and 'no'")
+    protected String           duplicateSubjectS;
 
     private PasswordResolver passwordResolver;
 
@@ -143,17 +137,8 @@ public class CaUpdateCommand extends CaCommand
              }
         }
 
-        Boolean allowDuplicateKey = null;
-        if(enableDuplicateKey != null || disableDuplicateKey != null)
-        {
-            allowDuplicateKey = isEnabled(enableDuplicateKey, disableDuplicateKey, false);
-        }
-
-        Boolean allowDuplicateSubject = null;
-        if(enableDuplicateSubject != null || disableDuplicateSubject != null)
-        {
-            allowDuplicateSubject = isEnabled(enableDuplicateSubject, disableDuplicateSubject, false);
-        }
+        Boolean allowDuplicateKey = isEnabled(duplicateKeyS, "duplicateKey");
+        Boolean allowDuplicateSubject = isEnabled(duplicateSubjectS, "duplicateSubject");
 
         Set<Permission> _permissions = null;
         if (permissions != null && permissions.size() > 0)
