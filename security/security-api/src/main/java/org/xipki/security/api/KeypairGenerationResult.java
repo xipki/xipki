@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 xipki.org
+ * Copyright (c) 2014 Lijun Liao
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,10 @@
 package org.xipki.security.api;
 
 import org.bouncycastle.cert.X509CertificateHolder;
+
+/**
+ * @author Lijun Liao
+ */
 
 public abstract class KeypairGenerationResult
 {

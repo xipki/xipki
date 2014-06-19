@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 xipki.org
+ * Copyright (c) 2014 Lijun Liao
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,22 +18,25 @@
 package org.xipki.ca.server.mgmt;
 
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileReader;
-import java.io.FileWriter;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
 import org.xipki.security.common.IoCertUtil;
 
+/**
+ * @author Lijun Liao
+ */
+
 public class CanonicalizeCode
 {
 
     private final static String licenseText =
      "/*\n" +
-     " * Copyright (c) 2014 xipki.org\n" +
+     " * Copyright (c) 2014 Lijun Liao\n" +
      " *\n" +
      " * Licensed under the Apache License, Version 2.0 (the \"License\");\n" +
      " * you may not use this file except in compliance with the License.\n" +
@@ -92,8 +95,7 @@ public class CanonicalizeCode
     {
         BufferedReader reader = new BufferedReader(new FileReader(file));
 
-        File newFile = new File(file.getPath() + "-new");
-        BufferedWriter writer = new BufferedWriter(new FileWriter(newFile));
+        ByteArrayOutputStream writer = new ByteArrayOutputStream();
 
         try
         {
@@ -104,7 +106,7 @@ public class CanonicalizeCode
             {
                 if(line.trim().startsWith("package "))
                 {
-                    writer.write(licenseText);
+                    writer.write(licenseText.getBytes());
                     skip = false;
                 }
 
@@ -130,7 +132,7 @@ public class CanonicalizeCode
 
                     if(addThisLine)
                     {
-                        writer.write(canonicalizedLine);
+                        writer.write(canonicalizedLine.getBytes());
                         writer.write('\n');
                     }
                 }
@@ -142,17 +144,14 @@ public class CanonicalizeCode
         }
 
         byte[] oldBytes = IoCertUtil.read(file);
-        byte[] newBytes = IoCertUtil.read(newFile);
+        byte[] newBytes = writer.toByteArray();
         if(Arrays.equals(oldBytes, newBytes) == false)
         {
-            System.out.println(file.getPath());
+            File newFile = new File(file.getPath() + "-new");
+            IoCertUtil.save(file, newBytes);
             newFile.renameTo(file);
+            System.out.println(file.getPath());
         }
-        else
-        {
-            newFile.delete();
-        }
-
     }
 
     /**

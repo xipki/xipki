@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 xipki.org
+ * Copyright (c) 2014 Lijun Liao
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,6 +25,10 @@ import org.apache.felix.gogo.commands.Option;
 import org.xipki.security.api.P12KeypairGenerationResult;
 import org.xipki.security.common.IoCertUtil;
 import org.xipki.security.p10.P12KeypairGenerator;
+
+/**
+ * @author Lijun Liao
+ */
 
 @Command(scope = "keytool", name = "rsa-p12", description="Generate RSA keypair in PKCS#12 keystore")
 public class P12RSAKeyGenCommand extends KeyGenCommand

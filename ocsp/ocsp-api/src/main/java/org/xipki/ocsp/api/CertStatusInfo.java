@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 xipki.org
+ * Copyright (c) 2014 Lijun Liao
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,10 @@ import java.util.Date;
 import org.bouncycastle.asn1.ocsp.CrlID;
 import org.xipki.security.common.CertRevocationInfo;
 import org.xipki.security.common.HashAlgoType;
+
+/**
+ * @author Lijun Liao
+ */
 
 public class CertStatusInfo
 {

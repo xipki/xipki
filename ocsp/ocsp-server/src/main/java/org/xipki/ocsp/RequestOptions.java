@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 xipki.org
+ * Copyright (c) 2014 Lijun Liao
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,6 +24,10 @@ import org.xipki.ocsp.conf.jaxb.NonceType;
 import org.xipki.ocsp.conf.jaxb.RequestType;
 import org.xipki.ocsp.conf.jaxb.RequestType.HashAlgorithms;
 import org.xipki.security.common.HashAlgoType;
+
+/**
+ * @author Lijun Liao
+ */
 
 class RequestOptions
 {
