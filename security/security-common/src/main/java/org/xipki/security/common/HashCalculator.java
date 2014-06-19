@@ -68,10 +68,8 @@ public class HashCalculator
 
     public static byte[] hash(HashAlgoType hashAlgoType, byte[] data)
     {
-        if(hashAlgoType == null)
-        {
-             throw new IllegalArgumentException("hashAlgoType is null");
-        }
+        ParamChecker.assertNotNull("hashAlgoType", hashAlgoType);
+        ParamChecker.assertNotNull("data", data);
         if(mdsMap.containsKey(hashAlgoType) == false)
         {
              throw new IllegalArgumentException("Unknown hash algo " + hashAlgoType);

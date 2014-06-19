@@ -56,10 +56,7 @@ public class CertRevocationInfo
 
     public void setReason(CRLReason reason)
     {
-        if(reason == null)
-        {
-            throw new IllegalArgumentException("reason could not be null");
-        }
+        ParamChecker.assertNotNull("reason", reason);
         this.reason = reason;
     }
 

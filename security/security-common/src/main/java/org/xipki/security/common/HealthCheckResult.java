@@ -31,21 +31,13 @@ public class HealthCheckResult
     private Map<String, Object> statuses = new ConcurrentHashMap<>();
     private List<HealthCheckResult> childChecks = new LinkedList<>();
 
-    /*public HealthCheckResult()
-    {
-        this.name = "UNDEF";
-    }*/
-
     /**
      * Name of the check result
      * @param name
      */
     public HealthCheckResult(String name)
     {
-        if(name == null || name.isEmpty())
-        {
-            throw new IllegalArgumentException("name could not be null");
-        }
+        ParamChecker.assertNotEmpty("name", name);
         this.name = name;
     }
 
@@ -58,11 +50,6 @@ public class HealthCheckResult
     {
         this.statuses.clear();
     }
-
-    /*public void putStatus(String statusName, Object statusValue)
-    {
-        this.statuses.put(statusName, statusValue);
-    }*/
 
     public Object getStatus(String statusName)
     {
