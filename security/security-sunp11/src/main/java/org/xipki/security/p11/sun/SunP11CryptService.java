@@ -130,7 +130,7 @@ public final class SunP11CryptService implements P11CryptService
 
             if(idx_sunec < idx_xipki)
             {
-                Security.insertProviderAt(xipkiProv, idx_sunec+1);
+                Security.insertProviderAt(xipkiProv, idx_sunec + 1);
             }
 
             providers = Security.getProviders();

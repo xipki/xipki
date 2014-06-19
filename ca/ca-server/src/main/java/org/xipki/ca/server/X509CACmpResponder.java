@@ -574,7 +574,7 @@ public class X509CACmpResponder extends CmpResponder
         CertReqMsg[] certReqMsgs = kur.toCertReqMsgArray();
         CertResponse[] certResponses = new CertResponse[certReqMsgs.length];
 
-        for(int i=0; i<certReqMsgs.length; i++)
+        for(int i = 0; i < certReqMsgs.length; i++)
         {
             ChildAuditEvent childAuditEvent = null;
             if(auditEvent != null)
@@ -702,7 +702,7 @@ public class X509CACmpResponder extends CmpResponder
             CertificationRequestInfo certTemp = p10cr.getCertificationRequestInfo();
             Extensions extensions = null;
             ASN1Set attrs = certTemp.getAttributes();
-            for(int i=0; i<attrs.size(); i++)
+            for(int i = 0; i < attrs.size(); i++)
             {
                 Attribute attr = (Attribute) attrs.getObjectAt(i);
                 if(PKCSObjectIdentifiers.pkcs_9_at_extensionRequest.equals(attr.getAttrType()))

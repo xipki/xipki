@@ -138,7 +138,7 @@ public class HealthCheckResult
             if(pretty)
             {
                 sb.append("\n");
-                sb.append(getIndent(level+1));
+                sb.append(getIndent(level + 1));
             }
 
             sb.append("\"checks\":{");
@@ -155,8 +155,8 @@ public class HealthCheckResult
                 {
                     sb.append("\n");
                 }
-                sb.append(childCheck.toJsonMessage(level+2, pretty));
-                if(i < n-1)
+                sb.append(childCheck.toJsonMessage(level + 2, pretty));
+                if(i < n - 1)
                 {
                     sb.append(",");
                 }
@@ -165,7 +165,7 @@ public class HealthCheckResult
             if(pretty)
             {
                 sb.append("\n");
-                sb.append(getIndent(level+1));
+                sb.append(getIndent(level + 1));
             }
             sb.append("}");
         }

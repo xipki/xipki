@@ -499,7 +499,7 @@ public class IaikExtendedSlot
             LOG.debug("SessionInfo: {}", info);
         }
 
-        State state=info.getState();
+        State state = info.getState();
         long deviceError = info.getDeviceError();
 
         LOG.debug("to be verified PKCS11Module: state = {}, deviceError: {}", state, deviceError);
@@ -737,11 +737,11 @@ public class IaikExtendedSlot
             {
                 msg.append(" empty");
             }
-            for(int i = 0; i<tmpObjects.size(); i++)
+            for(int i = 0; i < tmpObjects.size(); i++)
             {
                 PrivateKey privKey = (PrivateKey) tmpObjects.get(i);
                 msg.append("------------------------PrivateKey ")
-                    .append(i+1).append("-------------------------\n");
+                    .append(i + 1).append("-------------------------\n");
 
                 msg.append("\tid(hex): ");
                 ByteArrayAttribute id = privKey.getId();
@@ -1000,7 +1000,7 @@ public class IaikExtendedSlot
             for(int i = 0; i<tmpObjects.size(); i++)
             {
                 X509PublicKeyCertificate cert = (X509PublicKeyCertificate) tmpObjects.get(i);
-                msg.append("------------------------Certificate ").append(i+1).append("-------------------------\n");
+                msg.append("------------------------Certificate ").append(i + 1).append("-------------------------\n");
 
                 msg.append("\tid(hex): ");
                 ByteArrayAttribute id = cert.getId();
@@ -1072,11 +1072,11 @@ public class IaikExtendedSlot
             {
                 msg.append(" empty");
             }
-            for(int i = 0; i<tmpObjects.size(); i++)
+            for(int i = 0; i < tmpObjects.size(); i++)
             {
                 iaik.pkcs.pkcs11.objects.PublicKey pubKey =
                         (iaik.pkcs.pkcs11.objects.PublicKey) tmpObjects.get(i);
-                msg.append("------------------------Public Key ").append(i+1).append("-------------------------\n");
+                msg.append("------------------------Public Key ").append(i + 1).append("-------------------------\n");
                 msg.append("\tid(hex): ");
                 ByteArrayAttribute id = pubKey.getId();
                 byte[] bytes = null;

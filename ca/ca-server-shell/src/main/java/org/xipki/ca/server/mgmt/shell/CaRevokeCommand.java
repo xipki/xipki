@@ -32,7 +32,7 @@ public class CaRevokeCommand extends CaCommand
     protected String           caName;
 
     @Option(name = "-reason",
-            required=true,
+            required = true,
             description = "Required. Reason, valid values are \n" +
                     "0: unspecified\n" +
                     "1: keyCompromise\n" +

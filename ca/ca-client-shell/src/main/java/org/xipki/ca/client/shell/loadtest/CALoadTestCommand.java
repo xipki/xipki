@@ -56,7 +56,7 @@ public class CALoadTestCommand extends ClientCommand
     private Boolean ecc;
 
     @Option(name="-keysize",
-            required =false,
+            required = false,
             description = "Key size of RSA key, the default is 2048.")
     private Integer keysize;
 
@@ -103,7 +103,7 @@ public class CALoadTestCommand extends ClientCommand
             {
                 keysize = 2048;
             }
-            loadTest =new CALoadTest.RSACALoadTest(raWorker, certProfile, commonNamePrefix, subjectNoCN, keysize.intValue());
+            loadTest = new CALoadTest.RSACALoadTest(raWorker, certProfile, commonNamePrefix, subjectNoCN, keysize.intValue());
         }
 
         loadTest.setDuration(durationInSecond);

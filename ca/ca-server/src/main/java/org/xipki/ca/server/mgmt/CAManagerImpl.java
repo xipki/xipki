@@ -253,7 +253,7 @@ public class CAManagerImpl implements CAManager
         }
 
         Statement stmt = null;
-        ResultSet rs =null;
+        ResultSet rs = null;
         try
         {
             stmt = createStatement();
@@ -303,7 +303,7 @@ public class CAManagerImpl implements CAManager
     private boolean do_unlockCA()
     {
         Statement stmt = null;
-        ResultSet rs =null;
+        ResultSet rs = null;
         try
         {
             try

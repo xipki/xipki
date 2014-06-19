@@ -81,16 +81,16 @@ class DefaultHttpCmpRequestor extends X509CmpRequestor
                         + httpUrlConnection.getResponseCode() + "  "
                         + httpUrlConnection.getResponseMessage());
             }
-            String responseContentType=httpUrlConnection.getContentType();
-            boolean isValidContentType=false;
-            if (responseContentType!=null)
+            String responseContentType = httpUrlConnection.getContentType();
+            boolean isValidContentType = false;
+            if (responseContentType != null)
             {
                if (responseContentType.equalsIgnoreCase(CMP_RESPONSE_MIMETYPE))
                {
-                   isValidContentType=true;
+                   isValidContentType = true;
                }
             }
-            if (isValidContentType==false)
+            if (isValidContentType == false)
             {
                 throw new IOException("Bad Response: Mime type "
                         + responseContentType
