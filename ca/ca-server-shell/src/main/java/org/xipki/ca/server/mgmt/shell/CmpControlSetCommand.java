@@ -28,37 +28,29 @@ import org.xipki.ca.cmp.server.CmpControl;
 @Command(scope = "ca", name = "cmpcontrol-set", description="Set CMP control")
 public class CmpControlSetCommand extends CaCommand
 {
-    @Option(name = "-ecc", aliases = { "--enableConfirmCert" },
-            description = "Confirm of certificate is required, the default is not required")
-    protected Boolean           enabledConfirmCert;
+    @Option(name = "-cc", aliases = { "--confirmCert" },
+            description = "Whether confirm of certificate is required.\n"
+                + "Valid values are 'yes' and 'no',\n"
+                + "the default is 'no'")
+    protected String           confirmCertS;
 
-    @Option(name = "-dcc", aliases = { "--disableConfirmCert" },
-            description = "Confirm of certificate is not required")
-    protected Boolean           disableConfirmCert;
+    @Option(name = "-scc", aliases = { "--sendCaCert" },
+            description = "Whether CA certificate is included in response.\n"
+                + "Valid values are 'yes' and 'no',\n"
+                + "the default is 'no'")
+    protected String            sendCaCertS;
 
-    @Option(name = "-esc", aliases = { "--enableSendCaCert" },
-            description = "Enable sending CA certificate in the response, the default is disabled")
-    protected Boolean            enableSendCaCert;
+    @Option(name = "-src", aliases = { "--sendResponderCert" },
+            description = "Whether responder certificate is included in response.\n"
+                + "Valid values are 'yes' and 'no',\n"
+                + "the default is 'yes'")
+    protected String            sendResponderCertS;
 
-    @Option(name = "-dsc", aliases = { "--disableSendCaCert" },
-            description = "Disable sending CA certificate in the responsed")
-    protected Boolean            disableSendCaCert;
-
-    @Option(name = "-erc", aliases = { "--enableSendResponderCert" },
-            description = "Enable sending Responder certificate in the response, the default is enabled")
-    protected Boolean            enableSendResponderCert;
-
-    @Option(name = "-drc", aliases = { "--disableSendResponderCert" },
-            description = "Disable sending Responder certificate in the response")
-    protected Boolean            disableSendResponderCert;
-
-    @Option(name = "-emt", aliases = { "--enableRequireMessageTime" },
-            description = "Enable sending Responder certificate in the response, the default is enabled")
-    protected Boolean            enableRequireMessageTime;
-
-    @Option(name = "-dmt", aliases = { "--disableRequireMessageTime" },
-            description = "Disable requiring message time in request")
-    protected Boolean            disableRequireMesssageTime;
+    @Option(name = "-mt", aliases = { "--messageTime" },
+            description = "Whether message time is required in request.\n"
+                + "Valid values are 'yes' and 'no',\n"
+                + "the default is 'yes'")
+    protected String            requireMessageTimeS;
 
     @Option(name = "-mtb", aliases = { "--msgTimeBias" },
             description = "Message time bias in seconds")
@@ -74,37 +66,16 @@ public class CmpControlSetCommand extends CaCommand
     {
         CmpControl entry = new CmpControl();
 
-        if(enabledConfirmCert != null && disableConfirmCert != null )
-        {
-            System.err.println("Confirm of certificate could not be enabled and disabled at the same time");
-            return null;
-        }
-        boolean confirmCert = isEnabled(enabledConfirmCert, disableConfirmCert, false);
+        boolean confirmCert = isEnabled(confirmCertS, false, "confirmCert");
         entry.setRequireConfirmCert(confirmCert);
 
-        if(enableSendCaCert != null && disableSendCaCert != null )
-        {
-            System.err.println("Sending CA certificate could not be enabled and disabled at the same time");
-            return null;
-        }
-        boolean sendCaCert = isEnabled(enableSendCaCert, disableSendCaCert, false);
+        boolean sendCaCert = isEnabled(sendCaCertS, false, "sendCaCert");
         entry.setSendCaCert(sendCaCert);
 
-        if(enableSendResponderCert != null && disableSendResponderCert != null)
-        {
-            System.err.println("Sending responder certificate could not be enabled and disabled at the same time");
-            return null;
-        }
-        boolean sendResponderCert = isEnabled(enableSendResponderCert, disableSendResponderCert, true);
+        boolean sendResponderCert = isEnabled(sendResponderCertS, true, "sendResponderCert");
         entry.setSendResponderCert(sendResponderCert);
 
-        if(enableRequireMessageTime != null && disableRequireMesssageTime != null)
-        {
-            System.err.println("Requiring message time could not be enabled and disabled at the same time");
-            return null;
-        }
-
-        boolean requireMessageTime = isEnabled(enableRequireMessageTime, disableRequireMesssageTime, true);
+        boolean requireMessageTime = isEnabled(requireMessageTimeS, true, "messageTime");
         entry.setMessageTimeRequired(requireMessageTime);
 
         if(messageTimeBias != null)
