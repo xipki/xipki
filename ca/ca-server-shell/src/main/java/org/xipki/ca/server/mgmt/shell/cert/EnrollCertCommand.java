@@ -107,7 +107,7 @@ public class EnrollCertCommand extends CaCommand
             CertificationRequestInfo certTemp = p10cr.getCertificationRequestInfo();
             Extensions extensions = null;
             ASN1Set attrs = certTemp.getAttributes();
-            for(int i=0; i<attrs.size(); i++)
+            for(int i = 0; i < attrs.size(); i++)
             {
                 Attribute attr = (Attribute) attrs.getObjectAt(i);
                 if(PKCSObjectIdentifiers.pkcs_9_at_extensionRequest.equals(attr.getAttrType()))

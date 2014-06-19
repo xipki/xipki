@@ -85,7 +85,7 @@ public class DefaultHttpOCSPRequestor extends AbstractOCSPRequestor
                         + httpUrlConnection.getResponseCode() + "  "
                         + httpUrlConnection.getResponseMessage());
             }
-            String responseContentType=httpUrlConnection.getContentType();
+            String responseContentType = httpUrlConnection.getContentType();
             boolean isValidContentType = false;
             if (responseContentType != null)
             {

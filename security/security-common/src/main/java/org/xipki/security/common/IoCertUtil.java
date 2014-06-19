@@ -634,4 +634,38 @@ public class IoCertUtil
             running = false;
         }
     }
+    
+
+    public static byte[] leftmost(byte[] bytes, int bitCount)
+    {
+        int byteLenKey = (bitCount + 7)/8;
+
+        if (bitCount >= (bytes.length << 3))
+        {
+            return bytes;
+        }
+
+        byte[] truncatedBytes = new byte[byteLenKey];
+        System.arraycopy(bytes, 0, truncatedBytes, 0, byteLenKey);
+
+        if (bitCount%8 > 0) // shift the bits to the right
+        {
+            int shiftBits = 8-(bitCount%8);
+
+            for(int i = byteLenKey - 1; i > 0; i--)
+            {
+                truncatedBytes[i] = (byte) (
+                        (byte2int(truncatedBytes[i]) >>> shiftBits) |
+                        ((byte2int(truncatedBytes[i- 1]) << (8 - shiftBits)) & 0xFF));
+            }
+            truncatedBytes[0] = (byte)(byte2int(truncatedBytes[0]) >>> shiftBits);
+        }
+
+        return truncatedBytes;
+    }
+
+    private static int byte2int(byte b)
+    {
+        return b >= 0 ? b : 256 + b;
+    }
 }

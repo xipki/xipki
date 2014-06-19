@@ -78,13 +78,13 @@ public class CmpUtf8Pairs
             String token = string.substring(beginIndex, endIndex);
 
             int sepIdx = token.indexOf(NAME_TERM);
-            if(sepIdx == -1 || sepIdx == token.length()-1)
+            if(sepIdx == -1 || sepIdx == token.length() - 1)
             {
                 throw new IllegalArgumentException("Invalid token: " + token);
             }
             String name = token.substring(0, sepIdx);
             name = decodeNameOrValue(name);
-            String value = token.substring(sepIdx+1);
+            String value = token.substring(sepIdx + 1);
             value = decodeNameOrValue(value);
             pairs.put(name, value);
 
@@ -116,7 +116,7 @@ public class CmpUtf8Pairs
 
         StringBuilder newS = new StringBuilder();
 
-        for(int i=0; i<s.length();)
+        for(int i = 0; i < s.length();)
         {
             char c = s.charAt(i);
             if(c != TOKEN_TERM)
@@ -126,9 +126,9 @@ public class CmpUtf8Pairs
             }
             else
             {
-                if(i+3 <= s.length())
+                if(i + 3 <= s.length())
                 {
-                    String hex = s.substring(i+1, i+3);
+                    String hex = s.substring(i + 1, i + 3);
                     c = (char) Byte.parseByte(hex, 16);
                     newS.append(c);
                     i += 3;

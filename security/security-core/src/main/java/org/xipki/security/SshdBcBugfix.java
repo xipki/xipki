@@ -71,7 +71,7 @@ public class SshdBcBugfix
             String methodName,
             Class<?>[] params)
     {
-        Method serviceMethod=null;
+        Method serviceMethod = null;
         final String desc = "Method " + clz.getName() + "." + methodName;
 
         try

@@ -137,7 +137,7 @@ public class RandomSerialNumberGenerator
         boolean ok = false;
         BigInteger serno = null;
 
-        while (!ok)
+        while (ok == false)
         {
             random.nextBytes(sernobytes);
             serno = (new java.math.BigInteger(sernobytes)).abs();
