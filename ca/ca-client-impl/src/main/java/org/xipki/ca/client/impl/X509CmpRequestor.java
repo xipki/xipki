@@ -650,7 +650,7 @@ abstract class X509CmpRequestor extends CmpRequestor
         List<EnrollCertRequestEntryType> reqEntries = req.getRequestEntries();
         CertReqMsg[] certReqMsgs = new CertReqMsg[reqEntries.size()];
 
-        for(int i=0; i<reqEntries.size(); i++)
+        for(int i = 0; i < reqEntries.size(); i++)
         {
             EnrollCertRequestEntryType reqEntry = reqEntries.get(i);
             CmpUtf8Pairs utf8Pairs = new CmpUtf8Pairs(CmpUtf8Pairs.KEY_CERT_PROFILE, reqEntry.getCertProfile());

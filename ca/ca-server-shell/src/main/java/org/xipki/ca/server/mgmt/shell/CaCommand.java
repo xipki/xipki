@@ -41,7 +41,7 @@ public abstract class CaCommand extends OsgiCommandSupport
         }
         else if(disabled != null)
         {
-            b = ! disabled.booleanValue();
+            b = disabled.booleanValue() == false;
         }
         return b;
     }

@@ -77,7 +77,7 @@ abstract class CALoadTest extends AbstractLoadTest
 
             this.baseN = BigInteger.valueOf(0);
             this.baseN = this.baseN.setBit(keysize - 1);
-            for(int i = 32; i < keysize - 1; i+= 2)
+            for(int i = 32; i < keysize - 1; i += 2)
             {
                 this.baseN = this.baseN.setBit(i);
             }
@@ -93,7 +93,7 @@ abstract class CALoadTest extends AbstractLoadTest
                 return SubjectPublicKeyInfoFactory.createSubjectPublicKeyInfo(
                         SignerUtil.generateRSAPublicKeyParameter(
                                 org.xipki.security.KeyUtil.generateRSAPublicKey(modulus,
-                                        BigInteger.valueOf(65535))));
+                                        BigInteger.valueOf(65537))));
             } catch (InvalidKeySpecException e)
             {
                 LOG.warn("InvalidKeySpecException: {}", e.getMessage());

@@ -147,12 +147,12 @@ public class PBETool
         {
             String arg = params[i];
 
-            if(i+1 >= params.length)
+            if(i + 1 >= params.length)
             {
                 printUsageAndExit("invalid parameters");
             }
 
-            String argValue = params[i+1];
+            String argValue = params[i + 1];
 
             if(arg.startsWith("-"))
             {

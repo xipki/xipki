@@ -115,7 +115,6 @@ class SelfSignedCertBuilder
     {
         if("pkcs12".equalsIgnoreCase(signerType) || "jks".equalsIgnoreCase(signerType))
         {
-            // password?1234%keystore?generate:keytype=rsa;keysize=2048;exponent=65535%hash?SHA256%padding?PKCS1v1_5
             CmpUtf8Pairs keyValues = new CmpUtf8Pairs(signerConf);
             String keystoreConf = keyValues.getValue("keystore");
             if(keystoreConf == null)
@@ -272,7 +271,7 @@ class SelfSignedCertBuilder
             Certificate bcCert;
             try
             {
-                bcCert= certBuilder.build(contentSigner).toASN1Structure();
+                bcCert = certBuilder.build(contentSigner).toASN1Structure();
             }finally
             {
                 signer.returnContentSigner(contentSigner);

@@ -81,16 +81,16 @@ class DefaultRemoteP11CryptService extends RemoteP11CryptService
 
         try
         {
-            String responseContentType=httpUrlConnection.getContentType();
-            boolean isValidContentType=false;
-            if (responseContentType!=null)
+            String responseContentType = httpUrlConnection.getContentType();
+            boolean isValidContentType = false;
+            if (responseContentType != null)
             {
                    if (responseContentType.equalsIgnoreCase(CMP_RESPONSE_MIMETYPE))
                    {
-                       isValidContentType=true;
+                       isValidContentType = true;
                 }
             }
-            if (isValidContentType==false)
+            if (isValidContentType == false)
             {
                 throw new IOException("Bad Response: Mime type "
                         + responseContentType

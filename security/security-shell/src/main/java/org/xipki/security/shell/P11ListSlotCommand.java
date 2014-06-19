@@ -131,7 +131,7 @@ public class P11ListSlotCommand extends SecurityCommand
 
                 PublicKey pubKey = slot.getPublicKeyObject(null, null, keyId, keyLabel);
                 sb.append("\t")
-                    .append(i+1)
+                    .append(i + 1)
                     .append(". ")
                     .append(privKey.getKeyLabelAsText())
                     .append(" (").append("id: ")
@@ -157,7 +157,7 @@ public class P11ListSlotCommand extends SecurityCommand
             {
                 X509PublicKeyCertificate certObj = allCertObjects.get(i);
                 sb.append("\tCert-")
-                    .append(i+1)
+                    .append(i + 1)
                     .append(". ")
                     .append(certObj.getLabel().getCharArrayValue())
                     .append(" (").append("id: ")
