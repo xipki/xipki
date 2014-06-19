@@ -35,6 +35,7 @@ import javax.crypto.NoSuchPaddingException;
 
 import org.xipki.security.api.PKCS11SlotIdentifier;
 import org.xipki.security.api.SignerException;
+import org.xipki.security.common.IoCertUtil;
 import org.xipki.security.common.ParamChecker;
 
 class SunP11Identity implements Comparable<SunP11Identity>
@@ -178,7 +179,7 @@ class SunP11Identity implements Comparable<SunP11Identity>
         if (inLen+3 > blockSize)
         {
             throw new SignerException(
-                    "data too long (maximal " + (blockSize - 3)+ " allowed): " + inLen);
+                    "data too long (maximal " + (blockSize - 3) + " allowed): " + inLen);
         }
 
         byte[]  block = new byte[blockSize];
@@ -228,7 +229,7 @@ class SunP11Identity implements Comparable<SunP11Identity>
             throw new SignerException("Operation CKM_ECDSA is not allowed for " + publicKey.getAlgorithm() + " public key");
         }
 
-        byte[] truncatedDigest = leftmost(hash, signatureKeyBitLength);
+        byte[] truncatedDigest = IoCertUtil.leftmost(hash, signatureKeyBitLength);
 
         synchronized (ecdsaSignature)
         {
@@ -241,39 +242,6 @@ class SunP11Identity implements Comparable<SunP11Identity>
                 throw new SignerException(e.getMessage(), e);
             }
         }
-    }
-
-    private static byte[] leftmost(byte[] bytes, int bitCount)
-    {
-        int byteLenKey = (bitCount + 7)/8;
-
-        if (bitCount >= (bytes.length<<3))
-        {
-            return bytes;
-        }
-
-        byte[] truncatedBytes = new byte[byteLenKey];
-        System.arraycopy(bytes, 0, truncatedBytes, 0, byteLenKey);
-
-        if (bitCount%8 > 0) // shift the bits to the right
-        {
-            int shiftBits = 8-(bitCount%8);
-
-            for(int i = byteLenKey - 1; i > 0; i--)
-            {
-                truncatedBytes[i] = (byte) (
-                                (byte2int(truncatedBytes[i]) >>> shiftBits) |
-                                ((byte2int(truncatedBytes[i-1]) << (8-shiftBits)) & 0xFF));
-            }
-            truncatedBytes[0] = (byte)(byte2int(truncatedBytes[0])>>>shiftBits);
-        }
-
-        return truncatedBytes;
-    }
-
-    private static int byte2int(byte b)
-    {
-        return b >= 0 ? b : 256 + b;
     }
 
     @Override

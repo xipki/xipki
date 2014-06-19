@@ -241,7 +241,7 @@ public final class IaikP11CryptService implements P11CryptService
                             Set<X509Certificate> issuerCerts = allCerts.get(issuerSubject);
                             if(issuerCerts == null)
                             {
-                                issuerCerts= new HashSet<>();
+                                issuerCerts = new HashSet<>();
                                 X509PublicKeyCertificate[] certObjects = slot.getCertificateObjects(
                                         signatureCert.getIssuerX500Principal());
                                 if(certObjects != null && certObjects.length > 0)
@@ -523,11 +523,11 @@ public final class IaikP11CryptService implements P11CryptService
         if(p11Key instanceof RSAPublicKey)
         {
             RSAPublicKey rsaP11Key = (RSAPublicKey) p11Key;
-            byte[] expBytes=rsaP11Key.getPublicExponent().getByteArrayValue();
-            BigInteger exp=new BigInteger(1,expBytes);
+            byte[] expBytes = rsaP11Key.getPublicExponent().getByteArrayValue();
+            BigInteger exp = new BigInteger(1,expBytes);
 
-            byte[] modBytes=rsaP11Key.getModulus().getByteArrayValue();
-            BigInteger mod=new BigInteger(1,modBytes);
+            byte[] modBytes = rsaP11Key.getModulus().getByteArrayValue();
+            BigInteger mod = new BigInteger(1,modBytes);
 
             if(LOG.isDebugEnabled())
             {

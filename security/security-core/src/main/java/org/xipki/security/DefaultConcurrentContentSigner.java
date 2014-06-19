@@ -57,7 +57,7 @@ public class DefaultConcurrentContentSigner implements ConcurrentContentSigner
         String v = System.getProperty("org.xipki.signservice.timeout");
         if(v != null)
         {
-            int vi =Integer.parseInt(v);
+            int vi = Integer.parseInt(v);
             // valid value is between 0 and 60 seconds
             if(vi < 0 || vi > 60 * 1000)
             {

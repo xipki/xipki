@@ -63,7 +63,7 @@ public class IaikExtendedModule
             throw new SignerException("No slot with present card could be found");
         }
 
-        for (int i=0; i < slotList.length; i++)
+        for (int i = 0; i < slotList.length; i++)
         {
             Slot slot = slotList[i];
             PKCS11SlotIdentifier slotId = new PKCS11SlotIdentifier(i, slot.getSlotID());
@@ -75,7 +75,7 @@ public class IaikExtendedModule
             try
             {
                 StringBuilder msg = new StringBuilder();
-                for (int i=0; i<slotList.length; i++)
+                for (int i = 0; i < slotList.length; i++)
                 {
                     Slot slot = slotList[i];
                     msg.append("------------------------Slot ").append(i+1).append("-------------------------\n");

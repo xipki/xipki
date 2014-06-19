@@ -30,6 +30,7 @@ import org.bouncycastle.asn1.DERSequence;
 import org.xipki.security.api.PKCS11SlotIdentifier;
 import org.xipki.security.api.Pkcs11KeyIdentifier;
 import org.xipki.security.api.SignerException;
+import org.xipki.security.common.IoCertUtil;
 import org.xipki.security.common.ParamChecker;
 
 class IaikP11Identity implements Comparable<IaikP11Identity>
@@ -176,7 +177,7 @@ class IaikP11Identity implements Comparable<IaikP11Identity>
             throw new SignerException("Could not find slot " + slotId);
         }
 
-        byte[] truncatedDigest = leftmost(hash, signatureKeyBitLength);
+        byte[] truncatedDigest = IoCertUtil.leftmost(hash, signatureKeyBitLength);
 
         byte[] signature = slot.CKM_ECDSA(truncatedDigest, keyId);
         return convertToX962Signature(signature);
@@ -202,39 +203,6 @@ class IaikP11Identity implements Comparable<IaikP11Identity>
         {
             throw new SignerException("IOException, message: " + e.getMessage(), e);
         }
-    }
-
-    private static byte[] leftmost(byte[] bytes, int bitCount)
-    {
-        int byteLenKey = (bitCount + 7)/8;
-
-        if (bitCount >= (bytes.length << 3))
-        {
-            return bytes;
-        }
-
-        byte[] truncatedBytes = new byte[byteLenKey];
-        System.arraycopy(bytes, 0, truncatedBytes, 0, byteLenKey);
-
-        if (bitCount%8 > 0) // shift the bits to the right
-        {
-            int shiftBits = 8-(bitCount%8);
-
-            for(int i = byteLenKey - 1; i > 0; i--)
-            {
-                truncatedBytes[i] = (byte) (
-                                (byte2int(truncatedBytes[i]) >>> shiftBits) |
-                                ((byte2int(truncatedBytes[i-1]) << (8-shiftBits)) & 0xFF));
-            }
-            truncatedBytes[0] = (byte)(byte2int(truncatedBytes[0]) >>> shiftBits);
-        }
-
-        return truncatedBytes;
-    }
-
-    private static int byte2int(byte b)
-    {
-        return b >= 0 ? b : 256 + b;
     }
 
     @Override

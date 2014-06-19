@@ -77,7 +77,7 @@ public class IaikP11ModulePool
 
         try
         {
-            module=Module.getInstance(pkcs11Lib);
+            module = Module.getInstance(pkcs11Lib);
         }catch(IOException e)
         {
             LOG.error("IOException: {}", e.getMessage());
