@@ -52,10 +52,7 @@ class CrlCertStatusInfo
             String certProfile,
             Map<HashAlgoType, byte[]> certHashes)
     {
-        if(certHashes == null || certHashes.isEmpty())
-        {
-            throw new IllegalArgumentException("certHashes is null or empty");
-        }
+        ParamChecker.assertNotEmpty("certProfile", certProfile);
         return new CrlCertStatusInfo(CertStatus.GOOD, null, certProfile, certHashes);
     }
 

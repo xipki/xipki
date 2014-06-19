@@ -28,6 +28,7 @@ import org.xipki.security.api.P11CryptService;
 import org.xipki.security.api.PKCS11SlotIdentifier;
 import org.xipki.security.api.Pkcs11KeyIdentifier;
 import org.xipki.security.api.SignerException;
+import org.xipki.security.common.ParamChecker;
 
 public class P11PrivateKey implements PrivateKey
 {
@@ -44,18 +45,9 @@ public class P11PrivateKey implements PrivateKey
             Pkcs11KeyIdentifier keyId)
     throws InvalidKeyException
     {
-        if(p11CryptService == null)
-        {
-            throw new IllegalArgumentException("p11CryptService could not be null");
-        }
-        if(slotId == null)
-        {
-            throw new IllegalArgumentException("slotId could not be null");
-        }
-        if(keyId == null)
-        {
-            throw new IllegalArgumentException("keyId could not be null");
-        }
+        ParamChecker.assertNotNull("p11CryptService", p11CryptService);
+        ParamChecker.assertNotNull("slotId", slotId);
+        ParamChecker.assertNotNull("keyId", keyId);
 
         this.p11CryptService = p11CryptService;
         this.slotId = slotId;

@@ -2482,10 +2482,7 @@ public class CAManagerImpl implements CAManager
     @Override
     public List<PublisherEntry> getPublishersForCA(String caName)
     {
-        if(caName == null)
-        {
-            throw new IllegalArgumentException("caName is null");
-        }
+        ParamChecker.assertNotEmpty("caName", caName);
 
         Set<String> publisherNames = ca_has_publishers.get(caName);
         if(publisherNames == null)
@@ -2889,10 +2886,7 @@ public class CAManagerImpl implements CAManager
     public static Set<Permission> getPermissions(String permissionsText)
     throws CAMgmtException
     {
-        if(permissionsText == null)
-        {
-            throw new IllegalArgumentException("permissionsText is null");
-        }
+        ParamChecker.assertNotEmpty("permissionsText", permissionsText);
 
         List<String> l = tokensAsList(permissionsText, ", ");
         Set<Permission> permissions = new HashSet<>();

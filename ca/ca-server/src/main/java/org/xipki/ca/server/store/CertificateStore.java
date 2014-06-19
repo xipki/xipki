@@ -38,6 +38,7 @@ import org.xipki.ca.server.CertRevocationInfoWithSerial;
 import org.xipki.ca.server.CertStatus;
 import org.xipki.database.api.DataSource;
 import org.xipki.security.common.CertRevocationInfo;
+import org.xipki.security.common.ParamChecker;
 
 public class CertificateStore
 {
@@ -47,8 +48,7 @@ public class CertificateStore
     public CertificateStore(DataSource dataSource)
     throws SQLException
     {
-        if(dataSource == null)
-            throw new IllegalArgumentException("dataSource is null");
+        ParamChecker.assertNotNull("dataSource", dataSource);
 
         this.queryExecutor = new CertStoreQueryExecutor(dataSource);
     }

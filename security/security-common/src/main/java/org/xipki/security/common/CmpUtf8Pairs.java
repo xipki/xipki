@@ -146,8 +146,9 @@ public class CmpUtf8Pairs
 
     public void putUtf8Pair(String name, String value)
     {
-        if(name == null || name.isEmpty())
-            throw new IllegalArgumentException("name is null or empty");
+        ParamChecker.assertNotEmpty("name", name);
+        ParamChecker.assertNotNull("value", value);
+
         char c = name.charAt(0);
         if(c >= '0' && c <= '9')
             throw new IllegalArgumentException("name begin with " + c);
