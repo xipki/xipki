@@ -193,7 +193,10 @@ public class IaikExtendedSlot
         {
             Mechanism algorithmId = Mechanism.get(PKCS11Constants.CKM_RSA_PKCS);
 
-            LOG.debug("sign with private key:\n{}", signatureKey);
+            if(LOG.isTraceEnabled())
+            {
+                LOG.debug("sign with private key:\n{}", signatureKey);
+            }
 
             synchronized (session)
             {
@@ -245,7 +248,7 @@ public class IaikExtendedSlot
                 login(session);
                 session.signInit(algorithmId, signatureKey);
                 byte[] signature = session.sign(hash);
-                if (LOG.isDebugEnabled())
+                if (LOG.isTraceEnabled())
                 {
                     LOG.debug("signature:\n{}", Hex.toHexString(signature));
                 }
