@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 xipki.org
+ * Copyright (c) 2014 Lijun Liao
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -47,6 +47,10 @@ import org.xipki.security.p11.iaik.IaikExtendedSlot;
 import org.xipki.security.p11.iaik.IaikP11CryptService;
 import org.xipki.security.p11.iaik.IaikP11ModulePool;
 import org.xipki.security.p11.iaik.IaikP11Util;
+
+/**
+ * @author Lijun Liao
+ */
 
 @Command(scope = "keytool", name = "update-cert", description="Update certificate in PKCS#11 device")
 public class P11CertUpdateCommand extends SecurityCommand

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 xipki.org
+ * Copyright (c) 2014 Lijun Liao
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,10 @@ import java.security.SecureRandom;
 import iaik.pkcs.pkcs11.Session;
 import iaik.pkcs.pkcs11.objects.Key;
 import iaik.pkcs.pkcs11.objects.X509PublicKeyCertificate;
+
+/**
+ * @author Lijun Liao
+ */
 
 public class IaikP11Util
 {

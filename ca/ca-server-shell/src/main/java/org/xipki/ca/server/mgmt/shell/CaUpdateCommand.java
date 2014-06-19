@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 xipki.org
+ * Copyright (c) 2014 Lijun Liao
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,6 +31,10 @@ import org.xipki.ca.server.mgmt.Permission;
 import org.xipki.security.api.PasswordResolver;
 import org.xipki.security.common.ConfigurationException;
 import org.xipki.security.common.IoCertUtil;
+
+/**
+ * @author Lijun Liao
+ */
 
 @Command(scope = "ca", name = "ca-update", description="Update CA")
 public class CaUpdateCommand extends CaCommand

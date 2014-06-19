@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 xipki.org
+ * Copyright (c) 2014 Lijun Liao
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,10 @@ package org.xipki.ca.server.mgmt.shell;
 import org.apache.felix.gogo.commands.Command;
 import org.apache.felix.gogo.commands.Option;
 import org.xipki.ca.cmp.server.CmpControl;
+
+/**
+ * @author Lijun Liao
+ */
 
 @Command(scope = "ca", name = "cmpcontrol-set", description="Set CMP control")
 public class CmpControlSetCommand extends CaCommand

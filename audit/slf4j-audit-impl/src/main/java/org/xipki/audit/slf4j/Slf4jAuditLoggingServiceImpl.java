@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 xipki.org
+ * Copyright (c) 2014 Lijun Liao
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,6 +30,10 @@ import org.xipki.audit.api.AuditEventDataType;
 import org.xipki.audit.api.AuditLoggingService;
 import org.xipki.audit.api.AuditStatus;
 import org.xipki.audit.api.PCIAuditEvent;
+
+/**
+ * @author Lijun Liao
+ */
 
 public class Slf4jAuditLoggingServiceImpl implements AuditLoggingService
 {

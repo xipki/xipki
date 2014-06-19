@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 xipki.org
+ * Copyright (c) 2014 Lijun Liao
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -52,6 +52,10 @@ import org.xipki.remotep11.common.asn1.SlotIdentifier;
 import org.xipki.security.api.P11CryptService;
 import org.xipki.security.api.PKCS11SlotIdentifier;
 import org.xipki.security.api.Pkcs11KeyIdentifier;
+
+/**
+ * @author Lijun Liao
+ */
 
 class CmpResponder
 {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 xipki.org
+ * Copyright (c) 2014 Lijun Liao
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,23 +25,26 @@ import java.util.Date;
 /**
  * This file is copied from PCSSyslogMessage from syslog4j.org
  *
-* PCISyslogMessage provides support for audit trails defined by section
-* 10.3 of the PCI Data Security Standard (PCI DSS) versions 1.1 and 1.2.
-*
-* <p>More information on the PCI DSS specification is available here:</p>
-*
-* <p>https://www.pcisecuritystandards.org/security_standards/pci_dss.shtml</p>
-*
-* <p>The PCI DSS specification is Copyright 2008 PCI Security Standards
-* Council LLC.</p>
-*
-* <p>Syslog4j is licensed under the Lesser GNU Public License v2.1.  A copy
-* of the LGPL license is available in the META-INF folder in all
-* distributions of Syslog4j and in the base directory of the "doc" ZIP.</p>
-*
-* @author &lt;syslog4j@productivity.org&gt;
-* @version $Id: PCISyslogMessage.java,v 1.3 2008/11/14 04:32:00 cvs Exp $
-*/
+ * PCISyslogMessage provides support for audit trails defined by section
+ * 10.3 of the PCI Data Security Standard (PCI DSS) versions 1.1 and 1.2.
+ *
+ * <p>More information on the PCI DSS specification is available here:</p>
+ *
+ * <p>https://www.pcisecuritystandards.org/security_standards/pci_dss.shtml</p>
+ *
+ * <p>The PCI DSS specification is Copyright 2008 PCI Security Standards
+ * Council LLC.</p>
+ *
+ * <p>Syslog4j is licensed under the Lesser GNU Public License v2.1.  A copy
+ * of the LGPL license is available in the META-INF folder in all
+ * distributions of Syslog4j and in the base directory of the "doc" ZIP.</p>
+ *
+ * @author &lt;syslog4j@productivity.org&gt;
+ * @version $Id: PCISyslogMessage.java,v 1.3 2008/11/14 04:32:00 cvs Exp $
+ *
+ * @author Lijun Liao
+ */
+
 public class PCIAuditEvent
 {
     public static final String UNDEFINED = "undefined";
