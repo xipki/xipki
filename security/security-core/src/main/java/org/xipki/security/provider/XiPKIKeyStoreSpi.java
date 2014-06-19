@@ -45,6 +45,7 @@ import org.xipki.security.api.P11CryptServiceFactory;
 import org.xipki.security.api.PKCS11SlotIdentifier;
 import org.xipki.security.api.Pkcs11KeyIdentifier;
 import org.xipki.security.api.SignerException;
+import org.xipki.security.common.ParamChecker;
 
 public class XiPKIKeyStoreSpi extends KeyStoreSpi
 {
@@ -82,10 +83,8 @@ public class XiPKIKeyStoreSpi extends KeyStoreSpi
 
         public KeyCertEntry(PrivateKey key, Certificate[] chain)
         {
-            if(chain == null)
-            {
-                throw new IllegalArgumentException("chain is null");
-            }
+            ParamChecker.assertNotNull("key", key);
+            ParamChecker.assertNotNull("chain", chain);
             if(chain.length < 1)
             {
                 throw new IllegalArgumentException("chain does not contain any certificate");
