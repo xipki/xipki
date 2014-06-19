@@ -57,21 +57,17 @@ public class CrlSignerUpdateCommand extends CaCommand
             description = "Overlap of CRL")
     protected Integer            overlap;
 
-    @Option(name = "-ewc", aliases = { "--enableWithCerts" },
-            description = "Certificates are contained in the CRL")
-    protected Boolean            enableWithCerts;
+    @Option(name = "-wc", aliases = { "--withCert" },
+            description = "Whether certificates are contained in CRL.\n"
+                + "Valid values are 'yes' and 'no',\n"
+                + "the default is 'no'")
+    protected String            withCertS;
 
-    @Option(name = "-dwc", aliases = { "--disableWithCerts" },
-            description = "Certificates are not contained in the CRL")
-    protected Boolean            disableWithCerts;
-
-    @Option(name = "-eec", aliases = { "--enableExpiredCerts" },
-            description = "Include revocation information of expired certificates")
-    protected Boolean            enableExpiredCerts;
-
-    @Option(name = "-dec", aliases = { "--disableExpiredCerts" },
-            description = "Do not include revocation information of expired certificates,")
-    protected Boolean            disableExpiredCerts;
+    @Option(name = "-wec", aliases = { "--withExpiredCerts" },
+            description = "Whether expired certificates are contained in CRL.\n"
+                    + "Valid values are 'yes' and 'no',\n"
+                    + "the default is 'no'")
+    protected String            withExpiredCertS;
 
     @Override
     protected Object doExecute()
@@ -89,25 +85,11 @@ public class CrlSignerUpdateCommand extends CaCommand
             signerCertConf = Base64.toBase64String(certBytes);
         }
 
-        if(enableWithCerts != null && disableWithCerts != null )
-        {
-            System.err.println("Containing certificates in CRL could not be enabled and disabled at the same time");
-        }
-
-        Boolean includeCerts = null;
-        if(enableWithCerts != null || disableWithCerts != null)
-        {
-            includeCerts = isEnabled(enableWithCerts, disableWithCerts, false);
-        }
-
-        Boolean includeExpiredCerts = null;
-        if(enableExpiredCerts != null || disableExpiredCerts != null)
-        {
-            includeExpiredCerts = isEnabled(enableExpiredCerts, disableExpiredCerts, false);
-        }
+        Boolean withCert = isEnabled(withCertS, "withCert");
+        Boolean withExpiredCert = isEnabled(withExpiredCertS, "withExpiredCerts");
 
         caManager.changeCrlSigner(name, signerType, signerConf, signerCertConf, period, overlap,
-                includeCerts, includeExpiredCerts);
+                withCert, withExpiredCert);
         return null;
     }
 }

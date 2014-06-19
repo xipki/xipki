@@ -60,23 +60,17 @@ public class CrlSignerAddCommand extends CaCommand
             description = "Overlap of CRL")
     protected Integer            overlap;
 
-    @Option(name = "-ewc", aliases = { "--enableWithCerts" },
-            description = "Certificates are contained in the CRL, the default is not")
-    protected Boolean            enableWithCerts;
+    @Option(name = "-wc", aliases = { "--withCert" },
+            description = "Whether certificates are contained in CRL.\n"
+                + "Valid values are 'yes' and 'no',\n"
+                + "the default is 'no'")
+    protected String            withCertS;
 
-    @Option(name = "-dwc", aliases = { "--disableWithCerts" },
-            description = "Certificates are not contained in the CRL, the default is not")
-    protected Boolean            disableWithCerts;
-
-    @Option(name = "-eec", aliases = { "--enableExpiredCerts" },
-            description = "Include revocation information of expired certificates.\n"
-                    + "The default is not included")
-    protected Boolean            enableExpiredCerts;
-
-    @Option(name = "-dec", aliases = { "--disableExpiredCerts" },
-            description = "Do not include revocation information of expired certificates.\n"
-                    + "The default is not included")
-    protected Boolean            disableExpiredCerts;
+    @Option(name = "-wec", aliases = { "--withExpiredCerts" },
+            description = "Whether expired certificates are contained in CRL.\n"
+                    + "Valid values are 'yes' and 'no',\n"
+                    + "the default is 'no'")
+    protected String            withExpiredCertS;
 
     private SecurityFactory securityFactory;
     private PasswordResolver passwordResolver;
@@ -118,16 +112,11 @@ public class CrlSignerAddCommand extends CaCommand
             entry.setOverlap(overlap);
         }
 
-        if(enableWithCerts != null && disableWithCerts != null )
-        {
-            System.err.println(
-                    "Containing certificates in CRL could not be enabled and disabled at the same time");
-        }
-        boolean withCerts = isEnabled(enableWithCerts, disableWithCerts, false);
-        entry.setIncludeCertsInCrl(withCerts);
+        boolean withCert = isEnabled(withCertS, false, "withCert");
+        entry.setIncludeCertsInCrl(withCert);
 
-        boolean withExpiredCerts = isEnabled(enableExpiredCerts, disableExpiredCerts, false);
-        entry.setIncludeExpiredCerts(withExpiredCerts);
+        boolean withExpiredCert = isEnabled(withExpiredCertS, false, "withExpiredCerts");
+        entry.setIncludeExpiredCerts(withExpiredCert);
 
         caManager.addCrlSigner(entry);
 

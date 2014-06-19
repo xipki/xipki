@@ -116,21 +116,17 @@ public class CaGenRootCACommand extends CaCommand
             description = "CA signer configuration")
     protected String            signerConf;
 
-    @Option(name = "-edk", aliases = { "--enableDuplicateKey" },
-            description = "Allow duplicate key, the default is not allowed")
-    protected Boolean           enableDuplicateKey;
+    @Option(name = "-dk", aliases = { "--duplicateKey" },
+            description = "Whether duplicate key is allowed.\n"
+                    + "Valid values are 'yes' and 'no',\n"
+                    + "the default is 'yes'")
+    protected String           duplicateKeyS;
 
-    @Option(name = "-ddk", aliases = { "--disableDuplicateKey" },
-            description = "Duplicate key is not allowed")
-    protected Boolean           disableDuplicateKey;
-
-    @Option(name = "-eds", aliases = { "--enableDuplicateSubject" },
-            description = "Allow duplicate subject, the default is not allowed")
-    protected Boolean           enableDuplicateSubject;
-
-    @Option(name = "-dds", aliases = { "--disableDuplicateSubject" },
-            description = "Duplicate subject is not allowed")
-    protected Boolean           disableDuplicateSubject;
+    @Option(name = "-ds", aliases = { "--duplicateSubject" },
+            description = "Whether duplicate subject is allowed.\n"
+                    + "Valid values are 'yes' and 'no',\n"
+                    + "the default is 'yes'")
+    protected String           duplicateSubjectS;
 
     private PasswordResolver passwordResolver;
     private SecurityFactory securityFactory;
@@ -210,10 +206,10 @@ public class CaGenRootCACommand extends CaCommand
         CAEntry entry = new CAEntry(caName, nextSerial, signerType, signerConf, caCert,
                 ocspUris, crlUris, null, numCrls.intValue(), expirationPeriod.intValue());
 
-        boolean allowDuplicateKey = isEnabled(enableDuplicateKey, disableDuplicateKey, false);
+        boolean allowDuplicateKey = isEnabled(duplicateKeyS, true, "duplicateKey");
         entry.setAllowDuplicateKey(allowDuplicateKey);
 
-        boolean allowDuplicateSubject = isEnabled(enableDuplicateSubject, disableDuplicateSubject, false);
+        boolean allowDuplicateSubject = isEnabled(duplicateSubjectS, true, "duplicateSubject");
         entry.setAllowDuplicateSubject(allowDuplicateSubject);
 
         entry.setStatus(status);

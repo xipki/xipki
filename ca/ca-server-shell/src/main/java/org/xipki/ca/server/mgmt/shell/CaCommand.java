@@ -36,18 +36,46 @@ public abstract class CaCommand extends OsgiCommandSupport
         this.caManager = caManager;
     }
 
-    protected boolean isEnabled(Boolean enabled, Boolean disabled, boolean defaultEnabled)
+    protected Boolean isEnabled(String enabledS, String optionName)
     {
-        boolean b = defaultEnabled;
-        if(enabled != null)
+        if(enabledS == null)
         {
-            b = enabled.booleanValue();
+            return null;
         }
-        else if(disabled != null)
+
+        if("yes".equalsIgnoreCase(enabledS))
         {
-            b = disabled.booleanValue() == false;
+            return true;
         }
-        return b;
+        else if("no".equalsIgnoreCase(enabledS))
+        {
+            return false;
+        }
+        else
+        {
+            throw new IllegalArgumentException("invalid option " + optionName + ": " + enabledS);
+        }
+    }
+
+    protected boolean isEnabled(String enabledS, boolean defaultEnabled, String optionName)
+    {
+        if(enabledS == null)
+        {
+            return defaultEnabled;
+        }
+
+        if("yes".equalsIgnoreCase(enabledS))
+        {
+            return true;
+        }
+        else if("no".equalsIgnoreCase(enabledS))
+        {
+            return false;
+        }
+        else
+        {
+            throw new IllegalArgumentException("invalid option " + optionName + ": " + enabledS);
+        }
     }
 
     protected static String getRealString(String s)

@@ -59,7 +59,8 @@ public class CaAddCommand extends CaCommand
     protected List<String> crlUris;
 
     @Option(name = "-permission",
-            description = "Required. Permission, multi options is allowed. allowed values are\n" + permissionsText,
+            description = "Required. Permission, multi options is allowed. allowed values are\n"
+            		+ permissionsText,
             required = true, multiValued = true)
     protected Set<String> permissions;
 
@@ -82,7 +83,7 @@ public class CaAddCommand extends CaCommand
     protected Integer           numCrls;
 
     @Option(name = "-expirationPeriod",
-            description = "Days before expiration time of CA to issue certificates\n"
+            description = "Days before expiration time of CA to issue certificates,\n"
                     + "the default is 365")
     protected Integer           expirationPeriod;
 
@@ -99,21 +100,17 @@ public class CaAddCommand extends CaCommand
             description = "CA signer configuration")
     protected String            signerConf;
 
-    @Option(name = "-edk", aliases = { "--enableDuplicateKey" },
-            description = "Allow duplicate key, the default is not allowed")
-    protected Boolean           enableDuplicateKey;
+    @Option(name = "-dk", aliases = { "--duplicateKey" },
+            description = "Whether duplicate key is allowed.\n"
+            		+ "Valid values are 'yes' and 'no',\n"
+            		+ "the default is 'yes'")
+    protected String           duplicateKeyS;
 
-    @Option(name = "-ddk", aliases = { "--disableDuplicateKey" },
-            description = "Duplicate key is not allowed")
-    protected Boolean           disableDuplicateKey;
-
-    @Option(name = "-eds", aliases = { "--enableDuplicateSubject" },
-            description = "Allow duplicate subject, the default is not allowed")
-    protected Boolean           enableDuplicateSubject;
-
-    @Option(name = "-dds", aliases = { "--disableDuplicateSubject" },
-            description = "Duplicate subject is not allowed")
-    protected Boolean           disableDuplicateSubject;
+    @Option(name = "-ds", aliases = { "--duplicateSubject" },
+            description = "Whether duplicate subject is allowed.\n"
+            		+ "Valid values are 'yes' and 'no',\n"
+            		+ "the default is 'yes'")
+    protected String           duplicateSubjectS;
 
     private SecurityFactory securityFactory;
     private PasswordResolver passwordResolver;
@@ -180,10 +177,10 @@ public class CaAddCommand extends CaCommand
 
         CAEntry entry = new CAEntry(caName, nextSerial, signerType, signerConf, caCert,
                 ocspUris, crlUris, null, numCrls.intValue(), expirationPeriod.intValue());
-        boolean allowDuplicateKey = isEnabled(enableDuplicateKey, disableDuplicateKey, false);
+        boolean allowDuplicateKey = isEnabled(duplicateKeyS, true, "duplicateKey");
         entry.setAllowDuplicateKey(allowDuplicateKey);
 
-        boolean allowDuplicateSubject = isEnabled(enableDuplicateSubject, disableDuplicateSubject, false);
+        boolean allowDuplicateSubject = isEnabled(duplicateSubjectS, true, "duplicateSubject");
         entry.setAllowDuplicateSubject(allowDuplicateSubject);
 
         entry.setStatus(status);
