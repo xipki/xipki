@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 xipki.org
+ * Copyright (c) 2014 Lijun Liao
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,6 +24,10 @@ import org.apache.felix.gogo.commands.Option;
 import org.bouncycastle.util.encoders.Base64;
 import org.xipki.ca.server.mgmt.CAManager;
 import org.xipki.security.common.IoCertUtil;
+
+/**
+ * @author Lijun Liao
+ */
 
 @Command(scope = "ca", name = "crlsigner-update", description="Update CRL signer")
 public class CrlSignerUpdateCommand extends CaCommand

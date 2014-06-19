@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 xipki.org
+ * Copyright (c) 2014 Lijun Liao
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,6 +24,10 @@ import org.apache.felix.gogo.commands.Option;
 import org.xipki.ca.common.X509CertificateWithMetaInfo;
 import org.xipki.ca.server.X509CA;
 import org.xipki.ca.server.mgmt.shell.CaCommand;
+
+/**
+ * @author Lijun Liao
+ */
 
 @Command(scope = "ca", name = "unrevoke-cert", description="Unrevoke certificate")
 public class UnrevokeCertCommand extends CaCommand

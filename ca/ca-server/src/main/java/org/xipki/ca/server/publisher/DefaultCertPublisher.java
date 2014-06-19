@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 xipki.org
+ * Copyright (c) 2014 Lijun Liao
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -40,6 +40,10 @@ import org.xipki.security.common.CmpUtf8Pairs;
 import org.xipki.security.common.EnvironmentParameterResolver;
 import org.xipki.security.common.IoCertUtil;
 import org.xipki.security.common.ParamChecker;
+
+/**
+ * @author Lijun Liao
+ */
 
 public class DefaultCertPublisher extends CertPublisher
 {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 xipki.org
+ * Copyright (c) 2014 Lijun Liao
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,6 +39,10 @@ import org.xipki.ca.server.CertStatus;
 import org.xipki.database.api.DataSource;
 import org.xipki.security.common.CertRevocationInfo;
 import org.xipki.security.common.ParamChecker;
+
+/**
+ * @author Lijun Liao
+ */
 
 public class CertificateStore
 {

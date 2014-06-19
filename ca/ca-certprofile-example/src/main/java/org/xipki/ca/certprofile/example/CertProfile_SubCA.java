@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 xipki.org
+ * Copyright (c) 2014 Lijun Liao
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,6 +27,10 @@ import org.bouncycastle.asn1.x509.Extension;
 import org.xipki.ca.api.profile.AbstractCACertProfile;
 import org.xipki.ca.api.profile.BadCertTemplateException;
 import org.xipki.ca.api.profile.ExtensionOccurrence;
+
+/**
+ * @author Lijun Liao
+ */
 
 public class CertProfile_SubCA extends AbstractCACertProfile
 {

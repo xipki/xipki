@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 xipki.org
+ * Copyright (c) 2014 Lijun Liao
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,10 @@ import java.util.Set;
 import org.xipki.ca.common.CertBasedRequestorInfo;
 import org.xipki.ca.common.X509CertificateWithMetaInfo;
 import org.xipki.ca.server.mgmt.Permission;
+
+/**
+ * @author Lijun Liao
+ */
 
 public class CmpRequestorInfo extends CertBasedRequestorInfo
 {

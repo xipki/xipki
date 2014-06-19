@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 xipki.org
+ * Copyright (c) 2014 Lijun Liao
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -72,6 +72,8 @@ import java.util.Random;
  * Based on EJBCA version: SernoGenerator.java 8373 2009-11-30 14:07:00Z jeklund
  *
  * @version $Id: SernoGeneratorRandom.java 300 2011-02-22 11:42:59Z tomas $
+ *
+ * @author Lijun Liao
  */
 
 public class RandomSerialNumberGenerator

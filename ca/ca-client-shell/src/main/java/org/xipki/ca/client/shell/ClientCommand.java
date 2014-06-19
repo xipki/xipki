@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 xipki.org
+ * Copyright (c) 2014 Lijun Liao
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,10 @@ package org.xipki.ca.client.shell;
 
 import org.apache.karaf.shell.console.OsgiCommandSupport;
 import org.xipki.ca.client.api.RAWorker;
+
+/**
+ * @author Lijun Liao
+ */
 
 public abstract class ClientCommand extends OsgiCommandSupport
 {
