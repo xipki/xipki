@@ -573,10 +573,7 @@ class CertStoreQueryExecutor
     Long getGreatestSerialNumber(X509CertificateWithMetaInfo caCert)
     throws SQLException, OperationException
     {
-        if(caCert == null)
-        {
-            throw new IllegalArgumentException("caCert is null");
-        }
+        ParamChecker.assertNotNull("caCert", caCert);
 
         Integer caId = getCaId(caCert);
         if(caId == null)
@@ -604,12 +601,8 @@ class CertStoreQueryExecutor
             Date notExpiredAt, BigInteger startSerial, int numEntries)
     throws SQLException, OperationException
     {
-        if(caCert == null)
-        {
-            throw new IllegalArgumentException("caCert is null");
-        }
-
-        else if(numEntries < 1)
+        ParamChecker.assertNotNull("caCert", caCert);
+        if(numEntries < 1)
         {
             throw new IllegalArgumentException("numSerials is not positive");
         }

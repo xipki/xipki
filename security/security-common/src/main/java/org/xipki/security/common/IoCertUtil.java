@@ -634,7 +634,6 @@ public class IoCertUtil
             running = false;
         }
     }
-    
 
     public static byte[] leftmost(byte[] bytes, int bitCount)
     {
