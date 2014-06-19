@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 xipki.org
+ * Copyright (c) 2014 Lijun Liao
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,6 +23,10 @@ import org.apache.karaf.shell.console.OsgiCommandSupport;
 import org.xipki.database.api.DataSourceFactory;
 import org.xipki.dbi.CaDbExporter;
 import org.xipki.security.api.PasswordResolver;
+
+/**
+ * @author Lijun Liao
+ */
 
 @Command(scope = "dbtool", name = "export-ca", description="Export CA database")
 public class ExportCaCommand extends OsgiCommandSupport

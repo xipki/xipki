@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 xipki.org
+ * Copyright (c) 2014 Lijun Liao
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,10 @@ package org.xipki.security.p11.sun;
 import java.security.PrivateKey;
 
 import org.bouncycastle.crypto.params.AsymmetricKeyParameter;
+
+/**
+ * @author Lijun Liao
+ */
 
 public class SunP11ECDSAPrivateKeyParameters extends AsymmetricKeyParameter
 {
