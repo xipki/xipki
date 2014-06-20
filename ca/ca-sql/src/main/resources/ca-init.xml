@@ -121,10 +121,10 @@
 				<constraints nullable="false"/>
 			</column>
 			<column name="CRLSIGNER_NAME" type="VARCHAR(45)"/>
-			<column defaultValueNumeric="1" name="ALLOW_DUPLICATE_KEY" type="INT">
+			<column defaultValueNumeric="2" name="DUPLICATE_KEY_MODE" type="INT">
 				<constraints nullable="false"/>
 			</column>
-			<column defaultValueNumeric="1" name="ALLOW_DUPLICATE_SUBJECT" type="INT">
+			<column defaultValueNumeric="2" name="DUPLICATE_SUBJECT_MODE" type="INT">
 				<constraints nullable="false"/>
 			</column>
 			<column name="PERMISSIONS" type="VARCHAR(200)">

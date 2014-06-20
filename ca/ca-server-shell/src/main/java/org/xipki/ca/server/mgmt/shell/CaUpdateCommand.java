@@ -27,6 +27,7 @@ import org.apache.felix.gogo.commands.Command;
 import org.apache.felix.gogo.commands.Option;
 import org.xipki.ca.api.CAStatus;
 import org.xipki.ca.server.mgmt.CAManager;
+import org.xipki.ca.server.mgmt.DuplicationMode;
 import org.xipki.ca.server.mgmt.Permission;
 import org.xipki.security.api.PasswordResolver;
 import org.xipki.security.common.ConfigurationException;
@@ -96,14 +97,18 @@ public class CaUpdateCommand extends CaCommand
     protected String            signerConf;
 
     @Option(name = "-dk", aliases = { "--duplicateKey" },
-            description = "Whether duplicate key is allowed.\n"
-                    + "Valid values are 'yes' and 'no'")
-    protected String           duplicateKeyS;
+            description = "Mode of duplicate key.\n"
+                    + "\t1: forbidden\n"
+                    + "\t2: forbidden in the same cert profile\n"
+                    + "\t3: allowed")
+    protected Integer           duplicateKeyI;
 
     @Option(name = "-ds", aliases = { "--duplicateSubject" },
-            description = "Whether duplicate subject is allowed.\n"
-                    + "Valid values are 'yes' and 'no'")
-    protected String           duplicateSubjectS;
+            description = "Mode of duplicate subject.\n"
+                    + "\t1: forbidden\n"
+                    + "\t2: forbidden in the same cert profile\n"
+                    + "\t3: allowed")
+    protected Integer           duplicateSubjectI;
 
     private PasswordResolver passwordResolver;
 
@@ -137,8 +142,17 @@ public class CaUpdateCommand extends CaCommand
              }
         }
 
-        Boolean allowDuplicateKey = isEnabled(duplicateKeyS, "duplicateKey");
-        Boolean allowDuplicateSubject = isEnabled(duplicateSubjectS, "duplicateSubject");
+        DuplicationMode duplicateKey = null;
+        if(duplicateKeyI != null)
+        {
+            duplicateKey = DuplicationMode.getInstance(duplicateKeyI.intValue());
+        }
+
+        DuplicationMode duplicateSubject = null;
+        if(duplicateSubjectI != null)
+        {
+            duplicateSubject = DuplicationMode.getInstance(duplicateSubjectI.intValue());
+        }
 
         Set<Permission> _permissions = null;
         if (permissions != null && permissions.size() > 0)
@@ -219,8 +233,8 @@ public class CaUpdateCommand extends CaCommand
                 signerType,
                 signerConf,
                 crlSignerName,
-                allowDuplicateKey,
-                allowDuplicateSubject,
+                duplicateKey,
+                duplicateSubject,
                 _permissions,
                 numCrls,
                 expirationPeriod);

@@ -19,6 +19,7 @@ package org.xipki.ca.server.mgmt.shell;
 
 import org.apache.karaf.shell.console.OsgiCommandSupport;
 import org.xipki.ca.server.mgmt.CAManager;
+import org.xipki.ca.server.mgmt.DuplicationMode;
 
 /**
  * @author Lijun Liao
@@ -76,6 +77,15 @@ public abstract class CaCommand extends OsgiCommandSupport
         {
             throw new IllegalArgumentException("invalid option " + optionName + ": " + enabledS);
         }
+    }
+
+    protected DuplicationMode getDuplicationMode(Integer mode, DuplicationMode defaultMode)
+    {
+        if(mode == null)
+        {
+            return defaultMode;
+        }
+        return DuplicationMode.getInstance(mode.intValue());
     }
 
     protected static String getRealString(String s)
