@@ -362,7 +362,7 @@ class CaConfigurationDbImporter extends DbPorter
             ps = prepareStatement(
                     "INSERT INTO CA (NAME, SUBJECT, NEXT_SERIAL, STATUS, CRL_URIS, OCSP_URIS, MAX_VALIDITY, "
                     + "CERT, SIGNER_TYPE, SIGNER_CONF, CRLSIGNER_NAME, "
-                    + "ALLOW_DUPLICATE_KEY, ALLOW_DUPLICATE_SUBJECT, PERMISSIONS, NUM_CRLS, "
+                    + "DUPLICATE_KEY_MODE, DUPLICATE_SUBJECT_MODE, PERMISSIONS, NUM_CRLS, "
                     + "EXPIRATION_PERIOD, REVOKED, REV_REASON, REV_TIME, REV_INVALIDITY_TIME) "
                     + "VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
 
@@ -385,8 +385,8 @@ class CaConfigurationDbImporter extends DbPorter
                     ps.setString(idx++, ca.getSignerType());
                     ps.setString(idx++, ca.getSignerConf());
                     ps.setString(idx++, ca.getCrlsignerName());
-                    ps.setBoolean(idx++, ca.isAllowDuplicateKey());
-                    ps.setBoolean(idx++, ca.isAllowDuplicateSubject());
+                    ps.setInt(idx++, ca.getDuplicateKeyMode());
+                    ps.setInt(idx++, ca.getDuplicateSubjectMode());
                     ps.setString(idx++, ca.getPermissions());
                     Integer numCrls = ca.getNumCrls();
                     ps.setInt(idx++, numCrls == null ? 30 : numCrls.intValue());

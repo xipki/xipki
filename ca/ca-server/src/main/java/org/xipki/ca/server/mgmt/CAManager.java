@@ -86,8 +86,8 @@ public interface CAManager
             X509Certificate cert,
             Set<String> crl_uris, Set<String> ocsp_uris,
             Integer max_validity, String signer_type, String signer_conf,
-            String crlsigner_name, Boolean allow_duplicate_key,
-            Boolean allow_duplicate_subject, Set<Permission> permissions,
+            String crlsigner_name, DuplicationMode duplicate_key,
+            DuplicationMode duplicate_subject, Set<Permission> permissions,
             Integer numCrls, Integer expirationPeriod)
     throws CAMgmtException;
 

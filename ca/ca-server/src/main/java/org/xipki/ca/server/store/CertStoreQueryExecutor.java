@@ -60,6 +60,8 @@ import org.xipki.ca.common.RequestorInfo;
 import org.xipki.ca.common.X509CertificateWithMetaInfo;
 import org.xipki.ca.server.CertRevocationInfoWithSerial;
 import org.xipki.ca.server.CertStatus;
+import org.xipki.ca.server.SubjectKeyProfileTriple;
+import org.xipki.ca.server.SubjectKeyProfileTripleCollection;
 import org.xipki.database.api.DataSource;
 import org.xipki.security.common.CRLReason;
 import org.xipki.security.common.CertRevocationInfo;
@@ -810,66 +812,17 @@ class CertStoreQueryExecutor
         }
     }
 
-    CertWithRevokedInfo getCertificate(List<Integer> certIds, String sha1FpSubject, String certProfile)
+    X509CertificateWithMetaInfo getCertForId(int certId)
     throws SQLException, OperationException
     {
-        ParamChecker.assertNotEmpty("certIds", certIds);
-        ParamChecker.assertNotEmpty("sha1FpSubject", sha1FpSubject);
-        ParamChecker.assertNotEmpty("certProfile", certProfile);
-
-        Integer profileId = getCertprofileId(certProfile);
-        if(profileId == null)
-        {
-            return null;
-        }
-
-        String sql = "REVOKED FROM CERT WHERE ID=? AND SHA1_FP_SUBJECT=? AND CERTPROFILEINFO_ID=?";
+        String sql = "CERT FROM RAWCERT WHERE CERT_ID=?";
         sql = createFetchFirstSelectSQL(sql, 1);
         PreparedStatement ps = borrowPreparedStatement(sql);
-
-        Boolean revoked = null;
-        Integer certId = null;
-        try
-        {
-            for(Integer _certId : certIds)
-            {
-                ResultSet rs = null;
-                try
-                {
-                    int idx = 1;
-                    ps.setInt(idx++, _certId.intValue());
-                    ps.setString(idx++, sha1FpSubject);
-                    ps.setInt(idx++, profileId);
-                    rs = ps.executeQuery();
-                    if(rs.next())
-                    {
-                        revoked = rs.getBoolean("REVOKED");
-                        certId = _certId;
-                        break;
-                    }
-                }finally
-                {
-                    releaseDbResources(null, rs);
-                }
-            }
-        }finally
-        {
-            releaseDbResources(ps, null);
-        }
-
-        if(certId == null)
-        {
-            return null;
-        }
-
-        sql = "CERT FROM RAWCERT WHERE CERT_ID=?";
-        sql = createFetchFirstSelectSQL(sql, 1);
-        ps = borrowPreparedStatement(sql);
         ResultSet rs = null;
 
         try
         {
-            ps.setInt(1, certId.intValue());
+            ps.setInt(1, certId);
             rs = ps.executeQuery();
 
             if(rs.next())
@@ -892,8 +845,7 @@ class CertStoreQueryExecutor
                 {
                     throw new OperationException(ErrorCode.System_Failure, "IOException: " + e.getMessage());
                 }
-                X509CertificateWithMetaInfo certWithMeta = new X509CertificateWithMetaInfo(cert, encodedCert);
-                return new CertWithRevokedInfo(certWithMeta, revoked);
+                return new X509CertificateWithMetaInfo(cert, encodedCert);
             }
         }finally
         {
@@ -1161,7 +1113,7 @@ class CertStoreQueryExecutor
         }
     }
 
-    boolean certIssued(X509CertificateWithMetaInfo caCert, String sha1FpSubject)
+    boolean certIssuedForSubject(X509CertificateWithMetaInfo caCert, String sha1FpSubject)
     throws OperationException, SQLException
     {
         byte[] encodedCert = caCert.getEncodedCert();
@@ -1197,7 +1149,8 @@ class CertStoreQueryExecutor
         return false;
     }
 
-    List<Integer> getCertIdsForPublicKey(X509CertificateWithMetaInfo caCert, byte[] encodedSubjectPublicKey)
+    SubjectKeyProfileTripleCollection getSubjectKeyProfileTriples(X509CertificateWithMetaInfo caCert,
+            String subjectFp, String keyFp)
     throws OperationException, SQLException
     {
         byte[] encodedCert = caCert.getEncodedCert();
@@ -1205,29 +1158,44 @@ class CertStoreQueryExecutor
 
         if(caId == null)
         {
-            return Collections.emptyList();
+            return null;
         }
 
-        String sha1FpPk = fp(encodedSubjectPublicKey);
-
-        String sql = "SELECT ID FROM CERT"
-                + " WHERE SHA1_FP_PK=? AND CAINFO_ID=?";
+        String sql = "ID, SHA1_FP_PK, SHA1_FP_SUBJECT, CERTPROFILEINFO_ID, REVOKED FROM CERT"
+                + " WHERE (SHA1_FP_PK=? OR SHA1_FP_SUBJECT=?) AND CAINFO_ID=?";
+        sql = createFetchFirstSelectSQL(sql, 1000);
         PreparedStatement ps = borrowPreparedStatement(sql);
 
         ResultSet rs = null;
         try
         {
             int idx = 1;
-            ps.setString(idx++, sha1FpPk);
+            ps.setString(idx++, keyFp);
+            ps.setString(idx++, subjectFp);
             ps.setInt(idx++, caId);
 
             rs = ps.executeQuery();
-            List<Integer> ids = new ArrayList<>(1);
-            while(rs.next())
+
+            if(rs.next() == false)
             {
-                ids.add(rs.getInt("ID"));
+                return null;
             }
-            return ids;
+
+            SubjectKeyProfileTripleCollection triples = new SubjectKeyProfileTripleCollection();
+            do
+            {
+                int id = rs.getInt("ID");
+                int profileId = rs.getInt("CERTPROFILEINFO_ID");
+                String profileName = certprofileStore.getName(profileId);
+                String thisKeyFp = rs.getString("SHA1_FP_PK");
+                String thisSubjectFp = rs.getString("SHA1_FP_SUBJECT");
+                boolean revoked = rs.getBoolean("REVOKED");
+                SubjectKeyProfileTriple triple = new SubjectKeyProfileTriple(
+                        id, thisSubjectFp, thisKeyFp, profileName, revoked);
+                triples.addTriple(triple);
+            }while(rs.next());
+
+            return triples;
         }finally
         {
             releaseDbResources(ps, rs);

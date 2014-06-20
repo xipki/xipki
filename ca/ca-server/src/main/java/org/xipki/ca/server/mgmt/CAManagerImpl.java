@@ -1171,7 +1171,7 @@ public class CAManagerImpl implements CAManager
             ResultSet rs = stmt.executeQuery(
                     "SELECT NAME, NEXT_SERIAL, STATUS, CRL_URIS, OCSP_URIS, MAX_VALIDITY, "
                     + "CERT, SIGNER_TYPE, SIGNER_CONF, CRLSIGNER_NAME, "
-                    + "ALLOW_DUPLICATE_KEY, ALLOW_DUPLICATE_SUBJECT, PERMISSIONS, NUM_CRLS, "
+                    + "DUPLICATE_KEY_MODE, DUPLICATE_SUBJECT_MODE, PERMISSIONS, NUM_CRLS, "
                     + "EXPIRATION_PERIOD, REVOKED, REV_REASON, REV_TIME, REV_INVALIDITY_TIME FROM CA");
 
             while(rs.next())
@@ -1186,8 +1186,8 @@ public class CAManagerImpl implements CAManager
                 String signer_type = rs.getString("SIGNER_TYPE");
                 String signer_conf = rs.getString("SIGNER_CONF");
                 String crlsigner_name = rs.getString("CRLSIGNER_NAME");
-                boolean allowDuplicateKey = rs.getBoolean("ALLOW_DUPLICATE_KEY");
-                boolean allowDuplicateSubject = rs.getBoolean("ALLOW_DUPLICATE_SUBJECT");
+                int duplicateKeyI = rs.getInt("DUPLICATE_KEY_MODE");
+                int duplicateSubjectI = rs.getInt("DUPLICATE_SUBJECT_MODE");
                 int numCrls = rs.getInt("NUM_CRLS");
                 int expirationPeriod = rs.getInt("EXPIRATION_PERIOD");
 
@@ -1237,8 +1237,8 @@ public class CAManagerImpl implements CAManager
                     entry.setCrlSignerName(crlsigner_name);
                 }
 
-                entry.setAllowDuplicateKey(allowDuplicateKey);
-                entry.setAllowDuplicateSubject(allowDuplicateSubject);
+                entry.setDuplicateKeyMode(DuplicationMode.getInstance(duplicateKeyI));
+                entry.setDuplicateSubjectMode(DuplicationMode.getInstance(duplicateSubjectI));
                 entry.setPermissions(permissions);
                 entry.setRevocationInfo(revocationInfo);
 
@@ -1337,7 +1337,7 @@ public class CAManagerImpl implements CAManager
             ps = prepareStatement(
                     "INSERT INTO CA (NAME, SUBJECT, NEXT_SERIAL, STATUS, CRL_URIS, OCSP_URIS, MAX_VALIDITY, "
                     + "CERT, SIGNER_TYPE, SIGNER_CONF, CRLSIGNER_NAME, "
-                    + "ALLOW_DUPLICATE_KEY, ALLOW_DUPLICATE_SUBJECT, PERMISSIONS, NUM_CRLS, EXPIRATION_PERIOD) "
+                    + "DUPLICATE_KEY_MODE, DUPLICATE_SUBJECT_MODE, PERMISSIONS, NUM_CRLS, EXPIRATION_PERIOD) "
                     + "VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
             int idx = 1;
             ps.setString(idx++, name);
@@ -1358,8 +1358,8 @@ public class CAManagerImpl implements CAManager
             ps.setString(idx++, newCaDbEntry.getSignerType());
             ps.setString(idx++, newCaDbEntry.getSignerConf());
             ps.setString(idx++, newCaDbEntry.getCrlSignerName());
-            ps.setBoolean(idx++, newCaDbEntry.isAllowDuplicateKey());
-            ps.setBoolean(idx++, newCaDbEntry.isAllowDuplicateSubject());
+            ps.setInt(idx++, newCaDbEntry.getDuplicateKeyMode().getMode());
+            ps.setInt(idx++, newCaDbEntry.getDuplicateSubjectMode().getMode());
             ps.setString(idx++, Permission.toString(newCaDbEntry.getPermissions()));
             ps.setInt(idx++, newCaDbEntry.getNumCrls());
             ps.setInt(idx++, newCaDbEntry.getExpirationPeriod());
@@ -1387,8 +1387,8 @@ public class CAManagerImpl implements CAManager
             X509Certificate cert,
             Set<String> crl_uris, Set<String> ocsp_uris,
             Integer max_validity, String signer_type, String signer_conf,
-            String crlsigner_name, Boolean allow_duplicate_key,
-            Boolean allow_duplicate_subject, Set<Permission> permissions,
+            String crlsigner_name, DuplicationMode duplicate_key,
+            DuplicationMode duplicate_subject, Set<Permission> permissions,
             Integer numCrls, Integer expirationPeriod)
     throws CAMgmtException
     {
@@ -1483,18 +1483,18 @@ public class CAManagerImpl implements CAManager
             iCrlsigner_name = i++;
         }
 
-        Integer iAllow_duplicate_key = null;
-        if(allow_duplicate_key != null)
+        Integer iDuplicate_key = null;
+        if(duplicate_key != null)
         {
-            sb.append("ALLOW_DUPLICATE_KEY=?,");
-            iAllow_duplicate_key = i++;
+            sb.append("DUPLICATE_KEY_MODE=?,");
+            iDuplicate_key = i++;
         }
 
-        Integer iAllow_duplicate_subject = null;
-        if(allow_duplicate_subject != null)
+        Integer iDuplicate_subject = null;
+        if(duplicate_subject != null)
         {
-            sb.append("ALLOW_DUPLICATE_SUBJECT=?,");
-            iAllow_duplicate_subject = i++;
+            sb.append("DUPLICATE_SUBJECT_MODE=?,");
+            iDuplicate_subject = i++;
         }
 
         Integer iPermissions = null;
@@ -1581,14 +1581,14 @@ public class CAManagerImpl implements CAManager
                 ps.setString(iCrlsigner_name, getRealString(crlsigner_name));
             }
 
-            if(iAllow_duplicate_key != null)
+            if(iDuplicate_key != null)
             {
-                ps.setBoolean(iAllow_duplicate_key, allow_duplicate_key);
+                ps.setInt(iDuplicate_key, duplicate_key.getMode());
             }
 
-            if(iAllow_duplicate_subject != null)
+            if(iDuplicate_subject != null)
             {
-                ps.setBoolean(iAllow_duplicate_subject, allow_duplicate_subject);
+                ps.setInt(iDuplicate_subject, duplicate_subject.getMode());
             }
 
             if(iPermissions != null)

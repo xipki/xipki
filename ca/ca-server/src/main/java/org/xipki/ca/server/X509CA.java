@@ -99,9 +99,9 @@ import org.xipki.ca.common.X509CertificateWithMetaInfo;
 import org.xipki.ca.server.mgmt.CAEntry;
 import org.xipki.ca.server.mgmt.CAManagerImpl;
 import org.xipki.ca.server.mgmt.CertProfileEntry;
+import org.xipki.ca.server.mgmt.DuplicationMode;
 import org.xipki.ca.server.mgmt.PublisherEntry;
 import org.xipki.ca.server.store.CertWithRevocationInfo;
-import org.xipki.ca.server.store.CertWithRevokedInfo;
 import org.xipki.ca.server.store.CertificateStore;
 import org.xipki.security.api.ConcurrentContentSigner;
 import org.xipki.security.api.NoIdleSignerException;
@@ -1206,6 +1206,8 @@ public class X509CA
         String sha1FpSubject = IoCertUtil.sha1sum_canonicalized_name(grantedSubject);
         String grandtedSubjectText = IoCertUtil.canonicalizeName(grantedSubject);
 
+        byte[] subjectPublicKeyData =  publicKeyInfo.getPublicKeyData().getBytes();
+
         if(keyUpdate)
         {
             CertStatus certStatus = certstore.getCertStatusForSubject(caInfo.getCertificate(), grantedSubject);
@@ -1220,75 +1222,131 @@ public class X509CA
         }
         else
         {
-            /*
-             * If there exists a certificate whose public key, subject and profile match the request,
-             * returns the certificate if it is not revoked, otherwise OperationException with
-             * ErrorCode CERT_REVOKED will be thrown
-             */
+            String sha1FpPublicKey = IoCertUtil.sha1sum(subjectPublicKeyData);
+            SubjectKeyProfileTripleCollection triples;
             try
             {
-                byte[] subjectPublicKey =  publicKeyInfo.getPublicKeyData().getBytes();
-                List<Integer> certIds = certstore.getCertIdsForPublicKey(caInfo.getCertificate(), subjectPublicKey);
-
-                if(certIds != null && certIds.isEmpty() == false)
-                {
-                    // return issued certificate if all of requested public key, certProfile and subject match
-                    CertWithRevokedInfo issuedCert = certstore.getCertificate(certIds, sha1FpSubject,
-                            certProfileName);
-                    if(issuedCert == null)
-                    {
-                        if(caInfo.isAllowDuplicateKey() == false)
-                        {
-                            throw new OperationException(ErrorCode.ALREADY_ISSUED,
-                                    "Certificate for the given public key already issued");
-                        }
-                    }
-                    else if(issuedCert.isRevoked())
-                    {
-                         throw new OperationException(ErrorCode.CERT_REVOKED);
-                    }
-                    else
-                    {
-                        CertificateInfo certInfo = new CertificateInfo(issuedCert.getCert(),
-                                caInfo.getCertificate(), subjectPublicKey, certProfileName);
-                        certInfo.setAlreadyIssued(true);
-                        return certInfo;
-                    }
-                }
+                triples = certstore.getSubjectKeyProfileTriples(
+                        caInfo.getCertificate(), sha1FpSubject, sha1FpPublicKey);
             } catch (SQLException e)
             {
                 throw new OperationException(ErrorCode.DATABASE_FAILURE, e.getMessage());
-            } catch (CertificateEncodingException e)
-            {
-                 throw new OperationException(ErrorCode.System_Failure, e.getMessage());
             }
 
-            if(caInfo.isAllowDuplicateSubject() == false)
+            if(triples != null && triples.isEmpty() == false)
             {
-                boolean certWithSameSubjectIssued = certstore.certIssuedForSubject(
-                        caInfo.getCertificate(), sha1FpSubject);
+                SubjectKeyProfileTriple triple = triples.getFirstTriple(sha1FpSubject, sha1FpPublicKey, certProfileName);
+                if(triple != null)
+                   {
+                    /*
+                     * If there exists a certificate whose public key, subject and profile match the request,
+                     * returns the certificate if it is not revoked, otherwise OperationException with
+                     * ErrorCode CERT_REVOKED will be thrown
+                     */
 
-                if(certWithSameSubjectIssued)
-                {
-                    boolean incSerialNumberAllowed = certProfile.incSerialNumberIfSubjectExists();
-
-                    if(incSerialNumberAllowed == false)
+                    if(triple.isRevoked())
                     {
-                        throw new OperationException(ErrorCode.ALREADY_ISSUED,
-                                "Certificate for the given subject " + grandtedSubjectText + " already issued");
+                        throw new OperationException(ErrorCode.CERT_REVOKED);
                     }
-
-                    do
+                    else
                     {
+                        X509CertificateWithMetaInfo issuedCert;
                         try
                         {
-                            grantedSubject = incSerialNumber(certProfile, grantedSubject);
-                        }catch (BadCertTemplateException e)
+                            issuedCert = certstore.getCertForId(triple.getCertId());
+                        } catch (SQLException e)
                         {
-                            throw new OperationException(ErrorCode.BAD_CERT_TEMPLATE, e.getMessage());
+                            throw new OperationException(ErrorCode.DATABASE_FAILURE, e.getMessage());
                         }
-                    }while(certstore.certIssuedForSubject(caInfo.getCertificate(),
-                            IoCertUtil.sha1sum_canonicalized_name(grantedSubject)));
+
+                        if(issuedCert == null)
+                        {
+                            throw new OperationException(ErrorCode.System_Failure,
+                                "Find no certificate in table RAWCERT for CERT_ID " + triple.getCertId());
+                        }
+                        else
+                        {
+                            CertificateInfo certInfo;
+                            try
+                            {
+                                certInfo = new CertificateInfo(issuedCert,
+                                        caInfo.getCertificate(), subjectPublicKeyData, certProfileName);
+                            } catch (CertificateEncodingException e)
+                            {
+                                 throw new OperationException(ErrorCode.System_Failure,
+                                         "could not construct CertificateInfo: " + e.getMessage());
+                            }
+                            certInfo.setAlreadyIssued(true);
+                            return certInfo;
+                        }
+                    }
+                }
+
+                DuplicationMode keyMode = caInfo.getDuplicateKeyMode();
+                DuplicationMode subjectMode = caInfo.getDuplicateSubjectMode();
+
+                if(keyMode == DuplicationMode.ALLOWED && subjectMode == DuplicationMode.ALLOWED)
+                {
+                }
+                else if(triples.hasTripleForSubjectAndProfile(sha1FpSubject, certProfileName))
+                {
+                    if(subjectMode == DuplicationMode.FORBIDDEN || subjectMode == DuplicationMode.FORBIDDEN_WITHIN_PROFILE)
+                    {
+                        if(certProfile.incSerialNumberIfSubjectExists() == false)
+                        {
+                            throw new OperationException(ErrorCode.ALREADY_ISSUED,
+                                    "Certificate for the given subject " + grandtedSubjectText +
+                                    " and profile " + certProfileName + " already issued");
+                        }
+
+                        do
+                        {
+                            try
+                            {
+                                grantedSubject = incSerialNumber(certProfile, grantedSubject);
+                            }catch (BadCertTemplateException e)
+                            {
+                                throw new OperationException(ErrorCode.BAD_CERT_TEMPLATE, e.getMessage());
+                            }
+                        } while(certstore.certIssuedForSubject(caInfo.getCertificate(),
+                                IoCertUtil.sha1sum_canonicalized_name(grantedSubject)));
+                    }
+                }
+                else if(triples.hasTripleForKeyAndProfile(sha1FpPublicKey, certProfileName))
+                {
+                    if(keyMode == DuplicationMode.FORBIDDEN || keyMode == DuplicationMode.FORBIDDEN_WITHIN_PROFILE)
+                    {
+                        throw new OperationException(ErrorCode.ALREADY_ISSUED,
+                                "Certificate for the given public key and profile " + certProfileName + " already issued");
+                    }
+                }
+                else if(triples.hasTripleForSubjectAndKey(sha1FpSubject, sha1FpPublicKey))
+                {
+                    if(keyMode == DuplicationMode.FORBIDDEN || subjectMode == DuplicationMode.FORBIDDEN)
+                    {
+                        throw new OperationException(ErrorCode.ALREADY_ISSUED,
+                                "Certificate for the given subject and public key already issued");
+                    }
+                }
+                else if(triples.hasTripleForKey(sha1FpPublicKey))
+                {
+                    if(keyMode == DuplicationMode.FORBIDDEN)
+                    {
+                        throw new OperationException(ErrorCode.ALREADY_ISSUED,
+                                "Certificate for the given public key already issued");
+                    }
+                }
+                else if(triples.hasTripleForSubject(sha1FpSubject))
+                {
+                    if(subjectMode == DuplicationMode.FORBIDDEN)
+                    {
+                        throw new OperationException(ErrorCode.ALREADY_ISSUED,
+                                "Certificate for the given subject already issued");
+                    }
+                }
+                else
+                {
+                    throw new OperationException(ErrorCode.System_Failure, "should not reach here");
                 }
             }
         }
@@ -1388,7 +1446,7 @@ public class X509CA
                 X509CertificateWithMetaInfo certWithMeta = new X509CertificateWithMetaInfo(cert, encodedCert);
 
                 ret = new CertificateInfo(certWithMeta, caInfo.getCertificate(),
-                        publicKeyInfo.getEncoded(), certProfileName);
+                        subjectPublicKeyData, certProfileName);
             } catch (CertificateException e)
             {
                 throw new OperationException(ErrorCode.System_Failure, "CertificateException: " + e.getMessage());
