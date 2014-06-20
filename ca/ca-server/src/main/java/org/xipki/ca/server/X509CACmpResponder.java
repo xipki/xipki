@@ -853,7 +853,7 @@ public class X509CACmpResponder extends CmpResponder
         }catch(OperationException ce)
         {
             ErrorCode code = ce.getErrorCode();
-            LOG.warn("geneate certificate, OperationException: code={}, message={}",
+            LOG.warn("generate certificate, OperationException: code={}, message={}",
                     code.name(), ce.getErrorMessage());
 
             AuditStatus auditStatus;
