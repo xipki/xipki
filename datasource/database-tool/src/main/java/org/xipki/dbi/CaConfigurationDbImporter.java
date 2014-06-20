@@ -79,6 +79,11 @@ class CaConfigurationDbImporter extends DbPorter
                 unmarshaller.unmarshal(new File(baseDir + File.separator + FILENAME_CA_Configuration));
         CAConfigurationType caconf = root.getValue();
 
+        if(caconf.getVersion() > VERSION)
+        {
+            throw new Exception("Cannot import CA configuration greater than " + VERSION + ": " + caconf.getVersion());
+        }
+
         System.out.println("Importing CA configuration to database");
         try
         {
