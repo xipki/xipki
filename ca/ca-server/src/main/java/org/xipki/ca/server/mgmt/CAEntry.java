@@ -306,6 +306,7 @@ public class CAEntry
 
     public void setDuplicateKeyMode(DuplicationMode mode)
     {
+        ParamChecker.assertNotNull("mode", mode);
         this.duplicateKeyMode = mode;
     }
 

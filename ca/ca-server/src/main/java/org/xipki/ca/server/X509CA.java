@@ -663,11 +663,11 @@ public class X509CA
                         notBefore, notAfter, extensions, false);
                 successfull = true;
 
-                LOG.info("SUCCESSFULL generateCertificate: CA={}, profile={},"
+                String prefix = ret.isAlreadyIssued() ? "RETURN_OLD_CERT" : "SUCCESSFULL";
+                LOG.info("{} generateCertificate: CA={}, profile={},"
                         + " subject={}, serialNumber={}",
-                        new Object[]{caInfo.getName(), certProfileName,
+                        new Object[]{prefix, caInfo.getName(), certProfileName,
                             ret.getCert().getSubject(), ret.getCert().getCert().getSerialNumber()});
-
                 return ret;
             }catch(RuntimeException e)
             {

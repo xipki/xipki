@@ -1162,7 +1162,8 @@ class CertStoreQueryExecutor
         }
 
         String sql = "ID, SHA1_FP_PK, SHA1_FP_SUBJECT, CERTPROFILEINFO_ID, REVOKED FROM CERT"
-                + " WHERE (SHA1_FP_PK=? OR SHA1_FP_SUBJECT=?) AND CAINFO_ID=?";
+                + " WHERE (SHA1_FP_PK=? OR SHA1_FP_SUBJECT=?) AND CAINFO_ID=? "
+                + " ORDER BY ID DESC";
         sql = createFetchFirstSelectSQL(sql, 1000);
         PreparedStatement ps = borrowPreparedStatement(sql);
 
