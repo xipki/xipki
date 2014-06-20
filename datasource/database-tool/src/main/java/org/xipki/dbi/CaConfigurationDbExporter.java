@@ -447,8 +447,8 @@ class CaConfigurationDbExporter extends DbPorter
                 String signer_type = rs.getString("SIGNER_TYPE");
                 String signer_conf = rs.getString("SIGNER_CONF");
                 String crlsigner_name = rs.getString("CRLSIGNER_NAME");
-                boolean allowDuplicateKey = rs.getBoolean("ALLOW_DUPLICATE_KEY");
-                boolean allowDuplicateSubject = rs.getBoolean("ALLOW_DUPLICATE_SUBJECT");
+                int duplicateKeyMode = rs.getInt("DUPLICATE_KEY_MODE");
+                int duplicateSubjectMode = rs.getInt("DUPLICATE_SUBJECT_MODE");
 
                 String permissions = rs.getString("PERMISSIONS");
                 int expirationPeriod = rs.getInt("EXPIRATION_PERIOD");
@@ -464,8 +464,8 @@ class CaConfigurationDbExporter extends DbPorter
                 ca.setSignerType(signer_type);
                 ca.setSignerConf(signer_conf);
                 ca.setCrlsignerName(crlsigner_name);
-                ca.setAllowDuplicateKey(allowDuplicateKey);
-                ca.setAllowDuplicateSubject(allowDuplicateSubject);
+                ca.setDuplicateKeyMode(duplicateKeyMode);
+                ca.setDuplicateSubjectMode(duplicateSubjectMode);
                 ca.setPermissions(permissions);
                 ca.setExpirationPeriod(expirationPeriod);
 

@@ -175,8 +175,8 @@
 			<xs:element name="signer_type" type="xs:string" />
 			<xs:element name="signer_conf" type="xs:string" minOccurs="0"/>
 			<xs:element name="crlsigner_name" type="xs:string" minOccurs="0"/>
-			<xs:element name="allowDuplicateKey" type="xs:boolean" />
-			<xs:element name="allowDuplicateSubject" type="xs:boolean" />
+			<xs:element name="duplicateKeyMode" type="xs:int" />
+			<xs:element name="duplicateSubjectMode" type="xs:int" />
 			<xs:element name="permissions" type="xs:string" minOccurs="0"/>
 			<xs:element name="numCrls" type="xs:int" minOccurs="0"/>
 			<xs:element name="expirationPeriod" type="xs:int"/>
