@@ -66,7 +66,7 @@ public class CrlSignerAddCommand extends CaCommand
                 + "the default is 'no'")
     protected String            withCertS;
 
-    @Option(name = "-wec", aliases = { "--withExpiredCerts" },
+    @Option(name = "-wec", aliases = { "--withExpiredCert" },
             description = "Whether expired certificates are contained in CRL.\n"
                     + "Valid values are 'yes' and 'no',\n"
                     + "the default is 'no'")
