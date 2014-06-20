@@ -26,6 +26,7 @@ import org.apache.felix.gogo.commands.Command;
 import org.apache.felix.gogo.commands.Option;
 import org.xipki.ca.api.CAStatus;
 import org.xipki.ca.server.mgmt.CAEntry;
+import org.xipki.ca.server.mgmt.DuplicationMode;
 import org.xipki.ca.server.mgmt.Permission;
 import org.xipki.security.api.ConcurrentContentSigner;
 import org.xipki.security.api.PasswordResolver;
@@ -60,7 +61,7 @@ public class CaAddCommand extends CaCommand
 
     @Option(name = "-permission",
             description = "Required. Permission, multi options is allowed. allowed values are\n"
-            		+ permissionsText,
+                    + permissionsText,
             required = true, multiValued = true)
     protected Set<String> permissions;
 
@@ -101,16 +102,20 @@ public class CaAddCommand extends CaCommand
     protected String            signerConf;
 
     @Option(name = "-dk", aliases = { "--duplicateKey" },
-            description = "Whether duplicate key is allowed.\n"
-            		+ "Valid values are 'yes' and 'no',\n"
-            		+ "the default is 'yes'")
-    protected String           duplicateKeyS;
+            description = "Mode of duplicate key.\n"
+                    + "\t1: forbidden\n"
+                    + "\t2: forbidden in the same cert profile\n"
+                    + "\t3: allowed\n"
+                    + "the default is 2")
+    protected Integer           duplicateKeyI;
 
     @Option(name = "-ds", aliases = { "--duplicateSubject" },
-            description = "Whether duplicate subject is allowed.\n"
-            		+ "Valid values are 'yes' and 'no',\n"
-            		+ "the default is 'yes'")
-    protected String           duplicateSubjectS;
+            description = "Mode of duplicate subject.\n"
+                    + "\t1: forbidden\n"
+                    + "\t2: forbidden in the same cert profile\n"
+                    + "\t3: allowed\n"
+                    + "the default is 2")
+    protected Integer           duplicateSubjectI;
 
     private SecurityFactory securityFactory;
     private PasswordResolver passwordResolver;
@@ -177,11 +182,12 @@ public class CaAddCommand extends CaCommand
 
         CAEntry entry = new CAEntry(caName, nextSerial, signerType, signerConf, caCert,
                 ocspUris, crlUris, null, numCrls.intValue(), expirationPeriod.intValue());
-        boolean allowDuplicateKey = isEnabled(duplicateKeyS, true, "duplicateKey");
-        entry.setAllowDuplicateKey(allowDuplicateKey);
 
-        boolean allowDuplicateSubject = isEnabled(duplicateSubjectS, true, "duplicateSubject");
-        entry.setAllowDuplicateSubject(allowDuplicateSubject);
+        DuplicationMode duplicateKey = getDuplicationMode(duplicateKeyI, DuplicationMode.FORBIDDEN_WITHIN_PROFILE);
+        entry.setDuplicateKeyMode(duplicateKey);
+
+        DuplicationMode duplicateSubject = getDuplicationMode(duplicateSubjectI, DuplicationMode.FORBIDDEN_WITHIN_PROFILE);
+        entry.setDuplicateSubjectMode(duplicateSubject);
 
         entry.setStatus(status);
         if(crlSignerName != null)

@@ -36,6 +36,7 @@ import org.xipki.ca.api.publisher.CertificateInfo;
 import org.xipki.ca.common.X509CertificateWithMetaInfo;
 import org.xipki.ca.server.CertRevocationInfoWithSerial;
 import org.xipki.ca.server.CertStatus;
+import org.xipki.ca.server.SubjectKeyProfileTripleCollection;
 import org.xipki.database.api.DataSource;
 import org.xipki.security.common.CertRevocationInfo;
 import org.xipki.security.common.ParamChecker;
@@ -219,21 +220,7 @@ public class CertificateStore
     {
         try
         {
-            return queryExecutor.certIssued(caCert, sha1FpSubject);
-        } catch (SQLException e)
-        {
-            LOG.debug("SQLException", e);
-            throw new OperationException(ErrorCode.DATABASE_FAILURE, e.getMessage());
-        }
-    }
-
-    public List<Integer> getCertIdsForPublicKey(X509CertificateWithMetaInfo caCert,
-            byte[] encodedSubjectPublicKey)
-    throws OperationException
-    {
-        try
-        {
-            return queryExecutor.getCertIdsForPublicKey(caCert, encodedSubjectPublicKey);
+            return queryExecutor.certIssuedForSubject(caCert, sha1FpSubject);
         } catch (SQLException e)
         {
             LOG.debug("SQLException", e);
@@ -299,12 +286,6 @@ public class CertificateStore
         return queryExecutor.getCertWithRevocationInfo(caCert, serial);
     }
 
-    public CertWithRevokedInfo getCertificate(List<Integer> certIds, String sha1FpSubject, String certProfile)
-    throws SQLException, OperationException
-    {
-        return queryExecutor.getCertificate(certIds, sha1FpSubject, certProfile);
-    }
-
     public CertificateInfo getCertificateInfo(X509CertificateWithMetaInfo caCert, BigInteger serial)
     throws SQLException, OperationException, CertificateException
     {
@@ -320,5 +301,18 @@ public class CertificateStore
     public boolean isHealthy()
     {
         return queryExecutor.isHealthy();
+    }
+
+    public SubjectKeyProfileTripleCollection getSubjectKeyProfileTriples(X509CertificateWithMetaInfo caCert,
+            String subjectFp, String keyFp)
+    throws SQLException, OperationException
+    {
+        return queryExecutor.getSubjectKeyProfileTriples(caCert, subjectFp, keyFp);
+    }
+
+    public X509CertificateWithMetaInfo getCertForId(int certId)
+    throws SQLException, OperationException
+    {
+        return queryExecutor.getCertForId(certId);
     }
 }

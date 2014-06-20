@@ -32,6 +32,7 @@ import org.xipki.ca.api.profile.IdentifiedCertProfile;
 import org.xipki.ca.server.RandomSerialNumberGenerator;
 import org.xipki.ca.server.mgmt.CAEntry;
 import org.xipki.ca.server.mgmt.CertProfileEntry;
+import org.xipki.ca.server.mgmt.DuplicationMode;
 import org.xipki.ca.server.mgmt.Permission;
 import org.xipki.ca.server.mgmt.shell.SelfSignedCertBuilder.GenerateSelfSignedResult;
 import org.xipki.security.api.PasswordResolver;
@@ -117,16 +118,20 @@ public class CaGenRootCACommand extends CaCommand
     protected String            signerConf;
 
     @Option(name = "-dk", aliases = { "--duplicateKey" },
-            description = "Whether duplicate key is allowed.\n"
-                    + "Valid values are 'yes' and 'no',\n"
-                    + "the default is 'yes'")
-    protected String           duplicateKeyS;
+            description = "Mode of duplicate key.\n"
+                    + "\t1: forbidden\n"
+                    + "\t2: forbidden in the same cert profile\n"
+                    + "\t3: allowed\n"
+                    + "the default is 2")
+    protected Integer           duplicateKeyI;
 
     @Option(name = "-ds", aliases = { "--duplicateSubject" },
-            description = "Whether duplicate subject is allowed.\n"
-                    + "Valid values are 'yes' and 'no',\n"
-                    + "the default is 'yes'")
-    protected String           duplicateSubjectS;
+            description = "Mode of duplicate subject.\n"
+                    + "\t1: forbidden\n"
+                    + "\t2: forbidden in the same cert profile\n"
+                    + "\t3: allowed\n"
+                    + "the default is 2")
+    protected Integer           duplicateSubjectI;
 
     private PasswordResolver passwordResolver;
     private SecurityFactory securityFactory;
@@ -206,11 +211,11 @@ public class CaGenRootCACommand extends CaCommand
         CAEntry entry = new CAEntry(caName, nextSerial, signerType, signerConf, caCert,
                 ocspUris, crlUris, null, numCrls.intValue(), expirationPeriod.intValue());
 
-        boolean allowDuplicateKey = isEnabled(duplicateKeyS, true, "duplicateKey");
-        entry.setAllowDuplicateKey(allowDuplicateKey);
+        DuplicationMode duplicateKey = getDuplicationMode(duplicateKeyI, DuplicationMode.FORBIDDEN_WITHIN_PROFILE);
+        entry.setDuplicateKeyMode(duplicateKey);
 
-        boolean allowDuplicateSubject = isEnabled(duplicateSubjectS, true, "duplicateSubject");
-        entry.setAllowDuplicateSubject(allowDuplicateSubject);
+        DuplicationMode duplicateSubject = getDuplicationMode(duplicateSubjectI, DuplicationMode.FORBIDDEN_WITHIN_PROFILE);
+        entry.setDuplicateSubjectMode(duplicateSubject);
 
         entry.setStatus(status);
         if(crlSignerName != null)

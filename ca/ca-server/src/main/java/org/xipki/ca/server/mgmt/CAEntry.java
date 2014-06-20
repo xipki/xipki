@@ -61,8 +61,8 @@ public class CAEntry
     private String crlSignerName;
     private long lastCommittedNextSerial;
     private long nextSerial;
-    private boolean allowDuplicateKey;
-    private boolean allowDuplicateSubject;
+    private DuplicationMode duplicateKeyMode;
+    private DuplicationMode duplicateSubjectMode;
     private Set<Permission> permissions;
     private int numCrls;
     private final int expirationPeriod;
@@ -270,8 +270,8 @@ public class CAEntry
             sb.append("\tEncoded: ").append(Base64.toBase64String(cert.getEncodedCert())).append("\n");
         }
         sb.append("crlsigner_name: ").append(crlSignerName).append('\n');
-        sb.append("allowDuplicateKey: ").append(allowDuplicateKey ? "yes" : "no").append('\n');
-        sb.append("allowDuplicateSubject: ").append(allowDuplicateSubject ? "yes" : "no").append('\n');
+        sb.append("duplicateKey: ").append(duplicateKeyMode).append('\n');
+        sb.append("duplicateSubject: ").append(duplicateSubjectMode).append('\n');
         sb.append("permissions: ").append(Permission.toString(permissions));
 
         return sb.toString();
@@ -299,24 +299,25 @@ public class CAEntry
         return sb.toString();
     }
 
-    public boolean isAllowDuplicateKey()
+    public DuplicationMode getDuplicateKeyMode()
     {
-        return allowDuplicateKey;
+        return duplicateKeyMode;
     }
 
-    public void setAllowDuplicateKey(boolean allowDuplicateKey)
+    public void setDuplicateKeyMode(DuplicationMode mode)
     {
-        this.allowDuplicateKey = allowDuplicateKey;
+        this.duplicateKeyMode = mode;
     }
 
-    public boolean isAllowDuplicateSubject()
+    public DuplicationMode getDuplicateSubjectMode()
     {
-        return allowDuplicateSubject;
+        return duplicateSubjectMode;
     }
 
-    public void setAllowDuplicateSubject(boolean allowDuplicateSubject)
+    public void setDuplicateSubjectMode(DuplicationMode mode)
     {
-        this.allowDuplicateSubject = allowDuplicateSubject;
+        ParamChecker.assertNotNull("mode", mode);
+        this.duplicateSubjectMode = mode;
     }
 
     public Set<Permission> getPermissions()
