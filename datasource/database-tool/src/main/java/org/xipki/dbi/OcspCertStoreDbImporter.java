@@ -71,6 +71,10 @@ class OcspCertStoreDbImporter extends DbPorter
         JAXBElement<CertStoreType> root = (JAXBElement<CertStoreType>)
                 unmarshaller.unmarshal(new File(baseDir + File.separator + FILENAME_OCSP_CertStore));
         CertStoreType certstore = root.getValue();
+        if(certstore.getVersion() > VERSION)
+        {
+            throw new Exception("Cannot import CertStore greater than " + VERSION + ": " + certstore.getVersion());
+        }
 
         System.out.println("Importing OCSP certstore to database");
         try
