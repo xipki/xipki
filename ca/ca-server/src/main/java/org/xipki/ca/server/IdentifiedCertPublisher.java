@@ -63,22 +63,22 @@ public class IdentifiedCertPublisher extends CertPublisher
     }
 
     @Override
-    public void certificateAdded(CertificateInfo certInfo)
+    public boolean certificateAdded(CertificateInfo certInfo)
     {
-        certPublisher.certificateAdded(certInfo);
+        return certPublisher.certificateAdded(certInfo);
     }
 
     @Override
-    public void certificateRevoked(X509CertificateWithMetaInfo issuerCert,
+    public boolean certificateRevoked(X509CertificateWithMetaInfo issuerCert,
             X509CertificateWithMetaInfo cert, CertRevocationInfo revInfo)
     {
-        certPublisher.certificateRevoked(issuerCert, cert, revInfo);
+        return certPublisher.certificateRevoked(issuerCert, cert, revInfo);
     }
 
     @Override
-    public void crlAdded(X509CertificateWithMetaInfo caCert, X509CRL crl)
+    public boolean crlAdded(X509CertificateWithMetaInfo caCert, X509CRL crl)
     {
-        certPublisher.crlAdded(caCert, crl);
+        return certPublisher.crlAdded(caCert, crl);
     }
 
     public String getName()
@@ -99,29 +99,35 @@ public class IdentifiedCertPublisher extends CertPublisher
     }
 
     @Override
-    public void caRevoked(X509CertificateWithMetaInfo caCert, CertRevocationInfo revocationInfo)
+    public boolean caRevoked(X509CertificateWithMetaInfo caCert, CertRevocationInfo revocationInfo)
     {
-        certPublisher.caRevoked(caCert, revocationInfo);
+        return certPublisher.caRevoked(caCert, revocationInfo);
     }
 
     @Override
-    public void caUnrevoked(X509CertificateWithMetaInfo caCert)
+    public boolean caUnrevoked(X509CertificateWithMetaInfo caCert)
     {
-        certPublisher.caUnrevoked(caCert);
+        return certPublisher.caUnrevoked(caCert);
     }
 
     @Override
-    public void certificateUnrevoked(X509CertificateWithMetaInfo issuerCert,
+    public boolean certificateUnrevoked(X509CertificateWithMetaInfo issuerCert,
             X509CertificateWithMetaInfo cert)
     {
-        certPublisher.certificateUnrevoked(issuerCert, cert);
+        return certPublisher.certificateUnrevoked(issuerCert, cert);
     }
 
     @Override
-    public void certificateRemoved(X509CertificateWithMetaInfo issuerCert,
+    public boolean certificateRemoved(X509CertificateWithMetaInfo issuerCert,
             X509CertificateWithMetaInfo cert)
     {
-        certPublisher.certificateRemoved(issuerCert, cert);
+        return certPublisher.certificateRemoved(issuerCert, cert);
+    }
+
+    @Override
+    public boolean isAsyn()
+    {
+        return certPublisher.isAsyn();
     }
 
 }

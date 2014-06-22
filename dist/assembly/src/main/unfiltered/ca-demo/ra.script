@@ -36,7 +36,32 @@ caclient:enroll -p10 output/TLS1.p10 -out output/TLS1.der -profile TLS -user USE
 
 keytool:update-cert-p12 -p12 output/TLS1.p12 -pwd 1234 -cert output/TLS1.der \
   -cacert output/SubCA1.der -cacert output/RCA1.der
+ 
+# Try to enroll with another profile
+caclient:enroll -p10 output/TLS1.p10 -out output/TLS1-TLS_C.der -profile TLS_C -user USER-T
 
+# Certificate TLSwithIncSN1 (all with same subject and profile but different key) 
+# 1.
+keytool:rsa-p12 -pwd 1234 -out output/TLSwithIncSN1.p12 -subject "CN=TLSwithIncSN1,O=xipki,C=DE"
+
+keytool:req-p12 -p12 output/TLSwithIncSN1.p12 -pwd 1234 -out output/TLSwithIncSN1.p10
+
+caclient:enroll -p10 output/TLSwithIncSN1.p10 -out output/TLSwithIncSN1.der -profile TLSwithIncSN -user USER-T
+
+# 2.
+keytool:rsa-p12 -pwd 1234 -out output/TLSwithIncSN1-1.p12 -subject "CN=TLSwithIncSN1,O=xipki,C=DE"
+
+keytool:req-p12 -p12 output/TLSwithIncSN1-1.p12 -pwd 1234 -out output/TLSwithIncSN1-1.p10
+
+caclient:enroll -p10 output/TLSwithIncSN1-1.p10 -out output/TLSwithIncSN1-1.der -profile TLSwithIncSN -user USER-T
+
+# 3.
+keytool:rsa-p12 -pwd 1234 -out output/TLSwithIncSN1-2.p12 -subject "CN=TLSwithIncSN1,O=xipki,C=DE"
+
+keytool:req-p12 -p12 output/TLSwithIncSN1-2.p12 -pwd 1234 -out output/TLSwithIncSN1-2.p10
+
+caclient:enroll -p10 output/TLSwithIncSN1-2.p10 -out output/TLSwithIncSN1-2.der -profile TLSwithIncSN -user USER-T
+ 
 # Certificate TLS2
 keytool:rsa-p12 -pwd 1234 -out output/TLS2.p12 -subject "CN=TSL2,O=xipki,C=DE"
 

@@ -17,6 +17,10 @@
 
 package org.xipki.ca.server;
 
+/**
+ * @author Lijun Liao
+ */
+
 public class SubjectKeyProfileTriple
 {
     private final int certId;

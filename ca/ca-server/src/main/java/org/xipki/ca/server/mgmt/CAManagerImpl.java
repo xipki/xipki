@@ -18,8 +18,10 @@
 package org.xipki.ca.server.mgmt;
 
 import java.io.ByteArrayInputStream;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.net.SocketException;
 import java.security.NoSuchProviderException;
 import java.security.Security;
 import java.security.cert.CertificateEncodingException;
@@ -31,6 +33,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.sql.Timestamp;
 import java.sql.Types;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -41,8 +44,10 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 import java.util.StringTokenizer;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.util.encoders.Base64;
@@ -59,6 +64,7 @@ import org.xipki.ca.api.profile.CertProfileException;
 import org.xipki.ca.api.publisher.CertPublisherException;
 import org.xipki.ca.api.publisher.CertificateInfo;
 import org.xipki.ca.cmp.server.CmpControl;
+import org.xipki.ca.common.CASystemStatus;
 import org.xipki.ca.common.X509CertificateWithMetaInfo;
 import org.xipki.ca.server.CmpRequestorInfo;
 import org.xipki.ca.server.CrlSigner;
@@ -89,13 +95,13 @@ public class CAManagerImpl implements CAManager
 {
     private static final Logger LOG = LoggerFactory.getLogger(CAManagerImpl.class);
 
-    private static final String ENVIRONMENT_NAME_LOCK = "lock";
-
     private final CertificateFactory certFact;
+    private final String lockInstanceId;
 
     private CertificateStore certstore;
     private DataSource dataSource;
     private CmpResponderEntry responder;
+
     private boolean caLockedByMe = false;
 
     private Map<String, DataSource> dataSources = null;
@@ -164,6 +170,39 @@ public class CAManagerImpl implements CAManager
         }
 
         this.certFact = cf;
+
+        String calockId = null;
+        File caLockFile = new File("etc", "calock");
+        if(caLockFile.exists())
+        {
+            try
+            {
+                calockId = new String(IoCertUtil.read(caLockFile));
+            } catch (IOException e)
+            {
+            }
+        }
+
+        if(calockId == null)
+        {
+            calockId = UUID.randomUUID().toString();
+            try
+            {
+                IoCertUtil.save(caLockFile, calockId.getBytes());
+            } catch (IOException e)
+            {
+            }
+        }
+
+        String hostAddress = null;
+        try
+        {
+            hostAddress = IoCertUtil.getHostAddress();
+        } catch (SocketException e)
+        {
+        }
+
+        this.lockInstanceId = (hostAddress == null) ? calockId :hostAddress + "/" + calockId;
     }
 
     private void init()
@@ -249,6 +288,27 @@ public class CAManagerImpl implements CAManager
         initDataObjects();
     }
 
+    @Override
+    public CASystemStatus getCASystemStatus()
+    {
+        if(caSystemSetuped)
+        {
+            return CASystemStatus.STARTED;
+        }
+        else if(initializing)
+        {
+            return CASystemStatus.INITIALIZING;
+        }
+        else if(caLockedByMe == false)
+        {
+            return CASystemStatus.LOCK_FAILED;
+        }
+        else
+        {
+            return CASystemStatus.ERROR;
+        }
+    }
+
     private boolean lockCA()
     {
         if(caLockedByMe)
@@ -256,111 +316,106 @@ public class CAManagerImpl implements CAManager
             return true;
         }
 
-        Statement stmt = null;
-        ResultSet rs = null;
         try
         {
-            stmt = createStatement();
-            String sql = "SELECT VALUE FROM ENVIRONMENT WHERE NAME='" + ENVIRONMENT_NAME_LOCK + "'";
-            rs = stmt.executeQuery(sql);
+            Statement stmt = null;
+            ResultSet rs = null;
 
-            boolean alreadyLocked = false;
-            String lockSql = null;
-            if(rs.next())
+            try
             {
-                String value = rs.getString("VALUE");
-                alreadyLocked = (value != null) && (value.trim().equals("0") == false);
-                lockSql = "UPDATE ENVIRONMENT SET VALUE='1' WHERE NAME='" + ENVIRONMENT_NAME_LOCK + "'";
-            }
-            else
+                stmt = createStatement();
+                String sql = "SELECT LOCKED, LOCKGRANTED, LOCKEDBY FROM CALOCK WHERE NAME='default'";
+                rs = stmt.executeQuery(sql);
+
+                if(rs.next())
+                {
+                    boolean alreadyLocked = rs.getBoolean("LOCKED");
+                    if(alreadyLocked)
+                    {
+                        long lockGranted = rs.getLong("LOCKGRANTED");
+                        String lockedBy = rs.getString("LOCKEDBY");
+                        if(this.lockInstanceId.equals(lockedBy))
+                        {
+                            LOG.info("CA has been locked by me since {}, relock it",
+                                    new Date(lockGranted * 1000));
+                        }
+                        else
+                        {
+                            LOG.error("Cannot lock CA, it has been locked by {} since {}", lockedBy,
+                                    new Date(lockGranted * 1000));
+                            return false;
+                        }
+                    }
+                }
+
+                stmt.execute("DELETE FROM CALOCK");
+            }finally
             {
-                lockSql = "INSERT INTO ENVIRONMENT (NAME, VALUE) VALUES ('" + ENVIRONMENT_NAME_LOCK + "', '1')";
+                dataSource.releaseResources(stmt, rs);
             }
 
-            if(alreadyLocked)
-            {
-                return false;
-            }
+            String lockSql = "INSERT INTO CALOCK (NAME, LOCKED, LOCKGRANTED, LOCKGRANTED2, LOCKEDBY)"
+                    + " VALUES ('default', ?, ?, ?, ?)";
 
-            int numColumns = stmt.executeUpdate(lockSql);
-            caLockedByMe = numColumns > 0;
-            return caLockedByMe;
+            PreparedStatement ps = null;
+            try
+            {
+                long nowMillis = System.currentTimeMillis();
+                ps = prepareStatement(lockSql);
+                int idx = 1;
+                ps.setBoolean(idx++, true);
+                ps.setLong(idx++, nowMillis / 1000);
+                ps.setTimestamp(idx++, new Timestamp(nowMillis));
+                ps.setString(idx++, lockInstanceId);
+                int numColumns = ps.executeUpdate();
+                caLockedByMe = numColumns > 0;
+                return caLockedByMe;
+            }finally
+            {
+                dataSource.releaseResources(ps, null);
+            }
         }catch(Exception e)
         {
             LOG.error("Error while locking CA. {}: {}", e.getClass().getName(), e.getMessage());
             LOG.debug("Error while locking CA", e);
             return false;
-        }finally
-        {
-            dataSource.releaseResources(stmt, rs);
         }
     }
 
     @Override
     public boolean unlockCA()
     {
-        boolean successfull = do_unlockCA();
-        auditLogPCIEvent(successfull, "UNLOCK");
-        return successfull;
-    }
+        boolean successfull = false;
 
-    private boolean do_unlockCA()
-    {
         Statement stmt = null;
-        ResultSet rs = null;
         try
         {
-            try
-            {
-                stmt = createStatement();
-            } catch (CAMgmtException e)
-            {
-                LOG.warn("Error in unlockCA(), SQLException: {}", e.getMessage());
-                LOG.debug("Error in unlockCA()", e);
-                return false;
-            }
-            String sql = "SELECT VALUE FROM ENVIRONMENT WHERE NAME='" + ENVIRONMENT_NAME_LOCK + "'";
-            rs = stmt.executeQuery(sql);
-
-            boolean alreadyLocked = false;
-
-            String lockSql = null;
-            if(rs.next())
-            {
-                String value = rs.getString("VALUE");
-                alreadyLocked = (value != null) && (value.trim().equals("0") == false);
-                lockSql = "UPDATE ENVIRONMENT SET VALUE='0' WHERE NAME='" + ENVIRONMENT_NAME_LOCK + "'";
-            }
-            else
-            {
-                lockSql = "INSERT INTO ENVIRONMENT (NAME, VALUE) VALUES ('" + ENVIRONMENT_NAME_LOCK + "', '0')";
-            }
-
-            if(alreadyLocked == false)
-            {
-                return true;
-            }
-
-            int numColumns = stmt.executeUpdate(lockSql);
-            boolean unlocked = numColumns > 0;
-            if(unlocked)
-            {
-                LOG.info("Unlocked CA");
-            }
-            else
-            {
-                LOG.error("Could not unlock CA");
-            }
-            return unlocked;
+            stmt = createStatement();
+            stmt.execute("DELETE FROM CALOCK");
+            successfull = true;
         }catch(SQLException e)
         {
             LOG.warn("Error in unlockCA(), SQLException: {}", e.getMessage());
             LOG.debug("Error in unlockCA()", e);
-            return false;
+        } catch (CAMgmtException e)
+        {
+            LOG.warn("Error in unlockCA(), SQLException: {}", e.getMessage());
+            LOG.debug("Error in unlockCA()", e);
         }finally
         {
-            dataSource.releaseResources(stmt, rs);
+            dataSource.releaseResources(stmt, null);
         }
+
+        if(successfull)
+        {
+            LOG.info("Unlocked CA");
+        }
+        else
+        {
+            LOG.error("Unlocking CA failed");
+        }
+        auditLogPCIEvent(successfull, "UNLOCK");
+        return successfull;
     }
 
     private void reset()
@@ -376,11 +431,7 @@ public class CAManagerImpl implements CAManager
         cAsInitialized = false;
         environmentParametersInitialized = false;
 
-        if(scheduledThreadPoolExecutor != null)
-        {
-            scheduledThreadPoolExecutor.shutdown();
-            scheduledThreadPoolExecutor = null;
-        }
+        shutdownScheduledThreadPoolExecutor();
     }
 
     private void initDataObjects()
@@ -435,6 +486,7 @@ public class CAManagerImpl implements CAManager
         auditLogPCIEvent(caSystemStarted, "START");
     }
 
+    private boolean initializing = false;
     private boolean do_startCaSystem()
     {
         if(caSystemSetuped)
@@ -442,232 +494,242 @@ public class CAManagerImpl implements CAManager
             return true;
         }
 
-        LOG.info("Starting CA system");
+        initializing = true;
+        shutdownScheduledThreadPoolExecutor();
+
         try
         {
-            init();
-        }catch(Exception e)
-        {
-            LOG.error("do_startCaSystem().init(). {}: {}", e.getClass().getName(), e.getMessage());
-            LOG.debug("do_startCaSystem().init()", e);
-            return false;
-        }
-
-        if(scheduledThreadPoolExecutor != null)
-        {
-            scheduledThreadPoolExecutor.shutdown();
-        }
-
-        scheduledThreadPoolExecutor = new ScheduledThreadPoolExecutor(5);
-
-        // check the configuration of certificate profiles
-        for(CertProfileEntry entry : certProfiles.values())
-        {
+            LOG.info("Starting CA system");
             try
             {
-                entry.getCertProfile();
-            } catch (CertProfileException e)
+                init();
+            }catch(Exception e)
             {
-                String event = "Invalid configuration for the certProfile " + entry.getName();
-                LOG.error("{},  message: {}", event, e.getMessage());
-                LOG.debug(event, e);
+                LOG.error("do_startCaSystem().init(). {}: {}", e.getClass().getName(), e.getMessage());
+                LOG.debug("do_startCaSystem().init()", e);
                 return false;
             }
-        }
 
-        // check the configuration of certificate publishers
-        for(PublisherEntry entry : publishers.values())
-        {
-            try
+            // check the configuration of certificate profiles
+            for(CertProfileEntry entry : certProfiles.values())
             {
-                entry.getCertPublisher();
-            } catch (CertPublisherException e)
-            {
-                final String event = "Invalid configuration for the certPublisher " + entry.getName();
-                LOG.error("{},  message: {}", event, e.getMessage());
-                LOG.debug(event, e);
-                return false;
-            }
-        }
-
-        x509cas.clear();
-        responders.clear();
-
-        ConcurrentContentSigner cmpSigner = null;
-        if(responder != null)
-        {
-            try
-            {
-                X509Certificate responderCert = responder.getCertificate();
-                cmpSigner = securityFactory.createSigner(
-                        responder.getType(), responder.getConf(), responderCert,
-                        passwordResolver);
-                if(responderCert == null)
-                {
-                    responder.setCertificate(cmpSigner.getCertificate());
-                }
-            } catch (PasswordResolverException e)
-            {
-                String event = "security.createSigner cmpResponder";
-                LOG.error("{}. {}, {}", new Object[]{event, e.getClass().getName(), e.getMessage()});
-                LOG.debug(event, e);
-                return false;
-            } catch (SignerException e)
-            {
-                String event = "security.createSigner cmpResponder";
-                LOG.error("{}. {}, {}", new Object[]{event, e.getClass().getName(), e.getMessage()});
-                LOG.debug(event, e);
-                return false;
-            }
-        }
-
-        // Add the CAs to the store
-        for(String caName : cas.keySet())
-        {
-            CAEntry caEntry = cas.get(caName);
-
-            CrlSigner crlSigner = null;
-            if(caEntry.getCrlSignerName() != null)
-            {
-                CrlSignerEntry crlSignerEntry = crlSigners.get(caEntry.getCrlSignerName());
-                String signerType = crlSignerEntry.getType();
-
-                ConcurrentContentSigner identifiedSigner = null;
-                if("CA".equals(signerType))
-                {
-                }
-                else
-                {
-                    try
-                    {
-                        X509Certificate crlSignerCert = crlSignerEntry.getCertificate();
-                        identifiedSigner = securityFactory.createSigner(
-                                signerType, crlSignerEntry.getConf(), crlSignerCert,
-                                passwordResolver);
-                        if(crlSignerCert == null)
-                        {
-                            crlSignerEntry.setCertificate(identifiedSigner.getCertificate());
-                        }
-                    } catch (PasswordResolverException e)
-                    {
-                        String event = "security.createSigner crlSigner (ca=" + caName + ")";
-                        LOG.error("{}. {}, {}", new Object[]{event, e.getClass().getName(), e.getMessage()});
-                        LOG.debug(event, e);
-                        return false;
-                    } catch (SignerException e)
-                    {
-                        String event = "security.createSigner crlSigner (ca=" + caName + ")";
-                        LOG.error("{}. {}, {}", new Object[]{event, e.getClass().getName(), e.getMessage()});
-                        LOG.debug(event, e);
-                        return false;
-                    }
-                    caEntry.getPublicCAInfo().setCrlSignerCertificate(identifiedSigner.getCertificate());
-                }
-
                 try
                 {
-                    crlSigner = new CrlSigner(identifiedSigner, crlSignerEntry.getPeriod(), crlSignerEntry.getOverlap());
-                } catch (OperationException e)
+                    entry.getCertProfile();
+                } catch (CertProfileException e)
                 {
-                    String event = "CrlSigner.<init> crlSigner (ca=" + caName + ")";
+                    String event = "Invalid configuration for the certProfile " + entry.getName();
+                    LOG.error("{},  message: {}", event, e.getMessage());
+                    LOG.debug(event, e);
+                    return false;
+                }
+            }
+
+            // check the configuration of certificate publishers
+            for(PublisherEntry entry : publishers.values())
+            {
+                try
+                {
+                    entry.getCertPublisher();
+                } catch (CertPublisherException e)
+                {
+                    final String event = "Invalid configuration for the certPublisher " + entry.getName();
+                    LOG.error("{},  message: {}", event, e.getMessage());
+                    LOG.debug(event, e);
+                    return false;
+                }
+            }
+
+            x509cas.clear();
+            responders.clear();
+
+            ConcurrentContentSigner cmpSigner = null;
+            if(responder != null)
+            {
+                try
+                {
+                    X509Certificate responderCert = responder.getCertificate();
+                    cmpSigner = securityFactory.createSigner(
+                            responder.getType(), responder.getConf(), responderCert,
+                            passwordResolver);
+                    if(responderCert == null)
+                    {
+                        responder.setCertificate(cmpSigner.getCertificate());
+                    }
+                } catch (PasswordResolverException e)
+                {
+                    String event = "security.createSigner cmpResponder";
+                    LOG.error("{}. {}, {}", new Object[]{event, e.getClass().getName(), e.getMessage()});
+                    LOG.debug(event, e);
+                    return false;
+                } catch (SignerException e)
+                {
+                    String event = "security.createSigner cmpResponder";
                     LOG.error("{}. {}, {}", new Object[]{event, e.getClass().getName(), e.getMessage()});
                     LOG.debug(event, e);
                     return false;
                 }
-                crlSigner.setIncludeCertsInCrl(crlSignerEntry.includeCertsInCRL());
-                crlSigner.setIncludeExpiredCerts(crlSignerEntry.includeExpiredCerts());
             }
 
-            ConcurrentContentSigner caSigner;
-            try
+            if(cas.isEmpty() == false)
             {
-                caSigner = securityFactory.createSigner(
-                        caEntry.getSignerType(), caEntry.getSignerConf(),
-                        caEntry.getCertificate().getCert(),
-                        passwordResolver);
-            } catch (PasswordResolverException e)
-            {
-                String event = "security.createSigner caSigner (ca=" + caName + ")";
-                LOG.error("{}. {}, {}", new Object[]{event, e.getClass().getName(), e.getMessage()});
-                LOG.debug(event, e);
-                return false;
-            } catch (SignerException e)
-            {
-                String event = "security.createSigner caSigner (ca=" + caName + ")";
-                LOG.error("{}. {}, {}", new Object[]{event, e.getClass().getName(), e.getMessage()});
-                LOG.debug(event, e);
-                return false;
+                scheduledThreadPoolExecutor = new ScheduledThreadPoolExecutor(10);
             }
 
-            X509CA ca;
-            try
+            // Add the CAs to the store
+            for(String caName : cas.keySet())
             {
-                ca = new X509CA(this, caEntry, caSigner, certstore, crlSigner);
-            } catch (OperationException e)
-            {
-                String event = "X509CA.<init> (ca=" + caName + ")";
-                LOG.error("{}. {}, {}", new Object[]{event, e.getClass().getName(), e.getMessage()});
-                LOG.debug(event, e);
-                return false;
-            }
+                CAEntry caEntry = cas.get(caName);
 
-            x509cas.put(caName, ca);
-
-            if(cmpSigner != null)
-            {
-                X509CACmpResponder caResponder = new X509CACmpResponder(ca, cmpSigner, securityFactory);
-                Set<CAHasRequestorEntry> caHasRequestorEntries = getCmpRequestorsForCA(caName);
-                if(caHasRequestorEntries != null)
+                CrlSigner crlSigner = null;
+                if(caEntry.getCrlSignerName() != null)
                 {
-                    for(CAHasRequestorEntry entry : caHasRequestorEntries)
+                    CrlSignerEntry crlSignerEntry = crlSigners.get(caEntry.getCrlSignerName());
+                    String signerType = crlSignerEntry.getType();
+
+                    ConcurrentContentSigner identifiedSigner = null;
+                    if("CA".equals(signerType))
                     {
-                        CmpRequestorEntry cmpRequestorEntry = getCmpRequestor(entry.getRequestorName());
-                        CmpRequestorInfo requestorInfo = new CmpRequestorInfo(
-                                cmpRequestorEntry.getName(),
-                                new X509CertificateWithMetaInfo(cmpRequestorEntry.getCert()),
-                                entry.isRa());
-                        requestorInfo.setPermissions(entry.getPermissions());
-                        requestorInfo.setProfiles(entry.getProfiles());
-                        caResponder.addAutorizatedRequestor(requestorInfo);
                     }
+                    else
+                    {
+                        try
+                        {
+                            X509Certificate crlSignerCert = crlSignerEntry.getCertificate();
+                            identifiedSigner = securityFactory.createSigner(
+                                    signerType, crlSignerEntry.getConf(), crlSignerCert,
+                                    passwordResolver);
+                            if(crlSignerCert == null)
+                            {
+                                crlSignerEntry.setCertificate(identifiedSigner.getCertificate());
+                            }
+                        } catch (PasswordResolverException e)
+                        {
+                            String event = "security.createSigner crlSigner (ca=" + caName + ")";
+                            LOG.error("{}. {}, {}", new Object[]{event, e.getClass().getName(), e.getMessage()});
+                            LOG.debug(event, e);
+                            return false;
+                        } catch (SignerException e)
+                        {
+                            String event = "security.createSigner crlSigner (ca=" + caName + ")";
+                            LOG.error("{}. {}, {}", new Object[]{event, e.getClass().getName(), e.getMessage()});
+                            LOG.debug(event, e);
+                            return false;
+                        }
+                        caEntry.getPublicCAInfo().setCrlSignerCertificate(identifiedSigner.getCertificate());
+                    }
+
+                    try
+                    {
+                        crlSigner = new CrlSigner(identifiedSigner, crlSignerEntry.getPeriod(), crlSignerEntry.getOverlap());
+                    } catch (OperationException e)
+                    {
+                        String event = "CrlSigner.<init> crlSigner (ca=" + caName + ")";
+                        LOG.error("{}. {}, {}", new Object[]{event, e.getClass().getName(), e.getMessage()});
+                        LOG.debug(event, e);
+                        return false;
+                    }
+                    crlSigner.setIncludeCertsInCrl(crlSignerEntry.includeCertsInCRL());
+                    crlSigner.setIncludeExpiredCerts(crlSignerEntry.includeExpiredCerts());
                 }
 
-                responders.put(caName, caResponder);
+                ConcurrentContentSigner caSigner;
+                try
+                {
+                    caSigner = securityFactory.createSigner(
+                            caEntry.getSignerType(), caEntry.getSignerConf(),
+                            caEntry.getCertificate().getCert(),
+                            passwordResolver);
+                } catch (PasswordResolverException e)
+                {
+                    String event = "security.createSigner caSigner (ca=" + caName + ")";
+                    LOG.error("{}. {}, {}", new Object[]{event, e.getClass().getName(), e.getMessage()});
+                    LOG.debug(event, e);
+                    return false;
+                } catch (SignerException e)
+                {
+                    String event = "security.createSigner caSigner (ca=" + caName + ")";
+                    LOG.error("{}. {}, {}", new Object[]{event, e.getClass().getName(), e.getMessage()});
+                    LOG.debug(event, e);
+                    return false;
+                }
+
+                X509CA ca;
+                try
+                {
+                    ca = new X509CA(this, caEntry, caSigner, certstore, crlSigner);
+                } catch (OperationException e)
+                {
+                    String event = "X509CA.<init> (ca=" + caName + ")";
+                    LOG.error("{}. {}, {}", new Object[]{event, e.getClass().getName(), e.getMessage()});
+                    LOG.debug(event, e);
+                    return false;
+                }
+
+                x509cas.put(caName, ca);
+
+                if(cmpSigner != null)
+                {
+                    X509CACmpResponder caResponder = new X509CACmpResponder(ca, cmpSigner, securityFactory);
+                    Set<CAHasRequestorEntry> caHasRequestorEntries = getCmpRequestorsForCA(caName);
+                    if(caHasRequestorEntries != null)
+                    {
+                        for(CAHasRequestorEntry entry : caHasRequestorEntries)
+                        {
+                            CmpRequestorEntry cmpRequestorEntry = getCmpRequestor(entry.getRequestorName());
+                            CmpRequestorInfo requestorInfo = new CmpRequestorInfo(
+                                    cmpRequestorEntry.getName(),
+                                    new X509CertificateWithMetaInfo(cmpRequestorEntry.getCert()),
+                                    entry.isRa());
+                            requestorInfo.setPermissions(entry.getPermissions());
+                            requestorInfo.setProfiles(entry.getProfiles());
+                            caResponder.addAutorizatedRequestor(requestorInfo);
+                        }
+                    }
+
+                    responders.put(caName, caResponder);
+                }
             }
-        }
 
-        scheduledThreadPoolExecutor = new ScheduledThreadPoolExecutor(10);
-        caSystemSetuped = true;
-        StringBuilder sb = new StringBuilder();
-        sb.append("Started CA system");
-        Set<String> names = new HashSet<>(getCANames());
+            caSystemSetuped = true;
+            StringBuilder sb = new StringBuilder();
+            sb.append("Started CA system");
+            Set<String> names = new HashSet<>(getCANames());
 
-        if(names.size() > 0)
-        {
-            sb.append(" with following CAs: ");
-            Set<String> caAliasNames = getCaAliasNames();
-             for(String aliasName : caAliasNames)
+            if(names.size() > 0)
             {
-                 String name = getCaName(aliasName);
-                 names.remove(name);
+                sb.append(" with following CAs: ");
+                Set<String> caAliasNames = getCaAliasNames();
+                 for(String aliasName : caAliasNames)
+                {
+                     String name = getCaName(aliasName);
+                     names.remove(name);
 
-                sb.append(name).append(" (alias ").append(aliasName).append(")").append(", ");
+                    sb.append(name).append(" (alias ").append(aliasName).append(")").append(", ");
+                }
+
+                 for(String name : names)
+                 {
+                    sb.append(name).append(", ");
+                 }
+
+                 int len = sb.length();
+                 sb.delete(len-2, len);
+
+                 ScheduledPublishQueueCleaner publishQueueCleaner = new ScheduledPublishQueueCleaner();
+                 scheduledThreadPoolExecutor.scheduleAtFixedRate(
+                         publishQueueCleaner, 120, 120, TimeUnit.SECONDS);
+            }
+            else
+            {
+                sb.append(": no CA is configured");
             }
 
-             for(String name : names)
-             {
-                sb.append(name).append(", ");
-             }
-
-             int len = sb.length();
-             sb.delete(len-2, len);
-        }
-        else
+            LOG.info("{}", sb);
+        } finally
         {
-            sb.append(": no CA is configured");
+            initializing = false;
         }
-
-        LOG.info("{}", sb);
 
         return true;
     }
@@ -676,10 +738,7 @@ public class CAManagerImpl implements CAManager
     {
         LOG.info("Stopping CA system");
 
-        if(scheduledThreadPoolExecutor != null)
-        {
-            scheduledThreadPoolExecutor.shutdown();
-        }
+        shutdownScheduledThreadPoolExecutor();
 
         for(String caName : x509cas.keySet())
         {
@@ -881,10 +940,7 @@ public class CAManagerImpl implements CAManager
             {
                 String name = rs.getString("NAME");
                 String value = rs.getString("VALUE");
-                if(ENVIRONMENT_NAME_LOCK.equals(name) == false)
-                {
-                    envParameterResolver.addEnvParam(name, value);
-                }
+                envParameterResolver.addEnvParam(name, value);
             }
         }catch(SQLException e)
         {
@@ -2799,11 +2855,6 @@ public class CAManagerImpl implements CAManager
     public void removeEnvParam(String envParamName)
     throws CAMgmtException
     {
-        if(ENVIRONMENT_NAME_LOCK.equals(envParamName))
-        {
-            return;
-        }
-
         PreparedStatement ps = null;
         try
         {
@@ -2823,17 +2874,6 @@ public class CAManagerImpl implements CAManager
 
     @Override
     public void changeEnvParam(String name, String value)
-    throws CAMgmtException
-    {
-        if(ENVIRONMENT_NAME_LOCK.equals(name))
-        {
-            return;
-        }
-
-        do_changeEnvParam(name, value);
-    }
-
-    private void do_changeEnvParam(String name, String value)
     throws CAMgmtException
     {
         ParamChecker.assertNotEmpty("name", name);
@@ -3140,16 +3180,36 @@ public class CAManagerImpl implements CAManager
     }
 
     @Override
-    public boolean republishCertificates(String caName, String publisherName)
+    public boolean republishCertificates(String caName, List<String> publisherNames)
     throws CAMgmtException
     {
-        X509CA ca = x509cas.get(caName);
-        if(ca == null)
+        Set<String> caNames;
+        if(caName == null)
         {
-            throw new CAMgmtException("Cannot find CA named " + caName);
+            caNames = x509cas.keySet();
+        }
+        else
+        {
+            caNames = new HashSet<>();
+            caNames.add(caName);
         }
 
-        return ca.republishCertificates(publisherName);
+        for(String name : caNames)
+        {
+            X509CA ca = x509cas.get(name);
+            if(ca == null)
+            {
+                throw new CAMgmtException("Cannot find CA named " + name);
+            }
+
+            boolean successfull = ca.republishCertificates(publisherNames);
+            if(successfull == false)
+            {
+                throw new CAMgmtException("Republishing certificates to CA " + name + " failed");
+            }
+        }
+
+        return true;
     }
 
     @Override
@@ -3305,6 +3365,88 @@ public class CAManagerImpl implements CAManager
                 auditEvent.setLevel(AuditLevel.ERROR);
             }
             auditLoggingService.logEvent(auditEvent);
+        }
+    }
+
+    @Override
+    public boolean clearPublishQueue(String caName, List<String> publisherNames)
+    throws CAMgmtException
+    {
+        if(caName == null)
+        {
+            try
+            {
+                certstore.clearPublishQueue((X509CertificateWithMetaInfo) null, (String) null);
+                return true;
+            } catch (SQLException e)
+            {
+                throw new CAMgmtException(e);
+            }
+        }
+        else
+        {
+            X509CA ca = x509cas.get(caName);
+            if(ca == null)
+            {
+                throw new CAMgmtException("Cannot find CA named " + caName);
+            }
+            return ca.clearPublishQueue(publisherNames);
+        }
+    }
+
+    private void shutdownScheduledThreadPoolExecutor()
+    {
+        if(scheduledThreadPoolExecutor != null)
+        {
+            scheduledThreadPoolExecutor.shutdown();
+            while(scheduledThreadPoolExecutor.isTerminated() == false)
+            {
+                try
+                {
+                    Thread.sleep(100);
+                }catch(InterruptedException e)
+                {
+                }
+            }
+            scheduledThreadPoolExecutor = null;
+        }
+    }
+
+    private class ScheduledPublishQueueCleaner implements Runnable
+    {
+        private boolean inProcess = false;
+
+        @Override
+        public void run()
+        {
+            if(inProcess || caSystemSetuped == false)
+            {
+                return;
+            }
+
+            inProcess = true;
+            try
+            {
+                LOG.debug("Publishing certificates in PUBLISHQUEUE");
+                for(String name : x509cas.keySet())
+                {
+                    X509CA ca = x509cas.get(name);
+                    boolean b = ca.publishCertsInQueue();
+                    if(b)
+                    {
+                        LOG.debug(" Published certificates of CA {} in PUBLISHQUEUE", name);
+                    }
+                    else
+                    {
+                        LOG.error("Publishing certificates of CA {} in PUBLISHQUEUE failed", name);
+                    }
+                }
+            }catch(Throwable t)
+            {
+            }finally
+            {
+                inProcess = false;
+            }
         }
     }
 

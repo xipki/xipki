@@ -37,25 +37,27 @@ public abstract class CertPublisher
             DataSource dataSource)
     throws CertPublisherException;
 
+    public abstract boolean isAsyn();
+
     public abstract void setEnvironmentParameterResolver(EnvironmentParameterResolver parameterResolver);
 
-    public abstract void certificateAdded(CertificateInfo certInfo);
+    public abstract boolean certificateAdded(CertificateInfo certInfo);
 
-    public abstract void certificateRevoked(X509CertificateWithMetaInfo issuerCert,
+    public abstract boolean certificateRevoked(X509CertificateWithMetaInfo issuerCert,
             X509CertificateWithMetaInfo cert,
             CertRevocationInfo revInfo);
 
-    public abstract void certificateUnrevoked(X509CertificateWithMetaInfo issuerCert,
+    public abstract boolean certificateUnrevoked(X509CertificateWithMetaInfo issuerCert,
             X509CertificateWithMetaInfo cert);
 
-    public abstract void certificateRemoved(X509CertificateWithMetaInfo issuerCert,
+    public abstract boolean certificateRemoved(X509CertificateWithMetaInfo issuerCert,
             X509CertificateWithMetaInfo cert);
 
-    public abstract void crlAdded(X509CertificateWithMetaInfo caCert, X509CRL crl);
+    public abstract boolean crlAdded(X509CertificateWithMetaInfo caCert, X509CRL crl);
 
-    public abstract void caRevoked(X509CertificateWithMetaInfo caCert, CertRevocationInfo revocationInfo);
+    public abstract boolean caRevoked(X509CertificateWithMetaInfo caCert, CertRevocationInfo revocationInfo);
 
-    public abstract void caUnrevoked(X509CertificateWithMetaInfo caCert);
+    public abstract boolean caUnrevoked(X509CertificateWithMetaInfo caCert);
 
     public abstract boolean isHealthy();
 

@@ -24,6 +24,7 @@ import java.util.Set;
 import org.xipki.ca.api.CAMgmtException;
 import org.xipki.ca.api.CAStatus;
 import org.xipki.ca.cmp.server.CmpControl;
+import org.xipki.ca.common.CASystemStatus;
 import org.xipki.ca.server.X509CA;
 import org.xipki.ca.server.X509CACmpResponder;
 import org.xipki.security.common.CertRevocationInfo;
@@ -37,12 +38,24 @@ public interface CAManager
 {
     public static final String NULL = "NULL";
 
+    CASystemStatus getCASystemStatus();
+
     boolean unlockCA();
 
     void publishRootCA(String caName, String certprofile)
     throws CAMgmtException;
 
-    boolean republishCertificates(String caName, String publisherName)
+    boolean republishCertificates(String caName, List<String> publisherNames)
+    throws CAMgmtException;
+
+    /**
+     *
+     * @param caName {@code null} for all CAs
+     * @param publisherNames {@code null} for all publishers
+     * @return
+     * @throws CAMgmtException
+     */
+    boolean clearPublishQueue(String caName, List<String> publisherNames)
     throws CAMgmtException;
 
     void removeCA(String caName)

@@ -46,7 +46,7 @@ public class ExportCaCommand extends OsgiCommandSupport
     protected Integer           numCertsInBundle;
 
     @Option(name = "-numcrls",
-            description = "Number of certificates in one zip file. Default is 30")
+            description = "Number of CRLs in one zip file. Default is 30")
     protected Integer           numCrls;
 
     private DataSourceFactory dataSourceFactory;
