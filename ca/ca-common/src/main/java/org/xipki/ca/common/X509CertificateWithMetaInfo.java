@@ -30,6 +30,7 @@ import org.xipki.security.common.ParamChecker;
 
 public class X509CertificateWithMetaInfo
 {
+    private Integer certId;
     private final X509Certificate cert;
     private final String subject;
     private final byte[] encodedCert;
@@ -82,6 +83,16 @@ public class X509CertificateWithMetaInfo
     public String toString()
     {
         return cert.toString();
+    }
+
+    public Integer getCertId()
+    {
+        return certId;
+    }
+
+    public void setCertId(Integer certId)
+    {
+        this.certId = certId;
     }
 
 }

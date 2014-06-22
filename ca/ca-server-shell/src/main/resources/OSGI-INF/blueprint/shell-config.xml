@@ -9,6 +9,13 @@
 	
     <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
 
+		<!-- CA system -->
+		<command name="ca/system-status">
+            <action class="org.xipki.ca.server.mgmt.shell.CaSystemStatusCommand">
+            	<property name="caManager" ref="caManager" />
+            </action>
+        </command>
+		
 		<!-- CA -->
         <command name="ca/unlock">
             <action class="org.xipki.ca.server.mgmt.shell.UnlockCACommand">
@@ -275,7 +282,13 @@
             <action class="org.xipki.ca.server.mgmt.shell.RepublishCommand">
             	<property name="caManager" ref="caManager" />
             </action>
-        </command>        
+        </command>
+
+        <command name="ca/clear-publishqueue">
+            <action class="org.xipki.ca.server.mgmt.shell.ClearPublishQueueCommand">
+            	<property name="caManager" ref="caManager" />
+            </action>
+        </command>
         
 		<!-- Requestor -->
         <command name="ca/requestor-add">

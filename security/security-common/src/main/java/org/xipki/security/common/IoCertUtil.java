@@ -28,6 +28,10 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
+import java.net.Inet4Address;
+import java.net.InetAddress;
+import java.net.NetworkInterface;
+import java.net.SocketException;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchProviderException;
@@ -670,5 +674,44 @@ public class IoCertUtil
     private static int byte2int(byte b)
     {
         return b >= 0 ? b : 256 + b;
+    }
+
+    public static String getHostAddress()
+    throws SocketException
+    {
+        List<String> addresses = new LinkedList<>();
+
+        Enumeration<NetworkInterface> e = NetworkInterface.getNetworkInterfaces();
+        while(e.hasMoreElements())
+        {
+            NetworkInterface n = (NetworkInterface) e.nextElement();
+            Enumeration<InetAddress> ee = n.getInetAddresses();
+            while (ee.hasMoreElements())
+            {
+                InetAddress i = (InetAddress) ee.nextElement();
+                if(i instanceof Inet4Address)
+                {
+                    addresses.add(((Inet4Address) i).getHostAddress());
+                }
+            }
+        }
+
+        for(String addr : addresses)
+        {
+            if(addr.startsWith("192.") == false && addr.startsWith("127."))
+            {
+                return addr;
+            }
+        }
+
+        for(String addr : addresses)
+        {
+            if(addr.startsWith("127.") == false)
+            {
+                return addr;
+            }
+        }
+
+        return addresses.get(0);
     }
 }

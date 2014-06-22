@@ -158,11 +158,6 @@ class CaConfigurationDbExporter extends DbPorter
                 String name = rs.getString("NAME");
                 String value = rs.getString("VALUE");
 
-                if("lock".equals(name))
-                {
-                    continue;
-                }
-
                 EnvironmentType environment = new EnvironmentType();
                 environment.setName(name);
                 environment.setValue(value);

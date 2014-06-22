@@ -26,8 +26,8 @@ import org.apache.felix.gogo.commands.Option;
  * @author Lijun Liao
  */
 
-@Command(scope = "ca", name = "republish", description="Republish certificates")
-public class RepublishCommand extends CaCommand
+@Command(scope = "ca", name = "clear-publishqueue", description="Clear publish queue")
+public class ClearPublishQueueCommand extends CaCommand
 {
     @Option(name = "-ca",
             description = "Required. CA name or 'all' for all CAs",
@@ -63,15 +63,7 @@ public class RepublishCommand extends CaCommand
             caName = null;
         }
 
-        boolean successfull = caManager.republishCertificates(caName, publisherNames);
-        if(successfull)
-        {
-            System.out.println("Replubished certificates");
-        }
-        else
-        {
-            System.err.println("Replubishing certificates failed");
-        }
+        caManager.clearPublishQueue(caName, publisherNames);
         return null;
     }
 }
