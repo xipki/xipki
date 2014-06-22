@@ -1265,7 +1265,6 @@ public class X509CACmpResponder extends CmpResponder
 
     private class PendingPoolCleaner implements Runnable
     {
-
         @Override
         public void run()
         {

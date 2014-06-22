@@ -52,14 +52,16 @@ import org.xipki.dbi.ca.jaxb.CertStoreType.Cainfos;
 import org.xipki.dbi.ca.jaxb.CertStoreType.Certprofileinfos;
 import org.xipki.dbi.ca.jaxb.CertStoreType.CertsFiles;
 import org.xipki.dbi.ca.jaxb.CertStoreType.Crls;
+import org.xipki.dbi.ca.jaxb.CertStoreType.PublishQueue;
+import org.xipki.dbi.ca.jaxb.CertStoreType.Publisherinfos;
 import org.xipki.dbi.ca.jaxb.CertStoreType.Requestorinfos;
 import org.xipki.dbi.ca.jaxb.CertStoreType.UsersFiles;
 import org.xipki.dbi.ca.jaxb.CertType;
-import org.xipki.dbi.ca.jaxb.CertprofileinfoType;
 import org.xipki.dbi.ca.jaxb.CertsType;
 import org.xipki.dbi.ca.jaxb.CrlType;
+import org.xipki.dbi.ca.jaxb.NameIdType;
 import org.xipki.dbi.ca.jaxb.ObjectFactory;
-import org.xipki.dbi.ca.jaxb.RequestorinfoType;
+import org.xipki.dbi.ca.jaxb.ToPublishType;
 import org.xipki.dbi.ca.jaxb.UserType;
 import org.xipki.dbi.ca.jaxb.UsersType;
 import org.xipki.security.api.PasswordResolverException;
@@ -111,10 +113,12 @@ class CaCertStoreDbExporter extends DbPorter
         {
             export_cainfo(certstore);
             export_requestorinfo(certstore);
+            export_publisherinfo(certstore);
             export_certprofileinfo(certstore);
             export_user(certstore);
             export_crl(certstore);
             export_cert(certstore);
+            export_publishQueue(certstore);
 
             JAXBElement<CertStoreType> root = new ObjectFactory().createCertStore(certstore);
             marshaller.marshal(root, new File(baseDir + File.separator + FILENAME_CA_CertStore));
@@ -255,10 +259,7 @@ class CaCertStoreDbExporter extends DbPorter
                 int id = rs.getInt("ID");
                 String name = rs.getString("NAME");
 
-                RequestorinfoType info = new RequestorinfoType();
-                info.setId(id);
-                info.setName(name);
-
+                NameIdType info = createNameId(name, id);
                 infos.getRequestorinfo().add(info);
             }
 
@@ -271,6 +272,39 @@ class CaCertStoreDbExporter extends DbPorter
 
         certstore.setRequestorinfos(infos);
         System.out.println(" Exported table REQUESTORINFO");
+    }
+
+    private void export_publisherinfo(CertStoreType certstore)
+    throws SQLException
+    {
+        System.out.println("Exporting table PUBLISHERINFO");
+        Publisherinfos infos = new Publisherinfos();
+
+        Statement stmt = null;
+        try
+        {
+            stmt = createStatement();
+            String sql = "SELECT ID, NAME FROM PUBLISHERINFO";
+            ResultSet rs = stmt.executeQuery(sql);
+
+            while(rs.next())
+            {
+                int id = rs.getInt("ID");
+                String name = rs.getString("NAME");
+
+                NameIdType info = createNameId(name, id);
+                infos.getPublisherinfo().add(info);
+            }
+
+            rs.close();
+            rs = null;
+        }finally
+        {
+            closeStatement(stmt);
+        }
+
+        certstore.setPublisherinfos(infos);
+        System.out.println(" Exported table PUBLISHERINFO");
     }
 
     private void export_user(CertStoreType certstore)
@@ -400,10 +434,7 @@ class CaCertStoreDbExporter extends DbPorter
                 int id = rs.getInt("ID");
                 String name = rs.getString("NAME");
 
-                CertprofileinfoType info = new CertprofileinfoType();
-                info.setId(id);
-                info.setName(name);
-
+                NameIdType info = createNameId(name, id);
                 infos.getCertprofileinfo().add(info);
             }
 
@@ -595,6 +626,59 @@ class CaCertStoreDbExporter extends DbPorter
         System.out.println(" Exported " + sum + " certificates from tables CERT and RAWCERT");
     }
 
+    private void export_publishQueue(CertStoreType certstore)
+    throws SQLException, IOException, JAXBException
+    {
+        System.out.println("Exporting table PUBLISHQUEUE");
+
+        String sql = "SELECT CERT_ID, PUBLISHER_ID, CAINFO_ID" +
+                " FROM CERT" +
+                " WHERE CERT_ID >= ? AND CERT_ID < ?" +
+                " ORDER BY CERT_ID ASC";
+
+        PreparedStatement ps = prepareStatement(sql);
+
+        final int minId = getMinCertId("CERT_ID", "PUBLISHQUEUE");
+        final int maxId = getMaxCertId("CERT_ID", "PUBLISHQUEUE");
+
+        PublishQueue queue = new PublishQueue();
+        List<ToPublishType> list = queue.getTop();
+        final int n = 500;
+
+        try
+        {
+            for(int i = minId; i <= maxId; i += n)
+            {
+                ps.setInt(1, i);
+                ps.setInt(2, i + n);
+
+                ResultSet rs = ps.executeQuery();
+
+                while(rs.next())
+                {
+                    int cert_id = rs.getInt("CERT_ID");
+                    int pub_id = rs.getInt("PUBLISHER_ID");
+                    int ca_id = rs.getInt("CAINFO_ID");
+
+                    ToPublishType toPub = new ToPublishType();
+                    toPub.setPubId(pub_id);
+                    toPub.setCertId(cert_id);
+                    toPub.setCaId(ca_id);
+                    list.add(toPub);
+                }
+
+                rs.close();
+                rs = null;
+            }
+        }finally
+        {
+            closeStatement(ps);
+        }
+
+        certstore.setPublishQueue(queue);
+        System.out.println(" Exported table PUBLISHQUEUE");
+    }
+
     private void finalizeZip(ZipOutputStream zipOutStream, CertsType certsType)
     throws JAXBException, IOException
     {
@@ -618,11 +702,17 @@ class CaCertStoreDbExporter extends DbPorter
     private int getMinCertId(String table)
     throws SQLException
     {
+        return getMinCertId("ID", table);
+    }
+
+    private int getMinCertId(String idColumn, String table)
+    throws SQLException
+    {
         Statement stmt = null;
         try
         {
             stmt = createStatement();
-            final String sql = "SELECT MIN(ID) FROM " + table;
+            final String sql = "SELECT MIN(" + idColumn + ") FROM " + table;
             ResultSet rs = stmt.executeQuery(sql);
 
             rs.next();
@@ -639,6 +729,12 @@ class CaCertStoreDbExporter extends DbPorter
     }
 
     private int getMaxCertId(String table)
+    throws SQLException
+    {
+        return getMaxCertId("ID", table);
+    }
+
+    private int getMaxCertId(String idColumn, String table)
     throws SQLException
     {
         Statement stmt = null;
@@ -720,6 +816,14 @@ class CaCertStoreDbExporter extends DbPorter
             {
             }
         }
+    }
+
+    private static NameIdType createNameId(String name, int id)
+    {
+        NameIdType info = new NameIdType();
+        info.setId(id);
+        info.setName(name);
+        return info;
     }
 
 }

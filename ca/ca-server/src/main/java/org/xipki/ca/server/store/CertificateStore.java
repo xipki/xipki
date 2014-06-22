@@ -81,6 +81,24 @@ public class CertificateStore
         return true;
     }
 
+    public void addToPublishQueue(String publisherName, int certId, X509CertificateWithMetaInfo caCert)
+    throws SQLException, OperationException
+    {
+        queryExecutor.addToPublishQueue(publisherName, certId, caCert);
+    }
+
+    public void removeFromPublishQueue(String publisherName, int certId)
+    throws SQLException
+    {
+        queryExecutor.removeFromPublishQueue(publisherName, certId);
+    }
+
+    public void clearPublishQueue(X509CertificateWithMetaInfo caCert, String publisherName)
+    throws SQLException
+    {
+        queryExecutor.clearPublishQueue(caCert, publisherName);
+    }
+
     public CertWithRevocationInfo revokeCertificate(X509CertificateWithMetaInfo caCert,
             BigInteger serialNumber, CertRevocationInfo revInfo, boolean force)
     throws OperationException
@@ -279,6 +297,13 @@ public class CertificateStore
         return queryExecutor.getSerialNumbers(caCert, notExpiredAt, startSerial, numEntries);
     }
 
+    public List<Integer> getPublishQueueEntries(X509CertificateWithMetaInfo caCert,
+            String publisherName, int numEntries)
+    throws SQLException, OperationException
+    {
+        return queryExecutor.getPublishQueueEntries(caCert, publisherName, numEntries);
+    }
+
     public CertWithRevocationInfo getCertWithRevocationInfo(X509CertificateWithMetaInfo caCert,
             BigInteger serial)
     throws SQLException, OperationException
@@ -286,7 +311,7 @@ public class CertificateStore
         return queryExecutor.getCertWithRevocationInfo(caCert, serial);
     }
 
-    public CertificateInfo getCertificateInfo(X509CertificateWithMetaInfo caCert, BigInteger serial)
+    public CertificateInfo getCertificateInfoForSerial(X509CertificateWithMetaInfo caCert, BigInteger serial)
     throws SQLException, OperationException, CertificateException
     {
         return queryExecutor.getCertificateInfo(caCert, serial);
@@ -308,6 +333,12 @@ public class CertificateStore
     throws SQLException, OperationException
     {
         return queryExecutor.getSubjectKeyProfileTriples(caCert, subjectFp, keyFp);
+    }
+
+    public CertificateInfo getCertificateInfoForId(X509CertificateWithMetaInfo caCert, int certId)
+    throws SQLException, OperationException, CertificateException
+    {
+        return queryExecutor.getCertForId(caCert, certId);
     }
 
     public X509CertificateWithMetaInfo getCertForId(int certId)

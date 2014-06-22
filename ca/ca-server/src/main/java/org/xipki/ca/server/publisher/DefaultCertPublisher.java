@@ -52,7 +52,7 @@ public class DefaultCertPublisher extends CertPublisher
     @SuppressWarnings("unused")
     private EnvironmentParameterResolver envParameterResolver;
     private CertStatusStoreQueryExecutor queryExecutor;
-    private boolean publishGoodCerts = true;
+    private boolean asyn = false;
 
     private AuditLoggingService auditLoggingService;
 
@@ -69,11 +69,14 @@ public class DefaultCertPublisher extends CertPublisher
 
         CmpUtf8Pairs utf8pairs = new CmpUtf8Pairs(conf);
         String v = utf8pairs.getValue("publish.goodcerts");
-        this.publishGoodCerts = (v == null) ? true : Boolean.parseBoolean(v);
+        boolean publishGoodCerts = (v == null) ? true : Boolean.parseBoolean(v);
+
+        v = utf8pairs.getValue("asyn");
+        this.asyn = (v == null) ? false : Boolean.parseBoolean(v);
 
         try
         {
-            queryExecutor = new CertStatusStoreQueryExecutor(dataSource);
+            queryExecutor = new CertStatusStoreQueryExecutor(dataSource, publishGoodCerts);
         } catch (NoSuchAlgorithmException e)
         {
             throw new CertPublisherException(e);
@@ -90,60 +93,50 @@ public class DefaultCertPublisher extends CertPublisher
     }
 
     @Override
-    public void certificateAdded(CertificateInfo certInfo)
+    public boolean certificateAdded(CertificateInfo certInfo)
     {
         X509CertificateWithMetaInfo caCert = certInfo.getIssuerCert();
         X509CertificateWithMetaInfo cert = certInfo.getCert();
 
         try
         {
-            if(certInfo.isRevoked())
-            {
-                queryExecutor.addCert(caCert,
-                        cert,
-                        certInfo.getProfileName(),
-                        certInfo.getRevocationInfo());
-            }
-            else
-            {
-                if(publishGoodCerts)
-                {
-                    queryExecutor.addCert(caCert, cert, certInfo.getProfileName());
-                }else
-                {
-                    queryExecutor.addIssuer(caCert);
-                }
-            }
+            queryExecutor.addCert(caCert, cert, certInfo.getProfileName(), certInfo.getRevocationInfo());
+            return true;
         } catch (Exception e)
         {
             logAndAudit(caCert.getSubject(), cert, e, "could not save certificate");
+            return false;
         }
     }
 
     @Override
-    public void certificateRevoked(X509CertificateWithMetaInfo caCert,
+    public boolean certificateRevoked(X509CertificateWithMetaInfo caCert,
             X509CertificateWithMetaInfo cert,
             CertRevocationInfo revInfo)
     {
         try
         {
             queryExecutor.revokeCert(caCert, cert, revInfo);
+            return true;
         } catch (Exception e)
         {
             logAndAudit(caCert.getSubject(), cert, e, "could not publish revoked certificate");
+            return false;
         }
     }
 
     @Override
-    public void certificateUnrevoked(X509CertificateWithMetaInfo caCert,
+    public boolean certificateUnrevoked(X509CertificateWithMetaInfo caCert,
             X509CertificateWithMetaInfo cert)
     {
         try
         {
             queryExecutor.unrevokeCert(caCert, cert);
+            return true;
         } catch (Exception e)
         {
             logAndAudit(caCert.getSubject(), cert, e, "could not publish unrevocation of certificate");
+            return false;
         }
     }
 
@@ -173,8 +166,9 @@ public class DefaultCertPublisher extends CertPublisher
     }
 
     @Override
-    public void crlAdded(X509CertificateWithMetaInfo caCert, X509CRL crl)
+    public boolean crlAdded(X509CertificateWithMetaInfo caCert, X509CRL crl)
     {
+        return true;
     }
 
     @Override
@@ -190,43 +184,55 @@ public class DefaultCertPublisher extends CertPublisher
     }
 
     @Override
-    public void caRevoked(X509CertificateWithMetaInfo caCert, CertRevocationInfo revocationInfo)
+    public boolean caRevoked(X509CertificateWithMetaInfo caCert, CertRevocationInfo revocationInfo)
     {
         try
         {
             queryExecutor.revokeCa(caCert, revocationInfo);
+            return true;
         } catch (Exception e)
         {
             String issuerText = IoCertUtil.canonicalizeName(caCert.getCert().getIssuerX500Principal());
             logAndAudit(issuerText, caCert, e, "Could not publish revocation of CA");
+            return false;
         }
     }
 
     @Override
-    public void caUnrevoked(X509CertificateWithMetaInfo caCert)
+    public boolean caUnrevoked(X509CertificateWithMetaInfo caCert)
     {
         try
         {
             queryExecutor.unrevokeCa(caCert);
+            return true;
         } catch (Exception e)
         {
             String issuerText = IoCertUtil.canonicalizeName(caCert.getCert().getIssuerX500Principal());
             logAndAudit(issuerText, caCert, e, "Could not publish unrevocation of CA");
+            return false;
         }
     }
 
     @Override
-    public void certificateRemoved(X509CertificateWithMetaInfo issuerCert,
+    public boolean certificateRemoved(X509CertificateWithMetaInfo issuerCert,
             X509CertificateWithMetaInfo cert)
     {
         try
         {
             queryExecutor.removeCert(issuerCert, cert);
+            return true;
         } catch (Exception e)
         {
             String issuerText = IoCertUtil.canonicalizeName(issuerCert.getCert().getIssuerX500Principal());
             logAndAudit(issuerText, issuerCert, e, "Could not publish removal of certificate");
+            return false;
         }
+    }
+
+    @Override
+    public boolean isAsyn()
+    {
+        return asyn;
     }
 
 }

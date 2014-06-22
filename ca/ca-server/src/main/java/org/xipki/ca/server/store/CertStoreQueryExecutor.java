@@ -85,6 +85,7 @@ class CertStoreQueryExecutor
     private final CertBasedIdentityStore caInfoStore;
     private final NameIdStore requestorInfoStore;
     private final NameIdStore certprofileStore;
+    private final NameIdStore publisherStore;
 
     private final LruCache<String, Integer> usernameIdCache = new LruCache<>(100);
 
@@ -122,6 +123,7 @@ class CertStoreQueryExecutor
         this.caInfoStore = initCertBasedIdentyStore("CAINFO");
         this.requestorInfoStore = initNameIdStore("REQUESTORINFO");
         this.certprofileStore = initNameIdStore("CERTPROFILEINFO");
+        this.publisherStore = initNameIdStore("PUBLISHERINFO");
     }
 
     private CertBasedIdentityStore initCertBasedIdentyStore(String table)
@@ -202,6 +204,7 @@ class CertStoreQueryExecutor
         PreparedStatement ps = borrowPreparedStatement(SQL_ADD_CERT);
 
         int certId = cert_id.getAndAdd(1);
+        certificate.setCertId(certId);
 
         try
         {
@@ -260,6 +263,74 @@ class CertStoreQueryExecutor
             ps.setInt(idx++, certId);
             ps.setString(idx++, sha1_fp);
             ps.setString(idx++, Base64.toBase64String(certificate.getEncodedCert()));
+            ps.executeUpdate();
+        }finally
+        {
+            releaseDbResources(ps, null);
+        }
+    }
+
+    void addToPublishQueue(String publisherName, int certId, X509CertificateWithMetaInfo caCert)
+    throws SQLException, OperationException
+    {
+        final String SQL = "INSERT INTO PUBLISHQUEUE " +
+                "(PUBLISHER_ID, CAINFO_ID, CERT_ID) " +
+                " VALUES (?, ?, ?)";
+        PreparedStatement ps = borrowPreparedStatement(SQL);
+
+        int caId = getCaId(caCert);
+        try
+        {
+            int publisherId = getPublisherId(publisherName);
+            int idx = 1;
+            ps.setInt(idx++, publisherId);
+            ps.setInt(idx++, caId);
+            ps.setInt(idx++, certId);
+            ps.executeUpdate();
+        }finally
+        {
+            releaseDbResources(ps, null);
+        }
+    }
+
+    void removeFromPublishQueue(String publisherName, int certId)
+    throws SQLException
+    {
+        final String SQL = "DELETE FROM PUBLISHQUEUE " +
+                "WHERE PUBLISHER_ID = ? AND CERT_ID = ?";
+
+        PreparedStatement ps = borrowPreparedStatement(SQL);
+
+        try
+        {
+            int publisherId = getPublisherId(publisherName);
+            int idx = 1;
+            ps.setInt(idx++, publisherId);
+            ps.setInt(idx++, certId);
+            ps.executeUpdate();
+        }finally
+        {
+            releaseDbResources(ps, null);
+        }
+    }
+
+    void clearPublishQueue(X509CertificateWithMetaInfo caCert, String publisherName)
+    throws SQLException
+    {
+        String SQL = "DELETE FROM PUBLISHQUEUE";
+        if(publisherName != null)
+        {
+            SQL += " WHERE PUBLISHER_ID=?";
+        }
+
+        PreparedStatement ps = borrowPreparedStatement(SQL);
+        try
+        {
+            if(publisherName != null)
+            {
+                int publisherId = getPublisherId(publisherName);
+                ps.setInt(1, publisherId);
+            }
             ps.executeUpdate();
         }finally
         {
@@ -411,12 +482,10 @@ class CertStoreQueryExecutor
             }
         }
 
-        Integer caId = getCaId(caCert); // could not be null
-
         final String SQL_REVOKE_CERT =
                 "UPDATE CERT" +
                 " SET LAST_UPDATE=?, REVOKED = ?, REV_TIME = ?, REV_INVALIDITY_TIME=?, REV_REASON = ?" +
-                " WHERE CAINFO_ID = ? AND SERIAL = ?";
+                " WHERE ID = ?";
         PreparedStatement ps = borrowPreparedStatement(SQL_REVOKE_CERT);
 
         try
@@ -434,8 +503,7 @@ class CertStoreQueryExecutor
             }
 
             ps.setInt(idx++, revInfo.getReason().getCode());
-            ps.setInt(idx++, caId.intValue());
-            ps.setLong(idx++, serialNumber.longValue());
+            ps.setLong(idx++, certWithRevInfo.getCert().getCertId().intValue());
 
             int count = ps.executeUpdate();
             if(count != 1)
@@ -489,12 +557,10 @@ class CertStoreQueryExecutor
             }
         }
 
-        Integer caId = getCaId(caCert); // could not be null
-
         final String SQL_REVOKE_CERT =
                 "UPDATE CERT" +
                 " SET LAST_UPDATE=?, REVOKED = ?, REV_TIME = ?, REV_INVALIDITY_TIME=?, REV_REASON = ?" +
-                " WHERE CAINFO_ID = ? AND SERIAL = ?";
+                " WHERE ID = ?";
         PreparedStatement ps = borrowPreparedStatement(SQL_REVOKE_CERT);
 
         try
@@ -505,8 +571,7 @@ class CertStoreQueryExecutor
             ps.setNull(idx++, Types.INTEGER);
             ps.setNull(idx++, Types.INTEGER);
             ps.setNull(idx++, Types.INTEGER);
-            ps.setInt(idx++, caId.intValue());
-            ps.setLong(idx++, serialNumber.longValue());
+            ps.setLong(idx++, certWithRevInfo.getCert().getCertId().intValue());
 
             int count = ps.executeUpdate();
             if(count != 1)
@@ -603,6 +668,51 @@ class CertStoreQueryExecutor
         }
     }
 
+    List<Integer> getPublishQueueEntries(X509CertificateWithMetaInfo caCert,
+            String publisherName, int numEntries)
+    throws SQLException, OperationException
+    {
+        ParamChecker.assertNotNull("caCert", caCert);
+        if(numEntries < 1)
+        {
+            throw new IllegalArgumentException("numEntries is not positive");
+        }
+
+        int caId = getCaId(caCert);
+        int publisherId = getPublisherId(publisherName);
+
+        StringBuilder sb = new StringBuilder("CERT_ID FROM PUBLISHQUEUE ");
+        sb.append(" WHERE CAINFO_ID=? AND PUBLISHER_ID=?");
+        sb.append(" ORDER BY CERT_ID ASC");
+
+        final String sql = createFetchFirstSelectSQL(sb.toString(), numEntries);
+        PreparedStatement ps = borrowPreparedStatement(sql);
+
+        ResultSet rs = null;
+        try
+        {
+            int idx = 1;
+            ps.setInt(idx++, caId);
+            ps.setLong(idx++, publisherId);
+            rs = ps.executeQuery();
+
+            List<Integer> ret = new ArrayList<>();
+            while(rs.next() && ret.size() < numEntries)
+            {
+                int certId = rs.getInt("CERT_ID");
+                if(ret.contains(certId) == false)
+                {
+                    ret.add(certId);
+                }
+            }
+
+            return ret;
+        }finally
+        {
+            releaseDbResources(ps, rs);
+        }
+    }
+
     List<BigInteger> getSerialNumbers(X509CertificateWithMetaInfo caCert,
             Date notExpiredAt, BigInteger startSerial, int numEntries)
     throws SQLException, OperationException
@@ -610,14 +720,10 @@ class CertStoreQueryExecutor
         ParamChecker.assertNotNull("caCert", caCert);
         if(numEntries < 1)
         {
-            throw new IllegalArgumentException("numSerials is not positive");
+            throw new IllegalArgumentException("numEntries is not positive");
         }
 
-        Integer caId = getCaId(caCert);
-        if(caId == null)
-        {
-            return Collections.emptyList();
-        }
+        int caId = getCaId(caCert);
 
         StringBuilder sb = new StringBuilder("SERIAL FROM CERT ");
         sb.append(" WHERE CAINFO_ID=? AND SERIAL>?");
@@ -634,7 +740,7 @@ class CertStoreQueryExecutor
         try
         {
             int idx = 1;
-            ps.setInt(idx++, caId.intValue());
+            ps.setInt(idx++, caId);
             ps.setLong(idx++, (startSerial == null)? 0 : startSerial.longValue()-1);
             if(notExpiredAt != null)
             {
@@ -700,7 +806,7 @@ class CertStoreQueryExecutor
         }
     }
 
-    public int cleanupCRLs(X509CertificateWithMetaInfo caCert, int numCRLs)
+    int cleanupCRLs(X509CertificateWithMetaInfo caCert, int numCRLs)
     throws SQLException, OperationException
     {
         if(numCRLs < 1)
@@ -812,6 +918,77 @@ class CertStoreQueryExecutor
         }
     }
 
+    CertificateInfo getCertForId(X509CertificateWithMetaInfo caCert, int certId)
+    throws SQLException, OperationException, CertificateException
+    {
+        ParamChecker.assertNotNull("caCert", caCert);
+
+        final String col_certprofileinfo_id = "CERTPROFILEINFO_ID";
+        final String col_revoked = "REVOKED";
+        final String col_rev_reason = "REV_REASON";
+        final String col_rev_time = "REV_TIME";
+        final String col_rev_invalidity_time = "REV_INVALIDITY_TIME";
+        final String col_cert = "CERT";
+
+        String sql = "T1." + col_certprofileinfo_id + " " + col_certprofileinfo_id +
+                ", T1." + col_revoked + " " + col_revoked +
+                ", T1." + col_rev_reason + " " + col_rev_reason +
+                ", T1." + col_rev_time + " " + col_rev_time +
+                ", T1." + col_rev_invalidity_time + " " + col_rev_invalidity_time +
+                ", T2." + col_cert + " " + col_cert +
+                " FROM CERT T1, RAWCERT T2" +
+                " WHERE T1.ID=? AND T2.CERT_ID=T1.ID";
+
+        sql = createFetchFirstSelectSQL(sql, 1);
+        PreparedStatement ps = borrowPreparedStatement(sql);
+
+        ResultSet rs = null;
+        try
+        {
+            ps.setInt(1, certId);
+            rs = ps.executeQuery();
+
+            if(rs.next())
+            {
+                String b64Cert = rs.getString(col_cert);
+                byte[] encodedCert = Base64.decode(b64Cert);
+                X509Certificate cert = IoCertUtil.parseCert(encodedCert);
+
+                int certProfileInfo_id = rs.getInt(col_certprofileinfo_id);
+                String certProfileName = certprofileStore.getName(certProfileInfo_id);
+
+                X509CertificateWithMetaInfo certWithMeta = new X509CertificateWithMetaInfo(cert, encodedCert);
+
+                CertificateInfo certInfo = new CertificateInfo(certWithMeta,
+                        caCert, cert.getPublicKey().getEncoded(), certProfileName);
+
+                boolean revoked = rs.getBoolean(col_revoked);
+
+                if(revoked)
+                {
+                    int rev_reasonCode = rs.getInt(col_rev_reason);
+                    CRLReason rev_reason = CRLReason.forReasonCode(rev_reasonCode);
+                    long rev_time = rs.getLong(col_rev_time);
+                    long invalidity_time = rs.getLong(col_rev_invalidity_time);
+
+                    CertRevocationInfo revInfo = new CertRevocationInfo(rev_reason,
+                            new Date(rev_time * 1000), new Date(invalidity_time * 1000));
+                    certInfo.setRevocationInfo(revInfo);
+                }
+
+                return certInfo;
+            }
+        } catch (IOException e)
+        {
+            throw new OperationException(ErrorCode.System_Failure, "IOException: " + e.getMessage());
+        }finally
+        {
+            releaseDbResources(ps, rs);
+        }
+
+        return null;
+    }
+
     X509CertificateWithMetaInfo getCertForId(int certId)
     throws SQLException, OperationException
     {
@@ -867,7 +1044,7 @@ class CertStoreQueryExecutor
             return null;
         }
 
-        String sql = "T1.REVOKED REVOKED,"
+        String sql = "T1.ID ID, T1.REVOKED REVOKED,"
                 + " T1.REV_REASON REV_REASON,"
                 + " T1.REV_TIME REV_TIME,"
                 + " T1.REV_INVALIDITY_TIME REV_INVALIDITY_TIME,"
@@ -888,6 +1065,7 @@ class CertStoreQueryExecutor
 
             if(rs.next())
             {
+                int certId = rs.getInt("ID");
                 String b64Cert = rs.getString("CERT");
                 byte[] certBytes = (b64Cert == null) ? null : Base64.decode(b64Cert);
                 X509Certificate cert;
@@ -914,9 +1092,9 @@ class CertStoreQueryExecutor
                             new Date(1000 * rev_invalidity_time));
                 }
 
-                return new CertWithRevocationInfo(
-                        new X509CertificateWithMetaInfo(cert, certBytes),
-                        revInfo);
+                X509CertificateWithMetaInfo certWithMeta = new X509CertificateWithMetaInfo(cert, certBytes);
+                certWithMeta.setCertId(certId);
+                return new CertWithRevocationInfo(certWithMeta, revInfo);
             }
         }finally
         {
@@ -1337,16 +1515,22 @@ class CertStoreQueryExecutor
         return id;
     }
 
-    private int getRequestorId(String requestorName)
+    private int getRequestorId(String name)
     throws SQLException
     {
-        return getIdForName(requestorName, requestorInfoStore);
+        return getIdForName(name, requestorInfoStore);
     }
 
-    private int getCertprofileId(String certprofileName)
+    private int getPublisherId(String name)
     throws SQLException
     {
-        return getIdForName(certprofileName, certprofileStore);
+        return getIdForName(name, publisherStore);
+    }
+
+    private int getCertprofileId(String name)
+    throws SQLException
+    {
+        return getIdForName(name, certprofileStore);
     }
 
     private int getIdForName(String name, NameIdStore store)

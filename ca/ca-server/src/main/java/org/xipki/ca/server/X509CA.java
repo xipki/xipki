@@ -508,7 +508,7 @@ public class X509CA
                             CertificateInfo certInfo;
                             try
                             {
-                                certInfo = certstore.getCertificateInfo(caCert, serial);
+                                certInfo = certstore.getCertificateInfoForSerial(caCert, serial);
                             } catch (SQLException e)
                             {
                                 throw new OperationException(ErrorCode.DATABASE_FAILURE,
@@ -742,39 +742,77 @@ public class X509CA
 
         for(IdentifiedCertPublisher publisher : getPublishers())
         {
+            if(publisher.isAsyn() == false)
+            {
+                boolean successfull;
+                try
+                {
+                    successfull = publisher.certificateAdded(certInfo);
+                }
+                catch (RuntimeException re)
+                {
+                    successfull = false;
+                    String msg = "Error while publish certificate to the publisher " + publisher.getName();
+                    LOG.warn(msg);
+                    LOG.debug(msg, re);
+                }
+
+                if(successfull)
+                {
+                    continue;
+                }
+            }
+
+            Integer certId = certInfo.getCert().getCertId();
             try
             {
-                publisher.certificateAdded(certInfo);
-            }
-            catch (RuntimeException re)
+                certstore.addToPublishQueue(publisher.getName(), certId.intValue(), caInfo.getCertificate());
+            } catch(Throwable t)
             {
-                String msg = "Error while publish certificate to the publisher " + publisher.getName();
+                String msg = "Error while add entry to PublishQueue: " + t.getMessage();
                 LOG.error(msg);
-                LOG.debug(msg, re);
+                LOG.debug(msg, t);
             }
         }
 
         return true;
     }
 
-    public boolean republishCertificates(String publisherName)
+    public boolean republishCertificates(List<String> publisherNames)
     {
-        ParamChecker.assertNotEmpty("publisherName", publisherName);
-
-        IdentifiedCertPublisher publisher = null;
-        for(IdentifiedCertPublisher p : getPublishers())
+        List<IdentifiedCertPublisher> publishers;
+        if(publisherNames == null)
         {
-            if(p.getName().equals(publisherName))
+            publishers = getPublishers();
+        }
+        else
+        {
+            publishers = new ArrayList<>(publisherNames.size());
+
+            for(String publisherName : publisherNames)
             {
-                publisher = p;
-                break;
+                IdentifiedCertPublisher publisher = null;
+                for(IdentifiedCertPublisher p : getPublishers())
+                {
+                    if(p.getName().equals(publisherName))
+                    {
+                        publisher = p;
+                        break;
+                    }
+                }
+
+                if(publisher == null)
+                {
+                    throw new IllegalArgumentException(
+                            "Could not find publisher " + publisherName + " for CA " + caInfo.getName());
+                }
+                publishers.add(publisher);
             }
         }
 
-        if(publisher == null)
+        if(publishers.isEmpty())
         {
-            throw new IllegalArgumentException(
-                    "Could not find publisher " + publisherName + " for CA " + caInfo.getName());
+            return true;
         }
 
         CAStatus status = caInfo.getStatus();
@@ -790,6 +828,21 @@ public class X509CA
                 Thread.sleep(1000);
             }catch(InterruptedException e)
             {
+            }
+        }
+
+        for(IdentifiedCertPublisher publisher : publishers)
+        {
+            String name = publisher.getName();
+            try
+            {
+                LOG.info("Clearing PublishQueue for publisher {}", name);
+                certstore.clearPublishQueue(this.caInfo.getCertificate(), name);
+                LOG.info(" Cleared PublishQueue for publisher {}", name);
+            } catch (SQLException e)
+            {
+                LOG.error("Exception while clearing PublishQueue for publisher {}: {}", name, e.getMessage());
+                LOG.debug("Exception while clearing PublishQueue",  e);
             }
         }
 
@@ -832,7 +885,7 @@ public class X509CA
 
                     try
                     {
-                        certInfo = certstore.getCertificateInfo(caCert, serial);
+                        certInfo = certstore.getCertificateInfoForSerial(caCert, serial);
                     } catch (SQLException e)
                     {
                         LOG.error("SQLException, message: {}", e.getMessage());
@@ -850,19 +903,156 @@ public class X509CA
                         return false;
                     }
 
-                    publisher.certificateAdded(certInfo);
+                    for(IdentifiedCertPublisher publisher : publishers)
+                    {
+                        boolean successfull = publisher.certificateAdded(certInfo);
+                        if(successfull == false)
+                        {
+                            LOG.error("Republish certificate serial={} to publisher {} failed", serial, publisher.getName());
+                            return false;
+                        }
+                    }
                 }
 
                 startSerial = maxSerial.add(BigInteger.ONE);
-            }while(serials.size() >= numEntries);
+            } while(serials.size() >= numEntries);
 
             if(caInfo.getRevocationInfo() != null)
             {
-                publisher.caRevoked(caInfo.getCertificate(), caInfo.getRevocationInfo());
+                for(IdentifiedCertPublisher publisher : publishers)
+                {
+                    boolean successfull = publisher.caRevoked(caInfo.getCertificate(), caInfo.getRevocationInfo());
+                    if(successfull == false)
+                    {
+                       LOG.error("Republish CA revocation to publisher {} failed", publisher.getName());
+                       return false;
+                    }
+                }
             }
-        }finally
+
+            return true;
+        } finally
         {
             caInfo.setStatus(status);
+        }
+    }
+
+    public boolean clearPublishQueue(List<String> publisherNames)
+    throws CAMgmtException
+    {
+        if(publisherNames == null)
+        {
+            try
+            {
+                certstore.clearPublishQueue(caInfo.getCertificate(), null);
+                return true;
+            } catch (SQLException e)
+            {
+                throw new CAMgmtException(e);
+            }
+        }
+
+        for(String publisherName : publisherNames)
+        {
+            try
+            {
+                certstore.clearPublishQueue(caInfo.getCertificate(), publisherName);
+            } catch (SQLException e)
+            {
+                throw new CAMgmtException(e);
+            }
+        }
+
+        return true;
+    }
+
+    public boolean publishCertsInQueue()
+    {
+        boolean allSuccessfull = true;
+        for(IdentifiedCertPublisher publisher : getPublishers())
+        {
+            if(publishCertsInQueue(publisher) == false)
+            {
+                allSuccessfull = false;
+            }
+        }
+
+        return allSuccessfull;
+    }
+
+    private boolean publishCertsInQueue(IdentifiedCertPublisher publisher)
+    {
+        X509CertificateWithMetaInfo caCert = caInfo.getCertificate();
+
+        final int numEntries = 500;
+
+        while(true)
+        {
+            List<Integer> certIds;
+            try
+            {
+                certIds = certstore.getPublishQueueEntries(caCert, publisher.getName(), numEntries);
+            } catch (SQLException e)
+            {
+                LOG.error("SQLException, message: {}", e.getMessage());
+                LOG.debug("SQLException, message", e);
+                return false;
+            } catch (OperationException e)
+            {
+                LOG.error("OperationException, message: {}", e.getMessage());
+                LOG.debug("OperationException, message", e);
+                return false;
+            }
+
+            if(certIds == null || certIds.isEmpty())
+            {
+                break;
+            }
+
+            for(Integer certId : certIds)
+            {
+                CertificateInfo certInfo;
+
+                try
+                {
+                    certInfo = certstore.getCertificateInfoForId(caCert, certId);
+                } catch (SQLException e)
+                {
+                    LOG.error("SQLException, message: {}", e.getMessage());
+                    LOG.debug("SQLException, message", e);
+                    return false;
+                } catch (OperationException e)
+                {
+                    LOG.error("OperationException, message: {}", e.getMessage());
+                    LOG.debug("OperationException, message", e);
+                    return false;
+                } catch (CertificateException e)
+                {
+                    LOG.error("CertificateException, message: {}", e.getMessage());
+                    LOG.debug("CertificateException, message", e);
+                    return false;
+                }
+
+                boolean successfull = publisher.certificateAdded(certInfo);
+                if(successfull)
+                {
+                    try
+                    {
+                        certstore.removeFromPublishQueue(publisher.getName(), certId);
+                    } catch (SQLException e)
+                    {
+                        LOG.warn("SQLException while removing republished cert id={} and publisher={}",
+                                certId, publisher.getName());
+                        LOG.debug("SQLException, message", e);
+                        continue;
+                    }
+                }
+                else
+                {
+                    LOG.error("Republish certificate id={} failed", certId);
+                    return false;
+                }
+            }
         }
 
         return true;
@@ -954,15 +1144,30 @@ public class X509CA
         {
             for(IdentifiedCertPublisher publisher : getPublishers())
             {
+                boolean successfull;
                 try
                 {
-                    publisher.certificateRemoved(caInfo.getCertificate(), removedCert);
+                    successfull = publisher.certificateRemoved(caInfo.getCertificate(), removedCert);
                 }
                 catch (RuntimeException re)
                 {
+                    successfull = false;
                     String msg = "Error while remove certificate to the publisher " + publisher.getName();
-                    LOG.error(msg);
+                    LOG.warn(msg);
                     LOG.debug(msg, re);
+                }
+
+                if(successfull == false)
+                {
+                    X509Certificate c = removedCert.getCert();
+                    LOG.error("Removing certificate issuer={}, serial={}, subject={} from publisher {} failed."
+                            + " Please remove it manually",
+                            new Object[]
+                            {
+                                    IoCertUtil.canonicalizeName(c.getIssuerX500Principal()),
+                                    c.getSerialNumber(),
+                                    IoCertUtil.canonicalizeName(c.getSubjectX500Principal()),
+                                    publisher.getName()});
                 }
             }
         }
@@ -993,17 +1198,38 @@ public class X509CA
 
             for(IdentifiedCertPublisher publisher : getPublishers())
             {
+                if(publisher.isAsyn() == false)
+                {
+                    boolean successfull;
+                    try
+                    {
+                        successfull = publisher.certificateRevoked(caInfo.getCertificate(),
+                                revokedCert.getCert(), revokedCert.getRevInfo());
+                    }
+                    catch (RuntimeException re)
+                    {
+                        successfull = false;
+                        String msg = "Error while publish revocation of certificate to the publisher " +
+                                publisher.getName();
+                        LOG.error(msg);
+                        LOG.debug(msg, re);
+                    }
+
+                    if(successfull)
+                    {
+                        continue;
+                    }
+                }
+
+                Integer certId = revokedCert.getCert().getCertId();
                 try
                 {
-                    publisher.certificateRevoked(caInfo.getCertificate(),
-                            revokedCert.getCert(), revokedCert.getRevInfo());
-                }
-                catch (RuntimeException re)
+                    certstore.addToPublishQueue(publisher.getName(), certId.intValue(), caInfo.getCertificate());
+                }catch(Throwable t)
                 {
-                    String msg = "Error while publish revocation of certificate to the publisher " +
-                            publisher.getName();
+                    String msg = "Error while add entry to PublishQueue: " + t.getMessage();
                     LOG.error(msg);
-                    LOG.debug(msg, re);
+                    LOG.debug(msg, t);
                 }
             }
         } finally
@@ -1038,16 +1264,37 @@ public class X509CA
 
             for(IdentifiedCertPublisher publisher : getPublishers())
             {
+                if(publisher.isAsyn())
+                {
+                    boolean successfull;
+                    try
+                    {
+                        successfull = publisher.certificateUnrevoked(caInfo.getCertificate(), unrevokedCert);
+                    }
+                    catch (RuntimeException re)
+                    {
+                        successfull = false;
+                        String msg = "Error while publish unrevocation of certificate to the publisher "
+                                + publisher.getName();
+                        LOG.error(msg);
+                        LOG.debug(msg, re);
+                    }
+
+                    if(successfull)
+                    {
+                        continue;
+                    }
+                }
+
+                Integer certId = unrevokedCert.getCertId();
                 try
                 {
-                    publisher.certificateUnrevoked(caInfo.getCertificate(), unrevokedCert);
-                }
-                catch (RuntimeException re)
+                    certstore.addToPublishQueue(publisher.getName(), certId.intValue(), caInfo.getCertificate());
+                }catch(Throwable t)
                 {
-                    String msg = "Error while publish unrevocation of certificate to the publisher "
-                            + publisher.getName();
+                    String msg = "Error while add entry to PublishQueue: " + t.getMessage();
                     LOG.error(msg);
-                    LOG.debug(msg, re);
+                    LOG.debug(msg, t);
                 }
             }
         } finally
@@ -1078,13 +1325,18 @@ public class X509CA
         {
             try
             {
-                publisher.caRevoked(caInfo.getCertificate(), revocationInfo);
+                boolean successfull = publisher.caRevoked(caInfo.getCertificate(), revocationInfo);
+                if(successfull == false)
+                {
+                    throw new OperationException(ErrorCode.System_Failure, "Publishing CA revocation failed");
+                }
             }
             catch (RuntimeException re)
             {
                 String msg = "Error while publish revocation of CA to the publisher " + publisher.getName();
                 LOG.error(msg);
                 LOG.debug(msg, re);
+                throw new OperationException(ErrorCode.System_Failure, msg);
             }
         }
     }
@@ -1102,13 +1354,18 @@ public class X509CA
         {
             try
             {
-                publisher.caUnrevoked(caInfo.getCertificate());
+                boolean successfull = publisher.caUnrevoked(caInfo.getCertificate());
+                if(successfull == false)
+                {
+                    throw new OperationException(ErrorCode.System_Failure, "Publishing CA revocation failed");
+                }
             }
             catch (RuntimeException re)
             {
                 String msg = "Error while publish revocation of CA to the publisher " + publisher.getName();
                 LOG.error(msg);
                 LOG.debug(msg, re);
+                throw new OperationException(ErrorCode.System_Failure, msg);
             }
         }
     }
@@ -1652,24 +1909,42 @@ public class X509CA
 
     private class ScheduledCRLGenerationService implements Runnable
     {
+        private boolean inProcess = false;
         @Override
         public void run()
         {
+            if(inProcess)
+            {
+                return;
+            }
+
+            inProcess = true;
             try
             {
                 generateCRL();
                 cleanupCRLs();
             } catch (OperationException e)
             {
+            } finally
+            {
+                inProcess = false;
             }
+
         }
     }
 
     private class ScheduledNextSerialCommitService implements Runnable
     {
+        private boolean inProcess = false;
         @Override
         public void run()
         {
+            if(inProcess)
+            {
+                return;
+            }
+
+            inProcess = true;
             try
             {
                 commitNextSerial();
@@ -1677,7 +1952,11 @@ public class X509CA
             {
                 LOG.error("Could not increment the next_serial, {}: {}", t.getClass().getName(), t.getMessage());
                 LOG.debug("Could not increment the next_serial", t);
+            } finally
+            {
+                inProcess = false;
             }
+
         }
     }
 

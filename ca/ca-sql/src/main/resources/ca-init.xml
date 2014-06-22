@@ -2,6 +2,19 @@
 <databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog dbchangelog-3.0.xsd" logicalFilePath="ca-init.xml">
 	<!-- CA configuration :: create table -->
 	<changeSet author="xipki" id="1">
+		<!-- table CALOCK -->
+		<createTable tableName="CALOCK">
+			<column name="NAME" type="VARCHAR(45)">
+				<constraints primaryKey="true" unique="true" nullable="false"/>
+			</column>
+			<column name="LOCKED" type="INT">
+				<constraints nullable="false"/>
+			</column>
+			<column name="LOCKGRANTED" remarks="seconds since January 1, 1970, 00:00:00 GMT" type="INT" />
+			<column name="LOCKGRANTED2" type="TIMESTAMP" />
+			<column name="LOCKEDBY" type="VARCHAR(255)"/>
+		</createTable>
+
 		<!-- table CMPCONTROL -->
 		<createTable tableName="CMPCONTROL">
 			<column name="NAME" type="VARCHAR(45)">
@@ -225,6 +238,16 @@
 			</column>
 		</createTable>
 
+		<!-- table PUBLISHERINFO -->
+		<createTable tableName="PUBLISHERINFO">
+			<column name="ID" type="INT(10)">
+				<constraints primaryKey="true" unique="true" nullable="false"/>
+			</column>
+			<column name="NAME" type="VARCHAR(45)">
+				<constraints nullable="false"/>
+			</column>
+		</createTable>
+
 		<!-- table USER -->
 		<createTable tableName="USER">
 			<column name="ID" type="INT(10)">
@@ -335,6 +358,24 @@
 				<constraints nullable="false"/>
 			</column>
 		</createTable>
+		
+		<!-- table PublishQueue -->
+		<createTable tableName="PUBLISHQUEUE">
+			<column name="CERT_ID" type="INT(10)">
+				<constraints nullable="false"/>
+			</column>
+			<column name="PUBLISHER_ID" type="INT(10)">
+				<constraints nullable="false"/>
+			</column>
+			<column name="CAINFO_ID" type="INT(10)">
+				<constraints nullable="false"/>
+			</column>
+		</createTable>
+		
+		<createIndex tableName="PUBLISHQUEUE" unique="false" indexName="IDX_PUBLISHQUEUE_CERT_CAINFO1">
+			<column name="CERT_ID"/>
+			<column name="CAINFO_ID"/>
+		</createIndex>
 	</changeSet>
 
 	<!-- CA Configuration :: foreign key -->
@@ -426,6 +467,18 @@
 			onDelete="CASCADE" onUpdate="NO ACTION"
 			baseColumnNames="CERT_ID" baseTableName="RAWCERT"
 			constraintName="FK_RAWCERT_CERT1"
+			referencedColumnNames="ID" referencedTableName="CERT"/>
+			
+		<addForeignKeyConstraint deferrable="false" initiallyDeferred="false"
+			onDelete="CASCADE" onUpdate="NO ACTION"
+			baseColumnNames="PUBLISHER_ID" baseTableName="PUBLISHQUEUE"
+			constraintName="FK_PUBLISHQUEUE_PUBLISHER1"
+			referencedColumnNames="ID" referencedTableName="PUBLISHERINFO"/>
+
+		<addForeignKeyConstraint deferrable="false" initiallyDeferred="false"
+			onDelete="CASCADE" onUpdate="NO ACTION"
+			baseColumnNames="CERT_ID" baseTableName="PUBLISHQUEUE"
+			constraintName="FK_PUBLISHQUEUE_CERT1"
 			referencedColumnNames="ID" referencedTableName="CERT"/>
 	</changeSet>
 </databaseChangeLog>

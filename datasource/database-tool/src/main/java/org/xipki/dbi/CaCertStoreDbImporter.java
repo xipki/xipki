@@ -50,13 +50,15 @@ import org.xipki.dbi.ca.jaxb.CertStoreType.Cainfos;
 import org.xipki.dbi.ca.jaxb.CertStoreType.Certprofileinfos;
 import org.xipki.dbi.ca.jaxb.CertStoreType.CertsFiles;
 import org.xipki.dbi.ca.jaxb.CertStoreType.Crls;
+import org.xipki.dbi.ca.jaxb.CertStoreType.PublishQueue;
+import org.xipki.dbi.ca.jaxb.CertStoreType.Publisherinfos;
 import org.xipki.dbi.ca.jaxb.CertStoreType.Requestorinfos;
 import org.xipki.dbi.ca.jaxb.CertStoreType.UsersFiles;
 import org.xipki.dbi.ca.jaxb.CertType;
-import org.xipki.dbi.ca.jaxb.CertprofileinfoType;
 import org.xipki.dbi.ca.jaxb.CertsType;
 import org.xipki.dbi.ca.jaxb.CrlType;
-import org.xipki.dbi.ca.jaxb.RequestorinfoType;
+import org.xipki.dbi.ca.jaxb.NameIdType;
+import org.xipki.dbi.ca.jaxb.ToPublishType;
 import org.xipki.dbi.ca.jaxb.UserType;
 import org.xipki.dbi.ca.jaxb.UsersType;
 import org.xipki.security.api.PasswordResolverException;
@@ -100,10 +102,12 @@ class CaCertStoreDbImporter extends DbPorter
         {
             import_cainfo(certstore.getCainfos());
             import_requestorinfo(certstore.getRequestorinfos());
+            import_publisherinfo(certstore.getPublisherinfos());
             import_certprofileinfo(certstore.getCertprofileinfos());
             import_user(certstore.getUsersFiles());
             import_crl(certstore.getCrls());
             import_cert(certstore.getCertsFiles());
+            import_publishQueue(certstore.getPublishQueue());
         }catch(Exception e)
         {
             System.err.println("Error while importing CA certstore to database");
@@ -168,7 +172,7 @@ class CaCertStoreDbImporter extends DbPorter
 
         try
         {
-            for(RequestorinfoType info : requestorinfos.getRequestorinfo())
+            for(NameIdType info : requestorinfos.getRequestorinfo())
             {
                 try
                 {
@@ -194,6 +198,43 @@ class CaCertStoreDbImporter extends DbPorter
         System.out.println(" Imported table REQUESTORINFO");
     }
 
+    private void import_publisherinfo(Publisherinfos publisherinfos)
+    throws Exception
+    {
+        final String sql = "INSERT INTO PUBLISHERINFO (ID, NAME) VALUES (?, ?)";
+
+        System.out.println("Importing table PUBLISHERINFO");
+
+        PreparedStatement ps = prepareStatement(sql);
+
+        try
+        {
+            for(NameIdType info : publisherinfos.getPublisherinfo())
+            {
+                try
+                {
+                    String name = info.getName();
+
+                    int idx = 1;
+                    ps.setInt   (idx++, info.getId());
+                    ps.setString(idx++, name);
+
+                    ps.execute();
+                }catch(Exception e)
+                {
+                    System.err.println("Error while importing publisherinfo with ID=" + info.getId() +
+                            ", message: " + e.getMessage());
+                    throw e;
+                }
+            }
+        }finally
+        {
+            closeStatement(ps);
+        }
+
+        System.out.println(" Imported table PUBLISHERINFO");
+    }
+
     private void import_certprofileinfo(Certprofileinfos certprofileinfos)
     throws Exception
     {
@@ -205,7 +246,7 @@ class CaCertStoreDbImporter extends DbPorter
 
         try
         {
-            for(CertprofileinfoType info : certprofileinfos.getCertprofileinfo())
+            for(NameIdType info : certprofileinfos.getCertprofileinfo())
             {
                 try
                 {
@@ -290,6 +331,42 @@ class CaCertStoreDbImporter extends DbPorter
         }
 
         return sum;
+    }
+
+    private void import_publishQueue(PublishQueue publishQueue)
+    throws Exception
+    {
+        final String SQL = "INSERT INTO PUBLISHQUEUE" +
+                " (CERT_ID, PUBLISHER_ID, CAINFO_ID)" +
+                " VALUES (?, ?, ?)";
+
+        System.out.println("Importing table PUBLISHQUEUE");
+        PreparedStatement ps = prepareStatement(SQL);
+
+        try
+        {
+            for(ToPublishType tbp : publishQueue.getTop())
+            {
+                try
+                {
+                    int idx = 1;
+                    ps.setInt(idx++, tbp.getCertId());
+                    ps.setInt(idx++, tbp.getPubId());
+                    ps.setInt(idx++, tbp.getCaId());
+                    ps.execute();
+                }catch(Exception e)
+                {
+                    System.err.println("Error while importing PUBLISHQUEUE with CERT_ID=" + tbp.getCertId()
+                            + " and PUBLISHER_ID=" + tbp.getPubId() + ", message: " + e.getMessage());
+                    throw e;
+                }
+            }
+        }finally
+        {
+            closeStatement(ps);
+        }
+
+        System.out.println(" Imported table PUBLISHQUEUE");
     }
 
     private void import_crl(Crls crls)

@@ -57,7 +57,9 @@ class CertStatusStoreQueryExecutor
 
     private final IssuerStore issuerStore;
 
-    CertStatusStoreQueryExecutor(DataSource dataSource)
+    private final boolean publishGoodCerts;
+
+    CertStatusStoreQueryExecutor(DataSource dataSource, boolean publishGoodCerts)
     throws SQLException, NoSuchAlgorithmException
     {
         this.dataSource = dataSource;
@@ -77,6 +79,7 @@ class CertStatusStoreQueryExecutor
         }
 
         this.issuerStore = initIssuerStore();
+        this.publishGoodCerts = publishGoodCerts;
     }
 
     private IssuerStore initIssuerStore()
@@ -146,6 +149,11 @@ class CertStatusStoreQueryExecutor
         int issuerId = getIssuerId(issuer);
         BigInteger serialNumber = certificate.getCert().getSerialNumber();
         boolean certRegistered = certRegistered(issuerId, serialNumber);
+
+        if(publishGoodCerts == false && revoked == false && certRegistered == false )
+        {
+            return;
+        }
 
         if(certRegistered)
         {

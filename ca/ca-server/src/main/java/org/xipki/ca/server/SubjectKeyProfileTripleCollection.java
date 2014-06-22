@@ -20,6 +20,10 @@ package org.xipki.ca.server;
 import java.util.LinkedList;
 import java.util.List;
 
+/**
+ * @author Lijun Liao
+ */
+
 public class SubjectKeyProfileTripleCollection
 {
     private final List<SubjectKeyProfileTriple> triples = new LinkedList<>();
