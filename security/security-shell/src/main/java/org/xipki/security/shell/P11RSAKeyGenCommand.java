@@ -59,7 +59,7 @@ public class P11RSAKeyGenCommand extends KeyGenCommand
     protected String            password;
 
     @Option(name = "-certout",
-            required = false, description = "Where to saven the self-signed certificate")
+            required = false, description = "Where to save the self-signed certificate")
     protected String            outputFilename;
 
     @Option(name = "-p",
