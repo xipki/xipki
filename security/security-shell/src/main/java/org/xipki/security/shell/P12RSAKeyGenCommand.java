@@ -47,11 +47,11 @@ public class P12RSAKeyGenCommand extends KeyGenCommand
     protected String            password;
 
     @Option(name = "-out",
-            required = true, description = "Required. Where to saven the key")
+            required = true, description = "Required. Where to save the key")
     protected String            keyOutFile;
 
     @Option(name = "-certout",
-            required = false, description = "Where to saven the self-signed certificate")
+            required = false, description = "Where to save the self-signed certificate")
     protected String            certOutFile;
 
     @Override
