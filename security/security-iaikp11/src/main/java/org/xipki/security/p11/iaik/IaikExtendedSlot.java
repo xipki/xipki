@@ -1114,7 +1114,7 @@ public class IaikExtendedSlot
         StringBuilder sb = new StringBuilder("identified by ");
         sb.append("id ");
         sb.append(keyId == null ? "null" : Hex.toHexString(keyId));
-        sb.append("label ");
+        sb.append(" and label ");
         sb.append(keyLabel == null ? "null" : new String(keyLabel));
         return sb.toString();
     }

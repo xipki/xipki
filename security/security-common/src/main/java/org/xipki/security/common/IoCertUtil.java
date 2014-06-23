@@ -698,7 +698,7 @@ public class IoCertUtil
 
         for(String addr : addresses)
         {
-            if(addr.startsWith("192.") == false && addr.startsWith("127."))
+            if(addr.startsWith("192.") == false && addr.startsWith("127.") == false)
             {
                 return addr;
             }
