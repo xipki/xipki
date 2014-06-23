@@ -172,7 +172,7 @@ public class CAManagerImpl implements CAManager
         this.certFact = cf;
 
         String calockId = null;
-        File caLockFile = new File("etc", "calock");
+        File caLockFile = new File("calock");
         if(caLockFile.exists())
         {
             try
@@ -755,6 +755,12 @@ public class CAManagerImpl implements CAManager
         if(caLockedByMe)
         {
             unlockCA();
+        }
+
+        File caLockFile = new File("calock");
+        if(caLockFile.exists())
+        {
+            caLockFile.delete();
         }
 
         LOG.info("Stopped CA system");
