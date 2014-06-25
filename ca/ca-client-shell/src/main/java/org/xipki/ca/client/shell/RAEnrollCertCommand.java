@@ -79,9 +79,7 @@ public class RAEnrollCertCommand extends ClientCommand
             }
 
             File certFile = new File(outputFile);
-
-            IoCertUtil.save(certFile, cert.getEncoded());
-            System.out.println("Certificate saved to " + certFile.getPath());
+            saveVerbose("Certificate saved to file", certFile, cert.getEncoded());
         }
 
         return null;

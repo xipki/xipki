@@ -26,7 +26,7 @@ import org.apache.felix.gogo.commands.Option;
  * @author Lijun Liao
  */
 
-@Command(scope = "ca", name = "capub-add", description="Add publisher to CA")
+@Command(scope = "ca", name = "capub-add", description="Add publishers to CA")
 public class CaPublisherAddCommand extends CaCommand
 {
     @Option(name = "-ca",

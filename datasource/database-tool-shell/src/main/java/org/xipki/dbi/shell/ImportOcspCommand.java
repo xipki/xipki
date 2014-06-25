@@ -19,7 +19,7 @@ package org.xipki.dbi.shell;
 
 import org.apache.felix.gogo.commands.Command;
 import org.apache.felix.gogo.commands.Option;
-import org.apache.karaf.shell.console.OsgiCommandSupport;
+import org.xipki.console.karaf.XipkiOsgiCommandSupport;
 import org.xipki.database.api.DataSourceFactory;
 import org.xipki.dbi.OcspDbImporter;
 import org.xipki.security.api.PasswordResolver;
@@ -29,7 +29,7 @@ import org.xipki.security.api.PasswordResolver;
  */
 
 @Command(scope = "dbtool", name = "import-ocsp", description="Import OCSP database")
-public class ImportOcspCommand extends OsgiCommandSupport
+public class ImportOcspCommand extends XipkiOsgiCommandSupport
 {
     @Option(name = "-dbconf",
             description = "Required. Database configuration file",

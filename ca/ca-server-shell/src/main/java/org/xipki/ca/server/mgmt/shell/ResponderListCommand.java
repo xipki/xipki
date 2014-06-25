@@ -30,7 +30,7 @@ public class ResponderListCommand extends CaCommand
 {
 
     @Option(name = "-v", aliases="--verbose",
-            required = false, description = "Show CA information verbosely")
+            required = false, description = "Show responder information verbosely")
     protected Boolean          verbose;
 
     @Override

@@ -37,7 +37,7 @@ public class CrlSignerListCommand extends CaCommand
     protected String name;
 
     @Option(name = "-v", aliases="--verbose",
-            required = false, description = "Show CA information verbosely")
+            required = false, description = "Show CRL signer information verbosely")
     protected Boolean          verbose;
 
     @Override

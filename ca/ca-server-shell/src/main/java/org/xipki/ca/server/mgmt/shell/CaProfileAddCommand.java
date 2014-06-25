@@ -26,7 +26,7 @@ import org.apache.felix.gogo.commands.Option;
  * @author Lijun Liao
  */
 
-@Command(scope = "ca", name = "caprofile-add", description="Add profile to CA")
+@Command(scope = "ca", name = "caprofile-add", description="Add certificate profiles to CA")
 public class CaProfileAddCommand extends CaCommand
 {
     @Option(name = "-ca",

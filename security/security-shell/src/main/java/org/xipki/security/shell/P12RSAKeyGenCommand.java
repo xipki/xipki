@@ -23,7 +23,6 @@ import java.math.BigInteger;
 import org.apache.felix.gogo.commands.Command;
 import org.apache.felix.gogo.commands.Option;
 import org.xipki.security.api.P12KeypairGenerationResult;
-import org.xipki.security.common.IoCertUtil;
 import org.xipki.security.p10.P12KeypairGenerator;
 
 /**
@@ -76,13 +75,12 @@ public class P12RSAKeyGenCommand extends KeyGenCommand
         P12KeypairGenerationResult keyAndCert = gen.generateIdentity();
 
         File p12File = new File(keyOutFile);
-        System.out.println("Saved PKCS#12 keystore in " + p12File.getPath());
-        IoCertUtil.save(p12File, keyAndCert.getKeystore());
+        saveVerbose("Saved PKCS#12 keystore to file", p12File, keyAndCert.getKeystore());
         if(certOutFile != null)
         {
             File certFile = new File(certOutFile);
-            IoCertUtil.save(certFile, keyAndCert.getCertificate().getEncoded());
-            System.out.println("Saved self-signed certificate in " + certFile.getPath());
+            saveVerbose("Saved self-signed certificate to file",
+                    certFile, keyAndCert.getCertificate().getEncoded());
         }
 
         return null;

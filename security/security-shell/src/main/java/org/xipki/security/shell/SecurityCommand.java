@@ -17,15 +17,14 @@
 
 package org.xipki.security.shell;
 
-import org.apache.karaf.shell.console.OsgiCommandSupport;
+import org.xipki.console.karaf.XipkiOsgiCommandSupport;
 import org.xipki.security.api.SecurityFactory;
-import org.xipki.security.common.IoCertUtil;
 
 /**
  * @author Lijun Liao
  */
 
-public abstract class SecurityCommand extends OsgiCommandSupport
+public abstract class SecurityCommand extends XipkiOsgiCommandSupport
 {
 
     protected SecurityFactory securityFactory;
@@ -40,34 +39,16 @@ public abstract class SecurityCommand extends OsgiCommandSupport
         this.securityFactory = securityFactory;
     }
 
-    protected char[] readPasswordIfNotSet(String password, Boolean readFromConsole)
+    protected char[] readPasswordIfRequired(String password, Boolean readFromConsole)
     {
         if(password != null)
         {
             return password.toCharArray();
         }
-
-        if(readFromConsole != null && readFromConsole.booleanValue())
+        else
         {
-            return readPassword();
+            return isTrue(readFromConsole) ? readPassword() : null;
         }
-
-        return null;
-    }
-
-    protected char[] readPasswordIfNotSet(String password)
-    {
-        if(password != null)
-        {
-            return password.toCharArray();
-        }
-
-          return readPassword();
-    }
-
-    protected char[] readPassword()
-    {
-        return IoCertUtil.readPassword("Enter the password");
     }
 
 }

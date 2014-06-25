@@ -52,14 +52,14 @@ liquibase ()
 
 if [ $# = 3 ]; then
   while true; do
-    read -p "Do you wish to $COMMAND database? y/n " RESP
-    if [ "$RESP" = "y" ]; then
+    read -p "Do you wish to $COMMAND database [yes/no] ?" RESP
+    if [ "$RESP" = "yes" ]; then
        liquibase
        break
-    elif [ "$RESP" = "n" ]; then
+    elif [ "$RESP" = "no" ]; then
        break
     else
-       echo "Please answer with y or n"
+       echo "Please answer with yes or no"
     fi
   done
 else

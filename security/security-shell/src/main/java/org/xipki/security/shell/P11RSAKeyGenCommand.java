@@ -25,7 +25,6 @@ import org.apache.felix.gogo.commands.Option;
 import org.bouncycastle.util.encoders.Hex;
 import org.xipki.security.api.P11KeypairGenerationResult;
 import org.xipki.security.api.PKCS11SlotIdentifier;
-import org.xipki.security.common.IoCertUtil;
 import org.xipki.security.p11.iaik.IaikP11CryptService;
 import org.xipki.security.p11.iaik.P11KeypairGenerator;
 
@@ -33,7 +32,7 @@ import org.xipki.security.p11.iaik.P11KeypairGenerator;
  * @author Lijun Liao
  */
 
-@Command(scope = "keytool", name = "rsa", description="Generate RSA keypair via PKCS#11")
+@Command(scope = "keytool", name = "rsa", description="Generate RSA keypair in PKCS#11 device")
 public class P11RSAKeyGenCommand extends KeyGenCommand
 {
     @Option(name = "-keysize",
@@ -55,7 +54,7 @@ public class P11RSAKeyGenCommand extends KeyGenCommand
     protected String            label;
 
     @Option(name = "-pwd", aliases = { "--password" },
-            required = false, description = "Password of the PKCS#11 token")
+            required = false, description = "Password of the PKCS#11 device")
     protected String            password;
 
     @Option(name = "-certout",
@@ -90,7 +89,7 @@ public class P11RSAKeyGenCommand extends KeyGenCommand
             _publicExponent = new BigInteger(publicExponent);
         }
 
-        char[] pwd = readPasswordIfNotSet(password, readFromConsole);
+        char[] pwd = readPasswordIfRequired(password, readFromConsole);
 
         P11KeypairGenerator gen = new P11KeypairGenerator();
         PKCS11SlotIdentifier slotId = new PKCS11SlotIdentifier(slotIndex, null);
@@ -107,8 +106,7 @@ public class P11RSAKeyGenCommand extends KeyGenCommand
         if(outputFilename != null)
         {
                File certFile = new File(outputFilename);
-               IoCertUtil.save(certFile, keyAndCert.getCertificate().getEncoded());
-               System.out.println("Saved self-signed certificate in " + certFile.getPath());
+               saveVerbose("Saved self-signed certificate", certFile, keyAndCert.getCertificate().getEncoded());
         }
 
         IaikP11CryptService.getInstance(securityFactory.getPkcs11Module(), pwd).refresh();
