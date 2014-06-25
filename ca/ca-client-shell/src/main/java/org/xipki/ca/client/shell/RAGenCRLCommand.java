@@ -23,7 +23,6 @@ import java.util.Set;
 
 import org.apache.felix.gogo.commands.Command;
 import org.apache.felix.gogo.commands.Option;
-import org.xipki.security.common.IoCertUtil;
 
 /**
  * @author Lijun Liao
@@ -78,7 +77,7 @@ public class RAGenCRLCommand extends ClientCommand
             return null;
         }
 
-        IoCertUtil.save(new File(outFile), crl.getEncoded());
+        saveVerbose("Saved CRL to file", new File(outFile), crl.getEncoded());
         return null;
     }
 

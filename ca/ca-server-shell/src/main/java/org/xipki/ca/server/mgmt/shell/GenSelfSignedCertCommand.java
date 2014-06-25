@@ -31,7 +31,6 @@ import org.xipki.ca.server.mgmt.CertProfileEntry;
 import org.xipki.ca.server.mgmt.shell.SelfSignedCertBuilder.GenerateSelfSignedResult;
 import org.xipki.security.api.PasswordResolver;
 import org.xipki.security.api.SecurityFactory;
-import org.xipki.security.common.IoCertUtil;
 
 /**
  * @author Lijun Liao
@@ -110,7 +109,7 @@ public class GenSelfSignedCertCommand extends CaCommand
 
         File outFile = new File(certOutFile);
         X509Certificate caCert = result.getCert();
-        IoCertUtil.save(outFile, caCert.getEncoded());
+        saveVerbose("Saved self-signed certificate to file", outFile, caCert.getEncoded());
 
         return null;
     }

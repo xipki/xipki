@@ -24,7 +24,7 @@ import org.apache.felix.gogo.commands.Option;
  * @author Lijun Liao
  */
 
-@Command(scope = "ca", name = "caprofile-rm", description="Remove certificate profile in given CA")
+@Command(scope = "ca", name = "caprofile-rm", description="Remove certificate profile from CA")
 public class CaProfileRemoveCommand extends CaCommand
 {
     @Option(name = "-ca",

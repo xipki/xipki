@@ -61,12 +61,12 @@ public class P11CertUpdateCommand extends SecurityCommand
     protected Integer           slotIndex;
 
     @Option(name = "-key-id",
-            required = false, description = "Id of the private key in the PKCS#11 token.\n"
+            required = false, description = "Id of the private key in the PKCS#11 device.\n"
                     + "Either keyId or keyLabel must be specified")
     protected String            keyId;
 
     @Option(name = "-key-label",
-            required = false, description = "Label of the private key in the PKCS#11 token.\n"
+            required = false, description = "Label of the private key in the PKCS#11 device.\n"
                     + "Either keyId or keyLabel must be specified")
     protected String            keyLabel;
 
@@ -107,7 +107,7 @@ public class P11CertUpdateCommand extends SecurityCommand
         IaikExtendedModule module = IaikP11ModulePool.getInstance().getModule(
                 securityFactory.getPkcs11Module());
 
-        char[] pwd = readPasswordIfNotSet(password, readFromConsole);
+        char[] pwd = readPasswordIfRequired(password, readFromConsole);
         IaikExtendedSlot slot = null;
         try
         {

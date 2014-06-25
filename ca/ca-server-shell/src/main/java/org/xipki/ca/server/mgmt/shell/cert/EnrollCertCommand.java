@@ -51,7 +51,7 @@ public class EnrollCertCommand extends CaCommand
     protected String            caName;
 
     @Option(name = "-p10",
-            required = true, description = "Required. PKCS-10 request file")
+            required = true, description = "Required. PKCS#10 request file")
     protected String            p10File;
 
     @Option(name = "-out",
@@ -129,7 +129,7 @@ public class EnrollCertCommand extends CaCommand
                 certInfo = ca.generateCertificate(false, profileName, user, subject, publicKeyInfo,
                         null, null, extensions);
                 ca.publishCertificate(certInfo);
-                IoCertUtil.save(new File(outFile), certInfo.getCert().getEncodedCert());
+                saveVerbose("Saved certificate to file", new File(outFile), certInfo.getCert().getEncodedCert());
             } catch (Exception e)
             {
                 LOG.warn("Exception: {}", e.getMessage());

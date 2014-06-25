@@ -32,11 +32,10 @@
 			<artifactId>ca-server</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-		<!-- Karaf -->
 		<dependency>
-			<groupId>org.apache.karaf.shell</groupId>
-			<artifactId>org.apache.karaf.shell.console</artifactId>
-			<version>${karaf.version}</version>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>console-karaf</artifactId>
+			<version>${project.version}</version>
 		</dependency>
 	</dependencies>
 	<build>

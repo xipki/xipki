@@ -38,13 +38,12 @@ import org.xipki.ca.server.mgmt.shell.SelfSignedCertBuilder.GenerateSelfSignedRe
 import org.xipki.security.api.PasswordResolver;
 import org.xipki.security.api.SecurityFactory;
 import org.xipki.security.common.ConfigurationException;
-import org.xipki.security.common.IoCertUtil;
 
 /**
  * @author Lijun Liao
  */
 
-@Command(scope = "ca", name = "gen-rca", description="Generate selfsigned root CA")
+@Command(scope = "ca", name = "gen-rca", description="Generate selfsigned CA")
 public class CaGenRootCACommand extends CaCommand
 {
     @Option(name = "-name",
@@ -241,13 +240,7 @@ public class CaGenRootCACommand extends CaCommand
 
         if(rcaCertOutFile != null)
         {
-            File outFile = new File(rcaCertOutFile);
-            File parentFile = outFile.getParentFile();
-            if(parentFile != null && ! parentFile.exists())
-            {
-                parentFile.mkdirs();
-            }
-            IoCertUtil.save(outFile, caCert.getEncoded());
+            saveVerbose("Save root certificate to file", new File(rcaCertOutFile), caCert.getEncoded());
         }
 
         return null;

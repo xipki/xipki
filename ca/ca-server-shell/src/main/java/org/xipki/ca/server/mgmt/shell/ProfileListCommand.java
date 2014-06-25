@@ -32,7 +32,7 @@ public class ProfileListCommand extends CaCommand
 {
 
     @Option(name = "-name",
-            description = "Parameter Name",
+            description = "Profile name",
             required = false, multiValued = false)
     protected String name;
 

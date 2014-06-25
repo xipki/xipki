@@ -158,6 +158,6 @@ public class OcspLoadTest extends AbstractLoadTest
             }
         }
 
-    } // End class OcspRequestor
+    }
 
 }
