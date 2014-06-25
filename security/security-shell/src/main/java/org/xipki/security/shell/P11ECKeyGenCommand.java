@@ -24,7 +24,6 @@ import org.apache.felix.gogo.commands.Option;
 import org.bouncycastle.util.encoders.Hex;
 import org.xipki.security.api.P11KeypairGenerationResult;
 import org.xipki.security.api.PKCS11SlotIdentifier;
-import org.xipki.security.common.IoCertUtil;
 import org.xipki.security.p11.iaik.IaikP11CryptService;
 import org.xipki.security.p11.iaik.P11KeypairGenerator;
 
@@ -69,7 +68,7 @@ public class P11ECKeyGenCommand extends KeyGenCommand
             curveName = "brainpoolP256r1";
         }
 
-        char[] pwd = readPasswordIfNotSet(password, readFromConsole);
+        char[] pwd = readPasswordIfRequired(password, readFromConsole);
 
         P11KeypairGenerator gen = new P11KeypairGenerator();
         P11KeypairGenerationResult keyAndCert = gen.generateECDSAKeypairAndCert(
@@ -82,8 +81,7 @@ public class P11ECKeyGenCommand extends KeyGenCommand
         if(outputFilename != null)
         {
             File certFile = new File(outputFilename);
-            IoCertUtil.save(certFile, keyAndCert.getCertificate().getEncoded());
-            System.out.println("Saved self-signed certificate in " + certFile.getPath());
+            saveVerbose("Saved self-signed certificate to file", certFile, keyAndCert.getCertificate().getEncoded());
         }
 
         IaikP11CryptService.getInstance(securityFactory.getPkcs11Module(), pwd).refresh();

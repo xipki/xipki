@@ -24,7 +24,6 @@ import java.util.Arrays;
 import org.bouncycastle.util.encoders.Base64;
 import org.xipki.security.api.PasswordResolverException;
 import org.xipki.security.api.SinglePasswordResolver;
-import org.xipki.security.common.IoCertUtil;
 
 /**
  * @author Lijun Liao
@@ -44,7 +43,7 @@ public class PBEPasswordResolver implements SinglePasswordResolver
         {
             if(masterPassword == null)
             {
-                this.masterPassword = IoCertUtil.readPassword("Please enter the master password");
+                this.masterPassword = SecurePasswordInputPanel.readPassword("Please enter the master password");
             }
             return masterPassword;
         }

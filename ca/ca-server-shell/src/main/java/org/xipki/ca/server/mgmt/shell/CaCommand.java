@@ -17,15 +17,15 @@
 
 package org.xipki.ca.server.mgmt.shell;
 
-import org.apache.karaf.shell.console.OsgiCommandSupport;
 import org.xipki.ca.server.mgmt.CAManager;
 import org.xipki.ca.server.mgmt.DuplicationMode;
+import org.xipki.console.karaf.XipkiOsgiCommandSupport;
 
 /**
  * @author Lijun Liao
  */
 
-public abstract class CaCommand extends OsgiCommandSupport
+public abstract class CaCommand extends XipkiOsgiCommandSupport
 {
     protected final static String permissionsText =
             "enroll, revoke, unrevoke, remove, key-update, gen-crl, get-crl, enroll-cross, all";
@@ -35,48 +35,6 @@ public abstract class CaCommand extends OsgiCommandSupport
     public void setCaManager(CAManager caManager)
     {
         this.caManager = caManager;
-    }
-
-    protected Boolean isEnabled(String enabledS, String optionName)
-    {
-        if(enabledS == null)
-        {
-            return null;
-        }
-
-        if("yes".equalsIgnoreCase(enabledS))
-        {
-            return true;
-        }
-        else if("no".equalsIgnoreCase(enabledS))
-        {
-            return false;
-        }
-        else
-        {
-            throw new IllegalArgumentException("invalid option " + optionName + ": " + enabledS);
-        }
-    }
-
-    protected boolean isEnabled(String enabledS, boolean defaultEnabled, String optionName)
-    {
-        if(enabledS == null)
-        {
-            return defaultEnabled;
-        }
-
-        if("yes".equalsIgnoreCase(enabledS))
-        {
-            return true;
-        }
-        else if("no".equalsIgnoreCase(enabledS))
-        {
-            return false;
-        }
-        else
-        {
-            throw new IllegalArgumentException("invalid option " + optionName + ": " + enabledS);
-        }
     }
 
     protected DuplicationMode getDuplicationMode(Integer mode, DuplicationMode defaultMode)

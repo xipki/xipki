@@ -51,11 +51,11 @@ import org.xipki.security.p11.iaik.IaikP11ModulePool;
  * @author Lijun Liao
  */
 
-@Command(scope = "keytool", name = "list", description="List PKCS#11 device objects")
+@Command(scope = "keytool", name = "list", description="List objects in PKCS#11 device")
 public class P11ListSlotCommand extends SecurityCommand
 {
     @Option(name = "-pwd", aliases = { "--password" },
-            required = false, description = "Password of the PKCS#11 token")
+            required = false, description = "Password of the PKCS#11 device")
     protected String            password;
 
     @Option(name = "-p",
@@ -79,7 +79,7 @@ public class P11ListSlotCommand extends SecurityCommand
         sb.append(n + " slots are configured\n");
         System.out.println(sb.toString());
 
-        char[] pwd = readPasswordIfNotSet(password, readFromConsole);
+        char[] pwd = readPasswordIfRequired(password, readFromConsole);
 
         for(PKCS11SlotIdentifier slotId : slotIds)
         {

@@ -67,7 +67,7 @@ public class P11CertAddCommand extends SecurityCommand
         IaikExtendedModule module = IaikP11ModulePool.getInstance().getModule(
                 securityFactory.getPkcs11Module());
 
-        char[] pwd = readPasswordIfNotSet(password, readFromConsole);
+        char[] pwd = readPasswordIfRequired(password, readFromConsole);
         IaikExtendedSlot slot = null;
         try
         {

@@ -28,7 +28,6 @@ import org.bouncycastle.util.encoders.Hex;
 import org.xipki.security.api.PKCS11SlotIdentifier;
 import org.xipki.security.api.Pkcs11KeyIdentifier;
 import org.xipki.security.api.SignerException;
-import org.xipki.security.common.IoCertUtil;
 import org.xipki.security.p11.iaik.IaikExtendedModule;
 import org.xipki.security.p11.iaik.IaikExtendedSlot;
 import org.xipki.security.p11.iaik.IaikP11ModulePool;
@@ -46,12 +45,12 @@ public class P11CertExportCommand extends SecurityCommand
     protected Integer           slotIndex;
 
     @Option(name = "-key-id",
-            required = false, description = "Id of the private key in the PKCS#11 token.\n"
+            required = false, description = "Id of the private key in the PKCS#11 device.\n"
                     + "Either keyId or keyLabel must be specified")
     protected String            keyId;
 
     @Option(name = "-key-label",
-            required = false, description = "Label of the private key in the PKCS#11 token.\n"
+            required = false, description = "Label of the private key in the PKCS#11 device.\n"
                     + "Either keyId or keyLabel must be specified")
     protected String            keyLabel;
 
@@ -87,7 +86,7 @@ public class P11CertExportCommand extends SecurityCommand
 
         IaikExtendedModule module = IaikP11ModulePool.getInstance().getModule(
                 securityFactory.getPkcs11Module());
-        char[] pwd = readPasswordIfNotSet(password, readFromConsole);
+        char[] pwd = readPasswordIfRequired(password, readFromConsole);
         IaikExtendedSlot slot = null;
         try
         {
@@ -115,8 +114,7 @@ public class P11CertExportCommand extends SecurityCommand
             return null;
         }
 
-        IoCertUtil.save(new File(outFile), cert.getValue().getByteArrayValue());
-        System.out.println("Saved certificate in " + outFile);
+        saveVerbose("Saved certificate to file", new File(outFile), cert.getValue().getByteArrayValue());
         return null;
     }
 

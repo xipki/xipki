@@ -49,7 +49,8 @@ public class CaRequestorAddCommand extends CaCommand
     protected String            raS;
 
     @Option(name = "-permission",
-            description = "Required. Permission, multi options is allowed. allowed values are " + permissionsText,
+            description = "Required. Permission, multi options is allowed. allowed values are\n"
+                    + permissionsText,
             required = true, multiValued = true)
     protected Set<String> permissions;
 

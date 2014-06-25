@@ -24,7 +24,7 @@ import org.apache.felix.gogo.commands.Option;
  * @author Lijun Liao
  */
 
-@Command(scope = "ca", name = "careq-rm", description="Remove requestor in given CA")
+@Command(scope = "ca", name = "careq-rm", description="Remove requestor in CA")
 public class CaRequestorRemoveCommand extends CaCommand
 {
     @Option(name = "-ca",

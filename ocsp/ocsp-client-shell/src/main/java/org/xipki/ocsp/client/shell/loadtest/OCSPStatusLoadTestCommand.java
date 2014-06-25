@@ -52,7 +52,8 @@ public class OCSPStatusLoadTestCommand extends OsgiCommandSupport
 
     @Option(name = "-serial",
             required = true,
-            description = "Required. Serial numbers. Comma-seperated serial numbers or ranges")
+            description = "Required. Serial numbers.\n"
+                    + "Comma-seperated serial numbers or ranges")
     protected String           serialNumbers;
 
     @Option(name = "-duration",
