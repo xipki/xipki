@@ -31,10 +31,10 @@
 		<version>${project.version}</version>
         </dependency>
 		<dependency>
-			<groupId>org.apache.karaf.shell</groupId>
-			<artifactId>org.apache.karaf.shell.console</artifactId>
-			<version>${karaf.version}</version>
-		</dependency>		
+			<groupId>${project.groupId}</groupId>
+			<artifactId>console-karaf</artifactId>
+			<version>${project.version}</version>
+		</dependency>	
 	</dependencies>
 	<build>
 		<plugins>

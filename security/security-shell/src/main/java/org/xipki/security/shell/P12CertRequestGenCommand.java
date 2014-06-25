@@ -44,7 +44,6 @@ import org.xipki.security.NopPasswordResolver;
 import org.xipki.security.SecurityFactoryImpl;
 import org.xipki.security.api.ConcurrentContentSigner;
 import org.xipki.security.api.SignerException;
-import org.xipki.security.common.IoCertUtil;
 import org.xipki.security.p10.Pkcs10RequestGenerator;
 
 /**
@@ -56,7 +55,8 @@ public class P12CertRequestGenCommand extends SecurityCommand
 {
     @Option(name = "-subject",
             required = false,
-            description = "Subject in the PKCS#10 request. The default is the subject of self-signed certifite.")
+            description = "Subject in the PKCS#10 request.\n"
+                    + "The default is the subject of self-signed certifite.")
     protected String            subject;
 
     @Option(name = "-p12",
@@ -140,8 +140,7 @@ public class P12CertRequestGenCommand extends SecurityCommand
         }
 
         File file = new File(outputFilename);
-        IoCertUtil.save(file, p10Req.getEncoded());
-        System.out.println("Saved PKCS#10 request in " + file.getPath());
+        saveVerbose("Saved PKCS#10 request to file", file, p10Req.getEncoded());
 
         return null;
     }

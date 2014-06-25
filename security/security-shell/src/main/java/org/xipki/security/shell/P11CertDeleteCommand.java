@@ -43,7 +43,7 @@ public class P11CertDeleteCommand extends SecurityCommand
     protected Integer           slotIndex;
 
     @Option(name = "-key-id",
-            required = true, description = "Required. Id of the certificate in the PKCS#11 token")
+            required = true, description = "Required. Id of the certificate in the PKCS#11 device")
     protected String            keyId;
 
     @Option(name = "-pwd", aliases = { "--password" },
@@ -61,7 +61,7 @@ public class P11CertDeleteCommand extends SecurityCommand
         IaikExtendedModule module = IaikP11ModulePool.getInstance().getModule(
                 securityFactory.getPkcs11Module());
 
-        char[] pwd = readPasswordIfNotSet(password, readFromConsole);
+        char[] pwd = readPasswordIfRequired(password, readFromConsole);
         IaikExtendedSlot slot = null;
         try
         {

@@ -26,7 +26,6 @@ import java.util.Enumeration;
 import org.apache.felix.gogo.commands.Command;
 import org.apache.felix.gogo.commands.Option;
 import org.xipki.security.api.SignerException;
-import org.xipki.security.common.IoCertUtil;
 
 /**
  * @author Lijun Liao
@@ -86,8 +85,7 @@ public class P12CertExportCommand extends SecurityCommand
         }
 
         X509Certificate cert = (X509Certificate) ks.getCertificate(keyname);
-        IoCertUtil.save(new File(outFile), cert.getEncoded());
-        System.out.println("Saved certificate in " + outFile);
+        saveVerbose("Saved certificate to file", new File(outFile), cert.getEncoded());
 
         return null;
     }
