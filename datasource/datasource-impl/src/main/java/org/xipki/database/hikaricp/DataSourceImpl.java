@@ -83,7 +83,7 @@ public class DataSourceImpl implements DataSource
 
         if(username == null)
         {
-            throw new IllegalStateException("url is not set");
+            throw new IllegalStateException("username is not set");
         }
 
         String realPassword = null;
@@ -224,6 +224,16 @@ public class DataSourceImpl implements DataSource
     {
         this.driverClassName = driverClassName;
         this.databaseType = DatabaseType.getDataSourceForDriver(driverClassName);
+
+        if(DatabaseType.ORACLE == this.databaseType &&
+                System.getProperty("os.name").equalsIgnoreCase("linux"))
+        {
+            String str = System.getProperty("java.security.egd");
+            if(str == null)
+            {
+                System.setProperty("java.security.egd", "file:///dev/urandom");
+            }
+        }
     }
 
     public void setMaxActive(int maxActive)
@@ -338,6 +348,205 @@ public class DataSourceImpl implements DataSource
                 {
                     returnConnection(conn);
                 }
+            }
+        }
+    }
+
+    private void releaseStatementAndResultSet(Statement ps, ResultSet rs)
+    {
+        if(rs != null)
+        {
+            try
+            {
+                rs.close();
+            }catch(Throwable t)
+            {
+                LOG.warn("Cannot close ResultSet", t);
+            }
+        }
+
+        if(ps != null)
+        {
+            try
+            {
+                ps.close();
+            }catch(Throwable t)
+            {
+                LOG.warn("Cannot close statement", t);
+            }
+        }
+    }
+    @Override
+    public String createFetchFirstSelectSQL(String coreSql, int rows)
+    {
+        return createFetchFirstSelectSQL(coreSql, rows, null);
+    }
+
+    /*
+     * Oracle: http://www.oracle.com/technetwork/issue-archive/2006/06-sep/o56asktom-086197.html
+     *
+     */
+    @Override
+    public String createFetchFirstSelectSQL(String coreSql, int rows, String orderBy)
+    {
+        String prefix;
+        String suffix;
+
+        if(databaseType == DatabaseType.ORACLE)
+        {
+            if(orderBy == null || orderBy.isEmpty())
+            {
+                prefix = "SELECT";
+                if(coreSql.contains("WHERE"))
+                {
+                	suffix = " AND ROWNUM < " + (rows + 1);
+                }
+                else
+                {
+                	suffix = " WHERE ROWNUM < " + (rows + 1);
+                }
+            }
+            else
+            {
+                prefix = "SELECT * FROM ( SELECT";
+                suffix = "ORDER BY " + orderBy + " ) WHERE ROWNUM < " + (rows + 1);
+            }
+        }
+        else
+        {
+            prefix = "SELECT";
+            suffix = "";
+
+            if(orderBy != null && orderBy.isEmpty() == false)
+            {
+                suffix += "ORDER BY " + orderBy + " ";
+            }
+
+            switch(databaseType)
+            {
+                case DB2:
+                    suffix += "FETCH FIRST " + rows + " ROWS ONLY";
+                    break;
+                case INFORMIX:
+                    prefix = "SELECT FIRST " + rows;
+                    break;
+                case MSSQL2000:
+                    prefix = "SELECT TOP " + rows;
+                    break;
+                case MYSQL:
+                    suffix += "LIMIT " + rows;
+                    break;
+                case POSTGRESQL:
+                    suffix += "FETCH FIRST " + rows + " ROWS ONLY";
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        return prefix + " " + coreSql + " " + suffix;
+    }
+
+    @Override
+    public int getMin(Connection conn, String table, String column)
+    throws SQLException
+    {
+        Statement stmt = null;
+        ResultSet rs = null;
+        try
+        {
+            stmt = (conn != null) ? conn.createStatement() : getConnection().createStatement();
+            final String sql = "SELECT MIN(" + column + ") FROM " + table;
+            rs = stmt.executeQuery(sql);
+
+            rs.next();
+            return rs.getInt(1);
+        }finally
+        {
+            if(conn == null)
+            {
+                releaseResources(stmt, rs);
+            }
+            else
+            {
+                releaseStatementAndResultSet(stmt, rs);
+            }
+        }
+    }
+
+    @Override
+    public int getMax(Connection conn, String table, String column)
+    throws SQLException
+    {
+        Statement stmt = null;
+        ResultSet rs = null;
+        try
+        {
+            stmt = (conn != null) ? conn.createStatement() : getConnection().createStatement();
+            final String sql = "SELECT MAX(" + column + ") FROM " + table;
+            rs = stmt.executeQuery(sql);
+
+            rs.next();
+            return rs.getInt(1);
+        }finally
+        {
+            if(conn == null)
+            {
+                releaseResources(stmt, rs);
+            }
+            else
+            {
+                releaseStatementAndResultSet(stmt, rs);
+            }
+        }
+    }
+
+    @Override
+    public boolean tableHasColumn(Connection conn, String table, String column)
+    throws SQLException
+    {
+        Statement stmt = (conn != null) ? conn.createStatement() : getConnection().createStatement();
+        try
+        {
+            stmt.execute(createFetchFirstSelectSQL(column + " FROM " + table, 1));
+            return true;
+        }catch(SQLException e)
+        {
+            return false;
+        } finally
+        {
+            if(conn == null)
+            {
+                releaseResources(stmt, null);
+            }
+            else
+            {
+                releaseStatementAndResultSet(stmt, null);
+            }
+        }
+    }
+
+    @Override
+    public boolean tableExists(Connection conn, String table)
+    throws SQLException
+    {
+        Statement stmt = (conn != null) ? conn.createStatement() : getConnection().createStatement();
+        try
+        {
+            stmt.execute(createFetchFirstSelectSQL("1 FROM " + table, 1));
+            return true;
+        }catch(SQLException e)
+        {
+            return false;
+        } finally
+        {
+            if(conn == null)
+            {
+                releaseResources(stmt, null);
+            }
+            else
+            {
+                releaseStatementAndResultSet(stmt, null);
             }
         }
     }

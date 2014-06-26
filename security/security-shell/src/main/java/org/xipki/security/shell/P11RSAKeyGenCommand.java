@@ -53,6 +53,10 @@ public class P11RSAKeyGenCommand extends KeyGenCommand
             required = true, description = "Required. Label of the PKCS#11 objects")
     protected String            label;
 
+    @Option(name = "-subject",
+            required = false, description = "Subject in the self-signed certificate")
+    protected String            subject;
+
     @Option(name = "-pwd", aliases = { "--password" },
             required = false, description = "Password of the PKCS#11 device")
     protected String            password;
@@ -79,6 +83,11 @@ public class P11RSAKeyGenCommand extends KeyGenCommand
             return null;
         }
 
+        if(subject == null || subject.isEmpty())
+        {
+            subject = "CN=" + label;
+        }
+
         BigInteger _publicExponent;
         if(publicExponent == null)
         {
@@ -97,7 +106,7 @@ public class P11RSAKeyGenCommand extends KeyGenCommand
         P11KeypairGenerationResult keyAndCert = gen.generateRSAKeypairAndCert(
                 securityFactory.getPkcs11Module(), slotId, pwd,
                 keysize, _publicExponent,
-                label, "CN=" + label,
+                label, subject,
                 getKeyUsage(),
                 getExtendedKeyUsage());
 

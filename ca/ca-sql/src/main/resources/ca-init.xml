@@ -1,16 +1,20 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog dbchangelog-3.0.xsd" logicalFilePath="ca-init.xml">
+
+  <property name="VARCHAR8000" value="CLOB" dbms="oracle"/>
+  <property name="VARCHAR8000" value="CLOB" dbms="mysql,postgresql,mssql,db2,h2"/>
+
 	<!-- CA configuration :: create table -->
 	<changeSet author="xipki" id="1">
 		<!-- table CALOCK -->
 		<createTable tableName="CALOCK">
 			<column name="NAME" type="VARCHAR(45)">
-				<constraints primaryKey="true" unique="true" nullable="false"/>
+				<constraints primaryKey="true" nullable="false"/>
 			</column>
-			<column name="LOCKED" type="INT">
+			<column name="LOCKED" type="SMALLINT">
 				<constraints nullable="false"/>
 			</column>
-			<column name="LOCKGRANTED" remarks="seconds since January 1, 1970, 00:00:00 GMT" type="INT" />
+			<column name="LOCKGRANTED" remarks="seconds since January 1, 1970, 00:00:00 GMT" type="BIGINT" />
 			<column name="LOCKGRANTED2" type="TIMESTAMP" />
 			<column name="LOCKEDBY" type="VARCHAR(255)"/>
 		</createTable>
@@ -18,24 +22,24 @@
 		<!-- table CMPCONTROL -->
 		<createTable tableName="CMPCONTROL">
 			<column name="NAME" type="VARCHAR(45)">
-				<constraints primaryKey="true" unique="true" nullable="false"/>
+				<constraints primaryKey="true" nullable="false"/>
 			</column>
-			<column name="REQUIRE_CONFIRM_CERT" type="INT">
+			<column name="REQUIRE_CONFIRM_CERT" type="SMALLINT">
 				<constraints nullable="false"/>
 			</column>
-			<column name="REQUIRE_MESSAGE_TIME" type="INT">
+			<column name="REQUIRE_MESSAGE_TIME" type="SMALLINT">
 				<constraints nullable="false"/>
 			</column>
-			<column name="MESSAGE_TIME_BIAS" remarks="seconds" type="INT">
+			<column name="MESSAGE_TIME_BIAS" remarks="seconds" type="SMALLINT">
 				<constraints nullable="false"/>
 			</column>
-			<column name="CONFIRM_WAIT_TIME" remarks="seconds" type="INT">
+			<column name="CONFIRM_WAIT_TIME" remarks="seconds" type="SMALLINT">
 				<constraints nullable="false"/>
 			</column>
-			<column name="SEND_CA_CERT" type="INT">
+			<column name="SEND_CA_CERT" type="SMALLINT">
 				<constraints nullable="false"/>
 			</column>
-			<column name="SEND_RESPONDER_CERT" type="INT">
+			<column name="SEND_RESPONDER_CERT" type="SMALLINT">
 				<constraints nullable="false"/>
 			</column>
 		</createTable>
@@ -43,43 +47,43 @@
 		<!-- table RESPONDER -->
 		<createTable tableName="RESPONDER">
 			<column name="NAME" type="VARCHAR(45)">
-				<constraints primaryKey="true" unique="true" nullable="false"/>
+				<constraints primaryKey="true" nullable="false"/>
 			</column>
 			<column name="TYPE" type="VARCHAR(100)">
 				<constraints nullable="false"/>
 			</column>
-			<column name="CONF" type="VARCHAR(8000)"/>
+			<column name="CONF" type="${VARCHAR8000}"/>
 			<column name="CERT" type="VARCHAR(3000)"/>
 		</createTable>
 
 		<!-- table ENVIRONMENT -->
 		<createTable tableName="ENVIRONMENT">
 			<column name="NAME" type="VARCHAR(45)">
-				<constraints primaryKey="true" unique="true" nullable="false"/>
+				<constraints primaryKey="true" nullable="false"/>
 			</column>
-			<column name="VALUE" type="VARCHAR(200)"/>
+			<column name="VALUE2" type="VARCHAR(200)"/>
 		</createTable>
 
 		<!-- table CRLSIGNER -->
 		<createTable tableName="CRLSIGNER">
 			<column name="NAME" type="VARCHAR(45)">
-				<constraints primaryKey="true" unique="true" nullable="false"/>
+				<constraints primaryKey="true" nullable="false"/>
 			</column>
 			<column name="SIGNER_TYPE" type="VARCHAR(100)">
 				<constraints nullable="false"/>
 			</column>
-			<column name="SIGNER_CONF" type="VARCHAR(8000)"/>
+			<column name="SIGNER_CONF" type="${VARCHAR8000}"/>
 			<column name="SIGNER_CERT" type="VARCHAR(3000)"/>
-			<column name="PERIOD" remarks="minutes. 0 indicates no CRL will be generated automatically." type="INT">
+			<column name="PERIOD" remarks="minutes. 0 indicates no CRL will be generated automatically." type="SMALLINT">
 				<constraints nullable="false"/>
 			</column>
-			<column name="OVERLAP" remarks="minutes" type="INT">
+			<column name="OVERLAP" remarks="minutes" type="SMALLINT">
 				<constraints nullable="false"/>
 			</column>
-			<column defaultValueNumeric="0" name="INCLUDE_CERTS_IN_CRL" type="INT">
+			<column defaultValueNumeric="0" name="INCLUDE_CERTS_IN_CRL" type="SMALLINT">
 				<constraints nullable="false"/>
 			</column>
-			<column defaultValueNumeric="0" name="INCLUDE_EXPIRED_CERTS" type="INT">
+			<column defaultValueNumeric="0" name="INCLUDE_EXPIRED_CERTS" type="SMALLINT">
 				<constraints nullable="false"/>
 			</column>
 		</createTable>
@@ -87,7 +91,7 @@
 		<!-- table REQUESTOR -->
 		<createTable tableName="REQUESTOR">
 			<column name="NAME" type="VARCHAR(45)">
-				<constraints primaryKey="true" unique="true" nullable="false"/>
+				<constraints primaryKey="true" nullable="false"/>
 			</column>
 			<column name="CERT" type="VARCHAR(3000)">
 				<constraints nullable="false"/>
@@ -97,7 +101,7 @@
 		<!-- table PUBLISHER -->
 		<createTable tableName="PUBLISHER">
 			<column name="NAME" type="VARCHAR(45)">
-				<constraints primaryKey="true" unique="true" nullable="false"/>
+				<constraints primaryKey="true" nullable="false"/>
 			</column>
 			<column name="TYPE" type="VARCHAR(100)">
 				<constraints nullable="false"/>
@@ -108,18 +112,18 @@
 		<!-- table "CERTPROFILE" -->
 		<createTable tableName="CERTPROFILE">
 			<column name="NAME" type="VARCHAR(45)">
-				<constraints primaryKey="true" unique="true" nullable="false"/>
+				<constraints primaryKey="true" nullable="false"/>
 			</column>
 			<column name="TYPE" type="VARCHAR(100)">
 				<constraints nullable="false"/>
 			</column>
-			<column name="CONF" remarks="profile data, depends on the type" type="VARCHAR(4000)"/>
+			<column name="CONF" remarks="profile data, depends on the type" type="${VARCHAR8000}"/>
 		</createTable>
 
 		<!-- table CA -->
 		<createTable tableName="CA">
 			<column name="NAME" type="VARCHAR(45)">
-				<constraints primaryKey="true" unique="true" nullable="false"/>
+				<constraints primaryKey="true" nullable="false"/>
 			</column>
 			<column name="NEXT_SERIAL" type="BIGINT"/>
 			<column name="STATUS" remarks="valid values: pending, enabled, disabled" type="VARCHAR(10)">
@@ -130,33 +134,33 @@
 			</column>
 			<column name="CRL_URIS" type="VARCHAR(100)"/>
 			<column name="OCSP_URIS" type="VARCHAR(100)"/>
-			<column name="MAX_VALIDITY" type="INT">
+			<column name="MAX_VALIDITY" type="SMALLINT">
 				<constraints nullable="false"/>
 			</column>
 			<column name="CRLSIGNER_NAME" type="VARCHAR(45)"/>
-			<column defaultValueNumeric="2" name="DUPLICATE_KEY_MODE" type="INT">
+			<column defaultValueNumeric="2" name="DUPLICATE_KEY_MODE" type="SMALLINT">
 				<constraints nullable="false"/>
 			</column>
-			<column defaultValueNumeric="2" name="DUPLICATE_SUBJECT_MODE" type="INT">
+			<column defaultValueNumeric="2" name="DUPLICATE_SUBJECT_MODE" type="SMALLINT">
 				<constraints nullable="false"/>
 			</column>
 			<column name="PERMISSIONS" type="VARCHAR(200)">
 				<constraints nullable="false"/>
 			</column>
-			<column defaultValueNumeric="30" name="NUM_CRLS" type="INT">
+			<column defaultValueNumeric="30" name="NUM_CRLS" type="SMALLINT">
 				<constraints nullable="false"/>
 			</column>
-			<column defaultValueNumeric="365" name="EXPIRATION_PERIOD" type="INT" />
-			<column defaultValueNumeric="0" name="REVOKED" type="INT">
+			<column defaultValueNumeric="365" name="EXPIRATION_PERIOD" type="SMALLINT" />
+			<column defaultValueNumeric="0" name="REVOKED" type="SMALLINT">
 				<constraints nullable="false"/>
 			</column>
-			<column name="REV_REASON" type="INT"/>
-			<column name="REV_TIME" remarks="seconds since January 1, 1970, 00:00:00 GMT" type="INT"/>
-			<column name="REV_INVALIDITY_TIME" remarks="seconds since January 1, 1970, 00:00:00 GMT" type="INT"/>
+			<column name="REV_REASON" type="SMALLINT"/>
+			<column name="REV_TIME" remarks="seconds since January 1, 1970, 00:00:00 GMT" type="BIGINT"/>
+			<column name="REV_INVALIDITY_TIME" remarks="seconds since January 1, 1970, 00:00:00 GMT" type="BIGINT"/>
 			<column name="SIGNER_TYPE" type="VARCHAR(100)">
 				<constraints nullable="false"/>
 			</column>
-			<column name="SIGNER_CONF" type="VARCHAR(8000)">
+			<column name="SIGNER_CONF" type="${VARCHAR8000}">
 				<constraints nullable="false"/>
 			</column>
 			<column name="CERT" type="VARCHAR(3000)">
@@ -167,7 +171,7 @@
 		<!-- table CAALIAS -->
 		<createTable tableName="CAALIAS">
 			<column name="NAME" type="VARCHAR(45)">
-				<constraints primaryKey="true" unique="true" nullable="false"/>
+				<constraints primaryKey="true" nullable="false"/>
 			</column>
 			<column name="CA_NAME" type="VARCHAR(45)">
 				<constraints nullable="false"/>
@@ -182,7 +186,7 @@
 			<column name="REQUESTOR_NAME" type="VARCHAR(45)">
 				<constraints primaryKey="true" nullable="false"/>
 			</column>
-			<column name="RA" type="INT">
+			<column name="RA" type="SMALLINT">
 				<constraints nullable="false"/>
 			</column>
 			<column name="PERMISSIONS" type="VARCHAR(200)"/>
@@ -214,8 +218,8 @@
 	<changeSet author="xipki" id="2">
 		<!-- table CAINFO -->
 		<createTable tableName="CAINFO">
-			<column name="ID" type="INT(10)">
-				<constraints primaryKey="true" unique="true" nullable="false"/>
+			<column name="ID" type="INT">
+				<constraints primaryKey="true" nullable="false"/>
 			</column>
 			<column name="SUBJECT" type="VARCHAR(300)">
 				<constraints nullable="false"/>
@@ -230,8 +234,8 @@
 
 		<!-- table REQUESTORINFO -->
 		<createTable tableName="REQUESTORINFO">
-			<column name="ID" type="INT(10)">
-				<constraints primaryKey="true" unique="true" nullable="false"/>
+			<column name="ID" type="INT">
+				<constraints primaryKey="true" nullable="false"/>
 			</column>
 			<column name="NAME" type="VARCHAR(45)">
 				<constraints nullable="false"/>
@@ -240,32 +244,32 @@
 
 		<!-- table PUBLISHERINFO -->
 		<createTable tableName="PUBLISHERINFO">
-			<column name="ID" type="INT(10)">
-				<constraints primaryKey="true" unique="true" nullable="false"/>
+			<column name="ID" type="INT">
+				<constraints primaryKey="true" nullable="false"/>
 			</column>
 			<column name="NAME" type="VARCHAR(45)">
 				<constraints nullable="false"/>
 			</column>
 		</createTable>
 
-		<!-- table USER -->
-		<createTable tableName="USER">
-			<column name="ID" type="INT(10)">
-				<constraints primaryKey="true" unique="true" nullable="false"/>
+		<!-- table USERNAME -->
+		<createTable tableName="USERNAME">
+			<column name="ID" type="INT">
+				<constraints primaryKey="true" nullable="false"/>
 			</column>
 			<column name="NAME" type="VARCHAR(200)">
 				<constraints nullable="false"/>
 			</column>
 		</createTable>
 		
-		<createIndex tableName="USER" unique="false" indexName="IDX_USER_NAME">
+		<createIndex tableName="USERNAME" unique="false" indexName="IDX_USER_NAME">
 			<column name="NAME"/>
 		</createIndex>	
 
 		<!-- table CERTPROFILEINFO -->
 		<createTable tableName="CERTPROFILEINFO">
-			<column name="ID" type="INT(10)">
-				<constraints primaryKey="true" unique="true" nullable="false"/>
+			<column name="ID" type="INT">
+				<constraints primaryKey="true" nullable="false"/>
 			</column>
 			<column name="NAME" type="VARCHAR(45)">
 				<constraints nullable="false"/>
@@ -274,19 +278,19 @@
 
 		<!-- table CRL -->
 		<createTable tableName="CRL">
-			<column autoIncrement="true" name="ID" type="INT(10)">
-				<constraints primaryKey="true" unique="true"/>
+			<column name="ID" type="INT">
+				<constraints primaryKey="true"/>
 			</column>
-			<column name="CAINFO_ID" type="INT(10)">
+			<column name="CAINFO_ID" type="INT">
 				<constraints nullable="false"/>
 			</column>
-			<column name="CRL_NUMBER" type="INT(10)">
+			<column name="CRL_NUMBER" type="INT">
 				<constraints nullable="false"/>
 			</column>
-			<column name="THISUPDATE" type="INT">
+			<column name="THISUPDATE" type="BIGINT">
 				<constraints nullable="false"/>
 			</column>
-			<column name="NEXTUPDATE" type="INT"/>
+			<column name="NEXTUPDATE" type="BIGINT"/>
 			<column name="CRL" type="LONGBLOB">
 				<constraints nullable="false"/>
 			</column>
@@ -296,38 +300,38 @@
 
 		<!-- table CERT -->
 		<createTable tableName="CERT">
-			<column name="ID" type="INT(10)">
-				<constraints primaryKey="true" unique="true" nullable="false"/>
+			<column name="ID" type="INT">
+				<constraints primaryKey="true" nullable="false"/>
 			</column>
-			<column name="CAINFO_ID" type="INT(10)">
+			<column name="CAINFO_ID" type="INT">
 				<constraints nullable="false"/>
 			</column>
 			<column name="SERIAL" type="BIGINT">
 				<constraints nullable="false"/>
 			</column>
-			<column name="CERTPROFILEINFO_ID" type="INT(10)">
+			<column name="CERTPROFILEINFO_ID" type="INT">
 				<constraints nullable="false"/>
 			</column>
-			<column name="REQUESTORINFO_ID" type="INT(10)"/>
+			<column name="REQUESTORINFO_ID" type="INT"/>
 			<column name="SUBJECT" type="VARCHAR(300)">
 				<constraints nullable="false"/>
 			</column>
-			<column name="LAST_UPDATE" remarks="seconds since January 1, 1970, 00:00:00 GMT" type="INT">
+			<column name="LAST_UPDATE" remarks="seconds since January 1, 1970, 00:00:00 GMT" type="BIGINT">
 				<constraints nullable="false"/>
 			</column>
-			<column name="NOTBEFORE" remarks="seconds since January 1, 1970, 00:00:00 GMT" type="INT">
+			<column name="NOTBEFORE" remarks="seconds since January 1, 1970, 00:00:00 GMT" type="BIGINT">
 				<constraints nullable="false"/>
 			</column>
-			<column name="NOTAFTER" remarks="seconds since January 1, 1970, 00:00:00 GMT" type="INT">
+			<column name="NOTAFTER" remarks="seconds since January 1, 1970, 00:00:00 GMT" type="BIGINT">
 				<constraints nullable="false"/>
 			</column>
-			<column name="REVOKED" type="INT">
+			<column name="REVOKED" type="SMALLINT">
 				<constraints nullable="false"/>
 			</column>
-			<column name="REV_REASON" type="INT"/>
-			<column name="REV_TIME" remarks="seconds since January 1, 1970, 00:00:00 GMT" type="INT"/>
-			<column name="REV_INVALIDITY_TIME" remarks="seconds since January 1, 1970, 00:00:00 GMT" type="INT"/>
-			<column name="USER_ID" type="INT(10)"/>
+			<column name="REV_REASON" type="SMALLINT"/>
+			<column name="REV_TIME" remarks="seconds since January 1, 1970, 00:00:00 GMT" type="BIGINT"/>
+			<column name="REV_INVALIDITY_TIME" remarks="seconds since January 1, 1970, 00:00:00 GMT" type="BIGINT"/>
+			<column name="USER_ID" type="INT"/>
 			<column name="SHA1_FP_PK" type="CHAR(40)">
 				<constraints nullable="false"/>
 			</column>
@@ -348,7 +352,7 @@
 
 		<!-- table RAWCERT -->
 		<createTable tableName="RAWCERT">
-			<column name="CERT_ID" type="INT(10)">
+			<column name="CERT_ID" type="INT">
 				<constraints primaryKey="true" nullable="false"/>
 			</column>
 			<column name="SHA1_FP" type="VARCHAR(40)">
@@ -361,13 +365,13 @@
 		
 		<!-- table PublishQueue -->
 		<createTable tableName="PUBLISHQUEUE">
-			<column name="CERT_ID" type="INT(10)">
+			<column name="CERT_ID" type="INT">
 				<constraints nullable="false"/>
 			</column>
-			<column name="PUBLISHER_ID" type="INT(10)">
+			<column name="PUBLISHER_ID" type="INT">
 				<constraints nullable="false"/>
 			</column>
-			<column name="CAINFO_ID" type="INT(10)">
+			<column name="CAINFO_ID" type="INT">
 				<constraints nullable="false"/>
 			</column>
 		</createTable>
@@ -422,7 +426,7 @@
 		<addForeignKeyConstraint deferrable="false" initiallyDeferred="false"
 			onDelete="CASCADE" onUpdate="NO ACTION"
 			baseColumnNames="CERTPROFILE_NAME" baseTableName="CA_HAS_CERTPROFILE"
-			constraintName="FK_CA_HAS_CERTPROFILE_CERTPROFILE1"
+			constraintName="FK_CA_HAS_PROFILE_PROFILE1"
 			referencedColumnNames="NAME" referencedTableName="CERTPROFILE"/>
 			
 		<addForeignKeyConstraint deferrable="false" initiallyDeferred="false"
@@ -455,7 +459,7 @@
 			onDelete="CASCADE" onUpdate="NO ACTION"
 			baseColumnNames="USER_ID" baseTableName="CERT"
 			constraintName="FK_CERT_USER1"
-			referencedColumnNames="ID" referencedTableName="USER"/>
+			referencedColumnNames="ID" referencedTableName="USERNAME"/>
 			
 		<addForeignKeyConstraint deferrable="false" initiallyDeferred="false"
 			onDelete="CASCADE" onUpdate="NO ACTION"

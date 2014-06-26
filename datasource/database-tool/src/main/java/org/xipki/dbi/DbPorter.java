@@ -19,8 +19,10 @@ package org.xipki.dbi;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.sql.Types;
 
 import org.xipki.database.api.DataSource;
 import org.xipki.security.common.ParamChecker;
@@ -40,35 +42,117 @@ public class DbPorter
 
     public static final int VERSION = 1;
 
-    protected final DataSource dataSource;
+    private final DataSource dataSource;
+    private Connection connection;
+
     protected final String baseDir;
 
     public DbPorter(DataSource dataSource, String baseDir)
+    throws SQLException
     {
         super();
         ParamChecker.assertNotNull("dataSource", dataSource);
         ParamChecker.assertNotEmpty("baseDir", baseDir);
 
         this.dataSource = dataSource;
+        this.connection = this.dataSource.getConnection();
         this.baseDir = baseDir;
+    }
+
+    protected static void setLong(PreparedStatement ps, int index, Long i)
+    throws SQLException
+    {
+        if(i != null)
+        {
+            ps.setLong(index, i.longValue());
+        }
+        else
+        {
+            ps.setNull(index, Types.BIGINT);
+        }
+    }
+
+    protected static void setInt(PreparedStatement ps, int index, Integer i)
+    throws SQLException
+    {
+        if(i != null)
+        {
+            ps.setInt(index, i.intValue());
+        }
+        else
+        {
+            ps.setNull(index, Types.INTEGER);
+        }
+    }
+
+    protected static void setBoolean(PreparedStatement ps, int index, boolean b)
+    throws SQLException
+    {
+        ps.setInt(index, b ? 1 : 0);
     }
 
     protected Statement createStatement()
     throws SQLException
     {
-        Connection dsConnection = dataSource.getConnection();
-        return dataSource.createStatement(dsConnection);
+        return connection.createStatement();
     }
 
     protected PreparedStatement prepareStatement(String sql)
     throws SQLException
     {
-        Connection dsConnection = dataSource.getConnection();
-        return dataSource.prepareStatement(dsConnection, sql);
+        return connection.prepareStatement(sql);
     }
 
-    protected void closeStatement(Statement ps)
+    protected void releaseResources(Statement ps, ResultSet rs)
     {
-        dataSource.releaseResources(ps, null);
+        if(ps != null)
+        {
+            try
+            {
+                ps.close();
+            }catch(SQLException e)
+            {
+            }
+        }
+
+        if(rs != null)
+        {
+            try
+            {
+                rs.close();
+            }catch(SQLException e)
+            {
+            }
+        }
+    }
+
+    public void shutdown()
+    {
+        dataSource.returnConnection(connection);
+        connection = null;
+    }
+
+    public int getMin(String table, String column)
+    throws SQLException
+    {
+        return dataSource.getMin(connection, table, column);
+    }
+
+    public int getMax(String table, String column)
+    throws SQLException
+    {
+        return dataSource.getMax(connection, table, column);
+    }
+
+    public boolean tableHasColumn(String table, String column)
+    throws SQLException
+    {
+        return dataSource.tableHasColumn(connection, table, column);
+    }
+
+    public boolean tableExists(String table)
+    throws SQLException
+    {
+        return dataSource.tableExists(connection, table);
     }
 }

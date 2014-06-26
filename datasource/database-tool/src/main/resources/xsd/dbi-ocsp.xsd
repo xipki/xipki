@@ -16,7 +16,7 @@
 	<xs:element name="CertStore" type="CertStoreType"/>
 	
 	<xs:complexType name="CertStoreType">
-		<xs:all>
+		<xs:sequence>
 			<xs:element name="issuers">
 				<xs:complexType>
 					<xs:sequence>
@@ -31,20 +31,20 @@
 					</xs:sequence>
 				</xs:complexType>
 			</xs:element>
-		</xs:all>
+		</xs:sequence>
 		<xs:attribute name="version" type="xs:int" use="required"/>
 	</xs:complexType>
 
 	<xs:element name="issuer" type="issuerType"/>
 	<xs:complexType name="issuerType">
-		<xs:all>
+		<xs:sequence>
 			<xs:element name="id" type="xs:int" />
 			<xs:element name="cert" type="xs:string" />
 			<xs:element name="revoked" type="xs:boolean"/>
-			<xs:element name="rev_reason" type="xs:string"/>
-			<xs:element name="rev_time" type="xs:string" minOccurs="0"/>
-			<xs:element name="rev_invalidity_time" type="xs:string" minOccurs="0"/>			
-		</xs:all>
+			<xs:element name="rev_reason" type="xs:int" minOccurs="0"/>
+			<xs:element name="rev_time" type="xs:long" minOccurs="0"/>
+			<xs:element name="rev_invalidity_time" type="xs:long" minOccurs="0"/>			
+		</xs:sequence>
 	</xs:complexType>
 
 	<xs:element name="certs" type="certsType"/>
@@ -56,16 +56,16 @@
 	
 	<xs:element name="cert" type="certType"/>
 	<xs:complexType name="certType">
-		<xs:all>
+		<xs:sequence>
 			<xs:element name="id" type="xs:int" />
 			<xs:element name="issuer_id" type="xs:int"/>
-			<xs:element name="last_update" type="xs:string"/>
+			<xs:element name="last_update" type="xs:long"/>
 			<xs:element name="revoked" type="xs:boolean"/>
-			<xs:element name="rev_reason" type="xs:string" minOccurs="0"/>
-			<xs:element name="rev_time" type="xs:string" minOccurs="0"/>
-			<xs:element name="rev_invalidity_time" type="xs:string" minOccurs="0"/>
-			<xs:element name="profile" type="xs:string"/>		
+			<xs:element name="rev_reason" type="xs:int" minOccurs="0"/>
+			<xs:element name="rev_time" type="xs:long" minOccurs="0"/>
+			<xs:element name="rev_invalidity_time" type="xs:long" minOccurs="0"/>
+			<xs:element name="profile" type="xs:string"/>
 			<xs:element name="certFile" type="xs:string"/>
-		</xs:all>		
+		</xs:sequence>		
 	</xs:complexType>
 </xs:schema>
