@@ -54,7 +54,13 @@ public class OcspDbImporter
     {
         // CertStore
         OcspCertStoreDbImporter certStoreImporter = new OcspCertStoreDbImporter(dataSource, unmarshaller, srcFolder);
-        certStoreImporter.importToDB();
+        try
+        {
+            certStoreImporter.importToDB();
+        } finally
+        {
+            certStoreImporter.shutdown();
+        }
     }
 
 }

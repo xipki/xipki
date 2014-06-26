@@ -129,10 +129,10 @@ class CaConfigurationDbImporter extends DbPorter
             {
                 int idx = 1;
                 ps.setString(idx++, "default");
-                ps.setBoolean(idx++, control.isRequireConfirmCert());
-                ps.setBoolean(idx++, control.isSendCaCert());
-                ps.setBoolean(idx++, control.isSendResponderCert());
-                ps.setBoolean(idx++, control.isRequireMessageTime());
+                setBoolean(ps, idx++, control.isRequireConfirmCert());
+                setBoolean(ps, idx++, control.isSendCaCert());
+                setBoolean(ps, idx++, control.isSendResponderCert());
+                setBoolean(ps, idx++, control.isRequireMessageTime());
                 ps.setInt(idx++, control.getMessageTimeBias());
                 ps.setInt(idx++, control.getConfirmWaitTime());
 
@@ -144,7 +144,7 @@ class CaConfigurationDbImporter extends DbPorter
             }
         }finally
         {
-            closeStatement(ps);
+            releaseResources(ps, null);
         }
         System.out.println(" Imported table CMPCONTROL");
     }
@@ -180,7 +180,7 @@ class CaConfigurationDbImporter extends DbPorter
             }
         }finally
         {
-            closeStatement(ps);
+            releaseResources(ps, null);
         }
         System.out.println(" Imported table RESPONDER");
     }
@@ -193,7 +193,7 @@ class CaConfigurationDbImporter extends DbPorter
         PreparedStatement ps = null;
         try
         {
-            ps = prepareStatement("INSERT INTO ENVIRONMENT (NAME, VALUE) VALUES (?, ?)");
+            ps = prepareStatement("INSERT INTO ENVIRONMENT (NAME, VALUE2) VALUES (?, ?)");
             for(EnvironmentType environment : environments.getEnvironment())
             {
                 try
@@ -210,7 +210,7 @@ class CaConfigurationDbImporter extends DbPorter
             }
         }finally
         {
-            closeStatement(ps);
+            releaseResources(ps, null);
         }
         System.out.println(" Imported table ENVIRONMENT");
     }
@@ -239,8 +239,8 @@ class CaConfigurationDbImporter extends DbPorter
                     ps.setString(idx++, crlsigner.getSignerCert());
                     ps.setInt(idx++, crlsigner.getPeriod());
                     ps.setInt(idx++, crlsigner.getOverlap());
-                    ps.setBoolean(idx++, crlsigner.isIncludeCertsInCrl());
-                    ps.setBoolean(idx++, crlsigner.isIncludeExpiredCerts());
+                    setBoolean(ps, idx++, crlsigner.isIncludeCertsInCrl());
+                    setBoolean(ps, idx++, crlsigner.isIncludeExpiredCerts());
                     ps.executeUpdate();
                 }catch(Exception e)
                 {
@@ -250,7 +250,7 @@ class CaConfigurationDbImporter extends DbPorter
             }
         }finally
         {
-            closeStatement(ps);
+            releaseResources(ps, null);
         }
         System.out.println(" Imported table CRLSIGNER");
     }
@@ -282,7 +282,7 @@ class CaConfigurationDbImporter extends DbPorter
             }
         }finally
         {
-            closeStatement(ps);
+            releaseResources(ps, null);
         }
         System.out.println(" Imported table REQUESTOR");
     }
@@ -314,7 +314,7 @@ class CaConfigurationDbImporter extends DbPorter
             }
         }finally
         {
-            closeStatement(ps);
+            releaseResources(ps, null);
         }
         System.out.println(" Imported table PUBLISHER");
     }
@@ -346,7 +346,7 @@ class CaConfigurationDbImporter extends DbPorter
             }
         }finally
         {
-            closeStatement(ps);
+            releaseResources(ps, null);
         }
         System.out.println(" Imported table CERTPROFILE");
     }
@@ -376,7 +376,7 @@ class CaConfigurationDbImporter extends DbPorter
                     int idx = 1;
                     ps.setString(idx++, ca.getName());
                     ps.setString(idx++, IoCertUtil.canonicalizeName(c.getSubjectX500Principal()));
-                    ps.setString(idx++, ca.getNextSerial());
+                    ps.setLong(idx++, ca.getNextSerial());
                     ps.setString(idx++, ca.getStatus());
                     ps.setString(idx++, ca.getCrlUris());
                     ps.setString(idx++, ca.getOcspUris());
@@ -391,10 +391,10 @@ class CaConfigurationDbImporter extends DbPorter
                     Integer numCrls = ca.getNumCrls();
                     ps.setInt(idx++, numCrls == null ? 30 : numCrls.intValue());
                     ps.setInt(idx++, ca.getExpirationPeriod());
-                    ps.setBoolean(idx++, ca.isRevoked());
-                    ps.setString(idx++, ca.getRevReason());
-                    ps.setString(idx++, ca.getRevTime());
-                    ps.setString(idx++, ca.getRevInvalidityTime());
+                    setBoolean(ps, idx++, ca.isRevoked());
+                    setInt(ps, idx++, ca.getRevReason());
+                    setLong(ps, idx++, ca.getRevTime());
+                    setLong(ps, idx++, ca.getRevInvalidityTime());
 
                     ps.executeUpdate();
                 }catch(Exception e)
@@ -405,7 +405,7 @@ class CaConfigurationDbImporter extends DbPorter
             }
         }finally
         {
-            closeStatement(ps);
+            releaseResources(ps, null);
         }
 
         System.out.println(" Imported table CA");
@@ -436,7 +436,7 @@ class CaConfigurationDbImporter extends DbPorter
             }
         }finally
         {
-            closeStatement(ps);
+            releaseResources(ps, null);
         }
         System.out.println(" Imported table CAALIAS");
     }
@@ -459,7 +459,7 @@ class CaConfigurationDbImporter extends DbPorter
                     int idx = 1;
                     ps.setString(idx++, entry.getCaName());
                     ps.setString(idx++, entry.getRequestorName());
-                    ps.setBoolean(idx++, entry.isRa());
+                    setBoolean(ps, idx++, entry.isRa());
                     ps.setString(idx++, entry.getPermissions());
                     ps.setString(idx++, entry.getProfiles());
 
@@ -473,7 +473,7 @@ class CaConfigurationDbImporter extends DbPorter
             }
         }finally
         {
-            closeStatement(ps);
+            releaseResources(ps, null);
         }
         System.out.println(" Imported table CA_HAS_REQUESTOR");
     }
@@ -504,7 +504,7 @@ class CaConfigurationDbImporter extends DbPorter
             }
         }finally
         {
-            closeStatement(ps);
+            releaseResources(ps, null);
         }
         System.out.println(" Imported table CA_HAS_PUBLISHER");
     }
@@ -535,7 +535,7 @@ class CaConfigurationDbImporter extends DbPorter
             }
         }finally
         {
-            closeStatement(ps);
+            releaseResources(ps, null);
         }
         System.out.println(" Imported table CA_HAS_CERTPROFILE");
     }
