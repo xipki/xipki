@@ -3,16 +3,16 @@
 	<changeSet author="xipki" id="1">
 		<!-- table ISSUER -->
 		<createTable tableName="ISSUER">
-			<column name="ID" type="INT(10)">
-				<constraints primaryKey="true" unique="true" nullable="false"/>
+			<column name="ID" type="INT">
+				<constraints primaryKey="true" nullable="false"/>
 			</column>
 			<column name="SUBJECT" type="VARCHAR(300)">
 				<constraints nullable="false"/>
 			</column>
-			<column name="NOTBEFORE" type="INT" remarks="seconds since January 1, 1970, 00:00:00 GMT">
+			<column name="NOTBEFORE" type="BIGINT" remarks="seconds since January 1, 1970, 00:00:00 GMT">
 				<constraints nullable="false"/>
 			</column>
-			<column name="NOTAFTER" type="INT" remarks="seconds since January 1, 1970, 00:00:00 GMT">
+			<column name="NOTAFTER" type="BIGINT" remarks="seconds since January 1, 1970, 00:00:00 GMT">
 				<constraints nullable="false"/>
 			</column>
 			<column name="SHA1_FP_NAME" type="CHAR(40)">
@@ -48,20 +48,20 @@
 			<column name="SHA1_FP_CERT" type="CHAR(40)">
 				<constraints nullable="false"/>
 			</column>
-			<column defaultValueNumeric="0" name="REVOKED" type="INT"/>
-			<column name="REV_REASON" type="INT"/>
-			<column name="REV_TIME" remarks="seconds since January 1, 1970, 00:00:00 GMT" type="INT"/>
-			<column name="REV_INVALIDITY_TIME" remarks="seconds since January 1, 1970, 00:00:00 GMT" type="INT"/>			
+			<column defaultValueNumeric="0" name="REVOKED" type="SMALLINT"/>
+			<column name="REV_REASON" type="SMALLINT"/>
+			<column name="REV_TIME" remarks="seconds since January 1, 1970, 00:00:00 GMT" type="BIGINT"/>
+			<column name="REV_INVALIDITY_TIME" remarks="seconds since January 1, 1970, 00:00:00 GMT" type="BIGINT"/>			
 			<column name="CERT" type="VARCHAR(3000)">
 				<constraints nullable="false"/>
 			</column>
 		</createTable>
 		<!-- table CERT -->
 		<createTable tableName="CERT">
-			<column name="ID" type="INT(10)">
-				<constraints primaryKey="true" unique="true" nullable="false"/>
+			<column name="ID" type="INT">
+				<constraints primaryKey="true" nullable="false"/>
 			</column>
-			<column name="ISSUER_ID" type="INT(10)">
+			<column name="ISSUER_ID" type="INT">
 				<constraints nullable="false"/>
 			</column>
 			<column name="SERIAL" type="BIGINT">
@@ -70,21 +70,21 @@
 			<column name="SUBJECT" type="VARCHAR(300)">
 				<constraints nullable="false"/>
 			</column>
-			<column name="LAST_UPDATE" type="INT" remarks="seconds since January 1, 1970, 00:00:00 GMT">
+			<column name="LAST_UPDATE" type="BIGINT" remarks="seconds since January 1, 1970, 00:00:00 GMT">
 				<constraints nullable="false"/>
 			</column>
-			<column name="NOTBEFORE" type="INT" remarks="seconds since January 1, 1970, 00:00:00 GMT">
+			<column name="NOTBEFORE" type="BIGINT" remarks="seconds since January 1, 1970, 00:00:00 GMT">
 				<constraints nullable="false"/>
 			</column>
-			<column name="NOTAFTER" type="INT" remarks="seconds since January 1, 1970, 00:00:00 GMT">
+			<column name="NOTAFTER" type="BIGINT" remarks="seconds since January 1, 1970, 00:00:00 GMT">
 				<constraints nullable="false"/>
 			</column>
-			<column name="REVOKED" type="INT">
+			<column name="REVOKED" type="SMALLINT">
 				<constraints nullable="false"/>
 			</column>
-			<column name="REV_REASON" type="INT"/>
-			<column name="REV_TIME" type="INT" remarks="seconds since January 1, 1970, 00:00:00 GMT"/>
-			<column name="REV_INVALIDITY_TIME" type="INT" remarks="seconds since January 1, 1970, 00:00:00 GMT"/>
+			<column name="REV_REASON" type="SMALLINT"/>
+			<column name="REV_TIME" type="BIGINT" remarks="seconds since January 1, 1970, 00:00:00 GMT"/>
+			<column name="REV_INVALIDITY_TIME" type="BIGINT" remarks="seconds since January 1, 1970, 00:00:00 GMT"/>
 			<column name="PROFILE" type="VARCHAR(45)"/>
 		</createTable>
 		
@@ -93,7 +93,7 @@
 		
 		<!-- table CERTHASH -->
 		<createTable tableName="CERTHASH">
-			<column name="CERT_ID" type="INT(10)">
+			<column name="CERT_ID" type="INT">
 				<constraints primaryKey="true" nullable="false"/>
 			</column>
 			<column name="SHA1_FP" type="CHAR(40)">
@@ -114,7 +114,7 @@
 		</createTable>
 		<!-- table RAWCERT -->
 		<createTable tableName="RAWCERT">
-			<column name="CERT_ID" type="INT(10)">
+			<column name="CERT_ID" type="INT">
 				<constraints primaryKey="true" nullable="false"/>
 			</column>
 			<column name="CERT" type="VARCHAR(3000)" remarks="Base64 encoded CERTificate">

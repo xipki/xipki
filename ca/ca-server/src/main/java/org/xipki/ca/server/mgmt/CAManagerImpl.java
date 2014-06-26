@@ -269,7 +269,15 @@ public class CAManagerImpl implements CAManager
             throw new CAMgmtException("no datasource configured with name 'ca'");
         }
 
-        boolean successfull = lockCA();
+        boolean successfull;
+        try
+        {
+            successfull = lockCA();
+        }catch(SQLException e)
+        {
+            throw new CAMgmtException("SQLException while locking CA", e);
+        }
+
         if(successfull == false)
         {
             String msg = "Could not lock the CA database. In general this indicates that another CA software is accessing the "
@@ -310,75 +318,68 @@ public class CAManagerImpl implements CAManager
     }
 
     private boolean lockCA()
+    throws SQLException, CAMgmtException
     {
         if(caLockedByMe)
         {
             return true;
         }
 
+        Statement stmt = null;
+        ResultSet rs = null;
+
         try
         {
-            Statement stmt = null;
-            ResultSet rs = null;
+            stmt = createStatement();
+            String sql = "SELECT LOCKED, LOCKGRANTED, LOCKEDBY FROM CALOCK WHERE NAME='default'";
+            rs = stmt.executeQuery(sql);
 
-            try
+            if(rs.next())
             {
-                stmt = createStatement();
-                String sql = "SELECT LOCKED, LOCKGRANTED, LOCKEDBY FROM CALOCK WHERE NAME='default'";
-                rs = stmt.executeQuery(sql);
-
-                if(rs.next())
+                boolean alreadyLocked = rs.getBoolean("LOCKED");
+                if(alreadyLocked)
                 {
-                    boolean alreadyLocked = rs.getBoolean("LOCKED");
-                    if(alreadyLocked)
+                    long lockGranted = rs.getLong("LOCKGRANTED");
+                    String lockedBy = rs.getString("LOCKEDBY");
+                    if(this.lockInstanceId.equals(lockedBy))
                     {
-                        long lockGranted = rs.getLong("LOCKGRANTED");
-                        String lockedBy = rs.getString("LOCKEDBY");
-                        if(this.lockInstanceId.equals(lockedBy))
-                        {
-                            LOG.info("CA has been locked by me since {}, relock it",
-                                    new Date(lockGranted * 1000));
-                        }
-                        else
-                        {
-                            LOG.error("Cannot lock CA, it has been locked by {} since {}", lockedBy,
-                                    new Date(lockGranted * 1000));
-                            return false;
-                        }
+                        LOG.info("CA has been locked by me since {}, relock it",
+                                new Date(lockGranted * 1000));
+                    }
+                    else
+                    {
+                        LOG.error("Cannot lock CA, it has been locked by {} since {}", lockedBy,
+                                new Date(lockGranted * 1000));
+                        return false;
                     }
                 }
-
-                stmt.execute("DELETE FROM CALOCK");
-            }finally
-            {
-                dataSource.releaseResources(stmt, rs);
             }
 
-            String lockSql = "INSERT INTO CALOCK (NAME, LOCKED, LOCKGRANTED, LOCKGRANTED2, LOCKEDBY)"
-                    + " VALUES ('default', ?, ?, ?, ?)";
-
-            PreparedStatement ps = null;
-            try
-            {
-                long nowMillis = System.currentTimeMillis();
-                ps = prepareStatement(lockSql);
-                int idx = 1;
-                ps.setBoolean(idx++, true);
-                ps.setLong(idx++, nowMillis / 1000);
-                ps.setTimestamp(idx++, new Timestamp(nowMillis));
-                ps.setString(idx++, lockInstanceId);
-                int numColumns = ps.executeUpdate();
-                caLockedByMe = numColumns > 0;
-                return caLockedByMe;
-            }finally
-            {
-                dataSource.releaseResources(ps, null);
-            }
-        }catch(Exception e)
+            stmt.execute("DELETE FROM CALOCK");
+        }finally
         {
-            LOG.error("Error while locking CA. {}: {}", e.getClass().getName(), e.getMessage());
-            LOG.debug("Error while locking CA", e);
-            return false;
+            dataSource.releaseResources(stmt, rs);
+        }
+
+        String lockSql = "INSERT INTO CALOCK (NAME, LOCKED, LOCKGRANTED, LOCKGRANTED2, LOCKEDBY)"
+                + " VALUES ('default', ?, ?, ?, ?)";
+
+        PreparedStatement ps = null;
+        try
+        {
+            long nowMillis = System.currentTimeMillis();
+            ps = prepareStatement(lockSql);
+            int idx = 1;
+            ps.setInt(idx++, 1);
+            ps.setLong(idx++, nowMillis / 1000);
+            ps.setTimestamp(idx++, new Timestamp(nowMillis));
+            ps.setString(idx++, lockInstanceId);
+            int numColumns = ps.executeUpdate();
+            caLockedByMe = numColumns > 0;
+            return caLockedByMe;
+        }finally
+        {
+            dataSource.releaseResources(ps, null);
         }
     }
 
@@ -939,13 +940,13 @@ public class CAManagerImpl implements CAManager
         try
         {
             stmt = createStatement();
-            String sql = "SELECT NAME, VALUE FROM ENVIRONMENT";
+            String sql = "SELECT NAME, VALUE2 FROM ENVIRONMENT";
             rs = stmt.executeQuery(sql);
 
             while(rs.next())
             {
                 String name = rs.getString("NAME");
-                String value = rs.getString("VALUE");
+                String value = rs.getString("VALUE2");
                 envParameterResolver.addEnvParam(name, value);
             }
         }catch(SQLException e)
@@ -2005,7 +2006,7 @@ public class CAManagerImpl implements CAManager
             int idx = 1;
             ps.setString(idx++, caName);
             ps.setString(idx++, requestorName);
-            ps.setBoolean(idx++, requestor.isRa());
+            setBoolean(ps, idx++, requestor.isRa());
             ps.setString(idx++, Permission.toString(requestor.getPermissions()));
 
             Set<String> profiles = requestor.getProfiles();
@@ -2300,8 +2301,8 @@ public class CAManagerImpl implements CAManager
                     Base64.toBase64String(dbEntry.getCertificate().getEncoded()));
             ps.setInt(idx++, dbEntry.getPeriod());
             ps.setInt(idx++, dbEntry.getOverlap());
-            ps.setBoolean(idx++, dbEntry.includeCertsInCRL());
-            ps.setBoolean(idx++, dbEntry.includeExpiredCerts());
+            setBoolean(ps, idx++, dbEntry.includeCertsInCRL());
+            setBoolean(ps, idx++, dbEntry.includeExpiredCerts());
 
             ps.executeUpdate();
         }catch(SQLException e)
@@ -2448,12 +2449,12 @@ public class CAManagerImpl implements CAManager
 
             if(iIncludeCerts != null)
             {
-                ps.setBoolean(iIncludeCerts, includeCerts);
+                setBoolean(ps, iIncludeCerts, includeCerts);
             }
 
             if(iIncludeExpiredCerts != null)
             {
-                ps.setBoolean(iIncludeExpiredCerts, includeExpiredCerts);
+                setBoolean(ps, iIncludeExpiredCerts, includeExpiredCerts);
             }
 
             ps.setString(iName, name);
@@ -2680,10 +2681,10 @@ public class CAManagerImpl implements CAManager
 
             int idx = 1;
             ps.setString(idx++, CmpControl.name);
-            ps.setBoolean(idx++, dbEntry.isRequireConfirmCert());
-            ps.setBoolean(idx++, dbEntry.isSendCaCert());
-            ps.setBoolean(idx++, dbEntry.isSendResponderCert());
-            ps.setBoolean(idx++, dbEntry.isMessageTimeRequired());
+            setBoolean(ps, idx++, dbEntry.isRequireConfirmCert());
+            setBoolean(ps, idx++, dbEntry.isSendCaCert());
+            setBoolean(ps, idx++, dbEntry.isSendResponderCert());
+            setBoolean(ps, idx++, dbEntry.isMessageTimeRequired());
             ps.setInt(idx++, dbEntry.getMessageTimeBias());
             ps.setInt(idx++, dbEntry.getConfirmWaitTime());
 
@@ -2785,12 +2786,12 @@ public class CAManagerImpl implements CAManager
             ps = prepareStatement(sb.toString());
             if(iConfirmCert != null)
             {
-                ps.setBoolean(iConfirmCert, requireConfirmCert);
+                setBoolean(ps, iConfirmCert, requireConfirmCert);
             }
 
             if(iRequireMessageTime != null)
             {
-                ps.setBoolean(iRequireMessageTime, requireMessageTime);
+                setBoolean(ps, iRequireMessageTime, requireMessageTime);
             }
 
             if(iMessageTimeBias != null)
@@ -2805,12 +2806,12 @@ public class CAManagerImpl implements CAManager
 
             if(iSendCaCert != null)
             {
-                ps.setBoolean(iSendCaCert, sendCaCert);
+                setBoolean(ps, iSendCaCert, sendCaCert);
             }
 
             if(iSendResponderCert != null)
             {
-                ps.setBoolean(iSendResponderCert, sendResponderCert);
+                setBoolean(ps, iSendResponderCert, sendResponderCert);
             }
 
             ps.setString(i, "default");
@@ -2842,7 +2843,7 @@ public class CAManagerImpl implements CAManager
         PreparedStatement ps = null;
         try
         {
-            ps = prepareStatement("INSERT INTO ENVIRONMENT (NAME, VALUE) VALUES (?, ?)");
+            ps = prepareStatement("INSERT INTO ENVIRONMENT (NAME, VALUE2) VALUES (?, ?)");
             ps.setString(1, name);
             ps.setString(2, value);
             ps.executeUpdate();
@@ -2893,7 +2894,7 @@ public class CAManagerImpl implements CAManager
         PreparedStatement ps = null;
         try
         {
-            ps = prepareStatement("UPDATE ENVIRONMENT SET VALUE=? WHERE NAME=?");
+            ps = prepareStatement("UPDATE ENVIRONMENT SET VALUE2=? WHERE NAME=?");
             ps.setString(1, getRealString(value));
             ps.setString(2, name);
             ps.executeUpdate();
@@ -3264,7 +3265,7 @@ public class CAManagerImpl implements CAManager
                 String sql = "UPDATE CA SET REVOKED=?, REV_REASON=?, REV_TIME=?, REV_INVALIDITY_TIME=? WHERE NAME=?";
                 ps = prepareStatement(sql);
                 int i = 1;
-                ps.setBoolean(i++, true);
+                setBoolean(ps, i++, true);
                 ps.setInt(i++, revocationInfo.getReason().getCode());
                 ps.setLong(i++, revocationInfo.getRevocationTime().getTime() / 1000);
                 ps.setLong(i++, revocationInfo.getInvalidityTime().getTime() / 1000);
@@ -3309,7 +3310,7 @@ public class CAManagerImpl implements CAManager
         {
             ps = prepareStatement(sql);
             int i = 1;
-            ps.setBoolean(i++, false);
+            setBoolean(ps, i++, false);
             ps.setNull(i++, Types.INTEGER);
             ps.setNull(i++, Types.INTEGER);
             ps.setNull(i++, Types.INTEGER);
@@ -3454,6 +3455,12 @@ public class CAManagerImpl implements CAManager
                 inProcess = false;
             }
         }
+    }
+
+    private static void setBoolean(PreparedStatement ps, int index, boolean b)
+    throws SQLException
+    {
+        ps.setInt(index, b ? 1 : 0);
     }
 
 }

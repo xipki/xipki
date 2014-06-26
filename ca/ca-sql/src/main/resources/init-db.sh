@@ -52,7 +52,7 @@ liquibase ()
 
 if [ $# = 3 ]; then
   while true; do
-    read -p "Do you wish to $COMMAND database [yes/no] ?" RESP
+    read -p "Do you wish to $COMMAND database [yes/no] ? " RESP
     if [ "$RESP" = "yes" ]; then
        liquibase
        break

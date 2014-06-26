@@ -63,20 +63,8 @@ class CertStatusStoreQueryExecutor
     throws SQLException, NoSuchAlgorithmException
     {
         this.dataSource = dataSource;
-
-        final String sql = "SELECT MAX(ID) FROM CERT";
-        PreparedStatement ps = borrowPreparedStatement(sql);
-        ResultSet rs = null;
-
-        try
-        {
-            rs = ps.executeQuery();
-            rs.next();
-            cert_id = new AtomicInteger(rs.getInt(1) + 1);
-        } finally
-        {
-            releaseDbResources(ps, rs);
-        }
+        int maxCertId = dataSource.getMax(null, "CERT", "ID");
+        this.cert_id = new AtomicInteger(maxCertId + 1);
 
         this.issuerStore = initIssuerStore();
         this.publishGoodCerts = publishGoodCerts;
@@ -166,7 +154,7 @@ class CertStatusStoreQueryExecutor
             {
                 int idx = 1;
                 ps.setLong(idx++, new Date().getTime()/1000);
-                ps.setBoolean(idx++, revoked);
+                setBoolean(ps, idx++, revoked);
                 if(revoked)
                 {
                     ps.setLong(idx++, revInfo.getRevocationTime().getTime()/1000);
@@ -226,7 +214,7 @@ class CertStatusStoreQueryExecutor
                 ps.setString(idx++, certificate.getSubject());
                 ps.setLong(idx++, cert.getNotBefore().getTime()/1000);
                 ps.setLong(idx++, cert.getNotAfter().getTime()/1000);
-                ps.setBoolean(idx++, revoked);
+                setBoolean(ps, idx++, revoked);
                 ps.setInt(idx++, issuerId);
                 ps.setString(idx++, certProfile);
 
@@ -322,7 +310,7 @@ class CertStatusStoreQueryExecutor
         {
             int idx = 1;
             ps.setLong(idx++, new Date().getTime()/1000);
-            ps.setBoolean(idx++, false);
+            setBoolean(ps, idx++, false);
             ps.setNull(idx++, Types.INTEGER);
             ps.setNull(idx++, Types.INTEGER);
             ps.setNull(idx++, Types.INTEGER);
@@ -380,7 +368,7 @@ class CertStatusStoreQueryExecutor
         try
         {
             int idx = 1;
-            ps.setBoolean(idx++, true);
+            setBoolean(ps, idx++, true);
             ps.setLong(idx++, revocationTime.getTime()/1000);
             ps.setLong(idx++, invalidityTime.getTime()/1000);
             ps.setInt(idx++, revocationInfo.getReason().getCode());
@@ -404,7 +392,7 @@ class CertStatusStoreQueryExecutor
         try
         {
             int idx = 1;
-            ps.setBoolean(idx++, false);
+            setBoolean(ps, idx++, false);
             ps.setNull(idx++, Types.INTEGER);
             ps.setNull(idx++, Types.INTEGER);
             ps.setNull(idx++, Types.INTEGER);
@@ -512,7 +500,7 @@ class CertStatusStoreQueryExecutor
     throws SQLException
     {
         String sql = "count(*) FROM CERT WHERE ISSUER_ID = ? AND SERIAL = ?";
-        sql = createFetchFirstSelectSQL(sql, 1);
+        sql = dataSource.createFetchFirstSelectSQL(sql, 1);
         PreparedStatement ps = borrowPreparedStatement(sql);
         ResultSet rs = null;
 
@@ -533,38 +521,6 @@ class CertStatusStoreQueryExecutor
         }
 
         return false;
-    }
-
-    private String createFetchFirstSelectSQL(String coreSql, int rows)
-    {
-        String prefix = "SELECT";
-        String suffix = "";
-
-        switch(dataSource.getDatabaseType())
-        {
-            case DB2:
-                suffix = "FETCH FIRST " + rows + " ROWS ONLY";
-                break;
-            case INFORMIX:
-                prefix = "SELECT FIRST " + rows;
-                break;
-            case MSSQL2000:
-                prefix = "SELECT TOP " + rows;
-                break;
-            case MYSQL:
-                suffix = "LIMIT " + rows;
-                break;
-            case ORACLE:
-                 suffix = "AND ROWNUM <= " + rows;
-                break;
-            case POSTGRESQL:
-                suffix = " FETCH FIRST " + rows + " ROWS ONLY";
-                break;
-            default:
-                break;
-        }
-
-        return prefix + " " + coreSql + " " + suffix;
     }
 
     boolean isHealthy()
@@ -595,6 +551,12 @@ class CertStatusStoreQueryExecutor
     private void releaseDbResources(Statement ps, ResultSet rs)
     {
         dataSource.releaseResources(ps, rs);
+    }
+
+    private static void setBoolean(PreparedStatement ps, int index, boolean b)
+    throws SQLException
+    {
+        ps.setInt(index, b ? 1 : 0);
     }
 
 }

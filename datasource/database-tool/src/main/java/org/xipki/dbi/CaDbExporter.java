@@ -86,6 +86,7 @@ public class CaDbExporter
         CaCertStoreDbExporter certStoreExporter = new CaCertStoreDbExporter(
                 dataSource, marshaller, destFolder, numCertsInBundle, numCrls);
         certStoreExporter.export();
+        certStoreExporter.shutdown();
     }
 
 }

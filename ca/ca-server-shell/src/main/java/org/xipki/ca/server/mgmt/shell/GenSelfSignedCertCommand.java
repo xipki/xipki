@@ -23,12 +23,11 @@ import java.util.List;
 
 import org.apache.felix.gogo.commands.Command;
 import org.apache.felix.gogo.commands.Option;
-import org.xipki.ca.api.OperationException;
-import org.xipki.ca.api.OperationException.ErrorCode;
+import org.xipki.ca.api.profile.CertProfile;
 import org.xipki.ca.api.profile.IdentifiedCertProfile;
 import org.xipki.ca.server.RandomSerialNumberGenerator;
-import org.xipki.ca.server.mgmt.CertProfileEntry;
 import org.xipki.ca.server.mgmt.shell.SelfSignedCertBuilder.GenerateSelfSignedResult;
+import org.xipki.console.karaf.XipkiOsgiCommandSupport;
 import org.xipki.security.api.PasswordResolver;
 import org.xipki.security.api.SecurityFactory;
 
@@ -37,17 +36,22 @@ import org.xipki.security.api.SecurityFactory;
  */
 
 @Command(scope = "ca", name = "gen-selfsign-cert", description="Generate selfsigned certificate")
-public class GenSelfSignedCertCommand extends CaCommand
+public class GenSelfSignedCertCommand extends XipkiOsgiCommandSupport
 {
     @Option(name = "-subject",
             description = "Required. Subject of the certificate",
             required = true)
     protected String           subject;
 
-    @Option(name = "-profile",
-            description = "Required. Profile of the certificate",
+    @Option(name = "-profileClass",
+            description = "Required. Profile class name",
             required = true)
-    protected String           profile;
+    protected String           profileClass;
+
+    @Option(name = "-profileConf",
+            description = "Profile configuration",
+            required = false)
+    protected String           profileConf;
 
     @Option(name = "-out",
             description = "Required. Where to save the generated certificate",
@@ -95,14 +99,17 @@ public class GenSelfSignedCertCommand extends CaCommand
             serial = RandomSerialNumberGenerator.getInstance().getSerialNumber().longValue();
         }
 
-        CertProfileEntry certProfileEntry = caManager.getCertProfile(profile);
-        if(certProfileEntry == null)
+        IdentifiedCertProfile certProfile;
+        try
         {
-            throw new OperationException(ErrorCode.UNKNOWN_CERT_PROFILE,
-                    "unknown cert profile " + profile);
+            CertProfile cp = (CertProfile) Class.forName(profileClass).newInstance();
+            certProfile = new IdentifiedCertProfile("dummy", cp);
+        }catch(Exception e)
+        {
+            System.err.println("Invalid cert profile configuration");
+            return null;
         }
 
-        IdentifiedCertProfile certProfile = certProfileEntry.getCertProfile();
         GenerateSelfSignedResult result = SelfSignedCertBuilder.generateSelfSigned(
                 securityFactory, passwordResolver, signerType, signerConf,
                 certProfile, subject, serial, ocspUris, crlUris);

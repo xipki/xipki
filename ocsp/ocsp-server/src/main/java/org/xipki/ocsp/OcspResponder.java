@@ -412,7 +412,7 @@ public class OcspResponder
                     }
                 }
 
-                store = new DbCertStatusStore(dataSource, issuers);
+                store = new DbCertStatusStore(storeConf.getName(), dataSource, issuers);
 
                 Integer i = storeConf.getRetentionInterval();
                 store.setRetentionInterval(i == null ? -1 : i.intValue());
@@ -430,7 +430,8 @@ public class OcspResponder
                 X509Certificate caCert = parseCert(caCertFile);
                 X509Certificate crlIssuerCert = issuerCertFile == null ? null : parseCert(issuerCertFile);
 
-                CrlCertStatusStore crlStore = new CrlCertStatusStore(crlFile, caCert, crlIssuerCert, crlUrl);
+                CrlCertStatusStore crlStore = new CrlCertStatusStore(storeConf.getName(),
+                        crlFile, caCert, crlIssuerCert, crlUrl);
                 store = crlStore;
 
                 crlStore.setUseUpdateDatesFromCRL(
@@ -485,7 +486,6 @@ public class OcspResponder
                 throw new RuntimeException("Should not reach here");
             }
 
-            store.setName(storeConf.getName());
             store.setIncludeArchiveCutoff(
                     getBoolean(storeConf.isIncludeArchiveCutoff(), true));
             store.setIncludeCrlID(

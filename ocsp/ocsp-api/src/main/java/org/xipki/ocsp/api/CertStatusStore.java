@@ -23,6 +23,7 @@ import org.xipki.audit.api.AuditLoggingService;
 import org.xipki.database.api.DataSourceFactory;
 import org.xipki.security.api.PasswordResolver;
 import org.xipki.security.common.HashAlgoType;
+import org.xipki.security.common.ParamChecker;
 
 /**
  * @author Lijun Liao
@@ -44,7 +45,7 @@ public abstract class CertStatusStore
 
     protected static final long DAY = 24L * 60 * 60 * 1000;
 
-    private String name;
+    private final String name;
     protected boolean unknownSerialAsGood;
     protected int retentionInterval;
     protected boolean inheritCaRevocation;
@@ -55,12 +56,9 @@ public abstract class CertStatusStore
 
     protected AuditLoggingService auditLoggingService;
 
-    protected CertStatusStore()
+    protected CertStatusStore(String name)
     {
-    }
-
-    public void setName(String name)
-    {
+        ParamChecker.assertNotEmpty("name", name);
         this.name = name;
     }
 

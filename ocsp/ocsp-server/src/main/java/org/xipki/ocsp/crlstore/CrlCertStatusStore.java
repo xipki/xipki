@@ -131,19 +131,22 @@ public class CrlCertStatusStore extends CertStatusStore
     private boolean initializationFailed = false;
 
     public CrlCertStatusStore(
+            String name,
             String crlFile,
             X509Certificate caCert,
             String crlUrl)
     {
-        this(crlFile, caCert, null, crlUrl);
+        this(name, crlFile, caCert, null, crlUrl);
     }
 
     public CrlCertStatusStore(
+            String name,
             String crlFile,
             X509Certificate caCert,
             X509Certificate issuerCert,
             String crlUrl)
     {
+        super(name);
         ParamChecker.assertNotEmpty("crlFile", crlFile);
         ParamChecker.assertNotNull("caCert", caCert);
 

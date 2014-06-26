@@ -103,13 +103,14 @@ class CaConfigurationDbExporter extends DbPorter
         CmpcontrolType cmpcontrol = null;
         System.out.println("Exporting table CMPCONTROL");
         Statement stmt = null;
+        ResultSet rs = null;
         try
         {
             stmt = createStatement();
             String sql = "SELECT REQUIRE_CONFIRM_CERT, SEND_CA_CERT, SEND_RESPONDER_CERT, "
                     + " REQUIRE_MESSAGE_TIME, MESSAGE_TIME_BIAS, CONFIRM_WAIT_TIME"
                     + " FROM CMPCONTROL";
-            ResultSet rs = stmt.executeQuery(sql);
+            rs = stmt.executeQuery(sql);
 
             if(rs.next())
             {
@@ -128,12 +129,9 @@ class CaConfigurationDbExporter extends DbPorter
                 cmpcontrol.setMessageTimeBias(messageTimeBias);
                 cmpcontrol.setConfirmWaitTime(confirmWaitTime);
             }
-
-            rs.close();
-            rs = null;
         }finally
         {
-            closeStatement(stmt);
+            releaseResources(stmt, rs);
         }
 
         caconf.setCmpcontrol(cmpcontrol);
@@ -146,29 +144,29 @@ class CaConfigurationDbExporter extends DbPorter
         System.out.println("Exporting table ENVIRONMENT");
         Environments environments = new Environments();
 
+        String valueColumn = tableHasColumn("ENVIRONMENT", "VALUE2") ? "VALUE2" : "VALUE";
         Statement stmt = null;
+        ResultSet rs = null;
         try
         {
             stmt = createStatement();
-            String sql = "SELECT NAME, VALUE FROM ENVIRONMENT";
-            ResultSet rs = stmt.executeQuery(sql);
+
+            String sql = "SELECT NAME, " + valueColumn + " FROM ENVIRONMENT";
+            rs = stmt.executeQuery(sql);
 
             while(rs.next())
             {
                 String name = rs.getString("NAME");
-                String value = rs.getString("VALUE");
+                String value = rs.getString(valueColumn);
 
                 EnvironmentType environment = new EnvironmentType();
                 environment.setName(name);
                 environment.setValue(value);
                 environments.getEnvironment().add(environment);
             }
-
-            rs.close();
-            rs = null;
         }finally
         {
-            closeStatement(stmt);
+            releaseResources(stmt, rs);
         }
 
         caconf.setEnvironments(environments);
@@ -182,6 +180,7 @@ class CaConfigurationDbExporter extends DbPorter
         Crlsigners crlsigners = new Crlsigners();
 
         Statement stmt = null;
+        ResultSet rs = null;
         try
         {
             stmt = createStatement();
@@ -190,7 +189,7 @@ class CaConfigurationDbExporter extends DbPorter
                     " OVERLAP, INCLUDE_CERTS_IN_CRL, INCLUDE_EXPIRED_CERTS" +
                     " FROM CRLSIGNER";
 
-            ResultSet rs = stmt.executeQuery(sql);
+            rs = stmt.executeQuery(sql);
 
             while(rs.next())
             {
@@ -216,12 +215,9 @@ class CaConfigurationDbExporter extends DbPorter
 
                 crlsigners.getCrlsigner().add(crlsigner);
             }
-
-            rs.close();
-            rs = null;
         }finally
         {
-            closeStatement(stmt);
+            releaseResources(stmt, rs);
         }
 
         caconf.setCrlsigners(crlsigners);
@@ -235,11 +231,12 @@ class CaConfigurationDbExporter extends DbPorter
         Caaliases caaliases = new Caaliases();
 
         Statement stmt = null;
+        ResultSet rs = null;
         try
         {
             stmt = createStatement();
             String sql = "SELECT NAME, CA_NAME FROM CAALIAS";
-            ResultSet rs = stmt.executeQuery(sql);
+            rs = stmt.executeQuery(sql);
 
             while(rs.next())
             {
@@ -252,12 +249,9 @@ class CaConfigurationDbExporter extends DbPorter
 
                 caaliases.getCaalias().add(caalias);
             }
-
-            rs.close();
-            rs = null;
         }finally
         {
-            closeStatement(stmt);
+            releaseResources(stmt, rs);
         }
 
         caconf.setCaaliases(caaliases);
@@ -271,11 +265,12 @@ class CaConfigurationDbExporter extends DbPorter
         Requestors requestors = new Requestors();
 
         Statement stmt = null;
+        ResultSet rs = null;
         try
         {
             stmt = createStatement();
             String sql = "SELECT NAME, CERT FROM REQUESTOR";
-            ResultSet rs = stmt.executeQuery(sql);
+            rs = stmt.executeQuery(sql);
 
             while(rs.next())
             {
@@ -288,12 +283,9 @@ class CaConfigurationDbExporter extends DbPorter
 
                 requestors.getRequestor().add(requestor);
             }
-
-            rs.close();
-            rs = null;
         }finally
         {
-            closeStatement(stmt);
+            releaseResources(stmt, rs);
         }
 
         caconf.setRequestors(requestors);
@@ -307,11 +299,12 @@ class CaConfigurationDbExporter extends DbPorter
         ResponderType responder = null;
 
         Statement stmt = null;
+        ResultSet rs = null;
         try
         {
             stmt = createStatement();
             String sql = "SELECT TYPE, CERT, CONF FROM RESPONDER";
-            ResultSet rs = stmt.executeQuery(sql);
+            rs = stmt.executeQuery(sql);
 
             while(rs.next())
             {
@@ -324,12 +317,9 @@ class CaConfigurationDbExporter extends DbPorter
                 responder.setConf(conf);
                 responder.setCert(cert);
             }
-
-            rs.close();
-            rs = null;
         }finally
         {
-            closeStatement(stmt);
+            releaseResources(stmt, rs);
         }
 
         caconf.setResponder(responder);
@@ -343,11 +333,12 @@ class CaConfigurationDbExporter extends DbPorter
         Publishers publishers = new Publishers();
 
         Statement stmt = null;
+        ResultSet rs = null;
         try
         {
             stmt = createStatement();
             String sql = "SELECT NAME, TYPE, CONF FROM PUBLISHER";
-            ResultSet rs = stmt.executeQuery(sql);
+            rs = stmt.executeQuery(sql);
 
             while(rs.next())
             {
@@ -362,12 +353,9 @@ class CaConfigurationDbExporter extends DbPorter
 
                 publishers.getPublisher().add(publisher);
             }
-
-            rs.close();
-            rs = null;
         }finally
         {
-            closeStatement(stmt);
+            releaseResources(stmt, rs);
         }
 
         caconf.setPublishers(publishers);
@@ -381,11 +369,12 @@ class CaConfigurationDbExporter extends DbPorter
         Certprofiles certprofiles = new Certprofiles();
 
         Statement stmt = null;
+        ResultSet rs = null;
         try
         {
             stmt = createStatement();
             String sql = "SELECT NAME, TYPE, CONF FROM CERTPROFILE";
-            ResultSet rs = stmt.executeQuery(sql);
+            rs = stmt.executeQuery(sql);
 
             while(rs.next())
             {
@@ -400,12 +389,9 @@ class CaConfigurationDbExporter extends DbPorter
 
                 certprofiles.getCertprofile().add(certprofile);
             }
-
-            rs.close();
-            rs = null;
         }finally
         {
-            closeStatement(stmt);
+            releaseResources(stmt, rs);
         }
 
         caconf.setCertprofiles(certprofiles);
@@ -419,21 +405,22 @@ class CaConfigurationDbExporter extends DbPorter
         Cas cas = new Cas();
 
         Statement stmt = null;
+        ResultSet rs = null;
         try
         {
             stmt = createStatement();
 
             String sql = "SELECT NAME, NEXT_SERIAL, STATUS, CRL_URIS, OCSP_URIS, MAX_VALIDITY, "
                     + "CERT, SIGNER_TYPE, SIGNER_CONF, CRLSIGNER_NAME, "
-                    + "ALLOW_DUPLICATE_KEY, ALLOW_DUPLICATE_SUBJECT, PERMISSIONS, NUM_CRLS, "
+                    + "DUPLICATE_KEY_MODE, DUPLICATE_SUBJECT_MODE, PERMISSIONS, NUM_CRLS, "
                     + "EXPIRATION_PERIOD, REVOKED, REV_REASON, REV_TIME, REV_INVALIDITY_TIME "
                     + "FROM CA";
-            ResultSet rs = stmt.executeQuery(sql);
+            rs = stmt.executeQuery(sql);
 
             while(rs.next())
             {
                 String name = rs.getString("NAME");
-                String next_serial = rs.getString("NEXT_SERIAL");
+                long next_serial = rs.getLong("NEXT_SERIAL");
                 String status = rs.getString("STATUS");
                 String crl_uris = rs.getString("CRL_URIS");
                 String ocsp_uris = rs.getString("OCSP_URIS");
@@ -468,22 +455,22 @@ class CaConfigurationDbExporter extends DbPorter
                 ca.setNumCrls(numCrls);
 
                 boolean revoked = rs.getBoolean("REVOKED");
-                String reason = rs.getString("REV_REASON");
-                String rev_time = rs.getString("REV_TIME");
-                String rev_invalidity_time = rs.getString("REV_INVALIDITY_TIME");
                 ca.setRevoked(revoked);
-                ca.setRevReason(reason);
-                ca.setRevTime(rev_time);
-                ca.setRevInvalidityTime(rev_invalidity_time);
+                if(revoked)
+                {
+                    int reason = rs.getInt("REV_REASON");
+                    long rev_time = rs.getLong("REV_TIME");
+                    long rev_invalidity_time = rs.getLong("REV_INVALIDITY_TIME");
+                    ca.setRevReason(reason);
+                    ca.setRevTime(rev_time);
+                    ca.setRevInvalidityTime(rev_invalidity_time);
+                }
 
                 cas.getCa().add(ca);
             }
-
-            rs.close();
-            rs = null;
         }finally
         {
-            closeStatement(stmt);
+            releaseResources(stmt, rs);
         }
 
         caconf.setCas(cas);
@@ -497,12 +484,13 @@ class CaConfigurationDbExporter extends DbPorter
         CaHasRequestors ca_has_requestors = new CaHasRequestors();
 
         Statement stmt = null;
+        ResultSet rs = null;
         try
         {
             stmt = createStatement();
 
             String sql = "SELECT CA_NAME, REQUESTOR_NAME, RA, PERMISSIONS, PROFILES FROM CA_HAS_REQUESTOR";
-            ResultSet rs = stmt.executeQuery(sql);
+            rs = stmt.executeQuery(sql);
 
             while(rs.next())
             {
@@ -521,12 +509,9 @@ class CaConfigurationDbExporter extends DbPorter
 
                 ca_has_requestors.getCaHasRequestor().add(ca_has_requestor);
             }
-
-            rs.close();
-            rs = null;
         }finally
         {
-            closeStatement(stmt);
+            releaseResources(stmt, rs);
         }
 
         caconf.setCaHasRequestors(ca_has_requestors);
@@ -540,12 +525,13 @@ class CaConfigurationDbExporter extends DbPorter
         CaHasPublishers ca_has_publishers = new CaHasPublishers();
 
         Statement stmt = null;
+        ResultSet rs = null;
         try
         {
             stmt = createStatement();
 
             String sql = "SELECT CA_NAME, PUBLISHER_NAME FROM CA_HAS_PUBLISHER";
-            ResultSet rs = stmt.executeQuery(sql);
+            rs = stmt.executeQuery(sql);
 
             while(rs.next())
             {
@@ -558,12 +544,9 @@ class CaConfigurationDbExporter extends DbPorter
 
                 ca_has_publishers.getCaHasPublisher().add(ca_has_publisher);
             }
-
-            rs.close();
-            rs = null;
         }finally
         {
-            closeStatement(stmt);
+            releaseResources(stmt, rs);
         }
 
         caconf.setCaHasPublishers(ca_has_publishers);
@@ -577,12 +560,13 @@ class CaConfigurationDbExporter extends DbPorter
         CaHasCertprofiles ca_has_certprofiles = new CaHasCertprofiles();
 
         Statement stmt = null;
+        ResultSet rs = null;
         try
         {
             stmt = createStatement();
 
             String sql = "SELECT CA_NAME, CERTPROFILE_NAME FROM CA_HAS_CERTPROFILE";
-            ResultSet rs = stmt.executeQuery(sql);
+            rs = stmt.executeQuery(sql);
 
             while(rs.next())
             {
@@ -595,12 +579,9 @@ class CaConfigurationDbExporter extends DbPorter
 
                 ca_has_certprofiles.getCaHasCertprofile().add(ca_has_certprofile);
             }
-
-            rs.close();
-            rs = null;
         }finally
         {
-            closeStatement(stmt);
+            releaseResources(stmt, rs);
         }
 
         caconf.setCaHasCertprofiles(ca_has_certprofiles);
