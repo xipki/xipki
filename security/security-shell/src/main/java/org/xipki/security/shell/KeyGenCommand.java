@@ -22,6 +22,7 @@ import java.util.List;
 
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.x509.KeyUsage;
+import org.xipki.security.common.ObjectIdentifiers;
 
 /**
  * @author Lijun Liao
@@ -29,12 +30,6 @@ import org.bouncycastle.asn1.x509.KeyUsage;
 
 abstract class KeyGenCommand extends SecurityCommand
 {
-    private static final ASN1ObjectIdentifier id_pkix = new ASN1ObjectIdentifier("1.3.6.1.5.5.7");
-    private static final ASN1ObjectIdentifier id_kp                  = id_pkix.branch("3");
-    public static final ASN1ObjectIdentifier id_kp_serverAuth        = id_kp.branch("1");
-    public static final ASN1ObjectIdentifier id_kp_clientAuth        = id_kp.branch("2");
-    public static final ASN1ObjectIdentifier id_kp_emailProtection   = id_kp.branch("3");
-
     protected Integer getKeyUsage()
     throws Exception
     {
@@ -49,6 +44,9 @@ abstract class KeyGenCommand extends SecurityCommand
     protected List<ASN1ObjectIdentifier> getExtendedKeyUsage()
     throws Exception
     {
-        return Arrays.asList(id_kp_clientAuth, id_kp_serverAuth, id_kp_emailProtection);
+        return Arrays.asList(ObjectIdentifiers.id_kp_clientAuth,
+                ObjectIdentifiers.id_kp_serverAuth,
+                ObjectIdentifiers.id_kp_emailProtection,
+                ObjectIdentifiers.id_kp_OCSPSigning);
     }
 }

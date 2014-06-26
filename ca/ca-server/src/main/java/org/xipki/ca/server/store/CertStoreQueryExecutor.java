@@ -78,6 +78,7 @@ class CertStoreQueryExecutor
     private static final Logger LOG = LoggerFactory.getLogger(CertStoreQueryExecutor.class);
 
     private AtomicInteger cert_id;
+    private AtomicInteger crl_id;
     private AtomicInteger user_id;
 
     private final DataSource dataSource;
@@ -93,32 +94,9 @@ class CertStoreQueryExecutor
     throws SQLException
     {
         this.dataSource = dataSource;
-
-        String sql = "SELECT MAX(ID) FROM CERT";
-        PreparedStatement ps = borrowPreparedStatement(sql);
-        ResultSet rs = null;
-        try
-        {
-            rs = ps.executeQuery();
-            rs.next();
-            cert_id = new AtomicInteger(rs.getInt(1) + 1);
-        } finally
-        {
-            releaseDbResources(ps, rs);
-        }
-
-        sql = "SELECT MAX(ID) FROM USER";
-        ps = borrowPreparedStatement(sql);
-        rs = null;
-        try
-        {
-            rs = ps.executeQuery();
-            rs.next();
-            user_id = new AtomicInteger(rs.getInt(1) + 1);
-        } finally
-        {
-            releaseDbResources(ps, rs);
-        }
+        this.cert_id = new AtomicInteger(dataSource.getMax(null, "CERT", "ID") + 1);
+        this.crl_id = new AtomicInteger(dataSource.getMax(null, "CRL", "ID") + 1);
+        this.user_id = new AtomicInteger(dataSource.getMax(null, "USERNAME", "ID") + 1);
 
         this.caInfoStore = initCertBasedIdentyStore("CAINFO");
         this.requestorInfoStore = initNameIdStore("REQUESTORINFO");
@@ -219,7 +197,7 @@ class CertStoreQueryExecutor
             ps.setString(idx++, certificate.getSubject());
             ps.setLong(idx++, cert.getNotBefore().getTime()/1000);
             ps.setLong(idx++, cert.getNotAfter().getTime()/1000);
-            ps.setBoolean(idx++, false);
+            setBoolean(ps, idx++, false);
             ps.setInt(idx++, certprofileId);
             ps.setInt(idx++, caId);
 
@@ -405,14 +383,17 @@ class CertStoreQueryExecutor
             crlNumber = ASN1Integer.getInstance(extnValue).getPositiveValue().intValue();
         }
 
-        final String SQL = "INSERT INTO CRL (CAINFO_ID, CRL_NUMBER, THISUPDATE, NEXTUPDATE, CRL)" +
-                " VALUES (?, ?, ?, ?, ?)";
+        final String SQL = "INSERT INTO CRL (ID, CAINFO_ID, CRL_NUMBER, THISUPDATE, NEXTUPDATE, CRL)" +
+                " VALUES (?, ?, ?, ?, ?, ?)";
         PreparedStatement ps = borrowPreparedStatement(SQL);
 
         try
         {
             int caId = getCaId(caCert);
             int idx = 1;
+
+            int crlId = crl_id.getAndAdd(1);
+            ps.setInt(idx++, crlId);
 
             ps.setInt(idx++, caId);
             if(crlNumber != null)
@@ -492,7 +473,7 @@ class CertStoreQueryExecutor
         {
             int idx = 1;
             ps.setLong(idx++, new Date().getTime()/1000);
-            ps.setBoolean(idx++, true);
+            setBoolean(ps, idx++, true);
             ps.setLong(idx++, revInfo.getRevocationTime().getTime()/1000);
             if(revInfo.getInvalidityTime() != null)
             {
@@ -567,7 +548,7 @@ class CertStoreQueryExecutor
         {
             int idx = 1;
             ps.setLong(idx++, new Date().getTime()/1000);
-            ps.setBoolean(idx++, false);
+            setBoolean(ps, idx++, false);
             ps.setNull(idx++, Types.INTEGER);
             ps.setNull(idx++, Types.INTEGER);
             ps.setNull(idx++, Types.INTEGER);
@@ -683,9 +664,8 @@ class CertStoreQueryExecutor
 
         StringBuilder sb = new StringBuilder("CERT_ID FROM PUBLISHQUEUE ");
         sb.append(" WHERE CAINFO_ID=? AND PUBLISHER_ID=?");
-        sb.append(" ORDER BY CERT_ID ASC");
 
-        final String sql = createFetchFirstSelectSQL(sb.toString(), numEntries);
+        final String sql = dataSource.createFetchFirstSelectSQL(sb.toString(), numEntries, "CERT_ID ASC");
         PreparedStatement ps = borrowPreparedStatement(sql);
 
         ResultSet rs = null;
@@ -731,9 +711,8 @@ class CertStoreQueryExecutor
         {
             sb.append(" AND NOTAFTER>?");
         }
-        sb.append(" ORDER BY SERIAL ASC");
 
-        final String sql = createFetchFirstSelectSQL(sb.toString(), numEntries);
+        final String sql = dataSource.createFetchFirstSelectSQL(sb.toString(), numEntries, "SERIAL ASC");
         PreparedStatement ps = borrowPreparedStatement(sql);
 
         ResultSet rs = null;
@@ -773,8 +752,8 @@ class CertStoreQueryExecutor
             return null;
         }
 
-        String sql = "THISUPDATE, CRL FROM CRL WHERE CAINFO_ID=? ORDER BY THISUPDATE DESC";
-        sql = createFetchFirstSelectSQL(sql, 1);
+        String sql = "THISUPDATE, CRL FROM CRL WHERE CAINFO_ID=?";
+        sql = dataSource.createFetchFirstSelectSQL(sql, 1, "THISUPDATE DESC");
         PreparedStatement ps = borrowPreparedStatement(sql);
 
         ResultSet rs = null;
@@ -939,7 +918,7 @@ class CertStoreQueryExecutor
                 " FROM CERT T1, RAWCERT T2" +
                 " WHERE T1.ID=? AND T2.CERT_ID=T1.ID";
 
-        sql = createFetchFirstSelectSQL(sql, 1);
+        sql = dataSource.createFetchFirstSelectSQL(sql, 1);
         PreparedStatement ps = borrowPreparedStatement(sql);
 
         ResultSet rs = null;
@@ -993,7 +972,7 @@ class CertStoreQueryExecutor
     throws SQLException, OperationException
     {
         String sql = "CERT FROM RAWCERT WHERE CERT_ID=?";
-        sql = createFetchFirstSelectSQL(sql, 1);
+        sql = dataSource.createFetchFirstSelectSQL(sql, 1);
         PreparedStatement ps = borrowPreparedStatement(sql);
         ResultSet rs = null;
 
@@ -1052,7 +1031,7 @@ class CertStoreQueryExecutor
                 + " FROM CERT T1, RAWCERT T2"
                 + " WHERE T1.CAINFO_ID=? AND T1.SERIAL=? AND T2.CERT_ID=T1.ID";
 
-        sql = createFetchFirstSelectSQL(sql, 1);
+        sql = dataSource.createFetchFirstSelectSQL(sql, 1);
         PreparedStatement ps = borrowPreparedStatement(sql);
 
         ResultSet rs = null;
@@ -1132,7 +1111,7 @@ class CertStoreQueryExecutor
                 " FROM CERT T1, RAWCERT T2" +
                 " WHERE T1.CAINFO_ID=? AND T1.SERIAL=? AND T2.CERT_ID=T1.ID";
 
-        sql = createFetchFirstSelectSQL(sql, 1);
+        sql = dataSource.createFetchFirstSelectSQL(sql, 1);
         PreparedStatement ps = borrowPreparedStatement(sql);
 
         ResultSet rs = null;
@@ -1204,10 +1183,9 @@ class CertStoreQueryExecutor
 
         String sql = "SERIAL, REV_REASON, REV_TIME, REV_INVALIDITY_TIME"
                 + " FROM CERT"
-                + " WHERE CAINFO_ID=? AND REVOKED=? AND SERIAL>? AND NOTAFTER>?"
-                + " ORDER BY SERIAL ASC";
+                + " WHERE CAINFO_ID=? AND REVOKED=? AND SERIAL>? AND NOTAFTER>?";
 
-        sql = createFetchFirstSelectSQL(sql, numEntries);
+        sql = dataSource.createFetchFirstSelectSQL(sql, numEntries, "SERIAL ASC");
         PreparedStatement ps = borrowPreparedStatement(sql);
 
         ResultSet rs = null;
@@ -1215,7 +1193,7 @@ class CertStoreQueryExecutor
         {
             int idx = 1;
             ps.setInt(idx++, caId.intValue());
-            ps.setBoolean(idx++, true);
+            setBoolean(ps, idx++, true);
             ps.setLong(idx++, startSerial.longValue()-1);
             ps.setLong(idx++, notExpiredAt.getTime()/1000 + 1);
             rs = ps.executeQuery();
@@ -1266,7 +1244,7 @@ class CertStoreQueryExecutor
         }
 
         String sql = "REVOKED FROM CERT WHERE SHA1_FP_SUBJECT=? AND CAINFO_ID=?";
-        sql = createFetchFirstSelectSQL(sql, 1);
+        sql = dataSource.createFetchFirstSelectSQL(sql, 1);
         PreparedStatement ps = borrowPreparedStatement(sql);
         ResultSet rs = null;
 
@@ -1303,7 +1281,7 @@ class CertStoreQueryExecutor
         }
 
         String sql = "COUNT(ID) FROM CERT WHERE SHA1_FP_SUBJECT=? AND CAINFO_ID=?";
-        sql = createFetchFirstSelectSQL(sql, 1);
+        sql = dataSource.createFetchFirstSelectSQL(sql, 1);
 
         PreparedStatement ps = borrowPreparedStatement(sql);
         ResultSet rs = null;
@@ -1340,9 +1318,8 @@ class CertStoreQueryExecutor
         }
 
         String sql = "ID, SHA1_FP_PK, SHA1_FP_SUBJECT, CERTPROFILEINFO_ID, REVOKED FROM CERT"
-                + " WHERE (SHA1_FP_PK=? OR SHA1_FP_SUBJECT=?) AND CAINFO_ID=? "
-                + " ORDER BY ID DESC";
-        sql = createFetchFirstSelectSQL(sql, 1000);
+                + " WHERE (SHA1_FP_PK=? OR SHA1_FP_SUBJECT=?) AND CAINFO_ID=? ";
+        sql = dataSource.createFetchFirstSelectSQL(sql, 1000, "ID DESC");
         PreparedStatement ps = borrowPreparedStatement(sql);
 
         ResultSet rs = null;
@@ -1379,38 +1356,6 @@ class CertStoreQueryExecutor
         {
             releaseDbResources(ps, rs);
         }
-    }
-
-    private String createFetchFirstSelectSQL(String coreSql, int rows)
-    {
-        String prefix = "SELECT";
-        String suffix = "";
-
-        switch(dataSource.getDatabaseType())
-        {
-            case DB2:
-                suffix = "FETCH FIRST " + rows + " ROWS ONLY";
-                break;
-            case INFORMIX:
-                prefix = "SELECT FIRST " + rows;
-                break;
-            case MSSQL2000:
-                prefix = "SELECT TOP " + rows;
-                break;
-            case MYSQL:
-                suffix = "LIMIT " + rows;
-                break;
-            case ORACLE:
-                 suffix = "AND ROWNUM <= " + rows;
-                break;
-            case POSTGRESQL:
-                suffix = " FETCH FIRST " + rows + " ROWS ONLY";
-                break;
-            default:
-                break;
-        }
-
-        return prefix + " " + coreSql + " " + suffix;
     }
 
     private String fp(byte[] data)
@@ -1475,8 +1420,8 @@ class CertStoreQueryExecutor
             return id.intValue();
         }
 
-        String sql = "ID FROM USER WHERE NAME=?";
-        sql = createFetchFirstSelectSQL(sql, 1);
+        String sql = "ID FROM USERNAME WHERE NAME=?";
+        sql = dataSource.createFetchFirstSelectSQL(sql, 1);
         PreparedStatement ps = borrowPreparedStatement(sql);
         ResultSet rs = null;
 
@@ -1497,7 +1442,7 @@ class CertStoreQueryExecutor
         if(id == null)
         {
             int userId = user_id.getAndAdd(1);
-            final String SQL_ADD_USER = "INSERT INTO USER (ID, NAME) VALUES (?, ?)";
+            final String SQL_ADD_USER = "INSERT INTO USERNAME (ID, NAME) VALUES (?, ?)";
             try
             {
                 ps = borrowPreparedStatement(SQL_ADD_USER);
@@ -1621,4 +1566,9 @@ class CertStoreQueryExecutor
         }
     }
 
+    private static void setBoolean(PreparedStatement ps, int index, boolean b)
+    throws SQLException
+    {
+        ps.setInt(index, b ? 1 : 0);
+    }
 }

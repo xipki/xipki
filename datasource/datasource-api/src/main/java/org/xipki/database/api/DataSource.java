@@ -43,4 +43,20 @@ public interface DataSource
     throws SQLException;
 
     void releaseResources(Statement ps, ResultSet rs);
+
+    String createFetchFirstSelectSQL(String coreSql, int rows);
+
+    String createFetchFirstSelectSQL(String coreSql, int rows, String orderBy);
+
+    int getMin(Connection conn, String table, String column)
+    throws SQLException;
+
+    int getMax(Connection conn, String table, String column)
+    throws SQLException;
+
+    boolean tableHasColumn(Connection conn, String table, String column)
+    throws SQLException;
+
+    boolean tableExists(Connection conn, String table)
+    throws SQLException;
 }

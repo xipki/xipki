@@ -47,6 +47,10 @@ public class P11ECKeyGenCommand extends KeyGenCommand
             required = true, description = "Required. Label of the PKCS#11 objects")
     protected String            label;
 
+    @Option(name = "-subject",
+            required = false, description = "Subject in the self-signed certificate")
+    protected String            subject;
+
     @Option(name = "-pwd", aliases = { "--password" },
             required = false, description = "Password of the PKCS#11 token")
     protected String            password;
@@ -68,12 +72,17 @@ public class P11ECKeyGenCommand extends KeyGenCommand
             curveName = "brainpoolP256r1";
         }
 
+        if(subject == null || subject.isEmpty())
+        {
+            subject = "CN=" + label;
+        }
+
         char[] pwd = readPasswordIfRequired(password, readFromConsole);
 
         P11KeypairGenerator gen = new P11KeypairGenerator();
         P11KeypairGenerationResult keyAndCert = gen.generateECDSAKeypairAndCert(
                 securityFactory.getPkcs11Module(), new PKCS11SlotIdentifier(slotIndex, null), pwd,
-                curveName, label, "CN=" + label,
+                curveName, label, subject,
                 getKeyUsage(), getExtendedKeyUsage());
 
         System.out.println("key id: " + Hex.toHexString(keyAndCert.getId()));

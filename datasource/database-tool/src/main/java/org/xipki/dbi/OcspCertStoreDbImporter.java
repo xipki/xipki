@@ -155,10 +155,10 @@ class OcspCertStoreDbImporter extends DbPorter
                     ps.setString(idx++, HashCalculator.hexHash(HashAlgoType.SHA512, encodedKey));
                     ps.setString(idx++, HashCalculator.hexHash(HashAlgoType.SHA1, encodedCert));
                     ps.setString(idx++, b64Cert);
-                    ps.setBoolean(idx++, issuer.isRevoked());
-                    ps.setString(idx++, issuer.getRevReason());
-                    ps.setString(idx++, issuer.getRevTime());
-                    ps.setString(idx++, issuer.getRevInvalidityTime());
+                    setBoolean(ps, idx++, issuer.isRevoked());
+                    setInt(ps, idx++, issuer.getRevReason());
+                    setLong(ps, idx++, issuer.getRevTime());
+                    setLong(ps, idx++, issuer.getRevInvalidityTime());
 
                     ps.execute();
                 }catch(Exception e)
@@ -169,7 +169,7 @@ class OcspCertStoreDbImporter extends DbPorter
             }
         }finally
         {
-            closeStatement(ps);
+            releaseResources(ps, null);
         }
         System.out.println(" Imported table ISSUER");
     }
@@ -263,15 +263,15 @@ class OcspCertStoreDbImporter extends DbPorter
                     int idx = 1;
                     ps_cert.setInt   (idx++, cert.getId());
                     ps_cert.setInt   (idx++, cert.getIssuerId());
-                    ps_cert.setString(idx++, c.getSerialNumber().toString());
+                    ps_cert.setLong(idx++, c.getSerialNumber().longValue());
                     ps_cert.setString(idx++, IoCertUtil.canonicalizeName(c.getSubjectX500Principal()));
-                    ps_cert.setString(idx++, cert.getLastUpdate());
+                    ps_cert.setLong(idx++, cert.getLastUpdate());
                     ps_cert.setLong  (idx++, c.getNotBefore().getTime() / 1000);
                     ps_cert.setLong  (idx++, c.getNotAfter().getTime() / 1000);
-                    ps_cert.setBoolean(idx++, cert.isRevoked());
-                    ps_cert.setString(idx++, cert.getRevReason());
-                    ps_cert.setString(idx++, cert.getRevTime());
-                    ps_cert.setString(idx++, cert.getRevInvalidityTime());
+                    setBoolean(ps_cert, idx++, cert.isRevoked());
+                    setInt(ps_cert, idx++, cert.getRevReason());
+                    setLong(ps_cert, idx++, cert.getRevTime());
+                    setLong(ps_cert, idx++, cert.getRevInvalidityTime());
                     ps_cert.setString(idx++, cert.getProfile());
                     ps_cert.executeUpdate();
 
@@ -301,8 +301,8 @@ class OcspCertStoreDbImporter extends DbPorter
             }
         }finally
         {
-            closeStatement(ps_cert);
-            closeStatement(ps_rawcert);
+            releaseResources(ps_cert, null);
+            releaseResources(ps_rawcert, null);
             zipFile.close();
         }
 

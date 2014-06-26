@@ -94,6 +94,8 @@ class OcspCertStoreDbExporter extends DbPorter
         Issuers issuers = new Issuers();
 
         Statement stmt = null;
+        ResultSet rs = null;
+
         try
         {
             stmt = createStatement();
@@ -101,7 +103,7 @@ class OcspCertStoreDbExporter extends DbPorter
             String sql = "SELECT ID, CERT, REVOKED, REV_REASON, REV_TIME, REV_INVALIDITY_TIME" +
                          " FROM ISSUER";
 
-            ResultSet rs = stmt.executeQuery(sql);
+            rs = stmt.executeQuery(sql);
 
             while(rs.next())
             {
@@ -113,22 +115,25 @@ class OcspCertStoreDbExporter extends DbPorter
                 issuer.setCert(cert);
 
                 boolean revoked = rs.getBoolean("REVOKED");
-                String reason = rs.getString("REV_REASON");
-                String rev_time = rs.getString("REV_TIME");
-                String rev_invalidity_time = rs.getString("REV_INVALIDITY_TIME");
                 issuer.setRevoked(revoked);
-                issuer.setRevReason(reason);
-                issuer.setRevTime(rev_time);
-                issuer.setRevInvalidityTime(rev_invalidity_time);
+                if(revoked)
+                {
+                    int rev_reason = rs.getInt("REV_REASON");
+                    long rev_time = rs.getLong("REV_TIME");
+                    long rev_invalidity_time = rs.getLong("REV_INVALIDITY_TIME");
+                    issuer.setRevReason(rev_reason);
+                    issuer.setRevTime(rev_time);
+                    if(rev_invalidity_time != 0)
+                    {
+                        issuer.setRevInvalidityTime(rev_invalidity_time);
+                    }
+                }
 
                 issuers.getIssuer().add(issuer);
             }
-
-            rs.close();
-            rs = null;
         }finally
         {
-            closeStatement(stmt);
+            releaseResources(stmt, rs);
         }
 
         System.out.println(" Exported table ISSUER");
@@ -148,11 +153,11 @@ class OcspCertStoreDbExporter extends DbPorter
 
         String rawCertSql = "SELECT CERT FROM RAWCERT WHERE CERT_ID = ?";
 
+        final int minCertId = getMin("CERT", "ID");
+        final int maxCertId = getMax("CERT", "ID");
+
         PreparedStatement certPs = prepareStatement(certSql);
         PreparedStatement rawCertPs = prepareStatement(rawCertSql);
-
-        final int minCertId = getMinCertId();
-        final int maxCertId = getMaxCertId();
 
         int numCertInCurrentFile = 0;
 
@@ -200,11 +205,8 @@ class OcspCertStoreDbExporter extends DbPorter
                     }
 
                     int issuer_id = rs.getInt("ISSUER_ID");
-                    String last_update = rs.getString("LAST_UPDATE");
+                    long last_update = rs.getLong("LAST_UPDATE");
                     boolean revoked = rs.getBoolean("REVOKED");
-                    String rev_reason = rs.getString("REV_REASON");
-                    String rev_time = rs.getString("REV_TIME");
-                    String rev_invalidity_time = rs.getString("REV_INVALIDITY_TIME");
                     String profile = rs.getString("PROFILE");
 
                     rawCertPs.setInt(1, id);
@@ -248,9 +250,22 @@ class OcspCertStoreDbExporter extends DbPorter
                     cert.setIssuerId(issuer_id);
                     cert.setLastUpdate(last_update);
                     cert.setRevoked(revoked);
-                    cert.setRevReason(rev_reason);
-                    cert.setRevTime(rev_time);
-                    cert.setRevInvalidityTime(rev_invalidity_time);
+
+                    if(revoked)
+                    {
+                        int rev_reason = rs.getInt("REV_REASON");
+                        long rev_time = rs.getLong("REV_TIME");
+                        long rev_invalidity_time = rs.getLong("REV_INVALIDITY_TIME");
+                        cert.setRevReason(rev_reason);
+                        cert.setRevTime(rev_time);
+                        if(rev_invalidity_time != 0)
+                        {
+                            cert.setRevInvalidityTime(rev_invalidity_time);
+                        }
+                        cert.setRevReason(rev_reason);
+                        cert.setRevTime(rev_time);
+                        cert.setRevInvalidityTime(rev_invalidity_time);
+                    }
                     cert.setCertFile(sha1_fp_cert + ".der");
                     cert.setProfile(profile);
 
@@ -303,58 +318,12 @@ class OcspCertStoreDbExporter extends DbPorter
 
         }finally
         {
-            closeStatement(certPs);
-            closeStatement(rawCertPs);
+            releaseResources(certPs, null);
+            releaseResources(rawCertPs, null);
         }
 
         System.out.println(" Exported " + sum + " certificates from tables cert, certhash and rawcert");
         return certsFiles;
-    }
-
-    private int getMinCertId()
-    throws SQLException
-    {
-        Statement stmt = null;
-        try
-        {
-            stmt = createStatement();
-            final String sql = "SELECT MIN(ID) FROM CERT";
-            ResultSet rs = stmt.executeQuery(sql);
-
-            rs.next();
-            int minCertId = rs.getInt(1);
-
-            rs.close();
-            rs = null;
-
-            return minCertId;
-        }finally
-        {
-            closeStatement(stmt);
-        }
-    }
-
-    private int getMaxCertId()
-    throws SQLException
-    {
-        Statement stmt = null;
-        try
-        {
-            stmt = createStatement();
-            final String sql = "SELECT MAX(ID) FROM CERT";
-            ResultSet rs = stmt.executeQuery(sql);
-
-            rs.next();
-            int maxCertId = rs.getInt(1);
-
-            rs.close();
-            rs = null;
-
-            return maxCertId;
-        }finally
-        {
-            closeStatement(stmt);
-        }
     }
 
     private void finalizeZip(ZipOutputStream zipOutStream, CertsType certsType)

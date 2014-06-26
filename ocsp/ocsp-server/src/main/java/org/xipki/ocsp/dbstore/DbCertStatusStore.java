@@ -24,6 +24,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -122,8 +123,9 @@ public class DbCertStatusStore extends CertStatusStore
 
     private ScheduledThreadPoolExecutor scheduledThreadPoolExecutor;
 
-    public DbCertStatusStore(DataSource dataSource, Set<X509Certificate> issuers)
+    public DbCertStatusStore(String name, DataSource dataSource, Set<X509Certificate> issuers)
     {
+        super(name);
         ParamChecker.assertNotNull("dataSource", dataSource);
         this.dataSource = dataSource;
         if(issuers != null)
@@ -175,7 +177,17 @@ public class DbCertStatusStore extends CertStatusStore
 
                     // no change in the issuerStore
                     Set<Integer> newIds = newIssuers.keySet();
-                    Set<Integer> ids = issuerStore.getIds();
+
+                    Set<Integer> ids;
+                    if(issuerStore != null)
+                    {
+                        ids = issuerStore.getIds();
+                    }
+                    else
+                    {
+                        ids = Collections.emptySet();
+                    }
+
                     boolean issuersUnchanged =
                             ids.size() == newIds.size()
                             && ids.containsAll(newIds)
@@ -271,9 +283,9 @@ public class DbCertStatusStore extends CertStatusStore
             }
         }catch(Exception e)
         {
-            LOG.error("Could not executing initIssurStore() for {},  {}: {}",
+            LOG.error("Could not executing initIssuerStore() for {},  {}: {}",
                     new Object[]{getName(), e.getClass().getName(), e.getMessage()});
-            LOG.debug("Could not executing initIssurStore()", e);
+            LOG.debug("Could not executing initIssuerStore()", e);
 
             initializationFailed = true;
             initialized = true;
@@ -329,7 +341,8 @@ public class DbCertStatusStore extends CertStatusStore
                     " FROM CERT" +
                     " WHERE ISSUER_ID=? AND SERIAL=?";
 
-            PreparedStatement ps = borrowPreparedStatement(createFetchFirstSelectSQL(sql, 1));
+            PreparedStatement ps = borrowPreparedStatement(
+                    dataSource.createFetchFirstSelectSQL(sql, 1));
             ResultSet rs = null;
 
             CertStatusInfo certStatusInfo = null;
@@ -427,7 +440,8 @@ public class DbCertStatusStore extends CertStatusStore
     {
         final String sql = hashAlgo.name().toUpperCase() + "_FP" +
                 " FROM CERTHASH WHERE CERT_ID=?";
-        PreparedStatement ps = borrowPreparedStatement(createFetchFirstSelectSQL(sql, 1));
+        PreparedStatement ps = borrowPreparedStatement(
+                dataSource.createFetchFirstSelectSQL(sql, 1));
         ResultSet rs = null;
         try
         {
@@ -447,38 +461,6 @@ public class DbCertStatusStore extends CertStatusStore
         {
             releaseDbResources(ps, rs);
         }
-    }
-
-    private String createFetchFirstSelectSQL(String coreSql, int rows)
-    {
-        String prefix = "SELECT";
-        String suffix = "";
-
-        switch(dataSource.getDatabaseType())
-        {
-            case DB2:
-                suffix = "FETCH FIRST " + rows + " ROWS ONLY";
-                break;
-            case INFORMIX:
-                prefix = "SELECT FIRST " + rows;
-                break;
-            case MSSQL2000:
-                prefix = "SELECT TOP " + rows;
-                break;
-            case MYSQL:
-                suffix = "LIMIT " + rows;
-                break;
-            case ORACLE:
-                 suffix = "AND ROWNUM <= " + rows;
-                break;
-            case POSTGRESQL:
-                suffix = " FETCH FIRST " + rows + " ROWS ONLY";
-                break;
-            default:
-                break;
-        }
-
-        return prefix + " " + coreSql + " " + suffix;
     }
 
     /**

@@ -81,7 +81,13 @@ public class OcspDbExporter
         // CertStore
         OcspCertStoreDbExporter certStoreExporter = new OcspCertStoreDbExporter(
                 dataSource, marshaller, destFolder, numCertsInBundle);
-        certStoreExporter.export();
+        try
+        {
+            certStoreExporter.export();
+        }finally
+        {
+            certStoreExporter.shutdown();
+        }
     }
 
 }

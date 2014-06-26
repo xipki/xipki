@@ -155,7 +155,7 @@ class CaCertStoreDbImporter extends DbPorter
             }
         }finally
         {
-            closeStatement(ps);
+            releaseResources(ps, null);
         }
 
         System.out.println(" Imported table CAINFO");
@@ -192,7 +192,7 @@ class CaCertStoreDbImporter extends DbPorter
             }
         }finally
         {
-            closeStatement(ps);
+            releaseResources(ps, null);
         }
 
         System.out.println(" Imported table REQUESTORINFO");
@@ -229,7 +229,7 @@ class CaCertStoreDbImporter extends DbPorter
             }
         }finally
         {
-            closeStatement(ps);
+            releaseResources(ps, null);
         }
 
         System.out.println(" Imported table PUBLISHERINFO");
@@ -264,7 +264,7 @@ class CaCertStoreDbImporter extends DbPorter
             }
         }finally
         {
-            closeStatement(ps);
+            releaseResources(ps, null);
         }
 
         System.out.println(" Imported table certprofileinfo");
@@ -295,9 +295,9 @@ class CaCertStoreDbImporter extends DbPorter
     private int do_import_user(String usersFile)
     throws Exception
     {
-        final String sql = "INSERT INTO USER (ID, NAME) VALUES (?, ?)";
+        final String sql = "INSERT INTO USERNAME (ID, NAME) VALUES (?, ?)";
 
-        System.out.println("Importing table USER");
+        System.out.println("Importing table USERNAME");
 
         @SuppressWarnings("unchecked")
         JAXBElement<UsersType> rootElement = (JAXBElement<UsersType>)
@@ -321,13 +321,14 @@ class CaCertStoreDbImporter extends DbPorter
                     sum ++;
                 }catch(Exception e)
                 {
-                    System.err.println("Error while importing USER with ID=" + user.getId() + ", message: " + e.getMessage());
+                    System.err.println("Error while importing USERNAME with ID=" +
+                            user.getId() + ", message: " + e.getMessage());
                     throw e;
                 }
             }
         }finally
         {
-            closeStatement(ps);
+            releaseResources(ps, null);
         }
 
         return sum;
@@ -363,7 +364,7 @@ class CaCertStoreDbImporter extends DbPorter
             }
         }finally
         {
-            closeStatement(ps);
+            releaseResources(ps, null);
         }
 
         System.out.println(" Imported table PUBLISHQUEUE");
@@ -372,7 +373,7 @@ class CaCertStoreDbImporter extends DbPorter
     private void import_crl(Crls crls)
     throws Exception
     {
-        final String sql = "INSERT INTO CRL (CAINFO_ID, CRL_NUMBER, THISUPDATE, NEXTUPDATE, CRL) VALUES (?, ?, ?, ?, ?)";
+        final String sql = "INSERT INTO CRL (ID, CAINFO_ID, CRL_NUMBER, THISUPDATE, NEXTUPDATE, CRL) VALUES (?, ?, ?, ?, ?, ?)";
 
         System.out.println("Importing table CRL");
 
@@ -380,6 +381,7 @@ class CaCertStoreDbImporter extends DbPorter
 
         try
         {
+            int id = 1;
             for(CrlType crl : crls.getCrl())
             {
                 try
@@ -413,6 +415,7 @@ class CaCertStoreDbImporter extends DbPorter
                     BigInteger crlNumber = ASN1Integer.getInstance(extnValue).getPositiveValue();
 
                     int idx = 1;
+                    ps.setInt   (idx++, id++);
                     ps.setInt   (idx++, crl.getCainfoId());
                     ps.setString(idx++, crlNumber.toString());
                     ps.setLong(idx++, c.getThisUpdate().getTime() / 1000);
@@ -437,7 +440,7 @@ class CaCertStoreDbImporter extends DbPorter
             }
         }finally
         {
-            closeStatement(ps);
+            releaseResources(ps, null);
         }
 
         System.out.println(" Imported table CRL");
@@ -529,19 +532,19 @@ class CaCertStoreDbImporter extends DbPorter
                     // cert
                     int idx = 1;
                     ps_cert.setInt   (idx++, cert.getId());
-                    ps_cert.setString(idx++, cert.getLastUpdate());
-                    ps_cert.setString(idx++, c.getSerialNumber().toString());
+                    ps_cert.setLong(idx++, cert.getLastUpdate());
+                    ps_cert.setLong(idx++, c.getSerialNumber().getPositiveValue().longValue());
                     ps_cert.setString(idx++, IoCertUtil.canonicalizeName(c.getSubject()));
                     ps_cert.setLong(idx++, c.getTBSCertificate().getStartDate().getDate().getTime() / 1000);
                     ps_cert.setLong(idx++, c.getTBSCertificate().getEndDate().getDate().getTime() / 1000);
-                    ps_cert.setBoolean(idx++, cert.isRevoked());
-                    ps_cert.setString(idx++, cert.getRevReason());
-                    ps_cert.setString(idx++, cert.getRevTime());
-                    ps_cert.setString(idx++, cert.getRevInvalidityTime());
-                    ps_cert.setString(idx++, cert.getCertprofileinfoId());
-                    ps_cert.setString(idx++, cert.getCainfoId());
-                    ps_cert.setString(idx++, cert.getRequestorinfoId());
-                    ps_cert.setString(idx++, cert.getUserId());
+                    setBoolean(ps_cert, idx++, cert.isRevoked());
+                    setInt(ps_cert, idx++, cert.getRevReason());
+                    setLong(ps_cert, idx++, cert.getRevTime());
+                    setLong(ps_cert, idx++, cert.getRevInvalidityTime());
+                    setInt(ps_cert, idx++, cert.getCertprofileinfoId());
+                    setInt(ps_cert, idx++, cert.getCainfoId());
+                    setInt(ps_cert, idx++, cert.getRequestorinfoId());
+                    setInt(ps_cert, idx++, cert.getUserId());
 
                     ps_cert.setString(idx++, HashCalculator.hexHash(HashAlgoType.SHA1, encodedKey));
                     String sha1FpSubject = IoCertUtil.sha1sum_canonicalized_name(c.getSubject());
@@ -563,8 +566,8 @@ class CaCertStoreDbImporter extends DbPorter
             }
         }finally
         {
-            closeStatement(ps_cert);
-            closeStatement(ps_rawcert);
+            releaseResources(ps_cert, null);
+            releaseResources(ps_rawcert, null);
             zipFile.close();
         }
 

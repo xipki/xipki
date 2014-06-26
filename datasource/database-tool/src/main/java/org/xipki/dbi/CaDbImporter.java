@@ -60,6 +60,7 @@ public class CaDbImporter
         // CertStore
         CaCertStoreDbImporter certStoreImporter = new CaCertStoreDbImporter(dataSource, unmarshaller, srcFolder);
         certStoreImporter.importToDB();
+        certStoreImporter.shutdown();
     }
 
 }
