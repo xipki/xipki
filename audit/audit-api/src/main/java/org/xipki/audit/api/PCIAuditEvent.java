@@ -17,8 +17,6 @@
 
 package org.xipki.audit.api;
 
-import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -177,13 +175,6 @@ public class PCIAuditEvent
 
     public String getOrigination()
     {
-        if (isBlank(this.origination))
-        {
-            String originationHere = generateLocalHostName();
-
-            return originationHere;
-        }
-
         return this.origination;
     }
 
@@ -214,19 +205,19 @@ public class PCIAuditEvent
         char delimiter = DEFAULT_DELIMITER;
         String replaceDelimiter = DEFAULT_REPLACE_DELIMITER;
 
-        buffer.append(replaceDelimiter(USER_ID,getUserId(),delimiter,replaceDelimiter));
+        buffer.append(replaceDelimiter(getUserId(), delimiter, replaceDelimiter));
         buffer.append(delimiter);
-        buffer.append(replaceDelimiter(EVENT_TYPE,getEventType(),delimiter,replaceDelimiter));
+        buffer.append(replaceDelimiter(getEventType(), delimiter, replaceDelimiter));
         buffer.append(delimiter);
-        buffer.append(replaceDelimiter(DATE,getDate(),delimiter,replaceDelimiter));
+        buffer.append(replaceDelimiter(getDate(), delimiter, replaceDelimiter));
         buffer.append(delimiter);
-        buffer.append(replaceDelimiter(TIME,getTime(),delimiter,replaceDelimiter));
+        buffer.append(replaceDelimiter(getTime(), delimiter, replaceDelimiter));
         buffer.append(delimiter);
-        buffer.append(replaceDelimiter(STATUS,getStatus(),delimiter,replaceDelimiter));
+        buffer.append(replaceDelimiter(getStatus(), delimiter, replaceDelimiter));
         buffer.append(delimiter);
-        buffer.append(replaceDelimiter(ORIGINATION,getOrigination(),delimiter,replaceDelimiter));
+        buffer.append(replaceDelimiter(getOrigination(), delimiter, replaceDelimiter));
         buffer.append(delimiter);
-        buffer.append(replaceDelimiter(AFFECTED_RESOURCE,getAffectedResource(),delimiter,replaceDelimiter));
+        buffer.append(replaceDelimiter(getAffectedResource(), delimiter, replaceDelimiter));
 
         return buffer.toString();
     }
@@ -248,23 +239,7 @@ public class PCIAuditEvent
         return true;
     }
 
-    private String generateLocalHostName()
-    {
-        String localHostName = UNDEFINED;
-
-        try
-        {
-            localHostName = InetAddress.getLocalHost().getHostName();
-
-        } catch (UnknownHostException uhe)
-        {
-            throw new RuntimeException("While finding host name: ", uhe);
-        }
-
-        return localHostName;
-    }
-
-    private String replaceDelimiter(String fieldName, String fieldValue,
+    private String replaceDelimiter(String fieldValue,
             char delimiter, String replaceDelimiter)
     {
         if (replaceDelimiter == null || replaceDelimiter.length() < 1 ||
