@@ -455,12 +455,7 @@ public class CAManagerImpl implements CAManager
         reset();
         boolean caSystemStarted = do_startCaSystem();
 
-        if(caSystemStarted)
-        {
-            String msg = "Restarted CA system";
-            LOG.info(msg);
-        }
-        else
+        if(caSystemStarted == false)
         {
             String msg = "Could not restart CA system";
             LOG.error(msg);
@@ -473,12 +468,7 @@ public class CAManagerImpl implements CAManager
     public void startCaSystem()
     {
         boolean caSystemStarted = do_startCaSystem();
-        if(caSystemStarted)
-        {
-            String msg = "Started CA system";
-            LOG.info(msg);
-        }
-        else
+        if(caSystemStarted == false)
         {
             String msg = "Could not start CA system";
             LOG.error(msg);
