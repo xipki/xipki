@@ -240,7 +240,7 @@ public class CaGenRootCACommand extends CaCommand
 
         if(rcaCertOutFile != null)
         {
-            saveVerbose("Save root certificate to file", new File(rcaCertOutFile), caCert.getEncoded());
+            saveVerbose("Saved root certificate to file", new File(rcaCertOutFile), caCert.getEncoded());
         }
 
         return null;

@@ -54,8 +54,8 @@ public abstract class XipkiOsgiCommandSupport extends OsgiCommandSupport
                 {
                     if(b)
                     {
-                        System.out.print("A file named '" +
-                                saveTo.getPath() + "' already exists.  Do you want to replace it [yes/no]? ");
+                        System.out.println("A file named '" +
+                                saveTo.getPath() + "' already exists. Do you want to replace it [yes/no]? ");
                     }
 
                     String answer = reader.readLine();
@@ -70,7 +70,7 @@ public abstract class XipkiOsgiCommandSupport extends OsgiCommandSupport
                     }
                     else if("no".equalsIgnoreCase(answer))
                     {
-                        System.out.print("Enter name of file to save to ... ");
+                        System.out.println("Enter name of file to save to ... ");
                         String newFn = null;
                         while(true)
                         {
@@ -85,7 +85,7 @@ public abstract class XipkiOsgiCommandSupport extends OsgiCommandSupport
                     }
                     else
                     {
-                        System.out.print("Please answer with yes or no. ");
+                        System.out.println("Please answer with yes or no. ");
                         b = false;
                     }
                 }
