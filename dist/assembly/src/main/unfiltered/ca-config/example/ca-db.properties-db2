@@ -3,6 +3,8 @@
 #      https://github.com/brettwooldridge/HikariCP         #
 ############################################################
 
+################## DB2 #################
+
 dataSourceClassName = com.ibm.db2.jcc.DB2SimpleDataSource
 
 dataSource.serverName = localhost
