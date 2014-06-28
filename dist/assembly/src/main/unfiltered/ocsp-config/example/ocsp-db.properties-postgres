@@ -5,11 +5,11 @@
 
 dataSourceClassName = com.impossibl.postgres.jdbc.PGDataSource
 
-dataSource.host = 192.168.52.85
+dataSource.host = localhost
 dataSource.port = 5432
-dataSource.database = esspki2ocsp
-dataSource.user = esspki2
-dataSource.password = Test1234
+dataSource.database = ocsp
+dataSource.user = root
+dataSource.password = 123456
 
 dataSource.housekeeper = true
 dataSource.parsedSqlCacheSize = 256
