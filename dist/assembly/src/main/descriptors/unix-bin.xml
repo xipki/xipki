@@ -112,7 +112,7 @@
             <directory>${project.build.directory}/sql</directory>
             <includes>
                 <include>liquibase/liquibase</include>
-                <include>**/*.sh</include>
+                <include>*.sh</include>
             </includes>
             <outputDirectory>sql</outputDirectory>
             <fileMode>0755</fileMode>
@@ -124,6 +124,7 @@
             <excludes>
                 <exclude>liquibase/liquibase</exclude>
                 <exclude>liquibase/javadoc/**</exclude>
+                <exclude>liquibase/sdk/**</exclude>
                 <exclude>**/*.sh</exclude>
             </excludes>
             <outputDirectory>sql</outputDirectory>
