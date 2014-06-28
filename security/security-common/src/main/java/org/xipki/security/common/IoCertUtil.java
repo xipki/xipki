@@ -640,10 +640,10 @@ public class IoCertUtil
     {
         List<String> addresses = new LinkedList<>();
 
-        Enumeration<NetworkInterface> e = NetworkInterface.getNetworkInterfaces();
-        while(e.hasMoreElements())
+        Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
+        while(interfaces.hasMoreElements())
         {
-            NetworkInterface n = (NetworkInterface) e.nextElement();
+            NetworkInterface n = (NetworkInterface) interfaces.nextElement();
             Enumeration<InetAddress> ee = n.getInetAddresses();
             while (ee.hasMoreElements())
             {
