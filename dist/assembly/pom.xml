@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!-- 
  Copyright 2014 xipki.org
  
@@ -15,7 +14,6 @@
  See the License for the specific language governing permissions and
  limitations under the License
 -->
-
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
@@ -191,34 +189,34 @@
 						</configuration>
 					</execution>
 					<execution>
-                        <id>copy-jdbcs</id>
-                        <phase>generate-resources</phase>
-                        <goals>
-                            <goal>copy</goal>
-                        </goals>
-                        <configuration>
-                            <outputDirectory>target/jdbc</outputDirectory>
-                            <!-- Define here the JDBC drivers -->
-                            <artifactItems>
-                                <artifactItem>
-                                    <groupId>mysql</groupId>
-                                    <artifactId>mysql-connector-java</artifactId>
-                                    <version>${mysql-jdbc.version}</version>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>com.h2database</groupId>
-                                    <artifactId>h2</artifactId>
-                                    <version>${h2-jdbc.version}</version>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>com.impossibl.pgjdbc-ng</groupId>
-                                    <artifactId>pgjdbc-ng</artifactId>
-                                    <classifier>complete</classifier>
-                                    <version>${pgjdbc-ng.version}</version>
-                                </artifactItem>                                
-                            </artifactItems>
-                        </configuration>
-                    </execution>
+						<id>copy-jdbcs</id>
+						<phase>generate-resources</phase>
+						<goals>
+							<goal>copy</goal>
+						</goals>
+						<configuration>
+							<outputDirectory>target/jdbc</outputDirectory>
+							<!-- Define here the JDBC drivers -->
+							<artifactItems>
+								<artifactItem>
+									<groupId>mysql</groupId>
+									<artifactId>mysql-connector-java</artifactId>
+									<version>${mysql-jdbc.version}</version>
+								</artifactItem>
+								<artifactItem>
+									<groupId>com.h2database</groupId>
+									<artifactId>h2</artifactId>
+									<version>${h2-jdbc.version}</version>
+								</artifactItem>
+								<artifactItem>
+									<groupId>com.impossibl.pgjdbc-ng</groupId>
+									<artifactId>pgjdbc-ng</artifactId>
+									<classifier>complete</classifier>
+									<version>${pgjdbc-ng.version}</version>
+								</artifactItem>
+							</artifactItems>
+						</configuration>
+					</execution>
 					<execution>
 						<id>unpack-liquibase</id>
 						<phase>generate-resources</phase>

@@ -3,6 +3,8 @@
 #      https://github.com/brettwooldridge/HikariCP         #
 ############################################################
 
+################## Oracle #################
+
 dataSourceClassName = oracle.jdbc.pool.OracleDataSource
 
 dataSource.serverName = localhost

@@ -3,6 +3,8 @@
 #      https://github.com/brettwooldridge/HikariCP         #
 ############################################################
 
+################## MySQL #################
+
 dataSourceClassName = com.mysql.jdbc.jdbc2.optional.MysqlDataSource
 
 dataSource.serverName = localhost
