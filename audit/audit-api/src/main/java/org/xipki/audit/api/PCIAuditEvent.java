@@ -17,8 +17,15 @@
 
 package org.xipki.audit.api;
 
+import java.net.Inet4Address;
+import java.net.InetAddress;
+import java.net.NetworkInterface;
+import java.net.SocketException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Enumeration;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * This file is copied from PCSSyslogMessage from syslog4j.org
@@ -175,7 +182,12 @@ public class PCIAuditEvent
 
     public String getOrigination()
     {
-        return this.origination;
+        if(isBlank(origination))
+        {
+            origination = getHostAddress();
+        }
+
+        return origination;
     }
 
     public void setOrigination(String origination)
@@ -251,6 +263,51 @@ public class PCIAuditEvent
         String newFieldValue = fieldValue.replaceAll("\\" + delimiter, replaceDelimiter);
 
         return newFieldValue;
+    }
+
+    private static String getHostAddress()
+    {
+        List<String> addresses = new LinkedList<>();
+
+        Enumeration<NetworkInterface> interfaces;
+        try
+        {
+            interfaces = NetworkInterface.getNetworkInterfaces();
+        } catch (SocketException e)
+        {
+            return "UNKNON";
+        }
+        while(interfaces.hasMoreElements())
+        {
+            NetworkInterface n = (NetworkInterface) interfaces.nextElement();
+            Enumeration<InetAddress> ee = n.getInetAddresses();
+            while (ee.hasMoreElements())
+            {
+                InetAddress i = (InetAddress) ee.nextElement();
+                if(i instanceof Inet4Address)
+                {
+                    addresses.add(((Inet4Address) i).getHostAddress());
+                }
+            }
+        }
+
+        for(String addr : addresses)
+        {
+            if(addr.startsWith("192.") == false && addr.startsWith("127.") == false)
+            {
+                return addr;
+            }
+        }
+
+        for(String addr : addresses)
+        {
+            if(addr.startsWith("127.") == false)
+            {
+                return addr;
+            }
+        }
+
+        return addresses.get(0);
     }
 
 }
