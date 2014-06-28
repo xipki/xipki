@@ -23,53 +23,64 @@ package org.xipki.database.api;
 
 public enum DatabaseType
 {
+    H2,
     DB2,
     HSQLDB,
-    INFORMIX,
     MSSQL2000,
     MYSQL,
     ORACLE,
     POSTGRESQL,
-    SAPDB,
     SYBASE,
     UNKNOWN;
 
     public static DatabaseType getDataSourceForDriver(String driverClass)
     {
-        DatabaseType type = null;
-        if (driverClass.indexOf("OracleDriver") >= 0)
+        return getDatabaseType(driverClass);
+    }
+
+    public static DatabaseType getDataSourceForDataSource(String dataSourceClass)
+    {
+        return getDatabaseType(dataSourceClass);
+    }
+
+    private static DatabaseType getDatabaseType(String className)
+    {
+        if(className.contains("db2."))
         {
-            type = DatabaseType.ORACLE;
+            return DatabaseType.DB2;
         }
-        else if (driverClass.indexOf("hsqldb.jdbcDriver") >= 0)
+        if(className.contains("h2."))
         {
-            type = DatabaseType.HSQLDB;
+            return DatabaseType.H2;
         }
-        else if (driverClass.indexOf("postgresql.Driver") >= 0)
+        else if(className.contains("hsqldb."))
         {
-            type = DatabaseType.POSTGRESQL;
+            return DatabaseType.HSQLDB;
         }
-        else if (driverClass.indexOf("SQLServerDriver") >= 0)
+        else if(className.contains("mysql."))
         {
-            type = DatabaseType.MSSQL2000;
+            return DatabaseType.MYSQL;
         }
-        else if (driverClass.indexOf("IfxDriver") >= 0)
+        else if(className.contains("oracle."))
         {
-            type = DatabaseType.INFORMIX;
+            return DatabaseType.ORACLE;
         }
-        else if (driverClass.indexOf("DB2Driver") >= 0)
+        else if(className.contains("postgres.") || className.contains("postgresql."))
         {
-            type = DatabaseType.DB2;
+            return DatabaseType.POSTGRESQL;
         }
-        else if (driverClass.indexOf("mysql") >= 0)
+        else if(className.contains("sqlserver."))
         {
-            type = DatabaseType.MYSQL;
+            return DatabaseType.MSSQL2000;
+        }
+        else if(className.contains("sybase."))
+        {
+            return DatabaseType.SYBASE;
         }
         else
         {
-            type = DatabaseType.UNKNOWN;
+            return DatabaseType.UNKNOWN;
         }
-
-        return type;
     }
+
 }

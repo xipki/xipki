@@ -34,6 +34,8 @@ public interface DataSource
 
     void returnConnection(Connection conn);
 
+    void shutdown();
+
     DatabaseType getDatabaseType();
 
     Statement createStatement(Connection conn)
