@@ -17,10 +17,7 @@
 
 package org.xipki.ca.server.store;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.math.BigInteger;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.CRLException;
@@ -28,7 +25,6 @@ import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509CRL;
 import java.security.cert.X509Certificate;
-import java.sql.Blob;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -417,8 +413,8 @@ class CertStoreQueryExecutor
             }
 
             byte[] encodedCrl = crl.getEncoded();
-            InputStream is = new ByteArrayInputStream(encodedCrl);
-            ps.setBlob(idx++, is);
+            String b64Crl = Base64.toBase64String(encodedCrl);
+            ps.setString(idx++, b64Crl);
 
             ps.executeUpdate();
         }finally
@@ -772,8 +768,8 @@ class CertStoreQueryExecutor
                 long thisUpdate = rs.getLong("THISUPDATE");
                 if(thisUpdate >= current_thisUpdate)
                 {
-                    Blob blob = rs.getBlob("CRL");
-                    encodedCrl = readBlob(blob);
+                    String b64Crl = rs.getString("CRL");
+                    encodedCrl = Base64.decode(b64Crl);
                     current_thisUpdate = thisUpdate;
                 }
             }
@@ -847,54 +843,6 @@ class CertStoreQueryExecutor
         }
 
         return numCrlsToDelete;
-    }
-    private static byte[] readBlob(Blob blob)
-    {
-        InputStream is;
-        try
-        {
-            is = blob.getBinaryStream();
-        } catch (SQLException e)
-        {
-            String msg = "Could not getBinaryStream from Blob";
-            LOG.warn(msg + " {}", e.getMessage());
-            LOG.debug(msg, e);
-            return null;
-        }
-        try
-        {
-            ByteArrayOutputStream out = new ByteArrayOutputStream();
-
-            byte[] buffer = new byte[2048];
-            int readed;
-
-            try
-            {
-                while((readed = is.read(buffer)) != -1)
-                {
-                    if(readed > 0)
-                    {
-                        out.write(buffer, 0, readed);
-                    }
-                }
-            } catch (IOException e)
-            {
-                String msg = "Could not read CRL from Blob";
-                LOG.warn(msg + " {}", e.getMessage());
-                LOG.debug(msg, e);
-                return null;
-            }
-
-            return out.toByteArray();
-        }finally
-        {
-            try
-            {
-                is.close();
-            }catch(IOException e)
-            {
-            }
-        }
     }
 
     CertificateInfo getCertForId(X509CertificateWithMetaInfo caCert, int certId)

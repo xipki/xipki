@@ -499,7 +499,7 @@ class CertStatusStoreQueryExecutor
     private boolean certRegistered(int issuerId, BigInteger serialNumber)
     throws SQLException
     {
-        String sql = "count(*) FROM CERT WHERE ISSUER_ID = ? AND SERIAL = ?";
+        String sql = "COUNT(*) FROM CERT WHERE ISSUER_ID = ? AND SERIAL = ?";
         sql = dataSource.createFetchFirstSelectSQL(sql, 1);
         PreparedStatement ps = borrowPreparedStatement(sql);
         ResultSet rs = null;

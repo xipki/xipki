@@ -21,8 +21,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.sql.Blob;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -178,9 +176,9 @@ class CaCertStoreDbExporter extends DbPorter
                         continue;
                     }
 
-                    Blob blob = rs.getBlob("CRL");
-                    byte[] encodedCrl = readBlob(blob);
+                    String b64Crl = rs.getString("CRL");
                     rs.close();
+                    byte[] encodedCrl = Base64.decode(b64Crl);
 
                     String fp = fp(encodedCrl);
                     File f = new File(baseDir, "CRL" + File.separator + fp + ".crl");
@@ -309,7 +307,7 @@ class CaCertStoreDbExporter extends DbPorter
         System.out.println("Exporting table USERNAME");
         UsersFiles usersFiles = new UsersFiles();
 
-        String tableName = tableExists("USERNAME") ? "USERNAME" : "USER";
+        String tableName = "USERNAME";
 
         final int minId = getMin(tableName, "ID");
         final int maxId = getMax(tableName, "ID");
@@ -723,55 +721,6 @@ class CaCertStoreDbExporter extends DbPorter
             byte[] digestValue = new byte[20];
             sha1md.doFinal(digestValue, 0);
             return Hex.toHexString(digestValue).toUpperCase();
-        }
-    }
-
-    private static byte[] readBlob(Blob blob)
-    {
-        InputStream is;
-        try
-        {
-            is = blob.getBinaryStream();
-        } catch (SQLException e)
-        {
-            String msg = "Could not getBinaryStream from Blob";
-            LOG.warn(msg + " {}", e.getMessage());
-            LOG.debug(msg, e);
-            return null;
-        }
-        try
-        {
-            ByteArrayOutputStream out = new ByteArrayOutputStream();
-
-            byte[] buffer = new byte[2048];
-            int readed;
-
-            try
-            {
-                while((readed = is.read(buffer)) != -1)
-                {
-                    if(readed > 0)
-                    {
-                        out.write(buffer, 0, readed);
-                    }
-                }
-            } catch (IOException e)
-            {
-                String msg = "Could not read CRL from Blob";
-                LOG.warn(msg + " {}", e.getMessage());
-                LOG.debug(msg, e);
-                return null;
-            }
-
-            return out.toByteArray();
-        }finally
-        {
-            try
-            {
-                is.close();
-            }catch(IOException e)
-            {
-            }
         }
     }
 

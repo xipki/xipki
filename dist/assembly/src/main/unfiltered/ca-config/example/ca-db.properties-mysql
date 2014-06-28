@@ -1,0 +1,25 @@
+############################################################
+#    For details of the configuration Please refer to      #
+#      https://github.com/brettwooldridge/HikariCP         #
+############################################################
+
+dataSourceClassName = com.mysql.jdbc.jdbc2.optional.MysqlDataSource
+
+dataSource.serverName = localhost
+dataSource.port = 3306
+dataSource.databaseName = ca
+dataSource.user = root
+dataSource.password = 123456
+dataSource.cachePrepStmts = true
+dataSource.prepStmtCacheSize = 250
+dataSource.prepStmtCacheSqlLimit = 2048
+dataSource.useServerPrepStmts = true
+
+autoCommit = true
+readOnly = false
+maximumPoolSize = 10
+minimumIdle = 4
+connectionTimeout = 60000
+idleTimeout = 600000
+maxLifetime = 1800000
+transactionIsolation = TRANSACTION_READ_COMMITTED

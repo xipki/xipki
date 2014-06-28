@@ -102,6 +102,9 @@ caclient:revoke -cert output/TLS_C2.der -reason 3
 ## Generate CRL
 caclient:gencrl -ca SubCAwithCRL1 -out output/SubCAwithCRL1.crl
 
+## Get CRL
+caclient:getcrl -ca SubCAwithCRL1 -out output/SubCAwithCRL1-get.crl
+
 #################################################################
 #              UNINSTALL UNNEEDED FEATURES                      #
 #################################################################
