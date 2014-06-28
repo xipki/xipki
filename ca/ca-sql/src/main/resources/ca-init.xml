@@ -1,9 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog dbchangelog-3.0.xsd" logicalFilePath="ca-init.xml">
 
-  <property name="VARCHAR8000" value="CLOB" dbms="oracle"/>
-  <property name="VARCHAR8000" value="CLOB" dbms="mysql,postgresql,mssql,db2,h2"/>
-
 	<!-- CA configuration :: create table -->
 	<changeSet author="xipki" id="1">
 		<!-- table CALOCK -->
@@ -52,7 +49,7 @@
 			<column name="TYPE" type="VARCHAR(100)">
 				<constraints nullable="false"/>
 			</column>
-			<column name="CONF" type="${VARCHAR8000}"/>
+			<column name="CONF" type="CLOB"/>
 			<column name="CERT" type="VARCHAR(3000)"/>
 		</createTable>
 
@@ -72,7 +69,7 @@
 			<column name="SIGNER_TYPE" type="VARCHAR(100)">
 				<constraints nullable="false"/>
 			</column>
-			<column name="SIGNER_CONF" type="${VARCHAR8000}"/>
+			<column name="SIGNER_CONF" type="CLOB"/>
 			<column name="SIGNER_CERT" type="VARCHAR(3000)"/>
 			<column name="PERIOD" remarks="minutes. 0 indicates no CRL will be generated automatically." type="SMALLINT">
 				<constraints nullable="false"/>
@@ -117,7 +114,7 @@
 			<column name="TYPE" type="VARCHAR(100)">
 				<constraints nullable="false"/>
 			</column>
-			<column name="CONF" remarks="profile data, depends on the type" type="${VARCHAR8000}"/>
+			<column name="CONF" remarks="profile data, depends on the type" type="CLOB"/>
 		</createTable>
 
 		<!-- table CA -->
@@ -160,7 +157,7 @@
 			<column name="SIGNER_TYPE" type="VARCHAR(100)">
 				<constraints nullable="false"/>
 			</column>
-			<column name="SIGNER_CONF" type="${VARCHAR8000}">
+			<column name="SIGNER_CONF" type="CLOB">
 				<constraints nullable="false"/>
 			</column>
 			<column name="CERT" type="VARCHAR(3000)">
@@ -291,7 +288,7 @@
 				<constraints nullable="false"/>
 			</column>
 			<column name="NEXTUPDATE" type="BIGINT"/>
-			<column name="CRL" type="LONGBLOB">
+			<column name="CRL" type="CLOB">
 				<constraints nullable="false"/>
 			</column>
 		</createTable>

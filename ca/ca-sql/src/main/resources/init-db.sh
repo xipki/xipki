@@ -20,32 +20,76 @@ CHANGELOG_FILE=$3
 JDBC_CP=$( echo $XIPKI_HOME/lib/ext/*.jar | sed 's/ /:/g')
 
 # retrieve the database configuration
-cat $PROP_FILE | sed 's/\./_/' > .tmp-db.properties
+java -cp $LIQUIBASE_HOME/.. PropsToEnv $PROP_FILE .tmp-db.properties
 . ./.tmp-db.properties
 rm -f .tmp-db.properties
 
-echo "db.driver   = $db_driverClassName"
-echo "db.username = $db_username"
+SCHEMA=""
+DRIVER=""
+USER=""
+PASSWORD=""
+URL=""
 
-DRIVER=$db_driverClassName
+if [ "$dataSourceClassName" != "" ]; then
+    if [ "$dataSourceClassName" = "org.h2.jdbcx.JdbcDataSource" ]; then
+       DRIVER="org.h2.Driver"
+       URL="$dataSource_url"
+    elif [ "$dataSourceClassName" = "com.mysql.jdbc.jdbc2.optional.MysqlDataSource" ]; then
+       DRIVER="com.mysql.jdbc.Driver"
+       URL="jdbc:mysql://$dataSource_serverName:$dataSource_port/$dataSource_databaseName"
+    elif [ "$dataSourceClassName" = "oracle.jdbc.pool.OracleDataSource" ]; then
+       DRIVER="oracle.jdbc.driver.OracleDriver"
+       URL="jdbc:oracle:thin:@$dataSource_serverName:$dataSource_portNumber:$dataSource_databaseName"
+    elif [ "$dataSourceClassName" = "com.ibm.db2.jcc.DB2SimpleDataSource" ]; then
+       DRIVER="com.ibm.db2.jcc.DB2Driver"
+       URL="jdbc:db2://$dataSource_serverName:$dataSource_portNumber/$dataSource_databaseName"
+       SCHEMA="$dataSource_currentSchema"
+    elif [ "$dataSourceClassName" = "com.impossibl.postgres.jdbc.PGDataSource" ]; then
+       DRIVER="com.impossibl.postgres.jdbc.PGDriver"
+       URL="jdbc:pgsql://$dataSource_host:$dataSource_port/$dataSource_database"
+    else
+       echo "Unknown dataSourceClassName: $db_dataSourceClassName"
+       exit
+    fi
 
-DFLT_SCHEMA=
+    USER="$dataSource_user"
+    PASSWORD="$dataSource_password"
+else
+    if [ "$driverClassName" != "" ]; then
+        DRIVER="$driverClassName"
+        USER="$username"
+        PASSWORD="$password"
+        URL="$jdbcUrl"
+    elif [ "$db_driverClassName" != "" ]; then
+        DRIVER="$db_driverClassName"
+        USER="$db_username"
+        PASSWORD="$db_password"
+        URL="$db_url"
+    else
+       echo "Unknown configuration"
+       exit
+    fi
 
-if [ "$DRIVER" = "com.ibm.db2.jcc.DB2Driver" ]; then
-        SEP=":currentSchema="
-        db_schema=${db_url#*$SEP}
-        db_url=${db_url%$SEP*}
-        DFLT_SCHEMA="--defaultSchemaName=$db_schema"
-
-        echo "db.schema   = $db_schema"
+    SCHEMA="$schema"
 fi
 
-echo "db.url      = $db_url"
-echo "changelog   = $CHANGELOG_FILE"
+echo "DRIVER     = $DRIVER"
+echo "USER       = $USER"
+echo "URL        = $URL"
+if [ "$SCHEMA" != "" ]; then
+    echo "SCHEMA     = $SCHEMA"
+fi
+echo "CHANGELOG  = $CHANGELOG_FILE"
 
 liquibase ()
 {
-   CMD="$LIQUIBASE_HOME/liquibase --driver=$DRIVER --classpath=$JDBC_CP --changeLogFile=$CHANGELOG_FILE $DFLT_SCHEMA --url=$db_url --username=$db_username --password=$db_password --logLevel=$LOG_LEVEL $COMMAND"
+   CMD="$LIQUIBASE_HOME/liquibase --driver=$DRIVER --classpath=$JDBC_CP --changeLogFile=$CHANGELOG_FILE --url=$URL --username=$USER --password=$PASSWORD --logLevel=$LOG_LEVEL"
+
+   if [ "$SCHEMA" != "" ]; then
+       CMD="$CMD --defaultSchemaName=$SCHEMA"
+   fi
+
+   CMD="$CMD $COMMAND"
    #echo "$CMD"
    $CMD
 }
@@ -69,5 +113,6 @@ else
   echo  'Command:'
   echo     update
   echo     dropAll
+  echo     releaseLocks
 fi
 

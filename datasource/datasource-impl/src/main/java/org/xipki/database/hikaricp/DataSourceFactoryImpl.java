@@ -25,6 +25,7 @@ import java.util.Properties;
 
 import org.xipki.database.api.DataSource;
 import org.xipki.database.api.DataSourceFactory;
+import org.xipki.database.api.DatabaseType;
 import org.xipki.security.api.PasswordResolver;
 import org.xipki.security.api.PasswordResolverException;
 
@@ -81,139 +82,41 @@ public class DataSourceFactoryImpl implements DataSourceFactory
         Properties config = new Properties();
         config.load(conf);
 
-        DataSourceImpl ds = new DataSourceImpl();
-
-        String s;
-        Boolean b;
-        Integer i;
-
-        String driverClassName = config.getProperty(DRIVER_CLASSNAME);
-        if(driverClassName != null)
+        DatabaseType databaseType;
+        String legacyJdbcUrl = config.getProperty(LegacyConfConverter.DRIVER_CLASSNAME);
+        if(legacyJdbcUrl != null)
         {
-            ds.setDriverClassName(driverClassName.trim());
+            config = LegacyConfConverter.convert(config);
         }
 
-        // username
-        s = config.getProperty(USERNAME);
-        if(s != null)
+        String className = config.getProperty("dataSourceClassName");
+        if(className != null)
         {
-            ds.setUsername(s.trim());
+            databaseType = DatabaseType.getDataSourceForDataSource(className);
+
+        }
+        else
+        {
+            className = config.getProperty("driverClassName");
+            databaseType = DatabaseType.getDataSourceForDriver(className);
         }
 
-        // password
-        String password = config.getProperty(PASSWORD);
+        String password = config.getProperty("password");
         if(password != null)
         {
-            ds.setPassword(password.trim());
+            password = new String(passwordResolver.resolvePassword(password));
+            config.setProperty("password", password);
         }
 
-        // url
-        s = config.getProperty(URL);
-        if(s != null)
+        password = config.getProperty("dataSource.password");
+        if(password != null)
         {
-            ds.setUrl(s.trim());
+            password = new String(passwordResolver.resolvePassword(password));
+            config.setProperty("dataSource.password", password);
         }
 
-        // defaultAutoCommit
-        b = getBooleanValue(config, DEFAULT_AUTOCOMMIT);
-        if(b != null)
-        {
-            ds.setAutoCommit(b);
-        }
-
-        // defaultReadOnly
-        b = getBooleanValue(config, DEFAULT_READONLY);
-        if(b != null)
-        {
-            ds.setReadOnly(b);
-        }
-
-        // defaultTransactionIsolation
-        i  = getIntValue(config, DEFAULT_TRANSACTION_ISOLATION);
-        if(i != null)
-        {
-            ds.setTransactionIsolation(i);
-        }
-
-        // maxActive
-        i = getIntValue(config, MAX_ACTIVE);
-        if(i != null)
-        {
-            ds.setMaxActive(i);
-        }
-
-        // minIdle
-        i = getIntValue(config, MIN_IDLE);
-        if(i != null)
-        {
-            ds.setMinimumIdle(i);
-        }
-
-        // connectionTimeout
-        i = getIntValue(config, MAX_WAIT);
-        if(i != null)
-        {
-            ds.setConnectionTimeout(i);
-        }
-
-        i = getIntValue(config,MAX_LIFETIME);
-        if(i != null)
-        {
-            ds.setMaxActive(i);
-        }
-
-        i = getIntValue(config, IDLE_TIMEOUT);
-        if(i != null)
-        {
-            ds.setIdleTimeout(i);
-        }
-
-        ds.setPasswordResolver(passwordResolver);
-        ds.init();
+        DataSourceImpl ds = new DataSourceImpl(config, databaseType);
         return ds;
     }
-
-    private static Boolean getBooleanValue(Properties props, String key)
-    {
-        String prop = props.getProperty(key);
-        if(prop != null && !prop.isEmpty())
-        {
-            return Boolean.valueOf(prop.trim());
-        }
-
-        return null;
-    }
-
-    private static Integer getIntValue(Properties props, String key)
-    {
-        String prop = props.getProperty(key);
-        if(prop != null && !prop.isEmpty())
-        {
-            try
-            {
-                return Integer.parseInt(prop.trim());
-            }catch(NumberFormatException e)
-            {
-            }
-        }
-        return null;
-    }
-
-    private final static String P = "db.";
-    private final static String DRIVER_CLASSNAME = P + "driverClassName";
-    private final static String URL = P + "url";
-    private final static String USERNAME = P + "username";
-    private final static String PASSWORD = P + "password";
-
-    private final static String DEFAULT_AUTOCOMMIT = "defaultAutoCommit";
-    private final static String DEFAULT_READONLY = "defaultReadOnly";
-    private final static String DEFAULT_TRANSACTION_ISOLATION = "defaultTransactionIsolation";
-
-    private final static String MAX_ACTIVE = P + "maxActive";
-    private final static String MIN_IDLE = P + "minIdle";
-    private final static String MAX_WAIT = P + "maxWait";
-
-    private final static String IDLE_TIMEOUT = P + "idleTimeout";
-    private final static String MAX_LIFETIME = P + "maxLifetime";
 
 }

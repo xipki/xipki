@@ -144,20 +144,19 @@ class CaConfigurationDbExporter extends DbPorter
         System.out.println("Exporting table ENVIRONMENT");
         Environments environments = new Environments();
 
-        String valueColumn = tableHasColumn("ENVIRONMENT", "VALUE2") ? "VALUE2" : "VALUE";
         Statement stmt = null;
         ResultSet rs = null;
         try
         {
             stmt = createStatement();
 
-            String sql = "SELECT NAME, " + valueColumn + " FROM ENVIRONMENT";
+            String sql = "SELECT NAME, VALUE2 FROM ENVIRONMENT";
             rs = stmt.executeQuery(sql);
 
             while(rs.next())
             {
                 String name = rs.getString("NAME");
-                String value = rs.getString(valueColumn);
+                String value = rs.getString("VALUE2");
 
                 EnvironmentType environment = new EnvironmentType();
                 environment.setName(name);

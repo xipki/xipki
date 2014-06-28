@@ -78,15 +78,16 @@ public class OcspDbExporter
             throw new IOException(destFolder + " is not empty");
         }
 
-        // CertStore
-        OcspCertStoreDbExporter certStoreExporter = new OcspCertStoreDbExporter(
-                dataSource, marshaller, destFolder, numCertsInBundle);
         try
         {
+            // CertStore
+            OcspCertStoreDbExporter certStoreExporter = new OcspCertStoreDbExporter(
+                    dataSource, marshaller, destFolder, numCertsInBundle);
             certStoreExporter.export();
+            certStoreExporter.shutdown();
         }finally
         {
-            certStoreExporter.shutdown();
+            dataSource.shutdown();
         }
     }
 
