@@ -53,13 +53,14 @@ public class OcspDbImporter
     throws Exception
     {
         // CertStore
-        OcspCertStoreDbImporter certStoreImporter = new OcspCertStoreDbImporter(dataSource, unmarshaller, srcFolder);
         try
         {
+            OcspCertStoreDbImporter certStoreImporter = new OcspCertStoreDbImporter(dataSource, unmarshaller, srcFolder);
             certStoreImporter.importToDB();
+            certStoreImporter.shutdown();
         } finally
         {
-            certStoreImporter.shutdown();
+            dataSource.shutdown();
         }
     }
 

@@ -88,7 +88,12 @@
 
         <!-- JDBC drivers -->
         <fileSet>
-            <!--directory>${project.build.directory}/jdbc</directory-->
+            <directory>${project.build.directory}/jdbc</directory>
+            <outputDirectory>/lib/ext</outputDirectory>
+            <fileMode>0644</fileMode>
+            <directoryMode>0755</directoryMode>
+        </fileSet>
+        <fileSet>
             <directory>../jdbc</directory>
             <outputDirectory>/lib/ext</outputDirectory>
             <fileMode>0644</fileMode>
@@ -169,6 +174,22 @@
     </fileSets>
 
     <files>
+        <file>
+            <source>${project.basedir}/src/main/unfiltered/ca-config/example/ca-db.properties-h2</source>
+            <outputDirectory>ca-config</outputDirectory>
+            <destName>ca-db.properties</destName>
+            <fileMode>0644</fileMode>
+            <lineEnding>unix</lineEnding>
+        </file>
+        
+        <file>
+            <source>${project.basedir}/src/main/unfiltered/ocsp-config/example/ocsp-db.properties-h2</source>
+            <outputDirectory>ocsp-config</outputDirectory>
+            <destName>ocsp-db.properties</destName>
+            <fileMode>0644</fileMode>
+            <lineEnding>unix</lineEnding>
+        </file>
+        
         <file>
             <source>${project.basedir}/../../LICENSE</source>
             <outputDirectory>/</outputDirectory>

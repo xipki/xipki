@@ -78,15 +78,21 @@ public class CaDbExporter
             throw new IOException(destFolder + " is not empty");
         }
 
-        // CAConfiguration
-        CaConfigurationDbExporter caConfExporter = new CaConfigurationDbExporter(dataSource, marshaller, destFolder);
-        caConfExporter.export();
+        try
+        {
+            // CAConfiguration
+            CaConfigurationDbExporter caConfExporter = new CaConfigurationDbExporter(dataSource, marshaller, destFolder);
+               caConfExporter.export();
 
-        // CertStore
-        CaCertStoreDbExporter certStoreExporter = new CaCertStoreDbExporter(
-                dataSource, marshaller, destFolder, numCertsInBundle, numCrls);
-        certStoreExporter.export();
-        certStoreExporter.shutdown();
+            // CertStore
+            CaCertStoreDbExporter certStoreExporter = new CaCertStoreDbExporter(
+                    dataSource, marshaller, destFolder, numCertsInBundle, numCrls);
+            certStoreExporter.export();
+            certStoreExporter.shutdown();
+        }finally
+        {
+            dataSource.shutdown();
+        }
     }
 
 }

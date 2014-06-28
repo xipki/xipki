@@ -237,7 +237,7 @@ public class X509CA
         if(greatestSerialNumber == null)
         {
             throw new OperationException(ErrorCode.DATABASE_FAILURE,
-                    "Could not retrieve the greated serial number for ca " + caInfo.getName());
+                    "Could not retrieve the greatest serial number for ca " + caInfo.getName());
         }
 
         if(caInfo.getNextSerial() < greatestSerialNumber + 1)

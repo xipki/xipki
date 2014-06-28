@@ -428,8 +428,8 @@ class CaCertStoreDbImporter extends DbPorter
                         ps.setNull(idx++, Types.INTEGER);
                     }
 
-                    InputStream is = new ByteArrayInputStream(encodedCrl);
-                    ps.setBlob(idx++, is);
+                    String s = Base64.toBase64String(encodedCrl);
+                    ps.setString(idx++, s);
 
                     ps.executeUpdate();
                 }catch(Exception e)

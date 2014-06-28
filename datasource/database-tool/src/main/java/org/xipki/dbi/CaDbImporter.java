@@ -52,15 +52,22 @@ public class CaDbImporter
     public void importDatabase(String srcFolder)
     throws Exception
     {
-        // CAConfiguration
-        CaConfigurationDbImporter caConfImporter = new CaConfigurationDbImporter(
-                dataSource, unmarshaller, srcFolder);
-        caConfImporter.importToDB();
+        try
+        {
+            // CAConfiguration
+            CaConfigurationDbImporter caConfImporter = new CaConfigurationDbImporter(
+                    dataSource, unmarshaller, srcFolder);
+            caConfImporter.importToDB();
+            caConfImporter.shutdown();
 
-        // CertStore
-        CaCertStoreDbImporter certStoreImporter = new CaCertStoreDbImporter(dataSource, unmarshaller, srcFolder);
-        certStoreImporter.importToDB();
-        certStoreImporter.shutdown();
+            // CertStore
+            CaCertStoreDbImporter certStoreImporter = new CaCertStoreDbImporter(dataSource, unmarshaller, srcFolder);
+            certStoreImporter.importToDB();
+            certStoreImporter.shutdown();
+        }finally
+        {
+            dataSource.shutdown();
+        }
     }
 
 }

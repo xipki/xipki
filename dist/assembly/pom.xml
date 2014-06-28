@@ -28,8 +28,10 @@
 	<name>${project.groupId}.${project.artifactId}</name>
 	<properties>
 		<features.repo>${project.build.directory}/features-repo</features.repo>
-		<mysql-jdbc.version>5.1.27</mysql-jdbc.version>
-		<liquibase.version>3.0.7</liquibase.version>
+		<mysql-jdbc.version>5.1.31</mysql-jdbc.version>
+		<pgjdbc-ng.version>0.3</pgjdbc-ng.version>
+		<h2-jdbc.version>1.4.179</h2-jdbc.version>
+		<liquibase.version>3.2.0</liquibase.version>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -110,6 +112,132 @@
 							</artifactItems>
 						</configuration>
 					</execution>
+					<execution>
+						<!-- Uncompress the standard Karaf distribution -->
+						<id>unpack</id>
+						<phase>generate-resources</phase>
+						<goals>
+							<goal>unpack</goal>
+						</goals>
+						<configuration>
+							<artifactItems>
+								<artifactItem>
+									<groupId>org.apache.karaf</groupId>
+									<artifactId>apache-karaf</artifactId>
+									<version>${karaf.version}</version>
+									<type>tar.gz</type>
+									<outputDirectory>target/dependencies</outputDirectory>
+								</artifactItem>
+							</artifactItems>
+						</configuration>
+					</execution>
+					<execution>
+						<!-- Uncompress the IAIK PKCS#11 native libraries -->
+						<id>unpack-iaik</id>
+						<phase>generate-resources</phase>
+						<goals>
+							<goal>unpack</goal>
+						</goals>
+						<configuration>
+							<artifactItems>
+								<artifactItem>
+									<groupId>at.tugraz.iaik</groupId>
+									<artifactId>iaikPkcs11Wrapper-native</artifactId>
+									<version>${pkcs11Wrapper.version}</version>
+									<type>zip</type>
+									<outputDirectory>target/native-lib</outputDirectory>
+								</artifactItem>
+							</artifactItems>
+						</configuration>
+					</execution>
+					<execution>
+						<!-- Extract the SQL scripts -->
+						<id>unpack-sql</id>
+						<phase>generate-resources</phase>
+						<goals>
+							<goal>unpack</goal>
+						</goals>
+						<configuration>
+							<artifactItems>
+								<artifactItem>
+									<groupId>org.xipki</groupId>
+									<artifactId>ca-sql</artifactId>
+									<version>${project.version}</version>
+									<type>jar</type>
+									<excludes>META-INF/**</excludes>
+									<outputDirectory>target/sql</outputDirectory>
+								</artifactItem>
+							</artifactItems>
+						</configuration>
+					</execution>
+					<execution>
+						<!-- Extract the OCSP XSD -->
+						<id>unpack-ocspserver-xsd</id>
+						<phase>generate-resources</phase>
+						<goals>
+							<goal>unpack</goal>
+						</goals>
+						<configuration>
+							<artifactItems>
+								<artifactItem>
+									<groupId>org.xipki</groupId>
+									<artifactId>ocsp-server</artifactId>
+									<version>${project.version}</version>
+									<type>jar</type>
+									<includes>xsd/**</includes>
+									<outputDirectory>target/ocsp-config</outputDirectory>
+								</artifactItem>
+							</artifactItems>
+						</configuration>
+					</execution>
+					<execution>
+                        <id>copy-jdbcs</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>copy</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>target/jdbc</outputDirectory>
+                            <!-- Define here the JDBC drivers -->
+                            <artifactItems>
+                                <artifactItem>
+                                    <groupId>mysql</groupId>
+                                    <artifactId>mysql-connector-java</artifactId>
+                                    <version>${mysql-jdbc.version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>com.h2database</groupId>
+                                    <artifactId>h2</artifactId>
+                                    <version>${h2-jdbc.version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>com.impossibl.pgjdbc-ng</groupId>
+                                    <artifactId>pgjdbc-ng</artifactId>
+                                    <classifier>complete</classifier>
+                                    <version>${pgjdbc-ng.version}</version>
+                                </artifactItem>                                
+                            </artifactItems>
+                        </configuration>
+                    </execution>
+					<execution>
+						<id>unpack-liquibase</id>
+						<phase>generate-resources</phase>
+						<goals>
+							<goal>unpack</goal>
+						</goals>
+						<configuration>
+							<artifactItems>
+								<artifactItem>
+									<groupId>org.liquibase</groupId>
+									<artifactId>liquibase-core</artifactId>
+									<version>${liquibase.version}</version>
+									<classifier>bin</classifier>
+									<type>tar.gz</type>
+									<outputDirectory>target/sql/liquibase</outputDirectory>
+								</artifactItem>
+							</artifactItems>
+						</configuration>
+					</execution>
 				</executions>
 			</plugin>
 			<plugin>
@@ -168,109 +296,6 @@
 			</activation>
 			<build>
 				<plugins>
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-dependency-plugin</artifactId>
-						<executions>
-							<execution>
-								<!-- Uncompress the standard Karaf distribution -->
-								<id>unpack</id>
-								<phase>generate-resources</phase>
-								<goals>
-									<goal>unpack</goal>
-								</goals>
-								<configuration>
-									<artifactItems>
-										<artifactItem>
-											<groupId>org.apache.karaf</groupId>
-											<artifactId>apache-karaf</artifactId>
-											<version>${karaf.version}</version>
-											<type>tar.gz</type>
-											<outputDirectory>target/dependencies</outputDirectory>
-										</artifactItem>
-									</artifactItems>
-								</configuration>
-							</execution>
-							<execution>
-								<!-- Uncompress the IAIK PKCS#11 native libraries -->
-								<id>unpack-iaik</id>
-								<phase>generate-resources</phase>
-								<goals>
-									<goal>unpack</goal>
-								</goals>
-								<configuration>
-									<artifactItems>
-										<artifactItem>
-											<groupId>at.tugraz.iaik</groupId>
-											<artifactId>iaikPkcs11Wrapper-native</artifactId>
-											<version>${pkcs11Wrapper.version}</version>
-											<type>zip</type>
-											<outputDirectory>target/native-lib</outputDirectory>
-										</artifactItem>
-									</artifactItems>
-								</configuration>
-							</execution>
-							<execution>
-								<!-- Extract the SQL scripts -->
-								<id>unpack-sql</id>
-								<phase>generate-resources</phase>
-								<goals>
-									<goal>unpack</goal>
-								</goals>
-								<configuration>
-									<artifactItems>
-										<artifactItem>
-											<groupId>org.xipki</groupId>
-											<artifactId>ca-sql</artifactId>
-											<version>${project.version}</version>
-											<type>jar</type>
-											<excludes>META-INF/**</excludes>
-											<outputDirectory>target/sql</outputDirectory>
-										</artifactItem>
-									</artifactItems>
-								</configuration>
-							</execution>
-							<execution>
-								<!-- Extract the OCSP XSD -->
-								<id>unpack-ocspserver-xsd</id>
-								<phase>generate-resources</phase>
-								<goals>
-									<goal>unpack</goal>
-								</goals>
-								<configuration>
-									<artifactItems>
-										<artifactItem>
-											<groupId>org.xipki</groupId>
-											<artifactId>ocsp-server</artifactId>
-											<version>${project.version}</version>
-											<type>jar</type>
-											<includes>xsd/**</includes>
-											<outputDirectory>target/ocsp-config</outputDirectory>
-										</artifactItem>
-									</artifactItems>
-								</configuration>
-							</execution>							
-							<execution>
-								<id>unpack-liquibase</id>
-								<phase>generate-resources</phase>
-								<goals>
-									<goal>unpack</goal>
-								</goals>
-								<configuration>
-									<artifactItems>
-										<artifactItem>
-											<groupId>org.liquibase</groupId>
-											<artifactId>liquibase-core</artifactId>
-											<version>${liquibase.version}</version>
-											<classifier>bin</classifier>
-											<type>tar.gz</type>
-											<outputDirectory>target/sql/liquibase</outputDirectory>
-										</artifactItem>
-									</artifactItems>
-								</configuration>
-							</execution>
-						</executions>
-					</plugin>
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-assembly-plugin</artifactId>
