@@ -134,7 +134,8 @@ public class OcspResponder
     private RequestOptions requestOptions;
     private boolean auditResponse = false;
     private boolean supportsHttpGet = false;
-    private Map<String, String> auditCertprofileMapping = new ConcurrentHashMap<>();
+    private final Map<String, String> auditCertprofileMapping = new ConcurrentHashMap<>();
+    private Set<String> excludeCertProfiles;
 
     private AuditLoggingService auditLoggingService;
 
@@ -266,6 +267,19 @@ public class OcspResponder
                 {
                     auditCertprofileMapping.put(mapping.getFrom(), mapping.getTo());
                 }
+            }
+        }
+
+        if(conf.getExcludeCertProfiles() != null)
+        {
+            List<String> list = conf.getExcludeCertProfiles().getCertProfile();
+            if(list.isEmpty())
+            {
+                excludeCertProfiles = null;
+            }
+            else
+            {
+                excludeCertProfiles = new HashSet<>(list);
             }
         }
 
@@ -673,7 +687,7 @@ public class OcspResponder
                     {
                         certStatusInfo = store.getCertStatus(
                                 reqHashAlgo, certID.getIssuerNameHash(), certID.getIssuerKeyHash(),
-                                certID.getSerialNumber());
+                                certID.getSerialNumber(), excludeCertProfiles);
                         if(certStatusInfo.getCertStatus() != CertStatus.ISSUER_UNKNOWN)
                         {
                             break;

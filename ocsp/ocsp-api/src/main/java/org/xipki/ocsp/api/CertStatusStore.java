@@ -18,6 +18,7 @@
 package org.xipki.ocsp.api;
 
 import java.math.BigInteger;
+import java.util.Set;
 
 import org.xipki.audit.api.AuditLoggingService;
 import org.xipki.database.api.DataSourceFactory;
@@ -32,7 +33,7 @@ import org.xipki.security.common.ParamChecker;
 public abstract class CertStatusStore
 {
     public abstract CertStatusInfo getCertStatus(HashAlgoType hashAlgo, byte[] issuerNameHash,
-            byte[] issuerKeyHash, BigInteger serialNumber)
+            byte[] issuerKeyHash, BigInteger serialNumber, Set<String> excludeCertProfiles)
     throws CertStatusStoreException;
 
     public abstract void init(String conf, DataSourceFactory datasourceFactory, PasswordResolver passwordResolver)

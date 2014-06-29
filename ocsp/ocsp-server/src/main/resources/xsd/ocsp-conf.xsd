@@ -44,6 +44,13 @@
 				</xs:annotation>
 			</xs:element>
 			<xs:element name="audit" type="auditType" minOccurs="0"/>
+			<xs:element name="excludeCertProfiles" minOccurs="0">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="certProfile" type="xs:string" maxOccurs="unbounded"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
 			<xs:element name="certstatusStores">
 				<xs:complexType>
 					<xs:sequence>
@@ -192,7 +199,6 @@
 					</xs:documentation>
 				</xs:annotation>		
 			</xs:element>
-			
 		</xs:sequence>
 	</xs:complexType>
 	
