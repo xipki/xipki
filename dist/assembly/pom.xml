@@ -30,6 +30,7 @@
 		<pgjdbc-ng.version>0.3</pgjdbc-ng.version>
 		<h2-jdbc.version>1.4.179</h2-jdbc.version>
 		<liquibase.version>3.2.0</liquibase.version>
+		<jtds.version>1.3.1</jtds.version>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -213,6 +214,11 @@
 									<artifactId>pgjdbc-ng</artifactId>
 									<classifier>complete</classifier>
 									<version>${pgjdbc-ng.version}</version>
+								</artifactItem>
+								<artifactItem>
+									<groupId>net.sourceforge.jtds</groupId>
+									<artifactId>jtds</artifactId>
+									<version>${jtds.version}</version>
 								</artifactItem>
 							</artifactItems>
 						</configuration>
