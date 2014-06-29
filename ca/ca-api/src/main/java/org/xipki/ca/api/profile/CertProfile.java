@@ -74,7 +74,7 @@ public abstract class CertProfile
     public abstract boolean incSerialNumberIfSubjectExists();
 
     public String incSerialNumber(String currentSerialNumber)
-    throws BadCertTemplateException
+    throws BadFormatException
     {
         try
         {
@@ -82,7 +82,7 @@ public abstract class CertProfile
             return Integer.toString(currentSN + 1);
         }catch(NumberFormatException e)
         {
-            throw new BadCertTemplateException("invalid serialNumber attribute " + currentSerialNumber);
+            throw new BadFormatException("invalid serialNumber attribute " + currentSerialNumber);
         }
     }
 }

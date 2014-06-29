@@ -55,7 +55,6 @@ import org.bouncycastle.asn1.DERSet;
 import org.bouncycastle.asn1.DERUTF8String;
 import org.bouncycastle.asn1.x500.RDN;
 import org.bouncycastle.asn1.x500.X500Name;
-import org.bouncycastle.asn1.x500.style.IETFUtils;
 import org.bouncycastle.asn1.x509.AuthorityInformationAccess;
 import org.bouncycastle.asn1.x509.AuthorityKeyIdentifier;
 import org.bouncycastle.asn1.x509.CRLDistPoint;
@@ -85,6 +84,7 @@ import org.xipki.ca.api.CAStatus;
 import org.xipki.ca.api.OperationException;
 import org.xipki.ca.api.OperationException.ErrorCode;
 import org.xipki.ca.api.profile.BadCertTemplateException;
+import org.xipki.ca.api.profile.BadFormatException;
 import org.xipki.ca.api.profile.CertProfile;
 import org.xipki.ca.api.profile.CertProfileException;
 import org.xipki.ca.api.profile.ExtensionOccurrence;
@@ -1556,17 +1556,44 @@ public class X509CA
                                     " and profile " + certProfileName + " already issued");
                         }
 
-                        do
+                        String latestSN;
+                        try{
+                        	Object[] objs = incSerialNumber(certProfile, grantedSubject, null);
+                        	latestSN = certstore.getLatestSN((X500Name) objs[0]);
+                        }catch(BadFormatException e)
+                        {
+                        	 throw new OperationException(ErrorCode.System_Failure, "BadFormatException: " + e.getMessage());
+                        }
+
+                        boolean foundUniqueSubject = false;
+                        // maximal ten tries
+                        for(int i = 0; i < 100; i++)
                         {
                             try
                             {
-                                grantedSubject = incSerialNumber(certProfile, grantedSubject);
-                            }catch (BadCertTemplateException e)
+                                Object[] objs = incSerialNumber(certProfile, grantedSubject, latestSN);
+                                grantedSubject = (X500Name) objs[0];
+                                latestSN = (String) objs[1];
+                            }catch (BadFormatException e)
                             {
-                                throw new OperationException(ErrorCode.BAD_CERT_TEMPLATE, e.getMessage());
+                                throw new OperationException(ErrorCode.System_Failure, "BadFormatException: " + e.getMessage());
                             }
-                        } while(certstore.certIssuedForSubject(caInfo.getCertificate(),
-                                IoCertUtil.sha1sum_canonicalized_name(grantedSubject)));
+
+                            foundUniqueSubject = (certstore.certIssuedForSubject(caInfo.getCertificate(),
+                                        IoCertUtil.sha1sum_canonicalized_name(grantedSubject)) == false);
+                            if(foundUniqueSubject)
+                            {
+                                break;
+                            }
+                        }
+
+                        if(foundUniqueSubject == false)
+                        {
+                            throw new OperationException(ErrorCode.ALREADY_ISSUED,
+                                    "Certificate for the given subject " + grandtedSubjectText +
+                                    " and profile " + certProfileName +
+                                    " already issued, and could not create new unique serial number");
+                        }
                     }
                 }
                 else if(triples.hasTripleForKeyAndProfile(sha1FpPublicKey, certProfileName))
@@ -2023,8 +2050,8 @@ public class X509CA
         return result;
     }
 
-    private static X500Name incSerialNumber(CertProfile profile, X500Name origName)
-    throws BadCertTemplateException
+    private static Object[] incSerialNumber(CertProfile profile, X500Name origName, String latestSN)
+    throws BadFormatException
     {
         RDN[] rdns = origName.getRDNs();
 
@@ -2044,18 +2071,14 @@ public class X509CA
             }
         }
 
-        String currentSerialNumber = null;
-        if(serialNumberIndex != -1)
-        {
-            currentSerialNumber = IETFUtils.valueToString(rdns[serialNumberIndex].getFirst().getValue());
-        }
-        String newSerialNumber = profile.incSerialNumber(currentSerialNumber);
+        String newSerialNumber = profile.incSerialNumber(latestSN);
         RDN serialNumberRdn = new RDN(ObjectIdentifiers.DN_SERIALNUMBER, new DERPrintableString(newSerialNumber));
 
+        X500Name newName;
         if(serialNumberIndex != -1)
         {
             rdns[serialNumberIndex] = serialNumberRdn;
-            return new X500Name(rdns);
+            newName = new X500Name(rdns);
         }
         else
         {
@@ -2075,8 +2098,10 @@ public class X509CA
                 }
             }
 
-            return new X500Name(newRdns.toArray(new RDN[0]));
+            newName = new X500Name(newRdns.toArray(new RDN[0]));
         }
+
+        return new Object[]{newName, newSerialNumber};
     }
 
     private boolean verifySignature(X509Certificate cert)

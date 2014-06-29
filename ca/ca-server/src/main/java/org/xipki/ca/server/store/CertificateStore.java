@@ -346,4 +346,10 @@ public class CertificateStore
     {
         return queryExecutor.getCertForId(certId);
     }
+
+    public String getLatestSN(X500Name nameWithSN)
+    throws OperationException
+    {
+        return queryExecutor.getLatestSN(nameWithSN);
+    }
 }
