@@ -1541,11 +1541,13 @@ class CertStoreQueryExecutor
         String sql = "SUBJECT FROM CERT WHERE SUBJECT LIKE ?";
         sql = dataSource.createFetchFirstSelectSQL(sql, 1, "NOTBEFORE DESC");
         PreparedStatement ps;
-		try {
-			ps = borrowPreparedStatement(sql);
-		} catch (SQLException e) {
-			throw new OperationException(ErrorCode.DATABASE_FAILURE, e.getMessage());
-		}
+        try
+        {
+            ps = borrowPreparedStatement(sql);
+        } catch (SQLException e)
+        {
+            throw new OperationException(ErrorCode.DATABASE_FAILURE, e.getMessage());
+        }
         ResultSet rs = null;
         try
         {

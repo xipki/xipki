@@ -1557,12 +1557,13 @@ public class X509CA
                         }
 
                         String latestSN;
-                        try{
-                        	Object[] objs = incSerialNumber(certProfile, grantedSubject, null);
-                        	latestSN = certstore.getLatestSN((X500Name) objs[0]);
+                        try
+                        {
+                            Object[] objs = incSerialNumber(certProfile, grantedSubject, null);
+                            latestSN = certstore.getLatestSN((X500Name) objs[0]);
                         }catch(BadFormatException e)
                         {
-                        	 throw new OperationException(ErrorCode.System_Failure, "BadFormatException: " + e.getMessage());
+                            throw new OperationException(ErrorCode.System_Failure, "BadFormatException: " + e.getMessage());
                         }
 
                         boolean foundUniqueSubject = false;

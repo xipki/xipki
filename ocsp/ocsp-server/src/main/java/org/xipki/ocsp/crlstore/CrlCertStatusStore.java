@@ -602,17 +602,17 @@ public class CrlCertStatusStore extends CertStatusStore
         CertStatusInfo certStatusInfo = null;
 
         CrlCertStatusInfo crlCertStatusInfo = certStatusInfoMap.get(serialNumber);
-        
+
         // SerialNumber is unknown
         if(crlCertStatusInfo != null)
         {
             String profile = crlCertStatusInfo.getCertProfile();
             if(profile == null || excludeCertProfiles == null || excludeCertProfiles.contains(profile) == false)
             {
-            	certStatusInfo = crlCertStatusInfo.getCertStatusInfo(certHashAlgo, thisUpdate, nextUpdate);
+                certStatusInfo = crlCertStatusInfo.getCertStatusInfo(certHashAlgo, thisUpdate, nextUpdate);
             }
         }
-        
+
         if(certStatusInfo == null)
         {
             if(unknownSerialAsGood)
