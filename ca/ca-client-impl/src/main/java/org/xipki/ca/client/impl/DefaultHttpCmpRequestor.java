@@ -30,6 +30,10 @@ import org.xipki.security.api.ConcurrentContentSigner;
 import org.xipki.security.api.SecurityFactory;
 import org.xipki.security.common.ParamChecker;
 
+/**
+ * @author Lijun Liao
+ */
+
 class DefaultHttpCmpRequestor extends X509CmpRequestor
 {
     private static final String CMP_REQUEST_MIMETYPE = "application/pkixcmp";

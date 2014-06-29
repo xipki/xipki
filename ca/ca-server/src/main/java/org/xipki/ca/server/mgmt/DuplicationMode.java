@@ -17,6 +17,10 @@
 
 package org.xipki.ca.server.mgmt;
 
+/**
+ * @author Lijun Liao
+ */
+
 public enum DuplicationMode
 {
     FORBIDDEN (1),
