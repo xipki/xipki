@@ -295,7 +295,7 @@ public class DbCertStatusStore extends CertStatusStore
     @Override
     public CertStatusInfo getCertStatus(
             HashAlgoType hashAlgo, byte[] issuerNameHash, byte[] issuerKeyHash,
-            BigInteger serialNumber)
+            BigInteger serialNumber, Set<String> excludeCertProfiles)
     throws CertStatusStoreException
     {
         // wait for max. 0.5 second
@@ -354,34 +354,46 @@ public class DbCertStatusStore extends CertStatusStore
 
                 rs = ps.executeQuery();
 
+                boolean unknownOrIgnore = true;
+
                 if(rs.next())
                 {
-                    String certprofile = rs.getString("PROFILE");
-                    byte[] certHash = null;
-                    if(includeCertHash)
-                    {
-                        int certId = rs.getInt("ID");
-                        certHash = getCertHash(certId, certHashAlgo);
-                    }
+                    unknownOrIgnore = false;
 
-                    boolean revoked = rs.getBoolean("REVOKED");
-                    if(revoked)
+                    String certprofile = rs.getString("PROFILE");
+                    if(excludeCertProfiles != null && excludeCertProfiles.contains(certprofile))
                     {
-                        int reason = rs.getInt("REV_REASON");
-                        long revocationTime = rs.getLong("REV_TIME");
-                        long invalidatityTime = rs.getLong("REV_INVALIDITY_TIME");
-                        CertRevocationInfo revInfo = new CertRevocationInfo(reason, new Date(revocationTime * 1000),
-                                new Date(invalidatityTime * 1000));
-                        certStatusInfo = CertStatusInfo.getRevokedCertStatusInfo(revInfo, certHashAlgo, certHash,
-                                thisUpdate, null, certprofile);
+                        unknownOrIgnore = true;
                     }
                     else
                     {
-                        certStatusInfo = CertStatusInfo.getGoodCertStatusInfo(certHashAlgo, certHash, thisUpdate,
-                                null, certprofile);
+                        byte[] certHash = null;
+                        if(includeCertHash)
+                        {
+                            int certId = rs.getInt("ID");
+                            certHash = getCertHash(certId, certHashAlgo);
+                        }
+
+                        boolean revoked = rs.getBoolean("REVOKED");
+                        if(revoked)
+                        {
+                            int reason = rs.getInt("REV_REASON");
+                            long revocationTime = rs.getLong("REV_TIME");
+                            long invalidatityTime = rs.getLong("REV_INVALIDITY_TIME");
+                            CertRevocationInfo revInfo = new CertRevocationInfo(reason, new Date(revocationTime * 1000),
+                                    new Date(invalidatityTime * 1000));
+                            certStatusInfo = CertStatusInfo.getRevokedCertStatusInfo(revInfo, certHashAlgo, certHash,
+                                    thisUpdate, null, certprofile);
+                        }
+                        else
+                        {
+                            certStatusInfo = CertStatusInfo.getGoodCertStatusInfo(certHashAlgo, certHash, thisUpdate,
+                                    null, certprofile);
+                        }
                     }
                 }
-                else
+
+                if(unknownOrIgnore)
                 {
                     if(unknownSerialAsGood)
                     {

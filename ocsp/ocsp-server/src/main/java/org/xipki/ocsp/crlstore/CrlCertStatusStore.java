@@ -540,7 +540,7 @@ public class CrlCertStatusStore extends CertStatusStore
     @Override
     public CertStatusInfo getCertStatus(
             HashAlgoType hashAlgo, byte[] issuerNameHash, byte[] issuerKeyHash,
-            BigInteger serialNumber)
+            BigInteger serialNumber, Set<String> excludeCertProfiles)
     throws CertStatusStoreException
     {
         // wait for max. 0.5 second
@@ -599,11 +599,21 @@ public class CrlCertStatusStore extends CertStatusStore
             return CertStatusInfo.getIssuerUnknownCertStatusInfo(thisUpdate, nextUpdate);
         }
 
-        CertStatusInfo certStatusInfo;
+        CertStatusInfo certStatusInfo = null;
 
         CrlCertStatusInfo crlCertStatusInfo = certStatusInfoMap.get(serialNumber);
+        
         // SerialNumber is unknown
-        if(crlCertStatusInfo == null)
+        if(crlCertStatusInfo != null)
+        {
+            String profile = crlCertStatusInfo.getCertProfile();
+            if(profile == null || excludeCertProfiles == null || excludeCertProfiles.contains(profile) == false)
+            {
+            	certStatusInfo = crlCertStatusInfo.getCertStatusInfo(certHashAlgo, thisUpdate, nextUpdate);
+            }
+        }
+        
+        if(certStatusInfo == null)
         {
             if(unknownSerialAsGood)
             {
@@ -624,10 +634,6 @@ public class CrlCertStatusStore extends CertStatusStore
             {
                 certStatusInfo = CertStatusInfo.getUnknownCertStatusInfo(thisUpdate, nextUpdate);
             }
-        }
-        else
-        {
-            certStatusInfo = crlCertStatusInfo.getCertStatusInfo(certHashAlgo, thisUpdate, nextUpdate);
         }
 
         if(includeCrlID)
