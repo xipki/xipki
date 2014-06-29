@@ -47,6 +47,14 @@ if [ "$dataSourceClassName" != "" ]; then
     elif [ "$dataSourceClassName" = "com.impossibl.postgres.jdbc.PGDataSource" ]; then
        DRIVER="com.impossibl.postgres.jdbc.PGDriver"
        URL="jdbc:pgsql://$dataSource_host:$dataSource_port/$dataSource_database"
+    elif [ "$dataSourceClassName" = "net.sourceforge.jtds.jdbcx.JtdsDataSource" ]; then
+       DRIVER="net.sourceforge.jtds.jdbc.Driver"     
+       if [ "$dataSource_serverType" = "2" ]; then
+           JTDS_SERVERTYPE="sybase"
+       else
+           JTDS_SERVERTYPE="sqlserver"
+       fi
+       URL="jdbc:jtds:$JTDS_SERVERTYPE://$dataSource_serverName:$dataSource_portNumber/$dataSource_databaseName"
     else
        echo "Unknown dataSourceClassName: $db_dataSourceClassName"
        exit
