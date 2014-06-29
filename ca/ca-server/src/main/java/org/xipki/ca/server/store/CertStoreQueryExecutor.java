@@ -44,7 +44,10 @@ import javax.security.auth.x500.X500Principal;
 
 import org.bouncycastle.asn1.ASN1Integer;
 import org.bouncycastle.asn1.DEROctetString;
+import org.bouncycastle.asn1.DERPrintableString;
+import org.bouncycastle.asn1.x500.RDN;
 import org.bouncycastle.asn1.x500.X500Name;
+import org.bouncycastle.asn1.x500.style.IETFUtils;
 import org.bouncycastle.asn1.x509.Extension;
 import org.bouncycastle.util.encoders.Base64;
 import org.slf4j.Logger;
@@ -63,6 +66,7 @@ import org.xipki.security.common.CRLReason;
 import org.xipki.security.common.CertRevocationInfo;
 import org.xipki.security.common.IoCertUtil;
 import org.xipki.security.common.LruCache;
+import org.xipki.security.common.ObjectIdentifiers;
 import org.xipki.security.common.ParamChecker;
 
 /**
@@ -1512,6 +1516,64 @@ class CertStoreQueryExecutor
             LOG.debug("isHealthy()", e);
             return false;
         }
+    }
+
+    public String getLatestSN(X500Name nameWithSN)
+    throws OperationException
+    {
+        RDN[] rdns1 = nameWithSN.getRDNs();
+        RDN[] rdns2 = new RDN[rdns1.length];
+        for(int i = 0; i < rdns1.length; i++)
+        {
+            RDN rdn = rdns1[i];
+            if(rdn.getFirst().getType().equals(ObjectIdentifiers.DN_SERIALNUMBER))
+            {
+                rdns2[i] = new RDN(ObjectIdentifiers.DN_SERIALNUMBER, new DERPrintableString("%"));
+            }
+            else
+            {
+                rdns2[i] = rdn;
+            }
+        }
+
+        String namePattern = IoCertUtil.canonicalizeName(new X500Name(rdns2));
+
+        String sql = "SUBJECT FROM CERT WHERE SUBJECT LIKE ?";
+        sql = dataSource.createFetchFirstSelectSQL(sql, 1, "NOTBEFORE DESC");
+        PreparedStatement ps;
+		try {
+			ps = borrowPreparedStatement(sql);
+		} catch (SQLException e) {
+			throw new OperationException(ErrorCode.DATABASE_FAILURE, e.getMessage());
+		}
+        ResultSet rs = null;
+        try
+        {
+            ps.setString(1, namePattern);
+            rs = ps.executeQuery();
+            if(rs.next())
+            {
+                String str = rs.getString("SUBJECT");
+                X500Name lastName = new X500Name(str);
+                RDN[] rdns = lastName.getRDNs(ObjectIdentifiers.DN_SERIALNUMBER);
+                if(rdns == null || rdns.length == 0)
+                {
+                    return null;
+                }
+                else
+                {
+                    return IETFUtils.valueToString(rdns[0].getFirst().getValue());
+                }
+            }
+        }catch(SQLException e)
+        {
+            throw new OperationException(ErrorCode.DATABASE_FAILURE, e.getMessage());
+        }finally
+        {
+            releaseDbResources(ps, rs);
+        }
+
+        return null;
     }
 
     private static void setBoolean(PreparedStatement ps, int index, boolean b)
