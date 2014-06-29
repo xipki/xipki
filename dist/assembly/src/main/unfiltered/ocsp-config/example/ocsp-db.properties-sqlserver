@@ -5,7 +5,7 @@
 
 ################## Microsoft SQL Server, NOT TESTED #################
 
-dataSourceClassName = 	net.sourceforge.jtds.jdbcx.JtdsDataSource
+dataSourceClassName = net.sourceforge.jtds.jdbcx.JtdsDataSource
 
 ## For details of DataSource configuration please refer to
 ## http://jtds.sourceforge.net/faq.html
