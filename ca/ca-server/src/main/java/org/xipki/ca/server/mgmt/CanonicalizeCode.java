@@ -102,11 +102,16 @@ public class CanonicalizeCode
             String line;
             boolean skip = true;
             boolean lastLineEmpty = false;
+            boolean licenseTextAdded = false;
             while((line = reader.readLine()) != null)
             {
-                if(line.trim().startsWith("package "))
+                if(line.trim().startsWith("package ") || line.trim().startsWith("import "))
                 {
-                    writer.write(licenseText.getBytes());
+                    if(licenseTextAdded == false)
+                    {
+                        writer.write(licenseText.getBytes());
+                        licenseTextAdded = true;
+                    }
                     skip = false;
                 }
 
@@ -263,6 +268,7 @@ public class CanonicalizeCode
     {
         BufferedReader reader = new BufferedReader(new FileReader(file));
 
+        boolean authorsLineAvailable = false;
         List<Integer> lineNumbers = new LinkedList<>();
 
         int lineNumber = 0;
@@ -272,6 +278,11 @@ public class CanonicalizeCode
             String line;
             while((line = reader.readLine()) != null)
             {
+                if(authorsLineAvailable == false && line.contains("* @author Lijun Liao"))
+                {
+                    authorsLineAvailable = true;
+                }
+
                 lineNumber++;
                 int idx = line.indexOf("throws");
                 if(idx == -1)
@@ -322,6 +333,13 @@ public class CanonicalizeCode
             System.out.println("Please check file " + file.getPath() +
                 ": lines " + Arrays.toString(lineNumbers.toArray(new Integer[0])));
         }
+
+       if(authorsLineAvailable == false)
+       {
+           System.out.println("Please check file " + file.getPath() +
+                   ": no authors line");
+       }
+
     }
 
 }
