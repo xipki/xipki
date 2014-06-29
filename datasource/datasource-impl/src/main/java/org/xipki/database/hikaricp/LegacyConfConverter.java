@@ -20,6 +20,10 @@ package org.xipki.database.hikaricp;
 import java.sql.Connection;
 import java.util.Properties;
 
+/**
+ * @author Lijun Liao
+ */
+
 class LegacyConfConverter
 {
 
