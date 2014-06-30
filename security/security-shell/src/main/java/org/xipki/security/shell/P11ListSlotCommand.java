@@ -29,6 +29,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 import javax.security.auth.x500.X500Principal;
 
@@ -69,6 +70,36 @@ public class P11ListSlotCommand extends SecurityCommand
         IaikExtendedModule module = IaikP11ModulePool.getInstance().getModule(
                 securityFactory.getPkcs11Module());
         List<PKCS11SlotIdentifier> slotIds = new ArrayList<>(module.getAllSlotIds());
+
+        Set<Integer> slotIndexes = securityFactory.getPkcs11IncludeSlots();
+        if(slotIndexes != null && slotIndexes.isEmpty() == false)
+        {
+            List<PKCS11SlotIdentifier> slotIds2 = new ArrayList<>(slotIndexes.size());
+            for(PKCS11SlotIdentifier slotId : slotIds)
+            {
+                if(slotIndexes.contains(slotId.getSlotIndex()))
+                {
+                    slotIds2.add(slotId);
+                }
+            }
+            slotIds = slotIds2;
+        }
+
+        slotIndexes.clear();
+        slotIndexes = securityFactory.getPkcs11ExcludeSlots();
+        if(slotIndexes != null && slotIndexes.isEmpty() == false)
+        {
+            List<PKCS11SlotIdentifier> slotIds2 = new ArrayList<>(slotIds.size());
+            for(PKCS11SlotIdentifier slotId : slotIds)
+            {
+                if(slotIndexes.contains(slotId.getSlotIndex()) == false)
+                {
+                    slotIds2.add(slotId);
+                }
+            }
+            slotIds = slotIds2;
+        }
+
         Collections.sort(slotIds);
 
         int n = slotIds.size();
@@ -76,7 +107,14 @@ public class P11ListSlotCommand extends SecurityCommand
         String defaultPkcs11Lib = securityFactory.getPkcs11Module();
         StringBuilder sb = new StringBuilder();
         sb.append("PKCS#11 library: ").append(defaultPkcs11Lib).append("\n");
-        sb.append(n + " slots are configured\n");
+        if(n == 0 || n == 1)
+        {
+            sb.append(((n == 0) ? "no" : "1") + " slot is configured\n");
+        }
+        else
+        {
+            sb.append(n + " slots are configured\n");
+        }
         System.out.println(sb.toString());
 
         char[] pwd = readPasswordIfRequired(password, readFromConsole);
