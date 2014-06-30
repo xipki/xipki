@@ -21,6 +21,7 @@ import java.math.BigInteger;
 import java.security.InvalidKeyException;
 import java.security.PublicKey;
 import java.security.cert.X509Certificate;
+import java.util.Set;
 
 import org.bouncycastle.asn1.pkcs.CertificationRequest;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
@@ -35,6 +36,10 @@ public interface SecurityFactory
 {
     String getPkcs11Provider();
     String getPkcs11Module();
+
+    public Set<Integer> getPkcs11ExcludeSlots();
+
+    public Set<Integer> getPkcs11IncludeSlots();
 
     ConcurrentContentSigner createSigner(String type, String conf,
             X509Certificate cert, PasswordResolver passwordResolver)
