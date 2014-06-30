@@ -49,7 +49,15 @@ public class EnvListCommand extends CaCommand
             Set<String> paramNames = envParameterResolver.getAllParameterNames();
             int n = paramNames.size();
 
-            sb.append(n + " Enviroment paramters are configured:\n");
+            if(n == 0 || n == 1)
+            {
+                sb.append(((n == 0) ? "no" : "1") + " environment parameter is configured\n");
+            }
+            else
+            {
+                sb.append(n + " enviroment paramters are configured:\n");
+            }
+
             for(String paramName : paramNames)
             {
                 sb.append("\t").append(paramName).append("\n");
