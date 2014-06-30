@@ -51,7 +51,15 @@ public class CrlSignerListCommand extends CaCommand
             Set<String> names = caManager.getCrlSignerNames();
             int n = names.size();
 
-            sb.append(n + " CRL signers are configured:\n");
+            if(n == 0 || n == 1)
+            {
+                sb.append(((n == 0) ? "no" : "1") + " CRL signer is configured\n");
+            }
+            else
+            {
+                sb.append(n + " CRL signers are configured:\n");
+            }
+
             for(String paramName : names)
             {
                 sb.append("\t").append(paramName).append("\n");

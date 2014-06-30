@@ -46,7 +46,15 @@ public class CaAliasListCommand extends CaCommand
         {
             int n = aliasNames.size();
 
-            sb.append(n + " CA aliases are configured:\n");
+            if(n == 0 || n == 1)
+            {
+                sb.append(((n == 0) ? "no" : "1") + " CA alias is configured\n");
+            }
+            else
+            {
+                sb.append(n + " CA aliases are configured:\n");
+            }
+
             for(String aliasName : aliasNames)
             {
                 sb.append("\t").append(aliasName).append("\n");
