@@ -33,6 +33,7 @@ import java.security.Signature;
 import java.security.SignatureException;
 import java.security.cert.X509Certificate;
 import java.security.spec.InvalidKeySpecException;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.StringTokenizer;
@@ -629,7 +630,7 @@ public class SecurityFactoryImpl implements SecurityFactory
             slotIndexes.add(Integer.parseInt(st.nextToken()));
         }
 
-        return slotIndexes;
+        return Collections.unmodifiableSet(slotIndexes);
     }
 
     public static String getKeystoreSignerConf(String keystoreFile, String password,
@@ -709,6 +710,18 @@ public class SecurityFactoryImpl implements SecurityFactory
     public void setPkcs11Module(String pkcs11Module)
     {
         this.pkcs11Module = pkcs11Module;
+    }
+
+    @Override
+    public Set<Integer> getPkcs11ExcludeSlots()
+    {
+        return pkcs11ExcludeSlots;
+    }
+
+    @Override
+    public Set<Integer> getPkcs11IncludeSlots()
+    {
+        return pkcs11IncludeSlots;
     }
 
 }
