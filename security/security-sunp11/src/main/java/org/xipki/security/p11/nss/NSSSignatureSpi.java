@@ -63,13 +63,13 @@ public class NSSSignatureSpi extends SignatureSpi
 
     private static final String MSG_UNSUPPORTED_ALGO = "Unsupported signature algorithm (digestAlgo: %s, encryptionAlgo: %s)";
 
-        private NSSSignatureSpi(String algorithm)
-        {
-            this.service = getSignatureService(algorithm);
-            this.md = null;
-            this.cipher = null;
-            this.hashAlgOid = null;
-        }
+    private NSSSignatureSpi(String algorithm)
+    {
+        this.service = getSignatureService(algorithm);
+        this.md = null;
+        this.cipher = null;
+        this.hashAlgOid = null;
+    }
 
     private NSSSignatureSpi(String digestAlgorithmName, String encrAlgorithmName)
     {
