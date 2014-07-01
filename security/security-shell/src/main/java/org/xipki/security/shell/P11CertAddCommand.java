@@ -58,7 +58,7 @@ public class P11CertAddCommand extends SecurityCommand
 
     @Option(name = "-p",
             required = false, description = "Read password from console")
-    protected Boolean            readFromConsole;
+    protected Boolean           readFromConsole;
 
     @Override
     protected Object doExecute()
