@@ -39,7 +39,11 @@ if [ "$dataSourceClassName" != "" ]; then
        URL="jdbc:mysql://$dataSource_serverName:$dataSource_port/$dataSource_databaseName"
     elif [ "$dataSourceClassName" = "oracle.jdbc.pool.OracleDataSource" ]; then
        DRIVER="oracle.jdbc.driver.OracleDriver"
-       URL="jdbc:oracle:thin:@$dataSource_serverName:$dataSource_portNumber:$dataSource_databaseName"
+       if [ "$dataSource_URL" != "" ]; then
+           URL="$dataSource_URL"
+       else
+           URL="jdbc:oracle:thin:@$dataSource_serverName:$dataSource_portNumber:$dataSource_databaseName"
+       fi
     elif [ "$dataSourceClassName" = "com.ibm.db2.jcc.DB2SimpleDataSource" ]; then
        DRIVER="com.ibm.db2.jcc.DB2Driver"
        URL="jdbc:db2://$dataSource_serverName:$dataSource_portNumber/$dataSource_databaseName"
