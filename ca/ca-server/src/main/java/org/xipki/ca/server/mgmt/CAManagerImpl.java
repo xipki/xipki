@@ -754,6 +754,18 @@ public class CAManagerImpl implements CAManager
             caLockFile.delete();
         }
 
+        for(String dsName :dataSources.keySet())
+        {
+            DataSource ds = dataSources.get(dsName);
+            try
+            {
+                ds.shutdown();
+            } catch(Exception e)
+            {
+                LOG.warn("could not shutdown datasource " + dsName + ": " + e.getMessage());
+                LOG.debug("could not shutdown datasource " + dsName, e);
+            }
+        }
         LOG.info("Stopped CA system");
         auditLogPCIEvent(true, "SHUTDOWN");
     }
