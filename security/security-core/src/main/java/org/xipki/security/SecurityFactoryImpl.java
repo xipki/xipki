@@ -713,13 +713,13 @@ public class SecurityFactoryImpl implements SecurityFactory
     }
 
     @Override
-    public Set<Integer> getPkcs11ExcludeSlots()
+    public Set<Integer> getPkcs11ExcludeSlotIndexes()
     {
         return pkcs11ExcludeSlots;
     }
 
     @Override
-    public Set<Integer> getPkcs11IncludeSlots()
+    public Set<Integer> getPkcs11IncludeSlotIndexes()
     {
         return pkcs11IncludeSlots;
     }
