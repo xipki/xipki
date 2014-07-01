@@ -63,6 +63,10 @@ public class P11ListSlotCommand extends SecurityCommand
             required = false, description = "Read password from console")
     protected Boolean            readFromConsole;
 
+    @Option(name = "-v", aliases="--verbose",
+            required = false, description = "Show object information verbosely")
+    protected Boolean          verbose;
+
     @Override
     protected Object doExecute()
     throws Exception
@@ -85,7 +89,6 @@ public class P11ListSlotCommand extends SecurityCommand
             slotIds = slotIds2;
         }
 
-        slotIndexes.clear();
         slotIndexes = securityFactory.getPkcs11ExcludeSlotIndexes();
         if(slotIndexes != null && slotIndexes.isEmpty() == false)
         {
@@ -261,6 +264,17 @@ public class P11ListSlotCommand extends SecurityCommand
             subject = new String(bytes);
         }
 
+        if(verbose == null || verbose.booleanValue() == false)
+        {
+            sb.append("\t\tCertificate: ").append(subject).append("\n");
+            return;
+        }
+
+        sb.append("\t\tCertificate:\n");
+        sb.append("\t\t\tSubject:    ")
+            .append(subject)
+            .append("\n");
+
         bytes = cert.getIssuer().getByteArrayValue();
         String issuer;
         try
@@ -271,16 +285,11 @@ public class P11ListSlotCommand extends SecurityCommand
         {
             issuer = new String(bytes);
         }
-
-        byte[] certBytes = cert.getValue().getByteArrayValue();
-
-        sb.append("\t\tCertificate:\n");
-        sb.append("\t\t\tSubject:    ")
-            .append(subject)
-            .append("\n");
         sb.append("\t\t\tIssuer:     ")
             .append(issuer)
             .append("\n");
+
+        byte[] certBytes = cert.getValue().getByteArrayValue();
 
         X509Certificate x509Cert = null;
         try
