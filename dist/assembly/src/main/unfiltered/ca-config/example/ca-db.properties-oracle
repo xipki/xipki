@@ -7,12 +7,19 @@
 
 dataSourceClassName = oracle.jdbc.pool.OracleDataSource
 
+# database can be either identified by choice 1 (serverName, portNumber,
+# databaseName and driverType) or choice 2 (only URL).
+# choice 1
 dataSource.serverName = localhost
 dataSource.portNumber = 1521
 dataSource.databaseName = ca
+dataSource.driverType = thin
+
+# choice 2
+#dataSource.URL = jdbc:oracle:thin:@localhost:1521:ca
+
 dataSource.user = root
 dataSource.password = 123456
-dataSource.driverType = thin
 dataSource.implicitCachingEnabled = true
 dataSource.explicitCachingEnabled = true
 
