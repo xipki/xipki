@@ -71,7 +71,7 @@ public class P11ListSlotCommand extends SecurityCommand
                 securityFactory.getPkcs11Module());
         List<PKCS11SlotIdentifier> slotIds = new ArrayList<>(module.getAllSlotIds());
 
-        Set<Integer> slotIndexes = securityFactory.getPkcs11IncludeSlots();
+        Set<Integer> slotIndexes = securityFactory.getPkcs11IncludeSlotIndexes();
         if(slotIndexes != null && slotIndexes.isEmpty() == false)
         {
             List<PKCS11SlotIdentifier> slotIds2 = new ArrayList<>(slotIndexes.size());
@@ -86,7 +86,7 @@ public class P11ListSlotCommand extends SecurityCommand
         }
 
         slotIndexes.clear();
-        slotIndexes = securityFactory.getPkcs11ExcludeSlots();
+        slotIndexes = securityFactory.getPkcs11ExcludeSlotIndexes();
         if(slotIndexes != null && slotIndexes.isEmpty() == false)
         {
             List<PKCS11SlotIdentifier> slotIds2 = new ArrayList<>(slotIds.size());

@@ -37,9 +37,9 @@ public interface SecurityFactory
     String getPkcs11Provider();
     String getPkcs11Module();
 
-    public Set<Integer> getPkcs11ExcludeSlots();
+    public Set<Integer> getPkcs11ExcludeSlotIndexes();
 
-    public Set<Integer> getPkcs11IncludeSlots();
+    public Set<Integer> getPkcs11IncludeSlotIndexes();
 
     ConcurrentContentSigner createSigner(String type, String conf,
             X509Certificate cert, PasswordResolver passwordResolver)
