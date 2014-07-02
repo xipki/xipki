@@ -772,6 +772,7 @@ public class X509CA
                 String msg = "Error while add entry to PublishQueue: " + t.getMessage();
                 LOG.error(msg);
                 LOG.debug(msg, t);
+                return false;
             }
         }
 
