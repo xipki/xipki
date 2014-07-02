@@ -246,7 +246,8 @@ public class CAManagerImpl implements CAManager
                     try
                     {
                         String datasourceName = key.substring("datasource.".length());
-                        DataSourceWrapper datasource = dataSourceFactory.createDataSourceForFile(datasourceFile, passwordResolver);
+                        DataSourceWrapper datasource = dataSourceFactory.createDataSourceForFile(
+                                datasourceFile, passwordResolver);
                         this.dataSources.put(datasourceName, datasource);
                     } catch (SQLException e)
                     {
