@@ -35,7 +35,7 @@ import javax.xml.bind.Marshaller;
 import org.bouncycastle.util.encoders.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.database.api.DataSource;
+import org.xipki.database.api.DataSourceWrapper;
 import org.xipki.dbi.ocsp.jaxb.CertStoreType;
 import org.xipki.dbi.ocsp.jaxb.CertStoreType.CertsFiles;
 import org.xipki.dbi.ocsp.jaxb.CertStoreType.Issuers;
@@ -60,7 +60,7 @@ class OcspCertStoreDbExporter extends DbPorter
     private final ObjectFactory objFact = new ObjectFactory();
     private final int numCertsInBundle;
 
-    OcspCertStoreDbExporter(DataSource dataSource, Marshaller marshaller, String baseDir, int numCertsInBundle)
+    OcspCertStoreDbExporter(DataSourceWrapper dataSource, Marshaller marshaller, String baseDir, int numCertsInBundle)
     throws SQLException, PasswordResolverException, IOException
     {
         super(dataSource, baseDir);

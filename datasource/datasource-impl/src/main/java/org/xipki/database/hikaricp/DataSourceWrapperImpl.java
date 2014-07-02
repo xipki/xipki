@@ -27,7 +27,7 @@ import java.util.Properties;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.database.api.DataSource;
+import org.xipki.database.api.DataSourceWrapper;
 import org.xipki.database.api.DatabaseType;
 
 import com.zaxxer.hikari.HikariConfig;
@@ -37,9 +37,9 @@ import com.zaxxer.hikari.HikariDataSource;
  * @author Lijun Liao
  */
 
-public class DataSourceImpl implements DataSource
+public class DataSourceWrapperImpl implements DataSourceWrapper
 {
-    private static final Logger LOG = LoggerFactory.getLogger(DataSourceImpl.class);
+    private static final Logger LOG = LoggerFactory.getLogger(DataSourceWrapperImpl.class);
 
     /**
      * References the real data source implementation this class acts as pure
@@ -49,7 +49,7 @@ public class DataSourceImpl implements DataSource
 
     private final DatabaseType databaseType;
 
-    DataSourceImpl(Properties props, DatabaseType databaseType)
+    DataSourceWrapperImpl(Properties props, DatabaseType databaseType)
     {
         HikariConfig conf = new HikariConfig(props);
         this.service = new HikariDataSource(conf);

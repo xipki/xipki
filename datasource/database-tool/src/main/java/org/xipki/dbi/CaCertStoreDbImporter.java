@@ -43,7 +43,7 @@ import org.bouncycastle.asn1.x509.Extension;
 import org.bouncycastle.util.encoders.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.database.api.DataSource;
+import org.xipki.database.api.DataSourceWrapper;
 import org.xipki.dbi.ca.jaxb.CainfoType;
 import org.xipki.dbi.ca.jaxb.CertStoreType;
 import org.xipki.dbi.ca.jaxb.CertStoreType.Cainfos;
@@ -77,7 +77,7 @@ class CaCertStoreDbImporter extends DbPorter
 
     private final Unmarshaller unmarshaller;
 
-    CaCertStoreDbImporter(DataSource dataSource, Unmarshaller unmarshaller, String srcDir)
+    CaCertStoreDbImporter(DataSourceWrapper dataSource, Unmarshaller unmarshaller, String srcDir)
     throws SQLException, PasswordResolverException, IOException, NoSuchAlgorithmException
     {
         super(dataSource, srcDir);

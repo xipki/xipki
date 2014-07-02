@@ -33,7 +33,7 @@ import org.bouncycastle.asn1.x509.Certificate;
 import org.bouncycastle.util.encoders.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.database.api.DataSource;
+import org.xipki.database.api.DataSourceWrapper;
 import org.xipki.dbi.ocsp.jaxb.CertStoreType;
 import org.xipki.dbi.ocsp.jaxb.CertStoreType.CertsFiles;
 import org.xipki.dbi.ocsp.jaxb.CertStoreType.Issuers;
@@ -56,7 +56,7 @@ class OcspCertStoreDbImporter extends DbPorter
 
     private final Unmarshaller unmarshaller;
 
-    OcspCertStoreDbImporter(DataSource dataSource, Unmarshaller unmarshaller, String srcDir)
+    OcspCertStoreDbImporter(DataSourceWrapper dataSource, Unmarshaller unmarshaller, String srcDir)
     throws SQLException, PasswordResolverException, NoSuchAlgorithmException
     {
         super(dataSource, srcDir);
