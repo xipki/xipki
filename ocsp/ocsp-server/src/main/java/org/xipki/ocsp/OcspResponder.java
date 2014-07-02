@@ -79,7 +79,7 @@ import org.xipki.audit.api.AuditLoggingService;
 import org.xipki.audit.api.AuditStatus;
 import org.xipki.audit.api.ChildAuditEvent;
 import org.xipki.audit.api.PCIAuditEvent;
-import org.xipki.database.api.DataSource;
+import org.xipki.database.api.DataSourceWrapper;
 import org.xipki.database.api.DataSourceFactory;
 import org.xipki.ocsp.api.CertStatus;
 import org.xipki.ocsp.api.CertStatusInfo;
@@ -390,7 +390,7 @@ public class OcspResponder
                 String databaseConfFile = dbStoreConf.getDbConfFile();
 
                 InputStream confStream = null;
-                DataSource dataSource;
+                DataSourceWrapper dataSource;
                 try
                 {
                     confStream = new FileInputStream(databaseConfFile);

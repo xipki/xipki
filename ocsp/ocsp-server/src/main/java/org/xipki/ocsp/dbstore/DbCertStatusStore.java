@@ -38,7 +38,7 @@ import java.util.concurrent.TimeUnit;
 import org.bouncycastle.util.encoders.Hex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.database.api.DataSource;
+import org.xipki.database.api.DataSourceWrapper;
 import org.xipki.database.api.DataSourceFactory;
 import org.xipki.ocsp.IssuerEntry;
 import org.xipki.ocsp.IssuerHashNameAndKey;
@@ -113,7 +113,7 @@ public class DbCertStatusStore extends CertStatusStore
         }
     }
 
-    private final DataSource dataSource;
+    private final DataSourceWrapper dataSource;
     private Set<String> issuerSHA1FPs;
 
     private IssuerStore issuerStore;
@@ -123,7 +123,7 @@ public class DbCertStatusStore extends CertStatusStore
 
     private ScheduledThreadPoolExecutor scheduledThreadPoolExecutor;
 
-    public DbCertStatusStore(String name, DataSource dataSource, Set<X509Certificate> issuers)
+    public DbCertStatusStore(String name, DataSourceWrapper dataSource, Set<X509Certificate> issuers)
     {
         super(name);
         ParamChecker.assertNotNull("dataSource", dataSource);

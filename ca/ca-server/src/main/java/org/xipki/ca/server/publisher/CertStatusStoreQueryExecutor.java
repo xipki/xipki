@@ -38,7 +38,7 @@ import org.bouncycastle.util.encoders.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.ca.common.X509CertificateWithMetaInfo;
-import org.xipki.database.api.DataSource;
+import org.xipki.database.api.DataSourceWrapper;
 import org.xipki.security.common.CertRevocationInfo;
 import org.xipki.security.common.HashAlgoType;
 import org.xipki.security.common.HashCalculator;
@@ -53,13 +53,13 @@ class CertStatusStoreQueryExecutor
 
     private AtomicInteger cert_id;
 
-    private final DataSource dataSource;
+    private final DataSourceWrapper dataSource;
 
     private final IssuerStore issuerStore;
 
     private final boolean publishGoodCerts;
 
-    CertStatusStoreQueryExecutor(DataSource dataSource, boolean publishGoodCerts)
+    CertStatusStoreQueryExecutor(DataSourceWrapper dataSource, boolean publishGoodCerts)
     throws SQLException, NoSuchAlgorithmException
     {
         this.dataSource = dataSource;

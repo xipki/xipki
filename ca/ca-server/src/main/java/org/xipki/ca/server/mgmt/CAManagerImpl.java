@@ -71,7 +71,7 @@ import org.xipki.ca.server.CrlSigner;
 import org.xipki.ca.server.X509CA;
 import org.xipki.ca.server.X509CACmpResponder;
 import org.xipki.ca.server.store.CertificateStore;
-import org.xipki.database.api.DataSource;
+import org.xipki.database.api.DataSourceWrapper;
 import org.xipki.database.api.DataSourceFactory;
 import org.xipki.security.api.ConcurrentContentSigner;
 import org.xipki.security.api.PasswordResolver;
@@ -99,12 +99,12 @@ public class CAManagerImpl implements CAManager
     private final String lockInstanceId;
 
     private CertificateStore certstore;
-    private DataSource dataSource;
+    private DataSourceWrapper dataSource;
     private CmpResponderEntry responder;
 
     private boolean caLockedByMe = false;
 
-    private Map<String, DataSource> dataSources = null;
+    private Map<String, DataSourceWrapper> dataSources = null;
 
     private final Map<String, CAEntry> cas = new ConcurrentHashMap<>();
     private final Map<String, CertProfileEntry> certProfiles = new ConcurrentHashMap<>();
@@ -246,7 +246,7 @@ public class CAManagerImpl implements CAManager
                     try
                     {
                         String datasourceName = key.substring("datasource.".length());
-                        DataSource datasource = dataSourceFactory.createDataSourceForFile(datasourceFile, passwordResolver);
+                        DataSourceWrapper datasource = dataSourceFactory.createDataSourceForFile(datasourceFile, passwordResolver);
                         this.dataSources.put(datasourceName, datasource);
                     } catch (SQLException e)
                     {
@@ -756,7 +756,7 @@ public class CAManagerImpl implements CAManager
 
         for(String dsName :dataSources.keySet())
         {
-            DataSource ds = dataSources.get(dsName);
+            DataSourceWrapper ds = dataSources.get(dsName);
             try
             {
                 ds.shutdown();
@@ -1070,7 +1070,7 @@ public class CAManagerImpl implements CAManager
                 {
                 }
 
-                DataSource ocspDataSource = null;
+                DataSourceWrapper ocspDataSource = null;
                 if(datasourceName != null)
                 {
                     ocspDataSource = dataSources.get(datasourceName);

@@ -61,7 +61,7 @@ import org.xipki.ca.server.CertRevocationInfoWithSerial;
 import org.xipki.ca.server.CertStatus;
 import org.xipki.ca.server.SubjectKeyProfileTriple;
 import org.xipki.ca.server.SubjectKeyProfileTripleCollection;
-import org.xipki.database.api.DataSource;
+import org.xipki.database.api.DataSourceWrapper;
 import org.xipki.security.common.CRLReason;
 import org.xipki.security.common.CertRevocationInfo;
 import org.xipki.security.common.IoCertUtil;
@@ -81,7 +81,7 @@ class CertStoreQueryExecutor
     private AtomicInteger crl_id;
     private AtomicInteger user_id;
 
-    private final DataSource dataSource;
+    private final DataSourceWrapper dataSource;
 
     private final CertBasedIdentityStore caInfoStore;
     private final NameIdStore requestorInfoStore;
@@ -90,7 +90,7 @@ class CertStoreQueryExecutor
 
     private final LruCache<String, Integer> usernameIdCache = new LruCache<>(100);
 
-    CertStoreQueryExecutor(DataSource dataSource)
+    CertStoreQueryExecutor(DataSourceWrapper dataSource)
     throws SQLException
     {
         this.dataSource = dataSource;

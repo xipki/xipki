@@ -24,7 +24,7 @@ import org.xipki.audit.api.AuditLoggingService;
 import org.xipki.ca.api.publisher.CertPublisher;
 import org.xipki.ca.api.publisher.CertPublisherException;
 import org.xipki.ca.server.IdentifiedCertPublisher;
-import org.xipki.database.api.DataSource;
+import org.xipki.database.api.DataSourceWrapper;
 import org.xipki.security.api.PasswordResolver;
 import org.xipki.security.common.ParamChecker;
 
@@ -41,7 +41,7 @@ public class PublisherEntry
     private String conf;
 
     private PasswordResolver passwordResolver;
-    private DataSource dataSource;
+    private DataSourceWrapper dataSource;
     private IdentifiedCertPublisher certPublisher;
     private AuditLoggingService auditLoggingService;
 
@@ -147,12 +147,12 @@ public class PublisherEntry
         this.passwordResolver = passwordResolver;
     }
 
-    public DataSource getDataSource()
+    public DataSourceWrapper getDataSource()
     {
         return dataSource;
     }
 
-    public void setDataSource(DataSource dataSource)
+    public void setDataSource(DataSourceWrapper dataSource)
     {
         this.dataSource = dataSource;
     }
