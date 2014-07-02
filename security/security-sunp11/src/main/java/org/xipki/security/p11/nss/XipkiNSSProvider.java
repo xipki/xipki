@@ -113,7 +113,7 @@ extends Provider
 
         try
         {
-            // check whether has been an NSS provider registered by the OpenJDK
+            // check whether there exists an NSS provider registered by OpenJDK
             nssProvider = Security.getProvider("SunPKCS11-NSS");
             if(nssProvider == null)
             {
