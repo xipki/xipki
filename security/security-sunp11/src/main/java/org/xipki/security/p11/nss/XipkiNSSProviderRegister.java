@@ -31,7 +31,7 @@ public class XipkiNSSProviderRegister
     private static Logger LOG = LoggerFactory.getLogger(XipkiNSSProviderRegister.class);
     public void regist()
     {
-        if(Security.getProperty(XipkiNSSProvider.PROVIDER_NAME) == null)
+        if(Security.getProvider(XipkiNSSProvider.PROVIDER_NAME) == null)
         {
             try
             {
@@ -39,7 +39,8 @@ public class XipkiNSSProviderRegister
                 Security.addProvider(provider);
             }catch(Throwable t)
             {
-                LOG.error("Could not add provider " + XipkiNSSProvider.PROVIDER_NAME);
+                LOG.error("Could not add provider {}: {}", XipkiNSSProvider.PROVIDER_NAME, t.getMessage());
+                LOG.debug("Could not add provider " + XipkiNSSProvider.PROVIDER_NAME, t);
             }
         }
     }
