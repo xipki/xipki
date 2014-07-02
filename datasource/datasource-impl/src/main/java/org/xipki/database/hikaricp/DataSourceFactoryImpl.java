@@ -23,7 +23,7 @@ import java.io.InputStream;
 import java.sql.SQLException;
 import java.util.Properties;
 
-import org.xipki.database.api.DataSource;
+import org.xipki.database.api.DataSourceWrapper;
 import org.xipki.database.api.DataSourceFactory;
 import org.xipki.database.api.DatabaseType;
 import org.xipki.security.api.PasswordResolver;
@@ -36,7 +36,7 @@ import org.xipki.security.api.PasswordResolverException;
 public class DataSourceFactoryImpl implements DataSourceFactory
 {
     @Override
-    public DataSource createDataSourceForFile(String confFile, PasswordResolver passwordResolver)
+    public DataSourceWrapper createDataSourceForFile(String confFile, PasswordResolver passwordResolver)
     throws SQLException, PasswordResolverException, IOException
     {
         if(confFile == null)
@@ -67,7 +67,7 @@ public class DataSourceFactoryImpl implements DataSourceFactory
     }
 
     @Override
-    public DataSource createDataSource(InputStream conf, PasswordResolver passwordResolver)
+    public DataSourceWrapper createDataSource(InputStream conf, PasswordResolver passwordResolver)
     throws SQLException, PasswordResolverException, IOException
     {
         if(conf == null)
@@ -115,7 +115,7 @@ public class DataSourceFactoryImpl implements DataSourceFactory
             config.setProperty("dataSource.password", password);
         }
 
-        DataSourceImpl ds = new DataSourceImpl(config, databaseType);
+        DataSourceWrapperImpl ds = new DataSourceWrapperImpl(config, databaseType);
         return ds;
     }
 

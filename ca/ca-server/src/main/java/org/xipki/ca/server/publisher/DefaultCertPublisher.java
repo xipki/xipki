@@ -33,7 +33,7 @@ import org.xipki.ca.api.publisher.CertPublisher;
 import org.xipki.ca.api.publisher.CertPublisherException;
 import org.xipki.ca.api.publisher.CertificateInfo;
 import org.xipki.ca.common.X509CertificateWithMetaInfo;
-import org.xipki.database.api.DataSource;
+import org.xipki.database.api.DataSourceWrapper;
 import org.xipki.security.api.PasswordResolver;
 import org.xipki.security.common.CertRevocationInfo;
 import org.xipki.security.common.CmpUtf8Pairs;
@@ -61,7 +61,7 @@ public class DefaultCertPublisher extends CertPublisher
     }
 
     @Override
-    public void initialize(String conf, PasswordResolver passwordResolver, DataSource dataSource)
+    public void initialize(String conf, PasswordResolver passwordResolver, DataSourceWrapper dataSource)
     throws CertPublisherException
     {
         ParamChecker.assertNotNull("conf", conf);

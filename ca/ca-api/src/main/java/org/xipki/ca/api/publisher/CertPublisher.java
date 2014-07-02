@@ -21,7 +21,7 @@ import java.security.cert.X509CRL;
 
 import org.xipki.audit.api.AuditLoggingService;
 import org.xipki.ca.common.X509CertificateWithMetaInfo;
-import org.xipki.database.api.DataSource;
+import org.xipki.database.api.DataSourceWrapper;
 import org.xipki.security.api.PasswordResolver;
 import org.xipki.security.common.CertRevocationInfo;
 import org.xipki.security.common.EnvironmentParameterResolver;
@@ -34,7 +34,7 @@ public abstract class CertPublisher
 {
     public abstract void initialize(String conf,
             PasswordResolver passwordResolver,
-            DataSource dataSource)
+            DataSourceWrapper dataSource)
     throws CertPublisherException;
 
     public abstract boolean isAsyn();

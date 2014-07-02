@@ -27,7 +27,7 @@ import javax.xml.bind.JAXBElement;
 import javax.xml.bind.Unmarshaller;
 
 import org.bouncycastle.util.encoders.Base64;
-import org.xipki.database.api.DataSource;
+import org.xipki.database.api.DataSourceWrapper;
 import org.xipki.dbi.ca.jaxb.CAConfigurationType;
 import org.xipki.dbi.ca.jaxb.CAConfigurationType.CaHasCertprofiles;
 import org.xipki.dbi.ca.jaxb.CAConfigurationType.CaHasPublishers;
@@ -63,7 +63,7 @@ class CaConfigurationDbImporter extends DbPorter
 {
     private final Unmarshaller unmarshaller;
 
-    CaConfigurationDbImporter(DataSource dataSource, Unmarshaller unmarshaller, String srcDir)
+    CaConfigurationDbImporter(DataSourceWrapper dataSource, Unmarshaller unmarshaller, String srcDir)
     throws SQLException, PasswordResolverException, IOException
     {
         super(dataSource, srcDir);

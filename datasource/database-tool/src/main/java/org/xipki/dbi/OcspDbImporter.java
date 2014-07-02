@@ -24,7 +24,7 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 
-import org.xipki.database.api.DataSource;
+import org.xipki.database.api.DataSourceWrapper;
 import org.xipki.database.api.DataSourceFactory;
 import org.xipki.dbi.ocsp.jaxb.ObjectFactory;
 import org.xipki.security.api.PasswordResolver;
@@ -37,7 +37,7 @@ import org.xipki.security.api.PasswordResolverException;
 public class OcspDbImporter
 {
 
-    private final DataSource dataSource;
+    private final DataSourceWrapper dataSource;
     private final Unmarshaller unmarshaller;
 
     public OcspDbImporter(DataSourceFactory dataSourceFactory,

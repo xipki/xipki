@@ -37,7 +37,7 @@ import org.xipki.ca.common.X509CertificateWithMetaInfo;
 import org.xipki.ca.server.CertRevocationInfoWithSerial;
 import org.xipki.ca.server.CertStatus;
 import org.xipki.ca.server.SubjectKeyProfileTripleCollection;
-import org.xipki.database.api.DataSource;
+import org.xipki.database.api.DataSourceWrapper;
 import org.xipki.security.common.CertRevocationInfo;
 import org.xipki.security.common.ParamChecker;
 
@@ -50,7 +50,7 @@ public class CertificateStore
     private static final Logger LOG = LoggerFactory.getLogger(CertificateStore.class);
     private final CertStoreQueryExecutor queryExecutor;
 
-    public CertificateStore(DataSource dataSource)
+    public CertificateStore(DataSourceWrapper dataSource)
     throws SQLException
     {
         ParamChecker.assertNotNull("dataSource", dataSource);

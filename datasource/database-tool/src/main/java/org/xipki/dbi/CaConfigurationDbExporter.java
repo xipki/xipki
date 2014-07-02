@@ -26,7 +26,7 @@ import java.sql.Statement;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.Marshaller;
 
-import org.xipki.database.api.DataSource;
+import org.xipki.database.api.DataSourceWrapper;
 import org.xipki.dbi.ca.jaxb.CAConfigurationType;
 import org.xipki.dbi.ca.jaxb.CAConfigurationType.CaHasCertprofiles;
 import org.xipki.dbi.ca.jaxb.CAConfigurationType.CaHasPublishers;
@@ -62,7 +62,7 @@ class CaConfigurationDbExporter extends DbPorter
 {
     private final Marshaller marshaller;
 
-    CaConfigurationDbExporter(DataSource dataSource, Marshaller marshaller, String destDir)
+    CaConfigurationDbExporter(DataSourceWrapper dataSource, Marshaller marshaller, String destDir)
     throws SQLException, PasswordResolverException, IOException
     {
         super(dataSource, destDir);
