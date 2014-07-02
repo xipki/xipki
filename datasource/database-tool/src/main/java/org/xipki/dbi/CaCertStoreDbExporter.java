@@ -43,7 +43,7 @@ import org.bouncycastle.util.encoders.Base64;
 import org.bouncycastle.util.encoders.Hex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.database.api.DataSource;
+import org.xipki.database.api.DataSourceWrapper;
 import org.xipki.dbi.ca.jaxb.CainfoType;
 import org.xipki.dbi.ca.jaxb.CertStoreType;
 import org.xipki.dbi.ca.jaxb.CertStoreType.Cainfos;
@@ -80,7 +80,7 @@ class CaCertStoreDbExporter extends DbPorter
     private final int numCertsInBundle;
     private final int numCrls;
 
-    CaCertStoreDbExporter(DataSource dataSource, Marshaller marshaller, String baseDir,
+    CaCertStoreDbExporter(DataSourceWrapper dataSource, Marshaller marshaller, String baseDir,
             int numCertsInBundle, int numCrls)
     throws SQLException, PasswordResolverException, IOException
     {

@@ -27,7 +27,7 @@ import java.sql.Statement;
  * @author Lijun Liao
  */
 
-public interface DataSource
+public interface DataSourceWrapper
 {
     Connection getConnection()
     throws SQLException;

@@ -24,7 +24,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Types;
 
-import org.xipki.database.api.DataSource;
+import org.xipki.database.api.DataSourceWrapper;
 import org.xipki.security.common.ParamChecker;
 
 /**
@@ -42,12 +42,12 @@ public class DbPorter
 
     public static final int VERSION = 1;
 
-    private final DataSource dataSource;
+    private final DataSourceWrapper dataSource;
     private Connection connection;
 
     protected final String baseDir;
 
-    public DbPorter(DataSource dataSource, String baseDir)
+    public DbPorter(DataSourceWrapper dataSource, String baseDir)
     throws SQLException
     {
         super();
