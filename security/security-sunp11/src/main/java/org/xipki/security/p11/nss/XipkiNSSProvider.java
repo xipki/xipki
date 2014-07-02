@@ -113,18 +113,23 @@ extends Provider
 
         try
         {
-            StringBuilder sb = new StringBuilder();
-            sb.append("name=").append(PROVIDER_NAME).append("\n");
-            sb.append("nssDbMode=noDb\n");
-            sb.append("attributes=compatibility");
-            String NSSLIB = System.getProperty("NSSLIB");
-            if(NSSLIB != null)
+            // check whether has been an NSS provider registered by the OpenJDK
+            nssProvider = Security.getProvider("SunPKCS11-NSS");
+            if(nssProvider == null)
             {
-                sb.append("\nnssLibraryDirectory=").append(NSSLIB);
-            }
+                StringBuilder sb = new StringBuilder();
+                sb.append("name=").append(PROVIDER_NAME).append("\n");
+                sb.append("nssDbMode=noDb\n");
+                sb.append("attributes=compatibility\n");
+                String NSSLIB = System.getProperty("NSSLIB");
+                if(NSSLIB != null)
+                {
+                    sb.append("\nnssLibraryDirectory=").append(NSSLIB);
+                }
 
-            nssProvider = new sun.security.pkcs11.SunPKCS11(new ByteArrayInputStream(sb.toString().getBytes()));
-            Security.addProvider(nssProvider);
+                nssProvider = new sun.security.pkcs11.SunPKCS11(new ByteArrayInputStream(sb.toString().getBytes()));
+                Security.addProvider(nssProvider);
+            }
         }catch(Throwable t)
         {
             throw new ProviderException("Cannot initialize SunPKCS11 NSS provider", t);
