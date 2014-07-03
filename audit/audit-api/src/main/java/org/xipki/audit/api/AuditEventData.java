@@ -39,7 +39,7 @@ public class AuditEventData
     {
         if(name == null || name.isEmpty())
         {
-            throw new IllegalArgumentException("name could not be null");
+            throw new IllegalArgumentException("name could not be empty");
         }
         if(value == null)
         {
@@ -56,7 +56,7 @@ public class AuditEventData
     {
         if(name == null || name.isEmpty())
         {
-            throw new IllegalArgumentException("name could not be null");
+            throw new IllegalArgumentException("name could not be empty");
         }
         if(value == null)
         {
@@ -73,7 +73,7 @@ public class AuditEventData
     {
         if(name == null || name.isEmpty())
         {
-            throw new IllegalArgumentException("name could not be null");
+            throw new IllegalArgumentException("name could not be empty");
         }
         if(value == null)
         {
@@ -89,7 +89,7 @@ public class AuditEventData
     {
         if(name == null || name.isEmpty())
         {
-            throw new IllegalArgumentException("name could not be null");
+            throw new IllegalArgumentException("name could not be empty");
         }
         if(value == null)
         {
