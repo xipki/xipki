@@ -49,7 +49,7 @@ class DefaultHttpCmpRequestor extends X509CmpRequestor
             boolean signRequest)
     {
         super(requestor, responderCert, caCert, securityFactory, signRequest);
-        ParamChecker.assertNotNull("serverUrl", serverUrl);
+        ParamChecker.assertNotEmpty("serverUrl", serverUrl);
 
         try
         {

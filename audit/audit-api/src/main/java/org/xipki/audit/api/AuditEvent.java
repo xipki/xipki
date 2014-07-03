@@ -60,9 +60,6 @@ public class AuditEvent
 
     private final List<ChildAuditEvent> childAuditEvents = new LinkedList<>();
 
-    /**
-     * Default constructor for jaxb.
-     */
     public AuditEvent(Date timestamp)
     {
         this.timestamp = (timestamp == null) ? new Date() : timestamp;
@@ -77,10 +74,6 @@ public class AuditEvent
     public void setLevel(AuditLevel level)
     {
         this.level = level;
-        for(ChildAuditEvent cae : childAuditEvents)
-        {
-            cae.setLevel(null);
-        }
     }
 
     public String getName()
@@ -170,9 +163,8 @@ public class AuditEvent
         }
 
         List<AuditEvent> expandedEvents = new ArrayList<>(size);
-        for(int i = 0; i < size; i++)
+        for(ChildAuditEvent child : childAuditEvents)
         {
-            ChildAuditEvent child = childAuditEvents.get(i);
             AuditEvent event = new AuditEvent(timestamp);
             event.setApplicationName(applicationName);
             event.setName(name);

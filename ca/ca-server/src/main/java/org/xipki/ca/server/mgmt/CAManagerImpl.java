@@ -61,8 +61,10 @@ import org.xipki.ca.api.CAMgmtException;
 import org.xipki.ca.api.CAStatus;
 import org.xipki.ca.api.OperationException;
 import org.xipki.ca.api.profile.CertProfileException;
+import org.xipki.ca.api.profile.IdentifiedCertProfile;
 import org.xipki.ca.api.publisher.CertPublisherException;
 import org.xipki.ca.api.publisher.CertificateInfo;
+import org.xipki.ca.api.publisher.IdentifiedCertPublisher;
 import org.xipki.ca.cmp.server.CmpControl;
 import org.xipki.ca.common.CASystemStatus;
 import org.xipki.ca.common.X509CertificateWithMetaInfo;
@@ -71,8 +73,8 @@ import org.xipki.ca.server.CrlSigner;
 import org.xipki.ca.server.X509CA;
 import org.xipki.ca.server.X509CACmpResponder;
 import org.xipki.ca.server.store.CertificateStore;
-import org.xipki.database.api.DataSourceWrapper;
 import org.xipki.database.api.DataSourceFactory;
+import org.xipki.database.api.DataSourceWrapper;
 import org.xipki.security.api.ConcurrentContentSigner;
 import org.xipki.security.api.PasswordResolver;
 import org.xipki.security.api.PasswordResolverException;
@@ -1003,6 +1005,22 @@ public class CAManagerImpl implements CAManager
     {
         if(certProfilesInitialized) return;
 
+        for(String name : certProfiles.keySet())
+        {
+            CertProfileEntry entry = certProfiles.get(name);
+            try
+            {
+                IdentifiedCertProfile profile = entry.getCertProfile();
+                if(profile != null)
+                {
+                    profile.shutdown();
+                }
+            } catch(Exception e)
+            {
+                LOG.warn("could not shutdown CertProfile {}: ", name, e.getMessage());
+                LOG.debug("could not shutdown CertProfile " + name, e);
+            }
+        }
         certProfiles.clear();
 
         Statement stmt = null;
@@ -1042,6 +1060,22 @@ public class CAManagerImpl implements CAManager
     {
         if(publishersInitialized) return;
 
+        for(String name : publishers.keySet())
+        {
+            PublisherEntry entry = publishers.get(name);
+            try
+            {
+                IdentifiedCertPublisher publisher = entry.getCertPublisher();
+                if(publisher != null)
+                {
+                    publisher.shutdown();
+                }
+            } catch(Exception e)
+            {
+                LOG.warn("could not shutdown CertPublisher {}: ", name, e.getMessage());
+                LOG.debug("could not shutdown CertPublisher " + name, e);
+            }
+        }
         publishers.clear();
 
         Statement stmt = null;

@@ -36,7 +36,7 @@ final public class Version
     public static String getVersion()
     {
 
-        StringBuffer version = new StringBuffer();
+        StringBuilder version = new StringBuilder();
 
         try
         {

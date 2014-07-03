@@ -30,6 +30,7 @@ import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
+import java.net.UnknownHostException;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchProviderException;
@@ -94,34 +95,6 @@ public class IoCertUtil
         statusTextMap.put(PKIStatus.KEY_UPDATE_WARNING, "keyUpdateWarning");
     }
 
-    private static final ASN1ObjectIdentifier[] forwardDNs = new ASN1ObjectIdentifier[]
-    {
-        ObjectIdentifiers.DN_C,
-        ObjectIdentifiers.DN_DC,
-        ObjectIdentifiers.DN_ST,
-        ObjectIdentifiers.DN_L,
-        ObjectIdentifiers.DN_O,
-        ObjectIdentifiers.DN_OU,
-        ObjectIdentifiers.DN_T,
-        ObjectIdentifiers.DN_SURNAME,
-        ObjectIdentifiers.DN_INITIALS,
-        ObjectIdentifiers.DN_GIVENNAME,
-        ObjectIdentifiers.DN_SERIALNUMBER,
-        ObjectIdentifiers.DN_NAME,
-        ObjectIdentifiers.DN_CN,
-        ObjectIdentifiers.DN_UID,
-        ObjectIdentifiers.DN_DMD_NAME,
-        ObjectIdentifiers.DN_EmailAddress,
-        ObjectIdentifiers.DN_UnstructuredName,
-        ObjectIdentifiers.DN_UnstructuredAddress,
-        ObjectIdentifiers.DN_POSTAL_CODE,
-        ObjectIdentifiers.DN_BUSINESS_CATEGORY,
-        ObjectIdentifiers.DN_POSTAL_ADDRESS,
-        ObjectIdentifiers.DN_TELEPHONE_NUMBER,
-        ObjectIdentifiers.DN_PSEUDONYM,
-        ObjectIdentifiers.DN_STREET
-    };
-
     public static String getCommonName(X500Name name)
     {
         RDN[] rdns = name.getRDNs(ObjectIdentifiers.DN_CN);
@@ -134,39 +107,26 @@ public class IoCertUtil
 
     public static X500Name sortX509Name(X500Name name)
     {
-        RDN[] requstedRDNs = name.getRDNs();
-
-        List<RDN> rdns = new LinkedList<>();
-        int size = forwardDNs.length;
-        for(int i = 0; i < size; i++)
-        {
-            ASN1ObjectIdentifier type = forwardDNs[i];
-            RDN[] thisRDNs = getRDNs(requstedRDNs, type);
-            int n = thisRDNs == null ? 0 : thisRDNs.length;
-            if(n == 0)
-            {
-                continue;
-            }
-
-            for(RDN thisRDN : thisRDNs)
-            {
-                String text = IETFUtils.valueToString(thisRDN.getFirst().getValue());
-                rdns.add(createSubjectRDN(text, type));
-            }
-        }
-
-        return new X500Name(rdns.toArray(new RDN[0]));
+        return sortX500Name(name, false);
     }
 
     public static X500Name backwardSortX509Name(X500Name name)
     {
+        return sortX500Name(name, true);
+    }
+
+    private static X500Name sortX500Name(X500Name name, boolean backwards)
+    {
         RDN[] requstedRDNs = name.getRDNs();
 
         List<RDN> rdns = new LinkedList<>();
-        int size = forwardDNs.length;
-        for(int i = size-1; i >= 0; i--)
+
+        List<ASN1ObjectIdentifier> sortedDNs = backwards ?
+                ObjectIdentifiers.getBackwardDNs() : ObjectIdentifiers.getForwardDNs();
+        int size = sortedDNs.size();
+        for(int i = 0; i < size; i++)
         {
-            ASN1ObjectIdentifier type = forwardDNs[i];
+            ASN1ObjectIdentifier type = sortedDNs.get(i);
             RDN[] thisRDNs = getRDNs(requstedRDNs, type);
             int n = thisRDNs == null ? 0 : thisRDNs.length;
             if(n == 0)
@@ -671,6 +631,19 @@ public class IoCertUtil
             }
         }
 
-        return addresses.get(0);
+        if(addresses.size() > 0)
+        {
+            return addresses.get(0);
+        }
+        else
+        {
+            try
+            {
+                return InetAddress.getLocalHost().getHostAddress();
+            } catch (UnknownHostException e)
+            {
+                return "UNKNOWN";
+            }
+        }
     }
 }

@@ -21,6 +21,7 @@ import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
+import java.net.UnknownHostException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Enumeration;
@@ -28,7 +29,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
- * This file is copied from PCSSyslogMessage from syslog4j.org
+ * This file is copied from PCISyslogMessage from syslog4j.org
  *
  * PCISyslogMessage provides support for audit trails defined by section
  * 10.3 of the PCI Data Security Standard (PCI DSS) versions 1.1 and 1.2.
@@ -212,7 +213,7 @@ public class PCIAuditEvent
 
     public String createMessage()
     {
-        StringBuffer buffer = new StringBuffer();
+        StringBuilder buffer = new StringBuilder();
 
         char delimiter = DEFAULT_DELIMITER;
         String replaceDelimiter = DEFAULT_REPLACE_DELIMITER;
@@ -260,9 +261,7 @@ public class PCIAuditEvent
             return fieldValue;
         }
 
-        String newFieldValue = fieldValue.replaceAll("\\" + delimiter, replaceDelimiter);
-
-        return newFieldValue;
+        return fieldValue.replaceAll("\\" + delimiter, replaceDelimiter);
     }
 
     private static String getHostAddress()
@@ -307,7 +306,20 @@ public class PCIAuditEvent
             }
         }
 
-        return addresses.get(0);
+        if(addresses.size() > 0)
+        {
+            return addresses.get(0);
+        }
+        else
+        {
+            try
+            {
+                return InetAddress.getLocalHost().getHostAddress();
+            } catch (UnknownHostException e)
+            {
+                return "UNKNOWN";
+            }
+        }
     }
 
 }
