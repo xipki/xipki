@@ -39,9 +39,6 @@ public class ChildAuditEvent
 
     private AuditStatus status;
 
-    /**
-     * Default constructor for jaxb.
-     */
     public ChildAuditEvent()
     {
         this.level = AuditLevel.INFO;
@@ -65,9 +62,8 @@ public class ChildAuditEvent
     public AuditEventData removeEventData(String eventDataName)
     {
         AuditEventData tbr = null;
-        for(int i = 0; i < eventDatas.size(); i++)
+        for(AuditEventData ed : eventDatas)
         {
-            AuditEventData ed = eventDatas.get(i);
             if(ed.getName().equals(eventDataName))
             {
                 tbr = ed;
