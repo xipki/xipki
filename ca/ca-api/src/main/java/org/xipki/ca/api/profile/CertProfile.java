@@ -38,6 +38,10 @@ public abstract class CertProfile
     public abstract void initialize(String data)
     throws CertProfileException;
 
+    public void shutdown()
+    {
+    }
+
     public abstract void setEnvironmentParameterResolver(EnvironmentParameterResolver parameterResolver);
 
     public abstract Date getNotBefore(Date notBefore);

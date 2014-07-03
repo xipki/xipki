@@ -53,7 +53,7 @@ public class RDNOccurrence
     public RDNOccurrence(ASN1ObjectIdentifier type, int minOccurs, int maxOccurs)
     {
         ParamChecker.assertNotNull("type", type);
-        if(minOccurs < 0 || maxOccurs < 0 || minOccurs > maxOccurs)
+        if(minOccurs < 0 || maxOccurs < 1 || minOccurs > maxOccurs)
         {
             throw new IllegalArgumentException("illegal minOccurs=" + minOccurs + ", maxOccurs=" + maxOccurs);
         }

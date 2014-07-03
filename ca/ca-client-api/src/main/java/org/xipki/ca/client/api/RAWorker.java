@@ -25,9 +25,6 @@ import java.util.Set;
 
 import org.bouncycastle.asn1.crmf.CertRequest;
 import org.bouncycastle.asn1.crmf.ProofOfPossession;
-//import org.bouncycastle.asn1.crmf.CertReqMsg;
-//import org.bouncycastle.asn1.crmf.CertRequest;
-//import org.bouncycastle.asn1.crmf.ProofOfPossession;
 import org.bouncycastle.asn1.pkcs.CertificationRequest;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.xipki.ca.cmp.client.type.EnrollCertEntryType;

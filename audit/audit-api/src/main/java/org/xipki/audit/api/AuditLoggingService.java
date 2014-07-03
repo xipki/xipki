@@ -30,8 +30,6 @@ public interface AuditLoggingService
      *
      * @param event
      *            The event.
-     * @throws AuditEventException
-     *             If the logging fails.
      */
     void logEvent(PCIAuditEvent event);
 }

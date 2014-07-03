@@ -17,6 +17,10 @@
 
 package org.xipki.security.common;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.ocsp.OCSPObjectIdentifiers;
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
@@ -273,10 +277,64 @@ public class ObjectIdentifiers
     public static final ASN1ObjectIdentifier id_kp_ocsp              = id_pkix.branch("1.48.1");
     public static final ASN1ObjectIdentifier id_extension_pkix_ocsp_nocheck = id_pkix.branch("48.1.5");
 
+    private static final List<ASN1ObjectIdentifier> forwardDNs;
+    private static final List<ASN1ObjectIdentifier> backwardDNs;
+
+    static
+    {
+        List<ASN1ObjectIdentifier> _forwardDNs = new ArrayList<>(25);
+
+        _forwardDNs.add(ObjectIdentifiers.DN_C);
+        _forwardDNs.add(ObjectIdentifiers.DN_DC);
+        _forwardDNs.add(ObjectIdentifiers.DN_ST);
+        _forwardDNs.add(ObjectIdentifiers.DN_L);
+        _forwardDNs.add(ObjectIdentifiers.DN_O);
+        _forwardDNs.add(ObjectIdentifiers.DN_OU);
+        _forwardDNs.add(ObjectIdentifiers.DN_T);
+        _forwardDNs.add(ObjectIdentifiers.DN_SURNAME);
+        _forwardDNs.add(ObjectIdentifiers.DN_INITIALS);
+        _forwardDNs.add(ObjectIdentifiers.DN_GIVENNAME);
+        _forwardDNs.add(ObjectIdentifiers.DN_SERIALNUMBER);
+        _forwardDNs.add(ObjectIdentifiers.DN_NAME);
+        _forwardDNs.add(ObjectIdentifiers.DN_CN);
+        _forwardDNs.add(ObjectIdentifiers.DN_UID);
+        _forwardDNs.add(ObjectIdentifiers.DN_DMD_NAME);
+        _forwardDNs.add(ObjectIdentifiers.DN_EmailAddress);
+        _forwardDNs.add(ObjectIdentifiers.DN_UnstructuredName);
+        _forwardDNs.add(ObjectIdentifiers.DN_UnstructuredAddress);
+        _forwardDNs.add(ObjectIdentifiers.DN_POSTAL_CODE);
+        _forwardDNs.add(ObjectIdentifiers.DN_BUSINESS_CATEGORY);
+        _forwardDNs.add(ObjectIdentifiers.DN_POSTAL_ADDRESS);
+        _forwardDNs.add(ObjectIdentifiers.DN_TELEPHONE_NUMBER);
+        _forwardDNs.add(ObjectIdentifiers.DN_PSEUDONYM);
+        _forwardDNs.add(ObjectIdentifiers.DN_STREET);
+
+        forwardDNs = Collections.unmodifiableList(_forwardDNs);
+
+        List<ASN1ObjectIdentifier> _backwardDNs = new ArrayList<>(25);
+        int size = _forwardDNs.size();
+        for(int i = size - 1; i >= 0; i--)
+        {
+            _backwardDNs.add(_forwardDNs.get(i));
+        }
+
+        backwardDNs = Collections.unmodifiableList(_backwardDNs);
+    }
+
     public static String oidToDisplayName(ASN1ObjectIdentifier type)
     {
         String displayName = RFC4519Style.INSTANCE.oidToDisplayName(type);
         return type.getId() + (displayName == null ? "" : " (" + displayName + ")");
+    }
+
+    public static List<ASN1ObjectIdentifier> getForwardDNs()
+    {
+        return forwardDNs;
+    }
+
+    public static List<ASN1ObjectIdentifier> getBackwardDNs()
+    {
+        return backwardDNs;
     }
 
 }

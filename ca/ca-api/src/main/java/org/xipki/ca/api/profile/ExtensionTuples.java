@@ -28,7 +28,7 @@ import java.util.List;
 public class ExtensionTuples
 {
     private String warning;
-    private List<ExtensionTuple> extensions = new LinkedList<>();
+    private final List<ExtensionTuple> extensions = new LinkedList<>();
 
     public void addExtension(ExtensionTuple extension)
     {

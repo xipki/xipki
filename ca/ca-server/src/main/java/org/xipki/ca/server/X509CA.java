@@ -95,6 +95,7 @@ import org.xipki.ca.api.profile.SubjectInfo;
 import org.xipki.ca.api.profile.X509Util;
 import org.xipki.ca.api.publisher.CertPublisherException;
 import org.xipki.ca.api.publisher.CertificateInfo;
+import org.xipki.ca.api.publisher.IdentifiedCertPublisher;
 import org.xipki.ca.common.X509CertificateWithMetaInfo;
 import org.xipki.ca.server.mgmt.CAEntry;
 import org.xipki.ca.server.mgmt.CAManagerImpl;
@@ -1568,7 +1569,7 @@ public class X509CA
                         }
 
                         boolean foundUniqueSubject = false;
-                        // maximal ten tries
+                        // maximal 100 tries
                         for(int i = 0; i < 100; i++)
                         {
                             try

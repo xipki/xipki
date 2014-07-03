@@ -205,17 +205,17 @@ public abstract class AbstractLoadTest
 
     private static String formatTime(long seconds)
     {
-        long h = seconds/3600;
-        long m = (seconds - h * 3600)/60;
+        long h = seconds / 3600;
+        long m = (seconds - h * 3600) / 60;
         long s = seconds - h * 3600 - m * 60;
 
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         // hours
         if(h == 0)
         {
             sb.append("   ");
         }
-        else if(h<10)
+        else if(h < 10)
         {
             sb.append(" " + h + ":");
         }
@@ -225,7 +225,7 @@ public abstract class AbstractLoadTest
         }
 
         // minutes
-        if(m<10)
+        if(m < 10)
         {
             sb.append("0" + m + ":");
         }
@@ -235,7 +235,7 @@ public abstract class AbstractLoadTest
         }
 
         // seconds
-        if(s<10)
+        if(s < 10)
         {
             sb.append("0" + s);
         }

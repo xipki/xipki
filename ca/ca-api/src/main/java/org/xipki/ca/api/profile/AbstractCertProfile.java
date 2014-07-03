@@ -18,7 +18,6 @@
 package org.xipki.ca.api.profile;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -49,9 +48,6 @@ import org.xipki.security.common.ObjectIdentifiers;
 public abstract class AbstractCertProfile
 extends CertProfile implements SubjectDNSubset
 {
-    private final List<ASN1ObjectIdentifier> forwardDNs;
-    private final List<ASN1ObjectIdentifier> backwardDNs;
-
     protected abstract Set<KeyUsage> getKeyUsage();
 
     protected abstract boolean isCa();
@@ -65,43 +61,6 @@ extends CertProfile implements SubjectDNSubset
 
     protected AbstractCertProfile()
     {
-        List<ASN1ObjectIdentifier> _forwardDNs = new ArrayList<>(25);
-
-        _forwardDNs.add(ObjectIdentifiers.DN_C);
-        _forwardDNs.add(ObjectIdentifiers.DN_DC);
-        _forwardDNs.add(ObjectIdentifiers.DN_ST);
-        _forwardDNs.add(ObjectIdentifiers.DN_L);
-        _forwardDNs.add(ObjectIdentifiers.DN_O);
-        _forwardDNs.add(ObjectIdentifiers.DN_OU);
-        _forwardDNs.add(ObjectIdentifiers.DN_T);
-        _forwardDNs.add(ObjectIdentifiers.DN_SURNAME);
-        _forwardDNs.add(ObjectIdentifiers.DN_INITIALS);
-        _forwardDNs.add(ObjectIdentifiers.DN_GIVENNAME);
-        _forwardDNs.add(ObjectIdentifiers.DN_SERIALNUMBER);
-        _forwardDNs.add(ObjectIdentifiers.DN_NAME);
-        _forwardDNs.add(ObjectIdentifiers.DN_CN);
-        _forwardDNs.add(ObjectIdentifiers.DN_UID);
-        _forwardDNs.add(ObjectIdentifiers.DN_DMD_NAME);
-        _forwardDNs.add(ObjectIdentifiers.DN_EmailAddress);
-        _forwardDNs.add(ObjectIdentifiers.DN_UnstructuredName);
-        _forwardDNs.add(ObjectIdentifiers.DN_UnstructuredAddress);
-        _forwardDNs.add(ObjectIdentifiers.DN_POSTAL_CODE);
-        _forwardDNs.add(ObjectIdentifiers.DN_BUSINESS_CATEGORY);
-        _forwardDNs.add(ObjectIdentifiers.DN_POSTAL_ADDRESS);
-        _forwardDNs.add(ObjectIdentifiers.DN_TELEPHONE_NUMBER);
-        _forwardDNs.add(ObjectIdentifiers.DN_PSEUDONYM);
-        _forwardDNs.add(ObjectIdentifiers.DN_STREET);
-
-        forwardDNs = Collections.unmodifiableList(_forwardDNs);
-
-        List<ASN1ObjectIdentifier> _backwardDNs = new ArrayList<>(25);
-        int size = _forwardDNs.size();
-        for(int i = size - 1; i >= 0; i--)
-        {
-            _backwardDNs.add(_forwardDNs.get(i));
-        }
-
-        backwardDNs = Collections.unmodifiableList(_backwardDNs);
     }
 
     public boolean backwardsSubject()
@@ -135,12 +94,6 @@ extends CertProfile implements SubjectDNSubset
     }
 
     @Override
-    public boolean isOnlyForRA()
-    {
-        return false;
-    }
-
-    @Override
     public SubjectInfo getSubject(X500Name requestedSubject)
     throws CertProfileException, BadCertTemplateException
     {
@@ -150,7 +103,8 @@ extends CertProfile implements SubjectDNSubset
         RDN[] requstedRDNs = requestedSubject.getRDNs();
         List<RDNOccurrence> occurences = getSubjectDNSubset();
         List<RDN> rdns = new LinkedList<>();
-        List<ASN1ObjectIdentifier> types = backwardsSubject() ? backwardDNs : forwardDNs;
+        List<ASN1ObjectIdentifier> types = backwardsSubject() ?
+                ObjectIdentifiers.getBackwardDNs() : ObjectIdentifiers.getForwardDNs();
 
         for(ASN1ObjectIdentifier type : types)
         {
@@ -172,21 +126,20 @@ extends CertProfile implements SubjectDNSubset
                         " not within [" + occurrence.getMinOccurs() + ", " + occurrence.getMaxOccurs() + "]");
             }
 
-            if(thisRDNs == null || thisRDNs.length < 1)
+            if(n == 0)
             {
                 continue;
             }
 
-            int size = thisRDNs.length;
-            if(size == 1)
+            if(n == 1)
             {
                 String value = IETFUtils.valueToString(thisRDNs[0].getFirst().getValue());
                 rdns.add(createSubjectRDN(value, type));
             }
             else
             {
-                String[] values = new String[size];
-                for(int i = 0; i < size; i++)
+                String[] values = new String[n];
+                for(int i = 0; i < n; i++)
                 {
                     values[i] = IETFUtils.valueToString(thisRDNs[i].getFirst().getValue());
                 }

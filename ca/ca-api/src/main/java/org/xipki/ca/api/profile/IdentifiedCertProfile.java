@@ -130,4 +130,23 @@ public class IdentifiedCertProfile extends CertProfile
         return certProfile.incSerialNumberIfSubjectExists();
     }
 
+    @Override
+    public void shutdown()
+    {
+        certProfile.shutdown();
+    }
+
+    @Override
+    public boolean includeIssuerAndSerialInAKI()
+    {
+        return certProfile.includeIssuerAndSerialInAKI();
+    }
+
+    @Override
+    public String incSerialNumber(String currentSerialNumber)
+    throws BadFormatException
+    {
+        return certProfile.incSerialNumber(currentSerialNumber);
+    }
+
 }

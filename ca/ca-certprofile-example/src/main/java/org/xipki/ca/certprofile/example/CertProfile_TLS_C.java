@@ -30,6 +30,7 @@ import org.xipki.ca.api.profile.AbstractEECertProfile;
 import org.xipki.ca.api.profile.BadCertTemplateException;
 import org.xipki.ca.api.profile.ExtensionOccurrence;
 import org.xipki.ca.api.profile.KeyUsage;
+import org.xipki.security.common.ObjectIdentifiers;
 
 /**
  * @author Lijun Liao

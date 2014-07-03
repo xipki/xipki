@@ -37,6 +37,10 @@ public abstract class CertPublisher
             DataSourceWrapper dataSource)
     throws CertPublisherException;
 
+    public void shutdown()
+    {
+    }
+
     public abstract boolean isAsyn();
 
     public abstract void setEnvironmentParameterResolver(EnvironmentParameterResolver parameterResolver);
