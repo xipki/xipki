@@ -15,13 +15,20 @@
  *
  */
 
-package org.xipki.ca.api.profile;
+package org.xipki.ca.server;
 
 import java.util.Date;
 
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.Extensions;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
+import org.xipki.ca.api.profile.BadCertTemplateException;
+import org.xipki.ca.api.profile.BadFormatException;
+import org.xipki.ca.api.profile.CertProfile;
+import org.xipki.ca.api.profile.CertProfileException;
+import org.xipki.ca.api.profile.ExtensionOccurrence;
+import org.xipki.ca.api.profile.ExtensionTuples;
+import org.xipki.ca.api.profile.SubjectInfo;
 import org.xipki.security.common.EnvironmentParameterResolver;
 import org.xipki.security.common.ParamChecker;
 

@@ -19,7 +19,7 @@ package org.xipki.ca.server.mgmt;
 
 import org.xipki.ca.api.profile.CertProfile;
 import org.xipki.ca.api.profile.CertProfileException;
-import org.xipki.ca.api.profile.IdentifiedCertProfile;
+import org.xipki.ca.server.IdentifiedCertProfile;
 import org.xipki.security.common.EnvironmentParameterResolver;
 import org.xipki.security.common.ParamChecker;
 
