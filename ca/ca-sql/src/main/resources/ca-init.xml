@@ -27,10 +27,10 @@
 			<column name="REQUIRE_MESSAGE_TIME" type="SMALLINT">
 				<constraints nullable="false"/>
 			</column>
-			<column name="MESSAGE_TIME_BIAS" remarks="seconds" type="SMALLINT">
+			<column name="MESSAGE_TIME_BIAS" remarks="seconds" type="INT">
 				<constraints nullable="false"/>
 			</column>
-			<column name="CONFIRM_WAIT_TIME" remarks="seconds" type="SMALLINT">
+			<column name="CONFIRM_WAIT_TIME" remarks="seconds" type="INT">
 				<constraints nullable="false"/>
 			</column>
 			<column name="SEND_CA_CERT" type="SMALLINT">
