@@ -28,7 +28,7 @@ import org.apache.felix.gogo.commands.Option;
 import org.xipki.ca.api.CAStatus;
 import org.xipki.ca.api.OperationException;
 import org.xipki.ca.api.OperationException.ErrorCode;
-import org.xipki.ca.api.profile.IdentifiedCertProfile;
+import org.xipki.ca.server.IdentifiedCertProfile;
 import org.xipki.ca.server.RandomSerialNumberGenerator;
 import org.xipki.ca.server.mgmt.CAEntry;
 import org.xipki.ca.server.mgmt.CertProfileEntry;
