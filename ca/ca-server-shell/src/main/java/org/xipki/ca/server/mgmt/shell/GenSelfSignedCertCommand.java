@@ -24,7 +24,7 @@ import java.util.List;
 import org.apache.felix.gogo.commands.Command;
 import org.apache.felix.gogo.commands.Option;
 import org.xipki.ca.api.profile.CertProfile;
-import org.xipki.ca.api.profile.IdentifiedCertProfile;
+import org.xipki.ca.server.IdentifiedCertProfile;
 import org.xipki.ca.server.RandomSerialNumberGenerator;
 import org.xipki.ca.server.mgmt.shell.SelfSignedCertBuilder.GenerateSelfSignedResult;
 import org.xipki.console.karaf.XipkiOsgiCommandSupport;
