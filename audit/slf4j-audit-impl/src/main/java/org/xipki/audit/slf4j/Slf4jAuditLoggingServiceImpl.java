@@ -27,6 +27,7 @@ import org.slf4j.LoggerFactory;
 import org.xipki.audit.api.AuditEvent;
 import org.xipki.audit.api.AuditEventData;
 import org.xipki.audit.api.AuditEventDataType;
+import org.xipki.audit.api.AuditLevel;
 import org.xipki.audit.api.AuditLoggingService;
 import org.xipki.audit.api.AuditStatus;
 import org.xipki.audit.api.PCIAuditEvent;
@@ -57,44 +58,27 @@ public class Slf4jAuditLoggingServiceImpl implements AuditLoggingService
         {
             switch(event.getLevel())
             {
-                case EMERGENCY:
-                case ALERT:
-                case CRITICAL:
-                case ERROR:
-                    if(LOG.isErrorEnabled())
-                    {
-                        LOG.error("{}", createMessage(event));
-                    }
-                    break;
-                case WARN:
-                case NOTICE:
-                    if(LOG.isWarnEnabled())
-                    {
-                        LOG.warn("{}", createMessage(event));
-                    }
-                    break;
-                case INFO:
-                    if(LOG.isInfoEnabled())
-                    {
-                        LOG.info("{}", createMessage(event));
-                    }
-                    break;
                 case DEBUG:
                     if(LOG.isDebugEnabled())
                     {
                         LOG.debug("{}", createMessage(event));
                     }
                     break;
+                default:
+                    LOG.error("{}", createMessage(event));
+                    break;
             }
         }catch(Throwable t)
         {
-            LOG.error("LOG - SYSTEM\tstatus: failed\tmessage: {}", t.getMessage());
+            LOG.error("{} | LOG - SYSTEM\tstatus: failed\tmessage: {}", AuditLevel.ERROR.getAlignedText(), t.getMessage());
         }
     }
 
     private static String createMessage(AuditEvent event)
     {
         StringBuilder sb = new StringBuilder();
+
+        sb.append(event.getLevel().getAlignedText()).append(" | ");
 
         String applicationName = event.getApplicationName();
         if(applicationName == null)
@@ -158,42 +142,24 @@ public class Slf4jAuditLoggingServiceImpl implements AuditLoggingService
 
         try
         {
-            switch(event.getLevel())
+            AuditLevel al = event.getLevel();
+            switch(al)
             {
-                case EMERGENCY:
-                case ALERT:
-                case CRITICAL:
-                case ERROR:
-                    if(LOG.isErrorEnabled())
-                    {
-                        LOG.error("{}", event.createMessage());
-                    }
-                    break;
-                case WARN:
-                case NOTICE:
-                    if(LOG.isWarnEnabled())
-                    {
-                        LOG.warn("{}", event.createMessage());
-                    }
-                    break;
-                case INFO:
-                    if(LOG.isInfoEnabled())
-                    {
-                        LOG.info("{}", event.createMessage());
-                    }
-                    break;
                 case DEBUG:
                     if(LOG.isDebugEnabled())
                     {
-                        LOG.debug("{}", event.createMessage());
+                        LOG.debug("{} | {}", al.getAlignedText(), event.createMessage());
                     }
+                    break;
+                default:
+                    LOG.info("{} | {}", al.getAlignedText(), event.createMessage());
                     break;
             }
 
             event.createMessage();
         }catch(Throwable t)
         {
-            LOG.error("LOG - SYSTEM\tstatus: failed\tmessage: {}", t.getMessage());
+            LOG.error("{} | LOG - SYSTEM\tstatus: failed\tmessage: {}", AuditLevel.ERROR.getAlignedText(), t.getMessage());
         }
     }
 
