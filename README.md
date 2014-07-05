@@ -7,14 +7,17 @@ eXtensible sImple Public Key Infrastructure
   - OCSP Responder (RFC 2560 and RFC 6960)
   - CMP (RFC 4210 and RFC 4211)
   - Support of direct and inderect CRL
-  - Support of PKCS#12 and PKCS#11 devices, e.g. HSM
+  - Support of PKCS#12 and JKS keystore
+  - Support of PKCS#11 devices, e.g. HSM, tested with nCipher of Thales
   - API to use customized key types, e.g. smartcard
   - API to specify customized certificate profiles
   - API to specify customized publisher, e.g. for LDAP and OCSP responder
-  - Support of most popular databases
+  - Support of most popular databases, tested with DB2, H2, MySQL, Oracle, Oracle RAC and PostgreSQL
   - High performance
   - Java based, OS independent
   - OSGi-based
+  - Health check embedded
+  - Audit with syslog and slf4j
   
 Version
 ----
@@ -25,6 +28,10 @@ License
 -----------
 
 Apache License 2.0
+
+Author
+-----------
+Dr. Lijun Liao (lijun.liao -A-T- gmail.com)
 
 Prerequisite
 ------------
