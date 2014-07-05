@@ -137,7 +137,7 @@
 		<bundle>mvn:org.apache.commons/commons-lang3/3.1</bundle>
 		<bundle>mvn:com.google.guava/guava/13.0</bundle>
 		<bundle>mvn:joda-time/joda-time/2.1</bundle>
-		<bundle>mvn:com.nesscomputing/ness-syslog4j/0.9.47-NESS-8</bundle>
+		<bundle>wrap:mvn:com.nesscomputing/ness-syslog4j/0.9.47-NESS-8</bundle>
 		<bundle>mvn:org.xipki/syslog-audit-impl/${project.version}</bundle>
 	</feature>
 
