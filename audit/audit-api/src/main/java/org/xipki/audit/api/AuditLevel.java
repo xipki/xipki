@@ -23,20 +23,22 @@ package org.xipki.audit.api;
 
 public enum AuditLevel
 {
-    EMERGENCY(0),
-    ALERT(1),
-    CRITICAL(2),
-    ERROR(3),
-    WARN(4),
-    NOTICE(5),
-    INFO(6),
-    DEBUG(7);
+    EMERGENCY(0, "EMERGENCY"),
+    ALERT(1,     "ALERT    "),
+    CRITICAL(2,  "CRITICAL "),
+    ERROR(3,     "ERROR    "),
+    WARN(4,      "WARN     "),
+    NOTICE(5,    "NOTICE   "),
+    INFO(6,      "INFO     "),
+    DEBUG(7,     "DEBUG    ");
 
     private final int value;
+    private final String alignedText;
 
-    private AuditLevel(int value)
+    private AuditLevel(int value, String alignedText)
     {
         this.value = value;
+        this.alignedText = alignedText;
     }
 
     public int getValue()
@@ -71,6 +73,11 @@ public enum AuditLevel
             }
         }
         return null;
+    }
+
+    public String getAlignedText()
+    {
+        return alignedText;
     }
 
 }
