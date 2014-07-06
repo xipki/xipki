@@ -270,6 +270,7 @@
 							<features>
 								<!-- karaf boot features (see etc/org.apache.karaf.features.cfg) -->
 								<feature>karaf-framework</feature>
+								<feature>http-whiteboard</feature>
 								<!-- project-core features -->
 								<feature>xipki-caserver</feature>
 								<feature>xipki-caserver-shell</feature>
