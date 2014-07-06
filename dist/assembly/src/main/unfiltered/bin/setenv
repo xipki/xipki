@@ -64,5 +64,12 @@ KARAF_OPTS="$KARAF_OPTS -Dsun.net.client.defaultConnectTimeout=30000"
 KARAF_OPTS="$KARAF_OPTS -Dsun.net.client.defaultReadTimeout=30000"
 #KARAF_OPTS="$KARAF_OPTS -Djavax.net.debug=all"
 
+# PORTS configuration
+KARAF_OPTS="$KARAF_OPTS -Dmy.https.port=8443"
+KARAF_OPTS="$KARAF_OPTS -Dmy.http.port=8080"
+KARAF_OPTS="$KARAF_OPTS -Dmy.rmiServerPort=44444"
+KARAF_OPTS="$KARAF_OPTS -Dmy.rmiRegistryPort=1090"
+KARAF_OPTS="$KARAF_OPTS -Dmy.ssh.port=8101"
+
 export LD_LIBRARY_PATH=$NATIVE_LIB:$LD_LIBRARY_PATH
 export KARAF_OPTS
