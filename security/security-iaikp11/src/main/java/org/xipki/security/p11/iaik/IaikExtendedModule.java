@@ -29,6 +29,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.security.api.PKCS11SlotIdentifier;
 import org.xipki.security.api.SignerException;
+import org.xipki.security.common.LogUtil;
 import org.xipki.security.common.ParamChecker;
 
 /**
@@ -95,8 +96,7 @@ public class IaikExtendedModule
                 LOG.debug("{}", msg);
             }catch(Throwable t)
             {
-                LOG.warn("Unexpected error. {}: {}", t.getClass().getName(), t.getMessage());
-                LOG.debug("Unexpected error", t);
+                LogUtil.logWarnThrowable(LOG, "Unexpected error", t);
             }
         }
     }
@@ -178,8 +178,7 @@ public class IaikExtendedModule
         }
         catch (Throwable t)
         {
-            LOG.error("error while module.finalize(). {}: {}", t.getClass().getName(), t.getMessage());
-            LOG.debug("error while module.finalize()", t);
+            LogUtil.logErrorThrowable(LOG, "error while module.finalize()", t);
         }
 
         module = null;

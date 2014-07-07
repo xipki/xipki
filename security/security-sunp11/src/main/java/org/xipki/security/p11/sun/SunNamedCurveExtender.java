@@ -43,6 +43,7 @@ import org.bouncycastle.asn1.x9.X9ECParameters;
 import org.bouncycastle.math.ec.ECCurve;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xipki.security.common.LogUtil;
 
 /**
  * @author Lijun Liao
@@ -168,8 +169,7 @@ public class SunNamedCurveExtender
 
             }catch(Throwable t)
             {
-                LOG.warn("Uncatched Error: {}", t.getMessage());
-                LOG.debug("Uncatched Error", t);
+                LogUtil.logErrorThrowable(LOG, "Uncatched Error", t);
             }
         }
     }
@@ -206,13 +206,11 @@ public class SunNamedCurveExtender
             field_SPLIT_PATTERN.set(null, SPLIT_PATTERN);
         } catch (IllegalArgumentException e)
         {
-            LOG.warn("Could not set Field SPLIT_PATTERN. IllegalArgumentException: {}", e.getMessage());
-            LOG.debug("Could not set Field SPLIT_PATTERN", e);
+            LogUtil.logWarnThrowable(LOG, "Could not set Field SPLIT_PATTERN", e);
             return;
         } catch (IllegalAccessException e)
         {
-            LOG.warn("Could not set Field SPLIT_PATTERN. IllegalAccessException: {}", e.getMessage());
-            LOG.debug("Could not set Field SPLIT_PATTERN", e);
+            LogUtil.logWarnThrowable(LOG, "Could not set Field SPLIT_PATTERN", e);
             return;
         }
 
@@ -277,13 +275,11 @@ public class SunNamedCurveExtender
             field_SPLIT_PATTERN.set(null, null);
         } catch (IllegalArgumentException e)
         {
-            LOG.warn("Could not set Field SPLIT_PATTERN. IllegalArgumentException: {}", e.getMessage());
-            LOG.debug("Could not set Field SPLIT_PATTERN", e);
+            LogUtil.logWarnThrowable(LOG, "Could not set Field SPLIT_PATTERN", e);
             return;
         } catch (IllegalAccessException e)
         {
-            LOG.warn("Could not set Field SPLIT_PATTERN. IllegalAccessException: {}", e.getMessage());
-            LOG.debug("Could not set Field SPLIT_PATTERN", e);
+            LogUtil.logWarnThrowable(LOG, "Could not set Field SPLIT_PATTERN", e);
             return;
         }
 
@@ -386,19 +382,13 @@ public class SunNamedCurveExtender
             field_specCollection.set(null, namedCurves);
         } catch (IllegalArgumentException e)
         {
-            LOG.warn("Could not update change the value of field CurveDB.specCollection. IllegalArgumentException {}",
-                    e.getMessage());
-            LOG.debug("Could not update change the value of field CurveDB.specCollection.", e);
+            LogUtil.logWarnThrowable(LOG, "Could not update change the value of field CurveDB.specCollection.", e);
         } catch (IllegalAccessException e)
         {
-            LOG.warn("Could not update change the value of field CurveDB.specCollection. IllegalArgumentException {}",
-                    e.getMessage());
-            LOG.debug("Could not update change the value of field CurveDB.specCollection.", e);
+            LogUtil.logWarnThrowable(LOG, "Could not update change the value of field CurveDB.specCollection.", e);
         } catch (ClassCastException e)
         {
-            LOG.warn("Could not update change the value of field CurveDB.specCollection. IllegalArgumentException {}",
-                    e.getMessage());
-            LOG.debug("Could not update change the value of field CurveDB.specCollection.", e);
+            LogUtil.logWarnThrowable(LOG, "Could not update change the value of field CurveDB.specCollection.", e);
         }
 
         logAddedCurves(addedCurves);
@@ -520,12 +510,10 @@ public class SunNamedCurveExtender
             return serviceMethod;
         } catch (SecurityException e)
         {
-            LOG.warn("Could not get " + desc + ", SecuirtyException: {}", e.getMessage());
-            LOG.debug("Could not get " + desc, e);
+            LogUtil.logWarnThrowable(LOG, "Could not get " + desc, e);
         } catch (NoSuchMethodException e)
         {
-            LOG.warn("Could not get " + desc + ", NoSuchMethodException: {}", e.getMessage());
-            LOG.debug("Could not get " + desc, e);
+            LogUtil.logWarnThrowable(LOG, "Could not get " + desc, e);
         }
 
         return null;
@@ -543,8 +531,7 @@ public class SunNamedCurveExtender
             return field;
         } catch (NoSuchFieldException e)
         {
-            LOG.warn("Could not get " + desc + ". NoSuchFieldException: {}", e.getMessage());
-            LOG.debug("Could not get " + desc, e);
+            LogUtil.logWarnThrowable(LOG, "Could not get " + desc, e);
         }
 
         return null;
