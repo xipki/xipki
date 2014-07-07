@@ -1436,11 +1436,11 @@ public class X509CA
         ASN1Encodable keyParameters = publicKeyInfo.getAlgorithm().getParameters();
         if(keyParameters == null)
         {
-        	AlgorithmIdentifier keyAlgId = new AlgorithmIdentifier(
-        			publicKeyInfo.getAlgorithm().getAlgorithm(), DERNull.INSTANCE);
-        	publicKeyInfo = new SubjectPublicKeyInfo(keyAlgId, publicKeyInfo.getPublicKeyData().getBytes());
+            AlgorithmIdentifier keyAlgId = new AlgorithmIdentifier(
+                    publicKeyInfo.getAlgorithm().getAlgorithm(), DERNull.INSTANCE);
+            publicKeyInfo = new SubjectPublicKeyInfo(keyAlgId, publicKeyInfo.getPublicKeyData().getBytes());
         }
-        
+
         // public key
         try
         {
