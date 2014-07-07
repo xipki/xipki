@@ -36,6 +36,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1EncodableVector;
 import org.bouncycastle.asn1.ASN1Integer;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
@@ -344,6 +345,7 @@ public class P11KeypairGenerator
 
         AlgorithmIdentifier keyAlgID = new AlgorithmIdentifier(X9ObjectIdentifiers.id_ecPublicKey, curveId);
         SubjectPublicKeyInfo pkInfo = new SubjectPublicKeyInfo(keyAlgID, os.getOctets());
+
         return new PrivateKeyAndPKInfo((ECDSAPrivateKey) kp.getPrivateKey(), pkInfo);
     }
 
@@ -527,6 +529,16 @@ public class P11KeypairGenerator
         {
             super();
             this.privateKey = privateKey;
+
+            // Set the parameters field to NULL if not specified
+            ASN1Encodable keyParameters = publicKeyInfo.getAlgorithm().getParameters();
+            if(keyParameters == null)
+            {
+                AlgorithmIdentifier keyAlgId = new AlgorithmIdentifier(
+                        publicKeyInfo.getAlgorithm().getAlgorithm(), DERNull.INSTANCE);
+                publicKeyInfo = new SubjectPublicKeyInfo(keyAlgId, publicKeyInfo.getPublicKeyData().getBytes());
+            }
+
             this.publicKeyInfo = publicKeyInfo;
         }
 

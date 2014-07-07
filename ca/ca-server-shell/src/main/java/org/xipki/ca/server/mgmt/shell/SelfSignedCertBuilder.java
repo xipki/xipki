@@ -37,7 +37,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
 
+import org.bouncycastle.asn1.ASN1Encodable;
+import org.bouncycastle.asn1.DERNull;
 import org.bouncycastle.asn1.x500.X500Name;
+import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.asn1.x509.AuthorityInformationAccess;
 import org.bouncycastle.asn1.x509.AuthorityKeyIdentifier;
 import org.bouncycastle.asn1.x509.CRLDistPoint;
@@ -209,6 +212,15 @@ class SelfSignedCertBuilder
     throws OperationException
     {
         String certProfileName = certProfile.getName();
+
+        // Set the parameters field to NULL if not specified
+        ASN1Encodable keyParameters = publicKeyInfo.getAlgorithm().getParameters();
+        if(keyParameters == null)
+        {
+            AlgorithmIdentifier keyAlgId = new AlgorithmIdentifier(
+                    publicKeyInfo.getAlgorithm().getAlgorithm(), DERNull.INSTANCE);
+            publicKeyInfo = new SubjectPublicKeyInfo(keyAlgId, publicKeyInfo.getPublicKeyData().getBytes());
+        }
 
         try
         {

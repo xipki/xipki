@@ -34,6 +34,7 @@ import java.security.spec.RSAKeyGenParameterSpec;
 import java.util.Date;
 import java.util.List;
 
+import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.ASN1OctetString;
 import org.bouncycastle.asn1.DERNull;
@@ -251,6 +252,14 @@ public abstract class P12KeypairGenerator
         {
             super();
             this.keypair = keypair;
+            // Set the parameters field to NULL if not specified
+            ASN1Encodable keyParameters = subjectPublicKeyInfo.getAlgorithm().getParameters();
+            if(keyParameters == null)
+            {
+                AlgorithmIdentifier keyAlgId = new AlgorithmIdentifier(
+                        subjectPublicKeyInfo.getAlgorithm().getAlgorithm(), DERNull.INSTANCE);
+                subjectPublicKeyInfo = new SubjectPublicKeyInfo(keyAlgId, subjectPublicKeyInfo.getPublicKeyData().getBytes());
+            }
             this.subjectPublicKeyInfo = subjectPublicKeyInfo;
         }
 
