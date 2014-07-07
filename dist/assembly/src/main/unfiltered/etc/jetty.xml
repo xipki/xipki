@@ -49,7 +49,7 @@ DTD Configure//EN" "http://jetty.mortbay.org/configure.dtd">
                 <Set name="host">
                     <Property name="jetty.host" />
                 </Set>
-                <Set name="Port" type="java.lang.Integer">
+                <Set name="Port">
                     <SystemProperty name="my.https.port" default="8443"/>
                 </Set>
                 <Set name="maxIdleTime">30000</Set>
