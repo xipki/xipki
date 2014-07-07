@@ -37,14 +37,8 @@ public class AuditEventData
 
     public AuditEventData(final String name, final byte[] value)
     {
-        if(name == null || name.isEmpty())
-        {
-            throw new IllegalArgumentException("name could not be empty");
-        }
-        if(value == null)
-        {
-            throw new IllegalArgumentException("value could not be null");
-        }
+        assertNotEmpty("name", name);
+        assertNotNull("value", value);
 
         eventDataType = AuditEventDataType.BINARY;
 
@@ -54,14 +48,8 @@ public class AuditEventData
 
     public AuditEventData(final String name, final Date value)
     {
-        if(name == null || name.isEmpty())
-        {
-            throw new IllegalArgumentException("name could not be empty");
-        }
-        if(value == null)
-        {
-            throw new IllegalArgumentException("value could not be null");
-        }
+        assertNotEmpty("name", name);
+        assertNotNull("value", value);
 
         eventDataType = AuditEventDataType.TIMESTAMP;
 
@@ -71,14 +59,8 @@ public class AuditEventData
 
     public AuditEventData(final String name, final Number value)
     {
-        if(name == null || name.isEmpty())
-        {
-            throw new IllegalArgumentException("name could not be empty");
-        }
-        if(value == null)
-        {
-            throw new IllegalArgumentException("value could not be null");
-        }
+        assertNotEmpty("name", name);
+        assertNotNull("value", value);
 
         eventDataType = AuditEventDataType.NUMBER;
         this.name = name;
@@ -87,14 +69,8 @@ public class AuditEventData
 
     public AuditEventData(final String name, final String value)
     {
-        if(name == null || name.isEmpty())
-        {
-            throw new IllegalArgumentException("name could not be empty");
-        }
-        if(value == null)
-        {
-            throw new IllegalArgumentException("value could not be null");
-        }
+        assertNotEmpty("name", name);
+        assertNotNull("value", value);
 
         eventDataType = AuditEventDataType.TEXT;
         this.name = name;
@@ -138,6 +114,27 @@ public class AuditEventData
         StringBuilder sb = new StringBuilder();
         sb.append(name).append("=").append(value);
         return sb.toString();
+    }
+
+    private static void assertNotNull(String parameterName, Object parameter)
+    {
+        if(parameter == null)
+        {
+            throw new IllegalArgumentException(parameterName + " could not be null");
+        }
+    }
+
+    private static void assertNotEmpty(String parameterName, String parameter)
+    {
+        if(parameter == null)
+        {
+            throw new IllegalArgumentException(parameterName + " could not be null");
+        }
+
+        if(parameter.isEmpty())
+        {
+            throw new IllegalArgumentException(parameterName + " could not be empty");
+        }
     }
 
 }

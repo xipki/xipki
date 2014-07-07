@@ -42,6 +42,7 @@ import org.xipki.database.api.DataSourceWrapper;
 import org.xipki.security.common.CertRevocationInfo;
 import org.xipki.security.common.HashAlgoType;
 import org.xipki.security.common.HashCalculator;
+import org.xipki.security.common.LogUtil;
 
 /**
  * @author Lijun Liao
@@ -542,8 +543,7 @@ class CertStatusStoreQueryExecutor
             return true;
         }catch(Exception e)
         {
-            LOG.error("isHealthy(). {}: {}", e.getClass().getName(), e.getMessage());
-            LOG.debug("isHealthy()", e);
+            LogUtil.logErrorThrowable(LOG, "isHealthy()", e);
             return false;
         }
     }

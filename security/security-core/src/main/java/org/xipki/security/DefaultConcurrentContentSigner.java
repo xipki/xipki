@@ -36,6 +36,7 @@ import org.xipki.security.api.ConcurrentContentSigner;
 import org.xipki.security.api.NoIdleSignerException;
 import org.xipki.security.api.PasswordResolver;
 import org.xipki.security.api.SignerException;
+import org.xipki.security.common.LogUtil;
 import org.xipki.security.common.ParamChecker;
 
 /**
@@ -252,8 +253,7 @@ public class DefaultConcurrentContentSigner implements ConcurrentContentSigner
             return signature != null && signature.length > 0;
         } catch(Exception e)
         {
-            LOG.error("healthCheck(). {}: {}", e.getClass().getName(), e.getMessage());
-            LOG.debug("healthCheck()", e);
+            LogUtil.logErrorThrowable(LOG, "healthCheck()", e);
             return false;
         }
         finally

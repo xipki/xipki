@@ -33,6 +33,7 @@ import org.xipki.security.api.P11CryptService;
 import org.xipki.security.api.PKCS11SlotIdentifier;
 import org.xipki.security.api.Pkcs11KeyIdentifier;
 import org.xipki.security.api.SignerException;
+import org.xipki.security.common.LogUtil;
 import org.xipki.security.common.ParamChecker;
 
 /**
@@ -101,8 +102,7 @@ public class P11ECDSAContentSigner implements ContentSigner
             throw new RuntimeCryptoException("SignerException: " + e.getMessage());
         } catch (Throwable t)
         {
-            LOG.warn("Throwable: {}", t.getMessage());
-            LOG.debug("Throwable", t);
+            LogUtil.logWarnThrowable(LOG, "Throwable", t);
             throw new RuntimeCryptoException("IOException: " + t.getMessage());
         }
     }

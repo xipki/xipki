@@ -215,7 +215,6 @@ class CaConfigurationDbImporter extends DbPorter
         System.out.println(" Imported table ENVIRONMENT");
     }
 
-    @SuppressWarnings("resource")
     private void import_crlsigner(Crlsigners crlsigners)
     throws Exception
     {
@@ -351,7 +350,6 @@ class CaConfigurationDbImporter extends DbPorter
         System.out.println(" Imported table CERTPROFILE");
     }
 
-    @SuppressWarnings("resource")
     private void import_ca(Cas cas)
     throws Exception
     {
@@ -441,7 +439,6 @@ class CaConfigurationDbImporter extends DbPorter
         System.out.println(" Imported table CAALIAS");
     }
 
-    @SuppressWarnings("resource")
     private void import_ca_has_requestor(CaHasRequestors ca_has_requestors)
     throws Exception
     {

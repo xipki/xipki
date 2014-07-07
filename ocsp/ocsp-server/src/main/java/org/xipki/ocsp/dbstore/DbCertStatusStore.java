@@ -50,6 +50,7 @@ import org.xipki.security.api.PasswordResolver;
 import org.xipki.security.common.CRLReason;
 import org.xipki.security.common.CertRevocationInfo;
 import org.xipki.security.common.HashAlgoType;
+import org.xipki.security.common.LogUtil;
 import org.xipki.security.common.ParamChecker;
 
 /**
@@ -283,10 +284,7 @@ public class DbCertStatusStore extends CertStatusStore
             }
         }catch(Exception e)
         {
-            LOG.error("Could not executing initIssuerStore() for {},  {}: {}",
-                    new Object[]{getName(), e.getClass().getName(), e.getMessage()});
-            LOG.debug("Could not executing initIssuerStore()", e);
-
+            LogUtil.logErrorThrowable(LOG, "Could not executing initIssuerStore()", e);
             initializationFailed = true;
             initialized = true;
         }
@@ -516,8 +514,7 @@ public class DbCertStatusStore extends CertStatusStore
             }
         }catch(Exception e)
         {
-            LOG.error("isHealthy(). {}: {}", e.getClass().getName(), e.getMessage());
-            LOG.debug("isHealthy()", e);
+            LogUtil.logErrorThrowable(LOG, "isHealthy()", e);
             return false;
         }
     }

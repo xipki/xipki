@@ -63,6 +63,7 @@ import org.xipki.security.api.ConcurrentContentSigner;
 import org.xipki.security.api.SecurityFactory;
 import org.xipki.security.common.CmpUtf8Pairs;
 import org.xipki.security.common.IoCertUtil;
+import org.xipki.security.common.LogUtil;
 import org.xipki.security.common.ParamChecker;
 
 /**
@@ -211,8 +212,7 @@ public abstract class CmpResponder
                 requestor = (CertBasedRequestorInfo) verificationResult.getRequestor();
             } catch (Exception e)
             {
-                LOG.error("tid=" + tidStr + ": error while verifying the signature: {}", e.getMessage());
-                LOG.debug("tid=" + tidStr + ": error while verifying the signature", e);
+                LogUtil.logErrorThrowable(LOG, "tid=" + tidStr + ": error while verifying the signature", e);
                 errorStatus = "Request has invalid signature based protection";
             }
         }
@@ -319,9 +319,7 @@ public abstract class CmpResponder
             return CmpUtil.addProtection(pkiMessage, responder, sender, getCmpControl().isSendResponderCert());
         } catch (Exception e)
         {
-            LOG.error("error while add protection to the PKI message: {}", e.getMessage());
-            LOG.debug("error while add protection to the PKI message", e);
-
+               LogUtil.logErrorThrowable(LOG, "error while add protection to the PKI message", e);
             PKIStatusInfo status = generateCmpRejectionStatus(
                     PKIFailureInfo.systemFailure, "could not sign the PKIMessage");
             PKIBody body = new PKIBody(PKIBody.TYPE_ERROR, new ErrorMsgContent(status));
