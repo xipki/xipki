@@ -17,48 +17,26 @@
 
 package org.xipki.ocsp.client.impl.digest;
 
-import java.io.ByteArrayOutputStream;
-import java.io.OutputStream;
-
+import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.nist.NISTObjectIdentifiers;
-import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.crypto.Digest;
 import org.bouncycastle.crypto.digests.SHA512Digest;
-import org.bouncycastle.operator.DigestCalculator;
 
 /**
  * @author Lijun Liao
  */
 
-public class SHA512DigestCalculator implements DigestCalculator
+public class SHA512DigestCalculator extends AbstractDigestCalculator
 {
-
-    private ByteArrayOutputStream bOut = new ByteArrayOutputStream();
-
-    public AlgorithmIdentifier getAlgorithmIdentifier()
+    @Override
+    protected ASN1ObjectIdentifier getObjectIdentifier()
     {
-        return new AlgorithmIdentifier(NISTObjectIdentifiers.id_sha512);
+        return NISTObjectIdentifiers.id_sha512;
     }
 
-    public OutputStream getOutputStream()
+    @Override
+    protected Digest getDigester()
     {
-        return bOut;
-    }
-
-    public byte[] getDigest()
-    {
-        byte[] bytes = bOut.toByteArray();
-
-        bOut.reset();
-
-        Digest sha = new SHA512Digest();
-
-        sha.update(bytes, 0, bytes.length);
-
-        byte[] digest = new byte[sha.getDigestSize()];
-
-        sha.doFinal(digest, 0);
-
-        return digest;
+        return new SHA512Digest();
     }
 }
