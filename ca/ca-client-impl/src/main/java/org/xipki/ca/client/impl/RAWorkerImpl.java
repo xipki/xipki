@@ -81,6 +81,7 @@ import org.xipki.security.api.PasswordResolverException;
 import org.xipki.security.api.SignerException;
 import org.xipki.security.common.ConfigurationException;
 import org.xipki.security.common.IoCertUtil;
+import org.xipki.security.common.LogUtil;
 import org.xipki.security.common.ParamChecker;
 
 /**
@@ -248,16 +249,14 @@ public final class RAWorkerImpl extends AbstractRAWorker implements RAWorker
                 configuredCaNames.add(caName);
             }catch(IOException e)
             {
-                LOG.warn("Could not configure CA {}, IOException: {}", caName, e.getMessage());
-                LOG.debug("Could not configure CA " + caName, e);
+                LogUtil.logWarnThrowable(LOG, "Could not configure CA " + caName, e);
                 if(dev_mode == false)
                 {
                     throw e;
                 }
             }catch(CertificateException e)
             {
-                LOG.warn("Could not configure CA {}, CertificateException: {}", caName, e.getMessage());
-                LOG.debug("Could not configure CA " + caName, e);
+                LogUtil.logWarnThrowable(LOG, "Could not configure CA " + caName, e);
                 if(dev_mode == false)
                 {
                     throw new ConfigurationException(e);

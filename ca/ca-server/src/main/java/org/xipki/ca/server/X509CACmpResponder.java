@@ -103,6 +103,7 @@ import org.xipki.security.common.CmpUtf8Pairs;
 import org.xipki.security.common.CustomObjectIdentifiers;
 import org.xipki.security.common.HealthCheckResult;
 import org.xipki.security.common.IoCertUtil;
+import org.xipki.security.common.LogUtil;
 
 /**
  * @author Lijun Liao
@@ -647,8 +648,7 @@ public class X509CACmpResponder extends CmpResponder
                                 certProfileName, keyUpdate, confirmWaitTime, childAuditEvent);
                     } catch (CMPException e)
                     {
-                        LOG.warn("generateCertificate, CMPException: {}", e.getMessage());
-                        LOG.debug("generateCertificate", e);
+                        LogUtil.logWarnThrowable(LOG, "generateCertificate", e);
 
                         certResponses[i] = new CertResponse(certReqId,
                                 generateCmpRejectionStatus(PKIFailureInfo.badCertTemplate, e.getMessage()));
@@ -1153,7 +1153,9 @@ public class X509CACmpResponder extends CmpResponder
                     ca.revokeCertificate(serialNumber, CRLReason.CESSATION_OF_OPERATION, new Date());
                 } catch (OperationException e)
                 {
-                    LOG.warn("Could not revoke certificate ca={}, serialNumber={}", ca.getCAInfo().getName(), serialNumber);
+                    String msg = "Could not revoke certificate ca=" + ca.getCAInfo().getName() +
+                            " serialNumber=" + serialNumber;
+                    LogUtil.logWarnThrowable(LOG, msg, e);
                 }
 
                 successfull = false;
@@ -1243,16 +1245,13 @@ public class X509CACmpResponder extends CmpResponder
             return certRequest.isValidSigningKeyPOP(cvp);
         } catch (InvalidKeyException e)
         {
-            LOG.error("verifyPOP, InvalidKeyException: {}" , e.getMessage());
-            LOG.debug("verifyPOP" , e);
+            LogUtil.logErrorThrowable(LOG, "verifyPOP", e);
         } catch (IllegalStateException e)
         {
-            LOG.error("verifyPOP, IllegalStateException: {}" , e.getMessage());
-            LOG.debug("verifyPOP" , e);
+            LogUtil.logErrorThrowable(LOG, "verifyPOP", e);
         } catch (CRMFException e)
         {
-            LOG.error("verifyPOP, CRMFException: {}" , e.getMessage());
-            LOG.debug("verifyPOP" , e);
+            LogUtil.logErrorThrowable(LOG, "verifyPOP", e);
         }
         return false;
     }

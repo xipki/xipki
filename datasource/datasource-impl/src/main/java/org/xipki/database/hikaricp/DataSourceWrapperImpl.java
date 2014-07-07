@@ -65,7 +65,7 @@ public class DataSourceWrapperImpl implements DataSourceWrapper
             return service.getConnection();
         } catch(SQLException e)
         {
-            LOG.error("Could not create connection to database ", e.getMessage());
+            LOG.error("Could not create connection to database {}", e.getMessage());
             LOG.debug("Could not create connection to database", e);
             throw e;
         }

@@ -39,14 +39,8 @@ public class DataSourceFactoryImpl implements DataSourceFactory
     public DataSourceWrapper createDataSourceForFile(String confFile, PasswordResolver passwordResolver)
     throws SQLException, PasswordResolverException, IOException
     {
-        if(confFile == null)
-        {
-            throw new IllegalArgumentException("confFile could not be null");
-        }
-        if(passwordResolver == null)
-        {
-            throw new IllegalArgumentException("passwordResolver could not be null");
-        }
+        assertNotNull("confFile", confFile);
+        assertNotNull("passwordResolver", passwordResolver);
 
         FileInputStream fIn = null;
 
@@ -70,14 +64,8 @@ public class DataSourceFactoryImpl implements DataSourceFactory
     public DataSourceWrapper createDataSource(InputStream conf, PasswordResolver passwordResolver)
     throws SQLException, PasswordResolverException, IOException
     {
-        if(conf == null)
-        {
-            throw new IllegalArgumentException("conf could not be null");
-        }
-        if(passwordResolver == null)
-        {
-            throw new IllegalArgumentException("passwordResolver could not be null");
-        }
+        assertNotNull("conf", conf);
+        assertNotNull("passwordResolver", passwordResolver);
 
         Properties config = new Properties();
         config.load(conf);
@@ -117,6 +105,14 @@ public class DataSourceFactoryImpl implements DataSourceFactory
 
         DataSourceWrapperImpl ds = new DataSourceWrapperImpl(config, databaseType);
         return ds;
+    }
+
+    private static void assertNotNull(String parameterName, Object parameter)
+    {
+        if(parameter == null)
+        {
+            throw new IllegalArgumentException(parameterName + " could not be null");
+        }
     }
 
 }

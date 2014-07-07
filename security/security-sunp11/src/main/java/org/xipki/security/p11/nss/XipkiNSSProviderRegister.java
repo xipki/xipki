@@ -21,6 +21,7 @@ import java.security.Security;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xipki.security.common.LogUtil;
 
 /**
  * @author Lijun Liao
@@ -39,8 +40,7 @@ public class XipkiNSSProviderRegister
                 Security.addProvider(provider);
             }catch(Throwable t)
             {
-                LOG.error("Could not add provider {}: {}", XipkiNSSProvider.PROVIDER_NAME, t.getMessage());
-                LOG.debug("Could not add provider " + XipkiNSSProvider.PROVIDER_NAME, t);
+                LogUtil.logErrorThrowable(LOG, "Could not add provider " + XipkiNSSProvider.PROVIDER_NAME, t);
             }
         }
     }

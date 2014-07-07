@@ -157,7 +157,10 @@ public abstract class CmpRequestor
             response = new GeneralPKIMessage(encodedResponse);
         } catch (IOException e)
         {
-            LOG.error("Error while decode the received PKI message: {}", Hex.toHexString(encodedResponse));
+            if(LOG.isErrorEnabled())
+            {
+                LOG.error("Error while decode the received PKI message: {}", Hex.toHexString(encodedResponse));
+            }
             throw new CmpRequestorException(e);
         }
 

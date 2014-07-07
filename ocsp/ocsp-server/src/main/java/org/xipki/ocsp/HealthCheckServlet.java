@@ -27,6 +27,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.security.common.HealthCheckResult;
+import org.xipki.security.common.LogUtil;
 
 /**
  * @author Lijun Liao
@@ -81,8 +82,7 @@ public class HealthCheckServlet extends HttpServlet
             response.getOutputStream().write(respBytes);
         }catch(Throwable t)
         {
-            LOG.error("Throwable thrown, this should not happen. {}: {}", t.getClass().getName(), t.getMessage());
-            LOG.debug("Throwable thrown, this should not happen", t);
+            LogUtil.logErrorThrowable(LOG, "Throwable thrown, this should not happen", t);
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             response.setContentLength(0);
         }
