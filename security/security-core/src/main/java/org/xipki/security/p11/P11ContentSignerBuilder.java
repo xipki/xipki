@@ -73,7 +73,7 @@ public class P11ContentSignerBuilder
         boolean keyExists = (signerCertInP11 != null);
         if(keyExists == false)
         {
-            keyExists = (this.cryptService.getPublicKey(slot, keyId) != null);
+            keyExists = (cryptService.getPublicKey(slot, keyId) != null);
         }
 
         if(keyExists == false)
