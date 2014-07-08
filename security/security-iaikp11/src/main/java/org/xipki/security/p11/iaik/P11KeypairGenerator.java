@@ -529,17 +529,7 @@ public class P11KeypairGenerator
         {
             super();
             this.privateKey = privateKey;
-
-            // Set the parameters field to NULL if not specified
-            ASN1Encodable keyParameters = publicKeyInfo.getAlgorithm().getParameters();
-            if(keyParameters == null)
-            {
-                AlgorithmIdentifier keyAlgId = new AlgorithmIdentifier(
-                        publicKeyInfo.getAlgorithm().getAlgorithm(), DERNull.INSTANCE);
-                publicKeyInfo = new SubjectPublicKeyInfo(keyAlgId, publicKeyInfo.getPublicKeyData().getBytes());
-            }
-
-            this.publicKeyInfo = publicKeyInfo;
+            this.publicKeyInfo = IoCertUtil.toRfc3279Style(publicKeyInfo);
         }
 
         public PrivateKey getPrivateKey()
