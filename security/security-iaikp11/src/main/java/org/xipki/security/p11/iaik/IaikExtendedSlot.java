@@ -51,6 +51,7 @@ import org.slf4j.LoggerFactory;
 import org.xipki.security.api.Pkcs11KeyIdentifier;
 import org.xipki.security.api.SignerException;
 import org.xipki.security.common.IoCertUtil;
+import org.xipki.security.common.LogUtil;
 
 /**
  * @author Lijun Liao
@@ -87,10 +88,8 @@ public class IaikExtendedSlot
             session = openSession();
         } catch (TokenException e)
         {
-            LOG.warn("openSession, TokenException: {}", e.getMessage());
-            LOG.debug("openSession", e);
+            LogUtil.logWarnThrowable(LOG, "openSession", e);
             close();
-
             throw new SignerException(e);
         }
 
@@ -99,10 +98,8 @@ public class IaikExtendedSlot
             firstLogin(session, password);
         } catch (TokenException e)
         {
-            LOG.warn("firstLogin, TokenException: {}", e.getMessage());
-            LOG.debug("firstLogin", e);
+            LogUtil.logWarnThrowable(LOG, "firstLogin", e);
             close();
-
             throw new SignerException(e);
         }
 
@@ -112,8 +109,7 @@ public class IaikExtendedSlot
             maxSessionCount2 = this.slot.getToken().getTokenInfo().getMaxSessionCount();
         } catch (TokenException e)
         {
-            LOG.warn("TokenException {}", e.getMessage());
-            LOG.debug("TokenException", e);
+            LogUtil.logWarnThrowable(LOG, "getToken", e);
         }
 
         if(maxSessionCount2 == 0)
@@ -530,9 +526,7 @@ public class IaikExtendedSlot
             }
             catch (Throwable t)
             {
-                LOG.error("error while slot.getToken().closeAllSessions(): {}: {}",
-                        t.getClass().getName(), t.getMessage());
-                LOG.debug("error while slot.getToken().closeAllSessions()", t);
+                LogUtil.logErrorThrowable(LOG, "error while slot.getToken().closeAllSessions()", t);
             }
 
             slot = null;

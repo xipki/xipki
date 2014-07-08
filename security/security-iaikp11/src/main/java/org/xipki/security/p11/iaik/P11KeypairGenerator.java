@@ -345,7 +345,6 @@ public class P11KeypairGenerator
 
         AlgorithmIdentifier keyAlgID = new AlgorithmIdentifier(X9ObjectIdentifiers.id_ecPublicKey, curveId);
         SubjectPublicKeyInfo pkInfo = new SubjectPublicKeyInfo(keyAlgID, os.getOctets());
-
         return new PrivateKeyAndPKInfo((ECDSAPrivateKey) kp.getPrivateKey(), pkInfo);
     }
 
@@ -377,14 +376,6 @@ public class P11KeypairGenerator
 
         KeyPair kp = session.generateKeyPair(Mechanism.get(PKCS11Constants.CKM_EC_KEY_PAIR_GEN),
                 publicKeyTemplate, privateKeyTemplate);
-
-        /*
-        ECDSAPublicKey publicKey = (ECDSAPublicKey) kp.getPublicKey();
-
-        ECDSAPublicKey namedPublicKeyTemplate = new ECDSAPublicKey();
-        namedPublicKeyTemplate.getEcdsaParams().setByteArrayValue(curveId.getEncoded());
-        session.setAttributeValues(publicKey, namedPublicKeyTemplate);
-        */
 
         return kp;
     }

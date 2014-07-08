@@ -39,6 +39,7 @@ import org.xipki.ca.server.CertStatus;
 import org.xipki.ca.server.SubjectKeyProfileTripleCollection;
 import org.xipki.database.api.DataSourceWrapper;
 import org.xipki.security.common.CertRevocationInfo;
+import org.xipki.security.common.LogUtil;
 import org.xipki.security.common.ParamChecker;
 
 /**
@@ -266,8 +267,7 @@ public class CertificateStore
             return queryExecutor.getCertStatusForSubject(caCert, subject);
         } catch (SQLException e)
         {
-            LOG.error("queryExecutor.getCertStatusForSubject. SQLException: {}", e.getMessage());
-            LOG.debug("queryExecutor.getCertStatusForSubject", e);
+            LogUtil.logErrorThrowable(LOG, "queryExecutor.getCertStatusForSubject", e);
             return CertStatus.Unknown;
         }
     }
