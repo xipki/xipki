@@ -83,8 +83,18 @@ public class Pkcs11KeyIdentifier implements Comparable<Pkcs11KeyIdentifier>
     public String toString()
     {
         StringBuilder sb = new StringBuilder();
-        sb.append("key-id: ").append(keyIdHex);
-        sb.append(", key-label: ").append(keyLabel);
+        if(keyIdHex != null)
+        {
+            sb.append("key-id: ").append(keyIdHex);
+            if(keyLabel != null)
+            {
+                sb.append(", ");
+            }
+        }
+        if(keyLabel != null)
+        {
+            sb.append("key-label: ").append(keyLabel);
+        }
         return sb.toString();
     }
 
