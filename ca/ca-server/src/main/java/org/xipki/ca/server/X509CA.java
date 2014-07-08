@@ -43,21 +43,18 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.security.auth.x500.X500Principal;
 
-import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1EncodableVector;
 import org.bouncycastle.asn1.ASN1GeneralizedTime;
 import org.bouncycastle.asn1.ASN1Integer;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.ASN1OctetString;
 import org.bouncycastle.asn1.ASN1Sequence;
-import org.bouncycastle.asn1.DERNull;
 import org.bouncycastle.asn1.DERPrintableString;
 import org.bouncycastle.asn1.DERSequence;
 import org.bouncycastle.asn1.DERSet;
 import org.bouncycastle.asn1.DERUTF8String;
 import org.bouncycastle.asn1.x500.RDN;
 import org.bouncycastle.asn1.x500.X500Name;
-import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.asn1.x509.AuthorityInformationAccess;
 import org.bouncycastle.asn1.x509.AuthorityKeyIdentifier;
 import org.bouncycastle.asn1.x509.CRLDistPoint;
@@ -1432,14 +1429,7 @@ public class X509CA
                     "CA will expire in " + caInfo.getExpirationPeriod() + " days, and cannot issue new certificates");
         }
 
-        // Set the parameters field to NULL if not specified
-        ASN1Encodable keyParameters = publicKeyInfo.getAlgorithm().getParameters();
-        if(keyParameters == null)
-        {
-            AlgorithmIdentifier keyAlgId = new AlgorithmIdentifier(
-                    publicKeyInfo.getAlgorithm().getAlgorithm(), DERNull.INSTANCE);
-            publicKeyInfo = new SubjectPublicKeyInfo(keyAlgId, publicKeyInfo.getPublicKeyData().getBytes());
-        }
+        publicKeyInfo = IoCertUtil.toRfc3279Style(publicKeyInfo);
 
         // public key
         try
