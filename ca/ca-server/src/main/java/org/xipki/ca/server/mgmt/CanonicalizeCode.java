@@ -78,7 +78,7 @@ public class CanonicalizeCode
         {
             if(file.isDirectory())
             {
-                if(file.getName().equals("target") == false)
+                if(file.getName().equals("target") == false && file.getName().equals("tbd") == false)
                 {
                     canonicalizeDir(file);
                 }
@@ -251,7 +251,7 @@ public class CanonicalizeCode
         {
             if(file.isDirectory())
             {
-                if(file.getName().equals("target") == false)
+                if(file.getName().equals("target") == false && file.getName().equals("tbd") == false)
                 {
                     checkWarningsInDir(file);
                 }
