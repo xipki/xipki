@@ -17,6 +17,9 @@
 
 package org.xipki.ca.server.mgmt.shell;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.Set;
 
 import org.apache.felix.gogo.commands.Command;
@@ -58,7 +61,10 @@ public class EnvListCommand extends CaCommand
                 sb.append(n + " enviroment paramters are configured:\n");
             }
 
-            for(String paramName : paramNames)
+            List<String> sorted = new ArrayList<>(paramNames);
+            Collections.sort(sorted);
+
+            for(String paramName : sorted)
             {
                 sb.append("\t").append(paramName).append("\n");
             }

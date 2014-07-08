@@ -17,6 +17,9 @@
 
 package org.xipki.ca.server.mgmt.shell;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.Set;
 
 import org.apache.felix.gogo.commands.Command;
@@ -55,7 +58,10 @@ public class CaAliasListCommand extends CaCommand
                 sb.append(n + " CA aliases are configured:\n");
             }
 
-            for(String aliasName : aliasNames)
+            List<String> sorted = new ArrayList<>(aliasNames);
+            Collections.sort(sorted);
+
+            for(String aliasName : sorted)
             {
                 sb.append("\t").append(aliasName).append("\n");
             }

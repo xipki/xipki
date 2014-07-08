@@ -98,23 +98,32 @@ public class CrlSignerEntry
         sb.append("overlap: ").append(getOverlap()).append(" minutes\n");
         sb.append("includeCertsInCrl: ").append(includeCertsInCrl ? "yes" : "no").append("\n");
         sb.append("includeExpiredCerts: ").append(includeExpiredCerts ? "yes" : "no").append('\n');
-        sb.append("cert: ").append("\n");
-        sb.append("\tissuer: ").append(
-                IoCertUtil.canonicalizeName(cert.getIssuerX500Principal())).append('\n');
-        sb.append("\tserialNumber: ").append(cert.getSerialNumber()).append('\n');
-        sb.append("\tsubject: ").append(
-                IoCertUtil.canonicalizeName(cert.getSubjectX500Principal())).append('\n');
-        if(verbose)
+        if(cert != null)
         {
-            sb.append("\tencoded: ");
-            try
+            sb.append("cert: ").append("\n");
+            sb.append("\tissuer: ").append(
+                    IoCertUtil.canonicalizeName(cert.getIssuerX500Principal())).append('\n');
+            sb.append("\tserialNumber: ").append(cert.getSerialNumber()).append('\n');
+            sb.append("\tsubject: ").append(
+                    IoCertUtil.canonicalizeName(cert.getSubjectX500Principal())).append('\n');
+
+            if(verbose)
             {
-                sb.append(Base64.toBase64String(cert.getEncoded()));
-            } catch (CertificateEncodingException e)
-            {
-                sb.append("ERROR");
+                sb.append("\tencoded: ");
+                try
+                {
+                    sb.append(Base64.toBase64String(cert.getEncoded()));
+                } catch (CertificateEncodingException e)
+                {
+                    sb.append("ERROR");
+                }
             }
         }
+        else
+        {
+            sb.append("cert: null\n");
+        }
+
         return sb.toString();
     }
 
