@@ -38,6 +38,7 @@ import org.xipki.security.api.P11CryptService;
 import org.xipki.security.api.PKCS11SlotIdentifier;
 import org.xipki.security.api.Pkcs11KeyIdentifier;
 import org.xipki.security.api.SignerException;
+import org.xipki.security.common.LogUtil;
 import org.xipki.security.common.ParamChecker;
 
 /**
@@ -119,8 +120,7 @@ public class P11RSAContentSigner implements ContentSigner
             return cryptService.CKM_RSA_PKCS(encodedDigestInfo, slot, keyId);
         } catch (SignerException e)
         {
-            LOG.warn("SignerException: {}", e.getMessage());
-            LOG.debug("SignerException", e);
+            LogUtil.logWarnThrowable(LOG, "SignerException", e);
             throw new RuntimeCryptoException("SignerException: " + e.getMessage());
         }
     }
