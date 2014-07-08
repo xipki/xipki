@@ -47,7 +47,7 @@ public class LdapCertPublisher extends CertPublisher
     @SuppressWarnings("unused")
     private EnvironmentParameterResolver envParameterResolver;
     private AuditLoggingService auditLoggingService;
-    
+
     @Override
     public void initialize(String conf, PasswordResolver passwordResolver,
             DataSourceWrapper dataSource)
@@ -67,7 +67,7 @@ public class LdapCertPublisher extends CertPublisher
     @Override
     public void setEnvironmentParameterResolver(EnvironmentParameterResolver parameterResolver)
     {
-    	this.envParameterResolver = parameterResolver;
+        this.envParameterResolver = parameterResolver;
     }
 
     @Override
