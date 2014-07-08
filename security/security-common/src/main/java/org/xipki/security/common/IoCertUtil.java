@@ -55,14 +55,18 @@ import javax.security.auth.x500.X500Principal;
 
 import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
+import org.bouncycastle.asn1.DERNull;
 import org.bouncycastle.asn1.DERPrintableString;
 import org.bouncycastle.asn1.DERUTF8String;
 import org.bouncycastle.asn1.cmp.PKIFreeText;
 import org.bouncycastle.asn1.cmp.PKIStatus;
+import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 import org.bouncycastle.asn1.x500.RDN;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x500.style.IETFUtils;
 import org.bouncycastle.asn1.x500.style.RFC4519Style;
+import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
+import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 
 /**
  * @author Lijun Liao
@@ -645,5 +649,31 @@ public class IoCertUtil
                 return "UNKNOWN";
             }
         }
+    }
+
+    public static SubjectPublicKeyInfo toRfc3279Style(SubjectPublicKeyInfo publicKeyInfo)
+    {
+        ASN1ObjectIdentifier algOid = publicKeyInfo.getAlgorithm().getAlgorithm();
+        ASN1Encodable keyParameters = publicKeyInfo.getAlgorithm().getParameters();
+
+        if(PKCSObjectIdentifiers.rsaEncryption.equals(algOid))
+        {
+            if(DERNull.INSTANCE.equals(keyParameters))
+            {
+                return publicKeyInfo;
+            }
+            else
+            {
+                keyParameters = null;
+            }
+        }
+
+        // Set the parameters field to NULL if not specified
+        if(keyParameters == null)
+        {
+            AlgorithmIdentifier keyAlgId = new AlgorithmIdentifier(algOid, DERNull.INSTANCE);
+            publicKeyInfo = new SubjectPublicKeyInfo(keyAlgId, publicKeyInfo.getPublicKeyData().getBytes());
+        }
+        return publicKeyInfo;
     }
 }
