@@ -37,5 +37,6 @@
 		<module>ca-server-shell</module>
 		<module>ca-certprofile-example</module>
 		<module>ca-sql</module>
+		<module>publisher-ldap</module>
 	</modules>
 </project>

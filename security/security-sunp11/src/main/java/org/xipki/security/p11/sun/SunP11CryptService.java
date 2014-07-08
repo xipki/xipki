@@ -45,6 +45,7 @@ import org.xipki.security.api.PKCS11SlotIdentifier;
 import org.xipki.security.api.Pkcs11KeyIdentifier;
 import org.xipki.security.api.SignerException;
 import org.xipki.security.common.IoCertUtil;
+import org.xipki.security.common.LogUtil;
 import org.xipki.security.common.ParamChecker;
 
 import sun.security.pkcs11.wrapper.PKCS11Exception;
@@ -256,8 +257,7 @@ public final class SunP11CryptService implements P11CryptService
             }catch(Throwable t)
             {
                 String msg = "Could not initialize PKCS11 slot " + i + " (module: " + pkcs11Module + ")";
-                LOG.warn(msg + ", message: {}", t.getMessage());
-                LOG.debug(msg, t);
+                LogUtil.logWarnThrowable(LOG, msg, t);
                 continue;
             }
         }

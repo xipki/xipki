@@ -39,6 +39,7 @@ import org.xipki.ca.common.PKIErrorException;
 import org.xipki.ca.common.RAWorkerException;
 import org.xipki.security.api.PasswordResolver;
 import org.xipki.security.api.SecurityFactory;
+import org.xipki.security.common.LogUtil;
 
 /**
  * @author Lijun Liao
@@ -114,7 +115,7 @@ public abstract class AbstractRAWorker
                     caPubs.add(getCertificate(cmpCaPub));
                 } catch (CertificateException e)
                 {
-                    LOG.error("Could not extract the caPub from CMPCertificate");
+                    LogUtil.logErrorThrowable(LOG, "Could not extract the caPub from CMPCertificate", e);
                 }
             }
 

@@ -89,6 +89,17 @@
             </action>
         </command>
 
+        <command name="keytool/pbe-enc">
+            <action class="org.xipki.security.shell.PBEEncryptCommand">
+            	<property name="securityFactory" ref="securityFactory" />
+            </action>
+        </command>
+
+        <command name="keytool/pbe-dec">
+            <action class="org.xipki.security.shell.PBEDecryptCommand">
+            	<property name="securityFactory" ref="securityFactory" />
+            </action>
+        </command>
     </command-bundle>
 
 </blueprint>
