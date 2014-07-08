@@ -17,6 +17,9 @@
 
 package org.xipki.ca.server.mgmt.shell;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.Set;
 
 import org.apache.felix.gogo.commands.Command;
@@ -49,7 +52,11 @@ public class CaProfileListCommand extends CaCommand
             if(entries != null && entries.isEmpty() == false)
             {
                 sb.append("Certificate Profiles supported by CA " + caName).append("\n");
-                for(String entry  : entries)
+
+                List<String> sorted = new ArrayList<>(entries);
+                Collections.sort(sorted);
+
+                for(String entry  : sorted)
                 {
                     sb.append("\t").append(entry).append("\n");
                 }

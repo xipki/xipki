@@ -267,7 +267,7 @@ abstract class X509CmpRequestor extends CmpRequestor
 
         RevRepContent content = (RevRepContent) respBody.getContent();
         PKIStatusInfo[] statuses = content.getStatus();
-        if(statuses.length != reqEntries.size())
+        if(statuses == null || statuses.length != reqEntries.size())
         {
             throw new CmpRequestorException("Incorrect number of status entries in response '" + statuses.length +
                     "' instead the exceptected '" + reqEntries.size() + "'");
