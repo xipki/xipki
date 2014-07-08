@@ -118,7 +118,7 @@ public class OCSPStatusCommand extends OsgiCommandSupport
     {
         if(serialNumber == null && certFile == null)
         {
-            System.out.println("Neither serialNumber nor certFile is not set");
+            System.out.println("Neither serialNumber nor certFile is set");
             return null;
         }
 

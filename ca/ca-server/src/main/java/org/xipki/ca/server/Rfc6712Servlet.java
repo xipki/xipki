@@ -42,6 +42,7 @@ import org.xipki.audit.api.AuditLevel;
 import org.xipki.audit.api.AuditLoggingService;
 import org.xipki.audit.api.AuditStatus;
 import org.xipki.ca.server.mgmt.CAManager;
+import org.xipki.security.common.LogUtil;
 
 /**
  * @author Lijun Liao
@@ -172,8 +173,7 @@ public class Rfc6712Servlet extends HttpServlet
 
         }catch(Throwable t)
         {
-            LOG.error("Throwable thrown, this should not happen. {}: {}", t.getClass().getName(), t.getMessage());
-            LOG.debug("Throwable thrown, this should not happen.", t);
+            LogUtil.logErrorThrowable(LOG, "Throwable thrown, this should not happen", t);
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             response.setContentLength(0);
             auditLevel = AuditLevel.ERROR;

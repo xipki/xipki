@@ -72,6 +72,7 @@ import org.xipki.security.common.CustomObjectIdentifiers;
 import org.xipki.security.common.HashAlgoType;
 import org.xipki.security.common.HashCalculator;
 import org.xipki.security.common.IoCertUtil;
+import org.xipki.security.common.LogUtil;
 import org.xipki.security.common.ParamChecker;
 
 /**
@@ -486,10 +487,7 @@ public class CrlCertStatusStore extends CertStatusStore
             LOG.info("Updated CertStore {}", getName());
         } catch (Exception e)
         {
-            LOG.error("Could not executing initializeStore() for {},  {}: {}",
-                    new Object[]{getName(), e.getClass().getName(), e.getMessage()});
-            LOG.debug("Could not executing initializeStore()", e);
-
+            LogUtil.logErrorThrowable(LOG, "Could not executing initializeStore()", e);
             initializationFailed = true;
             initialized = true;
         } finally

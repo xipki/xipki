@@ -39,6 +39,7 @@ import org.xipki.audit.api.AuditEventData;
 import org.xipki.audit.api.AuditLevel;
 import org.xipki.audit.api.AuditLoggingService;
 import org.xipki.audit.api.AuditStatus;
+import org.xipki.security.common.LogUtil;
 
 /**
  * @author Lijun Liao
@@ -211,8 +212,7 @@ public class Rfc2560Servlet extends HttpServlet
             }
         }catch(Throwable t)
         {
-            LOG.error("Throwable. {}: {}", t.getClass().getName(), t.getMessage());
-            LOG.debug("Throwable", t);
+            LogUtil.logErrorThrowable(LOG, "Throwable", t);
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             response.setContentLength(0);
 

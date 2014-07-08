@@ -107,6 +107,7 @@ import org.xipki.security.common.CertRevocationInfo;
 import org.xipki.security.common.HashAlgoType;
 import org.xipki.security.common.HealthCheckResult;
 import org.xipki.security.common.IoCertUtil;
+import org.xipki.security.common.LogUtil;
 import org.xipki.security.common.ObjectIdentifiers;
 import org.xml.sax.SAXException;
 
@@ -527,9 +528,7 @@ public class OcspResponder
                 store.shutdown();
             }catch(Exception e)
             {
-                LOG.warn("shutdown store {}. {}: {}",
-                        new Object[]{store.getName(), e.getClass().getName(), e.getMessage()});
-                LOG.debug("shutdown store " + store.getName(), e);
+                LogUtil.logWarnThrowable(LOG, "shutdown store " + store.getName(), e);
             }
         }
 
@@ -694,8 +693,7 @@ public class OcspResponder
                         }
                     } catch (CertStatusStoreException e)
                     {
-                        LOG.error("answer() CertStatusStore.getCertStatus. CertStatusStoreException: {}", e.getMessage());
-                        LOG.debug("answer() CertStatusStore.getCertStatus", e);
+                        LogUtil.logErrorThrowable(LOG, "answer() CertStatusStore.getCertStatus", e);
                         if(childAuditEvent != null)
                         {
                             fillAuditEvent(childAuditEvent, AuditLevel.ERROR, AuditStatus.ERROR,
@@ -774,8 +772,7 @@ public class OcspResponder
                         encodedCertHash = bcCertHash.getEncoded();
                     } catch (IOException e)
                     {
-                        LOG.error("answer() bcCertHash.getEncoded. IOException: {}", e.getMessage());
-                        LOG.debug("answer() bcCertHash.getEncoded", e);
+                        LogUtil.logErrorThrowable(LOG, "answer() bcCertHash.getEncoded", e);
                         if(childAuditEvent != null)
                         {
                             fillAuditEvent(childAuditEvent, AuditLevel.ERROR, AuditStatus.ERROR,
@@ -883,8 +880,7 @@ public class OcspResponder
                 basicOcspResp = basicOcspBuilder.build(signer, certsInResp, new Date());
             } catch (OCSPException e)
             {
-                LOG.error("answer() basicOcspBuilder.build. OCSPException: {}", e.getMessage());
-                LOG.debug("answer() basicOcspBuilder.build", e);
+                LogUtil.logErrorThrowable(LOG, "answer() basicOcspBuilder.build", e);
                 if(auditEvent != null)
                 {
                     fillAuditEvent(auditEvent, AuditLevel.ERROR, AuditStatus.ERROR,
@@ -902,8 +898,7 @@ public class OcspResponder
                 return ocspRespBuilder.build(OcspResponseStatus.successfull.getStatus(), basicOcspResp);
             } catch (OCSPException e)
             {
-                LOG.error("answer() ocspRespBuilder.build. OCSPException: {}", e.getMessage());
-                LOG.debug("answer() ocspRespBuilder.build", e);
+                LogUtil.logErrorThrowable(LOG, "answer() ocspRespBuilder.build", e);
                 if(auditEvent != null)
                 {
                     fillAuditEvent(auditEvent, AuditLevel.ERROR, AuditStatus.ERROR,
@@ -914,8 +909,7 @@ public class OcspResponder
 
         }catch(Throwable t)
         {
-            LOG.error("Throwable. {}: {}", t.getClass().getName(), t.getMessage());
-            LOG.debug("Throwable", t);
+            LogUtil.logErrorThrowable(LOG, "Throwable", t);
 
             if(auditEvent != null)
             {

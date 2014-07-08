@@ -138,7 +138,7 @@ public class NSSSignatureSpi extends SignatureSpi
 
         if(service == null)
         {
-             final String errorMsg = "Unsupported algorithm " + algorithm;
+            final String errorMsg = "Unsupported algorithm " + algorithm;
             throw new ProviderException(errorMsg);
         }
 

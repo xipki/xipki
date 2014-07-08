@@ -93,9 +93,9 @@ public class DefaultHttpOCSPRequestor extends AbstractOCSPRequestor
             boolean isValidContentType = false;
             if (responseContentType != null)
             {
-                   if (responseContentType.equalsIgnoreCase(CT_RESPONSE))
-                   {
-                       isValidContentType = true;
+                if (responseContentType.equalsIgnoreCase(CT_RESPONSE))
+                {
+                    isValidContentType = true;
                 }
             }
             if (isValidContentType == false)

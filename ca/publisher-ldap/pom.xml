@@ -19,17 +19,23 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
-		<artifactId>security-group</artifactId>
+		<artifactId>ca-group</artifactId>
 		<groupId>org.xipki</groupId>
 		<version>1.0.0-SNAPSHOT</version>
 	</parent>
+	<artifactId>publisher-ldap</artifactId>
 	<packaging>bundle</packaging>
-	<artifactId>security-common</artifactId>
 	<name>XiPKI :: ${project.artifactId}</name>
 	<dependencies>
 		<dependency>
-			<groupId>org.bouncycastle</groupId>
-			<artifactId>bcpkix-jdk15on</artifactId>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>ca-api</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.unboundid</groupId>
+			<artifactId>unboundid-ldapsdk</artifactId>
+			<version>${ldapsdk.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.slf4j</groupId>
