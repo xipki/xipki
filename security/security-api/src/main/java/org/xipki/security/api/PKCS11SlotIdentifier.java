@@ -28,6 +28,10 @@ public class PKCS11SlotIdentifier implements Comparable<PKCS11SlotIdentifier>
 
     public PKCS11SlotIdentifier(Integer slotIndex, Long slotId)
     {
+        if(slotIndex == null && slotId == null)
+        {
+            throw new IllegalArgumentException("at least one of slotIndex an slotId must be non-null");
+        }
         this.slotIndex = slotIndex;
         this.slotId = slotId;
     }
@@ -67,7 +71,20 @@ public class PKCS11SlotIdentifier implements Comparable<PKCS11SlotIdentifier>
     @Override
     public String toString()
     {
-        return "index: " + slotIndex + ", slot-id: " + slotId;
+        StringBuilder sb = new StringBuilder();
+        if(slotIndex != null)
+        {
+            sb.append("slot-index: ").append(slotIndex);
+            if(slotId != null)
+            {
+                sb.append(", ");
+            }
+        }
+        if(slotId != null)
+        {
+            sb.append("slot-id: ").append(slotId);
+        }
+        return sb.toString();
     }
 
     @Override
