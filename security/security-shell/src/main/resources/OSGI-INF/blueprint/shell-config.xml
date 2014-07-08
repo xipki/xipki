@@ -100,6 +100,12 @@
             	<property name="securityFactory" ref="securityFactory" />
             </action>
         </command>
+
+        <command name="keytool/extract-cert">
+            <action class="org.xipki.security.shell.ExtractCertFromCRLCommand">
+            	<property name="securityFactory" ref="securityFactory" />
+            </action>
+        </command>
     </command-bundle>
 
 </blueprint>
