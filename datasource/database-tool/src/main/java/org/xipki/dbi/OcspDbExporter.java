@@ -38,22 +38,20 @@ import org.xipki.security.api.PasswordResolverException;
 public class OcspDbExporter
 {
 
-    private final DataSourceWrapper dataSource;
-    private final Marshaller marshaller;
+    protected final DataSourceWrapper dataSource;
+    protected final Marshaller marshaller;
+    protected final String destFolder;
 
     public OcspDbExporter(DataSourceFactory dataSourceFactory,
-            PasswordResolver passwordResolver, String dbConfFile)
+            PasswordResolver passwordResolver, String dbConfFile, String destFolder)
     throws SQLException, PasswordResolverException, IOException, JAXBException
     {
         this.dataSource = dataSourceFactory.createDataSourceForFile(dbConfFile, passwordResolver);
         JAXBContext jaxbContext = JAXBContext.newInstance(ObjectFactory.class);
         marshaller = jaxbContext.createMarshaller();
         marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
-    }
+        marshaller.setSchema(DbPorter.retrieveSchema("/xsd/dbi-ocsp.xsd"));
 
-    public void exportDatabase(String destFolder, int numCertsInBundle)
-    throws Exception
-    {
         File f = new File(destFolder);
         if(f.exists() == false)
         {
@@ -77,7 +75,12 @@ public class OcspDbExporter
         {
             throw new IOException(destFolder + " is not empty");
         }
+        this.destFolder = destFolder;
+    }
 
+    public void exportDatabase(int numCertsInBundle)
+    throws Exception
+    {
         try
         {
             // CertStore

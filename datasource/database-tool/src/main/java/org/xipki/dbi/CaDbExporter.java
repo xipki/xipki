@@ -19,6 +19,7 @@ package org.xipki.dbi;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.sql.SQLException;
 
 import javax.xml.bind.JAXBContext;
@@ -30,6 +31,7 @@ import org.xipki.database.api.DataSourceFactory;
 import org.xipki.dbi.ca.jaxb.ObjectFactory;
 import org.xipki.security.api.PasswordResolver;
 import org.xipki.security.api.PasswordResolverException;
+import org.xipki.security.common.ParamChecker;
 
 /**
  * @author Lijun Liao
@@ -37,22 +39,44 @@ import org.xipki.security.api.PasswordResolverException;
 
 public class CaDbExporter
 {
-
-    private final DataSourceWrapper dataSource;
-    private final Marshaller marshaller;
+    protected final DataSourceWrapper dataSource;
+    protected final Marshaller marshaller;
+    protected final String destFolder;
 
     public CaDbExporter(DataSourceFactory dataSourceFactory,
-            PasswordResolver passwordResolver, String dbConfFile)
+            PasswordResolver passwordResolver, InputStream dbConfStream, String destFolder)
     throws SQLException, PasswordResolverException, IOException, JAXBException
     {
-        this.dataSource = dataSourceFactory.createDataSourceForFile(dbConfFile, passwordResolver);
-        JAXBContext jaxbContext = JAXBContext.newInstance(ObjectFactory.class);
-        marshaller = jaxbContext.createMarshaller();
-        marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
+        ParamChecker.assertNotEmpty("destFolder", destFolder);
+        this.dataSource = dataSourceFactory.createDataSource(dbConfStream, passwordResolver);
+        this.marshaller = getMarshaller();
+        this.destFolder = destFolder;
+        checkDestFolder();
     }
 
-    public void exportDatabase(String destFolder, int numCertsInBundle, int numCrls)
-    throws Exception
+    public CaDbExporter(DataSourceFactory dataSourceFactory,
+            PasswordResolver passwordResolver, String dbConfFile, String destFolder)
+    throws SQLException, PasswordResolverException, IOException, JAXBException
+    {
+        ParamChecker.assertNotEmpty("destFolder", destFolder);
+        this.dataSource = dataSourceFactory.createDataSourceForFile(dbConfFile, passwordResolver);
+        this.marshaller = getMarshaller();
+        this.destFolder = destFolder;
+        checkDestFolder();
+    }
+
+    private static Marshaller getMarshaller()
+    throws JAXBException
+    {
+        JAXBContext jaxbContext = JAXBContext.newInstance(ObjectFactory.class);
+        Marshaller marshaller = jaxbContext.createMarshaller();
+        marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
+        marshaller.setSchema(DbPorter.retrieveSchema("/xsd/dbi-ca.xsd"));
+        return marshaller;
+    }
+
+    private void checkDestFolder()
+    throws IOException
     {
         File f = new File(destFolder);
         if(f.exists() == false)
@@ -77,7 +101,10 @@ public class CaDbExporter
         {
             throw new IOException(destFolder + " is not empty");
         }
-
+    }
+    public void exportDatabase(int numCertsInBundle, int numCrls)
+    throws Exception
+    {
         try
         {
             // CAConfiguration
