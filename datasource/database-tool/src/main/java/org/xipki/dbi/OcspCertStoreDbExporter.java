@@ -25,6 +25,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -151,7 +153,7 @@ class OcspCertStoreDbExporter extends DbPorter
                 " FROM CERT" +
                 " WHERE ID >= ? AND ID < ?";
 
-        String rawCertSql = "SELECT CERT FROM RAWCERT WHERE CERT_ID = ?";
+        String rawCertSql = "SELECT CERT_ID, CERT FROM RAWCERT WHERE CERT_ID >= ? AND CERT_ID < ?";
 
         final int minCertId = getMin("CERT", "ID");
         final int maxCertId = getMax("CERT", "ID");
@@ -177,6 +179,21 @@ class OcspCertStoreDbExporter extends DbPorter
         {
             for(int i = minCertId; i <= maxCertId; i += n)
             {
+                Map<Integer, byte[]> rawCertMaps = new HashMap<>();
+
+                // retrieve raw certificates
+                rawCertPs.setInt(1, i);
+                rawCertPs.setInt(2, i + n);
+                ResultSet rawCertRs = rawCertPs.executeQuery();
+                while(rawCertRs.next())
+                {
+                    int certId = rawCertRs.getInt("CERT_ID");
+                    String b64Cert = rawCertRs.getString("CERT");
+                    byte[] certBytes = Base64.decode(b64Cert);
+                    rawCertMaps.put(certId, certBytes);
+                }
+                rawCertRs.close();
+
                 certPs.setInt(1, i);
                 certPs.setInt(2, i + n);
 
@@ -204,51 +221,38 @@ class OcspCertStoreDbExporter extends DbPorter
                         maxCertIdOfCurrentFile = id;
                     }
 
-                    int issuer_id = rs.getInt("ISSUER_ID");
-                    long last_update = rs.getLong("LAST_UPDATE");
-                    boolean revoked = rs.getBoolean("REVOKED");
-                    String profile = rs.getString("PROFILE");
+                    byte[] certBytes = rawCertMaps.remove(id);
+                    if(certBytes == null)
+                    {
+                        String msg = "Found no certificate in table RAWCERT for cert_id '" + id + "'";
+                        LOG.error(msg);
+                        System.out.println(msg);
+                        continue;
+                    }
 
-                    rawCertPs.setInt(1, id);
+                    String sha1_fp_cert = IoCertUtil.sha1sum(certBytes);
 
-                    String sha1_fp_cert;
-
-                    ResultSet rawCertRs = rawCertPs.executeQuery();
+                    ZipEntry certZipEntry = new ZipEntry(sha1_fp_cert + ".der");
+                    currentCertsZip.putNextEntry(certZipEntry);
                     try
                     {
-                        if(rawCertRs.next())
-                        {
-                            String b64Cert = rawCertRs.getString("CERT");
-                            byte[] cert = Base64.decode(b64Cert);
-                            sha1_fp_cert = IoCertUtil.sha1sum(cert);
-
-                            ZipEntry certZipEntry = new ZipEntry(sha1_fp_cert + ".der");
-                            currentCertsZip.putNextEntry(certZipEntry);
-                            try
-                            {
-                                currentCertsZip.write(cert);
-                            }finally
-                            {
-                                currentCertsZip.closeEntry();
-                            }
-                        }
-                        else
-                        {
-                            String msg = "Found no certificate in table RAWCERT for cert_id '" + id + "'";
-                            LOG.error(msg);
-                            System.out.println(msg);
-                            continue;
-                        }
+                        currentCertsZip.write(certBytes);
                     }finally
                     {
-                        rawCertRs.close();
+                        currentCertsZip.closeEntry();
                     }
 
                     CertType cert = new CertType();
 
                     cert.setId(id);
+
+                    int issuer_id = rs.getInt("ISSUER_ID");
                     cert.setIssuerId(issuer_id);
+
+                    long last_update = rs.getLong("LAST_UPDATE");
                     cert.setLastUpdate(last_update);
+
+                    boolean revoked = rs.getBoolean("REVOKED");
                     cert.setRevoked(revoked);
 
                     if(revoked)
@@ -267,6 +271,8 @@ class OcspCertStoreDbExporter extends DbPorter
                         cert.setRevInvalidityTime(rev_invalidity_time);
                     }
                     cert.setCertFile(sha1_fp_cert + ".der");
+
+                    String profile = rs.getString("PROFILE");
                     cert.setProfile(profile);
 
                     certsInCurrentFile.getCert().add(cert);
@@ -296,6 +302,9 @@ class OcspCertStoreDbExporter extends DbPorter
                         currentCertsZip = new ZipOutputStream(out);
                     }
                 }
+
+                rawCertMaps.clear();
+                rawCertMaps = null;
             }
 
             if(numCertInCurrentFile > 0)
