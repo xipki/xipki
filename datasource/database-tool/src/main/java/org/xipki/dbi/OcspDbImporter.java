@@ -47,6 +47,7 @@ public class OcspDbImporter
         this.dataSource = dataSourceFactory.createDataSourceForFile(dbConfFile, passwordResolver);
         JAXBContext jaxbContext = JAXBContext.newInstance(ObjectFactory.class);
         unmarshaller = jaxbContext.createUnmarshaller();
+        unmarshaller.setSchema(DbPorter.retrieveSchema("/xsd/dbi-ocsp.xsd"));
     }
 
     public void importDatabase(String srcFolder)

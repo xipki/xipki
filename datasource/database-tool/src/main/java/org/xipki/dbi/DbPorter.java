@@ -17,6 +17,7 @@
 
 package org.xipki.dbi;
 
+import java.net.URL;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -24,8 +25,13 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Types;
 
+import javax.xml.bind.JAXBException;
+import javax.xml.validation.Schema;
+import javax.xml.validation.SchemaFactory;
+
 import org.xipki.database.api.DataSourceWrapper;
 import org.xipki.security.common.ParamChecker;
+import org.xml.sax.SAXException;
 
 /**
  * @author Lijun Liao
@@ -155,4 +161,19 @@ public class DbPorter
     {
         return dataSource.tableExists(connection, table);
     }
+
+    public static final Schema retrieveSchema(String schemaPath)
+    throws JAXBException
+    {
+        URL schemaUrl = DbPorter.class.getResource(schemaPath);
+        final SchemaFactory schemaFact = SchemaFactory.newInstance(javax.xml.XMLConstants.W3C_XML_SCHEMA_NS_URI);
+        try
+        {
+            return schemaFact.newSchema(schemaUrl);
+        } catch (SAXException e)
+        {
+            throw new JAXBException("Error while loading schemas for the specified classes\nDetails:\n" + e.getMessage());
+        }
+    }
+
 }
