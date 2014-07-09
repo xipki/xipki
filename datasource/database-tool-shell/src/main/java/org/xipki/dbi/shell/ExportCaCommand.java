@@ -64,8 +64,8 @@ public class ExportCaCommand extends XipkiOsgiCommandSupport
         {
             numCrls = 30;
         }
-        CaDbExporter exporter = new CaDbExporter(dataSourceFactory, passwordResolver, dbconfFile);
-        exporter.exportDatabase(outdir, numCertsInBundle, numCrls);
+        CaDbExporter exporter = new CaDbExporter(dataSourceFactory, passwordResolver, dbconfFile, outdir);
+        exporter.exportDatabase(numCertsInBundle, numCrls);
         return null;
     }
 

@@ -36,7 +36,6 @@ import org.xipki.security.api.PasswordResolverException;
 
 public class CaDbImporter
 {
-
     private final DataSourceWrapper dataSource;
     private final Unmarshaller unmarshaller;
 
@@ -47,6 +46,7 @@ public class CaDbImporter
         this.dataSource = dataSourceFactory.createDataSourceForFile(dbConfFile, passwordResolver);
         JAXBContext jaxbContext = JAXBContext.newInstance(ObjectFactory.class);
         unmarshaller = jaxbContext.createUnmarshaller();
+        unmarshaller.setSchema(DbPorter.retrieveSchema("/xsd/dbi-ca.xsd"));
     }
 
     public void importDatabase(String srcFolder)

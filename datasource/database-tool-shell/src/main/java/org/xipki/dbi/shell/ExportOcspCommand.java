@@ -56,8 +56,8 @@ public class ExportOcspCommand extends XipkiOsgiCommandSupport
         {
             numCertsInBundle = 1000;
         }
-        OcspDbExporter exporter = new OcspDbExporter(dataSourceFactory, passwordResolver, dbconfFile);
-        exporter.exportDatabase(outdir, numCertsInBundle);
+        OcspDbExporter exporter = new OcspDbExporter(dataSourceFactory, passwordResolver, dbconfFile, outdir);
+        exporter.exportDatabase(numCertsInBundle);
         return null;
     }
 
