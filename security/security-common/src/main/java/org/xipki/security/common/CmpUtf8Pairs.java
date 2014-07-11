@@ -56,11 +56,18 @@ public class CmpUtf8Pairs
             return;
         }
 
+        // remove the ending '%'-symbols
+        while(string.charAt(string.length() - 1) == TOKEN_TERM)
+        {
+            string = string.substring(0, string.length() - 1);
+        }
+
         // find the position of terminators
         List<Integer> positions = new LinkedList<>();
 
         int idx = 1;
-        while(idx < string.length())
+        int n = string.length();
+        while(idx < n)
         {
             char c = string.charAt(idx++);
             if(c == TOKEN_TERM)
@@ -98,13 +105,14 @@ public class CmpUtf8Pairs
 
     private static String encodeNameOrValue(String s)
     {
-        if(s.indexOf(TOKEN_TERM_s) != -1)
+        if(s.indexOf("%") != -1)
         {
-            s = s.replace(TOKEN_TERM_s, "%25");
+            s = s.replaceAll("%", "%25");
         }
-        else if(s.indexOf(NAME_TERM_s) != -1)
+
+        if(s.indexOf("?") != -1)
         {
-            s = s.replace(NAME_TERM_s, "%3f");
+            s = s.replaceAll("\\?", "%3f");
         }
 
         return s;
@@ -177,18 +185,13 @@ public class CmpUtf8Pairs
     public String getEncoded()
     {
         StringBuilder sb = new StringBuilder();
-        boolean isFirst = true;
         for(String name : pairs.keySet())
         {
-            if(isFirst == false)
-            {
-                sb.append(TOKEN_TERM);
-            }
-            isFirst = false;
             sb.append(encodeNameOrValue(name));
             sb.append(NAME_TERM);
             String value = pairs.get(name);
             sb.append(value == null ? "" : encodeNameOrValue(value));
+            sb.append(TOKEN_TERM);
         }
         return sb.toString();
     }
@@ -207,11 +210,45 @@ public class CmpUtf8Pairs
             pairs.putUtf8Pair("key-b", "value-b");
 
             String encoded = pairs.getEncoded();
-            CmpUtf8Pairs p2 = new CmpUtf8Pairs(encoded);
-            for(String name : p2.getNames())
+            System.out.println(encoded);
+            pairs = new CmpUtf8Pairs(encoded);
+            for(String name : pairs.getNames())
             {
-                System.out.println(name + ": " + p2.getValue(name));
+                System.out.println(name + ": " + pairs.getValue(name));
             }
+
+            System.out.println("--------------");
+            pairs = new CmpUtf8Pairs("key-a?value-a");
+            System.out.println(pairs.getEncoded());
+            for(String name : pairs.getNames())
+            {
+                System.out.println(name + ": " + pairs.getValue(name));
+            }
+
+            System.out.println("--------------");
+            pairs = new CmpUtf8Pairs("key-a?value-a%");
+            System.out.println(pairs.getEncoded());
+            for(String name : pairs.getNames())
+            {
+                System.out.println(name + ": " + pairs.getValue(name));
+            }
+
+            System.out.println("--------------");
+            pairs = new CmpUtf8Pairs("key-a?value-a%3f%");
+            System.out.println(pairs.getEncoded());
+            for(String name : pairs.getNames())
+            {
+                System.out.println(name + ": " + pairs.getValue(name));
+            }
+
+            System.out.println("--------------");
+            pairs = new CmpUtf8Pairs("key-a?value-a%3f%3f%25%");
+            System.out.println(pairs.getEncoded());
+            for(String name : pairs.getNames())
+            {
+                System.out.println(name + ": " + pairs.getValue(name));
+            }
+
         }catch(Exception e)
         {
             e.printStackTrace();
