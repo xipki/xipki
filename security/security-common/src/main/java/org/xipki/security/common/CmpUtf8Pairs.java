@@ -34,9 +34,7 @@ public class CmpUtf8Pairs
     public static final String KEY_USER = "user";
 
     private static final char NAME_TERM = '?';
-    private static final String NAME_TERM_s = "?";
     private static final char TOKEN_TERM = '%';
-    private static final String TOKEN_TERM_s = "%";
 
     private final Map<String, String> pairs = new HashMap<>();
 
