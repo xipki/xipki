@@ -46,5 +46,18 @@ public enum ExtensionOccurrence
     {
         return required;
     }
+    
+    public static ExtensionOccurrence getInstance(boolean critical, boolean required)
+    {
+    	for(ExtensionOccurrence value : values())
+    	{
+    		if(value.critical == critical && value.required == required)
+    		{
+    			return value;
+    		}
+    	}
+    	
+    	throw new RuntimeException("Could not reach here");
+    }
 
 }
