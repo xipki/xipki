@@ -52,6 +52,7 @@ import org.xipki.dbi.ca.jaxb.PublisherType;
 import org.xipki.dbi.ca.jaxb.RequestorType;
 import org.xipki.dbi.ca.jaxb.ResponderType;
 import org.xipki.security.api.PasswordResolverException;
+import org.xipki.security.common.IoCertUtil;
 import org.xipki.security.common.ParamChecker;
 
 /**
@@ -362,7 +363,7 @@ class CaConfigurationDbExporter extends DbPorter
     }
 
     private void export_certprofile(CAConfigurationType caconf)
-    throws SQLException
+    throws SQLException, IOException
     {
         System.out.println("Exporting table CERTPROFILE");
         Certprofiles certprofiles = new Certprofiles();
@@ -384,7 +385,16 @@ class CaConfigurationDbExporter extends DbPorter
                 CertprofileType certprofile = new CertprofileType();
                 certprofile.setName(name);
                 certprofile.setType(type);
-                certprofile.setConf(conf);
+                if(conf != null && conf.length() > 200)
+                {
+                    File f = new File(baseDir, "certprofile" + File.separator + name + ".conf");
+                    IoCertUtil.save(f, conf.getBytes());
+                    certprofile.setConfFile(f.getPath());
+                }
+                else
+                {
+                    certprofile.setConf(conf);
+                }
 
                 certprofiles.getCertprofile().add(certprofile);
             }
@@ -407,13 +417,24 @@ class CaConfigurationDbExporter extends DbPorter
         ResultSet rs = null;
         try
         {
-            stmt = createStatement();
+            StringBuilder sb = new StringBuilder();
 
-            String sql = "SELECT NAME, NEXT_SERIAL, STATUS, CRL_URIS, OCSP_URIS, MAX_VALIDITY, "
-                    + "CERT, SIGNER_TYPE, SIGNER_CONF, CRLSIGNER_NAME, "
-                    + "DUPLICATE_KEY_MODE, DUPLICATE_SUBJECT_MODE, PERMISSIONS, NUM_CRLS, "
-                    + "EXPIRATION_PERIOD, REVOKED, REV_REASON, REV_TIME, REV_INVALIDITY_TIME "
-                    + "FROM CA";
+            sb.append("SELECT NAME, NEXT_SERIAL, STATUS, CRL_URIS, OCSP_URIS, MAX_VALIDITY, ");
+            sb.append("CERT, SIGNER_TYPE, SIGNER_CONF, CRLSIGNER_NAME, ");
+            sb.append("DUPLICATE_KEY_MODE, DUPLICATE_SUBJECT_MODE, PERMISSIONS, NUM_CRLS, ");
+            sb.append("EXPIRATION_PERIOD, REVOKED, REV_REASON, REV_TIME, REV_INVALIDITY_TIME");
+
+            boolean deletaCrlUrisColumnAvailable = tableHasColumn("CA", "DELTA_CRL_URIS");
+            if(deletaCrlUrisColumnAvailable)
+            {
+                sb.append(", DELTA_CRL_URIS");
+            }
+
+            sb.append(" FROM CA");
+
+            String sql = sb.toString();
+
+            stmt = createStatement();
             rs = stmt.executeQuery(sql);
 
             while(rs.next())
@@ -422,6 +443,12 @@ class CaConfigurationDbExporter extends DbPorter
                 long next_serial = rs.getLong("NEXT_SERIAL");
                 String status = rs.getString("STATUS");
                 String crl_uris = rs.getString("CRL_URIS");
+                String delta_crl_uris = null;
+                if(deletaCrlUrisColumnAvailable)
+                {
+                    delta_crl_uris = rs.getString("DELTA_CRL_URIS");
+                }
+
                 String ocsp_uris = rs.getString("OCSP_URIS");
                 int max_validity = rs.getInt("MAX_VALIDITY");
                 String cert = rs.getString("CERT");
@@ -439,6 +466,7 @@ class CaConfigurationDbExporter extends DbPorter
                 ca.setNextSerial(next_serial);
                 ca.setStatus(status);
                 ca.setCrlUris(crl_uris);
+                ca.setDeltaCrlUris(delta_crl_uris);
                 ca.setOcspUris(ocsp_uris);
                 ca.setMaxValidity(max_validity);
                 ca.setCert(cert);
