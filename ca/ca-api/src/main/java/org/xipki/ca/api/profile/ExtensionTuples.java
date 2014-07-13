@@ -21,6 +21,8 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.bouncycastle.asn1.ASN1ObjectIdentifier;
+
 /**
  * @author Lijun Liao
  */
@@ -51,6 +53,18 @@ public class ExtensionTuples
     public String getWarning()
     {
         return warning;
+    }
+
+    public boolean containsExtension(ASN1ObjectIdentifier type)
+    {
+        for(ExtensionTuple t : extensions)
+        {
+            if(t.getType().equals(type))
+            {
+                return true;
+            }
+        }
+        return false;
     }
 
 }

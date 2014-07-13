@@ -1763,6 +1763,7 @@ public class X509CA
         addAuthorityKeyIdentifier(certBuilder, certProfile);
         addAuthorityInformationAccess(certBuilder, certProfile);
         addCRLDistributionPoints(certBuilder, certProfile);
+        addDeltaCRLDistributionPoints(certBuilder, certProfile);
 
         ExtensionTuples extensionTuples = certProfile.getExtensions(requestedSubject, requestedExtensions);
         for(ExtensionTuple extension : extensionTuples.getExtensions())
@@ -1898,6 +1899,43 @@ public class X509CA
         else
         {
             certBuilder.addExtension(Extension.cRLDistributionPoints, extOccurrence.isCritical(), value);
+        }
+    }
+
+    private void addDeltaCRLDistributionPoints(X509v3CertificateBuilder certBuilder, CertProfile profile)
+    throws IOException, CertProfileException
+    {
+        ExtensionOccurrence extOccurrence = profile.getOccurenceOfFreshestCRL();
+        if(extOccurrence == null)
+        {
+            return;
+        }
+
+        List<String> uris = caInfo.getDeltaCrlUris();
+        X500Principal crlSignerSubject = null;
+        if(crlSigner != null && crlSigner.getSigner() != null)
+        {
+            X509Certificate crlSignerCert =  crlSigner.getSigner().getCertificate();
+            if(crlSignerCert != null)
+            {
+                crlSignerSubject = crlSignerCert.getSubjectX500Principal();
+            }
+        }
+
+        CRLDistPoint value = X509Util.createCRLDistributionPoints(
+                uris, caInfo.getCertificate().getCert().getSubjectX500Principal(),
+                crlSignerSubject);
+        if(value == null)
+        {
+            if(extOccurrence.isRequired())
+            {
+                throw new CertProfileException("Could not add required extension FreshestCRL");
+            }
+            return;
+        }
+        else
+        {
+            certBuilder.addExtension(Extension.deltaCRLIndicator, extOccurrence.isCritical(), value);
         }
     }
 

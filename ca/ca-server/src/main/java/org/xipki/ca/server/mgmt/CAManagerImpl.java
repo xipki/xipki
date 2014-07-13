@@ -1245,7 +1245,7 @@ public class CAManagerImpl implements CAManager
             stmt = createStatement();
 
             ResultSet rs = stmt.executeQuery(
-                    "SELECT NAME, NEXT_SERIAL, STATUS, CRL_URIS, OCSP_URIS, MAX_VALIDITY, "
+                    "SELECT NAME, NEXT_SERIAL, STATUS, CRL_URIS, DELTA_CRL_URIS, OCSP_URIS, MAX_VALIDITY, "
                     + "CERT, SIGNER_TYPE, SIGNER_CONF, CRLSIGNER_NAME, "
                     + "DUPLICATE_KEY_MODE, DUPLICATE_SUBJECT_MODE, PERMISSIONS, NUM_CRLS, "
                     + "EXPIRATION_PERIOD, REVOKED, REV_REASON, REV_TIME, REV_INVALIDITY_TIME FROM CA");
@@ -1256,6 +1256,7 @@ public class CAManagerImpl implements CAManager
                 long next_serial = rs.getLong("NEXT_SERIAL");
                 String status = rs.getString("STATUS");
                 String crl_uris = rs.getString("CRL_URIS");
+                String delta_crl_uris = rs.getString("DELTA_CRL_URIS");
                 String ocsp_uris = rs.getString("OCSP_URIS");
                 int max_validity = rs.getInt("MAX_VALIDITY");
                 String b64cert = rs.getString("CERT");
@@ -1287,6 +1288,12 @@ public class CAManagerImpl implements CAManager
                     lCrlUris = tokensAsList(crl_uris, " \t");
                 }
 
+                List<String> lDeltaCrlUris = null;
+                if(delta_crl_uris != null && delta_crl_uris.isEmpty() == false)
+                {
+                    lDeltaCrlUris = tokensAsList(delta_crl_uris, " \t");
+                }
+
                 List<String> lOcspUris = null;
                 if(ocsp_uris != null && ocsp_uris.isEmpty() == false)
                 {
@@ -1296,7 +1303,7 @@ public class CAManagerImpl implements CAManager
                 X509Certificate cert = generateCert(b64cert);
 
                 CAEntry entry = new CAEntry(name, next_serial, signer_type, signer_conf, cert,
-                        lOcspUris, lCrlUris, null, numCrls, expirationPeriod);
+                        lOcspUris, lCrlUris, lDeltaCrlUris, null, numCrls, expirationPeriod);
                 entry.setLastCommittedNextSerial(next_serial);
 
                 CAStatus caStatus = CAStatus.getCAStatus(status);
@@ -1411,10 +1418,10 @@ public class CAManagerImpl implements CAManager
         try
         {
             ps = prepareStatement(
-                    "INSERT INTO CA (NAME, SUBJECT, NEXT_SERIAL, STATUS, CRL_URIS, OCSP_URIS, MAX_VALIDITY, "
+                    "INSERT INTO CA (NAME, SUBJECT, NEXT_SERIAL, STATUS, CRL_URIS, DELTA_CRL_URIS, OCSP_URIS, MAX_VALIDITY, "
                     + "CERT, SIGNER_TYPE, SIGNER_CONF, CRLSIGNER_NAME, "
                     + "DUPLICATE_KEY_MODE, DUPLICATE_SUBJECT_MODE, PERMISSIONS, NUM_CRLS, EXPIRATION_PERIOD) "
-                    + "VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+                    + "VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
             int idx = 1;
             ps.setString(idx++, name);
             ps.setString(idx++, newCaDbEntry.getSubject());
@@ -1428,6 +1435,7 @@ public class CAManagerImpl implements CAManager
 
             ps.setString(idx++, newCaDbEntry.getStatus().getStatus());
             ps.setString(idx++, newCaDbEntry.getCrlUrisAsString());
+            ps.setString(idx++, newCaDbEntry.getDeltaCrlUrisAsString());
             ps.setString(idx++, newCaDbEntry.getOcspUrisAsString());
             ps.setInt(idx++, newCaDbEntry.getMaxValidity());
             ps.setString(idx++, Base64.toBase64String(newCaDbEntry.getCertificate().getEncodedCert()));
@@ -1461,7 +1469,7 @@ public class CAManagerImpl implements CAManager
     @Override
     public void changeCA(String name, CAStatus status, Long nextSerial,
             X509Certificate cert,
-            Set<String> crl_uris, Set<String> ocsp_uris,
+            Set<String> crl_uris, Set<String> delta_crl_uris, Set<String> ocsp_uris,
             Integer max_validity, String signer_type, String signer_conf,
             String crlsigner_name, DuplicationMode duplicate_key,
             DuplicationMode duplicate_subject, Set<Permission> permissions,
@@ -1522,6 +1530,13 @@ public class CAManagerImpl implements CAManager
         {
             sb.append("CRL_URIS=?,");
             iCrl_uris = i++;
+        }
+
+        Integer iDelta_crl_uris = null;
+        if(delta_crl_uris != null)
+        {
+            sb.append("DELTA_CRL_URIS=?,");
+            iDelta_crl_uris = i++;
         }
 
         Integer iOcsp_uris = null;
@@ -1629,12 +1644,17 @@ public class CAManagerImpl implements CAManager
 
             if(iCrl_uris != null)
             {
-                ps.setString(iCrl_uris, toString(crl_uris, ","));
+                ps.setString(iCrl_uris, toString(crl_uris, " "));
+            }
+
+            if(iDelta_crl_uris != null)
+            {
+                ps.setString(iDelta_crl_uris, toString(delta_crl_uris, " "));
             }
 
             if(iOcsp_uris != null)
             {
-                ps.setString(iOcsp_uris, toString(ocsp_uris, ","));
+                ps.setString(iOcsp_uris, toString(ocsp_uris, " "));
             }
 
             if(iMax_validity != null)

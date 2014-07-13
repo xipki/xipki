@@ -97,7 +97,7 @@ public interface CAManager
 
     void changeCA(String name, CAStatus status, Long nextSerial,
             X509Certificate cert,
-            Set<String> crl_uris, Set<String> ocsp_uris,
+            Set<String> crl_uris, Set<String> delta_crl_uris, Set<String> ocsp_uris,
             Integer max_validity, String signer_type, String signer_conf,
             String crlsigner_name, DuplicationMode duplicate_key,
             DuplicationMode duplicate_subject, Set<Permission> permissions,

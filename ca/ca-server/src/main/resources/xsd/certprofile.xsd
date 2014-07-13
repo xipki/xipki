@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
- ====================================================================
+ Copyright (c) 2014 Lijun Liao
+
  Licensed to the Apache Software Foundation (ASF) under one
  or more contributor license agreements.  See the NOTICE file
  distributed with this work for additional information
@@ -17,9 +18,6 @@
  KIND, either express or implied.  See the License for the
  specific language governing permissions and limitations
  under the License.
- ====================================================================
-
- This work is part of LiaoPKI, owned by Lijun Liao (lijun.liao@gmail.com)
  -->
 <xs:schema targetNamespace="http://xipki.org/xmlprofile/v1"
  xmlns="http://xipki.org/xmlprofile/v1"
@@ -38,6 +36,7 @@
 	
 	<xs:complexType name="ProfileType">
 		<xs:sequence>
+			<xs:element name="description" type="xs:string" minOccurs="0"/>
 			<xs:element name="raOnly" type="xs:boolean" default="false" minOccurs="0"/>
 			<xs:element name="validity" type="xs:int" minOccurs="0"/>
 			<xs:element name="subject" minOccurs="0">

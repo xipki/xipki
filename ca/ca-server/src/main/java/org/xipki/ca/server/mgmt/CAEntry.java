@@ -51,6 +51,7 @@ public class CAEntry
     private final String subject;
     private CAStatus status;
     private final List<String> crlUris;
+    private final List<String> deltaCrlUris;
     private final List<String> ocspUris;
     private final List<String> issuerLocations;
     private int maxValidity;
@@ -73,7 +74,7 @@ public class CAEntry
 
     public CAEntry(String name, long initialSerial,
             String signerType, String signerConf, X509Certificate cert,
-            List<String> ocspUris, List<String> crlUris,
+            List<String> ocspUris, List<String> crlUris, List<String> deltaCrlUris,
             List<String> issuerLocations, int numCrls,
             int expirationPeriod)
     throws CAMgmtException
@@ -124,6 +125,8 @@ public class CAEntry
                 null : Collections.unmodifiableList(new ArrayList<>(ocspUris));
         this.crlUris = (crlUris == null) ?
                 null : Collections.unmodifiableList(new ArrayList<>(crlUris));
+        this.deltaCrlUris = (deltaCrlUris == null) ?
+                null : Collections.unmodifiableList(new ArrayList<>(deltaCrlUris));
         this.issuerLocations = (issuerLocations == null) ?
                 null : Collections.unmodifiableList(new ArrayList<>(issuerLocations));
 
@@ -161,6 +164,16 @@ public class CAEntry
     public String getCrlUrisAsString()
     {
         return toString(crlUris);
+    }
+
+    public List<String> getDeltaCrlUris()
+    {
+        return deltaCrlUris;
+    }
+
+    public String getDeltaCrlUrisAsString()
+    {
+        return toString(deltaCrlUris);
     }
 
     public List<String> getOcspUris()

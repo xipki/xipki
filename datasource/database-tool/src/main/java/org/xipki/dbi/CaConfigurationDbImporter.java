@@ -334,7 +334,17 @@ class CaConfigurationDbImporter extends DbPorter
                     int idx = 1;
                     ps.setString(idx++, certprofile.getName());
                     ps.setString(idx++, certprofile.getType());
-                    ps.setString(idx++, certprofile.getConf());
+
+                    String conf = certprofile.getConf();
+                    if(conf == null)
+                    {
+                        String confFilename = certprofile.getConfFile();
+                        if(confFilename != null)
+                        {
+                            conf = new String(IoCertUtil.read(confFilename));
+                        }
+                    }
+                    ps.setString(idx++, conf);
 
                     ps.executeUpdate();
                 }catch(Exception e)
@@ -358,11 +368,11 @@ class CaConfigurationDbImporter extends DbPorter
         try
         {
             ps = prepareStatement(
-                    "INSERT INTO CA (NAME, SUBJECT, NEXT_SERIAL, STATUS, CRL_URIS, OCSP_URIS, MAX_VALIDITY, "
+                    "INSERT INTO CA (NAME, SUBJECT, NEXT_SERIAL, STATUS, CRL_URIS, DELTA_CRL_URIS, OCSP_URIS, MAX_VALIDITY, "
                     + "CERT, SIGNER_TYPE, SIGNER_CONF, CRLSIGNER_NAME, "
                     + "DUPLICATE_KEY_MODE, DUPLICATE_SUBJECT_MODE, PERMISSIONS, NUM_CRLS, "
                     + "EXPIRATION_PERIOD, REVOKED, REV_REASON, REV_TIME, REV_INVALIDITY_TIME) "
-                    + "VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+                    + "VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
 
             for(CaType ca : cas.getCa())
             {
@@ -377,6 +387,7 @@ class CaConfigurationDbImporter extends DbPorter
                     ps.setLong(idx++, ca.getNextSerial());
                     ps.setString(idx++, ca.getStatus());
                     ps.setString(idx++, ca.getCrlUris());
+                    ps.setString(idx++, ca.getDeltaCrlUris());
                     ps.setString(idx++, ca.getOcspUris());
                     ps.setInt   (idx++, ca.getMaxValidity());
                     ps.setString(idx++, b64Cert);
