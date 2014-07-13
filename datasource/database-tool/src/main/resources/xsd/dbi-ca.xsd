@@ -158,7 +158,10 @@
 		<xs:sequence>
 			<xs:element name="name" type="xs:string"/>
 			<xs:element name="type" type="xs:string" />
-			<xs:element name="conf" type="xs:string" minOccurs="0"/>
+			<xs:choice minOccurs="0">
+				<xs:element name="conf" type="xs:string"/>
+				<xs:element name="confFile" type="xs:string"/>
+			</xs:choice>
 		</xs:sequence>
 	</xs:complexType>
 	
@@ -169,6 +172,7 @@
 			<xs:element name="next_serial" type="xs:long" />
 			<xs:element name="status" type="xs:string" />
 			<xs:element name="crl_uris" type="xs:string" minOccurs="0" />
+			<xs:element name="delta_crl_uris" type="xs:string" minOccurs="0" />
 			<xs:element name="ocsp_uris" type="xs:string" minOccurs="0" />
 			<xs:element name="max_validity" type="xs:int"/>			
 			<xs:element name="cert" type="xs:string" />

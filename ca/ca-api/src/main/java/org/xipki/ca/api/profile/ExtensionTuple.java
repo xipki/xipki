@@ -19,6 +19,7 @@ package org.xipki.ca.api.profile;
 
 import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
+import org.bouncycastle.asn1.x509.Extension;
 import org.xipki.security.common.ParamChecker;
 
 /**
@@ -39,6 +40,15 @@ public class ExtensionTuple
         this.type = type;
         this.critical = critical;
         this.value = value;
+    }
+
+    public ExtensionTuple(boolean critical, Extension extension)
+    {
+        ParamChecker.assertNotNull("extension", extension);
+
+        this.type = extension.getExtnId();
+        this.critical = critical;
+        this.value = extension.getParsedValue();
     }
 
     public ASN1ObjectIdentifier getType()

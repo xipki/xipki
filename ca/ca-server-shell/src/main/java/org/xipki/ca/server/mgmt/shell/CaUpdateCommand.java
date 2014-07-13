@@ -58,6 +58,11 @@ public class CaUpdateCommand extends CaCommand
             multiValued = true)
     protected List<String> crlUris;
 
+    @Option(name = "-deltaCrlUri",
+            description = "Delta CRL URI or 'NULL', multi options is allowed",
+            multiValued = true)
+    protected List<String> deltaCrlUris;
+
     @Option(name = "-permission",
             description = "Permission, multi options is allowed. allowed values are\n" + permissionsText,
             multiValued = true)
@@ -196,6 +201,33 @@ public class CaUpdateCommand extends CaCommand
             }
         }
 
+        boolean clearDeltaCrlUris = false;
+        if(deltaCrlUris != null)
+        {
+            for(String uri : deltaCrlUris)
+            {
+                if(CAManager.NULL.equalsIgnoreCase(uri))
+                {
+                    clearDeltaCrlUris = true;
+                    break;
+                }
+            }
+        }
+
+        Set<String> _deltaCrlUris = null;
+
+        if(clearDeltaCrlUris)
+        {
+            _deltaCrlUris = Collections.emptySet();
+        }
+        else
+        {
+            if(deltaCrlUris != null )
+            {
+                _deltaCrlUris = new HashSet<>(deltaCrlUris);
+            }
+        }
+
         boolean clearOcspUris = false;
         if(ocspUris != null)
         {
@@ -228,6 +260,7 @@ public class CaUpdateCommand extends CaCommand
                 nextSerial,
                 caCert,
                 _crlUris,
+                _deltaCrlUris,
                 _ocspUris,
                 maxValidity,
                 signerType,

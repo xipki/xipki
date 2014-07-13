@@ -126,11 +126,12 @@
 			<column name="STATUS" remarks="valid values: pending, enabled, disabled" type="VARCHAR(10)">
 				<constraints nullable="false"/>
 			</column>
-			<column name="SUBJECT" type="VARCHAR(200)">
+			<column name="SUBJECT" type="VARCHAR(300)">
 				<constraints nullable="false"/>
 			</column>
-			<column name="CRL_URIS" type="VARCHAR(100)"/>
-			<column name="OCSP_URIS" type="VARCHAR(100)"/>
+			<column name="CRL_URIS" type="VARCHAR(1000)"/>
+			<column name="DELTA_CRL_URIS" type="VARCHAR(1000)"/>
+			<column name="OCSP_URIS" type="VARCHAR(1000)"/>
 			<column name="MAX_VALIDITY" type="SMALLINT">
 				<constraints nullable="false"/>
 			</column>

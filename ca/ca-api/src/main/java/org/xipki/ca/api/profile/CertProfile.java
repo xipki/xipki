@@ -70,6 +70,11 @@ public abstract class CertProfile
 
     public abstract ExtensionOccurrence getOccurenceOfCRLDistributinPoints();
 
+    public ExtensionOccurrence getOccurenceOfFreshestCRL()
+    {
+        return ExtensionOccurrence.NONCRITICAL_OPTIONAL;
+    }
+
     public abstract ExtensionOccurrence getOccurenceOfAuthorityInfoAccess();
 
     public abstract ExtensionTuples getExtensions(X500Name requestedSubject, Extensions requestedExtensions)
