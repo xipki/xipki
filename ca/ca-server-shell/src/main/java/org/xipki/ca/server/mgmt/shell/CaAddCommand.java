@@ -59,6 +59,11 @@ public class CaAddCommand extends CaCommand
             multiValued = true)
     protected List<String> crlUris;
 
+    @Option(name = "-deltaCrlUri",
+            description = "Delta CRL URI, multi options is allowed",
+            multiValued = true)
+    protected List<String> deltaCrlUris;
+
     @Option(name = "-permission",
             description = "Required. Permission, multi options is allowed. allowed values are\n"
                     + permissionsText,
@@ -181,7 +186,7 @@ public class CaAddCommand extends CaCommand
         }
 
         CAEntry entry = new CAEntry(caName, nextSerial, signerType, signerConf, caCert,
-                ocspUris, crlUris, null, numCrls.intValue(), expirationPeriod.intValue());
+                ocspUris, crlUris, deltaCrlUris, null, numCrls.intValue(), expirationPeriod.intValue());
 
         DuplicationMode duplicateKey = getDuplicationMode(duplicateKeyI, DuplicationMode.FORBIDDEN_WITHIN_PROFILE);
         entry.setDuplicateKeyMode(duplicateKey);
