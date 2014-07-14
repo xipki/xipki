@@ -77,7 +77,6 @@
 	<feature name="xipki-caserver" version="${project.version}" resolver="(obr)">
 		<feature>xipki-datasource</feature>
 		<feature>xipki-cabase</feature>
-		<bundle>mvn:org.xipki/ca-certprofile-example/${project.version}</bundle>
 		<bundle>mvn:org.xipki/ca-server/${project.version}</bundle>
 	</feature>
 	<feature name="xipki-caserver-shell" version="${project.version}" resolver="(obr)">

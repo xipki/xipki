@@ -386,6 +386,25 @@ class SelfSignedCertBuilder
             }
         }
 
+        // FreshestCRL
+        extOccurrence = profile.getOccurenceOfFreshestCRL();
+        if(extOccurrence != null)
+        {
+            CRLDistPoint deltaCrlDistPoint = X509Util.createCRLDistributionPoints(publicCaInfo.getCrlUris(),
+                    null, null);
+            if(deltaCrlDistPoint == null)
+            {
+                if(extOccurrence.isRequired())
+                {
+                    throw new CertProfileException("Could not add required extension freshestCRL");
+                }
+            }
+            else
+            {
+                certBuilder.addExtension(Extension.freshestCRL, extOccurrence.isCritical(), deltaCrlDistPoint);
+            }
+        }
+
         ExtensionTuples extensionTuples = profile.getExtensions(requestedSubject, null);
 
         for(ExtensionTuple extension : extensionTuples.getExtensions())

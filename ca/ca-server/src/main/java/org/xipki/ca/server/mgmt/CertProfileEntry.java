@@ -20,6 +20,7 @@ package org.xipki.ca.server.mgmt;
 import org.xipki.ca.api.profile.CertProfile;
 import org.xipki.ca.api.profile.CertProfileException;
 import org.xipki.ca.server.IdentifiedCertProfile;
+import org.xipki.ca.server.certprofile.DfltCertProfile;
 import org.xipki.security.common.EnvironmentParameterResolver;
 import org.xipki.security.common.ParamChecker;
 
@@ -81,6 +82,11 @@ public class CertProfileEntry
         }
 
         CertProfile underlyingCertProfile = null;
+        if(type.toLowerCase().equals("xml"))
+        {
+            type = "java:" + DfltCertProfile.class.getName();
+        }
+
         if(type.toLowerCase().startsWith("java:"))
         {
             String className = type.substring("java:".length());
