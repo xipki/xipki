@@ -25,6 +25,7 @@ import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.ocsp.OCSPObjectIdentifiers;
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 import org.bouncycastle.asn1.x500.style.RFC4519Style;
+import org.bouncycastle.asn1.x509.Extension;
 import org.bouncycastle.asn1.x509.X509ObjectIdentifiers;
 
 /**
@@ -207,6 +208,8 @@ public class ObjectIdentifiers
     private static final ASN1ObjectIdentifier id_pkix = new ASN1ObjectIdentifier("1.3.6.1.5.5.7");
     private static final ASN1ObjectIdentifier id_kp                  = id_pkix.branch("3");
 
+    public static final ASN1ObjectIdentifier anyExtendedKeyUsage  = Extension.extendedKeyUsage.branch("0");
+
     /**
      * TLS WWW server authentication
      * Key usage bits that may be consistent: digitalSignature,
@@ -387,6 +390,10 @@ public class ObjectIdentifiers
             else if(id_extension_pkix_ocsp_nocheck.equals(type))
             {
                 name = "id-pkix-ocsp-nocheck";
+            }
+            else if(anyExtendedKeyUsage.equals(type))
+            {
+                name = "anyExtendedKeyUsage";
             }
         }
 

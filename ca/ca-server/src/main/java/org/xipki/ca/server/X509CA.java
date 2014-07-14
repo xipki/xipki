@@ -134,6 +134,7 @@ public class X509CA
     private final ConcurrentContentSigner caSigner;
     private final X500Name caSubjectX500Name;
     private final byte[] caSKI;
+    private final GeneralNames caSubjectAltName;
     private final CertificateStore certstore;
     private final CrlSigner crlSigner;
 
@@ -183,6 +184,22 @@ public class X509CA
             throw new OperationException(ErrorCode.INVALID_EXTENSION, e.getMessage());
         }
         this.caSKI = ski.getOctets();
+
+        byte[] encodedSubjectAltName = caCert.getCert().getExtensionValue(Extension.subjectAlternativeName.getId());
+        if(encodedSubjectAltName == null)
+        {
+            this.caSubjectAltName = null;
+        }
+        else
+        {
+            try
+            {
+                this.caSubjectAltName = GeneralNames.getInstance(X509ExtensionUtil.fromExtensionValue(encodedSubjectAltName));
+            } catch (IOException e)
+            {
+                throw new OperationException(ErrorCode.INVALID_EXTENSION, "invalid SubjectAltName extension in CA certificate");
+            }
+        }
 
         this.cf = new CertificateFactory();
 
@@ -1764,6 +1781,7 @@ public class X509CA
         addAuthorityInformationAccess(certBuilder, certProfile);
         addCRLDistributionPoints(certBuilder, certProfile);
         addDeltaCRLDistributionPoints(certBuilder, certProfile);
+        addIssuerAltName(certBuilder, certProfile);
 
         ExtensionTuples extensionTuples = certProfile.getExtensions(requestedSubject, requestedExtensions);
         for(ExtensionTuple extension : extensionTuples.getExtensions())
@@ -1839,6 +1857,28 @@ public class X509CA
         }
 
         certBuilder.addExtension(Extension.authorityKeyIdentifier, extOccurrence.isCritical(), value);
+    }
+
+    private void addIssuerAltName(X509v3CertificateBuilder certBuilder, CertProfile profile)
+    throws IOException, CertProfileException
+    {
+        ExtensionOccurrence extOccurrence = profile.getOccurenceOfIssuerAltName();
+        if(extOccurrence == null)
+        {
+            return;
+        }
+
+        if(caSubjectAltName == null)
+        {
+            if(extOccurrence.isRequired())
+            {
+                throw new CertProfileException("Could not add required extension issuerAltName");
+            }
+        }
+        else
+        {
+            certBuilder.addExtension(Extension.issuerAlternativeName, extOccurrence.isCritical(), caSubjectAltName);
+        }
     }
 
     private void addAuthorityInformationAccess(X509v3CertificateBuilder certBuilder, CertProfile profile)

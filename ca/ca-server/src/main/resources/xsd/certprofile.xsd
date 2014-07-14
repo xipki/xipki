@@ -37,7 +37,7 @@
 	<xs:complexType name="ProfileType">
 		<xs:sequence>
 			<xs:element name="description" type="xs:string" minOccurs="0"/>
-			<xs:element name="raOnly" type="xs:boolean" default="false" minOccurs="0"/>
+			<xs:element name="ca" type="xs:boolean"/>			
 			<xs:element name="validity" type="xs:int" minOccurs="0"/>
 			<xs:element name="subject" minOccurs="0">
 				<xs:complexType>
@@ -57,11 +57,12 @@
 			</xs:element>
 			<xs:element name="extensions" type="ExtensionsType"/>
 		</xs:sequence>
+		<xs:attribute name="raOnly" type="xs:boolean" default="false" use="optional"/>
 	</xs:complexType>
 	
 	<xs:complexType name="RdnType">
 		<xs:complexContent>
-			<xs:extension base="OidWitDescType">
+			<xs:extension base="OidWithDescType">
 				<xs:attribute name="minOccurs" type="xs:int" default="1"/>
 				<xs:attribute name="maxOccurs" type="xs:int" default="1"/>
 			</xs:extension>
@@ -69,8 +70,14 @@
 	</xs:complexType>
 	
 	<xs:complexType name="ExtensionType">
+		<xs:annotation>
+			<xs:documentation>
+			  Critical will be considered if both values (true and false) are allowed,
+			  otherwise it will be ignored
+			</xs:documentation>
+		</xs:annotation>
 		<xs:complexContent>
-			<xs:extension base="OidWitDescType">
+			<xs:extension base="OidWithDescType">
 				<xs:attribute name="critical" type="xs:boolean" use="optional"/>
 				<xs:attribute name="required" type="xs:boolean" default="false"/>
 			</xs:extension>
@@ -80,20 +87,12 @@
 	<xs:complexType name="ExtensionsType">
 		<xs:sequence>
 			<xs:element name="extension" type="ExtensionType" minOccurs="1" maxOccurs="unbounded"/>
-			<xs:element name="ca" type="xs:boolean" minOccurs="0" default="false"/>
 			<xs:element name="pathLen" type="xs:int" minOccurs="0"/>
 			<xs:element name="includeIssuerAndSerialInAKI" type="xs:boolean" minOccurs="0" default="false"/>
 			<xs:element name="keyUsage" minOccurs="0">
 				<xs:complexType>
 					<xs:sequence>
 						<xs:element name="usage" type="KeyUsageType" maxOccurs="unbounded"/>
-					</xs:sequence>
-				</xs:complexType>
-			</xs:element>
-			<xs:element name="extendedKeyUsage" minOccurs="0">
-				<xs:complexType>
-					<xs:sequence>
-						<xs:element name="usage" type="OidWitDescType" maxOccurs="unbounded"/>
 					</xs:sequence>
 				</xs:complexType>
 			</xs:element>
@@ -104,6 +103,78 @@
 					</xs:sequence>
 				</xs:complexType>
 			</xs:element>
+
+			<xs:element name="policyMappings" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>
+					  Only for CA
+					</xs:documentation>
+				</xs:annotation>
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="mappings" type="PolicyIdMappingsType" maxOccurs="unbounded"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			
+			<xs:element name="nameConstraints" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>
+					  Only for CA, at least one of permittedSubtrees and excludedSubtrees must be present
+					</xs:documentation>
+				</xs:annotation>
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="permittedSubtrees" type="GeneralSubtreesType" minOccurs="0" />
+						<xs:element name="excludedSubtrees" type="GeneralSubtreesType" minOccurs="0" />
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			
+			<xs:element name="policyConstraints" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>
+					  Only for CA, at least one of requireExplicitPolicy and inhibitPolicyMapping must be present
+					</xs:documentation>
+				</xs:annotation>
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="requireExplicitPolicy" type="xs:int" minOccurs="0"/>
+						<xs:element name="inhibitPolicyMapping" type="xs:int" minOccurs="0"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+
+			<xs:element name="extendedKeyUsage" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Only for CA</xs:documentation>
+				</xs:annotation>
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="usage" type="OidWithDescType" maxOccurs="unbounded"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+
+			<xs:element name="inhibitAnyPolicy" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Only for CA</xs:documentation>
+				</xs:annotation>
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="skipCerts" type="xs:int"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			
+			<xs:element name="subjectInfoAccess" minOccurs="0">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="accessDescription" type="AccessDescriptionType" maxOccurs="unbounded"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+
 			<xs:element name="admission" minOccurs="0">
 				<xs:complexType>
 					<xs:sequence>
@@ -112,6 +183,7 @@
 					</xs:sequence>
 				</xs:complexType>
 			</xs:element>
+
 			<xs:element name="constantExtensions" minOccurs="0">
 				<xs:complexType>
 					<xs:sequence>
@@ -119,9 +191,35 @@
 					</xs:sequence>
 				</xs:complexType>
 			</xs:element>
+
 		</xs:sequence>
 	</xs:complexType>
 
+	<xs:complexType name="PolicyIdMappingsType">
+		<xs:sequence>
+			<xs:element name="issuerDomainPolicy" type="OidWithDescType" />
+			<xs:element name="subjectDomainPolicy" type="OidWithDescType" />
+		</xs:sequence>
+	</xs:complexType>
+			
+	<xs:complexType name="GeneralSubtreesType">
+		<xs:sequence>
+			<xs:element name="base" type="GeneralSubtreeBaseType" maxOccurs="unbounded"/>
+		</xs:sequence>
+		<xs:attribute name="minimum" type="xs:int" use="optional"/>
+		<xs:attribute name="maximum" type="xs:int" use="optional"/>
+	</xs:complexType>
+			
+	<xs:complexType name="GeneralSubtreeBaseType">
+		<xs:choice>
+			<xs:element name="rfc822Name" type="xs:string"/>
+			<xs:element name="dNSName" type="xs:string"/>
+			<xs:element name="directoryName" type="xs:string"/>
+			<xs:element name="uri" type="xs:string"/>
+			<xs:element name="ipAddress" type="xs:string"/>						
+		</xs:choice>
+	</xs:complexType>
+     
 	<xs:complexType name="ConstantExtensionType">
 		<xs:sequence>
 			<xs:element name="type" type="OidType"/>
@@ -143,7 +241,51 @@
 		</xs:sequence>
 	</xs:complexType>
 	
-	<xs:complexType name="OidWitDescType">
+	<xs:complexType name="AccessDescriptionType">
+		<xs:sequence>
+			<xs:element name="accessMethod" type="OidWithDescType"/>
+			<xs:element name="accessLocation" type="GeneralNameType"/>
+		</xs:sequence>
+	</xs:complexType>
+	
+	<xs:complexType name="GeneralNameType">
+		<xs:choice>
+			<xs:element name="otherName" type="OtherNameType"/>
+			<xs:element name="rfc822Name" type="xs:string"/>
+			<xs:element name="dNSName" type="xs:string"/>
+			<xs:element name="directoryName" type="xs:string"/>
+			<xs:element name="ediPartyName" type="EdiPartyNameType"/>
+			<xs:element name="uri" type="xs:string"/>
+			<xs:element name="ipAddress" type="xs:string"/>
+			<xs:element name="registeredID" type="OidWithDescType"/>				
+		</xs:choice>
+	</xs:complexType>
+	
+	<xs:complexType name="OtherNameType">
+		<xs:sequence>
+			<xs:element name="type" type="OidWithDescType"/>
+			<xs:element name="value" type="xs:base64Binary"/>
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:complexType name="EdiPartyNameType">
+		<xs:sequence>
+			<xs:element name="nameAssigner" type="DirectoryStringType" minOccurs="0"/>
+			<xs:element name="partyName" type="DirectoryStringType"/>
+		</xs:sequence>
+	</xs:complexType>
+	
+	<xs:complexType name="DirectoryStringType">
+		<xs:choice>
+			<xs:element name="teletexString" type="xs:string"/>
+			<xs:element name="printableString" type="xs:string"/>
+			<xs:element name="universalString" type="xs:string"/>
+			<xs:element name="utf8String" type="xs:string"/>
+			<xs:element name="bmpString" type="xs:string"/>
+		</xs:choice>
+	</xs:complexType>
+
+	<xs:complexType name="OidWithDescType">
 		<xs:simpleContent>
 			<xs:extension base="OidType">
 				<xs:attribute name="description" type="xs:string" use="optional"/>

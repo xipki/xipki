@@ -156,4 +156,16 @@ public class IdentifiedCertProfile extends CertProfile
         return certProfile.incSerialNumber(currentSerialNumber);
     }
 
+    @Override
+    public ExtensionOccurrence getOccurenceOfFreshestCRL()
+    {
+        return certProfile.getOccurenceOfFreshestCRL();
+    }
+
+    @Override
+    public ExtensionOccurrence getOccurenceOfIssuerAltName()
+    {
+        return certProfile.getOccurenceOfIssuerAltName();
+    }
+
 }

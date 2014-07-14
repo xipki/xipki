@@ -75,6 +75,11 @@ public abstract class CertProfile
         return ExtensionOccurrence.NONCRITICAL_OPTIONAL;
     }
 
+    public ExtensionOccurrence getOccurenceOfIssuerAltName()
+    {
+        return ExtensionOccurrence.NONCRITICAL_OPTIONAL;
+    }
+
     public abstract ExtensionOccurrence getOccurenceOfAuthorityInfoAccess();
 
     public abstract ExtensionTuples getExtensions(X500Name requestedSubject, Extensions requestedExtensions)
