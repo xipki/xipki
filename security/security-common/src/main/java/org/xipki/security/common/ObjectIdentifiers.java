@@ -323,8 +323,74 @@ public class ObjectIdentifiers
 
     public static String oidToDisplayName(ASN1ObjectIdentifier type)
     {
-        String displayName = RFC4519Style.INSTANCE.oidToDisplayName(type);
-        return type.getId() + (displayName == null ? "" : " (" + displayName + ")");
+        String name = getName(type);
+        return type.getId() + (name == null ? "" : " (" + name + ")");
+    }
+
+    public static String getName(ASN1ObjectIdentifier type)
+    {
+        String name = RFC4519Style.INSTANCE.oidToDisplayName(type);
+        if(name == null)
+        {
+            if(id_kp_clientAuth.equals(type))
+            {
+                name = "id-kp-clientAuth";
+            }
+            else if(id_kp_codeSigning.equals(type))
+            {
+                name = "id-kp-codeSigning";
+            }
+            else if(id_kp_emailProtection.equals(type))
+            {
+                name = "id-kp-emailProtection";
+            }
+            else if(id_kp_ipsecEndSystem.equals(type))
+            {
+                name = "id-kp-ipsecEndSystem";
+            }
+            else if(id_kp_ipsecTunnel.equals(type))
+            {
+                name = "id-kp-ipsecTunnel";
+            }
+            else if(id_kp_ipsecUser.equals(type))
+            {
+                name = "id-kp-ipsecUser";
+            }
+            else if(id_kp_ocsp.equals(type))
+            {
+                name = "id-kp-ocsp";
+            }
+            else if(id_kp_OCSPSigning.equals(type))
+            {
+                name = "id-kp-OCSPSigning";
+            }
+            else if(id_kp_serverAuth.equals(type))
+            {
+                name = "id-kp-serverAuth";
+            }
+            else if(id_kp_timeStamping.equals(type))
+            {
+                name = "id-kp-timeStamping";
+            }
+            else if(id_pkix_ocsp_extendedRevoke.equals(type))
+            {
+                name = "id-pkix-ocsp-extendedRevoke";
+            }
+            else if(id_pkix_ocsp_prefSigAlgs.equals(type))
+            {
+                name = "id-pkix-ocsp-prefSigAlgs";
+            }
+            else if(id_tsl_kp_tslSigning.equals(type))
+            {
+                name = "id-tsl-kp-tslSigning";
+            }
+            else if(id_extension_pkix_ocsp_nocheck.equals(type))
+            {
+                name = "id-pkix-ocsp-nocheck";
+            }
+        }
+
+        return name;
     }
 
     public static List<ASN1ObjectIdentifier> getForwardDNs()
