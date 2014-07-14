@@ -82,9 +82,9 @@ public class CertProfileEntry
         }
 
         CertProfile underlyingCertProfile = null;
-        if(type.toLowerCase().equals("xml"))
+        if(type.toLowerCase().equals("default"))
         {
-            type = "java:" + DfltCertProfile.class.getName();
+            underlyingCertProfile = new DfltCertProfile();
         }
 
         if(type.toLowerCase().startsWith("java:"))

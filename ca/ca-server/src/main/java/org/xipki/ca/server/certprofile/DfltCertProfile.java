@@ -68,7 +68,7 @@ import org.xipki.ca.server.certprofile.jaxb.ExtensionsType.ConstantExtensions;
 import org.xipki.ca.server.certprofile.jaxb.ExtensionsType.ExtendedKeyUsage;
 import org.xipki.ca.server.certprofile.jaxb.KeyUsageType;
 import org.xipki.ca.server.certprofile.jaxb.ObjectFactory;
-import org.xipki.ca.server.certprofile.jaxb.OidWitDescType;
+import org.xipki.ca.server.certprofile.jaxb.OidWithDescType;
 import org.xipki.ca.server.certprofile.jaxb.ProfileType;
 import org.xipki.ca.server.certprofile.jaxb.ProfileType.AllowedClientExtensions;
 import org.xipki.ca.server.certprofile.jaxb.ProfileType.Subject;
@@ -82,6 +82,10 @@ import org.xml.sax.SAXException;
 
 public class DfltCertProfile extends AbstractCertProfile
 {
+    private static final Set<String> criticalOnlyExtensionTypes;
+    private static final Set<String> noncriticalOnlyExtensionTypes;
+    private static final Set<String> caOnlyExtensionTypes;
+
     private static final ASN1ObjectIdentifier id_extension_admission = new ASN1ObjectIdentifier("1.3.36.8.3.3");
 
     private ProfileType conf;
@@ -110,6 +114,31 @@ public class DfltCertProfile extends AbstractCertProfile
     private final static Object jaxbUnmarshallerLock = new Object();
     private static Unmarshaller jaxbUnmarshaller;
 
+    static
+    {
+        criticalOnlyExtensionTypes = new HashSet<>();
+        criticalOnlyExtensionTypes.add(Extension.keyUsage.getId());
+        criticalOnlyExtensionTypes.add(Extension.policyMappings.getId());
+        criticalOnlyExtensionTypes.add(Extension.nameConstraints.getId());
+        criticalOnlyExtensionTypes.add(Extension.policyConstraints.getId());
+        criticalOnlyExtensionTypes.add(Extension.inhibitAnyPolicy.getId());
+
+        noncriticalOnlyExtensionTypes = new HashSet<>();
+        noncriticalOnlyExtensionTypes.add(Extension.authorityKeyIdentifier.getId());
+        noncriticalOnlyExtensionTypes.add(Extension.subjectKeyIdentifier.getId());
+        noncriticalOnlyExtensionTypes.add(Extension.issuerAlternativeName.getId());
+        noncriticalOnlyExtensionTypes.add(Extension.subjectDirectoryAttributes.getId());
+        noncriticalOnlyExtensionTypes.add(Extension.freshestCRL.getId());
+        noncriticalOnlyExtensionTypes.add(Extension.authorityInfoAccess.getId());
+        noncriticalOnlyExtensionTypes.add(Extension.subjectInfoAccess.getId());
+
+        caOnlyExtensionTypes = new HashSet<String>();
+        caOnlyExtensionTypes.add(Extension.policyMappings.getId());
+        caOnlyExtensionTypes.add(Extension.nameConstraints.getId());
+        caOnlyExtensionTypes.add(Extension.policyConstraints.getId());
+        caOnlyExtensionTypes.add(Extension.inhibitAnyPolicy.getId());
+    }
+
     @Override
     public void initialize(String data)
     throws CertProfileException
@@ -117,6 +146,7 @@ public class DfltCertProfile extends AbstractCertProfile
         this.conf = parse(data);
         this.raOnly = getBoolean(conf.isRaOnly(), false);
         this.validity = conf.getValidity();
+        this.ca = conf.isCa();
 
         // Subject
         Subject subject = conf.getSubject();
@@ -157,45 +187,9 @@ public class DfltCertProfile extends AbstractCertProfile
             }
         }
 
-        // Extension Occurrences
-        Map<ASN1ObjectIdentifier, ExtensionOccurrence> occurences = new HashMap<>();
+        // Extensions
         ExtensionsType extensionsType = conf.getExtensions();
-        for(ExtensionType extensionType : extensionsType.getExtension())
-        {
-            String oid = extensionType.getValue();
-            boolean required = extensionType.isRequired();
-            Boolean b = extensionType.isCritical();
 
-            boolean critical;
-            if( Extension.keyUsage.getId().equals(oid) ||
-                Extension.basicConstraints.getId().equals(oid) ||
-                Extension.policyMappings.getId().equals(oid) ||
-                Extension.nameConstraints.getId().equals(oid) ||
-                Extension.policyConstraints.getId().equals(oid) ||
-                Extension.inhibitAnyPolicy.getId().equals(oid))
-            {
-                critical = true;
-            }
-            else
-            {
-                critical = b == null ? false : b.booleanValue();
-            }
-
-            occurences.put(new ASN1ObjectIdentifier(oid),
-                    ExtensionOccurrence.getInstance(critical, required));
-        }
-
-        this.extensionOccurences = Collections.unmodifiableMap(occurences);
-
-        occurences = new HashMap<>(occurences);
-        occurences.remove(Extension.authorityKeyIdentifier);
-        occurences.remove(Extension.subjectKeyIdentifier);
-        occurences.remove(Extension.authorityInfoAccess);
-        occurences.remove(Extension.cRLDistributionPoints);
-        occurences.remove(Extension.freshestCRL);
-        this.additionalExtensionOccurences = Collections.unmodifiableMap(occurences);
-
-        this.ca = extensionsType.isCa();
         this.pathLen = extensionsType.getPathLen();
         this.includeIssuerAndSerialInAKI = extensionsType.isIncludeIssuerAndSerialInAKI();
 
@@ -253,7 +247,7 @@ public class DfltCertProfile extends AbstractCertProfile
         else
         {
             Set<ASN1ObjectIdentifier> set = new HashSet<>();
-            for(OidWitDescType type : extKeyUsageType.getUsage())
+            for(OidWithDescType type : extKeyUsageType.getUsage())
             {
                 set.add(new ASN1ObjectIdentifier(type.getValue()));
             }
@@ -302,6 +296,57 @@ public class DfltCertProfile extends AbstractCertProfile
                 this.constantExtensions.put(type, new Extension(type, false, ce.getValue()));
             }
         }
+
+        // Extension Occurrences
+        Map<ASN1ObjectIdentifier, ExtensionOccurrence> occurences = new HashMap<>();
+        for(ExtensionType extensionType : extensionsType.getExtension())
+        {
+            String oid = extensionType.getValue();
+            if(ca == false && caOnlyExtensionTypes.contains(oid))
+            {
+                continue;
+            }
+
+            boolean required = extensionType.isRequired();
+            Boolean b = extensionType.isCritical();
+
+            boolean critical;
+            if(criticalOnlyExtensionTypes.contains(oid))
+            {
+                critical = true;
+            }
+            else if(noncriticalOnlyExtensionTypes.contains(oid))
+            {
+                critical = false;
+            }
+            else if(ca && Extension.basicConstraints.getId().equals(oid))
+            {
+                critical = true;
+            }
+            else
+            {
+                critical = b == null ? false : b.booleanValue();
+                if(critical && extendedKeyusages != null &&
+                        extendedKeyusages.contains(ObjectIdentifiers.anyExtendedKeyUsage))
+                {
+                    critical = false;
+                }
+            }
+
+            occurences.put(new ASN1ObjectIdentifier(oid),
+                    ExtensionOccurrence.getInstance(critical, required));
+        }
+
+        this.extensionOccurences = Collections.unmodifiableMap(occurences);
+
+        occurences = new HashMap<>(occurences);
+        occurences.remove(Extension.authorityKeyIdentifier);
+        occurences.remove(Extension.subjectKeyIdentifier);
+        occurences.remove(Extension.authorityInfoAccess);
+        occurences.remove(Extension.cRLDistributionPoints);
+        occurences.remove(Extension.freshestCRL);
+        occurences.remove(Extension.issuerAlternativeName);
+        this.additionalExtensionOccurences = Collections.unmodifiableMap(occurences);
     }
 
     private static ProfileType parse(String xmlConf)
@@ -380,6 +425,12 @@ public class DfltCertProfile extends AbstractCertProfile
     public ExtensionOccurrence getOccurenceOfAuthorityInfoAccess()
     {
         return extensionOccurences.get(Extension.authorityInfoAccess);
+    }
+
+    @Override
+    public ExtensionOccurrence getOccurenceOfIssuerAltName()
+    {
+        return extensionOccurences.get(Extension.issuerAlternativeName);
     }
 
     @Override

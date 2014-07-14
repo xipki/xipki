@@ -12,11 +12,11 @@ ca:env-add -name env-name1 -value env-value1
 ca:cmpcontrol-set --msgTimeBias 300 --sendCaCert yes
 
 ## Certificate Profiles
-ca:profile-add -name SubCA -type XML -confFile ca-demo/profile/CertProfile_SubCA.xml
-ca:profile-add -name OCSP -type XML -confFile ca-demo/profile/CertProfile_OCSP.xml
-ca:profile-add -name TLS -type XML -confFile ca-demo/profile/CertProfile_TLS.xml
-ca:profile-add -name TLS_C -type XML -confFile ca-demo/profile/CertProfile_TLS_C.xml
-ca:profile-add -name TLSwithIncSN -type XML -confFile ca-demo/profile/CertProfile_TLSwithIncSN.xml
+ca:profile-add -name SubCA -type DEFAULT -confFile ca-demo/profile/CertProfile_SubCA.xml
+ca:profile-add -name OCSP -type DEFAULT -confFile ca-demo/profile/CertProfile_OCSP.xml
+ca:profile-add -name TLS -type DEFAULT -confFile ca-demo/profile/CertProfile_TLS.xml
+ca:profile-add -name TLS_C -type DEFAULT -confFile ca-demo/profile/CertProfile_TLS_C.xml
+ca:profile-add -name TLSwithIncSN -type DEFAULT -confFile ca-demo/profile/CertProfile_TLSwithIncSN.xml
 
 ## Publishers
 ca:publisher-add -name OCSP.PUBLISHER -type java:org.xipki.ca.server.publisher.DefaultCertPublisher \
@@ -36,7 +36,7 @@ ca:crlsigner-add -signerType CA -period 0 -name CASIGN.CRLSIGNER
 #                          GENERATE RCA                         #
 #################################################################
 ## Add the profile RCA
-ca:profile-add -name  RCA -type XML -confFile ca-demo/profile/CertProfile_RootCA.xml
+ca:profile-add -name  RCA -type DEFAULT -confFile ca-demo/profile/CertProfile_RootCA.xml
 
 ## Generate selfsigned RCA
 ca:gen-rca -name RCA1 \

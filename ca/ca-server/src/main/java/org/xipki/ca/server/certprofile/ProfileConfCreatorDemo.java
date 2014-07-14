@@ -35,7 +35,7 @@ import org.xipki.ca.server.certprofile.jaxb.ExtensionsType;
 import org.xipki.ca.server.certprofile.jaxb.ExtensionsType.ExtendedKeyUsage;
 import org.xipki.ca.server.certprofile.jaxb.KeyUsageType;
 import org.xipki.ca.server.certprofile.jaxb.ObjectFactory;
-import org.xipki.ca.server.certprofile.jaxb.OidWitDescType;
+import org.xipki.ca.server.certprofile.jaxb.OidWithDescType;
 import org.xipki.ca.server.certprofile.jaxb.ProfileType;
 import org.xipki.ca.server.certprofile.jaxb.ProfileType.Subject;
 import org.xipki.ca.server.certprofile.jaxb.RdnType;
@@ -146,6 +146,7 @@ public class ProfileConfCreatorDemo
         ProfileType profile = new ProfileType();
         profile.setDescription("CertProfile RootCA");
         profile.setRaOnly(false);
+        profile.setCa(true);
         profile.setValidity(1825);
 
         // Subject
@@ -170,7 +171,6 @@ public class ProfileConfCreatorDemo
         ExtensionsType extensions = new ExtensionsType();
         profile.setExtensions(extensions);
 
-        extensions.setCa(true);
         extensions.setIncludeIssuerAndSerialInAKI(false);
 
         // Extensions - occurrences
@@ -193,6 +193,7 @@ public class ProfileConfCreatorDemo
         ProfileType profile = new ProfileType();
         profile.setDescription("CertProfile SubCA");
         profile.setRaOnly(false);
+        profile.setCa(true);
         profile.setValidity(1825);
 
         // Subject
@@ -217,7 +218,6 @@ public class ProfileConfCreatorDemo
         ExtensionsType extensions = new ExtensionsType();
         profile.setExtensions(extensions);
 
-        extensions.setCa(true);
         extensions.setPathLen(1);
         extensions.setIncludeIssuerAndSerialInAKI(false);
 
@@ -242,6 +242,7 @@ public class ProfileConfCreatorDemo
         ProfileType profile = new ProfileType();
         profile.setDescription("CertProfile OCSP");
         profile.setRaOnly(false);
+        profile.setCa(false);
         profile.setValidity(730);
 
         // Subject
@@ -266,7 +267,6 @@ public class ProfileConfCreatorDemo
         ExtensionsType extensions = new ExtensionsType();
         profile.setExtensions(extensions);
 
-        extensions.setCa(false);
         extensions.setIncludeIssuerAndSerialInAKI(false);
 
         // Extensions - occurrences
@@ -297,6 +297,7 @@ public class ProfileConfCreatorDemo
         ProfileType profile = new ProfileType();
         profile.setDescription("CertProfile TLS");
         profile.setRaOnly(false);
+        profile.setCa(false);
         profile.setValidity(730);
 
         // Subject
@@ -321,7 +322,6 @@ public class ProfileConfCreatorDemo
         ExtensionsType extensions = new ExtensionsType();
         profile.setExtensions(extensions);
 
-        extensions.setCa(false);
         extensions.setIncludeIssuerAndSerialInAKI(false);
 
         // Extensions - occurrences
@@ -351,6 +351,7 @@ public class ProfileConfCreatorDemo
         ProfileType profile = new ProfileType();
         profile.setDescription("CertProfile TLS_C");
         profile.setRaOnly(false);
+        profile.setCa(false);
         profile.setValidity(730);
 
         // Subject
@@ -375,7 +376,6 @@ public class ProfileConfCreatorDemo
         ExtensionsType extensions = new ExtensionsType();
         profile.setExtensions(extensions);
 
-        extensions.setCa(false);
         extensions.setIncludeIssuerAndSerialInAKI(false);
 
         // Extensions - occurrences
@@ -404,6 +404,7 @@ public class ProfileConfCreatorDemo
     {
         ProfileType profile = new ProfileType();
         profile.setDescription("CertProfile TLSwithIncSN");
+        profile.setCa(false);
         profile.setRaOnly(false);
         profile.setValidity(730);
 
@@ -429,7 +430,6 @@ public class ProfileConfCreatorDemo
         ExtensionsType extensions = new ExtensionsType();
         profile.setExtensions(extensions);
 
-        extensions.setCa(false);
         extensions.setIncludeIssuerAndSerialInAKI(false);
 
         // Extensions - occurrences
@@ -499,7 +499,7 @@ public class ProfileConfCreatorDemo
         ExtendedKeyUsage ret = new ExtendedKeyUsage();
         for(ASN1ObjectIdentifier usage : extKeyUsages)
         {
-            OidWitDescType t = new OidWitDescType();
+            OidWithDescType t = new OidWithDescType();
             ret.getUsage().add(t);
 
             t.setValue(usage.getId());
