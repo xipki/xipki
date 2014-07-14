@@ -68,10 +68,11 @@ import org.xipki.ca.server.certprofile.jaxb.ExtensionsType.ConstantExtensions;
 import org.xipki.ca.server.certprofile.jaxb.ExtensionsType.ExtendedKeyUsage;
 import org.xipki.ca.server.certprofile.jaxb.KeyUsageType;
 import org.xipki.ca.server.certprofile.jaxb.ObjectFactory;
+import org.xipki.ca.server.certprofile.jaxb.OidWitDescType;
 import org.xipki.ca.server.certprofile.jaxb.ProfileType;
 import org.xipki.ca.server.certprofile.jaxb.ProfileType.AllowedClientExtensions;
 import org.xipki.ca.server.certprofile.jaxb.ProfileType.Subject;
-import org.xipki.ca.server.certprofile.jaxb.RdnOccurrenceType;
+import org.xipki.ca.server.certprofile.jaxb.RdnType;
 import org.xipki.security.common.ObjectIdentifiers;
 import org.xml.sax.SAXException;
 
@@ -131,10 +132,10 @@ public class DfltCertProfile extends AbstractCertProfile
             this.incSerialNrIfSubjectExists = subject.isIncSerialNrIfSubjectExists();
 
             List<RDNOccurrence> subjectDNSubject = new LinkedList<RDNOccurrence>();
-            for(RdnOccurrenceType t : subject.getRdnOccurrence())
+            for(RdnType t : subject.getRdn())
             {
-                RDNOccurrence occ = new RDNOccurrence(new ASN1ObjectIdentifier(t.getType()),
-                        getInt(t.getMinOccurs(), 0), getInt(t.getMaxOccurs(), 1));
+                RDNOccurrence occ = new RDNOccurrence(new ASN1ObjectIdentifier(t.getValue()),
+                        getInt(t.getMinOccurs(), 1), getInt(t.getMaxOccurs(), 1));
                 subjectDNSubject.add(occ);
             }
 
@@ -166,26 +167,20 @@ public class DfltCertProfile extends AbstractCertProfile
             Boolean b = extensionType.isCritical();
 
             boolean critical;
-            if(b == null)
+            if( Extension.keyUsage.getId().equals(oid) ||
+                Extension.basicConstraints.getId().equals(oid) ||
+                Extension.policyMappings.getId().equals(oid) ||
+                Extension.nameConstraints.getId().equals(oid) ||
+                Extension.policyConstraints.getId().equals(oid) ||
+                Extension.inhibitAnyPolicy.getId().equals(oid))
             {
-                if( Extension.keyUsage.getId().equals(oid) ||
-                    Extension.basicConstraints.getId().equals(oid) ||
-                    Extension.policyMappings.getId().equals(oid) ||
-                    Extension.nameConstraints.getId().equals(oid) ||
-                    Extension.policyConstraints.getId().equals(oid) ||
-                    Extension.inhibitAnyPolicy.getId().equals(oid))
-                {
-                    critical = true;
-                }
-                else
-                {
-                    critical = false;
-                }
+                critical = true;
             }
             else
             {
-                critical = b.booleanValue();
+                critical = b == null ? false : b.booleanValue();
             }
+
             occurences.put(new ASN1ObjectIdentifier(oid),
                     ExtensionOccurrence.getInstance(critical, required));
         }
@@ -197,6 +192,7 @@ public class DfltCertProfile extends AbstractCertProfile
         occurences.remove(Extension.subjectKeyIdentifier);
         occurences.remove(Extension.authorityInfoAccess);
         occurences.remove(Extension.cRLDistributionPoints);
+        occurences.remove(Extension.freshestCRL);
         this.additionalExtensionOccurences = Collections.unmodifiableMap(occurences);
 
         this.ca = extensionsType.isCa();
@@ -257,16 +253,16 @@ public class DfltCertProfile extends AbstractCertProfile
         else
         {
             Set<ASN1ObjectIdentifier> set = new HashSet<>();
-            for(String type : extKeyUsageType.getUsage())
+            for(OidWitDescType type : extKeyUsageType.getUsage())
             {
-                set.add(new ASN1ObjectIdentifier(type));
+                set.add(new ASN1ObjectIdentifier(type.getValue()));
             }
             this.extendedKeyusages = Collections.unmodifiableSet(set);
         }
 
         // admission
         Admission admissionType = extensionsType.getAdmission();
-        List<String> l = admissionType.getProfessionItem();
+        List<String> l = admissionType == null ? null : admissionType.getProfessionItem();
         if(l == null || l.isEmpty())
         {
             this.professionItems = null;
@@ -276,7 +272,7 @@ public class DfltCertProfile extends AbstractCertProfile
             this.professionItems = Collections.unmodifiableList(new LinkedList<>(l));
         }
 
-        l = admissionType.getProfessionOid();
+        l =  admissionType == null ? null : admissionType.getProfessionOid();
         if(l == null || l.isEmpty())
         {
             this.professionOIDs = null;
@@ -460,7 +456,7 @@ public class DfltCertProfile extends AbstractCertProfile
         }
 
         // check whether there is unknown extensions
-        if(! occurences.isEmpty())
+        if(occurences.isEmpty() == false)
         {
             StringBuilder sb = new StringBuilder("Extensions with the following types are not processed: ");
             for(ASN1ObjectIdentifier extnType : occurences.keySet())

@@ -44,7 +44,7 @@
 					<xs:sequence>
 						<xs:element name="dnBackwards" type="xs:boolean" default="false" minOccurs="0"/>
 						<xs:element name="incSerialNrIfSubjectExists" type="xs:boolean" default="false" minOccurs="0"/>
-						<xs:element name="rdnOccurrence" type="RdnOccurrenceType" maxOccurs="unbounded"/>
+						<xs:element name="rdn" type="RdnType" maxOccurs="unbounded"/>
 					</xs:sequence>
 				</xs:complexType>
 			</xs:element>
@@ -59,21 +59,22 @@
 		</xs:sequence>
 	</xs:complexType>
 	
-	<xs:complexType name="RdnOccurrenceType">
-		<xs:sequence>
-			<xs:element name="type" type="OidType"/>
-			<xs:element name="minOccurs" type="xs:int" default="0" minOccurs="0"/>
-			<xs:element name="maxOccurs" type="xs:int" default="1" minOccurs="0"/>
-		</xs:sequence>
+	<xs:complexType name="RdnType">
+		<xs:complexContent>
+			<xs:extension base="OidWitDescType">
+				<xs:attribute name="minOccurs" type="xs:int" default="1"/>
+				<xs:attribute name="maxOccurs" type="xs:int" default="1"/>
+			</xs:extension>
+		</xs:complexContent>
 	</xs:complexType>
 	
 	<xs:complexType name="ExtensionType">
-		<xs:simpleContent>
-			<xs:extension base="OidType">
+		<xs:complexContent>
+			<xs:extension base="OidWitDescType">
 				<xs:attribute name="critical" type="xs:boolean" use="optional"/>
 				<xs:attribute name="required" type="xs:boolean" default="false"/>
 			</xs:extension>
-		</xs:simpleContent>
+		</xs:complexContent>
 	</xs:complexType>
 	
 	<xs:complexType name="ExtensionsType">
@@ -92,7 +93,7 @@
 			<xs:element name="extendedKeyUsage" minOccurs="0">
 				<xs:complexType>
 					<xs:sequence>
-						<xs:element name="usage" type="OidType" maxOccurs="unbounded"/>
+						<xs:element name="usage" type="OidWitDescType" maxOccurs="unbounded"/>
 					</xs:sequence>
 				</xs:complexType>
 			</xs:element>
@@ -140,6 +141,14 @@
 				</xs:complexType>
 			</xs:element>
 		</xs:sequence>
+	</xs:complexType>
+	
+	<xs:complexType name="OidWitDescType">
+		<xs:simpleContent>
+			<xs:extension base="OidType">
+				<xs:attribute name="description" type="xs:string" use="optional"/>
+			</xs:extension>
+		</xs:simpleContent>
 	</xs:complexType>
 	
 	<xs:simpleType name="OidType">
