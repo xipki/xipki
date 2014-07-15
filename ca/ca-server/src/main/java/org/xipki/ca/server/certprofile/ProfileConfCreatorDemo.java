@@ -17,6 +17,7 @@
 
 package org.xipki.ca.server.certprofile;
 
+import java.io.File;
 import java.io.FileOutputStream;
 import java.net.URL;
 import java.util.HashMap;
@@ -29,13 +30,27 @@ import javax.xml.bind.Marshaller;
 import javax.xml.validation.SchemaFactory;
 
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
+import org.bouncycastle.asn1.DERNull;
 import org.bouncycastle.asn1.x509.Extension;
+import org.xipki.ca.server.certprofile.jaxb.CertificatePolicyInformationType;
+import org.xipki.ca.server.certprofile.jaxb.ConstantExtensionType;
 import org.xipki.ca.server.certprofile.jaxb.ExtensionType;
 import org.xipki.ca.server.certprofile.jaxb.ExtensionsType;
+import org.xipki.ca.server.certprofile.jaxb.ExtensionsType.Admission;
+import org.xipki.ca.server.certprofile.jaxb.ExtensionsType.ConstantExtensions;
 import org.xipki.ca.server.certprofile.jaxb.ExtensionsType.ExtendedKeyUsage;
+import org.xipki.ca.server.certprofile.jaxb.ExtensionsType.InhibitAnyPolicy;
+import org.xipki.ca.server.certprofile.jaxb.ExtensionsType.NameConstraints;
+import org.xipki.ca.server.certprofile.jaxb.ExtensionsType.PolicyConstraints;
+import org.xipki.ca.server.certprofile.jaxb.ExtensionsType.PolicyMappings;
+import org.xipki.ca.server.certprofile.jaxb.GeneralNameType.OtherName;
+import org.xipki.ca.server.certprofile.jaxb.GeneralNameType;
+import org.xipki.ca.server.certprofile.jaxb.GeneralSubtreeBaseType;
+import org.xipki.ca.server.certprofile.jaxb.GeneralSubtreesType;
 import org.xipki.ca.server.certprofile.jaxb.KeyUsageType;
 import org.xipki.ca.server.certprofile.jaxb.ObjectFactory;
 import org.xipki.ca.server.certprofile.jaxb.OidWithDescType;
+import org.xipki.ca.server.certprofile.jaxb.PolicyIdMappingType;
 import org.xipki.ca.server.certprofile.jaxb.ProfileType;
 import org.xipki.ca.server.certprofile.jaxb.ProfileType.Subject;
 import org.xipki.ca.server.certprofile.jaxb.RdnType;
@@ -95,7 +110,8 @@ public class ProfileConfCreatorDemo
             URL url = DfltCertProfile.class.getResource("/xsd/certprofile.xsd");
             m.setSchema(schemaFact.newSchema(url));
             m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
-
+            m.setProperty("com.sun.xml.internal.bind.indentString", "  ");
+            
             // RootCA
             ProfileType profile = CertProfile_RootCA();
             marshall(m, profile, "CertProfile_RootCA.xml");
@@ -103,6 +119,9 @@ public class ProfileConfCreatorDemo
             // SubCA
             profile = CertProfile_SubCA();
             marshall(m, profile, "CertProfile_SubCA.xml");
+
+            profile = CertProfile_SubCA_Complex();
+            marshall(m, profile, "CertProfile_SubCA_Complex.xml");
 
             // OCSP
             profile = CertProfile_OCSP();
@@ -128,8 +147,10 @@ public class ProfileConfCreatorDemo
     private static void marshall(Marshaller m, ProfileType profile, String filename)
     throws Exception
     {
+        File file = new File("tmp", filename);
+        file.getParentFile().mkdirs();
         JAXBElement<ProfileType> root = new ObjectFactory().createProfile(profile);
-        FileOutputStream out = new FileOutputStream(filename);
+        FileOutputStream out = new FileOutputStream(file);
         try
         {
             m.marshal(root, out);
@@ -145,7 +166,7 @@ public class ProfileConfCreatorDemo
     {
         ProfileType profile = new ProfileType();
         profile.setDescription("CertProfile RootCA");
-        profile.setRaOnly(false);
+        profile.setOnlyForRA(false);
         profile.setCa(true);
         profile.setValidity(1825);
 
@@ -167,7 +188,7 @@ public class ProfileConfCreatorDemo
         profile.setAllowedClientExtensions(null);
 
         // Extensions
-        // Extensions - generell
+        // Extensions - general
         ExtensionsType extensions = new ExtensionsType();
         profile.setExtensions(extensions);
 
@@ -183,7 +204,7 @@ public class ProfileConfCreatorDemo
         list.add(createExtension(Extension.basicConstraints, true));
 
         // Extensions - keyUsage
-        extensions.setKeyUsage(createKeyUsages(KeyUsageType.KEY_CERT_SIGN, KeyUsageType.C_RL_SIGN));
+        extensions.setKeyUsage(createKeyUsages(KeyUsageType.KEYCERT_SIGN, KeyUsageType.CRL_SIGN));
         return profile;
     }
 
@@ -192,7 +213,7 @@ public class ProfileConfCreatorDemo
     {
         ProfileType profile = new ProfileType();
         profile.setDescription("CertProfile SubCA");
-        profile.setRaOnly(false);
+        profile.setOnlyForRA(false);
         profile.setCa(true);
         profile.setValidity(1825);
 
@@ -214,7 +235,7 @@ public class ProfileConfCreatorDemo
         profile.setAllowedClientExtensions(null);
 
         // Extensions
-        // Extensions - generell
+        // Extensions - general
         ExtensionsType extensions = new ExtensionsType();
         profile.setExtensions(extensions);
 
@@ -232,7 +253,120 @@ public class ProfileConfCreatorDemo
         list.add(createExtension(Extension.basicConstraints, true));
 
         // Extensions - keyUsage
-        extensions.setKeyUsage(createKeyUsages(KeyUsageType.KEY_CERT_SIGN, KeyUsageType.C_RL_SIGN));
+        extensions.setKeyUsage(createKeyUsages(KeyUsageType.KEYCERT_SIGN, KeyUsageType.CRL_SIGN));
+        return profile;
+    }
+
+    private static ProfileType CertProfile_SubCA_Complex()
+    throws Exception
+    {
+        ProfileType profile = new ProfileType();
+        profile.setDescription("CertProfile SubCA with most extensions");
+        profile.setOnlyForRA(false);
+        profile.setCa(true);
+        profile.setValidity(1825);
+
+        // Subject
+        Subject subject = new Subject();
+        profile.setSubject(subject);
+
+        subject.setDnBackwards(false);
+        subject.setIncSerialNrIfSubjectExists(false);
+
+        List<RdnType> occurrences = subject.getRdn();
+        occurrences.add(createRDN(ObjectIdentifiers.DN_C, 1, 1));
+        occurrences.add(createRDN(ObjectIdentifiers.DN_O, 1, 1));
+        occurrences.add(createRDN(ObjectIdentifiers.DN_OU, 0, 1));
+        occurrences.add(createRDN(ObjectIdentifiers.DN_SN, 0, 1));
+        occurrences.add(createRDN(ObjectIdentifiers.DN_CN, 1, 1));
+
+        // AllowedClientExtensions
+        profile.setAllowedClientExtensions(null);
+
+        // Extensions
+        // Extensions - general
+        ExtensionsType extensions = new ExtensionsType();
+        profile.setExtensions(extensions);
+
+        extensions.setPathLen(1);
+        extensions.setIncludeIssuerAndSerialInAKI(false);
+
+        // Extensions - occurrences
+        List<ExtensionType> list = extensions.getExtension();
+        list.add(createExtension(Extension.subjectKeyIdentifier, true));
+        list.add(createExtension(Extension.authorityKeyIdentifier, true));
+        list.add(createExtension(Extension.authorityInfoAccess, false));
+        list.add(createExtension(Extension.cRLDistributionPoints, false));
+        list.add(createExtension(Extension.freshestCRL, false));
+        list.add(createExtension(Extension.keyUsage, true));
+        list.add(createExtension(Extension.basicConstraints, true));
+        list.add(createExtension(Extension.subjectAlternativeName, true));        
+        list.add(createExtension(Extension.subjectInfoAccess, true));
+
+        list.add(createExtension(Extension.policyMappings, true));
+        list.add(createExtension(Extension.nameConstraints, true));
+        list.add(createExtension(Extension.policyConstraints, true));
+        list.add(createExtension(Extension.inhibitAnyPolicy, true));
+
+        
+        ASN1ObjectIdentifier customExtensionOid = new ASN1ObjectIdentifier("1.2.3.4");
+        list.add(createExtension(customExtensionOid, true, "custom extension 1"));
+
+        // Extensions - keyUsage
+        extensions.setKeyUsage(createKeyUsages(KeyUsageType.KEYCERT_SIGN, KeyUsageType.CRL_SIGN));
+
+        // Certificate Policies
+        ExtensionsType.CertificateProfiles certificatePolicies = createCertificatePolicies(
+                new ASN1ObjectIdentifier("1.2.3.4.5"), new ASN1ObjectIdentifier("2.4.3.2.1"));
+        extensions.setCertificateProfiles(certificatePolicies);
+
+        // Policy Mappings
+        PolicyMappings policyMappings = new PolicyMappings();
+        policyMappings.getMapping().add(createPolicyIdMapping(
+                new ASN1ObjectIdentifier("1.1.1.1.1"),
+                new ASN1ObjectIdentifier("2.1.1.1.1")));
+        policyMappings.getMapping().add(createPolicyIdMapping(
+                new ASN1ObjectIdentifier("1.1.1.1.2"),
+                new ASN1ObjectIdentifier("2.1.1.1.2")));
+        extensions.setPolicyMappings(policyMappings);
+
+        // Policy Constraints
+        PolicyConstraints policyConstraints = createPolicyConstraints(2, 2);
+        extensions.setPolicyConstraints(policyConstraints);
+
+        // Name Constrains
+        NameConstraints nameConstraints = createNameConstraints();
+        extensions.setNameConstraints(nameConstraints);
+
+        // Inhibit anyPolicy
+        InhibitAnyPolicy inhibitAnyPolicy = createInhibitAnyPolicy(1);
+        extensions.setInhibitAnyPolicy(inhibitAnyPolicy);
+
+        // SubjectAltName
+        GeneralNameType subjectAltNameMode = new GeneralNameType();
+        extensions.setSubjectAltName(subjectAltNameMode);
+        
+        OtherName otherName = new OtherName();
+        otherName.setType(createOidType(ObjectIdentifiers.DN_O.getId(), "o"));
+        subjectAltNameMode.setOtherName(otherName);
+        
+        // SubjectInfoAccess
+        GeneralNameType subjectInfoAccessMode = new GeneralNameType();
+        extensions.setSubjectInfoAccess(subjectInfoAccessMode);
+        
+        subjectInfoAccessMode.setIPAddress("");        
+        
+        // Custom Extension
+        ConstantExtensions constantExts = new ConstantExtensions();
+        extensions.setConstantExtensions(constantExts);
+
+        ConstantExtensionType constantExt = new ConstantExtensionType();
+        constantExts.getConstantExtension().add(constantExt);
+
+        OidWithDescType type = createOidType(customExtensionOid.getId(), "custom extension 1");
+        constantExt.setType(type);
+        constantExt.setValue(DERNull.INSTANCE.getEncoded());
+
         return profile;
     }
 
@@ -241,7 +375,7 @@ public class ProfileConfCreatorDemo
     {
         ProfileType profile = new ProfileType();
         profile.setDescription("CertProfile OCSP");
-        profile.setRaOnly(false);
+        profile.setOnlyForRA(false);
         profile.setCa(false);
         profile.setValidity(730);
 
@@ -263,7 +397,7 @@ public class ProfileConfCreatorDemo
         profile.setAllowedClientExtensions(null);
 
         // Extensions
-        // Extensions - generell
+        // Extensions - general
         ExtensionsType extensions = new ExtensionsType();
         profile.setExtensions(extensions);
 
@@ -296,7 +430,7 @@ public class ProfileConfCreatorDemo
     {
         ProfileType profile = new ProfileType();
         profile.setDescription("CertProfile TLS");
-        profile.setRaOnly(false);
+        profile.setOnlyForRA(false);
         profile.setCa(false);
         profile.setValidity(730);
 
@@ -318,7 +452,7 @@ public class ProfileConfCreatorDemo
         profile.setAllowedClientExtensions(null);
 
         // Extensions
-        // Extensions - generell
+        // Extensions - general
         ExtensionsType extensions = new ExtensionsType();
         profile.setExtensions(extensions);
 
@@ -334,6 +468,7 @@ public class ProfileConfCreatorDemo
         list.add(createExtension(Extension.keyUsage, true));
         list.add(createExtension(Extension.basicConstraints, true));
         list.add(createExtension(Extension.extendedKeyUsage, true));
+        list.add(createExtension(ObjectIdentifiers.id_extension_admission, true));
 
         // Extensions - keyUsage
         extensions.setKeyUsage(createKeyUsages(KeyUsageType.DIGITAL_SIGNATURE,
@@ -342,6 +477,11 @@ public class ProfileConfCreatorDemo
         // Extensions - extenedKeyUsage
         extensions.setExtendedKeyUsage(createExtendedKeyUsage(
                 ObjectIdentifiers.id_kp_clientAuth, ObjectIdentifiers.id_kp_serverAuth));
+        
+        // Admission - just DEMO, does not belong to TLS certificate
+        Admission admission = createAdmission(new ASN1ObjectIdentifier("1.1.1.2"), "demo item");
+        extensions.setAdmission(admission);
+
         return profile;
     }
 
@@ -350,7 +490,7 @@ public class ProfileConfCreatorDemo
     {
         ProfileType profile = new ProfileType();
         profile.setDescription("CertProfile TLS_C");
-        profile.setRaOnly(false);
+        profile.setOnlyForRA(false);
         profile.setCa(false);
         profile.setValidity(730);
 
@@ -372,7 +512,7 @@ public class ProfileConfCreatorDemo
         profile.setAllowedClientExtensions(null);
 
         // Extensions
-        // Extensions - generell
+        // Extensions - general
         ExtensionsType extensions = new ExtensionsType();
         profile.setExtensions(extensions);
 
@@ -405,7 +545,7 @@ public class ProfileConfCreatorDemo
         ProfileType profile = new ProfileType();
         profile.setDescription("CertProfile TLSwithIncSN");
         profile.setCa(false);
-        profile.setRaOnly(false);
+        profile.setOnlyForRA(false);
         profile.setValidity(730);
 
         // Subject
@@ -426,7 +566,7 @@ public class ProfileConfCreatorDemo
         profile.setAllowedClientExtensions(null);
 
         // Extensions
-        // Extensions - generell
+        // Extensions - general
         ExtensionsType extensions = new ExtensionsType();
         profile.setExtensions(extensions);
 
@@ -470,10 +610,19 @@ public class ProfileConfCreatorDemo
 
     private static ExtensionType createExtension(ASN1ObjectIdentifier type, boolean required)
     {
+        return createExtension(type, required, null);
+    }
+
+    private static ExtensionType createExtension(ASN1ObjectIdentifier type, boolean required, String description)
+    {
         ExtensionType ret = new ExtensionType();
         ret.setValue(type.getId());
         ret.setRequired(required);
-        String description = getDescription(type);
+        if(description == null)
+        {
+            description = getDescription(type);
+        }
+
         if(description != null)
         {
             ret.setDescription(description);
@@ -493,21 +642,42 @@ public class ProfileConfCreatorDemo
         return ret;
     }
 
+    private static Admission createAdmission(ASN1ObjectIdentifier oid, String item)
+    {
+    	Admission ret = new Admission();
+    	ret.getProfessionItem().add(item);
+    	ret.getProfessionOid().add(createOidType(oid.getId(), null));
+    	return ret;
+    }
+    
+    private static ExtensionsType.CertificateProfiles createCertificatePolicies(
+            ASN1ObjectIdentifier... policyOids)
+    {
+        if(policyOids == null || policyOids.length == 0)
+        {
+            return null;
+        }
+
+        ExtensionsType.CertificateProfiles ret = new ExtensionsType.CertificateProfiles();
+        List<CertificatePolicyInformationType> l = ret.getCertificatePolicyInformation();
+        for(ASN1ObjectIdentifier oid : policyOids)
+        {
+            CertificatePolicyInformationType single = new CertificatePolicyInformationType();
+            l.add(single);
+            single.setPolicyIdentifier(createOidType(oid.getId(), null));
+        }
+
+        return ret;
+    }
+
     private static ExtendedKeyUsage createExtendedKeyUsage(
             ASN1ObjectIdentifier... extKeyUsages)
     {
         ExtendedKeyUsage ret = new ExtendedKeyUsage();
         for(ASN1ObjectIdentifier usage : extKeyUsages)
         {
-            OidWithDescType t = new OidWithDescType();
-            ret.getUsage().add(t);
-
-            t.setValue(usage.getId());
             String description = getDescription(usage);
-            if(description != null)
-            {
-                t.setDescription(description);
-            }
+            ret.getUsage().add(createOidType(usage.getId(), description));
         }
         return ret;
     }
@@ -523,4 +693,70 @@ public class ProfileConfCreatorDemo
         return desc;
     }
 
+    private static PolicyIdMappingType createPolicyIdMapping(
+        ASN1ObjectIdentifier issuerPolicyId,
+        ASN1ObjectIdentifier subjectPolicyId)
+    {
+        PolicyIdMappingType ret = new PolicyIdMappingType();
+
+        String desc = getDescription(issuerPolicyId);
+        ret.setIssuerDomainPolicy(createOidType(issuerPolicyId.getId(), desc));
+
+        desc = getDescription(subjectPolicyId);
+        ret.setSubjectDomainPolicy(createOidType(subjectPolicyId.getId(), desc));
+
+        return ret;
+    }
+
+    private static PolicyConstraints createPolicyConstraints(Integer inhibitPolicyMapping,
+            Integer requireExplicitPolicy)
+    {
+        PolicyConstraints ret = new PolicyConstraints();
+        if(inhibitPolicyMapping != null)
+        {
+            ret.setInhibitPolicyMapping(inhibitPolicyMapping);
+        }
+
+        if(requireExplicitPolicy != null)
+        {
+            ret.setRequireExplicitPolicy(requireExplicitPolicy);
+        }
+        return ret;
+    }
+
+    private static NameConstraints createNameConstraints()
+    {
+        NameConstraints ret = new NameConstraints();
+        GeneralSubtreesType permitted = new GeneralSubtreesType();
+        GeneralSubtreeBaseType single = new GeneralSubtreeBaseType();
+        single.setDirectoryName("O=example organization, C=DE");
+        permitted.getBase().add(single);
+        ret.setPermittedSubtrees(permitted);
+
+        GeneralSubtreesType excluded = new GeneralSubtreesType();
+        single = new GeneralSubtreeBaseType();
+        single.setDirectoryName("OU=bad OU, O=example organization, C=DE");
+        excluded.getBase().add(single);
+        ret.setExcludedSubtrees(excluded);
+
+        return ret;
+    }
+
+    private static InhibitAnyPolicy createInhibitAnyPolicy(int skipCerts)
+    {
+        InhibitAnyPolicy ret = new InhibitAnyPolicy();
+        ret.setSkipCerts(skipCerts);
+        return ret;
+    }
+    
+    private static OidWithDescType createOidType(String oid, String description)
+    {
+    	OidWithDescType ret = new OidWithDescType();
+    	ret.setValue(oid);
+    	if(description != null)
+    	{
+    		ret.setDescription(description);
+    	}
+    	return ret;
+    }
 }

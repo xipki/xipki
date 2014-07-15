@@ -86,8 +86,7 @@ public class CertProfileEntry
         {
             underlyingCertProfile = new DfltCertProfile();
         }
-
-        if(type.toLowerCase().startsWith("java:"))
+        else if(type.toLowerCase().startsWith("java:"))
         {
             String className = type.substring("java:".length());
             try

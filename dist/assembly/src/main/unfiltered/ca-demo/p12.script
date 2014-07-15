@@ -13,9 +13,15 @@ ca:cmpcontrol-set --msgTimeBias 300 --sendCaCert yes
 
 ## Certificate Profiles
 ca:profile-add -name SubCA -type DEFAULT -confFile ca-demo/profile/CertProfile_SubCA.xml
+
+ca:profile-add -name SubCA.Complex -type DEFAULT -confFile ca-demo/profile/CertProfile_SubCA_Complex.xml
+
 ca:profile-add -name OCSP -type DEFAULT -confFile ca-demo/profile/CertProfile_OCSP.xml
+
 ca:profile-add -name TLS -type DEFAULT -confFile ca-demo/profile/CertProfile_TLS.xml
+
 ca:profile-add -name TLS_C -type DEFAULT -confFile ca-demo/profile/CertProfile_TLS_C.xml
+
 ca:profile-add -name TLSwithIncSN -type DEFAULT -confFile ca-demo/profile/CertProfile_TLSwithIncSN.xml
 
 ## Publishers
@@ -55,6 +61,8 @@ ca:profile-rm -name RCA
 ## Add Profiles
 ca:caprofile-add -ca RCA1 -profile SubCA
 
+ca:caprofile-add -ca RCA1 -profile SubCA.Complex
+
 ## Add publisher
 ca:capub-add -ca RCA1 -publisher OCSP.PUBLISHER
 
@@ -80,9 +88,9 @@ keytool:update-cert-p12 -p12 output/SubCA1.p12 -pwd 1234 -cert output/SubCA1.der
 
 ## Generate keys and PKCS#10 request for SubCAwithCRL1
 keytool:req-p12 -p12 output/SubCAwithCRL1.p12 -pwd 1234 -out output/SubCAwithCRL1.p10 \
-  -subject "CN=SubCAwithCRL1,O=xipki,C=DE"
+  -subject "CN=SubCAwithCRL1, O=xipki, C=DE, 2.5.29.17=Long Organization name, 1.3.6.1.5.5.7.1.11=1.2.3.4?accessLocation_1%"
 
-caclient:enroll -p10 output/SubCAwithCRL1.p10 -out output/SubCAwithCRL1.der -profile SubCA
+caclient:enroll -p10 output/SubCAwithCRL1.p10 -out output/SubCAwithCRL1.der -profile SubCA.Complex
 
 keytool:update-cert-p12 -p12 output/SubCAwithCRL1.p12 -pwd 1234 -cert output/SubCAwithCRL1.der \
   -cacert output/RCA1.der
@@ -121,6 +129,7 @@ ca:ca-add -name SubCAwithCRL1 \
   -permission all -nextSerial 1 -maxValidity 1460 -signerType PKCS12 \
   -signerConf password?1234%keystore?file:output/SubCAwithCRL1.p12%algo?$CA_SIGNER_ALGO \
   -crlUri http://example.org/crl \
+  -deltaCrlUri http://example.org/deltacrl \
   -crlSigner CASIGN.CRLSIGNER
 
 ca:caalias-add -ca SubCAwithCRL1 -alias SubCAwithCRL

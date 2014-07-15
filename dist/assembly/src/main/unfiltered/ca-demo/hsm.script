@@ -13,9 +13,15 @@ ca:cmpcontrol-set --msgTimeBias 300 --sendCaCert yes
 
 ## Certificate Profiles
 ca:profile-add -name SubCA -type DEFAULT -confFile ca-demo/profile/CertProfile_SubCA.xml
+
+ca:profile-add -name SubCA.Complex -type DEFAULT -confFile ca-demo/profile/CertProfile_SubCA_Complex.xml
+
 ca:profile-add -name OCSP -type DEFAULT -confFile ca-demo/profile/CertProfile_OCSP.xml
+
 ca:profile-add -name TLS -type DEFAULT -confFile ca-demo/profile/CertProfile_TLS.xml
+
 ca:profile-add -name TLS_C -type DEFAULT -confFile ca-demo/profile/CertProfile_TLS_C.xml
+
 ca:profile-add -name TLSwithIncSN -type DEFAULT -confFile ca-demo/profile/CertProfile_TLSwithIncSN.xml
 
 ## Publishers
@@ -55,6 +61,8 @@ ca:profile-rm -name RCA
 ## Add Profiles
 ca:caprofile-add -ca RCA1 -profile SubCA
 
+ca:caprofile-add -ca RCA1 -profile SubCA.Complex
+
 ## Add publisher
 ca:capub-add -ca RCA1 -publisher OCSP.PUBLISHER
 
@@ -82,7 +90,7 @@ keytool:update-cert -slot 1 -key-label $SubCA_KEY_LABEL -cert output/SubCA1.der 
 keytool:req -slot 1 -key-label SubCAwithCRL1 -out output/SubCAwithCRL1.p10 \
   -subject "CN=SubCAwithCRL1,O=xipki,C=DE"
 
-caclient:enroll -p10 output/SubCAwithCRL1.p10 -out output/SubCAwithCRL1.der -profile SubCA
+caclient:enroll -p10 output/SubCAwithCRL1.p10 -out output/SubCAwithCRL1.der -profile SubCA.Complex
 
 keytool:update-cert -slot 1 -key-label $SubCAwithCRL_KEY_LABEL -cert output/SubCAwithCRL1.der \
   -cacert output/RCA1.der
@@ -121,6 +129,7 @@ ca:ca-add -name SubCAwithCRL1 \
   -permission all -nextSerial 1 -maxValidity 1460 -signerType PKCS11 \
   -signerConf algo?$CA_SIGNER_ALGO%slot?1%key-label?$SubCAwithCRL_KEY_LABEL \
   -crlUri http://example.org/crl \
+  -deltaCrlUri http://example.org/deltacrl \
   -crlSigner CASIGN.CRLSIGNER
 
 ca:caalias-add -ca SubCAwithCRL1 -alias SubCAwithCRL

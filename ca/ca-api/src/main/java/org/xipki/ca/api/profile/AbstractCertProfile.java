@@ -28,7 +28,6 @@ import java.util.Set;
 import java.util.StringTokenizer;
 
 import org.bouncycastle.asn1.ASN1Encodable;
-import org.bouncycastle.asn1.ASN1Object;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.DERPrintableString;
 import org.bouncycastle.asn1.DERUTF8String;
@@ -294,7 +293,7 @@ extends CertProfile implements SubjectDNSubset
         }
     }
 
-    protected static ExtensionTuple createExtension(ASN1ObjectIdentifier type, boolean critical, ASN1Object value)
+    protected static ExtensionTuple createExtension(ASN1ObjectIdentifier type, boolean critical, ASN1Encodable value)
     throws CertProfileException
     {
         return (value == null) ? null : new ExtensionTuple(type, critical, value);

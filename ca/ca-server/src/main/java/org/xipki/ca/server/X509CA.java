@@ -85,7 +85,6 @@ import org.xipki.ca.api.OperationException;
 import org.xipki.ca.api.OperationException.ErrorCode;
 import org.xipki.ca.api.profile.BadCertTemplateException;
 import org.xipki.ca.api.profile.BadFormatException;
-import org.xipki.ca.api.profile.CertProfile;
 import org.xipki.ca.api.profile.CertProfileException;
 import org.xipki.ca.api.profile.ExtensionOccurrence;
 import org.xipki.ca.api.profile.ExtensionTuple;
@@ -1769,7 +1768,7 @@ public class X509CA
     }
 
     private String addExtensions(X509v3CertificateBuilder certBuilder,
-            CertProfile certProfile,
+            IdentifiedCertProfile certProfile,
             X500Name requestedSubject,
             SubjectPublicKeyInfo requestedPublicKeyInfo,
             org.bouncycastle.asn1.x509.Extensions requestedExtensions,
@@ -1819,7 +1818,7 @@ public class X509CA
 
     private void addSubjectKeyIdentifier(
             X509v3CertificateBuilder certBuilder, SubjectPublicKeyInfo publicKeyInfo,
-            CertProfile profile)
+            IdentifiedCertProfile profile)
     throws IOException
     {
         ExtensionOccurrence extOccurrence = profile.getOccurenceOfSubjectKeyIdentifier();
@@ -1835,7 +1834,7 @@ public class X509CA
         certBuilder.addExtension(Extension.subjectKeyIdentifier, extOccurrence.isCritical(), value);
     }
 
-    private void addAuthorityKeyIdentifier(X509v3CertificateBuilder certBuilder, CertProfile profile)
+    private void addAuthorityKeyIdentifier(X509v3CertificateBuilder certBuilder, IdentifiedCertProfile profile)
     throws IOException
     {
         ExtensionOccurrence extOccurrence = profile.getOccurenceOfAuthorityKeyIdentifier();
@@ -1859,7 +1858,7 @@ public class X509CA
         certBuilder.addExtension(Extension.authorityKeyIdentifier, extOccurrence.isCritical(), value);
     }
 
-    private void addIssuerAltName(X509v3CertificateBuilder certBuilder, CertProfile profile)
+    private void addIssuerAltName(X509v3CertificateBuilder certBuilder, IdentifiedCertProfile profile)
     throws IOException, CertProfileException
     {
         ExtensionOccurrence extOccurrence = profile.getOccurenceOfIssuerAltName();
@@ -1881,7 +1880,7 @@ public class X509CA
         }
     }
 
-    private void addAuthorityInformationAccess(X509v3CertificateBuilder certBuilder, CertProfile profile)
+    private void addAuthorityInformationAccess(X509v3CertificateBuilder certBuilder, IdentifiedCertProfile profile)
     throws IOException, CertProfileException
     {
         ExtensionOccurrence extOccurrence = profile.getOccurenceOfAuthorityInfoAccess();
@@ -1905,7 +1904,7 @@ public class X509CA
         }
     }
 
-    private void addCRLDistributionPoints(X509v3CertificateBuilder certBuilder, CertProfile profile)
+    private void addCRLDistributionPoints(X509v3CertificateBuilder certBuilder, IdentifiedCertProfile profile)
     throws IOException, CertProfileException
     {
         ExtensionOccurrence extOccurrence = profile.getOccurenceOfCRLDistributinPoints();
@@ -1942,7 +1941,7 @@ public class X509CA
         }
     }
 
-    private void addDeltaCRLDistributionPoints(X509v3CertificateBuilder certBuilder, CertProfile profile)
+    private void addDeltaCRLDistributionPoints(X509v3CertificateBuilder certBuilder, IdentifiedCertProfile profile)
     throws IOException, CertProfileException
     {
         ExtensionOccurrence extOccurrence = profile.getOccurenceOfFreshestCRL();
@@ -2099,7 +2098,7 @@ public class X509CA
         return result;
     }
 
-    private static Object[] incSerialNumber(CertProfile profile, X500Name origName, String latestSN)
+    private static Object[] incSerialNumber(IdentifiedCertProfile profile, X500Name origName, String latestSN)
     throws BadFormatException
     {
         RDN[] rdns = origName.getRDNs();

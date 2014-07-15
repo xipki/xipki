@@ -184,7 +184,27 @@
 									<version>${project.version}</version>
 									<type>jar</type>
 									<includes>xsd/**</includes>
-									<outputDirectory>target/ocsp-config</outputDirectory>
+									<outputDirectory>target</outputDirectory>
+								</artifactItem>
+							</artifactItems>
+						</configuration>
+					</execution>
+					<execution>
+						<!-- Extract the CA-Server XSD -->
+						<id>unpack-caserver-xsd</id>
+						<phase>generate-resources</phase>
+						<goals>
+							<goal>unpack</goal>
+						</goals>
+						<configuration>
+							<artifactItems>
+								<artifactItem>
+									<groupId>org.xipki</groupId>
+									<artifactId>ca-server</artifactId>
+									<version>${project.version}</version>
+									<type>jar</type>
+									<includes>xsd/**</includes>
+									<outputDirectory>target</outputDirectory>
 								</artifactItem>
 							</artifactItems>
 						</configuration>

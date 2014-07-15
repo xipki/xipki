@@ -18,6 +18,8 @@
 package org.xipki.ca.server.certprofile;
 
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.math.BigInteger;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -34,18 +36,35 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.validation.SchemaFactory;
 
+import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1EncodableVector;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
+import org.bouncycastle.asn1.ASN1Sequence;
+import org.bouncycastle.asn1.ASN1StreamParser;
+import org.bouncycastle.asn1.DERInteger;
 import org.bouncycastle.asn1.DERNull;
 import org.bouncycastle.asn1.DERSequence;
+import org.bouncycastle.asn1.DERTaggedObject;
+import org.bouncycastle.asn1.DERUTF8String;
 import org.bouncycastle.asn1.isismtt.x509.AdmissionSyntax;
 import org.bouncycastle.asn1.isismtt.x509.Admissions;
 import org.bouncycastle.asn1.isismtt.x509.ProfessionInfo;
 import org.bouncycastle.asn1.x500.DirectoryString;
+import org.bouncycastle.asn1.x500.RDN;
 import org.bouncycastle.asn1.x500.X500Name;
+import org.bouncycastle.asn1.x500.style.IETFUtils;
+import org.bouncycastle.asn1.x509.AccessDescription;
+import org.bouncycastle.asn1.x509.CertPolicyId;
 import org.bouncycastle.asn1.x509.CertificatePolicies;
 import org.bouncycastle.asn1.x509.Extension;
 import org.bouncycastle.asn1.x509.Extensions;
+import org.bouncycastle.asn1.x509.GeneralName;
+import org.bouncycastle.asn1.x509.GeneralNames;
+import org.bouncycastle.asn1.x509.GeneralSubtree;
+import org.bouncycastle.asn1.x509.NameConstraints;
+import org.bouncycastle.asn1.x509.PolicyMappings;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xipki.ca.api.profile.AbstractCertProfile;
 import org.xipki.ca.api.profile.BadCertTemplateException;
 import org.xipki.ca.api.profile.CertProfileException;
@@ -56,6 +75,7 @@ import org.xipki.ca.api.profile.ExtensionTuple;
 import org.xipki.ca.api.profile.ExtensionTuples;
 import org.xipki.ca.api.profile.KeyUsage;
 import org.xipki.ca.api.profile.RDNOccurrence;
+import org.xipki.ca.api.profile.SubjectInfo;
 import org.xipki.ca.api.profile.X509Util;
 import org.xipki.ca.server.certprofile.jaxb.CertificatePolicyInformationType;
 import org.xipki.ca.server.certprofile.jaxb.CertificatePolicyInformationType.PolicyQualifiers;
@@ -66,13 +86,21 @@ import org.xipki.ca.server.certprofile.jaxb.ExtensionsType.Admission;
 import org.xipki.ca.server.certprofile.jaxb.ExtensionsType.CertificateProfiles;
 import org.xipki.ca.server.certprofile.jaxb.ExtensionsType.ConstantExtensions;
 import org.xipki.ca.server.certprofile.jaxb.ExtensionsType.ExtendedKeyUsage;
+import org.xipki.ca.server.certprofile.jaxb.ExtensionsType.PolicyConstraints;
+import org.xipki.ca.server.certprofile.jaxb.GeneralNameType;
+import org.xipki.ca.server.certprofile.jaxb.GeneralSubtreeBaseType;
+import org.xipki.ca.server.certprofile.jaxb.GeneralSubtreesType;
 import org.xipki.ca.server.certprofile.jaxb.KeyUsageType;
 import org.xipki.ca.server.certprofile.jaxb.ObjectFactory;
 import org.xipki.ca.server.certprofile.jaxb.OidWithDescType;
+import org.xipki.ca.server.certprofile.jaxb.PolicyIdMappingType;
 import org.xipki.ca.server.certprofile.jaxb.ProfileType;
 import org.xipki.ca.server.certprofile.jaxb.ProfileType.AllowedClientExtensions;
 import org.xipki.ca.server.certprofile.jaxb.ProfileType.Subject;
 import org.xipki.ca.server.certprofile.jaxb.RdnType;
+import org.xipki.security.common.CmpUtf8Pairs;
+import org.xipki.security.common.IoCertUtil;
+import org.xipki.security.common.LogUtil;
 import org.xipki.security.common.ObjectIdentifiers;
 import org.xml.sax.SAXException;
 
@@ -82,13 +110,14 @@ import org.xml.sax.SAXException;
 
 public class DfltCertProfile extends AbstractCertProfile
 {
+    private static final Logger LOG = LoggerFactory.getLogger(DfltCertProfile.class);
+
     private static final Set<String> criticalOnlyExtensionTypes;
     private static final Set<String> noncriticalOnlyExtensionTypes;
     private static final Set<String> caOnlyExtensionTypes;
 
-    private static final ASN1ObjectIdentifier id_extension_admission = new ASN1ObjectIdentifier("1.3.36.8.3.3");
-
-    private ProfileType conf;
+    private final static Object jaxbUnmarshallerLock = new Object();
+    private static Unmarshaller jaxbUnmarshaller;
 
     private List<RDNOccurrence> subjectDNSubject;
     private Map<ASN1ObjectIdentifier, ExtensionOccurrence> extensionOccurences;
@@ -103,16 +132,19 @@ public class DfltCertProfile extends AbstractCertProfile
     private Integer pathLen;
     private Set<KeyUsage> keyusages;
     private Set<ASN1ObjectIdentifier> extendedKeyusages;
-
     private Set<ASN1ObjectIdentifier> allowedClientExtensions;
+    private GeneralNameType subjectAltNameMode;
+    private GeneralNameType subjectInfoAccessMode;
+    
+    private ExtensionTuple certificatePolicies;
+    private ExtensionTuple policyMappings;
+    private ExtensionTuple nameConstraints;
+    private ExtensionTuple policyConstraints;
+    private ExtensionTuple inhibitAnyPolicy;
+    private ExtensionTuple ocspNoCheck;
+    private ExtensionTuple admission;
 
-    private List<ASN1ObjectIdentifier> professionOIDs;
-    private List<String> professionItems;
-
-    private Map<ASN1ObjectIdentifier, Extension> constantExtensions;
-
-    private final static Object jaxbUnmarshallerLock = new Object();
-    private static Unmarshaller jaxbUnmarshaller;
+    private Map<ASN1ObjectIdentifier, ExtensionTuple> constantExtensions;
 
     static
     {
@@ -143,210 +175,320 @@ public class DfltCertProfile extends AbstractCertProfile
     public void initialize(String data)
     throws CertProfileException
     {
-        this.conf = parse(data);
-        this.raOnly = getBoolean(conf.isRaOnly(), false);
-        this.validity = conf.getValidity();
-        this.ca = conf.isCa();
-
-        // Subject
-        Subject subject = conf.getSubject();
-        if(subject == null)
+        try
         {
-            this.backwardsSubject = false;
-            this.incSerialNrIfSubjectExists = false;
-            this.subjectDNSubject = null;
-        }
-        else
-        {
-            this.backwardsSubject = subject.isDnBackwards();
-            this.incSerialNrIfSubjectExists = subject.isIncSerialNrIfSubjectExists();
+            ProfileType conf = parse(data);
+            this.raOnly = getBoolean(conf.isOnlyForRA(), false);
+            this.validity = conf.getValidity();
+            this.ca = conf.isCa();
 
-            List<RDNOccurrence> subjectDNSubject = new LinkedList<RDNOccurrence>();
-            for(RdnType t : subject.getRdn())
+            // Subject
+            Subject subject = conf.getSubject();
+            if(subject == null)
             {
-                RDNOccurrence occ = new RDNOccurrence(new ASN1ObjectIdentifier(t.getValue()),
-                        getInt(t.getMinOccurs(), 1), getInt(t.getMaxOccurs(), 1));
-                subjectDNSubject.add(occ);
-            }
-
-            this.subjectDNSubject = subjectDNSubject;
-        }
-
-        // Allowed extensions to be fulfilled by the client
-        AllowedClientExtensions clientExtensions = conf.getAllowedClientExtensions();
-        if(clientExtensions == null)
-        {
-            this.allowedClientExtensions = null;
-        }
-        else
-        {
-            this.allowedClientExtensions = new HashSet<>();
-            for(String t : clientExtensions.getType())
-            {
-                this.allowedClientExtensions.add(new ASN1ObjectIdentifier(t));
-            }
-        }
-
-        // Extensions
-        ExtensionsType extensionsType = conf.getExtensions();
-
-        this.pathLen = extensionsType.getPathLen();
-        this.includeIssuerAndSerialInAKI = extensionsType.isIncludeIssuerAndSerialInAKI();
-
-        // Extension KeyUsage
-        org.xipki.ca.server.certprofile.jaxb.ExtensionsType.KeyUsage keyUsageTypes = extensionsType.getKeyUsage();
-        if(keyUsageTypes == null)
-        {
-            this.keyusages = null;
-        }
-        else
-        {
-            Set<KeyUsage> set = new HashSet<>();
-            for(KeyUsageType type : keyUsageTypes.getUsage())
-            {
-                switch(type)
-                {
-                case C_RL_SIGN:
-                    set.add(KeyUsage.cRLSign);
-                    break;
-                case DATA_ENCIPHERMENT:
-                    set.add(KeyUsage.dataEncipherment);
-                    break;
-                case CONTENT_COMMITMENT:
-                    set.add(KeyUsage.contentCommitment);
-                    break;
-                case DECIPHER_ONLY:
-                    set.add(KeyUsage.decipherOnly);
-                    break;
-                case ENCIPHER_ONLY:
-                    set.add(KeyUsage.encipherOnly);
-                    break;
-                case DIGITAL_SIGNATURE:
-                    set.add(KeyUsage.digitalSignature);
-                    break;
-                case KEY_AGREEMENT:
-                    set.add(KeyUsage.keyAgreement);
-                    break;
-                case KEY_CERT_SIGN:
-                    set.add(KeyUsage.keyCertSign);
-                    break;
-                case KEY_ENCIPHERMENT:
-                    set.add(KeyUsage.keyEncipherment);
-                    break;
-                }
-            }
-            this.keyusages = Collections.unmodifiableSet(set);
-        }
-
-        // ExtendedKeyUsage
-        ExtendedKeyUsage extKeyUsageType = extensionsType.getExtendedKeyUsage();
-        if(extKeyUsageType == null)
-        {
-            this.extendedKeyusages = null;
-        }
-        else
-        {
-            Set<ASN1ObjectIdentifier> set = new HashSet<>();
-            for(OidWithDescType type : extKeyUsageType.getUsage())
-            {
-                set.add(new ASN1ObjectIdentifier(type.getValue()));
-            }
-            this.extendedKeyusages = Collections.unmodifiableSet(set);
-        }
-
-        // admission
-        Admission admissionType = extensionsType.getAdmission();
-        List<String> l = admissionType == null ? null : admissionType.getProfessionItem();
-        if(l == null || l.isEmpty())
-        {
-            this.professionItems = null;
-        }
-        else
-        {
-            this.professionItems = Collections.unmodifiableList(new LinkedList<>(l));
-        }
-
-        l =  admissionType == null ? null : admissionType.getProfessionOid();
-        if(l == null || l.isEmpty())
-        {
-            this.professionOIDs = null;
-        }
-        else
-        {
-            List<ASN1ObjectIdentifier> oids = new LinkedList<>();
-            for(String entry : l)
-            {
-                oids.add(new ASN1ObjectIdentifier(entry));
-            }
-            this.professionOIDs = Collections.unmodifiableList(oids);
-        }
-
-        // constant extensions
-        ConstantExtensions ces = extensionsType.getConstantExtensions();
-        if(ces == null)
-        {
-            this.constantExtensions = null;
-        }
-        else
-        {
-            this.constantExtensions = new HashMap<>();
-            for(ConstantExtensionType ce :ces.getConstantExtension())
-            {
-                ASN1ObjectIdentifier type = new ASN1ObjectIdentifier(ce.getType());
-                this.constantExtensions.put(type, new Extension(type, false, ce.getValue()));
-            }
-        }
-
-        // Extension Occurrences
-        Map<ASN1ObjectIdentifier, ExtensionOccurrence> occurences = new HashMap<>();
-        for(ExtensionType extensionType : extensionsType.getExtension())
-        {
-            String oid = extensionType.getValue();
-            if(ca == false && caOnlyExtensionTypes.contains(oid))
-            {
-                continue;
-            }
-
-            boolean required = extensionType.isRequired();
-            Boolean b = extensionType.isCritical();
-
-            boolean critical;
-            if(criticalOnlyExtensionTypes.contains(oid))
-            {
-                critical = true;
-            }
-            else if(noncriticalOnlyExtensionTypes.contains(oid))
-            {
-                critical = false;
-            }
-            else if(ca && Extension.basicConstraints.getId().equals(oid))
-            {
-                critical = true;
+                this.backwardsSubject = false;
+                this.incSerialNrIfSubjectExists = false;
+                this.subjectDNSubject = null;
             }
             else
             {
-                critical = b == null ? false : b.booleanValue();
-                if(critical && extendedKeyusages != null &&
-                        extendedKeyusages.contains(ObjectIdentifiers.anyExtendedKeyUsage))
+                this.backwardsSubject = subject.isDnBackwards();
+                this.incSerialNrIfSubjectExists = subject.isIncSerialNrIfSubjectExists();
+
+                List<RDNOccurrence> subjectDNSubject = new LinkedList<RDNOccurrence>();
+                for(RdnType t : subject.getRdn())
                 {
-                    critical = false;
+                    RDNOccurrence occ = new RDNOccurrence(new ASN1ObjectIdentifier(t.getValue()),
+                            getInt(t.getMinOccurs(), 1), getInt(t.getMaxOccurs(), 1));
+                    subjectDNSubject.add(occ);
+                }
+
+                this.subjectDNSubject = subjectDNSubject;
+            }
+
+            // Allowed extensions to be fulfilled by the client
+            AllowedClientExtensions clientExtensions = conf.getAllowedClientExtensions();
+            if(clientExtensions == null)
+            {
+                this.allowedClientExtensions = null;
+            }
+            else
+            {
+                this.allowedClientExtensions = new HashSet<>();
+                for(OidWithDescType t : clientExtensions.getType())
+                {
+                    this.allowedClientExtensions.add(new ASN1ObjectIdentifier(t.getValue()));
                 }
             }
 
-            occurences.put(new ASN1ObjectIdentifier(oid),
-                    ExtensionOccurrence.getInstance(critical, required));
+            // Extensions
+            ExtensionsType extensionsType = conf.getExtensions();
+
+            this.pathLen = extensionsType.getPathLen();
+            this.includeIssuerAndSerialInAKI = extensionsType.isIncludeIssuerAndSerialInAKI();
+
+            // Extension KeyUsage
+            org.xipki.ca.server.certprofile.jaxb.ExtensionsType.KeyUsage keyUsageTypes = extensionsType.getKeyUsage();
+            if(keyUsageTypes == null)
+            {
+                this.keyusages = null;
+            }
+            else
+            {
+                Set<KeyUsage> set = new HashSet<>();
+                for(KeyUsageType type : keyUsageTypes.getUsage())
+                {
+                    switch(type)
+                    {
+                    case CRL_SIGN:
+                        set.add(KeyUsage.cRLSign);
+                        break;
+                    case DATA_ENCIPHERMENT:
+                        set.add(KeyUsage.dataEncipherment);
+                        break;
+                    case CONTENT_COMMITMENT:
+                        set.add(KeyUsage.contentCommitment);
+                        break;
+                    case DECIPHER_ONLY:
+                        set.add(KeyUsage.decipherOnly);
+                        break;
+                    case ENCIPHER_ONLY:
+                        set.add(KeyUsage.encipherOnly);
+                        break;
+                    case DIGITAL_SIGNATURE:
+                        set.add(KeyUsage.digitalSignature);
+                        break;
+                    case KEY_AGREEMENT:
+                        set.add(KeyUsage.keyAgreement);
+                        break;
+                    case KEYCERT_SIGN:
+                        set.add(KeyUsage.keyCertSign);
+                        break;
+                    case KEY_ENCIPHERMENT:
+                        set.add(KeyUsage.keyEncipherment);
+                        break;
+                    }
+                }
+                this.keyusages = Collections.unmodifiableSet(set);
+            }
+
+            // ExtendedKeyUsage
+            ExtendedKeyUsage extKeyUsageType = extensionsType.getExtendedKeyUsage();
+            if(extKeyUsageType == null)
+            {
+                this.extendedKeyusages = null;
+            }
+            else
+            {
+                Set<ASN1ObjectIdentifier> set = new HashSet<>();
+                for(OidWithDescType type : extKeyUsageType.getUsage())
+                {
+                    set.add(new ASN1ObjectIdentifier(type.getValue()));
+                }
+                this.extendedKeyusages = Collections.unmodifiableSet(set);
+            }
+
+            // Extension Occurrences
+            Map<ASN1ObjectIdentifier, ExtensionOccurrence> occurrences = new HashMap<>();
+            for(ExtensionType extensionType : extensionsType.getExtension())
+            {
+                String oid = extensionType.getValue();
+                if(ca == false && caOnlyExtensionTypes.contains(oid))
+                {
+                    LOG.warn("ignore CA-only extension {}", oid);
+                    continue;
+                }
+
+                boolean required = extensionType.isRequired();
+                Boolean b = extensionType.isCritical();
+
+                boolean critical;
+                if(criticalOnlyExtensionTypes.contains(oid))
+                {
+                    critical = true;
+                }
+                else if(noncriticalOnlyExtensionTypes.contains(oid))
+                {
+                    critical = false;
+                }
+                else if(ca && Extension.basicConstraints.getId().equals(oid))
+                {
+                    critical = true;
+                }
+                else
+                {
+                    critical = b == null ? false : b.booleanValue();
+                    if(critical && extendedKeyusages != null &&
+                            extendedKeyusages.contains(ObjectIdentifiers.anyExtendedKeyUsage))
+                    {
+                        critical = false;
+                    }
+                }
+
+                if(b != null && b.booleanValue() != critical)
+                {
+                    LOG.warn("corrected the critical of extenion {} from {} to {}", new Object[]{oid, b, critical});
+                }
+
+                occurrences.put(new ASN1ObjectIdentifier(oid),
+                        ExtensionOccurrence.getInstance(critical, required));
+            }
+
+            this.extensionOccurences = Collections.unmodifiableMap(occurrences);
+
+            occurrences = new HashMap<>(occurrences);
+            occurrences.remove(Extension.authorityKeyIdentifier);
+            occurrences.remove(Extension.subjectKeyIdentifier);
+            occurrences.remove(Extension.authorityInfoAccess);
+            occurrences.remove(Extension.cRLDistributionPoints);
+            occurrences.remove(Extension.freshestCRL);
+            occurrences.remove(Extension.issuerAlternativeName);
+            this.additionalExtensionOccurences = Collections.unmodifiableMap(occurrences);
+
+            // Certificate Policies
+            ASN1ObjectIdentifier extensionOid = Extension.certificatePolicies;
+            ExtensionOccurrence occurrence = occurrences.get(extensionOid);
+            if(occurrence != null && extensionsType.getCertificateProfiles() != null)
+            {
+                CertificateProfiles type = extensionsType.getCertificateProfiles();
+                List<CertificatePolicyInformation> policyInfos = buildCertificatePolicies(type);
+                CertificatePolicies value = X509Util.createCertificatePolicies(policyInfos);
+                this.certificatePolicies = createExtension(extensionOid,
+                        occurrence.isCritical(), value);
+            }
+
+            // Policy Mappings
+            extensionOid = Extension.policyMappings;
+            occurrence = occurrences.get(extensionOid);
+            if(occurrence != null && extensionsType.getPolicyMappings() != null)
+            {
+                org.bouncycastle.asn1.x509.PolicyMappings value = buildPolicyMappings(extensionsType.getPolicyMappings());
+                this.policyMappings = createExtension(extensionOid, occurrence.isCritical(), value);
+            }
+
+            // Name Constrains
+            extensionOid = Extension.nameConstraints;
+            occurrence = occurrences.get(extensionOid);
+            if(occurrence != null && extensionsType.getNameConstraints() != null)
+            {
+                NameConstraints value = buildNameConstrains(extensionsType.getNameConstraints());
+                this.nameConstraints = createExtension(extensionOid, occurrence.isCritical(), value);
+            }
+
+            // Policy Constraints
+            extensionOid = Extension.policyConstraints;
+            occurrence = occurrences.get(extensionOid);
+            if(occurrence != null && extensionsType.getPolicyConstraints() != null)
+            {
+                ASN1Sequence value = buildPolicyConstrains(extensionsType.getPolicyConstraints());
+                this.policyConstraints = createExtension(extensionOid, occurrence.isCritical(), value);
+            }
+
+            // Inhibit anyPolicy
+            extensionOid = Extension.inhibitAnyPolicy;
+            occurrence = occurrences.get(extensionOid);
+            if(occurrence != null && extensionsType.getInhibitAnyPolicy() != null)
+            {
+                int skipCerts = extensionsType.getInhibitAnyPolicy().getSkipCerts();
+                if(skipCerts < 0)
+                {
+                       throw new CertProfileException("negative inhibitAnyPolicy.skipCerts is not allowed: " + skipCerts);
+                }
+                DERInteger value = new DERInteger(skipCerts);
+                this.inhibitAnyPolicy = createExtension(extensionOid, occurrence.isCritical(), value);
+            }
+
+            // OCSP NoCheck
+            extensionOid = ObjectIdentifiers.id_extension_pkix_ocsp_nocheck;
+            occurrence = occurrences.get(extensionOid);
+            if(occurrence != null)
+            {
+                DERNull value = DERNull.INSTANCE;
+                this.ocspNoCheck = createExtension(extensionOid, occurrence.isCritical(), value);
+            }
+
+            // admission
+            extensionOid = ObjectIdentifiers.id_extension_admission;
+            occurrence = occurrences.get(extensionOid);
+            if(occurrence != null && extensionsType.getAdmission() != null)
+            {
+                List<ASN1ObjectIdentifier> professionOIDs;
+                List<String> professionItems;
+
+                Admission admissionType = extensionsType.getAdmission();
+                List<String> items = admissionType == null ? null : admissionType.getProfessionItem();
+                if(items == null || items.isEmpty())
+                {
+                    professionItems = null;
+                }
+                else
+                {
+                    professionItems = Collections.unmodifiableList(new LinkedList<>(items));
+                }
+
+                List<OidWithDescType> oidWithDescs =  admissionType == null ? null : admissionType.getProfessionOid();
+                if(oidWithDescs == null || oidWithDescs.isEmpty())
+                {
+                    professionOIDs = null;
+                }
+                else
+                {
+                    List<ASN1ObjectIdentifier> oids = new LinkedList<>();
+                    for(OidWithDescType entry : oidWithDescs)
+                    {
+                        oids.add(new ASN1ObjectIdentifier(entry.getValue()));
+                    }
+                    professionOIDs = Collections.unmodifiableList(oids);
+                }
+
+                this.admission = createAdmission(occurrence.isCritical(), professionOIDs, professionItems);
+            }
+
+            // SubjectAltNameMode
+            this.subjectAltNameMode = extensionsType.getSubjectAltName();
+            
+            // SubjectInfoAccess
+            this.subjectInfoAccessMode = extensionsType.getSubjectInfoAccess();
+
+            // constant extensions
+            ConstantExtensions ces = extensionsType.getConstantExtensions();
+            if(ces == null)
+            {
+                this.constantExtensions = null;
+            }
+            else
+            {
+                this.constantExtensions = new HashMap<>();
+                for(ConstantExtensionType ce :ces.getConstantExtension())
+                {
+                    ASN1ObjectIdentifier type = new ASN1ObjectIdentifier(ce.getType().getValue());
+                    occurrence = occurrences.get(type);
+                    if(occurrence != null)
+                    {
+                        ASN1StreamParser parser = new ASN1StreamParser(ce.getValue());
+                        ASN1Encodable value;
+                        try
+                        {
+                            value = parser.readObject();
+                        } catch (IOException e)
+                        {
+                            throw new CertProfileException("Could not parse the constant extension value", e);
+                        }
+                        ExtensionTuple tuple = createExtension(type, occurrence.isCritical(), value);
+                        this.constantExtensions.put(type, tuple);
+                    }
+                }
+
+                if(this.constantExtensions.isEmpty())
+                {
+                    this.constantExtensions = null;
+                }
+            }
+        }catch(RuntimeException e)
+        {
+            LogUtil.logErrorThrowable(LOG, "RuntimeException", e);
+            throw new CertProfileException("RuntimeException thrown while initializing certprofile: " + e.getMessage());
         }
-
-        this.extensionOccurences = Collections.unmodifiableMap(occurences);
-
-        occurences = new HashMap<>(occurences);
-        occurences.remove(Extension.authorityKeyIdentifier);
-        occurences.remove(Extension.subjectKeyIdentifier);
-        occurences.remove(Extension.authorityInfoAccess);
-        occurences.remove(Extension.cRLDistributionPoints);
-        occurences.remove(Extension.freshestCRL);
-        occurences.remove(Extension.issuerAlternativeName);
-        this.additionalExtensionOccurences = Collections.unmodifiableMap(occurences);
     }
 
     private static ProfileType parse(String xmlConf)
@@ -418,7 +560,7 @@ public class DfltCertProfile extends AbstractCertProfile
     @Override
     public ExtensionOccurrence getOccurenceOfFreshestCRL()
     {
-        return extensionOccurences.get(Extension.deltaCRLIndicator);
+        return extensionOccurences.get(Extension.freshestCRL);
     }
 
     @Override
@@ -432,6 +574,41 @@ public class DfltCertProfile extends AbstractCertProfile
     {
         return extensionOccurences.get(Extension.issuerAlternativeName);
     }
+    
+    @Override
+    public SubjectInfo getSubject(X500Name requestedSubject)
+    throws CertProfileException, BadCertTemplateException
+    {
+    	// remove the RDN with type subjectAltName and subjectInfoAccess
+    	ASN1ObjectIdentifier[] types = requestedSubject.getAttributeTypes();
+    	boolean reconstruct = false;
+    	for(ASN1ObjectIdentifier type : types)
+    	{
+    		if(type.equals(Extension.subjectAlternativeName) || type.equals(Extension.subjectInfoAccess))
+    		{
+    			reconstruct = true;
+    			break;
+    		}
+    	}
+    	
+    	if(reconstruct)
+    	{
+    		List<RDN> newRdns = new LinkedList<>();
+        	for(RDN rdn : requestedSubject.getRDNs())
+        	{
+        		ASN1ObjectIdentifier type = rdn.getFirst().getType();
+        		if(type.equals(Extension.subjectAlternativeName) || type.equals(Extension.subjectInfoAccess))
+        		{
+        			continue;
+        		}
+        		newRdns.add(rdn);
+        	}
+        	
+        	requestedSubject = new X500Name(newRdns.toArray(new RDN[0]));
+    	}
+    	
+    	return super.getSubject(requestedSubject);
+    }
 
     @Override
     public ExtensionTuples getExtensions(X500Name requestedSubject, Extensions requestedExtensions)
@@ -440,54 +617,136 @@ public class DfltCertProfile extends AbstractCertProfile
         ExtensionTuples tuples = super.getExtensions(requestedSubject, requestedExtensions);
 
         Map<ASN1ObjectIdentifier, ExtensionOccurrence> occurences = new HashMap<>(getAdditionalExtensionOccurences());
-        // remove the extensions processed by the parent class
-        occurences.remove(Extension.basicConstraints);
+
+        // AuthorityKeyIdentifier
+        // processed by the CA
+
+        // SubjectKeyIdentifier
+        // processed by the CA
+
+        // KeyUsage
+        // processed by the parent class
         occurences.remove(Extension.keyUsage);
-        occurences.remove(Extension.extendedKeyUsage);
 
         // CertificatePolicies
-        ASN1ObjectIdentifier extensionType = Extension.certificatePolicies;
+        processExtension(tuples, occurences, Extension.certificatePolicies, certificatePolicies, requestedExtensions);
+
+        // Policy Mappings
+        processExtension(tuples, occurences, Extension.policyMappings, policyMappings, requestedExtensions);
+
+        // SubjectAltName
+        ASN1ObjectIdentifier extensionType = Extension.subjectAlternativeName;
         ExtensionOccurrence occurence = occurences.remove(extensionType);
         if(occurence != null)
         {
-            List<CertificatePolicyInformation> policyInfos = getCertificatePolicies();
-            CertificatePolicies value = X509Util.createCertificatePolicies(policyInfos);
-            ExtensionTuple extension = createExtension(Extension.certificatePolicies,
-                    occurence.isCritical(), value);
-            if(extension == null)
+	        ExtensionTuple extension = null;
+        	if(subjectAltNameMode != null)
+        	{
+		        RDN[] rdns = requestedSubject.getRDNs(extensionType);
+		        if(rdns != null && rdns.length > 0)
+		        {
+		        	final int n = rdns.length;
+		        	GeneralName[] names = new GeneralName[n];
+		        	for(int i = 0; i < n; i++)
+		        	{
+		        		String value = IETFUtils.valueToString(rdns[i].getFirst().getValue());
+		        		names[i] = createGeneralName(value, subjectAltNameMode);
+		        	}
+		        	extension = createExtension(extensionType, occurence.isCritical(), new GeneralNames(names));
+		        }
+        	}
+	        
+	        if(extension == null)
             {
-                extension = retrieveExtensionTupleFromRequest(occurence.isCritical(), extensionType, requestedExtensions);
+                extension = retrieveExtensionTupleFromRequest(
+                        occurence.isCritical(), extensionType, requestedExtensions);
+            }
+            checkAndAddExtension(extensionType, occurence, extension, tuples);
+        }
+
+        // IssuerAltName
+        // processed by the CA
+
+        // Subject Directory Attributes
+        // Will not supported
+
+        // Basic Constraints
+        // processed by the parent class
+        occurences.remove(Extension.basicConstraints);
+
+        // Name Constraints
+        processExtension(tuples, occurences, Extension.nameConstraints, nameConstraints, requestedExtensions);
+
+        // PolicyConstrains
+        processExtension(tuples, occurences, Extension.policyConstraints, policyConstraints, requestedExtensions);
+
+        // ExtendedKeyUsage
+        // processed by the parent class
+        occurences.remove(Extension.extendedKeyUsage);
+
+        // CRL Distribution Points
+        // processed by the CA
+
+        // Inhibit anyPolicy
+        processExtension(tuples, occurences, Extension.inhibitAnyPolicy, inhibitAnyPolicy, requestedExtensions);
+
+        // Freshest CRL
+        // processed by the CA
+
+        // Authority Information Access
+        // processed by the CA
+
+        // Subject Information Access
+        extensionType = Extension.subjectInfoAccess;
+        occurence = occurences.remove(extensionType);
+        if(occurence != null)
+        {
+	        ExtensionTuple extension = null;
+        	if(subjectInfoAccessMode != null)
+        	{        		
+		        RDN[] rdns = requestedSubject.getRDNs(extensionType);
+		        if(rdns != null && rdns.length > 0)
+		        {
+		        	ASN1EncodableVector vector = new ASN1EncodableVector();
+		             
+		        	for(RDN rdn : rdns)
+		        	{
+		        		String value = IETFUtils.valueToString(rdn.getFirst().getValue());
+		        		try{
+			        		CmpUtf8Pairs pairs = new CmpUtf8Pairs(value);
+			        		String accessMethod = pairs.getNames().iterator().next();
+			        		String accessLocation = pairs.getValue(accessMethod);
+			        		
+			        		GeneralName location = createGeneralName(accessLocation, subjectInfoAccessMode);
+				        	AccessDescription accessDescription = new AccessDescription(
+				        			new ASN1ObjectIdentifier(accessMethod), location);
+				        	vector.add(accessDescription);
+		        		}catch(Exception e)
+		        		{
+		        			LOG.debug("Exception while processing subjectInfoAccess '{}': {}", value, e.getMessage());
+		        			throw new BadCertTemplateException("invalid subjectInfoAccess '" + value + "'");
+		        		}
+		        	}
+		        	
+		        	ASN1Sequence seq = new DERSequence(vector);		        	
+		        	extension = createExtension(extensionType, occurence.isCritical(), seq);
+		        }
+	        }
+        	
+	        if(extension == null)
+            {
+                extension = retrieveExtensionTupleFromRequest(
+                        occurence.isCritical(), extensionType, requestedExtensions);
             }
             checkAndAddExtension(extensionType, occurence, extension, tuples);
         }
 
         // Admission
-        extensionType = id_extension_admission;
-        occurence = occurences.remove(extensionType);
-        if(occurence != null)
-        {
-            ExtensionTuple extension = createAdmission(occurence.isCritical(),
-                    professionOIDs, professionItems);
-            if(extension == null)
-            {
-                extension = retrieveExtensionTupleFromRequest(occurence.isCritical(), extensionType, requestedExtensions);
-            }
-            checkAndAddExtension(extensionType, occurence, extension, tuples);
-        }
+        processExtension(tuples, occurences, ObjectIdentifiers.id_extension_admission, admission, requestedExtensions);
 
         // OCSP Nocheck
-        extensionType = ObjectIdentifiers.id_extension_pkix_ocsp_nocheck;
-        occurence = occurences.remove(extensionType);
-        if(occurence != null)
-        {
-            ExtensionTuple extension = createExtension(ObjectIdentifiers.id_extension_pkix_ocsp_nocheck,
-                    occurence.isCritical(), DERNull.INSTANCE);
-            if(extension == null)
-            {
-                extension = retrieveExtensionTupleFromRequest(occurence.isCritical(), extensionType, requestedExtensions);
-            }
-            checkAndAddExtension(extensionType, occurence, extension, tuples);
-        }
+        processExtension(tuples, occurences, ObjectIdentifiers.id_extension_pkix_ocsp_nocheck,
+                ocspNoCheck, requestedExtensions);
 
         // constant extensions
         if(constantExtensions != null)
@@ -495,12 +754,9 @@ public class DfltCertProfile extends AbstractCertProfile
             for(ASN1ObjectIdentifier type : constantExtensions.keySet())
             {
                 occurence = occurences.remove(type);
-
                 if(occurence != null)
                 {
-                    ExtensionTuple extensionTuple = new ExtensionTuple(
-                            occurence.isCritical(),
-                            constantExtensions.get(type));
+                    ExtensionTuple extensionTuple = constantExtensions.get(type);
                     tuples.addExtension(extensionTuple);
                 }
             }
@@ -587,15 +843,9 @@ public class DfltCertProfile extends AbstractCertProfile
         return includeIssuerAndSerialInAKI;
     }
 
-    private List<CertificatePolicyInformation> getCertificatePolicies()
+    private static List<CertificatePolicyInformation> buildCertificatePolicies(CertificateProfiles type)
     {
-        CertificateProfiles xmlCertPolicies = conf.getExtensions().getCertificateProfiles();
-        if(xmlCertPolicies == null)
-        {
-            return null;
-        }
-
-        List<CertificatePolicyInformationType> policyPairs = xmlCertPolicies.getCertificatePolicyInformation();
+        List<CertificatePolicyInformationType> policyPairs = type.getCertificatePolicyInformation();
         if(policyPairs == null || policyPairs.isEmpty())
         {
             return null;
@@ -630,12 +880,150 @@ public class DfltCertProfile extends AbstractCertProfile
             }
 
             CertificatePolicyInformation cpi = new CertificatePolicyInformation(
-                    policyPair.getPolicyIdentifier(), qualifiers);
+                    policyPair.getPolicyIdentifier().getValue(), qualifiers);
 
             policies.add(cpi);
         }
 
         return policies;
+    }
+
+    private static PolicyMappings buildPolicyMappings(
+            org.xipki.ca.server.certprofile.jaxb.ExtensionsType.PolicyMappings type)
+    {
+        List<PolicyIdMappingType> mappings = type.getMapping();
+        final int n = mappings.size();
+
+        CertPolicyId[] issuerDomainPolicy = new CertPolicyId[n];
+        CertPolicyId[] subjectDomainPolicy = new CertPolicyId[n];
+
+        for(int i = 0; i < n; i++)
+        {
+            PolicyIdMappingType mapping = mappings.get(i);
+            ASN1ObjectIdentifier oid = new ASN1ObjectIdentifier(mapping.getIssuerDomainPolicy().getValue());
+            issuerDomainPolicy[i] = CertPolicyId.getInstance(oid);
+
+            oid = new ASN1ObjectIdentifier(mapping.getSubjectDomainPolicy().getValue());
+            subjectDomainPolicy[i] = CertPolicyId.getInstance(oid);
+        }
+
+        return new PolicyMappings(issuerDomainPolicy, subjectDomainPolicy);
+    }
+
+    private static NameConstraints buildNameConstrains(
+            org.xipki.ca.server.certprofile.jaxb.ExtensionsType.NameConstraints type)
+    throws CertProfileException
+    {
+        GeneralSubtree[] permitted = buildGeneralSubtrees(type.getPermittedSubtrees());
+        GeneralSubtree[] excluded = buildGeneralSubtrees(type.getExcludedSubtrees());
+        if(permitted == null && excluded == null)
+        {
+            return null;
+        }
+        return new NameConstraints(permitted, excluded);
+    }
+
+    private static GeneralSubtree[] buildGeneralSubtrees(GeneralSubtreesType subtrees)
+    throws CertProfileException
+    {
+        if(subtrees == null || subtrees.getBase().isEmpty())
+        {
+            return null;
+        }
+
+        List<GeneralSubtreeBaseType> list = subtrees.getBase();
+        final int n = list.size();
+        GeneralSubtree[] ret = new GeneralSubtree[n];
+        for(int i = 0; i < n; i++)
+        {
+            ret[i] = buildGeneralSubtree(list.get(i));
+        }
+
+        return ret;
+    }
+
+    private static GeneralSubtree buildGeneralSubtree(GeneralSubtreeBaseType type)
+    throws CertProfileException
+    {
+        GeneralName base = null;
+        if(type.getDirectoryName() != null)
+        {
+            base = new GeneralName(IoCertUtil.backwardSortX509Name(
+                    new X500Name(type.getDirectoryName())));
+        }
+        else if(type.getDNSName() != null)
+        {
+            base = new GeneralName(GeneralName.dNSName, type.getDNSName());
+        }
+        else if(type.getIpAddress() != null)
+        {
+            base = new GeneralName(GeneralName.iPAddress, type.getIpAddress());
+        }
+        else if(type.getRfc822Name() != null)
+        {
+            base = new GeneralName(GeneralName.rfc822Name, type.getRfc822Name());
+        }
+        else if(type.getUri() != null)
+        {
+            base = new GeneralName(GeneralName.uniformResourceIdentifier, type.getUri());
+        }
+        else
+        {
+            throw new RuntimeException("should not reach here");
+        }
+
+        Integer i = type.getMinimum();
+        if(i != null && i < 0)
+        {
+            throw new CertProfileException("negative minimum is not allowed: " + i);
+        }
+
+        BigInteger minimum = (i == null) ? null : BigInteger.valueOf(i.intValue());
+
+        i = type.getMaximum();
+        if(i != null && i < 0)
+        {
+            throw new CertProfileException("negative maximum is not allowed: " + i);
+        }
+
+        BigInteger maximum = (i == null) ? null : BigInteger.valueOf(i.intValue());
+
+        return new GeneralSubtree(base, minimum, maximum);
+    }
+
+    private static ASN1Sequence buildPolicyConstrains(PolicyConstraints type)
+    throws CertProfileException
+    {
+        Integer requireExplicitPolicy = type.getRequireExplicitPolicy();
+        if(requireExplicitPolicy != null && requireExplicitPolicy < 0)
+        {
+            throw new CertProfileException("negative requireExplicitPolicy is not allowed: " + requireExplicitPolicy);
+        }
+
+        Integer inhibitPolicyMapping = type.getInhibitPolicyMapping();
+        if(inhibitPolicyMapping != null && inhibitPolicyMapping < 0)
+        {
+            throw new CertProfileException("negative inhibitPolicyMapping is not allowed: " + inhibitPolicyMapping);
+        }
+
+        if(requireExplicitPolicy == null && inhibitPolicyMapping == null)
+        {
+            return null;
+        }
+
+        final boolean explicit = false;
+        ASN1EncodableVector vec = new ASN1EncodableVector();
+        if (requireExplicitPolicy != null)
+        {
+            vec.add(new DERTaggedObject(explicit, 0, new DERInteger(requireExplicitPolicy)));
+        }
+
+        if (inhibitPolicyMapping != null)
+        {
+            vec.add(new DERTaggedObject(explicit, 1, new DERInteger(inhibitPolicyMapping)));
+        }
+
+        return new DERSequence(vec);
     }
 
     @Override
@@ -694,7 +1082,73 @@ public class DfltCertProfile extends AbstractCertProfile
         vector.add(admissions);
 
         AdmissionSyntax value = new AdmissionSyntax(null, new DERSequence(vector));
-        return createExtension(id_extension_admission, critical, value);
+        return createExtension(ObjectIdentifiers.id_extension_admission, critical, value);
     }
 
+    private void processExtension(ExtensionTuples tuples,
+            Map<ASN1ObjectIdentifier, ExtensionOccurrence> occurences,
+            ASN1ObjectIdentifier extensionType,
+            ExtensionTuple preferredExtension,
+            Extensions requestedExtensions)
+    throws CertProfileException
+    {
+        ExtensionOccurrence occurence = occurences.remove(extensionType);
+        if(occurence != null)
+        {
+            ExtensionTuple extension = preferredExtension;
+            if(extension == null)
+            {
+                extension = retrieveExtensionTupleFromRequest(
+                        occurence.isCritical(), extensionType, requestedExtensions);
+            }
+            checkAndAddExtension(extensionType, occurence, extension, tuples);
+        }
+    }
+
+    private static GeneralName createGeneralName(String value, GeneralNameType mode)
+    {
+    	GeneralName ret;
+    	if(mode.getDirectoryName() != null)
+    	{
+    		X500Name name = IoCertUtil.backwardSortX509Name(new X500Name(value));
+    		ret = new GeneralName(name);
+    	}
+    	else if(mode.getDNSName() != null)
+    	{
+    		ret = new GeneralName(GeneralName.dNSName, value);
+    	}
+    	else if(mode.getIPAddress() != null)
+    	{
+    		ret = new GeneralName(GeneralName.iPAddress, value);
+    	}
+    	else if(mode.getOtherName() != null)
+    	{
+    		String type = mode.getOtherName().getType().getValue();
+    		
+            ASN1EncodableVector vector = new ASN1EncodableVector();
+            vector.add(new ASN1ObjectIdentifier(type));
+            DERTaggedObject taggedObject = new DERTaggedObject(true, 0, new DERUTF8String(value));
+            vector.add(taggedObject);
+            DERSequence otherName = new DERSequence(vector);
+            ret = new GeneralName(GeneralName.otherName, otherName);
+    	}
+    	else if(mode.getRegisteredID() != null)
+    	{
+    		ret = new GeneralName(GeneralName.registeredID, value);
+    	}
+    	else if(mode.getRfc822Name() != null)
+    	{
+    		ret = new GeneralName(GeneralName.rfc822Name, value);
+    	}
+    	else if(mode.getUniformResourceIdentifier() != null)
+    	{
+    		ret = new GeneralName(GeneralName.uniformResourceIdentifier, value);
+    	}
+    	else
+    	{
+    		throw new RuntimeException("should not reach here");
+    	}
+    	
+    	return ret;
+    }
 }
