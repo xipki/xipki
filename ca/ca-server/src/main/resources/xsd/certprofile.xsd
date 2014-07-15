@@ -51,13 +51,13 @@
 			<xs:element name="allowedClientExtensions" minOccurs="0">
 				<xs:complexType>
 					<xs:sequence>
-						<xs:element name="type" type="OidType" maxOccurs="unbounded"/>
+						<xs:element name="type" type="OidWithDescType" maxOccurs="unbounded"/>
 					</xs:sequence>
 				</xs:complexType>
 			</xs:element>
 			<xs:element name="extensions" type="ExtensionsType"/>
 		</xs:sequence>
-		<xs:attribute name="raOnly" type="xs:boolean" default="false" use="optional"/>
+		<xs:attribute name="onlyForRA" type="xs:boolean" default="false" use="optional"/>
 	</xs:complexType>
 	
 	<xs:complexType name="RdnType">
@@ -112,7 +112,7 @@
 				</xs:annotation>
 				<xs:complexType>
 					<xs:sequence>
-						<xs:element name="mappings" type="PolicyIdMappingsType" maxOccurs="unbounded"/>
+						<xs:element name="mapping" type="PolicyIdMappingType" maxOccurs="unbounded"/>
 					</xs:sequence>
 				</xs:complexType>
 			</xs:element>
@@ -166,23 +166,19 @@
 					</xs:sequence>
 				</xs:complexType>
 			</xs:element>
-			
-			<xs:element name="subjectInfoAccess" minOccurs="0">
-				<xs:complexType>
-					<xs:sequence>
-						<xs:element name="accessDescription" type="AccessDescriptionType" maxOccurs="unbounded"/>
-					</xs:sequence>
-				</xs:complexType>
-			</xs:element>
 
 			<xs:element name="admission" minOccurs="0">
 				<xs:complexType>
 					<xs:sequence>
-						<xs:element name="professionOid" type="OidType" maxOccurs="unbounded"/>
+						<xs:element name="professionOid" type="OidWithDescType" maxOccurs="unbounded"/>
 						<xs:element name="professionItem" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
 					</xs:sequence>
 				</xs:complexType>
 			</xs:element>
+
+			<xs:element name="subjectAltName" type="generalNameType" minOccurs="0" />
+			
+			<xs:element name="subjectInfoAccess" type="generalNameType" minOccurs="0"/>
 
 			<xs:element name="constantExtensions" minOccurs="0">
 				<xs:complexType>
@@ -194,8 +190,26 @@
 
 		</xs:sequence>
 	</xs:complexType>
+	
+	<xs:complexType name="generalNameType">
+		<xs:choice>
+			<xs:element name="rfc822Name" type="xs:string"/>
+			<xs:element name="dNSName" type="xs:string"/>
+			<xs:element name="directoryName" type="xs:string"/>
+			<xs:element name="uniformResourceIdentifier" type="xs:string"/>
+			<xs:element name="iPAddress" type="xs:string"/>
+			<xs:element name="registeredID" type="xs:string"/>
+			<xs:element name="otherName">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="type" type="OidWithDescType"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+		</xs:choice>
+	</xs:complexType>
 
-	<xs:complexType name="PolicyIdMappingsType">
+	<xs:complexType name="PolicyIdMappingType">
 		<xs:sequence>
 			<xs:element name="issuerDomainPolicy" type="OidWithDescType" />
 			<xs:element name="subjectDomainPolicy" type="OidWithDescType" />
@@ -206,8 +220,6 @@
 		<xs:sequence>
 			<xs:element name="base" type="GeneralSubtreeBaseType" maxOccurs="unbounded"/>
 		</xs:sequence>
-		<xs:attribute name="minimum" type="xs:int" use="optional"/>
-		<xs:attribute name="maximum" type="xs:int" use="optional"/>
 	</xs:complexType>
 			
 	<xs:complexType name="GeneralSubtreeBaseType">
@@ -218,19 +230,21 @@
 			<xs:element name="uri" type="xs:string"/>
 			<xs:element name="ipAddress" type="xs:string"/>						
 		</xs:choice>
+		<xs:attribute name="minimum" type="xs:int" use="optional"/>
+		<xs:attribute name="maximum" type="xs:int" use="optional"/>
 	</xs:complexType>
      
 	<xs:complexType name="ConstantExtensionType">
 		<xs:sequence>
-			<xs:element name="type" type="OidType"/>
+			<xs:element name="type" type="OidWithDescType"/>
 			<xs:element name="value" type="xs:base64Binary"/>
 		</xs:sequence>
 	</xs:complexType>
 	
 	<xs:complexType name="CertificatePolicyInformationType">
 		<xs:sequence>
-			<xs:element name="policyIdentifier" type="OidType"/>
-			<xs:element name="policyQualifiers">
+			<xs:element name="policyIdentifier" type="OidWithDescType"/>
+			<xs:element name="policyQualifiers" minOccurs="0">
 				<xs:complexType>
 					<xs:choice maxOccurs="unbounded">
 						<xs:element name="cpsUri" type="xs:string"/>
@@ -241,50 +255,6 @@
 		</xs:sequence>
 	</xs:complexType>
 	
-	<xs:complexType name="AccessDescriptionType">
-		<xs:sequence>
-			<xs:element name="accessMethod" type="OidWithDescType"/>
-			<xs:element name="accessLocation" type="GeneralNameType"/>
-		</xs:sequence>
-	</xs:complexType>
-	
-	<xs:complexType name="GeneralNameType">
-		<xs:choice>
-			<xs:element name="otherName" type="OtherNameType"/>
-			<xs:element name="rfc822Name" type="xs:string"/>
-			<xs:element name="dNSName" type="xs:string"/>
-			<xs:element name="directoryName" type="xs:string"/>
-			<xs:element name="ediPartyName" type="EdiPartyNameType"/>
-			<xs:element name="uri" type="xs:string"/>
-			<xs:element name="ipAddress" type="xs:string"/>
-			<xs:element name="registeredID" type="OidWithDescType"/>				
-		</xs:choice>
-	</xs:complexType>
-	
-	<xs:complexType name="OtherNameType">
-		<xs:sequence>
-			<xs:element name="type" type="OidWithDescType"/>
-			<xs:element name="value" type="xs:base64Binary"/>
-		</xs:sequence>
-	</xs:complexType>
-
-	<xs:complexType name="EdiPartyNameType">
-		<xs:sequence>
-			<xs:element name="nameAssigner" type="DirectoryStringType" minOccurs="0"/>
-			<xs:element name="partyName" type="DirectoryStringType"/>
-		</xs:sequence>
-	</xs:complexType>
-	
-	<xs:complexType name="DirectoryStringType">
-		<xs:choice>
-			<xs:element name="teletexString" type="xs:string"/>
-			<xs:element name="printableString" type="xs:string"/>
-			<xs:element name="universalString" type="xs:string"/>
-			<xs:element name="utf8String" type="xs:string"/>
-			<xs:element name="bmpString" type="xs:string"/>
-		</xs:choice>
-	</xs:complexType>
-
 	<xs:complexType name="OidWithDescType">
 		<xs:simpleContent>
 			<xs:extension base="OidType">
@@ -301,15 +271,15 @@
 	
 	<xs:simpleType name="KeyUsageType">
 	    <xs:restriction base="xs:string">
-	      <xs:enumeration value="digitalSignature"/>
-	      <xs:enumeration value="contentCommitment"/>
-	      <xs:enumeration value="keyEncipherment"/>
-	      <xs:enumeration value="dataEncipherment"/>
-	      <xs:enumeration value="keyAgreement"/>
-	      <xs:enumeration value="keyCertSign"/>
-	      <xs:enumeration value="cRLSign"/>
-	      <xs:enumeration value="encipherOnly"/>
-	      <xs:enumeration value="decipherOnly"/>
+	      <xs:enumeration value="DIGITAL_SIGNATURE"/>
+	      <xs:enumeration value="CONTENT_COMMITMENT"/>
+	      <xs:enumeration value="KEY_ENCIPHERMENT"/>
+	      <xs:enumeration value="DATA_ENCIPHERMENT"/>
+	      <xs:enumeration value="KEY_AGREEMENT"/>
+	      <xs:enumeration value="KEYCERT_SIGN"/>
+	      <xs:enumeration value="CRL_SIGN"/>
+	      <xs:enumeration value="ENCIPHER_ONLY"/>
+	      <xs:enumeration value="DECIPHER_ONLY"/>
 	    </xs:restriction>
   	</xs:simpleType>
 </xs:schema>

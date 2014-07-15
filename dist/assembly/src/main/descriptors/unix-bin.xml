@@ -152,6 +152,16 @@
             <directoryMode>0755</directoryMode>
         </fileSet>
 
+        
+        <!-- Copy XSD schemas -->
+        <fileSet>
+            <directory>${project.build.directory}/xsd</directory>
+            <outputDirectory>/xsd</outputDirectory>
+            <lineEnding>unix</lineEnding>
+            <fileMode>0644</fileMode>
+            <directoryMode>0755</directoryMode>
+        </fileSet>
+        
         <!-- Expanded Karaf -->
         <fileSet>
             <directory>${project.build.directory}/dependencies/apache-karaf-${karaf.version}</directory>

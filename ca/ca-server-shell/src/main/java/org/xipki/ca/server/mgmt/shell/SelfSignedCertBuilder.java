@@ -57,7 +57,6 @@ import org.bouncycastle.util.encoders.Base64;
 import org.xipki.ca.api.OperationException;
 import org.xipki.ca.api.OperationException.ErrorCode;
 import org.xipki.ca.api.profile.BadCertTemplateException;
-import org.xipki.ca.api.profile.CertProfile;
 import org.xipki.ca.api.profile.CertProfileException;
 import org.xipki.ca.api.profile.ExtensionOccurrence;
 import org.xipki.ca.api.profile.ExtensionTuple;
@@ -313,7 +312,7 @@ class SelfSignedCertBuilder
 
     private static String addExtensions(
             X509v3CertificateBuilder certBuilder,
-            CertProfile profile,
+            IdentifiedCertProfile profile,
             X500Name requestedSubject,
             X500Name subject,
             SubjectPublicKeyInfo requestedPublicKeyInfo,

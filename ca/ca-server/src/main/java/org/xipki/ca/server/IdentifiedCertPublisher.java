@@ -34,7 +34,7 @@ import org.xipki.security.common.ParamChecker;
  * @author Lijun Liao
  */
 
-public class IdentifiedCertPublisher extends CertPublisher
+public class IdentifiedCertPublisher
 {
     private final String name;
     private final CertPublisher certPublisher;
@@ -48,7 +48,6 @@ public class IdentifiedCertPublisher extends CertPublisher
         this.certPublisher = certPublisher;
     }
 
-    @Override
     public void initialize(String conf, PasswordResolver passwordResolver,
             DataSourceWrapper dataSource)
     throws CertPublisherException
@@ -56,26 +55,22 @@ public class IdentifiedCertPublisher extends CertPublisher
         certPublisher.initialize(conf, passwordResolver, dataSource);
     }
 
-    @Override
     public void setEnvironmentParameterResolver(EnvironmentParameterResolver parameterResolver)
     {
         certPublisher.setEnvironmentParameterResolver(parameterResolver);
     }
 
-    @Override
     public boolean certificateAdded(CertificateInfo certInfo)
     {
         return certPublisher.certificateAdded(certInfo);
     }
 
-    @Override
     public boolean certificateRevoked(X509CertificateWithMetaInfo issuerCert,
             X509CertificateWithMetaInfo cert, CertRevocationInfo revInfo)
     {
         return certPublisher.certificateRevoked(issuerCert, cert, revInfo);
     }
 
-    @Override
     public boolean crlAdded(X509CertificateWithMetaInfo caCert, X509CRL crl)
     {
         return certPublisher.crlAdded(caCert, crl);
@@ -86,51 +81,43 @@ public class IdentifiedCertPublisher extends CertPublisher
         return name;
     }
 
-    @Override
     public boolean isHealthy()
     {
         return certPublisher.isHealthy();
     }
 
-    @Override
     public void setAuditLoggingService(AuditLoggingService auditLoggingService)
     {
         certPublisher.setAuditLoggingService(auditLoggingService);
     }
 
-    @Override
     public boolean caRevoked(X509CertificateWithMetaInfo caCert, CertRevocationInfo revocationInfo)
     {
         return certPublisher.caRevoked(caCert, revocationInfo);
     }
 
-    @Override
     public boolean caUnrevoked(X509CertificateWithMetaInfo caCert)
     {
         return certPublisher.caUnrevoked(caCert);
     }
 
-    @Override
     public boolean certificateUnrevoked(X509CertificateWithMetaInfo issuerCert,
             X509CertificateWithMetaInfo cert)
     {
         return certPublisher.certificateUnrevoked(issuerCert, cert);
     }
 
-    @Override
     public boolean certificateRemoved(X509CertificateWithMetaInfo issuerCert,
             X509CertificateWithMetaInfo cert)
     {
         return certPublisher.certificateRemoved(issuerCert, cert);
     }
 
-    @Override
     public boolean isAsyn()
     {
         return certPublisher.isAsyn();
     }
 
-    @Override
     public void shutdown()
     {
         certPublisher.shutdown();

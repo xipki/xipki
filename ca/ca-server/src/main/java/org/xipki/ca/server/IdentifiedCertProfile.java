@@ -36,7 +36,7 @@ import org.xipki.security.common.ParamChecker;
  * @author Lijun Liao
  */
 
-public class IdentifiedCertProfile extends CertProfile
+public class IdentifiedCertProfile
 {
     private final String name;
     private final CertProfile certProfile;
@@ -55,114 +55,96 @@ public class IdentifiedCertProfile extends CertProfile
         return name;
     }
 
-    @Override
     public void initialize(String data)
     throws CertProfileException
     {
         certProfile.initialize(data);
     }
 
-    @Override
     public void setEnvironmentParameterResolver(EnvironmentParameterResolver parameterResolver)
     {
         certProfile.setEnvironmentParameterResolver(parameterResolver);
     }
 
-    @Override
     public Date getNotBefore(Date notBefore)
     {
         return certProfile.getNotBefore(notBefore);
     }
 
-    @Override
     public Integer getValidity()
     {
         return certProfile.getValidity();
     }
 
-    @Override
     public SubjectInfo getSubject(X500Name requestedSubject)
     throws CertProfileException, BadCertTemplateException
     {
         return certProfile.getSubject(requestedSubject);
     }
 
-    @Override
     public ExtensionTuples getExtensions(X500Name requestedSubject, Extensions requestedExtensions)
     throws CertProfileException, BadCertTemplateException
     {
         return certProfile.getExtensions(requestedSubject, requestedExtensions);
     }
 
-    @Override
     public boolean isOnlyForRA()
     {
         return certProfile.isOnlyForRA();
     }
 
-    @Override
     public ExtensionOccurrence getOccurenceOfAuthorityKeyIdentifier()
     {
         return certProfile.getOccurenceOfAuthorityKeyIdentifier();
     }
 
-    @Override
     public ExtensionOccurrence getOccurenceOfSubjectKeyIdentifier()
     {
         return certProfile.getOccurenceOfSubjectKeyIdentifier();
     }
 
-    @Override
     public ExtensionOccurrence getOccurenceOfCRLDistributinPoints()
     {
         return certProfile.getOccurenceOfCRLDistributinPoints();
     }
 
-    @Override
     public ExtensionOccurrence getOccurenceOfAuthorityInfoAccess()
     {
         return certProfile.getOccurenceOfAuthorityInfoAccess();
     }
 
-    @Override
     public void checkPublicKey(SubjectPublicKeyInfo publicKey)
     throws BadCertTemplateException
     {
         certProfile.checkPublicKey(publicKey);
     }
 
-    @Override
     public boolean incSerialNumberIfSubjectExists()
     {
         return certProfile.incSerialNumberIfSubjectExists();
     }
 
-    @Override
     public void shutdown()
     {
         certProfile.shutdown();
     }
 
-    @Override
     public boolean includeIssuerAndSerialInAKI()
     {
         return certProfile.includeIssuerAndSerialInAKI();
     }
 
-    @Override
     public String incSerialNumber(String currentSerialNumber)
     throws BadFormatException
     {
         return certProfile.incSerialNumber(currentSerialNumber);
     }
 
-    @Override
     public ExtensionOccurrence getOccurenceOfFreshestCRL()
     {
         return certProfile.getOccurenceOfFreshestCRL();
     }
 
-    @Override
     public ExtensionOccurrence getOccurenceOfIssuerAltName()
     {
         return certProfile.getOccurenceOfIssuerAltName();

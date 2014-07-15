@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<profile xmlns="http://xipki.org/xmlprofile/v1" onlyForRA="false">
+  <description>CertProfile SubCA with most extensions</description>
+  <ca>true</ca>
+  <validity>1825</validity>
+  <subject>
+    <dnBackwards>false</dnBackwards>
+    <incSerialNrIfSubjectExists>false</incSerialNrIfSubjectExists>
+    <rdn minOccurs="1" maxOccurs="1" description="c">2.5.4.6</rdn>
+    <rdn minOccurs="1" maxOccurs="1" description="o">2.5.4.10</rdn>
+    <rdn minOccurs="0" maxOccurs="1" description="ou">2.5.4.11</rdn>
+    <rdn minOccurs="0" maxOccurs="1" description="serialNumber">2.5.4.5</rdn>
+    <rdn minOccurs="1" maxOccurs="1" description="cn">2.5.4.3</rdn>
+  </subject>
+  <extensions>
+    <extension required="true" description="subjectKeyIdentifier">2.5.29.14</extension>
+    <extension required="true" description="authorityKeyIdentifier">2.5.29.35</extension>
+    <extension required="false" description="authorityInfoAccess">1.3.6.1.5.5.7.1.1</extension>
+    <extension required="false" description="cRLDistributionPoints">2.5.29.31</extension>
+    <extension required="false" description="freshestCRL">2.5.29.46</extension>
+    <extension required="true" description="keyUsage">2.5.29.15</extension>
+    <extension required="true" description="basicConstraints">2.5.29.19</extension>
+    <extension required="true" description="subjectAlternativeName">2.5.29.17</extension>
+    <extension required="true" description="subjectInfoAccess">1.3.6.1.5.5.7.1.11</extension>
+    <extension required="true" description="policyMappings">2.5.29.33</extension>
+    <extension required="true" description="nameConstraints">2.5.29.30</extension>
+    <extension required="true" description="policyConstraints">2.5.29.36</extension>
+    <extension required="true" description="inhibitAnyPolicy">2.5.29.54</extension>
+    <extension required="true" description="custom extension 1">1.2.3.4</extension>
+    <pathLen>1</pathLen>
+    <includeIssuerAndSerialInAKI>false</includeIssuerAndSerialInAKI>
+    <keyUsage>
+      <usage>KEYCERT_SIGN</usage>
+      <usage>CRL_SIGN</usage>
+    </keyUsage>
+    <certificateProfiles>
+      <certificatePolicyInformation>
+        <policyIdentifier>1.2.3.4.5</policyIdentifier>
+      </certificatePolicyInformation>
+      <certificatePolicyInformation>
+        <policyIdentifier>2.4.3.2.1</policyIdentifier>
+      </certificatePolicyInformation>
+    </certificateProfiles>
+    <policyMappings>
+      <mapping>
+        <issuerDomainPolicy>1.1.1.1.1</issuerDomainPolicy>
+        <subjectDomainPolicy>2.1.1.1.1</subjectDomainPolicy>
+      </mapping>
+      <mapping>
+        <issuerDomainPolicy>1.1.1.1.2</issuerDomainPolicy>
+        <subjectDomainPolicy>2.1.1.1.2</subjectDomainPolicy>
+      </mapping>
+    </policyMappings>
+    <nameConstraints>
+      <permittedSubtrees>
+        <base>
+          <directoryName>O=example organization, C=DE</directoryName>
+        </base>
+      </permittedSubtrees>
+      <excludedSubtrees>
+        <base>
+          <directoryName>OU=bad OU, O=example organization, C=DE</directoryName>
+        </base>
+      </excludedSubtrees>
+    </nameConstraints>
+    <policyConstraints>
+      <requireExplicitPolicy>2</requireExplicitPolicy>
+      <inhibitPolicyMapping>2</inhibitPolicyMapping>
+    </policyConstraints>
+    <inhibitAnyPolicy>
+      <skipCerts>1</skipCerts>
+    </inhibitAnyPolicy>
+    <subjectAltName>
+      <otherName>
+        <type description="o">2.5.4.10</type>
+      </otherName>
+    </subjectAltName>
+    <subjectInfoAccess>
+      <iPAddress></iPAddress>
+    </subjectInfoAccess>
+    <constantExtensions>
+      <constantExtension>
+        <type description="custom extension 1">1.2.3.4</type>
+        <value>BQA=</value>
+      </constantExtension>
+    </constantExtensions>
+  </extensions>
+</profile>

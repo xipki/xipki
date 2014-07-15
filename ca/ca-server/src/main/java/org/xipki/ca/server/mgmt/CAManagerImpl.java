@@ -2575,8 +2575,6 @@ public class CAManagerImpl implements CAManager
         }
 
         dbEntry.setPasswordResolver(passwordResolver);
-
-        publishers.put(name, dbEntry);
     }
 
     @Override
