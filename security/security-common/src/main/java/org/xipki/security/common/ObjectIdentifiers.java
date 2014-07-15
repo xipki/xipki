@@ -280,6 +280,8 @@ public class ObjectIdentifiers
     public static final ASN1ObjectIdentifier id_kp_ocsp              = id_pkix.branch("1.48.1");
     public static final ASN1ObjectIdentifier id_extension_pkix_ocsp_nocheck = id_pkix.branch("48.1.5");
 
+    public static final ASN1ObjectIdentifier id_extension_admission = new ASN1ObjectIdentifier("1.3.36.8.3.3");
+
     private static final List<ASN1ObjectIdentifier> forwardDNs;
     private static final List<ASN1ObjectIdentifier> backwardDNs;
 
@@ -390,6 +392,10 @@ public class ObjectIdentifiers
             else if(id_extension_pkix_ocsp_nocheck.equals(type))
             {
                 name = "id-pkix-ocsp-nocheck";
+            }
+            else if(id_extension_admission.equals(type))
+            {
+                name = "admission";
             }
             else if(anyExtendedKeyUsage.equals(type))
             {

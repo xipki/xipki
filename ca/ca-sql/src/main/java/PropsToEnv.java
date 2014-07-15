@@ -31,6 +31,9 @@ public class PropsToEnv
     {
         try
         {
+            final String os = System.getProperty("os.name").toLowerCase();
+            boolean isWindows = os.indexOf("win") >= 0;
+
             String source = args[0];
             String target = args[1];
             BufferedWriter bw = new BufferedWriter(new FileWriter(target));
@@ -68,7 +71,19 @@ public class PropsToEnv
                 String key = (String) okey;
                 bw.write(key.replace('.', '_'));
                 bw.write("=");
+
+                if(isWindows == false)
+                {
+                    bw.write("\"");
+                }
+
                 bw.write(props.getProperty(key));
+
+                if(isWindows == false)
+                {
+                    bw.write("\"");
+                }
+
                 bw.write("\n");
             }
             bw.close();
