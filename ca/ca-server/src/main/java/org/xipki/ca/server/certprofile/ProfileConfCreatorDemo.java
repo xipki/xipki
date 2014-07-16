@@ -43,8 +43,8 @@ import org.xipki.ca.server.certprofile.jaxb.ExtensionsType.InhibitAnyPolicy;
 import org.xipki.ca.server.certprofile.jaxb.ExtensionsType.NameConstraints;
 import org.xipki.ca.server.certprofile.jaxb.ExtensionsType.PolicyConstraints;
 import org.xipki.ca.server.certprofile.jaxb.ExtensionsType.PolicyMappings;
-import org.xipki.ca.server.certprofile.jaxb.GeneralNameType.OtherName;
 import org.xipki.ca.server.certprofile.jaxb.GeneralNameType;
+import org.xipki.ca.server.certprofile.jaxb.GeneralNameType.OtherName;
 import org.xipki.ca.server.certprofile.jaxb.GeneralSubtreeBaseType;
 import org.xipki.ca.server.certprofile.jaxb.GeneralSubtreesType;
 import org.xipki.ca.server.certprofile.jaxb.KeyUsageType;
@@ -52,8 +52,11 @@ import org.xipki.ca.server.certprofile.jaxb.ObjectFactory;
 import org.xipki.ca.server.certprofile.jaxb.OidWithDescType;
 import org.xipki.ca.server.certprofile.jaxb.PolicyIdMappingType;
 import org.xipki.ca.server.certprofile.jaxb.ProfileType;
+import org.xipki.ca.server.certprofile.jaxb.RdnConstraintType;
 import org.xipki.ca.server.certprofile.jaxb.ProfileType.Subject;
 import org.xipki.ca.server.certprofile.jaxb.RdnType;
+import org.xipki.ca.server.certprofile.jaxb.SubjectInfoAccessType;
+import org.xipki.ca.server.certprofile.jaxb.SubjectInfoAccessType.Access;
 import org.xipki.security.common.ObjectIdentifiers;
 
 /**
@@ -62,6 +65,10 @@ import org.xipki.security.common.ObjectIdentifiers;
 
 public class ProfileConfCreatorDemo
 {
+    private static final String REGEX_FQDN =
+            "(?=^.{1,254}$)(^(?:(?!\\d+\\.|-)[a-zA-Z0-9_\\-]{1,63}(?<!-)\\.?)+(?:[a-zA-Z]{2,})$)";
+    private static final String REGEX_SN = "[\\d]{1,}";
+
     private static final Map<ASN1ObjectIdentifier, String> oidDescMap;
 
     static
@@ -107,11 +114,11 @@ public class ProfileConfCreatorDemo
             Marshaller m = JAXBContext.newInstance(ObjectFactory.class).createMarshaller();
             final SchemaFactory schemaFact = SchemaFactory.newInstance(
                     javax.xml.XMLConstants.W3C_XML_SCHEMA_NS_URI);
-            URL url = DfltCertProfile.class.getResource("/xsd/certprofile.xsd");
+            URL url = DefaultCertProfile.class.getResource("/xsd/certprofile.xsd");
             m.setSchema(schemaFact.newSchema(url));
             m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
             m.setProperty("com.sun.xml.internal.bind.indentString", "  ");
-            
+
             // RootCA
             ProfileType profile = CertProfile_RootCA();
             marshall(m, profile, "CertProfile_RootCA.xml");
@@ -178,11 +185,11 @@ public class ProfileConfCreatorDemo
         subject.setIncSerialNrIfSubjectExists(false);
 
         List<RdnType> occurrences = subject.getRdn();
-        occurrences.add(createRDN(ObjectIdentifiers.DN_C, 1, 1));
-        occurrences.add(createRDN(ObjectIdentifiers.DN_O, 1, 1));
-        occurrences.add(createRDN(ObjectIdentifiers.DN_OU, 0, 1));
-        occurrences.add(createRDN(ObjectIdentifiers.DN_SN, 0, 1));
-        occurrences.add(createRDN(ObjectIdentifiers.DN_CN, 1, 1));
+        occurrences.add(createRDN(ObjectIdentifiers.DN_C, 1, 1, "DE|FR"));
+        occurrences.add(createRDN(ObjectIdentifiers.DN_O, 1, 1, null));
+        occurrences.add(createRDN(ObjectIdentifiers.DN_OU, 0, 1, null));
+        occurrences.add(createRDN(ObjectIdentifiers.DN_SN, 0, 1, REGEX_SN));
+        occurrences.add(createRDN(ObjectIdentifiers.DN_CN, 1, 1, null));
 
         // AllowedClientExtensions
         profile.setAllowedClientExtensions(null);
@@ -225,11 +232,11 @@ public class ProfileConfCreatorDemo
         subject.setIncSerialNrIfSubjectExists(false);
 
         List<RdnType> occurrences = subject.getRdn();
-        occurrences.add(createRDN(ObjectIdentifiers.DN_C, 1, 1));
-        occurrences.add(createRDN(ObjectIdentifiers.DN_O, 1, 1));
-        occurrences.add(createRDN(ObjectIdentifiers.DN_OU, 0, 1));
-        occurrences.add(createRDN(ObjectIdentifiers.DN_SN, 0, 1));
-        occurrences.add(createRDN(ObjectIdentifiers.DN_CN, 1, 1));
+        occurrences.add(createRDN(ObjectIdentifiers.DN_C, 1, 1, "DE|FR"));
+        occurrences.add(createRDN(ObjectIdentifiers.DN_O, 1, 1, null));
+        occurrences.add(createRDN(ObjectIdentifiers.DN_OU, 0, 1, null));
+        occurrences.add(createRDN(ObjectIdentifiers.DN_SN, 0, 1, REGEX_SN));
+        occurrences.add(createRDN(ObjectIdentifiers.DN_CN, 1, 1, null));
 
         // AllowedClientExtensions
         profile.setAllowedClientExtensions(null);
@@ -274,11 +281,11 @@ public class ProfileConfCreatorDemo
         subject.setIncSerialNrIfSubjectExists(false);
 
         List<RdnType> occurrences = subject.getRdn();
-        occurrences.add(createRDN(ObjectIdentifiers.DN_C, 1, 1));
-        occurrences.add(createRDN(ObjectIdentifiers.DN_O, 1, 1));
-        occurrences.add(createRDN(ObjectIdentifiers.DN_OU, 0, 1));
-        occurrences.add(createRDN(ObjectIdentifiers.DN_SN, 0, 1));
-        occurrences.add(createRDN(ObjectIdentifiers.DN_CN, 1, 1));
+        occurrences.add(createRDN(ObjectIdentifiers.DN_C, 1, 1, "DE|FR"));
+        occurrences.add(createRDN(ObjectIdentifiers.DN_O, 1, 1, null));
+        occurrences.add(createRDN(ObjectIdentifiers.DN_OU, 0, 1, null));
+        occurrences.add(createRDN(ObjectIdentifiers.DN_SN, 0, 1, REGEX_SN));
+        occurrences.add(createRDN(ObjectIdentifiers.DN_CN, 1, 1, null));
 
         // AllowedClientExtensions
         profile.setAllowedClientExtensions(null);
@@ -300,7 +307,7 @@ public class ProfileConfCreatorDemo
         list.add(createExtension(Extension.freshestCRL, false));
         list.add(createExtension(Extension.keyUsage, true));
         list.add(createExtension(Extension.basicConstraints, true));
-        list.add(createExtension(Extension.subjectAlternativeName, true));        
+        list.add(createExtension(Extension.subjectAlternativeName, true));
         list.add(createExtension(Extension.subjectInfoAccess, true));
 
         list.add(createExtension(Extension.policyMappings, true));
@@ -308,7 +315,6 @@ public class ProfileConfCreatorDemo
         list.add(createExtension(Extension.policyConstraints, true));
         list.add(createExtension(Extension.inhibitAnyPolicy, true));
 
-        
         ASN1ObjectIdentifier customExtensionOid = new ASN1ObjectIdentifier("1.2.3.4");
         list.add(createExtension(customExtensionOid, true, "custom extension 1"));
 
@@ -345,17 +351,32 @@ public class ProfileConfCreatorDemo
         // SubjectAltName
         GeneralNameType subjectAltNameMode = new GeneralNameType();
         extensions.setSubjectAltName(subjectAltNameMode);
-        
+
         OtherName otherName = new OtherName();
-        otherName.setType(createOidType(ObjectIdentifiers.DN_O.getId(), "o"));
+        otherName.getType().add(createOidType(ObjectIdentifiers.DN_O));
         subjectAltNameMode.setOtherName(otherName);
-        
+        subjectAltNameMode.setRfc822Name("");
+        subjectAltNameMode.setDNSName("");
+        subjectAltNameMode.setDirectoryName("");
+        subjectAltNameMode.setEdiPartyName("");
+        subjectAltNameMode.setUniformResourceIdentifier("");
+        subjectAltNameMode.setIPAddress("");
+        subjectAltNameMode.setRegisteredID("");
+
         // SubjectInfoAccess
-        GeneralNameType subjectInfoAccessMode = new GeneralNameType();
+        SubjectInfoAccessType subjectInfoAccessMode = new SubjectInfoAccessType();
         extensions.setSubjectInfoAccess(subjectInfoAccessMode);
-        
-        subjectInfoAccessMode.setIPAddress("");        
-        
+
+        Access access = new Access();
+        access.setAccessMethod(createOidType(ObjectIdentifiers.id_ad_caRepository));
+
+        GeneralNameType accessLocation = new GeneralNameType();
+        access.setAccessLocation(accessLocation);
+        accessLocation.setDirectoryName("");
+        accessLocation.setUniformResourceIdentifier("");
+
+        subjectInfoAccessMode.getAccess().add(access);
+
         // Custom Extension
         ConstantExtensions constantExts = new ConstantExtensions();
         extensions.setConstantExtensions(constantExts);
@@ -363,7 +384,7 @@ public class ProfileConfCreatorDemo
         ConstantExtensionType constantExt = new ConstantExtensionType();
         constantExts.getConstantExtension().add(constantExt);
 
-        OidWithDescType type = createOidType(customExtensionOid.getId(), "custom extension 1");
+        OidWithDescType type = createOidType(customExtensionOid, "custom extension 1");
         constantExt.setType(type);
         constantExt.setValue(DERNull.INSTANCE.getEncoded());
 
@@ -387,11 +408,11 @@ public class ProfileConfCreatorDemo
         subject.setIncSerialNrIfSubjectExists(false);
 
         List<RdnType> occurrences = subject.getRdn();
-        occurrences.add(createRDN(ObjectIdentifiers.DN_C, 1, 1));
-        occurrences.add(createRDN(ObjectIdentifiers.DN_O, 1, 1));
-        occurrences.add(createRDN(ObjectIdentifiers.DN_OU, 0, 1));
-        occurrences.add(createRDN(ObjectIdentifiers.DN_SN, 0, 1));
-        occurrences.add(createRDN(ObjectIdentifiers.DN_CN, 1, 1));
+        occurrences.add(createRDN(ObjectIdentifiers.DN_C, 1, 1, "DE|FR"));
+        occurrences.add(createRDN(ObjectIdentifiers.DN_O, 1, 1, null));
+        occurrences.add(createRDN(ObjectIdentifiers.DN_OU, 0, 1, null));
+        occurrences.add(createRDN(ObjectIdentifiers.DN_SN, 0, 1, REGEX_SN));
+        occurrences.add(createRDN(ObjectIdentifiers.DN_CN, 1, 1, null));
 
         // AllowedClientExtensions
         profile.setAllowedClientExtensions(null);
@@ -442,11 +463,11 @@ public class ProfileConfCreatorDemo
         subject.setIncSerialNrIfSubjectExists(false);
 
         List<RdnType> occurrences = subject.getRdn();
-        occurrences.add(createRDN(ObjectIdentifiers.DN_C, 1, 1));
-        occurrences.add(createRDN(ObjectIdentifiers.DN_O, 1, 1));
-        occurrences.add(createRDN(ObjectIdentifiers.DN_OU, 0, 1));
-        occurrences.add(createRDN(ObjectIdentifiers.DN_SN, 0, 1));
-        occurrences.add(createRDN(ObjectIdentifiers.DN_CN, 1, 1));
+        occurrences.add(createRDN(ObjectIdentifiers.DN_C, 1, 1, "DE|FR"));
+        occurrences.add(createRDN(ObjectIdentifiers.DN_O, 1, 1, null));
+        occurrences.add(createRDN(ObjectIdentifiers.DN_OU, 0, 1, null));
+        occurrences.add(createRDN(ObjectIdentifiers.DN_SN, 0, 1, REGEX_SN));
+        occurrences.add(createRDN(ObjectIdentifiers.DN_CN, 1, 1, REGEX_FQDN));
 
         // AllowedClientExtensions
         profile.setAllowedClientExtensions(null);
@@ -477,7 +498,7 @@ public class ProfileConfCreatorDemo
         // Extensions - extenedKeyUsage
         extensions.setExtendedKeyUsage(createExtendedKeyUsage(
                 ObjectIdentifiers.id_kp_clientAuth, ObjectIdentifiers.id_kp_serverAuth));
-        
+
         // Admission - just DEMO, does not belong to TLS certificate
         Admission admission = createAdmission(new ASN1ObjectIdentifier("1.1.1.2"), "demo item");
         extensions.setAdmission(admission);
@@ -502,11 +523,11 @@ public class ProfileConfCreatorDemo
         subject.setIncSerialNrIfSubjectExists(false);
 
         List<RdnType> occurrences = subject.getRdn();
-        occurrences.add(createRDN(ObjectIdentifiers.DN_C, 1, 1));
-        occurrences.add(createRDN(ObjectIdentifiers.DN_O, 1, 1));
-        occurrences.add(createRDN(ObjectIdentifiers.DN_OU, 0, 1));
-        occurrences.add(createRDN(ObjectIdentifiers.DN_SN, 0, 1));
-        occurrences.add(createRDN(ObjectIdentifiers.DN_CN, 1, 1));
+        occurrences.add(createRDN(ObjectIdentifiers.DN_C, 1, 1, "DE|FR"));
+        occurrences.add(createRDN(ObjectIdentifiers.DN_O, 1, 1, null));
+        occurrences.add(createRDN(ObjectIdentifiers.DN_OU, 0, 1, null));
+        occurrences.add(createRDN(ObjectIdentifiers.DN_SN, 0, 1, REGEX_SN));
+        occurrences.add(createRDN(ObjectIdentifiers.DN_CN, 1, 1, null));
 
         // AllowedClientExtensions
         profile.setAllowedClientExtensions(null);
@@ -556,11 +577,11 @@ public class ProfileConfCreatorDemo
         subject.setIncSerialNrIfSubjectExists(true);
 
         List<RdnType> occurrences = subject.getRdn();
-        occurrences.add(createRDN(ObjectIdentifiers.DN_C, 1, 1));
-        occurrences.add(createRDN(ObjectIdentifiers.DN_O, 1, 1));
-        occurrences.add(createRDN(ObjectIdentifiers.DN_OU, 0, 1));
-        occurrences.add(createRDN(ObjectIdentifiers.DN_SN, 0, 1));
-        occurrences.add(createRDN(ObjectIdentifiers.DN_CN, 1, 1));
+        occurrences.add(createRDN(ObjectIdentifiers.DN_C, 1, 1, "DE|FR"));
+        occurrences.add(createRDN(ObjectIdentifiers.DN_O, 1, 1, null));
+        occurrences.add(createRDN(ObjectIdentifiers.DN_OU, 0, 1, null));
+        occurrences.add(createRDN(ObjectIdentifiers.DN_SN, 0, 1, REGEX_SN));
+        occurrences.add(createRDN(ObjectIdentifiers.DN_CN, 1, 1, REGEX_FQDN));
 
         // AllowedClientExtensions
         profile.setAllowedClientExtensions(null);
@@ -593,18 +614,20 @@ public class ProfileConfCreatorDemo
 
         return profile;
     }
-    private static RdnType createRDN(ASN1ObjectIdentifier type, int min, int max)
+    private static RdnType createRDN(ASN1ObjectIdentifier type, int min, int max, String regex)
     {
         RdnType ret = new RdnType();
-        ret.setValue(type.getId());
+        ret.setType(createOidType(type));
         ret.setMinOccurs(min);
         ret.setMaxOccurs(max);
 
-        String description = getDescription(type);
-        if(description != null)
+        if(regex != null)
         {
-            ret.setDescription(description);
+            RdnConstraintType constraint = new RdnConstraintType();
+            constraint.setRegex(regex);
+            ret.setConstraint(constraint);
         }
+
         return ret;
     }
 
@@ -644,12 +667,12 @@ public class ProfileConfCreatorDemo
 
     private static Admission createAdmission(ASN1ObjectIdentifier oid, String item)
     {
-    	Admission ret = new Admission();
-    	ret.getProfessionItem().add(item);
-    	ret.getProfessionOid().add(createOidType(oid.getId(), null));
-    	return ret;
+        Admission ret = new Admission();
+        ret.getProfessionItem().add(item);
+        ret.getProfessionOid().add(createOidType(oid));
+        return ret;
     }
-    
+
     private static ExtensionsType.CertificateProfiles createCertificatePolicies(
             ASN1ObjectIdentifier... policyOids)
     {
@@ -664,7 +687,7 @@ public class ProfileConfCreatorDemo
         {
             CertificatePolicyInformationType single = new CertificatePolicyInformationType();
             l.add(single);
-            single.setPolicyIdentifier(createOidType(oid.getId(), null));
+            single.setPolicyIdentifier(createOidType(oid));
         }
 
         return ret;
@@ -676,8 +699,7 @@ public class ProfileConfCreatorDemo
         ExtendedKeyUsage ret = new ExtendedKeyUsage();
         for(ASN1ObjectIdentifier usage : extKeyUsages)
         {
-            String description = getDescription(usage);
-            ret.getUsage().add(createOidType(usage.getId(), description));
+            ret.getUsage().add(createOidType(usage));
         }
         return ret;
     }
@@ -698,12 +720,8 @@ public class ProfileConfCreatorDemo
         ASN1ObjectIdentifier subjectPolicyId)
     {
         PolicyIdMappingType ret = new PolicyIdMappingType();
-
-        String desc = getDescription(issuerPolicyId);
-        ret.setIssuerDomainPolicy(createOidType(issuerPolicyId.getId(), desc));
-
-        desc = getDescription(subjectPolicyId);
-        ret.setSubjectDomainPolicy(createOidType(subjectPolicyId.getId(), desc));
+        ret.setIssuerDomainPolicy(createOidType(issuerPolicyId));
+        ret.setSubjectDomainPolicy(createOidType(subjectPolicyId));
 
         return ret;
     }
@@ -748,15 +766,24 @@ public class ProfileConfCreatorDemo
         ret.setSkipCerts(skipCerts);
         return ret;
     }
-    
-    private static OidWithDescType createOidType(String oid, String description)
+
+    private static OidWithDescType createOidType(ASN1ObjectIdentifier oid)
     {
-    	OidWithDescType ret = new OidWithDescType();
-    	ret.setValue(oid);
-    	if(description != null)
-    	{
-    		ret.setDescription(description);
-    	}
-    	return ret;
+        return createOidType(oid, null);
+    }
+
+    private static OidWithDescType createOidType(ASN1ObjectIdentifier oid, String description)
+    {
+        OidWithDescType ret = new OidWithDescType();
+        ret.setValue(oid.getId());
+        if(description == null)
+        {
+            description = getDescription(oid);
+        }
+        if(description != null)
+        {
+            ret.setDescription(description);
+        }
+        return ret;
     }
 }

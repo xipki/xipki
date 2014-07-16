@@ -61,12 +61,18 @@
 	</xs:complexType>
 	
 	<xs:complexType name="RdnType">
-		<xs:complexContent>
-			<xs:extension base="OidWithDescType">
-				<xs:attribute name="minOccurs" type="xs:int" default="1"/>
-				<xs:attribute name="maxOccurs" type="xs:int" default="1"/>
-			</xs:extension>
-		</xs:complexContent>
+		<xs:sequence>
+			<xs:element name="type" type="OidWithDescType"/>
+			<xs:element name="constraint" type="RdnConstraintType" minOccurs="0"/>
+		</xs:sequence>
+		<xs:attribute name="minOccurs" type="xs:int" default="1"/>
+		<xs:attribute name="maxOccurs" type="xs:int" default="1"/>
+	</xs:complexType>
+	
+	<xs:complexType name="RdnConstraintType">
+		<xs:all>
+			<xs:element name="regex" type="xs:string"/>
+		</xs:all>
 	</xs:complexType>
 	
 	<xs:complexType name="ExtensionType">
@@ -178,7 +184,7 @@
 
 			<xs:element name="subjectAltName" type="generalNameType" minOccurs="0" />
 			
-			<xs:element name="subjectInfoAccess" type="generalNameType" minOccurs="0"/>
+			<xs:element name="subjectInfoAccess" type="subjectInfoAccessType" minOccurs="0"/>
 
 			<xs:element name="constantExtensions" minOccurs="0">
 				<xs:complexType>
@@ -192,21 +198,22 @@
 	</xs:complexType>
 	
 	<xs:complexType name="generalNameType">
-		<xs:choice>
-			<xs:element name="rfc822Name" type="xs:string"/>
-			<xs:element name="dNSName" type="xs:string"/>
-			<xs:element name="directoryName" type="xs:string"/>
-			<xs:element name="uniformResourceIdentifier" type="xs:string"/>
-			<xs:element name="iPAddress" type="xs:string"/>
-			<xs:element name="registeredID" type="xs:string"/>
-			<xs:element name="otherName">
+		<xs:all>
+			<xs:element name="rfc822Name" type="xs:string" minOccurs="0"/>
+			<xs:element name="dNSName" type="xs:string" minOccurs="0"/>
+			<xs:element name="directoryName" type="xs:string" minOccurs="0"/>
+			<xs:element name="ediPartyName" type="xs:string" minOccurs="0"/>
+			<xs:element name="uniformResourceIdentifier" type="xs:string" minOccurs="0"/>			
+			<xs:element name="iPAddress" type="xs:string" minOccurs="0"/>
+			<xs:element name="registeredID" type="xs:string" minOccurs="0"/>
+			<xs:element name="otherName" minOccurs="0">
 				<xs:complexType>
 					<xs:sequence>
-						<xs:element name="type" type="OidWithDescType"/>
+						<xs:element name="type" type="OidWithDescType" maxOccurs="unbounded"/>
 					</xs:sequence>
 				</xs:complexType>
 			</xs:element>
-		</xs:choice>
+		</xs:all>
 	</xs:complexType>
 
 	<xs:complexType name="PolicyIdMappingType">
@@ -250,6 +257,19 @@
 						<xs:element name="cpsUri" type="xs:string"/>
 						<xs:element name="userNotice" type="xs:string"/>
 					</xs:choice>
+				</xs:complexType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	
+	<xs:complexType name="subjectInfoAccessType">
+		<xs:sequence>
+			<xs:element name="access" maxOccurs="unbounded">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="accessMethod" type="OidWithDescType"/>
+						<xs:element name="accessLocation" type="generalNameType" />
+					</xs:sequence>
 				</xs:complexType>
 			</xs:element>
 		</xs:sequence>

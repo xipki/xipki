@@ -216,7 +216,7 @@ extends CertProfile implements SubjectDNSubset
         return null;
     }
 
-    private static RDN[] getRDNs(RDN[] rdns, ASN1ObjectIdentifier type)
+    protected static RDN[] getRDNs(RDN[] rdns, ASN1ObjectIdentifier type)
     {
         List<RDN> ret = new ArrayList<>(1);
         for(int i = 0; i < rdns.length; i++)

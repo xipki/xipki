@@ -29,6 +29,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.Pattern;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
@@ -98,6 +99,7 @@ import org.xipki.ca.server.certprofile.jaxb.ProfileType;
 import org.xipki.ca.server.certprofile.jaxb.ProfileType.AllowedClientExtensions;
 import org.xipki.ca.server.certprofile.jaxb.ProfileType.Subject;
 import org.xipki.ca.server.certprofile.jaxb.RdnType;
+import org.xipki.ca.server.certprofile.jaxb.SubjectInfoAccessType.Access;
 import org.xipki.security.common.CmpUtf8Pairs;
 import org.xipki.security.common.IoCertUtil;
 import org.xipki.security.common.LogUtil;
@@ -108,9 +110,10 @@ import org.xml.sax.SAXException;
  * @author Lijun Liao
  */
 
-public class DfltCertProfile extends AbstractCertProfile
+public class DefaultCertProfile extends AbstractCertProfile
 {
-    private static final Logger LOG = LoggerFactory.getLogger(DfltCertProfile.class);
+    private static final Logger LOG = LoggerFactory.getLogger(DefaultCertProfile.class);
+    private static final char GENERALNAME_SEP = '|';
 
     private static final Set<String> criticalOnlyExtensionTypes;
     private static final Set<String> noncriticalOnlyExtensionTypes;
@@ -120,6 +123,7 @@ public class DfltCertProfile extends AbstractCertProfile
     private static Unmarshaller jaxbUnmarshaller;
 
     private List<RDNOccurrence> subjectDNSubject;
+    private Map<ASN1ObjectIdentifier, Pattern> subjectDNPatterns;
     private Map<ASN1ObjectIdentifier, ExtensionOccurrence> extensionOccurences;
     private Map<ASN1ObjectIdentifier, ExtensionOccurrence> additionalExtensionOccurences;
 
@@ -133,9 +137,9 @@ public class DfltCertProfile extends AbstractCertProfile
     private Set<KeyUsage> keyusages;
     private Set<ASN1ObjectIdentifier> extendedKeyusages;
     private Set<ASN1ObjectIdentifier> allowedClientExtensions;
-    private GeneralNameType subjectAltNameMode;
-    private GeneralNameType subjectInfoAccessMode;
-    
+    private Set<GeneralNameMode> allowedSubjectAltNameModes;
+    private Map<ASN1ObjectIdentifier, Set<GeneralNameMode>> allowedSubjectInfoAccessModes;
+
     private ExtensionTuple certificatePolicies;
     private ExtensionTuple policyMappings;
     private ExtensionTuple nameConstraints;
@@ -189,21 +193,33 @@ public class DfltCertProfile extends AbstractCertProfile
                 this.backwardsSubject = false;
                 this.incSerialNrIfSubjectExists = false;
                 this.subjectDNSubject = null;
+                this.subjectDNPatterns = null;
             }
             else
             {
                 this.backwardsSubject = subject.isDnBackwards();
                 this.incSerialNrIfSubjectExists = subject.isIncSerialNrIfSubjectExists();
 
-                List<RDNOccurrence> subjectDNSubject = new LinkedList<RDNOccurrence>();
+                this.subjectDNSubject = new LinkedList<RDNOccurrence>();
+                this.subjectDNPatterns = new HashMap<>();
+
                 for(RdnType t : subject.getRdn())
                 {
-                    RDNOccurrence occ = new RDNOccurrence(new ASN1ObjectIdentifier(t.getValue()),
+                    ASN1ObjectIdentifier type = new ASN1ObjectIdentifier(t.getType().getValue());
+                    RDNOccurrence occ = new RDNOccurrence(type,
                             getInt(t.getMinOccurs(), 1), getInt(t.getMaxOccurs(), 1));
-                    subjectDNSubject.add(occ);
-                }
+                    this.subjectDNSubject.add(occ);
 
-                this.subjectDNSubject = subjectDNSubject;
+                    if(t.getConstraint() != null)
+                    {
+                        String regex = t.getConstraint().getRegex();
+                        if(regex != null)
+                        {
+                            Pattern pattern = Pattern.compile(regex);
+                            this.subjectDNPatterns.put(type, pattern);
+                        }
+                    }
+                }
             }
 
             // Allowed extensions to be fulfilled by the client
@@ -445,10 +461,23 @@ public class DfltCertProfile extends AbstractCertProfile
             }
 
             // SubjectAltNameMode
-            this.subjectAltNameMode = extensionsType.getSubjectAltName();
-            
+            if(extensionsType.getSubjectAltName() != null)
+            {
+                this.allowedSubjectAltNameModes = buildGeneralNameMode(extensionsType.getSubjectAltName());
+            }
+
             // SubjectInfoAccess
-            this.subjectInfoAccessMode = extensionsType.getSubjectInfoAccess();
+            if(extensionsType.getSubjectInfoAccess() != null)
+            {
+                List<Access> list = extensionsType.getSubjectInfoAccess().getAccess();
+                this.allowedSubjectInfoAccessModes = new HashMap<>();
+                for(Access entry : list)
+                {
+                    this.allowedSubjectInfoAccessModes.put(
+                            new ASN1ObjectIdentifier(entry.getAccessMethod().getValue()),
+                            buildGeneralNameMode(entry.getAccessLocation()));
+                }
+            }
 
             // constant extensions
             ConstantExtensions ces = extensionsType.getConstantExtensions();
@@ -506,7 +535,7 @@ public class DfltCertProfile extends AbstractCertProfile
 
                     final SchemaFactory schemaFact = SchemaFactory.newInstance(
                             javax.xml.XMLConstants.W3C_XML_SCHEMA_NS_URI);
-                    URL url = DfltCertProfile.class.getResource("/xsd/certprofile.xsd");
+                    URL url = DefaultCertProfile.class.getResource("/xsd/certprofile.xsd");
                     jaxbUnmarshaller.setSchema(schemaFact.newSchema(url));
                 }
 
@@ -574,40 +603,72 @@ public class DfltCertProfile extends AbstractCertProfile
     {
         return extensionOccurences.get(Extension.issuerAlternativeName);
     }
-    
+
+    @Override
+    protected void checkSubjectContent(X500Name requestedSubject)
+    throws BadCertTemplateException
+    {
+        super.checkSubjectContent(requestedSubject);
+        if(subjectDNPatterns == null || subjectDNPatterns.isEmpty())
+        {
+            return;
+        }
+
+        RDN[] rdns = requestedSubject.getRDNs();
+        for(ASN1ObjectIdentifier type : subjectDNPatterns.keySet())
+        {
+            RDN[] rs = getRDNs(rdns, type);
+            if(rs == null || rs.length == 0)
+            {
+                continue;
+            }
+
+            Pattern p = subjectDNPatterns.get(type);
+            for(RDN r : rs)
+            {
+                String text = IETFUtils.valueToString(r.getFirst().getValue());
+                if(p.matcher(text).matches() == false)
+                {
+                    throw new BadCertTemplateException("invalid subject " + ObjectIdentifiers.oidToDisplayName(type) +
+                            " '" + text + "' against regex '" + p.pattern() + "'");
+                }
+            }
+        }
+    }
+
     @Override
     public SubjectInfo getSubject(X500Name requestedSubject)
     throws CertProfileException, BadCertTemplateException
     {
-    	// remove the RDN with type subjectAltName and subjectInfoAccess
-    	ASN1ObjectIdentifier[] types = requestedSubject.getAttributeTypes();
-    	boolean reconstruct = false;
-    	for(ASN1ObjectIdentifier type : types)
-    	{
-    		if(type.equals(Extension.subjectAlternativeName) || type.equals(Extension.subjectInfoAccess))
-    		{
-    			reconstruct = true;
-    			break;
-    		}
-    	}
-    	
-    	if(reconstruct)
-    	{
-    		List<RDN> newRdns = new LinkedList<>();
-        	for(RDN rdn : requestedSubject.getRDNs())
-        	{
-        		ASN1ObjectIdentifier type = rdn.getFirst().getType();
-        		if(type.equals(Extension.subjectAlternativeName) || type.equals(Extension.subjectInfoAccess))
-        		{
-        			continue;
-        		}
-        		newRdns.add(rdn);
-        	}
-        	
-        	requestedSubject = new X500Name(newRdns.toArray(new RDN[0]));
-    	}
-    	
-    	return super.getSubject(requestedSubject);
+        // remove the RDN with type subjectAltName and subjectInfoAccess
+        ASN1ObjectIdentifier[] types = requestedSubject.getAttributeTypes();
+        boolean reconstruct = false;
+        for(ASN1ObjectIdentifier type : types)
+        {
+            if(type.equals(Extension.subjectAlternativeName) || type.equals(Extension.subjectInfoAccess))
+            {
+                reconstruct = true;
+                break;
+            }
+        }
+
+        if(reconstruct)
+        {
+            List<RDN> newRdns = new LinkedList<>();
+            for(RDN rdn : requestedSubject.getRDNs())
+            {
+                ASN1ObjectIdentifier type = rdn.getFirst().getType();
+                if(type.equals(Extension.subjectAlternativeName) || type.equals(Extension.subjectInfoAccess))
+                {
+                    continue;
+                }
+                newRdns.add(rdn);
+            }
+
+            requestedSubject = new X500Name(newRdns.toArray(new RDN[0]));
+        }
+
+        return super.getSubject(requestedSubject);
     }
 
     @Override
@@ -639,24 +700,24 @@ public class DfltCertProfile extends AbstractCertProfile
         ExtensionOccurrence occurence = occurences.remove(extensionType);
         if(occurence != null)
         {
-	        ExtensionTuple extension = null;
-        	if(subjectAltNameMode != null)
-        	{
-		        RDN[] rdns = requestedSubject.getRDNs(extensionType);
-		        if(rdns != null && rdns.length > 0)
-		        {
-		        	final int n = rdns.length;
-		        	GeneralName[] names = new GeneralName[n];
-		        	for(int i = 0; i < n; i++)
-		        	{
-		        		String value = IETFUtils.valueToString(rdns[i].getFirst().getValue());
-		        		names[i] = createGeneralName(value, subjectAltNameMode);
-		        	}
-		        	extension = createExtension(extensionType, occurence.isCritical(), new GeneralNames(names));
-		        }
-        	}
-	        
-	        if(extension == null)
+            ExtensionTuple extension = null;
+            if(allowedSubjectAltNameModes != null)
+            {
+                RDN[] rdns = requestedSubject.getRDNs(extensionType);
+                if(rdns != null && rdns.length > 0)
+                {
+                    final int n = rdns.length;
+                    GeneralName[] names = new GeneralName[n];
+                    for(int i = 0; i < n; i++)
+                    {
+                        String value = IETFUtils.valueToString(rdns[i].getFirst().getValue());
+                        names[i] = createGeneralName(value, allowedSubjectAltNameModes);
+                    }
+                    extension = createExtension(extensionType, occurence.isCritical(), new GeneralNames(names));
+                }
+            }
+
+            if(extension == null)
             {
                 extension = retrieveExtensionTupleFromRequest(
                         occurence.isCritical(), extensionType, requestedExtensions);
@@ -701,39 +762,51 @@ public class DfltCertProfile extends AbstractCertProfile
         occurence = occurences.remove(extensionType);
         if(occurence != null)
         {
-	        ExtensionTuple extension = null;
-        	if(subjectInfoAccessMode != null)
-        	{        		
-		        RDN[] rdns = requestedSubject.getRDNs(extensionType);
-		        if(rdns != null && rdns.length > 0)
-		        {
-		        	ASN1EncodableVector vector = new ASN1EncodableVector();
-		             
-		        	for(RDN rdn : rdns)
-		        	{
-		        		String value = IETFUtils.valueToString(rdn.getFirst().getValue());
-		        		try{
-			        		CmpUtf8Pairs pairs = new CmpUtf8Pairs(value);
-			        		String accessMethod = pairs.getNames().iterator().next();
-			        		String accessLocation = pairs.getValue(accessMethod);
-			        		
-			        		GeneralName location = createGeneralName(accessLocation, subjectInfoAccessMode);
-				        	AccessDescription accessDescription = new AccessDescription(
-				        			new ASN1ObjectIdentifier(accessMethod), location);
-				        	vector.add(accessDescription);
-		        		}catch(Exception e)
-		        		{
-		        			LOG.debug("Exception while processing subjectInfoAccess '{}': {}", value, e.getMessage());
-		        			throw new BadCertTemplateException("invalid subjectInfoAccess '" + value + "'");
-		        		}
-		        	}
-		        	
-		        	ASN1Sequence seq = new DERSequence(vector);		        	
-		        	extension = createExtension(extensionType, occurence.isCritical(), seq);
-		        }
-	        }
-        	
-	        if(extension == null)
+            ExtensionTuple extension = null;
+            if(allowedSubjectInfoAccessModes != null)
+            {
+                RDN[] rdns = requestedSubject.getRDNs(extensionType);
+                if(rdns != null && rdns.length > 0)
+                {
+                    ASN1EncodableVector vector = new ASN1EncodableVector();
+
+                    for(RDN rdn : rdns)
+                    {
+                        String value = IETFUtils.valueToString(rdn.getFirst().getValue());
+                        try
+                        {
+                            CmpUtf8Pairs pairs = new CmpUtf8Pairs(value);
+                            String identifier = pairs.getNames().iterator().next();
+                            ASN1ObjectIdentifier accessMethod = new ASN1ObjectIdentifier(identifier);
+                            Set<GeneralNameMode> generalNameModes = allowedSubjectInfoAccessModes.get(accessMethod);
+                            if(generalNameModes == null)
+                            {
+                                throw new BadCertTemplateException("subjectInfoAccess.accessMethod " + identifier+
+                                        " is not allowed");
+                            }
+
+                            String accessLocation = pairs.getValue(identifier);
+
+                            GeneralName location = createGeneralName(accessLocation, generalNameModes);
+                            AccessDescription accessDescription = new AccessDescription(accessMethod, location);
+                            vector.add(accessDescription);
+                        } catch(BadCertTemplateException e)
+                        {
+                            throw e;
+                        }
+                        catch(Exception e)
+                        {
+                            LOG.debug("Exception while processing subjectInfoAccess '{}': {}", value, e.getMessage());
+                            throw new BadCertTemplateException("invalid subjectInfoAccess '" + value + "'");
+                        }
+                    }
+
+                    ASN1Sequence seq = new DERSequence(vector);
+                    extension = createExtension(extensionType, occurence.isCritical(), seq);
+                }
+            }
+
+            if(extension == null)
             {
                 extension = retrieveExtensionTupleFromRequest(
                         occurence.isCritical(), extensionType, requestedExtensions);
@@ -948,7 +1021,7 @@ public class DfltCertProfile extends AbstractCertProfile
         GeneralName base = null;
         if(type.getDirectoryName() != null)
         {
-            base = new GeneralName(IoCertUtil.backwardSortX509Name(
+            base = new GeneralName(IoCertUtil.reverse(
                     new X500Name(type.getDirectoryName())));
         }
         else if(type.getDNSName() != null)
@@ -1105,50 +1178,154 @@ public class DfltCertProfile extends AbstractCertProfile
         }
     }
 
-    private static GeneralName createGeneralName(String value, GeneralNameType mode)
+    private static GeneralName createGeneralName(String value, Set<GeneralNameMode> modes)
+    throws BadCertTemplateException
     {
-    	GeneralName ret;
-    	if(mode.getDirectoryName() != null)
-    	{
-    		X500Name name = IoCertUtil.backwardSortX509Name(new X500Name(value));
-    		ret = new GeneralName(name);
-    	}
-    	else if(mode.getDNSName() != null)
-    	{
-    		ret = new GeneralName(GeneralName.dNSName, value);
-    	}
-    	else if(mode.getIPAddress() != null)
-    	{
-    		ret = new GeneralName(GeneralName.iPAddress, value);
-    	}
-    	else if(mode.getOtherName() != null)
-    	{
-    		String type = mode.getOtherName().getType().getValue();
-    		
-            ASN1EncodableVector vector = new ASN1EncodableVector();
-            vector.add(new ASN1ObjectIdentifier(type));
-            DERTaggedObject taggedObject = new DERTaggedObject(true, 0, new DERUTF8String(value));
-            vector.add(taggedObject);
-            DERSequence otherName = new DERSequence(vector);
-            ret = new GeneralName(GeneralName.otherName, otherName);
-    	}
-    	else if(mode.getRegisteredID() != null)
-    	{
-    		ret = new GeneralName(GeneralName.registeredID, value);
-    	}
-    	else if(mode.getRfc822Name() != null)
-    	{
-    		ret = new GeneralName(GeneralName.rfc822Name, value);
-    	}
-    	else if(mode.getUniformResourceIdentifier() != null)
-    	{
-    		ret = new GeneralName(GeneralName.uniformResourceIdentifier, value);
-    	}
-    	else
-    	{
-    		throw new RuntimeException("should not reach here");
-    	}
-    	
-    	return ret;
+        int idxTagSep = value.indexOf(GENERALNAME_SEP);
+        if(idxTagSep == -1 || idxTagSep == 0 || idxTagSep == value.length() - 1)
+        {
+            throw new BadCertTemplateException("invalid generalName " + value);
+        }
+        String s = value.substring(0, idxTagSep);
+
+        int tag;
+        try
+        {
+            tag = Integer.parseInt(s);
+        }catch(NumberFormatException e)
+        {
+            throw new BadCertTemplateException("invalid generalName tag " + s);
+        }
+
+        GeneralNameMode mode = null;
+
+        for(GeneralNameMode m : modes)
+        {
+            if(m.getTag().getTag() == tag)
+            {
+                mode = m;
+                break;
+            }
+        }
+
+        if(mode == null)
+        {
+            throw new BadCertTemplateException("generalName tag " + tag + " is not allowed");
+        }
+
+        String name = value.substring(idxTagSep + 1);
+
+        switch(mode.getTag())
+        {
+            case otherName:
+            {
+                int idxSep = name.indexOf(GENERALNAME_SEP);
+                if(idxSep == -1 || idxSep == 0 || idxSep == name.length() - 1)
+                {
+                    throw new BadCertTemplateException("invalid otherName " + name);
+                }
+                String otherTypeOid = name.substring(0, idxSep);
+                ASN1ObjectIdentifier type = new ASN1ObjectIdentifier(otherTypeOid);
+                if(mode.getAllowedTypes().contains(type) == false)
+                {
+                    throw new BadCertTemplateException("otherName.type " + otherTypeOid + " is not allowed");
+                }
+                String otherValue = name.substring(idxSep + 1);
+
+                ASN1EncodableVector vector = new ASN1EncodableVector();
+                vector.add(type);
+                vector.add(new DERTaggedObject(true, 0, new DERUTF8String(otherValue)));
+                DERSequence seq = new DERSequence(vector);
+
+                return new GeneralName(GeneralName.otherName, seq);
+            }
+            case rfc822Name:
+                return new GeneralName(tag, name);
+            case dNSName:
+                return new GeneralName(tag, name);
+            case directoryName:
+            {
+                X500Name x500Name = IoCertUtil.reverse(new X500Name(name));
+                return new GeneralName(GeneralName.directoryName, x500Name);
+            }
+            case ediPartyName:
+            {
+                int idxSep = name.indexOf(GENERALNAME_SEP);
+                if(idxSep == -1 || idxSep == name.length() - 1)
+                {
+                    throw new BadCertTemplateException("invalid ediPartyName " + name);
+                }
+                String nameAssigner = idxSep == 0 ? null : name.substring(0, idxSep);
+                String partyName = name.substring(idxSep + 1);
+                ASN1EncodableVector vector = new ASN1EncodableVector();
+                if(nameAssigner != null)
+                {
+                    vector.add(new DERTaggedObject(false, 0, new DirectoryString(nameAssigner)));
+                }
+                vector.add(new DERTaggedObject(false, 1, new DirectoryString(partyName)));
+                ASN1Sequence seq = new DERSequence(vector);
+                return new GeneralName(GeneralName.ediPartyName, seq);
+            }
+            case uniformResourceIdentifier:
+                return new GeneralName(tag, name);
+            case iPAddress:
+                return new GeneralName(tag, name);
+            case registeredID:
+                return new GeneralName(tag, name);
+            default:
+                throw new RuntimeException("should not reach here");
+        }
+    }
+
+    private static Set<GeneralNameMode> buildGeneralNameMode(GeneralNameType name)
+    {
+        Set<GeneralNameMode> ret = new HashSet<>();
+        if(name.getOtherName() != null)
+        {
+            List<OidWithDescType> list = name.getOtherName().getType();
+            Set<ASN1ObjectIdentifier> set = new HashSet<>();
+            for(OidWithDescType entry : list)
+            {
+                set.add(new ASN1ObjectIdentifier(entry.getValue()));
+            }
+            ret.add(new GeneralNameMode(GeneralNameTag.otherName, set));
+        }
+
+        if(name.getRfc822Name() != null)
+        {
+            ret.add(new GeneralNameMode(GeneralNameTag.rfc822Name));
+        }
+
+        if(name.getDNSName() != null)
+        {
+            ret.add(new GeneralNameMode(GeneralNameTag.dNSName));
+        }
+
+        if(name.getDirectoryName() != null)
+        {
+            ret.add(new GeneralNameMode(GeneralNameTag.directoryName));
+        }
+
+        if(name.getEdiPartyName() != null)
+        {
+            ret.add(new GeneralNameMode(GeneralNameTag.ediPartyName));
+        }
+
+        if(name.getUniformResourceIdentifier() != null)
+        {
+            ret.add(new GeneralNameMode(GeneralNameTag.uniformResourceIdentifier));
+        }
+
+        if(name.getIPAddress() != null)
+        {
+            ret.add(new GeneralNameMode(GeneralNameTag.iPAddress));
+        }
+
+        if(name.getRegisteredID() != null)
+        {
+            ret.add(new GeneralNameMode(GeneralNameTag.registeredID));
+        }
+
+        return ret;
     }
 }

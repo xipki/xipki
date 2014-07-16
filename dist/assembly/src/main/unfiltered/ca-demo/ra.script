@@ -28,7 +28,7 @@ keytool:update-cert-p12 -p12 output/OCSP2.p12 -pwd 1234 -cert output/OCSP2.der \
 caclient:revoke -cert output/OCSP2.der -reason 1
 
 # Certificate TLS1
-keytool:rsa-p12 -pwd 1234 -out output/TLS1.p12 -subject "CN=TSL1,O=xipki,C=DE"
+keytool:rsa-p12 -pwd 1234 -out output/TLS1.p12 -subject "CN=TLS1.xipki.org,O=xipki,C=DE"
 
 keytool:req-p12 -p12 output/TLS1.p12 -pwd 1234 -out output/TLS1.p10
 
@@ -42,28 +42,28 @@ caclient:enroll -p10 output/TLS1.p10 -out output/TLS1-TLS_C.der -profile TLS_C -
 
 # Certificate TLSwithIncSN1 (all with same subject and profile but different key) 
 # 1.
-keytool:rsa-p12 -pwd 1234 -out output/TLSwithIncSN1.p12 -subject "CN=TLSwithIncSN1,O=xipki,C=DE"
+keytool:rsa-p12 -pwd 1234 -out output/TLSwithIncSN1.p12 -subject "CN=TLSwithIncSN1.xipki.org,O=xipki,C=DE"
 
 keytool:req-p12 -p12 output/TLSwithIncSN1.p12 -pwd 1234 -out output/TLSwithIncSN1.p10
 
 caclient:enroll -p10 output/TLSwithIncSN1.p10 -out output/TLSwithIncSN1.der -profile TLSwithIncSN -user USER-T
 
 # 2.
-keytool:rsa-p12 -pwd 1234 -out output/TLSwithIncSN1-1.p12 -subject "CN=TLSwithIncSN1,O=xipki,C=DE"
+keytool:rsa-p12 -pwd 1234 -out output/TLSwithIncSN1-1.p12 -subject "CN=TLSwithIncSN1.xipki.org,O=xipki,C=DE"
 
 keytool:req-p12 -p12 output/TLSwithIncSN1-1.p12 -pwd 1234 -out output/TLSwithIncSN1-1.p10
 
 caclient:enroll -p10 output/TLSwithIncSN1-1.p10 -out output/TLSwithIncSN1-1.der -profile TLSwithIncSN -user USER-T
 
 # 3.
-keytool:rsa-p12 -pwd 1234 -out output/TLSwithIncSN1-2.p12 -subject "CN=TLSwithIncSN1,O=xipki,C=DE"
+keytool:rsa-p12 -pwd 1234 -out output/TLSwithIncSN1-2.p12 -subject "CN=TLSwithIncSN1.xipki.org,O=xipki,C=DE"
 
 keytool:req-p12 -p12 output/TLSwithIncSN1-2.p12 -pwd 1234 -out output/TLSwithIncSN1-2.p10
 
 caclient:enroll -p10 output/TLSwithIncSN1-2.p10 -out output/TLSwithIncSN1-2.der -profile TLSwithIncSN -user USER-T
  
 # Certificate TLS2
-keytool:rsa-p12 -pwd 1234 -out output/TLS2.p12 -subject "CN=TSL2,O=xipki,C=DE"
+keytool:rsa-p12 -pwd 1234 -out output/TLS2.p12 -subject "CN=TLS2.xipki.org,O=xipki,C=DE"
 
 keytool:req-p12 -p12 output/TLS2.p12 -pwd 1234 -out output/TLS2.p10
 
@@ -77,7 +77,7 @@ caclient:revoke -cert output/TLS2.der -reason 3
 
 ## Enroll certificates
 # Certificate TLS_C1
-keytool:rsa-p12 -pwd 1234 -out output/TLS_C1.p12 -subject "CN=TSL_C1,O=xipki,C=DE"
+keytool:rsa-p12 -pwd 1234 -out output/TLS_C1.p12 -subject "CN=TLS_C1,O=xipki,C=DE"
 
 keytool:req-p12 -p12 output/TLS_C1.p12 -pwd 1234 -out output/TLS_C1.p10
 
@@ -87,7 +87,7 @@ keytool:update-cert-p12 -p12 output/TLS_C1.p12 -pwd 1234 -cert output/TLS_C1.der
   -cacert output/SubCA1.der -cacert output/RCA1.der
 
 # Certificate TLS_C2
-keytool:rsa-p12 -pwd 1234 -out output/TLS_C2.p12 -subject "CN=TSL_C2,O=xipki,C=DE"
+keytool:rsa-p12 -pwd 1234 -out output/TLS_C2.p12 -subject "CN=TLS_C2,O=xipki,C=DE"
 
 keytool:req-p12 -p12 output/TLS_C2.p12 -pwd 1234 -out output/TLS_C2.p10
 

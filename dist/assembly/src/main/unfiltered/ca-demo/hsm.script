@@ -25,7 +25,7 @@ ca:profile-add -name TLS_C -type DEFAULT -confFile ca-demo/profile/CertProfile_T
 ca:profile-add -name TLSwithIncSN -type DEFAULT -confFile ca-demo/profile/CertProfile_TLSwithIncSN.xml
 
 ## Publishers
-ca:publisher-add -name OCSP.PUBLISHER -type java:org.xipki.ca.server.publisher.DefaultCertPublisher \
+ca:publisher-add -name OCSP.PUBLISHER -type DEFAULT \
   -conf datasource?ocsp%publish.goodcerts?true
 
 # CMP Responder
@@ -88,7 +88,7 @@ keytool:update-cert -slot 1 -key-label $SubCA_KEY_LABEL -cert output/SubCA1.der 
 
 ## Generate keys and PKCS#10 request for SubCAwithCRL1
 keytool:req -slot 1 -key-label SubCAwithCRL1 -out output/SubCAwithCRL1.p10 \
-  -subject "CN=SubCAwithCRL1,O=xipki,C=DE"
+  -subject "CN=SubCAwithCRL1, O=xipki, C=DE, 2.5.29.17=1|info@xipki.org, 2.5.29.17=2|xipki.org, 2.5.29.17=5|edi-nameAssigner-1|edi-partyName1, 2.5.29.17=6|http://xipki.org/abc, 2.5.29.17=7|192.168.0.1, 2.5.29.17=8|1.2.3.4, 2.5.29.17=0|2.5.4.10|long organization name, 1.3.6.1.5.5.7.1.11=1.3.6.1.5.5.7.48.5?6|http://example.org/abc"
 
 caclient:enroll -p10 output/SubCAwithCRL1.p10 -out output/SubCAwithCRL1.der -profile SubCA.Complex
 
