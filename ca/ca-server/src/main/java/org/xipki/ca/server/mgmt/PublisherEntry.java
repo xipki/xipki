@@ -24,6 +24,7 @@ import org.xipki.audit.api.AuditLoggingService;
 import org.xipki.ca.api.publisher.CertPublisher;
 import org.xipki.ca.api.publisher.CertPublisherException;
 import org.xipki.ca.server.IdentifiedCertPublisher;
+import org.xipki.ca.server.publisher.DefaultCertPublisher;
 import org.xipki.database.api.DataSourceWrapper;
 import org.xipki.security.api.PasswordResolver;
 import org.xipki.security.common.ParamChecker;
@@ -98,7 +99,11 @@ public class PublisherEntry
         }
 
         CertPublisher realPublisher;
-        if(type.toLowerCase().startsWith("java:"))
+        if(type.equalsIgnoreCase("default"))
+        {
+            realPublisher = new DefaultCertPublisher();
+        }
+        else if(type.toLowerCase().startsWith("java:"))
         {
             String className = type.substring("java:".length());
             try

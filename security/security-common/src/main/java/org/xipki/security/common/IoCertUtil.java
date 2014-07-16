@@ -109,6 +109,18 @@ public class IoCertUtil
         return null;
     }
 
+    public static X500Name reverse(X500Name name)
+    {
+        RDN[] orig = name.getRDNs();
+        int n = orig.length;
+        RDN[] _new = new RDN[n];
+        for(int i = 0; i < n; i++)
+        {
+            _new[i] = orig[n - 1 - i];
+        }
+        return new X500Name(_new);
+    }
+
     public static X500Name sortX509Name(X500Name name)
     {
         return sortX500Name(name, false);

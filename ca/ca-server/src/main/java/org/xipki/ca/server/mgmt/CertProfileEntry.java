@@ -20,7 +20,7 @@ package org.xipki.ca.server.mgmt;
 import org.xipki.ca.api.profile.CertProfile;
 import org.xipki.ca.api.profile.CertProfileException;
 import org.xipki.ca.server.IdentifiedCertProfile;
-import org.xipki.ca.server.certprofile.DfltCertProfile;
+import org.xipki.ca.server.certprofile.DefaultCertProfile;
 import org.xipki.security.common.EnvironmentParameterResolver;
 import org.xipki.security.common.ParamChecker;
 
@@ -82,9 +82,9 @@ public class CertProfileEntry
         }
 
         CertProfile underlyingCertProfile = null;
-        if(type.toLowerCase().equals("default"))
+        if(type.equalsIgnoreCase("default"))
         {
-            underlyingCertProfile = new DfltCertProfile();
+            underlyingCertProfile = new DefaultCertProfile();
         }
         else if(type.toLowerCase().startsWith("java:"))
         {
