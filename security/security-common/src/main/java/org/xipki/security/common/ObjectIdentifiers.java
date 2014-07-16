@@ -282,6 +282,10 @@ public class ObjectIdentifiers
 
     public static final ASN1ObjectIdentifier id_extension_admission = new ASN1ObjectIdentifier("1.3.36.8.3.3");
 
+    private static final ASN1ObjectIdentifier id_ad = id_pkix.branch("48");
+    public static final ASN1ObjectIdentifier id_ad_timeStamping = id_ad.branch("3");
+    public static final ASN1ObjectIdentifier id_ad_caRepository = id_ad.branch("5");
+
     private static final List<ASN1ObjectIdentifier> forwardDNs;
     private static final List<ASN1ObjectIdentifier> backwardDNs;
 
@@ -400,6 +404,14 @@ public class ObjectIdentifiers
             else if(anyExtendedKeyUsage.equals(type))
             {
                 name = "anyExtendedKeyUsage";
+            }
+            else if(id_ad_caRepository.equals(type))
+            {
+                name = "id-ad-caRepository";
+            }
+            else if(id_ad_timeStamping.equals(type))
+            {
+                name = "id-ad-timeStamping";
             }
         }
 
