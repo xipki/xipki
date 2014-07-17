@@ -226,18 +226,27 @@ public class OCSPStatusCommand extends OsgiCommandSupport
             }
             else if(singleCertStatus instanceof RevokedStatus)
             {
-                int reason = ((RevokedStatus) singleCertStatus).getRevocationReason();
-                Date revTime = ((RevokedStatus) singleCertStatus).getRevocationTime();
-                if(extendedRevoke &&
-                        reason == CRLReason.CERTIFICATE_HOLD.getCode() &&
-                        revTime.getTime() == 0)
+                RevokedStatus revStatus = (RevokedStatus) singleCertStatus;
+                Date revTime = revStatus.getRevocationTime();
+
+                if(revStatus.hasRevocationReason())
                 {
-                    status = "Unknown (RFC6960)";
+                    int reason = revStatus.getRevocationReason();
+                    if(extendedRevoke &&
+                            reason == CRLReason.CERTIFICATE_HOLD.getCode() &&
+                            revTime.getTime() == 0)
+                    {
+                        status = "Unknown (RFC6960)";
+                    }
+                    else
+                    {
+                        status = "Revoked, reason = "+ CRLReason.forReasonCode(reason).getDescription() +
+                                ", revocationTime = " + revTime;
+                    }
                 }
                 else
                 {
-                    status = "Revoked, reason = "+ CRLReason.forReasonCode(reason).getDescription() +
-                            ", revocationTime = " + revTime;
+                    status = "Revoked, no reason, revocationTime = " + revTime;
                 }
             }
             else if(singleCertStatus instanceof UnknownStatus)
