@@ -50,6 +50,7 @@ import org.bouncycastle.asn1.isismtt.ISISMTTObjectIdentifiers;
 import org.bouncycastle.asn1.isismtt.ocsp.CertHash;
 import org.bouncycastle.asn1.ocsp.OCSPObjectIdentifiers;
 import org.bouncycastle.asn1.ocsp.OCSPResponse;
+import org.bouncycastle.asn1.ocsp.RevokedInfo;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.asn1.x509.Extension;
 import org.bouncycastle.asn1.x509.Extensions;
@@ -133,6 +134,7 @@ public class OcspResponder
     private OCSPMode ocspMode;
     private OCSPResponderType conf;
     private RequestOptions requestOptions;
+    private boolean noRevReason =  false;
     private boolean auditResponse = false;
     private boolean supportsHttpGet = false;
     private final Map<String, String> auditCertprofileMapping = new ConcurrentHashMap<>();
@@ -226,6 +228,16 @@ public class OcspResponder
         else
         {
             throw new OcspResponderException("Invalid OCSP mode '" + s + "'");
+        }
+
+        noRevReason = false;
+        if(conf.getResponse() != null)
+        {
+            Boolean b = conf.getResponse().isNoRevReason();
+            if(b != null)
+            {
+                noRevReason = b.booleanValue();
+            }
         }
 
         supportsHttpGet = getBoolean(conf.isSupportsHttpGet(), false);
@@ -752,8 +764,14 @@ public class OcspResponder
                         break;
                     case REVOKED:
                         CertRevocationInfo revInfo = certStatusInfo.getRevocationInfo();
-                        bcCertStatus = new RevokedStatus(revInfo.getRevocationTime(),
-                                revInfo.getReason().getCode());
+                        ASN1GeneralizedTime revTime = new ASN1GeneralizedTime(revInfo.getRevocationTime());
+                        org.bouncycastle.asn1.x509.CRLReason _reason = null;
+                        if(noRevReason == false)
+                        {
+                            _reason = org.bouncycastle.asn1.x509.CRLReason.lookup(revInfo.getReason().getCode());
+                        }
+                        RevokedInfo _revInfo = new RevokedInfo(revTime, _reason);
+                        bcCertStatus = new RevokedStatus(_revInfo);
                         break;
                 }
 
