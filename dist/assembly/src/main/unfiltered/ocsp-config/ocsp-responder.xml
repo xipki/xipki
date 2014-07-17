@@ -30,6 +30,9 @@
 			<algorithm>SHA512</algorithm>
 		</hashAlgorithms>
 	</request>
+	<response>
+		<noRevReason>false</noRevReason>
+	</response>
 	<!--certhashAlgorithm>SHA1</certhashAlgorithm-->
 	<audit>
 		<enabled>true</enabled>
