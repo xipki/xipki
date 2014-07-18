@@ -211,7 +211,7 @@ public class ProfileConfCreatorDemo
         list.add(createExtension(Extension.basicConstraints, true));
 
         // Extensions - keyUsage
-        extensions.setKeyUsage(createKeyUsages(KeyUsageType.KEYCERT_SIGN, KeyUsageType.CRL_SIGN));
+        extensions.getKeyUsage().add(createKeyUsages(KeyUsageType.KEYCERT_SIGN, KeyUsageType.CRL_SIGN));
         return profile;
     }
 
@@ -260,7 +260,7 @@ public class ProfileConfCreatorDemo
         list.add(createExtension(Extension.basicConstraints, true));
 
         // Extensions - keyUsage
-        extensions.setKeyUsage(createKeyUsages(KeyUsageType.KEYCERT_SIGN, KeyUsageType.CRL_SIGN));
+        extensions.getKeyUsage().add(createKeyUsages(KeyUsageType.KEYCERT_SIGN, KeyUsageType.CRL_SIGN));
         return profile;
     }
 
@@ -319,12 +319,12 @@ public class ProfileConfCreatorDemo
         list.add(createExtension(customExtensionOid, true, "custom extension 1"));
 
         // Extensions - keyUsage
-        extensions.setKeyUsage(createKeyUsages(KeyUsageType.KEYCERT_SIGN, KeyUsageType.CRL_SIGN));
+        extensions.getKeyUsage().add(createKeyUsages(KeyUsageType.KEYCERT_SIGN, KeyUsageType.CRL_SIGN));
 
         // Certificate Policies
-        ExtensionsType.CertificateProfiles certificatePolicies = createCertificatePolicies(
+        ExtensionsType.CertificatePolicies certificatePolicies = createCertificatePolicies(
                 new ASN1ObjectIdentifier("1.2.3.4.5"), new ASN1ObjectIdentifier("2.4.3.2.1"));
-        extensions.setCertificateProfiles(certificatePolicies);
+        extensions.getCertificatePolicies().add(certificatePolicies);
 
         // Policy Mappings
         PolicyMappings policyMappings = new PolicyMappings();
@@ -334,19 +334,19 @@ public class ProfileConfCreatorDemo
         policyMappings.getMapping().add(createPolicyIdMapping(
                 new ASN1ObjectIdentifier("1.1.1.1.2"),
                 new ASN1ObjectIdentifier("2.1.1.1.2")));
-        extensions.setPolicyMappings(policyMappings);
+        extensions.getPolicyMappings().add(policyMappings);
 
         // Policy Constraints
         PolicyConstraints policyConstraints = createPolicyConstraints(2, 2);
-        extensions.setPolicyConstraints(policyConstraints);
+        extensions.getPolicyConstraints().add(policyConstraints);
 
         // Name Constrains
         NameConstraints nameConstraints = createNameConstraints();
-        extensions.setNameConstraints(nameConstraints);
+        extensions.getNameConstraints().add(nameConstraints);
 
         // Inhibit anyPolicy
         InhibitAnyPolicy inhibitAnyPolicy = createInhibitAnyPolicy(1);
-        extensions.setInhibitAnyPolicy(inhibitAnyPolicy);
+        extensions.getInhibitAnyPolicy().add(inhibitAnyPolicy);
 
         // SubjectAltName
         GeneralNameType subjectAltNameMode = new GeneralNameType();
@@ -379,7 +379,7 @@ public class ProfileConfCreatorDemo
 
         // Custom Extension
         ConstantExtensions constantExts = new ConstantExtensions();
-        extensions.setConstantExtensions(constantExts);
+        extensions.getConstantExtensions().add(constantExts);
 
         ConstantExtensionType constantExt = new ConstantExtensionType();
         constantExts.getConstantExtension().add(constantExt);
@@ -437,10 +437,10 @@ public class ProfileConfCreatorDemo
         list.add(createExtension(ObjectIdentifiers.id_extension_pkix_ocsp_nocheck, false));
 
         // Extensions - keyUsage
-        extensions.setKeyUsage(createKeyUsages(KeyUsageType.CONTENT_COMMITMENT));
+        extensions.getKeyUsage().add(createKeyUsages(KeyUsageType.CONTENT_COMMITMENT));
 
         // Extensions - extenedKeyUsage
-        extensions.setExtendedKeyUsage(createExtendedKeyUsage(
+        extensions.getExtendedKeyUsage().add(createExtendedKeyUsage(
                 ObjectIdentifiers.id_kp_OCSPSigning));
 
         return profile;
@@ -492,16 +492,16 @@ public class ProfileConfCreatorDemo
         list.add(createExtension(ObjectIdentifiers.id_extension_admission, true));
 
         // Extensions - keyUsage
-        extensions.setKeyUsage(createKeyUsages(KeyUsageType.DIGITAL_SIGNATURE,
+        extensions.getKeyUsage().add(createKeyUsages(KeyUsageType.DIGITAL_SIGNATURE,
                 KeyUsageType.DATA_ENCIPHERMENT,  KeyUsageType.KEY_ENCIPHERMENT));
 
         // Extensions - extenedKeyUsage
-        extensions.setExtendedKeyUsage(createExtendedKeyUsage(
+        extensions.getExtendedKeyUsage().add(createExtendedKeyUsage(
                 ObjectIdentifiers.id_kp_clientAuth, ObjectIdentifiers.id_kp_serverAuth));
 
         // Admission - just DEMO, does not belong to TLS certificate
         Admission admission = createAdmission(new ASN1ObjectIdentifier("1.1.1.2"), "demo item");
-        extensions.setAdmission(admission);
+        extensions.getAdmission().add(admission);
 
         return profile;
     }
@@ -551,11 +551,11 @@ public class ProfileConfCreatorDemo
         list.add(createExtension(Extension.extendedKeyUsage, true));
 
         // Extensions - keyUsage
-        extensions.setKeyUsage(createKeyUsages(KeyUsageType.DIGITAL_SIGNATURE,
+        extensions.getKeyUsage().add(createKeyUsages(KeyUsageType.DIGITAL_SIGNATURE,
                 KeyUsageType.DATA_ENCIPHERMENT,  KeyUsageType.KEY_ENCIPHERMENT));
 
         // Extensions - extenedKeyUsage
-        extensions.setExtendedKeyUsage(createExtendedKeyUsage(
+        extensions.getExtendedKeyUsage().add(createExtendedKeyUsage(
                 ObjectIdentifiers.id_kp_clientAuth));
         return profile;
     }
@@ -605,11 +605,11 @@ public class ProfileConfCreatorDemo
         list.add(createExtension(Extension.extendedKeyUsage, true));
 
         // Extensions - keyUsage
-        extensions.setKeyUsage(createKeyUsages(KeyUsageType.DIGITAL_SIGNATURE,
+        extensions.getKeyUsage().add(createKeyUsages(KeyUsageType.DIGITAL_SIGNATURE,
                 KeyUsageType.DATA_ENCIPHERMENT,  KeyUsageType.KEY_ENCIPHERMENT));
 
         // Extensions - extenedKeyUsage
-        extensions.setExtendedKeyUsage(createExtendedKeyUsage(
+        extensions.getExtendedKeyUsage().add(createExtendedKeyUsage(
                 ObjectIdentifiers.id_kp_clientAuth, ObjectIdentifiers.id_kp_serverAuth));
 
         return profile;
@@ -673,7 +673,7 @@ public class ProfileConfCreatorDemo
         return ret;
     }
 
-    private static ExtensionsType.CertificateProfiles createCertificatePolicies(
+    private static ExtensionsType.CertificatePolicies createCertificatePolicies(
             ASN1ObjectIdentifier... policyOids)
     {
         if(policyOids == null || policyOids.length == 0)
@@ -681,7 +681,7 @@ public class ProfileConfCreatorDemo
             return null;
         }
 
-        ExtensionsType.CertificateProfiles ret = new ExtensionsType.CertificateProfiles();
+        ExtensionsType.CertificatePolicies ret = new ExtensionsType.CertificatePolicies();
         List<CertificatePolicyInformationType> l = ret.getCertificatePolicyInformation();
         for(ASN1ObjectIdentifier oid : policyOids)
         {
