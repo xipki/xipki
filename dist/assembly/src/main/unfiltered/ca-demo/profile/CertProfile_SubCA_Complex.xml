@@ -49,14 +49,14 @@
       <usage>KEYCERT_SIGN</usage>
       <usage>CRL_SIGN</usage>
     </keyUsage>
-    <certificateProfiles>
+    <certificatePolicies>
       <certificatePolicyInformation>
         <policyIdentifier>1.2.3.4.5</policyIdentifier>
       </certificatePolicyInformation>
       <certificatePolicyInformation>
         <policyIdentifier>2.4.3.2.1</policyIdentifier>
       </certificatePolicyInformation>
-    </certificateProfiles>
+    </certificatePolicies>
     <policyMappings>
       <mapping>
         <issuerDomainPolicy>1.1.1.1.1</issuerDomainPolicy>

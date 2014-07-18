@@ -168,12 +168,6 @@ extends CertProfile implements SubjectDNSubset
 
             RDN[] thisRDNs = getRDNs(requstedRDNs, type);
             int n = thisRDNs == null ? 0 : thisRDNs.length;
-            if(occurrence != null && (n < occurrence.getMinOccurs() || n > occurrence.getMaxOccurs()))
-            {
-                throw new BadCertTemplateException("Number of SubjectDN field " + oidToDisplayName(type) +
-                        " not within [" + occurrence.getMinOccurs() + ", " + occurrence.getMaxOccurs() + "]");
-            }
-
             if(n == 0)
             {
                 continue;
@@ -204,7 +198,7 @@ extends CertProfile implements SubjectDNSubset
         return new SubjectInfo(grantedSubject, null);
     }
 
-    private static RDNOccurrence getRDNOccurrence(List<RDNOccurrence> occurences, ASN1ObjectIdentifier type)
+    protected static RDNOccurrence getRDNOccurrence(List<RDNOccurrence> occurences, ASN1ObjectIdentifier type)
     {
         for(RDNOccurrence occurence : occurences)
         {
@@ -340,7 +334,13 @@ extends CertProfile implements SubjectDNSubset
     {
     }
 
-    private void verifySubjectDNOccurence(X500Name requestedSubject)
+    protected void verifySubjectDNOccurence(X500Name requestedSubject)
+    throws BadCertTemplateException
+    {
+        verifySubjectDNOccurence(requestedSubject, null);
+    }
+
+    protected void verifySubjectDNOccurence(X500Name requestedSubject, Set<ASN1ObjectIdentifier> ignoreRDNs)
     throws BadCertTemplateException
     {
         List<RDNOccurrence> occurences = getSubjectDNSubset();
@@ -352,6 +352,11 @@ extends CertProfile implements SubjectDNSubset
         ASN1ObjectIdentifier[] types = requestedSubject.getAttributeTypes();
         for(ASN1ObjectIdentifier type : types)
         {
+            if(ignoreRDNs != null && ignoreRDNs.contains(type))
+            {
+                continue;
+            }
+
             RDNOccurrence occu = null;
             for(RDNOccurrence occurence : occurences)
             {

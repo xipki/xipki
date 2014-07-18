@@ -56,6 +56,7 @@
 				</xs:complexType>
 			</xs:element>
 			<xs:element name="extensions" type="ExtensionsType"/>
+			<xs:any minOccurs="0"/>
 		</xs:sequence>
 		<xs:attribute name="onlyForRA" type="xs:boolean" default="false" use="optional"/>
 	</xs:complexType>
@@ -64,9 +65,36 @@
 		<xs:sequence>
 			<xs:element name="type" type="OidWithDescType"/>
 			<xs:element name="constraint" type="RdnConstraintType" minOccurs="0"/>
+			<xs:element name="addPrefix" type="addTextType" minOccurs="0" maxOccurs="10"/>
+			<xs:element name="addSuffix" type="addTextType" minOccurs="0" maxOccurs="10"/>
 		</xs:sequence>
-		<xs:attribute name="minOccurs" type="xs:int" default="1"/>
-		<xs:attribute name="maxOccurs" type="xs:int" default="1"/>
+		<xs:attribute name="minOccurs" type="xs:int" default="1" use="optional"/>
+		<xs:attribute name="maxOccurs" type="xs:int" default="1" use="optional"/>
+	</xs:complexType>
+	
+	<xs:complexType name="addTextType">
+		<xs:sequence>
+			<xs:element name="condition" type="ConditionType" minOccurs="0"/>
+			<xs:element name="text" type="xs:string"/>
+		</xs:sequence>
+	</xs:complexType>
+			
+	<xs:complexType name="ConditionType">
+		<xs:sequence>
+			<xs:element name="envParam" type="EnvParamType" maxOccurs="unbounded"/>
+		</xs:sequence>
+		<xs:attribute name="operator" type="OperatorType" default="AND" use="optional"/>
+	</xs:complexType>
+
+	<xs:complexType name="EnvParamType">
+		<xs:sequence>
+			<xs:element name="name" type="xs:string"/>
+			<xs:element name="value" type="xs:string">
+				<xs:annotation>
+					<xs:documentation>Specify empty content if the environment parameter is not set</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
 	</xs:complexType>
 	
 	<xs:complexType name="RdnConstraintType">
@@ -95,22 +123,24 @@
 			<xs:element name="extension" type="ExtensionType" minOccurs="1" maxOccurs="unbounded"/>
 			<xs:element name="pathLen" type="xs:int" minOccurs="0"/>
 			<xs:element name="includeIssuerAndSerialInAKI" type="xs:boolean" minOccurs="0" default="false"/>
-			<xs:element name="keyUsage" minOccurs="0">
+			<xs:element name="keyUsage" minOccurs="0" maxOccurs="10">
 				<xs:complexType>
 					<xs:sequence>
+						<xs:element name="condition" type="ConditionType" minOccurs="0"/>
 						<xs:element name="usage" type="KeyUsageType" maxOccurs="unbounded"/>
 					</xs:sequence>
 				</xs:complexType>
 			</xs:element>
-			<xs:element name="certificateProfiles" minOccurs="0">
+			<xs:element name="certificatePolicies" minOccurs="0" maxOccurs="10">
 				<xs:complexType>
 					<xs:sequence>
+						<xs:element name="condition" type="ConditionType" minOccurs="0"/>
 						<xs:element name="certificatePolicyInformation" type="CertificatePolicyInformationType" maxOccurs="unbounded"/>
 					</xs:sequence>
 				</xs:complexType>
 			</xs:element>
 
-			<xs:element name="policyMappings" minOccurs="0">
+			<xs:element name="policyMappings" minOccurs="0" maxOccurs="10">
 				<xs:annotation>
 					<xs:documentation>
 					  Only for CA
@@ -118,12 +148,13 @@
 				</xs:annotation>
 				<xs:complexType>
 					<xs:sequence>
+						<xs:element name="condition" type="ConditionType" minOccurs="0"/>
 						<xs:element name="mapping" type="PolicyIdMappingType" maxOccurs="unbounded"/>
 					</xs:sequence>
 				</xs:complexType>
 			</xs:element>
 			
-			<xs:element name="nameConstraints" minOccurs="0">
+			<xs:element name="nameConstraints" minOccurs="0" maxOccurs="10">
 				<xs:annotation>
 					<xs:documentation>
 					  Only for CA, at least one of permittedSubtrees and excludedSubtrees must be present
@@ -131,13 +162,14 @@
 				</xs:annotation>
 				<xs:complexType>
 					<xs:sequence>
+						<xs:element name="condition" type="ConditionType" minOccurs="0"/>
 						<xs:element name="permittedSubtrees" type="GeneralSubtreesType" minOccurs="0" />
 						<xs:element name="excludedSubtrees" type="GeneralSubtreesType" minOccurs="0" />
 					</xs:sequence>
 				</xs:complexType>
 			</xs:element>
 			
-			<xs:element name="policyConstraints" minOccurs="0">
+			<xs:element name="policyConstraints" minOccurs="0" maxOccurs="10">
 				<xs:annotation>
 					<xs:documentation>
 					  Only for CA, at least one of requireExplicitPolicy and inhibitPolicyMapping must be present
@@ -145,37 +177,41 @@
 				</xs:annotation>
 				<xs:complexType>
 					<xs:sequence>
+						<xs:element name="condition" type="ConditionType" minOccurs="0"/>
 						<xs:element name="requireExplicitPolicy" type="xs:int" minOccurs="0"/>
 						<xs:element name="inhibitPolicyMapping" type="xs:int" minOccurs="0"/>
 					</xs:sequence>
 				</xs:complexType>
 			</xs:element>
 
-			<xs:element name="extendedKeyUsage" minOccurs="0">
+			<xs:element name="extendedKeyUsage" minOccurs="0" maxOccurs="10">
 				<xs:annotation>
 					<xs:documentation>Only for CA</xs:documentation>
 				</xs:annotation>
 				<xs:complexType>
 					<xs:sequence>
+						<xs:element name="condition" type="ConditionType" minOccurs="0"/>
 						<xs:element name="usage" type="OidWithDescType" maxOccurs="unbounded"/>
 					</xs:sequence>
 				</xs:complexType>
 			</xs:element>
 
-			<xs:element name="inhibitAnyPolicy" minOccurs="0">
+			<xs:element name="inhibitAnyPolicy" minOccurs="0" maxOccurs="10">
 				<xs:annotation>
 					<xs:documentation>Only for CA</xs:documentation>
 				</xs:annotation>
 				<xs:complexType>
 					<xs:sequence>
+						<xs:element name="condition" type="ConditionType" minOccurs="0"/>
 						<xs:element name="skipCerts" type="xs:int"/>
 					</xs:sequence>
 				</xs:complexType>
 			</xs:element>
 
-			<xs:element name="admission" minOccurs="0">
+			<xs:element name="admission" minOccurs="0" maxOccurs="10">
 				<xs:complexType>
 					<xs:sequence>
+						<xs:element name="condition" type="ConditionType" minOccurs="0"/>
 						<xs:element name="professionOid" type="OidWithDescType" maxOccurs="unbounded"/>
 						<xs:element name="professionItem" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
 					</xs:sequence>
@@ -186,7 +222,7 @@
 			
 			<xs:element name="subjectInfoAccess" type="subjectInfoAccessType" minOccurs="0"/>
 
-			<xs:element name="constantExtensions" minOccurs="0">
+			<xs:element name="constantExtensions" minOccurs="0" maxOccurs="10">
 				<xs:complexType>
 					<xs:sequence>
 						<xs:element name="constantExtension" type="ConstantExtensionType" maxOccurs="unbounded"/>
@@ -243,6 +279,7 @@
      
 	<xs:complexType name="ConstantExtensionType">
 		<xs:sequence>
+			<xs:element name="condition" type="ConditionType" minOccurs="0"/>			
 			<xs:element name="type" type="OidWithDescType"/>
 			<xs:element name="value" type="xs:base64Binary"/>
 		</xs:sequence>
@@ -288,6 +325,13 @@
 			<xs:pattern value="\d+(\.\d+)*"/>
 		</xs:restriction>
 	</xs:simpleType>
+
+	<xs:simpleType name="OperatorType">
+	    <xs:restriction base="xs:string">
+	      <xs:enumeration value="OR"/>
+	      <xs:enumeration value="AND"/>
+	    </xs:restriction>
+  	</xs:simpleType>
 	
 	<xs:simpleType name="KeyUsageType">
 	    <xs:restriction base="xs:string">
