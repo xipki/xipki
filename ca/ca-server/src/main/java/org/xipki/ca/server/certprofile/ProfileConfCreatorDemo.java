@@ -31,9 +31,18 @@ import javax.xml.validation.SchemaFactory;
 
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.DERNull;
+import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
+import org.bouncycastle.asn1.sec.SECObjectIdentifiers;
+import org.bouncycastle.asn1.teletrust.TeleTrusTObjectIdentifiers;
 import org.bouncycastle.asn1.x509.Extension;
+import org.bouncycastle.asn1.x9.X9ObjectIdentifiers;
+import org.xipki.ca.server.certprofile.jaxb.AddTextType;
+import org.xipki.ca.server.certprofile.jaxb.AlgorithmType;
 import org.xipki.ca.server.certprofile.jaxb.CertificatePolicyInformationType;
+import org.xipki.ca.server.certprofile.jaxb.ConditionType;
 import org.xipki.ca.server.certprofile.jaxb.ConstantExtensionType;
+import org.xipki.ca.server.certprofile.jaxb.ECParameterType;
+import org.xipki.ca.server.certprofile.jaxb.EnvParamType;
 import org.xipki.ca.server.certprofile.jaxb.ExtensionType;
 import org.xipki.ca.server.certprofile.jaxb.ExtensionsType;
 import org.xipki.ca.server.certprofile.jaxb.ExtensionsType.Admission;
@@ -50,10 +59,13 @@ import org.xipki.ca.server.certprofile.jaxb.GeneralSubtreesType;
 import org.xipki.ca.server.certprofile.jaxb.KeyUsageType;
 import org.xipki.ca.server.certprofile.jaxb.ObjectFactory;
 import org.xipki.ca.server.certprofile.jaxb.OidWithDescType;
+import org.xipki.ca.server.certprofile.jaxb.OperatorType;
+import org.xipki.ca.server.certprofile.jaxb.ParameterType;
 import org.xipki.ca.server.certprofile.jaxb.PolicyIdMappingType;
 import org.xipki.ca.server.certprofile.jaxb.ProfileType;
-import org.xipki.ca.server.certprofile.jaxb.RdnConstraintType;
+import org.xipki.ca.server.certprofile.jaxb.ProfileType.KeyAlgorithms;
 import org.xipki.ca.server.certprofile.jaxb.ProfileType.Subject;
+import org.xipki.ca.server.certprofile.jaxb.RdnConstraintType;
 import org.xipki.ca.server.certprofile.jaxb.RdnType;
 import org.xipki.ca.server.certprofile.jaxb.SubjectInfoAccessType;
 import org.xipki.ca.server.certprofile.jaxb.SubjectInfoAccessType.Access;
@@ -177,6 +189,9 @@ public class ProfileConfCreatorDemo
         profile.setCa(true);
         profile.setValidity(1825);
 
+        // Key
+        profile.setKeyAlgorithms(createKeyAlgorithms());
+
         // Subject
         Subject subject = new Subject();
         profile.setSubject(subject);
@@ -223,6 +238,9 @@ public class ProfileConfCreatorDemo
         profile.setOnlyForRA(false);
         profile.setCa(true);
         profile.setValidity(1825);
+
+        // Key
+        profile.setKeyAlgorithms(createKeyAlgorithms());
 
         // Subject
         Subject subject = new Subject();
@@ -273,6 +291,9 @@ public class ProfileConfCreatorDemo
         profile.setCa(true);
         profile.setValidity(1825);
 
+        // Key
+        profile.setKeyAlgorithms(createKeyAlgorithms());
+
         // Subject
         Subject subject = new Subject();
         profile.setSubject(subject);
@@ -285,7 +306,7 @@ public class ProfileConfCreatorDemo
         occurrences.add(createRDN(ObjectIdentifiers.DN_O, 1, 1, null));
         occurrences.add(createRDN(ObjectIdentifiers.DN_OU, 0, 1, null));
         occurrences.add(createRDN(ObjectIdentifiers.DN_SN, 0, 1, REGEX_SN));
-        occurrences.add(createRDN(ObjectIdentifiers.DN_CN, 1, 1, null));
+        occurrences.add(createRDN(ObjectIdentifiers.DN_CN, 1, 1, null, "PREFIX ", " SUFFIX"));
 
         // AllowedClientExtensions
         profile.setAllowedClientExtensions(null);
@@ -400,6 +421,9 @@ public class ProfileConfCreatorDemo
         profile.setCa(false);
         profile.setValidity(730);
 
+        // Key
+        profile.setKeyAlgorithms(createKeyAlgorithms());
+
         // Subject
         Subject subject = new Subject();
         profile.setSubject(subject);
@@ -454,6 +478,9 @@ public class ProfileConfCreatorDemo
         profile.setOnlyForRA(false);
         profile.setCa(false);
         profile.setValidity(730);
+
+        // Key
+        profile.setKeyAlgorithms(createKeyAlgorithms());
 
         // Subject
         Subject subject = new Subject();
@@ -515,6 +542,9 @@ public class ProfileConfCreatorDemo
         profile.setCa(false);
         profile.setValidity(730);
 
+        // Key
+        profile.setKeyAlgorithms(createKeyAlgorithms());
+
         // Subject
         Subject subject = new Subject();
         profile.setSubject(subject);
@@ -569,6 +599,9 @@ public class ProfileConfCreatorDemo
         profile.setOnlyForRA(false);
         profile.setValidity(730);
 
+        // Key
+        profile.setKeyAlgorithms(createKeyAlgorithms());
+
         // Subject
         Subject subject = new Subject();
         profile.setSubject(subject);
@@ -614,7 +647,14 @@ public class ProfileConfCreatorDemo
 
         return profile;
     }
+
     private static RdnType createRDN(ASN1ObjectIdentifier type, int min, int max, String regex)
+    {
+        return createRDN(type, min, max, regex, null, null);
+    }
+
+    private static RdnType createRDN(ASN1ObjectIdentifier type, int min, int max, String regex,
+            String prefix, String suffix)
     {
         RdnType ret = new RdnType();
         ret.setType(createOidType(type));
@@ -627,6 +667,35 @@ public class ProfileConfCreatorDemo
             constraint.setRegex(regex);
             ret.setConstraint(constraint);
         }
+
+        if(prefix != null && prefix.isEmpty() == false)
+        {
+            ret.getAddPrefix().add(createAddText(prefix, "add.prefix", "true", OperatorType.AND));
+        }
+
+        if(suffix != null && suffix.isEmpty() == false)
+        {
+            ret.getAddSuffix().add(createAddText(suffix, "add.suffix", "true", OperatorType.AND));
+        }
+
+        return ret;
+    }
+
+    private static AddTextType createAddText(String text, String envName, String envValue,
+            OperatorType operator)
+    {
+        AddTextType ret = new AddTextType();
+        ret.setText(text);
+
+        ConditionType condition = new ConditionType();
+        ret.setCondition(condition);
+
+        condition.setOperator(operator);
+        EnvParamType envParam = new EnvParamType();
+        condition.getEnvParam().add(envParam);
+
+        envParam.setName(envName);
+        envParam.setValue(envValue);
 
         return ret;
     }
@@ -786,4 +855,50 @@ public class ProfileConfCreatorDemo
         }
         return ret;
     }
+
+    private static KeyAlgorithms createKeyAlgorithms()
+    {
+        KeyAlgorithms ret = new KeyAlgorithms();
+        List<AlgorithmType> list = ret.getAlgorithm();
+
+        // RSA
+        AlgorithmType rsa = new AlgorithmType();
+        list.add(rsa);
+
+        rsa.setAlgorithm(createOidType(PKCSObjectIdentifiers.rsaEncryption, "RSA"));
+
+        ParameterType param = new ParameterType();
+        param.setName(DefaultCertProfile.MODULUS_LENGTH);
+        param.setMin(2048);
+        param.setMax(2048);
+        rsa.getParameter().add(param);
+
+        param = new ParameterType();
+        param.setName(DefaultCertProfile.MODULUS_LENGTH);
+        param.setMin(3072);
+        param.setMax(3072);
+        rsa.getParameter().add(param);
+
+        // EC
+        AlgorithmType ec = new AlgorithmType();
+        ec.setAlgorithm(createOidType(X9ObjectIdentifiers.id_ecPublicKey, "EC"));
+
+        list.add(ec);
+
+        ECParameterType ecParams = new ECParameterType();
+        ec.setEcParameter(ecParams);
+
+        ASN1ObjectIdentifier[] curveIds = new ASN1ObjectIdentifier[]
+        {
+                SECObjectIdentifiers.secp256r1, TeleTrusTObjectIdentifiers.brainpoolP256r1};
+
+        for(ASN1ObjectIdentifier curveId : curveIds)
+        {
+            String name = DefaultCertProfile.getCurveName(curveId);
+            ecParams.getCurve().add(createOidType(curveId, name));
+        }
+
+        return ret;
+    }
+
 }

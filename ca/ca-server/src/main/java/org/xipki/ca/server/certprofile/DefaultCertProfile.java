@@ -39,6 +39,7 @@ import javax.xml.validation.SchemaFactory;
 
 import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1EncodableVector;
+import org.bouncycastle.asn1.ASN1Integer;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.ASN1StreamParser;
@@ -51,6 +52,10 @@ import org.bouncycastle.asn1.DERUTF8String;
 import org.bouncycastle.asn1.isismtt.x509.AdmissionSyntax;
 import org.bouncycastle.asn1.isismtt.x509.Admissions;
 import org.bouncycastle.asn1.isismtt.x509.ProfessionInfo;
+import org.bouncycastle.asn1.nist.NISTNamedCurves;
+import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
+import org.bouncycastle.asn1.sec.SECNamedCurves;
+import org.bouncycastle.asn1.teletrust.TeleTrusTNamedCurves;
 import org.bouncycastle.asn1.x500.DirectoryString;
 import org.bouncycastle.asn1.x500.RDN;
 import org.bouncycastle.asn1.x500.X500Name;
@@ -65,6 +70,9 @@ import org.bouncycastle.asn1.x509.GeneralNames;
 import org.bouncycastle.asn1.x509.GeneralSubtree;
 import org.bouncycastle.asn1.x509.NameConstraints;
 import org.bouncycastle.asn1.x509.PolicyMappings;
+import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
+import org.bouncycastle.asn1.x9.X962NamedCurves;
+import org.bouncycastle.asn1.x9.X9ObjectIdentifiers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.ca.api.profile.AbstractCertProfile;
@@ -80,6 +88,7 @@ import org.xipki.ca.api.profile.RDNOccurrence;
 import org.xipki.ca.api.profile.SubjectInfo;
 import org.xipki.ca.api.profile.X509Util;
 import org.xipki.ca.server.certprofile.jaxb.AddTextType;
+import org.xipki.ca.server.certprofile.jaxb.AlgorithmType;
 import org.xipki.ca.server.certprofile.jaxb.CertificatePolicyInformationType;
 import org.xipki.ca.server.certprofile.jaxb.CertificatePolicyInformationType.PolicyQualifiers;
 import org.xipki.ca.server.certprofile.jaxb.ConditionType;
@@ -97,9 +106,11 @@ import org.xipki.ca.server.certprofile.jaxb.GeneralSubtreesType;
 import org.xipki.ca.server.certprofile.jaxb.KeyUsageType;
 import org.xipki.ca.server.certprofile.jaxb.ObjectFactory;
 import org.xipki.ca.server.certprofile.jaxb.OidWithDescType;
+import org.xipki.ca.server.certprofile.jaxb.ParameterType;
 import org.xipki.ca.server.certprofile.jaxb.PolicyIdMappingType;
 import org.xipki.ca.server.certprofile.jaxb.ProfileType;
 import org.xipki.ca.server.certprofile.jaxb.ProfileType.AllowedClientExtensions;
+import org.xipki.ca.server.certprofile.jaxb.ProfileType.KeyAlgorithms;
 import org.xipki.ca.server.certprofile.jaxb.ProfileType.Subject;
 import org.xipki.ca.server.certprofile.jaxb.RdnType;
 import org.xipki.ca.server.certprofile.jaxb.SubjectInfoAccessType.Access;
@@ -117,6 +128,9 @@ public class DefaultCertProfile extends AbstractCertProfile
 {
     private static final Logger LOG = LoggerFactory.getLogger(DefaultCertProfile.class);
     private static final char GENERALNAME_SEP = '|';
+    public static final String MODULUS_LENGTH = "moduluslength";
+    public static final String P_LENGTH = "plength";
+    public static final String Q_LENGTH = "qlength";
 
     private static final Set<String> criticalOnlyExtensionTypes;
     private static final Set<String> noncriticalOnlyExtensionTypes;
@@ -127,6 +141,9 @@ public class DefaultCertProfile extends AbstractCertProfile
     private static Unmarshaller jaxbUnmarshaller;
 
     protected ProfileType profileConf;
+
+    private Set<ASN1ObjectIdentifier> allowedEcCurves;
+    private Map<ASN1ObjectIdentifier, List<KeyParamRanges>> nonEcKeyAlgorithms;
 
     private Map<ASN1ObjectIdentifier, SubjectDNOption> subjectDNOptions;
     private List<RDNOccurrence> subjectDNOccurrences;
@@ -188,6 +205,8 @@ public class DefaultCertProfile extends AbstractCertProfile
     private void reset()
     {
         profileConf = null;
+        allowedEcCurves = null;
+        nonEcKeyAlgorithms = null;
         subjectDNOptions = null;
         subjectDNOccurrences = null;
         extensionOccurences = null;
@@ -226,6 +245,81 @@ public class DefaultCertProfile extends AbstractCertProfile
             this.raOnly = getBoolean(conf.isOnlyForRA(), false);
             this.validity = conf.getValidity();
             this.ca = conf.isCa();
+
+            // KeyAlgorithms
+            KeyAlgorithms keyAlgos = conf.getKeyAlgorithms();
+            if(keyAlgos != null)
+            {
+                List<AlgorithmType> types = keyAlgos.getAlgorithm();
+                this.nonEcKeyAlgorithms = new HashMap<>();
+                this.allowedEcCurves = new HashSet<>();
+
+                for(AlgorithmType type : types)
+                {
+                    ASN1ObjectIdentifier oid = new ASN1ObjectIdentifier(type.getAlgorithm().getValue());
+                    if(X9ObjectIdentifiers.id_ecPublicKey.equals(oid))
+                    {
+                        if(type.getEcParameter() != null)
+                        {
+                            for(OidWithDescType curveType :type.getEcParameter().getCurve())
+                            {
+                                this.allowedEcCurves.add(new ASN1ObjectIdentifier(curveType.getValue()));
+                            }
+                        }
+                    }
+                    else
+                    {
+                        KeyParamRanges ranges = null;
+
+                        List<ParameterType> paramTypes = type.getParameter();
+                        if(paramTypes.isEmpty() == false)
+                        {
+                            Map<String, List<KeyParamRange>> map = new HashMap<>(paramTypes.size());
+                            for(ParameterType paramType : paramTypes)
+                            {
+                                if(paramType.getMin() != null || paramType.getMax() != null)
+                                {
+                                    List<KeyParamRange> list = map.get(paramType.getName());
+                                    if(list == null)
+                                    {
+                                        list = new LinkedList<>();
+                                        map.put(paramType.getName(), list);
+                                    }
+
+                                    list.add(new KeyParamRange(paramType.getMin(), paramType.getMax()));
+                                }
+                            }
+
+                            if(map.isEmpty() == false)
+                            {
+                                ranges = new KeyParamRanges(map);
+                            }
+                        }
+
+                        List<KeyParamRanges> list = this.nonEcKeyAlgorithms.get(oid);
+                        if(list == null)
+                        {
+                            list = new LinkedList<>();
+                            this.nonEcKeyAlgorithms.put(oid, list);
+                        }
+
+                        if(ranges != null)
+                        {
+                            list.add(ranges);
+                        }
+                    }
+                }
+
+                if(allowedEcCurves.isEmpty())
+                {
+                    allowedEcCurves = null;
+                }
+
+                if(nonEcKeyAlgorithms.isEmpty())
+                {
+                    nonEcKeyAlgorithms = null;
+                }
+            }
 
             // Subject
             Subject subject = conf.getSubject();
@@ -710,6 +804,123 @@ public class DefaultCertProfile extends AbstractCertProfile
     public ExtensionOccurrence getOccurenceOfIssuerAltName()
     {
         return extensionOccurences.get(Extension.issuerAlternativeName);
+    }
+
+    @Override
+    public void checkPublicKey(SubjectPublicKeyInfo publicKey)
+    throws BadCertTemplateException
+    {
+        if((nonEcKeyAlgorithms == null || nonEcKeyAlgorithms.isEmpty())
+                && (allowedEcCurves == null || allowedEcCurves.isEmpty()))
+        {
+            return;
+        }
+
+        ASN1ObjectIdentifier keyType = publicKey.getAlgorithm().getAlgorithm();
+        if(X9ObjectIdentifiers.id_ecPublicKey.equals(keyType))
+        {
+            if(allowedEcCurves == null || allowedEcCurves.isEmpty())
+            {
+                return;
+            }
+
+            ASN1ObjectIdentifier curveOid;
+            try
+            {
+                ASN1Encodable algParam = publicKey.getAlgorithm().getParameters();
+                curveOid = ASN1ObjectIdentifier.getInstance(algParam);
+            } catch(IllegalArgumentException e)
+            {
+                throw new BadCertTemplateException("Only named EC public key is supported");
+            }
+
+            if(allowedEcCurves.contains(curveOid))
+            {
+                return;
+            }
+            else
+            {
+                throw new BadCertTemplateException("EC curve " + getCurveName(curveOid) +
+                        " (OID: " + curveOid.getId() + ") is not allowed");
+            }
+        }
+        else
+        {
+            if(nonEcKeyAlgorithms == null || allowedEcCurves.isEmpty())
+            {
+                return;
+            }
+
+            if(nonEcKeyAlgorithms.containsKey(keyType))
+            {
+                List<KeyParamRanges> list = nonEcKeyAlgorithms.get(keyType);
+                if(list.isEmpty())
+                {
+                    return;
+                }
+
+                if(PKCSObjectIdentifiers.rsaEncryption.equals(keyType))
+                {
+                    ASN1Sequence seq = ASN1Sequence.getInstance(publicKey.getPublicKeyData().getBytes());
+                    ASN1Integer modulus = ASN1Integer.getInstance(seq.getObjectAt(0));
+                    int modulusLength = modulus.getPositiveValue().bitLength();
+                    for(KeyParamRanges ranges : list)
+                    {
+                        if(satisfy(modulusLength, MODULUS_LENGTH, ranges))
+                        {
+                            return;
+                        }
+                    }
+                }
+                else if(X9ObjectIdentifiers.id_dsa.equals(keyType))
+                {
+                    ASN1Sequence seq = ASN1Sequence.getInstance(publicKey.getPublicKeyData().getBytes());
+                    ASN1Integer p = ASN1Integer.getInstance(seq.getObjectAt(0));
+                    ASN1Integer q = ASN1Integer.getInstance(seq.getObjectAt(1));
+                    int pLength = p.getPositiveValue().bitLength();
+                    int qLength = q.getPositiveValue().bitLength();
+
+                    for(KeyParamRanges ranges : list)
+                    {
+                        boolean match = satisfy(pLength, P_LENGTH, ranges);
+                        if(match)
+                        {
+                            match = satisfy(qLength, Q_LENGTH, ranges);
+                        }
+
+                        if(match)
+                        {
+                            return;
+                        }
+                    }
+                }
+                else
+                {
+                    throw new BadCertTemplateException("Unknown key type " + keyType.getId());
+                }
+            }
+        }
+
+        throw new BadCertTemplateException("the given publicKey is not permitted");
+    }
+
+    private static boolean satisfy(int len, String paramName, KeyParamRanges ranges)
+    {
+        List<KeyParamRange> rangeList = ranges.getRanges(paramName);
+        if(rangeList == null || rangeList.isEmpty())
+        {
+            return true;
+        }
+
+        for(KeyParamRange range : rangeList)
+        {
+            if(range.match(len))
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     @Override
@@ -1542,16 +1753,16 @@ public class DefaultCertProfile extends AbstractCertProfile
 
     private static List<AddText> buildAddText(List<AddTextType> types)
     {
-        List<AddText> ret = null;
-
-        if(types != null && types.isEmpty())
+        if(types == null || types.isEmpty())
         {
-            ret = new ArrayList<>(types.size());
-            for(AddTextType type : types)
-            {
-                Condition c = createCondition(type.getCondition());
-                ret.add(new AddText(c, type.getText()));
-            }
+            return null;
+        }
+
+        List<AddText> ret = new ArrayList<>(types.size());
+        for(AddTextType type : types)
+        {
+            Condition c = createCondition(type.getCondition());
+            ret.add(new AddText(c, type.getText()));
         }
 
         return ret;
@@ -1561,4 +1772,27 @@ public class DefaultCertProfile extends AbstractCertProfile
     {
         return type == null ? null : new Condition(type);
     }
+
+    static String getCurveName(ASN1ObjectIdentifier curveId)
+    {
+        String curveName = X962NamedCurves.getName(curveId);
+
+        if (curveName == null)
+        {
+            curveName = SECNamedCurves.getName(curveId);
+        }
+
+        if (curveName == null)
+        {
+            curveName = TeleTrusTNamedCurves.getName(curveId);
+        }
+
+        if (curveName == null)
+        {
+            curveName = NISTNamedCurves.getName(curveId);
+        }
+
+        return curveName;
+    }
+
 }
