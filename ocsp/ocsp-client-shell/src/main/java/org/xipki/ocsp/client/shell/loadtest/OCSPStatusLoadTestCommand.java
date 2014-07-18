@@ -82,6 +82,10 @@ public class OCSPStatusLoadTestCommand extends OsgiCommandSupport
             required = false, description = "use HTTP GET for small request")
     protected Boolean          useHttpGetForSmallRequest;
 
+    @Option(name = "-sign",
+            required = false, description = "Sign request")
+    protected Boolean          signRequest;
+
     private OCSPRequestor      requestor;
 
     @Override
@@ -186,6 +190,7 @@ public class OCSPStatusLoadTestCommand extends OsgiCommandSupport
         RequestOptions options = new RequestOptions();
         options.setUseNonce(useNonce == null ? false : useNonce.booleanValue());
         options.setHashAlgorithmId(hashAlgoOid);
+        options.setSignRequest(signRequest == null ? false : signRequest.booleanValue());
 
         if(useHttpGetForSmallRequest != null)
         {
