@@ -39,6 +39,13 @@
 			<xs:element name="description" type="xs:string" minOccurs="0"/>
 			<xs:element name="ca" type="xs:boolean"/>			
 			<xs:element name="validity" type="xs:int" minOccurs="0"/>
+			<xs:element name="keyAlgorithms" minOccurs="0">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="algorithm" type="AlgorithmType" maxOccurs="10"/>					
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
 			<xs:element name="subject" minOccurs="0">
 				<xs:complexType>
 					<xs:sequence>
@@ -56,10 +63,42 @@
 				</xs:complexType>
 			</xs:element>
 			<xs:element name="extensions" type="ExtensionsType"/>
-			<xs:any minOccurs="0"/>
+			<xs:any namespace="##other" minOccurs="0"/>
 		</xs:sequence>
 		<xs:attribute name="onlyForRA" type="xs:boolean" default="false" use="optional"/>
 	</xs:complexType>
+	
+	<xs:complexType name="AlgorithmType">
+		<xs:sequence>
+			<xs:element name="algorithm" type="OidWithDescType"/>
+			<xs:choice>
+				<xs:element name="parameter" type="ParameterType" minOccurs="0" maxOccurs="unbounded"/>
+				<xs:element name="ecParameter" type="ECParameterType" minOccurs="0" maxOccurs="1"/>
+			</xs:choice>
+		</xs:sequence>
+	</xs:complexType>
+	
+	<xs:complexType name="ParameterType">
+		<xs:sequence>			
+			<xs:element name="Min" type="xs:int" minOccurs="0"/>
+			<xs:element name="Max" type="xs:int" minOccurs="0"/>
+		</xs:sequence>
+		<xs:attribute name="name" type="xs:string" use="required">
+			<xs:annotation>
+				<xs:documentation>
+					accepted names are 'moduluslength' for RSA,
+					'plength' and 'qlength' for DSA
+				</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+	</xs:complexType>
+
+	<xs:complexType name="ECParameterType">
+		<xs:sequence>			
+			<xs:element name="curve" type="OidWithDescType" maxOccurs="unbounded"/>
+		</xs:sequence>
+	</xs:complexType>
+	
 	
 	<xs:complexType name="RdnType">
 		<xs:sequence>
