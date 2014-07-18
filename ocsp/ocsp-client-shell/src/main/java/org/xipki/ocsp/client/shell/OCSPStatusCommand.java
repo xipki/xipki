@@ -20,6 +20,7 @@ package org.xipki.ocsp.client.shell;
 import java.math.BigInteger;
 import java.net.URL;
 import java.security.MessageDigest;
+import java.security.PublicKey;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -44,15 +45,18 @@ import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.asn1.x509.Extension;
 import org.bouncycastle.asn1.x509.X509ObjectIdentifiers;
+import org.bouncycastle.cert.X509CertificateHolder;
 import org.bouncycastle.cert.ocsp.BasicOCSPResp;
 import org.bouncycastle.cert.ocsp.CertificateStatus;
 import org.bouncycastle.cert.ocsp.RevokedStatus;
 import org.bouncycastle.cert.ocsp.SingleResp;
 import org.bouncycastle.cert.ocsp.UnknownStatus;
+import org.bouncycastle.operator.ContentVerifierProvider;
 import org.bouncycastle.util.encoders.Hex;
 import org.xipki.ocsp.client.api.OCSPRequestor;
 import org.xipki.ocsp.client.api.OCSPResponseNotSuccessfullException;
 import org.xipki.ocsp.client.api.RequestOptions;
+import org.xipki.security.KeyUtil;
 import org.xipki.security.SignerUtil;
 import org.xipki.security.common.CRLReason;
 import org.xipki.security.common.IoCertUtil;
@@ -94,8 +98,12 @@ public class OCSPStatusCommand extends OsgiCommandSupport
     protected String           prefSigAlgs;
 
     @Option(name = "-httpget",
-            required = false, description = "use HTTP GET for small request")
+            required = false, description = "Use HTTP GET for small request")
     protected Boolean          useHttpGetForSmallRequest;
+
+    @Option(name = "-sign",
+            required = false, description = "Sign request")
+    protected Boolean          signRequest;
 
     @Option(name = "-v", aliases="--verbose",
             required = false, description = "Show status verbosely")
@@ -172,6 +180,7 @@ public class OCSPStatusCommand extends OsgiCommandSupport
         RequestOptions options = new RequestOptions();
         options.setUseNonce(useNonce == null ? false : useNonce.booleanValue());
         options.setHashAlgorithmId(hashAlgoOid);
+        options.setSignRequest(signRequest == null ? false : signRequest.booleanValue());
 
         if(useHttpGetForSmallRequest != null)
         {
@@ -198,6 +207,39 @@ public class OCSPStatusCommand extends OsgiCommandSupport
         {
             System.err.println(e.getMessage());
             return null;
+        }
+
+        // check the signature if available
+        if(null == basicResp.getSignature())
+        {
+            System.out.println("Response is not signed");
+        }
+        else
+        {
+            X509CertificateHolder[] responderCerts = basicResp.getCerts();
+            if(responderCerts == null || responderCerts.length < 1)
+            {
+                System.err.println("No responder certificate is contained in the response");
+            }
+            else
+            {
+                PublicKey responderPubKey = KeyUtil.generatePublicKey(responderCerts[0].getSubjectPublicKeyInfo());
+                ContentVerifierProvider cvp = KeyUtil.getContentVerifierProvider(responderPubKey);
+                boolean sigValid = basicResp.isSignatureValid(cvp);
+                if(sigValid == false)
+                {
+                    System.err.println("Response is equipped with invalid signature");
+                }
+                else
+                {
+                    System.err.println("Response is equipped with valid signature");
+                }
+
+                if(verbose != null && verbose.booleanValue())
+                {
+                    System.out.println("Responder is " + IoCertUtil.canonicalizeName(responderCerts[0].getSubject()));
+                }
+            }
         }
 
         boolean extendedRevoke = basicResp.getExtension(OCSPRequestor.id_pkix_ocsp_extendedRevoke) != null;
@@ -352,6 +394,7 @@ public class OCSPStatusCommand extends OsgiCommandSupport
 
             System.out.println(msg.toString());
         }
+        System.out.println();
 
         return null;
     }

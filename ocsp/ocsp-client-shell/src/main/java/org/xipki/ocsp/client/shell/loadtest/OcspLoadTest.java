@@ -139,9 +139,18 @@ public class OcspLoadTest extends AbstractLoadTest
                 }
                 else if(singleCertStatus instanceof RevokedStatus)
                 {
-                    int reason = ((RevokedStatus) singleCertStatus).getRevocationReason();
-                    Date revTime = ((RevokedStatus) singleCertStatus).getRevocationTime();
-                    status = "Revoked, reason = "+ reason + ", revocationTime = " + revTime;
+                    RevokedStatus revStatus = (RevokedStatus) singleCertStatus;
+                    Date revTime = revStatus.getRevocationTime();
+
+                    if(revStatus.hasRevocationReason())
+                    {
+                        int reason = revStatus.getRevocationReason();
+                        status = "Revoked, reason = "+ reason + ", revocationTime = " + revTime;
+                    }
+                    else
+                    {
+                        status = "Revoked, no reason, revocationTime = " + revTime;
+                    }
                 }
                 else if(singleCertStatus instanceof UnknownStatus)
                 {
