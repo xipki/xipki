@@ -22,6 +22,7 @@ import java.math.BigInteger;
 import java.net.URL;
 import java.security.SecureRandom;
 import java.security.cert.CertificateEncodingException;
+import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.Arrays;
 import java.util.LinkedList;
@@ -44,6 +45,7 @@ import org.bouncycastle.cert.ocsp.OCSPException;
 import org.bouncycastle.cert.ocsp.OCSPReq;
 import org.bouncycastle.cert.ocsp.OCSPReqBuilder;
 import org.bouncycastle.cert.ocsp.OCSPResp;
+import org.bouncycastle.operator.ContentSigner;
 import org.bouncycastle.operator.DigestCalculator;
 import org.xipki.ocsp.client.api.OCSPRequestor;
 import org.xipki.ocsp.client.api.OCSPRequestorException;
@@ -54,6 +56,11 @@ import org.xipki.ocsp.client.impl.digest.SHA224DigestCalculator;
 import org.xipki.ocsp.client.impl.digest.SHA256DigestCalculator;
 import org.xipki.ocsp.client.impl.digest.SHA384DigestCalculator;
 import org.xipki.ocsp.client.impl.digest.SHA512DigestCalculator;
+import org.xipki.security.api.ConcurrentContentSigner;
+import org.xipki.security.api.NoIdleSignerException;
+import org.xipki.security.api.PasswordResolver;
+import org.xipki.security.api.SecurityFactory;
+import org.xipki.security.common.IoCertUtil;
 
 /**
  * @author Lijun Liao
@@ -61,6 +68,15 @@ import org.xipki.ocsp.client.impl.digest.SHA512DigestCalculator;
 
 public abstract class AbstractOCSPRequestor implements OCSPRequestor
 {
+    private PasswordResolver passwordResolver;
+    private SecurityFactory securityFactory;
+
+    private final Object signerLock = new Object();
+    private ConcurrentContentSigner signer;
+    private String signerType;
+    private String signerConf;
+    private String signerCertFile;
+
     private SecureRandom random = new SecureRandom();
 
     protected abstract byte[] send(byte[] request, URL responderUrl, RequestOptions requestOptions)
@@ -143,7 +159,6 @@ public abstract class AbstractOCSPRequestor implements OCSPRequestor
         {
             throw new OCSPResponseNotSuccessfullException(statusCode);
         }
-
     }
 
     private OCSPReq buildRequest(X509Certificate caCert, BigInteger serialNumber, byte[] nonce,
@@ -219,7 +234,68 @@ public abstract class AbstractOCSPRequestor implements OCSPRequestor
                     serialNumber);
 
             reqBuilder.addRequest(certID);
-            return reqBuilder.build();
+
+            if(requestOptions.isSignRequest())
+            {
+                synchronized (signerLock)
+                {
+                    if(signer == null)
+                    {
+                        if(signerType == null || signerType.isEmpty())
+                        {
+                            throw new OCSPRequestorException("signerType is not configured");
+                        }
+
+                        if(signerConf == null || signerConf.isEmpty())
+                        {
+                            throw new OCSPRequestorException("signerConf is not configured");
+                        }
+
+                        X509Certificate cert = null;
+                        if(signerCertFile != null && signerCertFile.isEmpty() == false)
+                        {
+                            try
+                            {
+                                cert = IoCertUtil.parseCert(signerCertFile);
+                            } catch (CertificateException e)
+                            {
+                                throw new OCSPRequestorException(
+                                        "Could not parse certificate " + signerCertFile + ": " + e.getMessage());
+                            }
+                        }
+
+                        try
+                        {
+                            signer = getSecurityFactory().createSigner(signerType, signerConf, cert, getPasswordResolver());
+                        } catch (Exception e)
+                        {
+                            throw new OCSPRequestorException("Could not create signer: " + e.getMessage());
+                        }
+                    }
+                }
+
+                ContentSigner singleSigner;
+                try
+                {
+                    singleSigner = signer.borrowContentSigner();
+                } catch (NoIdleSignerException e)
+                {
+                    throw new OCSPRequestorException("NoIdleSignerException: " + e.getMessage());
+                }
+
+                reqBuilder.setRequestorName(signer.getCertificateAsBCObject().getSubject());
+                try
+                {
+                    return reqBuilder.build(singleSigner, signer.getCertificateChainAsBCObjects());
+                }finally
+                {
+                    signer.returnContentSigner(singleSigner);
+                }
+            }
+            else
+            {
+                return reqBuilder.build();
+            }
         } catch (OCSPException e)
         {
             throw new OCSPRequestorException(e);
@@ -237,6 +313,59 @@ public abstract class AbstractOCSPRequestor implements OCSPRequestor
         byte[] nonce = new byte[20];
         random.nextBytes(nonce);
         return nonce;
+    }
+
+    public String getSignerConf()
+    {
+        return signerConf;
+    }
+
+    public void setSignerConf(String signerConf)
+    {
+        this.signer = null;
+        this.signerConf = signerConf;
+    }
+
+    public String getSignerCertFile()
+    {
+        return signerCertFile;
+    }
+
+    public void setSignerCertFile(String signerCertFile)
+    {
+        this.signer = null;
+        this.signerCertFile = signerCertFile;
+    }
+
+    public String getSignerType()
+    {
+        return signerType;
+    }
+
+    public void setSignerType(String signerType)
+    {
+        this.signer = null;
+        this.signerType = signerType;
+    }
+
+    public PasswordResolver getPasswordResolver()
+    {
+        return passwordResolver;
+    }
+
+    public void setPasswordResolver(PasswordResolver passwordResolver)
+    {
+        this.passwordResolver = passwordResolver;
+    }
+
+    public SecurityFactory getSecurityFactory()
+    {
+        return securityFactory;
+    }
+
+    public void setSecurityFactory(SecurityFactory securityFactory)
+    {
+        this.securityFactory = securityFactory;
     }
 
 }

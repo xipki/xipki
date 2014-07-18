@@ -81,6 +81,7 @@ public class RequestOptions
 
     }
 
+    private boolean signRequest = false;
     private boolean useNonce = true;
     private boolean useHttpGetForRequest = false;
     private ASN1ObjectIdentifier hashAlgorithmId = NISTObjectIdentifiers.id_sha256;
@@ -266,6 +267,16 @@ public class RequestOptions
             new AlgorithmIdentifier(PKCSObjectIdentifiers.id_mgf1, digAlgId),
             new ASN1Integer(saltSize),
             RSASSAPSSparams.DEFAULT_TRAILER_FIELD);
+    }
+
+    public boolean isSignRequest()
+    {
+        return signRequest;
+    }
+
+    public void setSignRequest(boolean signRequest)
+    {
+        this.signRequest = signRequest;
     }
 
 }

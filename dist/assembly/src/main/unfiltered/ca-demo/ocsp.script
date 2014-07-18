@@ -4,15 +4,35 @@
 features:install xipki-ocspserver
 features:install xipki-ocspclient-shell
 
-ocsp:status -cacert output/RCA1.der -cert output/SubCA1.der
+echo "===== expected: Good ====="
+ocsp:status -cacert output/RCA1.der -cert output/SubCA1.der -v -sign
 
-ocsp:status -cacert output/SubCA1.der -cert output/TLS1.der
-ocsp:status -cacert output/SubCA1.der -cert output/TLS2.der
-ocsp:status -cacert output/SubCA1.der -cert output/TLS_C1.der
-ocsp:status -cacert output/SubCA1.der -cert output/TLS_C2.der
+echo "===== expected: Good ====="
+ocsp:status -cacert output/SubCA1.der -cert output/TLS1.der -v
 
-ocsp:status -cacert output/SubCAwithCRL1.der -cert output/OCSP1.der
-ocsp:status -cacert output/SubCAwithCRL1.der -cert output/OCSP2.der
+echo "===== expected: Revoked, reason = affiliationChanged ====="
+ocsp:status -cacert output/SubCA1.der -cert output/TLS2.der -v -sign
+
+echo "===== expected: Good ====="
+ocsp:status -cacert output/SubCA1.der -cert output/TLS_C1.der -v
+
+echo "===== expected: Revoked, reason = affiliationChanged ====="
+ocsp:status -cacert output/SubCA1.der -cert output/TLS_C2.der -v -sign
+
+echo "===== expected: Good ====="
+ocsp:status -cacert output/SubCAwithCRL1.der -cert output/OCSP1.der -v
+
+echo "===== expected: Revoked, reason = keyCompromise ====="
+ocsp:status -cacert output/SubCAwithCRL1.der -cert output/OCSP2.der -v -sign
+
+echo "===== expected: Good ====="
+ocsp:status -cacert output/SubCAwithCRL1.der -serial 99999 -v
+
+echo "===== expected: Unknown (RFC6960) ====="
+ocsp:status -cacert output/SubCA1.der -serial 99999 -v
+
+echo "===== expected: Unknown (RFC2560) ====="
+ocsp:status -cacert output/TLS1.der -serial 2 -v
 
 features:uninstall xipki-ocspclient-shell
 features:uninstall xipki-ocspclient
