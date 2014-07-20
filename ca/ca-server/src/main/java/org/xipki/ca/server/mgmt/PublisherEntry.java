@@ -99,7 +99,7 @@ public class PublisherEntry
         }
 
         CertPublisher realPublisher;
-        if(type.equalsIgnoreCase("default"))
+        if(type.equalsIgnoreCase("ocsp"))
         {
             realPublisher = new DefaultCertPublisher();
         }
