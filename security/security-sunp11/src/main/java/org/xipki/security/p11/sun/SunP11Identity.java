@@ -182,8 +182,7 @@ class SunP11Identity implements Comparable<SunP11Identity>
 
         if (inLen+3 > blockSize)
         {
-            throw new SignerException(
-                    "data too long (maximal " + (blockSize - 3) + " allowed): " + inLen);
+            throw new SignerException("data too long (maximal " + (blockSize - 3) + " allowed): " + inLen);
         }
 
         byte[]  block = new byte[blockSize];
