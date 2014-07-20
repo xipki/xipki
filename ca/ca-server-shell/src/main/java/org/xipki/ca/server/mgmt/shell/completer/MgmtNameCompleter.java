@@ -15,21 +15,17 @@
  *
  */
 
-package org.xipki.ca.server.mgmt.shell;
+package org.xipki.ca.server.mgmt.shell.completer;
 
 import org.xipki.ca.server.mgmt.CAManager;
-import org.xipki.ca.server.mgmt.DuplicationMode;
-import org.xipki.console.karaf.XipkiOsgiCommandSupport;
+import org.xipki.console.karaf.DynamicEnumCompleter;
 
 /**
  * @author Lijun Liao
  */
 
-public abstract class CaCommand extends XipkiOsgiCommandSupport
+public abstract class MgmtNameCompleter extends DynamicEnumCompleter
 {
-    public final static String permissionsText =
-            "enroll, revoke, unrevoke, remove, key-update, gen-crl, get-crl, enroll-cross, all";
-
     protected CAManager caManager;
 
     public void setCaManager(CAManager caManager)
@@ -37,17 +33,4 @@ public abstract class CaCommand extends XipkiOsgiCommandSupport
         this.caManager = caManager;
     }
 
-    protected DuplicationMode getDuplicationMode(Integer mode, DuplicationMode defaultMode)
-    {
-        if(mode == null)
-        {
-            return defaultMode;
-        }
-        return DuplicationMode.getInstance(mode.intValue());
-    }
-
-    protected static String getRealString(String s)
-    {
-        return CAManager.NULL.equalsIgnoreCase(s) ? null : s;
-    }
 }
