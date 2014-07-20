@@ -19,6 +19,7 @@ package org.xipki.ca.server.mgmt.shell;
 
 import org.apache.felix.gogo.commands.Command;
 import org.apache.felix.gogo.commands.Option;
+import org.xipki.security.common.IoCertUtil;
 
 /**
  * @author Lijun Liao
@@ -41,14 +42,23 @@ public class PublisherUpdateCommand extends CaCommand
             description = "Publisher configuration or 'NULL'")
     protected String            conf;
 
+    @Option(name = "-confFile",
+            description = "Profile configuration file")
+    protected String            confFile;
+
     @Override
     protected Object doExecute()
     throws Exception
     {
-        if(type == null && conf == null)
+        if(type == null && conf == null && confFile == null)
         {
             System.out.println("Nothing to update");
             return null;
+        }
+
+        if(conf == null && confFile != null)
+        {
+            conf = new String(IoCertUtil.read(confFile));
         }
 
         caManager.changePublisher(name, type, conf);
