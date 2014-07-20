@@ -6,8 +6,76 @@
     <reference id="caManager" interface="org.xipki.ca.server.mgmt.CAManager" />
     <reference id="securityFactory" interface="org.xipki.security.api.SecurityFactory" />
 	<reference id="passwordResolver" interface="org.xipki.security.api.PasswordResolver" />
-	
-    <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.0.0">
+
+	<reference id="filePathCompleter" interface="org.xipki.console.karaf.FilePathCompleter"/>
+
+    <bean id="caStatusCompleter" class="org.xipki.console.karaf.EnumCompleter">
+        <property name="tokens" value="active, pending, deactivated"/>
+    </bean>
+
+    <bean id="signerTypeCompleter" class="org.xipki.console.karaf.EnumCompleter">
+        <property name="tokens" value="JKS, PKCS11, PKCS12"/>
+    </bean>
+
+    <bean id="crlSignerTypeCompleter" class="org.xipki.console.karaf.EnumCompleter">
+        <property name="tokens" value="CA, JKS, PKCS11, PKCS12"/>
+    </bean>
+
+    <bean id="duplicateKeyModeCompleter" class="org.xipki.console.karaf.EnumCompleter">
+        <property name="tokens" value="1, 2, 3"/>
+    </bean>
+
+    <bean id="duplicateSubjectModeCompleter" class="org.xipki.console.karaf.EnumCompleter">
+        <property name="tokens" value="1, 2, 3"/>
+    </bean>
+
+    <bean id="crlReasonCompleter" class="org.xipki.console.karaf.EnumCompleter">
+        <property name="tokens" value="0, 1, 3, 4, 5, 6, 9"/>
+    </bean>
+    
+    <bean id="caCrlReasonCompleter" class="org.xipki.console.karaf.EnumCompleter">
+        <property name="tokens" value="0, 1, 2, 3, 4, 5, 6, 9"/>
+    </bean>
+
+    <bean id="caNameCompleter" class="org.xipki.ca.server.mgmt.shell.completer.CaNameCompleter">
+        <property name="caManager" ref="caManager" />
+    </bean>
+
+    <bean id="caNamePlusAllCompleter" class="org.xipki.ca.server.mgmt.shell.completer.CaNamePlusAllCompleter">
+        <property name="caManager" ref="caManager" />
+    </bean>
+
+    <bean id="caAliasCompleter" class="org.xipki.ca.server.mgmt.shell.completer.CaAliasCompleter">
+        <property name="caManager" ref="caManager" />
+    </bean>
+
+    <bean id="profileNameCompleter" class="org.xipki.ca.server.mgmt.shell.completer.ProfileNameCompleter">
+        <property name="caManager" ref="caManager" />
+    </bean>
+
+    <bean id="publisherNameCompleter" class="org.xipki.ca.server.mgmt.shell.completer.PublisherNameCompleter">
+        <property name="caManager" ref="caManager" />
+    </bean>
+
+    <bean id="publisherNamePlusAllCompleter" class="org.xipki.ca.server.mgmt.shell.completer.PublisherNamePlusAllCompleter">
+        <property name="caManager" ref="caManager" />
+    </bean>
+
+    <bean id="requestorNameCompleter" class="org.xipki.ca.server.mgmt.shell.completer.RequestorNameCompleter">
+        <property name="caManager" ref="caManager" />
+    </bean>
+
+    <bean id="crlSignerNameCompleter" class="org.xipki.ca.server.mgmt.shell.completer.CrlSignerNameCompleter">
+        <property name="caManager" ref="caManager" />
+    </bean>
+
+    <bean id="envNameCompleter" class="org.xipki.ca.server.mgmt.shell.completer.EnvNameCompleter">
+        <property name="caManager" ref="caManager" />
+    </bean>
+
+    <bean id="permissionCompleter" class="org.xipki.ca.server.mgmt.shell.completer.PermissionCompleter"/>
+
+    <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.1.0">
 
 		<!-- CA system -->
 		<command name="ca/system-status">
@@ -35,18 +103,34 @@
             	<property name="passwordResolver" ref="passwordResolver"/>
        			<property name="securityFactory" ref="securityFactory"/>
             </action>
+            <optional-completers>
+                <entry key="-status" value-ref="caStatusCompleter"/>
+                <entry key="-permission" value-ref="permissionCompleter"/>
+                <entry key="-crlSigner" value-ref="crlSignerNameCompleter"/>
+                <entry key="-cert" value-ref="filePathCompleter"/>    
+                <entry key="-signerType" value-ref="signerTypeCompleter"/>
+                <entry key="-ds" value-ref="duplicateSubjectModeCompleter"/>
+                <entry key="-dk" value-ref="duplicateKeyModeCompleter"/>
+            </optional-completers>
         </command>
 
         <command name="ca/ca-revoke">
             <action class="org.xipki.ca.server.mgmt.shell.CaRevokeCommand">
             	<property name="caManager" ref="caManager" />
             </action>
+            <optional-completers>
+                <entry key="-name" value-ref="caNameCompleter"/>
+                <entry key="-reason" value-ref="caCrlReasonCompleter"/>
+            </optional-completers>
         </command>
 
         <command name="ca/ca-rm">
             <action class="org.xipki.ca.server.mgmt.shell.CaRemoveCommand">
             	<property name="caManager" ref="caManager" />
             </action>
+            <optional-completers>
+                <entry key="-name" value-ref="caNameCompleter"/>
+            </optional-completers>
         </command>
         
         <command name="ca/gen-rca">
@@ -55,18 +139,33 @@
             	<property name="passwordResolver" ref="passwordResolver"/>
        			<property name="securityFactory" ref="securityFactory"/>
             </action>
+            <optional-completers>
+                <entry key="-status" value-ref="caStatusCompleter"/>
+                <entry key="-permission" value-ref="permissionCompleter"/>
+                <entry key="-crlSigner" value-ref="crlSignerNameCompleter"/>
+                <entry key="-out" value-ref="filePathCompleter"/>    
+                <entry key="-signerType" value-ref="signerTypeCompleter"/>
+                <entry key="-ds" value-ref="duplicateSubjectModeCompleter"/>
+                <entry key="-dk" value-ref="duplicateKeyModeCompleter"/>
+            </optional-completers>
         </command>
         
         <command name="ca/publish-self">
             <action class="org.xipki.ca.server.mgmt.shell.CaPublishRCACertCommand">
             	<property name="caManager" ref="caManager" />
             </action>
+            <optional-completers>
+                <entry key="-ca" value-ref="caNameCompleter"/>
+            </optional-completers>
         </command>
         
         <command name="ca/ca-list">
             <action class="org.xipki.ca.server.mgmt.shell.CaListCommand">
             	<property name="caManager" ref="caManager" />
             </action>
+            <optional-completers>
+                <entry key="-name" value-ref="caNameCompleter"/>
+            </optional-completers>
         </command>
         
         <command name="ca/ca-update">
@@ -74,6 +173,15 @@
             	<property name="caManager" ref="caManager" />
             	<property name="passwordResolver" ref="passwordResolver"/>
             </action>
+            <optional-completers>
+                <entry key="-name" value-ref="caNameCompleter"/>
+                <entry key="-status" value-ref="caStatusCompleter"/>
+                <entry key="-permission" value-ref="permissionCompleter"/>
+                <entry key="-cert" value-ref="filePathCompleter"/>    
+                <entry key="-signerType" value-ref="signerTypeCompleter"/>
+                <entry key="-ds" value-ref="duplicateSubjectModeCompleter"/>
+                <entry key="-dk" value-ref="duplicateKeyModeCompleter"/>
+            </optional-completers>
         </command>
         
         <!-- CA Alias -->
@@ -81,18 +189,27 @@
             <action class="org.xipki.ca.server.mgmt.shell.CaAliasAddCommand">
             	<property name="caManager" ref="caManager" />
             </action>
+            <optional-completers>
+                <entry key="-ca" value-ref="caNameCompleter"/>
+            </optional-completers>
         </command>
 
         <command name="ca/caalias-list">
             <action class="org.xipki.ca.server.mgmt.shell.CaAliasListCommand">
             	<property name="caManager" ref="caManager" />
             </action>
+            <optional-completers>
+                <entry key="-alias" value-ref="caAliasCompleter"/>
+            </optional-completers>
         </command>
 
         <command name="ca/caalias-rm">
             <action class="org.xipki.ca.server.mgmt.shell.CaAliasRemoveCommand">
             	<property name="caManager" ref="caManager" />
             </action>
+            <optional-completers>
+                <entry key="-alias" value-ref="caAliasCompleter"/>
+            </optional-completers>
         </command>
         
         <!--  CA-Profile -->
@@ -100,18 +217,28 @@
             <action class="org.xipki.ca.server.mgmt.shell.CaProfileAddCommand">
             	<property name="caManager" ref="caManager" />
             </action>
+            <optional-completers>
+                <entry key="-ca" value-ref="caNameCompleter"/>
+                <entry key="-profile" value-ref="profileNameCompleter"/>
+            </optional-completers>
         </command>
 		
 		<command name="ca/caprofile-list">
             <action class="org.xipki.ca.server.mgmt.shell.CaProfileListCommand">
             	<property name="caManager" ref="caManager" />
             </action>
+            <optional-completers>
+                <entry key="-ca" value-ref="caNameCompleter"/>
+            </optional-completers>
         </command>
 
 		<command name="ca/caprofile-rm">
             <action class="org.xipki.ca.server.mgmt.shell.CaProfileRemoveCommand">
             	<property name="caManager" ref="caManager" />
             </action>
+            <optional-completers>
+                <entry key="-ca" value-ref="caNameCompleter"/>
+            </optional-completers>
         </command>        
         
 		<!--  CA-Publisher -->
@@ -119,18 +246,28 @@
             <action class="org.xipki.ca.server.mgmt.shell.CaPublisherAddCommand">
             	<property name="caManager" ref="caManager" />
             </action>
+            <optional-completers>
+                <entry key="-ca" value-ref="caNameCompleter"/>
+                <entry key="-publisher" value-ref="publisherNameCompleter"/>
+            </optional-completers>
         </command>
 		
 		<command name="ca/capub-list">
             <action class="org.xipki.ca.server.mgmt.shell.CaPublisherListCommand">
             	<property name="caManager" ref="caManager" />
             </action>
+            <optional-completers>
+                <entry key="-ca" value-ref="caNameCompleter"/>
+            </optional-completers>
         </command>
 
 		<command name="ca/capub-rm">
             <action class="org.xipki.ca.server.mgmt.shell.CaPublisherRemoveCommand">
             	<property name="caManager" ref="caManager" />
             </action>
+            <optional-completers>
+                <entry key="-ca" value-ref="caNameCompleter"/>
+            </optional-completers>
         </command>
         
 		<!--  CA-Requestor -->
@@ -138,18 +275,30 @@
             <action class="org.xipki.ca.server.mgmt.shell.CaRequestorAddCommand">
             	<property name="caManager" ref="caManager" />
             </action>
+            <optional-completers>
+                <entry key="-ca" value-ref="caNameCompleter"/>
+                <entry key="-requestor" value-ref="requestorNameCompleter"/>
+                <entry key="-permission" value-ref="permissionCompleter"/>
+				<entry key="-profile" value-ref="profileNameCompleter"/>
+            </optional-completers>
         </command>
 		
 		<command name="ca/careq-list">
             <action class="org.xipki.ca.server.mgmt.shell.CaRequestorListCommand">
             	<property name="caManager" ref="caManager" />
             </action>
+            <optional-completers>
+                <entry key="-ca" value-ref="caNameCompleter"/>
+            </optional-completers>
         </command>
 
 		<command name="ca/careq-rm">
             <action class="org.xipki.ca.server.mgmt.shell.CaRequestorRemoveCommand">
             	<property name="caManager" ref="caManager" />
             </action>
+            <optional-completers>
+                <entry key="-ca" value-ref="caNameCompleter"/>
+            </optional-completers>
         </command>
         
         <!-- CMPControl -->
@@ -176,6 +325,7 @@
             	<property name="caManager" ref="caManager" />
             </action>
         </command>
+
         <!-- CRL signer -->
 		<command name="ca/crlsigner-add">
             <action class="org.xipki.ca.server.mgmt.shell.CrlSignerAddCommand">
@@ -183,24 +333,39 @@
             	<property name="passwordResolver" ref="passwordResolver"/>
        			<property name="securityFactory" ref="securityFactory"/>
             </action>
+            <optional-completers>
+                <entry key="-cert" value-ref="filePathCompleter"/>    
+                <entry key="-signerType" value-ref="crlSignerTypeCompleter"/>
+            </optional-completers>
         </command>
         
 		<command name="ca/crlsigner-list">
             <action class="org.xipki.ca.server.mgmt.shell.CrlSignerListCommand">
             	<property name="caManager" ref="caManager" />
             </action>
+            <optional-completers>
+                <entry key="-name" value-ref="crlSignerNameCompleter"/>    
+            </optional-completers>
         </command>
 		
 		<command name="ca/crlsigner-rm">
             <action class="org.xipki.ca.server.mgmt.shell.CrlSignerRemoveCommand">
             	<property name="caManager" ref="caManager" />
             </action>
+            <optional-completers>
+                <entry key="-name" value-ref="crlSignerNameCompleter"/>    
+            </optional-completers>
         </command>
         
 		<command name="ca/crlsigner-update">
             <action class="org.xipki.ca.server.mgmt.shell.CrlSignerUpdateCommand">
             	<property name="caManager" ref="caManager" />
             </action>
+            <optional-completers>
+                <entry key="-name" value-ref="crlSignerNameCompleter"/>    
+                <entry key="-cert" value-ref="filePathCompleter"/>
+                <entry key="-signerType" value-ref="crlSignerTypeCompleter"/>
+            </optional-completers>
         </command>
                 
 		<!-- Environment -->
@@ -214,18 +379,27 @@
             <action class="org.xipki.ca.server.mgmt.shell.EnvListCommand">
             	<property name="caManager" ref="caManager" />
             </action>
+            <optional-completers>
+                <entry key="-name" value-ref="envNameCompleter"/>    
+            </optional-completers>
         </command>
 
         <command name="ca/env-rm">
             <action class="org.xipki.ca.server.mgmt.shell.EnvRemoveCommand">
             	<property name="caManager" ref="caManager" />
             </action>
+            <optional-completers>
+                <entry key="-name" value-ref="envNameCompleter"/>    
+            </optional-completers>
         </command>
 
         <command name="ca/env-update">
             <action class="org.xipki.ca.server.mgmt.shell.EnvUpdateCommand">
             	<property name="caManager" ref="caManager" />
             </action>
+            <optional-completers>
+                <entry key="-name" value-ref="envNameCompleter"/>    
+            </optional-completers>
         </command>
         
 		<!-- Profile -->
@@ -233,24 +407,37 @@
             <action class="org.xipki.ca.server.mgmt.shell.ProfileAddCommand">
             	<property name="caManager" ref="caManager" />
             </action>
+            <optional-completers>
+                <entry key="-confFile" value-ref="filePathCompleter"/>
+            </optional-completers>
         </command>
 
         <command name="ca/profile-list">
             <action class="org.xipki.ca.server.mgmt.shell.ProfileListCommand">
             	<property name="caManager" ref="caManager" />
             </action>
+            <optional-completers>
+                <entry key="-name" value-ref="profileNameCompleter"/>
+            </optional-completers>
         </command>
 
         <command name="ca/profile-rm">
             <action class="org.xipki.ca.server.mgmt.shell.ProfileRemoveCommand">
             	<property name="caManager" ref="caManager" />
             </action>
+            <optional-completers>
+                <entry key="-name" value-ref="profileNameCompleter"/>
+            </optional-completers>
         </command>
 
         <command name="ca/profile-update">
             <action class="org.xipki.ca.server.mgmt.shell.ProfileUpdateCommand">
             	<property name="caManager" ref="caManager" />
             </action>
+            <optional-completers>
+                <entry key="-name" value-ref="profileNameCompleter"/>
+                <entry key="-confFile" value-ref="filePathCompleter"/>
+            </optional-completers>
         </command>
         
 		<!-- Publisher -->
@@ -258,36 +445,57 @@
             <action class="org.xipki.ca.server.mgmt.shell.PublisherAddCommand">
             	<property name="caManager" ref="caManager" />
             </action>
+            <optional-completers>
+                <entry key="-confFile" value-ref="filePathCompleter"/>
+            </optional-completers>
         </command>
 
         <command name="ca/publisher-list">
             <action class="org.xipki.ca.server.mgmt.shell.PublisherListCommand">
             	<property name="caManager" ref="caManager" />
             </action>
+            <optional-completers>
+                <entry key="-name" value-ref="publisherNameCompleter"/>
+            </optional-completers>
         </command>
 
         <command name="ca/publisher-rm">
             <action class="org.xipki.ca.server.mgmt.shell.PublisherRemoveCommand">
             	<property name="caManager" ref="caManager" />
             </action>
+            <optional-completers>
+                <entry key="-name" value-ref="publisherNameCompleter"/>
+            </optional-completers>
         </command>
         
         <command name="ca/publisher-update">
             <action class="org.xipki.ca.server.mgmt.shell.PublisherUpdateCommand">
             	<property name="caManager" ref="caManager" />
             </action>
+            <optional-completers>
+                <entry key="-name" value-ref="publisherNameCompleter"/>
+                <entry key="-confFile" value-ref="filePathCompleter"/>
+            </optional-completers>
         </command>
 
         <command name="ca/republish">
             <action class="org.xipki.ca.server.mgmt.shell.RepublishCommand">
             	<property name="caManager" ref="caManager" />
             </action>
+            <optional-completers>
+                <entry key="-ca" value-ref="caNamePlusAllCompleter"/>
+                <entry key="-publisher" value-ref="publisherNamePlusAllCompleter"/>
+            </optional-completers>
         </command>
 
         <command name="ca/clear-publishqueue">
             <action class="org.xipki.ca.server.mgmt.shell.ClearPublishQueueCommand">
             	<property name="caManager" ref="caManager" />
             </action>
+            <optional-completers>
+                <entry key="-ca" value-ref="caNamePlusAllCompleter"/>
+                <entry key="-publisher" value-ref="publisherNamePlusAllCompleter"/>
+            </optional-completers>
         </command>
         
 		<!-- Requestor -->
@@ -295,24 +503,37 @@
             <action class="org.xipki.ca.server.mgmt.shell.RequestorAddCommand">
             	<property name="caManager" ref="caManager" />
             </action>
+            <optional-completers>
+                <entry key="-cert" value-ref="filePathCompleter"/>
+            </optional-completers>
         </command>
 
         <command name="ca/requestor-list">
             <action class="org.xipki.ca.server.mgmt.shell.RequestorListCommand">
             	<property name="caManager" ref="caManager" />
             </action>
+            <optional-completers>
+                <entry key="-name" value-ref="requestorNameCompleter"/>
+            </optional-completers>
         </command>
 
         <command name="ca/requestor-rm">
             <action class="org.xipki.ca.server.mgmt.shell.RequestorRemoveCommand">
             	<property name="caManager" ref="caManager" />
             </action>
+            <optional-completers>
+                <entry key="-name" value-ref="requestorNameCompleter"/>
+            </optional-completers>
         </command>
 
         <command name="ca/requestor-update">
             <action class="org.xipki.ca.server.mgmt.shell.RequestorUpdateCommand">
             	<property name="caManager" ref="caManager" />
             </action>
+            <optional-completers>
+                <entry key="-name" value-ref="requestorNameCompleter"/>
+                <entry key="-cert" value-ref="filePathCompleter"/>
+            </optional-completers>
         </command>
         
 		<!-- Responder -->
@@ -334,6 +555,10 @@
             	<property name="passwordResolver" ref="passwordResolver"/>
        			<property name="securityFactory" ref="securityFactory"/>
             </action>
+            <optional-completers>
+                <entry key="-signerType" value-ref="signerTypeCompleter"/>
+                <entry key="-cert" value-ref="filePathCompleter"/>
+            </optional-completers>            
         </command>
 
         <command name="ca/responder-update">
@@ -341,6 +566,10 @@
             	<property name="caManager" ref="caManager" />
             	<property name="passwordResolver" ref="passwordResolver"/>
             </action>
+            <optional-completers>
+                <entry key="-signerType" value-ref="signerTypeCompleter"/>
+                <entry key="-cert" value-ref="filePathCompleter"/>
+            </optional-completers>
         </command>
 
 		<!-- Certificate management -->
@@ -350,6 +579,11 @@
             	<property name="caManager" ref="caManager" />
             	<property name="securityFactory" ref="securityFactory"/>
             </action>
+            <optional-completers>
+                <entry key="-ca" value-ref="caNameCompleter"/>
+                <entry key="-p10" value-ref="filePathCompleter"/>
+                <entry key="-out" value-ref="filePathCompleter"/>
+            </optional-completers>
         </command>
         
 		<!-- Enroll Certificate -->
@@ -357,6 +591,10 @@
             <action class="org.xipki.ca.server.mgmt.shell.cert.RevokeCertCommand">
             	<property name="caManager" ref="caManager" />
             </action>
+            <optional-completers>
+                <entry key="-ca" value-ref="caNameCompleter"/>
+                <entry key="-reason" value-ref="crlReasonCompleter"/>
+            </optional-completers>
         </command>
 
 		<!-- Enroll Certificate -->
@@ -364,6 +602,9 @@
             <action class="org.xipki.ca.server.mgmt.shell.cert.UnrevokeCertCommand">
             	<property name="caManager" ref="caManager" />
             </action>
+            <optional-completers>
+                <entry key="-ca" value-ref="caNameCompleter"/>
+            </optional-completers>
         </command>
 
 		<!-- Remove Certificate -->
@@ -371,6 +612,9 @@
             <action class="org.xipki.ca.server.mgmt.shell.cert.RemoveCertCommand">
             	<property name="caManager" ref="caManager" />
             </action>
+            <optional-completers>
+                <entry key="-ca" value-ref="caNameCompleter"/>
+            </optional-completers>
         </command>
 		        
         <!-- Misc -->
@@ -380,6 +624,10 @@
             	<property name="passwordResolver" ref="passwordResolver"/>
        			<property name="securityFactory" ref="securityFactory"/>
             </action>
+            <optional-completers>
+                <entry key="-out" value-ref="filePathCompleter"/>    
+                <entry key="-signerType" value-ref="signerTypeCompleter"/>
+            </optional-completers>
         </command>
 
     </command-bundle>

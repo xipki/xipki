@@ -15,39 +15,43 @@
  *
  */
 
-package org.xipki.ca.server.mgmt.shell;
+package org.xipki.ca.server.mgmt.shell.completer;
 
+import java.util.List;
+
+import org.apache.karaf.shell.console.Completer;
+import org.apache.karaf.shell.console.completer.StringsCompleter;
 import org.xipki.ca.server.mgmt.CAManager;
-import org.xipki.ca.server.mgmt.DuplicationMode;
-import org.xipki.console.karaf.XipkiOsgiCommandSupport;
 
 /**
  * @author Lijun Liao
  */
 
-public abstract class CaCommand extends XipkiOsgiCommandSupport
+public class CaAliasCompleter implements Completer
 {
-    public final static String permissionsText =
-            "enroll, revoke, unrevoke, remove, key-update, gen-crl, get-crl, enroll-cross, all";
-
-    protected CAManager caManager;
+    private CAManager caManager;
 
     public void setCaManager(CAManager caManager)
     {
         this.caManager = caManager;
     }
 
-    protected DuplicationMode getDuplicationMode(Integer mode, DuplicationMode defaultMode)
+    @Override
+    public int complete(String buffer, int cursor, List<String> candidates)
     {
-        if(mode == null)
+        StringsCompleter delegate = new StringsCompleter();
+
+        if(buffer == null || buffer.isEmpty())
         {
-            return defaultMode;
+            return delegate.complete(buffer, cursor, candidates);
         }
-        return DuplicationMode.getInstance(mode.intValue());
+
+        for(String s : caManager.getCaAliasNames())
+        {
+            delegate.getStrings().add(s);
+        }
+
+        return delegate.complete(buffer, cursor, candidates);
     }
 
-    protected static String getRealString(String s)
-    {
-        return CAManager.NULL.equalsIgnoreCase(s) ? null : s;
-    }
 }
