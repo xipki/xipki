@@ -76,6 +76,7 @@ import org.bouncycastle.math.ec.ECCurve;
  *
  * @author Lijun Liao
  */
+
 public final class ECParameters extends AlgorithmParametersSpi
 {
 
@@ -85,8 +86,7 @@ public final class ECParameters extends AlgorithmParametersSpi
     {
         try
         {
-            AlgorithmParameters params =
-                AlgorithmParameters.getInstance("EC", "BC");
+            AlgorithmParameters params = AlgorithmParameters.getInstance("EC", "BC");
             params.init(spec);
             return params;
         } catch (GeneralSecurityException e)
@@ -114,8 +114,7 @@ public final class ECParameters extends AlgorithmParametersSpi
     {
         if (paramSpec == null)
         {
-            throw new InvalidParameterSpecException
-                ("paramSpec must not be null");
+            throw new InvalidParameterSpecException("paramSpec must not be null");
         }
 
         if (paramSpec.getClass().getName().equals("sun.security.ec.NamedCurve"))
@@ -133,14 +132,12 @@ public final class ECParameters extends AlgorithmParametersSpi
             namedCurve = SunNamedCurveExtender.lookupCurve(name);
         } else
         {
-            throw new InvalidParameterSpecException
-                ("Only ECParameterSpec and ECGenParameterSpec supported");
+            throw new InvalidParameterSpecException("Only ECParameterSpec and ECGenParameterSpec supported");
         }
 
         if (namedCurve == null)
         {
-            throw new InvalidParameterSpecException(
-                "Not a supported curve: " + paramSpec);
+            throw new InvalidParameterSpecException("Not a supported curve: " + paramSpec);
         }
     }
 
@@ -210,8 +207,7 @@ public final class ECParameters extends AlgorithmParametersSpi
             return spec.cast(new ECGenParameterSpec(name));
         }
 
-        throw new InvalidParameterSpecException(
-            "Only ECParameterSpec and ECGenParameterSpec supported");
+        throw new InvalidParameterSpecException("Only ECParameterSpec and ECGenParameterSpec supported");
     }
 
     protected byte[] engineGetEncoded()
