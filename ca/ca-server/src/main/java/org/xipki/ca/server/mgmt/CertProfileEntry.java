@@ -82,7 +82,7 @@ public class CertProfileEntry
         }
 
         CertProfile underlyingCertProfile = null;
-        if(type.equalsIgnoreCase("default"))
+        if(type.equalsIgnoreCase("xml"))
         {
             underlyingCertProfile = new DefaultCertProfile();
         }
