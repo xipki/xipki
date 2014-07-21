@@ -25,7 +25,7 @@ keytool:update-cert-p12 -p12 output/OCSP2.p12 -pwd 1234 -cert output/OCSP2.der \
   -cacert output/SubCAwithCRL1.der -cacert output/RCA1.der
 
 ## Revocate certificates
-caclient:revoke -cert output/OCSP2.der -reason 1
+caclient:revoke -cert output/OCSP2.der -reason keyCompromise
 
 # Certificate TLS1
 keytool:rsa-p12 -pwd 1234 -out output/TLS1.p12 -subject "CN=TLS1.xipki.org,O=xipki,C=DE"
@@ -73,7 +73,7 @@ keytool:update-cert-p12 -p12 output/TLS2.p12 -pwd 1234 -cert output/TLS2.der \
   -cacert output/SubCA1.der -cacert output/RCA1.der
 
 ## Revocate certificates
-caclient:revoke -cert output/TLS2.der -reason 3
+caclient:revoke -cert output/TLS2.der -reason affiliationChanged
 
 ## Enroll certificates
 # Certificate TLS_C1
@@ -97,7 +97,7 @@ keytool:update-cert-p12 -p12 output/TLS_C2.p12 -pwd 1234 -cert output/TLS_C2.der
   -cacert output/SubCA1.der -cacert output/RCA1.der
 
 ## Revocate certificates
-caclient:revoke -cert output/TLS_C2.der -reason 3
+caclient:revoke -cert output/TLS_C2.der -reason affiliationChanged
 
 ## Generate CRL
 caclient:gencrl -ca SubCAwithCRL1 -out output/SubCAwithCRL1.crl

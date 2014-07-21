@@ -123,4 +123,19 @@ public enum CRLReason
     {
         return reasons.get(reasonCode);
     }
+
+    public static CRLReason getInstance(String text)
+    {
+        for(CRLReason value : values())
+        {
+            if(value.desription.equalsIgnoreCase(text) ||
+                    value.name().equalsIgnoreCase(text) ||
+                    Integer.toString(value.code).equals(text))
+            {
+                return value;
+            }
+        }
+
+        return null;
+    }
 }
