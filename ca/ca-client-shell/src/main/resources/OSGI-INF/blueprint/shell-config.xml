@@ -76,7 +76,7 @@
             </optional-completers>
         </command>
         
-        <command name="caclient/enroll-loadtest">
+        <command name="caclient/loadtest-enroll">
             <action class="org.xipki.ca.client.shell.loadtest.CALoadTestCommand">
             	<property name="raWorker" ref="raWorker" />
             </action>

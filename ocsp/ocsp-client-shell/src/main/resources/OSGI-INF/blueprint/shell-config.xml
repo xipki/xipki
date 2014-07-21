@@ -19,7 +19,7 @@
             </optional-completers>
         </command>
 
-        <command name="ocsp/status-loadtest">
+        <command name="ocsp/loadtest-status">
             <action class="org.xipki.ocsp.client.shell.loadtest.OCSPStatusLoadTestCommand">
             	<property name="requestor" ref="ocspRequestor" />
             </action>
