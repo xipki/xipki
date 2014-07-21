@@ -38,7 +38,7 @@ import org.xipki.security.common.IoCertUtil;
  * @author Lijun Liao
  */
 
-@Command(scope = "ocsp", name = "status-loadtest", description="OCSP Load test")
+@Command(scope = "ocsp", name = "loadtest-status", description="OCSP Load test")
 public class OCSPStatusLoadTestCommand extends OsgiCommandSupport
 {
     private static final String DFLT_URL = "http://localhost:8080/ocsp";
