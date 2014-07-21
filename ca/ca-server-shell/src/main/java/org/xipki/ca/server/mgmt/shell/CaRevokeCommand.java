@@ -17,11 +17,14 @@
 
 package org.xipki.ca.server.mgmt.shell;
 
-import java.util.Set;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 import org.apache.felix.gogo.commands.Command;
 import org.apache.felix.gogo.commands.Option;
-import org.xipki.ca.server.mgmt.CAEntry;
+import org.xipki.security.common.CRLReason;
+import org.xipki.security.common.CertRevocationInfo;
 
 /**
  * @author Lijun Liao
@@ -30,9 +33,16 @@ import org.xipki.ca.server.mgmt.CAEntry;
 @Command(scope = "ca", name = "ca-revoke", description="Revoke CA")
 public class CaRevokeCommand extends CaCommand
 {
+    public static List<CRLReason> permitted_reasons = Collections.unmodifiableList(
+            Arrays.asList(    new CRLReason[]
+            {
+                CRLReason.UNSPECIFIED, CRLReason.KEY_COMPROMISE, CRLReason.CA_COMPROMISE,
+                CRLReason.AFFILIATION_CHANGED, CRLReason.SUPERSEDED, CRLReason.CESSATION_OF_OPERATION,
+                CRLReason.CERTIFICATE_HOLD,    CRLReason.PRIVILEGE_WITHDRAWN}));
+
     @Option(name = "-name",
-            description = "CA name",
-            required = false)
+            description = "Required, CA name",
+            required = true)
     protected String           caName;
 
     @Option(name = "-reason",
@@ -46,51 +56,34 @@ public class CaRevokeCommand extends CaCommand
                     "5: cessationOfOperation\n" +
                     "6: certificateHold\n" +
                     "9: privilegeWithdrawn")
-    protected Integer           reason;
+    protected String           reason;
 
     @Override
     protected Object doExecute()
     throws Exception
     {
-        if(reason != 0 && reason != 1 && reason != 2 && reason != 3 && reason != 4 && reason != 5 && reason != 6 && reason != 9)
+
+        CRLReason crlReason = CRLReason.getInstance(reason);
+        if(crlReason == null)
         {
-            System.err.println("invalid reason " + reason);
+            System.out.println("invalid reason " + reason);
             return null;
         }
 
-        StringBuilder sb = new StringBuilder();
-
-        if(caName == null)
+        if(permitted_reasons.contains(crlReason) == false)
         {
-            Set<String> names = caManager.getCANames();
-            int n = names.size();
-
-            sb.append(n + " CAs are configured:\n");
-            for(String paramName : names)
-            {
-                sb.append("\t").append(paramName);
-                String alias = caManager.getAliasName(paramName);
-                if(alias != null)
-                {
-                    sb.append(" (alias: ").append(alias).append(")");
-                }
-                sb.append("\n");
-            }
-        }
-        else
-        {
-            CAEntry entry = caManager.getCA(caName);
-            if(entry == null)
-            {
-                sb.append("Could not find CA '" + caName + "'");
-            }
-            else
-            {
-                sb.append(entry);
-            }
+            System.err.println("reason " + reason + " is not permitted");
+            return null;
         }
 
-        System.out.println(sb.toString());
+        if(caManager.getCANames().contains(caName) == false)
+        {
+            System.out.println("invalid CA name " + caName);
+            return null;
+        }
+
+        CertRevocationInfo revInfo = new CertRevocationInfo(crlReason);
+        caManager.revokeCa(caName, revInfo);
 
         return null;
     }

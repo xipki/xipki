@@ -3335,7 +3335,7 @@ public class CAManagerImpl implements CAManager
 
         LOG.info("Unrevoking of CA {}", caName);
 
-        String sql = "UPDATE CA SET REVOKED=?, REV_REASON, REV_TIME=?, REV_INVALIDITY_TIME=? WHERE NAME=?";
+        String sql = "UPDATE CA SET REVOKED=?, REV_REASON=?, REV_TIME=?, REV_INVALIDITY_TIME=? WHERE NAME=?";
         PreparedStatement ps = null;
         try
         {
