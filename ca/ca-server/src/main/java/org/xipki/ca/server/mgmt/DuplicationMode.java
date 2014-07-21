@@ -23,20 +23,42 @@ package org.xipki.ca.server.mgmt;
 
 public enum DuplicationMode
 {
-    FORBIDDEN (1),
-    FORBIDDEN_WITHIN_PROFILE (2),
-    ALLOWED (3);
+    FORBIDDEN (1, "forbidden"),
+    FORBIDDEN_WITHIN_PROFILE (2, "forbiddenWithinProfile"),
+    PERMITTED (3, "permitted");
 
     private final int mode;
+    private final String description;
 
-    private DuplicationMode(int mode)
+    private DuplicationMode(int mode, String description)
     {
         this.mode = mode;
+        this.description = description;
     }
 
     public int getMode()
     {
         return mode;
+    }
+
+    public String getDescription()
+    {
+        return description;
+    }
+
+    public static DuplicationMode getInstance(String text)
+    {
+        for(DuplicationMode value : values())
+        {
+            if(value.description.equalsIgnoreCase(text) ||
+                    value.name().equalsIgnoreCase(text) ||
+                    Integer.toString(value.mode).equalsIgnoreCase(text))
+            {
+                return value;
+            }
+        }
+
+        return null;
     }
 
     public static DuplicationMode getInstance(int mode)
@@ -49,6 +71,6 @@ public enum DuplicationMode
             }
         }
 
-        throw new IllegalArgumentException("invalid duplication mode " + mode);
+        return null;
     }
 }

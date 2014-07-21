@@ -21,21 +21,11 @@
         <property name="tokens" value="CA, JKS, PKCS11, PKCS12"/>
     </bean>
 
-    <bean id="duplicateKeyModeCompleter" class="org.xipki.console.karaf.EnumCompleter">
-        <property name="tokens" value="1, 2, 3"/>
-    </bean>
+    <bean id="duplicationModeCompleter" class="org.xipki.ca.server.mgmt.shell.completer.DuplicationModeCompleter"/>
 
-    <bean id="duplicateSubjectModeCompleter" class="org.xipki.console.karaf.EnumCompleter">
-        <property name="tokens" value="1, 2, 3"/>
-    </bean>
-
-    <bean id="crlReasonCompleter" class="org.xipki.console.karaf.EnumCompleter">
-        <property name="tokens" value="0, 1, 3, 4, 5, 6, 9"/>
-    </bean>
+    <bean id="crlReasonCompleter" class="org.xipki.ca.server.mgmt.shell.completer.ClientCRLReasonCompleter" />
     
-    <bean id="caCrlReasonCompleter" class="org.xipki.console.karaf.EnumCompleter">
-        <property name="tokens" value="0, 1, 2, 3, 4, 5, 6, 9"/>
-    </bean>
+    <bean id="caCrlReasonCompleter" class="org.xipki.ca.server.mgmt.shell.completer.CACRLReasonCompleter"/>
 
     <bean id="caNameCompleter" class="org.xipki.ca.server.mgmt.shell.completer.CaNameCompleter">
         <property name="caManager" ref="caManager" />
@@ -66,6 +56,10 @@
     </bean>
 
     <bean id="crlSignerNameCompleter" class="org.xipki.ca.server.mgmt.shell.completer.CrlSignerNameCompleter">
+        <property name="caManager" ref="caManager" />
+    </bean>
+
+    <bean id="crlSignerNamePlusNullCompleter" class="org.xipki.ca.server.mgmt.shell.completer.CrlSignerNamePlusNullCompleter">
         <property name="caManager" ref="caManager" />
     </bean>
 
@@ -109,8 +103,8 @@
                 <entry key="-crlSigner" value-ref="crlSignerNameCompleter"/>
                 <entry key="-cert" value-ref="filePathCompleter"/>    
                 <entry key="-signerType" value-ref="signerTypeCompleter"/>
-                <entry key="-ds" value-ref="duplicateSubjectModeCompleter"/>
-                <entry key="-dk" value-ref="duplicateKeyModeCompleter"/>
+                <entry key="-ds" value-ref="duplicationModeCompleter"/>
+                <entry key="-dk" value-ref="duplicationModeCompleter"/>
             </optional-completers>
         </command>
 
@@ -121,6 +115,15 @@
             <optional-completers>
                 <entry key="-name" value-ref="caNameCompleter"/>
                 <entry key="-reason" value-ref="caCrlReasonCompleter"/>
+            </optional-completers>
+        </command>
+
+        <command name="ca/ca-unrevoke">
+            <action class="org.xipki.ca.server.mgmt.shell.CaUnrevokeCommand">
+            	<property name="caManager" ref="caManager" />
+            </action>
+            <optional-completers>
+                <entry key="-name" value-ref="caNameCompleter"/>
             </optional-completers>
         </command>
 
@@ -145,8 +148,8 @@
                 <entry key="-crlSigner" value-ref="crlSignerNameCompleter"/>
                 <entry key="-out" value-ref="filePathCompleter"/>    
                 <entry key="-signerType" value-ref="signerTypeCompleter"/>
-                <entry key="-ds" value-ref="duplicateSubjectModeCompleter"/>
-                <entry key="-dk" value-ref="duplicateKeyModeCompleter"/>
+                <entry key="-ds" value-ref="duplicationModeCompleter"/>
+                <entry key="-dk" value-ref="duplicationModeCompleter"/>
             </optional-completers>
         </command>
         
@@ -177,10 +180,11 @@
                 <entry key="-name" value-ref="caNameCompleter"/>
                 <entry key="-status" value-ref="caStatusCompleter"/>
                 <entry key="-permission" value-ref="permissionCompleter"/>
+                <entry key="-crlSigner" value-ref="crlSignerNamePlusNullCompleter"/>
                 <entry key="-cert" value-ref="filePathCompleter"/>    
                 <entry key="-signerType" value-ref="signerTypeCompleter"/>
-                <entry key="-ds" value-ref="duplicateSubjectModeCompleter"/>
-                <entry key="-dk" value-ref="duplicateKeyModeCompleter"/>
+                <entry key="-ds" value-ref="duplicationModeCompleter"/>
+                <entry key="-dk" value-ref="duplicationModeCompleter"/>
             </optional-completers>
         </command>
         

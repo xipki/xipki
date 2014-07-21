@@ -37,13 +37,13 @@ public abstract class CaCommand extends XipkiOsgiCommandSupport
         this.caManager = caManager;
     }
 
-    protected DuplicationMode getDuplicationMode(Integer mode, DuplicationMode defaultMode)
+    protected DuplicationMode getDuplicationMode(String mode, DuplicationMode defaultMode)
     {
         if(mode == null)
         {
             return defaultMode;
         }
-        return DuplicationMode.getInstance(mode.intValue());
+        return DuplicationMode.getInstance(mode);
     }
 
     protected static String getRealString(String s)

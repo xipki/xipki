@@ -104,16 +104,16 @@ public class CaUpdateCommand extends CaCommand
     @Option(name = "-dk", aliases = { "--duplicateKey" },
             description = "Mode of duplicate key.\n"
                     + "\t1: forbidden\n"
-                    + "\t2: forbidden in the same cert profile\n"
+                    + "\t2: forbiddenWithinProfile\n"
                     + "\t3: allowed")
-    protected Integer           duplicateKeyI;
+    protected String           duplicateKeyI;
 
     @Option(name = "-ds", aliases = { "--duplicateSubject" },
             description = "Mode of duplicate subject.\n"
                     + "\t1: forbidden\n"
-                    + "\t2: forbidden in the same cert profile\n"
+                    + "\t2: forbiddenWithinProfile\n"
                     + "\t3: allowed")
-    protected Integer           duplicateSubjectI;
+    protected String           duplicateSubjectI;
 
     private PasswordResolver passwordResolver;
 
@@ -150,13 +150,13 @@ public class CaUpdateCommand extends CaCommand
         DuplicationMode duplicateKey = null;
         if(duplicateKeyI != null)
         {
-            duplicateKey = DuplicationMode.getInstance(duplicateKeyI.intValue());
+            duplicateKey = DuplicationMode.getInstance(duplicateKeyI);
         }
 
         DuplicationMode duplicateSubject = null;
         if(duplicateSubjectI != null)
         {
-            duplicateSubject = DuplicationMode.getInstance(duplicateSubjectI.intValue());
+            duplicateSubject = DuplicationMode.getInstance(duplicateSubjectI);
         }
 
         Set<Permission> _permissions = null;

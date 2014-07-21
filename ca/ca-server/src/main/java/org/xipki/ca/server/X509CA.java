@@ -1529,7 +1529,7 @@ public class X509CA
                 DuplicationMode keyMode = caInfo.getDuplicateKeyMode();
                 DuplicationMode subjectMode = caInfo.getDuplicateSubjectMode();
 
-                if(keyMode == DuplicationMode.ALLOWED && subjectMode == DuplicationMode.ALLOWED)
+                if(keyMode == DuplicationMode.PERMITTED && subjectMode == DuplicationMode.PERMITTED)
                 {
                 }
                 else if(triples.hasTripleForSubjectAndProfile(sha1FpSubject, certProfileName))
