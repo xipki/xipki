@@ -3,12 +3,14 @@
            xmlns:cm="http://aries.apache.org/blueprint/xmlns/blueprint-cm/v1.1.0"
            default-activation="lazy">
 
-	<reference id="dirPathCompleter" interface="org.xipki.console.karaf.DirPathCompleter"/>
-	<reference id="filePathCompleter" interface="org.xipki.console.karaf.FilePathCompleter"/>
+    <reference id="dataSourceFactory" interface="org.xipki.database.api.DataSourceFactory" />
 
-	<reference id="dataSourceFactory" interface="org.xipki.database.api.DataSourceFactory" />
-	<reference id="passwordResolver" interface="org.xipki.security.api.PasswordResolver" />
+    <reference id="passwordResolver" interface="org.xipki.security.api.PasswordResolver" />
 	
+    <reference id="dirPathCompleter" interface="org.xipki.console.karaf.DirPathCompleter"/>
+
+    <reference id="filePathCompleter" interface="org.xipki.console.karaf.FilePathCompleter"/>
+
     <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.1.0">  
         <command name="dbtool/export-ca">
             <action class="org.xipki.dbi.shell.ExportCaCommand">

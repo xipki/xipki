@@ -4,8 +4,12 @@
            default-activation="lazy">
 
     <bean id="dirPathCompleter" class="org.xipki.console.karaf.DirPathCompleterImpl"/>
-	<service ref="dirPathCompleter" interface="org.xipki.console.karaf.DirPathCompleter"/>
-	
+    <service ref="dirPathCompleter" interface="org.xipki.console.karaf.DirPathCompleter"/>
+
     <bean id="filePathCompleter" class="org.xipki.console.karaf.FilePathCompleterImpl"/>
-	<service ref="filePathCompleter" interface="org.xipki.console.karaf.FilePathCompleter"/>
+    <service ref="filePathCompleter" interface="org.xipki.console.karaf.FilePathCompleter"/>
+
+    <bean id="yesNoCompleter" class="org.xipki.console.karaf.YesNoCompleterImpl"/>
+    <service ref="yesNoCompleter" interface="org.xipki.console.karaf.YesNoCompleter"/>
+
 </blueprint>
