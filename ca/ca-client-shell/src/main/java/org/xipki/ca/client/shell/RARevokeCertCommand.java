@@ -19,12 +19,16 @@ package org.xipki.ca.client.shell;
 
 import java.math.BigInteger;
 import java.security.cert.X509Certificate;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 import org.apache.felix.gogo.commands.Command;
 import org.apache.felix.gogo.commands.Option;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.xipki.ca.common.CertIDOrError;
 import org.xipki.ca.common.PKIStatusInfo;
+import org.xipki.security.common.CRLReason;
 import org.xipki.security.common.IoCertUtil;
 
 /**
@@ -34,6 +38,13 @@ import org.xipki.security.common.IoCertUtil;
 @Command(scope = "caclient", name = "revoke", description="Revoke certificate")
 public class RARevokeCertCommand extends ClientCommand
 {
+    public static List<CRLReason> permitted_reasons = Collections.unmodifiableList(
+            Arrays.asList(    new CRLReason[]
+            {
+                CRLReason.UNSPECIFIED, CRLReason.KEY_COMPROMISE,
+                CRLReason.AFFILIATION_CHANGED, CRLReason.SUPERSEDED, CRLReason.CESSATION_OF_OPERATION,
+                CRLReason.CERTIFICATE_HOLD,    CRLReason.PRIVILEGE_WITHDRAWN}));
+
     @Option(name = "-cert",
             description = "Certificate file")
     protected String            certFile;
@@ -56,7 +67,7 @@ public class RARevokeCertCommand extends ClientCommand
                     "  5: cessationOfOperation\n" +
                     "  6: certificateHold\n" +
                     "  9: privilegeWithdrawn")
-    protected Integer           reason;
+    protected String           reason;
 
     @Override
     protected Object doExecute()
@@ -68,9 +79,16 @@ public class RARevokeCertCommand extends ClientCommand
             return null;
         }
 
-        if(reason != 0 && reason != 1 && reason != 3 && reason != 4 && reason != 5 && reason != 6 && reason != 9)
+        CRLReason crlReason = CRLReason.getInstance(reason);
+        if(crlReason == null)
         {
-            System.err.println("invalid reason " + reason);
+            System.out.println("invalid reason " + reason);
+            return null;
+        }
+
+        if(permitted_reasons.contains(crlReason) == false)
+        {
+            System.err.println("reason " + reason + " is not permitted");
             return null;
         }
 
@@ -78,13 +96,13 @@ public class RARevokeCertCommand extends ClientCommand
         if(certFile != null)
         {
             X509Certificate cert = IoCertUtil.parseCert(certFile);
-            certIdOrError = raWorker.revokeCert(cert, reason);
+            certIdOrError = raWorker.revokeCert(cert, crlReason.getCode());
         }
         else
         {
             X509Certificate caCert = IoCertUtil.parseCert(caCertFile);
             X500Name issuer = X500Name.getInstance(caCert.getSubjectX500Principal().getEncoded());
-            certIdOrError = raWorker.revokeCert(issuer, new BigInteger(serialNumber), reason);
+            certIdOrError = raWorker.revokeCert(issuer, new BigInteger(serialNumber), crlReason.getCode());
         }
 
         if(certIdOrError.getError() != null)

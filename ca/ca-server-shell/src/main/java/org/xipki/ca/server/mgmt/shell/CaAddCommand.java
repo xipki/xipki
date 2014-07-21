@@ -109,18 +109,18 @@ public class CaAddCommand extends CaCommand
     @Option(name = "-dk", aliases = { "--duplicateKey" },
             description = "Mode of duplicate key.\n"
                     + "\t1: forbidden\n"
-                    + "\t2: forbidden in the same cert profile\n"
+                    + "\t2: forbiddenWithinProfile\n"
                     + "\t3: allowed\n"
                     + "the default is 2")
-    protected Integer           duplicateKeyI;
+    protected String           duplicateKeyI;
 
     @Option(name = "-ds", aliases = { "--duplicateSubject" },
             description = "Mode of duplicate subject.\n"
                     + "\t1: forbidden\n"
-                    + "\t2: forbidden in the same cert profile\n"
+                    + "\t2: forbiddenWithinProfile\n"
                     + "\t3: allowed\n"
                     + "the default is 2")
-    protected Integer           duplicateSubjectI;
+    protected String           duplicateSubjectI;
 
     private SecurityFactory securityFactory;
     private PasswordResolver passwordResolver;
