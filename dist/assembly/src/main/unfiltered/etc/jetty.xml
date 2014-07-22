@@ -57,8 +57,12 @@ DTD Configure//EN" "http://jetty.mortbay.org/configure.dtd">
                 <Set name="AcceptQueueSize">100</Set>
                 <Set name="IncludeCipherSuites">
                     <Array type="java.lang.String">
+                        <!-- Oracle JRE/JDK, OpenJDK -->
                         <Item>TLS_DHE_RSA_WITH_AES_256_CBC_SHA</Item>
                         <Item>TLS_DHE_RSA_WITH_AES_128_CBC_SHA</Item>
+                        <!-- IBM JRE/JDK -->
+                        <Item>SSL_DHE_RSA_WITH_AES_256_CBC_SHA</Item>
+                        <Item>SSL_DHE_RSA_WITH_AES_128_CBC_SHA</Item>
                     </Array>
                 </Set>
             </New>
