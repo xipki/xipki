@@ -41,9 +41,12 @@ Prerequisite
 *    (see http://www.oracle.com/technetwork/java/javase/downloads/index.html)
 * For IBM JRE / JDK:  JCE Unlimited Jurisdiction Policy File
 *    (see https://www14.software.ibm.com/webapp/iwm/web/preLogin.do?source=jcesdk) 
-*
-* Tested with OpenJDK 7, Oracle JRE 7, Oracle JDK 7, IBM JRE 7 and IBM JDK 7 on Linux (Fedora, Ubuntu,
-* CentOS, RedHat, SLES)
+
+Tested Platforms
+----------------
+* OpenJDK 7 on Linux
+* Oracle JRE 7, Oracle JDK 7 on Linux
+* IBM JRE 7 and IBM JDK 7 on Linux
 
 Build and Assembly
 ------------------
