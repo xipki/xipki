@@ -17,7 +17,10 @@
 
 package org.xipki.security.common;
 
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -90,6 +93,14 @@ public enum CRLReason
      * to authority attribute (AA) certificates only.
      */
     AA_COMPROMISE(10, "aACompromise");
+
+    public static List<CRLReason> PERMITTED_CLIENT_CRLREASONS = Collections.unmodifiableList(
+        Arrays.asList(
+               new CRLReason[]
+            {
+                CRLReason.UNSPECIFIED, CRLReason.KEY_COMPROMISE,
+                CRLReason.AFFILIATION_CHANGED, CRLReason.SUPERSEDED, CRLReason.CESSATION_OF_OPERATION,
+                CRLReason.CERTIFICATE_HOLD,    CRLReason.PRIVILEGE_WITHDRAWN}));
 
     private final int code;
     private final String desription;
