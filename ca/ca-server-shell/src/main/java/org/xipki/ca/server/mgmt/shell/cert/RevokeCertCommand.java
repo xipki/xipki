@@ -18,9 +18,6 @@
 package org.xipki.ca.server.mgmt.shell.cert;
 
 import java.math.BigInteger;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
 
 import org.apache.felix.gogo.commands.Command;
 import org.apache.felix.gogo.commands.Option;
@@ -36,13 +33,6 @@ import org.xipki.security.common.CRLReason;
 @Command(scope = "ca", name = "revoke-cert", description="Revoke certificate")
 public class RevokeCertCommand extends CaCommand
 {
-    public static List<CRLReason> permitted_reasons = Collections.unmodifiableList(
-            Arrays.asList(    new CRLReason[]
-            {
-                CRLReason.UNSPECIFIED, CRLReason.KEY_COMPROMISE,
-                CRLReason.AFFILIATION_CHANGED, CRLReason.SUPERSEDED, CRLReason.CESSATION_OF_OPERATION,
-                CRLReason.CERTIFICATE_HOLD,    CRLReason.PRIVILEGE_WITHDRAWN}));
-
     @Option(name = "-ca",
             required = true, description = "Required. CA name")
     protected String caName;
@@ -82,7 +72,7 @@ public class RevokeCertCommand extends CaCommand
             return null;
         }
 
-        if(permitted_reasons.contains(crlReason) == false)
+        if(CRLReason.PERMITTED_CLIENT_CRLREASONS.contains(crlReason) == false)
         {
             System.err.println("reason " + reason + " is not permitted");
             return null;
