@@ -12,7 +12,7 @@ eXtensible sImple Public Key Infrastructure
   - API to use customized key types, e.g. smartcard
   - API to specify customized certificate profiles
   - API to specify customized publisher, e.g. for LDAP and OCSP responder
-  - Support of most popular databases, tested with DB2, H2, MySQL, Oracle, Oracle RAC and PostgreSQL
+  - Support of most popular databases
   - High performance
   - Java based, OS independent
   - OSGi-based
@@ -44,9 +44,10 @@ Prerequisite
 
 Tested Platforms
 ----------------
-* OpenJDK 7 on Linux
-* Oracle JRE 7, Oracle JDK 7 on Linux
-* IBM JRE 7 and IBM JDK 7 on Linux
+* Database: DB2, H2, MySQL, Oracle, Oracle RAC and PostgreSQL
+* HSM: Thales nCipher Solo (PCI Card) and nCipher Connect (network)
+* JVM: OpenJDK 7, Oracle JRE 7 and JDK 7, IBM JRE 7 and JDK 7
+* OS: CentOS, Fedora, Redhat, SLES, Ubuntu
 
 Build and Assembly
 ------------------
