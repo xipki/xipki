@@ -22,21 +22,28 @@ eXtensible sImple Public Key Infrastructure
 Version
 ----
 
-1.0
+1.0.0-SNAPSHOT
 
 License
 -----------
 
-Apache License 2.0
+TBD
 
-Author
+Owner
 -----------
 Dr. Lijun Liao (lijun.liao -A-T- gmail.com)
 
 Prerequisite
 ------------
 * JRE / JDK 1.7+
-* For Oracle: Java Cryptography Extension (JCE) Unlimited Strength Jurisdiction Policy Files
+* For OpenJDK: none
+* For Oracle JRE / JDK: JCE Unlimited Strength Jurisdiction Policy Files
+*    (see http://www.oracle.com/technetwork/java/javase/downloads/index.html)
+* For IBM JRE / JDK:  JCE Unlimited Jurisdiction Policy File
+*    (see https://www14.software.ibm.com/webapp/iwm/web/preLogin.do?source=jcesdk) 
+*
+* Tested with OpenJDK 7, Oracle JRE 7, Oracle JDK 7, IBM JRE 7 and IBM JDK 7 on Linux (Fedora, Ubuntu,
+* CentOS, RedHat, SLES)
 
 Build and Assembly
 ------------------
