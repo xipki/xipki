@@ -17,7 +17,6 @@
 
 package org.xipki.ca.client.shell.completer;
 
-import org.xipki.ca.client.shell.RARevokeCertCommand;
 import org.xipki.console.karaf.EnumCompleter;
 import org.xipki.security.common.CRLReason;
 
@@ -31,7 +30,7 @@ public class ClientCRLReasonCompleter extends EnumCompleter
     {
         StringBuilder enums = new StringBuilder();
 
-        for(CRLReason reason : RARevokeCertCommand.permitted_reasons)
+        for(CRLReason reason : CRLReason.PERMITTED_CLIENT_CRLREASONS)
         {
             enums.append(Integer.toString(reason.getCode())).append(",");
             enums.append(reason.getDescription()).append(",");
