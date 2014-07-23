@@ -7,6 +7,9 @@ CA_SIGNER_ALGO = SHA256withRSA
 
 features:install xipki-security-shell
 
+# Wait one second
+sleep 1000
+
 keytool:rsa-p12 -pwd 1234 -keysize $KEYSIZE -out output/RCA1.p12 \
   -subject "CN=RCA1"
 

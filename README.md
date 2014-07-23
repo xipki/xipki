@@ -31,7 +31,7 @@ TBD
 
 Owner
 -----------
-Dr. Lijun Liao (lijun.liao -A-T- gmail.com)
+Dr. Lijun Liao (lijun.liao -A-T- gmail -D-O-T- com)
 
 Prerequisite
 ------------
@@ -46,7 +46,7 @@ Tested Platforms
 ----------------
 * Database: DB2, H2, MySQL, Oracle, Oracle RAC and PostgreSQL
 * HSM: Thales nCipher Solo (PCI Card) and nCipher Connect (network)
-* JVM: OpenJDK 7, Oracle JRE 7 and JDK 7, IBM JRE 7 and JDK 7
+* JVM: OpenJDK JRE/JDK 7 and 8, Oracle JRE/JDK 7 and 8, IBM J9 JRE/JDK 7 and 8
 * OS: CentOS, Fedora, Redhat, SLES, Ubuntu
 
 Build and Assembly

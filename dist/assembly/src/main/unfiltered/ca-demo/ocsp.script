@@ -4,6 +4,9 @@
 features:install xipki-ocspserver
 features:install xipki-ocspclient-shell
 
+# Wait one second
+sleep 1000
+
 echo "===== expected: Good ====="
 ocsp:status -cacert output/RCA1.der -cert output/SubCA1.der -v -sign
 

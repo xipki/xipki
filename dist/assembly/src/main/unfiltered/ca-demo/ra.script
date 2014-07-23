@@ -3,6 +3,9 @@
 #################################################################
 features:install xipki-caclient-shell
 
+# Wait one second
+sleep 1000
+
 ## Enroll certificates
 # Certificate OCSP1
 keytool:rsa-p12 -pwd 1234 -out output/OCSP1.p12 -subject "CN=OCSP1,O=xipki,C=DE"

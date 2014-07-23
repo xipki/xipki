@@ -46,6 +46,7 @@
 	</developers>
 	<properties>
 		<karaf.version>2.3.4</karaf.version>
+		<karaf-console.version>2.3.4</karaf-console.version>
 		<bc.version>1.49</bc.version>
 		<slf4j.version>1.5.11</slf4j.version>
 		<commons-dbcp.version>1.4</commons-dbcp.version>
