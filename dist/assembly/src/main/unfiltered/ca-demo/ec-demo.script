@@ -5,6 +5,9 @@ CA_SIGNER_ALGO = SHA256withECDSA
 
 features:install xipki-security-shell
 
+# Wait one second
+sleep 1000
+
 keytool:ec-p12 -curve $CURVE -pwd 1234 -out output/RCA1.p12 \
   -subject "CN=RCA1,O=xipki,C=DE"
 
