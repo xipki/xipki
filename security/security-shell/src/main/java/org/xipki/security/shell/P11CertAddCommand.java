@@ -36,19 +36,19 @@ public class P11CertAddCommand extends SecurityCommand
 
     @Option(name = "-slot",
             required = true, description = "Required. Slot index")
-    protected Integer           slotIndex;
+    protected Integer slotIndex;
 
     @Option(name = "-cert",
             required = true, description = "Required. Certificate file")
-    protected String            certFile;
+    protected String certFile;
 
     @Option(name = "-pwd", aliases = { "--password" },
             required = false, description = "Password of the PKCS#11 device")
-    protected String            password;
+    protected String password;
 
     @Option(name = "-p",
             required = false, description = "Read password from console")
-    protected Boolean           readFromConsole;
+    protected Boolean readFromConsole;
 
     @Override
     protected Object doExecute()

@@ -47,15 +47,15 @@ public class P11ListSlotCommand extends SecurityCommand
 {
     @Option(name = "-pwd", aliases = { "--password" },
             required = false, description = "Password of the PKCS#11 device")
-    protected String            password;
+    protected String password;
 
     @Option(name = "-p",
             required = false, description = "Read password from console")
-    protected Boolean            readFromConsole;
+    protected Boolean readFromConsole;
 
     @Option(name = "-v", aliases="--verbose",
             required = false, description = "Show object information verbosely")
-    protected Boolean          verbose;
+    protected Boolean verbose;
 
     @Override
     protected Object doExecute()

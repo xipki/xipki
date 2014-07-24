@@ -24,12 +24,12 @@ public class ImportOcspCommand extends XipkiOsgiCommandSupport
     @Option(name = "-dbconf",
             description = "Required. Database configuration file",
             required = true)
-    protected String            dbconfFile;
+    protected String dbconfFile;
 
     @Option(name = "-indir",
             description = "Required. Input directory",
             required = true)
-    protected String            indir;
+    protected String indir;
 
     private DataSourceFactory dataSourceFactory;
     private PasswordResolver passwordResolver;

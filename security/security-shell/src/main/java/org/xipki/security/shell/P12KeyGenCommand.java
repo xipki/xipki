@@ -22,15 +22,15 @@ public abstract class P12KeyGenCommand extends KeyGenCommand
 
     @Option(name = "-subject",
             required = true, description = "Required. Subject in the self-signed certificate")
-    protected String            subject;
+    protected String subject;
 
     @Option(name = "-out",
             required = true, description = "Required. Where to save the key")
-    protected String            keyOutFile;
+    protected String keyOutFile;
 
     @Option(name = "-certout",
             required = false, description = "Where to save the self-signed certificate")
-    protected String            certOutFile;
+    protected String certOutFile;
 
     protected void saveKeyAndCert(P12KeypairGenerationResult keyAndCert)
     throws IOException

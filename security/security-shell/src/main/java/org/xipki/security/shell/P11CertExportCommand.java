@@ -31,7 +31,7 @@ public class P11CertExportCommand extends P11SecurityCommand
 
     @Option(name = "-out",
             required = true, description = "Required. Where to save the certificate")
-    protected String            outFile;
+    protected String outFile;
 
     @Override
     protected Object doExecute()
