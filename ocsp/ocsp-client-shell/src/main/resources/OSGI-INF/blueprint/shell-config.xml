@@ -1,32 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0"
-           xmlns:cm="http://aries.apache.org/blueprint/xmlns/blueprint-cm/v1.1.0"
-           default-activation="lazy">
-
-	<reference id="filePathCompleter" interface="org.xipki.console.karaf.FilePathCompleter"/>
-
-  	<reference id="ocspRequestor" interface="org.xipki.ocsp.client.api.OCSPRequestor" />
-	
-    <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.1.0">
-
-        <command name="ocsp/status">
-            <action class="org.xipki.ocsp.client.shell.OCSPStatusCommand">
-            	<property name="requestor" ref="ocspRequestor" />
-            </action>
-            <optional-completers>
-                <entry key="-cert" value-ref="filePathCompleter"/>
-                <entry key="-cacert" value-ref="filePathCompleter"/>
-            </optional-completers>
-        </command>
-
-        <command name="ocsp/loadtest-status">
-            <action class="org.xipki.ocsp.client.shell.loadtest.OCSPStatusLoadTestCommand">
-            	<property name="requestor" ref="ocspRequestor" />
-            </action>
-            <optional-completers>
-                <entry key="-cacert" value-ref="filePathCompleter"/>
-            </optional-completers>
-        </command>
-    </command-bundle>
-
+<blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0" xmlns:cm="http://aries.apache.org/blueprint/xmlns/blueprint-cm/v1.1.0" default-activation="lazy">
+  <reference id="filePathCompleter" interface="org.xipki.console.karaf.FilePathCompleter"/>
+  <reference id="ocspRequestor" interface="org.xipki.ocsp.client.api.OCSPRequestor"/>
+  <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.1.0">
+    <command name="ocsp/status">
+      <action class="org.xipki.ocsp.client.shell.OCSPStatusCommand">
+        <property name="requestor" ref="ocspRequestor"/>
+      </action>
+      <optional-completers>
+        <entry key="-cert" value-ref="filePathCompleter"/>
+        <entry key="-cacert" value-ref="filePathCompleter"/>
+      </optional-completers>
+    </command>
+    <command name="ocsp/loadtest-status">
+      <action class="org.xipki.ocsp.client.shell.loadtest.OCSPStatusLoadTestCommand">
+        <property name="requestor" ref="ocspRequestor"/>
+      </action>
+      <optional-completers>
+        <entry key="-cacert" value-ref="filePathCompleter"/>
+      </optional-completers>
+    </command>
+  </command-bundle>
 </blueprint>
