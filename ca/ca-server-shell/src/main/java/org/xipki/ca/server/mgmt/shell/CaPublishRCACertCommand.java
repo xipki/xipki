@@ -7,6 +7,7 @@
 
 package org.xipki.ca.server.mgmt.shell;
 
+import org.apache.felix.gogo.commands.Argument;
 import org.apache.felix.gogo.commands.Command;
 import org.apache.felix.gogo.commands.Option;
 
@@ -17,9 +18,7 @@ import org.apache.felix.gogo.commands.Option;
 @Command(scope = "ca", name = "publish-self", description="Publish the certificate of root CA")
 public class CaPublishRCACertCommand extends CaCommand
 {
-    @Option(name = "-ca",
-            description = "Required. CA name",
-            required = true)
+    @Argument(index = 0, name = "name", description = "CA name", required = true)
     protected String           caName;
 
     @Option(name = "-profile",

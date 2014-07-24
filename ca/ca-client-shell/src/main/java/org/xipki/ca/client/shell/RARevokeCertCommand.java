@@ -23,20 +23,8 @@ import org.xipki.security.common.IoCertUtil;
  */
 
 @Command(scope = "caclient", name = "revoke", description="Revoke certificate")
-public class RARevokeCertCommand extends ClientCommand
+public class RARevokeCertCommand extends RAUnRevRemoveCertCommand
 {
-    @Option(name = "-cert",
-            description = "Certificate file")
-    protected String            certFile;
-
-    @Option(name = "-cacert",
-            description = "CA Certificate file")
-    protected String            caCertFile;
-
-    @Option(name = "-serial",
-            description = "Serial number")
-    protected String            serialNumber;
-
     @Option(name = "-reason",
             required = true,
             description = "Required. Reason, valid values are \n" +

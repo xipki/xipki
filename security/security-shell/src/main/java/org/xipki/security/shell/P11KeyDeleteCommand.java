@@ -14,8 +14,6 @@ import iaik.pkcs.pkcs11.objects.PublicKey;
 import iaik.pkcs.pkcs11.objects.X509PublicKeyCertificate;
 
 import org.apache.felix.gogo.commands.Command;
-import org.apache.felix.gogo.commands.Option;
-import org.bouncycastle.util.encoders.Hex;
 import org.xipki.security.api.PKCS11SlotIdentifier;
 import org.xipki.security.api.Pkcs11KeyIdentifier;
 import org.xipki.security.api.SignerException;
@@ -29,49 +27,14 @@ import org.xipki.security.p11.iaik.IaikP11ModulePool;
  */
 
 @Command(scope = "keytool", name = "delete-key", description="Generate EC keypair in PKCS#11 device")
-public class P11KeyDeleteCommand extends SecurityCommand
+public class P11KeyDeleteCommand extends P11SecurityCommand
 {
-    @Option(name = "-slot",
-            required = true, description = "Required. Slot index")
-    protected Integer           slotIndex;
-
-    @Option(name = "-key-id",
-            required = false, description = "Id of the private key in the PKCS#11 device.\n"
-                    + "Either keyId or keyLabel must be specified")
-    protected String            keyId;
-
-    @Option(name = "-key-label",
-            required = false, description = "Label of the private key in the PKCS#11 device.\n"
-                    + "Either keyId or keyLabel must be specified")
-    protected String            keyLabel;
-
-    @Option(name = "-pwd", aliases = { "--password" },
-            required = false, description = "Password of the PKCS#11 device")
-    protected String            password;
-
-    @Option(name = "-p",
-            required = false, description = "Read password from console")
-    protected Boolean            readFromConsole;
-
     @Override
     protected Object doExecute()
     throws Exception
     {
-        Pkcs11KeyIdentifier keyIdentifier;
-        if(keyId != null && keyLabel == null)
-        {
-            keyIdentifier = new Pkcs11KeyIdentifier(Hex.decode(keyId));
-        }
-        else if(keyId == null && keyLabel != null)
-        {
-            keyIdentifier = new Pkcs11KeyIdentifier(keyLabel);
-        }
-        else
-        {
-            throw new Exception("Exactly one of keyId or keyLabel should be specified");
-        }
-
-        char[] pwd = readPasswordIfRequired(password, readFromConsole);
+        Pkcs11KeyIdentifier keyIdentifier = getKeyIdentifier();
+        char[] pwd = getPassword();
 
         IaikExtendedModule module = IaikP11ModulePool.getInstance().getModule(
                 securityFactory.getPkcs11Module());
