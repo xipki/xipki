@@ -25,9 +25,10 @@ import java.security.cert.X509Certificate;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.ConcurrentSkipListSet;
+import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -132,7 +133,9 @@ public class X509CA
     private final Object crlLock = new Object();
     private Boolean tryXipkiNSStoVerify;
 
-    private final ConcurrentSkipListSet<String> pendingSubjectSha1Fps = new ConcurrentSkipListSet<>();
+    private final ConcurrentSkipListMap<String, List<String>> pendingSubjectMap = new ConcurrentSkipListMap<>();
+    private final ConcurrentSkipListMap<String, List<String>> pendingKeyMap = new ConcurrentSkipListMap<>();
+
     private final AtomicInteger numActiveRevocations = new AtomicInteger(0);
 
     public X509CA(
@@ -820,7 +823,7 @@ public class X509CA
         caInfo.setStatus(CAStatus.INACTIVE);
 
         // wait till no certificate request in process
-        while(pendingSubjectSha1Fps.isEmpty() == false || numActiveRevocations.get() > 0)
+        while(pendingSubjectMap.isEmpty() == false || numActiveRevocations.get() > 0)
         {
             LOG.info("Certificate requests are still in process, wait 1 second");
             try
@@ -1437,10 +1440,14 @@ public class X509CA
                     "Certificate with the same subject as CA is not allowed");
         }
 
+        DuplicationMode keyMode = caInfo.getDuplicateKeyMode();
+        DuplicationMode subjectMode = caInfo.getDuplicateSubjectMode();
+
         String sha1FpSubject = IoCertUtil.sha1sum_canonicalized_name(grantedSubject);
         String grandtedSubjectText = IoCertUtil.canonicalizeName(grantedSubject);
 
         byte[] subjectPublicKeyData =  publicKeyInfo.getPublicKeyData().getBytes();
+        String sha1FpPublicKey = IoCertUtil.sha1sum(subjectPublicKeyData);
 
         if(keyUpdate)
         {
@@ -1456,7 +1463,6 @@ public class X509CA
         }
         else
         {
-            String sha1FpPublicKey = IoCertUtil.sha1sum(subjectPublicKeyData);
             SubjectKeyProfileTripleCollection triples;
             try
             {
@@ -1515,9 +1521,6 @@ public class X509CA
                         }
                     }
                 }
-
-                DuplicationMode keyMode = caInfo.getDuplicateKeyMode();
-                DuplicationMode subjectMode = caInfo.getDuplicateSubjectMode();
 
                 if(keyMode == DuplicationMode.PERMITTED && subjectMode == DuplicationMode.PERMITTED)
                 {
@@ -1613,19 +1616,88 @@ public class X509CA
             }
         }
 
-        // check request with the same subject is still in process
-        synchronized (pendingSubjectSha1Fps)
+        if(subjectMode == DuplicationMode.FORBIDDEN || subjectMode == DuplicationMode.FORBIDDEN_WITHIN_PROFILE)
         {
-            if(pendingSubjectSha1Fps.contains(sha1FpSubject))
+            synchronized (pendingSubjectMap)
             {
-                throw new OperationException(ErrorCode.ALREADY_ISSUED,
-                        "Certificate for the given subject " + grandtedSubjectText + " already in process");
+                // check request with the same subject is still in process
+                if(subjectMode == DuplicationMode.FORBIDDEN)
+                {
+                    if(pendingSubjectMap.containsKey(sha1FpSubject))
+                    {
+                        throw new OperationException(ErrorCode.ALREADY_ISSUED,
+                                "Certificate for the given subject " + grandtedSubjectText + " already in process");
+                    }
+                }
+                else if(subjectMode == DuplicationMode.FORBIDDEN_WITHIN_PROFILE)
+                {
+                    if(pendingSubjectMap.containsKey(sha1FpSubject) &&
+                            pendingSubjectMap.get(sha1FpSubject).contains(certProfileName))
+                    {
+                        throw new OperationException(ErrorCode.ALREADY_ISSUED,
+                               "Certificate for the given subject " + grandtedSubjectText +
+                               " and profile " + certProfileName + " already in process");
+                    }
+                }
             }
-            pendingSubjectSha1Fps.add(sha1FpSubject);
+        }
+
+        if(keyMode == DuplicationMode.FORBIDDEN || keyMode == DuplicationMode.FORBIDDEN_WITHIN_PROFILE)
+        {
+            synchronized (pendingSubjectMap)
+            {
+                // check request with the same subject is still in process
+                if(keyMode == DuplicationMode.FORBIDDEN)
+                {
+                    if(pendingKeyMap.containsKey(sha1FpPublicKey))
+                    {
+                        throw new OperationException(ErrorCode.ALREADY_ISSUED,
+                                "Certificate for the given public key already in process");
+                    }
+                }
+                else if(keyMode == DuplicationMode.FORBIDDEN_WITHIN_PROFILE)
+                {
+                    if(pendingKeyMap.containsKey(sha1FpPublicKey) &&
+                            pendingKeyMap.get(sha1FpPublicKey).contains(certProfileName))
+                    {
+                        throw new OperationException(ErrorCode.ALREADY_ISSUED,
+                               "Certificate for the given public key" +
+                               " and profile " + certProfileName + " already in process");
+                    }
+                }
+            }
         }
 
         try
         {
+            if(subjectMode == DuplicationMode.FORBIDDEN || subjectMode == DuplicationMode.FORBIDDEN_WITHIN_PROFILE)
+            {
+                synchronized (pendingSubjectMap)
+                {
+                    List<String> profiles = pendingSubjectMap.get(sha1FpSubject);
+                    if(profiles == null)
+                    {
+                        profiles = new LinkedList<>();
+                        pendingSubjectMap.put(sha1FpSubject, profiles);
+                    }
+                    profiles.add(certProfileName);
+                }
+            }
+
+            if(keyMode == DuplicationMode.FORBIDDEN || keyMode == DuplicationMode.FORBIDDEN_WITHIN_PROFILE)
+            {
+                synchronized (pendingSubjectMap)
+                {
+                    List<String> profiles = pendingKeyMap.get(sha1FpSubject);
+                    if(profiles == null)
+                    {
+                        profiles = new LinkedList<>();
+                        pendingKeyMap.put(sha1FpPublicKey, profiles);
+                    }
+                    profiles.add(certProfileName);
+                }
+            }
+
             StringBuilder msgBuilder = new StringBuilder();
 
             if(subjectInfo.getWarning() != null)
@@ -1731,9 +1803,27 @@ public class X509CA
             return ret;
         }finally
         {
-            synchronized (pendingSubjectSha1Fps)
+            synchronized (pendingSubjectMap)
             {
-                pendingSubjectSha1Fps.remove(sha1FpSubject);
+                List<String> profiles = pendingSubjectMap.remove(sha1FpSubject);
+                if(profiles != null)
+                {
+                    profiles.remove(certProfileName);
+                    if(profiles.isEmpty() == false)
+                    {
+                        pendingSubjectMap.put(sha1FpSubject, profiles);
+                    }
+                }
+
+                profiles = pendingKeyMap.remove(sha1FpSubject);
+                if(profiles != null)
+                {
+                    profiles.remove(certProfileName);
+                    if(profiles.isEmpty() == false)
+                    {
+                        pendingKeyMap.put(sha1FpSubject, profiles);
+                    }
+                }
             }
         }
     }
