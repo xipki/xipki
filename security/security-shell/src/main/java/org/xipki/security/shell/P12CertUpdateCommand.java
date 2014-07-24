@@ -7,7 +7,6 @@
 
 package org.xipki.security.shell;
 
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.security.Key;
 import java.security.KeyStore;
@@ -32,16 +31,8 @@ import org.xipki.security.common.IoCertUtil;
  */
 
 @Command(scope = "keytool", name = "update-cert-p12", description="Update certificate in PKCS#12 keystore")
-public class P12CertUpdateCommand extends SecurityCommand
+public class P12CertUpdateCommand extends P12SecurityCommand
 {
-    @Option(name = "-p12",
-            required = true, description = "Required. PKCS#12 keystore file")
-    protected String            p12File;
-
-    @Option(name = "-pwd", aliases = { "--password" },
-            required = false, description = "Password of the PKCS#12 file")
-    protected String            password;
-
     @Option(name = "-cert",
             required = true, description = "Required. Certificate file")
     protected String            certFile;
@@ -54,23 +45,9 @@ public class P12CertUpdateCommand extends SecurityCommand
     protected Object doExecute()
     throws Exception
     {
-        KeyStore ks;
+        KeyStore ks = getKeyStore();
 
-        char[] pwd = readPasswordIfNotSet(password);
-        FileInputStream fIn = null;
-        try
-        {
-            fIn = new FileInputStream(p12File);
-            ks = KeyStore.getInstance("PKCS12", "BC");
-            ks.load(fIn, pwd);
-        }finally
-        {
-            if(fIn != null)
-            {
-                fIn.close();
-            }
-        }
-
+        char[] pwd = getPassword();
         X509Certificate newCert = IoCertUtil.parseCert(certFile);
 
         assertMatch(newCert, new String(pwd));

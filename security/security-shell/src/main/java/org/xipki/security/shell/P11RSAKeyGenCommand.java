@@ -7,15 +7,11 @@
 
 package org.xipki.security.shell;
 
-import java.io.File;
 import java.math.BigInteger;
 
 import org.apache.felix.gogo.commands.Command;
 import org.apache.felix.gogo.commands.Option;
-import org.bouncycastle.util.encoders.Hex;
 import org.xipki.security.api.P11KeypairGenerationResult;
-import org.xipki.security.api.PKCS11SlotIdentifier;
-import org.xipki.security.p11.iaik.IaikP11CryptService;
 import org.xipki.security.p11.iaik.P11KeypairGenerator;
 
 /**
@@ -23,7 +19,7 @@ import org.xipki.security.p11.iaik.P11KeypairGenerator;
  */
 
 @Command(scope = "keytool", name = "rsa", description="Generate RSA keypair in PKCS#11 device")
-public class P11RSAKeyGenCommand extends KeyGenCommand
+public class P11RSAKeyGenCommand extends P11KeyGenCommand
 {
     @Option(name = "-keysize",
             description = "Keysize in bit, the default is 2048",
@@ -34,30 +30,6 @@ public class P11RSAKeyGenCommand extends KeyGenCommand
             description = "public exponent, the default is 65537",
             required = false)
     protected String            publicExponent;
-
-    @Option(name = "-slot",
-            required = true, description = "Required. Slot index")
-    protected Integer           slotIndex;
-
-    @Option(name = "-key-label",
-            required = true, description = "Required. Label of the PKCS#11 objects")
-    protected String            label;
-
-    @Option(name = "-subject",
-            required = false, description = "Subject in the self-signed certificate")
-    protected String            subject;
-
-    @Option(name = "-pwd", aliases = { "--password" },
-            required = false, description = "Password of the PKCS#11 device")
-    protected String            password;
-
-    @Option(name = "-certout",
-            required = false, description = "Where to save the self-signed certificate")
-    protected String            outputFilename;
-
-    @Option(name = "-p",
-            required = false, description = "Read password from console")
-    protected Boolean            readFromConsole;
 
     @Override
     protected Object doExecute()
@@ -73,11 +45,6 @@ public class P11RSAKeyGenCommand extends KeyGenCommand
             return null;
         }
 
-        if(subject == null || subject.isEmpty())
-        {
-            subject = "CN=" + label;
-        }
-
         BigInteger _publicExponent;
         if(publicExponent == null)
         {
@@ -88,27 +55,15 @@ public class P11RSAKeyGenCommand extends KeyGenCommand
             _publicExponent = new BigInteger(publicExponent);
         }
 
-        char[] pwd = readPasswordIfRequired(password, readFromConsole);
-
         P11KeypairGenerator gen = new P11KeypairGenerator();
-        PKCS11SlotIdentifier slotId = new PKCS11SlotIdentifier(slotIndex, null);
 
         P11KeypairGenerationResult keyAndCert = gen.generateRSAKeypairAndCert(
-                securityFactory.getPkcs11Module(), slotId, pwd,
+                securityFactory.getPkcs11Module(), getSlotId(), getPassword(),
                 keysize, _publicExponent,
-                label, subject,
+                label, getSubject(),
                 getKeyUsage(),
                 getExtendedKeyUsage());
-
-        System.out.println("key id: " + Hex.toHexString(keyAndCert.getId()));
-        System.out.println("key label: " + keyAndCert.getLabel());
-        if(outputFilename != null)
-        {
-               File certFile = new File(outputFilename);
-               saveVerbose("Saved self-signed certificate", certFile, keyAndCert.getCertificate().getEncoded());
-        }
-
-        IaikP11CryptService.getInstance(securityFactory.getPkcs11Module(), pwd).refresh();
+        saveKeyAndCert(keyAndCert);
 
         return null;
     }

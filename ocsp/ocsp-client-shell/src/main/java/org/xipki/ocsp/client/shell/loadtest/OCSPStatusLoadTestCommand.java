@@ -9,19 +9,14 @@ package org.xipki.ocsp.client.shell.loadtest;
 
 import java.net.URL;
 import java.security.cert.X509Certificate;
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.StringTokenizer;
 
 import org.apache.felix.gogo.commands.Command;
 import org.apache.felix.gogo.commands.Option;
-import org.apache.karaf.shell.console.OsgiCommandSupport;
-import org.bouncycastle.asn1.ASN1ObjectIdentifier;
-import org.bouncycastle.asn1.nist.NISTObjectIdentifiers;
-import org.bouncycastle.asn1.x509.X509ObjectIdentifiers;
-import org.xipki.ocsp.client.api.OCSPRequestor;
 import org.xipki.ocsp.client.api.RequestOptions;
+import org.xipki.ocsp.client.shell.AbstractOCSPStatusCommand;
 import org.xipki.security.common.IoCertUtil;
 
 /**
@@ -29,17 +24,8 @@ import org.xipki.security.common.IoCertUtil;
  */
 
 @Command(scope = "ocsp", name = "loadtest-status", description="OCSP Load test")
-public class OCSPStatusLoadTestCommand extends OsgiCommandSupport
+public class OCSPStatusLoadTestCommand extends AbstractOCSPStatusCommand
 {
-    private static final String DFLT_URL = "http://localhost:8080/ocsp";
-    @Option(name = "-url",
-            description = "Server URL, the default is " + DFLT_URL)
-    protected String            serverURL;
-
-    @Option(name = "-cacert",
-            required = true, description = "Required. CA certificate file")
-    protected String            caCertFile;
-
     @Option(name = "-serial",
             required = true,
             description = "Required. Serial numbers.\n"
@@ -56,28 +42,6 @@ public class OCSPStatusLoadTestCommand extends OsgiCommandSupport
             description = "Number of threads, the default is 5")
     protected Integer          numThreads;
 
-    @Option(name = "-nonce",
-            description = "Use nonce")
-    protected Boolean            useNonce;
-
-    @Option(name = "-hash",
-            required = false, description = "Hash algorithm name. The default is SHA256")
-    protected String            hashAlgo;
-
-    @Option(name = "-sigalgs",
-            required = false, description = "comma-seperated preferred signature algorithms")
-    protected String           prefSigAlgs;
-
-    @Option(name = "-httpget",
-            required = false, description = "use HTTP GET for small request")
-    protected Boolean          useHttpGetForSmallRequest;
-
-    @Option(name = "-sign",
-            required = false, description = "Sign request")
-    protected Boolean          signRequest;
-
-    private OCSPRequestor      requestor;
-
     @Override
     protected Object doExecute()
     throws Exception
@@ -85,36 +49,6 @@ public class OCSPStatusLoadTestCommand extends OsgiCommandSupport
         if(numThreads == null)
         {
             numThreads = 5;
-        }
-
-        if(hashAlgo == null)
-        {
-            hashAlgo = "SHA256";
-        }
-
-        ASN1ObjectIdentifier hashAlgoOid;
-
-        hashAlgo = hashAlgo.trim().toUpperCase();
-
-        if("SHA1".equalsIgnoreCase(hashAlgo) || "SHA-1".equalsIgnoreCase(hashAlgo))
-        {
-            hashAlgoOid = X509ObjectIdentifiers.id_SHA1;
-        }
-        else if("SHA256".equalsIgnoreCase(hashAlgo) || "SHA-256".equalsIgnoreCase(hashAlgo))
-        {
-            hashAlgoOid = NISTObjectIdentifiers.id_sha256;
-        }
-        else if("SHA384".equalsIgnoreCase(hashAlgo) || "SHA-384".equalsIgnoreCase(hashAlgo))
-        {
-            hashAlgoOid = NISTObjectIdentifiers.id_sha384;
-        }
-        else if("SHA512".equalsIgnoreCase(hashAlgo) || "SHA-512".equalsIgnoreCase(hashAlgo))
-        {
-            hashAlgoOid = NISTObjectIdentifiers.id_sha512;
-        }
-        else
-        {
-            throw new Exception("Unsupported hash algorithm " + hashAlgo);
         }
 
         List<Long> serialNumbers = new LinkedList<>();
@@ -163,7 +97,7 @@ public class OCSPStatusLoadTestCommand extends OsgiCommandSupport
             return null;
         }
 
-        URL serverUrl = new URL(serverURL == null ? DFLT_URL : serverURL);
+        URL serverUrl = getServiceURL();
 
         StringBuilder startMsg = new StringBuilder();
 
@@ -177,27 +111,7 @@ public class OCSPStatusLoadTestCommand extends OsgiCommandSupport
 
         X509Certificate caCert = IoCertUtil.parseCert(caCertFile);
 
-        RequestOptions options = new RequestOptions();
-        options.setUseNonce(useNonce == null ? false : useNonce.booleanValue());
-        options.setHashAlgorithmId(hashAlgoOid);
-        options.setSignRequest(signRequest == null ? false : signRequest.booleanValue());
-
-        if(useHttpGetForSmallRequest != null)
-        {
-            options.setUseHttpGetForRequest(useHttpGetForSmallRequest.booleanValue());
-        }
-
-        if(prefSigAlgs != null)
-        {
-            StringTokenizer st = new StringTokenizer(prefSigAlgs, ",;: \t");
-            List<String> sortedList = new ArrayList<>(st.countTokens());
-            while(st.hasMoreTokens())
-            {
-                sortedList.add(st.nextToken());
-            }
-
-            options.setPreferredSignatureAlgorithms2(sortedList);
-        }
+        RequestOptions options = getRequestOptions();
 
         OcspLoadTest loadTest = new OcspLoadTest(requestor, serialNumbers,
                 caCert, serverUrl, options);
@@ -206,15 +120,5 @@ public class OCSPStatusLoadTestCommand extends OsgiCommandSupport
         loadTest.test();
 
         return null;
-    }
-
-    public OCSPRequestor getRequestor()
-    {
-        return requestor;
-    }
-
-    public void setRequestor(OCSPRequestor requestor)
-    {
-        this.requestor = requestor;
     }
 }

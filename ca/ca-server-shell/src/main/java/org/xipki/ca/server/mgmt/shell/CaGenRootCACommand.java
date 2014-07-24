@@ -10,7 +10,6 @@ package org.xipki.ca.server.mgmt.shell;
 import java.io.File;
 import java.security.cert.X509Certificate;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import org.apache.felix.gogo.commands.Command;
@@ -25,8 +24,6 @@ import org.xipki.ca.server.mgmt.CertProfileEntry;
 import org.xipki.ca.server.mgmt.DuplicationMode;
 import org.xipki.ca.server.mgmt.Permission;
 import org.xipki.ca.server.mgmt.shell.SelfSignedCertBuilder.GenerateSelfSignedResult;
-import org.xipki.security.api.PasswordResolver;
-import org.xipki.security.api.SecurityFactory;
 import org.xipki.security.common.ConfigurationException;
 
 /**
@@ -34,13 +31,8 @@ import org.xipki.security.common.ConfigurationException;
  */
 
 @Command(scope = "ca", name = "gen-rca", description="Generate selfsigned CA")
-public class CaGenRootCACommand extends CaCommand
+public class CaGenRootCACommand extends CaAddOrGenCommand
 {
-    @Option(name = "-name",
-            description = "Required. CA name",
-            required = true)
-    protected String           caName;
-
     @Option(name = "-subject",
             description = "Required. Subject of the Root CA",
             required = true)
@@ -54,81 +46,6 @@ public class CaGenRootCACommand extends CaCommand
     @Option(name = "-out",
             description = "Where to save the generated CA certificate")
     protected String rcaCertOutFile;
-
-    @Option(name = "-status",
-            description = "CA status, active|pending|deactivated, default is active")
-    protected String            caStatus;
-
-    @Option(name = "-ocspUri",
-            description = "OCSP URI, multi options is allowed",
-            multiValued = true)
-    protected List<String> ocspUris;
-
-    @Option(name = "-crlUri",
-            description = "CRL URI, multi options is allowed",
-            multiValued = true)
-    protected List<String> crlUris;
-
-    @Option(name = "-deltaCrlUri",
-            description = "Delta CRL URI, multi options is allowed",
-            multiValued = true)
-    protected List<String> deltaCrlUris;
-
-    @Option(name = "-permission",
-            description = "Required. Permission, multi options is allowed. allowed values are\n" + permissionsText,
-            required = true, multiValued = true)
-    protected Set<String> permissions;
-
-    @Option(name = "-nextSerial",
-            description = "Required. Serial number for the next certificate, 0 for random serial number",
-            required = true)
-    protected Long            nextSerial;
-
-    @Option(name = "-maxValidity",
-            description = "Required. maximal validity in days",
-            required = true)
-    protected Integer            maxValidity;
-
-    @Option(name = "-crlSigner",
-            description = "CRL signer name")
-    protected String            crlSignerName;
-
-    @Option(name = "-numCrls",
-            description = "Number of CRLs to be kept in database")
-    protected Integer           numCrls;
-
-    @Option(name = "-expirationPeriod",
-            description = "Days before expiration time of CA to issue certificates\n"
-                    + "the default is 365")
-    protected Integer           expirationPeriod;
-
-    @Option(name = "-signerType",
-            description = "Required. CA signer type",
-            required = true)
-    protected String            signerType;
-
-    @Option(name = "-signerConf",
-            description = "CA signer configuration")
-    protected String            signerConf;
-
-    @Option(name = "-dk", aliases = { "--duplicateKey" },
-            description = "Mode of duplicate key.\n"
-                    + "\t1: forbidden\n"
-                    + "\t2: forbiddenWithinProfile\n"
-                    + "\t3: allowed\n"
-                    + "the default is 2")
-    protected String           duplicateKeyI;
-
-    @Option(name = "-ds", aliases = { "--duplicateSubject" },
-            description = "Mode of duplicate subject.\n"
-                    + "\t1: forbidden\n"
-                    + "\t2: forbiddenWithinProfile\n"
-                    + "\t3: allowed\n"
-                    + "the default is 2")
-    protected String           duplicateSubjectI;
-
-    private PasswordResolver passwordResolver;
-    private SecurityFactory securityFactory;
 
     @Override
     protected Object doExecute()
@@ -241,13 +158,4 @@ public class CaGenRootCACommand extends CaCommand
         return null;
     }
 
-    public void setPasswordResolver(PasswordResolver passwordResolver)
-    {
-        this.passwordResolver = passwordResolver;
-    }
-
-    public void setSecurityFactory(SecurityFactory securityFactory)
-    {
-        this.securityFactory = securityFactory;
-    }
 }

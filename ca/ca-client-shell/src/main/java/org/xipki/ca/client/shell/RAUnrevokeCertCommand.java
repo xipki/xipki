@@ -11,9 +11,7 @@ import java.math.BigInteger;
 import java.security.cert.X509Certificate;
 
 import org.apache.felix.gogo.commands.Command;
-import org.apache.felix.gogo.commands.Option;
 import org.bouncycastle.asn1.x500.X500Name;
-import org.xipki.ca.client.api.RAWorker;
 import org.xipki.ca.common.CertIDOrError;
 import org.xipki.ca.common.PKIStatusInfo;
 import org.xipki.security.common.IoCertUtil;
@@ -23,22 +21,8 @@ import org.xipki.security.common.IoCertUtil;
  */
 
 @Command(scope = "caclient", name = "unrevoke", description="Unrevoke certificate")
-public class RAUnrevokeCertCommand extends ClientCommand
+public class RAUnrevokeCertCommand extends RAUnRevRemoveCertCommand
 {
-    @Option(name = "-cert",
-            description = "Certificate file")
-    protected String            certFile;
-
-    @Option(name = "-cacert",
-            description = "CA Certificate file")
-    protected String            caCertFile;
-
-    @Option(name = "-serial",
-            description = "Serial number")
-    protected String            serialNumber;
-
-    private RAWorker             raWorker;
-
     @Override
     protected Object doExecute()
     throws Exception

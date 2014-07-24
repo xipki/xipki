@@ -31,11 +31,6 @@ public class CaAliasCompleter implements Completer
     {
         StringsCompleter delegate = new StringsCompleter();
 
-        if(buffer == null || buffer.isEmpty())
-        {
-            return delegate.complete(buffer, cursor, candidates);
-        }
-
         for(String s : caManager.getCaAliasNames())
         {
             delegate.getStrings().add(s);
