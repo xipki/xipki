@@ -12,6 +12,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.felix.gogo.commands.Argument;
 import org.apache.felix.gogo.commands.Command;
 import org.apache.felix.gogo.commands.Option;
 import org.xipki.ca.server.mgmt.CmpRequestorEntry;
@@ -23,10 +24,7 @@ import org.xipki.ca.server.mgmt.CmpRequestorEntry;
 @Command(scope = "ca", name = "requestor-list", description="List requestors")
 public class RequestorListCommand extends CaCommand
 {
-
-    @Option(name = "-name",
-            description = "Requestor name",
-            required = false, multiValued = false)
+    @Argument(index = 0, name = "name", description = "Requestor name", required = false)
     protected String name;
 
     @Option(name = "-v", aliases="--verbose",

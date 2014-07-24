@@ -7,8 +7,8 @@
 
 package org.xipki.ca.server.mgmt.shell;
 
+import org.apache.felix.gogo.commands.Argument;
 import org.apache.felix.gogo.commands.Command;
-import org.apache.felix.gogo.commands.Option;
 
 /**
  * @author Lijun Liao
@@ -17,10 +17,7 @@ import org.apache.felix.gogo.commands.Option;
 @Command(scope = "ca", name = "env-rm", description="Remove environment parameter")
 public class EnvRemoveCommand extends CaCommand
 {
-
-    @Option(name = "-name",
-            description = "Required. Parameter Name",
-            required = true, multiValued = false)
+    @Argument(index = 0, name = "name", description = "Environment parameter name", required = true)
     protected String            name;
 
     @Override

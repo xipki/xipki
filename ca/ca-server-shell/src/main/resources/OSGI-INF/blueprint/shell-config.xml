@@ -29,6 +29,10 @@
     
     <bean id="caCrlReasonCompleter" class="org.xipki.ca.server.mgmt.shell.completer.CACRLReasonCompleter"/>
 
+    <bean id="rcaNameCompleter" class="org.xipki.ca.server.mgmt.shell.completer.RcaNameCompleter">
+        <property name="caManager" ref="caManager" />
+    </bean>
+
     <bean id="caNameCompleter" class="org.xipki.ca.server.mgmt.shell.completer.CaNameCompleter">
         <property name="caManager" ref="caManager" />
     </bean>
@@ -114,8 +118,11 @@
             <action class="org.xipki.ca.server.mgmt.shell.CaRevokeCommand">
             	<property name="caManager" ref="caManager" />
             </action>
+            <completers>
+                <ref component-id="caNameCompleter"/>
+                <null/>
+            </completers>
             <optional-completers>
-                <entry key="-name" value-ref="caNameCompleter"/>
                 <entry key="-reason" value-ref="caCrlReasonCompleter"/>
             </optional-completers>
         </command>
@@ -124,18 +131,20 @@
             <action class="org.xipki.ca.server.mgmt.shell.CaUnrevokeCommand">
             	<property name="caManager" ref="caManager" />
             </action>
-            <optional-completers>
-                <entry key="-name" value-ref="caNameCompleter"/>
-            </optional-completers>
+            <completers>
+                <ref component-id="caNameCompleter"/>
+                <null/>
+            </completers>
         </command>
 
         <command name="ca/ca-rm">
             <action class="org.xipki.ca.server.mgmt.shell.CaRemoveCommand">
             	<property name="caManager" ref="caManager" />
             </action>
-            <optional-completers>
-                <entry key="-name" value-ref="caNameCompleter"/>
-            </optional-completers>
+            <completers>
+                <ref component-id="caNameCompleter"/>
+                <null/>
+            </completers>
         </command>
         
         <command name="ca/gen-rca">
@@ -159,18 +168,20 @@
             <action class="org.xipki.ca.server.mgmt.shell.CaPublishRCACertCommand">
             	<property name="caManager" ref="caManager" />
             </action>
-            <optional-completers>
-                <entry key="-ca" value-ref="caNameCompleter"/>
-            </optional-completers>
+            <completers>
+                <ref component-id="rcaNameCompleter"/>
+                <null/>
+            </completers>
         </command>
         
         <command name="ca/ca-list">
             <action class="org.xipki.ca.server.mgmt.shell.CaListCommand">
             	<property name="caManager" ref="caManager" />
             </action>
-            <optional-completers>
-                <entry key="-name" value-ref="caNameCompleter"/>
-            </optional-completers>
+            <completers>
+                <ref component-id="caNameCompleter"/>
+                <null/>
+            </completers>
         </command>
         
         <command name="ca/ca-update">
@@ -204,22 +215,24 @@
             <action class="org.xipki.ca.server.mgmt.shell.CaAliasListCommand">
             	<property name="caManager" ref="caManager" />
             </action>
-            <optional-completers>
-                <entry key="-alias" value-ref="caAliasCompleter"/>
-            </optional-completers>
+            <completers>
+                <ref component-id="caAliasCompleter"/>
+                <null/>
+            </completers>
         </command>
 
         <command name="ca/caalias-rm">
             <action class="org.xipki.ca.server.mgmt.shell.CaAliasRemoveCommand">
             	<property name="caManager" ref="caManager" />
             </action>
-            <optional-completers>
-                <entry key="-alias" value-ref="caAliasCompleter"/>
-            </optional-completers>
+            <completers>
+                <ref component-id="caAliasCompleter"/>
+                <null/>
+            </completers>
         </command>
         
         <!--  CA-Profile -->
-	      <command name="ca/caprofile-add">
+	    <command name="ca/caprofile-add">
             <action class="org.xipki.ca.server.mgmt.shell.CaProfileAddCommand">
             	<property name="caManager" ref="caManager" />
             </action>
@@ -229,7 +242,7 @@
             </optional-completers>
         </command>
 		
-	      <command name="ca/caprofile-list">
+	    <command name="ca/caprofile-list">
             <action class="org.xipki.ca.server.mgmt.shell.CaProfileListCommand">
             	<property name="caManager" ref="caManager" />
             </action>
@@ -238,7 +251,7 @@
             </optional-completers>
         </command>
 
-	      <command name="ca/caprofile-rm">
+	    <command name="ca/caprofile-rm">
             <action class="org.xipki.ca.server.mgmt.shell.CaProfileRemoveCommand">
             	<property name="caManager" ref="caManager" />
             </action>
@@ -366,18 +379,20 @@
             <action class="org.xipki.ca.server.mgmt.shell.CrlSignerListCommand">
             	<property name="caManager" ref="caManager" />
             </action>
-            <optional-completers>
-                <entry key="-name" value-ref="crlSignerNameCompleter"/>    
-            </optional-completers>
+            <completers>
+                <ref component-id="crlSignerNameCompleter"/>
+                <null/>
+            </completers>
         </command>
 		
         <command name="ca/crlsigner-rm">
             <action class="org.xipki.ca.server.mgmt.shell.CrlSignerRemoveCommand">
             	<property name="caManager" ref="caManager" />
             </action>
-            <optional-completers>
-                <entry key="-name" value-ref="crlSignerNameCompleter"/>    
-            </optional-completers>
+            <completers>
+                <ref component-id="crlSignerNameCompleter"/>
+                <null/>
+            </completers>
         </command>
         
         <command name="ca/crlsigner-update">
@@ -404,18 +419,20 @@
             <action class="org.xipki.ca.server.mgmt.shell.EnvListCommand">
             	<property name="caManager" ref="caManager" />
             </action>
-            <optional-completers>
-                <entry key="-name" value-ref="envNameCompleter"/>    
-            </optional-completers>
+            <completers>
+                <ref component-id="envNameCompleter"/>
+                <null/>
+            </completers>
         </command>
 
         <command name="ca/env-rm">
             <action class="org.xipki.ca.server.mgmt.shell.EnvRemoveCommand">
             	<property name="caManager" ref="caManager" />
             </action>
-            <optional-completers>
-                <entry key="-name" value-ref="envNameCompleter"/>    
-            </optional-completers>
+            <completers>
+                <ref component-id="envNameCompleter"/>
+                <null/>
+            </completers>
         </command>
 
         <command name="ca/env-update">
@@ -441,18 +458,20 @@
             <action class="org.xipki.ca.server.mgmt.shell.ProfileListCommand">
             	<property name="caManager" ref="caManager" />
             </action>
-            <optional-completers>
-                <entry key="-name" value-ref="profileNameCompleter"/>
-            </optional-completers>
+            <completers>
+                <ref component-id="profileNameCompleter"/>
+                <null/>
+            </completers>
         </command>
 
         <command name="ca/profile-rm">
             <action class="org.xipki.ca.server.mgmt.shell.ProfileRemoveCommand">
             	<property name="caManager" ref="caManager" />
             </action>
-            <optional-completers>
-                <entry key="-name" value-ref="profileNameCompleter"/>
-            </optional-completers>
+            <completers>
+                <ref component-id="profileNameCompleter"/>
+                <null/>
+            </completers>
         </command>
 
         <command name="ca/profile-update">
@@ -479,18 +498,20 @@
             <action class="org.xipki.ca.server.mgmt.shell.PublisherListCommand">
             	<property name="caManager" ref="caManager" />
             </action>
-            <optional-completers>
-                <entry key="-name" value-ref="publisherNameCompleter"/>
-            </optional-completers>
+            <completers>
+                <ref component-id="publisherNameCompleter"/>
+                <null/>
+            </completers>
         </command>
 
         <command name="ca/publisher-rm">
             <action class="org.xipki.ca.server.mgmt.shell.PublisherRemoveCommand">
             	<property name="caManager" ref="caManager" />
             </action>
-            <optional-completers>
-                <entry key="-name" value-ref="publisherNameCompleter"/>
-            </optional-completers>
+            <completers>
+                <ref component-id="publisherNameCompleter"/>
+                <null/>
+            </completers>
         </command>
         
         <command name="ca/publisher-update">
@@ -537,18 +558,20 @@
             <action class="org.xipki.ca.server.mgmt.shell.RequestorListCommand">
             	<property name="caManager" ref="caManager" />
             </action>
-            <optional-completers>
-                <entry key="-name" value-ref="requestorNameCompleter"/>
-            </optional-completers>
+            <completers>
+                <ref component-id="requestorNameCompleter"/>
+                <null/>
+            </completers>
         </command>
 
         <command name="ca/requestor-rm">
             <action class="org.xipki.ca.server.mgmt.shell.RequestorRemoveCommand">
             	<property name="caManager" ref="caManager" />
             </action>
-            <optional-completers>
-                <entry key="-name" value-ref="requestorNameCompleter"/>
-            </optional-completers>
+            <completers>
+                <ref component-id="requestorNameCompleter"/>
+                <null/>
+            </completers>
         </command>
 
         <command name="ca/requestor-update">

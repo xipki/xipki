@@ -3,11 +3,13 @@
            xmlns:cm="http://aries.apache.org/blueprint/xmlns/blueprint-cm/v1.1.0"
            default-activation="lazy">
 
+    <reference id="securityFactory" interface="org.xipki.security.api.SecurityFactory" />
+
 	<reference id="filePathCompleter" interface="org.xipki.console.karaf.FilePathCompleter"/>
 
-    <reference id="securityFactory" interface="org.xipki.security.api.SecurityFactory" />
+	<bean id="curveNameCompleter" class="org.xipki.security.shell.completer.ECCurverNameCompleter"/>
 	
-    <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.1.0">  
+    <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.1.0">
         <command name="keytool/list">
             <action class="org.xipki.security.shell.P11ListSlotCommand">
             	<property name="securityFactory" ref="securityFactory" />
@@ -38,6 +40,7 @@
             	<property name="securityFactory" ref="securityFactory" />
             </action>
             <optional-completers>
+            	<entry key="-curve" value-ref="curveNameCompleter"/>
                 <entry key="-certout" value-ref="filePathCompleter"/>
             </optional-completers>
         </command>
@@ -47,6 +50,7 @@
             	<property name="securityFactory" ref="securityFactory" />
             </action>
             <optional-completers>
+            	<entry key="-curve" value-ref="curveNameCompleter"/>
                 <entry key="-out" value-ref="filePathCompleter"/>
                 <entry key="-certout" value-ref="filePathCompleter"/>
             </optional-completers>

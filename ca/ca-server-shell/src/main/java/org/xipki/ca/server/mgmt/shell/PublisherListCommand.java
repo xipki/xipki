@@ -12,8 +12,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.felix.gogo.commands.Argument;
 import org.apache.felix.gogo.commands.Command;
-import org.apache.felix.gogo.commands.Option;
 import org.xipki.ca.server.mgmt.PublisherEntry;
 
 /**
@@ -23,10 +23,7 @@ import org.xipki.ca.server.mgmt.PublisherEntry;
 @Command(scope = "ca", name = "publisher-list", description="List publishers")
 public class PublisherListCommand extends CaCommand
 {
-
-    @Option(name = "-name",
-            description = "Publisher Name",
-            required = false, multiValued = false)
+    @Argument(index = 0, name = "name", description = "Publisher name", required = false)
     protected String name;
 
     @Override

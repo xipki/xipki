@@ -65,7 +65,7 @@ keytool:update-cert-p12 -p12 output/RCA1.p12 -pwd 1234 -cert output/RCA1.der
 ca:caalias-add -ca RCA1 -alias RCA
 
 ## Remove the profile RCA
-ca:profile-rm -name RCA
+ca:profile-rm RCA
 
 ## Add Profiles
 ca:caprofile-add -ca RCA1 -profile SubCA
@@ -82,7 +82,7 @@ ca:careq-add -requestor requestor -permission all -ra yes -profile all -ca RCA1
 ca:ca-restart
 
 ## Publish the self-signed certificate
-ca:publish-self -ca RCA1 -profile RCA
+ca:publish-self -profile RCA RCA1
 
 features:install xipki-caclient-shell
 

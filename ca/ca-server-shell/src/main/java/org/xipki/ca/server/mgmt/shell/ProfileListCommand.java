@@ -12,8 +12,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.felix.gogo.commands.Argument;
 import org.apache.felix.gogo.commands.Command;
-import org.apache.felix.gogo.commands.Option;
 import org.xipki.ca.server.mgmt.CertProfileEntry;
 
 /**
@@ -23,10 +23,7 @@ import org.xipki.ca.server.mgmt.CertProfileEntry;
 @Command(scope = "ca", name = "profile-list", description="List profiles")
 public class ProfileListCommand extends CaCommand
 {
-
-    @Option(name = "-name",
-            description = "Profile name",
-            required = false, multiValued = false)
+    @Argument(index = 0, name = "name", description = "Certificate profile name", required = false)
     protected String name;
 
     @Override
