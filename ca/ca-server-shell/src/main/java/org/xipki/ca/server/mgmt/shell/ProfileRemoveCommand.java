@@ -7,8 +7,8 @@
 
 package org.xipki.ca.server.mgmt.shell;
 
+import org.apache.felix.gogo.commands.Argument;
 import org.apache.felix.gogo.commands.Command;
-import org.apache.felix.gogo.commands.Option;
 
 /**
  * @author Lijun Liao
@@ -17,10 +17,7 @@ import org.apache.felix.gogo.commands.Option;
 @Command(scope = "ca", name = "profile-rm", description="Remove Profile")
 public class ProfileRemoveCommand extends CaCommand
 {
-
-    @Option(name = "-name",
-                description = "Required. Parameter Name",
-                required = true, multiValued = false)
+    @Argument(index = 0, name = "name", description = "Certificate profile name", required = true)
     protected String            name;
 
     @Override

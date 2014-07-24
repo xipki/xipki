@@ -82,7 +82,7 @@ ca:careq-add -requestor requestor -permission all -ra yes -profile all -ca RCA1
 ca:ca-restart
 
 ## Publish the self-signed certificate
-ca:publish-self -ca RCA1 -profile RCA
+ca:publish-self -profile RCA RCA1
 
 features:install xipki-caclient-shell
 

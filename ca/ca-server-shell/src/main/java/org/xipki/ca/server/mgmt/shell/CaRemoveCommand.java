@@ -7,8 +7,8 @@
 
 package org.xipki.ca.server.mgmt.shell;
 
+import org.apache.felix.gogo.commands.Argument;
 import org.apache.felix.gogo.commands.Command;
-import org.apache.felix.gogo.commands.Option;
 
 /**
  * @author Lijun Liao
@@ -17,11 +17,8 @@ import org.apache.felix.gogo.commands.Option;
 @Command(scope = "ca", name = "ca-rm", description="Remove CA")
 public class CaRemoveCommand extends CaCommand
 {
-
-    @Option( name = "-name",
-                description = "Required. CA Name",
-                required = true, multiValued = false)
-    protected String            name;
+    @Argument(index = 0, name="name", description = "CA name", required = true)
+    protected String           name;
 
     @Override
     protected Object doExecute()
