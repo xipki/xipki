@@ -32,7 +32,7 @@ public class CaRevokeCommand extends CaCommand
                 CRLReason.CERTIFICATE_HOLD,    CRLReason.PRIVILEGE_WITHDRAWN}));
 
     @Argument(index = 0, name = "name", description = "CA name", required = true)
-    protected String           caName;
+    protected String caName;
 
     @Option(name = "-reason",
             required = true,
@@ -45,7 +45,7 @@ public class CaRevokeCommand extends CaCommand
                     "5: cessationOfOperation\n" +
                     "6: certificateHold\n" +
                     "9: privilegeWithdrawn")
-    protected String           reason;
+    protected String reason;
 
     @Override
     protected Object doExecute()

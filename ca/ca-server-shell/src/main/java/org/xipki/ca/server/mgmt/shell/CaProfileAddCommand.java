@@ -22,12 +22,12 @@ public class CaProfileAddCommand extends CaCommand
     @Option(name = "-ca",
             description = " Required. CA name",
             required = true)
-    protected String           caName;
+    protected String caName;
 
     @Option(name = "-profile",
         description = "Required. Profile profileNames, multi values allowed",
         required = true, multiValued = true)
-    protected List<String>            profileNames;
+    protected List<String> profileNames;
 
     @Override
     protected Object doExecute()

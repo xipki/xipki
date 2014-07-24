@@ -45,15 +45,15 @@ public class P11CertRequestGenCommand extends P11SecurityCommand
             required = false,
             description = "Subject in the PKCS#10 request.\n"
                     + "The default is the subject of self-signed certifite.")
-    protected String            subject;
+    protected String subject;
 
     @Option(name = "-hash",
             required = false, description = "Hash algorithm name. The default is SHA256")
-    protected String            hashAlgo;
+    protected String hashAlgo;
 
     @Option(name = "-out",
             required = true, description = "Required. Output file name")
-    protected String            outputFilename;
+    protected String outputFilename;
 
     @Override
     protected Object doExecute()

@@ -22,11 +22,11 @@ public abstract class CaAddOrGenCommand extends CaCommand
 {
     @Option(name = "-name",
             required = true, description = "Required. CA name")
-    protected String            caName;
+    protected String caName;
 
     @Option(name = "-status",
             description = "CA status, active|pending|deactivated, default is active")
-    protected String            caStatus;
+    protected String caStatus;
 
     @Option(name = "-ocspUri",
             description = "OCSP URI, multi options is allowed",
@@ -52,34 +52,34 @@ public abstract class CaAddOrGenCommand extends CaCommand
     @Option(name = "-nextSerial",
             description = "Required. Serial number for the next certificate, 0 for random serial number",
             required = true)
-    protected Long            nextSerial;
+    protected Long nextSerial;
 
     @Option(name = "-maxValidity",
             description = "Required. maximal validity in days",
             required = true)
-    protected Integer            maxValidity;
+    protected Integer maxValidity;
 
     @Option(name = "-crlSigner",
             description = "CRL signer name")
-    protected String            crlSignerName;
+    protected String crlSignerName;
 
     @Option(name = "-numCrls",
             description = "Number of CRLs to be kept in database")
-    protected Integer           numCrls;
+    protected Integer numCrls;
 
     @Option(name = "-expirationPeriod",
             description = "Days before expiration time of CA to issue certificates,\n"
                     + "the default is 365")
-    protected Integer           expirationPeriod;
+    protected Integer expirationPeriod;
 
     @Option(name = "-signerType",
             description = "Required. CA signer type",
             required = true)
-    protected String            signerType;
+    protected String signerType;
 
     @Option(name = "-signerConf",
             description = "CA signer configuration")
-    protected String            signerConf;
+    protected String signerConf;
 
     @Option(name = "-dk", aliases = { "--duplicateKey" },
             description = "Mode of duplicate key.\n"
@@ -87,7 +87,7 @@ public abstract class CaAddOrGenCommand extends CaCommand
                     + "\t2: forbiddenWithinProfile\n"
                     + "\t3: allowed\n"
                     + "the default is 2")
-    protected String           duplicateKeyI;
+    protected String duplicateKeyI;
 
     @Option(name = "-ds", aliases = { "--duplicateSubject" },
             description = "Mode of duplicate subject.\n"
@@ -95,7 +95,7 @@ public abstract class CaAddOrGenCommand extends CaCommand
                     + "\t2: forbiddenWithinProfile\n"
                     + "\t3: allowed\n"
                     + "the default is 2")
-    protected String           duplicateSubjectI;
+    protected String duplicateSubjectI;
 
     protected SecurityFactory securityFactory;
     protected PasswordResolver passwordResolver;

@@ -18,7 +18,7 @@ import org.apache.felix.gogo.commands.Command;
 public class CrlSignerRemoveCommand extends CaCommand
 {
     @Argument(index = 0, name = "name", description = "CRL signer name", required = true)
-    protected String            name;
+    protected String name;
 
     @Override
     protected Object doExecute()

@@ -22,27 +22,27 @@ public class CALoadTestCommand extends ClientCommand
     @Option(name = "-profile",
             required = true,
             description = "Required. Certificate profile")
-    protected String           certProfile;
+    protected String certProfile;
 
     @Option(name = "-cn",
             required = true,
             description = "Required. Common name prefix")
-    protected String           commonNamePrefix;
+    protected String commonNamePrefix;
 
     @Option(name = "-subject",
             required = true,
             description = "Required. Subject without common name")
-    protected String           subjectNoCN;
+    protected String subjectNoCN;
 
     @Option(name = "-duration",
             required = true,
             description = "Required. Duration in seconds")
-    protected int              durationInSecond;
+    protected int durationInSecond;
 
     @Option(name = "-thread",
             required = false,
             description = "Number of threads, the default is 5")
-    protected Integer          numThreads;
+    protected Integer numThreads;
 
     @Option(name="-ec",
             required = false,

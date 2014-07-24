@@ -31,33 +31,33 @@ public abstract class AbstractOCSPStatusCommand extends OsgiCommandSupport
 
     @Option(name = "-url",
             description = "Server URL, the default is " + DFLT_URL)
-    protected String            serverURL;
+    protected String serverURL;
 
     @Option(name = "-cacert",
             required = true, description = "Required. CA certificate file")
-    protected String            caCertFile;
+    protected String caCertFile;
 
     @Option(name = "-nonce",
             description = "Use nonce")
-    protected Boolean            useNonce;
+    protected Boolean useNonce;
 
     @Option(name = "-hash",
             required = false, description = "Hash algorithm name. The default is SHA256")
-    protected String            hashAlgo;
+    protected String hashAlgo;
 
     @Option(name = "-sigalgs",
             required = false, description = "comma-seperated preferred signature algorithms")
-    protected String           prefSigAlgs;
+    protected String prefSigAlgs;
 
     @Option(name = "-httpget",
             required = false, description = "Use HTTP GET for small request")
-    protected Boolean          useHttpGetForSmallRequest;
+    protected Boolean useHttpGetForSmallRequest;
 
     @Option(name = "-sign",
             required = false, description = "Sign request")
-    protected Boolean          signRequest;
+    protected Boolean signRequest;
 
-    protected OCSPRequestor      requestor;
+    protected OCSPRequestor requestor;
 
     protected URL getServiceURL()
     throws MalformedURLException

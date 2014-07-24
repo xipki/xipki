@@ -26,17 +26,17 @@ public class CaRequestorAddCommand extends CaCommand
     @Option(name = "-ca",
             description = "Required. CA name",
             required = true)
-    protected String           caName;
+    protected String caName;
 
     @Option(name = "-requestor",
             required = true, description = "Required. Requestor name")
-    protected String            requestorName;
+    protected String requestorName;
 
     @Option(name = "-ra",
             description = "Whether as RA.\n"
                     + "Valid values are 'yes' and 'no',\n"
                     + "the default is 'no'")
-    protected String            raS;
+    protected String raS;
 
     @Option(name = "-permission",
             description = "Required. Permission, multi options is allowed. allowed values are\n"

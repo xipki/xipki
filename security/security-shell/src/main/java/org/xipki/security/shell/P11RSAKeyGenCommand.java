@@ -24,12 +24,12 @@ public class P11RSAKeyGenCommand extends P11KeyGenCommand
     @Option(name = "-keysize",
             description = "Keysize in bit, the default is 2048",
             required = false)
-    protected Integer            keysize;
+    protected Integer keysize;
 
     @Option(name = "-e",
             description = "public exponent, the default is 65537",
             required = false)
-    protected String            publicExponent;
+    protected String publicExponent;
 
     @Override
     protected Object doExecute()

@@ -18,7 +18,7 @@ import org.apache.felix.gogo.commands.Command;
 public class PublisherRemoveCommand extends CaCommand
 {
     @Argument(index = 0, name = "name", description = "Publisher name", required = true)
-    protected String            name;
+    protected String name;
 
     @Override
     protected Object doExecute()
