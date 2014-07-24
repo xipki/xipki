@@ -1,61 +1,49 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0"
-           xmlns:cm="http://aries.apache.org/blueprint/xmlns/blueprint-cm/v1.1.0"
-           default-activation="lazy">
-
-    <reference id="dataSourceFactory" interface="org.xipki.database.api.DataSourceFactory" />
-
-    <reference id="passwordResolver" interface="org.xipki.security.api.PasswordResolver" />
-	
-    <reference id="dirPathCompleter" interface="org.xipki.console.karaf.DirPathCompleter"/>
-
-    <reference id="filePathCompleter" interface="org.xipki.console.karaf.FilePathCompleter"/>
-
-    <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.1.0">  
-        <command name="dbtool/export-ca">
-            <action class="org.xipki.dbi.shell.ExportCaCommand">
-            	<property name="dataSourceFactory" ref="dataSourceFactory"/>
-            	<property name="passwordResolver" ref="passwordResolver" />
-            </action>
-            <optional-completers>
-                <entry key="-outdir" value-ref="dirPathCompleter"/>
-                <entry key="-dbconf" value-ref="filePathCompleter"/>
-            </optional-completers>
-        </command>
-              
-        <command name="dbtool/import-ca">
-            <action class="org.xipki.dbi.shell.ImportCaCommand">
-            	<property name="dataSourceFactory" ref="dataSourceFactory"/>
-            	<property name="passwordResolver" ref="passwordResolver" />
-            </action>
-            <optional-completers>
-                <entry key="-indir" value-ref="dirPathCompleter"/>
-                <entry key="-dbconf" value-ref="filePathCompleter"/>
-            </optional-completers>
-        </command>
-              
-        <command name="dbtool/export-ocsp">
-            <action class="org.xipki.dbi.shell.ExportOcspCommand">
-            	<property name="dataSourceFactory" ref="dataSourceFactory"/>
-            	<property name="passwordResolver" ref="passwordResolver" />
-            </action>
-            <optional-completers>
-                <entry key="-outdir" value-ref="dirPathCompleter"/>
-                <entry key="-dbconf" value-ref="filePathCompleter"/>
-            </optional-completers>
-        </command>
-              
-        <command name="dbtool/import-ocsp">
-            <action class="org.xipki.dbi.shell.ImportOcspCommand">
-            	<property name="dataSourceFactory" ref="dataSourceFactory"/>
-            	<property name="passwordResolver" ref="passwordResolver" />
-            </action>
-            <optional-completers>
-                <entry key="-indir" value-ref="dirPathCompleter"/>
-                <entry key="-dbconf" value-ref="filePathCompleter"/>
-            </optional-completers>
-        </command>
-              
-    </command-bundle>
-
+<blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0" xmlns:cm="http://aries.apache.org/blueprint/xmlns/blueprint-cm/v1.1.0" default-activation="lazy">
+  <reference id="dataSourceFactory" interface="org.xipki.database.api.DataSourceFactory"/>
+  <reference id="passwordResolver" interface="org.xipki.security.api.PasswordResolver"/>
+  <reference id="dirPathCompleter" interface="org.xipki.console.karaf.DirPathCompleter"/>
+  <reference id="filePathCompleter" interface="org.xipki.console.karaf.FilePathCompleter"/>
+  <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.1.0">
+    <command name="dbtool/export-ca">
+      <action class="org.xipki.dbi.shell.ExportCaCommand">
+        <property name="dataSourceFactory" ref="dataSourceFactory"/>
+        <property name="passwordResolver" ref="passwordResolver"/>
+      </action>
+      <optional-completers>
+        <entry key="-outdir" value-ref="dirPathCompleter"/>
+        <entry key="-dbconf" value-ref="filePathCompleter"/>
+      </optional-completers>
+    </command>
+    <command name="dbtool/import-ca">
+      <action class="org.xipki.dbi.shell.ImportCaCommand">
+        <property name="dataSourceFactory" ref="dataSourceFactory"/>
+        <property name="passwordResolver" ref="passwordResolver"/>
+      </action>
+      <optional-completers>
+        <entry key="-indir" value-ref="dirPathCompleter"/>
+        <entry key="-dbconf" value-ref="filePathCompleter"/>
+      </optional-completers>
+    </command>
+    <command name="dbtool/export-ocsp">
+      <action class="org.xipki.dbi.shell.ExportOcspCommand">
+        <property name="dataSourceFactory" ref="dataSourceFactory"/>
+        <property name="passwordResolver" ref="passwordResolver"/>
+      </action>
+      <optional-completers>
+        <entry key="-outdir" value-ref="dirPathCompleter"/>
+        <entry key="-dbconf" value-ref="filePathCompleter"/>
+      </optional-completers>
+    </command>
+    <command name="dbtool/import-ocsp">
+      <action class="org.xipki.dbi.shell.ImportOcspCommand">
+        <property name="dataSourceFactory" ref="dataSourceFactory"/>
+        <property name="passwordResolver" ref="passwordResolver"/>
+      </action>
+      <optional-completers>
+        <entry key="-indir" value-ref="dirPathCompleter"/>
+        <entry key="-dbconf" value-ref="filePathCompleter"/>
+      </optional-completers>
+    </command>
+  </command-bundle>
 </blueprint>
