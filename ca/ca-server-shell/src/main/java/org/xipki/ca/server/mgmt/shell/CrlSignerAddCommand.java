@@ -42,7 +42,7 @@ public class CrlSignerAddCommand extends CaCommand
     protected String            signerCertFile;
 
     @Option(name = "-period",
-            required=true, description = "Required. Interval in minutes of two CRLs,\n"
+            required = true, description = "Required. Interval in minutes of two CRLs,\n"
                     + "set to 0 to generate CRL on demand")
     protected Integer            period;
 

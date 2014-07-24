@@ -8,7 +8,6 @@
 package org.xipki.security.shell;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.security.KeyStore;
 import java.security.cert.X509Certificate;
 import java.util.Enumeration;
@@ -22,16 +21,8 @@ import org.xipki.security.api.SignerException;
  */
 
 @Command(scope = "keytool", name = "export-cert-p12", description="Export certificate from PKCS#12 keystore")
-public class P12CertExportCommand extends SecurityCommand
+public class P12CertExportCommand extends P12SecurityCommand
 {
-    @Option(name = "-p12",
-            required = true, description = "Required. PKCS#12 keystore file")
-    protected String            p12File;
-
-    @Option(name = "-pwd", aliases = { "--password" },
-            required = false, description = "Password of the PKCS#12 file")
-    protected String            password;
-
     @Option(name = "-out",
             required = true, description = "Required. Where to save the certificate")
     protected String            outFile;
@@ -40,22 +31,7 @@ public class P12CertExportCommand extends SecurityCommand
     protected Object doExecute()
     throws Exception
     {
-        KeyStore ks;
-
-        char[] pwd = readPasswordIfNotSet(password);
-        FileInputStream fIn = null;
-        try
-        {
-            fIn = new FileInputStream(p12File);
-            ks = KeyStore.getInstance("PKCS12", "BC");
-            ks.load(fIn, pwd);
-        }finally
-        {
-            if(fIn != null)
-            {
-                fIn.close();
-            }
-        }
+        KeyStore ks = getKeyStore();
 
         String keyname = null;
         Enumeration<String> aliases = ks.aliases();

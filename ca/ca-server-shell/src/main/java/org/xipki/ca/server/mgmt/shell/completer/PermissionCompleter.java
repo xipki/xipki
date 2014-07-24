@@ -18,6 +18,6 @@ public class PermissionCompleter extends EnumCompleter
 {
     public PermissionCompleter()
     {
-        super.setTokens(CaCommand.permissionsText);
+        setTokens(CaCommand.permissionsText);
     }
 }
