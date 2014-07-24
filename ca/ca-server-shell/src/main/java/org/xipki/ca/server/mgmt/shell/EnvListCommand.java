@@ -12,8 +12,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.felix.gogo.commands.Argument;
 import org.apache.felix.gogo.commands.Command;
-import org.apache.felix.gogo.commands.Option;
 import org.xipki.security.common.EnvironmentParameterResolver;
 
 /**
@@ -23,10 +23,7 @@ import org.xipki.security.common.EnvironmentParameterResolver;
 @Command(scope = "ca", name = "env-list", description="List environment parameters")
 public class EnvListCommand extends CaCommand
 {
-
-    @Option(name = "-name",
-            description = "Parameter Name",
-            required = false, multiValued = false)
+    @Argument(index = 0, name = "name", description = "Environment parameter name", required = false)
     protected String name;
 
     @Override

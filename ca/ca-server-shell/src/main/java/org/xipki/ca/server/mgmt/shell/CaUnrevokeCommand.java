@@ -7,8 +7,8 @@
 
 package org.xipki.ca.server.mgmt.shell;
 
+import org.apache.felix.gogo.commands.Argument;
 import org.apache.felix.gogo.commands.Command;
-import org.apache.felix.gogo.commands.Option;
 
 /**
  * @author Lijun Liao
@@ -17,9 +17,7 @@ import org.apache.felix.gogo.commands.Option;
 @Command(scope = "ca", name = "ca-unrevoke", description="Unrevoke CA")
 public class CaUnrevokeCommand extends CaCommand
 {
-    @Option(name = "-name",
-            description = "Required, CA name",
-            required = true)
+    @Argument(index = 0, name="name", description = "CA name", required = true)
     protected String           caName;
 
     @Override

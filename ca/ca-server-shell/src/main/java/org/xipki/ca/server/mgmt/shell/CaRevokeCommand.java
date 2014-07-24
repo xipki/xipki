@@ -11,6 +11,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import org.apache.felix.gogo.commands.Argument;
 import org.apache.felix.gogo.commands.Command;
 import org.apache.felix.gogo.commands.Option;
 import org.xipki.security.common.CRLReason;
@@ -30,9 +31,7 @@ public class CaRevokeCommand extends CaCommand
                 CRLReason.AFFILIATION_CHANGED, CRLReason.SUPERSEDED, CRLReason.CESSATION_OF_OPERATION,
                 CRLReason.CERTIFICATE_HOLD,    CRLReason.PRIVILEGE_WITHDRAWN}));
 
-    @Option(name = "-name",
-            description = "Required, CA name",
-            required = true)
+    @Argument(index = 0, name = "name", description = "CA name", required = true)
     protected String           caName;
 
     @Option(name = "-reason",
