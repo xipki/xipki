@@ -24,12 +24,12 @@ public abstract class RACRLCommand extends ClientCommand
 
     @Option(name = "-ca",
             required = false, description = "Required if multiple CAs are configured. CA name")
-    protected String            caName;
+    protected String caName;
 
     @Option(name = "-out",
             description = "Required. Where to save the CRL",
             required = true)
-    protected String            outFile;
+    protected String outFile;
 
     protected abstract X509CRL retrieveCRL(String caName)
     throws RAWorkerException, PKIErrorException;

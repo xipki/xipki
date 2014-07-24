@@ -17,14 +17,14 @@ public abstract class RAUnRevRemoveCertCommand extends ClientCommand
 {
     @Option(name = "-cert",
             description = "Certificate file")
-    protected String            certFile;
+    protected String certFile;
 
     @Option(name = "-cacert",
             description = "CA Certificate file")
-    protected String            caCertFile;
+    protected String caCertFile;
 
     @Option(name = "-serial",
             description = "Serial number")
-    protected String            serialNumber;
+    protected String serialNumber;
 
 }

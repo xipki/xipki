@@ -18,7 +18,7 @@ import org.apache.felix.gogo.commands.Command;
 public class CaRemoveCommand extends CaCommand
 {
     @Argument(index = 0, name="name", description = "CA name", required = true)
-    protected String           name;
+    protected String name;
 
     @Override
     protected Object doExecute()

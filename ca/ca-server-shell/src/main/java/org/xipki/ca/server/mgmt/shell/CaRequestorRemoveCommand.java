@@ -20,7 +20,7 @@ public class CaRequestorRemoveCommand extends CaCommand
     @Option(name = "-ca",
             description = "Required. CA name",
             required = true)
-    protected String           caName;
+    protected String caName;
 
     @Option(name = "-requestor",
             required = true, description = "Required. Requestor name")

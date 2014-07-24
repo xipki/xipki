@@ -22,12 +22,12 @@ public class ClearPublishQueueCommand extends CaCommand
     @Option(name = "-ca",
             description = "Required. CA name or 'all' for all CAs",
             required = true)
-    protected String           caName;
+    protected String caName;
 
     @Option(name = "-publisher",
         required = true, multiValued = true,
         description = "Required. Publisher name or 'all' for all publishers. Multivalued")
-    protected List<String>     publisherNames;
+    protected List<String> publisherNames;
 
     @Override
     protected Object doExecute()

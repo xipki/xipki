@@ -21,7 +21,7 @@ public class ResponderListCommand extends CaCommand
 
     @Option(name = "-v", aliases="--verbose",
             required = false, description = "Show responder information verbosely")
-    protected Boolean          verbose;
+    protected Boolean verbose;
 
     @Override
     protected Object doExecute()

@@ -24,7 +24,7 @@ public class P12RSAKeyGenCommand extends P12KeyGenCommand
     @Option(name = "-keysize",
             description = "Keysize in bit, the default is 2048",
             required = false)
-    protected Integer            keysize;
+    protected Integer keysize;
 
     @Override
     protected Object doExecute()

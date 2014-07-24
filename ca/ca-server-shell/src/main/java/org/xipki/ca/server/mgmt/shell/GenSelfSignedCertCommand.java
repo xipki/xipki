@@ -31,17 +31,17 @@ public class GenSelfSignedCertCommand extends XipkiOsgiCommandSupport
     @Option(name = "-subject",
             description = "Required. Subject of the certificate",
             required = true)
-    protected String           subject;
+    protected String subject;
 
     @Option(name = "-profileClass",
             description = "Required. Profile class name",
             required = true)
-    protected String           profileClass;
+    protected String profileClass;
 
     @Option(name = "-profileConf",
             description = "Profile configuration",
             required = false)
-    protected String           profileConf;
+    protected String profileConf;
 
     @Option(name = "-out",
             description = "Required. Where to save the generated certificate",
@@ -61,16 +61,16 @@ public class GenSelfSignedCertCommand extends XipkiOsgiCommandSupport
     @Option(name = "-signerType",
             description = "Required. Signer type",
             required = true)
-    protected String            signerType;
+    protected String signerType;
 
     @Option(name = "-signerConf",
             description = "Signer configuration")
-    protected String            signerConf;
+    protected String signerConf;
 
     @Option(name = "-serial",
             description = "Required. Serial number for the certificate, 0 for random serial number",
             required = true)
-    protected Long            serial;
+    protected Long serial;
 
     private PasswordResolver passwordResolver;
     private SecurityFactory securityFactory;

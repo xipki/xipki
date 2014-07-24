@@ -32,11 +32,11 @@ public class CaUpdateCommand extends CaCommand
 {
     @Option(name = "-name",
             required = true, description = "Required. CA name")
-    protected String            caName;
+    protected String caName;
 
     @Option(name = "-status",
             description = "CA status, active|pending|deactivated")
-    protected String            caStatus;
+    protected String caStatus;
 
     @Option(name = "-ocspUri",
             description = "OCSP URI or 'NULL', multi options is allowed",
@@ -61,49 +61,49 @@ public class CaUpdateCommand extends CaCommand
     @Option(name = "-nextSerial",
             description = "Serial number for the next certificate,\n"
                     + "must be greater than the current nextSerial or 0 for random serial number")
-    protected Long            nextSerial;
+    protected Long nextSerial;
 
     @Option(name = "-maxValidity",
             description = "Maximal validity in days")
-    protected Integer            maxValidity;
+    protected Integer maxValidity;
 
     @Option(name = "-expirationPeriod",
             description = "Days before expiration time of CA to issue certificates")
-    protected Integer           expirationPeriod;
+    protected Integer expirationPeriod;
 
     @Option(name = "-crlSigner",
             description = "CRL signer name or 'NULL'")
-    protected String            crlSignerName;
+    protected String crlSignerName;
 
     @Option(name = "-numCrls",
             description = "Number of CRLs to be kept in database")
-    protected Integer           numCrls;
+    protected Integer numCrls;
 
     @Option(name = "-cert",
             description = "CA certificate file")
-    protected String            certFile;
+    protected String certFile;
 
     @Option(name = "-signerType",
             description = "CA signer type")
-    protected String            signerType;
+    protected String signerType;
 
     @Option(name = "-signerConf",
             description = "CA signer configuration or 'NULL'")
-    protected String            signerConf;
+    protected String signerConf;
 
     @Option(name = "-dk", aliases = { "--duplicateKey" },
             description = "Mode of duplicate key.\n"
                     + "\t1: forbidden\n"
                     + "\t2: forbiddenWithinProfile\n"
                     + "\t3: allowed")
-    protected String           duplicateKeyI;
+    protected String duplicateKeyI;
 
     @Option(name = "-ds", aliases = { "--duplicateSubject" },
             description = "Mode of duplicate subject.\n"
                     + "\t1: forbidden\n"
                     + "\t2: forbiddenWithinProfile\n"
                     + "\t3: allowed")
-    protected String           duplicateSubjectI;
+    protected String duplicateSubjectI;
 
     private PasswordResolver passwordResolver;
 

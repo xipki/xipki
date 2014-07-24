@@ -36,12 +36,12 @@ public class CaGenRootCACommand extends CaAddOrGenCommand
     @Option(name = "-subject",
             description = "Required. Subject of the Root CA",
             required = true)
-    protected String           rcaSubject;
+    protected String rcaSubject;
 
     @Option(name = "-profile",
             description = "Required. Profile of the Root CA",
             required = true)
-    protected String           rcaProfile;
+    protected String rcaProfile;
 
     @Option(name = "-out",
             description = "Where to save the generated CA certificate")

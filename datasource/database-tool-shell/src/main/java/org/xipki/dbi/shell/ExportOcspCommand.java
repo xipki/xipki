@@ -24,16 +24,16 @@ public class ExportOcspCommand extends XipkiOsgiCommandSupport
     @Option(name = "-dbconf",
             description = "Required. Database configuration file",
             required = true)
-    protected String            dbconfFile;
+    protected String dbconfFile;
 
     @Option(name = "-outdir",
             description = "Required. Output directory",
             required = true)
-    protected String            outdir;
+    protected String outdir;
 
     @Option(name = "-n",
             description = "Number of certificates in one zip file. Default is 1000")
-    protected Integer           numCertsInBundle;
+    protected Integer numCertsInBundle;
 
     private DataSourceFactory dataSourceFactory;
     private PasswordResolver passwordResolver;

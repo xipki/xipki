@@ -30,7 +30,7 @@ public class CaAddCommand extends CaAddOrGenCommand
 {
     @Option(name = "-cert",
             description = "CA certificate file")
-    protected String            certFile;
+    protected String certFile;
 
     @Override
     protected Object doExecute()

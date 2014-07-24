@@ -19,25 +19,25 @@ public abstract class P11SecurityCommand extends SecurityCommand
 {
     @Option(name = "-slot",
             required = true, description = "Required. Slot index")
-    protected Integer           slotIndex;
+    protected Integer slotIndex;
 
     @Option(name = "-key-id",
             required = false, description = "Id of the private key in the PKCS#11 device.\n"
                     + "Either keyId or keyLabel must be specified")
-    protected String            keyId;
+    protected String keyId;
 
     @Option(name = "-key-label",
             required = false, description = "Label of the private key in the PKCS#11 device.\n"
                     + "Either keyId or keyLabel must be specified")
-    protected String            keyLabel;
+    protected String keyLabel;
 
     @Option(name = "-pwd", aliases = { "--password" },
             required = false, description = "Password of the PKCS#11 device")
-    protected String            password;
+    protected String password;
 
     @Option(name = "-p",
             required = false, description = "Read password from console")
-    protected Boolean            readFromConsole;
+    protected Boolean readFromConsole;
 
     protected char[] getPassword()
     {

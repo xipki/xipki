@@ -25,11 +25,11 @@ import org.xipki.ca.server.mgmt.CAEntry;
 public class CaListCommand extends CaCommand
 {
     @Argument(index = 0, name = "name", description = "CA name", required = false)
-    protected String           caName;
+    protected String caName;
 
     @Option(name = "-v", aliases="--verbose",
             required = false, description = "Show CA information verbosely")
-    protected Boolean          verbose;
+    protected Boolean verbose;
 
     @Override
     protected Object doExecute()
