@@ -1,61 +1,50 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0" xmlns:cm="http://aries.apache.org/blueprint/xmlns/blueprint-cm/v1.1.0" xmlns:ext="http://aries.apache.org/blueprint/xmlns/blueprint-ext/v1.0.0">
-
-	<!--
-		Properties
-	 -->
-
-    <!-- Allow the use of system properties -->
-	<ext:property-placeholder placeholder-prefix="$[" placeholder-suffix="]" />
-	
-	<!--
-		Note: Don't include a "-" in the persistent-id, or the config admin will
-		interpret it as a service-factory.
-	-->
-	<cm:property-placeholder persistent-id="org.xipki.ocsp.server" update-strategy="reload">
-		<cm:default-properties>
-			<cm:property name="confFile" value="ocsp-config/ocsp-responder.xml"/>
-			<cm:property name="urlPatterns" value="/ocsp/*"/>
-			<cm:property name="healthUrlPatterns" value="/health/ocsp/*"/>
-		</cm:default-properties>
-	</cm:property-placeholder>
-    
-   	<reference id="dataSourceFactory" interface="org.xipki.database.api.DataSourceFactory" />
-    <reference id="securityFactory" interface="org.xipki.security.api.SecurityFactory" />
-    <reference id="passwordResolver" interface="org.xipki.security.api.PasswordResolver" />
-    <reference id="auditLoggingService" interface="org.xipki.audit.api.AuditLoggingService" availability="optional" />
-
-    <bean id="ocspResponder" class="org.xipki.ocsp.OcspResponder"
-			init-method="init" destroy-method="shutdown">
-        <property name="confFile" value="${confFile}"/>
-        <property name="dataSourceFactory" ref="dataSourceFactory"/>
-        <property name="securityFactory" ref="securityFactory"/>
-        <property name="passwordResolver" ref="passwordResolver"/>
-        <property name="auditLoggingService" ref="auditLoggingService" />
-    </bean>
-    
-    <!-- create the servlet and inject our own app factory -->
-    <bean id="ocspServlet" class="org.xipki.ocsp.Rfc2560Servlet">
-        <property name="responder" ref="ocspResponder" />
-		<property name="auditLoggingService" ref="auditLoggingService" />
-    </bean>
-
-    <!-- register it as a servlet service for the web extender -->
-    <service ref="ocspServlet" interface="javax.servlet.Servlet">
-        <service-properties>
-            <entry key="urlPatterns" value="${urlPatterns}" />
-        </service-properties>
-    </service>
-
-    <!-- create the servlet and inject our own app factory -->
-    <bean id="healthServlet" class="org.xipki.ocsp.HealthCheckServlet">
-        <property name="responder" ref="ocspResponder" />
-    </bean>
-
-    <service ref="healthServlet" interface="javax.servlet.Servlet">
-        <service-properties>
-            <entry key="urlPatterns" value="${healthUrlPatterns}" />
-        </service-properties>
-    </service>
-
+  <!--
+      Properties
+  -->
+  <!-- Allow the use of system properties -->
+  <ext:property-placeholder placeholder-prefix="$[" placeholder-suffix="]"/>
+  <!--
+      Note: Don't include a "-" in the persistent-id, or the config admin will
+      interpret it as a service-factory.
+  -->
+  <cm:property-placeholder persistent-id="org.xipki.ocsp.server" update-strategy="reload">
+    <cm:default-properties>
+      <cm:property name="confFile" value="ocsp-config/ocsp-responder.xml"/>
+      <cm:property name="urlPatterns" value="/ocsp/*"/>
+      <cm:property name="healthUrlPatterns" value="/health/ocsp/*"/>
+    </cm:default-properties>
+  </cm:property-placeholder>
+  <reference id="dataSourceFactory" interface="org.xipki.database.api.DataSourceFactory"/>
+  <reference id="securityFactory" interface="org.xipki.security.api.SecurityFactory"/>
+  <reference id="passwordResolver" interface="org.xipki.security.api.PasswordResolver"/>
+  <reference id="auditLoggingService" interface="org.xipki.audit.api.AuditLoggingService" availability="optional"/>
+  <bean id="ocspResponder" class="org.xipki.ocsp.OcspResponder" init-method="init" destroy-method="shutdown">
+    <property name="confFile" value="${confFile}"/>
+    <property name="dataSourceFactory" ref="dataSourceFactory"/>
+    <property name="securityFactory" ref="securityFactory"/>
+    <property name="passwordResolver" ref="passwordResolver"/>
+    <property name="auditLoggingService" ref="auditLoggingService"/>
+  </bean>
+  <!-- create the servlet and inject our own app factory -->
+  <bean id="ocspServlet" class="org.xipki.ocsp.Rfc2560Servlet">
+    <property name="responder" ref="ocspResponder"/>
+    <property name="auditLoggingService" ref="auditLoggingService"/>
+  </bean>
+  <!-- register it as a servlet service for the web extender -->
+  <service ref="ocspServlet" interface="javax.servlet.Servlet">
+    <service-properties>
+      <entry key="urlPatterns" value="${urlPatterns}"/>
+    </service-properties>
+  </service>
+  <!-- create the servlet and inject our own app factory -->
+  <bean id="healthServlet" class="org.xipki.ocsp.HealthCheckServlet">
+    <property name="responder" ref="ocspResponder"/>
+  </bean>
+  <service ref="healthServlet" interface="javax.servlet.Servlet">
+    <service-properties>
+      <entry key="urlPatterns" value="${healthUrlPatterns}"/>
+    </service-properties>
+  </service>
 </blueprint>

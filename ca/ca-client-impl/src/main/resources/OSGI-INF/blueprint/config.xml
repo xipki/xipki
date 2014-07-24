@@ -1,33 +1,25 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0" xmlns:cm="http://aries.apache.org/blueprint/xmlns/blueprint-cm/v1.1.0" xmlns:ext="http://aries.apache.org/blueprint/xmlns/blueprint-ext/v1.0.0">
-
-	<!--
-		Properties
-	 -->
-
-    <!-- Allow the use of system properties -->
-	<ext:property-placeholder placeholder-prefix="$[" placeholder-suffix="]" />
-	
-	<!--
-		Note: Don't include a "-" in the persistent-id, or the config admin will
-		interpret it as a service-factory.
-	-->
-	<cm:property-placeholder persistent-id="org.xipki.ca.client" update-strategy="reload">
-		<cm:default-properties>
-			<cm:property name="clientConfFile" value="client-config/ca-client.properties" />
-		</cm:default-properties>
-	</cm:property-placeholder>
-	
-    <reference id="securityFactory" interface="org.xipki.security.api.SecurityFactory" />
-    <reference id="passwordResolver" interface="org.xipki.security.api.PasswordResolver" />
-    
-    <bean id="raWorker" class="org.xipki.ca.client.impl.RAWorkerImpl" init-method="init">
-        <property name="passwordResolver" ref="passwordResolver"/>
-        <property name="securityFactory" ref="securityFactory"/>
-        <property name="confFile" value="${clientConfFile}"/>        
-    </bean>
-
-    <service ref="raWorker" interface="org.xipki.ca.client.api.RAWorker" />
-
-
+  <!--
+     Properties
+  -->
+  <!-- Allow the use of system properties -->
+  <ext:property-placeholder placeholder-prefix="$[" placeholder-suffix="]"/>
+  <!--
+      Note: Don't include a "-" in the persistent-id, or the config admin will
+      interpret it as a service-factory.
+  -->
+  <cm:property-placeholder persistent-id="org.xipki.ca.client" update-strategy="reload">
+    <cm:default-properties>
+      <cm:property name="clientConfFile" value="client-config/ca-client.properties"/>
+    </cm:default-properties>
+  </cm:property-placeholder>
+  <reference id="securityFactory" interface="org.xipki.security.api.SecurityFactory"/>
+  <reference id="passwordResolver" interface="org.xipki.security.api.PasswordResolver"/>
+  <bean id="raWorker" class="org.xipki.ca.client.impl.RAWorkerImpl" init-method="init">
+    <property name="passwordResolver" ref="passwordResolver"/>
+    <property name="securityFactory" ref="securityFactory"/>
+    <property name="confFile" value="${clientConfFile}"/>
+  </bean>
+  <service ref="raWorker" interface="org.xipki.ca.client.api.RAWorker"/>
 </blueprint>
