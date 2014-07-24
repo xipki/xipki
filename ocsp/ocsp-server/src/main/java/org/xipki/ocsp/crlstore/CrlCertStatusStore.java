@@ -166,6 +166,7 @@ public class CrlCertStatusStore extends CertStatusStore
             if(f.exists() == false)
             {
                 // file does not exist
+                LOG.warn("CRL File {} does not exist", crlFile);
                 return;
             }
 
