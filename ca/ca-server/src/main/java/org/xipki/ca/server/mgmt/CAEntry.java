@@ -273,8 +273,8 @@ public class CAEntry
             sb.append("\tEncoded: ").append(Base64.toBase64String(cert.getEncodedCert())).append("\n");
         }
         sb.append("crlsigner_name: ").append(crlSignerName).append('\n');
-        sb.append("duplicateKey: ").append(duplicateKeyMode).append('\n');
-        sb.append("duplicateSubject: ").append(duplicateSubjectMode).append('\n');
+        sb.append("duplicateKey: ").append(duplicateKeyMode.getDescription()).append('\n');
+        sb.append("duplicateSubject: ").append(duplicateSubjectMode.getDescription()).append('\n');
         sb.append("permissions: ").append(Permission.toString(permissions));
 
         return sb.toString();
