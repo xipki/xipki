@@ -23,7 +23,6 @@ import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.bouncycastle.asn1.x9.X9ObjectIdentifiers;
 import org.bouncycastle.operator.ContentSigner;
 import org.bouncycastle.pkcs.PKCS10CertificationRequest;
-import org.bouncycastle.util.encoders.Hex;
 import org.xipki.security.NopPasswordResolver;
 import org.xipki.security.SecurityFactoryImpl;
 import org.xipki.security.api.ConcurrentContentSigner;
@@ -40,31 +39,13 @@ import org.xipki.security.p11.iaik.IaikP11ModulePool;
  */
 
 @Command(scope = "keytool", name = "req", description="Generate PKCS#10 request with PKCS#11 device")
-public class P11CertRequestGenCommand extends SecurityCommand
+public class P11CertRequestGenCommand extends P11SecurityCommand
 {
     @Option(name = "-subject",
             required = false,
             description = "Subject in the PKCS#10 request.\n"
                     + "The default is the subject of self-signed certifite.")
     protected String            subject;
-
-    @Option(name = "-slot",
-            required = true, description = "Required. Slot index of the PKCS#11 token")
-    protected Integer           slotIndex;
-
-    @Option(name = "-key-id",
-            required = false, description = "Id of the private key in the PKCS#11 token.\n"
-                    + "Either keyId or keyLabel must be specified")
-    protected String            keyId;
-
-    @Option(name = "-key-label",
-            required = false, description = "Label of the private key in the PKCS#11 token.\n"
-                    + "Either keyId or keyLabel must be specified")
-    protected String            keyLabel;
-
-    @Option(name = "-pwd", aliases = { "--password" },
-            required = false, description = "Password to access the PKCS#11 token")
-    protected String            password;
 
     @Option(name = "-hash",
             required = false, description = "Hash algorithm name. The default is SHA256")
@@ -73,10 +54,6 @@ public class P11CertRequestGenCommand extends SecurityCommand
     @Option(name = "-out",
             required = true, description = "Required. Output file name")
     protected String            outputFilename;
-
-    @Option(name = "-p",
-            required = false, description = "Read password from console")
-    protected Boolean            readFromConsole;
 
     @Override
     protected Object doExecute()
@@ -87,21 +64,8 @@ public class P11CertRequestGenCommand extends SecurityCommand
             hashAlgo = "SHA256";
         }
 
-        Pkcs11KeyIdentifier keyIdentifier;
-        if(keyId != null && keyLabel == null)
-        {
-            keyIdentifier = new Pkcs11KeyIdentifier(Hex.decode(keyId));
-        }
-        else if(keyId == null && keyLabel != null)
-        {
-            keyIdentifier = new Pkcs11KeyIdentifier(keyLabel);
-        }
-        else
-        {
-            throw new Exception("Exactly one of keyId or keyLabel should be specified");
-        }
-
-        char[] pwd = readPasswordIfRequired(password, readFromConsole);
+        Pkcs11KeyIdentifier keyIdentifier = getKeyIdentifier();
+        char[] pwd = getPassword();
 
         IaikExtendedModule module = IaikP11ModulePool.getInstance().getModule(
                 securityFactory.getPkcs11Module());

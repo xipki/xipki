@@ -8,14 +8,7 @@
 package org.xipki.security.shell;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.security.KeyStore;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
-import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.security.interfaces.ECPublicKey;
 import java.util.Enumeration;
@@ -41,21 +34,13 @@ import org.xipki.security.p10.Pkcs10RequestGenerator;
  */
 
 @Command(scope = "keytool", name = "req-p12", description="Generate PKCS#10 request with PKCS#12 keystore")
-public class P12CertRequestGenCommand extends SecurityCommand
+public class P12CertRequestGenCommand extends P12SecurityCommand
 {
     @Option(name = "-subject",
             required = false,
             description = "Subject in the PKCS#10 request.\n"
                     + "The default is the subject of self-signed certifite.")
     protected String            subject;
-
-    @Option(name = "-p12",
-            required = true, description = "Required. PKCS#12 keystore file")
-    protected String            p12File;
-
-    @Option(name = "-pwd", aliases = { "--password" },
-            required = false, description = "Password of the PKCS#12 file")
-    protected String            password;
 
     @Option(name = "-hash",
             required = false, description = "Hash algorithm name. The default is SHA256")
@@ -79,7 +64,8 @@ public class P12CertRequestGenCommand extends SecurityCommand
         char[] pwd = readPasswordIfNotSet(password);
         ASN1ObjectIdentifier sigAlgOid;
 
-        boolean ec = isEcKey(p12File, pwd);
+        KeyStore keystore = getKeyStore();
+        boolean ec = isEcKey(keystore, pwd);
 
         hashAlgo = hashAlgo.trim().toUpperCase();
 
@@ -135,61 +121,27 @@ public class P12CertRequestGenCommand extends SecurityCommand
         return null;
     }
 
-    private static boolean isEcKey(String p12File, char[] password)
-    throws SignerException, FileNotFoundException
+    private static boolean isEcKey(KeyStore keystore, char[] password)
+    throws Exception
     {
-        FileInputStream fIn = new FileInputStream(p12File);
-
-        try
+        String keyname = null;
+        Enumeration<String> aliases = keystore.aliases();
+        while(aliases.hasMoreElements())
         {
-            KeyStore ks = KeyStore.getInstance("PKCS12", "BC");
-            ks.load(fIn, password);
-
-            String keyname = null;
-            Enumeration<String> aliases = ks.aliases();
-            while(aliases.hasMoreElements())
+            String alias = aliases.nextElement();
+            if(keystore.isKeyEntry(alias))
             {
-                String alias = aliases.nextElement();
-                if(ks.isKeyEntry(alias))
-                {
-                    keyname = alias;
-                    break;
-                }
-            }
-
-            if(keyname == null)
-            {
-                throw new SignerException("Could not find private key");
-            }
-
-            return ks.getCertificate(keyname).getPublicKey() instanceof ECPublicKey;
-        }catch(KeyStoreException e)
-        {
-            throw new SignerException(e);
-        } catch (NoSuchProviderException e)
-        {
-            throw new SignerException(e);
-        } catch (NoSuchAlgorithmException e)
-        {
-            throw new SignerException(e);
-        } catch (CertificateException e)
-        {
-            throw new SignerException(e);
-        } catch (IOException e)
-        {
-            throw new SignerException(e);
-        } catch (ClassCastException e)
-        {
-            throw new SignerException(e);
-        } finally
-        {
-            try
-            {
-                fIn.close();
-            } catch (IOException e)
-            {
+                keyname = alias;
+                break;
             }
         }
+
+        if(keyname == null)
+        {
+            throw new SignerException("Could not find private key");
+        }
+
+        return keystore.getCertificate(keyname).getPublicKey() instanceof ECPublicKey;
     }
 
 }

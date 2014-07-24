@@ -24,7 +24,6 @@ import java.util.Set;
 import org.apache.felix.gogo.commands.Command;
 import org.apache.felix.gogo.commands.Option;
 import org.bouncycastle.asn1.x500.X500Name;
-import org.bouncycastle.util.encoders.Hex;
 import org.xipki.security.NopPasswordResolver;
 import org.xipki.security.api.PKCS11SlotIdentifier;
 import org.xipki.security.api.PasswordResolverException;
@@ -43,61 +42,27 @@ import org.xipki.security.p11.iaik.IaikP11Util;
  */
 
 @Command(scope = "keytool", name = "update-cert", description="Update certificate in PKCS#11 device")
-public class P11CertUpdateCommand extends SecurityCommand
+public class P11CertUpdateCommand extends P11SecurityCommand
 {
-
-    @Option(name = "-slot",
-            required = true, description = "Required. Slot index")
-    protected Integer           slotIndex;
-
-    @Option(name = "-key-id",
-            required = false, description = "Id of the private key in the PKCS#11 device.\n"
-                    + "Either keyId or keyLabel must be specified")
-    protected String            keyId;
-
-    @Option(name = "-key-label",
-            required = false, description = "Label of the private key in the PKCS#11 device.\n"
-                    + "Either keyId or keyLabel must be specified")
-    protected String            keyLabel;
 
     @Option(name = "-cert",
             required = true, description = "Required. Certificate file")
     protected String            certFile;
 
-    @Option(name = "-pwd", aliases = { "--password" },
-            required = false, description = "Password of the PKCS#11 device")
-    protected String            password;
-
     @Option(name = "-cacert",
             required = false, multiValued = true, description = "CA Certificate files")
     protected Set<String>       caCertFiles;
-
-    @Option(name = "-p",
-            required = false, description = "Read password from console")
-    protected Boolean            readFromConsole;
 
     @Override
     protected Object doExecute()
     throws Exception
     {
-        Pkcs11KeyIdentifier keyIdentifier;
-        if(keyId != null && keyLabel == null)
-        {
-            keyIdentifier = new Pkcs11KeyIdentifier(Hex.decode(keyId));
-        }
-        else if(keyId == null && keyLabel != null)
-        {
-            keyIdentifier = new Pkcs11KeyIdentifier(keyLabel);
-        }
-        else
-        {
-            throw new Exception("Exactly one of keyId or keyLabel should be specified");
-        }
-
         IaikExtendedModule module = IaikP11ModulePool.getInstance().getModule(
                 securityFactory.getPkcs11Module());
 
-        char[] pwd = readPasswordIfRequired(password, readFromConsole);
+        Pkcs11KeyIdentifier keyIdentifier = getKeyIdentifier();
+        char[] pwd = getPassword();
+
         IaikExtendedSlot slot = null;
         try
         {
