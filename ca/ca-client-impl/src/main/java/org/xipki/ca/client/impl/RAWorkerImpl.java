@@ -661,6 +661,20 @@ public final class RAWorkerImpl extends AbstractRAWorker implements RAWorker
             String caName, String username)
     throws RAWorkerException
     {
+        if(caName == null)
+        {
+            // detect the CA name
+            caName = getCANameForProfile(profileName);
+            if(caName == null)
+            {
+                throw new RAWorkerException("CertProfile " + profileName + " is not supported by any CA");
+            }
+        }
+        else
+        {
+            checkCertProfileSupportInCA(profileName, caName);
+        }
+
         X509CmpRequestor cmpRequestor = cmpRequestorsMap.get(caName);
         if(cmpRequestor == null)
         {
