@@ -20,7 +20,7 @@ public class PBEDecryptCommand extends SecurityCommand
 {
     @Option(name = "-pwd", aliases = { "--password" },
             required = true, description = "Required. Encrypted password, starts with PBE:")
-    protected String            passwordHint;
+    protected String passwordHint;
 
     @Override
     protected Object doExecute()

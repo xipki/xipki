@@ -26,41 +26,41 @@ public class CrlSignerAddCommand extends CaCommand
     @Option( name = "-name",
              description = "Required. CRL signer name",
              required = true, multiValued = false)
-    protected String            name;
+    protected String name;
 
     @Option(name = "-signerType",
             description = "Required. CRL signer type, use 'CA' to sign the CRL by the CA itself",
             required = true)
-    protected String            signerType;
+    protected String signerType;
 
     @Option(name = "-signerConf",
             description = "CRL signer configuration")
-    protected String            signerConf;
+    protected String signerConf;
 
     @Option(name = "-cert",
             description = "CRL signer's certificate file")
-    protected String            signerCertFile;
+    protected String signerCertFile;
 
     @Option(name = "-period",
             required = true, description = "Required. Interval in minutes of two CRLs,\n"
                     + "set to 0 to generate CRL on demand")
-    protected Integer            period;
+    protected Integer period;
 
     @Option(name = "-overlap",
             description = "Overlap of CRL")
-    protected Integer            overlap;
+    protected Integer overlap;
 
     @Option(name = "-wc", aliases = { "--withCert" },
             description = "Whether certificates are contained in CRL.\n"
                 + "Valid values are 'yes' and 'no',\n"
                 + "the default is 'no'")
-    protected String            withCertS;
+    protected String withCertS;
 
     @Option(name = "-wec", aliases = { "--withExpiredCert" },
             description = "Whether expired certificates are contained in CRL.\n"
                     + "Valid values are 'yes' and 'no',\n"
                     + "the default is 'no'")
-    protected String            withExpiredCertS;
+    protected String withExpiredCertS;
 
     private SecurityFactory securityFactory;
     private PasswordResolver passwordResolver;

@@ -55,15 +55,15 @@ public class OCSPStatusCommand extends AbstractOCSPStatusCommand
 {
     @Option(name = "-serial",
             description = "Serial number")
-    protected String            serialNumber;
+    protected String serialNumber;
 
     @Option(name = "-cert",
             description = "Certificate")
-    protected String            certFile;
+    protected String certFile;
 
     @Option(name = "-v", aliases="--verbose",
             required = false, description = "Show status verbosely")
-    protected Boolean          verbose;
+    protected Boolean verbose;
 
     private static final Map<ASN1ObjectIdentifier, String> extensionOidNameMap = new HashMap<>();
     static

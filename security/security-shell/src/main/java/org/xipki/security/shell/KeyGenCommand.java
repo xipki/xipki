@@ -23,7 +23,7 @@ public abstract class KeyGenCommand extends SecurityCommand
 {
     @Option(name = "-pwd", aliases = { "--password" },
             required = false, description = "Password of the PKCS#11 token")
-    protected String            password;
+    protected String password;
 
     protected Integer getKeyUsage()
     throws Exception

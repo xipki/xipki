@@ -18,7 +18,7 @@ import org.apache.felix.gogo.commands.Command;
 public class CaUnrevokeCommand extends CaCommand
 {
     @Argument(index = 0, name="name", description = "CA name", required = true)
-    protected String           caName;
+    protected String caName;
 
     @Override
     protected Object doExecute()

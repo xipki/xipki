@@ -21,12 +21,12 @@ public class EnvAddCommand extends CaCommand
     @Option(name = "-name",
             description = "Required. Parameter Name",
             required = true, multiValued = false)
-    protected String            name;
+    protected String name;
 
     @Option(name = "-value",
             description = "Required. Environment paremter value",
             required = true)
-    protected String            value;
+    protected String value;
 
     @Override
     protected Object doExecute()

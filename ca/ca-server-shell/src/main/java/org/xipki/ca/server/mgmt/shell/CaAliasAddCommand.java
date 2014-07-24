@@ -20,12 +20,12 @@ public class CaAliasAddCommand extends CaCommand
     @Option(name = "-ca",
             description = "Required. CA name",
             required = true)
-    protected String            caName;
+    protected String caName;
 
     @Option(name = "-alias",
             description = "Required. CA alias",
             required = true)
-    protected String            caAlias;
+    protected String caAlias;
 
     @Override
     protected Object doExecute()

@@ -18,7 +18,7 @@ import org.apache.felix.gogo.commands.Command;
 public class CaAliasRemoveCommand extends CaCommand
 {
     @Argument(index = 0, name = "alias", description = "CA alias", required = true)
-    protected String            caAlias;
+    protected String caAlias;
 
     @Override
     protected Object doExecute()

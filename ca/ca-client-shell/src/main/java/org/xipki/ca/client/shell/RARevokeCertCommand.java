@@ -35,7 +35,7 @@ public class RARevokeCertCommand extends RAUnRevRemoveCertCommand
                     "  5: cessationOfOperation\n" +
                     "  6: certificateHold\n" +
                     "  9: privilegeWithdrawn")
-    protected String           reason;
+    protected String reason;
 
     @Override
     protected Object doExecute()

@@ -35,11 +35,11 @@ public class P12CertUpdateCommand extends P12SecurityCommand
 {
     @Option(name = "-cert",
             required = true, description = "Required. Certificate file")
-    protected String            certFile;
+    protected String certFile;
 
     @Option(name = "-cacert",
             required = false, multiValued = true, description = "CA Certificate files")
-    protected Set<String>       caCertFiles;
+    protected Set<String> caCertFiles;
 
     @Override
     protected Object doExecute()

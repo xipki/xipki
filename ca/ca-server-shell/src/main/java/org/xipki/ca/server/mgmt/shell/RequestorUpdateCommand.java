@@ -24,12 +24,12 @@ public class RequestorUpdateCommand extends CaCommand
     @Option(name = "-name",
             description = "Required. Requestor name",
             required = true)
-    protected String            name;
+    protected String name;
 
     @Option(name = "-cert",
             description = "Required. Requestor certificate file",
             required = true)
-    protected String            certFile;
+    protected String certFile;
 
     @Override
     protected Object doExecute()

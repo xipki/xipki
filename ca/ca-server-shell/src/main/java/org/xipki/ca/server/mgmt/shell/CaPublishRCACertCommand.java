@@ -19,12 +19,12 @@ import org.apache.felix.gogo.commands.Option;
 public class CaPublishRCACertCommand extends CaCommand
 {
     @Argument(index = 0, name = "name", description = "CA name", required = true)
-    protected String           caName;
+    protected String caName;
 
     @Option(name = "-profile",
             description = "Required. Certificate profile name",
             required = true)
-    protected String           certprofile;
+    protected String certprofile;
 
     @Override
     protected Object doExecute()

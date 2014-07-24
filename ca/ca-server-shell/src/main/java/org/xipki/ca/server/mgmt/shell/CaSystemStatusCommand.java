@@ -20,7 +20,7 @@ public class CaSystemStatusCommand extends CaCommand
 {
     @Option(name = "-code",
             required = false, description = "Show only the code of CA system status")
-    protected Boolean          codeOnly;
+    protected Boolean codeOnly;
 
     @Override
     protected Object doExecute()

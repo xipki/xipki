@@ -29,7 +29,7 @@ public class CrlSignerListCommand extends CaCommand
 
     @Option(name = "-v", aliases="--verbose",
             required = false, description = "Show CRL signer information verbosely")
-    protected Boolean          verbose;
+    protected Boolean verbose;
 
     @Override
     protected Object doExecute()

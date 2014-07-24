@@ -22,19 +22,19 @@ public class PublisherUpdateCommand extends CaCommand
     @Option(name = "-name",
                 description = "Required. Publisher Name",
                 required = true, multiValued = false)
-    protected String            name;
+    protected String name;
 
     @Option(name = "-type",
             description = "Publisher type")
-    protected String            type;
+    protected String type;
 
     @Option(name = "-conf",
             description = "Publisher configuration or 'NULL'")
-    protected String            conf;
+    protected String conf;
 
     @Option(name = "-confFile",
             description = "Profile configuration file")
-    protected String            confFile;
+    protected String confFile;
 
     @Override
     protected Object doExecute()

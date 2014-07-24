@@ -29,7 +29,7 @@ public class RequestorListCommand extends CaCommand
 
     @Option(name = "-v", aliases="--verbose",
             required = false, description = "Show requestor information verbosely")
-    protected Boolean          verbose;
+    protected Boolean verbose;
 
     @Override
     protected Object doExecute()
