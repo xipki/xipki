@@ -634,7 +634,7 @@ public class X509CA
         try
         {
             GeneralName generalName = new GeneralName(certificateIssuer);
-            return new Extension(Extension.certificateIssuer, false,
+            return new Extension(Extension.certificateIssuer, true,
                     new GeneralNames(generalName).getEncoded());
         }
         catch (IOException e)
