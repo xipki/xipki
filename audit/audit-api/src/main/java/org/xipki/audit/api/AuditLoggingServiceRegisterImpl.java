@@ -23,7 +23,7 @@ public class AuditLoggingServiceRegisterImpl implements AuditLoggingServiceRegis
 
     public AuditLoggingService getAuditLoggingService()
     {
-        return services.isEmpty() ? null : services.getFirst();
+        return services.isEmpty() ? null : services.getLast();
     }
 
     public void bindService(AuditLoggingService service)
