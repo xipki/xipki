@@ -9,7 +9,7 @@ package org.xipki.ca.server;
 
 import java.security.cert.X509CRL;
 
-import org.xipki.audit.api.AuditLoggingService;
+import org.xipki.audit.api.AuditLoggingServiceRegister;
 import org.xipki.ca.api.publisher.CertPublisher;
 import org.xipki.ca.api.publisher.CertPublisherException;
 import org.xipki.ca.api.publisher.CertificateInfo;
@@ -76,9 +76,9 @@ public class IdentifiedCertPublisher
         return certPublisher.isHealthy();
     }
 
-    public void setAuditLoggingService(AuditLoggingService auditLoggingService)
+    public void setAuditServiceRegister(AuditLoggingServiceRegister auditServiceRegister)
     {
-        certPublisher.setAuditLoggingService(auditLoggingService);
+        certPublisher.setAuditServiceRegister(auditServiceRegister);
     }
 
     public boolean caRevoked(X509CertificateWithMetaInfo caCert, CertRevocationInfo revocationInfo)

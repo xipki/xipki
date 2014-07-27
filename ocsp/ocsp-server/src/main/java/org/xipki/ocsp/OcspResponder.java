@@ -67,11 +67,12 @@ import org.xipki.audit.api.AuditEvent;
 import org.xipki.audit.api.AuditEventData;
 import org.xipki.audit.api.AuditLevel;
 import org.xipki.audit.api.AuditLoggingService;
+import org.xipki.audit.api.AuditLoggingServiceRegister;
 import org.xipki.audit.api.AuditStatus;
 import org.xipki.audit.api.ChildAuditEvent;
 import org.xipki.audit.api.PCIAuditEvent;
-import org.xipki.database.api.DataSourceWrapper;
 import org.xipki.database.api.DataSourceFactory;
+import org.xipki.database.api.DataSourceWrapper;
 import org.xipki.ocsp.api.CertStatus;
 import org.xipki.ocsp.api.CertStatusInfo;
 import org.xipki.ocsp.api.CertStatusStore;
@@ -130,7 +131,7 @@ public class OcspResponder
     private final Map<String, String> auditCertprofileMapping = new ConcurrentHashMap<>();
     private Set<String> excludeCertProfiles;
 
-    private AuditLoggingService auditLoggingService;
+    private AuditLoggingServiceRegister auditServiceRegister;
 
     public OcspResponder()
     {
@@ -1031,17 +1032,19 @@ public class OcspResponder
         }
     }
 
-    public void setAuditLoggingService(AuditLoggingService auditLoggingService)
+    public void setAuditServiceRegister(AuditLoggingServiceRegister auditServiceRegister)
     {
-        this.auditLoggingService = auditLoggingService;
+        this.auditServiceRegister = auditServiceRegister;
         for(CertStatusStore store : certStatusStores)
         {
-            store.setAuditLoggingService(auditLoggingService);
+            store.setAuditServiceRegister(auditServiceRegister);
         }
     }
 
     private void auditLogPCIEvent(boolean successfull, String eventType)
     {
+        AuditLoggingService auditLoggingService = auditServiceRegister == null ? null :
+            auditServiceRegister.getAuditLoggingService();
         if(auditLoggingService != null)
         {
             PCIAuditEvent auditEvent = new PCIAuditEvent(new Date());

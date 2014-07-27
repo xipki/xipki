@@ -744,7 +744,7 @@ public class ProfileConfCreatorDemo
     {
         ProfileType profile = getBaseProfile("CertProfile gSMC_K", false, 730);
         profile.setDuplicateSubjectPermitted(true);
-        
+
         // SpecialBehavior
         profile.setSpecialBehavior(SpecialCertProfileBehavior.gematik_gSMC_K.name());
 

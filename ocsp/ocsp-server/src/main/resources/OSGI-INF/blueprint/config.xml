@@ -19,18 +19,18 @@
   <reference id="dataSourceFactory" interface="org.xipki.database.api.DataSourceFactory"/>
   <reference id="securityFactory" interface="org.xipki.security.api.SecurityFactory"/>
   <reference id="passwordResolver" interface="org.xipki.security.api.PasswordResolver"/>
-  <reference id="auditLoggingService" interface="org.xipki.audit.api.AuditLoggingService" availability="optional"/>
+  <reference id="auditServiceRegister" interface="org.xipki.audit.api.AuditLoggingServiceRegister"/>
   <bean id="ocspResponder" class="org.xipki.ocsp.OcspResponder" init-method="init" destroy-method="shutdown">
     <property name="confFile" value="${confFile}"/>
     <property name="dataSourceFactory" ref="dataSourceFactory"/>
     <property name="securityFactory" ref="securityFactory"/>
     <property name="passwordResolver" ref="passwordResolver"/>
-    <property name="auditLoggingService" ref="auditLoggingService"/>
+    <property name="auditServiceRegister" ref="auditServiceRegister"/>
   </bean>
   <!-- create the servlet and inject our own app factory -->
   <bean id="ocspServlet" class="org.xipki.ocsp.Rfc2560Servlet">
     <property name="responder" ref="ocspResponder"/>
-    <property name="auditLoggingService" ref="auditLoggingService"/>
+    <property name="auditServiceRegister" ref="auditServiceRegister"/>
   </bean>
   <!-- register it as a servlet service for the web extender -->
   <service ref="ocspServlet" interface="javax.servlet.Servlet">

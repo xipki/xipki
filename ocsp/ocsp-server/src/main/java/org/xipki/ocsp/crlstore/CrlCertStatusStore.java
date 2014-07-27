@@ -48,6 +48,7 @@ import org.bouncycastle.crypto.digests.SHA1Digest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.audit.api.AuditLevel;
+import org.xipki.audit.api.AuditLoggingService;
 import org.xipki.audit.api.AuditStatus;
 import org.xipki.audit.api.PCIAuditEvent;
 import org.xipki.database.api.DataSourceFactory;
@@ -673,6 +674,7 @@ public class CrlCertStatusStore extends CertStatusStore
 
     private void auditLogPCIEvent(AuditLevel auditLevel, String eventType, String auditStatus)
     {
+        AuditLoggingService auditLoggingService = getAuditLoggingService();
         if(auditLoggingService != null)
         {
             PCIAuditEvent auditEvent = new PCIAuditEvent(new Date());

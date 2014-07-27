@@ -1673,7 +1673,7 @@ public class X509CA
 
         if(certProfile.isSerialNumberInReqPermitted() == false)
         {
-        	RDN[] rdns = requestedSubject.getRDNs(ObjectIdentifiers.DN_SN);
+            RDN[] rdns = requestedSubject.getRDNs(ObjectIdentifiers.DN_SN);
             if(rdns != null && rdns.length > 0)
             {
                 throw new OperationException(ErrorCode.BAD_CERT_TEMPLATE,
