@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0" xmlns:cm="http://aries.apache.org/blueprint/xmlns/blueprint-cm/v1.1.0" xmlns:ext="http://aries.apache.org/blueprint/xmlns/blueprint-ext/v1.0.0">
+  <reference id="auditLoggingService" interface="org.xipki.audit.api.AuditLoggingService" availability="optional"/>
+
+  <bean id="auditServiceRegister" class="org.xipki.audit.api.AuditLoggingServiceRegisterImpl"/>
+
+  <reference-list id="auditServices" interface="org.xipki.audit.api.AuditLoggingService" availability="optional">
+    <reference-listener ref="auditServiceRegister" bind-method="bindService" unbind-method="unbindService"/>
+  </reference-list>
+    
+  <service ref="auditServiceRegister" interface="org.xipki.audit.api.AuditLoggingServiceRegister"/>
+
+</blueprint>

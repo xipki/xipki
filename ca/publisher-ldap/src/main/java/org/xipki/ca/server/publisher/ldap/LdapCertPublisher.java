@@ -11,7 +11,7 @@ import java.security.cert.X509CRL;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.audit.api.AuditLoggingService;
+import org.xipki.audit.api.AuditLoggingServiceRegister;
 import org.xipki.ca.api.publisher.CertPublisher;
 import org.xipki.ca.api.publisher.CertPublisherException;
 import org.xipki.ca.api.publisher.CertificateInfo;
@@ -30,13 +30,13 @@ import org.xipki.security.common.EnvironmentParameterResolver;
 // RFC 4510 - 4519
 // https://www.unboundid.com/products/ldap-sdk/docs/
 // use the in-memory ldap server of unboundid for test
+@SuppressWarnings("unused")
 public class LdapCertPublisher extends CertPublisher
 {
     private static final Logger LOG = LoggerFactory.getLogger(LdapCertPublisher.class);
 
-    @SuppressWarnings("unused")
     private EnvironmentParameterResolver envParameterResolver;
-    private AuditLoggingService auditLoggingService;
+    private AuditLoggingServiceRegister auditServiceRegister;
 
     @Override
     public void initialize(String conf, PasswordResolver passwordResolver,
@@ -121,9 +121,9 @@ public class LdapCertPublisher extends CertPublisher
     }
 
     @Override
-    public void setAuditLoggingService(AuditLoggingService auditLoggingService)
+    public void setAuditServiceRegister(AuditLoggingServiceRegister auditServiceRegister)
     {
-        this.auditLoggingService = auditLoggingService;
+        this.auditServiceRegister = auditServiceRegister;
     }
 
 }
