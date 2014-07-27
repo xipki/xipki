@@ -103,7 +103,7 @@ keytool:update-cert-p12 -p12 output/TLS_C2.p12 -pwd 1234 -cert output/TLS_C2.der
 caclient:revoke -cert output/TLS_C2.der -reason affiliationChanged
 
 ## Enroll certificates gSMC-K
-keytool:rsa-p12 -pwd 1234 -out output/gSMC_K1.p12 -subject "CN=gSMC_K,O=xipki,C=DE"
+keytool:rsa-p12 -pwd 1234 -out output/gSMC_K1.p12 -subject "CN=80276123451234512345,O=xipki,C=DE"
 
 keytool:req-p12 -p12 output/gSMC_K1.p12 -pwd 1234 -out output/gSMC_K1.p10
 
@@ -116,7 +116,7 @@ keytool:update-cert-p12 -p12 output/gSMC_K1.p12 -pwd 1234 -cert output/gSMC_K1.d
 # sleep 2 seconds so that the notBefore in gSMC_K2.der and gSMC_K1.der differs.
 sleep 2000
 
-keytool:rsa-p12 -pwd 1234 -out output/gSMC_K2.p12 -subject "CN=gSMC_K,O=xipki,C=DE"
+keytool:rsa-p12 -pwd 1234 -out output/gSMC_K2.p12 -subject "CN=80276123451234512345,O=xipki,C=DE"
 
 keytool:req-p12 -p12 output/gSMC_K2.p12 -pwd 1234 -out output/gSMC_K2.p10
 

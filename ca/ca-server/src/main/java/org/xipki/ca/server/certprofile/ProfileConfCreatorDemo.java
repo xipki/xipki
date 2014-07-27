@@ -37,6 +37,7 @@ import org.xipki.ca.server.certprofile.jaxb.EnvParamType;
 import org.xipki.ca.server.certprofile.jaxb.ExtensionType;
 import org.xipki.ca.server.certprofile.jaxb.ExtensionsType;
 import org.xipki.ca.server.certprofile.jaxb.ExtensionsType.Admission;
+import org.xipki.ca.server.certprofile.jaxb.ExtensionsType.CertificatePolicies;
 import org.xipki.ca.server.certprofile.jaxb.ExtensionsType.ConstantExtensions;
 import org.xipki.ca.server.certprofile.jaxb.ExtensionsType.ExtendedKeyUsage;
 import org.xipki.ca.server.certprofile.jaxb.ExtensionsType.InhibitAnyPolicy;
@@ -69,6 +70,8 @@ import org.xipki.security.common.ObjectIdentifiers;
 
 public class ProfileConfCreatorDemo
 {
+    private static final ASN1ObjectIdentifier id_gematik = new ASN1ObjectIdentifier("1.2.276.0.76.4");
+
     private static final String REGEX_FQDN =
             "(?=^.{1,254}$)(^(?:(?!\\d+\\.|-)[a-zA-Z0-9_\\-]{1,63}(?<!-)\\.?)+(?:[a-zA-Z]{2,})$)";
     private static final String REGEX_SN = "[\\d]{1,}";
@@ -742,7 +745,7 @@ public class ProfileConfCreatorDemo
     private static ProfileType CertProfile_gSMC_K()
     throws Exception
     {
-        ProfileType profile = getBaseProfile("CertProfile gSMC_K", false, 730);
+        ProfileType profile = getBaseProfile("CertProfile gSMC_K (C.AK.AUT)", false, 730);
         profile.setDuplicateSubjectPermitted(true);
 
         // SpecialBehavior
@@ -753,10 +756,16 @@ public class ProfileConfCreatorDemo
         subject.setIncSerialNrIfSubjectExists(false);
 
         List<RdnType> occurrences = subject.getRdn();
-        occurrences.add(createRDN(ObjectIdentifiers.DN_C, 1, 1, "DE|FR"));
+        occurrences.add(createRDN(ObjectIdentifiers.DN_C, 1, 1, "DE"));
         occurrences.add(createRDN(ObjectIdentifiers.DN_O, 1, 1, null));
         occurrences.add(createRDN(ObjectIdentifiers.DN_OU, 0, 1, null));
-        occurrences.add(createRDN(ObjectIdentifiers.DN_CN, 1, 1, null));
+        occurrences.add(createRDN(ObjectIdentifiers.DN_ST, 0, 1, null));
+        occurrences.add(createRDN(ObjectIdentifiers.DN_L, 0, 1, null));
+        occurrences.add(createRDN(ObjectIdentifiers.DN_POSTAL_CODE, 0, 1, null));
+        occurrences.add(createRDN(ObjectIdentifiers.DN_STREET, 0, 1, null));
+        // regex: ICCSN-yyyyMMdd
+        String regex = "80276[\\d]{15,15}-20\\d\\d(0[1-9]|1[012])(0[1-9]|[12][0-9]|3[01])";
+        occurrences.add(createRDN(ObjectIdentifiers.DN_CN, 1, 1, regex));
 
         // Extensions
         // Extensions - general
@@ -766,20 +775,43 @@ public class ProfileConfCreatorDemo
         List<ExtensionType> list = extensions.getExtension();
         list.add(createExtension(Extension.subjectKeyIdentifier, true));
         list.add(createExtension(Extension.authorityKeyIdentifier, true));
-        list.add(createExtension(Extension.authorityInfoAccess, false));
+        list.add(createExtension(Extension.authorityInfoAccess, true));
         list.add(createExtension(Extension.cRLDistributionPoints, false));
-        list.add(createExtension(Extension.freshestCRL, false));
         list.add(createExtension(Extension.keyUsage, true));
+        list.add(createExtension(Extension.subjectAlternativeName, false));
         list.add(createExtension(Extension.basicConstraints, true));
+        list.add(createExtension(Extension.certificatePolicies, true));
+        list.add(createExtension(ObjectIdentifiers.id_extension_admission, true));
         list.add(createExtension(Extension.extendedKeyUsage, true));
+
 
         // Extensions - keyUsage
         extensions.getKeyUsage().add(createKeyUsages(KeyUsageType.DIGITAL_SIGNATURE,
-                KeyUsageType.DATA_ENCIPHERMENT,  KeyUsageType.KEY_ENCIPHERMENT));
+                KeyUsageType.KEY_ENCIPHERMENT));
 
         // Extensions - extenedKeyUsage
         extensions.getExtendedKeyUsage().add(createExtendedKeyUsage(
-                ObjectIdentifiers.id_kp_clientAuth));
+                ObjectIdentifiers.id_kp_clientAuth, ObjectIdentifiers.id_kp_serverAuth));
+        
+        // Extensions - Policy
+        CertificatePolicies policies = new CertificatePolicies();
+        extensions.getCertificatePolicies().add(policies);
+
+        ASN1ObjectIdentifier[] policyIds = new ASN1ObjectIdentifier[]{
+        		id_gematik.branch("79"), id_gematik.branch("163")};        
+        for(ASN1ObjectIdentifier id : policyIds)
+        {
+	        CertificatePolicyInformationType policyInfo = new CertificatePolicyInformationType();
+	        policies.getCertificatePolicyInformation().add(policyInfo);
+	        policyInfo.setPolicyIdentifier(createOidType(id));
+        }
+        
+        // Extension - Adminssion
+        Admission admission = new Admission();
+        extensions.getAdmission().add(admission);        
+        admission.getProfessionOid().add(createOidType(id_gematik.branch("103")));
+        admission.getProfessionItem().add("Anwendungskonnektor");
+
         return profile;
     }
 
