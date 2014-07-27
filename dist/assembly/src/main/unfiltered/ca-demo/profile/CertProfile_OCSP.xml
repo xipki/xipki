@@ -3,6 +3,9 @@
   <description>CertProfile OCSP</description>
   <ca>false</ca>
   <validity>730</validity>
+  <duplicateKeyPermitted>false</duplicateKeyPermitted>
+  <duplicateSubjectPermitted>false</duplicateSubjectPermitted>
+  <serialNumberInReqPermitted>false</serialNumberInReqPermitted>
   <keyAlgorithms>
     <algorithm>
       <algorithm description="RSA">1.2.840.113549.1.1.1</algorithm>

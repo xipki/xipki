@@ -146,4 +146,19 @@ public class IdentifiedCertProfile
         return certProfile.getOccurenceOfIssuerAltName();
     }
 
+    public boolean isDuplicateKeyPermitted()
+    {
+        return certProfile.isDuplicateKeyPermitted();
+    }
+
+    public boolean isDuplicateSubjectPermitted()
+    {
+        return certProfile.isDuplicateSubjectPermitted();
+    }
+
+    public boolean isSerialNumberInReqPermitted()
+    {
+        return certProfile.isSerialNumberInReqPermitted();
+    }
+
 }

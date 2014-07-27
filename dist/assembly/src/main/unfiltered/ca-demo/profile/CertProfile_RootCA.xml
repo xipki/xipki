@@ -3,6 +3,9 @@
   <description>CertProfile RootCA</description>
   <ca>true</ca>
   <validity>1825</validity>
+  <duplicateKeyPermitted>false</duplicateKeyPermitted>
+  <duplicateSubjectPermitted>false</duplicateSubjectPermitted>
+  <serialNumberInReqPermitted>false</serialNumberInReqPermitted>
   <keyAlgorithms>
     <algorithm>
       <algorithm description="RSA">1.2.840.113549.1.1.1</algorithm>

@@ -179,20 +179,10 @@ public class ProfileConfCreatorDemo
     private static ProfileType CertProfile_RootCA()
     throws Exception
     {
-        ProfileType profile = new ProfileType();
-        profile.setDescription("CertProfile RootCA");
-        profile.setOnlyForRA(false);
-        profile.setCa(true);
-        profile.setValidity(1825);
-
-        // Key
-        profile.setKeyAlgorithms(createKeyAlgorithms());
+        ProfileType profile = getBaseProfile("CertProfile RootCA", true, 1825);
 
         // Subject
-        Subject subject = new Subject();
-        profile.setSubject(subject);
-
-        subject.setDnBackwards(false);
+        Subject subject = profile.getSubject();
         subject.setIncSerialNrIfSubjectExists(false);
 
         List<RdnType> occurrences = subject.getRdn();
@@ -202,15 +192,9 @@ public class ProfileConfCreatorDemo
         occurrences.add(createRDN(ObjectIdentifiers.DN_SN, 0, 1, REGEX_SN));
         occurrences.add(createRDN(ObjectIdentifiers.DN_CN, 1, 1, null));
 
-        // AllowedClientExtensions
-        profile.setAllowedClientExtensions(null);
-
         // Extensions
         // Extensions - general
-        ExtensionsType extensions = new ExtensionsType();
-        profile.setExtensions(extensions);
-
-        extensions.setIncludeIssuerAndSerialInAKI(false);
+        ExtensionsType extensions = profile.getExtensions();
 
         // Extensions - occurrences
         List<ExtensionType> list = extensions.getExtension();
@@ -229,20 +213,10 @@ public class ProfileConfCreatorDemo
     private static ProfileType CertProfile_SubCA()
     throws Exception
     {
-        ProfileType profile = new ProfileType();
-        profile.setDescription("CertProfile SubCA");
-        profile.setOnlyForRA(false);
-        profile.setCa(true);
-        profile.setValidity(1825);
-
-        // Key
-        profile.setKeyAlgorithms(createKeyAlgorithms());
+        ProfileType profile = getBaseProfile("CertProfile SubCA", true, 1825);
 
         // Subject
-        Subject subject = new Subject();
-        profile.setSubject(subject);
-
-        subject.setDnBackwards(false);
+        Subject subject = profile.getSubject();
         subject.setIncSerialNrIfSubjectExists(false);
 
         List<RdnType> occurrences = subject.getRdn();
@@ -252,16 +226,10 @@ public class ProfileConfCreatorDemo
         occurrences.add(createRDN(ObjectIdentifiers.DN_SN, 0, 1, REGEX_SN));
         occurrences.add(createRDN(ObjectIdentifiers.DN_CN, 1, 1, null));
 
-        // AllowedClientExtensions
-        profile.setAllowedClientExtensions(null);
-
         // Extensions
         // Extensions - general
-        ExtensionsType extensions = new ExtensionsType();
-        profile.setExtensions(extensions);
-
+        ExtensionsType extensions = profile.getExtensions();
         extensions.setPathLen(1);
-        extensions.setIncludeIssuerAndSerialInAKI(false);
 
         // Extensions - occurrences
         List<ExtensionType> list = extensions.getExtension();
@@ -281,20 +249,10 @@ public class ProfileConfCreatorDemo
     private static ProfileType CertProfile_SubCA_Complex()
     throws Exception
     {
-        ProfileType profile = new ProfileType();
-        profile.setDescription("CertProfile SubCA with most extensions");
-        profile.setOnlyForRA(false);
-        profile.setCa(true);
-        profile.setValidity(1825);
-
-        // Key
-        profile.setKeyAlgorithms(createKeyAlgorithms());
+        ProfileType profile = getBaseProfile("CertProfile SubCA with most extensions", true, 1825);
 
         // Subject
-        Subject subject = new Subject();
-        profile.setSubject(subject);
-
-        subject.setDnBackwards(false);
+        Subject subject = profile.getSubject();
         subject.setIncSerialNrIfSubjectExists(false);
 
         List<RdnType> occurrences = subject.getRdn();
@@ -304,16 +262,10 @@ public class ProfileConfCreatorDemo
         occurrences.add(createRDN(ObjectIdentifiers.DN_SN, 0, 1, REGEX_SN));
         occurrences.add(createRDN(ObjectIdentifiers.DN_CN, 1, 1, null, "PREFIX ", " SUFFIX"));
 
-        // AllowedClientExtensions
-        profile.setAllowedClientExtensions(null);
-
         // Extensions
         // Extensions - general
-        ExtensionsType extensions = new ExtensionsType();
-        profile.setExtensions(extensions);
-
+        ExtensionsType extensions = profile.getExtensions();
         extensions.setPathLen(1);
-        extensions.setIncludeIssuerAndSerialInAKI(false);
 
         // Extensions - occurrences
         List<ExtensionType> list = extensions.getExtension();
@@ -411,20 +363,10 @@ public class ProfileConfCreatorDemo
     private static ProfileType CertProfile_OCSP()
     throws Exception
     {
-        ProfileType profile = new ProfileType();
-        profile.setDescription("CertProfile OCSP");
-        profile.setOnlyForRA(false);
-        profile.setCa(false);
-        profile.setValidity(730);
-
-        // Key
-        profile.setKeyAlgorithms(createKeyAlgorithms());
+        ProfileType profile = getBaseProfile("CertProfile OCSP", false, 730);
 
         // Subject
-        Subject subject = new Subject();
-        profile.setSubject(subject);
-
-        subject.setDnBackwards(false);
+        Subject subject = profile.getSubject();
         subject.setIncSerialNrIfSubjectExists(false);
 
         List<RdnType> occurrences = subject.getRdn();
@@ -434,15 +376,9 @@ public class ProfileConfCreatorDemo
         occurrences.add(createRDN(ObjectIdentifiers.DN_SN, 0, 1, REGEX_SN));
         occurrences.add(createRDN(ObjectIdentifiers.DN_CN, 1, 1, null));
 
-        // AllowedClientExtensions
-        profile.setAllowedClientExtensions(null);
-
         // Extensions
         // Extensions - general
-        ExtensionsType extensions = new ExtensionsType();
-        profile.setExtensions(extensions);
-
-        extensions.setIncludeIssuerAndSerialInAKI(false);
+        ExtensionsType extensions = profile.getExtensions();
 
         // Extensions - occurrences
         List<ExtensionType> list = extensions.getExtension();
@@ -469,20 +405,10 @@ public class ProfileConfCreatorDemo
     private static ProfileType CertProfile_TLS()
     throws Exception
     {
-        ProfileType profile = new ProfileType();
-        profile.setDescription("CertProfile TLS");
-        profile.setOnlyForRA(false);
-        profile.setCa(false);
-        profile.setValidity(730);
-
-        // Key
-        profile.setKeyAlgorithms(createKeyAlgorithms());
+        ProfileType profile = getBaseProfile("CertProfile TLS", false, 730);
 
         // Subject
-        Subject subject = new Subject();
-        profile.setSubject(subject);
-
-        subject.setDnBackwards(false);
+        Subject subject = profile.getSubject();
         subject.setIncSerialNrIfSubjectExists(false);
 
         List<RdnType> occurrences = subject.getRdn();
@@ -492,15 +418,9 @@ public class ProfileConfCreatorDemo
         occurrences.add(createRDN(ObjectIdentifiers.DN_SN, 0, 1, REGEX_SN));
         occurrences.add(createRDN(ObjectIdentifiers.DN_CN, 1, 1, REGEX_FQDN));
 
-        // AllowedClientExtensions
-        profile.setAllowedClientExtensions(null);
-
         // Extensions
         // Extensions - general
-        ExtensionsType extensions = new ExtensionsType();
-        profile.setExtensions(extensions);
-
-        extensions.setIncludeIssuerAndSerialInAKI(false);
+        ExtensionsType extensions = profile.getExtensions();
 
         // Extensions - occurrences
         List<ExtensionType> list = extensions.getExtension();
@@ -532,20 +452,10 @@ public class ProfileConfCreatorDemo
     private static ProfileType CertProfile_TLS_C()
     throws Exception
     {
-        ProfileType profile = new ProfileType();
-        profile.setDescription("CertProfile TLS_C");
-        profile.setOnlyForRA(false);
-        profile.setCa(false);
-        profile.setValidity(730);
-
-        // Key
-        profile.setKeyAlgorithms(createKeyAlgorithms());
+        ProfileType profile = getBaseProfile("CertProfile TLS_C", false, 730);
 
         // Subject
-        Subject subject = new Subject();
-        profile.setSubject(subject);
-
-        subject.setDnBackwards(false);
+        Subject subject = profile.getSubject();
         subject.setIncSerialNrIfSubjectExists(false);
 
         List<RdnType> occurrences = subject.getRdn();
@@ -555,16 +465,9 @@ public class ProfileConfCreatorDemo
         occurrences.add(createRDN(ObjectIdentifiers.DN_SN, 0, 1, REGEX_SN));
         occurrences.add(createRDN(ObjectIdentifiers.DN_CN, 1, 1, null));
 
-        // AllowedClientExtensions
-        profile.setAllowedClientExtensions(null);
-
         // Extensions
         // Extensions - general
-        ExtensionsType extensions = new ExtensionsType();
-        profile.setExtensions(extensions);
-
-        extensions.setIncludeIssuerAndSerialInAKI(false);
-
+        ExtensionsType extensions = profile.getExtensions();
         // Extensions - occurrences
         List<ExtensionType> list = extensions.getExtension();
         list.add(createExtension(Extension.subjectKeyIdentifier, true));
@@ -589,20 +492,10 @@ public class ProfileConfCreatorDemo
     private static ProfileType CertProfile_TLSwithIncSN()
     throws Exception
     {
-        ProfileType profile = new ProfileType();
-        profile.setDescription("CertProfile TLSwithIncSN");
-        profile.setCa(false);
-        profile.setOnlyForRA(false);
-        profile.setValidity(730);
-
-        // Key
-        profile.setKeyAlgorithms(createKeyAlgorithms());
+        ProfileType profile = getBaseProfile("CertProfile TLSwithIncSN", false, 730);
 
         // Subject
-        Subject subject = new Subject();
-        profile.setSubject(subject);
-
-        subject.setDnBackwards(false);
+        Subject subject = profile.getSubject();
         subject.setIncSerialNrIfSubjectExists(true);
 
         List<RdnType> occurrences = subject.getRdn();
@@ -612,15 +505,9 @@ public class ProfileConfCreatorDemo
         occurrences.add(createRDN(ObjectIdentifiers.DN_SN, 0, 1, REGEX_SN));
         occurrences.add(createRDN(ObjectIdentifiers.DN_CN, 1, 1, REGEX_FQDN));
 
-        // AllowedClientExtensions
-        profile.setAllowedClientExtensions(null);
-
         // Extensions
         // Extensions - general
-        ExtensionsType extensions = new ExtensionsType();
-        profile.setExtensions(extensions);
-
-        extensions.setIncludeIssuerAndSerialInAKI(false);
+        ExtensionsType extensions = profile.getExtensions();
 
         // Extensions - occurrences
         List<ExtensionType> list = extensions.getExtension();
@@ -852,6 +739,84 @@ public class ProfileConfCreatorDemo
         return ret;
     }
 
+    private static ProfileType CertProfile_gSMC_K()
+    throws Exception
+    {
+        ProfileType profile = getBaseProfile("CertProfile gSMC_K", false, 730);
+        profile.setDuplicateSubjectPermitted(true);
+        
+        // SpecialBehavior
+        profile.setSpecialBehavior(SpecialCertProfileBehavior.gematik_gSMC_K.name());
+
+        // Subject
+        Subject subject = profile.getSubject();
+        subject.setIncSerialNrIfSubjectExists(false);
+
+        List<RdnType> occurrences = subject.getRdn();
+        occurrences.add(createRDN(ObjectIdentifiers.DN_C, 1, 1, "DE|FR"));
+        occurrences.add(createRDN(ObjectIdentifiers.DN_O, 1, 1, null));
+        occurrences.add(createRDN(ObjectIdentifiers.DN_OU, 0, 1, null));
+        occurrences.add(createRDN(ObjectIdentifiers.DN_CN, 1, 1, null));
+
+        // Extensions
+        // Extensions - general
+        ExtensionsType extensions = profile.getExtensions();
+
+        // Extensions - occurrences
+        List<ExtensionType> list = extensions.getExtension();
+        list.add(createExtension(Extension.subjectKeyIdentifier, true));
+        list.add(createExtension(Extension.authorityKeyIdentifier, true));
+        list.add(createExtension(Extension.authorityInfoAccess, false));
+        list.add(createExtension(Extension.cRLDistributionPoints, false));
+        list.add(createExtension(Extension.freshestCRL, false));
+        list.add(createExtension(Extension.keyUsage, true));
+        list.add(createExtension(Extension.basicConstraints, true));
+        list.add(createExtension(Extension.extendedKeyUsage, true));
+
+        // Extensions - keyUsage
+        extensions.getKeyUsage().add(createKeyUsages(KeyUsageType.DIGITAL_SIGNATURE,
+                KeyUsageType.DATA_ENCIPHERMENT,  KeyUsageType.KEY_ENCIPHERMENT));
+
+        // Extensions - extenedKeyUsage
+        extensions.getExtendedKeyUsage().add(createExtendedKeyUsage(
+                ObjectIdentifiers.id_kp_clientAuth));
+        return profile;
+    }
+
+    private static ProfileType getBaseProfile(String description, boolean ca, int validity)
+    {
+        ProfileType profile = new ProfileType();
+        profile.setDescription(description);
+        profile.setOnlyForRA(false);
+        profile.setCa(ca);
+        profile.setValidity(validity);
+
+        profile.setDuplicateKeyPermitted(false);
+        profile.setDuplicateSubjectPermitted(false);
+        profile.setSerialNumberInReqPermitted(false);
+
+        // Subject
+        Subject subject = new Subject();
+        profile.setSubject(subject);
+
+        subject.setDnBackwards(false);
+
+        // Key
+        profile.setKeyAlgorithms(createKeyAlgorithms());
+
+        // AllowedClientExtensions
+        profile.setAllowedClientExtensions(null);
+
+        // Extensions
+        // Extensions - general
+        ExtensionsType extensions = new ExtensionsType();
+        profile.setExtensions(extensions);
+
+        extensions.setIncludeIssuerAndSerialInAKI(false);
+
+        return profile;
+    }
+
     private static KeyAlgorithms createKeyAlgorithms()
     {
         KeyAlgorithms ret = new KeyAlgorithms();
@@ -895,65 +860,6 @@ public class ProfileConfCreatorDemo
         }
 
         return ret;
-    }
-
-    private static ProfileType CertProfile_gSMC_K()
-    throws Exception
-    {
-        ProfileType profile = new ProfileType();
-        profile.setDescription("CertProfile gSMC_K");
-        profile.setOnlyForRA(false);
-        profile.setCa(false);
-        profile.setValidity(730);
-
-        // SpecialBehavior
-        profile.setSpecialBehavior(SpecialCertProfileBehavior.gematik_gSMC_K.name());
-        // Key
-        profile.setKeyAlgorithms(createKeyAlgorithms());
-
-        // Subject
-        Subject subject = new Subject();
-        profile.setSubject(subject);
-
-        subject.setDnBackwards(false);
-        subject.setIncSerialNrIfSubjectExists(true);
-
-        List<RdnType> occurrences = subject.getRdn();
-        occurrences.add(createRDN(ObjectIdentifiers.DN_C, 1, 1, "DE|FR"));
-        occurrences.add(createRDN(ObjectIdentifiers.DN_O, 1, 1, null));
-        occurrences.add(createRDN(ObjectIdentifiers.DN_OU, 0, 1, null));
-        occurrences.add(createRDN(ObjectIdentifiers.DN_SN, 0, 1, REGEX_SN));
-        occurrences.add(createRDN(ObjectIdentifiers.DN_CN, 1, 1, null));
-
-        // AllowedClientExtensions
-        profile.setAllowedClientExtensions(null);
-
-        // Extensions
-        // Extensions - general
-        ExtensionsType extensions = new ExtensionsType();
-        profile.setExtensions(extensions);
-
-        extensions.setIncludeIssuerAndSerialInAKI(false);
-
-        // Extensions - occurrences
-        List<ExtensionType> list = extensions.getExtension();
-        list.add(createExtension(Extension.subjectKeyIdentifier, true));
-        list.add(createExtension(Extension.authorityKeyIdentifier, true));
-        list.add(createExtension(Extension.authorityInfoAccess, false));
-        list.add(createExtension(Extension.cRLDistributionPoints, false));
-        list.add(createExtension(Extension.freshestCRL, false));
-        list.add(createExtension(Extension.keyUsage, true));
-        list.add(createExtension(Extension.basicConstraints, true));
-        list.add(createExtension(Extension.extendedKeyUsage, true));
-
-        // Extensions - keyUsage
-        extensions.getKeyUsage().add(createKeyUsages(KeyUsageType.DIGITAL_SIGNATURE,
-                KeyUsageType.DATA_ENCIPHERMENT,  KeyUsageType.KEY_ENCIPHERMENT));
-
-        // Extensions - extenedKeyUsage
-        extensions.getExtendedKeyUsage().add(createExtendedKeyUsage(
-                ObjectIdentifiers.id_kp_clientAuth));
-        return profile;
     }
 
 }

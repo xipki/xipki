@@ -144,6 +144,9 @@ public class DefaultCertProfile extends AbstractCertProfile
     private boolean raOnly;
     private boolean backwardsSubject;
     private boolean ca;
+    private boolean duplicateKeyPermitted;
+    private boolean duplicateSubjectPermitted;
+    private boolean serialNumberInReqPermitted;
     private Integer pathLen;
     private KeyUsageOptions keyusages;
     private ExtKeyUsageOptions extendedKeyusages;
@@ -205,6 +208,9 @@ public class DefaultCertProfile extends AbstractCertProfile
         raOnly = false;
         backwardsSubject = false;
         ca = false;
+        duplicateKeyPermitted = true;
+        duplicateSubjectPermitted = true;
+        serialNumberInReqPermitted = true;
         pathLen = null;
         keyusages = null;
         extendedKeyusages = null;
@@ -239,6 +245,22 @@ public class DefaultCertProfile extends AbstractCertProfile
             {
                 this.specialBehavior = SpecialCertProfileBehavior.getInstance(specialBehavior);
             }
+
+            if(conf.isDuplicateKeyPermitted() != null)
+            {
+                duplicateKeyPermitted = conf.isDuplicateKeyPermitted().booleanValue();
+            }
+
+            if(conf.isDuplicateSubjectPermitted() != null)
+            {
+                duplicateSubjectPermitted = conf.isDuplicateSubjectPermitted().booleanValue();
+            }
+
+            if(conf.isSerialNumberInReqPermitted() != null)
+            {
+                serialNumberInReqPermitted = conf.isSerialNumberInReqPermitted().booleanValue();
+            }
+
             // KeyAlgorithms
             KeyAlgorithms keyAlgos = conf.getKeyAlgorithms();
             if(keyAlgos != null)
@@ -1597,6 +1619,24 @@ public class DefaultCertProfile extends AbstractCertProfile
             }
             checkAndAddExtension(extensionType, occurence, extension, tuples);
         }
+    }
+
+    @Override
+    public boolean isDuplicateKeyPermitted()
+    {
+        return duplicateKeyPermitted;
+    }
+
+    @Override
+    public boolean isDuplicateSubjectPermitted()
+    {
+        return duplicateSubjectPermitted;
+    }
+
+    @Override
+    public boolean isSerialNumberInReqPermitted()
+    {
+        return serialNumberInReqPermitted;
     }
 
     private static GeneralName createGeneralName(String value, Set<GeneralNameMode> modes)
