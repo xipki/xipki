@@ -39,6 +39,9 @@
 			<xs:element name="description" type="xs:string" minOccurs="0"/>
 			<xs:element name="ca" type="xs:boolean"/>
 			<xs:element name="validity" type="xs:int" minOccurs="0"/>
+			<xs:element name="duplicateKeyPermitted" type="xs:boolean" minOccurs="0"/>
+			<xs:element name="duplicateSubjectPermitted" type="xs:boolean" minOccurs="0"/>
+			<xs:element name="serialNumberInReqPermitted" type="xs:boolean" minOccurs="0"/>
 			<xs:element name="specialBehavior" type="xs:string" minOccurs="0">
 				<xs:annotation>
 					<xs:documentation>

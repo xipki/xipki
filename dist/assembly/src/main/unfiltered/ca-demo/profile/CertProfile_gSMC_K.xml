@@ -3,6 +3,9 @@
   <description>CertProfile gSMC_K</description>
   <ca>false</ca>
   <validity>730</validity>
+  <duplicateKeyPermitted>false</duplicateKeyPermitted>
+  <duplicateSubjectPermitted>true</duplicateSubjectPermitted>
+  <serialNumberInReqPermitted>false</serialNumberInReqPermitted>
   <specialBehavior>gematik_gSMC_K</specialBehavior>
   <keyAlgorithms>
     <algorithm>
@@ -26,7 +29,7 @@
   </keyAlgorithms>
   <subject>
     <dnBackwards>false</dnBackwards>
-    <incSerialNrIfSubjectExists>true</incSerialNrIfSubjectExists>
+    <incSerialNrIfSubjectExists>false</incSerialNrIfSubjectExists>
     <rdn minOccurs="1" maxOccurs="1">
       <type description="c">2.5.4.6</type>
       <constraint>
@@ -38,12 +41,6 @@
     </rdn>
     <rdn minOccurs="0" maxOccurs="1">
       <type description="ou">2.5.4.11</type>
-    </rdn>
-    <rdn minOccurs="0" maxOccurs="1">
-      <type description="serialNumber">2.5.4.5</type>
-      <constraint>
-        <regex>[\d]{1,}</regex>
-      </constraint>
     </rdn>
     <rdn minOccurs="1" maxOccurs="1">
       <type description="cn">2.5.4.3</type>

@@ -1487,7 +1487,16 @@ public class X509CA
         }
 
         DuplicationMode keyMode = caInfo.getDuplicateKeyMode();
+        if(keyMode == DuplicationMode.PERMITTED && certProfile.isDuplicateKeyPermitted() == false)
+        {
+            keyMode = DuplicationMode.FORBIDDEN_WITHIN_PROFILE;
+        }
+
         DuplicationMode subjectMode = caInfo.getDuplicateSubjectMode();
+        if(subjectMode == DuplicationMode.PERMITTED && certProfile.isDuplicateSubjectPermitted() == false)
+        {
+            subjectMode = DuplicationMode.FORBIDDEN_WITHIN_PROFILE;
+        }
 
         String sha1FpSubject = IoCertUtil.sha1sum_canonicalized_name(grantedSubject);
         String grandtedSubjectText = IoCertUtil.canonicalizeName(grantedSubject);
@@ -1523,7 +1532,7 @@ public class X509CA
             {
                 SubjectKeyProfileTriple triple = triples.getFirstTriple(sha1FpSubject, sha1FpPublicKey, certProfileName);
                 if(triple != null)
-                   {
+                {
                     /*
                      * If there exists a certificate whose public key, subject and profile match the request,
                      * returns the certificate if it is not revoked, otherwise OperationException with
@@ -1659,6 +1668,16 @@ public class X509CA
                 {
                     throw new OperationException(ErrorCode.System_Failure, "should not reach here");
                 }
+            }
+        }
+
+        if(certProfile.isSerialNumberInReqPermitted() == false)
+        {
+        	RDN[] rdns = requestedSubject.getRDNs(ObjectIdentifiers.DN_SN);
+            if(rdns != null && rdns.length > 0)
+            {
+                throw new OperationException(ErrorCode.BAD_CERT_TEMPLATE,
+                        "SubjectDN SerialNumber in request is not permitted");
             }
         }
 

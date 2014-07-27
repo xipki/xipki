@@ -25,9 +25,6 @@ public abstract class CertProfile
         return false;
     }
 
-    public abstract void initialize(String data)
-    throws CertProfileException;
-
     public void shutdown()
     {
     }
@@ -36,6 +33,60 @@ public abstract class CertProfile
     {
         return null;
     }
+
+    /**
+     * Whether include subject and serial number of the issuer certificate in the
+     * AuthorityKeyIdentifier extension.
+     * @return
+     */
+    public boolean includeIssuerAndSerialInAKI()
+    {
+        return false;
+    }
+
+    public ExtensionOccurrence getOccurenceOfFreshestCRL()
+    {
+        return ExtensionOccurrence.NONCRITICAL_OPTIONAL;
+    }
+
+    public ExtensionOccurrence getOccurenceOfIssuerAltName()
+    {
+        return ExtensionOccurrence.NONCRITICAL_OPTIONAL;
+    }
+
+    public String incSerialNumber(String currentSerialNumber)
+    throws BadFormatException
+    {
+        try
+        {
+            int currentSN = currentSerialNumber == null ? 0 : Integer.parseInt(currentSerialNumber.trim());
+            return Integer.toString(currentSN + 1);
+        }catch(NumberFormatException e)
+        {
+            throw new BadFormatException("invalid serialNumber attribute " + currentSerialNumber);
+        }
+    }
+
+    public boolean isDuplicateKeyPermitted()
+    {
+        return true;
+    }
+
+    public boolean isDuplicateSubjectPermitted()
+    {
+        return true;
+    }
+
+    /**
+     * Whether the subject attribute serialNumber in request is permitted
+     */
+    public boolean isSerialNumberInReqPermitted()
+    {
+        return true;
+    }
+
+    public abstract void initialize(String data)
+    throws CertProfileException;
 
     public abstract void setEnvironmentParameterResolver(EnvironmentParameterResolver parameterResolver);
 
@@ -51,29 +102,9 @@ public abstract class CertProfile
 
     public abstract ExtensionOccurrence getOccurenceOfAuthorityKeyIdentifier();
 
-    /**
-     * Whether include subject and serial number of the issuer certificate in the
-     * AuthorityKeyIdentifier extension.
-     * @return
-     */
-    public boolean includeIssuerAndSerialInAKI()
-    {
-        return false;
-    }
-
     public abstract ExtensionOccurrence getOccurenceOfSubjectKeyIdentifier();
 
     public abstract ExtensionOccurrence getOccurenceOfCRLDistributinPoints();
-
-    public ExtensionOccurrence getOccurenceOfFreshestCRL()
-    {
-        return ExtensionOccurrence.NONCRITICAL_OPTIONAL;
-    }
-
-    public ExtensionOccurrence getOccurenceOfIssuerAltName()
-    {
-        return ExtensionOccurrence.NONCRITICAL_OPTIONAL;
-    }
 
     public abstract ExtensionOccurrence getOccurenceOfAuthorityInfoAccess();
 
@@ -82,16 +113,4 @@ public abstract class CertProfile
 
     public abstract boolean incSerialNumberIfSubjectExists();
 
-    public String incSerialNumber(String currentSerialNumber)
-    throws BadFormatException
-    {
-        try
-        {
-            int currentSN = currentSerialNumber == null ? 0 : Integer.parseInt(currentSerialNumber.trim());
-            return Integer.toString(currentSN + 1);
-        }catch(NumberFormatException e)
-        {
-            throw new BadFormatException("invalid serialNumber attribute " + currentSerialNumber);
-        }
-    }
 }
