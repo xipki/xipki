@@ -18,6 +18,7 @@ import org.xipki.audit.api.AuditEvent;
 import org.xipki.audit.api.AuditEventData;
 import org.xipki.audit.api.AuditLevel;
 import org.xipki.audit.api.AuditLoggingService;
+import org.xipki.audit.api.AuditLoggingServiceRegister;
 import org.xipki.audit.api.AuditStatus;
 import org.xipki.ca.api.publisher.CertPublisher;
 import org.xipki.ca.api.publisher.CertPublisherException;
@@ -44,7 +45,7 @@ public class DefaultCertPublisher extends CertPublisher
     private CertStatusStoreQueryExecutor queryExecutor;
     private boolean asyn = false;
 
-    private AuditLoggingService auditLoggingService;
+    private AuditLoggingServiceRegister auditServiceRegister;
 
     public DefaultCertPublisher()
     {
@@ -140,6 +141,9 @@ public class DefaultCertPublisher extends CertPublisher
                 new Object[]{messagePrefix, issuer, subjectText, serialText, e.getMessage()});
         LOG.debug("error", e);
 
+        AuditLoggingService auditLoggingService = auditServiceRegister == null ? null :
+            auditServiceRegister.getAuditLoggingService();
+
         if(auditLoggingService != null)
         {
             AuditEvent auditEvent = new AuditEvent(new Date());
@@ -168,9 +172,9 @@ public class DefaultCertPublisher extends CertPublisher
     }
 
     @Override
-    public void setAuditLoggingService(AuditLoggingService auditLoggingService)
+    public void setAuditServiceRegister(AuditLoggingServiceRegister auditServiceRegister)
     {
-        this.auditLoggingService = auditLoggingService;
+        this.auditServiceRegister = auditServiceRegister;
     }
 
     @Override

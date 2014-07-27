@@ -45,6 +45,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.audit.api.AuditLevel;
 import org.xipki.audit.api.AuditLoggingService;
+import org.xipki.audit.api.AuditLoggingServiceRegister;
 import org.xipki.audit.api.AuditStatus;
 import org.xipki.audit.api.PCIAuditEvent;
 import org.xipki.ca.api.CAMgmtException;
@@ -134,7 +135,7 @@ public class CAManagerImpl implements CAManager
     private boolean cAsInitialized = false;
     private boolean environmentParametersInitialized = false;
 
-    private AuditLoggingService auditLoggingService;
+    private AuditLoggingServiceRegister auditServiceRegister;
 
     public CAManagerImpl()
     throws ConfigurationException
@@ -3358,24 +3359,21 @@ public class CAManagerImpl implements CAManager
         auditLogPCIEvent(true, "UNREVOKE CA " + caName);
     }
 
-    public AuditLoggingService getAuditLoggingService()
+    public void setAuditServiceRegister(AuditLoggingServiceRegister serviceRegister)
     {
-        return auditLoggingService;
-    }
-
-    public void setAuditLoggingService(AuditLoggingService auditLoggingService)
-    {
-        this.auditLoggingService = auditLoggingService;
+        this.auditServiceRegister = serviceRegister;
 
         for(String name : publishers.keySet())
         {
             PublisherEntry publisherEntry = publishers.get(name);
-            publisherEntry.setAuditLoggingService(auditLoggingService);
+            publisherEntry.setAuditServiceRegister(auditServiceRegister);
         }
     }
 
     private void auditLogPCIEvent(boolean successfull, String eventType)
     {
+        AuditLoggingService auditLoggingService =
+                auditServiceRegister == null ? null : auditServiceRegister.getAuditLoggingService();
         if(auditLoggingService != null)
         {
             PCIAuditEvent auditEvent = new PCIAuditEvent(new Date());

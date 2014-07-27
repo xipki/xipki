@@ -30,6 +30,7 @@ import org.xipki.audit.api.AuditEvent;
 import org.xipki.audit.api.AuditEventData;
 import org.xipki.audit.api.AuditLevel;
 import org.xipki.audit.api.AuditLoggingService;
+import org.xipki.audit.api.AuditLoggingServiceRegister;
 import org.xipki.audit.api.AuditStatus;
 import org.xipki.ca.server.mgmt.CAManager;
 import org.xipki.security.common.LogUtil;
@@ -48,7 +49,7 @@ public class Rfc6712Servlet extends HttpServlet
     private static final String CT_RESPONSE = "application/pkixcmp";
 
     private CAManager caManager;
-    private AuditLoggingService auditLoggingService;
+    private AuditLoggingServiceRegister auditServiceRegister;
 
     public Rfc6712Servlet()
     {
@@ -61,9 +62,13 @@ public class Rfc6712Servlet extends HttpServlet
         X509Certificate[] certs = (X509Certificate[]) request.getAttribute("javax.servlet.request.X509Certificate");
         X509Certificate clientCert = (certs == null || certs.length < 1)? null : certs[0];
 
+        AuditLoggingService auditLoggingService = auditServiceRegister.getAuditLoggingService();
         AuditEvent auditEvent = (auditLoggingService != null) ? new AuditEvent(new Date()) : null;
-        auditEvent.setApplicationName("CA");
-        auditEvent.setName("SYSTEM");
+        if(auditEvent != null)
+        {
+            auditEvent.setApplicationName("CA");
+            auditEvent.setName("SYSTEM");
+        }
 
         AuditLevel auditLevel = AuditLevel.INFO;
         AuditStatus auditStatus = null;
@@ -142,7 +147,10 @@ public class Rfc6712Servlet extends HttpServlet
                 return;
             }
 
-            auditEvent.addEventData(new AuditEventData("CA", responder.getCA().getCAInfo().getName()));
+            if(auditEvent != null)
+            {
+                auditEvent.addEventData(new AuditEventData("CA", responder.getCA().getCAInfo().getName()));
+            }
 
             PKIMessage pkiReq = generatePKIMessage(request.getInputStream());
 
@@ -236,8 +244,8 @@ public class Rfc6712Servlet extends HttpServlet
         this.caManager = caManager;
     }
 
-    public void setAuditLoggingService(AuditLoggingService auditLoggingService)
+    public void setAuditServiceRegister(AuditLoggingServiceRegister auditServiceRegister)
     {
-        this.auditLoggingService = auditLoggingService;
+        this.auditServiceRegister = auditServiceRegister;
     }
 }

@@ -11,6 +11,7 @@ import java.math.BigInteger;
 import java.util.Set;
 
 import org.xipki.audit.api.AuditLoggingService;
+import org.xipki.audit.api.AuditLoggingServiceRegister;
 import org.xipki.database.api.DataSourceFactory;
 import org.xipki.security.api.PasswordResolver;
 import org.xipki.security.common.HashAlgoType;
@@ -45,7 +46,7 @@ public abstract class CertStatusStore
     protected boolean includeCertHash;
     protected HashAlgoType certHashAlgorithm;
 
-    protected AuditLoggingService auditLoggingService;
+    protected AuditLoggingServiceRegister auditServiceRegister;
 
     protected CertStatusStore(String name)
     {
@@ -58,14 +59,14 @@ public abstract class CertStatusStore
         return name;
     }
 
-    public void setAuditLoggingService(AuditLoggingService auditLoggingService)
+    public void setAuditServiceRegister(AuditLoggingServiceRegister auditServiceRegister)
     {
-        this.auditLoggingService = auditLoggingService;
+        this.auditServiceRegister = auditServiceRegister;
     }
 
     public AuditLoggingService getAuditLoggingService()
     {
-        return auditLoggingService;
+        return auditServiceRegister == null ? null : auditServiceRegister.getAuditLoggingService();
     }
 
     public boolean isUnknownSerialAsGood()

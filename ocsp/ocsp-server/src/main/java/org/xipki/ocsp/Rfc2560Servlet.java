@@ -28,6 +28,7 @@ import org.xipki.audit.api.AuditEvent;
 import org.xipki.audit.api.AuditEventData;
 import org.xipki.audit.api.AuditLevel;
 import org.xipki.audit.api.AuditLoggingService;
+import org.xipki.audit.api.AuditLoggingServiceRegister;
 import org.xipki.audit.api.AuditStatus;
 import org.xipki.security.common.LogUtil;
 
@@ -48,7 +49,7 @@ public class Rfc2560Servlet extends HttpServlet
 
     private int maxRequestLength = 4096;
 
-    private AuditLoggingService auditLoggingService;
+    private AuditLoggingServiceRegister auditServiceRegister;
 
     private OcspResponder responder;
 
@@ -92,6 +93,9 @@ public class Rfc2560Servlet extends HttpServlet
         String auditMessage = null;
 
         long startInUs = 0;
+
+        AuditLoggingService auditLoggingService = auditServiceRegister == null ? null :
+            auditServiceRegister.getAuditLoggingService();
 
         if(auditLoggingService != null && responder.isAuditResponse())
         {
@@ -276,9 +280,9 @@ public class Rfc2560Servlet extends HttpServlet
         this.maxRequestLength = maxRequestLength;
     }
 
-    public void setAuditLoggingService(AuditLoggingService auditLoggingService)
+    public void setAuditServiceRegister(AuditLoggingServiceRegister auditServiceRegister)
     {
-        this.auditLoggingService = auditLoggingService;
+        this.auditServiceRegister = auditServiceRegister;
     }
 
 }

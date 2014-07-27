@@ -10,7 +10,7 @@ package org.xipki.ca.server.mgmt;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.xipki.audit.api.AuditLoggingService;
+import org.xipki.audit.api.AuditLoggingServiceRegister;
 import org.xipki.ca.api.publisher.CertPublisher;
 import org.xipki.ca.api.publisher.CertPublisherException;
 import org.xipki.ca.server.IdentifiedCertPublisher;
@@ -34,7 +34,7 @@ public class PublisherEntry
     private PasswordResolver passwordResolver;
     private DataSourceWrapper dataSource;
     private IdentifiedCertPublisher certPublisher;
-    private AuditLoggingService auditLoggingService;
+    private AuditLoggingServiceRegister auditServiceRegister;
 
     public PublisherEntry(String name)
     {
@@ -112,7 +112,7 @@ public class PublisherEntry
 
         this.certPublisher = new IdentifiedCertPublisher(name, realPublisher);
         this.certPublisher.initialize(conf, passwordResolver, dataSource);
-        this.certPublisher.setAuditLoggingService(auditLoggingService);
+        this.certPublisher.setAuditServiceRegister(auditServiceRegister);
 
         return this.certPublisher;
     }
@@ -152,9 +152,9 @@ public class PublisherEntry
         this.dataSource = dataSource;
     }
 
-    public void setAuditLoggingService(AuditLoggingService auditLoggingService)
+    public void setAuditServiceRegister(AuditLoggingServiceRegister serviceRegister)
     {
-        this.auditLoggingService = auditLoggingService;
-        certPublisher.setAuditLoggingService(auditLoggingService);
+        this.auditServiceRegister = serviceRegister;
+        certPublisher.setAuditServiceRegister(serviceRegister);
     }
 }
