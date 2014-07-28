@@ -21,7 +21,7 @@
     <dependency>
       <groupId>com.zaxxer</groupId>
       <artifactId>HikariCP</artifactId>
-      <version>${hikaricp.version}</version>
+      <version>${hikaricp-compile.version}</version>
       <scope>compile</scope>
     </dependency>
     <dependency>
