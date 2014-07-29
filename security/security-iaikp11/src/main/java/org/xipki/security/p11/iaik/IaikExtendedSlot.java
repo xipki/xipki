@@ -936,7 +936,7 @@ public class IaikExtendedSlot
             List<iaik.pkcs.pkcs11.objects.Object> tmpObjects = getObjects(session, template);
             if(tmpObjects == null || tmpObjects.isEmpty())
             {
-                LOG.warn("found no certificate identified by {}", getDescription(keyId, keyLabel));
+                LOG.info("found no certificate identified by {}", getDescription(keyId, keyLabel));
                 return null;
             }
 
@@ -1095,7 +1095,7 @@ public class IaikExtendedSlot
 
     private static String getDescription(byte[] keyId, char[] keyLabel)
     {
-        StringBuilder sb = new StringBuilder("identified by ");
+        StringBuilder sb = new StringBuilder();
         sb.append("id ");
         sb.append(keyId == null ? "null" : Hex.toHexString(keyId));
         sb.append(" and label ");

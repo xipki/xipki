@@ -389,7 +389,7 @@ public class SecurityFactoryImpl implements SecurityFactory
                 {
                     P11CryptServiceFactory p11CryptServiceFact = (P11CryptServiceFactory) p11Provider;
                     P11CryptService p11CryptService = p11CryptServiceFact.createP11CryptService(
-                            pkcs11Module, password, pkcs11IncludeSlots,pkcs11ExcludeSlots);
+                            pkcs11Module, password, pkcs11IncludeSlots, pkcs11ExcludeSlots);
                     P11ContentSignerBuilder signerBuilder = new P11ContentSignerBuilder(
                                 p11CryptService, slot, password, keyIdentifier, certificateChain);
 
