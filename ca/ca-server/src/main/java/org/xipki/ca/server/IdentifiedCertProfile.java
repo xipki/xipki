@@ -8,7 +8,6 @@
 package org.xipki.ca.server;
 
 import java.util.Date;
-import java.util.Map;
 
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.Extensions;
@@ -162,9 +161,9 @@ public class IdentifiedCertProfile
         return certProfile.isSerialNumberInReqPermitted();
     }
 
-    public Map<String, String> getParameters()
+    public  String getParameter(String paramName)
     {
-        return certProfile.getParameters();
+        return certProfile.getParameter(paramName);
     }
 
 }

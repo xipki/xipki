@@ -841,9 +841,9 @@ public class DefaultCertProfile extends AbstractCertProfile
     }
 
     @Override
-    public Map<String, String> getParameters()
+    public String getParameter(String paramName)
     {
-        return parameters;
+        return parameters == null ? null : parameters.get(paramName);
     }
 
     @Override

@@ -15,6 +15,8 @@ public enum SpecialCertProfileBehavior
 {
     gematik_gSMC_K;
 
+    public static final String PARAMETER_MAXLIFTIME = "maxLifetime";
+
     public static SpecialCertProfileBehavior getInstance(String behavior)
     {
         for(SpecialCertProfileBehavior b : values())

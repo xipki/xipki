@@ -9,6 +9,7 @@ package org.xipki.ca.server.mgmt;
 
 import org.xipki.ca.api.profile.CertProfile;
 import org.xipki.ca.api.profile.CertProfileException;
+import org.xipki.ca.api.profile.SpecialCertProfileBehavior;
 import org.xipki.ca.server.IdentifiedCertProfile;
 import org.xipki.ca.server.certprofile.DefaultCertProfile;
 import org.xipki.security.common.EnvironmentParameterResolver;
@@ -105,6 +106,30 @@ public class CertProfileEntry
         this.certProfile = new IdentifiedCertProfile(name, underlyingCertProfile);
         this.certProfile.initialize(conf);
         this.certProfile.setEnvironmentParameterResolver(envParamResolver);
+
+        if(this.certProfile.getSpecialCertProfileBehavior() == SpecialCertProfileBehavior.gematik_gSMC_K)
+        {
+            String paramName = SpecialCertProfileBehavior.PARAMETER_MAXLIFTIME;
+            String s = this.certProfile.getParameter(paramName);
+            if(s == null)
+            {
+                throw new CertProfileException("parameter " + paramName + " is not defined");
+            }
+
+            s = s.trim();
+            int i;
+            try
+            {
+                i = Integer.parseInt(s);
+            }catch(NumberFormatException e)
+            {
+                throw new CertProfileException("invalid " + paramName + ": " + s);
+            }
+            if(i < 1)
+            {
+                throw new CertProfileException("invalid " + paramName + ": " + s);
+            }
+        }
 
         return this.certProfile;
     }
