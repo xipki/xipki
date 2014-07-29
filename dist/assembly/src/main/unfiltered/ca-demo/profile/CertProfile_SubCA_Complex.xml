@@ -2,7 +2,7 @@
 <profile xmlns="http://xipki.org/xmlprofile/v1" onlyForRA="false">
   <description>CertProfile SubCA with most extensions</description>
   <ca>true</ca>
-  <validity>1825</validity>
+  <validity>2920</validity>
   <duplicateKeyPermitted>false</duplicateKeyPermitted>
   <duplicateSubjectPermitted>false</duplicateSubjectPermitted>
   <serialNumberInReqPermitted>false</serialNumberInReqPermitted>

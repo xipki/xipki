@@ -2,7 +2,7 @@
 <profile xmlns="http://xipki.org/xmlprofile/v1" onlyForRA="false">
   <description>CertProfile OCSP</description>
   <ca>false</ca>
-  <validity>730</validity>
+  <validity>1825</validity>
   <duplicateKeyPermitted>false</duplicateKeyPermitted>
   <duplicateSubjectPermitted>false</duplicateSubjectPermitted>
   <serialNumberInReqPermitted>false</serialNumberInReqPermitted>
