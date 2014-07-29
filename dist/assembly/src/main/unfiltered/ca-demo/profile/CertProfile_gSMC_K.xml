@@ -10,7 +10,7 @@
   <parameters>
     <parameter>
       <name>maxLifetime</name>
-      <value>2920</value>
+      <value>7300</value>
     </parameter>
   </parameters>
   <keyAlgorithms>

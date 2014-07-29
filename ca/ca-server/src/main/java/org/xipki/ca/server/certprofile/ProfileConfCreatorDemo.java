@@ -184,7 +184,7 @@ public class ProfileConfCreatorDemo
     private static ProfileType CertProfile_RootCA()
     throws Exception
     {
-        ProfileType profile = getBaseProfile("CertProfile RootCA", true, 1825);
+        ProfileType profile = getBaseProfile("CertProfile RootCA", true, 10 * 365);
 
         // Subject
         Subject subject = profile.getSubject();
@@ -218,7 +218,7 @@ public class ProfileConfCreatorDemo
     private static ProfileType CertProfile_SubCA()
     throws Exception
     {
-        ProfileType profile = getBaseProfile("CertProfile SubCA", true, 1825);
+        ProfileType profile = getBaseProfile("CertProfile SubCA", true, 8 * 365);
 
         // Subject
         Subject subject = profile.getSubject();
@@ -254,7 +254,7 @@ public class ProfileConfCreatorDemo
     private static ProfileType CertProfile_SubCA_Complex()
     throws Exception
     {
-        ProfileType profile = getBaseProfile("CertProfile SubCA with most extensions", true, 1825);
+        ProfileType profile = getBaseProfile("CertProfile SubCA with most extensions", true, 8 * 365);
 
         // Subject
         Subject subject = profile.getSubject();
@@ -368,7 +368,7 @@ public class ProfileConfCreatorDemo
     private static ProfileType CertProfile_OCSP()
     throws Exception
     {
-        ProfileType profile = getBaseProfile("CertProfile OCSP", false, 730);
+        ProfileType profile = getBaseProfile("CertProfile OCSP", false, 5 * 365);
 
         // Subject
         Subject subject = profile.getSubject();
@@ -410,7 +410,7 @@ public class ProfileConfCreatorDemo
     private static ProfileType CertProfile_TLS()
     throws Exception
     {
-        ProfileType profile = getBaseProfile("CertProfile TLS", false, 730);
+        ProfileType profile = getBaseProfile("CertProfile TLS", false, 5 * 365);
 
         // Subject
         Subject subject = profile.getSubject();
@@ -457,7 +457,7 @@ public class ProfileConfCreatorDemo
     private static ProfileType CertProfile_TLS_C()
     throws Exception
     {
-        ProfileType profile = getBaseProfile("CertProfile TLS_C", false, 730);
+        ProfileType profile = getBaseProfile("CertProfile TLS_C", false, 5 * 365);
 
         // Subject
         Subject subject = profile.getSubject();
@@ -497,7 +497,7 @@ public class ProfileConfCreatorDemo
     private static ProfileType CertProfile_TLSwithIncSN()
     throws Exception
     {
-        ProfileType profile = getBaseProfile("CertProfile TLSwithIncSN", false, 730);
+        ProfileType profile = getBaseProfile("CertProfile TLSwithIncSN", false, 5 * 365);
 
         // Subject
         Subject subject = profile.getSubject();
@@ -757,8 +757,8 @@ public class ProfileConfCreatorDemo
         Parameters profileParams = new Parameters();
         profile.setParameters(profileParams);
         NameValueType nv = new NameValueType();
-        nv.setName("maxLifetime");
-        nv.setValue(Integer.toString(8 * 365));
+        nv.setName(SpecialCertProfileBehavior.PARAMETER_MAXLIFTIME);
+        nv.setValue(Integer.toString(20 * 365));
         profileParams.getParameter().add(nv);
 
         // Subject

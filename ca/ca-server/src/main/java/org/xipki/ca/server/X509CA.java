@@ -28,7 +28,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.SimpleTimeZone;
 import java.util.concurrent.ConcurrentSkipListMap;
@@ -1780,26 +1779,8 @@ public class X509CA
             Date maxNotAfter = new Date(notBefore.getTime() + DAY * validity);
             if(certProfile.getSpecialCertProfileBehavior() == SpecialCertProfileBehavior.gematik_gSMC_K)
             {
-                long maxLifetimeInDays = 8 * 365L;
-                Map<String, String> params = certProfile.getParameters();
-                if(params != null)
-                {
-                    String s = params.get("maxLifetime");
-                    if(s != null)
-                    {
-                        try
-                        {
-                            maxLifetimeInDays = Long.parseLong(s);
-                        }catch(NumberFormatException e)
-                        {
-                            throw new OperationException(ErrorCode.System_Failure, "invalid maxLifetime '" + s + "'");
-                        }
-                        if(maxLifetimeInDays < 1)
-                        {
-                            throw new OperationException(ErrorCode.System_Failure, "invalid maxLifetime '" + s + "'");
-                        }
-                    }
-                }
+                String s = certProfile.getParameter(SpecialCertProfileBehavior.PARAMETER_MAXLIFTIME);
+                long maxLifetimeInDays = Long.parseLong(s);
                 Date maxLifetime = new Date(gSMC_KFirstNotBefore.getTime() + maxLifetimeInDays * DAY);
                 if(maxNotAfter.after(maxLifetime))
                 {
