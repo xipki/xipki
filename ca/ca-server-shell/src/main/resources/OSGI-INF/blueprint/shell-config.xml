@@ -420,6 +420,15 @@
         <entry key="-confFile" value-ref="filePathCompleter"/>
       </optional-completers>
     </command>
+    <command name="ca/profile-export">
+      <action class="org.xipki.ca.server.mgmt.shell.ProfileExportCommand">
+        <property name="caManager" ref="caManager"/>
+      </action>
+      <optional-completers>
+        <entry key="-name" value-ref="profileNameCompleter"/>
+        <entry key="-out" value-ref="filePathCompleter"/>
+      </optional-completers>
+    </command>
     <!-- Publisher -->
     <command name="ca/publisher-add">
       <action class="org.xipki.ca.server.mgmt.shell.PublisherAddCommand">
