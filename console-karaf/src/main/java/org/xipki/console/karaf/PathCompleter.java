@@ -8,10 +8,8 @@
 package org.xipki.console.karaf;
 
 import java.io.File;
-import java.io.FileFilter;
+import java.util.LinkedList;
 import java.util.List;
-
-import org.apache.karaf.shell.console.completer.StringsCompleter;
 
 /**
  * @author Lijun Liao
@@ -19,95 +17,123 @@ import org.apache.karaf.shell.console.completer.StringsCompleter;
 
 public abstract class PathCompleter
 {
-
-    private static class PrefixFileFilter implements FileFilter
-    {
-        private boolean dirOnly;
-        private String prefix;
-        public PrefixFileFilter(String prefix, boolean dirOnly)
-        {
-            this.prefix = prefix;
-            this.dirOnly = dirOnly;
-        }
-
-        @Override
-        public boolean accept(File pathname)
-        {
-            if(dirOnly && pathname.isDirectory() == false)
-            {
-                return false;
-            }
-
-            return pathname.getName().startsWith(prefix);
-        }
-    }
-
     protected abstract boolean isDirOnly();
 
-    public int complete(String buffer, int cursor, List<String> candidates)
-    {
-        StringsCompleter delegate = new StringsCompleter();
+    private static final boolean OS_IS_WINDOWS = Configuration.isWindows();
 
-        if(buffer == null || buffer.isEmpty())
+    public int complete(String buffer, final int cursor, final List<String> candidates)
+    {
+        if(candidates == null)
         {
-            return delegate.complete(buffer, cursor, candidates);
+            throw new IllegalArgumentException("candidates could not be null");
         }
 
-        String path = null;
-        File[] children = null;
-
-        File f = new File(buffer);
-        if(f.exists())
+        if (buffer == null)
         {
-            if(f.isDirectory())
-            {
-                path = f.getPath();
-                children = f.listFiles();
-            }
+            buffer = "";
+        }
+
+        if (OS_IS_WINDOWS)
+        {
+            buffer = buffer.replace('/', '\\');
+        }
+
+        String translated = buffer;
+
+        File homeDir = getUserHome();
+
+        // Special character: ~ maps to the user's home directory
+        if (translated.startsWith("~" + separator()))
+        {
+            translated = homeDir.getPath() + translated.substring(1);
+        }
+        else if (translated.startsWith("~"))
+        {
+            translated = homeDir.getParentFile().getAbsolutePath();
+        }
+        else if (!(new File(translated).isAbsolute()))
+        {
+            String cwd = getUserDir().getAbsolutePath();
+            translated = cwd + separator() + translated;
+        }
+
+        File file = new File(translated);
+        final File dir;
+
+        if (translated.endsWith(separator()))
+        {
+            dir = file;
         }
         else
         {
-            File p = f.getParentFile();
-            if(p == null)
-            {
-                p = new File(".");
-                path = "";
-            }
-            else
-            {
-                path = p.getPath();
-            }
-
-            children = p.listFiles(new PrefixFileFilter(f.getName(), isDirOnly()));
+            dir = file.getParentFile();
         }
 
-        if(path != null)
+        File[] entries = dir == null ? new File[0] : dir.listFiles();
+        if(isDirOnly() && entries.length > 0)
         {
-            if(path.isEmpty() == false && path.endsWith(File.separator) == false)
+            List<File> list = new LinkedList<File>();
+            for(File f : entries)
             {
-                path += File.separator;
-            }
-
-            if(children != null)
-            {
-                for(File child : children)
+                if(f.isDirectory())
                 {
-                    if(child.isDirectory())
-                    {
-                        String childName = child.getName();
-                        delegate.getStrings().add(path + childName);
-                        delegate.getStrings().add(path + childName + File.separator);
-                    }
-                    else if(isDirOnly() == false)
-                    {
-                        String childName = child.getName();
-                        delegate.getStrings().add(path + childName);
-                    }
+                    list.add(f);
                 }
             }
+            entries = list.toArray(new File[0]);
         }
 
-        return delegate.complete(buffer, cursor, candidates);
+        return matchFiles(buffer, translated, entries, candidates);
     }
 
-}
+    protected String separator()
+    {
+        return File.separator;
+    }
+
+    protected File getUserHome()
+    {
+        return Configuration.getUserHome();
+    }
+
+    protected File getUserDir()
+    {
+        return new File(".");
+    }
+
+    protected int matchFiles(final String buffer, final String translated, final File[] files, final List<String> candidates)
+    {
+        if (files == null)
+        {
+            return -1;
+        }
+
+        int matches = 0;
+
+        // first pass: just count the matches
+        for (File file : files)
+        {
+            if (file.getAbsolutePath().startsWith(translated))
+            {
+                matches++;
+            }
+        }
+        for (File file : files)
+        {
+            if (file.getAbsolutePath().startsWith(translated))
+            {
+                CharSequence name = file.getName() + (matches == 1 && file.isDirectory() ? separator() : " ");
+                candidates.add(render(file, name).toString());
+            }
+        }
+
+        final int index = buffer.lastIndexOf(separator());
+
+        return index + separator().length();
+    }
+
+    protected CharSequence render(final File file, final CharSequence name)
+    {
+        return name;
+    }
+ }
