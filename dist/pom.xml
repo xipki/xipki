@@ -8,6 +8,11 @@
   </parent>
   <artifactId>dist-group</artifactId>
   <packaging>pom</packaging>
+  <properties>
+    <bc.version>1.51</bc.version>
+    <hikaricp.version>1.4.0</hikaricp.version>
+    <karaf.version>2.3.4</karaf.version>
+  </properties>
   <modules>
     <module>assembly</module>
     <module>branding</module>
