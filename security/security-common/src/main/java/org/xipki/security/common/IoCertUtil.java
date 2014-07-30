@@ -50,13 +50,17 @@ import org.bouncycastle.asn1.DERPrintableString;
 import org.bouncycastle.asn1.DERUTF8String;
 import org.bouncycastle.asn1.cmp.PKIFreeText;
 import org.bouncycastle.asn1.cmp.PKIStatus;
+import org.bouncycastle.asn1.nist.NISTNamedCurves;
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
+import org.bouncycastle.asn1.sec.SECNamedCurves;
+import org.bouncycastle.asn1.teletrust.TeleTrusTNamedCurves;
 import org.bouncycastle.asn1.x500.RDN;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x500.style.IETFUtils;
 import org.bouncycastle.asn1.x500.style.RFC4519Style;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
+import org.bouncycastle.asn1.x9.X962NamedCurves;
 
 /**
  * @author Lijun Liao
@@ -678,4 +682,27 @@ public class IoCertUtil
         }
         return publicKeyInfo;
     }
+
+    public static String getCurveName(ASN1ObjectIdentifier curveId)
+    {
+        String curveName = X962NamedCurves.getName(curveId);
+
+        if (curveName == null)
+        {
+            curveName = SECNamedCurves.getName(curveId);
+        }
+
+        if (curveName == null)
+        {
+            curveName = TeleTrusTNamedCurves.getName(curveId);
+        }
+
+        if (curveName == null)
+        {
+            curveName = NISTNamedCurves.getName(curveId);
+        }
+
+        return curveName;
+    }
+
 }

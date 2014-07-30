@@ -8,7 +8,7 @@ eXtensible sImple Public Key Infrastructure
   - CMP (RFC 4210 and RFC 4211)
   - Support of direct and inderect CRL
   - Support of PKCS#12 and JKS keystore
-  - Support of PKCS#11 devices, e.g. HSM, tested with nCipher of Thales
+  - Support of PKCS#11 devices, e.g. HSM
   - API to use customized key types, e.g. smartcard
   - API to specify customized certificate profiles
   - API to specify customized publisher, e.g. for LDAP and OCSP responder
