@@ -20,6 +20,7 @@ import java.security.SignatureException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509CRL;
 import java.security.cert.X509Certificate;
+import java.security.interfaces.ECPublicKey;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -733,32 +734,40 @@ public final class RAWorkerImpl extends AbstractRAWorker implements RAWorker
         {
             if(tryXipkiNSStoVerify == null)
             {
-                if(Security.getProvider(provider) == null)
+                if(caPublicKey instanceof ECPublicKey)
                 {
                     tryXipkiNSStoVerify = Boolean.FALSE;
                     tryXipkiNSStoVerifyMap.put(_caCert, tryXipkiNSStoVerify);
                 }
                 else
                 {
-                    byte[] tbs = _cert.getTBSCertificate();
-                    byte[] signatureValue = _cert.getSignature();
-                    String sigAlgName = _cert.getSigAlgName();
-                    try
+                    if(Security.getProvider(provider) == null)
                     {
-                        Signature verifier = Signature.getInstance(sigAlgName, provider);
-                        verifier.initVerify(caPublicKey);
-                        verifier.update(tbs);
-                        boolean sigValid = verifier.verify(signatureValue);
-
-                        LOG.info("Use {} to verify {} signature", provider, sigAlgName);
-                        tryXipkiNSStoVerify = Boolean.TRUE;
-                        tryXipkiNSStoVerifyMap.put(_caCert, tryXipkiNSStoVerify);
-                        return sigValid;
-                    }catch(Exception e)
-                    {
-                        LOG.info("Could not use {} to verify {} signature", provider, sigAlgName);
                         tryXipkiNSStoVerify = Boolean.FALSE;
                         tryXipkiNSStoVerifyMap.put(_caCert, tryXipkiNSStoVerify);
+                    }
+                    else
+                    {
+                        byte[] tbs = _cert.getTBSCertificate();
+                        byte[] signatureValue = _cert.getSignature();
+                        String sigAlgName = _cert.getSigAlgName();
+                        try
+                        {
+                            Signature verifier = Signature.getInstance(sigAlgName, provider);
+                            verifier.initVerify(caPublicKey);
+                            verifier.update(tbs);
+                            boolean sigValid = verifier.verify(signatureValue);
+
+                            LOG.info("Use {} to verify {} signature", provider, sigAlgName);
+                            tryXipkiNSStoVerify = Boolean.TRUE;
+                            tryXipkiNSStoVerifyMap.put(_caCert, tryXipkiNSStoVerify);
+                            return sigValid;
+                        }catch(Exception e)
+                        {
+                            LOG.info("Could not use {} to verify {} signature", provider, sigAlgName);
+                            tryXipkiNSStoVerify = Boolean.FALSE;
+                            tryXipkiNSStoVerifyMap.put(_caCert, tryXipkiNSStoVerify);
+                        }
                     }
                 }
             }

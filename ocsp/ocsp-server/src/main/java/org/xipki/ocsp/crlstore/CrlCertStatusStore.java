@@ -29,10 +29,11 @@ import javax.security.auth.x500.X500Principal;
 
 import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1EncodableVector;
+import org.bouncycastle.asn1.ASN1Enumerated;
+import org.bouncycastle.asn1.ASN1GeneralizedTime;
 import org.bouncycastle.asn1.ASN1Integer;
 import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.ASN1Set;
-import org.bouncycastle.asn1.DEREnumerated;
 import org.bouncycastle.asn1.DERGeneralizedTime;
 import org.bouncycastle.asn1.DERIA5String;
 import org.bouncycastle.asn1.DEROctetString;
@@ -371,7 +372,7 @@ public class CrlCertStatusStore extends CertStatusStore
                     int reasonCode;
                     if(encodedExtnValue != null)
                     {
-                        DEREnumerated enumerated = DEREnumerated.getInstance(
+                        ASN1Enumerated enumerated = ASN1Enumerated.getInstance(
                                 removingTagAndLenFromExtensionValue(encodedExtnValue));
                         reasonCode = enumerated.getValue().intValue();
                     }
@@ -388,7 +389,7 @@ public class CrlCertStatusStore extends CertStatusStore
                     if(extnValue != null)
                     {
                         extnValue = removingTagAndLenFromExtensionValue(extnValue);
-                        DERGeneralizedTime gTime = DERGeneralizedTime.getInstance(extnValue);
+                        ASN1GeneralizedTime gTime = DERGeneralizedTime.getInstance(extnValue);
                         try
                         {
                             invalidityTime = gTime.getDate();

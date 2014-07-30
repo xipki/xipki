@@ -22,6 +22,7 @@ import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509CRL;
 import java.security.cert.X509Certificate;
+import java.security.interfaces.ECPublicKey;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -479,7 +480,7 @@ public class X509CA
                             true, // onlyContainsUserCerts,
                             false, // onlyContainsCACerts,
                             (ReasonFlags) null, // onlySomeReasons,
-                            true, // indirectCRL,
+                            directCRL == false, // indirectCRL,
                             false // onlyContainsAttributeCerts
                             );
 
@@ -2314,32 +2315,41 @@ public class X509CA
         try
         {
             final String provider = "XipkiNSS";
+
             if(tryXipkiNSStoVerify == null)
             {
-                if(Security.getProvider(provider) == null)
+                // Not for ECDSA
+                if(caPublicKey instanceof ECPublicKey)
                 {
-                     LOG.info("Security provider {} is not registered", provider);
                     tryXipkiNSStoVerify = Boolean.FALSE;
                 }
                 else
                 {
-                    byte[] tbs = cert.getTBSCertificate();
-                    byte[] signatureValue = cert.getSignature();
-                    String sigAlgName = cert.getSigAlgName();
-                    try
+                    if(Security.getProvider(provider) == null)
                     {
-                        Signature verifier = Signature.getInstance(sigAlgName, provider);
-                        verifier.initVerify(caPublicKey);
-                        verifier.update(tbs);
-                        boolean sigValid = verifier.verify(signatureValue);
-
-                        LOG.info("Use {} to verify {} signature", provider, sigAlgName);
-                        tryXipkiNSStoVerify = Boolean.TRUE;
-                        return sigValid;
-                    }catch(Exception e)
-                    {
-                        LOG.info("Cannot use {} to verify {} signature", provider, sigAlgName);
+                        LOG.info("Security provider {} is not registered", provider);
                         tryXipkiNSStoVerify = Boolean.FALSE;
+                    }
+                    else
+                    {
+                        byte[] tbs = cert.getTBSCertificate();
+                        byte[] signatureValue = cert.getSignature();
+                        String sigAlgName = cert.getSigAlgName();
+                        try
+                        {
+                            Signature verifier = Signature.getInstance(sigAlgName, provider);
+                            verifier.initVerify(caPublicKey);
+                            verifier.update(tbs);
+                            boolean sigValid = verifier.verify(signatureValue);
+
+                            LOG.info("Use {} to verify {} signature", provider, sigAlgName);
+                            tryXipkiNSStoVerify = Boolean.TRUE;
+                            return sigValid;
+                        }catch(Exception e)
+                        {
+                            LOG.info("Cannot use {} to verify {} signature", provider, sigAlgName);
+                            tryXipkiNSStoVerify = Boolean.FALSE;
+                        }
                     }
                 }
             }
