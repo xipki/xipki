@@ -23,11 +23,13 @@ import java.security.cert.CertificateException;
 import java.security.cert.X509CRL;
 import java.security.cert.X509Certificate;
 import java.sql.SQLException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
+import java.util.SimpleTimeZone;
 import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -46,6 +48,7 @@ import org.bouncycastle.asn1.DERSet;
 import org.bouncycastle.asn1.DERUTF8String;
 import org.bouncycastle.asn1.x500.RDN;
 import org.bouncycastle.asn1.x500.X500Name;
+import org.bouncycastle.asn1.x500.style.IETFUtils;
 import org.bouncycastle.asn1.x509.AuthorityInformationAccess;
 import org.bouncycastle.asn1.x509.AuthorityKeyIdentifier;
 import org.bouncycastle.asn1.x509.CRLDistPoint;
@@ -80,6 +83,7 @@ import org.xipki.ca.api.profile.CertProfileException;
 import org.xipki.ca.api.profile.ExtensionOccurrence;
 import org.xipki.ca.api.profile.ExtensionTuple;
 import org.xipki.ca.api.profile.ExtensionTuples;
+import org.xipki.ca.api.profile.SpecialCertProfileBehavior;
 import org.xipki.ca.api.profile.SubjectInfo;
 import org.xipki.ca.api.profile.X509Util;
 import org.xipki.ca.api.publisher.CertPublisherException;
@@ -1416,6 +1420,48 @@ public class X509CA
         } catch (BadCertTemplateException e)
         {
             throw new OperationException(ErrorCode.BAD_CERT_TEMPLATE, e.getMessage());
+        }
+
+        if(certProfile.getSpecialCertProfileBehavior() == SpecialCertProfileBehavior.gematik_gSMC_K)
+        {
+            RDN[] cnRDNs = requestedSubject.getRDNs(ObjectIdentifiers.DN_CN);
+            if(cnRDNs != null && cnRDNs.length > 0)
+            {
+                Date notBeforeForSuffix = notBefore;
+
+                String requestedCN = IETFUtils.valueToString(cnRDNs[0].getFirst().getValue());
+                try
+                {
+                    long[] v = certstore.getValidityOfFirstCertStartsWithCN(
+                            caInfo.getCertificate(), requestedCN, certProfileName);
+                    if(v != null)
+                    {
+                        notBeforeForSuffix = new Date(v[0] * 1000);
+                        notAfter = new Date(v[1]* 1000);
+                    }
+                } catch (SQLException e)
+                {
+                    LOG.debug("Error in certstore.getSubjectDNsContainsCN()", e);
+                    throw new OperationException(ErrorCode.DATABASE_FAILURE, e.getMessage());
+                }
+
+                // append the commonName with '-' + yyyyMMdd
+                SimpleDateFormat dateF = new SimpleDateFormat("yyyyMMdd");
+                dateF.setTimeZone(new SimpleTimeZone(0,"Z"));
+                String yyyyMMdd = dateF.format(notBeforeForSuffix);
+                String suffix = "-" + yyyyMMdd;
+
+                // append the -YYYYMMDD to the commonName
+                RDN[] rdns = requestedSubject.getRDNs();
+                for(int i = 0; i < rdns.length; i++)
+                {
+                    if(ObjectIdentifiers.DN_CN.equals(rdns[i].getFirst().getType()))
+                    {
+                        rdns[i] = new RDN(ObjectIdentifiers.DN_CN, new DERUTF8String(requestedCN + suffix));
+                    }
+                }
+                requestedSubject = new X500Name(rdns);
+            }
         }
 
         // subject

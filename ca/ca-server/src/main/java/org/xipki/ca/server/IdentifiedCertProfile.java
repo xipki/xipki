@@ -18,6 +18,7 @@ import org.xipki.ca.api.profile.CertProfile;
 import org.xipki.ca.api.profile.CertProfileException;
 import org.xipki.ca.api.profile.ExtensionOccurrence;
 import org.xipki.ca.api.profile.ExtensionTuples;
+import org.xipki.ca.api.profile.SpecialCertProfileBehavior;
 import org.xipki.ca.api.profile.SubjectInfo;
 import org.xipki.security.common.EnvironmentParameterResolver;
 import org.xipki.security.common.ParamChecker;
@@ -49,6 +50,11 @@ public class IdentifiedCertProfile
     throws CertProfileException
     {
         certProfile.initialize(data);
+    }
+
+    public SpecialCertProfileBehavior getSpecialCertProfileBehavior()
+    {
+        return certProfile.getSpecialCertProfileBehavior();
     }
 
     public void setEnvironmentParameterResolver(EnvironmentParameterResolver parameterResolver)

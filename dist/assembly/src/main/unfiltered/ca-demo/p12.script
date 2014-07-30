@@ -26,6 +26,8 @@ ca:profile-add -name TLS_C -type XML -confFile ca-demo/profile/CertProfile_TLS_C
 
 ca:profile-add -name TLSwithIncSN -type XML -confFile ca-demo/profile/CertProfile_TLSwithIncSN.xml
 
+ca:profile-add -name gSMC_K -type XML -confFile ca-demo/profile/CertProfile_gSMC_K.xml
+
 ## Publishers
 ca:publisher-add -name OCSP.PUBLISHER -type OCSP \
   -conf datasource?ocsp%publish.goodcerts?true
@@ -124,7 +126,7 @@ ca:ca-add -name SubCA1 \
 ca:caalias-add -ca SubCA1 -alias SubCA
 
 ## Add cert profile to CA
-ca:caprofile-add -ca SubCA1 -profile TLS -profile TLS_C -profile TLSwithIncSN
+ca:caprofile-add -ca SubCA1 -profile TLS -profile TLS_C -profile TLSwithIncSN -profile gSMC_K
 
 ## Add publisher
 ca:capub-add -ca SubCA1 -publisher OCSP.PUBLISHER

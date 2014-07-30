@@ -37,8 +37,16 @@
 	<xs:complexType name="ProfileType">
 		<xs:sequence>
 			<xs:element name="description" type="xs:string" minOccurs="0"/>
-			<xs:element name="ca" type="xs:boolean"/>			
+			<xs:element name="ca" type="xs:boolean"/>
 			<xs:element name="validity" type="xs:int" minOccurs="0"/>
+			<xs:element name="specialBehavior" type="xs:string" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>
+						some certificate profiles must be processed specially. Currently 
+						defined special behavior is gematik_gSMC_K.
+					</xs:documentation>
+				</xs:annotation>
+			</xs:element>
 			<xs:element name="keyAlgorithms" minOccurs="0">
 				<xs:complexType>
 					<xs:sequence>
