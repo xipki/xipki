@@ -7,6 +7,9 @@
 
 package org.xipki.ca.server;
 
+import java.io.InputStream;
+import java.util.jar.Manifest;
+
 /**
  * @author Lijun Liao
  */
@@ -25,15 +28,12 @@ final public class Version
      */
     public static String getVersion()
     {
-
         StringBuilder version = new StringBuilder();
 
         try
         {
-            java.security.CodeSource cs     = Version.class.getProtectionDomain().getCodeSource();
-            java.net.URL             jarLoc = cs.getLocation();
-            java.util.jar.JarFile    jfile  = new java.util.jar.JarFile(new java.io.File(jarLoc.getFile()));
-            java.util.jar.Manifest   man    = jfile.getManifest();
+            InputStream is = Version.class.getResourceAsStream("/MANIFEST.MF");
+            java.util.jar.Manifest   man    = new Manifest(is);
             java.util.jar.Attributes jattr  = man.getMainAttributes();
             // Copyright
             // Maven Version, SVN Revision, Build timestamp
@@ -44,7 +44,6 @@ final public class Version
             version.append(jattr.getValue("Implementation-Build")).append(" ");
             version.append("Build at: ");
             version.append(jattr.getValue("Implementation-Build-Timestamp")).append(" ");
-            jfile.close();
         }
         catch (Exception e)
         {

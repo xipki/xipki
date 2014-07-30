@@ -20,11 +20,11 @@ import java.util.Random;
 
 import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1GeneralizedTime;
+import org.bouncycastle.asn1.ASN1Integer;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.ASN1OctetString;
 import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.ASN1String;
-import org.bouncycastle.asn1.DERInteger;
 import org.bouncycastle.asn1.DERNull;
 import org.bouncycastle.asn1.DEROctetString;
 import org.bouncycastle.asn1.cmp.ErrorMsgContent;
@@ -80,10 +80,10 @@ public abstract class RemoteP11CryptService implements P11CryptService
         InfoTypeAndValue itv = new InfoTypeAndValue(RemoteP11Constants.id_version, DERNull.INSTANCE);
         ASN1Encodable result = send(itv);
 
-        DERInteger derInt;
+        ASN1Integer derInt;
         try
         {
-            derInt = DERInteger.getInstance(result);
+            derInt = ASN1Integer.getInstance(result);
         }catch(IllegalArgumentException e)
         {
             throw new SignerException("The returned result is not INTEGER");
