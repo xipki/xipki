@@ -9,6 +9,9 @@
   <groupId>org.xipki.remotep11</groupId>
   <artifactId>dist-group</artifactId>
   <packaging>pom</packaging>
+  <properties>
+    <bc.version>1.51</bc.version>
+  </properties>
   <modules>
     <module>assembly</module>
     <module>branding</module>
