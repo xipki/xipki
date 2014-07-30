@@ -36,7 +36,6 @@ public abstract class P12KeyGenCommand extends KeyGenCommand
     throws IOException
     {
         File p12File = new File(keyOutFile);
-        System.out.println("Saved PKCS#12 keystore in " + p12File.getPath());
         saveVerbose("Saved PKCS#12 keystore to file", p12File, keyAndCert.getKeystore());
         if(certOutFile != null)
         {
