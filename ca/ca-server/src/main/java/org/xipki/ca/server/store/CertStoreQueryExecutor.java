@@ -1568,6 +1568,51 @@ class CertStoreQueryExecutor
         return null;
     }
 
+    long[] getValidityOfFirstCertStartsWithCN(X509CertificateWithMetaInfo caCert, String commonName, String profileName)
+    throws SQLException
+    {
+        byte[] encodedCert = caCert.getEncodedCert();
+        Integer caId =  caInfoStore.getCaIdForCert(encodedCert);
+
+        if(caId == null)
+        {
+            return null;
+        }
+
+        Integer profileId = certprofileStore.getId(profileName);
+        if(profileId == null)
+        {
+            return null;
+        }
+
+        String sql = "NOTBEFORE, NOTAFTER FROM CERT WHERE CERTPROFILEINFO_ID = ? AND SUBJECT LIKE ?";
+        sql = dataSource.createFetchFirstSelectSQL(sql, 1, "NOTBEFORE ASC");
+        PreparedStatement ps = borrowPreparedStatement(sql);
+
+        ResultSet rs = null;
+        try
+        {
+            int idx = 1;
+            ps.setInt(idx++, profileId.intValue());
+            ps.setString(idx++, "%cn=" + commonName + "%");
+
+            rs = ps.executeQuery();
+
+            if(rs.next() == false)
+            {
+                return null;
+            }
+
+            long notBefore = rs.getLong("NOTBEFORE");
+            long notAfter = rs.getLong("NOTAFTER");
+
+            return new long[]{notBefore, notAfter};
+        }finally
+        {
+            releaseDbResources(ps, rs);
+        }
+    }
+
     private static void setBoolean(PreparedStatement ps, int index, boolean b)
     throws SQLException
     {

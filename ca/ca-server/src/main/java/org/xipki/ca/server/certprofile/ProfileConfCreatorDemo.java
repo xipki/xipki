@@ -26,6 +26,7 @@ import org.bouncycastle.asn1.sec.SECObjectIdentifiers;
 import org.bouncycastle.asn1.teletrust.TeleTrusTObjectIdentifiers;
 import org.bouncycastle.asn1.x509.Extension;
 import org.bouncycastle.asn1.x9.X9ObjectIdentifiers;
+import org.xipki.ca.api.profile.SpecialCertProfileBehavior;
 import org.xipki.ca.server.certprofile.jaxb.AddTextType;
 import org.xipki.ca.server.certprofile.jaxb.AlgorithmType;
 import org.xipki.ca.server.certprofile.jaxb.CertificatePolicyInformationType;
@@ -59,6 +60,7 @@ import org.xipki.ca.server.certprofile.jaxb.RdnConstraintType;
 import org.xipki.ca.server.certprofile.jaxb.RdnType;
 import org.xipki.ca.server.certprofile.jaxb.SubjectInfoAccessType;
 import org.xipki.ca.server.certprofile.jaxb.SubjectInfoAccessType.Access;
+import org.xipki.security.common.IoCertUtil;
 import org.xipki.security.common.ObjectIdentifiers;
 
 /**
@@ -147,6 +149,10 @@ public class ProfileConfCreatorDemo
             // TLSwithIncSN
             profile = CertProfile_TLSwithIncSN();
             marshall(m, profile, "CertProfile_TLSwithIncSN.xml");
+
+            //gSMC-K
+            profile = CertProfile_gSMC_K();
+            marshall(m, profile, "CertProfile_gSMC_K.xml");
         }catch(Exception e)
         {
             e.printStackTrace();
@@ -884,11 +890,70 @@ public class ProfileConfCreatorDemo
 
         for(ASN1ObjectIdentifier curveId : curveIds)
         {
-            String name = DefaultCertProfile.getCurveName(curveId);
+            String name = IoCertUtil.getCurveName(curveId);
             ecParams.getCurve().add(createOidType(curveId, name));
         }
 
         return ret;
+    }
+
+    private static ProfileType CertProfile_gSMC_K()
+    throws Exception
+    {
+        ProfileType profile = new ProfileType();
+        profile.setDescription("CertProfile gSMC_K");
+        profile.setOnlyForRA(false);
+        profile.setCa(false);
+        profile.setValidity(730);
+
+        // SpecialBehavior
+        profile.setSpecialBehavior(SpecialCertProfileBehavior.gematik_gSMC_K.name());
+        // Key
+        profile.setKeyAlgorithms(createKeyAlgorithms());
+
+        // Subject
+        Subject subject = new Subject();
+        profile.setSubject(subject);
+
+        subject.setDnBackwards(false);
+        subject.setIncSerialNrIfSubjectExists(true);
+
+        List<RdnType> occurrences = subject.getRdn();
+        occurrences.add(createRDN(ObjectIdentifiers.DN_C, 1, 1, "DE|FR"));
+        occurrences.add(createRDN(ObjectIdentifiers.DN_O, 1, 1, null));
+        occurrences.add(createRDN(ObjectIdentifiers.DN_OU, 0, 1, null));
+        occurrences.add(createRDN(ObjectIdentifiers.DN_SN, 0, 1, REGEX_SN));
+        occurrences.add(createRDN(ObjectIdentifiers.DN_CN, 1, 1, null));
+
+        // AllowedClientExtensions
+        profile.setAllowedClientExtensions(null);
+
+        // Extensions
+        // Extensions - general
+        ExtensionsType extensions = new ExtensionsType();
+        profile.setExtensions(extensions);
+
+        extensions.setIncludeIssuerAndSerialInAKI(false);
+
+        // Extensions - occurrences
+        List<ExtensionType> list = extensions.getExtension();
+        list.add(createExtension(Extension.subjectKeyIdentifier, true));
+        list.add(createExtension(Extension.authorityKeyIdentifier, true));
+        list.add(createExtension(Extension.authorityInfoAccess, false));
+        list.add(createExtension(Extension.cRLDistributionPoints, false));
+        list.add(createExtension(Extension.freshestCRL, false));
+        list.add(createExtension(Extension.keyUsage, true));
+        list.add(createExtension(Extension.basicConstraints, true));
+        list.add(createExtension(Extension.extendedKeyUsage, true));
+
+        // Extensions - keyUsage
+        extensions.getKeyUsage().add(createKeyUsages(KeyUsageType.DIGITAL_SIGNATURE,
+                KeyUsageType.DATA_ENCIPHERMENT,  KeyUsageType.KEY_ENCIPHERMENT));
+
+        // Extensions - extenedKeyUsage
+        extensions.getExtendedKeyUsage().add(createExtendedKeyUsage(
+                ObjectIdentifiers.id_kp_clientAuth));
+        return profile;
     }
 
 }

@@ -102,6 +102,29 @@ keytool:update-cert-p12 -p12 output/TLS_C2.p12 -pwd 1234 -cert output/TLS_C2.der
 ## Revocate certificates
 caclient:revoke -cert output/TLS_C2.der -reason affiliationChanged
 
+## Enroll certificates gSMC-K
+keytool:rsa-p12 -pwd 1234 -out output/gSMC_K1.p12 -subject "CN=gSMC_K,O=xipki,C=DE"
+
+keytool:req-p12 -p12 output/gSMC_K1.p12 -pwd 1234 -out output/gSMC_K1.p10
+
+caclient:enroll -p10 output/gSMC_K1.p10 -out output/gSMC_K1.der -profile gSMC_K -user USER-T
+
+keytool:update-cert-p12 -p12 output/gSMC_K1.p12 -pwd 1234 -cert output/gSMC_K1.der \
+  -cacert output/SubCA1.der -cacert output/RCA1.der
+
+# with the same CN
+# sleep 2 seconds so that the notBefore in gSMC_K2.der and gSMC_K1.der differs.
+sleep 2000
+
+keytool:rsa-p12 -pwd 1234 -out output/gSMC_K2.p12 -subject "CN=gSMC_K,O=xipki,C=DE"
+
+keytool:req-p12 -p12 output/gSMC_K2.p12 -pwd 1234 -out output/gSMC_K2.p10
+
+caclient:enroll -p10 output/gSMC_K2.p10 -out output/gSMC_K2.der -profile gSMC_K -user USER-T
+
+keytool:update-cert-p12 -p12 output/gSMC_K2.p12 -pwd 1234 -cert output/gSMC_K2.der \
+  -cacert output/SubCA1.der -cacert output/RCA1.der
+
 ## Generate CRL
 caclient:gencrl -ca SubCAwithCRL1 -out output/SubCAwithCRL1.crl
 

@@ -42,10 +42,7 @@ import org.bouncycastle.asn1.DERUTF8String;
 import org.bouncycastle.asn1.isismtt.x509.AdmissionSyntax;
 import org.bouncycastle.asn1.isismtt.x509.Admissions;
 import org.bouncycastle.asn1.isismtt.x509.ProfessionInfo;
-import org.bouncycastle.asn1.nist.NISTNamedCurves;
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
-import org.bouncycastle.asn1.sec.SECNamedCurves;
-import org.bouncycastle.asn1.teletrust.TeleTrusTNamedCurves;
 import org.bouncycastle.asn1.x500.DirectoryString;
 import org.bouncycastle.asn1.x500.RDN;
 import org.bouncycastle.asn1.x500.X500Name;
@@ -61,7 +58,6 @@ import org.bouncycastle.asn1.x509.GeneralSubtree;
 import org.bouncycastle.asn1.x509.NameConstraints;
 import org.bouncycastle.asn1.x509.PolicyMappings;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
-import org.bouncycastle.asn1.x9.X962NamedCurves;
 import org.bouncycastle.asn1.x9.X9ObjectIdentifiers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -75,6 +71,7 @@ import org.xipki.ca.api.profile.ExtensionTuple;
 import org.xipki.ca.api.profile.ExtensionTuples;
 import org.xipki.ca.api.profile.KeyUsage;
 import org.xipki.ca.api.profile.RDNOccurrence;
+import org.xipki.ca.api.profile.SpecialCertProfileBehavior;
 import org.xipki.ca.api.profile.SubjectInfo;
 import org.xipki.ca.api.profile.X509Util;
 import org.xipki.ca.server.certprofile.jaxb.AddTextType;
@@ -132,6 +129,7 @@ public class DefaultCertProfile extends AbstractCertProfile
 
     protected ProfileType profileConf;
 
+    private SpecialCertProfileBehavior specialBehavior;
     private Set<ASN1ObjectIdentifier> allowedEcCurves;
     private Map<ASN1ObjectIdentifier, List<KeyParamRanges>> nonEcKeyAlgorithms;
 
@@ -236,6 +234,11 @@ public class DefaultCertProfile extends AbstractCertProfile
             this.validity = conf.getValidity();
             this.ca = conf.isCa();
 
+            String specialBehavior = conf.getSpecialBehavior();
+            if(specialBehavior != null)
+            {
+                this.specialBehavior = SpecialCertProfileBehavior.getInstance(specialBehavior);
+            }
             // KeyAlgorithms
             KeyAlgorithms keyAlgos = conf.getKeyAlgorithms();
             if(keyAlgos != null)
@@ -830,7 +833,7 @@ public class DefaultCertProfile extends AbstractCertProfile
             }
             else
             {
-                throw new BadCertTemplateException("EC curve " + getCurveName(curveOid) +
+                throw new BadCertTemplateException("EC curve " + IoCertUtil.getCurveName(curveOid) +
                         " (OID: " + curveOid.getId() + ") is not allowed");
             }
         }
@@ -1497,6 +1500,12 @@ public class DefaultCertProfile extends AbstractCertProfile
         return subjectDNOccurrences;
     }
 
+    @Override
+    public SpecialCertProfileBehavior getSpecialCertProfileBehavior()
+    {
+        return specialBehavior;
+    }
+
     private static boolean getBoolean(Boolean b, boolean dfltValue)
     {
         return b == null ? dfltValue : b.booleanValue();
@@ -1761,28 +1770,6 @@ public class DefaultCertProfile extends AbstractCertProfile
     private static Condition createCondition(ConditionType type)
     {
         return type == null ? null : new Condition(type);
-    }
-
-    static String getCurveName(ASN1ObjectIdentifier curveId)
-    {
-        String curveName = X962NamedCurves.getName(curveId);
-
-        if (curveName == null)
-        {
-            curveName = SECNamedCurves.getName(curveId);
-        }
-
-        if (curveName == null)
-        {
-            curveName = TeleTrusTNamedCurves.getName(curveId);
-        }
-
-        if (curveName == null)
-        {
-            curveName = NISTNamedCurves.getName(curveId);
-        }
-
-        return curveName;
     }
 
 }

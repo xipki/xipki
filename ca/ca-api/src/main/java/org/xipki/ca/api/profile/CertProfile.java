@@ -32,6 +32,11 @@ public abstract class CertProfile
     {
     }
 
+    public SpecialCertProfileBehavior getSpecialCertProfileBehavior()
+    {
+        return null;
+    }
+
     public abstract void setEnvironmentParameterResolver(EnvironmentParameterResolver parameterResolver);
 
     public abstract Date getNotBefore(Date notBefore);
