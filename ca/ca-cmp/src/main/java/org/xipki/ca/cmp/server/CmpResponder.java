@@ -19,7 +19,6 @@ import javax.security.auth.x500.X500Principal;
 
 import org.bouncycastle.asn1.ASN1GeneralizedTime;
 import org.bouncycastle.asn1.ASN1OctetString;
-import org.bouncycastle.asn1.DERGeneralizedTime;
 import org.bouncycastle.asn1.DEROctetString;
 import org.bouncycastle.asn1.cmp.ErrorMsgContent;
 import org.bouncycastle.asn1.cmp.PKIBody;
@@ -51,6 +50,7 @@ import org.xipki.ca.common.CertBasedRequestorInfo;
 import org.xipki.ca.common.RequestorInfo;
 import org.xipki.security.api.ConcurrentContentSigner;
 import org.xipki.security.api.SecurityFactory;
+import org.xipki.security.common.BCCompatilbilityUtil;
 import org.xipki.security.common.CmpUtf8Pairs;
 import org.xipki.security.common.IoCertUtil;
 import org.xipki.security.common.LogUtil;
@@ -120,8 +120,7 @@ public abstract class CmpResponder
         Integer failureCode = null;
         String statusText = null;
 
-        DERGeneralizedTime messageTime = reqHeader.getMessageTime();
-
+        Date messageTime = BCCompatilbilityUtil.getMessageTime(reqHeader);
         if(messageTime == null)
         {
             if(cmpControl.isMessageTimeRequired())
@@ -132,31 +131,24 @@ public abstract class CmpResponder
         }
         else
         {
-            try
+            long messageTimeBias = cmpControl.getMessageTimeBias();
+            if(messageTimeBias < 0)
             {
-                long messageTimeBias = cmpControl.getMessageTimeBias();
-                if(messageTimeBias < 0)
-                {
-                    messageTimeBias *= -1;
-                }
+                messageTimeBias *= -1;
+            }
 
-                long msgTimeMs = messageTime.getDate().getTime();
-                long currentTimeMs = System.currentTimeMillis();
-                long bias = (msgTimeMs - currentTimeMs)/ 1000L;
-                if(bias > messageTimeBias)
-                {
-                    failureCode = PKIFailureInfo.badTime;
-                    statusText = "message time is in the future";
-                }
-                else if(bias * -1 > messageTimeBias)
-                {
-                    failureCode = PKIFailureInfo.badTime;
-                    statusText = "message too old";
-                }
-            } catch (ParseException e)
+            long msgTimeMs = messageTime.getTime();
+            long currentTimeMs = System.currentTimeMillis();
+            long bias = (msgTimeMs - currentTimeMs)/ 1000L;
+            if(bias > messageTimeBias)
             {
-                failureCode = PKIFailureInfo.badRequest;
-                statusText = "invalid message time format";
+                failureCode = PKIFailureInfo.badTime;
+                statusText = "message time is in the future";
+            }
+            else if(bias * -1 > messageTimeBias)
+            {
+                failureCode = PKIFailureInfo.badTime;
+                statusText = "message too old";
             }
         }
 

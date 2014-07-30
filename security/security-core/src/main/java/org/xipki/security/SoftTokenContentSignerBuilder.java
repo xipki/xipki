@@ -210,7 +210,8 @@ public class SoftTokenContentSignerBuilder
         ASN1ObjectIdentifier algOid = signatureAlgId.getAlgorithm();
 
         if(Security.getProvider(PROVIDER_XIPKI_NSS) != null &&
-                algOid.equals(PKCSObjectIdentifiers.id_RSASSA_PSS) == false)
+                algOid.equals(PKCSObjectIdentifiers.id_RSASSA_PSS) == false &&
+                key instanceof ECPrivateKey == false)
         {
             String algoName = SignerUtil.getSignatureAlgoName(signatureAlgId);
             if(algoName == null)
@@ -256,7 +257,7 @@ public class SoftTokenContentSignerBuilder
                 if(key instanceof RSAPrivateKey)
                 {
                     keyparam = SignerUtil.generateRSAPrivateKeyParameter((RSAPrivateKey) key);
-                       signerBuilder = new RSAContentSignerBuilder(signatureAlgId);
+                    signerBuilder = new RSAContentSignerBuilder(signatureAlgId);
                 }
                 else if(key instanceof DSAPrivateKey)
                 {
@@ -265,8 +266,8 @@ public class SoftTokenContentSignerBuilder
                 }
                 else if(key instanceof ECPrivateKey)
                 {
-                     keyparam = ECUtil.generatePrivateKeyParameter(key);
-                     signerBuilder = new ECDSAContentSignerBuilder(signatureAlgId);
+                    keyparam = ECUtil.generatePrivateKeyParameter(key);
+                    signerBuilder = new ECDSAContentSignerBuilder(signatureAlgId);
                 }
                 else
                 {
