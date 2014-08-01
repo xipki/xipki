@@ -8,6 +8,7 @@
 package org.xipki.console.karaf;
 
 import java.io.File;
+import java.io.FilenameFilter;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -20,6 +21,7 @@ public abstract class PathCompleter
     protected abstract boolean isDirOnly();
 
     private static final boolean OS_IS_WINDOWS = Configuration.isWindows();
+    private static final FilenameFilter filenameFilter = new MyFilenameFilter();
 
     public int complete(String buffer, final int cursor, final List<String> candidates)
     {
@@ -69,7 +71,7 @@ public abstract class PathCompleter
             dir = file.getParentFile();
         }
 
-        File[] entries = dir == null ? new File[0] : dir.listFiles();
+        File[] entries = dir == null ? new File[0] : dir.listFiles(filenameFilter);
         if(isDirOnly() && entries.length > 0)
         {
             List<File> list = new LinkedList<File>();
