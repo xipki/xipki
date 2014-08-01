@@ -11,10 +11,8 @@
 			</jxb:schemaBindings>
 		</xs:appinfo>
 	</xs:annotation>
-
 	<!-- CertStore -->
 	<xs:element name="OCSPResponder" type="OCSPResponderType"/>
-	
 	<xs:complexType name="OCSPResponderType">
 		<xs:sequence>
 			<xs:element name="mode" type="xs:string" minOccurs="0">
@@ -24,7 +22,7 @@
 						RFC2560 mode will be applied.
 					</xs:documentation>
 				</xs:annotation>
-			</xs:element>			
+			</xs:element>
 			<xs:element name="supportsHttpGet" type="xs:boolean" minOccurs="0">
 				<xs:annotation>
 					<xs:documentation>
@@ -61,7 +59,6 @@
 			</xs:element>
 		</xs:sequence>
 	</xs:complexType>
-	
 	<xs:complexType name="signerType">
 		<xs:sequence>
 			<xs:element name="type" type="xs:string"/>
@@ -80,7 +77,7 @@
 						The default is false.
 					</xs:documentation>
 				</xs:annotation>
-			</xs:element>						
+			</xs:element>
 			<xs:element name="includeSignerCACertsInResp" type="xs:boolean">
 				<xs:annotation>
 					<xs:documentation>
@@ -89,7 +86,7 @@
 					</xs:documentation>
 				</xs:annotation>
 			</xs:element>
-			<xs:element name="certFile" type="xs:string" minOccurs="0" /> 
+			<xs:element name="certFile" type="xs:string" minOccurs="0"/>
 			<xs:element name="caCertFiles" minOccurs="0">
 				<xs:complexType>
 					<xs:sequence>
@@ -99,10 +96,9 @@
 			</xs:element>
 		</xs:sequence>
 	</xs:complexType>
-	
 	<xs:complexType name="requestType">
 		<xs:sequence>
-			<xs:element name="nonce" type="nonceType" minOccurs="0"/>		
+			<xs:element name="nonce" type="nonceType" minOccurs="0"/>
 			<xs:element name="signatureRequired" type="xs:boolean"/>
 			<xs:element name="validateSignature" type="xs:boolean"/>
 			<xs:element name="hashAlgorithms" minOccurs="0">
@@ -112,32 +108,42 @@
 					</xs:sequence>
 				</xs:complexType>
 			</xs:element>
-			<xs:element name="trustAnchors" type="certCollectionType" minOccurs="0"/>
-			<xs:element name="certs" type="certCollectionType" minOccurs="0"/>
+			<xs:element name="certpathValidation" minOccurs="0">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="validationModel" type="validationModelType"/>
+						<xs:element name="trustAnchors" type="certCollectionType"/>
+						<xs:element name="certs" type="certCollectionType" minOccurs="0"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
 		</xs:sequence>
 	</xs:complexType>
-
+	<xs:simpleType name="validationModelType">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="PKIX"/>
+			<xs:enumeration value="CHAIN"/>
+		</xs:restriction>
+	</xs:simpleType>
 	<xs:complexType name="certCollectionType">
 		<xs:choice>
-			<xs:element name="dir" type="xs:string" />
+			<xs:element name="dir" type="xs:string"/>
 			<xs:element name="keystore">
 				<xs:complexType>
 					<xs:all>
 						<xs:element name="type" type="xs:string"/>
-						<xs:element name="uri" type="xs:anyURI" minOccurs="0"/>						
+						<xs:element name="uri" type="xs:anyURI" minOccurs="0"/>
 						<xs:element name="password" type="xs:string" minOccurs="0"/>
 					</xs:all>
 				</xs:complexType>
-			</xs:element> 
+			</xs:element>
 		</xs:choice>
 	</xs:complexType>
-
 	<xs:complexType name="responseType">
 		<xs:all>
 			<xs:element name="noRevReason" type="xs:boolean" minOccurs="0"/>
 		</xs:all>
 	</xs:complexType>
-
 	<xs:complexType name="nonceType">
 		<xs:sequence>
 			<xs:element name="required" type="xs:boolean"/>
@@ -145,7 +151,6 @@
 			<xs:element name="maxLen" type="xs:int" minOccurs="0"/>
 		</xs:sequence>
 	</xs:complexType>
-
 	<xs:complexType name="auditType">
 		<xs:sequence>
 			<xs:element name="enabled" type="xs:boolean"/>
@@ -158,15 +163,13 @@
 			</xs:element>
 		</xs:sequence>
 	</xs:complexType>
-	
 	<xs:complexType name="mappingType">
 		<xs:attribute name="from" type="xs:string"/>
 		<xs:attribute name="to" type="xs:string"/>
 	</xs:complexType>
-	
 	<xs:complexType name="certstatusStoreType">
 		<xs:sequence>
-			<xs:element name="name" type="xs:string" />
+			<xs:element name="name" type="xs:string"/>
 			<xs:choice>
 				<xs:element name="dbStore" type="dbStoreType"/>
 				<xs:element name="crlStore" type="crlStoreType"/>
@@ -206,7 +209,7 @@
 					</xs:documentation>
 				</xs:annotation>
 			</xs:element>
-			<xs:element name="includeCrlID" type="xs:boolean" minOccurs="0">			
+			<xs:element name="includeCrlID" type="xs:boolean" minOccurs="0">
 				<xs:annotation>
 					<xs:documentation>
 						Whether to include extension crlID in OCSP response if 
@@ -221,11 +224,10 @@
 						Whether to include extension CertHash in OCSP response.
 						The default is false. 
 					</xs:documentation>
-				</xs:annotation>		
+				</xs:annotation>
 			</xs:element>
 		</xs:sequence>
 	</xs:complexType>
-	
 	<xs:complexType name="dbStoreType">
 		<xs:sequence>
 			<xs:element name="dbConfFile" type="xs:string"/>
@@ -244,7 +246,6 @@
 			</xs:element>
 		</xs:sequence>
 	</xs:complexType>
-	
 	<xs:complexType name="crlStoreType">
 		<xs:sequence>
 			<xs:element name="crlFile" type="xs:string"/>
@@ -278,10 +279,9 @@
 						 When CA certificate is revoked. Required if caRevoked is true
 					</xs:documentation>
 				</xs:annotation>
-			</xs:element>		
+			</xs:element>
 		</xs:sequence>
 	</xs:complexType>
-	
 	<xs:complexType name="customStoreType">
 		<xs:sequence>
 			<xs:element name="className" type="xs:string">
