@@ -376,7 +376,7 @@ public class X509CA
                 if(crlSigner.getPeriod() > 0)
                 {
                     Date nextUpdate = new Date(thisUpdate.getTime() +
-                            (crlSigner.getPeriod() + crlSigner.getOverlap()) * MINUTE);
+                            crlSigner.getPeriod() * MINUTE);
                     crlBuilder.setNextUpdate(nextUpdate);
                 }
 

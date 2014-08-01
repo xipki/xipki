@@ -61,10 +61,10 @@ public class P12CertRequestGenCommand extends P12SecurityCommand
             hashAlgo = "SHA256";
         }
 
-        char[] pwd = readPasswordIfNotSet(password);
         ASN1ObjectIdentifier sigAlgOid;
 
         KeyStore keystore = getKeyStore();
+        char[] pwd = getPassword();
         boolean ec = isEcKey(keystore, pwd);
 
         hashAlgo = hashAlgo.trim().toUpperCase();
