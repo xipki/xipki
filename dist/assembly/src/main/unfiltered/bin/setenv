@@ -70,6 +70,7 @@ KARAF_OPTS="$KARAF_OPTS -Dmy.http.port=8080"
 KARAF_OPTS="$KARAF_OPTS -Dmy.rmiServerPort=44444"
 KARAF_OPTS="$KARAF_OPTS -Dmy.rmiRegistryPort=1099"
 KARAF_OPTS="$KARAF_OPTS -Dmy.ssh.port=8101"
+KARAF_OPTS="$KARAF_OPTS -Dorg.xipki.console.ignore.regex=\..*"
 
 export LD_LIBRARY_PATH=$NATIVE_LIB:$LD_LIBRARY_PATH
 export KARAF_OPTS
