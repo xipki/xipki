@@ -21,13 +21,20 @@
       <maxLen>32</maxLen>
     </nonce>
     <signatureRequired>false</signatureRequired>
-    <validateSignature>false</validateSignature>
+    <validateSignature>true</validateSignature>
     <hashAlgorithms>
       <algorithm>SHA1</algorithm>
       <algorithm>SHA256</algorithm>
       <algorithm>SHA384</algorithm>
       <algorithm>SHA512</algorithm>
     </hashAlgorithms>
+    <trustAnchors>
+    	<keystore>
+    		<type>JKS</type>
+    		<uri>file:etc/tlskeys/tls-server-truststore.jks</uri>
+    		<password>1234</password>
+    	</keystore>
+    </trustAnchors>
   </request>
   <response>
     <noRevReason>false</noRevReason>
