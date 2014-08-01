@@ -203,11 +203,14 @@ public class IoCertUtil
     public static byte[] read(File file)
     throws IOException
     {
-        FileInputStream in = null;
+        return read(new FileInputStream(file));
+    }
 
+    public static byte[] read(InputStream in)
+    throws IOException
+    {
         try
         {
-            in = new FileInputStream(file);
             ByteArrayOutputStream bout = new ByteArrayOutputStream();
             int readed = 0;
             byte[] buffer = new byte[2048];
@@ -253,11 +256,23 @@ public class IoCertUtil
     private static CertificateFactory certFact;
     private static Object certFactLock = new Object();
 
-    public static X509Certificate parseCert(String f)
+    public static X509Certificate parseCert(String fileName)
     throws IOException, CertificateException
     {
-        return parseCert(new FileInputStream(f));
+        return parseCert(new File(fileName));
+    }
 
+    public static X509Certificate parseCert(File file)
+    throws IOException, CertificateException
+    {
+        FileInputStream in = new FileInputStream(file);
+        try
+        {
+            return parseCert(in);
+        }finally
+        {
+            in.close();
+        }
     }
 
     public static X509Certificate parseCert(byte[] certBytes)
