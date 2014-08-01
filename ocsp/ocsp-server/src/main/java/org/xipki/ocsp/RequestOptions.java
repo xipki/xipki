@@ -25,10 +25,12 @@ import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.bouncycastle.x509.ExtendedPKIXBuilderParameters;
 import org.xipki.ocsp.conf.jaxb.CertCollectionType;
 import org.xipki.ocsp.conf.jaxb.CertCollectionType.Keystore;
 import org.xipki.ocsp.conf.jaxb.NonceType;
 import org.xipki.ocsp.conf.jaxb.RequestType;
+import org.xipki.ocsp.conf.jaxb.RequestType.CertpathValidation;
 import org.xipki.ocsp.conf.jaxb.RequestType.HashAlgorithms;
 import org.xipki.security.common.HashAlgoType;
 import org.xipki.security.common.IoCertUtil;
@@ -59,6 +61,7 @@ class RequestOptions
     private final Set<HashAlgoType> hashAlgos;
     private final Set<TrustAnchor> trustAnchors;
     private final CertStore certs;
+    private final int certpathValidationModel;
 
     public RequestOptions(RequestType conf)
     throws OcspResponderException
@@ -116,22 +119,34 @@ class RequestOptions
             hashAlgos.addAll(supportedHashAlgorithms);
         }
 
-        // keystore
-        CertCollectionType trustStoreType = conf.getTrustAnchors();
-        if(trustStoreType == null)
+        // certpath validiation
+        CertpathValidation certpathConf = conf.getCertpathValidation();
+        if(certpathConf == null)
         {
             if(validateSignature)
             {
-                throw new OcspResponderException("TrustAnchor is not specified");
+                throw new OcspResponderException("certpathValidation is not specified");
             }
             trustAnchors = null;
             certs = null;
+            certpathValidationModel = ExtendedPKIXBuilderParameters.PKIX_VALIDITY_MODEL;
         }
         else
         {
+            switch(certpathConf.getValidationModel())
+            {
+                case CHAIN:
+                    certpathValidationModel = ExtendedPKIXBuilderParameters.CHAIN_VALIDITY_MODEL;
+                    break;
+                case PKIX:
+                    certpathValidationModel = ExtendedPKIXBuilderParameters.PKIX_VALIDITY_MODEL;
+                    break;
+                default:
+                    throw new RuntimeException("should not reach here");
+            }
             try
             {
-                Set<X509Certificate> certs = getCerts(trustStoreType);
+                Set<X509Certificate> certs = getCerts(certpathConf.getTrustAnchors());
                 Set<TrustAnchor> _trustAnchors = new HashSet<TrustAnchor>();
                 for(X509Certificate cert : certs)
                 {
@@ -143,7 +158,7 @@ class RequestOptions
                 throw new OcspResponderException("Error while initializing the trustAnchors: " + e.getMessage(), e);
             }
 
-            CertCollectionType certsType = conf.getCerts();
+            CertCollectionType certsType = certpathConf.getCerts();
             if(certsType == null)
             {
                 this.certs = null;
@@ -196,6 +211,11 @@ class RequestOptions
     public boolean allows(HashAlgoType hashAlgo)
     {
         return hashAlgos.contains(hashAlgo);
+    }
+
+    public int getCertpathValidationModel()
+    {
+        return certpathValidationModel;
     }
 
     public Set<TrustAnchor> getTrustAnchors()

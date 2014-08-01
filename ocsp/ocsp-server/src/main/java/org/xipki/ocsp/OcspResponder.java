@@ -632,6 +632,7 @@ public class OcspResponder
                     Set<TrustAnchor> trustAnchors = requestOptions.getTrustAnchors();
                     ExtendedPKIXBuilderParameters cpp = new ExtendedPKIXBuilderParameters(trustAnchors, certSelector);
                     cpp.setRevocationEnabled(false);
+                    cpp.setValidityModel(requestOptions.getCertpathValidationModel());
                     CertStore additionalCertStore;
                     try
                     {

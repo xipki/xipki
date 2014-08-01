@@ -28,13 +28,16 @@
       <algorithm>SHA384</algorithm>
       <algorithm>SHA512</algorithm>
     </hashAlgorithms>
-    <trustAnchors>
-    	<keystore>
-    		<type>JKS</type>
-    		<uri>file:etc/tlskeys/tls-server-truststore.jks</uri>
-    		<password>1234</password>
-    	</keystore>
-    </trustAnchors>
+    <certpathValidation>
+      <validationModel>PKIX</validationModel>
+      <trustAnchors>
+        <keystore>
+          <type>JKS</type>
+          <uri>file:etc/tlskeys/tls-server-truststore.jks</uri>
+          <password>1234</password>
+        </keystore>
+      </trustAnchors>
+    </certpathValidation>
   </request>
   <response>
     <noRevReason>false</noRevReason>
