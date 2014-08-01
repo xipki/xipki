@@ -111,8 +111,25 @@
 						<xs:element name="algorithm" type="xs:string" maxOccurs="unbounded"/>
 					</xs:sequence>
 				</xs:complexType>
-			</xs:element>			
+			</xs:element>
+			<xs:element name="trustAnchors" type="certCollectionType" minOccurs="0"/>
+			<xs:element name="certs" type="certCollectionType" minOccurs="0"/>
 		</xs:sequence>
+	</xs:complexType>
+
+	<xs:complexType name="certCollectionType">
+		<xs:choice>
+			<xs:element name="dir" type="xs:string" />
+			<xs:element name="keystore">
+				<xs:complexType>
+					<xs:all>
+						<xs:element name="type" type="xs:string"/>
+						<xs:element name="uri" type="xs:anyURI" minOccurs="0"/>						
+						<xs:element name="password" type="xs:string" minOccurs="0"/>
+					</xs:all>
+				</xs:complexType>
+			</xs:element> 
+		</xs:choice>
 	</xs:complexType>
 
 	<xs:complexType name="responseType">

@@ -11,10 +11,21 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
 import java.security.Security;
+import java.security.cert.CertPath;
+import java.security.cert.CertPathBuilder;
+import java.security.cert.CertPathBuilderException;
+import java.security.cert.CertPathBuilderResult;
+import java.security.cert.CertStore;
+import java.security.cert.CertStoreParameters;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateException;
+import java.security.cert.CollectionCertStoreParameters;
+import java.security.cert.TrustAnchor;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Date;
@@ -58,9 +69,12 @@ import org.bouncycastle.cert.ocsp.RespID;
 import org.bouncycastle.cert.ocsp.RevokedStatus;
 import org.bouncycastle.cert.ocsp.UnknownStatus;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
+import org.bouncycastle.jce.provider.X509CertificateObject;
 import org.bouncycastle.operator.ContentSigner;
 import org.bouncycastle.operator.ContentVerifierProvider;
 import org.bouncycastle.util.encoders.Hex;
+import org.bouncycastle.x509.ExtendedPKIXBuilderParameters;
+import org.bouncycastle.x509.X509CertStoreSelector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.audit.api.AuditEvent;
@@ -132,6 +146,7 @@ public class OcspResponder
     private Set<String> excludeCertProfiles;
 
     private AuditLoggingServiceRegister auditServiceRegister;
+    private CertPathBuilder certpathBuilder;
 
     public OcspResponder()
     {
@@ -235,6 +250,20 @@ public class OcspResponder
 
         // RequestOptions
         this.requestOptions = new RequestOptions(conf.getRequest());
+
+        if(this.requestOptions.isValidateSignature())
+        {
+            try
+            {
+                this.certpathBuilder = CertPathBuilder.getInstance("PKIX", "BC");
+            } catch (NoSuchAlgorithmException e)
+            {
+                throw new OcspResponderException(e.getMessage(), e);
+            } catch (NoSuchProviderException e)
+            {
+                throw new OcspResponderException(e.getMessage(), e);
+            }
+        }
 
         // CertHash hash algorithm of the response
         HashAlgoType certHashAlgo = null;
@@ -582,6 +611,70 @@ public class OcspResponder
                     if(sigValid == false)
                     {
                         String message = "request signature is invalid";
+                        LOG.warn(message);
+                        if(auditEvent != null)
+                        {
+                            fillAuditEvent(auditEvent, AuditLevel.INFO, AuditStatus.FAILED, message);
+                        }
+                        return createUnsuccessfullOCSPResp(OcspResponseStatus.malformedRequest);
+                    }
+
+                    // validate the certPath
+                    List<X509Certificate> x509Certs = new ArrayList<>(certs.length);
+                    for(X509CertificateHolder cert : certs)
+                    {
+                        x509Certs.add(new X509CertificateObject(cert.toASN1Structure()));
+                    }
+
+                    X509CertStoreSelector certSelector = new X509CertStoreSelector();
+                    certSelector.setCertificateValid(new Date());
+                    certSelector.setCertificate(x509Certs.get(0));
+                    Set<TrustAnchor> trustAnchors = requestOptions.getTrustAnchors();
+                    ExtendedPKIXBuilderParameters cpp = new ExtendedPKIXBuilderParameters(trustAnchors, certSelector);
+
+                    CertStore additionalCertStore;
+                    try
+                    {
+                        CertStoreParameters csp = new CollectionCertStoreParameters(x509Certs);
+                        additionalCertStore = CertStore.getInstance("Collection", csp, "BC");
+                    }catch(Exception e)
+                    {
+                        throw new OcspResponderException("Error while initializing the CertStore of type Collection: "
+                                + e.getMessage(), e);
+                    }
+                    cpp.addCertStore(additionalCertStore);
+
+                    if(requestOptions.getCerts() != null)
+                    {
+                        cpp.addCertStore(requestOptions.getCerts());
+                    }
+
+                    CertPathBuilderResult result;
+                    try
+                    {
+                        result = certpathBuilder.build(cpp);
+                    }catch(CertPathBuilderException | InvalidAlgorithmParameterException e)
+                    {
+                        LogUtil.logWarnThrowable(LOG, "could not build certpath for the request's signer certifcate", e);
+                        String message = "could not build certpath for the request's signer certifcate";
+                        if(auditEvent != null)
+                        {
+                            fillAuditEvent(auditEvent, AuditLevel.INFO, AuditStatus.FAILED, message);
+                        }
+                        return createUnsuccessfullOCSPResp(OcspResponseStatus.malformedRequest);
+                    }
+
+                    CertPath certPath = result.getCertPath();
+
+                    boolean pathValid = true;
+                    if(certPath.getCertificates().isEmpty())
+                    {
+                        pathValid = false;
+                    }
+
+                    if(pathValid == false)
+                    {
+                        String message = "could not build certpath for the request's signer certifcate";
                         LOG.warn(message);
                         if(auditEvent != null)
                         {
