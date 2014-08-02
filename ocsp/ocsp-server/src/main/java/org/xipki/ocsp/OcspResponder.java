@@ -140,6 +140,7 @@ public class OcspResponder
     private OCSPResponderType conf;
     private RequestOptions requestOptions;
     private boolean noRevReason =  false;
+    private boolean includeInvalidityDate = false;
     private boolean auditResponse = false;
     private boolean supportsHttpGet = false;
     private final Map<String, String> auditCertprofileMapping = new ConcurrentHashMap<>();
@@ -237,12 +238,19 @@ public class OcspResponder
         }
 
         noRevReason = false;
+        includeInvalidityDate = true;
         if(conf.getResponse() != null)
         {
             Boolean b = conf.getResponse().isNoRevReason();
             if(b != null)
             {
                 noRevReason = b.booleanValue();
+            }
+
+            b = conf.getResponse().isIncludeInvalidityDate();
+            if(b != null)
+            {
+                includeInvalidityDate = b.booleanValue();
             }
         }
 
@@ -822,6 +830,8 @@ public class OcspResponder
                 }
                 Date nextUpdate = certStatusInfo.getNextUpdate();
 
+                List<Extension> extensions = new LinkedList<>();
+
                 boolean unknownAsRevoked = false;
                 CertificateStatus bcCertStatus = null;
                 switch(certStatusInfo.getCertStatus())
@@ -857,10 +867,17 @@ public class OcspResponder
                         }
                         RevokedInfo _revInfo = new RevokedInfo(revTime, _reason);
                         bcCertStatus = new RevokedStatus(_revInfo);
+
+                        Date invalidityDate = revInfo.getInvalidityTime();
+                        if(includeInvalidityDate && invalidityDate != null && invalidityDate.equals(revTime) == false)
+                        {
+                            Extension extension = new Extension(Extension.invalidityDate,
+                                    false, new ASN1GeneralizedTime(invalidityDate).getEncoded());
+                            extensions.add(extension);
+                        }
                         break;
                 }
 
-                List<Extension> extensions = new LinkedList<>();
                 byte[] certHash = certStatusInfo.getCertHash();
                 if(certHash != null)
                 {

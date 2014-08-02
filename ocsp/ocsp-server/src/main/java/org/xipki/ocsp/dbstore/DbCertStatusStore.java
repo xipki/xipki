@@ -368,8 +368,14 @@ public class DbCertStatusStore extends CertStatusStore
                             int reason = rs.getInt("REV_REASON");
                             long revocationTime = rs.getLong("REV_TIME");
                             long invalidatityTime = rs.getLong("REV_INVALIDITY_TIME");
+
+                            Date invTime = null;
+                            if(invalidatityTime != 0 && invalidatityTime != revocationTime)
+                            {
+                                invTime = new Date(invalidatityTime * 1000);
+                            }
                             CertRevocationInfo revInfo = new CertRevocationInfo(reason, new Date(revocationTime * 1000),
-                                    new Date(invalidatityTime * 1000));
+                                    invTime);
                             certStatusInfo = CertStatusInfo.getRevokedCertStatusInfo(revInfo, certHashAlgo, certHash,
                                     thisUpdate, null, certprofile);
                         }
