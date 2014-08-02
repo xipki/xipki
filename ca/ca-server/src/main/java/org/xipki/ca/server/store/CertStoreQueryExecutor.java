@@ -892,8 +892,10 @@ class CertStoreQueryExecutor
                     long rev_time = rs.getLong(col_rev_time);
                     long invalidity_time = rs.getLong(col_rev_invalidity_time);
 
+                    Date invalidityTime = (invalidity_time == 0 || invalidity_time == rev_time) ?
+                            null : new Date(invalidity_time * 1000);
                     CertRevocationInfo revInfo = new CertRevocationInfo(rev_reason,
-                            new Date(rev_time * 1000), new Date(invalidity_time * 1000));
+                            new Date(rev_time * 1000), invalidityTime);
                     certInfo.setRevocationInfo(revInfo);
                 }
 
@@ -1008,9 +1010,10 @@ class CertStoreQueryExecutor
                     int rev_reason = rs.getInt("REV_REASON");
                     long rev_time = rs.getLong("REV_TIME");
                     long rev_invalidity_time = rs.getLong("REV_INVALIDITY_TIME");
+                    Date invalidityTime = rev_invalidity_time == 0 ? null : new Date(1000 * rev_invalidity_time);
                     revInfo = new CertRevocationInfo(CRLReason.forReasonCode(rev_reason),
                             new Date(1000 * rev_time),
-                            new Date(1000 * rev_invalidity_time));
+                            invalidityTime);
                 }
 
                 X509CertificateWithMetaInfo certWithMeta = new X509CertificateWithMetaInfo(cert, certBytes);
@@ -1087,8 +1090,9 @@ class CertStoreQueryExecutor
                     long rev_time = rs.getLong(col_rev_time);
                     long invalidity_time = rs.getLong(col_rev_invalidity_time);
 
+                    Date invalidityTime = invalidity_time == 0 ? null : new Date(invalidity_time * 1000);
                     CertRevocationInfo revInfo = new CertRevocationInfo(rev_reason,
-                            new Date(rev_time * 1000), new Date(invalidity_time * 1000));
+                            new Date(rev_time * 1000), invalidityTime);
                     certInfo.setRevocationInfo(revInfo);
                 }
 
@@ -1147,9 +1151,11 @@ class CertStoreQueryExecutor
                 int rev_reason = rs.getInt("REV_REASON");
                 long rev_time = rs.getLong("REV_TIME");
                 long rev_invalidity_time = rs.getLong("REV_INVALIDITY_TIME");
+
+                Date invalidityTime = rev_invalidity_time == 0 ? null :  new Date(1000 * rev_invalidity_time);
                 CertRevocationInfoWithSerial revInfo = new CertRevocationInfoWithSerial(
                         BigInteger.valueOf(serial),
-                        rev_reason, new Date(1000 * rev_time), new Date(1000 * rev_invalidity_time));
+                        rev_reason, new Date(1000 * rev_time), invalidityTime);
                 ret.add(revInfo);
             }
 

@@ -41,6 +41,7 @@
   </request>
   <response>
     <noRevReason>false</noRevReason>
+    <includeInvalidityDate>true</includeInvalidityDate>
   </response>
   <!--certhashAlgorithm>SHA1</certhashAlgorithm-->
   <audit>

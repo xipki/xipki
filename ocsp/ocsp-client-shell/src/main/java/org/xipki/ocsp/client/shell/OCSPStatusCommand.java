@@ -174,6 +174,12 @@ public class OCSPStatusCommand extends AbstractOCSPStatusCommand
             {
                 RevokedStatus revStatus = (RevokedStatus) singleCertStatus;
                 Date revTime = revStatus.getRevocationTime();
+                Date invTime = null;
+                Extension ext = singleResp.getExtension(Extension.invalidityDate);
+                if(ext != null)
+                {
+                    invTime = ASN1GeneralizedTime.getInstance(ext.getParsedValue()).getDate();
+                }
 
                 if(revStatus.hasRevocationReason())
                 {
@@ -186,8 +192,16 @@ public class OCSPStatusCommand extends AbstractOCSPStatusCommand
                     }
                     else
                     {
-                        status = "Revoked, reason = "+ CRLReason.forReasonCode(reason).getDescription() +
-                                ", revocationTime = " + revTime;
+                        StringBuilder sb = new StringBuilder("Revoked, reason = ");
+                        sb.append(CRLReason.forReasonCode(reason).getDescription());
+                        sb.append(", revocationTime = ");
+                        sb.append(revTime);
+                        if(invTime !=null)
+                        {
+                            sb.append(", invalidityTime = ");
+                            sb.append(invTime);
+                        }
+                        status = sb.toString();
                     }
                 }
                 else

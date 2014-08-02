@@ -376,7 +376,7 @@ public class X509CA
                 if(crlSigner.getPeriod() > 0)
                 {
                     Date nextUpdate = new Date(thisUpdate.getTime() +
-                            crlSigner.getPeriod() * MINUTE);
+                            (crlSigner.getPeriod() + crlSigner.getOverlap()) * MINUTE);
                     crlBuilder.setNextUpdate(nextUpdate);
                 }
 
@@ -421,11 +421,23 @@ public class X509CA
                         CRLReason reason = revInfo.getReason();
                         Date revocationTime = revInfo.getRevocationTime();
                         Date invalidityTime = revInfo.getInvalidityTime();
+                        if(invalidityTime != null && invalidityTime.equals(revocationTime))
+                        {
+                            invalidityTime = null;
+                        }
 
                         if(directCRL || isFirstCRLEntry == false)
                         {
-                            crlBuilder.addCRLEntry(revInfo.getSerial(), revocationTime,
-                                    reason.getCode(), invalidityTime);
+                            if(invalidityTime != null)
+                            {
+                                crlBuilder.addCRLEntry(revInfo.getSerial(), revocationTime,
+                                        reason.getCode(), invalidityTime);
+                            }
+                            else
+                            {
+                                crlBuilder.addCRLEntry(revInfo.getSerial(), revocationTime,
+                                        reason.getCode());
+                            }
                         }
                         else
                         {

@@ -397,6 +397,11 @@ public class CrlCertStatusStore extends CertStatusStore
                         {
                             throw new CertStatusStoreException(e);
                         }
+
+                        if(revTime.equals(invalidityTime))
+                        {
+                            invalidityTime = null;
+                        }
                     }
 
                     CertWithInfo cert = null;
