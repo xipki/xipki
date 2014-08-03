@@ -87,12 +87,14 @@ import org.xipki.audit.api.ChildAuditEvent;
 import org.xipki.audit.api.PCIAuditEvent;
 import org.xipki.database.api.DataSourceFactory;
 import org.xipki.database.api.DataSourceWrapper;
+import org.xipki.ocsp.OCSPRespWithCacheInfo.ResponseCacheInfo;
 import org.xipki.ocsp.api.CertStatus;
 import org.xipki.ocsp.api.CertStatusInfo;
 import org.xipki.ocsp.api.CertStatusStore;
 import org.xipki.ocsp.api.CertStatusStoreException;
 import org.xipki.ocsp.api.OCSPMode;
 import org.xipki.ocsp.conf.jaxb.AuditType;
+import org.xipki.ocsp.conf.jaxb.CacheType;
 import org.xipki.ocsp.conf.jaxb.CertstatusStoreType;
 import org.xipki.ocsp.conf.jaxb.CrlStoreType;
 import org.xipki.ocsp.conf.jaxb.CustomStoreType;
@@ -100,6 +102,7 @@ import org.xipki.ocsp.conf.jaxb.DbStoreType;
 import org.xipki.ocsp.conf.jaxb.MappingType;
 import org.xipki.ocsp.conf.jaxb.OCSPResponderType;
 import org.xipki.ocsp.conf.jaxb.ObjectFactory;
+import org.xipki.ocsp.conf.jaxb.ResponseType;
 import org.xipki.ocsp.conf.jaxb.SignerType;
 import org.xipki.ocsp.crlstore.CrlCertStatusStore;
 import org.xipki.ocsp.dbstore.DbCertStatusStore;
@@ -124,7 +127,7 @@ import org.xml.sax.SAXException;
 public class OcspResponder
 {
     private static final Logger LOG = LoggerFactory.getLogger(OcspResponder.class);
-
+    private static final long defaultCacheMaxAge = 60; // 1 minute
     private ResponderSigner responderSigner;
     private X509CertificateHolder[] certsInResp;
 
@@ -140,9 +143,10 @@ public class OcspResponder
     private OCSPResponderType conf;
     private RequestOptions requestOptions;
     private boolean noRevReason =  false;
-    private boolean includeInvalidityDate = false;
+    private boolean noInvalidityDate = false;
     private boolean auditResponse = false;
     private boolean supportsHttpGet = false;
+    private Long cacheMaxAge;
     private final Map<String, String> auditCertprofileMapping = new ConcurrentHashMap<>();
     private Set<String> excludeCertProfiles;
 
@@ -238,19 +242,26 @@ public class OcspResponder
         }
 
         noRevReason = false;
-        includeInvalidityDate = true;
+        noInvalidityDate = false;
         if(conf.getResponse() != null)
         {
-            Boolean b = conf.getResponse().isNoRevReason();
+            ResponseType respConf = conf.getResponse();
+            Boolean b = respConf.isNoRevReason();
             if(b != null)
             {
                 noRevReason = b.booleanValue();
             }
 
-            b = conf.getResponse().isIncludeInvalidityDate();
+            b = respConf.isNoInvalidityDate();
             if(b != null)
             {
-                includeInvalidityDate = b.booleanValue();
+                noInvalidityDate = b.booleanValue();
+            }
+
+            CacheType cacheConf = respConf.getCache();
+            if(cacheConf != null && cacheConf.getCacheMaxAge() != null)
+            {
+                this.cacheMaxAge = cacheConf.getCacheMaxAge().longValue();
             }
         }
 
@@ -575,7 +586,7 @@ public class OcspResponder
         auditLogPCIEvent(true, "SHUTDOWN");
     }
 
-    public OCSPResp answer(OCSPReq request, AuditEvent auditEvent)
+    public OCSPRespWithCacheInfo answer(OCSPReq request, AuditEvent auditEvent, boolean viaGet)
     {
         if(certStatusStores.isEmpty())
         {
@@ -707,6 +718,8 @@ public class OcspResponder
                 }
             }
 
+            boolean couldCacheInfo = viaGet;
+
             List<Extension> responseExtensions = new ArrayList<>(2);
 
             Req[] requestList = request.getRequestList();
@@ -735,6 +748,7 @@ public class OcspResponder
                     return createUnsuccessfullOCSPResp(OcspResponseStatus.malformedRequest);
                 }
 
+                couldCacheInfo = false;
                 responseExtensions.add(nonceExtn);
             }
             else if(requestOptions.isNonceRequired())
@@ -749,6 +763,9 @@ public class OcspResponder
             }
 
             boolean includeExtendedRevokeExtension = false;
+
+            long cacheThisUpdate = 0;
+            long cacheNextUpdate = Long.MAX_VALUE;
             for(int i = 0; i < n; i++)
             {
                 ChildAuditEvent childAuditEvent = null;
@@ -841,10 +858,12 @@ public class OcspResponder
                         break;
 
                     case ISSUER_UNKNOWN:
+                        couldCacheInfo = false;
                         bcCertStatus = new UnknownStatus();
                         break;
 
                     case UNKNOWN:
+                        couldCacheInfo = false;
                         if(ocspMode == OCSPMode.RFC2560)
                         {
                             bcCertStatus = new UnknownStatus();
@@ -869,7 +888,7 @@ public class OcspResponder
                         bcCertStatus = new RevokedStatus(_revInfo);
 
                         Date invalidityDate = revInfo.getInvalidityTime();
-                        if(includeInvalidityDate && invalidityDate != null && invalidityDate.equals(revTime) == false)
+                        if((noInvalidityDate || invalidityDate == null || invalidityDate.equals(revTime)) == false)
                         {
                             Extension extension = new Extension(Extension.invalidityDate,
                                     false, new ASN1GeneralizedTime(invalidityDate).getEncoded());
@@ -961,8 +980,14 @@ public class OcspResponder
                     sb.append("certHash: ").append(hexCertHash);
                     LOG.debug(sb.toString());
                 }
+
                 basicOcspBuilder.addResponse(certID, bcCertStatus, thisUpdate, nextUpdate,
                         extensions.isEmpty() ? null : new Extensions(extensions.toArray(new Extension[0])));
+                cacheThisUpdate = Math.max(cacheThisUpdate, thisUpdate.getTime());
+                if(nextUpdate != null)
+                {
+                    cacheNextUpdate = Math.min(cacheNextUpdate, nextUpdate.getTime());
+                }
             }
 
             if(includeExtendedRevokeExtension)
@@ -1015,7 +1040,21 @@ public class OcspResponder
             OCSPRespBuilder ocspRespBuilder = new OCSPRespBuilder();
             try
             {
-                return ocspRespBuilder.build(OcspResponseStatus.successfull.getStatus(), basicOcspResp);
+                OCSPResp ocspResp = ocspRespBuilder.build(OcspResponseStatus.successfull.getStatus(), basicOcspResp);
+
+                if(couldCacheInfo)
+                {
+                    ResponseCacheInfo cacheInfo = new ResponseCacheInfo(cacheThisUpdate);
+                    if(cacheNextUpdate != Long.MAX_VALUE)
+                    {
+                        cacheInfo.setNextUpdate(cacheNextUpdate);
+                    }
+                    return new OCSPRespWithCacheInfo(ocspResp, cacheInfo);
+                }
+                else
+                {
+                    return new OCSPRespWithCacheInfo(ocspResp, null);
+                }
             } catch (OCSPException e)
             {
                 LogUtil.logErrorThrowable(LOG, "answer() ocspRespBuilder.build", e);
@@ -1041,10 +1080,11 @@ public class OcspResponder
         }
     }
 
-    private static OCSPResp createUnsuccessfullOCSPResp(OcspResponseStatus status)
+    private static OCSPRespWithCacheInfo createUnsuccessfullOCSPResp(OcspResponseStatus status)
     {
-        return new OCSPResp(new OCSPResponse(
+        OCSPResp resp = new OCSPResp(new OCSPResponse(
                 new org.bouncycastle.asn1.ocsp.OCSPResponseStatus(status.getStatus()), null));
+        return new OCSPRespWithCacheInfo(resp, null);
     }
 
     public void setSecurityFactory(SecurityFactory securityFactory)
@@ -1184,6 +1224,21 @@ public class OcspResponder
     public boolean supportsHttpGet()
     {
         return supportsHttpGet;
+    }
+
+    public int getMaxRequestSize()
+    {
+        return requestOptions.getMaxRequestSize();
+    }
+
+    public Long getCachMaxAge()
+    {
+        return cacheMaxAge;
+    }
+
+    public long getDefaultCacheMaxAge()
+    {
+        return defaultCacheMaxAge;
     }
 
     private static boolean getBoolean(Boolean b, boolean defaultValue)

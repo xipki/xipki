@@ -98,6 +98,7 @@
 	</xs:complexType>
 	<xs:complexType name="requestType">
 		<xs:sequence>
+			<xs:element name="maxRequestSize" type="xs:int" minOccurs="0"/>
 			<xs:element name="nonce" type="nonceType" minOccurs="0"/>
 			<xs:element name="signatureRequired" type="xs:boolean"/>
 			<xs:element name="validateSignature" type="xs:boolean"/>
@@ -142,14 +143,15 @@
 	<xs:complexType name="responseType">
 		<xs:all>
 			<xs:element name="noRevReason" type="xs:boolean" minOccurs="0"/>
-			<xs:element name="includeInvalidityDate" type="xs:boolean" minOccurs="0">
+			<xs:element name="noInvalidityDate" type="xs:boolean" minOccurs="0">
 				<xs:annotation>
 					<xs:documentation>
-						Whether to include extension InvalidityDate in OCSP response.
+						Whether not to include extension InvalidityDate in OCSP response.
 						The default is false. 
 					</xs:documentation>
 				</xs:annotation>
 			</xs:element>
+			<xs:element name="cache" type="cacheType" minOccurs="0"/>
 		</xs:all>
 	</xs:complexType>
 	<xs:complexType name="nonceType">
@@ -159,6 +161,18 @@
 			<xs:element name="maxLen" type="xs:int" minOccurs="0"/>
 		</xs:sequence>
 	</xs:complexType>
+	<xs:complexType name="cacheType">
+		<xs:sequence>
+			<xs:element name="cacheMaxAge" type="xs:int" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>
+						max-age in seconds. Only useful for OCSP request sent by HTTP GET. 
+					</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	
 	<xs:complexType name="auditType">
 		<xs:sequence>
 			<xs:element name="enabled" type="xs:boolean"/>
