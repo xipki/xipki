@@ -55,6 +55,7 @@ class RequestOptions
     private final boolean signatureRequired;
     private final boolean validateSignature;
 
+    private final int maxRequestSize;
     private final boolean nonceRequired;
     private final int nonceMinLen;
     private final int nonceMaxLen;
@@ -91,6 +92,18 @@ class RequestOptions
         {
             nonceRequired = false;
         }
+
+        int _maxSize = 0;
+        if(conf.getMaxRequestSize() != null)
+        {
+            _maxSize = conf.getMaxRequestSize().intValue();
+        }
+
+        if(_maxSize < 255)
+        {
+            _maxSize = 4 * 1024; // 4 KB
+        }
+        this.maxRequestSize = _maxSize;
 
         this.nonceMinLen = minLen;
         this.nonceMaxLen = maxLen;
@@ -196,6 +209,11 @@ class RequestOptions
     public boolean isNonceRequired()
     {
         return nonceRequired;
+    }
+
+    public int getMaxRequestSize()
+    {
+        return maxRequestSize;
     }
 
     public int getNonceMinLen()

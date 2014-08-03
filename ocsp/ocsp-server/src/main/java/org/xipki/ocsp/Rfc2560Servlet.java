@@ -30,6 +30,8 @@ import org.xipki.audit.api.AuditLevel;
 import org.xipki.audit.api.AuditLoggingService;
 import org.xipki.audit.api.AuditLoggingServiceRegister;
 import org.xipki.audit.api.AuditStatus;
+import org.xipki.ocsp.OCSPRespWithCacheInfo.ResponseCacheInfo;
+import org.xipki.security.common.IoCertUtil;
 import org.xipki.security.common.LogUtil;
 
 /**
@@ -44,10 +46,6 @@ public class Rfc2560Servlet extends HttpServlet
 
     private static final String CT_REQUEST  = "application/ocsp-request";
     private static final String CT_RESPONSE = "application/ocsp-response";
-
-    private static final int maxGetRequestLen = 255;
-
-    private int maxRequestLength = 4096;
 
     private AuditLoggingServiceRegister auditServiceRegister;
 
@@ -130,7 +128,9 @@ public class Rfc2560Servlet extends HttpServlet
                     servletPath += "/";
                 }
 
-                if(requestURI.length() > maxGetRequestLen + servletPath.length())
+                // RFC2560 A.1.1 specifies that request longer than 255 bytes SHOULD be sent by POST,
+                // we support GET for longer requests anyway.
+                if(requestURI.length() > responder.getMaxRequestSize() + servletPath.length())
                 {
                     response.setContentLength(0);
                     response.setStatus(HttpServletResponse.SC_REQUEST_ENTITY_TOO_LARGE);
@@ -168,7 +168,7 @@ public class Rfc2560Servlet extends HttpServlet
                 }
 
                 // request too long
-                if(request.getContentLength() > maxRequestLength)
+                if(request.getContentLength() > responder.getMaxRequestSize())
                 {
                     response.setContentLength(0);
                     response.setStatus(HttpServletResponse.SC_REQUEST_ENTITY_TOO_LARGE);
@@ -186,8 +186,8 @@ public class Rfc2560Servlet extends HttpServlet
 
             response.setContentType(Rfc2560Servlet.CT_RESPONSE);
 
-            OCSPResp ocspResp = responder.answer(ocspReq, auditEvent);
-            if (ocspResp == null)
+            OCSPRespWithCacheInfo ocspRespWithCacheInfo = responder.answer(ocspReq, auditEvent, getMethod);
+            if (ocspRespWithCacheInfo == null)
             {
                 auditMessage = "processRequest returned null, this should not happen";
                 LOG.error(auditMessage);
@@ -199,9 +199,48 @@ public class Rfc2560Servlet extends HttpServlet
             }
             else
             {
-                byte[] encodedOcspResp = ocspResp.getEncoded();
+                OCSPResp resp =ocspRespWithCacheInfo.getResponse();
+                byte[] encodedOcspResp = resp.getEncoded();
                 response.setStatus(HttpServletResponse.SC_OK);
                 response.setContentLength(encodedOcspResp.length);
+
+                ResponseCacheInfo cacheInfo = ocspRespWithCacheInfo.getCacheInfo();
+                if(getMethod && cacheInfo != null)
+                {
+                    long now = System.currentTimeMillis();
+                    // RFC 5019 6.2: Date: The date and time at which the OCSP server generated the HTTP response.
+                    response.setDateHeader("Date", now);
+                    // RFC 5019 6.2: Last-Modified: date and time at which the OCSP responder last modified the response.
+                    response.setDateHeader("Last-Modified", cacheInfo.getThisUpdate());
+                    // RFC 5019 6.2: Expires: This date and time will be the same as the nextUpdate time-stamp in the OCSP
+                    // response itself.
+                    // This is overridden by max-age on HTTP/1.1 compatible components
+                    if(cacheInfo.getNextUpdate() != null)
+                    {
+                        response.setDateHeader("Expires", cacheInfo.getNextUpdate());
+                    }
+                    // RFC 5019 6.2: This profile RECOMMENDS that the ETag value be the ASCII HEX representation of the
+                    // SHA1 hash of the OCSPResponse structure.
+                    response.setHeader("ETag", "\"" + IoCertUtil.sha1sum(encodedOcspResp).toLowerCase() + "\"");
+
+                    // Max age must be in seconds in the cache-control header
+                    long maxAge;
+                    if(responder.getCachMaxAge() != null)
+                    {
+                        maxAge = responder.getCachMaxAge().longValue();
+                    }
+                    else
+                    {
+                        maxAge = responder.getDefaultCacheMaxAge();
+                    }
+
+                    if(cacheInfo.getNextUpdate() != null)
+                    {
+                        maxAge = Math.min(maxAge, (cacheInfo.getNextUpdate() - cacheInfo.getThisUpdate()) / 1000);
+                    }
+
+                    response.setHeader("Cache-Control", "max-age=" + maxAge + ",public,no-transform,must-revalidate");
+                }
                 response.getOutputStream().write(encodedOcspResp);
             }
         }catch(Throwable t)
@@ -268,16 +307,6 @@ public class Rfc2560Servlet extends HttpServlet
             }
         }
 
-    }
-
-    public int getMaxRequestLength()
-    {
-        return maxRequestLength;
-    }
-
-    public void setMaxRequestLength(int maxRequestLength)
-    {
-        this.maxRequestLength = maxRequestLength;
     }
 
     public void setAuditServiceRegister(AuditLoggingServiceRegister auditServiceRegister)

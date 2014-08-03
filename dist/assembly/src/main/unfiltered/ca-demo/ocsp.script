@@ -7,35 +7,98 @@ features:install xipki-ocspclient-shell
 # Wait one second
 sleep 1000
 
-echo "===== expected: Good ====="
-ocsp:status -cacert output/RCA1.der -cert output/SubCA1.der -v -sign
+## POST
+echo "===== expected: Good (POST) ====="
+ocsp:status -cacert output/RCA1.der -cert output/SubCA1.der -v
 
-echo "===== expected: Good ====="
+echo "===== expected: Good (POST) ====="
 ocsp:status -cacert output/SubCA1.der -cert output/TLS1.der -v
 
-echo "===== expected: Revoked, reason = affiliationChanged ====="
-ocsp:status -cacert output/SubCA1.der -cert output/TLS2.der -v -sign
+echo "===== expected: Revoked, reason = affiliationChanged (POST) ====="
+ocsp:status -cacert output/SubCA1.der -cert output/TLS2.der -v
 
-echo "===== expected: Good ====="
+echo "===== expected: Good (POST) ====="
 ocsp:status -cacert output/SubCA1.der -cert output/TLS_C1.der -v
 
-echo "===== expected: Revoked, reason = affiliationChanged ====="
-ocsp:status -cacert output/SubCA1.der -cert output/TLS_C2.der -v -sign
+echo "===== expected: Revoked, reason = affiliationChanged (POST) ====="
+ocsp:status -cacert output/SubCA1.der -cert output/TLS_C2.der -v
 
-echo "===== expected: Good ====="
+echo "===== expected: Good (POST) ====="
 ocsp:status -cacert output/SubCAwithCRL1.der -cert output/OCSP1.der -v
 
-echo "===== expected: Revoked, reason = keyCompromise ====="
-ocsp:status -cacert output/SubCAwithCRL1.der -cert output/OCSP2.der -v -sign
+echo "===== expected: Revoked, reason = keyCompromise (POST) ====="
+ocsp:status -cacert output/SubCAwithCRL1.der -cert output/OCSP2.der -v
 
-echo "===== expected: Good ====="
+echo "===== expected: Good (POST) ====="
 ocsp:status -cacert output/SubCAwithCRL1.der -serial 99999 -v
 
-echo "===== expected: Unknown (RFC6960) ====="
+echo "===== expected: Unknown (RFC6960) (POST) ====="
 ocsp:status -cacert output/SubCA1.der -serial 99999 -v
 
-echo "===== expected: Unknown (RFC2560) ====="
+echo "===== expected: Unknown (RFC2560) (POST) ====="
 ocsp:status -cacert output/TLS1.der -serial 2 -v
+
+## GET
+echo "===== expected: Good (GET) ====="
+ocsp:status -cacert output/RCA1.der -cert output/SubCA1.der -v -httpget
+
+echo "===== expected: Good (GET) ====="
+ocsp:status -cacert output/SubCA1.der -cert output/TLS1.der -v -httpget
+
+echo "===== expected: Revoked, reason = affiliationChanged (GET) ====="
+ocsp:status -cacert output/SubCA1.der -cert output/TLS2.der -v -httpget
+
+echo "===== expected: Good (GET) ====="
+ocsp:status -cacert output/SubCA1.der -cert output/TLS_C1.der -v -httpget
+
+echo "===== expected: Revoked, reason = affiliationChanged (GET) ====="
+ocsp:status -cacert output/SubCA1.der -cert output/TLS_C2.der -v -httpget
+
+echo "===== expected: Good (GET) ====="
+ocsp:status -cacert output/SubCAwithCRL1.der -cert output/OCSP1.der -v -httpget
+
+echo "===== expected: Revoked, reason = keyCompromise (GET) ====="
+ocsp:status -cacert output/SubCAwithCRL1.der -cert output/OCSP2.der -v -httpget
+
+echo "===== expected: Good (GET) ====="
+ocsp:status -cacert output/SubCAwithCRL1.der -serial 99999 -v -httpget
+
+echo "===== expected: Unknown (RFC6960) (GET) ====="
+ocsp:status -cacert output/SubCA1.der -serial 99999 -v -httpget
+
+echo "===== expected: Unknown (RFC2560) (GET) ====="
+ocsp:status -cacert output/TLS1.der -serial 2 -v -httpget
+
+## POST, SIGNED
+echo "===== expected: Good (POST, SIGNED) ====="
+ocsp:status -cacert output/RCA1.der -cert output/SubCA1.der -v -sign
+
+echo "===== expected: Good (POST, SIGNED) ====="
+ocsp:status -cacert output/SubCA1.der -cert output/TLS1.der -v -sign
+
+echo "===== expected: Revoked, reason = affiliationChanged (POST, SIGNED) ====="
+ocsp:status -cacert output/SubCA1.der -cert output/TLS2.der -v -sign
+
+echo "===== expected: Good (POST, SIGNED) ====="
+ocsp:status -cacert output/SubCA1.der -cert output/TLS_C1.der -v -sign
+
+echo "===== expected: Revoked, reason = affiliationChanged (POST, SIGNED) ====="
+ocsp:status -cacert output/SubCA1.der -cert output/TLS_C2.der -v -sign
+
+echo "===== expected: Good (POST, SIGNED) ====="
+ocsp:status -cacert output/SubCAwithCRL1.der -cert output/OCSP1.der -v -sign
+
+echo "===== expected: Revoked, reason = keyCompromise (POST, SIGNED) ====="
+ocsp:status -cacert output/SubCAwithCRL1.der -cert output/OCSP2.der -v -sign
+
+echo "===== expected: Good (POST, SIGNED) ====="
+ocsp:status -cacert output/SubCAwithCRL1.der -serial 99999 -v -sign
+
+echo "===== expected: Unknown (RFC6960) (POST, SIGNED) ====="
+ocsp:status -cacert output/SubCA1.der -serial 99999 -v -sign
+
+echo "===== expected: Unknown (RFC2560) (POST, SIGNED) ====="
+ocsp:status -cacert output/TLS1.der -serial 2 -v -sign
 
 features:uninstall xipki-ocspclient-shell
 features:uninstall xipki-ocspclient
