@@ -18,8 +18,8 @@
   <url>http://xipki.org</url>
   <licenses>
     <license>
-      <name>The Apache Software License, Version 2.0</name>
-      <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+      <name>TO-BE-DEFINE</name>
+      <url>http://TO-BE-DEFINE</url>
       <distribution>repo</distribution>
     </license>
   </licenses>
@@ -51,9 +51,9 @@
     <module>audit</module>
   </modules>
   <scm>
-    <connection>scm:git:git@github.com:xipki/XiPKI.git</connection>
-    <developerConnection>scm:git:git@github.com:xipki/XiPKI.git</developerConnection>
-    <url>git@github.com:xipki/XiPKI.git</url>
+    <connection>scm:git:git@github.com:xipki/xipki.git</connection>
+    <developerConnection>scm:git:git@github.com:xipki/xipki.git</developerConnection>
+    <url>git@github.com:xipki/xipki.git</url>
   </scm>
   <dependencyManagement>
     <dependencies>
