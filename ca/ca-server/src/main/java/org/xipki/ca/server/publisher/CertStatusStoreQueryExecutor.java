@@ -533,7 +533,12 @@ class CertStatusStoreQueryExecutor
             return true;
         }catch(Exception e)
         {
-            LogUtil.logErrorThrowable(LOG, "isHealthy()", e);
+            final String message = "isHealthy()";
+            if(LOG.isErrorEnabled())
+            {
+                LOG.error(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(), e.getMessage());
+            }
+            LOG.debug(message, e);
             return false;
         }
     }

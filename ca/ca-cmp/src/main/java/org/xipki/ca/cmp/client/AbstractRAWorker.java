@@ -105,7 +105,12 @@ public abstract class AbstractRAWorker
                     caPubs.add(getCertificate(cmpCaPub));
                 } catch (CertificateException e)
                 {
-                    LogUtil.logErrorThrowable(LOG, "Could not extract the caPub from CMPCertificate", e);
+                    final String message = "Could not extract the caPub from CMPCertificate";
+                    if(LOG.isErrorEnabled())
+                    {
+                        LOG.error(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(), e.getMessage());
+                    }
+                    LOG.debug(message, e);
                 }
             }
 

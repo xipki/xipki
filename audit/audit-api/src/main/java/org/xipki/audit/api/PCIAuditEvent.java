@@ -264,7 +264,7 @@ public class PCIAuditEvent
             interfaces = NetworkInterface.getNetworkInterfaces();
         } catch (SocketException e)
         {
-            return "UNKNON";
+            return "UNKNOWN";
         }
         while(interfaces.hasMoreElements())
         {

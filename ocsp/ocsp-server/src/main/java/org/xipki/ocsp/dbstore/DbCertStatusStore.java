@@ -28,8 +28,8 @@ import java.util.concurrent.TimeUnit;
 import org.bouncycastle.util.encoders.Hex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.database.api.DataSourceWrapper;
 import org.xipki.database.api.DataSourceFactory;
+import org.xipki.database.api.DataSourceWrapper;
 import org.xipki.ocsp.IssuerEntry;
 import org.xipki.ocsp.IssuerHashNameAndKey;
 import org.xipki.ocsp.IssuerStore;
@@ -274,7 +274,12 @@ public class DbCertStatusStore extends CertStatusStore
             }
         }catch(Exception e)
         {
-            LogUtil.logErrorThrowable(LOG, "Could not executing initIssuerStore()", e);
+            final String message = "Could not executing initializeStore()";
+            if(LOG.isErrorEnabled())
+            {
+                LOG.error(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(), e.getMessage());
+            }
+            LOG.debug(message, e);
             initializationFailed = true;
             initialized = true;
         }
@@ -510,7 +515,12 @@ public class DbCertStatusStore extends CertStatusStore
             }
         }catch(Exception e)
         {
-            LogUtil.logErrorThrowable(LOG, "isHealthy()", e);
+            final String message = "isHealthy()";
+            if(LOG.isErrorEnabled())
+            {
+                LOG.error(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(), e.getMessage());
+            }
+            LOG.debug(message, e);
             return false;
         }
     }

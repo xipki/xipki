@@ -81,12 +81,9 @@ class SunP11Identity implements Comparable<SunP11Identity>
             try
             {
                 this.rsaCipher = Cipher.getInstance(algorithm, p11Provider);
-            } catch (NoSuchAlgorithmException e)
+            } catch (NoSuchAlgorithmException | NoSuchPaddingException e)
             {
-                throw new SignerException("NoSuchAlgorithmException: " + e.getMessage(), e);
-            } catch (NoSuchPaddingException e)
-            {
-                throw new SignerException("NoSuchPaddingException: " + e.getMessage(), e);
+                throw new SignerException(e.getClass().getName() + ": " + e.getMessage(), e);
             }
             try
             {
@@ -204,12 +201,9 @@ class SunP11Identity implements Comparable<SunP11Identity>
             {
                 rsaCipher.update(hash);
                 return rsaCipher.doFinal();
-            } catch (IllegalBlockSizeException e)
+            } catch (IllegalBlockSizeException | BadPaddingException e)
             {
-                throw new SignerException("IllegalBlockSizeException: " + e.getMessage(), e);
-            } catch (BadPaddingException e)
-            {
-                throw new SignerException("BadPaddingException: " + e.getMessage(), e);
+                throw new SignerException(e.getClass().getName() + ": " + e.getMessage(), e);
             }
         }
     }

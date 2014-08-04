@@ -751,7 +751,12 @@ public class DefaultCertProfile extends AbstractCertProfile
             }
         }catch(RuntimeException e)
         {
-            LogUtil.logErrorThrowable(LOG, "RuntimeException", e);
+            final String message = "RuntimeException";
+            if(LOG.isErrorEnabled())
+            {
+                LOG.error(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(), e.getMessage());
+            }
+            LOG.debug(message, e);
             throw new CertProfileException("RuntimeException thrown while initializing certprofile: " + e.getMessage());
         }
     }
@@ -778,10 +783,7 @@ public class DefaultCertProfile extends AbstractCertProfile
                 rootElement = (JAXBElement<?>) jaxbUnmarshaller.unmarshal(
                         new ByteArrayInputStream(xmlConf.getBytes()));
             }
-            catch(JAXBException e)
-            {
-                throw new CertProfileException("parse profile failed, message: " + e.getMessage(), e);
-            } catch (SAXException e)
+            catch(JAXBException | SAXException e)
             {
                 throw new CertProfileException("parse profile failed, message: " + e.getMessage(), e);
             }

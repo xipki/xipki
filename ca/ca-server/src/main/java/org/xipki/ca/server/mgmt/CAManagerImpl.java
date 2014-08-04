@@ -243,15 +243,9 @@ public class CAManagerImpl implements CAManager
                         DataSourceWrapper datasource = dataSourceFactory.createDataSourceForFile(
                                 datasourceFile, passwordResolver);
                         this.dataSources.put(datasourceName, datasource);
-                    } catch (SQLException e)
+                    } catch (SQLException | PasswordResolverException | IOException e)
                     {
-                        throw new CAMgmtException("SQLException while paring datasoure " + datasourceFile, e);
-                    } catch (PasswordResolverException e)
-                    {
-                        throw new CAMgmtException("PasswordResolverException while paring datasoure " + datasourceFile, e);
-                    } catch (IOException e)
-                    {
-                        throw new CAMgmtException("IOException while paring datasoure " + datasourceFile, e);
+                        throw new CAMgmtException(e.getClass().getName() + " while paring datasoure " + datasourceFile, e);
                     }
                 }
             }
@@ -389,12 +383,14 @@ public class CAManagerImpl implements CAManager
             stmt = createStatement();
             stmt.execute("DELETE FROM CALOCK");
             successfull = true;
-        }catch(SQLException e)
+        }catch(SQLException | CAMgmtException e)
         {
-            LogUtil.logWarnThrowable(LOG, "Error in unlockCA()", e);
-        } catch (CAMgmtException e)
-        {
-            LogUtil.logWarnThrowable(LOG, "Error in unlockCA()", e);
+            final String message = "Error in unlockCA()";
+            if(LOG.isWarnEnabled())
+            {
+                LOG.warn(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(), e.getMessage());
+            }
+            LOG.debug(message, e);
         }finally
         {
             dataSource.releaseResources(stmt, null);
@@ -489,7 +485,12 @@ public class CAManagerImpl implements CAManager
                 init();
             }catch(Exception e)
             {
-                LogUtil.logErrorThrowable(LOG, "do_startCaSystem().init()", e);
+                final String message = "do_startCaSystem().init()";
+                if(LOG.isErrorEnabled())
+                {
+                    LOG.error(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(), e.getMessage());
+                }
+                LOG.debug(message, e);
                 return false;
             }
 
@@ -501,7 +502,12 @@ public class CAManagerImpl implements CAManager
                     entry.getCertProfile();
                 } catch (CertProfileException e)
                 {
-                    LogUtil.logErrorThrowable(LOG, "Invalid configuration for the certProfile " + entry.getName(), e);
+                    final String message = "Invalid configuration for the certProfile " + entry.getName();
+                    if(LOG.isErrorEnabled())
+                    {
+                        LOG.error(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(), e.getMessage());
+                    }
+                    LOG.debug(message, e);
                     return false;
                 }
             }
@@ -514,7 +520,12 @@ public class CAManagerImpl implements CAManager
                     entry.getCertPublisher();
                 } catch (CertPublisherException e)
                 {
-                    LogUtil.logErrorThrowable(LOG, "Invalid configuration for the certPublisher " + entry.getName(), e);
+                    final String message = "Invalid configuration for the certPublisher " + entry.getName();
+                    if(LOG.isErrorEnabled())
+                    {
+                        LOG.error(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(), e.getMessage());
+                    }
+                    LOG.debug(message, e);
                     return false;
                 }
             }
@@ -535,13 +546,14 @@ public class CAManagerImpl implements CAManager
                     {
                         responder.setCertificate(cmpSigner.getCertificate());
                     }
-                } catch (PasswordResolverException e)
+                } catch (PasswordResolverException | SignerException e)
                 {
-                    LogUtil.logErrorThrowable(LOG, "security.createSigner cmpResponder", e);
-                    return false;
-                } catch (SignerException e)
-                {
-                    LogUtil.logErrorThrowable(LOG, "security.createSigner cmpResponder", e);
+                    final String message = "security.createSigner cmpResponder";
+                    if(LOG.isErrorEnabled())
+                    {
+                        LOG.error(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(), e.getMessage());
+                    }
+                    LOG.debug(message, e);
                     return false;
                 }
             }
@@ -578,13 +590,14 @@ public class CAManagerImpl implements CAManager
                             {
                                 crlSignerEntry.setCertificate(identifiedSigner.getCertificate());
                             }
-                        } catch (PasswordResolverException e)
+                        } catch (PasswordResolverException | SignerException e)
                         {
-                            LogUtil.logErrorThrowable(LOG, "security.createSigner crlSigner (ca=" + caName + ")", e);
-                            return false;
-                        } catch (SignerException e)
-                        {
-                            LogUtil.logErrorThrowable(LOG, "security.createSigner crlSigner (ca=" + caName + ")", e);
+                            final String message = "security.createSigner crlSigner (ca=" + caName + ")";
+                            if(LOG.isErrorEnabled())
+                            {
+                                LOG.error(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(), e.getMessage());
+                            }
+                            LOG.debug(message, e);
                             return false;
                         }
                         caEntry.getPublicCAInfo().setCrlSignerCertificate(identifiedSigner.getCertificate());
@@ -595,7 +608,12 @@ public class CAManagerImpl implements CAManager
                         crlSigner = new CrlSigner(identifiedSigner, crlSignerEntry.getPeriod(), crlSignerEntry.getOverlap());
                     } catch (OperationException e)
                     {
-                        LogUtil.logErrorThrowable(LOG, "CrlSigner.<init> crlSigner (ca=" + caName + ")", e);
+                        final String message = "CrlSigner.<init> crlSigner (ca=" + caName + ")";
+                        if(LOG.isErrorEnabled())
+                        {
+                            LOG.error(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(), e.getMessage());
+                        }
+                        LOG.debug(message, e);
                         return false;
                     }
                     crlSigner.setIncludeCertsInCrl(crlSignerEntry.includeCertsInCRL());
@@ -609,13 +627,14 @@ public class CAManagerImpl implements CAManager
                             caEntry.getSignerType(), caEntry.getSignerConf(),
                             caEntry.getCertificate().getCert(),
                             passwordResolver);
-                } catch (PasswordResolverException e)
+                } catch (PasswordResolverException | SignerException e)
                 {
-                    LogUtil.logErrorThrowable(LOG, "security.createSigner caSigner (ca=" + caName + ")", e);
-                    return false;
-                } catch (SignerException e)
-                {
-                    LogUtil.logErrorThrowable(LOG, "security.createSigner caSigner (ca=" + caName + ")", e);
+                    final String message = "security.createSigner caSigner (ca=" + caName + ")";
+                    if(LOG.isErrorEnabled())
+                    {
+                        LOG.error(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(), e.getMessage());
+                    }
+                    LOG.debug(message, e);
                     return false;
                 }
 
@@ -625,7 +644,12 @@ public class CAManagerImpl implements CAManager
                     ca = new X509CA(this, caEntry, caSigner, certstore, crlSigner);
                 } catch (OperationException e)
                 {
-                    LogUtil.logErrorThrowable(LOG, "X509CA.<init> (ca=" + caName + ")", e);
+                    final String message = "X509CA.<init> (ca=" + caName + ")";
+                    if(LOG.isErrorEnabled())
+                    {
+                        LOG.error(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(), e.getMessage());
+                    }
+                    LOG.debug(message, e);
                     return false;
                 }
 
@@ -734,7 +758,12 @@ public class CAManagerImpl implements CAManager
                 ds.shutdown();
             } catch(Exception e)
             {
-                LogUtil.logWarnThrowable(LOG, "could not shutdown datasource " + dsName, e);
+                final String message = "could not shutdown datasource " + dsName;
+                if(LOG.isWarnEnabled())
+                {
+                    LOG.warn(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(), e.getMessage());
+                }
+                LOG.debug(message, e);
             }
         }
 
@@ -985,7 +1014,12 @@ public class CAManagerImpl implements CAManager
                 }
             } catch(Exception e)
             {
-                LogUtil.logWarnThrowable(LOG, "could not shutdown CertProfile " + name, e);
+                final String message = "could not shutdown CertProfile " + name;
+                if(LOG.isWarnEnabled())
+                {
+                    LOG.warn(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(), e.getMessage());
+                }
+                LOG.debug(message, e);
             }
         }
         certProfiles.clear();
@@ -1039,7 +1073,12 @@ public class CAManagerImpl implements CAManager
                 }
             } catch(Exception e)
             {
-                LogUtil.logWarnThrowable(LOG, "could not shutdown CertPublisher " + name, e);
+                final String message = "could not shutdown CertPublisher " + name;
+                if(LOG.isWarnEnabled())
+                {
+                    LOG.warn(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(), e.getMessage());
+                }
+                LOG.debug(message, e);
             }
         }
         publishers.clear();
@@ -1151,10 +1190,7 @@ public class CAManagerImpl implements CAManager
                 entry.setIncludeExpiredCerts(include_expired_certs);
                 crlSigners.put(entry.getName(), entry);
             }
-        }catch(SQLException e)
-        {
-            throw new CAMgmtException(e);
-        } catch (ConfigurationException e)
+        }catch(SQLException | ConfigurationException e)
         {
             throw new CAMgmtException(e);
         }finally
@@ -1695,10 +1731,7 @@ public class CAManagerImpl implements CAManager
 
             ps.setString(iName, name);
             ps.executeUpdate();
-        }catch(SQLException e)
-        {
-            throw new CAMgmtException(e);
-        } catch (CertificateEncodingException e)
+        }catch(SQLException | CertificateEncodingException e)
         {
             throw new CAMgmtException(e);
         }finally
@@ -1893,10 +1926,7 @@ public class CAManagerImpl implements CAManager
             ps.setString(idx++, Base64.toBase64String(dbEntry.getCert().getEncoded()));
 
             ps.executeUpdate();
-        }catch(SQLException e)
-        {
-            throw new CAMgmtException(e);
-        } catch (CertificateEncodingException e)
+        }catch(SQLException | CertificateEncodingException e)
         {
             throw new CAMgmtException(e);
         }finally
@@ -2196,10 +2226,7 @@ public class CAManagerImpl implements CAManager
             ps.setString(idx++, b64Cert);
 
             ps.executeUpdate();
-        }catch(SQLException e)
-        {
-            throw new CAMgmtException(e);
-        } catch (CertificateEncodingException e)
+        }catch(SQLException | CertificateEncodingException e)
         {
             throw new CAMgmtException(e);
         }finally
@@ -2329,10 +2356,7 @@ public class CAManagerImpl implements CAManager
             setBoolean(ps, idx++, dbEntry.includeExpiredCerts());
 
             ps.executeUpdate();
-        }catch(SQLException e)
-        {
-            throw new CAMgmtException(e);
-        } catch (CertificateEncodingException e)
+        }catch(SQLException | CertificateEncodingException e)
         {
             throw new CAMgmtException(e);
         }finally

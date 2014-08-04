@@ -246,8 +246,12 @@ public final class SunP11CryptService implements P11CryptService
                 }
             }catch(Throwable t)
             {
-                String msg = "Could not initialize PKCS11 slot " + i + " (module: " + pkcs11Module + ")";
-                LogUtil.logWarnThrowable(LOG, msg, t);
+                final String message = "Could not initialize PKCS11 slot " + i + " (module: " + pkcs11Module + ")";
+                if(LOG.isWarnEnabled())
+                {
+                    LOG.warn(LogUtil.buildExceptionLogFormat(message), t.getClass().getName(), t.getMessage());
+                }
+                LOG.debug(message, t);
                 continue;
             }
         }
@@ -315,12 +319,9 @@ public final class SunP11CryptService implements P11CryptService
         {
             pkcs11 = sun.security.pkcs11.wrapper.PKCS11.getInstance(
                     pkcs11Module, functionList, pInitArgs, omitInitialize);
-        } catch (IOException e)
+        } catch (IOException | PKCS11Exception e)
         {
-            throw new SignerException("IOException: " + e.getMessage(), e);
-        } catch (PKCS11Exception e)
-        {
-            throw new SignerException("PKCS11Exception: " + e.getMessage(), e);
+            throw new SignerException(e.getClass().getName() + ": " + e.getMessage(), e);
         }
 
         long[] slotList;

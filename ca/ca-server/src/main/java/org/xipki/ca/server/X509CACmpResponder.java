@@ -638,7 +638,12 @@ public class X509CACmpResponder extends CmpResponder
                                 certProfileName, keyUpdate, confirmWaitTime, childAuditEvent);
                     } catch (CMPException e)
                     {
-                        LogUtil.logWarnThrowable(LOG, "generateCertificate", e);
+                        final String message = "generateCertificate";
+                        if(LOG.isWarnEnabled())
+                        {
+                            LOG.warn(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(), e.getMessage());
+                        }
+                        LOG.debug(message, e);
 
                         certResponses[i] = new CertResponse(certReqId,
                                 generateCmpRejectionStatus(PKIFailureInfo.badCertTemplate, e.getMessage()));
@@ -1143,9 +1148,13 @@ public class X509CACmpResponder extends CmpResponder
                     ca.revokeCertificate(serialNumber, CRLReason.CESSATION_OF_OPERATION, new Date());
                 } catch (OperationException e)
                 {
-                    String msg = "Could not revoke certificate ca=" + ca.getCAInfo().getName() +
+                    final String msg = "Could not revoke certificate ca=" + ca.getCAInfo().getName() +
                             " serialNumber=" + serialNumber;
-                    LogUtil.logWarnThrowable(LOG, msg, e);
+                    if(LOG.isWarnEnabled())
+                    {
+                        LOG.warn(LogUtil.buildExceptionLogFormat(msg), e.getClass().getName(), e.getMessage());
+                    }
+                    LOG.debug(msg, e);
                 }
 
                 successfull = false;
@@ -1233,15 +1242,14 @@ public class X509CACmpResponder extends CmpResponder
             PublicKey publicKey = securityFactory.generatePublicKey(certRequest.getCertTemplate().getPublicKey());
             ContentVerifierProvider cvp = securityFactory.getContentVerifierProvider(publicKey);
             return certRequest.isValidSigningKeyPOP(cvp);
-        } catch (InvalidKeyException e)
+        } catch (InvalidKeyException | IllegalStateException | CRMFException e)
         {
-            LogUtil.logErrorThrowable(LOG, "verifyPOP", e);
-        } catch (IllegalStateException e)
-        {
-            LogUtil.logErrorThrowable(LOG, "verifyPOP", e);
-        } catch (CRMFException e)
-        {
-            LogUtil.logErrorThrowable(LOG, "verifyPOP", e);
+            final String message = "verifyPOP";
+            if(LOG.isErrorEnabled())
+            {
+                LOG.error(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(), e.getMessage());
+            }
+            LOG.debug(message, e);
         }
         return false;
     }

@@ -286,13 +286,7 @@ public abstract class AbstractOCSPRequestor implements OCSPRequestor
             {
                 return reqBuilder.build();
             }
-        } catch (OCSPException e)
-        {
-            throw new OCSPRequestorException(e);
-        } catch (CertificateEncodingException e)
-        {
-            throw new OCSPRequestorException(e);
-        } catch (IOException e)
+        } catch (OCSPException | CertificateEncodingException | IOException e)
         {
             throw new OCSPRequestorException(e);
         }

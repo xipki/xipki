@@ -128,8 +128,13 @@ public final class IaikP11CryptService implements P11CryptService
             this.extModule = IaikP11ModulePool.getInstance().getModule(pkcs11Module);
         }catch(SignerException e)
         {
-            LogUtil.logErrorThrowable(LOG, "Could not initialize the PKCS#11 Module for " +
-                    pkcs11ModuleOmitSensitiveInfo, e);
+            final String message = "Could not initialize the PKCS#11 Module for " +
+                    pkcs11ModuleOmitSensitiveInfo;
+            if(LOG.isErrorEnabled())
+            {
+                LOG.error(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(), e.getMessage());
+            }
+            LOG.debug(message, e);
             throw e;
         }
 
@@ -161,11 +166,21 @@ public final class IaikP11CryptService implements P11CryptService
                 }
             } catch (SignerException e)
             {
-                LogUtil.logWarnThrowable(LOG, "SignerException while initializing slot " + slotId, e);
+                final String message = "SignerException while initializing slot " + slotId;
+                if(LOG.isWarnEnabled())
+                {
+                    LOG.warn(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(), e.getMessage());
+                }
+                LOG.debug(message, e);
                 continue;
             } catch (Throwable t)
             {
-                LogUtil.logWarnThrowable(LOG, "unexpected error while initializing slot " + slotId, t);
+                final String message = "unexpected error while initializing slot " + slotId;
+                if(LOG.isWarnEnabled())
+                {
+                    LOG.warn(LogUtil.buildExceptionLogFormat(message), t.getClass().getName(), t.getMessage());
+                }
+                LOG.debug(message, t);
                 continue;
             }
 
@@ -195,7 +210,12 @@ public final class IaikP11CryptService implements P11CryptService
                         } catch (Exception e)
                         {
                             String keyIdStr = hex(keyId);
-                            LogUtil.logWarnThrowable(LOG, "Could not parse certificate with id " + keyIdStr, e);
+                            final String message = "Could not parse certificate with id " + keyIdStr;
+                            if(LOG.isWarnEnabled())
+                            {
+                                LOG.warn(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(), e.getMessage());
+                            }
+                            LOG.debug(message, e);
                             continue;
                         }
                         signaturePublicKey = signatureCert.getPublicKey();
@@ -278,12 +298,22 @@ public final class IaikP11CryptService implements P11CryptService
                 } catch (SignerException e)
                 {
                     String keyIdStr = hex(keyId);
-                    LogUtil.logWarnThrowable(LOG, "SignerException while initializing key with key-id " + keyIdStr, e);
+                    final String message = "SignerException while initializing key with key-id " + keyIdStr;
+                    if(LOG.isWarnEnabled())
+                    {
+                        LOG.warn(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(), e.getMessage());
+                    }
+                    LOG.debug(message, e);
                     continue;
                 } catch (Throwable t)
                 {
                     String keyIdStr = hex(keyId);
-                    LogUtil.logWarnThrowable(LOG, "Unexpected exception while initializing key with key-id " + keyIdStr, t);
+                    final String message = "Unexpected exception while initializing key with key-id " + keyIdStr;
+                    if(LOG.isWarnEnabled())
+                    {
+                        LOG.warn(LogUtil.buildExceptionLogFormat(message), t.getClass().getName(), t.getMessage());
+                    }
+                    LOG.debug(message, t);
                     continue;
                 }
             }
@@ -329,16 +359,21 @@ public final class IaikP11CryptService implements P11CryptService
         try
         {
             return identity.CKM_RSA_PKCS(extModule, password, encodedDigestInfo);
-        }catch(PKCS11RuntimeException pre)
+        }catch(PKCS11RuntimeException e)
         {
-            LogUtil.logWarnThrowable(LOG, "error while calling identity.CKM_RSA_PKCS()", pre);
+            final String message = "error while calling identity.CKM_RSA_PKCS()";
+            if(LOG.isWarnEnabled())
+            {
+                LOG.warn(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(), e.getMessage());
+            }
+            LOG.debug(message, e);
             if(reconnect())
             {
                 return CKM_RSA_PKCS_noReconnect(encodedDigestInfo, slotId, keyId);
             }
             else
             {
-                throw new SignerException("PKCS11RuntimeException: " + pre.getMessage(), pre);
+                throw new SignerException("PKCS11RuntimeException: " + e.getMessage(), e);
             }
         }
     }
@@ -372,16 +407,21 @@ public final class IaikP11CryptService implements P11CryptService
         try
         {
             return identity.CKM_RSA_X_509(extModule, password, hash);
-        }catch(PKCS11RuntimeException pre)
+        }catch(PKCS11RuntimeException e)
         {
-            LogUtil.logWarnThrowable(LOG, "error while calling identity.CKM_RSA_X_509()", pre);
+            final String message = "error while calling identity.CKM_RSA_X_509()";
+            if(LOG.isWarnEnabled())
+            {
+                LOG.warn(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(), e.getMessage());
+            }
+            LOG.debug(message, e);
             if(reconnect())
             {
                 return CKM_RSA_X509_noReconnect(hash, slotId, keyId);
             }
             else
             {
-                throw new SignerException("PKCS11RuntimeException: " + pre.getMessage(), pre);
+                throw new SignerException("PKCS11RuntimeException: " + e.getMessage(), e);
             }
         }
     }
@@ -414,16 +454,21 @@ public final class IaikP11CryptService implements P11CryptService
         try
         {
             return identity.CKM_ECDSA(extModule, password, hash);
-        }catch(PKCS11RuntimeException pre)
+        }catch(PKCS11RuntimeException e)
         {
-            LogUtil.logWarnThrowable(LOG, "error while calling identity.CKM_ECDSA()", pre);
+            final String message = "error while calling identity.CKM_ECDSA()";
+            if(LOG.isWarnEnabled())
+            {
+                LOG.warn(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(), e.getMessage());
+            }
+            LOG.debug(message, e);
             if(reconnect())
             {
                 return CKM_ECDSA_noReconnect(hash, slotId, keyId);
             }
             else
             {
-                throw new SignerException("PKCS11RuntimeException: " + pre.getMessage(), pre);
+                throw new SignerException("PKCS11RuntimeException: " + e.getMessage());
             }
         }
     }
@@ -522,10 +567,7 @@ public final class IaikP11CryptService implements P11CryptService
             {
                 KeyFactory keyFactory=KeyFactory.getInstance("RSA");
                 return keyFactory.generatePublic(keySpec);
-            }catch(NoSuchAlgorithmException e)
-            {
-                throw new SignerException(e);
-            } catch (InvalidKeySpecException e)
+            }catch(NoSuchAlgorithmException | InvalidKeySpecException e)
             {
                 throw new SignerException(e);
             }

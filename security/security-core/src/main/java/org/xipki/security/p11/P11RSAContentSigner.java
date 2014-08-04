@@ -110,8 +110,14 @@ public class P11RSAContentSigner implements ContentSigner
             return cryptService.CKM_RSA_PKCS(encodedDigestInfo, slot, keyId);
         } catch (SignerException e)
         {
-            LogUtil.logWarnThrowable(LOG, "SignerException", e);
+            final String message = "SignerException";
+            if(LOG.isErrorEnabled())
+            {
+                LOG.error(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(), e.getMessage());
+            }
+            LOG.debug(message, e);
             throw new RuntimeCryptoException("SignerException: " + e.getMessage());
         }
     }
+
 }

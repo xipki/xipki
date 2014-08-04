@@ -995,12 +995,9 @@ class CertStoreQueryExecutor
                 try
                 {
                     cert = IoCertUtil.parseCert(certBytes);
-                } catch (CertificateException e)
+                } catch (CertificateException | IOException e)
                 {
-                    throw new OperationException(ErrorCode.System_Failure, "CertificateException: " + e.getMessage());
-                } catch (IOException e)
-                {
-                    throw new OperationException(ErrorCode.System_Failure, "IOException: " + e.getMessage());
+                    throw new OperationException(ErrorCode.System_Failure, e.getClass().getName() + ": " + e.getMessage());
                 }
 
                 CertRevocationInfo revInfo = null;

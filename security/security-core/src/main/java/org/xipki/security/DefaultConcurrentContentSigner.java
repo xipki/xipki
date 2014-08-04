@@ -180,13 +180,9 @@ public class DefaultConcurrentContentSigner implements ConcurrentContentSigner
             try
             {
                 this.certificateChainAsBCObjects[i] = new X509CertificateHolder(cert.getEncoded());
-            } catch (CertificateEncodingException e)
+            } catch (CertificateEncodingException | IOException e)
             {
-                throw new IllegalArgumentException("CertificateEncodingException occured while"
-                        + " parsing certificate at index " + i + ": " + e.getMessage(), e);
-            } catch (IOException e)
-            {
-                throw new IllegalArgumentException("IOException occured while"
+                throw new IllegalArgumentException(e.getClass().getName() + " occured while"
                         + " parsing certificate at index " + i + ": " + e.getMessage(), e);
             }
         }
@@ -243,7 +239,12 @@ public class DefaultConcurrentContentSigner implements ConcurrentContentSigner
             return signature != null && signature.length > 0;
         } catch(Exception e)
         {
-            LogUtil.logErrorThrowable(LOG, "healthCheck()", e);
+            final String message = "isHealthy()";
+            if(LOG.isErrorEnabled())
+            {
+                LOG.error(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(), e.getMessage());
+            }
+            LOG.debug(message, e);
             return false;
         }
         finally

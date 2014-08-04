@@ -65,4 +65,9 @@ public enum KeyUsage
 
         return null;
     }
+
+    public String getName()
+    {
+        return names[0];
+    }
 }

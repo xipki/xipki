@@ -84,18 +84,9 @@ public class CertProfileEntry
             {
                 Class<?> clazz = Class.forName(className);
                 underlyingCertProfile = (CertProfile) clazz.newInstance();
-            }catch(ClassNotFoundException e)
+            }catch(ClassNotFoundException | InstantiationException  | IllegalAccessException | ClassCastException e)
             {
-                throw new CertProfileException("invalid type " + type + ", ClassNotFoundException: " + e.getMessage());
-            } catch (InstantiationException e)
-            {
-                throw new CertProfileException("invalid type " + type + ", InstantiationException: " + e.getMessage());
-            } catch (IllegalAccessException e)
-            {
-                throw new CertProfileException("invalid type " + type + ", IllegalAccessException: " + e.getMessage());
-            } catch(ClassCastException e)
-            {
-                throw new CertProfileException("invalid type " + type + ", ClassCastException: " + e.getMessage());
+                throw new CertProfileException("invalid type " + type + ", " + e.getClass().getName() + ": " + e.getMessage());
             }
         }
         else

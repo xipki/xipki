@@ -171,7 +171,13 @@ public class Rfc6712Servlet extends HttpServlet
 
         }catch(Throwable t)
         {
-            LogUtil.logErrorThrowable(LOG, "Throwable thrown, this should not happen", t);
+            final String message = "Throwable thrown, this should not happen!";
+            if(LOG.isErrorEnabled())
+            {
+                LOG.error(LogUtil.buildExceptionLogFormat(message), t.getClass().getName(), t.getMessage());
+            }
+            LOG.debug(message, t);
+
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             response.setContentLength(0);
             auditLevel = AuditLevel.ERROR;
@@ -248,4 +254,5 @@ public class Rfc6712Servlet extends HttpServlet
     {
         this.auditServiceRegister = auditServiceRegister;
     }
+
 }

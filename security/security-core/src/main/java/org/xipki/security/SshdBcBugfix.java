@@ -46,15 +46,9 @@ public class SshdBcBugfix
         try
         {
             method.invoke(null, new Object[]{false});
-        } catch (IllegalArgumentException e)
+        } catch (IllegalArgumentException | IllegalAccessException | InvocationTargetException e)
         {
-            LOG.warn(errorMsgPrefix + "IllegalArgumentException {}", e.getMessage());
-        } catch (IllegalAccessException e)
-        {
-            LOG.warn(errorMsgPrefix + "IllegalAccessException {}", e.getMessage());
-        } catch (InvocationTargetException e)
-        {
-            LOG.warn(errorMsgPrefix + "InvocationTargetException {}", e.getMessage());
+            LOG.warn(errorMsgPrefix + "{}: {}", e.getClass().getName(), e.getMessage());
         }
 
         LOG.info("Fixed SSH BouncyCastle Bug");
@@ -80,13 +74,9 @@ public class SshdBcBugfix
             }
             serviceMethod.setAccessible(true);
             return serviceMethod;
-        } catch (SecurityException e)
+        } catch (SecurityException | NoSuchMethodException e)
         {
-            LOG.warn("Could not get " + desc + ", SecuirtyException: {}", e.getMessage());
-            LOG.debug("Could not get " + desc, e);
-        } catch (NoSuchMethodException e)
-        {
-            LOG.warn("Could not get " + desc + ", NoSuchMethodException: {}", e.getMessage());
+            LOG.warn("Could not get " + desc + ", {}: {}", e.getClass().getName(), e.getMessage());
             LOG.debug("Could not get " + desc, e);
         }
 
