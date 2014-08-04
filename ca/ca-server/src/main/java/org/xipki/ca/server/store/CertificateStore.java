@@ -286,10 +286,10 @@ public class CertificateStore
     }
 
     public List<BigInteger> getCertSerials(X509CertificateWithMetaInfo caCert,
-            Date notExpiredAt, BigInteger startSerial, int numEntries)
+            Date notExpiredAt, BigInteger startSerial, int numEntries, boolean onlyRevoked)
     throws SQLException, OperationException
     {
-        return queryExecutor.getSerialNumbers(caCert, notExpiredAt, startSerial, numEntries);
+        return queryExecutor.getSerialNumbers(caCert, notExpiredAt, startSerial, numEntries, onlyRevoked);
     }
 
     public List<Integer> getPublishQueueEntries(X509CertificateWithMetaInfo caCert,

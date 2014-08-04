@@ -684,7 +684,7 @@ class CertStoreQueryExecutor
     }
 
     List<BigInteger> getSerialNumbers(X509CertificateWithMetaInfo caCert,
-            Date notExpiredAt, BigInteger startSerial, int numEntries)
+            Date notExpiredAt, BigInteger startSerial, int numEntries, boolean onlyRevoked)
     throws SQLException, OperationException
     {
         ParamChecker.assertNotNull("caCert", caCert);
@@ -700,6 +700,10 @@ class CertStoreQueryExecutor
         if(notExpiredAt != null)
         {
             sb.append(" AND NOTAFTER>?");
+        }
+        if(onlyRevoked)
+        {
+            sb.append(" AND REVOKED=1");
         }
 
         final String sql = dataSource.createFetchFirstSelectSQL(sb.toString(), numEntries, "SERIAL ASC");

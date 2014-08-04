@@ -113,4 +113,9 @@ public class IdentifiedCertPublisher
         certPublisher.shutdown();
     }
 
+    public boolean publishsGoodCert()
+    {
+        return certPublisher.publishsGoodCert();
+    }
+
 }
