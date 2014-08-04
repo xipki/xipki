@@ -54,7 +54,12 @@ public class IaikP11ModulePool
         }catch(Throwable t)
         {
             String text = IaikP11Util.eraseSensitiveInfo(pkcs11Lib);
-            LogUtil.logWarnThrowable(LOG, "Could not finalize the module " + text, t);
+            final String message = "Could not finalize the module " + text;
+            if(LOG.isWarnEnabled())
+            {
+                LOG.warn(LogUtil.buildExceptionLogFormat(message), t.getClass().getName(), t.getMessage());
+            }
+            LOG.debug(message, t);
         }
     }
 
@@ -74,8 +79,12 @@ public class IaikP11ModulePool
             module = Module.getInstance(pkcs11Lib);
         }catch(IOException e)
         {
-            String msg = "Could not load the PKCS#11 library " + IaikP11Util.eraseSensitiveInfo(pkcs11Lib);
-            LogUtil.logErrorThrowable(LOG, msg, e);
+            final String msg = "Could not load the PKCS#11 library " + IaikP11Util.eraseSensitiveInfo(pkcs11Lib);
+            if(LOG.isErrorEnabled())
+            {
+                LOG.error(LogUtil.buildExceptionLogFormat(msg), e.getClass().getName(), e.getMessage());
+            }
+            LOG.debug(msg, e);
             throw new SignerException(msg);
         }
 
@@ -87,7 +96,12 @@ public class IaikP11ModulePool
         {
             if (e.getErrorCode() != PKCS11Constants.CKR_CRYPTOKI_ALREADY_INITIALIZED)
             {
-                LogUtil.logErrorThrowable(LOG, "PKCS11Exception", e);
+                final String message = "PKCS11Exception";
+                if(LOG.isErrorEnabled())
+                {
+                    LOG.error(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(), e.getMessage());
+                }
+                LOG.debug(message, e);
                 close(module);
                 throw new SignerException(e.getMessage());
             }
@@ -108,7 +122,12 @@ public class IaikP11ModulePool
         }
         catch (Throwable t)
         {
-            LogUtil.logErrorThrowable(LOG, "Unexpected Exception: ", t);
+            final String message = "Unexpected Exception: ";
+            if(LOG.isErrorEnabled())
+            {
+                LOG.error(LogUtil.buildExceptionLogFormat(message), t.getClass().getName(), t.getMessage());
+            }
+            LOG.debug(message, t);
             close(module);
             throw new SignerException(t.getMessage());
         }
@@ -147,7 +166,12 @@ public class IaikP11ModulePool
             }
             catch (Throwable t)
             {
-                LogUtil.logErrorThrowable(LOG, "error while module.finalize()", t);
+                final String message = "error while module.finalize()";
+                if(LOG.isErrorEnabled())
+                {
+                    LOG.error(LogUtil.buildExceptionLogFormat(message), t.getClass().getName(), t.getMessage());
+                }
+                LOG.debug(message, t);
             }
         }
     }

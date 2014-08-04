@@ -203,12 +203,9 @@ public class XiPKIKeyStoreSpi extends KeyStoreSpi
                 }
             }
 
-        } catch (SignerException e)
+        } catch (SignerException | InvalidKeyException e)
         {
-            throw new IllegalArgumentException("SignerException: " + e.getMessage(), e);
-        } catch (InvalidKeyException e)
-        {
-            throw new IllegalArgumentException("InvalidKeyException: " + e.getMessage(), e);
+            throw new IllegalArgumentException(e.getClass().getName() + ": " + e.getMessage(), e);
         }
     }
 

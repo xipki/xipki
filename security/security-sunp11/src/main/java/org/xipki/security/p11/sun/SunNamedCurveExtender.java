@@ -159,7 +159,12 @@ public class SunNamedCurveExtender
 
             }catch(Throwable t)
             {
-                LogUtil.logErrorThrowable(LOG, "Uncatched Error", t);
+                final String message = "Uncatched Error";
+                if(LOG.isErrorEnabled())
+                {
+                    LOG.error(LogUtil.buildExceptionLogFormat(message), t.getClass().getName(), t.getMessage());
+                }
+                LOG.debug(message, t);
             }
         }
     }
@@ -194,13 +199,14 @@ public class SunNamedCurveExtender
         try
         {
             field_SPLIT_PATTERN.set(null, SPLIT_PATTERN);
-        } catch (IllegalArgumentException e)
+        } catch (IllegalArgumentException | IllegalAccessException e)
         {
-            LogUtil.logWarnThrowable(LOG, "Could not set Field SPLIT_PATTERN", e);
-            return;
-        } catch (IllegalAccessException e)
-        {
-            LogUtil.logWarnThrowable(LOG, "Could not set Field SPLIT_PATTERN", e);
+            final String message = "Could not set Field SPLIT_PATTERN";
+            if(LOG.isWarnEnabled())
+            {
+                LOG.warn(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(), e.getMessage());
+            }
+            LOG.debug(message, e);
             return;
         }
 
@@ -263,13 +269,14 @@ public class SunNamedCurveExtender
         try
         {
             field_SPLIT_PATTERN.set(null, null);
-        } catch (IllegalArgumentException e)
+        } catch (IllegalArgumentException | IllegalAccessException e)
         {
-            LogUtil.logWarnThrowable(LOG, "Could not set Field SPLIT_PATTERN", e);
-            return;
-        } catch (IllegalAccessException e)
-        {
-            LogUtil.logWarnThrowable(LOG, "Could not set Field SPLIT_PATTERN", e);
+            final String message = "Could not set Field SPLIT_PATTERN";
+            if(LOG.isWarnEnabled())
+            {
+                LOG.warn(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(), e.getMessage());
+            }
+            LOG.debug(message, e);
             return;
         }
 
@@ -370,15 +377,14 @@ public class SunNamedCurveExtender
             Collection<?> namedCurves = Collections.unmodifiableCollection(oidMap.values());
 
             field_specCollection.set(null, namedCurves);
-        } catch (IllegalArgumentException e)
+        } catch (IllegalArgumentException | IllegalAccessException | ClassCastException e)
         {
-            LogUtil.logWarnThrowable(LOG, "Could not update change the value of field CurveDB.specCollection.", e);
-        } catch (IllegalAccessException e)
-        {
-            LogUtil.logWarnThrowable(LOG, "Could not update change the value of field CurveDB.specCollection.", e);
-        } catch (ClassCastException e)
-        {
-            LogUtil.logWarnThrowable(LOG, "Could not update change the value of field CurveDB.specCollection.", e);
+            final String message = "Could not update change the value of field CurveDB.specCollection.";
+            if(LOG.isWarnEnabled())
+            {
+                LOG.warn(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(), e.getMessage());
+            }
+            LOG.debug(message, e);
         }
 
         logAddedCurves(addedCurves);
@@ -414,15 +420,9 @@ public class SunNamedCurveExtender
         {
             Object curve = method_lookup.invoke(null, new Object[]{curveId.getId()});
             return curve != null;
-        } catch (IllegalArgumentException e)
+        } catch (IllegalArgumentException | IllegalAccessException | InvocationTargetException e)
         {
-            LOG.warn("IllegalArgumentException " + e.getMessage());
-        } catch (IllegalAccessException e)
-        {
-            LOG.warn("IllegalAccessException " + e.getMessage());
-        } catch (InvocationTargetException e)
-        {
-            LOG.warn("InvocationTargetException " + e.getMessage());
+            LOG.warn("{}: {}", e.getClass().getName(), e.getMessage());
         }
 
         return true; // if error occurs, just return true
@@ -436,17 +436,9 @@ public class SunNamedCurveExtender
         try
         {
             method_add.invoke(null, new Object[]{name, soid, type, sfield, a, b, x, y, n, h, SPLIT_PATTERN});
-        } catch (IllegalArgumentException e)
+        } catch (IllegalArgumentException | IllegalAccessException | InvocationTargetException e)
         {
-            LOG.warn("IllegalArgumentException " + e.getMessage());
-            return false;
-        } catch (IllegalAccessException e)
-        {
-            LOG.warn("IllegalAccessException " + e.getMessage());
-            return false;
-        } catch (InvocationTargetException e)
-        {
-            LOG.warn("InvocationTargetException " + e.getMessage());
+            LOG.warn("{}: {}", e.getClass().getName(), e.getMessage());
             return false;
         }
 
@@ -461,17 +453,9 @@ public class SunNamedCurveExtender
         try
         {
             method_add.invoke(null, new Object[]{name, soid, type, sfield, a, b, x, y, n, h});
-        } catch (IllegalArgumentException e)
+        } catch (IllegalArgumentException | IllegalAccessException | InvocationTargetException e)
         {
-            LOG.warn("IllegalArgumentException " + e.getMessage());
-            return false;
-        } catch (IllegalAccessException e)
-        {
-            LOG.warn("IllegalAccessException " + e.getMessage());
-            return false;
-        } catch (InvocationTargetException e)
-        {
-            LOG.warn("InvocationTargetException " + e.getMessage());
+            LOG.warn("{}: {}", e.getClass().getName(), e.getMessage());
             return false;
         }
 
@@ -498,12 +482,14 @@ public class SunNamedCurveExtender
             }
             serviceMethod.setAccessible(true);
             return serviceMethod;
-        } catch (SecurityException e)
+        } catch (SecurityException | NoSuchMethodException e)
         {
-            LogUtil.logWarnThrowable(LOG, "Could not get " + desc, e);
-        } catch (NoSuchMethodException e)
-        {
-            LogUtil.logWarnThrowable(LOG, "Could not get " + desc, e);
+            final String message = "Could not get " + desc;
+            if(LOG.isWarnEnabled())
+            {
+                LOG.warn(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(), e.getMessage());
+            }
+            LOG.debug(message, e);
         }
 
         return null;
@@ -521,7 +507,12 @@ public class SunNamedCurveExtender
             return field;
         } catch (NoSuchFieldException e)
         {
-            LogUtil.logWarnThrowable(LOG, "Could not get " + desc, e);
+            final String message = "Could not get " + desc;
+            if(LOG.isWarnEnabled())
+            {
+                LOG.warn(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(), e.getMessage());
+            }
+            LOG.debug(message, e);
         }
 
         return null;
@@ -609,17 +600,9 @@ public class SunNamedCurveExtender
         try
         {
             return (byte[]) method_NamedCurve_getEncoded.invoke(namedCurve, (Object) null);
-        } catch (IllegalArgumentException e)
+        } catch (IllegalArgumentException | IllegalAccessException | InvocationTargetException e)
         {
-            LOG.warn("IllegalArgumentException " + e.getMessage());
-            return null;
-        } catch (IllegalAccessException e)
-        {
-            LOG.warn("IllegalAccessException " + e.getMessage());
-            return null;
-        } catch (InvocationTargetException e)
-        {
-            LOG.warn("InvocationTargetException " + e.getMessage());
+            LOG.warn("{}: {}", e.getClass().getName(), e.getMessage());
             return null;
         }
     }
@@ -629,17 +612,9 @@ public class SunNamedCurveExtender
         try
         {
             return (String) method_NamedCurve_getObjectId.invoke(namedCurve, (Object)null);
-        } catch (IllegalArgumentException e)
+        } catch (IllegalArgumentException | IllegalAccessException | InvocationTargetException e)
         {
-            LOG.warn("IllegalArgumentException " + e.getMessage());
-            return null;
-        } catch (IllegalAccessException e)
-        {
-            LOG.warn("IllegalAccessException " + e.getMessage());
-            return null;
-        } catch (InvocationTargetException e)
-        {
-            LOG.warn("InvocationTargetException " + e.getMessage());
+            LOG.warn("{}: {}", e.getClass().getName(), e.getMessage());
             return null;
         }
     }
@@ -649,17 +624,9 @@ public class SunNamedCurveExtender
         try
         {
             return (ECParameterSpec) method_CurveDB_lookup_name.invoke(null, name);
-        } catch (IllegalArgumentException e)
+        } catch (IllegalArgumentException | IllegalAccessException | InvocationTargetException e)
         {
-            LOG.warn("IllegalArgumentException " + e.getMessage());
-            return null;
-        } catch (IllegalAccessException e)
-        {
-            LOG.warn("IllegalAccessException " + e.getMessage());
-            return null;
-        } catch (InvocationTargetException e)
-        {
-            LOG.warn("InvocationTargetException " + e.getMessage());
+            LOG.warn("{}: {}", e.getClass().getName(), e.getMessage());
             return null;
         }
     }
@@ -669,17 +636,9 @@ public class SunNamedCurveExtender
         try
         {
             return (ECParameterSpec) method_CurveDB_lookup_paramSpec.invoke(null, paramSpec);
-        } catch (IllegalArgumentException e)
+        } catch (IllegalArgumentException | IllegalAccessException | InvocationTargetException e)
         {
-            LOG.warn("IllegalArgumentException " + e.getMessage());
-            return null;
-        } catch (IllegalAccessException e)
-        {
-            LOG.warn("IllegalAccessException " + e.getMessage());
-            return null;
-        } catch (InvocationTargetException e)
-        {
-            LOG.warn("InvocationTargetException " + e.getMessage());
+            LOG.warn("{}: {}", e.getClass().getName(), e.getMessage());
             return null;
         }
     }

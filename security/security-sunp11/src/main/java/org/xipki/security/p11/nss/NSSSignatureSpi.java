@@ -116,10 +116,7 @@ public class NSSSignatureSpi extends SignatureSpi
                 try
                 {
                     service = Signature.getInstance(algorithm, "SunEC");
-                } catch (NoSuchAlgorithmException e2)
-                {
-                    throw new ProviderException("Signature " + algorithm + "not supported");
-                } catch (NoSuchProviderException e2)
+                } catch (NoSuchAlgorithmException | NoSuchProviderException e2)
                 {
                     throw new ProviderException("Signature " + algorithm + "not supported");
                 }
@@ -357,10 +354,7 @@ public class NSSSignatureSpi extends SignatureSpi
         try
         {
             return cipher.doFinal(tbsHash);
-        } catch (IllegalBlockSizeException e)
-        {
-            throw new SignatureException(e);
-        } catch (BadPaddingException e)
+        } catch (IllegalBlockSizeException | BadPaddingException e)
         {
             throw new SignatureException(e);
         }
