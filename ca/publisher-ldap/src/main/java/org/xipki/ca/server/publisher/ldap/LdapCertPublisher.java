@@ -126,4 +126,11 @@ public class LdapCertPublisher extends CertPublisher
         this.auditServiceRegister = auditServiceRegister;
     }
 
+    @Override
+    public boolean publishsGoodCert()
+    {
+        // TODO Auto-generated method stub
+        return false;
+    }
+
 }
