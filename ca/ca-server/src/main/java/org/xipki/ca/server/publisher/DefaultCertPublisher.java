@@ -44,6 +44,7 @@ public class DefaultCertPublisher extends CertPublisher
     private EnvironmentParameterResolver envParameterResolver;
     private CertStatusStoreQueryExecutor queryExecutor;
     private boolean asyn = false;
+    private boolean publishsGoodCert = true;
 
     private AuditLoggingServiceRegister auditServiceRegister;
 
@@ -60,14 +61,14 @@ public class DefaultCertPublisher extends CertPublisher
 
         CmpUtf8Pairs utf8pairs = new CmpUtf8Pairs(conf);
         String v = utf8pairs.getValue("publish.goodcerts");
-        boolean publishGoodCerts = (v == null) ? true : Boolean.parseBoolean(v);
+        this.publishsGoodCert = (v == null) ? true : Boolean.parseBoolean(v);
 
         v = utf8pairs.getValue("asyn");
         this.asyn = (v == null) ? false : Boolean.parseBoolean(v);
 
         try
         {
-            queryExecutor = new CertStatusStoreQueryExecutor(dataSource, publishGoodCerts);
+            queryExecutor = new CertStatusStoreQueryExecutor(dataSource, this.publishsGoodCert);
         } catch (NoSuchAlgorithmException | SQLException e)
         {
             throw new CertPublisherException(e);
@@ -224,6 +225,12 @@ public class DefaultCertPublisher extends CertPublisher
     public boolean isAsyn()
     {
         return asyn;
+    }
+
+    @Override
+    public boolean publishsGoodCert()
+    {
+        return publishsGoodCert;
     }
 
 }

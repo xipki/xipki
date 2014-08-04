@@ -524,7 +524,7 @@ public class X509CA
                     {
                         try
                         {
-                            serials = certstore.getCertSerials(caCert, notExpireAt, startSerial, numEntries);
+                            serials = certstore.getCertSerials(caCert, notExpireAt, startSerial, numEntries, false);
                         } catch (SQLException e)
                         {
                             throw new OperationException(ErrorCode.DATABASE_FAILURE, "SQLException: " + e.getMessage());
@@ -880,8 +880,14 @@ public class X509CA
             }
         }
 
+        boolean allPublishersOnlyForRevokedCerts = true;
         for(IdentifiedCertPublisher publisher : publishers)
         {
+            if(publisher.publishsGoodCert())
+            {
+                allPublishersOnlyForRevokedCerts = false;
+            }
+
             String name = publisher.getName();
             try
             {
@@ -909,11 +915,13 @@ public class X509CA
             BigInteger startSerial = BigInteger.ONE;
             int numEntries = 100;
 
+            boolean onlyRevokedCerts = false;
+
             do
             {
                 try
                 {
-                    serials = certstore.getCertSerials(caCert, notExpiredAt, startSerial, numEntries);
+                    serials = certstore.getCertSerials(caCert, notExpiredAt, startSerial, numEntries, onlyRevokedCerts);
                 } catch (SQLException | OperationException e)
                 {
                     final String message = "Exception";
@@ -923,6 +931,13 @@ public class X509CA
                     }
                     LOG.debug(message, e);
                     return false;
+                }
+
+                // Even if only revoked certificates will be published, good certificates will be republished
+                // at the first round. This is required to publish CA information if there is no revoked certs
+                if(allPublishersOnlyForRevokedCerts)
+                {
+                    onlyRevokedCerts = true;
                 }
 
                 BigInteger maxSerial = BigInteger.ONE;

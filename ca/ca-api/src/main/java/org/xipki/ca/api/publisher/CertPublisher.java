@@ -31,6 +31,8 @@ public abstract class CertPublisher
     {
     }
 
+    public abstract boolean publishsGoodCert();
+
     public abstract boolean isAsyn();
 
     public abstract void setEnvironmentParameterResolver(EnvironmentParameterResolver parameterResolver);
