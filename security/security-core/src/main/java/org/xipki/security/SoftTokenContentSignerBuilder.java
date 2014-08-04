@@ -171,25 +171,8 @@ public class SoftTokenContentSignerBuilder
             }
 
             this.certificateChain = IoCertUtil.buildCertPath(cert, caCerts);
-        }catch(KeyStoreException e)
-        {
-            throw new SignerException(e);
-        } catch (NoSuchProviderException e)
-        {
-            throw new SignerException(e);
-        } catch (NoSuchAlgorithmException e)
-        {
-            throw new SignerException(e);
-        } catch (CertificateException e)
-        {
-            throw new SignerException(e);
-        } catch (IOException e)
-        {
-            throw new SignerException(e);
-        } catch (UnrecoverableKeyException e)
-        {
-            throw new SignerException(e);
-        } catch (ClassCastException e)
+        }catch(KeyStoreException | NoSuchProviderException | NoSuchAlgorithmException |
+                CertificateException | IOException | UnrecoverableKeyException | ClassCastException e)
         {
             throw new SignerException(e);
         }
@@ -465,10 +448,7 @@ public class SoftTokenContentSignerBuilder
             try
             {
                 return cipher.doFinal(in, 0, in.length);
-            } catch (IllegalBlockSizeException e)
-            {
-                throw new InvalidCipherTextException(e.getMessage(), e);
-            } catch (BadPaddingException e)
+            } catch (IllegalBlockSizeException | BadPaddingException e)
             {
                 throw new InvalidCipherTextException(e.getMessage(), e);
             }

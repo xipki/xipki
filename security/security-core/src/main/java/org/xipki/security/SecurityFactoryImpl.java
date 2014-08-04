@@ -147,19 +147,8 @@ public class SecurityFactoryImpl implements SecurityFactory
 
                 throw new SignerException(sb.toString());
             }
-        } catch (IOException e)
-        {
-            throw new SignerException(e.getMessage(), e);
-        } catch (NoSuchAlgorithmException e)
-        {
-            throw new SignerException(e.getMessage(), e);
-        } catch (InvalidKeyException e)
-        {
-            throw new SignerException(e.getMessage(), e);
-        } catch (SignatureException e)
-        {
-            throw new SignerException(e.getMessage(), e);
-        } catch (NoSuchProviderException e)
+        } catch (IOException | NoSuchAlgorithmException | InvalidKeyException |
+                SignatureException | NoSuchProviderException e)
         {
             throw new SignerException(e.getMessage(), e);
         }
@@ -396,10 +385,7 @@ public class SecurityFactoryImpl implements SecurityFactory
                     try
                     {
                         return  signerBuilder.createSigner(signatureAlgId, parallelism);
-                    } catch (OperatorCreationException e)
-                    {
-                        throw new SignerException(e.getMessage());
-                    } catch (NoSuchPaddingException e)
+                    } catch (OperatorCreationException | NoSuchPaddingException e)
                     {
                         throw new SignerException(e.getMessage());
                     }
@@ -449,10 +435,7 @@ public class SecurityFactoryImpl implements SecurityFactory
                 {
                     return signerBuilder.createSigner(
                             signatureAlgId, parallelism);
-                } catch (OperatorCreationException e)
-                {
-                    throw new SignerException(e.getMessage());
-                } catch (NoSuchPaddingException e)
+                } catch (OperatorCreationException | NoSuchPaddingException e)
                 {
                     throw new SignerException(e.getMessage());
                 }
@@ -522,16 +505,7 @@ public class SecurityFactoryImpl implements SecurityFactory
         {
             PublicKey pk = KeyUtil.generatePublicKey(cert.getSubjectPublicKeyInfo());
             return KeyUtil.getContentVerifierProvider(pk);
-        } catch (OperatorCreationException e)
-        {
-            throw new InvalidKeyException(e);
-        } catch (NoSuchAlgorithmException e)
-        {
-            throw new InvalidKeyException(e);
-        } catch (InvalidKeySpecException e)
-        {
-            throw new InvalidKeyException(e);
-        } catch (IOException e)
+        } catch (OperatorCreationException | NoSuchAlgorithmException | InvalidKeySpecException | IOException e)
         {
             throw new InvalidKeyException(e);
         }
@@ -544,13 +518,7 @@ public class SecurityFactoryImpl implements SecurityFactory
         try
         {
             return KeyUtil.generatePublicKey(subjectPublicKeyInfo);
-        } catch (NoSuchAlgorithmException e)
-        {
-            throw new InvalidKeyException(e);
-        } catch (InvalidKeySpecException e)
-        {
-            throw new InvalidKeyException(e);
-        } catch (IOException e)
+        } catch (NoSuchAlgorithmException | InvalidKeySpecException | IOException e)
         {
             throw new InvalidKeyException(e);
         }

@@ -355,22 +355,8 @@ public class SignerUtil
 
             ContentVerifierProvider cvp = KeyUtil.getContentVerifierProvider(pk);
             return p10Request.isSignatureValid(cvp);
-        } catch (OperatorCreationException e)
-        {
-            return false;
-        } catch (InvalidKeyException e)
-        {
-            return false;
-        } catch (PKCSException e)
-        {
-            return false;
-        } catch (NoSuchAlgorithmException e)
-        {
-            return false;
-        } catch (InvalidKeySpecException e)
-        {
-            return false;
-        } catch (IOException e)
+        } catch (OperatorCreationException | InvalidKeyException | PKCSException |
+                NoSuchAlgorithmException | InvalidKeySpecException | IOException e)
         {
             return false;
         }

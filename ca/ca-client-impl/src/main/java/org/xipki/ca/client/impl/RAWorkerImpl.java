@@ -238,16 +238,15 @@ public final class RAWorkerImpl extends AbstractRAWorker implements RAWorker
                         IoCertUtil.parseCert(_responderFile));
                 cas.add(ca);
                 configuredCaNames.add(caName);
-            }catch(IOException e)
+            }catch(IOException | CertificateException e)
             {
-                LogUtil.logWarnThrowable(LOG, "Could not configure CA " + caName, e);
-                if(dev_mode == false)
+                final String message = "Could not configure CA " + caName;
+                if(LOG.isWarnEnabled())
                 {
-                    throw e;
+                    LOG.warn(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(), e.getMessage());
                 }
-            }catch(CertificateException e)
-            {
-                LogUtil.logWarnThrowable(LOG, "Could not configure CA " + caName, e);
+                LOG.debug(message, e);
+
                 if(dev_mode == false)
                 {
                     throw new ConfigurationException(e);
@@ -787,25 +786,10 @@ public final class RAWorkerImpl extends AbstractRAWorker implements RAWorker
                 _cert.verify(caPublicKey);
                 return true;
             }
-        } catch (SignatureException e)
+        } catch (SignatureException | InvalidKeyException | CertificateException |
+                NoSuchAlgorithmException | NoSuchProviderException e)
         {
-            LOG.debug("SignatureException while verifying signature: {}", e.getMessage());
-            return false;
-        } catch (InvalidKeyException e)
-        {
-            LOG.debug("InvalidKeyException while verifying signature: {}", e.getMessage());
-            return false;
-        } catch (CertificateException e)
-        {
-            LOG.debug("CertificateException while verifying signature: {}", e.getMessage());
-            return false;
-        } catch (NoSuchAlgorithmException e)
-        {
-            LOG.debug("NoSuchAlgorithmException while verifying signature: {}", e.getMessage());
-            return false;
-        } catch (NoSuchProviderException e)
-        {
-            LOG.debug("NoSuchProviderException while verifying signature: {}", e.getMessage());
+            LOG.debug("{} while verifying signature: {}", e.getClass().getName(), e.getMessage());
             return false;
         }
     }
@@ -827,10 +811,7 @@ public final class RAWorkerImpl extends AbstractRAWorker implements RAWorker
         {
             PKIMessage pkiMessage = cmpRequestor.envelopeRevocation(request);
             return pkiMessage.getEncoded();
-        } catch (CmpRequestorException e)
-        {
-            throw new RAWorkerException(e);
-        } catch (IOException e)
+        } catch (CmpRequestorException | IOException e)
         {
             throw new RAWorkerException(e);
         }

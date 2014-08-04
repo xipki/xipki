@@ -196,10 +196,7 @@ public class KeyUtil
                 try
                 {
                     kf = KeyFactory.getInstance(algorithm, "BC");
-                } catch (NoSuchAlgorithmException e)
-                {
-                    throw new InvalidKeySpecException("Could not find KeyFactory for " + algorithm + ": " + e.getMessage());
-                } catch (NoSuchProviderException e)
+                } catch (NoSuchAlgorithmException | NoSuchProviderException e)
                 {
                     throw new InvalidKeySpecException("Could not find KeyFactory for " + algorithm + ": " + e.getMessage());
                 }

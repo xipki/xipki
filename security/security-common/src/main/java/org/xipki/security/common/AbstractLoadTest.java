@@ -63,7 +63,7 @@ public abstract class AbstractLoadTest
                 }
             } catch (InterruptedException e)
             {
-                e.printStackTrace();
+                break;
             }
         }
 

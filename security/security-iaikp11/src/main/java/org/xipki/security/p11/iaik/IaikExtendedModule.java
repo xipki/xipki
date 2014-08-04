@@ -86,7 +86,12 @@ public class IaikExtendedModule
                 LOG.debug("{}", msg);
             }catch(Throwable t)
             {
-                LogUtil.logWarnThrowable(LOG, "Unexpected error", t);
+                final String message = "Unexpected error";
+                if(LOG.isErrorEnabled())
+                {
+                    LOG.error(LogUtil.buildExceptionLogFormat(message), t.getClass().getName(), t.getMessage());
+                }
+                LOG.debug(message, t);
             }
         }
     }
@@ -168,7 +173,12 @@ public class IaikExtendedModule
         }
         catch (Throwable t)
         {
-            LogUtil.logErrorThrowable(LOG, "error while module.finalize()", t);
+            final String message = "error while module.finalize()";
+            if(LOG.isErrorEnabled())
+            {
+                LOG.error(LogUtil.buildExceptionLogFormat(message), t.getClass().getName(), t.getMessage());
+            }
+            LOG.debug(message, t);
         }
 
         module = null;

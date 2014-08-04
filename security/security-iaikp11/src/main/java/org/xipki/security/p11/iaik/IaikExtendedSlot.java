@@ -78,7 +78,12 @@ public class IaikExtendedSlot
             session = openSession();
         } catch (TokenException e)
         {
-            LogUtil.logWarnThrowable(LOG, "openSession", e);
+            final String message = "openSession";
+            if(LOG.isWarnEnabled())
+            {
+                LOG.warn(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(), e.getMessage());
+            }
+            LOG.debug(message, e);
             close();
             throw new SignerException(e);
         }
@@ -88,7 +93,12 @@ public class IaikExtendedSlot
             firstLogin(session, password);
         } catch (TokenException e)
         {
-            LogUtil.logWarnThrowable(LOG, "firstLogin", e);
+            final String message = "firstLogin";
+            if(LOG.isWarnEnabled())
+            {
+                LOG.warn(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(), e.getMessage());
+            }
+            LOG.debug(message, e);
             close();
             throw new SignerException(e);
         }
@@ -99,7 +109,12 @@ public class IaikExtendedSlot
             maxSessionCount2 = this.slot.getToken().getTokenInfo().getMaxSessionCount();
         } catch (TokenException e)
         {
-            LogUtil.logWarnThrowable(LOG, "getToken", e);
+            final String message = "getToken";
+            if(LOG.isWarnEnabled())
+            {
+                LOG.warn(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(), e.getMessage());
+            }
+            LOG.debug(message, e);
         }
 
         if(maxSessionCount2 == 0)
@@ -516,7 +531,12 @@ public class IaikExtendedSlot
             }
             catch (Throwable t)
             {
-                LogUtil.logErrorThrowable(LOG, "error while slot.getToken().closeAllSessions()", t);
+                final String message = "error while slot.getToken().closeAllSessions()";
+                if(LOG.isWarnEnabled())
+                {
+                    LOG.warn(LogUtil.buildExceptionLogFormat(message), t.getClass().getName(), t.getMessage());
+                }
+                LOG.debug(message, t);
             }
 
             slot = null;

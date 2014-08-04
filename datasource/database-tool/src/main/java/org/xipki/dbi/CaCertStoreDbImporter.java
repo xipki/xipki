@@ -382,16 +382,10 @@ class CaCertStoreDbImporter extends DbPorter
                     try
                     {
                         c = IoCertUtil.parseCRL(new ByteArrayInputStream(encodedCrl));
-                    } catch (CertificateException e)
+                    } catch (CertificateException | CRLException e)
                     {
                         LOG.error("could not parse CRL in file {}", filename);
                         LOG.debug("could not parse CRL in file " + filename, e);
-                        //throw e;
-                    } catch (CRLException e)
-                    {
-                        LOG.error("could not parse CRL in file {}", filename);
-                        LOG.debug("could not parse CRL in file " + filename, e);
-                        //throw e;
                     }
 
                     if(c == null)

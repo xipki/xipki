@@ -48,21 +48,10 @@ public class BCCompatilbilityUtil
 
             Method m = o.getClass().getMethod("getDate");
             return (Date) m.invoke(o);
-        } catch (IllegalAccessException e)
+        } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException |
+                NoSuchMethodException | SecurityException e)
         {
-            throw new RuntimeException("IllegalAccessException: " + e.getMessage(), e);
-        } catch (IllegalArgumentException e)
-        {
-            throw new RuntimeException("IllegalArgumentException: " + e.getMessage(), e);
-        } catch (InvocationTargetException e)
-        {
-            throw new RuntimeException("InvocationTargetException: " + e.getMessage(), e);
-        } catch (NoSuchMethodException e)
-        {
-            throw new RuntimeException("NoSuchMethodException: " + e.getMessage(), e);
-        } catch (SecurityException e)
-        {
-            throw new RuntimeException("SecurityException: " + e.getMessage(), e);
+            throw new RuntimeException(e.getClass().getName() + ": " + e.getMessage(), e);
         }
     }
 
