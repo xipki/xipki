@@ -92,8 +92,13 @@ public class P11ECDSAContentSigner implements ContentSigner
             throw new RuntimeCryptoException("SignerException: " + e.getMessage());
         } catch (Throwable t)
         {
-            LogUtil.logWarnThrowable(LOG, "Throwable", t);
-            throw new RuntimeCryptoException("IOException: " + t.getMessage());
+            final String message = "Throwable";
+            if(LOG.isWarnEnabled())
+            {
+                LOG.warn(LogUtil.buildExceptionLogFormat(message), t.getClass().getName(), t.getMessage());
+            }
+            LOG.debug(message, t);
+            throw new RuntimeCryptoException(t.getClass().getName() + ": " + t.getMessage());
         }
     }
 

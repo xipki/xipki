@@ -139,12 +139,9 @@ public abstract class RemoteP11CryptService implements P11CryptService
         try
         {
             return IoCertUtil.parseCert(certBytes);
-        } catch (CertificateException e)
+        } catch (CertificateException | IOException e)
         {
-            throw new SignerException("CertificateException: " + e.getMessage(), e);
-        } catch (IOException e)
-        {
-            throw new SignerException("IOException: " + e.getMessage(), e);
+            throw new SignerException(e.getClass().getName() + ": " + e.getMessage(), e);
         }
     }
 

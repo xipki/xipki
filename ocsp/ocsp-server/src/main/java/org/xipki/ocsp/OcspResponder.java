@@ -218,10 +218,7 @@ public class OcspResponder
             JAXBElement<OCSPResponderType> rootElement = (JAXBElement<OCSPResponderType>)
                     unmarshaller.unmarshal(new File(confFile));
             this.conf = rootElement.getValue();
-        } catch (JAXBException e)
-        {
-            throw new OcspResponderException(e);
-        } catch (SAXException e)
+        } catch (JAXBException | SAXException e)
         {
             throw new OcspResponderException(e);
         }
@@ -275,10 +272,7 @@ public class OcspResponder
             try
             {
                 this.certpathBuilder = CertPathBuilder.getInstance("PKIX", "BC");
-            } catch (NoSuchAlgorithmException e)
-            {
-                throw new OcspResponderException(e.getMessage(), e);
-            } catch (NoSuchProviderException e)
+            } catch (NoSuchAlgorithmException | NoSuchProviderException e)
             {
                 throw new OcspResponderException(e.getMessage(), e);
             }
@@ -375,10 +369,7 @@ public class OcspResponder
                         responderSignerType, "algo?" + sigAlgo + "%" + responderKeyConf,
                         explicitCertificateChain, passwordResolver);
                 signers.add(requestorSigner);
-            } catch (SignerException e)
-            {
-                throw new OcspResponderException(e);
-            } catch (PasswordResolverException e)
+            } catch (SignerException | PasswordResolverException e)
             {
                 throw new OcspResponderException(e);
             }
@@ -387,10 +378,7 @@ public class OcspResponder
         try
         {
             responderSigner = new ResponderSigner(signers);
-        } catch (CertificateEncodingException e)
-        {
-            throw new OcspResponderException(e);
-        } catch (IOException e)
+        } catch (CertificateEncodingException | IOException e)
         {
             throw new OcspResponderException(e);
         }
@@ -579,7 +567,12 @@ public class OcspResponder
                 store.shutdown();
             }catch(Exception e)
             {
-                LogUtil.logWarnThrowable(LOG, "shutdown store " + store.getName(), e);
+                final String message =  "shutdown store " + store.getName();
+                if(LOG.isWarnEnabled())
+                {
+                    LOG.warn(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(), e.getMessage());
+                }
+                LOG.debug(message, e);
             }
         }
 
@@ -675,8 +668,12 @@ public class OcspResponder
                         result = certpathBuilder.build(cpp);
                     }catch(CertPathBuilderException | InvalidAlgorithmParameterException e)
                     {
-                        LogUtil.logWarnThrowable(LOG, "could not build certpath for the request's signer certifcate", e);
-                        String message = "could not build certpath for the request's signer certifcate";
+                        final String message = "could not build certpath for the request's signer certifcate";
+                        if(LOG.isWarnEnabled())
+                        {
+                            LOG.warn(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(), e.getMessage());
+                        }
+                        LOG.debug(message, e);
                         if(auditEvent != null)
                         {
                             fillAuditEvent(auditEvent, AuditLevel.INFO, AuditStatus.FAILED, message);
@@ -815,7 +812,12 @@ public class OcspResponder
                         }
                     } catch (CertStatusStoreException e)
                     {
-                        LogUtil.logErrorThrowable(LOG, "answer() CertStatusStore.getCertStatus", e);
+                        final String message = "answer() CertStatusStore.getCertStatus";
+                        if(LOG.isErrorEnabled())
+                        {
+                            LOG.error(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(), e.getMessage());
+                        }
+                        LOG.debug(message, e);
                         if(childAuditEvent != null)
                         {
                             fillAuditEvent(childAuditEvent, AuditLevel.ERROR, AuditStatus.ERROR,
@@ -828,15 +830,21 @@ public class OcspResponder
                 if(childAuditEvent != null)
                 {
                     String certProfile = certStatusInfo.getCertProfile();
+                    String auditCertType;
                     if(certProfile != null)
                     {
-                        String auditCertType = auditCertprofileMapping.get(certProfile);
+                        auditCertType = auditCertprofileMapping.get(certProfile);
                         if(auditCertType == null)
                         {
                             auditCertType = certProfile;
                         }
-                        childAuditEvent.addEventData(new AuditEventData("certType", auditCertType));
                     }
+                    else
+                    {
+                        auditCertType = "NN";
+                    }
+
+                    childAuditEvent.addEventData(new AuditEventData("certType", auditCertType));
                 }
 
                 // certStatusInfo could not be null in any case, since at least one store is configured
@@ -911,7 +919,12 @@ public class OcspResponder
                         encodedCertHash = bcCertHash.getEncoded();
                     } catch (IOException e)
                     {
-                        LogUtil.logErrorThrowable(LOG, "answer() bcCertHash.getEncoded", e);
+                        final String message = "answer() bcCertHash.getEncoded";
+                        if(LOG.isErrorEnabled())
+                        {
+                            LOG.error(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(), e.getMessage());
+                        }
+                        LOG.debug(message, e);
                         if(childAuditEvent != null)
                         {
                             fillAuditEvent(childAuditEvent, AuditLevel.ERROR, AuditStatus.ERROR,
@@ -1025,7 +1038,12 @@ public class OcspResponder
                 basicOcspResp = basicOcspBuilder.build(signer, certsInResp, new Date());
             } catch (OCSPException e)
             {
-                LogUtil.logErrorThrowable(LOG, "answer() basicOcspBuilder.build", e);
+                final String message = "answer() basicOcspBuilder.build";
+                if(LOG.isErrorEnabled())
+                {
+                    LOG.error(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(), e.getMessage());
+                }
+                LOG.debug(message, e);
                 if(auditEvent != null)
                 {
                     fillAuditEvent(auditEvent, AuditLevel.ERROR, AuditStatus.ERROR,
@@ -1057,7 +1075,12 @@ public class OcspResponder
                 }
             } catch (OCSPException e)
             {
-                LogUtil.logErrorThrowable(LOG, "answer() ocspRespBuilder.build", e);
+                final String message = "answer() ocspRespBuilder.build";
+                if(LOG.isErrorEnabled())
+                {
+                    LOG.error(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(), e.getMessage());
+                }
+                LOG.debug(message, e);
                 if(auditEvent != null)
                 {
                     fillAuditEvent(auditEvent, AuditLevel.ERROR, AuditStatus.ERROR,
@@ -1068,7 +1091,12 @@ public class OcspResponder
 
         }catch(Throwable t)
         {
-            LogUtil.logErrorThrowable(LOG, "Throwable", t);
+            final String message = "Throwable";
+            if(LOG.isErrorEnabled())
+            {
+                LOG.error(LogUtil.buildExceptionLogFormat(message), t.getClass().getName(), t.getMessage());
+            }
+            LOG.debug(message, t);
 
             if(auditEvent != null)
             {
@@ -1108,10 +1136,7 @@ public class OcspResponder
         try
         {
             return IoCertUtil.parseCert(f);
-        }catch(IOException e)
-        {
-            throw new OcspResponderException("Could not parse cert " + f, e);
-        } catch (CertificateException e)
+        }catch(IOException | CertificateException e)
         {
             throw new OcspResponderException("Could not parse cert " + f, e);
         }
@@ -1245,4 +1270,5 @@ public class OcspResponder
     {
         return (b == null) ? defaultValue : b.booleanValue();
     }
+
 }

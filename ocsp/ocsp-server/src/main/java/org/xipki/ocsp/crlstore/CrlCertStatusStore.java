@@ -485,7 +485,12 @@ public class CrlCertStatusStore extends CertStatusStore
             LOG.info("Updated CertStore {}", getName());
         } catch (Exception e)
         {
-            LogUtil.logErrorThrowable(LOG, "Could not executing initializeStore()", e);
+            final String message = "Could not executing initializeStore()";
+            if(LOG.isErrorEnabled())
+            {
+                LOG.error(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(), e.getMessage());
+            }
+            LOG.debug(message, e);
             initializationFailed = true;
             initialized = true;
         } finally

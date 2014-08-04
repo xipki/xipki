@@ -257,7 +257,12 @@ public class CertificateStore
             return queryExecutor.getCertStatusForSubject(caCert, subject);
         } catch (SQLException e)
         {
-            LogUtil.logErrorThrowable(LOG, "queryExecutor.getCertStatusForSubject", e);
+            final String message = "queryExecutor.getCertStatusForSubject";
+            if(LOG.isErrorEnabled())
+            {
+                LOG.error(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(), e.getMessage());
+            }
+            LOG.debug(message, e);
             return CertStatus.Unknown;
         }
     }
@@ -348,4 +353,5 @@ public class CertificateStore
     {
         return queryExecutor.getNotBeforeOfFirstCertStartsWithCN(commonName, profileName);
     }
+
 }

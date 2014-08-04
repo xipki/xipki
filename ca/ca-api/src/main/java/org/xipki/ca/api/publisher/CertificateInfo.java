@@ -39,7 +39,6 @@ public class CertificateInfo
             String profileName)
     throws CertificateEncodingException
     {
-        super();
         ParamChecker.assertNotNull("cert", cert);
         ParamChecker.assertNotNull("issuerCert", issuerCert);
         ParamChecker.assertNotEmpty("profileName", profileName);

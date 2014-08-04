@@ -31,22 +31,15 @@ public enum CAStatus
 
     public static CAStatus getCAStatus(String status)
     {
-        if(PENDING.status.equalsIgnoreCase(status))
+        for(CAStatus value : values())
         {
-            return PENDING;
+            if(value.status.equalsIgnoreCase(status))
+            {
+                return value;
+            }
         }
-        else if(ACTIVE.status.equalsIgnoreCase(status))
-        {
-            return ACTIVE;
-        }
-        else if(INACTIVE.status.equalsIgnoreCase(status))
-        {
-            return INACTIVE;
-        }
-        else
-        {
-            return null;
-        }
+
+        return null;
     }
 
 }

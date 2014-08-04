@@ -30,7 +30,12 @@ public class XipkiNSSProviderRegister
                 Security.addProvider(provider);
             }catch(Throwable t)
             {
-                LogUtil.logErrorThrowable(LOG, "Could not add provider " + XipkiNSSProvider.PROVIDER_NAME, t);
+                final String message = "Could not add provider " + XipkiNSSProvider.PROVIDER_NAME;
+                if(LOG.isErrorEnabled())
+                {
+                    LOG.error(LogUtil.buildExceptionLogFormat(message), t.getClass().getName(), t.getMessage());
+                }
+                LOG.debug(message, t);
             }
         }
     }

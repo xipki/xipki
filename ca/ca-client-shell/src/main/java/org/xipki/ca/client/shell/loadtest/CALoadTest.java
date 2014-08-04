@@ -283,13 +283,9 @@ abstract class CALoadTest extends AbstractLoadTest
                 request.addRequestEntry(requestEntry);
 
                 result = raWorker.requestCerts(request, null, null);
-            } catch (RAWorkerException e)
+            } catch (RAWorkerException | PKIErrorException e)
             {
-                LOG.warn("RAWorkerException: {}", e.getMessage());
-                return false;
-            } catch (PKIErrorException e)
-            {
-                LOG.warn("PKIErrorException: {}", e.getMessage());
+                LOG.warn("{}: {}", e.getClass().getName(), e.getMessage());
                 return false;
             }
 

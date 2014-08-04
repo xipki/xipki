@@ -103,10 +103,7 @@ public abstract class CmpRequestor
         try
         {
             request = CmpUtil.addProtection(request, requestor, sender, false);
-        } catch (CMPException e)
-        {
-            throw new CmpRequestorException("Could not sign the request", e);
-        } catch (NoIdleSignerException e)
+        } catch (CMPException | NoIdleSignerException e)
         {
             throw new CmpRequestorException("Could not sign the request", e);
         }
@@ -170,13 +167,7 @@ public abstract class CmpRequestor
                 ProtectionVerificationResult verifyProtection = verifyProtection(
                         Hex.toHexString(tid.getOctets()), response);
                 ret.setProtectionVerificationResult(verifyProtection);
-            } catch (InvalidKeyException e)
-            {
-                throw new CmpRequestorException(e);
-            } catch (OperatorCreationException e)
-            {
-                throw new CmpRequestorException(e);
-            } catch (CMPException e)
+            } catch (InvalidKeyException | OperatorCreationException | CMPException e)
             {
                 throw new CmpRequestorException(e);
             }

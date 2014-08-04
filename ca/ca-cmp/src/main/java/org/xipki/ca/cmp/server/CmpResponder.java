@@ -10,7 +10,6 @@ package org.xipki.ca.cmp.server;
 import java.security.InvalidKeyException;
 import java.security.SecureRandom;
 import java.security.cert.X509Certificate;
-import java.text.ParseException;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -194,7 +193,12 @@ public abstract class CmpResponder
                 requestor = (CertBasedRequestorInfo) verificationResult.getRequestor();
             } catch (Exception e)
             {
-                LogUtil.logErrorThrowable(LOG, "tid=" + tidStr + ": error while verifying the signature", e);
+                final String msg = "tid=" + tidStr + ": error while verifying the signature";
+                if(LOG.isErrorEnabled())
+                {
+                    LOG.error(LogUtil.buildExceptionLogFormat(msg), e.getClass().getName(), e.getMessage());
+                }
+                LOG.debug(msg, e);
                 errorStatus = "Request has invalid signature based protection";
             }
         }
@@ -301,7 +305,13 @@ public abstract class CmpResponder
             return CmpUtil.addProtection(pkiMessage, responder, sender, getCmpControl().isSendResponderCert());
         } catch (Exception e)
         {
-               LogUtil.logErrorThrowable(LOG, "error while add protection to the PKI message", e);
+            final String message = "error while add protection to the PKI message";
+            if(LOG.isErrorEnabled())
+            {
+                LOG.error(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(), e.getMessage());
+            }
+            LOG.debug(message, e);
+
             PKIStatusInfo status = generateCmpRejectionStatus(
                     PKIFailureInfo.systemFailure, "could not sign the PKIMessage");
             PKIBody body = new PKIBody(PKIBody.TYPE_ERROR, new ErrorMsgContent(status));

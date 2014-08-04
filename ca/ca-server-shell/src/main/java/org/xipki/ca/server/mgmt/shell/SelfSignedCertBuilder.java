@@ -162,12 +162,9 @@ class SelfSignedCertBuilder
         try
         {
             signer = securityFactory.createSigner(signerType, signerConf, (X509Certificate[]) null, passwordResolver);
-        } catch (PasswordResolverException e)
+        } catch (PasswordResolverException | SignerException e)
         {
-            throw new OperationException(ErrorCode.System_Failure, "PasswordResolverException: " + e.getMessage());
-        } catch (SignerException e)
-        {
-            throw new OperationException(ErrorCode.System_Failure, "SignerException: " + e.getMessage());
+            throw new OperationException(ErrorCode.System_Failure, e.getClass().getName() + ": " + e.getMessage());
         }
 
         // this certificate is the dummy one which can be considered only as public key container
@@ -276,27 +273,13 @@ class SelfSignedCertBuilder
 
             CertificateFactory cf = CertificateFactory.getInstance("X.509", "BC");
             return (X509Certificate) cf.generateCertificate(new ByteArrayInputStream(encodedCert));
-        } catch (NoIdleSignerException e)
-        {
-            throw new OperationException(ErrorCode.System_Failure, "NoIdleSignerException: " + e.getMessage());
-        } catch (CertificateException e)
-        {
-            throw new OperationException(ErrorCode.System_Failure, "CertificateException: " + e.getMessage());
-        } catch (IOException e)
-        {
-            throw new OperationException(ErrorCode.System_Failure, "IOException: " + e.getMessage());
-        } catch (CertProfileException e)
-        {
-            throw new OperationException(ErrorCode.System_Failure, "CertProfileException: " + e.getMessage());
         } catch (BadCertTemplateException e)
         {
             throw new OperationException(ErrorCode.BAD_CERT_TEMPLATE, e.getMessage());
-        } catch (NoSuchAlgorithmException e)
+        } catch (NoIdleSignerException | CertificateException | IOException | CertProfileException |
+                NoSuchAlgorithmException | NoSuchProviderException e)
         {
-            throw new OperationException(ErrorCode.System_Failure, "NoSuchAlgorithmException: " + e.getMessage());
-        } catch (NoSuchProviderException e)
-        {
-            throw new OperationException(ErrorCode.System_Failure, "NoSuchProviderException: " + e.getMessage());
+            throw new OperationException(ErrorCode.System_Failure, e.getClass().getName() + ": " + e.getMessage());
         }
     }
 

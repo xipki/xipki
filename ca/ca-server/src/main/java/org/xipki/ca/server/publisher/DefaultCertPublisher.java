@@ -68,10 +68,7 @@ public class DefaultCertPublisher extends CertPublisher
         try
         {
             queryExecutor = new CertStatusStoreQueryExecutor(dataSource, publishGoodCerts);
-        } catch (NoSuchAlgorithmException e)
-        {
-            throw new CertPublisherException(e);
-        } catch (SQLException e)
+        } catch (NoSuchAlgorithmException | SQLException e)
         {
             throw new CertPublisherException(e);
         }
