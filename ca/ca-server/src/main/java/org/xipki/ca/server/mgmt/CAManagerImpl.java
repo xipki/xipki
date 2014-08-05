@@ -3406,7 +3406,7 @@ public class CAManagerImpl implements CAManager
             auditEvent.setAffectedResource("CORE");
             if(successfull)
             {
-                auditEvent.setStatus(AuditStatus.SUCCSEEFULL.name());
+                auditEvent.setStatus(AuditStatus.SUCCESSFUL.name());
                 auditEvent.setLevel(AuditLevel.INFO);
             }
             else

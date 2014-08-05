@@ -87,7 +87,7 @@ public class Rfc2560Servlet extends HttpServlet
         AuditEvent auditEvent = null;
 
         AuditLevel auditLevel = AuditLevel.INFO;
-        AuditStatus auditStatus = AuditStatus.SUCCSEEFULL;
+        AuditStatus auditStatus = AuditStatus.SUCCESSFUL;
         String auditMessage = null;
 
         long startInUs = 0;

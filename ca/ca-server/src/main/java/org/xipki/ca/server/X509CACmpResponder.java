@@ -511,7 +511,7 @@ public class X509CACmpResponder extends CmpResponder
             }
             else if(auditEvent.getStatus() == null)
             {
-                auditEvent.setStatus(AuditStatus.SUCCSEEFULL);
+                auditEvent.setStatus(AuditStatus.SUCCESSFUL);
             }
         }
 
@@ -836,7 +836,7 @@ public class X509CACmpResponder extends CmpResponder
 
             if(childAuditEvent != null)
             {
-                childAuditEvent.setStatus(AuditStatus.SUCCSEEFULL);
+                childAuditEvent.setStatus(AuditStatus.SUCCESSFUL);
             }
 
             CertOrEncCert cec = new CertOrEncCert(
@@ -1020,7 +1020,7 @@ public class X509CACmpResponder extends CmpResponder
                     repContentBuilder.add(status, certId);
                     if(childAuditEvent != null)
                     {
-                        childAuditEvent.setStatus(AuditStatus.SUCCSEEFULL);
+                        childAuditEvent.setStatus(AuditStatus.SUCCESSFUL);
                     }
                 }
                 else

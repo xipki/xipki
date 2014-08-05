@@ -967,7 +967,7 @@ public class OcspResponder
                 if(childAuditEvent != null)
                 {
                     childAuditEvent.setLevel(AuditLevel.INFO);
-                    childAuditEvent.setStatus(AuditStatus.SUCCSEEFULL);
+                    childAuditEvent.setStatus(AuditStatus.SUCCESSFUL);
                     childAuditEvent.addEventData(new AuditEventData("certStatus", certStatusText));
                 }
 
@@ -1229,7 +1229,7 @@ public class OcspResponder
             auditEvent.setAffectedResource("CORE");
             if(successfull)
             {
-                auditEvent.setStatus(AuditStatus.SUCCSEEFULL.name());
+                auditEvent.setStatus(AuditStatus.SUCCESSFUL.name());
                 auditEvent.setLevel(AuditLevel.INFO);
             }
             else
