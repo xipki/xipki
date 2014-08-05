@@ -19,6 +19,7 @@ import java.security.cert.X509Certificate;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Types;
+import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
@@ -478,8 +479,11 @@ class CaCertStoreDbImporter extends DbPorter
         int sum = 0;
         try
         {
-            for(CertType cert : certs.getCert())
+            List<CertType> list = certs.getCert();
+            final int n = list.size();
+            for(int i = 0; i < n; i++)
             {
+                CertType cert = list.get(i);
                 try
                 {
                     String filename = cert.getCertFile();
@@ -533,13 +537,18 @@ class CaCertStoreDbImporter extends DbPorter
                     String sha1FpSubject = IoCertUtil.sha1sum_canonicalized_name(c.getSubject());
                     ps_cert.setString(idx++, sha1FpSubject);
 
-                    ps_cert.executeUpdate();
-
                     ps_rawcert.setInt   (1, cert.getId());
                     ps_rawcert.setString(2, hexSha1FpCert);
                     ps_rawcert.setString(3, Base64.toBase64String(encodedCert));
 
-                    ps_rawcert.executeUpdate();
+                    ps_cert.addBatch();
+                    ps_rawcert.addBatch();
+                    if(i % 100 == 0 || i == n-1)
+                    {
+                        ps_cert.executeBatch();
+                        ps_rawcert.executeBatch();
+                    }
+
                     sum++;
                 }catch(Exception e)
                 {
