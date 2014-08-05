@@ -13,6 +13,7 @@ import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
@@ -220,8 +221,12 @@ class OcspCertStoreDbImporter extends DbPorter
 
         try
         {
-            for(CertType cert : certs.getCert())
+            List<CertType> list = certs.getCert();
+            final int n = list.size();
+
+            for(int i = 0; i < n; i++)
             {
+                CertType cert = list.get(i);
                 try
                 {
                     String filename = cert.getCertFile();
@@ -263,7 +268,6 @@ class OcspCertStoreDbImporter extends DbPorter
                     setLong(ps_cert, idx++, cert.getRevTime());
                     setLong(ps_cert, idx++, cert.getRevInvalidityTime());
                     ps_cert.setString(idx++, cert.getProfile());
-                    ps_cert.executeUpdate();
 
                     // certhash
                     idx = 1;
@@ -274,13 +278,18 @@ class OcspCertStoreDbImporter extends DbPorter
                     ps_certhash.setString(idx++, HashCalculator.hexHash(HashAlgoType.SHA384, encodedCert));
                     ps_certhash.setString(idx++, HashCalculator.hexHash(HashAlgoType.SHA512, encodedCert));
 
-                    ps_certhash.executeUpdate();
-
                     // rawcert
                     ps_rawcert.setInt   (1, cert.getId());
                     ps_rawcert.setString(2, Base64.toBase64String(encodedCert));
 
-                    ps_rawcert.executeUpdate();
+                    ps_cert.addBatch();
+                    ps_rawcert.addBatch();
+                    if(i % 100 == 0 || i == n-1)
+                    {
+                        ps_cert.executeBatch();
+                        ps_certhash.executeUpdate();
+                        ps_rawcert.executeBatch();
+                    }
 
                     sum++;
                 }catch(Exception e)
