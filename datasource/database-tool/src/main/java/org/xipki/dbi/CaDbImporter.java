@@ -14,6 +14,8 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xipki.database.api.DataSourceWrapper;
 import org.xipki.database.api.DataSourceFactory;
 import org.xipki.dbi.ca.jaxb.ObjectFactory;
@@ -26,6 +28,7 @@ import org.xipki.security.api.PasswordResolverException;
 
 public class CaDbImporter
 {
+    private static final Logger LOG = LoggerFactory.getLogger(CaDbImporter.class);
     private final DataSourceWrapper dataSource;
     private final Unmarshaller unmarshaller;
 
@@ -54,9 +57,15 @@ public class CaDbImporter
             CaCertStoreDbImporter certStoreImporter = new CaCertStoreDbImporter(dataSource, unmarshaller, srcFolder);
             certStoreImporter.importToDB();
             certStoreImporter.shutdown();
-        }finally
+        } finally
         {
-            dataSource.shutdown();
+            try
+            {
+                dataSource.shutdown();
+            }catch(Throwable e)
+            {
+                LOG.error("dataSource.shutdown()", e);
+            }
         }
     }
 
