@@ -5,7 +5,7 @@
  *
  */
 
-package org.xipki.security.shell.completer;
+package org.xipki.ca.client.shell.completer;
 
 import java.util.Enumeration;
 import java.util.HashSet;
@@ -21,7 +21,7 @@ import org.xipki.console.karaf.DynamicEnumCompleter;
  * @author Lijun Liao
  */
 
-public class ECCurverNameCompleter extends DynamicEnumCompleter
+public class ECCurveNameCompleter extends DynamicEnumCompleter
 {
 
     @Override
