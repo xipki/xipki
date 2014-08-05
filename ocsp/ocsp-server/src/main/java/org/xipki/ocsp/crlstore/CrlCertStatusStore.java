@@ -508,7 +508,7 @@ public class CrlCertStatusStore extends CertStatusStore
                 else
                 {
                     auditLevel = AuditLevel.ERROR;
-                    auditStatus = AuditStatus.SUCCSEEFULL;
+                    auditStatus = AuditStatus.SUCCESSFUL;
                 }
 
                 auditLogPCIEvent(auditLevel, eventType, auditStatus.name());
