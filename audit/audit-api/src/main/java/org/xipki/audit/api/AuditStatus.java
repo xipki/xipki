@@ -13,7 +13,7 @@ package org.xipki.audit.api;
 
 public enum AuditStatus
 {
-    SUCCSEEFULL(0),
+    SUCCESSFUL(0),
     FAILED(1),
     OK(2),
     ERROR(3),
