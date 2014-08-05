@@ -841,7 +841,7 @@ public class OcspResponder
                     }
                     else
                     {
-                        auditCertType = "NN";
+                        auditCertType = "UNKNOWN";
                     }
 
                     childAuditEvent.addEventData(new AuditEventData("certType", auditCertType));
