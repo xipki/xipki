@@ -21,7 +21,7 @@ import org.xipki.console.karaf.DynamicEnumCompleter;
  * @author Lijun Liao
  */
 
-public class ECCurverNameCompleter extends DynamicEnumCompleter
+public class ECCurveNameCompleter extends DynamicEnumCompleter
 {
 
     @Override
