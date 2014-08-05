@@ -32,8 +32,8 @@ public abstract class XipkiOsgiCommandSupport extends OsgiCommandSupport
     throws IOException
     {
         ConsoleReader reader = (ConsoleReader) session.get(".jline.reader");
+        File saveTo = expandFilepath(file);
 
-        File saveTo = file;
         boolean randomSaveTo = false;
         if(saveTo.exists())
         {
@@ -115,6 +115,7 @@ public abstract class XipkiOsgiCommandSupport extends OsgiCommandSupport
     protected void save(File file, byte[] encoded)
     throws IOException
     {
+        file = expandFilepath(file);
         File parent = file.getParentFile();
         if (parent != null && parent.exists() == false)
         {
@@ -209,6 +210,30 @@ public abstract class XipkiOsgiCommandSupport extends OsgiCommandSupport
                 return new char[0];
             }
         }
+    }
+
+    public static String expandFilepath(String path)
+    {
+        if (path.startsWith("~" + File.separator))
+        {
+            return System.getProperty("user.home") + path.substring(1);
+        }
+        else
+        {
+            return path;
+        }
+    }
+
+    public static File expandFilepath(File file)
+    {
+        String path = file.getPath();
+        String expandedPath = expandFilepath(path);
+        if(path.equals(expandedPath) == false)
+        {
+            file = new File(expandedPath);
+        }
+
+        return file;
     }
 
 }
