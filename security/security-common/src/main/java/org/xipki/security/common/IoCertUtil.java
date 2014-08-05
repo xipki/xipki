@@ -197,13 +197,13 @@ public class IoCertUtil
     public static byte[] read(String fileName)
     throws IOException
     {
-        return read(new File(fileName));
+        return read(new File(expandFilepath(fileName)));
     }
 
     public static byte[] read(File file)
     throws IOException
     {
-        return read(new FileInputStream(file));
+        return read(new FileInputStream(expandFilepath(file)));
     }
 
     public static byte[] read(InputStream in)
@@ -234,9 +234,17 @@ public class IoCertUtil
         }
     }
 
+    public static void save(String fileName, byte[] encoded)
+    throws IOException
+    {
+        save(new File(expandFilepath(fileName)), encoded);
+    }
+
     public static void save(File file, byte[] encoded)
     throws IOException
     {
+           file = expandFilepath(file);
+
         File parent = file.getParentFile();
         if (parent != null && parent.exists() == false)
         {
@@ -259,13 +267,13 @@ public class IoCertUtil
     public static X509Certificate parseCert(String fileName)
     throws IOException, CertificateException
     {
-        return parseCert(new File(fileName));
+        return parseCert(new File(expandFilepath(fileName)));
     }
 
     public static X509Certificate parseCert(File file)
     throws IOException, CertificateException
     {
-        FileInputStream in = new FileInputStream(file);
+        FileInputStream in = new FileInputStream(expandFilepath(file));
         try
         {
             return parseCert(in);
@@ -304,7 +312,7 @@ public class IoCertUtil
     public static X509CRL parseCRL(String f)
     throws IOException, CertificateException, CRLException
     {
-        return parseCRL(new FileInputStream(f));
+        return parseCRL(new FileInputStream(expandFilepath(f)));
     }
 
     public static X509CRL parseCRL(InputStream crlStream)
@@ -720,4 +728,27 @@ public class IoCertUtil
         return curveName;
     }
 
+    public static String expandFilepath(String path)
+    {
+        if (path.startsWith("~" + File.separator))
+        {
+            return System.getProperty("user.home") + path.substring(1);
+        }
+        else
+        {
+            return path;
+        }
+    }
+
+    public static File expandFilepath(File file)
+    {
+        String path = file.getPath();
+        String expandedPath = expandFilepath(path);
+        if(path.equals(expandedPath) == false)
+        {
+            file = new File(expandedPath);
+        }
+
+        return file;
+    }
 }

@@ -20,6 +20,7 @@ import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 
 import org.xipki.database.api.DataSourceWrapper;
+import org.xipki.security.common.IoCertUtil;
 import org.xipki.security.common.ParamChecker;
 import org.xml.sax.SAXException;
 
@@ -52,7 +53,7 @@ public class DbPorter
 
         this.dataSource = dataSource;
         this.connection = this.dataSource.getConnection();
-        this.baseDir = baseDir;
+        this.baseDir = IoCertUtil.expandFilepath(baseDir);
     }
 
     protected static void setLong(PreparedStatement ps, int index, Long i)
