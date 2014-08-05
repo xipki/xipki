@@ -16,6 +16,8 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xipki.database.api.DataSourceWrapper;
 import org.xipki.database.api.DataSourceFactory;
 import org.xipki.dbi.ca.jaxb.ObjectFactory;
@@ -29,6 +31,8 @@ import org.xipki.security.common.ParamChecker;
 
 public class CaDbExporter
 {
+    private static final Logger LOG = LoggerFactory.getLogger(CaDbExporter.class);
+
     protected final DataSourceWrapper dataSource;
     protected final Marshaller marshaller;
     protected final String destFolder;
@@ -108,7 +112,13 @@ public class CaDbExporter
             certStoreExporter.shutdown();
         }finally
         {
-            dataSource.shutdown();
+            try
+            {
+                dataSource.shutdown();
+            }catch(Throwable e)
+            {
+                LOG.error("dataSource.shutdown()", e);
+            }
         }
     }
 
