@@ -283,30 +283,30 @@ public class ObjectIdentifiers
     {
         List<ASN1ObjectIdentifier> _forwardDNs = new ArrayList<>(25);
 
-        _forwardDNs.add(ObjectIdentifiers.DN_C);
-        _forwardDNs.add(ObjectIdentifiers.DN_DC);
-        _forwardDNs.add(ObjectIdentifiers.DN_ST);
-        _forwardDNs.add(ObjectIdentifiers.DN_L);
-        _forwardDNs.add(ObjectIdentifiers.DN_O);
-        _forwardDNs.add(ObjectIdentifiers.DN_OU);
-        _forwardDNs.add(ObjectIdentifiers.DN_T);
-        _forwardDNs.add(ObjectIdentifiers.DN_SURNAME);
-        _forwardDNs.add(ObjectIdentifiers.DN_INITIALS);
-        _forwardDNs.add(ObjectIdentifiers.DN_GIVENNAME);
-        _forwardDNs.add(ObjectIdentifiers.DN_SERIALNUMBER);
-        _forwardDNs.add(ObjectIdentifiers.DN_NAME);
-        _forwardDNs.add(ObjectIdentifiers.DN_CN);
-        _forwardDNs.add(ObjectIdentifiers.DN_UID);
-        _forwardDNs.add(ObjectIdentifiers.DN_DMD_NAME);
-        _forwardDNs.add(ObjectIdentifiers.DN_EmailAddress);
-        _forwardDNs.add(ObjectIdentifiers.DN_UnstructuredName);
-        _forwardDNs.add(ObjectIdentifiers.DN_UnstructuredAddress);
-        _forwardDNs.add(ObjectIdentifiers.DN_POSTAL_CODE);
-        _forwardDNs.add(ObjectIdentifiers.DN_BUSINESS_CATEGORY);
-        _forwardDNs.add(ObjectIdentifiers.DN_POSTAL_ADDRESS);
-        _forwardDNs.add(ObjectIdentifiers.DN_TELEPHONE_NUMBER);
-        _forwardDNs.add(ObjectIdentifiers.DN_PSEUDONYM);
-        _forwardDNs.add(ObjectIdentifiers.DN_STREET);
+        _forwardDNs.add(DN_C);
+        _forwardDNs.add(DN_DC);
+        _forwardDNs.add(DN_ST);
+        _forwardDNs.add(DN_L);
+        _forwardDNs.add(DN_O);
+        _forwardDNs.add(DN_OU);
+        _forwardDNs.add(DN_T);
+        _forwardDNs.add(DN_SURNAME);
+        _forwardDNs.add(DN_INITIALS);
+        _forwardDNs.add(DN_GIVENNAME);
+        _forwardDNs.add(DN_SERIALNUMBER);
+        _forwardDNs.add(DN_NAME);
+        _forwardDNs.add(DN_CN);
+        _forwardDNs.add(DN_UID);
+        _forwardDNs.add(DN_DMD_NAME);
+        _forwardDNs.add(DN_EmailAddress);
+        _forwardDNs.add(DN_UnstructuredName);
+        _forwardDNs.add(DN_UnstructuredAddress);
+        _forwardDNs.add(DN_POSTAL_CODE);
+        _forwardDNs.add(DN_BUSINESS_CATEGORY);
+        _forwardDNs.add(DN_POSTAL_ADDRESS);
+        _forwardDNs.add(DN_TELEPHONE_NUMBER);
+        _forwardDNs.add(DN_PSEUDONYM);
+        _forwardDNs.add(DN_STREET);
 
         forwardDNs = Collections.unmodifiableList(_forwardDNs);
 

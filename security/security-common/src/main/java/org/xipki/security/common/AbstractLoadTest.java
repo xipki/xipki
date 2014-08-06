@@ -7,9 +7,6 @@
 
 package org.xipki.security.common;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -235,32 +232,6 @@ public abstract class AbstractLoadTest
         }
 
         return sb.toString();
-    }
-
-    /**
-     * Save the specified content to file.
-     * The non-existing parent directories will be created.
-     *
-     * @param filename where to save the content
-     * @param content content to be saved
-     */
-    protected static void saveToFile(String filename, byte[] content)
-    {
-        try
-        {
-            File f = new File(filename);
-            File p = f.getParentFile();
-            if(p != null && ! p.exists())
-            {
-                p.mkdirs();
-            }
-
-            FileOutputStream fout = new FileOutputStream(f);
-            fout.write(content);
-            fout.close();
-        }catch(IOException e)
-        {
-        }
     }
 
     private static class MeasurePoint

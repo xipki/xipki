@@ -164,7 +164,7 @@ public class CrlCertStatusStore extends CertStatusStore
 
         try
         {
-            File f = new File(crlFile);
+            File f = new File(IoCertUtil.expandFilepath(crlFile));
             if(f.exists() == false)
             {
                 // file does not exist

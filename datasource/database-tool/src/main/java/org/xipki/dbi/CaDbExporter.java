@@ -18,11 +18,12 @@ import javax.xml.bind.Marshaller;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.database.api.DataSourceWrapper;
 import org.xipki.database.api.DataSourceFactory;
+import org.xipki.database.api.DataSourceWrapper;
 import org.xipki.dbi.ca.jaxb.ObjectFactory;
 import org.xipki.security.api.PasswordResolver;
 import org.xipki.security.api.PasswordResolverException;
+import org.xipki.security.common.IoCertUtil;
 import org.xipki.security.common.ParamChecker;
 
 /**
@@ -44,7 +45,7 @@ public class CaDbExporter
         ParamChecker.assertNotEmpty("destFolder", destFolder);
         this.dataSource = dataSourceFactory.createDataSource(dbConfStream, passwordResolver);
         this.marshaller = getMarshaller();
-        this.destFolder = destFolder;
+        this.destFolder = IoCertUtil.expandFilepath(destFolder);
         checkDestFolder();
     }
 
@@ -53,9 +54,10 @@ public class CaDbExporter
     throws SQLException, PasswordResolverException, IOException, JAXBException
     {
         ParamChecker.assertNotEmpty("destFolder", destFolder);
-        this.dataSource = dataSourceFactory.createDataSourceForFile(dbConfFile, passwordResolver);
+        this.dataSource = dataSourceFactory.createDataSourceForFile(
+                IoCertUtil.expandFilepath(dbConfFile), passwordResolver);
         this.marshaller = getMarshaller();
-        this.destFolder = destFolder;
+        this.destFolder = IoCertUtil.expandFilepath(destFolder);
         checkDestFolder();
     }
 

@@ -16,11 +16,12 @@ import javax.xml.bind.Unmarshaller;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.database.api.DataSourceWrapper;
 import org.xipki.database.api.DataSourceFactory;
+import org.xipki.database.api.DataSourceWrapper;
 import org.xipki.dbi.ca.jaxb.ObjectFactory;
 import org.xipki.security.api.PasswordResolver;
 import org.xipki.security.api.PasswordResolverException;
+import org.xipki.security.common.IoCertUtil;
 
 /**
  * @author Lijun Liao
@@ -36,7 +37,8 @@ public class CaDbImporter
             PasswordResolver passwordResolver, String dbConfFile)
     throws SQLException, PasswordResolverException, IOException, JAXBException
     {
-        this.dataSource = dataSourceFactory.createDataSourceForFile(dbConfFile, passwordResolver);
+        this.dataSource = dataSourceFactory.createDataSourceForFile(
+                IoCertUtil.expandFilepath(dbConfFile), passwordResolver);
         JAXBContext jaxbContext = JAXBContext.newInstance(ObjectFactory.class);
         unmarshaller = jaxbContext.createUnmarshaller();
         unmarshaller.setSchema(DbPorter.retrieveSchema("/xsd/dbi-ca.xsd"));

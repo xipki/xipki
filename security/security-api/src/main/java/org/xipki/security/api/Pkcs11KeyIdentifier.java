@@ -28,7 +28,7 @@ public class Pkcs11KeyIdentifier implements Comparable<Pkcs11KeyIdentifier>
             throw new IllegalArgumentException("at least one of keyId an keyLabel must be non-null");
         }
         this.keyId = keyId;
-        this.keyIdHex = (keyId == null) ? null : Hex.toHexString(keyId).toUpperCase();
+        this.keyIdHex = (keyId == null) ? null : new String(Hex.encode(keyId)).toUpperCase();
         this.keyLabel = keyLabel;
     }
 
@@ -39,7 +39,7 @@ public class Pkcs11KeyIdentifier implements Comparable<Pkcs11KeyIdentifier>
             throw new IllegalArgumentException("keyId could not be null");
         }
         this.keyId = keyId;
-        this.keyIdHex = Hex.toHexString(keyId).toUpperCase();
+        this.keyIdHex = new String(Hex.encode(keyId)).toUpperCase();
         this.keyLabel = null;
     }
 
