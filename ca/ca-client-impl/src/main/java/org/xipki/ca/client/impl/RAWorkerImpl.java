@@ -148,7 +148,7 @@ public final class RAWorkerImpl extends AbstractRAWorker implements RAWorker
         }
 
         Properties props = new Properties();
-        FileInputStream configStream = new FileInputStream(confFile);
+        FileInputStream configStream = new FileInputStream(IoCertUtil.expandFilepath(confFile));
         try
         {
             props.load(configStream);

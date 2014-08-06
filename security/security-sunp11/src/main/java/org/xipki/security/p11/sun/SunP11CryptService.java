@@ -62,6 +62,7 @@ public final class SunP11CryptService implements P11CryptService
             Set<Integer> includeSlotIndexes, Set<Integer> excludeSlotIndexes)
     throws SignerException
     {
+        pkcs11Module = IoCertUtil.expandFilepath(pkcs11Module);
         SunNamedCurveExtender.addNamedCurves();
 
         synchronized (instances)

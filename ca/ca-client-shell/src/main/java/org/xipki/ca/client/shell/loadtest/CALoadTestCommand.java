@@ -24,20 +24,15 @@ public class CALoadTestCommand extends ClientCommand
             description = "Required. Certificate profile")
     protected String certProfile;
 
-    @Option(name = "-cn",
-            required = true,
-            description = "Required. Common name prefix")
-    protected String commonNamePrefix;
-
     @Option(name = "-subject",
             required = true,
-            description = "Required. Subject without common name")
-    protected String subjectNoCN;
+            description = "Required. Subject template")
+    protected String subjectTemplate;
 
     @Option(name = "-duration",
-            required = true,
-            description = "Required. Duration in seconds")
-    protected int durationInSecond;
+            required = false,
+            description = "Required. Duration in seconds, the default is 10")
+    protected Integer durationInSecond;
 
     @Option(name = "-thread",
             required = false,
@@ -55,7 +50,7 @@ public class CALoadTestCommand extends ClientCommand
     private Integer keysize;
 
     @Option(name = "-curve",
-            description = "ECC curve name or OID, the default is brainpoolP256r1",
+            description = "EC curve name or OID, the default is brainpoolp256r1",
             required = false)
     protected String curveName;
 
@@ -74,12 +69,23 @@ public class CALoadTestCommand extends ClientCommand
             return null;
         }
 
+        if(durationInSecond == null)
+        {
+            durationInSecond = 10;
+        }
+
+        if(durationInSecond < 1)
+        {
+            System.err.println("Invalid duration " + durationInSecond);
+            return null;
+        }
+
         StringBuilder startMsg = new StringBuilder();
 
-        startMsg.append("Threads:      " + numThreads).append("\n");
-        startMsg.append("Duration:     " + durationInSecond + " s").append("\n");
-        startMsg.append("Subject:      " + "CN=" + commonNamePrefix + "<n>," + subjectNoCN).append("\n");
-        startMsg.append("Profile:      " + certProfile).append("\n");
+        startMsg.append("Threads:         " + numThreads).append("\n");
+        startMsg.append("Duration:        " + durationInSecond + " s").append("\n");
+        startMsg.append("SubjectTemplate: " + subjectTemplate).append("\n");
+        startMsg.append("Profile:         " + certProfile).append("\n");
         System.out.print(startMsg.toString());
 
         CALoadTest loadTest;
@@ -87,9 +93,9 @@ public class CALoadTestCommand extends ClientCommand
         {
             if(curveName == null)
             {
-                curveName = "brainpoolP256r1";
+                curveName = "brainpoolp256r1";
             }
-            loadTest = new CALoadTest.ECCALoadTest(raWorker, certProfile, commonNamePrefix, subjectNoCN, curveName);
+            loadTest = new CALoadTest.ECCALoadTest(raWorker, certProfile, subjectTemplate, curveName);
         }
         else
         {
@@ -97,7 +103,7 @@ public class CALoadTestCommand extends ClientCommand
             {
                 keysize = 2048;
             }
-            loadTest = new CALoadTest.RSACALoadTest(raWorker, certProfile, commonNamePrefix, subjectNoCN, keysize.intValue());
+            loadTest = new CALoadTest.RSACALoadTest(raWorker, certProfile, subjectTemplate, keysize.intValue());
         }
 
         loadTest.setDuration(durationInSecond);

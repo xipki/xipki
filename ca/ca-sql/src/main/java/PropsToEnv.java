@@ -6,6 +6,7 @@
  */
 
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileWriter;
 import java.util.Properties;
@@ -24,8 +25,8 @@ public class PropsToEnv
             final String os = System.getProperty("os.name").toLowerCase();
             boolean isWindows = os.indexOf("win") >= 0;
 
-            String source = args[0];
-            String target = args[1];
+            String source = expandFilepath(args[0]);
+            String target = expandFilepath(args[1]);
             BufferedWriter bw = new BufferedWriter(new FileWriter(target));
 
             Properties props = new Properties();
@@ -81,6 +82,18 @@ public class PropsToEnv
         {
             e.printStackTrace();
             System.exit(1);
+        }
+    }
+
+    public static String expandFilepath(String path)
+    {
+        if (path.startsWith("~" + File.separator))
+        {
+            return System.getProperty("user.home") + path.substring(1);
+        }
+        else
+        {
+            return path;
         }
     }
 

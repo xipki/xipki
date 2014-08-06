@@ -12,6 +12,7 @@ import java.io.IOException;
 import org.bouncycastle.asn1.ASN1Object;
 import org.bouncycastle.asn1.ASN1OctetString;
 import org.bouncycastle.asn1.ASN1Primitive;
+import org.bouncycastle.asn1.ASN1String;
 import org.bouncycastle.asn1.DEROctetString;
 import org.bouncycastle.asn1.DERUTF8String;
 import org.xipki.security.api.Pkcs11KeyIdentifier;
@@ -57,9 +58,9 @@ public class KeyIdentifier extends ASN1Object
             Pkcs11KeyIdentifier keyIdentifier = new Pkcs11KeyIdentifier(keyIdBytes);
             return new KeyIdentifier(keyIdentifier);
         }
-        else if(obj instanceof DERUTF8String)
+        else if(obj instanceof ASN1String)
         {
-            String keyLabel = ((DERUTF8String) obj).getString();
+            String keyLabel = ((ASN1String) obj).getString();
             Pkcs11KeyIdentifier keyIdentifier = new Pkcs11KeyIdentifier(keyLabel);
             return new KeyIdentifier(keyIdentifier);
         }
