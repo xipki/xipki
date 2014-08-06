@@ -543,7 +543,7 @@ class CaCertStoreDbImporter extends DbPorter
 
                     ps_cert.addBatch();
                     ps_rawcert.addBatch();
-                    if(i % 100 == 0 || i == n-1)
+                    if((i + 1) % 100 == 0 || i == n-1)
                     {
                         ps_cert.executeBatch();
                         ps_rawcert.executeBatch();
