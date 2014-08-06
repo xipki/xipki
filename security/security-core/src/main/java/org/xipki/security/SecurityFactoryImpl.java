@@ -410,7 +410,7 @@ public class SecurityFactoryImpl implements SecurityFactory
                     String fn = s.substring("file:".length());
                     try
                     {
-                        keystoreStream = new FileInputStream(fn);
+                        keystoreStream = new FileInputStream(IoCertUtil.expandFilepath(fn));
                     } catch (FileNotFoundException e)
                     {
                         throw new SignerException("File not found: " + fn);

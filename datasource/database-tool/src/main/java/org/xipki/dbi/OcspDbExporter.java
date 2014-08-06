@@ -15,8 +15,8 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 
-import org.xipki.database.api.DataSourceWrapper;
 import org.xipki.database.api.DataSourceFactory;
+import org.xipki.database.api.DataSourceWrapper;
 import org.xipki.dbi.ocsp.jaxb.ObjectFactory;
 import org.xipki.security.api.PasswordResolver;
 import org.xipki.security.api.PasswordResolverException;

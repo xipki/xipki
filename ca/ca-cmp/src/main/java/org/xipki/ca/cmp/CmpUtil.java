@@ -10,6 +10,7 @@ package org.xipki.ca.cmp;
 import java.util.Date;
 
 import org.bouncycastle.asn1.ASN1OctetString;
+import org.bouncycastle.asn1.ASN1String;
 import org.bouncycastle.asn1.DERNull;
 import org.bouncycastle.asn1.DERUTF8String;
 import org.bouncycastle.asn1.cmp.CMPObjectIdentifiers;
@@ -151,7 +152,7 @@ public class CmpUtil
             {
                 if(CMPObjectIdentifiers.regInfo_utf8Pairs.equals(regInfo.getInfoType()))
                 {
-                    String regInfoValue = ((DERUTF8String) regInfo.getInfoValue()).getString();
+                    String regInfoValue = ((ASN1String) regInfo.getInfoValue()).getString();
                     return new CmpUtf8Pairs(regInfoValue);
                 }
             }
@@ -171,7 +172,7 @@ public class CmpUtil
         {
             if(CMPObjectIdentifiers.regInfo_utf8Pairs.equals(atv.getType()))
             {
-                String regInfoValue = ((DERUTF8String) atv.getValue()).getString();
+                String regInfoValue = ((ASN1String) atv.getValue()).getString();
                 return new CmpUtf8Pairs(regInfoValue);
             }
         }

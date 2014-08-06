@@ -13,17 +13,21 @@ import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.cert.X509Certificate;
 import java.security.spec.InvalidKeySpecException;
+import java.util.Arrays;
 import java.util.Calendar;
+import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.atomic.AtomicLong;
 
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
-import org.bouncycastle.asn1.ASN1OctetString;
+import org.bouncycastle.asn1.DERUTF8String;
 import org.bouncycastle.asn1.crmf.CertRequest;
 import org.bouncycastle.asn1.crmf.CertTemplate;
 import org.bouncycastle.asn1.crmf.CertTemplateBuilder;
 import org.bouncycastle.asn1.crmf.ProofOfPossession;
+import org.bouncycastle.asn1.x500.RDN;
 import org.bouncycastle.asn1.x500.X500Name;
+import org.bouncycastle.asn1.x500.style.IETFUtils;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.bouncycastle.asn1.x9.X9ECPoint;
@@ -32,8 +36,6 @@ import org.bouncycastle.crypto.util.SubjectPublicKeyInfoFactory;
 import org.bouncycastle.jcajce.provider.asymmetric.ec.BCECPublicKey;
 import org.bouncycastle.jce.ECNamedCurveTable;
 import org.bouncycastle.jce.spec.ECNamedCurveParameterSpec;
-import org.bouncycastle.math.ec.ECFieldElement;
-import org.bouncycastle.math.ec.ECFieldElement.F2m;
 import org.bouncycastle.math.ec.ECPoint;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,6 +49,8 @@ import org.xipki.ca.common.PKIErrorException;
 import org.xipki.ca.common.RAWorkerException;
 import org.xipki.security.SignerUtil;
 import org.xipki.security.common.AbstractLoadTest;
+import org.xipki.security.common.IoCertUtil;
+import org.xipki.security.common.ObjectIdentifiers;
 import org.xipki.security.common.ParamChecker;
 import org.xipki.security.p10.P12KeypairGenerator;
 
@@ -61,9 +65,9 @@ abstract class CALoadTest extends AbstractLoadTest
         private BigInteger baseN;
 
         public RSACALoadTest(RAWorker raWorker, String certProfile,
-                String commonNamePrefix, String otherPartOfSubject, int keysize)
+                String subjectTemplate, int keysize)
         {
-            super(raWorker, certProfile, commonNamePrefix, otherPartOfSubject);
+            super(raWorker, certProfile, subjectTemplate);
             if(keysize % 1024 != 0)
             {
                 throw new IllegalArgumentException("invalid RSA keysize " + keysize);
@@ -104,14 +108,12 @@ abstract class CALoadTest extends AbstractLoadTest
     {
         private ASN1ObjectIdentifier curveOid;
         private String curveName;
-        private ECPoint baseQ;
-        private BigInteger baseQx;
+        private BigInteger basePublicKey;
 
-        public ECCALoadTest(RAWorker raWorker, String certProfile,
-        String commonNamePrefix, String otherPartOfSubject, String curveNameOrOid)
+        public ECCALoadTest(RAWorker raWorker, String certProfile, String subjectTemplate, String curveNameOrOid)
         throws Exception
         {
-            super(raWorker, certProfile, commonNamePrefix, otherPartOfSubject);
+            super(raWorker, certProfile, subjectTemplate);
             boolean isOid;
             try
             {
@@ -141,23 +143,9 @@ abstract class CALoadTest extends AbstractLoadTest
             ECNamedCurveParameterSpec spec = ECNamedCurveTable.getParameterSpec(curveName);
             kpgen.initialize(spec);
             KeyPair kp = kpgen.generateKeyPair();
-            this.baseQ = ((BCECPublicKey) kp.getPublic()).getQ();
 
-            if(baseQ instanceof ECPoint.F2m)
-            {
-                ECFieldElement.F2m basePointX = (ECFieldElement.F2m) ((ECPoint.F2m) baseQ).getX();
-                baseQx = basePointX.toBigInteger();
-            }
-            else //if(baseQ instanceof ECPoint.Fp)
-            {
-                ECFieldElement.Fp basePointX = (ECFieldElement.Fp) ((ECPoint.Fp) baseQ).getX();
-                baseQx = basePointX.toBigInteger();
-            }
-
-            for(int i = 0; i < 32; i++)
-            {
-                baseQx = baseQx.clearBit(i);
-            }
+            ECPoint baseQ = ((BCECPublicKey) kp.getPublic()).getQ();
+            basePublicKey = new BigInteger(new X9ECPoint(baseQ).getEncoded());
         }
 
         @Override
@@ -166,27 +154,8 @@ abstract class CALoadTest extends AbstractLoadTest
             AlgorithmIdentifier algId = new AlgorithmIdentifier(X9ObjectIdentifiers.id_ecPublicKey,
                     this.curveOid);
 
-            ECPoint q;
-            if(baseQ instanceof ECPoint.F2m)
-            {
-                ECFieldElement.F2m basePointX = (ECFieldElement.F2m) ((ECPoint.F2m) baseQ).getX();
-                BigInteger x = baseQx.add(BigInteger.valueOf(index));
-
-                ECFieldElement.F2m pointX = new F2m(basePointX.getM(),basePointX.getK1(),
-                        basePointX.getK2(), basePointX.getK3(), x);
-                q = new ECPoint.F2m(baseQ.getCurve(), pointX, baseQ.getY());
-            }
-            else //if(baseQ instanceof ECPoint.Fp)
-            {
-                ECFieldElement.Fp basePointX = (ECFieldElement.Fp) ((ECPoint.Fp) baseQ).getX();
-                BigInteger x = baseQx.add(BigInteger.valueOf(index));
-                ECFieldElement.Fp pointX = new ECFieldElement.Fp(basePointX.getQ(), x);
-
-                q = new ECPoint.Fp(baseQ.getCurve(), pointX, baseQ.getY());
-            }
-
-           ASN1OctetString p = (ASN1OctetString)new X9ECPoint(q).toASN1Primitive();
-           return new SubjectPublicKeyInfo(algId, p.getOctets());
+            BigInteger publicKey = basePublicKey.add(BigInteger.valueOf(index));
+            return new SubjectPublicKeyInfo(algId, publicKey.toByteArray());
         }
     }
 
@@ -194,8 +163,8 @@ abstract class CALoadTest extends AbstractLoadTest
 
     private final RAWorker raWorker;
     private final String certProfile;
-    private final String commonNamePrefix;
-    private final String otherPartOfSubject;
+    private final X500Name subjectTemplate;
+    private final ASN1ObjectIdentifier subjectRDNForIncrement;
 
     private AtomicLong index;
 
@@ -208,19 +177,37 @@ abstract class CALoadTest extends AbstractLoadTest
         return new Testor();
     }
 
-    public CALoadTest(RAWorker raWorker, String certProfile,
-            String commonNamePrefix,
-            String otherPartOfSubject)
+    public CALoadTest(RAWorker raWorker, String certProfile, String subjectTemplate)
     {
         ParamChecker.assertNotNull("raWorker", raWorker);
         ParamChecker.assertNotEmpty("certProfile", certProfile);
-        ParamChecker.assertNotEmpty("commonNamePrefix", commonNamePrefix);
-        ParamChecker.assertNotEmpty("otherPartOfSubject", otherPartOfSubject);
+        ParamChecker.assertNotEmpty("subjectTemplate", subjectTemplate);
+        this.subjectTemplate = IoCertUtil.sortX509Name(new X500Name(subjectTemplate));
+
+        ASN1ObjectIdentifier[] rdnOidsForIncrement = new ASN1ObjectIdentifier[]
+        {
+                    ObjectIdentifiers.DN_O, ObjectIdentifiers.DN_OU, ObjectIdentifiers.DN_GIVENNAME,
+                    ObjectIdentifiers.DN_SURNAME, ObjectIdentifiers.DN_STREET, ObjectIdentifiers.DN_POSTAL_CODE,
+                    ObjectIdentifiers.DN_CN};
+
+        ASN1ObjectIdentifier _subjectRDNForIncrement = null;
+        List<ASN1ObjectIdentifier> attrTypes = Arrays.asList(this.subjectTemplate.getAttributeTypes());
+        for(ASN1ObjectIdentifier oid : rdnOidsForIncrement)
+        {
+            if(attrTypes.contains(oid))
+            {
+                _subjectRDNForIncrement = oid;
+            }
+        }
+
+        if(_subjectRDNForIncrement == null)
+        {
+            throw new IllegalArgumentException("invalid subjectTemplate");
+        }
+        this.subjectRDNForIncrement = _subjectRDNForIncrement;
 
         this.raWorker = raWorker;
         this.certProfile = certProfile;
-        this.commonNamePrefix = commonNamePrefix;
-        this.otherPartOfSubject = otherPartOfSubject;
 
         Calendar baseTime = Calendar.getInstance(Locale.UK);
         baseTime.set(Calendar.YEAR, 2014);
@@ -236,8 +223,8 @@ abstract class CALoadTest extends AbstractLoadTest
 
         long thisIndex = index.getAndIncrement();
 
-        X500Name subject = new X500Name("CN=" + commonNamePrefix + thisIndex + "," + otherPartOfSubject);
-        certTempBuilder.setSubject(subject);
+        this.subjectTemplate.getRDNs();
+        certTempBuilder.setSubject(incrementX500Name(thisIndex));
 
         SubjectPublicKeyInfo spki = getSubjectPublicKeyInfo(thisIndex);
         if(spki == null)
@@ -307,4 +294,29 @@ abstract class CALoadTest extends AbstractLoadTest
 
     } // End class OcspRequestor
 
+    private X500Name incrementX500Name(long index)
+    {
+        RDN[] baseRDNs = subjectTemplate.getRDNs();
+
+        final int n = baseRDNs.length;
+        RDN[] newRDNS = new RDN[n];
+
+        boolean incremented = false;
+        for(int i = 0; i < n; i++)
+        {
+            RDN rdn = baseRDNs[i];
+            if(incremented == false)
+            {
+                if(rdn.getFirst().getType().equals(subjectRDNForIncrement))
+                {
+                    String text = IETFUtils.valueToString(rdn.getFirst().getValue());
+                    rdn = new RDN(subjectRDNForIncrement, new DERUTF8String(text + index));
+                    incremented = true;
+                }
+            }
+
+            newRDNS[i] = rdn;
+        }
+        return new X500Name(newRDNS);
+    }
 }

@@ -44,7 +44,7 @@ public abstract class P12SecurityCommand extends SecurityCommand
         FileInputStream fIn = null;
         try
         {
-            fIn = new FileInputStream(p12File);
+            fIn = new FileInputStream(expandFilepath(p12File));
             ks = KeyStore.getInstance("PKCS12", "BC");
             ks.load(fIn, getPassword());
         }finally
