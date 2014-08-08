@@ -25,7 +25,6 @@ import java.util.Date;
 import java.util.List;
 
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
-import org.bouncycastle.asn1.ASN1OctetString;
 import org.bouncycastle.asn1.DERNull;
 import org.bouncycastle.asn1.nist.NISTNamedCurves;
 import org.bouncycastle.asn1.nist.NISTObjectIdentifiers;
@@ -40,7 +39,6 @@ import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.bouncycastle.asn1.x509.X509Extension;
 import org.bouncycastle.asn1.x509.X509ObjectIdentifiers;
 import org.bouncycastle.asn1.x9.X962NamedCurves;
-import org.bouncycastle.asn1.x9.X9ECPoint;
 import org.bouncycastle.asn1.x9.X9ObjectIdentifiers;
 import org.bouncycastle.cert.X509CertificateHolder;
 import org.bouncycastle.cert.X509v3CertificateBuilder;
@@ -344,9 +342,8 @@ public abstract class P12KeypairGenerator
                      this.curveOid);
 
             BCECPublicKey pub = (BCECPublicKey) kp.getPublic();
-
-            ASN1OctetString p = (ASN1OctetString)new X9ECPoint(pub.getQ()).toASN1Primitive();
-            SubjectPublicKeyInfo subjectPublicKeyInfo = new SubjectPublicKeyInfo(algId, p.getOctets());
+            byte[] keyData = pub.getQ().getEncoded(false);
+            SubjectPublicKeyInfo subjectPublicKeyInfo = new SubjectPublicKeyInfo(algId, keyData);
 
             return new KeyPairWithSubjectPublicKeyInfo(kp, subjectPublicKeyInfo);
         }

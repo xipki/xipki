@@ -76,7 +76,7 @@ import org.xipki.security.common.ParamChecker;
 
 public class P11KeypairGenerator
 {
-    public static final long YEAR = 365L * 24 * 60 * 60 * 1000; // milliseconds of one day
+    public static final long YEAR = 365L * 24 * 60 * 60 * 1000; // milliseconds of one year
 
     private static IaikExtendedSlot getSlot(String pkcs11Lib, PKCS11SlotIdentifier slotId, char[] password)
     throws SignerException
