@@ -32,6 +32,8 @@ import org.xipki.ca.server.certprofile.jaxb.AlgorithmType;
 import org.xipki.ca.server.certprofile.jaxb.CertificatePolicyInformationType;
 import org.xipki.ca.server.certprofile.jaxb.ConditionType;
 import org.xipki.ca.server.certprofile.jaxb.ConstantExtensionType;
+import org.xipki.ca.server.certprofile.jaxb.CurveType;
+import org.xipki.ca.server.certprofile.jaxb.CurveType.Encodings;
 import org.xipki.ca.server.certprofile.jaxb.ECParameterType;
 import org.xipki.ca.server.certprofile.jaxb.EnvParamType;
 import org.xipki.ca.server.certprofile.jaxb.ExtensionType;
@@ -898,7 +900,14 @@ public class ProfileConfCreatorDemo
         for(ASN1ObjectIdentifier curveId : curveIds)
         {
             String name = IoCertUtil.getCurveName(curveId);
-            ecParams.getCurve().add(createOidType(curveId, name));
+            CurveType curve = new CurveType();
+            curve.setOid(createOidType(curveId, name));
+
+            Encodings encodings = new Encodings();
+            encodings.getEncoding().add((byte) 4); // uncompressed
+            curve.setEncodings(encodings);
+
+            ecParams.getCurve().add(curve);
         }
 
         return ret;

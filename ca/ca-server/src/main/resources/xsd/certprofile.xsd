@@ -102,12 +102,30 @@
 	</xs:complexType>
 
 	<xs:complexType name="ECParameterType">
-		<xs:sequence>			
-			<xs:element name="curve" type="OidWithDescType" maxOccurs="unbounded"/>
+		<xs:sequence>
+			<xs:element name="curve" type="curveType" maxOccurs="unbounded"/>
+		</xs:sequence>
+	</xs:complexType>	
+
+	<xs:complexType name="curveType">
+		<xs:sequence>
+			<xs:element name="oid" type="OidWithDescType"/>
+			<xs:element name="encodings" minOccurs="0">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="encoding" type="xs:byte" minOccurs="0" maxOccurs="unbounded">
+							<xs:annotation>
+								<xs:documentation>
+									first byte of the encoded EC point									
+								</xs:documentation>
+							</xs:annotation>						
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
 		</xs:sequence>
 	</xs:complexType>
-	
-	
+		
 	<xs:complexType name="RdnType">
 		<xs:sequence>
 			<xs:element name="type" type="OidWithDescType"/>

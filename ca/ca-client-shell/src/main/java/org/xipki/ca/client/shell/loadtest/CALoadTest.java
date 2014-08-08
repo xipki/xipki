@@ -30,7 +30,6 @@ import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x500.style.IETFUtils;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
-import org.bouncycastle.asn1.x9.X9ECPoint;
 import org.bouncycastle.asn1.x9.X9ObjectIdentifiers;
 import org.bouncycastle.crypto.util.SubjectPublicKeyInfoFactory;
 import org.bouncycastle.jcajce.provider.asymmetric.ec.BCECPublicKey;
@@ -145,7 +144,7 @@ abstract class CALoadTest extends AbstractLoadTest
             KeyPair kp = kpgen.generateKeyPair();
 
             ECPoint baseQ = ((BCECPublicKey) kp.getPublic()).getQ();
-            basePublicKey = new BigInteger(new X9ECPoint(baseQ).getEncoded());
+            basePublicKey = new BigInteger(baseQ.getEncoded(false));
         }
 
         @Override
@@ -197,6 +196,7 @@ abstract class CALoadTest extends AbstractLoadTest
             if(attrTypes.contains(oid))
             {
                 _subjectRDNForIncrement = oid;
+                break;
             }
         }
 

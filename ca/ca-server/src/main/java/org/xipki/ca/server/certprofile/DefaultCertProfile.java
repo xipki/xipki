@@ -33,7 +33,6 @@ import org.bouncycastle.asn1.ASN1Integer;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.ASN1StreamParser;
-import org.bouncycastle.asn1.DERInteger;
 import org.bouncycastle.asn1.DERNull;
 import org.bouncycastle.asn1.DERPrintableString;
 import org.bouncycastle.asn1.DERSequence;
@@ -58,7 +57,10 @@ import org.bouncycastle.asn1.x509.GeneralSubtree;
 import org.bouncycastle.asn1.x509.NameConstraints;
 import org.bouncycastle.asn1.x509.PolicyMappings;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
+import org.bouncycastle.asn1.x9.X9ECParameters;
 import org.bouncycastle.asn1.x9.X9ObjectIdentifiers;
+import org.bouncycastle.jcajce.provider.asymmetric.util.ECUtil;
+import org.bouncycastle.math.ec.ECCurve;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.ca.api.profile.AbstractCertProfile;
@@ -80,6 +82,9 @@ import org.xipki.ca.server.certprofile.jaxb.CertificatePolicyInformationType;
 import org.xipki.ca.server.certprofile.jaxb.CertificatePolicyInformationType.PolicyQualifiers;
 import org.xipki.ca.server.certprofile.jaxb.ConditionType;
 import org.xipki.ca.server.certprofile.jaxb.ConstantExtensionType;
+import org.xipki.ca.server.certprofile.jaxb.CurveType;
+import org.xipki.ca.server.certprofile.jaxb.CurveType.Encodings;
+import org.xipki.ca.server.certprofile.jaxb.ECParameterType;
 import org.xipki.ca.server.certprofile.jaxb.ExtensionType;
 import org.xipki.ca.server.certprofile.jaxb.ExtensionsType;
 import org.xipki.ca.server.certprofile.jaxb.ExtensionsType.Admission;
@@ -132,7 +137,7 @@ public class DefaultCertProfile extends AbstractCertProfile
     protected ProfileType profileConf;
 
     private SpecialCertProfileBehavior specialBehavior;
-    private Set<ASN1ObjectIdentifier> allowedEcCurves;
+    private Map<ASN1ObjectIdentifier, Set<Byte>> allowedEcCurves;
     private Map<ASN1ObjectIdentifier, List<KeyParamRanges>> nonEcKeyAlgorithms;
 
     private Map<ASN1ObjectIdentifier, SubjectDNOption> subjectDNOptions;
@@ -270,18 +275,26 @@ public class DefaultCertProfile extends AbstractCertProfile
             {
                 List<AlgorithmType> types = keyAlgos.getAlgorithm();
                 this.nonEcKeyAlgorithms = new HashMap<>();
-                this.allowedEcCurves = new HashSet<>();
+                this.allowedEcCurves = new HashMap<>();
 
                 for(AlgorithmType type : types)
                 {
                     ASN1ObjectIdentifier oid = new ASN1ObjectIdentifier(type.getAlgorithm().getValue());
                     if(X9ObjectIdentifiers.id_ecPublicKey.equals(oid))
                     {
-                        if(type.getEcParameter() != null)
+                        ECParameterType params = type.getEcParameter();
+                        if(params != null)
                         {
-                            for(OidWithDescType curveType :type.getEcParameter().getCurve())
+                            for(CurveType curveType :params.getCurve())
                             {
-                                this.allowedEcCurves.add(new ASN1ObjectIdentifier(curveType.getValue()));
+                                ASN1ObjectIdentifier curveOid = new ASN1ObjectIdentifier(curveType.getOid().getValue());
+                                Encodings encodingsType = curveType.getEncodings();
+                                Set<Byte> encodings = new HashSet<>();
+                                if(encodingsType != null)
+                                {
+                                    encodings.addAll(encodingsType.getEncoding());
+                                }
+                                this.allowedEcCurves.put(curveOid, encodings);
                             }
                         }
                     }
@@ -620,7 +633,7 @@ public class DefaultCertProfile extends AbstractCertProfile
                     {
                         throw new CertProfileException("negative inhibitAnyPolicy.skipCerts is not allowed: " + skipCerts);
                     }
-                    DERInteger value = new DERInteger(skipCerts);
+                    ASN1Integer value = new ASN1Integer(BigInteger.valueOf(skipCerts));
                     ExtensionTuple extension = createExtension(extensionOid, occurrence.isCritical(), value);
                     ExtensionTupleOption option = new ExtensionTupleOption(
                             createCondition(type.getCondition()), extension);
@@ -861,11 +874,6 @@ public class DefaultCertProfile extends AbstractCertProfile
         ASN1ObjectIdentifier keyType = publicKey.getAlgorithm().getAlgorithm();
         if(X9ObjectIdentifiers.id_ecPublicKey.equals(keyType))
         {
-            if(allowedEcCurves == null || allowedEcCurves.isEmpty())
-            {
-                return;
-            }
-
             ASN1ObjectIdentifier curveOid;
             try
             {
@@ -876,15 +884,39 @@ public class DefaultCertProfile extends AbstractCertProfile
                 throw new BadCertTemplateException("Only named EC public key is supported");
             }
 
-            if(allowedEcCurves.contains(curveOid))
+            if(allowedEcCurves != null && allowedEcCurves.isEmpty() == false)
             {
-                return;
+                if(allowedEcCurves.containsKey(curveOid) == false)
+                {
+                    throw new BadCertTemplateException("EC curve " + IoCertUtil.getCurveName(curveOid) +
+                            " (OID: " + curveOid.getId() + ") is not allowed");
+                }
             }
-            else
+
+            byte[] keyData = publicKey.getPublicKeyData().getBytes();
+
+            Set<Byte> allowedEncodings = allowedEcCurves.get(curveOid);
+            if(allowedEncodings != null && allowedEncodings.isEmpty() == false)
             {
-                throw new BadCertTemplateException("EC curve " + IoCertUtil.getCurveName(curveOid) +
-                        " (OID: " + curveOid.getId() + ") is not allowed");
+                if(allowedEncodings.contains(keyData[0]) == false)
+                {
+                    throw new BadCertTemplateException("Unaccepted EC point encoding " + keyData[0]);
+                }
             }
+
+            try
+            {
+                checkECSubjectPublicKeyInfo(curveOid, publicKey.getPublicKeyData().getBytes());
+            }catch(BadCertTemplateException e)
+            {
+                throw e;
+            }catch(Exception e)
+            {
+                LOG.debug("populateFromPubKeyInfo", e);
+                throw new BadCertTemplateException("Invalid public key: " + e.getMessage());
+            }
+
+            return;
         }
         else
         {
@@ -944,6 +976,40 @@ public class DefaultCertProfile extends AbstractCertProfile
         }
 
         throw new BadCertTemplateException("the given publicKey is not permitted");
+    }
+
+    private static void checkECSubjectPublicKeyInfo(ASN1ObjectIdentifier curveOid, byte[] encoded)
+    throws BadCertTemplateException
+    {
+        X9ECParameters ecP = ECUtil.getNamedCurveByOid(curveOid);
+        ECCurve curve = ecP.getCurve();
+
+       int expectedLength = (curve.getFieldSize() + 7) / 8;
+
+       switch (encoded[0])
+       {
+            case 0x02: // compressed
+            case 0x03: // compressed
+            {
+                if (encoded.length != (expectedLength + 1))
+                {
+                    throw new BadCertTemplateException("Incorrect length for compressed encoding");
+                }
+                break;
+            }
+            case 0x04: // uncompressed
+            case 0x06: // hybrid
+            case 0x07: // hybrid
+            {
+                if (encoded.length != (2 * expectedLength + 1))
+                {
+                    throw new BadCertTemplateException("Incorrect length for uncompressed/hybrid encoding");
+                }
+                break;
+            }
+            default:
+                throw new BadCertTemplateException("Invalid point encoding 0x" + Integer.toString(encoded[0], 16));
+        }
     }
 
     private static boolean satisfy(int len, String paramName, KeyParamRanges ranges)
@@ -1532,12 +1598,12 @@ public class DefaultCertProfile extends AbstractCertProfile
         ASN1EncodableVector vec = new ASN1EncodableVector();
         if (requireExplicitPolicy != null)
         {
-            vec.add(new DERTaggedObject(explicit, 0, new DERInteger(requireExplicitPolicy)));
+            vec.add(new DERTaggedObject(explicit, 0, new ASN1Integer(BigInteger.valueOf(requireExplicitPolicy))));
         }
 
         if (inhibitPolicyMapping != null)
         {
-            vec.add(new DERTaggedObject(explicit, 1, new DERInteger(inhibitPolicyMapping)));
+            vec.add(new DERTaggedObject(explicit, 1, new ASN1Integer(BigInteger.valueOf(inhibitPolicyMapping))));
         }
 
         return new DERSequence(vec);
