@@ -476,7 +476,8 @@ class CaCertStoreDbImporter extends DbPorter
                 unmarshaller.unmarshal(zipFile.getInputStream(certsXmlEntry));
         CertsType certs = rootElement.getValue();
 
-        int sum = 0;
+        disableAutoCommit();
+
         try
         {
             List<CertType> list = certs.getCert();
@@ -484,86 +485,111 @@ class CaCertStoreDbImporter extends DbPorter
             for(int i = 0; i < n; i++)
             {
                 CertType cert = list.get(i);
+                String filename = cert.getCertFile();
+
+                // rawcert
+                ZipEntry certZipEnty = zipFile.getEntry(filename);
+
+                // rawcert
+                byte[] encodedCert = DbiUtil.read(zipFile.getInputStream(certZipEnty));
+
+                Certificate c;
                 try
                 {
-                    String filename = cert.getCertFile();
-
-                    // rawcert
-                    ZipEntry certZipEnty = zipFile.getEntry(filename);
-
-                    // rawcert
-                    byte[] encodedCert = DbiUtil.read(zipFile.getInputStream(certZipEnty));
-
-                    Certificate c;
-                    try
+                    c = Certificate.getInstance(encodedCert);
+                } catch (Exception e)
+                {
+                    LOG.error("could not parse certificate in file {}", filename);
+                    LOG.debug("could not parse certificate in file " + filename, e);
+                    if(e instanceof CertificateException)
                     {
-                        c = Certificate.getInstance(encodedCert);
-                    } catch (Exception e)
-                    {
-                        LOG.error("could not parse certificate in file {}", filename);
-                        LOG.debug("could not parse certificate in file " + filename, e);
-                        if(e instanceof CertificateException)
-                        {
-                            throw (CertificateException) e;
-                        }
-                        else
-                        {
-                            throw new CertificateException(e);
-                        }
+                        throw (CertificateException) e;
                     }
+                    else
+                    {
+                        throw new CertificateException(e);
+                    }
+                }
 
-                    byte[] encodedKey = c.getSubjectPublicKeyInfo().getPublicKeyData().getBytes();
+                byte[] encodedKey = c.getSubjectPublicKeyInfo().getPublicKeyData().getBytes();
 
-                    String hexSha1FpCert = HashCalculator.hexHash(HashAlgoType.SHA1, encodedCert);
+                String hexSha1FpCert = HashCalculator.hexHash(HashAlgoType.SHA1, encodedCert);
 
-                    // cert
-                    int idx = 1;
-                    ps_cert.setInt   (idx++, cert.getId());
-                    ps_cert.setLong(idx++, cert.getLastUpdate());
-                    ps_cert.setLong(idx++, c.getSerialNumber().getPositiveValue().longValue());
-                    ps_cert.setString(idx++, IoCertUtil.canonicalizeName(c.getSubject()));
-                    ps_cert.setLong(idx++, c.getTBSCertificate().getStartDate().getDate().getTime() / 1000);
-                    ps_cert.setLong(idx++, c.getTBSCertificate().getEndDate().getDate().getTime() / 1000);
-                    setBoolean(ps_cert, idx++, cert.isRevoked());
-                    setInt(ps_cert, idx++, cert.getRevReason());
-                    setLong(ps_cert, idx++, cert.getRevTime());
-                    setLong(ps_cert, idx++, cert.getRevInvalidityTime());
-                    setInt(ps_cert, idx++, cert.getCertprofileinfoId());
-                    setInt(ps_cert, idx++, cert.getCainfoId());
-                    setInt(ps_cert, idx++, cert.getRequestorinfoId());
-                    setInt(ps_cert, idx++, cert.getUserId());
+                // cert
+                int idx = 1;
+                ps_cert.setInt   (idx++, cert.getId());
+                ps_cert.setLong(idx++, cert.getLastUpdate());
+                ps_cert.setLong(idx++, c.getSerialNumber().getPositiveValue().longValue());
+                ps_cert.setString(idx++, IoCertUtil.canonicalizeName(c.getSubject()));
+                ps_cert.setLong(idx++, c.getTBSCertificate().getStartDate().getDate().getTime() / 1000);
+                ps_cert.setLong(idx++, c.getTBSCertificate().getEndDate().getDate().getTime() / 1000);
+                setBoolean(ps_cert, idx++, cert.isRevoked());
+                setInt(ps_cert, idx++, cert.getRevReason());
+                setLong(ps_cert, idx++, cert.getRevTime());
+                setLong(ps_cert, idx++, cert.getRevInvalidityTime());
+                setInt(ps_cert, idx++, cert.getCertprofileinfoId());
+                setInt(ps_cert, idx++, cert.getCainfoId());
+                setInt(ps_cert, idx++, cert.getRequestorinfoId());
+                setInt(ps_cert, idx++, cert.getUserId());
 
-                    ps_cert.setString(idx++, HashCalculator.hexHash(HashAlgoType.SHA1, encodedKey));
-                    String sha1FpSubject = IoCertUtil.sha1sum_canonicalized_name(c.getSubject());
-                    ps_cert.setString(idx++, sha1FpSubject);
+                ps_cert.setString(idx++, HashCalculator.hexHash(HashAlgoType.SHA1, encodedKey));
+                String sha1FpSubject = IoCertUtil.sha1sum_canonicalized_name(c.getSubject());
+                ps_cert.setString(idx++, sha1FpSubject);
+                ps_cert.addBatch();
 
-                    ps_rawcert.setInt   (1, cert.getId());
-                    ps_rawcert.setString(2, hexSha1FpCert);
-                    ps_rawcert.setString(3, Base64.toBase64String(encodedCert));
+                ps_rawcert.setInt   (1, cert.getId());
+                ps_rawcert.setString(2, hexSha1FpCert);
+                ps_rawcert.setString(3, Base64.toBase64String(encodedCert));
+                ps_rawcert.addBatch();
 
-                    ps_cert.addBatch();
-                    ps_rawcert.addBatch();
-                    if((i + 1) % 100 == 0 || i == n-1)
+                if((i + 1) % 100 == 0 || i == n - 1)
+                {
+                    try
                     {
                         ps_cert.executeBatch();
                         ps_rawcert.executeBatch();
+                    }catch(SQLException e)
+                    {
+                        try
+                        {
+                            ps_cert.cancel();
+                        }catch(SQLException e1)
+                        {
+                            System.err.println("Could not cancel ps_cert: " + e1.getMessage());
+                            LOG.error("Could not cancel ps_cert", e);
+                        }
+
+                        try
+                        {
+                            ps_rawcert.cancel();
+                        }catch(SQLException e1)
+                        {
+                            System.err.println("Could not cancel ps_rawcert: " + e1.getMessage());
+                            LOG.error("Could not cancel ps_rawcert", e);
+                        }
+
+                        throw e;
                     }
 
-                    sum++;
-                }catch(Exception e)
-                {
-                    System.err.println("Error while importing certificate with ID=" + cert.getId());
-                    throw e;
+                    commit();
                 }
             }
-        }finally
+
+            return n;
+        }
+        finally
         {
+            try
+            {
+                recoverAutoCommit();
+            }catch(SQLException e)
+            {
+            }
+
             releaseResources(ps_cert, null);
             releaseResources(ps_rawcert, null);
             zipFile.close();
         }
-
-        return sum;
     }
 
 }

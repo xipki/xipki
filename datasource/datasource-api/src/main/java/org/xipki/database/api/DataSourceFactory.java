@@ -10,6 +10,7 @@ package org.xipki.database.api;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.SQLException;
+import java.util.Properties;
 
 import org.xipki.security.api.PasswordResolver;
 import org.xipki.security.api.PasswordResolverException;
@@ -24,6 +25,9 @@ public interface DataSourceFactory
     throws SQLException, PasswordResolverException, IOException;
 
     DataSourceWrapper createDataSourceForFile(String confFile, PasswordResolver passwordResolver)
+    throws SQLException, PasswordResolverException, IOException;
+
+    DataSourceWrapper createDataSource(Properties conf, PasswordResolver passwordResolver)
     throws SQLException, PasswordResolverException, IOException;
 
 }
