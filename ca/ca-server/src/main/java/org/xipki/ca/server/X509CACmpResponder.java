@@ -59,11 +59,11 @@ import org.bouncycastle.asn1.pkcs.CertificationRequestInfo;
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.CertificateList;
+import org.bouncycastle.asn1.x509.Extension;
 import org.bouncycastle.asn1.x509.Extensions;
 import org.bouncycastle.asn1.x509.GeneralName;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.bouncycastle.asn1.x509.Time;
-import org.bouncycastle.asn1.x509.X509Extension;
 import org.bouncycastle.cert.cmp.CMPException;
 import org.bouncycastle.cert.cmp.GeneralPKIMessage;
 import org.bouncycastle.cert.crmf.CRMFException;
@@ -275,7 +275,7 @@ public class X509CACmpResponder extends CmpResponder
                     {
                         RevDetails revDetails = revContent[i];
                         Extensions crlDetails = revDetails.getCrlEntryDetails();
-                        ASN1ObjectIdentifier extId = X509Extension.reasonCode;
+                        ASN1ObjectIdentifier extId = Extension.reasonCode;
                         ASN1Encodable extValue = crlDetails.getExtensionParsedValue(extId);
                         int reasonCode = ((ASN1Enumerated) extValue).getValue().intValue();
                         if(reasonCode == XiPKI_CRL_REASON_REMOVE)
@@ -963,7 +963,7 @@ public class X509CACmpResponder extends CmpResponder
             {
                 Extensions crlDetails = revDetails.getCrlEntryDetails();
 
-                ASN1ObjectIdentifier extId = X509Extension.reasonCode;
+                ASN1ObjectIdentifier extId = Extension.reasonCode;
                 ASN1Encodable extValue = crlDetails.getExtensionParsedValue(extId);
                 int reasonCode = ((ASN1Enumerated) extValue).getValue().intValue();
                 reason = CRLReason.forReasonCode(reasonCode);
@@ -973,7 +973,7 @@ public class X509CACmpResponder extends CmpResponder
                             reason == null ? Integer.toString(reasonCode) : reason.getDescription()));
                 }
 
-                extId = X509Extension.invalidityDate;
+                extId = Extension.invalidityDate;
                 extValue = crlDetails.getExtensionParsedValue(extId);
                 if(extValue != null)
                 {
