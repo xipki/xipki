@@ -50,7 +50,6 @@ import org.xipki.ca.common.X509CertificateWithMetaInfo;
 import org.xipki.ca.server.CertRevocationInfoWithSerial;
 import org.xipki.ca.server.CertStatus;
 import org.xipki.ca.server.SubjectKeyProfileTriple;
-import org.xipki.ca.server.SubjectKeyProfileTripleCollection;
 import org.xipki.database.api.DataSourceWrapper;
 import org.xipki.security.common.CRLReason;
 import org.xipki.security.common.CertRevocationInfo;
@@ -1285,9 +1284,9 @@ class CertStoreQueryExecutor
         return false;
     }
 
-    SubjectKeyProfileTripleCollection getSubjectKeyProfileTriples(X509CertificateWithMetaInfo caCert,
-            String subjectFp, String keyFp)
-    throws OperationException, SQLException
+    SubjectKeyProfileTriple getLatestCert(X509CertificateWithMetaInfo caCert, String subjectFp,
+            String keyFp, String profile)
+    throws SQLException
     {
         byte[] encodedCert = caCert.getEncodedCert();
         Integer caId =  caInfoStore.getCaIdForCert(encodedCert);
@@ -1297,9 +1296,15 @@ class CertStoreQueryExecutor
             return null;
         }
 
-        String sql = "ID, SHA1_FP_PK, SHA1_FP_SUBJECT, CERTPROFILEINFO_ID, REVOKED FROM CERT"
-                + " WHERE (SHA1_FP_PK=? OR SHA1_FP_SUBJECT=?) AND CAINFO_ID=? ";
-        sql = dataSource.createFetchFirstSelectSQL(sql, 1000, "ID DESC");
+        Integer profileId = certprofileStore.getId(profile);
+        if(profileId == null)
+        {
+            return null;
+        }
+
+        String sql = "ID, REVOKED FROM CERT"
+                + " WHERE SHA1_FP_PK=? AND SHA1_FP_SUBJECT=? AND CAINFO_ID=? AND CERTPROFILEINFO_ID=?";
+        sql = dataSource.createFetchFirstSelectSQL(sql, 1, "ID DESC");
         PreparedStatement ps = borrowPreparedStatement(sql);
 
         ResultSet rs = null;
@@ -1309,6 +1314,7 @@ class CertStoreQueryExecutor
             ps.setString(idx++, keyFp);
             ps.setString(idx++, subjectFp);
             ps.setInt(idx++, caId);
+            ps.setInt(idx++, profileId);
 
             rs = ps.executeQuery();
 
@@ -1317,21 +1323,71 @@ class CertStoreQueryExecutor
                 return null;
             }
 
-            SubjectKeyProfileTripleCollection triples = new SubjectKeyProfileTripleCollection();
-            do
-            {
-                int id = rs.getInt("ID");
-                int profileId = rs.getInt("CERTPROFILEINFO_ID");
-                String profileName = certprofileStore.getName(profileId);
-                String thisKeyFp = rs.getString("SHA1_FP_PK");
-                String thisSubjectFp = rs.getString("SHA1_FP_SUBJECT");
-                boolean revoked = rs.getBoolean("REVOKED");
-                SubjectKeyProfileTriple triple = new SubjectKeyProfileTriple(
-                        id, thisSubjectFp, thisKeyFp, profileName, revoked);
-                triples.addTriple(triple);
-            }while(rs.next());
+            int id = rs.getInt("ID");
+            boolean revoked = rs.getBoolean("REVOKED");
+            return new SubjectKeyProfileTriple(id, subjectFp, keyFp, profile, revoked);
+        }finally
+        {
+            releaseDbResources(ps, rs);
+        }
+    }
 
-            return triples;
+    boolean isCertForSubjectIssued(X509CertificateWithMetaInfo caCert, String subjectFp, String profile)
+    throws SQLException
+    {
+        return isCertIssuedForFp("SHA1_FP_SUBJECT", caCert, subjectFp, profile);
+    }
+
+    boolean isCertForKeyIssued(X509CertificateWithMetaInfo caCert, String keyFp, String profile)
+    throws SQLException
+    {
+        return isCertIssuedForFp("SHA1_FP_PK", caCert, keyFp, profile);
+    }
+
+    private boolean isCertIssuedForFp(String fpColumnName, X509CertificateWithMetaInfo caCert,
+            String fp, String profile)
+    throws SQLException
+    {
+        byte[] encodedCert = caCert.getEncodedCert();
+        Integer caId =  caInfoStore.getCaIdForCert(encodedCert);
+
+        if(caId == null)
+        {
+            return false;
+        }
+
+        Integer profileId = null;
+        if(profile != null)
+        {
+            profileId = certprofileStore.getId(profile);
+            if(profileId == null)
+            {
+                return false;
+            }
+        }
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("ID FROM CERT WHERE ").append(fpColumnName).append("=?");
+        if(profile != null)
+        {
+            sb.append(" AND CERTPROFILEINFO_ID=?");
+        }
+        String sql = dataSource.createFetchFirstSelectSQL(sb.toString(), 1);
+        PreparedStatement ps = borrowPreparedStatement(sql);
+
+        ResultSet rs = null;
+        try
+        {
+            int idx = 1;
+            ps.setString(idx++, fp);
+            if(profile != null)
+            {
+                ps.setInt(idx++, profileId);
+            }
+
+            rs = ps.executeQuery();
+
+            return rs.next();
         }finally
         {
             releaseDbResources(ps, rs);

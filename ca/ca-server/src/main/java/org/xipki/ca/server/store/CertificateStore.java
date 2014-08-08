@@ -26,7 +26,7 @@ import org.xipki.ca.api.publisher.CertificateInfo;
 import org.xipki.ca.common.X509CertificateWithMetaInfo;
 import org.xipki.ca.server.CertRevocationInfoWithSerial;
 import org.xipki.ca.server.CertStatus;
-import org.xipki.ca.server.SubjectKeyProfileTripleCollection;
+import org.xipki.ca.server.SubjectKeyProfileTriple;
 import org.xipki.database.api.DataSourceWrapper;
 import org.xipki.security.common.CertRevocationInfo;
 import org.xipki.security.common.LogUtil;
@@ -73,15 +73,29 @@ public class CertificateStore
     }
 
     public void addToPublishQueue(String publisherName, int certId, X509CertificateWithMetaInfo caCert)
-    throws SQLException, OperationException
+    throws OperationException
     {
-        queryExecutor.addToPublishQueue(publisherName, certId, caCert);
+        try
+        {
+            queryExecutor.addToPublishQueue(publisherName, certId, caCert);
+        } catch (SQLException e)
+        {
+            LOG.debug("SQLException", e);
+            throw new OperationException(ErrorCode.DATABASE_FAILURE, e.getMessage());
+        }
     }
 
     public void removeFromPublishQueue(String publisherName, int certId)
-    throws SQLException
+    throws OperationException
     {
-        queryExecutor.removeFromPublishQueue(publisherName, certId);
+        try
+        {
+            queryExecutor.removeFromPublishQueue(publisherName, certId);
+        } catch (SQLException e)
+        {
+            LOG.debug("SQLException", e);
+            throw new OperationException(ErrorCode.DATABASE_FAILURE, e.getMessage());
+        }
     }
 
     public void clearPublishQueue(X509CertificateWithMetaInfo caCert, String publisherName)
@@ -182,15 +196,29 @@ public class CertificateStore
     }
 
     public int getNextFreeCRLNumber(X509CertificateWithMetaInfo caCert)
-    throws SQLException, OperationException
+    throws OperationException
     {
-        return queryExecutor.getNextFreeCrlNumber(caCert);
+        try
+        {
+            return queryExecutor.getNextFreeCrlNumber(caCert);
+        } catch (SQLException e)
+        {
+            LOG.debug("SQLException", e);
+            throw new OperationException(ErrorCode.DATABASE_FAILURE, e.getMessage());
+        }
     }
 
     public long getThisUpdateOfCurrentCRL(X509CertificateWithMetaInfo caCert)
-    throws SQLException, OperationException
+    throws OperationException
     {
-        return queryExecutor.getThisUpdateOfCurrentCRL(caCert);
+        try
+        {
+            return queryExecutor.getThisUpdateOfCurrentCRL(caCert);
+        } catch (SQLException e)
+        {
+            LOG.debug("SQLException", e);
+            throw new OperationException(ErrorCode.DATABASE_FAILURE, e.getMessage());
+        }
     }
 
     public byte[] getEncodedCurrentCRL(X509CertificateWithMetaInfo caCert)
@@ -280,42 +308,84 @@ public class CertificateStore
      */
     public List<CertRevocationInfoWithSerial> getRevokedCertificates(X509CertificateWithMetaInfo caCert,
             Date notExpiredAt, BigInteger startSerial, int numEntries)
-    throws SQLException, OperationException
+    throws OperationException
     {
-        return queryExecutor.getRevokedCertificates(caCert, notExpiredAt, startSerial, numEntries);
+        try
+        {
+            return queryExecutor.getRevokedCertificates(caCert, notExpiredAt, startSerial, numEntries);
+        } catch (SQLException e)
+        {
+            LOG.debug("SQLException", e);
+            throw new OperationException(ErrorCode.DATABASE_FAILURE, e.getMessage());
+        }
     }
 
     public List<BigInteger> getCertSerials(X509CertificateWithMetaInfo caCert,
             Date notExpiredAt, BigInteger startSerial, int numEntries, boolean onlyRevoked)
-    throws SQLException, OperationException
+    throws OperationException
     {
-        return queryExecutor.getSerialNumbers(caCert, notExpiredAt, startSerial, numEntries, onlyRevoked);
+        try
+        {
+            return queryExecutor.getSerialNumbers(caCert, notExpiredAt, startSerial, numEntries, onlyRevoked);
+        } catch (SQLException e)
+        {
+            LOG.debug("SQLException", e);
+            throw new OperationException(ErrorCode.DATABASE_FAILURE, e.getMessage());
+        }
     }
 
     public List<Integer> getPublishQueueEntries(X509CertificateWithMetaInfo caCert,
             String publisherName, int numEntries)
-    throws SQLException, OperationException
+    throws OperationException
     {
-        return queryExecutor.getPublishQueueEntries(caCert, publisherName, numEntries);
+        try
+        {
+            return queryExecutor.getPublishQueueEntries(caCert, publisherName, numEntries);
+        } catch (SQLException e)
+        {
+            LOG.debug("SQLException", e);
+            throw new OperationException(ErrorCode.DATABASE_FAILURE, e.getMessage());
+        }
     }
 
     public CertWithRevocationInfo getCertWithRevocationInfo(X509CertificateWithMetaInfo caCert,
             BigInteger serial)
-    throws SQLException, OperationException
+    throws OperationException
     {
-        return queryExecutor.getCertWithRevocationInfo(caCert, serial);
+        try
+        {
+            return queryExecutor.getCertWithRevocationInfo(caCert, serial);
+        } catch (SQLException e)
+        {
+            LOG.debug("SQLException", e);
+            throw new OperationException(ErrorCode.DATABASE_FAILURE, e.getMessage());
+        }
     }
 
     public CertificateInfo getCertificateInfoForSerial(X509CertificateWithMetaInfo caCert, BigInteger serial)
-    throws SQLException, OperationException, CertificateException
+    throws OperationException, CertificateException
     {
-        return queryExecutor.getCertificateInfo(caCert, serial);
+        try
+        {
+            return queryExecutor.getCertificateInfo(caCert, serial);
+        } catch (SQLException e)
+        {
+            LOG.debug("SQLException", e);
+            throw new OperationException(ErrorCode.DATABASE_FAILURE, e.getMessage());
+        }
     }
 
     public Long getGreatestSerialNumber(X509CertificateWithMetaInfo caCert)
-    throws SQLException, OperationException
+    throws OperationException
     {
-        return queryExecutor.getGreatestSerialNumber(caCert);
+        try
+        {
+            return queryExecutor.getGreatestSerialNumber(caCert);
+        } catch (SQLException e)
+        {
+            LOG.debug("SQLException", e);
+            throw new OperationException(ErrorCode.DATABASE_FAILURE, e.getMessage());
+        }
     }
 
     public boolean isHealthy()
@@ -323,23 +393,82 @@ public class CertificateStore
         return queryExecutor.isHealthy();
     }
 
-    public SubjectKeyProfileTripleCollection getSubjectKeyProfileTriples(X509CertificateWithMetaInfo caCert,
-            String subjectFp, String keyFp)
-    throws SQLException, OperationException
+    public SubjectKeyProfileTriple getLatestCert(X509CertificateWithMetaInfo caCert, String subjectFp,
+            String keyFp, String profile)
+    throws OperationException
     {
-        return queryExecutor.getSubjectKeyProfileTriples(caCert, subjectFp, keyFp);
+        try
+        {
+            return queryExecutor.getLatestCert(caCert, subjectFp, keyFp, profile);
+        } catch (SQLException e)
+        {
+            LOG.debug("SQLException", e);
+            throw new OperationException(ErrorCode.DATABASE_FAILURE, e.getMessage());
+        }
+    }
+
+    public boolean isCertForSubjectIssued(X509CertificateWithMetaInfo caCert, String subjectFp)
+    throws OperationException
+    {
+        return isCertForSubjectIssued(caCert, subjectFp, null);
+    }
+
+    public boolean isCertForSubjectIssued(X509CertificateWithMetaInfo caCert, String subjectFp, String profile)
+    throws OperationException
+    {
+        try
+        {
+            return queryExecutor.isCertForSubjectIssued(caCert, subjectFp, profile);
+        } catch (SQLException e)
+        {
+            LOG.debug("SQLException", e);
+            throw new OperationException(ErrorCode.DATABASE_FAILURE, e.getMessage());
+        }
+    }
+
+    public boolean isCertForKeyIssued(X509CertificateWithMetaInfo caCert, String subjectFp)
+    throws OperationException
+    {
+        return isCertForKeyIssued(caCert, subjectFp, null);
+    }
+
+    public boolean isCertForKeyIssued(X509CertificateWithMetaInfo caCert, String keyFp, String profile)
+    throws OperationException
+    {
+        try
+        {
+            return queryExecutor.isCertForKeyIssued(caCert, keyFp, profile);
+        } catch (SQLException e)
+        {
+            LOG.debug("SQLException", e);
+            throw new OperationException(ErrorCode.DATABASE_FAILURE, e.getMessage());
+        }
     }
 
     public CertificateInfo getCertificateInfoForId(X509CertificateWithMetaInfo caCert, int certId)
-    throws SQLException, OperationException, CertificateException
+    throws OperationException, CertificateException
     {
-        return queryExecutor.getCertForId(caCert, certId);
+        try
+        {
+            return queryExecutor.getCertForId(caCert, certId);
+        } catch (SQLException e)
+        {
+            LOG.debug("SQLException", e);
+            throw new OperationException(ErrorCode.DATABASE_FAILURE, e.getMessage());
+        }
     }
 
     public X509CertificateWithMetaInfo getCertForId(int certId)
-    throws SQLException, OperationException
+    throws OperationException
     {
-        return queryExecutor.getCertForId(certId);
+        try
+        {
+            return queryExecutor.getCertForId(certId);
+        } catch (SQLException e)
+        {
+            LOG.debug("SQLException", e);
+            throw new OperationException(ErrorCode.DATABASE_FAILURE, e.getMessage());
+        }
     }
 
     public String getLatestSN(X500Name nameWithSN)
@@ -349,9 +478,16 @@ public class CertificateStore
     }
 
     public Long getNotBeforeOfFirstCertStartsWithCN(String commonName, String profileName)
-    throws SQLException
+    throws OperationException
     {
-        return queryExecutor.getNotBeforeOfFirstCertStartsWithCN(commonName, profileName);
+        try
+        {
+            return queryExecutor.getNotBeforeOfFirstCertStartsWithCN(commonName, profileName);
+        } catch (SQLException e)
+        {
+            LOG.debug("SQLException", e);
+            throw new OperationException(ErrorCode.DATABASE_FAILURE, e.getMessage());
+        }
     }
 
 }

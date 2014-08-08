@@ -112,6 +112,9 @@ caclient:enroll -p10 output/gSMC_K1.p10 -out output/gSMC_K1.der -profile gSMC_K 
 keytool:update-cert-p12 -p12 output/gSMC_K1.p12 -pwd 1234 -cert output/gSMC_K1.der \
   -cacert output/SubCA1.der -cacert output/RCA1.der
 
+# sleept 1.2 seconds to ensure different notBefore in certificate
+sleep 1200
+
 # with the same CN
 keytool:rsa-p12 -pwd 1234 -out output/gSMC_K2.p12 -subject "CN=80276123451234512345,O=xipki,C=DE"
 

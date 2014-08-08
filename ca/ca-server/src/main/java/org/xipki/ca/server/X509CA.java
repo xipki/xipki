@@ -203,17 +203,8 @@ public class X509CA
         if(crlSigner != null && crlSigner.getPeriod() > 0)
         {
             // Add scheduled CRL generation service
-            long lastThisUpdate;
-            try
-            {
-                lastThisUpdate = certstore.getThisUpdateOfCurrentCRL(caCert);
-            } catch (SQLException e)
-            {
-                throw new OperationException(ErrorCode.DATABASE_FAILURE, "SQLException: " + e.getMessage());
-            }
-
+            long lastThisUpdate = certstore.getThisUpdateOfCurrentCRL(caCert);
             long period = crlSigner.getPeriod();
-
             long now = System.currentTimeMillis() / 1000; // in seconds
 
             long initialDelay;
@@ -239,15 +230,7 @@ public class X509CA
             return;
         }
 
-        Long greatestSerialNumber;
-        try
-        {
-            greatestSerialNumber = certstore.getGreatestSerialNumber(caCert);
-        } catch (SQLException e)
-        {
-            throw new OperationException(ErrorCode.DATABASE_FAILURE, "SQLException: " + e.getMessage());
-        }
-
+        Long greatestSerialNumber = certstore.getGreatestSerialNumber(caCert);
         if(greatestSerialNumber == null)
         {
             throw new OperationException(ErrorCode.DATABASE_FAILURE,
@@ -400,14 +383,7 @@ public class X509CA
 
                 do
                 {
-                    try
-                    {
-                        revInfos = certstore.getRevokedCertificates(caCert, notExpireAt,
-                                startSerial, numEntries);
-                    } catch (SQLException e)
-                    {
-                        throw new OperationException(ErrorCode.DATABASE_FAILURE, "SQLException: " + e.getMessage());
-                    }
+                    revInfos = certstore.getRevokedCertificates(caCert, notExpireAt, startSerial, numEntries);
 
                     BigInteger maxSerial = BigInteger.ONE;
                     for(CertRevocationInfoWithSerial revInfo : revInfos)
@@ -466,20 +442,7 @@ public class X509CA
 
                 }while(revInfos.size() >= numEntries);
 
-                int crlNumber;
-                try
-                {
-                    crlNumber = certstore.getNextFreeCRLNumber(caCert);
-                }catch(SQLException e)
-                {
-                    final String message = "getNextFreeCRLNumber";
-                    if(LOG.isErrorEnabled())
-                    {
-                        LOG.error(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(), e.getMessage());
-                    }
-                    LOG.debug(message, e);
-                    throw new OperationException(ErrorCode.DATABASE_FAILURE, e.getMessage());
-                }
+                int crlNumber = certstore.getNextFreeCRLNumber(caCert);
 
                 try
                 {
@@ -494,7 +457,7 @@ public class X509CA
                     // IssuingDistributionPoint
                     IssuingDistributionPoint idp = new IssuingDistributionPoint(
                             (DistributionPointName) null, // distributionPoint,
-                            true, // onlyContainsUserCerts,
+                            false, // onlyContainsUserCerts,
                             false, // onlyContainsCACerts,
                             (ReasonFlags) null, // onlySomeReasons,
                             directCRL == false, // indirectCRL,
@@ -522,13 +485,7 @@ public class X509CA
 
                     do
                     {
-                        try
-                        {
-                            serials = certstore.getCertSerials(caCert, notExpireAt, startSerial, numEntries, false);
-                        } catch (SQLException e)
-                        {
-                            throw new OperationException(ErrorCode.DATABASE_FAILURE, "SQLException: " + e.getMessage());
-                        }
+                        serials = certstore.getCertSerials(caCert, notExpireAt, startSerial, numEntries, false);
 
                         BigInteger maxSerial = BigInteger.ONE;
                         for(BigInteger serial : serials)
@@ -542,10 +499,6 @@ public class X509CA
                             try
                             {
                                 certInfo = certstore.getCertificateInfoForSerial(caCert, serial);
-                            } catch (SQLException e)
-                            {
-                                throw new OperationException(ErrorCode.DATABASE_FAILURE,
-                                        "SQLException: " + e.getMessage());
                             } catch (CertificateException e)
                             {
                                 throw new OperationException(ErrorCode.System_Failure,
@@ -922,7 +875,7 @@ public class X509CA
                 try
                 {
                     serials = certstore.getCertSerials(caCert, notExpiredAt, startSerial, numEntries, onlyRevokedCerts);
-                } catch (SQLException | OperationException e)
+                } catch (OperationException e)
                 {
                     final String message = "Exception";
                     if(LOG.isErrorEnabled())
@@ -953,7 +906,7 @@ public class X509CA
                     try
                     {
                         certInfo = certstore.getCertificateInfoForSerial(caCert, serial);
-                    } catch (SQLException | OperationException | CertificateException e)
+                    } catch (OperationException | CertificateException e)
                     {
                         final String message = "Exception";
                         if(LOG.isErrorEnabled())
@@ -1053,7 +1006,7 @@ public class X509CA
             try
             {
                 certIds = certstore.getPublishQueueEntries(caCert, publisher.getName(), numEntries);
-            } catch (SQLException | OperationException e)
+            } catch (OperationException e)
             {
                 final String message = "Exception";
                 if(LOG.isErrorEnabled())
@@ -1076,7 +1029,7 @@ public class X509CA
                 try
                 {
                     certInfo = certstore.getCertificateInfoForId(caCert, certId);
-                } catch (SQLException | OperationException | CertificateException e)
+                } catch (OperationException | CertificateException e)
                 {
                     final String message = "Exception";
                     if(LOG.isErrorEnabled())
@@ -1093,7 +1046,7 @@ public class X509CA
                     try
                     {
                         certstore.removeFromPublishQueue(publisher.getName(), certId);
-                    } catch (SQLException e)
+                    } catch (OperationException e)
                     {
                         final String message = "SQLException while removing republished cert id=" + certId +
                                 " and publisher=" + publisher.getName();
@@ -1497,6 +1450,16 @@ public class X509CA
                     "Profile " + certProfileName + " not applied to non-RA");
         }
 
+        if(certProfile.isSerialNumberInReqPermitted() == false)
+        {
+            RDN[] rdns = requestedSubject.getRDNs(ObjectIdentifiers.DN_SN);
+            if(rdns != null && rdns.length > 0)
+            {
+                throw new OperationException(ErrorCode.BAD_CERT_TEMPLATE,
+                        "SubjectDN SerialNumber in request is not permitted");
+            }
+        }
+
         notBefore = certProfile.getNotBefore(notBefore);
         Date now = new Date();
         if(notBefore == null)
@@ -1531,18 +1494,11 @@ public class X509CA
             if(cnRDNs != null && cnRDNs.length > 0)
             {
                 String requestedCN = IETFUtils.valueToString(cnRDNs[0].getFirst().getValue());
-                try
+                Long gsmckFirstNotBeforeInSecond = certstore.getNotBeforeOfFirstCertStartsWithCN(
+                        requestedCN, certProfileName);
+                if(gsmckFirstNotBeforeInSecond != null)
                 {
-                    Long gsmckFirstNotBeforeInSecond = certstore.getNotBeforeOfFirstCertStartsWithCN(
-                            requestedCN, certProfileName);
-                    if(gsmckFirstNotBeforeInSecond != null)
-                    {
-                        gSMC_KFirstNotBefore = new Date(gsmckFirstNotBeforeInSecond * 1000);
-                    }
-                } catch (SQLException e)
-                {
-                    LOG.debug("Error in certstore.getSubjectDNsContainsCN()", e);
-                    throw new OperationException(ErrorCode.DATABASE_FAILURE, e.getMessage());
+                    gSMC_KFirstNotBefore = new Date(gsmckFirstNotBeforeInSecond * 1000);
                 }
 
                 // append the commonName with '-' + yyyyMMdd
@@ -1551,7 +1507,7 @@ public class X509CA
                 String yyyyMMdd = dateF.format(gSMC_KFirstNotBefore);
                 String suffix = "-" + yyyyMMdd;
 
-                // append the -YYYYMMDD to the commonName
+                // append the -yyyyMMdd to the commonName
                 RDN[] rdns = requestedSubject.getRDNs();
                 for(int i = 0; i < rdns.length; i++)
                 {
@@ -1618,216 +1574,139 @@ public class X509CA
         }
         else
         {
-            SubjectKeyProfileTripleCollection triples;
-            try
-            {
-                triples = certstore.getSubjectKeyProfileTriples(
-                        caInfo.getCertificate(), sha1FpSubject, sha1FpPublicKey);
-            } catch (SQLException e)
-            {
-                throw new OperationException(ErrorCode.DATABASE_FAILURE, e.getMessage());
-            }
+            // try to get certificate with the same subject, key and certificate profile
+            SubjectKeyProfileTriple triple = certstore.getLatestCert(caInfo.getCertificate(),
+                    sha1FpSubject, sha1FpPublicKey, certProfileName);
 
-            if(triples != null && triples.isEmpty() == false)
+            if(triple != null)
             {
-                SubjectKeyProfileTriple triple = triples.getFirstTriple(sha1FpSubject, sha1FpPublicKey, certProfileName);
-                if(triple != null)
+                /*
+                 * If there exists a certificate whose public key, subject and profile match the request,
+                 * returns the certificate if it is not revoked, otherwise OperationException with
+                 * ErrorCode CERT_REVOKED will be thrown
+                 */
+                if(triple.isRevoked())
                 {
-                    /*
-                     * If there exists a certificate whose public key, subject and profile match the request,
-                     * returns the certificate if it is not revoked, otherwise OperationException with
-                     * ErrorCode CERT_REVOKED will be thrown
-                     */
-
-                    if(triple.isRevoked())
+                    throw new OperationException(ErrorCode.CERT_REVOKED);
+                }
+                else
+                {
+                    X509CertificateWithMetaInfo issuedCert = certstore.getCertForId(triple.getCertId());
+                    if(issuedCert == null)
                     {
-                        throw new OperationException(ErrorCode.CERT_REVOKED);
+                        throw new OperationException(ErrorCode.System_Failure,
+                            "Find no certificate in table RAWCERT for CERT_ID " + triple.getCertId());
                     }
                     else
                     {
-                        X509CertificateWithMetaInfo issuedCert;
+                        CertificateInfo certInfo;
                         try
                         {
-                            issuedCert = certstore.getCertForId(triple.getCertId());
-                        } catch (SQLException e)
+                            certInfo = new CertificateInfo(issuedCert,
+                                    caInfo.getCertificate(), subjectPublicKeyData, certProfileName);
+                        } catch (CertificateEncodingException e)
                         {
-                            throw new OperationException(ErrorCode.DATABASE_FAILURE, e.getMessage());
+                             throw new OperationException(ErrorCode.System_Failure,
+                                     "could not construct CertificateInfo: " + e.getMessage());
                         }
-
-                        if(issuedCert == null)
-                        {
-                            throw new OperationException(ErrorCode.System_Failure,
-                                "Find no certificate in table RAWCERT for CERT_ID " + triple.getCertId());
-                        }
-                        else
-                        {
-                            CertificateInfo certInfo;
-                            try
-                            {
-                                certInfo = new CertificateInfo(issuedCert,
-                                        caInfo.getCertificate(), subjectPublicKeyData, certProfileName);
-                            } catch (CertificateEncodingException e)
-                            {
-                                 throw new OperationException(ErrorCode.System_Failure,
-                                         "could not construct CertificateInfo: " + e.getMessage());
-                            }
-                            certInfo.setAlreadyIssued(true);
-                            return certInfo;
-                        }
+                        certInfo.setAlreadyIssued(true);
+                        return certInfo;
                     }
                 }
+            }
 
-                if(keyMode == DuplicationMode.PERMITTED && subjectMode == DuplicationMode.PERMITTED)
+            if(keyMode != DuplicationMode.PERMITTED)
+            {
+                if(keyMode == DuplicationMode.FORBIDDEN)
                 {
-                }
-                else if(triples.hasTripleForSubjectAndProfile(sha1FpSubject, certProfileName))
-                {
-                    if(subjectMode == DuplicationMode.FORBIDDEN || subjectMode == DuplicationMode.FORBIDDEN_WITHIN_PROFILE)
-                    {
-                        if(certProfile.incSerialNumberIfSubjectExists() == false)
-                        {
-                            throw new OperationException(ErrorCode.ALREADY_ISSUED,
-                                    "Certificate for the given subject " + grandtedSubjectText +
-                                    " and profile " + certProfileName + " already issued");
-                        }
-
-                        String latestSN;
-                        try
-                        {
-                            Object[] objs = incSerialNumber(certProfile, grantedSubject, null);
-                            latestSN = certstore.getLatestSN((X500Name) objs[0]);
-                        }catch(BadFormatException e)
-                        {
-                            throw new OperationException(ErrorCode.System_Failure, "BadFormatException: " + e.getMessage());
-                        }
-
-                        boolean foundUniqueSubject = false;
-                        // maximal 100 tries
-                        for(int i = 0; i < 100; i++)
-                        {
-                            try
-                            {
-                                Object[] objs = incSerialNumber(certProfile, grantedSubject, latestSN);
-                                grantedSubject = (X500Name) objs[0];
-                                latestSN = (String) objs[1];
-                            }catch (BadFormatException e)
-                            {
-                                throw new OperationException(ErrorCode.System_Failure, "BadFormatException: " + e.getMessage());
-                            }
-
-                            foundUniqueSubject = (certstore.certIssuedForSubject(caInfo.getCertificate(),
-                                        IoCertUtil.sha1sum_canonicalized_name(grantedSubject)) == false);
-                            if(foundUniqueSubject)
-                            {
-                                break;
-                            }
-                        }
-
-                        if(foundUniqueSubject == false)
-                        {
-                            throw new OperationException(ErrorCode.ALREADY_ISSUED,
-                                    "Certificate for the given subject " + grandtedSubjectText +
-                                    " and profile " + certProfileName +
-                                    " already issued, and could not create new unique serial number");
-                        }
-                    }
-                }
-                else if(triples.hasTripleForKeyAndProfile(sha1FpPublicKey, certProfileName))
-                {
-                    if(keyMode == DuplicationMode.FORBIDDEN || keyMode == DuplicationMode.FORBIDDEN_WITHIN_PROFILE)
-                    {
-                        throw new OperationException(ErrorCode.ALREADY_ISSUED,
-                                "Certificate for the given public key and profile " + certProfileName + " already issued");
-                    }
-                }
-                else if(triples.hasTripleForSubjectAndKey(sha1FpSubject, sha1FpPublicKey))
-                {
-                    if(keyMode == DuplicationMode.FORBIDDEN || subjectMode == DuplicationMode.FORBIDDEN)
-                    {
-                        throw new OperationException(ErrorCode.ALREADY_ISSUED,
-                                "Certificate for the given subject and public key already issued");
-                    }
-                }
-                else if(triples.hasTripleForKey(sha1FpPublicKey))
-                {
-                    if(keyMode == DuplicationMode.FORBIDDEN)
+                    if(certstore.isCertForKeyIssued(caInfo.getCertificate(), sha1FpPublicKey))
                     {
                         throw new OperationException(ErrorCode.ALREADY_ISSUED,
                                 "Certificate for the given public key already issued");
                     }
                 }
-                else if(triples.hasTripleForSubject(sha1FpSubject))
+                else if(keyMode == DuplicationMode.FORBIDDEN_WITHIN_PROFILE)
                 {
-                    if(subjectMode == DuplicationMode.FORBIDDEN)
+                    if(certstore.isCertForKeyIssued(caInfo.getCertificate(), sha1FpPublicKey, certProfileName))
                     {
                         throw new OperationException(ErrorCode.ALREADY_ISSUED,
-                                "Certificate for the given subject already issued");
+                                "Certificate for the given public key and profile " + certProfileName + " already issued");
                     }
                 }
                 else
                 {
-                    throw new OperationException(ErrorCode.System_Failure, "should not reach here");
+                    throw new RuntimeException("should not reach here");
                 }
             }
-        }
 
-        if(certProfile.isSerialNumberInReqPermitted() == false)
-        {
-            RDN[] rdns = requestedSubject.getRDNs(ObjectIdentifiers.DN_SN);
-            if(rdns != null && rdns.length > 0)
+            if(subjectMode != DuplicationMode.PERMITTED)
             {
-                throw new OperationException(ErrorCode.BAD_CERT_TEMPLATE,
-                        "SubjectDN SerialNumber in request is not permitted");
-            }
-        }
-
-        if(subjectMode == DuplicationMode.FORBIDDEN || subjectMode == DuplicationMode.FORBIDDEN_WITHIN_PROFILE)
-        {
-            synchronized (pendingSubjectMap)
-            {
-                // check request with the same subject is still in process
+                final boolean incSerial = certProfile.incSerialNumberIfSubjectExists();
+                final boolean certIssued;
                 if(subjectMode == DuplicationMode.FORBIDDEN)
                 {
-                    if(pendingSubjectMap.containsKey(sha1FpSubject))
+                    certIssued = certstore.isCertForSubjectIssued(caInfo.getCertificate(), sha1FpSubject);
+                    if(certIssued && incSerial == false)
                     {
                         throw new OperationException(ErrorCode.ALREADY_ISSUED,
-                                "Certificate for the given subject " + grandtedSubjectText + " already in process");
+                                "Certificate for the given subject " + grandtedSubjectText + " already issued");
                     }
                 }
                 else if(subjectMode == DuplicationMode.FORBIDDEN_WITHIN_PROFILE)
                 {
-                    if(pendingSubjectMap.containsKey(sha1FpSubject) &&
-                            pendingSubjectMap.get(sha1FpSubject).contains(certProfileName))
+                    certIssued = certstore.isCertForSubjectIssued(caInfo.getCertificate(), sha1FpSubject, certProfileName);
+                    if(certIssued && incSerial == false)
                     {
                         throw new OperationException(ErrorCode.ALREADY_ISSUED,
-                               "Certificate for the given subject " + grandtedSubjectText +
-                               " and profile " + certProfileName + " already in process");
+                                "Certificate for the given subject " + grandtedSubjectText +
+                                " and profile " + certProfileName + " already issued");
                     }
                 }
-            }
-        }
+                else
+                {
+                    throw new RuntimeException("should not reach here");
+                }
 
-        if(keyMode == DuplicationMode.FORBIDDEN || keyMode == DuplicationMode.FORBIDDEN_WITHIN_PROFILE)
-        {
-            synchronized (pendingSubjectMap)
-            {
-                // check request with the same subject is still in process
-                if(keyMode == DuplicationMode.FORBIDDEN)
+                if(certIssued)
                 {
-                    if(pendingKeyMap.containsKey(sha1FpPublicKey))
+                    String latestSN;
+                    try
                     {
-                        throw new OperationException(ErrorCode.ALREADY_ISSUED,
-                                "Certificate for the given public key already in process");
+                        Object[] objs = incSerialNumber(certProfile, grantedSubject, null);
+                        latestSN = certstore.getLatestSN((X500Name) objs[0]);
+                    }catch(BadFormatException e)
+                    {
+                        throw new OperationException(ErrorCode.System_Failure, "BadFormatException: " + e.getMessage());
                     }
-                }
-                else if(keyMode == DuplicationMode.FORBIDDEN_WITHIN_PROFILE)
-                {
-                    if(pendingKeyMap.containsKey(sha1FpPublicKey) &&
-                            pendingKeyMap.get(sha1FpPublicKey).contains(certProfileName))
+
+                    boolean foundUniqueSubject = false;
+                    // maximal 100 tries
+                    for(int i = 0; i < 100; i++)
+                    {
+                        try
+                        {
+                            Object[] objs = incSerialNumber(certProfile, grantedSubject, latestSN);
+                            grantedSubject = (X500Name) objs[0];
+                            latestSN = (String) objs[1];
+                        }catch (BadFormatException e)
+                        {
+                            throw new OperationException(ErrorCode.System_Failure, "BadFormatException: " + e.getMessage());
+                        }
+
+                        foundUniqueSubject = (certstore.certIssuedForSubject(caInfo.getCertificate(),
+                                    IoCertUtil.sha1sum_canonicalized_name(grantedSubject)) == false);
+                        if(foundUniqueSubject)
+                        {
+                            break;
+                        }
+                    }
+
+                    if(foundUniqueSubject == false)
                     {
                         throw new OperationException(ErrorCode.ALREADY_ISSUED,
-                               "Certificate for the given public key" +
-                               " and profile " + certProfileName + " already in process");
+                                "Certificate for the given subject " + grandtedSubjectText +
+                                " and profile " + certProfileName +
+                                " already issued, and could not create new unique serial number");
                     }
                 }
             }
@@ -1839,6 +1718,26 @@ public class X509CA
             {
                 synchronized (pendingSubjectMap)
                 {
+                    // check request with the same subject is still in process
+                    if(subjectMode == DuplicationMode.FORBIDDEN)
+                    {
+                        if(pendingSubjectMap.containsKey(sha1FpSubject))
+                        {
+                            throw new OperationException(ErrorCode.ALREADY_ISSUED,
+                                    "Certificate for the given subject " + grandtedSubjectText + " already in process");
+                        }
+                    }
+                    else if(subjectMode == DuplicationMode.FORBIDDEN_WITHIN_PROFILE)
+                    {
+                        if(pendingSubjectMap.containsKey(sha1FpSubject) &&
+                                pendingSubjectMap.get(sha1FpSubject).contains(certProfileName))
+                        {
+                            throw new OperationException(ErrorCode.ALREADY_ISSUED,
+                                   "Certificate for the given subject " + grandtedSubjectText +
+                                   " and profile " + certProfileName + " already in process");
+                        }
+                    }
+
                     List<String> profiles = pendingSubjectMap.get(sha1FpSubject);
                     if(profiles == null)
                     {
@@ -1853,6 +1752,26 @@ public class X509CA
             {
                 synchronized (pendingSubjectMap)
                 {
+                    // check request with the same subject is still in process
+                    if(keyMode == DuplicationMode.FORBIDDEN)
+                    {
+                        if(pendingKeyMap.containsKey(sha1FpPublicKey))
+                        {
+                            throw new OperationException(ErrorCode.ALREADY_ISSUED,
+                                    "Certificate for the given public key already in process");
+                        }
+                    }
+                    else if(keyMode == DuplicationMode.FORBIDDEN_WITHIN_PROFILE)
+                    {
+                        if(pendingKeyMap.containsKey(sha1FpPublicKey) &&
+                                pendingKeyMap.get(sha1FpPublicKey).contains(certProfileName))
+                        {
+                            throw new OperationException(ErrorCode.ALREADY_ISSUED,
+                                   "Certificate for the given public key" +
+                                   " and profile " + certProfileName + " already in process");
+                        }
+                    }
+
                     List<String> profiles = pendingKeyMap.get(sha1FpSubject);
                     if(profiles == null)
                     {
