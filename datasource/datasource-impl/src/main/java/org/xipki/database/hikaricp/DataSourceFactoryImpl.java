@@ -30,24 +30,9 @@ public class DataSourceFactoryImpl implements DataSourceFactory
     throws SQLException, PasswordResolverException, IOException
     {
         assertNotNull("confFile", confFile);
-        assertNotNull("passwordResolver", passwordResolver);
 
-        FileInputStream fIn = null;
-
-        try
-        {
-            fIn = new FileInputStream(confFile);
-            return createDataSource(fIn, passwordResolver);
-        }finally
-        {
-            if(fIn != null)
-            {
-                try
-                {
-                    fIn.close();
-                }catch(IOException e){};
-            }
-        }
+        FileInputStream fIn = new FileInputStream(confFile);
+        return createDataSource(fIn, passwordResolver);
     }
 
     @Override
@@ -55,19 +40,39 @@ public class DataSourceFactoryImpl implements DataSourceFactory
     throws SQLException, PasswordResolverException, IOException
     {
         assertNotNull("conf", conf);
-        assertNotNull("passwordResolver", passwordResolver);
 
         Properties config = new Properties();
-        config.load(conf);
-
-        DatabaseType databaseType;
-        String legacyJdbcUrl = config.getProperty(LegacyConfConverter.DRIVER_CLASSNAME);
-        if(legacyJdbcUrl != null)
+        try
         {
-            config = LegacyConfConverter.convert(config);
+            config.load(conf);
+        }finally
+        {
+            try
+            {
+                conf.close();
+            }catch(Exception e)
+            {
+            }
         }
 
-        String className = config.getProperty("dataSourceClassName");
+        return createDataSource(config, passwordResolver);
+    }
+
+    @Override
+    public DataSourceWrapper createDataSource(Properties conf, PasswordResolver passwordResolver)
+    throws SQLException, PasswordResolverException
+    {
+        assertNotNull("conf", conf);
+        assertNotNull("passwordResolver", passwordResolver);
+
+        DatabaseType databaseType;
+        String legacyJdbcUrl = conf.getProperty(LegacyConfConverter.DRIVER_CLASSNAME);
+        if(legacyJdbcUrl != null)
+        {
+            conf = LegacyConfConverter.convert(conf);
+        }
+
+        String className = conf.getProperty("dataSourceClassName");
         if(className != null)
         {
             databaseType = DatabaseType.getDataSourceForDataSource(className);
@@ -75,25 +80,25 @@ public class DataSourceFactoryImpl implements DataSourceFactory
         }
         else
         {
-            className = config.getProperty("driverClassName");
+            className = conf.getProperty("driverClassName");
             databaseType = DatabaseType.getDataSourceForDriver(className);
         }
 
-        String password = config.getProperty("password");
+        String password = conf.getProperty("password");
         if(password != null)
         {
             password = new String(passwordResolver.resolvePassword(password));
-            config.setProperty("password", password);
+            conf.setProperty("password", password);
         }
 
-        password = config.getProperty("dataSource.password");
+        password = conf.getProperty("dataSource.password");
         if(password != null)
         {
             password = new String(passwordResolver.resolvePassword(password));
-            config.setProperty("dataSource.password", password);
+            conf.setProperty("dataSource.password", password);
         }
 
-        DataSourceWrapperImpl ds = new DataSourceWrapperImpl(config, databaseType);
+        DataSourceWrapperImpl ds = new DataSourceWrapperImpl(conf, databaseType);
         return ds;
     }
 
