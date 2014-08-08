@@ -42,8 +42,8 @@ import org.bouncycastle.asn1.DERNull;
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
+import org.bouncycastle.asn1.x509.Extension;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
-import org.bouncycastle.asn1.x509.X509Extension;
 import org.bouncycastle.asn1.x9.X9ObjectIdentifiers;
 import org.bouncycastle.cert.X509v3CertificateBuilder;
 import org.bouncycastle.crypto.params.AsymmetricKeyParameter;
@@ -332,7 +332,7 @@ public class KeyUtil
                     X509KeyUsage.nonRepudiation + X509KeyUsage.digitalSignature +
                     X509KeyUsage.keyCertSign + X509KeyUsage.cRLSign);
             certBuilder.addExtension(
-                    X509Extension.keyUsage, true, ku);
+                    Extension.keyUsage, true, ku);
 
             SoftTokenContentSignerBuilder signerBuilder = new SoftTokenContentSignerBuilder(
                     keypair.getPrivate());
