@@ -50,7 +50,6 @@ import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.bouncycastle.asn1.x509.TBSCertificate;
 import org.bouncycastle.asn1.x509.Time;
 import org.bouncycastle.asn1.x509.V3TBSCertificateGenerator;
-import org.bouncycastle.asn1.x509.X509Extension;
 import org.bouncycastle.asn1.x9.ECNamedCurveTable;
 import org.bouncycastle.asn1.x9.X962NamedCurves;
 import org.bouncycastle.asn1.x9.X9ECParameters;
@@ -397,7 +396,7 @@ public class P11KeypairGenerator
             keyUsage = KeyUsage.keyCertSign | KeyUsage.cRLSign |
                     KeyUsage.digitalSignature | KeyUsage.keyEncipherment;
         }
-        extensions.add(new Extension(X509Extension.keyUsage, true,
+        extensions.add(new Extension(Extension.keyUsage, true,
                 new DEROctetString(new KeyUsage(keyUsage))));
 
         if(extendedKeyUsage != null && extendedKeyUsage.isEmpty() == false)
@@ -410,7 +409,7 @@ public class P11KeypairGenerator
                 kps[i++] = KeyPurposeId.getInstance(oid);
             }
 
-            extensions.add(new Extension(X509Extension.extendedKeyUsage, false,
+            extensions.add(new Extension(Extension.extendedKeyUsage, false,
                     new DEROctetString(new ExtendedKeyUsage(kps))));
         }
 
