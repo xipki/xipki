@@ -27,6 +27,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
 
+import jline.internal.Log;
+
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.AuthorityInformationAccess;
 import org.bouncycastle.asn1.x509.AuthorityKeyIdentifier;
@@ -203,6 +205,7 @@ class SelfSignedCertBuilder
             certProfile.checkPublicKey(publicKeyInfo);
         } catch (BadCertTemplateException e)
         {
+            Log.warn("certProfile.checkPublicKey", e);
             throw new OperationException(ErrorCode.BAD_CERT_TEMPLATE, e.getMessage());
         }
 
@@ -216,6 +219,7 @@ class SelfSignedCertBuilder
             throw new OperationException(ErrorCode.System_Failure, "exception in cert profile " + certProfileName);
         } catch (BadCertTemplateException e)
         {
+            Log.warn("certProfile.getSubject", e);
             throw new OperationException(ErrorCode.BAD_CERT_TEMPLATE, e.getMessage());
         }
 
