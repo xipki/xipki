@@ -191,77 +191,101 @@ class CertStatusStoreQueryExecutor
             sb.append(")");
 
             final String SQL_ADD_CERT = sb.toString();
-            PreparedStatement ps = borrowPreparedStatement(SQL_ADD_CERT);
+
+            final String SQL_ADD_RAWCERT = "INSERT INTO RAWCERT (CERT_ID, CERT) VALUES (?, ?)";
+
+            final String SQL_ADD_CERTHASH = "INSERT INTO CERTHASH "
+                    + " (CERT_ID, SHA1_FP, SHA224_FP, SHA256_FP, SHA384_FP, SHA512_FP)"
+                    + " VALUES (?, ?, ?, ?, ?, ?)";
+
+            PreparedStatement[] pss = borrowPreparedStatements(SQL_ADD_CERT, SQL_ADD_RAWCERT, SQL_ADD_CERTHASH);
+            PreparedStatement ps_addcert = pss[0];
+            PreparedStatement ps_addRawcert = pss[1];
+            PreparedStatement ps_addCerthash = pss[2];
+            // all statements have the same connection
+            Connection conn = ps_addcert.getConnection();
 
             int certId = cert_id.getAndAdd(1);
 
             try
             {
+                // CERT
                 X509Certificate cert = certificate.getCert();
                 int idx = 1;
-                ps.setInt(idx++, certId);
-                ps.setLong(idx++, System.currentTimeMillis()/1000);
-                ps.setLong(idx++, serialNumber.longValue());
-                ps.setString(idx++, certificate.getSubject());
-                ps.setLong(idx++, cert.getNotBefore().getTime()/1000);
-                ps.setLong(idx++, cert.getNotAfter().getTime()/1000);
-                setBoolean(ps, idx++, revoked);
-                ps.setInt(idx++, issuerId);
-                ps.setString(idx++, certProfile);
+                ps_addcert.setInt(idx++, certId);
+                ps_addcert.setLong(idx++, System.currentTimeMillis()/1000);
+                ps_addcert.setLong(idx++, serialNumber.longValue());
+                ps_addcert.setString(idx++, certificate.getSubject());
+                ps_addcert.setLong(idx++, cert.getNotBefore().getTime()/1000);
+                ps_addcert.setLong(idx++, cert.getNotAfter().getTime()/1000);
+                setBoolean(ps_addcert, idx++, revoked);
+                ps_addcert.setInt(idx++, issuerId);
+                ps_addcert.setString(idx++, certProfile);
 
                 if(revoked)
                 {
-                    ps.setLong(idx++, revInfo.getRevocationTime().getTime()/1000);
+                    ps_addcert.setLong(idx++, revInfo.getRevocationTime().getTime()/1000);
                     if(revInfo.getInvalidityTime() != null)
                     {
-                        ps.setLong(idx++, revInfo.getInvalidityTime().getTime()/1000);
+                        ps_addcert.setLong(idx++, revInfo.getInvalidityTime().getTime()/1000);
                     }else
                     {
-                        ps.setNull(idx++, Types.BIGINT);
+                        ps_addcert.setNull(idx++, Types.BIGINT);
                     }
-                    ps.setInt(idx++, revInfo.getReason() == null? 0 : revInfo.getReason().getCode());
+                    ps_addcert.setInt(idx++, revInfo.getReason() == null? 0 : revInfo.getReason().getCode());
                 }
 
-                ps.executeUpdate();
-            }finally
-            {
-                releaseDbResources(ps, null);
-            }
+                // RAWCERT
+                byte[] encodedCert = certificate.getEncodedCert();
+                idx = 1;
+                ps_addRawcert.setInt(idx++, certId);
+                ps_addRawcert.setString(idx++, Base64.toBase64String(encodedCert));
 
-            byte[] encodedCert = certificate.getEncodedCert();
+                // CERTHASH
+                idx = 1;
+                ps_addCerthash.setInt(idx++, certId);
+                ps_addCerthash.setString(idx++, HashCalculator.hexHash(HashAlgoType.SHA1, encodedCert));
+                ps_addCerthash.setString(idx++, HashCalculator.hexHash(HashAlgoType.SHA224, encodedCert));
+                ps_addCerthash.setString(idx++, HashCalculator.hexHash(HashAlgoType.SHA256, encodedCert));
+                ps_addCerthash.setString(idx++, HashCalculator.hexHash(HashAlgoType.SHA384, encodedCert));
+                ps_addCerthash.setString(idx++, HashCalculator.hexHash(HashAlgoType.SHA512, encodedCert));
 
-            final String SQL_ADD_RAWCERT = "INSERT INTO RAWCERT (CERT_ID, CERT) VALUES (?, ?)";
-            ps = borrowPreparedStatement(SQL_ADD_RAWCERT);
-
-            try
+                final boolean origAutoCommit = conn.getAutoCommit();
+                conn.setAutoCommit(false);
+                try
+                {
+                    ps_addcert.executeUpdate();
+                    ps_addRawcert.executeUpdate();
+                    ps_addCerthash.executeUpdate();
+                    conn.commit();
+                }catch(SQLException e)
+                {
+                    ps_addcert.cancel();
+                    ps_addRawcert.cancel();
+                    ps_addCerthash.cancel();
+                }
+                finally
+                {
+                    conn.setAutoCommit(origAutoCommit);
+                }
+            } finally
             {
-                int idx = 1;
-                ps.setInt(idx++, certId);
-                ps.setString(idx++, Base64.toBase64String(encodedCert));
-                ps.executeUpdate();
-            }finally
-            {
-                releaseDbResources(ps, null);
-            }
-
-            final String SQL_ADD_CERTHASH = "INSERT INTO CERTHASH "
-                    + " (CERT_ID, SHA1_FP, SHA224_FP, SHA256_FP, SHA384_FP, SHA512_FP)"
-                    + " VALUES (?, ?, ?, ?, ?, ?)";
-            ps = borrowPreparedStatement(SQL_ADD_CERTHASH);
-
-            try
-            {
-                int idx = 1;
-                ps.setInt(idx++, certId);
-                ps.setString(idx++, HashCalculator.hexHash(HashAlgoType.SHA1, encodedCert));
-                ps.setString(idx++, HashCalculator.hexHash(HashAlgoType.SHA224, encodedCert));
-                ps.setString(idx++, HashCalculator.hexHash(HashAlgoType.SHA256, encodedCert));
-                ps.setString(idx++, HashCalculator.hexHash(HashAlgoType.SHA384, encodedCert));
-                ps.setString(idx++, HashCalculator.hexHash(HashAlgoType.SHA512, encodedCert));
-                ps.executeUpdate();
-            }finally
-            {
-                releaseDbResources(ps, null);
+                try
+                {
+                    for(PreparedStatement ps : pss)
+                    {
+                        try
+                        {
+                            ps.close();
+                        }catch(SQLException e)
+                        {
+                            LOG.warn("Could not close PreparedStatement", e);
+                        }
+                    }
+                }finally
+                {
+                    dataSource.returnConnection(conn);
+                }
             }
         }
     }
@@ -485,6 +509,46 @@ class CertStatusStoreQueryExecutor
             throw new SQLException("Cannot create prepared statement for " + sqlQuery);
         }
         return ps;
+    }
+
+    private PreparedStatement[] borrowPreparedStatements(String... sqlQueries)
+    throws SQLException
+    {
+        PreparedStatement[] pss = new PreparedStatement[sqlQueries.length];
+
+        Connection c = dataSource.getConnection();
+        if(c != null)
+        {
+               final int n = sqlQueries.length;
+               for(int i = 0; i < n; i++)
+               {
+                   pss[i] = dataSource.prepareStatement(c, sqlQueries[i]);
+                if(pss[i] == null)
+                {
+                       for(int j = 0; j < i; j++)
+                       {
+                           try
+                           {
+                               pss[j].close();
+                           }catch(SQLException e)
+                           {
+                               LOG.warn("Could not close preparedStatement", e);
+                           }
+                       }
+                       try
+                       {
+                           c.close();
+                       }catch(SQLException e)
+                       {
+                           LOG.warn("Could not clse connection", e);
+                       }
+
+                    throw new SQLException("Cannot create prepared statement for " + sqlQueries[i]);
+                }
+            }
+       }
+
+        return pss;
     }
 
     private boolean certRegistered(int issuerId, BigInteger serialNumber)

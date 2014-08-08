@@ -169,72 +169,102 @@ class CertStoreQueryExecutor
                 + " CERTPROFILEINFO_ID, CAINFO_ID,"
                 + " REQUESTORINFO_ID, USER_ID, SHA1_FP_PK, SHA1_FP_SUBJECT)" +
                 " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-        PreparedStatement ps = borrowPreparedStatement(SQL_ADD_CERT);
 
-        int certId = cert_id.getAndAdd(1);
-        certificate.setCertId(certId);
+        final String SQL_ADD_RAWCERT = "INSERT INTO RAWCERT (CERT_ID, SHA1_FP, CERT) VALUES (?, ?, ?)";
+
+        PreparedStatement[] pss = borrowPreparedStatements(SQL_ADD_CERT, SQL_ADD_RAWCERT);
+        PreparedStatement ps_addcert = pss[0];
+        PreparedStatement ps_addRawcert = pss[1];
+        // all statements have the same connection
+        Connection conn = ps_addcert.getConnection();
 
         try
         {
+            int certId = cert_id.getAndAdd(1);
+            certificate.setCertId(certId);
+
             int caId = getCaId(issuer);
             int certprofileId = getCertprofileId(certprofileName);
 
+            // cert
             X509Certificate cert = certificate.getCert();
             int idx = 1;
-            ps.setInt(idx++, certId);
-            ps.setLong(idx++, System.currentTimeMillis()/1000);
-            ps.setLong(idx++, cert.getSerialNumber().longValue());
-            ps.setString(idx++, certificate.getSubject());
-            ps.setLong(idx++, cert.getNotBefore().getTime()/1000);
-            ps.setLong(idx++, cert.getNotAfter().getTime()/1000);
-            setBoolean(ps, idx++, false);
-            ps.setInt(idx++, certprofileId);
-            ps.setInt(idx++, caId);
+            ps_addcert.setInt(idx++, certId);
+            ps_addcert.setLong(idx++, System.currentTimeMillis()/1000);
+            ps_addcert.setLong(idx++, cert.getSerialNumber().longValue());
+            ps_addcert.setString(idx++, certificate.getSubject());
+            ps_addcert.setLong(idx++, cert.getNotBefore().getTime()/1000);
+            ps_addcert.setLong(idx++, cert.getNotAfter().getTime()/1000);
+            setBoolean(ps_addcert, idx++, false);
+            ps_addcert.setInt(idx++, certprofileId);
+            ps_addcert.setInt(idx++, caId);
 
             Integer requestorId = (requestor == null) ? null : getRequestorId(requestor.getName());
             if(requestorId != null)
             {
-                ps.setInt(idx++, requestorId.intValue());
+                ps_addcert.setInt(idx++, requestorId.intValue());
             }
             else
             {
-                ps.setNull(idx++, Types.INTEGER);
+                ps_addcert.setNull(idx++, Types.INTEGER);
             }
 
             Integer userId = (user == null) ? null : getUserId(user);
             if(userId != null)
             {
-                ps.setInt(idx++, userId.intValue());
+                ps_addcert.setInt(idx++, userId.intValue());
             }
             else
             {
-                ps.setNull(idx++, Types.INTEGER);
+                ps_addcert.setNull(idx++, Types.INTEGER);
             }
 
-            ps.setString(idx++, fp(encodedSubjectPublicKey));
+            ps_addcert.setString(idx++, fp(encodedSubjectPublicKey));
             String sha1_fp_subject = IoCertUtil.sha1sum_canonicalized_name(cert.getSubjectX500Principal());
-            ps.setString(idx++, sha1_fp_subject);
-            ps.executeUpdate();
-        }finally
-        {
-            releaseDbResources(ps, null);
-        }
+            ps_addcert.setString(idx++, sha1_fp_subject);
 
-        final String SQL_ADD_RAWCERT = "INSERT INTO RAWCERT (CERT_ID, SHA1_FP, CERT) VALUES (?, ?, ?)";
-        ps = borrowPreparedStatement(SQL_ADD_RAWCERT);
+            // rawcert
+            String sha1_fp = fp(certificate.getEncodedCert());
 
-        String sha1_fp = fp(certificate.getEncodedCert());
+            idx = 1;
+            ps_addRawcert.setInt(idx++, certId);
+            ps_addRawcert.setString(idx++, sha1_fp);
+            ps_addRawcert.setString(idx++, Base64.toBase64String(certificate.getEncodedCert()));
 
-        try
+            final boolean origAutoCommit = conn.getAutoCommit();
+            conn.setAutoCommit(false);
+            try
+            {
+                ps_addcert.executeUpdate();
+                ps_addRawcert.executeUpdate();
+                conn.commit();
+            }catch(SQLException e)
+            {
+                ps_addcert.cancel();
+                ps_addRawcert.cancel();
+            }
+            finally
+            {
+                conn.setAutoCommit(origAutoCommit);
+            }
+        } finally
         {
-            int idx = 1;
-            ps.setInt(idx++, certId);
-            ps.setString(idx++, sha1_fp);
-            ps.setString(idx++, Base64.toBase64String(certificate.getEncodedCert()));
-            ps.executeUpdate();
-        }finally
-        {
-            releaseDbResources(ps, null);
+            try
+            {
+                for(PreparedStatement ps : pss)
+                {
+                    try
+                    {
+                        ps.close();
+                    }catch(SQLException e)
+                    {
+                        LOG.warn("Could not close PreparedStatement", e);
+                    }
+                }
+            }finally
+            {
+                dataSource.returnConnection(conn);
+            }
         }
     }
 
@@ -1101,6 +1131,7 @@ class CertStoreQueryExecutor
             }
         } catch (IOException e)
         {
+            LOG.warn("getCertificateInfo()", e);
             throw new OperationException(ErrorCode.System_Failure, "IOException: " + e.getMessage());
         }finally
         {
@@ -1461,12 +1492,46 @@ class CertStoreQueryExecutor
         return id.intValue();
     }
 
-    /**
-     *
-     * @return the next idle preparedStatement, {@code null} will be returned
-     *         if no PreparedStament can be created within 5 seconds
-     * @throws SQLException
-     */
+    private PreparedStatement[] borrowPreparedStatements(String... sqlQueries)
+    throws SQLException
+    {
+        PreparedStatement[] pss = new PreparedStatement[sqlQueries.length];
+
+        Connection c = dataSource.getConnection();
+        if(c != null)
+        {
+            final int n = sqlQueries.length;
+            for(int i = 0; i < n; i++)
+            {
+                pss[i] = dataSource.prepareStatement(c, sqlQueries[i]);
+                if(pss[i] == null)
+                {
+                    for(int j = 0; j < i; j++)
+                    {
+                        try
+                        {
+                            pss[j].close();
+                        }catch(SQLException e)
+                        {
+                            LOG.warn("Could not close preparedStatement", e);
+                        }
+                    }
+                    try
+                    {
+                        c.close();
+                    }catch(SQLException e)
+                    {
+                        LOG.warn("Could not clse connection", e);
+                    }
+
+                    throw new SQLException("Cannot create prepared statement for " + sqlQueries[i]);
+                }
+            }
+        }
+
+        return pss;
+    }
+
     private PreparedStatement borrowPreparedStatement(String sqlQuery)
     throws SQLException
     {
