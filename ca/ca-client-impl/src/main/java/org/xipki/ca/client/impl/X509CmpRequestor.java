@@ -54,7 +54,6 @@ import org.bouncycastle.asn1.x509.CertificateList;
 import org.bouncycastle.asn1.x509.Extension;
 import org.bouncycastle.asn1.x509.Extensions;
 import org.bouncycastle.asn1.x509.GeneralName;
-import org.bouncycastle.asn1.x509.X509Extension;
 import org.bouncycastle.cert.X509CertificateHolder;
 import org.bouncycastle.cert.cmp.CMPException;
 import org.bouncycastle.cert.cmp.CertificateConfirmationContent;
@@ -555,13 +554,13 @@ abstract class X509CmpRequestor extends CmpRequestor
             try
             {
                 DEREnumerated reason = new DEREnumerated(requestEntry.getReason());
-                extensions[0] = new Extension(X509Extension.reasonCode,
+                extensions[0] = new Extension(Extension.reasonCode,
                         true, new DEROctetString(reason.getEncoded()));
 
                 if(invalidityDate != null)
                 {
                     ASN1GeneralizedTime time = new ASN1GeneralizedTime(invalidityDate);
-                    extensions[1] = new Extension(X509Extension.invalidityDate,
+                    extensions[1] = new Extension(Extension.invalidityDate,
                         true, new DEROctetString(time.getEncoded()));
                 }
             }catch(IOException e)
@@ -601,7 +600,7 @@ abstract class X509CmpRequestor extends CmpRequestor
             try
             {
                 DEREnumerated reason = new DEREnumerated(reasonCode);
-                extensions[0] = new Extension(X509Extension.reasonCode,
+                extensions[0] = new Extension(Extension.reasonCode,
                         true, new DEROctetString(reason.getEncoded()));
             }catch(IOException e)
             {

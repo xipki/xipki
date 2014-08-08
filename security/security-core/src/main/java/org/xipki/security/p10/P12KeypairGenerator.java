@@ -34,9 +34,9 @@ import org.bouncycastle.asn1.teletrust.TeleTrusTNamedCurves;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.asn1.x509.ExtendedKeyUsage;
+import org.bouncycastle.asn1.x509.Extension;
 import org.bouncycastle.asn1.x509.KeyPurposeId;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
-import org.bouncycastle.asn1.x509.X509Extension;
 import org.bouncycastle.asn1.x509.X509ObjectIdentifiers;
 import org.bouncycastle.asn1.x9.X962NamedCurves;
 import org.bouncycastle.asn1.x9.X9ObjectIdentifiers;
@@ -126,7 +126,7 @@ public abstract class P12KeypairGenerator
         }
 
         certGenerator.addExtension(
-                 X509Extension.keyUsage, true, ku);
+                 Extension.keyUsage, true, ku);
 
         if(extendedKeyUsage != null && extendedKeyUsage.isEmpty() == false)
         {
@@ -138,7 +138,7 @@ public abstract class P12KeypairGenerator
                 kps[i++] = KeyPurposeId.getInstance(oid);
             }
 
-            certGenerator.addExtension(X509Extension.extendedKeyUsage, false,
+            certGenerator.addExtension(Extension.extendedKeyUsage, false,
                     new ExtendedKeyUsage(kps));
         }
 
