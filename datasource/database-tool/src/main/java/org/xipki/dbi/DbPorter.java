@@ -7,6 +7,8 @@
 
 package org.xipki.dbi;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -14,6 +16,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Types;
+import java.util.Properties;
 
 import javax.xml.bind.JAXBException;
 import javax.xml.validation.Schema;
@@ -41,6 +44,7 @@ public class DbPorter
 
     private final DataSourceWrapper dataSource;
     private Connection connection;
+    private boolean connectionAutoCommit;
 
     protected final String baseDir;
 
@@ -53,6 +57,7 @@ public class DbPorter
 
         this.dataSource = dataSource;
         this.connection = this.dataSource.getConnection();
+        this.connectionAutoCommit = connection.getAutoCommit();
         this.baseDir = IoCertUtil.expandFilepath(baseDir);
     }
 
@@ -165,6 +170,55 @@ public class DbPorter
         {
             throw new JAXBException("Error while loading schemas for the specified classes\nDetails:\n" + e.getMessage());
         }
+    }
+
+    protected void disableAutoCommit()
+    throws SQLException
+    {
+        connection.setAutoCommit(false);
+    }
+
+    protected void recoverAutoCommit()
+    throws SQLException
+    {
+        connection.setAutoCommit(connectionAutoCommit);
+    }
+
+    protected void commit()
+    throws SQLException
+    {
+        connection.commit();
+    }
+
+    public static Properties getDbConfProperties(InputStream is)
+    throws IOException
+    {
+        Properties props = new Properties();
+        try
+        {
+            props.load(is);
+        }finally
+        {
+            try
+            {
+                is.close();
+            }catch(IOException e)
+            {
+            }
+        }
+
+        // adapt the configuration
+        if(props.getProperty("minimumIdle") != null)
+        {
+            props.setProperty("minimumIdle", "1");
+        }
+
+        if(props.getProperty("db.minIdle") != null)
+        {
+            props.setProperty("db.minIdle", "1");
+        }
+
+        return props;
     }
 
 }

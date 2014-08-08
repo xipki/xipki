@@ -7,8 +7,10 @@
 
 package org.xipki.dbi;
 
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.Properties;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -37,8 +39,9 @@ public class CaDbImporter
             PasswordResolver passwordResolver, String dbConfFile)
     throws SQLException, PasswordResolverException, IOException, JAXBException
     {
-        this.dataSource = dataSourceFactory.createDataSourceForFile(
-                IoCertUtil.expandFilepath(dbConfFile), passwordResolver);
+        Properties props = DbPorter.getDbConfProperties(
+                new FileInputStream(IoCertUtil.expandFilepath(dbConfFile)));
+        this.dataSource = dataSourceFactory.createDataSource(props, passwordResolver);
         JAXBContext jaxbContext = JAXBContext.newInstance(ObjectFactory.class);
         unmarshaller = jaxbContext.createUnmarshaller();
         unmarshaller.setSchema(DbPorter.retrieveSchema("/xsd/dbi-ca.xsd"));
