@@ -8,9 +8,11 @@
 package org.xipki.dbi;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.SQLException;
+import java.util.Properties;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -43,7 +45,8 @@ public class CaDbExporter
     throws SQLException, PasswordResolverException, IOException, JAXBException
     {
         ParamChecker.assertNotEmpty("destFolder", destFolder);
-        this.dataSource = dataSourceFactory.createDataSource(dbConfStream, passwordResolver);
+        Properties props = DbPorter.getDbConfProperties(dbConfStream);
+        this.dataSource = dataSourceFactory.createDataSource(props, passwordResolver);
         this.marshaller = getMarshaller();
         this.destFolder = IoCertUtil.expandFilepath(destFolder);
         checkDestFolder();
@@ -53,12 +56,8 @@ public class CaDbExporter
             PasswordResolver passwordResolver, String dbConfFile, String destFolder)
     throws SQLException, PasswordResolverException, IOException, JAXBException
     {
-        ParamChecker.assertNotEmpty("destFolder", destFolder);
-        this.dataSource = dataSourceFactory.createDataSourceForFile(
-                IoCertUtil.expandFilepath(dbConfFile), passwordResolver);
-        this.marshaller = getMarshaller();
-        this.destFolder = IoCertUtil.expandFilepath(destFolder);
-        checkDestFolder();
+        this(dataSourceFactory, passwordResolver,
+                new FileInputStream(IoCertUtil.expandFilepath(dbConfFile)), destFolder);
     }
 
     private static Marshaller getMarshaller()
