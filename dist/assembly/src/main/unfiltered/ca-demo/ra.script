@@ -131,16 +131,6 @@ caclient:gencrl -ca SubCAwithCRL1 -out output/SubCAwithCRL1.crl
 ## Get CRL
 caclient:getcrl -ca SubCAwithCRL1 -out output/SubCAwithCRL1-get.crl
 
-# Loadtest RSA key
-echo "Load test with RSA key"
-caclient:loadtest-enroll \
- -subject "CN=xipki.org,O=example PKI company,C=DE" -profile TLS -duration 10 -thread 5
-
-# Loadtest EC key
-echo "Load test with EC key"
-caclient:loadtest-enroll -ec -curve secp256r1 \
- -subject "CN=xipki.org,O=example PKI company,C=DE" -profile TLS -duration 10 -thread 5 
-
 #################################################################
 #              UNINSTALL UNNEEDED FEATURES                      #
 #################################################################
