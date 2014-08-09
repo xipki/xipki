@@ -30,7 +30,6 @@ import org.bouncycastle.asn1.ASN1EncodableVector;
 import org.bouncycastle.asn1.ASN1Integer;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.DERBitString;
-import org.bouncycastle.asn1.DERInteger;
 import org.bouncycastle.asn1.DERNull;
 import org.bouncycastle.asn1.DEROctetString;
 import org.bouncycastle.asn1.DERSequence;
@@ -491,9 +490,9 @@ public class P11KeypairGenerator
         byte[] y = Arrays.copyOfRange(signature, n, 2*n);
 
         ASN1EncodableVector sigder = new ASN1EncodableVector();
-        sigder.add(new DERInteger(
+        sigder.add(new ASN1Integer(
                 new BigInteger(1, x)));
-        sigder.add(new DERInteger(
+        sigder.add(new ASN1Integer(
                 new BigInteger(1, y)));
 
         return new DERSequence(sigder).getEncoded();
