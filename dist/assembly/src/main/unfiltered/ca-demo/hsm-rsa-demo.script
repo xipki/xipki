@@ -11,3 +11,6 @@ source ./ca-demo/ra.script
 
 source ./ca-demo/ocsp.script
 
+source ./ca-demo/loadtest-enroll.script
+
+source ./ca-demo/loadtest-ocsp.script
