@@ -602,7 +602,7 @@ public class OcspResponder
                         {
                             fillAuditEvent(auditEvent, AuditLevel.INFO, AuditStatus.FAILED, message);
                         }
-                        return createUnsuccessfullOCSPResp(OcspResponseStatus.malformedRequest);
+                        return createUnsuccessfullOCSPResp(OcspResponseStatus.unauthorized);
                     }
 
                     ContentVerifierProvider cvp;
@@ -616,7 +616,7 @@ public class OcspResponder
                         {
                             fillAuditEvent(auditEvent, AuditLevel.ERROR, AuditStatus.ERROR, e.getMessage());
                         }
-                        return createUnsuccessfullOCSPResp(OcspResponseStatus.malformedRequest);
+                        return createUnsuccessfullOCSPResp(OcspResponseStatus.unauthorized);
                     }
 
                     boolean sigValid = request.isSignatureValid(cvp);
@@ -628,7 +628,7 @@ public class OcspResponder
                         {
                             fillAuditEvent(auditEvent, AuditLevel.INFO, AuditStatus.FAILED, message);
                         }
-                        return createUnsuccessfullOCSPResp(OcspResponseStatus.malformedRequest);
+                        return createUnsuccessfullOCSPResp(OcspResponseStatus.unauthorized);
                     }
 
                     // validate the certPath
@@ -678,7 +678,7 @@ public class OcspResponder
                         {
                             fillAuditEvent(auditEvent, AuditLevel.INFO, AuditStatus.FAILED, message);
                         }
-                        return createUnsuccessfullOCSPResp(OcspResponseStatus.malformedRequest);
+                        return createUnsuccessfullOCSPResp(OcspResponseStatus.unauthorized);
                     }
 
                     CertPath certPath = result.getCertPath();
@@ -697,7 +697,7 @@ public class OcspResponder
                         {
                             fillAuditEvent(auditEvent, AuditLevel.INFO, AuditStatus.FAILED, message);
                         }
-                        return createUnsuccessfullOCSPResp(OcspResponseStatus.malformedRequest);
+                        return createUnsuccessfullOCSPResp(OcspResponseStatus.unauthorized);
                     }
                 }
             }

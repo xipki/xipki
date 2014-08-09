@@ -18,11 +18,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.bouncycastle.asn1.ASN1Enumerated;
 import org.bouncycastle.asn1.ASN1GeneralizedTime;
 import org.bouncycastle.asn1.ASN1Integer;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.ASN1OctetString;
-import org.bouncycastle.asn1.DEREnumerated;
 import org.bouncycastle.asn1.DEROctetString;
 import org.bouncycastle.asn1.cmp.CMPCertificate;
 import org.bouncycastle.asn1.cmp.CMPObjectIdentifiers;
@@ -553,7 +553,7 @@ abstract class X509CmpRequestor extends CmpRequestor
 
             try
             {
-                DEREnumerated reason = new DEREnumerated(requestEntry.getReason());
+                ASN1Enumerated reason = new ASN1Enumerated(requestEntry.getReason());
                 extensions[0] = new Extension(Extension.reasonCode,
                         true, new DEROctetString(reason.getEncoded()));
 
@@ -599,7 +599,7 @@ abstract class X509CmpRequestor extends CmpRequestor
 
             try
             {
-                DEREnumerated reason = new DEREnumerated(reasonCode);
+                ASN1Enumerated reason = new ASN1Enumerated(reasonCode);
                 extensions[0] = new Extension(Extension.reasonCode,
                         true, new DEROctetString(reason.getEncoded()));
             }catch(IOException e)
