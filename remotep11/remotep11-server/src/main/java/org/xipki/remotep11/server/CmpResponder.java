@@ -11,9 +11,9 @@ import java.security.SecureRandom;
 
 import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1EncodableVector;
+import org.bouncycastle.asn1.ASN1Integer;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.ASN1OctetString;
-import org.bouncycastle.asn1.DERInteger;
 import org.bouncycastle.asn1.DEROctetString;
 import org.bouncycastle.asn1.DERSequence;
 import org.bouncycastle.asn1.DERUTF8String;
@@ -161,7 +161,7 @@ class CmpResponder
             {
                 if(RemoteP11Constants.id_version.equals(itvType))
                 {
-                    respItvInfoValue = new DERInteger(localP11CryptService.getVersion());
+                    respItvInfoValue = new ASN1Integer(localP11CryptService.getVersion());
                 }
                 else if(RemoteP11Constants.id_pso_ecdsa.equals(itvType) ||
                         RemoteP11Constants.id_pso_rsa_x509.equals(itvType) ||
