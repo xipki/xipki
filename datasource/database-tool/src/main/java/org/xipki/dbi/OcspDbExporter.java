@@ -8,18 +8,23 @@
 package org.xipki.dbi;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.Properties;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xipki.database.api.DataSourceFactory;
 import org.xipki.database.api.DataSourceWrapper;
 import org.xipki.dbi.ocsp.jaxb.ObjectFactory;
 import org.xipki.security.api.PasswordResolver;
 import org.xipki.security.api.PasswordResolverException;
+import org.xipki.security.common.IoCertUtil;
 
 /**
  * @author Lijun Liao
@@ -27,7 +32,7 @@ import org.xipki.security.api.PasswordResolverException;
 
 public class OcspDbExporter
 {
-
+    private static final Logger LOG = LoggerFactory.getLogger(OcspDbImporter.class);
     protected final DataSourceWrapper dataSource;
     protected final Marshaller marshaller;
     protected final String destFolder;
@@ -36,7 +41,10 @@ public class OcspDbExporter
             PasswordResolver passwordResolver, String dbConfFile, String destFolder)
     throws SQLException, PasswordResolverException, IOException, JAXBException
     {
-        this.dataSource = dataSourceFactory.createDataSourceForFile(dbConfFile, passwordResolver);
+        Properties props = DbPorter.getDbConfProperties(
+                new FileInputStream(IoCertUtil.expandFilepath(dbConfFile)));
+        this.dataSource = dataSourceFactory.createDataSource(props, passwordResolver);
+
         JAXBContext jaxbContext = JAXBContext.newInstance(ObjectFactory.class);
         marshaller = jaxbContext.createMarshaller();
         marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
@@ -80,7 +88,13 @@ public class OcspDbExporter
             certStoreExporter.shutdown();
         }finally
         {
-            dataSource.shutdown();
+            try
+            {
+                dataSource.shutdown();
+            }catch(Throwable e)
+            {
+                LOG.error("dataSource.shutdown()", e);
+            }
         }
     }
 
