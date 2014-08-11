@@ -260,9 +260,46 @@ class CertStatusStoreQueryExecutor
                     conn.commit();
                 }catch(SQLException e)
                 {
-                    ps_addcert.cancel();
-                    ps_addRawcert.cancel();
-                    ps_addCerthash.cancel();
+                    try
+                    {
+                        ps_addcert.cancel();
+                    }catch(SQLException e2)
+                    {
+                        final String message = "Could not cancel PreparedStatement ps_addcert";
+                        if(LOG.isErrorEnabled())
+                        {
+                            LOG.error(LogUtil.buildExceptionLogFormat(message), e2.getClass().getName(), e2.getMessage());
+                        }
+                        LOG.debug(message, e2);
+                    }
+
+                    try
+                    {
+                        ps_addRawcert.cancel();
+                    }catch(SQLException e2)
+                    {
+                        final String message = "Could not cancel PreparedStatement ps_addRawcert";
+                        if(LOG.isErrorEnabled())
+                        {
+                            LOG.error(LogUtil.buildExceptionLogFormat(message), e2.getClass().getName(), e2.getMessage());
+                        }
+                        LOG.debug(message, e2);
+                    }
+
+                    try
+                    {
+                        ps_addCerthash.cancel();
+                    }catch(SQLException e2)
+                    {
+                        final String message = "Could not cancel PreparedStatement ps_addCerthash";
+                        if(LOG.isErrorEnabled())
+                        {
+                            LOG.error(LogUtil.buildExceptionLogFormat(message), e2.getClass().getName(), e2.getMessage());
+                        }
+                        LOG.debug(message, e2);
+                    }
+
+                    throw e;
                 }
                 finally
                 {
@@ -519,10 +556,10 @@ class CertStatusStoreQueryExecutor
         Connection c = dataSource.getConnection();
         if(c != null)
         {
-               final int n = sqlQueries.length;
-               for(int i = 0; i < n; i++)
-               {
-                   pss[i] = dataSource.prepareStatement(c, sqlQueries[i]);
+            final int n = sqlQueries.length;
+            for(int i = 0; i < n; i++)
+            {
+                pss[i] = dataSource.prepareStatement(c, sqlQueries[i]);
                 if(pss[i] == null)
                 {
                        for(int j = 0; j < i; j++)
@@ -548,7 +585,7 @@ class CertStatusStoreQueryExecutor
             }
        }
 
-        return pss;
+       return pss;
     }
 
     private boolean certRegistered(int issuerId, BigInteger serialNumber)
