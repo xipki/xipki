@@ -54,6 +54,7 @@ import org.xipki.database.api.DataSourceWrapper;
 import org.xipki.security.common.CRLReason;
 import org.xipki.security.common.CertRevocationInfo;
 import org.xipki.security.common.IoCertUtil;
+import org.xipki.security.common.LogUtil;
 import org.xipki.security.common.LruCache;
 import org.xipki.security.common.ObjectIdentifiers;
 import org.xipki.security.common.ParamChecker;
@@ -179,11 +180,11 @@ class CertStoreQueryExecutor
 
         try
         {
-            int certId = cert_id.getAndAdd(1);
-            certificate.setCertId(certId);
-
             int caId = getCaId(issuer);
             int certprofileId = getCertprofileId(certprofileName);
+
+            int certId = cert_id.getAndAdd(1);
+            certificate.setCertId(certId);
 
             // cert
             X509Certificate cert = certificate.getCert();
@@ -239,8 +240,33 @@ class CertStoreQueryExecutor
                 conn.commit();
             }catch(SQLException e)
             {
-                ps_addcert.cancel();
-                ps_addRawcert.cancel();
+                try
+                {
+                    ps_addcert.cancel();
+                }catch(SQLException e2)
+                {
+                    final String message = "Could not cancel PreparedStatement ps_addcert";
+                    if(LOG.isErrorEnabled())
+                    {
+                        LOG.error(LogUtil.buildExceptionLogFormat(message), e2.getClass().getName(), e2.getMessage());
+                    }
+                    LOG.debug(message, e2);
+                }
+
+                try
+                {
+                    ps_addRawcert.cancel();
+                }catch(SQLException e2)
+                {
+                    final String message = "Could not cancel PreparedStatement ps_addRawcert";
+                    if(LOG.isErrorEnabled())
+                    {
+                        LOG.error(LogUtil.buildExceptionLogFormat(message), e2.getClass().getName(), e2.getMessage());
+                    }
+                    LOG.debug(message, e2);
+                }
+
+                throw e;
             }
             finally
             {
@@ -1368,6 +1394,7 @@ class CertStoreQueryExecutor
 
         StringBuilder sb = new StringBuilder();
         sb.append("ID FROM CERT WHERE ").append(fpColumnName).append("=?");
+        sb.append(" AND CAINFO_ID=?");
         if(profile != null)
         {
             sb.append(" AND CERTPROFILEINFO_ID=?");
@@ -1380,6 +1407,7 @@ class CertStoreQueryExecutor
         {
             int idx = 1;
             ps.setString(idx++, fp);
+            ps.setInt(idx++, caId);
             if(profile != null)
             {
                 ps.setInt(idx++, profileId);
