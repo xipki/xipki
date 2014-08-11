@@ -88,6 +88,7 @@ import org.xipki.ca.server.certprofile.jaxb.ECParameterType;
 import org.xipki.ca.server.certprofile.jaxb.ExtensionType;
 import org.xipki.ca.server.certprofile.jaxb.ExtensionsType;
 import org.xipki.ca.server.certprofile.jaxb.ExtensionsType.Admission;
+import org.xipki.ca.server.certprofile.jaxb.ExtensionsType.AuthorityKeyIdentifier;
 import org.xipki.ca.server.certprofile.jaxb.ExtensionsType.ConstantExtensions;
 import org.xipki.ca.server.certprofile.jaxb.ExtensionsType.ExtendedKeyUsage;
 import org.xipki.ca.server.certprofile.jaxb.ExtensionsType.InhibitAnyPolicy;
@@ -147,7 +148,6 @@ public class DefaultCertProfile extends AbstractCertProfile
     private Map<ASN1ObjectIdentifier, ExtensionOccurrence> additionalExtensionOccurences;
 
     private Integer validity;
-    private boolean includeIssuerAndSerialInAKI;
     private boolean incSerialNrIfSubjectExists;
     private boolean raOnly;
     private boolean backwardsSubject;
@@ -162,6 +162,7 @@ public class DefaultCertProfile extends AbstractCertProfile
     private Set<GeneralNameMode> allowedSubjectAltNameModes;
     private Map<ASN1ObjectIdentifier, Set<GeneralNameMode>> allowedSubjectInfoAccessModes;
 
+    private AuthorityKeyIdentifierOption akiOption;
     private ExtensionTupleOptions certificatePolicies;
     private ExtensionTupleOptions policyMappings;
     private ExtensionTupleOptions nameConstraints;
@@ -211,7 +212,7 @@ public class DefaultCertProfile extends AbstractCertProfile
         extensionOccurences = null;
         additionalExtensionOccurences = null;
         validity = null;
-        includeIssuerAndSerialInAKI = false;
+        akiOption = null;
         incSerialNrIfSubjectExists = false;
         raOnly = false;
         backwardsSubject = false;
@@ -417,7 +418,6 @@ public class DefaultCertProfile extends AbstractCertProfile
             ExtensionsType extensionsType = conf.getExtensions();
 
             this.pathLen = extensionsType.getPathLen();
-            this.includeIssuerAndSerialInAKI = extensionsType.isIncludeIssuerAndSerialInAKI();
 
             // Extension KeyUsage
             List<org.xipki.ca.server.certprofile.jaxb.ExtensionsType.KeyUsage> keyUsageTypeList = extensionsType.getKeyUsage();
@@ -545,6 +545,36 @@ public class DefaultCertProfile extends AbstractCertProfile
             occurrences.remove(Extension.freshestCRL);
             occurrences.remove(Extension.issuerAlternativeName);
             this.additionalExtensionOccurences = Collections.unmodifiableMap(occurrences);
+
+            // AuthorityKeyIdentifier
+            if(extensionOccurences.containsKey(Extension.authorityKeyIdentifier))
+            {
+                ExtensionOccurrence extOccurrence = extensionOccurences.get(Extension.authorityKeyIdentifier);
+                boolean includeIssuerAndSerial = true;
+                boolean absentIfSelfSigned = false;
+
+                AuthorityKeyIdentifier akiType = extensionsType.getAuthorityKeyIdentifier();
+                if(akiType != null)
+                {
+                    Boolean B = akiType.isIncludeIssuerAndSerial();
+                    if(B != null)
+                    {
+                        includeIssuerAndSerial = B.booleanValue();
+                    }
+
+                    B = akiType.isAbsentIfSelfSigned();
+                    if(B != null)
+                    {
+                        absentIfSelfSigned = B.booleanValue();
+                    }
+                }
+
+                this.akiOption = new AuthorityKeyIdentifierOption(includeIssuerAndSerial, absentIfSelfSigned, extOccurrence);
+            }
+            else
+            {
+                this.akiOption = null;
+            }
 
             // Certificate Policies
             ASN1ObjectIdentifier extensionOid = Extension.certificatePolicies;
@@ -820,9 +850,9 @@ public class DefaultCertProfile extends AbstractCertProfile
     }
 
     @Override
-    public ExtensionOccurrence getOccurenceOfAuthorityKeyIdentifier()
+    public ExtensionOccurrence getOccurenceOfAuthorityKeyIdentifier(boolean selfSigned)
     {
-        return extensionOccurences.get(Extension.authorityKeyIdentifier);
+           return akiOption == null ? null : akiOption.getOccurence(selfSigned);
     }
 
     @Override
@@ -1423,7 +1453,7 @@ public class DefaultCertProfile extends AbstractCertProfile
     @Override
     public boolean includeIssuerAndSerialInAKI()
     {
-        return includeIssuerAndSerialInAKI;
+        return akiOption == null ? false : akiOption.isIncludeIssuerAndSerial();
     }
 
     private static List<CertificatePolicyInformation> buildCertificatePolicies(ExtensionsType.CertificatePolicies type)

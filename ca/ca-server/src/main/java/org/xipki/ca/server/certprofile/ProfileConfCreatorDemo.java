@@ -39,6 +39,7 @@ import org.xipki.ca.server.certprofile.jaxb.EnvParamType;
 import org.xipki.ca.server.certprofile.jaxb.ExtensionType;
 import org.xipki.ca.server.certprofile.jaxb.ExtensionsType;
 import org.xipki.ca.server.certprofile.jaxb.ExtensionsType.Admission;
+import org.xipki.ca.server.certprofile.jaxb.ExtensionsType.AuthorityKeyIdentifier;
 import org.xipki.ca.server.certprofile.jaxb.ExtensionsType.CertificatePolicies;
 import org.xipki.ca.server.certprofile.jaxb.ExtensionsType.ConstantExtensions;
 import org.xipki.ca.server.certprofile.jaxb.ExtensionsType.ExtendedKeyUsage;
@@ -206,6 +207,7 @@ public class ProfileConfCreatorDemo
         // Extensions - occurrences
         List<ExtensionType> list = extensions.getExtension();
         list.add(createExtension(Extension.subjectKeyIdentifier, true));
+        list.add(createExtension(Extension.authorityKeyIdentifier, true));
         list.add(createExtension(Extension.authorityInfoAccess, false));
         list.add(createExtension(Extension.cRLDistributionPoints, false));
         list.add(createExtension(Extension.freshestCRL, false));
@@ -856,7 +858,10 @@ public class ProfileConfCreatorDemo
         ExtensionsType extensions = new ExtensionsType();
         profile.setExtensions(extensions);
 
-        extensions.setIncludeIssuerAndSerialInAKI(false);
+        AuthorityKeyIdentifier akiType = new AuthorityKeyIdentifier();
+        akiType.setIncludeIssuerAndSerial(Boolean.FALSE);
+        akiType.setAbsentIfSelfSigned(Boolean.TRUE);
+        extensions.setAuthorityKeyIdentifier(akiType);
 
         return profile;
     }

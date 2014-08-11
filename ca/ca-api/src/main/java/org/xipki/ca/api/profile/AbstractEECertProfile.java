@@ -13,8 +13,9 @@ package org.xipki.ca.api.profile;
 
 public abstract class AbstractEECertProfile extends AbstractCertProfile
 {
+
     @Override
-    public ExtensionOccurrence getOccurenceOfAuthorityKeyIdentifier()
+    public ExtensionOccurrence getOccurenceOfAuthorityKeyIdentifier(boolean selfSigned)
     {
         return ExtensionOccurrence.NONCRITICAL_REQUIRED;
     }

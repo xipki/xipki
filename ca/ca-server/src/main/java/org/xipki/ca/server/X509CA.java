@@ -2006,7 +2006,7 @@ public class X509CA
     private void addAuthorityKeyIdentifier(X509v3CertificateBuilder certBuilder, IdentifiedCertProfile profile)
     throws IOException
     {
-        ExtensionOccurrence extOccurrence = profile.getOccurenceOfAuthorityKeyIdentifier();
+        ExtensionOccurrence extOccurrence = profile.getOccurenceOfAuthorityKeyIdentifier(false);
         if(extOccurrence == null)
         {
             return;

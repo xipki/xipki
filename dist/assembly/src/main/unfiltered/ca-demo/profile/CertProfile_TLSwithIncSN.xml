@@ -73,7 +73,10 @@
     <extension required="true" description="keyUsage">2.5.29.15</extension>
     <extension required="true" description="basicConstraints">2.5.29.19</extension>
     <extension required="true" description="extendedKeyUsage">2.5.29.37</extension>
-    <includeIssuerAndSerialInAKI>false</includeIssuerAndSerialInAKI>
+    <authorityKeyIdentifier>
+      <includeIssuerAndSerial>false</includeIssuerAndSerial>
+      <absentIfSelfSigned>true</absentIfSelfSigned>
+    </authorityKeyIdentifier>
     <keyUsage>
       <usage>DIGITAL_SIGNATURE</usage>
       <usage>DATA_ENCIPHERMENT</usage>
