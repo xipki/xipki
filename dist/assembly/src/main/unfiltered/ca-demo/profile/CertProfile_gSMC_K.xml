@@ -88,7 +88,10 @@
     <extension required="true" description="certificatePolicies">2.5.29.32</extension>
     <extension required="true" description="admission">1.3.36.8.3.3</extension>
     <extension required="true" description="extendedKeyUsage">2.5.29.37</extension>
-    <includeIssuerAndSerialInAKI>false</includeIssuerAndSerialInAKI>
+    <authorityKeyIdentifier>
+      <includeIssuerAndSerial>false</includeIssuerAndSerial>
+      <absentIfSelfSigned>true</absentIfSelfSigned>
+    </authorityKeyIdentifier>
     <keyUsage>
       <usage>DIGITAL_SIGNATURE</usage>
       <usage>KEY_ENCIPHERMENT</usage>

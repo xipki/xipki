@@ -560,6 +560,7 @@
       </action>
       <optional-completers>
         <entry key="-ca" value-ref="caNameCompleter"/>
+        <entry key="-profile" value-ref="profileNameCompleter"/>
         <entry key="-p10" value-ref="filePathCompleter"/>
         <entry key="-out" value-ref="filePathCompleter"/>
       </optional-completers>

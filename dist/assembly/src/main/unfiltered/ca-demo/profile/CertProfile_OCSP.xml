@@ -71,7 +71,10 @@
     <extension required="true" description="basicConstraints">2.5.29.19</extension>
     <extension required="true" description="extendedKeyUsage">2.5.29.37</extension>
     <extension required="false" description="id-pkix-ocsp-nocheck">1.3.6.1.5.5.7.48.1.5</extension>
-    <includeIssuerAndSerialInAKI>false</includeIssuerAndSerialInAKI>
+    <authorityKeyIdentifier>
+      <includeIssuerAndSerial>false</includeIssuerAndSerial>
+      <absentIfSelfSigned>true</absentIfSelfSigned>
+    </authorityKeyIdentifier>
     <keyUsage>
       <usage>CONTENT_COMMITMENT</usage>
     </keyUsage>

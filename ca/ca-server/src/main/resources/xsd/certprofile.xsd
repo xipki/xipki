@@ -52,7 +52,7 @@
 					<xs:sequence>
 						<xs:element name="dnBackwards" type="xs:boolean" default="false" minOccurs="0"/>
 						<xs:element name="incSerialNrIfSubjectExists" type="xs:boolean" default="false" minOccurs="0"/>
-						<xs:element name="rdn" type="RdnType" maxOccurs="unbounded"/>
+						<xs:element name="rdn" type="rdnType" maxOccurs="unbounded"/>
 					</xs:sequence>
 				</xs:complexType>
 			</xs:element>
@@ -126,7 +126,7 @@
 		</xs:sequence>
 	</xs:complexType>
 		
-	<xs:complexType name="RdnType">
+	<xs:complexType name="rdnType">
 		<xs:sequence>
 			<xs:element name="type" type="OidWithDescType"/>
 			<xs:element name="constraint" type="RdnConstraintType" minOccurs="0"/>
@@ -187,7 +187,14 @@
 		<xs:sequence>
 			<xs:element name="extension" type="ExtensionType" minOccurs="1" maxOccurs="unbounded"/>
 			<xs:element name="pathLen" type="xs:int" minOccurs="0"/>
-			<xs:element name="includeIssuerAndSerialInAKI" type="xs:boolean" minOccurs="0" default="false"/>
+			<xs:element name="authorityKeyIdentifier" minOccurs="0">
+				<xs:complexType>
+					<xs:all>
+						<xs:element name="includeIssuerAndSerial" type="xs:boolean" minOccurs="0"/>
+						<xs:element name="absentIfSelfSigned" type="xs:boolean" minOccurs="0"/>
+					</xs:all>
+				</xs:complexType>
+			</xs:element>
 			<xs:element name="keyUsage" minOccurs="0" maxOccurs="10">
 				<xs:complexType>
 					<xs:sequence>

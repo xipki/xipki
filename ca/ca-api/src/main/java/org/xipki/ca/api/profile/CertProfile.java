@@ -105,7 +105,18 @@ public abstract class CertProfile
     public abstract SubjectInfo getSubject(X500Name requestedSubject)
     throws CertProfileException, BadCertTemplateException;
 
-    public abstract ExtensionOccurrence getOccurenceOfAuthorityKeyIdentifier();
+    /**
+     * @deprecated use {@link #getOccurenceOfAuthorityKeyIdentifier(boolean)} instead
+     */
+    public ExtensionOccurrence getOccurenceOfAuthorityKeyIdentifier()
+    {
+        return getOccurenceOfAuthorityKeyIdentifier(false);
+    }
+
+    public ExtensionOccurrence getOccurenceOfAuthorityKeyIdentifier(boolean selfSigned)
+    {
+        return ExtensionOccurrence.NONCRITICAL_REQUIRED;
+    }
 
     public abstract ExtensionOccurrence getOccurenceOfSubjectKeyIdentifier();
 
