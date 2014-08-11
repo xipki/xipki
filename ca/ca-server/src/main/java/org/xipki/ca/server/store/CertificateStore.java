@@ -426,10 +426,10 @@ public class CertificateStore
         }
     }
 
-    public boolean isCertForKeyIssued(X509CertificateWithMetaInfo caCert, String subjectFp)
+    public boolean isCertForKeyIssued(X509CertificateWithMetaInfo caCert, String keyFp)
     throws OperationException
     {
-        return isCertForKeyIssued(caCert, subjectFp, null);
+        return isCertForKeyIssued(caCert, keyFp, null);
     }
 
     public boolean isCertForKeyIssued(X509CertificateWithMetaInfo caCert, String keyFp, String profile)
