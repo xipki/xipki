@@ -309,7 +309,7 @@ class SelfSignedCertBuilder
         }
 
         // Authority key identifier
-        extOccurrence = profile.getOccurenceOfAuthorityKeyIdentifier();
+        extOccurrence = profile.getOccurenceOfAuthorityKeyIdentifier(true);
         if(extOccurrence != null)
         {
             AuthorityKeyIdentifier value;
