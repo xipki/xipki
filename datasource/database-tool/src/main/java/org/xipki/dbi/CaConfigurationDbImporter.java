@@ -361,7 +361,7 @@ class CaConfigurationDbImporter extends DbPorter
                     "INSERT INTO CA (NAME, SUBJECT, NEXT_SERIAL, STATUS, CRL_URIS, DELTA_CRL_URIS, OCSP_URIS, MAX_VALIDITY, "
                     + "CERT, SIGNER_TYPE, SIGNER_CONF, CRLSIGNER_NAME, "
                     + "DUPLICATE_KEY_MODE, DUPLICATE_SUBJECT_MODE, PERMISSIONS, NUM_CRLS, "
-                    + "EXPIRATION_PERIOD, REVOKED, REV_REASON, REV_TIME, REV_INVALIDITY_TIME) "
+                    + "EXPIRATION_PERIOD, REVOKED, REV_REASON, REV_TIME, REV_INVALIDITY_TIME, VALIDITY_MODE) "
                     + "VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
 
             for(CaType ca : cas.getCa())
@@ -394,6 +394,13 @@ class CaConfigurationDbImporter extends DbPorter
                     setInt(ps, idx++, ca.getRevReason());
                     setLong(ps, idx++, ca.getRevTime());
                     setLong(ps, idx++, ca.getRevInvalidityTime());
+
+                    String validityMode = ca.getValidityMode();
+                    if(validityMode == null)
+                    {
+                        validityMode = "PKIX";
+                    }
+                    ps.setString(idx++, validityMode);
 
                     ps.executeUpdate();
                 }catch(Exception e)
