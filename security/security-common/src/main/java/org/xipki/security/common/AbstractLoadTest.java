@@ -11,7 +11,7 @@ import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * @author Lijun Liao
@@ -91,10 +91,10 @@ public abstract class AbstractLoadTest
         }
     }
 
-    private AtomicInteger account = new AtomicInteger(0);
-    private AtomicInteger errorAccount = new AtomicInteger(0);
+    private AtomicLong account = new AtomicLong(0);
+    private AtomicLong errorAccount = new AtomicLong(0);
 
-    public int getErrorAccout()
+    public long getErrorAccout()
     {
         return errorAccount.get();
     }
@@ -124,11 +124,11 @@ public abstract class AbstractLoadTest
 
     protected void printStatus()
     {
-        int currentAccount = account.get();
+        long currentAccount = account.get();
         long now = System.currentTimeMillis();
         measureDeque.addLast(new MeasurePoint(now, currentAccount));
 
-        String accountS = Integer.toString(currentAccount);
+        String accountS = Long.toString(currentAccount);
         StringBuilder sb = new StringBuilder("\r");
 
         // 10 characters for processed accout
@@ -179,18 +179,19 @@ public abstract class AbstractLoadTest
             this.unit = unit;
         }
     }
+
     protected void printSummary()
     {
         StringBuilder sb = new StringBuilder();
         long ms = (System.currentTimeMillis() - startTime);
-        sb.append("\nFinished in " + ms/1000f + " s\n");
+        sb.append("\nFinished in " + formatTime(ms/1000) + "\n");
         sb.append("Account: " + account.get() + " " + unit + "\n");
         sb.append(" Failed: " + errorAccount.get() + " " + unit + "\n");
         sb.append("Average: " + (account.get() * 1000 / ms) + " " + unit + "/s\n");
         System.out.println(sb.toString());
     }
 
-    private static String formatTime(long seconds)
+    public static String formatTime(long seconds)
     {
         long h = seconds / 3600;
         long m = (seconds - h * 3600) / 60;
@@ -237,9 +238,9 @@ public abstract class AbstractLoadTest
     private static class MeasurePoint
     {
         private long measureTime;
-        private int measureAccount;
+        private long measureAccount;
 
-        public MeasurePoint(long measureTime, int measureAccount)
+        public MeasurePoint(long measureTime, long measureAccount)
         {
             this.measureTime = measureTime;
             this.measureAccount = measureAccount;

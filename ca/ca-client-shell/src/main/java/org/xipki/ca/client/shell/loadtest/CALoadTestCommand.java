@@ -10,6 +10,7 @@ package org.xipki.ca.client.shell.loadtest;
 import org.apache.felix.gogo.commands.Command;
 import org.apache.felix.gogo.commands.Option;
 import org.xipki.ca.client.shell.ClientCommand;
+import org.xipki.security.common.AbstractLoadTest;
 
 /**
  * @author Lijun Liao
@@ -82,10 +83,10 @@ public class CALoadTestCommand extends ClientCommand
 
         StringBuilder startMsg = new StringBuilder();
 
-        startMsg.append("Threads:         " + numThreads).append("\n");
-        startMsg.append("Duration:        " + durationInSecond + " s").append("\n");
-        startMsg.append("SubjectTemplate: " + subjectTemplate).append("\n");
-        startMsg.append("Profile:         " + certProfile).append("\n");
+        startMsg.append("Threads:         ").append(numThreads).append("\n");
+        startMsg.append("Duration:        ").append(AbstractLoadTest.formatTime(durationInSecond).trim()).append("\n");
+        startMsg.append("SubjectTemplate: ").append(subjectTemplate).append("\n");
+        startMsg.append("Profile:         ").append(certProfile).append("\n");
         System.out.print(startMsg.toString());
 
         CALoadTest loadTest;
