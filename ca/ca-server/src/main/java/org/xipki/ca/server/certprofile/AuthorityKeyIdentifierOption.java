@@ -16,15 +16,12 @@ import org.xipki.ca.api.profile.ExtensionOccurrence;
 class AuthorityKeyIdentifierOption
 {
     private final boolean includeIssuerAndSerial;
-    private final boolean absentIfSelfSigned;
     private final ExtensionOccurrence occurence;
 
     AuthorityKeyIdentifierOption(boolean includeIssuerAndSerial,
-            boolean absentIfSelfSigned,
             ExtensionOccurrence occurence)
     {
         this.includeIssuerAndSerial = includeIssuerAndSerial;
-        this.absentIfSelfSigned = absentIfSelfSigned;
         this.occurence = occurence;
     }
 
@@ -33,16 +30,9 @@ class AuthorityKeyIdentifierOption
         return includeIssuerAndSerial;
     }
 
-    ExtensionOccurrence getOccurence(boolean selfSigned)
+    ExtensionOccurrence getOccurence()
     {
-        if(selfSigned)
-        {
-            return absentIfSelfSigned ? null : occurence;
-        }
-        else
-        {
-            return occurence;
-        }
+        return occurence;
     }
 
 }

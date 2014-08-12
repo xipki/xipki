@@ -89,9 +89,9 @@ public class IdentifiedCertProfile
         return certProfile.isOnlyForRA();
     }
 
-    public ExtensionOccurrence getOccurenceOfAuthorityKeyIdentifier(boolean selfSigned)
+    public ExtensionOccurrence getOccurenceOfAuthorityKeyIdentifier()
     {
-        return certProfile.getOccurenceOfAuthorityKeyIdentifier(selfSigned);
+        return certProfile.getOccurenceOfAuthorityKeyIdentifier();
     }
 
     public ExtensionOccurrence getOccurenceOfSubjectKeyIdentifier()

@@ -54,6 +54,7 @@ public class CAEntry
     private long nextSerial;
     private DuplicationMode duplicateKeyMode;
     private DuplicationMode duplicateSubjectMode;
+    private ValidityMode validityMode = ValidityMode.PKIX;
     private Set<Permission> permissions;
     private int numCrls;
     private final int expirationPeriod;
@@ -257,6 +258,7 @@ public class CAEntry
         sb.append("name: ").append(name).append('\n');
         sb.append("next_serial: ").append(nextSerial).append('\n');
         sb.append("status: ").append(status.getStatus()).append('\n');
+        sb.append("deltaCrl_uris: ").append(getDeltaCrlUrisAsString()).append('\n');
         sb.append("crl_uris: ").append(getCrlUrisAsString()).append('\n');
         sb.append("ocsp_uris: ").append(getOcspUrisAsString()).append('\n');
         sb.append("max_validity: ").append(maxValidity).append(" days\n");
@@ -275,6 +277,7 @@ public class CAEntry
         sb.append("crlsigner_name: ").append(crlSignerName).append('\n');
         sb.append("duplicateKey: ").append(duplicateKeyMode.getDescription()).append('\n');
         sb.append("duplicateSubject: ").append(duplicateSubjectMode.getDescription()).append('\n');
+        sb.append("validityMode: ").append(validityMode).append('\n');
         sb.append("permissions: ").append(Permission.toString(permissions));
 
         return sb.toString();
@@ -322,6 +325,17 @@ public class CAEntry
     {
         ParamChecker.assertNotNull("mode", mode);
         this.duplicateSubjectMode = mode;
+    }
+
+    public ValidityMode getValidityMode()
+    {
+        return validityMode;
+    }
+
+    public void setValidtyMode(ValidityMode mode)
+    {
+        ParamChecker.assertNotNull("mode", mode);
+        this.validityMode = mode;
     }
 
     public Set<Permission> getPermissions()

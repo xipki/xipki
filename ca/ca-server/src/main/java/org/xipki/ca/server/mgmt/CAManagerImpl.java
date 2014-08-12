@@ -89,12 +89,18 @@ public class CAManagerImpl implements CAManager
 {
     private static final Logger LOG = LoggerFactory.getLogger(CAManagerImpl.class);
 
+    private static final String COLUMN_DELTA_CRL_URIS = "DELTA_CRL_URIS";
+    private static final String COLUMN_VALIDITY_MODE = "VALIDITY_MODE";
+
     private final CertificateFactory certFact;
     private final String lockInstanceId;
 
     private CertificateStore certstore;
     private DataSourceWrapper dataSource;
     private CmpResponderEntry responder;
+
+    private boolean columnDeltaCrlUrisAvailable = true;
+    private boolean columnValidityModeAvailable = true;
 
     private boolean caLockedByMe = false;
 
@@ -256,6 +262,15 @@ public class CAManagerImpl implements CAManager
         if(this.dataSource == null)
         {
             throw new CAMgmtException("no datasource configured with name 'ca'");
+        }
+
+        try
+        {
+            columnDeltaCrlUrisAvailable = this.dataSource.tableHasColumn(null, "CA", COLUMN_DELTA_CRL_URIS);
+            columnValidityModeAvailable = this.dataSource.tableHasColumn(null, "CA", COLUMN_VALIDITY_MODE);
+        }catch(SQLException e)
+        {
+            throw new CAMgmtException(e.getClass().getName() + " while calling datasoure.tableHasColumn()", e);
         }
 
         boolean successfull;
@@ -1271,11 +1286,22 @@ public class CAManagerImpl implements CAManager
         {
             stmt = createStatement();
 
-            ResultSet rs = stmt.executeQuery(
-                    "SELECT NAME, NEXT_SERIAL, STATUS, CRL_URIS, DELTA_CRL_URIS, OCSP_URIS, MAX_VALIDITY, "
-                    + "CERT, SIGNER_TYPE, SIGNER_CONF, CRLSIGNER_NAME, "
-                    + "DUPLICATE_KEY_MODE, DUPLICATE_SUBJECT_MODE, PERMISSIONS, NUM_CRLS, "
-                    + "EXPIRATION_PERIOD, REVOKED, REV_REASON, REV_TIME, REV_INVALIDITY_TIME FROM CA");
+            StringBuilder sqlBuilder = new StringBuilder();
+            sqlBuilder.append("SELECT NAME, NEXT_SERIAL, STATUS, CRL_URIS, OCSP_URIS, MAX_VALIDITY, ");
+            sqlBuilder.append("CERT, SIGNER_TYPE, SIGNER_CONF, CRLSIGNER_NAME, ");
+            sqlBuilder.append("DUPLICATE_KEY_MODE, DUPLICATE_SUBJECT_MODE, PERMISSIONS, NUM_CRLS, ");
+            sqlBuilder.append("EXPIRATION_PERIOD, REVOKED, REV_REASON, REV_TIME, REV_INVALIDITY_TIME");
+            if(columnDeltaCrlUrisAvailable)
+            {
+                sqlBuilder.append(", ").append(COLUMN_DELTA_CRL_URIS);
+            }
+            if(columnValidityModeAvailable)
+            {
+                sqlBuilder.append(", ").append(COLUMN_VALIDITY_MODE);
+            }
+            sqlBuilder.append(" FROM CA");
+
+            ResultSet rs = stmt.executeQuery(sqlBuilder.toString());
 
             while(rs.next())
             {
@@ -1283,7 +1309,8 @@ public class CAManagerImpl implements CAManager
                 long next_serial = rs.getLong("NEXT_SERIAL");
                 String status = rs.getString("STATUS");
                 String crl_uris = rs.getString("CRL_URIS");
-                String delta_crl_uris = rs.getString("DELTA_CRL_URIS");
+                String delta_crl_uris = columnDeltaCrlUrisAvailable ?
+                        rs.getString(COLUMN_DELTA_CRL_URIS) : null;
                 String ocsp_uris = rs.getString("OCSP_URIS");
                 int max_validity = rs.getInt("MAX_VALIDITY");
                 String b64cert = rs.getString("CERT");
@@ -1351,6 +1378,19 @@ public class CAManagerImpl implements CAManager
                 entry.setDuplicateSubjectMode(DuplicationMode.getInstance(duplicateSubjectI));
                 entry.setPermissions(permissions);
                 entry.setRevocationInfo(revocationInfo);
+
+                String validityModeS = columnValidityModeAvailable ?
+                        rs.getString(COLUMN_VALIDITY_MODE) : null;
+                ValidityMode validityMode = null;
+                if(validityModeS != null)
+                {
+                    validityMode = ValidityMode.getInstance(validityModeS);
+                }
+                if(validityMode == null)
+                {
+                    validityMode = ValidityMode.PKIX;
+                }
+                entry.setValidtyMode(validityMode);
 
                 cas.put(entry.getName(), entry);
             }
@@ -1440,15 +1480,52 @@ public class CAManagerImpl implements CAManager
             throw new CAMgmtException("CA named " + name + " exists");
         }
 
+        if(columnValidityModeAvailable == false)
+        {
+            if(newCaDbEntry.getValidityMode() != null && newCaDbEntry.getValidityMode() != ValidityMode.PKIX)
+            {
+                throw new CAMgmtException("Column " + COLUMN_VALIDITY_MODE + " in table CA does not exist,"
+                        + " please update the table definition");
+            }
+        }
+
+        if(columnDeltaCrlUrisAvailable == false && newCaDbEntry.getDeltaCrlUrisAsString() != null)
+        {
+            throw new CAMgmtException("Column " + COLUMN_DELTA_CRL_URIS + " in table CA does not exist,"
+                    + " please update the table definition");
+        }
+
         // insert to table ca
         PreparedStatement ps = null;
         try
         {
-            ps = prepareStatement(
-                    "INSERT INTO CA (NAME, SUBJECT, NEXT_SERIAL, STATUS, CRL_URIS, DELTA_CRL_URIS, OCSP_URIS, MAX_VALIDITY, "
-                    + "CERT, SIGNER_TYPE, SIGNER_CONF, CRLSIGNER_NAME, "
-                    + "DUPLICATE_KEY_MODE, DUPLICATE_SUBJECT_MODE, PERMISSIONS, NUM_CRLS, EXPIRATION_PERIOD) "
-                    + "VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+            StringBuilder sqlBuilder = new StringBuilder();
+            sqlBuilder.append("INSERT INTO CA (");
+            sqlBuilder.append("NAME, SUBJECT, NEXT_SERIAL, STATUS, CRL_URIS, OCSP_URIS, MAX_VALIDITY, ");
+            sqlBuilder.append("CERT, SIGNER_TYPE, SIGNER_CONF, CRLSIGNER_NAME, ");
+            sqlBuilder.append("DUPLICATE_KEY_MODE, DUPLICATE_SUBJECT_MODE, PERMISSIONS, NUM_CRLS, EXPIRATION_PERIOD");
+            if(columnValidityModeAvailable)
+            {
+                sqlBuilder.append(", ").append(COLUMN_VALIDITY_MODE);
+            }
+            if(columnDeltaCrlUrisAvailable)
+            {
+                sqlBuilder.append(", ").append(COLUMN_DELTA_CRL_URIS);
+            }
+            sqlBuilder.append(")");
+            sqlBuilder.append("VALUES(");
+            sqlBuilder.append("?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?");
+            if(columnValidityModeAvailable)
+            {
+                sqlBuilder.append(", ?");
+            }
+            if(columnDeltaCrlUrisAvailable)
+            {
+                sqlBuilder.append(", ?");
+            }
+            sqlBuilder.append(")");
+
+            ps = prepareStatement(sqlBuilder.toString());
             int idx = 1;
             ps.setString(idx++, name);
             ps.setString(idx++, newCaDbEntry.getSubject());
@@ -1462,7 +1539,6 @@ public class CAManagerImpl implements CAManager
 
             ps.setString(idx++, newCaDbEntry.getStatus().getStatus());
             ps.setString(idx++, newCaDbEntry.getCrlUrisAsString());
-            ps.setString(idx++, newCaDbEntry.getDeltaCrlUrisAsString());
             ps.setString(idx++, newCaDbEntry.getOcspUrisAsString());
             ps.setInt(idx++, newCaDbEntry.getMaxValidity());
             ps.setString(idx++, Base64.toBase64String(newCaDbEntry.getCertificate().getEncodedCert()));
@@ -1474,6 +1550,14 @@ public class CAManagerImpl implements CAManager
             ps.setString(idx++, Permission.toString(newCaDbEntry.getPermissions()));
             ps.setInt(idx++, newCaDbEntry.getNumCrls());
             ps.setInt(idx++, newCaDbEntry.getExpirationPeriod());
+            if(columnValidityModeAvailable)
+            {
+                ps.setString(idx++, newCaDbEntry.getValidityMode().name());
+            }
+            if(columnDeltaCrlUrisAvailable)
+            {
+                ps.setString(idx++, newCaDbEntry.getDeltaCrlUrisAsString());
+            }
 
             ps.executeUpdate();
         }catch(SQLException e)
@@ -1500,7 +1584,7 @@ public class CAManagerImpl implements CAManager
             Integer max_validity, String signer_type, String signer_conf,
             String crlsigner_name, DuplicationMode duplicate_key,
             DuplicationMode duplicate_subject, Set<Permission> permissions,
-            Integer numCrls, Integer expirationPeriod)
+            Integer numCrls, Integer expirationPeriod, ValidityMode validityMode)
     throws CAMgmtException
     {
         if(nextSerial != null && nextSerial > 0) // 0 for random serial
@@ -1562,7 +1646,13 @@ public class CAManagerImpl implements CAManager
         Integer iDelta_crl_uris = null;
         if(delta_crl_uris != null)
         {
-            sb.append("DELTA_CRL_URIS=?,");
+            if(columnDeltaCrlUrisAvailable == false)
+            {
+                throw new CAMgmtException("Column " + COLUMN_DELTA_CRL_URIS + " in table CA does not exist,"
+                        + " please update the table definition");
+            }
+
+            sb.append(COLUMN_DELTA_CRL_URIS).append("=?,");
             iDelta_crl_uris = i++;
         }
 
@@ -1634,6 +1724,19 @@ public class CAManagerImpl implements CAManager
         {
             sb.append("EXPIRATION_PERIOD=?,");
             iExpiration_period = i++;
+        }
+
+        Integer iValidity_mode = null;
+        if(validityMode != null && validityMode != ValidityMode.PKIX)
+        {
+            if(columnValidityModeAvailable == false)
+            {
+                throw new CAMgmtException("Column " + COLUMN_VALIDITY_MODE + " in table CA does not exist,"
+                        + " please update the table definition");
+            }
+
+            sb.append(COLUMN_VALIDITY_MODE).append("=?,");
+            iValidity_mode = i++;
         }
 
         // delete the last ','
@@ -1727,6 +1830,11 @@ public class CAManagerImpl implements CAManager
             if(iExpiration_period != null)
             {
                 ps.setInt(iExpiration_period, expirationPeriod);
+            }
+
+            if(iValidity_mode != null)
+            {
+                ps.setString(iValidity_mode, validityMode.name());
             }
 
             ps.setString(iName, name);

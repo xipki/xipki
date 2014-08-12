@@ -97,7 +97,6 @@
     <pathLen>1</pathLen>
     <authorityKeyIdentifier>
       <includeIssuerAndSerial>false</includeIssuerAndSerial>
-      <absentIfSelfSigned>true</absentIfSelfSigned>
     </authorityKeyIdentifier>
     <keyUsage>
       <usage>KEYCERT_SIGN</usage>

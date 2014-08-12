@@ -75,7 +75,6 @@
     <extension required="true" description="extendedKeyUsage">2.5.29.37</extension>
     <authorityKeyIdentifier>
       <includeIssuerAndSerial>false</includeIssuerAndSerial>
-      <absentIfSelfSigned>true</absentIfSelfSigned>
     </authorityKeyIdentifier>
     <keyUsage>
       <usage>DIGITAL_SIGNATURE</usage>

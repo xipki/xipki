@@ -132,8 +132,12 @@ public class ProfileConfCreatorDemo
             m.setProperty("com.sun.xml.internal.bind.indentString", "  ");
 
             // RootCA
-            ProfileType profile = CertProfile_RootCA();
+            ProfileType profile = CertProfile_RootCA(false);
             marshall(m, profile, "CertProfile_RootCA.xml");
+
+            // RootCA-Cross
+            profile = CertProfile_RootCA(true);
+            marshall(m, profile, "CertProfile_RootCA_Cross.xml");
 
             // SubCA
             profile = CertProfile_SubCA();
@@ -184,10 +188,10 @@ public class ProfileConfCreatorDemo
 
     }
 
-    private static ProfileType CertProfile_RootCA()
+    private static ProfileType CertProfile_RootCA(boolean cross)
     throws Exception
     {
-        ProfileType profile = getBaseProfile("CertProfile RootCA", true, 10 * 365);
+        ProfileType profile = getBaseProfile("CertProfile RootCA" + (cross ? " Cross" : ""), true, 10 * 365);
 
         // Subject
         Subject subject = profile.getSubject();
@@ -207,7 +211,10 @@ public class ProfileConfCreatorDemo
         // Extensions - occurrences
         List<ExtensionType> list = extensions.getExtension();
         list.add(createExtension(Extension.subjectKeyIdentifier, true));
-        list.add(createExtension(Extension.authorityKeyIdentifier, true));
+        if(cross)
+        {
+            list.add(createExtension(Extension.authorityKeyIdentifier, true));
+        }
         list.add(createExtension(Extension.authorityInfoAccess, false));
         list.add(createExtension(Extension.cRLDistributionPoints, false));
         list.add(createExtension(Extension.freshestCRL, false));
@@ -860,7 +867,6 @@ public class ProfileConfCreatorDemo
 
         AuthorityKeyIdentifier akiType = new AuthorityKeyIdentifier();
         akiType.setIncludeIssuerAndSerial(Boolean.FALSE);
-        akiType.setAbsentIfSelfSigned(Boolean.TRUE);
         extensions.setAuthorityKeyIdentifier(akiType);
 
         return profile;

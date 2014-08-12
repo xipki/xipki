@@ -73,7 +73,6 @@
     <extension required="false" description="id-pkix-ocsp-nocheck">1.3.6.1.5.5.7.48.1.5</extension>
     <authorityKeyIdentifier>
       <includeIssuerAndSerial>false</includeIssuerAndSerial>
-      <absentIfSelfSigned>true</absentIfSelfSigned>
     </authorityKeyIdentifier>
     <keyUsage>
       <usage>CONTENT_COMMITMENT</usage>
