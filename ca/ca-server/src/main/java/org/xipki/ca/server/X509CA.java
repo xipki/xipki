@@ -95,6 +95,7 @@ import org.xipki.ca.server.mgmt.CAManagerImpl;
 import org.xipki.ca.server.mgmt.CertProfileEntry;
 import org.xipki.ca.server.mgmt.DuplicationMode;
 import org.xipki.ca.server.mgmt.PublisherEntry;
+import org.xipki.ca.server.mgmt.ValidityMode;
 import org.xipki.ca.server.store.CertWithRevocationInfo;
 import org.xipki.ca.server.store.CertificateStore;
 import org.xipki.security.api.ConcurrentContentSigner;
@@ -1796,6 +1797,15 @@ public class X509CA
             }
 
             Date maxNotAfter = new Date(notBefore.getTime() + DAY * validity);
+            if(caInfo.getValidityMode() == ValidityMode.PKIX)
+            {
+                Date caNotAfter = caInfo.getCertificate().getCert().getNotAfter();
+                if(maxNotAfter.after(caNotAfter))
+                {
+                    maxNotAfter = caNotAfter;
+                }
+            }
+
             if(certProfile.getSpecialCertProfileBehavior() == SpecialCertProfileBehavior.gematik_gSMC_K)
             {
                 String s = certProfile.getParameter(SpecialCertProfileBehavior.PARAMETER_MAXLIFTIME);
@@ -2143,7 +2153,7 @@ public class X509CA
         }
         else
         {
-            certBuilder.addExtension(Extension.deltaCRLIndicator, extOccurrence.isCritical(), value);
+            certBuilder.addExtension(Extension.freshestCRL, extOccurrence.isCritical(), value);
         }
     }
 
