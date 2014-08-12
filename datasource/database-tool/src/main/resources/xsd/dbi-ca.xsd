@@ -188,6 +188,7 @@
 			<xs:element name="rev_reason" type="xs:int" minOccurs="0"/>
 			<xs:element name="rev_time" type="xs:long" minOccurs="0"/>
 			<xs:element name="rev_invalidity_time" type="xs:long" minOccurs="0"/>
+			<xs:element name="validity_mode" type="xs:string" minOccurs="0"/>
 		</xs:sequence>
 	</xs:complexType>
 
