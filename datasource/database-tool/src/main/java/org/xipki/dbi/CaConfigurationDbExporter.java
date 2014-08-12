@@ -420,6 +420,12 @@ class CaConfigurationDbExporter extends DbPorter
                 sb.append(", DELTA_CRL_URIS");
             }
 
+            boolean validityColumnAvailable = tableHasColumn("CA", "VALIDITY_MODE");
+            if(validityColumnAvailable)
+            {
+                sb.append(", VALIDITY_MODE");
+            }
+
             sb.append(" FROM CA");
 
             String sql = sb.toString();
@@ -451,6 +457,12 @@ class CaConfigurationDbExporter extends DbPorter
                 String permissions = rs.getString("PERMISSIONS");
                 int expirationPeriod = rs.getInt("EXPIRATION_PERIOD");
 
+                String validityMode = null;
+                if(validityColumnAvailable)
+                {
+                    validityMode = rs.getString("VALIDITY_MODE");
+                }
+
                 CaType ca = new CaType();
                 ca.setName(name);
                 ca.setNextSerial(next_serial);
@@ -467,6 +479,7 @@ class CaConfigurationDbExporter extends DbPorter
                 ca.setDuplicateSubjectMode(duplicateSubjectMode);
                 ca.setPermissions(permissions);
                 ca.setExpirationPeriod(expirationPeriod);
+                ca.setValidityMode(validityMode);
 
                 int numCrls = rs.getInt("num_crls");
                 ca.setNumCrls(numCrls);

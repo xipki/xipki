@@ -142,6 +142,7 @@
 			<column defaultValueNumeric="2" name="DUPLICATE_SUBJECT_MODE" type="SMALLINT">
 				<constraints nullable="false"/>
 			</column>
+			<column name="VALIDITY_MODE" type="varchar(100)"/>
 			<column name="PERMISSIONS" type="VARCHAR(200)">
 				<constraints nullable="false"/>
 			</column>
@@ -483,4 +484,5 @@
 			constraintName="FK_PUBLISHQUEUE_CERT1"
 			referencedColumnNames="ID" referencedTableName="CERT"/>
 	</changeSet>
+
 </databaseChangeLog>
