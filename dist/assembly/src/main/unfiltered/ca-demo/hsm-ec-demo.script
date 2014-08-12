@@ -3,6 +3,8 @@ RCA_KEY_LABEL = RCA1-EC
 SubCA_KEY_LABEL = SubCA1-EC
 SubCAwithCRL_KEY_LABEL = SubCAwithCRL1-EC
 
+source ./ca-demo/prepare.script
+
 source ./ca-demo/hsm.script
 
 source ./ca-demo/ra.script
