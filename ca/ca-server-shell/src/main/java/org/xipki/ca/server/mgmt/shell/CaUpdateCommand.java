@@ -19,6 +19,7 @@ import org.xipki.ca.api.CAStatus;
 import org.xipki.ca.server.mgmt.CAManager;
 import org.xipki.ca.server.mgmt.DuplicationMode;
 import org.xipki.ca.server.mgmt.Permission;
+import org.xipki.ca.server.mgmt.ValidityMode;
 import org.xipki.security.api.PasswordResolver;
 import org.xipki.security.common.ConfigurationException;
 import org.xipki.security.common.IoCertUtil;
@@ -104,6 +105,13 @@ public class CaUpdateCommand extends CaCommand
                     + "\t2: forbiddenWithinProfile\n"
                     + "\t3: allowed")
     protected String duplicateSubjectI;
+
+    @Option(name = "-validityMode",
+            description = "Mode of valditity.\n"
+                    + "\tPKIX: notAfter of issued certificates could not exceed CA's notAfter\n"
+                    + "\tCHAIN: notAfter of issued certificates may exceed CA's notAfter\n"
+                    + "the default is PKIX")
+    protected String validityModeS;
 
     private PasswordResolver passwordResolver;
 
@@ -244,6 +252,16 @@ public class CaUpdateCommand extends CaCommand
             }
         }
 
+        ValidityMode validityMode = null;
+        if(validityModeS != null)
+        {
+            validityMode = ValidityMode.getInstance(validityModeS);
+            if(validityMode == null)
+            {
+                throw new ConfigurationException("Invalid validity mode: " + validityModeS);
+            }
+        }
+
         caManager.changeCA(
                 caName,
                 status,
@@ -260,7 +278,8 @@ public class CaUpdateCommand extends CaCommand
                 duplicateSubject,
                 _permissions,
                 numCrls,
-                expirationPeriod);
+                expirationPeriod,
+                validityMode);
 
         return null;
     }

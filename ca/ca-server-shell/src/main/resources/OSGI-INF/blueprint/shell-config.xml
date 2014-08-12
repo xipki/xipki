@@ -15,6 +15,7 @@
     <property name="tokens" value="CA, JKS, PKCS11, PKCS12"/>
   </bean>
   <bean id="duplicationModeCompleter" class="org.xipki.ca.server.mgmt.shell.completer.DuplicationModeCompleter"/>
+  <bean id="validityModeCompleter" class="org.xipki.ca.server.mgmt.shell.completer.ValidityModeCompleter"/>
   <bean id="crlReasonCompleter" class="org.xipki.ca.server.mgmt.shell.completer.ClientCRLReasonCompleter"/>
   <bean id="caCrlReasonCompleter" class="org.xipki.ca.server.mgmt.shell.completer.CACRLReasonCompleter"/>
   <bean id="rcaNameCompleter" class="org.xipki.ca.server.mgmt.shell.completer.RcaNameCompleter">
@@ -83,6 +84,7 @@
         <entry key="-signerType" value-ref="signerTypeCompleter"/>
         <entry key="-ds" value-ref="duplicationModeCompleter"/>
         <entry key="-dk" value-ref="duplicationModeCompleter"/>
+        <entry key="-validityMode" value-ref="validityModeCompleter"/>        
       </optional-completers>
     </command>
     <command name="ca/ca-revoke">
@@ -129,6 +131,7 @@
         <entry key="-signerType" value-ref="signerTypeCompleter"/>
         <entry key="-ds" value-ref="duplicationModeCompleter"/>
         <entry key="-dk" value-ref="duplicationModeCompleter"/>
+        <entry key="-validityMode" value-ref="validityModeCompleter"/>        
       </optional-completers>
     </command>
     <command name="ca/publish-self">
@@ -163,6 +166,7 @@
         <entry key="-signerType" value-ref="signerTypeCompleter"/>
         <entry key="-ds" value-ref="duplicationModeCompleter"/>
         <entry key="-dk" value-ref="duplicationModeCompleter"/>
+        <entry key="-validityMode" value-ref="validityModeCompleter"/>        
       </optional-completers>
     </command>
     <!-- CA Alias -->

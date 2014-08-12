@@ -40,7 +40,7 @@ public abstract class AbstractCACertProfile extends AbstractCertProfile
     }
 
     @Override
-    public ExtensionOccurrence getOccurenceOfAuthorityKeyIdentifier(boolean selfSigned)
+    public ExtensionOccurrence getOccurenceOfAuthorityKeyIdentifier()
     {
         return ExtensionOccurrence.NONCRITICAL_REQUIRED;
     }

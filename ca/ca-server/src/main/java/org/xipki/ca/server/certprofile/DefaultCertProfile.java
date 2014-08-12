@@ -112,6 +112,7 @@ import org.xipki.ca.server.certprofile.jaxb.SubjectInfoAccessType.Access;
 import org.xipki.security.common.CmpUtf8Pairs;
 import org.xipki.security.common.IoCertUtil;
 import org.xipki.security.common.LogUtil;
+import org.xipki.security.common.LruCache;
 import org.xipki.security.common.ObjectIdentifiers;
 import org.xml.sax.SAXException;
 
@@ -172,6 +173,7 @@ public class DefaultCertProfile extends AbstractCertProfile
     private ExtensionTupleOptions admission;
 
     private Map<ASN1ObjectIdentifier, ExtensionTupleOptions> constantExtensions;
+    private static LruCache<ASN1ObjectIdentifier, Integer> ecCurveFieldSizes = new LruCache<>(100);
 
     static
     {
@@ -551,7 +553,6 @@ public class DefaultCertProfile extends AbstractCertProfile
             {
                 ExtensionOccurrence extOccurrence = extensionOccurences.get(Extension.authorityKeyIdentifier);
                 boolean includeIssuerAndSerial = true;
-                boolean absentIfSelfSigned = false;
 
                 AuthorityKeyIdentifier akiType = extensionsType.getAuthorityKeyIdentifier();
                 if(akiType != null)
@@ -561,15 +562,9 @@ public class DefaultCertProfile extends AbstractCertProfile
                     {
                         includeIssuerAndSerial = B.booleanValue();
                     }
-
-                    B = akiType.isAbsentIfSelfSigned();
-                    if(B != null)
-                    {
-                        absentIfSelfSigned = B.booleanValue();
-                    }
                 }
 
-                this.akiOption = new AuthorityKeyIdentifierOption(includeIssuerAndSerial, absentIfSelfSigned, extOccurrence);
+                this.akiOption = new AuthorityKeyIdentifierOption(includeIssuerAndSerial, extOccurrence);
             }
             else
             {
@@ -850,9 +845,9 @@ public class DefaultCertProfile extends AbstractCertProfile
     }
 
     @Override
-    public ExtensionOccurrence getOccurenceOfAuthorityKeyIdentifier(boolean selfSigned)
+    public ExtensionOccurrence getOccurenceOfAuthorityKeyIdentifier()
     {
-           return akiOption == null ? null : akiOption.getOccurence(selfSigned);
+        return akiOption == null ? null : akiOption.getOccurence();
     }
 
     @Override
@@ -1011,13 +1006,17 @@ public class DefaultCertProfile extends AbstractCertProfile
     private static void checkECSubjectPublicKeyInfo(ASN1ObjectIdentifier curveOid, byte[] encoded)
     throws BadCertTemplateException
     {
-        X9ECParameters ecP = ECUtil.getNamedCurveByOid(curveOid);
-        ECCurve curve = ecP.getCurve();
+        Integer expectedLength = ecCurveFieldSizes.get(curveOid);
+        if(expectedLength == null)
+        {
+            X9ECParameters ecP = ECUtil.getNamedCurveByOid(curveOid);
+            ECCurve curve = ecP.getCurve();
+            expectedLength = (curve.getFieldSize() + 7) / 8;
+            ecCurveFieldSizes.put(curveOid, expectedLength);
+        }
 
-       int expectedLength = (curve.getFieldSize() + 7) / 8;
-
-       switch (encoded[0])
-       {
+        switch (encoded[0])
+        {
             case 0x02: // compressed
             case 0x03: // compressed
             {

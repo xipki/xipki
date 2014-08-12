@@ -97,6 +97,13 @@ public abstract class CaAddOrGenCommand extends CaCommand
                     + "the default is 2")
     protected String duplicateSubjectI;
 
+    @Option(name = "-validityMode",
+            description = "Mode of valditity.\n"
+                    + "\tPKIX: notAfter of issued certificates could not exceed CA's notAfter\n"
+                    + "\tCHAIN: notAfter of issued certificates may exceed CA's notAfter\n"
+                    + "the default is PKIX")
+    protected String validityModeS;
+
     protected SecurityFactory securityFactory;
     protected PasswordResolver passwordResolver;
 

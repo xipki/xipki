@@ -191,7 +191,6 @@
 				<xs:complexType>
 					<xs:all>
 						<xs:element name="includeIssuerAndSerial" type="xs:boolean" minOccurs="0"/>
-						<xs:element name="absentIfSelfSigned" type="xs:boolean" minOccurs="0"/>
 					</xs:all>
 				</xs:complexType>
 			</xs:element>
