@@ -17,6 +17,7 @@ import org.apache.felix.gogo.commands.Command;
 import org.apache.felix.gogo.commands.Option;
 import org.xipki.ocsp.client.api.RequestOptions;
 import org.xipki.ocsp.client.shell.AbstractOCSPStatusCommand;
+import org.xipki.security.common.AbstractLoadTest;
 import org.xipki.security.common.IoCertUtil;
 
 /**
@@ -101,12 +102,12 @@ public class OCSPStatusLoadTestCommand extends AbstractOCSPStatusCommand
 
         StringBuilder startMsg = new StringBuilder();
 
-        startMsg.append("Threads:        " + numThreads).append("\n");
-        startMsg.append("Duration:       " + durationInSecond + " s").append("\n");
-        startMsg.append("Serial numbers: " + this.serialNumbers).append("\n");
-        startMsg.append("CA cert:        " + caCertFile).append("\n");
-        startMsg.append("Server URL:     " + serverUrl.toString()).append("\n");
-        startMsg.append("Hash:           " + hashAlgo).append("\n");
+        startMsg.append("Threads:        ").append(numThreads).append("\n");
+        startMsg.append("Duration:       ").append(AbstractLoadTest.formatTime(durationInSecond).trim()).append("\n");
+        startMsg.append("Serial numbers: ").append(this.serialNumbers).append("\n");
+        startMsg.append("CA cert:        ").append(caCertFile).append("\n");
+        startMsg.append("Server URL:     ").append(serverUrl.toString()).append("\n");
+        startMsg.append("Hash:           ").append(hashAlgo).append("\n");
         System.out.print(startMsg.toString());
 
         X509Certificate caCert = IoCertUtil.parseCert(caCertFile);
