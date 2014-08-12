@@ -23,6 +23,7 @@ import org.xipki.ca.server.mgmt.CAEntry;
 import org.xipki.ca.server.mgmt.CertProfileEntry;
 import org.xipki.ca.server.mgmt.DuplicationMode;
 import org.xipki.ca.server.mgmt.Permission;
+import org.xipki.ca.server.mgmt.ValidityMode;
 import org.xipki.ca.server.mgmt.shell.SelfSignedCertBuilder.GenerateSelfSignedResult;
 import org.xipki.security.common.ConfigurationException;
 
@@ -127,6 +128,17 @@ public class CaGenRootCACommand extends CaAddOrGenCommand
 
         DuplicationMode duplicateSubject = getDuplicationMode(duplicateSubjectI, DuplicationMode.FORBIDDEN_WITHIN_PROFILE);
         entry.setDuplicateSubjectMode(duplicateSubject);
+
+        ValidityMode validityMode = null;
+        if(validityModeS != null)
+        {
+            validityMode = ValidityMode.getInstance(validityModeS);
+        }
+        if(validityMode == null)
+        {
+            validityMode = ValidityMode.PKIX;
+        }
+        entry.setValidtyMode(validityMode);
 
         entry.setStatus(status);
         if(crlSignerName != null)
