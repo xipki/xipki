@@ -1829,7 +1829,7 @@ public class X509CA
                 ValidityMode mode = caInfo.getValidityMode();
                 if(mode == ValidityMode.CUTOFF)
                 {
-                    maxNotAfter = caInfo.getNotAfter();
+                    notAfter = caInfo.getNotAfter();
                 }
                 else if(mode == ValidityMode.STRICT)
                 {
