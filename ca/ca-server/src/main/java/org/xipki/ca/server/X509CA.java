@@ -1797,15 +1797,6 @@ public class X509CA
             }
 
             Date maxNotAfter = new Date(notBefore.getTime() + DAY * validity);
-            if(caInfo.getValidityMode() == ValidityMode.PKIX)
-            {
-                Date caNotAfter = caInfo.getCertificate().getCert().getNotAfter();
-                if(maxNotAfter.after(caNotAfter))
-                {
-                    maxNotAfter = caNotAfter;
-                }
-            }
-
             if(certProfile.getSpecialCertProfileBehavior() == SpecialCertProfileBehavior.gematik_gSMC_K)
             {
                 String s = certProfile.getParameter(SpecialCertProfileBehavior.PARAMETER_MAXLIFTIME);
@@ -1829,7 +1820,18 @@ public class X509CA
             {
                 notAfter = maxNotAfter;
             }
-
+            
+            /*Date caNotAfter 
+            if(notAfter.after(caInfo.getCertificate().getCert()))
+            if(caInfo.getValidityMode() == ValidityMode.CUTOFF)
+            {
+                Date caNotAfter = caInfo.getCertificate().getCert().getNotAfter();
+                if(maxNotAfter.after(caNotAfter))
+                {
+                    maxNotAfter = caNotAfter;
+                }
+            }
+	*/
             X509v3CertificateBuilder certBuilder = new X509v3CertificateBuilder(
                     caSubjectX500Name,
                     nextSerial(),
