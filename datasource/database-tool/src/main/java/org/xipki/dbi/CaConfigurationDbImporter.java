@@ -398,7 +398,7 @@ class CaConfigurationDbImporter extends DbPorter
                     String validityMode = ca.getValidityMode();
                     if(validityMode == null)
                     {
-                        validityMode = "PKIX";
+                        validityMode = "STRICT";
                     }
                     ps.setString(idx++, validityMode);
 
