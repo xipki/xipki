@@ -14,6 +14,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Savepoint;
 import java.sql.Statement;
 import java.sql.Types;
 import java.util.Properties;
@@ -172,6 +173,18 @@ public class DbPorter
         }
     }
 
+    protected Savepoint setSavepoint()
+    throws SQLException
+    {
+    	return connection.setSavepoint();
+    }
+    
+    protected void rollback(Savepoint savepoint)
+    throws SQLException
+    {
+    	connection.rollback(savepoint);
+    }
+    
     protected void disableAutoCommit()
     throws SQLException
     {

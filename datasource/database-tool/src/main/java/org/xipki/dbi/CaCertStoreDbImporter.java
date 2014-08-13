@@ -18,6 +18,7 @@ import java.security.cert.X509CRL;
 import java.security.cert.X509Certificate;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.sql.Savepoint;
 import java.sql.Types;
 import java.util.List;
 import java.util.zip.ZipEntry;
@@ -544,30 +545,14 @@ class CaCertStoreDbImporter extends DbPorter
 
                 if((i + 1) % 100 == 0 || i == n - 1)
                 {
+                	Savepoint savepoint = setSavepoint();
                     try
                     {
                         ps_cert.executeBatch();
                         ps_rawcert.executeBatch();
                     }catch(SQLException e)
                     {
-                        try
-                        {
-                            ps_cert.cancel();
-                        }catch(SQLException e1)
-                        {
-                            System.err.println("Could not cancel ps_cert: " + e1.getMessage());
-                            LOG.error("Could not cancel ps_cert", e);
-                        }
-
-                        try
-                        {
-                            ps_rawcert.cancel();
-                        }catch(SQLException e1)
-                        {
-                            System.err.println("Could not cancel ps_rawcert: " + e1.getMessage());
-                            LOG.error("Could not cancel ps_rawcert", e);
-                        }
-
+                    	rollback(savepoint);
                         throw e;
                     }
 
