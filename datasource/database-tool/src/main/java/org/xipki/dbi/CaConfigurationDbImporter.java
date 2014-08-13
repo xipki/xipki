@@ -362,7 +362,7 @@ class CaConfigurationDbImporter extends DbPorter
                     + "CERT, SIGNER_TYPE, SIGNER_CONF, CRLSIGNER_NAME, "
                     + "DUPLICATE_KEY_MODE, DUPLICATE_SUBJECT_MODE, PERMISSIONS, NUM_CRLS, "
                     + "EXPIRATION_PERIOD, REVOKED, REV_REASON, REV_TIME, REV_INVALIDITY_TIME, VALIDITY_MODE) "
-                    + "VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+                    + "VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
 
             for(CaType ca : cas.getCa())
             {
