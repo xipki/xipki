@@ -16,6 +16,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Savepoint;
 import java.sql.Statement;
 import java.sql.Types;
 import java.util.Date;
@@ -254,52 +255,17 @@ class CertStatusStoreQueryExecutor
                 conn.setAutoCommit(false);
                 try
                 {
-                    ps_addcert.executeUpdate();
-                    ps_addRawcert.executeUpdate();
-                    ps_addCerthash.executeUpdate();
+                    Savepoint savepoint = conn.setSavepoint();
+                    try{
+	                    ps_addcert.executeUpdate();
+	                    ps_addRawcert.executeUpdate();
+	                    ps_addCerthash.executeUpdate();
+	                }catch(SQLException e)
+	                {
+	                	conn.rollback(savepoint);
+	                    throw e;
+	                }
                     conn.commit();
-                }catch(SQLException e)
-                {
-                    try
-                    {
-                        ps_addcert.cancel();
-                    }catch(SQLException e2)
-                    {
-                        final String message = "Could not cancel PreparedStatement ps_addcert";
-                        if(LOG.isErrorEnabled())
-                        {
-                            LOG.error(LogUtil.buildExceptionLogFormat(message), e2.getClass().getName(), e2.getMessage());
-                        }
-                        LOG.debug(message, e2);
-                    }
-
-                    try
-                    {
-                        ps_addRawcert.cancel();
-                    }catch(SQLException e2)
-                    {
-                        final String message = "Could not cancel PreparedStatement ps_addRawcert";
-                        if(LOG.isErrorEnabled())
-                        {
-                            LOG.error(LogUtil.buildExceptionLogFormat(message), e2.getClass().getName(), e2.getMessage());
-                        }
-                        LOG.debug(message, e2);
-                    }
-
-                    try
-                    {
-                        ps_addCerthash.cancel();
-                    }catch(SQLException e2)
-                    {
-                        final String message = "Could not cancel PreparedStatement ps_addCerthash";
-                        if(LOG.isErrorEnabled())
-                        {
-                            LOG.error(LogUtil.buildExceptionLogFormat(message), e2.getClass().getName(), e2.getMessage());
-                        }
-                        LOG.debug(message, e2);
-                    }
-
-                    throw e;
                 }
                 finally
                 {

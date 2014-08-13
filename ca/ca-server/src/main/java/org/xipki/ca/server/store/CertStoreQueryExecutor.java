@@ -19,6 +19,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Savepoint;
 import java.sql.Statement;
 import java.sql.Types;
 import java.util.ArrayList;
@@ -55,7 +56,6 @@ import org.xipki.database.api.DataSourceWrapper;
 import org.xipki.security.common.CRLReason;
 import org.xipki.security.common.CertRevocationInfo;
 import org.xipki.security.common.IoCertUtil;
-import org.xipki.security.common.LogUtil;
 import org.xipki.security.common.LruCache;
 import org.xipki.security.common.ObjectIdentifiers;
 import org.xipki.security.common.ParamChecker;
@@ -231,43 +231,21 @@ class CertStoreQueryExecutor
             ps_addRawcert.setInt(idx++, certId);
             ps_addRawcert.setString(idx++, sha1_fp);
             ps_addRawcert.setString(idx++, Base64.toBase64String(certificate.getEncodedCert()));
-
+            
             final boolean origAutoCommit = conn.getAutoCommit();
             conn.setAutoCommit(false);
             try
             {
-                ps_addcert.executeUpdate();
-                ps_addRawcert.executeUpdate();
+                Savepoint savepoint = conn.setSavepoint();
+            	try{
+	                ps_addcert.executeUpdate();
+	                ps_addRawcert.executeUpdate();
+	            }catch(SQLException e)
+	            {
+	            	conn.rollback(savepoint);
+	                throw e;
+	            }
                 conn.commit();
-            }catch(SQLException e)
-            {
-                try
-                {
-                    ps_addcert.cancel();
-                }catch(SQLException e2)
-                {
-                    final String message = "Could not cancel PreparedStatement ps_addcert";
-                    if(LOG.isErrorEnabled())
-                    {
-                        LOG.error(LogUtil.buildExceptionLogFormat(message), e2.getClass().getName(), e2.getMessage());
-                    }
-                    LOG.debug(message, e2);
-                }
-
-                try
-                {
-                    ps_addRawcert.cancel();
-                }catch(SQLException e2)
-                {
-                    final String message = "Could not cancel PreparedStatement ps_addRawcert";
-                    if(LOG.isErrorEnabled())
-                    {
-                        LOG.error(LogUtil.buildExceptionLogFormat(message), e2.getClass().getName(), e2.getMessage());
-                    }
-                    LOG.debug(message, e2);
-                }
-
-                throw e;
             }
             finally
             {
