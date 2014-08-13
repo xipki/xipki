@@ -399,9 +399,9 @@ class CaCertStoreDbImporter extends DbPorter
                     BigInteger crlNumber = ASN1Integer.getInstance(extnValue).getPositiveValue();
 
                     int idx = 1;
-                    ps.setInt   (idx++, id++);
-                    ps.setInt   (idx++, crl.getCainfoId());
-                    ps.setString(idx++, crlNumber.toString());
+                    ps.setInt (idx++, id++);
+                    ps.setInt (idx++, crl.getCainfoId());
+                    ps.setLong(idx++, crlNumber.longValue());
                     ps.setLong(idx++, c.getThisUpdate().getTime() / 1000);
                     if(c.getNextUpdate() != null)
                     {
