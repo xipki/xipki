@@ -5,17 +5,15 @@
 
 ################## PostgreSQL #################
 
-dataSourceClassName = com.impossibl.postgres.jdbc.PGDataSource
+dataSourceClassName = org.postgresql.ds.PGSimpleDataSource
 
-dataSource.host = localhost
-dataSource.port = 5432
-dataSource.database = ocsp
+dataSource.serverName = localhost
+dataSource.portNumber = 5432
+dataSource.databaseName = ocsp
 dataSource.user = root
 dataSource.password = 123456
 
-dataSource.housekeeper = true
-dataSource.parsedSqlCacheSize = 256
-dataSource.preparedStatementCacheSize = 256
+dataSource.prepareThreshold = 256
 
 autoCommit = true
 readOnly = false
