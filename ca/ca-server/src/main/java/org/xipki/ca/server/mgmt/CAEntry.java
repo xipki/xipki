@@ -13,6 +13,7 @@ import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
@@ -39,6 +40,8 @@ public class CAEntry
     private final boolean selfSigned;
     private final BigInteger serialNumber;
     private final String subject;
+    private final Date notBefore;
+    private final Date notAfter;
     private CAStatus status;
     private final List<String> crlUris;
     private final List<String> deltaCrlUris;
@@ -54,7 +57,7 @@ public class CAEntry
     private long nextSerial;
     private DuplicationMode duplicateKeyMode;
     private DuplicationMode duplicateSubjectMode;
-    private ValidityMode validityMode = ValidityMode.STRICT;
+    private ValidityMode validityMode = ValidityMode.CUTOFF;
     private Set<Permission> permissions;
     private int numCrls;
     private final int expirationPeriod;
@@ -105,6 +108,8 @@ public class CAEntry
         }
 
         this.subject = IoCertUtil.canonicalizeName(cert.getSubjectX500Principal());
+        this.notBefore = cert.getNotBefore();
+        this.notAfter = cert.getNotAfter();
         this.serialNumber = cert.getSerialNumber();
         this.selfSigned = cert.getIssuerX500Principal().equals(cert.getSubjectX500Principal());
         this.certInCMPFormat = new CMPCertificate(bcCert);
@@ -197,6 +202,16 @@ public class CAEntry
         return subject;
     }
 
+    public Date getNotBefore()
+    {
+        return notBefore;
+    }
+
+    public Date getNotAfter()
+    {
+        return notAfter;
+    }
+
     public BigInteger getSerialNumber()
     {
         return serialNumber;
@@ -270,6 +285,8 @@ public class CAEntry
                 IoCertUtil.canonicalizeName(cert.getCert().getIssuerX500Principal())).append("\n");
         sb.append("\tserialNumber: ").append(cert.getCert().getSerialNumber()).append("\n");
         sb.append("\tsubject: ").append(subject).append("\n");
+        sb.append("\tnotBefore: ").append(notBefore).append("\n");
+        sb.append("\tnotAfter: ").append(notAfter).append("\n");
         if(verbose)
         {
             sb.append("\tEncoded: ").append(Base64.toBase64String(cert.getEncodedCert())).append("\n");

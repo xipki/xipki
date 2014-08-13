@@ -394,13 +394,7 @@ class CaConfigurationDbImporter extends DbPorter
                     setInt(ps, idx++, ca.getRevReason());
                     setLong(ps, idx++, ca.getRevTime());
                     setLong(ps, idx++, ca.getRevInvalidityTime());
-
-                    String validityMode = ca.getValidityMode();
-                    if(validityMode == null)
-                    {
-                        validityMode = "STRICT";
-                    }
-                    ps.setString(idx++, validityMode);
+                    ps.setString(idx++, ca.getValidityMode());
 
                     ps.executeUpdate();
                 }catch(Exception e)

@@ -1462,14 +1462,17 @@ public class X509CA
         }
 
         notBefore = certProfile.getNotBefore(notBefore);
-        Date now = new Date();
         if(notBefore == null)
         {
-            notBefore = now;
+            notBefore = new Date();
+        }
+        if(notBefore.before(caInfo.getNotBefore()))
+        {
+            notBefore = caInfo.getNotBefore();
         }
 
         long t = caInfo.getNoNewCertificateAfter();
-        if(notBefore.getTime() > t || now.getTime() > t)
+        if(notBefore.getTime() > t)
         {
             throw new OperationException(ErrorCode.NOT_PERMITTED,
                     "CA is not permitted to issue certifate after " + new Date(t));
@@ -1820,18 +1823,29 @@ public class X509CA
             {
                 notAfter = maxNotAfter;
             }
-            
-            /*Date caNotAfter 
-            if(notAfter.after(caInfo.getCertificate().getCert()))
-            if(caInfo.getValidityMode() == ValidityMode.CUTOFF)
+
+            if(notAfter.after(caInfo.getNotAfter()))
             {
-                Date caNotAfter = caInfo.getCertificate().getCert().getNotAfter();
-                if(maxNotAfter.after(caNotAfter))
+                ValidityMode mode = caInfo.getValidityMode();
+                if(mode == ValidityMode.CUTOFF)
                 {
-                    maxNotAfter = caNotAfter;
+                    maxNotAfter = caInfo.getNotAfter();
+                }
+                else if(mode == ValidityMode.STRICT)
+                {
+                    throw new OperationException(ErrorCode.NOT_PERMITTED,
+                            "notAfter outside of CA's validity is not permitted");
+                }
+                else if(mode == ValidityMode.LAX)
+                {
+                    // permitted
+                }
+                else
+                {
+                    throw new RuntimeException("should not reach here");
                 }
             }
-	*/
+
             X509v3CertificateBuilder certBuilder = new X509v3CertificateBuilder(
                     caSubjectX500Name,
                     nextSerial(),
