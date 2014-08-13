@@ -16,6 +16,7 @@
     <features.repo>${project.build.directory}/features-repo</features.repo>
     <mysql-jdbc.version>5.1.31</mysql-jdbc.version>
     <pgjdbc-ng.version>0.3</pgjdbc-ng.version>
+    <postgresql.version>9.3-1100-jdbc41</postgresql.version>
     <h2-jdbc.version>1.4.179</h2-jdbc.version>
     <liquibase.version>3.2.0</liquibase.version>
     <jtds.version>1.3.1</jtds.version>
@@ -222,6 +223,11 @@
                   <artifactId>pgjdbc-ng</artifactId>
                   <classifier>complete</classifier>
                   <version>${pgjdbc-ng.version}</version>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>org.postgresql</groupId>
+                  <artifactId>postgresql</artifactId>
+                  <version>${postgresql.version}</version>
                 </artifactItem>
                 <artifactItem>
                   <groupId>net.sourceforge.jtds</groupId>
