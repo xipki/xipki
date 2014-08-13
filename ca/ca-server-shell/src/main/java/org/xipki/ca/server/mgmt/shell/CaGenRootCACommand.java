@@ -136,7 +136,7 @@ public class CaGenRootCACommand extends CaAddOrGenCommand
         }
         if(validityMode == null)
         {
-            validityMode = ValidityMode.CUTOFF;
+            validityMode = ValidityMode.STRICT;
         }
         entry.setValidityMode(validityMode);
 

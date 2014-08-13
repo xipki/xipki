@@ -94,7 +94,7 @@
                   <artifactId>branding</artifactId>
                   <version>${project.version}</version>
                   <outputDirectory>target/dependencies</outputDirectory>
-                  <destFileName>xipki-branding.jar</destFileName>
+                  <destFileName>karaf-branding.jar</destFileName>
                 </artifactItem>
               </artifactItems>
             </configuration>

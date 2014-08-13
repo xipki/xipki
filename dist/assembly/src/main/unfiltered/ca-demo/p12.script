@@ -17,7 +17,8 @@ ca:gen-rca -name RCA1 \
   -signerType PKCS12 \
   -signerConf password?1234%keystore?file:output/RCA1.p12%algo?$CA_SIGNER_ALGO \
   --duplicateSubject permitted \
-  --duplicateKey permitted
+  --duplicateKey permitted \
+  -validityMode CUTOFF
 
 ## Update the certificate in the device
 keytool:update-cert-p12 -p12 output/RCA1.p12 -pwd 1234 -cert output/RCA1.der
