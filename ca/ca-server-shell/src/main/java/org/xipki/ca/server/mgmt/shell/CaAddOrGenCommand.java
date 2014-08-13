@@ -99,9 +99,11 @@ public abstract class CaAddOrGenCommand extends CaCommand
 
     @Option(name = "-validityMode",
             description = "Mode of valditity.\n"
-                    + "\tPKIX: notAfter of issued certificates could not exceed CA's notAfter\n"
-                    + "\tCHAIN: notAfter of issued certificates may exceed CA's notAfter\n"
-                    + "the default is PKIX")
+                    + "\tSTRICT: Reject if the notBefore + validity behinds CA's notAfter \n"
+                    + "\tLAX:    notBefore + validity after CA's notAfter is permitted\n"
+                    + "\tCUTOFF: notAfter of issued certificates will be set to the earlier time of\n"
+                    + "\t        notBefore + validigty and CA's notAfter\n"
+                    + "the default is STRICT")
     protected String validityModeS;
 
     protected SecurityFactory securityFactory;

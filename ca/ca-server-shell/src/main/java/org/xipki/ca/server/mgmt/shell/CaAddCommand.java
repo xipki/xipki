@@ -109,7 +109,7 @@ public class CaAddCommand extends CaAddOrGenCommand
         }
         if(validityMode == null)
         {
-            validityMode = ValidityMode.PKIX;
+            validityMode = ValidityMode.STRICT;
         }
         entry.setValidtyMode(validityMode);
 

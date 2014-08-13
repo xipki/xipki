@@ -13,8 +13,9 @@ package org.xipki.ca.server.mgmt;
 
 public enum ValidityMode
 {
-    PKIX,
-    CHAIN;
+    STRICT,
+    LAX,
+    CUTOFF;
 
     public static ValidityMode getInstance(String text)
     {

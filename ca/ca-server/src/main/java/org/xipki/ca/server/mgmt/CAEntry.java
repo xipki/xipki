@@ -54,7 +54,7 @@ public class CAEntry
     private long nextSerial;
     private DuplicationMode duplicateKeyMode;
     private DuplicationMode duplicateSubjectMode;
-    private ValidityMode validityMode = ValidityMode.PKIX;
+    private ValidityMode validityMode = ValidityMode.STRICT;
     private Set<Permission> permissions;
     private int numCrls;
     private final int expirationPeriod;
