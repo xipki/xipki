@@ -1390,7 +1390,7 @@ public class CAManagerImpl implements CAManager
                 {
                     validityMode = ValidityMode.CUTOFF;
                 }
-                entry.setValidtyMode(validityMode);
+                entry.setValidityMode(validityMode);
 
                 cas.put(entry.getName(), entry);
             }
