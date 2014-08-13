@@ -1388,7 +1388,7 @@ public class CAManagerImpl implements CAManager
                 }
                 if(validityMode == null)
                 {
-                    validityMode = ValidityMode.CUTOFF;
+                    validityMode = ValidityMode.STRICT;
                 }
                 entry.setValidityMode(validityMode);
 
@@ -1482,7 +1482,7 @@ public class CAManagerImpl implements CAManager
 
         if(columnValidityModeAvailable == false)
         {
-            if(newCaDbEntry.getValidityMode() != null && newCaDbEntry.getValidityMode() != ValidityMode.CUTOFF)
+            if(newCaDbEntry.getValidityMode() != null && newCaDbEntry.getValidityMode() != ValidityMode.STRICT)
             {
                 throw new CAMgmtException("Column " + COLUMN_VALIDITY_MODE + " in table CA does not exist,"
                         + " please update the table definition");
@@ -1727,7 +1727,7 @@ public class CAManagerImpl implements CAManager
         }
 
         Integer iValidity_mode = null;
-        if(validityMode != null && validityMode != ValidityMode.CUTOFF)
+        if(validityMode != null && validityMode != ValidityMode.STRICT)
         {
             if(columnValidityModeAvailable == false)
             {

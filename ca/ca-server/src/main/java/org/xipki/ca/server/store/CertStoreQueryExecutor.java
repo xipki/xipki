@@ -38,6 +38,7 @@ import org.bouncycastle.asn1.DERPrintableString;
 import org.bouncycastle.asn1.x500.RDN;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x500.style.IETFUtils;
+import org.bouncycastle.asn1.x509.Certificate;
 import org.bouncycastle.asn1.x509.Extension;
 import org.bouncycastle.util.encoders.Base64;
 import org.slf4j.Logger;
@@ -1134,8 +1135,10 @@ class CertStoreQueryExecutor
 
                 X509CertificateWithMetaInfo certWithMeta = new X509CertificateWithMetaInfo(cert, encodedCert);
 
+                byte[] subjectPublicKeyInfo = Certificate.getInstance(encodedCert).getTBSCertificate()
+                        .getSubjectPublicKeyInfo().getEncoded();
                 CertificateInfo certInfo = new CertificateInfo(certWithMeta,
-                        caCert, cert.getPublicKey().getEncoded(), certProfileName);
+                        caCert, subjectPublicKeyInfo, certProfileName);
 
                 boolean revoked = rs.getBoolean(col_revoked);
 

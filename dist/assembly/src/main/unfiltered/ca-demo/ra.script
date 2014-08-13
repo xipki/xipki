@@ -4,7 +4,7 @@
 # Wait one second
 sleep 1000
 
-keytool:rsa-p12 -pwd 1234 -keysize $KEYSIZE -out output/RCA2.p12 \
+keytool:rsa-p12 -pwd 1234 -out output/RCA2.p12 \
   -subject "CN=RCA2,O=xipki,C=DE"
 
 keytool:req-p12 -p12 output/RCA2.p12 -pwd 1234 -out output/RCA2.p10
