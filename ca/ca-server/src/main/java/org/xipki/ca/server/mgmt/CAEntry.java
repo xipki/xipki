@@ -349,7 +349,7 @@ public class CAEntry
         return validityMode;
     }
 
-    public void setValidtyMode(ValidityMode mode)
+    public void setValidityMode(ValidityMode mode)
     {
         ParamChecker.assertNotNull("mode", mode);
         this.validityMode = mode;

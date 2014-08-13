@@ -136,9 +136,9 @@ public class CaGenRootCACommand extends CaAddOrGenCommand
         }
         if(validityMode == null)
         {
-            validityMode = ValidityMode.STRICT;
+            validityMode = ValidityMode.CUTOFF;
         }
-        entry.setValidtyMode(validityMode);
+        entry.setValidityMode(validityMode);
 
         entry.setStatus(status);
         if(crlSignerName != null)
