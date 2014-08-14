@@ -7,10 +7,10 @@ features:install xipki-ocspclient-shell
 sleep 1000
 
 echo "Loadtest OCSP status (database based cert source)"
-ocsp:loadtest-status -cacert output/SubCA1.der -duration 30 -serial 1-500 -thread 8
+ocsp:loadtest-status -cacert output/SubCA1.der -duration 15 -serial 1-500 -thread 8
 
 echo "Loadtest OCSP status (CRL based cert source)"
-ocsp:loadtest-status -cacert output/SubCAwithCRL1.der -duration 30 -serial 1-2 -thread 8
+ocsp:loadtest-status -cacert output/SubCAwithCRL1.der -duration 15 -serial 1-2 -thread 8
 
 features:uninstall xipki-ocspclient-shell
 features:uninstall xipki-ocspclient
