@@ -65,7 +65,7 @@
       <crlStore>
         <crlFile>output/SubCAwithCRL1.crl</crlFile>
         <crlUrl>http://example.org/crl</crlUrl>
-        <useUpdateDatesFromCRL>true</useUpdateDatesFromCRL>
+        <useUpdateDatesFromCRL>false</useUpdateDatesFromCRL>
         <caCertFile>output/SubCAwithCRL1.der</caCertFile>
         <caRevoked>false</caRevoked>
       </crlStore>
