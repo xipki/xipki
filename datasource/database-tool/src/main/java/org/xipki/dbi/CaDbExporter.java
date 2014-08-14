@@ -25,6 +25,7 @@ import org.xipki.database.api.DataSourceWrapper;
 import org.xipki.dbi.ca.jaxb.ObjectFactory;
 import org.xipki.security.api.PasswordResolver;
 import org.xipki.security.api.PasswordResolverException;
+import org.xipki.security.common.AbstractLoadTest;
 import org.xipki.security.common.IoCertUtil;
 import org.xipki.security.common.ParamChecker;
 
@@ -100,11 +101,12 @@ public class CaDbExporter
     public void exportDatabase(int numCertsInBundle, int numCrls)
     throws Exception
     {
+        long start = System.currentTimeMillis();
         try
         {
             // CAConfiguration
             CaConfigurationDbExporter caConfExporter = new CaConfigurationDbExporter(dataSource, marshaller, destFolder);
-               caConfExporter.export();
+            caConfExporter.export();
 
             // CertStore
             CaCertStoreDbExporter certStoreExporter = new CaCertStoreDbExporter(
@@ -120,6 +122,8 @@ public class CaDbExporter
             {
                 LOG.error("dataSource.shutdown()", e);
             }
+            long end = System.currentTimeMillis();
+            System.out.println("Finished in " + AbstractLoadTest.formatTime((end - start) / 1000).trim());
         }
     }
 

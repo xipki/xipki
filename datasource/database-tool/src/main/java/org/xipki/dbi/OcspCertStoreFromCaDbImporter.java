@@ -13,7 +13,13 @@ import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
@@ -25,13 +31,19 @@ import org.bouncycastle.util.encoders.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.database.api.DataSourceWrapper;
-import org.xipki.dbi.ocsp.jaxb.CertStoreType;
-import org.xipki.dbi.ocsp.jaxb.CertStoreType.CertsFiles;
-import org.xipki.dbi.ocsp.jaxb.CertStoreType.Issuers;
-import org.xipki.dbi.ocsp.jaxb.CertType;
-import org.xipki.dbi.ocsp.jaxb.CertsType;
-import org.xipki.dbi.ocsp.jaxb.IssuerType;
+import org.xipki.dbi.ca.jaxb.CAConfigurationType;
+import org.xipki.dbi.ca.jaxb.CaHasPublisherType;
+import org.xipki.dbi.ca.jaxb.CaType;
+import org.xipki.dbi.ca.jaxb.CainfoType;
+import org.xipki.dbi.ca.jaxb.CertStoreType;
+import org.xipki.dbi.ca.jaxb.CertStoreType.Cainfos;
+import org.xipki.dbi.ca.jaxb.CertStoreType.CertsFiles;
+import org.xipki.dbi.ca.jaxb.CertType;
+import org.xipki.dbi.ca.jaxb.CertsType;
+import org.xipki.dbi.ca.jaxb.NameIdType;
+import org.xipki.dbi.ca.jaxb.PublisherType;
 import org.xipki.security.api.PasswordResolverException;
+import org.xipki.security.common.CmpUtf8Pairs;
 import org.xipki.security.common.HashAlgoType;
 import org.xipki.security.common.HashCalculator;
 import org.xipki.security.common.IoCertUtil;
@@ -41,44 +53,22 @@ import org.xipki.security.common.ParamChecker;
  * @author Lijun Liao
  */
 
-class OcspCertStoreDbImporter extends DbPorter
+class OcspCertStoreFromCaDbImporter extends DbPorter
 {
-    private static final Logger LOG = LoggerFactory.getLogger(OcspCertStoreDbImporter.class);
-
-    static final String SQL_ADD_CAINFO =
-            "INSERT INTO ISSUER (" +
-            " ID, SUBJECT," +
-            " NOTBEFORE, NOTAFTER," +
-            " SHA1_FP_NAME, SHA1_FP_KEY," +
-            " SHA224_FP_NAME, SHA224_FP_KEY," +
-            " SHA256_FP_NAME, SHA256_FP_KEY," +
-            " SHA384_FP_NAME, SHA384_FP_KEY," +
-            " SHA512_FP_NAME, SHA512_FP_KEY," +
-            " SHA1_fp_cert, cert," +
-            " REVOKED, REV_REASON, REV_TIME, REV_INVALIDITY_TIME" +
-            " ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-
-    static final String SQL_ADD_CERT =
-            "INSERT INTO CERT (" +
-            " ID, ISSUER_ID, SERIAL, " +
-            " SUBJECT, LAST_UPDATE, NOTBEFORE, NOTAFTER," +
-            " REVOKED, REV_REASON, REV_TIME, REV_INVALIDITY_TIME, PROFILE)" +
-            " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-
-    static final String SQL_ADD_CERTHASH = "INSERT INTO CERTHASH (" +
-            "CERT_ID, SHA1_FP, SHA224_FP, SHA256_FP, SHA384_FP, SHA512_FP)" +
-            " VALUES (?, ?, ?, ?, ?, ?)";
-
-    static final String SQL_ADD_RAWCERT = "INSERT INTO RAWCERT (CERT_ID, CERT) VALUES (?, ?)";
+    private static final Logger LOG = LoggerFactory.getLogger(OcspCertStoreFromCaDbImporter.class);
 
     private final Unmarshaller unmarshaller;
+    private final String publisherName;
 
-    OcspCertStoreDbImporter(DataSourceWrapper dataSource, Unmarshaller unmarshaller, String srcDir)
+    OcspCertStoreFromCaDbImporter(DataSourceWrapper dataSource, Unmarshaller unmarshaller,
+            String srcDir, String publisherName)
     throws SQLException, PasswordResolverException, NoSuchAlgorithmException
     {
         super(dataSource, srcDir);
         ParamChecker.assertNotNull("unmarshaller", unmarshaller);
+        ParamChecker.assertNotEmpty("publisherName", publisherName);
         this.unmarshaller = unmarshaller;
+        this.publisherName = publisherName;
     }
 
     public void importToDB()
@@ -86,18 +76,83 @@ class OcspCertStoreDbImporter extends DbPorter
     {
         @SuppressWarnings("unchecked")
         JAXBElement<CertStoreType> root = (JAXBElement<CertStoreType>)
-                unmarshaller.unmarshal(new File(baseDir + File.separator + FILENAME_OCSP_CertStore));
+                unmarshaller.unmarshal(new File(baseDir, FILENAME_CA_CertStore));
         CertStoreType certstore = root.getValue();
         if(certstore.getVersion() > VERSION)
         {
             throw new Exception("Cannot import CertStore greater than " + VERSION + ": " + certstore.getVersion());
         }
 
-        System.out.println("Importing OCSP certstore to database");
+        @SuppressWarnings("unchecked")
+        JAXBElement<CAConfigurationType> rootCaConf = (JAXBElement<CAConfigurationType>)
+                unmarshaller.unmarshal(new File(baseDir + File.separator + FILENAME_CA_Configuration));
+        CAConfigurationType caConf = rootCaConf.getValue();
+        if(caConf.getVersion() > VERSION)
+        {
+            throw new Exception("Cannot import CA Configuration greater than " + VERSION + ": " + certstore.getVersion());
+        }
+
+        System.out.println("Importing CA certstore to OCSP database");
         try
         {
-            import_issuer(certstore.getIssuers());
-            import_cert(certstore.getCertsFiles());
+            PublisherType publisherType = null;
+            for(PublisherType type : caConf.getPublishers().getPublisher())
+            {
+                if(publisherName.equals(type.getName()))
+                {
+                    publisherType = type;
+                    break;
+                }
+            }
+
+            if(publisherType == null)
+            {
+                throw new Exception("Unknown publisher " + publisherName);
+            }
+
+            String type = publisherType.getType();
+            if("ocsp".equalsIgnoreCase(type) || "java:org.xipki.ca.server.publisher.DefaultCertPublisher".equals(type))
+            {
+            }
+            else
+            {
+                throw new Exception("Unkwown publisher type " + type);
+            }
+
+            CmpUtf8Pairs utf8pairs = new CmpUtf8Pairs(publisherType.getConf());
+            String v = utf8pairs.getValue("publish.goodcerts");
+            boolean revokedOnly = false;
+            if(v != null)
+            {
+                revokedOnly = (Boolean.parseBoolean(v) == false);
+            }
+
+            Set<String> relatedCaNames = new HashSet<>();
+            for(CaHasPublisherType ctype : caConf.getCaHasPublishers().getCaHasPublisher())
+            {
+                if(ctype.getPublisherName().equals(publisherName))
+                {
+                    relatedCaNames.add(ctype.getCaName());
+                }
+            }
+
+            List<CaType> relatedCas = new LinkedList<>();
+            for(CaType cType : caConf.getCas().getCa())
+            {
+                if(relatedCaNames.contains(cType.getName()))
+                {
+                    relatedCas.add(cType);
+                }
+            }
+
+            Map<Integer, String> profileMap = new HashMap<Integer, String>();
+            for(NameIdType ni : certstore.getCertprofileinfos().getCertprofileinfo())
+            {
+                profileMap.put(ni.getId(), ni.getName());
+            }
+
+            List<Integer> relatedCaIds = import_issuer(certstore.getCainfos(), relatedCas);
+            import_cert(certstore.getCertsFiles(), profileMap, revokedOnly, relatedCaIds);
         }catch(Exception e)
         {
             System.err.println("Error while importing OCSP certstore to database");
@@ -106,20 +161,40 @@ class OcspCertStoreDbImporter extends DbPorter
         System.out.println(" Imported OCSP certstore to database");
     }
 
-    private void import_issuer(Issuers issuers)
+    private List<Integer> import_issuer(Cainfos issuers, List<CaType> cas)
     throws Exception
     {
         System.out.println("Importing table ISSUER");
-        PreparedStatement ps = prepareStatement(SQL_ADD_CAINFO);
+        PreparedStatement ps = prepareStatement(OcspCertStoreDbImporter.SQL_ADD_CAINFO);
+
+        List<Integer> relatedCaIds = new LinkedList<>();
 
         try
         {
-            for(IssuerType issuer : issuers.getIssuer())
+            for(CainfoType issuer : issuers.getCainfo())
             {
                 try
                 {
                     String b64Cert = issuer.getCert();
                     byte[] encodedCert = Base64.decode(b64Cert);
+
+                    // retrieve the revocation information of the CA, if possible
+                    CaType ca = null;
+                    for(CaType caType : cas)
+                    {
+                        if(Arrays.equals(encodedCert, Base64.decode(caType.getCert())))
+                        {
+                            ca = caType;
+                            break;
+                        }
+                    }
+
+                    if(ca == null)
+                    {
+                        continue;
+                    }
+
+                    relatedCaIds.add(issuer.getId());
 
                     Certificate c;
                     byte[] encodedName;
@@ -159,10 +234,11 @@ class OcspCertStoreDbImporter extends DbPorter
                     ps.setString(idx++, HashCalculator.hexHash(HashAlgoType.SHA512, encodedKey));
                     ps.setString(idx++, HashCalculator.hexHash(HashAlgoType.SHA1, encodedCert));
                     ps.setString(idx++, b64Cert);
-                    setBoolean(ps, idx++, issuer.isRevoked());
-                    setInt(ps, idx++, issuer.getRevReason());
-                    setLong(ps, idx++, issuer.getRevTime());
-                    setLong(ps, idx++, issuer.getRevInvalidityTime());
+
+                    setBoolean(ps, idx++, ca.isRevoked());
+                    setInt(ps, idx++, ca.getRevReason());
+                    setLong(ps, idx++, ca.getRevTime());
+                    setLong(ps, idx++, ca.getRevInvalidityTime());
 
                     ps.execute();
                 }catch(Exception e)
@@ -175,10 +251,13 @@ class OcspCertStoreDbImporter extends DbPorter
         {
             releaseResources(ps, null);
         }
+
         System.out.println(" Imported table ISSUER");
+        return relatedCaIds;
     }
 
-    private void import_cert(CertsFiles certsfiles)
+    private void import_cert(CertsFiles certsfiles, Map<Integer, String> profileMap,
+            boolean revokedOnly, List<Integer> caIds)
     throws Exception
     {
         final long total = certsfiles.getCountCerts();
@@ -192,7 +271,7 @@ class OcspCertStoreDbImporter extends DbPorter
         {
             try
             {
-                sum += do_import_cert(certsFile);
+                sum += do_import_cert(certsFile, profileMap, revokedOnly, caIds);
                 printStatus(total, sum, startTime);
             }catch(Exception e)
             {
@@ -206,12 +285,13 @@ class OcspCertStoreDbImporter extends DbPorter
         System.out.println("Processed " + sum + " certificates");
     }
 
-    private int do_import_cert(String certsZipFile)
+    private int do_import_cert(String certsZipFile, Map<Integer, String> profileMap,
+            boolean revokedOnly, List<Integer> caIds)
     throws Exception
     {
-        PreparedStatement ps_cert = prepareStatement(SQL_ADD_CERT);
-        PreparedStatement ps_certhash = prepareStatement(SQL_ADD_CERTHASH);
-        PreparedStatement ps_rawcert = prepareStatement(SQL_ADD_RAWCERT);
+        PreparedStatement ps_cert = prepareStatement(OcspCertStoreDbImporter.SQL_ADD_CERT);
+        PreparedStatement ps_certhash = prepareStatement(OcspCertStoreDbImporter.SQL_ADD_CERTHASH);
+        PreparedStatement ps_rawcert = prepareStatement(OcspCertStoreDbImporter.SQL_ADD_RAWCERT);
 
         ZipFile zipFile = new ZipFile(new File(baseDir, certsZipFile));
         ZipEntry certsXmlEntry = zipFile.getEntry("certs.xml");
@@ -231,6 +311,17 @@ class OcspCertStoreDbImporter extends DbPorter
             for(int i = 0; i < n; i++)
             {
                 CertType cert = list.get(i);
+                if(revokedOnly && cert.isRevoked() == false)
+                {
+                    continue;
+                }
+
+                int caId = cert.getCainfoId();
+                if(caIds.contains(caId) == false)
+                {
+                    continue;
+                }
+
                 String filename = cert.getCertFile();
 
                 // rawcert
@@ -259,7 +350,7 @@ class OcspCertStoreDbImporter extends DbPorter
                 // cert
                 int idx = 1;
                 ps_cert.setInt   (idx++, cert.getId());
-                ps_cert.setInt   (idx++, cert.getIssuerId());
+                ps_cert.setInt   (idx++, caId);
                 ps_cert.setLong(idx++, c.getSerialNumber().longValue());
                 ps_cert.setString(idx++, IoCertUtil.canonicalizeName(c.getSubjectX500Principal()));
                 ps_cert.setLong(idx++, cert.getLastUpdate());
@@ -269,7 +360,10 @@ class OcspCertStoreDbImporter extends DbPorter
                 setInt(ps_cert, idx++, cert.getRevReason());
                 setLong(ps_cert, idx++, cert.getRevTime());
                 setLong(ps_cert, idx++, cert.getRevInvalidityTime());
-                ps_cert.setString(idx++, cert.getProfile());
+
+                int certProfileId = cert.getCertprofileinfoId();
+                String certProfileName = profileMap.get(certProfileId);
+                ps_cert.setString(idx++, certProfileName);
                 ps_cert.addBatch();
 
                 // certhash

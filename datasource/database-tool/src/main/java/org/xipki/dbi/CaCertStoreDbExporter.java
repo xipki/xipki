@@ -448,6 +448,7 @@ class CaCertStoreDbExporter extends DbPorter
 
         final int minId = getMin("CERT", "ID");
         final int maxId = getMax("CERT", "ID");
+        final long total = getCount("CERT");
 
         String certSql = "SELECT ID, CAINFO_ID, CERTPROFILEINFO_ID," +
                 " REQUESTORINFO_ID, LAST_UPDATE, REVOKED," +
@@ -464,7 +465,7 @@ class CaCertStoreDbExporter extends DbPorter
         int numCertsInCurrentFile = 0;
         CertsType certsInCurrentFile = new CertsType();
 
-        int sum = 0;
+        long sum = 0;
         final int n = 100;
 
         File currentCertsZipFile = new File(baseDir, "tmp-certs-" + System.currentTimeMillis() + ".zip");
@@ -473,6 +474,9 @@ class CaCertStoreDbExporter extends DbPorter
 
         int minIdOfCurrentFile = -1;
         int maxIdOfCurrentFile = -1;
+
+        final long startTime = System.currentTimeMillis();
+        printHeader();
 
         try
         {
@@ -525,7 +529,6 @@ class CaCertStoreDbExporter extends DbPorter
                     {
                         String msg = "Found no certificate in table RAWCERT for cert_id '" + id + "'";
                         LOG.error(msg);
-                        System.out.println(msg);
                         continue;
                     }
 
@@ -595,9 +598,7 @@ class CaCertStoreDbExporter extends DbPorter
                         currentCertsZipFile.renameTo(new File(baseDir, currentCertsFilename));
 
                         certsFiles.getCertsFile().add(currentCertsFilename);
-
-                        System.out.println(" Exported " + numCertsInCurrentFile + " certificates in " + currentCertsFilename);
-                        System.out.println(" Exported " + sum + " certificates ...");
+                        printStatus(total, sum, startTime);
 
                         // reset
                         certsInCurrentFile = new CertsType();
@@ -623,8 +624,7 @@ class CaCertStoreDbExporter extends DbPorter
                 currentCertsZipFile.renameTo(new File(baseDir, currentCertsFilename));
 
                 certsFiles.getCertsFile().add(currentCertsFilename);
-
-                System.out.println(" Exported " + numCertsInCurrentFile + " certificates in " + currentCertsFilename);
+                printStatus(total, sum, startTime);
             }
             else
             {
@@ -637,7 +637,9 @@ class CaCertStoreDbExporter extends DbPorter
             releaseResources(ps, null);
         }
 
+        certsFiles.setCountCerts(sum);
         certstore.setCertsFiles(certsFiles);
+        printTrailer();
         System.out.println(" Exported " + sum + " certificates from tables CERT and RAWCERT");
     }
 
