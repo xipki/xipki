@@ -45,5 +45,17 @@
         <entry key="-dbconf" value-ref="filePathCompleter"/>
       </optional-completers>
     </command>
+    
+    <command name="dbtool/import-ocspfromca">
+      <action class="org.xipki.dbi.shell.ImportOcspFromCaCommand">
+        <property name="dataSourceFactory" ref="dataSourceFactory"/>
+        <property name="passwordResolver" ref="passwordResolver"/>
+      </action>
+      <optional-completers>
+        <entry key="-indir" value-ref="dirPathCompleter"/>
+        <entry key="-dbconf" value-ref="filePathCompleter"/>
+      </optional-completers>
+    </command>
+
   </command-bundle>
 </blueprint>

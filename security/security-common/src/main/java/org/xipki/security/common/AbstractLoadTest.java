@@ -131,7 +131,7 @@ public abstract class AbstractLoadTest
         String accountS = Long.toString(currentAccount);
         StringBuilder sb = new StringBuilder("\r");
 
-        // 10 characters for processed accout
+        // 10 characters for processed account
         for (int i = 0; i < 10 -accountS.length(); i++)
         {
             sb.append(" ");

@@ -24,6 +24,7 @@ import org.xipki.database.api.DataSourceWrapper;
 import org.xipki.dbi.ocsp.jaxb.ObjectFactory;
 import org.xipki.security.api.PasswordResolver;
 import org.xipki.security.api.PasswordResolverException;
+import org.xipki.security.common.AbstractLoadTest;
 import org.xipki.security.common.IoCertUtil;
 
 /**
@@ -79,6 +80,7 @@ public class OcspDbExporter
     public void exportDatabase(int numCertsInBundle)
     throws Exception
     {
+        long start = System.currentTimeMillis();
         try
         {
             // CertStore
@@ -95,6 +97,8 @@ public class OcspDbExporter
             {
                 LOG.error("dataSource.shutdown()", e);
             }
+            long end = System.currentTimeMillis();
+            System.out.println("Finished in " + AbstractLoadTest.formatTime((end - start) / 1000).trim());
         }
     }
 
