@@ -221,35 +221,38 @@ public class OCSPStatusCommand extends AbstractOCSPStatusCommand
             StringBuilder msg = new StringBuilder("Certificate status: ");
             msg.append(status);
 
-            Extension extension = singleResp.getExtension(
-                    ISISMTTObjectIdentifiers.id_isismtt_at_certHash);
-            if(extension != null)
-            {
-                msg.append("\nCertHash is provided:\n");
-                ASN1Encodable extensionValue = extension.getParsedValue();
-                CertHash certHash = CertHash.getInstance(extensionValue);
-                ASN1ObjectIdentifier hashAlgOid = certHash.getHashAlgorithm().getAlgorithm();
-                byte[] hashValue = certHash.getCertificateHash();
-
-                msg.append("\tHash algo : ").append(hashAlgOid.getId()).append("\n");
-                msg.append("\tHash value: ").append(Hex.toHexString(hashValue)).append("\n");
-                if(encodedCert != null)
-                {
-                    MessageDigest md = MessageDigest.getInstance(hashAlgOid.getId());
-                    byte[] expectedHashValue = md.digest(encodedCert);
-                    if(Arrays.equals(expectedHashValue, hashValue))
-                    {
-                        msg.append("\tThis matches the requested certificate");
-                    }
-                    else
-                    {
-                        msg.append("\tThis differs from the requested certificate");
-                    }
-                }
-            }
-
             if(verbose != null && verbose.booleanValue())
             {
+                msg.append("\nthisUpdate: " + singleResp.getThisUpdate());
+                msg.append("\nnextUpdate: " + singleResp.getNextUpdate());
+
+                Extension extension = singleResp.getExtension(
+                        ISISMTTObjectIdentifiers.id_isismtt_at_certHash);
+                if(extension != null)
+                {
+                    msg.append("\nCertHash is provided:\n");
+                    ASN1Encodable extensionValue = extension.getParsedValue();
+                    CertHash certHash = CertHash.getInstance(extensionValue);
+                    ASN1ObjectIdentifier hashAlgOid = certHash.getHashAlgorithm().getAlgorithm();
+                    byte[] hashValue = certHash.getCertificateHash();
+
+                    msg.append("\tHash algo : ").append(hashAlgOid.getId()).append("\n");
+                    msg.append("\tHash value: ").append(Hex.toHexString(hashValue)).append("\n");
+                    if(encodedCert != null)
+                    {
+                        MessageDigest md = MessageDigest.getInstance(hashAlgOid.getId());
+                        byte[] expectedHashValue = md.digest(encodedCert);
+                        if(Arrays.equals(expectedHashValue, hashValue))
+                        {
+                            msg.append("\tThis matches the requested certificate");
+                        }
+                        else
+                        {
+                            msg.append("\tThis differs from the requested certificate");
+                        }
+                    }
+                }
+
                 extension = singleResp.getExtension(
                         OCSPObjectIdentifiers.id_pkix_ocsp_archive_cutoff);
                 if(extension != null)
