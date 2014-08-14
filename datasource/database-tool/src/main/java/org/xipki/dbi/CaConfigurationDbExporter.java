@@ -83,7 +83,7 @@ class CaConfigurationDbExporter extends DbPorter
         export_ca_has_certprofile(caconf);
 
         JAXBElement<CAConfigurationType> root = new ObjectFactory().createCAConfiguration(caconf);
-        marshaller.marshal(root, new File(baseDir + File.separator + FILENAME_CA_Configuration));
+        marshaller.marshal(root, new File(baseDir, FILENAME_CA_Configuration));
 
         System.out.println(" Exported CA configuration from database");
     }
@@ -377,9 +377,10 @@ class CaConfigurationDbExporter extends DbPorter
                 certprofile.setType(type);
                 if(conf != null && conf.length() > 200)
                 {
-                    File f = new File(baseDir, "certprofile" + File.separator + name + ".conf");
+                    String filepath = "certprofile" + File.separator + name + ".conf";
+                    File f = new File(baseDir, filepath);
                     IoCertUtil.save(f, conf.getBytes());
-                    certprofile.setConfFile(f.getPath());
+                    certprofile.setConfFile(filepath);
                 }
                 else
                 {

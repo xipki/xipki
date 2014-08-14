@@ -278,6 +278,7 @@
 				<xs:complexType>
 					<xs:sequence>
 						<xs:element name="certsFile" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+						<xs:element name="countCerts" type="xs:long"/>
 					</xs:sequence>
 				</xs:complexType>
 			</xs:element>
