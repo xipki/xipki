@@ -19,7 +19,6 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Savepoint;
 import java.sql.Statement;
 import java.sql.Types;
 import java.util.ArrayList;
@@ -231,21 +230,21 @@ class CertStoreQueryExecutor
             ps_addRawcert.setInt(idx++, certId);
             ps_addRawcert.setString(idx++, sha1_fp);
             ps_addRawcert.setString(idx++, Base64.toBase64String(certificate.getEncodedCert()));
-            
+
             final boolean origAutoCommit = conn.getAutoCommit();
             conn.setAutoCommit(false);
             try
             {
-                Savepoint savepoint = conn.setSavepoint();
-            	try{
-	                ps_addcert.executeUpdate();
-	                ps_addRawcert.executeUpdate();
-	            }catch(SQLException e)
-	            {
-	            	conn.rollback(savepoint);
-	                throw e;
-	            }
-                conn.commit();
+                try
+                {
+                    ps_addcert.executeUpdate();
+                    ps_addRawcert.executeUpdate();
+                    conn.commit();
+                }catch(SQLException e)
+                {
+                    conn.rollback();
+                    throw e;
+                }
             }
             finally
             {

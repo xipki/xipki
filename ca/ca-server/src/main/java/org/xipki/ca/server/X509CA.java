@@ -871,6 +871,7 @@ public class X509CA
 
             boolean onlyRevokedCerts = false;
 
+            int sum = 0;
             do
             {
                 try
@@ -930,6 +931,9 @@ public class X509CA
                 }
 
                 startSerial = maxSerial.add(BigInteger.ONE);
+
+                sum += serials.size();
+                System.out.println("CA " + caInfo.getName() + " republished " + sum + " certificates");
             } while(serials.size() >= numEntries);
 
             if(caInfo.getRevocationInfo() != null)
