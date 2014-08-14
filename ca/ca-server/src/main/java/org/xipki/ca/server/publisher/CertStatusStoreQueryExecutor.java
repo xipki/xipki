@@ -16,7 +16,6 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Savepoint;
 import java.sql.Statement;
 import java.sql.Types;
 import java.util.Date;
@@ -255,17 +254,17 @@ class CertStatusStoreQueryExecutor
                 conn.setAutoCommit(false);
                 try
                 {
-                    Savepoint savepoint = conn.setSavepoint();
-                    try{
-	                    ps_addcert.executeUpdate();
-	                    ps_addRawcert.executeUpdate();
-	                    ps_addCerthash.executeUpdate();
-	                }catch(SQLException e)
-	                {
-	                	conn.rollback(savepoint);
-	                    throw e;
-	                }
-                    conn.commit();
+                    try
+                    {
+                        ps_addcert.executeUpdate();
+                        ps_addRawcert.executeUpdate();
+                        ps_addCerthash.executeUpdate();
+                        conn.commit();
+                    }catch(SQLException e)
+                    {
+                        conn.rollback();
+                        throw e;
+                    }
                 }
                 finally
                 {
