@@ -24,6 +24,7 @@ import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 
 import org.xipki.database.api.DataSourceWrapper;
+import org.xipki.security.common.AbstractLoadTest;
 import org.xipki.security.common.IoCertUtil;
 import org.xipki.security.common.ParamChecker;
 import org.xml.sax.SAXException;
@@ -146,6 +147,12 @@ public class DbPorter
     {
         return dataSource.getMax(connection, table, column);
     }
+    
+    public int getCount(String table)
+    throws SQLException
+    {
+        return dataSource.getCount(connection, table);
+    }
 
     public boolean tableHasColumn(String table, String column)
     throws SQLException
@@ -176,15 +183,15 @@ public class DbPorter
     protected Savepoint setSavepoint()
     throws SQLException
     {
-    	return connection.setSavepoint();
+        return connection.setSavepoint();
     }
-    
-    protected void rollback(Savepoint savepoint)
+
+    protected void rollback()
     throws SQLException
     {
-    	connection.rollback(savepoint);
+        connection.rollback();
     }
-    
+
     protected void disableAutoCommit()
     throws SQLException
     {
@@ -232,6 +239,54 @@ public class DbPorter
         }
 
         return props;
+    }
+
+    public static void printHeader()
+    {
+        System.out.println("-----------------------------------------");
+        System.out.println(" processed   percent      time       #/s");
+    }
+
+    public static void printTrailer()
+    {
+        System.out.println("\n-----------------------------------------");
+    }
+
+    public static void printStatus(long total, long currentAccount, long startTime)
+    {
+        long now = System.currentTimeMillis();
+        String accountS = Long.toString(currentAccount);
+        StringBuilder sb = new StringBuilder("\r");
+
+        // 10 characters for processed account
+        for (int i = 0; i < 10 -accountS.length(); i++)
+        {
+            sb.append(" ");
+        }
+        sb.append(currentAccount);
+
+        // 10 characters for processed percent
+        String percent = Long.toString(currentAccount * 100 / total);
+        for (int i = 0; i < 9 -percent.length(); i++)
+        {
+            sb.append(" ");
+        }
+        sb.append(percent).append('%');
+
+        long t = (now - startTime)/1000;  // in s
+        String time = AbstractLoadTest.formatTime(t);
+        sb.append("  ");
+        sb.append(time);
+
+        String averageS = (t > 0) ? Long.toString(currentAccount / t) : "";
+        for (int i = 0; i < 10 -averageS.length(); i++)
+        {
+            sb.append(" ");
+        }
+        sb.append(averageS);
+
+        System.out.print(sb.toString());
+        System.out.flush();
     }
 
 }

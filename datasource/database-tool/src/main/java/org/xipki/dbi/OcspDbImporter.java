@@ -23,6 +23,7 @@ import org.xipki.database.api.DataSourceWrapper;
 import org.xipki.dbi.ocsp.jaxb.ObjectFactory;
 import org.xipki.security.api.PasswordResolver;
 import org.xipki.security.api.PasswordResolverException;
+import org.xipki.security.common.AbstractLoadTest;
 import org.xipki.security.common.IoCertUtil;
 
 /**
@@ -50,10 +51,12 @@ public class OcspDbImporter
     public void importDatabase(String srcFolder)
     throws Exception
     {
+        long start = System.currentTimeMillis();
         // CertStore
         try
         {
-            OcspCertStoreDbImporter certStoreImporter = new OcspCertStoreDbImporter(dataSource, unmarshaller, srcFolder);
+            OcspCertStoreDbImporter certStoreImporter =
+                    new OcspCertStoreDbImporter(dataSource, unmarshaller, srcFolder);
             certStoreImporter.importToDB();
             certStoreImporter.shutdown();
         } finally
@@ -65,6 +68,8 @@ public class OcspDbImporter
             {
                 LOG.error("dataSource.shutdown()", e);
             }
+            long end = System.currentTimeMillis();
+            System.out.println("Finished in " + AbstractLoadTest.formatTime((end - start) / 1000).trim());
         }
     }
 

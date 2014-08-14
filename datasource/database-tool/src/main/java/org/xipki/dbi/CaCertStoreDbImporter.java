@@ -18,7 +18,6 @@ import java.security.cert.X509CRL;
 import java.security.cert.X509Certificate;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.sql.Savepoint;
 import java.sql.Types;
 import java.util.List;
 import java.util.zip.ZipEntry;
@@ -81,7 +80,7 @@ class CaCertStoreDbImporter extends DbPorter
     {
         @SuppressWarnings("unchecked")
         JAXBElement<CertStoreType> root = (JAXBElement<CertStoreType>)
-                unmarshaller.unmarshal(new File(baseDir + File.separator + FILENAME_CA_CertStore));
+                unmarshaller.unmarshal(new File(baseDir, FILENAME_CA_CertStore));
         CertStoreType certstore = root.getValue();
         if(certstore.getVersion() > VERSION)
         {
@@ -434,22 +433,26 @@ class CaCertStoreDbImporter extends DbPorter
     private void import_cert(CertsFiles certsfiles)
     throws Exception
     {
+        final long total = certsfiles.getCountCerts();
+        final long startTime = System.currentTimeMillis();
         int sum = 0;
+
+        System.out.println("Importing certificates");
+        printHeader();
+
         for(String certsFile : certsfiles.getCertsFile())
         {
-            System.out.println("Importing certificates from file " + certsFile);
-
             try
             {
                 sum += do_import_cert(certsFile);
-                System.out.println(" Imported certificates from file " + certsFile);
-                System.out.println(" Imported " + sum + " certificates ...");
+                printStatus(total, sum, startTime);
             }catch(Exception e)
             {
                 System.err.println("Error while importing certificates from file " + certsFile);
                 throw e;
             }
         }
+        printTrailer();
         System.out.println(" Imported " + sum + " certificates");
     }
 
@@ -542,22 +545,17 @@ class CaCertStoreDbImporter extends DbPorter
                 ps_rawcert.setString(2, hexSha1FpCert);
                 ps_rawcert.setString(3, Base64.toBase64String(encodedCert));
                 ps_rawcert.addBatch();
+            }
 
-                if((i + 1) % 100 == 0 || i == n - 1)
-                {
-                	Savepoint savepoint = setSavepoint();
-                    try
-                    {
-                        ps_cert.executeBatch();
-                        ps_rawcert.executeBatch();
-                    }catch(SQLException e)
-                    {
-                    	rollback(savepoint);
-                        throw e;
-                    }
-
-                    commit();
-                }
+            try
+            {
+                ps_cert.executeBatch();
+                ps_rawcert.executeBatch();
+                commit();
+            } catch(SQLException e)
+            {
+                rollback();
+                throw e;
             }
 
             return n;

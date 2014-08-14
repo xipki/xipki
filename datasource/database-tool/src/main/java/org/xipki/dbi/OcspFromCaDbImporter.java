@@ -30,14 +30,15 @@ import org.xipki.security.common.IoCertUtil;
  * @author Lijun Liao
  */
 
-public class CaDbImporter
+public class OcspFromCaDbImporter
 {
-    private static final Logger LOG = LoggerFactory.getLogger(CaDbImporter.class);
+    private static final Logger LOG = LoggerFactory.getLogger(OcspFromCaDbImporter.class);
     private final DataSourceWrapper dataSource;
     private final Unmarshaller unmarshaller;
+    private final String publisherName;
 
-    public CaDbImporter(DataSourceFactory dataSourceFactory,
-            PasswordResolver passwordResolver, String dbConfFile)
+    public OcspFromCaDbImporter(DataSourceFactory dataSourceFactory,
+            PasswordResolver passwordResolver, String dbConfFile, String publisherName)
     throws SQLException, PasswordResolverException, IOException, JAXBException
     {
         Properties props = DbPorter.getDbConfProperties(
@@ -46,22 +47,18 @@ public class CaDbImporter
         JAXBContext jaxbContext = JAXBContext.newInstance(ObjectFactory.class);
         unmarshaller = jaxbContext.createUnmarshaller();
         unmarshaller.setSchema(DbPorter.retrieveSchema("/xsd/dbi-ca.xsd"));
+        this.publisherName = publisherName;
     }
 
     public void importDatabase(String srcFolder)
     throws Exception
     {
         long start = System.currentTimeMillis();
+        // CertStore
         try
         {
-            // CAConfiguration
-            CaConfigurationDbImporter caConfImporter = new CaConfigurationDbImporter(
-                    dataSource, unmarshaller, srcFolder);
-            caConfImporter.importToDB();
-            caConfImporter.shutdown();
-
-            // CertStore
-            CaCertStoreDbImporter certStoreImporter = new CaCertStoreDbImporter(dataSource, unmarshaller, srcFolder);
+            OcspCertStoreFromCaDbImporter certStoreImporter =
+                    new OcspCertStoreFromCaDbImporter(dataSource, unmarshaller, srcFolder, publisherName);
             certStoreImporter.importToDB();
             certStoreImporter.shutdown();
         } finally

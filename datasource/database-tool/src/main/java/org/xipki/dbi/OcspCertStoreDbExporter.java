@@ -75,7 +75,7 @@ class OcspCertStoreDbExporter extends DbPorter
         certstore.setCertsFiles(export_cert());
 
         JAXBElement<CertStoreType> root = new ObjectFactory().createCertStore(certstore);
-        marshaller.marshal(root, new File(baseDir + File.separator + FILENAME_OCSP_CertStore));
+        marshaller.marshal(root, new File(baseDir, FILENAME_OCSP_CertStore));
         System.out.println(" Exported OCSP certstore from database");
     }
 
@@ -147,7 +147,8 @@ class OcspCertStoreDbExporter extends DbPorter
 
         final int minCertId = getMin("CERT", "ID");
         final int maxCertId = getMax("CERT", "ID");
-
+        final long total = getCount("CERT");
+        
         PreparedStatement certPs = prepareStatement(certSql);
         PreparedStatement rawCertPs = prepareStatement(rawCertSql);
 
@@ -155,7 +156,7 @@ class OcspCertStoreDbExporter extends DbPorter
 
         CertsType certsInCurrentFile = new CertsType();
 
-        int sum = 0;
+        long sum = 0;
         final int n = 100;
 
         File currentCertsZipFile = new File(baseDir, "tmp-certs-" + System.currentTimeMillis() + ".zip");
@@ -164,6 +165,9 @@ class OcspCertStoreDbExporter extends DbPorter
 
         int minCertIdOfCurrentFile = -1;
         int maxCertIdOfCurrentFile = -1;
+
+        final long startTime = System.currentTimeMillis();
+        printHeader();
 
         try
         {
@@ -216,7 +220,6 @@ class OcspCertStoreDbExporter extends DbPorter
                     {
                         String msg = "Found no certificate in table RAWCERT for cert_id '" + id + "'";
                         LOG.error(msg);
-                        System.out.println(msg);
                         continue;
                     }
 
@@ -279,8 +282,7 @@ class OcspCertStoreDbExporter extends DbPorter
 
                         certsFiles.getCertsFile().add(currentCertsFilename);
 
-                        System.out.println(" Exported " + numCertInCurrentFile + " certificates in " + currentCertsFilename);
-                        System.out.println(" Exported " + sum + " certificates ...");
+                        printStatus(total, sum, startTime);
 
                         // reset
                         certsInCurrentFile = new CertsType();
@@ -307,7 +309,7 @@ class OcspCertStoreDbExporter extends DbPorter
 
                 certsFiles.getCertsFile().add(currentCertsFilename);
 
-                System.out.println(" Exported " + numCertInCurrentFile + " certificates in " + currentCertsFilename);
+                printStatus(total, sum, startTime);
             }
             else
             {
@@ -321,6 +323,9 @@ class OcspCertStoreDbExporter extends DbPorter
             releaseResources(rawCertPs, null);
         }
 
+        certsFiles.setCountCerts(sum);
+
+        printTrailer();
         System.out.println(" Exported " + sum + " certificates from tables cert, certhash and rawcert");
         return certsFiles;
     }

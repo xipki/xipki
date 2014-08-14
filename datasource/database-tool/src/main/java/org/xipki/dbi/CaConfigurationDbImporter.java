@@ -66,7 +66,7 @@ class CaConfigurationDbImporter extends DbPorter
     {
         @SuppressWarnings("unchecked")
         JAXBElement<CAConfigurationType> root = (JAXBElement<CAConfigurationType>)
-                unmarshaller.unmarshal(new File(baseDir + File.separator + FILENAME_CA_Configuration));
+                unmarshaller.unmarshal(new File(baseDir, FILENAME_CA_Configuration));
         CAConfigurationType caconf = root.getValue();
 
         if(caconf.getVersion() > VERSION)
@@ -331,7 +331,8 @@ class CaConfigurationDbImporter extends DbPorter
                         String confFilename = certprofile.getConfFile();
                         if(confFilename != null)
                         {
-                            conf = new String(IoCertUtil.read(confFilename));
+                            File confFile = new File(baseDir, confFilename);
+                            conf = new String(IoCertUtil.read(confFile));
                         }
                     }
                     ps.setString(idx++, conf);

@@ -266,6 +266,33 @@ public class DataSourceWrapperImpl implements DataSourceWrapper
             }
         }
     }
+    
+    @Override
+    public int getCount(Connection conn, String table)
+    throws SQLException
+    {
+        Statement stmt = null;
+        ResultSet rs = null;
+        try
+        {
+            stmt = (conn != null) ? conn.createStatement() : getConnection().createStatement();
+            final String sql = "SELECT COUNT(*) FROM " + table;
+            rs = stmt.executeQuery(sql);
+
+            rs.next();
+            return rs.getInt(1);
+        }finally
+        {
+            if(conn == null)
+            {
+                releaseResources(stmt, rs);
+            }
+            else
+            {
+                releaseStatementAndResultSet(stmt, rs);
+            }
+        }
+    }
 
     @Override
     public int getMax(Connection conn, String table, String column)
