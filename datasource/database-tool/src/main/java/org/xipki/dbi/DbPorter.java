@@ -147,7 +147,7 @@ public class DbPorter
     {
         return dataSource.getMax(connection, table, column);
     }
-    
+
     public int getCount(String table)
     throws SQLException
     {
