@@ -148,7 +148,7 @@ class OcspCertStoreDbExporter extends DbPorter
         final int minCertId = getMin("CERT", "ID");
         final int maxCertId = getMax("CERT", "ID");
         final long total = getCount("CERT");
-        
+
         PreparedStatement certPs = prepareStatement(certSql);
         PreparedStatement rawCertPs = prepareStatement(rawCertSql);
 
