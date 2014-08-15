@@ -21,9 +21,11 @@ import org.xipki.security.api.PasswordResolver;
 @Command(scope = "dbtool", name = "import-ocspfromca", description="Import OCSP database from CA data")
 public class ImportOcspFromCaCommand extends XipkiOsgiCommandSupport
 {
+    private static final String DFLT_DBCONF_FILE = "ca-config/ocsp-db.properties";
+    private static final String DFLT_PUBLISHER = "OCSP.PUBLISHER";
+
     @Option(name = "-dbconf",
-            description = "Required. Database configuration file",
-            required = true)
+            description = "Database configuration file.\nDefault is " + DFLT_DBCONF_FILE)
     protected String dbconfFile;
 
     @Option(name = "-indir",
@@ -32,8 +34,7 @@ public class ImportOcspFromCaCommand extends XipkiOsgiCommandSupport
     protected String indir;
 
     @Option(name = "-publisher",
-            description = "Publisher name",
-            required = true)
+            description = "Publisher name. Default is " + DFLT_PUBLISHER)
     protected String publisherName;
 
     private DataSourceFactory dataSourceFactory;
@@ -43,6 +44,14 @@ public class ImportOcspFromCaCommand extends XipkiOsgiCommandSupport
     protected Object doExecute()
     throws Exception
     {
+        if(dbconfFile == null)
+        {
+            dbconfFile = DFLT_DBCONF_FILE;
+        }
+        if(publisherName == null)
+        {
+            publisherName = DFLT_PUBLISHER;
+        }
         OcspFromCaDbImporter importer = new OcspFromCaDbImporter(
                 dataSourceFactory, passwordResolver, dbconfFile, publisherName);
         importer.importDatabase(indir);
