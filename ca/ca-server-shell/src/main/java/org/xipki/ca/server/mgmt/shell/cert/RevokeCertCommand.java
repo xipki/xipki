@@ -12,7 +12,6 @@ import java.math.BigInteger;
 import org.apache.felix.gogo.commands.Command;
 import org.apache.felix.gogo.commands.Option;
 import org.xipki.ca.server.X509CA;
-import org.xipki.ca.server.mgmt.shell.CaCommand;
 import org.xipki.ca.server.store.CertWithRevocationInfo;
 import org.xipki.security.common.CRLReason;
 
@@ -21,7 +20,7 @@ import org.xipki.security.common.CRLReason;
  */
 
 @Command(scope = "ca", name = "revoke-cert", description="Revoke certificate")
-public class RevokeCertCommand extends CaCommand
+public class RevokeCertCommand extends CaCertCommand
 {
     @Option(name = "-ca",
             required = true, description = "Required. CA name")

@@ -15,7 +15,7 @@
   <dependencies>
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>ca-api</artifactId>
+      <artifactId>ca-mgmt-api</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
@@ -40,15 +40,6 @@
   </dependencies>
   <build>
     <plugins>
-      <plugin>
-        <groupId>org.apache.felix</groupId>
-        <artifactId>maven-bundle-plugin</artifactId>
-        <configuration>
-          <instructions>
-            <DynamicImport-Package>*</DynamicImport-Package>
-          </instructions>
-        </configuration>
-      </plugin>
       <plugin>
         <groupId>org.jvnet.jaxb2.maven2</groupId>
         <artifactId>maven-jaxb2-plugin</artifactId>

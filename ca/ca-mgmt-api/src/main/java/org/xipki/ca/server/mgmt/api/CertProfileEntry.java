@@ -5,13 +5,11 @@
  *
  */
 
-package org.xipki.ca.server.mgmt;
+package org.xipki.ca.server.mgmt.api;
 
 import org.xipki.ca.api.profile.CertProfile;
 import org.xipki.ca.api.profile.CertProfileException;
 import org.xipki.ca.api.profile.SpecialCertProfileBehavior;
-import org.xipki.ca.server.IdentifiedCertProfile;
-import org.xipki.ca.server.certprofile.DefaultCertProfile;
 import org.xipki.security.common.EnvironmentParameterResolver;
 import org.xipki.security.common.ParamChecker;
 
@@ -73,13 +71,11 @@ public class CertProfileEntry
         }
 
         CertProfile underlyingCertProfile = null;
-        if(type.equalsIgnoreCase("xml"))
+
+        String _type = "xml".equalsIgnoreCase(type) ? "java:org.xipki.ca.server.certprofile.DefaultCertProfile" : type;
+        if(_type.toLowerCase().startsWith("java:"))
         {
-            underlyingCertProfile = new DefaultCertProfile();
-        }
-        else if(type.toLowerCase().startsWith("java:"))
-        {
-            String className = type.substring("java:".length());
+            String className = _type.substring("java:".length());
             try
             {
                 Class<?> clazz = Class.forName(className);

@@ -5,7 +5,7 @@
  *
  */
 
-package org.xipki.ca.server.mgmt;
+package org.xipki.ca.server.mgmt.api;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -13,8 +13,6 @@ import java.util.Map;
 import org.xipki.audit.api.AuditLoggingServiceRegister;
 import org.xipki.ca.api.publisher.CertPublisher;
 import org.xipki.ca.api.publisher.CertPublisherException;
-import org.xipki.ca.server.IdentifiedCertPublisher;
-import org.xipki.ca.server.publisher.DefaultCertPublisher;
 import org.xipki.database.api.DataSourceWrapper;
 import org.xipki.security.api.PasswordResolver;
 import org.xipki.security.common.ParamChecker;
@@ -88,14 +86,12 @@ public class PublisherEntry
             return this.certPublisher;
         }
 
+        String _type = "ocsp".equalsIgnoreCase(type) ? "java:org.xipki.ca.server.publisher.DefaultCertPublisher" : type;
+
         CertPublisher realPublisher;
-        if(type.equalsIgnoreCase("ocsp"))
+        if(_type.toLowerCase().startsWith("java:"))
         {
-            realPublisher = new DefaultCertPublisher();
-        }
-        else if(type.toLowerCase().startsWith("java:"))
-        {
-            String className = type.substring("java:".length());
+            String className = _type.substring("java:".length());
             try
             {
                 Class<?> clazz = Class.forName(className);

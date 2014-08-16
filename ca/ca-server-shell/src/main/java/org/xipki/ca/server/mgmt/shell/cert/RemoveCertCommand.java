@@ -13,14 +13,13 @@ import org.apache.felix.gogo.commands.Command;
 import org.apache.felix.gogo.commands.Option;
 import org.xipki.ca.common.X509CertificateWithMetaInfo;
 import org.xipki.ca.server.X509CA;
-import org.xipki.ca.server.mgmt.shell.CaCommand;
 
 /**
  * @author Lijun Liao
  */
 
 @Command(scope = "ca", name = "remove-cert", description="Remove certificate")
-public class RemoveCertCommand extends CaCommand
+public class RemoveCertCommand extends CaCertCommand
 {
     @Option(name = "-ca",
             required = true, description = "Required. CA name")

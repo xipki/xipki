@@ -7,7 +7,7 @@
 
 package org.xipki.ca.server.mgmt.shell.completer;
 
-import org.xipki.ca.server.mgmt.CAManager;
+import org.xipki.ca.server.mgmt.api.CAManager;
 import org.xipki.console.karaf.DynamicEnumCompleter;
 
 /**

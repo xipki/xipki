@@ -14,7 +14,7 @@ import java.util.Set;
 
 import org.apache.felix.gogo.commands.Argument;
 import org.apache.felix.gogo.commands.Command;
-import org.xipki.ca.server.mgmt.PublisherEntry;
+import org.xipki.ca.server.mgmt.api.PublisherEntry;
 
 /**
  * @author Lijun Liao

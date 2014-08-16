@@ -11,7 +11,7 @@ import java.util.Set;
 
 import org.apache.felix.gogo.commands.Command;
 import org.apache.felix.gogo.commands.Option;
-import org.xipki.ca.server.mgmt.CAHasRequestorEntry;
+import org.xipki.ca.server.mgmt.api.CAHasRequestorEntry;
 
 /**
  * @author Lijun Liao

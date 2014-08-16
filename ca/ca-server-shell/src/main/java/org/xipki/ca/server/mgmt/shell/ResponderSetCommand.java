@@ -11,7 +11,7 @@ import java.security.cert.X509Certificate;
 
 import org.apache.felix.gogo.commands.Command;
 import org.apache.felix.gogo.commands.Option;
-import org.xipki.ca.server.mgmt.CmpResponderEntry;
+import org.xipki.ca.server.mgmt.api.CmpResponderEntry;
 import org.xipki.security.api.PasswordResolver;
 import org.xipki.security.api.SecurityFactory;
 import org.xipki.security.common.IoCertUtil;
