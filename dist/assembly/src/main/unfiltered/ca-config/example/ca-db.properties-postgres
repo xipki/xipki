@@ -13,7 +13,7 @@ dataSource.databaseName = ca
 dataSource.user = root
 dataSource.password = 123456
 
-dataSource.prepareThreshold = 256
+dataSource.prepareThreshold = 0
 
 autoCommit = true
 readOnly = false
