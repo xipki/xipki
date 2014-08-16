@@ -45,7 +45,7 @@ public interface DataSourceWrapper
 
     int getMax(Connection conn, String table, String column)
     throws SQLException;
-    
+
     int getCount(Connection conn, String table)
     throws SQLException;
 
