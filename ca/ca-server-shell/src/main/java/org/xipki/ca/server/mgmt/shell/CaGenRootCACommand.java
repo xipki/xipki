@@ -17,7 +17,6 @@ import org.apache.felix.gogo.commands.Option;
 import org.xipki.ca.api.CAStatus;
 import org.xipki.ca.api.OperationException;
 import org.xipki.ca.api.OperationException.ErrorCode;
-import org.xipki.ca.server.RandomSerialNumberGenerator;
 import org.xipki.ca.server.mgmt.api.CAEntry;
 import org.xipki.ca.server.mgmt.api.CertProfileEntry;
 import org.xipki.ca.server.mgmt.api.DuplicationMode;
@@ -26,6 +25,7 @@ import org.xipki.ca.server.mgmt.api.Permission;
 import org.xipki.ca.server.mgmt.api.ValidityMode;
 import org.xipki.ca.server.mgmt.shell.SelfSignedCertBuilder.GenerateSelfSignedResult;
 import org.xipki.security.common.ConfigurationException;
+import org.xipki.security.common.RandomSerialNumberGenerator;
 
 /**
  * @author Lijun Liao

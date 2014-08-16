@@ -11,8 +11,8 @@ import java.math.BigInteger;
 
 import org.apache.felix.gogo.commands.Command;
 import org.apache.felix.gogo.commands.Option;
-import org.xipki.ca.server.X509CA;
-import org.xipki.ca.server.store.CertWithRevocationInfo;
+import org.xipki.ca.server.mgmt.api.CAEntry;
+import org.xipki.ca.server.mgmt.shell.CaCommand;
 import org.xipki.security.common.CRLReason;
 
 /**
@@ -20,7 +20,7 @@ import org.xipki.security.common.CRLReason;
  */
 
 @Command(scope = "ca", name = "revoke-cert", description="Revoke certificate")
-public class RevokeCertCommand extends CaCertCommand
+public class RevokeCertCommand extends CaCommand
 {
     @Option(name = "-ca",
             required = true, description = "Required. CA name")
@@ -47,7 +47,7 @@ public class RevokeCertCommand extends CaCertCommand
     protected Object doExecute()
     throws Exception
     {
-        X509CA ca = caManager.getX509CA(caName);
+        CAEntry ca = caManager.getCA(caName);
         if(ca == null)
         {
             System.err.println("CA " + caName + " not available");
@@ -67,10 +67,9 @@ public class RevokeCertCommand extends CaCertCommand
             return null;
         }
 
-        CertWithRevocationInfo certWithRevInfo =
-                ca.revokeCertificate(BigInteger.valueOf(serialNumber), crlReason, null);
+        boolean successful = caManager.revokeCertificate(caName, BigInteger.valueOf(serialNumber), crlReason, null);
 
-        if(certWithRevInfo != null)
+        if(successful)
         {
             System.out.println("Revoked certificate");
         }

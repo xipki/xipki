@@ -7,13 +7,16 @@
 
 package org.xipki.ca.server.mgmt.api;
 
+import java.math.BigInteger;
 import java.security.cert.X509Certificate;
+import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
 import org.xipki.ca.api.CAMgmtException;
 import org.xipki.ca.api.CAStatus;
 import org.xipki.ca.common.CASystemStatus;
+import org.xipki.security.common.CRLReason;
 import org.xipki.security.common.CertRevocationInfo;
 import org.xipki.security.common.EnvironmentParameterResolver;
 
@@ -200,4 +203,17 @@ public interface CAManager
 
     void unrevokeCa(String caName)
     throws CAMgmtException;
+
+    boolean revokeCertificate(String caName, BigInteger serialNumber, CRLReason reason, Date invalidityTime)
+    throws CAMgmtException;
+
+    boolean unrevokeCertificate(String caName, BigInteger serialNumber)
+    throws CAMgmtException;
+
+    boolean removeCertificate(String caName, BigInteger serialNumber)
+    throws CAMgmtException;
+
+    X509Certificate generateCertificate(String caName, String profileName, String user, byte[] encodedPkcs10Request)
+    throws CAMgmtException;
+
 }

@@ -7,18 +7,15 @@
 
 package org.xipki.ca.server.mgmt;
 
-import org.xipki.ca.server.X509CA;
 import org.xipki.ca.server.X509CACmpResponder;
-import org.xipki.ca.server.mgmt.api.CAManager;
 
 /**
  * @author Lijun Liao
  */
 
-public interface ExtendedCAManager extends CAManager
+public interface CmpResponderManager
 {
-    X509CA getX509CA(String caName);
+    String getCaName(String caAlias);
 
     X509CACmpResponder getX509CACmpResponder(String caName);
-
 }
