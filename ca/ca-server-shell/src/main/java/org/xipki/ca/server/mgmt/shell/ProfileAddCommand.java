@@ -9,7 +9,7 @@ package org.xipki.ca.server.mgmt.shell;
 
 import org.apache.felix.gogo.commands.Command;
 import org.apache.felix.gogo.commands.Option;
-import org.xipki.ca.server.mgmt.CertProfileEntry;
+import org.xipki.ca.server.mgmt.api.CertProfileEntry;
 import org.xipki.security.common.IoCertUtil;
 
 /**

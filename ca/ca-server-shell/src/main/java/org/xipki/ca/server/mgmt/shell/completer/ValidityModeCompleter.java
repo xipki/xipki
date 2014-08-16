@@ -7,7 +7,7 @@
 
 package org.xipki.ca.server.mgmt.shell.completer;
 
-import org.xipki.ca.server.mgmt.ValidityMode;
+import org.xipki.ca.server.mgmt.api.ValidityMode;
 import org.xipki.console.karaf.EnumCompleter;
 
 /**

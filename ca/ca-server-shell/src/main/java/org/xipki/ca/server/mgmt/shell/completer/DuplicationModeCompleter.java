@@ -7,7 +7,7 @@
 
 package org.xipki.ca.server.mgmt.shell.completer;
 
-import org.xipki.ca.server.mgmt.DuplicationMode;
+import org.xipki.ca.server.mgmt.api.DuplicationMode;
 import org.xipki.console.karaf.EnumCompleter;
 
 /**

@@ -5,8 +5,9 @@
  *
  */
 
-package org.xipki.ca.server.mgmt.shell;
+package org.xipki.ca.server.mgmt.shell.cert;
 
+import org.xipki.ca.server.mgmt.ExtendedCAManager;
 import org.xipki.ca.server.mgmt.api.CAManager;
 import org.xipki.ca.server.mgmt.api.DuplicationMode;
 import org.xipki.console.karaf.XipkiOsgiCommandSupport;
@@ -15,14 +16,11 @@ import org.xipki.console.karaf.XipkiOsgiCommandSupport;
  * @author Lijun Liao
  */
 
-public abstract class CaCommand extends XipkiOsgiCommandSupport
+public abstract class CaCertCommand extends XipkiOsgiCommandSupport
 {
-    public final static String permissionsText =
-            "enroll, revoke, unrevoke, remove, key-update, gen-crl, get-crl, enroll-cross, all";
+    protected ExtendedCAManager caManager;
 
-    protected CAManager caManager;
-
-    public void setCaManager(CAManager caManager)
+    public void setCaManager(ExtendedCAManager caManager)
     {
         this.caManager = caManager;
     }
