@@ -21,9 +21,10 @@ import org.xipki.security.api.PasswordResolver;
 @Command(scope = "dbtool", name = "import-ocsp", description="Import OCSP database")
 public class ImportOcspCommand extends XipkiOsgiCommandSupport
 {
+    private static final String DFLT_DBCONF_FILE = "ca-config/ocsp-db.properties";
+
     @Option(name = "-dbconf",
-            description = "Required. Database configuration file",
-            required = true)
+            description = "Database configuration file.\nDefault is " + DFLT_DBCONF_FILE)
     protected String dbconfFile;
 
     @Option(name = "-indir",
@@ -38,6 +39,10 @@ public class ImportOcspCommand extends XipkiOsgiCommandSupport
     protected Object doExecute()
     throws Exception
     {
+        if(dbconfFile == null)
+        {
+            dbconfFile = DFLT_DBCONF_FILE;
+        }
         OcspDbImporter importer = new OcspDbImporter(dataSourceFactory, passwordResolver, dbconfFile);
         importer.importDatabase(indir);
         return null;
