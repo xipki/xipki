@@ -5,7 +5,7 @@
  *
  */
 
-package org.xipki.ca.server;
+package org.xipki.security.common;
 
 import java.math.BigInteger;
 import java.security.NoSuchAlgorithmException;

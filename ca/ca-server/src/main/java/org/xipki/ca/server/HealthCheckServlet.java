@@ -17,7 +17,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.ca.server.mgmt.ExtendedCAManager;
+import org.xipki.ca.server.mgmt.CmpResponderManager;
 import org.xipki.security.common.HealthCheckResult;
 import org.xipki.security.common.LogUtil;
 
@@ -33,7 +33,7 @@ public class HealthCheckServlet extends HttpServlet
 
     private static final String CT_RESPONSE = "application/json";
 
-    private ExtendedCAManager caManager;
+    private CmpResponderManager responderManager;
 
     public HealthCheckServlet()
     {
@@ -47,9 +47,9 @@ public class HealthCheckServlet extends HttpServlet
         response.setHeader("Access-Control-Allow-Origin", "*");
         try
         {
-            if(caManager == null)
+            if(responderManager == null)
             {
-                LOG.error("caManager in servlet not configured");
+                LOG.error("responderManager in servlet not configured");
                 response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
                 response.setContentLength(0);
                 return;
@@ -77,13 +77,13 @@ public class HealthCheckServlet extends HttpServlet
             String caAlias = (caAlias_end_index == -1) ?
                     constructedPath : constructedPath.substring(0, caAlias_end_index);
 
-            String caName = caManager.getCaName(caAlias);
+            String caName = responderManager.getCaName(caAlias);
             if(caName == null)
             {
                 caName = caAlias;
             }
 
-            X509CACmpResponder responder = caManager.getX509CACmpResponder(caName);
+            X509CACmpResponder responder = responderManager.getX509CACmpResponder(caName);
             if(responder == null || responder.isCAInService() == false)
             {
                 if(responder == null)
@@ -130,9 +130,9 @@ public class HealthCheckServlet extends HttpServlet
         response.flushBuffer();
     }
 
-    public void setCaManager(ExtendedCAManager caManager)
+    public void setResponderManager(CmpResponderManager responderManager)
     {
-        this.caManager = caManager;
+        this.responderManager = responderManager;
     }
 
 }

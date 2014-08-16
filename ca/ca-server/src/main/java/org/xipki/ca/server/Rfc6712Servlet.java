@@ -32,7 +32,7 @@ import org.xipki.audit.api.AuditLevel;
 import org.xipki.audit.api.AuditLoggingService;
 import org.xipki.audit.api.AuditLoggingServiceRegister;
 import org.xipki.audit.api.AuditStatus;
-import org.xipki.ca.server.mgmt.ExtendedCAManager;
+import org.xipki.ca.server.mgmt.CmpResponderManager;
 import org.xipki.security.common.LogUtil;
 
 /**
@@ -48,7 +48,8 @@ public class Rfc6712Servlet extends HttpServlet
     private static final String CT_REQUEST  = "application/pkixcmp";
     private static final String CT_RESPONSE = "application/pkixcmp";
 
-    private ExtendedCAManager caManager;
+    private CmpResponderManager responderManager;
+
     private AuditLoggingServiceRegister auditServiceRegister;
 
     public Rfc6712Servlet()
@@ -75,7 +76,7 @@ public class Rfc6712Servlet extends HttpServlet
         String auditMessage = null;
         try
         {
-            if(caManager == null)
+            if(responderManager == null)
             {
                 String message = "caManager in servlet not configured";
                 LOG.error(message);
@@ -120,13 +121,13 @@ public class Rfc6712Servlet extends HttpServlet
             String caAlias = (caAlias_end_index == -1) ?
                     constructedPath : constructedPath.substring(0, caAlias_end_index);
 
-            String caName = caManager.getCaName(caAlias);
+            String caName = responderManager.getCaName(caAlias);
             if(caName == null)
             {
                 caName = caAlias;
             }
 
-            X509CACmpResponder responder = caManager.getX509CACmpResponder(caName);
+            X509CACmpResponder responder = responderManager.getX509CACmpResponder(caName);
             if(responder == null || responder.isCAInService() == false)
             {
                 if(responder == null)
@@ -245,9 +246,9 @@ public class Rfc6712Servlet extends HttpServlet
         }
     }
 
-    public void setCaManager(ExtendedCAManager caManager)
+    public void setResponderManager(CmpResponderManager responderManager)
     {
-        this.caManager = caManager;
+        this.responderManager = responderManager;
     }
 
     public void setAuditServiceRegister(AuditLoggingServiceRegister auditServiceRegister)

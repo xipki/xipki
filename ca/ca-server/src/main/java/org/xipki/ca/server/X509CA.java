@@ -113,6 +113,7 @@ import org.xipki.security.common.IoCertUtil;
 import org.xipki.security.common.LogUtil;
 import org.xipki.security.common.ObjectIdentifiers;
 import org.xipki.security.common.ParamChecker;
+import org.xipki.security.common.RandomSerialNumberGenerator;
 
 /**
  * @author Lijun Liao

@@ -11,6 +11,7 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.math.BigInteger;
 import java.net.SocketException;
 import java.security.NoSuchProviderException;
 import java.security.Security;
@@ -39,6 +40,14 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
+import org.bouncycastle.asn1.ASN1Set;
+import org.bouncycastle.asn1.pkcs.Attribute;
+import org.bouncycastle.asn1.pkcs.CertificationRequest;
+import org.bouncycastle.asn1.pkcs.CertificationRequestInfo;
+import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
+import org.bouncycastle.asn1.x500.X500Name;
+import org.bouncycastle.asn1.x509.Extensions;
+import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.util.encoders.Base64;
 import org.slf4j.Logger;
@@ -63,6 +72,7 @@ import org.xipki.ca.server.X509CA;
 import org.xipki.ca.server.X509CACmpResponder;
 import org.xipki.ca.server.mgmt.api.CAEntry;
 import org.xipki.ca.server.mgmt.api.CAHasRequestorEntry;
+import org.xipki.ca.server.mgmt.api.CAManager;
 import org.xipki.ca.server.mgmt.api.CertProfileEntry;
 import org.xipki.ca.server.mgmt.api.CmpControlEntry;
 import org.xipki.ca.server.mgmt.api.CmpRequestorEntry;
@@ -96,7 +106,7 @@ import org.xipki.security.common.ParamChecker;
  * @author Lijun Liao
  */
 
-public class CAManagerImpl implements ExtendedCAManager
+public class CAManagerImpl implements CAManager, CmpResponderManager
 {
     private static final Logger LOG = LoggerFactory.getLogger(CAManagerImpl.class);
 
@@ -795,12 +805,6 @@ public class CAManagerImpl implements ExtendedCAManager
 
         LOG.info("Stopped CA system");
         auditLogPCIEvent(true, "SHUTDOWN");
-    }
-
-    @Override
-    public X509CA getX509CA(String caName)
-    {
-        return x509cas.get(caName);
     }
 
     @Override
@@ -3624,6 +3628,111 @@ public class CAManagerImpl implements ExtendedCAManager
     throws SQLException
     {
         ps.setInt(index, b ? 1 : 0);
+    }
+
+    @Override
+    public boolean revokeCertificate(String caName, BigInteger serialNumber,
+            CRLReason reason, Date invalidityTime)
+    throws CAMgmtException
+    {
+        X509CA ca = getX509CA(caName);
+        try
+        {
+            return ca.revokeCertificate(serialNumber, reason, invalidityTime) != null;
+        } catch (OperationException e)
+        {
+            throw new CAMgmtException(e.getMessage(), e);
+        }
+    }
+
+    @Override
+    public boolean unrevokeCertificate(String caName, BigInteger serialNumber)
+    throws CAMgmtException
+    {
+        X509CA ca = getX509CA(caName);
+        try
+        {
+            return ca.unrevokeCertificate(serialNumber) != null;
+        } catch (OperationException e)
+        {
+            throw new CAMgmtException(e.getMessage(), e);
+        }
+    }
+
+    @Override
+    public boolean removeCertificate(String caName, BigInteger serialNumber)
+    throws CAMgmtException
+    {
+        X509CA ca = getX509CA(caName);
+        try
+        {
+            return ca.removeCertificate(serialNumber) != null;
+        } catch (OperationException e)
+        {
+            throw new CAMgmtException(e.getMessage(), e);
+        }
+    }
+
+    @Override
+    public X509Certificate generateCertificate(String caName,
+            String profileName, String user, byte[] encodedPkcs10Request)
+    throws CAMgmtException
+    {
+        X509CA ca = getX509CA(caName);
+
+        CertificationRequest p10cr;
+        try
+        {
+            p10cr = CertificationRequest.getInstance(encodedPkcs10Request);
+        }catch(Exception e)
+        {
+            throw new CAMgmtException("Invalid PKCS#10 request. ERROR: " + e.getMessage());
+        }
+
+        if(securityFactory.verifyPOPO(p10cr) == false)
+        {
+            throw new CAMgmtException("could not validate POP for the pkcs#10 requst");
+        }
+        else
+        {
+            CertificationRequestInfo certTemp = p10cr.getCertificationRequestInfo();
+            Extensions extensions = null;
+            ASN1Set attrs = certTemp.getAttributes();
+            for(int i = 0; i < attrs.size(); i++)
+            {
+                Attribute attr = (Attribute) attrs.getObjectAt(i);
+                if(PKCSObjectIdentifiers.pkcs_9_at_extensionRequest.equals(attr.getAttrType()))
+                {
+                    extensions = (Extensions) attr.getAttributeValues()[0];
+                }
+            }
+
+            X500Name subject = certTemp.getSubject();
+            SubjectPublicKeyInfo publicKeyInfo = certTemp.getSubjectPublicKeyInfo();
+
+            CertificateInfo certInfo;
+            try
+            {
+                certInfo = ca.generateCertificate(false, profileName, user, subject, publicKeyInfo,
+                            null, null, extensions);
+            } catch (OperationException e)
+            {
+                throw new CAMgmtException(e.getMessage(), e);
+            }
+            ca.publishCertificate(certInfo);
+            return certInfo.getCert().getCert();
+        }
+    }
+
+    private X509CA getX509CA(String caName)
+    throws CAMgmtException
+    {
+        X509CA ca = x509cas.get(caName);
+        if(ca == null)
+        {
+            throw new CAMgmtException("Unknown CA " + caName);
+        }
+        return ca;
     }
 
 }
