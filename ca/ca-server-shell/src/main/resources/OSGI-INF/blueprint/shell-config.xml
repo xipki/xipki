@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0" xmlns:cm="http://aries.apache.org/blueprint/xmlns/blueprint-cm/v1.1.0" default-activation="lazy">
   <reference id="caManager" interface="org.xipki.ca.server.mgmt.api.CAManager"/>
-  <reference id="extendedCaManager" interface="org.xipki.ca.server.mgmt.ExtendedCAManager"/>
   <reference id="securityFactory" interface="org.xipki.security.api.SecurityFactory"/>
   <reference id="passwordResolver" interface="org.xipki.security.api.PasswordResolver"/>
   <reference id="filePathCompleter" interface="org.xipki.console.karaf.FilePathCompleter"/>
@@ -560,8 +559,7 @@
     <!-- Enroll Certificate -->
     <command name="ca/enroll-cert">
       <action class="org.xipki.ca.server.mgmt.shell.cert.EnrollCertCommand">
-        <property name="caManager" ref="extendedCaManager"/>
-        <property name="securityFactory" ref="securityFactory"/>
+        <property name="caManager" ref="caManager"/>
       </action>
       <optional-completers>
         <entry key="-ca" value-ref="caNameCompleter"/>
@@ -573,7 +571,7 @@
     <!-- Enroll Certificate -->
     <command name="ca/revoke-cert">
       <action class="org.xipki.ca.server.mgmt.shell.cert.RevokeCertCommand">
-        <property name="caManager" ref="extendedCaManager"/>
+        <property name="caManager" ref="caManager"/>
       </action>
       <optional-completers>
         <entry key="-ca" value-ref="caNameCompleter"/>
@@ -583,7 +581,7 @@
     <!-- Enroll Certificate -->
     <command name="ca/unrevoke-cert">
       <action class="org.xipki.ca.server.mgmt.shell.cert.UnrevokeCertCommand">
-        <property name="caManager" ref="extendedCaManager"/>
+        <property name="caManager" ref="caManager"/>
       </action>
       <optional-completers>
         <entry key="-ca" value-ref="caNameCompleter"/>
@@ -592,7 +590,7 @@
     <!-- Remove Certificate -->
     <command name="ca/remove-cert">
       <action class="org.xipki.ca.server.mgmt.shell.cert.RemoveCertCommand">
-        <property name="caManager" ref="extendedCaManager"/>
+        <property name="caManager" ref="caManager"/>
       </action>
       <optional-completers>
         <entry key="-ca" value-ref="caNameCompleter"/>
