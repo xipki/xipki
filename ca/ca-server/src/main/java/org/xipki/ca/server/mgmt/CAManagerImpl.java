@@ -59,10 +59,21 @@ import org.xipki.ca.common.CASystemStatus;
 import org.xipki.ca.common.X509CertificateWithMetaInfo;
 import org.xipki.ca.server.CmpRequestorInfo;
 import org.xipki.ca.server.CrlSigner;
-import org.xipki.ca.server.IdentifiedCertProfile;
-import org.xipki.ca.server.IdentifiedCertPublisher;
 import org.xipki.ca.server.X509CA;
 import org.xipki.ca.server.X509CACmpResponder;
+import org.xipki.ca.server.mgmt.api.CAEntry;
+import org.xipki.ca.server.mgmt.api.CAHasRequestorEntry;
+import org.xipki.ca.server.mgmt.api.CertProfileEntry;
+import org.xipki.ca.server.mgmt.api.CmpControlEntry;
+import org.xipki.ca.server.mgmt.api.CmpRequestorEntry;
+import org.xipki.ca.server.mgmt.api.CmpResponderEntry;
+import org.xipki.ca.server.mgmt.api.CrlSignerEntry;
+import org.xipki.ca.server.mgmt.api.DuplicationMode;
+import org.xipki.ca.server.mgmt.api.IdentifiedCertProfile;
+import org.xipki.ca.server.mgmt.api.IdentifiedCertPublisher;
+import org.xipki.ca.server.mgmt.api.Permission;
+import org.xipki.ca.server.mgmt.api.PublisherEntry;
+import org.xipki.ca.server.mgmt.api.ValidityMode;
 import org.xipki.ca.server.store.CertificateStore;
 import org.xipki.database.api.DataSourceFactory;
 import org.xipki.database.api.DataSourceWrapper;
@@ -85,7 +96,7 @@ import org.xipki.security.common.ParamChecker;
  * @author Lijun Liao
  */
 
-public class CAManagerImpl implements CAManager
+public class CAManagerImpl implements ExtendedCAManager
 {
     private static final Logger LOG = LoggerFactory.getLogger(CAManagerImpl.class);
 
@@ -118,7 +129,7 @@ public class CAManagerImpl implements CAManager
 
     private final DfltEnvironmentParameterResolver envParameterResolver = new DfltEnvironmentParameterResolver();
 
-    private CmpControl cmpControl;
+    private CmpControlEntry cmpControl;
 
     private ScheduledThreadPoolExecutor scheduledThreadPoolExecutor;
     private static final Map<String, X509CACmpResponder> responders = new ConcurrentHashMap<>();
@@ -1055,10 +1066,10 @@ public class CAManagerImpl implements CAManager
                 String conf = rs.getString("CONF");
 
                 CertProfileEntry entry = new CertProfileEntry(name);
-                entry.setEnvironmentParamterResolver(envParameterResolver);
                 entry.setType(type);
                 entry.setConf(conf);
-                certProfiles.put(entry.getName(), entry);
+                entry.setEnvironmentParamterResolver(envParameterResolver);
+                certProfiles.put(name, entry);
             }
         }catch(SQLException e)
         {
@@ -1141,7 +1152,7 @@ public class CAManagerImpl implements CAManager
                 entry.setConf(confPairs.getEncoded());
                 entry.setPasswordResolver(passwordResolver);
                 entry.setDataSource(ocspDataSource);
-                publishers.put(entry.getName(), entry);
+                publishers.put(name, entry);
             }
 
             if(errorMsg != null)
@@ -1244,7 +1255,7 @@ public class CAManagerImpl implements CAManager
                 int messageTimeBias = rs.getInt("MESSAGE_TIME_BIAS");
                 int confirmWaitTime = rs.getInt("CONFIRM_WAIT_TIME");
 
-                CmpControl entry = new CmpControl();
+                CmpControlEntry entry = new CmpControlEntry();
                 entry.setRequireConfirmCert(requireConfirmCert);
                 entry.setSendCaCert(sendCaCert);
                 entry.setSendResponderCert(sendResponderCert);
@@ -2698,6 +2709,7 @@ public class CAManagerImpl implements CAManager
         }
 
         dbEntry.setPasswordResolver(passwordResolver);
+        publishers.put(name, dbEntry);
     }
 
     @Override
@@ -2809,13 +2821,13 @@ public class CAManagerImpl implements CAManager
     }
 
     @Override
-    public CmpControl getCmpControl()
+    public CmpControlEntry getCmpControl()
     {
         return cmpControl;
     }
 
     @Override
-    public void setCmpControl(CmpControl dbEntry)
+    public void setCmpControl(CmpControlEntry dbEntry)
     throws CAMgmtException
     {
         if(cmpControl != null)

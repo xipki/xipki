@@ -11,7 +11,7 @@ import java.util.List;
 
 import org.apache.karaf.shell.console.Completer;
 import org.apache.karaf.shell.console.completer.StringsCompleter;
-import org.xipki.ca.server.mgmt.CAManager;
+import org.xipki.ca.server.mgmt.api.CAManager;
 
 /**
  * @author Lijun Liao

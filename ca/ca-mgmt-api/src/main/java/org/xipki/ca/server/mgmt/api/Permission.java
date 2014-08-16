@@ -5,7 +5,7 @@
  *
  */
 
-package org.xipki.ca.server.mgmt;
+package org.xipki.ca.server.mgmt.api;
 
 import java.util.Set;
 

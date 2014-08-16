@@ -8,7 +8,7 @@
 package org.xipki.ca.server.mgmt.shell;
 
 import org.apache.felix.gogo.commands.Command;
-import org.xipki.ca.cmp.server.CmpControl;
+import org.xipki.ca.server.mgmt.api.CmpControlEntry;
 
 /**
  * @author Lijun Liao
@@ -21,7 +21,7 @@ public class CmpControlListCommand extends CaCommand
     protected Object doExecute()
     throws Exception
     {
-        CmpControl cmpcontrol = caManager.getCmpControl();
+        CmpControlEntry cmpcontrol = caManager.getCmpControl();
         System.out.println(cmpcontrol);
         return null;
     }

@@ -27,7 +27,13 @@
     <property name="caConfFile" value="${caConfFile}"/>
     <property name="auditServiceRegister" ref="auditServiceRegister"/>
   </bean>
-  <service ref="caManager" interface="org.xipki.ca.server.mgmt.CAManager"/>
+  <service ref="caManager">
+    <interfaces>
+      <value>org.xipki.ca.server.mgmt.api.CAManager</value>
+      <value>org.xipki.ca.server.mgmt.ExtendedCAManager</value>
+    </interfaces>
+  </service>
+  
   <!-- create the servlet and inject our own app factory -->
   <bean id="caServlet" class="org.xipki.ca.server.Rfc6712Servlet">
     <property name="caManager" ref="caManager"/>

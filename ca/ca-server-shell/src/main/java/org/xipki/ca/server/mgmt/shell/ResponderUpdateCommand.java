@@ -12,7 +12,7 @@ import java.io.ByteArrayInputStream;
 import org.apache.felix.gogo.commands.Command;
 import org.apache.felix.gogo.commands.Option;
 import org.bouncycastle.util.encoders.Base64;
-import org.xipki.ca.server.mgmt.CAManager;
+import org.xipki.ca.server.mgmt.api.CAManager;
 import org.xipki.security.api.PasswordResolver;
 import org.xipki.security.common.IoCertUtil;
 

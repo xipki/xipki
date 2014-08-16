@@ -13,14 +13,13 @@ import org.apache.felix.gogo.commands.Command;
 import org.apache.felix.gogo.commands.Option;
 import org.xipki.ca.common.X509CertificateWithMetaInfo;
 import org.xipki.ca.server.X509CA;
-import org.xipki.ca.server.mgmt.shell.CaCommand;
 
 /**
  * @author Lijun Liao
  */
 
 @Command(scope = "ca", name = "unrevoke-cert", description="Unrevoke certificate")
-public class UnrevokeCertCommand extends CaCommand
+public class UnrevokeCertCommand extends CaCertCommand
 {
     @Option(name = "-ca",
             required = true, description = "Required. CA name")

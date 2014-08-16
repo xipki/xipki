@@ -5,7 +5,7 @@
  *
  */
 
-package org.xipki.ca.server.mgmt;
+package org.xipki.ca.server.mgmt.api;
 
 import java.math.BigInteger;
 import java.security.cert.CertificateEncodingException;
@@ -23,7 +23,6 @@ import org.bouncycastle.util.encoders.Base64;
 import org.xipki.ca.api.CAMgmtException;
 import org.xipki.ca.api.CAStatus;
 import org.xipki.ca.common.X509CertificateWithMetaInfo;
-import org.xipki.ca.server.PublicCAInfo;
 import org.xipki.security.common.CertRevocationInfo;
 import org.xipki.security.common.IoCertUtil;
 import org.xipki.security.common.ParamChecker;

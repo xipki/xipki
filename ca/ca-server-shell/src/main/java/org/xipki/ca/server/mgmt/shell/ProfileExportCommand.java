@@ -11,7 +11,7 @@ import java.io.File;
 
 import org.apache.felix.gogo.commands.Command;
 import org.apache.felix.gogo.commands.Option;
-import org.xipki.ca.server.mgmt.CertProfileEntry;
+import org.xipki.ca.server.mgmt.api.CertProfileEntry;
 
 /**
  * @author Lijun Liao

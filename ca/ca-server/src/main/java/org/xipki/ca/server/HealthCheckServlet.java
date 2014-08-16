@@ -17,7 +17,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.ca.server.mgmt.CAManager;
+import org.xipki.ca.server.mgmt.ExtendedCAManager;
 import org.xipki.security.common.HealthCheckResult;
 import org.xipki.security.common.LogUtil;
 
@@ -33,7 +33,7 @@ public class HealthCheckServlet extends HttpServlet
 
     private static final String CT_RESPONSE = "application/json";
 
-    private CAManager caManager;
+    private ExtendedCAManager caManager;
 
     public HealthCheckServlet()
     {
@@ -130,7 +130,7 @@ public class HealthCheckServlet extends HttpServlet
         response.flushBuffer();
     }
 
-    public void setCaManager(CAManager caManager)
+    public void setCaManager(ExtendedCAManager caManager)
     {
         this.caManager = caManager;
     }

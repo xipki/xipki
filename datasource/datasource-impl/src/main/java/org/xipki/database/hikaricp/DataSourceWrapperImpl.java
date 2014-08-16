@@ -266,7 +266,7 @@ public class DataSourceWrapperImpl implements DataSourceWrapper
             }
         }
     }
-    
+
     @Override
     public int getCount(Connection conn, String table)
     throws SQLException

@@ -32,7 +32,7 @@ import org.xipki.audit.api.AuditLevel;
 import org.xipki.audit.api.AuditLoggingService;
 import org.xipki.audit.api.AuditLoggingServiceRegister;
 import org.xipki.audit.api.AuditStatus;
-import org.xipki.ca.server.mgmt.CAManager;
+import org.xipki.ca.server.mgmt.ExtendedCAManager;
 import org.xipki.security.common.LogUtil;
 
 /**
@@ -48,7 +48,7 @@ public class Rfc6712Servlet extends HttpServlet
     private static final String CT_REQUEST  = "application/pkixcmp";
     private static final String CT_RESPONSE = "application/pkixcmp";
 
-    private CAManager caManager;
+    private ExtendedCAManager caManager;
     private AuditLoggingServiceRegister auditServiceRegister;
 
     public Rfc6712Servlet()
@@ -245,7 +245,7 @@ public class Rfc6712Servlet extends HttpServlet
         }
     }
 
-    public void setCaManager(CAManager caManager)
+    public void setCaManager(ExtendedCAManager caManager)
     {
         this.caManager = caManager;
     }

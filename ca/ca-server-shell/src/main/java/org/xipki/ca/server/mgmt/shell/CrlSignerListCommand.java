@@ -15,7 +15,7 @@ import java.util.Set;
 import org.apache.felix.gogo.commands.Argument;
 import org.apache.felix.gogo.commands.Command;
 import org.apache.felix.gogo.commands.Option;
-import org.xipki.ca.server.mgmt.CrlSignerEntry;
+import org.xipki.ca.server.mgmt.api.CrlSignerEntry;
 
 /**
  * @author Lijun Liao

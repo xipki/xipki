@@ -5,7 +5,7 @@
  *
  */
 
-package org.xipki.ca.server.mgmt;
+package org.xipki.ca.server.mgmt.api;
 
 import java.security.cert.X509Certificate;
 import java.util.List;
@@ -13,10 +13,7 @@ import java.util.Set;
 
 import org.xipki.ca.api.CAMgmtException;
 import org.xipki.ca.api.CAStatus;
-import org.xipki.ca.cmp.server.CmpControl;
 import org.xipki.ca.common.CASystemStatus;
-import org.xipki.ca.server.X509CA;
-import org.xipki.ca.server.X509CACmpResponder;
 import org.xipki.security.common.CertRevocationInfo;
 import org.xipki.security.common.EnvironmentParameterResolver;
 
@@ -54,10 +51,6 @@ public interface CAManager
     boolean restartCaSystem();
 
     EnvironmentParameterResolver getEnvParameterResolver();
-
-    X509CA getX509CA(String caName);
-
-    X509CACmpResponder getX509CACmpResponder(String caName);
 
     void addCaAlias(String aliasName, String caName)
     throws CAMgmtException;
@@ -180,9 +173,9 @@ public interface CAManager
     void changePublisher(String name, String type, String conf)
     throws CAMgmtException;
 
-    CmpControl getCmpControl();
+    CmpControlEntry getCmpControl();
 
-    void setCmpControl(CmpControl dbEntry)
+    void setCmpControl(CmpControlEntry dbEntry)
     throws CAMgmtException;
 
     void removeCmpControl()
