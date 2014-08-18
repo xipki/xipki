@@ -5,7 +5,7 @@
  *
  */
 
-package org.xipki.ca.cmp.server;
+package org.xipki.security.common;
 
 /**
  * @author Lijun Liao

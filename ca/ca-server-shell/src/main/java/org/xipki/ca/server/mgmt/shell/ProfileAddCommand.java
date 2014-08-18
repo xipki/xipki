@@ -42,18 +42,12 @@ public class ProfileAddCommand extends CaCommand
     protected Object doExecute()
     throws Exception
     {
-        CertProfileEntry entry = new CertProfileEntry(name);
-        entry.setType(type);
-
         if(conf == null && confFile != null)
         {
             conf = new String(IoCertUtil.read(confFile));
         }
-        if(conf != null)
-        {
-            entry.setConf(conf);
-        }
 
+        CertProfileEntry entry = new CertProfileEntry(name, type, conf);
         caManager.addCertProfile(entry);
 
         return null;

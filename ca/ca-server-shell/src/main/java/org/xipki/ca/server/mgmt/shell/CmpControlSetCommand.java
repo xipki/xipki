@@ -8,7 +8,7 @@
 package org.xipki.ca.server.mgmt.shell;
 
 import org.apache.felix.gogo.commands.Command;
-import org.xipki.ca.server.mgmt.api.CmpControlEntry;
+import org.xipki.security.common.CmpControl;
 
 /**
  * @author Lijun Liao
@@ -21,7 +21,7 @@ public class CmpControlSetCommand extends CmpControlSetOrUpdateCommand
     protected Object doExecute()
     throws Exception
     {
-        CmpControlEntry entry = new CmpControlEntry();
+        CmpControl entry = new CmpControl();
 
         boolean confirmCert = isEnabled(confirmCertS, false, "confirmCert");
         entry.setRequireConfirmCert(confirmCert);

@@ -77,7 +77,7 @@ public abstract class CmpResponder
     /**
      * @return never returns {@code null}.
      */
-    protected abstract CmpControl getCmpControl();
+    protected abstract org.xipki.security.common.CmpControl getCmpControl();
 
     protected abstract PKIMessage intern_processPKIMessage(RequestorInfo requestor, String user,
             ASN1OctetString transactionId, GeneralPKIMessage pkiMessage, AuditEvent auditEvent);
@@ -114,7 +114,7 @@ public abstract class CmpResponder
             auditEvent.addEventData(new AuditEventData("tid", tidStr));
         }
 
-        CmpControl cmpControl = getCmpControl();
+        org.xipki.security.common.CmpControl cmpControl = getCmpControl();
 
         Integer failureCode = null;
         String statusText = null;
