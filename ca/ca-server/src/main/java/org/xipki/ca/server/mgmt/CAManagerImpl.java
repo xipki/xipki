@@ -3723,11 +3723,11 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
         Set<String> publisherNames = ca_has_publishers.get(caName);
         if(publisherNames != null)
         {
-	        for(String publisherName : publisherNames)
-	        {
-	            PublisherEntryWrapper publisher = publishers.get(publisherName);
-	            ret.add(publisher.getCertPublisher());
-	        }
+            for(String publisherName : publisherNames)
+            {
+                PublisherEntryWrapper publisher = publishers.get(publisherName);
+                ret.add(publisher.getCertPublisher());
+            }
         }
         return ret;
     }
@@ -3787,7 +3787,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
         {
             result = SelfSignedCertBuilder.generateSelfSigned(
                     securityFactory, passwordResolver, signer_type, signer_conf,
-                    certProfile, subject, serialOfThisCert, ocsp_uris, crl_uris);
+                    certProfile, subject, serialOfThisCert, ocsp_uris, crl_uris, delta_crl_uris);
         } catch (OperationException | ConfigurationException e)
         {
             throw new CAMgmtException(e.getClass().getName() + ": " + e.getMessage(), e);
