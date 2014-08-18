@@ -77,7 +77,14 @@ public class DataSourceWrapperImpl implements DataSourceWrapper
     @Override
     public void shutdown()
     {
-        service.shutdown();
+        try
+        {
+            service.shutdown();
+        } catch (Exception e)
+        {
+            LOG.warn("Could not shutdown datasource: {}", e.getMessage());
+            LOG.debug("Could not close datasource", e);
+        }
     }
 
     public final PrintWriter getLogWriter()
