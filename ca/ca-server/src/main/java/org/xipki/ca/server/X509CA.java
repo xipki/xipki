@@ -87,17 +87,14 @@ import org.xipki.ca.api.profile.ExtensionTuples;
 import org.xipki.ca.api.profile.SpecialCertProfileBehavior;
 import org.xipki.ca.api.profile.SubjectInfo;
 import org.xipki.ca.api.profile.X509Util;
-import org.xipki.ca.api.publisher.CertPublisherException;
 import org.xipki.ca.api.publisher.CertificateInfo;
 import org.xipki.ca.common.X509CertificateWithMetaInfo;
 import org.xipki.ca.server.mgmt.CAManagerImpl;
+import org.xipki.ca.server.mgmt.IdentifiedCertProfile;
+import org.xipki.ca.server.mgmt.IdentifiedCertPublisher;
 import org.xipki.ca.server.mgmt.api.CAEntry;
-import org.xipki.ca.server.mgmt.api.CertProfileEntry;
 import org.xipki.ca.server.mgmt.api.DuplicationMode;
-import org.xipki.ca.server.mgmt.api.IdentifiedCertProfile;
-import org.xipki.ca.server.mgmt.api.IdentifiedCertPublisher;
 import org.xipki.ca.server.mgmt.api.PublicCAInfo;
-import org.xipki.ca.server.mgmt.api.PublisherEntry;
 import org.xipki.ca.server.mgmt.api.ValidityMode;
 import org.xipki.ca.server.store.CertWithRevocationInfo;
 import org.xipki.ca.server.store.CertificateStore;
@@ -1416,23 +1413,7 @@ public class X509CA
 
     private List<IdentifiedCertPublisher> getPublishers()
     {
-        List<PublisherEntry> dbEntries = caManager.getPublishersForCA(caInfo.getName());
-
-        List<IdentifiedCertPublisher> publishers = new ArrayList<>(dbEntries.size());
-        for(PublisherEntry dbEntry : dbEntries)
-        {
-            IdentifiedCertPublisher publisher = null;
-            try
-            {
-                publisher = dbEntry.getCertPublisher();
-            } catch (CertPublisherException e)
-            {
-                continue;
-            }
-
-            publishers.add(publisher);
-        }
-        return publishers;
+        return caManager.getIdentifiedPublishersForCa(caInfo.getName());
     }
 
     private CertificateInfo intern_generateCertificate(boolean requestedByRA,
@@ -1446,7 +1427,14 @@ public class X509CA
             boolean keyUpdate)
     throws OperationException
     {
-        IdentifiedCertProfile certProfile = getX509CertProfile(certProfileName);
+        IdentifiedCertProfile certProfile;
+        try
+        {
+            certProfile = getX509CertProfile(certProfileName);
+        } catch (CertProfileException e)
+        {
+             throw new OperationException(ErrorCode.System_Failure, "invalid configuration of cert profile " + certProfileName);
+        }
 
         if(certProfile == null)
         {
@@ -1995,6 +1983,7 @@ public class X509CA
     }
 
     public IdentifiedCertProfile getX509CertProfile(String certProfileName)
+    throws CertProfileException
     {
         if(certProfileName != null)
         {
@@ -2004,17 +1993,7 @@ public class X509CA
                 return null;
             }
 
-            CertProfileEntry dbEntry = caManager.getCertProfile(certProfileName);
-            if(dbEntry != null)
-            {
-                try
-                {
-                    return dbEntry.getCertProfile();
-                } catch (CertProfileException e)
-                {
-                    return null;
-                }
-            }
+            return caManager.getIdentifiedCertProfile(certProfileName);
         }
         return null;
     }

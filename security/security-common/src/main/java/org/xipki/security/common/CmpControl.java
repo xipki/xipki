@@ -5,13 +5,13 @@
  *
  */
 
-package org.xipki.ca.server.mgmt.api;
+package org.xipki.security.common;
 
 /**
  * @author Lijun Liao
  */
 
-public class CmpControlEntry
+public class CmpControl
 {
     private static final int DFLT_messageTimeBias = 300; // 300 seconds
     private static final int DFLT_confirmWaitTime = 300; // 300 seconds
@@ -36,19 +36,19 @@ public class CmpControlEntry
     private int messageTimeBias = DFLT_messageTimeBias;
     private int confirmWaitTime = DFLT_confirmWaitTime;
 
-    private static final CmpControlEntry defaultInstance;
+    private static final CmpControl defaultInstance;
     static
     {
-        defaultInstance = new CmpControlEntry();
+        defaultInstance = new CmpControl();
         defaultInstance.setRequireConfirmCert(false);
     }
 
-    public static CmpControlEntry getDefaultCmpControlEntry()
+    public static CmpControl getDefaultCmpControlEntry()
     {
         return defaultInstance;
     }
 
-    public CmpControlEntry()
+    public CmpControl()
     {
     }
 

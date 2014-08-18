@@ -3,7 +3,7 @@
 #      https://github.com/brettwooldridge/HikariCP         #
 ############################################################
 
-################## PostgreSQL #################
+################## PostgreSQL (pgjdbc-ng) #################
 
 dataSourceClassName = com.impossibl.postgres.jdbc.PGDataSource
 

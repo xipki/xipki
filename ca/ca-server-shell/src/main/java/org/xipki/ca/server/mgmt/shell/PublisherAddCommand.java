@@ -42,18 +42,12 @@ public class PublisherAddCommand extends CaCommand
     protected Object doExecute()
     throws Exception
     {
-        PublisherEntry entry = new PublisherEntry(name);
-        entry.setType(type);
-
         if(conf == null && confFile != null)
         {
             conf = new String(IoCertUtil.read(confFile));
         }
-        if(conf != null)
-        {
-            entry.setConf(conf);
-        }
 
+        PublisherEntry entry = new PublisherEntry(name, type, conf);
         caManager.addPublisher(entry);
 
         return null;
