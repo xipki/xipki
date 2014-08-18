@@ -30,6 +30,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -63,24 +64,21 @@ import org.xipki.ca.api.OperationException;
 import org.xipki.ca.api.profile.CertProfileException;
 import org.xipki.ca.api.publisher.CertPublisherException;
 import org.xipki.ca.api.publisher.CertificateInfo;
-import org.xipki.ca.cmp.server.CmpControl;
 import org.xipki.ca.common.CASystemStatus;
 import org.xipki.ca.common.X509CertificateWithMetaInfo;
 import org.xipki.ca.server.CmpRequestorInfo;
 import org.xipki.ca.server.CrlSigner;
 import org.xipki.ca.server.X509CA;
 import org.xipki.ca.server.X509CACmpResponder;
+import org.xipki.ca.server.mgmt.SelfSignedCertBuilder.GenerateSelfSignedResult;
 import org.xipki.ca.server.mgmt.api.CAEntry;
 import org.xipki.ca.server.mgmt.api.CAHasRequestorEntry;
 import org.xipki.ca.server.mgmt.api.CAManager;
 import org.xipki.ca.server.mgmt.api.CertProfileEntry;
-import org.xipki.ca.server.mgmt.api.CmpControlEntry;
 import org.xipki.ca.server.mgmt.api.CmpRequestorEntry;
 import org.xipki.ca.server.mgmt.api.CmpResponderEntry;
 import org.xipki.ca.server.mgmt.api.CrlSignerEntry;
 import org.xipki.ca.server.mgmt.api.DuplicationMode;
-import org.xipki.ca.server.mgmt.api.IdentifiedCertProfile;
-import org.xipki.ca.server.mgmt.api.IdentifiedCertPublisher;
 import org.xipki.ca.server.mgmt.api.Permission;
 import org.xipki.ca.server.mgmt.api.PublisherEntry;
 import org.xipki.ca.server.mgmt.api.ValidityMode;
@@ -94,6 +92,7 @@ import org.xipki.security.api.SecurityFactory;
 import org.xipki.security.api.SignerException;
 import org.xipki.security.common.CRLReason;
 import org.xipki.security.common.CertRevocationInfo;
+import org.xipki.security.common.CmpControl;
 import org.xipki.security.common.CmpUtf8Pairs;
 import org.xipki.security.common.ConfigurationException;
 import org.xipki.security.common.DfltEnvironmentParameterResolver;
@@ -101,6 +100,7 @@ import org.xipki.security.common.EnvironmentParameterResolver;
 import org.xipki.security.common.IoCertUtil;
 import org.xipki.security.common.LogUtil;
 import org.xipki.security.common.ParamChecker;
+import org.xipki.security.common.RandomSerialNumberGenerator;
 
 /**
  * @author Lijun Liao
@@ -128,8 +128,8 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
     private Map<String, DataSourceWrapper> dataSources = null;
 
     private final Map<String, CAEntry> cas = new ConcurrentHashMap<>();
-    private final Map<String, CertProfileEntry> certProfiles = new ConcurrentHashMap<>();
-    private final Map<String, PublisherEntry> publishers = new ConcurrentHashMap<>();
+    private final Map<String, CertProfileEntryWrapper> certProfiles = new ConcurrentHashMap<>();
+    private final Map<String, PublisherEntryWrapper> publishers = new ConcurrentHashMap<>();
     private final Map<String, CmpRequestorEntry> requestors = new ConcurrentHashMap<>();
     private final Map<String, CrlSignerEntry> crlSigners = new ConcurrentHashMap<>();
     private final Map<String, Set<String>> ca_has_profiles = new ConcurrentHashMap<>();
@@ -139,7 +139,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
 
     private final DfltEnvironmentParameterResolver envParameterResolver = new DfltEnvironmentParameterResolver();
 
-    private CmpControlEntry cmpControl;
+    private CmpControl cmpControl;
 
     private ScheduledThreadPoolExecutor scheduledThreadPoolExecutor;
     private static final Map<String, X509CACmpResponder> responders = new ConcurrentHashMap<>();
@@ -528,42 +528,6 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
                 }
                 LOG.debug(message, e);
                 return false;
-            }
-
-            // check the configuration of certificate profiles
-            for(CertProfileEntry entry : certProfiles.values())
-            {
-                try
-                {
-                    entry.getCertProfile();
-                } catch (CertProfileException e)
-                {
-                    final String message = "Invalid configuration for the certProfile " + entry.getName();
-                    if(LOG.isErrorEnabled())
-                    {
-                        LOG.error(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(), e.getMessage());
-                    }
-                    LOG.debug(message, e);
-                    return false;
-                }
-            }
-
-            // check the configuration of certificate publishers
-            for(PublisherEntry entry : publishers.values())
-            {
-                try
-                {
-                    entry.getCertPublisher();
-                } catch (CertPublisherException e)
-                {
-                    final String message = "Invalid configuration for the certPublisher " + entry.getName();
-                    if(LOG.isErrorEnabled())
-                    {
-                        LOG.error(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(), e.getMessage());
-                    }
-                    LOG.debug(message, e);
-                    return false;
-                }
             }
 
             x509cas.clear();
@@ -1034,7 +998,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
 
         for(String name : certProfiles.keySet())
         {
-            CertProfileEntry entry = certProfiles.get(name);
+            CertProfileEntryWrapper entry = certProfiles.get(name);
             try
             {
                 IdentifiedCertProfile profile = entry.getCertProfile();
@@ -1069,9 +1033,21 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
                 String type = rs.getString("TYPE");
                 String conf = rs.getString("CONF");
 
-                CertProfileEntry entry = new CertProfileEntry(name);
-                entry.setType(type);
-                entry.setConf(conf);
+                CertProfileEntry rawEntry = new CertProfileEntry(name, type, conf);
+                CertProfileEntryWrapper entry;
+                try
+                {
+                    entry = new CertProfileEntryWrapper(rawEntry);
+                } catch(CertProfileException e)
+                {
+                    final String message = "Invalid configuration for the certProfile " + name;
+                    if(LOG.isErrorEnabled())
+                    {
+                        LOG.error(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(), e.getMessage());
+                    }
+                    LOG.debug(message, e);
+                    continue;
+                }
                 entry.setEnvironmentParamterResolver(envParameterResolver);
                 certProfiles.put(name, entry);
             }
@@ -1093,7 +1069,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
 
         for(String name : publishers.keySet())
         {
-            PublisherEntry entry = publishers.get(name);
+            PublisherEntryWrapper entry = publishers.get(name);
             try
             {
                 IdentifiedCertPublisher publisher = entry.getCertPublisher();
@@ -1122,46 +1098,28 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
             String sql = "SELECT NAME, TYPE, CONF FROM PUBLISHER";
             rs = stmt.executeQuery(sql);
 
-            String errorMsg = null;
-
             while(rs.next())
             {
                 String name = rs.getString("NAME");
                 String type = rs.getString("TYPE");
                 String conf = rs.getString("CONF");
 
-                String datasourceName = null;
-                CmpUtf8Pairs confPairs = null;
+                PublisherEntry rawEntry = new PublisherEntry(name, type, conf);
+                PublisherEntryWrapper entry;
                 try
                 {
-                    confPairs = new CmpUtf8Pairs(conf);
-                    datasourceName = confPairs.getValue("datasource");
-                }catch(Exception e)
+                    entry = new PublisherEntryWrapper(rawEntry, passwordResolver, dataSources);
+                } catch(CertPublisherException e)
                 {
-                }
-
-                DataSourceWrapper ocspDataSource = null;
-                if(datasourceName != null)
-                {
-                    ocspDataSource = dataSources.get(datasourceName);
-                    if(ocspDataSource == null)
+                    final String message = "Invalid configuration for the certPublisher " + name;
+                    if(LOG.isErrorEnabled())
                     {
-                        errorMsg = "Cound not find datasource named '" + datasourceName + "'";
-                        break;
+                        LOG.error(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(), e.getMessage());
                     }
+                    LOG.debug(message, e);
+                    continue;
                 }
-
-                PublisherEntry entry = new PublisherEntry(name);
-                entry.setType(type);
-                entry.setConf(confPairs.getEncoded());
-                entry.setPasswordResolver(passwordResolver);
-                entry.setDataSource(ocspDataSource);
                 publishers.put(name, entry);
-            }
-
-            if(errorMsg != null)
-            {
-                throw new CAMgmtException(errorMsg);
             }
         }catch(SQLException e)
         {
@@ -1259,7 +1217,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
                 int messageTimeBias = rs.getInt("MESSAGE_TIME_BIAS");
                 int confirmWaitTime = rs.getInt("CONFIRM_WAIT_TIME");
 
-                CmpControlEntry entry = new CmpControlEntry();
+                CmpControl entry = new CmpControl();
                 entry.setRequireConfirmCert(requireConfirmCert);
                 entry.setSendCaCert(sendCaCert);
                 entry.setSendResponderCert(sendResponderCert);
@@ -2203,7 +2161,8 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
     @Override
     public CertProfileEntry getCertProfile(String profileName)
     {
-        return certProfiles.get(profileName);
+        CertProfileEntryWrapper entry = certProfiles.get(profileName);
+        return entry == null ? null : entry.getEntry();
     }
 
     @Override
@@ -2316,8 +2275,16 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
             dataSource.releaseResources(ps, null);
         }
 
-        dbEntry.setEnvironmentParamterResolver(envParameterResolver);
-        certProfiles.put(name, dbEntry);
+        CertProfileEntryWrapper entry;
+        try
+        {
+            entry = new CertProfileEntryWrapper(dbEntry);
+        } catch (CertProfileException e)
+        {
+            throw new CAMgmtException("CertProfileException: " + e.getMessage(), e);
+        }
+        entry.setEnvironmentParamterResolver(envParameterResolver);
+        certProfiles.put(name, entry);
     }
 
     @Override
@@ -2712,8 +2679,15 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
             dataSource.releaseResources(ps, null);
         }
 
-        dbEntry.setPasswordResolver(passwordResolver);
-        publishers.put(name, dbEntry);
+        PublisherEntryWrapper entry;
+        try
+        {
+            entry = new PublisherEntryWrapper(dbEntry, passwordResolver, dataSources);
+        } catch (CertPublisherException e)
+        {
+            throw new CAMgmtException("CertPublisherException: " + e.getMessage(), e);
+        }
+        publishers.put(name, entry);
     }
 
     @Override
@@ -2730,7 +2704,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
         List<PublisherEntry> ret = new ArrayList<>(publisherNames.size());
         for(String publisherName : publisherNames)
         {
-            ret.add(publishers.get(publisherName));
+            ret.add(publishers.get(publisherName).getEntry());
         }
 
         return ret;
@@ -2739,7 +2713,8 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
     @Override
     public PublisherEntry getPublisher(String publisherName)
     {
-        return publishers.get(publisherName);
+        PublisherEntryWrapper entry = publishers.get(publisherName);
+        return entry == null ? null : entry.getEntry();
     }
 
     @Override
@@ -2825,13 +2800,13 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
     }
 
     @Override
-    public CmpControlEntry getCmpControl()
+    public CmpControl getCmpControl()
     {
         return cmpControl;
     }
 
     @Override
-    public void setCmpControl(CmpControlEntry dbEntry)
+    public void setCmpControl(CmpControl dbEntry)
     throws CAMgmtException
     {
         if(cmpControl != null)
@@ -3513,7 +3488,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
 
         for(String name : publishers.keySet())
         {
-            PublisherEntry publisherEntry = publishers.get(name);
+            PublisherEntryWrapper publisherEntry = publishers.get(name);
             publisherEntry.setAuditServiceRegister(auditServiceRegister);
         }
     }
@@ -3733,6 +3708,162 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
             throw new CAMgmtException("Unknown CA " + caName);
         }
         return ca;
+    }
+
+    public IdentifiedCertProfile getIdentifiedCertProfile(String profileName)
+    throws CertProfileException
+    {
+        CertProfileEntryWrapper wrapper = certProfiles.get(profileName);
+        return wrapper == null ? null : wrapper.getCertProfile();
+    }
+
+    public List<IdentifiedCertPublisher> getIdentifiedPublishersForCa(String caName)
+    {
+        List<IdentifiedCertPublisher> ret = new LinkedList<>();
+        Set<String> publisherNames = ca_has_publishers.get(caName);
+        if(publisherNames != null)
+        {
+	        for(String publisherName : publisherNames)
+	        {
+	            PublisherEntryWrapper publisher = publishers.get(publisherName);
+	            ret.add(publisher.getCertPublisher());
+	        }
+        }
+        return ret;
+    }
+
+    @Override
+    public X509Certificate generateSelfSignedCA(
+            String name, String certprofileName, String subject,
+            CAStatus status, long nextSerial,
+            List<String> crl_uris, List<String> delta_crl_uris, List<String> ocsp_uris,
+            int max_validity, String signer_type, String signer_conf,
+            String crlsigner_name, DuplicationMode duplicate_key,
+            DuplicationMode duplicate_subject, Set<Permission> permissions,
+            int numCrls, int expirationPeriod, ValidityMode validityMode)
+    throws CAMgmtException
+    {
+        if(nextSerial < 0)
+        {
+            System.err.println("invalid serial number: " + nextSerial);
+            return null;
+        }
+
+        if(numCrls < 0)
+        {
+            System.err.println("invalid numCrls: " + numCrls);
+            return null;
+        }
+
+        if(expirationPeriod < 0)
+        {
+            System.err.println("invalid expirationPeriod: " + expirationPeriod);
+            return null;
+        }
+
+        IdentifiedCertProfile certProfile;
+        if(certProfiles.containsKey(certprofileName))
+        {
+            certProfile = certProfiles.get(certprofileName).getCertProfile();
+        }
+        else
+        {
+            throw new CAMgmtException("unknown cert profile " + certprofileName);
+        }
+
+        long serialOfThisCert;
+        if(nextSerial > 0)
+        {
+            serialOfThisCert = nextSerial;
+            nextSerial ++;
+        }
+        else
+        {
+            serialOfThisCert = RandomSerialNumberGenerator.getInstance().getSerialNumber().longValue();
+        }
+
+        GenerateSelfSignedResult result;
+        try
+        {
+            result = SelfSignedCertBuilder.generateSelfSigned(
+                    securityFactory, passwordResolver, signer_type, signer_conf,
+                    certProfile, subject, serialOfThisCert, ocsp_uris, crl_uris);
+        } catch (OperationException | ConfigurationException e)
+        {
+            throw new CAMgmtException(e.getClass().getName() + ": " + e.getMessage(), e);
+        }
+
+        String signerConf = result.getSignerConf();
+        X509Certificate caCert = result.getCert();
+
+        if("PKCS12".equalsIgnoreCase(signer_type) || "JKS".equalsIgnoreCase(signer_type))
+        {
+            try
+            {
+                signerConf = canonicalizeSignerConf(signer_type, signerConf, passwordResolver);
+            } catch (Exception e)
+            {
+                throw new CAMgmtException(e.getClass().getName() + ": " + e.getMessage(), e);
+            }
+        }
+
+        CAEntry entry = new CAEntry(name, nextSerial, signer_type, signerConf, caCert,
+                ocsp_uris, crl_uris, delta_crl_uris, null, numCrls, expirationPeriod);
+
+        entry.setDuplicateKeyMode(duplicate_key);
+
+        entry.setDuplicateSubjectMode(duplicate_subject);
+
+        entry.setValidityMode(validityMode);
+
+        entry.setStatus(status);
+        if(crlsigner_name != null)
+        {
+            entry.setCrlSignerName(crlsigner_name);
+        }
+        entry.setMaxValidity(max_validity);
+        entry.setPermissions(permissions);
+
+        addCA(entry);
+
+        return caCert;
+    }
+
+    public static String canonicalizeSignerConf(String keystoreType, String signerConf,
+            PasswordResolver passwordResolver)
+    throws Exception
+    {
+        if(signerConf.contains("file:") == false && signerConf.contains("base64:") == false )
+        {
+            return signerConf;
+        }
+
+        CmpUtf8Pairs utf8Pairs = new CmpUtf8Pairs(signerConf);
+        String keystoreConf = utf8Pairs.getValue("keystore");
+        String passwordHint = utf8Pairs.getValue("password");
+        String keyLabel     = utf8Pairs.getValue("key-label");
+
+        byte[] keystoreBytes;
+        if(keystoreConf.startsWith("file:"))
+        {
+            String keystoreFile = keystoreConf.substring("file:".length());
+            keystoreBytes = IoCertUtil.read(keystoreFile);
+        }
+        else if(keystoreConf.startsWith("base64:"))
+        {
+            keystoreBytes = Base64.decode(keystoreConf.substring("base64:".length()));
+        }
+        else
+        {
+            return signerConf;
+        }
+
+        keystoreBytes = IoCertUtil.extractMinimalKeyStore(keystoreType,
+                keystoreBytes, keyLabel,
+                passwordResolver.resolvePassword(passwordHint));
+
+        utf8Pairs.putUtf8Pair("keystore", "base64:" + Base64.toBase64String(keystoreBytes));
+        return utf8Pairs.getEncoded();
     }
 
 }

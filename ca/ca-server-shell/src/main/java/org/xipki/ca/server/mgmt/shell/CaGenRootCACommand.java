@@ -15,17 +15,10 @@ import java.util.Set;
 import org.apache.felix.gogo.commands.Command;
 import org.apache.felix.gogo.commands.Option;
 import org.xipki.ca.api.CAStatus;
-import org.xipki.ca.api.OperationException;
-import org.xipki.ca.api.OperationException.ErrorCode;
-import org.xipki.ca.server.mgmt.api.CAEntry;
-import org.xipki.ca.server.mgmt.api.CertProfileEntry;
 import org.xipki.ca.server.mgmt.api.DuplicationMode;
-import org.xipki.ca.server.mgmt.api.IdentifiedCertProfile;
 import org.xipki.ca.server.mgmt.api.Permission;
 import org.xipki.ca.server.mgmt.api.ValidityMode;
-import org.xipki.ca.server.mgmt.shell.SelfSignedCertBuilder.GenerateSelfSignedResult;
 import org.xipki.security.common.ConfigurationException;
-import org.xipki.security.common.RandomSerialNumberGenerator;
 
 /**
  * @author Lijun Liao
@@ -52,30 +45,14 @@ public class CaGenRootCACommand extends CaAddOrGenCommand
     protected Object doExecute()
     throws Exception
     {
-        if(nextSerial < 0)
-        {
-            System.err.println("invalid serial number: " + nextSerial);
-            return null;
-        }
-
         if(numCrls == null)
         {
             numCrls = 30;
-        }
-        else if(numCrls < 0)
-        {
-            System.err.println("invalid numCrls: " + numCrls);
-            return null;
         }
 
         if(expirationPeriod == null)
         {
             expirationPeriod = 365;
-        }
-        else if(expirationPeriod < 0)
-        {
-            System.err.println("invalid expirationPeriod: " + expirationPeriod);
-            return null;
         }
 
         CAStatus status = CAStatus.ACTIVE;
@@ -89,45 +66,8 @@ public class CaGenRootCACommand extends CaAddOrGenCommand
             }
         }
 
-        CertProfileEntry certProfileEntry = caManager.getCertProfile(rcaProfile);
-        if(certProfileEntry == null)
-        {
-            throw new OperationException(ErrorCode.UNKNOWN_CERT_PROFILE,
-                    "unknown cert profile " + rcaProfile);
-        }
-
-        long serialOfThisCert;
-        if(nextSerial > 0)
-        {
-            serialOfThisCert = nextSerial;
-            nextSerial ++;
-        }
-        else
-        {
-            serialOfThisCert = RandomSerialNumberGenerator.getInstance().getSerialNumber().longValue();
-        }
-
-        IdentifiedCertProfile certProfile = certProfileEntry.getCertProfile();
-        GenerateSelfSignedResult result = SelfSignedCertBuilder.generateSelfSigned(
-                securityFactory, passwordResolver, signerType, signerConf,
-                certProfile, rcaSubject, serialOfThisCert, ocspUris, crlUris);
-
-        signerConf = result.getSignerConf();
-        X509Certificate caCert = result.getCert();
-
-        if("PKCS12".equalsIgnoreCase(signerType) || "JKS".equalsIgnoreCase(signerType))
-        {
-            signerConf = ShellUtil.canonicalizeSignerConf(signerType, signerConf, passwordResolver);
-        }
-
-        CAEntry entry = new CAEntry(caName, nextSerial, signerType, signerConf, caCert,
-                ocspUris, crlUris, deltaCrlUris, null, numCrls.intValue(), expirationPeriod.intValue());
-
         DuplicationMode duplicateKey = getDuplicationMode(duplicateKeyI, DuplicationMode.FORBIDDEN_WITHIN_PROFILE);
-        entry.setDuplicateKeyMode(duplicateKey);
-
         DuplicationMode duplicateSubject = getDuplicationMode(duplicateSubjectI, DuplicationMode.FORBIDDEN_WITHIN_PROFILE);
-        entry.setDuplicateSubjectMode(duplicateSubject);
 
         ValidityMode validityMode = null;
         if(validityModeS != null)
@@ -138,14 +78,6 @@ public class CaGenRootCACommand extends CaAddOrGenCommand
         {
             validityMode = ValidityMode.STRICT;
         }
-        entry.setValidityMode(validityMode);
-
-        entry.setStatus(status);
-        if(crlSignerName != null)
-        {
-            entry.setCrlSignerName(crlSignerName);
-        }
-        entry.setMaxValidity(maxValidity);
 
         Set<Permission> _permissions = new HashSet<>();
         for(String permission : permissions)
@@ -158,13 +90,28 @@ public class CaGenRootCACommand extends CaAddOrGenCommand
             _permissions.add(_permission);
         }
 
-        entry.setPermissions(_permissions);
-
-        caManager.addCA(entry);
+        X509Certificate rcaCert = caManager.generateSelfSignedCA(caName,
+                rcaProfile,
+                rcaSubject,
+                status,
+                nextSerial,
+                crlUris,
+                deltaCrlUris,
+                ocspUris,
+                maxValidity,
+                signerType,
+                signerConf,
+                crlSignerName,
+                duplicateKey,
+                duplicateSubject,
+                _permissions,
+                numCrls,
+                expirationPeriod,
+                validityMode);
 
         if(rcaCertOutFile != null)
         {
-            saveVerbose("Saved root certificate to file", new File(rcaCertOutFile), caCert.getEncoded());
+            saveVerbose("Saved root certificate to file", new File(rcaCertOutFile), rcaCert.getEncoded());
         }
 
         return null;

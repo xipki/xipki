@@ -5,7 +5,7 @@
  *
  */
 
-package org.xipki.ca.server.mgmt.api;
+package org.xipki.ca.server.mgmt;
 
 import java.security.cert.X509CRL;
 

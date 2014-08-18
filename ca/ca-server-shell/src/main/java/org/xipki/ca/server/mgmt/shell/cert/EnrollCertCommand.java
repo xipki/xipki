@@ -12,7 +12,6 @@ import java.security.cert.X509Certificate;
 
 import org.apache.felix.gogo.commands.Command;
 import org.apache.felix.gogo.commands.Option;
-import org.bouncycastle.asn1.pkcs.CertificationRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.ca.server.mgmt.api.CAEntry;

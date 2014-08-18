@@ -18,6 +18,7 @@ import org.xipki.ca.api.CAStatus;
 import org.xipki.ca.common.CASystemStatus;
 import org.xipki.security.common.CRLReason;
 import org.xipki.security.common.CertRevocationInfo;
+import org.xipki.security.common.CmpControl;
 import org.xipki.security.common.EnvironmentParameterResolver;
 
 /**
@@ -137,6 +138,10 @@ public interface CAManager
     void addCertProfile(CertProfileEntry dbEntry)
     throws CAMgmtException;
 
+    /*
+    CertProfile getCertProfileImpl(String profileName)
+    throws CertProfileException;
+    */
     void setCmpResponder(CmpResponderEntry dbEntry)
     throws CAMgmtException;
 
@@ -176,9 +181,9 @@ public interface CAManager
     void changePublisher(String name, String type, String conf)
     throws CAMgmtException;
 
-    CmpControlEntry getCmpControl();
+    CmpControl getCmpControl();
 
-    void setCmpControl(CmpControlEntry dbEntry)
+    void setCmpControl(CmpControl dbEntry)
     throws CAMgmtException;
 
     void removeCmpControl()
@@ -216,4 +221,13 @@ public interface CAManager
     X509Certificate generateCertificate(String caName, String profileName, String user, byte[] encodedPkcs10Request)
     throws CAMgmtException;
 
+    public X509Certificate generateSelfSignedCA(
+            String name, String certprofileName, String subject,
+            CAStatus status, long nextSerial,
+            List<String> crl_uris, List<String> delta_crl_uris, List<String> ocsp_uris,
+            int max_validity, String signer_type, String signer_conf,
+            String crlsigner_name, DuplicationMode duplicate_key,
+            DuplicationMode duplicate_subject, Set<Permission> permissions,
+            int numCrls, int expirationPeriod, ValidityMode validityMode)
+    throws CAMgmtException;
 }

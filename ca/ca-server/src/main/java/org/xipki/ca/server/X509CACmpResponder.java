@@ -82,14 +82,13 @@ import org.xipki.ca.api.OperationException;
 import org.xipki.ca.api.OperationException.ErrorCode;
 import org.xipki.ca.api.publisher.CertificateInfo;
 import org.xipki.ca.cmp.CmpUtil;
-import org.xipki.ca.cmp.server.CmpControl;
 import org.xipki.ca.cmp.server.CmpResponder;
 import org.xipki.ca.common.RequestorInfo;
-import org.xipki.ca.server.mgmt.api.CmpControlEntry;
 import org.xipki.ca.server.mgmt.api.Permission;
 import org.xipki.security.api.ConcurrentContentSigner;
 import org.xipki.security.api.SecurityFactory;
 import org.xipki.security.common.CRLReason;
+import org.xipki.security.common.CmpControl;
 import org.xipki.security.common.CmpUtf8Pairs;
 import org.xipki.security.common.CustomObjectIdentifiers;
 import org.xipki.security.common.HealthCheckResult;
@@ -110,8 +109,6 @@ public class X509CACmpResponder extends CmpResponder
     private final PendingCertificatePool pendingCertPool;
 
     private final X509CA ca;
-    private CmpControlEntry cmpControlEntry;
-    private CmpControl cmpControl;
 
     public X509CACmpResponder(X509CA ca, ConcurrentContentSigner responder, SecurityFactory securityFactory)
     {
@@ -1260,19 +1257,7 @@ public class X509CACmpResponder extends CmpResponder
     @Override
     protected CmpControl getCmpControl()
     {
-        CmpControlEntry entry = ca.getCAManager().getCmpControl();
-        if(entry != cmpControlEntry)
-        {
-            cmpControlEntry = entry;
-            cmpControl = new CmpControl();
-            cmpControl.setConfirmWaitTime(entry.getConfirmWaitTime());
-            cmpControl.setMessageBias(entry.getMessageTimeBias());
-            cmpControl.setMessageTimeRequired(entry.isMessageTimeRequired());
-            cmpControl.setRequireConfirmCert(entry.isRequireConfirmCert());
-            cmpControl.setSendCaCert(entry.isSendCaCert());
-            cmpControl.setSendResponderCert(entry.isSendResponderCert());
-        }
-        return cmpControl;
+        return ca.getCAManager().getCmpControl();
     }
 
     private class PendingPoolCleaner implements Runnable

@@ -5,7 +5,7 @@
  *
  */
 
-package org.xipki.ca.server.mgmt.shell;
+package org.xipki.ca.server.mgmt;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -27,8 +27,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
 
-import jline.internal.Log;
-
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.AuthorityInformationAccess;
 import org.bouncycastle.asn1.x509.AuthorityKeyIdentifier;
@@ -46,6 +44,8 @@ import org.bouncycastle.jcajce.provider.asymmetric.dsa.DSAUtil;
 import org.bouncycastle.jcajce.provider.asymmetric.util.ECUtil;
 import org.bouncycastle.operator.ContentSigner;
 import org.bouncycastle.util.encoders.Base64;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xipki.ca.api.OperationException;
 import org.xipki.ca.api.OperationException.ErrorCode;
 import org.xipki.ca.api.profile.BadCertTemplateException;
@@ -55,7 +55,6 @@ import org.xipki.ca.api.profile.ExtensionTuple;
 import org.xipki.ca.api.profile.ExtensionTuples;
 import org.xipki.ca.api.profile.SubjectInfo;
 import org.xipki.ca.api.profile.X509Util;
-import org.xipki.ca.server.mgmt.api.IdentifiedCertProfile;
 import org.xipki.ca.server.mgmt.api.PublicCAInfo;
 import org.xipki.security.api.ConcurrentContentSigner;
 import org.xipki.security.api.NoIdleSignerException;
@@ -73,6 +72,8 @@ import org.xipki.security.common.IoCertUtil;
 
 class SelfSignedCertBuilder
 {
+    private static final Logger LOG = LoggerFactory.getLogger(SelfSignedCertBuilder.class);
+
     private static long DAY = 24L * 60 * 60 * 1000;
 
     static class GenerateSelfSignedResult
@@ -197,7 +198,6 @@ class SelfSignedCertBuilder
             List<String> crlUris)
     throws OperationException
     {
-        String certProfileName = certProfile.getName();
         publicKeyInfo = IoCertUtil.toRfc3279Style(publicKeyInfo);
 
         try
@@ -205,7 +205,7 @@ class SelfSignedCertBuilder
             certProfile.checkPublicKey(publicKeyInfo);
         } catch (BadCertTemplateException e)
         {
-            Log.warn("certProfile.checkPublicKey", e);
+            LOG.warn("certProfile.checkPublicKey", e);
             throw new OperationException(ErrorCode.BAD_CERT_TEMPLATE, e.getMessage());
         }
 
@@ -216,10 +216,10 @@ class SelfSignedCertBuilder
             subjectInfo = certProfile.getSubject(requestedSubject);
         }catch(CertProfileException e)
         {
-            throw new OperationException(ErrorCode.System_Failure, "exception in cert profile " + certProfileName);
+            throw new OperationException(ErrorCode.System_Failure, "exception in cert profile " + certProfile.getName());
         } catch (BadCertTemplateException e)
         {
-            Log.warn("certProfile.getSubject", e);
+            LOG.warn("certProfile.getSubject", e);
             throw new OperationException(ErrorCode.BAD_CERT_TEMPLATE, e.getMessage());
         }
 
@@ -233,7 +233,7 @@ class SelfSignedCertBuilder
         if(validity == null)
         {
             throw new OperationException(ErrorCode.BAD_CERT_TEMPLATE,
-                    "no validity specified in the profile " + certProfileName);
+                    "no validity specified in the profile " + certProfile.getName());
         }
 
         Date notAfter = new Date(notBefore.getTime() + DAY * validity);

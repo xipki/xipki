@@ -596,17 +596,5 @@
         <entry key="-ca" value-ref="caNameCompleter"/>
       </optional-completers>
     </command>
-    <!-- Misc -->
-    <command name="ca/gen-selfsign-cert">
-      <action class="org.xipki.ca.server.mgmt.shell.GenSelfSignedCertCommand">
-        <property name="caManager" ref="caManager"/>
-        <property name="passwordResolver" ref="passwordResolver"/>
-        <property name="securityFactory" ref="securityFactory"/>
-      </action>
-      <optional-completers>
-        <entry key="-out" value-ref="filePathCompleter"/>
-        <entry key="-signerType" value-ref="signerTypeCompleter"/>
-      </optional-completers>
-    </command>
   </command-bundle>
 </blueprint>
