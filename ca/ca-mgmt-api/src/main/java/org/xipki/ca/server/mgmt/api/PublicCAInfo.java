@@ -22,15 +22,17 @@ public class PublicCAInfo
     private final List<String> ocspUris;
     private final List<String> crlUris;
     private final List<String> caIssuerLocations;
+    private final List<String> deltaCrlUris;
 
     public PublicCAInfo(X509Certificate caCertificate,
             List<String> ocspUris, List<String> crlUris,
-            List<String> caIssuerLocations)
+            List<String> caIssuerLocations, List<String> deltaCrlUris)
     {
         this.caCertificate = caCertificate;
         this.ocspUris = ocspUris;
         this.crlUris = crlUris;
         this.caIssuerLocations = caIssuerLocations;
+        this.deltaCrlUris = deltaCrlUris;
     }
 
     public X509Certificate getCACertificate()
@@ -51,6 +53,11 @@ public class PublicCAInfo
     public List<String> getCaIssuerLocations()
     {
         return caIssuerLocations == null ? null : Collections.unmodifiableList(caIssuerLocations);
+    }
+
+    public List<String> getDeltaCrlUris()
+    {
+        return deltaCrlUris == null ? null : Collections.unmodifiableList(deltaCrlUris);
     }
 
     public X509Certificate getCrlSignerCertificate()

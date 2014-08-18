@@ -126,7 +126,7 @@ public class CAEntry
                 null : Collections.unmodifiableList(new ArrayList<>(issuerLocations));
 
         this.publicCAInfo = new PublicCAInfo(this.cert.getCert(),
-                this.ocspUris, this.crlUris, this.issuerLocations);
+                this.ocspUris, this.crlUris, this.issuerLocations, this.deltaCrlUris);
 
         this.noNewCertificateAfter = this.cert.getCert().getNotAfter().getTime() - DAY * expirationPeriod;
     }

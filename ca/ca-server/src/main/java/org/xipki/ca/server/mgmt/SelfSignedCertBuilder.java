@@ -107,7 +107,8 @@ class SelfSignedCertBuilder
             String subject,
             long serialNumber,
             List<String> ocspUris,
-            List<String> crlUris)
+            List<String> crlUris,
+            List<String> deltaCrlUris)
     throws OperationException, ConfigurationException
     {
         if("pkcs12".equalsIgnoreCase(signerType) || "jks".equalsIgnoreCase(signerType))
@@ -183,7 +184,7 @@ class SelfSignedCertBuilder
 
         X509Certificate newCert = generateCertificate(
                 signer, certProfile, new X500Name(subject), serialNumber, publicKeyInfo,
-                ocspUris, crlUris);
+                ocspUris, crlUris, deltaCrlUris);
 
         return new GenerateSelfSignedResult(signerConf, newCert);
     }
@@ -195,7 +196,8 @@ class SelfSignedCertBuilder
             long serialNumber,
             SubjectPublicKeyInfo publicKeyInfo,
             List<String> ocspUris,
-            List<String> crlUris)
+            List<String> crlUris,
+            List<String> deltaCrlUris)
     throws OperationException
     {
         publicKeyInfo = IoCertUtil.toRfc3279Style(publicKeyInfo);
@@ -249,7 +251,7 @@ class SelfSignedCertBuilder
                 publicKeyInfo);
 
         PublicCAInfo publicCaInfo = new PublicCAInfo(
-                null, ocspUris, crlUris, null);
+                null, ocspUris, crlUris, null, deltaCrlUris);
 
         try
         {
@@ -366,7 +368,7 @@ class SelfSignedCertBuilder
         extOccurrence = profile.getOccurenceOfFreshestCRL();
         if(extOccurrence != null)
         {
-            CRLDistPoint deltaCrlDistPoint = X509Util.createCRLDistributionPoints(publicCaInfo.getCrlUris(),
+            CRLDistPoint deltaCrlDistPoint = X509Util.createCRLDistributionPoints(publicCaInfo.getDeltaCrlUris(),
                     null, null);
             if(deltaCrlDistPoint == null)
             {
