@@ -19,7 +19,7 @@ public class EnvNameCompleter extends MgmtNameCompleter
     @Override
     protected Set<String> getEnums()
     {
-        return caManager.getEnvParameterResolver().getAllParameterNames();
+        return caManager.getEnvParamNames();
     }
 
 }

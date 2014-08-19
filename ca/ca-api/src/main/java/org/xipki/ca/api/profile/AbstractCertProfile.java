@@ -29,6 +29,8 @@ import org.bouncycastle.asn1.x509.ExtendedKeyUsage;
 import org.bouncycastle.asn1.x509.Extension;
 import org.bouncycastle.asn1.x509.Extensions;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
+import org.xipki.ca.common.BadCertTemplateException;
+import org.xipki.ca.common.CertProfileException;
 import org.xipki.security.common.EnvironmentParameterResolver;
 import org.xipki.security.common.ObjectIdentifiers;
 
