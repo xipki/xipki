@@ -14,7 +14,6 @@ import java.util.Set;
 
 import org.apache.felix.gogo.commands.Argument;
 import org.apache.felix.gogo.commands.Command;
-import org.xipki.security.common.EnvironmentParameterResolver;
 
 /**
  * @author Lijun Liao
@@ -30,13 +29,11 @@ public class EnvListCommand extends CaCommand
     protected Object doExecute()
     throws Exception
     {
-        EnvironmentParameterResolver envParameterResolver = caManager.getEnvParameterResolver();
-
         StringBuilder sb = new StringBuilder();
 
         if(name == null)
         {
-            Set<String> paramNames = envParameterResolver.getAllParameterNames();
+            Set<String> paramNames = caManager.getEnvParamNames();
             int n = paramNames.size();
 
             if(n == 0 || n == 1)
@@ -58,7 +55,7 @@ public class EnvListCommand extends CaCommand
         }
         else
         {
-            String paramValue = envParameterResolver.getParameterValue(name);
+            String paramValue = caManager.getEnvParam(name);
             sb.append(name).append("\n\t").append(paramValue);
         }
 

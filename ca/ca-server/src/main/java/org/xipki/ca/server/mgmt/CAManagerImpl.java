@@ -58,13 +58,13 @@ import org.xipki.audit.api.AuditLoggingService;
 import org.xipki.audit.api.AuditLoggingServiceRegister;
 import org.xipki.audit.api.AuditStatus;
 import org.xipki.audit.api.PCIAuditEvent;
-import org.xipki.ca.api.CAMgmtException;
-import org.xipki.ca.api.CAStatus;
 import org.xipki.ca.api.OperationException;
-import org.xipki.ca.api.profile.CertProfileException;
-import org.xipki.ca.api.publisher.CertPublisherException;
 import org.xipki.ca.api.publisher.CertificateInfo;
+import org.xipki.ca.common.CAMgmtException;
+import org.xipki.ca.common.CAStatus;
 import org.xipki.ca.common.CASystemStatus;
+import org.xipki.ca.common.CertProfileException;
+import org.xipki.ca.common.CertPublisherException;
 import org.xipki.ca.common.X509CertificateWithMetaInfo;
 import org.xipki.ca.server.CmpRequestorInfo;
 import org.xipki.ca.server.CrlSigner;
@@ -2970,10 +2970,21 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
         }
     }
 
-    @Override
     public EnvironmentParameterResolver getEnvParameterResolver()
     {
         return envParameterResolver;
+    }
+
+    @Override
+    public Set<String> getEnvParamNames()
+    {
+        return envParameterResolver.getAllParameterNames();
+    }
+
+    @Override
+    public String getEnvParam(String name)
+    {
+        return envParameterResolver.getEnvParam(name);
     }
 
     @Override

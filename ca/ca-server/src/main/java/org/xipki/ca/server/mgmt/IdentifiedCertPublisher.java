@@ -11,8 +11,8 @@ import java.security.cert.X509CRL;
 
 import org.xipki.audit.api.AuditLoggingServiceRegister;
 import org.xipki.ca.api.publisher.CertPublisher;
-import org.xipki.ca.api.publisher.CertPublisherException;
 import org.xipki.ca.api.publisher.CertificateInfo;
+import org.xipki.ca.common.CertPublisherException;
 import org.xipki.ca.common.X509CertificateWithMetaInfo;
 import org.xipki.database.api.DataSourceWrapper;
 import org.xipki.security.api.PasswordResolver;

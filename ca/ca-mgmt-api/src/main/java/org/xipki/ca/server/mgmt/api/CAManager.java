@@ -13,13 +13,12 @@ import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
-import org.xipki.ca.api.CAMgmtException;
-import org.xipki.ca.api.CAStatus;
+import org.xipki.ca.common.CAMgmtException;
+import org.xipki.ca.common.CAStatus;
 import org.xipki.ca.common.CASystemStatus;
 import org.xipki.security.common.CRLReason;
 import org.xipki.security.common.CertRevocationInfo;
 import org.xipki.security.common.CmpControl;
-import org.xipki.security.common.EnvironmentParameterResolver;
 
 /**
  * @author Lijun Liao
@@ -53,8 +52,6 @@ public interface CAManager
     throws CAMgmtException;
 
     boolean restartCaSystem();
-
-    EnvironmentParameterResolver getEnvParameterResolver();
 
     void addCaAlias(String aliasName, String caName)
     throws CAMgmtException;
@@ -138,10 +135,6 @@ public interface CAManager
     void addCertProfile(CertProfileEntry dbEntry)
     throws CAMgmtException;
 
-    /*
-    CertProfile getCertProfileImpl(String profileName)
-    throws CertProfileException;
-    */
     void setCmpResponder(CmpResponderEntry dbEntry)
     throws CAMgmtException;
 
@@ -193,6 +186,10 @@ public interface CAManager
             Boolean requireMessageTime, Integer messageTimeBias,
             Integer confirmWaitTime, Boolean sendCaCert, Boolean sendResponderCert)
     throws CAMgmtException;
+
+    Set<String> getEnvParamNames();
+
+    String getEnvParam(String name);
 
     void addEnvParam(String name, String value)
     throws CAMgmtException;

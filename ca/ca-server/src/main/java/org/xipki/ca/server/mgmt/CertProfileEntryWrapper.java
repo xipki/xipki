@@ -8,8 +8,8 @@
 package org.xipki.ca.server.mgmt;
 
 import org.xipki.ca.api.profile.CertProfile;
-import org.xipki.ca.api.profile.CertProfileException;
 import org.xipki.ca.api.profile.SpecialCertProfileBehavior;
+import org.xipki.ca.common.CertProfileException;
 import org.xipki.ca.server.certprofile.DefaultCertProfile;
 import org.xipki.ca.server.mgmt.api.CertProfileEntry;
 import org.xipki.security.common.EnvironmentParameterResolver;

@@ -5,7 +5,7 @@
  *
  */
 
-package org.xipki.ca.api.publisher;
+package org.xipki.ca.common;
 
 /**
  * @author Lijun Liao

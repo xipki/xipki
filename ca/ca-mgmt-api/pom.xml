@@ -15,7 +15,7 @@
   <dependencies>
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>ca-api</artifactId>
+      <artifactId>ca-common</artifactId>
       <version>${project.version}</version>
     </dependency>
   </dependencies>
