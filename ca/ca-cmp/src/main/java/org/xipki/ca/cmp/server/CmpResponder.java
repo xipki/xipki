@@ -46,6 +46,7 @@ import org.xipki.ca.cmp.CmpUtil;
 import org.xipki.ca.cmp.ProtectionResult;
 import org.xipki.ca.cmp.ProtectionVerificationResult;
 import org.xipki.ca.common.CertBasedRequestorInfo;
+import org.xipki.ca.common.CmpControl;
 import org.xipki.ca.common.RequestorInfo;
 import org.xipki.security.api.ConcurrentContentSigner;
 import org.xipki.security.api.SecurityFactory;
@@ -77,7 +78,7 @@ public abstract class CmpResponder
     /**
      * @return never returns {@code null}.
      */
-    protected abstract org.xipki.security.common.CmpControl getCmpControl();
+    protected abstract CmpControl getCmpControl();
 
     protected abstract PKIMessage intern_processPKIMessage(RequestorInfo requestor, String user,
             ASN1OctetString transactionId, GeneralPKIMessage pkiMessage, AuditEvent auditEvent);
@@ -114,7 +115,7 @@ public abstract class CmpResponder
             auditEvent.addEventData(new AuditEventData("tid", tidStr));
         }
 
-        org.xipki.security.common.CmpControl cmpControl = getCmpControl();
+        CmpControl cmpControl = getCmpControl();
 
         Integer failureCode = null;
         String statusText = null;
