@@ -16,9 +16,9 @@ import java.util.Set;
 import org.xipki.ca.common.CAMgmtException;
 import org.xipki.ca.common.CAStatus;
 import org.xipki.ca.common.CASystemStatus;
+import org.xipki.ca.common.CmpControl;
 import org.xipki.security.common.CRLReason;
 import org.xipki.security.common.CertRevocationInfo;
-import org.xipki.security.common.CmpControl;
 
 /**
  * @author Lijun Liao
