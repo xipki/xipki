@@ -62,7 +62,6 @@
         <entry key="-out" value-ref="filePathCompleter"/>
         <entry key="-ca" value-ref="caNameCompleter"/>
         <entry key="-basecrl-out" value-ref="filePathCompleter"/>
-        
       </optional-completers>
     </command>
     <command name="caclient/loadtest-enroll">
