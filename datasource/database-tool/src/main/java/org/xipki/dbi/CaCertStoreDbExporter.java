@@ -40,6 +40,7 @@ import org.xipki.dbi.ca.jaxb.CertStoreType.Cainfos;
 import org.xipki.dbi.ca.jaxb.CertStoreType.Certprofileinfos;
 import org.xipki.dbi.ca.jaxb.CertStoreType.CertsFiles;
 import org.xipki.dbi.ca.jaxb.CertStoreType.Crls;
+import org.xipki.dbi.ca.jaxb.CertStoreType.DeltaCRLCache;
 import org.xipki.dbi.ca.jaxb.CertStoreType.PublishQueue;
 import org.xipki.dbi.ca.jaxb.CertStoreType.Publisherinfos;
 import org.xipki.dbi.ca.jaxb.CertStoreType.Requestorinfos;
@@ -47,6 +48,7 @@ import org.xipki.dbi.ca.jaxb.CertStoreType.UsersFiles;
 import org.xipki.dbi.ca.jaxb.CertType;
 import org.xipki.dbi.ca.jaxb.CertsType;
 import org.xipki.dbi.ca.jaxb.CrlType;
+import org.xipki.dbi.ca.jaxb.DeltaCRLCacheEntryType;
 import org.xipki.dbi.ca.jaxb.NameIdType;
 import org.xipki.dbi.ca.jaxb.ObjectFactory;
 import org.xipki.dbi.ca.jaxb.ToPublishType;
@@ -107,6 +109,7 @@ class CaCertStoreDbExporter extends DbPorter
             export_crl(certstore);
             export_cert(certstore);
             export_publishQueue(certstore);
+            export_deltaCRLCache(certstore);
 
             JAXBElement<CertStoreType> root = new ObjectFactory().createCertStore(certstore);
             marshaller.marshal(root, new File(baseDir + File.separator + FILENAME_CA_CertStore));
@@ -656,42 +659,83 @@ class CaCertStoreDbExporter extends DbPorter
         final int minId = getMin("PUBLISHQUEUE", "CERT_ID");
         final int maxId = getMax("PUBLISHQUEUE", "CERT_ID");
 
+        PublishQueue queue = new PublishQueue();
+        certstore.setPublishQueue(queue);
+        if(maxId != 0)
+        {
+            PreparedStatement ps = prepareStatement(sql);
+            ResultSet rs = null;
+
+            List<ToPublishType> list = queue.getTop();
+            final int n = 500;
+
+            try
+            {
+                for(int i = minId; i <= maxId; i += n)
+                {
+                    ps.setInt(1, i);
+                    ps.setInt(2, i + n);
+
+                    rs = ps.executeQuery();
+
+                    while(rs.next())
+                    {
+                        int cert_id = rs.getInt("CERT_ID");
+                        int pub_id = rs.getInt("PUBLISHER_ID");
+                        int ca_id = rs.getInt("CAINFO_ID");
+
+                        ToPublishType toPub = new ToPublishType();
+                        toPub.setPubId(pub_id);
+                        toPub.setCertId(cert_id);
+                        toPub.setCaId(ca_id);
+                        list.add(toPub);
+                    }
+                }
+            }finally
+            {
+                releaseResources(ps, rs);
+            }
+        }
+
+        System.out.println(" Exported table PUBLISHQUEUE");
+    }
+
+    private void export_deltaCRLCache(CertStoreType certstore)
+    throws SQLException, IOException, JAXBException
+    {
+        System.out.println("Exporting table DELTACRL_CACHE");
+
+        String sql = "SELECT SERIAL, CAINFO_ID" +
+                " FROM DELTACRL_CACHE";
+
+        DeltaCRLCache deltaCache = new DeltaCRLCache();
+        certstore.setDeltaCRLCache(deltaCache);
+
         PreparedStatement ps = prepareStatement(sql);
         ResultSet rs = null;
 
-        PublishQueue queue = new PublishQueue();
-        List<ToPublishType> list = queue.getTop();
-        final int n = 500;
+        List<DeltaCRLCacheEntryType> list = deltaCache.getEntry();
 
         try
         {
-            for(int i = minId; i <= maxId; i += n)
+            rs = ps.executeQuery();
+
+            while(rs.next())
             {
-                ps.setInt(1, i);
-                ps.setInt(2, i + n);
+                long serial = rs.getLong("SERIAL");
+                int ca_id = rs.getInt("CAINFO_ID");
 
-                rs = ps.executeQuery();
-
-                while(rs.next())
-                {
-                    int cert_id = rs.getInt("CERT_ID");
-                    int pub_id = rs.getInt("PUBLISHER_ID");
-                    int ca_id = rs.getInt("CAINFO_ID");
-
-                    ToPublishType toPub = new ToPublishType();
-                    toPub.setPubId(pub_id);
-                    toPub.setCertId(cert_id);
-                    toPub.setCaId(ca_id);
-                    list.add(toPub);
-                }
+                DeltaCRLCacheEntryType entry = new DeltaCRLCacheEntryType();
+                entry.setCaId(ca_id);
+                entry.setSerial(serial);
+                list.add(entry);
             }
         }finally
         {
             releaseResources(ps, rs);
         }
 
-        certstore.setPublishQueue(queue);
-        System.out.println(" Exported table PUBLISHQUEUE");
+        System.out.println(" Exported table DELTACRL_CACHE");
     }
 
     private void finalizeZip(ZipOutputStream zipOutStream, CertsType certsType)
