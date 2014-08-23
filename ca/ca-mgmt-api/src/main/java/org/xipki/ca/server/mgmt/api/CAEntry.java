@@ -62,6 +62,8 @@ public class CAEntry
     private final int expirationPeriod;
     private final long noNewCertificateAfter;
     private CertRevocationInfo revocationInfo;
+    private int lastCRLInterval;
+    private long lastCRLIntervalDate;
 
     private PublicCAInfo publicCAInfo;
 
@@ -295,6 +297,8 @@ public class CAEntry
         sb.append("duplicateSubject: ").append(duplicateSubjectMode.getDescription()).append('\n');
         sb.append("validityMode: ").append(validityMode).append('\n');
         sb.append("permissions: ").append(Permission.toString(permissions));
+        sb.append("lastCRLInterval: ").append(lastCRLInterval).append('\n');
+        sb.append("lastCRLIntervalDate: ").append(lastCRLIntervalDate).append('\n');
 
         return sb.toString();
     }
@@ -397,6 +401,26 @@ public class CAEntry
     public long getNoNewCertificateAfter()
     {
         return noNewCertificateAfter;
+    }
+
+    public int getLastCRLInterval()
+    {
+        return lastCRLInterval;
+    }
+
+    public void setLastCRLInterval(int lastInterval)
+    {
+        this.lastCRLInterval = lastInterval;
+    }
+
+    public long getLastCRLIntervalDate()
+    {
+        return lastCRLIntervalDate;
+    }
+
+    public void setLastCRLIntervalDate(long lastIntervalDate)
+    {
+        this.lastCRLIntervalDate = lastIntervalDate;
     }
 
 }

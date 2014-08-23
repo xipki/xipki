@@ -88,9 +88,6 @@ public interface CAManager
             Integer numCrls, Integer expirationPeriod, ValidityMode validityMode)
     throws CAMgmtException;
 
-    void setCANextSerial(String caName, long nextSerial)
-    throws CAMgmtException;
-
     void removeCertProfileFromCA(String profileName, String caName)
     throws CAMgmtException;
 

@@ -41,4 +41,4 @@ ca:responder-set -signerType JKS \
 ca:requestor-add -cert etc/tlskeys/tls-client.der -name requestor
 
 ## CRL Signer
-ca:crlsigner-add -signerType CA -period 0 -name CASIGN.CRLSIGNER
+ca:crlsigner-add -signerType CA -name CASIGN.CRLSIGNER -crlControl updateMode?onDemand

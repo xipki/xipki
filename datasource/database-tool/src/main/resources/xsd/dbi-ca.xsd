@@ -129,10 +129,7 @@
 			<xs:element name="signer_type" type="xs:string" />
 			<xs:element name="signer_conf" type="xs:string" minOccurs="0"/>
 			<xs:element name="signer_cert" type="xs:string" minOccurs="0"/>
-			<xs:element name="period" type="xs:int"/>
-			<xs:element name="overlap" type="xs:int"/>
-			<xs:element name="include_certs_in_crl" type="xs:boolean"/>
-			<xs:element name="include_expired_certs" type="xs:boolean"/>
+			<xs:element name="crl_control" type="xs:string"/>
 		</xs:sequence>
 	</xs:complexType>
 	
@@ -189,6 +186,8 @@
 			<xs:element name="rev_time" type="xs:long" minOccurs="0"/>
 			<xs:element name="rev_invalidity_time" type="xs:long" minOccurs="0"/>
 			<xs:element name="validity_mode" type="xs:string" minOccurs="0"/>
+			<xs:element name="last_crl_interval" type="xs:int" minOccurs="0"/>
+			<xs:element name="last_crl_interval_date" type="xs:long" minOccurs="0"/>
 		</xs:sequence>
 	</xs:complexType>
 
@@ -289,6 +288,13 @@
 					</xs:sequence>
 				</xs:complexType>
 			</xs:element>
+			<xs:element name="deltaCRLCache">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="entry" type="deltaCRLCacheEntryType" minOccurs="0" maxOccurs="unbounded"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
 		</xs:sequence>
 		<xs:attribute name="version" type="xs:int" use="required"/>
 	</xs:complexType>
@@ -301,6 +307,13 @@
 		</xs:sequence>
 	</xs:complexType>
 	
+	<xs:complexType name="deltaCRLCacheEntryType">
+		<xs:sequence>
+			<xs:element name="serial" type="xs:long"/>
+			<xs:element name="caId" type="xs:int" />
+		</xs:sequence>
+	</xs:complexType>
+		
 	<xs:element name="cainfo" type="cainfoType"/>
 	<xs:complexType name="cainfoType">
 		<xs:sequence>

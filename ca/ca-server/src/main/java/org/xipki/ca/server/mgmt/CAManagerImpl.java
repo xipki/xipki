@@ -75,6 +75,7 @@ import org.xipki.ca.server.mgmt.SelfSignedCertBuilder.GenerateSelfSignedResult;
 import org.xipki.ca.server.mgmt.api.CAEntry;
 import org.xipki.ca.server.mgmt.api.CAHasRequestorEntry;
 import org.xipki.ca.server.mgmt.api.CAManager;
+import org.xipki.ca.server.mgmt.api.CRLControl;
 import org.xipki.ca.server.mgmt.api.CertProfileEntry;
 import org.xipki.ca.server.mgmt.api.CmpRequestorEntry;
 import org.xipki.ca.server.mgmt.api.CmpResponderEntry;
@@ -110,8 +111,8 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
 {
     private static final Logger LOG = LoggerFactory.getLogger(CAManagerImpl.class);
 
-    private static final String COLUMN_DELTA_CRL_URIS = "DELTA_CRL_URIS";
-    private static final String COLUMN_VALIDITY_MODE = "VALIDITY_MODE";
+    //private static final String COLUMN_DELTA_CRL_URIS = "DELTA_CRL_URIS";
+    //private static final String COLUMN_VALIDITY_MODE = "VALIDITY_MODE";
 
     private final CertificateFactory certFact;
     private final String lockInstanceId;
@@ -119,9 +120,6 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
     private CertificateStore certstore;
     private DataSourceWrapper dataSource;
     private CmpResponderEntry responder;
-
-    private boolean columnDeltaCrlUrisAvailable = true;
-    private boolean columnValidityModeAvailable = true;
 
     private boolean caLockedByMe = false;
 
@@ -283,15 +281,6 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
         if(this.dataSource == null)
         {
             throw new CAMgmtException("no datasource configured with name 'ca'");
-        }
-
-        try
-        {
-            columnDeltaCrlUrisAvailable = this.dataSource.tableHasColumn(null, "CA", COLUMN_DELTA_CRL_URIS);
-            columnValidityModeAvailable = this.dataSource.tableHasColumn(null, "CA", COLUMN_VALIDITY_MODE);
-        }catch(SQLException e)
-        {
-            throw new CAMgmtException(e.getClass().getName() + " while calling datasoure.tableHasColumn()", e);
         }
 
         boolean successfull;
@@ -605,7 +594,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
 
                     try
                     {
-                        crlSigner = new CrlSigner(identifiedSigner, crlSignerEntry.getPeriod(), crlSignerEntry.getOverlap());
+                        crlSigner = new CrlSigner(identifiedSigner, crlSignerEntry.getCRLControl());
                     } catch (OperationException e)
                     {
                         final String message = "CrlSigner.<init> crlSigner (ca=" + caName + ")";
@@ -616,8 +605,6 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
                         LOG.debug(message, e);
                         return false;
                     }
-                    crlSigner.setIncludeCertsInCrl(crlSignerEntry.includeCertsInCRL());
-                    crlSigner.setIncludeExpiredCerts(crlSignerEntry.includeExpiredCerts());
                 }
 
                 ConcurrentContentSigner caSigner;
@@ -1146,10 +1133,10 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
         {
             stmt = createStatement();
 
-            String sql = "SELECT NAME, SIGNER_TYPE, SIGNER_CONF, SIGNER_CERT, PERIOD,"
-                    + " OVERLAP, INCLUDE_CERTS_IN_CRL, INCLUDE_EXPIRED_CERTS"
-                    + " FROM CRLSIGNER";
-            rs = stmt.executeQuery(sql);
+            StringBuilder sqlBuilder = new StringBuilder();
+            sqlBuilder.append("SELECT NAME, SIGNER_TYPE, SIGNER_CONF, SIGNER_CERT, CRL_CONTROL");
+            sqlBuilder.append(" FROM CRLSIGNER");
+            rs = stmt.executeQuery(sqlBuilder.toString());
 
             while(rs.next())
             {
@@ -1157,25 +1144,16 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
                 String signer_type = rs.getString("SIGNER_TYPE");
                 String signer_conf = rs.getString("SIGNER_CONF");
                 String signer_cert = rs.getString("SIGNER_CERT");
-                int period = rs.getInt("PERIOD");
-                int overlap = rs.getInt("OVERLAP");
-                boolean include_certs_in_crl = rs.getBoolean("INCLUDE_CERTS_IN_CRL");
-                boolean include_expired_certs = rs.getBoolean("INCLUDE_EXPIRED_CERTS");
+                String crlControlConf = rs.getString("CRL_CONTROL");
 
-                CrlSignerEntry entry = new CrlSignerEntry(name);
-                entry.setType(signer_type);
+                CrlSignerEntry entry = new CrlSignerEntry(name, signer_type, signer_conf, crlControlConf);
                 if("CA".equalsIgnoreCase(signer_type) == false)
                 {
-                    entry.setConf(signer_conf);
                     if(signer_cert != null)
                     {
                         entry.setCertificate(generateCert(signer_cert));
                     }
                 }
-                entry.setPeriod(period);
-                entry.setOverlap(overlap);
-                entry.setIncludeCertsInCrl(include_certs_in_crl);
-                entry.setIncludeExpiredCerts(include_expired_certs);
                 crlSigners.put(entry.getName(), entry);
             }
         }catch(SQLException | ConfigurationException e)
@@ -1264,14 +1242,8 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
             sqlBuilder.append("CERT, SIGNER_TYPE, SIGNER_CONF, CRLSIGNER_NAME, ");
             sqlBuilder.append("DUPLICATE_KEY_MODE, DUPLICATE_SUBJECT_MODE, PERMISSIONS, NUM_CRLS, ");
             sqlBuilder.append("EXPIRATION_PERIOD, REVOKED, REV_REASON, REV_TIME, REV_INVALIDITY_TIME");
-            if(columnDeltaCrlUrisAvailable)
-            {
-                sqlBuilder.append(", ").append(COLUMN_DELTA_CRL_URIS);
-            }
-            if(columnValidityModeAvailable)
-            {
-                sqlBuilder.append(", ").append(COLUMN_VALIDITY_MODE);
-            }
+            sqlBuilder.append(", DELTA_CRL_URIS, VALIDITY_MODE");
+            sqlBuilder.append(", LAST_CRL_INTERVAL, LAST_CRL_INTERVAL_DATE");
             sqlBuilder.append(" FROM CA");
 
             ResultSet rs = stmt.executeQuery(sqlBuilder.toString());
@@ -1282,8 +1254,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
                 long next_serial = rs.getLong("NEXT_SERIAL");
                 String status = rs.getString("STATUS");
                 String crl_uris = rs.getString("CRL_URIS");
-                String delta_crl_uris = columnDeltaCrlUrisAvailable ?
-                        rs.getString(COLUMN_DELTA_CRL_URIS) : null;
+                String delta_crl_uris = rs.getString("DELTA_CRL_URIS");
                 String ocsp_uris = rs.getString("OCSP_URIS");
                 int max_validity = rs.getInt("MAX_VALIDITY");
                 String b64cert = rs.getString("CERT");
@@ -1294,6 +1265,8 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
                 int duplicateSubjectI = rs.getInt("DUPLICATE_SUBJECT_MODE");
                 int numCrls = rs.getInt("NUM_CRLS");
                 int expirationPeriod = rs.getInt("EXPIRATION_PERIOD");
+                int lastCRLInterval = rs.getInt("LAST_CRL_INTERVAL");
+                long lastCRLIntervalDate = rs.getLong("LAST_CRL_INTERVAL_DATE");
 
                 CertRevocationInfo revocationInfo = null;
                 boolean revoked = rs.getBoolean("REVOKED");
@@ -1331,6 +1304,8 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
 
                 CAEntry entry = new CAEntry(name, next_serial, signer_type, signer_conf, cert,
                         lOcspUris, lCrlUris, lDeltaCrlUris, null, numCrls, expirationPeriod);
+                entry.setLastCRLInterval(lastCRLInterval);
+                entry.setLastCRLIntervalDate(lastCRLIntervalDate);
                 entry.setLastCommittedNextSerial(next_serial);
 
                 CAStatus caStatus = CAStatus.getCAStatus(status);
@@ -1352,8 +1327,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
                 entry.setPermissions(permissions);
                 entry.setRevocationInfo(revocationInfo);
 
-                String validityModeS = columnValidityModeAvailable ?
-                        rs.getString(COLUMN_VALIDITY_MODE) : null;
+                String validityModeS = rs.getString("VALIDITY_MODE");
                 ValidityMode validityMode = null;
                 if(validityModeS != null)
                 {
@@ -1453,21 +1427,6 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
             throw new CAMgmtException("CA named " + name + " exists");
         }
 
-        if(columnValidityModeAvailable == false)
-        {
-            if(newCaDbEntry.getValidityMode() != null && newCaDbEntry.getValidityMode() != ValidityMode.STRICT)
-            {
-                throw new CAMgmtException("Column " + COLUMN_VALIDITY_MODE + " in table CA does not exist,"
-                        + " please update the table definition");
-            }
-        }
-
-        if(columnDeltaCrlUrisAvailable == false && newCaDbEntry.getDeltaCrlUrisAsString() != null)
-        {
-            throw new CAMgmtException("Column " + COLUMN_DELTA_CRL_URIS + " in table CA does not exist,"
-                    + " please update the table definition");
-        }
-
         // insert to table ca
         PreparedStatement ps = null;
         try
@@ -1477,26 +1436,8 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
             sqlBuilder.append("NAME, SUBJECT, NEXT_SERIAL, STATUS, CRL_URIS, OCSP_URIS, MAX_VALIDITY, ");
             sqlBuilder.append("CERT, SIGNER_TYPE, SIGNER_CONF, CRLSIGNER_NAME, ");
             sqlBuilder.append("DUPLICATE_KEY_MODE, DUPLICATE_SUBJECT_MODE, PERMISSIONS, NUM_CRLS, EXPIRATION_PERIOD");
-            if(columnValidityModeAvailable)
-            {
-                sqlBuilder.append(", ").append(COLUMN_VALIDITY_MODE);
-            }
-            if(columnDeltaCrlUrisAvailable)
-            {
-                sqlBuilder.append(", ").append(COLUMN_DELTA_CRL_URIS);
-            }
-            sqlBuilder.append(")");
-            sqlBuilder.append("VALUES(");
-            sqlBuilder.append("?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?");
-            if(columnValidityModeAvailable)
-            {
-                sqlBuilder.append(", ?");
-            }
-            if(columnDeltaCrlUrisAvailable)
-            {
-                sqlBuilder.append(", ?");
-            }
-            sqlBuilder.append(")");
+            sqlBuilder.append(", VALIDITY_MODE, DELTA_CRL_URIS");
+            sqlBuilder.append(") VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
 
             ps = prepareStatement(sqlBuilder.toString());
             int idx = 1;
@@ -1523,14 +1464,8 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
             ps.setString(idx++, Permission.toString(newCaDbEntry.getPermissions()));
             ps.setInt(idx++, newCaDbEntry.getNumCrls());
             ps.setInt(idx++, newCaDbEntry.getExpirationPeriod());
-            if(columnValidityModeAvailable)
-            {
-                ps.setString(idx++, newCaDbEntry.getValidityMode().name());
-            }
-            if(columnDeltaCrlUrisAvailable)
-            {
-                ps.setString(idx++, newCaDbEntry.getDeltaCrlUrisAsString());
-            }
+            ps.setString(idx++, newCaDbEntry.getValidityMode().name());
+            ps.setString(idx++, newCaDbEntry.getDeltaCrlUrisAsString());
 
             ps.executeUpdate();
         }catch(SQLException e)
@@ -1619,13 +1554,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
         Integer iDelta_crl_uris = null;
         if(delta_crl_uris != null)
         {
-            if(columnDeltaCrlUrisAvailable == false)
-            {
-                throw new CAMgmtException("Column " + COLUMN_DELTA_CRL_URIS + " in table CA does not exist,"
-                        + " please update the table definition");
-            }
-
-            sb.append(COLUMN_DELTA_CRL_URIS).append("=?,");
+            sb.append("DELTA_CRL_URIS=?,");
             iDelta_crl_uris = i++;
         }
 
@@ -1702,13 +1631,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
         Integer iValidity_mode = null;
         if(validityMode != null && validityMode != ValidityMode.STRICT)
         {
-            if(columnValidityModeAvailable == false)
-            {
-                throw new CAMgmtException("Column " + COLUMN_VALIDITY_MODE + " in table CA does not exist,"
-                        + " please update the table definition");
-            }
-
-            sb.append(COLUMN_VALIDITY_MODE).append("=?,");
+            sb.append("VALIDITY_MODE=?,");
             iValidity_mode = i++;
         }
 
@@ -1821,7 +1744,6 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
         }
     }
 
-    @Override
     public void setCANextSerial(String caName, long nextSerial)
     throws CAMgmtException
     {
@@ -1837,6 +1759,32 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
             ps = prepareStatement("UPDATE CA SET NEXT_SERIAL=? WHERE NAME=?");
             ps.setLong(1, nextSerial);
             ps.setString(2, caName);
+            ps.executeUpdate();
+        }catch(SQLException e)
+        {
+            throw new CAMgmtException(e);
+        }finally
+        {
+            dataSource.releaseResources(ps, null);
+        }
+    }
+
+    public void setCRLLastInterval(String caName, int lastInterval, long lastIntervalDate)
+    throws CAMgmtException
+    {
+        CAEntry caInfo = cas.get(caName);
+        if(caInfo == null)
+        {
+            throw new CAMgmtException("Could not find CA named " + caName);
+        }
+
+        PreparedStatement ps = null;
+        try
+        {
+            ps = prepareStatement("UPDATE CA SET LAST_CRL_INTERVAL=?, LAST_CRL_INTERVAL_DATE=? WHERE NAME=?");
+            ps.setInt(1, lastInterval);
+            ps.setLong(2, lastIntervalDate);
+            ps.setString(3, caName);
             ps.executeUpdate();
         }catch(SQLException e)
         {
@@ -2430,20 +2378,20 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
         PreparedStatement ps = null;
         try
         {
-            ps = prepareStatement(
-                    "INSERT INTO CRLSIGNER (NAME, SIGNER_TYPE, SIGNER_CONF, SIGNER_CERT,"
-                    + " PERIOD, OVERLAP, INCLUDE_CERTS_IN_CRL, INCLUDE_EXPIRED_CERTS)"
-                    + " VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
+            StringBuilder sqlBuilder = new StringBuilder();
+            sqlBuilder.append("INSERT INTO CRLSIGNER (NAME, SIGNER_TYPE, SIGNER_CONF, SIGNER_CERT, CRL_CONTROL");
+            sqlBuilder.append(") VALUES (?, ?, ?, ?, ?)");
+
+            ps = prepareStatement(sqlBuilder.toString());
             int idx = 1;
             ps.setString(idx++, name);
             ps.setString(idx++, dbEntry.getType());
             ps.setString(idx++, dbEntry.getConf());
             ps.setString(idx++, dbEntry.getCertificate() == null ? null :
                     Base64.toBase64String(dbEntry.getCertificate().getEncoded()));
-            ps.setInt(idx++, dbEntry.getPeriod());
-            ps.setInt(idx++, dbEntry.getOverlap());
-            setBoolean(ps, idx++, dbEntry.includeCertsInCRL());
-            setBoolean(ps, idx++, dbEntry.includeExpiredCerts());
+
+            CRLControl crlControl = dbEntry.getCRLControl();
+            ps.setString(idx++, crlControl.getConf());
 
             ps.executeUpdate();
         }catch(SQLException | CertificateEncodingException e)
@@ -3368,7 +3316,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
             boolean successfull = ca.republishCertificates(publisherNames);
             if(successfull == false)
             {
-                throw new CAMgmtException("Republishing certificates to CA " + name + " failed");
+                throw new CAMgmtException("Republishing certificates of CA " + name + " failed");
             }
         }
 
@@ -3538,7 +3486,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
             {
                 certstore.clearPublishQueue((X509CertificateWithMetaInfo) null, (String) null);
                 return true;
-            } catch (SQLException e)
+            } catch (SQLException | OperationException e)
             {
                 throw new CAMgmtException(e);
             }

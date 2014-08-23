@@ -99,18 +99,25 @@ public class CertificateStore
     }
 
     public void clearPublishQueue(X509CertificateWithMetaInfo caCert, String publisherName)
-    throws SQLException
+    throws OperationException, SQLException
     {
         queryExecutor.clearPublishQueue(caCert, publisherName);
     }
 
+    public void clearDeltaCRLCache(X509CertificateWithMetaInfo caCert)
+    throws OperationException, SQLException
+    {
+        queryExecutor.clearDeltaCRLCache(caCert);
+    }
+
     public CertWithRevocationInfo revokeCertificate(X509CertificateWithMetaInfo caCert,
-            BigInteger serialNumber, CertRevocationInfo revInfo, boolean force)
+            BigInteger serialNumber, CertRevocationInfo revInfo, boolean force, boolean publishToDeltaCRLCache)
     throws OperationException
     {
         try
         {
-            CertWithRevocationInfo revokedCert = queryExecutor.revokeCert(caCert, serialNumber, revInfo, force);
+            CertWithRevocationInfo revokedCert = queryExecutor.revokeCert(
+                    caCert, serialNumber, revInfo, force, publishToDeltaCRLCache);
             if(revokedCert == null)
             {
                 LOG.info("Could not revoke non-existing certificate issuer={}, serialNumber={}",
@@ -130,12 +137,13 @@ public class CertificateStore
     }
 
     public X509CertificateWithMetaInfo unrevokeCertificate(X509CertificateWithMetaInfo caCert,
-            BigInteger serialNumber, boolean force)
+            BigInteger serialNumber, boolean force, boolean publishToDeltaCRLCache)
     throws OperationException
     {
         try
         {
-            X509CertificateWithMetaInfo unrevokedCert = queryExecutor.unrevokeCert(caCert, serialNumber, force);
+            X509CertificateWithMetaInfo unrevokedCert = queryExecutor.unrevokeCert(
+                    caCert, serialNumber, force, publishToDeltaCRLCache);
             if(unrevokedCert == null)
             {
                 LOG.info("Could not unrevoke non-existing certificate issuer={}, serialNumber={}",
@@ -221,11 +229,11 @@ public class CertificateStore
         }
     }
 
-    public byte[] getEncodedCurrentCRL(X509CertificateWithMetaInfo caCert)
+    public byte[] getEncodedCRL(X509CertificateWithMetaInfo caCert, BigInteger crlNumber)
     {
         try
         {
-            return queryExecutor.getEncodedCRL(caCert);
+            return queryExecutor.getEncodedCRL(caCert, crlNumber);
         } catch (Exception e)
         {
             LOG.error("Could not get CRL ca={}: error message: {}",
@@ -313,6 +321,20 @@ public class CertificateStore
         try
         {
             return queryExecutor.getRevokedCertificates(caCert, notExpiredAt, startSerial, numEntries);
+        } catch (SQLException e)
+        {
+            LOG.debug("SQLException", e);
+            throw new OperationException(ErrorCode.DATABASE_FAILURE, e.getMessage());
+        }
+    }
+
+    public List<CertRevocationInfoWithSerial> getCertificatesForDeltaCRL(
+            X509CertificateWithMetaInfo caCert, BigInteger startSerial, int numEntries)
+    throws OperationException
+    {
+        try
+        {
+            return queryExecutor.getCertificatesForDeltaCRL(caCert, startSerial, numEntries);
         } catch (SQLException e)
         {
             LOG.debug("SQLException", e);

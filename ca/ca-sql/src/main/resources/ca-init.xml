@@ -71,18 +71,7 @@
 			</column>
 			<column name="SIGNER_CONF" type="CLOB"/>
 			<column name="SIGNER_CERT" type="VARCHAR(3000)"/>
-			<column name="PERIOD" remarks="minutes. 0 indicates no CRL will be generated automatically." type="SMALLINT">
-				<constraints nullable="false"/>
-			</column>
-			<column name="OVERLAP" remarks="minutes" type="SMALLINT">
-				<constraints nullable="false"/>
-			</column>
-			<column defaultValueNumeric="0" name="INCLUDE_CERTS_IN_CRL" type="SMALLINT">
-				<constraints nullable="false"/>
-			</column>
-			<column defaultValueNumeric="0" name="INCLUDE_EXPIRED_CERTS" type="SMALLINT">
-				<constraints nullable="false"/>
-			</column>
+			<column name="CRL_CONTROL" type="VARCHAR(4000)"/>
 		</createTable>
 
 		<!-- table REQUESTOR -->
@@ -165,6 +154,8 @@
 			<column name="CERT" type="VARCHAR(3000)">
 				<constraints nullable="false"/>
 			</column>
+			<column name="LAST_CRL_INTERVAL" type="INT"/>
+			<column name="LAST_CRL_INTERVAL_DATE" type="BIGINT"/>
 		</createTable>
 
 		<!-- table CAALIAS -->
@@ -290,6 +281,10 @@
 				<constraints nullable="false"/>
 			</column>
 			<column name="NEXTUPDATE" type="BIGINT"/>
+			<column name="DELTACRL" type="SMALLINT">
+				<constraints nullable="false"/>
+			</column>
+			<column name="BASECRL_NUMBER" type="INT"/>
 			<column name="CRL" type="CLOB">
 				<constraints nullable="false"/>
 			</column>
@@ -375,10 +370,16 @@
 			</column>
 		</createTable>
 		
-		<createIndex tableName="PUBLISHQUEUE" unique="false" indexName="IDX_PUBLISHQUEUE_CERT_CAINFO1">
-			<column name="CERT_ID"/>
-			<column name="CAINFO_ID"/>
-		</createIndex>
+		<!-- table DELTACRL_CHANGES -->
+		<createTable tableName="DELTACRL_CACHE">
+			<column name="CAINFO_ID" type="INT">
+				<constraints nullable="false"/>
+			</column>
+			<column name="SERIAL" type="BIGINT">
+				<constraints nullable="false"/>
+			</column>
+		</createTable>
+		
 	</changeSet>
 
 	<!-- CA Configuration :: foreign key -->

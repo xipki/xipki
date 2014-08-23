@@ -22,19 +22,23 @@ import org.xipki.security.common.ParamChecker;
 public class CrlSignerEntry
 {
     private final String name;
-    private String type;
-    private String conf;
+    private final String signerType;
+    private final String signerConf;
     private X509Certificate cert;
-    private int period; // in minutes
-    private int overlap; // in minutes
-    private boolean includeCertsInCrl;
-    private boolean includeExpiredCerts;
 
-    public CrlSignerEntry(String name)
+    private final CRLControl crlControl;
+
+    public CrlSignerEntry(String name, String signerType, String signerConf, String crlControlConf)
+    throws ConfigurationException
     {
         ParamChecker.assertNotEmpty("name", name);
+        ParamChecker.assertNotEmpty("type", signerType);
+        ParamChecker.assertNotEmpty("crlControlConf", crlControlConf);
 
         this.name = name;
+        this.signerType = signerType;
+        this.signerConf = signerConf;
+        this.crlControl = CRLControl.getInstance(crlControlConf);
     }
 
     public String getName()
@@ -44,22 +48,12 @@ public class CrlSignerEntry
 
     public String getType()
     {
-        return type;
-    }
-
-    public void setType(String type)
-    {
-        this.type = type;
+        return signerType;
     }
 
     public String getConf()
     {
-        return conf;
-    }
-
-    public void setConf(String conf)
-    {
-        this.conf = conf;
+        return signerConf;
     }
 
     public X509Certificate getCertificate()
@@ -72,6 +66,11 @@ public class CrlSignerEntry
         this.cert = cert;
     }
 
+    public CRLControl getCRLControl()
+    {
+        return crlControl;
+    }
+
     @Override
     public String toString()
     {
@@ -82,12 +81,9 @@ public class CrlSignerEntry
     {
         StringBuilder sb = new StringBuilder();
         sb.append("name: ").append(name).append('\n');
-        sb.append("type: ").append(type).append('\n');
-        sb.append("conf: ").append(conf).append('\n');
-        sb.append("period: ").append(getPeriod()).append(" minutes\n");
-        sb.append("overlap: ").append(getOverlap()).append(" minutes\n");
-        sb.append("includeCertsInCrl: ").append(includeCertsInCrl ? "yes" : "no").append("\n");
-        sb.append("includeExpiredCerts: ").append(includeExpiredCerts ? "yes" : "no").append('\n');
+        sb.append("signerType: ").append(signerType).append('\n');
+        sb.append("signerConf: ").append(signerConf).append('\n');
+        sb.append("crlControl: ").append(crlControl.getConf()).append("\n");
         if(cert != null)
         {
             sb.append("cert: ").append("\n");
@@ -115,47 +111,6 @@ public class CrlSignerEntry
         }
 
         return sb.toString();
-    }
-
-    public int getPeriod()
-    {
-        return period;
-    }
-
-    public void setPeriod(int period)
-    {
-        this.period = period;
-    }
-
-    public int getOverlap()
-    {
-        return overlap;
-    }
-
-    public void setOverlap(int overlap)
-    {
-        this.overlap = overlap;
-    }
-
-    public boolean includeCertsInCRL()
-    {
-        return includeCertsInCrl;
-    }
-
-    public void setIncludeCertsInCrl(boolean includeCertsInCrl)
-    throws ConfigurationException
-    {
-        this.includeCertsInCrl = includeCertsInCrl;
-    }
-
-    public boolean includeExpiredCerts()
-    {
-        return includeExpiredCerts;
-    }
-
-    public void setIncludeExpiredCerts(boolean includeExpiredCerts)
-    {
-        this.includeExpiredCerts = includeExpiredCerts;
     }
 
 }

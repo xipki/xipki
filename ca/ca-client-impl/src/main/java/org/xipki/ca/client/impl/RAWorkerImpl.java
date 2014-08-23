@@ -537,14 +537,79 @@ public final class RAWorkerImpl extends AbstractRAWorker implements RAWorker
     public X509CRL downloadCRL(String caName)
     throws RAWorkerException, PKIErrorException
     {
-        return requestCRL(caName, false);
+        return downloadCRL(caName, null);
+    }
+
+    @Override
+    public X509CRL downloadCRL(String caName, BigInteger crlNumber)
+    throws RAWorkerException, PKIErrorException
+    {
+        ParamChecker.assertNotNull("caName", caName);
+
+        if(casMap.containsKey(caName) == false)
+        {
+            throw new IllegalArgumentException("Unknown CAConf " + caName);
+        }
+
+        X509CmpRequestor requestor = cmpRequestorsMap.get(caName);
+        CmpResultType result;
+        try
+        {
+            result = crlNumber == null ? requestor.downloadCurrentCRL() : requestor.downloadCRL(crlNumber);
+        } catch (CmpRequestorException e)
+        {
+            throw new RAWorkerException(e);
+        }
+
+        if(result instanceof ErrorResultType)
+        {
+            throw createPKIErrorException((ErrorResultType) result);
+        }
+        else if(result instanceof CRLResultType)
+        {
+            CRLResultType downloadCRLResult = (CRLResultType) result;
+            return downloadCRLResult.getCRL();
+        }
+        else
+        {
+            throw new RuntimeException("Unknown result type: " + result.getClass().getName());
+        }
     }
 
     @Override
     public X509CRL generateCRL(String caName)
     throws RAWorkerException, PKIErrorException
     {
-        return requestCRL(caName, true);
+        ParamChecker.assertNotNull("caName", caName);
+
+        if(casMap.containsKey(caName) == false)
+        {
+            throw new IllegalArgumentException("Unknown CAConf " + caName);
+        }
+
+        X509CmpRequestor requestor = cmpRequestorsMap.get(caName);
+        CmpResultType result;
+        try
+        {
+            result = requestor.generateCRL();
+        } catch (CmpRequestorException e)
+        {
+            throw new RAWorkerException(e);
+        }
+
+        if(result instanceof ErrorResultType)
+        {
+            throw createPKIErrorException((ErrorResultType) result);
+        }
+        else if(result instanceof CRLResultType)
+        {
+            CRLResultType downloadCRLResult = (CRLResultType) result;
+            return downloadCRLResult.getCRL();
+        }
+        else
+        {
+            throw new RuntimeException("Unknown result type: " + result.getClass().getName());
+        }
     }
 
     @Override
@@ -567,41 +632,6 @@ public final class RAWorkerImpl extends AbstractRAWorker implements RAWorker
         }
 
         throw new RAWorkerException("Unknown CA for issuer: " + issuer);
-    }
-
-    private X509CRL requestCRL(String caName, boolean generateCRL)
-    throws RAWorkerException, PKIErrorException
-    {
-        ParamChecker.assertNotNull("caName", caName);
-
-        if(casMap.containsKey(caName) == false)
-        {
-            throw new IllegalArgumentException("Unknown CAConf " + caName);
-        }
-
-        X509CmpRequestor requestor = cmpRequestorsMap.get(caName);
-        CmpResultType result;
-        try
-        {
-            result = generateCRL ? requestor.generateCRL() : requestor.downloadCurrentCRL();
-        } catch (CmpRequestorException e)
-        {
-            throw new RAWorkerException(e);
-        }
-
-        if(result instanceof ErrorResultType)
-        {
-            throw createPKIErrorException((ErrorResultType) result);
-        }
-        else if(result instanceof CRLResultType)
-        {
-            CRLResultType downloadCRLResult = (CRLResultType) result;
-            return downloadCRLResult.getCRL();
-        }
-        else
-        {
-            throw new RuntimeException("Unknown result type: " + result.getClass().getName());
-        }
     }
 
     private String getCANameForProfile(String certProfile)

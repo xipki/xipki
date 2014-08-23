@@ -32,6 +32,7 @@ public class CertRevocationInfo
     public CertRevocationInfo(CRLReason reason, Date revocationTime, Date invalidityTime)
     {
         ParamChecker.assertNotNull("reason", reason);
+        ParamChecker.assertNotNull("revocationTime", revocationTime);
         this.reason = reason;
         this.revocationTime = revocationTime;
         this.invalidityTime = invalidityTime;
@@ -39,6 +40,8 @@ public class CertRevocationInfo
 
     public CertRevocationInfo(int reasonCode, Date revocationTime, Date invalidityTime)
     {
+        ParamChecker.assertNotNull("revocationTime", revocationTime);
+
         this.reason = CRLReason.forReasonCode(reasonCode);
         if(this.reason == null)
         {

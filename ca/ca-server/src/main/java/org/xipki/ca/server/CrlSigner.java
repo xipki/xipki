@@ -15,7 +15,9 @@ import org.bouncycastle.util.Arrays;
 import org.bouncycastle.x509.extension.X509ExtensionUtil;
 import org.xipki.ca.api.OperationException;
 import org.xipki.ca.api.OperationException.ErrorCode;
+import org.xipki.ca.server.mgmt.api.CRLControl;
 import org.xipki.security.api.ConcurrentContentSigner;
+import org.xipki.security.common.ParamChecker;
 
 /**
  * @author Lijun Liao
@@ -26,18 +28,15 @@ public class CrlSigner
     private final ConcurrentContentSigner signer;
     private final byte[] subjectKeyIdentifier;
 
-    private final int period;
-    private final int overlap;
-    private boolean includeCertsInCrl;
-    private boolean includeExpiredCerts;
+    private final CRLControl crlControl;
 
-    public CrlSigner(ConcurrentContentSigner signer, int period, int overlap)
+    public CrlSigner(ConcurrentContentSigner signer, CRLControl crlControl)
     throws OperationException
     {
-        super();
+        ParamChecker.assertNotNull("crlControl", crlControl);
+
         this.signer = signer;
-        this.period = period;
-        this.overlap = overlap;
+        this.crlControl = crlControl;
 
         if(signer == null)
         {
@@ -69,39 +68,14 @@ public class CrlSigner
         return signer;
     }
 
-    public int getPeriod()
+    public CRLControl getCRLcontrol()
     {
-        return period;
-    }
-
-    public int getOverlap()
-    {
-        return overlap;
-    }
-
-    public boolean includeCertsInCrl()
-    {
-        return includeCertsInCrl;
-    }
-
-    public void setIncludeCertsInCrl(boolean includeCertsInCrl)
-    {
-        this.includeCertsInCrl = includeCertsInCrl;
+        return crlControl;
     }
 
     public byte[] getSubjectKeyIdentifier()
     {
         return subjectKeyIdentifier == null ? null : Arrays.clone(subjectKeyIdentifier);
-    }
-
-    public boolean includeExpiredCerts()
-    {
-        return includeExpiredCerts;
-    }
-
-    public void setIncludeExpiredCerts(boolean includeExpiredCerts)
-    {
-        this.includeExpiredCerts = includeExpiredCerts;
     }
 
 }
