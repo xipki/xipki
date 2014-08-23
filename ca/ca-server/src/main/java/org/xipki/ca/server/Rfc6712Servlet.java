@@ -256,7 +256,7 @@ public class Rfc6712Servlet extends HttpServlet
 
         try
         {
-              return PKIMessage.getInstance(asn1Stream.readObject());
+            return PKIMessage.getInstance(asn1Stream.readObject());
         }finally
         {
             try
