@@ -18,6 +18,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1Enumerated;
 import org.bouncycastle.asn1.ASN1GeneralizedTime;
 import org.bouncycastle.asn1.ASN1Integer;
@@ -139,8 +140,20 @@ abstract class X509CmpRequestor extends CmpRequestor
     public CmpResultType downloadCurrentCRL()
     throws CmpRequestorException
     {
+        return downloadCRL(null);
+    }
+
+    public CmpResultType downloadCRL(BigInteger crlNumber)
+    throws CmpRequestorException
+    {
         ASN1ObjectIdentifier type = CMPObjectIdentifiers.it_currentCRL;
-        PKIMessage request = buildMessageWithGeneralMsgContent(type);
+
+        ASN1Integer value = null;
+        if(crlNumber != null)
+        {
+            value = new ASN1Integer(crlNumber);
+        }
+        PKIMessage request = buildMessageWithGeneralMsgContent(type, value);
         PKIResponse response = signAndSend(request);
         return evaluateCRLResponse(response, type);
     }
@@ -524,6 +537,12 @@ abstract class X509CmpRequestor extends CmpRequestor
     }
 
     private PKIMessage buildMessageWithGeneralMsgContent(ASN1ObjectIdentifier type)
+    throws CmpRequestorException
+    {
+        return buildMessageWithGeneralMsgContent(type, null);
+    }
+
+    private PKIMessage buildMessageWithGeneralMsgContent(ASN1ObjectIdentifier type, ASN1Encodable value)
     throws CmpRequestorException
     {
         PKIHeader header = buildPKIHeader(null);

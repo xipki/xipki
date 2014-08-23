@@ -175,11 +175,12 @@ class CaConfigurationDbExporter extends DbPorter
         {
             stmt = createStatement();
 
-            String sql = "SELECT NAME, SIGNER_TYPE, SIGNER_CONF, SIGNER_CERT, PERIOD," +
-                    " OVERLAP, INCLUDE_CERTS_IN_CRL, INCLUDE_EXPIRED_CERTS" +
-                    " FROM CRLSIGNER";
+            StringBuilder sqlBuilder = new StringBuilder();
+            sqlBuilder.append("SELECT NAME, SIGNER_TYPE, SIGNER_CONF, SIGNER_CERT, CRL_CONTROL");
 
-            rs = stmt.executeQuery(sql);
+            sqlBuilder.append(" FROM CRLSIGNER");
+
+            rs = stmt.executeQuery(sqlBuilder.toString());
 
             while(rs.next())
             {
@@ -187,21 +188,14 @@ class CaConfigurationDbExporter extends DbPorter
                 String signer_type = rs.getString("SIGNER_TYPE");
                 String signer_conf = rs.getString("SIGNER_CONF");
                 String signer_cert = rs.getString("SIGNER_CERT");
-                int period = rs.getInt("PERIOD");
-                int overlap = rs.getInt("OVERLAP");
-                boolean include_certs_in_crl = rs.getBoolean("INCLUDE_CERTS_IN_CRL");
+                String crl_control = rs.getString("CRL_CONTROL");
 
                 CrlsignerType crlsigner = new CrlsignerType();
                 crlsigner.setName(name);
                 crlsigner.setSignerType(signer_type);
                 crlsigner.setSignerConf(signer_conf);
                 crlsigner.setSignerCert(signer_cert);
-                crlsigner.setPeriod(period);
-                crlsigner.setOverlap(overlap);
-                crlsigner.setIncludeCertsInCrl(include_certs_in_crl);
-
-                boolean includeExpiredCerts = rs.getBoolean("INCLUDE_EXPIRED_CERTS");
-                crlsigner.setIncludeExpiredCerts(includeExpiredCerts);
+                crlsigner.setCrlControl(crl_control);
 
                 crlsigners.getCrlsigner().add(crlsigner);
             }
@@ -414,19 +408,8 @@ class CaConfigurationDbExporter extends DbPorter
             sb.append("CERT, SIGNER_TYPE, SIGNER_CONF, CRLSIGNER_NAME, ");
             sb.append("DUPLICATE_KEY_MODE, DUPLICATE_SUBJECT_MODE, PERMISSIONS, NUM_CRLS, ");
             sb.append("EXPIRATION_PERIOD, REVOKED, REV_REASON, REV_TIME, REV_INVALIDITY_TIME");
-
-            boolean deletaCrlUrisColumnAvailable = tableHasColumn("CA", "DELTA_CRL_URIS");
-            if(deletaCrlUrisColumnAvailable)
-            {
-                sb.append(", DELTA_CRL_URIS");
-            }
-
-            boolean validityColumnAvailable = tableHasColumn("CA", "VALIDITY_MODE");
-            if(validityColumnAvailable)
-            {
-                sb.append(", VALIDITY_MODE");
-            }
-
+            sb.append(", DELTA_CRL_URIS, VALIDITY_MODE");
+            sb.append(", LAST_CRL_INTERVAL, LAST_CRL_INTERVAL_DATE");
             sb.append(" FROM CA");
 
             String sql = sb.toString();
@@ -440,11 +423,7 @@ class CaConfigurationDbExporter extends DbPorter
                 long next_serial = rs.getLong("NEXT_SERIAL");
                 String status = rs.getString("STATUS");
                 String crl_uris = rs.getString("CRL_URIS");
-                String delta_crl_uris = null;
-                if(deletaCrlUrisColumnAvailable)
-                {
-                    delta_crl_uris = rs.getString("DELTA_CRL_URIS");
-                }
+                String delta_crl_uris = rs.getString("DELTA_CRL_URIS");
 
                 String ocsp_uris = rs.getString("OCSP_URIS");
                 int max_validity = rs.getInt("MAX_VALIDITY");
@@ -454,15 +433,11 @@ class CaConfigurationDbExporter extends DbPorter
                 String crlsigner_name = rs.getString("CRLSIGNER_NAME");
                 int duplicateKeyMode = rs.getInt("DUPLICATE_KEY_MODE");
                 int duplicateSubjectMode = rs.getInt("DUPLICATE_SUBJECT_MODE");
-
                 String permissions = rs.getString("PERMISSIONS");
                 int expirationPeriod = rs.getInt("EXPIRATION_PERIOD");
-
-                String validityMode = null;
-                if(validityColumnAvailable)
-                {
-                    validityMode = rs.getString("VALIDITY_MODE");
-                }
+                String validityMode = rs.getString("VALIDITY_MODE");
+                int lastCRLInterval = rs.getInt("LAST_CRL_INTERVAL");
+                long lastCRLIntervalDate = rs.getLong("LAST_CRL_INTERVAL_DATE");
 
                 CaType ca = new CaType();
                 ca.setName(name);
@@ -481,6 +456,8 @@ class CaConfigurationDbExporter extends DbPorter
                 ca.setPermissions(permissions);
                 ca.setExpirationPeriod(expirationPeriod);
                 ca.setValidityMode(validityMode);
+                ca.setLastCrlInterval(lastCRLInterval);
+                ca.setLastCrlIntervalDate(lastCRLIntervalDate);
 
                 int numCrls = rs.getInt("num_crls");
                 ca.setNumCrls(numCrls);

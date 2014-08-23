@@ -57,6 +57,9 @@ public interface RAWorker
     X509CRL downloadCRL(String caName)
     throws RAWorkerException, PKIErrorException;
 
+    X509CRL downloadCRL(String caName, BigInteger crlNumber)
+    throws RAWorkerException, PKIErrorException;
+
     X509CRL generateCRL(String caName)
     throws RAWorkerException, PKIErrorException;
 
