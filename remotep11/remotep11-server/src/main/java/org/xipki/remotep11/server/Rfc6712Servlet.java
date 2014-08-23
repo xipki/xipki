@@ -66,7 +66,23 @@ public class Rfc6712Servlet extends HttpServlet
                 return;
             }
 
-            PKIMessage pkiReq = generatePKIMessage(request.getInputStream());
+            PKIMessage pkiReq;
+            try
+            {
+                pkiReq = generatePKIMessage(request.getInputStream());
+            }catch(Exception e)
+            {
+                response.setContentLength(0);
+                response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                final String message = "could not parse the request (PKIMessage)";
+                if(LOG.isErrorEnabled())
+                {
+                    LOG.error(message + ", class={}, message={}", e.getClass().getName(), e.getMessage());
+                }
+                LOG.debug(message, e);
+
+                return;
+            }
 
             PKIHeader reqHeader = pkiReq.getHeader();
             ASN1OctetString tid = reqHeader.getTransactionID();
