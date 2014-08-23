@@ -325,6 +325,9 @@
 			<column name="REV_REASON" type="SMALLINT"/>
 			<column name="REV_TIME" remarks="seconds since January 1, 1970, 00:00:00 GMT" type="BIGINT"/>
 			<column name="REV_INVALIDITY_TIME" remarks="seconds since January 1, 1970, 00:00:00 GMT" type="BIGINT"/>
+			<column name="EE" type="SMALLINT" remarks="whether it is an end entity cert">
+				<constraints nullable="false"/>
+			</column>
 			<column name="USER_ID" type="INT"/>
 			<column name="SHA1_FP_PK" type="CHAR(40)">
 				<constraints nullable="false"/>

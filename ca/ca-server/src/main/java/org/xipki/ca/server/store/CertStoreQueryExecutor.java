@@ -167,8 +167,8 @@ class CertStoreQueryExecutor
                 "(ID, LAST_UPDATE, SERIAL, SUBJECT,"
                 + " NOTBEFORE, NOTAFTER, REVOKED,"
                 + " CERTPROFILEINFO_ID, CAINFO_ID,"
-                + " REQUESTORINFO_ID, USER_ID, SHA1_FP_PK, SHA1_FP_SUBJECT)" +
-                " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                + " REQUESTORINFO_ID, USER_ID, SHA1_FP_PK, SHA1_FP_SUBJECT, EE)" +
+                " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
         final String SQL_ADD_RAWCERT = "INSERT INTO RAWCERT (CERT_ID, SHA1_FP, CERT) VALUES (?, ?, ?)";
 
@@ -222,6 +222,9 @@ class CertStoreQueryExecutor
             ps_addcert.setString(idx++, fp(encodedSubjectPublicKey));
             String sha1_fp_subject = IoCertUtil.sha1sum_canonicalized_name(cert.getSubjectX500Principal());
             ps_addcert.setString(idx++, sha1_fp_subject);
+            
+            boolean isEECert = cert.getBasicConstraints() == -1;
+            ps_addcert.setInt(idx++, isEECert ? 1 : 0);
 
             // rawcert
             String sha1_fp = fp(certificate.getEncodedCert());
