@@ -153,7 +153,27 @@ public class Rfc6712Servlet extends HttpServlet
                 auditEvent.addEventData(new AuditEventData("CA", responder.getCA().getCAInfo().getName()));
             }
 
-            PKIMessage pkiReq = generatePKIMessage(request.getInputStream());
+            PKIMessage pkiReq;
+            try
+            {
+                pkiReq = generatePKIMessage(request.getInputStream());
+            }catch(Exception e)
+            {
+                response.setContentLength(0);
+                response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+
+                auditStatus = AuditStatus.FAILED;
+                auditMessage = "bad request";
+
+                final String message = "could not parse the request (PKIMessage)";
+                if(LOG.isErrorEnabled())
+                {
+                    LOG.error(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(), e.getMessage());
+                }
+                LOG.debug(message, e);
+
+                return;
+            }
 
             PKIHeader reqHeader = pkiReq.getHeader();
             ASN1OctetString tid = reqHeader.getTransactionID();
@@ -236,13 +256,13 @@ public class Rfc6712Servlet extends HttpServlet
 
         try
         {
-            return PKIMessage.getInstance(asn1Stream.readObject());
+              return PKIMessage.getInstance(asn1Stream.readObject());
         }finally
         {
             try
             {
                 asn1Stream.close();
-            }catch(IOException e){}
+            }catch(Exception e){}
         }
     }
 

@@ -206,7 +206,6 @@ public class X509CA
 
         this.cf = new CertificateFactory();
 
-
         // CRL generaration services
         if(crlSigner != null && crlSigner.getCRLcontrol().getUpdateMode() == UpdateMode.interval)
         {

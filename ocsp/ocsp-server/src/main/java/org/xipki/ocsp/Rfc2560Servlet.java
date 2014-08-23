@@ -7,12 +7,13 @@
 
 package org.xipki.ocsp;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Date;
 import java.util.List;
 
 import javax.servlet.ServletException;
-import javax.servlet.ServletInputStream;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -118,7 +119,7 @@ public class Rfc2560Servlet extends HttpServlet
                 return;
             }
 
-            OCSPRequest ocspRequest;
+            InputStream requestStream;
             if(getMethod)
             {
                 String requestURI = request.getRequestURI();
@@ -152,7 +153,7 @@ public class Rfc2560Servlet extends HttpServlet
                     b64Request = requestURI;
                 }
 
-                ocspRequest = OCSPRequest.getInstance(Base64.decode(b64Request));
+                requestStream = new ByteArrayInputStream(Base64.decode(b64Request));
             }
             else
             {
@@ -177,9 +178,31 @@ public class Rfc2560Servlet extends HttpServlet
                     auditMessage = "request too large";
                     return;
                 }
-                ServletInputStream in = request.getInputStream();
-                ASN1StreamParser parser = new ASN1StreamParser(in);
+
+                requestStream = request.getInputStream();
+            }
+
+            OCSPRequest ocspRequest;
+            try
+            {
+                ASN1StreamParser parser = new ASN1StreamParser(requestStream);
                 ocspRequest = OCSPRequest.getInstance(parser.readObject());
+            }catch(Exception e)
+            {
+                response.setContentLength(0);
+                response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+
+                auditStatus = AuditStatus.FAILED;
+                auditMessage = "bad request";
+
+                final String message = "could not parse the request (OCSPRequest)";
+                if(LOG.isErrorEnabled())
+                {
+                    LOG.error(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(), e.getMessage());
+                }
+                LOG.debug(message, e);
+
+                return;
             }
 
             OCSPReq ocspReq = new OCSPReq(ocspRequest);
