@@ -393,18 +393,29 @@ public class X509CACmpResponder extends CmpResponder
                             {
                                 eventType = "CRL_DOWNLOAD";
                                 checkPermission(_requestor, Permission.GET_CRL);
-                                crl = ca.getCurrentCRL();
+
+                                if(itvCRL.getInfoValue() == null)
+                                { // as defined in RFC 4210
+                                    crl = ca.getCurrentCRL();
+                                }
+                                else
+                                {
+                                    // xipki extension
+                                    ASN1Integer crlNumber = ASN1Integer.getInstance(itvCRL.getInfoValue());
+                                    crl = ca.getCRL(crlNumber.getPositiveValue());
+                                }
+
                                 if(crl == null)
                                 {
                                     statusMessage = "No CRL is available";
                                     failureInfo = PKIFailureInfo.badRequest;
                                 }
                             }
-                            else
+                            else if(CustomObjectIdentifiers.id_cmp_generateCRL.equals(infoType.getId()))
                             {
                                 eventType = "CRL_GEN";
                                 checkPermission(_requestor, Permission.GEN_CRL);
-                                X509CRL _crl = ca.generateCRL();
+                                X509CRL _crl = ca.generateCRLonDemand();
                                 if(_crl == null)
                                 {
                                     statusMessage = "CRL generation is not activated";
@@ -414,6 +425,10 @@ public class X509CACmpResponder extends CmpResponder
                                 {
                                     crl = CertificateList.getInstance(_crl.getEncoded());
                                 }
+                            }
+                            else
+                            {
+                                throw new RuntimeException("should not reach here");
                             }
 
                             if(crl != null)
@@ -902,6 +917,11 @@ public class X509CACmpResponder extends CmpResponder
                     auditStatus = AuditStatus.ERROR;
                     auditMessage = "System_Failure";
                     break;
+                case System_Unavailable:
+                    failureInfo = PKIFailureInfo.systemUnavail;
+                    auditStatus = AuditStatus.FAILED;
+                    auditMessage = "System_Unavailable";
+                    break;
                 case UNKNOWN_CERT:
                     failureInfo = PKIFailureInfo.badCertId;
                     auditStatus = AuditStatus.FAILED;
@@ -1076,6 +1096,11 @@ public class X509CACmpResponder extends CmpResponder
                         failureInfo = PKIFailureInfo.systemFailure;
                         auditStatus = AuditStatus.ERROR;
                         auditMessage = "System_Failure";
+                        break;
+                    case System_Unavailable:
+                        failureInfo = PKIFailureInfo.systemUnavail;
+                        auditStatus = AuditStatus.FAILED;
+                        auditMessage = "System_Unavailable";
                         break;
                     case UNKNOWN_CERT:
                         failureInfo = PKIFailureInfo.badCertId;

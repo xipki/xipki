@@ -41,26 +41,9 @@ public class CrlSignerAddCommand extends CaCommand
             description = "CRL signer's certificate file")
     protected String signerCertFile;
 
-    @Option(name = "-period",
-            required = true, description = "Required. Interval in minutes of two CRLs,\n"
-                    + "set to 0 to generate CRL on demand")
-    protected Integer period;
-
-    @Option(name = "-overlap",
-            description = "Overlap of CRL")
-    protected Integer overlap;
-
-    @Option(name = "-wc", aliases = { "--withCert" },
-            description = "Whether certificates are contained in CRL.\n"
-                + "Valid values are 'yes' and 'no',\n"
-                + "the default is 'no'")
-    protected String withCertS;
-
-    @Option(name = "-wec", aliases = { "--withExpiredCert" },
-            description = "Whether expired certificates are contained in CRL.\n"
-                    + "Valid values are 'yes' and 'no',\n"
-                    + "the default is 'no'")
-    protected String withExpiredCertS;
+    @Option(name = "-crlControl",
+            required = true, description = "Required. CRL control")
+    protected String crlControl;
 
     private SecurityFactory securityFactory;
     private PasswordResolver passwordResolver;
@@ -69,16 +52,12 @@ public class CrlSignerAddCommand extends CaCommand
     protected Object doExecute()
     throws Exception
     {
-        CrlSignerEntry entry = new CrlSignerEntry(name);
-
-        entry.setType(signerType);
+        X509Certificate signerCert = null;
         if("CA".equalsIgnoreCase(signerType) == false)
         {
-            X509Certificate signerCert = null;
             if(signerCertFile != null)
             {
                 signerCert = IoCertUtil.parseCert(signerCertFile);
-                entry.setCertificate(signerCert);
             }
 
             if(signerConf != null)
@@ -88,26 +67,16 @@ public class CrlSignerAddCommand extends CaCommand
                     signerConf = ShellUtil.canonicalizeSignerConf(signerType,
                             signerConf, passwordResolver);
                 }
-                entry.setConf(signerConf);
             }
-
             // check whether we can initialize the signer
             securityFactory.createSigner(signerType, signerConf, signerCert, passwordResolver);
         }
 
-        entry.setPeriod(period);
-
-        if(overlap != null)
+        CrlSignerEntry entry = new CrlSignerEntry(name, signerType, signerConf, crlControl);
+        if(signerCert != null)
         {
-            entry.setOverlap(overlap);
+            entry.setCertificate(signerCert);
         }
-
-        boolean withCert = isEnabled(withCertS, false, "withCert");
-        entry.setIncludeCertsInCrl(withCert);
-
-        boolean withExpiredCert = isEnabled(withExpiredCertS, false, "withExpiredCerts");
-        entry.setIncludeExpiredCerts(withExpiredCert);
-
         caManager.addCrlSigner(entry);
 
         return null;

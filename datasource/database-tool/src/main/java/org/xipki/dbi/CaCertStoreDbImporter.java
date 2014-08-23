@@ -40,6 +40,7 @@ import org.xipki.dbi.ca.jaxb.CertStoreType.Cainfos;
 import org.xipki.dbi.ca.jaxb.CertStoreType.Certprofileinfos;
 import org.xipki.dbi.ca.jaxb.CertStoreType.CertsFiles;
 import org.xipki.dbi.ca.jaxb.CertStoreType.Crls;
+import org.xipki.dbi.ca.jaxb.CertStoreType.DeltaCRLCache;
 import org.xipki.dbi.ca.jaxb.CertStoreType.PublishQueue;
 import org.xipki.dbi.ca.jaxb.CertStoreType.Publisherinfos;
 import org.xipki.dbi.ca.jaxb.CertStoreType.Requestorinfos;
@@ -47,6 +48,7 @@ import org.xipki.dbi.ca.jaxb.CertStoreType.UsersFiles;
 import org.xipki.dbi.ca.jaxb.CertType;
 import org.xipki.dbi.ca.jaxb.CertsType;
 import org.xipki.dbi.ca.jaxb.CrlType;
+import org.xipki.dbi.ca.jaxb.DeltaCRLCacheEntryType;
 import org.xipki.dbi.ca.jaxb.NameIdType;
 import org.xipki.dbi.ca.jaxb.ToPublishType;
 import org.xipki.dbi.ca.jaxb.UserType;
@@ -98,6 +100,7 @@ class CaCertStoreDbImporter extends DbPorter
             import_crl(certstore.getCrls());
             import_cert(certstore.getCertsFiles());
             import_publishQueue(certstore.getPublishQueue());
+            import_deltaCRLCache(certstore.getDeltaCRLCache());
         }catch(Exception e)
         {
             System.err.println("Error while importing CA certstore to database");
@@ -360,10 +363,45 @@ class CaCertStoreDbImporter extends DbPorter
         System.out.println(" Imported table PUBLISHQUEUE");
     }
 
+    private void import_deltaCRLCache(DeltaCRLCache deltaCRLCache)
+    throws Exception
+    {
+        final String SQL = "INSERT INTO DELTACRL_CACHE" +
+                " (SERIAL, CAINFO_ID)" +
+                " VALUES (?, ?)";
+
+        System.out.println("Importing table DELTACRL_CACHE");
+        PreparedStatement ps = prepareStatement(SQL);
+
+        try
+        {
+            for(DeltaCRLCacheEntryType entry : deltaCRLCache.getEntry())
+            {
+                try
+                {
+                    ps.setLong(1, entry.getSerial());
+                    ps.setInt(2, entry.getCaId());
+                    ps.execute();
+                }catch(Exception e)
+                {
+                    System.err.println("Error while importing DELTACRL_CACHE with SERIAL=" + entry.getSerial()
+                            + " and CAINFO_ID=" + entry.getCaId() + ", message: " + e.getMessage());
+                    throw e;
+                }
+            }
+        }finally
+        {
+            releaseResources(ps, null);
+        }
+
+        System.out.println(" Imported table DELTACRL_CACHE");
+    }
+
     private void import_crl(Crls crls)
     throws Exception
     {
-        final String sql = "INSERT INTO CRL (ID, CAINFO_ID, CRL_NUMBER, THISUPDATE, NEXTUPDATE, CRL) VALUES (?, ?, ?, ?, ?, ?)";
+        final String sql = "INSERT INTO CRL (ID, CAINFO_ID, CRL_NUMBER, THISUPDATE, NEXTUPDATE, DELTACRL, BASECRL_NUMBER, CRL)"
+                + " VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
 
         System.out.println("Importing table CRL");
 
@@ -398,6 +436,14 @@ class CaCertStoreDbImporter extends DbPorter
                     byte[] extnValue = DEROctetString.getInstance(octetString).getOctets();
                     BigInteger crlNumber = ASN1Integer.getInstance(extnValue).getPositiveValue();
 
+                    BigInteger baseCrlNumber = null;
+                    octetString = c.getExtensionValue(Extension.deltaCRLIndicator.getId());
+                    if(octetString != null)
+                    {
+                        extnValue = DEROctetString.getInstance(octetString).getOctets();
+                        baseCrlNumber = ASN1Integer.getInstance(extnValue).getPositiveValue();
+                    }
+
                     int idx = 1;
                     ps.setInt (idx++, id++);
                     ps.setInt (idx++, crl.getCainfoId());
@@ -410,6 +456,17 @@ class CaCertStoreDbImporter extends DbPorter
                     else
                     {
                         ps.setNull(idx++, Types.INTEGER);
+                    }
+
+                    if(baseCrlNumber == null)
+                    {
+                        ps.setBoolean(idx++, true);
+                        ps.setNull(idx++, Types.BIGINT);
+                    }
+                    else
+                    {
+                        ps.setBoolean(idx++, true);
+                        ps.setLong(idx++, baseCrlNumber.longValue());
                     }
 
                     String s = Base64.toBase64String(encodedCrl);

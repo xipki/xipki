@@ -315,22 +315,67 @@ class CertStoreQueryExecutor
         }
     }
 
-    void clearPublishQueue(X509CertificateWithMetaInfo caCert, String publisherName)
-    throws SQLException
+    public void clearDeltaCRLCache(X509CertificateWithMetaInfo caCert)
+    throws OperationException, SQLException
     {
-        String SQL = "DELETE FROM PUBLISHQUEUE";
-        if(publisherName != null)
+        StringBuilder sqlBuilder = new StringBuilder("DELETE FROM DELTACRL_CACHE");
+        if(caCert != null)
         {
-            SQL += " WHERE PUBLISHER_ID=?";
+            sqlBuilder.append("WHERE CAINFO_ID=?");
         }
 
-        PreparedStatement ps = borrowPreparedStatement(SQL);
+        PreparedStatement ps = borrowPreparedStatement(sqlBuilder.toString());
         try
         {
+            if(caCert != null)
+            {
+                int caId = getCaId(caCert);
+                ps.setInt(1, caId);
+            }
+            ps.executeUpdate();
+        }finally
+        {
+            releaseDbResources(ps, null);
+        }
+    }
+
+    void clearPublishQueue(X509CertificateWithMetaInfo caCert, String publisherName)
+    throws OperationException, SQLException
+    {
+        StringBuilder sqlBuilder = new StringBuilder("DELETE FROM PUBLISHQUEUE");
+
+        if(caCert != null || publisherName != null)
+        {
+            sqlBuilder.append(" WHERE");
+            if(caCert != null)
+            {
+                sqlBuilder.append(" CAINFO_ID=?");
+                if(publisherName != null)
+                {
+                    sqlBuilder.append(" AND");
+                }
+            }
+
+            if(publisherName != null)
+            {
+                sqlBuilder.append(" PUBLISHER_ID=?");
+            }
+        }
+
+        PreparedStatement ps = borrowPreparedStatement(sqlBuilder.toString());
+        try
+        {
+            int idx = 1;
+            if(caCert != null)
+            {
+                int caId = getCaId(caCert);
+                ps.setInt(idx++, caId);
+            }
+
             if(publisherName != null)
             {
                 int publisherId = getPublisherId(publisherName);
-                ps.setInt(1, publisherId);
+                ps.setInt(idx++, publisherId);
             }
             ps.executeUpdate();
         }finally
@@ -399,15 +444,24 @@ class CertStoreQueryExecutor
     throws SQLException, CRLException, OperationException
     {
         byte[] encodedExtnValue = crl.getExtensionValue(Extension.cRLNumber.getId());
-        Integer crlNumber = null;
+        Long crlNumber = null;
         if(encodedExtnValue != null)
         {
             byte[] extnValue = DEROctetString.getInstance(encodedExtnValue).getOctets();
-            crlNumber = ASN1Integer.getInstance(extnValue).getPositiveValue().intValue();
+            crlNumber = ASN1Integer.getInstance(extnValue).getPositiveValue().longValue();
         }
 
-        final String SQL = "INSERT INTO CRL (ID, CAINFO_ID, CRL_NUMBER, THISUPDATE, NEXTUPDATE, CRL)" +
-                " VALUES (?, ?, ?, ?, ?, ?)";
+        encodedExtnValue = crl.getExtensionValue(Extension.deltaCRLIndicator.getId());
+        Long baseCrlNumber = null;
+        if(encodedExtnValue != null)
+        {
+            byte[] extnValue = DEROctetString.getInstance(encodedExtnValue).getOctets();
+            baseCrlNumber = ASN1Integer.getInstance(extnValue).getPositiveValue().longValue();
+        }
+
+        final String SQL =
+                "INSERT INTO CRL (ID, CAINFO_ID, CRL_NUMBER, THISUPDATE, NEXTUPDATE, DELTACRL, BASECRL_NUMBER, CRL)" +
+                " VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
         PreparedStatement ps = borrowPreparedStatement(SQL);
 
         try
@@ -439,6 +493,17 @@ class CertStoreQueryExecutor
                 ps.setNull(idx++, Types.BIGINT);
             }
 
+            ps.setInt(idx++, baseCrlNumber != null ? 1 : 0);
+
+            if(baseCrlNumber != null)
+            {
+                ps.setLong(idx++, baseCrlNumber);
+            }
+            else
+            {
+                ps.setNull(idx++, Types.BIGINT);
+            }
+
             byte[] encodedCrl = crl.getEncoded();
             String b64Crl = Base64.toBase64String(encodedCrl);
             ps.setString(idx++, b64Crl);
@@ -451,7 +516,7 @@ class CertStoreQueryExecutor
     }
 
     CertWithRevocationInfo revokeCert(X509CertificateWithMetaInfo caCert, BigInteger serialNumber,
-            CertRevocationInfo revInfo, boolean force)
+            CertRevocationInfo revInfo, boolean force, boolean publishToDeltaCRLCache)
     throws OperationException, SQLException
     {
         CertWithRevocationInfo certWithRevInfo = getCertWithRevocationInfo(caCert, serialNumber);
@@ -492,6 +557,7 @@ class CertStoreQueryExecutor
                 " WHERE ID = ?";
         PreparedStatement ps = borrowPreparedStatement(SQL_REVOKE_CERT);
 
+        int certId = certWithRevInfo.getCert().getCertId().intValue();
         try
         {
             int idx = 1;
@@ -507,7 +573,7 @@ class CertStoreQueryExecutor
             }
 
             ps.setInt(idx++, revInfo.getReason().getCode());
-            ps.setLong(idx++, certWithRevInfo.getCert().getCertId().intValue());
+            ps.setLong(idx++, certId);
 
             int count = ps.executeUpdate();
             if(count != 1)
@@ -528,12 +594,18 @@ class CertStoreQueryExecutor
             releaseDbResources(ps, null);
         }
 
+        if(publishToDeltaCRLCache)
+        {
+            Integer caId = getCaId(caCert); // must not be null
+            publishToDeltaCRLCache(caId, certWithRevInfo.getCert().getCert().getSerialNumber());
+        }
+
         certWithRevInfo.setRevInfo(revInfo);
         return certWithRevInfo;
     }
 
     X509CertificateWithMetaInfo unrevokeCert(X509CertificateWithMetaInfo caCert, BigInteger serialNumber,
-            boolean force)
+            boolean force, boolean publishToDeltaCRLCache)
     throws OperationException, SQLException
     {
         CertWithRevocationInfo certWithRevInfo = getCertWithRevocationInfo(caCert, serialNumber);
@@ -567,6 +639,7 @@ class CertStoreQueryExecutor
                 " WHERE ID = ?";
         PreparedStatement ps = borrowPreparedStatement(SQL_REVOKE_CERT);
 
+        int certId = certWithRevInfo.getCert().getCertId().intValue();
         try
         {
             int idx = 1;
@@ -575,7 +648,7 @@ class CertStoreQueryExecutor
             ps.setNull(idx++, Types.INTEGER);
             ps.setNull(idx++, Types.INTEGER);
             ps.setNull(idx++, Types.INTEGER);
-            ps.setLong(idx++, certWithRevInfo.getCert().getCertId().intValue());
+            ps.setLong(idx++, certId);
 
             int count = ps.executeUpdate();
             if(count != 1)
@@ -596,7 +669,32 @@ class CertStoreQueryExecutor
             releaseDbResources(ps, null);
         }
 
+        if(publishToDeltaCRLCache)
+        {
+            Integer caId = getCaId(caCert); // must not be null
+            publishToDeltaCRLCache(caId, certWithRevInfo.getCert().getCert().getSerialNumber());
+        }
+
         return certWithRevInfo.getCert();
+    }
+
+    private void publishToDeltaCRLCache(int caId, BigInteger serialNumber)
+    throws SQLException
+    {
+        final String SQL = "INSERT INTO DELTACRL_CACHE " +
+                "(CAINFO_ID, SERIAL) " +
+                " VALUES (?, ?)";
+        PreparedStatement ps = borrowPreparedStatement(SQL);
+
+        try
+        {
+            ps.setInt(1, caId);
+            ps.setLong(2, serialNumber.longValue());
+            ps.executeUpdate();
+        }finally
+        {
+            releaseDbResources(ps, null);
+        }
     }
 
     X509CertificateWithMetaInfo removeCert(X509CertificateWithMetaInfo caCert, BigInteger serialNumber)
@@ -768,7 +866,7 @@ class CertStoreQueryExecutor
         }
     }
 
-    byte[] getEncodedCRL(X509CertificateWithMetaInfo caCert)
+    byte[] getEncodedCRL(X509CertificateWithMetaInfo caCert, BigInteger crlNumber)
     throws SQLException, OperationException
     {
         ParamChecker.assertNotNull("caCert", caCert);
@@ -779,8 +877,14 @@ class CertStoreQueryExecutor
             return null;
         }
 
-        String sql = "THISUPDATE, CRL FROM CRL WHERE CAINFO_ID=?";
-        sql = dataSource.createFetchFirstSelectSQL(sql, 1, "THISUPDATE DESC");
+        StringBuilder sqlBuilder = new StringBuilder();
+        sqlBuilder.append("THISUPDATE, CRL FROM CRL WHERE CAINFO_ID=?");
+        if(crlNumber != null)
+        {
+            sqlBuilder.append(" AND CRL_NUMBER=?");
+        }
+
+        String sql = dataSource.createFetchFirstSelectSQL(sqlBuilder.toString(), 1, "THISUPDATE DESC");
         PreparedStatement ps = borrowPreparedStatement(sql);
 
         ResultSet rs = null;
@@ -788,6 +892,11 @@ class CertStoreQueryExecutor
         {
             int idx = 1;
             ps.setInt(idx++, caId.intValue());
+            if(crlNumber != null)
+            {
+                ps.setLong(idx++, crlNumber.longValue());
+            }
+
             rs = ps.executeQuery();
 
             byte[] encodedCrl = null;
@@ -827,7 +936,7 @@ class CertStoreQueryExecutor
             return 0;
         }
 
-        String sql = "SELECT CRL_NUMBER FROM CRL WHERE CAINFO_ID=?";
+        String sql = "SELECT CRL_NUMBER FROM CRL WHERE CAINFO_ID=? AND DELTACRL=?";
         PreparedStatement ps = borrowPreparedStatement(sql);
 
         List<Integer> crlNumbers = new LinkedList<>();
@@ -837,6 +946,7 @@ class CertStoreQueryExecutor
         {
             int idx = 1;
             ps.setInt(idx++, caId.intValue());
+            ps.setBoolean(idx++, false);
             rs = ps.executeQuery();
 
             while(rs.next())
@@ -1155,7 +1265,7 @@ class CertStoreQueryExecutor
 
         if(numEntries < 1)
         {
-            throw new IllegalArgumentException("numSerials is not positive");
+            throw new IllegalArgumentException("numEntries is not positive");
         }
 
         Integer caId = getCaId(caCert);
@@ -1177,12 +1287,12 @@ class CertStoreQueryExecutor
             int idx = 1;
             ps.setInt(idx++, caId.intValue());
             setBoolean(ps, idx++, true);
-            ps.setLong(idx++, startSerial.longValue()-1);
-            ps.setLong(idx++, notExpiredAt.getTime()/1000 + 1);
+            ps.setLong(idx++, startSerial.longValue() - 1);
+            ps.setLong(idx++, notExpiredAt.getTime() / 1000 + 1);
             rs = ps.executeQuery();
 
             List<CertRevocationInfoWithSerial> ret = new ArrayList<>();
-            while(rs.next() && ret.size() < numEntries)
+            while(rs.next())
             {
                 long serial = rs.getLong("SERIAL");
                 int rev_reason = rs.getInt("REV_REASON");
@@ -1201,6 +1311,87 @@ class CertStoreQueryExecutor
         {
             releaseDbResources(ps, rs);
         }
+    }
+
+    List<CertRevocationInfoWithSerial> getCertificatesForDeltaCRL(
+            X509CertificateWithMetaInfo caCert, BigInteger startSerial, int numEntries)
+    throws SQLException, OperationException
+    {
+        ParamChecker.assertNotNull("caCert", caCert);
+
+        if(numEntries < 1)
+        {
+            throw new IllegalArgumentException("numEntries is not positive");
+        }
+
+        Integer caId = getCaId(caCert);
+        if(caId == null)
+        {
+            return Collections.emptyList();
+        }
+
+        String sql = "SERIAL FROM DELTACRL_CACHE"
+                + " WHERE CAINFO_ID=? AND SERIAL>?";
+
+        sql = dataSource.createFetchFirstSelectSQL(sql, numEntries, "SERIAL ASC");
+        PreparedStatement ps = borrowPreparedStatement(sql);
+
+        List<Long> serials = new LinkedList<>();
+        ResultSet rs = null;
+        try
+        {
+            int idx = 1;
+            ps.setInt(idx++, caId.intValue());
+            ps.setLong(idx++, startSerial.longValue() - 1);
+            rs = ps.executeQuery();
+
+            while(rs.next())
+            {
+                long serial = rs.getLong("SERIAL");
+                serials.add(serial);
+            }
+        }finally
+        {
+            releaseDbResources(ps, rs);
+        }
+
+        sql = "REVOKED, REV_REASON, REV_TIME, REV_INVALIDITY_TIME"
+                + " FROM CERT"
+                + " WHERE CAINFO_ID=? AND SERIAL=?";
+        sql = dataSource.createFetchFirstSelectSQL(sql, 1);
+        ps = borrowPreparedStatement(sql);
+
+        List<CertRevocationInfoWithSerial> ret = new ArrayList<>();
+        for(Long serial : serials)
+        {
+            ps.setInt(1, caId);
+            ps.setLong(2, serial);
+            rs = ps.executeQuery();
+
+            CertRevocationInfoWithSerial revInfo;
+
+            boolean revoked = rs.getBoolean("REVOEKD");
+            if(revoked)
+            {
+                int rev_reason = rs.getInt("REV_REASON");
+                long rev_time = rs.getLong("REV_TIME");
+                long rev_invalidity_time = rs.getLong("REV_INVALIDITY_TIME");
+
+                Date invalidityTime = rev_invalidity_time == 0 ? null :  new Date(1000 * rev_invalidity_time);
+                revInfo = new CertRevocationInfoWithSerial(
+                        BigInteger.valueOf(serial),
+                        rev_reason, new Date(1000 * rev_time), invalidityTime);
+            }
+            else
+            {
+                long lastUpdate = rs.getLong("LAST_UPDATE");
+                revInfo = new CertRevocationInfoWithSerial(BigInteger.valueOf(serial),
+                        CRLReason.REMOVE_FROM_CRL.getCode(), new Date(1000 * lastUpdate), null);
+            }
+            ret.add(revInfo);
+        }
+
+        return ret;
     }
 
     CertStatus getCertStatusForSubject(X509CertificateWithMetaInfo caCert, X500Principal subject)
