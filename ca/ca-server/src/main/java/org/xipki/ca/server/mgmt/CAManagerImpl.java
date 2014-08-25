@@ -35,7 +35,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
-import java.util.StringTokenizer;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
@@ -102,6 +101,7 @@ import org.xipki.security.common.IoCertUtil;
 import org.xipki.security.common.LogUtil;
 import org.xipki.security.common.ParamChecker;
 import org.xipki.security.common.RandomSerialNumberGenerator;
+import org.xipki.security.common.StringUtil;
 
 /**
  * @author Lijun Liao
@@ -1285,19 +1285,19 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
                 List<String> lCrlUris = null;
                 if(crl_uris != null && crl_uris.isEmpty() == false)
                 {
-                    lCrlUris = tokensAsList(crl_uris, " \t");
+                    lCrlUris = StringUtil.split(crl_uris, " \t");
                 }
 
                 List<String> lDeltaCrlUris = null;
                 if(delta_crl_uris != null && delta_crl_uris.isEmpty() == false)
                 {
-                    lDeltaCrlUris = tokensAsList(delta_crl_uris, " \t");
+                    lDeltaCrlUris = StringUtil.split(delta_crl_uris, " \t");
                 }
 
                 List<String> lOcspUris = null;
                 if(ocsp_uris != null && ocsp_uris.isEmpty() == false)
                 {
-                    lOcspUris = tokensAsList(ocsp_uris, " \t");
+                    lOcspUris = StringUtil.split(ocsp_uris, " \t");
                 }
 
                 X509Certificate cert = generateCert(b64cert);
@@ -3011,17 +3011,6 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
         }
     }
 
-    static List<String> tokensAsList(String tokens, String seperator)
-    {
-        StringTokenizer st = new StringTokenizer(tokens, seperator);
-        List<String> ret = new ArrayList<>(st.countTokens());
-        while(st.hasMoreTokens())
-        {
-            ret.add(st.nextToken());
-        }
-        return ret;
-    }
-
     private static String toString(Set<String> tokens, String seperator)
     {
         if(tokens == null || tokens.isEmpty())
@@ -3043,7 +3032,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
     {
         ParamChecker.assertNotEmpty("permissionsText", permissionsText);
 
-        List<String> l = tokensAsList(permissionsText, ", ");
+        List<String> l = StringUtil.split(permissionsText, ", ");
         Set<Permission> permissions = new HashSet<>();
         for(String permissionText : l)
         {

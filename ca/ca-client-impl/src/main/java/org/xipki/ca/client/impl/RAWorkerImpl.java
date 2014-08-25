@@ -28,7 +28,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
-import java.util.StringTokenizer;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.bouncycastle.asn1.cmp.CMPCertificate;
@@ -74,6 +73,7 @@ import org.xipki.security.common.ConfigurationException;
 import org.xipki.security.common.IoCertUtil;
 import org.xipki.security.common.LogUtil;
 import org.xipki.security.common.ParamChecker;
+import org.xipki.security.common.StringUtil;
 
 /**
  * @author Lijun Liao
@@ -223,16 +223,7 @@ public final class RAWorkerImpl extends AbstractRAWorker implements RAWorker
                 String _responderFile = props.getProperty(CA_PREFIX + caName + CA_RESPONDER_SUFFIX);
                 String _profiles = props.getProperty(CA_PREFIX + caName + CA_PROFILES_SUFFIX);
 
-                Set<String> profiles = null;
-                if(_profiles != null)
-                {
-                    StringTokenizer st = new StringTokenizer(_profiles, ", ");
-                    profiles = new HashSet<>(st.countTokens());
-                    while(st.hasMoreTokens())
-                    {
-                        profiles.add(st.nextToken().trim());
-                    }
-                }
+                Set<String> profiles = StringUtil.splitAsSet(_profiles, ", ");
 
                 CAConf ca = new CAConf(caName, _serviceUrl, IoCertUtil.parseCert(_caCertFile), profiles,
                         IoCertUtil.parseCert(_responderFile));

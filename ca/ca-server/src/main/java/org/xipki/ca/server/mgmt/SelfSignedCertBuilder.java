@@ -25,7 +25,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.StringTokenizer;
 
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.AuthorityInformationAccess;
@@ -65,6 +64,7 @@ import org.xipki.security.api.SignerException;
 import org.xipki.security.common.CmpUtf8Pairs;
 import org.xipki.security.common.ConfigurationException;
 import org.xipki.security.common.IoCertUtil;
+import org.xipki.security.common.StringUtil;
 
 /**
  * @author Lijun Liao
@@ -396,11 +396,10 @@ class SelfSignedCertBuilder
     private static Map<String, String> keyValues(String conf, String seperator)
     {
         Map<String, String> ret = new HashMap<>();
-        StringTokenizer tokens = new StringTokenizer(conf, seperator);
+        List<String> tokens = StringUtil.split(conf, seperator);
 
-        while(tokens.hasMoreTokens())
+        for(String token : tokens)
         {
-            String token = tokens.nextToken();
             int idx = token.indexOf('=');
             if(idx <= 0 || idx == token.length()-1)
             {
