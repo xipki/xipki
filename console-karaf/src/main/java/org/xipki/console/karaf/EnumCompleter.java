@@ -24,6 +24,7 @@ public class EnumCompleter implements Completer
 
     public void setTokens(String tokens)
     {
+        enums.clear();
         StringTokenizer st = new StringTokenizer(tokens, ", ");
         while(st.hasMoreTokens())
         {
