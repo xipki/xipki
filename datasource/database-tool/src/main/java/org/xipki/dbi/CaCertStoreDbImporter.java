@@ -26,8 +26,10 @@ import java.util.zip.ZipFile;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.Unmarshaller;
 
+import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1Integer;
 import org.bouncycastle.asn1.DEROctetString;
+import org.bouncycastle.asn1.x509.BasicConstraints;
 import org.bouncycastle.asn1.x509.Certificate;
 import org.bouncycastle.asn1.x509.Extension;
 import org.bouncycastle.util.encoders.Base64;
@@ -521,8 +523,8 @@ class CaCertStoreDbImporter extends DbPorter
                 "(ID, LAST_UPDATE, SERIAL, SUBJECT,"
                 + " NOTBEFORE, NOTAFTER, REVOKED, REV_REASON, REV_TIME, REV_INVALIDITY_TIME,"
                 + " CERTPROFILEINFO_ID, CAINFO_ID,"
-                + " REQUESTORINFO_ID, USER_ID, SHA1_FP_PK, SHA1_FP_SUBJECT)" +
-                " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                + " REQUESTORINFO_ID, USER_ID, SHA1_FP_PK, SHA1_FP_SUBJECT, EE)" +
+                " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
         final String SQL_ADD_RAWCERT = "INSERT INTO RAWCERT (CERT_ID, SHA1_FP, CERT) VALUES (?, ?, ?)";
 
@@ -596,6 +598,20 @@ class CaCertStoreDbImporter extends DbPorter
                 ps_cert.setString(idx++, HashCalculator.hexHash(HashAlgoType.SHA1, encodedKey));
                 String sha1FpSubject = IoCertUtil.sha1sum_canonicalized_name(c.getSubject());
                 ps_cert.setString(idx++, sha1FpSubject);
+                Extension extension = c.getTBSCertificate().getExtensions().getExtension(Extension.basicConstraints);
+                boolean ee = true;
+                if(extension != null)
+                {
+                    ASN1Encodable asn1 = extension.getParsedValue();
+                    try
+                    {
+                        ee = BasicConstraints.getInstance(asn1).isCA() == false;
+                    }catch(Exception e)
+                    {
+                    }
+                }
+                ps_cert.setInt(idx++, ee ? 1 : 0);
+
                 ps_cert.addBatch();
 
                 ps_rawcert.setInt   (1, cert.getId());
