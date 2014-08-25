@@ -53,7 +53,7 @@ import org.bouncycastle.operator.ContentSigner;
 import org.bouncycastle.operator.bc.BcContentSignerBuilder;
 import org.bouncycastle.operator.bc.BcRSAContentSignerBuilder;
 import org.xipki.security.KeyUtil;
-import org.xipki.security.api.p11.P12KeypairGenerationResult;
+import org.xipki.security.api.P12KeypairGenerationResult;
 import org.xipki.security.bcext.ECDSAContentSignerBuilder;
 import org.xipki.security.common.IoCertUtil;
 
