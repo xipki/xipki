@@ -11,7 +11,7 @@ import java.io.File;
 import java.io.IOException;
 
 import org.apache.felix.gogo.commands.Option;
-import org.xipki.security.api.p11.P12KeypairGenerationResult;
+import org.xipki.security.api.P12KeypairGenerationResult;
 
 /**
  * @author Lijun Liao
@@ -19,7 +19,6 @@ import org.xipki.security.api.p11.P12KeypairGenerationResult;
 
 public abstract class P12KeyGenCommand extends KeyGenCommand
 {
-
     @Option(name = "-subject",
             required = true, description = "Required. Subject in the self-signed certificate")
     protected String subject;
@@ -31,6 +30,10 @@ public abstract class P12KeyGenCommand extends KeyGenCommand
     @Option(name = "-certout",
             required = false, description = "Where to save the self-signed certificate")
     protected String certOutFile;
+
+    @Option(name = "-pwd", aliases = { "--password" },
+            required = false, description = "Password of the PKCS#11 token")
+    protected String password;
 
     protected void saveKeyAndCert(P12KeypairGenerationResult keyAndCert)
     throws IOException
