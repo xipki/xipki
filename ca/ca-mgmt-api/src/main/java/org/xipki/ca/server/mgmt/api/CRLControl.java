@@ -166,7 +166,14 @@ public class CRLControl
     public static CRLControl getInstance(String conf)
     throws ConfigurationException
     {
-        CmpUtf8Pairs props = new CmpUtf8Pairs(conf);
+        CmpUtf8Pairs props;
+        try
+        {
+            props = new CmpUtf8Pairs(conf);
+        }catch(RuntimeException e)
+        {
+            throw new ConfigurationException(e.getClass().getName() + ": " + e.getMessage(), e);
+        }
 
         CRLControl control = new CRLControl();
         String s = props.getValue(KEY_updateMode);
