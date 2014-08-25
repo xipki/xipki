@@ -11,7 +11,7 @@ import java.io.File;
 import java.io.IOException;
 
 import org.apache.felix.gogo.commands.Option;
-import org.xipki.security.api.P12KeypairGenerationResult;
+import org.xipki.security.api.p11.P12KeypairGenerationResult;
 
 /**
  * @author Lijun Liao

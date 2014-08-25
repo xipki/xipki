@@ -10,9 +10,9 @@ package org.xipki.security.p11;
 import java.security.InvalidKeyException;
 
 import org.bouncycastle.crypto.params.AsymmetricKeyParameter;
-import org.xipki.security.api.P11CryptService;
-import org.xipki.security.api.PKCS11SlotIdentifier;
-import org.xipki.security.api.Pkcs11KeyIdentifier;
+import org.xipki.security.api.p11.P11CryptService;
+import org.xipki.security.api.p11.P11SlotIdentifier;
+import org.xipki.security.api.p11.P11KeyIdentifier;
 import org.xipki.security.common.ParamChecker;
 
 /**
@@ -23,12 +23,12 @@ public class P11ECDSAKeyParameter extends AsymmetricKeyParameter
 {
     private final P11CryptService p11CryptService;
 
-    private final PKCS11SlotIdentifier slot;
-    private final Pkcs11KeyIdentifier keyId;
+    private final P11SlotIdentifier slot;
+    private final P11KeyIdentifier keyId;
 
     private P11ECDSAKeyParameter(P11CryptService p11CryptService,
-            PKCS11SlotIdentifier slot,
-            Pkcs11KeyIdentifier keyId)
+            P11SlotIdentifier slot,
+            P11KeyIdentifier keyId)
     {
         super(true);
 
@@ -39,8 +39,8 @@ public class P11ECDSAKeyParameter extends AsymmetricKeyParameter
 
     public static P11ECDSAKeyParameter getInstance(
             P11CryptService p11CryptService,
-            PKCS11SlotIdentifier slot,
-            Pkcs11KeyIdentifier keyId)
+            P11SlotIdentifier slot,
+            P11KeyIdentifier keyId)
     throws InvalidKeyException
     {
         ParamChecker.assertNotNull("p11CryptService", p11CryptService);
@@ -55,12 +55,12 @@ public class P11ECDSAKeyParameter extends AsymmetricKeyParameter
         return p11CryptService;
     }
 
-    public PKCS11SlotIdentifier getSlot()
+    public P11SlotIdentifier getSlot()
     {
         return slot;
     }
 
-    public Pkcs11KeyIdentifier getKeyId()
+    public P11KeyIdentifier getKeyId()
     {
         return keyId;
     }

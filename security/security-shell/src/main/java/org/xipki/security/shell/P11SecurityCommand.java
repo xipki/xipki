@@ -9,7 +9,7 @@ package org.xipki.security.shell;
 
 import org.apache.felix.gogo.commands.Option;
 import org.bouncycastle.util.encoders.Hex;
-import org.xipki.security.api.Pkcs11KeyIdentifier;
+import org.xipki.security.api.p11.P11KeyIdentifier;
 
 /**
  * @author Lijun Liao
@@ -49,17 +49,17 @@ public abstract class P11SecurityCommand extends SecurityCommand
         return pwdInChar;
     }
 
-    protected Pkcs11KeyIdentifier getKeyIdentifier()
+    protected P11KeyIdentifier getKeyIdentifier()
     throws Exception
     {
-        Pkcs11KeyIdentifier keyIdentifier;
+        P11KeyIdentifier keyIdentifier;
         if(keyId != null && keyLabel == null)
         {
-            keyIdentifier = new Pkcs11KeyIdentifier(Hex.decode(keyId));
+            keyIdentifier = new P11KeyIdentifier(Hex.decode(keyId));
         }
         else if(keyId == null && keyLabel != null)
         {
-            keyIdentifier = new Pkcs11KeyIdentifier(keyLabel);
+            keyIdentifier = new P11KeyIdentifier(keyLabel);
         }
         else
         {

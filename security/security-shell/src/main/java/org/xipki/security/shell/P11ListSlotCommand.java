@@ -31,8 +31,8 @@ import org.bouncycastle.asn1.sec.SECNamedCurves;
 import org.bouncycastle.asn1.teletrust.TeleTrusTNamedCurves;
 import org.bouncycastle.asn1.x9.X962NamedCurves;
 import org.bouncycastle.util.encoders.Hex;
-import org.xipki.security.api.PKCS11SlotIdentifier;
 import org.xipki.security.api.SignerException;
+import org.xipki.security.api.p11.P11SlotIdentifier;
 import org.xipki.security.common.IoCertUtil;
 import org.xipki.security.p11.iaik.IaikExtendedModule;
 import org.xipki.security.p11.iaik.IaikExtendedSlot;
@@ -63,13 +63,13 @@ public class P11ListSlotCommand extends SecurityCommand
     {
         IaikExtendedModule module = IaikP11ModulePool.getInstance().getModule(
                 securityFactory.getPkcs11Module());
-        List<PKCS11SlotIdentifier> slotIds = new ArrayList<>(module.getAllSlotIds());
+        List<P11SlotIdentifier> slotIds = new ArrayList<>(module.getAllSlotIds());
 
         Set<Integer> slotIndexes = securityFactory.getPkcs11IncludeSlotIndexes();
         if(slotIndexes != null && slotIndexes.isEmpty() == false)
         {
-            List<PKCS11SlotIdentifier> slotIds2 = new ArrayList<>(slotIndexes.size());
-            for(PKCS11SlotIdentifier slotId : slotIds)
+            List<P11SlotIdentifier> slotIds2 = new ArrayList<>(slotIndexes.size());
+            for(P11SlotIdentifier slotId : slotIds)
             {
                 if(slotIndexes.contains(slotId.getSlotIndex()))
                 {
@@ -82,8 +82,8 @@ public class P11ListSlotCommand extends SecurityCommand
         slotIndexes = securityFactory.getPkcs11ExcludeSlotIndexes();
         if(slotIndexes != null && slotIndexes.isEmpty() == false)
         {
-            List<PKCS11SlotIdentifier> slotIds2 = new ArrayList<>(slotIds.size());
-            for(PKCS11SlotIdentifier slotId : slotIds)
+            List<P11SlotIdentifier> slotIds2 = new ArrayList<>(slotIds.size());
+            for(P11SlotIdentifier slotId : slotIds)
             {
                 if(slotIndexes.contains(slotId.getSlotIndex()) == false)
                 {
@@ -112,7 +112,7 @@ public class P11ListSlotCommand extends SecurityCommand
 
         char[] pwd = readPasswordIfRequired(password, readFromConsole);
 
-        for(PKCS11SlotIdentifier slotId : slotIds)
+        for(P11SlotIdentifier slotId : slotIds)
         {
             sb = new StringBuilder();
             sb.append("\nslot[").append(slotId.getSlotIndex()).append("]: ").append(slotId.getSlotId()).append("\n");

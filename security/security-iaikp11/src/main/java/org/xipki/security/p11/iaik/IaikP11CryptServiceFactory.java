@@ -9,9 +9,9 @@ package org.xipki.security.p11.iaik;
 
 import java.util.Set;
 
-import org.xipki.security.api.P11CryptService;
-import org.xipki.security.api.P11CryptServiceFactory;
 import org.xipki.security.api.SignerException;
+import org.xipki.security.api.p11.P11CryptService;
+import org.xipki.security.api.p11.P11CryptServiceFactory;
 
 /**
  * @author Lijun Liao

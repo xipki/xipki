@@ -17,9 +17,9 @@ import java.security.interfaces.RSAPublicKey;
 import org.bouncycastle.asn1.ASN1EncodableVector;
 import org.bouncycastle.asn1.ASN1Integer;
 import org.bouncycastle.asn1.DERSequence;
-import org.xipki.security.api.PKCS11SlotIdentifier;
-import org.xipki.security.api.Pkcs11KeyIdentifier;
 import org.xipki.security.api.SignerException;
+import org.xipki.security.api.p11.P11SlotIdentifier;
+import org.xipki.security.api.p11.P11KeyIdentifier;
 import org.xipki.security.common.IoCertUtil;
 import org.xipki.security.common.ParamChecker;
 
@@ -29,16 +29,16 @@ import org.xipki.security.common.ParamChecker;
 
 class IaikP11Identity implements Comparable<IaikP11Identity>
 {
-    private final PKCS11SlotIdentifier slotId;
-    private final Pkcs11KeyIdentifier keyId;
+    private final P11SlotIdentifier slotId;
+    private final P11KeyIdentifier keyId;
 
     private final X509Certificate[] certificateChain;
     private final PublicKey publicKey;
     private final int signatureKeyBitLength;
 
     public IaikP11Identity(
-            PKCS11SlotIdentifier slotId,
-            Pkcs11KeyIdentifier keyId,
+            P11SlotIdentifier slotId,
+            P11KeyIdentifier keyId,
             X509Certificate[] certificateChain,
             PublicKey publicKey)
     {
@@ -73,7 +73,7 @@ class IaikP11Identity implements Comparable<IaikP11Identity>
         }
     }
 
-    public Pkcs11KeyIdentifier getKeyId()
+    public P11KeyIdentifier getKeyId()
     {
         return keyId;
     }
@@ -93,12 +93,12 @@ class IaikP11Identity implements Comparable<IaikP11Identity>
         return publicKey == null ? certificateChain[0].getPublicKey() : publicKey;
     }
 
-    public PKCS11SlotIdentifier getSlotId()
+    public P11SlotIdentifier getSlotId()
     {
         return slotId;
     }
 
-    public boolean match(PKCS11SlotIdentifier slotId, Pkcs11KeyIdentifier keyId)
+    public boolean match(P11SlotIdentifier slotId, P11KeyIdentifier keyId)
     {
         if(this.slotId.equals(slotId) == false)
         {
@@ -108,7 +108,7 @@ class IaikP11Identity implements Comparable<IaikP11Identity>
         return this.keyId.equals(keyId);
     }
 
-    public boolean match(PKCS11SlotIdentifier slotId, String keyLabel)
+    public boolean match(P11SlotIdentifier slotId, String keyLabel)
     {
         if(keyLabel == null)
         {

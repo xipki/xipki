@@ -28,10 +28,10 @@ import org.bouncycastle.operator.ContentSigner;
 import org.bouncycastle.operator.OperatorCreationException;
 import org.xipki.security.DefaultConcurrentContentSigner;
 import org.xipki.security.api.ConcurrentContentSigner;
-import org.xipki.security.api.P11CryptService;
-import org.xipki.security.api.PKCS11SlotIdentifier;
-import org.xipki.security.api.Pkcs11KeyIdentifier;
 import org.xipki.security.api.SignerException;
+import org.xipki.security.api.p11.P11CryptService;
+import org.xipki.security.api.p11.P11SlotIdentifier;
+import org.xipki.security.api.p11.P11KeyIdentifier;
 import org.xipki.security.common.IoCertUtil;
 import org.xipki.security.common.ParamChecker;
 import org.xipki.security.provider.P11PrivateKey;
@@ -45,13 +45,13 @@ public class P11ContentSignerBuilder
     private final X509Certificate[] certificateChain;
 
     private final P11CryptService cryptService;
-    private final PKCS11SlotIdentifier slot;
-    private final Pkcs11KeyIdentifier keyId;
+    private final P11SlotIdentifier slot;
+    private final P11KeyIdentifier keyId;
 
     public P11ContentSignerBuilder(
             P11CryptService cryptService,
-            PKCS11SlotIdentifier slot, char[] password,
-            Pkcs11KeyIdentifier keyId,
+            P11SlotIdentifier slot, char[] password,
+            P11KeyIdentifier keyId,
             X509Certificate[] certificateChain)
     throws SignerException
     {

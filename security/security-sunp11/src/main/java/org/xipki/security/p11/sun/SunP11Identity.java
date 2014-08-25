@@ -23,8 +23,8 @@ import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 
-import org.xipki.security.api.PKCS11SlotIdentifier;
 import org.xipki.security.api.SignerException;
+import org.xipki.security.api.p11.P11SlotIdentifier;
 import org.xipki.security.common.IoCertUtil;
 import org.xipki.security.common.ParamChecker;
 
@@ -36,7 +36,7 @@ class SunP11Identity implements Comparable<SunP11Identity>
 {
     private final Cipher rsaCipher;
     private final Signature ecdsaSignature;
-    private final PKCS11SlotIdentifier slotId;
+    private final P11SlotIdentifier slotId;
 
     private final String keyLabel;
     private final PrivateKey privateKey;
@@ -46,7 +46,7 @@ class SunP11Identity implements Comparable<SunP11Identity>
 
     public SunP11Identity(
             Provider p11Provider,
-            PKCS11SlotIdentifier slotId,
+            P11SlotIdentifier slotId,
             String keyLabel,
             PrivateKey privateKey,
             X509Certificate[] certificateChain,
@@ -145,12 +145,12 @@ class SunP11Identity implements Comparable<SunP11Identity>
         return publicKey == null ? certificateChain[0].getPublicKey() : publicKey;
     }
 
-    public PKCS11SlotIdentifier getSlotId()
+    public P11SlotIdentifier getSlotId()
     {
         return slotId;
     }
 
-    public boolean match(PKCS11SlotIdentifier slotId, String keyLabel)
+    public boolean match(P11SlotIdentifier slotId, String keyLabel)
     {
         return this.slotId.equals(slotId) && this.keyLabel.equals(keyLabel);
     }

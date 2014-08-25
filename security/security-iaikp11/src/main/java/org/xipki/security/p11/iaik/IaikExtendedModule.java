@@ -17,8 +17,8 @@ import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.security.api.PKCS11SlotIdentifier;
 import org.xipki.security.api.SignerException;
+import org.xipki.security.api.p11.P11SlotIdentifier;
 import org.xipki.security.common.LogUtil;
 import org.xipki.security.common.ParamChecker;
 
@@ -31,8 +31,8 @@ public class IaikExtendedModule
     private static final Logger LOG = LoggerFactory.getLogger(IaikExtendedModule.class);
 
     private Module module;
-    private Map<PKCS11SlotIdentifier, IaikExtendedSlot> slots = new HashMap<>();
-    private Map<PKCS11SlotIdentifier, Slot> availableSlots = new HashMap<>();
+    private Map<P11SlotIdentifier, IaikExtendedSlot> slots = new HashMap<>();
+    private Map<P11SlotIdentifier, Slot> availableSlots = new HashMap<>();
 
     public IaikExtendedModule(Module module)
     throws SignerException
@@ -61,7 +61,7 @@ public class IaikExtendedModule
         for (int i = 0; i < slotList.length; i++)
         {
             Slot slot = slotList[i];
-            PKCS11SlotIdentifier slotId = new PKCS11SlotIdentifier(i, slot.getSlotID());
+            P11SlotIdentifier slotId = new P11SlotIdentifier(i, slot.getSlotID());
             availableSlots.put(slotId, slot);
         }
 
@@ -96,7 +96,7 @@ public class IaikExtendedModule
         }
     }
 
-    public IaikExtendedSlot getSlot(PKCS11SlotIdentifier slotId, char[] password)
+    public IaikExtendedSlot getSlot(P11SlotIdentifier slotId, char[] password)
     throws SignerException
     {
         IaikExtendedSlot extSlot = slots.get(slotId);
@@ -106,7 +106,7 @@ public class IaikExtendedModule
         }
 
         Slot slot = null;
-        for(PKCS11SlotIdentifier s : availableSlots.keySet())
+        for(P11SlotIdentifier s : availableSlots.keySet())
         {
             if(s.getSlotIndex() == slotId.getSlotIndex() ||
                 s.getSlotId() == slotId.getSlotId())
@@ -139,7 +139,7 @@ public class IaikExtendedModule
 
     public void close()
     {
-        for(PKCS11SlotIdentifier slotId : slots.keySet())
+        for(P11SlotIdentifier slotId : slots.keySet())
         {
             try
             {
@@ -154,7 +154,7 @@ public class IaikExtendedModule
         slots.clear();
         slots = null;
 
-        for(PKCS11SlotIdentifier slotId : availableSlots.keySet())
+        for(P11SlotIdentifier slotId : availableSlots.keySet())
         {
             try
             {
@@ -184,7 +184,7 @@ public class IaikExtendedModule
         module = null;
     }
 
-    public Set<PKCS11SlotIdentifier> getAllSlotIds()
+    public Set<P11SlotIdentifier> getAllSlotIds()
     {
         return availableSlots.keySet();
     }
