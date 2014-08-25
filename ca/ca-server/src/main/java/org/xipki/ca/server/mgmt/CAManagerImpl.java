@@ -268,7 +268,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
                         DataSourceWrapper datasource = dataSourceFactory.createDataSourceForFile(
                                 datasourceFile, passwordResolver);
                         this.dataSources.put(datasourceName, datasource);
-                    } catch (SQLException | PasswordResolverException | IOException e)
+                    } catch (SQLException | PasswordResolverException | IOException | RuntimeException e)
                     {
                         throw new CAMgmtException(e.getClass().getName() + " while paring datasoure " + datasourceFile, e);
                     }
@@ -1025,7 +1025,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
                 try
                 {
                     entry = new CertProfileEntryWrapper(rawEntry);
-                } catch(CertProfileException e)
+                } catch(CertProfileException | RuntimeException e)
                 {
                     final String message = "Invalid configuration for the certProfile " + name;
                     if(LOG.isErrorEnabled())
@@ -1096,7 +1096,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
                 try
                 {
                     entry = new PublisherEntryWrapper(rawEntry, passwordResolver, dataSources);
-                } catch(CertPublisherException e)
+                } catch(CertPublisherException | RuntimeException e)
                 {
                     final String message = "Invalid configuration for the certPublisher " + name;
                     if(LOG.isErrorEnabled())
@@ -1238,10 +1238,10 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
             stmt = createStatement();
 
             StringBuilder sqlBuilder = new StringBuilder();
-            sqlBuilder.append("SELECT NAME, NEXT_SERIAL, STATUS, CRL_URIS, OCSP_URIS, MAX_VALIDITY, ");
-            sqlBuilder.append("CERT, SIGNER_TYPE, SIGNER_CONF, CRLSIGNER_NAME, ");
-            sqlBuilder.append("DUPLICATE_KEY_MODE, DUPLICATE_SUBJECT_MODE, PERMISSIONS, NUM_CRLS, ");
-            sqlBuilder.append("EXPIRATION_PERIOD, REVOKED, REV_REASON, REV_TIME, REV_INVALIDITY_TIME");
+            sqlBuilder.append("SELECT NAME, NEXT_SERIAL, STATUS, CRL_URIS, OCSP_URIS, MAX_VALIDITY");
+            sqlBuilder.append(", CERT, SIGNER_TYPE, SIGNER_CONF, CRLSIGNER_NAME");
+            sqlBuilder.append(", DUPLICATE_KEY_MODE, DUPLICATE_SUBJECT_MODE, PERMISSIONS, NUM_CRLS");
+            sqlBuilder.append(", EXPIRATION_PERIOD, REVOKED, REV_REASON, REV_TIME, REV_INVALIDITY_TIME");
             sqlBuilder.append(", DELTA_CRL_URIS, VALIDITY_MODE");
             sqlBuilder.append(", LAST_CRL_INTERVAL, LAST_CRL_INTERVAL_DATE");
             sqlBuilder.append(" FROM CA");
@@ -1433,9 +1433,9 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
         {
             StringBuilder sqlBuilder = new StringBuilder();
             sqlBuilder.append("INSERT INTO CA (");
-            sqlBuilder.append("NAME, SUBJECT, NEXT_SERIAL, STATUS, CRL_URIS, OCSP_URIS, MAX_VALIDITY, ");
-            sqlBuilder.append("CERT, SIGNER_TYPE, SIGNER_CONF, CRLSIGNER_NAME, ");
-            sqlBuilder.append("DUPLICATE_KEY_MODE, DUPLICATE_SUBJECT_MODE, PERMISSIONS, NUM_CRLS, EXPIRATION_PERIOD");
+            sqlBuilder.append("NAME, SUBJECT, NEXT_SERIAL, STATUS, CRL_URIS, OCSP_URIS, MAX_VALIDITY");
+            sqlBuilder.append(", CERT, SIGNER_TYPE, SIGNER_CONF, CRLSIGNER_NAME");
+            sqlBuilder.append(", DUPLICATE_KEY_MODE, DUPLICATE_SUBJECT_MODE, PERMISSIONS, NUM_CRLS, EXPIRATION_PERIOD");
             sqlBuilder.append(", VALIDITY_MODE, DELTA_CRL_URIS");
             sqlBuilder.append(") VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
 
@@ -2379,8 +2379,8 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
         try
         {
             StringBuilder sqlBuilder = new StringBuilder();
-            sqlBuilder.append("INSERT INTO CRLSIGNER (NAME, SIGNER_TYPE, SIGNER_CONF, SIGNER_CERT, CRL_CONTROL");
-            sqlBuilder.append(") VALUES (?, ?, ?, ?, ?)");
+            sqlBuilder.append("INSERT INTO CRLSIGNER (NAME, SIGNER_TYPE, SIGNER_CONF, SIGNER_CERT, CRL_CONTROL)");
+            sqlBuilder.append(" VALUES (?, ?, ?, ?, ?)");
 
             ps = prepareStatement(sqlBuilder.toString());
             int idx = 1;
@@ -2768,8 +2768,8 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
         try
         {
             ps = prepareStatement(
-                    "INSERT INTO CMPCONTROL (NAME, REQUIRE_CONFIRM_CERT, SEND_CA_CERT, SEND_RESPONDER_CERT,"
-                    + " REQUIRE_MESSAGE_TIME, MESSAGE_TIME_BIAS, CONFIRM_WAIT_TIME)"
+                    "INSERT INTO CMPCONTROL (NAME, REQUIRE_CONFIRM_CERT, SEND_CA_CERT, SEND_RESPONDER_CERT"
+                    + ", REQUIRE_MESSAGE_TIME, MESSAGE_TIME_BIAS, CONFIRM_WAIT_TIME)"
                     + " VALUES (?, ?, ?, ?, ?, ?, ?)");
 
             int idx = 1;
