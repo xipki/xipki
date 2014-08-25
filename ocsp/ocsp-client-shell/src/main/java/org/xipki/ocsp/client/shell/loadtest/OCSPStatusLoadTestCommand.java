@@ -11,7 +11,6 @@ import java.net.URL;
 import java.security.cert.X509Certificate;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.StringTokenizer;
 
 import org.apache.felix.gogo.commands.Command;
 import org.apache.felix.gogo.commands.Option;
@@ -19,6 +18,7 @@ import org.xipki.ocsp.client.api.RequestOptions;
 import org.xipki.ocsp.client.shell.AbstractOCSPStatusCommand;
 import org.xipki.security.common.AbstractLoadTest;
 import org.xipki.security.common.IoCertUtil;
+import org.xipki.security.common.StringUtil;
 
 /**
  * @author Lijun Liao
@@ -56,20 +56,19 @@ public class OCSPStatusLoadTestCommand extends AbstractOCSPStatusCommand
 
         try
         {
-            StringTokenizer tokens = new StringTokenizer(this.serialNumbers, ",");
-            while(tokens.hasMoreTokens())
+            List<String> tokens = StringUtil.split(this.serialNumbers, ",");
+            for(String token : tokens)
             {
-                String token = tokens.nextToken().trim();
-                StringTokenizer subtokens = new StringTokenizer(token, "- ");
-                int countTokens = subtokens.countTokens();
+                List<String> subtokens = StringUtil.split(token.trim(), "- ");
+                int countTokens = subtokens.size();
                 if(countTokens == 1)
                 {
-                    serialNumbers.add(Long.parseLong(subtokens.nextToken().trim()));
+                    serialNumbers.add(Long.parseLong(subtokens.get(0)));
                 }
                 else if(countTokens == 2)
                 {
-                    int startSerial = Integer.parseInt(subtokens.nextToken().trim());
-                    int endSerial = Integer.parseInt(subtokens.nextToken().trim());
+                    int startSerial = Integer.parseInt(subtokens.get(0).trim());
+                    int endSerial = Integer.parseInt(subtokens.get(1).trim());
                     if(startSerial < 1 || endSerial < 1 || startSerial > endSerial)
                     {
                         System.err.println("invalid serial number " + this.serialNumbers);

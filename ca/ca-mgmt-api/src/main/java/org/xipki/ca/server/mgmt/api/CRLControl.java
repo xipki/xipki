@@ -7,15 +7,15 @@
 
 package org.xipki.ca.server.mgmt.api;
 
-import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
-import java.util.StringTokenizer;
 
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.security.common.CmpUtf8Pairs;
 import org.xipki.security.common.ConfigurationException;
+import org.xipki.security.common.StringUtil;
 
 /**
  *
@@ -202,19 +202,17 @@ public class CRLControl
         s = props.getValue(KEY_extensions);
         if(s != null)
         {
-            StringTokenizer st = new StringTokenizer(s, ", ");
-            Set<String> extensionOIDs = new HashSet<>();
-            while(st.hasMoreTokens())
+            Set<String> extensionOIDs = StringUtil.splitAsSet(s, ", ");
+            // check the OID
+            for(String extensionOID : extensionOIDs)
             {
-                String oidStr = st.nextToken();
                 try
                 {
-                    new ASN1ObjectIdentifier(oidStr);
+                    new ASN1ObjectIdentifier(extensionOID);
                 }catch(IllegalArgumentException e)
                 {
-                    throw new ConfigurationException(oidStr + " is not valid OID");
+                    throw new ConfigurationException(extensionOID + " is not a valid OID");
                 }
-                extensionOIDs.add(oidStr);
             }
             control.setExtensionOIDs(extensionOIDs);
         }
@@ -257,15 +255,15 @@ public class CRLControl
         s = props.getValue(KEY_interval_time);
         if(s != null)
         {
-            StringTokenizer st = new StringTokenizer(s, ":");
-            if(st.countTokens() != 2)
+            List<String> tokens = StringUtil.split(s.trim(), ":");
+            if(tokens.size() != 2)
             {
                 throw new ConfigurationException("invalid " + KEY_interval_time + ": '" + s + "'");
             }
             try
             {
-                int hour = Integer.parseInt(st.nextToken());
-                int minute = Integer.parseInt(st.nextToken());
+                int hour = Integer.parseInt(tokens.get(0));
+                int minute = Integer.parseInt(tokens.get(1));
                 HourMinute hm = new HourMinute(hour, minute);
                 control.setIntervalDayTime(hm);
             }catch(IllegalArgumentException e)

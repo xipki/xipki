@@ -15,7 +15,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.StringTokenizer;
 
 import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
@@ -33,6 +32,7 @@ import org.xipki.ca.common.BadCertTemplateException;
 import org.xipki.ca.common.CertProfileException;
 import org.xipki.security.common.EnvironmentParameterResolver;
 import org.xipki.security.common.ObjectIdentifiers;
+import org.xipki.security.common.StringUtil;
 
 /**
  * @author Lijun Liao
@@ -72,11 +72,7 @@ extends CertProfile implements SubjectDNSubset
         String s = System.getProperty("org.xipki.countrycodes.extra");
         if(s != null)
         {
-            StringTokenizer st = new StringTokenizer(s, ",; \t");
-            while(st.hasMoreTokens())
-            {
-                countryCodes.add(st.nextToken());
-            }
+            countryCodes.addAll(StringUtil.split(s, ",; \t"));
         }
     }
 
