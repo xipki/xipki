@@ -222,7 +222,7 @@ class CertStoreQueryExecutor
             ps_addcert.setString(idx++, fp(encodedSubjectPublicKey));
             String sha1_fp_subject = IoCertUtil.sha1sum_canonicalized_name(cert.getSubjectX500Principal());
             ps_addcert.setString(idx++, sha1_fp_subject);
-            
+
             boolean isEECert = cert.getBasicConstraints() == -1;
             ps_addcert.setInt(idx++, isEECert ? 1 : 0);
 
