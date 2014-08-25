@@ -5,7 +5,7 @@
  *
  */
 
-package org.xipki.security.api.p11;
+package org.xipki.security.api;
 
 import org.bouncycastle.cert.X509CertificateHolder;
 import org.xipki.security.api.KeypairGenerationResult;
