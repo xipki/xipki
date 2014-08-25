@@ -18,7 +18,7 @@ import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.ASN1TaggedObject;
 import org.bouncycastle.asn1.DERSequence;
 import org.bouncycastle.asn1.DERTaggedObject;
-import org.xipki.security.api.PKCS11SlotIdentifier;
+import org.xipki.security.api.p11.P11SlotIdentifier;
 
 /**
  *
@@ -35,9 +35,9 @@ import org.xipki.security.api.PKCS11SlotIdentifier;
 
 public class SlotIdentifier extends ASN1Object
 {
-    private PKCS11SlotIdentifier slotId;
+    private P11SlotIdentifier slotId;
 
-    public SlotIdentifier(PKCS11SlotIdentifier slotId)
+    public SlotIdentifier(P11SlotIdentifier slotId)
     {
         if(slotId == null)
         {
@@ -90,7 +90,7 @@ public class SlotIdentifier extends ASN1Object
             }
         }
 
-        this.slotId = new PKCS11SlotIdentifier(slotIndex, slotId);
+        this.slotId = new P11SlotIdentifier(slotIndex, slotId);
     }
 
     public static SlotIdentifier getInstance(
@@ -139,7 +139,7 @@ public class SlotIdentifier extends ASN1Object
         return new DERSequence(vector);
     }
 
-    public PKCS11SlotIdentifier getSlotId()
+    public P11SlotIdentifier getSlotId()
     {
         return slotId;
     }

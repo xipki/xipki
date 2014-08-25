@@ -30,11 +30,11 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
-import org.xipki.security.api.P11CryptService;
-import org.xipki.security.api.P11CryptServiceFactory;
-import org.xipki.security.api.PKCS11SlotIdentifier;
-import org.xipki.security.api.Pkcs11KeyIdentifier;
 import org.xipki.security.api.SignerException;
+import org.xipki.security.api.p11.P11CryptService;
+import org.xipki.security.api.p11.P11CryptServiceFactory;
+import org.xipki.security.api.p11.P11SlotIdentifier;
+import org.xipki.security.api.p11.P11KeyIdentifier;
 import org.xipki.security.common.ParamChecker;
 
 /**
@@ -161,14 +161,14 @@ public class XiPKIKeyStoreSpi extends KeyStoreSpi
         try
         {
             P11CryptService p11Servcie = ((P11CryptServiceFactory) p11Provider).createP11CryptService(pkcs11Module, password);
-            PKCS11SlotIdentifier[] slotIds = p11Servcie.getSlotIdentifiers();
+            P11SlotIdentifier[] slotIds = p11Servcie.getSlotIdentifiers();
 
-            Map<PKCS11SlotIdentifier, String[]> keyLabelsMap = new HashMap<>();
+            Map<P11SlotIdentifier, String[]> keyLabelsMap = new HashMap<>();
 
             Set<String> allKeyLabels = new HashSet<>();
             Set<String> duplicatedKeyLabels = new HashSet<>();
 
-            for(PKCS11SlotIdentifier slotId: slotIds)
+            for(P11SlotIdentifier slotId: slotIds)
             {
                 String[] keyLabels = p11Servcie.getKeyLabels(slotId);
                 for(String keyLabel : keyLabels)
@@ -183,7 +183,7 @@ public class XiPKIKeyStoreSpi extends KeyStoreSpi
                 keyLabelsMap.put(slotId, keyLabels);
             }
 
-            for(PKCS11SlotIdentifier slotId: slotIds)
+            for(P11SlotIdentifier slotId: slotIds)
             {
                 String[] keyLabels = keyLabelsMap.get(slotId);
                 for(String keyLabel : keyLabels)
@@ -194,7 +194,7 @@ public class XiPKIKeyStoreSpi extends KeyStoreSpi
                         alias += "-slot" + slotId.getSlotIndex();
                     }
 
-                    Pkcs11KeyIdentifier keyId = new Pkcs11KeyIdentifier(keyLabel);
+                    P11KeyIdentifier keyId = new P11KeyIdentifier(keyLabel);
                     P11PrivateKey key = new P11PrivateKey(p11Servcie, slotId, keyId);
                     X509Certificate[] chain = p11Servcie.getCertificates(slotId, keyId);
 

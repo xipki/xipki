@@ -62,9 +62,9 @@ import org.bouncycastle.crypto.digests.SHA512Digest;
 import org.bouncycastle.crypto.params.RSAKeyParameters;
 import org.bouncycastle.crypto.util.SubjectPublicKeyInfoFactory;
 import org.bouncycastle.util.Arrays;
-import org.xipki.security.api.P11KeypairGenerationResult;
-import org.xipki.security.api.PKCS11SlotIdentifier;
 import org.xipki.security.api.SignerException;
+import org.xipki.security.api.p11.P11KeypairGenerationResult;
+import org.xipki.security.api.p11.P11SlotIdentifier;
 import org.xipki.security.common.IoCertUtil;
 import org.xipki.security.common.ParamChecker;
 
@@ -76,7 +76,7 @@ public class P11KeypairGenerator
 {
     public static final long YEAR = 365L * 24 * 60 * 60 * 1000; // milliseconds of one year
 
-    private static IaikExtendedSlot getSlot(String pkcs11Lib, PKCS11SlotIdentifier slotId, char[] password)
+    private static IaikExtendedSlot getSlot(String pkcs11Lib, P11SlotIdentifier slotId, char[] password)
     throws SignerException
     {
         if(pkcs11Lib == null)
@@ -94,7 +94,7 @@ public class P11KeypairGenerator
     }
 
     public P11KeypairGenerationResult generateRSAKeypairAndCert(
-            String pkcs11Lib, PKCS11SlotIdentifier slotId, char[] password,
+            String pkcs11Lib, P11SlotIdentifier slotId, char[] password,
             int keySize, BigInteger publicExponent,
             String label, String subject,
             Integer keyUsage,
@@ -205,7 +205,7 @@ public class P11KeypairGenerator
     }
 
     public P11KeypairGenerationResult generateECDSAKeypairAndCert(
-            String pkcs11Lib, PKCS11SlotIdentifier slotId, char[] password,
+            String pkcs11Lib, P11SlotIdentifier slotId, char[] password,
             String curveNameOrOid, String label, String subject,
             Integer keyUsage,
             List<ASN1ObjectIdentifier> extendedKeyusage)

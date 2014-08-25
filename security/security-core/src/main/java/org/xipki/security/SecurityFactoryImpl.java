@@ -47,14 +47,14 @@ import org.bouncycastle.util.encoders.Base64;
 import org.bouncycastle.util.encoders.Hex;
 import org.xipki.security.api.ConcurrentContentSigner;
 import org.xipki.security.api.NoIdleSignerException;
-import org.xipki.security.api.P11CryptService;
-import org.xipki.security.api.P11CryptServiceFactory;
-import org.xipki.security.api.PKCS11SlotIdentifier;
 import org.xipki.security.api.PasswordResolver;
 import org.xipki.security.api.PasswordResolverException;
-import org.xipki.security.api.Pkcs11KeyIdentifier;
 import org.xipki.security.api.SecurityFactory;
 import org.xipki.security.api.SignerException;
+import org.xipki.security.api.p11.P11CryptService;
+import org.xipki.security.api.p11.P11CryptServiceFactory;
+import org.xipki.security.api.p11.P11SlotIdentifier;
+import org.xipki.security.api.p11.P11KeyIdentifier;
 import org.xipki.security.common.CmpUtf8Pairs;
 import org.xipki.security.common.IoCertUtil;
 import org.xipki.security.common.ParamChecker;
@@ -339,7 +339,7 @@ public class SecurityFactoryImpl implements SecurityFactory
                 {
                     throw new SignerException("Exactly one of slot (index) and slot-id must be specified");
                 }
-                PKCS11SlotIdentifier slot = new PKCS11SlotIdentifier(slotIndex, slotId);
+                P11SlotIdentifier slot = new P11SlotIdentifier(slotIndex, slotId);
 
                 String keyLabel = keyValues.getValue("key-label");
                 s = keyValues.getValue("key-id");
@@ -354,14 +354,14 @@ public class SecurityFactoryImpl implements SecurityFactory
                     throw new SignerException("Exactly one of key-id and key-label must be specified");
                 }
 
-                Pkcs11KeyIdentifier keyIdentifier;
+                P11KeyIdentifier keyIdentifier;
                 if(keyId != null)
                 {
-                    keyIdentifier = new Pkcs11KeyIdentifier(keyId);
+                    keyIdentifier = new P11KeyIdentifier(keyId);
                 }
                 else
                 {
-                    keyIdentifier = new Pkcs11KeyIdentifier(keyLabel);
+                    keyIdentifier = new P11KeyIdentifier(keyLabel);
                 }
 
                 Object p11Provider;
@@ -617,8 +617,8 @@ public class SecurityFactoryImpl implements SecurityFactory
         return conf.getEncoded();
     }
 
-    public static String getPkcs11SignerConf(String pkcs11Lib, PKCS11SlotIdentifier slotId,
-            Pkcs11KeyIdentifier keyId,
+    public static String getPkcs11SignerConf(String pkcs11Lib, P11SlotIdentifier slotId,
+            P11KeyIdentifier keyId,
             String password,
             String signatureAlgorithm, int parallelism)
     {

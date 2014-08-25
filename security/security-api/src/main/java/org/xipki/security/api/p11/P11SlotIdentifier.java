@@ -5,18 +5,18 @@
  *
  */
 
-package org.xipki.security.api;
+package org.xipki.security.api.p11;
 
 /**
  * @author Lijun Liao
  */
 
-public class PKCS11SlotIdentifier implements Comparable<PKCS11SlotIdentifier>
+public class P11SlotIdentifier implements Comparable<P11SlotIdentifier>
 {
     private final Integer slotIndex;
     private final Long slotId;
 
-    public PKCS11SlotIdentifier(Integer slotIndex, Long slotId)
+    public P11SlotIdentifier(Integer slotIndex, Long slotId)
     {
         if(slotIndex == null && slotId == null)
         {
@@ -44,7 +44,7 @@ public class PKCS11SlotIdentifier implements Comparable<PKCS11SlotIdentifier>
             return true;
         }
 
-        if(b instanceof PKCS11SlotIdentifier == false)
+        if(b instanceof P11SlotIdentifier == false)
         {
             return false;
         }
@@ -54,7 +54,7 @@ public class PKCS11SlotIdentifier implements Comparable<PKCS11SlotIdentifier>
             return true;
         }
 
-        PKCS11SlotIdentifier another = (PKCS11SlotIdentifier) b;
+        P11SlotIdentifier another = (P11SlotIdentifier) b;
         return (this.slotIndex == another.slotIndex || this.slotId == another.slotId);
     }
 
@@ -78,7 +78,7 @@ public class PKCS11SlotIdentifier implements Comparable<PKCS11SlotIdentifier>
     }
 
     @Override
-    public int compareTo(PKCS11SlotIdentifier o)
+    public int compareTo(P11SlotIdentifier o)
     {
         if(this == o)
         {

@@ -25,9 +25,9 @@ import org.bouncycastle.operator.OperatorCreationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.security.SignerUtil;
-import org.xipki.security.api.P11CryptService;
-import org.xipki.security.api.PKCS11SlotIdentifier;
-import org.xipki.security.api.Pkcs11KeyIdentifier;
+import org.xipki.security.api.p11.P11CryptService;
+import org.xipki.security.api.p11.P11SlotIdentifier;
+import org.xipki.security.api.p11.P11KeyIdentifier;
 import org.xipki.security.common.ParamChecker;
 
 /**
@@ -43,8 +43,8 @@ public class P11RSAPSSContentSigner implements ContentSigner
 
     public P11RSAPSSContentSigner(
             P11CryptService cryptService,
-            PKCS11SlotIdentifier slot,
-            Pkcs11KeyIdentifier keyId,
+            P11SlotIdentifier slot,
+            P11KeyIdentifier keyId,
             AlgorithmIdentifier signatureAlgId)
     throws NoSuchAlgorithmException, NoSuchPaddingException, OperatorCreationException
     {

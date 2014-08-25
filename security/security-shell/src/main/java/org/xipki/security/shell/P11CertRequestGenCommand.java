@@ -26,9 +26,9 @@ import org.bouncycastle.pkcs.PKCS10CertificationRequest;
 import org.xipki.security.NopPasswordResolver;
 import org.xipki.security.SecurityFactoryImpl;
 import org.xipki.security.api.ConcurrentContentSigner;
-import org.xipki.security.api.PKCS11SlotIdentifier;
-import org.xipki.security.api.Pkcs11KeyIdentifier;
 import org.xipki.security.api.SignerException;
+import org.xipki.security.api.p11.P11SlotIdentifier;
+import org.xipki.security.api.p11.P11KeyIdentifier;
 import org.xipki.security.p10.Pkcs10RequestGenerator;
 import org.xipki.security.p11.iaik.IaikExtendedModule;
 import org.xipki.security.p11.iaik.IaikExtendedSlot;
@@ -64,7 +64,7 @@ public class P11CertRequestGenCommand extends P11SecurityCommand
             hashAlgo = "SHA256";
         }
 
-        Pkcs11KeyIdentifier keyIdentifier = getKeyIdentifier();
+        P11KeyIdentifier keyIdentifier = getKeyIdentifier();
         char[] pwd = getPassword();
 
         IaikExtendedModule module = IaikP11ModulePool.getInstance().getModule(
@@ -73,7 +73,7 @@ public class P11CertRequestGenCommand extends P11SecurityCommand
         IaikExtendedSlot slot = null;
         try
         {
-            slot = module.getSlot(new PKCS11SlotIdentifier(slotIndex, null),
+            slot = module.getSlot(new P11SlotIdentifier(slotIndex, null),
                     pwd);
         }catch(SignerException e)
         {
@@ -116,7 +116,7 @@ public class P11CertRequestGenCommand extends P11SecurityCommand
             throw new Exception("Unsupported hash algorithm " + hashAlgo);
         }
 
-        PKCS11SlotIdentifier slotId = new PKCS11SlotIdentifier(slotIndex, null);
+        P11SlotIdentifier slotId = new P11SlotIdentifier(slotIndex, null);
         String pwdStr = pwd == null ? null : new String(pwd);
         String signerConf = SecurityFactoryImpl.getPkcs11SignerConf(
                         securityFactory.getPkcs11Module(),

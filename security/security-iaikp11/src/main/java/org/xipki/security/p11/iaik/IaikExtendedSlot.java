@@ -38,8 +38,8 @@ import javax.security.auth.x500.X500Principal;
 import org.bouncycastle.util.encoders.Hex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.security.api.Pkcs11KeyIdentifier;
 import org.xipki.security.api.SignerException;
+import org.xipki.security.api.p11.P11KeyIdentifier;
 import org.xipki.security.common.IoCertUtil;
 import org.xipki.security.common.LogUtil;
 
@@ -134,7 +134,7 @@ public class IaikExtendedSlot
         returnIdleSession(session);
     }
 
-    public byte[] CKM_ECDSA(byte[] hash, Pkcs11KeyIdentifier keyId)
+    public byte[] CKM_ECDSA(byte[] hash, P11KeyIdentifier keyId)
     throws SignerException
     {
         PrivateKey signatureKey = getSigningKey(keyId);
@@ -178,7 +178,7 @@ public class IaikExtendedSlot
         }
     }
 
-    public byte[] CKM_RSA_PKCS(byte[] encodedDigestInfo, Pkcs11KeyIdentifier keyId)
+    public byte[] CKM_RSA_PKCS(byte[] encodedDigestInfo, P11KeyIdentifier keyId)
     throws SignerException
     {
         PrivateKey signatureKey = getSigningKey(keyId);
@@ -223,7 +223,7 @@ public class IaikExtendedSlot
         }
     }
 
-    public byte[] CKM_RSA_X509(byte[] hash, Pkcs11KeyIdentifier keyId)
+    public byte[] CKM_RSA_X509(byte[] hash, P11KeyIdentifier keyId)
     throws SignerException
     {
         PrivateKey signatureKey = getSigningKey(keyId);
@@ -268,7 +268,7 @@ public class IaikExtendedSlot
         }
     }
 
-    private PrivateKey getSigningKey(Pkcs11KeyIdentifier keyId)
+    private PrivateKey getSigningKey(P11KeyIdentifier keyId)
     throws SignerException
     {
         synchronized (keyId)
@@ -636,7 +636,7 @@ public class IaikExtendedSlot
 
         if(b == null || b.booleanValue() == false)
         {
-            LOG.warn("key {} is not for signing", new Pkcs11KeyIdentifier(id, label));
+            LOG.warn("key {} is not for signing", new P11KeyIdentifier(id, label));
             return;
         }
 
