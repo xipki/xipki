@@ -1355,7 +1355,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
                 Set<Permission> permissions = getPermissions(s);
 
                 s = rs.getString("PROFILES");
-                List<String> list = tokensAsList(s, ",");
+                List<String> list = StringUtil.split(s, ",");
                 Set<String> profiles = (list == null)? null : new HashSet<>(list);
 
                 Set<CAHasRequestorEntry> requestors = ca_has_requestors.get(ca_name);

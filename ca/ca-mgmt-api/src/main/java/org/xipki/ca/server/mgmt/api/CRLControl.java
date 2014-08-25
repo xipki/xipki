@@ -61,6 +61,12 @@ import org.xipki.security.common.StringUtil;
  * # Default is false
  * fullCRL.extendedNextUpdate?<'true'|'false'>
  *
+ * # Whether only user certificates are considered in CRL
+ * onlyContainsUserCerts?<'true'|'false'>
+ *
+ * # Whether only CA certificates are considered in CRL
+ * onlyContainsCACerts?<'true'|'false'>
+ *
  * @author Lijun Liao
  */
 
@@ -77,6 +83,8 @@ public class CRLControl
     public static final String KEY_interval_minutes = "interval.minutes";
     public static final String KEY_interval_time = "interval.time";
     public static final String KEY_fullCRL_extendedNextUpdate = "fullCRL.extendedNextUpdate";
+    public static final String KEY_onlyContainsUserCerts = "onlyContainsUserCerts";
+    public static final String KEY_onlyContainsCACerts = "onlyContainsCACerts";
 
     public static enum UpdateMode
     {
@@ -157,6 +165,9 @@ public class CRLControl
     private boolean extendedNextUpdate = false;
     private Integer intervalMinutes;
     private HourMinute intervalDayTime;
+    private boolean onlyContainsUserCerts = false;
+    private boolean onlyContainsCACerts = false;
+
     private Set<String> extensionOIDs;
 
     public CRLControl()
@@ -215,6 +226,18 @@ public class CRLControl
                 }
             }
             control.setExtensionOIDs(extensionOIDs);
+        }
+
+        b = getBoolean(props, KEY_onlyContainsCACerts);
+        if(b != null)
+        {
+            control.setOnlyContainsCACerts(b.booleanValue());
+        }
+
+        b = getBoolean(props, KEY_onlyContainsUserCerts);
+        if(b != null)
+        {
+            control.setOnlyContainsUserCerts(b.booleanValue());
         }
 
         if(control.getUpdateMode() == UpdateMode.onDemand)
@@ -323,6 +346,8 @@ public class CRLControl
         pairs.putUtf8Pair(KEY_updateMode, updateMode.name());
         pairs.putUtf8Pair(KEY_expiredCerts_included, Boolean.toString(includeExpiredCerts));
         pairs.putUtf8Pair(KEY_certs_embedded, Boolean.toString(embedsCerts));
+        pairs.putUtf8Pair(KEY_onlyContainsCACerts, Boolean.toString(onlyContainsCACerts));
+        pairs.putUtf8Pair(KEY_onlyContainsUserCerts, Boolean.toString(onlyContainsUserCerts));
         if(updateMode != UpdateMode.onDemand)
         {
             pairs.putUtf8Pair(KEY_fullCRL_intervals, Integer.toString(fullCRLIntervals));
@@ -468,9 +493,55 @@ public class CRLControl
         this.extendedNextUpdate = extendedNextUpdate;
     }
 
+    public boolean isOnlyContainsUserCerts()
+    {
+        return onlyContainsUserCerts;
+    }
+
+    public void setOnlyContainsUserCerts(boolean onlyContainsUserCerts)
+    {
+        this.onlyContainsUserCerts = onlyContainsUserCerts;
+    }
+
+    public boolean isOnlyContainsCACerts()
+    {
+        return onlyContainsCACerts;
+    }
+
+    public void setOnlyContainsCACerts(boolean onlyContainsCACerts)
+    {
+        this.onlyContainsCACerts = onlyContainsCACerts;
+    }
+
     public void validate()
     throws ConfigurationException
     {
+        if(onlyContainsCACerts && onlyContainsUserCerts)
+        {
+            throw new ConfigurationException("onlyContainsCACerts and onlyContainsUserCerts can not be both true");
+        }
+
+        if(updateMode == UpdateMode.onDemand)
+        {
+            return;
+        }
+
+        if(fullCRLIntervals < deltaCRLIntervals)
+        {
+            throw new ConfigurationException("fullCRLIntervals cannot be less than deltaCRLIntervals " +
+                    fullCRLIntervals + " < " + deltaCRLIntervals);
+        }
+
+        if(fullCRLIntervals < 1)
+        {
+            throw new ConfigurationException("fullCRLIntervals cannot be less than 1: " + fullCRLIntervals);
+        }
+
+        if(deltaCRLIntervals < 0)
+        {
+            throw new ConfigurationException("deltaCRLIntervals cannot be less than 0: " + deltaCRLIntervals);
+        }
+
         // TODO:validate the configuration
     }
 }

@@ -315,12 +315,14 @@ public class CertificateStore
      * @throws SQLException
      */
     public List<CertRevocationInfoWithSerial> getRevokedCertificates(X509CertificateWithMetaInfo caCert,
-            Date notExpiredAt, BigInteger startSerial, int numEntries)
+            Date notExpiredAt, BigInteger startSerial, int numEntries,
+            boolean onlyCACerts, boolean onlyUserCerts)
     throws OperationException
     {
         try
         {
-            return queryExecutor.getRevokedCertificates(caCert, notExpiredAt, startSerial, numEntries);
+            return queryExecutor.getRevokedCertificates(caCert, notExpiredAt, startSerial, numEntries,
+                    onlyCACerts, onlyUserCerts);
         } catch (SQLException e)
         {
             LOG.debug("SQLException", e);
@@ -329,12 +331,14 @@ public class CertificateStore
     }
 
     public List<CertRevocationInfoWithSerial> getCertificatesForDeltaCRL(
-            X509CertificateWithMetaInfo caCert, BigInteger startSerial, int numEntries)
+            X509CertificateWithMetaInfo caCert, BigInteger startSerial, int numEntries,
+            boolean onlyCACerts, boolean onlyUserCerts)
     throws OperationException
     {
         try
         {
-            return queryExecutor.getCertificatesForDeltaCRL(caCert, startSerial, numEntries);
+            return queryExecutor.getCertificatesForDeltaCRL(caCert, startSerial, numEntries,
+                    onlyCACerts, onlyUserCerts);
         } catch (SQLException e)
         {
             LOG.debug("SQLException", e);
@@ -343,12 +347,14 @@ public class CertificateStore
     }
 
     public List<BigInteger> getCertSerials(X509CertificateWithMetaInfo caCert,
-            Date notExpiredAt, BigInteger startSerial, int numEntries, boolean onlyRevoked)
+            Date notExpiredAt, BigInteger startSerial, int numEntries, boolean onlyRevoked,
+            boolean onlyCACerts, boolean onlyUserCerts)
     throws OperationException
     {
         try
         {
-            return queryExecutor.getSerialNumbers(caCert, notExpiredAt, startSerial, numEntries, onlyRevoked);
+            return queryExecutor.getSerialNumbers(caCert, notExpiredAt, startSerial, numEntries, onlyRevoked,
+                    onlyCACerts, onlyUserCerts);
         } catch (SQLException e)
         {
             LOG.debug("SQLException", e);

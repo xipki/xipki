@@ -419,6 +419,7 @@ public class X509CA
             throw new OperationException(ErrorCode.CRL_FAILURE, "nextUpdate and thisUpdate are too close");
         }
 
+        CRLControl crlControl = crlSigner.getCRLcontrol();
         boolean successfull = false;
 
         try
@@ -459,11 +460,13 @@ public class X509CA
             {
                 if(deltaCRL)
                 {
-                    revInfos = certstore.getCertificatesForDeltaCRL(caCert, startSerial, numEntries);
+                    revInfos = certstore.getCertificatesForDeltaCRL(caCert, startSerial, numEntries,
+                            control.isOnlyContainsCACerts(), control.isOnlyContainsUserCerts());
                 }
                 else
                 {
-                    revInfos = certstore.getRevokedCertificates(caCert, notExpireAt, startSerial, numEntries);
+                    revInfos = certstore.getRevokedCertificates(caCert, notExpireAt, startSerial, numEntries,
+                            control.isOnlyContainsCACerts(), control.isOnlyContainsUserCerts());
                 }
 
                 BigInteger maxSerial = BigInteger.ONE;
@@ -538,8 +541,8 @@ public class X509CA
                 // IssuingDistributionPoint
                 IssuingDistributionPoint idp = new IssuingDistributionPoint(
                         (DistributionPointName) null, // distributionPoint,
-                        false, // onlyContainsUserCerts,
-                        false, // onlyContainsCACerts,
+                        crlControl.isOnlyContainsUserCerts(), // onlyContainsUserCerts,
+                        crlControl.isOnlyContainsCACerts(), // onlyContainsCACerts,
                         (ReasonFlags) null, // onlySomeReasons,
                         directCRL == false, // indirectCRL,
                         false // onlyContainsAttributeCerts
@@ -566,7 +569,8 @@ public class X509CA
 
                 do
                 {
-                    serials = certstore.getCertSerials(caCert, notExpireAt, startSerial, numEntries, false);
+                    serials = certstore.getCertSerials(caCert, notExpireAt, startSerial, numEntries, false,
+                            control.isOnlyContainsCACerts(), control.isOnlyContainsUserCerts());
 
                     BigInteger maxSerial = BigInteger.ONE;
                     for(BigInteger serial : serials)
@@ -955,7 +959,8 @@ public class X509CA
             {
                 try
                 {
-                    serials = certstore.getCertSerials(caCert, notExpiredAt, startSerial, numEntries, onlyRevokedCerts);
+                    serials = certstore.getCertSerials(caCert, notExpiredAt, startSerial, numEntries, onlyRevokedCerts,
+                            false, false);
                 } catch (OperationException e)
                 {
                     final String message = "Exception";
