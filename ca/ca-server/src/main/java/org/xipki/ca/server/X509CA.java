@@ -169,6 +169,13 @@ public class X509CA
         this.crlSigner = crlSigner;
 
         X509CertificateWithMetaInfo caCert = caInfo.getCertificate();
+
+        // corrected the lastCRLIntervalDate if required
+        if(crlSigner != null && caInfo.getLastCRLIntervalDate() == 0)
+        {
+            caInfo.setLastCRLIntervalDate(certstore.getThisUpdateOfCurrentCRL(caCert));
+        }
+
         this.caSubjectX500Name = X500Name.getInstance(
                 caCert.getCert().getSubjectX500Principal().getEncoded());
 
