@@ -9,9 +9,6 @@ package org.xipki.ocsp.client.shell;
 
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.StringTokenizer;
 
 import org.apache.felix.gogo.commands.Option;
 import org.apache.karaf.shell.console.OsgiCommandSupport;
@@ -20,6 +17,7 @@ import org.bouncycastle.asn1.nist.NISTObjectIdentifiers;
 import org.bouncycastle.asn1.x509.X509ObjectIdentifiers;
 import org.xipki.ocsp.client.api.OCSPRequestor;
 import org.xipki.ocsp.client.api.RequestOptions;
+import org.xipki.security.common.StringUtil;
 
 /**
  * @author Lijun Liao
@@ -110,14 +108,7 @@ public abstract class AbstractOCSPStatusCommand extends OsgiCommandSupport
 
         if(prefSigAlgs != null)
         {
-            StringTokenizer st = new StringTokenizer(prefSigAlgs, ",;: \t");
-            List<String> sortedList = new ArrayList<>(st.countTokens());
-            while(st.hasMoreTokens())
-            {
-                sortedList.add(st.nextToken());
-            }
-
-            options.setPreferredSignatureAlgorithms2(sortedList);
+            options.setPreferredSignatureAlgorithms2(StringUtil.split(prefSigAlgs, ",;: \t"));
         }
 
         return options;
