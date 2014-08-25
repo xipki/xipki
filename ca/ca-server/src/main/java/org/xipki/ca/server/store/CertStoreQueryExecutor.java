@@ -818,7 +818,8 @@ class CertStoreQueryExecutor
     }
 
     List<BigInteger> getSerialNumbers(X509CertificateWithMetaInfo caCert,
-            Date notExpiredAt, BigInteger startSerial, int numEntries, boolean onlyRevoked)
+            Date notExpiredAt, BigInteger startSerial, int numEntries, boolean onlyRevoked,
+            boolean onlyCACerts, boolean onlyUserCerts)
     throws SQLException, OperationException
     {
         ParamChecker.assertNotNull("caCert", caCert);
@@ -838,6 +839,15 @@ class CertStoreQueryExecutor
         if(onlyRevoked)
         {
             sb.append(" AND REVOKED=1");
+        }
+
+        if(onlyCACerts)
+        {
+            sb.append(" AND EE=0");
+        }
+        else if(onlyUserCerts)
+        {
+            sb.append(" AND EE=1");
         }
 
         final String sql = dataSource.createFetchFirstSelectSQL(sb.toString(), numEntries, "SERIAL ASC");
@@ -1260,7 +1270,8 @@ class CertStoreQueryExecutor
     }
 
     List<CertRevocationInfoWithSerial> getRevokedCertificates(X509CertificateWithMetaInfo caCert,
-            Date notExpiredAt, BigInteger startSerial, int numEntries)
+            Date notExpiredAt, BigInteger startSerial, int numEntries,
+            boolean onlyCACerts, boolean onlyUserCerts)
     throws SQLException, OperationException
     {
         ParamChecker.assertNotNull("caCert", caCert);
@@ -1277,11 +1288,20 @@ class CertStoreQueryExecutor
             return Collections.emptyList();
         }
 
-        String sql = "SERIAL, REV_REASON, REV_TIME, REV_INVALIDITY_TIME"
-                + " FROM CERT"
-                + " WHERE CAINFO_ID=? AND REVOKED=? AND SERIAL>? AND NOTAFTER>?";
+        StringBuilder sqlBuiler = new StringBuilder();
+        sqlBuiler.append("SERIAL, REV_REASON, REV_TIME, REV_INVALIDITY_TIME");
+        sqlBuiler.append(" FROM CERT");
+        sqlBuiler.append(" WHERE CAINFO_ID=? AND REVOKED=? AND SERIAL>? AND NOTAFTER>?");
+        if(onlyCACerts)
+        {
+            sqlBuiler.append(" AND EE=0");
+        }
+        else if(onlyUserCerts)
+        {
+            sqlBuiler.append(" AND EE=1");
+        }
 
-        sql = dataSource.createFetchFirstSelectSQL(sql, numEntries, "SERIAL ASC");
+        String sql = dataSource.createFetchFirstSelectSQL(sqlBuiler.toString(), numEntries, "SERIAL ASC");
         PreparedStatement ps = borrowPreparedStatement(sql);
 
         ResultSet rs = null;
@@ -1317,7 +1337,8 @@ class CertStoreQueryExecutor
     }
 
     List<CertRevocationInfoWithSerial> getCertificatesForDeltaCRL(
-            X509CertificateWithMetaInfo caCert, BigInteger startSerial, int numEntries)
+            X509CertificateWithMetaInfo caCert, BigInteger startSerial, int numEntries,
+            boolean onlyCACerts, boolean onlyUserCerts)
     throws SQLException, OperationException
     {
         ParamChecker.assertNotNull("caCert", caCert);
@@ -1358,10 +1379,19 @@ class CertStoreQueryExecutor
             releaseDbResources(ps, rs);
         }
 
-        sql = "REVOKED, REV_REASON, REV_TIME, REV_INVALIDITY_TIME"
-                + " FROM CERT"
-                + " WHERE CAINFO_ID=? AND SERIAL=?";
-        sql = dataSource.createFetchFirstSelectSQL(sql, 1);
+        StringBuilder sqlBuilder = new StringBuilder();
+        sqlBuilder.append("REVOKED, REV_REASON, REV_TIME, REV_INVALIDITY_TIME");
+        sqlBuilder.append(" FROM CERT WHERE CAINFO_ID=? AND SERIAL=?");
+        if(onlyCACerts)
+        {
+            sqlBuilder.append(" AND EE=0");
+        }
+        else if(onlyUserCerts)
+        {
+            sqlBuilder.append(" AND EE=1");
+        }
+
+        sql = dataSource.createFetchFirstSelectSQL(sqlBuilder.toString(), 1);
         ps = borrowPreparedStatement(sql);
 
         List<CertRevocationInfoWithSerial> ret = new ArrayList<>();
@@ -1371,27 +1401,37 @@ class CertStoreQueryExecutor
             ps.setLong(2, serial);
             rs = ps.executeQuery();
 
-            CertRevocationInfoWithSerial revInfo;
-
-            boolean revoked = rs.getBoolean("REVOEKD");
-            if(revoked)
+            try
             {
-                int rev_reason = rs.getInt("REV_REASON");
-                long rev_time = rs.getLong("REV_TIME");
-                long rev_invalidity_time = rs.getLong("REV_INVALIDITY_TIME");
+                if(rs.next() == false)
+                {
+                    continue;
+                }
+                CertRevocationInfoWithSerial revInfo;
 
-                Date invalidityTime = rev_invalidity_time == 0 ? null :  new Date(1000 * rev_invalidity_time);
-                revInfo = new CertRevocationInfoWithSerial(
-                        BigInteger.valueOf(serial),
-                        rev_reason, new Date(1000 * rev_time), invalidityTime);
-            }
-            else
+                boolean revoked = rs.getBoolean("REVOEKD");
+                if(revoked)
+                {
+                    int rev_reason = rs.getInt("REV_REASON");
+                    long rev_time = rs.getLong("REV_TIME");
+                    long rev_invalidity_time = rs.getLong("REV_INVALIDITY_TIME");
+
+                    Date invalidityTime = rev_invalidity_time == 0 ? null :  new Date(1000 * rev_invalidity_time);
+                    revInfo = new CertRevocationInfoWithSerial(
+                            BigInteger.valueOf(serial),
+                            rev_reason, new Date(1000 * rev_time), invalidityTime);
+                }
+                else
+                {
+                    long lastUpdate = rs.getLong("LAST_UPDATE");
+                    revInfo = new CertRevocationInfoWithSerial(BigInteger.valueOf(serial),
+                            CRLReason.REMOVE_FROM_CRL.getCode(), new Date(1000 * lastUpdate), null);
+                }
+                ret.add(revInfo);
+            }finally
             {
-                long lastUpdate = rs.getLong("LAST_UPDATE");
-                revInfo = new CertRevocationInfoWithSerial(BigInteger.valueOf(serial),
-                        CRLReason.REMOVE_FROM_CRL.getCode(), new Date(1000 * lastUpdate), null);
+                releaseDbResources(null, rs);
             }
-            ret.add(revInfo);
         }
 
         return ret;
