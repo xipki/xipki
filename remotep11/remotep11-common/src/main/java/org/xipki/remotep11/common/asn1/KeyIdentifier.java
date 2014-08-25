@@ -15,7 +15,7 @@ import org.bouncycastle.asn1.ASN1Primitive;
 import org.bouncycastle.asn1.ASN1String;
 import org.bouncycastle.asn1.DEROctetString;
 import org.bouncycastle.asn1.DERUTF8String;
-import org.xipki.security.api.Pkcs11KeyIdentifier;
+import org.xipki.security.api.p11.P11KeyIdentifier;
 
 /**
  *
@@ -32,9 +32,9 @@ import org.xipki.security.api.Pkcs11KeyIdentifier;
 
 public class KeyIdentifier extends ASN1Object
 {
-    private Pkcs11KeyIdentifier keyId;
+    private P11KeyIdentifier keyId;
 
-    public KeyIdentifier(Pkcs11KeyIdentifier keyId)
+    public KeyIdentifier(P11KeyIdentifier keyId)
     {
         if(keyId == null)
         {
@@ -55,13 +55,13 @@ public class KeyIdentifier extends ASN1Object
         if (obj instanceof ASN1OctetString)
         {
             byte[] keyIdBytes = ((ASN1OctetString) obj).getOctets();
-            Pkcs11KeyIdentifier keyIdentifier = new Pkcs11KeyIdentifier(keyIdBytes);
+            P11KeyIdentifier keyIdentifier = new P11KeyIdentifier(keyIdBytes);
             return new KeyIdentifier(keyIdentifier);
         }
         else if(obj instanceof ASN1String)
         {
             String keyLabel = ((ASN1String) obj).getString();
-            Pkcs11KeyIdentifier keyIdentifier = new Pkcs11KeyIdentifier(keyLabel);
+            P11KeyIdentifier keyIdentifier = new P11KeyIdentifier(keyLabel);
             return new KeyIdentifier(keyIdentifier);
         }
 
@@ -93,7 +93,7 @@ public class KeyIdentifier extends ASN1Object
         }
     }
 
-    public Pkcs11KeyIdentifier getKeyId()
+    public P11KeyIdentifier getKeyId()
     {
         return keyId;
     }

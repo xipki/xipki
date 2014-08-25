@@ -5,7 +5,7 @@
  *
  */
 
-package org.xipki.security.api;
+package org.xipki.security.api.p11;
 
 import java.util.Arrays;
 
@@ -15,13 +15,13 @@ import org.bouncycastle.util.encoders.Hex;
  * @author Lijun Liao
  */
 
-public class Pkcs11KeyIdentifier implements Comparable<Pkcs11KeyIdentifier>
+public class P11KeyIdentifier implements Comparable<P11KeyIdentifier>
 {
     private final byte[] keyId;
     private final String keyIdHex;
     private final String keyLabel;
 
-    public Pkcs11KeyIdentifier(byte[] keyId, String keyLabel)
+    public P11KeyIdentifier(byte[] keyId, String keyLabel)
     {
         if(keyId == null && keyLabel == null)
         {
@@ -32,7 +32,7 @@ public class Pkcs11KeyIdentifier implements Comparable<Pkcs11KeyIdentifier>
         this.keyLabel = keyLabel;
     }
 
-    public Pkcs11KeyIdentifier(byte[] keyId)
+    public P11KeyIdentifier(byte[] keyId)
     {
         if(keyId == null)
         {
@@ -43,7 +43,7 @@ public class Pkcs11KeyIdentifier implements Comparable<Pkcs11KeyIdentifier>
         this.keyLabel = null;
     }
 
-    public Pkcs11KeyIdentifier(String keyLabel)
+    public P11KeyIdentifier(String keyLabel)
     {
         if(keyLabel == null)
         {
@@ -96,12 +96,12 @@ public class Pkcs11KeyIdentifier implements Comparable<Pkcs11KeyIdentifier>
             return true;
         }
 
-        if(o instanceof Pkcs11KeyIdentifier == false)
+        if(o instanceof P11KeyIdentifier == false)
         {
             return false;
         }
 
-        Pkcs11KeyIdentifier o2 = (Pkcs11KeyIdentifier) o;
+        P11KeyIdentifier o2 = (P11KeyIdentifier) o;
         if(keyId != null && o2.keyId != null)
         {
             return Arrays.equals(keyId, o2.keyId);
@@ -114,7 +114,7 @@ public class Pkcs11KeyIdentifier implements Comparable<Pkcs11KeyIdentifier>
     }
 
     @Override
-    public int compareTo(Pkcs11KeyIdentifier o)
+    public int compareTo(P11KeyIdentifier o)
     {
         if(this == o)
         {

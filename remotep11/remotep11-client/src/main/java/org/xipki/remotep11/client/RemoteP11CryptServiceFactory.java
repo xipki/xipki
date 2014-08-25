@@ -13,10 +13,10 @@ import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.security.api.P11CryptService;
-import org.xipki.security.api.P11CryptServiceFactory;
-import org.xipki.security.api.PKCS11SlotIdentifier;
 import org.xipki.security.api.SignerException;
+import org.xipki.security.api.p11.P11CryptService;
+import org.xipki.security.api.p11.P11CryptServiceFactory;
+import org.xipki.security.api.p11.P11SlotIdentifier;
 import org.xipki.security.common.CmpUtf8Pairs;
 
 /**
@@ -68,7 +68,7 @@ public class RemoteP11CryptServiceFactory implements P11CryptServiceFactory
 
         sb.append("Initialized RemoteP11CryptService (url=").append(url).append(")\n");
 
-        PKCS11SlotIdentifier[] slotIds;
+        P11SlotIdentifier[] slotIds;
         try
         {
             slotIds = service.getSlotIdentifiers();
@@ -88,7 +88,7 @@ public class RemoteP11CryptServiceFactory implements P11CryptServiceFactory
             return;
         }
 
-        for(PKCS11SlotIdentifier slotId : slotIds)
+        for(P11SlotIdentifier slotId : slotIds)
         {
             String[] keyLabels;
             try

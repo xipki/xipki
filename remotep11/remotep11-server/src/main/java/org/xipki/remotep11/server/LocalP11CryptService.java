@@ -15,9 +15,9 @@ import java.util.StringTokenizer;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.security.api.P11CryptService;
-import org.xipki.security.api.P11CryptServiceFactory;
 import org.xipki.security.api.SignerException;
+import org.xipki.security.api.p11.P11CryptService;
+import org.xipki.security.api.p11.P11CryptServiceFactory;
 
 /**
  * @author Lijun Liao

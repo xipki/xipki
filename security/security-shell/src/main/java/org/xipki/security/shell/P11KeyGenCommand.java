@@ -11,8 +11,8 @@ import java.io.File;
 
 import org.apache.felix.gogo.commands.Option;
 import org.bouncycastle.util.encoders.Hex;
-import org.xipki.security.api.P11KeypairGenerationResult;
-import org.xipki.security.api.PKCS11SlotIdentifier;
+import org.xipki.security.api.p11.P11KeypairGenerationResult;
+import org.xipki.security.api.p11.P11SlotIdentifier;
 import org.xipki.security.p11.iaik.IaikP11CryptService;
 
 /**
@@ -61,9 +61,9 @@ public abstract class P11KeyGenCommand extends KeyGenCommand
         return pwdInChar;
     }
 
-    protected PKCS11SlotIdentifier getSlotId()
+    protected P11SlotIdentifier getSlotId()
     {
-        return new PKCS11SlotIdentifier(slotIndex, null);
+        return new P11SlotIdentifier(slotIndex, null);
     }
 
     protected void saveKeyAndCert(P11KeypairGenerationResult keyAndCert)

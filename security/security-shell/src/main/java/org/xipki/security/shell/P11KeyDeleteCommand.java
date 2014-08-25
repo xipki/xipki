@@ -14,9 +14,9 @@ import iaik.pkcs.pkcs11.objects.PublicKey;
 import iaik.pkcs.pkcs11.objects.X509PublicKeyCertificate;
 
 import org.apache.felix.gogo.commands.Command;
-import org.xipki.security.api.PKCS11SlotIdentifier;
-import org.xipki.security.api.Pkcs11KeyIdentifier;
 import org.xipki.security.api.SignerException;
+import org.xipki.security.api.p11.P11SlotIdentifier;
+import org.xipki.security.api.p11.P11KeyIdentifier;
 import org.xipki.security.p11.iaik.IaikExtendedModule;
 import org.xipki.security.p11.iaik.IaikExtendedSlot;
 import org.xipki.security.p11.iaik.IaikP11CryptService;
@@ -33,7 +33,7 @@ public class P11KeyDeleteCommand extends P11SecurityCommand
     protected Object doExecute()
     throws Exception
     {
-        Pkcs11KeyIdentifier keyIdentifier = getKeyIdentifier();
+        P11KeyIdentifier keyIdentifier = getKeyIdentifier();
         char[] pwd = getPassword();
 
         IaikExtendedModule module = IaikP11ModulePool.getInstance().getModule(
@@ -42,7 +42,7 @@ public class P11KeyDeleteCommand extends P11SecurityCommand
         IaikExtendedSlot slot = null;
         try
         {
-            slot = module.getSlot(new PKCS11SlotIdentifier(slotIndex, null), pwd);
+            slot = module.getSlot(new P11SlotIdentifier(slotIndex, null), pwd);
         }catch(SignerException e)
         {
             System.err.println("ERROR:  " + e.getMessage());

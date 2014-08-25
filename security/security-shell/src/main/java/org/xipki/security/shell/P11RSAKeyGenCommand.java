@@ -11,7 +11,7 @@ import java.math.BigInteger;
 
 import org.apache.felix.gogo.commands.Command;
 import org.apache.felix.gogo.commands.Option;
-import org.xipki.security.api.P11KeypairGenerationResult;
+import org.xipki.security.api.p11.P11KeypairGenerationResult;
 import org.xipki.security.p11.iaik.P11KeypairGenerator;
 
 /**

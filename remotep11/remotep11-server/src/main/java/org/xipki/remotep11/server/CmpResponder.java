@@ -39,9 +39,9 @@ import org.xipki.remotep11.common.asn1.KeyIdentifier;
 import org.xipki.remotep11.common.asn1.PSOTemplate;
 import org.xipki.remotep11.common.asn1.SlotAndKeyIdentifer;
 import org.xipki.remotep11.common.asn1.SlotIdentifier;
-import org.xipki.security.api.P11CryptService;
-import org.xipki.security.api.PKCS11SlotIdentifier;
-import org.xipki.security.api.Pkcs11KeyIdentifier;
+import org.xipki.security.api.p11.P11CryptService;
+import org.xipki.security.api.p11.P11SlotIdentifier;
+import org.xipki.security.api.p11.P11KeyIdentifier;
 
 /**
  * @author Lijun Liao
@@ -170,10 +170,10 @@ class CmpResponder
                     PSOTemplate psoTemplate = PSOTemplate.getInstance(itvP11.getInfoValue());
                     byte[] psoMessage = psoTemplate.getMessage();
                     SlotAndKeyIdentifer slotAndKeyIdentifier = psoTemplate.getSlotAndKeyIdentifer();
-                    PKCS11SlotIdentifier slot = slotAndKeyIdentifier.getSlotIdentifier().getSlotId();
+                    P11SlotIdentifier slot = slotAndKeyIdentifier.getSlotIdentifier().getSlotId();
                     KeyIdentifier keyIdentifier = slotAndKeyIdentifier.getKeyIdentifier();
 
-                    Pkcs11KeyIdentifier keyId = keyIdentifier.getKeyId();
+                    P11KeyIdentifier keyId = keyIdentifier.getKeyId();
 
                     byte[] signature;
 
@@ -196,10 +196,10 @@ class CmpResponder
                         RemoteP11Constants.id_get_publickey.equals(itvType))
                 {
                     SlotAndKeyIdentifer slotAndKeyIdentifier = SlotAndKeyIdentifer.getInstance(itvP11.getInfoValue());
-                    PKCS11SlotIdentifier slot = slotAndKeyIdentifier.getSlotIdentifier().getSlotId();
+                    P11SlotIdentifier slot = slotAndKeyIdentifier.getSlotIdentifier().getSlotId();
                     KeyIdentifier keyIdentifier = slotAndKeyIdentifier.getKeyIdentifier();
 
-                    Pkcs11KeyIdentifier keyId = keyIdentifier.getKeyId();
+                    P11KeyIdentifier keyId = keyIdentifier.getKeyId();
 
                     byte[] encodeCertOrKey;
                     if(RemoteP11Constants.id_get_certificate.equals(itvType))
@@ -215,10 +215,10 @@ class CmpResponder
                 }
                 else if(RemoteP11Constants.id_list_slots.equals(itvType))
                 {
-                    PKCS11SlotIdentifier[] slotIds = p11CryptService.getSlotIdentifiers();
+                    P11SlotIdentifier[] slotIds = p11CryptService.getSlotIdentifiers();
 
                     ASN1EncodableVector vector = new ASN1EncodableVector();
-                    for(PKCS11SlotIdentifier slotId : slotIds)
+                    for(P11SlotIdentifier slotId : slotIds)
                     {
                         vector.add(new SlotIdentifier(slotId));
                     }
