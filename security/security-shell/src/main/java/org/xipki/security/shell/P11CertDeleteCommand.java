@@ -14,8 +14,8 @@ import iaik.pkcs.pkcs11.objects.X509PublicKeyCertificate;
 import org.apache.felix.gogo.commands.Command;
 import org.apache.felix.gogo.commands.Option;
 import org.bouncycastle.util.encoders.Hex;
-import org.xipki.security.api.PKCS11SlotIdentifier;
 import org.xipki.security.api.SignerException;
+import org.xipki.security.api.p11.P11SlotIdentifier;
 import org.xipki.security.p11.iaik.IaikExtendedModule;
 import org.xipki.security.p11.iaik.IaikExtendedSlot;
 import org.xipki.security.p11.iaik.IaikP11CryptService;
@@ -55,7 +55,7 @@ public class P11CertDeleteCommand extends SecurityCommand
         IaikExtendedSlot slot = null;
         try
         {
-            slot = module.getSlot(new PKCS11SlotIdentifier(slotIndex, null), pwd);
+            slot = module.getSlot(new P11SlotIdentifier(slotIndex, null), pwd);
         }catch(SignerException e)
         {
             System.err.println("ERROR:  " + e.getMessage());

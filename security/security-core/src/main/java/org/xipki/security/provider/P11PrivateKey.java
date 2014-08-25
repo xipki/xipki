@@ -14,10 +14,10 @@ import java.security.SignatureException;
 import java.security.interfaces.ECPublicKey;
 import java.security.interfaces.RSAPublicKey;
 
-import org.xipki.security.api.P11CryptService;
-import org.xipki.security.api.PKCS11SlotIdentifier;
-import org.xipki.security.api.Pkcs11KeyIdentifier;
 import org.xipki.security.api.SignerException;
+import org.xipki.security.api.p11.P11CryptService;
+import org.xipki.security.api.p11.P11SlotIdentifier;
+import org.xipki.security.api.p11.P11KeyIdentifier;
 import org.xipki.security.common.ParamChecker;
 
 /**
@@ -30,13 +30,13 @@ public class P11PrivateKey implements PrivateKey
     private static final long serialVersionUID = 1L;
 
     private final P11CryptService p11CryptService;
-    private final PKCS11SlotIdentifier slotId;
-    private final Pkcs11KeyIdentifier keyId;
+    private final P11SlotIdentifier slotId;
+    private final P11KeyIdentifier keyId;
     private final String algorithm;
     private final int keysize;
 
-    public P11PrivateKey(P11CryptService p11CryptService, PKCS11SlotIdentifier slotId,
-            Pkcs11KeyIdentifier keyId)
+    public P11PrivateKey(P11CryptService p11CryptService, P11SlotIdentifier slotId,
+            P11KeyIdentifier keyId)
     throws InvalidKeyException
     {
         ParamChecker.assertNotNull("p11CryptService", p11CryptService);
@@ -150,12 +150,12 @@ public class P11PrivateKey implements PrivateKey
         return p11CryptService;
     }
 
-    PKCS11SlotIdentifier getSlotId()
+    P11SlotIdentifier getSlotId()
     {
         return slotId;
     }
 
-    Pkcs11KeyIdentifier getKeyId()
+    P11KeyIdentifier getKeyId()
     {
         return keyId;
     }

@@ -14,9 +14,9 @@ import java.io.File;
 
 import org.apache.felix.gogo.commands.Command;
 import org.apache.felix.gogo.commands.Option;
-import org.xipki.security.api.PKCS11SlotIdentifier;
-import org.xipki.security.api.Pkcs11KeyIdentifier;
 import org.xipki.security.api.SignerException;
+import org.xipki.security.api.p11.P11SlotIdentifier;
+import org.xipki.security.api.p11.P11KeyIdentifier;
 import org.xipki.security.p11.iaik.IaikExtendedModule;
 import org.xipki.security.p11.iaik.IaikExtendedSlot;
 import org.xipki.security.p11.iaik.IaikP11ModulePool;
@@ -40,13 +40,13 @@ public class P11CertExportCommand extends P11SecurityCommand
         IaikExtendedModule module = IaikP11ModulePool.getInstance().getModule(
                 securityFactory.getPkcs11Module());
 
-        Pkcs11KeyIdentifier keyIdentifier = getKeyIdentifier();
+        P11KeyIdentifier keyIdentifier = getKeyIdentifier();
         char[] pwd = getPassword();
 
         IaikExtendedSlot slot = null;
         try
         {
-            slot = module.getSlot(new PKCS11SlotIdentifier(slotIndex, null), pwd);
+            slot = module.getSlot(new P11SlotIdentifier(slotIndex, null), pwd);
         }catch(SignerException e)
         {
             System.err.println("ERROR:  " + e.getMessage());

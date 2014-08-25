@@ -16,9 +16,9 @@ import java.util.Arrays;
 
 import org.apache.felix.gogo.commands.Command;
 import org.apache.felix.gogo.commands.Option;
-import org.xipki.security.api.PKCS11SlotIdentifier;
-import org.xipki.security.api.Pkcs11KeyIdentifier;
 import org.xipki.security.api.SignerException;
+import org.xipki.security.api.p11.P11SlotIdentifier;
+import org.xipki.security.api.p11.P11KeyIdentifier;
 import org.xipki.security.common.IoCertUtil;
 import org.xipki.security.p11.iaik.IaikExtendedModule;
 import org.xipki.security.p11.iaik.IaikExtendedSlot;
@@ -61,7 +61,7 @@ public class P11CertAddCommand extends SecurityCommand
         IaikExtendedSlot slot = null;
         try
         {
-            slot = module.getSlot(new PKCS11SlotIdentifier(slotIndex, null), pwd);
+            slot = module.getSlot(new P11SlotIdentifier(slotIndex, null), pwd);
         }catch(SignerException e)
         {
             System.err.println("ERROR:  " + e.getMessage());
@@ -82,7 +82,7 @@ public class P11CertAddCommand extends SecurityCommand
                 {
                     if(Arrays.equals(encodedCert, certObj.getValue().getByteArrayValue()))
                     {
-                        Pkcs11KeyIdentifier p11KeyId = new Pkcs11KeyIdentifier(
+                        P11KeyIdentifier p11KeyId = new P11KeyIdentifier(
                                 certObj.getId().getByteArrayValue(),
                                 new String(certObj.getLabel().getCharArrayValue()));
                         System.out.println("Given certificate already exists under " + p11KeyId);
@@ -95,7 +95,7 @@ public class P11CertAddCommand extends SecurityCommand
             X509PublicKeyCertificate newCaCertTemp = P11CertUpdateCommand.createPkcs11Template(
                     cert, encodedCert, keyId, null);
             session.createObject(newCaCertTemp);
-            Pkcs11KeyIdentifier p11KeyId = new Pkcs11KeyIdentifier(keyId,
+            P11KeyIdentifier p11KeyId = new P11KeyIdentifier(keyId,
                     new String(newCaCertTemp.getLabel().getCharArrayValue()));
             System.out.println("Added certificate under " + p11KeyId);
         }finally

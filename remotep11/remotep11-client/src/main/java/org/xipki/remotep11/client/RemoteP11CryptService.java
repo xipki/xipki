@@ -49,10 +49,10 @@ import org.xipki.remotep11.common.asn1.KeyIdentifier;
 import org.xipki.remotep11.common.asn1.PSOTemplate;
 import org.xipki.remotep11.common.asn1.SlotAndKeyIdentifer;
 import org.xipki.remotep11.common.asn1.SlotIdentifier;
-import org.xipki.security.api.P11CryptService;
-import org.xipki.security.api.PKCS11SlotIdentifier;
-import org.xipki.security.api.Pkcs11KeyIdentifier;
 import org.xipki.security.api.SignerException;
+import org.xipki.security.api.p11.P11CryptService;
+import org.xipki.security.api.p11.P11SlotIdentifier;
+import org.xipki.security.api.p11.P11KeyIdentifier;
 import org.xipki.security.common.IoCertUtil;
 
 /**
@@ -93,28 +93,28 @@ public abstract class RemoteP11CryptService implements P11CryptService
     }
 
     @Override
-    public byte[] CKM_RSA_PKCS(byte[] encodedDigestInfo, PKCS11SlotIdentifier slotId, Pkcs11KeyIdentifier keyId)
+    public byte[] CKM_RSA_PKCS(byte[] encodedDigestInfo, P11SlotIdentifier slotId, P11KeyIdentifier keyId)
     throws SignerException
     {
         return pso(RemoteP11Constants.id_pso_rsa_pkcs, encodedDigestInfo, slotId, keyId);
     }
 
     @Override
-    public byte[] CKM_RSA_X509(byte[] hash, PKCS11SlotIdentifier slotId, Pkcs11KeyIdentifier keyId)
+    public byte[] CKM_RSA_X509(byte[] hash, P11SlotIdentifier slotId, P11KeyIdentifier keyId)
     throws SignerException
     {
         return pso(RemoteP11Constants.id_pso_rsa_x509, hash, slotId, keyId);
     }
 
     @Override
-    public byte[] CKM_ECDSA(byte[] hash, PKCS11SlotIdentifier slotId, Pkcs11KeyIdentifier keyId)
+    public byte[] CKM_ECDSA(byte[] hash, P11SlotIdentifier slotId, P11KeyIdentifier keyId)
     throws SignerException
     {
         return pso(RemoteP11Constants.id_pso_ecdsa, hash, slotId, keyId);
     }
 
     @Override
-    public PublicKey getPublicKey(PKCS11SlotIdentifier slotId, Pkcs11KeyIdentifier keyId)
+    public PublicKey getPublicKey(P11SlotIdentifier slotId, P11KeyIdentifier keyId)
     throws SignerException
     {
         byte[] keyBytes = getCertOrKey(RemoteP11Constants.id_get_publickey, slotId, keyId);
@@ -127,7 +127,7 @@ public abstract class RemoteP11CryptService implements P11CryptService
     }
 
     @Override
-    public X509Certificate getCertificate(PKCS11SlotIdentifier slotId, Pkcs11KeyIdentifier keyId)
+    public X509Certificate getCertificate(P11SlotIdentifier slotId, P11KeyIdentifier keyId)
     throws SignerException
     {
         byte[] certBytes = getCertOrKey(RemoteP11Constants.id_get_certificate, slotId, keyId);
@@ -146,8 +146,8 @@ public abstract class RemoteP11CryptService implements P11CryptService
     }
 
     @Override
-    public X509Certificate[] getCertificates(PKCS11SlotIdentifier slotId,
-            Pkcs11KeyIdentifier keyId)
+    public X509Certificate[] getCertificates(P11SlotIdentifier slotId,
+            P11KeyIdentifier keyId)
     throws SignerException
     {
         X509Certificate cert = getCertificate(slotId, keyId);
@@ -160,7 +160,7 @@ public abstract class RemoteP11CryptService implements P11CryptService
     }
 
     private byte[] pso(ASN1ObjectIdentifier type, byte[] message,
-            PKCS11SlotIdentifier slotId, Pkcs11KeyIdentifier keyId)
+            P11SlotIdentifier slotId, P11KeyIdentifier keyId)
     throws SignerException
     {
         SlotAndKeyIdentifer slotAndKeyIdentifier = buildSlotAndKeyIdentifier(slotId, keyId);
@@ -182,7 +182,7 @@ public abstract class RemoteP11CryptService implements P11CryptService
     }
 
     private byte[] getCertOrKey(ASN1ObjectIdentifier type,
-            PKCS11SlotIdentifier slotId, Pkcs11KeyIdentifier keyId)
+            P11SlotIdentifier slotId, P11KeyIdentifier keyId)
     throws SignerException
     {
         SlotAndKeyIdentifer slotAndKeyIdentifier = buildSlotAndKeyIdentifier(slotId, keyId);
@@ -202,8 +202,8 @@ public abstract class RemoteP11CryptService implements P11CryptService
         return (octetString == null) ? null : octetString.getOctets();
     }
 
-    private SlotAndKeyIdentifer buildSlotAndKeyIdentifier(PKCS11SlotIdentifier slotId,
-            Pkcs11KeyIdentifier keyId)
+    private SlotAndKeyIdentifer buildSlotAndKeyIdentifier(P11SlotIdentifier slotId,
+            P11KeyIdentifier keyId)
     {
         SlotIdentifier slotIdentifier = new SlotIdentifier(slotId);
         KeyIdentifier keyIdentifier = new KeyIdentifier(keyId);
@@ -371,7 +371,7 @@ public abstract class RemoteP11CryptService implements P11CryptService
     }
 
     @Override
-    public PKCS11SlotIdentifier[] getSlotIdentifiers()
+    public P11SlotIdentifier[] getSlotIdentifiers()
     throws SignerException
     {
         InfoTypeAndValue itv = new InfoTypeAndValue(RemoteP11Constants.id_list_slots, null);
@@ -384,7 +384,7 @@ public abstract class RemoteP11CryptService implements P11CryptService
         ASN1Sequence seq = (ASN1Sequence) resp;
         int n = seq.size();
 
-        PKCS11SlotIdentifier[] slotIds = new PKCS11SlotIdentifier[n];
+        P11SlotIdentifier[] slotIds = new P11SlotIdentifier[n];
         for(int i = 0; i < n; i++)
         {
             SlotIdentifier asn1SlotId;
@@ -403,7 +403,7 @@ public abstract class RemoteP11CryptService implements P11CryptService
     }
 
     @Override
-    public String[] getKeyLabels(PKCS11SlotIdentifier slotId)
+    public String[] getKeyLabels(P11SlotIdentifier slotId)
     throws SignerException
     {
         InfoTypeAndValue itv = new InfoTypeAndValue(RemoteP11Constants.id_list_keylabels,

@@ -25,10 +25,10 @@ import org.apache.felix.gogo.commands.Command;
 import org.apache.felix.gogo.commands.Option;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.xipki.security.NopPasswordResolver;
-import org.xipki.security.api.PKCS11SlotIdentifier;
 import org.xipki.security.api.PasswordResolverException;
-import org.xipki.security.api.Pkcs11KeyIdentifier;
 import org.xipki.security.api.SignerException;
+import org.xipki.security.api.p11.P11SlotIdentifier;
+import org.xipki.security.api.p11.P11KeyIdentifier;
 import org.xipki.security.common.CmpUtf8Pairs;
 import org.xipki.security.common.IoCertUtil;
 import org.xipki.security.p11.iaik.IaikExtendedModule;
@@ -60,13 +60,13 @@ public class P11CertUpdateCommand extends P11SecurityCommand
         IaikExtendedModule module = IaikP11ModulePool.getInstance().getModule(
                 securityFactory.getPkcs11Module());
 
-        Pkcs11KeyIdentifier keyIdentifier = getKeyIdentifier();
+        P11KeyIdentifier keyIdentifier = getKeyIdentifier();
         char[] pwd = getPassword();
 
         IaikExtendedSlot slot = null;
         try
         {
-            slot = module.getSlot(new PKCS11SlotIdentifier(slotIndex, null), pwd);
+            slot = module.getSlot(new P11SlotIdentifier(slotIndex, null), pwd);
         }catch(SignerException e)
         {
             System.err.println("ERROR:  " + e.getMessage());

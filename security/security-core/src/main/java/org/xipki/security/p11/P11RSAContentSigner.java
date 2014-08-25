@@ -24,10 +24,10 @@ import org.bouncycastle.operator.bc.BcDefaultDigestProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.security.SignerUtil;
-import org.xipki.security.api.P11CryptService;
-import org.xipki.security.api.PKCS11SlotIdentifier;
-import org.xipki.security.api.Pkcs11KeyIdentifier;
 import org.xipki.security.api.SignerException;
+import org.xipki.security.api.p11.P11CryptService;
+import org.xipki.security.api.p11.P11SlotIdentifier;
+import org.xipki.security.api.p11.P11KeyIdentifier;
 import org.xipki.security.common.LogUtil;
 import org.xipki.security.common.ParamChecker;
 
@@ -42,15 +42,15 @@ public class P11RSAContentSigner implements ContentSigner
     private final DigestOutputStream outputStream;
 
     private final P11CryptService cryptService;
-    private final PKCS11SlotIdentifier slot;
-    private final Pkcs11KeyIdentifier keyId;
+    private final P11SlotIdentifier slot;
+    private final P11KeyIdentifier keyId;
 
     private final AlgorithmIdentifier digAlgId;
 
     public P11RSAContentSigner(
             P11CryptService cryptService,
-            PKCS11SlotIdentifier slot,
-            Pkcs11KeyIdentifier keyId,
+            P11SlotIdentifier slot,
+            P11KeyIdentifier keyId,
             AlgorithmIdentifier signatureAlgId)
     throws NoSuchAlgorithmException, NoSuchPaddingException, OperatorCreationException
     {

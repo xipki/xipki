@@ -5,9 +5,11 @@
  *
  */
 
-package org.xipki.security.api;
+package org.xipki.security.api.p11;
 
 import java.util.Set;
+
+import org.xipki.security.api.SignerException;
 
 /**
  * @author Lijun Liao
