@@ -44,7 +44,7 @@ public abstract class XipkiOsgiCommandSupport extends OsgiCommandSupport
                 {
                     if(b)
                     {
-                        System.out.println("A file named '" +
+                        out("A file named '" +
                                 saveTo.getPath() + "' already exists. Do you want to replace it [yes/no]? ");
                     }
 
@@ -60,7 +60,7 @@ public abstract class XipkiOsgiCommandSupport extends OsgiCommandSupport
                     }
                     else if("no".equalsIgnoreCase(answer))
                     {
-                        System.out.println("Enter name of file to save to ... ");
+                        out("Enter name of file to save to ... ");
                         String newFn = null;
                         while(true)
                         {
@@ -75,7 +75,7 @@ public abstract class XipkiOsgiCommandSupport extends OsgiCommandSupport
                     }
                     else
                     {
-                        System.out.println("Please answer with yes or no. ");
+                        out("Please answer with yes or no. ");
                         b = false;
                     }
                 }
@@ -109,7 +109,7 @@ public abstract class XipkiOsgiCommandSupport extends OsgiCommandSupport
             promptPrefix = "Saved to file";
         }
 
-        System.out.println(promptPrefix + " " + saveTo.getPath());
+        out(promptPrefix + " " + saveTo.getPath());
     }
 
     protected void save(File file, byte[] encoded)
@@ -200,7 +200,7 @@ public abstract class XipkiOsgiCommandSupport extends OsgiCommandSupport
         else
         {
             ConsoleReader reader = (ConsoleReader) session.get(".jline.reader");
-            System.out.println(prompt);
+            out(prompt);
             try
             {
                 String pwd = reader.readLine('*');
@@ -234,6 +234,16 @@ public abstract class XipkiOsgiCommandSupport extends OsgiCommandSupport
         }
 
         return file;
+    }
+
+    protected void err(String message)
+    {
+        System.err.println(message);
+    }
+
+    protected void out(String message)
+    {
+        System.out.println(message);
     }
 
 }

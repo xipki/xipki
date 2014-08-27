@@ -11,13 +11,17 @@ import iaik.pkcs.pkcs11.Module;
 import iaik.pkcs.pkcs11.Slot;
 import iaik.pkcs.pkcs11.TokenException;
 
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xipki.security.api.PasswordResolverException;
 import org.xipki.security.api.SignerException;
+import org.xipki.security.api.p11.P11ModuleConf;
 import org.xipki.security.api.p11.P11SlotIdentifier;
 import org.xipki.security.common.LogUtil;
 import org.xipki.security.common.ParamChecker;
@@ -31,15 +35,20 @@ public class IaikExtendedModule
     private static final Logger LOG = LoggerFactory.getLogger(IaikExtendedModule.class);
 
     private Module module;
+    private P11ModuleConf moduleConf;
+
     private Map<P11SlotIdentifier, IaikExtendedSlot> slots = new HashMap<>();
     private Map<P11SlotIdentifier, Slot> availableSlots = new HashMap<>();
+    private List<P11SlotIdentifier> slotIds;
 
-    public IaikExtendedModule(Module module)
+    public IaikExtendedModule(Module module, P11ModuleConf moduleConf)
     throws SignerException
     {
         ParamChecker.assertNotNull("module", module);
+        ParamChecker.assertNotNull("moduleConf", moduleConf);
 
         this.module = module;
+        this.moduleConf = moduleConf;
 
         Slot[] slotList;
         try
@@ -58,12 +67,19 @@ public class IaikExtendedModule
             throw new SignerException("No slot with present card could be found");
         }
 
+        List<P11SlotIdentifier> tmpSlotIds = new LinkedList<>();
         for (int i = 0; i < slotList.length; i++)
         {
             Slot slot = slotList[i];
             P11SlotIdentifier slotId = new P11SlotIdentifier(i, slot.getSlotID());
             availableSlots.put(slotId, slot);
+            if(moduleConf.isSlotIncluded(slotId))
+            {
+                tmpSlotIds.add(slotId);
+            }
         }
+
+        this.slotIds = Collections.unmodifiableList(tmpSlotIds);
 
         if(LOG.isDebugEnabled())
         {
@@ -96,7 +112,7 @@ public class IaikExtendedModule
         }
     }
 
-    public IaikExtendedSlot getSlot(P11SlotIdentifier slotId, char[] password)
+    public IaikExtendedSlot getSlot(P11SlotIdentifier slotId)
     throws SignerException
     {
         IaikExtendedSlot extSlot = slots.get(slotId);
@@ -121,7 +137,15 @@ public class IaikExtendedModule
             throw new SignerException("Could not find slot identified by " + slotId);
         }
 
-        extSlot = new IaikExtendedSlot(slot, password);
+        List<char[]> pwd;
+        try
+        {
+            pwd = moduleConf.getPasswordRetriever().getPassword(slotId);
+        } catch (PasswordResolverException e)
+        {
+            throw new SignerException("PasswordResolverException: " + e.getMessage(), e);
+        }
+        extSlot = new IaikExtendedSlot(slot, pwd);
 
         slots.put(slotId, extSlot);
         return extSlot;
@@ -130,11 +154,6 @@ public class IaikExtendedModule
     public void destroySlot(long slotId)
     {
         slots.remove(slotId);
-    }
-
-    public Module getModule()
-    {
-        return module;
     }
 
     public void close()
@@ -184,9 +203,9 @@ public class IaikExtendedModule
         module = null;
     }
 
-    public Set<P11SlotIdentifier> getAllSlotIds()
+    public List<P11SlotIdentifier> getSlotIds()
     {
-        return availableSlots.keySet();
+        return slotIds;
     }
 
 }

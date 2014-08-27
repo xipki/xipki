@@ -30,8 +30,8 @@ import org.xipki.security.DefaultConcurrentContentSigner;
 import org.xipki.security.api.ConcurrentContentSigner;
 import org.xipki.security.api.SignerException;
 import org.xipki.security.api.p11.P11CryptService;
-import org.xipki.security.api.p11.P11SlotIdentifier;
 import org.xipki.security.api.p11.P11KeyIdentifier;
+import org.xipki.security.api.p11.P11SlotIdentifier;
 import org.xipki.security.common.IoCertUtil;
 import org.xipki.security.common.ParamChecker;
 import org.xipki.security.provider.P11PrivateKey;
@@ -50,7 +50,7 @@ public class P11ContentSignerBuilder
 
     public P11ContentSignerBuilder(
             P11CryptService cryptService,
-            P11SlotIdentifier slot, char[] password,
+            P11SlotIdentifier slot,
             P11KeyIdentifier keyId,
             X509Certificate[] certificateChain)
     throws SignerException

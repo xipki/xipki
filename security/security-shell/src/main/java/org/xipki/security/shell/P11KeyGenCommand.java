@@ -11,9 +11,9 @@ import java.io.File;
 
 import org.apache.felix.gogo.commands.Option;
 import org.bouncycastle.util.encoders.Hex;
+import org.xipki.security.api.SecurityFactory;
 import org.xipki.security.api.p11.P11KeypairGenerationResult;
 import org.xipki.security.api.p11.P11SlotIdentifier;
-import org.xipki.security.p11.iaik.IaikP11CryptService;
 
 /**
  * @author Lijun Liao
@@ -38,9 +38,9 @@ public abstract class P11KeyGenCommand extends KeyGenCommand
             required = false, description = "Where to save the self-signed certificate")
     protected String outputFilename;
 
-    @Option(name = "-p",
-            required = false, description = "Read password from console")
-    protected Boolean readFromConsole;
+    @Option(name = "-module",
+            required = false, description = "Name of the PKCS#11 module.")
+    protected String moduleName = SecurityFactory.DEFAULT_P11MODULE_NAME;
 
     protected String getSubject()
     {
@@ -51,16 +51,6 @@ public abstract class P11KeyGenCommand extends KeyGenCommand
         return subject;
     }
 
-    protected char[] getPassword()
-    {
-        char[] pwdInChar = readPasswordIfRequired(password, readFromConsole);
-        if(pwdInChar != null)
-        {
-            password = new String(pwdInChar);
-        }
-        return pwdInChar;
-    }
-
     protected P11SlotIdentifier getSlotId()
     {
         return new P11SlotIdentifier(slotIndex, null);
@@ -69,14 +59,14 @@ public abstract class P11KeyGenCommand extends KeyGenCommand
     protected void saveKeyAndCert(P11KeypairGenerationResult keyAndCert)
     throws Exception
     {
-        System.out.println("key id: " + Hex.toHexString(keyAndCert.getId()));
-        System.out.println("key label: " + keyAndCert.getLabel());
+        out("key id: " + Hex.toHexString(keyAndCert.getId()));
+        out("key label: " + keyAndCert.getLabel());
         if(outputFilename != null)
         {
             File certFile = new File(outputFilename);
             saveVerbose("Saved self-signed certificate to file", certFile, keyAndCert.getCertificate().getEncoded());
         }
 
-        IaikP11CryptService.getInstance(securityFactory.getPkcs11Module(), getPassword()).refresh();
+        securityFactory.getP11CryptService(moduleName).refresh();
     }
 }
