@@ -118,7 +118,7 @@ class IaikP11Identity implements Comparable<IaikP11Identity>
         return this.slotId.equals(slotId) && keyLabel.equals(keyId.getKeyLabel());
     }
 
-    public byte[] CKM_RSA_PKCS(IaikExtendedModule module, char[] password,
+    public byte[] CKM_RSA_PKCS(IaikExtendedModule module,
             byte[] encodedDigestInfo)
     throws SignerException
     {
@@ -128,7 +128,7 @@ class IaikP11Identity implements Comparable<IaikP11Identity>
                     publicKey.getAlgorithm() + " public key");
         }
 
-        IaikExtendedSlot slot = module.getSlot(slotId, password);
+        IaikExtendedSlot slot = module.getSlot(slotId);
         if(slot == null)
         {
             throw new SignerException("Could not find slot " + slotId);
@@ -137,7 +137,7 @@ class IaikP11Identity implements Comparable<IaikP11Identity>
         return slot.CKM_RSA_PKCS(encodedDigestInfo, keyId);
     }
 
-    public byte[] CKM_RSA_X_509(IaikExtendedModule module, char[] password,
+    public byte[] CKM_RSA_X_509(IaikExtendedModule module,
             byte[] hash)
     throws SignerException
     {
@@ -147,7 +147,7 @@ class IaikP11Identity implements Comparable<IaikP11Identity>
                     publicKey.getAlgorithm() + " public key");
         }
 
-        IaikExtendedSlot slot = module.getSlot(slotId, password);
+        IaikExtendedSlot slot = module.getSlot(slotId);
         if(slot == null)
         {
             throw new SignerException("Could not find slot " + slotId);
@@ -156,7 +156,7 @@ class IaikP11Identity implements Comparable<IaikP11Identity>
         return slot.CKM_RSA_X509(hash, keyId);
     }
 
-    public byte[] CKM_ECDSA(IaikExtendedModule module, char[] password,
+    public byte[] CKM_ECDSA(IaikExtendedModule module,
             byte[] hash)
     throws SignerException
     {
@@ -165,7 +165,7 @@ class IaikP11Identity implements Comparable<IaikP11Identity>
             throw new SignerException("Operation CKM_ECDSA is not allowed for " + publicKey.getAlgorithm() + " public key");
         }
 
-        IaikExtendedSlot slot = module.getSlot(slotId, password);
+        IaikExtendedSlot slot = module.getSlot(slotId);
         if(slot == null)
         {
             throw new SignerException("Could not find slot " + slotId);

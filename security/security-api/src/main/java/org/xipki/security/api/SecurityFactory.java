@@ -17,6 +17,7 @@ import org.bouncycastle.asn1.pkcs.CertificationRequest;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.bouncycastle.cert.X509CertificateHolder;
 import org.bouncycastle.operator.ContentVerifierProvider;
+import org.xipki.security.api.p11.P11CryptService;
 
 /**
  * @author Lijun Liao
@@ -24,12 +25,13 @@ import org.bouncycastle.operator.ContentVerifierProvider;
 
 public interface SecurityFactory
 {
+    static final String DEFAULT_P11MODULE_NAME = "default";
+
     String getPkcs11Provider();
-    String getPkcs11Module();
 
-    public Set<Integer> getPkcs11ExcludeSlotIndexes();
+    Set<String> getPkcs11ModuleNames();
 
-    public Set<Integer> getPkcs11IncludeSlotIndexes();
+    String getDefaultPkcs11ModuleName();
 
     ConcurrentContentSigner createSigner(String type, String conf,
             X509Certificate cert, PasswordResolver passwordResolver)
@@ -58,4 +60,7 @@ public interface SecurityFactory
     throws SignerException;
 
     boolean verifyPOPO(CertificationRequest p10Req);
+
+    P11CryptService getP11CryptService(String moduleName)
+    throws SignerException;
 }

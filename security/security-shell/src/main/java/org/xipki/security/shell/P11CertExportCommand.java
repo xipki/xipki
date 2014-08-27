@@ -15,11 +15,10 @@ import java.io.File;
 import org.apache.felix.gogo.commands.Command;
 import org.apache.felix.gogo.commands.Option;
 import org.xipki.security.api.SignerException;
-import org.xipki.security.api.p11.P11SlotIdentifier;
 import org.xipki.security.api.p11.P11KeyIdentifier;
+import org.xipki.security.api.p11.P11SlotIdentifier;
 import org.xipki.security.p11.iaik.IaikExtendedModule;
 import org.xipki.security.p11.iaik.IaikExtendedSlot;
-import org.xipki.security.p11.iaik.IaikP11ModulePool;
 
 /**
  * @author Lijun Liao
@@ -37,19 +36,17 @@ public class P11CertExportCommand extends P11SecurityCommand
     protected Object doExecute()
     throws Exception
     {
-        IaikExtendedModule module = IaikP11ModulePool.getInstance().getModule(
-                securityFactory.getPkcs11Module());
+        IaikExtendedModule module = getModule(moduleName);
 
         P11KeyIdentifier keyIdentifier = getKeyIdentifier();
-        char[] pwd = getPassword();
 
         IaikExtendedSlot slot = null;
         try
         {
-            slot = module.getSlot(new P11SlotIdentifier(slotIndex, null), pwd);
+            slot = module.getSlot(new P11SlotIdentifier(slotIndex, null));
         }catch(SignerException e)
         {
-            System.err.println("ERROR:  " + e.getMessage());
+            err("ERROR:  " + e.getMessage());
             return null;
         }
 
@@ -59,14 +56,14 @@ public class P11CertExportCommand extends P11SecurityCommand
         PrivateKey privKey = slot.getPrivateObject(null, null, keyIdentifier.getKeyId(), keyLabelChars);
         if(privKey == null)
         {
-            System.err.println("Could not find private key " + keyIdentifier);
+            err("Could not find private key " + keyIdentifier);
             return null;
         }
 
         X509PublicKeyCertificate cert = slot.getCertificateObject(privKey.getId().getByteArrayValue(), null);
         if(cert == null)
         {
-            System.err.println("Could not find certificate " + keyIdentifier);
+            err("Could not find certificate " + keyIdentifier);
             return null;
         }
 

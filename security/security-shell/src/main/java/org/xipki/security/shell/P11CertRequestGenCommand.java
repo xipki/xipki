@@ -27,12 +27,11 @@ import org.xipki.security.NopPasswordResolver;
 import org.xipki.security.SecurityFactoryImpl;
 import org.xipki.security.api.ConcurrentContentSigner;
 import org.xipki.security.api.SignerException;
-import org.xipki.security.api.p11.P11SlotIdentifier;
 import org.xipki.security.api.p11.P11KeyIdentifier;
+import org.xipki.security.api.p11.P11SlotIdentifier;
 import org.xipki.security.p10.Pkcs10RequestGenerator;
 import org.xipki.security.p11.iaik.IaikExtendedModule;
 import org.xipki.security.p11.iaik.IaikExtendedSlot;
-import org.xipki.security.p11.iaik.IaikP11ModulePool;
 
 /**
  * @author Lijun Liao
@@ -44,12 +43,12 @@ public class P11CertRequestGenCommand extends P11SecurityCommand
     @Option(name = "-subject",
             required = false,
             description = "Subject in the PKCS#10 request.\n"
-                    + "The default is the subject of self-signed certifite.")
+                    + "The default is the subject of self-signed certifite")
     protected String subject;
 
     @Option(name = "-hash",
-            required = false, description = "Hash algorithm name. The default is SHA256")
-    protected String hashAlgo;
+            required = false, description = "Hash algorithm name")
+    protected String hashAlgo = "SHA256";
 
     @Option(name = "-out",
             required = true, description = "Required. Output file name")
@@ -59,25 +58,17 @@ public class P11CertRequestGenCommand extends P11SecurityCommand
     protected Object doExecute()
     throws Exception
     {
-        if(hashAlgo == null)
-        {
-            hashAlgo = "SHA256";
-        }
-
         P11KeyIdentifier keyIdentifier = getKeyIdentifier();
-        char[] pwd = getPassword();
 
-        IaikExtendedModule module = IaikP11ModulePool.getInstance().getModule(
-                securityFactory.getPkcs11Module());
+        IaikExtendedModule module = getModule(moduleName);
 
         IaikExtendedSlot slot = null;
         try
         {
-            slot = module.getSlot(new P11SlotIdentifier(slotIndex, null),
-                    pwd);
+            slot = module.getSlot(new P11SlotIdentifier(slotIndex, null));
         }catch(SignerException e)
         {
-            System.err.println("ERROR:  " + e.getMessage());
+            err("ERROR:  " + e.getMessage());
             return null;
         }
 
@@ -87,7 +78,7 @@ public class P11CertRequestGenCommand extends P11SecurityCommand
         PrivateKey privKey = slot.getPrivateObject(null, null, keyIdentifier.getKeyId(), keyLabelChars);
         if(privKey == null)
         {
-            System.err.println("Could not find private key " + keyIdentifier);
+            err("Could not find private key " + keyIdentifier);
             return null;
         }
 
@@ -117,11 +108,9 @@ public class P11CertRequestGenCommand extends P11SecurityCommand
         }
 
         P11SlotIdentifier slotId = new P11SlotIdentifier(slotIndex, null);
-        String pwdStr = pwd == null ? null : new String(pwd);
         String signerConf = SecurityFactoryImpl.getPkcs11SignerConf(
-                        securityFactory.getPkcs11Module(),
+                        moduleName,
                         slotId, keyIdentifier,
-                        pwdStr,
                         sigAlgOid.getId(), 1);
 
         ConcurrentContentSigner identifiedSigner = securityFactory.createSigner("PKCS11", signerConf,

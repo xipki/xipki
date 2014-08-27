@@ -19,7 +19,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.Set;
 
 import javax.security.auth.x500.X500Principal;
 
@@ -31,12 +30,12 @@ import org.bouncycastle.asn1.sec.SECNamedCurves;
 import org.bouncycastle.asn1.teletrust.TeleTrusTNamedCurves;
 import org.bouncycastle.asn1.x9.X962NamedCurves;
 import org.bouncycastle.util.encoders.Hex;
+import org.xipki.security.api.SecurityFactory;
 import org.xipki.security.api.SignerException;
 import org.xipki.security.api.p11.P11SlotIdentifier;
 import org.xipki.security.common.IoCertUtil;
 import org.xipki.security.p11.iaik.IaikExtendedModule;
 import org.xipki.security.p11.iaik.IaikExtendedSlot;
-import org.xipki.security.p11.iaik.IaikP11ModulePool;
 
 /**
  * @author Lijun Liao
@@ -45,167 +44,142 @@ import org.xipki.security.p11.iaik.IaikP11ModulePool;
 @Command(scope = "keytool", name = "list", description="List objects in PKCS#11 device")
 public class P11ListSlotCommand extends SecurityCommand
 {
-    @Option(name = "-pwd", aliases = { "--password" },
-            required = false, description = "Password of the PKCS#11 device")
-    protected String password;
-
-    @Option(name = "-p",
-            required = false, description = "Read password from console")
-    protected Boolean readFromConsole;
-
     @Option(name = "-v", aliases="--verbose",
             required = false, description = "Show object information verbosely")
-    protected Boolean verbose;
+    protected Boolean verbose = Boolean.FALSE;
+
+    @Option(name = "-module",
+            required = false, description = "Name of the PKCS#11 module.")
+    protected String moduleName = SecurityFactory.DEFAULT_P11MODULE_NAME;
+
+    @Option(name = "-slot",
+            required = false, description = "Required.")
+    protected Integer slotIndex;
 
     @Override
     protected Object doExecute()
     throws Exception
     {
-        IaikExtendedModule module = IaikP11ModulePool.getInstance().getModule(
-                securityFactory.getPkcs11Module());
-        List<P11SlotIdentifier> slotIds = new ArrayList<>(module.getAllSlotIds());
-
-        Set<Integer> slotIndexes = securityFactory.getPkcs11IncludeSlotIndexes();
-        if(slotIndexes != null && slotIndexes.isEmpty() == false)
+        IaikExtendedModule module = getModule(moduleName);
+        if(module == null)
         {
-            List<P11SlotIdentifier> slotIds2 = new ArrayList<>(slotIndexes.size());
-            for(P11SlotIdentifier slotId : slotIds)
-            {
-                if(slotIndexes.contains(slotId.getSlotIndex()))
-                {
-                    slotIds2.add(slotId);
-                }
-            }
-            slotIds = slotIds2;
+            err("Undefined module " + moduleName);
+            return null;
         }
 
-        slotIndexes = securityFactory.getPkcs11ExcludeSlotIndexes();
-        if(slotIndexes != null && slotIndexes.isEmpty() == false)
+        List<P11SlotIdentifier> slots = module.getSlotIds();
+        out("Module: " + moduleName);
+
+        if(slotIndex == null)
         {
-            List<P11SlotIdentifier> slotIds2 = new ArrayList<>(slotIds.size());
-            for(P11SlotIdentifier slotId : slotIds)
+            // list all slots
+            Collections.sort(slots);
+
+            int n = slots.size();
+
+            if(n == 0 || n == 1)
             {
-                if(slotIndexes.contains(slotId.getSlotIndex()) == false)
-                {
-                    slotIds2.add(slotId);
-                }
+                out(((n == 0) ? "no" : "1") + " slot is configured");
             }
-            slotIds = slotIds2;
-        }
-
-        Collections.sort(slotIds);
-
-        int n = slotIds.size();
-
-        String defaultPkcs11Lib = securityFactory.getPkcs11Module();
-        StringBuilder sb = new StringBuilder();
-        sb.append("PKCS#11 library: ").append(defaultPkcs11Lib).append("\n");
-        if(n == 0 || n == 1)
-        {
-            sb.append(((n == 0) ? "no" : "1") + " slot is configured\n");
-        }
-        else
-        {
-            sb.append(n + " slots are configured\n");
-        }
-        System.out.println(sb.toString());
-
-        char[] pwd = readPasswordIfRequired(password, readFromConsole);
-
-        for(P11SlotIdentifier slotId : slotIds)
-        {
-            sb = new StringBuilder();
-            sb.append("\nslot[").append(slotId.getSlotIndex()).append("]: ").append(slotId.getSlotId()).append("\n");
-
-            IaikExtendedSlot slot = null;
-            try
+            else
             {
-                slot = module.getSlot(slotId, pwd);
-            }catch(SignerException e)
-            {
-                sb.append("\tError:  ").append(e.getMessage()).append("\n");
+                out(n + " slots are configured");
             }
 
-            System.out.println(sb.toString());
-
-            if(slot == null)
+            for(P11SlotIdentifier slotId : slots)
             {
-                continue;
+                out("\tslot[" + slotId.getSlotIndex() + "]: " + slotId.getSlotId());
             }
 
-            List<PrivateKey> allPrivateObjects = slot.getAllPrivateObjects(null, null);
-            int size = allPrivateObjects.size();
+            return null;
+        }
 
-            List<ComparablePrivateKey> privateKeys = new ArrayList<>(size);
-            for(int i = 0; i < size; i++)
+        P11SlotIdentifier slotId = new P11SlotIdentifier(slotIndex, null);
+        IaikExtendedSlot slot = null;
+        try
+        {
+            slot = module.getSlot(slotId);
+        }catch(SignerException e)
+        {
+            err("\tError:  " + e.getMessage());
+            return null;
+        }
+
+        if(slot == null)
+        {
+            err("slot with index " + slotIndex + " does not exist");
+            return null;
+        }
+
+        List<PrivateKey> allPrivateObjects = slot.getAllPrivateObjects(null, null);
+        int size = allPrivateObjects.size();
+
+        List<ComparablePrivateKey> privateKeys = new ArrayList<>(size);
+        for(int i = 0; i < size; i++)
+        {
+            PrivateKey key = allPrivateObjects.get(i);
+            byte[] id = key.getId().getByteArrayValue();
+            if(id != null)
             {
-                PrivateKey key = allPrivateObjects.get(i);
-                byte[] id = key.getId().getByteArrayValue();
-
-                if(id == null)
-                {
-                    continue;
-                }
-
                 char[] label = key.getLabel().getCharArrayValue();
                 ComparablePrivateKey privKey = new ComparablePrivateKey(id, label, key);
                 privateKeys.add(privKey);
             }
+        }
 
-            Collections.sort(privateKeys);
-            size = privateKeys.size();
+        Collections.sort(privateKeys);
+        size = privateKeys.size();
 
-            List<X509PublicKeyCertificate> allCertObjects = slot.getAllCertificateObjects();
+        List<X509PublicKeyCertificate> allCertObjects = slot.getAllCertificateObjects();
 
-            sb = new StringBuilder();
-            for(int i = 0; i < size; i++)
+        StringBuilder sb = new StringBuilder();
+        for(int i = 0; i < size; i++)
+        {
+            ComparablePrivateKey privKey = privateKeys.get(i);
+            byte[] keyId = privKey.getKeyId();
+            char[] keyLabel = privKey.getKeyLabel();
+
+            PublicKey pubKey = slot.getPublicKeyObject(null, null, keyId, keyLabel);
+            sb.append("\t")
+                .append(i + 1)
+                .append(". ")
+                .append(privKey.getKeyLabelAsText())
+                .append(" (").append("id: ")
+                .append(Hex.toHexString(privKey.getKeyId()).toUpperCase())
+                .append(")\n");
+
+            sb.append("\t\tAlgorithm: ")
+                .append(getKeyAlgorithm(pubKey))
+                .append("\n");
+
+            X509PublicKeyCertificate cert = removeCertificateObject(allCertObjects, keyId, keyLabel);
+            if(cert == null)
             {
-                ComparablePrivateKey privKey = privateKeys.get(i);
-                byte[] keyId = privKey.getKeyId();
-                char[] keyLabel = privKey.getKeyLabel();
-
-                PublicKey pubKey = slot.getPublicKeyObject(null, null, keyId, keyLabel);
-                sb.append("\t")
-                    .append(i + 1)
-                    .append(". ")
-                    .append(privKey.getKeyLabelAsText())
-                    .append(" (").append("id: ")
-                    .append(Hex.toHexString(privKey.getKeyId()).toUpperCase())
-                    .append(")\n");
-
-                sb.append("\t\tAlgorithm: ")
-                    .append(getKeyAlgorithm(pubKey))
-                    .append("\n");
-
-                X509PublicKeyCertificate cert = removeCertificateObject(allCertObjects, keyId, keyLabel);
-                if(cert == null)
-                {
-                    sb.append("\t\tCertificate: NONE\n");
-                }
-                else
-                {
-                    formatString(sb, cert);
-                }
+                sb.append("\t\tCertificate: NONE\n");
             }
-
-            for(int i = 0; i < allCertObjects.size(); i++)
+            else
             {
-                X509PublicKeyCertificate certObj = allCertObjects.get(i);
-                sb.append("\tCert-")
-                    .append(i + 1)
-                    .append(". ")
-                    .append(certObj.getLabel().getCharArrayValue())
-                    .append(" (").append("id: ")
-                    .append(Hex.toHexString(certObj.getId().getByteArrayValue()).toUpperCase())
-                    .append(")\n");
-
-                formatString(sb, certObj);
+                formatString(sb, cert);
             }
+        }
 
-            if(sb.length() > 0)
-            {
-                System.out.println(sb.toString());
-            }
+        for(int i = 0; i < allCertObjects.size(); i++)
+        {
+            X509PublicKeyCertificate certObj = allCertObjects.get(i);
+            sb.append("\tCert-")
+                .append(i + 1)
+                .append(". ")
+                .append(certObj.getLabel().getCharArrayValue())
+                .append(" (").append("id: ")
+                .append(Hex.toHexString(certObj.getId().getByteArrayValue()).toUpperCase())
+                .append(")\n");
+
+            formatString(sb, certObj);
+        }
+
+        if(sb.length() > 0)
+        {
+            out(sb.toString());
         }
 
         return null;
@@ -254,7 +228,7 @@ public class P11ListSlotCommand extends SecurityCommand
             subject = new String(bytes);
         }
 
-        if(verbose == null || verbose.booleanValue() == false)
+        if(verbose.booleanValue() == false)
         {
             sb.append("\t\tCertificate: ").append(subject).append("\n");
             return;

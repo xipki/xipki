@@ -16,14 +16,13 @@ import java.util.Arrays;
 
 import org.apache.felix.gogo.commands.Command;
 import org.apache.felix.gogo.commands.Option;
+import org.xipki.security.api.SecurityFactory;
 import org.xipki.security.api.SignerException;
-import org.xipki.security.api.p11.P11SlotIdentifier;
 import org.xipki.security.api.p11.P11KeyIdentifier;
+import org.xipki.security.api.p11.P11SlotIdentifier;
 import org.xipki.security.common.IoCertUtil;
 import org.xipki.security.p11.iaik.IaikExtendedModule;
 import org.xipki.security.p11.iaik.IaikExtendedSlot;
-import org.xipki.security.p11.iaik.IaikP11CryptService;
-import org.xipki.security.p11.iaik.IaikP11ModulePool;
 import org.xipki.security.p11.iaik.IaikP11Util;
 
 /**
@@ -42,29 +41,23 @@ public class P11CertAddCommand extends SecurityCommand
             required = true, description = "Required. Certificate file")
     protected String certFile;
 
-    @Option(name = "-pwd", aliases = { "--password" },
-            required = false, description = "Password of the PKCS#11 device")
-    protected String password;
-
-    @Option(name = "-p",
-            required = false, description = "Read password from console")
-    protected Boolean readFromConsole;
+    @Option(name = "-module",
+            required = false, description = "Name of the PKCS#11 module.")
+    protected String moduleName = SecurityFactory.DEFAULT_P11MODULE_NAME;
 
     @Override
     protected Object doExecute()
     throws Exception
     {
-        IaikExtendedModule module = IaikP11ModulePool.getInstance().getModule(
-                securityFactory.getPkcs11Module());
+        IaikExtendedModule module = getModule(moduleName);
 
-        char[] pwd = readPasswordIfRequired(password, readFromConsole);
         IaikExtendedSlot slot = null;
         try
         {
-            slot = module.getSlot(new P11SlotIdentifier(slotIndex, null), pwd);
+            slot = module.getSlot(new P11SlotIdentifier(slotIndex, null));
         }catch(SignerException e)
         {
-            System.err.println("ERROR:  " + e.getMessage());
+            err("ERROR:  " + e.getMessage());
             return null;
         }
 
@@ -85,7 +78,7 @@ public class P11CertAddCommand extends SecurityCommand
                         P11KeyIdentifier p11KeyId = new P11KeyIdentifier(
                                 certObj.getId().getByteArrayValue(),
                                 new String(certObj.getLabel().getCharArrayValue()));
-                        System.out.println("Given certificate already exists under " + p11KeyId);
+                        err("Given certificate already exists under " + p11KeyId);
                         return null;
                     }
                 }
@@ -97,13 +90,13 @@ public class P11CertAddCommand extends SecurityCommand
             session.createObject(newCaCertTemp);
             P11KeyIdentifier p11KeyId = new P11KeyIdentifier(keyId,
                     new String(newCaCertTemp.getLabel().getCharArrayValue()));
-            System.out.println("Added certificate under " + p11KeyId);
+            out("Added certificate under " + p11KeyId);
         }finally
         {
             slot.returnWritableSession(session);
         }
 
-        IaikP11CryptService.getInstance(securityFactory.getPkcs11Module(), pwd, null, null).refresh();
+        securityFactory.getP11CryptService(moduleName).refresh();
         return null;
     }
 

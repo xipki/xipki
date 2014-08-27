@@ -14,12 +14,11 @@ import iaik.pkcs.pkcs11.objects.X509PublicKeyCertificate;
 import org.apache.felix.gogo.commands.Command;
 import org.apache.felix.gogo.commands.Option;
 import org.bouncycastle.util.encoders.Hex;
+import org.xipki.security.api.SecurityFactory;
 import org.xipki.security.api.SignerException;
 import org.xipki.security.api.p11.P11SlotIdentifier;
 import org.xipki.security.p11.iaik.IaikExtendedModule;
 import org.xipki.security.p11.iaik.IaikExtendedSlot;
-import org.xipki.security.p11.iaik.IaikP11CryptService;
-import org.xipki.security.p11.iaik.IaikP11ModulePool;
 
 /**
  * @author Lijun Liao
@@ -36,29 +35,23 @@ public class P11CertDeleteCommand extends SecurityCommand
             required = true, description = "Required. Id of the certificate in the PKCS#11 device")
     protected String keyId;
 
-    @Option(name = "-pwd", aliases = { "--password" },
-            required = false, description = "Password of the PKCS#11 device")
-    protected String password;
-
-    @Option(name = "-p",
-            required = false, description = "Read password from console")
-    protected Boolean readFromConsole;
+    @Option(name = "-module",
+            required = false, description = "Name of the PKCS#11 module.")
+    protected String moduleName = SecurityFactory.DEFAULT_P11MODULE_NAME;
 
     @Override
     protected Object doExecute()
     throws Exception
     {
-        IaikExtendedModule module = IaikP11ModulePool.getInstance().getModule(
-                securityFactory.getPkcs11Module());
+        IaikExtendedModule module = getModule(moduleName);
 
-        char[] pwd = readPasswordIfRequired(password, readFromConsole);
         IaikExtendedSlot slot = null;
         try
         {
-            slot = module.getSlot(new P11SlotIdentifier(slotIndex, null), pwd);
+            slot = module.getSlot(new P11SlotIdentifier(slotIndex, null));
         }catch(SignerException e)
         {
-            System.err.println("ERROR:  " + e.getMessage());
+            err("ERROR:  " + e.getMessage());
             return null;
         }
 
@@ -67,7 +60,7 @@ public class P11CertDeleteCommand extends SecurityCommand
 
         if(existingCerts == null || existingCerts.length == 0)
         {
-            System.out.println("Could not find certificates with id " + keyId);
+            err("Could not find certificates with id " + keyId);
             return null;
         }
 
@@ -83,9 +76,9 @@ public class P11CertDeleteCommand extends SecurityCommand
             slot.returnWritableSession(session);
         }
 
-        IaikP11CryptService.getInstance(securityFactory.getPkcs11Module(), pwd, null, null).refresh();
+        securityFactory.getP11CryptService(moduleName).refresh();
         int n = existingCerts.length;
-        System.out.println("Deleted " + n + " certificate" + (n > 1 ? "s" : ""));
+        out("Deleted " + n + " certificate" + (n > 1 ? "s" : ""));
         return null;
     }
 

@@ -27,14 +27,12 @@ import org.bouncycastle.asn1.x500.X500Name;
 import org.xipki.security.NopPasswordResolver;
 import org.xipki.security.api.PasswordResolverException;
 import org.xipki.security.api.SignerException;
-import org.xipki.security.api.p11.P11SlotIdentifier;
 import org.xipki.security.api.p11.P11KeyIdentifier;
+import org.xipki.security.api.p11.P11SlotIdentifier;
 import org.xipki.security.common.CmpUtf8Pairs;
 import org.xipki.security.common.IoCertUtil;
 import org.xipki.security.p11.iaik.IaikExtendedModule;
 import org.xipki.security.p11.iaik.IaikExtendedSlot;
-import org.xipki.security.p11.iaik.IaikP11CryptService;
-import org.xipki.security.p11.iaik.IaikP11ModulePool;
 import org.xipki.security.p11.iaik.IaikP11Util;
 
 /**
@@ -57,19 +55,17 @@ public class P11CertUpdateCommand extends P11SecurityCommand
     protected Object doExecute()
     throws Exception
     {
-        IaikExtendedModule module = IaikP11ModulePool.getInstance().getModule(
-                securityFactory.getPkcs11Module());
+        IaikExtendedModule module = getModule(moduleName);
 
         P11KeyIdentifier keyIdentifier = getKeyIdentifier();
-        char[] pwd = getPassword();
 
         IaikExtendedSlot slot = null;
         try
         {
-            slot = module.getSlot(new P11SlotIdentifier(slotIndex, null), pwd);
+            slot = module.getSlot(new P11SlotIdentifier(slotIndex, null));
         }catch(SignerException e)
         {
-            System.err.println("ERROR:  " + e.getMessage());
+            err("ERROR:  " + e.getMessage());
             return null;
         }
 
@@ -80,7 +76,7 @@ public class P11CertUpdateCommand extends P11SecurityCommand
 
         if(privKey == null)
         {
-            System.err.println("Could not find private key " + keyIdentifier);
+            err("Could not find private key " + keyIdentifier);
             return null;
         }
 
@@ -88,8 +84,7 @@ public class P11CertUpdateCommand extends P11SecurityCommand
         X509PublicKeyCertificate[] existingCerts = slot.getCertificateObjects(keyId, null);
         X509Certificate newCert = IoCertUtil.parseCert(certFile);
 
-        String pwdStr = pwd == null ? null : new String(pwd);
-        assertMatch(newCert, pwdStr);
+        assertMatch(newCert);
 
         Set<X509Certificate> caCerts = new HashSet<>();
         if(caCertFiles != null && caCertFiles.isEmpty() == false)
@@ -157,19 +152,15 @@ public class P11CertUpdateCommand extends P11SecurityCommand
             slot.returnWritableSession(session);
         }
 
-        IaikP11CryptService.getInstance(securityFactory.getPkcs11Module(), pwd, null, null).refresh();
-        System.out.println("Updated certificate");
+        securityFactory.getP11CryptService(moduleName).refresh();
+        out("Updated certificate");
         return null;
     }
 
-    private void assertMatch(X509Certificate cert, String password)
+    private void assertMatch(X509Certificate cert)
     throws SignerException, PasswordResolverException
     {
         CmpUtf8Pairs pairs = new CmpUtf8Pairs("slot", slotIndex.toString());
-        if(password != null)
-        {
-            pairs.putUtf8Pair("password", new String(password));
-        }
         if(keyId != null)
         {
             pairs.putUtf8Pair("key-id", keyId);

@@ -62,7 +62,9 @@ import org.bouncycastle.crypto.digests.SHA512Digest;
 import org.bouncycastle.crypto.params.RSAKeyParameters;
 import org.bouncycastle.crypto.util.SubjectPublicKeyInfoFactory;
 import org.bouncycastle.util.Arrays;
+import org.xipki.security.api.SecurityFactory;
 import org.xipki.security.api.SignerException;
+import org.xipki.security.api.p11.P11CryptService;
 import org.xipki.security.api.p11.P11KeypairGenerationResult;
 import org.xipki.security.api.p11.P11SlotIdentifier;
 import org.xipki.security.common.IoCertUtil;
@@ -76,16 +78,33 @@ public class P11KeypairGenerator
 {
     public static final long YEAR = 365L * 24 * 60 * 60 * 1000; // milliseconds of one year
 
-    private static IaikExtendedSlot getSlot(String pkcs11Lib, P11SlotIdentifier slotId, char[] password)
+    private final SecurityFactory securityFactory;
+    public P11KeypairGenerator(SecurityFactory securityFacotry)
+    {
+        ParamChecker.assertNotNull("securityFactory", securityFacotry);
+        this.securityFactory = securityFacotry;
+    }
+
+    private IaikExtendedSlot getSlot(String pkcs11ModuleName, P11SlotIdentifier slotId)
     throws SignerException
     {
-        if(pkcs11Lib == null)
+        if(IaikP11CryptServiceFactory.class.getName().equals(
+                securityFactory.getPkcs11Provider()) == false)
         {
-            throw new IllegalStateException("pkcs11Lib not specified");
+            throw new SignerException("P11KeypairGenerator only works with P11CryptServiceFactory " +
+                    IaikP11CryptServiceFactory.class.getName() +
+                    ", but not " + securityFactory.getPkcs11Provider());
         }
 
-        IaikExtendedModule extModule = IaikP11ModulePool.getInstance().getModule(pkcs11Lib);
-        IaikExtendedSlot slot = extModule.getSlot(slotId, password);
+        // this call initialize the IaikExtendedModule
+        P11CryptService p11CryptService = securityFactory.getP11CryptService(pkcs11ModuleName);
+        if(p11CryptService == null)
+        {
+            throw new SignerException("Could not initialize P11CryptService " + pkcs11ModuleName);
+        }
+
+        IaikExtendedModule module = IaikP11ModulePool.getInstance().getModule(pkcs11ModuleName);
+        IaikExtendedSlot slot = module.getSlot(slotId);
         if(slot == null)
         {
             throw new SignerException("Could not find any slot with id " + slotId);
@@ -94,7 +113,7 @@ public class P11KeypairGenerator
     }
 
     public P11KeypairGenerationResult generateRSAKeypairAndCert(
-            String pkcs11Lib, P11SlotIdentifier slotId, char[] password,
+            String p11ModuleName, P11SlotIdentifier slotId,
             int keySize, BigInteger publicExponent,
             String label, String subject,
             Integer keyUsage,
@@ -113,7 +132,7 @@ public class P11KeypairGenerator
             throw new IllegalArgumentException("Key size is not multiple of 1024: " + keySize);
         }
 
-        IaikExtendedSlot slot = getSlot(pkcs11Lib, slotId, password);
+        IaikExtendedSlot slot = getSlot(p11ModuleName, slotId);
 
         Session session = slot.borrowWritableSession();
         try
@@ -205,7 +224,7 @@ public class P11KeypairGenerator
     }
 
     public P11KeypairGenerationResult generateECDSAKeypairAndCert(
-            String pkcs11Lib, P11SlotIdentifier slotId, char[] password,
+            String p11ModuleName, P11SlotIdentifier slotId,
             String curveNameOrOid, String label, String subject,
             Integer keyUsage,
             List<ASN1ObjectIdentifier> extendedKeyusage)
@@ -223,7 +242,7 @@ public class P11KeypairGenerator
             throw new IllegalArgumentException("Unknown curve " + curveNameOrOid);
         }
 
-        IaikExtendedSlot slot = getSlot(pkcs11Lib, slotId, password);
+        IaikExtendedSlot slot = getSlot(p11ModuleName, slotId);
 
         Session session = slot.borrowWritableSession();
         try
