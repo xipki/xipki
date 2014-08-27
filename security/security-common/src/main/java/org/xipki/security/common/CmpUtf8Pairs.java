@@ -181,11 +181,6 @@ public class CmpUtf8Pairs
             sb.append(value == null ? "" : encodeNameOrValue(value));
             sb.append(TOKEN_TERM);
         }
-        // FIXME: remove the following block if all CAs have been updated to use the new security-common.jar
-        if(sb.length() > 0 && sb.charAt(sb.length() - 1) == TOKEN_TERM)
-        {
-            sb.deleteCharAt(sb.length() - 1);
-        }
 
         return sb.toString();
     }
