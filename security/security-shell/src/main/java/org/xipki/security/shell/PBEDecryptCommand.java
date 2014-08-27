@@ -26,20 +26,20 @@ public class PBEDecryptCommand extends SecurityCommand
     protected Object doExecute()
     throws Exception
     {
-        char[] masterPassword = readPassword("Please enter the master password");
         if(passwordHint.startsWith("PBE:") == false)
         {
-            System.err.println("encrypted password '" + passwordHint + "' does not start with PBE:");
+            err("encrypted password '" + passwordHint + "' does not start with PBE:");
             return null;
         }
 
+        char[] masterPassword = readPassword("Please enter the master password");
         try
         {
             char[] password = PBEPasswordResolver.resolvePassword(masterPassword, passwordHint);
-            System.out.println("The decrypted password is: '" + new String(password) + "'");
+            out("The decrypted password is: '" + new String(password) + "'");
         }catch(Exception e)
         {
-            System.err.println(e.getMessage());
+            err(e.getMessage());
         }
         return null;
     }

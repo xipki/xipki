@@ -8,10 +8,8 @@
 package org.xipki.security;
 
 import java.security.Principal;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import java.util.StringTokenizer;
 import java.util.concurrent.ConcurrentHashMap;
 
 import javax.net.ssl.HostnameVerifier;
@@ -23,6 +21,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.security.common.CmpUtf8Pairs;
 import org.xipki.security.common.IoCertUtil;
+import org.xipki.security.common.StringUtil;
 
 /**
  * @author Lijun Liao
@@ -112,13 +111,7 @@ public class HttpsHostnameVerifier implements HostnameVerifier
         for(String commonName :commonNames)
         {
             String v = utf8Pairs.getValue(commonName);
-            StringTokenizer st = new StringTokenizer(v, ",; \t");
-            Set<String> hosts = new HashSet<>();
-            while(st.hasMoreTokens())
-            {
-                hosts.add(st.nextToken());
-            }
-
+            Set<String> hosts = StringUtil.splitAsSet(v, ",; \t");
             hostnameMap.put(commonName, hosts);
         }
     }

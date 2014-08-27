@@ -25,8 +25,8 @@ public class ExportOcspCommand extends XipkiOsgiCommandSupport
     private static final int DFLT_NUM_CERTS_IN_BUNDLE = 1000;
 
     @Option(name = "-dbconf",
-            description = "Database configuration file.\nDefault is " + DFLT_DBCONF_FILE)
-    protected String dbconfFile;
+            description = "Database configuration file.")
+    protected String dbconfFile = DFLT_DBCONF_FILE;
 
     @Option(name = "-outdir",
             description = "Required. Output directory",
@@ -34,8 +34,8 @@ public class ExportOcspCommand extends XipkiOsgiCommandSupport
     protected String outdir;
 
     @Option(name = "-n",
-            description = "Number of certificates in one zip file. Default is " + DFLT_NUM_CERTS_IN_BUNDLE)
-    protected Integer numCertsInBundle;
+            description = "Number of certificates in one zip file")
+    protected Integer numCertsInBundle = DFLT_NUM_CERTS_IN_BUNDLE;
 
     private DataSourceFactory dataSourceFactory;
     private PasswordResolver passwordResolver;
@@ -44,14 +44,6 @@ public class ExportOcspCommand extends XipkiOsgiCommandSupport
     protected Object doExecute()
     throws Exception
     {
-        if(dbconfFile == null)
-        {
-            dbconfFile = DFLT_DBCONF_FILE;
-        }
-        if(numCertsInBundle == null)
-        {
-            numCertsInBundle = DFLT_NUM_CERTS_IN_BUNDLE;
-        }
         OcspDbExporter exporter = new OcspDbExporter(dataSourceFactory, passwordResolver, dbconfFile, outdir);
         exporter.exportDatabase(numCertsInBundle);
         return null;

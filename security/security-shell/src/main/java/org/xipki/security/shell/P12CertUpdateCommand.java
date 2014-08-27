@@ -87,7 +87,7 @@ public class P12CertUpdateCommand extends P12SecurityCommand
         {
             fOut = new FileOutputStream(p12File);
             ks.store(fOut, pwd);
-            System.out.println("Updated certificate");
+            out("Updated certificate");
             return null;
         }finally
         {

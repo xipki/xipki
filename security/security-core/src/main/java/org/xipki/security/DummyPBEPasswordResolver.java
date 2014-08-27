@@ -7,6 +7,8 @@
 
 package org.xipki.security;
 
+import org.xipki.security.api.PasswordResolverException;
+
 /**
  * SHOULD NOT BE USED IN PRODUCTION ENVIRONMENT. ONLY FOR TEST PURPOSE
  *
@@ -19,6 +21,7 @@ public class DummyPBEPasswordResolver extends PBEPasswordResolver
     private char[] masterPassword;
 
     protected char[] getMasterPassword()
+    throws PasswordResolverException
     {
         if(masterPassword != null)
         {
