@@ -22,43 +22,31 @@ import org.xipki.security.p11.iaik.P11KeypairGenerator;
 public class P11RSAKeyGenCommand extends P11KeyGenCommand
 {
     @Option(name = "-keysize",
-            description = "Keysize in bit, the default is 2048",
+            description = "Keysize in bit",
             required = false)
-    protected Integer keysize;
+    protected Integer keysize = 2048;
 
     @Option(name = "-e",
-            description = "public exponent, the default is 65537",
+            description = "public exponent",
             required = false)
-    protected String publicExponent;
+    protected String publicExponent = "65537";
 
     @Override
     protected Object doExecute()
     throws Exception
     {
-        if(keysize == null)
+        if(keysize % 1024 != 0)
         {
-            keysize = 2048;
-        }
-        else if(keysize % 1024 != 0)
-        {
-            System.err.println("Keysize is not multiple of 1024: " + keysize);
+            err("Keysize is not multiple of 1024: " + keysize);
             return null;
         }
 
-        BigInteger _publicExponent;
-        if(publicExponent == null)
-        {
-            _publicExponent = BigInteger.valueOf(65537);
-        }
-        else
-        {
-            _publicExponent = new BigInteger(publicExponent);
-        }
+        BigInteger _publicExponent = new BigInteger(publicExponent);
 
-        P11KeypairGenerator gen = new P11KeypairGenerator();
+        P11KeypairGenerator gen = new P11KeypairGenerator(securityFactory);
 
         P11KeypairGenerationResult keyAndCert = gen.generateRSAKeypairAndCert(
-                securityFactory.getPkcs11Module(), getSlotId(), getPassword(),
+                moduleName, getSlotId(),
                 keysize, _publicExponent,
                 label, getSubject(),
                 getKeyUsage(),

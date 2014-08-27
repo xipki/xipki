@@ -15,12 +15,10 @@ import iaik.pkcs.pkcs11.objects.X509PublicKeyCertificate;
 
 import org.apache.felix.gogo.commands.Command;
 import org.xipki.security.api.SignerException;
-import org.xipki.security.api.p11.P11SlotIdentifier;
 import org.xipki.security.api.p11.P11KeyIdentifier;
+import org.xipki.security.api.p11.P11SlotIdentifier;
 import org.xipki.security.p11.iaik.IaikExtendedModule;
 import org.xipki.security.p11.iaik.IaikExtendedSlot;
-import org.xipki.security.p11.iaik.IaikP11CryptService;
-import org.xipki.security.p11.iaik.IaikP11ModulePool;
 
 /**
  * @author Lijun Liao
@@ -34,18 +32,15 @@ public class P11KeyDeleteCommand extends P11SecurityCommand
     throws Exception
     {
         P11KeyIdentifier keyIdentifier = getKeyIdentifier();
-        char[] pwd = getPassword();
-
-        IaikExtendedModule module = IaikP11ModulePool.getInstance().getModule(
-                securityFactory.getPkcs11Module());
+        IaikExtendedModule module = getModule(moduleName);
 
         IaikExtendedSlot slot = null;
         try
         {
-            slot = module.getSlot(new P11SlotIdentifier(slotIndex, null), pwd);
+            slot = module.getSlot(new P11SlotIdentifier(slotIndex, null));
         }catch(SignerException e)
         {
-            System.err.println("ERROR:  " + e.getMessage());
+            err("ERROR:  " + e.getMessage());
             return null;
         }
 
@@ -55,7 +50,7 @@ public class P11KeyDeleteCommand extends P11SecurityCommand
         PrivateKey privKey = slot.getPrivateObject(null, null, keyIdentifier.getKeyId(), keyLabelChars);
         if(privKey == null)
         {
-            System.err.println("Could not find private key " + keyIdentifier);
+            err("Could not find private key " + keyIdentifier);
             return null;
         }
 
@@ -65,10 +60,10 @@ public class P11KeyDeleteCommand extends P11SecurityCommand
             try
             {
                 session.destroyObject(privKey);
-                System.out.println("Deleted private key");
+                out("Deleted private key");
             }catch(TokenException e)
             {
-                System.err.println("Could not delete private key");
+                err("Could not delete private key");
             }
 
             PublicKey pubKey = slot.getPublicKeyObject(null, null,
@@ -78,10 +73,10 @@ public class P11KeyDeleteCommand extends P11SecurityCommand
                 try
                 {
                     session.destroyObject(pubKey);
-                    System.out.println("Deleted public key");
+                    out("Deleted public key");
                 }catch(TokenException e)
                 {
-                    System.err.println("Could not delete public key");
+                    err("Could not delete public key");
                 }
             }
 
@@ -97,7 +92,7 @@ public class P11KeyDeleteCommand extends P11SecurityCommand
                         nDeleted++;
                     }catch(TokenException e)
                     {
-                        System.err.println("Could not delete certificate at index " + i);
+                        err("Could not delete certificate at index " + i);
                     }
                 }
                 if(nDeleted > 0)
@@ -105,13 +100,11 @@ public class P11KeyDeleteCommand extends P11SecurityCommand
                     StringBuilder sb = new StringBuilder("Deleted ");
                     sb.append(nDeleted);
                     sb.append(nDeleted == 1 ? " certificate" : " certificates");
-                    System.out.println(sb.toString());
+                    out(sb.toString());
                 }
             }
 
-            IaikP11CryptService p11CryptService = IaikP11CryptService.getInstance(
-                    securityFactory.getPkcs11Module(), pwd);
-            p11CryptService.refresh();
+            securityFactory.getP11CryptService(moduleName).refresh();
         }finally
         {
             slot.returnWritableSession(session);

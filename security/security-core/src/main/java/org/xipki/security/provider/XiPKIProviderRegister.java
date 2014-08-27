@@ -9,6 +9,8 @@ package org.xipki.security.provider;
 
 import java.security.Security;
 
+import org.xipki.security.api.SecurityFactory;
+
 /**
  * @author Lijun Liao
  */
@@ -31,14 +33,9 @@ public class XiPKIProviderRegister
         }
     }
 
-    public void setPkcs11Module(String pkcs11Module)
+    public void setSecurityFactory(SecurityFactory securityFactory)
     {
-        XiPKIKeyStoreSpi.setDefaultPkcs11Module(pkcs11Module);
-    }
-
-    public void setPkcs11Provider(String pkcs11Provider)
-    {
-        XiPKIKeyStoreSpi.setDefaultPkcs11Provider(pkcs11Provider);
+        XiPKIKeyStoreSpi.setSecurityFactory(securityFactory);
     }
 
 }

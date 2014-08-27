@@ -7,7 +7,7 @@
 
 package org.xipki.security.api.p11;
 
-import java.util.Set;
+import java.util.Collection;
 
 import org.xipki.security.api.SignerException;
 
@@ -17,10 +17,8 @@ import org.xipki.security.api.SignerException;
 
 public interface P11CryptServiceFactory
 {
-    P11CryptService createP11CryptService(String pkcs11Module, char[] password)
-    throws SignerException;
+    void init(String defaultModuleName, Collection<P11ModuleConf> moduleConfs);
 
-    P11CryptService createP11CryptService(String pkcs11Module, char[] password,
-            Set<Integer> includeSlotIndexes, Set<Integer> excludeSlotIndexes)
+    P11CryptService createP11CryptService(String moduleName)
     throws SignerException;
 }

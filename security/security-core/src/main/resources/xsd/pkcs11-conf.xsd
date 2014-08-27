@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xs:schema targetNamespace="http://xipki.org/xipki/pkcs11/conf/v1"
+ xmlns="http://xipki.org/xipki/pkcs11/conf/v1"
+ xmlns:xs="http://www.w3.org/2001/XMLSchema"
+ elementFormDefault="qualified" version="1.0"
+ xmlns:jxb="http://java.sun.com/xml/ns/jaxb" jxb:version="2.0"> 
+	<xs:annotation>
+		<xs:appinfo>
+			<jxb:schemaBindings>
+				<jxb:package name="org.xipki.security.p11.conf.jaxb"/>
+			</jxb:schemaBindings>
+		</xs:appinfo>
+	</xs:annotation>
+
+	<!-- CertStore -->
+	<xs:element name="PKCS11Conf" type="PKCS11ConfType"/>
+	<xs:complexType name="PKCS11ConfType">
+		<xs:all>
+			<xs:element name="modules" type="modulesType"/>
+		</xs:all>
+	</xs:complexType>
+
+	<xs:complexType name="modulesType">
+		<xs:sequence>
+			<xs:element name="module" type="moduleType" maxOccurs="unbounded"/>
+		</xs:sequence>
+		<xs:attribute name="defaultModule" type="xs:string" use="required"/>
+	</xs:complexType>
+
+	<xs:complexType name="moduleType">
+		<xs:all>
+			<xs:element name="nativeLibraries">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="nativeLibrary" type="nativeLibraryType" maxOccurs="unbounded"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="includeSlots" type="slotsType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>
+						Which slots should be considered. Absent for all slots.
+					</xs:documentation>
+				</xs:annotation>		
+			</xs:element>
+			<xs:element name="excludeSlots" type="slotsType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>
+						Which slots should be considered. Absent for no slot.
+					</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="passwords" type="passwordsType" minOccurs="0"/>
+		</xs:all>
+		<xs:attribute name="name" type="xs:string" use="required"/>
+	</xs:complexType>
+
+	<xs:complexType name="nativeLibraryType">
+		<xs:sequence>
+			<xs:element name="os" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+			<xs:element name="path" type="xs:string" />
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:complexType name="slotsType">
+		<xs:sequence>
+			<xs:element name="slot" type="slotType" maxOccurs="unbounded"/>
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:complexType name="slotType">
+		<xs:choice>
+			<xs:element name="index" type="xs:int"/>
+			<xs:element name="id" type="xs:string"/>
+		</xs:choice>
+	</xs:complexType>
+
+	<xs:complexType name="passwordsType">
+		<xs:sequence>
+			<xs:element name="password" type="passwordType" maxOccurs="unbounded"/>
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:complexType name="passwordType">
+		<xs:sequence>
+			<xs:element name="slots" type="slotsType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>
+						To which slots the password should be applied.
+						Absent for all slots.
+					</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="singlePassword" type="xs:string" maxOccurs="unbounded"/>
+		</xs:sequence>
+	</xs:complexType>
+
+</xs:schema>

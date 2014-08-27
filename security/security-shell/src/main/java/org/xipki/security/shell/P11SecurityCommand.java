@@ -9,6 +9,7 @@ package org.xipki.security.shell;
 
 import org.apache.felix.gogo.commands.Option;
 import org.bouncycastle.util.encoders.Hex;
+import org.xipki.security.api.SecurityFactory;
 import org.xipki.security.api.p11.P11KeyIdentifier;
 
 /**
@@ -31,23 +32,9 @@ public abstract class P11SecurityCommand extends SecurityCommand
                     + "Either keyId or keyLabel must be specified")
     protected String keyLabel;
 
-    @Option(name = "-pwd", aliases = { "--password" },
-            required = false, description = "Password of the PKCS#11 device")
-    protected String password;
-
-    @Option(name = "-p",
-            required = false, description = "Read password from console")
-    protected Boolean readFromConsole;
-
-    protected char[] getPassword()
-    {
-        char[] pwdInChar = readPasswordIfRequired(password, readFromConsole);
-        if(pwdInChar != null)
-        {
-            password = new String(pwdInChar);
-        }
-        return pwdInChar;
-    }
+    @Option(name = "-module",
+            required = false, description = "Name of the PKCS#11 module.")
+    protected String moduleName = SecurityFactory.DEFAULT_P11MODULE_NAME;
 
     protected P11KeyIdentifier getKeyIdentifier()
     throws Exception
