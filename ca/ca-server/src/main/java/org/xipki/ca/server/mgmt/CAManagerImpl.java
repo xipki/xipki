@@ -2437,7 +2437,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
 
     @Override
     public void changeCrlSigner(String name, String signer_type, String signer_conf, String signer_cert,
-            Integer period, Integer overlap, Boolean includeCerts, Boolean includeExpiredCerts)
+            String crlControl)
     throws CAMgmtException
     {
         StringBuilder sb = new StringBuilder();
@@ -2466,32 +2466,11 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
             iSigner_cert = i++;
         }
 
-        Integer iPeriod = null;
-        if(period != null)
+        Integer iCrlControl = null;
+        if(crlControl != null)
         {
-            sb.append("PERIOD=?,");
-            iPeriod = i++;
-        }
-
-        Integer iOverlap = null;
-        if(overlap != null)
-        {
-            sb.append("OVERLAP=?,");
-            iOverlap = i++;
-        }
-
-        Integer iIncludeCerts = null;
-        if(includeCerts != null)
-        {
-            sb.append("INCLUDE_CERTS_IN_CRL=?,");
-            iIncludeCerts = i++;
-        }
-
-        Integer iIncludeExpiredCerts = null;
-        if(includeExpiredCerts != null)
-        {
-            sb.append("INCLUDE_EXPIRED_CERTS=?,");
-            iIncludeExpiredCerts = i++;
+            sb.append("CRL_CONTROL=?,");
+            iCrlControl = i++;
         }
 
         sb.deleteCharAt(sb.length() - 1);
@@ -2523,24 +2502,9 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
                 ps.setString(iSigner_cert, getRealString(signer_cert));
             }
 
-            if(iPeriod != null)
+            if(iCrlControl != null)
             {
-                ps.setInt(iPeriod, period);
-            }
-
-            if(iOverlap != null)
-            {
-                ps.setInt(iPeriod, overlap);
-            }
-
-            if(iIncludeCerts != null)
-            {
-                setBoolean(ps, iIncludeCerts, includeCerts);
-            }
-
-            if(iIncludeExpiredCerts != null)
-            {
-                setBoolean(ps, iIncludeExpiredCerts, includeExpiredCerts);
+                ps.setString(iCrlControl, crlControl);
             }
 
             ps.setString(iName, name);
