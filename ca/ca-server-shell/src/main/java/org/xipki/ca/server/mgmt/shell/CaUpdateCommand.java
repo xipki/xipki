@@ -97,14 +97,14 @@ public class CaUpdateCommand extends CaCommand
                     + "\t1: forbidden\n"
                     + "\t2: forbiddenWithinProfile\n"
                     + "\t3: allowed")
-    protected String duplicateKeyI;
+    protected String duplicateKeyS;
 
     @Option(name = "-ds", aliases = { "--duplicateSubject" },
             description = "Mode of duplicate subject.\n"
                     + "\t1: forbidden\n"
                     + "\t2: forbiddenWithinProfile\n"
                     + "\t3: allowed")
-    protected String duplicateSubjectI;
+    protected String duplicateSubjectS;
 
     @Option(name = "-validityMode",
             description = "Mode of valditity.\n"
@@ -128,7 +128,7 @@ public class CaUpdateCommand extends CaCommand
 
         if(expirationPeriod != null && expirationPeriod < 0)
         {
-            System.err.println("invalid expirationPeriod: " + expirationPeriod);
+            err("invalid expirationPeriod: " + expirationPeriod);
             return null;
         }
 
@@ -147,15 +147,23 @@ public class CaUpdateCommand extends CaCommand
         }
 
         DuplicationMode duplicateKey = null;
-        if(duplicateKeyI != null)
+        if(duplicateKeyS != null)
         {
-            duplicateKey = DuplicationMode.getInstance(duplicateKeyI);
+            duplicateKey = DuplicationMode.getInstance(duplicateKeyS);
+            if(duplicateKey == null)
+            {
+                err("invalid duplication mode " + duplicateKeyS);
+            }
         }
 
         DuplicationMode duplicateSubject = null;
-        if(duplicateSubjectI != null)
+        if(duplicateSubjectS != null)
         {
-            duplicateSubject = DuplicationMode.getInstance(duplicateSubjectI);
+            duplicateSubject = DuplicationMode.getInstance(duplicateSubjectS);
+            if(duplicateKey == null)
+            {
+                err("invalid duplication mode " + duplicateSubjectS);
+            }
         }
 
         Set<Permission> _permissions = null;

@@ -45,7 +45,7 @@ public class CaPublisherListCommand extends CaCommand
             sb.append("\tNo publisher for CA " + caName + " is configured");
         }
 
-        System.out.println(sb.toString());
+        out(sb.toString());
 
         return null;
     }

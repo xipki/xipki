@@ -44,7 +44,7 @@ public class CaRequestorListCommand extends CaCommand
         {
             sb.append("\tNo requestor for CA " + caName + " is configured");
         }
-        System.out.println(sb.toString());
+        out(sb.toString());
 
         return null;
     }

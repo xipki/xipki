@@ -34,9 +34,8 @@ public class CaRequestorAddCommand extends CaCommand
 
     @Option(name = "-ra",
             description = "Whether as RA.\n"
-                    + "Valid values are 'yes' and 'no',\n"
-                    + "the default is 'no'")
-    protected String raS;
+                    + "Valid values are 'yes' and 'no'")
+    protected String raS = "no";
 
     @Option(name = "-permission",
             description = "Required. Permission, multi options is allowed. allowed values are\n"

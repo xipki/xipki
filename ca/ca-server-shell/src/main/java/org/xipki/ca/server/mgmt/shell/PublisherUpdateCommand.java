@@ -42,7 +42,7 @@ public class PublisherUpdateCommand extends CaCommand
     {
         if(type == null && conf == null && confFile == null)
         {
-            System.out.println("Nothing to update");
+            err("Nothing to update");
             return null;
         }
 

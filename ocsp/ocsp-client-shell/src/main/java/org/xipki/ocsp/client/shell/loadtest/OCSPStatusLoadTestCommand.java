@@ -31,27 +31,22 @@ public class OCSPStatusLoadTestCommand extends AbstractOCSPStatusCommand
             required = true,
             description = "Required. Serial numbers.\n"
                     + "Comma-seperated serial numbers or ranges")
-    protected String           serialNumbers;
+    protected String serialNumbers;
 
     @Option(name = "-duration",
-            required = true,
-            description = "Required. Duration in seconds")
-    protected int              durationInSecond;
+            required = false,
+            description = "Duration in seconds")
+    protected int durationInSecond = 30;
 
     @Option(name = "-thread",
             required = false,
-            description = "Number of threads, the default is 5")
-    protected Integer          numThreads;
+            description = "Number of threads")
+    protected Integer numThreads = 5;
 
     @Override
     protected Object doExecute()
     throws Exception
     {
-        if(numThreads == null)
-        {
-            numThreads = 5;
-        }
-
         List<Long> serialNumbers = new LinkedList<>();
 
         try
@@ -71,7 +66,7 @@ public class OCSPStatusLoadTestCommand extends AbstractOCSPStatusCommand
                     int endSerial = Integer.parseInt(subtokens.get(1).trim());
                     if(startSerial < 1 || endSerial < 1 || startSerial > endSerial)
                     {
-                        System.err.println("invalid serial number " + this.serialNumbers);
+                        err("invalid serial number " + this.serialNumbers);
                         return null;
                     }
                     for(long i = startSerial; i <= endSerial; i++)
@@ -81,19 +76,19 @@ public class OCSPStatusLoadTestCommand extends AbstractOCSPStatusCommand
                 }
                 else
                 {
-                    System.err.println("invalid serial number " + this.serialNumbers);
+                    err("invalid serial number " + this.serialNumbers);
                     return null;
                 }
             }
         }catch(Exception e)
         {
-            System.err.println("invalid serial numbers " + this.serialNumbers);
+            err("invalid serial numbers " + this.serialNumbers);
             return null;
         }
 
         if(numThreads < 1)
         {
-            System.err.println("Invalid number of threads " + numThreads);
+            err("Invalid number of threads " + numThreads);
             return null;
         }
 

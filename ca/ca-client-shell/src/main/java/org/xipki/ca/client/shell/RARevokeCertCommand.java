@@ -43,20 +43,20 @@ public class RARevokeCertCommand extends RAUnRevRemoveCertCommand
     {
         if(certFile == null && (caCertFile == null || serialNumber == null))
         {
-            System.err.println("either cert or (cacert, serial) must be specified");
+            err("either cert or (cacert, serial) must be specified");
             return null;
         }
 
         CRLReason crlReason = CRLReason.getInstance(reason);
         if(crlReason == null)
         {
-            System.out.println("invalid reason " + reason);
+            err("invalid reason " + reason);
             return null;
         }
 
         if(CRLReason.PERMITTED_CLIENT_CRLREASONS.contains(crlReason) == false)
         {
-            System.err.println("reason " + reason + " is not permitted");
+            err("reason " + reason + " is not permitted");
             return null;
         }
 
@@ -76,11 +76,11 @@ public class RARevokeCertCommand extends RAUnRevRemoveCertCommand
         if(certIdOrError.getError() != null)
         {
             PKIStatusInfo error = certIdOrError.getError();
-            System.err.println("Revocation failed: " + error);
+            err("Revocation failed: " + error);
         }
         else
         {
-            System.out.println("Revoked certificate");
+            out("Revoked certificate");
         }
         return null;
     }

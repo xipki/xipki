@@ -20,20 +20,27 @@ public class CaSystemStatusCommand extends CaCommand
 {
     @Option(name = "-code",
             required = false, description = "Show only the code of CA system status")
-    protected Boolean codeOnly;
+    protected Boolean codeOnly = Boolean.FALSE;
 
     @Override
     protected Object doExecute()
     throws Exception
     {
         CASystemStatus status = caManager.getCASystemStatus();
-        if(codeOnly != null && codeOnly.booleanValue())
+        if(status != null)
         {
-            System.out.println(status.getCode());
+            if(codeOnly.booleanValue())
+            {
+                out(Integer.toString(status.getCode()));
+            }
+            else
+            {
+                out(status.toString());
+            }
         }
         else
         {
-            System.out.println(status);
+            err("status is NULL");
         }
         return null;
     }

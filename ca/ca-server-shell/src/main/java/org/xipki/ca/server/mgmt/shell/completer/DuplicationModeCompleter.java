@@ -21,7 +21,6 @@ public class DuplicationModeCompleter extends EnumCompleter
         StringBuilder enums = new StringBuilder();
         for(DuplicationMode mode : DuplicationMode.values())
         {
-            enums.append(Integer.toString(mode.getMode())).append(",");
             enums.append(mode.getDescription()).append(",");
         }
         enums.deleteCharAt(enums.length() - 1);

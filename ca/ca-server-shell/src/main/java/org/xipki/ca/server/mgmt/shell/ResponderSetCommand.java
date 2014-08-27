@@ -33,7 +33,7 @@ public class ResponderSetCommand extends CaCommand
     protected String signerConf;
 
     @Option(name = "-cert",
-            description = "Requestor certificate, in form of 'file:<path> or base64:<content>")
+            description = "Requestor certificate")
     protected String certFile;
 
     private SecurityFactory securityFactory;

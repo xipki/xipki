@@ -37,7 +37,7 @@ public class ProfileExportCommand extends CaCommand
         CertProfileEntry entry = caManager.getCertProfile(name);
         if(entry == null)
         {
-            System.out.println("No cert profile named " + name + " is defined");
+            err("No cert profile named " + name + " is defined");
             return null;
         }
 

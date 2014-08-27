@@ -32,7 +32,7 @@ public abstract class P12KeyGenCommand extends KeyGenCommand
     protected String certOutFile;
 
     @Option(name = "-pwd", aliases = { "--password" },
-            required = false, description = "Password of the PKCS#11 token")
+            required = false, description = "Password of the PKCS#12 file")
     protected String password;
 
     protected void saveKeyAndCert(P12KeypairGenerationResult keyAndCert)

@@ -29,24 +29,24 @@ public class EnrollCertCommand extends CaCommand
 
     @Option(name = "-ca",
             required = true, description = "Required. CA name")
-    protected String            caName;
+    protected String caName;
 
     @Option(name = "-p10",
             required = true, description = "Required. PKCS#10 request file")
-    protected String            p10File;
+    protected String p10File;
 
     @Option(name = "-out",
             description = "Required. Where to save the certificate",
             required = true)
-    protected String            outFile;
+    protected String outFile;
 
     @Option(name = "-profile",
             required = true, description = "Required. Profile name")
-    protected String            profileName;
+    protected String profileName;
 
     @Option(name = "-user",
             required = false, description = "Username")
-    protected String            user;
+    protected String user;
 
     @Override
     protected Object doExecute()
@@ -55,7 +55,7 @@ public class EnrollCertCommand extends CaCommand
         CAEntry ca = caManager.getCA(caName);
         if(ca == null)
         {
-            System.err.println("CA " + caName + " not available");
+            err("CA " + caName + " not available");
             return null;
         }
 
@@ -69,7 +69,7 @@ public class EnrollCertCommand extends CaCommand
         {
             LOG.warn("Exception: {}", e.getMessage());
             LOG.debug("Exception", e);
-            System.err.println("ERROR: " + e.getMessage());
+            err("ERROR: " + e.getMessage());
             return null;
         }
 
