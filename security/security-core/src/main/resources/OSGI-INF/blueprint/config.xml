@@ -2,37 +2,44 @@
 <blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0" xmlns:cm="http://aries.apache.org/blueprint/xmlns/blueprint-cm/v1.1.0" xmlns:ext="http://aries.apache.org/blueprint/xmlns/blueprint-ext/v1.0.0">
   <cm:property-placeholder persistent-id="org.xipki.security" update-strategy="reload">
     <cm:default-properties>
+      <cm:property name="masterPassword.callback" value="org.xipki.security.GuiPasswordCallback"/>
       <cm:property name="hostnameVerifier.enabled" value="false"/>
       <cm:property name="hostnameVerifier.trustAll" value="false"/>
       <cm:property name="hostnameVerifier.commonnameHostMap" value=""/>
+      <cm:property name="defaultParallelism" value="20"/>
+      <cm:property name="pkcs11.confFile" value=""/>
       <cm:property name="pkcs11.includeSlots" value=""/>
       <cm:property name="pkcs11.excludeSlots" value=""/>
-      <cm:property name="defaultParallelism" value="20"/>
+      <cm:property name="pkcs11.module" value=""/>
     </cm:default-properties>
   </cm:property-placeholder>
   <bean id="sshBcBugfix" class="org.xipki.security.SshdBcBugfix">
 	</bean>
   <bean id="securityFactoryImpl" class="org.xipki.security.SecurityFactoryImpl">
     <property name="pkcs11Provider" value="${pkcs11.provider}"/>
+    <property name="defaultParallelism" value="${defaultParallelism}"/>
+	<property name="pkcs11ConfFile" value="${pkcs11.confFile}"/>    
     <property name="pkcs11Module" value="${pkcs11.module}"/>
     <property name="pkcs11IncludeSlots" value="${pkcs11.includeSlots}"/>
     <property name="pkcs11ExcludeSlots" value="${pkcs11.excludeSlots}"/>
-    <property name="defaultParallelism" value="${defaultParallelism}"/>
   </bean>
   <service ref="securityFactoryImpl" interface="org.xipki.security.api.SecurityFactory"/>
+  <bean id="obfPasswordResolver" class="org.xipki.security.OBFPasswordResolver"/>
   <bean id="pbePasswordResolver" class="org.xipki.security.PBEPasswordResolver">
-    </bean>
+    <property name="masterPasswordCallback" value="${masterPassword.callback}"/>
+  </bean>
+
   <bean id="passwordResolverImpl" class="org.xipki.security.PasswordResolverImpl">
     <property name="passwordResolvers">
       <list>
         <ref component-id="pbePasswordResolver"/>
+        <ref component-id="obfPasswordResolver"/>
       </list>
     </property>
   </bean>
   <service ref="passwordResolverImpl" interface="org.xipki.security.api.PasswordResolver"/>
   <bean id="XiPKIProviderRegister" class="org.xipki.security.provider.XiPKIProviderRegister" init-method="regist" destroy-method="unregist">
-    <property name="pkcs11Provider" value="${pkcs11.provider}"/>
-    <property name="pkcs11Module" value="${pkcs11.module}"/>
+    <property name="securityFactory" ref="securityFactoryImpl"/>
   </bean>
   <bean id="httpHostnameVerifier" class="org.xipki.security.HttpsHostnameVerifier" init-method="init" destroy-method="shutdown">
     <property name="enabled" value="${hostnameVerifier.enabled}"/>

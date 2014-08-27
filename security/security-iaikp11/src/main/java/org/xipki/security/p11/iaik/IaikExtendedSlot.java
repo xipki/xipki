@@ -54,7 +54,7 @@ public class IaikExtendedSlot
     private final static long DEFAULT_MAX_COUNT_SESSION = 20;
     private Slot slot;
     private final int maxSessionCount;
-    private char[] password;
+    private List<char[]> password;
 
     private long timeOutWaitNewSession = 10000; // maximal wait for 10 second
     private AtomicLong countSessions = new AtomicLong(0);
@@ -66,7 +66,7 @@ public class IaikExtendedSlot
     private boolean writableSessionInUse = false;
     private Session writableSession;
 
-    IaikExtendedSlot(Slot slot, char[] password)
+    IaikExtendedSlot(Slot slot, List<char[]> password)
     throws SignerException
     {
         this.slot = slot;
@@ -422,7 +422,7 @@ public class IaikExtendedSlot
         }
     }
 
-    private void firstLogin(Session session, char[] password)
+    private void firstLogin(Session session, List<char[]> password)
     throws TokenException
     {
            boolean isProtectedAuthenticationPath =
@@ -430,7 +430,7 @@ public class IaikExtendedSlot
 
            try
            {
-            if (isProtectedAuthenticationPath)
+            if (isProtectedAuthenticationPath | password == null || password.isEmpty())
             {
                 LOG.info("verify on PKCS11Module with PROTECTED_AUTHENTICATION_PATH");
                 session.login(Session.UserType.USER, null);
@@ -440,13 +440,16 @@ public class IaikExtendedSlot
             {
                 LOG.info("verify on PKCS11Module with PIN");
 
-                session.login( Session.UserType.USER, password);
+                for(char[] singlePwd : password)
+                {
+                    session.login( Session.UserType.USER, singlePwd);
+                }
                 this.password = password;
             }
            }
         catch (PKCS11Exception p11e)
         {
-            if(p11e.getErrorCode() != 0x100)// user already logged in
+            if(p11e.getErrorCode() != 0x100)// 0x100: user already logged in
             {
                 throw p11e;
             }
@@ -484,7 +487,17 @@ public class IaikExtendedSlot
                 return;
             }
 
-            session.login( Session.UserType.USER, password);
+            if(password == null || password.isEmpty())
+            {
+                session.login(Session.UserType.USER, null);
+            }
+            else
+            {
+                for(char[] singlePwd : password)
+                {
+                    session.login( Session.UserType.USER, singlePwd);
+                }
+            }
         } catch (TokenException e)
         {
             throw new SignerException(e);

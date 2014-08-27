@@ -20,22 +20,17 @@ import org.xipki.security.p11.iaik.P11KeypairGenerator;
 public class P11ECKeyGenCommand extends P11KeyGenCommand
 {
     @Option(name = "-curve",
-            description = "EC Curve name, the default is brainpoolp256r1",
+            description = "EC Curve name",
             required = false)
-    protected String curveName;
+    protected String curveName = "brainpoolp256r1";
 
     @Override
     protected Object doExecute()
     throws Exception
     {
-        if(curveName == null)
-        {
-            curveName = "brainpoolp256r1";
-        }
-
-        P11KeypairGenerator gen = new P11KeypairGenerator();
+        P11KeypairGenerator gen = new P11KeypairGenerator(securityFactory);
         P11KeypairGenerationResult keyAndCert = gen.generateECDSAKeypairAndCert(
-                securityFactory.getPkcs11Module(), getSlotId(), getPassword(),
+                moduleName, getSlotId(),
                 curveName, label, getSubject(),
                 getKeyUsage(), getExtendedKeyUsage());
         saveKeyAndCert(keyAndCert);

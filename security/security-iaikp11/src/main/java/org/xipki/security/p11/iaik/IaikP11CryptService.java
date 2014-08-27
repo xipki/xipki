@@ -34,11 +34,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.security.api.SignerException;
 import org.xipki.security.api.p11.P11CryptService;
-import org.xipki.security.api.p11.P11SlotIdentifier;
 import org.xipki.security.api.p11.P11KeyIdentifier;
+import org.xipki.security.api.p11.P11ModuleConf;
+import org.xipki.security.api.p11.P11SlotIdentifier;
 import org.xipki.security.common.IoCertUtil;
 import org.xipki.security.common.LogUtil;
-import org.xipki.security.common.ParamChecker;
 
 /**
  * @author Lijun Liao
@@ -53,49 +53,31 @@ public final class IaikP11CryptService implements P11CryptService
 
     private IaikExtendedModule extModule;
 
-    private String pkcs11Module;
-    private String pkcs11ModuleOmitSensitiveInfo;
-    private char[] password;
-    private Set<Integer> includeSlotIndexes;
-    private Set<Integer> excludeSlotIndexes;
+    private final P11ModuleConf moduleConf;
 
     private static final Map<String, IaikP11CryptService> instances = new HashMap<>();
 
-    public synchronized static IaikP11CryptService getInstance(String pkcs11Module, char[] password)
-    throws SignerException
-    {
-        return getInstance(pkcs11Module, password, null, null);
-    }
-
-    public synchronized static IaikP11CryptService getInstance(String pkcs11Module, char[] password,
-            Set<Integer> includeSlotIndexes, Set<Integer> excludeSlotIndexes)
+    public synchronized static IaikP11CryptService getInstance(P11ModuleConf moduleConf)
     throws SignerException
     {
         synchronized (instances)
         {
-            IaikP11CryptService instance = instances.get(pkcs11Module);
+            final String name = moduleConf.getName();
+            IaikP11CryptService instance = instances.get(name);
             if(instance == null)
             {
-                instance = new IaikP11CryptService(pkcs11Module, password, includeSlotIndexes, excludeSlotIndexes);
-                instances.put(pkcs11Module, instance);
+                instance = new IaikP11CryptService(moduleConf);
+                instances.put(name, instance);
             }
 
             return instance;
         }
     }
 
-    private IaikP11CryptService(String pkcs11Module, char[] password,
-            Set<Integer> includeSlotIndexes, Set<Integer> excludeSlotIndexes)
+    private IaikP11CryptService(P11ModuleConf moduleConf)
     throws SignerException
     {
-        ParamChecker.assertNotEmpty("pkcs11Module", pkcs11Module);
-        this.pkcs11Module = pkcs11Module;
-        this.pkcs11ModuleOmitSensitiveInfo = IaikP11Util.eraseSensitiveInfo(pkcs11Module);
-        this.password = (password == null) ? "dummy".toCharArray() : password;
-        this.includeSlotIndexes = includeSlotIndexes == null ?
-                null : new HashSet<>(includeSlotIndexes);
-        this.excludeSlotIndexes = excludeSlotIndexes == null ?
-                null : new HashSet<>(excludeSlotIndexes);
+        this.moduleConf = moduleConf;
         refresh();
     }
 
@@ -112,7 +94,7 @@ public final class IaikP11CryptService implements P11CryptService
 
         lastRefresh = System.currentTimeMillis();
 
-        IaikP11ModulePool.getInstance().removeModule(pkcs11Module);
+        IaikP11ModulePool.getInstance().removeModule(moduleConf.getName());
         refresh();
         return lastRefreshSuccessfull;
     }
@@ -121,15 +103,14 @@ public final class IaikP11CryptService implements P11CryptService
     public synchronized void refresh()
     throws SignerException
     {
-        LOG.info("Refreshing PKCS#11 module {}", pkcs11ModuleOmitSensitiveInfo);
+        LOG.info("Refreshing PKCS#11 module {}", moduleConf.getName());
         lastRefreshSuccessfull = false;
         try
         {
-            this.extModule = IaikP11ModulePool.getInstance().getModule(pkcs11Module);
+            this.extModule = IaikP11ModulePool.getInstance().getModule(moduleConf);
         }catch(SignerException e)
         {
-            final String message = "Could not initialize the PKCS#11 Module for " +
-                    pkcs11ModuleOmitSensitiveInfo;
+            final String message = "Could not initialize the PKCS#11 Module for " + moduleConf.getName();
             if(LOG.isErrorEnabled())
             {
                 LOG.error(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(), e.getMessage());
@@ -142,23 +123,13 @@ public final class IaikP11CryptService implements P11CryptService
 
         Set<IaikP11Identity> currentIdentifies = new HashSet<>();
 
-        Set<P11SlotIdentifier> slotIds = extModule.getAllSlotIds();
+        List<P11SlotIdentifier> slotIds = extModule.getSlotIds();
         for(P11SlotIdentifier slotId : slotIds)
         {
-            if(excludeSlotIndexes != null && excludeSlotIndexes.contains(slotId.getSlotIndex()))
-            {
-                continue;
-            }
-
-            if(includeSlotIndexes != null && includeSlotIndexes.contains(slotId.getSlotIndex()) == false)
-            {
-                continue;
-            }
-
             IaikExtendedSlot slot;
             try
             {
-                slot = extModule.getSlot(slotId, password);
+                slot = extModule.getSlot(slotId);
                 if(slot == null)
                 {
                     LOG.warn("Could not initialize slot " + slotId);
@@ -340,7 +311,7 @@ public final class IaikP11CryptService implements P11CryptService
             LOG.info(sb.toString());
         }
 
-        LOG.info("Refreshed PKCS#11 module {}", pkcs11ModuleOmitSensitiveInfo);
+        LOG.info("Refreshed PKCS#11 module {}", moduleConf.getName());
     }
 
     @Override
@@ -358,7 +329,7 @@ public final class IaikP11CryptService implements P11CryptService
 
         try
         {
-            return identity.CKM_RSA_PKCS(extModule, password, encodedDigestInfo);
+            return identity.CKM_RSA_PKCS(extModule, encodedDigestInfo);
         }catch(PKCS11RuntimeException e)
         {
             final String message = "error while calling identity.CKM_RSA_PKCS()";
@@ -388,7 +359,7 @@ public final class IaikP11CryptService implements P11CryptService
             throw new SignerException("Found no identity with " + keyId + " in slot " + slotId);
         }
 
-        return identity.CKM_RSA_PKCS(extModule, password, encodedDigestInfo);
+        return identity.CKM_RSA_PKCS(extModule, encodedDigestInfo);
     }
 
     @Override
@@ -406,7 +377,7 @@ public final class IaikP11CryptService implements P11CryptService
 
         try
         {
-            return identity.CKM_RSA_X_509(extModule, password, hash);
+            return identity.CKM_RSA_X_509(extModule, hash);
         }catch(PKCS11RuntimeException e)
         {
             final String message = "error while calling identity.CKM_RSA_X_509()";
@@ -436,7 +407,7 @@ public final class IaikP11CryptService implements P11CryptService
             throw new SignerException("Found no identity with " + keyId + " in slot " + slotId);
         }
 
-        return identity.CKM_RSA_X_509(extModule, password, hash);
+        return identity.CKM_RSA_X_509(extModule, hash);
     }
 
     @Override
@@ -453,7 +424,7 @@ public final class IaikP11CryptService implements P11CryptService
 
         try
         {
-            return identity.CKM_ECDSA(extModule, password, hash);
+            return identity.CKM_ECDSA(extModule, hash);
         }catch(PKCS11RuntimeException e)
         {
             final String message = "error while calling identity.CKM_ECDSA()";
@@ -482,7 +453,7 @@ public final class IaikP11CryptService implements P11CryptService
             throw new SignerException("Found no identity with " + keyId + " in slot " + slotId);
         }
 
-        return identity.CKM_ECDSA(extModule, password, hash);
+        return identity.CKM_ECDSA(extModule, hash);
     }
 
     @Override
@@ -535,10 +506,7 @@ public final class IaikP11CryptService implements P11CryptService
     @Override
     public String toString()
     {
-        StringBuilder sb = new StringBuilder();
-        sb.append("IaikP11CryptService\n");
-        sb.append("\tModule: ").append(pkcs11ModuleOmitSensitiveInfo).append("\n");
-        return sb.toString();
+        return moduleConf.toString();
     }
 
     private static String hex(byte[] bytes)

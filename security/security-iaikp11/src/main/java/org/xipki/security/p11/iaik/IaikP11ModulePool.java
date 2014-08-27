@@ -18,7 +18,9 @@ import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xipki.security.api.SecurityFactory;
 import org.xipki.security.api.SignerException;
+import org.xipki.security.api.p11.P11ModuleConf;
 import org.xipki.security.common.LogUtil;
 
 /**
@@ -31,6 +33,8 @@ public class IaikP11ModulePool
 
     private final Map<String, IaikExtendedModule> modules = new HashMap<>();
 
+    private String defaultModuleName;
+
     private static IaikP11ModulePool INSTANCE = new IaikP11ModulePool();
 
     public static IaikP11ModulePool getInstance()
@@ -38,9 +42,15 @@ public class IaikP11ModulePool
         return INSTANCE;
     }
 
-    public synchronized void removeModule(String pkcs11Lib)
+    public synchronized void removeModule(String moduleName)
     {
-        IaikExtendedModule module = modules.remove(pkcs11Lib);
+        IaikExtendedModule module = modules.remove(moduleName);
+        if(module == null && defaultModuleName != null &&
+                SecurityFactory.DEFAULT_P11MODULE_NAME.equals(moduleName))
+        {
+            module = modules.remove(defaultModuleName);
+        }
+
         if(module == null)
         {
             return;
@@ -48,13 +58,12 @@ public class IaikP11ModulePool
 
         try
         {
-            LOG.info("Removed module {}", pkcs11Lib);
-            module.getModule().finalize();
-            LOG.info("Finalized module {}", pkcs11Lib);
+            LOG.info("Removed module {}", moduleName);
+            module.close();
+            LOG.info("Finalized module {}", moduleName);
         }catch(Throwable t)
         {
-            String text = IaikP11Util.eraseSensitiveInfo(pkcs11Lib);
-            final String message = "Could not finalize the module " + text;
+            final String message = "Could not finalize the module " + moduleName;
             if(LOG.isWarnEnabled())
             {
                 LOG.warn(LogUtil.buildExceptionLogFormat(message), t.getClass().getName(), t.getMessage());
@@ -63,10 +72,22 @@ public class IaikP11ModulePool
         }
     }
 
-    public synchronized IaikExtendedModule getModule(String pkcs11Lib)
+    public IaikExtendedModule getModule(String moduleName)
     throws SignerException
     {
-        IaikExtendedModule extModule = modules.get(pkcs11Lib);
+        IaikExtendedModule module = modules.get(moduleName);
+        if(module == null && defaultModuleName != null &&
+                SecurityFactory.DEFAULT_P11MODULE_NAME.equals(moduleName))
+        {
+            module = modules.get(defaultModuleName);
+        }
+        return module;
+    }
+
+    public synchronized IaikExtendedModule getModule(P11ModuleConf moduleConf)
+    throws SignerException
+    {
+        IaikExtendedModule extModule = modules.get(moduleConf.getName());
         if(extModule != null)
         {
             return extModule;
@@ -76,10 +97,10 @@ public class IaikP11ModulePool
 
         try
         {
-            module = Module.getInstance(pkcs11Lib);
+            module = Module.getInstance(moduleConf.getNativeLibrary());
         }catch(IOException e)
         {
-            final String msg = "Could not load the PKCS#11 library " + IaikP11Util.eraseSensitiveInfo(pkcs11Lib);
+            final String msg = "Could not load the PKCS#11 module " + moduleConf.getName();
             if(LOG.isErrorEnabled())
             {
                 LOG.error(LogUtil.buildExceptionLogFormat(msg), e.getClass().getName(), e.getMessage());
@@ -132,8 +153,8 @@ public class IaikP11ModulePool
             throw new SignerException(t.getMessage());
         }
 
-        extModule = new IaikExtendedModule(module);
-        modules.put(pkcs11Lib, extModule);
+        extModule = new IaikExtendedModule(module, moduleConf);
+        modules.put(moduleConf.getName(), extModule);
 
         return extModule;
     }
@@ -174,5 +195,15 @@ public class IaikP11ModulePool
                 LOG.debug(message, t);
             }
         }
+    }
+
+    public String getDefaultModuleName()
+    {
+        return defaultModuleName;
+    }
+
+    public void setDefaultModuleName(String defaultModuleName)
+    {
+        this.defaultModuleName = defaultModuleName;
     }
 }

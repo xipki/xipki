@@ -21,8 +21,8 @@ import org.slf4j.LoggerFactory;
 import org.xipki.security.SignerUtil;
 import org.xipki.security.api.SignerException;
 import org.xipki.security.api.p11.P11CryptService;
-import org.xipki.security.api.p11.P11SlotIdentifier;
 import org.xipki.security.api.p11.P11KeyIdentifier;
+import org.xipki.security.api.p11.P11SlotIdentifier;
 import org.xipki.security.common.LogUtil;
 import org.xipki.security.common.ParamChecker;
 

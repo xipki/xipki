@@ -8,6 +8,7 @@
 package org.xipki.security;
 
 import java.io.ByteArrayInputStream;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -23,12 +24,21 @@ import java.security.Signature;
 import java.security.SignatureException;
 import java.security.cert.X509Certificate;
 import java.security.spec.InvalidKeySpecException;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
-import java.util.StringTokenizer;
 
 import javax.crypto.NoSuchPaddingException;
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBElement;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Unmarshaller;
+import javax.xml.validation.Schema;
+import javax.xml.validation.SchemaFactory;
 
 import org.bouncycastle.asn1.DERNull;
 import org.bouncycastle.asn1.nist.NISTObjectIdentifiers;
@@ -45,6 +55,8 @@ import org.bouncycastle.operator.ContentVerifierProvider;
 import org.bouncycastle.operator.OperatorCreationException;
 import org.bouncycastle.util.encoders.Base64;
 import org.bouncycastle.util.encoders.Hex;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xipki.security.api.ConcurrentContentSigner;
 import org.xipki.security.api.NoIdleSignerException;
 import org.xipki.security.api.PasswordResolver;
@@ -53,12 +65,29 @@ import org.xipki.security.api.SecurityFactory;
 import org.xipki.security.api.SignerException;
 import org.xipki.security.api.p11.P11CryptService;
 import org.xipki.security.api.p11.P11CryptServiceFactory;
-import org.xipki.security.api.p11.P11SlotIdentifier;
 import org.xipki.security.api.p11.P11KeyIdentifier;
+import org.xipki.security.api.p11.P11ModuleConf;
+import org.xipki.security.api.p11.P11NullPasswordRetriever;
+import org.xipki.security.api.p11.P11PasswordRetriever;
+import org.xipki.security.api.p11.P11SlotIdentifier;
 import org.xipki.security.common.CmpUtf8Pairs;
+import org.xipki.security.common.ConfigurationException;
 import org.xipki.security.common.IoCertUtil;
+import org.xipki.security.common.LogUtil;
 import org.xipki.security.common.ParamChecker;
+import org.xipki.security.common.StringUtil;
 import org.xipki.security.p11.P11ContentSignerBuilder;
+import org.xipki.security.p11.P11PasswordRetrieverImpl;
+import org.xipki.security.p11.conf.jaxb.ModuleType;
+import org.xipki.security.p11.conf.jaxb.ModulesType;
+import org.xipki.security.p11.conf.jaxb.NativeLibraryType;
+import org.xipki.security.p11.conf.jaxb.ObjectFactory;
+import org.xipki.security.p11.conf.jaxb.PKCS11ConfType;
+import org.xipki.security.p11.conf.jaxb.PasswordType;
+import org.xipki.security.p11.conf.jaxb.PasswordsType;
+import org.xipki.security.p11.conf.jaxb.SlotType;
+import org.xipki.security.p11.conf.jaxb.SlotsType;
+import org.xml.sax.SAXException;
 
 /**
  * @author Lijun Liao
@@ -66,11 +95,26 @@ import org.xipki.security.p11.P11ContentSignerBuilder;
 
 public class SecurityFactoryImpl implements SecurityFactory
 {
+    private static final Logger LOG = LoggerFactory.getLogger(SecurityFactoryImpl.class);
+
     private String pkcs11Provider;
-    private String pkcs11Module;
-    private Set<Integer> pkcs11IncludeSlots;
-    private Set<Integer> pkcs11ExcludeSlots;
     private int defaultParallelism = 20;
+
+    private String defaultPkcs11ModuleName;
+    private Map<String, P11ModuleConf> p11ModuleConfs;
+    private Set<String> p11ModuleConfNames;
+    private P11CryptServiceFactory p11CryptServiceFactory;
+    private boolean p11CryptServiciceFactoryInitialized;
+
+    private PasswordResolver passwordResolver;
+    private String pkcs11ConfFile;
+
+    @Deprecated
+    private String pkcs11Module;
+    @Deprecated
+    private Set<P11SlotIdentifier> pkcs11IncludeSlots;
+    @Deprecated
+    private Set<P11SlotIdentifier> pkcs11ExcludeSlots;
 
     public SecurityFactoryImpl()
     {
@@ -78,6 +122,12 @@ public class SecurityFactoryImpl implements SecurityFactory
         {
             Security.addProvider(new BouncyCastleProvider());
         }
+    }
+
+    @Override
+    public String getPkcs11Provider()
+    {
+        return pkcs11Provider;
     }
 
     @Override
@@ -172,8 +222,6 @@ public class SecurityFactoryImpl implements SecurityFactory
         if("PKCS11".equalsIgnoreCase(type) || "PKCS12".equalsIgnoreCase(type) || "JKS".equalsIgnoreCase(type))
         {
             CmpUtf8Pairs keyValues = new CmpUtf8Pairs(conf);
-
-            String passwordHint = keyValues.getValue("password");
 
             String s = keyValues.getValue("parallelism");
             int parallelism = defaultParallelism;
@@ -306,27 +354,12 @@ public class SecurityFactoryImpl implements SecurityFactory
                 throw new SignerException("Unsupported signature algorithm " + algoS);
             }
 
-            char[] password;
-            if(passwordHint == null)
-            {
-                password = null;
-            }
-            else
-            {
-                if(passwordResolver == null)
-                {
-                    throw new IllegalStateException(
-                            "PasswordResolver is not initialized, please call setPasswordResolver first");
-                }
-                password = passwordResolver.resolvePassword(passwordHint);
-            }
-
             if("PKCS11".equalsIgnoreCase(type))
             {
                 String pkcs11Module = keyValues.getValue("module");
                 if(pkcs11Module == null)
                 {
-                    pkcs11Module = this.pkcs11Module;
+                    pkcs11Module = DEFAULT_P11MODULE_NAME;
                 }
 
                 s = keyValues.getValue("slot");
@@ -364,38 +397,37 @@ public class SecurityFactoryImpl implements SecurityFactory
                     keyIdentifier = new P11KeyIdentifier(keyLabel);
                 }
 
-                Object p11Provider;
+                P11CryptService p11CryptService = getP11CryptService(pkcs11Module);
+                P11ContentSignerBuilder signerBuilder = new P11ContentSignerBuilder(
+                            p11CryptService, slot, keyIdentifier, certificateChain);
+
                 try
                 {
-                    Class<?> clazz = Class.forName(pkcs11Provider);
-                    p11Provider = clazz.newInstance();
-                }catch(Exception e)
+                    return signerBuilder.createSigner(signatureAlgId, parallelism);
+                } catch (OperatorCreationException | NoSuchPaddingException e)
                 {
-                    throw new SignerException(e.getMessage(), e);
+                    throw new SignerException(e.getMessage());
                 }
 
-                if(p11Provider instanceof P11CryptServiceFactory)
-                {
-                    P11CryptServiceFactory p11CryptServiceFact = (P11CryptServiceFactory) p11Provider;
-                    P11CryptService p11CryptService = p11CryptServiceFact.createP11CryptService(
-                            pkcs11Module, password, pkcs11IncludeSlots, pkcs11ExcludeSlots);
-                    P11ContentSignerBuilder signerBuilder = new P11ContentSignerBuilder(
-                                p11CryptService, slot, password, keyIdentifier, certificateChain);
-
-                    try
-                    {
-                        return  signerBuilder.createSigner(signatureAlgId, parallelism);
-                    } catch (OperatorCreationException | NoSuchPaddingException e)
-                    {
-                        throw new SignerException(e.getMessage());
-                    }
-                }
-                {
-                    throw new SignerException(pkcs11Module + " is not instanceof " + P11CryptServiceFactory.class.getName());
-                }
             }
             else
             {
+                String passwordHint = keyValues.getValue("password");
+                char[] password;
+                if(passwordHint == null)
+                {
+                    password = null;
+                }
+                else
+                {
+                    if(passwordResolver == null)
+                    {
+                        throw new IllegalStateException(
+                                "PasswordResolver is not initialized, please call setPasswordResolver first");
+                    }
+                    password = passwordResolver.resolvePassword(passwordHint);
+                }
+
                 s = keyValues.getValue("keystore");
                 String keyLabel = keyValues.getValue("key-label");
 
@@ -540,25 +572,9 @@ public class SecurityFactoryImpl implements SecurityFactory
                 password, keyLabel, keysize, publicExponent);
     }
 
-    @Override
-    public String getPkcs11Provider()
-    {
-        return pkcs11Provider;
-    }
-
     public void setPkcs11Provider(String pkcs11Provider)
     {
         this.pkcs11Provider = pkcs11Provider;
-    }
-
-    public void setPkcs11IncludeSlots(String indexes)
-    {
-        this.pkcs11IncludeSlots = getSlotIndexes(indexes);
-    }
-
-    public void setPkcs11ExcludeSlots(String indexes)
-    {
-        this.pkcs11ExcludeSlots = getSlotIndexes(indexes);
     }
 
     public void setDefaultParallelism(int defaultParallelism)
@@ -567,28 +583,6 @@ public class SecurityFactoryImpl implements SecurityFactory
         {
             this.defaultParallelism = defaultParallelism;
         }
-    }
-
-    private static Set<Integer> getSlotIndexes(String indexes)
-    {
-        if(indexes == null || indexes.trim().isEmpty())
-        {
-            return null;
-        }
-
-        StringTokenizer st = new StringTokenizer(indexes.trim(), ", ");
-        if(st.countTokens() == 0)
-        {
-            return null;
-        }
-
-        Set<Integer> slotIndexes = new HashSet<>();
-        while(st.hasMoreTokens())
-        {
-            slotIndexes.add(Integer.parseInt(st.nextToken()));
-        }
-
-        return Collections.unmodifiableSet(slotIndexes);
     }
 
     public static String getKeystoreSignerConf(String keystoreFile, String password,
@@ -617,24 +611,18 @@ public class SecurityFactoryImpl implements SecurityFactory
         return conf.getEncoded();
     }
 
-    public static String getPkcs11SignerConf(String pkcs11Lib, P11SlotIdentifier slotId,
-            P11KeyIdentifier keyId,
-            String password,
-            String signatureAlgorithm, int parallelism)
+    public static String getPkcs11SignerConf(String pkcs11ModuleName, P11SlotIdentifier slotId,
+            P11KeyIdentifier keyId, String signatureAlgorithm, int parallelism)
     {
         ParamChecker.assertNotNull("algo", signatureAlgorithm);
         ParamChecker.assertNotNull("keyId", keyId);
 
         CmpUtf8Pairs conf = new CmpUtf8Pairs("algo", signatureAlgorithm);
         conf.putUtf8Pair("parallelism", Integer.toString(parallelism));
-        if(password != null && password.length() > 0)
-        {
-            conf.putUtf8Pair("password", password);
-        }
 
-        if(pkcs11Lib != null && pkcs11Lib.length() > 0)
+        if(pkcs11ModuleName != null && pkcs11ModuleName.length() > 0)
         {
-            conf.putUtf8Pair("module", pkcs11Lib);
+            conf.putUtf8Pair("module", pkcs11ModuleName);
         }
 
         if(slotId.getSlotId() != null)
@@ -660,26 +648,342 @@ public class SecurityFactoryImpl implements SecurityFactory
     }
 
     @Override
-    public String getPkcs11Module()
+    public P11CryptService getP11CryptService(String moduleName)
+    throws SignerException
     {
-        return pkcs11Module;
+        initP11CryptServiceFactory();
+        return p11CryptServiceFactory.createP11CryptService(
+                getRealPkcs11ModuleName(moduleName));
     }
 
+    @Override
+    public Set<String> getPkcs11ModuleNames()
+    {
+        initPkcs11ModuleConf();
+        return p11ModuleConfNames;
+    }
+
+    private synchronized void initP11CryptServiceFactory()
+    throws SignerException
+    {
+        if(p11CryptServiceFactory != null)
+        {
+            return;
+        }
+
+        if(p11CryptServiciceFactoryInitialized)
+        {
+            throw new SignerException("Initialization of P11CryptServiceFactory has been processed and failed"
+                    + ", no retry");
+        }
+
+        try
+        {
+            initPkcs11ModuleConf();
+
+            Object p11Provider;
+            try
+            {
+                Class<?> clazz = Class.forName(pkcs11Provider);
+                p11Provider = clazz.newInstance();
+            }catch(Exception e)
+            {
+                throw new SignerException(e.getMessage(), e);
+            }
+
+            if(p11Provider instanceof P11CryptServiceFactory)
+            {
+                P11CryptServiceFactory p11CryptServiceFact = (P11CryptServiceFactory) p11Provider;
+                p11CryptServiceFact.init(defaultPkcs11ModuleName, p11ModuleConfs.values());
+                this.p11CryptServiceFactory = p11CryptServiceFact;
+            }
+            else
+            {
+                throw new SignerException(pkcs11Provider + " is not instanceof " + P11CryptServiceFactory.class.getName());
+            }
+        }finally
+        {
+            p11CryptServiciceFactoryInitialized = true;
+        }
+    }
+
+    private void initPkcs11ModuleConf()
+    {
+        if(p11ModuleConfs != null)
+        {
+            return;
+        }
+
+        if(pkcs11ConfFile == null || pkcs11ConfFile.isEmpty())
+        {
+            Map<String, P11ModuleConf> confs = new HashMap<>();
+
+            if(pkcs11Provider == null | pkcs11Provider.isEmpty())
+            {
+            }
+            else
+            {
+                P11ModuleConf conf = new P11ModuleConf(DEFAULT_P11MODULE_NAME, pkcs11Module,
+                        P11NullPasswordRetriever.INSTANCE, pkcs11IncludeSlots, pkcs11ExcludeSlots);
+                defaultPkcs11ModuleName = DEFAULT_P11MODULE_NAME;
+                confs.put(DEFAULT_P11MODULE_NAME, conf);
+            }
+
+            this.p11ModuleConfs = confs;
+        }
+        else
+        {
+            try
+            {
+                JAXBContext jaxbContext = JAXBContext.newInstance(ObjectFactory.class);
+                Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
+                SchemaFactory schemaFact = SchemaFactory.newInstance(javax.xml.XMLConstants.W3C_XML_SCHEMA_NS_URI);
+                Schema schema = schemaFact.newSchema(getClass().getResource("/xsd/pkcs11-conf.xsd"));
+                unmarshaller.setSchema(schema);
+                @SuppressWarnings("unchecked")
+                JAXBElement<PKCS11ConfType> rootElement = (JAXBElement<PKCS11ConfType>)
+                        unmarshaller.unmarshal(new File(pkcs11ConfFile));
+                PKCS11ConfType pkcs11Conf = rootElement.getValue();
+                ModulesType modulesType = pkcs11Conf.getModules();
+
+                Map<String, P11ModuleConf> confs = new HashMap<>();
+                for(ModuleType moduleType : modulesType.getModule())
+                {
+                    String name = moduleType.getName();
+                    if(DEFAULT_P11MODULE_NAME.equals(name))
+                    {
+                        throw new ConfigurationException("invald module name " + DEFAULT_P11MODULE_NAME + ", it is reserved");
+                    }
+
+                    P11PasswordRetriever pwdRetriever;
+
+                    PasswordsType passwordsType = moduleType.getPasswords();
+                    if(passwordsType == null || passwordsType.getPassword().isEmpty())
+                    {
+                        pwdRetriever = P11NullPasswordRetriever.INSTANCE;
+                    }
+                    else
+                    {
+                        pwdRetriever = new P11PasswordRetrieverImpl();
+                        ((P11PasswordRetrieverImpl) pwdRetriever).setPasswordResolver(passwordResolver);
+
+                        for(PasswordType passwordType : passwordsType.getPassword())
+                        {
+                            Set<P11SlotIdentifier> slots = getSlots(passwordType.getSlots());
+                            ((P11PasswordRetrieverImpl) pwdRetriever).addPasswordEntry(
+                                    slots, new ArrayList<>(passwordType.getSinglePassword()));
+                        }
+                    }
+
+                    Set<P11SlotIdentifier> includeSlots = getSlots(moduleType.getIncludeSlots());
+                    Set<P11SlotIdentifier> excludeSlots = getSlots(moduleType.getExcludeSlots());
+
+                    final String osName = System.getProperty("os.name").toLowerCase();
+                    String nativeLibraryPath = null;
+                    for(NativeLibraryType library : moduleType.getNativeLibraries().getNativeLibrary())
+                    {
+                        List<String> osNames = library.getOs();
+                        if(osNames == null || osNames.isEmpty())
+                        {
+                            nativeLibraryPath = library.getPath();
+                        }
+                        else
+                        {
+                            for(String entry : osNames)
+                            {
+                                if(osName.contains(entry.toLowerCase()))
+                                {
+                                    nativeLibraryPath = library.getPath();
+                                    break;
+                                }
+                            }
+                        }
+
+                        if(nativeLibraryPath != null)
+                        {
+                            break;
+                        }
+                    }
+
+                    if(nativeLibraryPath == null)
+                    {
+                        throw new ConfigurationException("Could not find PKCS#11 library for OS " + osName);
+                    }
+
+                    File f = new File(nativeLibraryPath);
+                    if(f.exists() == false)
+                    {
+                        throw new ConfigurationException("PKCS#11 library " + f.getAbsolutePath() + " does not exist");
+                    }
+                    if(f.isFile() == false)
+                    {
+                        throw new ConfigurationException("PKCS#11 library " + f.getAbsolutePath() +
+                                " does not point to a file");
+                    }
+                    if(f.canRead() == false)
+                    {
+                        throw new ConfigurationException("No permission to access PKCS#11 library " + f.getAbsolutePath());
+                    }
+
+                    P11ModuleConf conf = new P11ModuleConf(name, nativeLibraryPath, pwdRetriever, includeSlots, excludeSlots);
+                    confs.put(name, conf);
+                }
+
+                final String defaultModuleName = modulesType.getDefaultModule();
+                if(confs.containsKey(defaultModuleName) == false)
+                {
+                    throw new ConfigurationException("Default module " + defaultModuleName + " is not defined");
+                }
+
+                this.defaultPkcs11ModuleName = defaultModuleName;
+                this.p11ModuleConfs = confs;
+            } catch (JAXBException | SAXException | ConfigurationException e)
+            {
+                final String message = "Invalid configuration file " + pkcs11ConfFile;
+                if(LOG.isErrorEnabled())
+                {
+                    LOG.error(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(), e.getMessage());
+                }
+                LOG.debug(message, e);
+
+                throw new RuntimeException(message);
+            }
+        }
+
+        if(this.p11ModuleConfs != null)
+        {
+            if(this.p11ModuleConfs.isEmpty())
+            {
+                this.p11ModuleConfNames = Collections.emptySet();
+            }
+            else
+            {
+                this.p11ModuleConfNames = new HashSet<String>(this.p11ModuleConfs.keySet());
+            }
+        }
+
+    }
+
+    public void setPkcs11ConfFile(String confFile)
+    {
+        if(confFile != null && confFile.isEmpty())
+        {
+            this.pkcs11ConfFile = null;
+        }
+        else
+        {
+            this.pkcs11ConfFile = confFile;
+        }
+    }
+
+    @Deprecated
     public void setPkcs11Module(String pkcs11Module)
     {
         this.pkcs11Module = pkcs11Module;
     }
 
-    @Override
-    public Set<Integer> getPkcs11ExcludeSlotIndexes()
+    @Deprecated
+    public void setPkcs11IncludeSlots(String indexes)
     {
-        return pkcs11ExcludeSlots;
+        this.pkcs11IncludeSlots = getSlots(indexes);
+    }
+
+    @Deprecated
+    public void setPkcs11ExcludeSlots(String indexes)
+    {
+        this.pkcs11ExcludeSlots = getSlots(indexes);
+    }
+
+    private static Set<P11SlotIdentifier> getSlots(SlotsType type)
+    throws ConfigurationException
+    {
+        if(type == null || type.getSlot().isEmpty())
+        {
+            return null;
+        }
+
+        Set<P11SlotIdentifier> slots = new HashSet<>();
+        for(SlotType slotType : type.getSlot())
+        {
+            Long slotId = null;
+            if(slotType.getId() != null)
+            {
+                String str = slotType.getId().trim();
+                try
+                {
+                    if(str.startsWith("0x") || str.startsWith("0X"))
+                    {
+                        slotId = Long.parseLong(str.substring(2), 16);
+                    }
+                    else
+                    {
+                        slotId = Long.parseLong(str);
+                    }
+                }catch(NumberFormatException e)
+                {
+                    String message = "invalid slotId '" + str + "'";
+                    LOG.error(message);
+                    throw new ConfigurationException(message);
+                }
+            }
+            slots.add(new P11SlotIdentifier(slotType.getIndex(), slotId));
+        }
+
+        return slots;
+    }
+
+    @Deprecated
+    private static Set<P11SlotIdentifier> getSlots(String indexes)
+    {
+        if(indexes == null || indexes.trim().isEmpty())
+        {
+            return null;
+        }
+
+        Set<String> slotStrs = StringUtil.splitAsSet(indexes.trim(), ", ");
+        if(slotStrs.isEmpty())
+        {
+            return null;
+        }
+
+        Set<P11SlotIdentifier> slots = new HashSet<>(slotStrs.size());
+        for(String slotStr : slotStrs)
+        {
+            int slotIndex;
+            try
+            {
+                slotIndex = Integer.parseInt(slotStr);
+            }catch(NumberFormatException e)
+            {
+                throw new RuntimeException("Invalid slot index " + slotStr);
+            }
+            slots.add(new P11SlotIdentifier(slotIndex, null));
+        }
+
+        return Collections.unmodifiableSet(slots);
+    }
+
+    private String getRealPkcs11ModuleName(String moduleName)
+    {
+        if(moduleName == null || DEFAULT_P11MODULE_NAME.equals(moduleName))
+        {
+            return defaultPkcs11ModuleName;
+        }
+        else
+        {
+            return moduleName;
+        }
+    }
+
+    public void setPasswordResolver(PasswordResolver passwordResolver)
+    {
+        this.passwordResolver = passwordResolver;
     }
 
     @Override
-    public Set<Integer> getPkcs11IncludeSlotIndexes()
+    public String getDefaultPkcs11ModuleName()
     {
-        return pkcs11IncludeSlots;
+        return defaultPkcs11ModuleName;
     }
 
 }

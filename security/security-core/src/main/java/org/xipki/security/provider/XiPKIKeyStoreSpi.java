@@ -27,14 +27,13 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.Properties;
 import java.util.Set;
 
+import org.xipki.security.api.SecurityFactory;
 import org.xipki.security.api.SignerException;
 import org.xipki.security.api.p11.P11CryptService;
-import org.xipki.security.api.p11.P11CryptServiceFactory;
-import org.xipki.security.api.p11.P11SlotIdentifier;
 import org.xipki.security.api.p11.P11KeyIdentifier;
+import org.xipki.security.api.p11.P11SlotIdentifier;
 import org.xipki.security.common.ParamChecker;
 
 /**
@@ -43,8 +42,7 @@ import org.xipki.security.common.ParamChecker;
 
 public class XiPKIKeyStoreSpi extends KeyStoreSpi
 {
-    private static String defaultPkcs11Module;
-    private static String defaultPkcs11Provider;
+    private static SecurityFactory securityFactory;
 
     private Date creationDate;
 
@@ -111,56 +109,9 @@ public class XiPKIKeyStoreSpi extends KeyStoreSpi
     {
         this.creationDate = new Date();
 
-        String pkcs11Provider = defaultPkcs11Provider;
-        String pkcs11Module = defaultPkcs11Module;
-
-        if(stream != null)
-        {
-            Properties props = new Properties();
-            props.load(stream);
-
-            String s = props.getProperty("pkcs11.provider");
-            if(s != null)
-            {
-                pkcs11Provider = s;
-            }
-
-            s = props.getProperty("pkcs11.module");
-            if(s != null)
-            {
-                pkcs11Module = s;
-            }
-        }
-
-        if(pkcs11Provider == null)
-        {
-            throw new IllegalArgumentException("pkcs11.provider is not defined");
-        }
-
-        if(pkcs11Module == null)
-        {
-            throw new IllegalArgumentException("pkcs11.module is not defined");
-        }
-
-        Object p11Provider;
         try
         {
-            Class<?> clazz = Class.forName(pkcs11Provider);
-            p11Provider = clazz.newInstance();
-        }catch(Exception e)
-        {
-            throw new IllegalArgumentException(e.getMessage(), e);
-        }
-
-        if(p11Provider instanceof P11CryptServiceFactory == false)
-        {
-            throw new IllegalArgumentException(pkcs11Provider + " does not implement " +
-                    P11CryptServiceFactory.class.getName());
-        }
-
-        try
-        {
-            P11CryptService p11Servcie = ((P11CryptServiceFactory) p11Provider).createP11CryptService(pkcs11Module, password);
+            P11CryptService p11Servcie = securityFactory.getP11CryptService(SecurityFactory.DEFAULT_P11MODULE_NAME);
             P11SlotIdentifier[] slotIds = p11Servcie.getSlotIdentifiers();
 
             Map<P11SlotIdentifier, String[]> keyLabelsMap = new HashMap<>();
@@ -202,7 +153,6 @@ public class XiPKIKeyStoreSpi extends KeyStoreSpi
                     keyCerts.put(alias, keyCertEntry);
                 }
             }
-
         } catch (SignerException | InvalidKeyException e)
         {
             throw new IllegalArgumentException(e.getClass().getName() + ": " + e.getMessage(), e);
@@ -342,13 +292,9 @@ public class XiPKIKeyStoreSpi extends KeyStoreSpi
         return null;
     }
 
-    public static void setDefaultPkcs11Module(String pkcs11Module)
+    public static void setSecurityFactory(SecurityFactory pSecurityFactory)
     {
-        defaultPkcs11Module = pkcs11Module;
+        securityFactory = pSecurityFactory;
     }
 
-    public static void setDefaultPkcs11Provider(String pkcs11Provider)
-    {
-        defaultPkcs11Provider = pkcs11Provider;
-    }
 }
