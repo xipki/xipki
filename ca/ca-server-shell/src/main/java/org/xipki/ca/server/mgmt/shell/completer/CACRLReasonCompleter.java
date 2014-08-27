@@ -23,7 +23,6 @@ public class CACRLReasonCompleter extends EnumCompleter
 
         for(CRLReason reason : CaRevokeCommand.permitted_reasons)
         {
-            enums.append(Integer.toString(reason.getCode())).append(",");
             enums.append(reason.getDescription()).append(",");
         }
         enums.deleteCharAt(enums.length() - 1);

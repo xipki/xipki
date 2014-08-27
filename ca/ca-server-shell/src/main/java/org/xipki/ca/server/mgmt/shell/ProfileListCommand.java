@@ -63,7 +63,7 @@ public class ProfileListCommand extends CaCommand
             }
         }
 
-        System.out.println(sb.toString());
+        out(sb.toString());
         return null;
     }
 }

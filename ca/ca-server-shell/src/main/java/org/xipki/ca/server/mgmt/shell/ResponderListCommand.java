@@ -21,14 +21,14 @@ public class ResponderListCommand extends CaCommand
 
     @Option(name = "-v", aliases="--verbose",
             required = false, description = "Show responder information verbosely")
-    protected Boolean verbose;
+    protected Boolean verbose = Boolean.FALSE;
 
     @Override
     protected Object doExecute()
     throws Exception
     {
         CmpResponderEntry responder = caManager.getCmpResponder();
-        System.out.println(responder.toString(verbose == null ? false :verbose.booleanValue()));
+        out(responder.toString(verbose.booleanValue()));
         return null;
     }
 }

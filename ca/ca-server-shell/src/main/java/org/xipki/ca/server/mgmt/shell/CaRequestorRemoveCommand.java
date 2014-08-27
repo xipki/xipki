@@ -24,7 +24,7 @@ public class CaRequestorRemoveCommand extends CaCommand
 
     @Option(name = "-requestor",
             required = true, description = "Required. Requestor name")
-    protected String            requestorName;
+    protected String requestorName;
 
     @Override
     protected Object doExecute()

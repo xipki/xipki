@@ -27,7 +27,7 @@ public class RemoveCertCommand extends CaCommand
     @Option(name = "-serial",
             required = true,
             description = "Serial number")
-    protected Long   serialNumber;
+    protected Long serialNumber;
 
     @Override
     protected Object doExecute()
@@ -35,7 +35,7 @@ public class RemoveCertCommand extends CaCommand
     {
         if(caManager.getCA(caName) == null)
         {
-            System.err.println("CA " + caName + " not available");
+            err("CA " + caName + " not available");
             return null;
         }
 
@@ -44,11 +44,11 @@ public class RemoveCertCommand extends CaCommand
 
         if(successful)
         {
-            System.out.println("Removed certificate");
+            out("Removed certificate");
         }
         else
         {
-            System.out.println("Could not remove certificate");
+            err("Could not remove certificate");
         }
 
         return null;

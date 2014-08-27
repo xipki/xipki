@@ -64,9 +64,9 @@ abstract class CALoadTest extends AbstractLoadTest
         private BigInteger baseN;
 
         public RSACALoadTest(RAWorker raWorker, String certProfile,
-                String subjectTemplate, int keysize)
+                String subjectTemplate, int keysize, RandomDN randomDN)
         {
-            super(raWorker, certProfile, subjectTemplate);
+            super(raWorker, certProfile, subjectTemplate, randomDN);
             if(keysize % 1024 != 0)
             {
                 throw new IllegalArgumentException("invalid RSA keysize " + keysize);
@@ -109,10 +109,11 @@ abstract class CALoadTest extends AbstractLoadTest
         private String curveName;
         private BigInteger basePublicKey;
 
-        public ECCALoadTest(RAWorker raWorker, String certProfile, String subjectTemplate, String curveNameOrOid)
+        public ECCALoadTest(RAWorker raWorker, String certProfile, String subjectTemplate,
+        String curveNameOrOid, RandomDN randomDN)
         throws Exception
         {
-            super(raWorker, certProfile, subjectTemplate);
+            super(raWorker, certProfile, subjectTemplate, randomDN);
             boolean isOid;
             try
             {
@@ -176,7 +177,7 @@ abstract class CALoadTest extends AbstractLoadTest
         return new Testor();
     }
 
-    public CALoadTest(RAWorker raWorker, String certProfile, String subjectTemplate)
+    public CALoadTest(RAWorker raWorker, String certProfile, String subjectTemplate, RandomDN randomDN)
     {
         ParamChecker.assertNotNull("raWorker", raWorker);
         ParamChecker.assertNotEmpty("certProfile", certProfile);
@@ -189,22 +190,48 @@ abstract class CALoadTest extends AbstractLoadTest
                     ObjectIdentifiers.DN_SURNAME, ObjectIdentifiers.DN_STREET, ObjectIdentifiers.DN_POSTAL_CODE,
                     ObjectIdentifiers.DN_CN};
 
-        ASN1ObjectIdentifier _subjectRDNForIncrement = null;
-        List<ASN1ObjectIdentifier> attrTypes = Arrays.asList(this.subjectTemplate.getAttributeTypes());
-        for(ASN1ObjectIdentifier oid : rdnOidsForIncrement)
+        if(randomDN != null)
         {
-            if(attrTypes.contains(oid))
+            switch(randomDN)
             {
-                _subjectRDNForIncrement = oid;
-                break;
+                case CN:
+                    this.subjectRDNForIncrement = ObjectIdentifiers.DN_CN;
+                    break;
+                case O:
+                    this.subjectRDNForIncrement = ObjectIdentifiers.DN_O;
+                    break;
+                case OU:
+                    this.subjectRDNForIncrement = ObjectIdentifiers.DN_OU;
+                    break;
+                default:
+                    throw new RuntimeException("should not reach here");
+            }
+
+            if(this.subjectTemplate.getRDNs(this.subjectRDNForIncrement).length == 0)
+            {
+                throw new IllegalArgumentException("subjectTemplate does not contain DN field " +
+                        ObjectIdentifiers.oidToDisplayName(this.subjectRDNForIncrement));
             }
         }
-
-        if(_subjectRDNForIncrement == null)
+        else
         {
-            throw new IllegalArgumentException("invalid subjectTemplate");
+            ASN1ObjectIdentifier _subjectRDNForIncrement = null;
+            List<ASN1ObjectIdentifier> attrTypes = Arrays.asList(this.subjectTemplate.getAttributeTypes());
+            for(ASN1ObjectIdentifier oid : rdnOidsForIncrement)
+            {
+                if(attrTypes.contains(oid))
+                {
+                    _subjectRDNForIncrement = oid;
+                    break;
+                }
+            }
+
+            if(_subjectRDNForIncrement == null)
+            {
+                throw new IllegalArgumentException("invalid subjectTemplate");
+            }
+            this.subjectRDNForIncrement = _subjectRDNForIncrement;
         }
-        this.subjectRDNForIncrement = _subjectRDNForIncrement;
 
         this.raWorker = raWorker;
         this.certProfile = certProfile;

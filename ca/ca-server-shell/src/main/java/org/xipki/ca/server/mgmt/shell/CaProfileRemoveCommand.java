@@ -24,7 +24,7 @@ public class CaProfileRemoveCommand extends CaCommand
 
     @Option(name = "-profile",
             required = true, description = "Required. Certificate profile name")
-    protected String            profileName;
+    protected String profileName;
 
     @Override
     protected Object doExecute()

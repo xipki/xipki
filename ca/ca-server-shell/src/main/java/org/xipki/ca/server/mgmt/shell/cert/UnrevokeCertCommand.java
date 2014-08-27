@@ -28,7 +28,7 @@ public class UnrevokeCertCommand extends CaCommand
     @Option(name = "-serial",
             required = true,
             description = "Serial number")
-    protected Long   serialNumber;
+    protected Long serialNumber;
 
     @Override
     protected Object doExecute()
@@ -37,7 +37,7 @@ public class UnrevokeCertCommand extends CaCommand
         CAEntry ca = caManager.getCA(caName);
         if(ca == null)
         {
-            System.err.println("CA " + caName + " not available");
+            err("CA " + caName + " not available");
             return null;
         }
 
@@ -45,11 +45,11 @@ public class UnrevokeCertCommand extends CaCommand
 
         if(successful)
         {
-            System.out.println("Unrevoked certificate");
+            out("Unrevoked certificate");
         }
         else
         {
-            System.out.println("Could not unrevoke certificate");
+            err("Could not unrevoke certificate");
         }
 
         return null;

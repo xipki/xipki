@@ -22,7 +22,7 @@ public class CmpControlListCommand extends CaCommand
     throws Exception
     {
         CmpControl cmpcontrol = caManager.getCmpControl();
-        System.out.println(cmpcontrol);
+        out(cmpcontrol == null ? "NULL" : cmpcontrol.toString());
         return null;
     }
 }

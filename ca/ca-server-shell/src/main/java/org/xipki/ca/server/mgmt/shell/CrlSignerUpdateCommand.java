@@ -39,25 +39,9 @@ public class CrlSignerUpdateCommand extends CaCommand
             description = "CRL signer's certificate file or 'NULL'")
     protected String signerCert;
 
-    @Option(name = "-period",
-            description = "Interval in minutes of two CRLs, set to 0 to generate CRL on demand")
-    protected Integer period;
-
-    @Option(name = "-overlap",
-            description = "Overlap of CRL")
-    protected Integer overlap;
-
-    @Option(name = "-wc", aliases = { "--withCert" },
-            description = "Whether certificates are contained in CRL.\n"
-                + "Valid values are 'yes' and 'no',\n"
-                + "the default is 'no'")
-    protected String withCertS;
-
-    @Option(name = "-wec", aliases = { "--withExpiredCerts" },
-            description = "Whether expired certificates are contained in CRL.\n"
-                    + "Valid values are 'yes' and 'no',\n"
-                    + "the default is 'no'")
-    protected String withExpiredCertS;
+    @Option(name = "-crlControl",
+            description = "CRL control")
+    protected String crlControl;
 
     @Override
     protected Object doExecute()
@@ -75,11 +59,7 @@ public class CrlSignerUpdateCommand extends CaCommand
             signerCertConf = Base64.toBase64String(certBytes);
         }
 
-        Boolean withCert = isEnabled(withCertS, "withCert");
-        Boolean withExpiredCert = isEnabled(withExpiredCertS, "withExpiredCerts");
-
-        caManager.changeCrlSigner(name, signerType, signerConf, signerCertConf, period, overlap,
-                withCert, withExpiredCert);
+        caManager.changeCrlSigner(name, signerType, signerConf, signerCertConf, crlControl);
         return null;
     }
 }

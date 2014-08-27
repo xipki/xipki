@@ -7,24 +7,26 @@
 
 package org.xipki.ca.client.shell.completer;
 
+import org.xipki.ca.client.shell.loadtest.RandomDN;
 import org.xipki.console.karaf.EnumCompleter;
-import org.xipki.security.common.CRLReason;
 
 /**
  * @author Lijun Liao
  */
 
-public class ClientCRLReasonCompleter extends EnumCompleter
+public class RandomDNCompleter extends EnumCompleter
 {
-    public ClientCRLReasonCompleter()
+
+    public RandomDNCompleter()
     {
         StringBuilder enums = new StringBuilder();
 
-        for(CRLReason reason : CRLReason.PERMITTED_CLIENT_CRLREASONS)
+        for(RandomDN dn : RandomDN.values())
         {
-            enums.append(reason.getDescription()).append(",");
+            enums.append(dn.name()).append(",");
         }
         enums.deleteCharAt(enums.length() - 1);
         setTokens(enums.toString());
     }
+
 }

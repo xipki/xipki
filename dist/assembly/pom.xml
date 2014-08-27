@@ -159,8 +159,8 @@
             </configuration>
           </execution>
           <execution>
-            <!-- Extract the OCSP XSD -->
-            <id>unpack-ocspserver-xsd</id>
+            <!-- Extract the XSD schemas -->
+            <id>unpack-xsd</id>
             <phase>generate-resources</phase>
             <goals>
               <goal>unpack</goal>
@@ -170,6 +170,14 @@
                 <artifactItem>
                   <groupId>org.xipki</groupId>
                   <artifactId>ocsp-server</artifactId>
+                  <version>${project.version}</version>
+                  <type>jar</type>
+                  <includes>xsd/**</includes>
+                  <outputDirectory>target</outputDirectory>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>org.xipki</groupId>
+                  <artifactId>security-core</artifactId>
                   <version>${project.version}</version>
                   <type>jar</type>
                   <includes>xsd/**</includes>

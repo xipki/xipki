@@ -26,7 +26,7 @@ public class CaUnrevokeCommand extends CaCommand
     {
         if(caManager.getCANames().contains(caName) == false)
         {
-            System.out.println("invalid CA name " + caName);
+            err("invalid CA name " + caName);
             return null;
         }
 

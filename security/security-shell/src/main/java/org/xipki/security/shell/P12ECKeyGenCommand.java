@@ -21,19 +21,14 @@ import org.xipki.security.p10.P12KeypairGenerator.ECDSAIdentityGenerator;
 public class P12ECKeyGenCommand extends P12KeyGenCommand
 {
     @Option(name = "-curve",
-            description = "EC Curve name, the default is brainpoolp256r1",
+            description = "EC Curve name",
             required = false)
-    protected String curveName;
+    protected String curveName = "brainpoolp256r1";
 
     @Override
     protected Object doExecute()
     throws Exception
     {
-        if(curveName == null)
-        {
-            curveName = "brainpoolp256r1";
-        }
-
         ECDSAIdentityGenerator gen = new P12KeypairGenerator.ECDSAIdentityGenerator(
                 curveName, getPassword(), subject, getKeyUsage(), getExtendedKeyUsage());
 

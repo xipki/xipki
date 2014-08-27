@@ -45,38 +45,47 @@ public class CaGenRootCACommand extends CaAddOrGenCommand
     protected Object doExecute()
     throws Exception
     {
-        if(numCrls == null)
+        if(nextSerial < 0)
         {
-            numCrls = 30;
+            err("invalid serial number: " + nextSerial);
+            return null;
         }
 
-        if(expirationPeriod == null)
+        if(numCrls < 0)
         {
-            expirationPeriod = 365;
+            err("invalid numCrls: " + numCrls);
+            return null;
         }
 
-        CAStatus status = CAStatus.ACTIVE;
-        if(caStatus != null)
+        if(expirationPeriod < 0)
         {
-            status = CAStatus.getCAStatus(caStatus);
-            if(status == null)
-            {
-                System.out.println("invalid status: " + caStatus);
-                return null;
-            }
+            err("invalid expirationPeriod: " + expirationPeriod);
+            return null;
         }
 
-        DuplicationMode duplicateKey = getDuplicationMode(duplicateKeyI, DuplicationMode.FORBIDDEN_WITHIN_PROFILE);
-        DuplicationMode duplicateSubject = getDuplicationMode(duplicateSubjectI, DuplicationMode.FORBIDDEN_WITHIN_PROFILE);
-
-        ValidityMode validityMode = null;
-        if(validityModeS != null)
+        CAStatus status = CAStatus.getCAStatus(caStatus);
+        if(status == null)
         {
-            validityMode = ValidityMode.getInstance(validityModeS);
+            err("invalid status: " + caStatus);
+            return null;
         }
+
+        DuplicationMode duplicateKey = DuplicationMode.getInstance(duplicateKeyS);
+        if(duplicateKey == null)
+        {
+              err("invalid duplication mode: " + duplicateKeyS);
+        }
+        DuplicationMode duplicateSubject = DuplicationMode.getInstance(duplicateSubjectS);
+        if(duplicateSubject == null)
+        {
+              err("invalid duplication mode: " + duplicateSubjectS);
+        }
+
+        ValidityMode validityMode = ValidityMode.getInstance(validityModeS);
         if(validityMode == null)
         {
-            validityMode = ValidityMode.STRICT;
+            err("invalid validityMode: " + validityModeS);
+            return null;
         }
 
         Set<Permission> _permissions = new HashSet<>();

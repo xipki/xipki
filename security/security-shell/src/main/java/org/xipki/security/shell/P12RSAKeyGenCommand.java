@@ -22,21 +22,17 @@ import org.xipki.security.p10.P12KeypairGenerator;
 public class P12RSAKeyGenCommand extends P12KeyGenCommand
 {
     @Option(name = "-keysize",
-            description = "Keysize in bit, the default is 2048",
+            description = "Keysize in bit",
             required = false)
-    protected Integer keysize;
+    protected Integer keysize = 2048;
 
     @Override
     protected Object doExecute()
     throws Exception
     {
-        if(keysize == null)
+        if(keysize % 1024 != 0)
         {
-            keysize = 2048;
-        }
-        else if(keysize % 1024 != 0)
-        {
-            System.err.println("Keysize is not multiple of 1024: " + keysize);
+            err("Keysize is not multiple of 1024: " + keysize);
             return null;
         }
 

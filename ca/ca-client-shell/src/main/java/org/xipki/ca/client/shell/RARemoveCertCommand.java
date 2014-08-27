@@ -30,7 +30,7 @@ public class RARemoveCertCommand extends RAUnRevRemoveCertCommand
     {
         if(certFile == null && (caCertFile == null || serialNumber == null))
         {
-            System.err.println("either cert or (cacert, serial) must be specified");
+            err("either cert or (cacert, serial) must be specified");
             return null;
         }
 
@@ -50,11 +50,11 @@ public class RARemoveCertCommand extends RAUnRevRemoveCertCommand
         if(certIdOrError.getError() != null)
         {
             PKIStatusInfo error = certIdOrError.getError();
-            System.err.println("Removing certificate failed: " + error);
+            err("Removing certificate failed: " + error);
         }
         else
         {
-            System.out.println("Removed certificate");
+            out("Removed certificate");
         }
         return null;
     }

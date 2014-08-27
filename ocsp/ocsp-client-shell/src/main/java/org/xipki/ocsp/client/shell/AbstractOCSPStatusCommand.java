@@ -11,10 +11,10 @@ import java.net.MalformedURLException;
 import java.net.URL;
 
 import org.apache.felix.gogo.commands.Option;
-import org.apache.karaf.shell.console.OsgiCommandSupport;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.nist.NISTObjectIdentifiers;
 import org.bouncycastle.asn1.x509.X509ObjectIdentifiers;
+import org.xipki.console.karaf.XipkiOsgiCommandSupport;
 import org.xipki.ocsp.client.api.OCSPRequestor;
 import org.xipki.ocsp.client.api.RequestOptions;
 import org.xipki.security.common.StringUtil;
@@ -23,13 +23,13 @@ import org.xipki.security.common.StringUtil;
  * @author Lijun Liao
  */
 
-public abstract class AbstractOCSPStatusCommand extends OsgiCommandSupport
+public abstract class AbstractOCSPStatusCommand extends XipkiOsgiCommandSupport
 {
     private static final String DFLT_URL = "http://localhost:8080/ocsp";
 
     @Option(name = "-url",
-            description = "Server URL, the default is " + DFLT_URL)
-    protected String serverURL;
+            description = "Server URL")
+    protected String serverURL = DFLT_URL;
 
     @Option(name = "-cacert",
             required = true, description = "Required. CA certificate file")
@@ -37,11 +37,11 @@ public abstract class AbstractOCSPStatusCommand extends OsgiCommandSupport
 
     @Option(name = "-nonce",
             description = "Use nonce")
-    protected Boolean useNonce;
+    protected Boolean useNonce = Boolean.FALSE;
 
     @Option(name = "-hash",
-            required = false, description = "Hash algorithm name. The default is SHA256")
-    protected String hashAlgo;
+            required = false, description = "Hash algorithm name")
+    protected String hashAlgo = "SHA256";
 
     @Option(name = "-sigalgs",
             required = false, description = "comma-seperated preferred signature algorithms")
@@ -49,28 +49,23 @@ public abstract class AbstractOCSPStatusCommand extends OsgiCommandSupport
 
     @Option(name = "-httpget",
             required = false, description = "Use HTTP GET for small request")
-    protected Boolean useHttpGetForSmallRequest;
+    protected Boolean useHttpGetForSmallRequest = Boolean.FALSE;
 
     @Option(name = "-sign",
             required = false, description = "Sign request")
-    protected Boolean signRequest;
+    protected Boolean signRequest = Boolean.FALSE;
 
     protected OCSPRequestor requestor;
 
     protected URL getServiceURL()
     throws MalformedURLException
     {
-        return new URL(serverURL == null ? DFLT_URL : serverURL);
+        return new URL(serverURL);
     }
 
     protected RequestOptions getRequestOptions()
     throws Exception
     {
-        if(hashAlgo == null)
-        {
-            hashAlgo = "SHA256";
-        }
-
         ASN1ObjectIdentifier hashAlgoOid;
 
         hashAlgo = hashAlgo.trim().toUpperCase();
@@ -97,14 +92,10 @@ public abstract class AbstractOCSPStatusCommand extends OsgiCommandSupport
         }
 
         RequestOptions options = new RequestOptions();
-        options.setUseNonce(useNonce == null ? false : useNonce.booleanValue());
+        options.setUseNonce(useNonce.booleanValue());
         options.setHashAlgorithmId(hashAlgoOid);
-        options.setSignRequest(signRequest == null ? false : signRequest.booleanValue());
-
-        if(useHttpGetForSmallRequest != null)
-        {
-            options.setUseHttpGetForRequest(useHttpGetForSmallRequest.booleanValue());
-        }
+        options.setSignRequest(signRequest.booleanValue());
+        options.setUseHttpGetForRequest(useHttpGetForSmallRequest.booleanValue());
 
         if(prefSigAlgs != null)
         {

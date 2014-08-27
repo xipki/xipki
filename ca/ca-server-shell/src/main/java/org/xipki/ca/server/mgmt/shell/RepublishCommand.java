@@ -56,11 +56,11 @@ public class RepublishCommand extends CaCommand
         boolean successfull = caManager.republishCertificates(caName, publisherNames);
         if(successfull)
         {
-            System.out.println("Replubished certificates");
+            out("Replubished certificates");
         }
         else
         {
-            System.err.println("Replubishing certificates failed");
+            err("Replubishing certificates failed");
         }
         return null;
     }
