@@ -55,19 +55,19 @@ public class CaRevokeCommand extends CaCommand
         CRLReason crlReason = CRLReason.getInstance(reason);
         if(crlReason == null)
         {
-            System.out.println("invalid reason " + reason);
+            err("invalid reason " + reason);
             return null;
         }
 
         if(permitted_reasons.contains(crlReason) == false)
         {
-            System.err.println("reason " + reason + " is not permitted");
+            err("reason " + reason + " is not permitted");
             return null;
         }
 
         if(caManager.getCANames().contains(caName) == false)
         {
-            System.out.println("invalid CA name " + caName);
+            err("invalid CA name " + caName);
             return null;
         }
 

@@ -10,7 +10,6 @@ package org.xipki.security.shell;
 import java.util.Arrays;
 import java.util.List;
 
-import org.apache.felix.gogo.commands.Option;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.x509.KeyUsage;
 import org.xipki.security.common.ObjectIdentifiers;
@@ -21,10 +20,6 @@ import org.xipki.security.common.ObjectIdentifiers;
 
 public abstract class KeyGenCommand extends SecurityCommand
 {
-    @Option(name = "-pwd", aliases = { "--password" },
-            required = false, description = "Password of the PKCS#11 token")
-    protected String password;
-
     protected Integer getKeyUsage()
     throws Exception
     {

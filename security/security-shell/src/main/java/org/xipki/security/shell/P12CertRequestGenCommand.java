@@ -43,8 +43,8 @@ public class P12CertRequestGenCommand extends P12SecurityCommand
     protected String subject;
 
     @Option(name = "-hash",
-            required = false, description = "Hash algorithm name. The default is SHA256")
-    protected String hashAlgo;
+            required = false, description = "Hash algorithm name.")
+    protected String hashAlgo = "SHA256";
 
     @Option(name = "-out",
             required = true, description = "Required. Output file name")
@@ -55,14 +55,7 @@ public class P12CertRequestGenCommand extends P12SecurityCommand
     throws Exception
     {
         Pkcs10RequestGenerator p10Gen = new Pkcs10RequestGenerator();
-
-        if(hashAlgo == null)
-        {
-            hashAlgo = "SHA256";
-        }
-
         ASN1ObjectIdentifier sigAlgOid;
-
         KeyStore keystore = getKeyStore();
         char[] pwd = getPassword();
         boolean ec = isEcKey(keystore, pwd);

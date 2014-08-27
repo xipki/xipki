@@ -27,7 +27,7 @@ public class CaRestartCommand extends CaCommand
         boolean successfull = caManager.restartCaSystem();
         if(successfull == false)
         {
-            System.err.println("Could not restart CA system");
+            err("Could not restart CA system");
             return null;
         }
 
@@ -59,7 +59,7 @@ public class CaRestartCommand extends CaCommand
             sb.append(": no CA is configured");
         }
 
-        System.out.println(sb);
+        out(sb.toString());
         return null;
     }
 }

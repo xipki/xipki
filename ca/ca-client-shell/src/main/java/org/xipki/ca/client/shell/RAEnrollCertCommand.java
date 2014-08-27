@@ -59,18 +59,17 @@ public class RAEnrollCertCommand extends ClientCommand
 
         if(cert == null)
         {
-            System.err.println("No certificate received from the server");
+            err("No certificate received from the server");
+            return null;
         }
-        else
-        {
-            if(outputFile == null)
-            {
-                outputFile = p10File.substring(0, p10File.length() - ".p10".length()) + ".der";
-            }
 
-            File certFile = new File(outputFile);
-            saveVerbose("Certificate saved to file", certFile, cert.getEncoded());
+        if(outputFile == null)
+        {
+            outputFile = p10File.substring(0, p10File.length() - ".p10".length()) + ".der";
         }
+
+        File certFile = new File(outputFile);
+        saveVerbose("Certificate saved to file", certFile, cert.getEncoded());
 
         return null;
     }

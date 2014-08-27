@@ -38,13 +38,6 @@ public interface CAManager
     boolean republishCertificates(String caName, List<String> publisherNames)
     throws CAMgmtException;
 
-    /**
-     *
-     * @param caName {@code null} for all CAs
-     * @param publisherNames {@code null} for all publishers
-     * @return
-     * @throws CAMgmtException
-     */
     boolean clearPublishQueue(String caName, List<String> publisherNames)
     throws CAMgmtException;
 
@@ -150,7 +143,7 @@ public interface CAManager
     throws CAMgmtException;
 
     void changeCrlSigner(String name, String signer_type, String signer_conf, String signer_cert,
-            Integer period, Integer overlap, Boolean includeCerts, Boolean includeExpiredCerts)
+            String crlControl)
     throws CAMgmtException;
 
     CrlSignerEntry getCrlSigner(String name);

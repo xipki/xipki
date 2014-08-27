@@ -26,7 +26,7 @@ keytool:update-cert -slot 1 -key-label RCA1 -cert output/RCA1.der
 ca:caalias-add -ca RCA1 -alias RCA
 
 ## Remove the profile RCA
-ca:profile-rm -name RCA
+ca:profile-rm RCA
 
 ## Add Profiles
 ca:caprofile-add -ca RCA1 -profile RCA-Cross

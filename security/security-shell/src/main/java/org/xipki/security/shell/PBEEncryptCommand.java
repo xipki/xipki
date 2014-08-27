@@ -25,7 +25,7 @@ public class PBEEncryptCommand extends SecurityCommand
         char[] password = readPassword("Please enter the password");
 
         String passwordHint = PBEPasswordResolver.encryptPassword(masterPassword, password);
-        System.out.println("The encrypted password is: '" + passwordHint + "'");
+        out("The encrypted password is: '" + passwordHint + "'");
         return null;
     }
 

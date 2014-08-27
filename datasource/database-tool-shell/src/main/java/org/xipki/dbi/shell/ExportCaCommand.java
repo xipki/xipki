@@ -26,8 +26,8 @@ public class ExportCaCommand extends XipkiOsgiCommandSupport
     private static final int DFLT_NUM_CRLS = 30;
 
     @Option(name = "-dbconf",
-            description = "Database configuration file.\nDefault is " + DFLT_DBCONF_FILE)
-    protected String dbconfFile;
+            description = "Database configuration file")
+    protected String dbconfFile = DFLT_DBCONF_FILE;
 
     @Option(name = "-outdir",
             description = "Required. Output directory",
@@ -35,12 +35,12 @@ public class ExportCaCommand extends XipkiOsgiCommandSupport
     protected String outdir;
 
     @Option(name = "-n",
-            description = "Number of certificates in one zip file. Default is " + DFLT_NUM_CERTS_IN_BUNDLE)
-    protected Integer numCertsInBundle;
+            description = "Number of certificates in one zip file")
+    protected Integer numCertsInBundle = DFLT_NUM_CERTS_IN_BUNDLE;
 
     @Option(name = "-numcrls",
-            description = "Number of CRLs in one zip file. Default is " + DFLT_NUM_CRLS)
-    protected Integer numCrls;
+            description = "Number of CRLs in one zip file")
+    protected Integer numCrls = DFLT_NUM_CRLS;
 
     private DataSourceFactory dataSourceFactory;
     private PasswordResolver passwordResolver;
@@ -49,18 +49,6 @@ public class ExportCaCommand extends XipkiOsgiCommandSupport
     protected Object doExecute()
     throws Exception
     {
-        if(dbconfFile == null)
-        {
-            dbconfFile = DFLT_DBCONF_FILE;
-        }
-        if(numCertsInBundle == null)
-        {
-            numCertsInBundle = DFLT_NUM_CERTS_IN_BUNDLE;
-        }
-        if(numCrls == null)
-        {
-            numCrls = DFLT_NUM_CRLS;
-        }
         CaDbExporter exporter = new CaDbExporter(dataSourceFactory, passwordResolver, dbconfFile, outdir);
         exporter.exportDatabase(numCertsInBundle, numCrls);
         return null;

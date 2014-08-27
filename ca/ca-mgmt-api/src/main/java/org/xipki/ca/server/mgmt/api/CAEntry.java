@@ -33,7 +33,7 @@ import org.xipki.security.common.ParamChecker;
 
 public class CAEntry
 {
-    private static long DAY = 24L * 60 * 60 * 1000;
+    private static long MS_PER_DAY = 24L * 60 * 60 * 1000;
 
     private final String name;
     private final boolean selfSigned;
@@ -130,7 +130,7 @@ public class CAEntry
         this.publicCAInfo = new PublicCAInfo(this.cert.getCert(),
                 this.ocspUris, this.crlUris, this.issuerLocations, this.deltaCrlUris);
 
-        this.noNewCertificateAfter = this.cert.getCert().getNotAfter().getTime() - DAY * expirationPeriod;
+        this.noNewCertificateAfter = this.cert.getCert().getNotAfter().getTime() - MS_PER_DAY * expirationPeriod;
     }
 
     public String getName()

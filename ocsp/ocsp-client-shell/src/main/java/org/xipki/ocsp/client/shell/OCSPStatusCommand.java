@@ -63,7 +63,7 @@ public class OCSPStatusCommand extends AbstractOCSPStatusCommand
 
     @Option(name = "-v", aliases="--verbose",
             required = false, description = "Show status verbosely")
-    protected Boolean verbose;
+    protected Boolean verbose = Boolean.FALSE;
 
     private static final Map<ASN1ObjectIdentifier, String> extensionOidNameMap = new HashMap<>();
     static
@@ -80,7 +80,7 @@ public class OCSPStatusCommand extends AbstractOCSPStatusCommand
     {
         if(serialNumber == null && certFile == null)
         {
-            System.out.println("Neither serialNumber nor certFile is set");
+            err("Neither serialNumber nor certFile is set");
             return null;
         }
 
@@ -109,21 +109,21 @@ public class OCSPStatusCommand extends AbstractOCSPStatusCommand
             basicResp = requestor.ask(caCert, sn, serverUrl, options);
         }catch(OCSPResponseNotSuccessfullException e)
         {
-            System.err.println(e.getMessage());
+            err(e.getMessage());
             return null;
         }
 
         // check the signature if available
         if(null == basicResp.getSignature())
         {
-            System.out.println("Response is not signed");
+            out("Response is not signed");
         }
         else
         {
             X509CertificateHolder[] responderCerts = basicResp.getCerts();
             if(responderCerts == null || responderCerts.length < 1)
             {
-                System.err.println("No responder certificate is contained in the response");
+                err("No responder certificate is contained in the response");
             }
             else
             {
@@ -132,16 +132,16 @@ public class OCSPStatusCommand extends AbstractOCSPStatusCommand
                 boolean sigValid = basicResp.isSignatureValid(cvp);
                 if(sigValid == false)
                 {
-                    System.err.println("Response is equipped with invalid signature");
+                    err("Response is equipped with invalid signature");
                 }
                 else
                 {
-                    System.err.println("Response is equipped with valid signature");
+                    err("Response is equipped with valid signature");
                 }
 
-                if(verbose != null && verbose.booleanValue())
+                if(verbose.booleanValue())
                 {
-                    System.out.println("Responder is " + IoCertUtil.canonicalizeName(responderCerts[0].getSubject()));
+                    out("Responder is " + IoCertUtil.canonicalizeName(responderCerts[0].getSubject()));
                 }
             }
         }
@@ -153,11 +153,11 @@ public class OCSPStatusCommand extends AbstractOCSPStatusCommand
         int n = singleResponses == null ? 0 : singleResponses.length;
         if(n == 0)
         {
-            System.err.println("Received no status from server");
+            err("Received no status from server");
         }
         else if(n != 1)
         {
-            System.err.println("Received status with " + n +
+            err("Received status with " + n +
                     " single responses from server, but 1 was requested");
         }
         else
@@ -221,7 +221,7 @@ public class OCSPStatusCommand extends AbstractOCSPStatusCommand
             StringBuilder msg = new StringBuilder("Certificate status: ");
             msg.append(status);
 
-            if(verbose != null && verbose.booleanValue())
+            if(verbose.booleanValue())
             {
                 msg.append("\nthisUpdate: " + singleResp.getThisUpdate());
                 msg.append("\nnextUpdate: " + singleResp.getNextUpdate());
@@ -313,9 +313,9 @@ public class OCSPStatusCommand extends AbstractOCSPStatusCommand
                 }
             }
 
-            System.out.println(msg.toString());
+            out(msg.toString());
         }
-        System.out.println();
+        out("");
 
         return null;
     }

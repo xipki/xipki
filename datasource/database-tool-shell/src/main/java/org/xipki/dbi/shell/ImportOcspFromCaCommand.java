@@ -25,8 +25,8 @@ public class ImportOcspFromCaCommand extends XipkiOsgiCommandSupport
     private static final String DFLT_PUBLISHER = "OCSP.PUBLISHER";
 
     @Option(name = "-dbconf",
-            description = "Database configuration file.\nDefault is " + DFLT_DBCONF_FILE)
-    protected String dbconfFile;
+            description = "Database configuration file")
+    protected String dbconfFile = DFLT_DBCONF_FILE;
 
     @Option(name = "-indir",
             description = "Required. Input directory",
@@ -34,8 +34,8 @@ public class ImportOcspFromCaCommand extends XipkiOsgiCommandSupport
     protected String indir;
 
     @Option(name = "-publisher",
-            description = "Publisher name. Default is " + DFLT_PUBLISHER)
-    protected String publisherName;
+            description = "Publisher name")
+    protected String publisherName = DFLT_PUBLISHER;
 
     private DataSourceFactory dataSourceFactory;
     private PasswordResolver passwordResolver;
@@ -44,14 +44,6 @@ public class ImportOcspFromCaCommand extends XipkiOsgiCommandSupport
     protected Object doExecute()
     throws Exception
     {
-        if(dbconfFile == null)
-        {
-            dbconfFile = DFLT_DBCONF_FILE;
-        }
-        if(publisherName == null)
-        {
-            publisherName = DFLT_PUBLISHER;
-        }
         OcspFromCaDbImporter importer = new OcspFromCaDbImporter(
                 dataSourceFactory, passwordResolver, dbconfFile, publisherName);
         importer.importDatabase(indir);

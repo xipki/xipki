@@ -24,8 +24,8 @@ public class ImportOcspCommand extends XipkiOsgiCommandSupport
     private static final String DFLT_DBCONF_FILE = "ca-config/ocsp-db.properties";
 
     @Option(name = "-dbconf",
-            description = "Database configuration file.\nDefault is " + DFLT_DBCONF_FILE)
-    protected String dbconfFile;
+            description = "Database configuration file")
+    protected String dbconfFile = DFLT_DBCONF_FILE;
 
     @Option(name = "-indir",
             description = "Required. Input directory",
@@ -39,10 +39,6 @@ public class ImportOcspCommand extends XipkiOsgiCommandSupport
     protected Object doExecute()
     throws Exception
     {
-        if(dbconfFile == null)
-        {
-            dbconfFile = DFLT_DBCONF_FILE;
-        }
         OcspDbImporter importer = new OcspDbImporter(dataSourceFactory, passwordResolver, dbconfFile);
         importer.importDatabase(indir);
         return null;

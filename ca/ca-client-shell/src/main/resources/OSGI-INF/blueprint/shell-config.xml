@@ -7,6 +7,8 @@
   <bean id="caNameCompleter" class="org.xipki.ca.client.shell.completer.CaNameCompleter">
     <property name="raWorker" ref="raWorker"/>
   </bean>
+  <bean id="randomDNCompleter" class="org.xipki.ca.client.shell.completer.RandomDNCompleter"/>
+
   <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.1.0">
     <command name="caclient/enroll">
       <action class="org.xipki.ca.client.shell.RAEnrollCertCommand">
@@ -70,6 +72,7 @@
       </action>
       <optional-completers>
         <entry key="-curve" value-ref="curveNameCompleter"/>
+        <entry key="-randomDN" value-ref="randomDNCompleter"/>
       </optional-completers>
     </command>
   </command-bundle>

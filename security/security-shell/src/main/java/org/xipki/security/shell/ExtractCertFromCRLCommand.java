@@ -49,7 +49,7 @@ public class ExtractCertFromCRLCommand extends SecurityCommand
         byte[] extnValue = crl.getExtensionValue(oidExtnCerts);
         if(extnValue == null)
         {
-            System.out.println("No certificate is contained in " + crlFile);
+            err("No certificate is contained in " + crlFile);
             return null;
         }
 
@@ -58,7 +58,7 @@ public class ExtractCertFromCRLCommand extends SecurityCommand
         int n = asn1Set.size();
         if(n == 0)
         {
-            System.out.println("No certificate is contained in " + crlFile);
+            err("No certificate is contained in " + crlFile);
             return null;
         }
 

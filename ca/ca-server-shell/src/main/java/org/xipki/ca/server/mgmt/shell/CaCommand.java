@@ -8,7 +8,6 @@
 package org.xipki.ca.server.mgmt.shell;
 
 import org.xipki.ca.server.mgmt.api.CAManager;
-import org.xipki.ca.server.mgmt.api.DuplicationMode;
 import org.xipki.console.karaf.XipkiOsgiCommandSupport;
 
 /**
@@ -25,15 +24,6 @@ public abstract class CaCommand extends XipkiOsgiCommandSupport
     public void setCaManager(CAManager caManager)
     {
         this.caManager = caManager;
-    }
-
-    protected DuplicationMode getDuplicationMode(String mode, DuplicationMode defaultMode)
-    {
-        if(mode == null)
-        {
-            return defaultMode;
-        }
-        return DuplicationMode.getInstance(mode);
     }
 
     protected static String getRealString(String s)

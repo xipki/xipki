@@ -59,7 +59,7 @@ public class EnvListCommand extends CaCommand
             sb.append(name).append("\n\t").append(paramValue);
         }
 
-        System.out.println(sb.toString());
+        out(sb.toString());
 
         return null;
     }

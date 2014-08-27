@@ -22,7 +22,6 @@ public class ClientCRLReasonCompleter extends EnumCompleter
 
         for(CRLReason reason : CRLReason.PERMITTED_CLIENT_CRLREASONS)
         {
-            enums.append(Integer.toString(reason.getCode())).append(",");
             enums.append(reason.getDescription()).append(",");
         }
         enums.deleteCharAt(enums.length() - 1);

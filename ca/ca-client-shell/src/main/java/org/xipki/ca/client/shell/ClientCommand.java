@@ -16,7 +16,7 @@ import org.xipki.console.karaf.XipkiOsgiCommandSupport;
 
 public abstract class ClientCommand extends XipkiOsgiCommandSupport
 {
-    protected RAWorker            raWorker;
+    protected RAWorker raWorker;
 
     public final void setRaWorker(RAWorker raWorker)
     {

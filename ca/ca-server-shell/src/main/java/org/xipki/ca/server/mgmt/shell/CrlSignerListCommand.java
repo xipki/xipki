@@ -29,7 +29,7 @@ public class CrlSignerListCommand extends CaCommand
 
     @Option(name = "-v", aliases="--verbose",
             required = false, description = "Show CRL signer information verbosely")
-    protected Boolean verbose;
+    protected Boolean verbose = Boolean.FALSE;
 
     @Override
     protected Object doExecute()
@@ -64,11 +64,11 @@ public class CrlSignerListCommand extends CaCommand
             CrlSignerEntry entry = caManager.getCrlSigner(name);
             if(entry != null)
             {
-                sb.append(entry.toString(verbose == null ? false :verbose.booleanValue()));
+                sb.append(entry.toString(verbose.booleanValue()));
             }
         }
 
-        System.out.println(sb.toString());
+        out(sb.toString());
 
         return null;
     }

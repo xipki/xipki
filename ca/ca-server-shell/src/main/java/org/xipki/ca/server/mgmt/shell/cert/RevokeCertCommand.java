@@ -29,7 +29,7 @@ public class RevokeCertCommand extends CaCommand
     @Option(name = "-serial",
             required = true,
             description = "Serial number")
-    protected Long   serialNumber;
+    protected Long serialNumber;
 
     @Option(name = "-reason",
             required = true,
@@ -41,7 +41,7 @@ public class RevokeCertCommand extends CaCommand
                     "5: cessationOfOperation\n" +
                     "6: certificateHold\n" +
                     "9: privilegeWithdrawn")
-    protected String           reason;
+    protected String reason;
 
     @Override
     protected Object doExecute()
@@ -50,20 +50,20 @@ public class RevokeCertCommand extends CaCommand
         CAEntry ca = caManager.getCA(caName);
         if(ca == null)
         {
-            System.err.println("CA " + caName + " not available");
+            err("CA " + caName + " not available");
             return null;
         }
 
         CRLReason crlReason = CRLReason.getInstance(reason);
         if(crlReason == null)
         {
-            System.out.println("invalid reason " + reason);
+            err("invalid reason " + reason);
             return null;
         }
 
         if(CRLReason.PERMITTED_CLIENT_CRLREASONS.contains(crlReason) == false)
         {
-            System.err.println("reason " + reason + " is not permitted");
+            err("reason " + reason + " is not permitted");
             return null;
         }
 
@@ -71,11 +71,11 @@ public class RevokeCertCommand extends CaCommand
 
         if(successful)
         {
-            System.out.println("Revoked certificate");
+            out("Revoked certificate");
         }
         else
         {
-            System.out.println("Could not revoke certificate");
+            err("Could not revoke certificate");
         }
 
         return null;

@@ -39,39 +39,27 @@ public class CaAddCommand extends CaAddOrGenCommand
     {
         if(nextSerial < 0)
         {
-            System.err.println("invalid serial number: " + nextSerial);
+            err("invalid serial number: " + nextSerial);
             return null;
         }
 
-        if(numCrls == null)
+        if(numCrls < 0)
         {
-            numCrls = 30;
-        }
-        else if(numCrls < 0)
-        {
-            System.err.println("invalid numCrls: " + numCrls);
+            err("invalid numCrls: " + numCrls);
             return null;
         }
 
-        if(expirationPeriod == null)
+        if(expirationPeriod < 0)
         {
-            expirationPeriod = 365;
-        }
-        else if(expirationPeriod < 0)
-        {
-            System.err.println("invalid expirationPeriod: " + expirationPeriod);
+            err("invalid expirationPeriod: " + expirationPeriod);
             return null;
         }
 
-        CAStatus status = CAStatus.ACTIVE;
-        if(caStatus != null)
+        CAStatus status = CAStatus.getCAStatus(caStatus);
+        if(status == null)
         {
-            status = CAStatus.getCAStatus(caStatus);
-            if(status == null)
-            {
-                System.out.println("invalid status: " + caStatus);
-                return null;
-            }
+            err("invalid status: " + caStatus);
+            return null;
         }
 
         X509Certificate caCert = null;
@@ -96,20 +84,25 @@ public class CaAddCommand extends CaAddOrGenCommand
         CAEntry entry = new CAEntry(caName, nextSerial, signerType, signerConf, caCert,
                 ocspUris, crlUris, deltaCrlUris, null, numCrls.intValue(), expirationPeriod.intValue());
 
-        DuplicationMode duplicateKey = getDuplicationMode(duplicateKeyI, DuplicationMode.FORBIDDEN_WITHIN_PROFILE);
+        DuplicationMode duplicateKey = DuplicationMode.getInstance(duplicateKeyS);
+        if(duplicateKey == null)
+        {
+              err("invalid duplication mode: " + duplicateKeyS);
+        }
         entry.setDuplicateKeyMode(duplicateKey);
 
-        DuplicationMode duplicateSubject = getDuplicationMode(duplicateSubjectI, DuplicationMode.FORBIDDEN_WITHIN_PROFILE);
+        DuplicationMode duplicateSubject = DuplicationMode.getInstance(duplicateSubjectS);
+        if(duplicateSubject == null)
+        {
+              err("invalid duplication mode: " + duplicateSubjectS);
+        }
         entry.setDuplicateSubjectMode(duplicateSubject);
 
-        ValidityMode validityMode = null;
-        if(validityModeS != null)
-        {
-            validityMode = ValidityMode.getInstance(validityModeS);
-        }
+        ValidityMode validityMode = ValidityMode.getInstance(validityModeS);
         if(validityMode == null)
         {
-            validityMode = ValidityMode.STRICT;
+            err("invalid validity: " + validityModeS);
+            return null;
         }
         entry.setValidityMode(validityMode);
 

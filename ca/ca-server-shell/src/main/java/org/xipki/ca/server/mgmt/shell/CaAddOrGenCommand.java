@@ -25,8 +25,8 @@ public abstract class CaAddOrGenCommand extends CaCommand
     protected String caName;
 
     @Option(name = "-status",
-            description = "CA status, active|pending|deactivated, default is active")
-    protected String caStatus;
+            description = "CA status, active|pending|deactivated")
+    protected String caStatus = "active";
 
     @Option(name = "-ocspUri",
             description = "OCSP URI, multi options is allowed",
@@ -65,12 +65,11 @@ public abstract class CaAddOrGenCommand extends CaCommand
 
     @Option(name = "-numCrls",
             description = "Number of CRLs to be kept in database")
-    protected Integer numCrls;
+    protected Integer numCrls = 30;
 
     @Option(name = "-expirationPeriod",
-            description = "Days before expiration time of CA to issue certificates,\n"
-                    + "the default is 365")
-    protected Integer expirationPeriod;
+            description = "Days before expiration time of CA to issue certificates")
+    protected Integer expirationPeriod = 365;
 
     @Option(name = "-signerType",
             description = "Required. CA signer type",
@@ -85,26 +84,23 @@ public abstract class CaAddOrGenCommand extends CaCommand
             description = "Mode of duplicate key.\n"
                     + "\t1: forbidden\n"
                     + "\t2: forbiddenWithinProfile\n"
-                    + "\t3: allowed\n"
-                    + "the default is 2")
-    protected String duplicateKeyI;
+                    + "\t3: allowed")
+    protected String duplicateKeyS = "forbiddenWithinProfile";
 
     @Option(name = "-ds", aliases = { "--duplicateSubject" },
             description = "Mode of duplicate subject.\n"
                     + "\t1: forbidden\n"
                     + "\t2: forbiddenWithinProfile\n"
-                    + "\t3: allowed\n"
-                    + "the default is 2")
-    protected String duplicateSubjectI;
+                    + "\t3: allowed")
+    protected String duplicateSubjectS = "forbiddenWithinProfile";
 
     @Option(name = "-validityMode",
             description = "Mode of valditity.\n"
                     + "\tSTRICT: Reject if the notBefore + validity behinds CA's notAfter \n"
                     + "\tLAX:    notBefore + validity after CA's notAfter is permitted\n"
                     + "\tCUTOFF: notAfter of issued certificates will be set to the earlier time of\n"
-                    + "\t        notBefore + validigty and CA's notAfter\n"
-                    + "the default is STRICT")
-    protected String validityModeS;
+                    + "\t        notBefore + validigty and CA's notAfter")
+    protected String validityModeS = "STRICT";
 
     protected SecurityFactory securityFactory;
     protected PasswordResolver passwordResolver;

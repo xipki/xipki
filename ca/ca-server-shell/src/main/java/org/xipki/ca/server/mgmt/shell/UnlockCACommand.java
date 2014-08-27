@@ -24,11 +24,11 @@ public class UnlockCACommand extends CaCommand
 
         if(unlocked)
         {
-            System.out.println("Unlocked CA system, calling ca:ca-restart to restart CA system");
+            out("Unlocked CA system, calling ca:ca-restart to restart CA system");
         }
         else
         {
-            System.err.println("Could not unlock CA system");
+            err("Could not unlock CA system");
         }
 
         return null;
