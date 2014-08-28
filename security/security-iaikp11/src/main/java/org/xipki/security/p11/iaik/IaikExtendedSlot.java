@@ -430,10 +430,11 @@ public class IaikExtendedSlot
 
            try
            {
-            if (isProtectedAuthenticationPath | password == null || password.isEmpty())
+            if (isProtectedAuthenticationPath || password == null || password.isEmpty())
             {
                 LOG.info("verify on PKCS11Module with PROTECTED_AUTHENTICATION_PATH");
-                session.login(Session.UserType.USER, null);
+                // some driver does not accept null PIN
+                session.login(Session.UserType.USER, "".toCharArray());
                 this.password = null;
             }
             else

@@ -73,8 +73,6 @@ public class P11ListSlotCommand extends SecurityCommand
         if(slotIndex == null)
         {
             // list all slots
-            Collections.sort(slots);
-
             int n = slots.size();
 
             if(n == 0 || n == 1)
