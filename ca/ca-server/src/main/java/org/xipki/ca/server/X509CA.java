@@ -561,7 +561,7 @@ public class X509CA
             }
 
             startSerial = BigInteger.ONE;
-            if(control.isEmbedsCerts()) // XiPKI extension
+            if(deltaCRL == false && control.isEmbedsCerts()) // XiPKI extension
             {
                 ASN1EncodableVector vector = new ASN1EncodableVector();
 
