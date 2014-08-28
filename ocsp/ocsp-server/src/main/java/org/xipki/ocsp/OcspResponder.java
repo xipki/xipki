@@ -478,14 +478,13 @@ public class OcspResponder
                 CrlStoreType crlStoreConf = storeConf.getCrlStore();
                 String caCertFile = crlStoreConf.getCaCertFile();
                 String issuerCertFile = crlStoreConf.getIssuerCertFile();
-                String crlUrl = crlStoreConf.getCrlUrl();
-                String crlFile = crlStoreConf.getCrlFile();
 
                 X509Certificate caCert = parseCert(caCertFile);
                 X509Certificate crlIssuerCert = issuerCertFile == null ? null : parseCert(issuerCertFile);
 
                 CrlCertStatusStore crlStore = new CrlCertStatusStore(storeConf.getName(),
-                        crlFile, caCert, crlIssuerCert, crlUrl);
+                        crlStoreConf.getCrlFile(), crlStoreConf.getDeltaCrlFile(),
+                        caCert, crlIssuerCert, crlStoreConf.getCrlUrl());
                 store = crlStore;
 
                 crlStore.setUseUpdateDatesFromCRL(

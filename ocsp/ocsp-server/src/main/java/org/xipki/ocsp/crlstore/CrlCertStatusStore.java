@@ -18,7 +18,9 @@ import java.security.cert.X509Certificate;
 import java.text.ParseException;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -100,7 +102,8 @@ public class CrlCertStatusStore extends CertStatusStore
 
     private final X509Certificate caCert;
     private final X509Certificate issuerCert;
-    private final String crlFile;
+    private final String crlFilename;
+    private final String deltaCrlFilename;
     private final SHA1Digest sha1;
     private final String crlUrl;
     private final Date caNotBefore;
@@ -112,7 +115,10 @@ public class CrlCertStatusStore extends CertStatusStore
     private CrlID crlID;
 
     private byte[] fpOfCrlFile;
-    private long   lastmodifiedOfCrlFile = 0;
+    private long lastmodifiedOfCrlFile = 0;
+
+    private byte[] fpOfDeltaCrlFile;
+    private long lastModifiedOfDeltaCrlFile = 0;
 
     private Date thisUpdate;
     private Date nextUpdate;
@@ -126,24 +132,27 @@ public class CrlCertStatusStore extends CertStatusStore
     public CrlCertStatusStore(
             String name,
             String crlFile,
+            String deltaCrlFile,
             X509Certificate caCert,
             String crlUrl)
     {
-        this(name, crlFile, caCert, null, crlUrl);
+        this(name, crlFile, (String) null, caCert, (X509Certificate) null, crlUrl);
     }
 
     public CrlCertStatusStore(
             String name,
-            String crlFile,
+            String crlFilename,
+            String deltaCrlFilename,
             X509Certificate caCert,
             X509Certificate issuerCert,
             String crlUrl)
     {
         super(name);
-        ParamChecker.assertNotEmpty("crlFile", crlFile);
+        ParamChecker.assertNotEmpty("crlFile", crlFilename);
         ParamChecker.assertNotNull("caCert", caCert);
 
-        this.crlFile = crlFile;
+        this.crlFilename = IoCertUtil.expandFilepath(crlFilename);
+        this.deltaCrlFilename = deltaCrlFilename == null ? null : IoCertUtil.expandFilepath(deltaCrlFilename);
         this.caCert = caCert;
         this.issuerCert = issuerCert;
         this.crlUrl = crlUrl;
@@ -164,72 +173,89 @@ public class CrlCertStatusStore extends CertStatusStore
 
         try
         {
-            File f = new File(IoCertUtil.expandFilepath(crlFile));
-            if(f.exists() == false)
+            File fullCrlFile = new File(crlFilename);
+            if(fullCrlFile.exists() == false)
             {
                 // file does not exist
-                LOG.warn("CRL File {} does not exist", crlFile);
+                LOG.warn("CRL File {} does not exist", crlFilename);
                 return;
             }
 
-            long newLastModifed = f.lastModified();
+            long newLastModifed = fullCrlFile.lastModified();
+
+            boolean deltaCrlExists;
+            File deltaCrlFile = null;
+            if(deltaCrlFilename != null)
+            {
+                deltaCrlFile = new File(deltaCrlFilename);
+                deltaCrlExists = deltaCrlFile.exists();
+            }
+            else
+            {
+                deltaCrlExists = false;
+            }
+
+            long newLastModifedOfDeltaCrl = deltaCrlExists ? deltaCrlFile.lastModified() : 0;
 
             if(force  == false)
             {
-                if(newLastModifed == lastmodifiedOfCrlFile)
-                {
-                    return;
-                }
-
                 long now = System.currentTimeMillis();
-                if(now - newLastModifed < 5000)
+                if(newLastModifed != lastmodifiedOfCrlFile)
                 {
-                    return; // still in copy process
-                }
-            }
-
-            byte[] newFp = null;
-            synchronized (sha1)
-            {
-                sha1.reset();
-                FileInputStream in = new FileInputStream(f);
-                byte[] buffer = new byte[1024];
-                int readed;
-
-                try
-                {
-                    while((readed = in.read(buffer)) != -1)
+                    if(now - newLastModifed < 5000)
                     {
-                        if(readed > 0)
+                        return; // still in copy process
+                    }
+                }
+
+                if(deltaCrlExists)
+                {
+                    if(newLastModifedOfDeltaCrl != lastModifiedOfDeltaCrlFile)
+                    {
+                        if(now - newLastModifed < 5000)
                         {
-                            sha1.update(buffer, 0, readed);
+                            return; // still in copy process
                         }
                     }
-                }finally
-                {
-                    try
-                    {
-                        in.close();
-                    }catch(IOException e)
-                    {
-                    }
                 }
-
-                newFp = new byte[20];
-                sha1.doFinal(newFp, 0);
             }
 
-            if(Arrays.equals(newFp, fpOfCrlFile))
+            byte[] newFp = sha1Fp(fullCrlFile);
+            boolean crlFileChanged = Arrays.equals(newFp, fpOfCrlFile) == false;
+
+            if(crlFileChanged == false)
             {
                 auditLogPCIEvent(AuditLevel.INFO, "UPDATE_CERTSTORE", "current CRL is still up-to-date");
                 return;
             }
 
-            LOG.info("CRL file {} has changed, updating of the CertStore required", crlFile);
+            byte[] newFpOfDeltaCrl = deltaCrlExists ? sha1Fp(deltaCrlFile) : null;
+            boolean deltaCrlFileChanged = Arrays.equals(newFpOfDeltaCrl, fpOfDeltaCrlFile);
+
+            if(crlFileChanged == false && deltaCrlFileChanged == false)
+            {
+                return;
+            }
+
+            if(crlFileChanged)
+            {
+                LOG.info("CRL file {} has changed, updating of the CertStore required", crlFilename);
+            }
+            if(deltaCrlFileChanged)
+            {
+                LOG.info("DeltaCRL file {} has changed, updating of the CertStore required", deltaCrlFilename);
+            }
+
             auditLogPCIEvent(AuditLevel.INFO, "UPDATE_CERTSTORE", "a newer version of CRL is available");
             updateCRLSuccessfull = false;
 
-            X509CRL crl = IoCertUtil.parseCRL(crlFile);
+            X509CRL crl = IoCertUtil.parseCRL(crlFilename);
+            BigInteger crlNumber;
+            {
+                byte[] octetString = crl.getExtensionValue(Extension.cRLNumber.getId());
+                byte[] extnValue = DEROctetString.getInstance(octetString).getOctets();
+                crlNumber = ASN1Integer.getInstance(extnValue).getPositiveValue();
+            }
 
             X500Principal issuer = crl.getIssuerX500Principal();
 
@@ -241,7 +267,7 @@ public class CrlCertStatusStore extends CertStatusStore
                 {
                     if(issuerCert.getSubjectX500Principal().equals(issuer) == false)
                     {
-                        throw new IllegalArgumentException("The issuerCert and crl do not match");
+                        throw new IllegalArgumentException("The issuerCert and CRL do not match");
                     }
                 }
                 else
@@ -250,16 +276,65 @@ public class CrlCertStatusStore extends CertStatusStore
                 }
             }
 
+            X509Certificate crlSignerCert = caAsCrlIssuer ? caCert : issuerCert;
             try
             {
-                crl.verify((caAsCrlIssuer ? caCert : issuerCert).getPublicKey());
+                crl.verify(crlSignerCert.getPublicKey());
             }catch(Exception e)
             {
                 throw new CertStatusStoreException(e);
             }
 
-            Date newThisUpdate = crl.getThisUpdate();
-            Date newNextUpdate = crl.getNextUpdate();
+            X509CRL deltaCrl = null;
+            BigInteger deltaCrlNumber = null;
+            BigInteger baseCrlNumber = null;
+
+            if(deltaCrlExists)
+            {
+                deltaCrl = IoCertUtil.parseCRL(deltaCrlFilename);
+                byte[] octetString = deltaCrl.getExtensionValue(Extension.deltaCRLIndicator.getId());
+                if(octetString == null)
+                {
+                    deltaCrl = null;
+                    LOG.warn("{} is a full CRL instead of delta CRL, ignore it", deltaCrlFilename);
+                }
+                else
+                {
+                    byte[] extnValue = DEROctetString.getInstance(octetString).getOctets();
+                    baseCrlNumber = ASN1Integer.getInstance(extnValue).getPositiveValue();
+                    if(baseCrlNumber.equals(crlNumber) == false)
+                    {
+                        deltaCrl = null;
+                        LOG.info("{} is not a deltaCRL for the CRL {}, ignore it", deltaCrlFilename, crlFilename);
+                    }
+                    else
+                    {
+                        octetString = deltaCrl.getExtensionValue(Extension.cRLNumber.getId());
+                        extnValue = DEROctetString.getInstance(octetString).getOctets();
+                        deltaCrlNumber = ASN1Integer.getInstance(extnValue).getPositiveValue();
+                    }
+                }
+            }
+
+            if(crlFileChanged == false && deltaCrl == null)
+            {
+                return;
+            }
+
+            Date newThisUpdate;
+            Date newNextUpdate;
+
+            if(deltaCrl != null)
+            {
+                LOG.info("Try to update CRL with CRLNumber={} and DeltaCRL with CRLNumber={}", crlNumber, deltaCrlNumber);
+                newThisUpdate = deltaCrl.getThisUpdate();
+                newNextUpdate = deltaCrl.getNextUpdate();
+            }
+            else
+            {
+                newThisUpdate = crl.getThisUpdate();
+                newNextUpdate = crl.getNextUpdate();
+            }
 
             // Construct CrlID
             ASN1EncodableVector v = new ASN1EncodableVector();
@@ -267,12 +342,12 @@ public class CrlCertStatusStore extends CertStatusStore
             {
                 v.add(new DERTaggedObject(true, 0, new DERIA5String(crlUrl, true)));
             }
-            byte[] extValue = crl.getExtensionValue(Extension.cRLNumber.getId());
+            byte[] extValue = (deltaCrlExists ? deltaCrl : crl).getExtensionValue(Extension.cRLNumber.getId());
             if(extValue != null)
             {
-                ASN1Integer crlNumber = ASN1Integer.getInstance(
+                ASN1Integer asn1CrlNumber = ASN1Integer.getInstance(
                         removingTagAndLenFromExtensionValue(extValue));
-                v.add(new DERTaggedObject(true, 1, crlNumber));
+                v.add(new DERTaggedObject(true, 1, asn1CrlNumber));
             }
             v.add(new DERTaggedObject(true, 2, new DERGeneralizedTime(newThisUpdate)));
             this.crlID = CrlID.getInstance(new DERSequence(v));
@@ -310,7 +385,7 @@ public class CrlCertStatusStore extends CertStatusStore
 
             X500Name caName = X500Name.getInstance(caCert.getSubjectX500Principal().getEncoded());
 
-            // extract the certificate
+            // extract the certificate, only in full CRL, not in delta CRL
             boolean certsIncluded = false;
             Set<CertWithInfo> certs = new HashSet<>();
             String oidExtnCerts = CustomObjectIdentifiers.id_crl_certset;
@@ -352,10 +427,25 @@ public class CrlCertStatusStore extends CertStatusStore
 
             Map<BigInteger, CrlCertStatusInfo> newCertStatusInfoMap = new ConcurrentHashMap<>();
 
-            Set<? extends X509CRLEntry> revokedCertList = crl.getRevokedCertificates();
-            if(revokedCertList != null)
+            // First consider only full CRL
+            Set<? extends X509CRLEntry> revokedCertListInFullCRL = crl.getRevokedCertificates();
+            for(X509CRLEntry revokedCert : revokedCertListInFullCRL)
             {
-                for(X509CRLEntry revokedCert : revokedCertList)
+                X500Principal thisIssuer = revokedCert.getCertificateIssuer();
+                if(thisIssuer != null)
+                {
+                    if(caCert.getSubjectX500Principal().equals(thisIssuer) == false)
+                    {
+                        throw new CertStatusStoreException("Invalid CRLEntry");
+                    }
+                }
+            }
+
+            Set<? extends X509CRLEntry> revokedCertListInDeltaCRL = null;
+            if(deltaCrl != null)
+            {
+                revokedCertListInDeltaCRL = deltaCrl.getRevokedCertificates();
+                for(X509CRLEntry revokedCert : revokedCertListInDeltaCRL)
                 {
                     X500Principal thisIssuer = revokedCert.getCertificateIssuer();
                     if(thisIssuer != null)
@@ -365,7 +455,50 @@ public class CrlCertStatusStore extends CertStatusStore
                             throw new CertStatusStoreException("Invalid CRLEntry");
                         }
                     }
+                }
+            }
 
+            Map<BigInteger, X509CRLEntry> revokedCertMap = null;
+
+            // merge the revoked list
+            if(revokedCertListInDeltaCRL != null && revokedCertListInDeltaCRL.isEmpty() == false)
+            {
+                revokedCertMap = new HashMap<BigInteger, X509CRLEntry>();
+                for(X509CRLEntry entry : revokedCertListInFullCRL)
+                {
+                    revokedCertMap.put(entry.getSerialNumber(), entry);
+                }
+
+                for(X509CRLEntry entry : revokedCertListInDeltaCRL)
+                {
+                    BigInteger serialNumber = entry.getSerialNumber();
+                    java.security.cert.CRLReason reason = entry.getRevocationReason();
+                    if(reason == java.security.cert.CRLReason.REMOVE_FROM_CRL)
+                    {
+                        revokedCertMap.remove(serialNumber);
+                    }
+                    else
+                    {
+                        revokedCertMap.put(serialNumber, entry);
+                    }
+                }
+            }
+
+            Iterator<? extends X509CRLEntry> it = null;
+            if(revokedCertMap != null)
+            {
+                it = revokedCertMap.values().iterator();
+            }
+            else if(revokedCertListInFullCRL != null)
+            {
+                it = revokedCertListInFullCRL.iterator();
+            }
+
+            if(it != null)
+            {
+                while(it.hasNext())
+                {
+                    X509CRLEntry revokedCert = it.next();
                     BigInteger serialNumber = revokedCert.getSerialNumber();
                     byte[] encodedExtnValue = revokedCert.getExtensionValue(Extension.reasonCode.getId());
 
@@ -472,6 +605,10 @@ public class CrlCertStatusStore extends CertStatusStore
             this.initialized = false;
             this.lastmodifiedOfCrlFile = newLastModifed;
             this.fpOfCrlFile = newFp;
+
+            this.lastModifiedOfDeltaCrlFile = newLastModifedOfDeltaCrl;
+            this.fpOfDeltaCrlFile = newFpOfDeltaCrl;
+
             this.issuerHashMap.clear();
             this.issuerHashMap.putAll(newIssuerHashMap);
             this.certStatusInfoMap.clear();
@@ -743,6 +880,41 @@ public class CrlCertStatusStore extends CertStatusStore
     public void setCaRevocationTime(Date caRevocationTime)
     {
         this.caRevocationTime = caRevocationTime;
+    }
+
+    private final byte[] sha1Fp(File file)
+    throws IOException
+    {
+        synchronized (sha1)
+        {
+            sha1.reset();
+            FileInputStream in = new FileInputStream(file);
+            byte[] buffer = new byte[1024];
+            int readed;
+
+            try
+            {
+                while((readed = in.read(buffer)) != -1)
+                {
+                    if(readed > 0)
+                    {
+                        sha1.update(buffer, 0, readed);
+                    }
+                }
+            }finally
+            {
+                try
+                {
+                    in.close();
+                }catch(IOException e)
+                {
+                }
+            }
+
+            byte[] fp = new byte[20];
+            sha1.doFinal(fp, 0);
+            return fp;
+        }
     }
 
 }
