@@ -324,7 +324,7 @@ class CertStoreQueryExecutor
         StringBuilder sqlBuilder = new StringBuilder("DELETE FROM DELTACRL_CACHE");
         if(caCert != null)
         {
-            sqlBuilder.append("WHERE CAINFO_ID=?");
+            sqlBuilder.append(" WHERE CAINFO_ID=?");
         }
 
         PreparedStatement ps = borrowPreparedStatement(sqlBuilder.toString());
