@@ -16,6 +16,8 @@ import java.net.MalformedURLException;
 import java.net.URL;
 
 import org.xipki.security.api.SignerException;
+import org.xipki.security.api.p11.P11ModuleConf;
+import org.xipki.security.common.CmpUtf8Pairs;
 import org.xipki.security.common.ParamChecker;
 
 /**
@@ -27,15 +29,25 @@ class DefaultRemoteP11CryptService extends RemoteP11CryptService
     private static final String CMP_REQUEST_MIMETYPE = "application/pkixcmp";
     private static final String CMP_RESPONSE_MIMETYPE = "application/pkixcmp";
 
-    private URL serverUrl;
+    private URL _serverUrl;
+    private final String serverUrl;
 
-    DefaultRemoteP11CryptService(String url)
+    DefaultRemoteP11CryptService(P11ModuleConf moduleConf)
     {
-        ParamChecker.assertNotEmpty("url", url);
+        super(moduleConf);
+
+        ParamChecker.assertNotNull("moduleConf", moduleConf);
+
+        CmpUtf8Pairs conf = new CmpUtf8Pairs(moduleConf.getNativeLibrary());
+        serverUrl = conf.getValue("url");
+        if(serverUrl == null || serverUrl.isEmpty())
+        {
+            throw new IllegalArgumentException("url is not specified");
+        }
 
         try
         {
-            this.serverUrl = new URL(url);
+            _serverUrl = new URL(serverUrl);
         } catch (MalformedURLException e)
         {
             throw new IllegalArgumentException("Invalid url: " + serverUrl);
@@ -46,7 +58,7 @@ class DefaultRemoteP11CryptService extends RemoteP11CryptService
     public byte[] send(byte[] request)
     throws IOException
     {
-        HttpURLConnection httpUrlConnection = (HttpURLConnection) serverUrl.openConnection();
+        HttpURLConnection httpUrlConnection = (HttpURLConnection) _serverUrl.openConnection();
         httpUrlConnection.setDoOutput(true);
         httpUrlConnection.setUseCaches(false);
 
@@ -114,6 +126,11 @@ class DefaultRemoteP11CryptService extends RemoteP11CryptService
     public void refresh()
     throws SignerException
     {
+    }
+
+    public String getServerUrl()
+    {
+        return serverUrl;
     }
 
 }

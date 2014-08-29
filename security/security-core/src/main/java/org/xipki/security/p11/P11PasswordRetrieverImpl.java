@@ -69,7 +69,14 @@ public class P11PasswordRetrieverImpl implements P11PasswordRetriever
             List<char[]> ret = new ArrayList<char[]>(singlePasswords.size());
             for(String singlePassword : singlePasswords)
             {
-                   ret.add(passwordResolver.resolvePassword(singlePassword));
+                if(passwordResolver ==null)
+                {
+                    ret.add(singlePassword.toCharArray());
+                }
+                else
+                {
+                    ret.add(passwordResolver.resolvePassword(singlePassword));
+                }
             }
 
             return ret;
@@ -97,11 +104,6 @@ public class P11PasswordRetrieverImpl implements P11PasswordRetriever
         if(singleRetrievers.isEmpty())
         {
             return null;
-        }
-
-        if(passwordResolver == null)
-        {
-            throw new PasswordResolverException("passwordResolver is not set");
         }
 
         for(SingleRetriever sr : singleRetrievers)

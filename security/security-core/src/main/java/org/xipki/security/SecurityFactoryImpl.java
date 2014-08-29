@@ -63,6 +63,7 @@ import org.xipki.security.api.PasswordResolver;
 import org.xipki.security.api.PasswordResolverException;
 import org.xipki.security.api.SecurityFactory;
 import org.xipki.security.api.SignerException;
+import org.xipki.security.api.p11.P11Control;
 import org.xipki.security.api.p11.P11CryptService;
 import org.xipki.security.api.p11.P11CryptServiceFactory;
 import org.xipki.security.api.p11.P11KeyIdentifier;
@@ -100,9 +101,8 @@ public class SecurityFactoryImpl implements SecurityFactory
     private String pkcs11Provider;
     private int defaultParallelism = 20;
 
-    private String defaultPkcs11ModuleName;
-    private Map<String, P11ModuleConf> p11ModuleConfs;
-    private Set<String> p11ModuleConfNames;
+    private P11Control p11Control;
+
     private P11CryptServiceFactory p11CryptServiceFactory;
     private boolean p11CryptServiciceFactoryInitialized;
 
@@ -413,15 +413,17 @@ public class SecurityFactoryImpl implements SecurityFactory
                 {
                     if(passwordResolver == null)
                     {
-                        throw new IllegalStateException(
-                                "PasswordResolver is not initialized, please call setPasswordResolver first");
+                        password = passwordHint.toCharArray();
                     }
-                    try
+                    else
                     {
-                        password = passwordResolver.resolvePassword(passwordHint);
-                    }catch(PasswordResolverException e)
-                    {
-                        throw new SignerException("Could not resolve password. Message: " + e.getMessage());
+                        try
+                        {
+                            password = passwordResolver.resolvePassword(passwordHint);
+                        }catch(PasswordResolverException e)
+                        {
+                            throw new SignerException("Could not resolve password. Message: " + e.getMessage());
+                        }
                     }
                 }
 
@@ -657,7 +659,7 @@ public class SecurityFactoryImpl implements SecurityFactory
     public Set<String> getPkcs11ModuleNames()
     {
         initPkcs11ModuleConf();
-        return p11ModuleConfNames;
+        return p11Control == null ? null : p11Control.getModuleNames();
     }
 
     private synchronized void initP11CryptServiceFactory()
@@ -691,7 +693,7 @@ public class SecurityFactoryImpl implements SecurityFactory
             if(p11Provider instanceof P11CryptServiceFactory)
             {
                 P11CryptServiceFactory p11CryptServiceFact = (P11CryptServiceFactory) p11Provider;
-                p11CryptServiceFact.init(defaultPkcs11ModuleName, p11ModuleConfs.values());
+                p11CryptServiceFact.init(p11Control);
                 this.p11CryptServiceFactory = p11CryptServiceFact;
             }
             else
@@ -706,14 +708,14 @@ public class SecurityFactoryImpl implements SecurityFactory
 
     private void initPkcs11ModuleConf()
     {
-        if(p11ModuleConfs != null)
+        if(p11Control != null)
         {
             return;
         }
 
         if(pkcs11ConfFile == null || pkcs11ConfFile.isEmpty())
         {
-            Map<String, P11ModuleConf> confs = new HashMap<>();
+            Set<P11ModuleConf> confs = new HashSet<>();
 
             if(pkcs11Provider == null | pkcs11Provider.isEmpty())
             {
@@ -722,11 +724,9 @@ public class SecurityFactoryImpl implements SecurityFactory
             {
                 P11ModuleConf conf = new P11ModuleConf(DEFAULT_P11MODULE_NAME, pkcs11Module,
                         P11NullPasswordRetriever.INSTANCE, pkcs11IncludeSlots, pkcs11ExcludeSlots);
-                defaultPkcs11ModuleName = DEFAULT_P11MODULE_NAME;
-                confs.put(DEFAULT_P11MODULE_NAME, conf);
+                confs.add(conf);
             }
-
-            this.p11ModuleConfs = confs;
+            this.p11Control = new P11Control(DEFAULT_P11MODULE_NAME, confs);
         }
         else
         {
@@ -750,6 +750,11 @@ public class SecurityFactoryImpl implements SecurityFactory
                     if(DEFAULT_P11MODULE_NAME.equals(name))
                     {
                         throw new ConfigurationException("invald module name " + DEFAULT_P11MODULE_NAME + ", it is reserved");
+                    }
+
+                    if(confs.containsKey(name))
+                    {
+                        throw new ConfigurationException("Multiple modules with the same module name is not permitted");
                     }
 
                     P11PasswordRetriever pwdRetriever;
@@ -822,7 +827,8 @@ public class SecurityFactoryImpl implements SecurityFactory
                         throw new ConfigurationException("No permission to access PKCS#11 library " + f.getAbsolutePath());
                     }
 
-                    P11ModuleConf conf = new P11ModuleConf(name, nativeLibraryPath, pwdRetriever, includeSlots, excludeSlots);
+                    P11ModuleConf conf = new P11ModuleConf(name,
+                            nativeLibraryPath, pwdRetriever, includeSlots, excludeSlots);
                     confs.put(name, conf);
                 }
 
@@ -832,8 +838,7 @@ public class SecurityFactoryImpl implements SecurityFactory
                     throw new ConfigurationException("Default module " + defaultModuleName + " is not defined");
                 }
 
-                this.defaultPkcs11ModuleName = defaultModuleName;
-                this.p11ModuleConfs = confs;
+                this.p11Control = new P11Control(defaultModuleName, new HashSet<>(confs.values()));
             } catch (JAXBException | SAXException | ConfigurationException e)
             {
                 final String message = "Invalid configuration file " + pkcs11ConfFile;
@@ -846,19 +851,6 @@ public class SecurityFactoryImpl implements SecurityFactory
                 throw new RuntimeException(message);
             }
         }
-
-        if(this.p11ModuleConfs != null)
-        {
-            if(this.p11ModuleConfs.isEmpty())
-            {
-                this.p11ModuleConfNames = Collections.emptySet();
-            }
-            else
-            {
-                this.p11ModuleConfNames = new HashSet<String>(this.p11ModuleConfs.keySet());
-            }
-        }
-
     }
 
     public void setPkcs11ConfFile(String confFile)
@@ -964,7 +956,7 @@ public class SecurityFactoryImpl implements SecurityFactory
     {
         if(moduleName == null || DEFAULT_P11MODULE_NAME.equals(moduleName))
         {
-            return defaultPkcs11ModuleName;
+            return getDefaultPkcs11ModuleName();
         }
         else
         {
@@ -980,7 +972,8 @@ public class SecurityFactoryImpl implements SecurityFactory
     @Override
     public String getDefaultPkcs11ModuleName()
     {
-        return defaultPkcs11ModuleName;
+        initPkcs11ModuleConf();
+        return p11Control == null ? null : p11Control.getDefaultModuleName();
     }
 
     @Override

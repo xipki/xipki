@@ -7,7 +7,6 @@
 
 package org.xipki.remotep11.client;
 
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -15,11 +14,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.security.api.SecurityFactory;
 import org.xipki.security.api.SignerException;
+import org.xipki.security.api.p11.P11Control;
 import org.xipki.security.api.p11.P11CryptService;
 import org.xipki.security.api.p11.P11CryptServiceFactory;
 import org.xipki.security.api.p11.P11ModuleConf;
 import org.xipki.security.api.p11.P11SlotIdentifier;
-import org.xipki.security.common.CmpUtf8Pairs;
 import org.xipki.security.common.ParamChecker;
 
 /**
@@ -30,27 +29,13 @@ public class RemoteP11CryptServiceFactory implements P11CryptServiceFactory
 {
     private static final Logger LOG = LoggerFactory.getLogger(RemoteP11CryptServiceFactory.class);
 
-    private String defaultModuleName;
-    private Map<String, P11ModuleConf> moduleConfs;
+    private P11Control p11Control;
 
     @Override
-    public void init(String defaultModuleName, Collection<P11ModuleConf> moduleConfs)
+    public void init(P11Control p11Control)
     {
-        ParamChecker.assertNotEmpty("defaultModuleName", defaultModuleName);
-        this.defaultModuleName = defaultModuleName;
-
-        if(moduleConfs == null || moduleConfs.isEmpty())
-        {
-            this.moduleConfs = null;
-        }
-        else
-        {
-            this.moduleConfs = new HashMap<>(moduleConfs.size());
-            for(P11ModuleConf conf : moduleConfs)
-            {
-                this.moduleConfs.put(conf.getName(), conf);
-            }
-        }
+        ParamChecker.assertNotNull("p11Control", p11Control);
+        this.p11Control = p11Control;
     }
 
     private final Map<String, RemoteP11CryptService> services = new HashMap<>();
@@ -60,17 +45,17 @@ public class RemoteP11CryptServiceFactory implements P11CryptServiceFactory
     throws SignerException
     {
         ParamChecker.assertNotNull("moduleName", moduleName);
-        if(SecurityFactory.DEFAULT_P11MODULE_NAME.equals(moduleName))
-        {
-            moduleName = defaultModuleName;
-        }
-
-        if(moduleConfs == null)
+        if(p11Control == null)
         {
             throw new IllegalStateException("please call init() first");
         }
 
-        P11ModuleConf moduleConf = moduleConfs.get(moduleName.toLowerCase());
+        if(SecurityFactory.DEFAULT_P11MODULE_NAME.equals(moduleName))
+        {
+            moduleName = p11Control.getDefaultModuleName();
+        }
+
+        P11ModuleConf moduleConf = p11Control.getModuleConf(moduleName);
         if(moduleConf == null)
         {
             throw new SignerException("PKCS#11 module " + moduleName + " is not defined");
@@ -83,14 +68,8 @@ public class RemoteP11CryptServiceFactory implements P11CryptServiceFactory
             {
                 try
                 {
-                    CmpUtf8Pairs conf = new CmpUtf8Pairs(moduleConf.getNativeLibrary());
-                    String url = conf.getValue("url");
-                    if(url == null || url.isEmpty())
-                    {
-                        throw new IllegalArgumentException("url is not specified");
-                    }
-
-                    service = new DefaultRemoteP11CryptService(url);
+                    service = new DefaultRemoteP11CryptService(moduleConf);
+                    String url = ((DefaultRemoteP11CryptService) service).getServerUrl();
                     logServiceInfo(url, service);
                     services.put(moduleConf.getName(), service);
                 }catch(Exception e)
@@ -108,7 +87,6 @@ public class RemoteP11CryptServiceFactory implements P11CryptServiceFactory
     private static void logServiceInfo(String url, RemoteP11CryptService service)
     {
         StringBuilder sb = new StringBuilder();
-
         sb.append("Initialized RemoteP11CryptService (url=").append(url).append(")\n");
 
         P11SlotIdentifier[] slotIds;
