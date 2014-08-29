@@ -66,7 +66,7 @@ public class HashCalculator
         ParamChecker.assertNotNull("data", data);
         if(mdsMap.containsKey(hashAlgoType) == false)
         {
-             throw new IllegalArgumentException("Unknown hash algo " + hashAlgoType);
+            throw new IllegalArgumentException("Unknown hash algo " + hashAlgoType);
         }
 
         BlockingDeque<MessageDigest> mds = mdsMap.get(hashAlgoType);

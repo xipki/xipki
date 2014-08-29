@@ -33,13 +33,13 @@ import org.bouncycastle.math.ec.ECCurve;
  *
  * <pre>
  *    EcpkParameters ::= CHOICE
- {
+ *    {
  *      ecParameters  ECParameters,
  *      namedCurve    OBJECT IDENTIFIER,
  *      implicitlyCA  NULL }
  *
  *    ECParameters ::= SEQUENCE
- {
+ *    {
  *       version   ECPVer,          -- version is always 1
  *       fieldID   FieldID,         -- identifies the finite field over
  *                                  -- which the curve is defined
@@ -48,13 +48,12 @@ import org.bouncycastle.math.ec.ECCurve;
  *       base      ECPoint,         -- specifies the base point P
  *                                  -- on the elliptic curve
  *       order     INTEGER,         -- the order n of the base point
- *       cofactor  INTEGER OPTIONAL -- The integer h = #E(Fq)/n
- *       }
+ *       cofactor  INTEGER OPTIONAL -- The integer h = #E(Fq)/n }
  *
  *    ECPVer ::= INTEGER {ecpVer1(1)}
  *
  *    Curve ::= SEQUENCE
- {
+ *    {
  *       a         FieldElement,
  *       b         FieldElement,
  *       seed      BIT STRING OPTIONAL }

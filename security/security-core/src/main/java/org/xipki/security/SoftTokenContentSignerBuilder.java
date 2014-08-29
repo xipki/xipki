@@ -358,7 +358,7 @@ public class SoftTokenContentSignerBuilder
         throws OperatorCreationException
         {
             Digest dig = digestProvider.get(digAlgId);
-               return new DSADigestSigner(new DSASigner(), dig);
+            return new DSADigestSigner(new DSASigner(), dig);
         }
     } // DSAContentSignerBuilder
 
@@ -374,7 +374,7 @@ public class SoftTokenContentSignerBuilder
         throws OperatorCreationException
         {
             Digest dig = digestProvider.get(digAlgId);
-               return new DSADigestSigner(new ECDSASigner(), dig);
+            return new DSADigestSigner(new ECDSASigner(), dig);
         }
     } // ECDSAContentSignerBuilder
 
@@ -387,7 +387,7 @@ public class SoftTokenContentSignerBuilder
         public NssPlainRSASigner()
         throws NoSuchAlgorithmException, NoSuchProviderException, NoSuchPaddingException
         {
-                 cipher = Cipher.getInstance(algorithm, "SunPKCS11-XipkiNSS");
+            cipher = Cipher.getInstance(algorithm, "SunPKCS11-XipkiNSS");
         }
 
         @Override

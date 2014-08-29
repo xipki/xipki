@@ -91,9 +91,9 @@ class DefaultRemoteP11CryptService extends RemoteP11CryptService
             boolean isValidContentType = false;
             if (responseContentType != null)
             {
-                   if (responseContentType.equalsIgnoreCase(CMP_RESPONSE_MIMETYPE))
-                   {
-                       isValidContentType = true;
+                if (responseContentType.equalsIgnoreCase(CMP_RESPONSE_MIMETYPE))
+                {
+                    isValidContentType = true;
                 }
             }
             if (isValidContentType == false)

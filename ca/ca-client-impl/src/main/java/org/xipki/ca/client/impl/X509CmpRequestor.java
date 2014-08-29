@@ -292,7 +292,7 @@ abstract class X509CmpRequestor extends CmpRequestor
                     for(CertId _certId : revCerts)
                     {
                         if(re.getIssuer().equals(_certId.getIssuer().getName()) &&
-                          re.getSerialNumber().equals(_certId.getSerialNumber().getValue()))
+                                re.getSerialNumber().equals(_certId.getSerialNumber().getValue()))
                         {
                             certId = _certId;
                             break;

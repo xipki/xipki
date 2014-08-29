@@ -86,7 +86,7 @@ public class SyslogAuditLoggingServiceImpl implements AuditLoggingService
     private String splitMessageBeginText;
     private String splitMessageEndText;
 
-   // private String
+    // private String
     private boolean initialized;
 
     public SyslogAuditLoggingServiceImpl()

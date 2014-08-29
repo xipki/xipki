@@ -64,7 +64,7 @@ extends Provider
                 while(it.hasNext())
                 {
                     Descriptor d = it.next();
-                      put(d.service.type + "." + d.algorithm, d.getClassName());
+                    put(d.service.type + "." + d.algorithm, d.getClassName());
                     if(d.aliases != null)
                     {
                         List<String> aliases = d.getAliases();
@@ -75,7 +75,7 @@ extends Provider
                     }
                 }
                 return null;
-             }
+            }
         });
     }
 
@@ -159,8 +159,8 @@ extends Provider
         private final String[] aliases;
 
         private Descriptor(Service service, String algorithm,
-              String classNameWithoutPackage, String oid,
-              String... aliases)
+            String classNameWithoutPackage, String oid,
+            String... aliases)
         {
             this.service = service;
             this.algorithm = algorithm;

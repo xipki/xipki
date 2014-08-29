@@ -22,9 +22,9 @@ import org.xipki.security.common.IoCertUtil;
 @Command(scope = "ca", name = "crlsigner-add", description="Add CRL signer")
 public class CrlSignerAddCommand extends CaCommand
 {
-    @Option( name = "-name",
-             description = "Required. CRL signer name",
-             required = true, multiValued = false)
+    @Option(name = "-name",
+            description = "Required. CRL signer name",
+            required = true, multiValued = false)
     protected String name;
 
     @Option(name = "-signerType",

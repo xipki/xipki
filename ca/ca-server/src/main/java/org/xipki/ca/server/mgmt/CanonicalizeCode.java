@@ -26,28 +26,28 @@ public class CanonicalizeCode
 
     private final static String licenseText =
 /*     "/*\n" +
-     " * Copyright (c) 2014 Lijun Liao\n" +
-     " *\n" +
-     " * Licensed under the Apache License, Version 2.0 (the \"License\");\n" +
-     " * you may not use this file except in compliance with the License.\n" +
-     " * You may obtain a copy of the License at\n" +
-     " *\n" +
-     " *         http://www.apache.org/licenses/LICENSE-2.0\n" +
-     " *\n" +
-     " * Unless required by applicable law or agreed to in writing, software\n" +
-     " * distributed under the License is distributed on an \"AS IS\" BASIS,\n" +
-     " * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\n" +
-     " * See the License for the specific language governing permissions and\n" +
-     " * limitations under the License\n" +
-     " *\n" +
-     " *//*\n\n";
+        " * Copyright (c) 2014 Lijun Liao\n" +
+        " *\n" +
+        " * Licensed under the Apache License, Version 2.0 (the \"License\");\n" +
+        " * you may not use this file except in compliance with the License.\n" +
+        " * You may obtain a copy of the License at\n" +
+        " *\n" +
+        " *         http://www.apache.org/licenses/LICENSE-2.0\n" +
+        " *\n" +
+        " * Unless required by applicable law or agreed to in writing, software\n" +
+        " * distributed under the License is distributed on an \"AS IS\" BASIS,\n" +
+        " * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\n" +
+        " * See the License for the specific language governing permissions and\n" +
+        " * limitations under the License\n" +
+        " *\n" +
+        " *//*\n\n";
 */
-     "/*\n" +
-     " * Copyright (c) 2014 Lijun Liao\n" +
-     " *\n" +
-     " * TO-BE-DEFINE\n" +
-     " *\n" +
-     " */\n\n";
+        "/*\n" +
+        " * Copyright (c) 2014 Lijun Liao\n" +
+        " *\n" +
+        " * TO-BE-DEFINE\n" +
+        " *\n" +
+        " */\n\n";
 
     private final static String THROWS_PREFIX = "    ";
 
@@ -198,7 +198,9 @@ public class CanonicalizeCode
         boolean addNewLine = false;
 
         len = sb.length();
-        if(len > 0 && sb.charAt(len-1) == '{')
+        boolean isCommentLine = sb.toString().trim().startsWith("*");
+
+        if(isCommentLine == false && len > 0 && sb.charAt(len-1) == '{')
         {
             for(int i = 0; i < len - 1; i++)
             {
@@ -290,10 +292,33 @@ public class CanonicalizeCode
                     {
                         lineNumbers.add(lineNumber);
                     }
+                    else
+                    {
+                        // check whether the number of leading spaces is multiple of 4
+                        int numLeadingSpaces = 0;
+                        char c = 'Z';
+                        for(int i = 0; i < line.length(); i++)
+                        {
+                            if(line.charAt(i) == ' ')
+                            {
+                                numLeadingSpaces++;
+                            }
+                            else
+                            {
+                                c = line.charAt(i);
+                                break;
+                            }
+                        }
+
+                        if(c != '*' && numLeadingSpaces % 4 != 0)
+                        {
+                            lineNumbers.add(lineNumber);
+                        }
+                    }
                     continue;
                 }
 
-                if(idx > 0 && line.charAt(idx-1) == '@' || line.charAt(idx-1) == '"' )
+                if(idx > 0 && line.charAt(idx - 1) == '@' || line.charAt(idx - 1) == '"' )
                 {
                     lastLine = line;
                     continue;
@@ -331,11 +356,11 @@ public class CanonicalizeCode
                 ": lines " + Arrays.toString(lineNumbers.toArray(new Integer[0])));
         }
 
-       if(authorsLineAvailable == false)
-       {
-           System.out.println("Please check file " + file.getPath() +
-                   ": no authors line");
-       }
+        if(authorsLineAvailable == false)
+        {
+            System.out.println("Please check file " + file.getPath() +
+                    ": no authors line");
+        }
 
     }
 

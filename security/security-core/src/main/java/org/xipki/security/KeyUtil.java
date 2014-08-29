@@ -258,8 +258,8 @@ public class KeyUtil
             RSAPrivateCrtKey k = (RSAPrivateCrtKey)key;
 
             return new RSAPrivateCrtKeyParameters(k.getModulus(),
-                 k.getPublicExponent(), k.getPrivateExponent(),
-                 k.getPrimeP(), k.getPrimeQ(), k.getPrimeExponentP(), k.getPrimeExponentQ(), k.getCrtCoefficient());
+                k.getPublicExponent(), k.getPrivateExponent(),
+                k.getPrimeP(), k.getPrimeQ(), k.getPrimeExponentP(), k.getPrimeExponentQ(), k.getCrtCoefficient());
         }
         else if(key instanceof RSAPrivateKey)
         {
@@ -273,7 +273,7 @@ public class KeyUtil
         }
         else if(key instanceof DSAPrivateKey)
         {
-               return DSAUtil.generatePrivateKeyParameter(key);
+            return DSAUtil.generatePrivateKeyParameter(key);
         }
         else
         {
@@ -296,7 +296,7 @@ public class KeyUtil
         }
         else if(key instanceof DSAPublicKey)
         {
-               return DSAUtil.generatePublicKeyParameter(key);
+            return DSAUtil.generatePublicKeyParameter(key);
         }
         else
         {

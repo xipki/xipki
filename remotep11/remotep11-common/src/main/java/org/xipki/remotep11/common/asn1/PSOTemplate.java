@@ -20,7 +20,7 @@ import org.bouncycastle.asn1.DERSequence;
  *
  * <pre>
  * PSOTemplate ::= SEQUENCE
- {
+ * {
  *     slotAndKeyIdentifier   SlotAndKeyIdentifer
  *     message                OCTET STRING,
  * }

@@ -527,30 +527,30 @@ class CertStatusStoreQueryExecutor
                 pss[i] = dataSource.prepareStatement(c, sqlQueries[i]);
                 if(pss[i] == null)
                 {
-                       for(int j = 0; j < i; j++)
-                       {
-                           try
-                           {
-                               pss[j].close();
-                           }catch(SQLException e)
-                           {
-                               LOG.warn("Could not close preparedStatement", e);
-                           }
-                       }
-                       try
-                       {
-                           c.close();
-                       }catch(SQLException e)
-                       {
-                           LOG.warn("Could not clse connection", e);
-                       }
+                    for(int j = 0; j < i; j++)
+                    {
+                        try
+                        {
+                            pss[j].close();
+                        }catch(SQLException e)
+                        {
+                            LOG.warn("Could not close preparedStatement", e);
+                        }
+                    }
+                    try
+                    {
+                        c.close();
+                    }catch(SQLException e)
+                    {
+                        LOG.warn("Could not clse connection", e);
+                    }
 
                     throw new SQLException("Cannot create prepared statement for " + sqlQueries[i]);
                 }
             }
-       }
+        }
 
-       return pss;
+        return pss;
     }
 
     private boolean certRegistered(int issuerId, BigInteger serialNumber)

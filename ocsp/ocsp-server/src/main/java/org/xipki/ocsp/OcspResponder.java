@@ -454,7 +454,7 @@ public class OcspResponder
                             issuers.add(IoCertUtil.parseCert(caCertFile));
                         } catch (Exception e)
                         {
-                             throw new OcspResponderException(e);
+                            throw new OcspResponderException(e);
                         }
                     }
                 }

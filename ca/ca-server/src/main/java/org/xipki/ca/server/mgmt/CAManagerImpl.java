@@ -663,25 +663,25 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
             {
                 sb.append(" with following CAs: ");
                 Set<String> caAliasNames = getCaAliasNames();
-                 for(String aliasName : caAliasNames)
+                for(String aliasName : caAliasNames)
                 {
-                     String name = getCaName(aliasName);
-                     names.remove(name);
+                    String name = getCaName(aliasName);
+                    names.remove(name);
 
                     sb.append(name).append(" (alias ").append(aliasName).append(")").append(", ");
                 }
 
-                 for(String name : names)
-                 {
+                for(String name : names)
+                {
                     sb.append(name).append(", ");
-                 }
+                }
 
-                 int len = sb.length();
-                 sb.delete(len-2, len);
+                int len = sb.length();
+                sb.delete(len-2, len);
 
-                 ScheduledPublishQueueCleaner publishQueueCleaner = new ScheduledPublishQueueCleaner();
-                 scheduledThreadPoolExecutor.scheduleAtFixedRate(
-                         publishQueueCleaner, 120, 120, TimeUnit.SECONDS);
+                ScheduledPublishQueueCleaner publishQueueCleaner = new ScheduledPublishQueueCleaner();
+                scheduledThreadPoolExecutor.scheduleAtFixedRate(
+                        publishQueueCleaner, 120, 120, TimeUnit.SECONDS);
             }
             else
             {
@@ -3194,7 +3194,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
 
         try
         {
-           return dataSource.createStatement(dsConnection);
+            return dataSource.createStatement(dsConnection);
         }catch(SQLException e)
         {
             throw new CAMgmtException("Could not create statement", e);

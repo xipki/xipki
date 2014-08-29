@@ -145,10 +145,10 @@ public class CaUpdateCommand extends CaCommand
 
         if(signerConf != null)
         {
-             if("PKCS12".equalsIgnoreCase(signerType) || "JKS".equalsIgnoreCase(signerType))
-             {
-                 signerConf = ShellUtil.canonicalizeSignerConf(signerType, signerConf, securityFactory.getPasswordResolver());
-             }
+            if("PKCS12".equalsIgnoreCase(signerType) || "JKS".equalsIgnoreCase(signerType))
+            {
+                signerConf = ShellUtil.canonicalizeSignerConf(signerType, signerConf, securityFactory.getPasswordResolver());
+            }
         }
 
         DuplicationMode duplicateKey = null;

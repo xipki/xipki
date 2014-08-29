@@ -116,8 +116,8 @@ public class CmpUtil
         ContentSigner realSigner = signer.borrowContentSigner();
         try
         {
-             ProtectedPKIMessage signedMessage = builder.build(realSigner);
-             return signedMessage.toASN1Structure();
+            ProtectedPKIMessage signedMessage = builder.build(realSigner);
+            return signedMessage.toASN1Structure();
         }finally
         {
             signer.returnContentSigner(realSigner);

@@ -86,7 +86,7 @@ public enum CRLReason
 
     public static List<CRLReason> PERMITTED_CLIENT_CRLREASONS = Collections.unmodifiableList(
         Arrays.asList(
-               new CRLReason[]
+            new CRLReason[]
             {
                 CRLReason.UNSPECIFIED, CRLReason.KEY_COMPROMISE,
                 CRLReason.AFFILIATION_CHANGED, CRLReason.SUPERSEDED, CRLReason.CESSATION_OF_OPERATION,
