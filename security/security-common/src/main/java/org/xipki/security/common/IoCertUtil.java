@@ -179,8 +179,7 @@ public class IoCertUtil
     private static RDN createSubjectRDN(String text, ASN1ObjectIdentifier type)
     {
         ASN1Encodable dnValue;
-        if(ObjectIdentifiers.DN_SERIALNUMBER.equals(type) ||
-           ObjectIdentifiers.DN_C.equals(type))
+        if(ObjectIdentifiers.DN_SERIALNUMBER.equals(type) || ObjectIdentifiers.DN_C.equals(type))
         {
             dnValue = new DERPrintableString(text);
         }
@@ -243,7 +242,7 @@ public class IoCertUtil
     public static void save(File file, byte[] encoded)
     throws IOException
     {
-           file = expandFilepath(file);
+        file = expandFilepath(file);
 
         File parent = file.getParentFile();
         if (parent != null && parent.exists() == false)
@@ -414,7 +413,7 @@ public class IoCertUtil
         }
         else
         {
-             ks = KeyStore.getInstance(keystoreType, "BC");
+            ks = KeyStore.getInstance(keystoreType, "BC");
         }
         ks.load(new ByteArrayInputStream(keystoreBytes), password);
 
@@ -462,7 +461,7 @@ public class IoCertUtil
         }
         else
         {
-             ks = KeyStore.getInstance(keystoreType, "BC");
+            ks = KeyStore.getInstance(keystoreType, "BC");
         }
         ks.load(null, password);
         ks.setKeyEntry(keyname, key, password, certs);

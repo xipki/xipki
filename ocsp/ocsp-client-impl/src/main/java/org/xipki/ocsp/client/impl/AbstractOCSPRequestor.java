@@ -204,7 +204,7 @@ public abstract class AbstractOCSPRequestor implements OCSPRequestor
                 extn = new Extension(id_pkix_ocsp_prefSigAlgs, false, new DEROctetString(extnValue));
             } catch (IOException e)
             {
-                 throw new OCSPRequestorException(e);
+                throw new OCSPRequestorException(e);
             }
             extensions.add(extn);
         }

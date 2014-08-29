@@ -131,7 +131,7 @@ class RSAPSSSignatureSpi
 
         P11RSAKeyParameter p11RSAKeyParam = P11RSAKeyParameter.getInstance(signingKey.getP11CryptService(),
                 signingKey.getSlotId(), signingKey.getKeyId());
-           pss.init(true, p11RSAKeyParam);
+        pss.init(true, p11RSAKeyParam);
     }
 
     protected void engineInitSign(
@@ -193,7 +193,7 @@ class RSAPSSSignatureSpi
                 }
             }
             if ((newParamSpec.getMGFAlgorithm().equalsIgnoreCase("MGF1") == false) &&
-                 (newParamSpec.getMGFAlgorithm().equals(PKCSObjectIdentifiers.id_mgf1.getId()) == false))
+                    (newParamSpec.getMGFAlgorithm().equals(PKCSObjectIdentifiers.id_mgf1.getId()) == false))
             {
                 throw new InvalidParameterException("unknown mask generation function specified");
             }

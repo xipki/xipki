@@ -19,7 +19,7 @@ import org.bouncycastle.asn1.DERSequence;
  *
  * <pre>
  * SlotAndKeyIdentifer ::= SEQUENCE
- {
+ * {
  *     slotIdentifier   SlotIdentifier,
  *     keyIdentifier    KeyIdentifier,
  * }

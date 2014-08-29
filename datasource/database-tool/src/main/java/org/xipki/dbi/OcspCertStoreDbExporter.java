@@ -92,8 +92,7 @@ class OcspCertStoreDbExporter extends DbPorter
         {
             stmt = createStatement();
 
-            String sql = "SELECT ID, CERT, REVOKED, REV_REASON, REV_TIME, REV_INVALIDITY_TIME" +
-                         " FROM ISSUER";
+            String sql = "SELECT ID, CERT, REVOKED, REV_REASON, REV_TIME, REV_INVALIDITY_TIME FROM ISSUER";
 
             rs = stmt.executeQuery(sql);
 

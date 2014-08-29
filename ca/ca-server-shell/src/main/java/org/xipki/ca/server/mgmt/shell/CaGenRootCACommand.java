@@ -73,12 +73,12 @@ public class CaGenRootCACommand extends CaAddOrGenCommand
         DuplicationMode duplicateKey = DuplicationMode.getInstance(duplicateKeyS);
         if(duplicateKey == null)
         {
-              err("invalid duplication mode: " + duplicateKeyS);
+            err("invalid duplication mode: " + duplicateKeyS);
         }
         DuplicationMode duplicateSubject = DuplicationMode.getInstance(duplicateSubjectS);
         if(duplicateSubject == null)
         {
-              err("invalid duplication mode: " + duplicateSubjectS);
+            err("invalid duplication mode: " + duplicateSubjectS);
         }
 
         ValidityMode validityMode = ValidityMode.getInstance(validityModeS);

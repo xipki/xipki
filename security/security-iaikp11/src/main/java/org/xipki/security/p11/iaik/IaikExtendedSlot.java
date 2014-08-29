@@ -425,11 +425,10 @@ public class IaikExtendedSlot
     private void firstLogin(Session session, List<char[]> password)
     throws TokenException
     {
-           boolean isProtectedAuthenticationPath =
-                   session.getToken().getTokenInfo().isProtectedAuthenticationPath();
+        boolean isProtectedAuthenticationPath = session.getToken().getTokenInfo().isProtectedAuthenticationPath();
 
-           try
-           {
+        try
+        {
             if (isProtectedAuthenticationPath || password == null || password.isEmpty())
             {
                 LOG.info("verify on PKCS11Module with PROTECTED_AUTHENTICATION_PATH");
@@ -447,7 +446,7 @@ public class IaikExtendedSlot
                 }
                 this.password = password;
             }
-           }
+        }
         catch (PKCS11Exception p11e)
         {
             if(p11e.getErrorCode() != 0x100)// 0x100: user already logged in

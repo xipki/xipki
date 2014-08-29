@@ -117,16 +117,15 @@ public abstract class P12KeypairGenerator
         if(keyUsage == null)
         {
             ku = new X509KeyUsage(
-                 X509KeyUsage.nonRepudiation | X509KeyUsage.digitalSignature |
-                 X509KeyUsage.keyCertSign | X509KeyUsage.cRLSign);
+                    X509KeyUsage.nonRepudiation | X509KeyUsage.digitalSignature |
+                    X509KeyUsage.keyCertSign | X509KeyUsage.cRLSign);
         }
         else
         {
             ku = new X509KeyUsage(keyUsage);
         }
 
-        certGenerator.addExtension(
-                 Extension.keyUsage, true, ku);
+        certGenerator.addExtension(Extension.keyUsage, true, ku);
 
         if(extendedKeyUsage != null && extendedKeyUsage.isEmpty() == false)
         {
@@ -142,27 +141,23 @@ public abstract class P12KeypairGenerator
                     new ExtendedKeyUsage(kps));
         }
 
-        KeyAndCertPair identity = new KeyAndCertPair(
-             certGenerator.build(contentSigner),
-             kp.getKeypair().getPrivate());
+        KeyAndCertPair identity = new KeyAndCertPair(certGenerator.build(contentSigner), kp.getKeypair().getPrivate());
 
-         KeyStore ks = KeyStore.getInstance("PKCS12", "BC");
-         ks.load(null, password);
+        KeyStore ks = KeyStore.getInstance("PKCS12", "BC");
+        ks.load(null, password);
 
-         ks.setKeyEntry("main", identity.getKey(), password, new Certificate[]{identity.getJceCert()});
+        ks.setKeyEntry("main", identity.getKey(), password, new Certificate[]{identity.getJceCert()});
 
-         ByteArrayOutputStream ksStream = new ByteArrayOutputStream();
-         try
-         {
-             ks.store(ksStream, password);
-         }finally
-         {
-             ksStream.flush();
-         }
+        ByteArrayOutputStream ksStream = new ByteArrayOutputStream();
+        try
+        {
+            ks.store(ksStream, password);
+        }finally
+        {
+            ksStream.flush();
+        }
 
-        return new P12KeypairGenerationResult(
-                ksStream.toByteArray(),
-                identity.getCert());
+        return new P12KeypairGenerationResult(ksStream.toByteArray(), identity.getCert());
     }
 
     private ContentSigner getContentSigner(PrivateKey key)
@@ -338,8 +333,7 @@ public abstract class P12KeypairGenerator
             kpgen.initialize(spec);
             KeyPair kp = kpgen.generateKeyPair();
 
-            AlgorithmIdentifier algId = new AlgorithmIdentifier(X9ObjectIdentifiers.id_ecPublicKey,
-                     this.curveOid);
+            AlgorithmIdentifier algId = new AlgorithmIdentifier(X9ObjectIdentifiers.id_ecPublicKey, this.curveOid);
 
             BCECPublicKey pub = (BCECPublicKey) kp.getPublic();
             byte[] keyData = pub.getQ().getEncoded(false);
