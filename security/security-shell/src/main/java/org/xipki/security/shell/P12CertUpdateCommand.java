@@ -20,7 +20,6 @@ import java.util.Set;
 
 import org.apache.felix.gogo.commands.Command;
 import org.apache.felix.gogo.commands.Option;
-import org.xipki.security.NopPasswordResolver;
 import org.xipki.security.api.PasswordResolverException;
 import org.xipki.security.api.SignerException;
 import org.xipki.security.common.CmpUtf8Pairs;
@@ -121,7 +120,7 @@ public class P12CertUpdateCommand extends P12SecurityCommand
             throw new SignerException("Unknown key type: " + pubKey.getClass().getName());
         }
 
-        securityFactory.createSigner("PKCS12", pairs.getEncoded(), cert, NopPasswordResolver.INSTANCE);
+        securityFactory.createSigner("PKCS12", pairs.getEncoded(), cert);
     }
 
 }

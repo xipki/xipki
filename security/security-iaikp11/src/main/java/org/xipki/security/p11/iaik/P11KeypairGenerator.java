@@ -88,14 +88,6 @@ public class P11KeypairGenerator
     private IaikExtendedSlot getSlot(String pkcs11ModuleName, P11SlotIdentifier slotId)
     throws SignerException
     {
-        if(IaikP11CryptServiceFactory.class.getName().equals(
-                securityFactory.getPkcs11Provider()) == false)
-        {
-            throw new SignerException("P11KeypairGenerator only works with P11CryptServiceFactory " +
-                    IaikP11CryptServiceFactory.class.getName() +
-                    ", but not " + securityFactory.getPkcs11Provider());
-        }
-
         // this call initialize the IaikExtendedModule
         P11CryptService p11CryptService = securityFactory.getP11CryptService(pkcs11ModuleName);
         if(p11CryptService == null)
@@ -104,6 +96,12 @@ public class P11KeypairGenerator
         }
 
         IaikExtendedModule module = IaikP11ModulePool.getInstance().getModule(pkcs11ModuleName);
+        if(module == null)
+        {
+            throw new SignerException("P11KeypairGenerator only works with P11CryptServiceFactory " +
+                    IaikP11CryptServiceFactory.class.getName());
+        }
+
         IaikExtendedSlot slot = module.getSlot(slotId);
         if(slot == null)
         {
