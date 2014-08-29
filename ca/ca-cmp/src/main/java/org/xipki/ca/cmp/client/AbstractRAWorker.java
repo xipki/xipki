@@ -27,7 +27,6 @@ import org.xipki.ca.common.CertificateOrError;
 import org.xipki.ca.common.EnrollCertResult;
 import org.xipki.ca.common.PKIErrorException;
 import org.xipki.ca.common.RAWorkerException;
-import org.xipki.security.api.PasswordResolver;
 import org.xipki.security.api.SecurityFactory;
 import org.xipki.security.common.LogUtil;
 
@@ -47,15 +46,9 @@ public abstract class AbstractRAWorker
     protected abstract boolean verify(Certificate caCert, Certificate cert);
 
     protected SecurityFactory securityFactory;
-    protected PasswordResolver passwordResolver;
 
     protected AbstractRAWorker()
     {
-    }
-
-    public void setPasswordResolver(PasswordResolver passwordResolver)
-    {
-        this.passwordResolver = passwordResolver;
     }
 
     protected EnrollCertResult parseEnrollCertResult(EnrollCertResultType result, String caName)

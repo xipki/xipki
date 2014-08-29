@@ -23,7 +23,6 @@ import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.bouncycastle.asn1.x9.X9ObjectIdentifiers;
 import org.bouncycastle.operator.ContentSigner;
 import org.bouncycastle.pkcs.PKCS10CertificationRequest;
-import org.xipki.security.NopPasswordResolver;
 import org.xipki.security.SecurityFactoryImpl;
 import org.xipki.security.api.ConcurrentContentSigner;
 import org.xipki.security.api.SignerException;
@@ -81,7 +80,7 @@ public class P12CertRequestGenCommand extends P12SecurityCommand
 
         String signerConf = SecurityFactoryImpl.getKeystoreSignerConf(p12File, new String(pwd), sigAlgOid.getId(), 1);
         ConcurrentContentSigner identifiedSigner = securityFactory.createSigner("PKCS12", signerConf,
-                (X509Certificate[]) null, NopPasswordResolver.INSTANCE);
+                (X509Certificate[]) null);
 
         Certificate cert = Certificate.getInstance(identifiedSigner.getCertificate().getEncoded());
 

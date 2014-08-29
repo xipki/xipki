@@ -27,20 +27,18 @@ public interface SecurityFactory
 {
     static final String DEFAULT_P11MODULE_NAME = "default";
 
-    String getPkcs11Provider();
-
     Set<String> getPkcs11ModuleNames();
 
     String getDefaultPkcs11ModuleName();
 
-    ConcurrentContentSigner createSigner(String type, String conf,
-            X509Certificate cert, PasswordResolver passwordResolver)
-    throws SignerException, PasswordResolverException;
+    PasswordResolver getPasswordResolver();
+
+    ConcurrentContentSigner createSigner(String type, String conf, X509Certificate cert)
+    throws SignerException;
 
     ConcurrentContentSigner createSigner(String type, String conf,
-            X509Certificate[] certs,
-            PasswordResolver passwordResolver)
-    throws SignerException, PasswordResolverException;
+            X509Certificate[] certs)
+    throws SignerException;
 
     ContentVerifierProvider getContentVerifierProvider(PublicKey publicKey)
     throws InvalidKeyException;

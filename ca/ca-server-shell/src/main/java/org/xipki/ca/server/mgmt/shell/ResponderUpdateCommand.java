@@ -13,7 +13,7 @@ import org.apache.felix.gogo.commands.Command;
 import org.apache.felix.gogo.commands.Option;
 import org.bouncycastle.util.encoders.Base64;
 import org.xipki.ca.server.mgmt.api.CAManager;
-import org.xipki.security.api.PasswordResolver;
+import org.xipki.security.api.SecurityFactory;
 import org.xipki.security.common.IoCertUtil;
 
 /**
@@ -36,7 +36,12 @@ public class ResponderUpdateCommand extends CaCommand
             description = "Requestor certificate file or 'NULL'")
     protected String certFile;
 
-    private PasswordResolver passwordResolver;
+    protected SecurityFactory securityFactory;
+
+    public void setSecurityFactory(SecurityFactory securityFactory)
+    {
+        this.securityFactory = securityFactory;
+    }
 
     @Override
     protected Object doExecute()
@@ -56,17 +61,12 @@ public class ResponderUpdateCommand extends CaCommand
 
         if("PKCS12".equalsIgnoreCase(signerType) || "JKS".equalsIgnoreCase(signerType))
         {
-            signerConf = ShellUtil.canonicalizeSignerConf(signerType, signerConf, passwordResolver);
+            signerConf = ShellUtil.canonicalizeSignerConf(signerType, signerConf, securityFactory.getPasswordResolver());
         }
 
         caManager.changeCmpResponder(signerType, signerConf, cert);
 
         return null;
-    }
-
-    public void setPasswordResolver(PasswordResolver passwordResolver)
-    {
-        this.passwordResolver = passwordResolver;
     }
 
 }

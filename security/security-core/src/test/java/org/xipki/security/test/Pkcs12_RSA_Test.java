@@ -20,7 +20,6 @@ import org.junit.Test;
 import org.xipki.security.PasswordResolverImpl;
 import org.xipki.security.SecurityFactoryImpl;
 import org.xipki.security.api.ConcurrentContentSigner;
-import org.xipki.security.api.PasswordResolver;
 import org.xipki.security.api.SecurityFactory;
 import org.xipki.security.common.CmpUtf8Pairs;
 import org.xipki.security.common.IoCertUtil;
@@ -33,7 +32,12 @@ public abstract class Pkcs12_RSA_Test
 {
     protected abstract ASN1ObjectIdentifier getSignatureAlgorithm();
 
-    private static final SecurityFactory securityFactory = new SecurityFactoryImpl();
+    private static final SecurityFactoryImpl securityFactory = new SecurityFactoryImpl();
+
+    static
+    {
+        securityFactory.setPasswordResolver(new PasswordResolverImpl());
+    }
 
     protected Pkcs12_RSA_Test()
     {
@@ -75,10 +79,9 @@ public abstract class Pkcs12_RSA_Test
         {
             String certFile = getCertificateFile();
             X509Certificate cert = IoCertUtil.parseCert(certFile);
-            PasswordResolver passwordResolver = new PasswordResolverImpl();
 
             String signerConf = getSignerConf();
-            signer = securityFactory.createSigner("PKCS12", signerConf, cert, passwordResolver);
+            signer = securityFactory.createSigner("PKCS12", signerConf, cert);
         }
         return signer;
     }

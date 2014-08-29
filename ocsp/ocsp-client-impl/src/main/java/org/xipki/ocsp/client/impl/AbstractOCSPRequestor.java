@@ -48,7 +48,6 @@ import org.xipki.ocsp.client.impl.digest.SHA384DigestCalculator;
 import org.xipki.ocsp.client.impl.digest.SHA512DigestCalculator;
 import org.xipki.security.api.ConcurrentContentSigner;
 import org.xipki.security.api.NoIdleSignerException;
-import org.xipki.security.api.PasswordResolver;
 import org.xipki.security.api.SecurityFactory;
 import org.xipki.security.common.IoCertUtil;
 
@@ -58,7 +57,7 @@ import org.xipki.security.common.IoCertUtil;
 
 public abstract class AbstractOCSPRequestor implements OCSPRequestor
 {
-    private PasswordResolver passwordResolver;
+
     private SecurityFactory securityFactory;
 
     private final Object signerLock = new Object();
@@ -256,7 +255,7 @@ public abstract class AbstractOCSPRequestor implements OCSPRequestor
 
                         try
                         {
-                            signer = getSecurityFactory().createSigner(signerType, signerConf, cert, getPasswordResolver());
+                            signer = getSecurityFactory().createSigner(signerType, signerConf, cert);
                         } catch (Exception e)
                         {
                             throw new OCSPRequestorException("Could not create signer: " + e.getMessage());
@@ -330,16 +329,6 @@ public abstract class AbstractOCSPRequestor implements OCSPRequestor
     {
         this.signer = null;
         this.signerType = signerType;
-    }
-
-    public PasswordResolver getPasswordResolver()
-    {
-        return passwordResolver;
-    }
-
-    public void setPasswordResolver(PasswordResolver passwordResolver)
-    {
-        this.passwordResolver = passwordResolver;
     }
 
     public SecurityFactory getSecurityFactory()

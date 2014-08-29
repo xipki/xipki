@@ -11,7 +11,6 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.felix.gogo.commands.Option;
-import org.xipki.security.api.PasswordResolver;
 import org.xipki.security.api.SecurityFactory;
 
 /**
@@ -103,15 +102,9 @@ public abstract class CaAddOrGenCommand extends CaCommand
     protected String validityModeS = "STRICT";
 
     protected SecurityFactory securityFactory;
-    protected PasswordResolver passwordResolver;
 
     public void setSecurityFactory(SecurityFactory securityFactory)
     {
         this.securityFactory = securityFactory;
-    }
-
-    public void setPasswordResolver(PasswordResolver passwordResolver)
-    {
-        this.passwordResolver = passwordResolver;
     }
 }

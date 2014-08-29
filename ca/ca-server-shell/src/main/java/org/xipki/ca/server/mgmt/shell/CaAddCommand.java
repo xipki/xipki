@@ -70,11 +70,11 @@ public class CaAddCommand extends CaAddOrGenCommand
 
         if("PKCS12".equalsIgnoreCase(signerType) || "JKS".equalsIgnoreCase(signerType))
         {
-            signerConf = ShellUtil.canonicalizeSignerConf(signerType, signerConf, passwordResolver);
+            signerConf = ShellUtil.canonicalizeSignerConf(signerType, signerConf, securityFactory.getPasswordResolver());
         }
 
         // check whether the signer and certificate match
-        ConcurrentContentSigner signer = securityFactory.createSigner(signerType, signerConf, caCert, passwordResolver);
+        ConcurrentContentSigner signer = securityFactory.createSigner(signerType, signerConf, caCert);
         // retrieve the certificate from the key token if not specified explicitly
         if(caCert == null)
         {
