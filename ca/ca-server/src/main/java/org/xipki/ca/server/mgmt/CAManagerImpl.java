@@ -111,9 +111,6 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
 {
     private static final Logger LOG = LoggerFactory.getLogger(CAManagerImpl.class);
 
-    //private static final String COLUMN_DELTA_CRL_URIS = "DELTA_CRL_URIS";
-    //private static final String COLUMN_VALIDITY_MODE = "VALIDITY_MODE";
-
     private final CertificateFactory certFact;
     private final String lockInstanceId;
 
@@ -144,7 +141,6 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
 
     private static final Map<String, X509CA> x509cas = new ConcurrentHashMap<>();
 
-    private PasswordResolver passwordResolver;
     private SecurityFactory securityFactory;
     private DataSourceFactory dataSourceFactory;
     private String caConfFile;
@@ -231,10 +227,6 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
         {
             throw new IllegalStateException("securityFactory is not set");
         }
-        if(passwordResolver == null)
-        {
-            throw new IllegalStateException("passwordResolver is not set");
-        }
         if(dataSourceFactory == null)
         {
             throw new IllegalStateException("dataSourceFactory is not set");
@@ -266,7 +258,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
                     {
                         String datasourceName = key.substring("datasource.".length());
                         DataSourceWrapper datasource = dataSourceFactory.createDataSourceForFile(
-                                datasourceFile, passwordResolver);
+                                datasourceFile, securityFactory.getPasswordResolver());
                         this.dataSources.put(datasourceName, datasource);
                     } catch (SQLException | PasswordResolverException | IOException | RuntimeException e)
                     {
@@ -529,13 +521,12 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
                 {
                     X509Certificate responderCert = responder.getCertificate();
                     cmpSigner = securityFactory.createSigner(
-                            responder.getType(), responder.getConf(), responderCert,
-                            passwordResolver);
+                            responder.getType(), responder.getConf(), responderCert);
                     if(responderCert == null)
                     {
                         responder.setCertificate(cmpSigner.getCertificate());
                     }
-                } catch (PasswordResolverException | SignerException e)
+                } catch (SignerException e)
                 {
                     final String message = "security.createSigner cmpResponder";
                     if(LOG.isErrorEnabled())
@@ -573,13 +564,12 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
                         {
                             X509Certificate crlSignerCert = crlSignerEntry.getCertificate();
                             identifiedSigner = securityFactory.createSigner(
-                                    signerType, crlSignerEntry.getConf(), crlSignerCert,
-                                    passwordResolver);
+                                    signerType, crlSignerEntry.getConf(), crlSignerCert);
                             if(crlSignerCert == null)
                             {
                                 crlSignerEntry.setCertificate(identifiedSigner.getCertificate());
                             }
-                        } catch (PasswordResolverException | SignerException e)
+                        } catch (SignerException e)
                         {
                             final String message = "security.createSigner crlSigner (ca=" + caName + ")";
                             if(LOG.isErrorEnabled())
@@ -612,9 +602,8 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
                 {
                     caSigner = securityFactory.createSigner(
                             caEntry.getSignerType(), caEntry.getSignerConf(),
-                            caEntry.getCertificate().getCert(),
-                            passwordResolver);
-                } catch (PasswordResolverException | SignerException e)
+                            caEntry.getCertificate().getCert());
+                } catch (SignerException e)
                 {
                     final String message = "security.createSigner caSigner (ca=" + caName + ")";
                     if(LOG.isErrorEnabled())
@@ -1095,7 +1084,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
                 PublisherEntryWrapper entry;
                 try
                 {
-                    entry = new PublisherEntryWrapper(rawEntry, passwordResolver, dataSources);
+                    entry = new PublisherEntryWrapper(rawEntry, securityFactory.getPasswordResolver(), dataSources);
                 } catch(CertPublisherException | RuntimeException e)
                 {
                     final String message = "Invalid configuration for the certPublisher " + name;
@@ -2594,7 +2583,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
         PublisherEntryWrapper entry;
         try
         {
-            entry = new PublisherEntryWrapper(dbEntry, passwordResolver, dataSources);
+            entry = new PublisherEntryWrapper(dbEntry, securityFactory.getPasswordResolver(), dataSources);
         } catch (CertPublisherException e)
         {
             throw new CAMgmtException("CertPublisherException: " + e.getMessage(), e);
@@ -3018,16 +3007,6 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
         }
 
         return permissions;
-    }
-
-    public PasswordResolver getPasswordResolver()
-    {
-        return passwordResolver;
-    }
-
-    public void setPasswordResolver(PasswordResolver passwordResolver)
-    {
-        this.passwordResolver = passwordResolver;
     }
 
     private static String getRealString(String s)
@@ -3698,7 +3677,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
         try
         {
             result = SelfSignedCertBuilder.generateSelfSigned(
-                    securityFactory, passwordResolver, signer_type, signer_conf,
+                    securityFactory, signer_type, signer_conf,
                     certProfile, subject, serialOfThisCert, ocsp_uris, crl_uris, delta_crl_uris);
         } catch (OperationException | ConfigurationException e)
         {
@@ -3712,7 +3691,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
         {
             try
             {
-                signerConf = canonicalizeSignerConf(signer_type, signerConf, passwordResolver);
+                signerConf = canonicalizeSignerConf(signer_type, signerConf, securityFactory.getPasswordResolver());
             } catch (Exception e)
             {
                 throw new CAMgmtException(e.getClass().getName() + ": " + e.getMessage(), e);

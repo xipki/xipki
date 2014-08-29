@@ -24,7 +24,6 @@ import java.util.Set;
 import org.apache.felix.gogo.commands.Command;
 import org.apache.felix.gogo.commands.Option;
 import org.bouncycastle.asn1.x500.X500Name;
-import org.xipki.security.NopPasswordResolver;
 import org.xipki.security.api.PasswordResolverException;
 import org.xipki.security.api.SignerException;
 import org.xipki.security.api.p11.P11KeyIdentifier;
@@ -184,7 +183,7 @@ public class P11CertUpdateCommand extends P11SecurityCommand
             throw new SignerException("Unknown key type: " + pubKey.getClass().getName());
         }
 
-        securityFactory.createSigner("PKCS11", pairs.getEncoded(), cert, NopPasswordResolver.INSTANCE);
+        securityFactory.createSigner("PKCS11", pairs.getEncoded(), cert);
     }
 
     static X509PublicKeyCertificate createPkcs11Template(

@@ -20,7 +20,7 @@ import org.xipki.ca.server.mgmt.api.CAManager;
 import org.xipki.ca.server.mgmt.api.DuplicationMode;
 import org.xipki.ca.server.mgmt.api.Permission;
 import org.xipki.ca.server.mgmt.api.ValidityMode;
-import org.xipki.security.api.PasswordResolver;
+import org.xipki.security.api.SecurityFactory;
 import org.xipki.security.common.ConfigurationException;
 import org.xipki.security.common.IoCertUtil;
 
@@ -114,7 +114,12 @@ public class CaUpdateCommand extends CaCommand
                     + "\t        notBefore + validigty and CA's notAfter")
     protected String validityModeS;
 
-    private PasswordResolver passwordResolver;
+    protected SecurityFactory securityFactory;
+
+    public void setSecurityFactory(SecurityFactory securityFactory)
+    {
+        this.securityFactory = securityFactory;
+    }
 
     @Override
     protected Object doExecute()
@@ -142,7 +147,7 @@ public class CaUpdateCommand extends CaCommand
         {
              if("PKCS12".equalsIgnoreCase(signerType) || "JKS".equalsIgnoreCase(signerType))
              {
-                 signerConf = ShellUtil.canonicalizeSignerConf(signerType, signerConf, passwordResolver);
+                 signerConf = ShellUtil.canonicalizeSignerConf(signerType, signerConf, securityFactory.getPasswordResolver());
              }
         }
 
@@ -291,10 +296,5 @@ public class CaUpdateCommand extends CaCommand
                 validityMode);
 
         return null;
-    }
-
-    public void setPasswordResolver(PasswordResolver passwordResolver)
-    {
-        this.passwordResolver = passwordResolver;
     }
 }

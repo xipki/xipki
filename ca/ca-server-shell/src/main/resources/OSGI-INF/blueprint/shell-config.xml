@@ -2,7 +2,6 @@
 <blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0" xmlns:cm="http://aries.apache.org/blueprint/xmlns/blueprint-cm/v1.1.0" default-activation="lazy">
   <reference id="caManager" interface="org.xipki.ca.server.mgmt.api.CAManager"/>
   <reference id="securityFactory" interface="org.xipki.security.api.SecurityFactory"/>
-  <reference id="passwordResolver" interface="org.xipki.security.api.PasswordResolver"/>
   <reference id="filePathCompleter" interface="org.xipki.console.karaf.FilePathCompleter"/>
   <reference id="yesNoCompleter" interface="org.xipki.console.karaf.YesNoCompleter"/>
   <bean id="caStatusCompleter" class="org.xipki.console.karaf.EnumCompleter">
@@ -73,7 +72,6 @@
     <command name="ca/ca-add">
       <action class="org.xipki.ca.server.mgmt.shell.CaAddCommand">
         <property name="caManager" ref="caManager"/>
-        <property name="passwordResolver" ref="passwordResolver"/>
         <property name="securityFactory" ref="securityFactory"/>
       </action>
       <optional-completers>
@@ -120,7 +118,6 @@
     <command name="ca/gen-rca">
       <action class="org.xipki.ca.server.mgmt.shell.CaGenRootCACommand">
         <property name="caManager" ref="caManager"/>
-        <property name="passwordResolver" ref="passwordResolver"/>
         <property name="securityFactory" ref="securityFactory"/>
       </action>
       <optional-completers>
@@ -155,7 +152,7 @@
     <command name="ca/ca-update">
       <action class="org.xipki.ca.server.mgmt.shell.CaUpdateCommand">
         <property name="caManager" ref="caManager"/>
-        <property name="passwordResolver" ref="passwordResolver"/>
+        <property name="securityFactory" ref="securityFactory"/>        
       </action>
       <optional-completers>
         <entry key="-name" value-ref="caNameCompleter"/>
@@ -316,7 +313,6 @@
     <command name="ca/crlsigner-add">
       <action class="org.xipki.ca.server.mgmt.shell.CrlSignerAddCommand">
         <property name="caManager" ref="caManager"/>
-        <property name="passwordResolver" ref="passwordResolver"/>
         <property name="securityFactory" ref="securityFactory"/>
       </action>
       <optional-completers>
@@ -537,7 +533,6 @@
     <command name="ca/responder-set">
       <action class="org.xipki.ca.server.mgmt.shell.ResponderSetCommand">
         <property name="caManager" ref="caManager"/>
-        <property name="passwordResolver" ref="passwordResolver"/>
         <property name="securityFactory" ref="securityFactory"/>
       </action>
       <optional-completers>
@@ -548,7 +543,7 @@
     <command name="ca/responder-update">
       <action class="org.xipki.ca.server.mgmt.shell.ResponderUpdateCommand">
         <property name="caManager" ref="caManager"/>
-        <property name="passwordResolver" ref="passwordResolver"/>
+        <property name="securityFactory" ref="securityFactory"/>
       </action>
       <optional-completers>
         <entry key="-signerType" value-ref="signerTypeCompleter"/>

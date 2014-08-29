@@ -107,8 +107,6 @@ import org.xipki.ocsp.conf.jaxb.SignerType;
 import org.xipki.ocsp.crlstore.CrlCertStatusStore;
 import org.xipki.ocsp.dbstore.DbCertStatusStore;
 import org.xipki.security.api.ConcurrentContentSigner;
-import org.xipki.security.api.PasswordResolver;
-import org.xipki.security.api.PasswordResolverException;
 import org.xipki.security.api.SecurityFactory;
 import org.xipki.security.api.SignerException;
 import org.xipki.security.common.CRLReason;
@@ -135,7 +133,6 @@ public class OcspResponder
 
     private DataSourceFactory dataSourceFactory;
     private SecurityFactory securityFactory;
-    private PasswordResolver passwordResolver;
 
     private String confFile;
 
@@ -196,10 +193,6 @@ public class OcspResponder
         if(securityFactory == null)
         {
             throw new IllegalStateException("securityFactory is not set");
-        }
-        if(passwordResolver == null)
-        {
-            throw new IllegalStateException("passwordResolver is not set");
         }
 
         if(Security.getProvider("BC") == null)
@@ -367,9 +360,9 @@ public class OcspResponder
             {
                 ConcurrentContentSigner requestorSigner = securityFactory.createSigner(
                         responderSignerType, "algo?" + sigAlgo + "%" + responderKeyConf,
-                        explicitCertificateChain, passwordResolver);
+                        explicitCertificateChain);
                 signers.add(requestorSigner);
-            } catch (SignerException | PasswordResolverException e)
+            } catch (SignerException e)
             {
                 throw new OcspResponderException(e);
             }
@@ -434,7 +427,7 @@ public class OcspResponder
                 try
                 {
                     confStream = new FileInputStream(databaseConfFile);
-                    dataSource = dataSourceFactory.createDataSource(confStream, passwordResolver);
+                    dataSource = dataSourceFactory.createDataSource(confStream, securityFactory.getPasswordResolver());
                 } catch (Exception e)
                 {
                     throw new OcspResponderException(e);
@@ -524,7 +517,7 @@ public class OcspResponder
 
                     try
                     {
-                        customStore.init(conf, dataSourceFactory, passwordResolver);
+                        customStore.init(conf, dataSourceFactory, securityFactory.getPasswordResolver());
                     } catch (CertStatusStoreException e)
                     {
                         throw new OcspResponderException(e.getMessage(), e);
@@ -1122,11 +1115,6 @@ public class OcspResponder
     public void setDataSourceFactory(DataSourceFactory dataSourceFactory)
     {
         this.dataSourceFactory = dataSourceFactory;
-    }
-
-    public void setPasswordResolver(PasswordResolver passwordResolver)
-    {
-        this.passwordResolver = passwordResolver;
     }
 
     private static X509Certificate parseCert(String f)

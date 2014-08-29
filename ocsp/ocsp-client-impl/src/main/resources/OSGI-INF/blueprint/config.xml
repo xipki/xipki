@@ -8,9 +8,7 @@
     </cm:default-properties>
   </cm:property-placeholder>
   <reference id="securityFactory" interface="org.xipki.security.api.SecurityFactory"/>
-  <reference id="passwordResolver" interface="org.xipki.security.api.PasswordResolver"/>
   <bean id="ocspRequestor" class="org.xipki.ocsp.client.impl.DefaultHttpOCSPRequestor">
-    <property name="passwordResolver" ref="passwordResolver"/>
     <property name="securityFactory" ref="securityFactory"/>
     <property name="signerType" value="${signer.type}"/>
     <property name="signerConf" value="${signer.conf}"/>

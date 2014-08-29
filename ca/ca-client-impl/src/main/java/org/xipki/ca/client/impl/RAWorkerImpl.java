@@ -67,7 +67,6 @@ import org.xipki.ca.common.EnrollCertResult;
 import org.xipki.ca.common.PKIErrorException;
 import org.xipki.ca.common.RAWorkerException;
 import org.xipki.security.api.ConcurrentContentSigner;
-import org.xipki.security.api.PasswordResolverException;
 import org.xipki.security.api.SignerException;
 import org.xipki.security.common.ConfigurationException;
 import org.xipki.security.common.IoCertUtil;
@@ -139,7 +138,6 @@ public final class RAWorkerImpl extends AbstractRAWorker implements RAWorker
     throws ConfigurationException, IOException
     {
         ParamChecker.assertNotNull("confFile", confFile);
-        ParamChecker.assertNotNull("passwordResolver", passwordResolver);
         ParamChecker.assertNotNull("securityFactory", securityFactory);
 
         if(Security.getProvider("BC") == null)
@@ -250,11 +248,8 @@ public final class RAWorkerImpl extends AbstractRAWorker implements RAWorker
         try
         {
             requestorSigner = securityFactory.createSigner(
-                    requestorSignerType, requestorSignerConf, requestorCert, passwordResolver);
+                    requestorSignerType, requestorSignerConf, requestorCert);
         } catch (SignerException e)
-        {
-            throw new ConfigurationException(e);
-        } catch (PasswordResolverException e)
         {
             throw new ConfigurationException(e);
         }
