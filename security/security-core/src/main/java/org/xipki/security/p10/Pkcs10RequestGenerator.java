@@ -14,7 +14,6 @@ import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.bouncycastle.operator.ContentSigner;
 import org.bouncycastle.pkcs.PKCS10CertificationRequest;
 import org.bouncycastle.pkcs.PKCS10CertificationRequestBuilder;
-import org.xipki.security.NopPasswordResolver;
 import org.xipki.security.api.ConcurrentContentSigner;
 import org.xipki.security.api.NoIdleSignerException;
 import org.xipki.security.api.PasswordResolverException;
@@ -47,7 +46,7 @@ public class Pkcs10RequestGenerator
     throws PasswordResolverException, SignerException
     {
         ConcurrentContentSigner signer = securityFactory.createSigner(signerType, signerConf,
-                (X509Certificate[]) null, NopPasswordResolver.INSTANCE);
+                (X509Certificate[]) null);
         ContentSigner contentSigner;
         try
         {

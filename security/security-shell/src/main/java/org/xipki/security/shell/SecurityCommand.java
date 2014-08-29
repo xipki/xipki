@@ -49,14 +49,6 @@ public abstract class SecurityCommand extends XipkiOsgiCommandSupport
     protected IaikExtendedModule getModule(String moduleName)
     throws SignerException
     {
-        if(IaikP11CryptServiceFactory.class.getName().equals(
-                securityFactory.getPkcs11Provider()) == false)
-        {
-            throw new SignerException("P11KeypairGenerator only works with P11CryptServiceFactory " +
-                    IaikP11CryptServiceFactory.class.getName() +
-                    ", but not " + securityFactory.getPkcs11Provider());
-        }
-
         // this call initialize the IaikExtendedModule
         P11CryptService p11CryptService = securityFactory.getP11CryptService(moduleName);
         if(p11CryptService == null)
@@ -65,7 +57,13 @@ public abstract class SecurityCommand extends XipkiOsgiCommandSupport
         }
 
         // the returned object could not be null
-        return IaikP11ModulePool.getInstance().getModule(moduleName);
+        IaikExtendedModule module = IaikP11ModulePool.getInstance().getModule(moduleName);
+        if(module == null)
+        {
+           throw new SignerException("P11KeypairGenerator only works with P11CryptServiceFactory " +
+                   IaikP11CryptServiceFactory.class.getName());
+        }
+        return module;
     }
 
 }

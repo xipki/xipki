@@ -12,7 +12,6 @@ import java.security.cert.X509Certificate;
 import org.apache.felix.gogo.commands.Command;
 import org.apache.felix.gogo.commands.Option;
 import org.xipki.ca.server.mgmt.api.CrlSignerEntry;
-import org.xipki.security.api.PasswordResolver;
 import org.xipki.security.api.SecurityFactory;
 import org.xipki.security.common.IoCertUtil;
 
@@ -46,7 +45,6 @@ public class CrlSignerAddCommand extends CaCommand
     protected String crlControl;
 
     private SecurityFactory securityFactory;
-    private PasswordResolver passwordResolver;
 
     @Override
     protected Object doExecute()
@@ -65,11 +63,11 @@ public class CrlSignerAddCommand extends CaCommand
                 if("PKCS12".equalsIgnoreCase(signerType) || "JKS".equalsIgnoreCase(signerType))
                 {
                     signerConf = ShellUtil.canonicalizeSignerConf(signerType,
-                            signerConf, passwordResolver);
+                            signerConf, securityFactory.getPasswordResolver());
                 }
             }
             // check whether we can initialize the signer
-            securityFactory.createSigner(signerType, signerConf, signerCert, passwordResolver);
+            securityFactory.createSigner(signerType, signerConf, signerCert);
         }
 
         CrlSignerEntry entry = new CrlSignerEntry(name, signerType, signerConf, crlControl);
@@ -85,11 +83,6 @@ public class CrlSignerAddCommand extends CaCommand
     public void setSecurityFactory(SecurityFactory securityFactory)
     {
         this.securityFactory = securityFactory;
-    }
-
-    public void setPasswordResolver(PasswordResolver passwordResolver)
-    {
-        this.passwordResolver = passwordResolver;
     }
 
 }

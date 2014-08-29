@@ -57,8 +57,6 @@ import org.xipki.ca.common.CertProfileException;
 import org.xipki.ca.server.mgmt.api.PublicCAInfo;
 import org.xipki.security.api.ConcurrentContentSigner;
 import org.xipki.security.api.NoIdleSignerException;
-import org.xipki.security.api.PasswordResolver;
-import org.xipki.security.api.PasswordResolverException;
 import org.xipki.security.api.SecurityFactory;
 import org.xipki.security.api.SignerException;
 import org.xipki.security.common.CmpUtf8Pairs;
@@ -100,7 +98,6 @@ class SelfSignedCertBuilder
 
     public static GenerateSelfSignedResult generateSelfSigned(
             SecurityFactory securityFactory,
-            PasswordResolver passwordResolver,
             String signerType,
             String signerConf,
             IdentifiedCertProfile certProfile,
@@ -165,8 +162,8 @@ class SelfSignedCertBuilder
         ConcurrentContentSigner signer;
         try
         {
-            signer = securityFactory.createSigner(signerType, signerConf, (X509Certificate[]) null, passwordResolver);
-        } catch (PasswordResolverException | SignerException e)
+            signer = securityFactory.createSigner(signerType, signerConf, (X509Certificate[]) null);
+        } catch (SignerException e)
         {
             throw new OperationException(ErrorCode.System_Failure, e.getClass().getName() + ": " + e.getMessage());
         }

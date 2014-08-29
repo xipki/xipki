@@ -18,10 +18,8 @@
   </cm:property-placeholder>
   <reference id="dataSourceFactory" interface="org.xipki.database.api.DataSourceFactory"/>
   <reference id="securityFactory" interface="org.xipki.security.api.SecurityFactory"/>
-  <reference id="passwordResolver" interface="org.xipki.security.api.PasswordResolver"/>
   <reference id="auditServiceRegister" interface="org.xipki.audit.api.AuditLoggingServiceRegister"/>
   <bean id="caManager" class="org.xipki.ca.server.mgmt.CAManagerImpl" init-method="startCaSystem" destroy-method="shutdown">
-    <property name="passwordResolver" ref="passwordResolver"/>
     <property name="securityFactory" ref="securityFactory"/>
     <property name="dataSourceFactory" ref="dataSourceFactory"/>
     <property name="caConfFile" value="${caConfFile}"/>

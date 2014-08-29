@@ -12,7 +12,6 @@ import java.security.cert.X509Certificate;
 import org.apache.felix.gogo.commands.Command;
 import org.apache.felix.gogo.commands.Option;
 import org.xipki.ca.server.mgmt.api.CmpResponderEntry;
-import org.xipki.security.api.PasswordResolver;
 import org.xipki.security.api.SecurityFactory;
 import org.xipki.security.common.IoCertUtil;
 
@@ -37,7 +36,6 @@ public class ResponderSetCommand extends CaCommand
     protected String certFile;
 
     private SecurityFactory securityFactory;
-    private PasswordResolver passwordResolver;
 
     @Override
     protected Object doExecute()
@@ -54,13 +52,13 @@ public class ResponderSetCommand extends CaCommand
 
         if("PKCS12".equalsIgnoreCase(signerType) || "JKS".equalsIgnoreCase(signerType))
         {
-            signerConf = ShellUtil.canonicalizeSignerConf(signerType, signerConf, passwordResolver);
+            signerConf = ShellUtil.canonicalizeSignerConf(signerType, signerConf, securityFactory.getPasswordResolver());
         }
 
         entry.setConf(signerConf);
 
         // check whether we can initialize the signer
-        securityFactory.createSigner(signerType, signerConf, signerCert, passwordResolver);
+        securityFactory.createSigner(signerType, signerConf, signerCert);
 
         caManager.setCmpResponder(entry);
 
@@ -72,8 +70,4 @@ public class ResponderSetCommand extends CaCommand
         this.securityFactory = securityFactory;
     }
 
-    public void setPasswordResolver(PasswordResolver passwordResolver)
-    {
-        this.passwordResolver = passwordResolver;
-    }
 }

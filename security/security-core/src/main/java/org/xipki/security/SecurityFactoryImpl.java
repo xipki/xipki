@@ -125,29 +125,21 @@ public class SecurityFactoryImpl implements SecurityFactory
     }
 
     @Override
-    public String getPkcs11Provider()
-    {
-        return pkcs11Provider;
-    }
-
-    @Override
     public ConcurrentContentSigner createSigner(
-            String type, String conf, X509Certificate cert, PasswordResolver passwordResolver)
-    throws SignerException, PasswordResolverException
+            String type, String conf, X509Certificate cert)
+    throws SignerException
     {
         return createSigner(type, conf,
-                (cert == null ? null : new X509Certificate[]{cert}),
-                passwordResolver);
+                (cert == null ? null : new X509Certificate[]{cert}));
     }
 
     @Override
     public ConcurrentContentSigner createSigner(
             String type, String conf,
-            X509Certificate[] certificateChain,
-            PasswordResolver passwordResolver)
-    throws SignerException, PasswordResolverException
+            X509Certificate[] certificateChain)
+    throws SignerException
     {
-        ConcurrentContentSigner signer = doCreateSigner(type, conf, certificateChain, passwordResolver);
+        ConcurrentContentSigner signer = doCreateSigner(type, conf, certificateChain);
 
         X509Certificate cert = signer.getCertificate();
         if(certificateChain == null)
@@ -215,9 +207,8 @@ public class SecurityFactoryImpl implements SecurityFactory
 
     private ConcurrentContentSigner doCreateSigner(
             String type, String conf,
-            X509Certificate[] certificateChain,
-            PasswordResolver passwordResolver)
-    throws SignerException, PasswordResolverException
+            X509Certificate[] certificateChain)
+    throws SignerException
     {
         if("PKCS11".equalsIgnoreCase(type) || "PKCS12".equalsIgnoreCase(type) || "JKS".equalsIgnoreCase(type))
         {
@@ -425,7 +416,13 @@ public class SecurityFactoryImpl implements SecurityFactory
                         throw new IllegalStateException(
                                 "PasswordResolver is not initialized, please call setPasswordResolver first");
                     }
-                    password = passwordResolver.resolvePassword(passwordHint);
+                    try
+                    {
+                        password = passwordResolver.resolvePassword(passwordHint);
+                    }catch(PasswordResolverException e)
+                    {
+                        throw new SignerException("Could not resolve password. Message: " + e.getMessage());
+                    }
                 }
 
                 s = keyValues.getValue("keystore");
@@ -984,6 +981,12 @@ public class SecurityFactoryImpl implements SecurityFactory
     public String getDefaultPkcs11ModuleName()
     {
         return defaultPkcs11ModuleName;
+    }
+
+    @Override
+    public PasswordResolver getPasswordResolver()
+    {
+        return passwordResolver;
     }
 
 }
