@@ -32,6 +32,11 @@ class ShellUtil
         String passwordHint = utf8Pairs.getValue("password");
         String keyLabel     = utf8Pairs.getValue("key-label");
 
+        if(passwordHint == null)
+        {
+            throw new IllegalArgumentException("password is not set in " + signerConf);
+        }
+
         byte[] keystoreBytes;
         if(keystoreConf.startsWith("file:"))
         {
@@ -47,9 +52,18 @@ class ShellUtil
             return signerConf;
         }
 
+        char[] password;
+        if(passwordResolver == null)
+        {
+            password = passwordHint.toCharArray();
+        }
+        else
+        {
+            password = passwordResolver.resolvePassword(passwordHint);
+        }
+
         keystoreBytes = IoCertUtil.extractMinimalKeyStore(keystoreType,
-                keystoreBytes, keyLabel,
-                passwordResolver.resolvePassword(passwordHint));
+                keystoreBytes, keyLabel, password);
 
         utf8Pairs.putUtf8Pair("keystore", "base64:" + Base64.toBase64String(keystoreBytes));
         return utf8Pairs.getEncoded();

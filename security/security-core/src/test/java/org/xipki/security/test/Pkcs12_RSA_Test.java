@@ -20,7 +20,6 @@ import org.junit.Test;
 import org.xipki.security.PasswordResolverImpl;
 import org.xipki.security.SecurityFactoryImpl;
 import org.xipki.security.api.ConcurrentContentSigner;
-import org.xipki.security.api.SecurityFactory;
 import org.xipki.security.common.CmpUtf8Pairs;
 import org.xipki.security.common.IoCertUtil;
 

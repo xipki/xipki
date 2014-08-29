@@ -441,9 +441,21 @@ public class X509CACmpResponder extends CmpResponder
                         } catch (OperationException e)
                         {
                             failureInfo = PKIFailureInfo.systemFailure;
+                            ErrorCode code = e.getErrorCode();
+                            switch(code)
+                            {
+                                case DATABASE_FAILURE:
+                                case System_Failure:
+                                    statusMessage = code.name();
+                                    break;
+                                default:
+                                    statusMessage = code.name() + ": " + e.getErrorMessage();
+                                    break;
+                            }
                         } catch (CRLException e)
                         {
                             failureInfo = PKIFailureInfo.systemFailure;
+                            statusMessage = "CRLException: " + e.getMessage();
                         }
                     }
 
@@ -860,11 +872,11 @@ public class X509CACmpResponder extends CmpResponder
             CertifiedKeyPair kp = new CertifiedKeyPair(cec);
             CertResponse certResp = new CertResponse(certReqId, statusInfo, kp, null);
             return certResp;
-        }catch(OperationException ce)
+        }catch(OperationException e)
         {
-            ErrorCode code = ce.getErrorCode();
+            ErrorCode code = e.getErrorCode();
             LOG.warn("generate certificate, OperationException: code={}, message={}",
-                    code.name(), ce.getErrorMessage());
+                    code.name(), e.getErrorMessage());
 
             AuditStatus auditStatus;
             String auditMessage;
@@ -935,7 +947,7 @@ public class X509CACmpResponder extends CmpResponder
                 default:
                     failureInfo = PKIFailureInfo.systemFailure;
                     auditStatus = AuditStatus.ERROR;
-                    auditMessage = "InternalErrorCode " + ce.getErrorCode();
+                    auditMessage = "InternalErrorCode " + e.getErrorCode();
                     break;
             }
 
@@ -945,7 +957,17 @@ public class X509CACmpResponder extends CmpResponder
                 childAuditEvent.addEventData(new AuditEventData("message", auditMessage));
             }
 
-            String errorMessage = auditMessage;
+            String errorMessage;
+            switch(code)
+            {
+                case DATABASE_FAILURE:
+                case System_Failure:
+                    errorMessage = code.name();
+                    break;
+                default:
+                    errorMessage = code.name() + ": " + e.getErrorMessage();
+                    break;
+            }
             PKIStatusInfo status = generateCmpRejectionStatus(failureInfo, errorMessage);
             return new CertResponse(certReqId, status);
         }
@@ -1120,7 +1142,18 @@ public class X509CACmpResponder extends CmpResponder
                     childAuditEvent.addEventData(new AuditEventData("message", auditMessage));
                 }
 
-                String errorMessage = auditMessage;
+                String errorMessage;
+                switch(code)
+                {
+                    case DATABASE_FAILURE:
+                    case System_Failure:
+                        errorMessage = code.name();
+                        break;
+                    default:
+                        errorMessage = code.name() + ": " + e.getErrorMessage();
+                        break;
+                }
+
                 PKIStatusInfo status = generateCmpRejectionStatus(failureInfo, errorMessage);
                 repContentBuilder.add(status);
             }

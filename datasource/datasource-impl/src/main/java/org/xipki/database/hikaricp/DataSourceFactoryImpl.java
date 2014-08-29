@@ -63,7 +63,6 @@ public class DataSourceFactoryImpl implements DataSourceFactory
     throws SQLException, PasswordResolverException
     {
         assertNotNull("conf", conf);
-        assertNotNull("passwordResolver", passwordResolver);
 
         DatabaseType databaseType;
         String legacyJdbcUrl = conf.getProperty(LegacyConfConverter.DRIVER_CLASSNAME);
@@ -94,7 +93,10 @@ public class DataSourceFactoryImpl implements DataSourceFactory
         password = conf.getProperty("dataSource.password");
         if(password != null)
         {
-            password = new String(passwordResolver.resolvePassword(password));
+            if(passwordResolver != null)
+            {
+                password = new String(passwordResolver.resolvePassword(password));
+            }
             conf.setProperty("dataSource.password", password);
         }
 

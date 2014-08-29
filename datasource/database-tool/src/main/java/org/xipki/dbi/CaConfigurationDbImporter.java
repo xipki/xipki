@@ -205,6 +205,7 @@ class CaConfigurationDbImporter extends DbPorter
         System.out.println(" Imported table ENVIRONMENT");
     }
 
+    @SuppressWarnings("resource")
     private void import_crlsigner(Crlsigners crlsigners)
     throws Exception
     {
