@@ -87,14 +87,14 @@ public class CaAddCommand extends CaAddOrGenCommand
         DuplicationMode duplicateKey = DuplicationMode.getInstance(duplicateKeyS);
         if(duplicateKey == null)
         {
-              err("invalid duplication mode: " + duplicateKeyS);
+            err("invalid duplication mode: " + duplicateKeyS);
         }
         entry.setDuplicateKeyMode(duplicateKey);
 
         DuplicationMode duplicateSubject = DuplicationMode.getInstance(duplicateSubjectS);
         if(duplicateSubject == null)
         {
-              err("invalid duplication mode: " + duplicateSubjectS);
+            err("invalid duplication mode: " + duplicateSubjectS);
         }
         entry.setDuplicateSubjectMode(duplicateSubject);
 

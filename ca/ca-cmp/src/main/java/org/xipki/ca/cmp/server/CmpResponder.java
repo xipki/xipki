@@ -263,7 +263,7 @@ public abstract class CmpResponder
     protected byte[] randomTransactionId()
     {
         byte[] b = new byte[10];
-           random.nextBytes(b);
+        random.nextBytes(b);
         return  b;
     }
 

@@ -38,21 +38,21 @@ public class CaRestartCommand extends CaCommand
         {
             sb.append(" with following CAs: ");
             Set<String> caAliasNames = caManager.getCaAliasNames();
-             for(String aliasName : caAliasNames)
+            for(String aliasName : caAliasNames)
             {
-                 String name = caManager.getCaName(aliasName);
-                 names.remove(name);
+                String name = caManager.getCaName(aliasName);
+                names.remove(name);
 
                 sb.append(name).append(" (alias ").append(aliasName).append(")").append(", ");
             }
 
-             for(String name : names)
-             {
+            for(String name : names)
+            {
                 sb.append(name).append(", ");
-             }
+            }
 
-             int len = sb.length();
-             sb.delete(len-2, len);
+            int len = sb.length();
+            sb.delete(len-2, len);
         }
         else
         {

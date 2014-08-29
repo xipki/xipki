@@ -111,7 +111,7 @@ public class CmpUtf8Pairs
         int idx = s.indexOf(TOKEN_TERM);
         if(idx == -1)
         {
-             return s;
+            return s;
         }
 
         StringBuilder newS = new StringBuilder();

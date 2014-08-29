@@ -137,7 +137,7 @@ class ECDSASignatureSpi extends SignatureSpi
         digest.update(b);
     }
 
-   protected void engineUpdate(
+    protected void engineUpdate(
         byte[]  b,
         int     off,
         int     len)

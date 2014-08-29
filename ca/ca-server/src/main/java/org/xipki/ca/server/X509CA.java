@@ -1027,8 +1027,8 @@ public class X509CA
                     boolean successfull = publisher.caRevoked(caInfo.getCertificate(), caInfo.getRevocationInfo());
                     if(successfull == false)
                     {
-                       LOG.error("Republish CA revocation to publisher {} failed", publisher.getName());
-                       return false;
+                        LOG.error("Republish CA revocation to publisher {} failed", publisher.getName());
+                        return false;
                     }
                 }
             }
@@ -1556,7 +1556,7 @@ public class X509CA
             certProfile = getX509CertProfile(certProfileName);
         } catch (CertProfileException e)
         {
-             throw new OperationException(ErrorCode.System_Failure, "invalid configuration of cert profile " + certProfileName);
+            throw new OperationException(ErrorCode.System_Failure, "invalid configuration of cert profile " + certProfileName);
         }
 
         if(certProfile == null)
@@ -1729,8 +1729,8 @@ public class X509CA
                                     caInfo.getCertificate(), subjectPublicKeyData, certProfileName);
                         } catch (CertificateEncodingException e)
                         {
-                             throw new OperationException(ErrorCode.System_Failure,
-                                     "could not construct CertificateInfo: " + e.getMessage());
+                            throw new OperationException(ErrorCode.System_Failure,
+                                    "could not construct CertificateInfo: " + e.getMessage());
                         }
                         certInfo.setAlreadyIssued(true);
                         return certInfo;
@@ -1856,8 +1856,8 @@ public class X509CA
                                 pendingSubjectMap.get(sha1FpSubject).contains(certProfileName))
                         {
                             throw new OperationException(ErrorCode.ALREADY_ISSUED,
-                                   "Certificate for the given subject " + grandtedSubjectText +
-                                   " and profile " + certProfileName + " already in process");
+                                    "Certificate for the given subject " + grandtedSubjectText +
+                                    " and profile " + certProfileName + " already in process");
                         }
                     }
 
@@ -1890,8 +1890,8 @@ public class X509CA
                                 pendingKeyMap.get(sha1FpPublicKey).contains(certProfileName))
                         {
                             throw new OperationException(ErrorCode.ALREADY_ISSUED,
-                                   "Certificate for the given public key" +
-                                   " and profile " + certProfileName + " already in process");
+                                    "Certificate for the given public key" +
+                                    " and profile " + certProfileName + " already in process");
                         }
                     }
 
@@ -2013,8 +2013,8 @@ public class X509CA
                         new ByteArrayInputStream(encodedCert));
                 if(verifySignature(cert) == false)
                 {
-                     throw new OperationException(ErrorCode.System_Failure,
-                             "Could not verify the signature of generated certificate");
+                    throw new OperationException(ErrorCode.System_Failure,
+                            "Could not verify the signature of generated certificate");
                 }
 
                 X509CertificateWithMetaInfo certWithMeta = new X509CertificateWithMetaInfo(cert, encodedCert);
@@ -2498,7 +2498,7 @@ public class X509CA
 
                     try
                     {
-                           caInfo.setLastCRLInterval(deltaCrl ? thisInterval : 0);
+                        caInfo.setLastCRLInterval(deltaCrl ? thisInterval : 0);
                         caInfo.setLastCRLIntervalDate(nowInSecond);
                         caManager.setCRLLastInterval(caInfo.getName(), caInfo.getLastCRLInterval(),
                                 caInfo.getLastCRLIntervalDate());
@@ -2536,9 +2536,9 @@ public class X509CA
         }
 
         int intervalsTillNextCRL = 0;
-           for(int i = 1; ; i++)
-           {
-               if(i % control.getFullCRLIntervals() == 0)
+        for(int i = 1; ; i++)
+        {
+            if(i % control.getFullCRLIntervals() == 0)
             {
                 intervalsTillNextCRL = i;
                 break;

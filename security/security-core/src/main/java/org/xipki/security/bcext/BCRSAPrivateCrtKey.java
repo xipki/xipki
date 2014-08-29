@@ -206,8 +206,8 @@ public class BCRSAPrivateCrtKey
     public int hashCode()
     {
         return this.getModulus().hashCode()
-               ^ this.getPublicExponent().hashCode()
-               ^ this.getPrivateExponent().hashCode();
+                ^ this.getPublicExponent().hashCode()
+                ^ this.getPrivateExponent().hashCode();
     }
 
     public boolean equals(Object o)
@@ -225,13 +225,13 @@ public class BCRSAPrivateCrtKey
         RSAPrivateCrtKey key = (RSAPrivateCrtKey)o;
 
         return this.getModulus().equals(key.getModulus())
-         && this.getPublicExponent().equals(key.getPublicExponent())
-         && this.getPrivateExponent().equals(key.getPrivateExponent())
-         && this.getPrimeP().equals(key.getPrimeP())
-         && this.getPrimeQ().equals(key.getPrimeQ())
-         && this.getPrimeExponentP().equals(key.getPrimeExponentP())
-         && this.getPrimeExponentQ().equals(key.getPrimeExponentQ())
-         && this.getCrtCoefficient().equals(key.getCrtCoefficient());
+            && this.getPublicExponent().equals(key.getPublicExponent())
+            && this.getPrivateExponent().equals(key.getPrivateExponent())
+            && this.getPrimeP().equals(key.getPrimeP())
+            && this.getPrimeQ().equals(key.getPrimeQ())
+            && this.getPrimeExponentP().equals(key.getPrimeExponentP())
+            && this.getPrimeExponentQ().equals(key.getPrimeExponentQ())
+            && this.getCrtCoefficient().equals(key.getCrtCoefficient());
     }
 
     public String toString()

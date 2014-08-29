@@ -1179,8 +1179,7 @@ public class DefaultCertProfile extends AbstractCertProfile
         }
 
         ASN1Encodable dnValue;
-        if(ObjectIdentifiers.DN_SERIALNUMBER.equals(type) ||
-           ObjectIdentifiers.DN_C.equals(type))
+        if(ObjectIdentifiers.DN_SERIALNUMBER.equals(type) || ObjectIdentifiers.DN_C.equals(type))
         {
             dnValue = new DERPrintableString(text);
         }

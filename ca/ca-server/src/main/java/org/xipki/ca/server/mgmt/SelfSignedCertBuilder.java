@@ -430,12 +430,11 @@ class SelfSignedCertBuilder
         }
         else if(key instanceof DSAPublicKey)
         {
-               return DSAUtil.generatePublicKeyParameter(key);
+            return DSAUtil.generatePublicKeyParameter(key);
         }
         else
         {
             throw new InvalidKeyException("unknown key " + key.getClass().getName());
-
         }
     }
 
