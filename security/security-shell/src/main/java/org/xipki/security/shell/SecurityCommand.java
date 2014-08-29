@@ -60,8 +60,8 @@ public abstract class SecurityCommand extends XipkiOsgiCommandSupport
         IaikExtendedModule module = IaikP11ModulePool.getInstance().getModule(moduleName);
         if(module == null)
         {
-           throw new SignerException("P11KeypairGenerator only works with P11CryptServiceFactory " +
-                   IaikP11CryptServiceFactory.class.getName());
+            throw new SignerException("P11KeypairGenerator only works with P11CryptServiceFactory " +
+                    IaikP11CryptServiceFactory.class.getName());
         }
         return module;
     }

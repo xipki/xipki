@@ -96,7 +96,7 @@ public class DefaultConcurrentContentSigner implements ConcurrentContentSigner
     {
         if(soTimeout == 0)
         {
-               ContentSigner signer = null;
+            ContentSigner signer = null;
             try
             {
                 signer = idleSigners.takeFirst();

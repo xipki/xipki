@@ -59,6 +59,7 @@ public class ChildAuditEvent
                 tbr = ed;
             }
         }
+
         if(tbr != null)
         {
             eventDatas.remove(tbr);

@@ -21,7 +21,7 @@ import org.xipki.security.api.p11.P11KeyIdentifier;
  *
  * <pre>
  * SlotIdentifier ::= CHOICE
- {
+ * {
  *     keyLabel   UTF8STRING,
  *     keyId      OCTET STRING
  * }

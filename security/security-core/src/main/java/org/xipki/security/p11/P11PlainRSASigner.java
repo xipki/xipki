@@ -49,7 +49,7 @@ public class P11PlainRSASigner implements AsymmetricBlockCipher
     @Override
     public int getOutputBlockSize()
     {
-         return (param.getKeysize() + 7) / 8;
+        return (param.getKeysize() + 7) / 8;
     }
 
     @Override
