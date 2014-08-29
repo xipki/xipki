@@ -42,8 +42,6 @@ class IaikP11Identity implements Comparable<IaikP11Identity>
             X509Certificate[] certificateChain,
             PublicKey publicKey)
     {
-        super();
-
         ParamChecker.assertNotNull("slotId", slotId);
         ParamChecker.assertNotNull("keyId", keyId);
 

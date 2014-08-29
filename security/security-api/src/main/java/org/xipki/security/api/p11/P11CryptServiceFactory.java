@@ -7,8 +7,6 @@
 
 package org.xipki.security.api.p11;
 
-import java.util.Collection;
-
 import org.xipki.security.api.SignerException;
 
 /**
@@ -17,7 +15,7 @@ import org.xipki.security.api.SignerException;
 
 public interface P11CryptServiceFactory
 {
-    void init(String defaultModuleName, Collection<P11ModuleConf> moduleConfs);
+    void init(P11Control p11Control);
 
     P11CryptService createP11CryptService(String moduleName)
     throws SignerException;
