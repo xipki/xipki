@@ -65,7 +65,7 @@ public class ResponderUpdateCommand extends CaCommand
         }
 
         caManager.changeCmpResponder(signerType, signerConf, cert);
-
+        out("updated CMP responder");
         return null;
     }
 

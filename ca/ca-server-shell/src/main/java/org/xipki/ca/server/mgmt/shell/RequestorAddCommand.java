@@ -36,7 +36,7 @@ public class RequestorAddCommand extends CaCommand
         CmpRequestorEntry entry = new CmpRequestorEntry(name);
         entry.setCert(IoCertUtil.parseCert(certFile));
         caManager.addCmpRequestor(entry);
-
+        out("added CMP requestor " + name);
         return null;
     }
 }

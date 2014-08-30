@@ -25,6 +25,7 @@ public class EnvRemoveCommand extends CaCommand
     throws Exception
     {
         caManager.removeEnvParam(name);
+        out("removed environment parameter " + name);
         return null;
     }
 }

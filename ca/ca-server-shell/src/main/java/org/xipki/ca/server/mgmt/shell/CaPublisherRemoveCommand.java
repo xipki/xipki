@@ -31,6 +31,7 @@ public class CaPublisherRemoveCommand extends CaCommand
     throws Exception
     {
         caManager.removePublisherFromCA(publisherName, caName);
+        out("removed publisher " + publisherName + " from CA " + caName);
         return null;
     }
 }

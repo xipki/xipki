@@ -33,6 +33,7 @@ public class EnvAddCommand extends CaCommand
     throws Exception
     {
         caManager.addEnvParam(name, value);
+        out("added environment parameter " + name);
         return null;
     }
 }

@@ -56,7 +56,7 @@ public class CmpControlUpdateCommand extends CaCommand
 
         caManager.changeCmpControl(requireConfirmCert, requireMessageTime, messageTimeBias, confirmWaitTime,
                 sendCaCert, sendResponderCert);
-
+        out("update CMP control");
         return null;
     }
 }

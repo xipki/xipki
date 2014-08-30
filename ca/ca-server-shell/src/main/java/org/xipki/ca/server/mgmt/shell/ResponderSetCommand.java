@@ -61,7 +61,7 @@ public class ResponderSetCommand extends CaCommand
         securityFactory.createSigner(signerType, signerConf, signerCert);
 
         caManager.setCmpResponder(entry);
-
+        out("configured CMP responder");
         return null;
     }
 

@@ -32,6 +32,7 @@ public class CaAliasAddCommand extends CaCommand
     throws Exception
     {
         caManager.addCaAlias(caAlias, caName);
+        out("added CA alias " + caAlias + " associated with CA " + caName);
         return null;
     }
 }

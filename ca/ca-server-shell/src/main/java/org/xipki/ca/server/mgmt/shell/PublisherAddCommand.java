@@ -49,7 +49,7 @@ public class PublisherAddCommand extends CaCommand
 
         PublisherEntry entry = new PublisherEntry(name, type, conf);
         caManager.addPublisher(entry);
-
+        out("added publisher " + name);
         return null;
     }
 }

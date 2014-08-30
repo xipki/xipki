@@ -32,6 +32,8 @@ public class CaUnrevokeCommand extends CaCommand
 
         caManager.unrevokeCa(caName);
 
+        out("unrevoked CA " + caName);
+
         return null;
     }
 }

@@ -52,7 +52,7 @@ public class ProfileUpdateCommand extends CaCommand
         }
 
         caManager.changeCertProfile(name, type, conf);
-
+        out("updated certificate profile " + name);
         return null;
     }
 }

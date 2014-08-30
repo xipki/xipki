@@ -123,6 +123,7 @@ public class CaGenRootCACommand extends CaAddOrGenCommand
             saveVerbose("Saved root certificate to file", new File(rcaCertOutFile), rcaCert.getEncoded());
         }
 
+        out("Generated root CA " + caName);
         return null;
     }
 
