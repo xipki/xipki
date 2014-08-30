@@ -177,7 +177,6 @@ class CaConfigurationDbExporter extends DbPorter
 
             StringBuilder sqlBuilder = new StringBuilder();
             sqlBuilder.append("SELECT NAME, SIGNER_TYPE, SIGNER_CONF, SIGNER_CERT, CRL_CONTROL");
-
             sqlBuilder.append(" FROM CRLSIGNER");
 
             rs = stmt.executeQuery(sqlBuilder.toString());
@@ -404,12 +403,12 @@ class CaConfigurationDbExporter extends DbPorter
         {
             StringBuilder sb = new StringBuilder();
 
-            sb.append("SELECT NAME, NEXT_SERIAL, STATUS, CRL_URIS, OCSP_URIS, MAX_VALIDITY, ");
-            sb.append("CERT, SIGNER_TYPE, SIGNER_CONF, CRLSIGNER_NAME, ");
-            sb.append("DUPLICATE_KEY_MODE, DUPLICATE_SUBJECT_MODE, PERMISSIONS, NUM_CRLS, ");
-            sb.append("EXPIRATION_PERIOD, REVOKED, REV_REASON, REV_TIME, REV_INVALIDITY_TIME");
-            sb.append(", DELTA_CRL_URIS, VALIDITY_MODE");
-            sb.append(", LAST_CRL_INTERVAL, LAST_CRL_INTERVAL_DATE");
+            sb.append("SELECT NAME, NEXT_SERIAL, STATUS, CRL_URIS, OCSP_URIS, MAX_VALIDITY,");
+            sb.append(" CERT, SIGNER_TYPE, SIGNER_CONF, CRLSIGNER_NAME,");
+            sb.append(" DUPLICATE_KEY_MODE, DUPLICATE_SUBJECT_MODE, PERMISSIONS, NUM_CRLS,");
+            sb.append(" EXPIRATION_PERIOD, REVOKED, REV_REASON, REV_TIME, REV_INVALIDITY_TIME,");
+            sb.append(" DELTA_CRL_URIS, VALIDITY_MODE,");
+            sb.append(" LAST_CRL_INTERVAL, LAST_CRL_INTERVAL_DATE");
             sb.append(" FROM CA");
 
             String sql = sb.toString();
