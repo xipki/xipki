@@ -13,8 +13,6 @@
   <packaging>pom</packaging>
   <name>XiPKI :: ${project.artifactId}</name>
   <modules>
-    <module>remotep11-common</module>
-    <module>remotep11-client</module>
     <module>remotep11-server</module>
   </modules>
 </project>
