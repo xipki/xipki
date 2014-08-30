@@ -214,8 +214,8 @@ class CaConfigurationDbImporter extends DbPorter
         try
         {
             ps = prepareStatement(
-                    "INSERT INTO CRLSIGNER (NAME, SIGNER_TYPE, SIGNER_CONF, SIGNER_CERT, CRL_CONTROL)"
-                    + " VALUES (?, ?, ?, ?, ?)");
+                    "INSERT INTO CRLSIGNER (NAME, SIGNER_TYPE, SIGNER_CONF, SIGNER_CERT, CRL_CONTROL)" +
+                    " VALUES (?, ?, ?, ?, ?)");
 
             for(CrlsignerType crlsigner : crlsigners.getCrlsigner())
             {
@@ -356,12 +356,12 @@ class CaConfigurationDbImporter extends DbPorter
         try
         {
             StringBuilder sqlBuilder = new StringBuilder();
-            sqlBuilder.append("INSERT INTO CA (NAME, SUBJECT, NEXT_SERIAL, STATUS");
-            sqlBuilder.append(", CRL_URIS, DELTA_CRL_URIS, OCSP_URIS, MAX_VALIDITY");
-            sqlBuilder.append(", CERT, SIGNER_TYPE, SIGNER_CONF, CRLSIGNER_NAME");
-            sqlBuilder.append(", DUPLICATE_KEY_MODE, DUPLICATE_SUBJECT_MODE, PERMISSIONS, NUM_CRLS");
-            sqlBuilder.append(", EXPIRATION_PERIOD, REVOKED, REV_REASON, REV_TIME, REV_INVALIDITY_TIME, VALIDITY_MODE");
-            sqlBuilder.append(", LAST_CRL_INTERVAL, LAST_CRL_INTERVAL_DATE)");
+            sqlBuilder.append("INSERT INTO CA (NAME, SUBJECT, NEXT_SERIAL, STATUS,");
+            sqlBuilder.append(" CRL_URIS, DELTA_CRL_URIS, OCSP_URIS, MAX_VALIDITY,");
+            sqlBuilder.append(" CERT, SIGNER_TYPE, SIGNER_CONF, CRLSIGNER_NAME,");
+            sqlBuilder.append(" DUPLICATE_KEY_MODE, DUPLICATE_SUBJECT_MODE, PERMISSIONS, NUM_CRLS,");
+            sqlBuilder.append(" EXPIRATION_PERIOD, REVOKED, REV_REASON, REV_TIME, REV_INVALIDITY_TIME, VALIDITY_MODE,");
+            sqlBuilder.append(" LAST_CRL_INTERVAL, LAST_CRL_INTERVAL_DATE)");
             sqlBuilder.append(" VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
 
             ps = prepareStatement(sqlBuilder.toString());

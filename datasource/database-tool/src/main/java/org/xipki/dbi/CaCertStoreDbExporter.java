@@ -705,8 +705,7 @@ class CaCertStoreDbExporter extends DbPorter
     {
         System.out.println("Exporting table DELTACRL_CACHE");
 
-        String sql = "SELECT SERIAL, CAINFO_ID" +
-                " FROM DELTACRL_CACHE";
+        String sql = "SELECT SERIAL, CAINFO_ID FROM DELTACRL_CACHE";
 
         DeltaCRLCache deltaCache = new DeltaCRLCache();
         certstore.setDeltaCRLCache(deltaCache);
