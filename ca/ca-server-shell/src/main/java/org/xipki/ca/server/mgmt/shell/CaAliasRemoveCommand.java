@@ -25,6 +25,7 @@ public class CaAliasRemoveCommand extends CaCommand
     throws Exception
     {
         caManager.removeCaAlias(caAlias);
+        out("Removed CA alias " + caAlias );
         return null;
     }
 }

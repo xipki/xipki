@@ -31,6 +31,7 @@ public class CaRequestorRemoveCommand extends CaCommand
     throws Exception
     {
         caManager.removeCmpRequestorFromCA(requestorName, caName);
+        out("removed requestor " + requestorName + " from CA " + caName);
         return null;
     }
 }

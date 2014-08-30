@@ -49,7 +49,7 @@ public class ProfileAddCommand extends CaCommand
 
         CertProfileEntry entry = new CertProfileEntry(name, type, conf);
         caManager.addCertProfile(entry);
-
+        out("added certificate profile " + name);
         return null;
     }
 }

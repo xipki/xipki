@@ -25,6 +25,7 @@ public class PublisherRemoveCommand extends CaCommand
     throws Exception
     {
         caManager.removePublisher(name);
+        out("removed certificate profile " + name);
         return null;
     }
 }

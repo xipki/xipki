@@ -25,6 +25,7 @@ public class CaRemoveCommand extends CaCommand
     throws Exception
     {
         caManager.removeCA(name);
+        out("removed CA " + name);
         return null;
     }
 }

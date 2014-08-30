@@ -31,6 +31,7 @@ public class CaPublishRCACertCommand extends CaCommand
     throws Exception
     {
         caManager.publishRootCA(caName, certprofile);
+        out("published CA certificate of root CA " + caName);
         return null;
     }
 }

@@ -35,6 +35,7 @@ public class CaPublisherAddCommand extends CaCommand
         for(String publisherName : publisherNames)
         {
             caManager.addPublisherToCA(publisherName, caName);
+            out("added publisher " + publisherName + " to CA " + caName);
         }
         return null;
     }
