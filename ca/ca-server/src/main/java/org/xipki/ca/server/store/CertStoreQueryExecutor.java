@@ -163,11 +163,9 @@ class CertStoreQueryExecutor
     throws SQLException, OperationException
     {
         final String SQL_ADD_CERT =
-                "INSERT INTO CERT " +
-                "(ID, LAST_UPDATE, SERIAL, SUBJECT,"
-                + " NOTBEFORE, NOTAFTER, REVOKED,"
-                + " CERTPROFILEINFO_ID, CAINFO_ID,"
-                + " REQUESTORINFO_ID, USER_ID, SHA1_FP_PK, SHA1_FP_SUBJECT, EE)" +
+                "INSERT INTO CERT" +
+                " (ID, LAST_UPDATE, SERIAL, SUBJECT, NOTBEFORE, NOTAFTER, REVOKED, CERTPROFILEINFO_ID,"
+                + " CAINFO_ID, REQUESTORINFO_ID, USER_ID, SHA1_FP_PK, SHA1_FP_SUBJECT, EE)" +
                 " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
         final String SQL_ADD_RAWCERT = "INSERT INTO RAWCERT (CERT_ID, SHA1_FP, CERT) VALUES (?, ?, ?)";
@@ -277,11 +275,8 @@ class CertStoreQueryExecutor
     void addToPublishQueue(String publisherName, int certId, X509CertificateWithMetaInfo caCert)
     throws SQLException, OperationException
     {
-        final String SQL = "INSERT INTO PUBLISHQUEUE " +
-                "(PUBLISHER_ID, CAINFO_ID, CERT_ID) " +
-                " VALUES (?, ?, ?)";
+        final String SQL = "INSERT INTO PUBLISHQUEUE (PUBLISHER_ID, CAINFO_ID, CERT_ID) VALUES (?, ?, ?)";
         PreparedStatement ps = borrowPreparedStatement(SQL);
-
         int caId = getCaId(caCert);
         try
         {
@@ -300,11 +295,8 @@ class CertStoreQueryExecutor
     void removeFromPublishQueue(String publisherName, int certId)
     throws SQLException
     {
-        final String SQL = "DELETE FROM PUBLISHQUEUE " +
-                "WHERE PUBLISHER_ID = ? AND CERT_ID = ?";
-
+        final String SQL = "DELETE FROM PUBLISHQUEUE WHERE PUBLISHER_ID=? AND CERT_ID=?";
         PreparedStatement ps = borrowPreparedStatement(SQL);
-
         try
         {
             int publisherId = getPublisherId(publisherName);
@@ -554,10 +546,9 @@ class CertStoreQueryExecutor
             }
         }
 
-        final String SQL_REVOKE_CERT =
-                "UPDATE CERT" +
-                " SET LAST_UPDATE=?, REVOKED = ?, REV_TIME = ?, REV_INVALIDITY_TIME=?, REV_REASON = ?" +
-                " WHERE ID = ?";
+        final String SQL_REVOKE_CERT = "UPDATE CERT" +
+                " SET LAST_UPDATE=?, REVOKED=?, REV_TIME=?, REV_INVALIDITY_TIME=?, REV_REASON=?" +
+                " WHERE ID=?";
         PreparedStatement ps = borrowPreparedStatement(SQL_REVOKE_CERT);
 
         int certId = certWithRevInfo.getCert().getCertId().intValue();
@@ -638,8 +629,8 @@ class CertStoreQueryExecutor
 
         final String SQL_REVOKE_CERT =
                 "UPDATE CERT" +
-                " SET LAST_UPDATE=?, REVOKED = ?, REV_TIME = ?, REV_INVALIDITY_TIME=?, REV_REASON = ?" +
-                " WHERE ID = ?";
+                " SET LAST_UPDATE=?, REVOKED=?, REV_TIME=?, REV_INVALIDITY_TIME=?, REV_REASON=?" +
+                " WHERE ID=?";
         PreparedStatement ps = borrowPreparedStatement(SQL_REVOKE_CERT);
 
         int certId = certWithRevInfo.getCert().getCertId().intValue();
@@ -684,9 +675,7 @@ class CertStoreQueryExecutor
     private void publishToDeltaCRLCache(int caId, BigInteger serialNumber)
     throws SQLException
     {
-        final String SQL = "INSERT INTO DELTACRL_CACHE " +
-                "(CAINFO_ID, SERIAL) " +
-                " VALUES (?, ?)";
+        final String SQL = "INSERT INTO DELTACRL_CACHE (CAINFO_ID, SERIAL) VALUES (?, ?)";
         PreparedStatement ps = borrowPreparedStatement(SQL);
 
         try
@@ -713,9 +702,7 @@ class CertStoreQueryExecutor
 
         Integer caId = getCaId(caCert); // could not be null
 
-        final String SQL_REVOKE_CERT =
-                "DELETE FROM CERT" +
-                " WHERE CAINFO_ID = ? AND SERIAL = ?";
+        final String SQL_REVOKE_CERT = "DELETE FROM CERT WHERE CAINFO_ID=? AND SERIAL=?";
         PreparedStatement ps = borrowPreparedStatement(SQL_REVOKE_CERT);
 
         try
@@ -786,10 +773,8 @@ class CertStoreQueryExecutor
         int caId = getCaId(caCert);
         int publisherId = getPublisherId(publisherName);
 
-        StringBuilder sb = new StringBuilder("CERT_ID FROM PUBLISHQUEUE ");
-        sb.append(" WHERE CAINFO_ID=? AND PUBLISHER_ID=?");
-
-        final String sql = dataSource.createFetchFirstSelectSQL(sb.toString(), numEntries, "CERT_ID ASC");
+        String sql = "CERT_ID FROM PUBLISHQUEUE WHERE CAINFO_ID=? AND PUBLISHER_ID=?";
+        sql = dataSource.createFetchFirstSelectSQL(sql, numEntries, "CERT_ID ASC");
         PreparedStatement ps = borrowPreparedStatement(sql);
 
         ResultSet rs = null;
@@ -830,8 +815,7 @@ class CertStoreQueryExecutor
 
         int caId = getCaId(caCert);
 
-        StringBuilder sb = new StringBuilder("SERIAL FROM CERT ");
-        sb.append(" WHERE CAINFO_ID=? AND SERIAL>?");
+        StringBuilder sb = new StringBuilder("SERIAL FROM CERT WHERE CAINFO_ID=? AND SERIAL>?");
         if(notExpiredAt != null)
         {
             sb.append(" AND NOTAFTER>?");
@@ -1289,8 +1273,7 @@ class CertStoreQueryExecutor
         }
 
         StringBuilder sqlBuiler = new StringBuilder();
-        sqlBuiler.append("SERIAL, REV_REASON, REV_TIME, REV_INVALIDITY_TIME");
-        sqlBuiler.append(" FROM CERT");
+        sqlBuiler.append("SERIAL, REV_REASON, REV_TIME, REV_INVALIDITY_TIME FROM CERT");
         sqlBuiler.append(" WHERE CAINFO_ID=? AND REVOKED=? AND SERIAL>? AND NOTAFTER>?");
         if(onlyCACerts)
         {
@@ -1354,9 +1337,7 @@ class CertStoreQueryExecutor
             return Collections.emptyList();
         }
 
-        String sql = "SERIAL FROM DELTACRL_CACHE"
-                + " WHERE CAINFO_ID=? AND SERIAL>?";
-
+        String sql = "SERIAL FROM DELTACRL_CACHE WHERE CAINFO_ID=? AND SERIAL>?";
         sql = dataSource.createFetchFirstSelectSQL(sql, numEntries, "SERIAL ASC");
         PreparedStatement ps = borrowPreparedStatement(sql);
 
@@ -1947,7 +1928,7 @@ class CertStoreQueryExecutor
             return null;
         }
 
-        String sql = "NOTBEFORE FROM CERT WHERE CERTPROFILEINFO_ID = ? AND SUBJECT LIKE ?";
+        String sql = "NOTBEFORE FROM CERT WHERE CERTPROFILEINFO_ID=? AND SUBJECT LIKE ?";
         sql = dataSource.createFetchFirstSelectSQL(sql, 1, "NOTBEFORE ASC");
         PreparedStatement ps = borrowPreparedStatement(sql);
 

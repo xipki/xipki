@@ -329,10 +329,8 @@ public class DbCertStatusStore extends CertStatusStore
                 return CertStatusInfo.getIssuerUnknownCertStatusInfo(thisUpdate, null);
             }
 
-            final String sql =
-                    "ID, NOTBEFORE, REVOKED, REV_REASON, REV_TIME, REV_INVALIDITY_TIME, PROFILE" +
-                    " FROM CERT" +
-                    " WHERE ISSUER_ID=? AND SERIAL=?";
+            final String sql = "ID, NOTBEFORE, REVOKED, REV_REASON, REV_TIME, REV_INVALIDITY_TIME, PROFILE" +
+                    " FROM CERT WHERE ISSUER_ID=? AND SERIAL=?";
 
             PreparedStatement ps = borrowPreparedStatement(
                     dataSource.createFetchFirstSelectSQL(sql, 1));
@@ -449,8 +447,7 @@ public class DbCertStatusStore extends CertStatusStore
     private byte[] getCertHash(int certId, HashAlgoType hashAlgo)
     throws SQLException
     {
-        final String sql = hashAlgo.name().toUpperCase() + "_FP" +
-                " FROM CERTHASH WHERE CERT_ID=?";
+        final String sql = hashAlgo.name().toUpperCase() + "_FP FROM CERTHASH WHERE CERT_ID=?";
         PreparedStatement ps = borrowPreparedStatement(
                 dataSource.createFetchFirstSelectSQL(sql, 1));
         ResultSet rs = null;

@@ -137,8 +137,8 @@ class CertStatusStoreQueryExecutor
         if(certRegistered)
         {
             final String sql = "UPDATE CERT" +
-                    " SET LAST_UPDATE = ?, REVOKED = ?, REV_TIME = ?, REV_INVALIDITY_TIME = ?, REV_REASON = ?" +
-                    " WHERE ISSUER_ID = ? AND SERIAL = ?";
+                    " SET LAST_UPDATE=?, REVOKED=?, REV_TIME=?, REV_INVALIDITY_TIME=?, REV_REASON=?" +
+                    " WHERE ISSUER_ID=? AND SERIAL=?";
             PreparedStatement ps = borrowPreparedStatement(sql);
 
             try
@@ -319,8 +319,8 @@ class CertStatusStoreQueryExecutor
         }
 
         final String sql = "UPDATE CERT" +
-                " SET LAST_UPDATE = ?, REVOKED = ?, REV_TIME = ?, REV_INVALIDITY_TIME = ?, REV_REASON = ?" +
-                " WHERE ISSUER_ID = ? AND SERIAL = ?";
+                " SET LAST_UPDATE=?, REVOKED=?, REV_TIME=?, REV_INVALIDITY_TIME=?, REV_REASON=?" +
+                " WHERE ISSUER_ID=? AND SERIAL=?";
         PreparedStatement ps = borrowPreparedStatement(sql);
 
         try
@@ -350,8 +350,7 @@ class CertStatusStoreQueryExecutor
             return;
         }
 
-        final String sql = "DELETE FROM CERT" +
-                " WHERE ISSUER_ID = ? AND SERIAL = ?";
+        final String sql = "DELETE FROM CERT WHERE ISSUER_ID=? AND SERIAL=?";
         PreparedStatement ps = borrowPreparedStatement(sql);
 
         try
@@ -377,9 +376,7 @@ class CertStatusStoreQueryExecutor
         }
 
         int issuerId = getIssuerId(caCert);
-        final String sql = "UPDATE ISSUER" +
-                    " SET REVOKED = ?, REV_TIME = ?, REV_INVALIDITY_TIME = ?, REV_REASON = ?" +
-                    " WHERE ID = ?";
+        final String sql = "UPDATE ISSUER SET REVOKED=?, REV_TIME=?, REV_INVALIDITY_TIME=?, REV_REASON=? WHERE ID=?";
         PreparedStatement ps = borrowPreparedStatement(sql);
 
         try
@@ -401,9 +398,7 @@ class CertStatusStoreQueryExecutor
     throws SQLException, CertificateEncodingException
     {
         int issuerId = getIssuerId(caCert);
-        final String sql = "UPDATE ISSUER" +
-                    " SET REVOKED = ?, REV_TIME = ?, REV_INVALIDITY_TIME = ?, REV_REASON = ?" +
-                    " WHERE ID = ?";
+        final String sql = "UPDATE ISSUER SET REVOKED=?, REV_TIME=?, REV_INVALIDITY_TIME=?, REV_REASON=? WHERE ID=?";
         PreparedStatement ps = borrowPreparedStatement(sql);
 
         try
@@ -431,15 +426,9 @@ class CertStatusStoreQueryExecutor
         }
 
         final String sql =
-                "INSERT INTO ISSUER" +
-                " (ID, SUBJECT, "
-                + "NOTBEFORE, NOTAFTER, "
-                + "SHA1_FP_NAME, SHA1_FP_KEY, "
-                + "SHA224_FP_NAME, SHA224_FP_KEY, "
-                + "SHA256_FP_NAME, SHA256_FP_KEY, "
-                + "SHA384_FP_NAME, SHA384_FP_KEY, "
-                + "SHA512_FP_NAME, SHA512_FP_KEY,"
-                + "SHA1_FP_CERT, CERT)" +
+                "INSERT INTO ISSUER (ID, SUBJECT, NOTBEFORE, NOTAFTER," +
+                " SHA1_FP_NAME, SHA1_FP_KEY, SHA224_FP_NAME, SHA224_FP_KEY, SHA256_FP_NAME, SHA256_FP_KEY," +
+                " SHA384_FP_NAME, SHA384_FP_KEY, SHA512_FP_NAME, SHA512_FP_KEY,SHA1_FP_CERT, CERT)" +
                 " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         PreparedStatement ps = borrowPreparedStatement(sql);
 
@@ -556,7 +545,7 @@ class CertStatusStoreQueryExecutor
     private boolean certRegistered(int issuerId, BigInteger serialNumber)
     throws SQLException
     {
-        String sql = "COUNT(*) FROM CERT WHERE ISSUER_ID = ? AND SERIAL = ?";
+        String sql = "COUNT(*) FROM CERT WHERE ISSUER_ID=? AND SERIAL=?";
         sql = dataSource.createFetchFirstSelectSQL(sql, 1);
         PreparedStatement ps = borrowPreparedStatement(sql);
         ResultSet rs = null;
