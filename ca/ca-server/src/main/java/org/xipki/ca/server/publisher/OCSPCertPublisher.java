@@ -35,20 +35,20 @@ import org.xipki.security.common.ParamChecker;
 /**
  * @author Lijun Liao
  */
-
-public class DefaultCertPublisher extends CertPublisher
+@Deprecated
+public class OCSPCertPublisher extends CertPublisher
 {
-    private static final Logger LOG = LoggerFactory.getLogger(DefaultCertPublisher.class);
+    private static final Logger LOG = LoggerFactory.getLogger(OCSPCertPublisher.class);
 
     @SuppressWarnings("unused")
     private EnvironmentParameterResolver envParameterResolver;
-    private CertStatusStoreQueryExecutor queryExecutor;
+    private OCSPStoreQueryExecutor queryExecutor;
     private boolean asyn = false;
     private boolean publishsGoodCert = true;
 
     private AuditLoggingServiceRegister auditServiceRegister;
 
-    public DefaultCertPublisher()
+    public OCSPCertPublisher()
     {
     }
 
@@ -68,7 +68,7 @@ public class DefaultCertPublisher extends CertPublisher
 
         try
         {
-            queryExecutor = new CertStatusStoreQueryExecutor(dataSource, this.publishsGoodCert);
+            queryExecutor = new OCSPStoreQueryExecutor(dataSource, this.publishsGoodCert);
         } catch (NoSuchAlgorithmException | SQLException e)
         {
             throw new CertPublisherException(e);

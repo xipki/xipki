@@ -14,7 +14,7 @@ import org.xipki.audit.api.AuditLoggingServiceRegister;
 import org.xipki.ca.api.publisher.CertPublisher;
 import org.xipki.ca.common.CertPublisherException;
 import org.xipki.ca.server.mgmt.api.PublisherEntry;
-import org.xipki.ca.server.publisher.DefaultCertPublisher;
+import org.xipki.ca.server.publisher.OCSPCertPublisher;
 import org.xipki.database.api.DataSourceWrapper;
 import org.xipki.security.api.PasswordResolver;
 import org.xipki.security.common.CmpUtf8Pairs;
@@ -63,9 +63,11 @@ public class PublisherEntryWrapper
         }
 
         CertPublisher realPublisher;
-        if("ocsp".equalsIgnoreCase(type))
+        if("ocsp".equalsIgnoreCase(type) ||
+                "java:org.xipki.ca.server.publisher.DefaultCertPublisher".equals(type) || // for backwards compatibility
+                "java:org.xipki.ca.server.publisher.OCSPCertPublisher".equals(type))
         {
-            realPublisher = new DefaultCertPublisher();
+            realPublisher = new OCSPCertPublisher();
         }
         else if(type.toLowerCase().startsWith("java:"))
         {
