@@ -38,6 +38,11 @@
       <artifactId>servlet-api</artifactId>
       <optional>true</optional>
     </dependency>
+    <!--dependency>
+      <groupId>com.unboundid</groupId>
+      <artifactId>unboundid-ldapsdk</artifactId>
+      <version>${ldapsdk.version}</version>
+    </dependency-->
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>

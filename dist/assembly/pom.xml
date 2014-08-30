@@ -301,7 +301,6 @@
                 <feature>xipki-ocspserver</feature>
                 <feature>xipki-ocspclient-shell</feature>
                 <!-- optional features -->
-                <feature>xipki-remotep11</feature>
                 <feature>xipki-database-tool</feature>
                 <feature>xipki-audit-slf4j</feature>
                 <feature>xipki-audit-syslog</feature>

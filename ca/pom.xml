@@ -23,6 +23,5 @@
     <module>ca-server</module>
     <module>ca-server-shell</module>
     <module>ca-sql</module>
-    <module>publisher-ldap</module>
   </modules>
 </project>

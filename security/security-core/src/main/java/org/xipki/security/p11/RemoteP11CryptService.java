@@ -5,7 +5,7 @@
  *
  */
 
-package org.xipki.remotep11.client;
+package org.xipki.security.p11;
 
 import java.io.IOException;
 import java.security.KeyFactory;
@@ -46,16 +46,16 @@ import org.bouncycastle.cert.cmp.GeneralPKIMessage;
 import org.bouncycastle.util.encoders.Hex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.remotep11.common.RemoteP11Constants;
-import org.xipki.remotep11.common.asn1.KeyIdentifier;
-import org.xipki.remotep11.common.asn1.PSOTemplate;
-import org.xipki.remotep11.common.asn1.SlotAndKeyIdentifer;
-import org.xipki.remotep11.common.asn1.SlotIdentifier;
 import org.xipki.security.api.SignerException;
 import org.xipki.security.api.p11.P11CryptService;
 import org.xipki.security.api.p11.P11KeyIdentifier;
 import org.xipki.security.api.p11.P11ModuleConf;
 import org.xipki.security.api.p11.P11SlotIdentifier;
+import org.xipki.security.api.p11.remote.KeyIdentifier;
+import org.xipki.security.api.p11.remote.PSOTemplate;
+import org.xipki.security.api.p11.remote.RemoteP11Constants;
+import org.xipki.security.api.p11.remote.SlotAndKeyIdentifer;
+import org.xipki.security.api.p11.remote.SlotIdentifier;
 import org.xipki.security.common.IoCertUtil;
 import org.xipki.security.common.ParamChecker;
 
