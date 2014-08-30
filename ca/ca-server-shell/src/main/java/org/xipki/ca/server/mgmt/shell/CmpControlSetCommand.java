@@ -75,6 +75,7 @@ public class CmpControlSetCommand extends CaCommand
         }
 
         caManager.setCmpControl(entry);
+        out("configured CMP control");
 
         return null;
     }

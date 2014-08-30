@@ -52,7 +52,7 @@ public class PublisherUpdateCommand extends CaCommand
         }
 
         caManager.changePublisher(name, type, conf);
-
+        out("updated certificate profile " + name);
         return null;
     }
 }

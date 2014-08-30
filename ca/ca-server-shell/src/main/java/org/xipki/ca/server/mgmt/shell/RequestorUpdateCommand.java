@@ -39,7 +39,7 @@ public class RequestorUpdateCommand extends CaCommand
         byte[] certBytes = IoCertUtil.read(certFile);
         IoCertUtil.parseCert(new ByteArrayInputStream(certBytes));
         caManager.changeCmpRequestor(name, Base64.toBase64String(certBytes));
-
+        out("updated CMP requestor " + name);
         return null;
     }
 }

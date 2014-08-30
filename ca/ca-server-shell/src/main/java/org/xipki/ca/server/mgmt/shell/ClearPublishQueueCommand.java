@@ -54,6 +54,7 @@ public class ClearPublishQueueCommand extends CaCommand
         }
 
         caManager.clearPublishQueue(caName, publisherNames);
+        out("clear publish queue of CA " + caName + " for publishers " + toString(publisherNames));
         return null;
     }
 }

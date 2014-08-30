@@ -25,6 +25,7 @@ public class CrlSignerRemoveCommand extends CaCommand
     throws Exception
     {
         caManager.removeCrlSigner(name);
+        out("removed CRL signer " + name);
         return null;
     }
 }

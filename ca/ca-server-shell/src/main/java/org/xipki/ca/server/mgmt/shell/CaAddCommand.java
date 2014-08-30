@@ -128,6 +128,8 @@ public class CaAddCommand extends CaAddOrGenCommand
 
         caManager.addCA(entry);
 
+        out("added CA " + caName);
+
         return null;
     }
 }

@@ -25,6 +25,7 @@ public class RequestorRemoveCommand extends CaCommand
     throws Exception
     {
         caManager.removeCmpRequestor(name);
+        out("removed CMP requestor " + name);
         return null;
     }
 }

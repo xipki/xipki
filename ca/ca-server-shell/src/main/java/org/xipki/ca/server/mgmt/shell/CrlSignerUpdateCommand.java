@@ -60,6 +60,7 @@ public class CrlSignerUpdateCommand extends CaCommand
         }
 
         caManager.changeCrlSigner(name, signerType, signerConf, signerCertConf, crlControl);
+        out("updated CRL signer " + name);
         return null;
     }
 }

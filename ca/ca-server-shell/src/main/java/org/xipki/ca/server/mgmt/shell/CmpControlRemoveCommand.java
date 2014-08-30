@@ -21,6 +21,7 @@ public class CmpControlRemoveCommand extends CaCommand
     throws Exception
     {
         caManager.removeCmpControl();
+        out("removed CMP control");
         return null;
     }
 }

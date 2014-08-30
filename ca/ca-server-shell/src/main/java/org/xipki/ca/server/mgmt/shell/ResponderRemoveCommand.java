@@ -21,6 +21,7 @@ public class ResponderRemoveCommand extends CaCommand
     throws Exception
     {
         caManager.removeCmpResponder();
+        out("removed CMP responder");
         return null;
     }
 }

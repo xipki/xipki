@@ -70,6 +70,7 @@ public class CaRequestorAddCommand extends CaCommand
         entry.setPermissions(_permissions);
 
         caManager.addCmpRequestorToCA(entry, caName);
+        out("added requestor " + requestorName + " to CA " + caName);
 
         return null;
     }
