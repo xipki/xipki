@@ -12,15 +12,7 @@
   <artifactId>remotep11-server</artifactId>
   <packaging>bundle</packaging>
   <name>XiPKI :: ${project.artifactId}</name>
-  <properties>
-    <DynamicImport-Package>*</DynamicImport-Package>
-  </properties>
   <dependencies>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>remotep11-common</artifactId>
-      <version>${project.version}</version>
-    </dependency>
     <dependency>
       <groupId>org.xipki</groupId>
       <artifactId>security-api</artifactId>

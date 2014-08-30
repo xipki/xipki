@@ -5,7 +5,7 @@
  *
  */
 
-package org.xipki.remotep11.common.asn1;
+package org.xipki.security.api.p11.remote;
 
 import java.io.IOException;
 

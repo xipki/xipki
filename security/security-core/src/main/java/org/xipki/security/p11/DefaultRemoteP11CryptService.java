@@ -5,7 +5,7 @@
  *
  */
 
-package org.xipki.remotep11.client;
+package org.xipki.security.p11;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
