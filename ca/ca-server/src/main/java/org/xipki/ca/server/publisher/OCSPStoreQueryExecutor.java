@@ -38,9 +38,9 @@ import org.xipki.security.common.LogUtil;
  * @author Lijun Liao
  */
 
-class CertStatusStoreQueryExecutor
+class OCSPStoreQueryExecutor
 {
-    private static final Logger LOG = LoggerFactory.getLogger(CertStatusStoreQueryExecutor.class);
+    private static final Logger LOG = LoggerFactory.getLogger(OCSPStoreQueryExecutor.class);
 
     private AtomicInteger cert_id;
 
@@ -50,7 +50,7 @@ class CertStatusStoreQueryExecutor
 
     private final boolean publishGoodCerts;
 
-    CertStatusStoreQueryExecutor(DataSourceWrapper dataSource, boolean publishGoodCerts)
+    OCSPStoreQueryExecutor(DataSourceWrapper dataSource, boolean publishGoodCerts)
     throws SQLException, NoSuchAlgorithmException
     {
         this.dataSource = dataSource;
