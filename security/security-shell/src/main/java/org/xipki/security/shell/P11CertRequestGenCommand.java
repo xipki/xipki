@@ -7,8 +7,10 @@
 
 package org.xipki.security.shell;
 
+import iaik.pkcs.pkcs11.objects.DSAPrivateKey;
 import iaik.pkcs.pkcs11.objects.ECDSAPrivateKey;
 import iaik.pkcs.pkcs11.objects.PrivateKey;
+import iaik.pkcs.pkcs11.objects.RSAPrivateKey;
 
 import java.io.File;
 import java.security.cert.X509Certificate;
@@ -16,6 +18,7 @@ import java.security.cert.X509Certificate;
 import org.apache.felix.gogo.commands.Command;
 import org.apache.felix.gogo.commands.Option;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
+import org.bouncycastle.asn1.nist.NISTObjectIdentifiers;
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.Certificate;
@@ -81,29 +84,99 @@ public class P11CertRequestGenCommand extends P11SecurityCommand
             return null;
         }
 
-        boolean ec = privKey instanceof ECDSAPrivateKey;
-
         Pkcs10RequestGenerator p10Gen = new Pkcs10RequestGenerator();
-
         ASN1ObjectIdentifier sigAlgOid;
 
         hashAlgo = hashAlgo.trim().toUpperCase();
+        if(hashAlgo.indexOf('-') != -1)
+        {
+            hashAlgo = hashAlgo.replaceAll("-", "");
+        }
 
-        if("SHA256".equalsIgnoreCase(hashAlgo) || "SHA-256".equalsIgnoreCase(hashAlgo))
+        if(privKey instanceof RSAPrivateKey)
         {
-            sigAlgOid = ec ? X9ObjectIdentifiers.ecdsa_with_SHA256 : PKCSObjectIdentifiers.sha256WithRSAEncryption;
+            if("SHA1".equalsIgnoreCase(hashAlgo))
+            {
+                sigAlgOid = PKCSObjectIdentifiers.sha1WithRSAEncryption;
+            }
+            else if("SHA224".equalsIgnoreCase(hashAlgo))
+            {
+                sigAlgOid = PKCSObjectIdentifiers.sha224WithRSAEncryption;
+            }
+            else if("SHA256".equalsIgnoreCase(hashAlgo))
+            {
+                sigAlgOid = PKCSObjectIdentifiers.sha256WithRSAEncryption;
+            }
+            else if("SHA384".equalsIgnoreCase(hashAlgo))
+            {
+                sigAlgOid = PKCSObjectIdentifiers.sha384WithRSAEncryption;
+            }
+            else if("SHA512".equalsIgnoreCase(hashAlgo))
+            {
+                sigAlgOid = PKCSObjectIdentifiers.sha512WithRSAEncryption;
+            }
+            else
+            {
+                throw new Exception("Unsupported hash algorithm " + hashAlgo);
+            }
         }
-        else if("SHA384".equalsIgnoreCase(hashAlgo) || "SHA-384".equalsIgnoreCase(hashAlgo))
+        else if(privKey instanceof DSAPrivateKey)
         {
-            sigAlgOid = ec ? X9ObjectIdentifiers.ecdsa_with_SHA384 : PKCSObjectIdentifiers.sha384WithRSAEncryption;
+            if("SHA1".equalsIgnoreCase(hashAlgo))
+            {
+                sigAlgOid = X9ObjectIdentifiers.id_dsa_with_sha1;
+            }
+            else if("SHA224".equalsIgnoreCase(hashAlgo))
+            {
+                sigAlgOid = NISTObjectIdentifiers.dsa_with_sha224;
+            }
+            else if("SHA256".equalsIgnoreCase(hashAlgo))
+            {
+                sigAlgOid = NISTObjectIdentifiers.dsa_with_sha256;
+            }
+            else if("SHA384".equalsIgnoreCase(hashAlgo))
+            {
+                sigAlgOid = NISTObjectIdentifiers.dsa_with_sha384;
+            }
+            else if("SHA512".equalsIgnoreCase(hashAlgo))
+            {
+                sigAlgOid = NISTObjectIdentifiers.dsa_with_sha512;
+            }
+            else
+            {
+                throw new Exception("Unsupported hash algorithm " + hashAlgo);
+            }
         }
-        else if("SHA512".equalsIgnoreCase(hashAlgo) || "SHA-512".equalsIgnoreCase(hashAlgo))
+        else if(privKey instanceof ECDSAPrivateKey)
         {
-            sigAlgOid = ec ? X9ObjectIdentifiers.ecdsa_with_SHA512 : PKCSObjectIdentifiers.sha512WithRSAEncryption;
+            if("SHA1".equalsIgnoreCase(hashAlgo))
+            {
+                sigAlgOid = X9ObjectIdentifiers.ecdsa_with_SHA1;
+            }
+            else if("SHA224".equalsIgnoreCase(hashAlgo))
+            {
+                sigAlgOid = X9ObjectIdentifiers.ecdsa_with_SHA224;
+            }
+            else if("SHA256".equalsIgnoreCase(hashAlgo))
+            {
+                sigAlgOid = X9ObjectIdentifiers.ecdsa_with_SHA256;
+            }
+            else if("SHA384".equalsIgnoreCase(hashAlgo))
+            {
+                sigAlgOid = X9ObjectIdentifiers.ecdsa_with_SHA384;
+            }
+            else if("SHA512".equalsIgnoreCase(hashAlgo))
+            {
+                sigAlgOid = X9ObjectIdentifiers.ecdsa_with_SHA512;
+            }
+            else
+            {
+                throw new Exception("Unsupported hash algorithm " + hashAlgo);
+            }
         }
         else
         {
-            throw new Exception("Unsupported hash algorithm " + hashAlgo);
+            throw new Exception("Unsupported key type " + privKey.getClass().getName());
         }
 
         P11SlotIdentifier slotId = new P11SlotIdentifier(slotIndex, null);

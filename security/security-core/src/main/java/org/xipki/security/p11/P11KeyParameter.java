@@ -19,14 +19,14 @@ import org.xipki.security.common.ParamChecker;
  * @author Lijun Liao
  */
 
-public class P11ECDSAKeyParameter extends AsymmetricKeyParameter
+public class P11KeyParameter extends AsymmetricKeyParameter
 {
     private final P11CryptService p11CryptService;
 
     private final P11SlotIdentifier slot;
     private final P11KeyIdentifier keyId;
 
-    private P11ECDSAKeyParameter(P11CryptService p11CryptService,
+    private P11KeyParameter(P11CryptService p11CryptService,
             P11SlotIdentifier slot,
             P11KeyIdentifier keyId)
     {
@@ -37,7 +37,7 @@ public class P11ECDSAKeyParameter extends AsymmetricKeyParameter
         this.keyId = keyId;
     }
 
-    public static P11ECDSAKeyParameter getInstance(
+    public static P11KeyParameter getInstance(
             P11CryptService p11CryptService,
             P11SlotIdentifier slot,
             P11KeyIdentifier keyId)
@@ -47,7 +47,7 @@ public class P11ECDSAKeyParameter extends AsymmetricKeyParameter
         ParamChecker.assertNotNull("slot", slot);
         ParamChecker.assertNotNull("keyId", keyId);
 
-        return new P11ECDSAKeyParameter(p11CryptService, slot, keyId);
+        return new P11KeyParameter(p11CryptService, slot, keyId);
     }
 
     public P11CryptService getP11CryptService()

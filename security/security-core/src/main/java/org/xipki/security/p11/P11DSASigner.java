@@ -14,9 +14,9 @@ import org.xipki.security.api.SignerException;
  * @author Lijun Liao
  */
 
-public class P11ECDSASigner extends AbstractP11DSASigner
+public class P11DSASigner extends AbstractP11DSASigner
 {
-    public P11ECDSASigner(Digest digest)
+    public P11DSASigner(Digest digest)
     {
         super(digest);
     }
@@ -25,7 +25,7 @@ public class P11ECDSASigner extends AbstractP11DSASigner
     protected byte[] sign(byte[] hashValue)
     throws SignerException
     {
-        return param.getP11CryptService().CKM_ECDSA(hashValue, param.getSlot(), param.getKeyId());
+        return param.getP11CryptService().CKM_DSA(hashValue, param.getSlot(), param.getKeyId());
     }
 
 }

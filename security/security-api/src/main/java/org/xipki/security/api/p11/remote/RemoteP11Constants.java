@@ -23,10 +23,11 @@ public class RemoteP11Constants
     public static final ASN1ObjectIdentifier id_pso_rsa_x509    = id_remotep11.branch("2");
     public static final ASN1ObjectIdentifier id_pso_rsa_pkcs    = id_remotep11.branch("3");
     public static final ASN1ObjectIdentifier id_pso_ecdsa       = id_remotep11.branch("4");
-    public static final ASN1ObjectIdentifier id_get_publickey   = id_remotep11.branch("5");
-    public static final ASN1ObjectIdentifier id_get_certificate = id_remotep11.branch("6");
-    public static final ASN1ObjectIdentifier id_list_slots      = id_remotep11.branch("7");
-    public static final ASN1ObjectIdentifier id_list_keylabels  = id_remotep11.branch("8");
+    public static final ASN1ObjectIdentifier id_pso_dsa         = id_remotep11.branch("5");
+    public static final ASN1ObjectIdentifier id_get_publickey   = id_remotep11.branch("11");
+    public static final ASN1ObjectIdentifier id_get_certificate = id_remotep11.branch("12");
+    public static final ASN1ObjectIdentifier id_list_slots      = id_remotep11.branch("13");
+    public static final ASN1ObjectIdentifier id_list_keylabels  = id_remotep11.branch("14");
 
     public static final GeneralName CMP_SERVER =
             new GeneralName(GeneralName.uniformResourceIdentifier, "http://xipki.org/remotep11/server");
