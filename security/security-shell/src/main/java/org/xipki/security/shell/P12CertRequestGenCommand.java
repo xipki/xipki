@@ -9,13 +9,17 @@ package org.xipki.security.shell;
 
 import java.io.File;
 import java.security.KeyStore;
+import java.security.PublicKey;
 import java.security.cert.X509Certificate;
+import java.security.interfaces.DSAPublicKey;
 import java.security.interfaces.ECPublicKey;
+import java.security.interfaces.RSAPublicKey;
 import java.util.Enumeration;
 
 import org.apache.felix.gogo.commands.Command;
 import org.apache.felix.gogo.commands.Option;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
+import org.bouncycastle.asn1.nist.NISTObjectIdentifiers;
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.Certificate;
@@ -49,6 +53,14 @@ public class P12CertRequestGenCommand extends P12SecurityCommand
             required = true, description = "Required. Output file name")
     protected String outputFilename;
 
+    private static enum KeyType
+    {
+        RSA,
+        DSA,
+        EC,
+        OTHER
+    }
+
     @Override
     protected Object doExecute()
     throws Exception
@@ -57,25 +69,98 @@ public class P12CertRequestGenCommand extends P12SecurityCommand
         ASN1ObjectIdentifier sigAlgOid;
         KeyStore keystore = getKeyStore();
         char[] pwd = getPassword();
-        boolean ec = isEcKey(keystore, pwd);
+        KeyType keyType = getKeyType(keystore, pwd);
 
         hashAlgo = hashAlgo.trim().toUpperCase();
+        if(hashAlgo.indexOf('-') != -1)
+        {
+            hashAlgo = hashAlgo.replaceAll("-", "");
+        }
 
-        if("SHA256".equalsIgnoreCase(hashAlgo) || "SHA-256".equalsIgnoreCase(hashAlgo))
+        if(keyType == KeyType.RSA)
         {
-            sigAlgOid = ec ? X9ObjectIdentifiers.ecdsa_with_SHA256 : PKCSObjectIdentifiers.sha256WithRSAEncryption;
+            if("SHA1".equalsIgnoreCase(hashAlgo))
+            {
+                sigAlgOid = PKCSObjectIdentifiers.sha1WithRSAEncryption;
+            }
+            else if("SHA224".equalsIgnoreCase(hashAlgo))
+            {
+                sigAlgOid = PKCSObjectIdentifiers.sha224WithRSAEncryption;
+            }
+            else if("SHA256".equalsIgnoreCase(hashAlgo))
+            {
+                sigAlgOid = PKCSObjectIdentifiers.sha256WithRSAEncryption;
+            }
+            else if("SHA384".equalsIgnoreCase(hashAlgo))
+            {
+                sigAlgOid = PKCSObjectIdentifiers.sha384WithRSAEncryption;
+            }
+            else if("SHA512".equalsIgnoreCase(hashAlgo))
+            {
+                sigAlgOid = PKCSObjectIdentifiers.sha512WithRSAEncryption;
+            }
+            else
+            {
+                throw new Exception("Unsupported hash algorithm " + hashAlgo);
+            }
         }
-        else if("SHA384".equalsIgnoreCase(hashAlgo) || "SHA-384".equalsIgnoreCase(hashAlgo))
+        else if(keyType == KeyType.DSA)
         {
-            sigAlgOid = ec ? X9ObjectIdentifiers.ecdsa_with_SHA384 : PKCSObjectIdentifiers.sha384WithRSAEncryption;
+            if("SHA1".equalsIgnoreCase(hashAlgo))
+            {
+                sigAlgOid = X9ObjectIdentifiers.id_dsa_with_sha1;
+            }
+            else if("SHA224".equalsIgnoreCase(hashAlgo))
+            {
+                sigAlgOid = NISTObjectIdentifiers.dsa_with_sha224;
+            }
+            else if("SHA256".equalsIgnoreCase(hashAlgo))
+            {
+                sigAlgOid = NISTObjectIdentifiers.dsa_with_sha256;
+            }
+            else if("SHA384".equalsIgnoreCase(hashAlgo))
+            {
+                sigAlgOid = NISTObjectIdentifiers.dsa_with_sha384;
+            }
+            else if("SHA512".equalsIgnoreCase(hashAlgo))
+            {
+                sigAlgOid = NISTObjectIdentifiers.dsa_with_sha512;
+            }
+            else
+            {
+                throw new Exception("Unsupported hash algorithm " + hashAlgo);
+            }
         }
-        else if("SHA512".equalsIgnoreCase(hashAlgo) || "SHA-512".equalsIgnoreCase(hashAlgo))
+        else if(keyType == KeyType.EC)
         {
-            sigAlgOid = ec ? X9ObjectIdentifiers.ecdsa_with_SHA512 : PKCSObjectIdentifiers.sha512WithRSAEncryption;
+            if("SHA1".equalsIgnoreCase(hashAlgo))
+            {
+                sigAlgOid = X9ObjectIdentifiers.ecdsa_with_SHA1;
+            }
+            else if("SHA224".equalsIgnoreCase(hashAlgo))
+            {
+                sigAlgOid = X9ObjectIdentifiers.ecdsa_with_SHA224;
+            }
+            else if("SHA256".equalsIgnoreCase(hashAlgo))
+            {
+                sigAlgOid = X9ObjectIdentifiers.ecdsa_with_SHA256;
+            }
+            else if("SHA384".equalsIgnoreCase(hashAlgo))
+            {
+                sigAlgOid = X9ObjectIdentifiers.ecdsa_with_SHA384;
+            }
+            else if("SHA512".equalsIgnoreCase(hashAlgo))
+            {
+                sigAlgOid = X9ObjectIdentifiers.ecdsa_with_SHA512;
+            }
+            else
+            {
+                throw new Exception("Unsupported hash algorithm " + hashAlgo);
+            }
         }
         else
         {
-            throw new Exception("Unsupported hash algorithm " + hashAlgo);
+            throw new Exception("Unsupported key type ");
         }
 
         String signerConf = SecurityFactoryImpl.getKeystoreSignerConf(p12File, new String(pwd), sigAlgOid.getId(), 1);
@@ -113,7 +198,7 @@ public class P12CertRequestGenCommand extends P12SecurityCommand
         return null;
     }
 
-    private static boolean isEcKey(KeyStore keystore, char[] password)
+    private static KeyType getKeyType(KeyStore keystore, char[] password)
     throws Exception
     {
         String keyname = null;
@@ -133,7 +218,23 @@ public class P12CertRequestGenCommand extends P12SecurityCommand
             throw new SignerException("Could not find private key");
         }
 
-        return keystore.getCertificate(keyname).getPublicKey() instanceof ECPublicKey;
+        PublicKey pub = keystore.getCertificate(keyname).getPublicKey();
+        if(pub instanceof ECPublicKey)
+        {
+            return KeyType.EC;
+        }
+        else if(pub instanceof RSAPublicKey)
+        {
+            return KeyType.RSA;
+        }
+        else if(pub instanceof DSAPublicKey)
+        {
+            return KeyType.DSA;
+        }
+        else
+        {
+            return KeyType.OTHER;
+        }
     }
 
 }

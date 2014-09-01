@@ -15,6 +15,7 @@ import iaik.pkcs.pkcs11.objects.X509PublicKeyCertificate;
 
 import java.security.PublicKey;
 import java.security.cert.X509Certificate;
+import java.security.interfaces.DSAPublicKey;
 import java.security.interfaces.ECPublicKey;
 import java.security.interfaces.RSAPublicKey;
 import java.util.Arrays;
@@ -177,6 +178,10 @@ public class P11CertUpdateCommand extends P11SecurityCommand
         else if(pubKey instanceof ECPublicKey)
         {
             pairs.putUtf8Pair("algo", "SHA1withECDSA");
+        }
+        else if(pubKey instanceof DSAPublicKey)
+        {
+            pairs.putUtf8Pair("algo", "SHA1withDSA");
         }
         else
         {

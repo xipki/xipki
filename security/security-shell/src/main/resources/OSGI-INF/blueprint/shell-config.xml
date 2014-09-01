@@ -34,6 +34,24 @@
         <entry key="-certout" value-ref="filePathCompleter"/>
       </optional-completers>
     </command>
+    <command name="keytool/dsa">
+      <action class="org.xipki.security.shell.P11DSAKeyGenCommand">
+        <property name="securityFactory" ref="securityFactory"/>
+      </action>
+      <optional-completers>
+        <entry key="-certout" value-ref="filePathCompleter"/>
+        <entry key="-module" value-ref="p11ModuleNameCompleter"/>
+      </optional-completers>
+    </command>
+    <command name="keytool/dsa-p12">
+      <action class="org.xipki.security.shell.P12DSAKeyGenCommand">
+        <property name="securityFactory" ref="securityFactory"/>
+      </action>
+      <optional-completers>
+        <entry key="-out" value-ref="filePathCompleter"/>
+        <entry key="-certout" value-ref="filePathCompleter"/>
+      </optional-completers>
+    </command>
     <command name="keytool/ec">
       <action class="org.xipki.security.shell.P11ECKeyGenCommand">
         <property name="securityFactory" ref="securityFactory"/>

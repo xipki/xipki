@@ -10,6 +10,8 @@ package org.xipki.security.p11.iaik;
 import iaik.pkcs.pkcs11.Mechanism;
 import iaik.pkcs.pkcs11.Session;
 import iaik.pkcs.pkcs11.TokenException;
+import iaik.pkcs.pkcs11.objects.DSAPrivateKey;
+import iaik.pkcs.pkcs11.objects.DSAPublicKey;
 import iaik.pkcs.pkcs11.objects.ECDSAPrivateKey;
 import iaik.pkcs.pkcs11.objects.ECDSAPublicKey;
 import iaik.pkcs.pkcs11.objects.KeyPair;
@@ -22,6 +24,7 @@ import iaik.pkcs.pkcs11.wrapper.PKCS11Constants;
 
 import java.io.IOException;
 import java.math.BigInteger;
+import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -29,11 +32,13 @@ import java.util.List;
 import org.bouncycastle.asn1.ASN1EncodableVector;
 import org.bouncycastle.asn1.ASN1Integer;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
+import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.DERBitString;
 import org.bouncycastle.asn1.DERNull;
 import org.bouncycastle.asn1.DEROctetString;
 import org.bouncycastle.asn1.DERSequence;
 import org.bouncycastle.asn1.nist.NISTNamedCurves;
+import org.bouncycastle.asn1.nist.NISTObjectIdentifiers;
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 import org.bouncycastle.asn1.sec.SECNamedCurves;
 import org.bouncycastle.asn1.teletrust.TeleTrusTNamedCurves;
@@ -59,6 +64,9 @@ import org.bouncycastle.crypto.digests.SHA1Digest;
 import org.bouncycastle.crypto.digests.SHA256Digest;
 import org.bouncycastle.crypto.digests.SHA384Digest;
 import org.bouncycastle.crypto.digests.SHA512Digest;
+import org.bouncycastle.crypto.generators.DSAParametersGenerator;
+import org.bouncycastle.crypto.params.DSAParameterGenerationParameters;
+import org.bouncycastle.crypto.params.DSAParameters;
 import org.bouncycastle.crypto.params.RSAKeyParameters;
 import org.bouncycastle.crypto.util.SubjectPublicKeyInfoFactory;
 import org.bouncycastle.util.Arrays;
@@ -147,14 +155,12 @@ public class P11KeypairGenerator
                     keySize, publicExponent, id, label);
 
             AlgorithmIdentifier signatureAlgId = new AlgorithmIdentifier(
-                    PKCSObjectIdentifiers.sha256WithRSAEncryption);
+                    PKCSObjectIdentifiers.sha256WithRSAEncryption, DERNull.INSTANCE);
 
-            X509CertificateHolder certificate = generateCertificate(
-                    session,
+            X509CertificateHolder certificate = generateCertificate(session,
                     id, label, subject,
                     signatureAlgId, privateKeyAndPKInfo,
-                    keyUsage,
-                    extendedKeyusage);
+                    keyUsage, extendedKeyusage);
             return new P11KeypairGenerationResult(id, label, certificate);
         }
         finally
@@ -193,6 +199,89 @@ public class P11KeypairGenerator
         SubjectPublicKeyInfo pkInfo = SubjectPublicKeyInfoFactory.createSubjectPublicKeyInfo(keyParams);
 
         return new PrivateKeyAndPKInfo((RSAPrivateKey) kp.getPrivateKey(), pkInfo);
+    }
+
+    public P11KeypairGenerationResult generateDSAKeypairAndCert(
+            String p11ModuleName, P11SlotIdentifier slotId,
+            int pLength, int qLength, String label, String subject, Integer keyUsage,
+            List<ASN1ObjectIdentifier> extendedKeyusage)
+    throws Exception
+    {
+        ParamChecker.assertNotEmpty("label", label);
+
+        if (pLength < 1024)
+        {
+            throw new IllegalArgumentException("Keysize not allowed: " + pLength);
+        }
+
+        if(pLength % 1024 != 0)
+        {
+            throw new IllegalArgumentException("Key size is not multiple of 1024: " + pLength);
+        }
+
+        IaikExtendedSlot slot = getSlot(p11ModuleName, slotId);
+
+        Session session = slot.borrowWritableSession();
+        try
+        {
+            if(IaikP11Util.labelExists(session, label))
+            {
+                throw new IllegalArgumentException("Label " + label + " exists, please specify another one");
+            }
+
+            byte[] id = IaikP11Util.generateKeyID(session);
+
+            PrivateKeyAndPKInfo privateKeyAndPKInfo = generateDSAKeyPair(session, pLength, qLength, id, label);
+            AlgorithmIdentifier signatureAlgId = new AlgorithmIdentifier(NISTObjectIdentifiers.dsa_with_sha256);
+
+            X509CertificateHolder certificate = generateCertificate(session,
+                    id, label, subject,
+                    signatureAlgId, privateKeyAndPKInfo,
+                    keyUsage, extendedKeyusage);
+            return new P11KeypairGenerationResult(id, label, certificate);
+        }
+        finally
+        {
+            slot.returnWritableSession(session);
+        }
+    }
+
+    private PrivateKeyAndPKInfo generateDSAKeyPair(
+            Session session, int pLength, int qLength, byte[] id, String label)
+    throws Exception
+    {
+        DSAParametersGenerator paramGen = new DSAParametersGenerator(new SHA512Digest());
+        DSAParameterGenerationParameters genParams = new DSAParameterGenerationParameters(
+                pLength, qLength, 80, new SecureRandom());
+        paramGen.init(genParams);
+        DSAParameters dsaParams = paramGen.generateParameters();
+
+        DSAPrivateKey privateKey = new DSAPrivateKey();
+        DSAPublicKey publicKey = new DSAPublicKey();
+
+        setKeyAttributes(id, label, PKCS11Constants.CKK_DSA, privateKey, publicKey);
+
+        publicKey.getPrime().setByteArrayValue(dsaParams.getP().toByteArray());
+        publicKey.getSubprime().setByteArrayValue(dsaParams.getQ().toByteArray());
+        publicKey.getBase().setByteArrayValue(dsaParams.getG().toByteArray());
+
+        KeyPair kp = session.generateKeyPair(
+                Mechanism.get(PKCS11Constants.CKM_DSA_KEY_PAIR_GEN), publicKey, privateKey);
+
+        publicKey = (DSAPublicKey) kp.getPublicKey();
+        BigInteger value = new BigInteger(1, publicKey.getValue().getByteArrayValue());
+
+        ASN1EncodableVector v = new ASN1EncodableVector();
+        v.add(new ASN1Integer(dsaParams.getP()));
+        v.add(new ASN1Integer(dsaParams.getQ()));
+        v.add(new ASN1Integer(dsaParams.getG()));
+        ASN1Sequence dssParams = new DERSequence(v);
+
+        SubjectPublicKeyInfo pkInfo = new SubjectPublicKeyInfo(
+                new AlgorithmIdentifier(X9ObjectIdentifiers.id_dsa, dssParams),
+                new ASN1Integer(value));
+
+        return new PrivateKeyAndPKInfo((DSAPrivateKey) kp.getPrivateKey(), pkInfo);
     }
 
     private static void setKeyAttributes(
@@ -279,8 +368,8 @@ public class P11KeypairGenerator
                 sigAlgOid = X9ObjectIdentifiers.ecdsa_with_SHA1;
             }
 
-            X509CertificateHolder certificate = generateCertificate(
-                    session, id, label, subject,
+            X509CertificateHolder certificate = generateCertificate(session,
+                    id, label, subject,
                     new AlgorithmIdentifier(sigAlgOid, DERNull.INSTANCE),
                     privateKeyAndPKInfo,
                     keyUsage,
@@ -446,6 +535,17 @@ public class P11KeypairGenerator
             session.signInit(sigMechanism, privateKeyAndPkInfo.getPrivateKey());
             signature = session.sign(encodedTbsCertificate);
         }
+        else if (sigAlgID.equals(NISTObjectIdentifiers.dsa_with_sha256))
+        {
+            digest = new SHA256Digest();
+            byte[] digestValue = new byte[digest.getDigestSize()];
+            digest.update(encodedTbsCertificate, 0, encodedTbsCertificate.length);
+            digest.doFinal(digestValue, 0);
+
+            session.signInit(Mechanism.get(PKCS11Constants.CKM_DSA), privateKeyAndPkInfo.getPrivateKey());
+            byte[] rawSignature = session.sign(digestValue);
+            signature = convertToX962Signature(rawSignature);
+        }
         else
         {
             if (sigAlgID.equals(X9ObjectIdentifiers.ecdsa_with_SHA1))
@@ -475,7 +575,8 @@ public class P11KeypairGenerator
             digest.doFinal(digestValue, 0);
 
             session.signInit(Mechanism.get(PKCS11Constants.CKM_ECDSA), privateKeyAndPkInfo.getPrivateKey());
-            signature = convertToX962Signature(session.sign(digestValue));
+            byte[] rawSignature = session.sign(digestValue);
+            signature = convertToX962Signature(rawSignature);
         }
 
         // build DER certificate

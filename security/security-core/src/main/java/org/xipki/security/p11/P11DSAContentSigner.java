@@ -20,10 +20,9 @@ import org.xipki.security.api.p11.P11SlotIdentifier;
  * @author Lijun Liao
  */
 
-public class P11ECDSAContentSigner extends AbstractP11DSAContentSigner
+public class P11DSAContentSigner extends AbstractP11DSAContentSigner
 {
-
-    public P11ECDSAContentSigner(
+    public P11DSAContentSigner(
             P11CryptService cryptService,
             P11SlotIdentifier slot,
             P11KeyIdentifier keyId,
@@ -37,7 +36,7 @@ public class P11ECDSAContentSigner extends AbstractP11DSAContentSigner
     protected byte[] CKM_SIGN(byte[] hashValue)
     throws SignerException
     {
-        return cryptService.CKM_ECDSA(hashValue, slot, keyId);
+        return cryptService.CKM_DSA(hashValue, slot, keyId);
     }
 
 }

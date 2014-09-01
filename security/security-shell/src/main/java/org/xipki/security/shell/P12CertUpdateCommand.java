@@ -12,6 +12,7 @@ import java.security.Key;
 import java.security.KeyStore;
 import java.security.PublicKey;
 import java.security.cert.X509Certificate;
+import java.security.interfaces.DSAPublicKey;
 import java.security.interfaces.ECPublicKey;
 import java.security.interfaces.RSAPublicKey;
 import java.util.Enumeration;
@@ -114,6 +115,10 @@ public class P12CertUpdateCommand extends P12SecurityCommand
         else if(pubKey instanceof ECPublicKey)
         {
             pairs.putUtf8Pair("algo", "SHA1withECDSA");
+        }
+        else if(pubKey instanceof DSAPublicKey)
+        {
+            pairs.putUtf8Pair("algo", "SHA1withDSA");
         }
         else
         {

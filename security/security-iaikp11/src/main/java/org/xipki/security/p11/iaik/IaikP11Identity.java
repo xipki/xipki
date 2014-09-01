@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.math.BigInteger;
 import java.security.PublicKey;
 import java.security.cert.X509Certificate;
+import java.security.interfaces.DSAPublicKey;
 import java.security.interfaces.ECPublicKey;
 import java.security.interfaces.RSAPublicKey;
 
@@ -64,9 +65,13 @@ class IaikP11Identity implements Comparable<IaikP11Identity>
         {
             signatureKeyBitLength = ((ECPublicKey) this.publicKey).getParams().getCurve().getField().getFieldSize();
         }
+        else if(this.publicKey instanceof DSAPublicKey)
+        {
+            signatureKeyBitLength = ((DSAPublicKey) this.publicKey).getParams().getP().bitLength();
+        }
         else
         {
-            throw new IllegalArgumentException("Currently only RSA and EC public key are supported, but not " +
+            throw new IllegalArgumentException("Currently only RSA, DSA and EC public key are supported, but not " +
                     this.publicKey.getAlgorithm() + " (class: " + this.publicKey.getClass().getName() + ")");
         }
     }
@@ -172,6 +177,25 @@ class IaikP11Identity implements Comparable<IaikP11Identity>
         byte[] truncatedDigest = IoCertUtil.leftmost(hash, signatureKeyBitLength);
 
         byte[] signature = slot.CKM_ECDSA(truncatedDigest, keyId);
+        return convertToX962Signature(signature);
+    }
+
+    public byte[] CKM_DSA(IaikExtendedModule module,
+            byte[] hash)
+    throws SignerException
+    {
+        if(publicKey instanceof DSAPublicKey == false)
+        {
+            throw new SignerException("Operation CKM_DSA is not allowed for " + publicKey.getAlgorithm() + " public key");
+        }
+
+        IaikExtendedSlot slot = module.getSlot(slotId);
+        if(slot == null)
+        {
+            throw new SignerException("Could not find slot " + slotId);
+        }
+
+        byte[] signature = slot.CKM_DSA(hash, keyId);
         return convertToX962Signature(signature);
     }
 
