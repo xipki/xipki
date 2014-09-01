@@ -47,6 +47,7 @@ import org.bouncycastle.pkcs.PKCSException;
  *
  * @author Lijun Liao
  */
+
 public class SignerUtil
 {
     static public RSAKeyParameters generateRSAPublicKeyParameter(
@@ -63,8 +64,7 @@ public class SignerUtil
         {
             RSAPrivateCrtKey k = (RSAPrivateCrtKey)key;
 
-            return new RSAPrivateCrtKeyParameters(k.getModulus(),
-                k.getPublicExponent(), k.getPrivateExponent(),
+            return new RSAPrivateCrtKeyParameters(k.getModulus(), k.getPublicExponent(), k.getPrivateExponent(),
                 k.getPrimeP(), k.getPrimeQ(), k.getPrimeExponentP(), k.getPrimeExponentQ(), k.getCrtCoefficient());
         }
         else
@@ -202,7 +202,7 @@ public class SignerUtil
         {
             throw new NoSuchAlgorithmException("No signature algorithm for DSA with digest algorithm " + digAlgOid.getId());
         }
-        return new AlgorithmIdentifier(sid, DERNull.INSTANCE);
+        return new AlgorithmIdentifier(sid);
     }
 
     static public String getSignatureAlgoName(AlgorithmIdentifier sigAlgId)
@@ -228,6 +228,26 @@ public class SignerUtil
         else if(X9ObjectIdentifiers.ecdsa_with_SHA512.equals(algOid))
         {
             return "SHA512withECDSA";
+        }
+        else if(X9ObjectIdentifiers.id_dsa_with_sha1.equals(algOid))
+        {
+            return "SHA1withDSA";
+        }
+        else if(NISTObjectIdentifiers.dsa_with_sha224.equals(algOid))
+        {
+            return "SHA224withDSA";
+        }
+        else if(NISTObjectIdentifiers.dsa_with_sha256.equals(algOid))
+        {
+            return "SHA256withDSA";
+        }
+        else if(NISTObjectIdentifiers.dsa_with_sha384.equals(algOid))
+        {
+            return "SHA384withDSA";
+        }
+        else if(NISTObjectIdentifiers.dsa_with_sha512.equals(algOid))
+        {
+            return "SHA512withDSA";
         }
         else if(PKCSObjectIdentifiers.sha1WithRSAEncryption.equals(algOid))
         {
@@ -303,6 +323,26 @@ public class SignerUtil
             digestAlgOid = NISTObjectIdentifiers.id_sha384;
         }
         else if(X9ObjectIdentifiers.ecdsa_with_SHA512.equals(algOid))
+        {
+            digestAlgOid = NISTObjectIdentifiers.id_sha512;
+        }
+        if(X9ObjectIdentifiers.id_dsa_with_sha1.equals(algOid))
+        {
+            digestAlgOid = X509ObjectIdentifiers.id_SHA1;
+        }
+        else if(NISTObjectIdentifiers.dsa_with_sha224.equals(algOid))
+        {
+            digestAlgOid = NISTObjectIdentifiers.id_sha224;
+        }
+        else if(NISTObjectIdentifiers.dsa_with_sha256.equals(algOid))
+        {
+            digestAlgOid = NISTObjectIdentifiers.id_sha256;
+        }
+        else if(NISTObjectIdentifiers.dsa_with_sha384.equals(algOid))
+        {
+            digestAlgOid = NISTObjectIdentifiers.id_sha384;
+        }
+        else if(NISTObjectIdentifiers.dsa_with_sha512.equals(algOid))
         {
             digestAlgOid = NISTObjectIdentifiers.id_sha512;
         }

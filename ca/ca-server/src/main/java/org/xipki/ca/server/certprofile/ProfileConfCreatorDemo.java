@@ -878,47 +878,91 @@ public class ProfileConfCreatorDemo
         List<AlgorithmType> list = ret.getAlgorithm();
 
         // RSA
-        AlgorithmType rsa = new AlgorithmType();
-        list.add(rsa);
+        {
+            AlgorithmType rsa = new AlgorithmType();
+            list.add(rsa);
 
-        rsa.setAlgorithm(createOidType(PKCSObjectIdentifiers.rsaEncryption, "RSA"));
+            rsa.setAlgorithm(createOidType(PKCSObjectIdentifiers.rsaEncryption, "RSA"));
+            List<ParameterType> params = rsa.getParameter();
 
-        ParameterType param = new ParameterType();
-        param.setName(DefaultCertProfile.MODULUS_LENGTH);
-        param.setMin(2048);
-        param.setMax(2048);
-        rsa.getParameter().add(param);
+            ParameterType param = new ParameterType();
+            params.add(param);
+            param.setName(DefaultCertProfile.MODULUS_LENGTH);
+            param.setMin(2048);
+            param.setMax(2048);
 
-        param = new ParameterType();
-        param.setName(DefaultCertProfile.MODULUS_LENGTH);
-        param.setMin(3072);
-        param.setMax(3072);
-        rsa.getParameter().add(param);
+            param = new ParameterType();
+            param.setName(DefaultCertProfile.MODULUS_LENGTH);
+            params.add(param);
+            param.setMin(3072);
+            param.setMax(3072);
+        }
+
+        // DSA
+        {
+            AlgorithmType dsa = new AlgorithmType();
+            list.add(dsa);
+
+            dsa.setAlgorithm(createOidType(X9ObjectIdentifiers.id_dsa, "DSA"));
+            List<ParameterType> params = dsa.getParameter();
+
+            ParameterType param = new ParameterType();
+            params.add(param);
+            param.setName(DefaultCertProfile.P_LENGTH);
+            param.setMin(1024);
+            param.setMax(1024);
+
+            param = new ParameterType();
+            params.add(param);
+            param.setName(DefaultCertProfile.P_LENGTH);
+            param.setMin(2048);
+            param.setMax(2048);
+
+            param = new ParameterType();
+            params.add(param);
+            param.setName(DefaultCertProfile.Q_LENGTH);
+            param.setMin(160);
+            param.setMax(160);
+
+            param = new ParameterType();
+            params.add(param);
+            param.setName(DefaultCertProfile.Q_LENGTH);
+            param.setMin(224);
+            param.setMax(224);
+
+            param = new ParameterType();
+            params.add(param);
+            param.setName(DefaultCertProfile.Q_LENGTH);
+            param.setMin(256);
+            param.setMax(256);
+        }
 
         // EC
-        AlgorithmType ec = new AlgorithmType();
-        ec.setAlgorithm(createOidType(X9ObjectIdentifiers.id_ecPublicKey, "EC"));
-
-        list.add(ec);
-
-        ECParameterType ecParams = new ECParameterType();
-        ec.setEcParameter(ecParams);
-
-        ASN1ObjectIdentifier[] curveIds = new ASN1ObjectIdentifier[]
         {
-                SECObjectIdentifiers.secp256r1, TeleTrusTObjectIdentifiers.brainpoolP256r1};
+            AlgorithmType ec = new AlgorithmType();
+            ec.setAlgorithm(createOidType(X9ObjectIdentifiers.id_ecPublicKey, "EC"));
 
-        for(ASN1ObjectIdentifier curveId : curveIds)
-        {
-            String name = IoCertUtil.getCurveName(curveId);
-            CurveType curve = new CurveType();
-            curve.setOid(createOidType(curveId, name));
+            list.add(ec);
 
-            Encodings encodings = new Encodings();
-            encodings.getEncoding().add((byte) 4); // uncompressed
-            curve.setEncodings(encodings);
+            ECParameterType params = new ECParameterType();
+            ec.setEcParameter(params);
 
-            ecParams.getCurve().add(curve);
+            ASN1ObjectIdentifier[] curveIds = new ASN1ObjectIdentifier[]
+            {
+                    SECObjectIdentifiers.secp256r1, TeleTrusTObjectIdentifiers.brainpoolP256r1};
+
+            for(ASN1ObjectIdentifier curveId : curveIds)
+            {
+                String name = IoCertUtil.getCurveName(curveId);
+                CurveType curve = new CurveType();
+                curve.setOid(createOidType(curveId, name));
+
+                Encodings encodings = new Encodings();
+                encodings.getEncoding().add((byte) 4); // uncompressed
+                curve.setEncodings(encodings);
+
+                params.getCurve().add(curve);
+            }
         }
 
         return ret;

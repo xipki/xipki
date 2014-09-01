@@ -15,6 +15,7 @@ import java.security.PublicKey;
 import java.security.Signature;
 import java.security.SignatureException;
 import java.security.cert.X509Certificate;
+import java.security.interfaces.DSAPublicKey;
 import java.security.interfaces.ECPublicKey;
 import java.security.interfaces.RSAPublicKey;
 
@@ -35,7 +36,7 @@ import org.xipki.security.common.ParamChecker;
 class SunP11Identity implements Comparable<SunP11Identity>
 {
     private final Cipher rsaCipher;
-    private final Signature ecdsaSignature;
+    private final Signature dsaSignature;
     private final P11SlotIdentifier slotId;
 
     private final String keyLabel;
@@ -77,7 +78,7 @@ class SunP11Identity implements Comparable<SunP11Identity>
         {
             signatureKeyBitLength = ((RSAPublicKey) this.publicKey).getModulus().bitLength();
             String algorithm = "RSA/ECB/NoPadding";
-            this.ecdsaSignature = null;
+            this.dsaSignature = null;
             try
             {
                 this.rsaCipher = Cipher.getInstance(algorithm, p11Provider);
@@ -93,20 +94,34 @@ class SunP11Identity implements Comparable<SunP11Identity>
                 throw new SignerException("InvalidKeyException: " + e.getMessage(), e);
             }
         }
-        else if(this.publicKey instanceof ECPublicKey)
+        else if(this.publicKey instanceof ECPublicKey || this.publicKey instanceof DSAPublicKey)
         {
-            signatureKeyBitLength = ((ECPublicKey) this.publicKey).getParams().getCurve().getField().getFieldSize();
-            String algorithm = "NONEwithECDSA";
+            String algorithm;
+            if(this.publicKey instanceof ECPublicKey)
+            {
+                signatureKeyBitLength = ((ECPublicKey) this.publicKey).getParams().getCurve().getField().getFieldSize();
+                algorithm = "NONEwithECDSA";
+            }
+            else if(this.publicKey instanceof DSAPublicKey)
+            {
+                signatureKeyBitLength = ((DSAPublicKey) this.publicKey).getParams().getP().bitLength();
+                algorithm = "NONEwithDSA";
+            }
+            else
+            {
+                throw new RuntimeException("should not reach here");
+            }
+
             try
             {
-                this.ecdsaSignature = Signature.getInstance(algorithm, p11Provider);
+                this.dsaSignature = Signature.getInstance(algorithm, p11Provider);
             } catch (NoSuchAlgorithmException e)
             {
                 throw new SignerException("NoSuchAlgorithmException: " + e.getMessage(), e);
             }
             try
             {
-                this.ecdsaSignature.initSign(privateKey);
+                this.dsaSignature.initSign(privateKey);
             } catch (InvalidKeyException e)
             {
                 throw new SignerException("InvalidKeyException: " + e.getMessage(), e);
@@ -115,7 +130,7 @@ class SunP11Identity implements Comparable<SunP11Identity>
         }
         else
         {
-            throw new IllegalArgumentException("Currently only RSA and EC public key are supported, but not " +
+            throw new IllegalArgumentException("Currently only RSA, EC and DSA public key are supported, but not " +
                     this.publicKey.getAlgorithm() + " (class: " + this.publicKey.getClass().getName() + ")");
         }
     }
@@ -218,12 +233,33 @@ class SunP11Identity implements Comparable<SunP11Identity>
 
         byte[] truncatedDigest = IoCertUtil.leftmost(hash, signatureKeyBitLength);
 
-        synchronized (ecdsaSignature)
+        synchronized (dsaSignature)
         {
             try
             {
-                ecdsaSignature.update(truncatedDigest);
-                return ecdsaSignature.sign();
+                dsaSignature.update(truncatedDigest);
+                return dsaSignature.sign();
+            } catch (SignatureException e)
+            {
+                throw new SignerException(e.getMessage(), e);
+            }
+        }
+    }
+
+    public byte[] CKM_DSA(byte[] hash)
+    throws SignerException
+    {
+        if(publicKey instanceof DSAPublicKey == false)
+        {
+            throw new SignerException("Operation CKM_DSA is not allowed for " + publicKey.getAlgorithm() + " public key");
+        }
+
+        synchronized (dsaSignature)
+        {
+            try
+            {
+                dsaSignature.update(hash);
+                return dsaSignature.sign();
             } catch (SignatureException e)
             {
                 throw new SignerException(e.getMessage(), e);

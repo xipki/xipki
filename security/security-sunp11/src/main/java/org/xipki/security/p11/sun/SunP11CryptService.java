@@ -389,6 +389,21 @@ public final class SunP11CryptService implements P11CryptService
     }
 
     @Override
+    public byte[] CKM_DSA(byte[] hash, P11SlotIdentifier slotId, P11KeyIdentifier keyId)
+    throws SignerException
+    {
+        ensureResource();
+
+        SunP11Identity identity = getIdentity(slotId, keyId);
+        if(identity == null)
+        {
+            throw new SignerException("Found no key with " + keyId);
+        }
+
+        return identity.CKM_DSA(hash);
+    }
+
+    @Override
     public PublicKey getPublicKey(P11SlotIdentifier slotId, P11KeyIdentifier keyId)
     throws SignerException
     {

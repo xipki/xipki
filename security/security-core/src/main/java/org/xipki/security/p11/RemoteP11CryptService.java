@@ -125,6 +125,14 @@ public abstract class RemoteP11CryptService implements P11CryptService
     }
 
     @Override
+    public byte[] CKM_DSA(byte[] hash, P11SlotIdentifier slotId,
+            P11KeyIdentifier keyId)
+    throws SignerException
+    {
+        checkSlotId(slotId);
+        return pso(RemoteP11Constants.id_pso_dsa, hash, slotId, keyId);    }
+
+    @Override
     public PublicKey getPublicKey(P11SlotIdentifier slotId, P11KeyIdentifier keyId)
     throws SignerException
     {

@@ -22,9 +22,7 @@ import java.security.interfaces.DSAPublicKey;
 import java.security.interfaces.ECPublicKey;
 import java.security.interfaces.RSAPublicKey;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.AuthorityInformationAccess;
@@ -42,7 +40,6 @@ import org.bouncycastle.crypto.params.RSAKeyParameters;
 import org.bouncycastle.jcajce.provider.asymmetric.dsa.DSAUtil;
 import org.bouncycastle.jcajce.provider.asymmetric.util.ECUtil;
 import org.bouncycastle.operator.ContentSigner;
-import org.bouncycastle.util.encoders.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.ca.api.OperationException;
@@ -62,7 +59,6 @@ import org.xipki.security.api.SignerException;
 import org.xipki.security.common.CmpUtf8Pairs;
 import org.xipki.security.common.ConfigurationException;
 import org.xipki.security.common.IoCertUtil;
-import org.xipki.security.common.StringUtil;
 
 /**
  * @author Lijun Liao
@@ -116,47 +112,6 @@ class SelfSignedCertBuilder
             {
                 throw new ConfigurationException("required parameter 'keystore', for types PKCS12 and JKS, is not specified");
             }
-            if(keystoreConf.startsWith("generate:"))
-            {
-                String keyLabel = keyValues.getValue("key-label");
-                char[] password = keyValues.getValue("password").toCharArray();
-                Map<String, String> keyStoreKeyValues = keyValues(
-                        keystoreConf.substring("generate:".length()), ";");
-
-                String keyType = keyStoreKeyValues.get("keytype");
-
-                byte[] keystoreBytes = null;
-                if("RSA".equalsIgnoreCase(keyType))
-                {
-                    String s = keyStoreKeyValues.get("keysize");
-                    if(s == null)
-                    {
-                        throw new ConfigurationException("no keysize is specified");
-                    }
-                    int keysize = Integer.parseInt(s);
-                    s = keyStoreKeyValues.get("exponent");
-                    BigInteger exponent = (s == null) ? BigInteger.valueOf(65535) : new BigInteger(s);
-
-                    try
-                    {
-                        keystoreBytes = securityFactory.generateSelfSignedRSAKeyStore(BigInteger.ONE,
-                                subject, signerType, password, keyLabel, keysize, exponent);
-                    } catch (Exception e)
-                    {
-                        throw new OperationException(ErrorCode.System_Failure, e.getMessage());
-                    }
-                }
-                else
-                {
-                    throw new ConfigurationException("Unsupported keytype " + keyType);
-                }
-
-                keystoreConf = "base64:" + Base64.toBase64String(keystoreBytes);
-                keyValues.putUtf8Pair("keystore", keystoreConf);
-
-                signerConf = keyValues.getEncoded();
-            }
-            // generate the key first if not set
         }
 
         ConcurrentContentSigner signer;
@@ -388,31 +343,6 @@ class SelfSignedCertBuilder
         }
 
         return extensionTuples.getWarning();
-    }
-
-    private static Map<String, String> keyValues(String conf, String seperator)
-    {
-        Map<String, String> ret = new HashMap<>();
-        List<String> tokens = StringUtil.split(conf, seperator);
-
-        for(String token : tokens)
-        {
-            int idx = token.indexOf('=');
-            if(idx <= 0 || idx == token.length()-1)
-            {
-                continue;
-            }
-
-            String tokenKey = token.substring(0, idx).trim();
-            String tokenValue = token.substring(idx+1).trim();
-            if("NULL".equalsIgnoreCase(tokenValue))
-            {
-                tokenValue = null;
-            }
-            ret.put(tokenKey, tokenValue);
-        }
-
-        return ret;
     }
 
     public static AsymmetricKeyParameter generatePublicKeyParameter(

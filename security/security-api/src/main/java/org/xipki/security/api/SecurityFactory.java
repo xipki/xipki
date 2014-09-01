@@ -36,8 +36,7 @@ public interface SecurityFactory
     ConcurrentContentSigner createSigner(String type, String conf, X509Certificate cert)
     throws SignerException;
 
-    ConcurrentContentSigner createSigner(String type, String conf,
-            X509Certificate[] certs)
+    ConcurrentContentSigner createSigner(String type, String conf, X509Certificate[] certs)
     throws SignerException;
 
     ContentVerifierProvider getContentVerifierProvider(PublicKey publicKey)
@@ -51,11 +50,6 @@ public interface SecurityFactory
 
     PublicKey generatePublicKey(SubjectPublicKeyInfo subjectPublicKeyInfo)
     throws InvalidKeyException;
-
-    byte[] generateSelfSignedRSAKeyStore(
-            BigInteger serial, String subject, String keystoreType, char[] password, String keyLabel,
-            int keysize, BigInteger publicExponent)
-    throws SignerException;
 
     boolean verifyPOPO(CertificationRequest p10Req);
 
