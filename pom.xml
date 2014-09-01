@@ -48,6 +48,7 @@
     <module>ocsp</module>
     <module>remotep11</module>
     <module>audit</module>
+    <module>pkiconsole</module>
   </modules>
   <scm>
     <connection>scm:git:git@github.com:xipki/xipki.git</connection>
