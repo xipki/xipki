@@ -253,8 +253,15 @@ public class CrlCertStatusStore extends CertStatusStore
             BigInteger crlNumber;
             {
                 byte[] octetString = crl.getExtensionValue(Extension.cRLNumber.getId());
-                byte[] extnValue = DEROctetString.getInstance(octetString).getOctets();
-                crlNumber = ASN1Integer.getInstance(extnValue).getPositiveValue();
+                if(octetString != null)
+                {
+                    byte[] extnValue = DEROctetString.getInstance(octetString).getOctets();
+                    crlNumber = ASN1Integer.getInstance(extnValue).getPositiveValue();
+                }
+                else
+                {
+                    crlNumber = null;
+                }
             }
 
             X500Principal issuer = crl.getIssuerX500Principal();
@@ -291,6 +298,11 @@ public class CrlCertStatusStore extends CertStatusStore
 
             if(deltaCrlExists)
             {
+                if(crlNumber == null)
+                {
+                    throw new CertStatusStoreException("baseCRL does not contains CRLNumber");
+                }
+
                 deltaCrl = IoCertUtil.parseCRL(deltaCrlFilename);
                 byte[] octetString = deltaCrl.getExtensionValue(Extension.deltaCRLIndicator.getId());
                 if(octetString == null)
