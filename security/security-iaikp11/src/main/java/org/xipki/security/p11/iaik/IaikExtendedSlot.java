@@ -137,143 +137,33 @@ public class IaikExtendedSlot
     public byte[] CKM_ECDSA(byte[] hash, P11KeyIdentifier keyId)
     throws SignerException
     {
-        PrivateKey signatureKey = getSigningKey(keyId);
-        if(signatureKey == null)
-        {
-            throw new SignerException("No key for signing is available");
-        }
+        return CKM_SIGN(PKCS11Constants.CKM_ECDSA, hash, keyId);
+    }
 
-        Session session = borrowIdleSession();
-        if(session == null)
-        {
-            throw new SignerException("No idle session available");
-        }
-
-        try
-        {
-            Mechanism algorithmId = Mechanism.get(PKCS11Constants.CKM_ECDSA);
-
-            if(LOG.isTraceEnabled())
-            {
-                LOG.debug("sign with private key:\n{}", signatureKey);
-            }
-
-            synchronized (session)
-            {
-                login(session);
-                session.signInit(algorithmId, signatureKey);
-                byte[] signature = session.sign(hash);
-                if (LOG.isDebugEnabled())
-                {
-                    LOG.debug("signature:\n{}", Hex.toHexString(signature));
-                }
-                return signature;
-            }
-        } catch (TokenException e)
-        {
-            throw new SignerException(e);
-        }finally
-        {
-            returnIdleSession(session);
-        }
+    public byte[] CKM_DSA(byte[] hash, P11KeyIdentifier keyId)
+    throws SignerException
+    {
+        return CKM_SIGN(PKCS11Constants.CKM_DSA, hash, keyId);
     }
 
     public byte[] CKM_RSA_PKCS(byte[] encodedDigestInfo, P11KeyIdentifier keyId)
     throws SignerException
     {
-        PrivateKey signatureKey = getSigningKey(keyId);
-
-        if(signatureKey == null)
-        {
-            throw new SignerException("No key for signing is available");
-        }
-
-        Session session = borrowIdleSession();
-        if(session == null)
-        {
-            throw new SignerException("No idle session available");
-        }
-
-        try
-        {
-            Mechanism algorithmId = Mechanism.get(PKCS11Constants.CKM_RSA_PKCS);
-
-            if(LOG.isTraceEnabled())
-            {
-                LOG.debug("sign with private key:\n{}", signatureKey);
-            }
-
-            synchronized (session)
-            {
-                login(session);
-                session.signInit(algorithmId, signatureKey);
-                byte[] signature = session.sign(encodedDigestInfo);
-                if (LOG.isDebugEnabled())
-                {
-                    LOG.debug("signature:\n{}", Hex.toHexString(signature));
-                }
-                return signature;
-            }
-        } catch (TokenException e)
-        {
-            throw new SignerException(e);
-        }finally
-        {
-            returnIdleSession(session);
-        }
+        return CKM_SIGN(PKCS11Constants.CKM_RSA_PKCS, encodedDigestInfo, keyId);
     }
 
     public byte[] CKM_RSA_X509(byte[] hash, P11KeyIdentifier keyId)
     throws SignerException
     {
-        PrivateKey signatureKey = getSigningKey(keyId);
-
-        if(signatureKey == null)
-        {
-            throw new SignerException("No key for signing is available");
-        }
-
-        Session session = borrowIdleSession();
-        if(session == null)
-        {
-            throw new SignerException("No idle session available");
-        }
-
-        try
-        {
-            Mechanism algorithmId = Mechanism.get(PKCS11Constants.CKM_RSA_X_509);
-
-            if(LOG.isTraceEnabled())
-            {
-                LOG.debug("sign with private key:\n{}", signatureKey);
-            }
-
-            synchronized (session)
-            {
-                login(session);
-                session.signInit(algorithmId, signatureKey);
-                byte[] signature = session.sign(hash);
-                if (LOG.isTraceEnabled())
-                {
-                    LOG.debug("signature:\n{}", Hex.toHexString(signature));
-                }
-                return signature;
-            }
-        } catch (TokenException e)
-        {
-            throw new SignerException(e);
-        }finally
-        {
-            returnIdleSession(session);
-        }
+        return CKM_SIGN(PKCS11Constants.CKM_RSA_X_509, hash, keyId);
     }
 
-    private PrivateKey getSigningKey(P11KeyIdentifier keyId)
+    private byte[] CKM_SIGN(long mech, byte[] hash, P11KeyIdentifier keyId)
     throws SignerException
     {
+        PrivateKey signingKey;
         synchronized (keyId)
         {
-            PrivateKey signingKey;
             if(keyId.getKeyId() != null)
             {
                 signingKey = signingKeysById.get(keyId.getKeyIdHex());
@@ -299,9 +189,42 @@ public class IaikExtendedSlot
                 {
                     LOG.warn("Could not find private key " + keyId);
                 }
+                throw new SignerException("No key for signing is available");
+            }
+        }
+
+        Session session = borrowIdleSession();
+        if(session == null)
+        {
+            throw new SignerException("No idle session available");
+        }
+
+        try
+        {
+            Mechanism algorithmId = Mechanism.get(mech);
+
+            if(LOG.isTraceEnabled())
+            {
+                LOG.debug("sign with private key:\n{}", signingKey);
             }
 
-            return signingKey;
+            synchronized (session)
+            {
+                login(session);
+                session.signInit(algorithmId, signingKey);
+                byte[] signature = session.sign(hash);
+                if (LOG.isDebugEnabled())
+                {
+                    LOG.debug("signature:\n{}", Hex.toHexString(signature));
+                }
+                return signature;
+            }
+        } catch (TokenException e)
+        {
+            throw new SignerException(e);
+        }finally
+        {
+            returnIdleSession(session);
         }
     }
 

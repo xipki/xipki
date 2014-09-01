@@ -13,6 +13,7 @@ import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
+import java.security.interfaces.DSAPublicKey;
 import java.security.interfaces.ECPublicKey;
 import java.security.interfaces.RSAPublicKey;
 import java.util.ArrayList;
@@ -139,6 +140,10 @@ public class P11ContentSignerBuilder
                 else if(publicKey instanceof ECPublicKey)
                 {
                     signer = new P11ECDSAContentSigner(cryptService, slot, keyId, signatureAlgId);
+                }
+                else if(publicKey instanceof DSAPublicKey)
+                {
+                    signer = new P11DSAContentSigner(cryptService, slot, keyId, signatureAlgId);
                 }
                 else
                 {

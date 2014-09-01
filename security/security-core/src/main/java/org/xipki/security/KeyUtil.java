@@ -7,19 +7,17 @@
 
 package org.xipki.security;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.security.InvalidKeyException;
 import java.security.KeyFactory;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
-import java.security.KeyStore;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
-import java.security.cert.Certificate;
+import java.security.SecureRandom;
 import java.security.cert.X509Certificate;
 import java.security.interfaces.DSAPrivateKey;
 import java.security.interfaces.DSAPublicKey;
@@ -29,43 +27,41 @@ import java.security.interfaces.RSAPrivateCrtKey;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
 import java.security.spec.AlgorithmParameterSpec;
+import java.security.spec.DSAParameterSpec;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.RSAKeyGenParameterSpec;
 import java.security.spec.RSAPublicKeySpec;
 import java.security.spec.X509EncodedKeySpec;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.bouncycastle.asn1.ASN1EncodableVector;
+import org.bouncycastle.asn1.ASN1Integer;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
-import org.bouncycastle.asn1.DERNull;
+import org.bouncycastle.asn1.ASN1Sequence;
+import org.bouncycastle.asn1.DERSequence;
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
-import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
-import org.bouncycastle.asn1.x509.Extension;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.bouncycastle.asn1.x9.X9ObjectIdentifiers;
-import org.bouncycastle.cert.X509v3CertificateBuilder;
+import org.bouncycastle.crypto.digests.SHA512Digest;
+import org.bouncycastle.crypto.generators.DSAParametersGenerator;
 import org.bouncycastle.crypto.params.AsymmetricKeyParameter;
+import org.bouncycastle.crypto.params.DSAParameterGenerationParameters;
+import org.bouncycastle.crypto.params.DSAParameters;
 import org.bouncycastle.crypto.params.RSAKeyParameters;
 import org.bouncycastle.crypto.params.RSAPrivateCrtKeyParameters;
-import org.bouncycastle.crypto.util.SubjectPublicKeyInfoFactory;
 import org.bouncycastle.jcajce.provider.asymmetric.dsa.DSAUtil;
 import org.bouncycastle.jcajce.provider.asymmetric.util.ECUtil;
 import org.bouncycastle.jce.ECNamedCurveTable;
-import org.bouncycastle.jce.X509KeyUsage;
-import org.bouncycastle.jce.provider.X509CertificateObject;
 import org.bouncycastle.jce.spec.ECNamedCurveParameterSpec;
 import org.bouncycastle.jce.spec.ECPublicKeySpec;
 import org.bouncycastle.math.ec.ECPoint;
-import org.bouncycastle.operator.ContentSigner;
 import org.bouncycastle.operator.ContentVerifierProvider;
 import org.bouncycastle.operator.DefaultDigestAlgorithmIdentifierFinder;
 import org.bouncycastle.operator.OperatorCreationException;
 import org.bouncycastle.operator.bc.BcContentVerifierProviderBuilder;
 import org.bouncycastle.operator.bc.BcDSAContentVerifierProviderBuilder;
-import org.xipki.security.api.ConcurrentContentSigner;
-import org.xipki.security.api.SignerException;
 import org.xipki.security.bcext.BcRSAContentVerifierProviderBuilder;
 import org.xipki.security.bcext.ECDSAContentVerifierProviderBuilder;
 
@@ -142,7 +138,6 @@ public class KeyUtil
             }
             else if("ECDSA".equals(keyAlg))
             {
-                // TODO: use SunEC implementation
                 builder = new ECDSAContentVerifierProviderBuilder(dfltDigesAlgIdentifierFinder);
             }
             else
@@ -156,13 +151,13 @@ public class KeyUtil
         return builder.build(keyParam);
     }
 
-    public static KeyPair generateRSAKeypair(int keySize)
+    public static KeyPair generateRSAKeypair(int keysize)
     throws Exception
     {
-        return generateRSAKeypair(keySize, null);
+        return generateRSAKeypair(keysize, null);
     }
 
-    public static KeyPair generateRSAKeypair(int keySize, BigInteger publicExponent)
+    public static KeyPair generateRSAKeypair(int keysize, BigInteger publicExponent)
     throws Exception
     {
         KeyPairGenerator kpGen = KeyPairGenerator.getInstance("RSA", "BC");
@@ -171,12 +166,27 @@ public class KeyUtil
         {
             publicExponent = RSAKeyGenParameterSpec.F4;
         }
-        AlgorithmParameterSpec params = new RSAKeyGenParameterSpec(keySize,    publicExponent);
+        AlgorithmParameterSpec params = new RSAKeyGenParameterSpec(keysize, publicExponent);
         kpGen.initialize(params);
         return kpGen.generateKeyPair();
     }
 
-    public static KeyPair generateECKeypair(ASN1ObjectIdentifier curveId, char[] password)
+    public static KeyPair generateDSAKeypair(int pLength, int qLength)
+    throws Exception
+    {
+        DSAParametersGenerator paramGen = new DSAParametersGenerator(new SHA512Digest());
+        DSAParameterGenerationParameters genParams = new DSAParameterGenerationParameters(
+                pLength, qLength, 80, new SecureRandom());
+        paramGen.init(genParams);
+        DSAParameters dsaParams = paramGen.generateParameters();
+
+        KeyPairGenerator kpGen = KeyPairGenerator.getInstance("DSA", "BC");
+        DSAParameterSpec dsaParamSpec = new DSAParameterSpec(dsaParams.getP(), dsaParams.getQ(), dsaParams.getG());
+        kpGen.initialize(dsaParamSpec, new SecureRandom());
+        return kpGen.generateKeyPair();
+    }
+
+    public static KeyPair generateECKeypair(ASN1ObjectIdentifier curveId)
     throws Exception
     {
         KeyPairGenerator kpGen = KeyPairGenerator.getInstance("ECDSA", "BC");
@@ -217,6 +227,10 @@ public class KeyUtil
         if(PKCSObjectIdentifiers.rsaEncryption.equals(aid))
         {
             kf = KeyFactory.getInstance("RSA");
+        }
+        else if(X9ObjectIdentifiers.id_dsa.equals(aid))
+        {
+            kf = KeyFactory.getInstance("DSA");
         }
         else if(X9ObjectIdentifiers.id_ecPublicKey.equals(aid))
         {
@@ -304,71 +318,25 @@ public class KeyUtil
         }
     }
 
-    public static byte[] generateSelfSignedRSAKeyStore(
-            BigInteger serial,
-            String subject,
-            String keystoreType, char[] password, String keyLabel,
-            int keysize, BigInteger publicExponent)
-    throws SignerException
+    /**
+     * Create a SubjectPublicKeyInfo public key.
+     *
+     * @param publicKey the SubjectPublicKeyInfo encoding
+     * @return the appropriate key parameter
+     * @throws java.io.IOException on an error encoding the key
+     */
+    public static SubjectPublicKeyInfo creatDSASubjectPublicKeyInfo(DSAPublicKey publicKey)
+    throws IOException
     {
-        final String provider = "BC";
+        ASN1EncodableVector v = new ASN1EncodableVector();
+        v.add(new ASN1Integer(publicKey.getParams().getP()));
+        v.add(new ASN1Integer(publicKey.getParams().getQ()));
+        v.add(new ASN1Integer(publicKey.getParams().getG()));
+        ASN1Sequence dssParams = new DERSequence(v);
 
-        try
-        {
-            X500Name subjectDN = new X500Name(subject);
-            KeyPair keypair = KeyUtil.generateRSAKeypair(keysize, publicExponent);
-            SubjectPublicKeyInfo pkInfo = SubjectPublicKeyInfoFactory.createSubjectPublicKeyInfo(
-                    KeyUtil.generatePublicKeyParameter(keypair.getPublic()));
-
-            KeyStore ks = KeyStore.getInstance(keystoreType, provider);
-            ks.load(null, password);
-
-            Date dummyNotBefore = new Date();
-            Date dummyNotAfter = new Date(dummyNotBefore.getTime() + 3650L*24*3600*1000);
-            X509v3CertificateBuilder certBuilder = new X509v3CertificateBuilder(
-                    subjectDN, serial, dummyNotBefore, dummyNotAfter, subjectDN,
-                    pkInfo);
-            X509KeyUsage ku = new X509KeyUsage(
-                    X509KeyUsage.nonRepudiation + X509KeyUsage.digitalSignature +
-                    X509KeyUsage.keyCertSign + X509KeyUsage.cRLSign);
-            certBuilder.addExtension(
-                    Extension.keyUsage, true, ku);
-
-            SoftTokenContentSignerBuilder signerBuilder = new SoftTokenContentSignerBuilder(
-                    keypair.getPrivate());
-
-            ConcurrentContentSigner concurrentSigner = signerBuilder.createSigner(
-                    new AlgorithmIdentifier(PKCSObjectIdentifiers.sha256WithRSAEncryption, DERNull.INSTANCE), 1);
-
-            ContentSigner signer = concurrentSigner.borrowContentSigner();
-            X509CertificateObject cert;
-            try
-            {
-                cert = new X509CertificateObject(
-                    certBuilder.build(signer).toASN1Structure());
-            }finally
-            {
-                concurrentSigner.returnContentSigner(signer);
-            }
-
-            if(keyLabel == null)
-            {
-                keyLabel = "main";
-            }
-
-            ks.setKeyEntry(keyLabel, keypair.getPrivate(), password, new Certificate[]{cert});
-            ByteArrayOutputStream out = new ByteArrayOutputStream();
-            ks.store(out, password);
-            out.flush();
-
-            return out.toByteArray();
-        }catch(SignerException e)
-        {
-            throw e;
-        }catch(Exception e)
-        {
-            throw new SignerException(e);
-        }
+        return new SubjectPublicKeyInfo(
+                new AlgorithmIdentifier(X9ObjectIdentifiers.id_dsa, dssParams),
+                new ASN1Integer(publicKey.getY()));
     }
 
 }

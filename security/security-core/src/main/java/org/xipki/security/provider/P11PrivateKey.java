@@ -11,6 +11,7 @@ import java.security.InvalidKeyException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.SignatureException;
+import java.security.interfaces.DSAPublicKey;
 import java.security.interfaces.ECPublicKey;
 import java.security.interfaces.RSAPublicKey;
 
@@ -59,6 +60,11 @@ public class P11PrivateKey implements PrivateKey
         {
             algorithm = "RSA";
             keysize = ((RSAPublicKey) publicKey).getModulus().bitLength();
+        }
+        else if(publicKey instanceof DSAPublicKey)
+        {
+            algorithm = "DSA";
+            keysize = ((DSAPublicKey) publicKey).getParams().getP().bitLength();
         }
         else if(publicKey instanceof ECPublicKey)
         {
@@ -139,6 +145,23 @@ public class P11PrivateKey implements PrivateKey
         try
         {
             return p11CryptService.CKM_ECDSA(hash, slotId, keyId);
+        } catch (SignerException e)
+        {
+            throw new SignatureException("SignatureException: " + e.getMessage(), e);
+        }
+    }
+
+    public byte[] CKM_DSA(byte[] hash)
+    throws SignatureException
+    {
+        if("DSA".equals(algorithm) == false)
+        {
+            throw new SignatureException("Could not compute DSA signature with " + algorithm + " key");
+        }
+
+        try
+        {
+            return p11CryptService.CKM_DSA(hash, slotId, keyId);
         } catch (SignerException e)
         {
             throw new SignatureException("SignatureException: " + e.getMessage(), e);

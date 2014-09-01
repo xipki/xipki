@@ -19,6 +19,29 @@
       </parameter>
     </algorithm>
     <algorithm>
+      <algorithm description="DSA">1.2.840.10040.4.1</algorithm>
+      <parameter name="plength">
+        <Min>1024</Min>
+        <Max>1024</Max>
+      </parameter>
+      <parameter name="plength">
+        <Min>2048</Min>
+        <Max>2048</Max>
+      </parameter>
+      <parameter name="qlength">
+        <Min>160</Min>
+        <Max>160</Max>
+      </parameter>
+      <parameter name="qlength">
+        <Min>224</Min>
+        <Max>224</Max>
+      </parameter>
+      <parameter name="qlength">
+        <Min>256</Min>
+        <Max>256</Max>
+      </parameter>
+    </algorithm>
+    <algorithm>
       <algorithm description="EC">1.2.840.10045.2.1</algorithm>
       <ecParameter>
         <curve>

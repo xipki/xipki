@@ -682,27 +682,22 @@ public class IoCertUtil
     public static SubjectPublicKeyInfo toRfc3279Style(SubjectPublicKeyInfo publicKeyInfo)
     {
         ASN1ObjectIdentifier algOid = publicKeyInfo.getAlgorithm().getAlgorithm();
-        ASN1Encodable keyParameters = publicKeyInfo.getAlgorithm().getParameters();
 
-        if(PKCSObjectIdentifiers.rsaEncryption.equals(algOid))
+        if(PKCSObjectIdentifiers.rsaEncryption.equals(algOid) == false)
         {
-            if(DERNull.INSTANCE.equals(keyParameters))
-            {
-                return publicKeyInfo;
-            }
-            else
-            {
-                keyParameters = null;
-            }
+            return publicKeyInfo;
         }
 
-        // Set the parameters field to NULL if not specified
-        if(keyParameters == null)
+        ASN1Encodable keyParameters = publicKeyInfo.getAlgorithm().getParameters();
+        if(DERNull.INSTANCE.equals(keyParameters))
+        {
+            return publicKeyInfo;
+        }
+        else
         {
             AlgorithmIdentifier keyAlgId = new AlgorithmIdentifier(algOid, DERNull.INSTANCE);
-            publicKeyInfo = new SubjectPublicKeyInfo(keyAlgId, publicKeyInfo.getPublicKeyData().getBytes());
+            return new SubjectPublicKeyInfo(keyAlgId, publicKeyInfo.getPublicKeyData().getBytes());
         }
-        return publicKeyInfo;
     }
 
     public static String getCurveName(ASN1ObjectIdentifier curveId)

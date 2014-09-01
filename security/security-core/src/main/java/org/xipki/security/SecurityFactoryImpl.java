@@ -14,7 +14,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.math.BigInteger;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
@@ -278,31 +277,37 @@ public class SecurityFactoryImpl implements SecurityFactory
             }
             else
             {
+                boolean withNullParam = false;
                 ASN1ObjectIdentifier algOid;
                 if("SHA1withRSA".equalsIgnoreCase(algoS) || "RSAwithSHA1".equalsIgnoreCase(algoS) ||
                         PKCSObjectIdentifiers.sha1WithRSAEncryption.getId().equals(algoS))
                 {
                     algOid = PKCSObjectIdentifiers.sha1WithRSAEncryption;
+                    withNullParam = true;
                 }
                 else if("SHA224withRSA".equalsIgnoreCase(algoS) || "RSAwithSHA224".equalsIgnoreCase(algoS) ||
                         PKCSObjectIdentifiers.sha224WithRSAEncryption.getId().equals(algoS))
                 {
                     algOid = PKCSObjectIdentifiers.sha224WithRSAEncryption;
+                    withNullParam = true;
                 }
                 else if("SHA256withRSA".equalsIgnoreCase(algoS) || "RSAwithSHA256".equalsIgnoreCase(algoS) ||
                         PKCSObjectIdentifiers.sha256WithRSAEncryption.getId().equals(algoS))
                 {
                     algOid = PKCSObjectIdentifiers.sha256WithRSAEncryption;
+                    withNullParam = true;
                 }
                 else if("SHA384withRSA".equalsIgnoreCase(algoS) || "RSAwithSHA384".equalsIgnoreCase(algoS) ||
                         PKCSObjectIdentifiers.sha384WithRSAEncryption.getId().equals(algoS))
                 {
                     algOid = PKCSObjectIdentifiers.sha384WithRSAEncryption;
+                    withNullParam = true;
                 }
                 else if("SHA512withRSA".equalsIgnoreCase(algoS) || "RSAwithSHA512".equalsIgnoreCase(algoS) ||
                         PKCSObjectIdentifiers.sha512WithRSAEncryption.getId().equals(algoS))
                 {
                     algOid = PKCSObjectIdentifiers.sha512WithRSAEncryption;
+                    withNullParam = true;
                 }
                 else if("SHA1withECDSA".equalsIgnoreCase(algoS) || "ECDSAwithSHA1".equalsIgnoreCase(algoS) ||
                         X9ObjectIdentifiers.ecdsa_with_SHA1.getId().equals(algoS))
@@ -329,12 +334,38 @@ public class SecurityFactoryImpl implements SecurityFactory
                 {
                     algOid = X9ObjectIdentifiers.ecdsa_with_SHA512;
                 }
+                else if("SHA1withDSA".equalsIgnoreCase(algoS) || "DSAwithSHA1".equalsIgnoreCase(algoS) ||
+                        X9ObjectIdentifiers.id_dsa_with_sha1.getId().equals(algoS))
+                {
+                    algOid = X9ObjectIdentifiers.id_dsa_with_sha1;
+                }
+                else if("SHA224withDSA".equalsIgnoreCase(algoS) || "DSAwithSHA224".equalsIgnoreCase(algoS) ||
+                        NISTObjectIdentifiers.dsa_with_sha224.getId().equals(algoS))
+                {
+                    algOid = NISTObjectIdentifiers.dsa_with_sha224;
+                }
+                else if("SHA256withDSA".equalsIgnoreCase(algoS) || "DSAwithSHA256".equalsIgnoreCase(algoS) ||
+                        NISTObjectIdentifiers.dsa_with_sha256.getId().equals(algoS))
+                {
+                    algOid = NISTObjectIdentifiers.dsa_with_sha256;
+                }
+                else if("SHA384withDSA".equalsIgnoreCase(algoS) || "DSAwithSHA384".equalsIgnoreCase(algoS) ||
+                        NISTObjectIdentifiers.dsa_with_sha384.getId().equals(algoS))
+                {
+                    algOid = NISTObjectIdentifiers.dsa_with_sha384;
+                }
+                else if("SHA512withDSA".equalsIgnoreCase(algoS) || "DSAwithSHA512".equalsIgnoreCase(algoS) ||
+                        NISTObjectIdentifiers.dsa_with_sha512.getId().equals(algoS))
+                {
+                    algOid = NISTObjectIdentifiers.dsa_with_sha512;
+                }
                 else
                 {
                     throw new SignerException("Unsupported signature algorithm " + algoS);
                 }
 
-                signatureAlgId = new AlgorithmIdentifier(algOid, DERNull.INSTANCE);
+                signatureAlgId = withNullParam ? new AlgorithmIdentifier(algOid, DERNull.INSTANCE) :
+                    new AlgorithmIdentifier(algOid);
             }
 
             if("PKCS11".equalsIgnoreCase(type))
@@ -548,16 +579,6 @@ public class SecurityFactoryImpl implements SecurityFactory
     public boolean verifyPOPO(CertificationRequest p10Req)
     {
         return SignerUtil.verifyPOP(p10Req);
-    }
-
-    @Override
-    public byte[] generateSelfSignedRSAKeyStore(BigInteger serial,
-            String subject, String keystoreType, char[] password,
-            String keyLabel, int keysize, BigInteger publicExponent)
-    throws SignerException
-    {
-        return KeyUtil.generateSelfSignedRSAKeyStore(serial, subject, keystoreType,
-                password, keyLabel, keysize, publicExponent);
     }
 
     public void setPkcs11Provider(String pkcs11Provider)

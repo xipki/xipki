@@ -11,16 +11,16 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.security.KeyPair;
-import java.security.KeyPairGenerator;
 import java.security.KeyStore;
 import java.security.PrivateKey;
 import java.security.Security;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateParsingException;
 import java.security.cert.X509Certificate;
+import java.security.interfaces.DSAPrivateKey;
+import java.security.interfaces.DSAPublicKey;
 import java.security.interfaces.ECPrivateKey;
 import java.security.interfaces.RSAPrivateKey;
-import java.security.spec.RSAKeyGenParameterSpec;
 import java.util.Date;
 import java.util.List;
 
@@ -29,6 +29,7 @@ import org.bouncycastle.asn1.DERNull;
 import org.bouncycastle.asn1.nist.NISTNamedCurves;
 import org.bouncycastle.asn1.nist.NISTObjectIdentifiers;
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
+import org.bouncycastle.asn1.pkcs.RSAPublicKey;
 import org.bouncycastle.asn1.sec.SECNamedCurves;
 import org.bouncycastle.asn1.teletrust.TeleTrusTNamedCurves;
 import org.bouncycastle.asn1.x500.X500Name;
@@ -42,15 +43,13 @@ import org.bouncycastle.asn1.x9.X962NamedCurves;
 import org.bouncycastle.asn1.x9.X9ObjectIdentifiers;
 import org.bouncycastle.cert.X509CertificateHolder;
 import org.bouncycastle.cert.X509v3CertificateBuilder;
-import org.bouncycastle.crypto.util.SubjectPublicKeyInfoFactory;
 import org.bouncycastle.jcajce.provider.asymmetric.ec.BCECPublicKey;
-import org.bouncycastle.jce.ECNamedCurveTable;
 import org.bouncycastle.jce.X509KeyUsage;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.jce.provider.X509CertificateObject;
-import org.bouncycastle.jce.spec.ECNamedCurveParameterSpec;
 import org.bouncycastle.operator.ContentSigner;
 import org.bouncycastle.operator.bc.BcContentSignerBuilder;
+import org.bouncycastle.operator.bc.BcDSAContentSignerBuilder;
 import org.bouncycastle.operator.bc.BcRSAContentSignerBuilder;
 import org.xipki.security.KeyUtil;
 import org.xipki.security.api.P12KeypairGenerationResult;
@@ -174,7 +173,13 @@ public abstract class P12KeypairGenerator
                     buildAlgId(sigOid),
                     buildAlgId(hashOid));
         }
+        else if(key instanceof DSAPrivateKey)
+        {
+            ASN1ObjectIdentifier hashOid = X509ObjectIdentifiers.id_SHA1;
+            AlgorithmIdentifier sigId = new AlgorithmIdentifier(X9ObjectIdentifiers.id_dsa_with_sha1);
 
+            builder = new BcDSAContentSignerBuilder(sigId, buildAlgId(hashOid));
+        }
         else if(key instanceof ECPrivateKey)
         {
             ASN1ObjectIdentifier hashOid;
@@ -208,7 +213,7 @@ public abstract class P12KeypairGenerator
             }
 
             builder = new ECDSAContentSignerBuilder(
-                    buildAlgId(sigOid),
+                    new AlgorithmIdentifier(sigOid),
                     buildAlgId(hashOid));
         }
         else
@@ -289,8 +294,8 @@ public abstract class P12KeypairGenerator
 
     public static class ECDSAIdentityGenerator extends P12KeypairGenerator
     {
-        private String curveName;
-        private ASN1ObjectIdentifier curveOid;
+        private final String curveName;
+        private final ASN1ObjectIdentifier curveOid;
 
         public ECDSAIdentityGenerator(String curveNameOrOid, char[] password, String subject,
         Integer keyUsage, List<ASN1ObjectIdentifier> extendedKeyUsage)
@@ -328,13 +333,9 @@ public abstract class P12KeypairGenerator
         protected KeyPairWithSubjectPublicKeyInfo genKeypair()
         throws Exception
         {
-            KeyPairGenerator kpgen = KeyPairGenerator.getInstance("ECDSA", "BC");
-            ECNamedCurveParameterSpec spec = ECNamedCurveTable.getParameterSpec(curveName);
-            kpgen.initialize(spec);
-            KeyPair kp = kpgen.generateKeyPair();
+            KeyPair kp = KeyUtil.generateECKeypair(this.curveOid);
 
             AlgorithmIdentifier algId = new AlgorithmIdentifier(X9ObjectIdentifiers.id_ecPublicKey, this.curveOid);
-
             BCECPublicKey pub = (BCECPublicKey) kp.getPublic();
             byte[] keyData = pub.getQ().getEncoded(false);
             SubjectPublicKeyInfo subjectPublicKeyInfo = new SubjectPublicKeyInfo(algId, keyData);
@@ -390,8 +391,8 @@ public abstract class P12KeypairGenerator
 
     public static class RSAIdentityGenerator extends P12KeypairGenerator
     {
-        private int keysize;
-        private BigInteger publicExponent;
+        private final int keysize;
+        private final BigInteger publicExponent;
 
         public RSAIdentityGenerator(int keysize, BigInteger publicExponent, char[] password,
         String subject, Integer keyUsage, List<ASN1ObjectIdentifier> extendedKeyUsage)
@@ -407,13 +408,44 @@ public abstract class P12KeypairGenerator
         protected KeyPairWithSubjectPublicKeyInfo genKeypair()
         throws Exception
         {
-            KeyPairGenerator kpgen = KeyPairGenerator.getInstance("RSA", "BC");
-            RSAKeyGenParameterSpec spec = new RSAKeyGenParameterSpec(keysize, publicExponent);
-            kpgen.initialize(spec);
-            KeyPair kp =  kpgen.generateKeyPair();
+            KeyPair kp = KeyUtil.generateRSAKeypair(keysize, publicExponent);
+            java.security.interfaces.RSAPublicKey rsaPubKey = (java.security.interfaces.RSAPublicKey) kp.getPublic();
 
-            SubjectPublicKeyInfo spki = SubjectPublicKeyInfoFactory.createSubjectPublicKeyInfo(
-                    KeyUtil.generatePublicKeyParameter(kp.getPublic()));
+            SubjectPublicKeyInfo spki = new SubjectPublicKeyInfo(
+                    new AlgorithmIdentifier(PKCSObjectIdentifiers.rsaEncryption, DERNull.INSTANCE),
+                    new RSAPublicKey(rsaPubKey.getModulus(), rsaPubKey.getPublicExponent()));
+            return new KeyPairWithSubjectPublicKeyInfo(kp, spki);
+        }
+
+        @Override
+        protected String getKeyAlgorithm()
+        {
+            return "RSA";
+        }
+    }
+
+    public static class DSAIdentityGenerator extends P12KeypairGenerator
+    {
+        private final int pLength;
+        private final int qLength;
+
+        public DSAIdentityGenerator(int pLength, int qLength, char[] password,
+        String subject, Integer keyUsage, List<ASN1ObjectIdentifier> extendedKeyUsage)
+        throws Exception
+        {
+            super(password, subject, keyUsage, extendedKeyUsage);
+
+            this.pLength = pLength;
+            this.qLength = qLength;
+        }
+
+        @Override
+        protected KeyPairWithSubjectPublicKeyInfo genKeypair()
+        throws Exception
+        {
+            KeyPair kp =  KeyUtil.generateDSAKeypair(pLength, qLength);
+            SubjectPublicKeyInfo spki = KeyUtil.creatDSASubjectPublicKeyInfo(
+                    (DSAPublicKey) kp.getPublic());
             return new KeyPairWithSubjectPublicKeyInfo(kp, spki);
         }
 

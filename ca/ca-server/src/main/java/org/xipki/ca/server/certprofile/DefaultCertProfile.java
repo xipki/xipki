@@ -973,11 +973,26 @@ public class DefaultCertProfile extends AbstractCertProfile
                 }
                 else if(X9ObjectIdentifiers.id_dsa.equals(keyType))
                 {
-                    ASN1Sequence seq = ASN1Sequence.getInstance(publicKey.getPublicKeyData().getBytes());
-                    ASN1Integer p = ASN1Integer.getInstance(seq.getObjectAt(0));
-                    ASN1Integer q = ASN1Integer.getInstance(seq.getObjectAt(1));
-                    int pLength = p.getPositiveValue().bitLength();
-                    int qLength = q.getPositiveValue().bitLength();
+                    ASN1Encodable params = publicKey.getAlgorithm().getParameters();
+                    if(params == null)
+                    {
+                        throw new BadCertTemplateException("null Dss-Parms is not permitted");
+                    }
+
+                    int pLength;
+                    int qLength;
+
+                    try
+                    {
+                        ASN1Sequence seq = ASN1Sequence.getInstance(params);
+                        ASN1Integer p = ASN1Integer.getInstance(seq.getObjectAt(0));
+                        ASN1Integer q = ASN1Integer.getInstance(seq.getObjectAt(1));
+                        pLength = p.getPositiveValue().bitLength();
+                        qLength = q.getPositiveValue().bitLength();
+                    } catch(IllegalArgumentException | ArrayIndexOutOfBoundsException e)
+                    {
+                        throw new BadCertTemplateException("illegal Dss-Parms");
+                    }
 
                     for(KeyParamRanges ranges : list)
                     {

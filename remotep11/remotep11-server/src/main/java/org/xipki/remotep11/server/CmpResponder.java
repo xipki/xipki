@@ -55,6 +55,7 @@ class CmpResponder
     {
             RemoteP11Constants.id_version,
             RemoteP11Constants.id_pso_ecdsa,
+            RemoteP11Constants.id_pso_dsa,
             RemoteP11Constants.id_pso_rsa_x509,
             RemoteP11Constants.id_pso_rsa_pkcs,
             RemoteP11Constants.id_get_certificate,
@@ -65,6 +66,7 @@ class CmpResponder
     private static final String UNKOWNTYPE_MSG = "PKIBody type %s is only supported with the sub-knownTypes " +
             RemoteP11Constants.id_version.getId() + ", " +
             RemoteP11Constants.id_pso_ecdsa.getId() + ", " +
+            RemoteP11Constants.id_pso_dsa.getId() + ", " +
             RemoteP11Constants.id_pso_rsa_x509.getId() + ", " +
             RemoteP11Constants.id_pso_rsa_pkcs.getId() + ", " +
             RemoteP11Constants.id_get_certificate.getId() + ", " +
@@ -164,6 +166,7 @@ class CmpResponder
                     respItvInfoValue = new ASN1Integer(localP11CryptService.getVersion());
                 }
                 else if(RemoteP11Constants.id_pso_ecdsa.equals(itvType) ||
+                        RemoteP11Constants.id_pso_dsa.equals(itvType) ||
                         RemoteP11Constants.id_pso_rsa_x509.equals(itvType) ||
                         RemoteP11Constants.id_pso_rsa_pkcs.equals(itvType))
                 {
@@ -181,13 +184,21 @@ class CmpResponder
                     {
                         signature = p11CryptService.CKM_ECDSA(psoMessage, slot, keyId);
                     }
+                    else if(RemoteP11Constants.id_pso_dsa.equals(itvType))
+                    {
+                        signature = p11CryptService.CKM_DSA(psoMessage, slot, keyId);
+                    }
                     else if(RemoteP11Constants.id_pso_rsa_x509.equals(itvType))
                     {
                         signature = p11CryptService.CKM_RSA_X509(psoMessage, slot, keyId);
                     }
-                    else
+                    else if(RemoteP11Constants.id_pso_rsa_pkcs.equals(itvType))
                     {
                         signature = p11CryptService.CKM_RSA_PKCS(psoMessage, slot, keyId);
+                    }
+                    else
+                    {
+                        throw new RuntimeException("should not reach here");
                     }
 
                     respItvInfoValue = new DEROctetString(signature);
