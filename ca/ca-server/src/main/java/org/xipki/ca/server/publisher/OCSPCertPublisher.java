@@ -35,7 +35,7 @@ import org.xipki.security.common.ParamChecker;
 /**
  * @author Lijun Liao
  */
-@Deprecated
+
 public class OCSPCertPublisher extends CertPublisher
 {
     private static final Logger LOG = LoggerFactory.getLogger(OCSPCertPublisher.class);
