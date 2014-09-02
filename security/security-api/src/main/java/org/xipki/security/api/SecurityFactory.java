@@ -7,7 +7,6 @@
 
 package org.xipki.security.api;
 
-import java.math.BigInteger;
 import java.security.InvalidKeyException;
 import java.security.PublicKey;
 import java.security.cert.X509Certificate;

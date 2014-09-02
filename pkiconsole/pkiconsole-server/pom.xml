@@ -15,12 +15,8 @@
   <dependencies>
     <dependency>
       <groupId>org.xipki</groupId>
-      <artifactId>ca-mgmt-api</artifactId>
+      <artifactId>pkiconsole-common</artifactId>
       <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-api</artifactId>
     </dependency>
     <dependency>
      <groupId>com.caucho</groupId>

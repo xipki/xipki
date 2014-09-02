@@ -46,7 +46,6 @@
     <module>datasource</module>
     <module>ca</module>
     <module>ocsp</module>
-    <module>remotep11</module>
     <module>audit</module>
     <module>pkiconsole</module>
   </modules>
