@@ -19,7 +19,8 @@ import org.xipki.security.common.CertRevocationInfo;
 
 public class CertRevocationInfoWithSerial extends CertRevocationInfo
 {
-    private final BigInteger serial;
+    private static final long serialVersionUID = 1L;
+    private BigInteger serial;
 
     public CertRevocationInfoWithSerial(BigInteger serial, CRLReason reason,
             Date revocationTime, Date invalidityTime)

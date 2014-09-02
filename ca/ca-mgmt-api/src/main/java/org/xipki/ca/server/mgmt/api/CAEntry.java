@@ -7,6 +7,8 @@
 
 package org.xipki.ca.server.mgmt.api;
 
+import java.io.IOException;
+import java.io.Serializable;
 import java.math.BigInteger;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
@@ -14,7 +16,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.bouncycastle.asn1.cmp.CMPCertificate;
@@ -31,24 +35,24 @@ import org.xipki.security.common.ParamChecker;
  * @author Lijun Liao
  */
 
-public class CAEntry
+public class CAEntry implements Serializable
 {
     private static long MS_PER_DAY = 24L * 60 * 60 * 1000;
 
-    private final String name;
-    private final boolean selfSigned;
-    private final BigInteger serialNumber;
-    private final String subject;
-    private final Date notBefore;
-    private final Date notAfter;
+    private String name;
+    private boolean selfSigned;
+    private BigInteger serialNumber;
+    private String subject;
+    private Date notBefore;
+    private Date notAfter;
     private CAStatus status;
-    private final List<String> crlUris;
-    private final List<String> deltaCrlUris;
-    private final List<String> ocspUris;
-    private final List<String> issuerLocations;
+    private List<String> crlUris;
+    private List<String> deltaCrlUris;
+    private List<String> ocspUris;
+    private List<String> issuerLocations;
     private int maxValidity;
-    private final X509CertificateWithMetaInfo cert;
-    private final CMPCertificate certInCMPFormat;
+    private X509CertificateWithMetaInfo cert;
+    private CMPCertificate certInCMPFormat;
     private String signerType;
     private String signerConf;
     private String crlSignerName;
@@ -59,8 +63,8 @@ public class CAEntry
     private ValidityMode validityMode = ValidityMode.STRICT;
     private Set<Permission> permissions;
     private int numCrls;
-    private final int expirationPeriod;
-    private final long noNewCertificateAfter;
+    private int expirationPeriod;
+    private long noNewCertificateAfter;
     private CertRevocationInfo revocationInfo;
     private int lastCRLInterval;
     private long lastCRLIntervalDate;
@@ -68,6 +72,18 @@ public class CAEntry
     private PublicCAInfo publicCAInfo;
 
     public CAEntry(String name, long initialSerial,
+            String signerType, String signerConf, X509Certificate cert,
+            List<String> ocspUris, List<String> crlUris, List<String> deltaCrlUris,
+            List<String> issuerLocations, int numCrls,
+            int expirationPeriod)
+    throws CAMgmtException
+    {
+        init(name, initialSerial, signerType, signerConf, cert, ocspUris,
+                crlUris, deltaCrlUris, issuerLocations, numCrls, expirationPeriod);
+        this.serialVersion = SERIAL_VERSION;
+    }
+
+    private void init(String name, long initialSerial,
             String signerType, String signerConf, X509Certificate cert,
             List<String> ocspUris, List<String> crlUris, List<String> deltaCrlUris,
             List<String> issuerLocations, int numCrls,
@@ -423,4 +439,103 @@ public class CAEntry
         this.lastCRLIntervalDate = lastIntervalDate;
     }
 
+    // ------------------------------------------------
+    // Customized serialization
+    // ------------------------------------------------
+    private static final long serialVersionUID = 1L;
+
+    private static final String SR_serialVersion = "serialVersion";
+    private static final double SERIAL_VERSION = 1.0;
+
+    private static final String SR_name = "name";
+    private static final String SR_signerType = "signerType";
+    private static final String SR_signerConf = "signerConf";
+    private static final String SR_cert = "cert";
+    private static final String SR_nextSerial = "nextSerial";
+    private static final String SR_ocspUris = "ocspUris";
+    private static final String SR_crlUris = "crlUris";
+    private static final String SR_deltaCrlUris = "deltaCrlUris";
+    private static final String SR_issuerLocations = "issuerLocations";
+    private static final String SR_numCrls = "numCrls";
+    private static final String SR_expirationPeriod = "expirationPeriod";
+    private static final String SR_status = "status";
+    private static final String SR_maxValidity = "maxValidity";
+    private static final String SR_crlSignerName = "crlSignerName";
+    private static final String SR_duplicateKeyMode = "duplicateKeyMode";
+    private static final String SR_duplicateSubjectMode = "duplicateSubjectMode";
+    private static final String SR_validityMode = "validityMode";
+    private static final String SR_permissions = "permissions";
+    private static final String SR_lastCRLInterval = "lastCRLInterval";
+    private static final String SR_lastCRLIntervalDate = "lastCRLIntervalDate";
+
+    private double serialVersion;
+
+    private void writeObject(java.io.ObjectOutputStream out)
+    throws IOException
+    {
+        final Map<String, Object> serialMap = new HashMap<String, Object>();
+
+        serialMap.put(SR_serialVersion, serialVersion);
+        serialMap.put(SR_name, name);
+        serialMap.put(SR_signerType, signerType);
+        serialMap.put(SR_signerConf, signerConf);
+        serialMap.put(SR_nextSerial, nextSerial);
+        serialMap.put(SR_ocspUris, ocspUris);
+        serialMap.put(SR_crlUris, crlUris);
+        serialMap.put(SR_deltaCrlUris, deltaCrlUris);
+        serialMap.put(SR_issuerLocations, issuerLocations);
+        serialMap.put(SR_numCrls, numCrls);
+        serialMap.put(SR_expirationPeriod, expirationPeriod);
+        serialMap.put(SR_status, status);
+        serialMap.put(SR_maxValidity, maxValidity);
+        serialMap.put(SR_crlSignerName, crlSignerName);
+        serialMap.put(SR_duplicateKeyMode, duplicateKeyMode);
+        serialMap.put(SR_duplicateSubjectMode, duplicateSubjectMode);
+        serialMap.put(SR_validityMode, validityMode);
+        serialMap.put(SR_permissions, permissions);
+        serialMap.put(SR_lastCRLInterval, lastCRLInterval);
+        serialMap.put(SR_lastCRLIntervalDate, lastCRLIntervalDate);
+        SerializationUtil.writeCert(serialMap, SR_cert, cert == null ? null : cert.getCert());
+
+        out.writeObject(serialMap);
+    }
+
+    @SuppressWarnings("unchecked")
+    private void readObject(java.io.ObjectInputStream in)
+    throws IOException, ClassNotFoundException
+    {
+        final Map<String, Object> serialMap = (Map<String, Object>) in.readObject();
+        serialVersion = (double) serialMap.get(SR_serialVersion);
+
+        String name = (String) serialMap.get(SR_name);
+        long nextSerial = (long) serialMap.get(SR_nextSerial);
+        String signerType = (String) serialMap.get(SR_signerType);
+        String signerConf = (String) serialMap.get(SR_signerConf);
+        X509Certificate cert = SerializationUtil.readCert(serialMap, SR_cert);
+        List<String> ocspUris = (List<String>) serialMap.get(SR_ocspUris);
+        List<String> crlUris = (List<String>) serialMap.get(SR_crlUris);
+        List<String> deltaCrlUris = (List<String>) serialMap.get(SR_deltaCrlUris);
+        List<String> issuerLocations = (List<String>) serialMap.get(SR_issuerLocations);
+        int numCrls = (int) serialMap.get(SR_numCrls);
+        int expirationPeriod = (int) serialMap.get(SR_expirationPeriod);
+
+        try
+        {
+            init(name, nextSerial, signerType, signerConf, cert,
+                    ocspUris, crlUris, deltaCrlUris, issuerLocations, numCrls, expirationPeriod);
+        } catch (CAMgmtException e)
+        {
+            throw new IOException("CAMgmtException: " + e.getMessage(), e);
+        }
+
+        status = (CAStatus) serialMap.get(SR_status);
+        maxValidity = (int) serialMap.get(SR_maxValidity);
+        crlSignerName = (String) serialMap.get(SR_crlSignerName);
+        duplicateKeyMode = (DuplicationMode) serialMap.get(SR_duplicateKeyMode);
+        duplicateSubjectMode = (DuplicationMode) serialMap.get(SR_duplicateSubjectMode);
+        validityMode = (ValidityMode) serialMap.get(SR_validityMode);
+        permissions = (Set<Permission>) serialMap.get(SR_permissions);
+        lastCRLInterval = (int) serialMap.get(SR_lastCRLInterval);
+        lastCRLIntervalDate = (long) serialMap.get(SR_lastCRLIntervalDate);
+    }
 }

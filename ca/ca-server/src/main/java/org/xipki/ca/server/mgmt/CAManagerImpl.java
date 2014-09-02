@@ -550,7 +550,6 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
                             LOG.debug(message, e);
                             return false;
                         }
-                        caEntry.getPublicCAInfo().setCrlSignerCertificate(identifiedSigner.getCertificate());
                     }
 
                     try
