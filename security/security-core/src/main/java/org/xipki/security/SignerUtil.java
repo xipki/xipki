@@ -326,7 +326,7 @@ public class SignerUtil
         {
             digestAlgOid = NISTObjectIdentifiers.id_sha512;
         }
-        if(X9ObjectIdentifiers.id_dsa_with_sha1.equals(algOid))
+        else if(X9ObjectIdentifiers.id_dsa_with_sha1.equals(algOid))
         {
             digestAlgOid = X509ObjectIdentifiers.id_SHA1;
         }
