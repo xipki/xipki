@@ -14,8 +14,8 @@
     <karaf.version>2.3.4</karaf.version>
   </properties>
   <modules>
-    <module>assembly</module>
-    <module>branding</module>
-    <module>features</module>
+    <module>pki</module>
+    <module>pkiconsole</module>
+    <module>remotep11</module>
   </modules>
 </project>

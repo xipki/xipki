@@ -7,7 +7,11 @@
 
 package org.xipki.ca.server.mgmt.api;
 
+import java.io.IOException;
+import java.io.Serializable;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 
 import org.xipki.security.common.ParamChecker;
@@ -16,9 +20,9 @@ import org.xipki.security.common.ParamChecker;
  * @author Lijun Liao
  */
 
-public class CAHasRequestorEntry
+public class CAHasRequestorEntry implements Serializable
 {
-    private final String requestorName;
+    private String requestorName;
     private boolean ra;
     private Set<Permission> permissions;
     private Set<String> profiles;
@@ -27,6 +31,7 @@ public class CAHasRequestorEntry
     {
         ParamChecker.assertNotEmpty("requestorName", requestorName);
         this.requestorName = requestorName;
+        this.serialVersion = SERIAL_VERSION;
     }
 
     public boolean isRa()
@@ -73,5 +78,47 @@ public class CAHasRequestorEntry
         sb.append("profiles: ").append(profiles).append(", ");
         sb.append("permissions: ").append(Permission.toString(permissions));
         return sb.toString();
+    }
+
+    // ------------------------------------------------
+    // Customized serialization
+    // ------------------------------------------------
+    private static final long serialVersionUID = 1L;
+
+    private static final String SR_serialVersion = "serialVersion";
+    private static final double SERIAL_VERSION = 1.0;
+
+    private static final String SR_requestorName = "requestorName";
+    private static final String SR_ra = "ra";
+    private static final String SR_permissions = "permissions";
+    private static final String SR_profiles = "profiles";
+
+    private double serialVersion;
+
+    private void writeObject(java.io.ObjectOutputStream out)
+    throws IOException
+    {
+        final Map<String, Object> serialMap = new HashMap<String, Object>();
+
+        serialMap.put(SR_serialVersion, serialVersion);
+        serialMap.put(SR_requestorName, requestorName);
+        serialMap.put(SR_ra, ra);
+        serialMap.put(SR_permissions, permissions);
+        serialMap.put(SR_profiles, profiles);
+
+        out.writeObject(serialMap);
+    }
+
+    @SuppressWarnings("unchecked")
+    private void readObject(java.io.ObjectInputStream in)
+    throws IOException, ClassNotFoundException
+    {
+        final Map<String, Object> serialMap = (Map<String, Object>) in.readObject();
+        serialVersion = (double) serialMap.get(SR_serialVersion);
+
+        requestorName = (String) serialMap.get(SR_requestorName);
+        ra = (boolean) serialMap.get(SR_ra);
+        permissions = (Set<Permission>) serialMap.get(SR_permissions);
+        profiles = (Set<String>) serialMap.get(SR_profiles);
     }
 }

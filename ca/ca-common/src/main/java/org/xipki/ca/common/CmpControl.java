@@ -7,11 +7,16 @@
 
 package org.xipki.ca.common;
 
+import java.io.IOException;
+import java.io.Serializable;
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * @author Lijun Liao
  */
 
-public class CmpControl
+public class CmpControl implements Serializable
 {
     private static final int DFLT_messageTimeBias = 300; // 300 seconds
     private static final int DFLT_confirmWaitTime = 300; // 300 seconds
@@ -50,6 +55,7 @@ public class CmpControl
 
     public CmpControl()
     {
+        this.serialVersion = SERIAL_VERSION;
     }
 
     public boolean isRequireConfirmCert()
@@ -115,5 +121,52 @@ public class CmpControl
     public void setSendResponderCert(boolean sendResponderCert)
     {
         this.sendResponderCert = sendResponderCert;
+    }
+
+    // ------------------------------------------------
+    // Customized serialization
+    // ------------------------------------------------
+    private static final long serialVersionUID = 1L;
+
+    private static final String SR_serialVersion = "serialVersion";
+    private static final double SERIAL_VERSION = 1.0;
+
+    private static final String SR_requireConfirmCert= "requireConfirmCert";
+    private static final String SR_sendCaCert = "sendCaCert";
+    private static final String SR_messageTimeRequired = "messageTimeRequired";
+    private static final String SR_sendResponderCert = "sendResponderCert";
+    private static final String SR_messageTimeBias = "messageTimeBias";
+    private static final String SR_confirmWaitTime = "confirmWaitTime";
+
+    private double serialVersion;
+
+    private void writeObject(java.io.ObjectOutputStream out)
+    throws IOException
+    {
+        final Map<String, Object> serialMap = new HashMap<String, Object>();
+
+        serialMap.put(SR_serialVersion, serialVersion);
+        serialMap.put(SR_requireConfirmCert, requireConfirmCert);
+        serialMap.put(SR_sendCaCert, sendCaCert);
+        serialMap.put(SR_messageTimeRequired, messageTimeRequired);
+        serialMap.put(SR_sendResponderCert, sendResponderCert);
+        serialMap.put(SR_messageTimeBias, messageTimeBias);
+        serialMap.put(SR_confirmWaitTime, confirmWaitTime);
+
+        out.writeObject(serialMap);
+    }
+
+    @SuppressWarnings("unchecked")
+    private void readObject(java.io.ObjectInputStream in)
+    throws IOException, ClassNotFoundException
+    {
+        final Map<String, Object> serialMap = (Map<String, Object>) in.readObject();
+        serialVersion = (double) serialMap.get(SR_serialVersion);
+        requireConfirmCert = (boolean) serialMap.get(SR_requireConfirmCert);
+        sendCaCert = (boolean) serialMap.get(SR_sendCaCert);
+        messageTimeRequired = (boolean) serialMap.get(SR_messageTimeRequired);
+        sendResponderCert = (boolean) serialMap.get(SR_sendResponderCert);
+        messageTimeBias = (int) serialMap.get(SR_messageTimeBias);
+        confirmWaitTime = (int) serialMap.get(SR_confirmWaitTime);
     }
 }

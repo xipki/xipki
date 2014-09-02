@@ -16,6 +16,7 @@
     <hessian.version>4.0.38</hessian.version>
   </properties>
   <modules>
+    <module>pkiconsole-common</module>
     <module>pkiconsole-client</module>
     <module>pkiconsole-server</module>
   </modules>

@@ -7,8 +7,12 @@
 
 package org.xipki.ca.server.mgmt.api;
 
+import java.io.IOException;
+import java.io.Serializable;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.bouncycastle.util.encoders.Base64;
 import org.xipki.security.common.IoCertUtil;
@@ -17,7 +21,7 @@ import org.xipki.security.common.IoCertUtil;
  * @author Lijun Liao
  */
 
-public class CmpResponderEntry
+public class CmpResponderEntry implements Serializable
 {
     public static final String name = "default";
     private String type;
@@ -26,6 +30,7 @@ public class CmpResponderEntry
 
     public CmpResponderEntry()
     {
+        this.serialVersion = SERIAL_VERSION;
     }
 
     public String getType()
@@ -92,9 +97,47 @@ public class CmpResponderEntry
         }
         else
         {
-            sb.append("null");
+            sb.append("not set");
         }
         return sb.toString();
     }
 
+    // ------------------------------------------------
+    // Customized serialization
+    // ------------------------------------------------
+    private static final long serialVersionUID = 1L;
+
+    private static final String SR_serialVersion = "serialVersion";
+    private static final double SERIAL_VERSION = 1.0;
+
+    private static final String SR_type = "type";
+    private static final String SR_conf = "conf";
+    private static final String SR_cert = "cert";
+
+    private double serialVersion;
+
+    private void writeObject(java.io.ObjectOutputStream out)
+    throws IOException
+    {
+        final Map<String, Object> serialMap = new HashMap<String, Object>();
+
+        serialMap.put(SR_serialVersion, serialVersion);
+        serialMap.put(SR_type, type);
+        serialMap.put(SR_conf, conf);
+        SerializationUtil.writeCert(serialMap, SR_cert, cert);
+
+        out.writeObject(serialMap);
+    }
+
+    @SuppressWarnings("unchecked")
+    private void readObject(java.io.ObjectInputStream in)
+    throws IOException, ClassNotFoundException
+    {
+        final Map<String, Object> serialMap = (Map<String, Object>) in.readObject();
+        serialVersion = (double) serialMap.get(SR_serialVersion);
+
+        type = (String) serialMap.get(SR_type);
+        conf = (String) serialMap.get(SR_conf);
+        cert = SerializationUtil.readCert(serialMap, SR_cert);
+    }
 }
