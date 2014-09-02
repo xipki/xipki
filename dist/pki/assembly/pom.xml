@@ -304,6 +304,7 @@
                 <feature>xipki-database-tool</feature>
                 <feature>xipki-audit-slf4j</feature>
                 <feature>xipki-audit-syslog</feature>
+                <feature>xipki-pkiconsole-server</feature>
               </features>
             </configuration>
           </execution>

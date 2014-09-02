@@ -34,7 +34,7 @@ import org.xipki.security.common.CertRevocationInfo;
 
 public interface HessianCAManager
 {
-    public String getAttribute(String attributeKey);
+    String getAttribute(String attributeKey);
 
     CASystemStatus getCASystemStatus();
 

@@ -16,7 +16,7 @@
     </fileSet>
     <!--
         Copy over jar files for the lib dir
-    ->
+    -->
     <fileSet>
       <directory>${project.build.directory}/dependencies</directory>
       <includes>

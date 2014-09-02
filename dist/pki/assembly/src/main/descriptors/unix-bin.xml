@@ -168,14 +168,14 @@
       <lineEnding>unix</lineEnding>
     </file>
     <file>
-      <source>${project.basedir}/../../LICENSE</source>
+      <source>${project.basedir}/../../../LICENSE</source>
       <outputDirectory>/</outputDirectory>
       <destName>LICENSE</destName>
       <fileMode>0644</fileMode>
       <lineEnding>unix</lineEnding>
     </file>
     <file>
-      <source>${project.basedir}/../../README.md</source>
+      <source>${project.basedir}/../../../README.md</source>
       <outputDirectory>/</outputDirectory>
       <destName>README.md</destName>
       <fileMode>0644</fileMode>
