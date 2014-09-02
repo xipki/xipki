@@ -86,7 +86,7 @@
                   <artifactId>branding</artifactId>
                   <version>${project.version}</version>
                   <outputDirectory>target/dependencies</outputDirectory>
-                  <destFileName>remotep11-branding.jar</destFileName>
+                  <destFileName>pkiconsole-branding.jar</destFileName>
                 </artifactItem>
               </artifactItems>
             </configuration>
@@ -120,15 +120,13 @@
                 <!-- karaf boot features (see etc/org.apache.karaf.features.cfg) -->
                 <feature>karaf-framework</feature>
                 <feature>config</feature>
-                <feature>ssh</feature>
+                <!-- feature>ssh</feature -->
                 <feature>management</feature>
                 <!-- transitive: http, jetty -->
-                <feature>http-whiteboard</feature>
-                <!-- service/daemon wrapper support -->
-                <feature>wrapper</feature>
+                <!-- feature>http-whiteboard</feature -->
                 <!-- project-core features -->
-                <feature>xipki-remotep11-server</feature>
-                <feature>xipki-security-shell</feature>
+                <feature>xipki-pkiconsole</feature>
+                <feature>xipki-pkiconsole-shell</feature>
               </features>
             </configuration>
           </execution>
@@ -203,7 +201,7 @@
                   <goal>single</goal>
                 </goals>
                 <configuration>
-                  <finalName>xipki-remotep11-${project.version}</finalName>
+                  <finalName>xipki-pkiconsole-${project.version}</finalName>
                   <descriptors>
                     <descriptor>src/main/descriptors/unix-bin.xml</descriptor>
                   </descriptors>
