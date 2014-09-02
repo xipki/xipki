@@ -12,9 +12,6 @@
   <artifactId>pkiconsole-group</artifactId>
   <packaging>pom</packaging>
   <name>XiPKI :: ${project.artifactId}</name>
-  <properties>
-    <hessian.version>4.0.38</hessian.version>
-  </properties>
   <modules>
     <module>pkiconsole-common</module>
     <module>pkiconsole-client</module>
