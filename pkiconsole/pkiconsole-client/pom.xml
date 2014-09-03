@@ -24,4 +24,32 @@
      <version>${hessian.version}</version>
     </dependency>
   </dependencies>
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.felix</groupId>
+        <artifactId>maven-bundle-plugin</artifactId>
+        <configuration>
+          <instructions>
+            <Import-Package>
+	com.caucho.burlap.client;resolution:=optional,
+	com.caucho.burlap.io;resolution:=optional,
+	com.caucho.hessian;resolution:=optional,
+	com.caucho.hessian.client;resolution:=optional,
+	com.caucho.hessian.io;resolution:=optional,
+	com.caucho.hessian.jmx;resolution:=optional,
+	com.caucho.hessian.micro;resolution:=optional,
+	com.caucho.hessian.mux;resolution:=optional,
+	com.caucho.hessian.security;resolution:=optional,
+	com.caucho.hessian.util;resolution:=optional,
+	com.caucho.services.client;resolution:=optional,
+	com.caucho.services.message;resolution:=optional,
+	com.caucho.services.name;resolution:=optional,
+	*
+            </Import-Package>
+          </instructions>
+        </configuration>
+      </plugin>    
+    </plugins>
+  </build>
 </project>

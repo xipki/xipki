@@ -8,6 +8,7 @@
   </parent>
   <groupId>org.xipki.dist.pki</groupId>
   <artifactId>dist-group</artifactId>
+  <name>${project.groupId}.${project.artifactId}</name>
   <packaging>pom</packaging>
   <modules>
     <module>assembly</module>
