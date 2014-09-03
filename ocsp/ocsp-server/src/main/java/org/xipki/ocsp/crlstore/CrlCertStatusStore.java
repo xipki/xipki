@@ -230,7 +230,7 @@ public class CrlCertStatusStore extends CertStatusStore
             }
 
             byte[] newFpOfDeltaCrl = deltaCrlExists ? sha1Fp(deltaCrlFile) : null;
-            boolean deltaCrlFileChanged = Arrays.equals(newFpOfDeltaCrl, fpOfDeltaCrlFile);
+            boolean deltaCrlFileChanged = Arrays.equals(newFpOfDeltaCrl, fpOfDeltaCrlFile) == false;
 
             if(crlFileChanged == false && deltaCrlFileChanged == false)
             {
