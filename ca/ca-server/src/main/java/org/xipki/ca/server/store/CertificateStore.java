@@ -518,4 +518,30 @@ public class CertificateStore
         }
     }
 
+    public boolean containsCACertificates(X509CertificateWithMetaInfo caCert)
+    throws OperationException
+    {
+        try
+        {
+            return queryExecutor.containsCertificates(caCert, true) == false;
+        } catch (SQLException e)
+        {
+            LOG.debug("SQLException", e);
+            throw new OperationException(ErrorCode.DATABASE_FAILURE, e.getMessage());
+        }
+    }
+
+    public boolean containsUserCertificates(X509CertificateWithMetaInfo caCert)
+    throws OperationException
+    {
+        try
+        {
+            return queryExecutor.containsCertificates(caCert, false) == false;
+        } catch (SQLException e)
+        {
+            LOG.debug("SQLException", e);
+            throw new OperationException(ErrorCode.DATABASE_FAILURE, e.getMessage());
+        }
+    }
+
 }

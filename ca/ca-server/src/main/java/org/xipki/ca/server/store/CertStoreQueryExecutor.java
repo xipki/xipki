@@ -802,6 +802,38 @@ class CertStoreQueryExecutor
         }
     }
 
+    boolean containsCertificates(X509CertificateWithMetaInfo caCert, boolean ee)
+    throws SQLException, OperationException
+    {
+        ParamChecker.assertNotNull("caCert", caCert);
+        String sql = "COUNT(*) FROM CERT WHERE CAINFO_ID=? AND EE=?";
+        sql = dataSource.createFetchFirstSelectSQL(sql, 1);
+        int caId = getCaId(caCert);
+
+        PreparedStatement ps = borrowPreparedStatement(sql);
+
+        ResultSet rs = null;
+        try
+        {
+            int idx = 1;
+            ps.setInt(idx++, caId);
+            ps.setInt(2, ee ? 1 : 0);
+            rs = ps.executeQuery();
+
+            if(rs.next())
+            {
+                return rs.getInt(1) == 1;
+            }
+            else
+            {
+                return false;
+            }
+        }finally
+        {
+            releaseDbResources(ps, rs);
+        }
+    }
+
     List<BigInteger> getSerialNumbers(X509CertificateWithMetaInfo caCert,
             Date notExpiredAt, BigInteger startSerial, int numEntries, boolean onlyRevoked,
             boolean onlyCACerts, boolean onlyUserCerts)
