@@ -69,7 +69,7 @@ public class CAManagerClient implements CAManager
         factory.setHessian2Reply(true);
 
         this.client = (HessianCAManager) factory.create(
-                HessianCAManager.class, serverURL);
+                HessianCAManager.class, serverURL, getClass().getClassLoader());
         determineServerVersion();
     }
 
@@ -100,7 +100,7 @@ public class CAManagerClient implements CAManager
                 LOG.info("invalid version {}, reset it to 0", versionS);
             }
         }
-        LOG.info("set HSMService version to {}", version);
+        LOG.info("set version to {}", version);
     }
 
     @Override
