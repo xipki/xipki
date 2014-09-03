@@ -822,7 +822,7 @@ class CertStoreQueryExecutor
 
             if(rs.next())
             {
-                return rs.getInt(1) == 1;
+                return rs.getInt(1) > 0;
             }
             else
             {
