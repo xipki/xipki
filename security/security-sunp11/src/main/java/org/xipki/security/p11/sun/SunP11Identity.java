@@ -254,11 +254,12 @@ class SunP11Identity implements Comparable<SunP11Identity>
             throw new SignerException("Operation CKM_DSA is not allowed for " + publicKey.getAlgorithm() + " public key");
         }
 
+        byte[] truncatedDigest = IoCertUtil.leftmost(hash, signatureKeyBitLength);
         synchronized (dsaSignature)
         {
             try
             {
-                dsaSignature.update(hash);
+                dsaSignature.update(truncatedDigest);
                 return dsaSignature.sign();
             } catch (SignatureException e)
             {

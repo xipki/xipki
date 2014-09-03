@@ -67,7 +67,7 @@ class IaikP11Identity implements Comparable<IaikP11Identity>
         }
         else if(this.publicKey instanceof DSAPublicKey)
         {
-            signatureKeyBitLength = ((DSAPublicKey) this.publicKey).getParams().getP().bitLength();
+            signatureKeyBitLength = ((DSAPublicKey) this.publicKey).getParams().getQ().bitLength();
         }
         else
         {
@@ -194,8 +194,8 @@ class IaikP11Identity implements Comparable<IaikP11Identity>
         {
             throw new SignerException("Could not find slot " + slotId);
         }
-
-        byte[] signature = slot.CKM_DSA(hash, keyId);
+        byte[] truncatedDigest = IoCertUtil.leftmost(hash, signatureKeyBitLength);
+        byte[] signature = slot.CKM_DSA(truncatedDigest, keyId);
         return convertToX962Signature(signature);
     }
 
