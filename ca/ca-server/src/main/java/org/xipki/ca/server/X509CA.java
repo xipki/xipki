@@ -539,10 +539,33 @@ public class X509CA
                 crlBuilder.addExtension(Extension.cRLNumber, false, new ASN1Integer(crlNumber));
 
                 // IssuingDistributionPoint
+                boolean onlyUserCerts = crlControl.isOnlyContainsUserCerts();
+                if(onlyUserCerts == false)
+                {
+                    if(certstore.containsCACertificates(caCert) == false)
+                    {
+                        onlyUserCerts = true;
+                    }
+                }
+
+                boolean onlyCACerts = crlControl.isOnlyContainsCACerts();
+                if(onlyCACerts == false)
+                {
+                    if(certstore.containsUserCertificates(caCert) == false)
+                    {
+                        onlyCACerts = true;
+                    }
+                }
+
+                if(onlyUserCerts && onlyCACerts)
+                {
+                    throw new RuntimeException("should not reach here");
+                }
+
                 IssuingDistributionPoint idp = new IssuingDistributionPoint(
                         (DistributionPointName) null, // distributionPoint,
-                        crlControl.isOnlyContainsUserCerts(), // onlyContainsUserCerts,
-                        crlControl.isOnlyContainsCACerts(), // onlyContainsCACerts,
+                        onlyUserCerts, // onlyContainsUserCerts,
+                        onlyCACerts, // onlyContainsCACerts,
                         (ReasonFlags) null, // onlySomeReasons,
                         directCRL == false, // indirectCRL,
                         false // onlyContainsAttributeCerts
