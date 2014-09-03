@@ -52,17 +52,18 @@ public class CAManagerClient implements CAManager
     private int version;
 
     private String serverURL;
-    
+
     public CAManagerClient()
     {
     }
-    
-    public void init() throws Exception
+
+    public void init()
+    throws Exception
     {
-    	if(serverURL == null)
-    	{
-    		throw new IllegalStateException("serverURL is not set");
-    	}
+        if(serverURL == null)
+        {
+            throw new IllegalStateException("serverURL is not set");
+        }
         HessianProxyFactory factory = new HessianProxyFactory();
         factory.setHessian2Request(true);
         factory.setHessian2Reply(true);
@@ -72,14 +73,14 @@ public class CAManagerClient implements CAManager
         determineServerVersion();
     }
 
-    public void shutdown() throws Exception
+    public void shutdown()
+    throws Exception
     {
     }
-    
 
     public void setServerURL(String serverURL)
     {
-    	this.serverURL = serverURL;
+        this.serverURL = serverURL;
     }
 
     private void determineServerVersion()
