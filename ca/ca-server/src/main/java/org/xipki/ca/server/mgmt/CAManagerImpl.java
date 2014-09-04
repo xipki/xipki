@@ -1276,7 +1276,6 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
                         lOcspUris, lCrlUris, lDeltaCrlUris, null, numCrls, expirationPeriod);
                 entry.setLastCRLInterval(lastCRLInterval);
                 entry.setLastCRLIntervalDate(lastCRLIntervalDate);
-                entry.setLastCommittedNextSerial(next_serial);
 
                 CAStatus caStatus = CAStatus.getCAStatus(status);
                 if(caStatus == null)
@@ -3366,7 +3365,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
             {
                 throw new CAMgmtException(e.getMessage(), e);
             }
-            ca.publishCertificate(certInfo);
+
             return certInfo.getCert().getCert();
         }
     }

@@ -225,11 +225,9 @@ public class X509CACmpResponder extends CmpResponder
 
                     if(cmpControl.isRequireConfirmCert() == false && CmpUtil.isImplictConfirm(reqHeader))
                     {
-                        successfull = publishPendingCertificates(tid);
-                        if(successfull)
-                        {
-                            tv = CmpUtil.getImplictConfirmGeneralInfo();
-                        }
+                        pendingCertPool.removeCertificates(tid.getOctets());
+                        tv = CmpUtil.getImplictConfirmGeneralInfo();
+                        successfull = true;
                     }
                     else
                     {
@@ -1191,14 +1189,7 @@ public class X509CACmpResponder extends CmpResponder
                 }
             }
 
-            if(accept)
-            {
-                if(ca.publishCertificate(certInfo) == false)
-                {
-                    successfull = false;
-                }
-            }
-            else
+            if(accept == false)
             {
                 BigInteger serialNumber = certInfo.getCert().getCert().getSerialNumber();
                 try
@@ -1236,25 +1227,6 @@ public class X509CACmpResponder extends CmpResponder
 
             return new PKIBody(PKIBody.TYPE_ERROR, emc);
         }
-    }
-
-    private boolean publishPendingCertificates(ASN1OctetString transactionId)
-    {
-        Set<CertificateInfo> remainingCerts = pendingCertPool.removeCertificates(transactionId.getOctets());
-
-        boolean successfull = true;
-        if(remainingCerts != null && remainingCerts.isEmpty() == false)
-        {
-            for(CertificateInfo remainingCert : remainingCerts)
-            {
-                if(ca.publishCertificate(remainingCert) == false)
-                {
-                    successfull = false;
-                }
-            }
-        }
-
-        return successfull;
     }
 
     private boolean revokePendingCertificates(ASN1OctetString transactionId)
