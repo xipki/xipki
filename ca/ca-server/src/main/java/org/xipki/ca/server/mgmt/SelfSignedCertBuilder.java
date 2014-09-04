@@ -51,7 +51,7 @@ import org.xipki.ca.api.profile.SubjectInfo;
 import org.xipki.ca.api.profile.X509Util;
 import org.xipki.ca.common.BadCertTemplateException;
 import org.xipki.ca.common.CertProfileException;
-import org.xipki.ca.server.mgmt.api.PublicCAInfo;
+import org.xipki.ca.server.PublicCAInfo;
 import org.xipki.security.api.ConcurrentContentSigner;
 import org.xipki.security.api.NoIdleSignerException;
 import org.xipki.security.api.SecurityFactory;

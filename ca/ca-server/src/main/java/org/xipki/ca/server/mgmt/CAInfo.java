@@ -5,7 +5,7 @@
  *
  */
 
-package org.xipki.ca.server;
+package org.xipki.ca.server.mgmt;
 
 import java.math.BigInteger;
 import java.security.cert.CertificateEncodingException;
@@ -20,10 +20,10 @@ import org.xipki.ca.api.OperationException;
 import org.xipki.ca.api.OperationException.ErrorCode;
 import org.xipki.ca.common.CAStatus;
 import org.xipki.ca.common.X509CertificateWithMetaInfo;
+import org.xipki.ca.server.PublicCAInfo;
 import org.xipki.ca.server.mgmt.api.CAEntry;
 import org.xipki.ca.server.mgmt.api.DuplicationMode;
 import org.xipki.ca.server.mgmt.api.Permission;
-import org.xipki.ca.server.mgmt.api.PublicCAInfo;
 import org.xipki.ca.server.mgmt.api.ValidityMode;
 import org.xipki.security.common.CertRevocationInfo;
 import org.xipki.security.common.ParamChecker;
@@ -46,6 +46,7 @@ public class CAInfo
     private CMPCertificate certInCMPFormat;
     private PublicCAInfo publicCAInfo;
     private long lastCommittedNextSerial;
+    private X509CertificateWithMetaInfo cert;
 
     public CAInfo(CAEntry caEntry)
     throws OperationException
@@ -53,7 +54,7 @@ public class CAInfo
         ParamChecker.assertNotNull("caEntry", caEntry);
         this.caEntry = caEntry;
 
-        X509Certificate cert = caEntry.getCertificate().getCert();
+        X509Certificate cert = caEntry.getCertificate();
         this.notBefore = cert.getNotBefore();
         this.notAfter = cert.getNotAfter();
         this.serialNumber = cert.getSerialNumber();
@@ -63,7 +64,9 @@ public class CAInfo
         Certificate bcCert;
         try
         {
-            bcCert = Certificate.getInstance(cert.getEncoded());
+            byte[] encodedCert = cert.getEncoded();
+            this.cert = new X509CertificateWithMetaInfo(cert, encodedCert);
+            bcCert = Certificate.getInstance(encodedCert);
         } catch (CertificateEncodingException e)
         {
             throw new OperationException(ErrorCode.System_Failure, "could not encode the CA certificate");
@@ -188,7 +191,7 @@ public class CAInfo
 
     public X509CertificateWithMetaInfo getCertificate()
     {
-        return caEntry.getCertificate();
+        return cert;
     }
 
     public String getSignerConf()

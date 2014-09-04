@@ -92,14 +92,13 @@ import org.xipki.ca.common.CAMgmtException;
 import org.xipki.ca.common.CAStatus;
 import org.xipki.ca.common.CertProfileException;
 import org.xipki.ca.common.X509CertificateWithMetaInfo;
+import org.xipki.ca.server.mgmt.CAInfo;
 import org.xipki.ca.server.mgmt.CAManagerImpl;
+import org.xipki.ca.server.mgmt.CRLControl;
 import org.xipki.ca.server.mgmt.IdentifiedCertProfile;
 import org.xipki.ca.server.mgmt.IdentifiedCertPublisher;
-import org.xipki.ca.server.mgmt.api.CAEntry;
-import org.xipki.ca.server.mgmt.api.CRLControl;
-import org.xipki.ca.server.mgmt.api.CRLControl.UpdateMode;
+import org.xipki.ca.server.mgmt.CRLControl.UpdateMode;
 import org.xipki.ca.server.mgmt.api.DuplicationMode;
-import org.xipki.ca.server.mgmt.api.PublicCAInfo;
 import org.xipki.ca.server.mgmt.api.ValidityMode;
 import org.xipki.ca.server.store.CertWithRevocationInfo;
 import org.xipki.ca.server.store.CertificateStore;
@@ -151,19 +150,19 @@ public class X509CA
 
     public X509CA(
             CAManagerImpl caManager,
-            CAEntry caEntry,
+            CAInfo caInfo,
             ConcurrentContentSigner caSigner,
             CertificateStore certstore,
             CrlSigner crlSigner)
     throws OperationException
     {
         ParamChecker.assertNotNull("caManager", caManager);
-        ParamChecker.assertNotNull("caEntry", caEntry);
+        ParamChecker.assertNotNull("caInfo", caInfo);
         ParamChecker.assertNotNull("caSigner", caSigner);
         ParamChecker.assertNotNull("certstore", certstore);
 
         this.caManager = caManager;
-        this.caInfo = new CAInfo(caEntry);
+        this.caInfo = caInfo;
         this.caSigner = caSigner;
         this.certstore = certstore;
         this.crlSigner = crlSigner;

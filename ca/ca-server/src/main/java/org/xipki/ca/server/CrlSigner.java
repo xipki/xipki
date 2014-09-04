@@ -15,8 +15,9 @@ import org.bouncycastle.util.Arrays;
 import org.bouncycastle.x509.extension.X509ExtensionUtil;
 import org.xipki.ca.api.OperationException;
 import org.xipki.ca.api.OperationException.ErrorCode;
-import org.xipki.ca.server.mgmt.api.CRLControl;
+import org.xipki.ca.server.mgmt.CRLControl;
 import org.xipki.security.api.ConcurrentContentSigner;
+import org.xipki.security.common.ConfigurationException;
 import org.xipki.security.common.ParamChecker;
 
 /**
@@ -29,6 +30,12 @@ public class CrlSigner
     private final byte[] subjectKeyIdentifier;
 
     private final CRLControl crlControl;
+
+    public CrlSigner(ConcurrentContentSigner signer, String crlControlConf)
+    throws OperationException, ConfigurationException
+    {
+        this(signer, CRLControl.getInstance(crlControlConf));
+    }
 
     public CrlSigner(ConcurrentContentSigner signer, CRLControl crlControl)
     throws OperationException

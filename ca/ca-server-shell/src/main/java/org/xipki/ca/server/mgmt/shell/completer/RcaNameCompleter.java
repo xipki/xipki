@@ -24,7 +24,7 @@ public class RcaNameCompleter extends MgmtNameCompleter
         Set<String> ret = new HashSet<>();
         for(String name : caManager.getCANames())
         {
-            X509Certificate cert = caManager.getCA(name).getCertificate().getCert();
+            X509Certificate cert = caManager.getCA(name).getCertificate();
             if(cert.getIssuerX500Principal().equals(cert.getSubjectX500Principal()))
             {
                 ret.add(name);

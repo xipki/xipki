@@ -9,7 +9,7 @@
       Note: Don't include a "-" in the persistent-id, or the config admin will
       interpret it as a service-factory.
   -->
-  <cm:property-placeholder persistent-id="org.xipki.pkiconsole.client" update-strategy="reload">
+  <cm:property-placeholder persistent-id="org.xipki.pkiconsole" update-strategy="reload">
     <cm:default-properties>
       <cm:property name="serverURL" value="http://localhost:8080/pkiconsole/hessian"/>
     </cm:default-properties>

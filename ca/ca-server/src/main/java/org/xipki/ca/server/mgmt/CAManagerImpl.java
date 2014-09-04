@@ -72,7 +72,6 @@ import org.xipki.ca.server.mgmt.SelfSignedCertBuilder.GenerateSelfSignedResult;
 import org.xipki.ca.server.mgmt.api.CAEntry;
 import org.xipki.ca.server.mgmt.api.CAHasRequestorEntry;
 import org.xipki.ca.server.mgmt.api.CAManager;
-import org.xipki.ca.server.mgmt.api.CRLControl;
 import org.xipki.ca.server.mgmt.api.CertProfileEntry;
 import org.xipki.ca.server.mgmt.api.CmpRequestorEntry;
 import org.xipki.ca.server.mgmt.api.CmpResponderEntry;
@@ -119,7 +118,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
 
     private Map<String, DataSourceWrapper> dataSources = null;
 
-    private final Map<String, CAEntry> cas = new ConcurrentHashMap<>();
+    private final Map<String, CAInfo> cas = new ConcurrentHashMap<>();
     private final Map<String, CertProfileEntryWrapper> certProfiles = new ConcurrentHashMap<>();
     private final Map<String, PublisherEntryWrapper> publishers = new ConcurrentHashMap<>();
     private final Map<String, CmpRequestorEntry> requestors = new ConcurrentHashMap<>();
@@ -520,7 +519,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
             // Add the CAs to the store
             for(String caName : cas.keySet())
             {
-                CAEntry caEntry = cas.get(caName);
+                CAInfo caEntry = cas.get(caName);
 
                 CrlSigner crlSigner = null;
                 if(caEntry.getCrlSignerName() != null)
@@ -555,7 +554,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
                     try
                     {
                         crlSigner = new CrlSigner(identifiedSigner, crlSignerEntry.getCRLControl());
-                    } catch (OperationException e)
+                    } catch (OperationException | ConfigurationException e)
                     {
                         final String message = "CrlSigner.<init> crlSigner (ca=" + caName + ")";
                         if(LOG.isErrorEnabled())
@@ -1308,7 +1307,13 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
                 }
                 entry.setValidityMode(validityMode);
 
-                cas.put(entry.getName(), entry);
+                try
+                {
+                    cas.put(entry.getName(), new CAInfo(entry));
+                } catch (OperationException e)
+                {
+                    throw new CAMgmtException(e.getMessage(), e);
+                }
             }
 
             rs.close();
@@ -1424,7 +1429,8 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
             ps.setString(idx++, newCaDbEntry.getCrlUrisAsString());
             ps.setString(idx++, newCaDbEntry.getOcspUrisAsString());
             ps.setInt(idx++, newCaDbEntry.getMaxValidity());
-            ps.setString(idx++, Base64.toBase64String(newCaDbEntry.getCertificate().getEncodedCert()));
+            byte[] encodedCert = newCaDbEntry.getCertificate().getEncoded();
+            ps.setString(idx++, Base64.toBase64String(encodedCert));
             ps.setString(idx++, newCaDbEntry.getSignerType());
             ps.setString(idx++, newCaDbEntry.getSignerConf());
             ps.setString(idx++, newCaDbEntry.getCrlSignerName());
@@ -1440,18 +1446,20 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
         }catch(SQLException e)
         {
             throw new CAMgmtException(e);
+        } catch (CertificateEncodingException e)
+        {
+            throw new CAMgmtException(e);
         }finally
         {
             dataSource.releaseResources(ps, null);
         }
-
-        cas.put(newCaDbEntry.getName(), newCaDbEntry);
     }
 
     @Override
     public CAEntry getCA(String caName)
     {
-        return cas.get(caName);
+        CAInfo caInfo = cas.get(caName);
+        return caInfo == null ? null : caInfo.getCaEntry();
     }
 
     @Override
@@ -1470,7 +1478,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
                 throw new CAMgmtException("Could not find CA named " + name);
             }
 
-            CAEntry caEntry = cas.get(name);
+            CAInfo caEntry = cas.get(name);
             if(caEntry.getNextSerial() > nextSerial + 1) // 1 as buffer
             {
                 throw new CAMgmtException("the nextSerial " + nextSerial + " is not allowed");
@@ -1617,8 +1625,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
     public void setCANextSerial(String caName, long nextSerial)
     throws CAMgmtException
     {
-        CAEntry caInfo = cas.get(caName);
-        if(caInfo == null)
+        if(cas.containsKey(caName) == false)
         {
             throw new CAMgmtException("Could not find CA named " + caName);
         }
@@ -1642,8 +1649,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
     public void setCRLLastInterval(String caName, int lastInterval, long lastIntervalDate)
     throws CAMgmtException
     {
-        CAEntry caInfo = cas.get(caName);
-        if(caInfo == null)
+        if(cas.containsKey(caName) == false)
         {
             throw new CAMgmtException("Could not find CA named " + caName);
         }
@@ -2231,8 +2237,8 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
             ps.setString(idx++, dbEntry.getCertificate() == null ? null :
                     Base64.toBase64String(dbEntry.getCertificate().getEncoded()));
 
-            CRLControl crlControl = dbEntry.getCRLControl();
-            ps.setString(idx++, crlControl.getConf());
+            String crlControl = dbEntry.getCRLControl();
+            ps.setString(idx++, crlControl);
 
             ps.executeUpdate();
         }catch(SQLException | CertificateEncodingException e)
@@ -2252,7 +2258,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
     {
         for(String caName : cas.keySet())
         {
-            CAEntry caInfo = cas.get(caName);
+            CAInfo caInfo = cas.get(caName);
             if(crlSignerName.equals(caInfo.getCrlSignerName()))
             {
                 setCrlSignerInCA(null, caName);
@@ -2346,7 +2352,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
     public void setCrlSignerInCA(String crlSignerName, String caName)
     throws CAMgmtException
     {
-        CAEntry caInfo = cas.get(caName);
+        CAInfo caInfo = cas.get(caName);
         if(caInfo == null)
         {
             throw new CAMgmtException("Unknown CA " + caName);
