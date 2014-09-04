@@ -441,14 +441,17 @@ public class CrlCertStatusStore extends CertStatusStore
 
             // First consider only full CRL
             Set<? extends X509CRLEntry> revokedCertListInFullCRL = crl.getRevokedCertificates();
-            for(X509CRLEntry revokedCert : revokedCertListInFullCRL)
+            if(revokedCertListInFullCRL != null)
             {
-                X500Principal thisIssuer = revokedCert.getCertificateIssuer();
-                if(thisIssuer != null)
+                for(X509CRLEntry revokedCert : revokedCertListInFullCRL)
                 {
-                    if(caCert.getSubjectX500Principal().equals(thisIssuer) == false)
+                    X500Principal thisIssuer = revokedCert.getCertificateIssuer();
+                    if(thisIssuer != null)
                     {
-                        throw new CertStatusStoreException("Invalid CRLEntry");
+                        if(caCert.getSubjectX500Principal().equals(thisIssuer) == false)
+                        {
+                            throw new CertStatusStoreException("Invalid CRLEntry");
+                        }
                     }
                 }
             }
@@ -457,14 +460,17 @@ public class CrlCertStatusStore extends CertStatusStore
             if(deltaCrl != null)
             {
                 revokedCertListInDeltaCRL = deltaCrl.getRevokedCertificates();
-                for(X509CRLEntry revokedCert : revokedCertListInDeltaCRL)
+                if(revokedCertListInDeltaCRL != null)
                 {
-                    X500Principal thisIssuer = revokedCert.getCertificateIssuer();
-                    if(thisIssuer != null)
+                    for(X509CRLEntry revokedCert : revokedCertListInDeltaCRL)
                     {
-                        if(caCert.getSubjectX500Principal().equals(thisIssuer) == false)
+                        X500Principal thisIssuer = revokedCert.getCertificateIssuer();
+                        if(thisIssuer != null)
                         {
-                            throw new CertStatusStoreException("Invalid CRLEntry");
+                            if(caCert.getSubjectX500Principal().equals(thisIssuer) == false)
+                            {
+                                throw new CertStatusStoreException("Invalid CRLEntry");
+                            }
                         }
                     }
                 }
