@@ -13,7 +13,7 @@
     <bundle>mvn:org.xipki/security-common/${project.version}</bundle>
     <bundle>mvn:org.xipki/ca-common/${project.version}</bundle>
     <bundle>mvn:org.xipki/ca-mgmt-api/${project.version}</bundle>
-    <bundle><![CDATA[wrap:mvn:com.caucho/hessian/${hessian.version}/$Bundle-SymbolicName=hessian&Bundle-Version=${hessian.version}&DynamicImport-Package=*]]></bundle>
+    <bundle><![CDATA[wrap:mvn:com.caucho/hessian/${hessian.version}/$Bundle-SymbolicName=hessian&Bundle-Version=${hessian.version}]]></bundle>
     <bundle>mvn:org.xipki/pkiconsole-common/${project.version}</bundle>
     <bundle>mvn:org.xipki/pkiconsole-client/${project.version}</bundle>
   </feature>

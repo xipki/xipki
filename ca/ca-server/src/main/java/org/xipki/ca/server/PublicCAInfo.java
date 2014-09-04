@@ -5,7 +5,7 @@
  *
  */
 
-package org.xipki.ca.server.mgmt.api;
+package org.xipki.ca.server;
 
 import java.security.cert.X509Certificate;
 import java.util.Collections;

@@ -5,8 +5,9 @@
  *
  */
 
-package org.xipki.ca.server.mgmt.api;
+package org.xipki.ca.server.mgmt;
 
+import java.io.Serializable;
 import java.util.List;
 import java.util.Set;
 
@@ -70,9 +71,11 @@ import org.xipki.security.common.StringUtil;
  * @author Lijun Liao
  */
 
-public class CRLControl
+public class CRLControl implements Serializable
 {
-    Logger LOG = LoggerFactory.getLogger(CRLControl.class);
+    private static final long serialVersionUID = 1L;
+
+    private static final Logger LOG = LoggerFactory.getLogger(CRLControl.class);
     public static final String KEY_updateMode = "updateMode";
     public static final String KEY_extensions = "extensions";
     public static final String KEY_expiredCerts_included = "expiredCerts.included";
@@ -86,7 +89,7 @@ public class CRLControl
     public static final String KEY_onlyContainsUserCerts = "onlyContainsUserCerts";
     public static final String KEY_onlyContainsCACerts = "onlyContainsCACerts";
 
-    public static enum UpdateMode
+    public static enum UpdateMode implements Serializable
     {
         interval,
         onDemand;
@@ -541,7 +544,5 @@ public class CRLControl
         {
             throw new ConfigurationException("deltaCRLIntervals cannot be less than 0: " + deltaCRLIntervals);
         }
-
-        // TODO:validate the configuration
     }
 }

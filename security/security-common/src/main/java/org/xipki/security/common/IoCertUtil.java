@@ -61,6 +61,7 @@ import org.bouncycastle.asn1.x500.style.RFC4519Style;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.bouncycastle.asn1.x9.X962NamedCurves;
+import org.bouncycastle.util.encoders.Base64;
 
 /**
  * @author Lijun Liao
@@ -286,6 +287,12 @@ public class IoCertUtil
     throws IOException, CertificateException
     {
         return parseCert(new ByteArrayInputStream(certBytes));
+    }
+
+    public static X509Certificate parseBase64EncodedCert(String base64EncodedCert)
+    throws IOException, CertificateException
+    {
+        return parseCert(Base64.decode(base64EncodedCert));
     }
 
     public static X509Certificate parseCert(InputStream certStream)
