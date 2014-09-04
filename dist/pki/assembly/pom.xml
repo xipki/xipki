@@ -237,11 +237,6 @@
                   <artifactId>postgresql</artifactId>
                   <version>${postgresql.version}</version>
                 </artifactItem>
-                <artifactItem>
-                  <groupId>net.sourceforge.jtds</groupId>
-                  <artifactId>jtds</artifactId>
-                  <version>${jtds.version}</version>
-                </artifactItem>
               </artifactItems>
             </configuration>
           </execution>
