@@ -64,12 +64,12 @@ public class CAManagerClient implements CAManager
         {
             throw new IllegalStateException("serverURL is not set");
         }
-        HessianProxyFactory factory = new HessianProxyFactory();
+        HessianProxyFactory factory = new HessianProxyFactory(getClass().getClassLoader());
         factory.setHessian2Request(true);
         factory.setHessian2Reply(true);
 
         this.client = (HessianCAManager) factory.create(
-                HessianCAManager.class, serverURL, getClass().getClassLoader());
+                HessianCAManager.class, serverURL);
         determineServerVersion();
     }
 
@@ -591,4 +591,21 @@ public class CAManagerClient implements CAManager
         }
     }
 
+    public static void main(String[] args)
+    {
+        try
+        {
+            CAManagerClient c = new CAManagerClient();
+            c.setServerURL("http://localhost:8080/pkiconsole/hessian");
+            c.init();
+            CrlSignerEntry crlSigner = c.getCrlSigner("CASIGN.CRLSIGNER");
+            System.out.println(crlSigner);
+
+            CAEntry caEntry = c.getCA("RCA1");
+            System.out.println(caEntry);
+        }catch(Exception e)
+        {
+            e.printStackTrace();
+        }
+    }
 }
