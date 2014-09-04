@@ -9,20 +9,16 @@ package org.xipki.ca.server.mgmt.api;
 
 import java.io.IOException;
 import java.io.Serializable;
-import java.math.BigInteger;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.bouncycastle.asn1.cmp.CMPCertificate;
-import org.bouncycastle.asn1.x509.Certificate;
 import org.bouncycastle.util.encoders.Base64;
 import org.xipki.ca.common.CAMgmtException;
 import org.xipki.ca.common.CAStatus;
@@ -37,14 +33,7 @@ import org.xipki.security.common.ParamChecker;
 
 public class CAEntry implements Serializable
 {
-    private static long MS_PER_DAY = 24L * 60 * 60 * 1000;
-
     private String name;
-    private boolean selfSigned;
-    private BigInteger serialNumber;
-    private String subject;
-    private Date notBefore;
-    private Date notAfter;
     private CAStatus status;
     private List<String> crlUris;
     private List<String> deltaCrlUris;
@@ -52,11 +41,9 @@ public class CAEntry implements Serializable
     private List<String> issuerLocations;
     private int maxValidity;
     private X509CertificateWithMetaInfo cert;
-    private CMPCertificate certInCMPFormat;
     private String signerType;
     private String signerConf;
     private String crlSignerName;
-    private long lastCommittedNextSerial;
     private long nextSerial;
     private DuplicationMode duplicateKeyMode;
     private DuplicationMode duplicateSubjectMode;
@@ -64,12 +51,10 @@ public class CAEntry implements Serializable
     private Set<Permission> permissions;
     private int numCrls;
     private int expirationPeriod;
-    private long noNewCertificateAfter;
     private CertRevocationInfo revocationInfo;
     private int lastCRLInterval;
     private long lastCRLIntervalDate;
-
-    private PublicCAInfo publicCAInfo;
+    private String subject;
 
     public CAEntry(String name, long initialSerial,
             String signerType, String signerConf, X509Certificate cert,
@@ -114,22 +99,14 @@ public class CAEntry implements Serializable
         this.name = name;
         this.nextSerial = initialSerial;
 
-        Certificate bcCert;
         try
         {
-            bcCert = Certificate.getInstance(cert.getEncoded());
             this.cert = new X509CertificateWithMetaInfo(cert, cert.getEncoded());
         } catch (CertificateEncodingException e)
         {
             throw new CAMgmtException("could not encode the CA certificate");
         }
-
         this.subject = IoCertUtil.canonicalizeName(cert.getSubjectX500Principal());
-        this.notBefore = cert.getNotBefore();
-        this.notAfter = cert.getNotAfter();
-        this.serialNumber = cert.getSerialNumber();
-        this.selfSigned = cert.getIssuerX500Principal().equals(cert.getSubjectX500Principal());
-        this.certInCMPFormat = new CMPCertificate(bcCert);
 
         this.signerType = signerType;
         this.signerConf = signerConf;
@@ -142,11 +119,6 @@ public class CAEntry implements Serializable
                 null : Collections.unmodifiableList(new ArrayList<>(deltaCrlUris));
         this.issuerLocations = (issuerLocations == null) ?
                 null : Collections.unmodifiableList(new ArrayList<>(issuerLocations));
-
-        this.publicCAInfo = new PublicCAInfo(this.cert.getCert(),
-                this.ocspUris, this.crlUris, this.issuerLocations, this.deltaCrlUris);
-
-        this.noNewCertificateAfter = this.cert.getCert().getNotAfter().getTime() - MS_PER_DAY * expirationPeriod;
     }
 
     public String getName()
@@ -162,11 +134,6 @@ public class CAEntry implements Serializable
     public void setNextSerial(long nextSerial)
     {
         this.nextSerial = nextSerial;
-    }
-
-    public PublicCAInfo getPublicCAInfo()
-    {
-        return publicCAInfo;
     }
 
     public List<String> getCrlUris()
@@ -212,31 +179,6 @@ public class CAEntry implements Serializable
     public X509CertificateWithMetaInfo getCertificate()
     {
         return cert;
-    }
-
-    public String getSubject()
-    {
-        return subject;
-    }
-
-    public Date getNotBefore()
-    {
-        return notBefore;
-    }
-
-    public Date getNotAfter()
-    {
-        return notAfter;
-    }
-
-    public BigInteger getSerialNumber()
-    {
-        return serialNumber;
-    }
-
-    public boolean isSelfSigned()
-    {
-        return selfSigned;
     }
 
     public String getSignerConf()
@@ -302,8 +244,8 @@ public class CAEntry implements Serializable
                 IoCertUtil.canonicalizeName(cert.getCert().getIssuerX500Principal())).append("\n");
         sb.append("\tserialNumber: ").append(cert.getCert().getSerialNumber()).append("\n");
         sb.append("\tsubject: ").append(subject).append("\n");
-        sb.append("\tnotBefore: ").append(notBefore).append("\n");
-        sb.append("\tnotAfter: ").append(notAfter).append("\n");
+        sb.append("\tnotBefore: ").append(cert.getCert().getNotBefore()).append("\n");
+        sb.append("\tnotAfter: ").append(cert.getCert().getNotAfter()).append("\n");
         if(verbose)
         {
             sb.append("\tEncoded: ").append(Base64.toBase64String(cert.getEncodedCert())).append("\n");
@@ -384,21 +326,6 @@ public class CAEntry implements Serializable
         this.permissions = (permissions == null) ? null : Collections.unmodifiableSet(permissions);
     }
 
-    public long getLastCommittedNextSerial()
-    {
-        return lastCommittedNextSerial;
-    }
-
-    public void setLastCommittedNextSerial(long lastCommittedNextSerial)
-    {
-        this.lastCommittedNextSerial = lastCommittedNextSerial;
-    }
-
-    public CMPCertificate getCertInCMPFormat()
-    {
-        return certInCMPFormat;
-    }
-
     public CertRevocationInfo getRevocationInfo()
     {
         return revocationInfo;
@@ -412,11 +339,6 @@ public class CAEntry implements Serializable
     public int getExpirationPeriod()
     {
         return expirationPeriod;
-    }
-
-    public long getNoNewCertificateAfter()
-    {
-        return noNewCertificateAfter;
     }
 
     public int getLastCRLInterval()
@@ -437,6 +359,11 @@ public class CAEntry implements Serializable
     public void setLastCRLIntervalDate(long lastIntervalDate)
     {
         this.lastCRLIntervalDate = lastIntervalDate;
+    }
+
+    public String getSubject()
+    {
+        return subject;
     }
 
     // ------------------------------------------------

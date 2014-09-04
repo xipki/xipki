@@ -131,7 +131,7 @@ public class X509CA
 
     private final boolean useRandomSerialNumber;
     private final RandomSerialNumberGenerator randomSNGenerator;
-    private final CAEntry caInfo;
+    private final CAInfo caInfo;
     private final ConcurrentContentSigner caSigner;
     private final X500Name caSubjectX500Name;
     private final byte[] caSKI;
@@ -151,19 +151,19 @@ public class X509CA
 
     public X509CA(
             CAManagerImpl caManager,
-            CAEntry caInfo,
+            CAEntry caEntry,
             ConcurrentContentSigner caSigner,
             CertificateStore certstore,
             CrlSigner crlSigner)
     throws OperationException
     {
         ParamChecker.assertNotNull("caManager", caManager);
-        ParamChecker.assertNotNull("caInfo", caInfo);
+        ParamChecker.assertNotNull("caEntry", caEntry);
         ParamChecker.assertNotNull("caSigner", caSigner);
         ParamChecker.assertNotNull("certstore", certstore);
 
         this.caManager = caManager;
-        this.caInfo = caInfo;
+        this.caInfo = new CAInfo(caEntry);
         this.caSigner = caSigner;
         this.certstore = certstore;
         this.crlSigner = crlSigner;
@@ -247,7 +247,7 @@ public class X509CA
                 nextSerialCommitService, 5, 5, TimeUnit.SECONDS); // commit the next_serial every 5 seconds
     }
 
-    public CAEntry getCAInfo()
+    public CAInfo getCAInfo()
     {
         return caInfo;
     }
@@ -2044,6 +2044,7 @@ public class X509CA
 
                 ret = new CertificateInfo(certWithMeta, caInfo.getCertificate(),
                         subjectPublicKeyData, certProfileName);
+                publishCertificate(ret);
             } catch (CertificateException | IOException | CertProfileException e)
             {
                 throw new OperationException(ErrorCode.System_Failure, e.getClass().getName() + ": " + e.getMessage());
