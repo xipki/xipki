@@ -804,19 +804,23 @@ public class OcspResponder
                         }
                     } catch (CertStatusStoreException e)
                     {
-                        final String message = "answer() CertStatusStore.getCertStatus";
+                        final String message = "getCertStatus() of CertStatusStore " + store.getName();
                         if(LOG.isErrorEnabled())
                         {
                             LOG.error(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(), e.getMessage());
                         }
                         LOG.debug(message, e);
-                        if(childAuditEvent != null)
-                        {
-                            fillAuditEvent(childAuditEvent, AuditLevel.ERROR, AuditStatus.ERROR,
-                                    "CertStatusStore.getCertStatus() with CertStatusStoreException");
-                        }
-                        return createUnsuccessfullOCSPResp(OcspResponseStatus.tryLater);
                     }
+                }
+
+                if(certStatusInfo == null)
+                {
+                    if(childAuditEvent != null)
+                    {
+                        fillAuditEvent(childAuditEvent, AuditLevel.ERROR, AuditStatus.ERROR,
+                                "No CertStatusStore can answer the request");
+                    }
+                    return createUnsuccessfullOCSPResp(OcspResponseStatus.tryLater);
                 }
 
                 if(childAuditEvent != null)
