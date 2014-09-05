@@ -11,7 +11,7 @@
   -->
   <cm:property-placeholder persistent-id="org.xipki.pkiconsole" update-strategy="reload">
     <cm:default-properties>
-      <cm:property name="serverURL" value="http://localhost:8080/pkiconsole/hessian"/>
+      <cm:property name="serverURL" value="https://localhost:8443/pkiconsole/hessian"/>
     </cm:default-properties>
   </cm:property-placeholder>
   

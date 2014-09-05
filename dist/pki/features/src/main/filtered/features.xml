@@ -114,7 +114,7 @@
   <feature name="xipki-pkiconsole-server" version="${project.version}" resolver="(obr)">
     <feature>xipki-caserver</feature>
     <bundle>mvn:org.xipki/pkiconsole-common/${project.version}</bundle>
-    <bundle>wrap:mvn:com.caucho/hessian/${hessian.version}</bundle>
+    <bundle><![CDATA[wrap:mvn:com.caucho/hessian/${hessian.version}/$Bundle-SymbolicName=hessian&Bundle-Version=${hessian.version}]]></bundle>    
     <bundle>mvn:org.xipki/pkiconsole-server/${project.version}</bundle>
   </feature>
 </features>
