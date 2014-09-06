@@ -107,9 +107,9 @@ class CaCertStoreDbExporter extends DbPorter
             export_certprofileinfo(certstore);
             export_user(certstore);
             export_crl(certstore);
-            export_cert(certstore);
             export_publishQueue(certstore);
             export_deltaCRLCache(certstore);
+            export_cert(certstore);
 
             JAXBElement<CertStoreType> root = new ObjectFactory().createCertStore(certstore);
             marshaller.marshal(root, new File(baseDir + File.separator + FILENAME_CA_CertStore));
