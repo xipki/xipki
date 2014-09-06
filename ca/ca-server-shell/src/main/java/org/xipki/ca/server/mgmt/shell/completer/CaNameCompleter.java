@@ -19,7 +19,7 @@ public class CaNameCompleter extends MgmtNameCompleter
     @Override
     protected Set<String> getEnums()
     {
-        return caManager.getCANames();
+        return caManager.getCaNames();
     }
 
 }

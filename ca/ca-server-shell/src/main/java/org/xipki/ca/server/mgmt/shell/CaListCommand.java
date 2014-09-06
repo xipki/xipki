@@ -39,7 +39,7 @@ public class CaListCommand extends CaCommand
 
         if(caName == null)
         {
-            Set<String> names = caManager.getCANames();
+            Set<String> names = caManager.getCaNames();
             int n = names.size();
             if(n == 0 || n == 1)
             {
