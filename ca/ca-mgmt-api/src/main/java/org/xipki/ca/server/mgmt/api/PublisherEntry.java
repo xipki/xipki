@@ -18,9 +18,9 @@ import org.xipki.security.common.ParamChecker;
 public class PublisherEntry implements Serializable
 {
     private static final long serialVersionUID = 1L;
-    private String name;
-    private String type;
-    private String conf;
+    private final String name;
+    private final String type;
+    private final String conf;
 
     public PublisherEntry(String name, String type, String conf)
     {
