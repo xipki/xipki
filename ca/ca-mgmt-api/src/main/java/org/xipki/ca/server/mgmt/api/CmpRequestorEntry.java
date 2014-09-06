@@ -22,7 +22,7 @@ import org.xipki.security.common.ParamChecker;
 public class CmpRequestorEntry implements Serializable
 {
     private static final long serialVersionUID = 1L;
-    private String name;
+    private final String name;
     private X509Certificate cert;
 
     public CmpRequestorEntry(String name)

@@ -21,7 +21,7 @@ public class CAHasRequestorEntry implements Serializable
 {
     private static final long serialVersionUID = 1L;
 
-    private String requestorName;
+    private final String requestorName;
     private boolean ra;
     private Set<Permission> permissions;
     private Set<String> profiles;

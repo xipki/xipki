@@ -23,9 +23,9 @@ import org.xipki.security.common.ParamChecker;
 public class CrlSignerEntry implements Serializable
 {
     private static final long serialVersionUID = 1L;
-    private String name;
-    private String signerType;
-    private String signerConf;
+    private final String name;
+    private final String signerType;
+    private final String signerConf;
     private X509Certificate cert;
 
     private String crlControl;
