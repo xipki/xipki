@@ -220,9 +220,9 @@ implements HessianCAManager
     }
 
     @Override
-    public Set<String> getCANames()
+    public Set<String> getCaNames()
     {
-        return caManager.getCANames();
+        return caManager.getCaNames();
     }
 
     @Override

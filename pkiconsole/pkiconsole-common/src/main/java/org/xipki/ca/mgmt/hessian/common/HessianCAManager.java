@@ -73,7 +73,7 @@ public interface HessianCAManager
 
     Set<String> getCrlSignerNames();
 
-    Set<String> getCANames();
+    Set<String> getCaNames();
 
     void addCA(CAEntry newCaDbEntry)
     throws HessianCAMgmtException;

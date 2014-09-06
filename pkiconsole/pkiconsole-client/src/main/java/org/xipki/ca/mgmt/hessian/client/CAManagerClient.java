@@ -206,9 +206,9 @@ public class CAManagerClient implements CAManager
     }
 
     @Override
-    public Set<String> getCANames()
+    public Set<String> getCaNames()
     {
-        return client.getCANames();
+        return client.getCaNames();
     }
 
     @Override
