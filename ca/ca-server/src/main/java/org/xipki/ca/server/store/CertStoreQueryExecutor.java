@@ -52,6 +52,7 @@ import org.xipki.ca.server.CertRevocationInfoWithSerial;
 import org.xipki.ca.server.CertStatus;
 import org.xipki.ca.server.SubjectKeyProfileTriple;
 import org.xipki.database.api.DataSourceWrapper;
+import org.xipki.database.api.DatabaseType;
 import org.xipki.security.common.CRLReason;
 import org.xipki.security.common.CertRevocationInfo;
 import org.xipki.security.common.IoCertUtil;
@@ -1987,9 +1988,322 @@ class CertStoreQueryExecutor
         }
     }
 
+    void commitNextSerialIfLess(String caName, long nextSerial)
+    throws SQLException
+    {
+        Connection conn = dataSource.getConnection();
+        PreparedStatement ps = null;
+        try
+        {
+            final String SQL_SELECT = "SELECT NEXT_SERIAL FROM CA WHERE NAME = '" + caName + "'";
+            ResultSet rs = null;
+            long nextSerialInDB;
+
+            try
+            {
+                ps = conn.prepareStatement(SQL_SELECT);
+                rs = ps.executeQuery();
+                rs.next();
+                nextSerialInDB = rs.getLong("NEXT_SERIAL");
+            }finally
+            {
+                try
+                {
+                    ps.close();
+                }catch(SQLException e)
+                {
+                }
+
+                if(rs != null)
+                {
+                    try
+                    {
+                        rs.close();
+                    }catch(SQLException e)
+                    {
+                    }
+                }
+            }
+
+            if(nextSerialInDB < nextSerial)
+            {
+                ps = conn.prepareStatement("UPDATE CA SET NEXT_SERIAL=? WHERE NAME=?");
+                ps.setLong(1, nextSerial);
+                ps.setString(2, caName);
+                ps.executeUpdate();
+            }
+        }finally
+        {
+            dataSource.releaseResources(ps, null);
+        }
+    }
+
+    void createSerialNumberGeneratorIfNotExistsOrLess(String caName, long startValue)
+    throws SQLException
+    {
+        DatabaseType dbType = dataSource.getDatabaseType();
+        switch(dbType)
+        {
+            case DB2:
+            case ORACLE:
+            case POSTGRESQL:
+            case H2:
+                boolean alterSequence = false;
+                try
+                {
+                    long lastestSerial = lastestSerial(caName);
+                    // sequence exists
+
+                    if(lastestSerial + 1 >= startValue)
+                    {
+                        // number in sequence is correct, do nothing
+                        return;
+                    }
+                    else
+                    {
+                        // the startValue in sequence should be corrected
+                        alterSequence = true;
+                    }
+                    return;
+                }catch(SQLException e)
+                {
+                    // sequence does not exist
+                }
+
+                // subtract 1 from the startValue, this will be incremented at the next step nextSerial()
+                final long _startValue = startValue - 1;
+                String sql;
+                if(alterSequence)
+                {
+                    if(DatabaseType.DB2 == dbType | DatabaseType.POSTGRESQL == dbType | DatabaseType.H2 == dbType)
+                    {
+                        sql = "ALTER SEQUENCE SERIAL_" + caName + " RESTART WITH " + _startValue;
+                    }
+                    else if(DatabaseType.ORACLE == dbType)
+                    {
+                        sql = "DROP SEQUENCE SERIAL_" + caName;
+                    }
+                    else
+                    {
+                        throw new RuntimeException("should not reach here");
+                    }
+
+                    Connection conn = dataSource.getConnection();
+                    Statement stmt = null;
+                    try
+                    {
+                        stmt = conn.createStatement();
+                        stmt.execute(sql);
+                    }
+                    finally
+                    {
+                        dataSource.releaseResources(stmt, null);
+                    }
+                }
+
+                if(alterSequence == false || DatabaseType.ORACLE == dbType)
+                {
+                    final String prefix = "CREATE SEQUENCE SERIAL_" + caName + " ";
+                    if(DatabaseType.DB2 == dbType)
+                    {
+                        sql = "AS BIGINT START WITH " + _startValue + " INCREMENT BY 1 NO CYCLE NO CACHE";
+                    }
+                    else if(DatabaseType.ORACLE == dbType)
+                    {
+                        sql = "START WITH " + _startValue + " INCREMENT BY 1 NOCYCLE NOCACHE";
+                    }
+                    else if(DatabaseType.POSTGRESQL == dbType)
+                    {
+                        sql = "START WITH " + _startValue + " INCREMENT BY 1 NO CYCLE";
+                    }
+                    else if(DatabaseType.H2 == dbType)
+                    {
+                        sql = "START WITH " + _startValue + " INCREMENT BY 1 NO CYCLE NO CACHE";
+                    }
+                    else
+                    {
+                        throw new RuntimeException("should not reach here");
+                    }
+                    sql = prefix + sql;
+
+                    Connection conn = dataSource.getConnection();
+                    Statement stmt = null;
+                    try
+                    {
+                        stmt = conn.createStatement();
+                        stmt.execute(sql);
+                    }
+                    finally
+                    {
+                        dataSource.releaseResources(stmt, null);
+                    }
+                }
+
+                // increment the serial number once so that we can get the current value to test
+                // whether a sequence exists
+                nextSerial(caName);
+
+                break;
+            default:
+            throw new RuntimeException("unsupported database type " + dbType);
+        }
+    }
+
+    long lastestSerial(String caName)
+    throws SQLException
+    {
+        DatabaseType dbType = dataSource.getDatabaseType();
+        switch(dbType)
+        {
+            case DB2:
+            case ORACLE:
+            case POSTGRESQL:
+            case H2:
+            {
+                String sql;
+                if(DatabaseType.DB2 == dbType)
+                {
+                    sql = "SELECT PREVIOUS VALUE FOR SERIAL_" + caName + " FROM sysibm.sysdummy1";
+                }
+                else if(DatabaseType.ORACLE == dbType)
+                {
+                    sql = "SELECT SERIAL_" + caName + ".CURRVAL FROM DUAL";
+                }
+                else if(DatabaseType.POSTGRESQL == dbType | DatabaseType.H2 == dbType)
+                {
+                    sql = "SELECT CURRVAL ('SERIAL_" + caName + "')";
+                }
+                else
+                {
+                    throw new RuntimeException("should not reach here");
+                }
+                Connection conn = dataSource.getConnection();
+                Statement stmt = conn.createStatement();
+                ResultSet rs = null;
+                try
+                {
+                    rs = stmt.executeQuery(sql);
+                    if(rs.next())
+                    {
+                        return rs.getLong(1);
+                    }
+                    else
+                    {
+                        throw new SQLException("Could not increment the serial number in " + dbType);
+                    }
+                }finally
+                {
+                    dataSource.releaseResources(stmt, rs);
+                }
+            }
+            case MYSQL:
+            {
+                final String SQL_SELECT = "SELECT NEXT_SERIAL FROM CA WHERE NAME = '" + caName + "'";
+                Connection conn = dataSource.getConnection();
+                Statement stmt = conn.createStatement();
+                ResultSet rs = null;
+                try
+                {
+                    rs = stmt.executeQuery(SQL_SELECT);
+                    if(rs.next())
+                    {
+                        return rs.getLong(1) - 1;
+                    }
+                    else
+                    {
+                        throw new SQLException("Could not get the current serial number in " + dbType);
+                    }
+                }finally
+                {
+                    dataSource.releaseResources(stmt, rs);
+                }
+            }
+            default:
+                throw new RuntimeException("unsupported database type " + dbType);
+        }
+    }
+
+    long nextSerial(String caName)
+    throws SQLException
+    {
+        DatabaseType dbType = dataSource.getDatabaseType();
+        switch(dbType)
+        {
+            case DB2:
+            case ORACLE:
+            case POSTGRESQL:
+            case H2:
+            {
+                String sql;
+                if(DatabaseType.DB2 == dbType)
+                {
+                    sql = "SELECT NEXT VALUE FOR SERIAL_" + caName + " FROM sysibm.sysdummy1";
+                }
+                else if(DatabaseType.ORACLE == dbType)
+                {
+                    sql = "SELECT SERIAL_" + caName + ".NEXTVAL FROM DUAL";
+                }
+                else if(DatabaseType.POSTGRESQL == dbType | DatabaseType.H2 == dbType)
+                {
+                    sql = "SELECT NEXTVAL ('SERIAL_" + caName + "')";
+                }
+                else
+                {
+                    throw new RuntimeException("should not reach here");
+                }
+                Connection conn = dataSource.getConnection();
+                Statement stmt = conn.createStatement();
+                ResultSet rs = null;
+                try
+                {
+                    rs = stmt.executeQuery(sql);
+                    if(rs.next())
+                    {
+                        return rs.getLong(1);
+                    }
+                    else
+                    {
+                        throw new SQLException("Could not increment the serial number in " + dbType);
+                    }
+                }finally
+                {
+                    dataSource.releaseResources(stmt, rs);
+                }
+            }
+            case MYSQL:
+            {
+                final String SQL_UPDATE =
+                        "UPDATE CA SET NEXT_SERIAL = (@cur_value := NEXT_SERIAL) + 1 WHERE NAME = '" + caName + "'";
+                final String SQL_SELECT = "SELECT @cur_value";
+                Connection conn = dataSource.getConnection();
+                Statement stmt = conn.createStatement();
+                ResultSet rs = null;
+                try
+                {
+                    stmt.executeUpdate(SQL_UPDATE);
+                    rs = stmt.executeQuery(SQL_SELECT);
+                    if(rs.next())
+                    {
+                        return rs.getLong(1);
+                    }
+                    else
+                    {
+                        throw new SQLException("Could not increment the serial number in " + dbType);
+                    }
+                }finally
+                {
+                    dataSource.releaseResources(stmt, rs);
+                }
+            }
+            default:
+                throw new RuntimeException("unsupported database type " + dbType);
+        }
+    }
+
     private static void setBoolean(PreparedStatement ps, int index, boolean b)
     throws SQLException
     {
         ps.setInt(index, b ? 1 : 0);
     }
+
 }

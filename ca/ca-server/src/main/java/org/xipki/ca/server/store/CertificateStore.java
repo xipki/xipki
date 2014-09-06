@@ -544,4 +544,48 @@ public class CertificateStore
         }
     }
 
+    public long nextSerial(String caName)
+    throws OperationException
+    {
+        try
+        {
+            return queryExecutor.nextSerial(caName);
+        } catch (SQLException e)
+        {
+            throw new OperationException(ErrorCode.DATABASE_FAILURE, e.getMessage());
+        } catch (RuntimeException e)
+        {
+            throw new OperationException(ErrorCode.System_Failure, e.getMessage());
+        }
+    }
+
+    public void commitNextSerialIfLess(String caName, long nextSerial)
+    throws OperationException
+    {
+        try
+        {
+            queryExecutor.commitNextSerialIfLess(caName, nextSerial);
+        } catch (SQLException e)
+        {
+            throw new OperationException(ErrorCode.DATABASE_FAILURE, e.getMessage());
+        } catch (RuntimeException e)
+        {
+            throw new OperationException(ErrorCode.System_Failure, e.getMessage());
+        }
+    }
+
+    public void createSerialNumberGenerator(String caName,long minimalStartValue)
+    throws OperationException
+    {
+        try
+        {
+            queryExecutor.createSerialNumberGeneratorIfNotExistsOrLess(caName, minimalStartValue);
+        } catch (SQLException e)
+        {
+            throw new OperationException(ErrorCode.DATABASE_FAILURE, e.getMessage());
+        } catch (RuntimeException e)
+        {
+            throw new OperationException(ErrorCode.System_Failure, e.getMessage());
+        }
+    }
 }

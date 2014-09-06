@@ -95,9 +95,9 @@ import org.xipki.ca.common.X509CertificateWithMetaInfo;
 import org.xipki.ca.server.mgmt.CAInfo;
 import org.xipki.ca.server.mgmt.CAManagerImpl;
 import org.xipki.ca.server.mgmt.CRLControl;
+import org.xipki.ca.server.mgmt.CRLControl.UpdateMode;
 import org.xipki.ca.server.mgmt.IdentifiedCertProfile;
 import org.xipki.ca.server.mgmt.IdentifiedCertPublisher;
-import org.xipki.ca.server.mgmt.CRLControl.UpdateMode;
 import org.xipki.ca.server.mgmt.api.DuplicationMode;
 import org.xipki.ca.server.mgmt.api.ValidityMode;
 import org.xipki.ca.server.store.CertWithRevocationInfo;
@@ -114,7 +114,6 @@ import org.xipki.security.common.IoCertUtil;
 import org.xipki.security.common.LogUtil;
 import org.xipki.security.common.ObjectIdentifiers;
 import org.xipki.security.common.ParamChecker;
-import org.xipki.security.common.RandomSerialNumberGenerator;
 
 /**
  * @author Lijun Liao
@@ -128,8 +127,8 @@ public class X509CA
 
     private final CertificateFactory cf;
 
-    private final boolean useRandomSerialNumber;
-    private final RandomSerialNumberGenerator randomSNGenerator;
+    private boolean masterMode = false;
+
     private final CAInfo caInfo;
     private final ConcurrentContentSigner caSigner;
     private final X500Name caSubjectX500Name;
@@ -139,7 +138,6 @@ public class X509CA
     private final CrlSigner crlSigner;
 
     private final CAManagerImpl caManager;
-    private final Object nextSerialLock = new Object();
     private Boolean tryXipkiNSStoVerify;
     private AtomicBoolean crlGenInProcess = new AtomicBoolean(false);
 
@@ -212,38 +210,25 @@ public class X509CA
 
         this.cf = new CertificateFactory();
 
-        // CRL generaration services
+        if(caInfo.useRandomSerialNumber() == false)
+        {
+            ScheduledNextSerialCommitService nextSerialCommitService = new ScheduledNextSerialCommitService();
+            caManager.getScheduledThreadPoolExecutor().scheduleAtFixedRate(
+                    nextSerialCommitService, 1, 1, TimeUnit.MINUTES); // commit the next_serial every 1 minute
+        }
+
+        if(masterMode == false)
+        {
+            return;
+        }
+
+        // CRL generation services
         if(crlSigner != null && crlSigner.getCRLcontrol().getUpdateMode() == UpdateMode.interval)
         {
             ScheduledCRLGenerationService crlGenerationService = new ScheduledCRLGenerationService();
             caManager.getScheduledThreadPoolExecutor().scheduleAtFixedRate(crlGenerationService,
                     1, 1, TimeUnit.MINUTES);
         }
-
-        useRandomSerialNumber = caInfo.getNextSerial() < 1;
-        randomSNGenerator = useRandomSerialNumber ? RandomSerialNumberGenerator.getInstance() : null;
-        if(useRandomSerialNumber)
-        {
-            return;
-        }
-
-        Long greatestSerialNumber = certstore.getGreatestSerialNumber(caCert);
-        if(greatestSerialNumber == null)
-        {
-            throw new OperationException(ErrorCode.DATABASE_FAILURE,
-                    "Could not retrieve the greatest serial number for ca " + caInfo.getName());
-        }
-
-        if(caInfo.getNextSerial() < greatestSerialNumber + 1)
-        {
-            LOG.info("Corrected the next_serial of {} from {} to {}",
-                    new Object[]{caInfo.getName(), caInfo.getNextSerial(), greatestSerialNumber + 1});
-            caInfo.setNextSerial(greatestSerialNumber + 1);
-        }
-
-        ScheduledNextSerialCommitService nextSerialCommitService = new ScheduledNextSerialCommitService();
-        caManager.getScheduledThreadPoolExecutor().scheduleAtFixedRate(
-                nextSerialCommitService, 5, 5, TimeUnit.SECONDS); // commit the next_serial every 5 seconds
     }
 
     public CAInfo getCAInfo()
@@ -305,7 +290,7 @@ public class X509CA
         }
     }
 
-    public void cleanupCRLs()
+    private void cleanupCRLs()
     throws OperationException
     {
         int numCrls = caInfo.getNumCrls();
@@ -380,7 +365,7 @@ public class X509CA
                 caInfo.setLastCRLIntervalDate(thisUpdate.getTime() / 1000);
                 try
                 {
-                    caManager.setCRLLastInterval(caInfo.getName(), caInfo.getLastCRLInterval(),
+                    caManager.setCrlLastInterval(caInfo.getName(), caInfo.getLastCRLInterval(),
                             caInfo.getLastCRLIntervalDate());
                 } catch (Throwable t)
                 {
@@ -668,6 +653,19 @@ public class X509CA
                 successfull = true;
                 LOG.info("SUCCESSFULL generateCRL: ca={}, crlNumber={}, thisUpdate={}",
                         new Object[]{caInfo.getName(), crlNumber, crl.getThisUpdate()});
+
+                // clean up the CRL
+                if(deltaCRL == false)
+                {
+                    try
+                    {
+                        cleanupCRLs();
+                    }catch(Throwable t)
+                    {
+                        LOG.warn("Could not cleanup CRLs.{}: {}", t.getClass().getName(), t.getMessage());
+                    }
+                }
+
                 return crl;
             } catch (CRLException e)
             {
@@ -1989,7 +1987,7 @@ public class X509CA
 
             X509v3CertificateBuilder certBuilder = new X509v3CertificateBuilder(
                     caSubjectX500Name,
-                    nextSerial(),
+                    caInfo.nextSerial(),
                     notBefore,
                     notAfter,
                     grantedSubject,
@@ -2081,25 +2079,6 @@ public class X509CA
                         pendingKeyMap.put(sha1FpSubject, profiles);
                     }
                 }
-            }
-        }
-    }
-
-    private BigInteger nextSerial()
-    throws OperationException
-    {
-        synchronized (nextSerialLock)
-        {
-            if(useRandomSerialNumber)
-            {
-                return randomSNGenerator.getSerialNumber();
-            }
-            else
-            {
-                long thisSerial = caInfo.getNextSerial();
-                long nextSerial = thisSerial + 1;
-                caInfo.setNextSerial(nextSerial);
-                return BigInteger.valueOf(thisSerial);
             }
         }
     }
@@ -2325,10 +2304,10 @@ public class X509CA
             inProcess = true;
             try
             {
-                commitNextSerial();
+                caInfo.commitNextSerial();
             } catch (Throwable t)
             {
-                final String message = "Could not increase the next_serial";
+                final String message = "Could not commit the next_serial";
                 if(LOG.isErrorEnabled())
                 {
                     LOG.error(LogUtil.buildExceptionLogFormat(message), t.getClass().getName(), t.getMessage());
@@ -2523,7 +2502,7 @@ public class X509CA
                     {
                         caInfo.setLastCRLInterval(deltaCrl ? thisInterval : 0);
                         caInfo.setLastCRLIntervalDate(nowInSecond);
-                        caManager.setCRLLastInterval(caInfo.getName(), caInfo.getLastCRLInterval(),
+                        caManager.setCrlLastInterval(caInfo.getName(), caInfo.getLastCRLInterval(),
                                 caInfo.getLastCRLIntervalDate());
                     } catch (Throwable t)
                     {
@@ -2597,24 +2576,6 @@ public class X509CA
         }
 
         return nextUpdate;
-    }
-
-    public synchronized void commitNextSerial()
-    throws CAMgmtException
-    {
-        if(useRandomSerialNumber)
-        {
-            return;
-        }
-        long nextSerial = caInfo.getNextSerial();
-        long lastCommittedNextSerial = caInfo.getLastCommittedNextSerial();
-        if(nextSerial > lastCommittedNextSerial)
-        {
-            caManager.setCANextSerial(caInfo.getName(), nextSerial);
-            caInfo.setLastCommittedNextSerial(nextSerial);
-            LOG.debug("Committed next_serial of ca {} from {} to {}",
-                    new Object[]{caInfo.getName(), lastCommittedNextSerial, nextSerial});
-        }
     }
 
     public HealthCheckResult healthCheck()
