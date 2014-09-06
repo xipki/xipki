@@ -11,6 +11,10 @@
     <fileSet>
       <directory>${project.basedir}/../../demo-tlskeys</directory>
       <outputDirectory>/etc/tlskeys</outputDirectory>
+      <includes>
+      	<include>tls-client-keystore.jks</include>
+      	<include>tls-client-truststore.jks</include>
+      </includes>
       <fileMode>0644</fileMode>
       <directoryMode>0755</directoryMode>
     </fileSet>
