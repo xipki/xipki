@@ -115,6 +115,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
     private CmpResponderEntry responder;
 
     private boolean caLockedByMe = false;
+    private boolean masterMode = true;
 
     private Map<String, DataSourceWrapper> dataSources = null;
 
@@ -212,17 +213,34 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
             throw new IllegalStateException("caConfFile is not set");
         }
 
+        Properties caConfProps = new Properties();
+        try
+        {
+            caConfProps.load(new FileInputStream(caConfFile));
+        } catch (IOException e)
+        {
+            throw new CAMgmtException("IOException while parsing ca configuration" + caConfFile, e);
+        }
+
+        String caModeStr = caConfProps.getProperty("ca.mode");
+        if(caModeStr != null)
+        {
+            if(caModeStr.equalsIgnoreCase("slave"))
+            {
+                masterMode = false;
+            }
+            else if(caModeStr.equalsIgnoreCase("master"))
+            {
+                masterMode = true;
+            }
+            else
+            {
+                throw new CAMgmtException("invalid ca.mode '" + caModeStr + "'");
+            }
+        }
+
         if(this.dataSources == null)
         {
-            Properties caConfProps = new Properties();
-            try
-            {
-                caConfProps.load(new FileInputStream(caConfFile));
-            } catch (IOException e)
-            {
-                throw new CAMgmtException("IOException while parsing ca configuration" + caConfFile, e);
-            }
-
             this.dataSources = new ConcurrentHashMap<>();
             for(Object objKey : caConfProps.keySet())
             {
@@ -251,20 +269,24 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
             throw new CAMgmtException("no datasource configured with name 'ca'");
         }
 
-        boolean successfull;
-        try
+        if(masterMode)
         {
-            successfull = lockCA();
-        }catch(SQLException e)
-        {
-            throw new CAMgmtException("SQLException while locking CA", e);
-        }
+            boolean lockedSuccessfull;
+            try
+            {
+                lockedSuccessfull = lockCA();
+            }catch(SQLException e)
+            {
+                throw new CAMgmtException("SQLException while locking CA", e);
+            }
 
-        if(successfull == false)
-        {
-            String msg = "Could not lock the CA database. In general this indicates that another CA software is accessing the "
-                    + "database or the last shutdown of CA software is not normal.";
-            throw new CAMgmtException(msg);
+            if(lockedSuccessfull == false)
+            {
+                String msg = "Could not lock the CA database. In general this indicates that another CA software in "
+                        + "active mode is accessing the "
+                        + "database or the last shutdown of CA software in active mode is not normal.";
+                throw new CAMgmtException(msg);
+            }
         }
 
         try
@@ -283,7 +305,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
     {
         if(caSystemSetuped)
         {
-            return CASystemStatus.STARTED;
+            return masterMode ? CASystemStatus.STARTED_AS_MASTER : CASystemStatus.STARTED_AS_SLAVE;
         }
         else if(initializing)
         {
@@ -366,6 +388,12 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
     @Override
     public boolean unlockCA()
     {
+        if(masterMode == false)
+        {
+            LOG.error("Could not unlock CA in slave mode");
+            return false;
+        }
+
         boolean successfull = false;
 
         Statement stmt = null;
@@ -623,7 +651,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
             caSystemSetuped = true;
             StringBuilder sb = new StringBuilder();
             sb.append("Started CA system");
-            Set<String> names = new HashSet<>(getCANames());
+            Set<String> names = new HashSet<>(getCaNames());
 
             if(names.size() > 0)
             {
@@ -664,7 +692,6 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
     public void shutdown()
     {
         LOG.info("Stopping CA system");
-
         shutdownScheduledThreadPoolExecutor();
 
         for(String caName : x509cas.keySet())
@@ -672,10 +699,10 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
             X509CA ca = x509cas.get(caName);
             try
             {
-                ca.commitNextSerial();
+                ca.getCAInfo().commitNextSerial();
             } catch (Throwable t)
             {
-                LOG.info("Exception while calling ca.commitNextSerial for ca {}: {}", caName, t.getMessage());
+                LOG.info("Exception while calling CAInfo.commitNextSerial for ca {}: {}", caName, t.getMessage());
             }
         }
 
@@ -747,7 +774,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
     }
 
     @Override
-    public Set<String> getCANames()
+    public Set<String> getCaNames()
     {
         return cas.keySet();
     }
@@ -1307,9 +1334,11 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
                 }
                 entry.setValidityMode(validityMode);
 
+                CAInfo caInfo;
                 try
                 {
-                    cas.put(entry.getName(), new CAInfo(entry));
+                    caInfo = new CAInfo(entry, certstore, masterMode);
+                    cas.put(entry.getName(), caInfo);
                 } catch (OperationException e)
                 {
                     throw new CAMgmtException(e.getMessage(), e);
@@ -1394,6 +1423,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
     public void addCA(CAEntry newCaDbEntry)
     throws CAMgmtException
     {
+        asssertMasterMode();
         String name = newCaDbEntry.getName();
 
         if(cas.containsKey(name))
@@ -1471,17 +1501,12 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
             Integer numCrls, Integer expirationPeriod, ValidityMode validityMode)
     throws CAMgmtException
     {
+        asssertMasterMode();
         if(nextSerial != null && nextSerial > 0) // 0 for random serial
         {
             if(cas.containsKey(name) == false)
             {
                 throw new CAMgmtException("Could not find CA named " + name);
-            }
-
-            CAInfo caEntry = cas.get(name);
-            if(caEntry.getNextSerial() > nextSerial + 1) // 1 as buffer
-            {
-                throw new CAMgmtException("the nextSerial " + nextSerial + " is not allowed");
             }
         }
 
@@ -1622,31 +1647,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
         }
     }
 
-    public void setCANextSerial(String caName, long nextSerial)
-    throws CAMgmtException
-    {
-        if(cas.containsKey(caName) == false)
-        {
-            throw new CAMgmtException("Could not find CA named " + caName);
-        }
-
-        PreparedStatement ps = null;
-        try
-        {
-            ps = prepareStatement("UPDATE CA SET NEXT_SERIAL=? WHERE NAME=?");
-            ps.setLong(1, nextSerial);
-            ps.setString(2, caName);
-            ps.executeUpdate();
-        }catch(SQLException e)
-        {
-            throw new CAMgmtException(e);
-        }finally
-        {
-            dataSource.releaseResources(ps, null);
-        }
-    }
-
-    public void setCRLLastInterval(String caName, int lastInterval, long lastIntervalDate)
+    public void setCrlLastInterval(String caName, int lastInterval, long lastIntervalDate)
     throws CAMgmtException
     {
         if(cas.containsKey(caName) == false)
@@ -1675,6 +1676,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
     public void removeCertProfileFromCA(String profileName, String caName)
     throws CAMgmtException
     {
+        asssertMasterMode();
         Set<String> profileNames = ca_has_profiles.get(caName);
 
         PreparedStatement ps = null;
@@ -1702,6 +1704,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
     public void addCertProfileToCA(String profileName, String caName)
     throws CAMgmtException
     {
+        asssertMasterMode();
         Set<String> profileNames = ca_has_profiles.get(caName);
         if(profileNames == null)
         {
@@ -1737,6 +1740,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
     public void removePublisherFromCA(String publisherName, String caName)
     throws CAMgmtException
     {
+        asssertMasterMode();
         Set<String> publisherNames = ca_has_publishers.get(caName);
         PreparedStatement ps = null;
         try
@@ -1763,6 +1767,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
     public void addPublisherToCA(String publisherName, String caName)
     throws CAMgmtException
     {
+        asssertMasterMode();
         Set<String> publisherNames = ca_has_publishers.get(caName);
         if(publisherNames == null)
         {
@@ -1816,6 +1821,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
     public void addCmpRequestor(CmpRequestorEntry dbEntry)
     throws CAMgmtException
     {
+        asssertMasterMode();
         String name = dbEntry.getName();
         if(requestors.containsKey(name))
         {
@@ -1846,6 +1852,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
     public void removeCmpRequestor(String requestorName)
     throws CAMgmtException
     {
+        asssertMasterMode();
         for(String caName : ca_has_requestors.keySet())
         {
             removeCmpRequestorFromCA(requestorName, caName);
@@ -1876,6 +1883,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
     public void changeCmpRequestor(String name, String cert)
     throws CAMgmtException
     {
+        asssertMasterMode();
         if(cert == null)
         {
             return;
@@ -1902,6 +1910,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
     public void removeCmpRequestorFromCA(String requestorName, String caName)
     throws CAMgmtException
     {
+        asssertMasterMode();
         Set<CAHasRequestorEntry> requestors = ca_has_requestors.get(caName);
         PreparedStatement ps = null;
         try
@@ -1928,6 +1937,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
     public void addCmpRequestorToCA(CAHasRequestorEntry requestor, String caName)
     throws CAMgmtException
     {
+        asssertMasterMode();
         String requestorName = requestor.getRequestorName();
         Set<CAHasRequestorEntry> cmpRequestors = ca_has_requestors.get(caName);
         if(cmpRequestors == null)
@@ -1993,6 +2003,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
     public void removeCertProfile(String profileName)
     throws CAMgmtException
     {
+        asssertMasterMode();
         for(String caName : ca_has_profiles.keySet())
         {
             removeCertProfileFromCA(profileName, caName);
@@ -2019,6 +2030,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
     public void changeCertProfile(String name, String type, String conf)
     throws CAMgmtException
     {
+        asssertMasterMode();
         if(type == null && conf == null)
         {
             throw new IllegalArgumentException("at least one of type and conf should not be null");
@@ -2063,6 +2075,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
     public void addCertProfile(CertProfileEntry dbEntry)
     throws CAMgmtException
     {
+        asssertMasterMode();
         String name = dbEntry.getName();
         if(certProfiles.containsKey(name))
         {
@@ -2103,6 +2116,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
     public void setCmpResponder(CmpResponderEntry dbEntry)
     throws CAMgmtException
     {
+        asssertMasterMode();
         if(responder != null)
         {
             removeCmpResponder();
@@ -2141,6 +2155,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
     public void removeCmpResponder()
     throws CAMgmtException
     {
+        asssertMasterMode();
         Statement stmt = null;
         try
         {
@@ -2161,6 +2176,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
     public void changeCmpResponder(String type, String conf, String cert)
     throws CAMgmtException
     {
+        asssertMasterMode();
         if(type == null && conf == null && cert == null)
         {
             return;
@@ -2216,6 +2232,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
     public void addCrlSigner(CrlSignerEntry dbEntry)
     throws CAMgmtException
     {
+        asssertMasterMode();
         String name = dbEntry.getName();
         if(crlSigners.containsKey(name))
         {
@@ -2256,6 +2273,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
     public void removeCrlSigner(String crlSignerName)
     throws CAMgmtException
     {
+        asssertMasterMode();
         for(String caName : cas.keySet())
         {
             CAInfo caInfo = cas.get(caName);
@@ -2287,6 +2305,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
             String crlControl)
     throws CAMgmtException
     {
+        asssertMasterMode();
         StringBuilder sqlBuilder = new StringBuilder();
         sqlBuilder.append("UPDATE CRLSIGNER SET ");
 
@@ -2390,6 +2409,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
     public void addPublisher(PublisherEntry dbEntry)
     throws CAMgmtException
     {
+        asssertMasterMode();
         String name = dbEntry.getName();
         if(publishers.containsKey(name))
         {
@@ -2456,6 +2476,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
     public void removePublisher(String publisherName)
     throws CAMgmtException
     {
+        asssertMasterMode();
         for(String caName : ca_has_publishers.keySet())
         {
             removePublisherFromCA(publisherName, caName);
@@ -2482,6 +2503,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
     public void changePublisher(String name, String type, String conf)
     throws CAMgmtException
     {
+        asssertMasterMode();
         StringBuilder sqlBuilder = new StringBuilder();
         sqlBuilder.append("UPDATE PUBLISHER SET ");
 
@@ -2534,6 +2556,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
     public void setCmpControl(CmpControl dbEntry)
     throws CAMgmtException
     {
+        asssertMasterMode();
         if(cmpControl != null)
         {
             removeCmpControl();
@@ -2571,6 +2594,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
     public void removeCmpControl()
     throws CAMgmtException
     {
+        asssertMasterMode();
         Statement stmt = null;
         try
         {
@@ -2593,6 +2617,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
             Integer confirmWaitTime, Boolean sendCaCert, Boolean sendResponderCert)
     throws CAMgmtException
     {
+        asssertMasterMode();
         if(requireConfirmCert == null && requireMessageTime == null && messageTimeBias == null
                 && confirmWaitTime == null && sendCaCert == null && sendResponderCert == null)
         {
@@ -2678,6 +2703,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
     public void addEnvParam(String name, String value)
     throws CAMgmtException
     {
+        asssertMasterMode();
         if(envParameterResolver.getEnvParam(name) != null)
         {
             throw new CAMgmtException("Environemt parameter named " + name + " exists");
@@ -2705,6 +2731,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
     public void removeEnvParam(String envParamName)
     throws CAMgmtException
     {
+        asssertMasterMode();
         PreparedStatement ps = null;
         try
         {
@@ -2726,6 +2753,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
     public void changeEnvParam(String name, String value)
     throws CAMgmtException
     {
+        asssertMasterMode();
         ParamChecker.assertNotEmpty("name", name);
         assertNotNULL("value", value);
 
@@ -2828,13 +2856,13 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
     public void setCaConfFile(String caConfFile)
     {
         this.caConfFile = caConfFile;
-
     }
 
     @Override
     public void addCaAlias(String aliasName, String caName)
     throws CAMgmtException
     {
+        asssertMasterMode();
         if(caAliases.get(aliasName) != null)
         {
             throw new CAMgmtException("CA alias " + aliasName + " exists");
@@ -2862,6 +2890,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
     public void removeCaAlias(String aliasName)
     throws CAMgmtException
     {
+        asssertMasterMode();
         PreparedStatement ps = null;
         try
         {
@@ -2910,6 +2939,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
     public void removeCA(String caName)
     throws CAMgmtException
     {
+        asssertMasterMode();
         PreparedStatement ps = null;
         try
         {
@@ -2931,6 +2961,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
     public void publishRootCA(String caName, String certprofile)
     throws CAMgmtException
     {
+        asssertMasterMode();
         X509CA ca = x509cas.get(caName);
         if(ca == null)
         {
@@ -3012,6 +3043,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
     public boolean republishCertificates(String caName, List<String> publisherNames)
     throws CAMgmtException
     {
+        asssertMasterMode();
         Set<String> caNames;
         if(caName == null)
         {
@@ -3045,6 +3077,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
     public void revokeCa(String caName, CertRevocationInfo revocationInfo)
     throws CAMgmtException
     {
+        asssertMasterMode();
         ParamChecker.assertNotEmpty("caName", caName);
         ParamChecker.assertNotNull("revocationInfo", revocationInfo);
         if(x509cas.containsKey(caName) == false)
@@ -3118,6 +3151,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
     public void unrevokeCa(String caName)
     throws CAMgmtException
     {
+        asssertMasterMode();
         ParamChecker.assertNotEmpty("caName", caName);
         if(x509cas.containsKey(caName) == false)
         {
@@ -3198,6 +3232,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
     public boolean clearPublishQueue(String caName, List<String> publisherNames)
     throws CAMgmtException
     {
+        asssertMasterMode();
         if(caName == null)
         {
             try
@@ -3315,6 +3350,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
     public boolean removeCertificate(String caName, BigInteger serialNumber)
     throws CAMgmtException
     {
+        asssertMasterMode();
         X509CA ca = getX509CA(caName);
         try
         {
@@ -3420,6 +3456,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
             int numCrls, int expirationPeriod, ValidityMode validityMode)
     throws CAMgmtException
     {
+        asssertMasterMode();
         if(nextSerial < 0)
         {
             System.err.println("invalid serial number: " + nextSerial);
@@ -3551,4 +3588,12 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
         return index.getAndIncrement();
     }
 
+    private void asssertMasterMode()
+    throws CAMgmtException
+    {
+        if(masterMode == false)
+        {
+            throw new CAMgmtException("Operation not allowed in slave mode");
+        }
+    }
 }

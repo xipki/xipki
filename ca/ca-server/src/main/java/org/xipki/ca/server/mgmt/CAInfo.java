@@ -16,6 +16,8 @@ import java.util.Set;
 
 import org.bouncycastle.asn1.cmp.CMPCertificate;
 import org.bouncycastle.asn1.x509.Certificate;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xipki.ca.api.OperationException;
 import org.xipki.ca.api.OperationException.ErrorCode;
 import org.xipki.ca.common.CAStatus;
@@ -25,8 +27,10 @@ import org.xipki.ca.server.mgmt.api.CAEntry;
 import org.xipki.ca.server.mgmt.api.DuplicationMode;
 import org.xipki.ca.server.mgmt.api.Permission;
 import org.xipki.ca.server.mgmt.api.ValidityMode;
+import org.xipki.ca.server.store.CertificateStore;
 import org.xipki.security.common.CertRevocationInfo;
 import org.xipki.security.common.ParamChecker;
+import org.xipki.security.common.RandomSerialNumberGenerator;
 
 /**
  * @author Lijun Liao
@@ -34,6 +38,8 @@ import org.xipki.security.common.ParamChecker;
 
 public class CAInfo
 {
+    private final static Logger LOG = LoggerFactory.getLogger(CAInfo.class);
+
     private static long MS_PER_DAY = 24L * 60 * 60 * 1000;
 
     private final CAEntry caEntry;
@@ -43,23 +49,29 @@ public class CAInfo
     private Date notBefore;
     private Date notAfter;
     private boolean selfSigned;
+    private boolean masterMode;
     private CMPCertificate certInCMPFormat;
     private PublicCAInfo publicCAInfo;
-    private long lastCommittedNextSerial;
     private X509CertificateWithMetaInfo cert;
 
-    public CAInfo(CAEntry caEntry)
+    private CertificateStore certStore;
+    private boolean useRandomSerialNumber;
+    private RandomSerialNumberGenerator randomSNGenerator;
+
+    public CAInfo(CAEntry caEntry, CertificateStore certStore, boolean masterMode)
     throws OperationException
     {
         ParamChecker.assertNotNull("caEntry", caEntry);
+        ParamChecker.assertNotNull("certStore", certStore);
         this.caEntry = caEntry;
+        this.certStore = certStore;
 
         X509Certificate cert = caEntry.getCertificate();
         this.notBefore = cert.getNotBefore();
         this.notAfter = cert.getNotAfter();
         this.serialNumber = cert.getSerialNumber();
         this.selfSigned = cert.getIssuerX500Principal().equals(cert.getSubjectX500Principal());
-        this.lastCommittedNextSerial = caEntry.getNextSerial();
+        this.masterMode = masterMode;
 
         Certificate bcCert;
         try
@@ -77,16 +89,50 @@ public class CAInfo
                 caEntry.getOcspUris(), caEntry.getCrlUris(), caEntry.getCaIssuerLocations(), caEntry.getDeltaCrlUris());
 
         this.noNewCertificateAfter = this.notAfter.getTime() - MS_PER_DAY * caEntry.getExpirationPeriod();
+
+        this.useRandomSerialNumber = caEntry.getNextSerial() < 1;
+        if(this.useRandomSerialNumber)
+        {
+            randomSNGenerator = RandomSerialNumberGenerator.getInstance();
+            return;
+        }
+
+        Long greatestSerialNumber = certStore.getGreatestSerialNumber(this.cert);
+
+        if(greatestSerialNumber == null)
+        {
+            throw new OperationException(ErrorCode.System_Failure,
+                    "Could not retrieve the greatest serial number for ca " + caEntry.getName());
+        }
+
+        long nextSerial = greatestSerialNumber + 1;
+        if(caEntry.getNextSerial() < nextSerial)
+        {
+            LOG.info("Corrected the next_serial of {} from {} to {}",
+                    new Object[]{caEntry.getName(), caEntry.getNextSerial(), nextSerial});
+            caEntry.setNextSerial(nextSerial);
+            certStore.commitNextSerialIfLess(getName(), nextSerial);
+        }
+        else
+        {
+            nextSerial = caEntry.getNextSerial();
+        }
+
+        if(masterMode)
+        {
+            certStore.createSerialNumberGenerator(getName(), nextSerial);
+        }
     }
 
-    public long getLastCommittedNextSerial()
+    public void commitNextSerial()
+    throws OperationException
     {
-        return lastCommittedNextSerial;
-    }
-
-    public void setLastCommittedNextSerial(long lastCommittedNextSerial)
-    {
-        this.lastCommittedNextSerial = lastCommittedNextSerial;
+        if(useRandomSerialNumber)
+        {
+            return;
+        }
+        long nextSerial = caEntry.getNextSerial();
+        certStore.commitNextSerialIfLess(caEntry.getName(), nextSerial);
     }
 
     public PublicCAInfo getPublicCAInfo()
@@ -137,16 +183,6 @@ public class CAInfo
     public String getName()
     {
         return caEntry.getName();
-    }
-
-    public long getNextSerial()
-    {
-        return caEntry.getNextSerial();
-    }
-
-    public void setNextSerial(long nextSerial)
-    {
-        caEntry.setNextSerial(nextSerial);
     }
 
     public List<String> getCrlUris()
@@ -318,5 +354,28 @@ public class CAInfo
     public void setLastCRLIntervalDate(long lastIntervalDate)
     {
         caEntry.setLastCRLIntervalDate(lastIntervalDate);
+    }
+
+    public BigInteger nextSerial()
+    throws OperationException
+    {
+        if(useRandomSerialNumber)
+        {
+            return randomSNGenerator.getSerialNumber();
+        }
+
+        long serial = certStore.nextSerial(caEntry.getName());
+        caEntry.setNextSerial(serial + 1);
+        return BigInteger.valueOf(serial);
+    }
+
+    public boolean useRandomSerialNumber()
+    {
+        return useRandomSerialNumber;
+    }
+
+    public boolean isMasterMode()
+    {
+        return masterMode;
     }
 }
