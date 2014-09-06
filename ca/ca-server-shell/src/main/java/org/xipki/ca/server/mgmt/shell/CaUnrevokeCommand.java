@@ -24,7 +24,7 @@ public class CaUnrevokeCommand extends CaCommand
     protected Object doExecute()
     throws Exception
     {
-        if(caManager.getCANames().contains(caName) == false)
+        if(caManager.getCaNames().contains(caName) == false)
         {
             err("invalid CA name " + caName);
             return null;

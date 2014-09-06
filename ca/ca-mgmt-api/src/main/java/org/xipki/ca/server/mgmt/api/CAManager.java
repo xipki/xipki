@@ -65,7 +65,7 @@ public interface CAManager
 
     Set<String> getCrlSignerNames();
 
-    Set<String> getCANames();
+    Set<String> getCaNames();
 
     void addCA(CAEntry newCaDbEntry)
     throws CAMgmtException;
