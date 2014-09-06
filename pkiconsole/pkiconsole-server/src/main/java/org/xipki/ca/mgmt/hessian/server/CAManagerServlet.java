@@ -7,15 +7,26 @@
 
 package org.xipki.ca.mgmt.hessian.server;
 
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.math.BigInteger;
+import java.security.KeyStore;
+import java.security.cert.Certificate;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.Date;
+import java.util.Enumeration;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import javax.servlet.ServletException;
+import javax.servlet.ServletRequest;
+import javax.servlet.ServletResponse;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xipki.ca.common.CAMgmtException;
 import org.xipki.ca.common.CAStatus;
 import org.xipki.ca.common.CASystemStatus;
@@ -33,9 +44,11 @@ import org.xipki.ca.server.mgmt.api.DuplicationMode;
 import org.xipki.ca.server.mgmt.api.Permission;
 import org.xipki.ca.server.mgmt.api.PublisherEntry;
 import org.xipki.ca.server.mgmt.api.ValidityMode;
+import org.xipki.security.api.SecurityFactory;
 import org.xipki.security.common.CRLReason;
 import org.xipki.security.common.CertRevocationInfo;
 import org.xipki.security.common.IoCertUtil;
+import org.xipki.security.common.LogUtil;
 
 import com.caucho.hessian.server.HessianServlet;
 
@@ -46,9 +59,17 @@ import com.caucho.hessian.server.HessianServlet;
 public class CAManagerServlet extends HessianServlet
 implements HessianCAManager
 {
+    private static final Logger LOG = LoggerFactory.getLogger(CAManagerServlet.class);
+
     private static final long serialVersionUID = 1L;
 
     private CAManager caManager;
+    private String truststoreFile;
+    private String truststoreProvider;
+    private String truststoreType = "PKCS12";
+    private String truststorePassword;
+    private SecurityFactory securityFactory;
+    private Set<X509Certificate> trustedUserCerts = new HashSet<>();
 
     public CAManagerServlet()
     {
@@ -803,6 +824,134 @@ implements HessianCAManager
             return "1";
         }
         return null;
+    }
+
+    @Override
+    public void service(ServletRequest request, ServletResponse response)
+    throws IOException, ServletException
+    {
+        X509Certificate[] certs = (X509Certificate[]) request.getAttribute("javax.servlet.request.X509Certificate");
+        X509Certificate clientCert = (certs == null || certs.length < 1)? null : certs[0];
+
+        if(clientCert == null)
+        {
+            String msg = "not authorizated (not in TLS session)";
+            LOG.info(msg);
+            throw new ServletException(msg);
+        }
+
+        if(trustedUserCerts.contains(clientCert) == false)
+        {
+            String msg = "untrusted TLS client certificate ";
+            if(LOG.isInfoEnabled())
+            {
+                LOG.info(msg + "with subject={}, issuer={} and serialNumber={}",
+                        new Object[]{clientCert.getSubjectX500Principal().getName(),
+                        clientCert.getIssuerX500Principal().getName(),
+                        clientCert.getSerialNumber()});
+            }
+            throw new ServletException(msg);
+        }
+
+        super.service(request, response);
+    }
+
+    public void initialize()
+    {
+        if(truststoreFile == null)
+        {
+            LOG.error("truststoreFile is not set");
+            return;
+        }
+
+        if(truststorePassword == null)
+        {
+            LOG.error("truststorePassword is not set");
+            return;
+        }
+
+        try
+        {
+            String storePath = IoCertUtil.expandFilepath(truststoreFile);
+
+            KeyStore keyStore;
+            if(truststoreProvider == null || truststoreProvider.trim().length() == 0)
+            {
+                keyStore = KeyStore.getInstance(truststoreType);
+            }
+            else
+            {
+                keyStore = KeyStore.getInstance(truststoreType, truststoreProvider);
+            }
+
+            char[] password;
+            if(securityFactory.getPasswordResolver() == null)
+            {
+                password = truststorePassword.toCharArray();
+            }
+            else
+            {
+                password = securityFactory.getPasswordResolver().resolvePassword(truststorePassword);
+            }
+            keyStore.load(new FileInputStream(storePath), password);
+            Enumeration<String> aliases = keyStore.aliases();
+
+            while(aliases.hasMoreElements())
+            {
+                String alias = aliases.nextElement();
+                Certificate cert = keyStore.getCertificate(alias);
+                if(cert instanceof X509Certificate)
+                {
+                    X509Certificate x509Cert = (X509Certificate) cert;
+                    trustedUserCerts.add(x509Cert);
+                    if(LOG.isInfoEnabled())
+                    {
+                        LOG.info("added trusted user certificate with subject={}, issuer={} and serialNumber={}",
+                                new Object[]{x509Cert.getSubjectX500Principal().getName(),
+                                        x509Cert.getIssuerX500Principal().getName(),
+                                        x509Cert.getSerialNumber()});
+                    }
+                }
+            }
+        }catch(Exception e)
+        {
+            final String message = "Could not initialize CAManagerServlet";
+            if(LOG.isErrorEnabled())
+            {
+                LOG.error(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(), e.getMessage());
+            }
+            LOG.debug(message, e);
+        }
+    }
+
+    public void shutdown()
+    {
+        trustedUserCerts.clear();
+    }
+
+    public void setTruststoreFile(String truststoreFile)
+    {
+        this.truststoreFile = truststoreFile;
+    }
+
+    public void setTruststoreType(String truststoreType)
+    {
+        this.truststoreType = truststoreType;
+    }
+
+    public void setTruststoreProvider(String truststoreProvider)
+    {
+        this.truststoreProvider = truststoreProvider;
+    }
+
+    public void setTruststorePassword(String truststorePassword)
+    {
+        this.truststorePassword = truststorePassword;
+    }
+
+    public void setSecurityFactory(SecurityFactory securityFactory)
+    {
+        this.securityFactory = securityFactory;
     }
 
 }

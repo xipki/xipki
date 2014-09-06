@@ -19,6 +19,11 @@
       <version>${project.version}</version>
     </dependency>
     <dependency>
+      <groupId>org.xipki</groupId>
+      <artifactId>security-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>    
+    <dependency>
      <groupId>com.caucho</groupId>
      <artifactId>hessian</artifactId>
      <version>${hessian.version}</version>
