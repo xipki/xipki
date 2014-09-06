@@ -435,6 +435,11 @@ class CaCertStoreDbImporter extends DbPorter
                     }
 
                     byte[] octetString = c.getExtensionValue(Extension.cRLNumber.getId());
+                    if(octetString == null)
+                    {
+                        LOG.warn("CRL without CRL number, ignore it");
+                        continue;
+                    }
                     byte[] extnValue = DEROctetString.getInstance(octetString).getOctets();
                     BigInteger crlNumber = ASN1Integer.getInstance(extnValue).getPositiveValue();
 
