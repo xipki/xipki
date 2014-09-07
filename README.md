@@ -129,9 +129,9 @@ Run Demo
 
 * Initialize the databases
 
-    In folder $XIPKI_HOME/sql
+    In folder $XIPKI_HOME
     ```sh
-    ./reset.sh
+    sql/reset.sh
     ```
 * Delete folders $XIPKI_HOME/data and $XIPKI_HOME/output
 
@@ -196,7 +196,7 @@ Run Demo
       ```sh
       ca-demo/hsm-ec-demo.script
       ```
-     * For EC key in PKCS#11 device
+     * For DSA key in PKCS#11 device
      
       ```sh
       ca-demo/hsm-dsa-demo.script
