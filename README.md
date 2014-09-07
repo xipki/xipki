@@ -24,10 +24,10 @@ eXtensible sImple Public Key Infrastructure consists of CA and OCSP responder.
  - Multiple software instances (all can be in active mode) for the same CA
  - Support of databases Oracle, DB2, PostgreSQL, MySQL, H2
  - Embedded support of management of CA via embedded OSGi commands
- - API to specifiy CA management, e.g. GUI
+ - API to specify CA management, e.g. GUI
  - Embedded database tool (export and import CA database) simplifies the switch of databases, upgrade of XiPKi and switch from other CA system to XiPKI CA
  - Embedded client to enroll, revoke, unrevoke and remove certificates, to generate and download CRLs
- - All configuration of CA except those of databases are saved in database
+ - All configuration of CA except those of databases is saved in database
 
 - OCSP Responder
   - OCSP Responder (RFC 2560 and RFC 6960)
@@ -55,7 +55,7 @@ eXtensible sImple Public Key Infrastructure consists of CA and OCSP responder.
   - High performance
   - Java based, OS independent
   - OSGi-based
-  - Health check embedded
+  - Support of health check
   - Audit with syslog and slf4j
 
 - For CA, OCSP Responder and Key Tool
