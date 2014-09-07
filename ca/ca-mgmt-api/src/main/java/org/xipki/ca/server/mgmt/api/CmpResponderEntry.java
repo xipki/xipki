@@ -71,7 +71,20 @@ public class CmpResponderEntry implements Serializable
         StringBuilder sb = new StringBuilder();
         sb.append("name: ").append(name).append('\n');
         sb.append("type: ").append(type).append('\n');
-        sb.append("conf: ").append(conf).append('\n');
+        sb.append("conf: ");
+        if(conf == null)
+        {
+            sb.append("null");
+        }
+        else if(verbose || conf.length() < 101)
+        {
+            sb.append(conf);
+        }
+        else
+        {
+            sb.append(conf.substring(0, 97)).append("...");
+        }
+        sb.append('\n');
         sb.append("cert: ").append("\n");
         if(cert != null)
         {

@@ -84,7 +84,20 @@ public class CrlSignerEntry implements Serializable
         StringBuilder sb = new StringBuilder();
         sb.append("name: ").append(name).append('\n');
         sb.append("signerType: ").append(signerType).append('\n');
-        sb.append("signerConf: ").append(signerConf).append('\n');
+        sb.append("signerConf: ");
+        if(signerConf == null)
+        {
+            sb.append("null");
+        }
+        else if(verbose || signerConf.length() < 101)
+        {
+            sb.append(signerConf);
+        }
+        else
+        {
+            sb.append(signerConf.substring(0, 97)).append("...");
+        }
+        sb.append('\n');
         sb.append("crlControl: ").append(crlControl).append("\n");
         if(cert != null)
         {
