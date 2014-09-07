@@ -34,6 +34,12 @@ eXtensible sImple Public Key Infrastructure consists of CA and OCSP responder.
   - Multiple software instances (all can be in active mode) for the same OCSP signer and certifcate status sources.
   - Support of most popular databases, e.g. Oracle, DB2, PostgreSQL, MySQL, H2
  
+- Key Tool (for both PKCS#12 and PKCS#11 tokens)
+  - Generation of keypairs and self-signed certificates of RSA, EC and DSA to token
+  - Deletation of keypairs and certificates from token
+  - Update of certificates in token
+  - Generation of PKCS#10 request
+  - Export certificate from token
 
 - For both CA and OCSP Responder
   - Support of PKCS#12 and JKS keystore
@@ -45,7 +51,12 @@ eXtensible sImple Public Key Infrastructure consists of CA and OCSP responder.
   - Health check embedded
   - Audit with syslog and slf4j
 
-  
+- For CA, OCSP Responder and Key Tool
+  - API to resolve password
+  - Embedded support of PBE (password based encryption) password resolver
+     - All passwords are encrypted by the master password
+  - Embedded support of OBF (the same one as in jetty) password resolver
+
 Version
 ----
 
