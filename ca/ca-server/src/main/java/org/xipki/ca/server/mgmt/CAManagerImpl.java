@@ -115,7 +115,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
     private CmpResponderEntry responder;
 
     private boolean caLockedByMe = false;
-    private boolean masterMode = true;
+    private boolean masterMode = false;
 
     private Map<String, DataSourceWrapper> dataSources = null;
 
@@ -2941,6 +2941,8 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
     {
         asssertMasterMode();
         PreparedStatement ps = null;
+
+        CAMgmtException exception = null;
         try
         {
             ps = prepareStatement("DELETE FROM CA WHERE NAME=?");
@@ -2948,13 +2950,40 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
             ps.executeUpdate();
         }catch(SQLException e)
         {
-            throw new CAMgmtException(e);
+            exception = new CAMgmtException(e);
         }finally
         {
             dataSource.releaseResources(ps, null);
         }
 
+        // drop the serial number sequence
+        switch(dataSource.getDatabaseType())
+        {
+            case DB2:
+            case H2:
+            case ORACLE:
+            case POSTGRESQL:
+                String sql = "DROP SEQUENCE SERIAL_" + caName;
+                try
+                {
+                    createStatement().executeUpdate(sql);
+                } catch (SQLException e)
+                {
+                } finally
+                {
+                    dataSource.releaseResources(ps, null);
+                }
+                break;
+            default:
+                break;
+        }
+
         cas.remove(caName);
+
+        if(exception != null)
+        {
+            throw exception;
+        }
     }
 
     @Override
