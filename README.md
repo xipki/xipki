@@ -8,6 +8,7 @@ eXtensible sImple Public Key Infrastructure consists of CA and OCSP responder.
   - X.509 CRL v2 (RFC5280)
   - Direct and indirect CRL
   - FullCRL and DeltaCRL
+  - Customized extension to embed certificates in CRL
   - CMP (RFC 4210 and RFC 4211)
   - API to specify customized certificate profiles
   - Embedded support of XML-based certificate profile
@@ -18,12 +19,16 @@ eXtensible sImple Public Key Infrastructure consists of CA and OCSP responder.
     - SHA1withRSAandMGF1, SHA224withRSAandMGF1, SHA256withRSAandMGF1, SHA384withRSAandMGF1, SHA512withRSAandMGF1
     - SHA1withECDSA, SHA224withECDSA, SHA256withECDSA, SHA384withECDSA, SHA512withECDSA
     - SHA1withDSA, SHA224withDSA, SHA256withDSA, SHA384withDSA, SHA512withDSA
+ - Support of both random and sequential certificate serial number assignment
  - Management of multiple CAs in one software instance
  - Multiple software instances (all can be in active mode) for the same CA
  - Support of databases Oracle, DB2, PostgreSQL, MySQL, H2
  - Embedded support of management of CA via embedded OSGi commands
  - API to specifiy CA management, e.g. GUI
- 
+ - Embedded database tool (export and import CA database) simplifies the switch of databases, upgrade of XiPKi and switch from other CA system to XiPKI CA
+ - Embedded client to enroll, revoke, unrevoke and remove certificates, to generate and download CRLs
+ - All configuration of CA except those of databases are saved in database
+
 - OCSP Responder
   - OCSP Responder (RFC 2560 and RFC 6960)
   - Support of Common PKI 2.0
@@ -33,7 +38,9 @@ eXtensible sImple Public Key Infrastructure consists of CA and OCSP responder.
   - Support of both unsigned and signed OCSP requests
   - Multiple software instances (all can be in active mode) for the same OCSP signer and certifcate status sources.
   - Support of most popular databases, e.g. Oracle, DB2, PostgreSQL, MySQL, H2
- 
+  - Embedded database tool (export and import OCSP database) simplifies the switch of databases, upgrade of XiPKi and switch from other OCSP system to XiPKI OCSP.
+  - Embedded client to send OCSP request
+
 - Key Tool (for both PKCS#12 and PKCS#11 tokens)
   - Generation of keypairs and self-signed certificates of RSA, EC and DSA to token
   - Deletation of keypairs and certificates from token
@@ -54,8 +61,8 @@ eXtensible sImple Public Key Infrastructure consists of CA and OCSP responder.
 - For CA, OCSP Responder and Key Tool
   - API to resolve password
   - Embedded support of PBE (password based encryption) password resolver
-     - All passwords are encrypted by the master password
-  - Embedded support of OBF (the same one as in jetty) password resolver
+     - All passwords can be encrypted by the master password
+  - Embedded support of OBF (as in jetty) password resolver
 
 Version
 ----
@@ -144,6 +151,12 @@ Run Demo
     ```sh
     sql/reset.sh
     ```
+* Initialize the PKCS#11 configuration
+
+    ```sh
+    etc/pkcs11-conf.xml
+    ```
+
 * Delete folders $XIPKI_HOME/data and $XIPKI_HOME/output
 
 * Start XiPKI
