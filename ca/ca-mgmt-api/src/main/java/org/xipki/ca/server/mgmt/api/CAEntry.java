@@ -227,7 +227,20 @@ public class CAEntry implements Serializable
         sb.append("max_validity: ").append(maxValidity).append(" days\n");
         sb.append("expirationPeriod: ").append(expirationPeriod).append(" days\n");
         sb.append("signer_type: ").append(signerType).append('\n');
-        sb.append("signer_conf: ").append(signerConf).append('\n');
+        sb.append("signer_conf: ");
+        if(signerConf == null)
+        {
+            sb.append("null");
+        }
+        else if(verbose || signerConf.length() < 101)
+        {
+            sb.append(signerConf);
+        }
+        else
+        {
+            sb.append(signerConf.substring(0, 97)).append("...");
+        }
+        sb.append('\n');
         sb.append("cert: ").append("\n");
         sb.append("\tissuer: ").append(
                 IoCertUtil.canonicalizeName(cert.getIssuerX500Principal())).append("\n");
