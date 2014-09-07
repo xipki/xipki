@@ -1,23 +1,50 @@
 XiPKI
 =========
+eXtensible sImple Public Key Infrastructure consists of CA and OCSP responder.
 
-eXtensible sImple Public Key Infrastructure
+- CA (Certificate Authority)
 
-  - Certificate Authority (RFC 5280)
-  - OCSP Responder (RFC 2560 and RFC 6960)
+  - X.509 Certificate v3 (RFC5280)
+  - X.509 CRL v2 (RFC5280)
+  - Direct and indirect CRL
+  - FullCRL and DeltaCRL
   - CMP (RFC 4210 and RFC 4211)
-  - Support of direct and inderect CRL
+  - API to specify customized certificate profiles
+  - Embedded support of XML-based certificate profile
+  - API to specify customized publisher, e.g. for LDAP and OCSP responder
+  - Embedded support of publisher for OCSP responder
+  - Signature algorithms of certificates
+    - SHA1withRSA, SHA224withRSA, SHA256withRSA, SHA384withRSA, SHA512withRSA
+    - SHA1withRSAandMGF1, SHA224withRSAandMGF1, SHA256withRSAandMGF1, SHA384withRSAandMGF1, SHA512withRSAandMGF1
+    - SHA1withECDSA, SHA224withECDSA, SHA256withECDSA, SHA384withECDSA, SHA512withECDSA
+    - SHA1withDSA, SHA224withDSA, SHA256withDSA, SHA384withDSA, SHA512withDSA
+ - Management of multiple CAs in one software instance
+ - Multiple software instances (all can be in active mode) for the same CA
+ - Support of databases Oracle, DB2, PostgreSQL, MySQL, H2
+ - Embedded support of management of CA via embedded OSGi commands
+ - API to specifiy CA management, e.g. GUI
+ 
+- OCSP Responder
+  - OCSP Responder (RFC 2560 and RFC 6960)
+  - Support of Common PKI 2.0
+  - Management of multiple certificate status sources
+  - Embedded support of certificate status source published by XiPKI CA
+  - Embedded support of certificate status source CRL and DeltaCRL
+  - Support of both unsigned and signed OCSP requests
+  - Multiple software instances (all can be in active mode) for the same OCSP signer and certifcate status sources.
+  - Support of most popular databases, e.g. Oracle, DB2, PostgreSQL, MySQL, H2
+ 
+
+- For both CA and OCSP Responder
   - Support of PKCS#12 and JKS keystore
   - Support of PKCS#11 devices, e.g. HSM
   - API to use customized key types, e.g. smartcard
-  - API to specify customized certificate profiles
-  - API to specify customized publisher, e.g. for LDAP and OCSP responder
-  - Support of most popular databases
   - High performance
   - Java based, OS independent
   - OSGi-based
   - Health check embedded
   - Audit with syslog and slf4j
+
   
 Version
 ----
@@ -35,7 +62,7 @@ Dr. Lijun Liao (lijun.liao -A-T- gmail -D-O-T- com)
 
 Prerequisite
 ------------
-* JRE / JDK 1.7+
+* JRE / JDK 1.7 and 1.8
 * For OpenJDK: none
 * For Oracle JRE / JDK: JCE Unlimited Strength Jurisdiction Policy Files
 *    (see http://www.oracle.com/technetwork/java/javase/downloads/index.html)
@@ -94,7 +121,7 @@ Install
 
     ```sh
     $XIPKI_HOME/ca-config/ca-db.properties
-    $XIPKI_HOME/ocsp-config/ocsp-publisher.properties
+    $XIPKI_HOME/ocsp-config/ocsp-db.properties
     ```
 
 Run Demo
@@ -127,10 +154,12 @@ Run Demo
     Generate keypair with self-signed certificate in PKCS#11 device in karaf terminal
     ```sh
     features:install xipki-security-shell
-    # RSA key, the default labels for demo are RCA1, SubCA1 and SubCAwithCRL1, and the default slot is 1
-    keytool:rsa -slot <slot index> -key-label <label> [-pwd <password>]
-    # EC key, the default labels for demo are RCA1-EC, SubCA1-EC and SubCAwithCRL1-EC, and the default slot is 1
-    keytool:ec  -slot <slot index> -key-label <label> -curve secp256r1 [-pwd <password>]
+    # RSA key, the default labels for demo are RCA1, SubCA1 and SubCAwithCRL1, and the default slot index is 1
+    keytool:rsa -slot <slot index> -key-label <label>
+    # EC key, the default labels for demo are RCA1-EC, SubCA1-EC and SubCAwithCRL1-EC, and the default slot index is 1
+    keytool:ec  -slot <slot index> -key-label <label> -curve secp256r1
+    # DSA key, the default labels for demo are RCA1-DSA, SubCA1-DSA and SubCAwithCRL1-DSA, and the default slot index is 1
+    keytool:dsa  -slot <slot index> -key-label <label>
     ```
 * Run the pre-configured OSGi-commands in karaf terminal
   
@@ -150,6 +179,12 @@ Run Demo
       ca-demo/ec-demo.script
       ```
        
+     * For DSA key in PKCS#12 file
+     
+      ```sh
+      ca-demo/dsa-demo.script
+      ```
+       
      * For RSA key in PKCS#11 device
      
       ```sh
@@ -160,6 +195,11 @@ Run Demo
      
       ```sh
       ca-demo/hsm-ec-demo.script
+      ```
+     * For EC key in PKCS#11 device
+     
+      ```sh
+      ca-demo/hsm-dsa-demo.script
       ```
     The generated keys, certificates, CRLs are saved in folder $XIPKI_HOME/output
   
