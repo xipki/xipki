@@ -66,23 +66,15 @@ SET PATH = %PATH% %NATIVE_LIB%
 
 rem SET KARAF_OPTS=%KARAF_OPTS% -DNSSLIB=point\to\firefox
 SET KARAF_OPTS=%KARAF_OPTS% -Djava.library.path=%NATIVE_LIB%
-rem SET KARAF_OPTS=%KARAF_OPTS% -Dorg.xipki.signservice.timeout=10000
 SET KARAF_OPTS=%KARAF_OPTS% -Dorg.xipki.console.passwordui=console
 rem SET KARAF_OPTS=%KARAF_OPTS% -Dorg.xipki.console.passwordui=gui
-SET KARAF_OPTS="%KARAF_OPTS% -Dhttps.protocols=TLSv1.2,TLSv1.1,TLSv1
-SET KARAF_OPTS="%KARAF_OPTS% -Djavax.net.ssl.trustStore=etc\tlskeys\tls-client-truststore.jks
-SET KARAF_OPTS="%KARAF_OPTS% -Djavax.net.ssl.trustStorePassword=1234
-SET KARAF_OPTS="%KARAF_OPTS% -Djavax.net.ssl.keyStore=etc\tlskeys\tls-client-keystore.jks
-SET KARAF_OPTS="%KARAF_OPTS% -Djavax.net.ssl.keyStorePassword=1234
-SET KARAF_OPTS="%KARAF_OPTS% -Dsun.net.http.errorstream.enableBuffering=true
-SET KARAF_OPTS="%KARAF_OPTS% -Dsun.net.client.defaultConnectTimeout=60000
-SET KARAF_OPTS="%KARAF_OPTS% -Dsun.net.client.defaultReadTimeout=60000
-rem SET KARAF_OPTS="%KARAF_OPTS% -Djavax.net.debug=all
+SET KARAF_OPTS=%KARAF_OPTS% -Dsun.net.http.errorstream.enableBuffering=true
+rem SET KARAF_OPTS=%KARAF_OPTS% -Djavax.net.debug=all
 
 # PORTS configuration
-SET KARAF_OPTS=%KARAF_OPTS% -Dmy.https.port=8443
-SET KARAF_OPTS=%KARAF_OPTS% -Dmy.http.port=8080
-SET KARAF_OPTS=%KARAF_OPTS% -Dmy.rmiServerPort=44444
-SET KARAF_OPTS=%KARAF_OPTS% -Dmy.rmiRegistryPort=1099
-SET KARAF_OPTS=%KARAF_OPTS% -Dmy.ssh.port=8101
+SET KARAF_OPTS=%KARAF_OPTS% -Dmy.https.port=9443
+SET KARAF_OPTS=%KARAF_OPTS% -Dmy.http.port=9090
+SET KARAF_OPTS=%KARAF_OPTS% -Dmy.rmiServerPort=44445
+SET KARAF_OPTS=%KARAF_OPTS% -Dmy.rmiRegistryPort=2099
+SET KARAF_OPTS=%KARAF_OPTS% -Dmy.ssh.port=9101
 SET KARAF_OPTS=%KARAF_OPTS% -Dorg.xipki.console.ignore.regex=\..*
