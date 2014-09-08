@@ -577,18 +577,10 @@ public class CAManagerClient implements CAManager
             int numCrls, int expirationPeriod, ValidityMode validityMode)
     throws CAMgmtException
     {
-        byte[] encodedCert = client.generateSelfSignedCA(name, certprofileName, subject, status,
+        return client.generateSelfSignedCA(name, certprofileName, subject, status,
                 nextSerial, crl_uris, delta_crl_uris, ocsp_uris, max_validity,
                 signer_type, signer_conf, crlsigner_name, duplicate_key, duplicate_subject,
                 permissions, numCrls, expirationPeriod, validityMode);
-
-        try
-        {
-            return IoCertUtil.parseCert(encodedCert);
-        } catch (CertificateException | IOException e)
-        {
-            throw new CAMgmtException("Could not parse the certificate: " + e.getMessage(), e);
-        }
     }
 
     public static void main(String[] args)

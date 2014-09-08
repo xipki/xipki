@@ -8,6 +8,7 @@
 package org.xipki.ca.mgmt.hessian.common;
 
 import java.math.BigInteger;
+import java.security.cert.X509Certificate;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
@@ -216,7 +217,7 @@ public interface HessianCAManager
     byte[] generateCertificate(String caName, String profileName, String user, byte[] encodedPkcs10Request)
     throws HessianCAMgmtException;
 
-    public byte[] generateSelfSignedCA(
+    public X509Certificate generateSelfSignedCA(
             String name, String certprofileName, String subject,
             CAStatus status, long nextSerial,
             List<String> crl_uris, List<String> delta_crl_uris, List<String> ocsp_uris,
