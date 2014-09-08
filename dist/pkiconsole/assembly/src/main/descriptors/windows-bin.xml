@@ -1,7 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- 
- Copyright (c) 2014 Lijun Liao
--->
 <assembly>
   <id>windows-bin</id>
   <formats>
@@ -14,6 +11,10 @@
     <fileSet>
       <directory>${project.basedir}/../../demo-tlskeys</directory>
       <outputDirectory>/etc/tlskeys</outputDirectory>
+      <includes>
+      	<include>tls-client-keystore.jks</include>
+      	<include>tls-client-truststore.jks</include>
+      </includes>
       <fileMode>0644</fileMode>
       <directoryMode>0755</directoryMode>
     </fileSet>
@@ -21,7 +22,7 @@
         Copy over jar files for the lib dir
     -->
     <fileSet>
-      <directory>${project.build.directory}/windows-dependencies</directory>
+      <directory>${project.build.directory}/dependencies</directory>
       <includes>
         <include>*-branding.jar</include>
       </includes>
@@ -40,11 +41,11 @@
     <!-- Copy over everything unfiltered ressources -->
     <fileSet>
       <directory>${project.basedir}/src/main/unfiltered</directory>
+      <outputDirectory>/</outputDirectory>
       <excludes>
         <exclude>**/*.sh</exclude>
         <exclude>bin/setenv</exclude>
       </excludes>
-      <outputDirectory>/</outputDirectory>
       <filtered>false</filtered>
       <fileMode>0644</fileMode>
       <directoryMode>0755</directoryMode>
@@ -55,41 +56,10 @@
       <fileMode>0644</fileMode>
       <directoryMode>0755</directoryMode>
     </fileSet>
-    <!-- JDBC drivers -->
-    <fileSet>
-      <directory>${project.build.directory}/jdbc</directory>
-      <outputDirectory>/lib/ext</outputDirectory>
-      <fileMode>0644</fileMode>
-      <directoryMode>0755</directoryMode>
-    </fileSet>
-    <fileSet>
-      <directory>../jdbc</directory>
-      <outputDirectory>/lib/ext</outputDirectory>
-      <fileMode>0644</fileMode>
-      <directoryMode>0755</directoryMode>
-    </fileSet>
     <!-- native libraries -->
     <fileSet>
       <directory>${project.build.directory}/native-lib</directory>
       <outputDirectory>native-lib</outputDirectory>
-      <fileMode>0644</fileMode>
-      <directoryMode>0755</directoryMode>
-    </fileSet>
-    <fileSet>
-      <directory>${project.build.directory}/sql</directory>
-      <excludes>
-        <exclude>liquibase/liquibase</exclude>
-        <exclude>liquibase/javadoc/**</exclude>
-        <exclude>liquibase/sdk/**</exclude>
-      </excludes>
-      <outputDirectory>sql</outputDirectory>
-      <fileMode>0644</fileMode>
-      <directoryMode>0755</directoryMode>
-    </fileSet>
-    <!-- OCSP configuration -->
-    <fileSet>
-      <directory>${project.build.directory}/ocsp-config</directory>
-      <outputDirectory>ocsp-config</outputDirectory>
       <fileMode>0644</fileMode>
       <directoryMode>0755</directoryMode>
     </fileSet>
@@ -104,14 +74,6 @@
       <fileMode>0755</fileMode>
       <directoryMode>0755</directoryMode>
     </fileSet>
-    <!-- Copy XSD schemas -->
-    <fileSet>
-      <directory>${project.build.directory}/xsd</directory>
-      <outputDirectory>/xsd</outputDirectory>
-      <lineEnding>unix</lineEnding>
-      <fileMode>0644</fileMode>
-      <directoryMode>0755</directoryMode>
-    </fileSet>
     <!-- Expanded Karaf -->
     <fileSet>
       <directory>${project.build.directory}/windows-dependencies/apache-karaf-${karaf.version}</directory>
@@ -122,7 +84,6 @@
         -->
         <exclude>**/demos/**</exclude>
         <exclude>deploy/README</exclude>
-        <exclude>README</exclude>
         <exclude>LICENSE</exclude>
         <exclude>NOTICE</exclude>
         <exclude>RELEASE-NOTES</exclude>
@@ -132,41 +93,4 @@
       <directoryMode>0755</directoryMode>
     </fileSet>
   </fileSets>
-  <files>
-    <file>
-      <source>${project.basedir}/src/main/unfiltered/ca-config/example/ca-db.properties-h2</source>
-      <outputDirectory>ca-config</outputDirectory>
-      <destName>ca-db.properties</destName>
-      <fileMode>0644</fileMode>
-      <lineEnding>dos</lineEnding>
-    </file>
-    <file>
-      <source>${project.basedir}/src/main/unfiltered/ocsp-config/example/ocsp-db.properties-h2</source>
-      <outputDirectory>ocsp-config</outputDirectory>
-      <destName>ocsp-db.properties</destName>
-      <fileMode>0644</fileMode>
-      <lineEnding>dos</lineEnding>
-    </file>
-    <file>
-      <source>${project.basedir}/../../../LICENSE</source>
-      <outputDirectory>/</outputDirectory>
-      <destName>LICENSE</destName>
-      <fileMode>0644</fileMode>
-      <lineEnding>dos</lineEnding>
-    </file>
-    <file>
-      <source>${project.basedir}/../../../README.md</source>
-      <outputDirectory>/</outputDirectory>
-      <destName>README.md</destName>
-      <fileMode>0644</fileMode>
-      <lineEnding>dos</lineEnding>
-    </file>
-    <file>
-      <source>${project.build.directory}/windows-dependencies/apache-karaf-${karaf.version}/LICENSE</source>
-      <outputDirectory>Licenses</outputDirectory>
-      <destName>karaf-LICENSE.txt</destName>
-      <fileMode>0644</fileMode>
-      <lineEnding>dos</lineEnding>
-    </file>
-  </files>
 </assembly>
