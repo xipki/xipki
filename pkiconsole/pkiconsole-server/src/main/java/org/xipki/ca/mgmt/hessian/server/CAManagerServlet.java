@@ -794,7 +794,7 @@ implements HessianCAManager
     }
 
     @Override
-    public byte[] generateSelfSignedCA(String name, String certprofileName,
+    public X509Certificate generateSelfSignedCA(String name, String certprofileName,
             String subject, CAStatus status, long nextSerial,
             List<String> crl_uris, List<String> delta_crl_uris,
             List<String> ocsp_uris, int max_validity, String signer_type,
