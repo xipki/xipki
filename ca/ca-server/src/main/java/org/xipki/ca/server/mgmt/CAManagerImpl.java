@@ -256,7 +256,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
                         this.dataSources.put(datasourceName, datasource);
                     } catch (SQLException | PasswordResolverException | IOException | RuntimeException e)
                     {
-                        throw new CAMgmtException(e.getClass().getName() + " while paring datasoure " + datasourceFile, e);
+                        throw new CAMgmtException(e.getClass().getName() + " while parsing datasoure " + datasourceFile, e);
                     }
                 }
             }
