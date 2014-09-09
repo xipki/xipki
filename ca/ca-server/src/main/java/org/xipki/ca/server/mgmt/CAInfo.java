@@ -106,6 +106,11 @@ public class CAInfo
         }
 
         long nextSerial = greatestSerialNumber + 1;
+        if(nextSerial < 2)
+        {
+            nextSerial = 2;
+        }
+
         if(caEntry.getNextSerial() < nextSerial)
         {
             LOG.info("Corrected the next_serial of {} from {} to {}",
