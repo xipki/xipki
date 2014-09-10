@@ -27,6 +27,17 @@
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
     </dependency>
+    <dependency>
+	  <groupId>org.liquibase</groupId>
+	  <artifactId>liquibase-osgi</artifactId>
+	  <version>${liquibase.version}</version>
+      <!--exclusions>
+        <exclusion>
+      	  <groupId>org.liquibase</groupId>
+      	  <artifactId>liquibase-core</artifactId>
+        </exclusion>
+      </exclusions-->
+    </dependency>
   </dependencies>
   <build>
     <plugins>

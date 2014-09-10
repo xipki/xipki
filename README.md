@@ -145,13 +145,7 @@ Install
 Run Demo
 -----
 
-* Initialize the databases
-
-    In folder $XIPKI_HOME
-    ```sh
-    sql/reset.sh
-    ```
-* Initialize the PKCS#11 configuration
+* Configure the PKCS#11 configuration
 
     ```sh
     etc/pkcs11-conf.xml
@@ -185,6 +179,14 @@ Run Demo
     # DSA key, the default labels for demo are RCA1-DSA, SubCA1-DSA and SubCAwithCRL1-DSA, and the default slot index is 1
     keytool:dsa  -slot <slot index> -key-label <label>
     ```
+* Initialize the databases
+
+    ```sh
+    features:install xipki-database-tool
+
+    dbtool:initdb-all
+    ```sh
+
 * Run the pre-configured OSGi-commands in karaf terminal
   
     ```sh
