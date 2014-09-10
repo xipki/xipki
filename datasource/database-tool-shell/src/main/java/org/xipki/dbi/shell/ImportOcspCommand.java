@@ -32,6 +32,9 @@ public class ImportOcspCommand extends XipkiOsgiCommandSupport
             required = true)
     protected String indir;
 
+    @Option(name = "-resume")
+    protected Boolean resume = Boolean.FALSE;
+
     private DataSourceFactory dataSourceFactory;
     private PasswordResolver passwordResolver;
 
@@ -39,7 +42,7 @@ public class ImportOcspCommand extends XipkiOsgiCommandSupport
     protected Object doExecute()
     throws Exception
     {
-        OcspDbImporter importer = new OcspDbImporter(dataSourceFactory, passwordResolver, dbconfFile);
+        OcspDbImporter importer = new OcspDbImporter(dataSourceFactory, passwordResolver, dbconfFile, resume);
         importer.importDatabase(indir);
         return null;
     }

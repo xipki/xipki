@@ -7,6 +7,8 @@
 
 package org.xipki.dbi;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
@@ -287,6 +289,41 @@ public class DbPorter
 
         System.out.print(sb.toString());
         System.out.flush();
+    }
+
+    public static void echoToFile(String content, File file)
+    throws IOException
+    {
+        FileOutputStream out = null;
+        try
+        {
+            out = new FileOutputStream(file);
+            out.write(content.getBytes());
+        } finally
+        {
+            if(out != null)
+            {
+                out.flush();
+                out.close();
+            }
+        }
+    }
+
+    public static void deleteTmpFiles(String dirName, String prefix)
+    {
+        // delete the temporary files
+        File dir = new File(dirName);
+        File[] children = dir.listFiles();
+        if(children != null && children.length > 0)
+        {
+            for(File child : children)
+            {
+                if(child.getName().startsWith(prefix))
+                {
+                    child.delete();
+                }
+            }
+        }
     }
 
 }

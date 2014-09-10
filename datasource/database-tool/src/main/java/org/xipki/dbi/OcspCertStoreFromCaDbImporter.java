@@ -8,7 +8,6 @@
 package org.xipki.dbi;
 
 import java.io.File;
-import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.sql.PreparedStatement;
@@ -20,6 +19,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.StringTokenizer;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
@@ -42,7 +42,6 @@ import org.xipki.dbi.ca.jaxb.CertType;
 import org.xipki.dbi.ca.jaxb.CertsType;
 import org.xipki.dbi.ca.jaxb.NameIdType;
 import org.xipki.dbi.ca.jaxb.PublisherType;
-import org.xipki.security.api.PasswordResolverException;
 import org.xipki.security.common.CmpUtf8Pairs;
 import org.xipki.security.common.HashAlgoType;
 import org.xipki.security.common.HashCalculator;
@@ -55,20 +54,41 @@ import org.xipki.security.common.ParamChecker;
 
 class OcspCertStoreFromCaDbImporter extends DbPorter
 {
+    public static final String PROCESS_LOG_FILENAME = "importToOcsp.process";
+    private static final String MSG_CERTS_FINISHED = "CERTS.FINISHED";
+
     private static final Logger LOG = LoggerFactory.getLogger(OcspCertStoreFromCaDbImporter.class);
 
     private final Unmarshaller unmarshaller;
     private final String publisherName;
+    private final boolean resume;
 
     OcspCertStoreFromCaDbImporter(DataSourceWrapper dataSource, Unmarshaller unmarshaller,
-            String srcDir, String publisherName)
-    throws SQLException, PasswordResolverException, NoSuchAlgorithmException
+            String srcDir, String publisherName, boolean resume)
+    throws Exception
     {
         super(dataSource, srcDir);
         ParamChecker.assertNotNull("unmarshaller", unmarshaller);
         ParamChecker.assertNotEmpty("publisherName", publisherName);
         this.unmarshaller = unmarshaller;
         this.publisherName = publisherName;
+        File processLogFile = new File(baseDir, PROCESS_LOG_FILENAME);
+        if(resume)
+        {
+            if(processLogFile.exists() == false)
+            {
+                throw new Exception("Could not process with '-resume' option");
+            }
+        }
+        else
+        {
+            if(processLogFile.exists())
+            {
+                throw new Exception("Please either specify '-resume' option or delete the file " +
+                        processLogFile.getPath() + " first");
+            }
+        }
+        this.resume = resume;
     }
 
     public void importToDB()
@@ -151,14 +171,54 @@ class OcspCertStoreFromCaDbImporter extends DbPorter
                 profileMap.put(ni.getId(), ni.getName());
             }
 
-            List<Integer> relatedCaIds = import_issuer(certstore.getCainfos(), relatedCas);
-            import_cert(certstore.getCertsFiles(), profileMap, revokedOnly, relatedCaIds);
+            List<Integer> relatedCaIds;
+            if(resume)
+            {
+                relatedCaIds = getIssuerIds(certstore.getCainfos(), relatedCas);
+            }
+            else
+            {
+                relatedCaIds = import_issuer(certstore.getCainfos(), relatedCas);
+            }
+
+            File processLogFile = new File(baseDir, PROCESS_LOG_FILENAME);
+            import_cert(certstore.getCertsFiles(), profileMap, revokedOnly, relatedCaIds, processLogFile);
+            processLogFile.delete();
         }catch(Exception e)
         {
             System.err.println("Error while importing OCSP certstore to database");
             throw e;
         }
         System.out.println(" Imported OCSP certstore to database");
+    }
+
+    private List<Integer> getIssuerIds(Cainfos issuers, List<CaType> cas)
+    throws Exception
+    {
+        List<Integer> relatedCaIds = new LinkedList<>();
+        for(CainfoType issuer : issuers.getCainfo())
+        {
+            String b64Cert = issuer.getCert();
+            byte[] encodedCert = Base64.decode(b64Cert);
+
+            // retrieve the revocation information of the CA, if possible
+            CaType ca = null;
+            for(CaType caType : cas)
+            {
+                if(Arrays.equals(encodedCert, Base64.decode(caType.getCert())))
+                {
+                    ca = caType;
+                    break;
+                }
+            }
+
+            if(ca == null)
+            {
+                continue;
+            }
+            relatedCaIds.add(issuer.getId());
+        }
+        return relatedCaIds;
     }
 
     private List<Integer> import_issuer(Cainfos issuers, List<CaType> cas)
@@ -257,36 +317,65 @@ class OcspCertStoreFromCaDbImporter extends DbPorter
     }
 
     private void import_cert(CertsFiles certsfiles, Map<Integer, String> profileMap,
-            boolean revokedOnly, List<Integer> caIds)
+            boolean revokedOnly, List<Integer> caIds, File processLogFile)
     throws Exception
     {
-        final long total = certsfiles.getCountCerts();
+        int numProcessedBefore = 0;
+        int minId = 0;
+        if(processLogFile.exists())
+        {
+            byte[] content = IoCertUtil.read(processLogFile);
+            if(content != null && content.length > 2)
+            {
+                String str = new String(content);
+                if(str.trim().equalsIgnoreCase(MSG_CERTS_FINISHED))
+                {
+                    return;
+                }
+
+                StringTokenizer st = new StringTokenizer(str, ":");
+                numProcessedBefore = Integer.parseInt(st.nextToken());
+                minId = Integer.parseInt(st.nextToken());
+                minId++;
+            }
+        }
+
+        final long total = certsfiles.getCountCerts() - numProcessedBefore;
         final long startTime = System.currentTimeMillis();
         long sum = 0;
 
-        System.out.println("Importing certificates");
+        System.out.println("Importing certificates from ID " + minId);
         printHeader();
 
         for(String certsFile : certsfiles.getCertsFile())
         {
             try
             {
-                sum += do_import_cert(certsFile, profileMap, revokedOnly, caIds);
-                printStatus(total, sum, startTime);
+                int[] numAndLastId = do_import_cert(certsFile, profileMap, revokedOnly, caIds, minId);
+                int numProcessed = numAndLastId[0];
+                int lastId = numAndLastId[1];
+                if(numProcessed > 0)
+                {
+                    sum += numProcessed;
+                    DbPorter.echoToFile((sum + numProcessedBefore) + ":" + lastId, processLogFile);
+                    printStatus(total, sum, startTime);
+                }
             }catch(Exception e)
             {
-                System.err.println("Error while importing certificates from file " + certsFile);
+                System.err.println("\nError while importing certificates from file " + certsFile +
+                        ".\nPlease continue with the option '-resume'");
                 LOG.error("Exception", e);
                 throw e;
             }
 
         }
         printTrailer();
+        DbPorter.echoToFile(MSG_CERTS_FINISHED, processLogFile);
         System.out.println("Processed " + sum + " certificates");
     }
 
-    private int do_import_cert(String certsZipFile, Map<Integer, String> profileMap,
-            boolean revokedOnly, List<Integer> caIds)
+    private int[] do_import_cert(String certsZipFile, Map<Integer, String> profileMap,
+            boolean revokedOnly, List<Integer> caIds, int minId)
     throws Exception
     {
         PreparedStatement ps_cert = prepareStatement(OcspCertStoreDbImporter.SQL_ADD_CERT);
@@ -306,11 +395,23 @@ class OcspCertStoreFromCaDbImporter extends DbPorter
         try
         {
             List<CertType> list = certs.getCert();
-            final int n = list.size();
+            final int size = list.size();
+            int n = 0;
 
-            for(int i = 0; i < n; i++)
+            int lastSuccessfulCertId = 0;
+
+            for(int i = 0; i < size; i++)
             {
                 CertType cert = list.get(i);
+                int id = cert.getId();
+                lastSuccessfulCertId = id;
+                if(id < minId)
+                {
+                    continue;
+                }
+
+                n++;
+
                 if(revokedOnly && cert.isRevoked() == false)
                 {
                     continue;
@@ -394,7 +495,7 @@ class OcspCertStoreFromCaDbImporter extends DbPorter
                 throw e;
             }
 
-            return n;
+            return new int[]{n, lastSuccessfulCertId};
         }
         finally
         {

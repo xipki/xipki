@@ -36,9 +36,10 @@ public class OcspFromCaDbImporter
     private final DataSourceWrapper dataSource;
     private final Unmarshaller unmarshaller;
     private final String publisherName;
+    private final boolean resume;
 
     public OcspFromCaDbImporter(DataSourceFactory dataSourceFactory,
-            PasswordResolver passwordResolver, String dbConfFile, String publisherName)
+            PasswordResolver passwordResolver, String dbConfFile, String publisherName, boolean resume)
     throws SQLException, PasswordResolverException, IOException, JAXBException
     {
         Properties props = DbPorter.getDbConfProperties(
@@ -48,6 +49,7 @@ public class OcspFromCaDbImporter
         unmarshaller = jaxbContext.createUnmarshaller();
         unmarshaller.setSchema(DbPorter.retrieveSchema("/xsd/dbi-ca.xsd"));
         this.publisherName = publisherName;
+        this.resume = resume;
     }
 
     public void importDatabase(String srcFolder)
@@ -58,7 +60,7 @@ public class OcspFromCaDbImporter
         try
         {
             OcspCertStoreFromCaDbImporter certStoreImporter =
-                    new OcspCertStoreFromCaDbImporter(dataSource, unmarshaller, srcFolder, publisherName);
+                    new OcspCertStoreFromCaDbImporter(dataSource, unmarshaller, srcFolder, publisherName, resume);
             certStoreImporter.importToDB();
             certStoreImporter.shutdown();
         } finally

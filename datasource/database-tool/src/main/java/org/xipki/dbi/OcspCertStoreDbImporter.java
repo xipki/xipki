@@ -8,12 +8,12 @@
 package org.xipki.dbi;
 
 import java.io.File;
-import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.StringTokenizer;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
@@ -31,7 +31,6 @@ import org.xipki.dbi.ocsp.jaxb.CertStoreType.Issuers;
 import org.xipki.dbi.ocsp.jaxb.CertType;
 import org.xipki.dbi.ocsp.jaxb.CertsType;
 import org.xipki.dbi.ocsp.jaxb.IssuerType;
-import org.xipki.security.api.PasswordResolverException;
 import org.xipki.security.common.HashAlgoType;
 import org.xipki.security.common.HashCalculator;
 import org.xipki.security.common.IoCertUtil;
@@ -43,6 +42,9 @@ import org.xipki.security.common.ParamChecker;
 
 class OcspCertStoreDbImporter extends DbPorter
 {
+    public static final String PROCESS_LOG_FILENAME = "import.process";
+    private static final String MSG_CERTS_FINISHED = "CERTS.FINISHED";
+
     private static final Logger LOG = LoggerFactory.getLogger(OcspCertStoreDbImporter.class);
 
     static final String SQL_ADD_CAINFO =
@@ -54,7 +56,7 @@ class OcspCertStoreDbImporter extends DbPorter
             " SHA256_FP_NAME, SHA256_FP_KEY," +
             " SHA384_FP_NAME, SHA384_FP_KEY," +
             " SHA512_FP_NAME, SHA512_FP_KEY," +
-            " SHA1_fp_cert, cert," +
+            " SHA1_FP_CERT, CERT," +
             " REVOKED, REV_REASON, REV_TIME, REV_INVALIDITY_TIME" +
             " ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
@@ -72,13 +74,31 @@ class OcspCertStoreDbImporter extends DbPorter
     static final String SQL_ADD_RAWCERT = "INSERT INTO RAWCERT (CERT_ID, CERT) VALUES (?, ?)";
 
     private final Unmarshaller unmarshaller;
+    private final boolean resume;
 
-    OcspCertStoreDbImporter(DataSourceWrapper dataSource, Unmarshaller unmarshaller, String srcDir)
-    throws SQLException, PasswordResolverException, NoSuchAlgorithmException
+    OcspCertStoreDbImporter(DataSourceWrapper dataSource, Unmarshaller unmarshaller, String srcDir, boolean resume)
+    throws Exception
     {
         super(dataSource, srcDir);
         ParamChecker.assertNotNull("unmarshaller", unmarshaller);
         this.unmarshaller = unmarshaller;
+        File processLogFile = new File(baseDir, PROCESS_LOG_FILENAME);
+        if(resume)
+        {
+            if(processLogFile.exists() == false)
+            {
+                throw new Exception("Could not process with '-resume' option");
+            }
+        }
+        else
+        {
+            if(processLogFile.exists())
+            {
+                throw new Exception("Please either specify '-resume' option or delete the file " +
+                        processLogFile.getPath() + " first");
+            }
+        }
+        this.resume = resume;
     }
 
     public void importToDB()
@@ -93,11 +113,16 @@ class OcspCertStoreDbImporter extends DbPorter
             throw new Exception("Cannot import CertStore greater than " + VERSION + ": " + certstore.getVersion());
         }
 
+        File processLogFile = new File(baseDir, PROCESS_LOG_FILENAME);
         System.out.println("Importing OCSP certstore to database");
         try
         {
-            import_issuer(certstore.getIssuers());
-            import_cert(certstore.getCertsFiles());
+            if(resume == false)
+            {
+                import_issuer(certstore.getIssuers());
+            }
+            import_cert(certstore.getCertsFiles(), processLogFile);
+            processLogFile.delete();
         }catch(Exception e)
         {
             System.err.println("Error while importing OCSP certstore to database");
@@ -178,35 +203,65 @@ class OcspCertStoreDbImporter extends DbPorter
         System.out.println(" Imported table ISSUER");
     }
 
-    private void import_cert(CertsFiles certsfiles)
+    private void import_cert(CertsFiles certsfiles, File processLogFile)
     throws Exception
     {
-        final long total = certsfiles.getCountCerts();
+        int numProcessedBefore = 0;
+        int minId = 0;
+        if(processLogFile.exists())
+        {
+            byte[] content = IoCertUtil.read(processLogFile);
+            if(content != null && content.length > 2)
+            {
+                String str = new String(content);
+                if(str.trim().equalsIgnoreCase(MSG_CERTS_FINISHED))
+                {
+                    return;
+                }
+
+                StringTokenizer st = new StringTokenizer(str, ":");
+                numProcessedBefore = Integer.parseInt(st.nextToken());
+                minId = Integer.parseInt(st.nextToken());
+                minId++;
+            }
+        }
+
+        final long total = certsfiles.getCountCerts() - numProcessedBefore;
+
         final long startTime = System.currentTimeMillis();
         long sum = 0;
 
-        System.out.println("Importing certificates");
+        System.out.println("Importing certificates from ID " + minId);
         printHeader();
 
         for(String certsFile : certsfiles.getCertsFile())
         {
             try
             {
-                sum += do_import_cert(certsFile);
-                printStatus(total, sum, startTime);
+                int[] numAndLastId = do_import_cert(certsFile, minId);
+                int numProcessed = numAndLastId[0];
+                int lastId = numAndLastId[1];
+                if(numProcessed > 0)
+                {
+                    sum += numProcessed;
+                    DbPorter.echoToFile((sum + numProcessedBefore) + ":" + lastId, processLogFile);
+                    printStatus(total, sum, startTime);
+                }
             }catch(Exception e)
             {
-                System.err.println("Error while importing certificates from file " + certsFile);
+                System.err.println("\nError while importing certificates from file " + certsFile +
+                        ".\nPlease continue with the option '-resume'");
                 LOG.error("Exception", e);
                 throw e;
             }
-
         }
+
         printTrailer();
+        DbPorter.echoToFile(MSG_CERTS_FINISHED, processLogFile);
         System.out.println("Processed " + sum + " certificates");
     }
 
-    private int do_import_cert(String certsZipFile)
+    private int[] do_import_cert(String certsZipFile, int minId)
     throws Exception
     {
         PreparedStatement ps_cert = prepareStatement(SQL_ADD_CERT);
@@ -226,11 +281,23 @@ class OcspCertStoreDbImporter extends DbPorter
         try
         {
             List<CertType> list = certs.getCert();
-            final int n = list.size();
+            final int size = list.size();
+            int n = 0;
 
-            for(int i = 0; i < n; i++)
+            int lastSuccessfulCertId = 0;
+
+            for(int i = 0; i < size; i++)
             {
                 CertType cert = list.get(i);
+                int id = cert.getId();
+                lastSuccessfulCertId = id;
+                if(id < minId)
+                {
+                    continue;
+                }
+
+                n++;
+
                 String filename = cert.getCertFile();
 
                 // rawcert
@@ -258,7 +325,7 @@ class OcspCertStoreDbImporter extends DbPorter
 
                 // cert
                 int idx = 1;
-                ps_cert.setInt   (idx++, cert.getId());
+                ps_cert.setInt   (idx++, id);
                 ps_cert.setInt   (idx++, cert.getIssuerId());
                 ps_cert.setLong(idx++, c.getSerialNumber().longValue());
                 ps_cert.setString(idx++, IoCertUtil.canonicalizeName(c.getSubjectX500Principal()));
@@ -300,7 +367,7 @@ class OcspCertStoreDbImporter extends DbPorter
                 throw e;
             }
 
-            return n;
+            return new int[]{n, lastSuccessfulCertId};
         }
         finally
         {
