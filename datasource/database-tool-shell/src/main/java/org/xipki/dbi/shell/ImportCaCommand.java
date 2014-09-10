@@ -32,6 +32,9 @@ public class ImportCaCommand extends XipkiOsgiCommandSupport
             required = true)
     protected String indir;
 
+    @Option(name = "-resume")
+    protected Boolean resume = Boolean.FALSE;
+
     private DataSourceFactory dataSourceFactory;
     private PasswordResolver passwordResolver;
 
@@ -39,7 +42,7 @@ public class ImportCaCommand extends XipkiOsgiCommandSupport
     protected Object doExecute()
     throws Exception
     {
-        CaDbImporter importer = new CaDbImporter(dataSourceFactory, passwordResolver, dbconfFile);
+        CaDbImporter importer = new CaDbImporter(dataSourceFactory, passwordResolver, dbconfFile, resume);
         importer.importDatabase(indir);
         return null;
     }

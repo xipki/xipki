@@ -23,6 +23,7 @@ import java.util.zip.ZipOutputStream;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
+import javax.xml.bind.Unmarshaller;
 
 import org.bouncycastle.util.encoders.Base64;
 import org.slf4j.Logger;
@@ -35,7 +36,6 @@ import org.xipki.dbi.ocsp.jaxb.CertType;
 import org.xipki.dbi.ocsp.jaxb.CertsType;
 import org.xipki.dbi.ocsp.jaxb.IssuerType;
 import org.xipki.dbi.ocsp.jaxb.ObjectFactory;
-import org.xipki.security.api.PasswordResolverException;
 import org.xipki.security.common.IoCertUtil;
 import org.xipki.security.common.ParamChecker;
 
@@ -45,45 +45,84 @@ import org.xipki.security.common.ParamChecker;
 
 class OcspCertStoreDbExporter extends DbPorter
 {
+    public static final String PROCESS_LOG_FILENAME = "export.process";
+
     private static final Logger LOG = LoggerFactory.getLogger(OcspCertStoreDbExporter.class);
 
     private final Marshaller marshaller;
+    private final Unmarshaller unmarshaller;
 
     private final ObjectFactory objFact = new ObjectFactory();
     private final int numCertsInBundle;
+    private final boolean resume;
 
-    OcspCertStoreDbExporter(DataSourceWrapper dataSource, Marshaller marshaller, String baseDir, int numCertsInBundle)
-    throws SQLException, PasswordResolverException, IOException
+    OcspCertStoreDbExporter(DataSourceWrapper dataSource,
+            Marshaller marshaller, Unmarshaller unmarshaller, String baseDir, int numCertsInBundle,
+            boolean resume)
+    throws Exception
     {
         super(dataSource, baseDir);
         ParamChecker.assertNotNull("marshaller", marshaller);
+        ParamChecker.assertNotNull("unmarshaller", unmarshaller);
         if(numCertsInBundle < 1)
         {
             numCertsInBundle = 1;
         }
         this.numCertsInBundle = numCertsInBundle;
         this.marshaller = marshaller;
+        this.unmarshaller = unmarshaller;
+        if(resume)
+        {
+            File processLogFile = new File(baseDir, PROCESS_LOG_FILENAME);
+            if(processLogFile.exists() == false)
+            {
+                throw new Exception("Could not process with '-resume' option");
+            }
+        }
+        this.resume = resume;
     }
 
     public void export()
     throws Exception
     {
-        CertStoreType certstore = new CertStoreType();
+        File processLogFile = new File(baseDir, PROCESS_LOG_FILENAME);
+
+        CertStoreType certstore;
+        if(resume)
+        {
+            @SuppressWarnings("unchecked")
+            JAXBElement<CertStoreType> root = (JAXBElement<CertStoreType>)
+                    unmarshaller.unmarshal(new File(baseDir, FILENAME_OCSP_CertStore));
+            certstore = root.getValue();
+            if(certstore.getVersion() > VERSION)
+            {
+                throw new Exception("Cannot continue with CertStore greater than " + VERSION + ": " + certstore.getVersion());
+            }
+        }
+        else
+        {
+            certstore = new CertStoreType();
+        }
         certstore.setVersion(VERSION);
         System.out.println("Exporting OCSP certstore from database");
-        certstore.setIssuers(export_issuer());
-        certstore.setCertsFiles(export_cert());
+
+        if(resume == false)
+        {
+            export_issuer(certstore);
+        }
+        export_cert(certstore, processLogFile);
 
         JAXBElement<CertStoreType> root = new ObjectFactory().createCertStore(certstore);
         marshaller.marshal(root, new File(baseDir, FILENAME_OCSP_CertStore));
         System.out.println(" Exported OCSP certstore from database");
     }
 
-    private Issuers export_issuer()
+    private void export_issuer(CertStoreType certstore)
     throws SQLException
     {
         System.out.println("Exporting table ISSUER");
         Issuers issuers = new Issuers();
+        certstore.setIssuers(issuers);
 
         Statement stmt = null;
         ResultSet rs = null;
@@ -128,14 +167,55 @@ class OcspCertStoreDbExporter extends DbPorter
         }
 
         System.out.println(" Exported table ISSUER");
-        return issuers;
     }
 
-    private CertsFiles export_cert()
+    private void export_cert(CertStoreType certstore, File processLogFile)
+    {
+        try
+        {
+            do_export_cert(certstore, processLogFile);
+        }catch(Exception e)
+        {
+            // delete the temporary files
+            DbPorter.deleteTmpFiles(baseDir, "tmp-certs-");
+            System.err.println("\nExporting table CERT and RAWCERT has been cancelled due to error,\n"
+                    + "please continue with the option '-resume'");
+            LOG.error("Exception", e);
+        }
+    }
+
+    private void do_export_cert(CertStoreType certstore, File processLogFile)
     throws SQLException, IOException, JAXBException
     {
-        System.out.println("Exporting tables CERT, CERTHASH and RAWCERT");
-        CertsFiles certsFiles = new CertsFiles();
+        CertsFiles certsFiles = certstore.getCertsFiles();
+        int numProcessedBefore = 0;
+        if(certsFiles == null)
+        {
+            certsFiles = new CertsFiles();
+            certstore.setCertsFiles(certsFiles);
+        }
+        else
+        {
+            numProcessedBefore = (int) certsFiles.getCountCerts();
+        }
+
+        Integer minCertId = null;
+        if(processLogFile.exists())
+        {
+            byte[] content = IoCertUtil.read(processLogFile);
+            if(content != null && content.length > 0)
+            {
+                minCertId = Integer.parseInt(new String(content).trim());
+                minCertId++;
+            }
+        }
+
+        if(minCertId == null)
+        {
+            minCertId = getMin("CERT", "ID");
+        }
+
+        System.out.println("Exporting tables CERT, CERTHASH and RAWCERT from ID " + minCertId);
 
         String certSql = "SELECT ID, ISSUER_ID, LAST_UPDATE, REVOKED " +
                 ", REV_REASON, REV_TIME, REV_INVALIDITY_TIME, PROFILE " +
@@ -144,9 +224,8 @@ class OcspCertStoreDbExporter extends DbPorter
 
         String rawCertSql = "SELECT CERT_ID, CERT FROM RAWCERT WHERE CERT_ID >= ? AND CERT_ID < ?";
 
-        final int minCertId = getMin("CERT", "ID");
         final int maxCertId = getMax("CERT", "ID");
-        final long total = getCount("CERT");
+        final long total = getCount("CERT") - numProcessedBefore;
 
         PreparedStatement certPs = prepareStatement(certSql);
         PreparedStatement rawCertPs = prepareStatement(rawCertSql);
@@ -168,6 +247,7 @@ class OcspCertStoreDbExporter extends DbPorter
         final long startTime = System.currentTimeMillis();
         printHeader();
 
+        Integer id = null;
         try
         {
             for(int i = minCertId; i <= maxCertId; i += n)
@@ -194,7 +274,7 @@ class OcspCertStoreDbExporter extends DbPorter
 
                 while(rs.next())
                 {
-                    int id = rs.getInt("ID");
+                    id = rs.getInt("ID");
 
                     if(minCertIdOfCurrentFile == -1)
                     {
@@ -280,6 +360,8 @@ class OcspCertStoreDbExporter extends DbPorter
                         currentCertsZipFile.renameTo(new File(baseDir, currentCertsFilename));
 
                         certsFiles.getCertsFile().add(currentCertsFilename);
+                        certsFiles.setCountCerts(numProcessedBefore + sum);
+                        echoToFile(Integer.toString(id), processLogFile);
 
                         printStatus(total, sum, startTime);
 
@@ -307,6 +389,8 @@ class OcspCertStoreDbExporter extends DbPorter
                 currentCertsZipFile.renameTo(new File(baseDir, currentCertsFilename));
 
                 certsFiles.getCertsFile().add(currentCertsFilename);
+                certsFiles.setCountCerts(numProcessedBefore + sum);
+                echoToFile(Integer.toString(id), processLogFile);
 
                 printStatus(total, sum, startTime);
             }
@@ -322,11 +406,11 @@ class OcspCertStoreDbExporter extends DbPorter
             releaseResources(rawCertPs, null);
         }
 
-        certsFiles.setCountCerts(sum);
-
         printTrailer();
+        // all successful, delete the processLogFile
+        processLogFile.delete();
+
         System.out.println(" Exported " + sum + " certificates from tables cert, certhash and rawcert");
-        return certsFiles;
     }
 
     private void finalizeZip(ZipOutputStream zipOutStream, CertsType certsType)

@@ -17,6 +17,7 @@ import java.util.Properties;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
+import javax.xml.bind.Unmarshaller;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,26 +40,32 @@ public class CaDbExporter
 
     protected final DataSourceWrapper dataSource;
     protected final Marshaller marshaller;
+    protected final Unmarshaller unmarshaller;
     protected final String destFolder;
+    protected final boolean resume;
 
     public CaDbExporter(DataSourceFactory dataSourceFactory,
-            PasswordResolver passwordResolver, InputStream dbConfStream, String destFolder)
+            PasswordResolver passwordResolver, InputStream dbConfStream,
+            String destFolder, boolean resume)
     throws SQLException, PasswordResolverException, IOException, JAXBException
     {
         ParamChecker.assertNotEmpty("destFolder", destFolder);
         Properties props = DbPorter.getDbConfProperties(dbConfStream);
         this.dataSource = dataSourceFactory.createDataSource(props, passwordResolver);
         this.marshaller = getMarshaller();
+        this.unmarshaller = getUnmarshaller();
         this.destFolder = IoCertUtil.expandFilepath(destFolder);
+        this.resume = resume;
         checkDestFolder();
     }
 
     public CaDbExporter(DataSourceFactory dataSourceFactory,
-            PasswordResolver passwordResolver, String dbConfFile, String destFolder)
+            PasswordResolver passwordResolver, String dbConfFile, String destFolder,
+            boolean destFolderEmpty)
     throws SQLException, PasswordResolverException, IOException, JAXBException
     {
         this(dataSourceFactory, passwordResolver,
-                new FileInputStream(IoCertUtil.expandFilepath(dbConfFile)), destFolder);
+                new FileInputStream(IoCertUtil.expandFilepath(dbConfFile)), destFolder, destFolderEmpty);
     }
 
     private static Marshaller getMarshaller()
@@ -69,6 +76,15 @@ public class CaDbExporter
         marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
         marshaller.setSchema(DbPorter.retrieveSchema("/xsd/dbi-ca.xsd"));
         return marshaller;
+    }
+
+    private static Unmarshaller getUnmarshaller()
+    throws JAXBException
+    {
+        JAXBContext jaxbContext = JAXBContext.newInstance(ObjectFactory.class);
+        Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
+        unmarshaller.setSchema(DbPorter.retrieveSchema("/xsd/dbi-ca.xsd"));
+        return unmarshaller;
     }
 
     private void checkDestFolder()
@@ -92,10 +108,13 @@ public class CaDbExporter
             }
         }
 
-        String[] children = f.list();
-        if(children != null && children.length > 0)
+        if(resume == false)
         {
-            throw new IOException(destFolder + " is not empty");
+            String[] children = f.list();
+            if(children != null && children.length > 0)
+            {
+                throw new IOException(destFolder + " is not empty");
+            }
         }
     }
     public void exportDatabase(int numCertsInBundle, int numCrls)
@@ -104,13 +123,17 @@ public class CaDbExporter
         long start = System.currentTimeMillis();
         try
         {
-            // CAConfiguration
-            CaConfigurationDbExporter caConfExporter = new CaConfigurationDbExporter(dataSource, marshaller, destFolder);
-            caConfExporter.export();
+            if(resume == false)
+            {
+                // CAConfiguration
+                CaConfigurationDbExporter caConfExporter = new CaConfigurationDbExporter(dataSource, marshaller, destFolder);
+                caConfExporter.export();
+                caConfExporter.shutdown();
+            }
 
             // CertStore
             CaCertStoreDbExporter certStoreExporter = new CaCertStoreDbExporter(
-                    dataSource, marshaller, destFolder, numCertsInBundle, numCrls);
+                    dataSource, marshaller, unmarshaller, destFolder, numCertsInBundle, numCrls, resume);
             certStoreExporter.export();
             certStoreExporter.shutdown();
         }finally

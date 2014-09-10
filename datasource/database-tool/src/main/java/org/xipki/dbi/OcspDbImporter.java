@@ -35,9 +35,10 @@ public class OcspDbImporter
     private static final Logger LOG = LoggerFactory.getLogger(OcspDbImporter.class);
     private final DataSourceWrapper dataSource;
     private final Unmarshaller unmarshaller;
+    private final boolean resume;
 
     public OcspDbImporter(DataSourceFactory dataSourceFactory,
-            PasswordResolver passwordResolver, String dbConfFile)
+            PasswordResolver passwordResolver, String dbConfFile, boolean resume)
     throws SQLException, PasswordResolverException, IOException, JAXBException
     {
         Properties props = DbPorter.getDbConfProperties(
@@ -46,6 +47,7 @@ public class OcspDbImporter
         JAXBContext jaxbContext = JAXBContext.newInstance(ObjectFactory.class);
         unmarshaller = jaxbContext.createUnmarshaller();
         unmarshaller.setSchema(DbPorter.retrieveSchema("/xsd/dbi-ocsp.xsd"));
+        this.resume = resume;
     }
 
     public void importDatabase(String srcFolder)
@@ -56,7 +58,7 @@ public class OcspDbImporter
         try
         {
             OcspCertStoreDbImporter certStoreImporter =
-                    new OcspCertStoreDbImporter(dataSource, unmarshaller, srcFolder);
+                    new OcspCertStoreDbImporter(dataSource, unmarshaller, srcFolder, resume);
             certStoreImporter.importToDB();
             certStoreImporter.shutdown();
         } finally

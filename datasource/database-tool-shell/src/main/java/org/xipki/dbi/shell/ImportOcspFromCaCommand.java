@@ -37,6 +37,9 @@ public class ImportOcspFromCaCommand extends XipkiOsgiCommandSupport
             description = "Publisher name")
     protected String publisherName = DFLT_PUBLISHER;
 
+    @Option(name = "-resume")
+    protected Boolean resume = Boolean.FALSE;
+
     private DataSourceFactory dataSourceFactory;
     private PasswordResolver passwordResolver;
 
@@ -45,7 +48,7 @@ public class ImportOcspFromCaCommand extends XipkiOsgiCommandSupport
     throws Exception
     {
         OcspFromCaDbImporter importer = new OcspFromCaDbImporter(
-                dataSourceFactory, passwordResolver, dbconfFile, publisherName);
+                dataSourceFactory, passwordResolver, dbconfFile, publisherName, resume);
         importer.importDatabase(indir);
         return null;
     }

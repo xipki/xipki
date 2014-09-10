@@ -9,9 +9,7 @@ package org.xipki.dbi;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
-import java.io.IOException;
 import java.math.BigInteger;
-import java.security.NoSuchAlgorithmException;
 import java.security.cert.CRLException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509CRL;
@@ -20,6 +18,7 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Types;
 import java.util.List;
+import java.util.StringTokenizer;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
@@ -55,7 +54,6 @@ import org.xipki.dbi.ca.jaxb.NameIdType;
 import org.xipki.dbi.ca.jaxb.ToPublishType;
 import org.xipki.dbi.ca.jaxb.UserType;
 import org.xipki.dbi.ca.jaxb.UsersType;
-import org.xipki.security.api.PasswordResolverException;
 import org.xipki.security.common.HashAlgoType;
 import org.xipki.security.common.HashCalculator;
 import org.xipki.security.common.IoCertUtil;
@@ -67,16 +65,37 @@ import org.xipki.security.common.ParamChecker;
 
 class CaCertStoreDbImporter extends DbPorter
 {
+    public static final String PROCESS_LOG_FILENAME = "import.process";
+    private static final String MSG_CERTS_FINISHED = "CERTS.FINISHED";
+
     private static final Logger LOG = LoggerFactory.getLogger(CaConfigurationDbImporter.class);
 
     private final Unmarshaller unmarshaller;
+    private final boolean resume;
 
-    CaCertStoreDbImporter(DataSourceWrapper dataSource, Unmarshaller unmarshaller, String srcDir)
-    throws SQLException, PasswordResolverException, IOException, NoSuchAlgorithmException
+    CaCertStoreDbImporter(DataSourceWrapper dataSource, Unmarshaller unmarshaller, String srcDir, boolean resume)
+    throws Exception
     {
         super(dataSource, srcDir);
         ParamChecker.assertNotNull("unmarshaller", unmarshaller);
         this.unmarshaller = unmarshaller;
+        File processLogFile = new File(baseDir, PROCESS_LOG_FILENAME);
+        if(resume)
+        {
+            if(processLogFile.exists() == false)
+            {
+                throw new Exception("Could not process with '-resume' option");
+            }
+        }
+        else
+        {
+            if(processLogFile.exists())
+            {
+                throw new Exception("Please either specify '-resume' option or delete the file " +
+                        processLogFile.getPath() + " first");
+            }
+        }
+        this.resume = resume;
     }
 
     public void importToDB()
@@ -91,18 +110,24 @@ class CaCertStoreDbImporter extends DbPorter
             throw new Exception("Cannot import CertStore greater than " + VERSION + ": " + certstore.getVersion());
         }
 
+        File processLogFile = new File(baseDir, PROCESS_LOG_FILENAME);
         System.out.println("Importing CA certstore to database");
         try
         {
-            import_cainfo(certstore.getCainfos());
-            import_requestorinfo(certstore.getRequestorinfos());
-            import_publisherinfo(certstore.getPublisherinfos());
-            import_certprofileinfo(certstore.getCertprofileinfos());
-            import_user(certstore.getUsersFiles());
-            import_crl(certstore.getCrls());
-            import_cert(certstore.getCertsFiles());
+            if(resume == false)
+            {
+                import_cainfo(certstore.getCainfos());
+                import_requestorinfo(certstore.getRequestorinfos());
+                import_publisherinfo(certstore.getPublisherinfos());
+                import_certprofileinfo(certstore.getCertprofileinfos());
+                import_user(certstore.getUsersFiles());
+                import_crl(certstore.getCrls());
+            }
+
+            import_cert(certstore.getCertsFiles(), processLogFile);
             import_publishQueue(certstore.getPublishQueue());
             import_deltaCRLCache(certstore.getDeltaCRLCache());
+            processLogFile.delete();
         }catch(Exception e)
         {
             System.err.println("Error while importing CA certstore to database");
@@ -494,33 +519,63 @@ class CaCertStoreDbImporter extends DbPorter
         System.out.println(" Imported table CRL");
     }
 
-    private void import_cert(CertsFiles certsfiles)
+    private void import_cert(CertsFiles certsfiles, File processLogFile)
     throws Exception
     {
-        final long total = certsfiles.getCountCerts();
+        int numProcessedBefore = 0;
+        int minId = 0;
+        if(processLogFile.exists())
+        {
+            byte[] content = IoCertUtil.read(processLogFile);
+            if(content != null && content.length > 2)
+            {
+                String str = new String(content);
+                if(str.trim().equalsIgnoreCase(MSG_CERTS_FINISHED))
+                {
+                    return;
+                }
+
+                StringTokenizer st = new StringTokenizer(str, ":");
+                numProcessedBefore = Integer.parseInt(st.nextToken());
+                minId = Integer.parseInt(st.nextToken());
+                minId++;
+            }
+        }
+
+        final long total = certsfiles.getCountCerts() - numProcessedBefore;
         final long startTime = System.currentTimeMillis();
         int sum = 0;
 
-        System.out.println("Importing certificates");
+        System.out.println("Importing certificates from ID " + minId);
         printHeader();
 
         for(String certsFile : certsfiles.getCertsFile())
         {
             try
             {
-                sum += do_import_cert(certsFile);
-                printStatus(total, sum, startTime);
+                int[] numAndLastId = do_import_cert(certsFile, minId);
+                int numProcessed = numAndLastId[0];
+                int lastId = numAndLastId[1];
+                if(numProcessed > 0)
+                {
+                    sum += numProcessed;
+                    DbPorter.echoToFile((sum + numProcessedBefore) + ":" + lastId, processLogFile);
+                    printStatus(total, sum, startTime);
+                }
             }catch(Exception e)
             {
-                System.err.println("Error while importing certificates from file " + certsFile);
+                System.err.println("\nError while importing certificates from file " + certsFile +
+                        ".\nPlease continue with the option '-resume'");
+                LOG.error("Exception", e);
                 throw e;
             }
         }
         printTrailer();
+        DbPorter.echoToFile(MSG_CERTS_FINISHED, processLogFile);
         System.out.println(" Imported " + sum + " certificates");
     }
 
-    private int do_import_cert(String certsZipFile)
+    private int[] do_import_cert(String certsZipFile, int minId)
     throws Exception
     {
         final String SQL_ADD_CERT =
@@ -549,10 +604,22 @@ class CaCertStoreDbImporter extends DbPorter
         try
         {
             List<CertType> list = certs.getCert();
-            final int n = list.size();
-            for(int i = 0; i < n; i++)
+            final int size = list.size();
+            int n = 0;
+            int lastSuccessfulCertId = 0;
+
+            for(int i = 0; i < size; i++)
             {
                 CertType cert = list.get(i);
+                int id = cert.getId();
+                lastSuccessfulCertId = id;
+                if(id < minId)
+                {
+                    continue;
+                }
+
+                n++;
+
                 String filename = cert.getCertFile();
 
                 // rawcert
@@ -585,7 +652,7 @@ class CaCertStoreDbImporter extends DbPorter
 
                 // cert
                 int idx = 1;
-                ps_cert.setInt   (idx++, cert.getId());
+                ps_cert.setInt   (idx++, id);
                 ps_cert.setLong(idx++, cert.getLastUpdate());
                 ps_cert.setLong(idx++, c.getSerialNumber().getPositiveValue().longValue());
                 ps_cert.setString(idx++, IoCertUtil.canonicalizeName(c.getSubject()));
@@ -636,7 +703,7 @@ class CaCertStoreDbImporter extends DbPorter
                 throw e;
             }
 
-            return n;
+            return new int[]{n, lastSuccessfulCertId};
         }
         finally
         {
