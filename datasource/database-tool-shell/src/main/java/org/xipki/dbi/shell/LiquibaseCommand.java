@@ -22,6 +22,8 @@ import jline.console.ConsoleReader;
 import org.apache.felix.gogo.commands.Option;
 import org.xipki.console.karaf.XipkiOsgiCommandSupport;
 import org.xipki.database.api.SimpleDatabaseConf;
+import org.xipki.security.api.PasswordResolver;
+import org.xipki.security.api.PasswordResolverException;
 import org.xipki.security.common.IoCertUtil;
 
 /**
@@ -31,6 +33,8 @@ import org.xipki.security.common.IoCertUtil;
 public abstract class LiquibaseCommand extends XipkiOsgiCommandSupport
 {
     private static final Set<String> yesNo = new HashSet<>();
+
+    private PasswordResolver passwordResolver;
 
     static
     {
@@ -51,7 +55,7 @@ public abstract class LiquibaseCommand extends XipkiOsgiCommandSupport
     }
 
     protected Map<String, SimpleDatabaseConf> getDatabaseConfs()
-    throws FileNotFoundException, IOException
+    throws FileNotFoundException, IOException, PasswordResolverException
     {
         Map<String, SimpleDatabaseConf> ret = new HashMap<>();
         Properties props = getPropertiesFromFile("ca-config/ca.properties");
@@ -63,7 +67,7 @@ public abstract class LiquibaseCommand extends XipkiOsgiCommandSupport
                 String datasourceFile = props.getProperty(key);
                 String datasourceName = key.substring("datasource.".length());
                 Properties dbConf = getDbConfPoperties(datasourceFile);
-                SimpleDatabaseConf dbParams = SimpleDatabaseConf.getInstance(dbConf);
+                SimpleDatabaseConf dbParams = SimpleDatabaseConf.getInstance(dbConf, passwordResolver);
                 ret.put(datasourceName, dbParams);
             }
         }
@@ -160,4 +164,8 @@ public abstract class LiquibaseCommand extends XipkiOsgiCommandSupport
         }
     }
 
+    public void setPasswordResolver(PasswordResolver passwordResolver)
+    {
+        this.passwordResolver = passwordResolver;
+    }
 }
