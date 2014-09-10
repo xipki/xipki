@@ -77,12 +77,10 @@
     </fileSet>
     <fileSet>
       <directory>${project.build.directory}/sql</directory>
-      <excludes>
-        <exclude>liquibase/liquibase</exclude>
-        <exclude>liquibase/javadoc/**</exclude>
-        <exclude>liquibase/sdk/**</exclude>
-      </excludes>
       <outputDirectory>sql</outputDirectory>
+      <includes>
+      	<include>*.xml</include>
+      </includes>
       <fileMode>0644</fileMode>
       <directoryMode>0755</directoryMode>
     </fileSet>

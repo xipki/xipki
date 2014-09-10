@@ -18,8 +18,6 @@
     <pgjdbc-ng.version>0.3</pgjdbc-ng.version>
     <postgresql.version>9.3-1100-jdbc41</postgresql.version>
     <h2-jdbc.version>1.4.179</h2-jdbc.version>
-    <liquibase.version>3.2.0</liquibase.version>
-    <jtds.version>1.3.1</jtds.version>
   </properties>
   <dependencies>
     <dependency>
@@ -249,25 +247,6 @@
                   <groupId>org.postgresql</groupId>
                   <artifactId>postgresql</artifactId>
                   <version>${postgresql.version}</version>
-                </artifactItem>
-              </artifactItems>
-            </configuration>
-          </execution>
-          <execution>
-            <id>unpack-liquibase</id>
-            <phase>generate-resources</phase>
-            <goals>
-              <goal>unpack</goal>
-            </goals>
-            <configuration>
-              <artifactItems>
-                <artifactItem>
-                  <groupId>org.liquibase</groupId>
-                  <artifactId>liquibase-core</artifactId>
-                  <version>${liquibase.version}</version>
-                  <classifier>bin</classifier>
-                  <type>tar.gz</type>
-                  <outputDirectory>target/sql/liquibase</outputDirectory>
                 </artifactItem>
               </artifactItems>
             </configuration>

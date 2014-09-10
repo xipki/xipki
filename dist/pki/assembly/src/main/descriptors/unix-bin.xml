@@ -88,21 +88,8 @@
     <fileSet>
       <directory>${project.build.directory}/sql</directory>
       <includes>
-        <include>liquibase/liquibase</include>
-        <include>*.sh</include>
+      	<include>*.xml</include>
       </includes>
-      <outputDirectory>sql</outputDirectory>
-      <fileMode>0755</fileMode>
-      <directoryMode>0755</directoryMode>
-    </fileSet>
-    <fileSet>
-      <directory>${project.build.directory}/sql</directory>
-      <excludes>
-        <exclude>liquibase/liquibase</exclude>
-        <exclude>liquibase/javadoc/**</exclude>
-        <exclude>liquibase/sdk/**</exclude>
-        <exclude>**/*.sh</exclude>
-      </excludes>
       <outputDirectory>sql</outputDirectory>
       <fileMode>0644</fileMode>
       <directoryMode>0755</directoryMode>
