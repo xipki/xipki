@@ -9,6 +9,9 @@ package org.xipki.database.api;
 
 import java.util.Properties;
 
+import org.xipki.security.api.PasswordResolver;
+import org.xipki.security.api.PasswordResolverException;
+
 /**
  * @author Lijun Liao
  */
@@ -21,7 +24,8 @@ public class SimpleDatabaseConf
     private final String url;
     private final String schema;
 
-    public static SimpleDatabaseConf getInstance(Properties dbProps)
+    public static SimpleDatabaseConf getInstance(Properties dbProps, PasswordResolver passwordResolver)
+    throws PasswordResolverException
     {
         String driverClassName;
         String url;
@@ -146,6 +150,11 @@ public class SimpleDatabaseConf
         else
         {
             throw new IllegalArgumentException("Unsupported configuration");
+        }
+
+        if(passwordResolver != null && password != null && password.isEmpty() == false)
+        {
+            password = new String(passwordResolver.resolvePassword(password));
         }
 
         return new SimpleDatabaseConf(driverClassName, user, password, url, schema);
