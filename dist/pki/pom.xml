@@ -10,6 +10,10 @@
   <artifactId>dist-group</artifactId>
   <name>${project.groupId}.${project.artifactId}</name>
   <packaging>pom</packaging>
+  <properties>
+    <liquibase.version>3.2.2</liquibase.version>
+    <junit.version>4.8.2</junit.version>
+  </properties>
   <modules>
     <module>assembly</module>
     <module>branding</module>
