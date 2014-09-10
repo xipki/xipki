@@ -183,8 +183,9 @@ Run Demo
 
     ```sh
     features:install xipki-database-tool
+
     dbtool:initdb
-    ```sh
+    ```
 
 * Run the pre-configured OSGi-commands in karaf terminal
   
