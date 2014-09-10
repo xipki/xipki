@@ -61,19 +61,25 @@
     </command>
     <!-- Liquibase Commands -->
     <command name="dbtool/initdb-ca">
-      <action class="org.xipki.dbi.shell.InitDbCaCommand"/>
+      <action class="org.xipki.dbi.shell.InitDbCaCommand">
+        <property name="passwordResolver" ref="passwordResolver"/>      
+      </action>
       <optional-completers>
         <entry key="-logLevel" value-ref="logLevelCompleter"/>
       </optional-completers>
     </command>
     <command name="dbtool/initdb-all">
-      <action class="org.xipki.dbi.shell.InitDbAllCommand"/>
+      <action class="org.xipki.dbi.shell.InitDbAllCommand">
+        <property name="passwordResolver" ref="passwordResolver"/>      
+      </action>
       <optional-completers>
         <entry key="-logLevel" value-ref="logLevelCompleter"/>
       </optional-completers>
     </command>
     <command name="dbtool/initdb-ocsp">
-      <action class="org.xipki.dbi.shell.InitDbOcspCommand"/>
+      <action class="org.xipki.dbi.shell.InitDbOcspCommand">
+        <property name="passwordResolver" ref="passwordResolver"/>      
+      </action>
       <optional-completers>
         <entry key="-logLevel" value-ref="logLevelCompleter"/>
       </optional-completers>

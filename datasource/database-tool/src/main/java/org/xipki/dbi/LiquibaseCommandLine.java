@@ -7,11 +7,9 @@
 
 package org.xipki.dbi;
 
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Properties;
 
 import liquibase.exception.CommandLineParsingException;
 import liquibase.exception.LiquibaseException;
@@ -27,23 +25,6 @@ import org.xipki.security.common.IoCertUtil;
 
 public class LiquibaseCommandLine extends Main
 {
-    public static void main(String[] args)
-    {
-        try
-        {
-            Properties props = new Properties();
-            props.load(new FileInputStream(
-                    "/home/lliao/xipki/dist/pki/assembly/src/main/unfiltered/ca-config/example/ca-db.properties-db2"));
-            SimpleDatabaseConf dbParams = SimpleDatabaseConf.getInstance(props);
-
-            //String changeLogFile = "/home/lliao/xipki/ca/ca-sql/src/main/resources/ca-init.xml";
-            String logLevel = "debug";
-            releaseLocks(dbParams, logLevel);
-        }catch(Exception e)
-        {
-            e.printStackTrace();
-        }
-    }
     public static void releaseLocks(SimpleDatabaseConf dbParams, String logLevel)
     throws LiquibaseException, CommandLineParsingException, IOException
     {
