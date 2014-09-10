@@ -42,6 +42,9 @@ public class ExportCaCommand extends XipkiOsgiCommandSupport
             description = "Number of CRLs in one zip file")
     protected Integer numCrls = DFLT_NUM_CRLS;
 
+    @Option(name = "-resume")
+    protected Boolean resume = Boolean.FALSE;
+
     private DataSourceFactory dataSourceFactory;
     private PasswordResolver passwordResolver;
 
@@ -49,7 +52,7 @@ public class ExportCaCommand extends XipkiOsgiCommandSupport
     protected Object doExecute()
     throws Exception
     {
-        CaDbExporter exporter = new CaDbExporter(dataSourceFactory, passwordResolver, dbconfFile, outdir);
+        CaDbExporter exporter = new CaDbExporter(dataSourceFactory, passwordResolver, dbconfFile, outdir, resume);
         exporter.exportDatabase(numCertsInBundle, numCrls);
         return null;
     }

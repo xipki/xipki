@@ -37,6 +37,9 @@ public class ExportOcspCommand extends XipkiOsgiCommandSupport
             description = "Number of certificates in one zip file")
     protected Integer numCertsInBundle = DFLT_NUM_CERTS_IN_BUNDLE;
 
+    @Option(name = "-resume")
+    protected Boolean resume = Boolean.FALSE;
+
     private DataSourceFactory dataSourceFactory;
     private PasswordResolver passwordResolver;
 
@@ -44,7 +47,7 @@ public class ExportOcspCommand extends XipkiOsgiCommandSupport
     protected Object doExecute()
     throws Exception
     {
-        OcspDbExporter exporter = new OcspDbExporter(dataSourceFactory, passwordResolver, dbconfFile, outdir);
+        OcspDbExporter exporter = new OcspDbExporter(dataSourceFactory, passwordResolver, dbconfFile, outdir, resume);
         exporter.exportDatabase(numCertsInBundle);
         return null;
     }

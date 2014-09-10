@@ -16,6 +16,8 @@ import java.util.Properties;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
+import javax.xml.bind.Unmarshaller;
+import javax.xml.validation.Schema;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,10 +38,13 @@ public class OcspDbExporter
     private static final Logger LOG = LoggerFactory.getLogger(OcspDbImporter.class);
     protected final DataSourceWrapper dataSource;
     protected final Marshaller marshaller;
+    protected final Unmarshaller unmarshaller;
     protected final String destFolder;
+    protected final boolean resume;
 
     public OcspDbExporter(DataSourceFactory dataSourceFactory,
-            PasswordResolver passwordResolver, String dbConfFile, String destFolder)
+            PasswordResolver passwordResolver, String dbConfFile,
+            String destFolder, boolean resume)
     throws SQLException, PasswordResolverException, IOException, JAXBException
     {
         Properties props = DbPorter.getDbConfProperties(
@@ -49,7 +54,12 @@ public class OcspDbExporter
         JAXBContext jaxbContext = JAXBContext.newInstance(ObjectFactory.class);
         marshaller = jaxbContext.createMarshaller();
         marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
-        marshaller.setSchema(DbPorter.retrieveSchema("/xsd/dbi-ocsp.xsd"));
+
+        Schema schema = DbPorter.retrieveSchema("/xsd/dbi-ocsp.xsd");
+        marshaller.setSchema(schema);
+
+        unmarshaller = jaxbContext.createUnmarshaller();
+        unmarshaller.setSchema(schema);
 
         File f = new File(destFolder);
         if(f.exists() == false)
@@ -69,11 +79,15 @@ public class OcspDbExporter
             }
         }
 
-        String[] children = f.list();
-        if(children != null && children.length > 0)
+        if(resume == false)
         {
-            throw new IOException(destFolder + " is not empty");
+            String[] children = f.list();
+            if(children != null && children.length > 0)
+            {
+                throw new IOException(destFolder + " is not empty");
+            }
         }
+        this.resume = resume;
         this.destFolder = destFolder;
     }
 
@@ -85,7 +99,7 @@ public class OcspDbExporter
         {
             // CertStore
             OcspCertStoreDbExporter certStoreExporter = new OcspCertStoreDbExporter(
-                    dataSource, marshaller, destFolder, numCertsInBundle);
+                    dataSource, marshaller, unmarshaller, destFolder, numCertsInBundle, resume);
             certStoreExporter.export();
             certStoreExporter.shutdown();
         }finally

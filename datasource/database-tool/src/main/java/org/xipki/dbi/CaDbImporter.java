@@ -7,6 +7,7 @@
 
 package org.xipki.dbi;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.sql.SQLException;
@@ -35,9 +36,10 @@ public class CaDbImporter
     private static final Logger LOG = LoggerFactory.getLogger(CaDbImporter.class);
     private final DataSourceWrapper dataSource;
     private final Unmarshaller unmarshaller;
+    protected final boolean resume;
 
     public CaDbImporter(DataSourceFactory dataSourceFactory,
-            PasswordResolver passwordResolver, String dbConfFile)
+            PasswordResolver passwordResolver, String dbConfFile, boolean resume)
     throws SQLException, PasswordResolverException, IOException, JAXBException
     {
         Properties props = DbPorter.getDbConfProperties(
@@ -46,22 +48,43 @@ public class CaDbImporter
         JAXBContext jaxbContext = JAXBContext.newInstance(ObjectFactory.class);
         unmarshaller = jaxbContext.createUnmarshaller();
         unmarshaller.setSchema(DbPorter.retrieveSchema("/xsd/dbi-ca.xsd"));
+        this.resume = resume;
     }
 
     public void importDatabase(String srcFolder)
     throws Exception
     {
+        File processLogFile = new File(srcFolder, CaCertStoreDbImporter.PROCESS_LOG_FILENAME);
+        if(resume)
+        {
+            if(processLogFile.exists() == false)
+            {
+                throw new Exception("Could not process with '-resume' option");
+            }
+        }
+        else
+        {
+            if(processLogFile.exists())
+            {
+                throw new Exception("Please either specify '-resume' option or delete the file " +
+                        processLogFile.getPath() + " first");
+            }
+        }
+
         long start = System.currentTimeMillis();
         try
         {
-            // CAConfiguration
-            CaConfigurationDbImporter caConfImporter = new CaConfigurationDbImporter(
-                    dataSource, unmarshaller, srcFolder);
-            caConfImporter.importToDB();
-            caConfImporter.shutdown();
+            if(resume == false)
+            {
+                // CAConfiguration
+                CaConfigurationDbImporter caConfImporter = new CaConfigurationDbImporter(
+                        dataSource, unmarshaller, srcFolder);
+                caConfImporter.importToDB();
+                caConfImporter.shutdown();
+            }
 
             // CertStore
-            CaCertStoreDbImporter certStoreImporter = new CaCertStoreDbImporter(dataSource, unmarshaller, srcFolder);
+            CaCertStoreDbImporter certStoreImporter = new CaCertStoreDbImporter(dataSource, unmarshaller, srcFolder, resume);
             certStoreImporter.importToDB();
             certStoreImporter.shutdown();
         } finally
