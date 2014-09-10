@@ -127,7 +127,7 @@ public class SimpleDatabaseConf
             else
             {
                 driverClassName = dbProps.getProperty("db.driverClassName");
-                user = dbProps.getProperty("db.userName");
+                user = dbProps.getProperty("db.username");
                 password = dbProps.getProperty("db.password");
                 url= dbProps.getProperty("db.url");
             }

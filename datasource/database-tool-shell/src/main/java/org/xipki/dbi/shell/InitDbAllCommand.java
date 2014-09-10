@@ -17,7 +17,7 @@ import org.xipki.dbi.LiquibaseCommandLine;
  * @author Lijun Liao
  */
 
-@Command(scope = "dbtool", name = "initdb-all", description="Reset and initialize the CA and OCSP databases")
+@Command(scope = "dbtool", name = "initdb", description="Reset and initialize the CA and OCSP databases")
 public class InitDbAllCommand extends LiquibaseCommand
 {
     private static final String ca_schemaFile = "sql/ca-init.xml";

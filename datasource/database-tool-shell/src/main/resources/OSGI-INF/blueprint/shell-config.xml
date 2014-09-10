@@ -68,7 +68,7 @@
         <entry key="-logLevel" value-ref="logLevelCompleter"/>
       </optional-completers>
     </command>
-    <command name="dbtool/initdb-all">
+    <command name="dbtool/initdb">
       <action class="org.xipki.dbi.shell.InitDbAllCommand">
         <property name="passwordResolver" ref="passwordResolver"/>      
       </action>
