@@ -183,7 +183,6 @@ Run Demo
 
     ```sh
     features:install xipki-database-tool
-
     dbtool:initdb
     ```sh
 
