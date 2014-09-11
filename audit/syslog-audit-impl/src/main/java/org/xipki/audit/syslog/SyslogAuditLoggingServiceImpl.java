@@ -31,6 +31,7 @@ import com.nesscomputing.syslog4j.SyslogRuntimeException;
 import com.nesscomputing.syslog4j.impl.AbstractSyslogConfigIF;
 import com.nesscomputing.syslog4j.impl.message.modifier.sequential.SequentialSyslogMessageModifier;
 import com.nesscomputing.syslog4j.impl.message.pci.PCISyslogMessage;
+import com.nesscomputing.syslog4j.impl.net.udp.UDPNetSyslogConfig;
 import com.nesscomputing.syslog4j.util.SyslogUtility;
 
 /**
@@ -216,6 +217,13 @@ public class SyslogAuditLoggingServiceImpl implements AuditLoggingService
         {
             syslog = Syslog.getInstance(this.protocol);
             SyslogConfigIF config = syslog.getConfig();
+            if(config instanceof AbstractSyslogConfigIF)
+            {
+                AbstractSyslogConfigIF _config = (AbstractSyslogConfigIF) config;
+                _config.setThreaded(true);
+                _config.setThrowExceptionOnWrite(true);
+                _config.setWriteRetries(-1);
+            }
 
             if (notEmpty(host))
             {

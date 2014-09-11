@@ -28,9 +28,9 @@
       <version>${slf4j.version}</version>
     </dependency>
     <dependency>
-      <groupId>com.nesscomputing</groupId>
-      <artifactId>ness-syslog4j</artifactId>
-      <version>0.9.47-NESS-8</version>
+      <groupId>org.xipki</groupId>
+      <artifactId>ness-syslog4j-xipki</artifactId>
+      <version>${project.version}</version>
     </dependency>
   </dependencies>
 </project>
