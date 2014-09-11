@@ -41,6 +41,7 @@
     <ldapsdk.version>2.3.6</ldapsdk.version>
     <hessian.version>4.0.38</hessian.version>
     <liquibase.version>3.2.2</liquibase.version>
+    <syslog4j.version>0.9.47-NESS-8</syslog4j.version>
   </properties>
   <modules>
     <module>console-karaf</module>
