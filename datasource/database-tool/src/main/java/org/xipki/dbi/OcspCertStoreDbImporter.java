@@ -42,9 +42,6 @@ import org.xipki.security.common.ParamChecker;
 
 class OcspCertStoreDbImporter extends DbPorter
 {
-    public static final String PROCESS_LOG_FILENAME = "import.process";
-    private static final String MSG_CERTS_FINISHED = "CERTS.FINISHED";
-
     private static final Logger LOG = LoggerFactory.getLogger(OcspCertStoreDbImporter.class);
 
     static final String SQL_ADD_CAINFO =
@@ -82,7 +79,7 @@ class OcspCertStoreDbImporter extends DbPorter
         super(dataSource, srcDir);
         ParamChecker.assertNotNull("unmarshaller", unmarshaller);
         this.unmarshaller = unmarshaller;
-        File processLogFile = new File(baseDir, PROCESS_LOG_FILENAME);
+        File processLogFile = new File(baseDir, DbPorter.IMPORT_PROCESS_LOG_FILENAME);
         if(resume)
         {
             if(processLogFile.exists() == false)
@@ -113,7 +110,7 @@ class OcspCertStoreDbImporter extends DbPorter
             throw new Exception("Cannot import CertStore greater than " + VERSION + ": " + certstore.getVersion());
         }
 
-        File processLogFile = new File(baseDir, PROCESS_LOG_FILENAME);
+        File processLogFile = new File(baseDir, DbPorter.IMPORT_PROCESS_LOG_FILENAME);
         System.out.println("Importing OCSP certstore to database");
         try
         {
@@ -207,7 +204,7 @@ class OcspCertStoreDbImporter extends DbPorter
     throws Exception
     {
         int numProcessedBefore = 0;
-        int minId = 0;
+        int minId = 1;
         if(processLogFile.exists())
         {
             byte[] content = IoCertUtil.read(processLogFile);

@@ -64,8 +64,6 @@ import org.xipki.security.common.ParamChecker;
 
 class CaCertStoreDbExporter extends DbPorter
 {
-    public static final String PROCESS_LOG_FILENAME = "export.process";
-
     private static final Logger LOG = LoggerFactory.getLogger(CaCertStoreDbExporter.class);
     private final Marshaller marshaller;
     private final Unmarshaller unmarshaller;
@@ -136,7 +134,7 @@ class CaCertStoreDbExporter extends DbPorter
                 export_publishQueue(certstore);
                 export_deltaCRLCache(certstore);
             }
-            File processLogFile = new File(baseDir, PROCESS_LOG_FILENAME);
+            File processLogFile = new File(baseDir, DbPorter.EXPORT_PROCESS_LOG_FILENAME);
             export_cert(certstore, processLogFile);
 
             JAXBElement<CertStoreType> root = new ObjectFactory().createCertStore(certstore);
