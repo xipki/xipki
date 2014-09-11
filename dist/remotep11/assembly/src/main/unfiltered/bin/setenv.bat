@@ -55,11 +55,11 @@ rem SET KARAF_BASE
 rem Additional available Karaf options
 rem SET KARAF_OPTS
 
-if "%PROCESSOR_ARCHITECTURE%"=="AMD64" goto 64BIT
-SET NATIVE_LIB=native-lib\windows\win_x86
-goto OS_END
-:64BIT
+if "%PROCESSOR_ARCHITECTURE%"=="x86" goto 32BIT
 SET NATIVE_LIB=native-lib\windows\win_x64
+goto OS_END
+:32BIT
+SET NATIVE_LIB=native-lib\windows\win_x86
 :OS_END
 
 SET PATH = %PATH% %NATIVE_LIB%
@@ -71,7 +71,7 @@ rem SET KARAF_OPTS=%KARAF_OPTS% -Dorg.xipki.console.passwordui=gui
 SET KARAF_OPTS=%KARAF_OPTS% -Dsun.net.http.errorstream.enableBuffering=true
 rem SET KARAF_OPTS=%KARAF_OPTS% -Djavax.net.debug=all
 
-# PORTS configuration
+rem PORTS configuration
 SET KARAF_OPTS=%KARAF_OPTS% -Dmy.https.port=9443
 SET KARAF_OPTS=%KARAF_OPTS% -Dmy.http.port=9090
 SET KARAF_OPTS=%KARAF_OPTS% -Dmy.rmiServerPort=44445

@@ -55,31 +55,31 @@ rem SET KARAF_BASE
 rem Additional available Karaf options
 rem SET KARAF_OPTS
 
-if "%PROCESSOR_ARCHITECTURE%"=="AMD64" goto 64BIT
-SET NATIVE_LIB=native-lib\windows\win_x86
-goto OS_END
-:64BIT
+if "%PROCESSOR_ARCHITECTURE%"=="x86" goto 32BIT
 SET NATIVE_LIB=native-lib\windows\win_x64
+goto OS_END
+:32BIT
+SET NATIVE_LIB=native-lib\windows\win_x86
 :OS_END
 
 SET PATH = %PATH% %NATIVE_LIB%
 
 rem SET KARAF_OPTS=%KARAF_OPTS% -DNSSLIB=point\to\firefox
-SET KARAF_OPTS=%KARAF_OPTS% -Djava.library.path=%NATIVE_LIB%
+SET KARAF_OPTS=KARAF_OPTS% -Djava.library.path=%NATIVE_LIB%
 rem SET KARAF_OPTS=%KARAF_OPTS% -Dorg.xipki.signservice.timeout=10000
 SET KARAF_OPTS=%KARAF_OPTS% -Dorg.xipki.console.passwordui=console
 rem SET KARAF_OPTS=%KARAF_OPTS% -Dorg.xipki.console.passwordui=gui
-SET KARAF_OPTS="%KARAF_OPTS% -Dhttps.protocols=TLSv1.2,TLSv1.1,TLSv1
-SET KARAF_OPTS="%KARAF_OPTS% -Djavax.net.ssl.trustStore=etc\tlskeys\tls-client-truststore.jks
-SET KARAF_OPTS="%KARAF_OPTS% -Djavax.net.ssl.trustStorePassword=1234
-SET KARAF_OPTS="%KARAF_OPTS% -Djavax.net.ssl.keyStore=etc\tlskeys\tls-client-keystore.jks
-SET KARAF_OPTS="%KARAF_OPTS% -Djavax.net.ssl.keyStorePassword=1234
-SET KARAF_OPTS="%KARAF_OPTS% -Dsun.net.http.errorstream.enableBuffering=true
-SET KARAF_OPTS="%KARAF_OPTS% -Dsun.net.client.defaultConnectTimeout=60000
-SET KARAF_OPTS="%KARAF_OPTS% -Dsun.net.client.defaultReadTimeout=60000
+SET KARAF_OPTS=%KARAF_OPTS% -Dhttps.protocols=TLSv1.2,TLSv1.1,TLSv1
+SET KARAF_OPTS=%KARAF_OPTS% -Djavax.net.ssl.trustStore=etc\tlskeys\tls-client-truststore.jks
+SET KARAF_OPTS=%KARAF_OPTS% -Djavax.net.ssl.trustStorePassword=1234
+SET KARAF_OPTS=%KARAF_OPTS% -Djavax.net.ssl.keyStore=etc\tlskeys\tls-client-keystore.jks
+SET KARAF_OPTS=%KARAF_OPTS% -Djavax.net.ssl.keyStorePassword=1234
+SET KARAF_OPTS=%KARAF_OPTS% -Dsun.net.http.errorstream.enableBuffering=true
+SET KARAF_OPTS=%KARAF_OPTS% -Dsun.net.client.defaultConnectTimeout=60000
+SET KARAF_OPTS=%KARAF_OPTS% -Dsun.net.client.defaultReadTimeout=60000
 rem SET KARAF_OPTS="%KARAF_OPTS% -Djavax.net.debug=all
 
-# PORTS configuration
+rem PORTS configuration
 SET KARAF_OPTS=%KARAF_OPTS% -Dmy.https.port=9443
 SET KARAF_OPTS=%KARAF_OPTS% -Dmy.http.port=9090
 SET KARAF_OPTS=%KARAF_OPTS% -Dmy.rmiServerPort=44445
