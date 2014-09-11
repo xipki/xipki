@@ -119,6 +119,7 @@ class CaCertStoreDbExporter extends DbPorter
             certstore = new CertStoreType();
         }
 
+        Exception exception = null;
         certstore.setVersion(VERSION);
         System.out.println("Exporting CA certstore from database");
         try
@@ -135,16 +136,24 @@ class CaCertStoreDbExporter extends DbPorter
                 export_deltaCRLCache(certstore);
             }
             File processLogFile = new File(baseDir, DbPorter.EXPORT_PROCESS_LOG_FILENAME);
-            export_cert(certstore, processLogFile);
+            exception = export_cert(certstore, processLogFile);
 
             JAXBElement<CertStoreType> root = new ObjectFactory().createCertStore(certstore);
             marshaller.marshal(root, new File(baseDir + File.separator + FILENAME_CA_CertStore));
         }catch(Exception e)
         {
             System.err.println("Error while exporting CA certstore from database");
-            throw e;
+            exception = e;
         }
-        System.out.println(" Exported CA certstore from database");
+
+        if(exception == null)
+        {
+            System.out.println(" Exported CA certstore from database");
+        }
+        else
+        {
+            throw exception;
+        }
     }
 
     private void export_crl(CertStoreType certstore)
@@ -469,11 +478,12 @@ class CaCertStoreDbExporter extends DbPorter
         System.out.println(" Exported table CERTPROFILEINFO");
     }
 
-    private void export_cert(CertStoreType certstore, File processLogFile)
+    private Exception export_cert(CertStoreType certstore, File processLogFile)
     {
         try
         {
             do_export_cert(certstore, processLogFile);
+            return null;
         }catch(Exception e)
         {
             // delete the temporary files
@@ -481,6 +491,7 @@ class CaCertStoreDbExporter extends DbPorter
             System.err.println("\nExporting table CERT and RAWCERT has been cancelled due to error,\n"
                     + "please continue with the option '-resume'");
             LOG.error("Exception", e);
+            return e;
         }
     }
 
