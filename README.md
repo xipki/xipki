@@ -92,7 +92,7 @@ Tested Platforms
 * Database: DB2, H2, MySQL, Oracle, Oracle RAC and PostgreSQL
 * HSM: Thales nCipher Solo (PCI Card) and nCipher Connect (network)
 * JVM: OpenJDK JRE/JDK 7 and 8, Oracle JRE/JDK 7 and 8, IBM J9 JRE/JDK 7 and 8
-* OS: CentOS, Fedora, Redhat, SLES, Ubuntu
+* OS: CentOS, Fedora, Redhat, SLES, Ubuntu, Windows
 
 Build and Assembly
 ------------------
