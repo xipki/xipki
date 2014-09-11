@@ -53,7 +53,7 @@ public class P11ListSlotCommand extends SecurityCommand
     protected String moduleName = SecurityFactory.DEFAULT_P11MODULE_NAME;
 
     @Option(name = "-slot",
-            required = false, description = "Required.")
+            required = false, description = "Slot index")
     protected Integer slotIndex;
 
     @Override
