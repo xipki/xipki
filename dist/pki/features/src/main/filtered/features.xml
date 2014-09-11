@@ -18,9 +18,6 @@
     <bundle>mvn:org.bouncycastle/bcprov-jdk15on/${bc.version}</bundle>
     <bundle>mvn:org.bouncycastle/bcpkix-jdk15on/${bc.version}</bundle>
   </feature>
-  <feature name="xipki-console" version="${project.version}" resolver="(obr)">
-    <bundle>mvn:org.xipki/console-karaf/${project.version}</bundle>
-  </feature>
   <feature name="xipki-datasource" version="${project.version}" resolver="(obr)">
     <bundle>mvn:com.zaxxer/HikariCP/${hikaricp.version}</bundle>
     <bundle>mvn:org.javassist/javassist/3.18.1-GA</bundle>
@@ -58,7 +55,7 @@
   </feature>
   <feature name="xipki-caserver-shell" version="${project.version}" resolver="(obr)">
     <feature>xipki-caserver</feature>
-    <feature>xipki-console</feature>
+    <bundle>mvn:org.xipki/console-karaf/${project.version}</bundle>
     <bundle>mvn:org.xipki/ca-server-shell/${project.version}</bundle>
   </feature>
   <feature name="xipki-caclient" version="${project.version}" resolver="(obr)">
@@ -68,12 +65,12 @@
   </feature>
   <feature name="xipki-caclient-shell" version="${project.version}" resolver="(obr)">
     <feature>xipki-caclient</feature>
-    <feature>xipki-console</feature>
+    <bundle>mvn:org.xipki/console-karaf/${project.version}</bundle>
     <bundle>mvn:org.xipki/ca-client-shell/${project.version}</bundle>
   </feature>
   <feature name="xipki-security-shell" version="${project.version}" resolver="(obr)">
     <feature>xipki-security</feature>
-    <feature>xipki-console</feature>
+    <bundle>mvn:org.xipki/console-karaf/${project.version}</bundle>
     <bundle>mvn:org.xipki/security-shell/${project.version}</bundle>
   </feature>
   <feature name="xipki-ocspserver" version="${project.version}" resolver="(obr)">
@@ -90,12 +87,12 @@
   </feature>
   <feature name="xipki-ocspclient-shell" version="${project.version}" resolver="(obr)">
     <feature>xipki-ocspclient</feature>
-    <feature>xipki-console</feature>
+    <bundle>mvn:org.xipki/console-karaf/${project.version}</bundle>
     <bundle>mvn:org.xipki/ocsp-client-shell/${project.version}</bundle>
   </feature>
   <feature name="xipki-database-tool" version="${project.version}" resolver="(obr)">
     <feature>xipki-datasource</feature>
-    <feature>xipki-console</feature>
+    <bundle>mvn:org.xipki/console-karaf/${project.version}</bundle>
     <bundle><![CDATA[wrap:mvn:junit/junit/${junit.version}/$Bundle-SymbolicName=junit&Bundle-Version=${junit.version}]]></bundle>
     <bundle>mvn:org.liquibase/liquibase-osgi/${liquibase.version}</bundle>
     <bundle>mvn:org.xipki/database-tool/${project.version}</bundle>
