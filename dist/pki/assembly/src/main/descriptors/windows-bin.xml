@@ -21,7 +21,7 @@
         Copy over jar files for the lib dir
     -->
     <fileSet>
-      <directory>${project.build.directory}/windows-dependencies</directory>
+      <directory>${project.build.directory}/dependencies</directory>
       <includes>
         <include>*-branding.jar</include>
       </includes>
