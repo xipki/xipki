@@ -65,9 +65,6 @@ import org.xipki.security.common.ParamChecker;
 
 class CaCertStoreDbImporter extends DbPorter
 {
-    public static final String PROCESS_LOG_FILENAME = "import.process";
-    private static final String MSG_CERTS_FINISHED = "CERTS.FINISHED";
-
     private static final Logger LOG = LoggerFactory.getLogger(CaConfigurationDbImporter.class);
 
     private final Unmarshaller unmarshaller;
@@ -79,7 +76,7 @@ class CaCertStoreDbImporter extends DbPorter
         super(dataSource, srcDir);
         ParamChecker.assertNotNull("unmarshaller", unmarshaller);
         this.unmarshaller = unmarshaller;
-        File processLogFile = new File(baseDir, PROCESS_LOG_FILENAME);
+        File processLogFile = new File(baseDir, DbPorter.IMPORT_PROCESS_LOG_FILENAME);
         if(resume)
         {
             if(processLogFile.exists() == false)
@@ -110,7 +107,7 @@ class CaCertStoreDbImporter extends DbPorter
             throw new Exception("Cannot import CertStore greater than " + VERSION + ": " + certstore.getVersion());
         }
 
-        File processLogFile = new File(baseDir, PROCESS_LOG_FILENAME);
+        File processLogFile = new File(baseDir, DbPorter.IMPORT_PROCESS_LOG_FILENAME);
         System.out.println("Importing CA certstore to database");
         try
         {
@@ -523,14 +520,14 @@ class CaCertStoreDbImporter extends DbPorter
     throws Exception
     {
         int numProcessedBefore = 0;
-        int minId = 0;
+        int minId = 1;
         if(processLogFile.exists())
         {
             byte[] content = IoCertUtil.read(processLogFile);
             if(content != null && content.length > 2)
             {
                 String str = new String(content);
-                if(str.trim().equalsIgnoreCase(MSG_CERTS_FINISHED))
+                if(str.trim().equalsIgnoreCase(DbPorter.MSG_CERTS_FINISHED))
                 {
                     return;
                 }
