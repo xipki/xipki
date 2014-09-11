@@ -44,6 +44,11 @@ public class DbPorter
     public static final String DIRNAME_CERT = "CERT";
     public static final String PREFIX_FILENAME_CERTS = "certs-";
 
+    public static final String EXPORT_PROCESS_LOG_FILENAME = "export.process";
+    public static final String IMPORT_PROCESS_LOG_FILENAME = "import.process";
+    public static final String MSG_CERTS_FINISHED = "CERTS.FINISHED";
+    public static final String IMPORT_TO_OCSP_PROCESS_LOG_FILENAME = "importToOcsp.process";
+
     public static final int VERSION = 1;
 
     private final DataSourceWrapper dataSource;

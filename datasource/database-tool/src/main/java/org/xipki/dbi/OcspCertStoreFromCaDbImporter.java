@@ -54,9 +54,6 @@ import org.xipki.security.common.ParamChecker;
 
 class OcspCertStoreFromCaDbImporter extends DbPorter
 {
-    public static final String PROCESS_LOG_FILENAME = "importToOcsp.process";
-    private static final String MSG_CERTS_FINISHED = "CERTS.FINISHED";
-
     private static final Logger LOG = LoggerFactory.getLogger(OcspCertStoreFromCaDbImporter.class);
 
     private final Unmarshaller unmarshaller;
@@ -72,7 +69,7 @@ class OcspCertStoreFromCaDbImporter extends DbPorter
         ParamChecker.assertNotEmpty("publisherName", publisherName);
         this.unmarshaller = unmarshaller;
         this.publisherName = publisherName;
-        File processLogFile = new File(baseDir, PROCESS_LOG_FILENAME);
+        File processLogFile = new File(baseDir, DbPorter.IMPORT_TO_OCSP_PROCESS_LOG_FILENAME);
         if(resume)
         {
             if(processLogFile.exists() == false)
@@ -181,7 +178,7 @@ class OcspCertStoreFromCaDbImporter extends DbPorter
                 relatedCaIds = import_issuer(certstore.getCainfos(), relatedCas);
             }
 
-            File processLogFile = new File(baseDir, PROCESS_LOG_FILENAME);
+            File processLogFile = new File(baseDir, DbPorter.IMPORT_TO_OCSP_PROCESS_LOG_FILENAME);
             import_cert(certstore.getCertsFiles(), profileMap, revokedOnly, relatedCaIds, processLogFile);
             processLogFile.delete();
         }catch(Exception e)
