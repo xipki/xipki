@@ -110,11 +110,18 @@ class OcspCertStoreDbExporter extends DbPorter
         {
             export_issuer(certstore);
         }
-        export_cert(certstore, processLogFile);
+        Exception exception = export_cert(certstore, processLogFile);
 
         JAXBElement<CertStoreType> root = new ObjectFactory().createCertStore(certstore);
         marshaller.marshal(root, new File(baseDir, FILENAME_OCSP_CertStore));
-        System.out.println(" Exported OCSP certstore from database");
+        if(exception == null)
+        {
+            System.out.println(" Exported OCSP certstore from database");
+        }
+        else
+        {
+            throw exception;
+        }
     }
 
     private void export_issuer(CertStoreType certstore)
@@ -169,11 +176,12 @@ class OcspCertStoreDbExporter extends DbPorter
         System.out.println(" Exported table ISSUER");
     }
 
-    private void export_cert(CertStoreType certstore, File processLogFile)
+    private Exception export_cert(CertStoreType certstore, File processLogFile)
     {
         try
         {
             do_export_cert(certstore, processLogFile);
+            return null;
         }catch(Exception e)
         {
             // delete the temporary files
@@ -181,6 +189,7 @@ class OcspCertStoreDbExporter extends DbPorter
             System.err.println("\nExporting table CERT and RAWCERT has been cancelled due to error,\n"
                     + "please continue with the option '-resume'");
             LOG.error("Exception", e);
+            return e;
         }
     }
 
