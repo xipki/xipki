@@ -54,7 +54,7 @@ public class CaDbImporter
     public void importDatabase(String srcFolder)
     throws Exception
     {
-        File processLogFile = new File(srcFolder, CaCertStoreDbImporter.PROCESS_LOG_FILENAME);
+        File processLogFile = new File(srcFolder, DbPorter.IMPORT_PROCESS_LOG_FILENAME);
         if(resume)
         {
             if(processLogFile.exists() == false)

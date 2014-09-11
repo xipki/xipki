@@ -108,7 +108,15 @@ public class CaDbExporter
             }
         }
 
-        if(resume == false)
+        File processLogFile = new File(destFolder, DbPorter.EXPORT_PROCESS_LOG_FILENAME);
+        if(resume)
+        {
+            if(processLogFile.exists() == false)
+            {
+                throw new IOException("Could not process with '-resume' option");
+            }
+        }
+        else
         {
             String[] children = f.list();
             if(children != null && children.length > 0)
