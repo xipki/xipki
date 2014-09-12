@@ -295,7 +295,7 @@ public class CaUpdateCommand extends CaCommand
                 expirationPeriod,
                 validityMode);
 
-        out("update CA " + caName);
+        out("updated CA " + caName);
         return null;
     }
 }

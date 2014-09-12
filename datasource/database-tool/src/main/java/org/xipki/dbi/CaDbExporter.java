@@ -121,8 +121,7 @@ public class CaDbExporter
             String[] children = f.list();
             if(children != null && children.length > 0)
             {
-                throw new IOException("Please either specify '-resume' option or delete the file " +
-                        processLogFile.getPath() + " first");
+                throw new IOException(destFolder + " is not empty");
             }
         }
     }
