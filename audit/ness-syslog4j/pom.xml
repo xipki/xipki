@@ -8,7 +8,7 @@
   </parent>
   <groupId>org.xipki.thirdparty</groupId>
   <artifactId>ness-syslog4j</artifactId>
-  <version>${syslog4j.version}_1</version>
+  <version>${syslog4j.version}_1-SNAPSHOT</version>
   <packaging>jar</packaging>
   <name>XiPKI :: ${project.artifactId}</name>
   <build>
