@@ -107,7 +107,7 @@
     <bundle>mvn:org.apache.commons/commons-lang3/3.1</bundle>
     <bundle>mvn:com.google.guava/guava/13.0</bundle>
     <bundle>mvn:joda-time/joda-time/2.1</bundle>
-    <bundle><![CDATA[wrap:mvn:org.xipki/ness-syslog4j-xipki/${project.version}/$Bundle-SymbolicName=ness-syslog4j-xipki&Bundle-Version=1.0.0.SNAPSHOT]]></bundle>
+    <bundle><![CDATA[wrap:mvn:org.xipki.thirdparty/ness-syslog4j/${syslog4j.version}_1/$Bundle-SymbolicName=ness-syslog4j&Bundle-Version=${syslog4j.version4bundle}]]></bundle>
     <bundle>mvn:org.xipki/syslog-audit-impl/${project.version}</bundle>
   </feature>
   <feature name="xipki-pkiconsole-server" version="${project.version}" resolver="(obr)">

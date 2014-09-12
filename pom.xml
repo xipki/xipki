@@ -42,6 +42,7 @@
     <hessian.version>4.0.38</hessian.version>
     <liquibase.version>3.2.2</liquibase.version>
     <syslog4j.version>0.9.47-NESS-8</syslog4j.version>
+    <syslog4j.version4bundle>0.9.47.1</syslog4j.version4bundle>
   </properties>
   <modules>
     <module>console-karaf</module>
