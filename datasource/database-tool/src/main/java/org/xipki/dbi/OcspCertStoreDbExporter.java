@@ -102,8 +102,8 @@ class OcspCertStoreDbExporter extends DbPorter
         else
         {
             certstore = new CertStoreType();
+            certstore.setVersion(VERSION);
         }
-        certstore.setVersion(VERSION);
         System.out.println("Exporting OCSP certstore from database");
 
         if(resume == false)
@@ -185,7 +185,7 @@ class OcspCertStoreDbExporter extends DbPorter
         }catch(Exception e)
         {
             // delete the temporary files
-            DbPorter.deleteTmpFiles(baseDir, "tmp-certs-");
+            deleteTmpFiles(baseDir, "tmp-certs-");
             System.err.println("\nExporting table CERT and RAWCERT has been cancelled due to error,\n"
                     + "please continue with the option '-resume'");
             LOG.error("Exception", e);

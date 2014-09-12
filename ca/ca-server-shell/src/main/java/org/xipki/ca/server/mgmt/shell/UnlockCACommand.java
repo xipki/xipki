@@ -30,7 +30,7 @@ public class UnlockCACommand extends CaCommand
         {
             err("Could not unlock CA system");
         }
-        out("unlocked CMP responder");
+
         return null;
     }
 }

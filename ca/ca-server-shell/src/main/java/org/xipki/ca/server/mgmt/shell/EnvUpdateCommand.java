@@ -33,7 +33,7 @@ public class EnvUpdateCommand extends CaCommand
     throws Exception
     {
         caManager.changeEnvParam(name, value);
-        out("Update the environment " + name + "=" + getRealString(value));
+        out("Updated the environment " + name + "=" + getRealString(value));
         return null;
     }
 }
