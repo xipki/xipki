@@ -16,6 +16,6 @@
     <module>audit-api</module>
     <module>syslog-audit-impl</module>
     <module>slf4j-audit-impl</module>
-    <module>ness-syslog4j-xipki</module>
+    <module>ness-syslog4j</module>
   </modules>
 </project>
