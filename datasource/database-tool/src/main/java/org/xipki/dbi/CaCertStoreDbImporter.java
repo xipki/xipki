@@ -556,7 +556,7 @@ class CaCertStoreDbImporter extends DbPorter
                 if(numProcessed > 0)
                 {
                     sum += numProcessed;
-                    DbPorter.echoToFile((sum + numProcessedBefore) + ":" + lastId, processLogFile);
+                    echoToFile((sum + numProcessedBefore) + ":" + lastId, processLogFile);
                     printStatus(total, sum, startTime);
                 }
             }catch(Exception e)
@@ -568,7 +568,7 @@ class CaCertStoreDbImporter extends DbPorter
             }
         }
         printTrailer();
-        DbPorter.echoToFile(MSG_CERTS_FINISHED, processLogFile);
+        echoToFile(MSG_CERTS_FINISHED, processLogFile);
         System.out.println(" Imported " + sum + " certificates");
     }
 

@@ -114,7 +114,7 @@ public class UDPNetSyslog extends AbstractNetSyslog
                 else
                 {
                     attempts++;
-                }                
+                }
                 /* -----END PATCH----- */
             }
         }

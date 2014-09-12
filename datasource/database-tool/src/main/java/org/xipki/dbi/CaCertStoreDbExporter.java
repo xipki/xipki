@@ -117,10 +117,10 @@ class CaCertStoreDbExporter extends DbPorter
         else
         {
             certstore = new CertStoreType();
+            certstore.setVersion(VERSION);
         }
 
         Exception exception = null;
-        certstore.setVersion(VERSION);
         System.out.println("Exporting CA certstore from database");
         try
         {
@@ -487,7 +487,7 @@ class CaCertStoreDbExporter extends DbPorter
         }catch(Exception e)
         {
             // delete the temporary files
-            DbPorter.deleteTmpFiles(baseDir, "tmp-certs-");
+            deleteTmpFiles(baseDir, "tmp-certs-");
             System.err.println("\nExporting table CERT and RAWCERT has been cancelled due to error,\n"
                     + "please continue with the option '-resume'");
             LOG.error("Exception", e);
