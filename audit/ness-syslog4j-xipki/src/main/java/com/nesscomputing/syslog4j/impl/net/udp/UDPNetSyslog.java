@@ -99,14 +99,23 @@ public class UDPNetSyslog extends AbstractNetSyslog
 
             } catch (IOException ioe)
             {
+                /* -----BEGIN ORIGINAL-----
+                if (attempts == (this.netSyslogConfig.getWriteRetries() + 1))
+                {
+                    throw new SyslogRuntimeException(ioe);
+                }
+                -----END ORIGINAL----- */
+
+                /* -----BEGIN PATCH----- */
                 if (attempts >= (this.netSyslogConfig.getWriteRetries() + 1))
                 {
                     throw new SyslogRuntimeException(ioe);
                 }
                 else
                 {
-                	attempts++; // PATCH: added by xipki
+                    attempts++;
                 }                
+                /* -----END PATCH----- */
             }
         }
     }
