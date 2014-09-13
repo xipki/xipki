@@ -108,6 +108,11 @@ public class SimpleDatabaseConf
                 urlBuilder.append("jdbc:postgresql://");
                 urlBuilder.append(serverName).append(":").append(portNumber).append("/").append(databaseName);
             }
+            else if(dataSourceClassName.contains("hsqldb."))
+            {
+                driverClassName = "org.hsqldb.jdbc.JDBCDriver";
+                urlBuilder.append(dbProps.getProperty("dataSource.url"));
+            }
             else
             {
                 throw new IllegalArgumentException("Unsupported datasbase type " + dataSourceClassName);

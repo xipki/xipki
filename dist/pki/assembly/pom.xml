@@ -18,6 +18,7 @@
     <pgjdbc-ng.version>0.3</pgjdbc-ng.version>
     <postgresql.version>9.3-1100-jdbc41</postgresql.version>
     <h2-jdbc.version>1.4.179</h2-jdbc.version>
+    <hsqldb.version>2.3.2</hsqldb.version>
   </properties>
   <dependencies>
     <dependency>
@@ -247,6 +248,11 @@
                   <groupId>org.postgresql</groupId>
                   <artifactId>postgresql</artifactId>
                   <version>${postgresql.version}</version>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>org.hsqldb</groupId>
+                  <artifactId>hsqldb</artifactId>
+                  <version>${hsqldb.version}</version>
                 </artifactItem>
               </artifactItems>
             </configuration>

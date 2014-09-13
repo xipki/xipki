@@ -2048,10 +2048,19 @@ class CertStoreQueryExecutor
             case ORACLE:
             case POSTGRESQL:
             case H2:
+            case HSQLDB:
                 boolean alterSequence = false;
                 try
                 {
-                    long lastestSerial = lastestSerial(caName);
+                    long lastestSerial;
+                    if(DatabaseType.HSQLDB == dbType)
+                    {
+                        lastestSerial = nextSerial(caName) - 1;
+                    }
+                    else
+                    {
+                        lastestSerial = lastestSerial(caName);
+                    }
                     // sequence exists
 
                     if(lastestSerial + 1 >= startValue)
@@ -2067,7 +2076,6 @@ class CertStoreQueryExecutor
                     return;
                 }catch(SQLException e)
                 {
-                    // sequence does not exist
                 }
 
                 // subtract 1 from the startValue, this will be incremented at the next step nextSerial()
@@ -2075,7 +2083,8 @@ class CertStoreQueryExecutor
                 String sql;
                 if(alterSequence)
                 {
-                    if(DatabaseType.DB2 == dbType | DatabaseType.POSTGRESQL == dbType | DatabaseType.H2 == dbType)
+                    if(DatabaseType.DB2 == dbType | DatabaseType.POSTGRESQL == dbType | DatabaseType.H2 == dbType ||
+                            DatabaseType.HSQLDB == dbType)
                     {
                         sql = "ALTER SEQUENCE SERIAL_" + caName + " RESTART WITH " + _startValue;
                     }
@@ -2120,6 +2129,10 @@ class CertStoreQueryExecutor
                     {
                         sql = "START WITH " + _startValue + " INCREMENT BY 1 NO CYCLE NO CACHE";
                     }
+                    else if(DatabaseType.HSQLDB == dbType)
+                    {
+                        sql = "AS BIGINT START WITH " + _startValue + " INCREMENT BY 1";
+                    }
                     else
                     {
                         throw new RuntimeException("should not reach here");
@@ -2143,6 +2156,8 @@ class CertStoreQueryExecutor
                 // whether a sequence exists
                 nextSerial(caName);
 
+                break;
+            case MYSQL:
                 break;
             default:
             throw new RuntimeException("unsupported database type " + dbType);
@@ -2169,7 +2184,7 @@ class CertStoreQueryExecutor
                 {
                     sql = "SELECT SERIAL_" + caName + ".CURRVAL FROM DUAL";
                 }
-                else if(DatabaseType.POSTGRESQL == dbType | DatabaseType.H2 == dbType)
+                else if(DatabaseType.POSTGRESQL == dbType || DatabaseType.H2 == dbType)
                 {
                     sql = "SELECT CURRVAL ('SERIAL_" + caName + "')";
                 }
@@ -2233,6 +2248,7 @@ class CertStoreQueryExecutor
             case ORACLE:
             case POSTGRESQL:
             case H2:
+            case HSQLDB:
             {
                 String sql;
                 if(DatabaseType.DB2 == dbType)
@@ -2243,9 +2259,14 @@ class CertStoreQueryExecutor
                 {
                     sql = "SELECT SERIAL_" + caName + ".NEXTVAL FROM DUAL";
                 }
-                else if(DatabaseType.POSTGRESQL == dbType | DatabaseType.H2 == dbType)
+                else if(DatabaseType.POSTGRESQL == dbType || DatabaseType.H2 == dbType)
                 {
                     sql = "SELECT NEXTVAL ('SERIAL_" + caName + "')";
+                }
+                else if(DatabaseType.HSQLDB == dbType)
+                {
+                    sql = "SELECT NEXTVAL ('SERIAL_" + caName + "')";
+                    // sql = "SELECT NEXT VALUE FOR SERIAL_" + caName;
                 }
                 else
                 {
