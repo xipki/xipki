@@ -17,6 +17,8 @@ import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.bouncycastle.cert.X509CertificateHolder;
 import org.bouncycastle.operator.ContentVerifierProvider;
 import org.xipki.security.api.p11.P11CryptService;
+import org.xipki.security.api.p11.P11KeyIdentifier;
+import org.xipki.security.api.p11.P11SlotIdentifier;
 
 /**
  * @author Lijun Liao
@@ -54,4 +56,7 @@ public interface SecurityFactory
 
     P11CryptService getP11CryptService(String moduleName)
     throws SignerException;
+
+    PublicKey getPkcs11PublicKey(String moduleName, P11SlotIdentifier slotId, P11KeyIdentifier keyId)
+    throws InvalidKeyException;
 }
