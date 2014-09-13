@@ -2963,6 +2963,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
             case H2:
             case ORACLE:
             case POSTGRESQL:
+            case HSQLDB:
                 String sql = "DROP SEQUENCE SERIAL_" + caName;
                 try
                 {
