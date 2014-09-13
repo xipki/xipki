@@ -990,4 +990,18 @@ public class SecurityFactoryImpl implements SecurityFactory
         return passwordResolver;
     }
 
+    @Override
+    public PublicKey getPkcs11PublicKey(String moduleName, P11SlotIdentifier slotId, P11KeyIdentifier keyId)
+    throws InvalidKeyException
+    {
+        try
+        {
+            P11CryptService p11 = getP11CryptService(moduleName);
+            return p11 == null ? null : p11.getPublicKey(slotId, keyId);
+        } catch (SignerException e)
+        {
+            throw new InvalidKeyException(e.getMessage(), e);
+        }
+    }
+
 }
