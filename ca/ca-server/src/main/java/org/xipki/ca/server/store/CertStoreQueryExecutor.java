@@ -2052,18 +2052,18 @@ class CertStoreQueryExecutor
                 boolean alterSequence = false;
                 try
                 {
-                    long lastestSerial;
+                    long latestSerial;
                     if(DatabaseType.HSQLDB == dbType)
                     {
-                        lastestSerial = nextSerial(caName) - 1;
+                        latestSerial = nextSerial(caName) - 1;
                     }
                     else
                     {
-                        lastestSerial = lastestSerial(caName);
+                        latestSerial = latestSerial(caName);
                     }
                     // sequence exists
 
-                    if(lastestSerial + 1 >= startValue)
+                    if(latestSerial + 1 >= startValue)
                     {
                         // number in sequence is correct, do nothing
                         return;
@@ -2073,9 +2073,9 @@ class CertStoreQueryExecutor
                         // the startValue in sequence should be corrected
                         alterSequence = true;
                     }
-                    return;
                 }catch(SQLException e)
                 {
+                    // e.printStackTrace();
                 }
 
                 // subtract 1 from the startValue, this will be incremented at the next step nextSerial()
@@ -2164,7 +2164,7 @@ class CertStoreQueryExecutor
         }
     }
 
-    long lastestSerial(String caName)
+    long latestSerial(String caName)
     throws SQLException
     {
         DatabaseType dbType = dataSource.getDatabaseType();
@@ -2266,7 +2266,6 @@ class CertStoreQueryExecutor
                 else if(DatabaseType.HSQLDB == dbType)
                 {
                     sql = "SELECT NEXTVAL ('SERIAL_" + caName + "')";
-                    // sql = "SELECT NEXT VALUE FOR SERIAL_" + caName;
                 }
                 else
                 {
