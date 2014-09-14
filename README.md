@@ -22,7 +22,7 @@ eXtensible sImple Public Key Infrastructure consists of CA and OCSP responder.
  - Support of both random and sequential certificate serial number assignment
  - Management of multiple CAs in one software instance
  - Multiple software instances (all can be in active mode) for the same CA
- - Support of databases Oracle, DB2, PostgreSQL, MySQL, H2
+ - Support of databases Oracle, DB2, PostgreSQL, MySQL, H2 and HSQLDB
  - Embedded support of management of CA via embedded OSGi commands
  - API to specify CA management, e.g. GUI
  - Embedded database tool (export and import CA database) simplifies the switch of databases, upgrade of XiPKi and switch from other CA system to XiPKI CA
@@ -37,7 +37,7 @@ eXtensible sImple Public Key Infrastructure consists of CA and OCSP responder.
   - Embedded support of certificate status source CRL and DeltaCRL
   - Support of both unsigned and signed OCSP requests
   - Multiple software instances (all can be in active mode) for the same OCSP signer and certifcate status sources.
-  - Support of most popular databases, e.g. Oracle, DB2, PostgreSQL, MySQL, H2
+  - Support of most popular databases, e.g. Oracle, DB2, PostgreSQL, MySQL, H2 and HSQLDB
   - Embedded database tool (export and import OCSP database) simplifies the switch of databases, upgrade of XiPKi and switch from other OCSP system to XiPKI OCSP.
   - Embedded client to send OCSP request
 
