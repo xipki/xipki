@@ -1221,7 +1221,10 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
     private void initCAs()
     throws CAMgmtException
     {
-        if(cAsInitialized) return;
+        if(cAsInitialized)
+        {
+            return;
+        }
 
         cas.clear();
         ca_has_requestors.clear();

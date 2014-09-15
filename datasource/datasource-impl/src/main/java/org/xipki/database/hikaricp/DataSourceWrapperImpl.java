@@ -248,7 +248,7 @@ public class DataSourceWrapperImpl implements DataSourceWrapper
     }
 
     @Override
-    public int getMin(Connection conn, String table, String column)
+    public long getMin(Connection conn, String table, String column)
     throws SQLException
     {
         Statement stmt = null;
@@ -260,7 +260,7 @@ public class DataSourceWrapperImpl implements DataSourceWrapper
             rs = stmt.executeQuery(sql);
 
             rs.next();
-            return rs.getInt(1);
+            return rs.getLong(1);
         }finally
         {
             if(conn == null)
@@ -302,7 +302,7 @@ public class DataSourceWrapperImpl implements DataSourceWrapper
     }
 
     @Override
-    public int getMax(Connection conn, String table, String column)
+    public long getMax(Connection conn, String table, String column)
     throws SQLException
     {
         Statement stmt = null;
@@ -314,7 +314,7 @@ public class DataSourceWrapperImpl implements DataSourceWrapper
             rs = stmt.executeQuery(sql);
 
             rs.next();
-            return rs.getInt(1);
+            return rs.getLong(1);
         }finally
         {
             if(conn == null)

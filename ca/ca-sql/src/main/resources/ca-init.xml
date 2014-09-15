@@ -3,6 +3,9 @@
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.0.xsd"
   logicalFilePath="ca-init.xml">
+  
+    <property name="autoIncrement" value="true" dbms="postgresql,db2,mysql,h2,hsqldb"/>
+    <property name="autoIncrement" value="false" dbms="oracle"/>
 
 	<!-- CA configuration :: create table -->
 	<changeSet author="xipki" id="1">
@@ -363,7 +366,7 @@
 			</column>
 		</createTable>
 		
-		<!-- table PublishQueue -->
+		<!-- table PUBLISHQUEUE -->
 		<createTable tableName="PUBLISHQUEUE">
 			<column name="CERT_ID" type="INT">
 				<constraints nullable="false"/>
@@ -376,8 +379,11 @@
 			</column>
 		</createTable>
 		
-		<!-- table DELTACRL_CHANGES -->
+		<!-- table DELTACRL_CACHE -->
 		<createTable tableName="DELTACRL_CACHE">
+			<column name="ID" type="BIGINT" autoIncrement="${autoIncrement}">
+				<constraints primaryKey="true" nullable="false"/>
+			</column>
 			<column name="CAINFO_ID" type="INT">
 				<constraints nullable="false"/>
 			</column>
@@ -387,9 +393,16 @@
 		</createTable>
 		
 	</changeSet>
+	
+	<changeSet author="xipki" id="3" dbms="oracle">
+		<!-- sequence for the column ID in table DELTACRL_CACHE -->
+		<createSequence sequenceName="SEQ_DCC_ID"
+			incrementBy="1"
+			startValue="1"/>
+	</changeSet>
 
 	<!-- CA Configuration :: foreign key -->
-	<changeSet author="xipki" id="3">
+	<changeSet author="xipki" id="4">
 		<addForeignKeyConstraint deferrable="false" initiallyDeferred="false"
 			onDelete="CASCADE" onUpdate="NO ACTION"
 			baseColumnNames="CRLSIGNER_NAME" baseTableName="CA" 
@@ -442,7 +455,7 @@
 			referencedColumnNames="NAME" referencedTableName="CA"/>
 	</changeSet>
 	<!-- CertStore :: foreigen key -->
-	<changeSet author="xipki" id="4">
+	<changeSet author="xipki" id="5">
 		<addForeignKeyConstraint deferrable="false" initiallyDeferred="false"
 			onDelete="CASCADE" onUpdate="NO ACTION"
 			baseColumnNames="CAINFO_ID" baseTableName="CRL"
