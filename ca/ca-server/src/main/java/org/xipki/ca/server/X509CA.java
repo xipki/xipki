@@ -1255,12 +1255,6 @@ public class X509CA
                     "Not allow to unrevoke CA certificate");
         }
 
-        if(crlGenInProcess.get())
-        {
-            throw new OperationException(ErrorCode.System_Unavailable,
-                    "TRY_LATER");
-        }
-
         return do_unrevokeCertificate(serialNumber, false);
     }
 
@@ -1589,6 +1583,8 @@ public class X509CA
             throw new OperationException(ErrorCode.INSUFFICIENT_PERMISSION,
                     "Profile " + certProfileName + " not applied to non-RA");
         }
+
+        requestedSubject = removeEmptyRDNs(requestedSubject);
 
         if(certProfile.isSerialNumberInReqPermitted() == false)
         {
@@ -2080,6 +2076,35 @@ public class X509CA
                     }
                 }
             }
+        }
+    }
+
+    // remove the RDNs with empty content
+    private static X500Name removeEmptyRDNs(X500Name name)
+    {
+        RDN[] rdns = name.getRDNs();
+        List<RDN> l = new ArrayList<RDN>(rdns.length);
+        boolean changed = false;
+        for(RDN rdn : rdns)
+        {
+        	String textValue = IETFUtils.valueToString(rdn.getFirst().getValue());
+        	if(textValue == null || textValue.isEmpty())
+        	{
+        		changed = true;
+        	}
+        	else
+        	{
+        		l.add(rdn);
+        	}
+        }
+        
+        if(changed)
+        {
+        	return new X500Name(l.toArray(new RDN[0]));
+        }        
+        else
+        {
+        	return name;
         }
     }
 
