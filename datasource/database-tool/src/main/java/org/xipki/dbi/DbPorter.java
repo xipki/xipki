@@ -51,7 +51,7 @@ public class DbPorter
 
     public static final int VERSION = 1;
 
-    private final DataSourceWrapper dataSource;
+    protected final DataSourceWrapper dataSource;
     private Connection connection;
     private boolean connectionAutoCommit;
 
@@ -143,13 +143,13 @@ public class DbPorter
         connection = null;
     }
 
-    public int getMin(String table, String column)
+    public long getMin(String table, String column)
     throws SQLException
     {
         return dataSource.getMin(connection, table, column);
     }
 
-    public int getMax(String table, String column)
+    public long getMax(String table, String column)
     throws SQLException
     {
         return dataSource.getMax(connection, table, column);

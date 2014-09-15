@@ -337,8 +337,8 @@ class CaCertStoreDbExporter extends DbPorter
 
         String tableName = "USERNAME";
 
-        final int minId = getMin(tableName, "ID");
-        final int maxId = getMax(tableName, "ID");
+        final int minId = (int) getMin(tableName, "ID");
+        final int maxId = (int) getMax(tableName, "ID");
 
         String sql = "SELECT ID, NAME FROM " + tableName +
                 " WHERE ID >= ? AND ID < ?" +
@@ -523,12 +523,12 @@ class CaCertStoreDbExporter extends DbPorter
 
         if(minId == null)
         {
-            minId = getMin("CERT", "ID");
+            minId = (int) getMin("CERT", "ID");
         }
 
         System.out.println("Exporting tables CERT and RAWCERT from ID " + minId);
 
-        final int maxId = getMax("CERT", "ID");
+        final int maxId = (int) getMax("CERT", "ID");
         long total = getCount("CERT") - numProcessedBefore;
         if(total < 1)
         {
@@ -747,8 +747,8 @@ class CaCertStoreDbExporter extends DbPorter
                 " WHERE CERT_ID >= ? AND CERT_ID < ?" +
                 " ORDER BY CERT_ID ASC";
 
-        final int minId = getMin("PUBLISHQUEUE", "CERT_ID");
-        final int maxId = getMax("PUBLISHQUEUE", "CERT_ID");
+        final int minId = (int) getMin("PUBLISHQUEUE", "CERT_ID");
+        final int maxId = (int) getMax("PUBLISHQUEUE", "CERT_ID");
 
         PublishQueue queue = new PublishQueue();
         certstore.setPublishQueue(queue);
@@ -796,7 +796,7 @@ class CaCertStoreDbExporter extends DbPorter
     {
         System.out.println("Exporting table DELTACRL_CACHE");
 
-        String sql = "SELECT SERIAL, CAINFO_ID FROM DELTACRL_CACHE";
+        String sql = "SELECT ID, SERIAL, CAINFO_ID FROM DELTACRL_CACHE";
 
         DeltaCRLCache deltaCache = new DeltaCRLCache();
         certstore.setDeltaCRLCache(deltaCache);
@@ -812,10 +812,12 @@ class CaCertStoreDbExporter extends DbPorter
 
             while(rs.next())
             {
+                long id = rs.getLong("ID");
                 long serial = rs.getLong("SERIAL");
                 int ca_id = rs.getInt("CAINFO_ID");
 
                 DeltaCRLCacheEntryType entry = new DeltaCRLCacheEntryType();
+                entry.setId(id);
                 entry.setCaId(ca_id);
                 entry.setSerial(serial);
                 list.add(entry);

@@ -40,10 +40,10 @@ public interface DataSourceWrapper
 
     String createFetchFirstSelectSQL(String coreSql, int rows, String orderBy);
 
-    int getMin(Connection conn, String table, String column)
+    long getMin(Connection conn, String table, String column)
     throws SQLException;
 
-    int getMax(Connection conn, String table, String column)
+    long getMax(Connection conn, String table, String column)
     throws SQLException;
 
     int getCount(Connection conn, String table)

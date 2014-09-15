@@ -221,7 +221,7 @@ class OcspCertStoreDbExporter extends DbPorter
 
         if(minCertId == null)
         {
-            minCertId = getMin("CERT", "ID");
+            minCertId = (int) getMin("CERT", "ID");
         }
 
         System.out.println("Exporting tables CERT, CERTHASH and RAWCERT from ID " + minCertId);
@@ -233,7 +233,7 @@ class OcspCertStoreDbExporter extends DbPorter
 
         String rawCertSql = "SELECT CERT_ID, CERT FROM RAWCERT WHERE CERT_ID >= ? AND CERT_ID < ?";
 
-        final int maxCertId = getMax("CERT", "ID");
+        final int maxCertId = (int) getMax("CERT", "ID");
         final long total = getCount("CERT") - numProcessedBefore;
 
         PreparedStatement certPs = prepareStatement(certSql);

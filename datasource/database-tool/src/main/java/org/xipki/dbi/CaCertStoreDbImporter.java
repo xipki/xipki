@@ -16,6 +16,7 @@ import java.security.cert.X509CRL;
 import java.security.cert.X509Certificate;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.sql.Types;
 import java.util.List;
 import java.util.StringTokenizer;
@@ -35,6 +36,7 @@ import org.bouncycastle.util.encoders.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.database.api.DataSourceWrapper;
+import org.xipki.database.api.DatabaseType;
 import org.xipki.dbi.ca.jaxb.CainfoType;
 import org.xipki.dbi.ca.jaxb.CertStoreType;
 import org.xipki.dbi.ca.jaxb.CertStoreType.Cainfos;
@@ -122,6 +124,7 @@ class CaCertStoreDbImporter extends DbPorter
             }
 
             import_cert(certstore.getCertsFiles(), processLogFile);
+
             import_publishQueue(certstore.getPublishQueue());
             import_deltaCRLCache(certstore.getDeltaCRLCache());
             processLogFile.delete();
@@ -391,8 +394,8 @@ class CaCertStoreDbImporter extends DbPorter
     throws Exception
     {
         final String SQL = "INSERT INTO DELTACRL_CACHE" +
-                " (SERIAL, CAINFO_ID)" +
-                " VALUES (?, ?)";
+                " (ID, SERIAL, CAINFO_ID)" +
+                " VALUES (?, ?, ?)";
 
         System.out.println("Importing table DELTACRL_CACHE");
         PreparedStatement ps = prepareStatement(SQL);
@@ -403,19 +406,39 @@ class CaCertStoreDbImporter extends DbPorter
             {
                 try
                 {
-                    ps.setLong(1, entry.getSerial());
-                    ps.setInt(2, entry.getCaId());
+                    int idx = 1;
+                    ps.setLong(idx++, entry.getId());
+                    ps.setLong(idx++, entry.getSerial());
+                    ps.setInt(idx++, entry.getCaId());
                     ps.execute();
                 }catch(Exception e)
                 {
-                    System.err.println("Error while importing DELTACRL_CACHE with SERIAL=" + entry.getSerial()
-                            + " and CAINFO_ID=" + entry.getCaId() + ", message: " + e.getMessage());
+                    System.err.println("Error while importing DELTACRL_CACHE with ID=" + entry.getId() +
+                            ", message: " + e.getMessage());
                     throw e;
                 }
             }
         }finally
         {
             releaseResources(ps, null);
+        }
+
+        if(dataSource.getDatabaseType() == DatabaseType.ORACLE)
+        {
+            long maxId = getMax("DELTACRL_CACHE", "ID");
+
+            final String sql_drop = "DROP SEQUENCE SEQ_DCC_ID";
+            final String sqL_create = "CREATE SEQUENCE SEQ_DCC_ID START WITH " + (maxId + 1) +
+                    " INCREMENT BY 1 NOCYCLE NOCACHE";
+            Statement stmt = createStatement();
+            try
+            {
+                stmt.executeUpdate(sql_drop);
+                stmt.executeUpdate(sqL_create);
+            }finally
+            {
+                releaseResources(stmt, null);
+            }
         }
 
         System.out.println(" Imported table DELTACRL_CACHE");
