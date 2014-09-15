@@ -344,13 +344,15 @@ public class X509CA
             {
                 nextUpdate = null;
             }
+
+            long maxIdOfDeltaCRLCache = certstore.getMaxIdOfDeltaCRLCache(caInfo.getCertificate());
             X509CRL crl = generateCRL(false, thisUpdate, nextUpdate);
 
             if(crl != null)
             {
                 try
                 {
-                    certstore.clearDeltaCRLCache(caInfo.getCertificate());
+                    certstore.clearDeltaCRLCache(caInfo.getCertificate(), maxIdOfDeltaCRLCache);
                 } catch (Throwable t)
                 {
                     final String message = "Could not clear DeltaCRLCache of CA " + caInfo.getName();
@@ -1216,12 +1218,6 @@ public class X509CA
                     "Not allow to revoke CA certificate");
         }
 
-        if(crlGenInProcess.get())
-        {
-            throw new OperationException(ErrorCode.System_Unavailable,
-                    "TRY_LATER");
-        }
-
         if(reason == null)
         {
             reason = CRLReason.UNSPECIFIED;
@@ -1265,12 +1261,6 @@ public class X509CA
         {
             throw new OperationException(ErrorCode.INSUFFICIENT_PERMISSION,
                     "Not allow to remove CA certificate");
-        }
-
-        if(crlGenInProcess.get())
-        {
-            throw new OperationException(ErrorCode.System_Unavailable,
-                    "TRY_LATER");
         }
 
         X509CertificateWithMetaInfo removedCert =
@@ -2087,24 +2077,24 @@ public class X509CA
         boolean changed = false;
         for(RDN rdn : rdns)
         {
-        	String textValue = IETFUtils.valueToString(rdn.getFirst().getValue());
-        	if(textValue == null || textValue.isEmpty())
-        	{
-        		changed = true;
-        	}
-        	else
-        	{
-        		l.add(rdn);
-        	}
+            String textValue = IETFUtils.valueToString(rdn.getFirst().getValue());
+            if(textValue == null || textValue.isEmpty())
+            {
+                changed = true;
+            }
+            else
+            {
+                l.add(rdn);
+            }
         }
-        
+
         if(changed)
         {
-        	return new X500Name(l.toArray(new RDN[0]));
-        }        
+            return new X500Name(l.toArray(new RDN[0]));
+        }
         else
         {
-        	return name;
+            return name;
         }
     }
 
@@ -2508,11 +2498,12 @@ public class X509CA
 
                 try
                 {
+                    long maxIdOfDeltaCRLCache = certstore.getMaxIdOfDeltaCRLCache(caInfo.getCertificate());
                     generateCRL(deltaCrl, thisUpdate, nextUpdate);
 
                     try
                     {
-                        certstore.clearDeltaCRLCache(caInfo.getCertificate());
+                        certstore.clearDeltaCRLCache(caInfo.getCertificate(), maxIdOfDeltaCRLCache);
                     } catch (Throwable t)
                     {
                         final String message = "Could not clear DeltaCRLCache of CA " + caInfo.getName();

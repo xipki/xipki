@@ -85,9 +85,9 @@ class CertStoreQueryExecutor
     throws SQLException
     {
         this.dataSource = dataSource;
-        this.cert_id = new AtomicInteger(dataSource.getMax(null, "CERT", "ID") + 1);
-        this.crl_id = new AtomicInteger(dataSource.getMax(null, "CRL", "ID") + 1);
-        this.user_id = new AtomicInteger(dataSource.getMax(null, "USERNAME", "ID") + 1);
+        this.cert_id = new AtomicInteger((int) dataSource.getMax(null, "CERT", "ID") + 1);
+        this.crl_id = new AtomicInteger((int) dataSource.getMax(null, "CRL", "ID") + 1);
+        this.user_id = new AtomicInteger((int) dataSource.getMax(null, "USERNAME", "ID") + 1);
 
         this.caInfoStore = initCertBasedIdentyStore("CAINFO");
         this.requestorInfoStore = initNameIdStore("REQUESTORINFO");
@@ -311,23 +311,43 @@ class CertStoreQueryExecutor
         }
     }
 
-    public void clearDeltaCRLCache(X509CertificateWithMetaInfo caCert)
+    long getMaxIdOfDeltaCRLCache(X509CertificateWithMetaInfo caCert)
     throws OperationException, SQLException
     {
-        StringBuilder sqlBuilder = new StringBuilder("DELETE FROM DELTACRL_CACHE");
-        if(caCert != null)
-        {
-            sqlBuilder.append(" WHERE CAINFO_ID=?");
-        }
+        String sql = "SELECT MAX(ID) FROM DELTACRL_CACHE WHERE CAINFO_ID=?";
+        PreparedStatement ps = borrowPreparedStatement(sql);
 
-        PreparedStatement ps = borrowPreparedStatement(sqlBuilder.toString());
         try
         {
-            if(caCert != null)
+            int caId = getCaId(caCert);
+            ps.setInt(1, caId);
+
+            ResultSet rs = ps.executeQuery();
+            if(rs.next())
             {
-                int caId = getCaId(caCert);
-                ps.setInt(1, caId);
+                return rs.getLong(1);
             }
+            else
+            {
+                return 0;
+            }
+        }finally
+        {
+            releaseDbResources(ps, null);
+        }
+    }
+
+    public void clearDeltaCRLCache(X509CertificateWithMetaInfo caCert, long maxId)
+    throws OperationException, SQLException
+    {
+        String sql = "DELETE FROM DELTACRL_CACHE WHERE ID<? AND CAINFO_ID=?";
+
+        PreparedStatement ps = borrowPreparedStatement(sql);
+        try
+        {
+            ps.setLong(1, maxId + 1);
+            int caId = getCaId(caCert);
+            ps.setInt(2, caId);
             ps.executeUpdate();
         }finally
         {
@@ -676,13 +696,38 @@ class CertStoreQueryExecutor
     private void publishToDeltaCRLCache(int caId, BigInteger serialNumber)
     throws SQLException
     {
-        final String SQL = "INSERT INTO DELTACRL_CACHE (CAINFO_ID, SERIAL) VALUES (?, ?)";
-        PreparedStatement ps = borrowPreparedStatement(SQL);
+        final String SQL_ORACLE = "INSERT INTO DELTACRL_CACHE (ID, CAINFO_ID, SERIAL) VALUES (?, ?, ?)";
+        final String SQL_OTHER = "INSERT INTO DELTACRL_CACHE (CAINFO_ID, SERIAL) VALUES (?, ?)";
+
+        PreparedStatement ps = null;
 
         try
         {
-            ps.setInt(1, caId);
-            ps.setLong(2, serialNumber.longValue());
+            int idx = 1;
+            if(dataSource.getDatabaseType() == DatabaseType.ORACLE)
+            {
+                PreparedStatement ps_id = borrowPreparedStatement("SELECT SEQ_DCC_ID.NEXTVAL FROM DUAL");
+                ResultSet rs = null;
+                long id;
+                try
+                {
+                    rs = ps_id.executeQuery();
+                    id = rs.getLong(1);
+                }finally
+                {
+                    releaseDbResources(ps_id, rs);
+                }
+
+                ps = borrowPreparedStatement(SQL_ORACLE);
+                ps.setLong(idx++, id);
+            }
+            else
+            {
+                ps = borrowPreparedStatement(SQL_OTHER);
+            }
+
+            ps.setInt(idx++, caId);
+            ps.setLong(idx++, serialNumber.longValue());
             ps.executeUpdate();
         }finally
         {
@@ -1892,7 +1937,7 @@ class CertStoreQueryExecutor
         }
     }
 
-    public String getLatestSN(X500Name nameWithSN)
+    String getLatestSN(X500Name nameWithSN)
     throws OperationException
     {
         RDN[] rdns1 = nameWithSN.getRDNs();

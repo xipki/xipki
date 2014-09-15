@@ -54,7 +54,7 @@ class OCSPStoreQueryExecutor
     throws SQLException, NoSuchAlgorithmException
     {
         this.dataSource = dataSource;
-        int maxCertId = dataSource.getMax(null, "CERT", "ID");
+        int maxCertId = (int) dataSource.getMax(null, "CERT", "ID");
         this.cert_id = new AtomicInteger(maxCertId + 1);
 
         this.issuerStore = initIssuerStore();

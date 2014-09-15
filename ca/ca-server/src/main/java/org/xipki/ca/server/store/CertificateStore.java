@@ -104,10 +104,23 @@ public class CertificateStore
         queryExecutor.clearPublishQueue(caCert, publisherName);
     }
 
-    public void clearDeltaCRLCache(X509CertificateWithMetaInfo caCert)
+    public long getMaxIdOfDeltaCRLCache(X509CertificateWithMetaInfo caCert)
+    throws OperationException
+    {
+        try
+        {
+            return queryExecutor.getMaxIdOfDeltaCRLCache(caCert);
+        } catch (SQLException e)
+        {
+            LOG.debug("SQLException", e);
+            throw new OperationException(ErrorCode.DATABASE_FAILURE, e.getMessage());
+        }
+    }
+
+    public void clearDeltaCRLCache(X509CertificateWithMetaInfo caCert, long maxId)
     throws OperationException, SQLException
     {
-        queryExecutor.clearDeltaCRLCache(caCert);
+        queryExecutor.clearDeltaCRLCache(caCert, maxId);
     }
 
     public CertWithRevocationInfo revokeCertificate(X509CertificateWithMetaInfo caCert,
