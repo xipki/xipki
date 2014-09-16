@@ -955,4 +955,11 @@ public final class RAWorkerImpl extends AbstractRAWorker implements RAWorker
         return parseRevokeCertResult(result);
     }
 
+    @Override
+    public Set<String> getCertProfiles(String caName)
+    {
+        CAConf ca = casMap.get(caName);
+        return ca == null ? null : ca.getProfiles();
+    }
+
 }

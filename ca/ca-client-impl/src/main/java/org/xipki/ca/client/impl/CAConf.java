@@ -44,7 +44,7 @@ class CAConf
         }
         else
         {
-            this.profiles = profiles;
+            this.profiles = Collections.unmodifiableSet(profiles);
         }
         this.responder = responder;
     }
