@@ -15,6 +15,7 @@
   <modules>
     <module>datasource-api</module>
     <module>datasource-impl</module>
+    <module>database-liquibase</module>
     <module>database-tool</module>
     <module>database-tool-shell</module>
   </modules>

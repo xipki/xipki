@@ -5,7 +5,7 @@
  *
  */
 
-package org.xipki.database.api;
+package org.xipki.liquibase;
 
 import java.util.Properties;
 
@@ -16,7 +16,7 @@ import org.xipki.security.api.PasswordResolverException;
  * @author Lijun Liao
  */
 
-public class SimpleDatabaseConf
+public class LiquibaseDatabaseConf
 {
     private final String driver;
     private final String username;
@@ -24,7 +24,7 @@ public class SimpleDatabaseConf
     private final String url;
     private final String schema;
 
-    public static SimpleDatabaseConf getInstance(Properties dbProps, PasswordResolver passwordResolver)
+    public static LiquibaseDatabaseConf getInstance(Properties dbProps, PasswordResolver passwordResolver)
     throws PasswordResolverException
     {
         String driverClassName;
@@ -162,10 +162,10 @@ public class SimpleDatabaseConf
             password = new String(passwordResolver.resolvePassword(password));
         }
 
-        return new SimpleDatabaseConf(driverClassName, user, password, url, schema);
+        return new LiquibaseDatabaseConf(driverClassName, user, password, url, schema);
     }
 
-    public SimpleDatabaseConf(String driver, String username, String password, String url, String schema)
+    public LiquibaseDatabaseConf(String driver, String username, String password, String url, String schema)
     {
         this.driver = driver;
         this.username = username;
