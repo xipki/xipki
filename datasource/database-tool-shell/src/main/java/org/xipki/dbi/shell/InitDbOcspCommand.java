@@ -10,8 +10,7 @@ package org.xipki.dbi.shell;
 import java.util.Map;
 
 import org.apache.felix.gogo.commands.Command;
-import org.xipki.database.api.SimpleDatabaseConf;
-import org.xipki.dbi.LiquibaseCommandLine;
+import org.xipki.liquibase.LiquibaseDatabaseConf;
 
 /**
  * @author Lijun Liao
@@ -26,7 +25,7 @@ public class InitDbOcspCommand extends LiquibaseCommand
     protected Object doExecute()
     throws Exception
     {
-        Map<String, SimpleDatabaseConf> dbConfs = getDatabaseConfs();
+        Map<String, LiquibaseDatabaseConf> dbConfs = getDatabaseConfs();
 
         for(String dbName : dbConfs.keySet())
         {
@@ -35,13 +34,8 @@ public class InitDbOcspCommand extends LiquibaseCommand
                 continue;
             }
 
-            SimpleDatabaseConf dbConf = dbConfs.get(dbName);
-            if(confirm("reset and initialize", dbConf, schemaFile))
-            {
-                LiquibaseCommandLine.releaseLocks(dbConf, logLevel);
-                LiquibaseCommandLine.dropAll(dbConf, logLevel);
-                LiquibaseCommandLine.update(dbConf, schemaFile, logLevel);
-            }
+            LiquibaseDatabaseConf dbConf = dbConfs.get(dbName);
+            resetAndInit(dbConf, schemaFile);
         }
         return null;
     }

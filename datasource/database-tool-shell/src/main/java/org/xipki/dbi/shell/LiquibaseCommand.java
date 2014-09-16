@@ -21,7 +21,8 @@ import jline.console.ConsoleReader;
 
 import org.apache.felix.gogo.commands.Option;
 import org.xipki.console.karaf.XipkiOsgiCommandSupport;
-import org.xipki.database.api.SimpleDatabaseConf;
+import org.xipki.liquibase.LiquibaseDatabaseConf;
+import org.xipki.liquibase.LiquibaseMain;
 import org.xipki.security.api.PasswordResolver;
 import org.xipki.security.api.PasswordResolverException;
 import org.xipki.security.common.IoCertUtil;
@@ -46,6 +47,35 @@ public abstract class LiquibaseCommand extends XipkiOsgiCommandSupport
             description = "Log level, valid values are debug, info, warning, severe, off")
     protected String logLevel = "warning";
 
+    protected void resetAndInit(LiquibaseDatabaseConf dbConf, String schemaFile)
+    throws Exception
+    {
+        if(confirm("reset and initialize", dbConf, schemaFile))
+        {
+            LiquibaseMain liquibase = new LiquibaseMain(dbConf, schemaFile);
+            try
+            {
+                liquibase.init(logLevel);
+                liquibase.releaseLocks();
+
+                if(LiquibaseMain.loglevelIsSevereOrOff(logLevel) == false)
+                {
+                    liquibase.init("severe");
+                }
+                liquibase.dropAll();
+
+                if(LiquibaseMain.loglevelIsSevereOrOff(logLevel) == false)
+                {
+                    liquibase.init(logLevel);
+                }
+                liquibase.update();
+            }finally
+            {
+                liquibase.shutdown();
+            }
+        }
+    }
+
     protected static Properties getDbConfPoperties(String dbconfFile)
     throws FileNotFoundException, IOException
     {
@@ -54,10 +84,10 @@ public abstract class LiquibaseCommand extends XipkiOsgiCommandSupport
         return props;
     }
 
-    protected Map<String, SimpleDatabaseConf> getDatabaseConfs()
+    protected Map<String, LiquibaseDatabaseConf> getDatabaseConfs()
     throws FileNotFoundException, IOException, PasswordResolverException
     {
-        Map<String, SimpleDatabaseConf> ret = new HashMap<>();
+        Map<String, LiquibaseDatabaseConf> ret = new HashMap<>();
         Properties props = getPropertiesFromFile("ca-config/ca.properties");
         for(Object objKey : props.keySet())
         {
@@ -67,7 +97,7 @@ public abstract class LiquibaseCommand extends XipkiOsgiCommandSupport
                 String datasourceFile = props.getProperty(key);
                 String datasourceName = key.substring("datasource.".length());
                 Properties dbConf = getDbConfPoperties(datasourceFile);
-                SimpleDatabaseConf dbParams = SimpleDatabaseConf.getInstance(dbConf, passwordResolver);
+                LiquibaseDatabaseConf dbParams = LiquibaseDatabaseConf.getInstance(dbConf, passwordResolver);
                 ret.put(datasourceName, dbParams);
             }
         }
@@ -83,13 +113,7 @@ public abstract class LiquibaseCommand extends XipkiOsgiCommandSupport
         return props;
     }
 
-    protected boolean confirm(String command, SimpleDatabaseConf dbParams)
-    throws IOException
-    {
-        return confirm(command, dbParams, null);
-    }
-
-    protected boolean confirm(String command, SimpleDatabaseConf dbParams, String schemaFile)
+    private boolean confirm(String command, LiquibaseDatabaseConf dbParams, String schemaFile)
     throws IOException
     {
         StringBuilder promptBuilder = new StringBuilder();
@@ -108,7 +132,7 @@ public abstract class LiquibaseCommand extends XipkiOsgiCommandSupport
         return "yes".equalsIgnoreCase(text);
     }
 
-    protected String read(String prompt, Set<String> validValues)
+    private String read(String prompt, Set<String> validValues)
     throws IOException
     {
         if(validValues == null)

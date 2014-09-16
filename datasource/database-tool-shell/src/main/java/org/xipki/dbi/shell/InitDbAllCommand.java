@@ -10,8 +10,7 @@ package org.xipki.dbi.shell;
 import java.util.Map;
 
 import org.apache.felix.gogo.commands.Command;
-import org.xipki.database.api.SimpleDatabaseConf;
-import org.xipki.dbi.LiquibaseCommandLine;
+import org.xipki.liquibase.LiquibaseDatabaseConf;
 
 /**
  * @author Lijun Liao
@@ -27,15 +26,10 @@ public class InitDbAllCommand extends LiquibaseCommand
     protected Object doExecute()
     throws Exception
     {
-        Map<String, SimpleDatabaseConf> dbConfs = getDatabaseConfs();
+        Map<String, LiquibaseDatabaseConf> dbConfs = getDatabaseConfs();
 
-        SimpleDatabaseConf dbConf = dbConfs.get("ca");
-        if(confirm("reset and initialize", dbConf, ca_schemaFile))
-        {
-            LiquibaseCommandLine.releaseLocks(dbConf, logLevel);
-            LiquibaseCommandLine.dropAll(dbConf, logLevel);
-            LiquibaseCommandLine.update(dbConf, ca_schemaFile, logLevel);
-        }
+        LiquibaseDatabaseConf dbConf = dbConfs.get("ca");
+        resetAndInit(dbConf, ca_schemaFile);
 
         for(String dbName : dbConfs.keySet())
         {
@@ -45,12 +39,7 @@ public class InitDbAllCommand extends LiquibaseCommand
             }
 
             dbConf = dbConfs.get(dbName);
-            if(confirm("reset and initialize", dbConf, ocsp_schemaFile))
-            {
-                LiquibaseCommandLine.releaseLocks(dbConf, logLevel);
-                LiquibaseCommandLine.dropAll(dbConf, logLevel);
-                LiquibaseCommandLine.update(dbConf, ocsp_schemaFile, logLevel);
-            }
+            resetAndInit(dbConf, ocsp_schemaFile);
         }
         return null;
     }
