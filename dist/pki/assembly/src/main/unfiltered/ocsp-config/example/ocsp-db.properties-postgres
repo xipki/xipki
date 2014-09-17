@@ -16,7 +16,7 @@ dataSource.password = 123456
 dataSource.prepareThreshold = 0
 
 autoCommit = true
-readOnly = false
+readOnly = true
 maximumPoolSize = 10
 minimumIdle = 4
 connectionTimeout = 60000
