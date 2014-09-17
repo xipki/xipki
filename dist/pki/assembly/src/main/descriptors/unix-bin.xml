@@ -87,9 +87,6 @@
     </fileSet>
     <fileSet>
       <directory>${project.build.directory}/sql</directory>
-      <includes>
-      	<include>*.xml</include>
-      </includes>
       <outputDirectory>sql</outputDirectory>
       <fileMode>0644</fileMode>
       <directoryMode>0755</directoryMode>
