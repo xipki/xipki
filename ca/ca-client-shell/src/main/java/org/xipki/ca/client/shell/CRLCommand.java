@@ -19,7 +19,7 @@ import org.xipki.ca.common.RAWorkerException;
  * @author Lijun Liao
  */
 
-public abstract class RACRLCommand extends ClientCommand
+public abstract class CRLCommand extends ClientCommand
 {
 
     @Option(name = "-ca",

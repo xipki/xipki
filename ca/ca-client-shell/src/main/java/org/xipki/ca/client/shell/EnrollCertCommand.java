@@ -22,11 +22,11 @@ import org.xipki.security.common.IoCertUtil;
  */
 
 @Command(scope = "caclient", name = "enroll", description="Enroll certificate")
-public class RAEnrollCertCommand extends ClientCommand
+public class EnrollCertCommand extends ClientCommand
 {
 
     @Option(name = "-p10",
-            required = true, description = "Required. PKCS-10 request file")
+            required = true, description = "Required. PKCS#10 request file")
     protected String p10File;
 
     @Option(name = "-profile",

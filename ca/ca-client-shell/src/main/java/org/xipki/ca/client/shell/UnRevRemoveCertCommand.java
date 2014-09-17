@@ -13,7 +13,7 @@ import org.apache.felix.gogo.commands.Option;
  * @author Lijun Liao
  */
 
-public abstract class RAUnRevRemoveCertCommand extends ClientCommand
+public abstract class UnRevRemoveCertCommand extends ClientCommand
 {
     @Option(name = "-cert",
             description = "Certificate file")
