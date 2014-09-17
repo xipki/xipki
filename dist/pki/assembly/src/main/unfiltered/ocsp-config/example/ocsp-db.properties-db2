@@ -17,7 +17,7 @@ dataSource.maxStatements = 2048
 dataSource.driverType = 4
 
 autoCommit = true
-readOnly = false
+readOnly = true
 maximumPoolSize = 10
 minimumIdle = 4
 connectionTimeout = 60000
