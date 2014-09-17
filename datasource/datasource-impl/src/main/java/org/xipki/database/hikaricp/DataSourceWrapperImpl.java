@@ -55,6 +55,11 @@ public class DataSourceWrapperImpl implements DataSourceWrapper
             return service.getConnection();
         } catch(SQLException e)
         {
+            Throwable cause = e.getCause();
+            if(cause instanceof SQLException)
+            {
+                e = (SQLException) cause;
+            }
             LOG.error("Could not create connection to database {}", e.getMessage());
             LOG.debug("Could not create connection to database", e);
             throw e;
@@ -69,8 +74,13 @@ public class DataSourceWrapperImpl implements DataSourceWrapper
             conn.close();
         } catch (SQLException e)
         {
-            LOG.warn("Could not close connection: {}", e.getMessage());
-            LOG.debug("Could not close connection", e);
+            Throwable cause = e.getCause();
+            if(cause instanceof SQLException)
+            {
+                e = (SQLException) cause;
+            }
+            LOG.error("Could not create connection to database {}", e.getMessage());
+            LOG.debug("Could not create connection to database", e);
         }
     }
 
