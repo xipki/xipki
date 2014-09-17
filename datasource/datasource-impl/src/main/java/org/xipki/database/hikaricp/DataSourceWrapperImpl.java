@@ -388,4 +388,108 @@ public class DataSourceWrapperImpl implements DataSourceWrapper
         }
     }
 
+    @Override
+    public void createSequence(String sequenceName, long startValue)
+    throws SQLException
+    {
+        switch(databaseType)
+        {
+            case DB2:
+            case ORACLE:
+            case POSTGRESQL:
+            case H2:
+            case HSQLDB:
+                StringBuilder sb = new StringBuilder();
+                sb.append("CREATE SEQUENCE ").append(sequenceName).append(" ");
+
+                if(DatabaseType.DB2 == databaseType)
+                {
+                    sb.append("AS BIGINT START WITH ");
+                    sb.append(startValue);
+                    sb.append(" INCREMENT BY 1 NO CYCLE NO CACHE");
+                }
+                else if(DatabaseType.ORACLE == databaseType)
+                {
+                    sb.append("START WITH ");
+                    sb.append(startValue);
+                    sb.append(" INCREMENT BY 1 NOCYCLE NOCACHE");
+                }
+                else if(DatabaseType.POSTGRESQL == databaseType)
+                {
+                    sb.append("START WITH ");
+                    sb.append(startValue);
+                    sb.append(" INCREMENT BY 1 NO CYCLE");
+                }
+                else if(DatabaseType.H2 == databaseType)
+                {
+                    sb.append("START WITH ");
+                    sb.append(startValue);
+                    sb.append(" INCREMENT BY 1 NO CYCLE NO CACHE");
+                }
+                else if(DatabaseType.HSQLDB == databaseType)
+                {
+                    sb.append("AS BIGINT START WITH ");
+                    sb.append(startValue);
+                    sb.append(" INCREMENT BY 1");
+                }
+                else
+                {
+                    throw new RuntimeException("should not reach here");
+                }
+
+                String sql = sb.toString();
+
+                Connection conn = getConnection();
+                Statement stmt = null;
+                try
+                {
+                    stmt = conn.createStatement();
+                    stmt.execute(sql);
+                }
+                finally
+                {
+                    releaseResources(stmt, null);
+                }
+
+                break;
+            case MYSQL:
+                break;
+            default:
+                throw new RuntimeException("unsupported database type " + databaseType);
+        }
+    }
+
+    @Override
+    public void dropSequence(String sequenceName)
+    throws SQLException
+    {
+        switch(databaseType)
+        {
+            case DB2:
+            case ORACLE:
+            case POSTGRESQL:
+            case H2:
+            case HSQLDB:
+                String  sql = "DROP SEQUENCE " + sequenceName;
+
+                Connection conn = getConnection();
+                Statement stmt = null;
+                try
+                {
+                    stmt = conn.createStatement();
+                    stmt.execute(sql);
+                }
+                finally
+                {
+                    releaseResources(stmt, null);
+                }
+
+                break;
+            case MYSQL:
+                break;
+            default:
+                throw new RuntimeException("unsupported database type " + databaseType);
+        }
+    }
+
 }
