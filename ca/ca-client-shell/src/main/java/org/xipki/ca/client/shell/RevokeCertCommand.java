@@ -23,7 +23,7 @@ import org.xipki.security.common.IoCertUtil;
  */
 
 @Command(scope = "caclient", name = "revoke", description="Revoke certificate")
-public class RARevokeCertCommand extends RAUnRevRemoveCertCommand
+public class RevokeCertCommand extends UnRevRemoveCertCommand
 {
     @Option(name = "-reason",
             required = true,
