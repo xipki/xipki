@@ -60,6 +60,11 @@ public class CALoadTestCommand extends ClientCommand
             required = false)
     protected String curveName = "brainpoolp256r1";
 
+    @Option(name = "-n",
+            description = "Number of certificates to be requested in one request",
+            required = false)
+    protected Integer n = 1;
+
     @Override
     protected Object doExecute()
     throws Exception
@@ -82,6 +87,7 @@ public class CALoadTestCommand extends ClientCommand
         startMsg.append("Duration:        ").append(AbstractLoadTest.formatTime(durationInSecond).trim()).append("\n");
         startMsg.append("SubjectTemplate: ").append(subjectTemplate).append("\n");
         startMsg.append("Profile:         ").append(certProfile).append("\n");
+        startMsg.append("#Certs/Request:  ").append(n).append("\n");
         out(startMsg.toString());
 
         RandomDN randomDN = null;
@@ -97,11 +103,11 @@ public class CALoadTestCommand extends ClientCommand
         CALoadTest loadTest;
         if(ecc.booleanValue())
         {
-            loadTest = new CALoadTest.ECCALoadTest(raWorker, certProfile, subjectTemplate, curveName, randomDN);
+            loadTest = new CALoadTest.ECCALoadTest(raWorker, certProfile, subjectTemplate, curveName, randomDN, n);
         }
         else
         {
-            loadTest = new CALoadTest.RSACALoadTest(raWorker, certProfile, subjectTemplate, keysize.intValue(), randomDN);
+            loadTest = new CALoadTest.RSACALoadTest(raWorker, certProfile, subjectTemplate, keysize.intValue(), randomDN, n);
         }
 
         loadTest.setDuration(durationInSecond);
