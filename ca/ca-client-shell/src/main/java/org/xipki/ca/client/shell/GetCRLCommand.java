@@ -25,7 +25,7 @@ import org.xipki.ca.common.RAWorkerException;
  */
 
 @Command(scope = "caclient", name = "getcrl", description="Download CRL")
-public class RAGetCRLCommand extends RACRLCommand
+public class GetCRLCommand extends CRLCommand
 {
     @Option(name = "-with-basecrl",
             required = false, description = "Indicates whether to retrieve the baseCRL if the current CRL is a delta CRL")

@@ -18,7 +18,7 @@ import org.xipki.ca.common.RAWorkerException;
  */
 
 @Command(scope = "caclient", name = "gencrl", description="Generate CRL")
-public class RAGenCRLCommand extends RACRLCommand
+public class GenCRLCommand extends CRLCommand
 {
     @Override
     protected X509CRL retrieveCRL(String caName)

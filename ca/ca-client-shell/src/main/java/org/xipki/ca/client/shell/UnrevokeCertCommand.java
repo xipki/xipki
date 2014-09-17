@@ -20,10 +20,9 @@ import org.xipki.security.common.IoCertUtil;
  * @author Lijun Liao
  */
 
-@Command(scope = "caclient", name = "remove", description="Remove certificate")
-public class RARemoveCertCommand extends RAUnRevRemoveCertCommand
+@Command(scope = "caclient", name = "unrevoke", description="Unrevoke certificate")
+public class UnrevokeCertCommand extends UnRevRemoveCertCommand
 {
-
     @Override
     protected Object doExecute()
     throws Exception
@@ -38,25 +37,24 @@ public class RARemoveCertCommand extends RAUnRevRemoveCertCommand
         if(certFile != null)
         {
             X509Certificate cert = IoCertUtil.parseCert(certFile);
-            certIdOrError = raWorker.removeCert(cert);
+            certIdOrError = raWorker.unrevokeCert(cert);
         }
         else
         {
             X509Certificate caCert = IoCertUtil.parseCert(caCertFile);
             X500Name issuer = X500Name.getInstance(caCert.getSubjectX500Principal().getEncoded());
-            certIdOrError = raWorker.removeCert(issuer, new BigInteger(serialNumber));
+            certIdOrError = raWorker.unrevokeCert(issuer, new BigInteger(serialNumber));
         }
 
         if(certIdOrError.getError() != null)
         {
             PKIStatusInfo error = certIdOrError.getError();
-            err("Removing certificate failed: " + error);
+            err("Releasing revocation failed: " + error);
         }
         else
         {
-            out("Removed certificate");
+            out("Unrevoked certificate");
         }
         return null;
     }
-
 }
