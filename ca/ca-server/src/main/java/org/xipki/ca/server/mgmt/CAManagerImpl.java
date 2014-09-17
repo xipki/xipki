@@ -741,6 +741,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
     @Override
     public X509CACmpResponder getX509CACmpResponder(String caName)
     {
+        caName = caName.toUpperCase();
         return responders.get(caName);
     }
 
@@ -1340,7 +1341,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
                 CAInfo caInfo;
                 try
                 {
-                    caInfo = new CAInfo(entry, certstore, masterMode);
+                    caInfo = new CAInfo(entry, certstore);
                     cas.put(entry.getName(), caInfo);
                 } catch (OperationException e)
                 {
@@ -1476,6 +1477,13 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
             ps.setString(idx++, newCaDbEntry.getDeltaCrlUrisAsString());
 
             ps.executeUpdate();
+
+            // create serial sequence
+            if(nextSerial > 0)
+            {
+                final String sequenceName = "SERIAL_" + name;
+                dataSource.createSequence(sequenceName, nextSerial);
+            }
         }catch(SQLException e)
         {
             throw new CAMgmtException(e);
@@ -1491,12 +1499,13 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
     @Override
     public CAEntry getCA(String caName)
     {
+        caName = caName.toUpperCase();
         CAInfo caInfo = cas.get(caName);
         return caInfo == null ? null : caInfo.getCaEntry();
     }
 
     @Override
-    public void changeCA(String name, CAStatus status, Long nextSerial, X509Certificate cert,
+    public void changeCA(String name, CAStatus status, X509Certificate cert,
             Set<String> crl_uris, Set<String> delta_crl_uris, Set<String> ocsp_uris,
             Integer max_validity, String signer_type, String signer_conf,
             String crlsigner_name, DuplicationMode duplicate_key,
@@ -1505,18 +1514,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
     throws CAMgmtException
     {
         asssertMasterMode();
-        if(nextSerial != null && nextSerial > 0) // 0 for random serial
-        {
-            if(cas.containsKey(name) == false)
-            {
-                throw new CAMgmtException("Could not find CA named " + name);
-            }
-        }
-
-        if(nextSerial != null && nextSerial < 0)
-        {
-            nextSerial = 0L;
-        }
+        name = name.toUpperCase();
 
         StringBuilder sqlBuilder = new StringBuilder();
         sqlBuilder.append("UPDATE CA SET ");
@@ -1524,7 +1522,6 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
         AtomicInteger index = new AtomicInteger(1);
 
         Integer iStatus = addToSqlIfNotNull(sqlBuilder, index, status, "STATUS");
-        Integer iNext_serial = addToSqlIfNotNull(sqlBuilder, index, nextSerial, "NEXT_SERIAL");
         Integer iSubject = addToSqlIfNotNull(sqlBuilder, index, cert, "SUBJECT");
         Integer iCert = addToSqlIfNotNull(sqlBuilder, index, cert, "CERT");
         Integer iCrl_uris = addToSqlIfNotNull(sqlBuilder, index, crl_uris, "CRL_URIS");
@@ -1559,11 +1556,6 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
             if(iStatus != null)
             {
                 ps.setString(iStatus, status.name());
-            }
-
-            if(iNext_serial != null)
-            {
-                ps.setLong(iNext_serial, nextSerial.longValue());
             }
 
             if(iCert != null)
@@ -1653,6 +1645,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
     public void setCrlLastInterval(String caName, int lastInterval, long lastIntervalDate)
     throws CAMgmtException
     {
+        caName = caName.toUpperCase();
         if(cas.containsKey(caName) == false)
         {
             throw new CAMgmtException("Could not find CA named " + caName);
@@ -1680,6 +1673,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
     throws CAMgmtException
     {
         asssertMasterMode();
+        caName = caName.toUpperCase();
         Set<String> profileNames = ca_has_profiles.get(caName);
 
         PreparedStatement ps = null;
@@ -1708,6 +1702,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
     throws CAMgmtException
     {
         asssertMasterMode();
+        caName = caName.toUpperCase();
         Set<String> profileNames = ca_has_profiles.get(caName);
         if(profileNames == null)
         {
@@ -1744,6 +1739,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
     throws CAMgmtException
     {
         asssertMasterMode();
+        caName = caName.toUpperCase();
         Set<String> publisherNames = ca_has_publishers.get(caName);
         PreparedStatement ps = null;
         try
@@ -1771,6 +1767,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
     throws CAMgmtException
     {
         asssertMasterMode();
+        caName = caName.toUpperCase();
         Set<String> publisherNames = ca_has_publishers.get(caName);
         if(publisherNames == null)
         {
@@ -1805,12 +1802,14 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
     @Override
     public Set<String> getCertProfilesForCA(String caName)
     {
+        caName = caName.toUpperCase();
         return ca_has_profiles.get(caName);
     }
 
     @Override
     public Set<CAHasRequestorEntry> getCmpRequestorsForCA(String caName)
     {
+        caName = caName.toUpperCase();
         return ca_has_requestors.get(caName);
     }
 
@@ -1914,6 +1913,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
     throws CAMgmtException
     {
         asssertMasterMode();
+        caName = caName.toUpperCase();
         Set<CAHasRequestorEntry> requestors = ca_has_requestors.get(caName);
         PreparedStatement ps = null;
         try
@@ -1941,6 +1941,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
     throws CAMgmtException
     {
         asssertMasterMode();
+        caName = caName.toUpperCase();
         String requestorName = requestor.getRequestorName();
         Set<CAHasRequestorEntry> cmpRequestors = ca_has_requestors.get(caName);
         if(cmpRequestors == null)
@@ -2374,6 +2375,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
     public void setCrlSignerInCA(String crlSignerName, String caName)
     throws CAMgmtException
     {
+        caName = caName.toUpperCase();
         CAInfo caInfo = cas.get(caName);
         if(caInfo == null)
         {
@@ -2452,7 +2454,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
     public List<PublisherEntry> getPublishersForCA(String caName)
     {
         ParamChecker.assertNotEmpty("caName", caName);
-
+        caName = caName.toUpperCase();
         Set<String> publisherNames = ca_has_publishers.get(caName);
         if(publisherNames == null)
         {
@@ -2866,6 +2868,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
     throws CAMgmtException
     {
         asssertMasterMode();
+        caName = caName.toUpperCase();
         if(caAliases.get(aliasName) != null)
         {
             throw new CAMgmtException("CA alias " + aliasName + " exists");
@@ -2920,6 +2923,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
     @Override
     public String getAliasName(String caName)
     {
+        caName = caName.toUpperCase();
         for(String alias : caAliases.keySet())
         {
             String thisCaName = caAliases.get(alias);
@@ -2943,6 +2947,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
     throws CAMgmtException
     {
         asssertMasterMode();
+        caName = caName.toUpperCase();
         PreparedStatement ps = null;
 
         CAMgmtException exception = null;
@@ -2959,27 +2964,27 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
             dataSource.releaseResources(ps, null);
         }
 
-        // drop the serial number sequence
-        switch(dataSource.getDatabaseType())
+        CAInfo caInfo = cas.get(caName);
+        if(caInfo == null || caInfo.getCaEntry().getNextSerial() > 0)
         {
-            case DB2:
-            case H2:
-            case ORACLE:
-            case POSTGRESQL:
-            case HSQLDB:
-                String sql = "DROP SEQUENCE SERIAL_" + caName;
-                try
+            // drop the serial number sequence
+            final String sequenceName = "SERIAL_" + caName;
+            try
+            {
+                dataSource.dropSequence(sequenceName);
+            }catch(SQLException e)
+            {
+                final String message = "Error in dropSequence " + sequenceName;
+                if(LOG.isWarnEnabled())
                 {
-                    createStatement().executeUpdate(sql);
-                } catch (SQLException e)
-                {
-                } finally
-                {
-                    dataSource.releaseResources(ps, null);
+                    LOG.warn(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(), e.getMessage());
                 }
-                break;
-            default:
-                break;
+                LOG.debug(message, e);
+                if(exception == null)
+                {
+                    exception = new CAMgmtException(e);
+                }
+            }
         }
 
         cas.remove(caName);
@@ -2995,6 +3000,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
     throws CAMgmtException
     {
         asssertMasterMode();
+        caName = caName.toUpperCase();
         X509CA ca = x509cas.get(caName);
         if(ca == null)
         {
@@ -3077,6 +3083,8 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
     throws CAMgmtException
     {
         asssertMasterMode();
+        caName = caName.toUpperCase();
+
         Set<String> caNames;
         if(caName == null)
         {
@@ -3113,6 +3121,8 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
         asssertMasterMode();
         ParamChecker.assertNotEmpty("caName", caName);
         ParamChecker.assertNotNull("revocationInfo", revocationInfo);
+
+        caName = caName.toUpperCase();
         if(x509cas.containsKey(caName) == false)
         {
             throw new CAMgmtException("Could not find CA named " + caName);
@@ -3185,6 +3195,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
     throws CAMgmtException
     {
         asssertMasterMode();
+        caName = caName.toUpperCase();
         ParamChecker.assertNotEmpty("caName", caName);
         if(x509cas.containsKey(caName) == false)
         {
@@ -3266,6 +3277,8 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
     throws CAMgmtException
     {
         asssertMasterMode();
+        caName = caName.toUpperCase();
+
         if(caName == null)
         {
             try
@@ -3355,6 +3368,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
             CRLReason reason, Date invalidityTime)
     throws CAMgmtException
     {
+        caName = caName.toUpperCase();
         X509CA ca = getX509CA(caName);
         try
         {
@@ -3369,6 +3383,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
     public boolean unrevokeCertificate(String caName, BigInteger serialNumber)
     throws CAMgmtException
     {
+        caName = caName.toUpperCase();
         X509CA ca = getX509CA(caName);
         try
         {
@@ -3384,6 +3399,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
     throws CAMgmtException
     {
         asssertMasterMode();
+        caName = caName.toUpperCase();
         X509CA ca = getX509CA(caName);
         try
         {
@@ -3399,6 +3415,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
             String profileName, String user, byte[] encodedPkcs10Request)
     throws CAMgmtException
     {
+        caName = caName.toUpperCase();
         X509CA ca = getX509CA(caName);
 
         CertificationRequest p10cr;
@@ -3465,6 +3482,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
 
     public List<IdentifiedCertPublisher> getIdentifiedPublishersForCa(String caName)
     {
+        caName = caName.toUpperCase();
         List<IdentifiedCertPublisher> ret = new LinkedList<>();
         Set<String> publisherNames = ca_has_publishers.get(caName);
         if(publisherNames != null)

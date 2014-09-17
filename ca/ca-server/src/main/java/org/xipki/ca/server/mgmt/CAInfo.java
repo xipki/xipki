@@ -49,7 +49,6 @@ public class CAInfo
     private Date notBefore;
     private Date notAfter;
     private boolean selfSigned;
-    private boolean masterMode;
     private CMPCertificate certInCMPFormat;
     private PublicCAInfo publicCAInfo;
     private X509CertificateWithMetaInfo cert;
@@ -58,7 +57,7 @@ public class CAInfo
     private boolean useRandomSerialNumber;
     private RandomSerialNumberGenerator randomSNGenerator;
 
-    public CAInfo(CAEntry caEntry, CertificateStore certStore, boolean masterMode)
+    public CAInfo(CAEntry caEntry, CertificateStore certStore)
     throws OperationException
     {
         ParamChecker.assertNotNull("caEntry", caEntry);
@@ -71,7 +70,6 @@ public class CAInfo
         this.notAfter = cert.getNotAfter();
         this.serialNumber = cert.getSerialNumber();
         this.selfSigned = cert.getIssuerX500Principal().equals(cert.getSubjectX500Principal());
-        this.masterMode = masterMode;
 
         Certificate bcCert;
         try
@@ -121,11 +119,6 @@ public class CAInfo
         else
         {
             nextSerial = caEntry.getNextSerial();
-        }
-
-        if(masterMode)
-        {
-            certStore.createSerialNumberGenerator(getName(), nextSerial);
         }
     }
 
@@ -377,10 +370,5 @@ public class CAInfo
     public boolean useRandomSerialNumber()
     {
         return useRandomSerialNumber;
-    }
-
-    public boolean isMasterMode()
-    {
-        return masterMode;
     }
 }

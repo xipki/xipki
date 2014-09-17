@@ -92,7 +92,7 @@ public class CAEntry implements Serializable
         }
         this.numCrls = numCrls;
 
-        this.name = name;
+        this.name = name.toUpperCase();
         this.nextSerial = initialSerial;
         this.cert = cert;
         this.subject = IoCertUtil.canonicalizeName(cert.getSubjectX500Principal());
