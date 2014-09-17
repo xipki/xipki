@@ -7,6 +7,7 @@
 
 package org.xipki.security.common;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -173,11 +174,30 @@ public class CmpUtf8Pairs
     public String getEncoded()
     {
         StringBuilder sb = new StringBuilder();
+        List<String> names = new LinkedList<>();
         for(String name : pairs.keySet())
         {
+            String value = pairs.get(name);
+            if(value.length() <= 100)
+            {
+                names.add(name);
+            }
+        }
+        Collections.sort(names);
+
+        for(String name : pairs.keySet())
+        {
+            if(names.contains(name) == false)
+            {
+                names.add(name);
+            }
+        }
+
+        for(String name : names)
+        {
+            String value = pairs.get(name);
             sb.append(encodeNameOrValue(name));
             sb.append(NAME_TERM);
-            String value = pairs.get(name);
             sb.append(value == null ? "" : encodeNameOrValue(value));
             sb.append(TOKEN_TERM);
         }
