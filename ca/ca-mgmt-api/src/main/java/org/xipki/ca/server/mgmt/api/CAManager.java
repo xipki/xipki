@@ -72,7 +72,7 @@ public interface CAManager
 
     CAEntry getCA(String caName);
 
-    void changeCA(String name, CAStatus status, Long nextSerial,
+    void changeCA(String name, CAStatus status,
             X509Certificate cert,
             Set<String> crl_uris, Set<String> delta_crl_uris, Set<String> ocsp_uris,
             Integer max_validity, String signer_type, String signer_conf,

@@ -587,18 +587,4 @@ public class CertificateStore
         }
     }
 
-    public void createSerialNumberGenerator(String caName,long minimalStartValue)
-    throws OperationException
-    {
-        try
-        {
-            queryExecutor.createSerialNumberGeneratorIfNotExistsOrLess(caName, minimalStartValue);
-        } catch (SQLException e)
-        {
-            throw new OperationException(ErrorCode.DATABASE_FAILURE, e.getMessage());
-        } catch (RuntimeException e)
-        {
-            throw new OperationException(ErrorCode.System_Failure, e.getMessage());
-        }
-    }
 }

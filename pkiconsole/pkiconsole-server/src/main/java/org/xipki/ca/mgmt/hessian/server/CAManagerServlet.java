@@ -245,7 +245,7 @@ implements HessianCAManager
     }
 
     @Override
-    public void changeCA(String name, CAStatus status, Long nextSerial,
+    public void changeCA(String name, CAStatus status,
             byte[] encodedCert, Set<String> crl_uris,
             Set<String> delta_crl_uris, Set<String> ocsp_uris,
             Integer max_validity, String signer_type, String signer_conf,
@@ -265,7 +265,7 @@ implements HessianCAManager
 
         try
         {
-            caManager.changeCA(name, status, nextSerial, cert, crl_uris, delta_crl_uris, ocsp_uris,
+            caManager.changeCA(name, status, cert, crl_uris, delta_crl_uris, ocsp_uris,
                     max_validity, signer_type, signer_conf, crlsigner_name, duplicate_key, duplicate_subject,
                     permissions, numCrls, expirationPeriod, validityMode);
         } catch (CAMgmtException e)

@@ -59,11 +59,6 @@ public class CaUpdateCommand extends CaCommand
             multiValued = true)
     protected Set<String> permissions;
 
-    @Option(name = "-nextSerial",
-            description = "Serial number for the next certificate,\n"
-                    + "must be greater than the current nextSerial or 0 for random serial number")
-    protected Long nextSerial;
-
     @Option(name = "-maxValidity",
             description = "Maximal validity in days")
     protected Integer maxValidity;
@@ -279,7 +274,6 @@ public class CaUpdateCommand extends CaCommand
         caManager.changeCA(
                 caName,
                 status,
-                nextSerial,
                 caCert,
                 _crlUris,
                 _deltaCrlUris,

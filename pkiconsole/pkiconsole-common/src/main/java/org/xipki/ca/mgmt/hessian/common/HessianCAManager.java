@@ -81,7 +81,7 @@ public interface HessianCAManager
 
     CAEntry getCA(String caName);
 
-    void changeCA(String name, CAStatus status, Long nextSerial,
+    void changeCA(String name, CAStatus status,
             byte[] encodedCert,
             Set<String> crl_uris, Set<String> delta_crl_uris, Set<String> ocsp_uris,
             Integer max_validity, String signer_type, String signer_conf,
