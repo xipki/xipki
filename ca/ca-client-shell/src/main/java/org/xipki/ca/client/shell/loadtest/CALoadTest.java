@@ -15,8 +15,11 @@ import java.security.cert.X509Certificate;
 import java.security.spec.InvalidKeySpecException;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicLong;
 
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
@@ -59,25 +62,27 @@ import org.xipki.security.p10.P12KeypairGenerator;
 
 abstract class CALoadTest extends AbstractLoadTest
 {
+    private static final ProofOfPossession RA_VERIFIED = new ProofOfPossession();
     static class RSACALoadTest extends CALoadTest
     {
-        private BigInteger baseN;
+        private final BigInteger baseN;
 
         public RSACALoadTest(RAWorker raWorker, String certProfile,
-                String subjectTemplate, int keysize, RandomDN randomDN)
+                String subjectTemplate, int keysize, RandomDN randomDN, int n)
         {
-            super(raWorker, certProfile, subjectTemplate, randomDN);
+            super(raWorker, certProfile, subjectTemplate, randomDN, n);
             if(keysize % 1024 != 0)
             {
                 throw new IllegalArgumentException("invalid RSA keysize " + keysize);
             }
 
-            this.baseN = BigInteger.valueOf(0);
-            this.baseN = this.baseN.setBit(keysize - 1);
+            BigInteger _baseN = BigInteger.valueOf(0);
+            _baseN = _baseN.setBit(keysize - 1);
             for(int i = 32; i < keysize - 1; i += 2)
             {
-                this.baseN = this.baseN.setBit(i);
+                _baseN = _baseN.setBit(i);
             }
+            this.baseN = _baseN;
         }
 
         @Override
@@ -105,15 +110,16 @@ abstract class CALoadTest extends AbstractLoadTest
 
     static class ECCALoadTest extends CALoadTest
     {
-        private ASN1ObjectIdentifier curveOid;
-        private String curveName;
-        private BigInteger basePublicKey;
+        private final ASN1ObjectIdentifier curveOid;
+        private final String curveName;
+        private final BigInteger basePublicKey;
 
         public ECCALoadTest(RAWorker raWorker, String certProfile, String subjectTemplate,
-        String curveNameOrOid, RandomDN randomDN)
+        String curveNameOrOid, RandomDN randomDN, int n)
         throws Exception
         {
-            super(raWorker, certProfile, subjectTemplate, randomDN);
+            super(raWorker, certProfile, subjectTemplate, randomDN, n);
+
             boolean isOid;
             try
             {
@@ -167,6 +173,7 @@ abstract class CALoadTest extends AbstractLoadTest
     private final ASN1ObjectIdentifier subjectRDNForIncrement;
 
     private AtomicLong index;
+    private final int n;
 
     protected abstract SubjectPublicKeyInfo getSubjectPublicKeyInfo(long index);
 
@@ -177,11 +184,17 @@ abstract class CALoadTest extends AbstractLoadTest
         return new Testor();
     }
 
-    public CALoadTest(RAWorker raWorker, String certProfile, String subjectTemplate, RandomDN randomDN)
+    public CALoadTest(RAWorker raWorker, String certProfile, String subjectTemplate, RandomDN randomDN, int n)
     {
         ParamChecker.assertNotNull("raWorker", raWorker);
         ParamChecker.assertNotEmpty("certProfile", certProfile);
         ParamChecker.assertNotEmpty("subjectTemplate", subjectTemplate);
+        if(n < 1)
+        {
+            throw new IllegalArgumentException("non-positive n " + n + " is not allowed");
+        }
+        this.n = n;
+
         this.subjectTemplate = IoCertUtil.sortX509Name(new X500Name(subjectTemplate));
 
         ASN1ObjectIdentifier[] rdnOidsForIncrement = new ASN1ObjectIdentifier[]
@@ -244,25 +257,32 @@ abstract class CALoadTest extends AbstractLoadTest
         this.index = new AtomicLong(System.nanoTime() / 10000L - baseTime.getTimeInMillis() * 10L);
     }
 
-    private CertRequest nextCertRequest()
+    private Map<Integer, CertRequest> nextCertRequests()
     {
-        CertTemplateBuilder certTempBuilder = new CertTemplateBuilder();
-
-        long thisIndex = index.getAndIncrement();
-
-        this.subjectTemplate.getRDNs();
-        certTempBuilder.setSubject(incrementX500Name(thisIndex));
-
-        SubjectPublicKeyInfo spki = getSubjectPublicKeyInfo(thisIndex);
-        if(spki == null)
+        Map<Integer, CertRequest> certRequests = new HashMap<>();
+        for(int i = 0; i < n; i++)
         {
-            return null;
+            final int certId = i + 1;
+            CertTemplateBuilder certTempBuilder = new CertTemplateBuilder();
+
+            long thisIndex = index.getAndIncrement();
+
+            this.subjectTemplate.getRDNs();
+            certTempBuilder.setSubject(incrementX500Name(thisIndex));
+
+            SubjectPublicKeyInfo spki = getSubjectPublicKeyInfo(thisIndex);
+            if(spki == null)
+            {
+                return null;
+            }
+
+            certTempBuilder.setPublicKey(spki);
+
+            CertTemplate certTemplate = certTempBuilder.build();
+            CertRequest certRequest = new CertRequest(certId, certTemplate, null);
+            certRequests.put(certId, certRequest);
         }
-
-        certTempBuilder.setPublicKey(spki);
-
-        CertTemplate certTemplate = certTempBuilder.build();
-        return new CertRequest(1, certTemplate, null);
+        return certRequests;
     }
 
     class Testor implements Runnable
@@ -273,10 +293,18 @@ abstract class CALoadTest extends AbstractLoadTest
         {
             while(stop() == false && getErrorAccout() < 1)
             {
-                CertRequest certReq = nextCertRequest();
-                if(certReq != null)
+                Map<Integer, CertRequest> certReqs = nextCertRequests();
+                if(certReqs != null)
                 {
-                    account(1, (testNext(certReq)? 0: 1));
+                    int size = certReqs.size();
+                    int nSucc = testNext(certReqs);
+                    int failed = size - nSucc;
+                    if(failed < 0)
+                    {
+                        nSucc = 0;
+                        failed = size;
+                    }
+                    account(nSucc, failed);
                 }
                 else
                 {
@@ -285,38 +313,46 @@ abstract class CALoadTest extends AbstractLoadTest
             }
         }
 
-        private boolean testNext(CertRequest certRequest)
+        private int testNext(Map<Integer, CertRequest> certRequests)
         {
             EnrollCertResult result;
             try
             {
-                EnrollCertRequestEntryType requestEntry = new EnrollCertRequestEntryType
-                        ("id-1", certProfile, certRequest, new ProofOfPossession());
-
                 EnrollCertRequestType request = new EnrollCertRequestType(Type.CERT_REQ);
-                request.addRequestEntry(requestEntry);
+                for(Integer certId : certRequests.keySet())
+                {
+                    String id = "id-" + certId;
+                    EnrollCertRequestEntryType requestEntry = new EnrollCertRequestEntryType
+                            (id, certProfile, certRequests.get(certId), RA_VERIFIED);
+
+                    request.addRequestEntry(requestEntry);
+                }
 
                 result = raWorker.requestCerts(request, null, null);
             } catch (RAWorkerException | PKIErrorException e)
             {
                 LOG.warn("{}: {}", e.getClass().getName(), e.getMessage());
-                return false;
+                return 0;
             }
 
-            X509Certificate cert = null;
-            if(result != null)
+            Set<String> ids = result.getAllIds();
+            int nSuccess = 0;
+            for(String id : ids)
             {
-                String id = result.getAllIds().iterator().next();
-                CertificateOrError certOrError = result.getCertificateOrError(id);
-                cert = (X509Certificate) certOrError.getCertificate();
+                X509Certificate cert = null;
+                if(result != null)
+                {
+                    CertificateOrError certOrError = result.getCertificateOrError(id);
+                    cert = (X509Certificate) certOrError.getCertificate();
+                }
+
+                if(cert != null)
+                {
+                    nSuccess++;
+                }
             }
 
-            if(cert == null)
-            {
-                return false;
-            }
-
-            return true;
+            return nSuccess;
         }
 
     } // End class OcspRequestor
