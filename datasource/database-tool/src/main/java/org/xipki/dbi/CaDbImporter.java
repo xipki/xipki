@@ -10,13 +10,21 @@ package org.xipki.dbi;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Properties;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 
+import org.bouncycastle.util.encoders.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.database.api.DataSourceFactory;
@@ -33,6 +41,25 @@ import org.xipki.security.common.IoCertUtil;
 
 public class CaDbImporter
 {
+    private static class CAInfoBundle
+    {
+        private final String CA_name;
+        private final long CA_nextSerial;
+        private final byte[] cert;
+
+        private long should_CA_nextSerial;
+        private Integer CAINFO_id;
+
+        public CAInfoBundle(String CA_name, long CA_nextSerial, byte[] cert)
+        {
+            this.CA_name = CA_name;
+            this.CA_nextSerial = CA_nextSerial;
+            this.should_CA_nextSerial = CA_nextSerial;
+            this.cert = cert;
+        }
+
+    }
+
     private static final Logger LOG = LoggerFactory.getLogger(CaDbImporter.class);
     private final DataSourceWrapper dataSource;
     private final Unmarshaller unmarshaller;
@@ -87,6 +114,9 @@ public class CaDbImporter
             CaCertStoreDbImporter certStoreImporter = new CaCertStoreDbImporter(dataSource, unmarshaller, srcFolder, resume);
             certStoreImporter.importToDB();
             certStoreImporter.shutdown();
+
+            // create serialNumber generator
+            createSerialNumberSequences();
         } finally
         {
             try
@@ -99,6 +129,104 @@ public class CaDbImporter
             long end = System.currentTimeMillis();
             System.out.println("Finished in " + AbstractLoadTest.formatTime((end - start) / 1000).trim());
         }
+    }
+
+    private void createSerialNumberSequences()
+    throws Exception
+    {
+        List<CAInfoBundle> CAInfoBundles = new LinkedList<>();
+
+        // create the sequence for the certificate serial numbers
+        Connection conn = dataSource.getConnection();
+        try
+        {
+            Statement st = dataSource.createStatement(conn);
+            ResultSet rs = st.executeQuery("SELECT NAME, NEXT_SERIAL, CERT FROM CA");
+
+            while(rs.next())
+            {
+                long nextSerial = rs.getLong("NEXT_SERIAL");
+                if(nextSerial < 1)
+                {
+                    // random serial number assignment
+                    continue;
+                }
+
+                String CA_name = rs.getString("NAME");
+                byte[] cert = Base64.decode(rs.getString("CERT"));
+                CAInfoBundle entry = new CAInfoBundle(CA_name, nextSerial, cert);
+                CAInfoBundles.add(entry);
+            }
+
+            rs.close();
+
+            if(CAInfoBundles.isEmpty())
+            {
+                return;
+            }
+
+            // get the CAINFO.ID
+            rs = st.executeQuery("SELECT ID, CERT FROM CAINFO");
+            while(rs.next())
+            {
+                byte[] cert = Base64.decode(rs.getString("CERT"));
+                int id = rs.getInt("ID");
+                for(CAInfoBundle entry : CAInfoBundles)
+                {
+                    if(Arrays.equals(cert, entry.cert))
+                    {
+                        entry.CAINFO_id = id;
+                        break;
+                    }
+                }
+            }
+
+            rs.close();
+            st.close();
+
+            // get the maximal serial number
+            PreparedStatement ps = conn.prepareStatement("SELECT MAX(SERIAL) FROM CERT WHERE CAINFO_ID=?");
+            for(CAInfoBundle entry : CAInfoBundles)
+            {
+                ps.setInt(1, entry.CAINFO_id);
+                rs = ps.executeQuery();
+                if(rs.next() == false)
+                {
+                    continue;
+                }
+
+                long maxSerial = rs.getLong(1);
+                if(maxSerial + 1 > entry.CA_nextSerial)
+                {
+                    entry.should_CA_nextSerial = maxSerial + 1;
+                }
+                rs.close();
+            }
+            ps.close();
+
+            ps = conn.prepareStatement("UPDATE CA SET NEXT_SERIAL=? WHERE NAME=?");
+            for(CAInfoBundle entry : CAInfoBundles)
+            {
+                if(entry.CA_nextSerial != entry.should_CA_nextSerial)
+                {
+                    ps.setLong(1, entry.should_CA_nextSerial);
+                    ps.setString(2, entry.CA_name);
+                    ps.executeUpdate();
+                }
+            }
+
+        }finally
+        {
+            dataSource.returnConnection(conn);
+        }
+
+        // create the sequences
+        for(CAInfoBundle entry : CAInfoBundles)
+        {
+            long nextSerial = Math.max(entry.CA_nextSerial, entry.should_CA_nextSerial);
+            dataSource.createSequence("SERIAL_" + entry.CA_name, nextSerial);
+        }
+
     }
 
 }
