@@ -40,6 +40,14 @@ public interface SecurityFactory
     ConcurrentContentSigner createSigner(String type, String conf, X509Certificate[] certs)
     throws SignerException;
 
+    ConcurrentContentSigner createSigner(String type, String confWithoutAlgo, String hashAlgo,
+            boolean mgf1, X509Certificate cert)
+    throws SignerException;
+
+    ConcurrentContentSigner createSigner(String type, String confWithoutAlgo, String hashAlgo,
+            boolean mgf1, X509Certificate[] certs)
+    throws SignerException;
+
     ContentVerifierProvider getContentVerifierProvider(PublicKey publicKey)
     throws InvalidKeyException;
 
