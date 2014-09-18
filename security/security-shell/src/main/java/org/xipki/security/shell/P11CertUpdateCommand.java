@@ -13,11 +13,7 @@ import iaik.pkcs.pkcs11.objects.Object;
 import iaik.pkcs.pkcs11.objects.PrivateKey;
 import iaik.pkcs.pkcs11.objects.X509PublicKeyCertificate;
 
-import java.security.PublicKey;
 import java.security.cert.X509Certificate;
-import java.security.interfaces.DSAPublicKey;
-import java.security.interfaces.ECPublicKey;
-import java.security.interfaces.RSAPublicKey;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
@@ -170,25 +166,7 @@ public class P11CertUpdateCommand extends P11SecurityCommand
             pairs.putUtf8Pair("key-label", keyLabel);
         }
 
-        PublicKey pubKey = cert.getPublicKey();
-        if(pubKey instanceof RSAPublicKey)
-        {
-            pairs.putUtf8Pair("algo", "SHA1withRSA");
-        }
-        else if(pubKey instanceof ECPublicKey)
-        {
-            pairs.putUtf8Pair("algo", "SHA1withECDSA");
-        }
-        else if(pubKey instanceof DSAPublicKey)
-        {
-            pairs.putUtf8Pair("algo", "SHA1withDSA");
-        }
-        else
-        {
-            throw new SignerException("Unknown key type: " + pubKey.getClass().getName());
-        }
-
-        securityFactory.createSigner("PKCS11", pairs.getEncoded(), cert);
+        securityFactory.createSigner("PKCS11", pairs.getEncoded(), "SHA1", false, cert);
     }
 
     static X509PublicKeyCertificate createPkcs11Template(
