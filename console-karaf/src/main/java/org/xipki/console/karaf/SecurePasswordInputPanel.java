@@ -155,7 +155,7 @@ class SecurePasswordInputPanel extends Panel
             String[] options = new String[]{"OK"};
             if(prompt == null || prompt.isEmpty())
             {
-                prompt = "Password requried";
+                prompt = "Password required";
             }
 
             int option = JOptionPane.showOptionDialog(null, gui, prompt,
