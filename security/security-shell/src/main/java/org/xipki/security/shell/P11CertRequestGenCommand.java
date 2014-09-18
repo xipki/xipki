@@ -7,33 +7,21 @@
 
 package org.xipki.security.shell;
 
-import iaik.pkcs.pkcs11.objects.DSAPrivateKey;
-import iaik.pkcs.pkcs11.objects.ECDSAPrivateKey;
-import iaik.pkcs.pkcs11.objects.PrivateKey;
-import iaik.pkcs.pkcs11.objects.RSAPrivateKey;
-
 import java.io.File;
 import java.security.cert.X509Certificate;
 
 import org.apache.felix.gogo.commands.Command;
 import org.apache.felix.gogo.commands.Option;
-import org.bouncycastle.asn1.ASN1ObjectIdentifier;
-import org.bouncycastle.asn1.nist.NISTObjectIdentifiers;
-import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.Certificate;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
-import org.bouncycastle.asn1.x9.X9ObjectIdentifiers;
 import org.bouncycastle.operator.ContentSigner;
 import org.bouncycastle.pkcs.PKCS10CertificationRequest;
 import org.xipki.security.SecurityFactoryImpl;
 import org.xipki.security.api.ConcurrentContentSigner;
-import org.xipki.security.api.SignerException;
 import org.xipki.security.api.p11.P11KeyIdentifier;
 import org.xipki.security.api.p11.P11SlotIdentifier;
 import org.xipki.security.p10.Pkcs10RequestGenerator;
-import org.xipki.security.p11.iaik.IaikExtendedModule;
-import org.xipki.security.p11.iaik.IaikExtendedSlot;
 
 /**
  * @author Lijun Liao
@@ -60,32 +48,7 @@ public class P11CertRequestGenCommand extends P11SecurityCommand
     protected Object doExecute()
     throws Exception
     {
-        P11KeyIdentifier keyIdentifier = getKeyIdentifier();
-
-        IaikExtendedModule module = getModule(moduleName);
-
-        IaikExtendedSlot slot = null;
-        try
-        {
-            slot = module.getSlot(new P11SlotIdentifier(slotIndex, null));
-        }catch(SignerException e)
-        {
-            err("ERROR:  " + e.getMessage());
-            return null;
-        }
-
-        char[] keyLabelChars = (keyLabel == null) ?
-                null : keyLabel.toCharArray();
-
-        PrivateKey privKey = slot.getPrivateObject(null, null, keyIdentifier.getKeyId(), keyLabelChars);
-        if(privKey == null)
-        {
-            err("Could not find private key " + keyIdentifier);
-            return null;
-        }
-
         Pkcs10RequestGenerator p10Gen = new Pkcs10RequestGenerator();
-        ASN1ObjectIdentifier sigAlgOid;
 
         hashAlgo = hashAlgo.trim().toUpperCase();
         if(hashAlgo.indexOf('-') != -1)
@@ -93,99 +56,14 @@ public class P11CertRequestGenCommand extends P11SecurityCommand
             hashAlgo = hashAlgo.replaceAll("-", "");
         }
 
-        if(privKey instanceof RSAPrivateKey)
-        {
-            if("SHA1".equalsIgnoreCase(hashAlgo))
-            {
-                sigAlgOid = PKCSObjectIdentifiers.sha1WithRSAEncryption;
-            }
-            else if("SHA224".equalsIgnoreCase(hashAlgo))
-            {
-                sigAlgOid = PKCSObjectIdentifiers.sha224WithRSAEncryption;
-            }
-            else if("SHA256".equalsIgnoreCase(hashAlgo))
-            {
-                sigAlgOid = PKCSObjectIdentifiers.sha256WithRSAEncryption;
-            }
-            else if("SHA384".equalsIgnoreCase(hashAlgo))
-            {
-                sigAlgOid = PKCSObjectIdentifiers.sha384WithRSAEncryption;
-            }
-            else if("SHA512".equalsIgnoreCase(hashAlgo))
-            {
-                sigAlgOid = PKCSObjectIdentifiers.sha512WithRSAEncryption;
-            }
-            else
-            {
-                throw new Exception("Unsupported hash algorithm " + hashAlgo);
-            }
-        }
-        else if(privKey instanceof DSAPrivateKey)
-        {
-            if("SHA1".equalsIgnoreCase(hashAlgo))
-            {
-                sigAlgOid = X9ObjectIdentifiers.id_dsa_with_sha1;
-            }
-            else if("SHA224".equalsIgnoreCase(hashAlgo))
-            {
-                sigAlgOid = NISTObjectIdentifiers.dsa_with_sha224;
-            }
-            else if("SHA256".equalsIgnoreCase(hashAlgo))
-            {
-                sigAlgOid = NISTObjectIdentifiers.dsa_with_sha256;
-            }
-            else if("SHA384".equalsIgnoreCase(hashAlgo))
-            {
-                sigAlgOid = NISTObjectIdentifiers.dsa_with_sha384;
-            }
-            else if("SHA512".equalsIgnoreCase(hashAlgo))
-            {
-                sigAlgOid = NISTObjectIdentifiers.dsa_with_sha512;
-            }
-            else
-            {
-                throw new Exception("Unsupported hash algorithm " + hashAlgo);
-            }
-        }
-        else if(privKey instanceof ECDSAPrivateKey)
-        {
-            if("SHA1".equalsIgnoreCase(hashAlgo))
-            {
-                sigAlgOid = X9ObjectIdentifiers.ecdsa_with_SHA1;
-            }
-            else if("SHA224".equalsIgnoreCase(hashAlgo))
-            {
-                sigAlgOid = X9ObjectIdentifiers.ecdsa_with_SHA224;
-            }
-            else if("SHA256".equalsIgnoreCase(hashAlgo))
-            {
-                sigAlgOid = X9ObjectIdentifiers.ecdsa_with_SHA256;
-            }
-            else if("SHA384".equalsIgnoreCase(hashAlgo))
-            {
-                sigAlgOid = X9ObjectIdentifiers.ecdsa_with_SHA384;
-            }
-            else if("SHA512".equalsIgnoreCase(hashAlgo))
-            {
-                sigAlgOid = X9ObjectIdentifiers.ecdsa_with_SHA512;
-            }
-            else
-            {
-                throw new Exception("Unsupported hash algorithm " + hashAlgo);
-            }
-        }
-        else
-        {
-            throw new Exception("Unsupported key type " + privKey.getClass().getName());
-        }
+        P11SlotIdentifier slotIdentifier = new P11SlotIdentifier(slotIndex, null);
+        P11KeyIdentifier keyIdentifier = getKeyIdentifier();
 
-        P11SlotIdentifier slotId = new P11SlotIdentifier(slotIndex, null);
-        String signerConf = SecurityFactoryImpl.getPkcs11SignerConf(
-                        moduleName,
-                        slotId, keyIdentifier,
-                        sigAlgOid.getId(), 1);
+        String signerConfWithoutAlgo = SecurityFactoryImpl.getPkcs11SignerConfWithoutAlgo(
+                        moduleName, slotIdentifier, keyIdentifier, 1);
 
-        ConcurrentContentSigner identifiedSigner = securityFactory.createSigner("PKCS11", signerConf,
+        ConcurrentContentSigner identifiedSigner = securityFactory.createSigner("PKCS11",
+                signerConfWithoutAlgo, hashAlgo, false,
                 (X509Certificate[]) null);
 
         Certificate cert = Certificate.getInstance(identifiedSigner.getCertificate().getEncoded());
