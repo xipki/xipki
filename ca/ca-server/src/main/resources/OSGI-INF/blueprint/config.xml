@@ -31,7 +31,6 @@
       <value>org.xipki.ca.server.mgmt.CmpResponderManager</value>
     </interfaces>
   </service>
-  
   <!-- create the servlet and inject our own app factory -->
   <bean id="caServlet" class="org.xipki.ca.server.Rfc6712Servlet">
     <property name="responderManager" ref="caManager"/>

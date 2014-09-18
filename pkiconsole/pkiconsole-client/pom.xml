@@ -19,9 +19,9 @@
       <version>${project.version}</version>
     </dependency>
     <dependency>
-     <groupId>com.caucho</groupId>
-     <artifactId>hessian</artifactId>
-     <version>${hessian.version}</version>
+      <groupId>com.caucho</groupId>
+      <artifactId>hessian</artifactId>
+      <version>${hessian.version}</version>
     </dependency>
   </dependencies>
   <build>
@@ -49,7 +49,7 @@
             </Import-Package>
           </instructions>
         </configuration>
-      </plugin>    
+      </plugin>
     </plugins>
   </build>
 </project>

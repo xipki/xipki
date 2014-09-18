@@ -22,11 +22,11 @@
       <groupId>org.xipki</groupId>
       <artifactId>security-api</artifactId>
       <version>${project.version}</version>
-    </dependency>    
+    </dependency>
     <dependency>
-     <groupId>com.caucho</groupId>
-     <artifactId>hessian</artifactId>
-     <version>${hessian.version}</version>
+      <groupId>com.caucho</groupId>
+      <artifactId>hessian</artifactId>
+      <version>${hessian.version}</version>
     </dependency>
     <dependency>
       <groupId>javax.servlet</groupId>

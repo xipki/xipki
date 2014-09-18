@@ -5,9 +5,7 @@
       <cm:property name="urlPatterns" value="/p11/*"/>
     </cm:default-properties>
   </cm:property-placeholder>
-  
   <reference id="securityFactory" interface="org.xipki.security.api.SecurityFactory"/>
-  
   <bean id="localP11CryptService" class="org.xipki.remotep11.server.LocalP11CryptService" init-method="init">
     <property name="securityFactory" ref="securityFactory"/>
   </bean>

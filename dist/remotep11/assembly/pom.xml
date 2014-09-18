@@ -24,7 +24,7 @@
       <artifactId>apache-karaf</artifactId>
       <version>${karaf.version}</version>
       <type>zip</type>
-    </dependency>    
+    </dependency>
     <dependency>
       <!-- Karaf Standard Features -->
       <groupId>org.apache.karaf.assemblies.features</groupId>
@@ -119,7 +119,7 @@
                   <version>${karaf.version}</version>
                   <type>zip</type>
                   <outputDirectory>target/windows-dependencies</outputDirectory>
-                </artifactItem>                
+                </artifactItem>
               </artifactItems>
             </configuration>
           </execution>
@@ -130,9 +130,9 @@
             <goals>
               <goal>unpack</goal>
             </goals>
-          <configuration>
-            <artifactItems>
-               <artifactItem>
+            <configuration>
+              <artifactItems>
+                <artifactItem>
                   <groupId>at.tugraz.iaik</groupId>
                   <artifactId>iaikPkcs11Wrapper-native</artifactId>
                   <version>${pkcs11Wrapper.version}</version>

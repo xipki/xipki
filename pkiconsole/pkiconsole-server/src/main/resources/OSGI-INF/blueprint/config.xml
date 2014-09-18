@@ -15,10 +15,8 @@
       <cm:property name="truststore.provider" value=""/>
     </cm:default-properties>
   </cm:property-placeholder>
-  
   <reference id="caManager" interface="org.xipki.ca.server.mgmt.api.CAManager"/>
   <reference id="securityFactory" interface="org.xipki.security.api.SecurityFactory"/>
-
   <!-- create the servlet and inject our own app factory -->
   <bean id="serverServlet" class="org.xipki.ca.mgmt.hessian.server.CAManagerServlet" init-method="initialize" destroy-method="shutdown">
     <property name="securityFactory" ref="securityFactory"/>

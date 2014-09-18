@@ -17,12 +17,11 @@
     <bundle>mvn:org.xipki/pkiconsole-common/${project.version}</bundle>
     <bundle>mvn:org.xipki/pkiconsole-client/${project.version}</bundle>
   </feature>
-
   <feature name="xipki-pkiconsole-shell" version="${project.version}" resolver="(obr)">
     <feature>xipki-pkiconsole</feature>
     <bundle>mvn:org.xipki/security-api/${project.version}</bundle>
     <bundle>mvn:org.xipki/security-core/${project.version}</bundle>
     <bundle>mvn:org.xipki/console-karaf/${project.version}</bundle>
     <bundle>mvn:org.xipki/ca-server-shell/${project.version}</bundle>
-  </feature>  
+  </feature>
 </features>

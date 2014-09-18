@@ -4,9 +4,8 @@
   <reference id="filePathCompleter" interface="org.xipki.console.karaf.FilePathCompleter"/>
   <bean id="curveNameCompleter" class="org.xipki.security.shell.completer.ECCurveNameCompleter"/>
   <bean id="p11ModuleNameCompleter" class="org.xipki.security.shell.completer.P11ModuleNameCompleter">
-  	<property name="securityFactory" ref="securityFactory"/>
+    <property name="securityFactory" ref="securityFactory"/>
   </bean>
-  
   <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.1.0">
     <command name="keytool/list">
       <action class="org.xipki.security.shell.P11ListSlotCommand">

@@ -1,21 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <PKCS11Conf xmlns="http://xipki.org/xipki/pkcs11/conf/v1">
-	<modules defaultModule="cknfast">
-		<module name="cknfast">
-			<nativeLibraries>
-				<nativeLibrary>
-					<os>nix</os>
-					<os>nux</os>
-					<os>aix</os>
-					<path>/opt/nfast/toolkits/pkcs11/libcknfast.so</path>
-				</nativeLibrary>
-			</nativeLibraries>
-			<excludeSlots>
-				<!-- Slot 0 is the management slot -->
-				<slot>
-					<index>0</index>
-				</slot>
-			</excludeSlots>
-		</module>		
-	</modules>
+  <modules defaultModule="cknfast">
+    <module name="cknfast">
+      <nativeLibraries>
+        <nativeLibrary>
+          <os>nix</os>
+          <os>nux</os>
+          <os>aix</os>
+          <path>/opt/nfast/toolkits/pkcs11/libcknfast.so</path>
+        </nativeLibrary>
+      </nativeLibraries>
+      <excludeSlots>
+        <!-- Slot 0 is the management slot -->
+        <slot>
+          <index>0</index>
+        </slot>
+      </excludeSlots>
+    </module>
+  </modules>
 </PKCS11Conf>

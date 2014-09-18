@@ -82,7 +82,7 @@
         <entry key="-signerType" value-ref="signerTypeCompleter"/>
         <entry key="-ds" value-ref="duplicationModeCompleter"/>
         <entry key="-dk" value-ref="duplicationModeCompleter"/>
-        <entry key="-validityMode" value-ref="validityModeCompleter"/>        
+        <entry key="-validityMode" value-ref="validityModeCompleter"/>
       </optional-completers>
     </command>
     <command name="ca/ca-revoke">
@@ -128,7 +128,7 @@
         <entry key="-signerType" value-ref="signerTypeCompleter"/>
         <entry key="-ds" value-ref="duplicationModeCompleter"/>
         <entry key="-dk" value-ref="duplicationModeCompleter"/>
-        <entry key="-validityMode" value-ref="validityModeCompleter"/>        
+        <entry key="-validityMode" value-ref="validityModeCompleter"/>
       </optional-completers>
     </command>
     <command name="ca/publish-self">
@@ -152,7 +152,7 @@
     <command name="ca/ca-update">
       <action class="org.xipki.ca.server.mgmt.shell.CaUpdateCommand">
         <property name="caManager" ref="caManager"/>
-        <property name="securityFactory" ref="securityFactory"/>        
+        <property name="securityFactory" ref="securityFactory"/>
       </action>
       <optional-completers>
         <entry key="-name" value-ref="caNameCompleter"/>
@@ -163,7 +163,7 @@
         <entry key="-signerType" value-ref="signerTypeCompleter"/>
         <entry key="-ds" value-ref="duplicationModeCompleter"/>
         <entry key="-dk" value-ref="duplicationModeCompleter"/>
-        <entry key="-validityMode" value-ref="validityModeCompleter"/>        
+        <entry key="-validityMode" value-ref="validityModeCompleter"/>
       </optional-completers>
     </command>
     <!-- CA Alias -->
