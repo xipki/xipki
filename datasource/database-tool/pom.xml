@@ -12,7 +12,6 @@
   <artifactId>database-tool</artifactId>
   <packaging>bundle</packaging>
   <name>XiPKI :: ${project.artifactId}</name>
-  
   <dependencies>
     <dependency>
       <groupId>${project.groupId}</groupId>

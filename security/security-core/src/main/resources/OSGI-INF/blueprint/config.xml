@@ -13,10 +13,8 @@
       <cm:property name="pkcs11.module" value=""/>
     </cm:default-properties>
   </cm:property-placeholder>
-
   <bean id="sshBcBugfix" class="org.xipki.security.SshdBcBugfix">
   </bean>
-
   <bean id="passwordResolverImpl" class="org.xipki.security.PasswordResolverImpl">
     <property name="passwordResolvers">
       <list>
@@ -25,35 +23,27 @@
       </list>
     </property>
   </bean>
-
   <service ref="passwordResolverImpl" interface="org.xipki.security.api.PasswordResolver"/>
-
   <bean id="securityFactoryImpl" class="org.xipki.security.SecurityFactoryImpl">
     <property name="pkcs11Provider" value="${pkcs11.provider}"/>
     <property name="defaultParallelism" value="${defaultParallelism}"/>
-	<property name="pkcs11ConfFile" value="${pkcs11.confFile}"/>    
+    <property name="pkcs11ConfFile" value="${pkcs11.confFile}"/>
     <property name="pkcs11Module" value="${pkcs11.module}"/>
     <property name="pkcs11IncludeSlots" value="${pkcs11.includeSlots}"/>
     <property name="pkcs11ExcludeSlots" value="${pkcs11.excludeSlots}"/>
     <property name="passwordResolver" ref="passwordResolverImpl"/>
   </bean>
-
   <service ref="securityFactoryImpl" interface="org.xipki.security.api.SecurityFactory"/>
-
   <bean id="obfPasswordResolver" class="org.xipki.security.OBFPasswordResolver"/>
-
   <bean id="pbePasswordResolver" class="org.xipki.security.PBEPasswordResolver">
     <property name="masterPasswordCallback" value="${masterPassword.callback}"/>
   </bean>
-
   <bean id="XiPKIProviderRegister" class="org.xipki.security.provider.XiPKIProviderRegister" init-method="regist" destroy-method="unregist">
     <property name="securityFactory" ref="securityFactoryImpl"/>
   </bean>
-
   <bean id="httpHostnameVerifier" class="org.xipki.security.HttpsHostnameVerifier" init-method="init" destroy-method="shutdown">
     <property name="enabled" value="${hostnameVerifier.enabled}"/>
     <property name="trustAll" value="${hostnameVerifier.trustAll}"/>
     <property name="commonnameHostMap" value="${hostnameVerifier.commonnameHostMap}"/>
   </bean>
-
 </blueprint>

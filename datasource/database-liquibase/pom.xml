@@ -12,29 +12,27 @@
   <artifactId>database-liquibase</artifactId>
   <packaging>bundle</packaging>
   <name>XiPKI :: ${project.artifactId}</name>
-  
   <properties>
     <DynamicImport-Package>*</DynamicImport-Package>
   </properties>
-      
   <dependencies>
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>security-api</artifactId>
       <version>${project.version}</version>
-    </dependency>  
+    </dependency>
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
     </dependency>
     <dependency>
-	  <groupId>org.liquibase</groupId>
-	  <artifactId>liquibase-core</artifactId>
-	  <version>${liquibase.version}</version>
+      <groupId>org.liquibase</groupId>
+      <artifactId>liquibase-core</artifactId>
+      <version>${liquibase.version}</version>
       <exclusions>
         <exclusion>
-      	  <groupId>org.liquibase</groupId>
-      	  <artifactId>liquibase-core</artifactId>
+          <groupId>org.liquibase</groupId>
+          <artifactId>liquibase-core</artifactId>
         </exclusion>
       </exclusions>
     </dependency>
