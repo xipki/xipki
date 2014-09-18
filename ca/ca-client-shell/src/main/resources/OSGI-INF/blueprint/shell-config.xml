@@ -26,6 +26,7 @@
     <command name="caclient/enroll2">
       <action class="org.xipki.ca.client.shell.P11EnrollCert2Command">
         <property name="raWorker" ref="raWorker"/>
+        <property name="securityFactory" ref="securityFactory"/>
       </action>
       <optional-completers>
         <entry key="-out" value-ref="filePathCompleter"/>
@@ -35,6 +36,7 @@
     <command name="caclient/enroll2-p12">
       <action class="org.xipki.ca.client.shell.P12EnrollCert2Command">
         <property name="raWorker" ref="raWorker"/>
+        <property name="securityFactory" ref="securityFactory"/>
       </action>
       <optional-completers>
         <entry key="-out" value-ref="filePathCompleter"/>

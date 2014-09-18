@@ -7,11 +7,17 @@
 
 package org.xipki.ca.client.shell;
 
+import java.security.cert.X509Certificate;
+
 import org.apache.felix.gogo.commands.Command;
 import org.apache.felix.gogo.commands.Option;
+import org.bouncycastle.util.encoders.Hex;
+import org.xipki.security.SecurityFactoryImpl;
 import org.xipki.security.api.ConcurrentContentSigner;
 import org.xipki.security.api.SecurityFactory;
 import org.xipki.security.api.SignerException;
+import org.xipki.security.api.p11.P11KeyIdentifier;
+import org.xipki.security.api.p11.P11SlotIdentifier;
 
 /**
  * @author Lijun Liao
@@ -42,8 +48,31 @@ public class P11EnrollCert2Command extends EnrollCert2Command
     protected ConcurrentContentSigner getSigner()
     throws SignerException
     {
-        // TODO Auto-generated method stub
-        return null;
+        P11SlotIdentifier slotIdentifier = new P11SlotIdentifier(slotIndex, null);
+        P11KeyIdentifier keyIdentifier = getKeyIdentifier();
+
+        String signerConfWithoutAlgo = SecurityFactoryImpl.getPkcs11SignerConfWithoutAlgo(
+                moduleName, slotIdentifier, keyIdentifier, 1);
+        return securityFactory.createSigner("PKCS11", signerConfWithoutAlgo, hashAlgo, false, (X509Certificate[]) null);
+    }
+
+    private P11KeyIdentifier getKeyIdentifier()
+    throws SignerException
+    {
+        P11KeyIdentifier keyIdentifier;
+        if(keyId != null && keyLabel == null)
+        {
+            keyIdentifier = new P11KeyIdentifier(Hex.decode(keyId));
+        }
+        else if(keyId == null && keyLabel != null)
+        {
+            keyIdentifier = new P11KeyIdentifier(keyLabel);
+        }
+        else
+        {
+            throw new SignerException("Exactly one of keyId or keyLabel should be specified");
+        }
+        return keyIdentifier;
     }
 
 }

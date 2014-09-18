@@ -24,6 +24,7 @@ import org.xipki.ca.cmp.client.type.EnrollCertRequestType;
 import org.xipki.ca.common.CertificateOrError;
 import org.xipki.ca.common.EnrollCertResult;
 import org.xipki.security.api.ConcurrentContentSigner;
+import org.xipki.security.api.SecurityFactory;
 import org.xipki.security.api.SignerException;
 
 /**
@@ -49,6 +50,17 @@ public abstract class EnrollCert2Command extends ClientCommand
     @Option(name = "-user",
             required = false, description = "Username")
     protected String user;
+
+    @Option(name = "-hash",
+            required = false, description = "Hash algorithm name for the POPO computation")
+    protected String hashAlgo = "SHA256";
+
+    protected SecurityFactory securityFactory;
+
+    public void setSecurityFactory(SecurityFactory securityFactory)
+    {
+        this.securityFactory = securityFactory;
+    }
 
     protected abstract ConcurrentContentSigner getSigner()
     throws SignerException;
