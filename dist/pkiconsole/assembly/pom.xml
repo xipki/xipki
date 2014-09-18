@@ -24,7 +24,7 @@
       <artifactId>apache-karaf</artifactId>
       <version>${karaf.version}</version>
       <type>zip</type>
-    </dependency>    
+    </dependency>
     <dependency>
       <!-- Karaf Standard Features -->
       <groupId>org.apache.karaf.assemblies.features</groupId>
@@ -119,10 +119,10 @@
                   <version>${karaf.version}</version>
                   <type>zip</type>
                   <outputDirectory>target/windows-dependencies</outputDirectory>
-                </artifactItem>                
+                </artifactItem>
               </artifactItems>
             </configuration>
-          </execution>          
+          </execution>
         </executions>
       </plugin>
       <plugin>
@@ -198,7 +198,7 @@
                 </configuration>
               </execution>
             </executions>
-          </plugin>          
+          </plugin>
         </plugins>
       </build>
     </profile>

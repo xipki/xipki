@@ -126,7 +126,7 @@
                   <version>${karaf.version}</version>
                   <type>zip</type>
                   <outputDirectory>target/windows-dependencies</outputDirectory>
-                </artifactItem>                
+                </artifactItem>
               </artifactItems>
             </configuration>
           </execution>

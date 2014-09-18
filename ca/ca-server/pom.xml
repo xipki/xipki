@@ -58,7 +58,7 @@
             <DynamicImport-Package>*</DynamicImport-Package>
           </instructions>
         </configuration>
-      </plugin>    
+      </plugin>
       <plugin>
         <groupId>org.jvnet.jaxb2.maven2</groupId>
         <artifactId>maven-jaxb2-plugin</artifactId>

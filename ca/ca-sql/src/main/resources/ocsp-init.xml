@@ -1,148 +1,128 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
-  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog dbchangelog-3.0.xsd"
-  logicalFilePath="ocsp-init.xml">
-	<changeSet author="xipki" id="1">
-		<!-- table ISSUER -->
-		<createTable tableName="ISSUER">
-			<column name="ID" type="INT">
-				<constraints primaryKey="true" nullable="false"/>
-			</column>
-			<column name="SUBJECT" type="VARCHAR(300)">
-				<constraints nullable="false"/>
-			</column>
-			<column name="NOTBEFORE" type="BIGINT" remarks="seconds since January 1, 1970, 00:00:00 GMT">
-				<constraints nullable="false"/>
-			</column>
-			<column name="NOTAFTER" type="BIGINT" remarks="seconds since January 1, 1970, 00:00:00 GMT">
-				<constraints nullable="false"/>
-			</column>
-			<column name="SHA1_FP_NAME" type="CHAR(40)">
-				<constraints nullable="false"/>
-			</column>
-			<column name="SHA1_FP_KEY" type="CHAR(40)">
-				<constraints nullable="false"/>
-			</column>
-			<column name="SHA224_FP_NAME" type="CHAR(56)">
-				<constraints nullable="false"/>
-			</column>
-			<column name="SHA224_FP_KEY" type="CHAR(56)">
-				<constraints nullable="false"/>
-			</column>
-			<column name="SHA256_FP_NAME" type="CHAR(64)">
-				<constraints nullable="false"/>
-			</column>
-			<column name="SHA256_FP_KEY" type="CHAR(64)">
-				<constraints nullable="false"/>
-			</column>
-			<column name="SHA384_FP_NAME" type="CHAR(96)">
-				<constraints nullable="false"/>
-			</column>
-			<column name="SHA384_FP_KEY" type="CHAR(96)">
-				<constraints nullable="false"/>
-			</column>
-			<column name="SHA512_FP_NAME" type="CHAR(128)">
-				<constraints nullable="false"/>
-			</column>
-			<column name="SHA512_FP_KEY" type="CHAR(128)">
-				<constraints nullable="false"/>
-			</column>
-			<column name="SHA1_FP_CERT" type="CHAR(40)">
-				<constraints nullable="false"/>
-			</column>
-			<column defaultValueNumeric="0" name="REVOKED" type="SMALLINT"/>
-			<column name="REV_REASON" type="SMALLINT"/>
-			<column name="REV_TIME" remarks="seconds since January 1, 1970, 00:00:00 GMT" type="BIGINT"/>
-			<column name="REV_INVALIDITY_TIME" remarks="seconds since January 1, 1970, 00:00:00 GMT" type="BIGINT"/>			
-			<column name="CERT" type="VARCHAR(3000)">
-				<constraints nullable="false"/>
-			</column>
-		</createTable>
-		<!-- table CERT -->
-		<createTable tableName="CERT">
-			<column name="ID" type="INT">
-				<constraints primaryKey="true" nullable="false"/>
-			</column>
-			<column name="ISSUER_ID" type="INT">
-				<constraints nullable="false"/>
-			</column>
-			<column name="SERIAL" type="BIGINT">
-				<constraints nullable="false"/>
-			</column>
-			<column name="SUBJECT" type="VARCHAR(300)">
-				<constraints nullable="false"/>
-			</column>
-			<column name="LAST_UPDATE" type="BIGINT" remarks="seconds since January 1, 1970, 00:00:00 GMT">
-				<constraints nullable="false"/>
-			</column>
-			<column name="NOTBEFORE" type="BIGINT" remarks="seconds since January 1, 1970, 00:00:00 GMT">
-				<constraints nullable="false"/>
-			</column>
-			<column name="NOTAFTER" type="BIGINT" remarks="seconds since January 1, 1970, 00:00:00 GMT">
-				<constraints nullable="false"/>
-			</column>
-			<column name="REVOKED" type="SMALLINT">
-				<constraints nullable="false"/>
-			</column>
-			<column name="REV_REASON" type="SMALLINT"/>
-			<column name="REV_TIME" type="BIGINT" remarks="seconds since January 1, 1970, 00:00:00 GMT"/>
-			<column name="REV_INVALIDITY_TIME" type="BIGINT" remarks="seconds since January 1, 1970, 00:00:00 GMT"/>
-			<column name="PROFILE" type="VARCHAR(45)"/>
-		</createTable>
-		
-		<addUniqueConstraint tableName="CERT" columnNames="ISSUER_ID, SERIAL"
-			constraintName="CONST_ISSUER_SERIAL"/>
-		
-		<!-- table CERTHASH -->
-		<createTable tableName="CERTHASH">
-			<column name="CERT_ID" type="INT">
-				<constraints primaryKey="true" nullable="false"/>
-			</column>
-			<column name="SHA1_FP" type="CHAR(40)">
-				<constraints nullable="false"/>
-			</column>
-			<column name="SHA224_FP" type="CHAR(56)">
-				<constraints nullable="false"/>
-			</column>
-			<column name="SHA256_FP" type="CHAR(64)">
-				<constraints nullable="false"/>
-			</column>
-			<column name="SHA384_FP" type="CHAR(96)">
-				<constraints nullable="false"/>
-			</column>
-			<column name="SHA512_FP" type="CHAR(128)">
-				<constraints nullable="false"/>
-			</column>
-		</createTable>
-		<!-- table RAWCERT -->
-		<createTable tableName="RAWCERT">
-			<column name="CERT_ID" type="INT">
-				<constraints primaryKey="true" nullable="false"/>
-			</column>
-			<column name="CERT" type="VARCHAR(3000)" remarks="Base64 encoded CERTificate">
-				<constraints nullable="false"/>
-			</column>
-		</createTable>
-	</changeSet>
-	<!-- foreign key -->
-	<changeSet author="xipki" id="2">
-		<addForeignKeyConstraint deferrable="false" initiallyDeferred="false"
-			onDelete="CASCADE" onUpdate="NO ACTION"
-			baseColumnNames="ISSUER_ID" baseTableName="CERT"
-			constraintName="FK_CERT_CAINFO1"
-			referencedColumnNames="ID" referencedTableName="ISSUER"/>
-			
-		<addForeignKeyConstraint deferrable="false" initiallyDeferred="false"
-			onDelete="CASCADE" onUpdate="NO ACTION"
-			baseColumnNames="CERT_ID" baseTableName="CERTHASH"
-			constraintName="FK_CERTHASH_CERT1"
-			referencedColumnNames="ID" referencedTableName="CERT"/>
-
-		<addForeignKeyConstraint deferrable="false" initiallyDeferred="false"
-			onDelete="CASCADE" onUpdate="NO ACTION"
-			baseColumnNames="CERT_ID" baseTableName="RAWCERT"
-			constraintName="FK_RAWCERT_CERT1"
-			referencedColumnNames="ID" referencedTableName="CERT"/>
-	</changeSet>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog dbchangelog-3.0.xsd" logicalFilePath="ocsp-init.xml">
+  <changeSet author="xipki" id="1">
+    <!-- table ISSUER -->
+    <createTable tableName="ISSUER">
+      <column name="ID" type="INT">
+        <constraints primaryKey="true" nullable="false"/>
+      </column>
+      <column name="SUBJECT" type="VARCHAR(300)">
+        <constraints nullable="false"/>
+      </column>
+      <column name="NOTBEFORE" type="BIGINT" remarks="seconds since January 1, 1970, 00:00:00 GMT">
+        <constraints nullable="false"/>
+      </column>
+      <column name="NOTAFTER" type="BIGINT" remarks="seconds since January 1, 1970, 00:00:00 GMT">
+        <constraints nullable="false"/>
+      </column>
+      <column name="SHA1_FP_NAME" type="CHAR(40)">
+        <constraints nullable="false"/>
+      </column>
+      <column name="SHA1_FP_KEY" type="CHAR(40)">
+        <constraints nullable="false"/>
+      </column>
+      <column name="SHA224_FP_NAME" type="CHAR(56)">
+        <constraints nullable="false"/>
+      </column>
+      <column name="SHA224_FP_KEY" type="CHAR(56)">
+        <constraints nullable="false"/>
+      </column>
+      <column name="SHA256_FP_NAME" type="CHAR(64)">
+        <constraints nullable="false"/>
+      </column>
+      <column name="SHA256_FP_KEY" type="CHAR(64)">
+        <constraints nullable="false"/>
+      </column>
+      <column name="SHA384_FP_NAME" type="CHAR(96)">
+        <constraints nullable="false"/>
+      </column>
+      <column name="SHA384_FP_KEY" type="CHAR(96)">
+        <constraints nullable="false"/>
+      </column>
+      <column name="SHA512_FP_NAME" type="CHAR(128)">
+        <constraints nullable="false"/>
+      </column>
+      <column name="SHA512_FP_KEY" type="CHAR(128)">
+        <constraints nullable="false"/>
+      </column>
+      <column name="SHA1_FP_CERT" type="CHAR(40)">
+        <constraints nullable="false"/>
+      </column>
+      <column defaultValueNumeric="0" name="REVOKED" type="SMALLINT"/>
+      <column name="REV_REASON" type="SMALLINT"/>
+      <column name="REV_TIME" remarks="seconds since January 1, 1970, 00:00:00 GMT" type="BIGINT"/>
+      <column name="REV_INVALIDITY_TIME" remarks="seconds since January 1, 1970, 00:00:00 GMT" type="BIGINT"/>
+      <column name="CERT" type="VARCHAR(3000)">
+        <constraints nullable="false"/>
+      </column>
+    </createTable>
+    <!-- table CERT -->
+    <createTable tableName="CERT">
+      <column name="ID" type="INT">
+        <constraints primaryKey="true" nullable="false"/>
+      </column>
+      <column name="ISSUER_ID" type="INT">
+        <constraints nullable="false"/>
+      </column>
+      <column name="SERIAL" type="BIGINT">
+        <constraints nullable="false"/>
+      </column>
+      <column name="SUBJECT" type="VARCHAR(300)">
+        <constraints nullable="false"/>
+      </column>
+      <column name="LAST_UPDATE" type="BIGINT" remarks="seconds since January 1, 1970, 00:00:00 GMT">
+        <constraints nullable="false"/>
+      </column>
+      <column name="NOTBEFORE" type="BIGINT" remarks="seconds since January 1, 1970, 00:00:00 GMT">
+        <constraints nullable="false"/>
+      </column>
+      <column name="NOTAFTER" type="BIGINT" remarks="seconds since January 1, 1970, 00:00:00 GMT">
+        <constraints nullable="false"/>
+      </column>
+      <column name="REVOKED" type="SMALLINT">
+        <constraints nullable="false"/>
+      </column>
+      <column name="REV_REASON" type="SMALLINT"/>
+      <column name="REV_TIME" type="BIGINT" remarks="seconds since January 1, 1970, 00:00:00 GMT"/>
+      <column name="REV_INVALIDITY_TIME" type="BIGINT" remarks="seconds since January 1, 1970, 00:00:00 GMT"/>
+      <column name="PROFILE" type="VARCHAR(45)"/>
+    </createTable>
+    <addUniqueConstraint tableName="CERT" columnNames="ISSUER_ID, SERIAL" constraintName="CONST_ISSUER_SERIAL"/>
+    <!-- table CERTHASH -->
+    <createTable tableName="CERTHASH">
+      <column name="CERT_ID" type="INT">
+        <constraints primaryKey="true" nullable="false"/>
+      </column>
+      <column name="SHA1_FP" type="CHAR(40)">
+        <constraints nullable="false"/>
+      </column>
+      <column name="SHA224_FP" type="CHAR(56)">
+        <constraints nullable="false"/>
+      </column>
+      <column name="SHA256_FP" type="CHAR(64)">
+        <constraints nullable="false"/>
+      </column>
+      <column name="SHA384_FP" type="CHAR(96)">
+        <constraints nullable="false"/>
+      </column>
+      <column name="SHA512_FP" type="CHAR(128)">
+        <constraints nullable="false"/>
+      </column>
+    </createTable>
+    <!-- table RAWCERT -->
+    <createTable tableName="RAWCERT">
+      <column name="CERT_ID" type="INT">
+        <constraints primaryKey="true" nullable="false"/>
+      </column>
+      <column name="CERT" type="VARCHAR(3000)" remarks="Base64 encoded CERTificate">
+        <constraints nullable="false"/>
+      </column>
+    </createTable>
+  </changeSet>
+  <!-- foreign key -->
+  <changeSet author="xipki" id="2">
+    <addForeignKeyConstraint deferrable="false" initiallyDeferred="false" onDelete="CASCADE" onUpdate="NO ACTION" baseColumnNames="ISSUER_ID" baseTableName="CERT" constraintName="FK_CERT_CAINFO1" referencedColumnNames="ID" referencedTableName="ISSUER"/>
+    <addForeignKeyConstraint deferrable="false" initiallyDeferred="false" onDelete="CASCADE" onUpdate="NO ACTION" baseColumnNames="CERT_ID" baseTableName="CERTHASH" constraintName="FK_CERTHASH_CERT1" referencedColumnNames="ID" referencedTableName="CERT"/>
+    <addForeignKeyConstraint deferrable="false" initiallyDeferred="false" onDelete="CASCADE" onUpdate="NO ACTION" baseColumnNames="CERT_ID" baseTableName="RAWCERT" constraintName="FK_RAWCERT_CERT1" referencedColumnNames="ID" referencedTableName="CERT"/>
+  </changeSet>
 </databaseChangeLog>
