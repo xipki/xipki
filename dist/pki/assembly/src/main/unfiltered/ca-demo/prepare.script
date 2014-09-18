@@ -1,4 +1,14 @@
+#################################################################
+#                      Initialize the database                  #
+#################################################################
+
+features:install xipki-database-tool
+dbtool:initdb --quiet
+features:uninstall xipki-database-tool
+
 features:install xipki-caserver-shell
+
+ca:ca-restart
 
 #################################################################
 #                       PREPARE ENVIRONMENET                    #

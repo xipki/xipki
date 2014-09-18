@@ -43,6 +43,10 @@ public abstract class LiquibaseCommand extends XipkiOsgiCommandSupport
         yesNo.add("no");
     }
 
+    @Option(name = "-q", aliases="--quiet",
+            required = false, description = "Quiet mode")
+    protected Boolean quiet = Boolean.FALSE;
+
     @Option(name = "-logLevel",
             description = "Log level, valid values are debug, info, warning, severe, off")
     protected String logLevel = "warning";
@@ -50,30 +54,38 @@ public abstract class LiquibaseCommand extends XipkiOsgiCommandSupport
     protected void resetAndInit(LiquibaseDatabaseConf dbConf, String schemaFile)
     throws Exception
     {
-        if(confirm("reset and initialize", dbConf, schemaFile))
+        printDatabaseInfo(dbConf, schemaFile);
+        if(quiet == false)
         {
-            LiquibaseMain liquibase = new LiquibaseMain(dbConf, schemaFile);
-            try
+            if(confirm("reset and initialize") == false)
             {
-                liquibase.init(logLevel);
-                liquibase.releaseLocks();
-
-                if(LiquibaseMain.loglevelIsSevereOrOff(logLevel) == false)
-                {
-                    liquibase.init("severe");
-                }
-                liquibase.dropAll();
-
-                if(LiquibaseMain.loglevelIsSevereOrOff(logLevel) == false)
-                {
-                    liquibase.init(logLevel);
-                }
-                liquibase.update();
-            }finally
-            {
-                liquibase.shutdown();
+                out("Cancelled");
+                return;
             }
         }
+
+        LiquibaseMain liquibase = new LiquibaseMain(dbConf, schemaFile);
+        try
+        {
+            liquibase.init(logLevel);
+            liquibase.releaseLocks();
+
+            if(LiquibaseMain.loglevelIsSevereOrOff(logLevel) == false)
+            {
+                liquibase.init("severe");
+            }
+            liquibase.dropAll();
+
+            if(LiquibaseMain.loglevelIsSevereOrOff(logLevel) == false)
+            {
+                liquibase.init(logLevel);
+            }
+            liquibase.update();
+        }finally
+        {
+            liquibase.shutdown();
+        }
+
     }
 
     protected static Properties getDbConfPoperties(String dbconfFile)
@@ -113,22 +125,26 @@ public abstract class LiquibaseCommand extends XipkiOsgiCommandSupport
         return props;
     }
 
-    private boolean confirm(String command, LiquibaseDatabaseConf dbParams, String schemaFile)
-    throws IOException
+    private void printDatabaseInfo(LiquibaseDatabaseConf dbParams, String schemaFile)
     {
-        StringBuilder promptBuilder = new StringBuilder();
-        promptBuilder.append("\n--------------------------------------------\n");
-        promptBuilder.append("DRIVER      = ").append(dbParams.getDriver()).append("\n");
-        promptBuilder.append("USER        = ").append(dbParams.getUsername()).append("\n");
-        promptBuilder.append("URL         = ").append(dbParams.getUrl()).append("\n");
+        StringBuilder msg = new StringBuilder();
+        msg.append("\n--------------------------------------------\n");
+        msg.append("DRIVER      = ").append(dbParams.getDriver()).append("\n");
+        msg.append("USER        = ").append(dbParams.getUsername()).append("\n");
+        msg.append("URL         = ").append(dbParams.getUrl()).append("\n");
         if(dbParams.getSchema() != null)
         {
-            promptBuilder.append("SCHEMA      = ").append(dbParams.getSchema()).append("\n");
+            msg.append("SCHEMA      = ").append(dbParams.getSchema()).append("\n");
         }
-        promptBuilder.append("SCHEMA_FILE = ").append(schemaFile).append("\n");
+        msg.append("SCHEMA_FILE = ").append(schemaFile).append("\n");
 
-        promptBuilder.append("\nDo you wish to ").append(command).append(" the database");
-        String text = read(promptBuilder.toString(), yesNo);
+        System.out.println(msg);
+    }
+
+    private boolean confirm(String command)
+    throws IOException
+    {
+        String text = read("\nDo you wish to " + command + " the database", yesNo);
         return "yes".equalsIgnoreCase(text);
     }
 
