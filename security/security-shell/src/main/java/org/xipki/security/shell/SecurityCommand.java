@@ -34,18 +34,6 @@ public abstract class SecurityCommand extends XipkiOsgiCommandSupport
         this.securityFactory = securityFactory;
     }
 
-    protected char[] readPasswordIfRequired(String password, Boolean readFromConsole)
-    {
-        if(password != null)
-        {
-            return password.toCharArray();
-        }
-        else
-        {
-            return isTrue(readFromConsole) ? readPassword() : null;
-        }
-    }
-
     protected IaikExtendedModule getModule(String moduleName)
     throws SignerException
     {
