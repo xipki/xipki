@@ -16,7 +16,6 @@ import java.security.cert.X509CRL;
 import java.security.cert.X509Certificate;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.sql.Types;
 import java.util.List;
 import java.util.StringTokenizer;
@@ -393,21 +392,30 @@ class CaCertStoreDbImporter extends DbPorter
     private void import_deltaCRLCache(DeltaCRLCache deltaCRLCache)
     throws Exception
     {
-        final String SQL = "INSERT INTO DELTACRL_CACHE" +
+        final String SQL_ORACLE = "INSERT INTO DELTACRL_CACHE" +
                 " (ID, SERIAL, CAINFO_ID)" +
                 " VALUES (?, ?, ?)";
+        final String SQL_OTHER = "INSERT INTO DELTACRL_CACHE" +
+                " (SERIAL, CAINFO_ID)" +
+                " VALUES (?, ?)";
+
+        boolean oracle = dataSource.getDatabaseType() == DatabaseType.ORACLE;
 
         System.out.println("Importing table DELTACRL_CACHE");
-        PreparedStatement ps = prepareStatement(SQL);
+        PreparedStatement ps = prepareStatement(oracle ? SQL_ORACLE : SQL_OTHER);
 
         try
         {
+            long id = 1;
             for(DeltaCRLCacheEntryType entry : deltaCRLCache.getEntry())
             {
                 try
                 {
                     int idx = 1;
-                    ps.setLong(idx++, entry.getId());
+                    if(oracle)
+                    {
+                        ps.setLong(idx++, id++);
+                    }
                     ps.setLong(idx++, entry.getSerial());
                     ps.setInt(idx++, entry.getCaId());
                     ps.execute();
@@ -423,22 +431,10 @@ class CaCertStoreDbImporter extends DbPorter
             releaseResources(ps, null);
         }
 
-        if(dataSource.getDatabaseType() == DatabaseType.ORACLE)
+        if(oracle)
         {
             long maxId = getMax("DELTACRL_CACHE", "ID");
-
-            final String sql_drop = "DROP SEQUENCE SEQ_DCC_ID";
-            final String sqL_create = "CREATE SEQUENCE SEQ_DCC_ID START WITH " + (maxId + 1) +
-                    " INCREMENT BY 1 NOCYCLE NOCACHE";
-            Statement stmt = createStatement();
-            try
-            {
-                stmt.executeUpdate(sql_drop);
-                stmt.executeUpdate(sqL_create);
-            }finally
-            {
-                releaseResources(stmt, null);
-            }
+            dataSource.createSequence("SEQUENCE SEQ_DCC_ID", maxId + 1);
         }
 
         System.out.println(" Imported table DELTACRL_CACHE");
