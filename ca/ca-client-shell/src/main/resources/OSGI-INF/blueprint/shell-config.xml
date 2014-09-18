@@ -10,9 +10,8 @@
   </bean>
   <bean id="randomDNCompleter" class="org.xipki.ca.client.shell.completer.RandomDNCompleter"/>
   <bean id="p11ModuleNameCompleter" class="org.xipki.ca.client.shell.completer.P11ModuleNameCompleter">
-  	<property name="securityFactory" ref="securityFactory"/>
+    <property name="securityFactory" ref="securityFactory"/>
   </bean>
-
   <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.1.0">
     <command name="caclient/enroll">
       <action class="org.xipki.ca.client.shell.EnrollCertCommand">
