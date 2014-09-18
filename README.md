@@ -81,18 +81,42 @@ Dr. Lijun Liao (lijun.liao -A-T- gmail -D-O-T- com)
 Prerequisite
 ------------
 * JRE / JDK 1.7 and 1.8
-* For OpenJDK: none
-* For Oracle JRE / JDK: JCE Unlimited Strength Jurisdiction Policy Files
-*    (see http://www.oracle.com/technetwork/java/javase/downloads/index.html)
-* For IBM JRE / JDK:  JCE Unlimited Jurisdiction Policy File
-*    (see https://www14.software.ibm.com/webapp/iwm/web/preLogin.do?source=jcesdk) 
+ * OpenJDK: none
+ * Oracle: [JCE Unlimited Strength Jurisdiction Policy Files](http://www.oracle.com/technetwork/java/javase/downloads/index.html)
+ * IBM J9: [JCE Unlimited Jurisdiction Policy File](https://www14.software.ibm.com/webapp/iwm/web/preLogin.do?source=jcesdk) 
 
 Tested Platforms
 ----------------
-* Database: DB2, H2, MySQL, Oracle, Oracle RAC and PostgreSQL
-* HSM: Thales nCipher Solo (PCI Card) and nCipher Connect (network)
-* JVM: OpenJDK JRE/JDK 7 and 8, Oracle JRE/JDK 7 and 8, IBM J9 JRE/JDK 7 and 8
-* OS: CentOS, Fedora, Redhat, SLES, Ubuntu, Windows
+* Database
+ * DB2
+ * Oracle
+ * Oracle RAC
+ * PostgreSQL
+ * MySQL
+ * H2
+ * HSQLDB
+ 
+* HSM
+ * Thales nCipher Solo (PCI Card)
+ * Thales nCipher Connect (network)
+
+* JVM
+ * OpenJDK
+   * JRE/JDK 7
+   * JRE/JDK 8
+ * Oracle
+   * JRE/JDK 7
+   * JRE/JDK 8
+ * IBM J9
+   * JRE/JDK 7
+   * JRE/JDK 8
+* OS
+ * CentOS
+ * Fedora
+ * Redhat
+ * SLES
+ * Ubuntu
+ * Windows
 
 Build and Assembly
 ------------------
@@ -104,7 +128,7 @@ Build and Assembly
 * Prepare
   * Install the third party artifacts that are not availablle in maven repositories
     
-    In folder xipki/ext
+    In folder `xipki/ext`
     ```sh
     ./install.sh
     ```
@@ -112,14 +136,14 @@ Build and Assembly
 * Build
   * Compile and install the artifacts
     
-    In folder xipki
+    In folder `xipki`
     ```sh
     mvn clean install
     ```
     
   * Assembly
   
-    In folder xipki/dist
+    In folder `xipki/dist`
     ```sh
     mvn clean install
     ```
@@ -127,13 +151,15 @@ Build and Assembly
 Install
 -------
 
+* Copy the assembled file `xipki/dist/pki/assembly/target/xipki-<version>.tar.gz` to the destination folder
+
 * Unpack the assembled file
  
     In destination folder of the installation
     ```sh
     tar xvf xipki-<version>.tar.gz
     ```
-    The following steps use $XIPKI_HOME to point to the unpacked folder
+    The following steps use `$XIPKI_HOME` to point to the unpacked folder
 
 * Adapt the database configuration (access rights read and write of database are required)
 
@@ -145,17 +171,17 @@ Install
 Run Demo
 -----
 
-* Configure the PKCS#11 configuration
+* If you use PKCS#11 keys, configure the PKCS#11 configuration
 
     ```sh
     etc/pkcs11-conf.xml
     ```
 
-* Delete folders $XIPKI_HOME/data and $XIPKI_HOME/output
+* Delete folders `$XIPKI_HOME/data` and `$XIPKI_HOME/output`
 
 * Start XiPKI
   
-    In folder $XIPKI_HOME
+    In folder `$XIPKI_HOME`
     ```sh
     bin/karaf
     ```
@@ -165,26 +191,21 @@ Run Demo
     preload bin/karaf
     ```
 
-    If you have changed the content within folder $XIPKI_HOME/etc or $XIPKI_HOME/system, please delete the folder $XIPKI_HOME/data before starting XiPKI.
+    If you have changed the content within folder `$XIPKI_HOME/etc` or `$XIPKI_HOME/system`, please delete the folder `$XIPKI_HOME/data` before starting XiPKI.
 
 * If you use keys in PKCS#11 device
 
     Generate keypair with self-signed certificate in PKCS#11 device in karaf terminal
     ```sh
     features:install xipki-security-shell
-    # RSA key, the default labels for demo are RCA1, SubCA1 and SubCAwithCRL1, and the default slot index is 1
+    # RSA key, the labels used in the demo are RCA1, SubCA1 and SubCAwithCRL1, and the slot index is 1
     keytool:rsa -slot <slot index> -key-label <label>
-    # EC key, the default labels for demo are RCA1-EC, SubCA1-EC and SubCAwithCRL1-EC, and the default slot index is 1
+
+    # EC key, the labels used in the demo are RCA1-EC, SubCA1-EC and SubCAwithCRL1-EC, and the slot index is 1
     keytool:ec  -slot <slot index> -key-label <label> -curve secp256r1
-    # DSA key, the default labels for demo are RCA1-DSA, SubCA1-DSA and SubCAwithCRL1-DSA, and the default slot index is 1
+
+    # DSA key, the labels used in the demo are RCA1-DSA, SubCA1-DSA and SubCAwithCRL1-DSA, and the slot index is 1
     keytool:dsa  -slot <slot index> -key-label <label>
-    ```
-* Initialize the databases
-
-    ```sh
-    features:install xipki-database-tool
-
-    dbtool:initdb
     ```
 
 * Run the pre-configured OSGi-commands in karaf terminal
@@ -227,6 +248,5 @@ Run Demo
       ```sh
       ca-demo/hsm-dsa-demo.script
       ```
-    The generated keys, certificates, CRLs are saved in folder $XIPKI_HOME/output
+    The generated keys, certificates, CRLs are saved in folder `$XIPKI_HOME/output`
   
-
