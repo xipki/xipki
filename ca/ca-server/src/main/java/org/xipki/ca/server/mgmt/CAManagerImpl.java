@@ -2518,9 +2518,6 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
         sqlBuilder.deleteCharAt(sqlBuilder.length() - 1);
         sqlBuilder.append(" WHERE NAME=?");
 
-        sqlBuilder.deleteCharAt(sqlBuilder.length() - 1);
-        sqlBuilder.append(" WHERE NAME=?");
-
         if(index.get() == 1)
         {
             return;
