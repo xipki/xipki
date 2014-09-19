@@ -42,11 +42,11 @@ eXtensible sImple Public Key Infrastructure consists of CA and OCSP responder.
   - Embedded client to send OCSP request
 
 - Key Tool (for both PKCS#12 and PKCS#11 tokens)
-  - Generation of keypairs and self-signed certificates of RSA, EC and DSA to token
+  - Generation of keypairs and self-signed certificates of RSA, EC and DSA in token
   - Deletation of keypairs and certificates from token
   - Update of certificates in token
   - Generation of PKCS#10 request
-  - Export certificate from token
+  - Export of certificate from token
 
 - For both CA and OCSP Responder
   - Support of PKCS#12 and JKS keystore
@@ -101,15 +101,9 @@ Tested Platforms
  * Thales nCipher Connect (network)
 
 * JVM
- * OpenJDK
-   * JRE/JDK 7
-   * JRE/JDK 8
- * Oracle
-   * JRE/JDK 7
-   * JRE/JDK 8
- * IBM J9
-   * JRE/JDK 7
-   * JRE/JDK 8
+ * OpenJDK JRE/JDK 7 and 8
+ * Oracle JRE/JDK 7 and 8
+ * IBM J9 JRE/JDK 7 and 8
 * OS
  * CentOS
  * Fedora
@@ -198,13 +192,16 @@ Run Demo
     Generate keypair with self-signed certificate in PKCS#11 device in karaf terminal
     ```sh
     features:install xipki-security-shell
-    # RSA key, the labels used in the demo are RCA1, SubCA1 and SubCAwithCRL1, and the slot index is 1
+    # RSA key, the labels used in the demo are RCA1, SubCA1 and
+    # SubCAwithCRL1, and the slot index is 1
     keytool:rsa -slot <slot index> -key-label <label>
 
-    # EC key, the labels used in the demo are RCA1-EC, SubCA1-EC and SubCAwithCRL1-EC, and the slot index is 1
+    # EC key, the labels used in the demo are RCA1-EC, SubCA1-EC and
+    # SubCAwithCRL1-EC, and the slot index is 1
     keytool:ec  -slot <slot index> -key-label <label> -curve secp256r1
 
-    # DSA key, the labels used in the demo are RCA1-DSA, SubCA1-DSA and SubCAwithCRL1-DSA, and the slot index is 1
+    # DSA key, the labels used in the demo are RCA1-DSA, SubCA1-DSA and
+    # SubCAwithCRL1-DSA, and the slot index is 1
     keytool:dsa  -slot <slot index> -key-label <label>
     ```
 
