@@ -55,7 +55,7 @@ public class Slf4jAuditLoggingServiceImpl implements AuditLoggingService
                     }
                     break;
                 default:
-                    LOG.error("{}", createMessage(event));
+                    LOG.info("{}", createMessage(event));
                     break;
             }
         }catch(Throwable t)
