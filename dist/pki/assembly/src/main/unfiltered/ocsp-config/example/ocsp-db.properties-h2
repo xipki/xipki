@@ -12,7 +12,7 @@ dataSource.user = root
 dataSource.password = 123456
 
 autoCommit = true
-readOnly = true
+readOnly = false
 maximumPoolSize = 10
 minimumIdle = 4
 connectionTimeout = 60000
