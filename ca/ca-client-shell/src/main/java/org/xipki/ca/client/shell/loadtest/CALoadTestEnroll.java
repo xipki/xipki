@@ -60,10 +60,10 @@ import org.xipki.security.p10.P12KeypairGenerator;
  * @author Lijun Liao
  */
 
-abstract class CALoadTest extends AbstractLoadTest
+abstract class CALoadTestEnroll extends AbstractLoadTest
 {
     private static final ProofOfPossession RA_VERIFIED = new ProofOfPossession();
-    static class RSACALoadTest extends CALoadTest
+    static class RSACALoadTest extends CALoadTestEnroll
     {
         private final BigInteger baseN;
 
@@ -108,7 +108,7 @@ abstract class CALoadTest extends AbstractLoadTest
         }
     }
 
-    static class ECCALoadTest extends CALoadTest
+    static class ECCALoadTest extends CALoadTestEnroll
     {
         private final ASN1ObjectIdentifier curveOid;
         private final String curveName;
@@ -165,7 +165,7 @@ abstract class CALoadTest extends AbstractLoadTest
         }
     }
 
-    private static final Logger LOG = LoggerFactory.getLogger(CALoadTest.class);
+    private static final Logger LOG = LoggerFactory.getLogger(CALoadTestEnroll.class);
 
     private final RAWorker raWorker;
     private final String certProfile;
@@ -184,7 +184,7 @@ abstract class CALoadTest extends AbstractLoadTest
         return new Testor();
     }
 
-    public CALoadTest(RAWorker raWorker, String certProfile, String subjectTemplate, RandomDN randomDN, int n)
+    public CALoadTestEnroll(RAWorker raWorker, String certProfile, String subjectTemplate, RandomDN randomDN, int n)
     {
         ParamChecker.assertNotNull("raWorker", raWorker);
         ParamChecker.assertNotEmpty("certProfile", certProfile);
@@ -301,10 +301,9 @@ abstract class CALoadTest extends AbstractLoadTest
                     int failed = size - nSucc;
                     if(failed < 0)
                     {
-                        nSucc = 0;
                         failed = size;
                     }
-                    account(nSucc, failed);
+                    account(size, failed);
                 }
                 else
                 {
@@ -335,16 +334,17 @@ abstract class CALoadTest extends AbstractLoadTest
                 return 0;
             }
 
+            if(result == null)
+            {
+                return 0;
+            }
+
             Set<String> ids = result.getAllIds();
             int nSuccess = 0;
             for(String id : ids)
             {
-                X509Certificate cert = null;
-                if(result != null)
-                {
-                    CertificateOrError certOrError = result.getCertificateOrError(id);
-                    cert = (X509Certificate) certOrError.getCertificate();
-                }
+                CertificateOrError certOrError = result.getCertificateOrError(id);
+                X509Certificate cert = (X509Certificate) certOrError.getCertificate();
 
                 if(cert != null)
                 {
@@ -355,7 +355,7 @@ abstract class CALoadTest extends AbstractLoadTest
             return nSuccess;
         }
 
-    } // End class OcspRequestor
+    }
 
     private X500Name incrementX500Name(long index)
     {
