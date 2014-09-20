@@ -24,7 +24,7 @@ dataSource.implicitCachingEnabled = true
 dataSource.explicitCachingEnabled = true
 
 autoCommit = true
-readOnly = true
+readOnly = false
 maximumPoolSize = 10
 minimumIdle = 4
 connectionTimeout = 60000
