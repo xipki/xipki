@@ -17,7 +17,7 @@ import org.xipki.security.common.AbstractLoadTest;
  */
 
 @Command(scope = "caclient", name = "loadtest-enroll", description="CA Client Enroll Load test")
-public class CALoadTestCommand extends ClientCommand
+public class CALoadTestEnrollCommand extends ClientCommand
 {
 
     @Option(name = "-profile",
@@ -100,14 +100,15 @@ public class CALoadTestCommand extends ClientCommand
             }
         }
 
-        CALoadTest loadTest;
+        CALoadTestEnroll loadTest;
         if(ecc.booleanValue())
         {
-            loadTest = new CALoadTest.ECCALoadTest(raWorker, certProfile, subjectTemplate, curveName, randomDN, n);
+            loadTest = new CALoadTestEnroll.ECCALoadTest(raWorker, certProfile, subjectTemplate, curveName, randomDN, n);
         }
         else
         {
-            loadTest = new CALoadTest.RSACALoadTest(raWorker, certProfile, subjectTemplate, keysize.intValue(), randomDN, n);
+            loadTest = new CALoadTestEnroll.RSACALoadTest(
+                    raWorker, certProfile, subjectTemplate, keysize.intValue(), randomDN, n);
         }
 
         loadTest.setDuration(durationInSecond);

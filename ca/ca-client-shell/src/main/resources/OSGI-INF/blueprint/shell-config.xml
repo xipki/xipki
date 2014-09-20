@@ -3,12 +3,13 @@
   <reference id="securityFactory" interface="org.xipki.security.api.SecurityFactory"/>
   <reference id="raWorker" interface="org.xipki.ca.client.api.RAWorker"/>
   <reference id="filePathCompleter" interface="org.xipki.console.karaf.FilePathCompleter"/>
+  <reference id="dataSourceFactory" interface="org.xipki.database.api.DataSourceFactory" availability="optional"/>
   <bean id="crlReasonCompleter" class="org.xipki.ca.client.shell.completer.ClientCRLReasonCompleter"/>
   <bean id="curveNameCompleter" class="org.xipki.ca.client.shell.completer.ECCurveNameCompleter"/>
   <bean id="caNameCompleter" class="org.xipki.ca.client.shell.completer.CaNameCompleter">
     <property name="raWorker" ref="raWorker"/>
   </bean>
-  <bean id="randomDNCompleter" class="org.xipki.ca.client.shell.completer.RandomDNCompleter"/>
+  <bean id="randomDNCompleter" class="org.xipki.ca.client.shell.completer.RandomDNCompleter"/>  
   <bean id="p11ModuleNameCompleter" class="org.xipki.ca.client.shell.completer.P11ModuleNameCompleter">
     <property name="securityFactory" ref="securityFactory"/>
   </bean>
@@ -99,12 +100,23 @@
       </optional-completers>
     </command>
     <command name="caclient/loadtest-enroll">
-      <action class="org.xipki.ca.client.shell.loadtest.CALoadTestCommand">
+      <action class="org.xipki.ca.client.shell.loadtest.CALoadTestEnrollCommand">
         <property name="raWorker" ref="raWorker"/>
       </action>
       <optional-completers>
         <entry key="-curve" value-ref="curveNameCompleter"/>
         <entry key="-randomDN" value-ref="randomDNCompleter"/>
+      </optional-completers>
+    </command>
+    <command name="caclient/loadtest-revoke">
+      <action class="org.xipki.ca.client.shell.loadtest.CALoadTestRevokeCommand">
+        <property name="raWorker" ref="raWorker"/>
+        <property name="securityFactory" ref="securityFactory"/>
+        <property name="dataSourceFactory" ref="dataSourceFactory"/>
+      </action>
+      <optional-completers>
+        <entry key="-cacert" value-ref="filePathCompleter"/>
+        <entry key="-cadb" value-ref="filePathCompleter"/>
       </optional-completers>
     </command>
   </command-bundle>
