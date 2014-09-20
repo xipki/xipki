@@ -475,7 +475,21 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
 
     public void startCaSystem()
     {
-        boolean caSystemStarted = do_startCaSystem();
+        boolean caSystemStarted = false;
+        try
+        {
+            caSystemStarted = do_startCaSystem();
+        }catch(Throwable t)
+        {
+            final String message = "do_startCaSystem()";
+            if(LOG.isErrorEnabled())
+            {
+                LOG.error(LogUtil.buildExceptionLogFormat(message), t.getClass().getName(), t.getMessage());
+            }
+            LOG.debug(message, t);
+            LOG.error(message);
+        }
+
         if(caSystemStarted == false)
         {
             String msg = "Could not start CA system";

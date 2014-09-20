@@ -6,15 +6,10 @@ features:install xipki-caclient-shell
 # Wait one second
 sleep 1000
 
-# Loadtest RSA key
-echo "Enroll load test with RSA key"
-caclient:loadtest-enroll \
- -subject "CN=xipki.org,O=example PKI company,C=DE" -profile TLS -duration 15 -thread 8 -n 4
-
-# Loadtest EC key
-echo "Enroll load test with EC key"
-caclient:loadtest-enroll -ec -curve secp256r1 \
- -subject "CN=xipki.org,O=example PKI company,C=DE" -profile TLS -duration 15 -thread 8 -n 4
+echo "Revoke load test"
+caclient:loadtest-revoke \
+ -cacert output/SubCA1.der -cadb ca-config/ca-db.properties \
+ -excludeSerials 1 -duration 15 -thread 8
 
 #################################################################
 #              UNINSTALL UNNEEDED FEATURES                      #
