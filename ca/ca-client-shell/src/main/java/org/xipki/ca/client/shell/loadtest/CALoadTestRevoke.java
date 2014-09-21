@@ -43,7 +43,11 @@ class CALoadTestRevoke extends AbstractLoadTest
     private final X500Name caSubject;
     private final Set<Long> excludeSerials;
     private final ConcurrentLinkedDeque<Long> serials = new ConcurrentLinkedDeque<>();
-    private int caInfoId;
+    private final int caInfoId;
+    private final long minSerial;
+    private final long maxSerial;
+
+    private long nextStartSerial;
     private boolean noUnrevokedCerts = false;
 
     private CRLReason[] reasons =
@@ -81,10 +85,9 @@ class CALoadTestRevoke extends AbstractLoadTest
         String sha1Fp = IoCertUtil.sha1sum(caCert.getEncoded());
         String sql = "SELECT ID FROM CAINFO WHERE SHA1_FP_CERT='" + sha1Fp + "'";
         Statement stmt = caDataSource.getConnection().createStatement();
-        ResultSet rs = null;
         try
         {
-            rs = stmt.executeQuery(sql);
+            ResultSet rs = stmt.executeQuery(sql);
             if(rs.next())
             {
                 caInfoId = rs.getInt("ID");
@@ -93,66 +96,80 @@ class CALoadTestRevoke extends AbstractLoadTest
             {
                 throw new Exception("CA Certificate and database configuration does not match");
             }
+            rs.close();
+
+            sql = "SELECT MIN(SERIAL) FROM CERT WHERE REVOKED=0 AND CAINFO_ID=" + caInfoId;
+            rs = stmt.executeQuery(sql);
+            rs.next();
+            minSerial = rs.getLong(1);
+            nextStartSerial = minSerial;
+
+            sql = "SELECT MAX(SERIAL) FROM CERT WHERE REVOKED=0 AND CAINFO_ID=" + caInfoId;
+            rs = stmt.executeQuery(sql);
+            rs.next();
+            maxSerial = rs.getLong(1);
         }finally
         {
-            caDataSource.releaseResources(stmt, rs);
-        }
-    }
-
-    private void nextSerials()
-    throws SQLException
-    {
-        synchronized (caDataSource)
-        {
-            if(noUnrevokedCerts)
-            {
-                return;
-            }
-
-            String sql = "SERIAL FROM CERT WHERE REVOKED=0 AND CAINFO_ID=" + caInfoId;
-            sql = caDataSource.createFetchFirstSelectSQL(sql, 1000, "SERIAL");
-            PreparedStatement stmt = caDataSource.getConnection().prepareStatement(sql);
-            ResultSet rs = null;
-
-            int n = 0;
-            try
-            {
-                rs = stmt.executeQuery();
-                while(rs.next())
-                {
-                    n++;
-                    long serial = rs.getLong("SERIAL");
-                    if(excludeSerials.contains(serial) == false)
-                    {
-                        serials.addLast(serial);
-                    }
-                }
-            }finally
-            {
-                caDataSource.releaseResources(stmt, rs);
-            }
-
-            if(n == 0)
-            {
-                System.out.println("No unrevoked certificate");
-            }
-
-            if(n < 1000)
-            {
-                noUnrevokedCerts = true;
-            }
+            caDataSource.releaseResources(stmt, null);
         }
     }
 
     private Long nextSerial()
     throws SQLException
     {
-        Long serial = serials.pollFirst();
-        if(serial == null)
+        synchronized (caDataSource)
         {
-            nextSerials();
+            Long firstSerial = serials.pollFirst();
+            if(firstSerial != null)
+            {
+                return firstSerial;
+            }
+
+            if(noUnrevokedCerts == false)
+            {
+                String sql = "SERIAL FROM CERT WHERE REVOKED=0 AND CAINFO_ID=" + caInfoId +
+                        " AND SERIAL > " + (nextStartSerial - 1) +
+                        " AND SERIAL < " + (maxSerial + 1);
+                sql = caDataSource.createFetchFirstSelectSQL(sql, 1000, "SERIAL");
+                PreparedStatement stmt = caDataSource.getConnection().prepareStatement(sql);
+                ResultSet rs = null;
+
+                int n = 0;
+                try
+                {
+                    rs = stmt.executeQuery();
+                    while(rs.next())
+                    {
+                        n++;
+                        long serial = rs.getLong("SERIAL");
+                        if(serial + 1 > nextStartSerial)
+                        {
+                            nextStartSerial = serial + 1;
+                        }
+                        if(excludeSerials.contains(serial) == false)
+                        {
+                            serials.addLast(serial);
+                        }
+                    }
+                }finally
+                {
+                    caDataSource.releaseResources(stmt, rs);
+                }
+
+                if(n == 0)
+                {
+                    System.out.println("No unrevoked certificate");
+                    System.out.flush();
+                }
+
+                if(n < 1000)
+                {
+                    noUnrevokedCerts = true;
+                }
+            }
+
+            return serials.pollFirst();
         }
-        return serial;
     }
 
     class Testor implements Runnable
@@ -203,17 +220,6 @@ class CALoadTestRevoke extends AbstractLoadTest
 
             return result.getCertId() != null;
         }
-    }
-
-    @Override
-    protected boolean stop()
-    {
-        if(noUnrevokedCerts && serials.isEmpty())
-        {
-            return true;
-        }
-
-        return super.stop();
     }
 
 }
