@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog dbchangelog-3.0.xsd" logicalFilePath="ca-init.xml">
-  <property name="autoIncrement" value="true" dbms="postgresql,db2,mysql,h2,hsqldb"/>
-  <property name="autoIncrement" value="false" dbms="oracle"/>
+  <property name="autoIncrement" value="true" dbms="mysql"/>
+  <property name="autoIncrement" value="false" dbms="oracle,postgresql,db2,h2,hsqldb"/>
   <!-- CA configuration :: create table -->
   <changeSet author="xipki" id="1">
     <!-- table CALOCK -->
@@ -229,7 +229,7 @@
     </createTable>
     <!-- table USERNAME -->
     <createTable tableName="USERNAME">
-      <column name="ID" type="INT">
+      <column name="ID" type="INT" autoIncrement="${autoIncrement}">
         <constraints primaryKey="true" nullable="false"/>
       </column>
       <column name="NAME" type="VARCHAR(200)">
@@ -250,7 +250,7 @@
     </createTable>
     <!-- table CRL -->
     <createTable tableName="CRL">
-      <column name="ID" type="INT">
+      <column name="ID" type="INT" autoIncrement="${autoIncrement}">
         <constraints primaryKey="true"/>
       </column>
       <column name="CAINFO_ID" type="INT">
@@ -274,7 +274,7 @@
     <addUniqueConstraint tableName="CRL" columnNames="CAINFO_ID, CRL_NUMBER" constraintName="CONST_CA_CRLNUMBER"/>
     <!-- table CERT -->
     <createTable tableName="CERT">
-      <column name="ID" type="INT">
+      <column name="ID" type="INT" autoIncrement="${autoIncrement}">
         <constraints primaryKey="true" nullable="false"/>
       </column>
       <column name="CAINFO_ID" type="INT">
@@ -349,7 +349,7 @@
     </createTable>
     <!-- table DELTACRL_CACHE -->
     <createTable tableName="DELTACRL_CACHE">
-      <column name="ID" type="BIGINT" autoIncrement="${autoIncrement}">
+      <column name="ID" type="BIGINT">
         <constraints primaryKey="true" nullable="false"/>
       </column>
       <column name="CAINFO_ID" type="INT">
@@ -360,9 +360,38 @@
       </column>
     </createTable>
   </changeSet>
-  <changeSet author="xipki" id="3" dbms="oracle">
+  <changeSet author="xipki" id="3" dbms="mysql">
+    <createTable tableName="SEQ_TBL">
+      <column name="SEQ_NAME" type="CHAR(100)">
+        <constraints primaryKey="true" nullable="false"/>
+      </column>
+      <column name="SEQ_VALUE" type="BIGINT">
+        <constraints nullable="false"/>
+      </column>
+    </createTable>
+    <insert tableName="SEQ_TBL">
+      <column name="SEQ_NAME" value="DCC_ID"/>
+      <column name="SEQ_VALUE" value="1"/>
+    </insert>
+    <insert tableName="SEQ_TBL">
+      <column name="SEQ_NAME" value="CERT_ID"/>
+      <column name="SEQ_VALUE" value="1"/>
+    </insert>
+    <insert tableName="SEQ_TBL">
+      <column name="SEQ_NAME" value="USER_ID"/>
+      <column name="SEQ_VALUE" value="1"/>
+    </insert>
+    <insert tableName="SEQ_TBL">
+      <column name="SEQ_NAME" value="CRL_ID"/>
+      <column name="SEQ_VALUE" value="1"/>
+    </insert>
+  </changeSet>  
+  <changeSet author="xipki" id="4" dbms="oracle,postgresql,db2,h2,hsqldb">
     <!-- sequence for the column ID in table DELTACRL_CACHE -->
-    <createSequence sequenceName="SEQ_DCC_ID" incrementBy="1" startValue="1"/>
+    <createSequence sequenceName="DCC_ID" incrementBy="1" startValue="1"/>
+    <createSequence sequenceName="CERT_ID" incrementBy="1" startValue="1"/>
+    <createSequence sequenceName="USER_ID" incrementBy="1" startValue="1"/>
+    <createSequence sequenceName="CRL_ID" incrementBy="1" startValue="1"/>
   </changeSet>
   <!-- CA Configuration :: foreign key -->
   <changeSet author="xipki" id="4">
@@ -379,7 +408,7 @@
     <addForeignKeyConstraint deferrable="false" initiallyDeferred="false" onDelete="CASCADE" onUpdate="NO ACTION" baseColumnNames="CA_NAME" baseTableName="CA_HAS_CERTPROFILE" constraintName="FK_CA_HAS_CERTPROFILE_CA1" referencedColumnNames="NAME" referencedTableName="CA"/>
   </changeSet>
   <!-- CertStore :: foreigen key -->
-  <changeSet author="xipki" id="5">
+  <changeSet author="xipki" id="6">
     <addForeignKeyConstraint deferrable="false" initiallyDeferred="false" onDelete="CASCADE" onUpdate="NO ACTION" baseColumnNames="CAINFO_ID" baseTableName="CRL" constraintName="FK_CRL_CAINFO1" referencedColumnNames="ID" referencedTableName="CAINFO"/>
     <addForeignKeyConstraint deferrable="false" initiallyDeferred="false" onDelete="CASCADE" onUpdate="NO ACTION" baseColumnNames="CAINFO_ID" baseTableName="CERT" constraintName="FK_CERT_CAINFO1" referencedColumnNames="ID" referencedTableName="CAINFO"/>
     <addForeignKeyConstraint deferrable="false" initiallyDeferred="false" onDelete="CASCADE" onUpdate="NO ACTION" baseColumnNames="REQUESTORINFO_ID" baseTableName="CERT" constraintName="FK_CERT_REQUESTORINFO1" referencedColumnNames="ID" referencedTableName="REQUESTORINFO"/>
