@@ -38,6 +38,8 @@ public abstract class CertPublisher
 
     public abstract void setEnvironmentParameterResolver(EnvironmentParameterResolver parameterResolver);
 
+    public abstract boolean issuerAdded(X509CertificateWithMetaInfo issuerCert);
+
     public abstract boolean certificateAdded(CertificateInfo certInfo);
 
     public abstract boolean certificateRevoked(X509CertificateWithMetaInfo issuerCert,

@@ -694,6 +694,45 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
                 sb.append(": no CA is configured");
             }
 
+            // Initialize the CertStore if CA is in master mode
+            if(masterMode)
+            {
+                try
+                {
+                    // table CAINFO
+                    for(CAInfo caInfo : cas.values())
+                    {
+                        certstore.addCa(caInfo.getCertificate());
+                    }
+
+                    // table REQUESTORINFO
+                    for(String name : requestors.keySet())
+                    {
+                        certstore.addRequestorName(name);
+                    }
+
+                    // table PUBLISHERINFO
+                    for(String name : publishers.keySet())
+                    {
+                        certstore.addPublisherName(name);
+                    }
+
+                    // table CERTPROFILEINFO
+                    for(String name : certProfiles.keySet())
+                    {
+                        certstore.addCertprofileName(name);
+                    }
+                }catch(OperationException e)
+                {
+                    final String message = "Exception while publishing information to certStore";
+                    if(LOG.isErrorEnabled())
+                    {
+                        LOG.error(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(), e.getMessage());
+                    }
+                    LOG.debug(message, e);
+                    return false;
+                }
+            }
             LOG.info("{}", sb);
         } finally
         {
@@ -1355,6 +1394,12 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
                 CAInfo caInfo;
                 try
                 {
+                    if(masterMode)
+                    {
+                        X509CertificateWithMetaInfo cm = new X509CertificateWithMetaInfo(entry.getCertificate());
+                        certstore.addCa(cm);
+                    }
+
                     caInfo = new CAInfo(entry, certstore);
                     cas.put(entry.getName(), caInfo);
                 } catch (OperationException e)

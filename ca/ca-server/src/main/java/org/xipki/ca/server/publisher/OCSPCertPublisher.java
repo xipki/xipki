@@ -82,6 +82,20 @@ public class OCSPCertPublisher extends CertPublisher
     }
 
     @Override
+    public boolean issuerAdded(X509CertificateWithMetaInfo issuer)
+    {
+        try
+        {
+            queryExecutor.addIssuer(issuer);
+            return true;
+        } catch (Exception e)
+        {
+            logAndAudit(issuer.getSubject(), issuer, e, "could not publish issuer");
+            return false;
+        }
+    }
+
+    @Override
     public boolean certificateAdded(CertificateInfo certInfo)
     {
         X509CertificateWithMetaInfo caCert = certInfo.getIssuerCert();
