@@ -60,4 +60,7 @@ public interface DataSourceWrapper
 
     void dropSequence(String sequenceName)
     throws SQLException;
+
+    long nextSeqValue(String sequenceName)
+    throws SQLException;
 }

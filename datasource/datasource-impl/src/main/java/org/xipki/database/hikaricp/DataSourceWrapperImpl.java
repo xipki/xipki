@@ -392,6 +392,7 @@ public class DataSourceWrapperImpl implements DataSourceWrapper
     public void createSequence(String sequenceName, long startValue)
     throws SQLException
     {
+        String sql;
         switch(databaseType)
         {
             case DB2:
@@ -437,30 +438,65 @@ public class DataSourceWrapperImpl implements DataSourceWrapper
                     throw new RuntimeException("should not reach here");
                 }
 
-                String sql = sb.toString();
-
-                Connection conn = getConnection();
-                Statement stmt = null;
-                try
-                {
-                    stmt = conn.createStatement();
-                    stmt.execute(sql);
-                }
-                finally
-                {
-                    releaseResources(stmt, null);
-                }
-
+                sql = sb.toString();
                 break;
             case MYSQL:
+                sql = "INSERT INTO SEQ_TBL (SEQ_NAME, SEQ_VALUE) VALUES('" + sequenceName + "', " + startValue + ")";
                 break;
             default:
                 throw new RuntimeException("unsupported database type " + databaseType);
         }
+
+        Connection conn = getConnection();
+        Statement stmt = null;
+        try
+        {
+            stmt = conn.createStatement();
+            stmt.execute(sql);
+        }
+        finally
+        {
+            releaseResources(stmt, null);
+        }
+
     }
 
     @Override
     public void dropSequence(String sequenceName)
+    throws SQLException
+    {
+        String sql;
+        switch(databaseType)
+        {
+            case DB2:
+            case ORACLE:
+            case POSTGRESQL:
+            case H2:
+            case HSQLDB:
+                sql = "DROP SEQUENCE " + sequenceName;
+                break;
+            case MYSQL:
+                sql = "DELETE FROM SEQ_TBL WHERE SEQ_NAME='" + sequenceName + "'";
+                break;
+            default:
+                throw new RuntimeException("unsupported database type " + databaseType);
+        }
+
+        Connection conn = getConnection();
+        Statement stmt = null;
+        try
+        {
+            stmt = conn.createStatement();
+            stmt.execute(sql);
+        }
+        finally
+        {
+            releaseResources(stmt, null);
+        }
+    }
+
+    @Override
+    public long nextSeqValue(String seqName)
     throws SQLException
     {
         switch(databaseType)
@@ -470,23 +506,69 @@ public class DataSourceWrapperImpl implements DataSourceWrapper
             case POSTGRESQL:
             case H2:
             case HSQLDB:
-                String  sql = "DROP SEQUENCE " + sequenceName;
-
+            {
+                String sql;
+                if(DatabaseType.DB2 == databaseType)
+                {
+                    sql = "SELECT NEXT VALUE FOR " + seqName + " FROM sysibm.sysdummy1";
+                }
+                else if(DatabaseType.ORACLE == databaseType)
+                {
+                    sql = "SELECT " + seqName + ".NEXTVAL FROM DUAL";
+                }
+                else if(DatabaseType.POSTGRESQL == databaseType || DatabaseType.H2 == databaseType ||
+                        DatabaseType.HSQLDB == databaseType)
+                {
+                    sql = "SELECT NEXTVAL ('" + seqName + "')";
+                }
+                else
+                {
+                    throw new RuntimeException("should not reach here");
+                }
                 Connection conn = getConnection();
-                Statement stmt = null;
+                Statement stmt = conn.createStatement();
+                ResultSet rs = null;
                 try
                 {
-                    stmt = conn.createStatement();
-                    stmt.execute(sql);
-                }
-                finally
+                    rs = stmt.executeQuery(sql);
+                    if(rs.next())
+                    {
+                        return rs.getLong(1);
+                    }
+                    else
+                    {
+                        throw new SQLException("Could not increment the serial number in " + databaseType);
+                    }
+                }finally
                 {
-                    releaseResources(stmt, null);
+                    releaseResources(stmt, rs);
                 }
-
-                break;
+            }
             case MYSQL:
-                break;
+            {
+                final String SQL_UPDATE =
+                        "UPDATE SEQ_TBL SET SEQ_VALUE = (@cur_value := SEQ_VALUE) + 1 WHERE SEQ_NAME = '" + seqName + "'";
+                final String SQL_SELECT = "SELECT @cur_value";
+                Connection conn = getConnection();
+                Statement stmt = conn.createStatement();
+                ResultSet rs = null;
+                try
+                {
+                    stmt.executeUpdate(SQL_UPDATE);
+                    rs = stmt.executeQuery(SQL_SELECT);
+                    if(rs.next())
+                    {
+                        return rs.getLong(1);
+                    }
+                    else
+                    {
+                        throw new SQLException("Could not increment the serial number in " + databaseType);
+                    }
+                }finally
+                {
+                    releaseResources(stmt, rs);
+                }
+            }
             default:
                 throw new RuntimeException("unsupported database type " + databaseType);
         }
