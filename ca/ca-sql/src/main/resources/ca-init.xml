@@ -229,7 +229,7 @@
     </createTable>
     <!-- table USERNAME -->
     <createTable tableName="USERNAME">
-      <column name="ID" type="INT" autoIncrement="${autoIncrement}">
+      <column name="ID" type="INT">
         <constraints primaryKey="true" nullable="false"/>
       </column>
       <column name="NAME" type="VARCHAR(200)">
@@ -250,7 +250,7 @@
     </createTable>
     <!-- table CRL -->
     <createTable tableName="CRL">
-      <column name="ID" type="INT" autoIncrement="${autoIncrement}">
+      <column name="ID" type="INT">
         <constraints primaryKey="true"/>
       </column>
       <column name="CAINFO_ID" type="INT">
@@ -274,7 +274,7 @@
     <addUniqueConstraint tableName="CRL" columnNames="CAINFO_ID, CRL_NUMBER" constraintName="CONST_CA_CRLNUMBER"/>
     <!-- table CERT -->
     <createTable tableName="CERT">
-      <column name="ID" type="INT" autoIncrement="${autoIncrement}">
+      <column name="ID" type="INT">
         <constraints primaryKey="true" nullable="false"/>
       </column>
       <column name="CAINFO_ID" type="INT">
