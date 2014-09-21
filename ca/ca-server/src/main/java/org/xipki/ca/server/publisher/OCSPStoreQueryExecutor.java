@@ -84,12 +84,6 @@ class OCSPStoreQueryExecutor
         }
     }
 
-    void addIssuer(X509CertificateWithMetaInfo issuer)
-    throws CertificateEncodingException, SQLException
-    {
-        getIssuerId(issuer);
-    }
-
     /**
      * @throws SQLException if there is problem while accessing database.
      * @throws NoSuchAlgorithmException
@@ -120,6 +114,7 @@ class OCSPStoreQueryExecutor
     {
         boolean revoked = revInfo != null;
         int issuerId = getIssuerId(issuer);
+
         BigInteger serialNumber = certificate.getCert().getSerialNumber();
         boolean certRegistered = certRegistered(issuerId, serialNumber);
 
@@ -412,18 +407,22 @@ class OCSPStoreQueryExecutor
     private int getIssuerId(X509CertificateWithMetaInfo issuerCert)
     throws SQLException, CertificateEncodingException
     {
-        Integer id =  issuerStore.getIdForCert(issuerCert.getEncodedCert());
-        if(id != null)
+        Integer id = issuerStore.getIdForCert(issuerCert.getEncodedCert());
+        if(id == null)
         {
-            return id.intValue();
+            throw new IllegalStateException("Could not find issuer, "
+                    + "please start XiPKI in master mode first the restart this XiPKI system");
         }
+        return id.intValue();
+    }
 
-        final String sql =
-                "INSERT INTO ISSUER (ID, SUBJECT, NOTBEFORE, NOTAFTER," +
-                " SHA1_FP_NAME, SHA1_FP_KEY, SHA224_FP_NAME, SHA224_FP_KEY, SHA256_FP_NAME, SHA256_FP_KEY," +
-                " SHA384_FP_NAME, SHA384_FP_KEY, SHA512_FP_NAME, SHA512_FP_KEY,SHA1_FP_CERT, CERT)" +
-                " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-        PreparedStatement ps = borrowPreparedStatement(sql);
+    void addIssuer(X509CertificateWithMetaInfo issuerCert)
+    throws CertificateEncodingException, SQLException
+    {
+        if(issuerStore.getIdForCert(issuerCert.getEncodedCert()) != null)
+        {
+            return;
+        }
 
         String hexSha1FpCert = HashCalculator.hexHash(HashAlgoType.SHA1, issuerCert.getEncodedCert());
 
@@ -438,13 +437,22 @@ class OCSPStoreQueryExecutor
         }
         byte[] encodedKey = bcCert.getSubjectPublicKeyInfo().getPublicKeyData().getBytes();
 
-        id = issuerStore.getNextFreeId();
+        long maxId = dataSource.getMax(null, "ISSUER", "ID");
+        int id = (int) maxId + 1;
+
+        final String sql =
+                "INSERT INTO ISSUER (ID, SUBJECT, NOTBEFORE, NOTAFTER," +
+                " SHA1_FP_NAME, SHA1_FP_KEY, SHA224_FP_NAME, SHA224_FP_KEY, SHA256_FP_NAME, SHA256_FP_KEY," +
+                " SHA384_FP_NAME, SHA384_FP_KEY, SHA512_FP_NAME, SHA512_FP_KEY,SHA1_FP_CERT, CERT)" +
+                " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        PreparedStatement ps = borrowPreparedStatement(sql);
+
         try
         {
             String b64Cert = Base64.toBase64String(issuerCert.getEncodedCert());
             String subject = issuerCert.getSubject();
             int idx = 1;
-            ps.setInt(idx++, id.intValue());
+            ps.setInt(idx++, id);
             ps.setString(idx++, subject);
             ps.setLong  (idx++, issuerCert.getCert().getNotBefore().getTime() / 1000);
             ps.setLong  (idx++, issuerCert.getCert().getNotAfter() .getTime() / 1000);
@@ -463,14 +471,12 @@ class OCSPStoreQueryExecutor
 
             ps.execute();
 
-            IssuerEntry newInfo = new IssuerEntry(id.intValue(), subject, hexSha1FpCert, b64Cert);
+            IssuerEntry newInfo = new IssuerEntry(id, subject, hexSha1FpCert, b64Cert);
             issuerStore.addIdentityEntry(newInfo);
         }finally
         {
             releaseDbResources(ps, null);
         }
-
-        return id.intValue();
     }
 
     /**

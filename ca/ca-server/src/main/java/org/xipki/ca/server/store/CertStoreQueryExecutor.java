@@ -1671,52 +1671,59 @@ class CertStoreQueryExecutor
         return IoCertUtil.sha1sum(data);
     }
 
-    private int getCertBasedIdentityId(X509CertificateWithMetaInfo identityCert, CertBasedIdentityStore store)
+    private int getCaId(X509CertificateWithMetaInfo caCert)
     throws SQLException, OperationException
     {
-        byte[] encodedCert = identityCert.getEncodedCert();
-        Integer id =  store.getCaIdForCert(encodedCert);
-
-        if(id != null)
+        byte[] encodedCert = caCert.getEncodedCert();
+        Integer id =  caInfoStore.getCaIdForCert(encodedCert);
+        if(id == null)
         {
-            return id.intValue();
+            throw new IllegalStateException("Could not find CA with subject  '" + caCert.getSubject() + "' in table " +
+                    caInfoStore.getTable() + ", please start XiPKI in master mode first the restart this XiPKI system");
+
+        }
+        return id.intValue();
+    }
+
+    void addCa(X509CertificateWithMetaInfo caCert)
+    throws SQLException, OperationException
+    {
+        byte[] encodedCert = caCert.getEncodedCert();
+        if(caInfoStore.getCaIdForCert(encodedCert) != null)
+        {
+            return;
         }
 
         String hexSha1Fp = fp(encodedCert);
+        
+        String tblName = caInfoStore.getTable();
+        long maxId = dataSource.getMax(null, tblName, "ID");
+        int id = (int) maxId + 1;
 
         final String SQL_ADD_CAINFO =
-                "INSERT INTO " + store.getTable() +
+                "INSERT INTO " + tblName +
                 " (ID, SUBJECT, SHA1_FP_CERT, CERT)" +
                 " VALUES (?, ?, ?, ?)";
         PreparedStatement ps = borrowPreparedStatement(SQL_ADD_CAINFO);
 
-        id = store.getNextFreeId();
         try
         {
             String b64Cert = Base64.toBase64String(encodedCert);
-            String subject = identityCert.getSubject();
+            String subject = caCert.getSubject();
             int idx = 1;
-            ps.setInt(idx++, id.intValue());
+            ps.setInt(idx++, id);
             ps.setString(idx++, subject);
             ps.setString(idx++, hexSha1Fp);
             ps.setString(idx++, b64Cert);
 
             ps.execute();
 
-            CertBasedIdentityEntry newInfo = new CertBasedIdentityEntry(id.intValue(), subject, hexSha1Fp, b64Cert);
-            store.addIdentityEntry(newInfo);
+            CertBasedIdentityEntry newInfo = new CertBasedIdentityEntry(id, subject, hexSha1Fp, b64Cert);
+            caInfoStore.addIdentityEntry(newInfo);
         } finally
         {
             releaseDbResources(ps, null);
         }
-
-        return id.intValue();
-    }
-
-    private int getCaId(X509CertificateWithMetaInfo caCert)
-    throws SQLException, OperationException
-    {
-        return getCertBasedIdentityId(caCert, caInfoStore);
     }
 
     private int getUserId(String user)
@@ -1774,16 +1781,34 @@ class CertStoreQueryExecutor
         return getIdForName(name, requestorInfoStore);
     }
 
+    void addRequestorName(String name)
+    throws SQLException
+    {
+        addName(name, requestorInfoStore);
+    }
+
     private int getPublisherId(String name)
     throws SQLException
     {
         return getIdForName(name, publisherStore);
     }
 
+    void addPublisherName(String name)
+    throws SQLException
+    {
+        addName(name, publisherStore);
+    }
+
     private int getCertprofileId(String name)
     throws SQLException
     {
         return getIdForName(name, certprofileStore);
+    }
+
+    void addCertprofileName(String name)
+    throws SQLException
+    {
+        addName(name, certprofileStore);
     }
 
     private int getIdForName(String name, NameIdStore store)
@@ -1795,19 +1820,33 @@ class CertStoreQueryExecutor
         }
 
         Integer id = store.getId(name);
-        if(id != null)
+        if(id == null)
         {
-            return id.intValue();
+            throw new IllegalStateException("Could not find entry named " + name + "in table " +
+                    store.getTable() + ", please start XiPKI in master mode first the restart this XiPKI system");
+        }
+        return id.intValue();
+    }
+
+    private void addName(String name, NameIdStore store)
+    throws SQLException
+    {
+        if(store.getId(name) != null)
+        {
+            return;
         }
 
-        final String sql = "INSERT INTO " + store.getTable() + " (ID, NAME) VALUES (?, ?)";
+        String tblName = store.getTable();
+        long maxId = dataSource.getMax(null, tblName, "ID");
+        int id = (int) maxId + 1;
+
+        final String sql = "INSERT INTO " + tblName + " (ID, NAME) VALUES (?, ?)";
         PreparedStatement ps = borrowPreparedStatement(sql);
 
-        id = store.getNextFreeId();
         try
         {
             int idx = 1;
-            ps.setInt(idx++, id.intValue());
+            ps.setInt(idx++, id);
             ps.setString(idx++, name);
 
             ps.execute();
@@ -1816,8 +1855,6 @@ class CertStoreQueryExecutor
         {
             releaseDbResources(ps, null);
         }
-
-        return id.intValue();
     }
 
     private PreparedStatement[] borrowPreparedStatements(String... sqlQueries)

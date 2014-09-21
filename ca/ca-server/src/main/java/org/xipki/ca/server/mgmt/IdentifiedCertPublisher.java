@@ -50,6 +50,11 @@ public class IdentifiedCertPublisher
         certPublisher.setEnvironmentParameterResolver(parameterResolver);
     }
 
+    public boolean issuerAdded(X509CertificateWithMetaInfo issuerCert)
+    {
+        return certPublisher.issuerAdded(issuerCert);
+    }
+
     public boolean certificateAdded(CertificateInfo certInfo)
     {
         return certPublisher.certificateAdded(certInfo);

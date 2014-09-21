@@ -20,7 +20,6 @@ class CertBasedIdentityStore
 {
     private final String table;
     private final List<CertBasedIdentityEntry> entries;
-    private int nextFreeId;
 
     CertBasedIdentityStore(String table, List<CertBasedIdentityEntry> entries)
     {
@@ -31,14 +30,9 @@ class CertBasedIdentityStore
         {
             addIdentityEntry(entry);
         }
-
-        if(nextFreeId < 1)
-        {
-            nextFreeId = 1;
-        }
     }
 
-    synchronized void addIdentityEntry(CertBasedIdentityEntry entry)
+    void addIdentityEntry(CertBasedIdentityEntry entry)
     {
         ParamChecker.assertNotNull("entry", entry);
 
@@ -50,15 +44,10 @@ class CertBasedIdentityStore
             }
         }
 
-        if(nextFreeId <= entry.getId())
-        {
-            nextFreeId = entry.getId() + 1;
-        }
-
         entries.add(entry);
     }
 
-    synchronized Integer getCaIdForSubject(String subject)
+    Integer getCaIdForSubject(String subject)
     {
         for(CertBasedIdentityEntry entry : entries)
         {
@@ -71,7 +60,7 @@ class CertBasedIdentityStore
         return null;
     }
 
-    synchronized Integer getCaIdForSha1Fp(byte[] sha1Fp_cert)
+    Integer getCaIdForSha1Fp(byte[] sha1Fp_cert)
     {
         for(CertBasedIdentityEntry entry : entries)
         {
@@ -84,7 +73,7 @@ class CertBasedIdentityStore
         return null;
     }
 
-    synchronized Integer getCaIdForCert(byte[] encodedCert)
+    Integer getCaIdForCert(byte[] encodedCert)
     {
         for(CertBasedIdentityEntry entry : entries)
         {
@@ -95,11 +84,6 @@ class CertBasedIdentityStore
         }
 
         return null;
-    }
-
-    synchronized int getNextFreeId()
-    {
-        return nextFreeId++;
     }
 
     String getTable()

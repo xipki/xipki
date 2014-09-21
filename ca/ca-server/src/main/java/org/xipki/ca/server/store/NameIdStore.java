@@ -20,7 +20,6 @@ class NameIdStore
 {
     private final String table;
     private final Map<String, Integer> entries;
-    private int nextFreeId;
 
     NameIdStore(String table, Map<String, Integer> entries)
     {
@@ -31,14 +30,9 @@ class NameIdStore
         {
             addEntry(name, entries.get(name));
         }
-
-        if(nextFreeId < 1)
-        {
-            nextFreeId = 1;
-        }
     }
 
-    synchronized void addEntry(String name, Integer id)
+    void addEntry(String name, Integer id)
     {
         ParamChecker.assertNotEmpty("name", name);
         ParamChecker.assertNotNull("id", id);
@@ -53,15 +47,10 @@ class NameIdStore
             throw new IllegalArgumentException("entry with the same id " + id + " already available");
         }
 
-        if(nextFreeId <= id)
-        {
-            nextFreeId = id + 1;
-        }
-
         entries.put(name, id);
     }
 
-    synchronized String getName(Integer id)
+    String getName(Integer id)
     {
         for(String name : entries.keySet())
         {
@@ -74,14 +63,9 @@ class NameIdStore
         return null;
     }
 
-    synchronized Integer getId(String name)
+    Integer getId(String name)
     {
         return entries.get(name);
-    }
-
-    synchronized int getNextFreeId()
-    {
-        return nextFreeId++;
     }
 
     public String getTable()

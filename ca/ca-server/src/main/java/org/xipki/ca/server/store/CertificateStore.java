@@ -587,4 +587,63 @@ public class CertificateStore
         }
     }
 
+    public void addCa(X509CertificateWithMetaInfo caCert)
+    throws OperationException
+    {
+        try
+        {
+            queryExecutor.addCa(caCert);
+        } catch (SQLException e)
+        {
+            throw new OperationException(ErrorCode.DATABASE_FAILURE, e.getMessage());
+        } catch (RuntimeException e)
+        {
+            throw new OperationException(ErrorCode.System_Failure, e.getMessage());
+        }
+    }
+
+    public void addRequestorName(String name)
+    throws OperationException
+    {
+        try
+        {
+            queryExecutor.addRequestorName(name);
+        } catch (SQLException e)
+        {
+            throw new OperationException(ErrorCode.DATABASE_FAILURE, e.getMessage());
+        } catch (RuntimeException e)
+        {
+            throw new OperationException(ErrorCode.System_Failure, e.getMessage());
+        }
+    }
+
+    public void addPublisherName(String name)
+    throws OperationException
+    {
+        try
+        {
+            queryExecutor.addPublisherName(name);
+        } catch (SQLException e)
+        {
+            throw new OperationException(ErrorCode.DATABASE_FAILURE, e.getMessage());
+        } catch (RuntimeException e)
+        {
+            throw new OperationException(ErrorCode.System_Failure, e.getMessage());
+        }
+    }
+
+    public void addCertprofileName(String name)
+    throws OperationException
+    {
+        try
+        {
+            queryExecutor.addCertprofileName(name);
+        } catch (SQLException e)
+        {
+            throw new OperationException(ErrorCode.DATABASE_FAILURE, e.getMessage());
+        } catch (RuntimeException e)
+        {
+            throw new OperationException(ErrorCode.System_Failure, e.getMessage());
+        }
+    }
 }

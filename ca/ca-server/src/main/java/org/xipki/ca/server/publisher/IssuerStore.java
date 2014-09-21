@@ -19,7 +19,6 @@ import org.xipki.security.common.ParamChecker;
 class IssuerStore
 {
     private final List<IssuerEntry> entries;
-    private int nextFreeId;
 
     IssuerStore( List<IssuerEntry> entries)
     {
@@ -29,14 +28,9 @@ class IssuerStore
         {
             addIdentityEntry(entry);
         }
-
-        if(nextFreeId < 1)
-        {
-            nextFreeId = 1;
-        }
     }
 
-    synchronized void addIdentityEntry(IssuerEntry entry)
+    void addIdentityEntry(IssuerEntry entry)
     {
         ParamChecker.assertNotNull("entry", entry);
 
@@ -48,15 +42,10 @@ class IssuerStore
             }
         }
 
-        if(nextFreeId <= entry.getId())
-        {
-            nextFreeId = entry.getId() + 1;
-        }
-
         entries.add(entry);
     }
 
-    synchronized Integer getIdForSubject(String subject)
+    Integer getIdForSubject(String subject)
     {
         for(IssuerEntry entry : entries)
         {
@@ -69,7 +58,7 @@ class IssuerStore
         return null;
     }
 
-    synchronized Integer getIdForSha1Fp(byte[] sha1Fp_cert)
+    Integer getIdForSha1Fp(byte[] sha1Fp_cert)
     {
         for(IssuerEntry entry : entries)
         {
@@ -82,7 +71,7 @@ class IssuerStore
         return null;
     }
 
-    synchronized Integer getIdForCert(byte[] encodedCert)
+    Integer getIdForCert(byte[] encodedCert)
     {
         for(IssuerEntry entry : entries)
         {
@@ -94,10 +83,4 @@ class IssuerStore
 
         return null;
     }
-
-    synchronized int getNextFreeId()
-    {
-        return nextFreeId++;
-    }
-
 }
