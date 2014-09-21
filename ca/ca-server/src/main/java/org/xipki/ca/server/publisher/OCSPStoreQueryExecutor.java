@@ -21,7 +21,6 @@ import java.sql.Types;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import org.bouncycastle.asn1.x509.Certificate;
 import org.bouncycastle.util.encoders.Base64;
@@ -42,8 +41,6 @@ class OCSPStoreQueryExecutor
 {
     private static final Logger LOG = LoggerFactory.getLogger(OCSPStoreQueryExecutor.class);
 
-    private AtomicInteger cert_id;
-
     private final DataSourceWrapper dataSource;
 
     private final IssuerStore issuerStore;
@@ -54,9 +51,6 @@ class OCSPStoreQueryExecutor
     throws SQLException, NoSuchAlgorithmException
     {
         this.dataSource = dataSource;
-        int maxCertId = (int) dataSource.getMax(null, "CERT", "ID");
-        this.cert_id = new AtomicInteger(maxCertId + 1);
-
         this.issuerStore = initIssuerStore();
         this.publishGoodCerts = publishGoodCerts;
     }
@@ -205,10 +199,9 @@ class OCSPStoreQueryExecutor
             // all statements have the same connection
             Connection conn = ps_addcert.getConnection();
 
-            int certId = cert_id.getAndAdd(1);
-
             try
             {
+                int certId = (int) dataSource.nextSeqValue("CERT_ID");
                 // CERT
                 X509Certificate cert = certificate.getCert();
                 int idx = 1;

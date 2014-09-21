@@ -125,4 +125,21 @@
     <addForeignKeyConstraint deferrable="false" initiallyDeferred="false" onDelete="CASCADE" onUpdate="NO ACTION" baseColumnNames="CERT_ID" baseTableName="CERTHASH" constraintName="FK_CERTHASH_CERT1" referencedColumnNames="ID" referencedTableName="CERT"/>
     <addForeignKeyConstraint deferrable="false" initiallyDeferred="false" onDelete="CASCADE" onUpdate="NO ACTION" baseColumnNames="CERT_ID" baseTableName="RAWCERT" constraintName="FK_RAWCERT_CERT1" referencedColumnNames="ID" referencedTableName="CERT"/>
   </changeSet>
+  <changeSet author="xipki" id="3" dbms="mysql">
+    <createTable tableName="SEQ_TBL">
+      <column name="SEQ_NAME" type="CHAR(100)">
+        <constraints primaryKey="true" nullable="false"/>
+      </column>
+      <column name="SEQ_VALUE" type="BIGINT">
+        <constraints nullable="false"/>
+      </column>
+    </createTable>
+    <insert tableName="SEQ_TBL">
+      <column name="SEQ_NAME" value="CERT_ID"/>
+      <column name="SEQ_VALUE" value="1"/>
+    </insert>
+  </changeSet>
+  <changeSet author="xipki" id="4" dbms="oracle,postgresql,db2,h2,hsqldb">
+    <createSequence sequenceName="CERT_ID" incrementBy="1" startValue="1"/>
+  </changeSet>
 </databaseChangeLog>

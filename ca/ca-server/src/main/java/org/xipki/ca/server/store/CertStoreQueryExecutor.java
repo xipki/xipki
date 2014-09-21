@@ -28,7 +28,6 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.security.auth.x500.X500Principal;
 
@@ -52,7 +51,6 @@ import org.xipki.ca.server.CertRevocationInfoWithSerial;
 import org.xipki.ca.server.CertStatus;
 import org.xipki.ca.server.SubjectKeyProfileTriple;
 import org.xipki.database.api.DataSourceWrapper;
-import org.xipki.database.api.DatabaseType;
 import org.xipki.security.common.CRLReason;
 import org.xipki.security.common.CertRevocationInfo;
 import org.xipki.security.common.IoCertUtil;
@@ -68,10 +66,6 @@ class CertStoreQueryExecutor
 {
     private static final Logger LOG = LoggerFactory.getLogger(CertStoreQueryExecutor.class);
 
-    private AtomicInteger cert_id;
-    private AtomicInteger crl_id;
-    private AtomicInteger user_id;
-
     private final DataSourceWrapper dataSource;
 
     private final CertBasedIdentityStore caInfoStore;
@@ -85,9 +79,6 @@ class CertStoreQueryExecutor
     throws SQLException
     {
         this.dataSource = dataSource;
-        this.cert_id = new AtomicInteger((int) dataSource.getMax(null, "CERT", "ID") + 1);
-        this.crl_id = new AtomicInteger((int) dataSource.getMax(null, "CRL", "ID") + 1);
-        this.user_id = new AtomicInteger((int) dataSource.getMax(null, "USERNAME", "ID") + 1);
 
         this.caInfoStore = initCertBasedIdentyStore("CAINFO");
         this.requestorInfoStore = initNameIdStore("REQUESTORINFO");
@@ -182,7 +173,7 @@ class CertStoreQueryExecutor
             int caId = getCaId(issuer);
             int certprofileId = getCertprofileId(certprofileName);
 
-            int certId = cert_id.getAndAdd(1);
+            int certId = (int) dataSource.nextSeqValue("CERT_ID");
             certificate.setCertId(certId);
 
             // cert
@@ -485,7 +476,7 @@ class CertStoreQueryExecutor
             int caId = getCaId(caCert);
             int idx = 1;
 
-            int crlId = crl_id.getAndAdd(1);
+            int crlId = (int) dataSource.nextSeqValue("CRL_ID");
             ps.setInt(idx++, crlId);
 
             ps.setInt(idx++, caId);
@@ -696,36 +687,16 @@ class CertStoreQueryExecutor
     private void publishToDeltaCRLCache(int caId, BigInteger serialNumber)
     throws SQLException
     {
-        final String SQL_ORACLE = "INSERT INTO DELTACRL_CACHE (ID, CAINFO_ID, SERIAL) VALUES (?, ?, ?)";
-        final String SQL_OTHER = "INSERT INTO DELTACRL_CACHE (CAINFO_ID, SERIAL) VALUES (?, ?)";
+        final String SQL = "INSERT INTO DELTACRL_CACHE (ID, CAINFO_ID, SERIAL) VALUES (?, ?, ?)";
 
         PreparedStatement ps = null;
 
         try
         {
+            long id = dataSource.nextSeqValue("DDC_ID");
+            ps = borrowPreparedStatement(SQL);
             int idx = 1;
-            if(dataSource.getDatabaseType() == DatabaseType.ORACLE)
-            {
-                PreparedStatement ps_id = borrowPreparedStatement("SELECT SEQ_DCC_ID.NEXTVAL FROM DUAL");
-                ResultSet rs = null;
-                long id;
-                try
-                {
-                    rs = ps_id.executeQuery();
-                    id = rs.getLong(1);
-                }finally
-                {
-                    releaseDbResources(ps_id, rs);
-                }
-
-                ps = borrowPreparedStatement(SQL_ORACLE);
-                ps.setLong(idx++, id);
-            }
-            else
-            {
-                ps = borrowPreparedStatement(SQL_OTHER);
-            }
-
+            ps.setLong(idx++, id);
             ps.setInt(idx++, caId);
             ps.setLong(idx++, serialNumber.longValue());
             ps.executeUpdate();
@@ -1778,7 +1749,7 @@ class CertStoreQueryExecutor
 
         if(id == null)
         {
-            int userId = user_id.getAndAdd(1);
+            int userId = (int) dataSource.nextSeqValue("USER_ID");
             final String SQL_ADD_USER = "INSERT INTO USERNAME (ID, NAME) VALUES (?, ?)";
             try
             {
@@ -2086,83 +2057,7 @@ class CertStoreQueryExecutor
     long nextSerial(String caName)
     throws SQLException
     {
-        DatabaseType dbType = dataSource.getDatabaseType();
-        switch(dbType)
-        {
-            case DB2:
-            case ORACLE:
-            case POSTGRESQL:
-            case H2:
-            case HSQLDB:
-            {
-                String sql;
-                if(DatabaseType.DB2 == dbType)
-                {
-                    sql = "SELECT NEXT VALUE FOR SERIAL_" + caName + " FROM sysibm.sysdummy1";
-                }
-                else if(DatabaseType.ORACLE == dbType)
-                {
-                    sql = "SELECT SERIAL_" + caName + ".NEXTVAL FROM DUAL";
-                }
-                else if(DatabaseType.POSTGRESQL == dbType || DatabaseType.H2 == dbType)
-                {
-                    sql = "SELECT NEXTVAL ('SERIAL_" + caName + "')";
-                }
-                else if(DatabaseType.HSQLDB == dbType)
-                {
-                    sql = "SELECT NEXTVAL ('SERIAL_" + caName + "')";
-                }
-                else
-                {
-                    throw new RuntimeException("should not reach here");
-                }
-                Connection conn = dataSource.getConnection();
-                Statement stmt = conn.createStatement();
-                ResultSet rs = null;
-                try
-                {
-                    rs = stmt.executeQuery(sql);
-                    if(rs.next())
-                    {
-                        return rs.getLong(1);
-                    }
-                    else
-                    {
-                        throw new SQLException("Could not increment the serial number in " + dbType);
-                    }
-                }finally
-                {
-                    dataSource.releaseResources(stmt, rs);
-                }
-            }
-            case MYSQL:
-            {
-                final String SQL_UPDATE =
-                        "UPDATE CA SET NEXT_SERIAL = (@cur_value := NEXT_SERIAL) + 1 WHERE NAME = '" + caName + "'";
-                final String SQL_SELECT = "SELECT @cur_value";
-                Connection conn = dataSource.getConnection();
-                Statement stmt = conn.createStatement();
-                ResultSet rs = null;
-                try
-                {
-                    stmt.executeUpdate(SQL_UPDATE);
-                    rs = stmt.executeQuery(SQL_SELECT);
-                    if(rs.next())
-                    {
-                        return rs.getLong(1);
-                    }
-                    else
-                    {
-                        throw new SQLException("Could not increment the serial number in " + dbType);
-                    }
-                }finally
-                {
-                    dataSource.releaseResources(stmt, rs);
-                }
-            }
-            default:
-                throw new RuntimeException("unsupported database type " + dbType);
-        }
+        return dataSource.nextSeqValue("SERIAL_" + caName);
     }
 
     private static void setBoolean(PreparedStatement ps, int index, boolean b)

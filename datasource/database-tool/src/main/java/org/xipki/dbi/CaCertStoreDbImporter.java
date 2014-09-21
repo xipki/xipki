@@ -308,6 +308,10 @@ class CaCertStoreDbImporter extends DbPorter
                 throw e;
             }
         }
+
+        long maxId = getMax("USERNAME", "ID");
+        alterSequence("USER_ID", maxId + 1);
+
         System.out.println(" Imported " + sum + " users");
     }
 
@@ -431,11 +435,8 @@ class CaCertStoreDbImporter extends DbPorter
             releaseResources(ps, null);
         }
 
-        if(oracle)
-        {
-            long maxId = getMax("DELTACRL_CACHE", "ID");
-            dataSource.createSequence("SEQUENCE SEQ_DCC_ID", maxId + 1);
-        }
+        long maxId = getMax("DELTACRL_CACHE", "ID");
+        alterSequence("DCC_ID", maxId + 1);
 
         System.out.println(" Imported table DELTACRL_CACHE");
     }
@@ -532,6 +533,9 @@ class CaCertStoreDbImporter extends DbPorter
             releaseResources(ps, null);
         }
 
+        long maxId = getMax("CRL", "ID");
+        alterSequence("CRL_ID", maxId + 1);
+
         System.out.println(" Imported table CRL");
     }
 
@@ -586,6 +590,10 @@ class CaCertStoreDbImporter extends DbPorter
                 throw e;
             }
         }
+
+        long maxId = getMax("CERT", "ID");
+        alterSequence("CERT_ID", maxId + 1);
+
         printTrailer();
         echoToFile(MSG_CERTS_FINISHED, processLogFile);
         System.out.println(" Imported " + sum + " certificates");
@@ -734,6 +742,18 @@ class CaCertStoreDbImporter extends DbPorter
             releaseResources(ps_rawcert, null);
             zipFile.close();
         }
+    }
+
+    private void alterSequence(String seqName, long startValue)
+    throws SQLException
+    {
+        try
+        {
+            dataSource.dropSequence(seqName);
+        }catch(SQLException e)
+        {
+        }
+        dataSource.createSequence(seqName, startValue);
     }
 
 }
