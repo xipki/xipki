@@ -1695,7 +1695,7 @@ class CertStoreQueryExecutor
         }
 
         String hexSha1Fp = fp(encodedCert);
-        
+
         String tblName = caInfoStore.getTable();
         long maxId = dataSource.getMax(null, tblName, "ID");
         int id = (int) maxId + 1;
