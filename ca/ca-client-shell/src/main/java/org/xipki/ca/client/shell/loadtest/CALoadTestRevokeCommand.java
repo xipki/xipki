@@ -52,6 +52,11 @@ public class CALoadTestRevokeCommand extends ClientCommand
             description = "maximal number of certificates to be revoked. 0 for unlimited")
     protected Integer maxCerts = 0;
 
+    @Option(name = "-n",
+            description = "Number of certificates to be revoked in one request",
+            required = false)
+    protected Integer n = 1;
+
     private DataSourceFactory dataSourceFactory;
     private SecurityFactory securityFactory;
 
@@ -78,6 +83,7 @@ public class CALoadTestRevokeCommand extends ClientCommand
         startMsg.append("cacert:          ").append(caCertFile).append("\n");
         startMsg.append("cadb:            ").append(caDbConfFile).append("\n");
         startMsg.append("maxCerts:        ").append(maxCerts).append("\n");
+        startMsg.append("#Certs/Request:  ").append(n).append("\n");
         out(startMsg.toString());
 
         Certificate caCert = Certificate.getInstance(IoCertUtil.read(caCertFile));
@@ -91,7 +97,7 @@ public class CALoadTestRevokeCommand extends ClientCommand
         DataSourceWrapper caDataSource = dataSourceFactory.createDataSource(props, securityFactory.getPasswordResolver());
         try
         {
-            CALoadTestRevoke loadTest = new CALoadTestRevoke(raWorker, caCert, caDataSource, maxCerts);
+            CALoadTestRevoke loadTest = new CALoadTestRevoke(raWorker, caCert, caDataSource, maxCerts, n);
 
             loadTest.setDuration(durationInSecond);
             loadTest.setThreads(numThreads);
