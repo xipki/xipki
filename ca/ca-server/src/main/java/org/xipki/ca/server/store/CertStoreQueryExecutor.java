@@ -1688,7 +1688,6 @@ class CertStoreQueryExecutor
         {
             throw new IllegalStateException("Could not find CA with subject  '" + caCert.getSubject() + "' in table " +
                     caInfoStore.getTable() + ", please start XiPKI in master mode first the restart this XiPKI system");
-
         }
         return id.intValue();
     }
