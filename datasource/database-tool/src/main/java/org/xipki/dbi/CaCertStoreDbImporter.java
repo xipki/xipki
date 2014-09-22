@@ -35,7 +35,6 @@ import org.bouncycastle.util.encoders.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.database.api.DataSourceWrapper;
-import org.xipki.database.api.DatabaseType;
 import org.xipki.dbi.ca.jaxb.CainfoType;
 import org.xipki.dbi.ca.jaxb.CertStoreType;
 import org.xipki.dbi.ca.jaxb.CertStoreType.Cainfos;
@@ -396,17 +395,12 @@ class CaCertStoreDbImporter extends DbPorter
     private void import_deltaCRLCache(DeltaCRLCache deltaCRLCache)
     throws Exception
     {
-        final String SQL_ORACLE = "INSERT INTO DELTACRL_CACHE" +
+        final String SQL = "INSERT INTO DELTACRL_CACHE" +
                 " (ID, SERIAL, CAINFO_ID)" +
                 " VALUES (?, ?, ?)";
-        final String SQL_OTHER = "INSERT INTO DELTACRL_CACHE" +
-                " (SERIAL, CAINFO_ID)" +
-                " VALUES (?, ?)";
-
-        boolean oracle = dataSource.getDatabaseType() == DatabaseType.ORACLE;
 
         System.out.println("Importing table DELTACRL_CACHE");
-        PreparedStatement ps = prepareStatement(oracle ? SQL_ORACLE : SQL_OTHER);
+        PreparedStatement ps = prepareStatement(SQL);
 
         try
         {
@@ -416,10 +410,7 @@ class CaCertStoreDbImporter extends DbPorter
                 try
                 {
                     int idx = 1;
-                    if(oracle)
-                    {
-                        ps.setLong(idx++, id++);
-                    }
+                    ps.setLong(idx++, id++);
                     ps.setLong(idx++, entry.getSerial());
                     ps.setInt(idx++, entry.getCaId());
                     ps.execute();
@@ -509,12 +500,12 @@ class CaCertStoreDbImporter extends DbPorter
 
                     if(baseCrlNumber == null)
                     {
-                        ps.setBoolean(idx++, true);
+                        setBoolean(ps, idx++, false);
                         ps.setNull(idx++, Types.BIGINT);
                     }
                     else
                     {
-                        ps.setBoolean(idx++, true);
+                        setBoolean(ps, idx++, true);
                         ps.setLong(idx++, baseCrlNumber.longValue());
                     }
 
