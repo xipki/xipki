@@ -148,6 +148,7 @@ public class LiquibaseDatabaseConf
                     {
                         schema = schema.substring(0, schema.length() - 1);
                     }
+                    schema = schema.toUpperCase();
                     url = url.substring(0, idx);
                 }
             }
