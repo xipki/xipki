@@ -224,7 +224,14 @@ public class CaDbImporter
         for(CAInfoBundle entry : CAInfoBundles)
         {
             long nextSerial = Math.max(entry.CA_nextSerial, entry.should_CA_nextSerial);
-            dataSource.createSequence("SERIAL_" + entry.CA_name, nextSerial);
+            String seqName = "SERIAL_" + entry.CA_name;
+            try
+            {
+                dataSource.dropSequence(seqName);
+            }catch(SQLException e)
+            {
+            }
+            dataSource.createSequence(seqName, nextSerial);
         }
 
     }
