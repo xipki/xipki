@@ -425,8 +425,8 @@ class CaCertStoreDbImporter extends DbPorter
                     ps.execute();
                 }catch(Exception e)
                 {
-                    System.err.println("Error while importing DELTACRL_CACHE with ID=" + entry.getId() +
-                            ", message: " + e.getMessage());
+                    System.err.println("Error while importing DELTACRL_CACHE with caId=" + entry.getCaId() +
+                            " and serial=" + entry.getSerial() + ", message: " + e.getMessage());
                     throw e;
                 }
             }
