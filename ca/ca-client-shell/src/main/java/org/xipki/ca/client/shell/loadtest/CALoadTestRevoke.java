@@ -12,9 +12,10 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.Collections;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedDeque;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.Certificate;
@@ -41,11 +42,14 @@ class CALoadTestRevoke extends AbstractLoadTest
     private final RAWorker raWorker;
     private final DataSourceWrapper caDataSource;
     private final X500Name caSubject;
-    private final Set<Long> excludeSerials;
+    private final Set<Long> excludeSerials = new HashSet<>();
     private final ConcurrentLinkedDeque<Long> serials = new ConcurrentLinkedDeque<>();
     private final int caInfoId;
     private final long minSerial;
     private final long maxSerial;
+    private final int maxCerts;
+
+    private AtomicInteger processedCerts = new AtomicInteger(0);
 
     private long nextStartSerial;
     private boolean noUnrevokedCerts = false;
@@ -63,7 +67,7 @@ class CALoadTestRevoke extends AbstractLoadTest
     }
 
     public CALoadTestRevoke(RAWorker raWorker, Certificate caCert,
-            DataSourceWrapper caDataSource, Set<Long> excludeSerials)
+            DataSourceWrapper caDataSource, int maxCerts)
     throws Exception
     {
         ParamChecker.assertNotNull("raWorker", raWorker);
@@ -73,13 +77,10 @@ class CALoadTestRevoke extends AbstractLoadTest
         this.raWorker = raWorker;
         this.caDataSource = caDataSource;
         this.caSubject = caCert.getSubject();
-        if(excludeSerials == null)
+        this.maxCerts = maxCerts;
+        if(caCert.getIssuer().equals(caCert.getSubject()))
         {
-            this.excludeSerials = Collections.emptySet();
-        }
-        else
-        {
-            this.excludeSerials = excludeSerials;
+            this.excludeSerials.add(caCert.getSerialNumber().getPositiveValue().longValue());
         }
 
         String sha1Fp = IoCertUtil.sha1sum(caCert.getEncoded());
@@ -119,6 +120,15 @@ class CALoadTestRevoke extends AbstractLoadTest
     {
         synchronized (caDataSource)
         {
+            if(maxCerts > 0)
+            {
+                int num = processedCerts.getAndAdd(1);
+                if(num >= maxCerts)
+                {
+                    return null;
+                }
+            }
+
             Long firstSerial = serials.pollFirst();
             if(firstSerial != null)
             {
