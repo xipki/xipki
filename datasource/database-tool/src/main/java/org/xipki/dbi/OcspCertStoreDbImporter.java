@@ -255,13 +255,7 @@ class OcspCertStoreDbImporter extends DbPorter
 
         long maxId = getMax("CERT", "ID");
         String seqName = "CERT_ID";
-        try
-        {
-            dataSource.dropSequence(seqName);
-        }catch(SQLException e)
-        {
-        }
-        dataSource.createSequence(seqName, maxId + 1);
+        dataSource.dropAndCreateSequence(seqName, maxId + 1);
 
         printTrailer();
         echoToFile(MSG_CERTS_FINISHED, processLogFile);

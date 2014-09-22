@@ -55,6 +55,9 @@ public interface DataSourceWrapper
     boolean tableExists(Connection conn, String table)
     throws SQLException;
 
+    void dropAndCreateSequence(String sequenceName, long startValue)
+    throws SQLException;
+
     void createSequence(String sequenceName, long startValue)
     throws SQLException;
 
@@ -63,4 +66,5 @@ public interface DataSourceWrapper
 
     long nextSeqValue(String sequenceName)
     throws SQLException;
+
 }

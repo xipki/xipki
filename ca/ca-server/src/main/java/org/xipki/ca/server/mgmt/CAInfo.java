@@ -362,7 +362,7 @@ public class CAInfo
             return randomSNGenerator.getSerialNumber();
         }
 
-        long serial = certStore.nextSerial(caEntry.getName());
+        long serial = certStore.nextSerial(caEntry.getSerialSeqName());
         caEntry.setNextSerial(serial + 1);
         return BigInteger.valueOf(serial);
     }

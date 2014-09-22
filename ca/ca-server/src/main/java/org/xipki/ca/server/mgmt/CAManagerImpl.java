@@ -1534,8 +1534,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
             // create serial sequence
             if(nextSerial > 0)
             {
-                final String sequenceName = "SERIAL_" + name;
-                dataSource.createSequence(sequenceName, nextSerial);
+                dataSource.createSequence(newCaDbEntry.getSerialSeqName(), nextSerial);
             }
         }catch(SQLException e)
         {
@@ -3018,7 +3017,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
         if(caInfo == null || caInfo.getCaEntry().getNextSerial() > 0)
         {
             // drop the serial number sequence
-            final String sequenceName = "SERIAL_" + caName;
+            final String sequenceName = caInfo.getCaEntry().getSerialSeqName();
             try
             {
                 dataSource.dropSequence(sequenceName);
