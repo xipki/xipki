@@ -170,14 +170,22 @@ class CertStoreQueryExecutor
 
         try
         {
+            X509Certificate cert = certificate.getCert();
+
             int caId = getCaId(issuer);
+
+            // the profile name of self signed CA certificate may not be contained in the
+            // table CETPROFILEINFO
+            if(cert.getIssuerDN().equals(cert.getSubjectDN()))
+            {
+                addCertprofileName(certprofileName);
+            }
             int certprofileId = getCertprofileId(certprofileName);
 
             int certId = (int) dataSource.nextSeqValue("CERT_ID");
             certificate.setCertId(certId);
 
             // cert
-            X509Certificate cert = certificate.getCert();
             int idx = 1;
             ps_addcert.setInt(idx++, certId);
             ps_addcert.setLong(idx++, System.currentTimeMillis()/1000);
@@ -1822,7 +1830,7 @@ class CertStoreQueryExecutor
         Integer id = store.getId(name);
         if(id == null)
         {
-            throw new IllegalStateException("Could not find entry named " + name + "in table " +
+            throw new IllegalStateException("Could not find entry named " + name + " in table " +
                     store.getTable() + ", please start XiPKI in master mode first the restart this XiPKI system");
         }
         return id.intValue();
