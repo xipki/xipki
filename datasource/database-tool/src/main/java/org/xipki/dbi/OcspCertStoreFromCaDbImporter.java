@@ -366,6 +366,17 @@ class OcspCertStoreFromCaDbImporter extends DbPorter
             }
 
         }
+
+        long maxId = getMax("CERT", "ID");
+        String seqName = "CERT_ID";
+        try
+        {
+            dataSource.dropSequence(seqName);
+        }catch(SQLException e)
+        {
+        }
+        dataSource.createSequence(seqName, maxId + 1);
+
         printTrailer();
         DbPorter.echoToFile(MSG_CERTS_FINISHED, processLogFile);
         System.out.println("Processed " + sum + " certificates");
