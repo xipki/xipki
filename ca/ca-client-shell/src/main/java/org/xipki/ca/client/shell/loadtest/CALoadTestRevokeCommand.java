@@ -8,10 +8,7 @@
 package org.xipki.ca.client.shell.loadtest;
 
 import java.io.FileInputStream;
-import java.util.HashSet;
 import java.util.Properties;
-import java.util.Set;
-import java.util.StringTokenizer;
 
 import org.apache.felix.gogo.commands.Command;
 import org.apache.felix.gogo.commands.Option;
@@ -50,10 +47,10 @@ public class CALoadTestRevokeCommand extends ClientCommand
             description = "CA database configuration file")
     protected String caDbConfFile;
 
-    @Option(name = "-excludeSerials",
+    @Option(name = "-maxCerts",
             required = false,
-            description = "Comma-separated serial numbers to be ignored")
-    protected String excludeSerials;
+            description = "maximal number of certificates to be revoked. 0 for unlimited")
+    protected Integer maxCerts = 0;
 
     private DataSourceFactory dataSourceFactory;
     private SecurityFactory securityFactory;
@@ -80,7 +77,7 @@ public class CALoadTestRevokeCommand extends ClientCommand
         startMsg.append("Max. Duration:   ").append(AbstractLoadTest.formatTime(durationInSecond).trim()).append("\n");
         startMsg.append("cacert:          ").append(caCertFile).append("\n");
         startMsg.append("cadb:            ").append(caDbConfFile).append("\n");
-        startMsg.append("excludeSerials:  ").append(excludeSerials).append("\n");
+        startMsg.append("maxCerts:        ").append(maxCerts).append("\n");
         out(startMsg.toString());
 
         Certificate caCert = Certificate.getInstance(IoCertUtil.read(caCertFile));
@@ -91,17 +88,10 @@ public class CALoadTestRevokeCommand extends ClientCommand
         props.setProperty("maximumPoolSize", "1");
         props.setProperty("minimumIdle", "1");
 
-        Set<Long> excludeSerialsSet = new HashSet<>();
-        if(excludeSerials != null && excludeSerials.isEmpty() == false)
-        {
-            StringTokenizer st = new StringTokenizer(excludeSerials, ",");
-            excludeSerialsSet.add(Long.parseLong(st.nextToken()));
-        }
-
         DataSourceWrapper caDataSource = dataSourceFactory.createDataSource(props, securityFactory.getPasswordResolver());
         try
         {
-            CALoadTestRevoke loadTest = new CALoadTestRevoke(raWorker, caCert, caDataSource, excludeSerialsSet);
+            CALoadTestRevoke loadTest = new CALoadTestRevoke(raWorker, caCert, caDataSource, maxCerts);
 
             loadTest.setDuration(durationInSecond);
             loadTest.setThreads(numThreads);
