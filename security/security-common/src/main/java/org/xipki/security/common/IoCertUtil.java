@@ -753,4 +753,22 @@ public class IoCertUtil
         return file;
     }
 
+    public static String convertSequenceName(String sequenceName)
+    {
+        StringBuilder sb = new StringBuilder();
+        int n = sequenceName.length();
+        for(int i = 0; i < n; i++)
+        {
+            char c = sequenceName.charAt(i);
+            if((c >= '0' && c <= '9') || (c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z'))
+            {
+                sb.append(c);
+            }
+            else
+            {
+                sb.append("_");
+            }
+        }
+        return sb.toString();
+    }
 }
