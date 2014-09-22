@@ -796,7 +796,7 @@ class CaCertStoreDbExporter extends DbPorter
     {
         System.out.println("Exporting table DELTACRL_CACHE");
 
-        String sql = "SELECT ID, SERIAL, CAINFO_ID FROM DELTACRL_CACHE";
+        String sql = "SELECT SERIAL, CAINFO_ID FROM DELTACRL_CACHE";
 
         DeltaCRLCache deltaCache = new DeltaCRLCache();
         certstore.setDeltaCRLCache(deltaCache);
@@ -812,12 +812,10 @@ class CaCertStoreDbExporter extends DbPorter
 
             while(rs.next())
             {
-                long id = rs.getLong("ID");
                 long serial = rs.getLong("SERIAL");
                 int ca_id = rs.getInt("CAINFO_ID");
 
                 DeltaCRLCacheEntryType entry = new DeltaCRLCacheEntryType();
-                entry.setId(id);
                 entry.setCaId(ca_id);
                 entry.setSerial(serial);
                 list.add(entry);
