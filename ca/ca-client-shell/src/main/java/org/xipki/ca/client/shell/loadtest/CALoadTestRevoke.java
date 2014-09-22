@@ -12,7 +12,10 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -22,6 +25,8 @@ import org.bouncycastle.asn1.x509.Certificate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.ca.client.api.RAWorker;
+import org.xipki.ca.cmp.client.type.RevokeCertRequestEntryType;
+import org.xipki.ca.cmp.client.type.RevokeCertRequestType;
 import org.xipki.ca.common.CertIDOrError;
 import org.xipki.ca.common.PKIErrorException;
 import org.xipki.ca.common.RAWorkerException;
@@ -48,6 +53,7 @@ class CALoadTestRevoke extends AbstractLoadTest
     private final long minSerial;
     private final long maxSerial;
     private final int maxCerts;
+    private final int n;
 
     private AtomicInteger processedCerts = new AtomicInteger(0);
 
@@ -67,12 +73,17 @@ class CALoadTestRevoke extends AbstractLoadTest
     }
 
     public CALoadTestRevoke(RAWorker raWorker, Certificate caCert,
-            DataSourceWrapper caDataSource, int maxCerts)
+            DataSourceWrapper caDataSource, int maxCerts, int n)
     throws Exception
     {
         ParamChecker.assertNotNull("raWorker", raWorker);
         ParamChecker.assertNotNull("caCert", caCert);
         ParamChecker.assertNotNull("caDataSource", caDataSource);
+        if(n < 1)
+        {
+            throw new IllegalArgumentException("non-positive n " + n + " is not allowed");
+        }
+        this.n = n;
 
         this.raWorker = raWorker;
         this.caDataSource = caDataSource;
@@ -113,6 +124,25 @@ class CALoadTestRevoke extends AbstractLoadTest
         {
             caDataSource.releaseResources(stmt, null);
         }
+    }
+
+    private List<Long> nextSerials()
+    throws SQLException
+    {
+        List<Long> ret = new ArrayList<>(n);
+        for(int i = 0; i < n; i++)
+        {
+            Long serial = nextSerial();
+            if(serial != null)
+            {
+                ret.add(serial);
+            }
+            else
+            {
+                break;
+            }
+        }
+        return ret;
     }
 
     private Long nextSerial()
@@ -190,45 +220,69 @@ class CALoadTestRevoke extends AbstractLoadTest
         {
             while(stop() == false && getErrorAccout() < 1)
             {
-                Long serial;
+                List<Long> serialNumbers;
                 try
                 {
-                    serial = nextSerial();
+                    serialNumbers = nextSerials();
                 } catch (SQLException e)
                 {
                     account(1, 1);
                     break;
                 }
 
-                if(serial == null)
+                if(serialNumbers == null || serialNumbers.isEmpty())
                 {
                     break;
                 }
 
-                boolean succ = testNext(serial);
-                account(1, succ ? 0 : 1);
+                int size = serialNumbers.size();
+                int nSucc = testNext(serialNumbers);
+                int failed = size - nSucc;
+                if(failed < 0)
+                {
+                    failed = size;
+                }
+                account(size, failed);
             }
         }
 
-        private boolean testNext(long serialNumber)
+        private int testNext(List<Long> serialNumbers)
         {
-            CertIDOrError result;
-            try
+            RevokeCertRequestType request = new RevokeCertRequestType();
+            int id = 1;
+            for(Long serialNumber : serialNumbers)
             {
                 CRLReason reason = reasons[(int) (serialNumber % reasons.length)];
-                result = raWorker.revokeCert(caSubject, BigInteger.valueOf(serialNumber), reason.getCode());
+                RevokeCertRequestEntryType entry = new RevokeCertRequestEntryType(
+                        Integer.toString(id++), caSubject, BigInteger.valueOf(serialNumber),
+                        reason.getCode(), null);
+                request.addRequestEntry(entry);
+            }
+
+            Map<String, CertIDOrError> result;
+            try
+            {
+                result = raWorker.revokeCerts(request);
             } catch (RAWorkerException | PKIErrorException e)
             {
                 LOG.warn("{}: {}", e.getClass().getName(), e.getMessage());
-                return false;
+                return 0;
             }
 
             if(result == null)
             {
-                return false;
+                return 0;
             }
 
-            return result.getCertId() != null;
+            int nSuccess = 0;
+            for(CertIDOrError entry : result.values())
+            {
+                if(entry.getCertId() != null)
+                {
+                    nSuccess++;
+                }
+            }
+            return nSuccess;
         }
     }
 
