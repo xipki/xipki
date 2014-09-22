@@ -557,12 +557,12 @@ public class CertificateStore
         }
     }
 
-    public long nextSerial(String caName)
+    public long nextSerial(String seqName)
     throws OperationException
     {
         try
         {
-            return queryExecutor.nextSerial(caName);
+            return queryExecutor.nextSerial(seqName);
         } catch (SQLException e)
         {
             throw new OperationException(ErrorCode.DATABASE_FAILURE, e.getMessage());

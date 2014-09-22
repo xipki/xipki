@@ -52,6 +52,7 @@ public class CAEntry implements Serializable
     private int lastCRLInterval;
     private long lastCRLIntervalDate;
     private String subject;
+    private String serialSeqName;
 
     public CAEntry(String name, long initialSerial,
             String signerType, String signerConf, X509Certificate cert,
@@ -93,6 +94,7 @@ public class CAEntry implements Serializable
         this.numCrls = numCrls;
 
         this.name = name.toUpperCase();
+        this.serialSeqName = IoCertUtil.convertSequenceName("SERIAL_" + this.name);
         this.nextSerial = initialSerial;
         this.cert = cert;
         this.subject = IoCertUtil.canonicalizeName(cert.getSubjectX500Principal());
@@ -376,4 +378,10 @@ public class CAEntry implements Serializable
     {
         return subject;
     }
+
+    public String getSerialSeqName()
+    {
+        return serialSeqName;
+    }
+
 }

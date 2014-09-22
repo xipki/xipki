@@ -2098,10 +2098,10 @@ class CertStoreQueryExecutor
         }
     }
 
-    long nextSerial(String caName)
+    long nextSerial(String seqName)
     throws SQLException
     {
-        return dataSource.nextSeqValue("SERIAL_" + caName);
+        return dataSource.nextSeqValue(seqName);
     }
 
     private static void setBoolean(PreparedStatement ps, int index, boolean b)
