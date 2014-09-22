@@ -74,7 +74,7 @@ features:uninstall xipki-caclient
 #                        ADD SubCA with OCSP                    #
 #################################################################
 ## Add CA
-ca:ca-add -name SubCA1 \
+ca:ca-add -name SubCA1.complex-Name \
   -permission all \
   -nextSerial 1 \
   -maxValidity 730 \
@@ -84,16 +84,16 @@ ca:ca-add -name SubCA1 \
   --duplicateSubject permitted \
   --duplicateKey permitted
 
-ca:caalias-add -ca SubCA1 -alias SubCA
+ca:caalias-add -ca SubCA1.complex-Name -alias SubCA
 
 ## Add cert profile to CA
-ca:caprofile-add -ca SubCA1 -profile TLS -profile TLS_C -profile TLSwithIncSN -profile gSMC_K
+ca:caprofile-add -ca SubCA1.complex-Name -profile TLS -profile TLS_C -profile TLSwithIncSN -profile gSMC_K
 
 ## Add publisher
-ca:capub-add -ca SubCA1 -publisher OCSP.PUBLISHER
+ca:capub-add -ca SubCA1.complex-Name -publisher OCSP.PUBLISHER
 
 # Add requestor to CA
-ca:careq-add -requestor requestor -permission all -ra yes -profile all -ca SubCA1
+ca:careq-add -requestor requestor -permission all -ra yes -profile all -ca SubCA1.complex-Name
 
 ## Restart the CA
 ca:ca-restart
