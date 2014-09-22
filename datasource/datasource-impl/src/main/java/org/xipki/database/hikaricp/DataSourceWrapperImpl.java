@@ -41,6 +41,50 @@ public class DataSourceWrapperImpl implements DataSourceWrapper
 
     DataSourceWrapperImpl(Properties props, DatabaseType databaseType)
     {
+        // The DB2 schema name is case-sensitive, and must be specified in uppercase characters
+        String dataSourceClassName = props.getProperty("dataSourceClassName");
+        if(dataSourceClassName != null)
+        {
+            if(dataSourceClassName.contains(".db2."))
+            {
+                String propName = "dataSource.currentSchema";
+                String schema = props.getProperty(propName);
+                if(schema != null)
+                {
+                    String upperCaseSchema = schema.toUpperCase();
+                    if(schema.equals(upperCaseSchema) == false)
+                    {
+                        props.setProperty(propName, upperCaseSchema);
+                    }
+                }
+            }
+        }
+        else
+        {
+            String propName = "jdbcUrl";
+            final String url = props.getProperty(propName);
+            if(url.startsWith("jdbc:db2:"))
+            {
+                String sep = ":currentSchema=";
+                int idx = url.indexOf(sep);
+                if(idx != 1)
+                {
+                    String schema = url.substring(idx + sep.length());
+                    if(schema.endsWith(";"))
+                    {
+                        schema = schema.substring(0, schema.length() - 1);
+                    }
+
+                    String upperCaseSchema = schema.toUpperCase();
+                    if(schema.equals(upperCaseSchema) == false)
+                    {
+                        String newUrl = url.replace(sep + schema, sep + upperCaseSchema);
+                        props.setProperty(propName, newUrl);
+                    }
+                }
+            }
+        }
+
         HikariConfig conf = new HikariConfig(props);
         this.service = new HikariDataSource(conf);
         this.databaseType = databaseType;
@@ -392,7 +436,7 @@ public class DataSourceWrapperImpl implements DataSourceWrapper
     public void createSequence(String sequenceName, long startValue)
     throws SQLException
     {
-    	sequenceName = c14nSequenceName(sequenceName);
+        sequenceName = c14nSequenceName(sequenceName);
         String sql;
         switch(databaseType)
         {
@@ -466,7 +510,7 @@ public class DataSourceWrapperImpl implements DataSourceWrapper
     public void dropSequence(String sequenceName)
     throws SQLException
     {
-    	sequenceName = c14nSequenceName(sequenceName);
+        sequenceName = c14nSequenceName(sequenceName);
         String sql;
         switch(databaseType)
         {
@@ -501,7 +545,7 @@ public class DataSourceWrapperImpl implements DataSourceWrapper
     public long nextSeqValue(String seqName)
     throws SQLException
     {
-    	seqName = c14nSequenceName(seqName);
+        seqName = c14nSequenceName(seqName);
         switch(databaseType)
         {
             case DB2:
@@ -576,14 +620,14 @@ public class DataSourceWrapperImpl implements DataSourceWrapper
                 throw new RuntimeException("unsupported database type " + databaseType);
         }
     }
-    
-    private static String c14nSequenceName(String seqName)    
+
+    private static String c14nSequenceName(String seqName)
     {
-    	if(seqName.indexOf('.') == -1)
-    	{
-    		return seqName;    				
-    	}
-    	return seqName.replace('.', '_');
+        if(seqName.indexOf('.') == -1)
+        {
+            return seqName;
+        }
+        return seqName.replace('.', '_');
     }
 
 }
