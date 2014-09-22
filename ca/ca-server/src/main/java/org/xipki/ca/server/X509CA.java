@@ -127,8 +127,6 @@ public class X509CA
 
     private final CertificateFactory cf;
 
-    private boolean masterMode = false;
-
     private final CAInfo caInfo;
     private final ConcurrentContentSigner caSigner;
     private final X500Name caSubjectX500Name;
@@ -151,7 +149,8 @@ public class X509CA
             CAInfo caInfo,
             ConcurrentContentSigner caSigner,
             CertificateStore certstore,
-            CrlSigner crlSigner)
+            CrlSigner crlSigner,
+            boolean masterMode)
     throws OperationException
     {
         ParamChecker.assertNotNull("caManager", caManager);
@@ -220,6 +219,11 @@ public class X509CA
         if(masterMode == false)
         {
             return;
+        }
+
+        for(IdentifiedCertPublisher publisher : getPublishers())
+        {
+            publisher.issuerAdded(caCert);
         }
 
         // CRL generation services

@@ -627,7 +627,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
                 X509CA ca;
                 try
                 {
-                    ca = new X509CA(this, caEntry, caSigner, certstore, crlSigner);
+                    ca = new X509CA(this, caEntry, caSigner, certstore, crlSigner, masterMode);
                 } catch (OperationException e)
                 {
                     final String message = "X509CA.<init> (ca=" + caName + ")";
@@ -699,12 +699,6 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
             {
                 try
                 {
-                    // table CAINFO
-                    for(CAInfo caInfo : cas.values())
-                    {
-                        certstore.addCa(caInfo.getCertificate());
-                    }
-
                     // table REQUESTORINFO
                     for(String name : requestors.keySet())
                     {

@@ -1,7 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog dbchangelog-3.0.xsd" logicalFilePath="ca-init.xml">
-  <property name="autoIncrement" value="true" dbms="mysql"/>
-  <property name="autoIncrement" value="false" dbms="oracle,postgresql,db2,h2,hsqldb"/>
   <!-- CA configuration :: create table -->
   <changeSet author="xipki" id="1">
     <!-- table CALOCK -->
@@ -394,7 +392,7 @@
     <createSequence sequenceName="CRL_ID" incrementBy="1" startValue="1"/>
   </changeSet>
   <!-- CA Configuration :: foreign key -->
-  <changeSet author="xipki" id="4">
+  <changeSet author="xipki" id="5">
     <addForeignKeyConstraint deferrable="false" initiallyDeferred="false" onDelete="CASCADE" onUpdate="NO ACTION" baseColumnNames="CRLSIGNER_NAME" baseTableName="CA" constraintName="FK_CA_CRLSIGNER1" referencedColumnNames="NAME" referencedTableName="CRLSIGNER"/>
     <addForeignKeyConstraint deferrable="false" initiallyDeferred="false" onDelete="CASCADE" onUpdate="NO ACTION" baseColumnNames="CA_NAME" baseTableName="CAALIAS" constraintName="FK_SERVLETNAME_CA1" referencedColumnNames="NAME" referencedTableName="CA"/>
     <!-- ca_ha_requestor -->
