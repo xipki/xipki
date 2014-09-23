@@ -22,6 +22,15 @@
 			<xs:element name="description" type="xs:string" minOccurs="0"/>
 			<xs:element name="ca" type="xs:boolean"/>
 			<xs:element name="validity" type="xs:int" minOccurs="0"/>
+			<xs:element name="notBeforeTime" type="xs:string" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>
+					  Format of the notBefore field.
+					    current: current time
+					    midnight: mid night, namely 00:00:00 UTC 
+					</xs:documentation>
+				</xs:annotation>
+			</xs:element>
 			<xs:element name="duplicateKeyPermitted" type="xs:boolean" minOccurs="0"/>
 			<xs:element name="duplicateSubjectPermitted" type="xs:boolean" minOccurs="0"/>
 			<xs:element name="serialNumberInReqPermitted" type="xs:boolean" minOccurs="0"/>

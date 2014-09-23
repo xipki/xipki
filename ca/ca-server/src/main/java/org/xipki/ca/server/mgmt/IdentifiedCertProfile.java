@@ -72,6 +72,11 @@ public class IdentifiedCertProfile
         return certProfile.getValidity();
     }
 
+    public boolean hasMidnightNotBefore()
+    {
+        return certProfile.hasMidnightNotBefore();
+    }
+
     public SubjectInfo getSubject(X500Name requestedSubject)
     throws CertProfileException, BadCertTemplateException
     {

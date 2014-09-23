@@ -3,6 +3,7 @@
   <description>CertProfile RootCA</description>
   <ca>true</ca>
   <validity>3650</validity>
+  <notBeforeTime>current</notBeforeTime>
   <duplicateKeyPermitted>false</duplicateKeyPermitted>
   <duplicateSubjectPermitted>false</duplicateSubjectPermitted>
   <serialNumberInReqPermitted>false</serialNumberInReqPermitted>
