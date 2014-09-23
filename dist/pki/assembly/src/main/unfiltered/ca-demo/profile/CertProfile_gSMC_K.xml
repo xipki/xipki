@@ -3,6 +3,7 @@
   <description>CertProfile gSMC_K (C.AK.AUT)</description>
   <ca>false</ca>
   <validity>1825</validity>
+  <notBeforeTime>current</notBeforeTime>
   <duplicateKeyPermitted>false</duplicateKeyPermitted>
   <duplicateSubjectPermitted>true</duplicateSubjectPermitted>
   <serialNumberInReqPermitted>false</serialNumberInReqPermitted>

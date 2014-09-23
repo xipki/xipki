@@ -93,6 +93,11 @@ public abstract class CertProfile
         return null;
     }
 
+    public boolean hasMidnightNotBefore()
+    {
+        return false;
+    }
+
     public abstract void initialize(String data)
     throws CertProfileException;
 

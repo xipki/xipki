@@ -156,6 +156,7 @@ public class DefaultCertProfile extends AbstractCertProfile
     private boolean duplicateKeyPermitted;
     private boolean duplicateSubjectPermitted;
     private boolean serialNumberInReqPermitted;
+    private boolean notBeforeMidnight;
     private Integer pathLen;
     private KeyUsageOptions keyusages;
     private ExtKeyUsageOptions extendedKeyusages;
@@ -214,6 +215,7 @@ public class DefaultCertProfile extends AbstractCertProfile
         extensionOccurences = null;
         additionalExtensionOccurences = null;
         validity = null;
+        notBeforeMidnight = false;
         akiOption = null;
         incSerialNrIfSubjectExists = false;
         raOnly = false;
@@ -250,6 +252,7 @@ public class DefaultCertProfile extends AbstractCertProfile
             this.raOnly = getBoolean(conf.isOnlyForRA(), false);
             this.validity = conf.getValidity();
             this.ca = conf.isCa();
+            this.notBeforeMidnight = "midnight".equalsIgnoreCase(conf.getNotBeforeTime());
 
             String specialBehavior = conf.getSpecialBehavior();
             if(specialBehavior != null)
@@ -1428,6 +1431,12 @@ public class DefaultCertProfile extends AbstractCertProfile
     protected Integer getPathLenBasicConstraint()
     {
         return pathLen;
+    }
+
+    @Override
+    public boolean hasMidnightNotBefore()
+    {
+        return notBeforeMidnight;
     }
 
     @Override

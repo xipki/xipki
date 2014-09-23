@@ -121,7 +121,9 @@ import org.xipki.security.common.ParamChecker;
 
 public class X509CA
 {
-    private static long DAY = 24L * 60 * 60 * 1000;
+    private static long SECOND = 1000;
+    private static long DAY = 24L * 60 * 60 * SECOND;
+    private static final TimeZone TIMEZONE_UTC = TimeZone.getTimeZone("UTC");
 
     private static Logger LOG = LoggerFactory.getLogger(X509CA.class);
 
@@ -368,7 +370,7 @@ public class X509CA
                 }
 
                 caInfo.setLastCRLInterval(0);
-                caInfo.setLastCRLIntervalDate(thisUpdate.getTime() / 1000);
+                caInfo.setLastCRLIntervalDate(thisUpdate.getTime() / SECOND);
                 try
                 {
                     caManager.setCrlLastInterval(caInfo.getName(), caInfo.getLastCRLInterval(),
@@ -405,7 +407,7 @@ public class X509CA
 
         if(nextUpdate != null)
         {
-            if(nextUpdate.getTime() - thisUpdate.getTime() < 10 * 60 * 1000) // less than 10 minutes
+            if(nextUpdate.getTime() - thisUpdate.getTime() < 10 * 60 * SECOND) // less than 10 minutes
             throw new OperationException(ErrorCode.CRL_FAILURE, "nextUpdate and thisUpdate are too close");
         }
 
@@ -443,7 +445,7 @@ public class X509CA
             else
             {
                 // 10 minutes buffer
-                notExpireAt = new Date(thisUpdate.getTime() - 600L * 1000);
+                notExpireAt = new Date(thisUpdate.getTime() - 600L * SECOND);
             }
 
             do
@@ -937,7 +939,7 @@ public class X509CA
             LOG.info("Certificate requests are still in process, wait 1 second");
             try
             {
-                Thread.sleep(1000);
+                Thread.sleep(SECOND);
             }catch(InterruptedException e)
             {
             }
@@ -1595,9 +1597,19 @@ public class X509CA
         {
             notBefore = new Date();
         }
+
+        if(certProfile.hasMidnightNotBefore())
+        {
+            notBefore = setToMidnight(notBefore);
+        }
+
         if(notBefore.before(caInfo.getNotBefore()))
         {
             notBefore = caInfo.getNotBefore();
+            if(certProfile.hasMidnightNotBefore())
+            {
+                notBefore = setToMidnight(new Date(notBefore.getTime() + DAY));
+            }
         }
 
         long t = caInfo.getNoNewCertificateAfter();
@@ -1631,7 +1643,7 @@ public class X509CA
                         requestedCN, certProfileName);
                 if(gsmckFirstNotBeforeInSecond != null)
                 {
-                    gSMC_KFirstNotBefore = new Date(gsmckFirstNotBeforeInSecond * 1000);
+                    gSMC_KFirstNotBefore = new Date(gsmckFirstNotBeforeInSecond * SECOND);
                 }
 
                 // append the commonName with '-' + yyyyMMdd
@@ -1928,12 +1940,14 @@ public class X509CA
                 validity = caInfo.getMaxValidity();
             }
 
-            Date maxNotAfter = new Date(notBefore.getTime() + DAY * validity);
+            Date maxNotAfter = new Date(notBefore.getTime() + DAY * validity - SECOND);
+            Date origMaxNotAfter = maxNotAfter;
+
             if(certProfile.getSpecialCertProfileBehavior() == SpecialCertProfileBehavior.gematik_gSMC_K)
             {
                 String s = certProfile.getParameter(SpecialCertProfileBehavior.PARAMETER_MAXLIFTIME);
                 long maxLifetimeInDays = Long.parseLong(s);
-                Date maxLifetime = new Date(gSMC_KFirstNotBefore.getTime() + maxLifetimeInDays * DAY);
+                Date maxLifetime = new Date(gSMC_KFirstNotBefore.getTime() + maxLifetimeInDays * DAY - SECOND);
                 if(maxNotAfter.after(maxLifetime))
                 {
                     maxNotAfter = maxLifetime;
@@ -1973,6 +1987,17 @@ public class X509CA
                 {
                     throw new RuntimeException("should not reach here");
                 }
+            }
+
+            if(certProfile.hasMidnightNotBefore() && maxNotAfter.equals(origMaxNotAfter) == false)
+            {
+                Calendar c = Calendar.getInstance(TIMEZONE_UTC);
+                c.setTime(new Date(notAfter.getTime() - DAY));
+                c.set(Calendar.HOUR_OF_DAY, 23);
+                c.set(Calendar.MINUTE, 59);
+                c.set(Calendar.SECOND, 59);
+                c.set(Calendar.MILLISECOND, 0);
+                notAfter = c.getTime();
             }
 
             X509v3CertificateBuilder certBuilder = new X509v3CertificateBuilder(
@@ -2356,7 +2381,7 @@ public class X509CA
             int thisInterval = -1;
 
             Date thisUpdate = new Date();
-            long nowInSecond = thisUpdate.getTime() / 1000;
+            long nowInSecond = thisUpdate.getTime() / SECOND;
 
             try
             {
@@ -2485,12 +2510,12 @@ public class X509CA
                 {
                     int minutesTillNextUpdate = (intervalOfNextUpdate - thisInterval) * control.getIntervalMinutes()
                             + control.getOverlapMinutes();
-                    nextUpdate = new Date(1000L * (nowInSecond + minutesTillNextUpdate * 60));
+                    nextUpdate = new Date(SECOND * (nowInSecond + minutesTillNextUpdate * 60));
                 }
                 else
                 {
                     Calendar c = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
-                    c.setTime(new Date(nowInSecond * 1000));
+                    c.setTime(new Date(nowInSecond * SECOND));
                     c.add(Calendar.DAY_OF_YEAR, (intervalOfNextUpdate - thisInterval));
                     c.set(Calendar.HOUR_OF_DAY, control.getIntervalDayTime().getHour());
                     c.set(Calendar.MINUTE, control.getIntervalDayTime().getMinute());
@@ -2580,7 +2605,7 @@ public class X509CA
         {
             int minutesTillNextUpdate = intervalsTillNextCRL * control.getIntervalMinutes()
                     + control.getOverlapMinutes();
-            nextUpdate = new Date(1000L * (thisUpdate.getTime() / 1000 / 60  + minutesTillNextUpdate) * 60);
+            nextUpdate = new Date(SECOND * (thisUpdate.getTime() / SECOND / 60  + minutesTillNextUpdate) * 60);
         }
         else
         {
@@ -2765,4 +2790,14 @@ public class X509CA
         }
     }
 
+    private static Date setToMidnight(Date date)
+    {
+        Calendar c = Calendar.getInstance(TIMEZONE_UTC);
+        c.setTime(date);
+        c.set(Calendar.HOUR_OF_DAY, 0);
+        c.set(Calendar.MINUTE, 0);
+        c.set(Calendar.SECOND, 0);
+        c.set(Calendar.MILLISECOND, 0);
+        return c.getTime();
+    }
 }

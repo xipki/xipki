@@ -3,6 +3,7 @@
   <description>CertProfile TLS</description>
   <ca>false</ca>
   <validity>1825</validity>
+  <notBeforeTime>midnight</notBeforeTime>
   <duplicateKeyPermitted>false</duplicateKeyPermitted>
   <duplicateSubjectPermitted>false</duplicateSubjectPermitted>
   <serialNumberInReqPermitted>false</serialNumberInReqPermitted>

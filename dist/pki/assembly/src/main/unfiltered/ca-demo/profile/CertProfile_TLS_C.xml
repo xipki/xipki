@@ -3,6 +3,7 @@
   <description>CertProfile TLS_C</description>
   <ca>false</ca>
   <validity>1825</validity>
+  <notBeforeTime>current</notBeforeTime>
   <duplicateKeyPermitted>false</duplicateKeyPermitted>
   <duplicateSubjectPermitted>false</duplicateSubjectPermitted>
   <serialNumberInReqPermitted>false</serialNumberInReqPermitted>

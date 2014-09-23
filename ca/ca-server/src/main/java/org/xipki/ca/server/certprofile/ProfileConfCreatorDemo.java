@@ -191,7 +191,7 @@ public class ProfileConfCreatorDemo
     private static ProfileType CertProfile_RootCA(boolean cross)
     throws Exception
     {
-        ProfileType profile = getBaseProfile("CertProfile RootCA" + (cross ? " Cross" : ""), true, 10 * 365);
+        ProfileType profile = getBaseProfile("CertProfile RootCA" + (cross ? " Cross" : ""), true, 10 * 365, false);
 
         // Subject
         Subject subject = profile.getSubject();
@@ -229,7 +229,7 @@ public class ProfileConfCreatorDemo
     private static ProfileType CertProfile_SubCA()
     throws Exception
     {
-        ProfileType profile = getBaseProfile("CertProfile SubCA", true, 8 * 365);
+        ProfileType profile = getBaseProfile("CertProfile SubCA", true, 8 * 365, false);
 
         // Subject
         Subject subject = profile.getSubject();
@@ -265,7 +265,7 @@ public class ProfileConfCreatorDemo
     private static ProfileType CertProfile_SubCA_Complex()
     throws Exception
     {
-        ProfileType profile = getBaseProfile("CertProfile SubCA with most extensions", true, 8 * 365);
+        ProfileType profile = getBaseProfile("CertProfile SubCA with most extensions", true, 8 * 365, false);
 
         // Subject
         Subject subject = profile.getSubject();
@@ -379,7 +379,7 @@ public class ProfileConfCreatorDemo
     private static ProfileType CertProfile_OCSP()
     throws Exception
     {
-        ProfileType profile = getBaseProfile("CertProfile OCSP", false, 5 * 365);
+        ProfileType profile = getBaseProfile("CertProfile OCSP", false, 5 * 365, false);
 
         // Subject
         Subject subject = profile.getSubject();
@@ -421,7 +421,7 @@ public class ProfileConfCreatorDemo
     private static ProfileType CertProfile_TLS()
     throws Exception
     {
-        ProfileType profile = getBaseProfile("CertProfile TLS", false, 5 * 365);
+        ProfileType profile = getBaseProfile("CertProfile TLS", false, 5 * 365, true);
 
         // Subject
         Subject subject = profile.getSubject();
@@ -468,7 +468,7 @@ public class ProfileConfCreatorDemo
     private static ProfileType CertProfile_TLS_C()
     throws Exception
     {
-        ProfileType profile = getBaseProfile("CertProfile TLS_C", false, 5 * 365);
+        ProfileType profile = getBaseProfile("CertProfile TLS_C", false, 5 * 365, false);
 
         // Subject
         Subject subject = profile.getSubject();
@@ -508,7 +508,7 @@ public class ProfileConfCreatorDemo
     private static ProfileType CertProfile_TLSwithIncSN()
     throws Exception
     {
-        ProfileType profile = getBaseProfile("CertProfile TLSwithIncSN", false, 5 * 365);
+        ProfileType profile = getBaseProfile("CertProfile TLSwithIncSN", false, 5 * 365, false);
 
         // Subject
         Subject subject = profile.getSubject();
@@ -758,7 +758,7 @@ public class ProfileConfCreatorDemo
     private static ProfileType CertProfile_gSMC_K()
     throws Exception
     {
-        ProfileType profile = getBaseProfile("CertProfile gSMC_K (C.AK.AUT)", false, 5 * 365);
+        ProfileType profile = getBaseProfile("CertProfile gSMC_K (C.AK.AUT)", false, 5 * 365, false);
         profile.setDuplicateSubjectPermitted(true);
 
         // SpecialBehavior
@@ -836,13 +836,14 @@ public class ProfileConfCreatorDemo
         return profile;
     }
 
-    private static ProfileType getBaseProfile(String description, boolean ca, int validity)
+    private static ProfileType getBaseProfile(String description, boolean ca, int validity, boolean useMidnightNotBefore)
     {
         ProfileType profile = new ProfileType();
         profile.setDescription(description);
         profile.setOnlyForRA(false);
         profile.setCa(ca);
         profile.setValidity(validity);
+        profile.setNotBeforeTime(useMidnightNotBefore ? "midnight" : "current");
 
         profile.setDuplicateKeyPermitted(false);
         profile.setDuplicateSubjectPermitted(false);
