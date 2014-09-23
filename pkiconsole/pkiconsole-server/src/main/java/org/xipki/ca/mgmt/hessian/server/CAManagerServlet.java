@@ -157,7 +157,6 @@ implements HessianCAManager
         try
         {
             caManager.addCaAlias(aliasName, caName);
-            throw new CAMgmtException("TESTBUG");
         } catch (CAMgmtException e)
         {
             throw new HessianCAMgmtException(e.getMessage());
