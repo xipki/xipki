@@ -382,7 +382,8 @@ extends CertProfile implements SubjectDNSubset
             {
                 if(occurence.getType().equals(type))
                 {
-                    return;
+                    present = true;
+                    break;
                 }
             }
 
