@@ -701,7 +701,7 @@ class CertStoreQueryExecutor
 
         try
         {
-            long id = dataSource.nextSeqValue("DDC_ID");
+            long id = dataSource.nextSeqValue("DCC_ID");
             ps = borrowPreparedStatement(SQL);
             int idx = 1;
             ps.setLong(idx++, id);
