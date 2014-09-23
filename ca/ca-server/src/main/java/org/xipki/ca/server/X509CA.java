@@ -1469,7 +1469,8 @@ public class X509CA
             return false;
         }
 
-        if(control.getDeltaCRLIntervals() >= control.getFullCRLIntervals())
+        int deltaCRLInterval = control.getDeltaCRLIntervals();
+        if(deltaCRLInterval == 0 || deltaCRLInterval >= control.getFullCRLIntervals())
         {
             return false;
         }
