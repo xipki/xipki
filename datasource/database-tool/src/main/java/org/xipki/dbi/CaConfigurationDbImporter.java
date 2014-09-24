@@ -374,7 +374,7 @@ class CaConfigurationDbImporter extends DbPorter
                     X509Certificate c = IoCertUtil.parseCert(Base64.decode(b64Cert));
 
                     int idx = 1;
-                    ps.setString(idx++, ca.getName());
+                    ps.setString(idx++, ca.getName().toUpperCase());
                     ps.setString(idx++, IoCertUtil.canonicalizeName(c.getSubjectX500Principal()));
                     ps.setLong(idx++, ca.getNextSerial());
                     ps.setString(idx++, ca.getStatus());
@@ -430,7 +430,7 @@ class CaConfigurationDbImporter extends DbPorter
                 {
                     int idx = 1;
                     ps.setString(idx++, caalias.getName());
-                    ps.setString(idx++, caalias.getCaName());
+                    ps.setString(idx++, caalias.getCaName().toUpperCase());
                     ps.executeUpdate();
                 }catch(Exception e)
                 {
@@ -460,7 +460,7 @@ class CaConfigurationDbImporter extends DbPorter
                 try
                 {
                     int idx = 1;
-                    ps.setString(idx++, entry.getCaName());
+                    ps.setString(idx++, entry.getCaName().toUpperCase());
                     ps.setString(idx++, entry.getRequestorName());
                     setBoolean(ps, idx++, entry.isRa());
                     ps.setString(idx++, entry.getPermissions());
@@ -495,7 +495,7 @@ class CaConfigurationDbImporter extends DbPorter
                 try
                 {
                     int idx = 1;
-                    ps.setString(idx++, entry.getCaName());
+                    ps.setString(idx++, entry.getCaName().toUpperCase());
                     ps.setString(idx++, entry.getPublisherName());
                     ps.executeUpdate();
                 }catch(Exception e)
@@ -526,7 +526,7 @@ class CaConfigurationDbImporter extends DbPorter
                 try
                 {
                     int idx = 1;
-                    ps.setString(idx++, entry.getCaName());
+                    ps.setString(idx++, entry.getCaName().toUpperCase());
                     ps.setString(idx++, entry.getCertprofileName());
                     ps.executeUpdate();
                 }catch(Exception e)
