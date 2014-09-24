@@ -126,6 +126,7 @@ public class Rfc6712Servlet extends HttpServlet
             {
                 caName = caAlias;
             }
+            caName = caName.toUpperCase();
 
             X509CACmpResponder responder = responderManager.getX509CACmpResponder(caName);
             if(responder == null || responder.isCAInService() == false)
