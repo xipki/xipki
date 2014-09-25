@@ -109,6 +109,16 @@ abstract class X509CmpRequestor extends CmpRequestor
     private boolean implicitConfirm = true;
     private final X509Certificate caCert;
 
+    X509CmpRequestor(X509Certificate requestorCert,
+            X509Certificate responderCert,
+            X509Certificate caCert,
+            SecurityFactory securityFactory)
+    {
+        super(responderCert, responderCert, securityFactory);
+        ParamChecker.assertNotNull("caCert", caCert);
+        this.caCert = caCert;
+    }
+
     X509CmpRequestor(ConcurrentContentSigner requestor,
             X509Certificate responderCert,
             X509Certificate caCert,
