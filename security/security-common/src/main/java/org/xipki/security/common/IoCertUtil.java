@@ -771,4 +771,39 @@ public class IoCertUtil
         }
         return sb.toString();
     }
+
+    public static String base64Encode(byte[] data, boolean withLineBreak)
+    {
+
+        String b64Str = Base64.toBase64String(data);
+        if(withLineBreak == false)
+        {
+            return b64Str;
+        }
+
+        if(b64Str.length() < 64)
+        {
+            return b64Str;
+        }
+
+        StringBuilder sb = new StringBuilder();
+        final int blockSize = 64;
+        final int size = b64Str.length();
+
+        final int nFullBlock = size / blockSize;
+
+        for(int i = 0; i < nFullBlock; i++)
+        {
+            int offset = i * blockSize;
+            sb.append(b64Str.subSequence(offset, offset + blockSize)).append("\n");
+        }
+
+        if(size % blockSize != 0)
+        {
+            sb.append(b64Str.substring(nFullBlock * blockSize)).append("\n");
+        }
+        sb.deleteCharAt(sb.length() - 1);
+        return sb.toString();
+    }
+
 }
