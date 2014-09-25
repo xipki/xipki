@@ -267,6 +267,10 @@ class CALoadTestRevoke extends AbstractLoadTest
             {
                 LOG.warn("{}: {}", e.getClass().getName(), e.getMessage());
                 return 0;
+            } catch (Throwable t)
+            {
+                LOG.warn("{}: {}", t.getClass().getName(), t.getMessage());
+                return 0;
             }
 
             if(result == null)
