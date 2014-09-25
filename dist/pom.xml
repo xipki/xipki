@@ -12,7 +12,7 @@
   <properties>
     <bc.version>1.51</bc.version>
     <hikaricp.version>1.4.0</hikaricp.version>
-    <karaf.version>2.3.7</karaf.version>
+    <karaf.version>2.3.8</karaf.version>
   </properties>
   <modules>
     <module>pki</module>
