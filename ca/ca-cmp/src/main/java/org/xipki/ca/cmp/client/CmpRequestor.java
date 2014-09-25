@@ -66,6 +66,26 @@ public abstract class CmpRequestor
     protected final SecurityFactory securityFactory;
     protected boolean signRequest;
 
+    public CmpRequestor(X509Certificate requestorCert,
+            X509Certificate responderCert,
+            SecurityFactory securityFactory)
+    {
+        ParamChecker.assertNotNull("requestorCert", requestorCert);
+        ParamChecker.assertNotNull("responderCert", responderCert);
+        ParamChecker.assertNotNull("securityFactory", securityFactory);
+
+        this.requestor = null;
+        this.responderCert = responderCert;
+        this.securityFactory = securityFactory;
+        this.signRequest = false;
+
+        X500Name subject = X500Name.getInstance(responderCert.getSubjectX500Principal().getEncoded());
+        this.recipient = new GeneralName(subject);
+
+        X500Name x500Name = X500Name.getInstance(requestorCert.getSubjectX500Principal().getEncoded());
+        this.sender = new GeneralName(x500Name);
+    }
+
     public CmpRequestor(ConcurrentContentSigner requestor,
             X509Certificate responderCert,
             SecurityFactory securityFactory)
@@ -100,6 +120,11 @@ public abstract class CmpRequestor
     protected PKIMessage sign(PKIMessage request)
     throws CmpRequestorException
     {
+        if(requestor == null)
+        {
+            throw new CmpRequestorException("No request signer is configured");
+        }
+
         try
         {
             request = CmpUtil.addProtection(request, requestor, sender, false);
