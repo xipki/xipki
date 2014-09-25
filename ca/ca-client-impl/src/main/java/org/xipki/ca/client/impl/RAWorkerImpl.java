@@ -244,14 +244,27 @@ public final class RAWorkerImpl extends AbstractRAWorker implements RAWorker
         }
 
         // ------------------------------------------------
-        ConcurrentContentSigner requestorSigner;
-        try
+        ConcurrentContentSigner requestorSigner = null;
+        if(requestorSignerType != null)
         {
-            requestorSigner = securityFactory.createSigner(
-                    requestorSignerType, requestorSignerConf, requestorCert);
-        } catch (SignerException e)
+            try
+            {
+                requestorSigner = securityFactory.createSigner(
+                        requestorSignerType, requestorSignerConf, requestorCert);
+            } catch (SignerException e)
+            {
+                throw new ConfigurationException(e);
+            }
+        } else
         {
-            throw new ConfigurationException(e);
+            if(signRequest)
+            {
+                throw new ConfigurationException("Signer of requestor must be configured");
+            }
+            else if(requestorCert == null)
+            {
+                throw new ConfigurationException("At least one of certificate and signer of requestor must be configured");
+            }
         }
 
         for(CAConf ca :cas)
@@ -261,9 +274,18 @@ public final class RAWorkerImpl extends AbstractRAWorker implements RAWorker
                 throw new IllegalArgumentException("duplicate CAs with the same name " + ca.getName());
             }
 
-            X509CmpRequestor cmpRequestor = new DefaultHttpCmpRequestor(
-                    requestorSigner, ca.getResponder(), ca.getCert(), ca.getUrl(),
-                    securityFactory, signRequest);
+            X509CmpRequestor cmpRequestor;
+            if(requestorSigner != null)
+            {
+                cmpRequestor = new DefaultHttpCmpRequestor(
+                        requestorSigner, ca.getResponder(), ca.getCert(), ca.getUrl(),
+                        securityFactory, signRequest);
+            } else
+            {
+                cmpRequestor = new DefaultHttpCmpRequestor(
+                        requestorCert, ca.getResponder(), ca.getCert(), ca.getUrl(),
+                        securityFactory);
+            }
 
             cmpRequestorsMap.put(ca.getName(), cmpRequestor);
         }

@@ -31,6 +31,24 @@ class DefaultHttpCmpRequestor extends X509CmpRequestor
 
     private final URL serverUrl;
 
+    DefaultHttpCmpRequestor(X509Certificate requestorCert,
+            X509Certificate responderCert,
+            X509Certificate caCert,
+            String serverUrl,
+            SecurityFactory securityFactory)
+    {
+        super(requestorCert, responderCert, caCert, securityFactory);
+        ParamChecker.assertNotEmpty("serverUrl", serverUrl);
+
+        try
+        {
+            this.serverUrl = new URL(serverUrl);
+        } catch (MalformedURLException e)
+        {
+            throw new IllegalArgumentException("Invalid url: " + serverUrl);
+        }
+    }
+
     DefaultHttpCmpRequestor(ConcurrentContentSigner requestor,
             X509Certificate responderCert,
             X509Certificate caCert,
