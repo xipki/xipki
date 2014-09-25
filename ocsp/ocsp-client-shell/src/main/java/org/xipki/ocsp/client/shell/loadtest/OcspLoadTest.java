@@ -102,6 +102,10 @@ public class OcspLoadTest extends AbstractLoadTest
             {
                 LOG.warn("OCSPRequestorException: {}", e.getMessage());
                 return false;
+            } catch (Throwable t)
+            {
+                LOG.warn("{}: {}", t.getClass().getName(), t.getMessage());
+                return false;
             }
 
             SingleResp[] singleResponses = basicResp.getResponses();
