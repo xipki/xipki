@@ -8,6 +8,7 @@
 package org.xipki.ca.api.profile;
 
 import java.util.Date;
+import java.util.TimeZone;
 
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.Extensions;
@@ -23,6 +24,8 @@ import org.xipki.security.common.EnvironmentParameterResolver;
 
 public abstract class CertProfile
 {
+    private TimeZone timeZone = TimeZone.getDefault();
+
     public boolean isOnlyForRA()
     {
         return false;
@@ -96,6 +99,11 @@ public abstract class CertProfile
     public boolean hasMidnightNotBefore()
     {
         return false;
+    }
+
+    public TimeZone getTimezone()
+    {
+        return timeZone;
     }
 
     public abstract void initialize(String data)
