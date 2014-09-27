@@ -7,9 +7,13 @@
 
 package org.xipki.ca.client.impl;
 
+import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.math.BigInteger;
+import java.net.URL;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
@@ -26,9 +30,14 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBElement;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Unmarshaller;
+import javax.xml.validation.SchemaFactory;
 
 import org.bouncycastle.asn1.cmp.CMPCertificate;
 import org.bouncycastle.asn1.cmp.PKIMessage;
@@ -45,6 +54,11 @@ import org.bouncycastle.jce.provider.X509CertificateObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.ca.client.api.RAWorker;
+import org.xipki.ca.client.impl.jaxb.CAClientType;
+import org.xipki.ca.client.impl.jaxb.CAType;
+import org.xipki.ca.client.impl.jaxb.FileOrValueType;
+import org.xipki.ca.client.impl.jaxb.ObjectFactory;
+import org.xipki.ca.client.impl.jaxb.RequestorType;
 import org.xipki.ca.cmp.client.AbstractRAWorker;
 import org.xipki.ca.cmp.client.CmpRequestorException;
 import org.xipki.ca.cmp.client.type.CRLResultType;
@@ -72,7 +86,7 @@ import org.xipki.security.common.ConfigurationException;
 import org.xipki.security.common.IoCertUtil;
 import org.xipki.security.common.LogUtil;
 import org.xipki.security.common.ParamChecker;
-import org.xipki.security.common.StringUtil;
+import org.xml.sax.SAXException;
 
 /**
  * @author Lijun Liao
@@ -80,54 +94,15 @@ import org.xipki.security.common.StringUtil;
 
 public final class RAWorkerImpl extends AbstractRAWorker implements RAWorker
 {
-    public static final String DEV_MODE = "dev.mode";
-
-    public static final String SIGN_REQUEST = "sign.request";
-
-    /**
-     * The certificate of the responder.
-     */
-    public static final String REQUESTOR_CERT = "requestor.cert";
-
-    /**
-     * The type of requestorSigner signer
-     */
-    public static final String REQUESTOR_SIGNER_TYPE = "requestor.signer.type";
-
-    /**
-     * The configuration of the requestorSigner signer
-     */
-    public static final String REQUESTOR_SIGNER_CONF = "requestor.signer.conf";
-
-    public static final String CA_PREFIX = "ca.";
-
-    public static final String CA_ENABLED_SUFFIX = ".enabled";
-
-    /**
-     * certificate of the given CA
-     */
-    public static final String CA_CERT_SUFFIX = ".cert";
-
-    /**
-     * URL of the given CA
-     */
-    public static final String CA_URL_SUFFIX = ".url";
-
-    public static final String CA_RESPONDER_SUFFIX = ".responder";
-
-    /**
-     * Certificate profiles supported by the given CA
-     */
-    public static final String CA_PROFILES_SUFFIX = ".profiles";
-
     private static final Logger LOG = LoggerFactory.getLogger(RAWorkerImpl.class);
 
-    public static long DAY = 24L * 60 * 60 * 1000;
+    private static Object jaxbUnmarshallerLock = new Object();
+    private static Unmarshaller jaxbUnmarshaller;
 
     private final Map<String, CAConf> casMap = new HashMap<>();
     private final Map<String, X509CmpRequestor> cmpRequestorsMap = new ConcurrentHashMap<>();
 
-    private String            confFile;
+    private String confFile;
     private Map<X509Certificate, Boolean> tryXipkiNSStoVerifyMap = new ConcurrentHashMap<>();
 
     public RAWorkerImpl()
@@ -145,87 +120,79 @@ public final class RAWorkerImpl extends AbstractRAWorker implements RAWorker
             Security.addProvider(new BouncyCastleProvider());
         }
 
-        Properties props = new Properties();
-        FileInputStream configStream = new FileInputStream(IoCertUtil.expandFilepath(confFile));
-        try
+        CAClientType config;
+        File configFile = new File(IoCertUtil.expandFilepath(confFile));
+        if(configFile.exists())
         {
-            props.load(configStream);
-        }finally
-        {
-            try
+            if(confFile.endsWith(".properties"))
             {
-                configStream.close();
-            }catch(IOException e)
+                config = LegacyConfConverter.convertConf(new FileInputStream(configFile));
+            } else
             {
+                config = parse(new FileInputStream(configFile));
             }
         }
-
-        boolean dev_mode = Boolean.parseBoolean(props.getProperty(DEV_MODE, "false"));
-
-        boolean signRequest = Boolean.parseBoolean(props.getProperty(SIGN_REQUEST, "true"));
-
-        X509Certificate requestorCert = null;
-        String s = props.getProperty(REQUESTOR_CERT);
-        if(isEmpty(s) == false)
+        else if(confFile.endsWith(".properties") == false)
         {
-            try
+            // consider the legacy software
+            int idx = confFile.lastIndexOf('.');
+            String fn = confFile.substring(0, idx) + ".properties";
+            configFile = new File(fn);
+            if(configFile.exists())
             {
-                requestorCert = IoCertUtil.parseCert(s);
-            } catch (Exception e)
+                config = LegacyConfConverter.convertConf(fn);
+            } else
             {
-                throw new ConfigurationException(e);
+                throw new FileNotFoundException("Cound not find configuration file " + confFile);
             }
         }
-
-        String requestorSignerType = props.getProperty(REQUESTOR_SIGNER_TYPE);
-        String requestorSignerConf = props.getProperty(REQUESTOR_SIGNER_CONF);
-
-        Set<String> caNames = new HashSet<>();
-        Set<String> disabledCaNames = new HashSet<>();
-
-        for(Object _propKey : props.keySet())
+        else
         {
-            String propKey = (String) _propKey;
-            if(propKey.startsWith(CA_PREFIX) && propKey.endsWith(CA_CERT_SUFFIX))
+            throw new FileNotFoundException("Cound not find configuration file " + confFile);
+        }
+
+        int numActiveCAs = 0;
+
+        for(CAType caType : config.getCAs().getCA())
+        {
+            if(caType.isEnabled() == false)
             {
-                String caName = propKey.substring(CA_PREFIX.length(),
-                        propKey.length() - CA_CERT_SUFFIX.length());
-
-                String enabled = props.getProperty(CA_PREFIX + caName + CA_ENABLED_SUFFIX, "true");
-                if(Boolean.parseBoolean(enabled))
-                {
-                    caNames.add(caName);
-                }
-                else
-                {
-                    LOG.info("CA " + caName + " is disabled");
-                    disabledCaNames.add(caName);
-                }
+                LOG.info("CA " + caType.getName() + " is disabled");
+                continue;
             }
+            numActiveCAs++;
         }
 
-        if(caNames.isEmpty())
+        if(numActiveCAs == 0)
         {
-            LOG.warn("No CA configured");
+            LOG.warn("No active CA configured");
         }
 
+        Boolean b = config.isDevMode();
+        boolean devMode = b != null && b.booleanValue();
+
+        // CA
         Set<String> configuredCaNames = new HashSet<>();
 
         Set<CAConf> cas = new HashSet<>();
-        for(String caName : caNames)
+        for(CAType caType : config.getCAs().getCA())
         {
+            b = caType.isEnabled();
+            if(b.booleanValue() == false)
+            {
+                continue;
+            }
+
+            String caName = caType.getName();
             try
             {
-                String _serviceUrl = props.getProperty(CA_PREFIX + caName + CA_URL_SUFFIX);
-                String _caCertFile = props.getProperty(CA_PREFIX + caName + CA_CERT_SUFFIX);
-                String _responderFile = props.getProperty(CA_PREFIX + caName + CA_RESPONDER_SUFFIX);
-                String _profiles = props.getProperty(CA_PREFIX + caName + CA_PROFILES_SUFFIX);
-
-                Set<String> profiles = StringUtil.splitAsSet(_profiles, ", ");
-
-                CAConf ca = new CAConf(caName, _serviceUrl, IoCertUtil.parseCert(_caCertFile), profiles,
-                        IoCertUtil.parseCert(_responderFile));
+                CAConf ca = new CAConf(caName,
+                        caType.getUrl(),
+                        IoCertUtil.parseCert(readData(caType.getCert())),
+                        caType.getCertProfiles().getCertProfile(),
+                        IoCertUtil.parseCert(readData(caType.getResponder())));
                 cas.add(ca);
+
                 configuredCaNames.add(caName);
             }catch(IOException | CertificateException e)
             {
@@ -236,28 +203,42 @@ public final class RAWorkerImpl extends AbstractRAWorker implements RAWorker
                 }
                 LOG.debug(message, e);
 
-                if(dev_mode == false)
+                if(devMode == false)
                 {
                     throw new ConfigurationException(e);
                 }
             }
         }
 
+        // requestor
+        X509Certificate requestorCert = null;
+        RequestorType requestorConf = config.getRequestor();
+        if(requestorConf.getCert() != null)
+        {
+            try
+            {
+                requestorCert = IoCertUtil.parseCert(readData(requestorConf.getCert()));
+            } catch (Exception e)
+            {
+                throw new ConfigurationException(e);
+            }
+        }
+
         // ------------------------------------------------
         ConcurrentContentSigner requestorSigner = null;
-        if(requestorSignerType != null)
+        if(requestorConf.getSignerType() != null)
         {
             try
             {
                 requestorSigner = securityFactory.createSigner(
-                        requestorSignerType, requestorSignerConf, requestorCert);
+                        requestorConf.getSignerType(), requestorConf.getSignerConf(), requestorCert);
             } catch (SignerException e)
             {
                 throw new ConfigurationException(e);
             }
         } else
         {
-            if(signRequest)
+            if(requestorConf.isSignRequest())
             {
                 throw new ConfigurationException("Signer of requestor must be configured");
             }
@@ -279,7 +260,7 @@ public final class RAWorkerImpl extends AbstractRAWorker implements RAWorker
             {
                 cmpRequestor = new DefaultHttpCmpRequestor(
                         requestorSigner, ca.getResponder(), ca.getCert(), ca.getUrl(),
-                        securityFactory, signRequest);
+                        securityFactory, requestorConf.isSignRequest());
             } else
             {
                 cmpRequestor = new DefaultHttpCmpRequestor(
@@ -289,6 +270,17 @@ public final class RAWorkerImpl extends AbstractRAWorker implements RAWorker
 
             cmpRequestorsMap.put(ca.getName(), cmpRequestor);
         }
+    }
+
+    private static byte[] readData(FileOrValueType fileOrValue)
+    throws IOException
+    {
+        byte[] data = fileOrValue.getValue();
+        if(data == null)
+        {
+            data = IoCertUtil.read(fileOrValue.getFile());
+        }
+        return data;
     }
 
     @Override
@@ -673,11 +665,6 @@ public final class RAWorkerImpl extends AbstractRAWorker implements RAWorker
         return (bcCert == null) ? null : new X509CertificateObject(bcCert);
     }
 
-    private static boolean isEmpty(String s)
-    {
-        return s == null || s.isEmpty();
-    }
-
     public String getConfFile()
     {
         return confFile;
@@ -982,6 +969,43 @@ public final class RAWorkerImpl extends AbstractRAWorker implements RAWorker
     {
         CAConf ca = casMap.get(caName);
         return ca == null ? null : ca.getProfiles();
+    }
+
+    private static CAClientType parse(InputStream configStream)
+    throws ConfigurationException
+    {
+        synchronized (jaxbUnmarshallerLock)
+        {
+            Object root;
+            try
+            {
+                if(jaxbUnmarshaller == null)
+                {
+                    JAXBContext context = JAXBContext.newInstance(ObjectFactory.class);
+                    jaxbUnmarshaller = context.createUnmarshaller();
+
+                    final SchemaFactory schemaFact = SchemaFactory.newInstance(
+                            javax.xml.XMLConstants.W3C_XML_SCHEMA_NS_URI);
+                    URL url = CAClientType.class.getResource("/xsd/caclient-conf.xsd");
+                    jaxbUnmarshaller.setSchema(schemaFact.newSchema(url));
+                }
+
+                root = jaxbUnmarshaller.unmarshal(configStream);
+            }
+            catch(JAXBException | SAXException e)
+            {
+                throw new ConfigurationException("parse configuration failed, message: " + e.getMessage(), e);
+            }
+
+            if(root instanceof JAXBElement)
+            {
+                return (CAClientType) ((JAXBElement<?>)root).getValue();
+            }
+            else
+            {
+                throw new ConfigurationException("invalid root element type");
+            }
+        }
     }
 
 }
