@@ -8,7 +8,9 @@
 package org.xipki.ca.client.impl;
 
 import java.security.cert.X509Certificate;
+import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Set;
 
 import org.bouncycastle.asn1.x500.X500Name;
@@ -27,7 +29,7 @@ class CAConf
     private final X500Name subject;
     private final Set<String> profiles;
 
-    CAConf(String name, String url, X509Certificate cert, Set<String> profiles, X509Certificate responder)
+    CAConf(String name, String url, X509Certificate cert, Collection<String> profiles, X509Certificate responder)
     {
         ParamChecker.assertNotEmpty("name", name);
         ParamChecker.assertNotEmpty("url", url);
@@ -44,7 +46,7 @@ class CAConf
         }
         else
         {
-            this.profiles = Collections.unmodifiableSet(profiles);
+            this.profiles = Collections.unmodifiableSet(new HashSet<>(profiles));
         }
         this.responder = responder;
     }
