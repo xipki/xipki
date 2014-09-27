@@ -8,6 +8,7 @@
 package org.xipki.ca.server.mgmt;
 
 import java.util.Date;
+import java.util.TimeZone;
 
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.Extensions;
@@ -75,6 +76,11 @@ public class IdentifiedCertProfile
     public boolean hasMidnightNotBefore()
     {
         return certProfile.hasMidnightNotBefore();
+    }
+
+    public TimeZone getTimezone()
+    {
+        return certProfile.getTimezone();
     }
 
     public SubjectInfo getSubject(X500Name requestedSubject)

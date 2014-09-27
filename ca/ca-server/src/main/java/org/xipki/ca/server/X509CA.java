@@ -123,7 +123,6 @@ public class X509CA
 {
     private static long SECOND = 1000;
     private static long DAY = 24L * 60 * 60 * SECOND;
-    private static final TimeZone TIMEZONE_UTC = TimeZone.getTimeZone("UTC");
 
     private static Logger LOG = LoggerFactory.getLogger(X509CA.class);
 
@@ -1601,7 +1600,7 @@ public class X509CA
 
         if(certProfile.hasMidnightNotBefore())
         {
-            notBefore = setToMidnight(notBefore);
+            notBefore = setToMidnight(notBefore, certProfile.getTimezone());
         }
 
         if(notBefore.before(caInfo.getNotBefore()))
@@ -1609,7 +1608,7 @@ public class X509CA
             notBefore = caInfo.getNotBefore();
             if(certProfile.hasMidnightNotBefore())
             {
-                notBefore = setToMidnight(new Date(notBefore.getTime() + DAY));
+                notBefore = setToMidnight(new Date(notBefore.getTime() + DAY), certProfile.getTimezone());
             }
         }
 
@@ -1992,7 +1991,7 @@ public class X509CA
 
             if(certProfile.hasMidnightNotBefore() && maxNotAfter.equals(origMaxNotAfter) == false)
             {
-                Calendar c = Calendar.getInstance(TIMEZONE_UTC);
+                Calendar c = Calendar.getInstance(certProfile.getTimezone());
                 c.setTime(new Date(notAfter.getTime() - DAY));
                 c.set(Calendar.HOUR_OF_DAY, 23);
                 c.set(Calendar.MINUTE, 59);
@@ -2791,9 +2790,9 @@ public class X509CA
         }
     }
 
-    private static Date setToMidnight(Date date)
+    private static Date setToMidnight(Date date, TimeZone timezone)
     {
-        Calendar c = Calendar.getInstance(TIMEZONE_UTC);
+        Calendar c = Calendar.getInstance(timezone);
         c.setTime(date);
         c.set(Calendar.HOUR_OF_DAY, 0);
         c.set(Calendar.MINUTE, 0);
