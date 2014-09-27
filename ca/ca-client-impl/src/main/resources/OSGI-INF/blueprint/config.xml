@@ -11,7 +11,7 @@
   -->
   <cm:property-placeholder persistent-id="org.xipki.ca.client" update-strategy="reload">
     <cm:default-properties>
-      <cm:property name="clientConfFile" value="client-config/ca-client.properties"/>
+      <cm:property name="clientConfFile" value="client-config/ca-client.xml"/>
     </cm:default-properties>
   </cm:property-placeholder>
   <reference id="securityFactory" interface="org.xipki.security.api.SecurityFactory"/>
