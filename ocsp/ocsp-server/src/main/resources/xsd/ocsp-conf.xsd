@@ -1,320 +1,315 @@
 <?xml version="1.0" encoding="utf-8"?>
-<xs:schema targetNamespace="http://xipki.org/xipki/ocsp/conf/v1"
- xmlns="http://xipki.org/xipki/ocsp/conf/v1"
- xmlns:xs="http://www.w3.org/2001/XMLSchema"
- elementFormDefault="qualified" version="1.0"
- xmlns:jxb="http://java.sun.com/xml/ns/jaxb" jxb:version="2.0"> 
-	<xs:annotation>
-		<xs:appinfo>
-			<jxb:schemaBindings>
-				<jxb:package name="org.xipki.ocsp.conf.jaxb"/>
-			</jxb:schemaBindings>
-		</xs:appinfo>
-	</xs:annotation>
-	<!-- CertStore -->
-	<xs:element name="OCSPResponder" type="OCSPResponderType"/>
-	<xs:complexType name="OCSPResponderType">
-		<xs:sequence>
-			<xs:element name="mode" type="xs:string" minOccurs="0">
-				<xs:annotation>
-					<xs:documentation>
-						Valid values are RFC2560 and RFC6960. If not present, then 
-						RFC2560 mode will be applied.
-					</xs:documentation>
-				</xs:annotation>
-			</xs:element>
-			<xs:element name="supportsHttpGet" type="xs:boolean" minOccurs="0">
-				<xs:annotation>
-					<xs:documentation>
-						Whether to support HTTP GET for small request.
-						The default is false.
-					</xs:documentation>
-				</xs:annotation>
-			</xs:element>
-			<xs:element name="signer" type="signerType"/>
-			<xs:element name="request" type="requestType"/>
-			<xs:element name="response" type="responseType"/>
-			<xs:element name="certhashAlgorithm" type="xs:string" minOccurs="0">
-				<xs:annotation>
-					<xs:documentation>
-						CertHash algorithm in the response, If this element is not present,
-						the hash algorithm in the request will be applied.
-					</xs:documentation>
-				</xs:annotation>
-			</xs:element>
-			<xs:element name="audit" type="auditType" minOccurs="0"/>
-			<xs:element name="excludeCertProfiles" minOccurs="0">
-				<xs:complexType>
-					<xs:sequence>
-						<xs:element name="certProfile" type="xs:string" maxOccurs="unbounded"/>
-					</xs:sequence>
-				</xs:complexType>
-			</xs:element>
-			<xs:element name="certstatusStores">
-				<xs:complexType>
-					<xs:sequence>
-						<xs:element name="certstatusStore" type="certstatusStoreType" maxOccurs="unbounded"/>
-					</xs:sequence>
-				</xs:complexType>
-			</xs:element>
-		</xs:sequence>
-	</xs:complexType>
-	<xs:complexType name="signerType">
-		<xs:sequence>
-			<xs:element name="type" type="xs:string"/>
-			<xs:element name="key" type="xs:string"/>
-			<xs:element name="algorithms">
-				<xs:complexType>
-					<xs:sequence>
-						<xs:element name="algorithm" type="xs:string" maxOccurs="unbounded"/>
-					</xs:sequence>
-				</xs:complexType>
-			</xs:element>
-			<xs:element name="includeSignerCertInResp" type="xs:boolean">
-				<xs:annotation>
-					<xs:documentation>
-						Whether to include responder certificate in the response.
-						The default is false.
-					</xs:documentation>
-				</xs:annotation>
-			</xs:element>
-			<xs:element name="includeSignerCACertsInResp" type="xs:boolean">
-				<xs:annotation>
-					<xs:documentation>
-						Whether to include responder certificate in the response.
-						The default is false.
-					</xs:documentation>
-				</xs:annotation>
-			</xs:element>
-			<xs:element name="certFile" type="xs:string" minOccurs="0"/>
-			<xs:element name="caCertFiles" minOccurs="0">
-				<xs:complexType>
-					<xs:sequence>
-						<xs:element name="caCertFile" type="xs:string" maxOccurs="unbounded"/>
-					</xs:sequence>
-				</xs:complexType>
-			</xs:element>
-		</xs:sequence>
-	</xs:complexType>
-	<xs:complexType name="requestType">
-		<xs:sequence>
-			<xs:element name="maxRequestSize" type="xs:int" minOccurs="0"/>
-			<xs:element name="nonce" type="nonceType" minOccurs="0"/>
-			<xs:element name="signatureRequired" type="xs:boolean"/>
-			<xs:element name="validateSignature" type="xs:boolean"/>
-			<xs:element name="hashAlgorithms" minOccurs="0">
-				<xs:complexType>
-					<xs:sequence>
-						<xs:element name="algorithm" type="xs:string" maxOccurs="unbounded"/>
-					</xs:sequence>
-				</xs:complexType>
-			</xs:element>
-			<xs:element name="certpathValidation" minOccurs="0">
-				<xs:complexType>
-					<xs:sequence>
-						<xs:element name="validationModel" type="validationModelType"/>
-						<xs:element name="trustAnchors" type="certCollectionType"/>
-						<xs:element name="certs" type="certCollectionType" minOccurs="0"/>
-					</xs:sequence>
-				</xs:complexType>
-			</xs:element>
-		</xs:sequence>
-	</xs:complexType>
-	<xs:simpleType name="validationModelType">
-		<xs:restriction base="xs:string">
-			<xs:enumeration value="PKIX"/>
-			<xs:enumeration value="CHAIN"/>
-		</xs:restriction>
-	</xs:simpleType>
-	<xs:complexType name="certCollectionType">
-		<xs:choice>
-			<xs:element name="dir" type="xs:string"/>
-			<xs:element name="keystore">
-				<xs:complexType>
-					<xs:all>
-						<xs:element name="type" type="xs:string"/>
-						<xs:element name="uri" type="xs:anyURI" minOccurs="0"/>
-						<xs:element name="password" type="xs:string" minOccurs="0"/>
-					</xs:all>
-				</xs:complexType>
-			</xs:element>
-		</xs:choice>
-	</xs:complexType>
-	<xs:complexType name="responseType">
-		<xs:all>
-			<xs:element name="noRevReason" type="xs:boolean" minOccurs="0"/>
-			<xs:element name="noInvalidityDate" type="xs:boolean" minOccurs="0">
-				<xs:annotation>
-					<xs:documentation>
-						Whether not to include extension InvalidityDate in OCSP response.
-						The default is false. 
-					</xs:documentation>
-				</xs:annotation>
-			</xs:element>
-			<xs:element name="cache" type="cacheType" minOccurs="0"/>
-		</xs:all>
-	</xs:complexType>
-	<xs:complexType name="nonceType">
-		<xs:sequence>
-			<xs:element name="required" type="xs:boolean"/>
-			<xs:element name="minLen" type="xs:int" minOccurs="0"/>
-			<xs:element name="maxLen" type="xs:int" minOccurs="0"/>
-		</xs:sequence>
-	</xs:complexType>
-	<xs:complexType name="cacheType">
-		<xs:sequence>
-			<xs:element name="cacheMaxAge" type="xs:int" minOccurs="0">
-				<xs:annotation>
-					<xs:documentation>
-						max-age in seconds. Only useful for OCSP request sent by HTTP GET. 
-					</xs:documentation>
-				</xs:annotation>
-			</xs:element>
-		</xs:sequence>
-	</xs:complexType>
-	
-	<xs:complexType name="auditType">
-		<xs:sequence>
-			<xs:element name="enabled" type="xs:boolean"/>
-			<xs:element name="certprofileMappings" minOccurs="0">
-				<xs:complexType>
-					<xs:sequence>
-						<xs:element name="mapping" type="mappingType" maxOccurs="unbounded"/>
-					</xs:sequence>
-				</xs:complexType>
-			</xs:element>
-		</xs:sequence>
-	</xs:complexType>
-	<xs:complexType name="mappingType">
-		<xs:attribute name="from" type="xs:string"/>
-		<xs:attribute name="to" type="xs:string"/>
-	</xs:complexType>
-	<xs:complexType name="certstatusStoreType">
-		<xs:sequence>
-			<xs:element name="name" type="xs:string"/>
-			<xs:choice>
-				<xs:element name="dbStore" type="dbStoreType"/>
-				<xs:element name="crlStore" type="crlStoreType"/>
-				<xs:element name="customStore" type="customStoreType"/>
-			</xs:choice>
-			<xs:element name="inheritCaRevocation" type="xs:boolean" minOccurs="0">
-				<xs:annotation>
-					<xs:documentation>
-						Whether to consider certificate as revoked if CA is revoked.
-						The default is true.
-					</xs:documentation>
-				</xs:annotation>
-			</xs:element>
-			<xs:element name="retentionInterval" type="xs:int" minOccurs="0">
-				<xs:annotation>
-					<xs:documentation>
-						Days of certificates stored in certstore after expiration
-						0 for no, -1 for forever. The default is 0 for CRL based
-						store and -1 for database based store						
-					</xs:documentation>
-				</xs:annotation>
-			</xs:element>
-			<xs:element name="unknownSerialAsGood" type="xs:boolean" minOccurs="0">
-				<xs:annotation>
-					<xs:documentation>
-						Whether Certificate with known Issuer but unknown serial number
-						is considered as good. The default is true for CRL based store
-						and false for database based store
-					</xs:documentation>
-				</xs:annotation>
-			</xs:element>
-			<xs:element name="includeArchiveCutoff" type="xs:boolean" minOccurs="0">
-				<xs:annotation>
-					<xs:documentation>
-						Whether to include extension archiveCutoff in OCSP response if 
-						retentionInterval is not 0. The default is true.
-					</xs:documentation>
-				</xs:annotation>
-			</xs:element>
-			<xs:element name="includeCrlID" type="xs:boolean" minOccurs="0">
-				<xs:annotation>
-					<xs:documentation>
-						Whether to include extension crlID in OCSP response if 
-						retentionInterval is not 0. It is ignored for database based
-						store. The default is true for CRL based store. 
-					</xs:documentation>
-				</xs:annotation>
-			</xs:element>
-			<xs:element name="includeCertHash" type="xs:boolean" minOccurs="0">
-				<xs:annotation>
-					<xs:documentation>
-						Whether to include extension CertHash in OCSP response.
-						The default is false. 
-					</xs:documentation>
-				</xs:annotation>
-			</xs:element>
-		</xs:sequence>
-	</xs:complexType>
-	<xs:complexType name="dbStoreType">
-		<xs:sequence>
-			<xs:element name="dbConfFile" type="xs:string"/>
-			<xs:element name="cacerts" minOccurs="0">
-				<xs:annotation>
-					<xs:documentation>
-						Which CAs should be considered. If not present, then all CAs will be 
-						considered.
-					</xs:documentation>
-				</xs:annotation>
-				<xs:complexType>
-					<xs:sequence>
-						<xs:element name="cacert" type="xs:string" maxOccurs="unbounded"/>
-					</xs:sequence>
-				</xs:complexType>
-			</xs:element>
-		</xs:sequence>
-	</xs:complexType>
-	<xs:complexType name="crlStoreType">
-		<xs:sequence>
-			<xs:element name="crlFile" type="xs:string"/>
-			<xs:element name="crlUrl" type="xs:string" minOccurs="0"/>
-			<xs:element name="deltaCrlFile" type="xs:string" minOccurs="0"/>
-			<xs:element name="useUpdateDatesFromCRL" type="xs:boolean" minOccurs="0">
-				<xs:annotation>
-					<xs:documentation>
-						 Where use thisUpdate and nextUpdate of CRL in the corresponding fields
-						 of OCSP response. The default value is true.
-					</xs:documentation>
-				</xs:annotation>
-			</xs:element>
-			<xs:element name="caCertFile" type="xs:string"/>
-			<xs:element name="issuerCertFile" type="xs:string" minOccurs="0">
-				<xs:annotation>
-					<xs:documentation>
-						 Required for indirect CRL
-					</xs:documentation>
-				</xs:annotation>
-			</xs:element>
-			<xs:element name="caRevoked" type="xs:boolean" minOccurs="0">
-				<xs:annotation>
-					<xs:documentation>
-						 Whether CA is revoked. The default is false.
-					</xs:documentation>
-				</xs:annotation>
-			</xs:element>
-			<xs:element name="caRevocationTime" type="xs:dateTime" minOccurs="0">
-				<xs:annotation>
-					<xs:documentation>
-						 When CA certificate is revoked. Required if caRevoked is true
-					</xs:documentation>
-				</xs:annotation>
-			</xs:element>
-		</xs:sequence>
-	</xs:complexType>
-	<xs:complexType name="customStoreType">
-		<xs:sequence>
-			<xs:element name="className" type="xs:string">
-				<xs:annotation>
-					<xs:documentation>
-						 class that extends the Java class org.xipki.ocsp.api.CertStatusStore
-					</xs:documentation>
-				</xs:annotation>
-			</xs:element>
-			<xs:element name="conf" type="xs:string"/>
-		</xs:sequence>
-	</xs:complexType>
+<xs:schema xmlns="http://xipki.org/xipki/ocsp/conf/v1" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:jxb="http://java.sun.com/xml/ns/jaxb" targetNamespace="http://xipki.org/xipki/ocsp/conf/v1" elementFormDefault="qualified" version="1.0" jxb:version="2.0">
+  <xs:annotation>
+    <xs:appinfo>
+      <jxb:schemaBindings>
+        <jxb:package name="org.xipki.ocsp.conf.jaxb"/>
+      </jxb:schemaBindings>
+    </xs:appinfo>
+  </xs:annotation>
+  <!-- CertStore -->
+  <xs:element name="OCSPResponder" type="OCSPResponderType"/>
+  <xs:complexType name="OCSPResponderType">
+    <xs:sequence>
+      <xs:element name="mode" type="xs:string" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation>
+            Valid values are RFC2560 and RFC6960. If not present, then 
+            RFC2560 mode will be applied.
+          </xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="supportsHttpGet" type="xs:boolean" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation>
+            Whether to support HTTP GET for small request.
+            The default is false.
+          </xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="signer" type="signerType"/>
+      <xs:element name="request" type="requestType"/>
+      <xs:element name="response" type="responseType"/>
+      <xs:element name="certhashAlgorithm" type="xs:string" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation>
+            CertHash algorithm in the response, If this element is not present,
+            the hash algorithm in the request will be applied.
+          </xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="audit" type="auditType" minOccurs="0"/>
+      <xs:element name="excludeCertProfiles" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="certProfile" type="xs:string" maxOccurs="unbounded"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="certstatusStores">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="certstatusStore" type="certstatusStoreType" maxOccurs="unbounded"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="signerType">
+    <xs:sequence>
+      <xs:element name="type" type="xs:string"/>
+      <xs:element name="key" type="xs:string"/>
+      <xs:element name="algorithms">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="algorithm" type="xs:string" maxOccurs="unbounded"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="includeSignerCertInResp" type="xs:boolean">
+        <xs:annotation>
+          <xs:documentation>
+            Whether to include responder certificate in the response.
+            The default is false.
+          </xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="includeSignerCACertsInResp" type="xs:boolean">
+        <xs:annotation>
+          <xs:documentation>
+            Whether to include responder certificate in the response.
+            The default is false.
+          </xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="certFile" type="xs:string" minOccurs="0"/>
+      <xs:element name="caCertFiles" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="caCertFile" type="xs:string" maxOccurs="unbounded"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="requestType">
+    <xs:sequence>
+      <xs:element name="maxRequestSize" type="xs:int" minOccurs="0"/>
+      <xs:element name="nonce" type="nonceType" minOccurs="0"/>
+      <xs:element name="signatureRequired" type="xs:boolean"/>
+      <xs:element name="validateSignature" type="xs:boolean"/>
+      <xs:element name="hashAlgorithms" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="algorithm" type="xs:string" maxOccurs="unbounded"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="certpathValidation" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="validationModel" type="validationModelType"/>
+            <xs:element name="trustAnchors" type="certCollectionType"/>
+            <xs:element name="certs" type="certCollectionType" minOccurs="0"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:simpleType name="validationModelType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="PKIX"/>
+      <xs:enumeration value="CHAIN"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:complexType name="certCollectionType">
+    <xs:choice>
+      <xs:element name="dir" type="xs:string"/>
+      <xs:element name="keystore">
+        <xs:complexType>
+          <xs:all>
+            <xs:element name="type" type="xs:string"/>
+            <xs:element name="uri" type="xs:anyURI" minOccurs="0"/>
+            <xs:element name="password" type="xs:string" minOccurs="0"/>
+          </xs:all>
+        </xs:complexType>
+      </xs:element>
+    </xs:choice>
+  </xs:complexType>
+  <xs:complexType name="responseType">
+    <xs:all>
+      <xs:element name="noRevReason" type="xs:boolean" minOccurs="0"/>
+      <xs:element name="noInvalidityDate" type="xs:boolean" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation>
+            Whether not to include extension InvalidityDate in OCSP response.
+            The default is false. 
+          </xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="cache" type="cacheType" minOccurs="0"/>
+    </xs:all>
+  </xs:complexType>
+  <xs:complexType name="nonceType">
+    <xs:sequence>
+      <xs:element name="required" type="xs:boolean"/>
+      <xs:element name="minLen" type="xs:int" minOccurs="0"/>
+      <xs:element name="maxLen" type="xs:int" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="cacheType">
+    <xs:sequence>
+      <xs:element name="cacheMaxAge" type="xs:int" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation>
+            max-age in seconds. Only useful for OCSP request sent by HTTP GET. 
+          </xs:documentation>
+        </xs:annotation>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="auditType">
+    <xs:sequence>
+      <xs:element name="enabled" type="xs:boolean"/>
+      <xs:element name="certprofileMappings" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="mapping" type="mappingType" maxOccurs="unbounded"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="mappingType">
+    <xs:attribute name="from" type="xs:string"/>
+    <xs:attribute name="to" type="xs:string"/>
+  </xs:complexType>
+  <xs:complexType name="certstatusStoreType">
+    <xs:sequence>
+      <xs:element name="name" type="xs:string"/>
+      <xs:choice>
+        <xs:element name="dbStore" type="dbStoreType"/>
+        <xs:element name="crlStore" type="crlStoreType"/>
+        <xs:element name="customStore" type="customStoreType"/>
+      </xs:choice>
+      <xs:element name="inheritCaRevocation" type="xs:boolean" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation>
+            Whether to consider certificate as revoked if CA is revoked.
+            The default is true.
+          </xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="retentionInterval" type="xs:int" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation>
+            Days of certificates stored in certstore after expiration
+            0 for no, -1 for forever. The default is 0 for CRL based
+            store and -1 for database based store            
+          </xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="unknownSerialAsGood" type="xs:boolean" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation>
+            Whether Certificate with known Issuer but unknown serial number
+            is considered as good. The default is true for CRL based store
+            and false for database based store
+          </xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="includeArchiveCutoff" type="xs:boolean" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation>
+            Whether to include extension archiveCutoff in OCSP response if 
+            retentionInterval is not 0. The default is true.
+          </xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="includeCrlID" type="xs:boolean" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation>
+            Whether to include extension crlID in OCSP response if 
+            retentionInterval is not 0. It is ignored for database based
+            store. The default is true for CRL based store. 
+          </xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="includeCertHash" type="xs:boolean" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation>
+            Whether to include extension CertHash in OCSP response.
+            The default is false. 
+          </xs:documentation>
+        </xs:annotation>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="dbStoreType">
+    <xs:sequence>
+      <xs:element name="dbConfFile" type="xs:string"/>
+      <xs:element name="cacerts" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation>
+            Which CAs should be considered. If not present, then all CAs will be 
+            considered.
+          </xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="cacert" type="xs:string" maxOccurs="unbounded"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="crlStoreType">
+    <xs:sequence>
+      <xs:element name="crlFile" type="xs:string"/>
+      <xs:element name="crlUrl" type="xs:string" minOccurs="0"/>
+      <xs:element name="deltaCrlFile" type="xs:string" minOccurs="0"/>
+      <xs:element name="useUpdateDatesFromCRL" type="xs:boolean" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation>
+             Where use thisUpdate and nextUpdate of CRL in the corresponding fields
+             of OCSP response. The default value is true.
+          </xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="caCertFile" type="xs:string"/>
+      <xs:element name="issuerCertFile" type="xs:string" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation>
+             Required for indirect CRL
+          </xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="caRevoked" type="xs:boolean" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation>
+             Whether CA is revoked. The default is false.
+          </xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="caRevocationTime" type="xs:dateTime" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation>
+             When CA certificate is revoked. Required if caRevoked is true
+          </xs:documentation>
+        </xs:annotation>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="customStoreType">
+    <xs:sequence>
+      <xs:element name="className" type="xs:string">
+        <xs:annotation>
+          <xs:documentation>
+             class that extends the Java class org.xipki.ocsp.api.CertStatusStore
+          </xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="conf" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
 </xs:schema>
