@@ -2,66 +2,56 @@
 <!--
  Copyright (c) 2014 Lijun Liao
  -->
-<xs:schema targetNamespace="http://xipki.org/caclient/conf/v1"
- xmlns="http://xipki.org/caclient/conf/v1"
- xmlns:xs="http://www.w3.org/2001/XMLSchema"
- elementFormDefault="qualified" version="1.0"
- xmlns:jxb="http://java.sun.com/xml/ns/jaxb" jxb:version="2.0"> 
-	<xs:annotation>
-		<xs:appinfo>
-			<jxb:schemaBindings>
-				<jxb:package name="org.xipki.ca.client.impl.jaxb"/>
-			</jxb:schemaBindings>
-		</xs:appinfo>
-	</xs:annotation>
-
-	<xs:element name="CAClient" type="CAClientType"/>
-	
-	<xs:complexType name="CAClientType">
-		<xs:all>
-			<xs:element name="devMode" type="xs:boolean" minOccurs="0"/>
-			<xs:element name="requestor" type="requestorType"/>
-			<xs:element name="CAs">
-				<xs:complexType>
-					<xs:sequence>
-						<xs:element name="CA" type="CAType" minOccurs="0" maxOccurs="unbounded"/>
-					</xs:sequence>
-				</xs:complexType>
-			</xs:element>
-		</xs:all>
-	</xs:complexType>
-	
-	<xs:complexType name="requestorType">
-		<xs:all>
-			<xs:element name="signRequest" type="xs:boolean"/>
-			<xs:element name="cert" type="fileOrValueType" minOccurs="0"/>
-			<xs:element name="signerType" type="xs:string" minOccurs="0"/>
-			<xs:element name="signerConf" type="xs:string" minOccurs="0"/>
-		</xs:all>
-	</xs:complexType>
-	
-	<xs:complexType name="CAType">
-		<xs:all>
-			<xs:element name="name" type="xs:string"/>
-			<xs:element name="enabled" type="xs:boolean"/>
-			<xs:element name="url" type="xs:anyURI"/>
-			<xs:element name="cert" type="fileOrValueType"/>
-			<xs:element name="responder" type="fileOrValueType"/>
-			<xs:element name="certProfiles" minOccurs="0">
-				<xs:complexType>
-					<xs:sequence>
-						<xs:element name="certProfile" type="xs:string" maxOccurs="unbounded"/>
-					</xs:sequence>
-				</xs:complexType>
-			</xs:element>
-		</xs:all>
-	</xs:complexType>
-	
-	<xs:complexType name="fileOrValueType">
-		<xs:choice>
-			<xs:element name="value" type="xs:base64Binary"/>
-			<xs:element name="file" type="xs:string"/>
-		</xs:choice>
-	</xs:complexType>
-
+<xs:schema xmlns="http://xipki.org/caclient/conf/v1" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:jxb="http://java.sun.com/xml/ns/jaxb" targetNamespace="http://xipki.org/caclient/conf/v1" elementFormDefault="qualified" version="1.0" jxb:version="2.0">
+  <xs:annotation>
+    <xs:appinfo>
+      <jxb:schemaBindings>
+        <jxb:package name="org.xipki.ca.client.impl.jaxb"/>
+      </jxb:schemaBindings>
+    </xs:appinfo>
+  </xs:annotation>
+  <xs:element name="CAClient" type="CAClientType"/>
+  <xs:complexType name="CAClientType">
+    <xs:all>
+      <xs:element name="devMode" type="xs:boolean" minOccurs="0"/>
+      <xs:element name="requestor" type="requestorType"/>
+      <xs:element name="CAs">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="CA" type="CAType" minOccurs="0" maxOccurs="unbounded"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+    </xs:all>
+  </xs:complexType>
+  <xs:complexType name="requestorType">
+    <xs:all>
+      <xs:element name="signRequest" type="xs:boolean"/>
+      <xs:element name="cert" type="fileOrValueType" minOccurs="0"/>
+      <xs:element name="signerType" type="xs:string" minOccurs="0"/>
+      <xs:element name="signerConf" type="xs:string" minOccurs="0"/>
+    </xs:all>
+  </xs:complexType>
+  <xs:complexType name="CAType">
+    <xs:all>
+      <xs:element name="name" type="xs:string"/>
+      <xs:element name="enabled" type="xs:boolean"/>
+      <xs:element name="url" type="xs:anyURI"/>
+      <xs:element name="cert" type="fileOrValueType"/>
+      <xs:element name="responder" type="fileOrValueType"/>
+      <xs:element name="certProfiles" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="certProfile" type="xs:string" maxOccurs="unbounded"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+    </xs:all>
+  </xs:complexType>
+  <xs:complexType name="fileOrValueType">
+    <xs:choice>
+      <xs:element name="value" type="xs:base64Binary"/>
+      <xs:element name="file" type="xs:string"/>
+    </xs:choice>
+  </xs:complexType>
 </xs:schema>
