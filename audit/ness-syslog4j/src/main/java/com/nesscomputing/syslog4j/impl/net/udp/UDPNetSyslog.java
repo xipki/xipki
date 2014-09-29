@@ -95,8 +95,9 @@ public class UDPNetSyslog extends AbstractNetSyslog
             try
             {
                 this.socket.send(packet);
+                /* -----BEGIN PATCH----- */
                 attempts = -1;
-
+                /* -----END PATCH----- */
             } catch (IOException ioe)
             {
                 /* -----BEGIN ORIGINAL-----
