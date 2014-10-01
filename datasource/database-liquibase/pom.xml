@@ -27,7 +27,7 @@
     </dependency>
     <dependency>
       <groupId>org.liquibase</groupId>
-      <artifactId>liquibase-core</artifactId>
+      <artifactId>liquibase-osgi</artifactId>
       <version>${liquibase.version}</version>
       <exclusions>
         <exclusion>
