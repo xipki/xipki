@@ -16,8 +16,8 @@ ca:enroll-cert -ca RCA1 -profile RCA-Cross -p10 output/RCA2.p10 -out output/RCA2
 #################################################################
 features:install xipki-caclient-shell
 
-# Wait one second
-sleep 1000
+# Wait two seconds
+sleep 2000
 
 ## Enroll certificates
 # Certificate OCSP1

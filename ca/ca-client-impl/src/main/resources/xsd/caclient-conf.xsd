@@ -18,6 +18,17 @@
       <xs:element name="CAs">
         <xs:complexType>
           <xs:sequence>
+            <xs:element name="CAInfoUpdateInterval" type="xs:int" minOccurs="0">
+              <xs:annotation>
+                <xs:documentation>
+                   - Update interval in minutes.
+                   - The non-positive value indicates that the CAInfo will be retrieved only
+                     when the CA client starts. 
+                   - Value between 1 and 4 will be corrected to 5. 
+                   - Default value is 10
+                </xs:documentation>
+              </xs:annotation>
+            </xs:element>
             <xs:element name="CA" type="CAType" minOccurs="0" maxOccurs="unbounded"/>
           </xs:sequence>
         </xs:complexType>
@@ -35,19 +46,29 @@
   <xs:complexType name="CAType">
     <xs:all>
       <xs:element name="name" type="xs:string"/>
-      <xs:element name="enabled" type="xs:boolean"/>
       <xs:element name="url" type="xs:anyURI"/>
-      <xs:element name="cert" type="fileOrValueType"/>
-      <xs:element name="responder" type="fileOrValueType"/>
-      <xs:element name="certProfiles" minOccurs="0">
-        <xs:complexType>
-          <xs:sequence>
-            <xs:element name="certProfile" type="xs:string" maxOccurs="unbounded"/>
-          </xs:sequence>
-        </xs:complexType>
-      </xs:element>
+      <xs:element name="CAInfo" type="CAInfoType"/>
     </xs:all>
+    <xs:attribute name="enabled" type="xs:boolean" default="true"/>
   </xs:complexType>
+  
+  <xs:complexType name="CAInfoType">
+    <xs:choice>
+      <xs:element name="autoConf"/>
+      <xs:sequence>
+        <xs:element name="cert" type="fileOrValueType" minOccurs="0"/>
+        <xs:element name="responder" type="fileOrValueType" minOccurs="0"/>
+        <xs:element name="certProfiles" minOccurs="0">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="certProfile" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+      </xs:sequence>
+    </xs:choice>
+  </xs:complexType>
+
   <xs:complexType name="fileOrValueType">
     <xs:choice>
       <xs:element name="value" type="xs:base64Binary"/>
