@@ -7,16 +7,24 @@
 
 package org.xipki.ca.client.impl;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.security.cert.CRLException;
+import java.security.cert.CertificateException;
 import java.security.cert.X509CRL;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 
 import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1Enumerated;
@@ -25,13 +33,13 @@ import org.bouncycastle.asn1.ASN1Integer;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.ASN1OctetString;
 import org.bouncycastle.asn1.DEROctetString;
+import org.bouncycastle.asn1.DERUTF8String;
 import org.bouncycastle.asn1.cmp.CMPCertificate;
 import org.bouncycastle.asn1.cmp.CMPObjectIdentifiers;
 import org.bouncycastle.asn1.cmp.CertRepMessage;
 import org.bouncycastle.asn1.cmp.CertResponse;
 import org.bouncycastle.asn1.cmp.CertifiedKeyPair;
 import org.bouncycastle.asn1.cmp.ErrorMsgContent;
-import org.bouncycastle.asn1.cmp.GenMsgContent;
 import org.bouncycastle.asn1.cmp.GenRepContent;
 import org.bouncycastle.asn1.cmp.InfoTypeAndValue;
 import org.bouncycastle.asn1.cmp.PKIBody;
@@ -64,6 +72,8 @@ import org.bouncycastle.operator.DigestCalculatorProvider;
 import org.bouncycastle.operator.bc.BcDigestCalculatorProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 import org.xipki.ca.cmp.CmpUtil;
 import org.xipki.ca.cmp.client.ClientErrorCode;
 import org.xipki.ca.cmp.client.CmpRequestor;
@@ -90,7 +100,8 @@ import org.xipki.security.api.SecurityFactory;
 import org.xipki.security.common.CmpUtf8Pairs;
 import org.xipki.security.common.CustomObjectIdentifiers;
 import org.xipki.security.common.IoCertUtil;
-import org.xipki.security.common.ParamChecker;
+import org.xipki.security.common.XMLUtil;
+import org.xml.sax.SAXException;
 
 /**
  * @author Lijun Liao
@@ -106,43 +117,33 @@ abstract class X509CmpRequestor extends CmpRequestor
 
     private static final Logger LOG = LoggerFactory.getLogger(X509CmpRequestor.class);
 
+    private DocumentBuilder xmlDocBuilder;
+
     private boolean implicitConfirm = true;
-    private final X509Certificate caCert;
 
     X509CmpRequestor(X509Certificate requestorCert,
             X509Certificate responderCert,
-            X509Certificate caCert,
             SecurityFactory securityFactory)
     {
-        super(responderCert, responderCert, securityFactory);
-        ParamChecker.assertNotNull("caCert", caCert);
-        this.caCert = caCert;
+        super(requestorCert, responderCert, securityFactory);
     }
 
     X509CmpRequestor(ConcurrentContentSigner requestor,
             X509Certificate responderCert,
-            X509Certificate caCert,
             SecurityFactory securityFactory,
             boolean signRequest)
     {
         super(requestor, responderCert, securityFactory, signRequest);
-        ParamChecker.assertNotNull("caCert", caCert);
-        this.caCert = caCert;
     }
 
     protected abstract byte[] send(byte[] request)
     throws IOException;
 
-    public X509Certificate getCaCert()
-    {
-        return caCert;
-    }
-
     public CmpResultType generateCRL()
     throws CmpRequestorException
     {
         ASN1ObjectIdentifier type = new ASN1ObjectIdentifier(CustomObjectIdentifiers.id_cmp_generateCRL);
-        PKIMessage request = buildMessageWithGeneralMsgContent(type);
+        PKIMessage request = buildMessageWithGeneralMsgContent(type, null);
         PKIResponse response = signAndSend(request);
         return evaluateCRLResponse(response, type);
     }
@@ -209,7 +210,7 @@ abstract class X509CmpRequestor extends CmpRequestor
         }
         if(itvCurrentCRL == null)
         {
-            throw new CmpRequestorException("The response does not contain InfoTypeAndValue currentCRL "
+            throw new CmpRequestorException("The response does not contain InfoTypeAndValue "
                     + exepectedType);
         }
 
@@ -533,7 +534,7 @@ abstract class X509CmpRequestor extends CmpRequestor
             CertificateConfirmationContentBuilder certConfirmBuilder)
     throws CmpRequestorException
     {
-        PKIHeader header = buildPKIHeader(implicitConfirm, tid, null, null);
+        PKIHeader header = buildPKIHeader(implicitConfirm, tid, null, (InfoTypeAndValue[]) null);
         CertificateConfirmationContent certConfirm;
         try
         {
@@ -544,24 +545,6 @@ abstract class X509CmpRequestor extends CmpRequestor
         }
         PKIBody body = new PKIBody(PKIBody.TYPE_CERT_CONFIRM, certConfirm.toASN1Structure());
         return new PKIMessage(header, body);
-    }
-
-    private PKIMessage buildMessageWithGeneralMsgContent(ASN1ObjectIdentifier type)
-    throws CmpRequestorException
-    {
-        return buildMessageWithGeneralMsgContent(type, null);
-    }
-
-    private PKIMessage buildMessageWithGeneralMsgContent(ASN1ObjectIdentifier type, ASN1Encodable value)
-    throws CmpRequestorException
-    {
-        PKIHeader header = buildPKIHeader(null);
-        InfoTypeAndValue itv = new InfoTypeAndValue(type);
-        GenMsgContent genMsgContent = new GenMsgContent(itv);
-        PKIBody body = new PKIBody(PKIBody.TYPE_GEN_MSG, genMsgContent);
-
-        PKIMessage pkiMessage = new PKIMessage(header, body);
-        return pkiMessage;
     }
 
     private PKIMessage buildRevokeCertRequest(RevokeCertRequestType request)
@@ -667,7 +650,7 @@ abstract class X509CmpRequestor extends CmpRequestor
 
     private PKIMessage buildPKIMessage(EnrollCertRequestType req, String username)
     {
-        PKIHeader header = buildPKIHeader(implicitConfirm, null, username, null);
+        PKIHeader header = buildPKIHeader(implicitConfirm, null, username, (InfoTypeAndValue[]) null);
 
         List<EnrollCertRequestEntryType> reqEntries = req.getRequestEntries();
         CertReqMsg[] certReqMsgs = new CertReqMsg[reqEntries.size()];
@@ -704,7 +687,7 @@ abstract class X509CmpRequestor extends CmpRequestor
 
     private PKIMessage buildPKIMessage(CertRequest req, ProofOfPossession pop, String profileName, String username)
     {
-        PKIHeader header = buildPKIHeader(implicitConfirm, null, username, null);
+        PKIHeader header = buildPKIHeader(implicitConfirm, null, username, (InfoTypeAndValue[]) null);
 
         CmpUtf8Pairs utf8Pairs = new CmpUtf8Pairs(CmpUtf8Pairs.KEY_CERT_PROFILE, profileName);
         AttributeTypeAndValue certProfileInfo = CmpUtil.buildAttributeTypeAndValue(utf8Pairs);
@@ -728,6 +711,67 @@ abstract class X509CmpRequestor extends CmpRequestor
         PKIMessage reqMessage = buildRevokeCertRequest(request);
         reqMessage = sign(reqMessage);
         return reqMessage;
+    }
+
+    CAInfo retrieveCAInfo(String caName)
+    throws CmpRequestorException
+    {
+        DocumentBuilder docBuilder = xmlDocBuilder;
+        if(docBuilder == null)
+        {
+            DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+            dbf.setNamespaceAware(true);
+            try
+            {
+                docBuilder = dbf.newDocumentBuilder();
+                xmlDocBuilder = docBuilder;
+            } catch (ParserConfigurationException e)
+            {
+                throw new CmpRequestorException(e);
+            }
+        }
+
+        PKIMessage request = buildMessageWithGeneralMsgContent(
+                new ASN1ObjectIdentifier(CustomObjectIdentifiers.id_cmp_getSystemInfo), null);
+        PKIResponse response = signAndSend(request);
+        ASN1Encodable itvValue = extractGeneralRepContent(response, CustomObjectIdentifiers.id_cmp_getSystemInfo);
+        DERUTF8String utf8Str = DERUTF8String.getInstance(itvValue);
+        String systemInfoStr = utf8Str.getString();
+
+        LOG.debug("CAInfo for CA {}: {}", caName, systemInfoStr);
+        Document doc;
+        try
+        {
+            doc = docBuilder.parse(new ByteArrayInputStream(systemInfoStr.getBytes("UTF-8")));
+        } catch (SAXException | IOException e)
+        {
+            throw new CmpRequestorException("Could not parse the returned systemInfo for CA " + caName, e);
+        }
+
+        X509Certificate caCert;
+        String namespace = null;
+        String b64CACert = XMLUtil.getValueOfFirstElementChild(doc.getDocumentElement(), namespace, "CACert");
+        try
+        {
+            caCert = IoCertUtil.parseBase64EncodedCert(b64CACert);
+        } catch (CertificateException | IOException e)
+        {
+            throw new CmpRequestorException("Could no parse the CA certificate", e);
+        }
+
+        Element profilesElement = XMLUtil.getFirstElementChild(doc.getDocumentElement(), namespace, "CertProfiles");
+        Set<String> profiles = new HashSet<>();
+        if(profilesElement != null)
+        {
+            List<Element> profileElements = XMLUtil.getElementChilden(profilesElement, namespace, "CertProfile");
+            for(Element element : profileElements)
+            {
+                String profile = XMLUtil.getNodeValue(element);
+                profiles.add(profile.trim());
+            }
+        }
+
+        return new CAInfo(caCert, profiles);
     }
 
 }

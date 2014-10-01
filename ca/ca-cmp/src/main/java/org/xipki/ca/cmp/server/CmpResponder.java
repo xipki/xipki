@@ -17,9 +17,13 @@ import java.util.Map;
 import javax.security.auth.x500.X500Principal;
 
 import org.bouncycastle.asn1.ASN1GeneralizedTime;
+import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.ASN1OctetString;
 import org.bouncycastle.asn1.DEROctetString;
 import org.bouncycastle.asn1.cmp.ErrorMsgContent;
+import org.bouncycastle.asn1.cmp.GenMsgContent;
+import org.bouncycastle.asn1.cmp.GenRepContent;
+import org.bouncycastle.asn1.cmp.InfoTypeAndValue;
 import org.bouncycastle.asn1.cmp.PKIBody;
 import org.bouncycastle.asn1.cmp.PKIFailureInfo;
 import org.bouncycastle.asn1.cmp.PKIFreeText;
@@ -52,6 +56,7 @@ import org.xipki.security.api.ConcurrentContentSigner;
 import org.xipki.security.api.SecurityFactory;
 import org.xipki.security.common.BCCompatilbilityUtil;
 import org.xipki.security.common.CmpUtf8Pairs;
+import org.xipki.security.common.CustomObjectIdentifiers;
 import org.xipki.security.common.IoCertUtil;
 import org.xipki.security.common.LogUtil;
 import org.xipki.security.common.ParamChecker;
@@ -102,8 +107,6 @@ public abstract class CmpResponder
         PKIHeader reqHeader = message.getHeader();
         ASN1OctetString tid = reqHeader.getTransactionID();
 
-        checkRequestRecipient(reqHeader);
-
         if(tid == null)
         {
             byte[] randomBytes = randomTransactionId();
@@ -121,7 +124,40 @@ public abstract class CmpResponder
         String statusText = null;
 
         Date messageTime = BCCompatilbilityUtil.getMessageTime(reqHeader);
-        if(messageTime == null)
+
+        boolean cmdForCmpRespCert = false;
+        boolean intentMe = checkRequestRecipient(reqHeader);
+
+        if(intentMe == false)
+        {
+            int bodyType = message.getBody().getType();
+            if(bodyType == PKIBody.TYPE_GEN_MSG)
+            {
+                GenMsgContent genMsgBody = (GenMsgContent) message.getBody().getContent();
+                InfoTypeAndValue[] itvs = genMsgBody.toInfoTypeAndValueArray();
+
+                if(itvs != null && itvs.length > 0)
+                {
+                    for(InfoTypeAndValue itv : itvs)
+                    {
+                        String itvType = itv.getInfoType().getId();
+                        if(CustomObjectIdentifiers.id_cmp_getCmpResponderCert.equals(itvType))
+                        {
+                            cmdForCmpRespCert = true;
+                            break;
+                        }
+                    }
+                }
+            }
+
+            if(cmdForCmpRespCert == false)
+            {
+                LOG.warn("tid={}: I am not the intented recipient, but '{}'", tid, reqHeader.getRecipient());
+                failureCode = PKIFailureInfo.badRequest;
+                statusText = "I am not the intended recipient";
+            }
+        }
+        else if(messageTime == null)
         {
             if(cmpControl.isMessageTimeRequired())
             {
@@ -244,10 +280,29 @@ public abstract class CmpResponder
             return buildErrorPkiMessage(tid, reqHeader, PKIFailureInfo.badMessageCheck, errorStatus);
         }
 
-        CmpUtf8Pairs keyvalues = CmpUtil.extract(reqHeader.getGeneralInfo());
-        String username = keyvalues == null ? null : keyvalues.getValue(CmpUtf8Pairs.KEY_USER);
+        PKIMessage resp;
+        if(cmdForCmpRespCert)
+        {
+            InfoTypeAndValue itv = new InfoTypeAndValue(
+                    new ASN1ObjectIdentifier(CustomObjectIdentifiers.id_cmp_getCmpResponderCert),
+                    responder.getCertificateAsBCObject().toASN1Structure());
+            GenRepContent genRepContent = new GenRepContent(itv);
+            PKIBody respBody = new PKIBody(PKIBody.TYPE_GEN_REP, genRepContent);
 
-        PKIMessage resp = intern_processPKIMessage(requestor, username, tid, message, auditEvent);
+            PKIHeaderBuilder respHeader = new PKIHeaderBuilder(
+                    reqHeader.getPvno().getValue().intValue(),
+                    sender,
+                    reqHeader.getSender());
+            resp = new PKIMessage(respHeader.build(), respBody);
+        }
+        else
+        {
+            CmpUtf8Pairs keyvalues = CmpUtil.extract(reqHeader.getGeneralInfo());
+            String username = keyvalues == null ? null : keyvalues.getValue(CmpUtf8Pairs.KEY_USER);
+
+            resp = intern_processPKIMessage(requestor, username, tid, message, auditEvent);
+        }
+
         if(isProtected)
         {
             resp = addProtection(resp, auditEvent);
@@ -327,14 +382,17 @@ public abstract class CmpResponder
         }
     }
 
-    private void checkRequestRecipient(PKIHeader reqHeader)
+    private boolean checkRequestRecipient(PKIHeader reqHeader)
     {
-        ASN1OctetString tid = reqHeader.getTransactionID();
         GeneralName recipient = reqHeader.getRecipient();
+        if(recipient == null)
+        {
+            return false;
+        }
 
         if(sender.equals(recipient))
         {
-            return;
+            return true;
         }
 
         if(recipient.getTagNo() == GeneralName.directoryName)
@@ -343,11 +401,11 @@ public abstract class CmpResponder
             String sortedName = canonicalizeSortedName(x500Name);
             if(sortedName.equals(this.c14nSenderName))
             {
-                return;
+                return true;
             }
         }
 
-        LOG.warn("tid={}: Unknown Recipient '{}'", tid, recipient);
+        return false;
     }
 
     protected PKIMessage buildErrorPkiMessage(ASN1OctetString tid,

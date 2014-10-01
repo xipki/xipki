@@ -9,16 +9,21 @@ package org.xipki.ca.cmp.client;
 
 import java.io.IOException;
 import java.security.InvalidKeyException;
+import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Random;
 
+import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1GeneralizedTime;
+import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.ASN1OctetString;
 import org.bouncycastle.asn1.DEROctetString;
 import org.bouncycastle.asn1.cmp.ErrorMsgContent;
+import org.bouncycastle.asn1.cmp.GenMsgContent;
+import org.bouncycastle.asn1.cmp.GenRepContent;
 import org.bouncycastle.asn1.cmp.InfoTypeAndValue;
 import org.bouncycastle.asn1.cmp.PKIBody;
 import org.bouncycastle.asn1.cmp.PKIFailureInfo;
@@ -28,6 +33,7 @@ import org.bouncycastle.asn1.cmp.PKIHeaderBuilder;
 import org.bouncycastle.asn1.cmp.PKIMessage;
 import org.bouncycastle.asn1.cmp.PKIStatusInfo;
 import org.bouncycastle.asn1.x500.X500Name;
+import org.bouncycastle.asn1.x509.Certificate;
 import org.bouncycastle.asn1.x509.GeneralName;
 import org.bouncycastle.cert.cmp.CMPException;
 import org.bouncycastle.cert.cmp.GeneralPKIMessage;
@@ -46,6 +52,8 @@ import org.xipki.security.api.ConcurrentContentSigner;
 import org.xipki.security.api.NoIdleSignerException;
 import org.xipki.security.api.SecurityFactory;
 import org.xipki.security.common.CmpUtf8Pairs;
+import org.xipki.security.common.CustomObjectIdentifiers;
+import org.xipki.security.common.IoCertUtil;
 import org.xipki.security.common.ParamChecker;
 
 /**
@@ -55,13 +63,15 @@ import org.xipki.security.common.ParamChecker;
 public abstract class CmpRequestor
 {
     private static final Logger LOG = LoggerFactory.getLogger(CmpRequestor.class);
+    private static GeneralName DUMMY_RECIPIENT = new GeneralName(new X500Name("CN=DUMMY"));
+
     private final  Random random = new Random();
 
     private final ConcurrentContentSigner requestor;
     private final GeneralName sender;
-    private final GeneralName recipient;
 
-    private final X509Certificate responderCert;
+    private X509Certificate responderCert;
+    private GeneralName recipient;
 
     protected final SecurityFactory securityFactory;
     protected boolean signRequest;
@@ -71,19 +81,19 @@ public abstract class CmpRequestor
             SecurityFactory securityFactory)
     {
         ParamChecker.assertNotNull("requestorCert", requestorCert);
-        ParamChecker.assertNotNull("responderCert", responderCert);
         ParamChecker.assertNotNull("securityFactory", securityFactory);
 
         this.requestor = null;
-        this.responderCert = responderCert;
         this.securityFactory = securityFactory;
         this.signRequest = false;
 
-        X500Name subject = X500Name.getInstance(responderCert.getSubjectX500Principal().getEncoded());
-        this.recipient = new GeneralName(subject);
-
         X500Name x500Name = X500Name.getInstance(requestorCert.getSubjectX500Principal().getEncoded());
         this.sender = new GeneralName(x500Name);
+
+        if(responderCert != null)
+        {
+            setResponderCert(responderCert);
+        }
     }
 
     public CmpRequestor(ConcurrentContentSigner requestor,
@@ -99,19 +109,28 @@ public abstract class CmpRequestor
             boolean signRequest)
     {
         ParamChecker.assertNotNull("requestor", requestor);
-        ParamChecker.assertNotNull("responderCert", responderCert);
         ParamChecker.assertNotNull("securityFactory", securityFactory);
 
         this.requestor = requestor;
-        this.responderCert = responderCert;
         this.securityFactory = securityFactory;
         this.signRequest = signRequest;
 
-        X500Name subject = X500Name.getInstance(responderCert.getSubjectX500Principal().getEncoded());
-        this.recipient = new GeneralName(subject);
-
         X500Name x500Name = X500Name.getInstance(requestor.getCertificate().getSubjectX500Principal().getEncoded());
         this.sender = new GeneralName(x500Name);
+
+        if(responderCert != null)
+        {
+            setResponderCert(responderCert);
+        }
+    }
+
+    private void setResponderCert(X509Certificate responderCert)
+    {
+        ParamChecker.assertNotNull("responderCert", responderCert);
+
+        this.responderCert = responderCert;
+        X500Name subject = X500Name.getInstance(responderCert.getSubjectX500Principal().getEncoded());
+        this.recipient = new GeneralName(subject);
     }
 
     protected abstract byte[] send(byte[] request)
@@ -120,9 +139,20 @@ public abstract class CmpRequestor
     protected PKIMessage sign(PKIMessage request)
     throws CmpRequestorException
     {
+        return sign(request, false);
+    }
+
+    private PKIMessage sign(PKIMessage request, boolean allowDummyResponder)
+    throws CmpRequestorException
+    {
         if(requestor == null)
         {
             throw new CmpRequestorException("No request signer is configured");
+        }
+
+        if(allowDummyResponder == false && responderCert == null)
+        {
+            throw new CmpRequestorException("CMP responder is not configured");
         }
 
         try
@@ -138,9 +168,20 @@ public abstract class CmpRequestor
     protected PKIResponse signAndSend(PKIMessage request)
     throws CmpRequestorException
     {
+        return signAndSend(request, false);
+    }
+
+    private PKIResponse signAndSend(PKIMessage request, boolean allowDummyResponder)
+    throws CmpRequestorException
+    {
         if(signRequest)
         {
-            request = sign(request);
+            request = sign(request, allowDummyResponder);
+        }
+
+        if(allowDummyResponder == false && responderCert == null)
+        {
+            throw new CmpRequestorException("CMP responder is not configured");
         }
 
         byte[] encodedRequest;
@@ -210,29 +251,94 @@ public abstract class CmpRequestor
         return ret;
     }
 
-    public X509Certificate getResponderCert()
+    protected ASN1Encodable extractGeneralRepContent(PKIResponse response, String exepectedType)
+    throws CmpRequestorException
     {
-        return responderCert;
+        ErrorResultType errorResult = checkAndBuildErrorResultIfRequired(response);
+        if(errorResult != null)
+        {
+            throw new CmpRequestorException(IoCertUtil.formatPKIStatusInfo(
+                    errorResult.getStatus(), errorResult.getPkiFailureInfo(), errorResult.getStatusMessage()));
+        }
+
+        PKIBody respBody = response.getPkiMessage().getBody();
+        int bodyType = respBody.getType();
+
+        if(PKIBody.TYPE_ERROR == bodyType)
+        {
+            ErrorMsgContent content = (ErrorMsgContent) respBody.getContent();
+            throw new CmpRequestorException(IoCertUtil.formatPKIStatusInfo(
+                    content.getPKIStatusInfo()));
+        }
+        else if(PKIBody.TYPE_GEN_REP != bodyType)
+        {
+            throw new CmpRequestorException("Unknown PKI body type " + bodyType +
+                    " instead the exceptected [" + PKIBody.TYPE_GEN_REP  + ", " +
+                    PKIBody.TYPE_ERROR + "]");
+        }
+
+        GenRepContent genRep = (GenRepContent) respBody.getContent();
+
+        InfoTypeAndValue[] itvs = genRep.toInfoTypeAndValueArray();
+        InfoTypeAndValue itv = null;
+        if(itvs != null && itvs.length > 0)
+        {
+            for(InfoTypeAndValue _itv : itvs)
+            {
+                if(exepectedType.equals(_itv.getInfoType().getId()))
+                {
+                    itv = _itv;
+                    break;
+                }
+            }
+        }
+        if(itv == null)
+        {
+            throw new CmpRequestorException("The response does not contain InfoTypeAndValue "
+                    + exepectedType);
+        }
+
+        return itv.getInfoValue();
+    }
+
+    public void autoConfigureResponder()
+    throws CmpRequestorException
+    {
+        PKIMessage request = buildMessageWithGeneralMsgContent(
+                new ASN1ObjectIdentifier(CustomObjectIdentifiers.id_cmp_getCmpResponderCert), null);
+        PKIResponse response = signAndSend(request, true);
+
+        ASN1Encodable itvValue = extractGeneralRepContent(response, CustomObjectIdentifiers.id_cmp_getCmpResponderCert);
+        Certificate cert = Certificate.getInstance(itvValue);
+
+        try
+        {
+            X509Certificate x509Cert = IoCertUtil.parseCert(cert.getEncoded());
+            setResponderCert(x509Cert);
+        } catch (CertificateException | IOException e)
+        {
+            throw new CmpRequestorException("Returned certificate is invalid: " + e.getMessage());
+        }
     }
 
     protected PKIHeader buildPKIHeader(ASN1OctetString tid)
     {
-        return buildPKIHeader(false, tid, null, null);
+        return buildPKIHeader(false, tid, null, (InfoTypeAndValue[]) null);
     }
 
     protected PKIHeader buildPKIHeader(ASN1OctetString tid, String username)
     {
-        return buildPKIHeader(false, tid, username, null);
+        return buildPKIHeader(false, tid, username, (InfoTypeAndValue[]) null);
     }
 
     protected PKIHeader buildPKIHeader(boolean addImplictConfirm,
             ASN1OctetString tid, String username,
-            InfoTypeAndValue generalInfo, InfoTypeAndValue... additionalGeneralInfos)
+            InfoTypeAndValue... additionalGeneralInfos)
     {
         PKIHeaderBuilder hBuilder = new PKIHeaderBuilder(
                 PKIHeader.CMP_2000,
                 sender,
-                recipient);
+                recipient != null ? recipient : DUMMY_RECIPIENT);
         hBuilder.setMessageTime(new ASN1GeneralizedTime(new Date()));
 
         if(tid == null)
@@ -250,6 +356,17 @@ public abstract class CmpRequestor
         {
             CmpUtf8Pairs utf8Pairs = new CmpUtf8Pairs(CmpUtf8Pairs.KEY_USER, username);
             itvs.add(CmpUtil.buildInfoTypeAndValue(utf8Pairs));
+        }
+
+        if(additionalGeneralInfos != null)
+        {
+            for(InfoTypeAndValue itv : additionalGeneralInfos)
+            {
+                if(itv != null)
+                {
+                    itvs.add(itv);
+                }
+            }
         }
 
         if(itvs.isEmpty() == false)
@@ -306,6 +423,26 @@ public abstract class CmpRequestor
         boolean signatureValid = pMsg.verify(verifierProvider);
         return new ProtectionVerificationResult(requestor,
                 signatureValid ? ProtectionResult.VALID : ProtectionResult.INVALID);
+    }
+
+    protected PKIMessage buildMessageWithGeneralMsgContent(ASN1ObjectIdentifier type, ASN1Encodable value)
+    throws CmpRequestorException
+    {
+        PKIHeader header = buildPKIHeader(null);
+        InfoTypeAndValue itv;
+        if(value != null)
+        {
+            itv = new InfoTypeAndValue(type, value);
+        }
+        else
+        {
+            itv = new InfoTypeAndValue(type);
+        }
+        GenMsgContent genMsgContent = new GenMsgContent(itv);
+        PKIBody body = new PKIBody(PKIBody.TYPE_GEN_MSG, genMsgContent);
+
+        PKIMessage pkiMessage = new PKIMessage(header, body);
+        return pkiMessage;
     }
 
     protected ErrorResultType checkAndBuildErrorResultIfRequired(PKIResponse response)

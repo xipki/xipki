@@ -14,51 +14,27 @@
     -->
   </requestor>
   <CAs>
-    <CA>
+    <CAInfoUpdateInterval>0</CAInfoUpdateInterval>
+    <CA enabled="true">
       <name>RCA1</name>
-      <enabled>true</enabled>
       <url>https://localhost:8443/cmp/RCA</url>
-      <cert>
-        <file>output/RCA1.der</file>
-      </cert>
-      <responder>
-      	<file>etc/tlskeys/tls-server.der</file>
-      </responder>
-      <certProfiles>
-        <certProfile>SubCA</certProfile>
-        <certProfile>SubCA.Complex</certProfile>
-      </certProfiles>
+      <CAInfo>
+        <autoConf/>
+      </CAInfo>
     </CA>
-    <CA>
+    <CA enabled="true">
       <name>SubCA1</name>
-      <enabled>true</enabled>
       <url>https://localhost:8443/cmp/SubCA</url>
-      <cert>
-        <file>output/SubCA1.der</file>
-      </cert>
-      <responder>
-      	<file>etc/tlskeys/tls-server.der</file>
-      </responder>
-      <certProfiles>
-        <certProfile>TLS</certProfile>
-        <certProfile>TLS_C</certProfile>
-        <certProfile>TLSwithIncSN</certProfile>
-        <certProfile>gSMC_K</certProfile>
-      </certProfiles>
+      <CAInfo>
+        <autoConf/>
+      </CAInfo>
     </CA>
-    <CA>
+    <CA enabled="true">
       <name>SubCAwithCRL1</name>
-      <enabled>true</enabled>
       <url>https://localhost:8443/cmp/SubCAwithCRL</url>
-      <cert>
-        <file>output/SubCAwithCRL1.der</file>
-      </cert>
-      <responder>
-      	<file>etc/tlskeys/tls-server.der</file>
-      </responder>
-      <certProfiles>
-        <certProfile>OCSP</certProfile>
-      </certProfiles>
+      <CAInfo>
+        <autoConf/>
+      </CAInfo>
     </CA>
   </CAs>
 </CAClient>

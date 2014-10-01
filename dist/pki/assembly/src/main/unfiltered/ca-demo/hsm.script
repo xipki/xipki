@@ -49,6 +49,8 @@ ca:publish-self -profile RCA RCA1
 
 features:install xipki-caclient-shell
 
+# Wait two seconds
+
 ## Generate keys and PKCS#10 request for SubCA1
 keytool:req -slot 1 -key-label $SubCA_KEY_LABEL -out output/SubCA1.p10 \
   -subject "CN=SubCA1,O=xipki,C=DE"

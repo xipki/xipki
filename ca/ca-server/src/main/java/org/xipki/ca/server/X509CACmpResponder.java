@@ -14,6 +14,7 @@ import java.security.cert.CRLException;
 import java.security.cert.X509CRL;
 import java.text.ParseException;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
@@ -25,6 +26,7 @@ import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.ASN1OctetString;
 import org.bouncycastle.asn1.ASN1Set;
 import org.bouncycastle.asn1.DERNull;
+import org.bouncycastle.asn1.DERUTF8String;
 import org.bouncycastle.asn1.cmp.CMPCertificate;
 import org.bouncycastle.asn1.cmp.CMPObjectIdentifiers;
 import org.bouncycastle.asn1.cmp.CertConfirmContent;
@@ -69,6 +71,7 @@ import org.bouncycastle.cert.cmp.GeneralPKIMessage;
 import org.bouncycastle.cert.crmf.CRMFException;
 import org.bouncycastle.cert.crmf.CertificateRequestMessage;
 import org.bouncycastle.operator.ContentVerifierProvider;
+import org.bouncycastle.util.encoders.Base64;
 import org.bouncycastle.util.encoders.Hex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -104,11 +107,20 @@ public class X509CACmpResponder extends CmpResponder
     public static final int XiPKI_CRL_REASON_UNREVOKE = 100;
     public static final int XiPKI_CRL_REASON_REMOVE = 101;
 
+    private static final Set<String> knownGenMsgIds = new HashSet<>();
+
     private static final Logger LOG = LoggerFactory.getLogger(X509CACmpResponder.class);
 
     private final PendingCertificatePool pendingCertPool;
 
     private final X509CA ca;
+
+    static
+    {
+        knownGenMsgIds.add(CMPObjectIdentifiers.it_currentCRL.getId());
+        knownGenMsgIds.add(CustomObjectIdentifiers.id_cmp_generateCRL);
+        knownGenMsgIds.add(CustomObjectIdentifiers.id_cmp_getSystemInfo);
+    }
 
     public X509CACmpResponder(X509CA ca, ConcurrentContentSigner responder, SecurityFactory securityFactory)
     {
@@ -352,16 +364,15 @@ public class X509CACmpResponder extends CmpResponder
                     GenMsgContent genMsgBody = (GenMsgContent) reqBody.getContent();
                     InfoTypeAndValue[] itvs = genMsgBody.toInfoTypeAndValueArray();
 
-                    InfoTypeAndValue itvCRL = null;
+                    InfoTypeAndValue itv = null;
                     if(itvs != null && itvs.length > 0)
                     {
-                        for(InfoTypeAndValue itv : itvs)
+                        for(InfoTypeAndValue _itv : itvs)
                         {
-                            String itvType = itv.getInfoType().getId();
-                            if(CMPObjectIdentifiers.it_currentCRL.getId().equals(itvType) ||
-                                    CustomObjectIdentifiers.id_cmp_generateCRL.equals(itvType))
+                            String itvType = _itv.getInfoType().getId();
+                            if(knownGenMsgIds.contains(itvType))
                             {
-                                itvCRL = itv;
+                                itv = _itv;
                                 break;
                             }
                         }
@@ -373,33 +384,32 @@ public class X509CACmpResponder extends CmpResponder
                     String statusMessage = null;
                     int failureInfo = PKIFailureInfo.badRequest;
 
-                    if(itvCRL == null)
+                    if(itv == null)
                     {
                         statusMessage = "PKIBody type " + type + " is only supported with the sub-types "
-                                + CMPObjectIdentifiers.it_currentCRL.getId() + " and "
-                                + CustomObjectIdentifiers.id_cmp_generateCRL;
-                        failureInfo = PKIFailureInfo.badRequest;
+                                + knownGenMsgIds.toString();
                     }
                     else
                     {
-                        ASN1ObjectIdentifier infoType = itvCRL.getInfoType();
+                        InfoTypeAndValue itvResp = null;
+                        ASN1ObjectIdentifier infoType = itv.getInfoType();
 
-                        CertificateList crl = null;
                         try
                         {
                             if(CMPObjectIdentifiers.it_currentCRL.equals(infoType))
                             {
                                 eventType = "CRL_DOWNLOAD";
+                                CertificateList crl;
                                 checkPermission(_requestor, Permission.GET_CRL);
 
-                                if(itvCRL.getInfoValue() == null)
+                                if(itv.getInfoValue() == null)
                                 { // as defined in RFC 4210
                                     crl = ca.getCurrentCRL();
                                 }
                                 else
                                 {
                                     // xipki extension
-                                    ASN1Integer crlNumber = ASN1Integer.getInstance(itvCRL.getInfoValue());
+                                    ASN1Integer crlNumber = ASN1Integer.getInstance(itv.getInfoValue());
                                     crl = ca.getCRL(crlNumber.getPositiveValue());
                                 }
 
@@ -408,10 +418,15 @@ public class X509CACmpResponder extends CmpResponder
                                     statusMessage = "No CRL is available";
                                     failureInfo = PKIFailureInfo.badRequest;
                                 }
+                                else
+                                {
+                                    itvResp = new InfoTypeAndValue(infoType, crl);
+                                }
                             }
                             else if(CustomObjectIdentifiers.id_cmp_generateCRL.equals(infoType.getId()))
                             {
                                 eventType = "CRL_GEN";
+
                                 checkPermission(_requestor, Permission.GEN_CRL);
                                 X509CRL _crl = ca.generateCRLonDemand();
                                 if(_crl == null)
@@ -421,19 +436,24 @@ public class X509CACmpResponder extends CmpResponder
                                 }
                                 else
                                 {
-                                    crl = CertificateList.getInstance(_crl.getEncoded());
+                                    CertificateList crl = CertificateList.getInstance(_crl.getEncoded());
+                                    itvResp = new InfoTypeAndValue(infoType, crl);
                                 }
+                            }
+                            else if(CustomObjectIdentifiers.id_cmp_getSystemInfo.equals(infoType.getId()))
+                            {
+                                String systemInfo = getSystemInfo(_requestor);
+                                itvResp = new InfoTypeAndValue(infoType, new DERUTF8String(systemInfo));
                             }
                             else
                             {
                                 throw new RuntimeException("should not reach here");
                             }
 
-                            if(crl != null)
+                            if(itvResp != null)
                             {
                                 status = PKIStatus.granted;
-                                InfoTypeAndValue itv = new InfoTypeAndValue(infoType, crl);
-                                GenRepContent genRepContent = new GenRepContent(itv);
+                                GenRepContent genRepContent = new GenRepContent(itvResp);
                                 respBody = new PKIBody(PKIBody.TYPE_GEN_REP, genRepContent);
                             }
                         } catch (OperationException e)
@@ -1351,6 +1371,46 @@ public class X509CACmpResponder extends CmpResponder
             LOG.warn(msg);
             throw new InsuffientPermissionException(msg);
         }
+    }
+
+    private String getSystemInfo(CmpRequestorInfo requestor)
+    {
+        StringBuilder sb = new StringBuilder();
+        sb.append("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>");
+        sb.append("<SystemInfo version=\"1\">");
+        // CACert
+        sb.append("<CACert>");
+        sb.append(Base64.toBase64String(ca.getCAInfo().getCertificate().getEncodedCert()));
+        sb.append("</CACert>");
+
+        // Profiles
+        Set<String> requestorProfiles = requestor.getProfiles();
+
+        Set<String> supportedProfileNames = new HashSet<>();
+        Set<String> caProfileNames = ca.getCAManager().getCertProfilesForCA(ca.getCAInfo().getName());
+        for(String caProfileName : caProfileNames)
+        {
+            if(requestorProfiles.contains("all") || requestorProfiles.contains(caProfileName))
+            {
+                supportedProfileNames.add(caProfileName);
+            }
+        }
+
+        if(supportedProfileNames.isEmpty() == false)
+        {
+            sb.append("<CertProfiles>");
+            for(String name : supportedProfileNames)
+            {
+                sb.append("<CertProfile>");
+                sb.append(name);
+                sb.append("</CertProfile>");
+            }
+
+            sb.append("</CertProfiles>");
+        }
+
+        sb.append("</SystemInfo>");
+        return sb.toString();
     }
 
 }
