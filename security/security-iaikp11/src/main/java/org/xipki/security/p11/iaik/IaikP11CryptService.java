@@ -201,7 +201,7 @@ public final class IaikP11CryptService implements P11CryptService
                         if(publicKeyObject == null)
                         {
                             String msg = "neither certificate nor public key for signing is available";
-                            LOG.warn(msg);
+                            LOG.info(msg);
                             continue;
                         }
 
