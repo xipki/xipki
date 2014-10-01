@@ -68,6 +68,7 @@ public class ObjectIdentifiers
      * locality name - StringType(SIZE(1..64))
      */
     public static final ASN1ObjectIdentifier DN_L = new ASN1ObjectIdentifier("2.5.4.7");
+    public static final ASN1ObjectIdentifier DN_LOCALITYNAME = DN_L;
 
     /**
      * state, or province name - StringType(SIZE(1..64))
@@ -81,6 +82,7 @@ public class ObjectIdentifiers
     public static final ASN1ObjectIdentifier DN_GIVENNAME = new ASN1ObjectIdentifier("2.5.4.42");
     public static final ASN1ObjectIdentifier DN_INITIALS = new ASN1ObjectIdentifier("2.5.4.43");
     public static final ASN1ObjectIdentifier DN_GENERATION = new ASN1ObjectIdentifier("2.5.4.44");
+    public static final ASN1ObjectIdentifier DN_GENERATION_QUALIFIER = DN_GENERATION;
     public static final ASN1ObjectIdentifier DN_UNIQUE_IDENTIFIER = new ASN1ObjectIdentifier("2.5.4.45");
 
     /**
