@@ -156,7 +156,6 @@ public class X509CA
     {
         ParamChecker.assertNotNull("caManager", caManager);
         ParamChecker.assertNotNull("caInfo", caInfo);
-        ParamChecker.assertNotNull("caSigner", caSigner);
         ParamChecker.assertNotNull("certstore", certstore);
 
         this.caManager = caManager;
@@ -2637,12 +2636,15 @@ public class X509CA
 
         boolean healthy = true;
 
-        boolean caSignerHealthy = caSigner.isHealthy();
-        healthy &= caSignerHealthy;
+        if(caSigner != null)
+        {
+            boolean caSignerHealthy = caSigner.isHealthy();
+            healthy &= caSignerHealthy;
 
-        HealthCheckResult signerHealth = new HealthCheckResult("Signer");
-        signerHealth.setHealthy(caSignerHealthy);
-        result.addChildCheck(signerHealth);
+            HealthCheckResult signerHealth = new HealthCheckResult("Signer");
+            signerHealth.setHealthy(caSignerHealthy);
+            result.addChildCheck(signerHealth);
+        }
 
         boolean databaseHealthy = certstore.isHealthy();
         healthy &= databaseHealthy;

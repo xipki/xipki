@@ -566,9 +566,38 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
             for(String caName : cas.keySet())
             {
                 CAInfo caEntry = cas.get(caName);
+                Set<Permission> permissions = caEntry.getPermissions();
+
+                boolean signerRequired;
+                if(permissions != null)
+                {
+                    signerRequired = false;
+                    for(Permission permission : permissions)
+                    {
+                        switch(permission)
+                        {
+                            case REMOVE_CERT:
+                            case UNREVOKE_CERT:
+                            case REVOKE_CERT:
+                                break;
+                            default:
+                                signerRequired = true;
+                                break;
+                        }
+
+                        if(signerRequired)
+                        {
+                            break;
+                        }
+                    }
+                }
+                else
+                {
+                    signerRequired = true;
+                }
 
                 CrlSigner crlSigner = null;
-                if(caEntry.getCrlSignerName() != null)
+                if(signerRequired && caEntry.getCrlSignerName() != null)
                 {
                     CrlSignerEntry crlSignerEntry = crlSigners.get(caEntry.getCrlSignerName());
                     String signerType = crlSignerEntry.getType();
@@ -612,20 +641,24 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
                     }
                 }
 
-                ConcurrentContentSigner caSigner;
-                try
+                ConcurrentContentSigner caSigner = null;
+
+                if(signerRequired)
                 {
-                    caSigner = securityFactory.createSigner(caEntry.getSignerType(), caEntry.getSignerConf(),
-                            caEntry.getCertificate().getCert());
-                } catch (SignerException e)
-                {
-                    final String message = "security.createSigner caSigner (ca=" + caName + ")";
-                    if(LOG.isErrorEnabled())
+                    try
                     {
-                        LOG.error(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(), e.getMessage());
+                        caSigner = securityFactory.createSigner(caEntry.getSignerType(), caEntry.getSignerConf(),
+                                caEntry.getCertificate().getCert());
+                    } catch (SignerException e)
+                    {
+                        final String message = "security.createSigner caSigner (ca=" + caName + ")";
+                        if(LOG.isErrorEnabled())
+                        {
+                            LOG.error(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(), e.getMessage());
+                        }
+                        LOG.debug(message, e);
+                        return false;
                     }
-                    LOG.debug(message, e);
-                    return false;
                 }
 
                 X509CA ca;
