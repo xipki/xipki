@@ -238,6 +238,10 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
                 throw new CAMgmtException("invalid ca.mode '" + caModeStr + "'");
             }
         }
+        else
+        {
+            masterMode = true;
+        }
 
         if(this.dataSources == null)
         {
