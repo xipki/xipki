@@ -33,11 +33,10 @@ class DefaultHttpCmpRequestor extends X509CmpRequestor
 
     DefaultHttpCmpRequestor(X509Certificate requestorCert,
             X509Certificate responderCert,
-            X509Certificate caCert,
             String serverUrl,
             SecurityFactory securityFactory)
     {
-        super(requestorCert, responderCert, caCert, securityFactory);
+        super(requestorCert, responderCert, securityFactory);
         ParamChecker.assertNotEmpty("serverUrl", serverUrl);
 
         try
@@ -51,12 +50,11 @@ class DefaultHttpCmpRequestor extends X509CmpRequestor
 
     DefaultHttpCmpRequestor(ConcurrentContentSigner requestor,
             X509Certificate responderCert,
-            X509Certificate caCert,
             String serverUrl,
             SecurityFactory securityFactory,
             boolean signRequest)
     {
-        super(requestor, responderCert, caCert, securityFactory, signRequest);
+        super(requestor, responderCert, securityFactory, signRequest);
         ParamChecker.assertNotEmpty("serverUrl", serverUrl);
 
         try

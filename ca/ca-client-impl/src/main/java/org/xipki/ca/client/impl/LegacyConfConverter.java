@@ -18,8 +18,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.ca.client.impl.jaxb.CAClientType;
 import org.xipki.ca.client.impl.jaxb.CAClientType.CAs;
+import org.xipki.ca.client.impl.jaxb.CAInfoType;
+import org.xipki.ca.client.impl.jaxb.CAInfoType.CertProfiles;
 import org.xipki.ca.client.impl.jaxb.CAType;
-import org.xipki.ca.client.impl.jaxb.CAType.CertProfiles;
 import org.xipki.ca.client.impl.jaxb.FileOrValueType;
 import org.xipki.ca.client.impl.jaxb.RequestorType;
 import org.xipki.security.common.ConfigurationException;
@@ -132,10 +133,10 @@ class LegacyConfConverter
         for(Object _propKey : props.keySet())
         {
             String propKey = (String) _propKey;
-            if(propKey.startsWith(CA_PREFIX) && propKey.endsWith(CA_CERT_SUFFIX))
+            if(propKey.startsWith(CA_PREFIX) && propKey.endsWith(CA_URL_SUFFIX))
             {
                 String caName = propKey.substring(CA_PREFIX.length(),
-                        propKey.length() - CA_CERT_SUFFIX.length());
+                        propKey.length() - CA_URL_SUFFIX.length());
 
                 String enabled = props.getProperty(CA_PREFIX + caName + CA_ENABLED_SUFFIX, "true");
                 if(Boolean.parseBoolean(enabled))
@@ -161,21 +162,29 @@ class LegacyConfConverter
             s = props.getProperty(CA_PREFIX + caName + CA_URL_SUFFIX);
             ca.setUrl(s);
 
+            CAInfoType caInfo = new CAInfoType();
+            ca.setCAInfo(caInfo);
+
             s = props.getProperty(CA_PREFIX + caName + CA_CERT_SUFFIX);
-            ca.setCert(createFileOrValue(s));
+            caInfo.setCert(createFileOrValue(s));
 
             s = props.getProperty(CA_PREFIX + caName + CA_RESPONDER_SUFFIX);
-            ca.setResponder(createFileOrValue(s));
+            caInfo.setResponder(createFileOrValue(s));
 
-            s = props.getProperty(CA_PREFIX + caName + CA_PROFILES_SUFFIX);
-            if(s != null)
+            String propKey = CA_PREFIX + caName + CA_PROFILES_SUFFIX;
+            if(props.containsKey(propKey))
             {
-                Set<String> profiles = StringUtil.splitAsSet(s, ", ");
-                if(profiles.isEmpty() == false)
+                CertProfiles certProfiles = new CertProfiles();
+                caInfo.setCertProfiles(certProfiles);
+
+                s = props.getProperty(propKey);
+                if(s != null && s.isEmpty() == false)
                 {
-                    CertProfiles certProfiles = new CertProfiles();
-                    ca.setCertProfiles(certProfiles);
-                    ca.getCertProfiles().getCertProfile().addAll(profiles);
+                    Set<String> profiles = StringUtil.splitAsSet(s, ", ");
+                    if(profiles.isEmpty() == false)
+                    {
+                        caInfo.getCertProfiles().getCertProfile().addAll(profiles);
+                    }
                 }
             }
 

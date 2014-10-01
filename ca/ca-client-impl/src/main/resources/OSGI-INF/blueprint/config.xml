@@ -15,7 +15,7 @@
     </cm:default-properties>
   </cm:property-placeholder>
   <reference id="securityFactory" interface="org.xipki.security.api.SecurityFactory"/>
-  <bean id="raWorker" class="org.xipki.ca.client.impl.RAWorkerImpl" init-method="init">
+  <bean id="raWorker" class="org.xipki.ca.client.impl.RAWorkerImpl" init-method="init" destroy-method="shutdown">
     <property name="securityFactory" ref="securityFactory"/>
     <property name="confFile" value="${clientConfFile}"/>
   </bean>
