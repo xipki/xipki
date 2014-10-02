@@ -759,11 +759,11 @@ abstract class X509CmpRequestor extends CmpRequestor
             throw new CmpRequestorException("Could no parse the CA certificate", e);
         }
 
-        Element profilesElement = XMLUtil.getFirstElementChild(doc.getDocumentElement(), namespace, "CertProfiles");
+        Element profilesElement = XMLUtil.getFirstElementChild(doc.getDocumentElement(), namespace, "certProfiles");
         Set<String> profiles = new HashSet<>();
         if(profilesElement != null)
         {
-            List<Element> profileElements = XMLUtil.getElementChilden(profilesElement, namespace, "CertProfile");
+            List<Element> profileElements = XMLUtil.getElementChilden(profilesElement, namespace, "certProfile");
             for(Element element : profileElements)
             {
                 String profile = XMLUtil.getNodeValue(element);

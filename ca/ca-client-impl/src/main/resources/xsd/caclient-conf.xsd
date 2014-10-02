@@ -63,9 +63,9 @@
     <xs:choice>
       <xs:element name="autoConf"/>
       <xs:sequence>
-        <xs:element name="cert" type="fileOrValueType" minOccurs="0"/>
-        <xs:element name="responder" type="fileOrValueType" minOccurs="0"/>
-        <xs:element name="certProfiles" minOccurs="0">
+        <xs:element name="cert" type="fileOrValueType"/>
+        <xs:element name="responder" type="fileOrValueType"/>
+        <xs:element name="certProfiles">
           <xs:complexType>
             <xs:sequence>
               <xs:element name="certProfile" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>

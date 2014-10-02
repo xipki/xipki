@@ -179,18 +179,18 @@ class LegacyConfConverter
             caInfo.setResponder(createFileOrValue(s));
 
             String propKey = CA_PREFIX + caName + CA_PROFILES_SUFFIX;
+            CertProfiles certProfiles = new CertProfiles();
+            caInfo.setCertProfiles(certProfiles);
+
             if(props.containsKey(propKey))
             {
-                CertProfiles certProfiles = new CertProfiles();
-                caInfo.setCertProfiles(certProfiles);
-
                 s = props.getProperty(propKey);
                 if(s != null && s.isEmpty() == false)
                 {
                     Set<String> profiles = StringUtil.splitAsSet(s, ", ");
                     if(profiles.isEmpty() == false)
                     {
-                        caInfo.getCertProfiles().getCertProfile().addAll(profiles);
+                        certProfiles.getCertProfile().addAll(profiles);
                     }
                 }
             }
