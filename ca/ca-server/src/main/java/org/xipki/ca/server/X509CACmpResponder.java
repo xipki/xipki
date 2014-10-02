@@ -1377,7 +1377,7 @@ public class X509CACmpResponder extends CmpResponder
     {
         StringBuilder sb = new StringBuilder();
         sb.append("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>");
-        sb.append("<SystemInfo version=\"1\">");
+        sb.append("<systemInfo version=\"1\">");
         // CACert
         sb.append("<CACert>");
         sb.append(Base64.toBase64String(ca.getCAInfo().getCertificate().getEncodedCert()));
@@ -1398,18 +1398,18 @@ public class X509CACmpResponder extends CmpResponder
 
         if(supportedProfileNames.isEmpty() == false)
         {
-            sb.append("<CertProfiles>");
+            sb.append("<certProfiles>");
             for(String name : supportedProfileNames)
             {
-                sb.append("<CertProfile>");
+                sb.append("<certProfile>");
                 sb.append(name);
-                sb.append("</CertProfile>");
+                sb.append("</certProfile>");
             }
 
-            sb.append("</CertProfiles>");
+            sb.append("</certProfiles>");
         }
 
-        sb.append("</SystemInfo>");
+        sb.append("</systemInfo>");
         return sb.toString();
     }
 
