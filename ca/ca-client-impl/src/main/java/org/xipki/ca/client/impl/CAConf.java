@@ -22,6 +22,7 @@ class CAConf
 {
     private final String name;
     private final String url;
+    private final String requestorName;
     private X509CmpRequestor requestor;
 
     private boolean autoConf;
@@ -30,13 +31,15 @@ class CAConf
     private X500Name subject;
     private Set<String> profiles = Collections.emptySet();
 
-    CAConf(String name, String url)
+    CAConf(String name, String url, String requestorName)
     {
         ParamChecker.assertNotEmpty("name", name);
         ParamChecker.assertNotEmpty("url", url);
+        ParamChecker.assertNotEmpty("requestorName", requestorName);
 
         this.name = name;
         this.url = url;
+        this.requestorName = requestorName;
     }
 
     public String getName()
@@ -119,6 +122,11 @@ class CAConf
     public void setRequestor(X509CmpRequestor requestor)
     {
         this.requestor = requestor;
+    }
+
+    public String getRequestorName()
+    {
+        return requestorName;
     }
 
     public X509CmpRequestor getRequestor()

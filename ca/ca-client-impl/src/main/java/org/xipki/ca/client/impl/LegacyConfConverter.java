@@ -18,6 +18,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.ca.client.impl.jaxb.CAClientType;
 import org.xipki.ca.client.impl.jaxb.CAClientType.CAs;
+import org.xipki.ca.client.impl.jaxb.CAClientType.Requestors;
 import org.xipki.ca.client.impl.jaxb.CAInfoType;
 import org.xipki.ca.client.impl.jaxb.CAInfoType.CertProfiles;
 import org.xipki.ca.client.impl.jaxb.CAType;
@@ -104,9 +105,14 @@ class LegacyConfConverter
         conf.setDevMode(dev_mode);
 
         // Requestor
-        RequestorType requestorConf = new RequestorType();
-        conf.setRequestor(requestorConf);
+        Requestors requestors = new Requestors();
+        conf.setRequestors(requestors);
 
+        RequestorType requestorConf = new RequestorType();
+        requestors.getRequestor().add(requestorConf);
+
+        String requestorName = "requestor1";
+        requestorConf.setName(requestorName);
         boolean signRequest = Boolean.parseBoolean(props.getProperty(SIGN_REQUEST, "true"));
         requestorConf.setSignRequest(signRequest);
 
@@ -158,6 +164,7 @@ class LegacyConfConverter
             CAType ca = new CAType();
             ca.setEnabled(true);
             ca.setName(caName);
+            ca.setRequestor(requestorName);
 
             s = props.getProperty(CA_PREFIX + caName + CA_URL_SUFFIX);
             ca.setUrl(s);
