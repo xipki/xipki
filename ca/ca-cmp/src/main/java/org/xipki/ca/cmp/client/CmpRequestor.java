@@ -139,18 +139,12 @@ public abstract class CmpRequestor
     protected PKIMessage sign(PKIMessage request)
     throws CmpRequestorException
     {
-        return sign(request, false);
-    }
-
-    private PKIMessage sign(PKIMessage request, boolean allowDummyResponder)
-    throws CmpRequestorException
-    {
         if(requestor == null)
         {
             throw new CmpRequestorException("No request signer is configured");
         }
 
-        if(allowDummyResponder == false && responderCert == null)
+        if(responderCert == null)
         {
             throw new CmpRequestorException("CMP responder is not configured");
         }
@@ -168,18 +162,12 @@ public abstract class CmpRequestor
     protected PKIResponse signAndSend(PKIMessage request)
     throws CmpRequestorException
     {
-        return signAndSend(request, false);
-    }
-
-    private PKIResponse signAndSend(PKIMessage request, boolean allowDummyResponder)
-    throws CmpRequestorException
-    {
         if(signRequest)
         {
-            request = sign(request, allowDummyResponder);
+            request = sign(request);
         }
 
-        if(allowDummyResponder == false && responderCert == null)
+        if(responderCert == null)
         {
             throw new CmpRequestorException("CMP responder is not configured");
         }
@@ -201,7 +189,7 @@ public abstract class CmpRequestor
         } catch (IOException e)
         {
             LOG.error("Error while send the PKI request {} to server", request);
-            throw new CmpRequestorException(e);
+            throw new CmpRequestorException("TRANSPORT_ERROR", e);
         }
 
         GeneralPKIMessage response;
@@ -231,7 +219,7 @@ public abstract class CmpRequestor
             try
             {
                 ProtectionVerificationResult verifyProtection = verifyProtection(
-                        Hex.toHexString(tid.getOctets()), response);
+                        Hex.toHexString(tid.getOctets()), response, responderCert);
                 ret.setProtectionVerificationResult(verifyProtection);
             } catch (InvalidKeyException | OperatorCreationException | CMPException e)
             {
@@ -254,11 +242,20 @@ public abstract class CmpRequestor
     protected ASN1Encodable extractGeneralRepContent(PKIResponse response, String exepectedType)
     throws CmpRequestorException
     {
-        ErrorResultType errorResult = checkAndBuildErrorResultIfRequired(response);
-        if(errorResult != null)
+        return extractGeneralRepContent(response, exepectedType, true);
+    }
+
+    private ASN1Encodable extractGeneralRepContent(PKIResponse response, String exepectedType, boolean requireProtectionCheck)
+    throws CmpRequestorException
+    {
+        if(requireProtectionCheck)
         {
-            throw new CmpRequestorException(IoCertUtil.formatPKIStatusInfo(
-                    errorResult.getStatus(), errorResult.getPkiFailureInfo(), errorResult.getStatusMessage()));
+            ErrorResultType errorResult = checkAndBuildErrorResultIfRequired(response);
+            if(errorResult != null)
+            {
+                throw new CmpRequestorException(IoCertUtil.formatPKIStatusInfo(
+                        errorResult.getStatus(), errorResult.getPkiFailureInfo(), errorResult.getStatusMessage()));
+            }
         }
 
         PKIBody respBody = response.getPkiMessage().getBody();
@@ -306,19 +303,108 @@ public abstract class CmpRequestor
     {
         PKIMessage request = buildMessageWithGeneralMsgContent(
                 new ASN1ObjectIdentifier(CustomObjectIdentifiers.id_cmp_getCmpResponderCert), null);
-        PKIResponse response = signAndSend(request, true);
 
-        ASN1Encodable itvValue = extractGeneralRepContent(response, CustomObjectIdentifiers.id_cmp_getCmpResponderCert);
-        Certificate cert = Certificate.getInstance(itvValue);
+        if(signRequest)
+        {
+            if(requestor == null)
+            {
+                throw new CmpRequestorException("No request signer is configured");
+            }
 
+            try
+            {
+                request = CmpUtil.addProtection(request, requestor, sender, false);
+            } catch (CMPException | NoIdleSignerException e)
+            {
+                throw new CmpRequestorException("Could not sign the request", e);
+            }
+        }
+
+        byte[] encodedRequest;
         try
         {
-            X509Certificate x509Cert = IoCertUtil.parseCert(cert.getEncoded());
-            setResponderCert(x509Cert);
+            encodedRequest = request.getEncoded();
+        } catch (IOException e)
+        {
+            LOG.error("Error while encode the PKI request {}", request);
+            throw new CmpRequestorException(e);
+        }
+
+        byte[] encodedResponse;
+        try
+        {
+            encodedResponse = send(encodedRequest);
+        } catch (IOException e)
+        {
+            LOG.error("Error while send the PKI request {} to server", request);
+            throw new CmpRequestorException("TRANSPORT_ERROR", e);
+        }
+
+        GeneralPKIMessage response;
+        try
+        {
+            response = new GeneralPKIMessage(encodedResponse);
+        } catch (IOException e)
+        {
+            if(LOG.isErrorEnabled())
+            {
+                LOG.error("Error while decode the received PKI message: {}", Hex.toHexString(encodedResponse));
+            }
+            throw new CmpRequestorException(e);
+        }
+
+        PKIHeader respHeader = response.getHeader();
+        ASN1OctetString tid = respHeader.getTransactionID();
+        GeneralName recipient = respHeader.getRecipient();
+        if(sender.equals(recipient) == false)
+        {
+            LOG.warn("tid={}: Unknown CMP requestor '{}'", tid, recipient);
+        }
+
+        PKIResponse pkiResp = new PKIResponse(response);
+        if(response.hasProtection() == false && signRequest)
+        {
+            PKIBody respBody = response.getBody();
+            int bodyType = respBody.getType();
+            if(bodyType != PKIBody.TYPE_ERROR)
+            {
+                throw new CmpRequestorException("Response is not signed");
+            }
+        }
+
+        ASN1Encodable itvValue = extractGeneralRepContent(pkiResp,
+                CustomObjectIdentifiers.id_cmp_getCmpResponderCert, false);
+        Certificate cert = Certificate.getInstance(itvValue);
+
+        X509Certificate x509Cert;
+        try
+        {
+            x509Cert = IoCertUtil.parseCert(cert.getEncoded());
         } catch (CertificateException | IOException e)
         {
-            throw new CmpRequestorException("Returned certificate is invalid: " + e.getMessage());
+            throw new CmpRequestorException("Returned certificate is invalid: " + e.getMessage(), e);
         }
+
+        if(response.hasProtection())
+        {
+            try
+            {
+                ProtectionVerificationResult verifyProtection = verifyProtection(
+                        Hex.toHexString(tid.getOctets()), response, x509Cert);
+
+                if(verifyProtection.getProtectionResult() != ProtectionResult.VALID)
+                {
+                    throw new CmpRequestorException(IoCertUtil.formatPKIStatusInfo(
+                            ClientErrorCode.PKIStatus_RESPONSE_ERROR,
+                            PKIFailureInfo.badMessageCheck, "message check of the response failed"));
+                }
+            } catch (InvalidKeyException | OperatorCreationException | CMPException e)
+            {
+                throw new CmpRequestorException(e);
+            }
+        }
+
+        setResponderCert(x509Cert);
     }
 
     protected PKIHeader buildPKIHeader(ASN1OctetString tid)
@@ -394,7 +480,8 @@ public abstract class CmpRequestor
         return tid;
     }
 
-    private ProtectionVerificationResult verifyProtection(String tid, GeneralPKIMessage pkiMessage)
+    private ProtectionVerificationResult verifyProtection(String tid, GeneralPKIMessage pkiMessage,
+            X509Certificate cert)
     throws CMPException, InvalidKeyException, OperatorCreationException
     {
         ProtectedPKIMessage pMsg = new ProtectedPKIMessage(pkiMessage);
@@ -406,22 +493,22 @@ public abstract class CmpRequestor
         }
 
         PKIHeader h = pMsg.getHeader();
-        if(recipient.equals(h.getSender()) == false)
+        if(recipient != null && recipient.equals(h.getSender()) == false)
         {
             LOG.warn("tid={}: not authorized responder {}", tid, h.getSender());
             return new ProtectionVerificationResult(null, ProtectionResult.SENDER_NOT_AUTHORIZED);
         }
 
         ContentVerifierProvider verifierProvider =
-                securityFactory.getContentVerifierProvider(responderCert);
+                securityFactory.getContentVerifierProvider(cert);
         if(verifierProvider == null)
         {
-            LOG.warn("tid={}: not authorized requestor {}", tid, h.getSender());
-            return new ProtectionVerificationResult(requestor, ProtectionResult.SENDER_NOT_AUTHORIZED);
+            LOG.warn("tid={}: not authorized responder {}", tid, h.getSender());
+            return new ProtectionVerificationResult(cert, ProtectionResult.SENDER_NOT_AUTHORIZED);
         }
 
         boolean signatureValid = pMsg.verify(verifierProvider);
-        return new ProtectionVerificationResult(requestor,
+        return new ProtectionVerificationResult(cert,
                 signatureValid ? ProtectionResult.VALID : ProtectionResult.INVALID);
     }
 
