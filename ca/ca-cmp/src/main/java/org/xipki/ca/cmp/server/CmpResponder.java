@@ -126,36 +126,33 @@ public abstract class CmpResponder
         Date messageTime = BCCompatilbilityUtil.getMessageTime(reqHeader);
 
         boolean cmdForCmpRespCert = false;
-        boolean intentMe = checkRequestRecipient(reqHeader);
-
-        if(intentMe == false)
+        int bodyType = message.getBody().getType();
+        if(bodyType == PKIBody.TYPE_GEN_MSG)
         {
-            int bodyType = message.getBody().getType();
-            if(bodyType == PKIBody.TYPE_GEN_MSG)
-            {
-                GenMsgContent genMsgBody = (GenMsgContent) message.getBody().getContent();
-                InfoTypeAndValue[] itvs = genMsgBody.toInfoTypeAndValueArray();
+            GenMsgContent genMsgBody = (GenMsgContent) message.getBody().getContent();
+            InfoTypeAndValue[] itvs = genMsgBody.toInfoTypeAndValueArray();
 
-                if(itvs != null && itvs.length > 0)
+            if(itvs != null && itvs.length > 0)
+            {
+                for(InfoTypeAndValue itv : itvs)
                 {
-                    for(InfoTypeAndValue itv : itvs)
+                    String itvType = itv.getInfoType().getId();
+                    if(CustomObjectIdentifiers.id_cmp_getCmpResponderCert.equals(itvType))
                     {
-                        String itvType = itv.getInfoType().getId();
-                        if(CustomObjectIdentifiers.id_cmp_getCmpResponderCert.equals(itvType))
-                        {
-                            cmdForCmpRespCert = true;
-                            break;
-                        }
+                        cmdForCmpRespCert = true;
+                        break;
                     }
                 }
             }
+        }
 
-            if(cmdForCmpRespCert == false)
-            {
-                LOG.warn("tid={}: I am not the intented recipient, but '{}'", tid, reqHeader.getRecipient());
-                failureCode = PKIFailureInfo.badRequest;
-                statusText = "I am not the intended recipient";
-            }
+        boolean intentMe = checkRequestRecipient(reqHeader);
+
+        if(intentMe == false && cmdForCmpRespCert == false)
+        {
+            LOG.warn("tid={}: I am not the intented recipient, but '{}'", tid, reqHeader.getRecipient());
+            failureCode = PKIFailureInfo.badRequest;
+            statusText = "I am not the intended recipient";
         }
         else if(messageTime == null)
         {
@@ -242,15 +239,16 @@ public abstract class CmpResponder
         else if(tlsClientCert != null)
         {
             boolean authorized = false;
-            for(CertBasedRequestorInfo authorizatedRequestor : authorizatedRequestors.values())
+
+            requestor = getRequestor(reqHeader);
+            if(requestor != null)
             {
-                if(tlsClientCert.equals(authorizatedRequestor.getCertificate().getCert()))
+                if(tlsClientCert.equals(requestor.getCertificate().getCert()))
                 {
-                    requestor = authorizatedRequestor;
                     authorized = true;
-                    break;
                 }
             }
+
             if(authorized)
             {
                 errorStatus = null;
@@ -261,7 +259,6 @@ public abstract class CmpResponder
                         tid, IoCertUtil.canonicalizeName(tlsClientCert.getSubjectX500Principal()));
                 errorStatus = "Requestor (TLS client certificate) is not authorized";
             }
-
         }
         else
         {
@@ -293,6 +290,7 @@ public abstract class CmpResponder
                     reqHeader.getPvno().getValue().intValue(),
                     sender,
                     reqHeader.getSender());
+            respHeader.setTransactionID(tid);
             resp = new PKIMessage(respHeader.build(), respBody);
         }
         else
