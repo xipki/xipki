@@ -290,7 +290,7 @@ public final class RAWorkerImpl extends AbstractRAWorker implements RAWorker
             String caName = caType.getName();
             try
             {
-                CAConf ca = new CAConf(caName, caType.getUrl());
+                CAConf ca = new CAConf(caName, caType.getUrl(), caType.getRequestor());
                 CAInfoType caInfo = caType.getCAInfo();
                 if(caInfo.getAutoConf() == null)
                 {
@@ -331,41 +331,51 @@ public final class RAWorkerImpl extends AbstractRAWorker implements RAWorker
             }
         }
 
-        // requestor
-        X509Certificate requestorCert = null;
-        RequestorType requestorConf = config.getRequestor();
-        if(requestorConf.getCert() != null)
-        {
-            try
-            {
-                requestorCert = IoCertUtil.parseCert(readData(requestorConf.getCert()));
-            } catch (Exception e)
-            {
-                throw new ConfigurationException(e);
-            }
-        }
+        // requestors
+        Map<String, X509Certificate> requestorCerts = new HashMap<>();
+        Map<String, ConcurrentContentSigner> requestorSigners = new HashMap<>();
+        Map<String, Boolean> requestorSignRequests = new HashMap<>();
 
-        // ------------------------------------------------
-        ConcurrentContentSigner requestorSigner = null;
-        if(requestorConf.getSignerType() != null)
+        for(RequestorType requestorConf : config.getRequestors().getRequestor())
         {
-            try
+            String name = requestorConf.getName();
+            requestorSignRequests.put(name, requestorConf.isSignRequest());
+
+            X509Certificate requestorCert = null;
+            if(requestorConf.getCert() != null)
             {
-                requestorSigner = securityFactory.createSigner(
-                        requestorConf.getSignerType(), requestorConf.getSignerConf(), requestorCert);
-            } catch (SignerException e)
-            {
-                throw new ConfigurationException(e);
+                try
+                {
+                    requestorCert = IoCertUtil.parseCert(readData(requestorConf.getCert()));
+                    requestorCerts.put(name, requestorCert);
+                } catch (Exception e)
+                {
+                    throw new ConfigurationException(e);
+                }
             }
-        } else
-        {
-            if(requestorConf.isSignRequest())
+
+            // ------------------------------------------------
+            if(requestorConf.getSignerType() != null)
             {
-                throw new ConfigurationException("Signer of requestor must be configured");
-            }
-            else if(requestorCert == null)
+                try
+                {
+                    ConcurrentContentSigner requestorSigner = securityFactory.createSigner(
+                            requestorConf.getSignerType(), requestorConf.getSignerConf(), requestorCert);
+                    requestorSigners.put(name, requestorSigner);
+                } catch (SignerException e)
+                {
+                    throw new ConfigurationException(e);
+                }
+            } else
             {
-                throw new ConfigurationException("At least one of certificate and signer of requestor must be configured");
+                if(requestorConf.isSignRequest())
+                {
+                    throw new ConfigurationException("Signer of requestor must be configured");
+                }
+                else if(requestorCert == null)
+                {
+                    throw new ConfigurationException("At least one of certificate and signer of requestor must be configured");
+                }
             }
         }
 
@@ -374,7 +384,7 @@ public final class RAWorkerImpl extends AbstractRAWorker implements RAWorker
         {
             if(null != this.casMap.put(ca.getName(), ca))
             {
-                throw new IllegalArgumentException("duplicate CAs with the same name " + ca.getName());
+                throw new ConfigurationException("duplicate CAs with the same name " + ca.getName());
             }
 
             if(ca.isAutoConf())
@@ -382,17 +392,24 @@ public final class RAWorkerImpl extends AbstractRAWorker implements RAWorker
                 autoConf = true;
             }
 
+            String requestorName = ca.getRequestorName();
+
             X509CmpRequestor cmpRequestor;
-            if(requestorSigner != null)
+            if(requestorSigners.containsKey(requestorName))
             {
                 cmpRequestor = new DefaultHttpCmpRequestor(
-                        requestorSigner, ca.getResponder(), ca.getUrl(),
-                        securityFactory, requestorConf.isSignRequest());
-            } else
+                        requestorSigners.get(requestorName), ca.getResponder(), ca.getUrl(),
+                        securityFactory, requestorSignRequests.get(requestorName));
+            } else if(requestorCerts.containsKey(requestorName))
             {
                 cmpRequestor = new DefaultHttpCmpRequestor(
-                        requestorCert, ca.getResponder(), ca.getUrl(),
+                        requestorCerts.get(requestorName), ca.getResponder(), ca.getUrl(),
                         securityFactory);
+            }
+            else
+            {
+                throw new ConfigurationException("Could not find requestor named " + requestorName +
+                        " for CA " + ca.getName());
             }
 
             ca.setRequestor(cmpRequestor);
@@ -400,7 +417,6 @@ public final class RAWorkerImpl extends AbstractRAWorker implements RAWorker
 
         if(autoConf)
         {
-            scheduledThreadPoolExecutor = new ScheduledThreadPoolExecutor(1);
             Integer cAInfoUpdateInterval = config.getCAs().getCAInfoUpdateInterval();
             if(cAInfoUpdateInterval == null)
             {
@@ -416,37 +432,15 @@ public final class RAWorkerImpl extends AbstractRAWorker implements RAWorker
             }
 
             Set<String> caNames = casMap.keySet();
-            final int tries = 2;
-            for(int i = 0; i < tries && caNames.isEmpty() == false; i++)
-            {
-                StringBuilder sb = new StringBuilder("Configuring CAs ");
-                sb.append(caNames);
-                sb.append("(");
-                if(i == 0)
-                {
-                    sb.append("first");
-                }
-                else if(i == 1)
-                {
-                    sb.append("second");
-                }
-                else if(i == 2)
-                {
-                    sb.append("third");
-                }
-                else
-                {
-                    sb.append(i + "-th");
-                }
-                sb.append(" try)");
+            StringBuilder sb = new StringBuilder("Configuring CAs ");
+            sb.append(caNames);
 
-                LOG.info(sb.toString());
-                caNames = autoConfCAs(caNames);
-            }
+            LOG.info(sb.toString());
+            caNames = autoConfCAs(caNames);
 
             if(caNames.isEmpty() == false)
             {
-                final String msg = "Could not configured following CAs " + caNames + " after " + tries + " tries";
+                final String msg = "Could not configured following CAs " + caNames;
                 if(devMode)
                 {
                     LOG.warn(msg);
@@ -459,6 +453,7 @@ public final class RAWorkerImpl extends AbstractRAWorker implements RAWorker
 
             if(cAInfoUpdateInterval > 0)
             {
+                scheduledThreadPoolExecutor = new ScheduledThreadPoolExecutor(1);
                 scheduledThreadPoolExecutor.scheduleAtFixedRate(
                         new ClientConfigUpdater(),
                         cAInfoUpdateInterval, cAInfoUpdateInterval, TimeUnit.MINUTES);

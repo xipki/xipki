@@ -14,7 +14,13 @@
   <xs:complexType name="CAClientType">
     <xs:all>
       <xs:element name="devMode" type="xs:boolean" minOccurs="0"/>
-      <xs:element name="requestor" type="requestorType"/>
+      <xs:element name="requestors">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="requestor" type="requestorType" maxOccurs="unbounded"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
       <xs:element name="CAs">
         <xs:complexType>
           <xs:sequence>
@@ -37,6 +43,7 @@
   </xs:complexType>
   <xs:complexType name="requestorType">
     <xs:all>
+      <xs:element name="name" type="xs:string"/>
       <xs:element name="signRequest" type="xs:boolean"/>
       <xs:element name="cert" type="fileOrValueType" minOccurs="0"/>
       <xs:element name="signerType" type="xs:string" minOccurs="0"/>
@@ -47,11 +54,11 @@
     <xs:all>
       <xs:element name="name" type="xs:string"/>
       <xs:element name="url" type="xs:anyURI"/>
+      <xs:element name="requestor" type="xs:string"/>
       <xs:element name="CAInfo" type="CAInfoType"/>
     </xs:all>
     <xs:attribute name="enabled" type="xs:boolean" default="true"/>
   </xs:complexType>
-  
   <xs:complexType name="CAInfoType">
     <xs:choice>
       <xs:element name="autoConf"/>
@@ -68,7 +75,6 @@
       </xs:sequence>
     </xs:choice>
   </xs:complexType>
-
   <xs:complexType name="fileOrValueType">
     <xs:choice>
       <xs:element name="value" type="xs:base64Binary"/>

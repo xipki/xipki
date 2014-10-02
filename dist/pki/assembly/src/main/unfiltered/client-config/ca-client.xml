@@ -1,23 +1,27 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <CAClient xmlns="http://xipki.org/caclient/conf/v1">
   <devMode>true</devMode>
-  <requestor>
-    <signRequest>false</signRequest>
-    <!-- Can be commented if the certificate can be retrieved from the signerType and signerConf -->
-    <cert>
-      <file>etc/tlskeys/tls-client.der</file>
-    </cert>
-    <!-- Required if signRequest is true -->
-    <!--
-    <signerType>JKS</signerType>
-    <signerConf>password?1234%algo?SHA256withRSA%keystore?file:etc/tlskeys/tls-client-keystore.jks</signerConf>
-    -->
-  </requestor>
+  <requestors>
+    <requestor>
+      <name>requestor1</name>
+      <signRequest>false</signRequest>
+      <!-- Can be commented if the certificate can be retrieved from the signerType and signerConf -->
+      <cert>
+        <file>etc/tlskeys/tls-client.der</file>
+      </cert>
+      <!-- Required if signRequest is true -->
+      <!--
+      <signerType>JKS</signerType>
+      <signerConf>password?1234%algo?SHA256withRSA%keystore?file:etc/tlskeys/tls-client-keystore.jks</signerConf>
+      -->
+    </requestor>
+  </requestors>
   <CAs>
     <CAInfoUpdateInterval>0</CAInfoUpdateInterval>
     <CA enabled="true">
       <name>RCA1</name>
       <url>https://localhost:8443/cmp/RCA</url>
+      <requestor>requestor1</requestor>
       <CAInfo>
         <autoConf/>
       </CAInfo>
@@ -25,6 +29,7 @@
     <CA enabled="true">
       <name>SubCA1</name>
       <url>https://localhost:8443/cmp/SubCA</url>
+      <requestor>requestor1</requestor>
       <CAInfo>
         <autoConf/>
       </CAInfo>
@@ -32,6 +37,7 @@
     <CA enabled="true">
       <name>SubCAwithCRL1</name>
       <url>https://localhost:8443/cmp/SubCAwithCRL</url>
+      <requestor>requestor1</requestor>
       <CAInfo>
         <autoConf/>
       </CAInfo>
