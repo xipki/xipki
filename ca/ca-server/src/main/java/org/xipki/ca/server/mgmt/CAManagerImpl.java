@@ -597,7 +597,8 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
                 }
 
                 CrlSigner crlSigner = null;
-                if(signerRequired && caEntry.getCrlSignerName() != null)
+                // CRL will be generated only in master mode
+                if(signerRequired && masterMode && caEntry.getCrlSignerName() != null)
                 {
                     CrlSignerEntry crlSignerEntry = crlSigners.get(caEntry.getCrlSignerName());
                     String signerType = crlSignerEntry.getType();
