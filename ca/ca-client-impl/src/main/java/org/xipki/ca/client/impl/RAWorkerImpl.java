@@ -304,7 +304,7 @@ public final class RAWorkerImpl extends AbstractRAWorker implements RAWorker
                     ca.setCAInfo(cert, certProfiles);
 
                     // responder
-                    cert = IoCertUtil.parseCert(readData(caInfo.getCert()));
+                    cert = IoCertUtil.parseCert(readData(caInfo.getResponder()));
                     ca.setResponder(cert);
                 }
                 else
@@ -478,6 +478,7 @@ public final class RAWorkerImpl extends AbstractRAWorker implements RAWorker
             scheduledThreadPoolExecutor = null;
         }
     }
+
     private static byte[] readData(FileOrValueType fileOrValue)
     throws IOException
     {
