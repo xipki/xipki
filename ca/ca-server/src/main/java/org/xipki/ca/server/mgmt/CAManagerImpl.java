@@ -257,6 +257,10 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
                         String datasourceName = key.substring("datasource.".length());
                         DataSourceWrapper datasource = dataSourceFactory.createDataSourceForFile(
                                 datasourceFile, securityFactory.getPasswordResolver());
+
+                        Connection conn = datasource.getConnection();
+                        datasource.returnConnection(conn);
+
                         this.dataSources.put(datasourceName, datasource);
                     } catch (SQLException | PasswordResolverException | IOException | RuntimeException e)
                     {
