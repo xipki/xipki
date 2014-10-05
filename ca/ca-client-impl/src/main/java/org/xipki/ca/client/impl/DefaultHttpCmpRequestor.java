@@ -7,7 +7,6 @@
 
 package org.xipki.ca.client.impl;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -18,6 +17,7 @@ import java.security.cert.X509Certificate;
 
 import org.xipki.security.api.ConcurrentContentSigner;
 import org.xipki.security.api.SecurityFactory;
+import org.xipki.security.common.IoCertUtil;
 import org.xipki.security.common.ParamChecker;
 
 /**
@@ -82,48 +82,33 @@ class DefaultHttpCmpRequestor extends X509CmpRequestor
         OutputStream outputstream = httpUrlConnection.getOutputStream();
         outputstream.write(request);
         outputstream.flush();
-        InputStream inputstream = httpUrlConnection.getInputStream();
-        try
-        {
-            if (httpUrlConnection.getResponseCode() != HttpURLConnection.HTTP_OK)
-            {
-                throw new IOException("Bad Response: "
-                        + httpUrlConnection.getResponseCode() + "  "
-                        + httpUrlConnection.getResponseMessage());
-            }
-            String responseContentType = httpUrlConnection.getContentType();
-            boolean isValidContentType = false;
-            if (responseContentType != null)
-            {
-                if (responseContentType.equalsIgnoreCase(CMP_RESPONSE_MIMETYPE))
-                {
-                    isValidContentType = true;
-                }
-            }
-            if (isValidContentType == false)
-            {
-                throw new IOException("Bad Response: Mime type "
-                        + responseContentType
-                        + " not supported!");
-            }
 
-            byte[] buf = new byte[4096];
-            ByteArrayOutputStream bytearrayoutputstream = new ByteArrayOutputStream();
-            do
-            {
-                int j = inputstream.read(buf);
-                if (j == -1)
-                {
-                    break;
-                }
-                bytearrayoutputstream.write(buf, 0, j);
-            } while (true);
-
-            return bytearrayoutputstream.toByteArray();
-        }finally
+        InputStream inputStream = httpUrlConnection.getInputStream();
+        if (httpUrlConnection.getResponseCode() != HttpURLConnection.HTTP_OK)
         {
-            inputstream.close();
+            inputStream.close();
+            throw new IOException("Bad Response: "
+                    + httpUrlConnection.getResponseCode() + "  "
+                    + httpUrlConnection.getResponseMessage());
         }
+        String responseContentType = httpUrlConnection.getContentType();
+        boolean isValidContentType = false;
+        if (responseContentType != null)
+        {
+            if (responseContentType.equalsIgnoreCase(CMP_RESPONSE_MIMETYPE))
+            {
+                isValidContentType = true;
+            }
+        }
+        if (isValidContentType == false)
+        {
+            inputStream.close();
+            throw new IOException("Bad Response: Mime type "
+                    + responseContentType
+                    + " not supported!");
+        }
+
+        return IoCertUtil.read(inputStream);
     }
 
 }
