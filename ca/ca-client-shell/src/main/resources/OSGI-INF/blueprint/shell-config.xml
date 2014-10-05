@@ -9,7 +9,7 @@
   <bean id="caNameCompleter" class="org.xipki.ca.client.shell.completer.CaNameCompleter">
     <property name="raWorker" ref="raWorker"/>
   </bean>
-  <bean id="randomDNCompleter" class="org.xipki.ca.client.shell.completer.RandomDNCompleter"/>  
+  <bean id="randomDNCompleter" class="org.xipki.ca.client.shell.completer.RandomDNCompleter"/>
   <bean id="p11ModuleNameCompleter" class="org.xipki.ca.client.shell.completer.P11ModuleNameCompleter">
     <property name="securityFactory" ref="securityFactory"/>
   </bean>

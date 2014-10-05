@@ -44,7 +44,7 @@
             </plugin>
           </plugins>
         </configuration>
-      </plugin>      
+      </plugin>
     </plugins>
   </build>
   <dependencies>
