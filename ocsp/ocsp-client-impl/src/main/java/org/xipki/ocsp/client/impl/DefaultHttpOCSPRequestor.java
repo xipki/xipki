@@ -7,7 +7,6 @@
 
 package org.xipki.ocsp.client.impl;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -16,6 +15,7 @@ import java.net.URL;
 
 import org.bouncycastle.util.encoders.Base64;
 import org.xipki.ocsp.client.api.RequestOptions;
+import org.xipki.security.common.IoCertUtil;
 
 /**
  * @author Lijun Liao
@@ -71,45 +71,29 @@ public class DefaultHttpOCSPRequestor extends AbstractOCSPRequestor
         }
 
         InputStream inputstream = httpUrlConnection.getInputStream();
-        try
-        {
-            if (httpUrlConnection.getResponseCode() != HttpURLConnection.HTTP_OK)
-            {
-                throw new IOException("Bad Response: "
-                        + httpUrlConnection.getResponseCode() + "  "
-                        + httpUrlConnection.getResponseMessage());
-            }
-            String responseContentType = httpUrlConnection.getContentType();
-            boolean isValidContentType = false;
-            if (responseContentType != null)
-            {
-                if (responseContentType.equalsIgnoreCase(CT_RESPONSE))
-                {
-                    isValidContentType = true;
-                }
-            }
-            if (isValidContentType == false)
-            {
-                throw new IOException("Bad Response: Mime type " + responseContentType + " not supported!");
-            }
-
-            byte[] buf = new byte[4096];
-            ByteArrayOutputStream bytearrayoutputstream = new ByteArrayOutputStream();
-            do
-            {
-                int j = inputstream.read(buf);
-                if (j == -1)
-                {
-                    break;
-                }
-                bytearrayoutputstream.write(buf, 0, j);
-            } while (true);
-
-            return bytearrayoutputstream.toByteArray();
-        }finally
+        if (httpUrlConnection.getResponseCode() != HttpURLConnection.HTTP_OK)
         {
             inputstream.close();
+            throw new IOException("Bad Response: "
+                    + httpUrlConnection.getResponseCode() + "  "
+                    + httpUrlConnection.getResponseMessage());
         }
+        String responseContentType = httpUrlConnection.getContentType();
+        boolean isValidContentType = false;
+        if (responseContentType != null)
+        {
+            if (responseContentType.equalsIgnoreCase(CT_RESPONSE))
+            {
+                isValidContentType = true;
+            }
+        }
+        if (isValidContentType == false)
+        {
+            inputstream.close();
+            throw new IOException("Bad Response: Mime type " + responseContentType + " not supported!");
+        }
+
+        return IoCertUtil.read(inputstream);
     }
 
 }
