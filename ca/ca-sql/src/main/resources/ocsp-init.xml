@@ -1,6 +1,15 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog dbchangelog-3.0.xsd" logicalFilePath="ocsp-init.xml">
   <changeSet author="xipki" id="1">
+    <!-- table DBSCHEMAINFO -->
+    <createTable tableName="DBSCHEMAINFO">
+      <column name="VERSION" type="SMALLINT">
+        <constraints nullable="false"/>
+      </column>
+    </createTable>
+    <insert tableName="DBSCHEMAINFO">
+      <column name="VERSION" value="1"/>
+    </insert>
     <!-- table ISSUER -->
     <createTable tableName="ISSUER">
       <column name="ID" type="INT">
