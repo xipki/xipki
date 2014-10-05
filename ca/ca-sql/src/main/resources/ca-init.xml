@@ -2,6 +2,15 @@
 <databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog dbchangelog-3.0.xsd" logicalFilePath="ca-init.xml">
   <!-- CA configuration :: create table -->
   <changeSet author="xipki" id="1">
+    <!-- table DBSCHEMAINFO -->
+    <createTable tableName="DBSCHEMAINFO">
+      <column name="VERSION" type="SMALLINT">
+        <constraints nullable="false"/>
+      </column>
+    </createTable>
+    <insert tableName="DBSCHEMAINFO">
+      <column name="VERSION" value="1"/>
+    </insert>
     <!-- table CALOCK -->
     <createTable tableName="CALOCK">
       <column name="NAME" type="VARCHAR(45)">
@@ -383,7 +392,7 @@
       <column name="SEQ_NAME" value="CRL_ID"/>
       <column name="SEQ_VALUE" value="1"/>
     </insert>
-  </changeSet>  
+  </changeSet>
   <changeSet author="xipki" id="4" dbms="oracle,postgresql,db2,h2,hsqldb">
     <!-- sequence for the column ID in table DELTACRL_CACHE -->
     <createSequence sequenceName="DCC_ID" incrementBy="1" startValue="1"/>
