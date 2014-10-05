@@ -1,0 +1,11 @@
+Due to the license restrictions I cannot provide the JDBC drivers of Oracle and DB2.
+Please copy them to this directory.
+
+1. Oracle
+  Driver: ojdbc7.jar
+  Download URL: http://www.oracle.com/technetwork/database/features/jdbc/jdbc-drivers-12c-download-1958347.html
+
+2. DB2
+  Driver: db2jcc4.jar
+  
+  
