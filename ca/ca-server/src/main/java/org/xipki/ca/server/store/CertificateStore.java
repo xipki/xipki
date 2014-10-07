@@ -175,24 +175,26 @@ public class CertificateStore
         }
     }
 
-    public X509CertificateWithMetaInfo removeCertificate(X509CertificateWithMetaInfo caCert,
+    X509CertificateWithMetaInfo getCert(X509CertificateWithMetaInfo caCert, BigInteger serialNumber)
+    throws OperationException, SQLException
+    {
+        try
+        {
+            return queryExecutor.getCert(caCert, serialNumber);
+        } catch (SQLException e)
+        {
+            LOG.debug("SQLException", e);
+            throw new OperationException(ErrorCode.DATABASE_FAILURE, e.getMessage());
+        }
+    }
+
+    public void removeCertificate(X509CertificateWithMetaInfo caCert,
             BigInteger serialNumber)
     throws OperationException
     {
         try
         {
-            X509CertificateWithMetaInfo removedCert = queryExecutor.removeCert(caCert, serialNumber);
-            if(removedCert == null)
-            {
-                LOG.info("Could not remove non-existing certificate issuer={}, serialNumber={}",
-                    caCert.getSubject(), serialNumber);
-            }
-            else
-            {
-                LOG.info("revoked certificate issuer={}, serialNumber={}", caCert.getSubject(), serialNumber);
-            }
-
-            return removedCert;
+            queryExecutor.removeCertificate(caCert, serialNumber);
         } catch (SQLException e)
         {
             LOG.debug("SQLException", e);
@@ -368,6 +370,36 @@ public class CertificateStore
         {
             return queryExecutor.getSerialNumbers(caCert, notExpiredAt, startSerial, numEntries, onlyRevoked,
                     onlyCACerts, onlyUserCerts);
+        } catch (SQLException e)
+        {
+            LOG.debug("SQLException", e);
+            throw new OperationException(ErrorCode.DATABASE_FAILURE, e.getMessage());
+        }
+    }
+
+    public List<BigInteger> getExpiredCertSerials(X509CertificateWithMetaInfo caCert,
+            long expiredAt, BigInteger startSerial, int numEntries,
+            String certProfile, String userLike)
+    throws OperationException
+    {
+        try
+        {
+            return queryExecutor.getExpiredSerialNumbers(caCert, expiredAt, startSerial,
+                    numEntries, certProfile, userLike);
+        } catch (SQLException e)
+        {
+            LOG.debug("SQLException", e);
+            throw new OperationException(ErrorCode.DATABASE_FAILURE, e.getMessage());
+        }
+    }
+
+    public int getNumOfExpiredCerts(X509CertificateWithMetaInfo caCert, long expiredAt,
+            String certProfile, String userLike)
+    throws OperationException
+    {
+        try
+        {
+            return queryExecutor.getNumOfExpiredCerts(caCert, expiredAt, certProfile, userLike);
         } catch (SQLException e)
         {
             LOG.debug("SQLException", e);

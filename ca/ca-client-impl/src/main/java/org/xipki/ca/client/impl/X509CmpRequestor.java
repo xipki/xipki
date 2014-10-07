@@ -74,6 +74,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.xipki.ca.client.api.RemoveExpiredCertsResult;
 import org.xipki.ca.cmp.CmpUtil;
 import org.xipki.ca.cmp.client.ClientErrorCode;
 import org.xipki.ca.cmp.client.CmpRequestor;
@@ -100,6 +101,7 @@ import org.xipki.security.api.SecurityFactory;
 import org.xipki.security.common.CmpUtf8Pairs;
 import org.xipki.security.common.CustomObjectIdentifiers;
 import org.xipki.security.common.IoCertUtil;
+import org.xipki.security.common.ParamChecker;
 import org.xipki.security.common.XMLUtil;
 import org.xml.sax.SAXException;
 
@@ -117,7 +119,7 @@ abstract class X509CmpRequestor extends CmpRequestor
 
     private static final Logger LOG = LoggerFactory.getLogger(X509CmpRequestor.class);
 
-    private DocumentBuilder xmlDocBuilder;
+    private final DocumentBuilder xmlDocBuilder;
 
     private boolean implicitConfirm = true;
 
@@ -126,6 +128,7 @@ abstract class X509CmpRequestor extends CmpRequestor
             SecurityFactory securityFactory)
     {
         super(requestorCert, responderCert, securityFactory);
+        xmlDocBuilder = newDocumentBuilder();
     }
 
     X509CmpRequestor(ConcurrentContentSigner requestor,
@@ -134,6 +137,20 @@ abstract class X509CmpRequestor extends CmpRequestor
             boolean signRequest)
     {
         super(requestor, responderCert, securityFactory, signRequest);
+        xmlDocBuilder = newDocumentBuilder();
+    }
+
+    private static DocumentBuilder newDocumentBuilder()
+    {
+        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+        dbf.setNamespaceAware(true);
+        try
+        {
+            return dbf.newDocumentBuilder();
+        } catch (ParserConfigurationException e)
+        {
+            throw new RuntimeException("Could not create XML document builder", e);
+        }
     }
 
     protected abstract byte[] send(byte[] request)
@@ -716,21 +733,6 @@ abstract class X509CmpRequestor extends CmpRequestor
     CAInfo retrieveCAInfo(String caName)
     throws CmpRequestorException
     {
-        DocumentBuilder docBuilder = xmlDocBuilder;
-        if(docBuilder == null)
-        {
-            DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-            dbf.setNamespaceAware(true);
-            try
-            {
-                docBuilder = dbf.newDocumentBuilder();
-                xmlDocBuilder = docBuilder;
-            } catch (ParserConfigurationException e)
-            {
-                throw new CmpRequestorException(e);
-            }
-        }
-
         PKIMessage request = buildMessageWithGeneralMsgContent(
                 new ASN1ObjectIdentifier(CustomObjectIdentifiers.id_cmp_getSystemInfo), null);
         PKIResponse response = signAndSend(request);
@@ -742,7 +744,7 @@ abstract class X509CmpRequestor extends CmpRequestor
         Document doc;
         try
         {
-            doc = docBuilder.parse(new ByteArrayInputStream(systemInfoStr.getBytes("UTF-8")));
+            doc = xmlDocBuilder.parse(new ByteArrayInputStream(systemInfoStr.getBytes("UTF-8")));
         } catch (SAXException | IOException e)
         {
             throw new CmpRequestorException("Could not parse the returned systemInfo for CA " + caName, e);
@@ -772,6 +774,104 @@ abstract class X509CmpRequestor extends CmpRequestor
         }
 
         return new CAInfo(caCert, profiles);
+    }
+
+    RemoveExpiredCertsResult removeExpiredCerts(
+            String certProfile, String userLike, long overlapSeconds)
+    throws CmpRequestorException
+    {
+        ParamChecker.assertNotEmpty("certProfile", certProfile);
+        if(overlapSeconds < 0)
+        {
+            throw new IllegalArgumentException("overlapSeconds could not be negative");
+        }
+
+        StringBuilder sb = new StringBuilder();
+
+        sb.append("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>");
+        sb.append("<removeExpiredCertsReq version=\"1\">");
+        // Profile
+        sb.append("<certProfile>");
+        sb.append(certProfile);
+        sb.append("</certProfile>");
+
+        // Username
+        if(userLike != null && userLike.isEmpty() == false)
+        {
+            sb.append("<userLike>");
+            sb.append(userLike);
+            sb.append("</userLike>");
+        }
+
+        sb.append("<overlap>");
+        sb.append(overlapSeconds);
+        sb.append("</overlap>");
+
+        sb.append("</removeExpiredCertsReq>");
+
+        String requestInfo = sb.toString();
+        PKIMessage request = buildMessageWithGeneralMsgContent(
+                new ASN1ObjectIdentifier(CustomObjectIdentifiers.id_cmp_removeExpiredCerts),
+                new DERUTF8String(requestInfo));
+        PKIResponse response = signAndSend(request);
+        ASN1Encodable itvValue = extractGeneralRepContent(response, CustomObjectIdentifiers.id_cmp_removeExpiredCerts);
+        DERUTF8String utf8Str = DERUTF8String.getInstance(itvValue);
+        String resultInfoStr = utf8Str.getString();
+
+        if(LOG.isDebugEnabled())
+        {
+            LOG.debug("removeExpiredCertsResp for (profile={}, usernameLike={}, overlapSeconds={}): {}",
+                    new Object[]{certProfile, userLike, overlapSeconds, resultInfoStr});
+        }
+        Document doc;
+        try
+        {
+            doc = xmlDocBuilder.parse(new ByteArrayInputStream(resultInfoStr.getBytes("UTF-8")));
+        } catch (SAXException | IOException e)
+        {
+            throw new CmpRequestorException("Could not parse the returned removeExpiredCertsResp", e);
+        }
+
+        String namespace = null;
+
+        RemoveExpiredCertsResult result = new RemoveExpiredCertsResult();
+        String nodeValue = XMLUtil.getValueOfFirstElementChild(doc.getDocumentElement(), namespace, "numCerts");
+        if(nodeValue != null)
+        {
+            try
+            {
+                result.setNumOfCerts(Integer.parseInt(nodeValue));
+            }catch(NumberFormatException e)
+            {
+                throw new CmpRequestorException("Invalid numCerts '" + nodeValue + "'");
+            }
+        }
+
+        nodeValue = XMLUtil.getValueOfFirstElementChild(doc.getDocumentElement(), namespace, "userLike");
+        if(nodeValue != null)
+        {
+            result.setUserLike(nodeValue);
+        }
+
+        nodeValue = XMLUtil.getValueOfFirstElementChild(doc.getDocumentElement(), namespace, "profile");
+        if(nodeValue != null)
+        {
+            result.setCertProfile(nodeValue);
+        }
+
+        nodeValue = XMLUtil.getValueOfFirstElementChild(doc.getDocumentElement(), namespace, "expiredAt");
+        if(nodeValue != null)
+        {
+            try
+            {
+                result.setExpiredAt(Long.parseLong(nodeValue));
+            }catch(NumberFormatException e)
+            {
+                throw new CmpRequestorException("Invalid expiredAt '" + nodeValue + "'");
+            }
+        }
+
+        return result;
     }
 
 }

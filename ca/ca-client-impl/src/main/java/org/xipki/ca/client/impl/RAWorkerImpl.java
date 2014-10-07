@@ -57,6 +57,7 @@ import org.bouncycastle.jce.provider.X509CertificateObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.ca.client.api.RAWorker;
+import org.xipki.ca.client.api.RemoveExpiredCertsResult;
 import org.xipki.ca.client.impl.jaxb.CAClientType;
 import org.xipki.ca.client.impl.jaxb.CAInfoType;
 import org.xipki.ca.client.impl.jaxb.CAType;
@@ -1190,6 +1191,28 @@ public final class RAWorkerImpl extends AbstractRAWorker implements RAWorker
     {
         CAConf ca = casMap.get(caName);
         return ca == null ? null : ca.getProfiles();
+    }
+
+    @Override
+    public RemoveExpiredCertsResult removeExpiredCerts(String caName,
+            String certProfile, String userLike, long overlapSeconds)
+    throws RAWorkerException, PKIErrorException
+    {
+        ParamChecker.assertNotNull("caName", caName);
+
+        if(casMap.containsKey(caName) == false)
+        {
+            throw new IllegalArgumentException("Unknown CAConf " + caName);
+        }
+
+        X509CmpRequestor requestor = casMap.get(caName).getRequestor();
+        try
+        {
+            return requestor.removeExpiredCerts(certProfile, userLike, overlapSeconds);
+        } catch (CmpRequestorException e)
+        {
+            throw new RAWorkerException(e);
+        }
     }
 
     private static CAClientType parse(InputStream configStream)

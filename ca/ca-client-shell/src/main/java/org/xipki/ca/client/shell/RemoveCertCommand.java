@@ -20,7 +20,7 @@ import org.xipki.security.common.IoCertUtil;
  * @author Lijun Liao
  */
 
-@Command(scope = "caclient", name = "remove", description="Remove certificate")
+@Command(scope = "caclient", name = "remove-cert", description="Remove certificate")
 public class RemoveCertCommand extends UnRevRemoveCertCommand
 {
 

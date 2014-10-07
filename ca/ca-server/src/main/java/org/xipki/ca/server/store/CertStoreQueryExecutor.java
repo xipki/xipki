@@ -714,18 +714,25 @@ class CertStoreQueryExecutor
         }
     }
 
-    X509CertificateWithMetaInfo removeCert(X509CertificateWithMetaInfo caCert, BigInteger serialNumber)
+    X509CertificateWithMetaInfo getCert(X509CertificateWithMetaInfo caCert, BigInteger serialNumber)
     throws OperationException, SQLException
     {
         CertWithRevocationInfo certWithRevInfo = getCertWithRevocationInfo(caCert, serialNumber);
         if(certWithRevInfo == null)
         {
-            LOG.warn("Certificate with issuer={} and serialNumber={} does not exist",
-                    caCert.getSubject(), serialNumber);
             return null;
         }
+        return certWithRevInfo.getCert();
+    }
 
-        Integer caId = getCaId(caCert); // could not be null
+    void removeCertificate(X509CertificateWithMetaInfo caCert, BigInteger serialNumber)
+    throws OperationException, SQLException
+    {
+        Integer caId = getCaId(caCert);
+        if(caId == null)
+        {
+            return;
+        }
 
         final String SQL_REVOKE_CERT = "DELETE FROM CERT WHERE CAINFO_ID=? AND SERIAL=?";
         PreparedStatement ps = borrowPreparedStatement(SQL_REVOKE_CERT);
@@ -755,7 +762,6 @@ class CertStoreQueryExecutor
             releaseDbResources(ps, null);
         }
 
-        return certWithRevInfo.getCert();
     }
 
     Long getGreatestSerialNumber(X509CertificateWithMetaInfo caCert)
@@ -914,6 +920,142 @@ class CertStoreQueryExecutor
             }
 
             return ret;
+        }finally
+        {
+            releaseDbResources(ps, rs);
+        }
+    }
+
+    List<BigInteger> getExpiredSerialNumbers(X509CertificateWithMetaInfo caCert,
+            long expiredAt, BigInteger startSerial, int numEntries,
+            String certProfile, String userLike)
+    throws SQLException, OperationException
+    {
+        ParamChecker.assertNotNull("caCert", caCert);
+        ParamChecker.assertNotNull("expiredAt", expiredAt);
+        ParamChecker.assertNotEmpty("certProfile", certProfile);
+
+        if(numEntries < 1)
+        {
+            throw new IllegalArgumentException("numEntries is not positive");
+        }
+
+        int caId = getCaId(caCert);
+
+        StringBuilder sqlBuilder = new StringBuilder(
+                "SERIAL FROM CERT WHERE CAINFO_ID=? AND SERIAL>? AND NOTAFTER<? AND CERTPROFILEINFO_ID=?");
+
+        if(userLike != null)
+        {
+            userLike = userLike.trim();
+            if(userLike.isEmpty() || "null".equalsIgnoreCase(userLike))
+            {
+                userLike = null;
+            }
+        }
+
+        Integer certProfileId = certprofileStore.getId(certProfile);
+        if(certProfileId == null)
+        {
+            return Collections.emptyList();
+        }
+
+        if(userLike == null)
+        {
+            sqlBuilder.append(" AND USER_ID IS NULL");
+        }
+        else if("all".equalsIgnoreCase(userLike) == false)
+        {
+            sqlBuilder.append(" AND USER_ID IN (SELECT ID FROM USERNAME WHERE NAME LIKE ?)");
+        }
+
+        final String sql = dataSource.createFetchFirstSelectSQL(sqlBuilder.toString(), numEntries, "SERIAL ASC");
+        PreparedStatement ps = borrowPreparedStatement(sql);
+
+        ResultSet rs = null;
+        try
+        {
+            int idx = 1;
+            ps.setInt(idx++, caId);
+            ps.setLong(idx++, (startSerial == null)? 0 : startSerial.longValue()-1);
+            ps.setLong(idx++, expiredAt);
+            ps.setInt(idx++, certProfileId);
+
+            if(userLike != null && "all".equalsIgnoreCase(userLike) == false)
+            {
+                ps.setString(idx++, userLike);
+            }
+
+            rs = ps.executeQuery();
+
+            List<BigInteger> ret = new ArrayList<>();
+            while(rs.next() && ret.size() < numEntries)
+            {
+                long serial = rs.getLong("SERIAL");
+                ret.add(BigInteger.valueOf(serial));
+            }
+
+            return ret;
+        }finally
+        {
+            releaseDbResources(ps, rs);
+        }
+    }
+
+    int getNumOfExpiredCerts(X509CertificateWithMetaInfo caCert, long expiredAt,
+            String certProfile, String userLike)
+    throws SQLException, OperationException
+    {
+        ParamChecker.assertNotNull("caCert", caCert);
+        ParamChecker.assertNotNull("expiredAt", expiredAt);
+        ParamChecker.assertNotEmpty("certProfile", certProfile);
+
+        int caId = getCaId(caCert);
+
+        StringBuilder sqlBuilder = new StringBuilder();
+        sqlBuilder.append("SELECT COUNT(*) FROM CERT WHERE CAINFO_ID=? AND NOTAFTER<? AND CERTPROFILEINFO_ID=?");
+        if(userLike != null)
+        {
+            userLike = userLike.trim();
+            if(userLike.isEmpty() || "null".equalsIgnoreCase(userLike))
+            {
+                userLike = null;
+            }
+        }
+
+        Integer certProfileId = certprofileStore.getId(certProfile);
+        if(certProfileId == null)
+        {
+            return 0;
+        }
+
+        if(userLike == null)
+        {
+            sqlBuilder.append(" AND USER_ID IS NULL");
+        }
+        else if("all".equalsIgnoreCase(userLike) == false)
+        {
+            sqlBuilder.append(" AND USER_ID IN (SELECT ID FROM USERNAME WHERE NAME LIKE ?)");
+        }
+
+        PreparedStatement ps = borrowPreparedStatement(sqlBuilder.toString());
+
+        ResultSet rs = null;
+        try
+        {
+            int idx = 1;
+            ps.setInt(idx++, caId);
+            ps.setLong(idx++, expiredAt);
+            ps.setInt(idx++, certProfileId);
+
+            if(userLike != null && "all".equalsIgnoreCase(userLike) == false)
+            {
+                ps.setString(idx++, userLike);
+            }
+
+            rs = ps.executeQuery();
+            rs.next();
+            return rs.getInt(1);
         }finally
         {
             releaseDbResources(ps, rs);
@@ -1830,7 +1972,7 @@ class CertStoreQueryExecutor
         if(id == null)
         {
             throw new IllegalStateException("Could not find entry named " + name + " in table " +
-                    store.getTable() + ", please start XiPKI in master mode first the restart this XiPKI system");
+                    store.getTable() + ", please start XiPKI in master mode first and then restart this XiPKI system");
         }
         return id.intValue();
     }

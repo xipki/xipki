@@ -33,6 +33,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.SimpleTimeZone;
 import java.util.TimeZone;
+import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -86,6 +87,7 @@ import org.xipki.ca.api.profile.SpecialCertProfileBehavior;
 import org.xipki.ca.api.profile.SubjectInfo;
 import org.xipki.ca.api.profile.X509Util;
 import org.xipki.ca.api.publisher.CertificateInfo;
+import org.xipki.ca.cmp.BadRequestException;
 import org.xipki.ca.common.BadCertTemplateException;
 import org.xipki.ca.common.BadFormatException;
 import org.xipki.ca.common.CAMgmtException;
@@ -121,6 +123,325 @@ import org.xipki.security.common.ParamChecker;
 
 public class X509CA
 {
+
+    private class ScheduledNextSerialCommitService implements Runnable
+    {
+        private boolean inProcess = false;
+        @Override
+        public void run()
+        {
+            if(inProcess)
+            {
+                return;
+            }
+
+            inProcess = true;
+            try
+            {
+                caInfo.commitNextSerial();
+            } catch (Throwable t)
+            {
+                final String message = "Could not commit the next_serial";
+                if(LOG.isErrorEnabled())
+                {
+                    LOG.error(LogUtil.buildExceptionLogFormat(message), t.getClass().getName(), t.getMessage());
+                }
+                LOG.debug(message, t);
+
+            } finally
+            {
+                inProcess = false;
+            }
+
+        }
+    }
+
+    private class ScheduledExpiredCertsRemover implements Runnable
+    {
+        private boolean inProcess = false;
+        @Override
+        public void run()
+        {
+            if(inProcess)
+            {
+                return;
+            }
+
+            inProcess = true;
+            boolean allCertsRemoved = true;
+
+            RemoveExpiredCertsInfo task = removeExpiredCertsQueue.poll();
+            if(task == null)
+            {
+                return;
+            }
+
+            try
+            {
+                BigInteger startSerial = BigInteger.ONE;
+                final int numEntries = 100;
+
+                X509CertificateWithMetaInfo caCert = caInfo.getCertificate();
+                long expiredAt = task.getExpiredAt();
+
+                List<BigInteger> serials;
+
+                do
+                {
+                    serials = certstore.getExpiredCertSerials(caCert, expiredAt, startSerial, numEntries,
+                            task.getCertProfile(), task.getUserLike());
+
+                    BigInteger maxSerial = BigInteger.ONE;
+                    for(BigInteger serial : serials)
+                    {
+                        if(serial.compareTo(maxSerial) > 0)
+                        {
+                            maxSerial = serial;
+                        }
+
+                        if((caInfo.isSelfSigned() && caInfo.getSerialNumber().equals(serial)) == false)
+                        {
+                            boolean removed = do_removeCertificate(serial) != null;
+                            if(removed == false)
+                            {
+                                allCertsRemoved = false;
+                            }
+                        }
+                    }
+
+                    startSerial = maxSerial.add(BigInteger.ONE);
+                }while(serials.size() >= numEntries && allCertsRemoved);
+
+            } catch (Throwable t)
+            {
+                if(allCertsRemoved == false)
+                {
+                    removeExpiredCertsQueue.add(task);
+                }
+
+                final String message = "Could not remove expired certificates";
+                if(LOG.isErrorEnabled())
+                {
+                    LOG.error(LogUtil.buildExceptionLogFormat(message), t.getClass().getName(), t.getMessage());
+                }
+                LOG.debug(message, t);
+
+            } finally
+            {
+                inProcess = false;
+            }
+
+        }
+    }
+
+    private class ScheduledCRLGenerationService implements Runnable
+    {
+        @Override
+        public void run()
+        {
+            if(crlGenInProcess.get())
+            {
+                return;
+            }
+
+            crlGenInProcess.set(true);
+
+            int thisInterval = -1;
+
+            Date thisUpdate = new Date();
+            long nowInSecond = thisUpdate.getTime() / SECOND;
+
+            try
+            {
+                int lastInterval = caInfo.getLastCRLInterval();
+
+                long lastCRLIntervalDateInSecond = caInfo.getLastCRLIntervalDate();
+                CRLControl control = crlSigner.getCRLcontrol();
+
+                boolean deltaCrl;
+                if(lastCRLIntervalDateInSecond == 0) // first time
+                {
+                    deltaCrl = false;
+                    thisInterval = 0;
+                }
+                else
+                {
+                    final int minutesSinceLastInterval = (int) (nowInSecond - lastCRLIntervalDateInSecond) / 60;
+                    int skippedIntervals = 0;
+
+                    // check whether it is the time to increase the number of intervals
+                    if(control.getIntervalMinutes() != null)
+                    {
+                        int intervalMinute = control.getIntervalMinutes().intValue();
+                        if(minutesSinceLastInterval < intervalMinute)
+                        {
+                            return;
+                        }
+                        else if(minutesSinceLastInterval % intervalMinute > 1)
+                        {
+                            skippedIntervals = minutesSinceLastInterval % intervalMinute - 1;
+                        }
+                    }
+                    else
+                    {
+                        final int minutesPerDay = 24 * 60;
+                        // in the last day the CA was not running
+                        if(minutesSinceLastInterval > minutesPerDay)
+                        {
+                            if(minutesSinceLastInterval / minutesPerDay > 1)
+                            {
+                                skippedIntervals = minutesSinceLastInterval % minutesPerDay - 1;
+                            }
+                        }
+                        // last interval date just in the last 10 minutes, ignore it
+                        else if(minutesSinceLastInterval > 10)
+                        {
+                        }
+                        else
+                        {
+                            int min = (int) ((nowInSecond / 60) % minutesPerDay);
+                            int expectedMin = 60 * control.getIntervalDayTime().getHour() + control.getIntervalMinutes();
+                            if(min - expectedMin < 0)
+                            {
+                                return;
+                            }
+                        }
+                    }
+
+                    thisInterval = lastInterval + 1;
+
+                    boolean generateFullCRL = false;
+                    boolean generateDeltaCRL = false;
+                    for(int i = 0; i < 1 + skippedIntervals; i++)
+                    {
+                        int interval = thisInterval + i;
+                        if(interval % control.getFullCRLIntervals() == 0)
+                        {
+                            generateFullCRL = true;
+                            break;
+                        }
+                        else if(control.getDeltaCRLIntervals() > 0 && interval % control.getDeltaCRLIntervals() == 0)
+                        {
+                            generateDeltaCRL = true;
+                        }
+                    }
+
+                    if(generateFullCRL == false && generateDeltaCRL == false)
+                    {
+                        return;
+                    }
+
+                    deltaCrl = generateFullCRL == false;
+                }
+
+                // find out the next interval for fullCRL and deltaCRL
+                int nextFullCRLInterval = 0;
+                int nextDeltaCRLInterval = 0;
+
+                for(int i = thisInterval + 1; ; i++)
+                {
+                    if(i % control.getFullCRLIntervals() == 0)
+                    {
+                        nextFullCRLInterval = i;
+                        break;
+                    }
+
+                    if(nextDeltaCRLInterval != 0 &&
+                            control.getDeltaCRLIntervals() != 0 &&
+                            i % control.getDeltaCRLIntervals() == 0)
+                    {
+                        nextDeltaCRLInterval = i;
+                    }
+                }
+
+                int intervalOfNextUpdate;
+                if(deltaCrl)
+                {
+                    intervalOfNextUpdate = nextDeltaCRLInterval == 0 ?
+                            nextFullCRLInterval : Math.min(nextFullCRLInterval, nextDeltaCRLInterval);
+                }
+                else
+                {
+                    if(nextDeltaCRLInterval == 0)
+                    {
+                        intervalOfNextUpdate = nextFullCRLInterval;
+                    }
+                    else
+                    {
+                        intervalOfNextUpdate = control.isExtendedNextUpdate() ?
+                                nextFullCRLInterval : Math.min(nextFullCRLInterval, nextDeltaCRLInterval);
+                    }
+                }
+
+                Date nextUpdate;
+                if(control.getIntervalMinutes() != null)
+                {
+                    int minutesTillNextUpdate = (intervalOfNextUpdate - thisInterval) * control.getIntervalMinutes()
+                            + control.getOverlapMinutes();
+                    nextUpdate = new Date(SECOND * (nowInSecond + minutesTillNextUpdate * 60));
+                }
+                else
+                {
+                    Calendar c = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
+                    c.setTime(new Date(nowInSecond * SECOND));
+                    c.add(Calendar.DAY_OF_YEAR, (intervalOfNextUpdate - thisInterval));
+                    c.set(Calendar.HOUR_OF_DAY, control.getIntervalDayTime().getHour());
+                    c.set(Calendar.MINUTE, control.getIntervalDayTime().getMinute());
+                    c.add(Calendar.MINUTE, control.getOverlapMinutes());
+                    c.set(Calendar.SECOND, 0);
+                    c.set(Calendar.MILLISECOND, 0);
+                    nextUpdate = c.getTime();
+                }
+
+                try
+                {
+                    long maxIdOfDeltaCRLCache = certstore.getMaxIdOfDeltaCRLCache(caInfo.getCertificate());
+                    generateCRL(deltaCrl, thisUpdate, nextUpdate);
+
+                    try
+                    {
+                        certstore.clearDeltaCRLCache(caInfo.getCertificate(), maxIdOfDeltaCRLCache);
+                    } catch (Throwable t)
+                    {
+                        final String message = "Could not clear DeltaCRLCache of CA " + caInfo.getName();
+                        if(LOG.isErrorEnabled())
+                        {
+                            LOG.error(LogUtil.buildExceptionLogFormat(message), t.getClass().getName(), t.getMessage());
+                        }
+                        LOG.debug(message, t);
+                    }
+
+                    try
+                    {
+                        caInfo.setLastCRLInterval(deltaCrl ? thisInterval : 0);
+                        caInfo.setLastCRLIntervalDate(nowInSecond);
+                        caManager.setCrlLastInterval(caInfo.getName(), caInfo.getLastCRLInterval(),
+                                caInfo.getLastCRLIntervalDate());
+                    } catch (Throwable t)
+                    {
+                        final String message = "Could not set the CRL lastInterval of CA " + caInfo.getName();
+                        if(LOG.isErrorEnabled())
+                        {
+                            LOG.error(LogUtil.buildExceptionLogFormat(message), t.getClass().getName(), t.getMessage());
+                        }
+                        LOG.debug(message, t);
+                    }
+                }catch(OperationException e)
+                {
+                    final String message = "Error in generateCRL()";
+                    if(LOG.isErrorEnabled())
+                    {
+                        LOG.error(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(), e.getMessage());
+                    }
+                    LOG.debug(message, e);
+                }
+            } finally
+            {
+                crlGenInProcess.set(false);
+            }
+        }
+    }
+
     private static long SECOND = 1000;
     private static long DAY = 24L * 60 * 60 * SECOND;
 
@@ -135,6 +456,7 @@ public class X509CA
     private final GeneralNames caSubjectAltName;
     private final CertificateStore certstore;
     private final CrlSigner crlSigner;
+    private final boolean masterMode;
 
     private final CAManagerImpl caManager;
     private Boolean tryXipkiNSStoVerify;
@@ -142,6 +464,7 @@ public class X509CA
 
     private final ConcurrentSkipListMap<String, List<String>> pendingSubjectMap = new ConcurrentSkipListMap<>();
     private final ConcurrentSkipListMap<String, List<String>> pendingKeyMap = new ConcurrentSkipListMap<>();
+    private final ConcurrentLinkedDeque<RemoveExpiredCertsInfo> removeExpiredCertsQueue = new ConcurrentLinkedDeque<>();
 
     private final AtomicInteger numActiveRevocations = new AtomicInteger(0);
 
@@ -163,6 +486,7 @@ public class X509CA
         this.caSigner = caSigner;
         this.certstore = certstore;
         this.crlSigner = crlSigner;
+        this.masterMode = masterMode;
 
         X509CertificateWithMetaInfo caCert = caInfo.getCertificate();
 
@@ -233,6 +557,10 @@ public class X509CA
             caManager.getScheduledThreadPoolExecutor().scheduleAtFixedRate(crlGenerationService,
                     1, 1, TimeUnit.MINUTES);
         }
+
+        ScheduledExpiredCertsRemover expiredCertsRemover = new ScheduledExpiredCertsRemover();
+        caManager.getScheduledThreadPoolExecutor().scheduleAtFixedRate(expiredCertsRemover,
+                10, 10, TimeUnit.MINUTES);
     }
 
     public CAInfo getCAInfo()
@@ -333,6 +661,12 @@ public class X509CA
     public X509CRL generateCRLonDemand()
     throws OperationException
     {
+        if(masterMode == false)
+        {
+            throw new OperationException(ErrorCode.INSUFFICIENT_PERMISSION,
+                    "CA cannot generate CRL at slave mode");
+        }
+
         if(crlGenInProcess.get())
         {
             throw new OperationException(ErrorCode.System_Unavailable,
@@ -1267,44 +1601,54 @@ public class X509CA
                     "Not allow to remove CA certificate");
         }
 
-        X509CertificateWithMetaInfo removedCert =
-                certstore.removeCertificate(caInfo.getCertificate(), serialNumber);
-        if(removedCert != null)
-        {
-            for(IdentifiedCertPublisher publisher : getPublishers())
-            {
-                boolean successfull;
-                try
-                {
-                    successfull = publisher.certificateRemoved(caInfo.getCertificate(), removedCert);
-                }
-                catch (RuntimeException e)
-                {
-                    successfull = false;
-                    final String message = "Error while remove certificate to the publisher " + publisher.getName();
-                    if(LOG.isWarnEnabled())
-                    {
-                        LOG.warn(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(), e.getMessage());
-                    }
-                    LOG.debug(message, e);
-                }
+        return do_removeCertificate(serialNumber);
+    }
 
-                if(successfull == false)
+    private X509CertificateWithMetaInfo do_removeCertificate(BigInteger serialNumber)
+    throws OperationException
+    {
+        CertWithRevocationInfo certWithRevInfo =
+                certstore.getCertWithRevocationInfo(caInfo.getCertificate(), serialNumber);
+        if(certWithRevInfo == null)
+        {
+            return null;
+        }
+
+        boolean successful = true;
+        X509CertificateWithMetaInfo certToRemove = certWithRevInfo.getCert();
+        for(IdentifiedCertPublisher publisher : getPublishers())
+        {
+            boolean singleSuccessful;
+            try
+            {
+                singleSuccessful = publisher.certificateRemoved(caInfo.getCertificate(), certToRemove);
+            }
+            catch (RuntimeException e)
+            {
+                singleSuccessful = false;
+                final String message = "Error while remove certificate to the publisher " + publisher.getName();
+                if(LOG.isWarnEnabled())
                 {
-                    X509Certificate c = removedCert.getCert();
-                    LOG.error("Removing certificate issuer={}, serial={}, subject={} from publisher {} failed."
-                            + " Please remove it manually",
-                            new Object[]
-                            {
-                                    IoCertUtil.canonicalizeName(c.getIssuerX500Principal()),
-                                    c.getSerialNumber(),
-                                    IoCertUtil.canonicalizeName(c.getSubjectX500Principal()),
-                                    publisher.getName()});
+                    LOG.warn(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(), e.getMessage());
                 }
+                LOG.debug(message, e);
+            }
+
+            if(singleSuccessful == false)
+            {
+                successful = false;
+                X509Certificate c = certToRemove.getCert();
+                LOG.error("Removing certificate issuer={}, serial={}, subject={} from publisher {} failed.",
+                        new Object[]
+                        {
+                                IoCertUtil.canonicalizeName(c.getIssuerX500Principal()),
+                                c.getSerialNumber(),
+                                IoCertUtil.canonicalizeName(c.getSubjectX500Principal()),
+                                publisher.getName()});
             }
         }
 
-        return removedCert;
+        return successful ? certToRemove : null;
     }
 
     private CertWithRevocationInfo do_revokeCertificate(BigInteger serialNumber,
@@ -2063,6 +2407,8 @@ public class X509CA
 
                 ret = new CertificateInfo(certWithMeta, caInfo.getCertificate(),
                         subjectPublicKeyData, certProfileName);
+                ret.setUser(user);
+
                 publishCertificate(ret);
             } catch (CertificateException | IOException | CertProfileException e)
             {
@@ -2341,244 +2687,56 @@ public class X509CA
         return caManager;
     }
 
-    private class ScheduledNextSerialCommitService implements Runnable
+    public RemoveExpiredCertsInfo removeExpiredCerts(String certProfile, String userLike, Long overlapSeconds)
+    throws OperationException, BadRequestException
     {
-        private boolean inProcess = false;
-        @Override
-        public void run()
+        if(masterMode == false)
         {
-            if(inProcess)
-            {
-                return;
-            }
-
-            inProcess = true;
-            try
-            {
-                caInfo.commitNextSerial();
-            } catch (Throwable t)
-            {
-                final String message = "Could not commit the next_serial";
-                if(LOG.isErrorEnabled())
-                {
-                    LOG.error(LogUtil.buildExceptionLogFormat(message), t.getClass().getName(), t.getMessage());
-                }
-                LOG.debug(message, t);
-
-            } finally
-            {
-                inProcess = false;
-            }
-
+            throw new OperationException(ErrorCode.INSUFFICIENT_PERMISSION,
+                    "CA cannot remove expired certificates at slave mode");
         }
-    }
 
-    private class ScheduledCRLGenerationService implements Runnable
-    {
-        @Override
-        public void run()
+        if(userLike != null)
         {
-            if(crlGenInProcess.get())
+            if(userLike.indexOf(' ') != -1 || userLike.indexOf('\t') != -1 ||
+                    userLike.indexOf('\r') != -1|| userLike.indexOf('\n') != -1)
             {
-                return;
+                throw new BadRequestException("invalid userLike '" + userLike + "'");
             }
 
-            crlGenInProcess.set(true);
-
-            int thisInterval = -1;
-
-            Date thisUpdate = new Date();
-            long nowInSecond = thisUpdate.getTime() / SECOND;
-
-            try
+            if(userLike.indexOf('*') != -1)
             {
-                int lastInterval = caInfo.getLastCRLInterval();
-
-                long lastCRLIntervalDateInSecond = caInfo.getLastCRLIntervalDate();
-                CRLControl control = crlSigner.getCRLcontrol();
-
-                boolean deltaCrl;
-                if(lastCRLIntervalDateInSecond == 0) // first time
-                {
-                    deltaCrl = false;
-                    thisInterval = 0;
-                }
-                else
-                {
-                    final int minutesSinceLastInterval = (int) (nowInSecond - lastCRLIntervalDateInSecond) / 60;
-                    int skippedIntervals = 0;
-
-                    // check whether it is the time to increase the number of intervals
-                    if(control.getIntervalMinutes() != null)
-                    {
-                        int intervalMinute = control.getIntervalMinutes().intValue();
-                        if(minutesSinceLastInterval < intervalMinute)
-                        {
-                            return;
-                        }
-                        else if(minutesSinceLastInterval % intervalMinute > 1)
-                        {
-                            skippedIntervals = minutesSinceLastInterval % intervalMinute - 1;
-                        }
-                    }
-                    else
-                    {
-                        final int minutesPerDay = 24 * 60;
-                        // in the last day the CA was not running
-                        if(minutesSinceLastInterval > minutesPerDay)
-                        {
-                            if(minutesSinceLastInterval / minutesPerDay > 1)
-                            {
-                                skippedIntervals = minutesSinceLastInterval % minutesPerDay - 1;
-                            }
-                        }
-                        // last interval date just in the last 10 minutes, ignore it
-                        else if(minutesSinceLastInterval > 10)
-                        {
-                        }
-                        else
-                        {
-                            int min = (int) ((nowInSecond / 60) % minutesPerDay);
-                            int expectedMin = 60 * control.getIntervalDayTime().getHour() + control.getIntervalMinutes();
-                            if(min - expectedMin < 0)
-                            {
-                                return;
-                            }
-                        }
-                    }
-
-                    thisInterval = lastInterval + 1;
-
-                    boolean generateFullCRL = false;
-                    boolean generateDeltaCRL = false;
-                    for(int i = 0; i < 1 + skippedIntervals; i++)
-                    {
-                        int interval = thisInterval + i;
-                        if(interval % control.getFullCRLIntervals() == 0)
-                        {
-                            generateFullCRL = true;
-                            break;
-                        }
-                        else if(control.getDeltaCRLIntervals() > 0 && interval % control.getDeltaCRLIntervals() == 0)
-                        {
-                            generateDeltaCRL = true;
-                        }
-                    }
-
-                    if(generateFullCRL == false && generateDeltaCRL == false)
-                    {
-                        return;
-                    }
-
-                    deltaCrl = generateFullCRL == false;
-                }
-
-                // find out the next interval for fullCRL and deltaCRL
-                int nextFullCRLInterval = 0;
-                int nextDeltaCRLInterval = 0;
-
-                for(int i = thisInterval + 1; ; i++)
-                {
-                    if(i % control.getFullCRLIntervals() == 0)
-                    {
-                        nextFullCRLInterval = i;
-                        break;
-                    }
-
-                    if(nextDeltaCRLInterval != 0 &&
-                            control.getDeltaCRLIntervals() != 0 &&
-                            i % control.getDeltaCRLIntervals() == 0)
-                    {
-                        nextDeltaCRLInterval = i;
-                    }
-                }
-
-                int intervalOfNextUpdate;
-                if(deltaCrl)
-                {
-                    intervalOfNextUpdate = nextDeltaCRLInterval == 0 ?
-                            nextFullCRLInterval : Math.min(nextFullCRLInterval, nextDeltaCRLInterval);
-                }
-                else
-                {
-                    if(nextDeltaCRLInterval == 0)
-                    {
-                        intervalOfNextUpdate = nextFullCRLInterval;
-                    }
-                    else
-                    {
-                        intervalOfNextUpdate = control.isExtendedNextUpdate() ?
-                                nextFullCRLInterval : Math.min(nextFullCRLInterval, nextDeltaCRLInterval);
-                    }
-                }
-
-                Date nextUpdate;
-                if(control.getIntervalMinutes() != null)
-                {
-                    int minutesTillNextUpdate = (intervalOfNextUpdate - thisInterval) * control.getIntervalMinutes()
-                            + control.getOverlapMinutes();
-                    nextUpdate = new Date(SECOND * (nowInSecond + minutesTillNextUpdate * 60));
-                }
-                else
-                {
-                    Calendar c = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
-                    c.setTime(new Date(nowInSecond * SECOND));
-                    c.add(Calendar.DAY_OF_YEAR, (intervalOfNextUpdate - thisInterval));
-                    c.set(Calendar.HOUR_OF_DAY, control.getIntervalDayTime().getHour());
-                    c.set(Calendar.MINUTE, control.getIntervalDayTime().getMinute());
-                    c.add(Calendar.MINUTE, control.getOverlapMinutes());
-                    c.set(Calendar.SECOND, 0);
-                    c.set(Calendar.MILLISECOND, 0);
-                    nextUpdate = c.getTime();
-                }
-
-                try
-                {
-                    long maxIdOfDeltaCRLCache = certstore.getMaxIdOfDeltaCRLCache(caInfo.getCertificate());
-                    generateCRL(deltaCrl, thisUpdate, nextUpdate);
-
-                    try
-                    {
-                        certstore.clearDeltaCRLCache(caInfo.getCertificate(), maxIdOfDeltaCRLCache);
-                    } catch (Throwable t)
-                    {
-                        final String message = "Could not clear DeltaCRLCache of CA " + caInfo.getName();
-                        if(LOG.isErrorEnabled())
-                        {
-                            LOG.error(LogUtil.buildExceptionLogFormat(message), t.getClass().getName(), t.getMessage());
-                        }
-                        LOG.debug(message, t);
-                    }
-
-                    try
-                    {
-                        caInfo.setLastCRLInterval(deltaCrl ? thisInterval : 0);
-                        caInfo.setLastCRLIntervalDate(nowInSecond);
-                        caManager.setCrlLastInterval(caInfo.getName(), caInfo.getLastCRLInterval(),
-                                caInfo.getLastCRLIntervalDate());
-                    } catch (Throwable t)
-                    {
-                        final String message = "Could not set the CRL lastInterval of CA " + caInfo.getName();
-                        if(LOG.isErrorEnabled())
-                        {
-                            LOG.error(LogUtil.buildExceptionLogFormat(message), t.getClass().getName(), t.getMessage());
-                        }
-                        LOG.debug(message, t);
-                    }
-                }catch(OperationException e)
-                {
-                    final String message = "Error in generateCRL()";
-                    if(LOG.isErrorEnabled())
-                    {
-                        LOG.error(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(), e.getMessage());
-                    }
-                    LOG.debug(message, e);
-                }
-            } finally
-            {
-                crlGenInProcess.set(false);
+                userLike = userLike.replace('*', '%');
             }
         }
+
+        RemoveExpiredCertsInfo info = new RemoveExpiredCertsInfo();
+        info.setUserLike(userLike);
+        info.setCertProfile(certProfile);
+
+        if(overlapSeconds == null || overlapSeconds < 0)
+        {
+            overlapSeconds = 24L * 60 * 60;
+        }
+        info.setOverlap(overlapSeconds);
+
+        long now = System.currentTimeMillis();
+        // remove the following DEBUG CODE
+        // now += DAY * 10 * 365;
+
+        long expiredAt = now / SECOND - overlapSeconds;
+        info.setExpiredAt(expiredAt);
+
+        int numOfCerts = certstore.getNumOfExpiredCerts(caInfo.getCertificate(), expiredAt,
+                certProfile, userLike);
+        info.setNumOfCerts(numOfCerts);
+
+        if(numOfCerts > 0)
+        {
+            removeExpiredCertsQueue.add(info);
+        }
+
+        return info;
     }
 
     private Date getCRLNextUpdate(Date thisUpdate)

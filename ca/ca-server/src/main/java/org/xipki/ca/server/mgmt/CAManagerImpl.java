@@ -106,6 +106,45 @@ import org.xipki.security.common.StringUtil;
 
 public class CAManagerImpl implements CAManager, CmpResponderManager
 {
+
+    private class ScheduledPublishQueueCleaner implements Runnable
+    {
+        private boolean inProcess = false;
+
+        @Override
+        public void run()
+        {
+            if(inProcess || caSystemSetuped == false)
+            {
+                return;
+            }
+
+            inProcess = true;
+            try
+            {
+                LOG.debug("Publishing certificates in PUBLISHQUEUE");
+                for(String name : x509cas.keySet())
+                {
+                    X509CA ca = x509cas.get(name);
+                    boolean b = ca.publishCertsInQueue();
+                    if(b)
+                    {
+                        LOG.debug(" Published certificates of CA {} in PUBLISHQUEUE", name);
+                    }
+                    else
+                    {
+                        LOG.error("Publishing certificates of CA {} in PUBLISHQUEUE failed", name);
+                    }
+                }
+            }catch(Throwable t)
+            {
+            }finally
+            {
+                inProcess = false;
+            }
+        }
+    }
+
     private static final Logger LOG = LoggerFactory.getLogger(CAManagerImpl.class);
 
     private final String lockInstanceId;
@@ -3407,44 +3446,6 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
                 }
             }
             scheduledThreadPoolExecutor = null;
-        }
-    }
-
-    private class ScheduledPublishQueueCleaner implements Runnable
-    {
-        private boolean inProcess = false;
-
-        @Override
-        public void run()
-        {
-            if(inProcess || caSystemSetuped == false)
-            {
-                return;
-            }
-
-            inProcess = true;
-            try
-            {
-                LOG.debug("Publishing certificates in PUBLISHQUEUE");
-                for(String name : x509cas.keySet())
-                {
-                    X509CA ca = x509cas.get(name);
-                    boolean b = ca.publishCertsInQueue();
-                    if(b)
-                    {
-                        LOG.debug(" Published certificates of CA {} in PUBLISHQUEUE", name);
-                    }
-                    else
-                    {
-                        LOG.error("Publishing certificates of CA {} in PUBLISHQUEUE failed", name);
-                    }
-                }
-            }catch(Throwable t)
-            {
-            }finally
-            {
-                inProcess = false;
-            }
         }
     }
 
