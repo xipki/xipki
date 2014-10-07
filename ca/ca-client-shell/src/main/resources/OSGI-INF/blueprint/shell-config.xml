@@ -71,13 +71,21 @@
         <entry key="-cacert" value-ref="filePathCompleter"/>
       </optional-completers>
     </command>
-    <command name="caclient/remove">
+    <command name="caclient/remove-cert">
       <action class="org.xipki.ca.client.shell.RemoveCertCommand">
         <property name="raWorker" ref="raWorker"/>
       </action>
       <optional-completers>
         <entry key="-cert" value-ref="filePathCompleter"/>
         <entry key="-cacert" value-ref="filePathCompleter"/>
+      </optional-completers>
+    </command>
+    <command name="caclient/remove-expired-certs">
+      <action class="org.xipki.ca.client.shell.RemoveExpiredCertsCommand">
+        <property name="raWorker" ref="raWorker"/>
+      </action>
+      <optional-completers>
+        <entry key="-ca" value-ref="caNameCompleter"/>
       </optional-completers>
     </command>
     <command name="caclient/gencrl">

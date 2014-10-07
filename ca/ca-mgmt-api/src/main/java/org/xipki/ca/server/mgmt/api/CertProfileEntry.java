@@ -26,6 +26,11 @@ public class CertProfileEntry implements Serializable
     {
         ParamChecker.assertNotEmpty("name", name);
         ParamChecker.assertNotEmpty("type", type);
+
+        if("all".equalsIgnoreCase(name) || "null".equalsIgnoreCase(name))
+        {
+            throw new IllegalArgumentException("certificate profile name could not be 'all' and 'null'");
+        }
         this.name = name;
         this.type = type;
         this.conf = conf;

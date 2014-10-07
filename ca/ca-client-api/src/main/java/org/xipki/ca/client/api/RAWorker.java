@@ -96,4 +96,15 @@ public interface RAWorker
     Map<String, CertIDOrError> removeCerts(UnrevokeOrRemoveCertRequestType request)
     throws RAWorkerException, PKIErrorException;
 
+    /**
+     * Remove the expired certificates
+     * @param caName
+     * @param certProfile certificate profile name or 'all' for all certificate profiles
+     * @param userLike user name pattern, or 'all' for all users, or {@code null} for those without user info
+     * @param overlapSeconds
+     */
+    RemoveExpiredCertsResult removeExpiredCerts(String caName,
+            String certProfile, String userLike, long overlapSeconds)
+    throws RAWorkerException, PKIErrorException;
+
 }

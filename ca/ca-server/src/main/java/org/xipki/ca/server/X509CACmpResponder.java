@@ -7,6 +7,8 @@
 
 package org.xipki.ca.server;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.math.BigInteger;
 import java.security.InvalidKeyException;
 import java.security.PublicKey;
@@ -17,6 +19,10 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 
 import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1Enumerated;
@@ -75,6 +81,7 @@ import org.bouncycastle.util.encoders.Base64;
 import org.bouncycastle.util.encoders.Hex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.w3c.dom.Document;
 import org.xipki.audit.api.AuditEvent;
 import org.xipki.audit.api.AuditEventData;
 import org.xipki.audit.api.AuditStatus;
@@ -82,6 +89,7 @@ import org.xipki.audit.api.ChildAuditEvent;
 import org.xipki.ca.api.OperationException;
 import org.xipki.ca.api.OperationException.ErrorCode;
 import org.xipki.ca.api.publisher.CertificateInfo;
+import org.xipki.ca.cmp.BadRequestException;
 import org.xipki.ca.cmp.CmpUtil;
 import org.xipki.ca.cmp.server.CmpResponder;
 import org.xipki.ca.common.CAStatus;
@@ -97,6 +105,8 @@ import org.xipki.security.common.CustomObjectIdentifiers;
 import org.xipki.security.common.HealthCheckResult;
 import org.xipki.security.common.IoCertUtil;
 import org.xipki.security.common.LogUtil;
+import org.xipki.security.common.XMLUtil;
+import org.xml.sax.SAXException;
 
 /**
  * @author Lijun Liao
@@ -114,12 +124,14 @@ public class X509CACmpResponder extends CmpResponder
     private final PendingCertificatePool pendingCertPool;
 
     private final X509CA ca;
+    private final DocumentBuilder xmlDocBuilder;
 
     static
     {
         knownGenMsgIds.add(CMPObjectIdentifiers.it_currentCRL.getId());
         knownGenMsgIds.add(CustomObjectIdentifiers.id_cmp_generateCRL);
         knownGenMsgIds.add(CustomObjectIdentifiers.id_cmp_getSystemInfo);
+        knownGenMsgIds.add(CustomObjectIdentifiers.id_cmp_removeExpiredCerts);
     }
 
     public X509CACmpResponder(X509CA ca, ConcurrentContentSigner responder, SecurityFactory securityFactory)
@@ -128,6 +140,16 @@ public class X509CACmpResponder extends CmpResponder
 
         this.ca = ca;
         this.pendingCertPool = new PendingCertificatePool();
+
+        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+        dbf.setNamespaceAware(true);
+        try
+        {
+            xmlDocBuilder = dbf.newDocumentBuilder();
+        } catch (ParserConfigurationException e)
+        {
+            throw new RuntimeException("Could not create XML document builder", e);
+        }
 
         PendingPoolCleaner pendingPoolCleaner = new PendingPoolCleaner();
         ca.getCAManager().getScheduledThreadPoolExecutor().scheduleAtFixedRate(
@@ -442,8 +464,17 @@ public class X509CACmpResponder extends CmpResponder
                             }
                             else if(CustomObjectIdentifiers.id_cmp_getSystemInfo.equals(infoType.getId()))
                             {
+                                eventType = "GET_SYSTEMINFO";
                                 String systemInfo = getSystemInfo(_requestor);
                                 itvResp = new InfoTypeAndValue(infoType, new DERUTF8String(systemInfo));
+                            }
+                            else if(CustomObjectIdentifiers.id_cmp_removeExpiredCerts.equals(infoType.getId()))
+                            {
+                                eventType = "REMOVE_EXIPIRED_CERTS";
+                                checkPermission(_requestor, Permission.REMOVE_CERT);
+
+                                String info = removeExpiredCerts(_requestor, itv.getInfoValue());
+                                itvResp = new InfoTypeAndValue(infoType, new DERUTF8String(info));
                             }
                             else
                             {
@@ -474,6 +505,10 @@ public class X509CACmpResponder extends CmpResponder
                         {
                             failureInfo = PKIFailureInfo.systemFailure;
                             statusMessage = "CRLException: " + e.getMessage();
+                        } catch (BadRequestException e)
+                        {
+                            failureInfo = PKIFailureInfo.badRequest;
+                            statusMessage = e.getMessage();
                         }
                     }
 
@@ -1410,6 +1445,94 @@ public class X509CACmpResponder extends CmpResponder
         }
 
         sb.append("</systemInfo>");
+        return sb.toString();
+    }
+
+    private String removeExpiredCerts(CmpRequestorInfo requestor, ASN1Encodable asn1RequestInfo)
+    throws BadRequestException, OperationException, InsuffientPermissionException
+    {
+        String requestInfo = null;
+        try
+        {
+            DERUTF8String asn1 = DERUTF8String.getInstance(asn1RequestInfo);
+            requestInfo = asn1.getString();
+        }catch(IllegalArgumentException e)
+        {
+            throw new BadRequestException("The content is not of UTF8 String");
+        }
+
+        final String namespace = null;
+        Document doc;
+        try
+        {
+            doc = xmlDocBuilder.parse(new ByteArrayInputStream(requestInfo.getBytes("UTF-8")));
+        } catch (SAXException | IOException e)
+        {
+            throw new BadRequestException("Invalid request", e);
+        }
+
+        String certProfile = XMLUtil.getValueOfFirstElementChild(doc.getDocumentElement(), namespace, "certProfile");
+        if(certProfile == null)
+        {
+            throw new BadRequestException("certProfile is not specified");
+        }
+
+        // make sure that the requestor is permitted to remove the certificate profiles
+        checkPermission(requestor, certProfile);
+
+        String userLike = XMLUtil.getValueOfFirstElementChild(doc.getDocumentElement(), namespace, "userLike");
+
+        String nodeValue = XMLUtil.getValueOfFirstElementChild(doc.getDocumentElement(), namespace, "overlap");
+
+        Long overlapSeconds = null;
+        if(nodeValue == null)
+        {
+            try
+            {
+                overlapSeconds = Long.parseLong(nodeValue);
+            }catch(NumberFormatException e)
+            {
+                throw new BadRequestException("Invalid overlap '" + nodeValue + "'");
+            }
+        }
+
+        RemoveExpiredCertsInfo result = ca.removeExpiredCerts(certProfile, userLike, overlapSeconds);
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>");
+        sb.append("<removedExpiredCertsResp version=\"1\">");
+        // Profile
+        certProfile = result.getCertProfile();
+        sb.append("<certProfile>");
+        sb.append(certProfile);
+        sb.append("</certProfile>");
+
+        // Username
+        userLike = result.getUserLike();
+        if(userLike != null && userLike.isEmpty() == false)
+        {
+            sb.append("<userLike>");
+            sb.append(userLike);
+            sb.append("</userLike>");
+        }
+
+        // overlap
+        sb.append("<overlap>");
+        sb.append(result.getOverlap());
+        sb.append("</overlap>");
+
+        // expiredAt
+        sb.append("<expiredAt>");
+        sb.append(result.getExpiredAt());
+        sb.append("</expiredAt>");
+
+        // numCerts
+        sb.append("<numCerts>");
+        sb.append(result.getNumOfCerts());
+        sb.append("</numCerts>");
+
+        sb.append("</removedExpiredCertsResp>");
+
         return sb.toString();
     }
 
