@@ -266,6 +266,20 @@ public abstract class CmpResponder
             requestor = null;
         }
 
+        String username = null;
+        if(cmdForCmpRespCert == false)
+        {
+            CmpUtf8Pairs keyvalues = CmpUtil.extract(reqHeader.getGeneralInfo());
+            username = keyvalues == null ? null : keyvalues.getValue(CmpUtf8Pairs.KEY_USER);
+            if(username != null)
+            {
+                if(username.indexOf('*') != -1 || username.indexOf('%') != -1)
+                {
+                    errorStatus = "user could not contains characters '*' and '%'";
+                }
+            }
+        }
+
         if(errorStatus != null)
         {
             if(auditEvent != null)
@@ -295,9 +309,6 @@ public abstract class CmpResponder
         }
         else
         {
-            CmpUtf8Pairs keyvalues = CmpUtil.extract(reqHeader.getGeneralInfo());
-            String username = keyvalues == null ? null : keyvalues.getValue(CmpUtf8Pairs.KEY_USER);
-
             resp = intern_processPKIMessage(requestor, username, tid, message, auditEvent);
         }
 
