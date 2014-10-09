@@ -10,6 +10,10 @@ package org.xipki.ca.client.shell.loadtest;
 import org.apache.felix.gogo.commands.Command;
 import org.apache.felix.gogo.commands.Option;
 import org.xipki.ca.client.shell.ClientCommand;
+import org.xipki.ca.client.shell.loadtest.KeyEntry.DSAKeyEntry;
+import org.xipki.ca.client.shell.loadtest.KeyEntry.ECKeyEntry;
+import org.xipki.ca.client.shell.loadtest.KeyEntry.RSAKeyEntry;
+import org.xipki.ca.client.shell.loadtest.LoadTestEntry.RandomDN;
 import org.xipki.security.common.AbstractLoadTest;
 
 /**
@@ -32,8 +36,9 @@ public class CALoadTestEnrollCommand extends ClientCommand
 
     @Option(name = "-randomDN",
             required = false,
-            description = "DN name to be incremented, valid values are CN, O and OU")
-    protected String randomDNStr;
+            description = "DN name to be incremented, valid values are\n"
+                    + "GIVENNAME, SURNAME, STREET, POSTALCODE, O, OU and CN")
+    protected String randomDNStr = "O";
 
     @Option(name = "-duration",
             required = false,
@@ -45,18 +50,22 @@ public class CALoadTestEnrollCommand extends ClientCommand
             description = "Number of threads")
     protected Integer numThreads = 5;
 
-    @Option(name="-ec",
+    @Option(name="-keyType",
             required = false,
-            description = "Generate certificate for ECC key")
-    private Boolean ecc = Boolean.FALSE;
+            description = "Key type to be requested. Valid values are RSA, EC and DSA")
+    private String keyType = "RSA";
+
+    @Option(name = "-user",
+            required = false, description = "Username")
+    protected String user;
 
     @Option(name="-keysize",
             required = false,
-            description = "Key size of RSA key")
+            description = "Modulus length of RSA key or p length of DSA key")
     private Integer keysize = 2048;
 
     @Option(name = "-curve",
-            description = "EC curve name or OID",
+            description = "EC curve name or OID of EC key",
             required = false)
     protected String curveName = "brainpoolp256r1";
 
@@ -87,6 +96,7 @@ public class CALoadTestEnrollCommand extends ClientCommand
         startMsg.append("Duration:        ").append(AbstractLoadTest.formatTime(durationInSecond).trim()).append("\n");
         startMsg.append("SubjectTemplate: ").append(subjectTemplate).append("\n");
         startMsg.append("Profile:         ").append(certProfile).append("\n");
+        startMsg.append("KeyType:         ").append(keyType).append("\n");
         startMsg.append("#Certs/Request:  ").append(n).append("\n");
         out(startMsg.toString());
 
@@ -97,19 +107,31 @@ public class CALoadTestEnrollCommand extends ClientCommand
             if(randomDN == null)
             {
                 err("Invalid randomDN " + randomDNStr);
+                return null;
             }
         }
 
-        CALoadTestEnroll loadTest;
-        if(ecc.booleanValue())
+        KeyEntry keyEntry;
+        if("EC".equalsIgnoreCase(keyType))
         {
-            loadTest = new CALoadTestEnroll.ECCALoadTest(raWorker, certProfile, subjectTemplate, curveName, randomDN, n);
+            keyEntry = new ECKeyEntry(curveName);
+        }
+        else if("RSA".equalsIgnoreCase(keyType))
+        {
+            keyEntry = new RSAKeyEntry(keysize.intValue());
+        }
+        else if("DSA".equalsIgnoreCase(keyType))
+        {
+            keyEntry = new DSAKeyEntry(keysize.intValue());
         }
         else
         {
-            loadTest = new CALoadTestEnroll.RSACALoadTest(
-                    raWorker, certProfile, subjectTemplate, keysize.intValue(), randomDN, n);
+            err("Invalid keyType " + keyType);
+            return null;
         }
+
+        LoadTestEntry loadtestEntry = new LoadTestEntry(certProfile, keyEntry, subjectTemplate, randomDN);
+        CALoadTestEnroll loadTest = new CALoadTestEnroll(raWorker, loadtestEntry, user, n);
 
         loadTest.setDuration(durationInSecond);
         loadTest.setThreads(numThreads);

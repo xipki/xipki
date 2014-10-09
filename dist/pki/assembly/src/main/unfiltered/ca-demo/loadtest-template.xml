@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<enrollTemplate xmlns="http://xipki.org/xipki/caclient/loadtest">
+  <!--
+  <user>user name</user>
+  <enrollCert>
+    <certProfile>certificate profile name</certProfile>
+    <subject>subject DN</subject>
+    <randomDN>RDN name to be attended with random number, valid values are 
+       NONE, GIVENNAME, SURNAME, STREET, POSTALCODE, O, OU and CN</randomDN>
+    <rsaKey modulusLength="2048"/>
+  </enrollCert>
+  -->
+  <user>Loadtester-1</user>
+  <enrollCert>
+    <certProfile>TLS</certProfile>
+    <subject>CN=xipki.org,O=example PKI TLS RSA,C=DE</subject>
+    <randomDN>O</randomDN>
+    <rsaKey modulusLength="2048"/>
+  </enrollCert>
+  <enrollCert>
+    <certProfile>TLSwithIncSN</certProfile>
+    <subject>CN=xipki.org,O=example PKI TLSwithIncSN DSA,C=DE</subject>
+    <randomDN>O</randomDN>
+    <dsaKey pLength="2048"/>
+  </enrollCert>  
+  <enrollCert>
+    <certProfile>TLS_C</certProfile>
+    <subject>CN=TLS Client Muster,O=example PKI TLS_C EC,C=DE</subject>
+    <randomDN>CN</randomDN>
+    <ecKey curve="secp256r1"/>
+  </enrollCert>
+</enrollTemplate>

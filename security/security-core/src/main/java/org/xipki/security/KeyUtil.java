@@ -174,9 +174,15 @@ public class KeyUtil
     public static KeyPair generateDSAKeypair(int pLength, int qLength)
     throws Exception
     {
+        return generateDSAKeypair(pLength, qLength, 80);
+    }
+
+    public static KeyPair generateDSAKeypair(int pLength, int qLength, int certainty)
+    throws Exception
+    {
         DSAParametersGenerator paramGen = new DSAParametersGenerator(new SHA512Digest());
         DSAParameterGenerationParameters genParams = new DSAParameterGenerationParameters(
-                pLength, qLength, 80, new SecureRandom());
+                pLength, qLength, certainty, new SecureRandom());
         paramGen.init(genParams);
         DSAParameters dsaParams = paramGen.generateParameters();
 
