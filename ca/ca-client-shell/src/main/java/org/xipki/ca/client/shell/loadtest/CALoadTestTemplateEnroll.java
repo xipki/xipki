@@ -169,7 +169,7 @@ public class CALoadTestTemplateEnroll extends AbstractLoadTest
         baseTime.set(Calendar.MONTH, 0);
         baseTime.set(Calendar.DAY_OF_MONTH, 1);
 
-        this.index = new AtomicLong(System.nanoTime() / 10000L - baseTime.getTimeInMillis() * 10L);
+        this.index = new AtomicLong(System.currentTimeMillis() * 100);
 
         EnrollTemplateType template = parse(new FileInputStream(templateFile));
         this.user = template.getUser();
