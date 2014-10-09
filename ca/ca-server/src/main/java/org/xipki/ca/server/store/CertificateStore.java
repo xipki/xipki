@@ -378,14 +378,12 @@ public class CertificateStore
     }
 
     public List<BigInteger> getExpiredCertSerials(X509CertificateWithMetaInfo caCert,
-            long expiredAt, BigInteger startSerial, int numEntries,
-            String certProfile, String userLike)
+            long expiredAt, int numEntries, String certProfile, String userLike)
     throws OperationException
     {
         try
         {
-            return queryExecutor.getExpiredSerialNumbers(caCert, expiredAt, startSerial,
-                    numEntries, certProfile, userLike);
+            return queryExecutor.getExpiredSerialNumbers(caCert, expiredAt, numEntries, certProfile, userLike);
         } catch (SQLException e)
         {
             LOG.debug("SQLException", e);
