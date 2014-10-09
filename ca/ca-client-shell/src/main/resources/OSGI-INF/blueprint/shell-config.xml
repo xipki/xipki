@@ -116,6 +116,14 @@
         <entry key="-randomDN" value-ref="randomDNCompleter"/>
       </optional-completers>
     </command>
+    <command name="caclient/loadtest-template-enroll">
+      <action class="org.xipki.ca.client.shell.loadtest.CALoadTestTemplateEnrollCommand">
+        <property name="raWorker" ref="raWorker"/>
+      </action>
+      <optional-completers>
+        <entry key="-template" value-ref="filePathCompleter"/>
+      </optional-completers>
+    </command>
     <command name="caclient/loadtest-revoke">
       <action class="org.xipki.ca.client.shell.loadtest.CALoadTestRevokeCommand">
         <property name="raWorker" ref="raWorker"/>
