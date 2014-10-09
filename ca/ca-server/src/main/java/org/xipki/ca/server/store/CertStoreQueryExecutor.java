@@ -927,8 +927,7 @@ class CertStoreQueryExecutor
     }
 
     List<BigInteger> getExpiredSerialNumbers(X509CertificateWithMetaInfo caCert,
-            long expiredAt, BigInteger startSerial, int numEntries,
-            String certProfile, String userLike)
+            long expiredAt, int numEntries, String certProfile, String userLike)
     throws SQLException, OperationException
     {
         ParamChecker.assertNotNull("caCert", caCert);
@@ -943,7 +942,7 @@ class CertStoreQueryExecutor
         int caId = getCaId(caCert);
 
         StringBuilder sqlBuilder = new StringBuilder(
-                "SERIAL FROM CERT WHERE CAINFO_ID=? AND SERIAL>? AND NOTAFTER<? AND CERTPROFILEINFO_ID=?");
+                "SERIAL FROM CERT WHERE CAINFO_ID=? AND NOTAFTER<? AND CERTPROFILEINFO_ID=?");
 
         if(userLike != null)
         {
@@ -969,7 +968,7 @@ class CertStoreQueryExecutor
             sqlBuilder.append(" AND USER_ID IN (SELECT ID FROM USERNAME WHERE NAME LIKE ?)");
         }
 
-        final String sql = dataSource.createFetchFirstSelectSQL(sqlBuilder.toString(), numEntries, "SERIAL ASC");
+        final String sql = dataSource.createFetchFirstSelectSQL(sqlBuilder.toString(), numEntries);
         PreparedStatement ps = borrowPreparedStatement(sql);
 
         ResultSet rs = null;
@@ -977,7 +976,6 @@ class CertStoreQueryExecutor
         {
             int idx = 1;
             ps.setInt(idx++, caId);
-            ps.setLong(idx++, (startSerial == null)? 0 : startSerial.longValue()-1);
             ps.setLong(idx++, expiredAt);
             ps.setInt(idx++, certProfileId);
 

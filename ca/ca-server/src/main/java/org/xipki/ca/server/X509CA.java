@@ -178,7 +178,6 @@ public class X509CA
 
             try
             {
-                BigInteger startSerial = BigInteger.ONE;
                 final int numEntries = 100;
 
                 X509CertificateWithMetaInfo caCert = caInfo.getCertificate();
@@ -188,17 +187,11 @@ public class X509CA
 
                 do
                 {
-                    serials = certstore.getExpiredCertSerials(caCert, expiredAt, startSerial, numEntries,
+                    serials = certstore.getExpiredCertSerials(caCert, expiredAt, numEntries,
                             task.getCertProfile(), task.getUserLike());
 
-                    BigInteger maxSerial = BigInteger.ONE;
                     for(BigInteger serial : serials)
                     {
-                        if(serial.compareTo(maxSerial) > 0)
-                        {
-                            maxSerial = serial;
-                        }
-
                         if((caInfo.isSelfSigned() && caInfo.getSerialNumber().equals(serial)) == false)
                         {
                             boolean removed = do_removeCertificate(serial) != null;
@@ -208,8 +201,6 @@ public class X509CA
                             }
                         }
                     }
-
-                    startSerial = maxSerial.add(BigInteger.ONE);
                 }while(serials.size() >= numEntries && allCertsRemoved);
 
             } catch (Throwable t)
