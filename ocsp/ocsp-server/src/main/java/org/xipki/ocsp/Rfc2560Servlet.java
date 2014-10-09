@@ -8,6 +8,7 @@
 package org.xipki.ocsp;
 
 import java.io.ByteArrayInputStream;
+import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Date;
@@ -266,6 +267,17 @@ public class Rfc2560Servlet extends HttpServlet
                 }
                 response.getOutputStream().write(encodedOcspResp);
             }
+        }catch(EOFException e)
+        {
+            final String message = "Connection reset by peer";
+            if(LOG.isErrorEnabled())
+            {
+                LOG.warn(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(), e.getMessage());
+            }
+            LOG.debug(message, e);
+
+            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            response.setContentLength(0);
         }catch(Throwable t)
         {
             final String message = "Throwable";

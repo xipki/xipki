@@ -188,14 +188,16 @@ class OCSPStoreQueryExecutor
                     + " VALUES (?, ?, ?, ?, ?, ?)";
 
             PreparedStatement[] pss = borrowPreparedStatements(SQL_ADD_CERT, SQL_ADD_RAWCERT, SQL_ADD_CERTHASH);
-            PreparedStatement ps_addcert = pss[0];
-            PreparedStatement ps_addRawcert = pss[1];
-            PreparedStatement ps_addCerthash = pss[2];
             // all statements have the same connection
-            Connection conn = ps_addcert.getConnection();
+            Connection conn = null;
 
             try
             {
+                PreparedStatement ps_addcert = pss[0];
+                PreparedStatement ps_addRawcert = pss[1];
+                PreparedStatement ps_addCerthash = pss[2];
+                conn = ps_addcert.getConnection();
+
                 int certId = (int) dataSource.nextSeqValue("CERT_ID");
                 // CERT
                 X509Certificate cert = certificate.getCert();
@@ -267,9 +269,9 @@ class OCSPStoreQueryExecutor
                         try
                         {
                             ps.close();
-                        }catch(SQLException e)
+                        }catch(Throwable t)
                         {
-                            LOG.warn("Could not close PreparedStatement", e);
+                            LOG.warn("Could not close PreparedStatement", t);
                         }
                     }
                 }finally
@@ -520,17 +522,17 @@ class OCSPStoreQueryExecutor
                         try
                         {
                             pss[j].close();
-                        }catch(SQLException e)
+                        }catch(Throwable t)
                         {
-                            LOG.warn("Could not close preparedStatement", e);
+                            LOG.warn("Could not close preparedStatement", t);
                         }
                     }
                     try
                     {
                         c.close();
-                    }catch(SQLException e)
+                    }catch(Throwable t)
                     {
-                        LOG.warn("Could not clse connection", e);
+                        LOG.warn("Could not close connection", t);
                     }
 
                     throw new SQLException("Cannot create prepared statement for " + sqlQueries[i]);
@@ -546,8 +548,8 @@ class OCSPStoreQueryExecutor
     {
         String sql = "COUNT(*) FROM CERT WHERE ISSUER_ID=? AND SERIAL=?";
         sql = dataSource.createFetchFirstSelectSQL(sql, 1);
-        PreparedStatement ps = borrowPreparedStatement(sql);
         ResultSet rs = null;
+        PreparedStatement ps = borrowPreparedStatement(sql);
 
         try
         {
@@ -574,8 +576,8 @@ class OCSPStoreQueryExecutor
 
         try
         {
-            PreparedStatement ps = borrowPreparedStatement(sql);
             ResultSet rs = null;
+            PreparedStatement ps = borrowPreparedStatement(sql);
 
             try
             {

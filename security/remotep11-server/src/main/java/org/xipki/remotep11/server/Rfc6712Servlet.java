@@ -7,6 +7,7 @@
 
 package org.xipki.remotep11.server;
 
+import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -98,7 +99,13 @@ public class Rfc6712Servlet extends HttpServlet
             response.setStatus(HttpServletResponse.SC_OK);
             response.setContentLength(pkiRespBytes.length);
             response.getOutputStream().write(pkiRespBytes);
-
+        }catch(EOFException e)
+        {
+            final String message = "Connection reset by peer";
+            LOG.error(message + ". {}: {}", e.getClass().getName(), e.getMessage());
+            LOG.debug(message, e);
+            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            response.setContentLength(0);
         }catch(Throwable t)
         {
             LOG.error("Throwable thrown, this should not happen. {}: {}", t.getClass().getName(), t.getMessage());

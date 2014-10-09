@@ -332,11 +332,11 @@ public class DbCertStatusStore extends CertStatusStore
             final String sql = "ID, NOTBEFORE, REVOKED, REV_REASON, REV_TIME, REV_INVALIDITY_TIME, PROFILE" +
                     " FROM CERT WHERE ISSUER_ID=? AND SERIAL=?";
 
+            ResultSet rs = null;
+            CertStatusInfo certStatusInfo = null;
+
             PreparedStatement ps = borrowPreparedStatement(
                     dataSource.createFetchFirstSelectSQL(sql, 1));
-            ResultSet rs = null;
-
-            CertStatusInfo certStatusInfo = null;
 
             try
             {
@@ -448,9 +448,9 @@ public class DbCertStatusStore extends CertStatusStore
     throws SQLException
     {
         final String sql = hashAlgo.name().toUpperCase() + "_FP FROM CERTHASH WHERE CERT_ID=?";
+        ResultSet rs = null;
         PreparedStatement ps = borrowPreparedStatement(
                 dataSource.createFetchFirstSelectSQL(sql, 1));
-        ResultSet rs = null;
         try
         {
             ps.setInt(1, certId);
