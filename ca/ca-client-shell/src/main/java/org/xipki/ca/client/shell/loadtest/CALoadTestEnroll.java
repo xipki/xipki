@@ -8,9 +8,7 @@
 package org.xipki.ca.client.shell.loadtest;
 
 import java.security.cert.X509Certificate;
-import java.util.Calendar;
 import java.util.HashMap;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicLong;
@@ -46,7 +44,7 @@ class CALoadTestEnroll extends AbstractLoadTest
     private final RAWorker raWorker;
     private final LoadTestEntry loadtestEntry;
     private final String user;
-    private AtomicLong index;
+    private final AtomicLong index;
     private final int n;
 
     @Override
@@ -70,12 +68,7 @@ class CALoadTestEnroll extends AbstractLoadTest
         this.user = user == null ? "LOADTESTER" : user;
         this.raWorker = raWorker;
 
-        Calendar baseTime = Calendar.getInstance(Locale.UK);
-        baseTime.set(Calendar.YEAR, 2014);
-        baseTime.set(Calendar.MONTH, 0);
-        baseTime.set(Calendar.DAY_OF_MONTH, 1);
-
-        this.index = new AtomicLong((System.currentTimeMillis() - baseTime.getTimeInMillis()) * 10);
+        this.index = new AtomicLong(System.currentTimeMillis() * 100);
     }
 
     private Map<Integer, CertRequest> nextCertRequests()
