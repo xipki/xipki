@@ -113,6 +113,11 @@ public class DataSourceWrapperImpl implements DataSourceWrapper
     @Override
     public void returnConnection(Connection conn)
     {
+        if(conn == null)
+        {
+            return;
+        }
+
         try
         {
             conn.close();

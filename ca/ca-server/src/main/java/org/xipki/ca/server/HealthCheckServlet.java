@@ -7,6 +7,7 @@
 
 package org.xipki.ca.server;
 
+import java.io.EOFException;
 import java.io.IOException;
 import java.net.URLDecoder;
 
@@ -115,7 +116,19 @@ public class HealthCheckServlet extends HttpServlet
             byte[] respBytes = healthResult.toJsonMessage(true).getBytes();
             response.setContentLength(respBytes.length);
             response.getOutputStream().write(respBytes);
-        }catch(Throwable t)
+        }catch(EOFException e)
+        {
+            final String message = "Connection reset by peer";
+            if(LOG.isErrorEnabled())
+            {
+                LOG.warn(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(), e.getMessage());
+            }
+            LOG.debug(message, e);
+
+            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            response.setContentLength(0);
+        }
+        catch(Throwable t)
         {
             final String message = "Throwable thrown, this should not happen!";
             if(LOG.isErrorEnabled())
