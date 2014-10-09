@@ -7,7 +7,7 @@
 
 package org.xipki.ca.client.shell.completer;
 
-import org.xipki.ca.client.shell.loadtest.RandomDN;
+import org.xipki.ca.client.shell.loadtest.LoadTestEntry.RandomDN;
 import org.xipki.console.karaf.EnumCompleter;
 
 /**
