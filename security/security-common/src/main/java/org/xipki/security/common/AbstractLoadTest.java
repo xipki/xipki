@@ -7,6 +7,7 @@
 
 package org.xipki.security.common;
 
+import java.security.SecureRandom;
 import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -64,6 +65,7 @@ public abstract class AbstractLoadTest
             }
         }
 
+        printStatus();
         printSummary();
 
         System.getProperties().remove(PROPKEY_LOADTEST);
@@ -177,6 +179,19 @@ public abstract class AbstractLoadTest
         if(unit != null)
         {
             this.unit = unit;
+        }
+    }
+
+    protected static long getSecureIndex()
+    {
+        SecureRandom random = new SecureRandom();
+        while(true)
+        {
+            long l = random.nextLong();
+            if(l > 0)
+            {
+                return l;
+            }
         }
     }
 

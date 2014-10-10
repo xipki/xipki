@@ -68,7 +68,7 @@ class CALoadTestEnroll extends AbstractLoadTest
         this.user = user == null ? "LOADTESTER" : user;
         this.raWorker = raWorker;
 
-        this.index = new AtomicLong(System.currentTimeMillis() * 100);
+        this.index = new AtomicLong(getSecureIndex());
     }
 
     private Map<Integer, CertRequest> nextCertRequests()
