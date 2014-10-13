@@ -89,7 +89,6 @@ import org.xipki.audit.api.ChildAuditEvent;
 import org.xipki.ca.api.OperationException;
 import org.xipki.ca.api.OperationException.ErrorCode;
 import org.xipki.ca.api.publisher.CertificateInfo;
-import org.xipki.ca.cmp.BadRequestException;
 import org.xipki.ca.cmp.CmpUtil;
 import org.xipki.ca.cmp.server.CmpResponder;
 import org.xipki.ca.common.CAStatus;
@@ -470,7 +469,7 @@ public class X509CACmpResponder extends CmpResponder
                             }
                             else if(CustomObjectIdentifiers.id_cmp_removeExpiredCerts.equals(infoType.getId()))
                             {
-                                eventType = "REMOVE_EXIPIRED_CERTS";
+                                eventType = "REMOVE_EXIPIRED_CERTS_TRIGGER";
                                 checkPermission(_requestor, Permission.REMOVE_CERT);
 
                                 String info = removeExpiredCerts(_requestor, itv.getInfoValue());
@@ -493,6 +492,10 @@ public class X509CACmpResponder extends CmpResponder
                             ErrorCode code = e.getErrorCode();
                             switch(code)
                             {
+                                case BAD_REQUEST:
+                                    failureInfo = PKIFailureInfo.badRequest;
+                                    statusMessage = e.getErrorMessage();
+                                    break;
                                 case DATABASE_FAILURE:
                                 case System_Failure:
                                     statusMessage = code.name();
@@ -505,10 +508,6 @@ public class X509CACmpResponder extends CmpResponder
                         {
                             failureInfo = PKIFailureInfo.systemFailure;
                             statusMessage = "CRLException: " + e.getMessage();
-                        } catch (BadRequestException e)
-                        {
-                            failureInfo = PKIFailureInfo.badRequest;
-                            statusMessage = e.getMessage();
                         }
                     }
 
@@ -947,6 +946,10 @@ public class X509CACmpResponder extends CmpResponder
                     auditStatus = AuditStatus.FAILED;
                     auditMessage = "BAD_CERT_TEMPLATE";
                     break;
+                case BAD_REQUEST:
+                    failureInfo = PKIFailureInfo.badRequest;
+                    auditStatus = AuditStatus.ERROR;
+                    auditMessage = "BAD_REQUEST";
                 case CERT_REVOKED:
                     failureInfo = PKIFailureInfo.certRevoked;
                     auditStatus = AuditStatus.FAILED;
@@ -1142,6 +1145,11 @@ public class X509CACmpResponder extends CmpResponder
                 int failureInfo;
                 switch(code)
                 {
+                    case BAD_REQUEST:
+                        failureInfo = PKIFailureInfo.badRequest;
+                        auditStatus = AuditStatus.FAILED;
+                        auditMessage = "BAD_REQUEST";
+                        break;
                     case CERT_REVOKED:
                         failureInfo = PKIFailureInfo.certRevoked;
                         auditStatus = AuditStatus.FAILED;
@@ -1157,15 +1165,15 @@ public class X509CACmpResponder extends CmpResponder
                         auditStatus = AuditStatus.ERROR;
                         auditMessage = "DATABASE_FAILURE";
                         break;
-                    case NOT_PERMITTED:
-                        failureInfo = PKIFailureInfo.notAuthorized;
-                        auditStatus = AuditStatus.FAILED;
-                        auditMessage = "NOT_PERMITTED";
-                        break;
                     case INSUFFICIENT_PERMISSION:
                         failureInfo = PKIFailureInfo.notAuthorized;
                         auditStatus = AuditStatus.ERROR;
                         auditMessage = "INSUFFICIENT_PERMISSION";
+                        break;
+                    case NOT_PERMITTED:
+                        failureInfo = PKIFailureInfo.notAuthorized;
+                        auditStatus = AuditStatus.FAILED;
+                        auditMessage = "NOT_PERMITTED";
                         break;
                     case System_Failure:
                         failureInfo = PKIFailureInfo.systemFailure;
@@ -1449,7 +1457,7 @@ public class X509CACmpResponder extends CmpResponder
     }
 
     private String removeExpiredCerts(CmpRequestorInfo requestor, ASN1Encodable asn1RequestInfo)
-    throws BadRequestException, OperationException, InsuffientPermissionException
+    throws OperationException, InsuffientPermissionException
     {
         String requestInfo = null;
         try
@@ -1458,7 +1466,7 @@ public class X509CACmpResponder extends CmpResponder
             requestInfo = asn1.getString();
         }catch(IllegalArgumentException e)
         {
-            throw new BadRequestException("The content is not of UTF8 String");
+            throw new OperationException(ErrorCode.BAD_REQUEST, "The content is not of UTF8 String");
         }
 
         final String namespace = null;
@@ -1468,13 +1476,13 @@ public class X509CACmpResponder extends CmpResponder
             doc = xmlDocBuilder.parse(new ByteArrayInputStream(requestInfo.getBytes("UTF-8")));
         } catch (SAXException | IOException e)
         {
-            throw new BadRequestException("Invalid request", e);
+            throw new OperationException(ErrorCode.BAD_REQUEST, "Invalid request" + e.getMessage());
         }
 
         String certProfile = XMLUtil.getValueOfFirstElementChild(doc.getDocumentElement(), namespace, "certProfile");
         if(certProfile == null)
         {
-            throw new BadRequestException("certProfile is not specified");
+            throw new OperationException(ErrorCode.BAD_REQUEST, "certProfile is not specified");
         }
 
         // make sure that the requestor is permitted to remove the certificate profiles
@@ -1492,7 +1500,7 @@ public class X509CACmpResponder extends CmpResponder
                 overlapSeconds = Long.parseLong(nodeValue);
             }catch(NumberFormatException e)
             {
-                throw new BadRequestException("Invalid overlap '" + nodeValue + "'");
+                throw new OperationException(ErrorCode.BAD_REQUEST, "Invalid overlap '" + nodeValue + "'");
             }
         }
 
