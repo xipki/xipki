@@ -78,6 +78,12 @@ import org.bouncycastle.operator.ContentSigner;
 import org.bouncycastle.x509.extension.X509ExtensionUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xipki.audit.api.AuditEvent;
+import org.xipki.audit.api.AuditEventData;
+import org.xipki.audit.api.AuditLevel;
+import org.xipki.audit.api.AuditLoggingService;
+import org.xipki.audit.api.AuditLoggingServiceRegister;
+import org.xipki.audit.api.AuditStatus;
 import org.xipki.ca.api.OperationException;
 import org.xipki.ca.api.OperationException.ErrorCode;
 import org.xipki.ca.api.profile.ExtensionOccurrence;
@@ -87,7 +93,6 @@ import org.xipki.ca.api.profile.SpecialCertProfileBehavior;
 import org.xipki.ca.api.profile.SubjectInfo;
 import org.xipki.ca.api.profile.X509Util;
 import org.xipki.ca.api.publisher.CertificateInfo;
-import org.xipki.ca.cmp.BadRequestException;
 import org.xipki.ca.common.BadCertTemplateException;
 import org.xipki.ca.common.BadFormatException;
 import org.xipki.ca.common.CAMgmtException;
@@ -169,15 +174,18 @@ public class X509CA
 
             inProcess = true;
             boolean allCertsRemoved = true;
-
-            RemoveExpiredCertsInfo task = removeExpiredCertsQueue.poll();
-            if(task == null)
-            {
-                return;
-            }
-
+            long startTime = System.currentTimeMillis();
+            RemoveExpiredCertsInfo task = null;
             try
             {
+                task = removeExpiredCertsQueue.poll();
+                if(task == null)
+                {
+                    return;
+                }
+
+                String caName = caInfo.getName();
+
                 final int numEntries = 100;
 
                 X509CertificateWithMetaInfo caCert = caInfo.getCertificate();
@@ -194,10 +202,44 @@ public class X509CA
                     {
                         if((caInfo.isSelfSigned() && caInfo.getSerialNumber().equals(serial)) == false)
                         {
-                            boolean removed = do_removeCertificate(serial) != null;
-                            if(removed == false)
+                            boolean removed = false;
+                            try
                             {
-                                allCertsRemoved = false;
+                                removed = do_removeCertificate(serial) != null;
+                            }catch(Throwable t)
+                            {
+                                final String message = "Could not remove expired certificate";
+                                if(LOG.isErrorEnabled())
+                                {
+                                    LOG.error(LogUtil.buildExceptionLogFormat(message), t.getClass().getName(), t.getMessage());
+                                }
+                                removed = false;
+                            } finally
+                            {
+                                AuditLoggingService audit = getAuditLoggingService();
+                                if(audit != null);
+                                {
+                                    AuditEvent auditEvent = newAuditEvent();
+                                    if(removed)
+                                    {
+                                        auditEvent.setLevel(AuditLevel.INFO);
+                                        auditEvent.setStatus(AuditStatus.OK);
+                                    }
+                                    else
+                                    {
+                                        auditEvent.setLevel(AuditLevel.ERROR);
+                                        auditEvent.setStatus(AuditStatus.FAILED);
+                                    }
+                                    auditEvent.addEventData(new AuditEventData("CA", caName));
+                                    auditEvent.addEventData(new AuditEventData("serialNumber", serial.toString()));
+                                    auditEvent.addEventData(new AuditEventData("eventType", "REMOVE_EXPIRED_CERT"));
+                                    audit.logEvent(auditEvent);
+                                }
+
+                                if(removed == false)
+                                {
+                                    allCertsRemoved = false;
+                                }
                             }
                         }
                     }
@@ -205,7 +247,7 @@ public class X509CA
 
             } catch (Throwable t)
             {
-                if(allCertsRemoved == false)
+                if(allCertsRemoved == false && task != null)
                 {
                     removeExpiredCertsQueue.add(task);
                 }
@@ -216,9 +258,34 @@ public class X509CA
                     LOG.error(LogUtil.buildExceptionLogFormat(message), t.getClass().getName(), t.getMessage());
                 }
                 LOG.debug(message, t);
-
             } finally
             {
+                AuditLoggingService audit = getAuditLoggingService();
+                if(audit != null && task != null);
+                {
+                    long durationMillis = System.currentTimeMillis() - startTime;
+                    AuditEvent auditEvent = newAuditEvent();
+                    auditEvent.addEventData(new AuditEventData("duration", durationMillis));
+                    auditEvent.addEventData(new AuditEventData("CA", caInfo.getName()));
+                    auditEvent.addEventData(new AuditEventData("cerProfile", task.getCertProfile()));
+                    auditEvent.addEventData(new AuditEventData("user", task.getUserLike()));
+                    auditEvent.addEventData(new AuditEventData("expiredAt",
+                            new Date(task.getExpiredAt() * SECOND).toString()));
+                    auditEvent.addEventData(new AuditEventData("eventType", "REMOVE_EXPIRED_CERTS"));
+
+                    if(allCertsRemoved)
+                    {
+                        auditEvent.setLevel(AuditLevel.INFO);
+                        auditEvent.setStatus(AuditStatus.OK);
+                    }
+                    else
+                    {
+                        auditEvent.setLevel(AuditLevel.ERROR);
+                        auditEvent.setStatus(AuditStatus.FAILED);
+                    }
+                    audit.logEvent(auditEvent);
+                }
+
                 inProcess = false;
             }
 
@@ -458,6 +525,8 @@ public class X509CA
     private final ConcurrentLinkedDeque<RemoveExpiredCertsInfo> removeExpiredCertsQueue = new ConcurrentLinkedDeque<>();
 
     private final AtomicInteger numActiveRevocations = new AtomicInteger(0);
+
+    private AuditLoggingServiceRegister serviceRegister;
 
     public X509CA(
             CAManagerImpl caManager,
@@ -1639,7 +1708,13 @@ public class X509CA
             }
         }
 
-        return successful ? certToRemove : null;
+        if(successful == false)
+        {
+            return null;
+        }
+
+        certstore.removeCertificate(caInfo.getCertificate(), serialNumber);
+        return certToRemove;
     }
 
     private CertWithRevocationInfo do_revokeCertificate(BigInteger serialNumber,
@@ -2679,7 +2754,7 @@ public class X509CA
     }
 
     public RemoveExpiredCertsInfo removeExpiredCerts(String certProfile, String userLike, Long overlapSeconds)
-    throws OperationException, BadRequestException
+    throws OperationException
     {
         if(masterMode == false)
         {
@@ -2692,7 +2767,7 @@ public class X509CA
             if(userLike.indexOf(' ') != -1 || userLike.indexOf('\t') != -1 ||
                     userLike.indexOf('\r') != -1|| userLike.indexOf('\n') != -1)
             {
-                throw new BadRequestException("invalid userLike '" + userLike + "'");
+                throw new OperationException(ErrorCode.BAD_REQUEST, "invalid userLike '" + userLike + "'");
             }
 
             if(userLike.indexOf('*') != -1)
@@ -2825,6 +2900,24 @@ public class X509CA
         result.setHealthy(healthy);
 
         return result;
+    }
+
+    public void setAuditServiceRegister(AuditLoggingServiceRegister serviceRegister)
+    {
+        this.serviceRegister = serviceRegister;
+    }
+
+    private AuditLoggingService getAuditLoggingService()
+    {
+        return serviceRegister == null ? null : serviceRegister.getAuditLoggingService();
+    }
+
+    private AuditEvent newAuditEvent()
+    {
+        AuditEvent ae = new AuditEvent(new Date());
+        ae.setApplicationName("CA");
+        ae.setName("SYSTEM");
+        return ae;
     }
 
     private static Object[] incSerialNumber(IdentifiedCertProfile profile, X500Name origName, String latestSN)

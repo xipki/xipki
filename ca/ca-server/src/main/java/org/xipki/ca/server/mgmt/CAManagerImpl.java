@@ -173,9 +173,9 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
     private CmpControl cmpControl;
 
     private ScheduledThreadPoolExecutor scheduledThreadPoolExecutor;
-    private static final Map<String, X509CACmpResponder> responders = new ConcurrentHashMap<>();
+    private final Map<String, X509CACmpResponder> responders = new ConcurrentHashMap<>();
 
-    private static final Map<String, X509CA> x509cas = new ConcurrentHashMap<>();
+    private final Map<String, X509CA> x509cas = new ConcurrentHashMap<>();
 
     private SecurityFactory securityFactory;
     private DataSourceFactory dataSourceFactory;
@@ -709,6 +709,10 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
                 try
                 {
                     ca = new X509CA(this, caEntry, caSigner, certstore, crlSigner, masterMode);
+                    if(auditServiceRegister != null)
+                    {
+                        ca.setAuditServiceRegister(auditServiceRegister);
+                    }
                 } catch (OperationException e)
                 {
                     final String message = "X509CA.<init> (ca=" + caName + ")";
@@ -3375,6 +3379,12 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
         {
             PublisherEntryWrapper publisherEntry = publishers.get(name);
             publisherEntry.setAuditServiceRegister(auditServiceRegister);
+        }
+
+        for(String name : x509cas.keySet())
+        {
+            X509CA ca = x509cas.get(name);
+            ca.setAuditServiceRegister(serviceRegister);
         }
     }
 
