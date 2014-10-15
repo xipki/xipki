@@ -58,7 +58,7 @@
       <unknownSerialAsGood>false</unknownSerialAsGood>
       <includeArchiveCutoff>true</includeArchiveCutoff>
       <includeCrlID>false</includeCrlID>
-      <includeCertHash>false</includeCertHash>
+      <includeCertHash>true</includeCertHash>
     </certstatusStore>
     <certstatusStore>
       <name>crl1</name>
@@ -68,13 +68,14 @@
         <useUpdateDatesFromCRL>false</useUpdateDatesFromCRL>
         <caCertFile>output/SubCAwithCRL1.der</caCertFile>
         <caRevoked>false</caRevoked>
+        <certsDir>output</certsDir>
       </crlStore>
       <inheritCaRevocation>true</inheritCaRevocation>
       <retentionInterval>0</retentionInterval>
       <unknownSerialAsGood>true</unknownSerialAsGood>
       <includeArchiveCutoff>false</includeArchiveCutoff>
       <includeCrlID>true</includeCrlID>
-      <includeCertHash>false</includeCertHash>
+      <includeCertHash>true</includeCertHash>
     </certstatusStore>
   </certstatusStores>
 </OCSPResponder>

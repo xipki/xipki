@@ -9,6 +9,7 @@ package org.xipki.ocsp.crlstore;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.security.cert.CertificateEncodingException;
@@ -17,6 +18,7 @@ import java.security.cert.X509CRLEntry;
 import java.security.cert.X509Certificate;
 import java.text.ParseException;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -107,6 +109,7 @@ public class CrlCertStatusStore extends CertStatusStore
     private final SHA1Digest sha1;
     private final String crlUrl;
     private final Date caNotBefore;
+    private final String certsDirname;
 
     private boolean useUpdateDatesFromCRL;
     private boolean caRevoked;
@@ -134,9 +137,10 @@ public class CrlCertStatusStore extends CertStatusStore
             String crlFile,
             String deltaCrlFile,
             X509Certificate caCert,
-            String crlUrl)
+            String crlUrl,
+            String certsDirname)
     {
-        this(name, crlFile, (String) null, caCert, (X509Certificate) null, crlUrl);
+        this(name, crlFile, (String) null, caCert, (X509Certificate) null, crlUrl, certsDirname);
     }
 
     public CrlCertStatusStore(
@@ -145,7 +149,8 @@ public class CrlCertStatusStore extends CertStatusStore
             String deltaCrlFilename,
             X509Certificate caCert,
             X509Certificate issuerCert,
-            String crlUrl)
+            String crlUrl,
+            String certsDirname)
     {
         super(name);
         ParamChecker.assertNotEmpty("crlFile", crlFilename);
@@ -157,6 +162,7 @@ public class CrlCertStatusStore extends CertStatusStore
         this.issuerCert = issuerCert;
         this.crlUrl = crlUrl;
         this.caNotBefore = caCert.getNotBefore();
+        this.certsDirname = certsDirname;
 
         this.sha1 = new SHA1Digest();
         initializeStore(true);
@@ -437,6 +443,13 @@ public class CrlCertStatusStore extends CertStatusStore
                 }
             }
 
+            if(certsDirname != null)
+            {
+                certsIncluded = true;
+                Set<CertWithInfo> tmpCerts = readCertWithInfosFromDir(caCert, certsDirname);
+                certs.addAll(tmpCerts);
+            }
+
             Map<BigInteger, CrlCertStatusInfo> newCertStatusInfoMap = new ConcurrentHashMap<>();
 
             // First consider only full CRL
@@ -570,10 +583,13 @@ public class CrlCertStatusStore extends CertStatusStore
 
                         if(cert == null)
                         {
-                            throw new CertStatusStoreException("Could not find certificate (issuer = '" +
-                                    IoCertUtil.canonicalizeName(caName) + "', serialNumber = '" + serialNumber + "')");
+                            LOG.info("Could not find certificate (issuer = '{}', serialNumber = '{}'",
+                                    IoCertUtil.canonicalizeName(caName), serialNumber);
                         }
-                        certs.remove(cert);
+                        else
+                        {
+                            certs.remove(cert);
+                        }
                     }
 
                     Map<HashAlgoType, byte[]> certHashes = (cert == null) ? null : getCertHashes(cert.cert);
@@ -898,6 +914,72 @@ public class CrlCertStatusStore extends CertStatusStore
     public void setCaRevocationTime(Date caRevocationTime)
     {
         this.caRevocationTime = caRevocationTime;
+    }
+
+    private Set<CertWithInfo> readCertWithInfosFromDir(X509Certificate caCert, String certsDirname)
+    {
+        File certsDir = new File(certsDirname);
+
+        if(certsDir.exists() == false)
+        {
+            LOG.warn("The folder " + certsDirname + " does not exist, ignore it");
+            return Collections.emptySet();
+        }
+
+        if(certsDir.isDirectory() == false)
+        {
+            LOG.warn("The path " + certsDirname + " does not point to a folder, ignore it");
+            return Collections.emptySet();
+        }
+
+        if(certsDir.canRead() == false)
+        {
+            LOG.warn("The folder " + certsDirname + " cannot be read, ignore it");
+            return Collections.emptySet();
+        }
+
+        File[] certFiles = certsDir.listFiles(new FilenameFilter()
+        {
+            @Override
+            public boolean accept(File dir, String name)
+            {
+                return name.endsWith(".der") || name.endsWith(".crt");
+            }
+        });
+
+        if(certFiles == null || certFiles.length == 0)
+        {
+            return Collections.emptySet();
+        }
+
+        X500Name issuer = X500Name.getInstance(caCert.getSubjectX500Principal().getEncoded());
+        Set<CertWithInfo> certs = new HashSet<>();
+
+        final String profileName = "UNKNOWN";
+        for(File certFile : certFiles)
+        {
+            Certificate bcCert;
+
+            try
+            {
+                byte[] encoded = IoCertUtil.read(certFile);
+                bcCert = Certificate.getInstance(encoded);
+            }catch(IllegalArgumentException | IOException e)
+            {
+                LOG.warn("Cannot parse certificate {}, ignore it", certFile.getPath());
+                continue;
+            }
+
+            // not issued by the given issuer
+            if(issuer.equals(bcCert.getIssuer()) == false)
+            {
+                continue;
+            }
+
+            certs.add(new CertWithInfo(bcCert, profileName));
+        }
+
+        return certs;
     }
 
     private final byte[] sha1Fp(File file)
