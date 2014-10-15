@@ -11,6 +11,7 @@ import java.io.ByteArrayInputStream;
 import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URLDecoder;
 import java.util.Date;
 import java.util.List;
 
@@ -124,6 +125,7 @@ public class Rfc2560Servlet extends HttpServlet
             if(getMethod)
             {
                 String requestURI = request.getRequestURI();
+                requestURI = URLDecoder.decode(requestURI, "UTF-8");
                 String servletPath = request.getServletPath();
                 if(servletPath.endsWith("/") == false)
                 {

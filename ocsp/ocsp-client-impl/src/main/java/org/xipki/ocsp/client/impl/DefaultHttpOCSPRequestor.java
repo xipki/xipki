@@ -12,6 +12,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.net.URLEncoder;
 
 import org.bouncycastle.util.encoders.Base64;
 import org.xipki.ocsp.client.api.RequestOptions;
@@ -42,7 +43,7 @@ public class DefaultHttpOCSPRequestor extends AbstractOCSPRequestor
         if(size <= MAX_LEN_GET && requestOptions.isUseHttpGetForRequest())
         {
             String b64Request = Base64.toBase64String(request);
-
+            String urlEncodedReq = URLEncoder.encode(b64Request, "UTF-8");
             StringBuilder urlBuilder = new StringBuilder();
             String baseUrl = responderURL.toString();
             urlBuilder.append(baseUrl);
@@ -50,7 +51,8 @@ public class DefaultHttpOCSPRequestor extends AbstractOCSPRequestor
             {
                 urlBuilder.append('/');
             }
-            urlBuilder.append(b64Request);
+            urlBuilder.append(urlEncodedReq);
+
             URL newURL = new URL(urlBuilder.toString());
 
             httpUrlConnection = (HttpURLConnection) newURL.openConnection();
