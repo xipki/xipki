@@ -477,7 +477,8 @@ public class OcspResponder
 
                 CrlCertStatusStore crlStore = new CrlCertStatusStore(storeConf.getName(),
                         crlStoreConf.getCrlFile(), crlStoreConf.getDeltaCrlFile(),
-                        caCert, crlIssuerCert, crlStoreConf.getCrlUrl());
+                        caCert, crlIssuerCert, crlStoreConf.getCrlUrl(),
+                        crlStoreConf.getCertsDir());
                 store = crlStore;
 
                 crlStore.setUseUpdateDatesFromCRL(
