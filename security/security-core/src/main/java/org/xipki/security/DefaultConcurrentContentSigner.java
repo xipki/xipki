@@ -94,33 +94,20 @@ public class DefaultConcurrentContentSigner implements ConcurrentContentSigner
     public ContentSigner borrowContentSigner(int soTimeout)
     throws NoIdleSignerException
     {
-        if(soTimeout == 0)
-        {
-            ContentSigner signer = null;
-            try
-            {
-                signer = idleSigners.takeFirst();
-            } catch (InterruptedException e)
-            {
-                LOG.info("interruppted");
-            }
-
-            if(signer == null)
-            {
-                throw new NoIdleSignerException("No idle signer available");
-            }
-
-            busySigners.addLast(signer);
-            return signer;
-        }
-
         ContentSigner signer = null;
         try
         {
-            signer = idleSigners.pollFirst(soTimeout, TimeUnit.MILLISECONDS);
-        }catch(InterruptedException e)
+            if(soTimeout == 0)
+            {
+                signer = idleSigners.takeFirst();
+            }
+            else
+            {
+                signer = idleSigners.pollFirst(soTimeout, TimeUnit.MILLISECONDS);
+            }
+        } catch (InterruptedException e)
         {
-            LOG.trace("interrupted");
+            LOG.info("interrupted");
         }
 
         if(signer == null)
