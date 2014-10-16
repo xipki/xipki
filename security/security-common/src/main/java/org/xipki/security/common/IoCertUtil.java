@@ -27,6 +27,7 @@ import java.security.NoSuchProviderException;
 import java.security.PrivateKey;
 import java.security.cert.CRLException;
 import java.security.cert.Certificate;
+import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509CRL;
@@ -45,6 +46,7 @@ import javax.security.auth.x500.X500Principal;
 
 import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
+import org.bouncycastle.asn1.ASN1OctetString;
 import org.bouncycastle.asn1.DERNull;
 import org.bouncycastle.asn1.DERPrintableString;
 import org.bouncycastle.asn1.DERUTF8String;
@@ -59,9 +61,12 @@ import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x500.style.IETFUtils;
 import org.bouncycastle.asn1.x500.style.RFC4519Style;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
+import org.bouncycastle.asn1.x509.AuthorityKeyIdentifier;
+import org.bouncycastle.asn1.x509.Extension;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.bouncycastle.asn1.x9.X962NamedCurves;
 import org.bouncycastle.util.encoders.Base64;
+import org.bouncycastle.x509.extension.X509ExtensionUtil;
 
 /**
  * @author Lijun Liao
@@ -806,4 +811,75 @@ public class IoCertUtil
         return sb.toString();
     }
 
+    public static byte[] extractSKI(X509Certificate cert)
+    throws CertificateEncodingException
+    {
+        byte[] encodedExtValue = cert.getExtensionValue(Extension.subjectKeyIdentifier.getId());
+        if(encodedExtValue == null)
+        {
+            return null;
+        }
+
+        try
+        {
+            ASN1OctetString ski = (ASN1OctetString) X509ExtensionUtil.fromExtensionValue(encodedExtValue);
+            return ski.getOctets();
+        } catch (IOException e)
+        {
+            throw new CertificateEncodingException("Invalid extension SubjectKeyIdentifier: " + e.getMessage());
+        }
+    }
+
+    public static byte[] extractSKI(org.bouncycastle.asn1.x509.Certificate cert)
+    throws CertificateEncodingException
+    {
+        Extension encodedSkiValue = cert.getTBSCertificate().getExtensions().getExtension(Extension.subjectKeyIdentifier);
+        if(encodedSkiValue == null)
+        {
+            return null;
+        }
+
+        try
+        {
+            return ASN1OctetString.getInstance(encodedSkiValue.getParsedValue()).getOctets();
+        } catch (IllegalArgumentException e)
+        {
+            throw new CertificateEncodingException("Invalid extension SubjectKeyIdentifier: " + e.getMessage());
+        }
+    }
+
+    public static byte[] extractAKI(X509Certificate cert)
+    throws CertificateEncodingException
+    {
+        byte[] encodedExtValue = cert.getExtensionValue(Extension.authorityKeyIdentifier.getId());
+        if(encodedExtValue == null)
+        {
+            return null;
+        }
+
+        try
+        {
+            ASN1OctetString v = (ASN1OctetString) X509ExtensionUtil.fromExtensionValue(encodedExtValue);
+            byte[] extValue = v.getOctets();
+            AuthorityKeyIdentifier aki = AuthorityKeyIdentifier.getInstance(extValue);
+            return aki.getKeyIdentifier();
+        } catch (IOException e)
+        {
+            throw new CertificateEncodingException("Invalid extension AuthorityKeyIdentifier: " + e.getMessage());
+        }
+    }
+
+    public static byte[] extractAKI(org.bouncycastle.asn1.x509.Certificate cert)
+    throws CertificateEncodingException
+    {
+        try
+        {
+            AuthorityKeyIdentifier aki = AuthorityKeyIdentifier.fromExtensions(
+                    cert.getTBSCertificate().getExtensions());
+            return aki == null ? null : aki.getKeyIdentifier();
+        } catch (IllegalArgumentException e)
+        {
+            throw new CertificateEncodingException("Invalid extension AuthorityKeyIdentifier: " + e.getMessage());
+        }
+    }
 }
