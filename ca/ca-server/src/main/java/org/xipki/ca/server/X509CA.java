@@ -45,7 +45,6 @@ import org.bouncycastle.asn1.ASN1EncodableVector;
 import org.bouncycastle.asn1.ASN1GeneralizedTime;
 import org.bouncycastle.asn1.ASN1Integer;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
-import org.bouncycastle.asn1.ASN1OctetString;
 import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.DERPrintableString;
 import org.bouncycastle.asn1.DERSequence;
@@ -559,21 +558,13 @@ public class X509CA
         this.caSubjectX500Name = X500Name.getInstance(
                 caCert.getCert().getSubjectX500Principal().getEncoded());
 
-        byte[] encodedSkiValue = caCert.getCert().getExtensionValue(Extension.subjectKeyIdentifier.getId());
-        if(encodedSkiValue == null)
-        {
-            throw new OperationException(ErrorCode.INVALID_EXTENSION,
-                    "CA certificate does not have required extension SubjectKeyIdentifier");
-        }
-        ASN1OctetString ski;
         try
         {
-            ski = (ASN1OctetString) X509ExtensionUtil.fromExtensionValue(encodedSkiValue);
-        } catch (IOException e)
+            this.caSKI = IoCertUtil.extractSKI(caCert.getCert());
+        } catch (CertificateEncodingException e)
         {
             throw new OperationException(ErrorCode.INVALID_EXTENSION, e.getMessage());
         }
-        this.caSKI = ski.getOctets();
 
         byte[] encodedSubjectAltName = caCert.getCert().getExtensionValue(Extension.subjectAlternativeName.getId());
         if(encodedSubjectAltName == null)
