@@ -143,7 +143,7 @@
         <xs:annotation>
           <xs:documentation>
             Whether not to include extension InvalidityDate in OCSP response.
-            The default is false. 
+            The default is false.
           </xs:documentation>
         </xs:annotation>
       </xs:element>

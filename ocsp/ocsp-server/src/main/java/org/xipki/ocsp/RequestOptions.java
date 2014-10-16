@@ -8,9 +8,11 @@
 package org.xipki.ocsp;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.net.URLDecoder;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
@@ -261,7 +263,15 @@ class RequestOptions
             if(uriS != null)
             {
                 URL uri = new URL(uriS);
-                is = uri.openStream();
+                if("file".equalsIgnoreCase(uri.getProtocol()))
+                {
+                    is = new FileInputStream(IoCertUtil.expandFilepath(
+                            URLDecoder.decode(uri.getPath(), "UTF-8")));
+                }
+                else
+                {
+                    is = uri.openStream();
+                }
             }
 
             char[] password = ksConf.getPassword() == null ?

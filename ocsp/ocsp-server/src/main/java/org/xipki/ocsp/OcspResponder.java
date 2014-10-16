@@ -209,7 +209,7 @@ public class OcspResponder
             unmarshaller.setSchema(schema);
             @SuppressWarnings("unchecked")
             JAXBElement<OCSPResponderType> rootElement = (JAXBElement<OCSPResponderType>)
-                    unmarshaller.unmarshal(new File(confFile));
+                    unmarshaller.unmarshal(new File(IoCertUtil.expandFilepath(confFile)));
             this.conf = rootElement.getValue();
         } catch (JAXBException | SAXException e)
         {
@@ -426,7 +426,7 @@ public class OcspResponder
                 DataSourceWrapper dataSource;
                 try
                 {
-                    confStream = new FileInputStream(databaseConfFile);
+                    confStream = new FileInputStream(IoCertUtil.expandFilepath(databaseConfFile));
                     dataSource = dataSourceFactory.createDataSource(confStream, securityFactory.getPasswordResolver());
                 } catch (Exception e)
                 {
