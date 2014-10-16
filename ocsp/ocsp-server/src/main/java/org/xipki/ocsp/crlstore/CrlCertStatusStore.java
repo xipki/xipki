@@ -656,7 +656,7 @@ public class CrlCertStatusStore extends CertStatusStore
             LOG.info("Updated CertStore {}", getName());
         } catch (Exception e)
         {
-            final String message = "Could not executing initializeStore()";
+            final String message = "Could not execute initializeStore()";
             if(LOG.isErrorEnabled())
             {
                 LOG.error(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(), e.getMessage());
@@ -917,6 +917,7 @@ public class CrlCertStatusStore extends CertStatusStore
     }
 
     private Set<CertWithInfo> readCertWithInfosFromDir(X509Certificate caCert, String certsDirname)
+    throws CertificateEncodingException
     {
         File certsDir = new File(certsDirname);
 
@@ -953,6 +954,8 @@ public class CrlCertStatusStore extends CertStatusStore
         }
 
         X500Name issuer = X500Name.getInstance(caCert.getSubjectX500Principal().getEncoded());
+        byte[] issuerSKI = IoCertUtil.extractSKI(caCert);
+
         Set<CertWithInfo> certs = new HashSet<>();
 
         final String profileName = "UNKNOWN";
@@ -974,6 +977,28 @@ public class CrlCertStatusStore extends CertStatusStore
             if(issuer.equals(bcCert.getIssuer()) == false)
             {
                 continue;
+            }
+
+            if(issuerSKI != null)
+            {
+                byte[] aki = null;
+                try
+                {
+                    aki = IoCertUtil.extractAKI(bcCert);
+                }catch(CertificateEncodingException e)
+                {
+                    final String message = "Could not extract AuthorityKeyIdentifier";
+                    if(LOG.isErrorEnabled())
+                    {
+                        LOG.error(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(), e.getMessage());
+                    }
+                    LOG.debug(message, e);
+                }
+
+                if(aki == null || Arrays.equals(issuerSKI, aki) == false)
+                {
+                    continue;
+                }
             }
 
             certs.add(new CertWithInfo(bcCert, profileName));
