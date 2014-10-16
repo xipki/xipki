@@ -255,7 +255,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
         Properties caConfProps = new Properties();
         try
         {
-            caConfProps.load(new FileInputStream(caConfFile));
+            caConfProps.load(new FileInputStream(IoCertUtil.expandFilepath(caConfFile)));
         } catch (IOException e)
         {
             throw new CAMgmtException("IOException while parsing ca configuration" + caConfFile, e);
