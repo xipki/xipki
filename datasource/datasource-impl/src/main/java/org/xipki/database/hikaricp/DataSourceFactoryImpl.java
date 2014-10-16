@@ -7,6 +7,7 @@
 
 package org.xipki.database.hikaricp;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -31,7 +32,7 @@ public class DataSourceFactoryImpl implements DataSourceFactory
     {
         assertNotNull("confFile", confFile);
 
-        FileInputStream fIn = new FileInputStream(confFile);
+        FileInputStream fIn = new FileInputStream(expandFilepath(confFile));
         return createDataSource(fIn, passwordResolver);
     }
 
@@ -109,6 +110,18 @@ public class DataSourceFactoryImpl implements DataSourceFactory
         if(parameter == null)
         {
             throw new IllegalArgumentException(parameterName + " could not be null");
+        }
+    }
+
+    private static String expandFilepath(String path)
+    {
+        if (path.startsWith("~" + File.separator))
+        {
+            return System.getProperty("user.home") + path.substring(1);
+        }
+        else
+        {
+            return path;
         }
     }
 
