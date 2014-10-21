@@ -69,7 +69,7 @@ public class Rfc6712Servlet extends HttpServlet
         if(auditEvent != null)
         {
             auditEvent.setApplicationName("CA");
-            auditEvent.setName("SYSTEM");
+            auditEvent.setName("PERF");
         }
 
         AuditLevel auditLevel = AuditLevel.INFO;

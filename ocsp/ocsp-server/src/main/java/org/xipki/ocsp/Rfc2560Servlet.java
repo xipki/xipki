@@ -103,7 +103,7 @@ public class Rfc2560Servlet extends HttpServlet
             startInUs = System.nanoTime()/1000;
             auditEvent = new AuditEvent(new Date());
             auditEvent.setApplicationName("OCSP");
-            auditEvent.setName("SYSTEM");
+            auditEvent.setName("PERF");
         }
 
         try
