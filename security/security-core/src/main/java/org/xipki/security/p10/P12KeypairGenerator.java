@@ -156,7 +156,9 @@ public abstract class P12KeypairGenerator
             ksStream.flush();
         }
 
-        return new P12KeypairGenerationResult(ksStream.toByteArray(), identity.getCert());
+        P12KeypairGenerationResult result = new P12KeypairGenerationResult(ksStream.toByteArray(), identity.getCert());
+        result.setKeystoreObject(ks);
+        return result;
     }
 
     private ContentSigner getContentSigner(PrivateKey key)
