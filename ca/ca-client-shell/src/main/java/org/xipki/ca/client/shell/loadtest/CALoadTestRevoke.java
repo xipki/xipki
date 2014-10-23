@@ -235,18 +235,12 @@ class CALoadTestRevoke extends AbstractLoadTest
                     break;
                 }
 
-                int size = serialNumbers.size();
-                int nSucc = testNext(serialNumbers);
-                int failed = size - nSucc;
-                if(failed < 0)
-                {
-                    failed = size;
-                }
-                account(size, failed);
+                boolean successful = testNext(serialNumbers);
+                account(1, successful ? 0 : 1);
             }
         }
 
-        private int testNext(List<Long> serialNumbers)
+        private boolean testNext(List<Long> serialNumbers)
         {
             RevokeCertRequestType request = new RevokeCertRequestType();
             int id = 1;
@@ -266,16 +260,16 @@ class CALoadTestRevoke extends AbstractLoadTest
             } catch (RAWorkerException | PKIErrorException e)
             {
                 LOG.warn("{}: {}", e.getClass().getName(), e.getMessage());
-                return 0;
+                return false;
             } catch (Throwable t)
             {
                 LOG.warn("{}: {}", t.getClass().getName(), t.getMessage());
-                return 0;
+                return false;
             }
 
             if(result == null)
             {
-                return 0;
+                return false;
             }
 
             int nSuccess = 0;
@@ -286,7 +280,7 @@ class CALoadTestRevoke extends AbstractLoadTest
                     nSuccess++;
                 }
             }
-            return nSuccess;
+            return nSuccess == serialNumbers.size();
         }
     }
 

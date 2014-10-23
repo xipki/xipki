@@ -52,13 +52,20 @@ public class CALoadTestTemplateEnrollCommand extends ClientCommand
         }
 
         StringBuilder startMsg = new StringBuilder();
+        CALoadTestTemplateEnroll loadTest = new CALoadTestTemplateEnroll(raWorker, templateFile);
+        int n = loadTest.getNumberOfCertsInOneRequest();
 
         startMsg.append("Threads:         ").append(numThreads).append("\n");
         startMsg.append("Duration:        ").append(AbstractLoadTest.formatTime(durationInSecond).trim()).append("\n");
         startMsg.append("Template:        ").append(templateFile).append("\n");
+        startMsg.append("#Certs/Request:  ").append(n).append("\n");
+        startMsg.append("Unit:            ").append(n).append(" certificate");
+        if(n > 1)
+        {
+            startMsg.append("s");
+        }
+        startMsg.append("\n");
         out(startMsg.toString());
-
-        CALoadTestTemplateEnroll loadTest = new CALoadTestTemplateEnroll(raWorker, templateFile);
 
         loadTest.setDuration(durationInSecond);
         loadTest.setThreads(numThreads);

@@ -84,6 +84,12 @@ public class CALoadTestRevokeCommand extends ClientCommand
         startMsg.append("cadb:            ").append(caDbConfFile).append("\n");
         startMsg.append("maxCerts:        ").append(maxCerts).append("\n");
         startMsg.append("#Certs/Request:  ").append(n).append("\n");
+        startMsg.append("Unit:            ").append(n).append(" certificate");
+        if(n > 1)
+        {
+            startMsg.append("s");
+        }
+        startMsg.append("\n");
         out(startMsg.toString());
 
         Certificate caCert = Certificate.getInstance(IoCertUtil.read(caCertFile));
