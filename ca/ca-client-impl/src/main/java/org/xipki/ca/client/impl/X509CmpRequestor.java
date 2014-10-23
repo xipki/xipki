@@ -372,7 +372,7 @@ abstract class X509CmpRequestor extends CmpRequestor
 
         for(EnrollCertRequestEntryType reqEntry : reqEntries)
         {
-            reqIdIdMap.put(reqEntry.getCertReq().getCertReqId().getValue(),    reqEntry.getId());
+            reqIdIdMap.put(reqEntry.getCertReq().getCertReqId().getValue(), reqEntry.getId());
         }
 
         int exptectedBodyType;
