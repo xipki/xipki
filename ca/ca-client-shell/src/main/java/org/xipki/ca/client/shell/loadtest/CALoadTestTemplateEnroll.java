@@ -80,14 +80,8 @@ public class CALoadTestTemplateEnroll extends AbstractLoadTest
                 Map<Integer, CertRequestWithProfile> certReqs = nextCertRequests();
                 if(certReqs != null)
                 {
-                    int size = certReqs.size();
-                    int nSucc = testNext(certReqs);
-                    int failed = size - nSucc;
-                    if(failed < 0)
-                    {
-                        failed = size;
-                    }
-                    account(size, failed);
+                    boolean succ = testNext(certReqs);
+                    account(1, succ ? 0 : 1);
                 }
                 else
                 {
@@ -96,7 +90,7 @@ public class CALoadTestTemplateEnroll extends AbstractLoadTest
             }
         }
 
-        private int testNext(Map<Integer, CertRequestWithProfile> certRequests)
+        private boolean testNext(Map<Integer, CertRequestWithProfile> certRequests)
         {
             EnrollCertResult result;
             try
@@ -115,32 +109,36 @@ public class CALoadTestTemplateEnroll extends AbstractLoadTest
             } catch (RAWorkerException | PKIErrorException e)
             {
                 LOG.warn("{}: {}", e.getClass().getName(), e.getMessage());
-                return 0;
+                return false;
             } catch (Throwable t)
             {
                 LOG.warn("{}: {}", t.getClass().getName(), t.getMessage());
-                return 0;
+                return false;
             }
 
             if(result == null)
             {
-                return 0;
+                return false;
             }
 
             Set<String> ids = result.getAllIds();
-            int nSuccess = 0;
+            if(ids.size() < certRequests.size())
+            {
+                return false;
+            }
+
             for(String id : ids)
             {
                 CertificateOrError certOrError = result.getCertificateOrError(id);
                 X509Certificate cert = (X509Certificate) certOrError.getCertificate();
 
-                if(cert != null)
+                if(cert == null)
                 {
-                    nSuccess++;
+                    return false;
                 }
             }
 
-            return nSuccess;
+            return true;
         }
     }
 
