@@ -108,14 +108,8 @@ class CALoadTestEnroll extends AbstractLoadTest
                 Map<Integer, CertRequest> certReqs = nextCertRequests();
                 if(certReqs != null)
                 {
-                    int size = certReqs.size();
-                    int nSucc = testNext(certReqs);
-                    int failed = size - nSucc;
-                    if(failed < 0)
-                    {
-                        failed = size;
-                    }
-                    account(size, failed);
+                    boolean successful = testNext(certReqs);
+                    account(1, successful ? 0 : 1);
                 }
                 else
                 {
@@ -124,7 +118,7 @@ class CALoadTestEnroll extends AbstractLoadTest
             }
         }
 
-        private int testNext(Map<Integer, CertRequest> certRequests)
+        private boolean testNext(Map<Integer, CertRequest> certRequests)
         {
             EnrollCertResult result;
             try
@@ -143,16 +137,16 @@ class CALoadTestEnroll extends AbstractLoadTest
             } catch (RAWorkerException | PKIErrorException e)
             {
                 LOG.warn("{}: {}", e.getClass().getName(), e.getMessage());
-                return 0;
+                return false;
             } catch (Throwable t)
             {
                 LOG.warn("{}: {}", t.getClass().getName(), t.getMessage());
-                return 0;
+                return false;
             }
 
             if(result == null)
             {
-                return 0;
+                return false;
             }
 
             Set<String> ids = result.getAllIds();
@@ -168,7 +162,7 @@ class CALoadTestEnroll extends AbstractLoadTest
                 }
             }
 
-            return nSuccess;
+            return nSuccess == certRequests.size();
         }
 
     }
