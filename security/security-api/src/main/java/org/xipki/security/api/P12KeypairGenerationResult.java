@@ -32,14 +32,14 @@ public class P12KeypairGenerationResult extends KeypairGenerationResult
         return keystore;
     }
 
-	public KeyStore getKeystoreObject()
-	{
-		return keystoreObject;
-	}
+    public KeyStore getKeystoreObject()
+    {
+        return keystoreObject;
+    }
 
-	public void setKeystoreObject(KeyStore keystoreObject)
-	{
-		this.keystoreObject = keystoreObject;
-	}
+    public void setKeystoreObject(KeyStore keystoreObject)
+    {
+        this.keystoreObject = keystoreObject;
+    }
 
 }
