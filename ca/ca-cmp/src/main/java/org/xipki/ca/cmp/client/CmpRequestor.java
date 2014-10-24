@@ -27,11 +27,9 @@ import org.bouncycastle.asn1.cmp.GenRepContent;
 import org.bouncycastle.asn1.cmp.InfoTypeAndValue;
 import org.bouncycastle.asn1.cmp.PKIBody;
 import org.bouncycastle.asn1.cmp.PKIFailureInfo;
-import org.bouncycastle.asn1.cmp.PKIFreeText;
 import org.bouncycastle.asn1.cmp.PKIHeader;
 import org.bouncycastle.asn1.cmp.PKIHeaderBuilder;
 import org.bouncycastle.asn1.cmp.PKIMessage;
-import org.bouncycastle.asn1.cmp.PKIStatusInfo;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.Certificate;
 import org.bouncycastle.asn1.x509.GeneralName;
@@ -72,9 +70,11 @@ public abstract class CmpRequestor
 
     private X509Certificate responderCert;
     private GeneralName recipient;
+    private String c14nRecipientName;
 
     protected final SecurityFactory securityFactory;
     protected boolean signRequest;
+    private boolean sendRequestorCert = false;
 
     public CmpRequestor(X509Certificate requestorCert,
             X509Certificate responderCert,
@@ -131,6 +131,7 @@ public abstract class CmpRequestor
         this.responderCert = responderCert;
         X500Name subject = X500Name.getInstance(responderCert.getSubjectX500Principal().getEncoded());
         this.recipient = new GeneralName(subject);
+        this.c14nRecipientName = canonicalizeSortedName(subject);
     }
 
     protected abstract byte[] send(byte[] request)
@@ -151,7 +152,7 @@ public abstract class CmpRequestor
 
         try
         {
-            request = CmpUtil.addProtection(request, requestor, sender, false);
+            request = CmpUtil.addProtection(request, requestor, sender, sendRequestorCert);
         } catch (CMPException | NoIdleSignerException e)
         {
             throw new CmpRequestorException("Could not sign the request", e);
@@ -465,12 +466,9 @@ public abstract class CmpRequestor
 
     protected ErrorResultType buildErrorResult(ErrorMsgContent bodyContent)
     {
-        PKIStatusInfo statusInfo = bodyContent.getPKIStatusInfo();
-        int status = statusInfo.getStatus().intValue();
-        int failureCode = statusInfo.getFailInfo().intValue();
-        PKIFreeText text = statusInfo.getStatusString();
-        String statusMessage = text == null ? null : text.getStringAt(0).getString();
-        return new ErrorResultType(status, failureCode, statusMessage);
+        org.xipki.ca.common.PKIStatusInfo statusInfo = new org.xipki.ca.common.PKIStatusInfo(        		
+        		bodyContent.getPKIStatusInfo()); 
+        return new ErrorResultType(statusInfo.getStatus(), statusInfo.getPkiFailureInfo(), statusInfo.getStatusMessage());
     }
 
     private byte[] randomTransactionId()
@@ -493,10 +491,25 @@ public abstract class CmpRequestor
         }
 
         PKIHeader h = pMsg.getHeader();
-        if(recipient != null && recipient.equals(h.getSender()) == false)
+
+        if(c14nRecipientName != null)
         {
-            LOG.warn("tid={}: not authorized responder {}", tid, h.getSender());
-            return new ProtectionVerificationResult(null, ProtectionResult.SENDER_NOT_AUTHORIZED);
+            boolean authorizedResponder = true;
+            if(h.getSender().getTagNo() != GeneralName.directoryName)
+            {
+                authorizedResponder = false;
+            }
+            else
+            {
+                String c14nMsgSender = canonicalizeSortedName((X500Name) h.getSender().getName());
+                authorizedResponder = c14nRecipientName.equalsIgnoreCase(c14nMsgSender);
+            }
+
+            if(authorizedResponder == false)
+            {
+                LOG.warn("tid={}: not authorized responder {}", tid, h.getSender());
+                return new ProtectionVerificationResult(null, ProtectionResult.SENDER_NOT_AUTHORIZED);
+            }
         }
 
         ContentVerifierProvider verifierProvider =
@@ -552,4 +565,18 @@ public abstract class CmpRequestor
                 "message check of the response failed");
     }
 
+    public boolean isSendRequestorCert()
+    {
+        return sendRequestorCert;
+    }
+
+    public void setSendRequestorCert(boolean sendRequestorCert)
+    {
+        this.sendRequestorCert = sendRequestorCert;
+    }
+
+    private static String canonicalizeSortedName(X500Name name)
+    {
+        return IoCertUtil.canonicalizeName(IoCertUtil.sortX509Name(name));
+    }
 }
