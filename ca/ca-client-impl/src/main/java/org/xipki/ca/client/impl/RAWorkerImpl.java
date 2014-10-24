@@ -688,7 +688,7 @@ public final class RAWorkerImpl extends AbstractRAWorker implements RAWorker
             if(issuer.equals(requestEntries.get(i).getIssuer()) == false)
             {
                 throw new PKIErrorException(
-                		PKIStatus.REJECTION, PKIFailureInfo.badRequest,
+                        PKIStatus.REJECTION, PKIFailureInfo.badRequest,
                         "Revoking certificates issued by more than one CA is not allowed");
             }
         }
@@ -1114,7 +1114,7 @@ public final class RAWorkerImpl extends AbstractRAWorker implements RAWorker
             if(issuer.equals(requestEntries.get(i).getIssuer()) == false)
             {
                 throw new PKIErrorException(
-                		PKIStatus.REJECTION, PKIFailureInfo.badRequest,
+                        PKIStatus.REJECTION, PKIFailureInfo.badRequest,
                         "Unrevoking certificates issued by more than one CA is not allowed");
             }
         }
@@ -1172,7 +1172,7 @@ public final class RAWorkerImpl extends AbstractRAWorker implements RAWorker
             if(issuer.equals(requestEntries.get(i).getIssuer()) == false)
             {
                 throw new PKIErrorException(
-                		PKIStatus.REJECTION, PKIFailureInfo.badRequest,
+                        PKIStatus.REJECTION, PKIFailureInfo.badRequest,
                         "Removing certificates issued by more than one CA is not allowed");
             }
         }
