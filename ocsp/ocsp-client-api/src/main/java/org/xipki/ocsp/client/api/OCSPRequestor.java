@@ -14,6 +14,7 @@ import java.security.cert.X509Certificate;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.ocsp.OCSPObjectIdentifiers;
 import org.bouncycastle.cert.ocsp.BasicOCSPResp;
+import org.bouncycastle.cert.ocsp.OCSPResp;
 
 /**
  * @author Lijun Liao
@@ -29,6 +30,14 @@ public interface OCSPRequestor
     throws OCSPRequestorException;
 
     BasicOCSPResp ask(X509Certificate caCert, BigInteger serialNumber,
+            URL responderUrl, RequestOptions requestOptions)
+    throws OCSPRequestorException;
+
+    OCSPResp ask2(X509Certificate caCert, X509Certificate cert,
+            URL responderUrl, RequestOptions requestOptions)
+    throws OCSPRequestorException;
+
+    OCSPResp ask2(X509Certificate caCert, BigInteger serialNumber,
             URL responderUrl, RequestOptions requestOptions)
     throws OCSPRequestorException;
 }

@@ -89,7 +89,34 @@ public abstract class AbstractOCSPRequestor implements OCSPRequestor
     }
 
     @Override
+    public OCSPResp ask2(X509Certificate caCert, X509Certificate cert, URL responderUrl,
+            RequestOptions requestOptions)
+    throws OCSPRequestorException
+    {
+        if(caCert.getSubjectX500Principal().equals(cert.getIssuerX500Principal()) == false)
+        {
+            throw new IllegalArgumentException("cert and caCert do not match");
+        }
+
+        return ask2(caCert, cert.getSerialNumber(), responderUrl, requestOptions);
+    }
+
+    @Override
     public BasicOCSPResp ask(X509Certificate caCert, BigInteger serialNumber, URL responderUrl,
+            RequestOptions requestOptions)
+    throws OCSPRequestorException
+    {
+        try
+        {
+            return (BasicOCSPResp) ask2(caCert, serialNumber, responderUrl, requestOptions).getResponseObject();
+        } catch (OCSPException e)
+        {
+            throw new OCSPRequestorException(e);
+        }
+    }
+
+    @Override
+    public OCSPResp ask2(X509Certificate caCert, BigInteger serialNumber, URL responderUrl,
             RequestOptions requestOptions)
     throws OCSPRequestorException
     {
@@ -142,7 +169,7 @@ public abstract class AbstractOCSPRequestor implements OCSPRequestor
                 }
             }
 
-            return basicOCSPResp;
+            return response;
         }
         else
         {
