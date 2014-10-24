@@ -98,6 +98,12 @@ public class CALoadTestEnrollCommand extends ClientCommand
         startMsg.append("Profile:         ").append(certProfile).append("\n");
         startMsg.append("KeyType:         ").append(keyType).append("\n");
         startMsg.append("#Certs/Request:  ").append(n).append("\n");
+        startMsg.append("Unit:            ").append(n).append(" certificate");
+        if(n > 1)
+        {
+            startMsg.append("s");
+        }
+        startMsg.append("\n");
         out(startMsg.toString());
 
         RandomDN randomDN = null;
