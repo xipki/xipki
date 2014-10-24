@@ -43,7 +43,9 @@ import javax.xml.bind.Unmarshaller;
 import javax.xml.validation.SchemaFactory;
 
 import org.bouncycastle.asn1.cmp.CMPCertificate;
+import org.bouncycastle.asn1.cmp.PKIFailureInfo;
 import org.bouncycastle.asn1.cmp.PKIMessage;
+import org.bouncycastle.asn1.cmp.PKIStatus;
 import org.bouncycastle.asn1.crmf.CertRequest;
 import org.bouncycastle.asn1.crmf.CertTemplate;
 import org.bouncycastle.asn1.crmf.CertTemplateBuilder;
@@ -683,10 +685,11 @@ public final class RAWorkerImpl extends AbstractRAWorker implements RAWorker
         X500Name issuer = requestEntries.get(0).getIssuer();
         for(int i = 1; i < requestEntries.size(); i++)
         {
-            if(issuer.equals(requestEntries.get(i).getIssuer()))
+            if(issuer.equals(requestEntries.get(i).getIssuer()) == false)
             {
-                throw new IllegalArgumentException(
-                        "Revocating certificates issued by more than one CA is not allowed");
+                throw new PKIErrorException(
+                		PKIStatus.REJECTION, PKIFailureInfo.badRequest,
+                        "Revoking certificates issued by more than one CA is not allowed");
             }
         }
 
@@ -1108,10 +1111,11 @@ public final class RAWorkerImpl extends AbstractRAWorker implements RAWorker
         X500Name issuer = requestEntries.get(0).getIssuer();
         for(int i = 1; i < requestEntries.size(); i++)
         {
-            if(issuer.equals(requestEntries.get(i).getIssuer()))
+            if(issuer.equals(requestEntries.get(i).getIssuer()) == false)
             {
-                throw new IllegalArgumentException(
-                        "Revocating certificates issued by more than one CA is not allowed");
+                throw new PKIErrorException(
+                		PKIStatus.REJECTION, PKIFailureInfo.badRequest,
+                        "Unrevoking certificates issued by more than one CA is not allowed");
             }
         }
 
@@ -1165,10 +1169,11 @@ public final class RAWorkerImpl extends AbstractRAWorker implements RAWorker
         X500Name issuer = requestEntries.get(0).getIssuer();
         for(int i = 1; i < requestEntries.size(); i++)
         {
-            if(issuer.equals(requestEntries.get(i).getIssuer()))
+            if(issuer.equals(requestEntries.get(i).getIssuer()) == false)
             {
-                throw new IllegalArgumentException(
-                        "Revocating certificates issued by more than one CA is not allowed");
+                throw new PKIErrorException(
+                		PKIStatus.REJECTION, PKIFailureInfo.badRequest,
+                        "Removing certificates issued by more than one CA is not allowed");
             }
         }
 
