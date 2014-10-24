@@ -7,6 +7,7 @@
 
 package org.xipki.ca.common;
 
+import org.bouncycastle.asn1.cmp.PKIFreeText;
 import org.xipki.security.common.IoCertUtil;
 
 /**
@@ -31,6 +32,21 @@ public class PKIStatusInfo
         this.status = status;
         this.pkiFailureInfo = 0;
         this.statusMessage = null;
+    }
+
+    public PKIStatusInfo(org.bouncycastle.asn1.cmp.PKIStatusInfo bcPKIStatusInfo)
+    {
+        this.status = bcPKIStatusInfo.getStatus().intValue();
+        if(bcPKIStatusInfo.getFailInfo() != null)
+        {
+            this.pkiFailureInfo = bcPKIStatusInfo.getFailInfo().intValue();
+        }
+        else
+        {
+            this.pkiFailureInfo = 0;
+        }
+        PKIFreeText text = bcPKIStatusInfo.getStatusString();
+        this.statusMessage = text == null ? null : text.getStringAt(0).getString();
     }
 
     public int getStatus()
