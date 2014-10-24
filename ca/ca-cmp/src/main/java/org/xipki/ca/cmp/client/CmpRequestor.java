@@ -466,8 +466,8 @@ public abstract class CmpRequestor
 
     protected ErrorResultType buildErrorResult(ErrorMsgContent bodyContent)
     {
-        org.xipki.ca.common.PKIStatusInfo statusInfo = new org.xipki.ca.common.PKIStatusInfo(        		
-        		bodyContent.getPKIStatusInfo()); 
+        org.xipki.ca.common.PKIStatusInfo statusInfo = new org.xipki.ca.common.PKIStatusInfo(
+                bodyContent.getPKIStatusInfo());
         return new ErrorResultType(statusInfo.getStatus(), statusInfo.getPkiFailureInfo(), statusInfo.getStatusMessage());
     }
 
