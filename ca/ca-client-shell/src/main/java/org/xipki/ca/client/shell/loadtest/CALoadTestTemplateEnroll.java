@@ -215,6 +215,11 @@ public class CALoadTestTemplateEnroll extends AbstractLoadTest
         return new Testor();
     }
 
+    public int getNumberOfCertsInOneRequest()
+    {
+        return loadtestEntries.size();
+    }
+
     private Map<Integer, CertRequestWithProfile> nextCertRequests()
     {
         Map<Integer, CertRequestWithProfile> certRequests = new HashMap<>();
