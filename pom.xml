@@ -18,9 +18,12 @@
   <url>http://xipki.org</url>
   <licenses>
     <license>
-      <name>TO-BE-DEFINE</name>
-      <url>http://TO-BE-DEFINE</url>
-      <distribution>repo</distribution>
+      <name>XiPKI commercial licensing</name>
+      <url>mailto:lijun.liao@gmail.com</url>
+    </license>
+    <license>
+      <name>AGPL</name>
+      <url>http://www.gnu.org/licenses/agpl-3.0.html</url>
     </license>
   </licenses>
   <developers>

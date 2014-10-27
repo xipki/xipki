@@ -72,7 +72,8 @@ Version
 License
 -----------
 
-TO-BE-DEFINE
+* Commercial License
+* THE AFFERO GENERAL PUBLIC LICENSE (AGPL)
 
 Owner
 -----------
