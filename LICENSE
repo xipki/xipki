@@ -1,1 +1,18 @@
-TO-BE-DEFINE
+THE XiPKI SOFTWARE IS AVAILABLE UNDER TWO LICENSING MODELS:
+
+============ COMMERCIAL LICENSING ============
+
+A XiPKI commercial license provides advantages not available with the
+open-source AGPL license. Specific benefits include:
+Release from the requirements of the copyleft AGPL license, which include:
+1. distribution of all source code, including your own product (even for
+   web-based applications)
+2. licensing of your own product under the AGPL license
+3. prominent mention and inclusion of the XiPKI copyright and the AGPL license
+
+============ THE AFFERO GENERAL PUBLIC LICENSE (AGPL) ============
+
+While the AGPL license has no direct financial cost there are clear requirements
+for AGPL use. Buying a commercial license is mandatory as soon as you develop
+activities involving the XiPKI software without disclosing the source code of
+your own applications.

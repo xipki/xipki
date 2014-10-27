@@ -1,8 +1,36 @@
 /*
+ *
+ * This file is part of the XiPKI project.
  * Copyright (c) 2014 Lijun Liao
+ * Author: Lijun Liao
  *
- * TO-BE-DEFINE
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License version 3
+ * as published by the Free Software Foundation with the addition of the
+ * following permission added to Section 15 as permitted in Section 7(a):
+ * FOR ANY PART OF THE COVERED WORK IN WHICH THE COPYRIGHT IS OWNED BY
+ * THE AUTHOR LIJUN LIAO. LIJUN LIAO DISCLAIMS THE WARRANTY OF NON INFRINGEMENT
+ * OF THIRD PARTY RIGHTS.
  *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * The interactive user interfaces in modified source and object code versions
+ * of this program must display Appropriate Legal Notices, as required under
+ * Section 5 of the GNU Affero General Public License.
+ *
+ * You can be released from the requirements of the license by purchasing
+ * a commercial license. Buying such a license is mandatory as soon as you
+ * develop commercial activities involving the XiPKI software without
+ * disclosing the source code of your own applications.
+ *
+ * For more information, please contact Lijun Liao at this
+ * address: lijun.liao@gmail.com
  */
 
 package org.xipki.ca.server.mgmt;
@@ -25,29 +53,40 @@ public class CanonicalizeCode
 {
 
     private final static String licenseText =
-/*     "/*\n" +
-        " * Copyright (c) 2014 Lijun Liao\n" +
-        " *\n" +
-        " * Licensed under the Apache License, Version 2.0 (the \"License\");\n" +
-        " * you may not use this file except in compliance with the License.\n" +
-        " * You may obtain a copy of the License at\n" +
-        " *\n" +
-        " *         http://www.apache.org/licenses/LICENSE-2.0\n" +
-        " *\n" +
-        " * Unless required by applicable law or agreed to in writing, software\n" +
-        " * distributed under the License is distributed on an \"AS IS\" BASIS,\n" +
-        " * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\n" +
-        " * See the License for the specific language governing permissions and\n" +
-        " * limitations under the License\n" +
-        " *\n" +
-        " *//*\n\n";
-*/
-        "/*\n" +
-        " * Copyright (c) 2014 Lijun Liao\n" +
-        " *\n" +
-        " * TO-BE-DEFINE\n" +
-        " *\n" +
-        " */\n\n";
+           "/*\n" +
+           " *\n" +
+           " * This file is part of the XiPKI project.\n" +
+           " * Copyright (c) 2014 Lijun Liao\n" +
+           " * Author: Lijun Liao\n" +
+           " *\n" +
+           " * This program is free software; you can redistribute it and/or modify\n" +
+           " * it under the terms of the GNU Affero General Public License version 3\n" +
+           " * as published by the Free Software Foundation with the addition of the\n" +
+           " * following permission added to Section 15 as permitted in Section 7(a):\n" +
+           " * FOR ANY PART OF THE COVERED WORK IN WHICH THE COPYRIGHT IS OWNED BY\n" +
+           " * THE AUTHOR LIJUN LIAO. LIJUN LIAO DISCLAIMS THE WARRANTY OF NON INFRINGEMENT\n" +
+           " * OF THIRD PARTY RIGHTS.\n" +
+           " *\n" +
+           " * This program is distributed in the hope that it will be useful,\n" +
+           " * but WITHOUT ANY WARRANTY; without even the implied warranty of\n" +
+           " * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the\n" +
+           " * GNU Affero General Public License for more details.\n" +
+           " *\n" +
+           " * You should have received a copy of the GNU Affero General Public License\n" +
+           " * along with this program.  If not, see <http://www.gnu.org/licenses/>.\n" +
+           " *\n" +
+           " * The interactive user interfaces in modified source and object code versions\n" +
+           " * of this program must display Appropriate Legal Notices, as required under\n" +
+           " * Section 5 of the GNU Affero General Public License.\n" +
+           " *\n" +
+           " * You can be released from the requirements of the license by purchasing\n" +
+           " * a commercial license. Buying such a license is mandatory as soon as you\n" +
+           " * develop commercial activities involving the XiPKI software without\n" +
+           " * disclosing the source code of your own applications.\n" +
+           " *\n" +
+           " * For more information, please contact Lijun Liao at this\n" +
+           " * address: lijun.liao@gmail.com\n" +
+           " */\n\n";
 
     private final static String THROWS_PREFIX = "    ";
 
