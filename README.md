@@ -72,8 +72,8 @@ Version
 License
 -----------
 
-* Commercial License
-* THE AFFERO GENERAL PUBLIC LICENSE (AGPL)
+* XiPKI Commercial License
+* AFFERO GENERAL PUBLIC LICENSE (AGPL) version 3
 
 Owner
 -----------
