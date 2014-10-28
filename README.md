@@ -67,13 +67,13 @@ eXtensible sImple Public Key Infrastructure consists of CA and OCSP responder.
 Version
 ----
 
-1.0.0-SNAPSHOT
+2.0
 
 License
 -----------
 
 * XiPKI Commercial License
-* AFFERO GENERAL PUBLIC LICENSE (AGPL) version 3
+* GNU AFFERO GENERAL PUBLIC LICENSE (AGPL) version 3
 
 Owner
 -----------
