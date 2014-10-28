@@ -100,7 +100,6 @@
     <feature>xipki-datasource</feature>
     <feature>xipki-security</feature>
     <bundle>mvn:org.xipki/audit/${project.version}</bundle>
-    <bundle>mvn:org.xipki/ocsp-api/${project.version}</bundle>
     <bundle>mvn:org.xipki/ocsp-server/${project.version}</bundle>
   </feature>
   <feature name="xipki-ocspclient" version="${project.version}" resolver="(obr)">
