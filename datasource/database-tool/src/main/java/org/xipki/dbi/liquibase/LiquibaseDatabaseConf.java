@@ -33,7 +33,7 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.liquibase;
+package org.xipki.dbi.liquibase;
 
 import java.util.Properties;
 
