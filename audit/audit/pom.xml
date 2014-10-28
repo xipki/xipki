@@ -10,7 +10,7 @@
     <version>2.0.0-SNAPSHOT</version>
   </parent>
   <packaging>bundle</packaging>
-  <artifactId>audit-api</artifactId>
+  <artifactId>audit</artifactId>
   <name>XiPKI :: ${project.artifactId}</name>
   <dependencies>
     <dependency>
