@@ -38,16 +38,16 @@ package org.xipki.dbi.shell;
 import java.util.Map;
 
 import org.apache.felix.gogo.commands.Command;
-import org.xipki.liquibase.LiquibaseDatabaseConf;
+import org.xipki.dbi.liquibase.LiquibaseDatabaseConf;
 
 /**
  * @author Lijun Liao
  */
 
-@Command(scope = "dbtool", name = "reset-ocspdb", description="Reset and initialize the OCSP databases")
-public class InitDbOcspCommand extends LiquibaseCommand
+@Command(scope = "dbtool", name = "initdb-ca", description="Reset and initialize the CA database")
+public class InitDbCaCommand extends LiquibaseCommand
 {
-    private static final String schemaFile = "sql/ocsp-init.xml";
+    private static final String schemaFile = "sql/ca-init.xml";
 
     @Override
     protected Object doExecute()
@@ -55,16 +55,8 @@ public class InitDbOcspCommand extends LiquibaseCommand
     {
         Map<String, LiquibaseDatabaseConf> dbConfs = getDatabaseConfs();
 
-        for(String dbName : dbConfs.keySet())
-        {
-            if(dbName.toLowerCase().contains("ocsp") == false)
-            {
-                continue;
-            }
-
-            LiquibaseDatabaseConf dbConf = dbConfs.get(dbName);
-            resetAndInit(dbConf, schemaFile);
-        }
+        LiquibaseDatabaseConf dbConf = dbConfs.get("ca");
+        resetAndInit(dbConf, schemaFile);
         return null;
     }
 
