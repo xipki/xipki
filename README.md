@@ -73,7 +73,7 @@ License
 -----------
 
 * XiPKI Commercial License
-* AFFERO GENERAL PUBLIC LICENSE (AGPL) version 3
+* GNU AFFERO GENERAL PUBLIC LICENSE (AGPL) version 3
 
 Owner
 -----------
