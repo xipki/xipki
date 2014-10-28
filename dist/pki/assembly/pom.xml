@@ -160,11 +160,11 @@
               <artifactItems>
                 <artifactItem>
                   <groupId>org.xipki</groupId>
-                  <artifactId>ca-sql</artifactId>
+                  <artifactId>ca-server</artifactId>
                   <version>${project.version}</version>
                   <type>jar</type>
-                  <excludes>META-INF/**</excludes>
-                  <outputDirectory>target/sql</outputDirectory>
+                  <includes>sql/**</includes>
+                  <outputDirectory>target</outputDirectory>
                 </artifactItem>
               </artifactItems>
             </configuration>

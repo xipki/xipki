@@ -22,6 +22,5 @@
     <module>ca-mgmt-api</module>
     <module>ca-server</module>
     <module>ca-server-shell</module>
-    <module>ca-sql</module>
   </modules>
 </project>
