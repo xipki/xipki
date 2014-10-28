@@ -589,28 +589,16 @@ public class X509CACmpResponder extends CmpResponder
                 ErrorMsgContent errorMsgContent = (ErrorMsgContent) respBody.getContent();
 
                 AuditStatus auditStatus = AuditStatus.FAILED;
-                if(errorMsgContent.getErrorCode() != null)
-                {
-                    int pkiErrorCode = errorMsgContent.getErrorCode().getPositiveValue().intValue();
+                org.xipki.ca.common.PKIStatusInfo pkiStatus = new org.xipki.ca.common.PKIStatusInfo(
+                        errorMsgContent.getPKIStatusInfo());
 
-                    if(pkiErrorCode == PKIFailureInfo.systemFailure)
-                    {
-                        auditStatus = AuditStatus.ERROR;
-                    }
+                if(pkiStatus.getPkiFailureInfo() == PKIFailureInfo.systemFailure)
+                {
+                    auditStatus = AuditStatus.ERROR;
                 }
                 auditEvent.setStatus(auditStatus);
 
-                String statusString = null;
-
-                if(errorMsgContent.getPKIStatusInfo() != null)
-                {
-                    PKIFreeText pkiFreeText = errorMsgContent.getPKIStatusInfo().getStatusString();
-                    if(pkiFreeText != null)
-                    {
-                        statusString = pkiFreeText.getStringAt(0).getString();
-                    }
-                }
-
+                String statusString = pkiStatus.getStatusMessage();
                 if(statusString != null)
                 {
                     auditEvent.addEventData(new AuditEventData("message", statusString));
