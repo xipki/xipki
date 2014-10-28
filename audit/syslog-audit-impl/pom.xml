@@ -28,9 +28,9 @@
       <version>${slf4j.version}</version>
     </dependency>
     <dependency>
-      <groupId>org.xipki.thirdparty</groupId>
+      <groupId>com.nesscomputing</groupId>
       <artifactId>ness-syslog4j</artifactId>
-      <version>${syslog4j.version}_1-SNAPSHOT</version>
+      <version>${syslog4j.version}</version>
     </dependency>
   </dependencies>
 </project>
