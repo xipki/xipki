@@ -14,11 +14,9 @@
   <name>XiPKI :: ${project.artifactId}</name>
   <modules>
     <module>security-common</module>
-    <module>security-api</module>
-    <module>security-core</module>
+    <module>security</module>
     <module>security-shell</module>
     <module>security-sunp11</module>
-    <module>security-iaikp11</module>
     <module>remotep11-server</module>
   </modules>
 </project>
