@@ -39,6 +39,7 @@ import java.util.concurrent.ConcurrentLinkedDeque;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xipki.audit.slf4j.Slf4jAuditLoggingServiceImpl;
 
 /**
  * @author Lijun Liao
@@ -48,10 +49,11 @@ public class AuditLoggingServiceRegisterImpl implements AuditLoggingServiceRegis
 {
     private static final Logger LOG = LoggerFactory.getLogger(AuditLoggingServiceRegisterImpl.class);
     private ConcurrentLinkedDeque<AuditLoggingService> services = new ConcurrentLinkedDeque<>();
+    private Slf4jAuditLoggingServiceImpl defaultAuditLoggingService = new Slf4jAuditLoggingServiceImpl();
 
     public AuditLoggingService getAuditLoggingService()
     {
-        return services.isEmpty() ? null : services.getLast();
+        return services.isEmpty() ? defaultAuditLoggingService : services.getLast();
     }
 
     public void bindService(AuditLoggingService service)

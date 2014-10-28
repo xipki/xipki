@@ -60,13 +60,13 @@
   <feature name="xipki-ca-api" version="${project.version}" resolver="(obr)">
     <bundle>mvn:org.xipki/security-common/${project.version}</bundle>
     <bundle>mvn:org.xipki/ca-common/${project.version}</bundle>
-    <bundle>mvn:org.xipki/audit-api/${project.version}</bundle>
+    <bundle>mvn:org.xipki/audit/${project.version}</bundle>
     <bundle>mvn:org.xipki/ca-api/${project.version}</bundle>
   </feature>
   <feature name="xipki-cabase" version="${project.version}" resolver="(obr)">
     <feature>xipki-security</feature>
     <feature>xipki-ca-api</feature>
-    <bundle>mvn:org.xipki/audit-api/${project.version}</bundle>
+    <bundle>mvn:org.xipki/audit/${project.version}</bundle>
     <bundle>mvn:org.xipki/ca-cmp/${project.version}</bundle>
     <bundle>mvn:org.xipki/datasource-api/${project.version}</bundle>
   </feature>
@@ -99,7 +99,7 @@
   <feature name="xipki-ocspserver" version="${project.version}" resolver="(obr)">
     <feature>xipki-datasource</feature>
     <feature>xipki-security</feature>
-    <bundle>mvn:org.xipki/audit-api/${project.version}</bundle>
+    <bundle>mvn:org.xipki/audit/${project.version}</bundle>
     <bundle>mvn:org.xipki/ocsp-api/${project.version}</bundle>
     <bundle>mvn:org.xipki/ocsp-server/${project.version}</bundle>
   </feature>
@@ -123,11 +123,11 @@
     <bundle>mvn:org.xipki/database-tool-shell/${project.version}</bundle>
   </feature>
   <feature name="xipki-audit-slf4j" version="${project.version}" resolver="(obr)">
-    <bundle>mvn:org.xipki/audit-api/${project.version}</bundle>
+    <bundle>mvn:org.xipki/audit/${project.version}</bundle>
     <bundle>mvn:org.xipki/slf4j-audit-impl/${project.version}</bundle>
   </feature>
   <feature name="xipki-audit-syslog" version="${project.version}" resolver="(obr)">
-    <bundle>mvn:org.xipki/audit-api/${project.version}</bundle>
+    <bundle>mvn:org.xipki/audit/${project.version}</bundle>
     <bundle>mvn:org.apache.commons/commons-lang3/3.1</bundle>
     <bundle>mvn:com.google.guava/guava/13.0</bundle>
     <bundle>mvn:joda-time/joda-time/2.1</bundle>
