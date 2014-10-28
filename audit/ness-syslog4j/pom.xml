@@ -4,11 +4,11 @@
   <parent>
     <artifactId>audit-group</artifactId>
     <groupId>org.xipki</groupId>
-    <version>1.0.0-SNAPSHOT</version>
+    <version>1.0.0</version>
   </parent>
   <groupId>org.xipki.thirdparty</groupId>
   <artifactId>ness-syslog4j</artifactId>
-  <version>${syslog4j.version}_1-SNAPSHOT</version>
+  <version>${syslog4j.version}_1</version>
   <packaging>jar</packaging>
   <name>XiPKI :: ${project.artifactId}</name>
   <build>

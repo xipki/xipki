@@ -7,7 +7,7 @@
   <parent>
     <artifactId>pkiconsole-group</artifactId>
     <groupId>org.xipki</groupId>
-    <version>1.0.0-SNAPSHOT</version>
+    <version>1.0.0</version>
   </parent>
   <artifactId>pkiconsole-client</artifactId>
   <packaging>bundle</packaging>

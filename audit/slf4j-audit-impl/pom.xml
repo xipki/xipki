@@ -7,7 +7,7 @@
   <parent>
     <artifactId>audit-group</artifactId>
     <groupId>org.xipki</groupId>
-    <version>1.0.0-SNAPSHOT</version>
+    <version>1.0.0</version>
   </parent>
   <artifactId>slf4j-audit-impl</artifactId>
   <packaging>bundle</packaging>
