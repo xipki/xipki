@@ -188,7 +188,7 @@
                 </artifactItem>
                 <artifactItem>
                   <groupId>org.xipki</groupId>
-                  <artifactId>security-core</artifactId>
+                  <artifactId>security</artifactId>
                   <version>${project.version}</version>
                   <type>jar</type>
                   <includes>xsd/**</includes>

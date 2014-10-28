@@ -18,12 +18,12 @@
   <dependencies>
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>ocsp-api</artifactId>
+      <artifactId>audit</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>security-api</artifactId>
+      <artifactId>security</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
