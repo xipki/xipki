@@ -20,7 +20,7 @@
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>security-core</artifactId>
+      <artifactId>security</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>

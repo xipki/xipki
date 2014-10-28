@@ -15,12 +15,7 @@
   <dependencies>
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>security-core</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>security-iaikp11</artifactId>
+      <artifactId>security</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>

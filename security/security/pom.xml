@@ -9,7 +9,7 @@
     <groupId>org.xipki</groupId>
     <version>2.0.0-SNAPSHOT</version>
   </parent>
-  <artifactId>security-core</artifactId>
+  <artifactId>security</artifactId>
   <packaging>bundle</packaging>
   <name>XiPKI :: ${project.artifactId}</name>
   <properties>
@@ -19,13 +19,13 @@
   <dependencies>
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>security-api</artifactId>
+      <artifactId>security-common</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>security-common</artifactId>
-      <version>${project.version}</version>
+      <groupId>at.tugraz.iaik</groupId>
+      <artifactId>iaikPkcs11Wrapper</artifactId>
+      <version>${pkcs11Wrapper.version}</version>
     </dependency>
     <dependency>
       <groupId>org.slf4j</groupId>
