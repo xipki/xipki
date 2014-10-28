@@ -13,8 +13,7 @@
   <packaging>pom</packaging>
   <name>XiPKI :: ${project.artifactId}</name>
   <modules>
-    <module>audit-api</module>
+    <module>audit</module>
     <module>syslog-audit-impl</module>
-    <module>slf4j-audit-impl</module>
   </modules>
 </project>
