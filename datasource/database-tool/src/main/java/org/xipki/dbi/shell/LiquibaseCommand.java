@@ -49,8 +49,8 @@ import jline.console.ConsoleReader;
 
 import org.apache.felix.gogo.commands.Option;
 import org.xipki.console.karaf.XipkiOsgiCommandSupport;
-import org.xipki.liquibase.LiquibaseDatabaseConf;
-import org.xipki.liquibase.LiquibaseMain;
+import org.xipki.dbi.liquibase.LiquibaseDatabaseConf;
+import org.xipki.dbi.liquibase.LiquibaseMain;
 import org.xipki.security.api.PasswordResolver;
 import org.xipki.security.api.PasswordResolverException;
 import org.xipki.security.common.IoCertUtil;

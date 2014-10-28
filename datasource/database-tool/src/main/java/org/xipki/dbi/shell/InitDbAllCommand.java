@@ -38,7 +38,7 @@ package org.xipki.dbi.shell;
 import java.util.Map;
 
 import org.apache.felix.gogo.commands.Command;
-import org.xipki.liquibase.LiquibaseDatabaseConf;
+import org.xipki.dbi.liquibase.LiquibaseDatabaseConf;
 
 /**
  * @author Lijun Liao

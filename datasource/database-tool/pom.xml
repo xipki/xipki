@@ -15,6 +15,11 @@
   <dependencies>
     <dependency>
       <groupId>${project.groupId}</groupId>
+      <artifactId>console-karaf</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
       <artifactId>datasource-api</artifactId>
       <version>${project.version}</version>
     </dependency>
@@ -24,8 +29,24 @@
       <version>${project.version}</version>
     </dependency>
     <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>security-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.liquibase</groupId>
+      <artifactId>liquibase-osgi</artifactId>
+      <version>${liquibase.version}</version>
+      <exclusions>
+        <exclusion>
+          <groupId>org.liquibase</groupId>
+          <artifactId>liquibase-core</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
   </dependencies>
   <build>
@@ -66,6 +87,20 @@
             </configuration>
           </execution>
         </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.felix</groupId>
+        <artifactId>maven-bundle-plugin</artifactId>
+        <configuration>
+          <instructions>
+            <Import-Package>
+              org.apache.felix.service.command,
+              org.apache.felix.gogo.commands,
+              org.apache.karaf.shell.console,
+              *
+            </Import-Package>
+          </instructions>
+        </configuration>
       </plugin>
     </plugins>
   </build>
