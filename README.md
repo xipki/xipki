@@ -67,7 +67,7 @@ eXtensible sImple Public Key Infrastructure consists of CA and OCSP responder.
 Version
 ----
 
-1.0.0-SNAPSHOT
+1.1
 
 License
 -----------
