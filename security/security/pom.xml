@@ -13,13 +13,12 @@
   <packaging>bundle</packaging>
   <name>XiPKI :: ${project.artifactId}</name>
   <properties>
-    <pkcs11Wrapper.version>1.2.18</pkcs11Wrapper.version>
     <DynamicImport-Package>*</DynamicImport-Package>
   </properties>
   <dependencies>
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>security-common</artifactId>
+      <artifactId>common</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
@@ -40,6 +39,19 @@
   </dependencies>
   <build>
     <plugins>
+      <plugin>
+        <groupId>org.apache.felix</groupId>
+        <artifactId>maven-bundle-plugin</artifactId>
+        <configuration>
+          <instructions>
+            <Import-Package>
+              sun.security.pkcs11;resolution:=optional,
+              sun.security.pkcs11.wrapper;resolution:=optional,
+              *
+            </Import-Package>
+          </instructions>
+        </configuration>
+      </plugin>
       <plugin>
         <groupId>org.jvnet.jaxb2.maven2</groupId>
         <artifactId>maven-jaxb2-plugin</artifactId>

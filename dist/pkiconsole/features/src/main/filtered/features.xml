@@ -10,7 +10,7 @@
   <feature name="xipki-pkiconsole" version="${project.version}" resolver="(obr)">
     <bundle>mvn:org.bouncycastle/bcprov-jdk15on/${bc.version}</bundle>
     <bundle>mvn:org.bouncycastle/bcpkix-jdk15on/${bc.version}</bundle>
-    <bundle>mvn:org.xipki/security-common/${project.version}</bundle>
+    <bundle>mvn:org.xipki/common/${project.version}</bundle>
     <bundle>mvn:org.xipki/ca-common/${project.version}</bundle>
     <bundle>mvn:org.xipki/ca-mgmt-api/${project.version}</bundle>
     <bundle><![CDATA[wrap:mvn:com.caucho/hessian/${hessian.version}/$Bundle-SymbolicName=hessian&Bundle-Version=${hessian.version}]]></bundle>
