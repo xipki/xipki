@@ -14,7 +14,6 @@
   <name>XiPKI :: ${project.artifactId}</name>
   <modules>
     <module>ca-common</module>
-    <module>ca-cmp</module>
     <module>ca-client-api</module>
     <module>ca-client-impl</module>
     <module>ca-client-shell</module>

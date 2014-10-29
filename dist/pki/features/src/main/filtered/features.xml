@@ -65,7 +65,6 @@
     <feature>xipki-security</feature>
     <feature>xipki-ca-api</feature>
     <bundle>mvn:org.xipki/audit/${project.version}</bundle>
-    <bundle>mvn:org.xipki/ca-cmp/${project.version}</bundle>
     <bundle>mvn:org.xipki/datasource-api/${project.version}</bundle>
   </feature>
   <feature name="xipki-caserver" version="${project.version}" resolver="(obr)">
