@@ -1,36 +1,8 @@
 /*
- *
- * This file is part of the XiPKI project.
  * Copyright (c) 2014 Lijun Liao
- * Author: Lijun Liao
  *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License version 3
- * as published by the Free Software Foundation with the addition of the
- * following permission added to Section 15 as permitted in Section 7(a):
- * FOR ANY PART OF THE COVERED WORK IN WHICH THE COPYRIGHT IS OWNED BY
- * THE AUTHOR LIJUN LIAO. LIJUN LIAO DISCLAIMS THE WARRANTY OF NON INFRINGEMENT
- * OF THIRD PARTY RIGHTS.
+ * TO-BE-DEFINE
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- *
- * The interactive user interfaces in modified source and object code versions
- * of this program must display Appropriate Legal Notices, as required under
- * Section 5 of the GNU Affero General Public License.
- *
- * You can be released from the requirements of the license by purchasing
- * a commercial license. Buying such a license is mandatory as soon as you
- * develop commercial activities involving the XiPKI software without
- * disclosing the source code of your own applications.
- *
- * For more information, please contact Lijun Liao at this
- * address: lijun.liao@gmail.com
  */
 
 package org.xipki.security;
@@ -55,7 +27,6 @@ import java.security.interfaces.ECPublicKey;
 import java.security.interfaces.RSAPublicKey;
 import java.security.spec.InvalidKeySpecException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -88,6 +59,11 @@ import org.bouncycastle.util.encoders.Base64;
 import org.bouncycastle.util.encoders.Hex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xipki.common.CmpUtf8Pairs;
+import org.xipki.common.ConfigurationException;
+import org.xipki.common.IoCertUtil;
+import org.xipki.common.LogUtil;
+import org.xipki.common.ParamChecker;
 import org.xipki.security.api.ConcurrentContentSigner;
 import org.xipki.security.api.NoIdleSignerException;
 import org.xipki.security.api.PasswordResolver;
@@ -102,12 +78,6 @@ import org.xipki.security.api.p11.P11ModuleConf;
 import org.xipki.security.api.p11.P11NullPasswordRetriever;
 import org.xipki.security.api.p11.P11PasswordRetriever;
 import org.xipki.security.api.p11.P11SlotIdentifier;
-import org.xipki.security.common.CmpUtf8Pairs;
-import org.xipki.security.common.ConfigurationException;
-import org.xipki.security.common.IoCertUtil;
-import org.xipki.security.common.LogUtil;
-import org.xipki.security.common.ParamChecker;
-import org.xipki.security.common.StringUtil;
 import org.xipki.security.p11.P11ContentSignerBuilder;
 import org.xipki.security.p11.P11PasswordRetrieverImpl;
 import org.xipki.security.p11.conf.jaxb.ModuleType;
@@ -139,13 +109,6 @@ public class SecurityFactoryImpl implements SecurityFactory
 
     private PasswordResolver passwordResolver;
     private String pkcs11ConfFile;
-
-    @Deprecated
-    private String pkcs11Module;
-    @Deprecated
-    private Set<P11SlotIdentifier> pkcs11IncludeSlots;
-    @Deprecated
-    private Set<P11SlotIdentifier> pkcs11ExcludeSlots;
 
     public SecurityFactoryImpl()
     {
@@ -1019,141 +982,128 @@ public class SecurityFactoryImpl implements SecurityFactory
 
         if(pkcs11ConfFile == null || pkcs11ConfFile.isEmpty())
         {
-            Set<P11ModuleConf> confs = new HashSet<>();
-
-            if(pkcs11Provider == null | pkcs11Provider.isEmpty())
-            {
-            }
-            else
-            {
-                P11ModuleConf conf = new P11ModuleConf(DEFAULT_P11MODULE_NAME, pkcs11Module,
-                        P11NullPasswordRetriever.INSTANCE, pkcs11IncludeSlots, pkcs11ExcludeSlots);
-                confs.add(conf);
-            }
-            this.p11Control = new P11Control(DEFAULT_P11MODULE_NAME, confs);
+            throw new IllegalStateException("pkcs11ConfFile is not set");
         }
-        else
+
+        try
         {
-            try
+            JAXBContext jaxbContext = JAXBContext.newInstance(ObjectFactory.class);
+            Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
+            SchemaFactory schemaFact = SchemaFactory.newInstance(javax.xml.XMLConstants.W3C_XML_SCHEMA_NS_URI);
+            Schema schema = schemaFact.newSchema(getClass().getResource("/xsd/pkcs11-conf.xsd"));
+            unmarshaller.setSchema(schema);
+            @SuppressWarnings("unchecked")
+            JAXBElement<PKCS11ConfType> rootElement = (JAXBElement<PKCS11ConfType>)
+                    unmarshaller.unmarshal(new File(pkcs11ConfFile));
+            PKCS11ConfType pkcs11Conf = rootElement.getValue();
+            ModulesType modulesType = pkcs11Conf.getModules();
+
+            Map<String, P11ModuleConf> confs = new HashMap<>();
+            for(ModuleType moduleType : modulesType.getModule())
             {
-                JAXBContext jaxbContext = JAXBContext.newInstance(ObjectFactory.class);
-                Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
-                SchemaFactory schemaFact = SchemaFactory.newInstance(javax.xml.XMLConstants.W3C_XML_SCHEMA_NS_URI);
-                Schema schema = schemaFact.newSchema(getClass().getResource("/xsd/pkcs11-conf.xsd"));
-                unmarshaller.setSchema(schema);
-                @SuppressWarnings("unchecked")
-                JAXBElement<PKCS11ConfType> rootElement = (JAXBElement<PKCS11ConfType>)
-                        unmarshaller.unmarshal(new File(pkcs11ConfFile));
-                PKCS11ConfType pkcs11Conf = rootElement.getValue();
-                ModulesType modulesType = pkcs11Conf.getModules();
-
-                Map<String, P11ModuleConf> confs = new HashMap<>();
-                for(ModuleType moduleType : modulesType.getModule())
+                String name = moduleType.getName();
+                if(DEFAULT_P11MODULE_NAME.equals(name))
                 {
-                    String name = moduleType.getName();
-                    if(DEFAULT_P11MODULE_NAME.equals(name))
+                    throw new ConfigurationException("invald module name " + DEFAULT_P11MODULE_NAME + ", it is reserved");
+                }
+
+                if(confs.containsKey(name))
+                {
+                    throw new ConfigurationException("Multiple modules with the same module name is not permitted");
+                }
+
+                P11PasswordRetriever pwdRetriever;
+
+                PasswordsType passwordsType = moduleType.getPasswords();
+                if(passwordsType == null || passwordsType.getPassword().isEmpty())
+                {
+                    pwdRetriever = P11NullPasswordRetriever.INSTANCE;
+                }
+                else
+                {
+                    pwdRetriever = new P11PasswordRetrieverImpl();
+                    ((P11PasswordRetrieverImpl) pwdRetriever).setPasswordResolver(passwordResolver);
+
+                    for(PasswordType passwordType : passwordsType.getPassword())
                     {
-                        throw new ConfigurationException("invald module name " + DEFAULT_P11MODULE_NAME + ", it is reserved");
+                        Set<P11SlotIdentifier> slots = getSlots(passwordType.getSlots());
+                        ((P11PasswordRetrieverImpl) pwdRetriever).addPasswordEntry(
+                                slots, new ArrayList<>(passwordType.getSinglePassword()));
                     }
+                }
 
-                    if(confs.containsKey(name))
+                Set<P11SlotIdentifier> includeSlots = getSlots(moduleType.getIncludeSlots());
+                Set<P11SlotIdentifier> excludeSlots = getSlots(moduleType.getExcludeSlots());
+
+                final String osName = System.getProperty("os.name").toLowerCase();
+                String nativeLibraryPath = null;
+                for(NativeLibraryType library : moduleType.getNativeLibraries().getNativeLibrary())
+                {
+                    List<String> osNames = library.getOs();
+                    if(osNames == null || osNames.isEmpty())
                     {
-                        throw new ConfigurationException("Multiple modules with the same module name is not permitted");
-                    }
-
-                    P11PasswordRetriever pwdRetriever;
-
-                    PasswordsType passwordsType = moduleType.getPasswords();
-                    if(passwordsType == null || passwordsType.getPassword().isEmpty())
-                    {
-                        pwdRetriever = P11NullPasswordRetriever.INSTANCE;
+                        nativeLibraryPath = library.getPath();
                     }
                     else
                     {
-                        pwdRetriever = new P11PasswordRetrieverImpl();
-                        ((P11PasswordRetrieverImpl) pwdRetriever).setPasswordResolver(passwordResolver);
-
-                        for(PasswordType passwordType : passwordsType.getPassword())
+                        for(String entry : osNames)
                         {
-                            Set<P11SlotIdentifier> slots = getSlots(passwordType.getSlots());
-                            ((P11PasswordRetrieverImpl) pwdRetriever).addPasswordEntry(
-                                    slots, new ArrayList<>(passwordType.getSinglePassword()));
-                        }
-                    }
-
-                    Set<P11SlotIdentifier> includeSlots = getSlots(moduleType.getIncludeSlots());
-                    Set<P11SlotIdentifier> excludeSlots = getSlots(moduleType.getExcludeSlots());
-
-                    final String osName = System.getProperty("os.name").toLowerCase();
-                    String nativeLibraryPath = null;
-                    for(NativeLibraryType library : moduleType.getNativeLibraries().getNativeLibrary())
-                    {
-                        List<String> osNames = library.getOs();
-                        if(osNames == null || osNames.isEmpty())
-                        {
-                            nativeLibraryPath = library.getPath();
-                        }
-                        else
-                        {
-                            for(String entry : osNames)
+                            if(osName.contains(entry.toLowerCase()))
                             {
-                                if(osName.contains(entry.toLowerCase()))
-                                {
-                                    nativeLibraryPath = library.getPath();
-                                    break;
-                                }
+                                nativeLibraryPath = library.getPath();
+                                break;
                             }
                         }
-
-                        if(nativeLibraryPath != null)
-                        {
-                            break;
-                        }
                     }
 
-                    if(nativeLibraryPath == null)
+                    if(nativeLibraryPath != null)
                     {
-                        throw new ConfigurationException("Could not find PKCS#11 library for OS " + osName);
+                        break;
                     }
-
-                    File f = new File(nativeLibraryPath);
-                    if(f.exists() == false)
-                    {
-                        throw new ConfigurationException("PKCS#11 library " + f.getAbsolutePath() + " does not exist");
-                    }
-                    if(f.isFile() == false)
-                    {
-                        throw new ConfigurationException("PKCS#11 library " + f.getAbsolutePath() +
-                                " does not point to a file");
-                    }
-                    if(f.canRead() == false)
-                    {
-                        throw new ConfigurationException("No permission to access PKCS#11 library " + f.getAbsolutePath());
-                    }
-
-                    P11ModuleConf conf = new P11ModuleConf(name,
-                            nativeLibraryPath, pwdRetriever, includeSlots, excludeSlots);
-                    confs.put(name, conf);
                 }
 
-                final String defaultModuleName = modulesType.getDefaultModule();
-                if(confs.containsKey(defaultModuleName) == false)
+                if(nativeLibraryPath == null)
                 {
-                    throw new ConfigurationException("Default module " + defaultModuleName + " is not defined");
+                    throw new ConfigurationException("Could not find PKCS#11 library for OS " + osName);
                 }
 
-                this.p11Control = new P11Control(defaultModuleName, new HashSet<>(confs.values()));
-            } catch (JAXBException | SAXException | ConfigurationException e)
-            {
-                final String message = "Invalid configuration file " + pkcs11ConfFile;
-                if(LOG.isErrorEnabled())
+                File f = new File(nativeLibraryPath);
+                if(f.exists() == false)
                 {
-                    LOG.error(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(), e.getMessage());
+                    throw new ConfigurationException("PKCS#11 library " + f.getAbsolutePath() + " does not exist");
                 }
-                LOG.debug(message, e);
+                if(f.isFile() == false)
+                {
+                    throw new ConfigurationException("PKCS#11 library " + f.getAbsolutePath() +
+                            " does not point to a file");
+                }
+                if(f.canRead() == false)
+                {
+                    throw new ConfigurationException("No permission to access PKCS#11 library " + f.getAbsolutePath());
+                }
 
-                throw new RuntimeException(message);
+                P11ModuleConf conf = new P11ModuleConf(name,
+                        nativeLibraryPath, pwdRetriever, includeSlots, excludeSlots);
+                confs.put(name, conf);
             }
+
+            final String defaultModuleName = modulesType.getDefaultModule();
+            if(confs.containsKey(defaultModuleName) == false)
+            {
+                throw new ConfigurationException("Default module " + defaultModuleName + " is not defined");
+            }
+
+            this.p11Control = new P11Control(defaultModuleName, new HashSet<>(confs.values()));
+        } catch (JAXBException | SAXException | ConfigurationException e)
+        {
+            final String message = "Invalid configuration file " + pkcs11ConfFile;
+            if(LOG.isErrorEnabled())
+            {
+                LOG.error(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(), e.getMessage());
+            }
+            LOG.debug(message, e);
+
+            throw new RuntimeException(message);
         }
     }
 
@@ -1167,24 +1117,6 @@ public class SecurityFactoryImpl implements SecurityFactory
         {
             this.pkcs11ConfFile = confFile;
         }
-    }
-
-    @Deprecated
-    public void setPkcs11Module(String pkcs11Module)
-    {
-        this.pkcs11Module = pkcs11Module;
-    }
-
-    @Deprecated
-    public void setPkcs11IncludeSlots(String indexes)
-    {
-        this.pkcs11IncludeSlots = getSlots(indexes);
-    }
-
-    @Deprecated
-    public void setPkcs11ExcludeSlots(String indexes)
-    {
-        this.pkcs11ExcludeSlots = getSlots(indexes);
     }
 
     private static Set<P11SlotIdentifier> getSlots(SlotsType type)
@@ -1223,37 +1155,6 @@ public class SecurityFactoryImpl implements SecurityFactory
         }
 
         return slots;
-    }
-
-    @Deprecated
-    private static Set<P11SlotIdentifier> getSlots(String indexes)
-    {
-        if(indexes == null || indexes.trim().isEmpty())
-        {
-            return null;
-        }
-
-        Set<String> slotStrs = StringUtil.splitAsSet(indexes.trim(), ", ");
-        if(slotStrs.isEmpty())
-        {
-            return null;
-        }
-
-        Set<P11SlotIdentifier> slots = new HashSet<>(slotStrs.size());
-        for(String slotStr : slotStrs)
-        {
-            int slotIndex;
-            try
-            {
-                slotIndex = Integer.parseInt(slotStr);
-            }catch(NumberFormatException e)
-            {
-                throw new RuntimeException("Invalid slot index " + slotStr);
-            }
-            slots.add(new P11SlotIdentifier(slotIndex, null));
-        }
-
-        return Collections.unmodifiableSet(slots);
     }
 
     private String getRealPkcs11ModuleName(String moduleName)
