@@ -30,22 +30,19 @@
     <bundle start-level="30">mvn:org.eclipse.jetty/jetty-plus/${jetty.version}</bundle>
     <bundle start-level="30">mvn:org.eclipse.jetty/jetty-websocket/${jetty.version}</bundle>
   </feature>
-  <feature name="xipki-security-p11" version="${project.version}" resolver="(obr)">
+  <feature name="xipki-security" version="${project.version}" resolver="(obr)">
     <bundle><![CDATA[wrap:mvn:at.tugraz.iaik/iaikPkcs11Wrapper/${pkcs11Wrapper.version}/$Bundle-SymbolicName=iaikPkcs11Wrapper&Bundle-Version=${pkcs11Wrapper.version}]]></bundle>
     <bundle>mvn:org.bouncycastle/bcprov-jdk15on/${bc.version}</bundle>
     <bundle>mvn:org.bouncycastle/bcpkix-jdk15on/${bc.version}</bundle>
-    <bundle>mvn:org.xipki/security-common/${project.version}</bundle>
-    <bundle>mvn:org.xipki/security-api/${project.version}</bundle>
-    <bundle>mvn:org.xipki/security-core/${project.version}</bundle>
-    <bundle>mvn:org.xipki/security-iaikp11/${project.version}</bundle>
-    <bundle>mvn:org.xipki/security-sunp11/${project.version}</bundle>
+    <bundle>mvn:org.xipki/common/${project.version}</bundle>
+    <bundle>mvn:org.xipki/security/${project.version}</bundle>
   </feature>
   <feature name="xipki-remotep11-server" version="${project.version}" resolver="(obr)">
-    <feature>xipki-security-p11</feature>
+    <feature>xipki-security</feature>
     <bundle>mvn:org.xipki/remotep11-server/${project.version}</bundle>
   </feature>
   <feature name="xipki-security-shell" version="${project.version}" resolver="(obr)">
-    <feature>xipki-security-p11</feature>
+    <feature>xipki-security</feature>
     <bundle>mvn:org.xipki/security-shell/${project.version}</bundle>
   </feature>
 </features>

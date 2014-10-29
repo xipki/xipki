@@ -1,36 +1,8 @@
 /*
- *
- * This file is part of the XiPKI project.
  * Copyright (c) 2014 Lijun Liao
- * Author: Lijun Liao
  *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License version 3
- * as published by the Free Software Foundation with the addition of the
- * following permission added to Section 15 as permitted in Section 7(a):
- * FOR ANY PART OF THE COVERED WORK IN WHICH THE COPYRIGHT IS OWNED BY
- * THE AUTHOR LIJUN LIAO. LIJUN LIAO DISCLAIMS THE WARRANTY OF NON INFRINGEMENT
- * OF THIRD PARTY RIGHTS.
+ * TO-BE-DEFINE
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- *
- * The interactive user interfaces in modified source and object code versions
- * of this program must display Appropriate Legal Notices, as required under
- * Section 5 of the GNU Affero General Public License.
- *
- * You can be released from the requirements of the license by purchasing
- * a commercial license. Buying such a license is mandatory as soon as you
- * develop commercial activities involving the XiPKI software without
- * disclosing the source code of your own applications.
- *
- * For more information, please contact Lijun Liao at this
- * address: lijun.liao@gmail.com
  */
 
 package org.xipki.ca.client.impl;
@@ -115,12 +87,12 @@ import org.xipki.ca.common.CertIDOrError;
 import org.xipki.ca.common.EnrollCertResult;
 import org.xipki.ca.common.PKIErrorException;
 import org.xipki.ca.common.RAWorkerException;
+import org.xipki.common.ConfigurationException;
+import org.xipki.common.IoCertUtil;
+import org.xipki.common.LogUtil;
+import org.xipki.common.ParamChecker;
 import org.xipki.security.api.ConcurrentContentSigner;
 import org.xipki.security.api.SignerException;
-import org.xipki.security.common.ConfigurationException;
-import org.xipki.security.common.IoCertUtil;
-import org.xipki.security.common.LogUtil;
-import org.xipki.security.common.ParamChecker;
 import org.xml.sax.SAXException;
 
 /**
@@ -255,37 +227,13 @@ public final class RAWorkerImpl extends AbstractRAWorker implements RAWorker
             Security.addProvider(new BouncyCastleProvider());
         }
 
-        CAClientType config;
         File configFile = new File(IoCertUtil.expandFilepath(confFile));
-        if(configFile.exists())
-        {
-            if(confFile.endsWith(".properties"))
-            {
-                config = LegacyConfConverter.convertConf(new FileInputStream(configFile));
-            } else
-            {
-                config = parse(new FileInputStream(configFile));
-            }
-        }
-        else if(confFile.endsWith(".properties") == false)
-        {
-            // consider the legacy software
-            int idx = confFile.lastIndexOf('.');
-            String fn = confFile.substring(0, idx) + ".properties";
-            configFile = new File(fn);
-            if(configFile.exists())
-            {
-                config = LegacyConfConverter.convertConf(fn);
-            } else
-            {
-                throw new FileNotFoundException("Cound not find configuration file " + confFile);
-            }
-        }
-        else
+        if(configFile.exists() == false)
         {
             throw new FileNotFoundException("Cound not find configuration file " + confFile);
         }
 
+        CAClientType config = parse(new FileInputStream(configFile));
         int numActiveCAs = 0;
 
         for(CAType caType : config.getCAs().getCA())
@@ -300,7 +248,7 @@ public final class RAWorkerImpl extends AbstractRAWorker implements RAWorker
 
         if(numActiveCAs == 0)
         {
-            LOG.warn("No active CA configured");
+            LOG.warn("No active CA is configured");
         }
 
         Boolean b = config.isDevMode();

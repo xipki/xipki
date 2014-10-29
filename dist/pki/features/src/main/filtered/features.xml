@@ -44,19 +44,18 @@
   <feature name="xipki-datasource" version="${project.version}" resolver="(obr)">
     <bundle>mvn:com.zaxxer/HikariCP/${hikaricp.version}</bundle>
     <bundle>mvn:org.javassist/javassist/3.18.1-GA</bundle>
-    <bundle>mvn:org.xipki/security-common/${project.version}</bundle>
+    <bundle>mvn:org.xipki/common/${project.version}</bundle>
     <bundle>mvn:org.xipki/datasource-api/${project.version}</bundle>
     <bundle>mvn:org.xipki/datasource-impl/${project.version}</bundle>
   </feature>
   <feature name="xipki-security" version="${project.version}" resolver="(obr)">
     <feature>bouncycastle</feature>
-    <bundle>mvn:org.xipki/security-common/${project.version}</bundle>
+    <bundle>mvn:org.xipki/common/${project.version}</bundle>
     <bundle><![CDATA[wrap:mvn:at.tugraz.iaik/iaikPkcs11Wrapper/${pkcs11Wrapper.version}/$Bundle-SymbolicName=iaikPkcs11Wrapper&Bundle-Version=${pkcs11Wrapper.version}]]></bundle>
     <bundle>mvn:org.xipki/security/${project.version}</bundle>
-    <bundle>mvn:org.xipki/security-sunp11/${project.version}</bundle>
   </feature>
   <feature name="xipki-ca-api" version="${project.version}" resolver="(obr)">
-    <bundle>mvn:org.xipki/security-common/${project.version}</bundle>
+    <bundle>mvn:org.xipki/common/${project.version}</bundle>
     <bundle>mvn:org.xipki/ca-common/${project.version}</bundle>
     <bundle>mvn:org.xipki/audit/${project.version}</bundle>
     <bundle>mvn:org.xipki/ca-api/${project.version}</bundle>
@@ -70,6 +69,7 @@
   <feature name="xipki-caserver" version="${project.version}" resolver="(obr)">
     <feature>xipki-datasource</feature>
     <feature>xipki-cabase</feature>
+    <feature>xipki-audit</feature>
     <bundle>mvn:org.xipki/ca-mgmt-api/${project.version}</bundle>
     <bundle>mvn:org.xipki/ca-server/${project.version}</bundle>
   </feature>
@@ -96,6 +96,7 @@
   <feature name="xipki-ocspserver" version="${project.version}" resolver="(obr)">
     <feature>xipki-datasource</feature>
     <feature>xipki-security</feature>
+    <feature>xipki-audit</feature>
     <bundle>mvn:org.xipki/audit/${project.version}</bundle>
     <bundle>mvn:org.xipki/ocsp-api/${project.version}</bundle>
     <bundle>mvn:org.xipki/ocsp-server/${project.version}</bundle>
@@ -117,12 +118,11 @@
     <bundle>mvn:org.liquibase/liquibase-osgi/${liquibase.version}</bundle>
     <bundle>mvn:org.xipki/database-tool/${project.version}</bundle>
   </feature>
-  <feature name="xipki-audit-slf4j" version="${project.version}" resolver="(obr)">
+  <feature name="xipki-audit" version="${project.version}" resolver="(obr)">
     <bundle>mvn:org.xipki/audit/${project.version}</bundle>
-    <bundle>mvn:org.xipki/slf4j-audit-impl/${project.version}</bundle>
   </feature>
   <feature name="xipki-audit-syslog" version="${project.version}" resolver="(obr)">
-    <bundle>mvn:org.xipki/audit/${project.version}</bundle>
+    <feature>xipki-audit</feature>
     <bundle>mvn:org.apache.commons/commons-lang3/3.1</bundle>
     <bundle>mvn:com.google.guava/guava/13.0</bundle>
     <bundle>mvn:joda-time/joda-time/2.1</bundle>
