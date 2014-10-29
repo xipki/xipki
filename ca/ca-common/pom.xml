@@ -15,7 +15,7 @@
   <dependencies>
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>security-common</artifactId>
+      <artifactId>security</artifactId>
       <version>${project.version}</version>
     </dependency>
   </dependencies>
