@@ -16,6 +16,7 @@
     <module>ocsp-client-api</module>
     <module>ocsp-client-impl</module>
     <module>ocsp-client-shell</module>
+    <module>ocsp-api</module>
     <module>ocsp-server</module>
   </modules>
 </project>
