@@ -15,11 +15,6 @@
   <dependencies>
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>ca-cmp</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
       <artifactId>ca-common</artifactId>
       <version>${project.version}</version>
     </dependency>
