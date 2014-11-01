@@ -10,29 +10,6 @@
         mvn:org.xipki/features/${project.version}/xml/features
     -->
   <repository>mvn:org.apache.karaf.assemblies.features/standard/${karaf.version}/xml/features</repository>
-  <!-- overrides karaf jetty version with the latest version from 7.6.x -->
-  <!-- pax web and all others should automatically pick up this version since no versions are defined and the newest will be selected by default -->
-  <feature name="jetty" description="Provide Jetty engine support" version="${jetty.version}" resolver="(obr)">
-    <bundle dependency="true" start-level="30">mvn:org.apache.servicemix.specs/org.apache.servicemix.specs.activation-api-1.1/2.4.0</bundle>
-    <bundle dependency="true" start-level="30">mvn:org.apache.geronimo.specs/geronimo-servlet_2.5_spec/1.2</bundle>
-    <bundle dependency="true" start-level="30">mvn:javax.mail/mail/1.4.5</bundle>
-    <bundle dependency="true" start-level="30">mvn:org.apache.geronimo.specs/geronimo-jta_1.1_spec/1.1.1</bundle>
-    <bundle start-level="30">mvn:org.eclipse.jetty/jetty-util/${jetty.version}</bundle>
-    <bundle start-level="30">mvn:org.eclipse.jetty/jetty-io/${jetty.version}</bundle>
-    <bundle start-level="30">mvn:org.eclipse.jetty/jetty-http/${jetty.version}</bundle>
-    <bundle start-level="30">mvn:org.eclipse.jetty/jetty-client/${jetty.version}</bundle>
-    <bundle start-level="30">mvn:org.eclipse.jetty/jetty-continuation/${jetty.version}</bundle>
-    <bundle start-level="30">mvn:org.eclipse.jetty/jetty-jmx/${jetty.version}</bundle>
-    <bundle start-level="30">mvn:org.eclipse.jetty/jetty-server/${jetty.version}</bundle>
-    <bundle start-level="30">mvn:org.eclipse.jetty/jetty-security/${jetty.version}</bundle>
-    <bundle start-level="30">mvn:org.eclipse.jetty/jetty-servlet/${jetty.version}</bundle>
-    <bundle start-level="30">mvn:org.eclipse.jetty/jetty-servlets/${jetty.version}</bundle>
-    <bundle start-level="30">mvn:org.eclipse.jetty/jetty-xml/${jetty.version}</bundle>
-    <bundle start-level="30">mvn:org.eclipse.jetty/jetty-webapp/${jetty.version}</bundle>
-    <bundle start-level="30">mvn:org.eclipse.jetty/jetty-jndi/${jetty.version}</bundle>
-    <bundle start-level="30">mvn:org.eclipse.jetty/jetty-plus/${jetty.version}</bundle>
-    <bundle start-level="30">mvn:org.eclipse.jetty/jetty-websocket/${jetty.version}</bundle>
-  </feature>
   <!--
         Note: instead of defining all features monolithically in a central features file,
         Project-plugins should be defined in their own feature descriptors and then aggregated later
@@ -42,8 +19,8 @@
     <bundle>mvn:org.bouncycastle/bcpkix-jdk15on/${bc.version}</bundle>
   </feature>
   <feature name="xipki-datasource" version="${project.version}" resolver="(obr)">
-    <bundle>mvn:com.zaxxer/HikariCP/${hikaricp.version}</bundle>
-    <bundle>mvn:org.javassist/javassist/3.18.1-GA</bundle>
+    <bundle>mvn:com.zaxxer/HikariCP-java6/${hikaricp.version}</bundle>
+    <bundle>mvn:org.javassist/javassist/${javassist.version}</bundle>
     <bundle>mvn:org.xipki/common/${project.version}</bundle>
     <bundle>mvn:org.xipki/datasource-api/${project.version}</bundle>
     <bundle>mvn:org.xipki/datasource-impl/${project.version}</bundle>
@@ -123,11 +100,11 @@
   </feature>
   <feature name="xipki-audit-syslog" version="${project.version}" resolver="(obr)">
     <feature>xipki-audit</feature>
-    <bundle>mvn:org.apache.commons/commons-lang3/3.1</bundle>
-    <bundle>mvn:com.google.guava/guava/13.0</bundle>
-    <bundle>mvn:joda-time/joda-time/2.1</bundle>
+    <bundle>mvn:org.apache.commons/commons-lang3/${commons-lang3.version}</bundle>
+    <bundle>mvn:com.google.guava/guava/${guava.version}</bundle>
+    <bundle>mvn:joda-time/joda-time/${joda-time.version}</bundle>
     <bundle>mvn:com.nesscomputing/ness-syslog4j/${syslog4j.version}</bundle>
-    <bundle>mvn:org.xipki/syslog-audit-impl/${project.version}</bundle>
+    <bundle>mvn:org.xipki/audit-syslog/${project.version}</bundle>
   </feature>
   <feature name="xipki-pkiconsole-server" version="${project.version}" resolver="(obr)">
     <feature>xipki-caserver</feature>

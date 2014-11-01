@@ -3,7 +3,7 @@
   <reference id="securityFactory" interface="org.xipki.security.api.SecurityFactory"/>
   <reference id="raWorker" interface="org.xipki.ca.client.api.RAWorker"/>
   <reference id="filePathCompleter" interface="org.xipki.console.karaf.FilePathCompleter"/>
-  <reference id="dataSourceFactory" interface="org.xipki.database.api.DataSourceFactory" availability="optional"/>
+  <reference id="dataSourceFactory" interface="org.xipki.datasource.api.DataSourceFactory" availability="optional"/>
   <bean id="crlReasonCompleter" class="org.xipki.ca.client.shell.completer.ClientCRLReasonCompleter"/>
   <bean id="curveNameCompleter" class="org.xipki.ca.client.shell.completer.ECCurveNameCompleter"/>
   <bean id="caNameCompleter" class="org.xipki.ca.client.shell.completer.CaNameCompleter">

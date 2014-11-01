@@ -7,29 +7,6 @@
         mvn:org.xipki.remotep11/features/${project.version}/xml/features
     -->
   <repository>mvn:org.apache.karaf.assemblies.features/standard/${karaf.version}/xml/features</repository>
-  <!-- overrides karaf jetty version with the latest version from 7.6.x -->
-  <!-- pax web and all others should automatically pick up this version since no versions are defined and the newest will be selected by default -->
-  <feature name="jetty" description="Provide Jetty engine support" version="${jetty.version}" resolver="(obr)">
-    <bundle dependency="true" start-level="30">mvn:org.apache.servicemix.specs/org.apache.servicemix.specs.activation-api-1.1/2.4.0</bundle>
-    <bundle dependency="true" start-level="30">mvn:org.apache.geronimo.specs/geronimo-servlet_2.5_spec/1.2</bundle>
-    <bundle dependency="true" start-level="30">mvn:javax.mail/mail/1.4.5</bundle>
-    <bundle dependency="true" start-level="30">mvn:org.apache.geronimo.specs/geronimo-jta_1.1_spec/1.1.1</bundle>
-    <bundle start-level="30">mvn:org.eclipse.jetty/jetty-util/${jetty.version}</bundle>
-    <bundle start-level="30">mvn:org.eclipse.jetty/jetty-io/${jetty.version}</bundle>
-    <bundle start-level="30">mvn:org.eclipse.jetty/jetty-http/${jetty.version}</bundle>
-    <bundle start-level="30">mvn:org.eclipse.jetty/jetty-client/${jetty.version}</bundle>
-    <bundle start-level="30">mvn:org.eclipse.jetty/jetty-continuation/${jetty.version}</bundle>
-    <bundle start-level="30">mvn:org.eclipse.jetty/jetty-jmx/${jetty.version}</bundle>
-    <bundle start-level="30">mvn:org.eclipse.jetty/jetty-server/${jetty.version}</bundle>
-    <bundle start-level="30">mvn:org.eclipse.jetty/jetty-security/${jetty.version}</bundle>
-    <bundle start-level="30">mvn:org.eclipse.jetty/jetty-servlet/${jetty.version}</bundle>
-    <bundle start-level="30">mvn:org.eclipse.jetty/jetty-servlets/${jetty.version}</bundle>
-    <bundle start-level="30">mvn:org.eclipse.jetty/jetty-xml/${jetty.version}</bundle>
-    <bundle start-level="30">mvn:org.eclipse.jetty/jetty-webapp/${jetty.version}</bundle>
-    <bundle start-level="30">mvn:org.eclipse.jetty/jetty-jndi/${jetty.version}</bundle>
-    <bundle start-level="30">mvn:org.eclipse.jetty/jetty-plus/${jetty.version}</bundle>
-    <bundle start-level="30">mvn:org.eclipse.jetty/jetty-websocket/${jetty.version}</bundle>
-  </feature>
   <feature name="xipki-security" version="${project.version}" resolver="(obr)">
     <bundle><![CDATA[wrap:mvn:at.tugraz.iaik/iaikPkcs11Wrapper/${pkcs11Wrapper.version}/$Bundle-SymbolicName=iaikPkcs11Wrapper&Bundle-Version=${pkcs11Wrapper.version}]]></bundle>
     <bundle>mvn:org.bouncycastle/bcprov-jdk15on/${bc.version}</bundle>

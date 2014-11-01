@@ -9,12 +9,6 @@
   <artifactId>dist-group</artifactId>
   <name>${project.groupId}.${project.artifactId}</name>
   <packaging>pom</packaging>
-  <properties>
-    <bc.version>1.51</bc.version>
-    <hikaricp.version>1.4.0</hikaricp.version>
-    <karaf.version>2.3.7</karaf.version>
-    <jetty.version>7.6.16.v20140903</jetty.version>
-  </properties>
   <modules>
     <module>pki</module>
     <module>pkiconsole</module>

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0" xmlns:cm="http://aries.apache.org/blueprint/xmlns/blueprint-cm/v1.1.0" default-activation="lazy">
-  <reference id="dataSourceFactory" interface="org.xipki.database.api.DataSourceFactory"/>
+  <reference id="dataSourceFactory" interface="org.xipki.datasource.api.DataSourceFactory"/>
   <reference id="passwordResolver" interface="org.xipki.security.api.PasswordResolver"/>
   <reference id="dirPathCompleter" interface="org.xipki.console.karaf.DirPathCompleter"/>
   <reference id="filePathCompleter" interface="org.xipki.console.karaf.FilePathCompleter"/>
@@ -9,7 +9,7 @@
   </bean>
   <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.1.0">
     <command name="dbtool/export-ca">
-      <action class="org.xipki.dbi.shell.ExportCaCommand">
+      <action class="org.xipki.dbtool.shell.ExportCaCommand">
         <property name="dataSourceFactory" ref="dataSourceFactory"/>
         <property name="passwordResolver" ref="passwordResolver"/>
       </action>
@@ -19,7 +19,7 @@
       </optional-completers>
     </command>
     <command name="dbtool/import-ca">
-      <action class="org.xipki.dbi.shell.ImportCaCommand">
+      <action class="org.xipki.dbtool.shell.ImportCaCommand">
         <property name="dataSourceFactory" ref="dataSourceFactory"/>
         <property name="passwordResolver" ref="passwordResolver"/>
       </action>
@@ -29,7 +29,7 @@
       </optional-completers>
     </command>
     <command name="dbtool/export-ocsp">
-      <action class="org.xipki.dbi.shell.ExportOcspCommand">
+      <action class="org.xipki.dbtool.shell.ExportOcspCommand">
         <property name="dataSourceFactory" ref="dataSourceFactory"/>
         <property name="passwordResolver" ref="passwordResolver"/>
       </action>
@@ -39,7 +39,7 @@
       </optional-completers>
     </command>
     <command name="dbtool/import-ocsp">
-      <action class="org.xipki.dbi.shell.ImportOcspCommand">
+      <action class="org.xipki.dbtool.shell.ImportOcspCommand">
         <property name="dataSourceFactory" ref="dataSourceFactory"/>
         <property name="passwordResolver" ref="passwordResolver"/>
       </action>
@@ -49,7 +49,7 @@
       </optional-completers>
     </command>
     <command name="dbtool/import-ocspfromca">
-      <action class="org.xipki.dbi.shell.ImportOcspFromCaCommand">
+      <action class="org.xipki.dbtool.shell.ImportOcspFromCaCommand">
         <property name="dataSourceFactory" ref="dataSourceFactory"/>
         <property name="passwordResolver" ref="passwordResolver"/>
       </action>
@@ -60,7 +60,7 @@
     </command>
     <!-- Liquibase Commands -->
     <command name="dbtool/initdb-ca">
-      <action class="org.xipki.dbi.shell.InitDbCaCommand">
+      <action class="org.xipki.dbtool.shell.InitDbCaCommand">
         <property name="passwordResolver" ref="passwordResolver"/>
       </action>
       <optional-completers>
@@ -68,7 +68,7 @@
       </optional-completers>
     </command>
     <command name="dbtool/initdb">
-      <action class="org.xipki.dbi.shell.InitDbAllCommand">
+      <action class="org.xipki.dbtool.shell.InitDbAllCommand">
         <property name="passwordResolver" ref="passwordResolver"/>
       </action>
       <optional-completers>
@@ -76,7 +76,7 @@
       </optional-completers>
     </command>
     <command name="dbtool/initdb-ocsp">
-      <action class="org.xipki.dbi.shell.InitDbOcspCommand">
+      <action class="org.xipki.dbtool.shell.InitDbOcspCommand">
         <property name="passwordResolver" ref="passwordResolver"/>
       </action>
       <optional-completers>
