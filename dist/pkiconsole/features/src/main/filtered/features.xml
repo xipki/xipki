@@ -6,7 +6,7 @@
         feature url is:
         mvn:org.xipki.remotep11/features/${project.version}/xml/features
     -->
-  <repository>mvn:org.apache.karaf.assemblies.features/standard/2.3.3/xml/features</repository>
+  <repository>mvn:org.apache.karaf.assemblies.features/standard/${karaf.version}/xml/features</repository>
   <feature name="xipki-pkiconsole" version="${project.version}" resolver="(obr)">
     <bundle>mvn:org.bouncycastle/bcprov-jdk15on/${bc.version}</bundle>
     <bundle>mvn:org.bouncycastle/bcpkix-jdk15on/${bc.version}</bundle>
@@ -19,8 +19,7 @@
   </feature>
   <feature name="xipki-pkiconsole-shell" version="${project.version}" resolver="(obr)">
     <feature>xipki-pkiconsole</feature>
-    <bundle>mvn:org.xipki/security-api/${project.version}</bundle>
-    <bundle>mvn:org.xipki/security-core/${project.version}</bundle>
+    <bundle>mvn:org.xipki/security/${project.version}</bundle>
     <bundle>mvn:org.xipki/console-karaf/${project.version}</bundle>
     <bundle>mvn:org.xipki/ca-server-shell/${project.version}</bundle>
   </feature>

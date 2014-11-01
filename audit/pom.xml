@@ -14,6 +14,6 @@
   <name>XiPKI :: ${project.artifactId}</name>
   <modules>
     <module>audit</module>
-    <module>syslog-audit-impl</module>
+    <module>audit-syslog</module>
   </modules>
 </project>

@@ -35,16 +35,20 @@
   </developers>
   <properties>
     <karaf.version>2.3.7</karaf.version>
-    <bc.version>1.49</bc.version>
-    <slf4j.version>1.5.11</slf4j.version>
-    <servlet-api.version>2.3</servlet-api.version>
+    <bc.version>1.51</bc.version>
+    <slf4j.version>1.7.7</slf4j.version>
+    <servlet-api.version>2.5</servlet-api.version>
     <junit.version>4.8.2</junit.version>
     <pkcs11Wrapper.version>1.2.18</pkcs11Wrapper.version>
-    <hikaricp.version>1.4.0</hikaricp.version>
+    <hikaricp.version>2.1.0</hikaricp.version>
     <ldapsdk.version>2.3.6</ldapsdk.version>
     <hessian.version>4.0.38</hessian.version>
     <liquibase.version>3.2.2</liquibase.version>
     <syslog4j.version>0.9.47-NESS-9-SNAPSHOT</syslog4j.version>
+    <javassist.version>3.18.1-GA</javassist.version>
+    <commons-lang3.version>3.1</commons-lang3.version>
+    <guava.version>13.0</guava.version>
+    <joda-time.version>2.1</joda-time.version>
   </properties>
   <modules>
     <module>console-karaf</module>
@@ -52,7 +56,7 @@
     <module>audit</module>
     <module>security</module>
     <module>datasource</module>
-    <module>ca</module>
+     <module>ca</module>
     <module>ocsp</module>
     <module>pkiconsole</module>
   </modules>
