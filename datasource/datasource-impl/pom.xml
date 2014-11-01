@@ -20,7 +20,7 @@
     </dependency>
     <dependency>
       <groupId>com.zaxxer</groupId>
-      <artifactId>HikariCP</artifactId>
+      <artifactId>HikariCP-java6</artifactId>
       <version>${hikaricp.version}</version>
       <scope>compile</scope>
     </dependency>
