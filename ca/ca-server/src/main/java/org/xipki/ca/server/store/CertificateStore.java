@@ -566,7 +566,7 @@ public class CertificateStore
     {
         try
         {
-            return queryExecutor.containsCertificates(caCert, true) == false;
+            return queryExecutor.containsCertificates(caCert, false);
         } catch (SQLException e)
         {
             LOG.debug("SQLException", e);
@@ -579,7 +579,7 @@ public class CertificateStore
     {
         try
         {
-            return queryExecutor.containsCertificates(caCert, false) == false;
+            return queryExecutor.containsCertificates(caCert, true);
         } catch (SQLException e)
         {
             LOG.debug("SQLException", e);
