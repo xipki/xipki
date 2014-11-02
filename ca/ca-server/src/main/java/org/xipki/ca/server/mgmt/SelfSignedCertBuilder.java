@@ -79,6 +79,7 @@ import org.xipki.ca.api.profile.SubjectInfo;
 import org.xipki.ca.api.profile.X509Util;
 import org.xipki.ca.common.BadCertTemplateException;
 import org.xipki.ca.common.CertProfileException;
+import org.xipki.ca.common.CertValidity;
 import org.xipki.ca.server.PublicCAInfo;
 import org.xipki.common.CmpUtf8Pairs;
 import org.xipki.common.ConfigurationException;
@@ -95,8 +96,6 @@ import org.xipki.security.api.SignerException;
 class SelfSignedCertBuilder
 {
     private static final Logger LOG = LoggerFactory.getLogger(SelfSignedCertBuilder.class);
-
-    private static long DAY = 24L * 60 * 60 * 1000;
 
     static class GenerateSelfSignedResult
     {
@@ -211,14 +210,14 @@ class SelfSignedCertBuilder
             notBefore = new Date();
         }
 
-        Integer validity = certProfile.getValidity();
+        CertValidity validity = certProfile.getValidity();
         if(validity == null)
         {
             throw new OperationException(ErrorCode.BAD_CERT_TEMPLATE,
                     "no validity specified in the profile " + certProfile.getName());
         }
 
-        Date notAfter = new Date(notBefore.getTime() + DAY * validity);
+        Date notAfter = validity.add(notBefore);
 
         X500Name grantedSubject = subjectInfo.getGrantedSubject();
 

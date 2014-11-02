@@ -49,6 +49,7 @@ import org.xipki.ca.api.profile.SubjectInfo;
 import org.xipki.ca.common.BadCertTemplateException;
 import org.xipki.ca.common.BadFormatException;
 import org.xipki.ca.common.CertProfileException;
+import org.xipki.ca.common.CertValidity;
 import org.xipki.common.EnvironmentParameterResolver;
 import org.xipki.common.ParamChecker;
 
@@ -96,7 +97,7 @@ public class IdentifiedCertProfile
         return certProfile.getNotBefore(notBefore);
     }
 
-    public Integer getValidity()
+    public CertValidity getValidity()
     {
         return certProfile.getValidity();
     }

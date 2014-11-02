@@ -104,6 +104,7 @@ import org.xipki.ca.api.profile.SubjectInfo;
 import org.xipki.ca.api.profile.X509Util;
 import org.xipki.ca.common.BadCertTemplateException;
 import org.xipki.ca.common.CertProfileException;
+import org.xipki.ca.common.CertValidity;
 import org.xipki.ca.server.certprofile.jaxb.AddTextType;
 import org.xipki.ca.server.certprofile.jaxb.AlgorithmType;
 import org.xipki.ca.server.certprofile.jaxb.CertificatePolicyInformationType;
@@ -171,12 +172,12 @@ public class DefaultCertProfile extends AbstractCertProfile
     private Map<ASN1ObjectIdentifier, List<KeyParamRanges>> nonEcKeyAlgorithms;
 
     private Map<ASN1ObjectIdentifier, SubjectDNOption> subjectDNOptions;
-    private List<RDNOccurrence> subjectDNOccurrences;
+    private Set<RDNOccurrence> subjectDNOccurrences;
     private Map<String, String> parameters;
     private Map<ASN1ObjectIdentifier, ExtensionOccurrence> extensionOccurences;
     private Map<ASN1ObjectIdentifier, ExtensionOccurrence> additionalExtensionOccurences;
 
-    private Integer validity;
+    private CertValidity validity;
     private boolean incSerialNrIfSubjectExists;
     private boolean raOnly;
     private boolean backwardsSubject;
@@ -278,7 +279,7 @@ public class DefaultCertProfile extends AbstractCertProfile
             this.profileConf = conf;
 
             this.raOnly = getBoolean(conf.isOnlyForRA(), false);
-            this.validity = conf.getValidity();
+            this.validity = CertValidity.getInstance(conf.getValidity());
             this.ca = conf.isCa();
             this.notBeforeMidnight = "midnight".equalsIgnoreCase(conf.getNotBeforeTime());
 
@@ -409,7 +410,7 @@ public class DefaultCertProfile extends AbstractCertProfile
                 this.backwardsSubject = subject.isDnBackwards();
                 this.incSerialNrIfSubjectExists = subject.isIncSerialNrIfSubjectExists();
 
-                this.subjectDNOccurrences = new LinkedList<RDNOccurrence>();
+                this.subjectDNOccurrences = new HashSet<RDNOccurrence>();
                 this.subjectDNOptions = new HashMap<>();
 
                 for(RdnType t : subject.getRdn())
@@ -870,7 +871,7 @@ public class DefaultCertProfile extends AbstractCertProfile
     }
 
     @Override
-    public Integer getValidity()
+    public CertValidity getValidity()
     {
         return validity;
     }
@@ -1114,7 +1115,7 @@ public class DefaultCertProfile extends AbstractCertProfile
         checkSubjectContent(requestedSubject);
 
         RDN[] requstedRDNs = requestedSubject.getRDNs();
-        List<RDNOccurrence> occurences = getSubjectDNSubset();
+        Set<RDNOccurrence> occurences = getSubjectDNSubset();
         List<RDN> rdns = new LinkedList<>();
         List<ASN1ObjectIdentifier> types = backwardsSubject() ?
                 ObjectIdentifiers.getBackwardDNs() : ObjectIdentifiers.getForwardDNs();
@@ -1690,7 +1691,7 @@ public class DefaultCertProfile extends AbstractCertProfile
     }
 
     @Override
-    public List<RDNOccurrence> getSubjectDNSubset()
+    public Set<RDNOccurrence> getSubjectDNSubset()
     {
         return subjectDNOccurrences;
     }

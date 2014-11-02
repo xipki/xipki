@@ -62,6 +62,7 @@ import org.bouncycastle.asn1.x509.Extension;
 import org.bouncycastle.util.encoders.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xipki.common.CertArt;
 import org.xipki.common.HashAlgoType;
 import org.xipki.common.HashCalculator;
 import org.xipki.common.IoCertUtil;
@@ -623,11 +624,11 @@ class CaCertStoreDbImporter extends DbPorter
     {
         final String SQL_ADD_CERT =
                 "INSERT INTO CERT " +
-                "(ID, LAST_UPDATE, SERIAL, SUBJECT,"
+                "(ID, ART, LAST_UPDATE, SERIAL, SUBJECT,"
                 + " NOTBEFORE, NOTAFTER, REVOKED, REV_REASON, REV_TIME, REV_INVALIDITY_TIME,"
                 + " CERTPROFILEINFO_ID, CAINFO_ID,"
                 + " REQUESTORINFO_ID, USER_ID, SHA1_FP_PK, SHA1_FP_SUBJECT, EE)" +
-                " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
         final String SQL_ADD_RAWCERT = "INSERT INTO RAWCERT (CERT_ID, SHA1_FP, CERT) VALUES (?, ?, ?)";
 
@@ -660,6 +661,8 @@ class CaCertStoreDbImporter extends DbPorter
                 {
                     continue;
                 }
+
+                int certArt = cert.getArt() == null ? CertArt.X509PKC.getCode() : cert.getArt();
 
                 n++;
 
@@ -695,7 +698,8 @@ class CaCertStoreDbImporter extends DbPorter
 
                 // cert
                 int idx = 1;
-                ps_cert.setInt   (idx++, id);
+                ps_cert.setInt(idx++, id);
+                ps_cert.setInt(idx++, certArt);
                 ps_cert.setLong(idx++, cert.getLastUpdate());
                 ps_cert.setLong(idx++, c.getSerialNumber().getPositiveValue().longValue());
                 ps_cert.setString(idx++, IoCertUtil.canonicalizeName(c.getSubject()));

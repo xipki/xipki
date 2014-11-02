@@ -44,6 +44,7 @@ import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.xipki.ca.common.BadCertTemplateException;
 import org.xipki.ca.common.BadFormatException;
 import org.xipki.ca.common.CertProfileException;
+import org.xipki.ca.common.CertValidity;
 import org.xipki.common.EnvironmentParameterResolver;
 
 /**
@@ -141,7 +142,7 @@ public abstract class CertProfile
 
     public abstract Date getNotBefore(Date notBefore);
 
-    public abstract Integer getValidity();
+    public abstract CertValidity getValidity();
 
     public abstract void checkPublicKey(SubjectPublicKeyInfo publicKey)
     throws BadCertTemplateException;

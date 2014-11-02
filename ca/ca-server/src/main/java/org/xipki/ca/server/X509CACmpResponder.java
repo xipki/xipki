@@ -140,7 +140,6 @@ import org.xml.sax.SAXException;
 
 public class X509CACmpResponder extends CmpResponder
 {
-    public static final int XiPKI_CRL_REASON_UNREVOKE = 100;
     public static final int XiPKI_CRL_REASON_REMOVE = 101;
 
     private static final Set<String> knownGenMsgIds = new HashSet<>();
@@ -349,7 +348,7 @@ public class X509CACmpResponder extends CmpResponder
                                 break;
                             }
                         }
-                        else if(reasonCode == XiPKI_CRL_REASON_UNREVOKE)
+                        else if(reasonCode == CRLReason.REMOVE_FROM_CRL.getCode())
                         {
                             if(requiredPermission == null)
                             {

@@ -67,7 +67,7 @@ import org.xipki.common.StringUtil;
  */
 
 public abstract class AbstractCertProfile
-extends CertProfile implements SubjectDNSubset
+extends CertProfile
 {
     private static Set<String> countryCodes;
 
@@ -139,8 +139,7 @@ extends CertProfile implements SubjectDNSubset
         return values;
     }
 
-    @Override
-    public List<RDNOccurrence> getSubjectDNSubset()
+    public Set<RDNOccurrence> getSubjectDNSubset()
     {
         return null;
     }
@@ -167,7 +166,7 @@ extends CertProfile implements SubjectDNSubset
         checkSubjectContent(requestedSubject);
 
         RDN[] requstedRDNs = requestedSubject.getRDNs();
-        List<RDNOccurrence> occurences = getSubjectDNSubset();
+        Set<RDNOccurrence> occurences = getSubjectDNSubset();
         List<RDN> rdns = new LinkedList<>();
         List<ASN1ObjectIdentifier> types = backwardsSubject() ?
                 ObjectIdentifiers.getBackwardDNs() : ObjectIdentifiers.getForwardDNs();
@@ -216,7 +215,7 @@ extends CertProfile implements SubjectDNSubset
         return new SubjectInfo(grantedSubject, null);
     }
 
-    protected static RDNOccurrence getRDNOccurrence(List<RDNOccurrence> occurences, ASN1ObjectIdentifier type)
+    protected static RDNOccurrence getRDNOccurrence(Set<RDNOccurrence> occurences, ASN1ObjectIdentifier type)
     {
         for(RDNOccurrence occurence : occurences)
         {
@@ -361,7 +360,7 @@ extends CertProfile implements SubjectDNSubset
     protected void verifySubjectDNOccurence(X500Name requestedSubject, Set<ASN1ObjectIdentifier> ignoreRDNs)
     throws BadCertTemplateException
     {
-        List<RDNOccurrence> occurences = getSubjectDNSubset();
+        Set<RDNOccurrence> occurences = getSubjectDNSubset();
         if(occurences == null)
         {
             return;

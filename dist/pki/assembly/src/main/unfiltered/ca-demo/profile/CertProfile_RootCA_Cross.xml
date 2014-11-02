@@ -2,7 +2,7 @@
 <profile xmlns="http://xipki.org/xmlprofile/v1" onlyForRA="false">
   <description>CertProfile RootCA Cross</description>
   <ca>true</ca>
-  <validity>3650</validity>
+  <validity>10y</validity>
   <notBeforeTime>current</notBeforeTime>
   <duplicateKeyPermitted>false</duplicateKeyPermitted>
   <duplicateSubjectPermitted>false</duplicateSubjectPermitted>
