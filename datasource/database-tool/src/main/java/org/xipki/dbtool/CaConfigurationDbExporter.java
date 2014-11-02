@@ -384,17 +384,19 @@ class CaConfigurationDbExporter extends DbPorter
         try
         {
             stmt = createStatement();
-            String sql = "SELECT NAME, TYPE, CONF FROM CERTPROFILE";
+            String sql = "SELECT NAME, ART, TYPE, CONF FROM CERTPROFILE";
             rs = stmt.executeQuery(sql);
 
             while(rs.next())
             {
                 String name = rs.getString("NAME");
+                int art = rs.getInt("ART");
                 String type = rs.getString("TYPE");
                 String conf = rs.getString("CONF");
 
                 CertprofileType certprofile = new CertprofileType();
                 certprofile.setName(name);
+                certprofile.setArt(art);
                 certprofile.setType(type);
                 if(conf != null && conf.length() > 200)
                 {
@@ -431,7 +433,7 @@ class CaConfigurationDbExporter extends DbPorter
         {
             StringBuilder sb = new StringBuilder();
 
-            sb.append("SELECT NAME, NEXT_SERIAL, STATUS, CRL_URIS, OCSP_URIS, MAX_VALIDITY,");
+            sb.append("SELECT NAME, ART, NEXT_SERIAL, STATUS, CRL_URIS, OCSP_URIS, MAX_VALIDITY,");
             sb.append(" CERT, SIGNER_TYPE, SIGNER_CONF, CRLSIGNER_NAME,");
             sb.append(" DUPLICATE_KEY_MODE, DUPLICATE_SUBJECT_MODE, PERMISSIONS, NUM_CRLS,");
             sb.append(" EXPIRATION_PERIOD, REVOKED, REV_REASON, REV_TIME, REV_INVALIDITY_TIME,");
@@ -447,13 +449,14 @@ class CaConfigurationDbExporter extends DbPorter
             while(rs.next())
             {
                 String name = rs.getString("NAME");
+                int art = rs.getInt("ART");
                 long next_serial = rs.getLong("NEXT_SERIAL");
                 String status = rs.getString("STATUS");
                 String crl_uris = rs.getString("CRL_URIS");
                 String delta_crl_uris = rs.getString("DELTA_CRL_URIS");
 
                 String ocsp_uris = rs.getString("OCSP_URIS");
-                int max_validity = rs.getInt("MAX_VALIDITY");
+                String max_validity = rs.getString("MAX_VALIDITY");
                 String cert = rs.getString("CERT");
                 String signer_type = rs.getString("SIGNER_TYPE");
                 String signer_conf = rs.getString("SIGNER_CONF");
@@ -468,6 +471,7 @@ class CaConfigurationDbExporter extends DbPorter
 
                 CaType ca = new CaType();
                 ca.setName(name);
+                ca.setArt(art);
                 ca.setNextSerial(next_serial);
                 ca.setStatus(status);
                 ca.setCrlUris(crl_uris);
