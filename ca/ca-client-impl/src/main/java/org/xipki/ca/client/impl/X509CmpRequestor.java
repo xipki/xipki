@@ -121,6 +121,7 @@ import org.xipki.ca.client.api.dto.RevokeCertResultType;
 import org.xipki.ca.client.api.dto.UnrevokeOrRemoveCertRequestType;
 import org.xipki.ca.common.cmp.CmpUtil;
 import org.xipki.ca.common.cmp.PKIResponse;
+import org.xipki.common.CRLReason;
 import org.xipki.common.CmpUtf8Pairs;
 import org.xipki.common.CustomObjectIdentifiers;
 import org.xipki.common.IoCertUtil;
@@ -136,7 +137,6 @@ import org.xml.sax.SAXException;
 
 abstract class X509CmpRequestor extends CmpRequestor
 {
-    public static final int XiPKI_CRL_REASON_UNREVOKE = 100;
     public static final int XiPKI_CRL_REASON_REMOVE = 101;
 
     private final static DigestCalculatorProvider digesetCalculatorProvider = new BcDigestCalculatorProvider();
@@ -283,7 +283,7 @@ abstract class X509CmpRequestor extends CmpRequestor
     public CmpResultType unrevokeCertificate(UnrevokeOrRemoveCertRequestType request)
     throws CmpRequestorException
     {
-        PKIMessage reqMessage = buildUnrevokeOrRemoveCertRequest(request, XiPKI_CRL_REASON_UNREVOKE);
+        PKIMessage reqMessage = buildUnrevokeOrRemoveCertRequest(request, CRLReason.REMOVE_FROM_CRL.getCode());
         PKIResponse response = signAndSend(reqMessage);
         return parse(response, request.getRequestEntries());
     }

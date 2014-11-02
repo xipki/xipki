@@ -76,7 +76,7 @@ class CALoadTestEnroll extends AbstractLoadTest
     private final int n;
 
     @Override
-    protected Runnable getTestor()
+    protected StoppableRunnable getTestor()
     throws Exception
     {
         return new Testor();
@@ -125,13 +125,14 @@ class CALoadTestEnroll extends AbstractLoadTest
         return certRequests;
     }
 
-    class Testor implements Runnable
+    class Testor implements StoppableRunnable
     {
+        private boolean stopMe = false;
 
         @Override
         public void run()
         {
-            while(stop() == false && getErrorAccout() < 1)
+            while(stopMe == false && stop() == false && getErrorAccout() < 1)
             {
                 Map<Integer, CertRequest> certReqs = nextCertRequests();
                 if(certReqs != null)
@@ -191,6 +192,12 @@ class CALoadTestEnroll extends AbstractLoadTest
             }
 
             return nSuccess == certRequests.size();
+        }
+
+        @Override
+        public void sendStopSignal()
+        {
+            stopMe = true;
         }
 
     }

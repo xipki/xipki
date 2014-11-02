@@ -45,6 +45,7 @@ import javax.xml.bind.JAXBElement;
 import javax.xml.bind.Unmarshaller;
 
 import org.bouncycastle.util.encoders.Base64;
+import org.xipki.common.CertArt;
 import org.xipki.common.IoCertUtil;
 import org.xipki.common.ParamChecker;
 import org.xipki.datasource.api.DataSourceWrapper;
@@ -341,13 +342,15 @@ class CaConfigurationDbImporter extends DbPorter
         PreparedStatement ps = null;
         try
         {
-            ps = prepareStatement("INSERT INTO CERTPROFILE (NAME, TYPE, CONF) VALUES (?, ?, ?)");
+            ps = prepareStatement("INSERT INTO CERTPROFILE (NAME, ART, TYPE, CONF) VALUES (?, ?, ?, ?)");
             for(CertprofileType certprofile : certprofiles.getCertprofile())
             {
                 try
                 {
                     int idx = 1;
                     ps.setString(idx++, certprofile.getName());
+                    int art = certprofile.getArt() == null ? CertArt.X509PKC.getCode() : certprofile.getArt();
+                    ps.setInt(idx++, art);
                     ps.setString(idx++, certprofile.getType());
 
                     String conf = certprofile.getConf();
@@ -384,18 +387,20 @@ class CaConfigurationDbImporter extends DbPorter
         try
         {
             StringBuilder sqlBuilder = new StringBuilder();
-            sqlBuilder.append("INSERT INTO CA (NAME, SUBJECT, NEXT_SERIAL, STATUS,");
+            sqlBuilder.append("INSERT INTO CA (NAME, ART, SUBJECT, NEXT_SERIAL, STATUS,");
             sqlBuilder.append(" CRL_URIS, DELTA_CRL_URIS, OCSP_URIS, MAX_VALIDITY,");
             sqlBuilder.append(" CERT, SIGNER_TYPE, SIGNER_CONF, CRLSIGNER_NAME,");
             sqlBuilder.append(" DUPLICATE_KEY_MODE, DUPLICATE_SUBJECT_MODE, PERMISSIONS, NUM_CRLS,");
             sqlBuilder.append(" EXPIRATION_PERIOD, REVOKED, REV_REASON, REV_TIME, REV_INVALIDITY_TIME, VALIDITY_MODE,");
             sqlBuilder.append(" LAST_CRL_INTERVAL, LAST_CRL_INTERVAL_DATE)");
-            sqlBuilder.append(" VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+            sqlBuilder.append(" VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
 
             ps = prepareStatement(sqlBuilder.toString());
 
             for(CaType ca : cas.getCa())
             {
+                CertArt art = ca.getArt() == null ? CertArt.X509PKC : CertArt.getInstance(ca.getArt());
+
                 try
                 {
                     String b64Cert = ca.getCert();
@@ -403,13 +408,14 @@ class CaConfigurationDbImporter extends DbPorter
 
                     int idx = 1;
                     ps.setString(idx++, ca.getName().toUpperCase());
+                    ps.setInt(idx++,art.getCode());
                     ps.setString(idx++, IoCertUtil.canonicalizeName(c.getSubjectX500Principal()));
                     ps.setLong(idx++, ca.getNextSerial());
                     ps.setString(idx++, ca.getStatus());
                     ps.setString(idx++, ca.getCrlUris());
                     ps.setString(idx++, ca.getDeltaCrlUris());
                     ps.setString(idx++, ca.getOcspUris());
-                    ps.setInt   (idx++, ca.getMaxValidity());
+                    ps.setString(idx++, ca.getMaxValidity());
                     ps.setString(idx++, b64Cert);
                     ps.setString(idx++, ca.getSignerType());
                     ps.setString(idx++, ca.getSignerConf());

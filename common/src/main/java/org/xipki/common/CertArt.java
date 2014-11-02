@@ -39,6 +39,32 @@ package org.xipki.common;
  * @author Lijun Liao
  */
 
-public class BCCompatilbilityUtil
+public enum CertArt
 {
+    X509PKC(1),
+    X509AC(2),
+    CVC(3);
+
+    private final int code;
+    private CertArt(int code)
+    {
+        this.code = code;
+    }
+
+    public int getCode()
+    {
+        return code;
+    }
+
+    public static CertArt getInstance(int code)
+    {
+        for(CertArt value : values())
+        {
+            if(value.code == code)
+            {
+                return value;
+            }
+        }
+        throw new IllegalArgumentException("invalid code " + code);
+    }
 }

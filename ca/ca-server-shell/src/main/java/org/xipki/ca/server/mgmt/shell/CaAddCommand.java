@@ -139,7 +139,7 @@ public class CaAddCommand extends CaAddOrGenCommand
         {
             entry.setCrlSignerName(crlSignerName);
         }
-        entry.setMaxValidity(maxValidity);
+        entry.setMaxValidity(getMaxValidity());
 
         Set<Permission> _permissions = new HashSet<>();
         for(String permission : permissions)

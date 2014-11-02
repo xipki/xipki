@@ -44,6 +44,7 @@ import java.util.Set;
 import org.apache.felix.gogo.commands.Command;
 import org.apache.felix.gogo.commands.Option;
 import org.xipki.ca.common.CAStatus;
+import org.xipki.ca.common.CertValidity;
 import org.xipki.ca.server.mgmt.api.CAManager;
 import org.xipki.ca.server.mgmt.api.DuplicationMode;
 import org.xipki.ca.server.mgmt.api.Permission;
@@ -88,8 +89,8 @@ public class CaUpdateCommand extends CaCommand
     protected Set<String> permissions;
 
     @Option(name = "-maxValidity",
-            description = "Maximal validity in days")
-    protected Integer maxValidity;
+            description = "Maximal validity")
+    protected String maxValidity;
 
     @Option(name = "-expirationPeriod",
             description = "Days before expiration time of CA to issue certificates")
@@ -299,6 +300,12 @@ public class CaUpdateCommand extends CaCommand
             }
         }
 
+        CertValidity _maxValidity = null;
+        if(maxValidity != null)
+        {
+            _maxValidity = CertValidity.getInstance(maxValidity);
+        }
+
         caManager.changeCA(
                 caName,
                 status,
@@ -306,7 +313,7 @@ public class CaUpdateCommand extends CaCommand
                 _crlUris,
                 _deltaCrlUris,
                 _ocspUris,
-                maxValidity,
+                _maxValidity,
                 signerType,
                 signerConf,
                 crlSignerName,
