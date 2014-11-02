@@ -39,6 +39,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.felix.gogo.commands.Option;
+import org.xipki.ca.common.CertValidity;
 import org.xipki.security.api.SecurityFactory;
 
 /**
@@ -82,9 +83,9 @@ public abstract class CaAddOrGenCommand extends CaCommand
     protected Long nextSerial;
 
     @Option(name = "-maxValidity",
-            description = "Required. maximal validity in days",
+            description = "Required. maximal validity.",
             required = true)
-    protected Integer maxValidity;
+    protected String maxValidity;
 
     @Option(name = "-crlSigner",
             description = "CRL signer name")
@@ -134,5 +135,15 @@ public abstract class CaAddOrGenCommand extends CaCommand
     public void setSecurityFactory(SecurityFactory securityFactory)
     {
         this.securityFactory = securityFactory;
+    }
+
+    protected CertValidity getMaxValidity()
+    {
+        CertValidity _maxValidity = null;
+        if(maxValidity != null)
+        {
+            _maxValidity = CertValidity.getInstance(maxValidity);
+        }
+        return _maxValidity;
     }
 }

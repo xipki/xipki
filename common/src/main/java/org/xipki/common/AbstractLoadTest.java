@@ -36,6 +36,8 @@
 package org.xipki.common;
 
 import java.security.SecureRandom;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -50,19 +52,21 @@ public abstract class AbstractLoadTest
 {
     private static final String PROPKEY_LOADTEST = "org.xipki.loadtest";
 
-    protected abstract Runnable getTestor()
+    public static interface StoppableRunnable extends Runnable
+    {
+        void sendStopSignal();
+    }
+
+    protected abstract StoppableRunnable getTestor()
     throws Exception;
 
     public void test()
     {
         System.getProperties().setProperty(PROPKEY_LOADTEST, "true");
-        System.out.println("Testing using " + threads + " threads.");
-        resetStartTime();
-
-        ExecutorService executor = Executors.newFixedThreadPool(threads);
+        List<StoppableRunnable> runnables = new ArrayList<>(threads);
         for (int i = 0; i < threads; i++)
         {
-            Runnable runnable;
+            StoppableRunnable runnable;
             try
             {
                 runnable = getTestor();
@@ -72,6 +76,15 @@ public abstract class AbstractLoadTest
                 return;
             }
 
+            runnables.add(runnable);
+        }
+
+        System.out.println("Testing using " + threads + " threads.");
+        resetStartTime();
+
+        ExecutorService executor = Executors.newFixedThreadPool(threads);
+        for(StoppableRunnable runnable : runnables)
+        {
             executor.execute(runnable);
         }
 
@@ -89,7 +102,10 @@ public abstract class AbstractLoadTest
                 }
             } catch (InterruptedException e)
             {
-                break;
+                for(StoppableRunnable runnable : runnables)
+                {
+                    runnable.sendStopSignal();
+                }
             }
         }
 

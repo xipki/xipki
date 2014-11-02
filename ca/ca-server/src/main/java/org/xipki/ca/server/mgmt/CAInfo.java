@@ -49,6 +49,7 @@ import org.slf4j.LoggerFactory;
 import org.xipki.ca.api.OperationException;
 import org.xipki.ca.api.OperationException.ErrorCode;
 import org.xipki.ca.common.CAStatus;
+import org.xipki.ca.common.CertValidity;
 import org.xipki.ca.common.X509CertificateWithMetaInfo;
 import org.xipki.ca.server.PublicCAInfo;
 import org.xipki.ca.server.mgmt.api.CAEntry;
@@ -241,12 +242,12 @@ public class CAInfo
         return caEntry.getOcspUrisAsString();
     }
 
-    public int getMaxValidity()
+    public CertValidity getMaxValidity()
     {
         return caEntry.getMaxValidity();
     }
 
-    public void setMaxValidity(int maxValidity)
+    public void setMaxValidity(CertValidity maxValidity)
     {
         caEntry.setMaxValidity(maxValidity);
     }

@@ -125,6 +125,7 @@ import org.xipki.ca.common.BadFormatException;
 import org.xipki.ca.common.CAMgmtException;
 import org.xipki.ca.common.CAStatus;
 import org.xipki.ca.common.CertProfileException;
+import org.xipki.ca.common.CertValidity;
 import org.xipki.ca.common.X509CertificateWithMetaInfo;
 import org.xipki.ca.server.mgmt.CAInfo;
 import org.xipki.ca.server.mgmt.CAManagerImpl;
@@ -2362,13 +2363,18 @@ public class X509CA
                 msgBuilder.append(", ").append(subjectInfo.getWarning());
             }
 
-            Integer validity = certProfile.getValidity();
+            CertValidity validity = certProfile.getValidity();
+
             if(validity == null)
             {
                 validity = caInfo.getMaxValidity();
             }
+            else if(validity.compareTo(caInfo.getMaxValidity()) > 0)
+            {
+                validity = caInfo.getMaxValidity();
+            }
 
-            Date maxNotAfter = new Date(notBefore.getTime() + DAY * validity - SECOND);
+            Date maxNotAfter = validity.add(notBefore);
             Date origMaxNotAfter = maxNotAfter;
 
             if(certProfile.getSpecialCertProfileBehavior() == SpecialCertProfileBehavior.gematik_gSMC_K)

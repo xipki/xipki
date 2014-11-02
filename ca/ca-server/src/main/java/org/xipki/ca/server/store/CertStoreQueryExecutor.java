@@ -79,6 +79,7 @@ import org.xipki.ca.server.CertRevocationInfoWithSerial;
 import org.xipki.ca.server.CertStatus;
 import org.xipki.ca.server.SubjectKeyProfileTriple;
 import org.xipki.common.CRLReason;
+import org.xipki.common.CertArt;
 import org.xipki.common.CertRevocationInfo;
 import org.xipki.common.IoCertUtil;
 import org.xipki.common.LruCache;
@@ -183,9 +184,9 @@ class CertStoreQueryExecutor
     {
         final String SQL_ADD_CERT =
                 "INSERT INTO CERT" +
-                " (ID, LAST_UPDATE, SERIAL, SUBJECT, NOTBEFORE, NOTAFTER, REVOKED, CERTPROFILEINFO_ID,"
+                " (ID, ART, LAST_UPDATE, SERIAL, SUBJECT, NOTBEFORE, NOTAFTER, REVOKED, CERTPROFILEINFO_ID,"
                 + " CAINFO_ID, REQUESTORINFO_ID, USER_ID, SHA1_FP_PK, SHA1_FP_SUBJECT, EE)" +
-                " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
         final String SQL_ADD_RAWCERT = "INSERT INTO RAWCERT (CERT_ID, SHA1_FP, CERT) VALUES (?, ?, ?)";
         Connection conn = null;
@@ -215,6 +216,7 @@ class CertStoreQueryExecutor
             // cert
             int idx = 1;
             ps_addcert.setInt(idx++, certId);
+            ps_addcert.setInt(idx++, CertArt.X509PKC.getCode());
             ps_addcert.setLong(idx++, System.currentTimeMillis()/1000);
             ps_addcert.setLong(idx++, cert.getSerialNumber().longValue());
             ps_addcert.setString(idx++, certificate.getSubject());

@@ -13,7 +13,7 @@ ca:gen-rca -name RCA1 \
   -out output/RCA1.der \
   -permission all \
   -nextSerial 1 \
-  -maxValidity 1825 \
+  -maxValidity 10y \
   -signerType PKCS12 \
   -signerConf password?1234%keystore?file:output/RCA1.p12%algo?$CA_SIGNER_ALGO \
   --duplicateSubject permitted \
@@ -80,7 +80,7 @@ features:uninstall xipki-caclient
 ca:ca-add -name SubCA1.complex-Name \
   -permission all \
   -nextSerial 1 \
-  -maxValidity 730 \
+  -maxValidity 5y \
   -signerType PKCS12 \
   -signerConf password?1234%keystore?file:output/SubCA1.p12%algo?$CA_SIGNER_ALGO \
   -ocspUri http://example.org/ocsp \
@@ -108,7 +108,7 @@ ca:ca-restart
 ca:ca-add -name SubCAwithCRL1 \
   -permission all \
   -nextSerial 1 \
-  -maxValidity 1460 \
+  -maxValidity 5y \
   -signerType PKCS12 \
   -signerConf password?1234%keystore?file:output/SubCAwithCRL1.p12%algo?$CA_SIGNER_ALGO \
   -crlUri http://example.org/crl \

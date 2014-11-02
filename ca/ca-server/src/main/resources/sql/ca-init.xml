@@ -9,7 +9,7 @@
       </column>
     </createTable>
     <insert tableName="DBSCHEMAINFO">
-      <column name="VERSION" value="1"/>
+      <column name="VERSION" value="2"/>
     </insert>
     <!-- table CALOCK -->
     <createTable tableName="CALOCK">
@@ -101,6 +101,9 @@
       <column name="NAME" type="VARCHAR(45)">
         <constraints primaryKey="true" nullable="false"/>
       </column>
+      <column name="ART" type="SMALLINT">
+        <constraints nullable="false"/>
+      </column>
       <column name="TYPE" type="VARCHAR(100)">
         <constraints nullable="false"/>
       </column>
@@ -110,6 +113,9 @@
     <createTable tableName="CA">
       <column name="NAME" type="VARCHAR(45)">
         <constraints primaryKey="true" nullable="false"/>
+      </column>
+      <column name="ART" type="SMALLINT">
+        <constraints nullable="false"/>
       </column>
       <column name="NEXT_SERIAL" type="BIGINT"/>
       <column name="STATUS" remarks="valid values: pending, enabled, disabled" type="VARCHAR(10)">
@@ -121,7 +127,7 @@
       <column name="CRL_URIS" type="VARCHAR(1000)"/>
       <column name="DELTA_CRL_URIS" type="VARCHAR(1000)"/>
       <column name="OCSP_URIS" type="VARCHAR(1000)"/>
-      <column name="MAX_VALIDITY" type="SMALLINT">
+      <column name="MAX_VALIDITY" type="VARCHAR(45)">
         <constraints nullable="false"/>
       </column>
       <column name="CRLSIGNER_NAME" type="VARCHAR(45)"/>
@@ -283,6 +289,9 @@
     <createTable tableName="CERT">
       <column name="ID" type="INT">
         <constraints primaryKey="true" nullable="false"/>
+      </column>
+      <column name="ART" type="SMALLINT">
+        <constraints nullable="false"/>
       </column>
       <column name="CAINFO_ID" type="INT">
         <constraints nullable="false"/>

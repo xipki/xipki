@@ -563,7 +563,7 @@ class CaCertStoreDbExporter extends DbPorter
             total = 1; // to avoid exception
         }
 
-        String certSql = "SELECT ID, CAINFO_ID, CERTPROFILEINFO_ID," +
+        String certSql = "SELECT ID, ART, CAINFO_ID, CERTPROFILEINFO_ID," +
                 " REQUESTORINFO_ID, LAST_UPDATE, REVOKED," +
                 " REV_REASON, REV_TIME, REV_INVALIDITY_TIME, USER_ID" +
                 " FROM CERT" +
@@ -661,6 +661,9 @@ class CaCertStoreDbExporter extends DbPorter
 
                     CertType cert = new CertType();
                     cert.setId(id);
+
+                    int art = rs.getInt("ART");
+                    cert.setArt(art);
 
                     int cainfo_id = rs.getInt("CAINFO_ID");
                     cert.setCainfoId(cainfo_id);

@@ -47,6 +47,7 @@ import java.util.Set;
 import org.bouncycastle.util.encoders.Base64;
 import org.xipki.ca.common.CAMgmtException;
 import org.xipki.ca.common.CAStatus;
+import org.xipki.ca.common.CertValidity;
 import org.xipki.common.CertRevocationInfo;
 import org.xipki.common.IoCertUtil;
 import org.xipki.common.ParamChecker;
@@ -64,7 +65,7 @@ public class CAEntry implements Serializable
     private List<String> deltaCrlUris;
     private List<String> ocspUris;
     private List<String> issuerLocations;
-    private int maxValidity;
+    private CertValidity maxValidity;
     private X509Certificate cert;
     private String signerType;
     private String signerConf;
@@ -185,12 +186,12 @@ public class CAEntry implements Serializable
         return toString(ocspUris);
     }
 
-    public int getMaxValidity()
+    public CertValidity getMaxValidity()
     {
         return maxValidity;
     }
 
-    public void setMaxValidity(int maxValidity)
+    public void setMaxValidity(CertValidity maxValidity)
     {
         this.maxValidity = maxValidity;
     }

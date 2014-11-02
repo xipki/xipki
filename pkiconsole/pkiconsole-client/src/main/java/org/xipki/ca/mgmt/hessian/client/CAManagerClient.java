@@ -49,6 +49,7 @@ import org.slf4j.LoggerFactory;
 import org.xipki.ca.common.CAMgmtException;
 import org.xipki.ca.common.CAStatus;
 import org.xipki.ca.common.CASystemStatus;
+import org.xipki.ca.common.CertValidity;
 import org.xipki.ca.common.CmpControl;
 import org.xipki.ca.mgmt.hessian.common.HessianCAManager;
 import org.xipki.ca.server.mgmt.api.CAEntry;
@@ -256,7 +257,7 @@ public class CAManagerClient implements CAManager
     public void changeCA(String name, CAStatus status,
             X509Certificate cert, Set<String> crl_uris,
             Set<String> delta_crl_uris, Set<String> ocsp_uris,
-            Integer max_validity, String signer_type, String signer_conf,
+            CertValidity max_validity, String signer_type, String signer_conf,
             String crlsigner_name, DuplicationMode duplicate_key,
             DuplicationMode duplicate_subject, Set<Permission> permissions,
             Integer numCrls, Integer expirationPeriod, ValidityMode validityMode)
@@ -599,7 +600,7 @@ public class CAManagerClient implements CAManager
             String certprofileName, String subject, CAStatus status,
             long nextSerial, List<String> crl_uris,
             List<String> delta_crl_uris, List<String> ocsp_uris,
-            int max_validity, String signer_type, String signer_conf,
+            CertValidity max_validity, String signer_type, String signer_conf,
             String crlsigner_name, DuplicationMode duplicate_key,
             DuplicationMode duplicate_subject, Set<Permission> permissions,
             int numCrls, int expirationPeriod, ValidityMode validityMode)

@@ -2,7 +2,7 @@
 <profile xmlns="http://xipki.org/xmlprofile/v1" onlyForRA="false">
   <description>CertProfile SubCA</description>
   <ca>true</ca>
-  <validity>2920</validity>
+  <validity>8y</validity>
   <notBeforeTime>current</notBeforeTime>
   <duplicateKeyPermitted>false</duplicateKeyPermitted>
   <duplicateSubjectPermitted>false</duplicateSubjectPermitted>

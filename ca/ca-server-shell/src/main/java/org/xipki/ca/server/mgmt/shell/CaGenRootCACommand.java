@@ -135,7 +135,7 @@ public class CaGenRootCACommand extends CaAddOrGenCommand
                 crlUris,
                 deltaCrlUris,
                 ocspUris,
-                maxValidity,
+                getMaxValidity(),
                 signerType,
                 signerConf,
                 crlSignerName,

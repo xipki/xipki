@@ -90,6 +90,7 @@ import org.xipki.ca.common.CAStatus;
 import org.xipki.ca.common.CASystemStatus;
 import org.xipki.ca.common.CertProfileException;
 import org.xipki.ca.common.CertPublisherException;
+import org.xipki.ca.common.CertValidity;
 import org.xipki.ca.common.CmpControl;
 import org.xipki.ca.common.X509CertificateWithMetaInfo;
 import org.xipki.ca.server.CmpRequestorInfo;
@@ -110,6 +111,7 @@ import org.xipki.ca.server.mgmt.api.PublisherEntry;
 import org.xipki.ca.server.mgmt.api.ValidityMode;
 import org.xipki.ca.server.store.CertificateStore;
 import org.xipki.common.CRLReason;
+import org.xipki.common.CertArt;
 import org.xipki.common.CertRevocationInfo;
 import org.xipki.common.CmpUtf8Pairs;
 import org.xipki.common.ConfigurationException;
@@ -1398,7 +1400,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
             stmt = createStatement();
 
             StringBuilder sqlBuilder = new StringBuilder();
-            sqlBuilder.append("SELECT NAME, NEXT_SERIAL, STATUS, CRL_URIS, OCSP_URIS, MAX_VALIDITY");
+            sqlBuilder.append("SELECT NAME, ART, NEXT_SERIAL, STATUS, CRL_URIS, OCSP_URIS, MAX_VALIDITY");
             sqlBuilder.append(", CERT, SIGNER_TYPE, SIGNER_CONF, CRLSIGNER_NAME");
             sqlBuilder.append(", DUPLICATE_KEY_MODE, DUPLICATE_SUBJECT_MODE, PERMISSIONS, NUM_CRLS");
             sqlBuilder.append(", EXPIRATION_PERIOD, REVOKED, REV_REASON, REV_TIME, REV_INVALIDITY_TIME");
@@ -1411,12 +1413,19 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
             while(rs.next())
             {
                 String name = rs.getString("NAME");
+                int artCode = rs.getInt("ART");
+                if(artCode != CertArt.X509PKC.getCode())
+                {
+                    throw new CAMgmtException("CA " + name + " is not X509CA, and is not supported");
+                }
+
                 long next_serial = rs.getLong("NEXT_SERIAL");
                 String status = rs.getString("STATUS");
                 String crl_uris = rs.getString("CRL_URIS");
                 String delta_crl_uris = rs.getString("DELTA_CRL_URIS");
                 String ocsp_uris = rs.getString("OCSP_URIS");
-                int max_validity = rs.getInt("MAX_VALIDITY");
+                String max_validityS = rs.getString("MAX_VALIDITY");
+                CertValidity max_validity = CertValidity.getInstance(max_validityS);
                 String b64cert = rs.getString("CERT");
                 String signer_type = rs.getString("SIGNER_TYPE");
                 String signer_conf = rs.getString("SIGNER_CONF");
@@ -1607,15 +1616,16 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
         {
             StringBuilder sqlBuilder = new StringBuilder();
             sqlBuilder.append("INSERT INTO CA (");
-            sqlBuilder.append("NAME, SUBJECT, NEXT_SERIAL, STATUS, CRL_URIS, OCSP_URIS, MAX_VALIDITY");
+            sqlBuilder.append("NAME, ART, SUBJECT, NEXT_SERIAL, STATUS, CRL_URIS, OCSP_URIS, MAX_VALIDITY");
             sqlBuilder.append(", CERT, SIGNER_TYPE, SIGNER_CONF, CRLSIGNER_NAME");
             sqlBuilder.append(", DUPLICATE_KEY_MODE, DUPLICATE_SUBJECT_MODE, PERMISSIONS, NUM_CRLS, EXPIRATION_PERIOD");
             sqlBuilder.append(", VALIDITY_MODE, DELTA_CRL_URIS");
-            sqlBuilder.append(") VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+            sqlBuilder.append(") VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
 
             ps = prepareStatement(sqlBuilder.toString());
             int idx = 1;
             ps.setString(idx++, name);
+            ps.setInt(idx++, CertArt.X509PKC.getCode());
             ps.setString(idx++, newCaDbEntry.getSubject());
 
             long nextSerial = newCaDbEntry.getNextSerial();
@@ -1628,7 +1638,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
             ps.setString(idx++, newCaDbEntry.getStatus().getStatus());
             ps.setString(idx++, newCaDbEntry.getCrlUrisAsString());
             ps.setString(idx++, newCaDbEntry.getOcspUrisAsString());
-            ps.setInt(idx++, newCaDbEntry.getMaxValidity());
+            ps.setString(idx++, newCaDbEntry.getMaxValidity().toString());
             byte[] encodedCert = newCaDbEntry.getCertificate().getEncoded();
             ps.setString(idx++, Base64.toBase64String(encodedCert));
             ps.setString(idx++, newCaDbEntry.getSignerType());
@@ -1672,7 +1682,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
     @Override
     public void changeCA(String name, CAStatus status, X509Certificate cert,
             Set<String> crl_uris, Set<String> delta_crl_uris, Set<String> ocsp_uris,
-            Integer max_validity, String signer_type, String signer_conf,
+            CertValidity max_validity, String signer_type, String signer_conf,
             String crlsigner_name, DuplicationMode duplicate_key,
             DuplicationMode duplicate_subject, Set<Permission> permissions,
             Integer numCrls, Integer expirationPeriod, ValidityMode validityMode)
@@ -1748,7 +1758,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
 
             if(iMax_validity != null)
             {
-                ps.setInt(iMax_validity, max_validity);
+                ps.setString(iMax_validity, max_validity.toString());
             }
 
             if(iSigner_type != null)
@@ -2254,11 +2264,12 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
         PreparedStatement ps = null;
         try
         {
-            ps = prepareStatement("INSERT INTO CERTPROFILE (NAME, TYPE, CONF) VALUES (?, ?, ?)");
+            ps = prepareStatement("INSERT INTO CERTPROFILE (NAME, ART, TYPE, CONF) VALUES (?, ?, ?, ?)");
             ps.setString(1, name);
-            ps.setString(2, dbEntry.getType());
+            ps.setInt(2, CertArt.X509PKC.getCode());
+            ps.setString(3, dbEntry.getType());
             String conf = dbEntry.getConf();
-            ps.setString(3, conf);
+            ps.setString(4, conf);
 
             ps.executeUpdate();
         }catch(SQLException e)
@@ -3631,7 +3642,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
             String name, String certprofileName, String subject,
             CAStatus status, long nextSerial,
             List<String> crl_uris, List<String> delta_crl_uris, List<String> ocsp_uris,
-            int max_validity, String signer_type, String signer_conf,
+            CertValidity max_validity, String signer_type, String signer_conf,
             String crlsigner_name, DuplicationMode duplicate_key,
             DuplicationMode duplicate_subject, Set<Permission> permissions,
             int numCrls, int expirationPeriod, ValidityMode validityMode)
