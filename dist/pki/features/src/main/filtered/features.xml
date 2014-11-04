@@ -50,10 +50,10 @@
     <bundle>mvn:org.xipki/ca-mgmt-api/${project.version}</bundle>
     <bundle>mvn:org.xipki/ca-server/${project.version}</bundle>
   </feature>
-  <feature name="xipki-caserver-shell" version="${project.version}" resolver="(obr)">
+  <feature name="xipki-camgmt-shell" version="${project.version}" resolver="(obr)">
     <feature>xipki-caserver</feature>
     <bundle>mvn:org.xipki/console-karaf/${project.version}</bundle>
-    <bundle>mvn:org.xipki/ca-server-shell/${project.version}</bundle>
+    <bundle>mvn:org.xipki/ca-mgmt-shell/${project.version}</bundle>
   </feature>
   <feature name="xipki-caclient" version="${project.version}" resolver="(obr)">
     <feature>xipki-cabase</feature>
