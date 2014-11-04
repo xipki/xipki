@@ -33,41 +33,36 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.ca.server.certprofile;
+package org.xipki.ca.server.certprofile.x509;
 
-import java.util.List;
 import java.util.Set;
 
-import org.xipki.ca.api.profile.KeyUsage;
-import org.xipki.common.EnvironmentParameterResolver;
-import org.xipki.common.ParamChecker;
+import org.xipki.ca.api.profile.x509.KeyUsage;
+import org.xipki.ca.server.certprofile.Condition;
 
 /**
  * @author Lijun Liao
  */
 
-class KeyUsageOptions
+class KeyUsageOption
 {
-    private final List<KeyUsageOption> options;
+    private final Condition condition;
+    private final Set<KeyUsage> keyusages;
 
-    public KeyUsageOptions(List<KeyUsageOption> options)
+    public KeyUsageOption(Condition condition, Set<KeyUsage> keyusages)
     {
-        ParamChecker.assertNotEmpty("options", options);
-        this.options = options;
+        this.condition = condition;
+        this.keyusages = keyusages;
     }
 
-    public Set<KeyUsage> getKeyusage(EnvironmentParameterResolver pr)
+    public Condition getCondition()
     {
-        for(KeyUsageOption o : options)
-        {
-            Condition c = o.getCondition();
-            if(c == null || c.satisfy(pr))
-            {
-                return o.getKeyusages();
-            }
-        }
+        return condition;
+    }
 
-        return null;
+    public Set<KeyUsage> getKeyusages()
+    {
+        return keyusages;
     }
 
 }

@@ -50,7 +50,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.ca.api.OperationException;
 import org.xipki.ca.api.OperationException.ErrorCode;
-import org.xipki.ca.api.publisher.CertificateInfo;
+import org.xipki.ca.api.publisher.X509CertificateInfo;
 import org.xipki.ca.common.X509CertificateWithMetaInfo;
 import org.xipki.ca.server.CertRevocationInfoWithSerial;
 import org.xipki.ca.server.CertStatus;
@@ -77,7 +77,7 @@ public class CertificateStore
         this.queryExecutor = new CertStoreQueryExecutor(dataSource);
     }
 
-    public boolean addCertificate(CertificateInfo certInfo)
+    public boolean addCertificate(X509CertificateInfo certInfo)
     {
         try
         {
@@ -151,13 +151,13 @@ public class CertificateStore
         queryExecutor.clearDeltaCRLCache(caCert, maxId);
     }
 
-    public CertWithRevocationInfo revokeCertificate(X509CertificateWithMetaInfo caCert,
+    public X509CertWithRevocationInfo revokeCertificate(X509CertificateWithMetaInfo caCert,
             BigInteger serialNumber, CertRevocationInfo revInfo, boolean force, boolean publishToDeltaCRLCache)
     throws OperationException
     {
         try
         {
-            CertWithRevocationInfo revokedCert = queryExecutor.revokeCert(
+            X509CertWithRevocationInfo revokedCert = queryExecutor.revokeCert(
                     caCert, serialNumber, revInfo, force, publishToDeltaCRLCache);
             if(revokedCert == null)
             {
@@ -447,7 +447,7 @@ public class CertificateStore
         }
     }
 
-    public CertWithRevocationInfo getCertWithRevocationInfo(X509CertificateWithMetaInfo caCert,
+    public X509CertWithRevocationInfo getCertWithRevocationInfo(X509CertificateWithMetaInfo caCert,
             BigInteger serial)
     throws OperationException
     {
@@ -461,7 +461,7 @@ public class CertificateStore
         }
     }
 
-    public CertificateInfo getCertificateInfoForSerial(X509CertificateWithMetaInfo caCert, BigInteger serial)
+    public X509CertificateInfo getCertificateInfoForSerial(X509CertificateWithMetaInfo caCert, BigInteger serial)
     throws OperationException, CertificateException
     {
         try
@@ -544,7 +544,7 @@ public class CertificateStore
         }
     }
 
-    public CertificateInfo getCertificateInfoForId(X509CertificateWithMetaInfo caCert, int certId)
+    public X509CertificateInfo getCertificateInfoForId(X509CertificateWithMetaInfo caCert, int certId)
     throws OperationException, CertificateException
     {
         try

@@ -44,7 +44,7 @@ import org.xipki.common.ParamChecker;
  * @author Lijun Liao
  */
 
-class KeyParamRanges
+public class KeyParamRanges
 {
     private final Map<String, List<KeyParamRange>> ranges;
 

@@ -44,7 +44,7 @@ import org.xipki.common.EnvironmentParameterResolver;
  * @author Lijun Liao
  */
 
-class SubjectDNOption
+public class SubjectDNOption
 {
     private final List<AddText> addprefixes;
     private final List<AddText> addsufixes;

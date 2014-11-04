@@ -48,8 +48,8 @@ import org.xipki.audit.api.AuditLevel;
 import org.xipki.audit.api.AuditLoggingService;
 import org.xipki.audit.api.AuditLoggingServiceRegister;
 import org.xipki.audit.api.AuditStatus;
-import org.xipki.ca.api.publisher.CertPublisher;
-import org.xipki.ca.api.publisher.CertificateInfo;
+import org.xipki.ca.api.publisher.X509CertPublisher;
+import org.xipki.ca.api.publisher.X509CertificateInfo;
 import org.xipki.ca.common.CertPublisherException;
 import org.xipki.ca.common.X509CertificateWithMetaInfo;
 import org.xipki.common.CertRevocationInfo;
@@ -64,7 +64,7 @@ import org.xipki.security.api.PasswordResolver;
  * @author Lijun Liao
  */
 
-public class OCSPCertPublisher extends CertPublisher
+public class OCSPCertPublisher extends X509CertPublisher
 {
     private static final Logger LOG = LoggerFactory.getLogger(OCSPCertPublisher.class);
 
@@ -124,7 +124,7 @@ public class OCSPCertPublisher extends CertPublisher
     }
 
     @Override
-    public boolean certificateAdded(CertificateInfo certInfo)
+    public boolean certificateAdded(X509CertificateInfo certInfo)
     {
         X509CertificateWithMetaInfo caCert = certInfo.getIssuerCert();
         X509CertificateWithMetaInfo cert = certInfo.getCert();

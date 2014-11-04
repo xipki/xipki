@@ -33,7 +33,7 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.ca.server.certprofile;
+package org.xipki.ca.server.certprofile.x509;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -91,20 +91,29 @@ import org.bouncycastle.jcajce.provider.asymmetric.util.ECUtil;
 import org.bouncycastle.math.ec.ECCurve;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.ca.api.profile.AbstractCertProfile;
-import org.xipki.ca.api.profile.CertificatePolicyInformation;
-import org.xipki.ca.api.profile.CertificatePolicyQualifier;
 import org.xipki.ca.api.profile.ExtensionOccurrence;
 import org.xipki.ca.api.profile.ExtensionTuple;
 import org.xipki.ca.api.profile.ExtensionTuples;
-import org.xipki.ca.api.profile.KeyUsage;
 import org.xipki.ca.api.profile.RDNOccurrence;
-import org.xipki.ca.api.profile.SpecialCertProfileBehavior;
 import org.xipki.ca.api.profile.SubjectInfo;
-import org.xipki.ca.api.profile.X509Util;
+import org.xipki.ca.api.profile.x509.AbstractX509CertProfile;
+import org.xipki.ca.api.profile.x509.CertificatePolicyInformation;
+import org.xipki.ca.api.profile.x509.CertificatePolicyQualifier;
+import org.xipki.ca.api.profile.x509.KeyUsage;
+import org.xipki.ca.api.profile.x509.SpecialX509CertProfileBehavior;
+import org.xipki.ca.api.profile.x509.X509Util;
 import org.xipki.ca.common.BadCertTemplateException;
 import org.xipki.ca.common.CertProfileException;
 import org.xipki.ca.common.CertValidity;
+import org.xipki.ca.server.certprofile.AddText;
+import org.xipki.ca.server.certprofile.Condition;
+import org.xipki.ca.server.certprofile.ExtensionTupleOption;
+import org.xipki.ca.server.certprofile.ExtensionTupleOptions;
+import org.xipki.ca.server.certprofile.GeneralNameMode;
+import org.xipki.ca.server.certprofile.GeneralNameTag;
+import org.xipki.ca.server.certprofile.KeyParamRange;
+import org.xipki.ca.server.certprofile.KeyParamRanges;
+import org.xipki.ca.server.certprofile.SubjectDNOption;
 import org.xipki.ca.server.certprofile.jaxb.AddTextType;
 import org.xipki.ca.server.certprofile.jaxb.AlgorithmType;
 import org.xipki.ca.server.certprofile.jaxb.CertificatePolicyInformationType;
@@ -149,9 +158,9 @@ import org.xml.sax.SAXException;
  * @author Lijun Liao
  */
 
-public class DefaultCertProfile extends AbstractCertProfile
+public class DefaultX509CertProfile extends AbstractX509CertProfile
 {
-    private static final Logger LOG = LoggerFactory.getLogger(DefaultCertProfile.class);
+    private static final Logger LOG = LoggerFactory.getLogger(DefaultX509CertProfile.class);
     private static final char GENERALNAME_SEP = '|';
     public static final String MODULUS_LENGTH = "moduluslength";
     public static final String P_LENGTH = "plength";
@@ -167,7 +176,7 @@ public class DefaultCertProfile extends AbstractCertProfile
 
     protected ProfileType profileConf;
 
-    private SpecialCertProfileBehavior specialBehavior;
+    private SpecialX509CertProfileBehavior specialBehavior;
     private Map<ASN1ObjectIdentifier, Set<Byte>> allowedEcCurves;
     private Map<ASN1ObjectIdentifier, List<KeyParamRanges>> nonEcKeyAlgorithms;
 
@@ -286,7 +295,7 @@ public class DefaultCertProfile extends AbstractCertProfile
             String specialBehavior = conf.getSpecialBehavior();
             if(specialBehavior != null)
             {
-                this.specialBehavior = SpecialCertProfileBehavior.getInstance(specialBehavior);
+                this.specialBehavior = SpecialX509CertProfileBehavior.getInstance(specialBehavior);
             }
 
             if(conf.isDuplicateKeyPermitted() != null)
@@ -846,7 +855,7 @@ public class DefaultCertProfile extends AbstractCertProfile
 
                     final SchemaFactory schemaFact = SchemaFactory.newInstance(
                             javax.xml.XMLConstants.W3C_XML_SCHEMA_NS_URI);
-                    URL url = DefaultCertProfile.class.getResource("/xsd/certprofile.xsd");
+                    URL url = DefaultX509CertProfile.class.getResource("/xsd/certprofile.xsd");
                     jaxbUnmarshaller.setSchema(schemaFact.newSchema(url));
                 }
 
@@ -1697,7 +1706,7 @@ public class DefaultCertProfile extends AbstractCertProfile
     }
 
     @Override
-    public SpecialCertProfileBehavior getSpecialCertProfileBehavior()
+    public SpecialX509CertProfileBehavior getSpecialCertProfileBehavior()
     {
         return specialBehavior;
     }

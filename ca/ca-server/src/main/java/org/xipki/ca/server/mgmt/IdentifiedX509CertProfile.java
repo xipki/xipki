@@ -41,11 +41,11 @@ import java.util.TimeZone;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.Extensions;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
-import org.xipki.ca.api.profile.CertProfile;
 import org.xipki.ca.api.profile.ExtensionOccurrence;
 import org.xipki.ca.api.profile.ExtensionTuples;
-import org.xipki.ca.api.profile.SpecialCertProfileBehavior;
 import org.xipki.ca.api.profile.SubjectInfo;
+import org.xipki.ca.api.profile.x509.X509CertProfile;
+import org.xipki.ca.api.profile.x509.SpecialX509CertProfileBehavior;
 import org.xipki.ca.common.BadCertTemplateException;
 import org.xipki.ca.common.BadFormatException;
 import org.xipki.ca.common.CertProfileException;
@@ -57,12 +57,12 @@ import org.xipki.common.ParamChecker;
  * @author Lijun Liao
  */
 
-public class IdentifiedCertProfile
+public class IdentifiedX509CertProfile
 {
     private final String name;
-    private final CertProfile certProfile;
+    private final X509CertProfile certProfile;
 
-    public IdentifiedCertProfile(String name, CertProfile certProfile)
+    public IdentifiedX509CertProfile(String name, X509CertProfile certProfile)
     {
         ParamChecker.assertNotEmpty("name", name);
         ParamChecker.assertNotNull("certProfile", certProfile);
@@ -82,7 +82,7 @@ public class IdentifiedCertProfile
         certProfile.initialize(data);
     }
 
-    public SpecialCertProfileBehavior getSpecialCertProfileBehavior()
+    public SpecialX509CertProfileBehavior getSpecialCertProfileBehavior()
     {
         return certProfile.getSpecialCertProfileBehavior();
     }

@@ -33,21 +33,23 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.ca.api.profile;
+package org.xipki.ca.api.profile.x509;
 
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.xipki.ca.api.profile.ExtensionOccurrence;
+
 /**
  * @author Lijun Liao
  */
 
-public abstract class AbstractCACertProfile extends AbstractCertProfile
+public abstract class AbstractCAX509CertProfile extends AbstractX509CertProfile
 {
     protected Set<KeyUsage> keyUsages;
 
-    public AbstractCACertProfile()
+    public AbstractCAX509CertProfile()
     {
         Set<KeyUsage> keyUsages = new HashSet<>();
         keyUsages.add(KeyUsage.keyCertSign);

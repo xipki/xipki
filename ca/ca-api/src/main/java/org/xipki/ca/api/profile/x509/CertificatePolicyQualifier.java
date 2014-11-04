@@ -33,35 +33,45 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.ca.server.certprofile;
+package org.xipki.ca.api.profile.x509;
 
-import java.util.Set;
-
-import org.bouncycastle.asn1.ASN1ObjectIdentifier;
+import org.xipki.common.ParamChecker;
 
 /**
  * @author Lijun Liao
  */
 
-class ExtKeyUsageOption
+public class CertificatePolicyQualifier
 {
-    private final Condition condition;
-    private final Set<ASN1ObjectIdentifier> extKeyusages;
+    private final String cpsUri;
+    private final String userNotice;
 
-    public ExtKeyUsageOption(Condition condition, Set<ASN1ObjectIdentifier> extKeyusages)
+    private CertificatePolicyQualifier(String cpsUri, String userNotice)
     {
-        this.condition = condition;
-        this.extKeyusages = extKeyusages;
+        this.cpsUri = cpsUri;
+        this.userNotice = userNotice;
     }
 
-    public Condition getCondition()
+    public static CertificatePolicyQualifier getInstanceForUserNotice(String userNotice)
     {
-        return condition;
+        ParamChecker.assertNotEmpty("userNotice", userNotice);
+        return new CertificatePolicyQualifier(null, userNotice);
     }
 
-    public Set<ASN1ObjectIdentifier> getExtKeyusages()
+    public static CertificatePolicyQualifier getInstanceForCpsUri(String cpsUri)
     {
-        return extKeyusages;
+        ParamChecker.assertNotEmpty("cpsUri", cpsUri);
+        return new CertificatePolicyQualifier(cpsUri, null);
+    }
+
+    public String getCpsUri()
+    {
+        return cpsUri;
+    }
+
+    public String getUserNotice()
+    {
+        return userNotice;
     }
 
 }

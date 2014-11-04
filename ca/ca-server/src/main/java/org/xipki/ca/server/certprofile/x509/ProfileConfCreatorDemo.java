@@ -33,7 +33,7 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.ca.server.certprofile;
+package org.xipki.ca.server.certprofile.x509;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -54,7 +54,7 @@ import org.bouncycastle.asn1.sec.SECObjectIdentifiers;
 import org.bouncycastle.asn1.teletrust.TeleTrusTObjectIdentifiers;
 import org.bouncycastle.asn1.x509.Extension;
 import org.bouncycastle.asn1.x9.X9ObjectIdentifiers;
-import org.xipki.ca.api.profile.SpecialCertProfileBehavior;
+import org.xipki.ca.api.profile.x509.SpecialX509CertProfileBehavior;
 import org.xipki.ca.server.certprofile.jaxb.AddTextType;
 import org.xipki.ca.server.certprofile.jaxb.AlgorithmType;
 import org.xipki.ca.server.certprofile.jaxb.CertificatePolicyInformationType;
@@ -154,7 +154,7 @@ public class ProfileConfCreatorDemo
             Marshaller m = JAXBContext.newInstance(ObjectFactory.class).createMarshaller();
             final SchemaFactory schemaFact = SchemaFactory.newInstance(
                     javax.xml.XMLConstants.W3C_XML_SCHEMA_NS_URI);
-            URL url = DefaultCertProfile.class.getResource("/xsd/certprofile.xsd");
+            URL url = DefaultX509CertProfile.class.getResource("/xsd/certprofile.xsd");
             m.setSchema(schemaFact.newSchema(url));
             m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
             m.setProperty("com.sun.xml.internal.bind.indentString", "  ");
@@ -791,13 +791,13 @@ public class ProfileConfCreatorDemo
         profile.setDuplicateSubjectPermitted(true);
 
         // SpecialBehavior
-        profile.setSpecialBehavior(SpecialCertProfileBehavior.gematik_gSMC_K.name());
+        profile.setSpecialBehavior(SpecialX509CertProfileBehavior.gematik_gSMC_K.name());
 
         // Maximal liftime
         Parameters profileParams = new Parameters();
         profile.setParameters(profileParams);
         NameValueType nv = new NameValueType();
-        nv.setName(SpecialCertProfileBehavior.PARAMETER_MAXLIFTIME);
+        nv.setName(SpecialX509CertProfileBehavior.PARAMETER_MAXLIFTIME);
         nv.setValue(Integer.toString(20 * 365));
         profileParams.getParameter().add(nv);
 
@@ -917,12 +917,12 @@ public class ProfileConfCreatorDemo
 
             ParameterType param = new ParameterType();
             params.add(param);
-            param.setName(DefaultCertProfile.MODULUS_LENGTH);
+            param.setName(DefaultX509CertProfile.MODULUS_LENGTH);
             param.setMin(2048);
             param.setMax(2048);
 
             param = new ParameterType();
-            param.setName(DefaultCertProfile.MODULUS_LENGTH);
+            param.setName(DefaultX509CertProfile.MODULUS_LENGTH);
             params.add(param);
             param.setMin(3072);
             param.setMax(3072);
@@ -938,31 +938,31 @@ public class ProfileConfCreatorDemo
 
             ParameterType param = new ParameterType();
             params.add(param);
-            param.setName(DefaultCertProfile.P_LENGTH);
+            param.setName(DefaultX509CertProfile.P_LENGTH);
             param.setMin(1024);
             param.setMax(1024);
 
             param = new ParameterType();
             params.add(param);
-            param.setName(DefaultCertProfile.P_LENGTH);
+            param.setName(DefaultX509CertProfile.P_LENGTH);
             param.setMin(2048);
             param.setMax(2048);
 
             param = new ParameterType();
             params.add(param);
-            param.setName(DefaultCertProfile.Q_LENGTH);
+            param.setName(DefaultX509CertProfile.Q_LENGTH);
             param.setMin(160);
             param.setMax(160);
 
             param = new ParameterType();
             params.add(param);
-            param.setName(DefaultCertProfile.Q_LENGTH);
+            param.setName(DefaultX509CertProfile.Q_LENGTH);
             param.setMin(224);
             param.setMax(224);
 
             param = new ParameterType();
             params.add(param);
-            param.setName(DefaultCertProfile.Q_LENGTH);
+            param.setName(DefaultX509CertProfile.Q_LENGTH);
             param.setMin(256);
             param.setMax(256);
         }

@@ -33,28 +33,34 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.ca.api.profile;
+package org.xipki.ca.server.certprofile.x509;
+
+import org.xipki.ca.api.profile.ExtensionOccurrence;
 
 /**
  * @author Lijun Liao
  */
 
-public enum SpecialCertProfileBehavior
+class AuthorityKeyIdentifierOption
 {
-    gematik_gSMC_K;
+    private final boolean includeIssuerAndSerial;
+    private final ExtensionOccurrence occurence;
 
-    public static final String PARAMETER_MAXLIFTIME = "maxLifetime";
-
-    public static SpecialCertProfileBehavior getInstance(String behavior)
+    AuthorityKeyIdentifierOption(boolean includeIssuerAndSerial,
+            ExtensionOccurrence occurence)
     {
-        for(SpecialCertProfileBehavior b : values())
-        {
-            if(b.name().equalsIgnoreCase(behavior))
-            {
-                return b;
-            }
-        }
-
-        return null;
+        this.includeIssuerAndSerial = includeIssuerAndSerial;
+        this.occurence = occurence;
     }
+
+    boolean isIncludeIssuerAndSerial()
+    {
+        return includeIssuerAndSerial;
+    }
+
+    ExtensionOccurrence getOccurence()
+    {
+        return occurence;
+    }
+
 }

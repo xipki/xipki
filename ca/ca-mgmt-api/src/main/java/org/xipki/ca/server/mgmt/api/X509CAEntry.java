@@ -56,7 +56,7 @@ import org.xipki.common.ParamChecker;
  * @author Lijun Liao
  */
 
-public class CAEntry implements Serializable
+public class X509CAEntry implements Serializable
 {
     private static final long serialVersionUID = 1L;
     private String name;
@@ -83,7 +83,7 @@ public class CAEntry implements Serializable
     private String subject;
     private String serialSeqName;
 
-    public CAEntry(String name, long initialSerial,
+    public X509CAEntry(String name, long initialSerial,
             String signerType, String signerConf, X509Certificate cert,
             List<String> ocspUris, List<String> crlUris, List<String> deltaCrlUris,
             List<String> issuerLocations, int numCrls,

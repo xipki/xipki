@@ -49,7 +49,7 @@ import org.xipki.security.api.PasswordResolver;
  * @author Lijun Liao
  */
 
-public abstract class CertPublisher
+public abstract class X509CertPublisher
 {
     public abstract void initialize(String conf,
             PasswordResolver passwordResolver,
@@ -68,7 +68,7 @@ public abstract class CertPublisher
 
     public abstract boolean issuerAdded(X509CertificateWithMetaInfo issuerCert);
 
-    public abstract boolean certificateAdded(CertificateInfo certInfo);
+    public abstract boolean certificateAdded(X509CertificateInfo certInfo);
 
     public abstract boolean certificateRevoked(X509CertificateWithMetaInfo issuerCert,
             X509CertificateWithMetaInfo cert,

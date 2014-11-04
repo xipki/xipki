@@ -116,7 +116,7 @@ import org.xipki.audit.api.AuditStatus;
 import org.xipki.audit.api.ChildAuditEvent;
 import org.xipki.ca.api.OperationException;
 import org.xipki.ca.api.OperationException.ErrorCode;
-import org.xipki.ca.api.publisher.CertificateInfo;
+import org.xipki.ca.api.publisher.X509CertificateInfo;
 import org.xipki.ca.common.CAStatus;
 import org.xipki.ca.common.CmpControl;
 import org.xipki.ca.common.InsuffientPermissionException;
@@ -884,7 +884,7 @@ public class X509CACmpResponder extends CmpResponder
 
         try
         {
-            CertificateInfo certInfo;
+            X509CertificateInfo certInfo;
             if(keyUpdate)
             {
                 certInfo = ca.regenerateCertificate(requestor.isRA(), certProfileName, user,
@@ -1246,7 +1246,7 @@ public class X509CACmpResponder extends CmpResponder
         {
             ASN1Integer certReqId = certStatus.getCertReqId();
             byte[] certHash = certStatus.getCertHash().getOctets();
-            CertificateInfo certInfo = pendingCertPool.removeCertificate(
+            X509CertificateInfo certInfo = pendingCertPool.removeCertificate(
                     transactionId.getOctets(), certReqId.getPositiveValue(), certHash);
             if(certInfo == null)
             {
@@ -1308,13 +1308,13 @@ public class X509CACmpResponder extends CmpResponder
 
     private boolean revokePendingCertificates(ASN1OctetString transactionId)
     {
-        Set<CertificateInfo> remainingCerts = pendingCertPool.removeCertificates(transactionId.getOctets());
+        Set<X509CertificateInfo> remainingCerts = pendingCertPool.removeCertificates(transactionId.getOctets());
 
         boolean successfull = true;
         if(remainingCerts != null && remainingCerts.isEmpty() == false)
         {
             Date invalidityDate = new Date();
-            for(CertificateInfo remainingCert : remainingCerts)
+            for(X509CertificateInfo remainingCert : remainingCerts)
             {
                 try
                 {
@@ -1372,12 +1372,12 @@ public class X509CACmpResponder extends CmpResponder
         @Override
         public void run()
         {
-            Set<CertificateInfo> remainingCerts = pendingCertPool.removeConfirmTimeoutedCertificates();
+            Set<X509CertificateInfo> remainingCerts = pendingCertPool.removeConfirmTimeoutedCertificates();
 
             if(remainingCerts != null && remainingCerts.isEmpty() == false)
             {
                 Date invalidityDate = new Date();
-                for(CertificateInfo remainingCert : remainingCerts)
+                for(X509CertificateInfo remainingCert : remainingCerts)
                 {
                     try
                     {

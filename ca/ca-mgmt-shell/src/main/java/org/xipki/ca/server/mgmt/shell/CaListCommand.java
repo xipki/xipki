@@ -43,7 +43,7 @@ import java.util.Set;
 import org.apache.felix.gogo.commands.Argument;
 import org.apache.felix.gogo.commands.Command;
 import org.apache.felix.gogo.commands.Option;
-import org.xipki.ca.server.mgmt.api.CAEntry;
+import org.xipki.ca.server.mgmt.api.X509CAEntry;
 
 /**
  * @author Lijun Liao
@@ -93,7 +93,7 @@ public class CaListCommand extends CaCommand
         }
         else
         {
-            CAEntry entry = caManager.getCA(caName);
+            X509CAEntry entry = caManager.getCA(caName);
             if(entry == null)
             {
                 sb.append("Could not find CA '" + caName + "'");

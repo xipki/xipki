@@ -76,7 +76,7 @@ import org.xipki.ca.api.profile.ExtensionOccurrence;
 import org.xipki.ca.api.profile.ExtensionTuple;
 import org.xipki.ca.api.profile.ExtensionTuples;
 import org.xipki.ca.api.profile.SubjectInfo;
-import org.xipki.ca.api.profile.X509Util;
+import org.xipki.ca.api.profile.x509.X509Util;
 import org.xipki.ca.common.BadCertTemplateException;
 import org.xipki.ca.common.CertProfileException;
 import org.xipki.ca.common.CertValidity;
@@ -93,9 +93,9 @@ import org.xipki.security.api.SignerException;
  * @author Lijun Liao
  */
 
-class SelfSignedCertBuilder
+class X509SelfSignedCertBuilder
 {
-    private static final Logger LOG = LoggerFactory.getLogger(SelfSignedCertBuilder.class);
+    private static final Logger LOG = LoggerFactory.getLogger(X509SelfSignedCertBuilder.class);
 
     static class GenerateSelfSignedResult
     {
@@ -123,7 +123,7 @@ class SelfSignedCertBuilder
             SecurityFactory securityFactory,
             String signerType,
             String signerConf,
-            IdentifiedCertProfile certProfile,
+            IdentifiedX509CertProfile certProfile,
             String subject,
             long serialNumber,
             List<String> ocspUris,
@@ -170,7 +170,7 @@ class SelfSignedCertBuilder
 
     private static X509Certificate generateCertificate(
             ConcurrentContentSigner signer,
-            IdentifiedCertProfile certProfile,
+            IdentifiedX509CertProfile certProfile,
             X500Name requestedSubject,
             long serialNumber,
             SubjectPublicKeyInfo publicKeyInfo,
@@ -270,7 +270,7 @@ class SelfSignedCertBuilder
 
     private static String addExtensions(
             X509v3CertificateBuilder certBuilder,
-            IdentifiedCertProfile profile,
+            IdentifiedX509CertProfile profile,
             X500Name requestedSubject,
             X500Name subject,
             SubjectPublicKeyInfo requestedPublicKeyInfo,

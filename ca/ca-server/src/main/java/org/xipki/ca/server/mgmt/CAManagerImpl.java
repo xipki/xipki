@@ -84,7 +84,7 @@ import org.xipki.audit.api.AuditLoggingServiceRegister;
 import org.xipki.audit.api.AuditStatus;
 import org.xipki.audit.api.PCIAuditEvent;
 import org.xipki.ca.api.OperationException;
-import org.xipki.ca.api.publisher.CertificateInfo;
+import org.xipki.ca.api.publisher.X509CertificateInfo;
 import org.xipki.ca.common.CAMgmtException;
 import org.xipki.ca.common.CAStatus;
 import org.xipki.ca.common.CASystemStatus;
@@ -97,14 +97,14 @@ import org.xipki.ca.server.CmpRequestorInfo;
 import org.xipki.ca.server.CrlSigner;
 import org.xipki.ca.server.X509CA;
 import org.xipki.ca.server.X509CACmpResponder;
-import org.xipki.ca.server.mgmt.SelfSignedCertBuilder.GenerateSelfSignedResult;
-import org.xipki.ca.server.mgmt.api.CAEntry;
+import org.xipki.ca.server.mgmt.X509SelfSignedCertBuilder.GenerateSelfSignedResult;
+import org.xipki.ca.server.mgmt.api.X509CAEntry;
 import org.xipki.ca.server.mgmt.api.CAHasRequestorEntry;
 import org.xipki.ca.server.mgmt.api.CAManager;
 import org.xipki.ca.server.mgmt.api.CertProfileEntry;
 import org.xipki.ca.server.mgmt.api.CmpRequestorEntry;
 import org.xipki.ca.server.mgmt.api.CmpResponderEntry;
-import org.xipki.ca.server.mgmt.api.CrlSignerEntry;
+import org.xipki.ca.server.mgmt.api.X509CrlSignerEntry;
 import org.xipki.ca.server.mgmt.api.DuplicationMode;
 import org.xipki.ca.server.mgmt.api.Permission;
 import org.xipki.ca.server.mgmt.api.PublisherEntry;
@@ -188,11 +188,11 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
 
     private Map<String, DataSourceWrapper> dataSources = null;
 
-    private final Map<String, CAInfo> cas = new ConcurrentHashMap<>();
+    private final Map<String, X509CAInfo> cas = new ConcurrentHashMap<>();
     private final Map<String, CertProfileEntryWrapper> certProfiles = new ConcurrentHashMap<>();
-    private final Map<String, PublisherEntryWrapper> publishers = new ConcurrentHashMap<>();
+    private final Map<String, X509PublisherEntryWrapper> publishers = new ConcurrentHashMap<>();
     private final Map<String, CmpRequestorEntry> requestors = new ConcurrentHashMap<>();
-    private final Map<String, CrlSignerEntry> crlSigners = new ConcurrentHashMap<>();
+    private final Map<String, X509CrlSignerEntry> crlSigners = new ConcurrentHashMap<>();
     private final Map<String, Set<String>> ca_has_profiles = new ConcurrentHashMap<>();
     private final Map<String, Set<String>> ca_has_publishers = new ConcurrentHashMap<>();
     private final Map<String, Set<CAHasRequestorEntry>> ca_has_requestors = new ConcurrentHashMap<>();
@@ -638,7 +638,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
             // Add the CAs to the store
             for(String caName : cas.keySet())
             {
-                CAInfo caEntry = cas.get(caName);
+                X509CAInfo caEntry = cas.get(caName);
                 Set<Permission> permissions = caEntry.getPermissions();
 
                 boolean signerRequired;
@@ -673,7 +673,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
                 // CRL will be generated only in master mode
                 if(signerRequired && masterMode && caEntry.getCrlSignerName() != null)
                 {
-                    CrlSignerEntry crlSignerEntry = crlSigners.get(caEntry.getCrlSignerName());
+                    X509CrlSignerEntry crlSignerEntry = crlSigners.get(caEntry.getCrlSignerName());
                     String signerType = crlSignerEntry.getType();
 
                     ConcurrentContentSigner identifiedSigner = null;
@@ -1140,7 +1140,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
             CertProfileEntryWrapper entry = certProfiles.get(name);
             try
             {
-                IdentifiedCertProfile profile = entry.getCertProfile();
+                IdentifiedX509CertProfile profile = entry.getCertProfile();
                 if(profile != null)
                 {
                     profile.shutdown();
@@ -1211,10 +1211,10 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
 
         for(String name : publishers.keySet())
         {
-            PublisherEntryWrapper entry = publishers.get(name);
+            X509PublisherEntryWrapper entry = publishers.get(name);
             try
             {
-                IdentifiedCertPublisher publisher = entry.getCertPublisher();
+                IdentifiedX509CertPublisher publisher = entry.getCertPublisher();
                 if(publisher != null)
                 {
                     publisher.shutdown();
@@ -1247,10 +1247,10 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
                 String conf = rs.getString("CONF");
 
                 PublisherEntry rawEntry = new PublisherEntry(name, type, conf);
-                PublisherEntryWrapper entry;
+                X509PublisherEntryWrapper entry;
                 try
                 {
-                    entry = new PublisherEntryWrapper(rawEntry, securityFactory.getPasswordResolver(), dataSources);
+                    entry = new X509PublisherEntryWrapper(rawEntry, securityFactory.getPasswordResolver(), dataSources);
                 } catch(CertPublisherException | RuntimeException e)
                 {
                     final String message = "Invalid configuration for the certPublisher " + name;
@@ -1302,7 +1302,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
                 String signer_cert = rs.getString("SIGNER_CERT");
                 String crlControlConf = rs.getString("CRL_CONTROL");
 
-                CrlSignerEntry entry = new CrlSignerEntry(name, signer_type, signer_conf, crlControlConf);
+                X509CrlSignerEntry entry = new X509CrlSignerEntry(name, signer_type, signer_conf, crlControlConf);
                 if("CA".equalsIgnoreCase(signer_type) == false)
                 {
                     if(signer_cert != null)
@@ -1471,7 +1471,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
 
                 X509Certificate cert = generateCert(b64cert);
 
-                CAEntry entry = new CAEntry(name, next_serial, signer_type, signer_conf, cert,
+                X509CAEntry entry = new X509CAEntry(name, next_serial, signer_type, signer_conf, cert,
                         lOcspUris, lCrlUris, lDeltaCrlUris, null, numCrls, expirationPeriod);
                 entry.setLastCRLInterval(lastCRLInterval);
                 entry.setLastCRLIntervalDate(lastCRLIntervalDate);
@@ -1507,7 +1507,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
                 }
                 entry.setValidityMode(validityMode);
 
-                CAInfo caInfo;
+                X509CAInfo caInfo;
                 try
                 {
                     if(masterMode)
@@ -1516,7 +1516,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
                         certstore.addCa(cm);
                     }
 
-                    caInfo = new CAInfo(entry, certstore);
+                    caInfo = new X509CAInfo(entry, certstore);
                     cas.put(entry.getName(), caInfo);
                 } catch (OperationException e)
                 {
@@ -1599,7 +1599,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
     }
 
     @Override
-    public void addCA(CAEntry newCaDbEntry)
+    public void addCA(X509CAEntry newCaDbEntry)
     throws CAMgmtException
     {
         asssertMasterMode();
@@ -1672,10 +1672,10 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
     }
 
     @Override
-    public CAEntry getCA(String caName)
+    public X509CAEntry getCA(String caName)
     {
         caName = caName.toUpperCase();
-        CAInfo caInfo = cas.get(caName);
+        X509CAInfo caInfo = cas.get(caName);
         return caInfo == null ? null : caInfo.getCaEntry();
     }
 
@@ -2409,7 +2409,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
     }
 
     @Override
-    public void addCrlSigner(CrlSignerEntry dbEntry)
+    public void addCrlSigner(X509CrlSignerEntry dbEntry)
     throws CAMgmtException
     {
         asssertMasterMode();
@@ -2456,7 +2456,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
         asssertMasterMode();
         for(String caName : cas.keySet())
         {
-            CAInfo caInfo = cas.get(caName);
+            X509CAInfo caInfo = cas.get(caName);
             if(crlSignerName.equals(caInfo.getCrlSignerName()))
             {
                 setCrlSignerInCA(null, caName);
@@ -2542,7 +2542,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
     }
 
     @Override
-    public CrlSignerEntry getCrlSigner(String name)
+    public X509CrlSignerEntry getCrlSigner(String name)
     {
         return crlSigners.get(name);
     }
@@ -2552,7 +2552,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
     throws CAMgmtException
     {
         caName = caName.toUpperCase();
-        CAInfo caInfo = cas.get(caName);
+        X509CAInfo caInfo = cas.get(caName);
         if(caInfo == null)
         {
             throw new CAMgmtException("Unknown CA " + caName);
@@ -2615,10 +2615,10 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
             dataSource.releaseResources(ps, null);
         }
 
-        PublisherEntryWrapper entry;
+        X509PublisherEntryWrapper entry;
         try
         {
-            entry = new PublisherEntryWrapper(dbEntry, securityFactory.getPasswordResolver(), dataSources);
+            entry = new X509PublisherEntryWrapper(dbEntry, securityFactory.getPasswordResolver(), dataSources);
         } catch (CertPublisherException e)
         {
             throw new CAMgmtException("CertPublisherException: " + e.getMessage(), e);
@@ -2649,7 +2649,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
     @Override
     public PublisherEntry getPublisher(String publisherName)
     {
-        PublisherEntryWrapper entry = publishers.get(publisherName);
+        X509PublisherEntryWrapper entry = publishers.get(publisherName);
         return entry == null ? null : entry.getEntry();
     }
 
@@ -3137,7 +3137,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
             dataSource.releaseResources(ps, null);
         }
 
-        CAInfo caInfo = cas.get(caName);
+        X509CAInfo caInfo = cas.get(caName);
         if(caInfo == null || caInfo.getCaEntry().getNextSerial() > 0)
         {
             // drop the serial number sequence
@@ -3188,10 +3188,10 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
         }
 
         byte[] encodedSubjectPublicKey = certInfo.getCert().getPublicKey().getEncoded();
-        CertificateInfo ci;
+        X509CertificateInfo ci;
         try
         {
-            ci = new CertificateInfo(
+            ci = new X509CertificateInfo(
                     certInfo, certInfo, encodedSubjectPublicKey,
                     certprofile == null ? "UNKNOWN" : certprofile);
         } catch (CertificateEncodingException e)
@@ -3416,7 +3416,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
 
         for(String name : publishers.keySet())
         {
-            PublisherEntryWrapper publisherEntry = publishers.get(name);
+            X509PublisherEntryWrapper publisherEntry = publishers.get(name);
             publisherEntry.setAuditServiceRegister(auditServiceRegister);
         }
 
@@ -3589,7 +3589,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
             X500Name subject = certTemp.getSubject();
             SubjectPublicKeyInfo publicKeyInfo = certTemp.getSubjectPublicKeyInfo();
 
-            CertificateInfo certInfo;
+            X509CertificateInfo certInfo;
             try
             {
                 certInfo = ca.generateCertificate(false, profileName, user, subject, publicKeyInfo,
@@ -3614,23 +3614,23 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
         return ca;
     }
 
-    public IdentifiedCertProfile getIdentifiedCertProfile(String profileName)
+    public IdentifiedX509CertProfile getIdentifiedCertProfile(String profileName)
     throws CertProfileException
     {
         CertProfileEntryWrapper wrapper = certProfiles.get(profileName);
         return wrapper == null ? null : wrapper.getCertProfile();
     }
 
-    public List<IdentifiedCertPublisher> getIdentifiedPublishersForCa(String caName)
+    public List<IdentifiedX509CertPublisher> getIdentifiedPublishersForCa(String caName)
     {
         caName = caName.toUpperCase();
-        List<IdentifiedCertPublisher> ret = new LinkedList<>();
+        List<IdentifiedX509CertPublisher> ret = new LinkedList<>();
         Set<String> publisherNames = ca_has_publishers.get(caName);
         if(publisherNames != null)
         {
             for(String publisherName : publisherNames)
             {
-                PublisherEntryWrapper publisher = publishers.get(publisherName);
+                X509PublisherEntryWrapper publisher = publishers.get(publisherName);
                 ret.add(publisher.getCertPublisher());
             }
         }
@@ -3667,7 +3667,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
             return null;
         }
 
-        IdentifiedCertProfile certProfile;
+        IdentifiedX509CertProfile certProfile;
         if(certProfiles.containsKey(certprofileName))
         {
             certProfile = certProfiles.get(certprofileName).getCertProfile();
@@ -3691,7 +3691,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
         GenerateSelfSignedResult result;
         try
         {
-            result = SelfSignedCertBuilder.generateSelfSigned(securityFactory, signer_type, signer_conf,
+            result = X509SelfSignedCertBuilder.generateSelfSigned(securityFactory, signer_type, signer_conf,
                     certProfile, subject, serialOfThisCert, ocsp_uris, crl_uris, delta_crl_uris);
         } catch (OperationException | ConfigurationException e)
         {
@@ -3712,7 +3712,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
             }
         }
 
-        CAEntry entry = new CAEntry(name, nextSerial, signer_type, signerConf, caCert,
+        X509CAEntry entry = new X509CAEntry(name, nextSerial, signer_type, signerConf, caCert,
                 ocsp_uris, crl_uris, delta_crl_uris, null, numCrls, expirationPeriod);
 
         entry.setDuplicateKeyMode(duplicate_key);

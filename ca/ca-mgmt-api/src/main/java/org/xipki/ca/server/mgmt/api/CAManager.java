@@ -96,10 +96,10 @@ public interface CAManager
 
     Set<String> getCaNames();
 
-    void addCA(CAEntry newCaDbEntry)
+    void addCA(X509CAEntry newCaDbEntry)
     throws CAMgmtException;
 
-    CAEntry getCA(String caName);
+    X509CAEntry getCA(String caName);
 
     void changeCA(String name, CAStatus status,
             X509Certificate cert,
@@ -165,7 +165,7 @@ public interface CAManager
 
     CmpResponderEntry getCmpResponder();
 
-    void addCrlSigner(CrlSignerEntry dbEntry)
+    void addCrlSigner(X509CrlSignerEntry dbEntry)
     throws CAMgmtException;
 
     void removeCrlSigner(String crlSignerName)
@@ -175,7 +175,7 @@ public interface CAManager
             String crlControl)
     throws CAMgmtException;
 
-    CrlSignerEntry getCrlSigner(String name);
+    X509CrlSignerEntry getCrlSigner(String name);
 
     void setCrlSignerInCA(String crlSignerName, String caName)
     throws CAMgmtException;

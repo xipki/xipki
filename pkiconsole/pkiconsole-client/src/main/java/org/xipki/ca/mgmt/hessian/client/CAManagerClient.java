@@ -52,13 +52,13 @@ import org.xipki.ca.common.CASystemStatus;
 import org.xipki.ca.common.CertValidity;
 import org.xipki.ca.common.CmpControl;
 import org.xipki.ca.mgmt.hessian.common.HessianCAManager;
-import org.xipki.ca.server.mgmt.api.CAEntry;
+import org.xipki.ca.server.mgmt.api.X509CAEntry;
 import org.xipki.ca.server.mgmt.api.CAHasRequestorEntry;
 import org.xipki.ca.server.mgmt.api.CAManager;
 import org.xipki.ca.server.mgmt.api.CertProfileEntry;
 import org.xipki.ca.server.mgmt.api.CmpRequestorEntry;
 import org.xipki.ca.server.mgmt.api.CmpResponderEntry;
-import org.xipki.ca.server.mgmt.api.CrlSignerEntry;
+import org.xipki.ca.server.mgmt.api.X509CrlSignerEntry;
 import org.xipki.ca.server.mgmt.api.DuplicationMode;
 import org.xipki.ca.server.mgmt.api.Permission;
 import org.xipki.ca.server.mgmt.api.PublisherEntry;
@@ -241,14 +241,14 @@ public class CAManagerClient implements CAManager
     }
 
     @Override
-    public void addCA(CAEntry newCaDbEntry)
+    public void addCA(X509CAEntry newCaDbEntry)
     throws CAMgmtException
     {
         client.addCA(newCaDbEntry);
     }
 
     @Override
-    public CAEntry getCA(String caName)
+    public X509CAEntry getCA(String caName)
     {
         return client.getCA(caName);
     }
@@ -413,7 +413,7 @@ public class CAManagerClient implements CAManager
     }
 
     @Override
-    public void addCrlSigner(CrlSignerEntry dbEntry)
+    public void addCrlSigner(X509CrlSignerEntry dbEntry)
     throws CAMgmtException
     {
         client.addCrlSigner(dbEntry);
@@ -435,7 +435,7 @@ public class CAManagerClient implements CAManager
     }
 
     @Override
-    public CrlSignerEntry getCrlSigner(String name)
+    public X509CrlSignerEntry getCrlSigner(String name)
     {
         return client.getCrlSigner(name);
     }
@@ -619,10 +619,10 @@ public class CAManagerClient implements CAManager
             CAManagerClient c = new CAManagerClient();
             c.setServerURL("http://localhost:8080/pkiconsole/hessian");
             c.init();
-            CrlSignerEntry crlSigner = c.getCrlSigner("CASIGN.CRLSIGNER");
+            X509CrlSignerEntry crlSigner = c.getCrlSigner("CASIGN.CRLSIGNER");
             System.out.println(crlSigner);
 
-            CAEntry caEntry = c.getCA("RCA1");
+            X509CAEntry caEntry = c.getCA("RCA1");
             System.out.println(caEntry);
         }catch(Exception e)
         {

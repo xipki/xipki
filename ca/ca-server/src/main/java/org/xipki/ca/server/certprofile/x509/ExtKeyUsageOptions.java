@@ -33,37 +33,42 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.ca.api.profile;
+package org.xipki.ca.server.certprofile.x509;
 
-import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
+import org.bouncycastle.asn1.ASN1ObjectIdentifier;
+import org.xipki.ca.server.certprofile.Condition;
+import org.xipki.common.EnvironmentParameterResolver;
 import org.xipki.common.ParamChecker;
 
 /**
  * @author Lijun Liao
  */
 
-public class CertificatePolicyInformation
+class ExtKeyUsageOptions
 {
-    private final String certPolicyId;
-    private final List<CertificatePolicyQualifier> qualifiers;
+    private final List<ExtKeyUsageOption> options;
 
-    public CertificatePolicyInformation(String certPolicyId, List<CertificatePolicyQualifier> qualifiers)
+    public ExtKeyUsageOptions(List<ExtKeyUsageOption> options)
     {
-        ParamChecker.assertNotEmpty("certPolicyId", certPolicyId);
-        this.certPolicyId = certPolicyId;
-        this.qualifiers = qualifiers == null ? null : Collections.unmodifiableList(qualifiers);
+        ParamChecker.assertNotEmpty("options", options);
+        this.options = options;
     }
 
-    public String getCertPolicyId()
+    public Set<ASN1ObjectIdentifier> getExtKeyusage(EnvironmentParameterResolver pr)
     {
-        return certPolicyId;
-    }
+        for(ExtKeyUsageOption o : options)
+        {
+            Condition c = o.getCondition();
+            if(c == null || c.satisfy(pr))
+            {
+                return o.getExtKeyusages();
+            }
+        }
 
-    public List<CertificatePolicyQualifier> getQualifiers()
-    {
-        return qualifiers;
+        return null;
     }
 
 }

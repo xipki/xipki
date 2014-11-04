@@ -39,7 +39,7 @@ package org.xipki.ca.server.certprofile;
  * @author Lijun Liao
  */
 
-enum GeneralNameTag
+public enum GeneralNameTag
 {
     otherName(0),
     rfc822Name(1),
