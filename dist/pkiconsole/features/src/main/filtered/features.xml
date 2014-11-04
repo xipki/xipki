@@ -21,6 +21,6 @@
     <feature>xipki-pkiconsole</feature>
     <bundle>mvn:org.xipki/security/${project.version}</bundle>
     <bundle>mvn:org.xipki/console-karaf/${project.version}</bundle>
-    <bundle>mvn:org.xipki/ca-server-shell/${project.version}</bundle>
+    <bundle>mvn:org.xipki/ca-mgmt-shell/${project.version}</bundle>
   </feature>
 </features>

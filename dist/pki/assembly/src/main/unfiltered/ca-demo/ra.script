@@ -145,5 +145,5 @@ caclient:getcrl -ca SubCAwithCRL1 -out output/SubCAwithCRL1-get.crl
 #################################################################
 features:uninstall xipki-caclient-shell
 features:uninstall xipki-caclient
-features:uninstall xipki-caserver-shell
+features:uninstall xipki-camgmt-shell
 features:uninstall xipki-security-shell

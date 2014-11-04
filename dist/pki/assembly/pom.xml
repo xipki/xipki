@@ -281,7 +281,7 @@
                 <feature>http-whiteboard</feature>
                 <!-- project-core features -->
                 <feature>xipki-caserver</feature>
-                <feature>xipki-caserver-shell</feature>
+                <feature>xipki-camgmt-shell</feature>
                 <feature>xipki-caclient-shell</feature>
                 <feature>xipki-security-shell</feature>
                 <feature>xipki-ocspserver</feature>

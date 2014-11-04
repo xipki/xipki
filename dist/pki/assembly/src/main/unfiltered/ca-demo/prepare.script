@@ -6,7 +6,7 @@ features:install xipki-database-tool
 dbtool:initdb --quiet
 features:uninstall xipki-database-tool
 
-features:install xipki-caserver-shell
+features:install xipki-camgmt-shell
 
 ca:ca-restart
 
