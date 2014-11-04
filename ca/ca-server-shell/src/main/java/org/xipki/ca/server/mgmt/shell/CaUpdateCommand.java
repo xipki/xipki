@@ -120,14 +120,14 @@ public class CaUpdateCommand extends CaCommand
             description = "Mode of duplicate key.\n"
                     + "\t1: forbidden\n"
                     + "\t2: forbiddenWithinProfile\n"
-                    + "\t3: allowed")
+                    + "\t3: permitted")
     protected String duplicateKeyS;
 
     @Option(name = "-ds", aliases = { "--duplicateSubject" },
             description = "Mode of duplicate subject.\n"
                     + "\t1: forbidden\n"
                     + "\t2: forbiddenWithinProfile\n"
-                    + "\t3: allowed")
+                    + "\t3: permitted")
     protected String duplicateSubjectS;
 
     @Option(name = "-validityMode",

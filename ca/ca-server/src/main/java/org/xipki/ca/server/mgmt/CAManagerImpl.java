@@ -3256,7 +3256,6 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
     throws CAMgmtException
     {
         asssertMasterMode();
-        caName = caName.toUpperCase();
 
         Set<String> caNames;
         if(caName == null)
@@ -3265,6 +3264,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
         }
         else
         {
+            caName = caName.toUpperCase();
             caNames = new HashSet<>();
             caNames.add(caName);
         }
@@ -3456,7 +3456,6 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
     throws CAMgmtException
     {
         asssertMasterMode();
-        caName = caName.toUpperCase();
 
         if(caName == null)
         {
@@ -3471,6 +3470,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
         }
         else
         {
+            caName = caName.toUpperCase();
             X509CA ca = x509cas.get(caName);
             if(ca == null)
             {
