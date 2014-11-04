@@ -45,12 +45,12 @@ import org.xipki.ca.common.CAStatus;
 import org.xipki.ca.common.CASystemStatus;
 import org.xipki.ca.common.CertValidity;
 import org.xipki.ca.common.CmpControl;
-import org.xipki.ca.server.mgmt.api.CAEntry;
+import org.xipki.ca.server.mgmt.api.X509CAEntry;
 import org.xipki.ca.server.mgmt.api.CAHasRequestorEntry;
 import org.xipki.ca.server.mgmt.api.CertProfileEntry;
 import org.xipki.ca.server.mgmt.api.CmpRequestorEntry;
 import org.xipki.ca.server.mgmt.api.CmpResponderEntry;
-import org.xipki.ca.server.mgmt.api.CrlSignerEntry;
+import org.xipki.ca.server.mgmt.api.X509CrlSignerEntry;
 import org.xipki.ca.server.mgmt.api.DuplicationMode;
 import org.xipki.ca.server.mgmt.api.Permission;
 import org.xipki.ca.server.mgmt.api.PublisherEntry;
@@ -105,10 +105,10 @@ public interface HessianCAManager
 
     Set<String> getCaNames();
 
-    void addCA(CAEntry newCaDbEntry)
+    void addCA(X509CAEntry newCaDbEntry)
     throws HessianCAMgmtException;
 
-    CAEntry getCA(String caName);
+    X509CAEntry getCA(String caName);
 
     void changeCA(String name, CAStatus status,
             byte[] encodedCert,
@@ -174,7 +174,7 @@ public interface HessianCAManager
 
     CmpResponderEntry getCmpResponder();
 
-    void addCrlSigner(CrlSignerEntry dbEntry)
+    void addCrlSigner(X509CrlSignerEntry dbEntry)
     throws HessianCAMgmtException;
 
     void removeCrlSigner(String crlSignerName)
@@ -184,7 +184,7 @@ public interface HessianCAManager
             String crlControl)
     throws HessianCAMgmtException;
 
-    CrlSignerEntry getCrlSigner(String name);
+    X509CrlSignerEntry getCrlSigner(String name);
 
     void setCrlSignerInCA(String crlSignerName, String caName)
     throws HessianCAMgmtException;
