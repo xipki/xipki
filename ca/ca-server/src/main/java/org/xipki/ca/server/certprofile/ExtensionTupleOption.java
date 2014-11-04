@@ -41,7 +41,7 @@ import org.xipki.ca.api.profile.ExtensionTuple;
  * @author Lijun Liao
  */
 
-class ExtensionTupleOption
+public class ExtensionTupleOption
 {
     private final Condition condition;
     private final ExtensionTuple extensionTuple;

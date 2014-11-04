@@ -39,7 +39,7 @@ package org.xipki.ca.server.certprofile;
  * @author Lijun Liao
  */
 
-class AddText
+public class AddText
 {
     private final Condition condition;
     private final String text;

@@ -52,7 +52,7 @@ import org.xipki.ca.common.CAStatus;
 import org.xipki.ca.common.CertValidity;
 import org.xipki.ca.common.X509CertificateWithMetaInfo;
 import org.xipki.ca.server.PublicCAInfo;
-import org.xipki.ca.server.mgmt.api.CAEntry;
+import org.xipki.ca.server.mgmt.api.X509CAEntry;
 import org.xipki.ca.server.mgmt.api.DuplicationMode;
 import org.xipki.ca.server.mgmt.api.Permission;
 import org.xipki.ca.server.mgmt.api.ValidityMode;
@@ -65,13 +65,13 @@ import org.xipki.common.RandomSerialNumberGenerator;
  * @author Lijun Liao
  */
 
-public class CAInfo
+public class X509CAInfo
 {
-    private final static Logger LOG = LoggerFactory.getLogger(CAInfo.class);
+    private final static Logger LOG = LoggerFactory.getLogger(X509CAInfo.class);
 
     private static long MS_PER_DAY = 24L * 60 * 60 * 1000;
 
-    private final CAEntry caEntry;
+    private final X509CAEntry caEntry;
 
     private long noNewCertificateAfter;
     private BigInteger serialNumber;
@@ -86,7 +86,7 @@ public class CAInfo
     private boolean useRandomSerialNumber;
     private RandomSerialNumberGenerator randomSNGenerator;
 
-    public CAInfo(CAEntry caEntry, CertificateStore certStore)
+    public X509CAInfo(X509CAEntry caEntry, CertificateStore certStore)
     throws OperationException
     {
         ParamChecker.assertNotNull("caEntry", caEntry);
@@ -202,7 +202,7 @@ public class CAInfo
         return noNewCertificateAfter;
     }
 
-    public CAEntry getCaEntry()
+    public X509CAEntry getCaEntry()
     {
         return caEntry;
     }

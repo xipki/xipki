@@ -116,10 +116,10 @@ import org.xipki.ca.api.OperationException.ErrorCode;
 import org.xipki.ca.api.profile.ExtensionOccurrence;
 import org.xipki.ca.api.profile.ExtensionTuple;
 import org.xipki.ca.api.profile.ExtensionTuples;
-import org.xipki.ca.api.profile.SpecialCertProfileBehavior;
 import org.xipki.ca.api.profile.SubjectInfo;
-import org.xipki.ca.api.profile.X509Util;
-import org.xipki.ca.api.publisher.CertificateInfo;
+import org.xipki.ca.api.profile.x509.SpecialX509CertProfileBehavior;
+import org.xipki.ca.api.profile.x509.X509Util;
+import org.xipki.ca.api.publisher.X509CertificateInfo;
 import org.xipki.ca.common.BadCertTemplateException;
 import org.xipki.ca.common.BadFormatException;
 import org.xipki.ca.common.CAMgmtException;
@@ -127,15 +127,15 @@ import org.xipki.ca.common.CAStatus;
 import org.xipki.ca.common.CertProfileException;
 import org.xipki.ca.common.CertValidity;
 import org.xipki.ca.common.X509CertificateWithMetaInfo;
-import org.xipki.ca.server.mgmt.CAInfo;
+import org.xipki.ca.server.mgmt.X509CAInfo;
 import org.xipki.ca.server.mgmt.CAManagerImpl;
 import org.xipki.ca.server.mgmt.CRLControl;
 import org.xipki.ca.server.mgmt.CRLControl.UpdateMode;
-import org.xipki.ca.server.mgmt.IdentifiedCertProfile;
-import org.xipki.ca.server.mgmt.IdentifiedCertPublisher;
+import org.xipki.ca.server.mgmt.IdentifiedX509CertProfile;
+import org.xipki.ca.server.mgmt.IdentifiedX509CertPublisher;
 import org.xipki.ca.server.mgmt.api.DuplicationMode;
 import org.xipki.ca.server.mgmt.api.ValidityMode;
-import org.xipki.ca.server.store.CertWithRevocationInfo;
+import org.xipki.ca.server.store.X509CertWithRevocationInfo;
 import org.xipki.ca.server.store.CertificateStore;
 import org.xipki.common.CRLReason;
 import org.xipki.common.CertRevocationInfo;
@@ -535,7 +535,7 @@ public class X509CA
 
     private final CertificateFactory cf;
 
-    private final CAInfo caInfo;
+    private final X509CAInfo caInfo;
     private final ConcurrentContentSigner caSigner;
     private final X500Name caSubjectX500Name;
     private final byte[] caSKI;
@@ -558,7 +558,7 @@ public class X509CA
 
     public X509CA(
             CAManagerImpl caManager,
-            CAInfo caInfo,
+            X509CAInfo caInfo,
             ConcurrentContentSigner caSigner,
             CertificateStore certstore,
             CrlSigner crlSigner,
@@ -625,7 +625,7 @@ public class X509CA
             return;
         }
 
-        for(IdentifiedCertPublisher publisher : getPublishers())
+        for(IdentifiedX509CertPublisher publisher : getPublishers())
         {
             publisher.issuerAdded(caCert);
         }
@@ -643,7 +643,7 @@ public class X509CA
                 10, 10, TimeUnit.MINUTES);
     }
 
-    public CAInfo getCAInfo()
+    public X509CAInfo getCAInfo()
     {
         return caInfo;
     }
@@ -1007,7 +1007,7 @@ public class X509CA
                             maxSerial = serial;
                         }
 
-                        CertificateInfo certInfo;
+                        X509CertificateInfo certInfo;
                         try
                         {
                             certInfo = certstore.getCertificateInfoForSerial(caCert, serial);
@@ -1147,7 +1147,7 @@ public class X509CA
         }
     }
 
-    public CertificateInfo generateCertificate(boolean requestedByRA,
+    public X509CertificateInfo generateCertificate(boolean requestedByRA,
             String certProfileName,
             String user,
             X500Name subject,
@@ -1167,7 +1167,7 @@ public class X509CA
         {
             try
             {
-                CertificateInfo ret = intern_generateCertificate(requestedByRA,
+                X509CertificateInfo ret = intern_generateCertificate(requestedByRA,
                         certProfileName, user,
                         subject, publicKeyInfo,
                         notBefore, notAfter, extensions, false);
@@ -1199,7 +1199,7 @@ public class X509CA
         }
     }
 
-    public CertificateInfo regenerateCertificate(
+    public X509CertificateInfo regenerateCertificate(
             boolean requestedByRA,
             String certProfileName,
             String user,
@@ -1218,7 +1218,7 @@ public class X509CA
 
         try
         {
-            CertificateInfo ret = intern_generateCertificate(requestedByRA, certProfileName, user,
+            X509CertificateInfo ret = intern_generateCertificate(requestedByRA, certProfileName, user,
                     subject, publicKeyInfo,
                     notBefore, notAfter, extensions, false);
             successfull = true;
@@ -1247,7 +1247,7 @@ public class X509CA
         }
     }
 
-    public boolean publishCertificate(CertificateInfo certInfo)
+    public boolean publishCertificate(X509CertificateInfo certInfo)
     {
         if(certInfo.isAlreadyIssued())
         {
@@ -1259,7 +1259,7 @@ public class X509CA
             return false;
         }
 
-        for(IdentifiedCertPublisher publisher : getPublishers())
+        for(IdentifiedX509CertPublisher publisher : getPublishers())
         {
             if(publisher.isAsyn() == false)
             {
@@ -1306,7 +1306,7 @@ public class X509CA
 
     public boolean republishCertificates(List<String> publisherNames)
     {
-        List<IdentifiedCertPublisher> publishers;
+        List<IdentifiedX509CertPublisher> publishers;
         if(publisherNames == null)
         {
             publishers = getPublishers();
@@ -1317,8 +1317,8 @@ public class X509CA
 
             for(String publisherName : publisherNames)
             {
-                IdentifiedCertPublisher publisher = null;
-                for(IdentifiedCertPublisher p : getPublishers())
+                IdentifiedX509CertPublisher publisher = null;
+                for(IdentifiedX509CertPublisher p : getPublishers())
                 {
                     if(p.getName().equals(publisherName))
                     {
@@ -1358,7 +1358,7 @@ public class X509CA
         }
 
         boolean allPublishersOnlyForRevokedCerts = true;
-        for(IdentifiedCertPublisher publisher : publishers)
+        for(IdentifiedX509CertPublisher publisher : publishers)
         {
             if(publisher.publishsGoodCert())
             {
@@ -1427,7 +1427,7 @@ public class X509CA
                         maxSerial = serial;
                     }
 
-                    CertificateInfo certInfo;
+                    X509CertificateInfo certInfo;
 
                     try
                     {
@@ -1443,7 +1443,7 @@ public class X509CA
                         return false;
                     }
 
-                    for(IdentifiedCertPublisher publisher : publishers)
+                    for(IdentifiedX509CertPublisher publisher : publishers)
                     {
                         boolean successfull = publisher.certificateAdded(certInfo);
                         if(successfull == false)
@@ -1462,7 +1462,7 @@ public class X509CA
 
             if(caInfo.getRevocationInfo() != null)
             {
-                for(IdentifiedCertPublisher publisher : publishers)
+                for(IdentifiedX509CertPublisher publisher : publishers)
                 {
                     boolean successfull = publisher.caRevoked(caInfo.getCertificate(), caInfo.getRevocationInfo());
                     if(successfull == false)
@@ -1512,7 +1512,7 @@ public class X509CA
     public boolean publishCertsInQueue()
     {
         boolean allSuccessfull = true;
-        for(IdentifiedCertPublisher publisher : getPublishers())
+        for(IdentifiedX509CertPublisher publisher : getPublishers())
         {
             if(publishCertsInQueue(publisher) == false)
             {
@@ -1523,7 +1523,7 @@ public class X509CA
         return allSuccessfull;
     }
 
-    private boolean publishCertsInQueue(IdentifiedCertPublisher publisher)
+    private boolean publishCertsInQueue(IdentifiedX509CertPublisher publisher)
     {
         X509CertificateWithMetaInfo caCert = caInfo.getCertificate();
 
@@ -1553,7 +1553,7 @@ public class X509CA
 
             for(Integer certId : certIds)
             {
-                CertificateInfo certInfo;
+                X509CertificateInfo certInfo;
 
                 try
                 {
@@ -1606,7 +1606,7 @@ public class X509CA
             return false;
         }
 
-        for(IdentifiedCertPublisher publisher : getPublishers())
+        for(IdentifiedX509CertPublisher publisher : getPublishers())
         {
             try
             {
@@ -1626,7 +1626,7 @@ public class X509CA
         return true;
     }
 
-    public CertWithRevocationInfo revokeCertificate(BigInteger serialNumber,
+    public X509CertWithRevocationInfo revokeCertificate(BigInteger serialNumber,
             CRLReason reason, Date invalidityTime)
     throws OperationException
     {
@@ -1687,7 +1687,7 @@ public class X509CA
     private X509CertificateWithMetaInfo do_removeCertificate(BigInteger serialNumber)
     throws OperationException
     {
-        CertWithRevocationInfo certWithRevInfo =
+        X509CertWithRevocationInfo certWithRevInfo =
                 certstore.getCertWithRevocationInfo(caInfo.getCertificate(), serialNumber);
         if(certWithRevInfo == null)
         {
@@ -1696,7 +1696,7 @@ public class X509CA
 
         boolean successful = true;
         X509CertificateWithMetaInfo certToRemove = certWithRevInfo.getCert();
-        for(IdentifiedCertPublisher publisher : getPublishers())
+        for(IdentifiedX509CertPublisher publisher : getPublishers())
         {
             boolean singleSuccessful;
             try
@@ -1737,7 +1737,7 @@ public class X509CA
         return certToRemove;
     }
 
-    private CertWithRevocationInfo do_revokeCertificate(BigInteger serialNumber,
+    private X509CertWithRevocationInfo do_revokeCertificate(BigInteger serialNumber,
             CRLReason reason, Date invalidityTime, boolean force)
     throws OperationException
     {
@@ -1745,7 +1745,7 @@ public class X509CA
                 new Object[]{caInfo.getName(), serialNumber, reason.getDescription(), invalidityTime});
 
         numActiveRevocations.addAndGet(1);
-        CertWithRevocationInfo revokedCert = null;
+        X509CertWithRevocationInfo revokedCert = null;
 
         try
         {
@@ -1758,7 +1758,7 @@ public class X509CA
                 return null;
             }
 
-            for(IdentifiedCertPublisher publisher : getPublishers())
+            for(IdentifiedX509CertPublisher publisher : getPublishers())
             {
                 if(publisher.isAsyn() == false)
                 {
@@ -1831,7 +1831,7 @@ public class X509CA
                 return null;
             }
 
-            for(IdentifiedCertPublisher publisher : getPublishers())
+            for(IdentifiedX509CertPublisher publisher : getPublishers())
             {
                 if(publisher.isAsyn())
                 {
@@ -1918,7 +1918,7 @@ public class X509CA
                 revocationInfo.getInvalidityTime(), true);
         }
 
-        for(IdentifiedCertPublisher publisher : getPublishers())
+        for(IdentifiedX509CertPublisher publisher : getPublishers())
         {
             try
             {
@@ -1950,7 +1950,7 @@ public class X509CA
             do_unrevokeCertificate(caInfo.getSerialNumber(), true);
         }
 
-        for(IdentifiedCertPublisher publisher : getPublishers())
+        for(IdentifiedX509CertPublisher publisher : getPublishers())
         {
             try
             {
@@ -1973,12 +1973,12 @@ public class X509CA
         }
     }
 
-    private List<IdentifiedCertPublisher> getPublishers()
+    private List<IdentifiedX509CertPublisher> getPublishers()
     {
         return caManager.getIdentifiedPublishersForCa(caInfo.getName());
     }
 
-    private CertificateInfo intern_generateCertificate(boolean requestedByRA,
+    private X509CertificateInfo intern_generateCertificate(boolean requestedByRA,
             String certProfileName,
             String user,
             X500Name requestedSubject,
@@ -1989,7 +1989,7 @@ public class X509CA
             boolean keyUpdate)
     throws OperationException
     {
-        IdentifiedCertProfile certProfile;
+        IdentifiedX509CertProfile certProfile;
         try
         {
             certProfile = getX509CertProfile(certProfileName);
@@ -2060,7 +2060,7 @@ public class X509CA
         }
 
         Date gSMC_KFirstNotBefore = null;
-        if(certProfile.getSpecialCertProfileBehavior() == SpecialCertProfileBehavior.gematik_gSMC_K)
+        if(certProfile.getSpecialCertProfileBehavior() == SpecialX509CertProfileBehavior.gematik_gSMC_K)
         {
             gSMC_KFirstNotBefore = notBefore;
 
@@ -2173,10 +2173,10 @@ public class X509CA
                     }
                     else
                     {
-                        CertificateInfo certInfo;
+                        X509CertificateInfo certInfo;
                         try
                         {
-                            certInfo = new CertificateInfo(issuedCert,
+                            certInfo = new X509CertificateInfo(issuedCert,
                                     caInfo.getCertificate(), subjectPublicKeyData, certProfileName);
                         } catch (CertificateEncodingException e)
                         {
@@ -2377,9 +2377,9 @@ public class X509CA
             Date maxNotAfter = validity.add(notBefore);
             Date origMaxNotAfter = maxNotAfter;
 
-            if(certProfile.getSpecialCertProfileBehavior() == SpecialCertProfileBehavior.gematik_gSMC_K)
+            if(certProfile.getSpecialCertProfileBehavior() == SpecialX509CertProfileBehavior.gematik_gSMC_K)
             {
-                String s = certProfile.getParameter(SpecialCertProfileBehavior.PARAMETER_MAXLIFTIME);
+                String s = certProfile.getParameter(SpecialX509CertProfileBehavior.PARAMETER_MAXLIFTIME);
                 long maxLifetimeInDays = Long.parseLong(s);
                 Date maxLifetime = new Date(gSMC_KFirstNotBefore.getTime() + maxLifetimeInDays * DAY - SECOND);
                 if(maxNotAfter.after(maxLifetime))
@@ -2450,7 +2450,7 @@ public class X509CA
                     grantedSubject,
                     publicKeyInfo);
 
-            CertificateInfo ret;
+            X509CertificateInfo ret;
 
             try
             {
@@ -2496,7 +2496,7 @@ public class X509CA
 
                 X509CertificateWithMetaInfo certWithMeta = new X509CertificateWithMetaInfo(cert, encodedCert);
 
-                ret = new CertificateInfo(certWithMeta, caInfo.getCertificate(),
+                ret = new X509CertificateInfo(certWithMeta, caInfo.getCertificate(),
                         subjectPublicKeyData, certProfileName);
                 ret.setUser(user);
 
@@ -2572,7 +2572,7 @@ public class X509CA
     }
 
     private String addExtensions(X509v3CertificateBuilder certBuilder,
-            IdentifiedCertProfile certProfile,
+            IdentifiedX509CertProfile certProfile,
             X500Name requestedSubject,
             SubjectPublicKeyInfo requestedPublicKeyInfo,
             org.bouncycastle.asn1.x509.Extensions requestedExtensions,
@@ -2595,7 +2595,7 @@ public class X509CA
         return extensionTuples.getWarning();
     }
 
-    public IdentifiedCertProfile getX509CertProfile(String certProfileName)
+    public IdentifiedX509CertProfile getX509CertProfile(String certProfileName)
     throws CertProfileException
     {
         if(certProfileName != null)
@@ -2613,7 +2613,7 @@ public class X509CA
 
     private void addSubjectKeyIdentifier(
             X509v3CertificateBuilder certBuilder, SubjectPublicKeyInfo publicKeyInfo,
-            IdentifiedCertProfile profile)
+            IdentifiedX509CertProfile profile)
     throws IOException
     {
         ExtensionOccurrence extOccurrence = profile.getOccurenceOfSubjectKeyIdentifier();
@@ -2629,7 +2629,7 @@ public class X509CA
         certBuilder.addExtension(Extension.subjectKeyIdentifier, extOccurrence.isCritical(), value);
     }
 
-    private void addAuthorityKeyIdentifier(X509v3CertificateBuilder certBuilder, IdentifiedCertProfile profile)
+    private void addAuthorityKeyIdentifier(X509v3CertificateBuilder certBuilder, IdentifiedX509CertProfile profile)
     throws IOException
     {
         ExtensionOccurrence extOccurrence = profile.getOccurenceOfAuthorityKeyIdentifier();
@@ -2653,7 +2653,7 @@ public class X509CA
         certBuilder.addExtension(Extension.authorityKeyIdentifier, extOccurrence.isCritical(), value);
     }
 
-    private void addIssuerAltName(X509v3CertificateBuilder certBuilder, IdentifiedCertProfile profile)
+    private void addIssuerAltName(X509v3CertificateBuilder certBuilder, IdentifiedX509CertProfile profile)
     throws IOException, CertProfileException
     {
         ExtensionOccurrence extOccurrence = profile.getOccurenceOfIssuerAltName();
@@ -2675,7 +2675,7 @@ public class X509CA
         }
     }
 
-    private void addAuthorityInformationAccess(X509v3CertificateBuilder certBuilder, IdentifiedCertProfile profile)
+    private void addAuthorityInformationAccess(X509v3CertificateBuilder certBuilder, IdentifiedX509CertProfile profile)
     throws IOException, CertProfileException
     {
         ExtensionOccurrence extOccurrence = profile.getOccurenceOfAuthorityInfoAccess();
@@ -2699,7 +2699,7 @@ public class X509CA
         }
     }
 
-    private void addCRLDistributionPoints(X509v3CertificateBuilder certBuilder, IdentifiedCertProfile profile)
+    private void addCRLDistributionPoints(X509v3CertificateBuilder certBuilder, IdentifiedX509CertProfile profile)
     throws IOException, CertProfileException
     {
         ExtensionOccurrence extOccurrence = profile.getOccurenceOfCRLDistributinPoints();
@@ -2736,7 +2736,7 @@ public class X509CA
         }
     }
 
-    private void addDeltaCRLDistributionPoints(X509v3CertificateBuilder certBuilder, IdentifiedCertProfile profile)
+    private void addDeltaCRLDistributionPoints(X509v3CertificateBuilder certBuilder, IdentifiedX509CertProfile profile)
     throws IOException, CertProfileException
     {
         ExtensionOccurrence extOccurrence = profile.getOccurenceOfFreshestCRL();
@@ -2912,7 +2912,7 @@ public class X509CA
             result.addChildCheck(crlSignerHealth);
         }
 
-        for(IdentifiedCertPublisher publisher : getPublishers())
+        for(IdentifiedX509CertPublisher publisher : getPublishers())
         {
             boolean ph = publisher.isHealthy();
             healthy &= ph;
@@ -2945,7 +2945,7 @@ public class X509CA
         return ae;
     }
 
-    private static Object[] incSerialNumber(IdentifiedCertProfile profile, X500Name origName, String latestSN)
+    private static Object[] incSerialNumber(IdentifiedX509CertProfile profile, X500Name origName, String latestSN)
     throws BadFormatException
     {
         RDN[] rdns = origName.getRDNs();

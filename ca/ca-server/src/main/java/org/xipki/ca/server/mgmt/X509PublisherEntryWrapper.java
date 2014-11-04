@@ -39,7 +39,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.xipki.audit.api.AuditLoggingServiceRegister;
-import org.xipki.ca.api.publisher.CertPublisher;
+import org.xipki.ca.api.publisher.X509CertPublisher;
 import org.xipki.ca.common.CertPublisherException;
 import org.xipki.ca.server.mgmt.api.PublisherEntry;
 import org.xipki.ca.server.publisher.OCSPCertPublisher;
@@ -52,14 +52,14 @@ import org.xipki.security.api.PasswordResolver;
  * @author Lijun Liao
  */
 
-public class PublisherEntryWrapper
+public class X509PublisherEntryWrapper
 {
-    private static final Map<String, IdentifiedCertPublisher> publisherPool = new HashMap<>();
+    private static final Map<String, IdentifiedX509CertPublisher> publisherPool = new HashMap<>();
 
     private final PublisherEntry entry;
-    private final IdentifiedCertPublisher certPublisher;
+    private final IdentifiedX509CertPublisher certPublisher;
 
-    public PublisherEntryWrapper(PublisherEntry entry, PasswordResolver passwordResolver,
+    public X509PublisherEntryWrapper(PublisherEntry entry, PasswordResolver passwordResolver,
             Map<String, DataSourceWrapper> dataSourceMap)
     throws CertPublisherException
     {
@@ -78,19 +78,19 @@ public class PublisherEntryWrapper
         return entry.getName();
     }
 
-    public static IdentifiedCertPublisher createCertPublisher(PublisherEntry entry,
+    public static IdentifiedX509CertPublisher createCertPublisher(PublisherEntry entry,
             PasswordResolver passwordResolver, Map<String, DataSourceWrapper> dataSourceMap)
     throws CertPublisherException
     {
         final String type = entry.getType();
         final String conf = entry.getConf();
-        IdentifiedCertPublisher cachedPublisher = publisherPool.get(type + conf);
+        IdentifiedX509CertPublisher cachedPublisher = publisherPool.get(type + conf);
         if(cachedPublisher != null)
         {
             return cachedPublisher;
         }
 
-        CertPublisher realPublisher;
+        X509CertPublisher realPublisher;
         if("ocsp".equalsIgnoreCase(type) ||
                 "java:org.xipki.ca.server.publisher.DefaultCertPublisher".equals(type) || // for backwards compatibility
                 "java:org.xipki.ca.server.publisher.OCSPCertPublisher".equals(type))
@@ -103,7 +103,7 @@ public class PublisherEntryWrapper
             try
             {
                 Class<?> clazz = Class.forName(className);
-                realPublisher = (CertPublisher) clazz.newInstance();
+                realPublisher = (X509CertPublisher) clazz.newInstance();
             }catch(Exception e)
             {
                 throw new CertPublisherException("invalid type " + type + ", " + e.getMessage());
@@ -130,7 +130,7 @@ public class PublisherEntryWrapper
             ocspDataSource = dataSourceMap.get(datasourceName);
         }
 
-        IdentifiedCertPublisher certPublisher = new IdentifiedCertPublisher(entry.getName(), realPublisher);
+        IdentifiedX509CertPublisher certPublisher = new IdentifiedX509CertPublisher(entry.getName(), realPublisher);
         certPublisher.initialize(conf, passwordResolver, ocspDataSource);
 
         return certPublisher;
@@ -147,7 +147,7 @@ public class PublisherEntryWrapper
         certPublisher.setAuditServiceRegister(serviceRegister);
     }
 
-    public IdentifiedCertPublisher getCertPublisher()
+    public IdentifiedX509CertPublisher getCertPublisher()
     {
         return certPublisher;
     }

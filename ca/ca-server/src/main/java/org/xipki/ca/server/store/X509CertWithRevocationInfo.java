@@ -33,69 +33,49 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.ca.api.profile;
+package org.xipki.ca.server.store;
+
+import org.xipki.ca.common.X509CertificateWithMetaInfo;
+import org.xipki.common.CertRevocationInfo;
 
 /**
  * @author Lijun Liao
  */
 
-public enum KeyUsage
+public class X509CertWithRevocationInfo
 {
-    digitalSignature  (0, "digitalSignature"),
-    contentCommitment (1, "contentCommitment", "nonRepudiation"),
-    keyEncipherment   (2, "keyEncipherment"),
-    dataEncipherment  (3, "dataEncipherment"),
-    keyAgreement      (4, "keyAgreement"),
-    keyCertSign       (5, "keyCertSign"),
-    cRLSign           (6, "cRLSign"),
-    encipherOnly      (7, "encipherOnly"),
-    decipherOnly      (8, "decipherOnly");
+    private X509CertificateWithMetaInfo cert;
+    private CertRevocationInfo revInfo;
 
-    private int bit;
-    private String[] names;
-
-    private KeyUsage(int bit, String... names)
+    public X509CertWithRevocationInfo(X509CertificateWithMetaInfo cert, CertRevocationInfo revInfo)
     {
-        this.bit = bit;
-        this.names = names;
+        this.cert = cert;
+        this.revInfo = revInfo;
     }
 
-    public static KeyUsage getKeyUsage(String usage)
+    public X509CertificateWithMetaInfo getCert()
     {
-        if(usage == null)
-        {
-            return null;
-        }
-
-        for(KeyUsage ku : KeyUsage.values())
-        {
-            for(String name : ku.names)
-            {
-                if(name.equals(usage))
-                {
-                    return ku;
-                }
-            }
-        }
-
-        return null;
+        return cert;
     }
 
-    public static KeyUsage getKeyUsage(int bit)
+    public boolean isRevoked()
     {
-        for(KeyUsage ku : KeyUsage.values())
-        {
-            if(ku.bit == bit)
-            {
-                return ku;
-            }
-        }
-
-        return null;
+        return revInfo != null;
     }
 
-    public String getName()
+    public CertRevocationInfo getRevInfo()
     {
-        return names[0];
+        return revInfo;
     }
+
+    public void setCert(X509CertificateWithMetaInfo cert)
+    {
+        this.cert = cert;
+    }
+
+    public void setRevInfo(CertRevocationInfo revInfo)
+    {
+        this.revInfo = revInfo;
+    }
+
 }

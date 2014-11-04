@@ -33,31 +33,28 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.ca.api.profile;
+package org.xipki.ca.api.profile.x509;
 
 /**
  * @author Lijun Liao
  */
 
-public abstract class AbstractEECertProfile extends AbstractCertProfile
+public enum SpecialX509CertProfileBehavior
 {
+    gematik_gSMC_K;
 
-    @Override
-    public ExtensionOccurrence getOccurenceOfAuthorityKeyIdentifier()
-    {
-        return ExtensionOccurrence.NONCRITICAL_REQUIRED;
-    }
+    public static final String PARAMETER_MAXLIFTIME = "maxLifetime";
 
-    @Override
-    protected boolean isCa()
+    public static SpecialX509CertProfileBehavior getInstance(String behavior)
     {
-        return false;
-    }
+        for(SpecialX509CertProfileBehavior b : values())
+        {
+            if(b.name().equalsIgnoreCase(behavior))
+            {
+                return b;
+            }
+        }
 
-    @Override
-    protected Integer getPathLenBasicConstraint()
-    {
         return null;
     }
-
 }

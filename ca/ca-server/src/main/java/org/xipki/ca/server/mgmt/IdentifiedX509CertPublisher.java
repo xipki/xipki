@@ -38,8 +38,8 @@ package org.xipki.ca.server.mgmt;
 import java.security.cert.X509CRL;
 
 import org.xipki.audit.api.AuditLoggingServiceRegister;
-import org.xipki.ca.api.publisher.CertPublisher;
-import org.xipki.ca.api.publisher.CertificateInfo;
+import org.xipki.ca.api.publisher.X509CertPublisher;
+import org.xipki.ca.api.publisher.X509CertificateInfo;
 import org.xipki.ca.common.CertPublisherException;
 import org.xipki.ca.common.X509CertificateWithMetaInfo;
 import org.xipki.common.CertRevocationInfo;
@@ -52,12 +52,12 @@ import org.xipki.security.api.PasswordResolver;
  * @author Lijun Liao
  */
 
-public class IdentifiedCertPublisher
+public class IdentifiedX509CertPublisher
 {
     private final String name;
-    private final CertPublisher certPublisher;
+    private final X509CertPublisher certPublisher;
 
-    public IdentifiedCertPublisher(String name, CertPublisher certPublisher)
+    public IdentifiedX509CertPublisher(String name, X509CertPublisher certPublisher)
     {
         ParamChecker.assertNotEmpty("name", name);
         ParamChecker.assertNotNull("certPublisher", certPublisher);
@@ -83,7 +83,7 @@ public class IdentifiedCertPublisher
         return certPublisher.issuerAdded(issuerCert);
     }
 
-    public boolean certificateAdded(CertificateInfo certInfo)
+    public boolean certificateAdded(X509CertificateInfo certInfo)
     {
         return certPublisher.certificateAdded(certInfo);
     }

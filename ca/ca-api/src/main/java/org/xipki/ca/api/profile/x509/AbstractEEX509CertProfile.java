@@ -33,49 +33,33 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.ca.server.store;
+package org.xipki.ca.api.profile.x509;
 
-import org.xipki.ca.common.X509CertificateWithMetaInfo;
-import org.xipki.common.CertRevocationInfo;
+import org.xipki.ca.api.profile.ExtensionOccurrence;
 
 /**
  * @author Lijun Liao
  */
 
-public class CertWithRevocationInfo
+public abstract class AbstractEEX509CertProfile extends AbstractX509CertProfile
 {
-    private X509CertificateWithMetaInfo cert;
-    private CertRevocationInfo revInfo;
 
-    public CertWithRevocationInfo(X509CertificateWithMetaInfo cert, CertRevocationInfo revInfo)
+    @Override
+    public ExtensionOccurrence getOccurenceOfAuthorityKeyIdentifier()
     {
-        this.cert = cert;
-        this.revInfo = revInfo;
+        return ExtensionOccurrence.NONCRITICAL_REQUIRED;
     }
 
-    public X509CertificateWithMetaInfo getCert()
+    @Override
+    protected boolean isCa()
     {
-        return cert;
+        return false;
     }
 
-    public boolean isRevoked()
+    @Override
+    protected Integer getPathLenBasicConstraint()
     {
-        return revInfo != null;
-    }
-
-    public CertRevocationInfo getRevInfo()
-    {
-        return revInfo;
-    }
-
-    public void setCert(X509CertificateWithMetaInfo cert)
-    {
-        this.cert = cert;
-    }
-
-    public void setRevInfo(CertRevocationInfo revInfo)
-    {
-        this.revInfo = revInfo;
+        return null;
     }
 
 }

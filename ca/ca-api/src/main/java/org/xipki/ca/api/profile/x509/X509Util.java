@@ -33,7 +33,7 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.ca.api.profile;
+package org.xipki.ca.api.profile.x509;
 
 import java.io.IOException;
 import java.util.ArrayList;

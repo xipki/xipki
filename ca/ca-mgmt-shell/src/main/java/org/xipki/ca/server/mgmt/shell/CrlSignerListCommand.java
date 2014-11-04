@@ -43,7 +43,7 @@ import java.util.Set;
 import org.apache.felix.gogo.commands.Argument;
 import org.apache.felix.gogo.commands.Command;
 import org.apache.felix.gogo.commands.Option;
-import org.xipki.ca.server.mgmt.api.CrlSignerEntry;
+import org.xipki.ca.server.mgmt.api.X509CrlSignerEntry;
 
 /**
  * @author Lijun Liao
@@ -89,7 +89,7 @@ public class CrlSignerListCommand extends CaCommand
         }
         else
         {
-            CrlSignerEntry entry = caManager.getCrlSigner(name);
+            X509CrlSignerEntry entry = caManager.getCrlSigner(name);
             if(entry != null)
             {
                 sb.append(entry.toString(verbose.booleanValue()));

@@ -39,7 +39,7 @@ package org.xipki.ca.server.certprofile;
  * @author Lijun Liao
  */
 
-class KeyParamRange
+public class KeyParamRange
 {
     private final Integer min;
     private final Integer max;

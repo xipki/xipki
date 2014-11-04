@@ -48,7 +48,7 @@ import org.xipki.common.ParamChecker;
  * @author Lijun Liao
  */
 
-public class CrlSignerEntry implements Serializable
+public class X509CrlSignerEntry implements Serializable
 {
     private static final long serialVersionUID = 1L;
     private final String name;
@@ -58,7 +58,7 @@ public class CrlSignerEntry implements Serializable
 
     private String crlControl;
 
-    public CrlSignerEntry(String name, String signerType, String signerConf, String crlControl)
+    public X509CrlSignerEntry(String name, String signerType, String signerConf, String crlControl)
     throws ConfigurationException
     {
         ParamChecker.assertNotEmpty("name", name);

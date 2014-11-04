@@ -33,7 +33,10 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.ca.api.profile;
+package org.xipki.ca.api.profile.x509;
+
+import java.util.Collections;
+import java.util.List;
 
 import org.xipki.common.ParamChecker;
 
@@ -41,37 +44,26 @@ import org.xipki.common.ParamChecker;
  * @author Lijun Liao
  */
 
-public class CertificatePolicyQualifier
+public class CertificatePolicyInformation
 {
-    private final String cpsUri;
-    private final String userNotice;
+    private final String certPolicyId;
+    private final List<CertificatePolicyQualifier> qualifiers;
 
-    private CertificatePolicyQualifier(String cpsUri, String userNotice)
+    public CertificatePolicyInformation(String certPolicyId, List<CertificatePolicyQualifier> qualifiers)
     {
-        this.cpsUri = cpsUri;
-        this.userNotice = userNotice;
+        ParamChecker.assertNotEmpty("certPolicyId", certPolicyId);
+        this.certPolicyId = certPolicyId;
+        this.qualifiers = qualifiers == null ? null : Collections.unmodifiableList(qualifiers);
     }
 
-    public static CertificatePolicyQualifier getInstanceForUserNotice(String userNotice)
+    public String getCertPolicyId()
     {
-        ParamChecker.assertNotEmpty("userNotice", userNotice);
-        return new CertificatePolicyQualifier(null, userNotice);
+        return certPolicyId;
     }
 
-    public static CertificatePolicyQualifier getInstanceForCpsUri(String cpsUri)
+    public List<CertificatePolicyQualifier> getQualifiers()
     {
-        ParamChecker.assertNotEmpty("cpsUri", cpsUri);
-        return new CertificatePolicyQualifier(cpsUri, null);
-    }
-
-    public String getCpsUri()
-    {
-        return cpsUri;
-    }
-
-    public String getUserNotice()
-    {
-        return userNotice;
+        return qualifiers;
     }
 
 }

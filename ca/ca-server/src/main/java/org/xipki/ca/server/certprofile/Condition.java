@@ -47,7 +47,7 @@ import org.xipki.common.EnvironmentParameterResolver;
  * @author Lijun Liao
  */
 
-class Condition
+public class Condition
 {
     private static class EnvParamConditionEntry
     {
@@ -64,7 +64,7 @@ class Condition
     private final OperatorType operator;
     private final List<EnvParamConditionEntry> entries;
 
-    Condition(ConditionType type)
+    public Condition(ConditionType type)
     {
         operator = type.getOperator() == null ? OperatorType.AND : type.getOperator();
         List<EnvParamType> envParams = type.getEnvParam();
@@ -76,7 +76,7 @@ class Condition
         }
     }
 
-    boolean satisfy(EnvironmentParameterResolver pr)
+    public boolean satisfy(EnvironmentParameterResolver pr)
     {
         if(pr == null)
         {

@@ -33,33 +33,69 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.ca.server.store;
-
-import org.xipki.ca.common.X509CertificateWithMetaInfo;
+package org.xipki.ca.api.profile.x509;
 
 /**
  * @author Lijun Liao
  */
 
-public class CertWithRevokedInfo
+public enum KeyUsage
 {
-    private final X509CertificateWithMetaInfo cert;
-    private final boolean revoked;
+    digitalSignature  (0, "digitalSignature"),
+    contentCommitment (1, "contentCommitment", "nonRepudiation"),
+    keyEncipherment   (2, "keyEncipherment"),
+    dataEncipherment  (3, "dataEncipherment"),
+    keyAgreement      (4, "keyAgreement"),
+    keyCertSign       (5, "keyCertSign"),
+    cRLSign           (6, "cRLSign"),
+    encipherOnly      (7, "encipherOnly"),
+    decipherOnly      (8, "decipherOnly");
 
-    public CertWithRevokedInfo(X509CertificateWithMetaInfo cert, boolean revoked)
+    private int bit;
+    private String[] names;
+
+    private KeyUsage(int bit, String... names)
     {
-        this.cert = cert;
-        this.revoked = revoked;
+        this.bit = bit;
+        this.names = names;
     }
 
-    public X509CertificateWithMetaInfo getCert()
+    public static KeyUsage getKeyUsage(String usage)
     {
-        return cert;
+        if(usage == null)
+        {
+            return null;
+        }
+
+        for(KeyUsage ku : KeyUsage.values())
+        {
+            for(String name : ku.names)
+            {
+                if(name.equals(usage))
+                {
+                    return ku;
+                }
+            }
+        }
+
+        return null;
     }
 
-    public boolean isRevoked()
+    public static KeyUsage getKeyUsage(int bit)
     {
-        return revoked;
+        for(KeyUsage ku : KeyUsage.values())
+        {
+            if(ku.bit == bit)
+            {
+                return ku;
+            }
+        }
+
+        return null;
     }
 
+    public String getName()
+    {
+        return names[0];
+    }
 }

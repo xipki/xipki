@@ -45,7 +45,7 @@ import org.xipki.common.ParamChecker;
  * @author Lijun Liao
  */
 
-class ExtensionTupleOptions
+public class ExtensionTupleOptions
 {
     private final List<ExtensionTupleOption> options;
 

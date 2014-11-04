@@ -72,7 +72,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.ca.api.OperationException;
 import org.xipki.ca.api.OperationException.ErrorCode;
-import org.xipki.ca.api.publisher.CertificateInfo;
+import org.xipki.ca.api.publisher.X509CertificateInfo;
 import org.xipki.ca.common.RequestorInfo;
 import org.xipki.ca.common.X509CertificateWithMetaInfo;
 import org.xipki.ca.server.CertRevocationInfoWithSerial;
@@ -559,11 +559,11 @@ class CertStoreQueryExecutor
         }
     }
 
-    CertWithRevocationInfo revokeCert(X509CertificateWithMetaInfo caCert, BigInteger serialNumber,
+    X509CertWithRevocationInfo revokeCert(X509CertificateWithMetaInfo caCert, BigInteger serialNumber,
             CertRevocationInfo revInfo, boolean force, boolean publishToDeltaCRLCache)
     throws OperationException, SQLException
     {
-        CertWithRevocationInfo certWithRevInfo = getCertWithRevocationInfo(caCert, serialNumber);
+        X509CertWithRevocationInfo certWithRevInfo = getCertWithRevocationInfo(caCert, serialNumber);
         if(certWithRevInfo == null)
         {
             LOG.warn("Certificate with issuer={} and serialNumber={} does not exist",
@@ -651,7 +651,7 @@ class CertStoreQueryExecutor
             boolean force, boolean publishToDeltaCRLCache)
     throws OperationException, SQLException
     {
-        CertWithRevocationInfo certWithRevInfo = getCertWithRevocationInfo(caCert, serialNumber);
+        X509CertWithRevocationInfo certWithRevInfo = getCertWithRevocationInfo(caCert, serialNumber);
         if(certWithRevInfo == null)
         {
             LOG.warn("Certificate with issuer={} and serialNumber={} does not exist",
@@ -746,7 +746,7 @@ class CertStoreQueryExecutor
     X509CertificateWithMetaInfo getCert(X509CertificateWithMetaInfo caCert, BigInteger serialNumber)
     throws OperationException, SQLException
     {
-        CertWithRevocationInfo certWithRevInfo = getCertWithRevocationInfo(caCert, serialNumber);
+        X509CertWithRevocationInfo certWithRevInfo = getCertWithRevocationInfo(caCert, serialNumber);
         if(certWithRevInfo == null)
         {
             return null;
@@ -1209,7 +1209,7 @@ class CertStoreQueryExecutor
         return numCrlsToDelete;
     }
 
-    CertificateInfo getCertForId(X509CertificateWithMetaInfo caCert, int certId)
+    X509CertificateInfo getCertForId(X509CertificateWithMetaInfo caCert, int certId)
     throws SQLException, OperationException, CertificateException
     {
         ParamChecker.assertNotNull("caCert", caCert);
@@ -1250,7 +1250,7 @@ class CertStoreQueryExecutor
 
                 X509CertificateWithMetaInfo certWithMeta = new X509CertificateWithMetaInfo(cert, encodedCert);
 
-                CertificateInfo certInfo = new CertificateInfo(certWithMeta,
+                X509CertificateInfo certInfo = new X509CertificateInfo(certWithMeta,
                         caCert, cert.getPublicKey().getEncoded(), certProfileName);
 
                 boolean revoked = rs.getBoolean(col_revoked);
@@ -1325,7 +1325,7 @@ class CertStoreQueryExecutor
         return null;
     }
 
-    CertWithRevocationInfo getCertWithRevocationInfo(X509CertificateWithMetaInfo caCert, BigInteger serial)
+    X509CertWithRevocationInfo getCertWithRevocationInfo(X509CertificateWithMetaInfo caCert, BigInteger serial)
     throws SQLException, OperationException
     {
         ParamChecker.assertNotNull("caCert", caCert);
@@ -1385,7 +1385,7 @@ class CertStoreQueryExecutor
 
                 X509CertificateWithMetaInfo certWithMeta = new X509CertificateWithMetaInfo(cert, certBytes);
                 certWithMeta.setCertId(certId);
-                return new CertWithRevocationInfo(certWithMeta, revInfo);
+                return new X509CertWithRevocationInfo(certWithMeta, revInfo);
             }
         }finally
         {
@@ -1395,7 +1395,7 @@ class CertStoreQueryExecutor
         return null;
     }
 
-    CertificateInfo getCertificateInfo(X509CertificateWithMetaInfo caCert, BigInteger serial)
+    X509CertificateInfo getCertificateInfo(X509CertificateWithMetaInfo caCert, BigInteger serial)
     throws SQLException, OperationException, CertificateException
     {
         ParamChecker.assertNotNull("caCert", caCert);
@@ -1447,7 +1447,7 @@ class CertStoreQueryExecutor
 
                 byte[] subjectPublicKeyInfo = Certificate.getInstance(encodedCert).getTBSCertificate()
                         .getSubjectPublicKeyInfo().getEncoded();
-                CertificateInfo certInfo = new CertificateInfo(certWithMeta,
+                X509CertificateInfo certInfo = new X509CertificateInfo(certWithMeta,
                         caCert, subjectPublicKeyInfo, certProfileName);
 
                 boolean revoked = rs.getBoolean(col_revoked);

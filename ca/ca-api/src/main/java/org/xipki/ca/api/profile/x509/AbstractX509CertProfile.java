@@ -33,7 +33,7 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.ca.api.profile;
+package org.xipki.ca.api.profile.x509;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -56,6 +56,11 @@ import org.bouncycastle.asn1.x509.ExtendedKeyUsage;
 import org.bouncycastle.asn1.x509.Extension;
 import org.bouncycastle.asn1.x509.Extensions;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
+import org.xipki.ca.api.profile.ExtensionOccurrence;
+import org.xipki.ca.api.profile.ExtensionTuple;
+import org.xipki.ca.api.profile.ExtensionTuples;
+import org.xipki.ca.api.profile.RDNOccurrence;
+import org.xipki.ca.api.profile.SubjectInfo;
 import org.xipki.ca.common.BadCertTemplateException;
 import org.xipki.ca.common.CertProfileException;
 import org.xipki.common.EnvironmentParameterResolver;
@@ -66,8 +71,8 @@ import org.xipki.common.StringUtil;
  * @author Lijun Liao
  */
 
-public abstract class AbstractCertProfile
-extends CertProfile
+public abstract class AbstractX509CertProfile
+extends X509CertProfile
 {
     private static Set<String> countryCodes;
 
@@ -125,7 +130,7 @@ extends CertProfile
         }
     }
 
-    protected AbstractCertProfile()
+    protected AbstractX509CertProfile()
     {
     }
 

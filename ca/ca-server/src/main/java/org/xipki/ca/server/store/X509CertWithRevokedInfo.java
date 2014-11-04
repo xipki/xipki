@@ -33,35 +33,33 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.ca.server.certprofile;
+package org.xipki.ca.server.store;
 
-import java.util.Set;
-
-import org.xipki.ca.api.profile.KeyUsage;
+import org.xipki.ca.common.X509CertificateWithMetaInfo;
 
 /**
  * @author Lijun Liao
  */
 
-class KeyUsageOption
+public class X509CertWithRevokedInfo
 {
-    private final Condition condition;
-    private final Set<KeyUsage> keyusages;
+    private final X509CertificateWithMetaInfo cert;
+    private final boolean revoked;
 
-    public KeyUsageOption(Condition condition, Set<KeyUsage> keyusages)
+    public X509CertWithRevokedInfo(X509CertificateWithMetaInfo cert, boolean revoked)
     {
-        this.condition = condition;
-        this.keyusages = keyusages;
+        this.cert = cert;
+        this.revoked = revoked;
     }
 
-    public Condition getCondition()
+    public X509CertificateWithMetaInfo getCert()
     {
-        return condition;
+        return cert;
     }
 
-    public Set<KeyUsage> getKeyusages()
+    public boolean isRevoked()
     {
-        return keyusages;
+        return revoked;
     }
 
 }

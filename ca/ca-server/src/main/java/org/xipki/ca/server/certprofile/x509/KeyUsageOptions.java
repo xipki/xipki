@@ -33,34 +33,42 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.ca.server.certprofile;
+package org.xipki.ca.server.certprofile.x509;
 
-import org.xipki.ca.api.profile.ExtensionOccurrence;
+import java.util.List;
+import java.util.Set;
+
+import org.xipki.ca.api.profile.x509.KeyUsage;
+import org.xipki.ca.server.certprofile.Condition;
+import org.xipki.common.EnvironmentParameterResolver;
+import org.xipki.common.ParamChecker;
 
 /**
  * @author Lijun Liao
  */
 
-class AuthorityKeyIdentifierOption
+class KeyUsageOptions
 {
-    private final boolean includeIssuerAndSerial;
-    private final ExtensionOccurrence occurence;
+    private final List<KeyUsageOption> options;
 
-    AuthorityKeyIdentifierOption(boolean includeIssuerAndSerial,
-            ExtensionOccurrence occurence)
+    public KeyUsageOptions(List<KeyUsageOption> options)
     {
-        this.includeIssuerAndSerial = includeIssuerAndSerial;
-        this.occurence = occurence;
+        ParamChecker.assertNotEmpty("options", options);
+        this.options = options;
     }
 
-    boolean isIncludeIssuerAndSerial()
+    public Set<KeyUsage> getKeyusage(EnvironmentParameterResolver pr)
     {
-        return includeIssuerAndSerial;
-    }
+        for(KeyUsageOption o : options)
+        {
+            Condition c = o.getCondition();
+            if(c == null || c.satisfy(pr))
+            {
+                return o.getKeyusages();
+            }
+        }
 
-    ExtensionOccurrence getOccurence()
-    {
-        return occurence;
+        return null;
     }
 
 }

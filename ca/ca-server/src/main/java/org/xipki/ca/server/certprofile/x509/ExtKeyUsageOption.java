@@ -33,41 +33,36 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.ca.server.certprofile;
+package org.xipki.ca.server.certprofile.x509;
 
-import java.util.List;
 import java.util.Set;
 
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
-import org.xipki.common.EnvironmentParameterResolver;
-import org.xipki.common.ParamChecker;
+import org.xipki.ca.server.certprofile.Condition;
 
 /**
  * @author Lijun Liao
  */
 
-class ExtKeyUsageOptions
+class ExtKeyUsageOption
 {
-    private final List<ExtKeyUsageOption> options;
+    private final Condition condition;
+    private final Set<ASN1ObjectIdentifier> extKeyusages;
 
-    public ExtKeyUsageOptions(List<ExtKeyUsageOption> options)
+    public ExtKeyUsageOption(Condition condition, Set<ASN1ObjectIdentifier> extKeyusages)
     {
-        ParamChecker.assertNotEmpty("options", options);
-        this.options = options;
+        this.condition = condition;
+        this.extKeyusages = extKeyusages;
     }
 
-    public Set<ASN1ObjectIdentifier> getExtKeyusage(EnvironmentParameterResolver pr)
+    public Condition getCondition()
     {
-        for(ExtKeyUsageOption o : options)
-        {
-            Condition c = o.getCondition();
-            if(c == null || c.satisfy(pr))
-            {
-                return o.getExtKeyusages();
-            }
-        }
+        return condition;
+    }
 
-        return null;
+    public Set<ASN1ObjectIdentifier> getExtKeyusages()
+    {
+        return extKeyusages;
     }
 
 }

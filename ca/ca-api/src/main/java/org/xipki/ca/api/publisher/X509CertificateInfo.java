@@ -46,7 +46,7 @@ import org.xipki.common.ParamChecker;
  * @author Lijun Liao
  */
 
-public class CertificateInfo
+public class X509CertificateInfo
 {
     private final byte[] subjectPublicKey;
     private final X509CertificateWithMetaInfo cert;
@@ -61,7 +61,7 @@ public class CertificateInfo
     private CertRevocationInfo revInfo;
     private boolean alreadyIssued;
 
-    public CertificateInfo(X509CertificateWithMetaInfo cert,
+    public X509CertificateInfo(X509CertificateWithMetaInfo cert,
             X509CertificateWithMetaInfo issuerCert,
             byte[] subjectPublicKey,
             String profileName)

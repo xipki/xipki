@@ -42,7 +42,7 @@ import java.util.Set;
 import org.apache.felix.gogo.commands.Command;
 import org.apache.felix.gogo.commands.Option;
 import org.xipki.ca.common.CAStatus;
-import org.xipki.ca.server.mgmt.api.CAEntry;
+import org.xipki.ca.server.mgmt.api.X509CAEntry;
 import org.xipki.ca.server.mgmt.api.DuplicationMode;
 import org.xipki.ca.server.mgmt.api.Permission;
 import org.xipki.ca.server.mgmt.api.ValidityMode;
@@ -109,7 +109,7 @@ public class CaAddCommand extends CaAddOrGenCommand
             caCert = signer.getCertificate();
         }
 
-        CAEntry entry = new CAEntry(caName, nextSerial, signerType, signerConf, caCert,
+        X509CAEntry entry = new X509CAEntry(caName, nextSerial, signerType, signerConf, caCert,
                 ocspUris, crlUris, deltaCrlUris, null, numCrls.intValue(), expirationPeriod.intValue());
 
         DuplicationMode duplicateKey = DuplicationMode.getInstance(duplicateKeyS);

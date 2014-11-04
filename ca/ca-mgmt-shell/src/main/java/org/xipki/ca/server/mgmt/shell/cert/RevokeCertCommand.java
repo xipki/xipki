@@ -39,7 +39,7 @@ import java.math.BigInteger;
 
 import org.apache.felix.gogo.commands.Command;
 import org.apache.felix.gogo.commands.Option;
-import org.xipki.ca.server.mgmt.api.CAEntry;
+import org.xipki.ca.server.mgmt.api.X509CAEntry;
 import org.xipki.ca.server.mgmt.shell.CaCommand;
 import org.xipki.common.CRLReason;
 
@@ -75,7 +75,7 @@ public class RevokeCertCommand extends CaCommand
     protected Object doExecute()
     throws Exception
     {
-        CAEntry ca = caManager.getCA(caName);
+        X509CAEntry ca = caManager.getCA(caName);
         if(ca == null)
         {
             err("CA " + caName + " not available");

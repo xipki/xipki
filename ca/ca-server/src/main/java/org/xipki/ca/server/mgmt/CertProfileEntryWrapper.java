@@ -35,10 +35,10 @@
 
 package org.xipki.ca.server.mgmt;
 
-import org.xipki.ca.api.profile.CertProfile;
-import org.xipki.ca.api.profile.SpecialCertProfileBehavior;
+import org.xipki.ca.api.profile.x509.X509CertProfile;
+import org.xipki.ca.api.profile.x509.SpecialX509CertProfileBehavior;
 import org.xipki.ca.common.CertProfileException;
-import org.xipki.ca.server.certprofile.DefaultCertProfile;
+import org.xipki.ca.server.certprofile.x509.DefaultX509CertProfile;
 import org.xipki.ca.server.mgmt.api.CertProfileEntry;
 import org.xipki.common.EnvironmentParameterResolver;
 import org.xipki.common.ParamChecker;
@@ -50,7 +50,7 @@ import org.xipki.common.ParamChecker;
 public class CertProfileEntryWrapper
 {
     private final CertProfileEntry entry;
-    private final IdentifiedCertProfile certProfile;
+    private final IdentifiedX509CertProfile certProfile;
 
     public CertProfileEntryWrapper(CertProfileEntry entry)
     throws CertProfileException
@@ -70,17 +70,17 @@ public class CertProfileEntryWrapper
         return entry.getName();
     }
 
-    private static IdentifiedCertProfile createIdentifiedCertProfile(CertProfileEntry entry)
+    private static IdentifiedX509CertProfile createIdentifiedCertProfile(CertProfileEntry entry)
     throws CertProfileException
     {
-        CertProfile underlyingCertProfile = null;
+        X509CertProfile underlyingCertProfile = null;
 
         final String type = entry.getType();
         final String conf = entry.getConf();
 
         if(type.equalsIgnoreCase("xml"))
         {
-            underlyingCertProfile = new DefaultCertProfile();
+            underlyingCertProfile = new DefaultX509CertProfile();
         }
         else if(type.toLowerCase().startsWith("java:"))
         {
@@ -88,7 +88,7 @@ public class CertProfileEntryWrapper
             try
             {
                 Class<?> clazz = Class.forName(className);
-                underlyingCertProfile = (CertProfile) clazz.newInstance();
+                underlyingCertProfile = (X509CertProfile) clazz.newInstance();
             }catch(ClassNotFoundException | InstantiationException  | IllegalAccessException | ClassCastException e)
             {
                 throw new CertProfileException("invalid type " + type + ", " + e.getClass().getName() + ": " + e.getMessage());
@@ -99,12 +99,12 @@ public class CertProfileEntryWrapper
             throw new CertProfileException("invalid type " + type);
         }
 
-        IdentifiedCertProfile identifiedCertProfile = new IdentifiedCertProfile(entry.getName(), underlyingCertProfile);
+        IdentifiedX509CertProfile identifiedCertProfile = new IdentifiedX509CertProfile(entry.getName(), underlyingCertProfile);
         identifiedCertProfile.initialize(conf);
 
-        if(identifiedCertProfile.getSpecialCertProfileBehavior() == SpecialCertProfileBehavior.gematik_gSMC_K)
+        if(identifiedCertProfile.getSpecialCertProfileBehavior() == SpecialX509CertProfileBehavior.gematik_gSMC_K)
         {
-            String paramName = SpecialCertProfileBehavior.PARAMETER_MAXLIFTIME;
+            String paramName = SpecialX509CertProfileBehavior.PARAMETER_MAXLIFTIME;
             String s = identifiedCertProfile.getParameter(paramName);
             if(s == null)
             {
@@ -135,7 +135,7 @@ public class CertProfileEntryWrapper
         certProfile.setEnvironmentParameterResolver(envParamResolver);
     }
 
-    public IdentifiedCertProfile getCertProfile()
+    public IdentifiedX509CertProfile getCertProfile()
     {
         return certProfile;
     }

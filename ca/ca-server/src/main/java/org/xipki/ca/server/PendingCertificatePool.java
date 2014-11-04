@@ -42,7 +42,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.bouncycastle.util.encoders.Hex;
-import org.xipki.ca.api.publisher.CertificateInfo;
+import org.xipki.ca.api.publisher.X509CertificateInfo;
 import org.xipki.common.ParamChecker;
 
 /**
@@ -55,11 +55,11 @@ class PendingCertificatePool
     {
         private final BigInteger certReqId;
         private final long waitForConfirmTill;
-        private final CertificateInfo certInfo;
+        private final X509CertificateInfo certInfo;
 
         public MyEntry(BigInteger certReqId,
                 long waitForConfirmTill,
-                CertificateInfo certInfo)
+                X509CertificateInfo certInfo)
         {
             super();
             ParamChecker.assertNotNull("certReqId", certReqId);
@@ -91,7 +91,7 @@ class PendingCertificatePool
     }
 
     synchronized void addCertificate(
-            byte[] tid, BigInteger certReqId, CertificateInfo certInfo, long waitForConfirmTill)
+            byte[] tid, BigInteger certReqId, X509CertificateInfo certInfo, long waitForConfirmTill)
     {
         if(certInfo.isAlreadyIssued())
         {
@@ -110,7 +110,7 @@ class PendingCertificatePool
         entries.add(myEntry);
     }
 
-    synchronized CertificateInfo removeCertificate(
+    synchronized X509CertificateInfo removeCertificate(
             byte[] transactionId, BigInteger certReqId, byte[] certHash)
     {
         String hexTid = Hex.toHexString(transactionId);
@@ -143,7 +143,7 @@ class PendingCertificatePool
         return retEntry.certInfo;
     }
 
-    synchronized Set<CertificateInfo> removeCertificates(byte[] transactionId)
+    synchronized Set<X509CertificateInfo> removeCertificates(byte[] transactionId)
     {
         Set<MyEntry> entries = map.remove(Hex.toHexString(transactionId));
         if(entries == null)
@@ -151,7 +151,7 @@ class PendingCertificatePool
             return null;
         }
 
-        Set<CertificateInfo> ret = new HashSet<>();
+        Set<X509CertificateInfo> ret = new HashSet<>();
         for(MyEntry myEntry :entries)
         {
             ret.add(myEntry.certInfo);
@@ -159,7 +159,7 @@ class PendingCertificatePool
         return ret;
     }
 
-    synchronized Set<CertificateInfo> removeConfirmTimeoutedCertificates()
+    synchronized Set<X509CertificateInfo> removeConfirmTimeoutedCertificates()
     {
         if(map.isEmpty())
         {
@@ -168,7 +168,7 @@ class PendingCertificatePool
 
         long now = System.currentTimeMillis();
 
-        Set<CertificateInfo> ret = new HashSet<>();
+        Set<X509CertificateInfo> ret = new HashSet<>();
 
         for(String tid : map.keySet())
         {
