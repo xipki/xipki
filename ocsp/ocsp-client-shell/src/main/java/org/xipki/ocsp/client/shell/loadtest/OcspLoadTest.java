@@ -73,7 +73,7 @@ public class OcspLoadTest extends AbstractLoadTest
     private RequestOptions options;
 
     @Override
-    protected StoppableRunnable getTestor()
+    protected Runnable getTestor()
     throws Exception
     {
         return new Testor();
@@ -108,14 +108,13 @@ public class OcspLoadTest extends AbstractLoadTest
         return this.serials.get(serialIndex);
     }
 
-    class Testor implements StoppableRunnable
+    class Testor implements Runnable
     {
-        private boolean stopMe = false;
 
         @Override
         public void run()
         {
-            while(stopMe == false && stop() == false && getErrorAccout() < 10)
+            while(stop() == false && getErrorAccout() < 10)
             {
                 long sn = nextSerialNumber();
                 account(1, (testNext(sn)? 0: 1));
@@ -190,12 +189,6 @@ public class OcspLoadTest extends AbstractLoadTest
                 LOG.info("SN: {}, Status: {}", sn, status);
                 return true;
             }
-        }
-
-        @Override
-        public void sendStopSignal()
-        {
-            stopMe = true;
         }
 
     }

@@ -479,10 +479,19 @@ public class X509CA
                     nextUpdate = c.getTime();
                 }
 
+                Date start = new Date();
+                AuditEvent auditEvent = new AuditEvent(start);
+                auditEvent.setApplicationName("CA");
+                auditEvent.setName("PERF");
+                auditEvent.addEventData(new AuditEventData("eventType", "CRL_GEN_INTERVAL"));
+
                 try
                 {
                     long maxIdOfDeltaCRLCache = certstore.getMaxIdOfDeltaCRLCache(caInfo.getCertificate());
-                    generateCRL(deltaCrl, thisUpdate, nextUpdate);
+
+                    generateCRL(deltaCrl, thisUpdate, nextUpdate, auditEvent);
+                    auditEvent.setStatus(AuditStatus.SUCCESSFUL);
+                    auditEvent.setLevel(AuditLevel.INFO);
 
                     try
                     {
@@ -512,14 +521,24 @@ public class X509CA
                         }
                         LOG.debug(message, t);
                     }
-                }catch(OperationException e)
+                }catch(Throwable t)
                 {
+                    auditEvent.setStatus(AuditStatus.ERROR);
+                    auditEvent.setLevel(AuditLevel.ERROR);
                     final String message = "Error in generateCRL()";
                     if(LOG.isErrorEnabled())
                     {
-                        LOG.error(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(), e.getMessage());
+                        LOG.error(LogUtil.buildExceptionLogFormat(message), t.getClass().getName(), t.getMessage());
                     }
-                    LOG.debug(message, e);
+                    LOG.debug(message, t);
+                }finally
+                {
+                    auditEvent.addEventData(new AuditEventData("duration", System.currentTimeMillis() - start.getTime()));
+                }
+
+                if(serviceRegister != null)
+                {
+                    serviceRegister.getAuditLoggingService().logEvent(auditEvent);
                 }
             } finally
             {
@@ -738,7 +757,7 @@ public class X509CA
         }
     }
 
-    public X509CRL generateCRLonDemand()
+    public X509CRL generateCRLonDemand(AuditEvent auditEvent)
     throws OperationException
     {
         if(masterMode == false)
@@ -764,7 +783,7 @@ public class X509CA
             }
 
             long maxIdOfDeltaCRLCache = certstore.getMaxIdOfDeltaCRLCache(caInfo.getCertificate());
-            X509CRL crl = generateCRL(false, thisUpdate, nextUpdate);
+            X509CRL crl = generateCRL(false, thisUpdate, nextUpdate, auditEvent);
 
             if(crl != null)
             {
@@ -805,7 +824,7 @@ public class X509CA
         }
     }
 
-    private X509CRL generateCRL(boolean deltaCRL, Date thisUpdate, Date nextUpdate)
+    private X509CRL generateCRL(boolean deltaCRL, Date thisUpdate, Date nextUpdate, AuditEvent auditEvent)
     throws OperationException
     {
         if(crlSigner == null)
@@ -840,6 +859,17 @@ public class X509CA
             if(nextUpdate != null)
             {
                 crlBuilder.setNextUpdate(nextUpdate);
+                if(auditEvent != null)
+                {
+                    auditEvent.addEventData(new AuditEventData("nextUpdate", nextUpdate));
+                }
+            }
+            else
+            {
+                if(auditEvent != null)
+                {
+                    auditEvent.addEventData(new AuditEventData("nextUpdate", "NULL"));
+                }
             }
 
             BigInteger startSerial = BigInteger.ONE;
@@ -871,6 +901,11 @@ public class X509CA
                 {
                     revInfos = certstore.getRevokedCertificates(caCert, notExpireAt, startSerial, numEntries,
                             control.isOnlyContainsCACerts(), control.isOnlyContainsUserCerts());
+                }
+
+                if(auditEvent != null)
+                {
+                    auditEvent.addEventData(new AuditEventData("crlType", deltaCRL ? "DELTA_CRL" : "FULL_CRL"));
                 }
 
                 BigInteger maxSerial = BigInteger.ONE;
@@ -931,6 +966,10 @@ public class X509CA
             }while(revInfos.size() >= numEntries);
 
             int crlNumber = certstore.getNextFreeCRLNumber(caCert);
+            if(auditEvent != null)
+            {
+                auditEvent.addEventData(new AuditEventData("crlNumber", crlNumber));
+            }
 
             try
             {
