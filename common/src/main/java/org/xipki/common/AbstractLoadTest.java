@@ -52,21 +52,18 @@ public abstract class AbstractLoadTest
 {
     private static final String PROPKEY_LOADTEST = "org.xipki.loadtest";
 
-    public static interface StoppableRunnable extends Runnable
-    {
-        void sendStopSignal();
-    }
+    private boolean interrupted = false;
 
-    protected abstract StoppableRunnable getTestor()
+    protected abstract Runnable getTestor()
     throws Exception;
 
     public void test()
     {
         System.getProperties().setProperty(PROPKEY_LOADTEST, "true");
-        List<StoppableRunnable> runnables = new ArrayList<>(threads);
+        List<Runnable> runnables = new ArrayList<>(threads);
         for (int i = 0; i < threads; i++)
         {
-            StoppableRunnable runnable;
+            Runnable runnable;
             try
             {
                 runnable = getTestor();
@@ -83,7 +80,7 @@ public abstract class AbstractLoadTest
         resetStartTime();
 
         ExecutorService executor = Executors.newFixedThreadPool(threads);
-        for(StoppableRunnable runnable : runnables)
+        for(Runnable runnable : runnables)
         {
             executor.execute(runnable);
         }
@@ -102,10 +99,7 @@ public abstract class AbstractLoadTest
                 }
             } catch (InterruptedException e)
             {
-                for(StoppableRunnable runnable : runnables)
-                {
-                    runnable.sendStopSignal();
-                }
+                interrupted = true;
             }
         }
 
@@ -160,7 +154,7 @@ public abstract class AbstractLoadTest
 
     protected boolean stop()
     {
-        return errorAccount.get() > 0 || System.currentTimeMillis() - startTime >= duration * 1000L;
+        return interrupted || errorAccount.get() > 0 || System.currentTimeMillis() - startTime >= duration * 1000L;
     }
 
     protected static void printHeader()

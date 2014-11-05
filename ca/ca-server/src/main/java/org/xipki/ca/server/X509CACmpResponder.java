@@ -472,10 +472,10 @@ public class X509CACmpResponder extends CmpResponder
                             }
                             else if(CustomObjectIdentifiers.id_cmp_generateCRL.equals(infoType.getId()))
                             {
-                                eventType = "CRL_GEN";
+                                eventType = "CRL_GEN_ONDEMAND";
 
                                 checkPermission(_requestor, Permission.GEN_CRL);
-                                X509CRL _crl = ca.generateCRLonDemand();
+                                X509CRL _crl = ca.generateCRLonDemand(auditEvent);
                                 if(_crl == null)
                                 {
                                     statusMessage = "CRL generation is not activated";
