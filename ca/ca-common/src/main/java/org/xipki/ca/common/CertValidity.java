@@ -125,7 +125,7 @@ public class CertValidity implements Comparable<CertValidity>
     {
         if(validity < 1)
         {
-            throw new IllegalArgumentException("validity could not be null");
+            throw new IllegalArgumentException("validity could not be less than 1");
         }
         ParamChecker.assertNotNull("unit", unit);
         this.validity = validity;

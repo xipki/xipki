@@ -94,7 +94,7 @@ class CALoadTestRevoke extends AbstractLoadTest
             CRLReason.CERTIFICATE_HOLD,    CRLReason.PRIVILEGE_WITHDRAWN};
 
     @Override
-    protected StoppableRunnable getTestor()
+    protected Runnable getTestor()
     throws Exception
     {
         return new Testor();
@@ -240,14 +240,13 @@ class CALoadTestRevoke extends AbstractLoadTest
         }
     }
 
-    class Testor implements StoppableRunnable
+    class Testor implements Runnable
     {
-        private boolean stopMe = false;
 
         @Override
         public void run()
         {
-            while(stopMe == false && stop() == false && getErrorAccout() < 1)
+            while(stop() == false && getErrorAccout() < 1)
             {
                 List<Long> serialNumbers;
                 try
@@ -311,13 +310,6 @@ class CALoadTestRevoke extends AbstractLoadTest
             }
             return nSuccess == serialNumbers.size();
         }
-
-        @Override
-        public void sendStopSignal()
-        {
-            stopMe = true;
-        }
-
     }
 
 }
