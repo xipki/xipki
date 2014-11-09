@@ -109,7 +109,7 @@ class CmpResponder
     {
     }
 
-    PKIMessage processPKIMessage(LocalP11CryptService localP11CryptService, PKIMessage pkiMessage)
+    PKIMessage processPKIMessage(LocalP11CryptServicePool localP11CryptServicePool, String moduleName, PKIMessage pkiMessage)
     {
         GeneralPKIMessage message = new GeneralPKIMessage(pkiMessage);
 
@@ -182,7 +182,7 @@ class CmpResponder
         }
         else
         {
-            P11CryptService p11CryptService = localP11CryptService.getP11CryptService();
+            P11CryptService p11CryptService = localP11CryptServicePool.getP11CryptService(moduleName);
 
             ASN1ObjectIdentifier itvType = itvP11.getInfoType();
 
@@ -191,7 +191,7 @@ class CmpResponder
             {
                 if(RemoteP11Constants.id_version.equals(itvType))
                 {
-                    respItvInfoValue = new ASN1Integer(localP11CryptService.getVersion());
+                    respItvInfoValue = new ASN1Integer(localP11CryptServicePool.getVersion());
                 }
                 else if(RemoteP11Constants.id_pso_ecdsa.equals(itvType) ||
                         RemoteP11Constants.id_pso_dsa.equals(itvType) ||
