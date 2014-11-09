@@ -101,8 +101,8 @@ import org.xipki.security.bcext.BCRSAPrivateKey;
 public class SoftTokenContentSignerBuilder
 {
     private static final Logger LOG = LoggerFactory.getLogger(SoftTokenContentSignerBuilder.class);
-    private static final String PROVIDER_XIPKI_NSS = "XipkiNSS";
-    private static final String PROVIDER_XIPKI_NSS_CIPHER = "SunPKCS11-XipkiNSS";
+    public static final String PROVIDER_XIPKI_NSS = "XipkiNSS";
+    public static final String PROVIDER_XIPKI_NSS_CIPHER = "SunPKCS11-XipkiNSS";
 
     private final PrivateKey key;
     private final X509Certificate[] certificateChain;
@@ -406,7 +406,7 @@ public class SoftTokenContentSignerBuilder
         }
     } // ECDSAContentSignerBuilder
 
-    private static class NssPlainRSASigner implements AsymmetricBlockCipher
+    public static class NssPlainRSASigner implements AsymmetricBlockCipher
     {
         private static final String algorithm = "RSA/ECB/NoPadding";
         private Cipher cipher;

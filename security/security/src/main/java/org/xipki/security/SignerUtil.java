@@ -68,6 +68,7 @@ import org.bouncycastle.operator.bc.BcDefaultDigestProvider;
 import org.bouncycastle.operator.bc.BcDigestProvider;
 import org.bouncycastle.pkcs.PKCS10CertificationRequest;
 import org.bouncycastle.pkcs.PKCSException;
+import org.xipki.security.api.SignerException;
 
 /**
  * utility class for converting java.security RSA objects into their
@@ -428,6 +429,31 @@ public class SignerUtil
         {
             return false;
         }
+    }
+
+    public static byte[] pkcs1padding(byte[] in, int blockSize)
+    throws SignerException
+    {
+        int inLen = in.length;
+
+        if (inLen+3 > blockSize)
+        {
+            throw new SignerException("data too long (maximal " + (blockSize - 3) + " allowed): " + inLen);
+        }
+
+        byte[]  block = new byte[blockSize];
+
+        block[0] = 0x00;
+        block[1] = 0x01;                        // type code 1
+
+        for (int i = 2; i != block.length - inLen - 1; i++)
+        {
+            block[i] = (byte)0xFF;
+        }
+
+        block[block.length - inLen - 1] = 0x00;       // mark the end of the padding
+        System.arraycopy(in, 0, block, block.length - inLen, inLen);
+        return block;
     }
 
 }

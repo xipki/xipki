@@ -270,6 +270,8 @@
             <xs:element name="condition" type="ConditionType" minOccurs="0"/>
             <xs:element name="professionOid" type="OidWithDescType" maxOccurs="unbounded"/>
             <xs:element name="professionItem" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="registrationNumber" type="xs:string" minOccurs="0"/>
+            <xs:element name="addProfessionInfo" type="xs:hexBinary" minOccurs="0"/>
           </xs:sequence>
         </xs:complexType>
       </xs:element>
