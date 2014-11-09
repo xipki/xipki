@@ -42,6 +42,7 @@ import iaik.pkcs.pkcs11.objects.PublicKey;
 import iaik.pkcs.pkcs11.objects.RSAPublicKey;
 import iaik.pkcs.pkcs11.objects.X509PublicKeyCertificate;
 
+import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -61,11 +62,15 @@ import org.bouncycastle.util.encoders.Hex;
 import org.xipki.common.IoCertUtil;
 import org.xipki.security.api.SecurityFactory;
 import org.xipki.security.api.SignerException;
+import org.xipki.security.api.p11.P11KeyIdentifier;
 import org.xipki.security.api.p11.P11SlotIdentifier;
 import org.xipki.security.p11.iaik.IaikExtendedModule;
 import org.xipki.security.p11.iaik.IaikExtendedSlot;
 import org.xipki.security.p11.iaik.IaikP11CryptServiceFactory;
 import org.xipki.security.p11.keystore.KeystoreP11CryptServiceFactory;
+import org.xipki.security.p11.keystore.KeystoreP11Identity;
+import org.xipki.security.p11.keystore.KeystoreP11Module;
+import org.xipki.security.p11.keystore.KeystoreP11Slot;
 
 /**
  * @author Lijun Liao
@@ -145,7 +150,7 @@ public class P11ListSlotCommand extends SecurityCommand
             List<PrivateKey> allPrivateObjects = slot.getAllPrivateObjects(null, null);
             int size = allPrivateObjects.size();
 
-            List<ComparablePrivateKey> privateKeys = new ArrayList<>(size);
+            List<ComparableIaikPrivateKey> privateKeys = new ArrayList<>(size);
             for(int i = 0; i < size; i++)
             {
                 PrivateKey key = allPrivateObjects.get(i);
@@ -153,7 +158,7 @@ public class P11ListSlotCommand extends SecurityCommand
                 if(id != null)
                 {
                     char[] label = key.getLabel().getCharArrayValue();
-                    ComparablePrivateKey privKey = new ComparablePrivateKey(id, label, key);
+                    ComparableIaikPrivateKey privKey = new ComparableIaikPrivateKey(id, label, key);
                     privateKeys.add(privKey);
                 }
             }
@@ -166,7 +171,7 @@ public class P11ListSlotCommand extends SecurityCommand
             StringBuilder sb = new StringBuilder();
             for(int i = 0; i < size; i++)
             {
-                ComparablePrivateKey privKey = privateKeys.get(i);
+                ComparableIaikPrivateKey privKey = privateKeys.get(i);
                 byte[] keyId = privKey.getKeyId();
                 char[] keyLabel = privKey.getKeyLabel();
 
@@ -214,7 +219,83 @@ public class P11ListSlotCommand extends SecurityCommand
             }
         } else if(KeystoreP11CryptServiceFactory.class.getName().equals(pkcs11Provider))
         {
+            KeystoreP11Module module = getKeystoreP11Module(moduleName);
+            if(module == null)
+            {
+                err("Undefined module " + moduleName);
+                return null;
+            }
 
+            List<P11SlotIdentifier> slots = module.getSlotIds();
+            out("Module: " + moduleName);
+
+            if(slotIndex == null)
+            {
+                // list all slots
+                int n = slots.size();
+
+                if(n == 0 || n == 1)
+                {
+                    out(((n == 0) ? "no" : "1") + " slot is configured");
+                }
+                else
+                {
+                    out(n + " slots are configured");
+                }
+
+                for(P11SlotIdentifier slotId : slots)
+                {
+                    out("\tslot[" + slotId.getSlotIndex() + "]: " + slotId.getSlotId());
+                }
+
+                return null;
+            }
+
+            P11SlotIdentifier slotId = new P11SlotIdentifier(slotIndex, null);
+            KeystoreP11Slot slot = null;
+            try
+            {
+                slot = module.getSlot(slotId);
+            }catch(SignerException e)
+            {
+                err("\tError:  " + e.getMessage());
+                return null;
+            }
+
+            if(slot == null)
+            {
+                err("slot with index " + slotIndex + " does not exist");
+                return null;
+            }
+
+            List<KeystoreP11Identity> identities = slot.getIdentities();
+            Collections.sort(identities);
+
+            StringBuilder sb = new StringBuilder();
+            for(int i = 0; i < identities.size(); i++)
+            {
+                KeystoreP11Identity identity = identities.get(i);
+                P11KeyIdentifier p11KeyId = identity.getKeyId();
+
+                sb.append("\t")
+                    .append(i + 1)
+                    .append(". ")
+                    .append(p11KeyId.getKeyLabel())
+                    .append(" (").append("id: ")
+                    .append(Hex.toHexString(p11KeyId.getKeyId()).toUpperCase())
+                    .append(")\n");
+
+                sb.append("\t\tAlgorithm: ")
+                    .append(identity.getPublicKey().getAlgorithm())
+                    .append("\n");
+
+                formatString(sb, identity.getCertificate());
+            }
+
+            if(sb.length() > 0)
+            {
+                out(sb.toString());
+            }
         } else
         {
             err("PKCS11 provider " + pkcs11Provider + " is not accepted");
@@ -317,6 +398,46 @@ public class P11ListSlotCommand extends SecurityCommand
             .append("\n");
     }
 
+    private void formatString(StringBuilder sb, X509Certificate cert)
+    {
+        String subject = IoCertUtil.canonicalizeName(cert.getSubjectX500Principal());
+
+        if(verbose.booleanValue() == false)
+        {
+            sb.append("\t\tCertificate: ").append(subject).append("\n");
+            return;
+        }
+
+        sb.append("\t\tCertificate:\n");
+        sb.append("\t\t\tSubject:    ")
+            .append(subject)
+            .append("\n");
+
+        String issuer = IoCertUtil.canonicalizeName(cert.getIssuerX500Principal());
+        sb.append("\t\t\tIssuer:     ")
+            .append(issuer)
+            .append("\n");
+
+        sb.append("\t\t\tSerial:     ")
+            .append(cert.getSerialNumber())
+            .append("\n");
+        sb.append("\t\t\tStart time: ")
+            .append(cert.getNotBefore())
+            .append("\n");
+        sb.append("\t\t\tEnd time:   ")
+            .append(cert.getNotAfter())
+            .append("\n");
+        sb.append("\t\t\tSHA1 Sum:   ");
+        try
+        {
+            sb.append(IoCertUtil.sha1sum(cert.getEncoded()));
+        } catch (CertificateEncodingException e)
+        {
+            sb.append("ERROR");
+        }
+        sb.append("\n");
+    }
+
     private static String getKeyAlgorithm(PublicKey key)
     {
         if(key instanceof RSAPublicKey)
@@ -375,13 +496,13 @@ public class P11ListSlotCommand extends SecurityCommand
         return curveName;
     }
 
-    private static class ComparablePrivateKey implements Comparable<ComparablePrivateKey>
+    private static class ComparableIaikPrivateKey implements Comparable<ComparableIaikPrivateKey>
     {
         private final byte[] keyId;
         private final char[] keyLabel;
         private final PrivateKey privateKey;
 
-        public ComparablePrivateKey(byte[] keyId, char[] keyLabel, PrivateKey privateKey)
+        public ComparableIaikPrivateKey(byte[] keyId, char[] keyLabel, PrivateKey privateKey)
         {
             this.keyId = keyId;
             this.keyLabel = keyLabel;
@@ -389,7 +510,7 @@ public class P11ListSlotCommand extends SecurityCommand
         }
 
         @Override
-        public int compareTo(ComparablePrivateKey o)
+        public int compareTo(ComparableIaikPrivateKey o)
         {
             if(keyLabel == null)
             {
