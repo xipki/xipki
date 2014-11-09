@@ -70,7 +70,7 @@ import org.xipki.security.api.p11.P11SlotIdentifier;
  * @author Lijun Liao
  */
 
-class KeystoreP11Identity implements Comparable<KeystoreP11Identity>
+public class KeystoreP11Identity implements Comparable<KeystoreP11Identity>
 {
     private final P11SlotIdentifier slotId;
     private final P11KeyIdentifier keyId;

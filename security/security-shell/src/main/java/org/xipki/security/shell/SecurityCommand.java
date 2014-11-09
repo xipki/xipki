@@ -40,8 +40,9 @@ import org.xipki.security.api.SecurityFactory;
 import org.xipki.security.api.SignerException;
 import org.xipki.security.api.p11.P11CryptService;
 import org.xipki.security.p11.iaik.IaikExtendedModule;
-import org.xipki.security.p11.iaik.IaikP11CryptServiceFactory;
 import org.xipki.security.p11.iaik.IaikP11ModulePool;
+import org.xipki.security.p11.keystore.KeystoreP11Module;
+import org.xipki.security.p11.keystore.KeystoreP11ModulePool;
 
 /**
  * @author Lijun Liao
@@ -76,8 +77,26 @@ public abstract class SecurityCommand extends XipkiOsgiCommandSupport
         IaikExtendedModule module = IaikP11ModulePool.getInstance().getModule(moduleName);
         if(module == null)
         {
-            throw new SignerException("It only works with P11CryptServiceFactory " +
-                    IaikP11CryptServiceFactory.class.getName());
+            throw new SignerException("Could not get P11 module " + moduleName);
+        }
+        return module;
+    }
+
+    protected KeystoreP11Module getKeystoreP11Module(String moduleName)
+    throws SignerException
+    {
+        // this call initialize the IaikExtendedModule
+        P11CryptService p11CryptService = securityFactory.getP11CryptService(moduleName);
+        if(p11CryptService == null)
+        {
+            throw new SignerException("Could not initialize P11CryptService " + moduleName);
+        }
+
+        // the returned object could not be null
+        KeystoreP11Module module = KeystoreP11ModulePool.getInstance().getModule(moduleName);
+        if(module == null)
+        {
+            throw new SignerException("Could not get P11 module " + moduleName);
         }
         return module;
     }
