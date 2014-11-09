@@ -33,30 +33,44 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.security.p11.iaik;
+package org.xipki.security.p11.keystore;
 
 import java.io.IOException;
 import java.math.BigInteger;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
+import java.security.PrivateKey;
 import java.security.PublicKey;
+import java.security.Signature;
+import java.security.SignatureException;
 import java.security.cert.X509Certificate;
 import java.security.interfaces.DSAPublicKey;
 import java.security.interfaces.ECPublicKey;
 import java.security.interfaces.RSAPublicKey;
+import java.util.concurrent.BlockingDeque;
+import java.util.concurrent.LinkedBlockingDeque;
+
+import javax.crypto.BadPaddingException;
+import javax.crypto.Cipher;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
 
 import org.bouncycastle.asn1.ASN1EncodableVector;
 import org.bouncycastle.asn1.ASN1Integer;
 import org.bouncycastle.asn1.DERSequence;
 import org.xipki.common.IoCertUtil;
 import org.xipki.common.ParamChecker;
+import org.xipki.security.SignerUtil;
 import org.xipki.security.api.SignerException;
-import org.xipki.security.api.p11.P11SlotIdentifier;
 import org.xipki.security.api.p11.P11KeyIdentifier;
+import org.xipki.security.api.p11.P11SlotIdentifier;
 
 /**
  * @author Lijun Liao
  */
 
-class IaikP11Identity implements Comparable<IaikP11Identity>
+class KeystoreP11Identity implements Comparable<KeystoreP11Identity>
 {
     private final P11SlotIdentifier slotId;
     private final P11KeyIdentifier keyId;
@@ -65,42 +79,73 @@ class IaikP11Identity implements Comparable<IaikP11Identity>
     private final PublicKey publicKey;
     private final int signatureKeyBitLength;
 
-    public IaikP11Identity(
+    private final BlockingDeque<Cipher> rsaCiphers = new LinkedBlockingDeque<>();
+    private final BlockingDeque<Signature> dsaSignatures = new LinkedBlockingDeque<>();
+
+    public KeystoreP11Identity(
             P11SlotIdentifier slotId,
             P11KeyIdentifier keyId,
+            PrivateKey privateKey,
             X509Certificate[] certificateChain,
-            PublicKey publicKey)
+            int maxSessions)
+    throws NoSuchAlgorithmException, NoSuchProviderException, InvalidKeyException
     {
         ParamChecker.assertNotNull("slotId", slotId);
         ParamChecker.assertNotNull("keyId", keyId);
 
-        if((certificateChain == null || certificateChain.length < 1 || certificateChain[0] == null)
-                && publicKey == null)
+        if(certificateChain == null || certificateChain.length < 1 || certificateChain[0] == null)
         {
-            throw new IllegalArgumentException("Neither certificate nor publicKey is non-null");
+            throw new IllegalArgumentException("no certificate is specified");
         }
 
         this.slotId = slotId;
         this.keyId = keyId;
         this.certificateChain = certificateChain;
-        this.publicKey = publicKey == null ? certificateChain[0].getPublicKey() : publicKey;
+        this.publicKey = certificateChain[0].getPublicKey();
 
         if(this.publicKey instanceof RSAPublicKey)
         {
             signatureKeyBitLength = ((RSAPublicKey) this.publicKey).getModulus().bitLength();
-        }
-        else if(this.publicKey instanceof ECPublicKey)
-        {
-            signatureKeyBitLength = ((ECPublicKey) this.publicKey).getParams().getCurve().getField().getFieldSize();
-        }
-        else if(this.publicKey instanceof DSAPublicKey)
-        {
-            signatureKeyBitLength = ((DSAPublicKey) this.publicKey).getParams().getQ().bitLength();
+
+            for(int i = 0; i < maxSessions; i++)
+            {
+                Cipher rsaCipher;
+                try
+                {
+                    rsaCipher = Cipher.getInstance("RSA/NONE/NoPadding", "BC");
+                }catch(NoSuchPaddingException e)
+                {
+                    throw new NoSuchAlgorithmException("NoSuchPadding", e);
+                }
+                rsaCipher.init(Cipher.ENCRYPT_MODE, privateKey);
+                rsaCiphers.add(rsaCipher);
+            }
         }
         else
         {
-            throw new IllegalArgumentException("Currently only RSA, DSA and EC public key are supported, but not " +
-                    this.publicKey.getAlgorithm() + " (class: " + this.publicKey.getClass().getName() + ")");
+            String algorithm;
+            if(this.publicKey instanceof ECPublicKey)
+            {
+                signatureKeyBitLength = ((ECPublicKey) this.publicKey).getParams().getCurve().getField().getFieldSize();
+                algorithm = "NONEwithECDSA";
+            }
+            else if(this.publicKey instanceof DSAPublicKey)
+            {
+                signatureKeyBitLength = ((DSAPublicKey) this.publicKey).getParams().getQ().bitLength();
+                algorithm = "NONEwithDSA";
+            }
+            else
+            {
+                throw new IllegalArgumentException("Currently only RSA, DSA and EC public key are supported, but not " +
+                        this.publicKey.getAlgorithm() + " (class: " + this.publicKey.getClass().getName() + ")");
+            }
+
+            for(int i = 0; i < maxSessions; i++)
+            {
+                Signature dsaSignature = Signature.getInstance(algorithm, "BC");
+                dsaSignature.initSign(privateKey);
+                dsaSignatures.add(dsaSignature);
+            }
         }
     }
 
@@ -149,8 +194,7 @@ class IaikP11Identity implements Comparable<IaikP11Identity>
         return this.slotId.equals(slotId) && keyLabel.equals(keyId.getKeyLabel());
     }
 
-    public byte[] CKM_RSA_PKCS(IaikExtendedModule module,
-            byte[] encodedDigestInfo)
+    public byte[] CKM_RSA_PKCS(byte[] encodedDigestInfo)
     throws SignerException
     {
         if(publicKey instanceof RSAPublicKey == false)
@@ -159,17 +203,11 @@ class IaikP11Identity implements Comparable<IaikP11Identity>
                     publicKey.getAlgorithm() + " public key");
         }
 
-        IaikExtendedSlot slot = module.getSlot(slotId);
-        if(slot == null)
-        {
-            throw new SignerException("Could not find slot " + slotId);
-        }
-
-        return slot.CKM_RSA_PKCS(encodedDigestInfo, keyId);
+        byte[] padded = SignerUtil.pkcs1padding(encodedDigestInfo, (signatureKeyBitLength + 7)/8);
+        return do_rsa_sign(padded);
     }
 
-    public byte[] CKM_RSA_X509(IaikExtendedModule module,
-            byte[] hash)
+    public byte[] CKM_RSA_X509(byte[] hash)
     throws SignerException
     {
         if(publicKey instanceof RSAPublicKey == false)
@@ -177,18 +215,34 @@ class IaikP11Identity implements Comparable<IaikP11Identity>
             throw new SignerException("Operation CKM_RSA_X509 is not allowed for " +
                     publicKey.getAlgorithm() + " public key");
         }
-
-        IaikExtendedSlot slot = module.getSlot(slotId);
-        if(slot == null)
-        {
-            throw new SignerException("Could not find slot " + slotId);
-        }
-
-        return slot.CKM_RSA_X509(hash, keyId);
+        return do_rsa_sign(hash);
     }
 
-    public byte[] CKM_ECDSA(IaikExtendedModule module,
-            byte[] hash)
+    private byte[] do_rsa_sign(byte[] paddedHash)
+    throws SignerException
+    {
+        Cipher cipher;
+        try
+        {
+            cipher = rsaCiphers.takeFirst();
+        } catch (InterruptedException e)
+        {
+            throw new SignerException("InterruptedException occurs while retrieving idle signature");
+        }
+
+        try
+        {
+            return cipher.doFinal(paddedHash);
+        } catch (BadPaddingException | IllegalBlockSizeException e)
+        {
+            throw new SignerException("SignatureException: " + e.getMessage(), e);
+        }finally
+        {
+            rsaCiphers.add(cipher);
+        }
+    }
+
+    public byte[] CKM_ECDSA(byte[] hash)
     throws SignerException
     {
         if(publicKey instanceof ECPublicKey == false)
@@ -196,35 +250,44 @@ class IaikP11Identity implements Comparable<IaikP11Identity>
             throw new SignerException("Operation CKM_ECDSA is not allowed for " + publicKey.getAlgorithm() + " public key");
         }
 
-        IaikExtendedSlot slot = module.getSlot(slotId);
-        if(slot == null)
-        {
-            throw new SignerException("Could not find slot " + slotId);
-        }
-
-        byte[] truncatedDigest = IoCertUtil.leftmost(hash, signatureKeyBitLength);
-
-        byte[] signature = slot.CKM_ECDSA(truncatedDigest, keyId);
-        return convertToX962Signature(signature);
+        return do_dsa_sign(hash);
     }
 
-    public byte[] CKM_DSA(IaikExtendedModule module,
-            byte[] hash)
+    public byte[] CKM_DSA(byte[] hash)
     throws SignerException
     {
         if(publicKey instanceof DSAPublicKey == false)
         {
             throw new SignerException("Operation CKM_DSA is not allowed for " + publicKey.getAlgorithm() + " public key");
         }
+        return do_dsa_sign(hash);
+    }
 
-        IaikExtendedSlot slot = module.getSlot(slotId);
-        if(slot == null)
-        {
-            throw new SignerException("Could not find slot " + slotId);
-        }
+    private byte[] do_dsa_sign(byte[] hash)
+    throws SignerException
+    {
         byte[] truncatedDigest = IoCertUtil.leftmost(hash, signatureKeyBitLength);
-        byte[] signature = slot.CKM_DSA(truncatedDigest, keyId);
-        return convertToX962Signature(signature);
+        Signature sig;
+        try
+        {
+            sig = dsaSignatures.takeFirst();
+        } catch (InterruptedException e)
+        {
+            throw new SignerException("InterruptedException occurs while retrieving idle signature");
+        }
+
+        try
+        {
+            sig.update(truncatedDigest);
+            byte[] signature = sig.sign();
+            return convertToX962Signature(signature);
+        } catch (SignatureException e)
+        {
+            throw new SignerException("SignatureException: " + e.getMessage(), e);
+        }finally
+        {
+            dsaSignatures.add(sig);
+        }
     }
 
     private static byte[] convertToX962Signature(byte[] signature)
@@ -250,7 +313,7 @@ class IaikP11Identity implements Comparable<IaikP11Identity>
     }
 
     @Override
-    public int compareTo(IaikP11Identity o)
+    public int compareTo(KeystoreP11Identity o)
     {
         return keyId.compareTo(o.keyId);
     }

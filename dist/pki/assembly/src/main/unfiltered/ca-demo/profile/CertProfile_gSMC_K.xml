@@ -134,6 +134,8 @@
     <admission>
       <professionOid>1.2.276.0.76.4.103</professionOid>
       <professionItem>Anwendungskonnektor</professionItem>
+      <registrationNumber>example.reg.number</registrationNumber>
+      <addProfessionInfo>12ab23cd45ef67</addProfessionInfo>      
     </admission>
   </extensions>
 </profile>

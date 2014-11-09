@@ -398,7 +398,7 @@ public final class SunP11CryptService implements P11CryptService
             throw new SignerException("Found no key with " + keyId);
         }
 
-        return identity.CKM_RSA_X_509(hash);
+        return identity.CKM_RSA_X509(hash);
     }
 
     @Override

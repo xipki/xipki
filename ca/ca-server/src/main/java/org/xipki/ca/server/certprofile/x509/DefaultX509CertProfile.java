@@ -59,9 +59,11 @@ import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1EncodableVector;
 import org.bouncycastle.asn1.ASN1Integer;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
+import org.bouncycastle.asn1.ASN1OctetString;
 import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.ASN1StreamParser;
 import org.bouncycastle.asn1.DERNull;
+import org.bouncycastle.asn1.DEROctetString;
 import org.bouncycastle.asn1.DERPrintableString;
 import org.bouncycastle.asn1.DERSequence;
 import org.bouncycastle.asn1.DERTaggedObject;
@@ -754,7 +756,8 @@ public class DefaultX509CertProfile extends AbstractX509CertProfile
                         professionOIDs = Collections.unmodifiableList(oids);
                     }
 
-                    ExtensionTuple extension = createAdmission(occurrence.isCritical(), professionOIDs, professionItems);
+                    ExtensionTuple extension = createAdmission(occurrence.isCritical(),
+                            professionOIDs, professionItems, type.getRegistrationNumber(), type.getAddProfessionInfo());
                     ExtensionTupleOption option = new ExtensionTupleOption(
                             createCondition(type.getCondition()), extension);
                     options.add(option);
@@ -1723,14 +1726,22 @@ public class DefaultX509CertProfile extends AbstractX509CertProfile
 
     private ExtensionTuple createAdmission(boolean critical,
             List<ASN1ObjectIdentifier> professionOIDs,
-            List<String> professionItems)
+            List<String> professionItems,
+            String registrationNumber,
+            byte[] addProfessionInfo)
     throws CertProfileException
     {
         if(professionItems == null || professionItems.isEmpty())
         {
             if(professionOIDs == null || professionOIDs.isEmpty())
             {
-                return null;
+                if(registrationNumber == null || registrationNumber.isEmpty())
+                {
+                    if(addProfessionInfo == null || addProfessionInfo.length == 0)
+                    {
+                        return null;
+                    }
+                }
             }
         }
 
@@ -1751,8 +1762,14 @@ public class DefaultX509CertProfile extends AbstractX509CertProfile
             _professionOIDs = professionOIDs.toArray(new ASN1ObjectIdentifier[0]);
         }
 
+        ASN1OctetString _addProfessionInfo = null;
+        if(addProfessionInfo != null && addProfessionInfo.length > 0)
+        {
+            _addProfessionInfo = new DEROctetString(addProfessionInfo);
+        }
+
         ProfessionInfo professionInfo = new ProfessionInfo(
-                    null, _professionItems, _professionOIDs, null, null);
+                    null, _professionItems, _professionOIDs, registrationNumber, _addProfessionInfo);
 
         Admissions admissions = new Admissions(null, null,
                 new ProfessionInfo[]{professionInfo});

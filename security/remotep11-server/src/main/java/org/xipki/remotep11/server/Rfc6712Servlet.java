@@ -38,6 +38,7 @@ package org.xipki.remotep11.server;
 import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URLDecoder;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -45,12 +46,10 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.bouncycastle.asn1.ASN1InputStream;
-import org.bouncycastle.asn1.ASN1OctetString;
-import org.bouncycastle.asn1.cmp.PKIHeader;
-import org.bouncycastle.asn1.cmp.PKIHeaderBuilder;
 import org.bouncycastle.asn1.cmp.PKIMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xipki.security.api.SecurityFactory;
 
 /**
  * @author Lijun Liao
@@ -66,7 +65,7 @@ public class Rfc6712Servlet extends HttpServlet
     private static final String CT_RESPONSE = "application/pkixcmp";
 
     private final CmpResponder responder;
-    private LocalP11CryptService localP11CryptService;
+    private LocalP11CryptServicePool localP11CryptService;
 
     public Rfc6712Servlet()
     {
@@ -113,14 +112,38 @@ public class Rfc6712Servlet extends HttpServlet
                 return;
             }
 
-            PKIHeader reqHeader = pkiReq.getHeader();
-            ASN1OctetString tid = reqHeader.getTransactionID();
+            // extract the module name
+            String moduleName = null;
+            String encodedUrl = request.getRequestURI();
+            String constructedPath = null;
+            if (encodedUrl != null)
+            {
+                constructedPath = URLDecoder.decode(encodedUrl, "UTF-8");
+                String servletPath = request.getServletPath();
+                if(servletPath.endsWith("/") == false)
+                {
+                    servletPath += "/";
+                    if(servletPath.startsWith(constructedPath))
+                    {
+                        moduleName = SecurityFactory.DEFAULT_P11MODULE_NAME;
+                    }
+                }
 
-            PKIHeaderBuilder respHeader = new PKIHeaderBuilder(reqHeader.getPvno().getValue().intValue(),
-                    reqHeader.getRecipient(), reqHeader.getSender());
-            respHeader.setTransactionID(tid);
+                int indexOf = constructedPath.indexOf(servletPath);
+                if (indexOf >= 0)
+                {
+                    constructedPath = constructedPath.substring(indexOf + servletPath.length());
+                }
+            }
 
-            PKIMessage pkiResp = responder.processPKIMessage(localP11CryptService, pkiReq);
+            if(moduleName == null)
+            {
+                int moduleName_end_index = constructedPath.indexOf('/');
+                moduleName = (moduleName_end_index == -1) ?
+                        constructedPath : constructedPath.substring(0, moduleName_end_index);
+            }
+
+            PKIMessage pkiResp = responder.processPKIMessage(localP11CryptService, moduleName, pkiReq);
             byte[] pkiRespBytes = pkiResp.getEncoded("DER");
 
             response.setContentType(Rfc6712Servlet.CT_RESPONSE);
@@ -164,7 +187,7 @@ public class Rfc6712Servlet extends HttpServlet
         }
     }
 
-    public void setLocalP11CryptService(LocalP11CryptService localP11CryptService)
+    public void setLocalP11CryptService(LocalP11CryptServicePool localP11CryptService)
     {
         this.localP11CryptService = localP11CryptService;
     }

@@ -33,77 +33,53 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.remotep11.server;
+package org.xipki.security.p11.keystore;
 
-import java.security.Security;
-
-import org.bouncycastle.jce.provider.BouncyCastleProvider;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.xipki.common.ParamChecker;
 import org.xipki.security.api.SecurityFactory;
+import org.xipki.security.api.SignerException;
+import org.xipki.security.api.p11.P11Control;
 import org.xipki.security.api.p11.P11CryptService;
+import org.xipki.security.api.p11.P11CryptServiceFactory;
+import org.xipki.security.api.p11.P11ModuleConf;
 
 /**
  * @author Lijun Liao
  */
 
-public class LocalP11CryptService
+public class KeystoreP11CryptServiceFactory implements P11CryptServiceFactory
 {
-    private static final Logger LOG = LoggerFactory.getLogger(LocalP11CryptService.class);
+    private P11Control p11Control;
 
-    public static final int version = 1;
-
-    private SecurityFactory securityFactory;
-    private P11CryptService p11CryptService;
-
-    public LocalP11CryptService()
+    @Override
+    public void init(P11Control p11Control)
     {
+        ParamChecker.assertNotNull("p11Control", p11Control);
+        this.p11Control = p11Control;
     }
 
-    public void setSecurityFactory(SecurityFactory securityFactory)
+    @Override
+    public P11CryptService createP11CryptService(String moduleName)
+    throws SignerException
     {
-        this.securityFactory = securityFactory;
-    }
-
-    private boolean initialized = false;
-    public void init()
-    throws Exception
-    {
-        if(initialized)
+        ParamChecker.assertNotNull("moduleName", moduleName);
+        if(p11Control == null)
         {
-            return;
+            throw new IllegalStateException("please call init() first");
         }
 
-        if(Security.getProvider("BC") == null)
+        if(SecurityFactory.DEFAULT_P11MODULE_NAME.equals(moduleName))
         {
-            Security.addProvider(new BouncyCastleProvider());
+            moduleName = p11Control.getDefaultModuleName();
         }
 
-        try
+        P11ModuleConf conf = p11Control.getModuleConf(moduleName);
+        if(conf == null)
         {
-            if(securityFactory == null)
-            {
-                throw new IllegalStateException("securityFactory is not configured");
-            }
-
-            this.p11CryptService = securityFactory.getP11CryptService(SecurityFactory.DEFAULT_P11MODULE_NAME);
-            initialized = true;
-        }catch(Exception e)
-        {
-            LOG.error("Exception thrown. {}: {}", e.getClass().getName(), e.getMessage());
-            LOG.debug("Exception thrown", e);
-            throw e;
+            throw new SignerException("PKCS#11 module " + moduleName + " is not defined");
         }
-    }
 
-    public P11CryptService getP11CryptService()
-    {
-        return p11CryptService;
-    }
-
-    public int getVersion()
-    {
-        return version;
+        return KeystoreP11CryptService.getInstance(conf);
     }
 
 }
