@@ -54,6 +54,7 @@ import javax.crypto.NoSuchPaddingException;
 
 import org.xipki.common.IoCertUtil;
 import org.xipki.common.ParamChecker;
+import org.xipki.security.SignerUtil;
 import org.xipki.security.api.SignerException;
 import org.xipki.security.api.p11.P11SlotIdentifier;
 
@@ -201,41 +202,16 @@ class SunP11Identity implements Comparable<SunP11Identity>
     public byte[] CKM_RSA_PKCS(byte[] encodedDigestInfo)
     throws SignerException
     {
-        byte[] padded = pkcs1padding(encodedDigestInfo, (signatureKeyBitLength + 7)/8);
-        return CKM_RSA_X_509(padded);
+        byte[] padded = SignerUtil.pkcs1padding(encodedDigestInfo, (signatureKeyBitLength + 7)/8);
+        return CKM_RSA_X509(padded);
     }
 
-    private static byte[] pkcs1padding(byte[] in, int blockSize)
-    throws SignerException
-    {
-        int inLen = in.length;
-
-        if (inLen+3 > blockSize)
-        {
-            throw new SignerException("data too long (maximal " + (blockSize - 3) + " allowed): " + inLen);
-        }
-
-        byte[]  block = new byte[blockSize];
-
-        block[0] = 0x00;
-        block[1] = 0x01;                        // type code 1
-
-        for (int i = 2; i != block.length - inLen - 1; i++)
-        {
-            block[i] = (byte)0xFF;
-        }
-
-        block[block.length - inLen - 1] = 0x00;       // mark the end of the padding
-        System.arraycopy(in, 0, block, block.length - inLen, inLen);
-        return block;
-    }
-
-    public byte[] CKM_RSA_X_509(byte[] hash)
+    public byte[] CKM_RSA_X509(byte[] hash)
     throws SignerException
     {
         if(publicKey instanceof RSAPublicKey == false)
         {
-            throw new SignerException("Operation CKM_RSA_X_509 is not allowed for " + publicKey.getAlgorithm() + " public key");
+            throw new SignerException("Operation CKM_RSA_X509 is not allowed for " + publicKey.getAlgorithm() + " public key");
         }
 
         synchronized (rsaCipher)

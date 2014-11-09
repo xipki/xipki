@@ -389,7 +389,7 @@ public final class IaikP11CryptService implements P11CryptService
 
         try
         {
-            return getIdentity(slotId, keyId).CKM_RSA_X_509(extModule, hash);
+            return getIdentity(slotId, keyId).CKM_RSA_X509(extModule, hash);
         }catch(PKCS11RuntimeException e)
         {
             final String message = "error while calling identity.CKM_RSA_X_509()";
@@ -413,7 +413,7 @@ public final class IaikP11CryptService implements P11CryptService
             P11KeyIdentifier keyId)
     throws SignerException
     {
-        return getIdentity(slotId, keyId).CKM_RSA_X_509(extModule, hash);
+        return getIdentity(slotId, keyId).CKM_RSA_X509(extModule, hash);
     }
 
     @Override

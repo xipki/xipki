@@ -33,7 +33,7 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.security.p11;
+package org.xipki.security.p11.remote;
 
 import java.io.IOException;
 import java.security.KeyFactory;
