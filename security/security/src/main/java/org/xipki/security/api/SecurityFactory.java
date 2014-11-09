@@ -95,4 +95,6 @@ public interface SecurityFactory
 
     PublicKey getPkcs11PublicKey(String moduleName, P11SlotIdentifier slotId, P11KeyIdentifier keyId)
     throws InvalidKeyException;
+
+    String getPkcs11Provider();
 }

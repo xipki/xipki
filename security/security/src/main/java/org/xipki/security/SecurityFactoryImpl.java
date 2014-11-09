@@ -817,6 +817,12 @@ public class SecurityFactoryImpl implements SecurityFactory
         this.pkcs11Provider = pkcs11Provider;
     }
 
+    @Override
+    public String getPkcs11Provider()
+    {
+        return pkcs11Provider;
+    }
+
     public void setDefaultParallelism(int defaultParallelism)
     {
         if(defaultParallelism > 0)

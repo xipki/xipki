@@ -35,17 +35,8 @@
 
 package org.xipki.security.p11.keystore;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.security.KeyStore;
-import java.security.PrivateKey;
 import java.security.PublicKey;
-import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
-import java.security.interfaces.DSAPrivateKey;
-import java.security.interfaces.ECPrivateKey;
-import java.security.interfaces.RSAPrivateKey;
-import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -54,10 +45,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentSkipListSet;
 
-import org.bouncycastle.util.encoders.Hex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.common.IoCertUtil;
 import org.xipki.common.LogUtil;
 import org.xipki.common.ParamChecker;
 import org.xipki.security.api.SignerException;
@@ -75,6 +64,7 @@ public class KeystoreP11CryptService implements P11CryptService
     private static final Logger LOG = LoggerFactory.getLogger(KeystoreP11CryptService.class);
 
     private final P11ModuleConf moduleConf;
+    private KeystoreP11Module module;
 
     private static final Map<String, KeystoreP11CryptService> instances = new HashMap<>();
 
@@ -109,149 +99,47 @@ public class KeystoreP11CryptService implements P11CryptService
     public synchronized void refresh()
     throws SignerException
     {
-        final String nativeLib = moduleConf.getNativeLibrary();
+        LOG.info("Refreshing PKCS#11 module {}", moduleConf.getName());
+        try
+        {
+            this.module = KeystoreP11ModulePool.getInstance().getModule(moduleConf);
+        }catch(SignerException e)
+        {
+            final String message = "Could not initialize the PKCS#11 Module for " + moduleConf.getName();
+            if(LOG.isErrorEnabled())
+            {
+                LOG.error(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(), e.getMessage());
+            }
+            LOG.debug(message, e);
+            throw e;
+        }
 
         Set<KeystoreP11Identity> currentIdentifies = new HashSet<>();
 
-        Map<Integer, Long> slotIndexIdMap = new HashMap<>();
-        File baseDir = new File(IoCertUtil.expandFilepath(nativeLib));
-        File[] children = baseDir.listFiles();
-        for(File child : children)
+        List<P11SlotIdentifier> slotIds = module.getSlotIds();
+        for(P11SlotIdentifier slotId : slotIds)
         {
-            if((child.isDirectory() && child.canRead() && child.exists()) == false)
-            {
-                LOG.warn("ignore path {}, it does not point to a readable exist directory", child.getPath());
-                continue;
-            }
-
-            String filename = child.getName();
-            String[] tokens = filename.split("-");
-            if(tokens == null || tokens.length != 2)
-            {
-                LOG.warn("ignore dir {}, invalid filename syntax", child.getPath());
-                continue;
-            }
-
-            int slotIndex;
-            long slotId;
+            KeystoreP11Slot slot;
             try
             {
-                slotIndex = Integer.parseInt(tokens[0]);
-                slotId = Long.parseLong(tokens[1]);
-            }catch(NumberFormatException e)
+                slot = module.getSlot(slotId);
+                if(slot == null)
+                {
+                    LOG.warn("Could not initialize slot " + slotId);
+                    continue;
+                }
+            } catch (SignerException e)
             {
-                LOG.warn("ignore dir {}, invalid filename syntax", child.getPath());
+                final String message = "SignerException while initializing slot " + slotId;
+                if(LOG.isWarnEnabled())
+                {
+                    LOG.warn(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(), e.getMessage());
+                }
+                LOG.debug(message, e);
                 continue;
-            }
-
-            slotIndexIdMap.put(slotIndex, slotId);
-        }
-
-        Set<Integer> slotIndexes = slotIndexIdMap.keySet();
-
-        for(Integer slotIndex : slotIndexes)
-        {
-            try
+            } catch (Throwable t)
             {
-                P11SlotIdentifier slotId = new P11SlotIdentifier(slotIndex, slotIndexIdMap.get(slotIndex));
-
-                if(moduleConf.isSlotIncluded(slotId) == false)
-                {
-                    continue;
-                }
-
-                File slotDir = new File(baseDir, slotIndex + "-" + slotIndexIdMap.get(slotIndex));
-                File[] keystoreFiles = slotDir.listFiles();
-                if(keystoreFiles == null || keystoreFiles.length == 0)
-                {
-                    LOG.info("No key found in directory", slotDir);
-                    continue;
-                }
-
-                for(File file : keystoreFiles)
-                {
-                    String fn = file.getName();
-                    String keyLabel;
-                    KeyStore ks;
-                    if(fn.endsWith(".p12") || fn.endsWith(".P12"))
-                    {
-                        ks = KeyStore.getInstance("PKCS12", "BC");
-                        keyLabel= fn.substring(0, fn.length() - ".p12".length());
-                    }
-                    else if(fn.endsWith(".jks") || fn.endsWith(".JKS"))
-                    {
-                        ks = KeyStore.getInstance("JKS");
-                        keyLabel= fn.substring(0, fn.length() - ".jks".length());
-                    }
-                    else
-                    {
-                        LOG.info("Ignore none keystore file {}", file.getPath());
-                        continue;
-                    }
-
-                    String sha1Fp = IoCertUtil.sha1sum(keyLabel.getBytes("UTF-8"));
-                    P11KeyIdentifier keyId = new P11KeyIdentifier(Hex.decode(sha1Fp.substring(0, 16)), keyLabel);
-                    List<char[]> password = moduleConf.getPasswordRetriever().getPassword(slotId);
-                    if(password == null)
-                    {
-                        LOG.info("No password is configured");
-                        continue;
-                    }
-                    else if(password.size() != 1)
-                    {
-                        LOG.info("Exactly 1 password must be specified, but not {}", password.size());
-                        continue;
-                    }
-
-                    ks.load(new FileInputStream(file), password.get(0));
-
-                    String keyname = null;
-                    Enumeration<String> aliases = ks.aliases();
-                    while(aliases.hasMoreElements())
-                    {
-                        String alias = aliases.nextElement();
-                        if(ks.isKeyEntry(alias))
-                        {
-                            keyname = alias;
-                            break;
-                        }
-                    }
-
-                    if(keyname == null)
-                    {
-                        LOG.info("No key is contained in file {}, ignore it", fn);
-                        continue;
-                    }
-
-                    PrivateKey privKey = (PrivateKey) ks.getKey(keyname, password.get(0));
-
-                    if( (privKey instanceof RSAPrivateKey || privKey instanceof DSAPrivateKey ||
-                            privKey instanceof ECPrivateKey) == false)
-                    {
-                        throw new SignerException("Unsupported key " + privKey.getClass().getName());
-                    }
-
-                    Set<Certificate> caCerts = new HashSet<>();
-
-                    X509Certificate cert = (X509Certificate) ks.getCertificate(keyname);
-                    Certificate[] certsInKeystore = ks.getCertificateChain(keyname);
-                    if(certsInKeystore.length > 1)
-                    {
-                        for(int i = 1; i < certsInKeystore.length; i++)
-                        {
-                            caCerts.add(certsInKeystore[i]);
-                        }
-                    }
-
-                    X509Certificate[] certificateChain = IoCertUtil.buildCertPath(cert, caCerts);
-                    KeystoreP11Identity p11Identity = new KeystoreP11Identity(slotId,
-                            keyId, privKey, certificateChain, 20);
-                    currentIdentifies.add(p11Identity);
-                }
-            }catch(Throwable t)
-            {
-                final String message = "Could not initialize PKCS11 slot " + slotIndex +
-                        " (module: " + moduleConf.getName() + ")";
+                final String message = "unexpected error while initializing slot " + slotId;
                 if(LOG.isWarnEnabled())
                 {
                     LOG.warn(LogUtil.buildExceptionLogFormat(message), t.getClass().getName(), t.getMessage());
@@ -259,6 +147,8 @@ public class KeystoreP11CryptService implements P11CryptService
                 LOG.debug(message, t);
                 continue;
             }
+
+            currentIdentifies.addAll(slot.getIdentities());
         }
 
         this.identities.clear();
@@ -274,12 +164,15 @@ public class KeystoreP11CryptService implements P11CryptService
             {
                 sb.append("\t(slot ").append(identity.getSlotId());
                 sb.append(", algo=").append(identity.getPublicKey().getAlgorithm());
-                sb.append(", label=").append(identity.getKeyId().getKeyLabel()).append(")\n");
+                sb.append(", key=").append(identity.getKeyId()).append(")\n");
             }
 
             LOG.info(sb.toString());
         }
+
+        LOG.info("Refreshed PKCS#11 module {}", moduleConf.getName());
     }
+
     @Override
     public byte[] CKM_RSA_PKCS(byte[] encodedDigestInfo, P11SlotIdentifier slotId, P11KeyIdentifier keyId)
     throws SignerException
