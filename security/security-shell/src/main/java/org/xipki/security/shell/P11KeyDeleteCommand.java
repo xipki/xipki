@@ -60,7 +60,7 @@ public class P11KeyDeleteCommand extends P11SecurityCommand
     throws Exception
     {
         P11KeyIdentifier keyIdentifier = getKeyIdentifier();
-        IaikExtendedModule module = getModule(moduleName);
+        IaikExtendedModule module = getIaikModule(moduleName);
 
         IaikExtendedSlot slot = null;
         try

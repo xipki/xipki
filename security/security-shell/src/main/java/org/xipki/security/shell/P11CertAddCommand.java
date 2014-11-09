@@ -77,7 +77,7 @@ public class P11CertAddCommand extends SecurityCommand
     protected Object doExecute()
     throws Exception
     {
-        IaikExtendedModule module = getModule(moduleName);
+        IaikExtendedModule module = getIaikModule(moduleName);
 
         IaikExtendedSlot slot = null;
         try

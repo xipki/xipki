@@ -64,6 +64,8 @@ import org.xipki.security.api.SignerException;
 import org.xipki.security.api.p11.P11SlotIdentifier;
 import org.xipki.security.p11.iaik.IaikExtendedModule;
 import org.xipki.security.p11.iaik.IaikExtendedSlot;
+import org.xipki.security.p11.iaik.IaikP11CryptServiceFactory;
+import org.xipki.security.p11.keystore.KeystoreP11CryptServiceFactory;
 
 /**
  * @author Lijun Liao
@@ -88,124 +90,134 @@ public class P11ListSlotCommand extends SecurityCommand
     protected Object doExecute()
     throws Exception
     {
-        IaikExtendedModule module = getModule(moduleName);
-        if(module == null)
+        String pkcs11Provider = securityFactory.getPkcs11Provider();
+        if(IaikP11CryptServiceFactory.class.equals(pkcs11Provider))
         {
-            err("Undefined module " + moduleName);
-            return null;
-        }
-
-        List<P11SlotIdentifier> slots = module.getSlotIds();
-        out("Module: " + moduleName);
-
-        if(slotIndex == null)
-        {
-            // list all slots
-            int n = slots.size();
-
-            if(n == 0 || n == 1)
+            IaikExtendedModule module = getIaikModule(moduleName);
+            if(module == null)
             {
-                out(((n == 0) ? "no" : "1") + " slot is configured");
-            }
-            else
-            {
-                out(n + " slots are configured");
+                err("Undefined module " + moduleName);
+                return null;
             }
 
-            for(P11SlotIdentifier slotId : slots)
+            List<P11SlotIdentifier> slots = module.getSlotIds();
+            out("Module: " + moduleName);
+
+            if(slotIndex == null)
             {
-                out("\tslot[" + slotId.getSlotIndex() + "]: " + slotId.getSlotId());
+                // list all slots
+                int n = slots.size();
+
+                if(n == 0 || n == 1)
+                {
+                    out(((n == 0) ? "no" : "1") + " slot is configured");
+                }
+                else
+                {
+                    out(n + " slots are configured");
+                }
+
+                for(P11SlotIdentifier slotId : slots)
+                {
+                    out("\tslot[" + slotId.getSlotIndex() + "]: " + slotId.getSlotId());
+                }
+
+                return null;
             }
 
-            return null;
-        }
-
-        P11SlotIdentifier slotId = new P11SlotIdentifier(slotIndex, null);
-        IaikExtendedSlot slot = null;
-        try
-        {
-            slot = module.getSlot(slotId);
-        }catch(SignerException e)
-        {
-            err("\tError:  " + e.getMessage());
-            return null;
-        }
-
-        if(slot == null)
-        {
-            err("slot with index " + slotIndex + " does not exist");
-            return null;
-        }
-
-        List<PrivateKey> allPrivateObjects = slot.getAllPrivateObjects(null, null);
-        int size = allPrivateObjects.size();
-
-        List<ComparablePrivateKey> privateKeys = new ArrayList<>(size);
-        for(int i = 0; i < size; i++)
-        {
-            PrivateKey key = allPrivateObjects.get(i);
-            byte[] id = key.getId().getByteArrayValue();
-            if(id != null)
+            P11SlotIdentifier slotId = new P11SlotIdentifier(slotIndex, null);
+            IaikExtendedSlot slot = null;
+            try
             {
-                char[] label = key.getLabel().getCharArrayValue();
-                ComparablePrivateKey privKey = new ComparablePrivateKey(id, label, key);
-                privateKeys.add(privKey);
-            }
-        }
-
-        Collections.sort(privateKeys);
-        size = privateKeys.size();
-
-        List<X509PublicKeyCertificate> allCertObjects = slot.getAllCertificateObjects();
-
-        StringBuilder sb = new StringBuilder();
-        for(int i = 0; i < size; i++)
-        {
-            ComparablePrivateKey privKey = privateKeys.get(i);
-            byte[] keyId = privKey.getKeyId();
-            char[] keyLabel = privKey.getKeyLabel();
-
-            PublicKey pubKey = slot.getPublicKeyObject(null, null, keyId, keyLabel);
-            sb.append("\t")
-                .append(i + 1)
-                .append(". ")
-                .append(privKey.getKeyLabelAsText())
-                .append(" (").append("id: ")
-                .append(Hex.toHexString(privKey.getKeyId()).toUpperCase())
-                .append(")\n");
-
-            sb.append("\t\tAlgorithm: ")
-                .append(getKeyAlgorithm(pubKey))
-                .append("\n");
-
-            X509PublicKeyCertificate cert = removeCertificateObject(allCertObjects, keyId, keyLabel);
-            if(cert == null)
+                slot = module.getSlot(slotId);
+            }catch(SignerException e)
             {
-                sb.append("\t\tCertificate: NONE\n");
+                err("\tError:  " + e.getMessage());
+                return null;
             }
-            else
+
+            if(slot == null)
             {
-                formatString(sb, cert);
+                err("slot with index " + slotIndex + " does not exist");
+                return null;
             }
-        }
 
-        for(int i = 0; i < allCertObjects.size(); i++)
+            List<PrivateKey> allPrivateObjects = slot.getAllPrivateObjects(null, null);
+            int size = allPrivateObjects.size();
+
+            List<ComparablePrivateKey> privateKeys = new ArrayList<>(size);
+            for(int i = 0; i < size; i++)
+            {
+                PrivateKey key = allPrivateObjects.get(i);
+                byte[] id = key.getId().getByteArrayValue();
+                if(id != null)
+                {
+                    char[] label = key.getLabel().getCharArrayValue();
+                    ComparablePrivateKey privKey = new ComparablePrivateKey(id, label, key);
+                    privateKeys.add(privKey);
+                }
+            }
+
+            Collections.sort(privateKeys);
+            size = privateKeys.size();
+
+            List<X509PublicKeyCertificate> allCertObjects = slot.getAllCertificateObjects();
+
+            StringBuilder sb = new StringBuilder();
+            for(int i = 0; i < size; i++)
+            {
+                ComparablePrivateKey privKey = privateKeys.get(i);
+                byte[] keyId = privKey.getKeyId();
+                char[] keyLabel = privKey.getKeyLabel();
+
+                PublicKey pubKey = slot.getPublicKeyObject(null, null, keyId, keyLabel);
+                sb.append("\t")
+                    .append(i + 1)
+                    .append(". ")
+                    .append(privKey.getKeyLabelAsText())
+                    .append(" (").append("id: ")
+                    .append(Hex.toHexString(privKey.getKeyId()).toUpperCase())
+                    .append(")\n");
+
+                sb.append("\t\tAlgorithm: ")
+                    .append(getKeyAlgorithm(pubKey))
+                    .append("\n");
+
+                X509PublicKeyCertificate cert = removeCertificateObject(allCertObjects, keyId, keyLabel);
+                if(cert == null)
+                {
+                    sb.append("\t\tCertificate: NONE\n");
+                }
+                else
+                {
+                    formatString(sb, cert);
+                }
+            }
+
+            for(int i = 0; i < allCertObjects.size(); i++)
+            {
+                X509PublicKeyCertificate certObj = allCertObjects.get(i);
+                sb.append("\tCert-")
+                    .append(i + 1)
+                    .append(". ")
+                    .append(certObj.getLabel().getCharArrayValue())
+                    .append(" (").append("id: ")
+                    .append(Hex.toHexString(certObj.getId().getByteArrayValue()).toUpperCase())
+                    .append(")\n");
+
+                formatString(sb, certObj);
+            }
+
+            if(sb.length() > 0)
+            {
+                out(sb.toString());
+            }
+        } else if(KeystoreP11CryptServiceFactory.class.getName().equals(pkcs11Provider))
         {
-            X509PublicKeyCertificate certObj = allCertObjects.get(i);
-            sb.append("\tCert-")
-                .append(i + 1)
-                .append(". ")
-                .append(certObj.getLabel().getCharArrayValue())
-                .append(" (").append("id: ")
-                .append(Hex.toHexString(certObj.getId().getByteArrayValue()).toUpperCase())
-                .append(")\n");
 
-            formatString(sb, certObj);
-        }
-
-        if(sb.length() > 0)
+        } else
         {
-            out(sb.toString());
+            err("PKCS11 provider " + pkcs11Provider + " is not accepted");
         }
 
         return null;
