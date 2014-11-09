@@ -79,7 +79,7 @@ public class P11CertUpdateCommand extends P11SecurityCommand
     protected Object doExecute()
     throws Exception
     {
-        IaikExtendedModule module = getModule(moduleName);
+        IaikExtendedModule module = getIaikModule(moduleName);
 
         P11KeyIdentifier keyIdentifier = getKeyIdentifier();
 
