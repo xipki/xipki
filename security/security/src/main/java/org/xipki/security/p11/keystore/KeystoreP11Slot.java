@@ -109,11 +109,6 @@ public class KeystoreP11Slot
                     ks = KeyStore.getInstance("PKCS12", "BC");
                     keyLabel= fn.substring(0, fn.length() - ".p12".length());
                 }
-                else if(fn.endsWith(".jks") || fn.endsWith(".JKS"))
-                {
-                    ks = KeyStore.getInstance("JKS");
-                    keyLabel= fn.substring(0, fn.length() - ".jks".length());
-                }
                 else
                 {
                     LOG.info("Ignore none keystore file {}", file.getPath());
