@@ -33,54 +33,60 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.security.shell;
+package org.xipki.security.shell.p12;
 
+import org.apache.felix.gogo.commands.Command;
 import org.apache.felix.gogo.commands.Option;
-import org.bouncycastle.util.encoders.Hex;
-import org.xipki.security.api.SecurityFactory;
-import org.xipki.security.api.p11.P11KeyIdentifier;
+import org.xipki.security.api.P12KeypairGenerationResult;
+import org.xipki.security.p10.P12KeypairGenerator;
 
 /**
  * @author Lijun Liao
  */
 
-public abstract class P11SecurityCommand extends SecurityCommand
+@Command(scope = "keytool", name = "rsa-p12", description="Generate RSA keypair in PKCS#12 keystore")
+public class P12DSAKeyGenCommand extends P12KeyGenCommand
 {
-    @Option(name = "-slot",
-            required = true, description = "Required. Slot index")
-    protected Integer slotIndex;
+    @Option(name = "-plen",
+            description = "Bit length of the prime",
+            required = false)
+    protected Integer pLen = 2048;
 
-    @Option(name = "-key-id",
-            required = false, description = "Id of the private key in the PKCS#11 device.\n"
-                    + "Either keyId or keyLabel must be specified")
-    protected String keyId;
+    @Option(name = "-qlen",
+            description = "Bit length of the sub-prime",
+            required = false)
+    protected Integer qLen;
 
-    @Option(name = "-key-label",
-            required = false, description = "Label of the private key in the PKCS#11 device.\n"
-                    + "Either keyId or keyLabel must be specified")
-    protected String keyLabel;
-
-    @Option(name = "-module",
-            required = false, description = "Name of the PKCS#11 module.")
-    protected String moduleName = SecurityFactory.DEFAULT_P11MODULE_NAME;
-
-    protected P11KeyIdentifier getKeyIdentifier()
+    @Override
+    protected Object doExecute()
     throws Exception
     {
-        P11KeyIdentifier keyIdentifier;
-        if(keyId != null && keyLabel == null)
+        if(pLen % 1024 != 0)
         {
-            keyIdentifier = new P11KeyIdentifier(Hex.decode(keyId));
+            err("plen is not multiple of 1024: " + pLen);
+            return null;
         }
-        else if(keyId == null && keyLabel != null)
+
+        if(qLen == null)
         {
-            keyIdentifier = new P11KeyIdentifier(keyLabel);
+            if(pLen >= 2048)
+            {
+                qLen = 256;
+            }
+            else
+            {
+                qLen = 160;
+            }
         }
-        else
-        {
-            throw new Exception("Exactly one of keyId or keyLabel should be specified");
-        }
-        return keyIdentifier;
+
+        P12KeypairGenerator gen = new P12KeypairGenerator.DSAIdentityGenerator(
+                pLen, qLen, getPassword(), subject,
+                getKeyUsage(), getExtendedKeyUsage());
+
+        P12KeypairGenerationResult keyAndCert = gen.generateIdentity();
+        saveKeyAndCert(keyAndCert);
+
+        return null;
     }
 
 }

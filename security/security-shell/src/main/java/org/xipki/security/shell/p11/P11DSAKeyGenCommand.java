@@ -33,35 +33,60 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.security.shell;
+package org.xipki.security.shell.p11;
 
 import org.apache.felix.gogo.commands.Command;
 import org.apache.felix.gogo.commands.Option;
 import org.xipki.security.api.p11.P11KeypairGenerationResult;
-import org.xipki.security.p11.iaik.P11KeypairGenerator;
+import org.xipki.security.api.p11.P11WritableSlot;
 
 /**
  * @author Lijun Liao
  */
 
-@Command(scope = "keytool", name = "ec", description="Generate EC keypair in PKCS#11 device")
-public class P11ECKeyGenCommand extends P11KeyGenCommand
+@Command(scope = "keytool", name = "dsa", description="Generate DSA keypair in PKCS#11 device")
+public class P11DSAKeyGenCommand extends P11KeyGenCommand
 {
-    @Option(name = "-curve",
-            description = "EC Curve name",
+    @Option(name = "-plen",
+            description = "Bit length of the prime",
             required = false)
-    protected String curveName = "brainpoolp256r1";
+    protected Integer pLen = 2048;
+
+    @Option(name = "-qlen",
+            description = "Bit length of the sub-prime",
+            required = false)
+    protected Integer qLen;
 
     @Override
     protected Object doExecute()
     throws Exception
     {
-        P11KeypairGenerator gen = new P11KeypairGenerator(securityFactory);
-        P11KeypairGenerationResult keyAndCert = gen.generateECDSAKeypairAndCert(
-                moduleName, getSlotId(),
-                curveName, label, getSubject(),
-                getKeyUsage(), getExtendedKeyUsage());
+        if(pLen % 1024 != 0)
+        {
+            err("plen is not multiple of 1024: " + pLen);
+            return null;
+        }
+
+        if(qLen == null)
+        {
+            if(pLen >= 2048)
+            {
+                qLen = 256;
+            }
+            else
+            {
+                qLen = 160;
+            }
+        }
+
+        P11WritableSlot slot = getP11WritablSlot(moduleName, slotIndex);
+        P11KeypairGenerationResult keyAndCert = slot.generateDSAKeypairAndCert(
+                pLen, qLen,
+                label, getSubject(),
+                getKeyUsage(),
+                getExtendedKeyUsage());
         saveKeyAndCert(keyAndCert);
+
         return null;
     }
 

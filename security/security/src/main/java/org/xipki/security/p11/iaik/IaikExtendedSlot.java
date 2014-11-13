@@ -43,18 +43,41 @@ import iaik.pkcs.pkcs11.State;
 import iaik.pkcs.pkcs11.Token;
 import iaik.pkcs.pkcs11.TokenException;
 import iaik.pkcs.pkcs11.objects.ByteArrayAttribute;
+import iaik.pkcs.pkcs11.objects.Certificate.CertificateType;
 import iaik.pkcs.pkcs11.objects.CharArrayAttribute;
+import iaik.pkcs.pkcs11.objects.DSAPrivateKey;
+import iaik.pkcs.pkcs11.objects.DSAPublicKey;
+import iaik.pkcs.pkcs11.objects.ECDSAPrivateKey;
+import iaik.pkcs.pkcs11.objects.ECDSAPublicKey;
+import iaik.pkcs.pkcs11.objects.KeyPair;
 import iaik.pkcs.pkcs11.objects.PrivateKey;
 import iaik.pkcs.pkcs11.objects.PublicKey;
+import iaik.pkcs.pkcs11.objects.RSAPrivateKey;
+import iaik.pkcs.pkcs11.objects.RSAPublicKey;
 import iaik.pkcs.pkcs11.objects.X509PublicKeyCertificate;
-import iaik.pkcs.pkcs11.objects.Certificate.CertificateType;
 import iaik.pkcs.pkcs11.wrapper.PKCS11Constants;
 import iaik.pkcs.pkcs11.wrapper.PKCS11Exception;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.math.BigInteger;
+import java.security.KeyFactory;
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
+import java.security.cert.X509Certificate;
+import java.security.spec.DSAPublicKeySpec;
+import java.security.spec.InvalidKeySpecException;
+import java.security.spec.RSAPublicKeySpec;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.LinkedBlockingDeque;
@@ -63,25 +86,99 @@ import java.util.concurrent.atomic.AtomicLong;
 
 import javax.security.auth.x500.X500Principal;
 
+import org.bouncycastle.asn1.ASN1EncodableVector;
+import org.bouncycastle.asn1.ASN1Integer;
+import org.bouncycastle.asn1.ASN1ObjectIdentifier;
+import org.bouncycastle.asn1.ASN1Sequence;
+import org.bouncycastle.asn1.DERBitString;
+import org.bouncycastle.asn1.DERNull;
+import org.bouncycastle.asn1.DEROctetString;
+import org.bouncycastle.asn1.DERSequence;
+import org.bouncycastle.asn1.nist.NISTNamedCurves;
+import org.bouncycastle.asn1.nist.NISTObjectIdentifiers;
+import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
+import org.bouncycastle.asn1.sec.SECNamedCurves;
+import org.bouncycastle.asn1.teletrust.TeleTrusTNamedCurves;
+import org.bouncycastle.asn1.x500.X500Name;
+import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
+import org.bouncycastle.asn1.x509.Certificate;
+import org.bouncycastle.asn1.x509.ExtendedKeyUsage;
+import org.bouncycastle.asn1.x509.Extension;
+import org.bouncycastle.asn1.x509.Extensions;
+import org.bouncycastle.asn1.x509.KeyPurposeId;
+import org.bouncycastle.asn1.x509.KeyUsage;
+import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
+import org.bouncycastle.asn1.x509.TBSCertificate;
+import org.bouncycastle.asn1.x509.Time;
+import org.bouncycastle.asn1.x509.V3TBSCertificateGenerator;
+import org.bouncycastle.asn1.x9.ECNamedCurveTable;
+import org.bouncycastle.asn1.x9.X962NamedCurves;
+import org.bouncycastle.asn1.x9.X9ECParameters;
+import org.bouncycastle.asn1.x9.X9ObjectIdentifiers;
+import org.bouncycastle.cert.X509CertificateHolder;
+import org.bouncycastle.crypto.Digest;
+import org.bouncycastle.crypto.digests.SHA1Digest;
+import org.bouncycastle.crypto.digests.SHA256Digest;
+import org.bouncycastle.crypto.digests.SHA384Digest;
+import org.bouncycastle.crypto.digests.SHA512Digest;
+import org.bouncycastle.crypto.generators.DSAParametersGenerator;
+import org.bouncycastle.crypto.params.DSAParameterGenerationParameters;
+import org.bouncycastle.crypto.params.DSAParameters;
+import org.bouncycastle.crypto.params.RSAKeyParameters;
+import org.bouncycastle.crypto.util.SubjectPublicKeyInfoFactory;
 import org.bouncycastle.util.encoders.Hex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xipki.common.CmpUtf8Pairs;
 import org.xipki.common.IoCertUtil;
 import org.xipki.common.LogUtil;
+import org.xipki.common.ParamChecker;
+import org.xipki.security.api.PasswordResolverException;
+import org.xipki.security.api.SecurityFactory;
 import org.xipki.security.api.SignerException;
+import org.xipki.security.api.p11.P11Identity;
 import org.xipki.security.api.p11.P11KeyIdentifier;
+import org.xipki.security.api.p11.P11KeypairGenerationResult;
+import org.xipki.security.api.p11.P11SlotIdentifier;
+import org.xipki.security.api.p11.P11WritableSlot;
 
 /**
  * @author Lijun Liao
  */
 
-public class IaikExtendedSlot
+public class IaikExtendedSlot implements P11WritableSlot
 {
+
+    private static class PrivateKeyAndPKInfo
+    {
+        private final PrivateKey privateKey;
+        private final SubjectPublicKeyInfo publicKeyInfo;
+
+        public PrivateKeyAndPKInfo(PrivateKey privateKey, SubjectPublicKeyInfo publicKeyInfo)
+        {
+            super();
+            this.privateKey = privateKey;
+            this.publicKeyInfo = IoCertUtil.toRfc3279Style(publicKeyInfo);
+        }
+
+        public PrivateKey getPrivateKey()
+        {
+            return privateKey;
+        }
+
+        public SubjectPublicKeyInfo getPublicKeyInfo()
+        {
+            return publicKeyInfo;
+        }
+    }
+
     private static final Logger LOG = LoggerFactory.getLogger(IaikExtendedSlot.class);
+
+    public static final long YEAR = 365L * 24 * 60 * 60 * 1000; // milliseconds of one year
 
     private final static long DEFAULT_MAX_COUNT_SESSION = 20;
     private Slot slot;
-    private final int maxSessionCount;
+    private int maxSessionCount;
     private List<char[]> password;
 
     private long timeOutWaitNewSession = 10000; // maximal wait for 10 second
@@ -91,12 +188,19 @@ public class IaikExtendedSlot
     private ConcurrentHashMap<String, PrivateKey> signingKeysById = new ConcurrentHashMap<>();
     private ConcurrentHashMap<String, PrivateKey> signingKeysByLabel = new ConcurrentHashMap<>();
 
+    private final List<IaikP11Identity> identities = new LinkedList<>();
+
     private boolean writableSessionInUse = false;
     private Session writableSession;
+    private final P11SlotIdentifier slotId;
 
-    IaikExtendedSlot(Slot slot, List<char[]> password)
+    IaikExtendedSlot(P11SlotIdentifier slotId, Slot slot, List<char[]> password)
     throws SignerException
     {
+        ParamChecker.assertNotNull("slotId", slotId);
+        ParamChecker.assertNotNull("slot", slot);
+
+        this.slotId = slotId;
         this.slot = slot;
         this.password = password;
 
@@ -160,6 +264,153 @@ public class IaikExtendedSlot
         LOG.info("maxSessionCount: {}", this.maxSessionCount);
 
         returnIdleSession(session);
+
+        refresh();
+    }
+
+    public void refresh()
+    throws SignerException
+    {
+        Set<IaikP11Identity> currentIdentifies = new HashSet<>();
+
+        List<PrivateKey> signatureKeys = getAllPrivateObjects(Boolean.TRUE, null);
+        for(PrivateKey signatureKey : signatureKeys)
+        {
+            byte[] keyId = signatureKey.getId().getByteArrayValue();
+            if(keyId == null || keyId.length == 0)
+            {
+                continue;
+            }
+
+            try
+            {
+                X509PublicKeyCertificate certificateObject = getCertificateObject(keyId, null);
+
+                X509Certificate signatureCert = null;
+                java.security.PublicKey signaturePublicKey = null;
+
+                if(certificateObject != null)
+                {
+                    byte[] encoded = certificateObject.getValue().getByteArrayValue();
+                    try
+                    {
+                        signatureCert = (X509Certificate) IoCertUtil.parseCert(
+                                    new ByteArrayInputStream(encoded));
+                    } catch (Exception e)
+                    {
+                        String keyIdStr = hex(keyId);
+                        final String message = "Could not parse certificate with id " + keyIdStr;
+                        if(LOG.isWarnEnabled())
+                        {
+                            LOG.warn(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(), e.getMessage());
+                        }
+                        LOG.debug(message, e);
+                        continue;
+                    }
+                    signaturePublicKey = signatureCert.getPublicKey();
+                }
+                else
+                {
+                    signatureCert = null;
+                    PublicKey publicKeyObject = getPublicKeyObject(
+                            Boolean.TRUE, null, keyId, null);
+                    if(publicKeyObject == null)
+                    {
+                        String msg = "neither certificate nor public key for signing is available";
+                        LOG.info(msg);
+                        continue;
+                    }
+
+                    signaturePublicKey = generatePublicKey(publicKeyObject);
+                }
+
+                Map<String, Set<X509Certificate>> allCerts = new HashMap<>();
+                List<X509Certificate> certChain = new LinkedList<>();
+
+                if(signatureCert != null)
+                {
+                    certChain.add(signatureCert);
+                    while(true)
+                    {
+                        X509Certificate context = certChain.get(certChain.size() - 1);
+                        if(IoCertUtil.isSelfSigned(context))
+                        {
+                            break;
+                        }
+
+                        String issuerSubject = signatureCert.getIssuerX500Principal().getName();
+                        Set<X509Certificate> issuerCerts = allCerts.get(issuerSubject);
+                        if(issuerCerts == null)
+                        {
+                            issuerCerts = new HashSet<>();
+                            X509PublicKeyCertificate[] certObjects = getCertificateObjects(
+                                    signatureCert.getIssuerX500Principal());
+                            if(certObjects != null && certObjects.length > 0)
+                            {
+                                for(X509PublicKeyCertificate certObject : certObjects)
+                                {
+                                    issuerCerts.add(IoCertUtil.parseCert(certObject.getValue().getByteArrayValue()));
+                                }
+                            }
+
+                            if(issuerCerts.isEmpty() == false)
+                            {
+                                allCerts.put(issuerSubject, issuerCerts);
+                            }
+                        }
+
+                        if(issuerCerts == null || issuerCerts.isEmpty())
+                        {
+                            break;
+                        }
+
+                        // find the certificate
+                        for(X509Certificate issuerCert : issuerCerts)
+                        {
+                            try
+                            {
+                                context.verify(issuerCert.getPublicKey());
+                                certChain.add(issuerCert);
+                            }catch(Exception e)
+                            {
+                            }
+                        }
+                    }
+                }
+
+                P11KeyIdentifier tKeyId = new P11KeyIdentifier(
+                        signatureKey.getId().getByteArrayValue(),
+                        new String(signatureKey.getLabel().getCharArrayValue()));
+
+                IaikP11Identity identity = new IaikP11Identity(slotId, tKeyId,
+                        certChain.toArray(new X509Certificate[0]), signaturePublicKey);
+                currentIdentifies.add(identity);
+            } catch (SignerException e)
+            {
+                String keyIdStr = hex(keyId);
+                final String message = "SignerException while initializing key with key-id " + keyIdStr;
+                if(LOG.isWarnEnabled())
+                {
+                    LOG.warn(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(), e.getMessage());
+                }
+                LOG.debug(message, e);
+                continue;
+            } catch (Throwable t)
+            {
+                String keyIdStr = hex(keyId);
+                final String message = "Unexpected exception while initializing key with key-id " + keyIdStr;
+                if(LOG.isWarnEnabled())
+                {
+                    LOG.warn(LogUtil.buildExceptionLogFormat(message), t.getClass().getName(), t.getMessage());
+                }
+                LOG.debug(message, t);
+                continue;
+            }
+        }
+
+        this.identities.clear();
+        this.identities.addAll(currentIdentifies);
+        currentIdentifies.clear();
     }
 
     public byte[] CKM_ECDSA(byte[] hash, P11KeyIdentifier keyId)
@@ -283,7 +534,7 @@ public class IaikExtendedSlot
         }
     }
 
-    public synchronized Session borrowWritableSession()
+    private synchronized Session borrowWritableSession()
     throws SignerException
     {
         if(writableSession == null)
@@ -306,7 +557,7 @@ public class IaikExtendedSlot
         return writableSession;
     }
 
-    public synchronized void returnWritableSession(Session session)
+    private synchronized void returnWritableSession(Session session)
     throws SignerException
     {
         if(session != writableSession)
@@ -563,7 +814,6 @@ public class IaikExtendedSlot
     throws SignerException
     {
         Session session = borrowIdleSession();
-
         try
         {
             if(LOG.isTraceEnabled())
@@ -571,24 +821,20 @@ public class IaikExtendedSlot
                 String info = listCertificateObjects(session);
                 LOG.debug(info);
             }
-
             X509PublicKeyCertificate template = new X509PublicKeyCertificate();
             List<iaik.pkcs.pkcs11.objects.Object> tmpObjects = getObjects(session, template);
             int n = tmpObjects.size();
-
             List<X509PublicKeyCertificate> certs = new ArrayList<>(n);
             for(iaik.pkcs.pkcs11.objects.Object tmpObject : tmpObjects)
             {
                 X509PublicKeyCertificate cert = (X509PublicKeyCertificate) tmpObject;
                 certs.add(cert);
             }
-
             return certs;
         }finally
         {
             returnIdleSession(session);
         }
-
     }
 
     private void cacheSigningKey(PrivateKey privateKey)
@@ -617,7 +863,7 @@ public class IaikExtendedSlot
         }
     }
 
-    public PrivateKey getPrivateObject(
+    private PrivateKey getPrivateObject(
             Boolean forSigning, Boolean forDecrypting, byte[] keyId, char[] keyLabel)
     throws SignerException
     {
@@ -663,27 +909,6 @@ public class IaikExtendedSlot
             }
             return (PrivateKey) tmpObjects.get(0);
         }finally
-        {
-            returnIdleSession(session);
-        }
-    }
-
-    public String listPrivateKeyObjects()
-    {
-        Session session;
-        try
-        {
-            session = borrowIdleSession();
-        } catch (SignerException e)
-        {
-            return "Exception: " + e.getMessage();
-        }
-
-        try
-        {
-            return listPrivateKeyObjects(session, null, null);
-        }
-        finally
         {
             returnIdleSession(session);
         }
@@ -841,7 +1066,7 @@ public class IaikExtendedSlot
         return objList;
     }
 
-    public X509PublicKeyCertificate[] getCertificateObjects(X500Principal subject)
+    private X509PublicKeyCertificate[] getCertificateObjects(X500Principal subject)
     throws SignerException
     {
         Session session = borrowIdleSession();
@@ -878,7 +1103,7 @@ public class IaikExtendedSlot
         }
     }
 
-    public X509PublicKeyCertificate getCertificateObject(byte[] keyId, char[] keyLabel)
+    private X509PublicKeyCertificate getCertificateObject(byte[] keyId, char[] keyLabel)
     throws SignerException
     {
         X509PublicKeyCertificate[] certs = getCertificateObjects(keyId, keyLabel);
@@ -894,7 +1119,7 @@ public class IaikExtendedSlot
         return certs[0];
     }
 
-    public X509PublicKeyCertificate[] getCertificateObjects(byte[] keyId, char[] keyLabel)
+    private X509PublicKeyCertificate[] getCertificateObjects(byte[] keyId, char[] keyLabel)
     throws SignerException
     {
         Session session = borrowIdleSession();
@@ -932,27 +1157,6 @@ public class IaikExtendedSlot
             }
             return certs;
         }finally
-        {
-            returnIdleSession(session);
-        }
-    }
-
-    public String listCertificateObjects()
-    {
-        Session session;
-        try
-        {
-            session = borrowIdleSession();
-        } catch (SignerException e)
-        {
-            return "Exception: " + e.getMessage();
-        }
-
-        try
-        {
-            return listCertificateObjects(session);
-        }
-        finally
         {
             returnIdleSession(session);
         }
@@ -1002,24 +1206,188 @@ public class IaikExtendedSlot
         }
     }
 
-    public String listPublicKeyObjects()
+    @Override
+    public void updateCertificate(P11KeyIdentifier keyIdentifier,
+            X509Certificate newCert, Set<X509Certificate> caCerts,
+            SecurityFactory securityFactory)
+    throws Exception
     {
-        Session session;
-        try
+        ParamChecker.assertNotNull("keyIdentifier", keyIdentifier);
+        ParamChecker.assertNotNull("newCert", newCert);
+
+        String keyLabel = keyIdentifier.getKeyLabel();
+        char[] keyLabelChars = (keyLabel == null) ?
+                null : keyLabel.toCharArray();
+
+        PrivateKey privKey = getPrivateObject(null, null, keyIdentifier.getKeyId(), keyLabelChars);
+
+        if(privKey == null)
         {
-            session = borrowIdleSession();
-        } catch (SignerException e)
-        {
-            return "Exception: " + e.getMessage();
+            throw new SignerException("Could not find private key " + keyIdentifier);
         }
 
+        byte[] keyId = privKey.getId().getByteArrayValue();
+        X509PublicKeyCertificate[] existingCerts = getCertificateObjects(keyId, null);
+
+        assertMatch(newCert, keyIdentifier, securityFactory);
+
+        X509Certificate[] certChain = IoCertUtil.buildCertPath(newCert, caCerts);
+
+        Session session = borrowWritableSession();
         try
         {
-            return listPublicKeyObjects(session, null, null);
-        }
-        finally
+            X509PublicKeyCertificate newCertTemp = createPkcs11Template(newCert, null, keyId,
+                    privKey.getLabel().getCharArrayValue());
+            // delete existing signer certificate objects
+            if(existingCerts != null && existingCerts.length > 0)
+            {
+                for(X509PublicKeyCertificate existingCert : existingCerts)
+                {
+                    session.destroyObject(existingCert);
+                }
+                Thread.sleep(1000);
+            }
+
+            // create new signer certificate object
+            session.createObject(newCertTemp);
+
+            // craete CA certificate objects
+            if(certChain.length > 1)
+            {
+                for(int i = 1; i < certChain.length; i++)
+                {
+                    X509Certificate caCert = certChain[i];
+                    byte[] encodedCaCert = caCert.getEncoded();
+
+                    boolean alreadyExists = false;
+                    X509PublicKeyCertificate[] certObjs = getCertificateObjects(caCert.getSubjectX500Principal());
+                    if(certObjs != null)
+                    {
+                        for(X509PublicKeyCertificate certObj : certObjs)
+                        {
+                            if(Arrays.equals(encodedCaCert, certObj.getValue().getByteArrayValue()))
+                            {
+                                alreadyExists = true;
+                                break;
+                            }
+                        }
+                    }
+
+                    if(alreadyExists)
+                    {
+                        continue;
+                    }
+
+                    byte[] caCertKeyId = IaikP11Util.generateKeyID(session);
+                    X509PublicKeyCertificate newCaCertTemp = createPkcs11Template(
+                            caCert, encodedCaCert, caCertKeyId, null);
+                    session.createObject(newCaCertTemp);
+                }
+            }
+        }finally
         {
-            returnIdleSession(session);
+            returnWritableSession(session);
+        }
+    }
+
+    @Override
+    public boolean removeKeyAndCerts(P11KeyIdentifier keyIdentifier)
+    throws Exception
+    {
+        ParamChecker.assertNotNull("keyIdentifier", keyIdentifier);
+
+        String keyLabel = keyIdentifier.getKeyLabel();
+        char[] keyLabelChars = (keyLabel == null) ?
+                null : keyLabel.toCharArray();
+
+        PrivateKey privKey = getPrivateObject(null, null, keyIdentifier.getKeyId(), keyLabelChars);
+        if(privKey == null)
+        {
+            return false;
+        }
+
+        StringBuilder msgBuilder = new StringBuilder();
+        Session session = borrowWritableSession();
+        try
+        {
+            try
+            {
+                session.destroyObject(privKey);
+            }catch(TokenException e)
+            {
+                msgBuilder.append("Could not delete private key, ");
+            }
+
+            PublicKey pubKey = getPublicKeyObject(null, null,
+                    privKey.getId().getByteArrayValue(), null);
+            if(pubKey != null)
+            {
+                try
+                {
+                    session.destroyObject(pubKey);
+                }catch(TokenException e)
+                {
+                    msgBuilder.append("Could not delete public key, ");
+                }
+            }
+
+            X509PublicKeyCertificate[] certs = getCertificateObjects(privKey.getId().getByteArrayValue(), null);
+            if(certs != null && certs.length > 0)
+            {
+                for(int i = 0; i < certs.length; i++)
+                {
+                    try
+                    {
+                        session.destroyObject(certs[i]);
+                    }catch(TokenException e)
+                    {
+                        msgBuilder.append("Could not delete certificate at index ").append(i);
+                        msgBuilder.append(", ");
+                    }
+                }
+            }
+        }finally
+        {
+            returnWritableSession(session);
+        }
+
+        int n = msgBuilder.length();
+        if(n > 2)
+        {
+            throw new SignerException(msgBuilder.substring(0, n - 2));
+        }
+
+        return true;
+    }
+
+    @Override
+    public void removeCerts(P11KeyIdentifier keyIdentifier)
+    throws Exception
+    {
+        ParamChecker.assertNotNull("keyIdentifier", keyIdentifier);
+
+        String keyLabel = keyIdentifier.getKeyLabel();
+        char[] keyLabelChars = (keyLabel == null) ?
+                null : keyLabel.toCharArray();
+
+        X509PublicKeyCertificate[] existingCerts = getCertificateObjects(
+                keyIdentifier.getKeyId(), keyLabelChars);
+
+        if(existingCerts == null || existingCerts.length == 0)
+        {
+            throw new SignerException("Could not find certificates with id " + keyIdentifier);
+        }
+
+        Session session = borrowWritableSession();
+        try
+        {
+            for(X509PublicKeyCertificate cert : existingCerts)
+            {
+                session.destroyObject(cert);
+            }
+        }finally
+        {
+            returnWritableSession(session);
         }
     }
 
@@ -1086,4 +1454,666 @@ public class IaikExtendedSlot
         sb.append(keyLabel == null ? "null" : new String(keyLabel));
         return sb.toString();
     }
+
+    private static X509PublicKeyCertificate createPkcs11Template(
+            X509Certificate cert, byte[] encodedCert,
+            byte[] keyId, char[] label)
+    throws Exception
+    {
+        if(encodedCert == null)
+        {
+            encodedCert = cert.getEncoded();
+        }
+
+        if(label == null)
+        {
+            X500Name x500Name = X500Name.getInstance(cert.getSubjectX500Principal().getEncoded());
+            label = IoCertUtil.getCommonName(x500Name).toCharArray();
+        }
+
+        X509PublicKeyCertificate newCertTemp = new X509PublicKeyCertificate();
+        newCertTemp.getId().setByteArrayValue(keyId);
+        newCertTemp.getLabel().setCharArrayValue(label);
+        newCertTemp.getToken().setBooleanValue(true);
+        newCertTemp.getCertificateType().setLongValue(
+                CertificateType.X_509_PUBLIC_KEY);
+
+        newCertTemp.getSubject().setByteArrayValue(
+                cert.getSubjectX500Principal().getEncoded());
+        newCertTemp.getIssuer().setByteArrayValue(
+                cert.getIssuerX500Principal().getEncoded());
+        newCertTemp.getSerialNumber().setByteArrayValue(
+                cert.getSerialNumber().toByteArray());
+        newCertTemp.getValue().setByteArrayValue(encodedCert);
+        return newCertTemp;
+    }
+
+    private void assertMatch(X509Certificate cert, P11KeyIdentifier keyId, SecurityFactory securityFactory)
+    throws SignerException, PasswordResolverException
+    {
+        CmpUtf8Pairs pairs = new CmpUtf8Pairs("slot-id", Long.toString(slot.getSlotID()));
+        if(keyId.getKeyId() != null)
+        {
+            pairs.putUtf8Pair("key-id", Hex.toHexString(keyId.getKeyId()));
+        }
+        if(keyId.getKeyLabel() != null)
+        {
+            pairs.putUtf8Pair("key-label", keyId.getKeyLabel());
+        }
+
+        securityFactory.createSigner("PKCS11", pairs.getEncoded(), "SHA1", false, cert);
+    }
+
+    @Override
+    public P11KeyIdentifier addCert(X509Certificate cert)
+    throws Exception
+    {
+        Session session = borrowWritableSession();
+        try
+        {
+            byte[] encodedCert = cert.getEncoded();
+
+            X509PublicKeyCertificate[] certObjs = getCertificateObjects(cert.getSubjectX500Principal());
+            if(certObjs != null)
+            {
+                for(X509PublicKeyCertificate certObj : certObjs)
+                {
+                    if(Arrays.equals(encodedCert, certObj.getValue().getByteArrayValue()))
+                    {
+                        P11KeyIdentifier p11KeyId = new P11KeyIdentifier(
+                                certObj.getId().getByteArrayValue(),
+                                new String(certObj.getLabel().getCharArrayValue()));
+                        throw new SignerException("Given certificate already exists under " + p11KeyId);
+                    }
+                }
+            }
+
+            byte[] keyId = IaikP11Util.generateKeyID(session);
+            X509PublicKeyCertificate newCaCertTemp = createPkcs11Template(
+                    cert, encodedCert, keyId, null);
+            session.createObject(newCaCertTemp);
+            P11KeyIdentifier p11KeyId = new P11KeyIdentifier(keyId,
+                    new String(newCaCertTemp.getLabel().getCharArrayValue()));
+            return p11KeyId;
+        }finally
+        {
+            returnWritableSession(session);
+        }
+    }
+
+    @Override
+    public P11KeypairGenerationResult generateRSAKeypairAndCert(int keySize,
+            BigInteger publicExponent, String label, String subject,
+            Integer keyUsage, List<ASN1ObjectIdentifier> extendedKeyusage)
+    throws Exception
+    {
+        ParamChecker.assertNotEmpty("label", label);
+
+        if (keySize < 1024)
+        {
+            throw new IllegalArgumentException("Keysize not allowed: " + keySize);
+        }
+
+        if(keySize % 1024 != 0)
+        {
+            throw new IllegalArgumentException("Key size is not multiple of 1024: " + keySize);
+        }
+
+        Session session = borrowWritableSession();
+        try
+        {
+            if(IaikP11Util.labelExists(session, label))
+            {
+                throw new IllegalArgumentException("Label " + label + " exists, please specify another one");
+            }
+
+            byte[] id = IaikP11Util.generateKeyID(session);
+
+            PrivateKeyAndPKInfo privateKeyAndPKInfo = generateRSAKeyPair(
+                    session,
+                    keySize, publicExponent, id, label);
+
+            AlgorithmIdentifier signatureAlgId = new AlgorithmIdentifier(
+                    PKCSObjectIdentifiers.sha256WithRSAEncryption, DERNull.INSTANCE);
+
+            X509CertificateHolder certificate = generateCertificate(session,
+                    id, label, subject,
+                    signatureAlgId, privateKeyAndPKInfo,
+                    keyUsage, extendedKeyusage);
+            return new P11KeypairGenerationResult(id, label, certificate);
+        }
+        finally
+        {
+            returnWritableSession(session);
+        }
+    }
+
+    @Override
+    public P11KeypairGenerationResult generateDSAKeypairAndCert(int pLength,
+            int qLength, String label, String subject, Integer keyUsage,
+            List<ASN1ObjectIdentifier> extendedKeyusage)
+    throws Exception
+    {
+        ParamChecker.assertNotEmpty("label", label);
+
+        if (pLength < 1024)
+        {
+            throw new IllegalArgumentException("Keysize not allowed: " + pLength);
+        }
+
+        if(pLength % 1024 != 0)
+        {
+            throw new IllegalArgumentException("Key size is not multiple of 1024: " + pLength);
+        }
+
+        Session session = borrowWritableSession();
+        try
+        {
+            if(IaikP11Util.labelExists(session, label))
+            {
+                throw new IllegalArgumentException("Label " + label + " exists, please specify another one");
+            }
+
+            byte[] id = IaikP11Util.generateKeyID(session);
+
+            PrivateKeyAndPKInfo privateKeyAndPKInfo = generateDSAKeyPair(session, pLength, qLength, id, label);
+            AlgorithmIdentifier signatureAlgId = new AlgorithmIdentifier(NISTObjectIdentifiers.dsa_with_sha256);
+
+            X509CertificateHolder certificate = generateCertificate(session,
+                    id, label, subject,
+                    signatureAlgId, privateKeyAndPKInfo,
+                    keyUsage, extendedKeyusage);
+            return new P11KeypairGenerationResult(id, label, certificate);
+        }
+        finally
+        {
+            returnWritableSession(session);
+        }
+    }
+
+    @Override
+    public P11KeypairGenerationResult generateECDSAKeypairAndCert(
+            String curveNameOrOid, String label, String subject,
+            Integer keyUsage, List<ASN1ObjectIdentifier> extendedKeyusage)
+    throws Exception
+    {
+        ParamChecker.assertNotEmpty("curveNameOrOid", curveNameOrOid);
+        ParamChecker.assertNotEmpty("label", label);
+
+        ASN1ObjectIdentifier curveId = getCurveId(curveNameOrOid);
+        if(curveId == null)
+        {
+            throw new IllegalArgumentException("Unknown curve " + curveNameOrOid);
+        }
+
+        X9ECParameters ecParams =  ECNamedCurveTable.getByOID(curveId);
+        if(ecParams == null)
+        {
+            throw new IllegalArgumentException("Unknown curve " + curveNameOrOid);
+        }
+
+        Session session = borrowWritableSession();
+        try
+        {
+            if(IaikP11Util.labelExists(session, label))
+            {
+                throw new IllegalArgumentException("Label " + label + " exists, please specify another one");
+            }
+
+            byte[] id = IaikP11Util.generateKeyID(session);
+
+            PrivateKeyAndPKInfo privateKeyAndPKInfo = generateECDSAKeyPair(
+                    session, curveId, ecParams, id, label);
+
+            int keyBitLength = ecParams.getN().bitLength();
+
+            ASN1ObjectIdentifier sigAlgOid;
+            if(keyBitLength > 384)
+            {
+                sigAlgOid = X9ObjectIdentifiers.ecdsa_with_SHA512;
+            }
+            else if(keyBitLength > 256)
+            {
+                sigAlgOid = X9ObjectIdentifiers.ecdsa_with_SHA384;
+            }
+            else if(keyBitLength > 224)
+            {
+                sigAlgOid = X9ObjectIdentifiers.ecdsa_with_SHA256;
+            }
+            else if(keyBitLength > 160)
+            {
+                sigAlgOid = X9ObjectIdentifiers.ecdsa_with_SHA224;
+            }
+            else
+            {
+                sigAlgOid = X9ObjectIdentifiers.ecdsa_with_SHA1;
+            }
+
+            X509CertificateHolder certificate = generateCertificate(session,
+                    id, label, subject,
+                    new AlgorithmIdentifier(sigAlgOid, DERNull.INSTANCE),
+                    privateKeyAndPKInfo,
+                    keyUsage,
+                    extendedKeyusage);
+
+            return new P11KeypairGenerationResult(id, label, certificate);
+        }finally
+        {
+            returnWritableSession(session);
+        }
+    }
+
+    private PrivateKeyAndPKInfo generateDSAKeyPair(
+            Session session, int pLength, int qLength, byte[] id, String label)
+    throws Exception
+    {
+        DSAParametersGenerator paramGen = new DSAParametersGenerator(new SHA512Digest());
+        DSAParameterGenerationParameters genParams = new DSAParameterGenerationParameters(
+                pLength, qLength, 80, new SecureRandom());
+        paramGen.init(genParams);
+        DSAParameters dsaParams = paramGen.generateParameters();
+
+        DSAPrivateKey privateKey = new DSAPrivateKey();
+        DSAPublicKey publicKey = new DSAPublicKey();
+
+        setKeyAttributes(id, label, PKCS11Constants.CKK_DSA, privateKey, publicKey);
+
+        publicKey.getPrime().setByteArrayValue(dsaParams.getP().toByteArray());
+        publicKey.getSubprime().setByteArrayValue(dsaParams.getQ().toByteArray());
+        publicKey.getBase().setByteArrayValue(dsaParams.getG().toByteArray());
+
+        KeyPair kp = session.generateKeyPair(
+                Mechanism.get(PKCS11Constants.CKM_DSA_KEY_PAIR_GEN), publicKey, privateKey);
+
+        publicKey = (DSAPublicKey) kp.getPublicKey();
+        BigInteger value = new BigInteger(1, publicKey.getValue().getByteArrayValue());
+
+        ASN1EncodableVector v = new ASN1EncodableVector();
+        v.add(new ASN1Integer(dsaParams.getP()));
+        v.add(new ASN1Integer(dsaParams.getQ()));
+        v.add(new ASN1Integer(dsaParams.getG()));
+        ASN1Sequence dssParams = new DERSequence(v);
+
+        SubjectPublicKeyInfo pkInfo = new SubjectPublicKeyInfo(
+                new AlgorithmIdentifier(X9ObjectIdentifiers.id_dsa, dssParams),
+                new ASN1Integer(value));
+
+        return new PrivateKeyAndPKInfo((DSAPrivateKey) kp.getPrivateKey(), pkInfo);
+    }
+
+    private X509CertificateHolder generateCertificate(
+            Session session, byte[] id, String label, String subject,
+            AlgorithmIdentifier signatureAlgId, PrivateKeyAndPKInfo privateKeyAndPkInfo,
+            Integer keyUsage, List<ASN1ObjectIdentifier> extendedKeyUsage)
+    throws Exception
+    {
+        BigInteger serialNumber = BigInteger.ONE;
+        Date startDate = new Date();
+        Date endDate = new Date(startDate.getTime() + 20 * YEAR);
+
+        X500Name x500Name_subject = new X500Name(subject);
+        x500Name_subject = IoCertUtil.sortX509Name(x500Name_subject);
+
+        V3TBSCertificateGenerator tbsGen = new V3TBSCertificateGenerator();
+        tbsGen.setSerialNumber(new ASN1Integer(serialNumber));
+        tbsGen.setSignature(signatureAlgId);
+        tbsGen.setIssuer(x500Name_subject);
+        tbsGen.setStartDate(new Time(startDate));
+        tbsGen.setEndDate(new Time(endDate));
+        tbsGen.setSubject(x500Name_subject);
+        tbsGen.setSubjectPublicKeyInfo(privateKeyAndPkInfo.getPublicKeyInfo());
+
+        List<Extension> extensions = new ArrayList<>(2);
+        if(keyUsage == null)
+        {
+            keyUsage = KeyUsage.keyCertSign | KeyUsage.cRLSign |
+                    KeyUsage.digitalSignature | KeyUsage.keyEncipherment;
+        }
+        extensions.add(new Extension(Extension.keyUsage, true,
+                new DEROctetString(new KeyUsage(keyUsage))));
+
+        if(extendedKeyUsage != null && extendedKeyUsage.isEmpty() == false)
+        {
+            KeyPurposeId[] kps = new KeyPurposeId[extendedKeyUsage.size()];
+
+            int i = 0;
+            for (ASN1ObjectIdentifier oid : extendedKeyUsage)
+            {
+                kps[i++] = KeyPurposeId.getInstance(oid);
+            }
+
+            extensions.add(new Extension(Extension.extendedKeyUsage, false,
+                    new DEROctetString(new ExtendedKeyUsage(kps))));
+        }
+
+        Extensions paramX509Extensions = new Extensions(extensions.toArray(new Extension[0]));
+        tbsGen.setExtensions(paramX509Extensions);
+
+        TBSCertificate tbsCertificate = tbsGen.generateTBSCertificate();
+        byte[] encodedTbsCertificate = tbsCertificate.getEncoded();
+        byte[] signature = null;
+        Digest digest = null;
+        Mechanism sigMechanism = null;
+
+        ASN1ObjectIdentifier sigAlgID = signatureAlgId.getAlgorithm();
+
+        if (sigAlgID.equals(PKCSObjectIdentifiers.sha256WithRSAEncryption))
+        {
+            sigMechanism = Mechanism.get(PKCS11Constants.CKM_SHA256_RSA_PKCS);
+            session.signInit(sigMechanism, privateKeyAndPkInfo.getPrivateKey());
+            signature = session.sign(encodedTbsCertificate);
+        }
+        else if (sigAlgID.equals(NISTObjectIdentifiers.dsa_with_sha256))
+        {
+            digest = new SHA256Digest();
+            byte[] digestValue = new byte[digest.getDigestSize()];
+            digest.update(encodedTbsCertificate, 0, encodedTbsCertificate.length);
+            digest.doFinal(digestValue, 0);
+
+            session.signInit(Mechanism.get(PKCS11Constants.CKM_DSA), privateKeyAndPkInfo.getPrivateKey());
+            byte[] rawSignature = session.sign(digestValue);
+            signature = convertToX962Signature(rawSignature);
+        }
+        else
+        {
+            if (sigAlgID.equals(X9ObjectIdentifiers.ecdsa_with_SHA1))
+            {
+                digest = new SHA1Digest();
+            }
+            else if (sigAlgID.equals(X9ObjectIdentifiers.ecdsa_with_SHA256))
+            {
+                digest = new SHA256Digest();
+            }
+            else if (sigAlgID.equals(X9ObjectIdentifiers.ecdsa_with_SHA384))
+            {
+                digest = new SHA384Digest();
+            }
+            else if (sigAlgID.equals(X9ObjectIdentifiers.ecdsa_with_SHA512))
+            {
+                digest = new SHA512Digest();
+            }
+            else
+            {
+                System.err.println("Unknown algorithm ID: " + sigAlgID.getId());
+                return null;
+            }
+
+            byte[] digestValue = new byte[digest.getDigestSize()];
+            digest.update(encodedTbsCertificate, 0, encodedTbsCertificate.length);
+            digest.doFinal(digestValue, 0);
+
+            session.signInit(Mechanism.get(PKCS11Constants.CKM_ECDSA), privateKeyAndPkInfo.getPrivateKey());
+            byte[] rawSignature = session.sign(digestValue);
+            signature = convertToX962Signature(rawSignature);
+        }
+
+        // build DER certificate
+        ASN1EncodableVector v = new ASN1EncodableVector();
+        v.add(tbsCertificate);
+        v.add(signatureAlgId);
+        v.add(new DERBitString(signature));
+        DERSequence cert = new DERSequence(v);
+
+        // build and store PKCS#11 certificate object
+        X509PublicKeyCertificate certTemp = new X509PublicKeyCertificate();
+        certTemp.getToken().setBooleanValue(true);
+        certTemp.getId().setByteArrayValue(id);
+        certTemp.getLabel().setCharArrayValue(label.toCharArray());
+        certTemp.getSubject().setByteArrayValue(x500Name_subject.getEncoded());
+        certTemp.getIssuer().setByteArrayValue(x500Name_subject.getEncoded());
+        certTemp.getSerialNumber().setByteArrayValue(serialNumber.toByteArray());
+        certTemp.getValue().setByteArrayValue(cert.getEncoded());
+        session.createObject(certTemp);
+
+        return new X509CertificateHolder(Certificate.getInstance(cert));
+    }
+
+    private static byte[] convertToX962Signature(byte[] signature)
+    throws IOException
+    {
+        int n = signature.length / 2;
+        byte[] x = Arrays.copyOfRange(signature, 0, n);
+        byte[] y = Arrays.copyOfRange(signature, n, 2*n);
+
+        ASN1EncodableVector sigder = new ASN1EncodableVector();
+        sigder.add(new ASN1Integer(
+                new BigInteger(1, x)));
+        sigder.add(new ASN1Integer(
+                new BigInteger(1, y)));
+
+        return new DERSequence(sigder).getEncoded();
+    }
+
+    private static void setKeyAttributes(
+            byte[] id, String label, long keyType,
+            PrivateKey privateKey, PublicKey publicKey)
+    {
+        if(privateKey != null)
+        {
+            privateKey.getId().setByteArrayValue(id);
+            privateKey.getToken().setBooleanValue(true);
+            privateKey.getLabel().setCharArrayValue(label.toCharArray());
+            privateKey.getKeyType().setLongValue(keyType);
+            privateKey.getSign().setBooleanValue(true);
+            privateKey.getPrivate().setBooleanValue(true);
+            privateKey.getSensitive().setBooleanValue(true);
+        }
+
+        if(publicKey != null)
+        {
+            publicKey.getId().setByteArrayValue(id);
+            publicKey.getToken().setBooleanValue(true);
+            publicKey.getLabel().setCharArrayValue(label.toCharArray());
+            publicKey.getKeyType().setLongValue(keyType);
+            publicKey.getVerify().setBooleanValue(true);
+            publicKey.getModifiable().setBooleanValue(Boolean.TRUE);
+        }
+    }
+
+    private PrivateKeyAndPKInfo generateRSAKeyPair(
+            Session session,
+            int keySize, BigInteger publicExponent,
+            byte[] id, String label)
+    throws Exception
+    {
+        if(publicExponent == null)
+        {
+            publicExponent = BigInteger.valueOf(65537);
+        }
+
+        RSAPrivateKey privateKey = new RSAPrivateKey();
+        RSAPublicKey publicKey = new RSAPublicKey();
+
+        setKeyAttributes(id, label, PKCS11Constants.CKK_RSA, privateKey, publicKey);
+
+        publicKey.getModulusBits().setLongValue((long) keySize);
+        publicKey.getPublicExponent().setByteArrayValue(publicExponent.toByteArray());
+
+        KeyPair kp = session.generateKeyPair(
+                Mechanism.get(PKCS11Constants.CKM_RSA_PKCS_KEY_PAIR_GEN), publicKey, privateKey);
+
+        publicKey = (RSAPublicKey) kp.getPublicKey();
+
+        BigInteger modulus = new BigInteger(1, publicKey.getModulus().getByteArrayValue());
+        publicExponent = new BigInteger(1, publicKey.getPublicExponent().getByteArrayValue());
+        RSAKeyParameters keyParams = new RSAKeyParameters(false, modulus, publicExponent);
+        SubjectPublicKeyInfo pkInfo = SubjectPublicKeyInfoFactory.createSubjectPublicKeyInfo(keyParams);
+
+        return new PrivateKeyAndPKInfo((RSAPrivateKey) kp.getPrivateKey(), pkInfo);
+    }
+
+    private static ASN1ObjectIdentifier getCurveId(String curveNameOrOid)
+    {
+        ASN1ObjectIdentifier curveId;
+
+        try
+        {
+            curveId = new ASN1ObjectIdentifier(curveNameOrOid);
+            return curveId;
+        } catch(Exception e)
+        {
+        }
+
+        curveId = X962NamedCurves.getOID(curveNameOrOid);
+
+        if (curveId == null)
+        {
+            curveId = SECNamedCurves.getOID(curveNameOrOid);
+        }
+
+        if (curveId == null)
+        {
+            curveId = TeleTrusTNamedCurves.getOID(curveNameOrOid);
+        }
+
+        if (curveId == null)
+        {
+            curveId = NISTNamedCurves.getOID(curveNameOrOid);
+        }
+
+        return curveId;
+    }
+
+    private PrivateKeyAndPKInfo generateECDSAKeyPair(
+            Session session,
+            ASN1ObjectIdentifier curveId, X9ECParameters ecParams,
+            byte[] id, String label)
+    throws Exception
+    {
+        KeyPair kp = null;
+
+        try
+        {
+            kp = generateNamedECDSAKeyPair(session, curveId, id, label);
+        }catch(TokenException e)
+        {
+            kp = generateSpecifiedECDSAKeyPair(session, curveId, ecParams, id, label);
+        }
+
+        ECDSAPublicKey publicKey = (ECDSAPublicKey) kp.getPublicKey();
+
+        // build subjectPKInfo object
+        byte[] pubPoint = publicKey.getEcPoint().getByteArrayValue();
+        DEROctetString os = (DEROctetString)DEROctetString.fromByteArray(pubPoint);
+
+        AlgorithmIdentifier keyAlgID = new AlgorithmIdentifier(X9ObjectIdentifiers.id_ecPublicKey, curveId);
+        SubjectPublicKeyInfo pkInfo = new SubjectPublicKeyInfo(keyAlgID, os.getOctets());
+        return new PrivateKeyAndPKInfo((ECDSAPrivateKey) kp.getPrivateKey(), pkInfo);
+    }
+
+    private KeyPair generateNamedECDSAKeyPair(
+            Session session, ASN1ObjectIdentifier curveId, byte[] id, String label)
+    throws TokenException, IOException
+    {
+        ECDSAPrivateKey privateKeyTemplate = new ECDSAPrivateKey();
+        ECDSAPublicKey publicKeyTemplate = new ECDSAPublicKey();
+        setKeyAttributes(id, label, PKCS11Constants.CKK_ECDSA, privateKeyTemplate, publicKeyTemplate);
+
+        byte[] ecdsaParamsBytes = curveId.getEncoded();
+        publicKeyTemplate.getEcdsaParams().setByteArrayValue(ecdsaParamsBytes);
+
+        return session.generateKeyPair(Mechanism.get(PKCS11Constants.CKM_EC_KEY_PAIR_GEN),
+                publicKeyTemplate, privateKeyTemplate);
+    }
+
+    private KeyPair generateSpecifiedECDSAKeyPair(
+            Session session, ASN1ObjectIdentifier curveId, X9ECParameters ecParams, byte[] id, String label)
+    throws TokenException, IOException
+    {
+        ECDSAPrivateKey privateKeyTemplate = new ECDSAPrivateKey();
+        ECDSAPublicKey publicKeyTemplate = new ECDSAPublicKey();
+        setKeyAttributes(id, label, PKCS11Constants.CKK_ECDSA, privateKeyTemplate, publicKeyTemplate);
+
+        byte[] ecdsaParamsBytes = ecParams.getEncoded();
+        publicKeyTemplate.getEcdsaParams().setByteArrayValue(ecdsaParamsBytes);
+
+        return session.generateKeyPair(Mechanism.get(PKCS11Constants.CKM_EC_KEY_PAIR_GEN),
+                publicKeyTemplate, privateKeyTemplate);
+    }
+
+    private static String hex(byte[] bytes)
+    {
+        return Hex.toHexString(bytes).toUpperCase();
+    }
+
+    private static java.security.PublicKey generatePublicKey(PublicKey p11Key)
+    throws SignerException
+    {
+        if(p11Key instanceof RSAPublicKey)
+        {
+            RSAPublicKey rsaP11Key = (RSAPublicKey) p11Key;
+            byte[] expBytes = rsaP11Key.getPublicExponent().getByteArrayValue();
+            BigInteger exp = new BigInteger(1,expBytes);
+
+            byte[] modBytes = rsaP11Key.getModulus().getByteArrayValue();
+            BigInteger mod = new BigInteger(1,modBytes);
+
+            if(LOG.isDebugEnabled())
+            {
+                LOG.debug("Modulus:\n {}", Hex.toHexString(modBytes));
+            }
+            RSAPublicKeySpec keySpec = new RSAPublicKeySpec(mod,exp);
+            try
+            {
+                KeyFactory keyFactory=KeyFactory.getInstance("RSA");
+                return keyFactory.generatePublic(keySpec);
+            }catch(NoSuchAlgorithmException | InvalidKeySpecException e)
+            {
+                throw new SignerException(e);
+            }
+        }
+        else if(p11Key instanceof DSAPublicKey)
+        {
+            DSAPublicKey dsaP11Key = (DSAPublicKey) p11Key;
+
+            BigInteger prime = new BigInteger(1, dsaP11Key.getPrime().getByteArrayValue()); // p
+            BigInteger subPrime = new BigInteger(1, dsaP11Key.getSubprime().getByteArrayValue()); // q
+            BigInteger base = new BigInteger(1, dsaP11Key.getBase().getByteArrayValue()); // g
+            BigInteger value = new BigInteger(1, dsaP11Key.getValue().getByteArrayValue()); // y
+
+            DSAPublicKeySpec keySpec = new DSAPublicKeySpec(value, prime, subPrime, base);
+            try
+            {
+                KeyFactory keyFactory=KeyFactory.getInstance("DSA");
+                return keyFactory.generatePublic(keySpec);
+            }catch(NoSuchAlgorithmException | InvalidKeySpecException e)
+            {
+                throw new SignerException(e);
+            }
+        }
+        else if(p11Key instanceof ECDSAPublicKey)
+        {
+            // FIXME: implement me
+            return null;
+        }
+        else
+        {
+            throw new SignerException("Unknown public key class " + p11Key.getClass().getName());
+        }
+    }
+
+    @Override
+    public List<? extends P11Identity> getP11Identities()
+    {
+        return Collections.unmodifiableList(identities);
+    }
+
+    @Override
+    public X509Certificate exportCert(P11KeyIdentifier keyIdentifier)
+    throws Exception
+    {
+        String keyLabel = keyIdentifier.getKeyLabel();
+        char[] keyLabelChars = (keyLabel == null) ?
+                null : keyLabel.toCharArray();
+
+        PrivateKey privKey = getPrivateObject(null, null, keyIdentifier.getKeyId(), keyLabelChars);
+        if(privKey == null)
+        {
+            return null;
+        }
+
+        X509PublicKeyCertificate cert = getCertificateObject(privKey.getId().getByteArrayValue(), null);
+        return IoCertUtil.parseCert(cert.getValue().getByteArrayValue());
+    }
+
 }

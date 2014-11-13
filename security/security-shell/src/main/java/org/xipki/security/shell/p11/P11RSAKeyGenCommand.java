@@ -33,54 +33,50 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.security.shell;
+package org.xipki.security.shell.p11;
 
-import java.io.File;
-import java.security.KeyStore;
-import java.security.cert.X509Certificate;
-import java.util.Enumeration;
+import java.math.BigInteger;
 
 import org.apache.felix.gogo.commands.Command;
 import org.apache.felix.gogo.commands.Option;
-import org.xipki.security.api.SignerException;
+import org.xipki.security.api.p11.P11KeypairGenerationResult;
+import org.xipki.security.api.p11.P11WritableSlot;
 
 /**
  * @author Lijun Liao
  */
 
-@Command(scope = "keytool", name = "export-cert-p12", description="Export certificate from PKCS#12 keystore")
-public class P12CertExportCommand extends P12SecurityCommand
+@Command(scope = "keytool", name = "rsa", description="Generate RSA keypair in PKCS#11 device")
+public class P11RSAKeyGenCommand extends P11KeyGenCommand
 {
-    @Option(name = "-out",
-            required = true, description = "Required. Where to save the certificate")
-    protected String outFile;
+    @Option(name = "-keysize",
+            description = "Keysize in bit",
+            required = false)
+    protected Integer keysize = 2048;
+
+    @Option(name = "-e",
+            description = "public exponent",
+            required = false)
+    protected String publicExponent = "65537";
 
     @Override
     protected Object doExecute()
     throws Exception
     {
-        KeyStore ks = getKeyStore();
-
-        String keyname = null;
-        Enumeration<String> aliases = ks.aliases();
-        while(aliases.hasMoreElements())
+        if(keysize % 1024 != 0)
         {
-            String alias = aliases.nextElement();
-            if(ks.isKeyEntry(alias))
-            {
-                keyname = alias;
-                break;
-            }
+            err("Keysize is not multiple of 1024: " + keysize);
+            return null;
         }
 
-        if(keyname == null)
-        {
-            throw new SignerException("Could not find private key");
-        }
-
-        X509Certificate cert = (X509Certificate) ks.getCertificate(keyname);
-        saveVerbose("Saved certificate to file", new File(outFile), cert.getEncoded());
-
+        BigInteger _publicExponent = new BigInteger(publicExponent);
+        P11WritableSlot slot = getP11WritablSlot(moduleName, slotIndex);
+        P11KeypairGenerationResult keyAndCert = slot.generateRSAKeypairAndCert(
+                keysize, _publicExponent,
+                label, getSubject(),
+                getKeyUsage(),
+                getExtendedKeyUsage());
+        saveKeyAndCert(keyAndCert);
         return null;
     }
 

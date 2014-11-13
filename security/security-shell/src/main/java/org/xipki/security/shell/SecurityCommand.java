@@ -39,9 +39,12 @@ import org.xipki.console.karaf.XipkiOsgiCommandSupport;
 import org.xipki.security.api.SecurityFactory;
 import org.xipki.security.api.SignerException;
 import org.xipki.security.api.p11.P11CryptService;
-import org.xipki.security.p11.iaik.IaikExtendedModule;
+import org.xipki.security.api.p11.P11Module;
+import org.xipki.security.api.p11.P11SlotIdentifier;
+import org.xipki.security.api.p11.P11WritableSlot;
+import org.xipki.security.p11.iaik.IaikP11CryptServiceFactory;
 import org.xipki.security.p11.iaik.IaikP11ModulePool;
-import org.xipki.security.p11.keystore.KeystoreP11Module;
+import org.xipki.security.p11.keystore.KeystoreP11CryptServiceFactory;
 import org.xipki.security.p11.keystore.KeystoreP11ModulePool;
 
 /**
@@ -63,42 +66,49 @@ public abstract class SecurityCommand extends XipkiOsgiCommandSupport
         this.securityFactory = securityFactory;
     }
 
-    protected IaikExtendedModule getIaikModule(String moduleName)
-    throws SignerException
+    protected P11Module getP11Module(String moduleName)
+    throws Exception
     {
-        // this call initialize the IaikExtendedModule
+        // this call initialization method
         P11CryptService p11CryptService = securityFactory.getP11CryptService(moduleName);
         if(p11CryptService == null)
         {
             throw new SignerException("Could not initialize P11CryptService " + moduleName);
         }
 
-        // the returned object could not be null
-        IaikExtendedModule module = IaikP11ModulePool.getInstance().getModule(moduleName);
-        if(module == null)
+        P11Module module;
+        String pkcs11Provider = securityFactory.getPkcs11Provider();
+        if(IaikP11CryptServiceFactory.class.equals(pkcs11Provider))
         {
-            throw new SignerException("Could not get P11 module " + moduleName);
+            // the returned object could not be null
+            module = IaikP11ModulePool.getInstance().getModule(moduleName);
+        } else if(KeystoreP11CryptServiceFactory.class.getName().equals(pkcs11Provider))
+        {
+            module = KeystoreP11ModulePool.getInstance().getModule(moduleName);
+        } else
+        {
+            throw new SignerException("PKCS11 provider " + pkcs11Provider + " is not accepted");
         }
+
         return module;
+
     }
 
-    protected KeystoreP11Module getKeystoreP11Module(String moduleName)
-    throws SignerException
+    protected P11WritableSlot getP11WritablSlot(String moduleName, int slotIndex)
+    throws Exception
     {
-        // this call initialize the IaikExtendedModule
-        P11CryptService p11CryptService = securityFactory.getP11CryptService(moduleName);
-        if(p11CryptService == null)
-        {
-            throw new SignerException("Could not initialize P11CryptService " + moduleName);
-        }
-
-        // the returned object could not be null
-        KeystoreP11Module module = KeystoreP11ModulePool.getInstance().getModule(moduleName);
+        P11SlotIdentifier slotId = new P11SlotIdentifier(slotIndex, null);
+        P11Module module = getP11Module(moduleName);
         if(module == null)
         {
-            throw new SignerException("Could not get P11 module " + moduleName);
+            throw new SignerException("module " + moduleName + " does not exist");
         }
-        return module;
+        P11WritableSlot slot = module.getSlot(slotId);
+        if(slot == null)
+        {
+            throw new SignerException("Could not get slot " + slotIndex + " of module " + moduleName);
+        }
+        return slot;
     }
 
 }

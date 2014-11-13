@@ -33,56 +33,37 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.security.shell;
+package org.xipki.security.shell.p12;
 
-import java.io.FileInputStream;
-import java.security.KeyStore;
-
+import org.apache.felix.gogo.commands.Command;
 import org.apache.felix.gogo.commands.Option;
+import org.xipki.security.api.P12KeypairGenerationResult;
+import org.xipki.security.p10.P12KeypairGenerator;
+import org.xipki.security.p10.P12KeypairGenerator.ECDSAIdentityGenerator;
 
 /**
  * @author Lijun Liao
  */
 
-public abstract class P12SecurityCommand extends SecurityCommand
+@Command(scope = "keytool", name = "ec-p12", description="Generate EC keypair in PKCS#12 keystore")
+public class P12ECKeyGenCommand extends P12KeyGenCommand
 {
-    @Option(name = "-p12",
-            required = true, description = "Required. PKCS#12 keystore file")
-    protected String p12File;
+    @Option(name = "-curve",
+            description = "EC Curve name",
+            required = false)
+    protected String curveName = "brainpoolp256r1";
 
-    @Option(name = "-pwd", aliases = { "--password" },
-            required = false, description = "Password of the PKCS#12 file")
-    protected String password;
-
-    protected char[] getPassword()
-    {
-        char[] pwdInChar = readPasswordIfNotSet(password);
-        if(pwdInChar != null)
-        {
-            password = new String(pwdInChar);
-        }
-        return pwdInChar;
-    }
-
-    protected KeyStore getKeyStore()
+    @Override
+    protected Object doExecute()
     throws Exception
     {
-        KeyStore ks;
+        ECDSAIdentityGenerator gen = new P12KeypairGenerator.ECDSAIdentityGenerator(
+                curveName, getPassword(), subject, getKeyUsage(), getExtendedKeyUsage());
 
-        FileInputStream fIn = null;
-        try
-        {
-            fIn = new FileInputStream(expandFilepath(p12File));
-            ks = KeyStore.getInstance("PKCS12", "BC");
-            ks.load(fIn, getPassword());
-        }finally
-        {
-            if(fIn != null)
-            {
-                fIn.close();
-            }
-        }
+        P12KeypairGenerationResult keyAndCert = gen.generateIdentity();
+        saveKeyAndCert(keyAndCert);
 
-        return ks;
+        return null;
     }
+
 }

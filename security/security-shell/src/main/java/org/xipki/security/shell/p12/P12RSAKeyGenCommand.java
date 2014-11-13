@@ -33,32 +33,40 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.security.shell;
+package org.xipki.security.shell.p12;
+
+import java.math.BigInteger;
 
 import org.apache.felix.gogo.commands.Command;
 import org.apache.felix.gogo.commands.Option;
 import org.xipki.security.api.P12KeypairGenerationResult;
 import org.xipki.security.p10.P12KeypairGenerator;
-import org.xipki.security.p10.P12KeypairGenerator.ECDSAIdentityGenerator;
 
 /**
  * @author Lijun Liao
  */
 
-@Command(scope = "keytool", name = "ec-p12", description="Generate EC keypair in PKCS#12 keystore")
-public class P12ECKeyGenCommand extends P12KeyGenCommand
+@Command(scope = "keytool", name = "rsa-p12", description="Generate RSA keypair in PKCS#12 keystore")
+public class P12RSAKeyGenCommand extends P12KeyGenCommand
 {
-    @Option(name = "-curve",
-            description = "EC Curve name",
+    @Option(name = "-keysize",
+            description = "Keysize in bit",
             required = false)
-    protected String curveName = "brainpoolp256r1";
+    protected Integer keysize = 2048;
 
     @Override
     protected Object doExecute()
     throws Exception
     {
-        ECDSAIdentityGenerator gen = new P12KeypairGenerator.ECDSAIdentityGenerator(
-                curveName, getPassword(), subject, getKeyUsage(), getExtendedKeyUsage());
+        if(keysize % 1024 != 0)
+        {
+            err("Keysize is not multiple of 1024: " + keysize);
+            return null;
+        }
+
+        P12KeypairGenerator gen = new P12KeypairGenerator.RSAIdentityGenerator(
+                keysize, BigInteger.valueOf(0x10001), getPassword(), subject,
+                getKeyUsage(), getExtendedKeyUsage());
 
         P12KeypairGenerationResult keyAndCert = gen.generateIdentity();
         saveKeyAndCert(keyAndCert);

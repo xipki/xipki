@@ -33,54 +33,54 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.security.p11.keystore;
+package org.xipki.security.shell.p11;
 
-import org.xipki.common.ParamChecker;
-import org.xipki.security.api.SecurityFactory;
-import org.xipki.security.api.SignerException;
-import org.xipki.security.api.p11.P11Control;
-import org.xipki.security.api.p11.P11CryptService;
-import org.xipki.security.api.p11.P11CryptServiceFactory;
-import org.xipki.security.api.p11.P11ModuleConf;
+import java.security.cert.X509Certificate;
+import java.util.HashSet;
+import java.util.Set;
+
+import org.apache.felix.gogo.commands.Command;
+import org.apache.felix.gogo.commands.Option;
+import org.xipki.common.IoCertUtil;
+import org.xipki.security.api.p11.P11KeyIdentifier;
+import org.xipki.security.api.p11.P11WritableSlot;
 
 /**
  * @author Lijun Liao
  */
 
-public class KeystoreP11CryptServiceFactory implements P11CryptServiceFactory
+@Command(scope = "keytool", name = "update-cert", description="Update certificate in PKCS#11 device")
+public class P11CertUpdateCommand extends P11SecurityCommand
 {
-    private P11Control p11Control;
+
+    @Option(name = "-cert",
+            required = true, description = "Required. Certificate file")
+    protected String certFile;
+
+    @Option(name = "-cacert",
+            required = false, multiValued = true, description = "CA Certificate files")
+    protected Set<String> caCertFiles;
 
     @Override
-    public void init(P11Control p11Control)
+    protected Object doExecute()
+    throws Exception
     {
-        ParamChecker.assertNotNull("p11Control", p11Control);
-        this.p11Control = p11Control;
-        KeystoreP11ModulePool.getInstance().setDefaultModuleName(p11Control.getDefaultModuleName());
-    }
-
-    @Override
-    public P11CryptService createP11CryptService(String moduleName)
-    throws SignerException
-    {
-        ParamChecker.assertNotNull("moduleName", moduleName);
-        if(p11Control == null)
+        P11WritableSlot slot = getP11WritablSlot(moduleName, slotIndex);
+        P11KeyIdentifier keyIdentifier = getKeyIdentifier();
+        X509Certificate newCert = IoCertUtil.parseCert(certFile);
+        Set<X509Certificate> caCerts = new HashSet<>();
+        if(caCertFiles != null && caCertFiles.isEmpty() == false)
         {
-            throw new IllegalStateException("please call init() first");
+            for(String caCertFile : caCertFiles)
+            {
+                caCerts.add(IoCertUtil.parseCert(caCertFile));
+            }
         }
 
-        if(SecurityFactory.DEFAULT_P11MODULE_NAME.equals(moduleName))
-        {
-            moduleName = p11Control.getDefaultModuleName();
-        }
-
-        P11ModuleConf conf = p11Control.getModuleConf(moduleName);
-        if(conf == null)
-        {
-            throw new SignerException("PKCS#11 module " + moduleName + " is not defined");
-        }
-
-        return KeystoreP11CryptService.getInstance(conf);
+        slot.updateCertificate(keyIdentifier, newCert, caCerts, securityFactory);
+        securityFactory.getP11CryptService(moduleName).refresh();
+        out("Updated certificate");
+        return null;
     }
 
 }

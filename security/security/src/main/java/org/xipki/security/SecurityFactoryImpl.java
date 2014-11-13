@@ -117,6 +117,9 @@ import org.xipki.security.p11.conf.jaxb.PasswordType;
 import org.xipki.security.p11.conf.jaxb.PasswordsType;
 import org.xipki.security.p11.conf.jaxb.SlotType;
 import org.xipki.security.p11.conf.jaxb.SlotsType;
+import org.xipki.security.p11.iaik.IaikP11CryptServiceFactory;
+import org.xipki.security.p11.keystore.KeystoreP11CryptServiceFactory;
+import org.xipki.security.p11.remote.RemoteP11CryptServiceFactory;
 import org.xml.sax.SAXException;
 
 /**
@@ -982,13 +985,29 @@ public class SecurityFactoryImpl implements SecurityFactory
             initPkcs11ModuleConf();
 
             Object p11Provider;
-            try
+
+            if(IaikP11CryptServiceFactory.class.getName().equals(pkcs11Provider))
             {
-                Class<?> clazz = Class.forName(pkcs11Provider);
-                p11Provider = clazz.newInstance();
-            }catch(Exception e)
+                p11Provider = new IaikP11CryptServiceFactory();
+            }
+            else if(KeystoreP11CryptServiceFactory.class.getName().equals(pkcs11Provider))
             {
-                throw new SignerException(e.getMessage(), e);
+                p11Provider = new KeystoreP11CryptServiceFactory();
+            }
+            else if(RemoteP11CryptServiceFactory.class.getName().equals(pkcs11Provider))
+            {
+                p11Provider = new RemoteP11CryptServiceFactory();
+            }
+            else
+            {
+                try
+                {
+                    Class<?> clazz = Class.forName(pkcs11Provider);
+                    p11Provider = clazz.newInstance();
+                }catch(Exception e)
+                {
+                    throw new SignerException(e.getMessage(), e);
+                }
             }
 
             if(p11Provider instanceof P11CryptServiceFactory)
@@ -1099,21 +1118,6 @@ public class SecurityFactoryImpl implements SecurityFactory
                 if(nativeLibraryPath == null)
                 {
                     throw new ConfigurationException("Could not find PKCS#11 library for OS " + osName);
-                }
-
-                File f = new File(nativeLibraryPath);
-                if(f.exists() == false)
-                {
-                    throw new ConfigurationException("PKCS#11 library " + f.getAbsolutePath() + " does not exist");
-                }
-                if(f.isFile() == false)
-                {
-                    throw new ConfigurationException("PKCS#11 library " + f.getAbsolutePath() +
-                            " does not point to a file");
-                }
-                if(f.canRead() == false)
-                {
-                    throw new ConfigurationException("No permission to access PKCS#11 library " + f.getAbsolutePath());
                 }
 
                 P11ModuleConf conf = new P11ModuleConf(name,

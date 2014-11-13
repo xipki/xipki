@@ -33,55 +33,57 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.security.shell;
+package org.xipki.security.shell.p12;
 
-import java.math.BigInteger;
+import java.io.FileInputStream;
+import java.security.KeyStore;
 
-import org.apache.felix.gogo.commands.Command;
 import org.apache.felix.gogo.commands.Option;
-import org.xipki.security.api.p11.P11KeypairGenerationResult;
-import org.xipki.security.p11.iaik.P11KeypairGenerator;
+import org.xipki.security.shell.SecurityCommand;
 
 /**
  * @author Lijun Liao
  */
 
-@Command(scope = "keytool", name = "rsa", description="Generate RSA keypair in PKCS#11 device")
-public class P11RSAKeyGenCommand extends P11KeyGenCommand
+public abstract class P12SecurityCommand extends SecurityCommand
 {
-    @Option(name = "-keysize",
-            description = "Keysize in bit",
-            required = false)
-    protected Integer keysize = 2048;
+    @Option(name = "-p12",
+            required = true, description = "Required. PKCS#12 keystore file")
+    protected String p12File;
 
-    @Option(name = "-e",
-            description = "public exponent",
-            required = false)
-    protected String publicExponent = "65537";
+    @Option(name = "-pwd", aliases = { "--password" },
+            required = false, description = "Password of the PKCS#12 file")
+    protected String password;
 
-    @Override
-    protected Object doExecute()
-    throws Exception
+    protected char[] getPassword()
     {
-        if(keysize % 1024 != 0)
+        char[] pwdInChar = readPasswordIfNotSet(password);
+        if(pwdInChar != null)
         {
-            err("Keysize is not multiple of 1024: " + keysize);
-            return null;
+            password = new String(pwdInChar);
         }
-
-        BigInteger _publicExponent = new BigInteger(publicExponent);
-
-        P11KeypairGenerator gen = new P11KeypairGenerator(securityFactory);
-
-        P11KeypairGenerationResult keyAndCert = gen.generateRSAKeypairAndCert(
-                moduleName, getSlotId(),
-                keysize, _publicExponent,
-                label, getSubject(),
-                getKeyUsage(),
-                getExtendedKeyUsage());
-        saveKeyAndCert(keyAndCert);
-
-        return null;
+        return pwdInChar;
     }
 
+    protected KeyStore getKeyStore()
+    throws Exception
+    {
+        KeyStore ks;
+
+        FileInputStream fIn = null;
+        try
+        {
+            fIn = new FileInputStream(expandFilepath(p12File));
+            ks = KeyStore.getInstance("PKCS12", "BC");
+            ks.load(fIn, getPassword());
+        }finally
+        {
+            if(fIn != null)
+            {
+                fIn.close();
+            }
+        }
+
+        return ks;
+    }
 }

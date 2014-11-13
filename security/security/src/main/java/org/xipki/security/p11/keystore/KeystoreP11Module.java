@@ -38,9 +38,11 @@ package org.xipki.security.p11.keystore;
 import java.io.File;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,6 +50,7 @@ import org.xipki.common.IoCertUtil;
 import org.xipki.common.ParamChecker;
 import org.xipki.security.api.PasswordResolverException;
 import org.xipki.security.api.SignerException;
+import org.xipki.security.api.p11.P11Module;
 import org.xipki.security.api.p11.P11ModuleConf;
 import org.xipki.security.api.p11.P11SlotIdentifier;
 
@@ -55,7 +58,7 @@ import org.xipki.security.api.p11.P11SlotIdentifier;
  * @author Lijun Liao
  */
 
-public class KeystoreP11Module
+public class KeystoreP11Module implements P11Module
 {
     private static final Logger LOG = LoggerFactory.getLogger(KeystoreP11Module.class);
 
@@ -73,6 +76,10 @@ public class KeystoreP11Module
 
         File baseDir = new File(IoCertUtil.expandFilepath(nativeLib));
         File[] children = baseDir.listFiles();
+
+        Set<Integer> allSlotIndexes = new HashSet<>();
+        Set<Long> allSlotIdentifiers = new HashSet<>();
+
         List<P11SlotIdentifier> allSlotIds = new LinkedList<>();
 
         for(File child : children)
@@ -103,6 +110,21 @@ public class KeystoreP11Module
                 continue;
             }
 
+            if(allSlotIndexes.contains(slotIndex))
+            {
+                LOG.error("ignore slot dir, the same slot index has been assigned", filename);
+                continue;
+            }
+
+            if(allSlotIdentifiers.contains(slotId))
+            {
+                LOG.error("ignore slot dir, the same slot identifier has been assigned", filename);
+                continue;
+            }
+
+            allSlotIndexes.add(slotIndex);
+            allSlotIdentifiers.add(slotId);
+
             allSlotIds.add(new P11SlotIdentifier(slotIndex, slotId));
         }
 
@@ -118,6 +140,7 @@ public class KeystoreP11Module
         this.slotIds = Collections.unmodifiableList(tmpSlotIds);
     }
 
+    @Override
     public KeystoreP11Slot getSlot(P11SlotIdentifier slotId)
     throws SignerException
     {
@@ -171,7 +194,8 @@ public class KeystoreP11Module
         LOG.info( "close", "close pkcs11 module: {}", moduleConf.getName());
     }
 
-    public List<P11SlotIdentifier> getSlotIds()
+    @Override
+    public List<P11SlotIdentifier> getSlotIdentifiers()
     {
         return slotIds;
     }
