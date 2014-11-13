@@ -93,10 +93,10 @@ import org.xipki.common.IoCertUtil;
 import org.xipki.common.LogUtil;
 import org.xipki.common.ParamChecker;
 import org.xipki.datasource.api.DataSourceFactory;
-import org.xipki.ocsp.IssuerHashNameAndKey;
 import org.xipki.ocsp.api.CertStatusInfo;
 import org.xipki.ocsp.api.CertStatusStore;
 import org.xipki.ocsp.api.CertStatusStoreException;
+import org.xipki.ocsp.api.IssuerHashNameAndKey;
 import org.xipki.security.api.PasswordResolver;
 
 /**
@@ -1068,6 +1068,26 @@ public class CrlCertStatusStore extends CertStatusStore
             sha1.doFinal(fp, 0);
             return fp;
         }
+    }
+
+    @Override
+    public boolean canResolveIssuer(HashAlgoType hashAlgo, byte[] issuerNameHash, byte[] issuerKeyHash)
+    {
+        IssuerHashNameAndKey hashes = issuerHashMap.get(hashAlgo);
+        if(hashes == null)
+        {
+            return false;
+        }
+
+        return hashes.match(hashAlgo, issuerNameHash, issuerKeyHash);
+    }
+
+    @Override
+    public Set<IssuerHashNameAndKey> getIssuerHashNameAndKeys()
+    {
+        Set<IssuerHashNameAndKey> ret = new HashSet<>();
+        ret.addAll(issuerHashMap.values());
+        return ret;
     }
 
 }

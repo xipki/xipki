@@ -24,23 +24,17 @@ DTD Configure//EN" "http://jetty.mortbay.org/configure.dtd">
   <!-- One of each type!                                           -->
   <!-- =========================================================== -->
   <New id="sslContextFactory" class="org.eclipse.jetty.util.ssl.SslContextFactory">
-    <Set name="KeyStore">etc/tls-server-keystore.jks</Set>
+    <Set name="KeyStore">etc/tlskeys/tls-server-keystore.jks</Set>
     <Set name="KeyStoreType">JKS</Set>
     <Set name="KeyStorePassword">1234</Set>
     <Set name="KeyManagerPassword">1234</Set>
-    <Set name="TrustStore">etc/tls-p11server-truststore.jks</Set>
+    <Set name="TrustStore">etc/tlskeys/tls-server-truststore.jks</Set>
     <Set name="TrustStorePassword">1234</Set>
     <Set name="NeedClientAuth">true</Set>
     <Set name="IncludeProtocols">
       <Array type="java.lang.String">
         <Item>TLSv1.2</Item>
         <Item>TLSv1.1</Item>
-      </Array>
-    </Set>
-    <Set name="IncludeCipherSuites">
-      <Array type="java.lang.String">
-        <Item>TLS_DHE_RSA_WITH_AES_256_CBC_SHA</Item>
-        <Item>TLS_DHE_RSA_WITH_AES_128_CBC_SHA</Item>
       </Array>
     </Set>
   </New>
@@ -59,6 +53,16 @@ DTD Configure//EN" "http://jetty.mortbay.org/configure.dtd">
         <Set name="maxIdleTime">30000</Set>
         <Set name="Acceptors">1</Set>
         <Set name="AcceptQueueSize">100</Set>
+        <Set name="IncludeCipherSuites">
+          <Array type="java.lang.String">
+            <!-- Oracle JRE/JDK, OpenJDK -->
+            <Item>TLS_DHE_RSA_WITH_AES_256_CBC_SHA</Item>
+            <Item>TLS_DHE_RSA_WITH_AES_128_CBC_SHA</Item>
+            <!-- IBM JRE/JDK -->
+            <Item>SSL_DHE_RSA_WITH_AES_256_CBC_SHA</Item>
+            <Item>SSL_DHE_RSA_WITH_AES_128_CBC_SHA</Item>
+          </Array>
+        </Set>
       </New>
     </Arg>
   </Call>

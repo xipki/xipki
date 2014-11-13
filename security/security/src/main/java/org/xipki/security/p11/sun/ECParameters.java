@@ -61,7 +61,7 @@ import org.bouncycastle.math.ec.ECCurve;
  *
  * <pre>
  *    EcpkParameters ::= CHOICE
- *    {
+ *   {
  *      ecParameters  ECParameters,
  *      namedCurve    OBJECT IDENTIFIER,
  *      implicitlyCA  NULL }

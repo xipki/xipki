@@ -35,11 +35,14 @@
 
 package org.xipki.ocsp;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.Map;
 
 import org.xipki.common.HashAlgoType;
 import org.xipki.common.ParamChecker;
+import org.xipki.ocsp.api.IssuerHashNameAndKey;
 
 /**
  * @author Lijun Liao
@@ -98,5 +101,10 @@ public class IssuerEntry
     public Date getCaNotBefore()
     {
         return caNotBefore;
+    }
+
+    Collection<IssuerHashNameAndKey> getIssuerHashNameAndKeys()
+    {
+        return Collections.unmodifiableCollection(issuerHashMap.values());
     }
 }

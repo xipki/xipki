@@ -47,106 +47,24 @@ import org.bouncycastle.asn1.ASN1EncodableVector;
 import org.bouncycastle.asn1.ASN1Integer;
 import org.bouncycastle.asn1.DERSequence;
 import org.xipki.common.IoCertUtil;
-import org.xipki.common.ParamChecker;
 import org.xipki.security.api.SignerException;
-import org.xipki.security.api.p11.P11SlotIdentifier;
+import org.xipki.security.api.p11.P11Identity;
 import org.xipki.security.api.p11.P11KeyIdentifier;
+import org.xipki.security.api.p11.P11SlotIdentifier;
 
 /**
  * @author Lijun Liao
  */
 
-class IaikP11Identity implements Comparable<IaikP11Identity>
+class IaikP11Identity extends P11Identity
 {
-    private final P11SlotIdentifier slotId;
-    private final P11KeyIdentifier keyId;
-
-    private final X509Certificate[] certificateChain;
-    private final PublicKey publicKey;
-    private final int signatureKeyBitLength;
-
     public IaikP11Identity(
             P11SlotIdentifier slotId,
             P11KeyIdentifier keyId,
             X509Certificate[] certificateChain,
             PublicKey publicKey)
     {
-        ParamChecker.assertNotNull("slotId", slotId);
-        ParamChecker.assertNotNull("keyId", keyId);
-
-        if((certificateChain == null || certificateChain.length < 1 || certificateChain[0] == null)
-                && publicKey == null)
-        {
-            throw new IllegalArgumentException("Neither certificate nor publicKey is non-null");
-        }
-
-        this.slotId = slotId;
-        this.keyId = keyId;
-        this.certificateChain = certificateChain;
-        this.publicKey = publicKey == null ? certificateChain[0].getPublicKey() : publicKey;
-
-        if(this.publicKey instanceof RSAPublicKey)
-        {
-            signatureKeyBitLength = ((RSAPublicKey) this.publicKey).getModulus().bitLength();
-        }
-        else if(this.publicKey instanceof ECPublicKey)
-        {
-            signatureKeyBitLength = ((ECPublicKey) this.publicKey).getParams().getCurve().getField().getFieldSize();
-        }
-        else if(this.publicKey instanceof DSAPublicKey)
-        {
-            signatureKeyBitLength = ((DSAPublicKey) this.publicKey).getParams().getQ().bitLength();
-        }
-        else
-        {
-            throw new IllegalArgumentException("Currently only RSA, DSA and EC public key are supported, but not " +
-                    this.publicKey.getAlgorithm() + " (class: " + this.publicKey.getClass().getName() + ")");
-        }
-    }
-
-    public P11KeyIdentifier getKeyId()
-    {
-        return keyId;
-    }
-
-    public X509Certificate getCertificate()
-    {
-        return (certificateChain != null && certificateChain.length > 0) ? certificateChain[0] : null;
-    }
-
-    public X509Certificate[] getCertificateChain()
-    {
-        return certificateChain;
-    }
-
-    public PublicKey getPublicKey()
-    {
-        return publicKey == null ? certificateChain[0].getPublicKey() : publicKey;
-    }
-
-    public P11SlotIdentifier getSlotId()
-    {
-        return slotId;
-    }
-
-    public boolean match(P11SlotIdentifier slotId, P11KeyIdentifier keyId)
-    {
-        if(this.slotId.equals(slotId) == false)
-        {
-            return false;
-        }
-
-        return this.keyId.equals(keyId);
-    }
-
-    public boolean match(P11SlotIdentifier slotId, String keyLabel)
-    {
-        if(keyLabel == null)
-        {
-            return false;
-        }
-
-        return this.slotId.equals(slotId) && keyLabel.equals(keyId.getKeyLabel());
+        super(slotId, keyId, certificateChain, publicKey);
     }
 
     public byte[] CKM_RSA_PKCS(IaikExtendedModule module,
@@ -247,12 +165,6 @@ class IaikP11Identity implements Comparable<IaikP11Identity>
         {
             throw new SignerException("IOException, message: " + e.getMessage(), e);
         }
-    }
-
-    @Override
-    public int compareTo(IaikP11Identity o)
-    {
-        return keyId.compareTo(o.keyId);
     }
 
 }

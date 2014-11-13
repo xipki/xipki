@@ -64,11 +64,11 @@ import org.xipki.common.ParamChecker;
 import org.xipki.datasource.api.DataSourceFactory;
 import org.xipki.datasource.api.DataSourceWrapper;
 import org.xipki.ocsp.IssuerEntry;
-import org.xipki.ocsp.IssuerHashNameAndKey;
 import org.xipki.ocsp.IssuerStore;
 import org.xipki.ocsp.api.CertStatusInfo;
 import org.xipki.ocsp.api.CertStatusStore;
 import org.xipki.ocsp.api.CertStatusStoreException;
+import org.xipki.ocsp.api.IssuerHashNameAndKey;
 import org.xipki.security.api.PasswordResolver;
 
 /**
@@ -160,6 +160,7 @@ public class DbCertStatusStore extends CertStatusStore
                 storeUpdateService, 60, 60, TimeUnit.SECONDS);
     }
 
+    @SuppressWarnings("resource")
     private synchronized void initIssuerStore()
     {
         try
@@ -274,8 +275,21 @@ public class DbCertStatusStore extends CertStatusStore
                         String hashAlgo = hashAlgoType.name().toUpperCase();
                         String hash_name = rs.getString(hashAlgo + "_FP_NAME");
                         String hash_key = rs.getString(hashAlgo + "_FP_KEY");
+                        byte[] hashNameBytes = Hex.decode(hash_name);
+                        byte[] hashKeyBytes = Hex.decode(hash_key);
                         IssuerHashNameAndKey hash = new IssuerHashNameAndKey(
-                                hashAlgoType, Hex.decode(hash_name), Hex.decode(hash_key));
+                                hashAlgoType, hashNameBytes, hashKeyBytes);
+
+                        if(hashAlgoType == HashAlgoType.SHA1)
+                        {
+                            for(IssuerEntry existingIssuer : caInfos)
+                            {
+                                if(existingIssuer.matchHash(hashAlgoType, hashNameBytes, hashKeyBytes))
+                                {
+                                    throw new Exception("Found at least two issuers with the same subject and key");
+                                }
+                            }
+                        }
                         hashes.put(hashAlgoType, hash);
                     }
 
@@ -572,4 +586,16 @@ public class DbCertStatusStore extends CertStatusStore
         }
     }
 
+    @Override
+    public boolean canResolveIssuer(HashAlgoType hashAlgo, byte[] issuerNameHash, byte[] issuerKeyHash)
+    {
+        IssuerEntry issuer = issuerStore.getIssuerForFp(hashAlgo, issuerNameHash, issuerKeyHash);
+        return issuer != null;
+    }
+
+    @Override
+    public Set<IssuerHashNameAndKey> getIssuerHashNameAndKeys()
+    {
+        return issuerStore.getIssuerHashNameAndKeys();
+    }
 }

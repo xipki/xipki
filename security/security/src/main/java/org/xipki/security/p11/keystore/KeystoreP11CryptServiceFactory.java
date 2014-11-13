@@ -56,6 +56,7 @@ public class KeystoreP11CryptServiceFactory implements P11CryptServiceFactory
     {
         ParamChecker.assertNotNull("p11Control", p11Control);
         this.p11Control = p11Control;
+        KeystoreP11ModulePool.getInstance().setDefaultModuleName(p11Control.getDefaultModuleName());
     }
 
     @Override

@@ -42,6 +42,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.xipki.common.HashAlgoType;
+import org.xipki.ocsp.api.IssuerHashNameAndKey;
 
 /**
  * @author Lijun Liao
@@ -109,6 +110,16 @@ public class IssuerStore
         }
 
         return null;
+    }
+
+    public Set<IssuerHashNameAndKey> getIssuerHashNameAndKeys()
+    {
+        Set<IssuerHashNameAndKey> ret = new HashSet<>();
+        for(IssuerEntry issuerEntry : entries)
+        {
+            ret.addAll(issuerEntry.getIssuerHashNameAndKeys());
+        }
+        return ret;
     }
 
 }

@@ -51,6 +51,7 @@ import org.xipki.common.LogUtil;
 import org.xipki.common.ParamChecker;
 import org.xipki.security.api.PasswordResolverException;
 import org.xipki.security.api.SignerException;
+import org.xipki.security.api.p11.P11Module;
 import org.xipki.security.api.p11.P11ModuleConf;
 import org.xipki.security.api.p11.P11SlotIdentifier;
 
@@ -58,7 +59,7 @@ import org.xipki.security.api.p11.P11SlotIdentifier;
  * @author Lijun Liao
  */
 
-public class IaikExtendedModule
+public class IaikExtendedModule implements P11Module
 {
     private static final Logger LOG = LoggerFactory.getLogger(IaikExtendedModule.class);
 
@@ -140,6 +141,7 @@ public class IaikExtendedModule
         }
     }
 
+    @Override
     public IaikExtendedSlot getSlot(P11SlotIdentifier slotId)
     throws SignerException
     {
@@ -150,11 +152,13 @@ public class IaikExtendedModule
         }
 
         Slot slot = null;
+        P11SlotIdentifier _slotId = null;
         for(P11SlotIdentifier s : availableSlots.keySet())
         {
             if(s.getSlotIndex() == slotId.getSlotIndex() ||
                 s.getSlotId() == slotId.getSlotId())
             {
+                _slotId = s;
                 slot = availableSlots.get(s);
                 break;
             }
@@ -173,7 +177,7 @@ public class IaikExtendedModule
         {
             throw new SignerException("PasswordResolverException: " + e.getMessage(), e);
         }
-        extSlot = new IaikExtendedSlot(slot, pwd);
+        extSlot = new IaikExtendedSlot(_slotId, slot, pwd);
 
         slots.put(slotId, extSlot);
         return extSlot;
@@ -231,7 +235,8 @@ public class IaikExtendedModule
         module = null;
     }
 
-    public List<P11SlotIdentifier> getSlotIds()
+    @Override
+    public List<P11SlotIdentifier> getSlotIdentifiers()
     {
         return slotIds;
     }

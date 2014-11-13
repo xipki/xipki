@@ -61,7 +61,6 @@ import org.bouncycastle.asn1.x509.Extension;
 import org.bouncycastle.cert.X509CertificateHolder;
 import org.bouncycastle.cert.ocsp.BasicOCSPResp;
 import org.bouncycastle.cert.ocsp.CertificateStatus;
-import org.bouncycastle.cert.ocsp.OCSPException;
 import org.bouncycastle.cert.ocsp.OCSPResp;
 import org.bouncycastle.cert.ocsp.RevokedStatus;
 import org.bouncycastle.cert.ocsp.SingleResp;
@@ -71,7 +70,6 @@ import org.bouncycastle.util.encoders.Hex;
 import org.xipki.common.CRLReason;
 import org.xipki.common.IoCertUtil;
 import org.xipki.ocsp.client.api.OCSPRequestor;
-import org.xipki.ocsp.client.api.OCSPRequestorException;
 import org.xipki.ocsp.client.api.RequestOptions;
 import org.xipki.security.KeyUtil;
 import org.xipki.security.SignerUtil;
@@ -133,15 +131,8 @@ public class OCSPStatusCommand extends AbstractOCSPStatusCommand
 
         RequestOptions options = getRequestOptions();
 
-        BasicOCSPResp basicResp;
-        try
-        {
-            OCSPResp response = requestor.ask(caCert, sn, serverUrl, options);
-            basicResp = (BasicOCSPResp) response.getResponseObject();
-        } catch (OCSPException e)
-        {
-            throw new OCSPRequestorException(e);
-        }
+        OCSPResp response = requestor.ask(caCert, sn, serverUrl, options);
+        BasicOCSPResp basicResp = OCSPUtils.extractBasicOCSPResp(response);
 
         // check the signature if available
         if(null == basicResp.getSignature())
@@ -349,4 +340,5 @@ public class OCSPStatusCommand extends AbstractOCSPStatusCommand
 
         return null;
     }
+
 }

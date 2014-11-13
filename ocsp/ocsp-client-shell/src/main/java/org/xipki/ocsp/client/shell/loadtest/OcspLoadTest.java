@@ -43,7 +43,6 @@ import java.util.List;
 
 import org.bouncycastle.cert.ocsp.BasicOCSPResp;
 import org.bouncycastle.cert.ocsp.CertificateStatus;
-import org.bouncycastle.cert.ocsp.OCSPException;
 import org.bouncycastle.cert.ocsp.OCSPResp;
 import org.bouncycastle.cert.ocsp.RevokedStatus;
 import org.bouncycastle.cert.ocsp.SingleResp;
@@ -53,7 +52,9 @@ import org.slf4j.LoggerFactory;
 import org.xipki.common.AbstractLoadTest;
 import org.xipki.common.ParamChecker;
 import org.xipki.ocsp.client.api.OCSPRequestor;
+import org.xipki.ocsp.client.api.OCSPRequestorException;
 import org.xipki.ocsp.client.api.RequestOptions;
+import org.xipki.ocsp.client.shell.OCSPUtils;
 
 /**
  * @author Lijun Liao
@@ -127,10 +128,10 @@ public class OcspLoadTest extends AbstractLoadTest
             try
             {
                 OCSPResp response = requestor.ask(caCert, BigInteger.valueOf(sn), serverUrl, options);
-                basicResp = (BasicOCSPResp) response.getResponseObject();
-            } catch (OCSPException e)
+                basicResp = OCSPUtils.extractBasicOCSPResp(response);
+            } catch (OCSPRequestorException e)
             {
-                LOG.warn("OCSPException: {}", e.getMessage());
+                LOG.warn("OCSPRequestorException: {}", e.getMessage());
                 return false;
             } catch (Throwable t)
             {

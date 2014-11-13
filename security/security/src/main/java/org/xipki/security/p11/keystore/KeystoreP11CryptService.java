@@ -51,6 +51,7 @@ import org.xipki.common.LogUtil;
 import org.xipki.common.ParamChecker;
 import org.xipki.security.api.SignerException;
 import org.xipki.security.api.p11.P11CryptService;
+import org.xipki.security.api.p11.P11Identity;
 import org.xipki.security.api.p11.P11KeyIdentifier;
 import org.xipki.security.api.p11.P11ModuleConf;
 import org.xipki.security.api.p11.P11SlotIdentifier;
@@ -116,7 +117,7 @@ public class KeystoreP11CryptService implements P11CryptService
 
         Set<KeystoreP11Identity> currentIdentifies = new HashSet<>();
 
-        List<P11SlotIdentifier> slotIds = module.getSlotIds();
+        List<P11SlotIdentifier> slotIds = module.getSlotIdentifiers();
         for(P11SlotIdentifier slotId : slotIds)
         {
             KeystoreP11Slot slot;
@@ -128,6 +129,7 @@ public class KeystoreP11CryptService implements P11CryptService
                     LOG.warn("Could not initialize slot " + slotId);
                     continue;
                 }
+                slot.refresh();
             } catch (SignerException e)
             {
                 final String message = "SignerException while initializing slot " + slotId;
@@ -148,11 +150,18 @@ public class KeystoreP11CryptService implements P11CryptService
                 continue;
             }
 
-            currentIdentifies.addAll(slot.getIdentities());
+            for(P11Identity identity : slot.getP11Identities())
+            {
+                currentIdentifies.add((KeystoreP11Identity) identity);
+            }
         }
 
         this.identities.clear();
-        this.identities.addAll(currentIdentifies);
+        for(KeystoreP11Identity identity : currentIdentifies)
+        {
+            this.identities.add(identity);
+        }
+
         currentIdentifies.clear();
         currentIdentifies = null;
 
@@ -292,7 +301,7 @@ public class KeystoreP11CryptService implements P11CryptService
 
         for(KeystoreP11Identity identity : identities)
         {
-            if(identity.match(slotId, keyId.getKeyLabel()))
+            if(identity.match(slotId, keyId))
             {
                 return identity;
             }

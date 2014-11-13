@@ -35,8 +35,6 @@
 
 package org.xipki.security.p11.keystore;
 
-import java.io.IOException;
-import java.math.BigInteger;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
@@ -56,13 +54,11 @@ import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 
-import org.bouncycastle.asn1.ASN1EncodableVector;
-import org.bouncycastle.asn1.ASN1Integer;
-import org.bouncycastle.asn1.DERSequence;
 import org.xipki.common.IoCertUtil;
 import org.xipki.common.ParamChecker;
 import org.xipki.security.SignerUtil;
 import org.xipki.security.api.SignerException;
+import org.xipki.security.api.p11.P11Identity;
 import org.xipki.security.api.p11.P11KeyIdentifier;
 import org.xipki.security.api.p11.P11SlotIdentifier;
 
@@ -70,19 +66,14 @@ import org.xipki.security.api.p11.P11SlotIdentifier;
  * @author Lijun Liao
  */
 
-public class KeystoreP11Identity implements Comparable<KeystoreP11Identity>
+public class KeystoreP11Identity extends P11Identity
 {
-    private final P11SlotIdentifier slotId;
-    private final P11KeyIdentifier keyId;
-
-    private final X509Certificate[] certificateChain;
-    private final PublicKey publicKey;
-    private final int signatureKeyBitLength;
-
+    private final String sha1sum;
     private final BlockingDeque<Cipher> rsaCiphers = new LinkedBlockingDeque<>();
     private final BlockingDeque<Signature> dsaSignatures = new LinkedBlockingDeque<>();
 
     public KeystoreP11Identity(
+            String sha1sum,
             P11SlotIdentifier slotId,
             P11KeyIdentifier keyId,
             PrivateKey privateKey,
@@ -90,23 +81,18 @@ public class KeystoreP11Identity implements Comparable<KeystoreP11Identity>
             int maxSessions)
     throws NoSuchAlgorithmException, NoSuchProviderException, InvalidKeyException
     {
-        ParamChecker.assertNotNull("slotId", slotId);
-        ParamChecker.assertNotNull("keyId", keyId);
+        super(slotId, keyId, certificateChain, getPublicKeyOfFirstCert(certificateChain));
+        ParamChecker.assertNotNull("privateKey", privateKey);
+        ParamChecker.assertNotEmpty("sha1sum", sha1sum);
 
         if(certificateChain == null || certificateChain.length < 1 || certificateChain[0] == null)
         {
             throw new IllegalArgumentException("no certificate is specified");
         }
 
-        this.slotId = slotId;
-        this.keyId = keyId;
-        this.certificateChain = certificateChain;
-        this.publicKey = certificateChain[0].getPublicKey();
-
+        this.sha1sum = sha1sum;
         if(this.publicKey instanceof RSAPublicKey)
         {
-            signatureKeyBitLength = ((RSAPublicKey) this.publicKey).getModulus().bitLength();
-
             for(int i = 0; i < maxSessions; i++)
             {
                 Cipher rsaCipher;
@@ -126,12 +112,10 @@ public class KeystoreP11Identity implements Comparable<KeystoreP11Identity>
             String algorithm;
             if(this.publicKey instanceof ECPublicKey)
             {
-                signatureKeyBitLength = ((ECPublicKey) this.publicKey).getParams().getCurve().getField().getFieldSize();
                 algorithm = "NONEwithECDSA";
             }
             else if(this.publicKey instanceof DSAPublicKey)
             {
-                signatureKeyBitLength = ((DSAPublicKey) this.publicKey).getParams().getQ().bitLength();
                 algorithm = "NONEwithDSA";
             }
             else
@@ -149,49 +133,13 @@ public class KeystoreP11Identity implements Comparable<KeystoreP11Identity>
         }
     }
 
-    public P11KeyIdentifier getKeyId()
+    private static PublicKey getPublicKeyOfFirstCert(X509Certificate[] certificateChain)
     {
-        return keyId;
-    }
-
-    public X509Certificate getCertificate()
-    {
-        return (certificateChain != null && certificateChain.length > 0) ? certificateChain[0] : null;
-    }
-
-    public X509Certificate[] getCertificateChain()
-    {
-        return certificateChain;
-    }
-
-    public PublicKey getPublicKey()
-    {
-        return publicKey == null ? certificateChain[0].getPublicKey() : publicKey;
-    }
-
-    public P11SlotIdentifier getSlotId()
-    {
-        return slotId;
-    }
-
-    public boolean match(P11SlotIdentifier slotId, P11KeyIdentifier keyId)
-    {
-        if(this.slotId.equals(slotId) == false)
+        if(certificateChain == null || certificateChain.length < 1 || certificateChain[0] == null)
         {
-            return false;
+            throw new IllegalArgumentException("no certificate is specified");
         }
-
-        return this.keyId.equals(keyId);
-    }
-
-    public boolean match(P11SlotIdentifier slotId, String keyLabel)
-    {
-        if(keyLabel == null)
-        {
-            return false;
-        }
-
-        return this.slotId.equals(slotId) && keyLabel.equals(keyId.getKeyLabel());
+        return certificateChain[0].getPublicKey();
     }
 
     public byte[] CKM_RSA_PKCS(byte[] encodedDigestInfo)
@@ -279,8 +227,7 @@ public class KeystoreP11Identity implements Comparable<KeystoreP11Identity>
         try
         {
             sig.update(truncatedDigest);
-            byte[] signature = sig.sign();
-            return convertToX962Signature(signature);
+            return sig.sign();
         } catch (SignatureException e)
         {
             throw new SignerException("SignatureException: " + e.getMessage(), e);
@@ -290,32 +237,9 @@ public class KeystoreP11Identity implements Comparable<KeystoreP11Identity>
         }
     }
 
-    private static byte[] convertToX962Signature(byte[] signature)
-    throws SignerException
+    public String getSha1Sum()
     {
-        byte[] ba = new byte[signature.length/2];
-        ASN1EncodableVector sigder = new ASN1EncodableVector();
-
-        System.arraycopy(signature, 0, ba, 0, ba.length);
-        sigder.add(new ASN1Integer(new BigInteger(1, ba)));
-
-        System.arraycopy(signature, ba.length, ba, 0, ba.length);
-        sigder.add(new ASN1Integer(new BigInteger(1, ba)));
-
-        DERSequence seq = new DERSequence(sigder);
-        try
-        {
-            return seq.getEncoded();
-        } catch (IOException e)
-        {
-            throw new SignerException("IOException, message: " + e.getMessage(), e);
-        }
-    }
-
-    @Override
-    public int compareTo(KeystoreP11Identity o)
-    {
-        return keyId.compareTo(o.keyId);
+        return sha1sum;
     }
 
 }
