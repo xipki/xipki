@@ -4,10 +4,16 @@ PLEN = 1024
 #
 CA_SIGNER_ALGO = SHA256withDSA
 
+echo "========================================================"
+echo "||           DEMO DSA with PKCS#12 Key                ||"
+echo "========================================================"
+
 features:install xipki-security-shell
 
 # Wait one second
 sleep 1000
+
+file:rm -r -f output
 
 keytool:dsa-p12 -pwd 1234 -plen $PLEN -out output/RCA1.p12 \
   -subject "CN=RCA1"
@@ -26,8 +32,8 @@ source ./ca-demo/ra.script
 
 source ./ca-demo/ocsp.script
 
-source ./ca-demo/loadtest-enroll.script
+#source ./ca-demo/loadtest-enroll.script
 
-source ./ca-demo/loadtest-ocsp.script
+#source ./ca-demo/loadtest-ocsp.script
 
 

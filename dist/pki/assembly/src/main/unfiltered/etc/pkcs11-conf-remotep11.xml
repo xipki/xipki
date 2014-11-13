@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<PKCS11Conf xmlns="http://xipki.org/xipki/pkcs11/conf/v1">
+  <modules defaultModule="abc">
+    <module name="abc">
+      <nativeLibraries>
+        <nativeLibrary>
+          <path>url?https://127.0.0.1:9443/p11</path>
+        </nativeLibrary>
+      </nativeLibraries>
+    </module>
+  </modules>
+</PKCS11Conf>

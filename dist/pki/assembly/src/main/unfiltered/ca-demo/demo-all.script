@@ -1,0 +1,17 @@
+source ./ca-demo/rsa-demo.script
+
+source ./ca-demo/rsapss-demo.script
+
+source ./ca-demo/dsa-demo.script
+
+source ./ca-demo/ec-demo.script
+
+source ./ca-demo/hsm-rsa-demo.script
+
+source ./ca-demo/hsm-rsapss-demo.script
+
+source ./ca-demo/hsm-dsa-demo.script
+
+source ./ca-demo/hsm-ec-demo.script
+
+

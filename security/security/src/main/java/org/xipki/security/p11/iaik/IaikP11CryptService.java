@@ -35,22 +35,10 @@
 
 package org.xipki.security.p11.iaik;
 
-import iaik.pkcs.pkcs11.objects.DSAPublicKey;
-import iaik.pkcs.pkcs11.objects.ECDSAPublicKey;
-import iaik.pkcs.pkcs11.objects.PrivateKey;
-import iaik.pkcs.pkcs11.objects.RSAPublicKey;
-import iaik.pkcs.pkcs11.objects.X509PublicKeyCertificate;
 import iaik.pkcs.pkcs11.wrapper.PKCS11RuntimeException;
 
-import java.io.ByteArrayInputStream;
-import java.math.BigInteger;
-import java.security.KeyFactory;
-import java.security.NoSuchAlgorithmException;
 import java.security.PublicKey;
 import java.security.cert.X509Certificate;
-import java.security.spec.DSAPublicKeySpec;
-import java.security.spec.InvalidKeySpecException;
-import java.security.spec.RSAPublicKeySpec;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -59,13 +47,12 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentSkipListSet;
 
-import org.bouncycastle.util.encoders.Hex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.common.IoCertUtil;
 import org.xipki.common.LogUtil;
 import org.xipki.security.api.SignerException;
 import org.xipki.security.api.p11.P11CryptService;
+import org.xipki.security.api.p11.P11Identity;
 import org.xipki.security.api.p11.P11KeyIdentifier;
 import org.xipki.security.api.p11.P11ModuleConf;
 import org.xipki.security.api.p11.P11SlotIdentifier;
@@ -149,11 +136,9 @@ public final class IaikP11CryptService implements P11CryptService
             throw e;
         }
 
-        Map<String, Set<X509Certificate>> allCerts = new HashMap<>();
-
         Set<IaikP11Identity> currentIdentifies = new HashSet<>();
 
-        List<P11SlotIdentifier> slotIds = extModule.getSlotIds();
+        List<P11SlotIdentifier> slotIds = extModule.getSlotIdentifiers();
         for(P11SlotIdentifier slotId : slotIds)
         {
             IaikExtendedSlot slot;
@@ -185,138 +170,10 @@ public final class IaikP11CryptService implements P11CryptService
                 continue;
             }
 
-            List<PrivateKey> signatureKeys = slot.getAllPrivateObjects(Boolean.TRUE, null);
-            for(PrivateKey signatureKey : signatureKeys)
+            slot.refresh();
+            for(P11Identity identity : slot.getP11Identities())
             {
-                byte[] keyId = signatureKey.getId().getByteArrayValue();
-                if(keyId == null || keyId.length == 0)
-                {
-                    continue;
-                }
-
-                try
-                {
-                    X509PublicKeyCertificate certificateObject = slot.getCertificateObject(keyId, null);
-
-                    X509Certificate signatureCert = null;
-                    PublicKey signaturePublicKey = null;
-
-                    if(certificateObject != null)
-                    {
-                        byte[] encoded = certificateObject.getValue().getByteArrayValue();
-                        try
-                        {
-                            signatureCert = (X509Certificate) IoCertUtil.parseCert(
-                                        new ByteArrayInputStream(encoded));
-                        } catch (Exception e)
-                        {
-                            String keyIdStr = hex(keyId);
-                            final String message = "Could not parse certificate with id " + keyIdStr;
-                            if(LOG.isWarnEnabled())
-                            {
-                                LOG.warn(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(), e.getMessage());
-                            }
-                            LOG.debug(message, e);
-                            continue;
-                        }
-                        signaturePublicKey = signatureCert.getPublicKey();
-                    }
-                    else
-                    {
-                        signatureCert = null;
-                        iaik.pkcs.pkcs11.objects.PublicKey publicKeyObject = slot.getPublicKeyObject(
-                                Boolean.TRUE, null, keyId, null);
-                        if(publicKeyObject == null)
-                        {
-                            String msg = "neither certificate nor public key for signing is available";
-                            LOG.info(msg);
-                            continue;
-                        }
-
-                        signaturePublicKey = generatePublicKey(publicKeyObject);
-                    }
-
-                    List<X509Certificate> certChain = new LinkedList<>();
-
-                    if(signatureCert != null)
-                    {
-                        certChain.add(signatureCert);
-                        while(true)
-                        {
-                            X509Certificate context = certChain.get(certChain.size() - 1);
-                            if(IoCertUtil.isSelfSigned(context))
-                            {
-                                break;
-                            }
-
-                            String issuerSubject = signatureCert.getIssuerX500Principal().getName();
-                            Set<X509Certificate> issuerCerts = allCerts.get(issuerSubject);
-                            if(issuerCerts == null)
-                            {
-                                issuerCerts = new HashSet<>();
-                                X509PublicKeyCertificate[] certObjects = slot.getCertificateObjects(
-                                        signatureCert.getIssuerX500Principal());
-                                if(certObjects != null && certObjects.length > 0)
-                                {
-                                    for(X509PublicKeyCertificate certObject : certObjects)
-                                    {
-                                        issuerCerts.add(IoCertUtil.parseCert(certObject.getValue().getByteArrayValue()));
-                                    }
-                                }
-
-                                if(issuerCerts.isEmpty() == false)
-                                {
-                                    allCerts.put(issuerSubject, issuerCerts);
-                                }
-                            }
-
-                            if(issuerCerts == null || issuerCerts.isEmpty())
-                            {
-                                break;
-                            }
-
-                            // find the certificate
-                            for(X509Certificate issuerCert : issuerCerts)
-                            {
-                                try
-                                {
-                                    context.verify(issuerCert.getPublicKey());
-                                    certChain.add(issuerCert);
-                                }catch(Exception e)
-                                {
-                                }
-                            }
-                        }
-                    }
-
-                    P11KeyIdentifier tKeyId = new P11KeyIdentifier(
-                            signatureKey.getId().getByteArrayValue(),
-                            new String(signatureKey.getLabel().getCharArrayValue()));
-
-                    IaikP11Identity identity = new IaikP11Identity(slotId, tKeyId,
-                            certChain.toArray(new X509Certificate[0]), signaturePublicKey);
-                    currentIdentifies.add(identity);
-                } catch (SignerException e)
-                {
-                    String keyIdStr = hex(keyId);
-                    final String message = "SignerException while initializing key with key-id " + keyIdStr;
-                    if(LOG.isWarnEnabled())
-                    {
-                        LOG.warn(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(), e.getMessage());
-                    }
-                    LOG.debug(message, e);
-                    continue;
-                } catch (Throwable t)
-                {
-                    String keyIdStr = hex(keyId);
-                    final String message = "Unexpected exception while initializing key with key-id " + keyIdStr;
-                    if(LOG.isWarnEnabled())
-                    {
-                        LOG.warn(LogUtil.buildExceptionLogFormat(message), t.getClass().getName(), t.getMessage());
-                    }
-                    LOG.debug(message, t);
-                    continue;
-                }
+                currentIdentifies.add((IaikP11Identity) identity);
             }
         }
 
@@ -504,15 +361,12 @@ public final class IaikP11CryptService implements P11CryptService
     private IaikP11Identity getIdentity(P11SlotIdentifier slotId, P11KeyIdentifier keyId)
     throws SignerException
     {
-        for(IaikP11Identity identity : identities)
+        IaikP11Identity identity = getIdentity2(slotId, keyId);
+        if(identity == null)
         {
-            if(identity.match(slotId, keyId))
-            {
-                return identity;
-            }
+            throw new SignerException("Found no identity with " + keyId + " in slot " + slotId);
         }
-
-        throw new SignerException("Found no identity with " + keyId + " in slot " + slotId);
+        return identity;
     }
 
     private IaikP11Identity getIdentity2(P11SlotIdentifier slotId, P11KeyIdentifier keyId)
@@ -549,67 +403,6 @@ public final class IaikP11CryptService implements P11CryptService
     public String toString()
     {
         return moduleConf.toString();
-    }
-
-    private static String hex(byte[] bytes)
-    {
-        return Hex.toHexString(bytes).toUpperCase();
-    }
-
-    private static PublicKey generatePublicKey(iaik.pkcs.pkcs11.objects.PublicKey p11Key)
-    throws SignerException
-    {
-        if(p11Key instanceof RSAPublicKey)
-        {
-            RSAPublicKey rsaP11Key = (RSAPublicKey) p11Key;
-            byte[] expBytes = rsaP11Key.getPublicExponent().getByteArrayValue();
-            BigInteger exp = new BigInteger(1,expBytes);
-
-            byte[] modBytes = rsaP11Key.getModulus().getByteArrayValue();
-            BigInteger mod = new BigInteger(1,modBytes);
-
-            if(LOG.isDebugEnabled())
-            {
-                LOG.debug("Modulus:\n {}", Hex.toHexString(modBytes));
-            }
-            RSAPublicKeySpec keySpec = new RSAPublicKeySpec(mod,exp);
-            try
-            {
-                KeyFactory keyFactory=KeyFactory.getInstance("RSA");
-                return keyFactory.generatePublic(keySpec);
-            }catch(NoSuchAlgorithmException | InvalidKeySpecException e)
-            {
-                throw new SignerException(e);
-            }
-        }
-        else if(p11Key instanceof DSAPublicKey)
-        {
-            DSAPublicKey dsaP11Key = (DSAPublicKey) p11Key;
-
-            BigInteger prime = new BigInteger(1, dsaP11Key.getPrime().getByteArrayValue()); // p
-            BigInteger subPrime = new BigInteger(1, dsaP11Key.getSubprime().getByteArrayValue()); // q
-            BigInteger base = new BigInteger(1, dsaP11Key.getBase().getByteArrayValue()); // g
-            BigInteger value = new BigInteger(1, dsaP11Key.getValue().getByteArrayValue()); // y
-
-            DSAPublicKeySpec keySpec = new DSAPublicKeySpec(value, prime, subPrime, base);
-            try
-            {
-                KeyFactory keyFactory=KeyFactory.getInstance("DSA");
-                return keyFactory.generatePublic(keySpec);
-            }catch(NoSuchAlgorithmException | InvalidKeySpecException e)
-            {
-                throw new SignerException(e);
-            }
-        }
-        else if(p11Key instanceof ECDSAPublicKey)
-        {
-            // FIXME: implement me
-            return null;
-        }
-        else
-        {
-            throw new SignerException("Unknown public key class " + p11Key.getClass().getName());
-        }
     }
 
     @Override

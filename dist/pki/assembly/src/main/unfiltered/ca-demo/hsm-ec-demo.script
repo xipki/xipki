@@ -1,7 +1,30 @@
-CA_SIGNER_ALGO = SHA256withECSA
-RCA_KEY_LABEL = RCA1-EC
-SubCA_KEY_LABEL = SubCA1-EC
-SubCAwithCRL_KEY_LABEL = SubCAwithCRL1-EC
+CA_SIGNER_ALGO = SHA256withECDSA
+
+RCA_KEY_LABEL = RCA1
+SubCA_KEY_LABEL = SubCA1
+SubCAwithCRL_KEY_LABEL = SubCAwithCRL1
+
+echo "========================================================"
+echo "||               DEMO EC with HSM Key                 ||"
+echo "========================================================"
+
+features:install xipki-security-shell
+
+file:rm -r -f output
+
+keytool:delete-key -slot 1 -key-label $RCA_KEY_LABEL
+
+keytool:delete-key -slot 1 -key-label $SubCA_KEY_LABEL
+
+keytool:delete-key -slot 1 -key-label $SubCAwithCRL_KEY_LABEL
+
+keytool:ec -curve secp256r1 -slot 1 -key-label $RCA_KEY_LABEL
+
+keytool:ec -curve secp256r1 -slot 1 -key-label $SubCA_KEY_LABEL
+
+keytool:ec -curve secp256r1 -slot 1 -key-label $SubCAwithCRL_KEY_LABEL
+
+features:uninstall xipki-security-shell
 
 source ./ca-demo/prepare.script
 
@@ -11,6 +34,6 @@ source ./ca-demo/ra.script
 
 source ./ca-demo/ocsp.script
 
-source ./ca-demo/loadtest-enroll.script
+#source ./ca-demo/loadtest-enroll.script
 
-source ./ca-demo/loadtest-ocsp.script
+#source ./ca-demo/loadtest-ocsp.script

@@ -101,7 +101,7 @@ public class Rfc6712Servlet extends HttpServlet
         }
 
         AuditLevel auditLevel = AuditLevel.INFO;
-        AuditStatus auditStatus = null;
+        AuditStatus auditStatus = AuditStatus.SUCCESSFUL;
         String auditMessage = null;
         try
         {

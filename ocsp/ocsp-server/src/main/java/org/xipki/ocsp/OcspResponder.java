@@ -142,6 +142,7 @@ import org.xipki.ocsp.conf.jaxb.ObjectFactory;
 import org.xipki.ocsp.conf.jaxb.ResponseType;
 import org.xipki.ocsp.conf.jaxb.SignerType;
 import org.xipki.security.api.ConcurrentContentSigner;
+import org.xipki.security.api.NoIdleSignerException;
 import org.xipki.security.api.SecurityFactory;
 import org.xipki.security.api.SignerException;
 import org.xml.sax.SAXException;
@@ -820,6 +821,7 @@ public class OcspResponder
                 }
 
                 CertStatusInfo certStatusInfo = null;
+                boolean exceptionOccurs = false;
 
                 for(CertStatusStore store : certStatusStores)
                 {
@@ -834,6 +836,7 @@ public class OcspResponder
                         }
                     } catch (CertStatusStoreException e)
                     {
+                        exceptionOccurs = true;
                         final String message = "getCertStatus() of CertStatusStore " + store.getName();
                         if(LOG.isErrorEnabled())
                         {
@@ -850,7 +853,14 @@ public class OcspResponder
                         fillAuditEvent(childAuditEvent, AuditLevel.ERROR, AuditStatus.ERROR,
                                 "No CertStatusStore can answer the request");
                     }
-                    return createUnsuccessfullOCSPResp(OcspResponseStatus.tryLater);
+                    if(exceptionOccurs)
+                    {
+                        return createUnsuccessfullOCSPResp(OcspResponseStatus.tryLater);
+                    }
+                    else
+                    {
+                        certStatusInfo = CertStatusInfo.getIssuerUnknownCertStatusInfo(new Date(), null);
+                    }
                 }
 
                 if(childAuditEvent != null)
@@ -1057,7 +1067,15 @@ public class OcspResponder
                 concurrentSigner = responderSigner.getFirstSigner();
             }
 
-            ContentSigner signer = concurrentSigner.borrowContentSigner();
+            ContentSigner signer;
+            try
+            {
+                signer = concurrentSigner.borrowContentSigner();
+            }catch(NoIdleSignerException e)
+            {
+                return createUnsuccessfullOCSPResp(OcspResponseStatus.tryLater);
+            }
+
             BasicOCSPResp basicOcspResp;
             try
             {

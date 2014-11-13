@@ -166,12 +166,6 @@ Install
 Run Demo
 -----
 
-* If you use PKCS#11 keys, configure the PKCS#11 configuration
-
-    ```sh
-    etc/pkcs11-conf.xml
-    ```
-
 * Delete folders `$XIPKI_HOME/data` and `$XIPKI_HOME/output`
 
 * Start XiPKI
@@ -187,24 +181,6 @@ Run Demo
     ```
 
     If you have changed the content within folder `$XIPKI_HOME/etc` or `$XIPKI_HOME/system`, please delete the folder `$XIPKI_HOME/data` before starting XiPKI.
-
-* If you use keys in PKCS#11 device
-
-    Generate keypair with self-signed certificate in PKCS#11 device in karaf terminal
-    ```sh
-    features:install xipki-security-shell
-    # RSA key, the labels used in the demo are RCA1, SubCA1 and
-    # SubCAwithCRL1, and the slot index is 1
-    keytool:rsa -slot <slot index> -key-label <label>
-
-    # EC key, the labels used in the demo are RCA1-EC, SubCA1-EC and
-    # SubCAwithCRL1-EC, and the slot index is 1
-    keytool:ec  -slot <slot index> -key-label <label> -curve secp256r1
-
-    # DSA key, the labels used in the demo are RCA1-DSA, SubCA1-DSA and
-    # SubCAwithCRL1-DSA, and the slot index is 1
-    keytool:dsa  -slot <slot index> -key-label <label>
-    ```
 
 * Run the pre-configured OSGi-commands in karaf terminal
   
@@ -230,18 +206,18 @@ Run Demo
       ca-demo/dsa-demo.script
       ```
        
-     * For RSA key in PKCS#11 device
+     * For RSA key in PKCS#11 device (simulator)
      
       ```sh
       ca-demo/hsm-rsa-demo.script
       ```
        
-     * For EC key in PKCS#11 device
+     * For EC key in PKCS#11 device (simulator)
      
       ```sh
       ca-demo/hsm-ec-demo.script
       ```
-     * For DSA key in PKCS#11 device
+     * For DSA key in PKCS#11 device (dimulator)
      
       ```sh
       ca-demo/hsm-dsa-demo.script

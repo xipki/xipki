@@ -51,6 +51,10 @@ import org.xipki.security.api.PasswordResolver;
 
 public abstract class CertStatusStore
 {
+    public abstract Set<IssuerHashNameAndKey> getIssuerHashNameAndKeys();
+
+    public abstract boolean canResolveIssuer(HashAlgoType hashAlgo, byte[] issuerNameHash, byte[] issuerKeyHash);
+
     public abstract CertStatusInfo getCertStatus(HashAlgoType hashAlgo, byte[] issuerNameHash,
             byte[] issuerKeyHash, BigInteger serialNumber, Set<String> excludeCertProfiles)
     throws CertStatusStoreException;

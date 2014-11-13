@@ -3,10 +3,16 @@ CURVE = secp256r1
 
 CA_SIGNER_ALGO = SHA256withECDSA
 
+echo "========================================================"
+echo "||            DEMO EC with PKCS#12 Key                ||"
+echo "========================================================"
+
 features:install xipki-security-shell
 
 # Wait one second
 sleep 1000
+
+file:rm -r -f output
 
 keytool:ec-p12 -curve $CURVE -pwd 1234 -out output/RCA1.p12 \
   -subject "CN=RCA1,O=xipki,C=DE"
@@ -25,6 +31,6 @@ source ./ca-demo/ra.script
 
 source ./ca-demo/ocsp.script
 
-source ./ca-demo/loadtest-enroll.script
+#source ./ca-demo/loadtest-enroll.script
 
-source ./ca-demo/loadtest-ocsp.script
+#source ./ca-demo/loadtest-ocsp.script

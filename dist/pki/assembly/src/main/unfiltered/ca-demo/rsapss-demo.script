@@ -1,0 +1,39 @@
+KEYSIZE = 2048
+
+# Valid signer algos are SHA<n>withRSAandMGF1, where n is 1, 256, 384 and 512
+#
+CA_SIGNER_ALGO = SHA256withRSAandMGF1
+
+echo "========================================================"
+echo "||         DEMO RSA (PSS) with PKCS#12 Key            ||"
+echo "========================================================"
+
+features:install xipki-security-shell
+
+# Wait one second
+sleep 1000
+
+file:rm -r -f output
+
+keytool:rsa-p12 -pwd 1234 -keysize $KEYSIZE -out output/RCA1.p12 \
+  -subject "CN=RCA1"
+
+keytool:rsa-p12 -pwd 1234 -keysize $KEYSIZE -out output/SubCA1.p12 \
+  -subject "CN=SubCA1"
+
+keytool:rsa-p12 -pwd 1234 -keysize $KEYSIZE -out output/SubCAwithCRL1.p12 \
+  -subject "CN=SubCAwithCRL1"
+
+source ./ca-demo/prepare.script
+
+source ./ca-demo/p12.script
+
+source ./ca-demo/ra.script
+
+source ./ca-demo/ocsp.script
+
+#source ./ca-demo/loadtest-enroll.script
+
+#source ./ca-demo/loadtest-ocsp.script
+
+
