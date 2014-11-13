@@ -33,57 +33,51 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.security.shell;
+package org.xipki.security.shell.p11;
 
-import java.io.File;
-import java.io.IOException;
+import java.math.BigInteger;
 
+import org.apache.felix.gogo.commands.Command;
 import org.apache.felix.gogo.commands.Option;
-import org.xipki.security.api.P12KeypairGenerationResult;
+import org.xipki.security.api.p11.P11KeypairGenerationResult;
+import org.xipki.security.api.p11.P11WritableSlot;
 
 /**
  * @author Lijun Liao
  */
 
-public abstract class P12KeyGenCommand extends KeyGenCommand
+@Command(scope = "keytool", name = "rsa", description="Generate RSA keypair in PKCS#11 device")
+public class P11RSAKeyGenCommand extends P11KeyGenCommand
 {
-    @Option(name = "-subject",
-            required = true, description = "Required. Subject in the self-signed certificate")
-    protected String subject;
+    @Option(name = "-keysize",
+            description = "Keysize in bit",
+            required = false)
+    protected Integer keysize = 2048;
 
-    @Option(name = "-out",
-            required = true, description = "Required. Where to save the key")
-    protected String keyOutFile;
+    @Option(name = "-e",
+            description = "public exponent",
+            required = false)
+    protected String publicExponent = "65537";
 
-    @Option(name = "-certout",
-            required = false, description = "Where to save the self-signed certificate")
-    protected String certOutFile;
-
-    @Option(name = "-pwd", aliases = { "--password" },
-            required = false, description = "Password of the PKCS#12 file")
-    protected String password;
-
-    protected void saveKeyAndCert(P12KeypairGenerationResult keyAndCert)
-    throws IOException
+    @Override
+    protected Object doExecute()
+    throws Exception
     {
-        File p12File = new File(keyOutFile);
-        saveVerbose("Saved PKCS#12 keystore to file", p12File, keyAndCert.getKeystore());
-        if(certOutFile != null)
+        if(keysize % 1024 != 0)
         {
-            File certFile = new File(certOutFile);
-            saveVerbose("Saved self-signed certificate to file", certFile,
-                    keyAndCert.getCertificate().getEncoded());
+            err("Keysize is not multiple of 1024: " + keysize);
+            return null;
         }
-    }
 
-    protected char[] getPassword()
-    {
-        char[] pwdInChar = readPasswordIfNotSet(password);
-        if(pwdInChar != null)
-        {
-            password = new String(pwdInChar);
-        }
-        return pwdInChar;
+        BigInteger _publicExponent = new BigInteger(publicExponent);
+        P11WritableSlot slot = getP11WritablSlot(moduleName, slotIndex);
+        P11KeypairGenerationResult keyAndCert = slot.generateRSAKeypairAndCert(
+                keysize, _publicExponent,
+                label, getSubject(),
+                getKeyUsage(),
+                getExtendedKeyUsage());
+        saveKeyAndCert(keyAndCert);
+        return null;
     }
 
 }

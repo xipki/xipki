@@ -33,48 +33,33 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.security.shell;
+package org.xipki.security.shell.p12;
 
-import java.io.FileOutputStream;
-import java.security.Key;
+import java.io.File;
 import java.security.KeyStore;
 import java.security.cert.X509Certificate;
 import java.util.Enumeration;
-import java.util.HashSet;
-import java.util.Set;
 
 import org.apache.felix.gogo.commands.Command;
 import org.apache.felix.gogo.commands.Option;
-import org.xipki.common.CmpUtf8Pairs;
-import org.xipki.common.IoCertUtil;
-import org.xipki.security.api.PasswordResolverException;
 import org.xipki.security.api.SignerException;
 
 /**
  * @author Lijun Liao
  */
 
-@Command(scope = "keytool", name = "update-cert-p12", description="Update certificate in PKCS#12 keystore")
-public class P12CertUpdateCommand extends P12SecurityCommand
+@Command(scope = "keytool", name = "export-cert-p12", description="Export certificate from PKCS#12 keystore")
+public class P12CertExportCommand extends P12SecurityCommand
 {
-    @Option(name = "-cert",
-            required = true, description = "Required. Certificate file")
-    protected String certFile;
-
-    @Option(name = "-cacert",
-            required = false, multiValued = true, description = "CA Certificate files")
-    protected Set<String> caCertFiles;
+    @Option(name = "-out",
+            required = true, description = "Required. Where to save the certificate")
+    protected String outFile;
 
     @Override
     protected Object doExecute()
     throws Exception
     {
         KeyStore ks = getKeyStore();
-
-        char[] pwd = getPassword();
-        X509Certificate newCert = IoCertUtil.parseCert(certFile);
-
-        assertMatch(newCert, new String(pwd));
 
         String keyname = null;
         Enumeration<String> aliases = ks.aliases();
@@ -93,45 +78,10 @@ public class P12CertUpdateCommand extends P12SecurityCommand
             throw new SignerException("Could not find private key");
         }
 
-        Key key = ks.getKey(keyname, pwd);
-        Set<X509Certificate> caCerts = new HashSet<>();
-        if(caCertFiles != null && caCertFiles.isEmpty() == false)
-        {
-            for(String caCertFile : caCertFiles)
-            {
-                caCerts.add(IoCertUtil.parseCert(caCertFile));
-            }
-        }
-        X509Certificate[] certChain = IoCertUtil.buildCertPath(newCert, caCerts);
+        X509Certificate cert = (X509Certificate) ks.getCertificate(keyname);
+        saveVerbose("Saved certificate to file", new File(outFile), cert.getEncoded());
 
-        ks.setKeyEntry(keyname, key, pwd, certChain);
-
-        FileOutputStream fOut = null;
-        try
-        {
-            fOut = new FileOutputStream(p12File);
-            ks.store(fOut, pwd);
-            out("Updated certificate");
-            return null;
-        }finally
-        {
-            if(fOut != null)
-            {
-                fOut.close();
-            }
-        }
-    }
-
-    private void assertMatch(X509Certificate cert, String password)
-    throws SignerException, PasswordResolverException
-    {
-        CmpUtf8Pairs pairs = new CmpUtf8Pairs("keystore", "file:" + p12File);
-        if(password != null)
-        {
-            pairs.putUtf8Pair("password", new String(password));
-        }
-
-        securityFactory.createSigner("PKCS12", pairs.getEncoded(), "SHA1", false, cert);
+        return null;
     }
 
 }

@@ -33,7 +33,7 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.security.shell;
+package org.xipki.security.shell.p11;
 
 import java.io.File;
 
@@ -42,6 +42,7 @@ import org.bouncycastle.util.encoders.Hex;
 import org.xipki.security.api.SecurityFactory;
 import org.xipki.security.api.p11.P11KeypairGenerationResult;
 import org.xipki.security.api.p11.P11SlotIdentifier;
+import org.xipki.security.shell.KeyGenCommand;
 
 /**
  * @author Lijun Liao
@@ -87,12 +88,13 @@ public abstract class P11KeyGenCommand extends KeyGenCommand
     protected void saveKeyAndCert(P11KeypairGenerationResult keyAndCert)
     throws Exception
     {
-        out("key id: " + Hex.toHexString(keyAndCert.getId()));
-        out("key label: " + keyAndCert.getLabel());
+        out("generate PKCS#11 key");
+        out("\tkey id: " + Hex.toHexString(keyAndCert.getId()));
+        out("\tkey label: " + keyAndCert.getLabel());
         if(outputFilename != null)
         {
             File certFile = new File(outputFilename);
-            saveVerbose("Saved self-signed certificate to file", certFile, keyAndCert.getCertificate().getEncoded());
+            saveVerbose("\tSaved self-signed certificate to file", certFile, keyAndCert.getCertificate().getEncoded());
         }
 
         securityFactory.getP11CryptService(moduleName).refresh();

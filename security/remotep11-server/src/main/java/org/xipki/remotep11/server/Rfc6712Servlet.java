@@ -65,7 +65,7 @@ public class Rfc6712Servlet extends HttpServlet
     private static final String CT_RESPONSE = "application/pkixcmp";
 
     private final CmpResponder responder;
-    private LocalP11CryptServicePool localP11CryptService;
+    private LocalP11CryptServicePool localP11CryptServicePool;
 
     public Rfc6712Servlet()
     {
@@ -78,7 +78,7 @@ public class Rfc6712Servlet extends HttpServlet
     {
         try
         {
-            if(localP11CryptService == null)
+            if(localP11CryptServicePool == null)
             {
                 LOG.error("localP11CryptService in servlet not configured");
                 response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
@@ -143,7 +143,7 @@ public class Rfc6712Servlet extends HttpServlet
                         constructedPath : constructedPath.substring(0, moduleName_end_index);
             }
 
-            PKIMessage pkiResp = responder.processPKIMessage(localP11CryptService, moduleName, pkiReq);
+            PKIMessage pkiResp = responder.processPKIMessage(localP11CryptServicePool, moduleName, pkiReq);
             byte[] pkiRespBytes = pkiResp.getEncoded("DER");
 
             response.setContentType(Rfc6712Servlet.CT_RESPONSE);
@@ -187,8 +187,8 @@ public class Rfc6712Servlet extends HttpServlet
         }
     }
 
-    public void setLocalP11CryptService(LocalP11CryptServicePool localP11CryptService)
+    public void setLocalP11CryptServicePool(LocalP11CryptServicePool localP11CryptServicePool)
     {
-        this.localP11CryptService = localP11CryptService;
+        this.localP11CryptServicePool = localP11CryptServicePool;
     }
 }

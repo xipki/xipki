@@ -33,54 +33,34 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.security.shell;
-
-import java.io.File;
-import java.security.KeyStore;
-import java.security.cert.X509Certificate;
-import java.util.Enumeration;
+package org.xipki.security.shell.p11;
 
 import org.apache.felix.gogo.commands.Command;
 import org.apache.felix.gogo.commands.Option;
-import org.xipki.security.api.SignerException;
+import org.xipki.security.api.p11.P11KeypairGenerationResult;
+import org.xipki.security.api.p11.P11WritableSlot;
 
 /**
  * @author Lijun Liao
  */
 
-@Command(scope = "keytool", name = "export-cert-p12", description="Export certificate from PKCS#12 keystore")
-public class P12CertExportCommand extends P12SecurityCommand
+@Command(scope = "keytool", name = "ec", description="Generate EC keypair in PKCS#11 device")
+public class P11ECKeyGenCommand extends P11KeyGenCommand
 {
-    @Option(name = "-out",
-            required = true, description = "Required. Where to save the certificate")
-    protected String outFile;
+    @Option(name = "-curve",
+            description = "EC Curve name",
+            required = false)
+    protected String curveName = "brainpoolp256r1";
 
     @Override
     protected Object doExecute()
     throws Exception
     {
-        KeyStore ks = getKeyStore();
-
-        String keyname = null;
-        Enumeration<String> aliases = ks.aliases();
-        while(aliases.hasMoreElements())
-        {
-            String alias = aliases.nextElement();
-            if(ks.isKeyEntry(alias))
-            {
-                keyname = alias;
-                break;
-            }
-        }
-
-        if(keyname == null)
-        {
-            throw new SignerException("Could not find private key");
-        }
-
-        X509Certificate cert = (X509Certificate) ks.getCertificate(keyname);
-        saveVerbose("Saved certificate to file", new File(outFile), cert.getEncoded());
-
+        P11WritableSlot slot = getP11WritablSlot(moduleName, slotIndex);
+        P11KeypairGenerationResult keyAndCert = slot.generateECDSAKeypairAndCert(
+                curveName, label, getSubject(),
+                getKeyUsage(), getExtendedKeyUsage());
+        saveKeyAndCert(keyAndCert);
         return null;
     }
 

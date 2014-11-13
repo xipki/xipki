@@ -33,52 +33,34 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.security.shell;
-
-import java.math.BigInteger;
+package org.xipki.security.shell.p12;
 
 import org.apache.felix.gogo.commands.Command;
 import org.apache.felix.gogo.commands.Option;
-import org.xipki.security.api.p11.P11KeypairGenerationResult;
-import org.xipki.security.p11.iaik.P11KeypairGenerator;
+import org.xipki.security.api.P12KeypairGenerationResult;
+import org.xipki.security.p10.P12KeypairGenerator;
+import org.xipki.security.p10.P12KeypairGenerator.ECDSAIdentityGenerator;
 
 /**
  * @author Lijun Liao
  */
 
-@Command(scope = "keytool", name = "rsa", description="Generate RSA keypair in PKCS#11 device")
-public class P11RSAKeyGenCommand extends P11KeyGenCommand
+@Command(scope = "keytool", name = "ec-p12", description="Generate EC keypair in PKCS#12 keystore")
+public class P12ECKeyGenCommand extends P12KeyGenCommand
 {
-    @Option(name = "-keysize",
-            description = "Keysize in bit",
+    @Option(name = "-curve",
+            description = "EC Curve name",
             required = false)
-    protected Integer keysize = 2048;
-
-    @Option(name = "-e",
-            description = "public exponent",
-            required = false)
-    protected String publicExponent = "65537";
+    protected String curveName = "brainpoolp256r1";
 
     @Override
     protected Object doExecute()
     throws Exception
     {
-        if(keysize % 1024 != 0)
-        {
-            err("Keysize is not multiple of 1024: " + keysize);
-            return null;
-        }
+        ECDSAIdentityGenerator gen = new P12KeypairGenerator.ECDSAIdentityGenerator(
+                curveName, getPassword(), subject, getKeyUsage(), getExtendedKeyUsage());
 
-        BigInteger _publicExponent = new BigInteger(publicExponent);
-
-        P11KeypairGenerator gen = new P11KeypairGenerator(securityFactory);
-
-        P11KeypairGenerationResult keyAndCert = gen.generateRSAKeypairAndCert(
-                moduleName, getSlotId(),
-                keysize, _publicExponent,
-                label, getSubject(),
-                getKeyUsage(),
-                getExtendedKeyUsage());
+        P12KeypairGenerationResult keyAndCert = gen.generateIdentity();
         saveKeyAndCert(keyAndCert);
 
         return null;

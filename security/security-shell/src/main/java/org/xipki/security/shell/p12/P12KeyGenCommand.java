@@ -33,54 +33,58 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.security.shell;
+package org.xipki.security.shell.p12;
+
+import java.io.File;
+import java.io.IOException;
 
 import org.apache.felix.gogo.commands.Option;
-import org.bouncycastle.util.encoders.Hex;
-import org.xipki.security.api.SecurityFactory;
-import org.xipki.security.api.p11.P11KeyIdentifier;
+import org.xipki.security.api.P12KeypairGenerationResult;
+import org.xipki.security.shell.KeyGenCommand;
 
 /**
  * @author Lijun Liao
  */
 
-public abstract class P11SecurityCommand extends SecurityCommand
+public abstract class P12KeyGenCommand extends KeyGenCommand
 {
-    @Option(name = "-slot",
-            required = true, description = "Required. Slot index")
-    protected Integer slotIndex;
+    @Option(name = "-subject",
+            required = true, description = "Required. Subject in the self-signed certificate")
+    protected String subject;
 
-    @Option(name = "-key-id",
-            required = false, description = "Id of the private key in the PKCS#11 device.\n"
-                    + "Either keyId or keyLabel must be specified")
-    protected String keyId;
+    @Option(name = "-out",
+            required = true, description = "Required. Where to save the key")
+    protected String keyOutFile;
 
-    @Option(name = "-key-label",
-            required = false, description = "Label of the private key in the PKCS#11 device.\n"
-                    + "Either keyId or keyLabel must be specified")
-    protected String keyLabel;
+    @Option(name = "-certout",
+            required = false, description = "Where to save the self-signed certificate")
+    protected String certOutFile;
 
-    @Option(name = "-module",
-            required = false, description = "Name of the PKCS#11 module.")
-    protected String moduleName = SecurityFactory.DEFAULT_P11MODULE_NAME;
+    @Option(name = "-pwd", aliases = { "--password" },
+            required = false, description = "Password of the PKCS#12 file")
+    protected String password;
 
-    protected P11KeyIdentifier getKeyIdentifier()
-    throws Exception
+    protected void saveKeyAndCert(P12KeypairGenerationResult keyAndCert)
+    throws IOException
     {
-        P11KeyIdentifier keyIdentifier;
-        if(keyId != null && keyLabel == null)
+        File p12File = new File(keyOutFile);
+        saveVerbose("Saved PKCS#12 keystore to file", p12File, keyAndCert.getKeystore());
+        if(certOutFile != null)
         {
-            keyIdentifier = new P11KeyIdentifier(Hex.decode(keyId));
+            File certFile = new File(certOutFile);
+            saveVerbose("Saved self-signed certificate to file", certFile,
+                    keyAndCert.getCertificate().getEncoded());
         }
-        else if(keyId == null && keyLabel != null)
+    }
+
+    protected char[] getPassword()
+    {
+        char[] pwdInChar = readPasswordIfNotSet(password);
+        if(pwdInChar != null)
         {
-            keyIdentifier = new P11KeyIdentifier(keyLabel);
+            password = new String(pwdInChar);
         }
-        else
-        {
-            throw new Exception("Exactly one of keyId or keyLabel should be specified");
-        }
-        return keyIdentifier;
+        return pwdInChar;
     }
 
 }

@@ -33,45 +33,39 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.security.shell;
+package org.xipki.ocsp.client.shell;
 
-import java.math.BigInteger;
-
-import org.apache.felix.gogo.commands.Command;
-import org.apache.felix.gogo.commands.Option;
-import org.xipki.security.api.P12KeypairGenerationResult;
-import org.xipki.security.p10.P12KeypairGenerator;
+import org.bouncycastle.cert.ocsp.BasicOCSPResp;
+import org.bouncycastle.cert.ocsp.OCSPException;
+import org.bouncycastle.cert.ocsp.OCSPResp;
+import org.xipki.ocsp.client.api.OCSPRequestorException;
+import org.xipki.ocsp.client.api.OCSPResponseNotSuccessfullException;
 
 /**
  * @author Lijun Liao
  */
 
-@Command(scope = "keytool", name = "rsa-p12", description="Generate RSA keypair in PKCS#12 keystore")
-public class P12RSAKeyGenCommand extends P12KeyGenCommand
+public class OCSPUtils
 {
-    @Option(name = "-keysize",
-            description = "Keysize in bit",
-            required = false)
-    protected Integer keysize = 2048;
-
-    @Override
-    protected Object doExecute()
-    throws Exception
+    public static BasicOCSPResp extractBasicOCSPResp(OCSPResp response)
+    throws OCSPRequestorException
     {
-        if(keysize % 1024 != 0)
+        int statusCode = response.getStatus();
+        if(statusCode == 0)
         {
-            err("Keysize is not multiple of 1024: " + keysize);
-            return null;
+            BasicOCSPResp basicOCSPResp;
+            try
+            {
+                basicOCSPResp = (BasicOCSPResp) response.getResponseObject();
+            } catch (OCSPException e)
+            {
+                throw new OCSPRequestorException(e);
+            }
+            return basicOCSPResp;
         }
-
-        P12KeypairGenerator gen = new P12KeypairGenerator.RSAIdentityGenerator(
-                keysize, BigInteger.valueOf(0x10001), getPassword(), subject,
-                getKeyUsage(), getExtendedKeyUsage());
-
-        P12KeypairGenerationResult keyAndCert = gen.generateIdentity();
-        saveKeyAndCert(keyAndCert);
-
-        return null;
+        else
+        {
+            throw new OCSPResponseNotSuccessfullException(statusCode);
+        }
     }
-
 }

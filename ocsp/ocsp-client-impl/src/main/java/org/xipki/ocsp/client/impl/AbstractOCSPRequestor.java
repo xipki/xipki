@@ -68,7 +68,6 @@ import org.bouncycastle.operator.DigestCalculator;
 import org.xipki.common.IoCertUtil;
 import org.xipki.ocsp.client.api.OCSPRequestor;
 import org.xipki.ocsp.client.api.OCSPRequestorException;
-import org.xipki.ocsp.client.api.OCSPResponseNotSuccessfullException;
 import org.xipki.ocsp.client.api.RequestOptions;
 import org.xipki.security.api.ConcurrentContentSigner;
 import org.xipki.security.api.NoIdleSignerException;
@@ -127,49 +126,36 @@ public abstract class AbstractOCSPRequestor implements OCSPRequestor
             nonce = nextNonce();
         }
 
-        OCSPReq ocspReq = buildRequest(caCert, serialNumber, nonce,
-                requestOptions);
-        OCSPResp response;
+        OCSPReq ocspReq = buildRequest(caCert, serialNumber, nonce, requestOptions);
         try
         {
             byte[] encodedReq = ocspReq.getEncoded();
             byte[] encodedResp = send(encodedReq, responderUrl, requestOptions);
-            response = new OCSPResp(encodedResp);
-        } catch (IOException e)
+            OCSPResp ocspResp = new OCSPResp(encodedResp);
+
+            Object respObject = ocspResp.getResponseObject();
+            if(ocspResp.getStatus() == 0 && respObject instanceof BasicOCSPResp)
+            {
+                BasicOCSPResp basicOCSPResp = (BasicOCSPResp) respObject;
+                Extension nonceExtn = basicOCSPResp.getExtension(OCSPObjectIdentifiers.id_pkix_ocsp_nonce);
+
+                if(nonce != null)
+                {
+                    if(nonceExtn == null)
+                    {
+                        throw new OCSPRequestorException("No nonce is contained in response");
+                    }
+                    if(Arrays.equals(nonce, nonceExtn.getExtnValue().getOctets()) == false)
+                    {
+                        throw new OCSPRequestorException("The nonce in response does not match the one in request");
+                    }
+                }
+            }
+
+            return ocspResp;
+        } catch (IOException | OCSPException e)
         {
             throw new OCSPRequestorException(e);
-        }
-
-        int statusCode = response.getStatus();
-        if(statusCode == 0)
-        {
-            BasicOCSPResp basicOCSPResp;
-            try
-            {
-                basicOCSPResp = (BasicOCSPResp) response.getResponseObject();
-            } catch (OCSPException e)
-            {
-                throw new OCSPRequestorException(e);
-            }
-            Extension nonceExtn = basicOCSPResp.getExtension(OCSPObjectIdentifiers.id_pkix_ocsp_nonce);
-
-            if(nonce != null)
-            {
-                if(nonceExtn == null)
-                {
-                    throw new OCSPRequestorException("No nonce is contained in response");
-                }
-                if(Arrays.equals(nonce, nonceExtn.getExtnValue().getOctets()) == false)
-                {
-                    throw new OCSPRequestorException("The nonce in response does not match the one in request");
-                }
-            }
-
-            return response;
-        }
-        else
-        {
-            throw new OCSPResponseNotSuccessfullException(statusCode);
         }
     }
 

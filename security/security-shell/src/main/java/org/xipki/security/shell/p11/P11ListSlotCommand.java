@@ -33,7 +33,7 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.security.shell;
+package org.xipki.security.shell.p11;
 
 import iaik.pkcs.pkcs11.objects.DSAPublicKey;
 import iaik.pkcs.pkcs11.objects.ECDSAPublicKey;
@@ -61,16 +61,14 @@ import org.bouncycastle.asn1.x9.X962NamedCurves;
 import org.bouncycastle.util.encoders.Hex;
 import org.xipki.common.IoCertUtil;
 import org.xipki.security.api.SecurityFactory;
-import org.xipki.security.api.SignerException;
+import org.xipki.security.api.p11.P11Identity;
 import org.xipki.security.api.p11.P11KeyIdentifier;
+import org.xipki.security.api.p11.P11Module;
 import org.xipki.security.api.p11.P11SlotIdentifier;
-import org.xipki.security.p11.iaik.IaikExtendedModule;
+import org.xipki.security.api.p11.P11WritableSlot;
 import org.xipki.security.p11.iaik.IaikExtendedSlot;
-import org.xipki.security.p11.iaik.IaikP11CryptServiceFactory;
-import org.xipki.security.p11.keystore.KeystoreP11CryptServiceFactory;
-import org.xipki.security.p11.keystore.KeystoreP11Identity;
-import org.xipki.security.p11.keystore.KeystoreP11Module;
 import org.xipki.security.p11.keystore.KeystoreP11Slot;
+import org.xipki.security.shell.SecurityCommand;
 
 /**
  * @author Lijun Liao
@@ -95,58 +93,32 @@ public class P11ListSlotCommand extends SecurityCommand
     protected Object doExecute()
     throws Exception
     {
-        String pkcs11Provider = securityFactory.getPkcs11Provider();
-        if(IaikP11CryptServiceFactory.class.equals(pkcs11Provider))
+        P11Module module = getP11Module(moduleName);
+        if(module == null)
         {
-            IaikExtendedModule module = getIaikModule(moduleName);
-            if(module == null)
-            {
-                err("Undefined module " + moduleName);
-                return null;
-            }
+            err("Undefined module " + moduleName);
+            return null;
+        }
 
-            List<P11SlotIdentifier> slots = module.getSlotIds();
-            out("Module: " + moduleName);
+        out("Module: " + moduleName);
+        List<P11SlotIdentifier> slots = module.getSlotIdentifiers();
+        if(slotIndex == null)
+        {
+            output(slots);
+            return null;
+        }
 
-            if(slotIndex == null)
-            {
-                // list all slots
-                int n = slots.size();
+        P11SlotIdentifier slotId = new P11SlotIdentifier(slotIndex, null);
+        P11WritableSlot p11slot = module.getSlot(slotId);
+        if(p11slot == null)
+        {
+            err("slot with index " + slotIndex + " does not exist");
+            return null;
+        }
 
-                if(n == 0 || n == 1)
-                {
-                    out(((n == 0) ? "no" : "1") + " slot is configured");
-                }
-                else
-                {
-                    out(n + " slots are configured");
-                }
-
-                for(P11SlotIdentifier slotId : slots)
-                {
-                    out("\tslot[" + slotId.getSlotIndex() + "]: " + slotId.getSlotId());
-                }
-
-                return null;
-            }
-
-            P11SlotIdentifier slotId = new P11SlotIdentifier(slotIndex, null);
-            IaikExtendedSlot slot = null;
-            try
-            {
-                slot = module.getSlot(slotId);
-            }catch(SignerException e)
-            {
-                err("\tError:  " + e.getMessage());
-                return null;
-            }
-
-            if(slot == null)
-            {
-                err("slot with index " + slotIndex + " does not exist");
-                return null;
-            }
-
+        if(p11slot instanceof IaikExtendedSlot)
+        {
+            IaikExtendedSlot slot = (IaikExtendedSlot) p11slot;
             List<PrivateKey> allPrivateObjects = slot.getAllPrivateObjects(null, null);
             int size = allPrivateObjects.size();
 
@@ -158,7 +130,7 @@ public class P11ListSlotCommand extends SecurityCommand
                 if(id != null)
                 {
                     char[] label = key.getLabel().getCharArrayValue();
-                    ComparableIaikPrivateKey privKey = new ComparableIaikPrivateKey(id, label, key);
+                    ComparableIaikPrivateKey privKey = new ComparableIaikPrivateKey(id, label);
                     privateKeys.add(privKey);
                 }
             }
@@ -217,64 +189,16 @@ public class P11ListSlotCommand extends SecurityCommand
             {
                 out(sb.toString());
             }
-        } else if(KeystoreP11CryptServiceFactory.class.getName().equals(pkcs11Provider))
+        } else if(p11slot instanceof KeystoreP11Slot)
         {
-            KeystoreP11Module module = getKeystoreP11Module(moduleName);
-            if(module == null)
-            {
-                err("Undefined module " + moduleName);
-                return null;
-            }
+            KeystoreP11Slot slot = (KeystoreP11Slot) p11slot;
 
-            List<P11SlotIdentifier> slots = module.getSlotIds();
-            out("Module: " + moduleName);
-
-            if(slotIndex == null)
-            {
-                // list all slots
-                int n = slots.size();
-
-                if(n == 0 || n == 1)
-                {
-                    out(((n == 0) ? "no" : "1") + " slot is configured");
-                }
-                else
-                {
-                    out(n + " slots are configured");
-                }
-
-                for(P11SlotIdentifier slotId : slots)
-                {
-                    out("\tslot[" + slotId.getSlotIndex() + "]: " + slotId.getSlotId());
-                }
-
-                return null;
-            }
-
-            P11SlotIdentifier slotId = new P11SlotIdentifier(slotIndex, null);
-            KeystoreP11Slot slot = null;
-            try
-            {
-                slot = module.getSlot(slotId);
-            }catch(SignerException e)
-            {
-                err("\tError:  " + e.getMessage());
-                return null;
-            }
-
-            if(slot == null)
-            {
-                err("slot with index " + slotIndex + " does not exist");
-                return null;
-            }
-
-            List<KeystoreP11Identity> identities = slot.getIdentities();
-            Collections.sort(identities);
+            List<? extends P11Identity> identities = slot.getP11Identities();
 
             StringBuilder sb = new StringBuilder();
             for(int i = 0; i < identities.size(); i++)
             {
-                KeystoreP11Identity identity = identities.get(i);
+                P11Identity identity = identities.get(i);
                 P11KeyIdentifier p11KeyId = identity.getKeyId();
 
                 sb.append("\t")
@@ -298,7 +222,7 @@ public class P11ListSlotCommand extends SecurityCommand
             }
         } else
         {
-            err("PKCS11 provider " + pkcs11Provider + " is not accepted");
+            err("should not reach here");
         }
 
         return null;
@@ -500,13 +424,11 @@ public class P11ListSlotCommand extends SecurityCommand
     {
         private final byte[] keyId;
         private final char[] keyLabel;
-        private final PrivateKey privateKey;
 
-        public ComparableIaikPrivateKey(byte[] keyId, char[] keyLabel, PrivateKey privateKey)
+        public ComparableIaikPrivateKey(byte[] keyId, char[] keyLabel)
         {
             this.keyId = keyId;
             this.keyLabel = keyLabel;
-            this.privateKey = privateKey;
         }
 
         @Override
@@ -550,11 +472,28 @@ public class P11ListSlotCommand extends SecurityCommand
         {
             return keyLabel == null ? null : new String(keyLabel);
         }
+    }
 
-        @SuppressWarnings("unused")
-        public PrivateKey getPrivateKey()
+    private void output(List<P11SlotIdentifier> slots)
+    {
+        if(slotIndex == null)
         {
-            return privateKey;
+            // list all slots
+            int n = slots.size();
+
+            if(n == 0 || n == 1)
+            {
+                out(((n == 0) ? "no" : "1") + " slot is configured");
+            }
+            else
+            {
+                out(n + " slots are configured");
+            }
+
+            for(P11SlotIdentifier slotId : slots)
+            {
+                out("\tslot[" + slotId.getSlotIndex() + "]: " + slotId.getSlotId());
+            }
         }
     }
 

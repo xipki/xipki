@@ -33,54 +33,57 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.security.p11.keystore;
+package org.xipki.security.shell.p12;
 
-import org.xipki.common.ParamChecker;
-import org.xipki.security.api.SecurityFactory;
-import org.xipki.security.api.SignerException;
-import org.xipki.security.api.p11.P11Control;
-import org.xipki.security.api.p11.P11CryptService;
-import org.xipki.security.api.p11.P11CryptServiceFactory;
-import org.xipki.security.api.p11.P11ModuleConf;
+import java.io.FileInputStream;
+import java.security.KeyStore;
+
+import org.apache.felix.gogo.commands.Option;
+import org.xipki.security.shell.SecurityCommand;
 
 /**
  * @author Lijun Liao
  */
 
-public class KeystoreP11CryptServiceFactory implements P11CryptServiceFactory
+public abstract class P12SecurityCommand extends SecurityCommand
 {
-    private P11Control p11Control;
+    @Option(name = "-p12",
+            required = true, description = "Required. PKCS#12 keystore file")
+    protected String p12File;
 
-    @Override
-    public void init(P11Control p11Control)
+    @Option(name = "-pwd", aliases = { "--password" },
+            required = false, description = "Password of the PKCS#12 file")
+    protected String password;
+
+    protected char[] getPassword()
     {
-        ParamChecker.assertNotNull("p11Control", p11Control);
-        this.p11Control = p11Control;
-        KeystoreP11ModulePool.getInstance().setDefaultModuleName(p11Control.getDefaultModuleName());
+        char[] pwdInChar = readPasswordIfNotSet(password);
+        if(pwdInChar != null)
+        {
+            password = new String(pwdInChar);
+        }
+        return pwdInChar;
     }
 
-    @Override
-    public P11CryptService createP11CryptService(String moduleName)
-    throws SignerException
+    protected KeyStore getKeyStore()
+    throws Exception
     {
-        ParamChecker.assertNotNull("moduleName", moduleName);
-        if(p11Control == null)
+        KeyStore ks;
+
+        FileInputStream fIn = null;
+        try
         {
-            throw new IllegalStateException("please call init() first");
+            fIn = new FileInputStream(expandFilepath(p12File));
+            ks = KeyStore.getInstance("PKCS12", "BC");
+            ks.load(fIn, getPassword());
+        }finally
+        {
+            if(fIn != null)
+            {
+                fIn.close();
+            }
         }
 
-        if(SecurityFactory.DEFAULT_P11MODULE_NAME.equals(moduleName))
-        {
-            moduleName = p11Control.getDefaultModuleName();
-        }
-
-        P11ModuleConf conf = p11Control.getModuleConf(moduleName);
-        if(conf == null)
-        {
-            throw new SignerException("PKCS#11 module " + moduleName + " is not defined");
-        }
-
-        return KeystoreP11CryptService.getInstance(conf);
+        return ks;
     }
-
 }

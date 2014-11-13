@@ -33,59 +33,47 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.security.shell;
+package org.xipki.security.shell.p11;
+
+import java.security.cert.X509Certificate;
 
 import org.apache.felix.gogo.commands.Command;
 import org.apache.felix.gogo.commands.Option;
-import org.xipki.security.api.P12KeypairGenerationResult;
-import org.xipki.security.p10.P12KeypairGenerator;
+import org.xipki.common.IoCertUtil;
+import org.xipki.security.api.SecurityFactory;
+import org.xipki.security.api.p11.P11KeyIdentifier;
+import org.xipki.security.api.p11.P11WritableSlot;
+import org.xipki.security.shell.SecurityCommand;
 
 /**
  * @author Lijun Liao
  */
 
-@Command(scope = "keytool", name = "rsa-p12", description="Generate RSA keypair in PKCS#12 keystore")
-public class P12DSAKeyGenCommand extends P12KeyGenCommand
+@Command(scope = "keytool", name = "add-cert", description="Add certificate to PKCS#11 device")
+public class P11CertAddCommand extends SecurityCommand
 {
-    @Option(name = "-plen",
-            description = "Bit length of the prime",
-            required = false)
-    protected Integer pLen = 2048;
 
-    @Option(name = "-qlen",
-            description = "Bit length of the sub-prime",
-            required = false)
-    protected Integer qLen;
+    @Option(name = "-slot",
+            required = true, description = "Required. Slot index")
+    protected Integer slotIndex;
+
+    @Option(name = "-cert",
+            required = true, description = "Required. Certificate file")
+    protected String certFile;
+
+    @Option(name = "-module",
+            required = false, description = "Name of the PKCS#11 module.")
+    protected String moduleName = SecurityFactory.DEFAULT_P11MODULE_NAME;
 
     @Override
     protected Object doExecute()
     throws Exception
     {
-        if(pLen % 1024 != 0)
-        {
-            err("plen is not multiple of 1024: " + pLen);
-            return null;
-        }
-
-        if(qLen == null)
-        {
-            if(pLen >= 2048)
-            {
-                qLen = 256;
-            }
-            else
-            {
-                qLen = 160;
-            }
-        }
-
-        P12KeypairGenerator gen = new P12KeypairGenerator.DSAIdentityGenerator(
-                pLen, qLen, getPassword(), subject,
-                getKeyUsage(), getExtendedKeyUsage());
-
-        P12KeypairGenerationResult keyAndCert = gen.generateIdentity();
-        saveKeyAndCert(keyAndCert);
-
+        X509Certificate cert = IoCertUtil.parseCert(certFile);
+        P11WritableSlot slot = getP11WritablSlot(moduleName, slotIndex);
+        P11KeyIdentifier p11KeyId = slot.addCert(cert);
+        out("Added certificate under " + p11KeyId);
+        securityFactory.getP11CryptService(moduleName).refresh();
         return null;
     }
 

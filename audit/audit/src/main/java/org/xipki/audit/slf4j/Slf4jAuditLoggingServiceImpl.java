@@ -33,7 +33,7 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.audit.api;
+package org.xipki.audit.slf4j;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -42,6 +42,13 @@ import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xipki.audit.api.AuditEvent;
+import org.xipki.audit.api.AuditEventData;
+import org.xipki.audit.api.AuditEventDataType;
+import org.xipki.audit.api.AuditLevel;
+import org.xipki.audit.api.AuditLoggingService;
+import org.xipki.audit.api.AuditStatus;
+import org.xipki.audit.api.PCIAuditEvent;
 
 /**
  * @author Lijun Liao

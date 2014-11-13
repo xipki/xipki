@@ -33,56 +33,60 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.security.shell;
+package org.xipki.security.shell.p12;
 
-import java.io.FileInputStream;
-import java.security.KeyStore;
-
+import org.apache.felix.gogo.commands.Command;
 import org.apache.felix.gogo.commands.Option;
+import org.xipki.security.api.P12KeypairGenerationResult;
+import org.xipki.security.p10.P12KeypairGenerator;
 
 /**
  * @author Lijun Liao
  */
 
-public abstract class P12SecurityCommand extends SecurityCommand
+@Command(scope = "keytool", name = "rsa-p12", description="Generate RSA keypair in PKCS#12 keystore")
+public class P12DSAKeyGenCommand extends P12KeyGenCommand
 {
-    @Option(name = "-p12",
-            required = true, description = "Required. PKCS#12 keystore file")
-    protected String p12File;
+    @Option(name = "-plen",
+            description = "Bit length of the prime",
+            required = false)
+    protected Integer pLen = 2048;
 
-    @Option(name = "-pwd", aliases = { "--password" },
-            required = false, description = "Password of the PKCS#12 file")
-    protected String password;
+    @Option(name = "-qlen",
+            description = "Bit length of the sub-prime",
+            required = false)
+    protected Integer qLen;
 
-    protected char[] getPassword()
-    {
-        char[] pwdInChar = readPasswordIfNotSet(password);
-        if(pwdInChar != null)
-        {
-            password = new String(pwdInChar);
-        }
-        return pwdInChar;
-    }
-
-    protected KeyStore getKeyStore()
+    @Override
+    protected Object doExecute()
     throws Exception
     {
-        KeyStore ks;
+        if(pLen % 1024 != 0)
+        {
+            err("plen is not multiple of 1024: " + pLen);
+            return null;
+        }
 
-        FileInputStream fIn = null;
-        try
+        if(qLen == null)
         {
-            fIn = new FileInputStream(expandFilepath(p12File));
-            ks = KeyStore.getInstance("PKCS12", "BC");
-            ks.load(fIn, getPassword());
-        }finally
-        {
-            if(fIn != null)
+            if(pLen >= 2048)
             {
-                fIn.close();
+                qLen = 256;
+            }
+            else
+            {
+                qLen = 160;
             }
         }
 
-        return ks;
+        P12KeypairGenerator gen = new P12KeypairGenerator.DSAIdentityGenerator(
+                pLen, qLen, getPassword(), subject,
+                getKeyUsage(), getExtendedKeyUsage());
+
+        P12KeypairGenerationResult keyAndCert = gen.generateIdentity();
+        saveKeyAndCert(keyAndCert);
+
+        return null;
     }
+
 }

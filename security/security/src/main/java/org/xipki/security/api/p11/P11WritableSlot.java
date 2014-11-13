@@ -33,54 +33,57 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.security.p11.keystore;
+package org.xipki.security.api.p11;
 
-import org.xipki.common.ParamChecker;
+import java.math.BigInteger;
+import java.security.cert.X509Certificate;
+import java.util.List;
+import java.util.Set;
+
+import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.xipki.security.api.SecurityFactory;
-import org.xipki.security.api.SignerException;
-import org.xipki.security.api.p11.P11Control;
-import org.xipki.security.api.p11.P11CryptService;
-import org.xipki.security.api.p11.P11CryptServiceFactory;
-import org.xipki.security.api.p11.P11ModuleConf;
 
 /**
  * @author Lijun Liao
  */
 
-public class KeystoreP11CryptServiceFactory implements P11CryptServiceFactory
+public interface P11WritableSlot
 {
-    private P11Control p11Control;
+    void updateCertificate(P11KeyIdentifier keyIdentifier,
+            X509Certificate newCert, Set<X509Certificate> caCerts,
+            SecurityFactory securityFactory)
+    throws Exception;
 
-    @Override
-    public void init(P11Control p11Control)
-    {
-        ParamChecker.assertNotNull("p11Control", p11Control);
-        this.p11Control = p11Control;
-        KeystoreP11ModulePool.getInstance().setDefaultModuleName(p11Control.getDefaultModuleName());
-    }
+    boolean removeKeyAndCerts(P11KeyIdentifier keyIdentifier)
+    throws Exception;
 
-    @Override
-    public P11CryptService createP11CryptService(String moduleName)
-    throws SignerException
-    {
-        ParamChecker.assertNotNull("moduleName", moduleName);
-        if(p11Control == null)
-        {
-            throw new IllegalStateException("please call init() first");
-        }
+    void removeCerts(P11KeyIdentifier keyIdentifier)
+    throws Exception;
 
-        if(SecurityFactory.DEFAULT_P11MODULE_NAME.equals(moduleName))
-        {
-            moduleName = p11Control.getDefaultModuleName();
-        }
+    P11KeyIdentifier addCert(X509Certificate cert)
+    throws Exception;
 
-        P11ModuleConf conf = p11Control.getModuleConf(moduleName);
-        if(conf == null)
-        {
-            throw new SignerException("PKCS#11 module " + moduleName + " is not defined");
-        }
+    P11KeypairGenerationResult generateRSAKeypairAndCert(
+            int keySize, BigInteger publicExponent,
+            String label, String subject,
+            Integer keyUsage,
+            List<ASN1ObjectIdentifier> extendedKeyusage)
+    throws Exception;
 
-        return KeystoreP11CryptService.getInstance(conf);
-    }
+    P11KeypairGenerationResult generateDSAKeypairAndCert(
+            int pLength, int qLength, String label, String subject, Integer keyUsage,
+            List<ASN1ObjectIdentifier> extendedKeyusage)
+    throws Exception;
+
+    P11KeypairGenerationResult generateECDSAKeypairAndCert(
+            String curveNameOrOid, String label, String subject,
+            Integer keyUsage,
+            List<ASN1ObjectIdentifier> extendedKeyusage)
+    throws Exception;
+
+    X509Certificate exportCert(P11KeyIdentifier keyIdentifier)
+    throws Exception;
+
+    List<? extends P11Identity> getP11Identities();
 
 }
