@@ -303,10 +303,10 @@ class OcspCertStoreFromCaDbImporter extends DbPorter
                     byte[] encodedKey = c.getSubjectPublicKeyInfo().getPublicKeyData().getBytes();
 
                     int idx = 1;
-                    ps.setInt   (idx++, issuer.getId());
+                    ps.setInt(idx++, issuer.getId());
                     ps.setString(idx++, IoCertUtil.canonicalizeName(c.getSubject()));
-                    ps.setLong  (idx++, c.getTBSCertificate().getStartDate().getDate().getTime() / 1000);
-                    ps.setLong  (idx++, c.getTBSCertificate().getEndDate().getDate().getTime() / 1000);
+                    ps.setLong(idx++, c.getTBSCertificate().getStartDate().getDate().getTime() / 1000);
+                    ps.setLong(idx++, c.getTBSCertificate().getEndDate().getDate().getTime() / 1000);
                     ps.setString(idx++, HashCalculator.hexHash(HashAlgoType.SHA1, encodedName));
                     ps.setString(idx++, HashCalculator.hexHash(HashAlgoType.SHA1, encodedKey));
                     ps.setString(idx++, HashCalculator.hexHash(HashAlgoType.SHA224, encodedName));
@@ -488,13 +488,13 @@ class OcspCertStoreFromCaDbImporter extends DbPorter
                 int currentId = (int) dataSource.nextSeqValue(seqName);
 
                 int idx = 1;
-                ps_cert.setInt   (idx++, currentId);
-                ps_cert.setInt   (idx++, caId);
+                ps_cert.setInt(idx++, currentId);
+                ps_cert.setInt(idx++, caId);
                 ps_cert.setLong(idx++, c.getSerialNumber().longValue());
                 ps_cert.setString(idx++, IoCertUtil.canonicalizeName(c.getSubjectX500Principal()));
                 ps_cert.setLong(idx++, cert.getLastUpdate());
-                ps_cert.setLong  (idx++, c.getNotBefore().getTime() / 1000);
-                ps_cert.setLong  (idx++, c.getNotAfter().getTime() / 1000);
+                ps_cert.setLong(idx++, c.getNotBefore().getTime() / 1000);
+                ps_cert.setLong(idx++, c.getNotAfter().getTime() / 1000);
                 setBoolean(ps_cert, idx++, cert.isRevoked());
                 setInt(ps_cert, idx++, cert.getRevReason());
                 setLong(ps_cert, idx++, cert.getRevTime());
@@ -516,7 +516,7 @@ class OcspCertStoreFromCaDbImporter extends DbPorter
                 ps_certhash.addBatch();
 
                 // rawcert
-                ps_rawcert.setInt   (1, currentId);
+                ps_rawcert.setInt(1, currentId);
                 ps_rawcert.setString(2, Base64.toBase64String(encodedCert));
                 ps_rawcert.addBatch();
             }
