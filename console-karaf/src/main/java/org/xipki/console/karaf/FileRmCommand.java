@@ -51,7 +51,7 @@ import org.apache.felix.gogo.commands.Option;
 @Command(scope = "file", name = "rm", description="Remove file or directory")
 public class FileRmCommand extends XipkiOsgiCommandSupport
 {
-    @Argument(index = 0, name = "file or directory to be deleted",
+    @Argument(index = 0, name = "file",
             required = true, description = "File or directory to be deleted")
     protected String targetPath;
 
