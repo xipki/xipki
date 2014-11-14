@@ -96,6 +96,18 @@ class CaCertStoreDbImporter extends DbPorter
 {
     private static final Logger LOG = LoggerFactory.getLogger(CaConfigurationDbImporter.class);
 
+    private static final String SQL_ADD_CERT =
+            "INSERT INTO CERT " +
+            "(ID, ART, LAST_UPDATE, SERIAL, SUBJECT,"
+            + " NOTBEFORE, NOTAFTER, REVOKED, REV_REASON, REV_TIME, REV_INVALIDITY_TIME,"
+            + " CERTPROFILEINFO_ID, CAINFO_ID,"
+            + " REQUESTORINFO_ID, USER_ID, SHA1_FP_PK, SHA1_FP_SUBJECT, EE)" +
+            " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+
+    private static final String SQL_ADD_RAWCERT = "INSERT INTO RAWCERT (CERT_ID, SHA1_FP, CERT) VALUES (?, ?, ?)";
+
+    private static final String SQL_ADD_USER = "INSERT INTO USERNAME (ID, NAME) VALUES (?, ?)";
+
     private final Unmarshaller unmarshaller;
     private final boolean resume;
 
@@ -320,21 +332,29 @@ class CaCertStoreDbImporter extends DbPorter
     private void import_user(UsersFiles usersFiles)
     throws Exception
     {
-        int sum = 0;
-        for(String file : usersFiles.getUsersFile())
-        {
-            System.out.println("Importing users from file " + file);
+        PreparedStatement ps = prepareStatement(SQL_ADD_USER);
 
-            try
+        int sum = 0;
+        try
+        {
+            for(String file : usersFiles.getUsersFile())
             {
-                sum += do_import_user(file);
-                System.out.println(" Imported users from file " + file);
-                System.out.println(" Imported " + sum + " users ...");
-            }catch(Exception e)
-            {
-                System.err.println("Error while importing users from file " + file);
-                throw e;
+                System.out.println("Importing users from file " + file);
+
+                try
+                {
+                    sum += do_import_user(ps, file);
+                    System.out.println(" Imported users from file " + file);
+                    System.out.println(" Imported " + sum + " users ...");
+                }catch(Exception e)
+                {
+                    System.err.println("Error while importing users from file " + file);
+                    throw e;
+                }
             }
+        }finally
+        {
+            releaseResources(ps, null);
         }
 
         long maxId = getMax("USERNAME", "ID");
@@ -343,11 +363,9 @@ class CaCertStoreDbImporter extends DbPorter
         System.out.println(" Imported " + sum + " users");
     }
 
-    private int do_import_user(String usersFile)
+    private int do_import_user(PreparedStatement ps_adduser, String usersFile)
     throws Exception
     {
-        final String sql = "INSERT INTO USERNAME (ID, NAME) VALUES (?, ?)";
-
         System.out.println("Importing table USERNAME");
 
         @SuppressWarnings("unchecked")
@@ -355,20 +373,16 @@ class CaCertStoreDbImporter extends DbPorter
                 unmarshaller.unmarshal(new File(baseDir, usersFile));
         UsersType users = rootElement.getValue();
 
-        PreparedStatement ps = prepareStatement(sql);
-
         int sum = 0;
-        try
-        {
             for(UserType user : users.getUser())
             {
                 try
                 {
                     int idx = 1;
-                    ps.setInt   (idx++, user.getId());
-                    ps.setString(idx++, user.getName());
+                    ps_adduser.setInt   (idx++, user.getId());
+                    ps_adduser.setString(idx++, user.getName());
 
-                    ps.execute();
+                    ps_adduser.execute();
                     sum ++;
                 }catch(Exception e)
                 {
@@ -377,10 +391,6 @@ class CaCertStoreDbImporter extends DbPorter
                     throw e;
                 }
             }
-        }finally
-        {
-            releaseResources(ps, null);
-        }
 
         return sum;
     }
@@ -589,26 +599,36 @@ class CaCertStoreDbImporter extends DbPorter
         System.out.println("Importing certificates from ID " + minId);
         printHeader();
 
-        for(String certsFile : certsfiles.getCertsFile())
+        PreparedStatement ps_cert = prepareStatement(SQL_ADD_CERT);
+        PreparedStatement ps_rawcert = prepareStatement(SQL_ADD_RAWCERT);
+
+        try
         {
-            try
+            for(String certsFile : certsfiles.getCertsFile())
             {
-                int[] numAndLastId = do_import_cert(certsFile, minId);
-                int numProcessed = numAndLastId[0];
-                int lastId = numAndLastId[1];
-                if(numProcessed > 0)
+                try
                 {
-                    sum += numProcessed;
-                    echoToFile((sum + numProcessedBefore) + ":" + lastId, processLogFile);
-                    printStatus(total, sum, startTime);
+                    int[] numAndLastId = do_import_cert(ps_cert, ps_rawcert, certsFile, minId);
+                    int numProcessed = numAndLastId[0];
+                    int lastId = numAndLastId[1];
+                    if(numProcessed > 0)
+                    {
+                        sum += numProcessed;
+                        echoToFile((sum + numProcessedBefore) + ":" + lastId, processLogFile);
+                        printStatus(total, sum, startTime);
+                    }
+                }catch(Exception e)
+                {
+                    System.err.println("\nError while importing certificates from file " + certsFile +
+                            ".\nPlease continue with the option '-resume'");
+                    LOG.error("Exception", e);
+                    throw e;
                 }
-            }catch(Exception e)
-            {
-                System.err.println("\nError while importing certificates from file " + certsFile +
-                        ".\nPlease continue with the option '-resume'");
-                LOG.error("Exception", e);
-                throw e;
             }
+        }finally
+        {
+            releaseResources(ps_cert, null);
+            releaseResources(ps_rawcert, null);
         }
 
         long maxId = getMax("CERT", "ID");
@@ -619,22 +639,10 @@ class CaCertStoreDbImporter extends DbPorter
         System.out.println(" Imported " + sum + " certificates");
     }
 
-    private int[] do_import_cert(String certsZipFile, int minId)
+    private int[] do_import_cert(PreparedStatement ps_cert, PreparedStatement ps_rawcert,
+            String certsZipFile, int minId)
     throws Exception
     {
-        final String SQL_ADD_CERT =
-                "INSERT INTO CERT " +
-                "(ID, ART, LAST_UPDATE, SERIAL, SUBJECT,"
-                + " NOTBEFORE, NOTAFTER, REVOKED, REV_REASON, REV_TIME, REV_INVALIDITY_TIME,"
-                + " CERTPROFILEINFO_ID, CAINFO_ID,"
-                + " REQUESTORINFO_ID, USER_ID, SHA1_FP_PK, SHA1_FP_SUBJECT, EE)" +
-                " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-
-        final String SQL_ADD_RAWCERT = "INSERT INTO RAWCERT (CERT_ID, SHA1_FP, CERT) VALUES (?, ?, ?)";
-
-        PreparedStatement ps_cert = prepareStatement(SQL_ADD_CERT);
-        PreparedStatement ps_rawcert = prepareStatement(SQL_ADD_RAWCERT);
-
         ZipFile zipFile = new ZipFile(new File(baseDir, certsZipFile));
         ZipEntry certsXmlEntry = zipFile.getEntry("certs.xml");
 
@@ -760,9 +768,6 @@ class CaCertStoreDbImporter extends DbPorter
             }catch(SQLException e)
             {
             }
-
-            releaseResources(ps_cert, null);
-            releaseResources(ps_rawcert, null);
             zipFile.close();
         }
     }
