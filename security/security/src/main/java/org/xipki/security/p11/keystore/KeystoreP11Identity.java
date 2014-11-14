@@ -40,6 +40,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
+import java.security.Security;
 import java.security.Signature;
 import java.security.SignatureException;
 import java.security.cert.X509Certificate;
@@ -54,9 +55,12 @@ import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xipki.common.IoCertUtil;
 import org.xipki.common.ParamChecker;
 import org.xipki.security.SignerUtil;
+import org.xipki.security.SoftTokenContentSignerBuilder;
 import org.xipki.security.api.SignerException;
 import org.xipki.security.api.p11.P11Identity;
 import org.xipki.security.api.p11.P11KeyIdentifier;
@@ -68,6 +72,8 @@ import org.xipki.security.api.p11.P11SlotIdentifier;
 
 public class KeystoreP11Identity extends P11Identity
 {
+	private static final Logger LOG = LoggerFactory.getLogger(KeystoreP11Identity.class);
+
     private final String sha1sum;
     private final BlockingDeque<Cipher> rsaCiphers = new LinkedBlockingDeque<>();
     private final BlockingDeque<Signature> dsaSignatures = new LinkedBlockingDeque<>();
@@ -93,15 +99,38 @@ public class KeystoreP11Identity extends P11Identity
         this.sha1sum = sha1sum;
         if(this.publicKey instanceof RSAPublicKey)
         {
+        	String providerName;
+            if(Security.getProvider(SoftTokenContentSignerBuilder.PROVIDER_XIPKI_NSS_CIPHER) != null)
+            {
+            	providerName = SoftTokenContentSignerBuilder.PROVIDER_XIPKI_NSS_CIPHER;
+            }
+            else
+            {
+            	providerName = "BC";
+            }
+            
+            LOG.info("use provider {}", providerName);
+            
             for(int i = 0; i < maxSessions; i++)
             {
                 Cipher rsaCipher;
                 try
                 {
-                    rsaCipher = Cipher.getInstance("RSA/NONE/NoPadding", "BC");
+                	final String algo = "RSA/ECB/NoPadding"; 
+                    rsaCipher = Cipher.getInstance(algo, providerName);
+                    LOG.info("use cipher algorithm {}", algo);
                 }catch(NoSuchPaddingException e)
                 {
                     throw new NoSuchAlgorithmException("NoSuchPadding", e);
+                }catch(NoSuchAlgorithmException e)
+                {
+                	final String algo = "RSA/NONE/NoPadding";                	
+                	try {
+						rsaCipher = Cipher.getInstance(algo, providerName);
+	                    LOG.info("use cipher algorithm {}", algo);
+					} catch (NoSuchPaddingException e1) {
+						throw new NoSuchAlgorithmException("NoSuchPadding", e);
+					}
                 }
                 rsaCipher.init(Cipher.ENCRYPT_MODE, privateKey);
                 rsaCiphers.add(rsaCipher);

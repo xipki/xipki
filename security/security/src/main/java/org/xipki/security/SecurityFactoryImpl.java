@@ -349,7 +349,7 @@ public class SecurityFactoryImpl implements SecurityFactory
                     return signerBuilder.createSigner(signatureAlgId, parallelism);
                 } catch (OperatorCreationException | NoSuchPaddingException e)
                 {
-                    throw new SignerException(e.getMessage());
+                    throw new SignerException(e.getMessage(), e);
                 }
 
             }
