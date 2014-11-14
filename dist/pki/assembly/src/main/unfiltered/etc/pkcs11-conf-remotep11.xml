@@ -4,7 +4,7 @@
     <module name="abc">
       <nativeLibraries>
         <nativeLibrary>
-          <path>url?https://127.0.0.1:9443/p11</path>
+          <path>url?https://localhost:9443/p11</path>
         </nativeLibrary>
       </nativeLibraries>
     </module>
