@@ -72,7 +72,7 @@ import org.xipki.security.api.p11.P11SlotIdentifier;
 
 public class KeystoreP11Identity extends P11Identity
 {
-	private static final Logger LOG = LoggerFactory.getLogger(KeystoreP11Identity.class);
+    private static final Logger LOG = LoggerFactory.getLogger(KeystoreP11Identity.class);
 
     private final String sha1sum;
     private final BlockingDeque<Cipher> rsaCiphers = new LinkedBlockingDeque<>();
@@ -99,24 +99,24 @@ public class KeystoreP11Identity extends P11Identity
         this.sha1sum = sha1sum;
         if(this.publicKey instanceof RSAPublicKey)
         {
-        	String providerName;
+            String providerName;
             if(Security.getProvider(SoftTokenContentSignerBuilder.PROVIDER_XIPKI_NSS_CIPHER) != null)
             {
-            	providerName = SoftTokenContentSignerBuilder.PROVIDER_XIPKI_NSS_CIPHER;
+                providerName = SoftTokenContentSignerBuilder.PROVIDER_XIPKI_NSS_CIPHER;
             }
             else
             {
-            	providerName = "BC";
+                providerName = "BC";
             }
-            
+
             LOG.info("use provider {}", providerName);
-            
+
             for(int i = 0; i < maxSessions; i++)
             {
                 Cipher rsaCipher;
                 try
                 {
-                	final String algo = "RSA/ECB/NoPadding"; 
+                    final String algo = "RSA/ECB/NoPadding";
                     rsaCipher = Cipher.getInstance(algo, providerName);
                     LOG.info("use cipher algorithm {}", algo);
                 }catch(NoSuchPaddingException e)
@@ -124,13 +124,15 @@ public class KeystoreP11Identity extends P11Identity
                     throw new NoSuchAlgorithmException("NoSuchPadding", e);
                 }catch(NoSuchAlgorithmException e)
                 {
-                	final String algo = "RSA/NONE/NoPadding";                	
-                	try {
-						rsaCipher = Cipher.getInstance(algo, providerName);
-	                    LOG.info("use cipher algorithm {}", algo);
-					} catch (NoSuchPaddingException e1) {
-						throw new NoSuchAlgorithmException("NoSuchPadding", e);
-					}
+                    final String algo = "RSA/NONE/NoPadding";
+                    try
+                    {
+                        rsaCipher = Cipher.getInstance(algo, providerName);
+                        LOG.info("use cipher algorithm {}", algo);
+                    } catch (NoSuchPaddingException e1)
+                    {
+                        throw new NoSuchAlgorithmException("NoSuchPadding", e);
+                    }
                 }
                 rsaCipher.init(Cipher.ENCRYPT_MODE, privateKey);
                 rsaCiphers.add(rsaCipher);
