@@ -217,7 +217,7 @@ Run Demo
       ```sh
       ca-demo/hsm-ec-demo.script
       ```
-     * For DSA key in PKCS#11 device (dimulator)
+     * For DSA key in PKCS#11 device (simulator)
      
       ```sh
       ca-demo/hsm-dsa-demo.script
