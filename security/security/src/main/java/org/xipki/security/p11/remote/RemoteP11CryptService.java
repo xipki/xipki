@@ -402,6 +402,10 @@ public abstract class RemoteP11CryptService implements P11CryptService
             {
                 kf = KeyFactory.getInstance("ECDSA");
             }
+            else if(X9ObjectIdentifiers.id_dsa.equals(aid))
+            {
+                kf = KeyFactory.getInstance("DSA");
+            }
             else
             {
                 throw new SignerException("unsupported key algorithm: " + aid);
