@@ -56,21 +56,19 @@ public class FileUtils
     public static void deleteDirectory(final File directory)
     throws IOException
     {
-        if (!directory.exists())
+        if (directory.exists() == false)
         {
             return;
         }
 
-        if (!isSymlink(directory))
+        if (isSymlink(directory) == false)
         {
             cleanDirectory(directory);
         }
 
-        if (!directory.delete())
+        if (directory.delete() == false)
         {
-            final String message =
-                "Unable to delete directory " + directory + ".";
-            throw new IOException(message);
+            throw new IOException("Unable to delete directory " + directory + ".");
         }
     }
 
@@ -112,13 +110,7 @@ public class FileUtils
             fileInCanonicalDir = new File(canonicalDir, file.getName());
         }
 
-        if (fileInCanonicalDir.getCanonicalFile().equals(fileInCanonicalDir.getAbsoluteFile()))
-        {
-            return false;
-        } else
-        {
-            return true;
-        }
+        return false == fileInCanonicalDir.getCanonicalFile().equals(fileInCanonicalDir.getAbsoluteFile());
     }
 
     /**
@@ -131,20 +123,19 @@ public class FileUtils
     public static void cleanDirectory(final File directory)
     throws IOException
     {
-        if (!directory.exists())
+        if (directory.exists() == false)
         {
-            final String message = directory + " does not exist";
-            throw new IllegalArgumentException(message);
+            throw new IllegalArgumentException(directory + " does not exist");
         }
 
-        if (!directory.isDirectory())
+        if (directory.isDirectory() == false)
         {
-            final String message = directory + " is not a directory";
-            throw new IllegalArgumentException(message);
+            throw new IllegalArgumentException(directory + " is not a directory");
         }
 
         final File[] files = directory.listFiles();
-        if (files == null) {  // null if security restricted
+        if (files == null)
+        {  // null if security restricted
             throw new IOException("Failed to list contents of " + directory);
         }
 
@@ -190,15 +181,13 @@ public class FileUtils
         } else
         {
             final boolean filePresent = file.exists();
-            if (!file.delete())
+            if (file.delete() == false)
             {
-                if (!filePresent)
+                if (filePresent == false)
                 {
                     throw new FileNotFoundException("File does not exist: " + file);
                 }
-                final String message =
-                    "Unable to delete file: " + file;
-                throw new IOException(message);
+                throw new IOException("Unable to delete file: " + file);
             }
         }
     }
