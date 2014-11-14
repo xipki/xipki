@@ -200,7 +200,7 @@ class CaCertStoreDbImporter extends DbPorter
                     String hexSha1FpCert = HashCalculator.hexHash(HashAlgoType.SHA1, encodedCert);
 
                     int idx = 1;
-                    ps.setInt   (idx++, info.getId());
+                    ps.setInt(idx++, info.getId());
                     ps.setString(idx++, IoCertUtil.canonicalizeName(c.getSubjectX500Principal()));
                     ps.setString(idx++, hexSha1FpCert);
                     ps.setString(idx++, b64Cert);
@@ -275,7 +275,7 @@ class CaCertStoreDbImporter extends DbPorter
                     String name = info.getName();
 
                     int idx = 1;
-                    ps.setInt   (idx++, info.getId());
+                    ps.setInt(idx++, info.getId());
                     ps.setString(idx++, name);
 
                     ps.execute();
@@ -310,7 +310,7 @@ class CaCertStoreDbImporter extends DbPorter
                 try
                 {
                     int idx = 1;
-                    ps.setInt   (idx++, info.getId());
+                    ps.setInt(idx++, info.getId());
                     ps.setString(idx++, info.getName());
 
                     ps.execute();
@@ -379,7 +379,7 @@ class CaCertStoreDbImporter extends DbPorter
                 try
                 {
                     int idx = 1;
-                    ps_adduser.setInt   (idx++, user.getId());
+                    ps_adduser.setInt(idx++, user.getId());
                     ps_adduser.setString(idx++, user.getName());
 
                     ps_adduser.execute();
@@ -524,8 +524,8 @@ class CaCertStoreDbImporter extends DbPorter
                     }
 
                     int idx = 1;
-                    ps.setInt (idx++, id++);
-                    ps.setInt (idx++, crl.getCainfoId());
+                    ps.setInt(idx++, id++);
+                    ps.setInt(idx++, crl.getCainfoId());
                     ps.setLong(idx++, crlNumber.longValue());
                     ps.setLong(idx++, c.getThisUpdate().getTime() / 1000);
                     if(c.getNextUpdate() != null)
@@ -741,7 +741,7 @@ class CaCertStoreDbImporter extends DbPorter
 
                 ps_cert.addBatch();
 
-                ps_rawcert.setInt   (1, cert.getId());
+                ps_rawcert.setInt(1, cert.getId());
                 ps_rawcert.setString(2, hexSha1FpCert);
                 ps_rawcert.setString(3, Base64.toBase64String(encodedCert));
                 ps_rawcert.addBatch();
