@@ -45,9 +45,9 @@ import javax.xml.bind.JAXBElement;
 import javax.xml.bind.Unmarshaller;
 
 import org.bouncycastle.util.encoders.Base64;
-import org.xipki.common.CertArt;
-import org.xipki.common.IoCertUtil;
+import org.xipki.common.IoUtil;
 import org.xipki.common.ParamChecker;
+import org.xipki.common.SecurityUtil;
 import org.xipki.datasource.api.DataSourceWrapper;
 import org.xipki.dbi.ca.jaxb.CAConfigurationType;
 import org.xipki.dbi.ca.jaxb.CAConfigurationType.CaHasCertprofiles;
@@ -349,7 +349,7 @@ class CaConfigurationDbImporter extends DbPorter
                 {
                     int idx = 1;
                     ps.setString(idx++, certprofile.getName());
-                    int art = certprofile.getArt() == null ? CertArt.X509PKC.getCode() : certprofile.getArt();
+                    int art = certprofile.getArt() == null ? 1 : certprofile.getArt();
                     ps.setInt(idx++, art);
                     ps.setString(idx++, certprofile.getType());
 
@@ -360,7 +360,7 @@ class CaConfigurationDbImporter extends DbPorter
                         if(confFilename != null)
                         {
                             File confFile = new File(baseDir, confFilename);
-                            conf = new String(IoCertUtil.read(confFile));
+                            conf = new String(IoUtil.read(confFile));
                         }
                     }
                     ps.setString(idx++, conf);
@@ -399,17 +399,17 @@ class CaConfigurationDbImporter extends DbPorter
 
             for(CaType ca : cas.getCa())
             {
-                CertArt art = ca.getArt() == null ? CertArt.X509PKC : CertArt.getInstance(ca.getArt());
+                int art = ca.getArt() == null ? 1 : ca.getArt();
 
                 try
                 {
                     String b64Cert = ca.getCert();
-                    X509Certificate c = IoCertUtil.parseCert(Base64.decode(b64Cert));
+                    X509Certificate c = SecurityUtil.parseCert(Base64.decode(b64Cert));
 
                     int idx = 1;
                     ps.setString(idx++, ca.getName().toUpperCase());
-                    ps.setInt(idx++,art.getCode());
-                    ps.setString(idx++, IoCertUtil.canonicalizeName(c.getSubjectX500Principal()));
+                    ps.setInt(idx++, art);
+                    ps.setString(idx++, SecurityUtil.canonicalizeName(c.getSubjectX500Principal()));
                     ps.setLong(idx++, ca.getNextSerial());
                     ps.setString(idx++, ca.getStatus());
                     ps.setString(idx++, ca.getCrlUris());

@@ -48,7 +48,7 @@ import org.bouncycastle.asn1.x500.X500Name;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.common.CmpUtf8Pairs;
-import org.xipki.common.IoCertUtil;
+import org.xipki.common.SecurityUtil;
 import org.xipki.common.StringUtil;
 
 /**
@@ -114,7 +114,7 @@ public class HttpsHostnameVerifier implements HostnameVerifier
             {
                 return false;
             }
-            commonName = IoCertUtil.getCommonName(new X500Name(peerPrincipal.getName()));
+            commonName = SecurityUtil.getCommonName(new X500Name(peerPrincipal.getName()));
             LOG.info("commonName: {}", commonName);
         }catch(Exception e)
         {

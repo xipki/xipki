@@ -91,10 +91,6 @@ class ECDSASignatureSpi extends SignatureSpi
         this.signingKey = (P11PrivateKey) signingKey;
     }
 
-/**
- * @author Lijun Liao
- */
-
     static public class SHA1
         extends ECDSASignatureSpi
     {

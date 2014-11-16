@@ -46,7 +46,7 @@ import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.common.IoCertUtil;
+import org.xipki.common.IoUtil;
 import org.xipki.common.ParamChecker;
 import org.xipki.security.api.PasswordResolverException;
 import org.xipki.security.api.SignerException;
@@ -74,7 +74,7 @@ public class KeystoreP11Module implements P11Module
 
         final String nativeLib = moduleConf.getNativeLibrary();
 
-        File baseDir = new File(IoCertUtil.expandFilepath(nativeLib));
+        File baseDir = new File(IoUtil.expandFilepath(nativeLib));
         File[] children = baseDir.listFiles();
 
         Set<Integer> allSlotIndexes = new HashSet<>();

@@ -130,7 +130,7 @@ import org.bouncycastle.util.encoders.Hex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.common.CmpUtf8Pairs;
-import org.xipki.common.IoCertUtil;
+import org.xipki.common.SecurityUtil;
 import org.xipki.common.LogUtil;
 import org.xipki.common.ParamChecker;
 import org.xipki.security.api.PasswordResolverException;
@@ -146,7 +146,7 @@ import org.xipki.security.api.p11.P11WritableSlot;
  * @author Lijun Liao
  */
 
-public class IaikExtendedSlot implements P11WritableSlot
+public class IaikP11Slot implements P11WritableSlot
 {
 
     private static class PrivateKeyAndPKInfo
@@ -158,7 +158,7 @@ public class IaikExtendedSlot implements P11WritableSlot
         {
             super();
             this.privateKey = privateKey;
-            this.publicKeyInfo = IoCertUtil.toRfc3279Style(publicKeyInfo);
+            this.publicKeyInfo = SecurityUtil.toRfc3279Style(publicKeyInfo);
         }
 
         public PrivateKey getPrivateKey()
@@ -172,7 +172,7 @@ public class IaikExtendedSlot implements P11WritableSlot
         }
     }
 
-    private static final Logger LOG = LoggerFactory.getLogger(IaikExtendedSlot.class);
+    private static final Logger LOG = LoggerFactory.getLogger(IaikP11Slot.class);
 
     public static final long YEAR = 365L * 24 * 60 * 60 * 1000; // milliseconds of one year
 
@@ -194,7 +194,7 @@ public class IaikExtendedSlot implements P11WritableSlot
     private Session writableSession;
     private final P11SlotIdentifier slotId;
 
-    IaikExtendedSlot(P11SlotIdentifier slotId, Slot slot, List<char[]> password)
+    IaikP11Slot(P11SlotIdentifier slotId, Slot slot, List<char[]> password)
     throws SignerException
     {
         ParamChecker.assertNotNull("slotId", slotId);
@@ -294,7 +294,7 @@ public class IaikExtendedSlot implements P11WritableSlot
                     byte[] encoded = certificateObject.getValue().getByteArrayValue();
                     try
                     {
-                        signatureCert = (X509Certificate) IoCertUtil.parseCert(
+                        signatureCert = (X509Certificate) SecurityUtil.parseCert(
                                     new ByteArrayInputStream(encoded));
                     } catch (Exception e)
                     {
@@ -333,7 +333,7 @@ public class IaikExtendedSlot implements P11WritableSlot
                     while(true)
                     {
                         X509Certificate context = certChain.get(certChain.size() - 1);
-                        if(IoCertUtil.isSelfSigned(context))
+                        if(SecurityUtil.isSelfSigned(context))
                         {
                             break;
                         }
@@ -349,7 +349,7 @@ public class IaikExtendedSlot implements P11WritableSlot
                             {
                                 for(X509PublicKeyCertificate certObject : certObjects)
                                 {
-                                    issuerCerts.add(IoCertUtil.parseCert(certObject.getValue().getByteArrayValue()));
+                                    issuerCerts.add(SecurityUtil.parseCert(certObject.getValue().getByteArrayValue()));
                                 }
                             }
 
@@ -1087,7 +1087,7 @@ public class IaikExtendedSlot implements P11WritableSlot
             int n = tmpObjects == null ? 0 : tmpObjects.size();
             if(n == 0)
             {
-                LOG.warn("found no certificate with subject {}", IoCertUtil.canonicalizeName(subject));
+                LOG.warn("found no certificate with subject {}", SecurityUtil.canonicalizeName(subject));
                 return null;
             }
 
@@ -1231,7 +1231,7 @@ public class IaikExtendedSlot implements P11WritableSlot
 
         assertMatch(newCert, keyIdentifier, securityFactory);
 
-        X509Certificate[] certChain = IoCertUtil.buildCertPath(newCert, caCerts);
+        X509Certificate[] certChain = SecurityUtil.buildCertPath(newCert, caCerts);
 
         Session session = borrowWritableSession();
         try
@@ -1468,7 +1468,7 @@ public class IaikExtendedSlot implements P11WritableSlot
         if(label == null)
         {
             X500Name x500Name = X500Name.getInstance(cert.getSubjectX500Principal().getEncoded());
-            label = IoCertUtil.getCommonName(x500Name).toCharArray();
+            label = SecurityUtil.getCommonName(x500Name).toCharArray();
         }
 
         X509PublicKeyCertificate newCertTemp = new X509PublicKeyCertificate();
@@ -1752,7 +1752,7 @@ public class IaikExtendedSlot implements P11WritableSlot
         Date endDate = new Date(startDate.getTime() + 20 * YEAR);
 
         X500Name x500Name_subject = new X500Name(subject);
-        x500Name_subject = IoCertUtil.sortX509Name(x500Name_subject);
+        x500Name_subject = SecurityUtil.sortX509Name(x500Name_subject);
 
         V3TBSCertificateGenerator tbsGen = new V3TBSCertificateGenerator();
         tbsGen.setSerialNumber(new ASN1Integer(serialNumber));
@@ -2113,7 +2113,7 @@ public class IaikExtendedSlot implements P11WritableSlot
         }
 
         X509PublicKeyCertificate cert = getCertificateObject(privKey.getId().getByteArrayValue(), null);
-        return IoCertUtil.parseCert(cert.getValue().getByteArrayValue());
+        return SecurityUtil.parseCert(cert.getValue().getByteArrayValue());
     }
 
 }

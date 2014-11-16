@@ -48,7 +48,7 @@ import java.util.Set;
 import jline.console.ConsoleReader;
 
 import org.apache.felix.gogo.commands.Option;
-import org.xipki.common.IoCertUtil;
+import org.xipki.common.IoUtil;
 import org.xipki.console.karaf.XipkiOsgiCommandSupport;
 import org.xipki.dbtool.LiquibaseDatabaseConf;
 import org.xipki.dbtool.LiquibaseMain;
@@ -120,7 +120,7 @@ public abstract class LiquibaseCommand extends XipkiOsgiCommandSupport
     throws FileNotFoundException, IOException
     {
         Properties props = new Properties();
-        props.load(new FileInputStream(IoCertUtil.expandFilepath(dbconfFile)));
+        props.load(new FileInputStream(IoUtil.expandFilepath(dbconfFile)));
         return props;
     }
 
@@ -149,7 +149,7 @@ public abstract class LiquibaseCommand extends XipkiOsgiCommandSupport
     throws FileNotFoundException, IOException
     {
         Properties props = new Properties();
-        props.load(new FileInputStream(IoCertUtil.expandFilepath(propFile)));
+        props.load(new FileInputStream(IoUtil.expandFilepath(propFile)));
         return props;
     }
 

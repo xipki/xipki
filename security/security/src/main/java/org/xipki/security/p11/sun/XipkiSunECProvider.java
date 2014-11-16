@@ -33,37 +33,33 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.security.provider;
+package org.xipki.security.p11.sun;
 
-import java.security.Security;
-
-import org.xipki.security.api.SecurityFactory;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
+import java.security.Provider;
 
 /**
  * @author Lijun Liao
  */
 
-public class XiPKIProviderRegister
+public class XipkiSunECProvider extends Provider
 {
-    public void regist()
+    private static final long serialVersionUID = 1L;
+    public static final String NAME = "XiPKI-SunEC";
+    public static final double VERSION = 1.0;
+
+    public XipkiSunECProvider()
     {
-        if(Security.getProperty(XiPKIProvider.PROVIDER_NAME) == null)
+        super(NAME, VERSION, NAME + " (version " + VERSION + ")");
+
+        AccessController.doPrivileged(new PrivilegedAction<Object>()
         {
-            Security.addProvider(new XiPKIProvider());
-        }
+            public Object run()
+            {
+                put("AlgorithmParameters.EC", ECParameters.class.getName());
+                return null;
+            }
+        });
     }
-
-    public void unregist()
-    {
-        if(Security.getProperty(XiPKIProvider.PROVIDER_NAME) != null)
-        {
-            Security.removeProvider(XiPKIProvider.PROVIDER_NAME);
-        }
-    }
-
-    public void setSecurityFactory(SecurityFactory securityFactory)
-    {
-        XiPKIKeyStoreSpi.setSecurityFactory(securityFactory);
-    }
-
 }

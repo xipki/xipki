@@ -9,7 +9,7 @@
     <groupId>org.xipki</groupId>
     <version>2.0.0-SNAPSHOT</version>
   </parent>
-  <artifactId>console-karaf</artifactId>
+  <artifactId>shell-base</artifactId>
   <packaging>bundle</packaging>
   <name>XiPKI :: ${project.artifactId}</name>
   <dependencies>

@@ -59,18 +59,18 @@ import org.xipki.security.api.p11.P11SlotIdentifier;
  * @author Lijun Liao
  */
 
-public class IaikExtendedModule implements P11Module
+public class IaikP11Module implements P11Module
 {
-    private static final Logger LOG = LoggerFactory.getLogger(IaikExtendedModule.class);
+    private static final Logger LOG = LoggerFactory.getLogger(IaikP11Module.class);
 
     private Module module;
     private P11ModuleConf moduleConf;
 
-    private Map<P11SlotIdentifier, IaikExtendedSlot> slots = new HashMap<>();
+    private Map<P11SlotIdentifier, IaikP11Slot> slots = new HashMap<>();
     private Map<P11SlotIdentifier, Slot> availableSlots = new HashMap<>();
     private List<P11SlotIdentifier> slotIds;
 
-    public IaikExtendedModule(Module module, P11ModuleConf moduleConf)
+    public IaikP11Module(Module module, P11ModuleConf moduleConf)
     throws SignerException
     {
         ParamChecker.assertNotNull("module", module);
@@ -142,10 +142,10 @@ public class IaikExtendedModule implements P11Module
     }
 
     @Override
-    public IaikExtendedSlot getSlot(P11SlotIdentifier slotId)
+    public IaikP11Slot getSlot(P11SlotIdentifier slotId)
     throws SignerException
     {
-        IaikExtendedSlot extSlot = slots.get(slotId);
+        IaikP11Slot extSlot = slots.get(slotId);
         if(extSlot != null)
         {
             return extSlot;
@@ -177,7 +177,7 @@ public class IaikExtendedModule implements P11Module
         {
             throw new SignerException("PasswordResolverException: " + e.getMessage(), e);
         }
-        extSlot = new IaikExtendedSlot(_slotId, slot, pwd);
+        extSlot = new IaikP11Slot(_slotId, slot, pwd);
 
         slots.put(slotId, extSlot);
         return extSlot;

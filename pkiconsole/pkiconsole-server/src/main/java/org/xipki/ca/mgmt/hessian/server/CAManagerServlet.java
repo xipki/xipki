@@ -55,28 +55,29 @@ import javax.servlet.ServletResponse;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.ca.common.CAMgmtException;
-import org.xipki.ca.common.CAStatus;
-import org.xipki.ca.common.CASystemStatus;
-import org.xipki.ca.common.CertValidity;
-import org.xipki.ca.common.CmpControl;
+import org.xipki.ca.api.CAMgmtException;
+import org.xipki.ca.api.CAStatus;
+import org.xipki.ca.api.CASystemStatus;
+import org.xipki.ca.api.CertValidity;
+import org.xipki.ca.api.CmpControl;
 import org.xipki.ca.mgmt.hessian.common.HessianCAManager;
 import org.xipki.ca.mgmt.hessian.common.HessianCAMgmtException;
-import org.xipki.ca.server.mgmt.api.X509CAEntry;
 import org.xipki.ca.server.mgmt.api.CAHasRequestorEntry;
 import org.xipki.ca.server.mgmt.api.CAManager;
 import org.xipki.ca.server.mgmt.api.CertProfileEntry;
 import org.xipki.ca.server.mgmt.api.CmpRequestorEntry;
 import org.xipki.ca.server.mgmt.api.CmpResponderEntry;
-import org.xipki.ca.server.mgmt.api.X509CrlSignerEntry;
 import org.xipki.ca.server.mgmt.api.DuplicationMode;
 import org.xipki.ca.server.mgmt.api.Permission;
 import org.xipki.ca.server.mgmt.api.PublisherEntry;
 import org.xipki.ca.server.mgmt.api.ValidityMode;
+import org.xipki.ca.server.mgmt.api.X509CAEntry;
+import org.xipki.ca.server.mgmt.api.X509CrlSignerEntry;
 import org.xipki.common.CRLReason;
 import org.xipki.common.CertRevocationInfo;
-import org.xipki.common.IoCertUtil;
+import org.xipki.common.IoUtil;
 import org.xipki.common.LogUtil;
+import org.xipki.common.SecurityUtil;
 import org.xipki.security.api.SecurityFactory;
 
 import com.caucho.hessian.server.HessianServlet;
@@ -285,7 +286,7 @@ implements HessianCAManager
         X509Certificate cert;
         try
         {
-            cert = IoCertUtil.parseCert(encodedCert);
+            cert = SecurityUtil.parseCert(encodedCert);
         } catch (CertificateException | IOException e)
         {
             throw new HessianCAMgmtException("could not parse certificate: " + e.getMessage());
@@ -900,7 +901,7 @@ implements HessianCAManager
 
         try
         {
-            String storePath = IoCertUtil.expandFilepath(truststoreFile);
+            String storePath = IoUtil.expandFilepath(truststoreFile);
 
             KeyStore keyStore;
             if(truststoreProvider == null || truststoreProvider.trim().length() == 0)

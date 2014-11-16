@@ -46,11 +46,11 @@ import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.ca.common.CAMgmtException;
-import org.xipki.ca.common.CAStatus;
-import org.xipki.ca.common.CASystemStatus;
-import org.xipki.ca.common.CertValidity;
-import org.xipki.ca.common.CmpControl;
+import org.xipki.ca.api.CAMgmtException;
+import org.xipki.ca.api.CAStatus;
+import org.xipki.ca.api.CASystemStatus;
+import org.xipki.ca.api.CertValidity;
+import org.xipki.ca.api.CmpControl;
 import org.xipki.ca.mgmt.hessian.common.HessianCAManager;
 import org.xipki.ca.server.mgmt.api.X509CAEntry;
 import org.xipki.ca.server.mgmt.api.CAHasRequestorEntry;
@@ -65,7 +65,7 @@ import org.xipki.ca.server.mgmt.api.PublisherEntry;
 import org.xipki.ca.server.mgmt.api.ValidityMode;
 import org.xipki.common.CRLReason;
 import org.xipki.common.CertRevocationInfo;
-import org.xipki.common.IoCertUtil;
+import org.xipki.common.SecurityUtil;
 
 import com.caucho.hessian.client.HessianProxyFactory;
 
@@ -588,7 +588,7 @@ public class CAManagerClient implements CAManager
         byte[] encodedCert = client.generateCertificate(caName, profileName, user, encodedPkcs10Request);
         try
         {
-            return IoCertUtil.parseCert(encodedCert);
+            return SecurityUtil.parseCert(encodedCert);
         } catch (CertificateException | IOException e)
         {
             throw new CAMgmtException("Could not parse the certificate: " + e.getMessage(), e);

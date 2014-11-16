@@ -44,7 +44,7 @@ import java.sql.Statement;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.Marshaller;
 
-import org.xipki.common.IoCertUtil;
+import org.xipki.common.IoUtil;
 import org.xipki.common.ParamChecker;
 import org.xipki.datasource.api.DataSourceWrapper;
 import org.xipki.dbi.ca.jaxb.CAConfigurationType;
@@ -402,7 +402,7 @@ class CaConfigurationDbExporter extends DbPorter
                 {
                     String filepath = "certprofile" + File.separator + name + ".conf";
                     File f = new File(baseDir, filepath);
-                    IoCertUtil.save(f, conf.getBytes());
+                    IoUtil.save(f, conf.getBytes());
                     certprofile.setConfFile(filepath);
                 }
                 else
