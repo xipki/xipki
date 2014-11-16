@@ -117,9 +117,10 @@ import org.xipki.common.CRLReason;
 import org.xipki.common.CertRevocationInfo;
 import org.xipki.common.HashAlgoType;
 import org.xipki.common.HealthCheckResult;
-import org.xipki.common.IoCertUtil;
+import org.xipki.common.IoUtil;
 import org.xipki.common.LogUtil;
 import org.xipki.common.ObjectIdentifiers;
+import org.xipki.common.SecurityUtil;
 import org.xipki.datasource.api.DataSourceFactory;
 import org.xipki.datasource.api.DataSourceWrapper;
 import org.xipki.ocsp.OCSPRespWithCacheInfo.ResponseCacheInfo;
@@ -239,7 +240,7 @@ public class OcspResponder
             unmarshaller.setSchema(schema);
             @SuppressWarnings("unchecked")
             JAXBElement<OCSPResponderType> rootElement = (JAXBElement<OCSPResponderType>)
-                    unmarshaller.unmarshal(new File(IoCertUtil.expandFilepath(confFile)));
+                    unmarshaller.unmarshal(new File(IoUtil.expandFilepath(confFile)));
             this.conf = rootElement.getValue();
         } catch (JAXBException | SAXException e)
         {
@@ -376,7 +377,7 @@ public class OcspResponder
                 }
             }
 
-            explicitCertificateChain = IoCertUtil.buildCertPath(explicitResponderCert, caCerts);
+            explicitCertificateChain = SecurityUtil.buildCertPath(explicitResponderCert, caCerts);
         }
 
         String responderSignerType = signerConf.getType();
@@ -412,10 +413,10 @@ public class OcspResponder
             {
                 X509Certificate[] certificateChain = responderSigner.getCertificateChain();
                 X509Certificate toplevelCaCert = certificateChain[certificateChain.length - 1];
-                if(IoCertUtil.isSelfSigned(toplevelCaCert) == false)
+                if(SecurityUtil.isSelfSigned(toplevelCaCert) == false)
                 {
                     throw new OcspResponderException("Could not build certchain of signer up to root CA, but only to "
-                            + IoCertUtil.canonicalizeName(toplevelCaCert.getSubjectX500Principal()));
+                            + SecurityUtil.canonicalizeName(toplevelCaCert.getSubjectX500Principal()));
                 }
 
                 certsInResp = new X509CertificateHolder[certificateChain.length];
@@ -431,7 +432,7 @@ public class OcspResponder
                         } catch (Exception e)
                         {
                             throw new OcspResponderException("Could not parse certificate "
-                                    + IoCertUtil.canonicalizeName(certInChain.getSubjectX500Principal()));
+                                    + SecurityUtil.canonicalizeName(certInChain.getSubjectX500Principal()));
                         }
                     }
                 }
@@ -456,7 +457,7 @@ public class OcspResponder
                 DataSourceWrapper dataSource;
                 try
                 {
-                    confStream = new FileInputStream(IoCertUtil.expandFilepath(databaseConfFile));
+                    confStream = new FileInputStream(IoUtil.expandFilepath(databaseConfFile));
                     dataSource = dataSourceFactory.createDataSource(confStream, securityFactory.getPasswordResolver());
                 } catch (Exception e)
                 {
@@ -481,7 +482,7 @@ public class OcspResponder
                     {
                         try
                         {
-                            issuers.add(IoCertUtil.parseCert(caCertFile));
+                            issuers.add(SecurityUtil.parseCert(caCertFile));
                         } catch (Exception e)
                         {
                             throw new OcspResponderException(e);
@@ -1174,7 +1175,7 @@ public class OcspResponder
     {
         try
         {
-            return IoCertUtil.parseCert(f);
+            return SecurityUtil.parseCert(f);
         }catch(IOException | CertificateException e)
         {
             throw new OcspResponderException("Could not parse cert " + f, e);

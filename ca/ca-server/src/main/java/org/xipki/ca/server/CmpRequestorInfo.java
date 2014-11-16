@@ -37,8 +37,8 @@ package org.xipki.ca.server;
 
 import java.util.Set;
 
-import org.xipki.ca.common.CertBasedRequestorInfo;
-import org.xipki.ca.common.X509CertificateWithMetaInfo;
+import org.xipki.ca.api.CertBasedRequestorInfo;
+import org.xipki.ca.api.X509CertificateWithMetaInfo;
 import org.xipki.ca.server.mgmt.api.Permission;
 
 /**

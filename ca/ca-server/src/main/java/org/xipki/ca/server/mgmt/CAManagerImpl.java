@@ -83,44 +83,45 @@ import org.xipki.audit.api.AuditLoggingService;
 import org.xipki.audit.api.AuditLoggingServiceRegister;
 import org.xipki.audit.api.AuditStatus;
 import org.xipki.audit.api.PCIAuditEvent;
+import org.xipki.ca.api.CAMgmtException;
+import org.xipki.ca.api.CAStatus;
+import org.xipki.ca.api.CASystemStatus;
+import org.xipki.ca.api.CertArt;
+import org.xipki.ca.api.CertProfileException;
+import org.xipki.ca.api.CertPublisherException;
+import org.xipki.ca.api.CertValidity;
+import org.xipki.ca.api.CmpControl;
+import org.xipki.ca.api.DfltEnvironmentParameterResolver;
+import org.xipki.ca.api.EnvironmentParameterResolver;
 import org.xipki.ca.api.OperationException;
+import org.xipki.ca.api.X509CertificateWithMetaInfo;
 import org.xipki.ca.api.publisher.X509CertificateInfo;
-import org.xipki.ca.common.CAMgmtException;
-import org.xipki.ca.common.CAStatus;
-import org.xipki.ca.common.CASystemStatus;
-import org.xipki.ca.common.CertProfileException;
-import org.xipki.ca.common.CertPublisherException;
-import org.xipki.ca.common.CertValidity;
-import org.xipki.ca.common.CmpControl;
-import org.xipki.ca.common.X509CertificateWithMetaInfo;
 import org.xipki.ca.server.CmpRequestorInfo;
 import org.xipki.ca.server.CrlSigner;
+import org.xipki.ca.server.RandomSerialNumberGenerator;
 import org.xipki.ca.server.X509CA;
 import org.xipki.ca.server.X509CACmpResponder;
 import org.xipki.ca.server.mgmt.X509SelfSignedCertBuilder.GenerateSelfSignedResult;
-import org.xipki.ca.server.mgmt.api.X509CAEntry;
 import org.xipki.ca.server.mgmt.api.CAHasRequestorEntry;
 import org.xipki.ca.server.mgmt.api.CAManager;
 import org.xipki.ca.server.mgmt.api.CertProfileEntry;
 import org.xipki.ca.server.mgmt.api.CmpRequestorEntry;
 import org.xipki.ca.server.mgmt.api.CmpResponderEntry;
-import org.xipki.ca.server.mgmt.api.X509CrlSignerEntry;
 import org.xipki.ca.server.mgmt.api.DuplicationMode;
 import org.xipki.ca.server.mgmt.api.Permission;
 import org.xipki.ca.server.mgmt.api.PublisherEntry;
 import org.xipki.ca.server.mgmt.api.ValidityMode;
+import org.xipki.ca.server.mgmt.api.X509CAEntry;
+import org.xipki.ca.server.mgmt.api.X509CrlSignerEntry;
 import org.xipki.ca.server.store.CertificateStore;
 import org.xipki.common.CRLReason;
-import org.xipki.common.CertArt;
 import org.xipki.common.CertRevocationInfo;
 import org.xipki.common.CmpUtf8Pairs;
 import org.xipki.common.ConfigurationException;
-import org.xipki.common.DfltEnvironmentParameterResolver;
-import org.xipki.common.EnvironmentParameterResolver;
-import org.xipki.common.IoCertUtil;
+import org.xipki.common.IoUtil;
 import org.xipki.common.LogUtil;
 import org.xipki.common.ParamChecker;
-import org.xipki.common.RandomSerialNumberGenerator;
+import org.xipki.common.SecurityUtil;
 import org.xipki.common.StringUtil;
 import org.xipki.datasource.api.DataSourceFactory;
 import org.xipki.datasource.api.DataSourceWrapper;
@@ -238,7 +239,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
         {
             try
             {
-                calockId = new String(IoCertUtil.read(caLockFile));
+                calockId = new String(IoUtil.read(caLockFile));
             } catch (IOException e)
             {
             }
@@ -249,7 +250,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
             calockId = UUID.randomUUID().toString();
             try
             {
-                IoCertUtil.save(caLockFile, calockId.getBytes());
+                IoUtil.save(caLockFile, calockId.getBytes());
             } catch (IOException e)
             {
             }
@@ -258,7 +259,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
         String hostAddress = null;
         try
         {
-            hostAddress = IoCertUtil.getHostAddress();
+            hostAddress = IoUtil.getHostAddress();
         } catch (SocketException e)
         {
         }
@@ -285,7 +286,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
         Properties caConfProps = new Properties();
         try
         {
-            caConfProps.load(new FileInputStream(IoCertUtil.expandFilepath(caConfFile)));
+            caConfProps.load(new FileInputStream(IoUtil.expandFilepath(caConfFile)));
         } catch (IOException e)
         {
             throw new CAMgmtException("IOException while parsing ca configuration" + caConfFile, e);
@@ -1050,7 +1051,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
         byte[] encodedCert = Base64.decode(b64Cert);
         try
         {
-            return IoCertUtil.parseCert(encodedCert);
+            return SecurityUtil.parseCert(encodedCert);
         } catch (CertificateException | IOException e)
         {
             throw new CAMgmtException(e);
@@ -1735,7 +1736,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
 
             if(iCert != null)
             {
-                ps.setString(iSubject, IoCertUtil.canonicalizeName(cert.getSubjectX500Principal()));
+                ps.setString(iSubject, SecurityUtil.canonicalizeName(cert.getSubjectX500Principal()));
 
                 String base64Cert = Base64.toBase64String(cert.getEncoded());
                 ps.setString(iCert, base64Cert);
@@ -3749,7 +3750,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
         if(keystoreConf.startsWith("file:"))
         {
             String keystoreFile = keystoreConf.substring("file:".length());
-            keystoreBytes = IoCertUtil.read(keystoreFile);
+            keystoreBytes = IoUtil.read(keystoreFile);
         }
         else if(keystoreConf.startsWith("base64:"))
         {
@@ -3760,7 +3761,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
             return signerConf;
         }
 
-        keystoreBytes = IoCertUtil.extractMinimalKeyStore(keystoreType,
+        keystoreBytes = SecurityUtil.extractMinimalKeyStore(keystoreType,
                 keystoreBytes, keyLabel,
                 passwordResolver.resolvePassword(passwordHint));
 

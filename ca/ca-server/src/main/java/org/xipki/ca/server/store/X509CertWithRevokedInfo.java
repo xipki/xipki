@@ -35,7 +35,7 @@
 
 package org.xipki.ca.server.store;
 
-import org.xipki.ca.common.X509CertificateWithMetaInfo;
+import org.xipki.ca.api.X509CertificateWithMetaInfo;
 
 /**
  * @author Lijun Liao

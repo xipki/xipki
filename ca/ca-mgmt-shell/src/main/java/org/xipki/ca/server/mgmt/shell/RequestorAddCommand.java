@@ -38,7 +38,7 @@ package org.xipki.ca.server.mgmt.shell;
 import org.apache.felix.gogo.commands.Command;
 import org.apache.felix.gogo.commands.Option;
 import org.xipki.ca.server.mgmt.api.CmpRequestorEntry;
-import org.xipki.common.IoCertUtil;
+import org.xipki.common.SecurityUtil;
 
 /**
  * @author Lijun Liao
@@ -62,7 +62,7 @@ public class RequestorAddCommand extends CaCommand
     throws Exception
     {
         CmpRequestorEntry entry = new CmpRequestorEntry(name);
-        entry.setCert(IoCertUtil.parseCert(certFile));
+        entry.setCert(SecurityUtil.parseCert(certFile));
         caManager.addCmpRequestor(entry);
         out("added CMP requestor " + name);
         return null;

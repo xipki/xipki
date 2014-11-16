@@ -50,7 +50,7 @@ import javax.xml.bind.Unmarshaller;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.common.AbstractLoadTest;
-import org.xipki.common.IoCertUtil;
+import org.xipki.common.IoUtil;
 import org.xipki.common.ParamChecker;
 import org.xipki.datasource.api.DataSourceFactory;
 import org.xipki.datasource.api.DataSourceWrapper;
@@ -82,7 +82,7 @@ public class CaDbExporter
         this.dataSource = dataSourceFactory.createDataSource(props, passwordResolver);
         this.marshaller = getMarshaller();
         this.unmarshaller = getUnmarshaller();
-        this.destFolder = IoCertUtil.expandFilepath(destFolder);
+        this.destFolder = IoUtil.expandFilepath(destFolder);
         this.resume = resume;
         checkDestFolder();
     }
@@ -93,7 +93,7 @@ public class CaDbExporter
     throws SQLException, PasswordResolverException, IOException, JAXBException
     {
         this(dataSourceFactory, passwordResolver,
-                new FileInputStream(IoCertUtil.expandFilepath(dbConfFile)), destFolder, destFolderEmpty);
+                new FileInputStream(IoUtil.expandFilepath(dbConfFile)), destFolder, destFolderEmpty);
     }
 
     private static Marshaller getMarshaller()

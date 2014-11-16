@@ -48,14 +48,14 @@ import org.bouncycastle.asn1.crmf.ProofOfPossession;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xipki.ca.client.api.CertificateOrError;
+import org.xipki.ca.client.api.EnrollCertResult;
+import org.xipki.ca.client.api.PKIErrorException;
 import org.xipki.ca.client.api.RAWorker;
+import org.xipki.ca.client.api.RAWorkerException;
 import org.xipki.ca.client.api.dto.EnrollCertRequestEntryType;
 import org.xipki.ca.client.api.dto.EnrollCertRequestType;
 import org.xipki.ca.client.api.dto.EnrollCertRequestType.Type;
-import org.xipki.ca.common.CertificateOrError;
-import org.xipki.ca.common.EnrollCertResult;
-import org.xipki.ca.common.PKIErrorException;
-import org.xipki.ca.common.RAWorkerException;
 import org.xipki.common.AbstractLoadTest;
 import org.xipki.common.ParamChecker;
 

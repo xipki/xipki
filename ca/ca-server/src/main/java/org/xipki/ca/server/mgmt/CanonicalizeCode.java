@@ -43,7 +43,7 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.xipki.common.IoCertUtil;
+import org.xipki.common.IoUtil;
 
 /**
  * @author Lijun Liao
@@ -184,12 +184,12 @@ public class CanonicalizeCode
             reader.close();
         }
 
-        byte[] oldBytes = IoCertUtil.read(file);
+        byte[] oldBytes = IoUtil.read(file);
         byte[] newBytes = writer.toByteArray();
         if(Arrays.equals(oldBytes, newBytes) == false)
         {
             File newFile = new File(file.getPath() + "-new");
-            IoCertUtil.save(file, newBytes);
+            IoUtil.save(file, newBytes);
             newFile.renameTo(file);
             System.out.println(file.getPath());
         }

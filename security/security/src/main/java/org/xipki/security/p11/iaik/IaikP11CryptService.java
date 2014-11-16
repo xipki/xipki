@@ -68,7 +68,7 @@ public final class IaikP11CryptService implements P11CryptService
 
     private final ConcurrentSkipListSet<IaikP11Identity> identities = new ConcurrentSkipListSet<>();
 
-    private IaikExtendedModule extModule;
+    private IaikP11Module extModule;
 
     private final P11ModuleConf moduleConf;
 
@@ -141,7 +141,7 @@ public final class IaikP11CryptService implements P11CryptService
         List<P11SlotIdentifier> slotIds = extModule.getSlotIdentifiers();
         for(P11SlotIdentifier slotId : slotIds)
         {
-            IaikExtendedSlot slot;
+            IaikP11Slot slot;
             try
             {
                 slot = extModule.getSlot(slotId);

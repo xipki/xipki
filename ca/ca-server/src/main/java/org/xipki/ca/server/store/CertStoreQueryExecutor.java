@@ -70,18 +70,18 @@ import org.bouncycastle.asn1.x509.Extension;
 import org.bouncycastle.util.encoders.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xipki.ca.api.CertArt;
 import org.xipki.ca.api.OperationException;
+import org.xipki.ca.api.RequestorInfo;
+import org.xipki.ca.api.X509CertificateWithMetaInfo;
 import org.xipki.ca.api.OperationException.ErrorCode;
 import org.xipki.ca.api.publisher.X509CertificateInfo;
-import org.xipki.ca.common.RequestorInfo;
-import org.xipki.ca.common.X509CertificateWithMetaInfo;
 import org.xipki.ca.server.CertRevocationInfoWithSerial;
 import org.xipki.ca.server.CertStatus;
 import org.xipki.ca.server.SubjectKeyProfileTriple;
 import org.xipki.common.CRLReason;
-import org.xipki.common.CertArt;
 import org.xipki.common.CertRevocationInfo;
-import org.xipki.common.IoCertUtil;
+import org.xipki.common.SecurityUtil;
 import org.xipki.common.LruCache;
 import org.xipki.common.ObjectIdentifiers;
 import org.xipki.common.ParamChecker;
@@ -247,7 +247,7 @@ class CertStoreQueryExecutor
             }
 
             ps_addcert.setString(idx++, fp(encodedSubjectPublicKey));
-            String sha1_fp_subject = IoCertUtil.sha1sum_canonicalized_name(cert.getSubjectX500Principal());
+            String sha1_fp_subject = SecurityUtil.sha1sum_canonicalized_name(cert.getSubjectX500Principal());
             ps_addcert.setString(idx++, sha1_fp_subject);
 
             boolean isEECert = cert.getBasicConstraints() == -1;
@@ -1243,7 +1243,7 @@ class CertStoreQueryExecutor
             {
                 String b64Cert = rs.getString(col_cert);
                 byte[] encodedCert = Base64.decode(b64Cert);
-                X509Certificate cert = IoCertUtil.parseCert(encodedCert);
+                X509Certificate cert = SecurityUtil.parseCert(encodedCert);
 
                 int certProfileInfo_id = rs.getInt(col_certprofileinfo_id);
                 String certProfileName = certprofileStore.getName(certProfileInfo_id);
@@ -1307,7 +1307,7 @@ class CertStoreQueryExecutor
                 X509Certificate cert;
                 try
                 {
-                    cert = IoCertUtil.parseCert(encodedCert);
+                    cert = SecurityUtil.parseCert(encodedCert);
                 } catch (CertificateException e)
                 {
                     throw new OperationException(ErrorCode.System_Failure, "CertificateException: " + e.getMessage());
@@ -1364,7 +1364,7 @@ class CertStoreQueryExecutor
                 X509Certificate cert;
                 try
                 {
-                    cert = IoCertUtil.parseCert(certBytes);
+                    cert = SecurityUtil.parseCert(certBytes);
                 } catch (CertificateException | IOException e)
                 {
                     throw new OperationException(ErrorCode.System_Failure, e.getClass().getName() + ": " + e.getMessage());
@@ -1438,7 +1438,7 @@ class CertStoreQueryExecutor
             {
                 String b64Cert = rs.getString(col_cert);
                 byte[] encodedCert = Base64.decode(b64Cert);
-                X509Certificate cert = IoCertUtil.parseCert(encodedCert);
+                X509Certificate cert = SecurityUtil.parseCert(encodedCert);
 
                 int certProfileInfo_id = rs.getInt(col_certprofileinfo_id);
                 String certProfileName = certprofileStore.getName(certProfileInfo_id);
@@ -1647,14 +1647,14 @@ class CertStoreQueryExecutor
     CertStatus getCertStatusForSubject(X509CertificateWithMetaInfo caCert, X500Principal subject)
     throws SQLException
     {
-        String subjectFp = IoCertUtil.sha1sum_canonicalized_name(subject);
+        String subjectFp = SecurityUtil.sha1sum_canonicalized_name(subject);
         return getCertStatusForSubjectFp(caCert, subjectFp);
     }
 
     CertStatus getCertStatusForSubject(X509CertificateWithMetaInfo caCert, X500Name subject)
     throws SQLException
     {
-        String subjectFp = IoCertUtil.sha1sum_canonicalized_name(subject);
+        String subjectFp = SecurityUtil.sha1sum_canonicalized_name(subject);
         return getCertStatusForSubjectFp(caCert, subjectFp);
     }
 
@@ -1845,7 +1845,7 @@ class CertStoreQueryExecutor
 
     private String fp(byte[] data)
     {
-        return IoCertUtil.sha1sum(data);
+        return SecurityUtil.sha1sum(data);
     }
 
     private int getCaId(X509CertificateWithMetaInfo caCert)
@@ -2140,7 +2140,7 @@ class CertStoreQueryExecutor
             }
         }
 
-        String namePattern = IoCertUtil.canonicalizeName(new X500Name(rdns2));
+        String namePattern = SecurityUtil.canonicalizeName(new X500Name(rdns2));
 
         String sql = "SUBJECT FROM CERT WHERE SUBJECT LIKE ?";
         sql = dataSource.createFetchFirstSelectSQL(sql, 1, "NOTBEFORE DESC");

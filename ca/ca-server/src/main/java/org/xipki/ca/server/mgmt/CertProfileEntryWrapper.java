@@ -35,12 +35,12 @@
 
 package org.xipki.ca.server.mgmt;
 
+import org.xipki.ca.api.CertProfileException;
+import org.xipki.ca.api.EnvironmentParameterResolver;
 import org.xipki.ca.api.profile.x509.X509CertProfile;
 import org.xipki.ca.api.profile.x509.SpecialX509CertProfileBehavior;
-import org.xipki.ca.common.CertProfileException;
 import org.xipki.ca.server.certprofile.x509.DefaultX509CertProfile;
 import org.xipki.ca.server.mgmt.api.CertProfileEntry;
-import org.xipki.common.EnvironmentParameterResolver;
 import org.xipki.common.ParamChecker;
 
 /**

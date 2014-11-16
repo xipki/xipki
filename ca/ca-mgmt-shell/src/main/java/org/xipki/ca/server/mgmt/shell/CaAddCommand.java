@@ -41,13 +41,13 @@ import java.util.Set;
 
 import org.apache.felix.gogo.commands.Command;
 import org.apache.felix.gogo.commands.Option;
-import org.xipki.ca.common.CAStatus;
+import org.xipki.ca.api.CAStatus;
 import org.xipki.ca.server.mgmt.api.X509CAEntry;
 import org.xipki.ca.server.mgmt.api.DuplicationMode;
 import org.xipki.ca.server.mgmt.api.Permission;
 import org.xipki.ca.server.mgmt.api.ValidityMode;
 import org.xipki.common.ConfigurationException;
-import org.xipki.common.IoCertUtil;
+import org.xipki.common.SecurityUtil;
 import org.xipki.security.api.ConcurrentContentSigner;
 
 /**
@@ -93,7 +93,7 @@ public class CaAddCommand extends CaAddOrGenCommand
         X509Certificate caCert = null;
         if(certFile != null)
         {
-            caCert = IoCertUtil.parseCert(certFile);
+            caCert = SecurityUtil.parseCert(certFile);
         }
 
         if("PKCS12".equalsIgnoreCase(signerType) || "JKS".equalsIgnoreCase(signerType))

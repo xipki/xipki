@@ -38,7 +38,7 @@ package org.xipki.ca.server.certprofile;
 import java.util.List;
 import java.util.regex.Pattern;
 
-import org.xipki.common.EnvironmentParameterResolver;
+import org.xipki.ca.api.EnvironmentParameterResolver;
 
 /**
  * @author Lijun Liao

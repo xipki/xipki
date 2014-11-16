@@ -43,7 +43,7 @@ import java.util.List;
 import org.apache.felix.gogo.commands.Command;
 import org.apache.felix.gogo.commands.Option;
 import org.xipki.common.AbstractLoadTest;
-import org.xipki.common.IoCertUtil;
+import org.xipki.common.SecurityUtil;
 import org.xipki.common.StringUtil;
 import org.xipki.ocsp.client.api.RequestOptions;
 import org.xipki.ocsp.client.shell.AbstractOCSPStatusCommand;
@@ -132,7 +132,7 @@ public class OCSPStatusLoadTestCommand extends AbstractOCSPStatusCommand
         startMsg.append("Hash:           ").append(hashAlgo).append("\n");
         System.out.print(startMsg.toString());
 
-        X509Certificate caCert = IoCertUtil.parseCert(caCertFile);
+        X509Certificate caCert = SecurityUtil.parseCert(caCertFile);
 
         RequestOptions options = getRequestOptions();
 

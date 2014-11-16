@@ -38,8 +38,8 @@ package org.xipki.ca.client.shell;
 import java.security.cert.X509CRL;
 
 import org.apache.felix.gogo.commands.Command;
-import org.xipki.ca.common.PKIErrorException;
-import org.xipki.ca.common.RAWorkerException;
+import org.xipki.ca.client.api.PKIErrorException;
+import org.xipki.ca.client.api.RAWorkerException;
 
 /**
  * @author Lijun Liao

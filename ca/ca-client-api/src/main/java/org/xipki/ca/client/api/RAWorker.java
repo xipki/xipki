@@ -49,10 +49,6 @@ import org.xipki.ca.client.api.dto.EnrollCertEntryType;
 import org.xipki.ca.client.api.dto.EnrollCertRequestType;
 import org.xipki.ca.client.api.dto.RevokeCertRequestType;
 import org.xipki.ca.client.api.dto.UnrevokeOrRemoveCertRequestType;
-import org.xipki.ca.common.CertIDOrError;
-import org.xipki.ca.common.EnrollCertResult;
-import org.xipki.ca.common.PKIErrorException;
-import org.xipki.ca.common.RAWorkerException;
 
 /**
  * @author Lijun Liao

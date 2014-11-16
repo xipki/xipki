@@ -57,7 +57,8 @@ import java.util.Set;
 
 import org.bouncycastle.x509.ExtendedPKIXBuilderParameters;
 import org.xipki.common.HashAlgoType;
-import org.xipki.common.IoCertUtil;
+import org.xipki.common.IoUtil;
+import org.xipki.common.SecurityUtil;
 import org.xipki.ocsp.conf.jaxb.CertCollectionType;
 import org.xipki.ocsp.conf.jaxb.CertCollectionType.Keystore;
 import org.xipki.ocsp.conf.jaxb.NonceType;
@@ -293,7 +294,7 @@ class RequestOptions
                 URL uri = new URL(uriS);
                 if("file".equalsIgnoreCase(uri.getProtocol()))
                 {
-                    is = new FileInputStream(IoCertUtil.expandFilepath(
+                    is = new FileInputStream(IoUtil.expandFilepath(
                             URLDecoder.decode(uri.getPath(), "UTF-8")));
                 }
                 else
@@ -324,7 +325,7 @@ class RequestOptions
             {
                 if(file.exists() && file.isFile())
                 {
-                    certs.add(IoCertUtil.parseCert(file));
+                    certs.add(SecurityUtil.parseCert(file));
                 }
             }
         }

@@ -94,7 +94,7 @@ import org.xipki.ca.server.certprofile.jaxb.RdnConstraintType;
 import org.xipki.ca.server.certprofile.jaxb.RdnType;
 import org.xipki.ca.server.certprofile.jaxb.SubjectInfoAccessType;
 import org.xipki.ca.server.certprofile.jaxb.SubjectInfoAccessType.Access;
-import org.xipki.common.IoCertUtil;
+import org.xipki.common.SecurityUtil;
 import org.xipki.common.ObjectIdentifiers;
 
 /**
@@ -983,7 +983,7 @@ public class ProfileConfCreatorDemo
 
             for(ASN1ObjectIdentifier curveId : curveIds)
             {
-                String name = IoCertUtil.getCurveName(curveId);
+                String name = SecurityUtil.getCurveName(curveId);
                 CurveType curve = new CurveType();
                 curve.setOid(createOidType(curveId, name));
 

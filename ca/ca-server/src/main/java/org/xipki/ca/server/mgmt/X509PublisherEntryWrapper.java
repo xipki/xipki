@@ -39,8 +39,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.xipki.audit.api.AuditLoggingServiceRegister;
+import org.xipki.ca.api.CertPublisherException;
 import org.xipki.ca.api.publisher.X509CertPublisher;
-import org.xipki.ca.common.CertPublisherException;
 import org.xipki.ca.server.mgmt.api.PublisherEntry;
 import org.xipki.ca.server.publisher.OCSPCertPublisher;
 import org.xipki.common.CmpUtf8Pairs;

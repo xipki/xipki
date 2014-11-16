@@ -40,8 +40,8 @@ import java.security.cert.X509CRL;
 import java.util.Set;
 
 import org.apache.felix.gogo.commands.Option;
-import org.xipki.ca.common.PKIErrorException;
-import org.xipki.ca.common.RAWorkerException;
+import org.xipki.ca.client.api.PKIErrorException;
+import org.xipki.ca.client.api.RAWorkerException;
 
 /**
  * @author Lijun Liao

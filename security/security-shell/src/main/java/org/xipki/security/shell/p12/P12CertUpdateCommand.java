@@ -46,7 +46,7 @@ import java.util.Set;
 import org.apache.felix.gogo.commands.Command;
 import org.apache.felix.gogo.commands.Option;
 import org.xipki.common.CmpUtf8Pairs;
-import org.xipki.common.IoCertUtil;
+import org.xipki.common.SecurityUtil;
 import org.xipki.security.api.PasswordResolverException;
 import org.xipki.security.api.SignerException;
 
@@ -72,7 +72,7 @@ public class P12CertUpdateCommand extends P12SecurityCommand
         KeyStore ks = getKeyStore();
 
         char[] pwd = getPassword();
-        X509Certificate newCert = IoCertUtil.parseCert(certFile);
+        X509Certificate newCert = SecurityUtil.parseCert(certFile);
 
         assertMatch(newCert, new String(pwd));
 
@@ -99,10 +99,10 @@ public class P12CertUpdateCommand extends P12SecurityCommand
         {
             for(String caCertFile : caCertFiles)
             {
-                caCerts.add(IoCertUtil.parseCert(caCertFile));
+                caCerts.add(SecurityUtil.parseCert(caCertFile));
             }
         }
-        X509Certificate[] certChain = IoCertUtil.buildCertPath(newCert, caCerts);
+        X509Certificate[] certChain = SecurityUtil.buildCertPath(newCert, caCerts);
 
         ks.setKeyEntry(keyname, key, pwd, certChain);
 

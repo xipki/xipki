@@ -40,7 +40,7 @@ import java.security.cert.X509Certificate;
 import org.apache.felix.gogo.commands.Command;
 import org.apache.felix.gogo.commands.Option;
 import org.xipki.ca.server.mgmt.api.CmpResponderEntry;
-import org.xipki.common.IoCertUtil;
+import org.xipki.common.SecurityUtil;
 import org.xipki.security.api.SecurityFactory;
 
 /**
@@ -73,7 +73,7 @@ public class ResponderSetCommand extends CaCommand
         X509Certificate signerCert = null;
         if(certFile != null)
         {
-            signerCert = IoCertUtil.parseCert(certFile);
+            signerCert = SecurityUtil.parseCert(certFile);
             entry.setCertificate(signerCert);
         }
         entry.setType(signerType);

@@ -37,8 +37,8 @@ package org.xipki.ca.api.publisher;
 
 import java.security.cert.CertificateEncodingException;
 
-import org.xipki.ca.common.RequestorInfo;
-import org.xipki.ca.common.X509CertificateWithMetaInfo;
+import org.xipki.ca.api.RequestorInfo;
+import org.xipki.ca.api.X509CertificateWithMetaInfo;
 import org.xipki.common.CertRevocationInfo;
 import org.xipki.common.ParamChecker;
 

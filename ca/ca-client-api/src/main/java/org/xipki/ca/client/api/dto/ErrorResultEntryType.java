@@ -35,7 +35,7 @@
 
 package org.xipki.ca.client.api.dto;
 
-import org.xipki.ca.common.PKIStatusInfo;
+import org.xipki.ca.common.cmp.PKIStatusInfo;
 import org.xipki.common.ParamChecker;
 
 /**

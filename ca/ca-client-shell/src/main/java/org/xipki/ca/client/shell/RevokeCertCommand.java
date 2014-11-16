@@ -41,10 +41,10 @@ import java.security.cert.X509Certificate;
 import org.apache.felix.gogo.commands.Command;
 import org.apache.felix.gogo.commands.Option;
 import org.bouncycastle.asn1.x500.X500Name;
-import org.xipki.ca.common.CertIDOrError;
-import org.xipki.ca.common.PKIStatusInfo;
+import org.xipki.ca.client.api.CertIDOrError;
+import org.xipki.ca.common.cmp.PKIStatusInfo;
 import org.xipki.common.CRLReason;
-import org.xipki.common.IoCertUtil;
+import org.xipki.common.SecurityUtil;
 
 /**
  * @author Lijun Liao
@@ -91,12 +91,12 @@ public class RevokeCertCommand extends UnRevRemoveCertCommand
         CertIDOrError certIdOrError;
         if(certFile != null)
         {
-            X509Certificate cert = IoCertUtil.parseCert(certFile);
+            X509Certificate cert = SecurityUtil.parseCert(certFile);
             certIdOrError = raWorker.revokeCert(cert, crlReason.getCode());
         }
         else
         {
-            X509Certificate caCert = IoCertUtil.parseCert(caCertFile);
+            X509Certificate caCert = SecurityUtil.parseCert(caCertFile);
             X500Name issuer = X500Name.getInstance(caCert.getSubjectX500Principal().getEncoded());
             certIdOrError = raWorker.revokeCert(issuer, new BigInteger(serialNumber), crlReason.getCode());
         }

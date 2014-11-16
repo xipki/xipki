@@ -89,9 +89,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.common.CmpUtf8Pairs;
 import org.xipki.common.ConfigurationException;
-import org.xipki.common.IoCertUtil;
+import org.xipki.common.IoUtil;
 import org.xipki.common.LogUtil;
 import org.xipki.common.ParamChecker;
+import org.xipki.common.SecurityUtil;
 import org.xipki.security.api.ConcurrentContentSigner;
 import org.xipki.security.api.NoIdleSignerException;
 import org.xipki.security.api.PasswordResolver;
@@ -220,7 +221,7 @@ public class SecurityFactoryImpl implements SecurityFactory
             boolean valid = verifier.verify(signatureValue);
             if(valid == false)
             {
-                String subject = IoCertUtil.canonicalizeName(cert.getSubjectX500Principal());
+                String subject = SecurityUtil.canonicalizeName(cert.getSubjectX500Principal());
 
                 StringBuilder sb = new StringBuilder();
                 sb.append("key and certificate not match. ");
@@ -393,7 +394,7 @@ public class SecurityFactoryImpl implements SecurityFactory
                     String fn = s.substring("file:".length());
                     try
                     {
-                        keystoreStream = new FileInputStream(IoCertUtil.expandFilepath(fn));
+                        keystoreStream = new FileInputStream(IoUtil.expandFilepath(fn));
                     } catch (FileNotFoundException e)
                     {
                         throw new SignerException("File not found: " + fn);

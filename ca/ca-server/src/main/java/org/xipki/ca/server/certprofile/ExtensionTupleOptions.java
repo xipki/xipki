@@ -37,8 +37,8 @@ package org.xipki.ca.server.certprofile;
 
 import java.util.List;
 
+import org.xipki.ca.api.EnvironmentParameterResolver;
 import org.xipki.ca.api.profile.ExtensionTuple;
-import org.xipki.common.EnvironmentParameterResolver;
 import org.xipki.common.ParamChecker;
 
 /**

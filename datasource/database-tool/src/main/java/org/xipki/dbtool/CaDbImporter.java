@@ -56,7 +56,7 @@ import org.bouncycastle.util.encoders.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.common.AbstractLoadTest;
-import org.xipki.common.IoCertUtil;
+import org.xipki.common.IoUtil;
 import org.xipki.datasource.api.DataSourceFactory;
 import org.xipki.datasource.api.DataSourceWrapper;
 import org.xipki.dbi.ca.jaxb.ObjectFactory;
@@ -98,7 +98,7 @@ public class CaDbImporter
     throws SQLException, PasswordResolverException, IOException, JAXBException
     {
         Properties props = DbPorter.getDbConfProperties(
-                new FileInputStream(IoCertUtil.expandFilepath(dbConfFile)));
+                new FileInputStream(IoUtil.expandFilepath(dbConfFile)));
         this.dataSource = dataSourceFactory.createDataSource(props, passwordResolver);
         JAXBContext jaxbContext = JAXBContext.newInstance(ObjectFactory.class);
         unmarshaller = jaxbContext.createUnmarshaller();
@@ -252,7 +252,7 @@ public class CaDbImporter
         for(CAInfoBundle entry : CAInfoBundles)
         {
             long nextSerial = Math.max(entry.CA_nextSerial, entry.should_CA_nextSerial);
-            String seqName = IoCertUtil.convertSequenceName("SERIAL_" + entry.CA_name);
+            String seqName = IoUtil.convertSequenceName("SERIAL_" + entry.CA_name);
             dataSource.dropAndCreateSequence(seqName, nextSerial);
         }
 

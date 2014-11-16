@@ -43,7 +43,7 @@ import java.net.URL;
 import java.net.URLEncoder;
 
 import org.bouncycastle.util.encoders.Base64;
-import org.xipki.common.IoCertUtil;
+import org.xipki.common.IoUtil;
 import org.xipki.ocsp.client.api.RequestOptions;
 
 /**
@@ -123,7 +123,7 @@ public class DefaultHttpOCSPRequestor extends AbstractOCSPRequestor
             throw new IOException("Bad Response: Mime type " + responseContentType + " not supported!");
         }
 
-        return IoCertUtil.read(inputstream);
+        return IoUtil.read(inputstream);
     }
 
 }

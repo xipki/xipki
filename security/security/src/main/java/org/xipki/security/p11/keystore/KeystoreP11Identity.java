@@ -57,7 +57,7 @@ import javax.crypto.NoSuchPaddingException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.common.IoCertUtil;
+import org.xipki.common.SecurityUtil;
 import org.xipki.common.ParamChecker;
 import org.xipki.security.SignerUtil;
 import org.xipki.security.SoftTokenContentSignerBuilder;
@@ -245,7 +245,7 @@ public class KeystoreP11Identity extends P11Identity
     private byte[] do_dsa_sign(byte[] hash)
     throws SignerException
     {
-        byte[] truncatedDigest = IoCertUtil.leftmost(hash, signatureKeyBitLength);
+        byte[] truncatedDigest = SecurityUtil.leftmost(hash, signatureKeyBitLength);
         Signature sig;
         try
         {

@@ -43,7 +43,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.security.cert.X509Certificate;
 
-import org.xipki.common.IoCertUtil;
+import org.xipki.common.IoUtil;
 import org.xipki.common.ParamChecker;
 import org.xipki.security.api.ConcurrentContentSigner;
 import org.xipki.security.api.SecurityFactory;
@@ -136,7 +136,7 @@ class DefaultHttpCmpRequestor extends X509CmpRequestor
                     + " not supported!");
         }
 
-        return IoCertUtil.read(inputStream);
+        return IoUtil.read(inputStream);
     }
 
 }

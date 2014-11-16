@@ -40,7 +40,8 @@ import java.io.ByteArrayInputStream;
 import org.apache.felix.gogo.commands.Command;
 import org.apache.felix.gogo.commands.Option;
 import org.bouncycastle.util.encoders.Base64;
-import org.xipki.common.IoCertUtil;
+import org.xipki.common.IoUtil;
+import org.xipki.common.SecurityUtil;
 
 /**
  * @author Lijun Liao
@@ -64,8 +65,8 @@ public class RequestorUpdateCommand extends CaCommand
     throws Exception
     {
         // check if the certificate is valid
-        byte[] certBytes = IoCertUtil.read(certFile);
-        IoCertUtil.parseCert(new ByteArrayInputStream(certBytes));
+        byte[] certBytes = IoUtil.read(certFile);
+        SecurityUtil.parseCert(new ByteArrayInputStream(certBytes));
         caManager.changeCmpRequestor(name, Base64.toBase64String(certBytes));
         out("updated CMP requestor " + name);
         return null;

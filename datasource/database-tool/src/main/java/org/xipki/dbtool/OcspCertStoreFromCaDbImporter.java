@@ -61,8 +61,9 @@ import org.slf4j.LoggerFactory;
 import org.xipki.common.CmpUtf8Pairs;
 import org.xipki.common.HashAlgoType;
 import org.xipki.common.HashCalculator;
-import org.xipki.common.IoCertUtil;
+import org.xipki.common.IoUtil;
 import org.xipki.common.ParamChecker;
+import org.xipki.common.SecurityUtil;
 import org.xipki.datasource.api.DataSourceWrapper;
 import org.xipki.dbi.ca.jaxb.CAConfigurationType;
 import org.xipki.dbi.ca.jaxb.CaHasPublisherType;
@@ -304,7 +305,7 @@ class OcspCertStoreFromCaDbImporter extends DbPorter
 
                     int idx = 1;
                     ps.setInt(idx++, issuer.getId());
-                    ps.setString(idx++, IoCertUtil.canonicalizeName(c.getSubject()));
+                    ps.setString(idx++, SecurityUtil.canonicalizeName(c.getSubject()));
                     ps.setLong(idx++, c.getTBSCertificate().getStartDate().getDate().getTime() / 1000);
                     ps.setLong(idx++, c.getTBSCertificate().getEndDate().getDate().getTime() / 1000);
                     ps.setString(idx++, HashCalculator.hexHash(HashAlgoType.SHA1, encodedName));
@@ -349,7 +350,7 @@ class OcspCertStoreFromCaDbImporter extends DbPorter
         int minId = 0;
         if(processLogFile.exists())
         {
-            byte[] content = IoCertUtil.read(processLogFile);
+            byte[] content = IoUtil.read(processLogFile);
             if(content != null && content.length > 2)
             {
                 String str = new String(content);
@@ -468,7 +469,7 @@ class OcspCertStoreFromCaDbImporter extends DbPorter
                 X509Certificate c;
                 try
                 {
-                    c = IoCertUtil.parseCert(encodedCert);
+                    c = SecurityUtil.parseCert(encodedCert);
                 } catch (Exception e)
                 {
                     LOG.error("could not parse certificate in file {}", filename);
@@ -491,7 +492,7 @@ class OcspCertStoreFromCaDbImporter extends DbPorter
                 ps_cert.setInt(idx++, currentId);
                 ps_cert.setInt(idx++, caId);
                 ps_cert.setLong(idx++, c.getSerialNumber().longValue());
-                ps_cert.setString(idx++, IoCertUtil.canonicalizeName(c.getSubjectX500Principal()));
+                ps_cert.setString(idx++, SecurityUtil.canonicalizeName(c.getSubjectX500Principal()));
                 ps_cert.setLong(idx++, cert.getLastUpdate());
                 ps_cert.setLong(idx++, c.getNotBefore().getTime() / 1000);
                 ps_cert.setLong(idx++, c.getNotAfter().getTime() / 1000);

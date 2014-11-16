@@ -44,7 +44,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.ca.server.mgmt.api.X509CAEntry;
 import org.xipki.ca.server.mgmt.shell.CaCommand;
-import org.xipki.common.IoCertUtil;
+import org.xipki.common.IoUtil;
 
 /**
  * @author Lijun Liao
@@ -87,7 +87,7 @@ public class EnrollCertCommand extends CaCommand
             return null;
         }
 
-        byte[] encodedP10Request = IoCertUtil.read(p10File);
+        byte[] encodedP10Request = IoUtil.read(p10File);
 
         try
         {

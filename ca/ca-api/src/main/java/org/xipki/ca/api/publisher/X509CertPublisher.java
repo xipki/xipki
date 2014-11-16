@@ -38,10 +38,10 @@ package org.xipki.ca.api.publisher;
 import java.security.cert.X509CRL;
 
 import org.xipki.audit.api.AuditLoggingServiceRegister;
-import org.xipki.ca.common.CertPublisherException;
-import org.xipki.ca.common.X509CertificateWithMetaInfo;
+import org.xipki.ca.api.CertPublisherException;
+import org.xipki.ca.api.EnvironmentParameterResolver;
+import org.xipki.ca.api.X509CertificateWithMetaInfo;
 import org.xipki.common.CertRevocationInfo;
-import org.xipki.common.EnvironmentParameterResolver;
 import org.xipki.datasource.api.DataSourceWrapper;
 import org.xipki.security.api.PasswordResolver;
 

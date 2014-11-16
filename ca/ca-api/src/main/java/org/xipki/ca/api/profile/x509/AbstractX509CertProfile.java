@@ -56,14 +56,14 @@ import org.bouncycastle.asn1.x509.ExtendedKeyUsage;
 import org.bouncycastle.asn1.x509.Extension;
 import org.bouncycastle.asn1.x509.Extensions;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
+import org.xipki.ca.api.BadCertTemplateException;
+import org.xipki.ca.api.CertProfileException;
+import org.xipki.ca.api.EnvironmentParameterResolver;
 import org.xipki.ca.api.profile.ExtensionOccurrence;
 import org.xipki.ca.api.profile.ExtensionTuple;
 import org.xipki.ca.api.profile.ExtensionTuples;
 import org.xipki.ca.api.profile.RDNOccurrence;
 import org.xipki.ca.api.profile.SubjectInfo;
-import org.xipki.ca.common.BadCertTemplateException;
-import org.xipki.ca.common.CertProfileException;
-import org.xipki.common.EnvironmentParameterResolver;
 import org.xipki.common.ObjectIdentifiers;
 import org.xipki.common.StringUtil;
 

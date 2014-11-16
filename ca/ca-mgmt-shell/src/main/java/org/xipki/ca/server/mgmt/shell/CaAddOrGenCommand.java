@@ -39,7 +39,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.felix.gogo.commands.Option;
-import org.xipki.ca.common.CertValidity;
+import org.xipki.ca.api.CertValidity;
 import org.xipki.security.api.SecurityFactory;
 
 /**

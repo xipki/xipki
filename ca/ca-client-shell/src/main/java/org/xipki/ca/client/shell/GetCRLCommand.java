@@ -45,8 +45,8 @@ import org.apache.felix.gogo.commands.Option;
 import org.bouncycastle.asn1.ASN1Integer;
 import org.bouncycastle.asn1.DEROctetString;
 import org.bouncycastle.asn1.x509.Extension;
-import org.xipki.ca.common.PKIErrorException;
-import org.xipki.ca.common.RAWorkerException;
+import org.xipki.ca.client.api.PKIErrorException;
+import org.xipki.ca.client.api.RAWorkerException;
 
 /**
  * @author Lijun Liao

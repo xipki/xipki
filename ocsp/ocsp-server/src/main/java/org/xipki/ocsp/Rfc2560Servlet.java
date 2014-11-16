@@ -61,7 +61,7 @@ import org.xipki.audit.api.AuditLevel;
 import org.xipki.audit.api.AuditLoggingService;
 import org.xipki.audit.api.AuditLoggingServiceRegister;
 import org.xipki.audit.api.AuditStatus;
-import org.xipki.common.IoCertUtil;
+import org.xipki.common.SecurityUtil;
 import org.xipki.common.LogUtil;
 import org.xipki.ocsp.OCSPRespWithCacheInfo.ResponseCacheInfo;
 
@@ -275,7 +275,7 @@ public class Rfc2560Servlet extends HttpServlet
                     }
                     // RFC 5019 6.2: This profile RECOMMENDS that the ETag value be the ASCII HEX representation of the
                     // SHA1 hash of the OCSPResponse structure.
-                    response.setHeader("ETag", "\"" + IoCertUtil.sha1sum(encodedOcspResp).toLowerCase() + "\"");
+                    response.setHeader("ETag", "\"" + SecurityUtil.sha1sum(encodedOcspResp).toLowerCase() + "\"");
 
                     // Max age must be in seconds in the cache-control header
                     long maxAge;

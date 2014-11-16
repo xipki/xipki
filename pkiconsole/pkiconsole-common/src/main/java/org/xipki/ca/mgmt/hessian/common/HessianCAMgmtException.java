@@ -35,7 +35,7 @@
 
 package org.xipki.ca.mgmt.hessian.common;
 
-import org.xipki.ca.common.CAMgmtException;
+import org.xipki.ca.api.CAMgmtException;
 
 /**
  * @author Lijun Liao

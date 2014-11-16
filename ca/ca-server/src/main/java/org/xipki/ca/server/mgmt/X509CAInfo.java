@@ -46,12 +46,13 @@ import org.bouncycastle.asn1.cmp.CMPCertificate;
 import org.bouncycastle.asn1.x509.Certificate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xipki.ca.api.CAStatus;
+import org.xipki.ca.api.CertValidity;
 import org.xipki.ca.api.OperationException;
+import org.xipki.ca.api.X509CertificateWithMetaInfo;
 import org.xipki.ca.api.OperationException.ErrorCode;
-import org.xipki.ca.common.CAStatus;
-import org.xipki.ca.common.CertValidity;
-import org.xipki.ca.common.X509CertificateWithMetaInfo;
 import org.xipki.ca.server.PublicCAInfo;
+import org.xipki.ca.server.RandomSerialNumberGenerator;
 import org.xipki.ca.server.mgmt.api.X509CAEntry;
 import org.xipki.ca.server.mgmt.api.DuplicationMode;
 import org.xipki.ca.server.mgmt.api.Permission;
@@ -59,7 +60,6 @@ import org.xipki.ca.server.mgmt.api.ValidityMode;
 import org.xipki.ca.server.store.CertificateStore;
 import org.xipki.common.CertRevocationInfo;
 import org.xipki.common.ParamChecker;
-import org.xipki.common.RandomSerialNumberGenerator;
 
 /**
  * @author Lijun Liao

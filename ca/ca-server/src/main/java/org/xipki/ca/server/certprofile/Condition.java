@@ -38,10 +38,10 @@ package org.xipki.ca.server.certprofile;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.xipki.ca.api.EnvironmentParameterResolver;
 import org.xipki.ca.server.certprofile.jaxb.ConditionType;
 import org.xipki.ca.server.certprofile.jaxb.EnvParamType;
 import org.xipki.ca.server.certprofile.jaxb.OperatorType;
-import org.xipki.common.EnvironmentParameterResolver;
 
 /**
  * @author Lijun Liao

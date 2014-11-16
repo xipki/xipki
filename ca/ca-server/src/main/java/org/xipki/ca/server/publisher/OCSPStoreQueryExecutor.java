@@ -54,7 +54,7 @@ import org.bouncycastle.asn1.x509.Certificate;
 import org.bouncycastle.util.encoders.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.ca.common.X509CertificateWithMetaInfo;
+import org.xipki.ca.api.X509CertificateWithMetaInfo;
 import org.xipki.common.CertRevocationInfo;
 import org.xipki.common.HashAlgoType;
 import org.xipki.common.HashCalculator;

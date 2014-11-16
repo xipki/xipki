@@ -40,7 +40,7 @@ import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
 
 import org.bouncycastle.util.encoders.Base64;
-import org.xipki.common.IoCertUtil;
+import org.xipki.common.SecurityUtil;
 
 /**
  * @author Lijun Liao
@@ -117,10 +117,10 @@ public class CmpResponderEntry implements Serializable
         if(cert != null)
         {
             sb.append("\tissuer: ").append(
-                    IoCertUtil.canonicalizeName(cert.getIssuerX500Principal())).append('\n');
+                    SecurityUtil.canonicalizeName(cert.getIssuerX500Principal())).append('\n');
             sb.append("\tserialNumber: ").append(cert.getSerialNumber()).append('\n');
             sb.append("\tsubject: ").append(
-                    IoCertUtil.canonicalizeName(cert.getSubjectX500Principal())).append('\n');
+                    SecurityUtil.canonicalizeName(cert.getSubjectX500Principal())).append('\n');
             if(verbose)
             {
                 sb.append("\tencoded: ");
