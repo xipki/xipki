@@ -43,7 +43,7 @@ import org.apache.felix.gogo.commands.Option;
 import org.bouncycastle.asn1.x509.Certificate;
 import org.xipki.ca.client.shell.ClientCommand;
 import org.xipki.common.AbstractLoadTest;
-import org.xipki.common.IoCertUtil;
+import org.xipki.common.IoUtil;
 import org.xipki.datasource.api.DataSourceFactory;
 import org.xipki.datasource.api.DataSourceWrapper;
 import org.xipki.security.api.SecurityFactory;
@@ -120,9 +120,9 @@ public class CALoadTestRevokeCommand extends ClientCommand
         startMsg.append("\n");
         out(startMsg.toString());
 
-        Certificate caCert = Certificate.getInstance(IoCertUtil.read(caCertFile));
+        Certificate caCert = Certificate.getInstance(IoUtil.read(caCertFile));
         Properties props = new Properties();
-        props.load(new FileInputStream(IoCertUtil.expandFilepath(caDbConfFile)));
+        props.load(new FileInputStream(IoUtil.expandFilepath(caDbConfFile)));
         props.setProperty("autoCommit", "false");
         props.setProperty("readOnly", "true");
         props.setProperty("maximumPoolSize", "1");

@@ -65,7 +65,7 @@ import org.bouncycastle.cert.ocsp.OCSPReqBuilder;
 import org.bouncycastle.cert.ocsp.OCSPResp;
 import org.bouncycastle.operator.ContentSigner;
 import org.bouncycastle.operator.DigestCalculator;
-import org.xipki.common.IoCertUtil;
+import org.xipki.common.SecurityUtil;
 import org.xipki.ocsp.client.api.OCSPRequestor;
 import org.xipki.ocsp.client.api.OCSPRequestorException;
 import org.xipki.ocsp.client.api.RequestOptions;
@@ -254,7 +254,7 @@ public abstract class AbstractOCSPRequestor implements OCSPRequestor
                         {
                             try
                             {
-                                cert = IoCertUtil.parseCert(signerCertFile);
+                                cert = SecurityUtil.parseCert(signerCertFile);
                             } catch (CertificateException e)
                             {
                                 throw new OCSPRequestorException(

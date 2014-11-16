@@ -52,15 +52,15 @@ import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.Certificate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xipki.ca.client.api.CertIDOrError;
+import org.xipki.ca.client.api.PKIErrorException;
 import org.xipki.ca.client.api.RAWorker;
+import org.xipki.ca.client.api.RAWorkerException;
 import org.xipki.ca.client.api.dto.RevokeCertRequestEntryType;
 import org.xipki.ca.client.api.dto.RevokeCertRequestType;
-import org.xipki.ca.common.CertIDOrError;
-import org.xipki.ca.common.PKIErrorException;
-import org.xipki.ca.common.RAWorkerException;
 import org.xipki.common.AbstractLoadTest;
 import org.xipki.common.CRLReason;
-import org.xipki.common.IoCertUtil;
+import org.xipki.common.SecurityUtil;
 import org.xipki.common.ParamChecker;
 import org.xipki.datasource.api.DataSourceWrapper;
 
@@ -122,7 +122,7 @@ class CALoadTestRevoke extends AbstractLoadTest
             this.excludeSerials.add(caCert.getSerialNumber().getPositiveValue().longValue());
         }
 
-        String sha1Fp = IoCertUtil.sha1sum(caCert.getEncoded());
+        String sha1Fp = SecurityUtil.sha1sum(caCert.getEncoded());
         String sql = "SELECT ID FROM CAINFO WHERE SHA1_FP_CERT='" + sha1Fp + "'";
         Statement stmt = caDataSource.getConnection().createStatement();
         try

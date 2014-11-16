@@ -39,7 +39,7 @@ import java.security.cert.X509Certificate;
 
 import org.apache.felix.gogo.commands.Command;
 import org.apache.felix.gogo.commands.Option;
-import org.xipki.common.IoCertUtil;
+import org.xipki.common.SecurityUtil;
 import org.xipki.security.api.SecurityFactory;
 import org.xipki.security.api.p11.P11KeyIdentifier;
 import org.xipki.security.api.p11.P11WritableSlot;
@@ -69,7 +69,7 @@ public class P11CertAddCommand extends SecurityCommand
     protected Object doExecute()
     throws Exception
     {
-        X509Certificate cert = IoCertUtil.parseCert(certFile);
+        X509Certificate cert = SecurityUtil.parseCert(certFile);
         P11WritableSlot slot = getP11WritablSlot(moduleName, slotIndex);
         P11KeyIdentifier p11KeyId = slot.addCert(cert);
         out("Added certificate under " + p11KeyId);

@@ -33,45 +33,42 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.ca.common;
+package org.xipki.ca.client.api;
 
 import java.security.cert.Certificate;
-
-import org.xipki.common.ParamChecker;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * @author Lijun Liao
  */
 
-public class CertificateOrError
+public class EnrollCertResult
 {
-    private final Certificate certificate;
-    private final PKIStatusInfo error;
 
-    public CertificateOrError(Certificate certificate)
+    private final Certificate caCertificate;
+    private final Map<String, CertificateOrError> certificatesOrErrors;
+
+    public EnrollCertResult(Certificate caCertificate,
+            Map<String, CertificateOrError> certificatesOrErrors)
     {
-        ParamChecker.assertNotNull("certificate", certificate);
-
-        this.certificate = certificate;
-        this.error = null;
+        this.caCertificate = caCertificate;
+        this.certificatesOrErrors = certificatesOrErrors;
     }
 
-    public CertificateOrError(PKIStatusInfo error)
+    public Certificate getCaCertificate()
     {
-        ParamChecker.assertNotNull("error", error);
-
-        this.certificate = null;
-        this.error = error;
+        return caCertificate;
     }
 
-    public Certificate getCertificate()
+    public CertificateOrError getCertificateOrError(String id)
     {
-        return certificate;
+        return certificatesOrErrors.get(id);
     }
 
-    public PKIStatusInfo getError()
+    public Set<String> getAllIds()
     {
-        return error;
+        return certificatesOrErrors.keySet();
     }
 
 }

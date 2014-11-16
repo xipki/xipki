@@ -33,84 +33,33 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.ca.common;
+package org.xipki.security.p11.sun;
 
-import java.security.cert.CertificateEncodingException;
-import java.security.cert.X509Certificate;
-
-import org.bouncycastle.crypto.RuntimeCryptoException;
-import org.xipki.common.IoCertUtil;
-import org.xipki.common.ParamChecker;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
+import java.security.Provider;
 
 /**
  * @author Lijun Liao
  */
 
-public class X509CertificateWithMetaInfo
+public class XipkiSunECProvider extends Provider
 {
-    private Integer certId;
-    private final X509Certificate cert;
-    private final String subject;
-    private final byte[] encodedCert;
+    private static final long serialVersionUID = 1L;
+    public static final String NAME = "XiPKI-SunEC";
+    public static final double VERSION = 1.0;
 
-    public X509CertificateWithMetaInfo(X509Certificate cert)
+    public XipkiSunECProvider()
     {
-        this(cert, null);
-    }
+        super(NAME, VERSION, NAME + " (version " + VERSION + ")");
 
-    public X509CertificateWithMetaInfo(X509Certificate cert, byte[] encodedCert)
-    {
-        ParamChecker.assertNotNull("cert", cert);
-
-        this.cert = cert;
-
-        this.subject = IoCertUtil.canonicalizeName(cert.getSubjectX500Principal());
-
-        if(encodedCert == null)
+        AccessController.doPrivileged(new PrivilegedAction<Object>()
         {
-            try
+            public Object run()
             {
-                this.encodedCert = cert.getEncoded();
-            } catch (CertificateEncodingException e)
-            {
-                throw new RuntimeCryptoException("could not encode certificate: " + e.getMessage());
+                put("AlgorithmParameters.EC", ECParameters.class.getName());
+                return null;
             }
-        }
-        else
-        {
-            this.encodedCert = encodedCert;
-        }
+        });
     }
-
-    public X509Certificate getCert()
-    {
-        return cert;
-    }
-
-    public byte[] getEncodedCert()
-    {
-        return encodedCert;
-    }
-
-    public String getSubject()
-    {
-        return subject;
-    }
-
-    @Override
-    public String toString()
-    {
-        return cert.toString();
-    }
-
-    public Integer getCertId()
-    {
-        return certId;
-    }
-
-    public void setCertId(Integer certId)
-    {
-        this.certId = certId;
-    }
-
 }

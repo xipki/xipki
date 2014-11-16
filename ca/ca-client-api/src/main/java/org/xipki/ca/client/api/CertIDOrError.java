@@ -33,41 +33,45 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.ca.common;
+package org.xipki.ca.client.api;
+
+import org.bouncycastle.asn1.crmf.CertId;
+import org.xipki.ca.common.cmp.PKIStatusInfo;
+import org.xipki.common.ParamChecker;
 
 /**
  * @author Lijun Liao
  */
 
-public enum CAStatus
+public class CertIDOrError
 {
-    PENDING("pending"),
-    ACTIVE ("active"),
-    INACTIVE ("inactive");
+    private final CertId certId;
+    private final PKIStatusInfo error;
 
-    private String status;
-
-    private CAStatus(String status)
+    public CertIDOrError(CertId certId)
     {
-        this.status = status;
+        ParamChecker.assertNotNull("certId", certId);
+
+        this.certId = certId;
+        this.error = null;
     }
 
-    public String getStatus()
+    public CertIDOrError(PKIStatusInfo error)
     {
-        return status;
+        ParamChecker.assertNotNull("error", error);
+
+        this.certId = null;
+        this.error = error;
     }
 
-    public static CAStatus getCAStatus(String status)
+    public CertId getCertId()
     {
-        for(CAStatus value : values())
-        {
-            if(value.status.equalsIgnoreCase(status))
-            {
-                return value;
-            }
-        }
+        return certId;
+    }
 
-        return null;
+    public PKIStatusInfo getError()
+    {
+        return error;
     }
 
 }

@@ -33,34 +33,69 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.ca.common;
+package org.xipki.ca.common.cmp;
+
+import org.bouncycastle.asn1.cmp.PKIFreeText;
+import org.xipki.common.SecurityUtil;
 
 /**
  * @author Lijun Liao
  */
 
-public class CertPublisherException extends Exception
+public class PKIStatusInfo
 {
+    private final int status;
+    private final int pkiFailureInfo;
+    private final String statusMessage;
 
-    private static final long serialVersionUID = 1L;
-
-    public CertPublisherException()
+    public PKIStatusInfo(int status, int pkiFailureInfo, String statusMessage)
     {
+        this.status = status;
+        this.pkiFailureInfo = pkiFailureInfo;
+        this.statusMessage = statusMessage;
     }
 
-    public CertPublisherException(String message)
+    public PKIStatusInfo(int status)
     {
-        super(message);
+        this.status = status;
+        this.pkiFailureInfo = 0;
+        this.statusMessage = null;
     }
 
-    public CertPublisherException(Throwable cause)
+    public PKIStatusInfo(org.bouncycastle.asn1.cmp.PKIStatusInfo bcPKIStatusInfo)
     {
-        super(cause);
+        this.status = bcPKIStatusInfo.getStatus().intValue();
+        if(bcPKIStatusInfo.getFailInfo() != null)
+        {
+            this.pkiFailureInfo = bcPKIStatusInfo.getFailInfo().intValue();
+        }
+        else
+        {
+            this.pkiFailureInfo = 0;
+        }
+        PKIFreeText text = bcPKIStatusInfo.getStatusString();
+        this.statusMessage = text == null ? null : text.getStringAt(0).getString();
     }
 
-    public CertPublisherException(String message, Throwable cause)
+    public int getStatus()
     {
-        super(message, cause);
+        return status;
+    }
+
+    public int getPkiFailureInfo()
+    {
+        return pkiFailureInfo;
+    }
+
+    public String getStatusMessage()
+    {
+        return statusMessage;
+    }
+
+    @Override
+    public String toString()
+    {
+        return SecurityUtil.formatPKIStatusInfo(status, pkiFailureInfo, statusMessage);
     }
 
 }

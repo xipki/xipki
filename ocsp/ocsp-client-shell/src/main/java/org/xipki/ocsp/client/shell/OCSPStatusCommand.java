@@ -68,7 +68,8 @@ import org.bouncycastle.cert.ocsp.UnknownStatus;
 import org.bouncycastle.operator.ContentVerifierProvider;
 import org.bouncycastle.util.encoders.Hex;
 import org.xipki.common.CRLReason;
-import org.xipki.common.IoCertUtil;
+import org.xipki.common.IoUtil;
+import org.xipki.common.SecurityUtil;
 import org.xipki.ocsp.client.api.OCSPRequestor;
 import org.xipki.ocsp.client.api.RequestOptions;
 import org.xipki.security.KeyUtil;
@@ -112,14 +113,14 @@ public class OCSPStatusCommand extends AbstractOCSPStatusCommand
             return null;
         }
 
-        X509Certificate caCert = IoCertUtil.parseCert(caCertFile);
+        X509Certificate caCert = SecurityUtil.parseCert(caCertFile);
 
         byte[] encodedCert = null;
         BigInteger sn;
         if(certFile != null)
         {
-            encodedCert = IoCertUtil.read(certFile);
-            X509Certificate cert = IoCertUtil.parseCert(certFile);
+            encodedCert = IoUtil.read(certFile);
+            X509Certificate cert = SecurityUtil.parseCert(certFile);
             sn = cert.getSerialNumber();
         }
         else
@@ -162,7 +163,7 @@ public class OCSPStatusCommand extends AbstractOCSPStatusCommand
 
                 if(verbose.booleanValue())
                 {
-                    out("Responder is " + IoCertUtil.canonicalizeName(responderCerts[0].getSubject()));
+                    out("Responder is " + SecurityUtil.canonicalizeName(responderCerts[0].getSubject()));
                 }
             }
         }

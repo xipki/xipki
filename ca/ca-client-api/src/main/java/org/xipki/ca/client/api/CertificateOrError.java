@@ -33,39 +33,41 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.ca.common;
+package org.xipki.ca.client.api;
 
-import org.bouncycastle.asn1.crmf.CertId;
+import java.security.cert.Certificate;
+
+import org.xipki.ca.common.cmp.PKIStatusInfo;
 import org.xipki.common.ParamChecker;
 
 /**
  * @author Lijun Liao
  */
 
-public class CertIDOrError
+public class CertificateOrError
 {
-    private final CertId certId;
+    private final Certificate certificate;
     private final PKIStatusInfo error;
 
-    public CertIDOrError(CertId certId)
+    public CertificateOrError(Certificate certificate)
     {
-        ParamChecker.assertNotNull("certId", certId);
+        ParamChecker.assertNotNull("certificate", certificate);
 
-        this.certId = certId;
+        this.certificate = certificate;
         this.error = null;
     }
 
-    public CertIDOrError(PKIStatusInfo error)
+    public CertificateOrError(PKIStatusInfo error)
     {
         ParamChecker.assertNotNull("error", error);
 
-        this.certId = null;
+        this.certificate = null;
         this.error = error;
     }
 
-    public CertId getCertId()
+    public Certificate getCertificate()
     {
-        return certId;
+        return certificate;
     }
 
     public PKIStatusInfo getError()

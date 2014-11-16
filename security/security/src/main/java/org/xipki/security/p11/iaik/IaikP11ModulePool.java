@@ -59,7 +59,7 @@ public class IaikP11ModulePool
 {
     private static final Logger LOG = LoggerFactory.getLogger(IaikP11ModulePool.class);
 
-    private final Map<String, IaikExtendedModule> modules = new HashMap<>();
+    private final Map<String, IaikP11Module> modules = new HashMap<>();
 
     private String defaultModuleName;
 
@@ -72,7 +72,7 @@ public class IaikP11ModulePool
 
     public synchronized void removeModule(String moduleName)
     {
-        IaikExtendedModule module = modules.remove(moduleName);
+        IaikP11Module module = modules.remove(moduleName);
         if(module == null && defaultModuleName != null &&
                 SecurityFactory.DEFAULT_P11MODULE_NAME.equals(moduleName))
         {
@@ -100,10 +100,10 @@ public class IaikP11ModulePool
         }
     }
 
-    public IaikExtendedModule getModule(String moduleName)
+    public IaikP11Module getModule(String moduleName)
     throws SignerException
     {
-        IaikExtendedModule module = modules.get(moduleName);
+        IaikP11Module module = modules.get(moduleName);
         if(module == null && defaultModuleName != null &&
                 SecurityFactory.DEFAULT_P11MODULE_NAME.equals(moduleName))
         {
@@ -112,10 +112,10 @@ public class IaikP11ModulePool
         return module;
     }
 
-    public synchronized IaikExtendedModule getModule(P11ModuleConf moduleConf)
+    public synchronized IaikP11Module getModule(P11ModuleConf moduleConf)
     throws SignerException
     {
-        IaikExtendedModule extModule = modules.get(moduleConf.getName());
+        IaikP11Module extModule = modules.get(moduleConf.getName());
         if(extModule != null)
         {
             return extModule;
@@ -181,7 +181,7 @@ public class IaikP11ModulePool
             throw new SignerException(t.getMessage());
         }
 
-        extModule = new IaikExtendedModule(module, moduleConf);
+        extModule = new IaikP11Module(module, moduleConf);
         modules.put(moduleConf.getName(), extModule);
 
         return extModule;

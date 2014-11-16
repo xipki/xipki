@@ -76,7 +76,7 @@ import org.xipki.ca.common.cmp.ProtectionVerificationResult;
 import org.xipki.ca.common.cmp.PKIResponse;
 import org.xipki.common.CmpUtf8Pairs;
 import org.xipki.common.CustomObjectIdentifiers;
-import org.xipki.common.IoCertUtil;
+import org.xipki.common.SecurityUtil;
 import org.xipki.common.ParamChecker;
 import org.xipki.security.api.ConcurrentContentSigner;
 import org.xipki.security.api.NoIdleSignerException;
@@ -282,7 +282,7 @@ public abstract class CmpRequestor
             ErrorResultType errorResult = checkAndBuildErrorResultIfRequired(response);
             if(errorResult != null)
             {
-                throw new CmpRequestorException(IoCertUtil.formatPKIStatusInfo(
+                throw new CmpRequestorException(SecurityUtil.formatPKIStatusInfo(
                         errorResult.getStatus(), errorResult.getPkiFailureInfo(), errorResult.getStatusMessage()));
             }
         }
@@ -293,7 +293,7 @@ public abstract class CmpRequestor
         if(PKIBody.TYPE_ERROR == bodyType)
         {
             ErrorMsgContent content = (ErrorMsgContent) respBody.getContent();
-            throw new CmpRequestorException(IoCertUtil.formatPKIStatusInfo(
+            throw new CmpRequestorException(SecurityUtil.formatPKIStatusInfo(
                     content.getPKIStatusInfo()));
         }
         else if(PKIBody.TYPE_GEN_REP != bodyType)
@@ -408,7 +408,7 @@ public abstract class CmpRequestor
         X509Certificate x509Cert;
         try
         {
-            x509Cert = IoCertUtil.parseCert(cert.getEncoded());
+            x509Cert = SecurityUtil.parseCert(cert.getEncoded());
         } catch (CertificateException | IOException e)
         {
             throw new CmpRequestorException("Returned certificate is invalid: " + e.getMessage(), e);
@@ -423,7 +423,7 @@ public abstract class CmpRequestor
 
                 if(verifyProtection.getProtectionResult() != ProtectionResult.VALID)
                 {
-                    throw new CmpRequestorException(IoCertUtil.formatPKIStatusInfo(
+                    throw new CmpRequestorException(SecurityUtil.formatPKIStatusInfo(
                             ClientErrorCode.PKIStatus_RESPONSE_ERROR,
                             PKIFailureInfo.badMessageCheck, "message check of the response failed"));
                 }
@@ -494,7 +494,7 @@ public abstract class CmpRequestor
 
     protected ErrorResultType buildErrorResult(ErrorMsgContent bodyContent)
     {
-        org.xipki.ca.common.PKIStatusInfo statusInfo = new org.xipki.ca.common.PKIStatusInfo(
+        org.xipki.ca.common.cmp.PKIStatusInfo statusInfo = new org.xipki.ca.common.cmp.PKIStatusInfo(
                 bodyContent.getPKIStatusInfo());
         return new ErrorResultType(statusInfo.getStatus(), statusInfo.getPkiFailureInfo(), statusInfo.getStatusMessage());
     }
@@ -605,6 +605,6 @@ public abstract class CmpRequestor
 
     private static String canonicalizeSortedName(X500Name name)
     {
-        return IoCertUtil.canonicalizeName(IoCertUtil.sortX509Name(name));
+        return SecurityUtil.canonicalizeName(SecurityUtil.sortX509Name(name));
     }
 }

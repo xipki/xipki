@@ -62,11 +62,11 @@ import org.bouncycastle.asn1.x509.Extension;
 import org.bouncycastle.util.encoders.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.common.CertArt;
 import org.xipki.common.HashAlgoType;
 import org.xipki.common.HashCalculator;
-import org.xipki.common.IoCertUtil;
+import org.xipki.common.IoUtil;
 import org.xipki.common.ParamChecker;
+import org.xipki.common.SecurityUtil;
 import org.xipki.datasource.api.DataSourceWrapper;
 import org.xipki.dbi.ca.jaxb.CainfoType;
 import org.xipki.dbi.ca.jaxb.CertStoreType;
@@ -195,13 +195,13 @@ class CaCertStoreDbImporter extends DbPorter
                     String b64Cert = info.getCert();
                     byte[] encodedCert = Base64.decode(b64Cert);
 
-                    X509Certificate c = IoCertUtil.parseCert(encodedCert);
+                    X509Certificate c = SecurityUtil.parseCert(encodedCert);
 
                     String hexSha1FpCert = HashCalculator.hexHash(HashAlgoType.SHA1, encodedCert);
 
                     int idx = 1;
                     ps.setInt(idx++, info.getId());
-                    ps.setString(idx++, IoCertUtil.canonicalizeName(c.getSubjectX500Principal()));
+                    ps.setString(idx++, SecurityUtil.canonicalizeName(c.getSubjectX500Principal()));
                     ps.setString(idx++, hexSha1FpCert);
                     ps.setString(idx++, b64Cert);
 
@@ -489,12 +489,12 @@ class CaCertStoreDbImporter extends DbPorter
                 try
                 {
                     String filename = baseDir + File.separator + crl.getCrlFile();
-                    byte[] encodedCrl = IoCertUtil.read(filename);
+                    byte[] encodedCrl = IoUtil.read(filename);
 
                     X509CRL c = null;
                     try
                     {
-                        c = IoCertUtil.parseCRL(new ByteArrayInputStream(encodedCrl));
+                        c = SecurityUtil.parseCRL(new ByteArrayInputStream(encodedCrl));
                     } catch (CertificateException | CRLException e)
                     {
                         LOG.error("could not parse CRL in file {}", filename);
@@ -576,7 +576,7 @@ class CaCertStoreDbImporter extends DbPorter
         int minId = 1;
         if(processLogFile.exists())
         {
-            byte[] content = IoCertUtil.read(processLogFile);
+            byte[] content = IoUtil.read(processLogFile);
             if(content != null && content.length > 2)
             {
                 String str = new String(content);
@@ -670,7 +670,7 @@ class CaCertStoreDbImporter extends DbPorter
                     continue;
                 }
 
-                int certArt = cert.getArt() == null ? CertArt.X509PKC.getCode() : cert.getArt();
+                int certArt = cert.getArt() == null ? 1 : cert.getArt();
 
                 n++;
 
@@ -710,7 +710,7 @@ class CaCertStoreDbImporter extends DbPorter
                 ps_cert.setInt(idx++, certArt);
                 ps_cert.setLong(idx++, cert.getLastUpdate());
                 ps_cert.setLong(idx++, c.getSerialNumber().getPositiveValue().longValue());
-                ps_cert.setString(idx++, IoCertUtil.canonicalizeName(c.getSubject()));
+                ps_cert.setString(idx++, SecurityUtil.canonicalizeName(c.getSubject()));
                 ps_cert.setLong(idx++, c.getTBSCertificate().getStartDate().getDate().getTime() / 1000);
                 ps_cert.setLong(idx++, c.getTBSCertificate().getEndDate().getDate().getTime() / 1000);
                 setBoolean(ps_cert, idx++, cert.isRevoked());
@@ -723,7 +723,7 @@ class CaCertStoreDbImporter extends DbPorter
                 setInt(ps_cert, idx++, cert.getUserId());
 
                 ps_cert.setString(idx++, HashCalculator.hexHash(HashAlgoType.SHA1, encodedKey));
-                String sha1FpSubject = IoCertUtil.sha1sum_canonicalized_name(c.getSubject());
+                String sha1FpSubject = SecurityUtil.sha1sum_canonicalized_name(c.getSubject());
                 ps_cert.setString(idx++, sha1FpSubject);
                 Extension extension = c.getTBSCertificate().getExtensions().getExtension(Extension.basicConstraints);
                 boolean ee = true;

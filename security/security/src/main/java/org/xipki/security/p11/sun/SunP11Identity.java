@@ -52,7 +52,7 @@ import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 
-import org.xipki.common.IoCertUtil;
+import org.xipki.common.SecurityUtil;
 import org.xipki.common.ParamChecker;
 import org.xipki.security.SignerUtil;
 import org.xipki.security.api.SignerException;
@@ -235,7 +235,7 @@ class SunP11Identity implements Comparable<SunP11Identity>
             throw new SignerException("Operation CKM_ECDSA is not allowed for " + publicKey.getAlgorithm() + " public key");
         }
 
-        byte[] truncatedDigest = IoCertUtil.leftmost(hash, signatureKeyBitLength);
+        byte[] truncatedDigest = SecurityUtil.leftmost(hash, signatureKeyBitLength);
 
         synchronized (dsaSignature)
         {
@@ -258,7 +258,7 @@ class SunP11Identity implements Comparable<SunP11Identity>
             throw new SignerException("Operation CKM_DSA is not allowed for " + publicKey.getAlgorithm() + " public key");
         }
 
-        byte[] truncatedDigest = IoCertUtil.leftmost(hash, signatureKeyBitLength);
+        byte[] truncatedDigest = SecurityUtil.leftmost(hash, signatureKeyBitLength);
         synchronized (dsaSignature)
         {
             try

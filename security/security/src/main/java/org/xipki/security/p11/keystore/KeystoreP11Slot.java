@@ -64,9 +64,12 @@ import org.bouncycastle.util.encoders.Hex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.common.CmpUtf8Pairs;
-import org.xipki.common.IoCertUtil;
+import org.xipki.common.IoUtil;
 import org.xipki.common.LogUtil;
 import org.xipki.common.ParamChecker;
+import org.xipki.common.SecurityUtil;
+import org.xipki.security.P12KeypairGenerator;
+import org.xipki.security.P12KeypairGenerator.ECDSAIdentityGenerator;
 import org.xipki.security.api.P12KeypairGenerationResult;
 import org.xipki.security.api.PasswordResolverException;
 import org.xipki.security.api.SecurityFactory;
@@ -76,8 +79,6 @@ import org.xipki.security.api.p11.P11KeyIdentifier;
 import org.xipki.security.api.p11.P11KeypairGenerationResult;
 import org.xipki.security.api.p11.P11SlotIdentifier;
 import org.xipki.security.api.p11.P11WritableSlot;
-import org.xipki.security.p10.P12KeypairGenerator;
-import org.xipki.security.p10.P12KeypairGenerator.ECDSAIdentityGenerator;
 
 /**
  * @author Lijun Liao
@@ -104,7 +105,7 @@ public class KeystoreP11Slot implements P11WritableSlot
             keyLabelBytes = keyLabel.getBytes();
         }
 
-        String sha1Fp = IoCertUtil.sha1sum(keyLabelBytes);
+        String sha1Fp = SecurityUtil.sha1sum(keyLabelBytes);
         return Hex.decode(sha1Fp.substring(0, 16));
     }
 
@@ -158,8 +159,8 @@ public class KeystoreP11Slot implements P11WritableSlot
                 P11KeyIdentifier keyId = new P11KeyIdentifier(deriveKeyIdFromLabel(keyLabel), keyLabel);
                 KeystoreP11Identity existingP11Identify = getIdentity(keyId);
 
-                byte[] contentBytes = IoCertUtil.read(file);
-                String sha1sum = IoCertUtil.sha1sum(contentBytes);
+                byte[] contentBytes = IoUtil.read(file);
+                String sha1sum = SecurityUtil.sha1sum(contentBytes);
                 if(existingP11Identify != null && existingP11Identify.getSha1Sum().equals(sha1sum))
                 {
                     currentIdentifies.add(existingP11Identify);
@@ -207,7 +208,7 @@ public class KeystoreP11Slot implements P11WritableSlot
                     }
                 }
 
-                X509Certificate[] certificateChain = IoCertUtil.buildCertPath(cert, caCerts);
+                X509Certificate[] certificateChain = SecurityUtil.buildCertPath(cert, caCerts);
                 KeystoreP11Identity p11Identity = new KeystoreP11Identity(
                         sha1sum, slotId,
                         keyId, privKey, certificateChain, 20);
@@ -324,7 +325,7 @@ public class KeystoreP11Slot implements P11WritableSlot
         }
 
         Key key = ks.getKey(keyname, password);
-        X509Certificate[] certChain = IoCertUtil.buildCertPath(newCert, caCerts);
+        X509Certificate[] certChain = SecurityUtil.buildCertPath(newCert, caCerts);
 
         ks.setKeyEntry(keyname, key, password, certChain);
 
@@ -386,7 +387,7 @@ public class KeystoreP11Slot implements P11WritableSlot
         P12KeypairGenerationResult keyAndCert = gen.generateIdentity();
 
         File file = new File(slotDir, label + ".p12");
-        IoCertUtil.save(file, keyAndCert.getKeystore());
+        IoUtil.save(file, keyAndCert.getKeystore());
 
         return new P11KeypairGenerationResult(KeystoreP11Slot.deriveKeyIdFromLabel(label), label,
                 keyAndCert.getCertificate());
@@ -422,7 +423,7 @@ public class KeystoreP11Slot implements P11WritableSlot
         P12KeypairGenerationResult keyAndCert = gen.generateIdentity();
 
         File file = new File(slotDir, label + ".p12");
-        IoCertUtil.save(file, keyAndCert.getKeystore());
+        IoUtil.save(file, keyAndCert.getKeystore());
 
         return new P11KeypairGenerationResult(KeystoreP11Slot.deriveKeyIdFromLabel(label), label,
                 keyAndCert.getCertificate());
@@ -447,7 +448,7 @@ public class KeystoreP11Slot implements P11WritableSlot
         P12KeypairGenerationResult keyAndCert = gen.generateIdentity();
 
         File file = new File(slotDir, label + ".p12");
-        IoCertUtil.save(file, keyAndCert.getKeystore());
+        IoUtil.save(file, keyAndCert.getKeystore());
 
         return new P11KeypairGenerationResult(KeystoreP11Slot.deriveKeyIdFromLabel(label), label,
                 keyAndCert.getCertificate());

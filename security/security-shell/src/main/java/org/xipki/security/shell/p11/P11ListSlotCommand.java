@@ -59,14 +59,14 @@ import org.bouncycastle.asn1.sec.SECNamedCurves;
 import org.bouncycastle.asn1.teletrust.TeleTrusTNamedCurves;
 import org.bouncycastle.asn1.x9.X962NamedCurves;
 import org.bouncycastle.util.encoders.Hex;
-import org.xipki.common.IoCertUtil;
+import org.xipki.common.SecurityUtil;
 import org.xipki.security.api.SecurityFactory;
 import org.xipki.security.api.p11.P11Identity;
 import org.xipki.security.api.p11.P11KeyIdentifier;
 import org.xipki.security.api.p11.P11Module;
 import org.xipki.security.api.p11.P11SlotIdentifier;
 import org.xipki.security.api.p11.P11WritableSlot;
-import org.xipki.security.p11.iaik.IaikExtendedSlot;
+import org.xipki.security.p11.iaik.IaikP11Slot;
 import org.xipki.security.p11.keystore.KeystoreP11Slot;
 import org.xipki.security.shell.SecurityCommand;
 
@@ -116,9 +116,9 @@ public class P11ListSlotCommand extends SecurityCommand
             return null;
         }
 
-        if(p11slot instanceof IaikExtendedSlot)
+        if(p11slot instanceof IaikP11Slot)
         {
-            IaikExtendedSlot slot = (IaikExtendedSlot) p11slot;
+            IaikP11Slot slot = (IaikP11Slot) p11slot;
             List<PrivateKey> allPrivateObjects = slot.getAllPrivateObjects(null, null);
             int size = allPrivateObjects.size();
 
@@ -265,7 +265,7 @@ public class P11ListSlotCommand extends SecurityCommand
         try
         {
             X500Principal x500Prin = new X500Principal(bytes);
-            subject = IoCertUtil.canonicalizeName(x500Prin);
+            subject = SecurityUtil.canonicalizeName(x500Prin);
         }catch(Exception e)
         {
             subject = new String(bytes);
@@ -287,7 +287,7 @@ public class P11ListSlotCommand extends SecurityCommand
         try
         {
             X500Principal x500Prin = new X500Principal(bytes);
-            issuer = IoCertUtil.canonicalizeName(x500Prin);
+            issuer = SecurityUtil.canonicalizeName(x500Prin);
         }catch(Exception e)
         {
             issuer = new String(bytes);
@@ -301,7 +301,7 @@ public class P11ListSlotCommand extends SecurityCommand
         X509Certificate x509Cert = null;
         try
         {
-            x509Cert = IoCertUtil.parseCert(certBytes);
+            x509Cert = SecurityUtil.parseCert(certBytes);
         } catch (Exception e)
         {
             sb.append("\t\t\tError: " + e.getMessage());
@@ -318,13 +318,13 @@ public class P11ListSlotCommand extends SecurityCommand
             .append(x509Cert.getNotAfter())
             .append("\n");
         sb.append("\t\t\tSHA1 Sum:   ")
-            .append(IoCertUtil.sha1sum(certBytes))
+            .append(SecurityUtil.sha1sum(certBytes))
             .append("\n");
     }
 
     private void formatString(StringBuilder sb, X509Certificate cert)
     {
-        String subject = IoCertUtil.canonicalizeName(cert.getSubjectX500Principal());
+        String subject = SecurityUtil.canonicalizeName(cert.getSubjectX500Principal());
 
         if(verbose.booleanValue() == false)
         {
@@ -337,7 +337,7 @@ public class P11ListSlotCommand extends SecurityCommand
             .append(subject)
             .append("\n");
 
-        String issuer = IoCertUtil.canonicalizeName(cert.getIssuerX500Principal());
+        String issuer = SecurityUtil.canonicalizeName(cert.getIssuerX500Principal());
         sb.append("\t\t\tIssuer:     ")
             .append(issuer)
             .append("\n");
@@ -354,7 +354,7 @@ public class P11ListSlotCommand extends SecurityCommand
         sb.append("\t\t\tSHA1 Sum:   ");
         try
         {
-            sb.append(IoCertUtil.sha1sum(cert.getEncoded()));
+            sb.append(SecurityUtil.sha1sum(cert.getEncoded()));
         } catch (CertificateEncodingException e)
         {
             sb.append("ERROR");

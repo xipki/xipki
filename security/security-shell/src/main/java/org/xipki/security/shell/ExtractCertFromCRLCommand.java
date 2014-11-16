@@ -50,7 +50,7 @@ import org.bouncycastle.asn1.DEROctetString;
 import org.bouncycastle.asn1.DERSet;
 import org.bouncycastle.asn1.x509.Certificate;
 import org.xipki.common.CustomObjectIdentifiers;
-import org.xipki.common.IoCertUtil;
+import org.xipki.common.SecurityUtil;
 
 /**
  * @author Lijun Liao
@@ -72,7 +72,7 @@ public class ExtractCertFromCRLCommand extends SecurityCommand
     protected Object doExecute()
     throws Exception
     {
-        X509CRL crl = IoCertUtil.parseCRL(crlFile);
+        X509CRL crl = SecurityUtil.parseCRL(crlFile);
         String oidExtnCerts = CustomObjectIdentifiers.id_crl_certset;
         byte[] extnValue = crl.getExtensionValue(oidExtnCerts);
         if(extnValue == null)
@@ -108,7 +108,7 @@ public class ExtractCertFromCRLCommand extends SecurityCommand
             }
 
             byte[] certBytes = cert.getEncoded();
-            String sha1_fp_cert = IoCertUtil.sha1sum(certBytes);
+            String sha1_fp_cert = SecurityUtil.sha1sum(certBytes);
 
             ZipEntry certZipEntry = new ZipEntry(sha1_fp_cert + ".der");
             zip.putNextEntry(certZipEntry);

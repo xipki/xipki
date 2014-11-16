@@ -33,7 +33,7 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.security.p10;
+package org.xipki.security;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -79,8 +79,7 @@ import org.bouncycastle.operator.ContentSigner;
 import org.bouncycastle.operator.bc.BcContentSignerBuilder;
 import org.bouncycastle.operator.bc.BcDSAContentSignerBuilder;
 import org.bouncycastle.operator.bc.BcRSAContentSignerBuilder;
-import org.xipki.common.IoCertUtil;
-import org.xipki.security.KeyUtil;
+import org.xipki.common.SecurityUtil;
 import org.xipki.security.api.P12KeypairGenerationResult;
 import org.xipki.security.bcext.ECDSAContentSignerBuilder;
 
@@ -132,7 +131,7 @@ public abstract class P12KeypairGenerator
         Date notAfter = new Date(notBefore.getTime() + validity * DAY );
 
         X500Name subjectDN = new X500Name(subject);
-        subjectDN = IoCertUtil.sortX509Name(subjectDN);
+        subjectDN = SecurityUtil.sortX509Name(subjectDN);
         SubjectPublicKeyInfo subjectPublicKeyInfo = kp.getSubjectPublicKeyInfo();
         ContentSigner contentSigner = getContentSigner(kp.getKeypair().getPrivate());
 
@@ -269,7 +268,7 @@ public abstract class P12KeypairGenerator
         {
             super();
             this.keypair = keypair;
-            this.subjectPublicKeyInfo = IoCertUtil.toRfc3279Style(subjectPublicKeyInfo);
+            this.subjectPublicKeyInfo = SecurityUtil.toRfc3279Style(subjectPublicKeyInfo);
         }
 
         public KeyPair getKeypair()

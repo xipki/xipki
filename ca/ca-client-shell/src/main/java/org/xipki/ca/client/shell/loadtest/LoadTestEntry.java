@@ -41,7 +41,7 @@ import org.bouncycastle.asn1.x500.RDN;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x500.style.IETFUtils;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
-import org.xipki.common.IoCertUtil;
+import org.xipki.common.SecurityUtil;
 import org.xipki.common.ObjectIdentifiers;
 import org.xipki.common.ParamChecker;
 
@@ -82,7 +82,7 @@ public class LoadTestEntry
 
         private IncreasableSubject(String subjectTemplate, RandomDN randomDN)
         {
-            this.subjectTemplate = IoCertUtil.sortX509Name(new X500Name(subjectTemplate));
+            this.subjectTemplate = SecurityUtil.sortX509Name(new X500Name(subjectTemplate));
 
             switch(randomDN)
             {

@@ -41,7 +41,7 @@ import java.util.Set;
 
 import org.apache.felix.gogo.commands.Command;
 import org.apache.felix.gogo.commands.Option;
-import org.xipki.common.IoCertUtil;
+import org.xipki.common.SecurityUtil;
 import org.xipki.security.api.p11.P11KeyIdentifier;
 import org.xipki.security.api.p11.P11WritableSlot;
 
@@ -67,13 +67,13 @@ public class P11CertUpdateCommand extends P11SecurityCommand
     {
         P11WritableSlot slot = getP11WritablSlot(moduleName, slotIndex);
         P11KeyIdentifier keyIdentifier = getKeyIdentifier();
-        X509Certificate newCert = IoCertUtil.parseCert(certFile);
+        X509Certificate newCert = SecurityUtil.parseCert(certFile);
         Set<X509Certificate> caCerts = new HashSet<>();
         if(caCertFiles != null && caCertFiles.isEmpty() == false)
         {
             for(String caCertFile : caCertFiles)
             {
-                caCerts.add(IoCertUtil.parseCert(caCertFile));
+                caCerts.add(SecurityUtil.parseCert(caCertFile));
             }
         }
 

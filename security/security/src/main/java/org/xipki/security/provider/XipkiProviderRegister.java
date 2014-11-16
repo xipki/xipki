@@ -33,34 +33,37 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.ca.common;
+package org.xipki.security.provider;
+
+import java.security.Security;
+
+import org.xipki.security.api.SecurityFactory;
 
 /**
  * @author Lijun Liao
  */
 
-public class BadRequestException extends Exception
+public class XipkiProviderRegister
 {
-
-    private static final long serialVersionUID = 1L;
-
-    public BadRequestException()
+    public void regist()
     {
+        if(Security.getProperty(XipkiProvider.PROVIDER_NAME) == null)
+        {
+            Security.addProvider(new XipkiProvider());
+        }
     }
 
-    public BadRequestException(String message)
+    public void unregist()
     {
-        super(message);
+        if(Security.getProperty(XipkiProvider.PROVIDER_NAME) != null)
+        {
+            Security.removeProvider(XipkiProvider.PROVIDER_NAME);
+        }
     }
 
-    public BadRequestException(Throwable cause)
+    public void setSecurityFactory(SecurityFactory securityFactory)
     {
-        super(cause);
-    }
-
-    public BadRequestException(String message, Throwable cause)
-    {
-        super(message, cause);
+        XipkiKeyStoreSpi.setSecurityFactory(securityFactory);
     }
 
 }

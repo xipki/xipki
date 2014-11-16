@@ -33,7 +33,7 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.security.p10;
+package org.xipki.security;
 
 import java.security.cert.X509Certificate;
 
@@ -52,7 +52,7 @@ import org.xipki.security.api.SignerException;
  * @author Lijun Liao
  */
 
-public class Pkcs10RequestGenerator
+public class P10RequestGenerator
 {
 
     public PKCS10CertificationRequest generateRequest(

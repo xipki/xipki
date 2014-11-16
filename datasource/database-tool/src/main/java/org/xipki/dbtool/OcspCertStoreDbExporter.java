@@ -56,8 +56,9 @@ import javax.xml.bind.Unmarshaller;
 import org.bouncycastle.util.encoders.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.common.IoCertUtil;
+import org.xipki.common.IoUtil;
 import org.xipki.common.ParamChecker;
+import org.xipki.common.SecurityUtil;
 import org.xipki.datasource.api.DataSourceWrapper;
 import org.xipki.dbi.ocsp.jaxb.CertStoreType;
 import org.xipki.dbi.ocsp.jaxb.CertStoreType.CertsFiles;
@@ -239,7 +240,7 @@ class OcspCertStoreDbExporter extends DbPorter
         Integer minCertId = null;
         if(processLogFile.exists())
         {
-            byte[] content = IoCertUtil.read(processLogFile);
+            byte[] content = IoUtil.read(processLogFile);
             if(content != null && content.length > 0)
             {
                 minCertId = Integer.parseInt(new String(content).trim());
@@ -339,7 +340,7 @@ class OcspCertStoreDbExporter extends DbPorter
                         continue;
                     }
 
-                    String sha1_fp_cert = IoCertUtil.sha1sum(certBytes);
+                    String sha1_fp_cert = SecurityUtil.sha1sum(certBytes);
 
                     ZipEntry certZipEntry = new ZipEntry(sha1_fp_cert + ".der");
                     currentCertsZip.putNextEntry(certZipEntry);

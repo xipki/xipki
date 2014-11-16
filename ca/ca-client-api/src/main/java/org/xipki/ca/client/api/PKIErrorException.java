@@ -33,48 +33,35 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.ca.common;
+package org.xipki.ca.client.api;
 
-import org.bouncycastle.asn1.cmp.PKIFreeText;
-import org.xipki.common.IoCertUtil;
+import org.xipki.common.SecurityUtil;
 
 /**
  * @author Lijun Liao
  */
 
-public class PKIStatusInfo
+public class PKIErrorException extends Exception
 {
+    private static final long serialVersionUID = 1L;
+
     private final int status;
     private final int pkiFailureInfo;
     private final String statusMessage;
 
-    public PKIStatusInfo(int status, int pkiFailureInfo, String statusMessage)
+    public PKIErrorException(int status, int pkiFailureInfo, String statusMessage)
     {
+        super(SecurityUtil.formatPKIStatusInfo(status, pkiFailureInfo, statusMessage));
         this.status = status;
         this.pkiFailureInfo = pkiFailureInfo;
         this.statusMessage = statusMessage;
     }
 
-    public PKIStatusInfo(int status)
+    public PKIErrorException(int status)
     {
         this.status = status;
         this.pkiFailureInfo = 0;
         this.statusMessage = null;
-    }
-
-    public PKIStatusInfo(org.bouncycastle.asn1.cmp.PKIStatusInfo bcPKIStatusInfo)
-    {
-        this.status = bcPKIStatusInfo.getStatus().intValue();
-        if(bcPKIStatusInfo.getFailInfo() != null)
-        {
-            this.pkiFailureInfo = bcPKIStatusInfo.getFailInfo().intValue();
-        }
-        else
-        {
-            this.pkiFailureInfo = 0;
-        }
-        PKIFreeText text = bcPKIStatusInfo.getStatusString();
-        this.statusMessage = text == null ? null : text.getStringAt(0).getString();
     }
 
     public int getStatus()
@@ -90,12 +77,6 @@ public class PKIStatusInfo
     public String getStatusMessage()
     {
         return statusMessage;
-    }
-
-    @Override
-    public String toString()
-    {
-        return IoCertUtil.formatPKIStatusInfo(status, pkiFailureInfo, statusMessage);
     }
 
 }

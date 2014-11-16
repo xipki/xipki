@@ -41,9 +41,9 @@ import java.security.cert.X509Certificate;
 import org.apache.felix.gogo.commands.Command;
 import org.apache.felix.gogo.commands.Option;
 import org.bouncycastle.asn1.pkcs.CertificationRequest;
-import org.xipki.ca.common.CertificateOrError;
-import org.xipki.ca.common.EnrollCertResult;
-import org.xipki.common.IoCertUtil;
+import org.xipki.ca.client.api.CertificateOrError;
+import org.xipki.ca.client.api.EnrollCertResult;
+import org.xipki.common.IoUtil;
 
 /**
  * @author Lijun Liao
@@ -74,7 +74,7 @@ public class EnrollCertCommand extends ClientCommand
     throws Exception
     {
         CertificationRequest p10Req = CertificationRequest.getInstance(
-                IoCertUtil.read(p10File));
+                IoUtil.read(p10File));
         EnrollCertResult result = raWorker.requestCert(p10Req, profile, null, user);
 
         X509Certificate cert = null;

@@ -68,7 +68,7 @@ import org.xipki.security.api.p11.P11SlotIdentifier;
  * @author Lijun Liao
  */
 
-public class XiPKIKeyStoreSpi extends KeyStoreSpi
+public class XipkiKeyStoreSpi extends KeyStoreSpi
 {
     private static SecurityFactory securityFactory;
 

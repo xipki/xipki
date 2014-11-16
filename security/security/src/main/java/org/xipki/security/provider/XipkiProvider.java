@@ -43,7 +43,7 @@ import java.security.Provider;
  * @author Lijun Liao
  */
 
-public class XiPKIProvider extends Provider
+public class XipkiProvider extends Provider
 {
     private static final long serialVersionUID = 1L;
 
@@ -66,7 +66,7 @@ public class XiPKIProvider extends Provider
     private static final String PROVIDER_INFO = "XiPKI JCA/JCE provider";
 
     @SuppressWarnings("unchecked")
-    public XiPKIProvider()
+    public XipkiProvider()
     {
         super(PROVIDER_NAME, PROVIDER_VERSION, PROVIDER_INFO);
         AccessController.doPrivileged(new MyPrivilegedAction(this));
@@ -75,8 +75,8 @@ public class XiPKIProvider extends Provider
     @SuppressWarnings("rawtypes")
     private static class MyPrivilegedAction implements PrivilegedAction
     {
-        private final XiPKIProvider provider;
-        MyPrivilegedAction(XiPKIProvider provider)
+        private final XipkiProvider provider;
+        MyPrivilegedAction(XipkiProvider provider)
         {
             this.provider = provider;
         }
@@ -84,7 +84,7 @@ public class XiPKIProvider extends Provider
         @Override
         public Object run()
         {
-            provider.put("KeyStore.PKCS11", XiPKIKeyStoreSpi.class.getName());
+            provider.put("KeyStore.PKCS11", XipkiKeyStoreSpi.class.getName());
 
             provider.put("Signature.NONEwithRSA", RSADigestSignatureSpi.noneRSA.class.getName());
             provider.put("Signature.SHA1withRSA", RSADigestSignatureSpi.SHA1.class.getName());

@@ -39,16 +39,10 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
-import java.net.Inet4Address;
-import java.net.InetAddress;
-import java.net.NetworkInterface;
-import java.net.SocketException;
-import java.net.UnknownHostException;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchProviderException;
@@ -100,7 +94,7 @@ import org.bouncycastle.x509.extension.X509ExtensionUtil;
  * @author Lijun Liao
  */
 
-public class IoCertUtil
+public class SecurityUtil
 {
     public static final Map<Integer, String> statusTextMap = new HashMap<>();
     public static final String[] failureInfoTexts = new String[]
@@ -227,86 +221,19 @@ public class IoCertUtil
         return rdn;
     }
 
-    public static byte[] read(String fileName)
-    throws IOException
-    {
-        return read(new File(expandFilepath(fileName)));
-    }
-
-    public static byte[] read(File file)
-    throws IOException
-    {
-        return read(new FileInputStream(expandFilepath(file)));
-    }
-
-    public static byte[] read(InputStream in)
-    throws IOException
-    {
-        try
-        {
-            ByteArrayOutputStream bout = new ByteArrayOutputStream();
-            int readed = 0;
-            byte[] buffer = new byte[2048];
-            while ((readed = in.read(buffer)) != -1)
-            {
-                bout.write(buffer, 0, readed);
-            }
-
-            return bout.toByteArray();
-        } finally
-        {
-            if (in != null)
-            {
-                try
-                {
-                    in.close();
-                } catch (IOException e)
-                {
-                }
-            }
-        }
-    }
-
-    public static void save(String fileName, byte[] encoded)
-    throws IOException
-    {
-        save(new File(expandFilepath(fileName)), encoded);
-    }
-
-    public static void save(File file, byte[] encoded)
-    throws IOException
-    {
-        file = expandFilepath(file);
-
-        File parent = file.getParentFile();
-        if (parent != null && parent.exists() == false)
-        {
-            parent.mkdirs();
-        }
-
-        FileOutputStream out = new FileOutputStream(file);
-        try
-        {
-            out.write(encoded);
-        } finally
-        {
-            out.close();
-        }
-    }
-
     private static CertificateFactory certFact;
     private static Object certFactLock = new Object();
 
     public static X509Certificate parseCert(String fileName)
     throws IOException, CertificateException
     {
-        return parseCert(new File(expandFilepath(fileName)));
+        return parseCert(new File(IoUtil.expandFilepath(fileName)));
     }
 
     public static X509Certificate parseCert(File file)
     throws IOException, CertificateException
     {
-        FileInputStream in = new FileInputStream(expandFilepath(file));
+        FileInputStream in = new FileInputStream(IoUtil.expandFilepath(file));
         try
         {
             return parseCert(in);
@@ -351,7 +278,7 @@ public class IoCertUtil
     public static X509CRL parseCRL(String f)
     throws IOException, CertificateException, CRLException
     {
-        return parseCRL(new FileInputStream(expandFilepath(f)));
+        return parseCRL(new FileInputStream(IoUtil.expandFilepath(f)));
     }
 
     public static X509CRL parseCRL(InputStream crlStream)
@@ -596,7 +523,7 @@ public class IoCertUtil
         PKIFreeText text = pkiStatusInfo.getStatusString();
         String statusMessage = text == null ? null : text.getStringAt(0).getString();
 
-        return IoCertUtil.formatPKIStatusInfo(status, failureInfo, statusMessage);
+        return SecurityUtil.formatPKIStatusInfo(status, failureInfo, statusMessage);
     }
 
     public static String formatPKIStatusInfo(int status, int failureInfo, String statusMessage)
@@ -667,58 +594,6 @@ public class IoCertUtil
         return b >= 0 ? b : 256 + b;
     }
 
-    public static String getHostAddress()
-    throws SocketException
-    {
-        List<String> addresses = new LinkedList<>();
-
-        Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
-        while(interfaces.hasMoreElements())
-        {
-            NetworkInterface n = (NetworkInterface) interfaces.nextElement();
-            Enumeration<InetAddress> ee = n.getInetAddresses();
-            while (ee.hasMoreElements())
-            {
-                InetAddress i = (InetAddress) ee.nextElement();
-                if(i instanceof Inet4Address)
-                {
-                    addresses.add(((Inet4Address) i).getHostAddress());
-                }
-            }
-        }
-
-        for(String addr : addresses)
-        {
-            if(addr.startsWith("192.") == false && addr.startsWith("127.") == false)
-            {
-                return addr;
-            }
-        }
-
-        for(String addr : addresses)
-        {
-            if(addr.startsWith("127.") == false)
-            {
-                return addr;
-            }
-        }
-
-        if(addresses.size() > 0)
-        {
-            return addresses.get(0);
-        }
-        else
-        {
-            try
-            {
-                return InetAddress.getLocalHost().getHostAddress();
-            } catch (UnknownHostException e)
-            {
-                return "UNKNOWN";
-            }
-        }
-    }
-
     public static SubjectPublicKeyInfo toRfc3279Style(SubjectPublicKeyInfo publicKeyInfo)
     {
         ASN1ObjectIdentifier algOid = publicKeyInfo.getAlgorithm().getAlgorithm();
@@ -760,83 +635,6 @@ public class IoCertUtil
         }
 
         return curveName;
-    }
-
-    public static String expandFilepath(String path)
-    {
-        if (path.startsWith("~" + File.separator))
-        {
-            return System.getProperty("user.home") + path.substring(1);
-        }
-        else
-        {
-            return path;
-        }
-    }
-
-    public static File expandFilepath(File file)
-    {
-        String path = file.getPath();
-        String expandedPath = expandFilepath(path);
-        if(path.equals(expandedPath) == false)
-        {
-            file = new File(expandedPath);
-        }
-
-        return file;
-    }
-
-    public static String convertSequenceName(String sequenceName)
-    {
-        StringBuilder sb = new StringBuilder();
-        int n = sequenceName.length();
-        for(int i = 0; i < n; i++)
-        {
-            char c = sequenceName.charAt(i);
-            if((c >= '0' && c <= '9') || (c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z'))
-            {
-                sb.append(c);
-            }
-            else
-            {
-                sb.append("_");
-            }
-        }
-        return sb.toString();
-    }
-
-    public static String base64Encode(byte[] data, boolean withLineBreak)
-    {
-
-        String b64Str = Base64.toBase64String(data);
-        if(withLineBreak == false)
-        {
-            return b64Str;
-        }
-
-        if(b64Str.length() < 64)
-        {
-            return b64Str;
-        }
-
-        StringBuilder sb = new StringBuilder();
-        final int blockSize = 64;
-        final int size = b64Str.length();
-
-        final int nFullBlock = size / blockSize;
-
-        for(int i = 0; i < nFullBlock; i++)
-        {
-            int offset = i * blockSize;
-            sb.append(b64Str.subSequence(offset, offset + blockSize)).append("\n");
-        }
-
-        if(size % blockSize != 0)
-        {
-            sb.append(b64Str.substring(nFullBlock * blockSize)).append("\n");
-        }
-        sb.deleteCharAt(sb.length() - 1);
-        return sb.toString();
     }
 
     public static byte[] extractSKI(X509Certificate cert)

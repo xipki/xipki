@@ -21,7 +21,7 @@
       </list>
     </property>
   </bean>
-  <bean id="XiPKIProviderNssRegister" class="org.xipki.security.p11.sun.nss.XipkiNSSProviderRegister" init-method="regist" destroy-method="unregist"/>
+  <bean id="XipkiProviderNssRegister" class="org.xipki.security.p11.sun.nss.XipkiNSSProviderRegister" init-method="regist" destroy-method="unregist"/>
   <service ref="passwordResolverImpl" interface="org.xipki.security.api.PasswordResolver"/>
   <bean id="securityFactoryImpl" class="org.xipki.security.SecurityFactoryImpl">
     <property name="pkcs11Provider" value="${pkcs11.provider}"/>
@@ -34,7 +34,7 @@
   <bean id="pbePasswordResolver" class="org.xipki.security.PBEPasswordResolver">
     <property name="masterPasswordCallback" value="${masterPassword.callback}"/>
   </bean>
-  <bean id="XiPKIProviderRegister" class="org.xipki.security.provider.XiPKIProviderRegister" init-method="regist" destroy-method="unregist">
+  <bean id="XipkiProviderRegister" class="org.xipki.security.provider.XipkiProviderRegister" init-method="regist" destroy-method="unregist">
     <property name="securityFactory" ref="securityFactoryImpl"/>
   </bean>
   <bean id="httpHostnameVerifier" class="org.xipki.security.HttpsHostnameVerifier" init-method="init" destroy-method="shutdown">

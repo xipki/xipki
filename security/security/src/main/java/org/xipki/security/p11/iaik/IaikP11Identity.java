@@ -46,7 +46,7 @@ import java.security.interfaces.RSAPublicKey;
 import org.bouncycastle.asn1.ASN1EncodableVector;
 import org.bouncycastle.asn1.ASN1Integer;
 import org.bouncycastle.asn1.DERSequence;
-import org.xipki.common.IoCertUtil;
+import org.xipki.common.SecurityUtil;
 import org.xipki.security.api.SignerException;
 import org.xipki.security.api.p11.P11Identity;
 import org.xipki.security.api.p11.P11KeyIdentifier;
@@ -67,7 +67,7 @@ class IaikP11Identity extends P11Identity
         super(slotId, keyId, certificateChain, publicKey);
     }
 
-    public byte[] CKM_RSA_PKCS(IaikExtendedModule module,
+    public byte[] CKM_RSA_PKCS(IaikP11Module module,
             byte[] encodedDigestInfo)
     throws SignerException
     {
@@ -77,7 +77,7 @@ class IaikP11Identity extends P11Identity
                     publicKey.getAlgorithm() + " public key");
         }
 
-        IaikExtendedSlot slot = module.getSlot(slotId);
+        IaikP11Slot slot = module.getSlot(slotId);
         if(slot == null)
         {
             throw new SignerException("Could not find slot " + slotId);
@@ -86,7 +86,7 @@ class IaikP11Identity extends P11Identity
         return slot.CKM_RSA_PKCS(encodedDigestInfo, keyId);
     }
 
-    public byte[] CKM_RSA_X509(IaikExtendedModule module,
+    public byte[] CKM_RSA_X509(IaikP11Module module,
             byte[] hash)
     throws SignerException
     {
@@ -96,7 +96,7 @@ class IaikP11Identity extends P11Identity
                     publicKey.getAlgorithm() + " public key");
         }
 
-        IaikExtendedSlot slot = module.getSlot(slotId);
+        IaikP11Slot slot = module.getSlot(slotId);
         if(slot == null)
         {
             throw new SignerException("Could not find slot " + slotId);
@@ -105,7 +105,7 @@ class IaikP11Identity extends P11Identity
         return slot.CKM_RSA_X509(hash, keyId);
     }
 
-    public byte[] CKM_ECDSA(IaikExtendedModule module,
+    public byte[] CKM_ECDSA(IaikP11Module module,
             byte[] hash)
     throws SignerException
     {
@@ -114,19 +114,19 @@ class IaikP11Identity extends P11Identity
             throw new SignerException("Operation CKM_ECDSA is not allowed for " + publicKey.getAlgorithm() + " public key");
         }
 
-        IaikExtendedSlot slot = module.getSlot(slotId);
+        IaikP11Slot slot = module.getSlot(slotId);
         if(slot == null)
         {
             throw new SignerException("Could not find slot " + slotId);
         }
 
-        byte[] truncatedDigest = IoCertUtil.leftmost(hash, signatureKeyBitLength);
+        byte[] truncatedDigest = SecurityUtil.leftmost(hash, signatureKeyBitLength);
 
         byte[] signature = slot.CKM_ECDSA(truncatedDigest, keyId);
         return convertToX962Signature(signature);
     }
 
-    public byte[] CKM_DSA(IaikExtendedModule module,
+    public byte[] CKM_DSA(IaikP11Module module,
             byte[] hash)
     throws SignerException
     {
@@ -135,12 +135,12 @@ class IaikP11Identity extends P11Identity
             throw new SignerException("Operation CKM_DSA is not allowed for " + publicKey.getAlgorithm() + " public key");
         }
 
-        IaikExtendedSlot slot = module.getSlot(slotId);
+        IaikP11Slot slot = module.getSlot(slotId);
         if(slot == null)
         {
             throw new SignerException("Could not find slot " + slotId);
         }
-        byte[] truncatedDigest = IoCertUtil.leftmost(hash, signatureKeyBitLength);
+        byte[] truncatedDigest = SecurityUtil.leftmost(hash, signatureKeyBitLength);
         byte[] signature = slot.CKM_DSA(truncatedDigest, keyId);
         return convertToX962Signature(signature);
     }
