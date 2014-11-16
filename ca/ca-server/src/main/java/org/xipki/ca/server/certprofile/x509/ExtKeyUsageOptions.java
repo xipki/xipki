@@ -39,8 +39,8 @@ import java.util.List;
 import java.util.Set;
 
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
+import org.xipki.ca.api.EnvironmentParameterResolver;
 import org.xipki.ca.server.certprofile.Condition;
-import org.xipki.common.EnvironmentParameterResolver;
 import org.xipki.common.ParamChecker;
 
 /**

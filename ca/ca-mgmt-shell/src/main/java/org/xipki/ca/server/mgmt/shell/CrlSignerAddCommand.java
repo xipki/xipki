@@ -40,7 +40,7 @@ import java.security.cert.X509Certificate;
 import org.apache.felix.gogo.commands.Command;
 import org.apache.felix.gogo.commands.Option;
 import org.xipki.ca.server.mgmt.api.X509CrlSignerEntry;
-import org.xipki.common.IoCertUtil;
+import org.xipki.common.SecurityUtil;
 import org.xipki.security.api.SecurityFactory;
 
 /**
@@ -83,7 +83,7 @@ public class CrlSignerAddCommand extends CaCommand
         {
             if(signerCertFile != null)
             {
-                signerCert = IoCertUtil.parseCert(signerCertFile);
+                signerCert = SecurityUtil.parseCert(signerCertFile);
             }
 
             if(signerConf != null)

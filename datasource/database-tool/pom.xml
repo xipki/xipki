@@ -18,7 +18,7 @@
   <dependencies>
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>console-karaf</artifactId>
+      <artifactId>shell-base</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>

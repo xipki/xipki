@@ -37,8 +37,8 @@ package org.xipki.security.shell.p12;
 
 import org.apache.felix.gogo.commands.Command;
 import org.apache.felix.gogo.commands.Option;
+import org.xipki.security.P12KeypairGenerator;
 import org.xipki.security.api.P12KeypairGenerationResult;
-import org.xipki.security.p10.P12KeypairGenerator;
 
 /**
  * @author Lijun Liao

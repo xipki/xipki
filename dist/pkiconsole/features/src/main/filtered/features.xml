@@ -20,7 +20,7 @@
   <feature name="xipki-pkiconsole-shell" version="${project.version}" resolver="(obr)">
     <feature>xipki-pkiconsole</feature>
     <bundle>mvn:org.xipki/security/${project.version}</bundle>
-    <bundle>mvn:org.xipki/console-karaf/${project.version}</bundle>
+    <bundle>mvn:org.xipki/shell-base/${project.version}</bundle>
     <bundle>mvn:org.xipki/ca-mgmt-shell/${project.version}</bundle>
   </feature>
 </features>

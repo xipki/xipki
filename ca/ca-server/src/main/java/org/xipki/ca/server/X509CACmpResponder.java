@@ -114,21 +114,21 @@ import org.xipki.audit.api.AuditEvent;
 import org.xipki.audit.api.AuditEventData;
 import org.xipki.audit.api.AuditStatus;
 import org.xipki.audit.api.ChildAuditEvent;
+import org.xipki.ca.api.CAStatus;
+import org.xipki.ca.api.CmpControl;
+import org.xipki.ca.api.InsuffientPermissionException;
 import org.xipki.ca.api.OperationException;
 import org.xipki.ca.api.OperationException.ErrorCode;
+import org.xipki.ca.api.RequestorInfo;
 import org.xipki.ca.api.publisher.X509CertificateInfo;
-import org.xipki.ca.common.CAStatus;
-import org.xipki.ca.common.CmpControl;
-import org.xipki.ca.common.InsuffientPermissionException;
-import org.xipki.ca.common.RequestorInfo;
 import org.xipki.ca.common.cmp.CmpUtil;
 import org.xipki.ca.server.mgmt.api.Permission;
 import org.xipki.common.CRLReason;
 import org.xipki.common.CmpUtf8Pairs;
 import org.xipki.common.CustomObjectIdentifiers;
 import org.xipki.common.HealthCheckResult;
-import org.xipki.common.IoCertUtil;
 import org.xipki.common.LogUtil;
+import org.xipki.common.SecurityUtil;
 import org.xipki.common.XMLUtil;
 import org.xipki.security.api.ConcurrentContentSigner;
 import org.xipki.security.api.SecurityFactory;
@@ -589,7 +589,7 @@ public class X509CACmpResponder extends CmpResponder
                 ErrorMsgContent errorMsgContent = (ErrorMsgContent) respBody.getContent();
 
                 AuditStatus auditStatus = AuditStatus.FAILED;
-                org.xipki.ca.common.PKIStatusInfo pkiStatus = new org.xipki.ca.common.PKIStatusInfo(
+                org.xipki.ca.common.cmp.PKIStatusInfo pkiStatus = new org.xipki.ca.common.cmp.PKIStatusInfo(
                         errorMsgContent.getPKIStatusInfo());
 
                 if(pkiStatus.getPkiFailureInfo() == PKIFailureInfo.systemFailure)
@@ -808,7 +808,7 @@ public class X509CACmpResponder extends CmpResponder
             X500Name subject = certTemp.getSubject();
             if(childAuditEvent != null)
             {
-                childAuditEvent.addEventData(new AuditEventData("subject", IoCertUtil.canonicalizeName(subject)));
+                childAuditEvent.addEventData(new AuditEventData("subject", SecurityUtil.canonicalizeName(subject)));
             }
 
             SubjectPublicKeyInfo publicKeyInfo = certTemp.getSubjectPublicKeyInfo();

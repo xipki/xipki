@@ -58,7 +58,7 @@ import java.util.concurrent.ConcurrentSkipListSet;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.common.IoCertUtil;
+import org.xipki.common.SecurityUtil;
 import org.xipki.common.LogUtil;
 import org.xipki.common.ParamChecker;
 import org.xipki.security.api.SignerException;
@@ -122,7 +122,7 @@ public final class SunP11CryptService implements P11CryptService
             {
                 idx_sunec = i;
             }
-            else if(XiPKISunECProvider.NAME.equals(name))
+            else if(XipkiSunECProvider.NAME.equals(name))
             {
                 xipkiProv = providers[i];
                 idx_xipki = i;
@@ -133,12 +133,12 @@ public final class SunP11CryptService implements P11CryptService
         {
             if(xipkiProv == null)
             {
-                xipkiProv = new XiPKISunECProvider();
+                xipkiProv = new XipkiSunECProvider();
                 idx_xipki = providers.length;
             }
             else if(idx_sunec < idx_xipki)
             {
-                Security.removeProvider(XiPKISunECProvider.NAME);
+                Security.removeProvider(XipkiSunECProvider.NAME);
             }
 
             if(idx_sunec < idx_xipki)
@@ -261,7 +261,7 @@ public final class SunP11CryptService implements P11CryptService
                             if(pubKey instanceof ECPublicKey == false)
                             {
                                 // reparse the certificate due to bug in bcprov version 1.49
-                                signatureCert = IoCertUtil.parseCert(signatureCert.getEncoded());
+                                signatureCert = SecurityUtil.parseCert(signatureCert.getEncoded());
                                 pubKey = signatureCert.getPublicKey();
                             }
                         }

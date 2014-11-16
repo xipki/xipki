@@ -41,7 +41,8 @@ import org.apache.felix.gogo.commands.Command;
 import org.apache.felix.gogo.commands.Option;
 import org.bouncycastle.util.encoders.Base64;
 import org.xipki.ca.server.mgmt.api.CAManager;
-import org.xipki.common.IoCertUtil;
+import org.xipki.common.IoUtil;
+import org.xipki.common.SecurityUtil;
 import org.xipki.security.api.SecurityFactory;
 
 /**
@@ -82,8 +83,8 @@ public class ResponderUpdateCommand extends CaCommand
         }
         else if(certFile != null)
         {
-            byte[] certBytes = IoCertUtil.read(certFile);
-            IoCertUtil.parseCert(new ByteArrayInputStream(certBytes));
+            byte[] certBytes = IoUtil.read(certFile);
+            SecurityUtil.parseCert(new ByteArrayInputStream(certBytes));
             cert = Base64.toBase64String(certBytes);
         }
 

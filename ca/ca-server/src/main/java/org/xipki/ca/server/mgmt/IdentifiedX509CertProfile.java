@@ -41,16 +41,16 @@ import java.util.TimeZone;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.Extensions;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
+import org.xipki.ca.api.BadCertTemplateException;
+import org.xipki.ca.api.BadFormatException;
+import org.xipki.ca.api.CertProfileException;
+import org.xipki.ca.api.CertValidity;
+import org.xipki.ca.api.EnvironmentParameterResolver;
 import org.xipki.ca.api.profile.ExtensionOccurrence;
 import org.xipki.ca.api.profile.ExtensionTuples;
 import org.xipki.ca.api.profile.SubjectInfo;
 import org.xipki.ca.api.profile.x509.X509CertProfile;
 import org.xipki.ca.api.profile.x509.SpecialX509CertProfileBehavior;
-import org.xipki.ca.common.BadCertTemplateException;
-import org.xipki.ca.common.BadFormatException;
-import org.xipki.ca.common.CertProfileException;
-import org.xipki.ca.common.CertValidity;
-import org.xipki.common.EnvironmentParameterResolver;
 import org.xipki.common.ParamChecker;
 
 /**

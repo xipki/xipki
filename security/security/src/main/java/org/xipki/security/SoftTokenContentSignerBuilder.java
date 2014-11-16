@@ -87,7 +87,7 @@ import org.bouncycastle.operator.OperatorCreationException;
 import org.bouncycastle.operator.bc.BcContentSignerBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.common.IoCertUtil;
+import org.xipki.common.SecurityUtil;
 import org.xipki.common.ParamChecker;
 import org.xipki.security.api.ConcurrentContentSigner;
 import org.xipki.security.api.SignerException;
@@ -198,7 +198,7 @@ public class SoftTokenContentSignerBuilder
                 }
             }
 
-            this.certificateChain = IoCertUtil.buildCertPath(cert, caCerts);
+            this.certificateChain = SecurityUtil.buildCertPath(cert, caCerts);
         }catch(KeyStoreException | NoSuchProviderException | NoSuchAlgorithmException |
                 CertificateException | IOException | UnrecoverableKeyException | ClassCastException e)
         {

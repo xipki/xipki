@@ -45,9 +45,9 @@ import org.bouncycastle.asn1.x509.Certificate;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.bouncycastle.operator.ContentSigner;
 import org.bouncycastle.pkcs.PKCS10CertificationRequest;
+import org.xipki.security.P10RequestGenerator;
 import org.xipki.security.SecurityFactoryImpl;
 import org.xipki.security.api.ConcurrentContentSigner;
-import org.xipki.security.p10.Pkcs10RequestGenerator;
 
 /**
  * @author Lijun Liao
@@ -74,7 +74,7 @@ public class P12CertRequestGenCommand extends P12SecurityCommand
     protected Object doExecute()
     throws Exception
     {
-        Pkcs10RequestGenerator p10Gen = new Pkcs10RequestGenerator();
+        P10RequestGenerator p10Gen = new P10RequestGenerator();
         char[] pwd = getPassword();
 
         String signerConf = SecurityFactoryImpl.getKeystoreSignerConfWithoutAlgo(

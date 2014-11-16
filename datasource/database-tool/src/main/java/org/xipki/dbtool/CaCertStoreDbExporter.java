@@ -62,8 +62,9 @@ import org.bouncycastle.util.encoders.Base64;
 import org.bouncycastle.util.encoders.Hex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.common.IoCertUtil;
+import org.xipki.common.IoUtil;
 import org.xipki.common.ParamChecker;
+import org.xipki.common.SecurityUtil;
 import org.xipki.datasource.api.DataSourceWrapper;
 import org.xipki.dbi.ca.jaxb.CainfoType;
 import org.xipki.dbi.ca.jaxb.CertStoreType;
@@ -238,7 +239,7 @@ class CaCertStoreDbExporter extends DbPorter
 
                     String fp = fp(encodedCrl);
                     File f = new File(baseDir, "CRL" + File.separator + fp + ".crl");
-                    IoCertUtil.save(f, encodedCrl);
+                    IoUtil.save(f, encodedCrl);
 
                     CrlType crl = new CrlType();
 
@@ -541,7 +542,7 @@ class CaCertStoreDbExporter extends DbPorter
         Integer minId = null;
         if(processLogFile.exists())
         {
-            byte[] content = IoCertUtil.read(processLogFile);
+            byte[] content = IoUtil.read(processLogFile);
             if(content != null && content.length > 0)
             {
                 minId = Integer.parseInt(new String(content).trim());
@@ -647,7 +648,7 @@ class CaCertStoreDbExporter extends DbPorter
                         continue;
                     }
 
-                    String sha1_fp_cert = IoCertUtil.sha1sum(certBytes);
+                    String sha1_fp_cert = SecurityUtil.sha1sum(certBytes);
 
                     ZipEntry certZipEntry = new ZipEntry(sha1_fp_cert + ".der");
                     currentCertsZip.putNextEntry(certZipEntry);

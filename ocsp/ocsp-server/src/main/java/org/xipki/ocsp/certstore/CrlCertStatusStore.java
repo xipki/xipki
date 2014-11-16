@@ -89,7 +89,8 @@ import org.xipki.common.CertRevocationInfo;
 import org.xipki.common.CustomObjectIdentifiers;
 import org.xipki.common.HashAlgoType;
 import org.xipki.common.HashCalculator;
-import org.xipki.common.IoCertUtil;
+import org.xipki.common.IoUtil;
+import org.xipki.common.SecurityUtil;
 import org.xipki.common.LogUtil;
 import org.xipki.common.ParamChecker;
 import org.xipki.datasource.api.DataSourceFactory;
@@ -184,8 +185,8 @@ public class CrlCertStatusStore extends CertStatusStore
         ParamChecker.assertNotEmpty("crlFile", crlFilename);
         ParamChecker.assertNotNull("caCert", caCert);
 
-        this.crlFilename = IoCertUtil.expandFilepath(crlFilename);
-        this.deltaCrlFilename = deltaCrlFilename == null ? null : IoCertUtil.expandFilepath(deltaCrlFilename);
+        this.crlFilename = IoUtil.expandFilepath(crlFilename);
+        this.deltaCrlFilename = deltaCrlFilename == null ? null : IoUtil.expandFilepath(deltaCrlFilename);
         this.caCert = caCert;
         this.issuerCert = issuerCert;
         this.crlUrl = crlUrl;
@@ -283,7 +284,7 @@ public class CrlCertStatusStore extends CertStatusStore
             auditLogPCIEvent(AuditLevel.INFO, "UPDATE_CERTSTORE", "a newer version of CRL is available");
             updateCRLSuccessfull = false;
 
-            X509CRL crl = IoCertUtil.parseCRL(crlFilename);
+            X509CRL crl = SecurityUtil.parseCRL(crlFilename);
             BigInteger crlNumber;
             {
                 byte[] octetString = crl.getExtensionValue(Extension.cRLNumber.getId());
@@ -337,7 +338,7 @@ public class CrlCertStatusStore extends CertStatusStore
                     throw new CertStatusStoreException("baseCRL does not contains CRLNumber");
                 }
 
-                deltaCrl = IoCertUtil.parseCRL(deltaCrlFilename);
+                deltaCrl = SecurityUtil.parseCRL(deltaCrlFilename);
                 byte[] octetString = deltaCrl.getExtensionValue(Extension.deltaCRLIndicator.getId());
                 if(octetString == null)
                 {
@@ -612,7 +613,7 @@ public class CrlCertStatusStore extends CertStatusStore
                         if(cert == null)
                         {
                             LOG.info("Could not find certificate (issuer = '{}', serialNumber = '{}'",
-                                    IoCertUtil.canonicalizeName(caName), serialNumber);
+                                    SecurityUtil.canonicalizeName(caName), serialNumber);
                         }
                         else
                         {
@@ -982,7 +983,7 @@ public class CrlCertStatusStore extends CertStatusStore
         }
 
         X500Name issuer = X500Name.getInstance(caCert.getSubjectX500Principal().getEncoded());
-        byte[] issuerSKI = IoCertUtil.extractSKI(caCert);
+        byte[] issuerSKI = SecurityUtil.extractSKI(caCert);
 
         Set<CertWithInfo> certs = new HashSet<>();
 
@@ -993,7 +994,7 @@ public class CrlCertStatusStore extends CertStatusStore
 
             try
             {
-                byte[] encoded = IoCertUtil.read(certFile);
+                byte[] encoded = IoUtil.read(certFile);
                 bcCert = Certificate.getInstance(encoded);
             }catch(IllegalArgumentException | IOException e)
             {
@@ -1012,7 +1013,7 @@ public class CrlCertStatusStore extends CertStatusStore
                 byte[] aki = null;
                 try
                 {
-                    aki = IoCertUtil.extractAKI(bcCert);
+                    aki = SecurityUtil.extractAKI(bcCert);
                 }catch(CertificateEncodingException e)
                 {
                     final String message = "Could not extract AuthorityKeyIdentifier";

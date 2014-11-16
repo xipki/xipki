@@ -48,14 +48,14 @@ import org.xipki.audit.api.AuditLevel;
 import org.xipki.audit.api.AuditLoggingService;
 import org.xipki.audit.api.AuditLoggingServiceRegister;
 import org.xipki.audit.api.AuditStatus;
+import org.xipki.ca.api.CertPublisherException;
+import org.xipki.ca.api.EnvironmentParameterResolver;
+import org.xipki.ca.api.X509CertificateWithMetaInfo;
 import org.xipki.ca.api.publisher.X509CertPublisher;
 import org.xipki.ca.api.publisher.X509CertificateInfo;
-import org.xipki.ca.common.CertPublisherException;
-import org.xipki.ca.common.X509CertificateWithMetaInfo;
 import org.xipki.common.CertRevocationInfo;
 import org.xipki.common.CmpUtf8Pairs;
-import org.xipki.common.EnvironmentParameterResolver;
-import org.xipki.common.IoCertUtil;
+import org.xipki.common.SecurityUtil;
 import org.xipki.common.ParamChecker;
 import org.xipki.datasource.api.DataSourceWrapper;
 import org.xipki.security.api.PasswordResolver;
@@ -226,7 +226,7 @@ public class OCSPCertPublisher extends X509CertPublisher
             return true;
         } catch (Exception e)
         {
-            String issuerText = IoCertUtil.canonicalizeName(caCert.getCert().getIssuerX500Principal());
+            String issuerText = SecurityUtil.canonicalizeName(caCert.getCert().getIssuerX500Principal());
             logAndAudit(issuerText, caCert, e, "Could not publish revocation of CA");
             return false;
         }
@@ -241,7 +241,7 @@ public class OCSPCertPublisher extends X509CertPublisher
             return true;
         } catch (Exception e)
         {
-            String issuerText = IoCertUtil.canonicalizeName(caCert.getCert().getIssuerX500Principal());
+            String issuerText = SecurityUtil.canonicalizeName(caCert.getCert().getIssuerX500Principal());
             logAndAudit(issuerText, caCert, e, "Could not publish unrevocation of CA");
             return false;
         }
@@ -257,7 +257,7 @@ public class OCSPCertPublisher extends X509CertPublisher
             return true;
         } catch (Exception e)
         {
-            String issuerText = IoCertUtil.canonicalizeName(issuerCert.getCert().getIssuerX500Principal());
+            String issuerText = SecurityUtil.canonicalizeName(issuerCert.getCert().getIssuerX500Principal());
             logAndAudit(issuerText, issuerCert, e, "Could not publish removal of certificate");
             return false;
         }

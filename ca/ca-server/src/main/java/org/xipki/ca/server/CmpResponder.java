@@ -75,15 +75,15 @@ import org.xipki.audit.api.AuditEvent;
 import org.xipki.audit.api.AuditEventData;
 import org.xipki.audit.api.AuditLevel;
 import org.xipki.audit.api.AuditStatus;
-import org.xipki.ca.common.CertBasedRequestorInfo;
-import org.xipki.ca.common.CmpControl;
-import org.xipki.ca.common.RequestorInfo;
+import org.xipki.ca.api.CertBasedRequestorInfo;
+import org.xipki.ca.api.CmpControl;
+import org.xipki.ca.api.RequestorInfo;
 import org.xipki.ca.common.cmp.CmpUtil;
 import org.xipki.ca.common.cmp.ProtectionResult;
 import org.xipki.ca.common.cmp.ProtectionVerificationResult;
 import org.xipki.common.CmpUtf8Pairs;
 import org.xipki.common.CustomObjectIdentifiers;
-import org.xipki.common.IoCertUtil;
+import org.xipki.common.SecurityUtil;
 import org.xipki.common.LogUtil;
 import org.xipki.common.ParamChecker;
 import org.xipki.security.api.ConcurrentContentSigner;
@@ -300,7 +300,7 @@ public abstract class CmpResponder
             else
             {
                 LOG.warn("tid={}: not authorized requestor (TLS client {})",
-                        tid, IoCertUtil.canonicalizeName(tlsClientCert.getSubjectX500Principal()));
+                        tid, SecurityUtil.canonicalizeName(tlsClientCert.getSubjectX500Principal()));
                 errorStatus = "Requestor (TLS client certificate) is not authorized";
             }
         }
@@ -532,7 +532,7 @@ public abstract class CmpResponder
 
     private static String canonicalizeSortedName(X500Name name)
     {
-        return IoCertUtil.canonicalizeName(IoCertUtil.sortX509Name(name));
+        return SecurityUtil.canonicalizeName(SecurityUtil.sortX509Name(name));
     }
 
 }

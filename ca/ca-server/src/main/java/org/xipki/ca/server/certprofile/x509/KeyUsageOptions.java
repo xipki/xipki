@@ -38,9 +38,9 @@ package org.xipki.ca.server.certprofile.x509;
 import java.util.List;
 import java.util.Set;
 
+import org.xipki.ca.api.EnvironmentParameterResolver;
 import org.xipki.ca.api.profile.x509.KeyUsage;
 import org.xipki.ca.server.certprofile.Condition;
-import org.xipki.common.EnvironmentParameterResolver;
 import org.xipki.common.ParamChecker;
 
 /**

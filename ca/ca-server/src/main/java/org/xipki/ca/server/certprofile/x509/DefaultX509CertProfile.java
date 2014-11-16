@@ -93,6 +93,9 @@ import org.bouncycastle.jcajce.provider.asymmetric.util.ECUtil;
 import org.bouncycastle.math.ec.ECCurve;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xipki.ca.api.BadCertTemplateException;
+import org.xipki.ca.api.CertProfileException;
+import org.xipki.ca.api.CertValidity;
 import org.xipki.ca.api.profile.ExtensionOccurrence;
 import org.xipki.ca.api.profile.ExtensionTuple;
 import org.xipki.ca.api.profile.ExtensionTuples;
@@ -104,9 +107,6 @@ import org.xipki.ca.api.profile.x509.CertificatePolicyQualifier;
 import org.xipki.ca.api.profile.x509.KeyUsage;
 import org.xipki.ca.api.profile.x509.SpecialX509CertProfileBehavior;
 import org.xipki.ca.api.profile.x509.X509Util;
-import org.xipki.ca.common.BadCertTemplateException;
-import org.xipki.ca.common.CertProfileException;
-import org.xipki.ca.common.CertValidity;
 import org.xipki.ca.server.certprofile.AddText;
 import org.xipki.ca.server.certprofile.Condition;
 import org.xipki.ca.server.certprofile.ExtensionTupleOption;
@@ -150,7 +150,7 @@ import org.xipki.ca.server.certprofile.jaxb.ProfileType.Subject;
 import org.xipki.ca.server.certprofile.jaxb.RdnType;
 import org.xipki.ca.server.certprofile.jaxb.SubjectInfoAccessType.Access;
 import org.xipki.common.CmpUtf8Pairs;
-import org.xipki.common.IoCertUtil;
+import org.xipki.common.SecurityUtil;
 import org.xipki.common.LogUtil;
 import org.xipki.common.LruCache;
 import org.xipki.common.ObjectIdentifiers;
@@ -957,7 +957,7 @@ public class DefaultX509CertProfile extends AbstractX509CertProfile
             {
                 if(allowedEcCurves.containsKey(curveOid) == false)
                 {
-                    throw new BadCertTemplateException("EC curve " + IoCertUtil.getCurveName(curveOid) +
+                    throw new BadCertTemplateException("EC curve " + SecurityUtil.getCurveName(curveOid) +
                             " (OID: " + curveOid.getId() + ") is not allowed");
                 }
             }
@@ -1624,7 +1624,7 @@ public class DefaultX509CertProfile extends AbstractX509CertProfile
         GeneralName base = null;
         if(type.getDirectoryName() != null)
         {
-            base = new GeneralName(IoCertUtil.reverse(
+            base = new GeneralName(SecurityUtil.reverse(
                     new X500Name(type.getDirectoryName())));
         }
         else if(type.getDNSName() != null)
@@ -1906,7 +1906,7 @@ public class DefaultX509CertProfile extends AbstractX509CertProfile
                 return new GeneralName(tag, name);
             case directoryName:
             {
-                X500Name x500Name = IoCertUtil.reverse(new X500Name(name));
+                X500Name x500Name = SecurityUtil.reverse(new X500Name(name));
                 return new GeneralName(GeneralName.directoryName, x500Name);
             }
             case ediPartyName:

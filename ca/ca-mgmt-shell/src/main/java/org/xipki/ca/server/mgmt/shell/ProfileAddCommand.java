@@ -38,7 +38,7 @@ package org.xipki.ca.server.mgmt.shell;
 import org.apache.felix.gogo.commands.Command;
 import org.apache.felix.gogo.commands.Option;
 import org.xipki.ca.server.mgmt.api.CertProfileEntry;
-import org.xipki.common.IoCertUtil;
+import org.xipki.common.IoUtil;
 
 /**
  * @author Lijun Liao
@@ -72,7 +72,7 @@ public class ProfileAddCommand extends CaCommand
     {
         if(conf == null && confFile != null)
         {
-            conf = new String(IoCertUtil.read(confFile));
+            conf = new String(IoUtil.read(confFile));
         }
 
         CertProfileEntry entry = new CertProfileEntry(name, type, conf);

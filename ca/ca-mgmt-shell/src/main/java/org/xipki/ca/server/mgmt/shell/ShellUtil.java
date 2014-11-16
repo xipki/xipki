@@ -37,7 +37,8 @@ package org.xipki.ca.server.mgmt.shell;
 
 import org.bouncycastle.util.encoders.Base64;
 import org.xipki.common.CmpUtf8Pairs;
-import org.xipki.common.IoCertUtil;
+import org.xipki.common.IoUtil;
+import org.xipki.common.SecurityUtil;
 import org.xipki.security.api.PasswordResolver;
 
 /**
@@ -69,7 +70,7 @@ class ShellUtil
         if(keystoreConf.startsWith("file:"))
         {
             String keystoreFile = keystoreConf.substring("file:".length());
-            keystoreBytes = IoCertUtil.read(keystoreFile);
+            keystoreBytes = IoUtil.read(keystoreFile);
         }
         else if(keystoreConf.startsWith("base64:"))
         {
@@ -90,7 +91,7 @@ class ShellUtil
             password = passwordResolver.resolvePassword(passwordHint);
         }
 
-        keystoreBytes = IoCertUtil.extractMinimalKeyStore(keystoreType,
+        keystoreBytes = SecurityUtil.extractMinimalKeyStore(keystoreType,
                 keystoreBytes, keyLabel, password);
 
         utf8Pairs.putUtf8Pair("keystore", "base64:" + Base64.toBase64String(keystoreBytes));

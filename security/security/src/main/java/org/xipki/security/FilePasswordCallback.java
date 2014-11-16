@@ -38,7 +38,7 @@ package org.xipki.security;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 
-import org.xipki.common.IoCertUtil;
+import org.xipki.common.IoUtil;
 import org.xipki.security.api.PasswordCallback;
 import org.xipki.security.api.PasswordResolverException;
 
@@ -62,7 +62,7 @@ public class FilePasswordCallback implements PasswordCallback
         byte[] content;
         try
         {
-            content = IoCertUtil.read(passwordFile);
+            content = IoUtil.read(passwordFile);
         }catch(IOException e)
         {
             throw new PasswordResolverException("Could not read file " + passwordFile, e);
@@ -95,6 +95,6 @@ public class FilePasswordCallback implements PasswordCallback
         {
             throw new PasswordResolverException("conf could not be null or empty");
         }
-        passwordFile = IoCertUtil.expandFilepath(conf);
+        passwordFile = IoUtil.expandFilepath(conf);
     }
 }

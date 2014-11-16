@@ -43,14 +43,14 @@ import java.util.Set;
 
 import org.apache.felix.gogo.commands.Command;
 import org.apache.felix.gogo.commands.Option;
-import org.xipki.ca.common.CAStatus;
-import org.xipki.ca.common.CertValidity;
+import org.xipki.ca.api.CAStatus;
+import org.xipki.ca.api.CertValidity;
 import org.xipki.ca.server.mgmt.api.CAManager;
 import org.xipki.ca.server.mgmt.api.DuplicationMode;
 import org.xipki.ca.server.mgmt.api.Permission;
 import org.xipki.ca.server.mgmt.api.ValidityMode;
 import org.xipki.common.ConfigurationException;
-import org.xipki.common.IoCertUtil;
+import org.xipki.common.SecurityUtil;
 import org.xipki.security.api.SecurityFactory;
 
 /**
@@ -164,7 +164,7 @@ public class CaUpdateCommand extends CaCommand
         X509Certificate caCert = null;
         if(certFile != null)
         {
-            caCert = IoCertUtil.parseCert(certFile);
+            caCert = SecurityUtil.parseCert(certFile);
         }
 
         if(signerConf != null)

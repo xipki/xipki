@@ -74,7 +74,7 @@ import org.bouncycastle.cert.cmp.GeneralPKIMessage;
 import org.bouncycastle.util.encoders.Hex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.common.IoCertUtil;
+import org.xipki.common.SecurityUtil;
 import org.xipki.common.ParamChecker;
 import org.xipki.security.api.SignerException;
 import org.xipki.security.api.p11.P11CryptService;
@@ -187,7 +187,7 @@ public abstract class RemoteP11CryptService implements P11CryptService
 
         try
         {
-            return IoCertUtil.parseCert(certBytes);
+            return SecurityUtil.parseCert(certBytes);
         } catch (CertificateException | IOException e)
         {
             throw new SignerException(e.getClass().getName() + ": " + e.getMessage(), e);
@@ -319,7 +319,7 @@ public abstract class RemoteP11CryptService implements P11CryptService
         {
             ErrorMsgContent content = (ErrorMsgContent) respBody.getContent();
             PKIStatusInfo statusInfo = content.getPKIStatusInfo();
-            throw new SignerException("Server answers with ERROR: " + IoCertUtil.formatPKIStatusInfo(statusInfo));
+            throw new SignerException("Server answers with ERROR: " + SecurityUtil.formatPKIStatusInfo(statusInfo));
         }
 
         else if(PKIBody.TYPE_GEN_REP != bodyType)

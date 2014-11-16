@@ -41,11 +41,11 @@ import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
-import org.xipki.ca.common.CAMgmtException;
-import org.xipki.ca.common.CAStatus;
-import org.xipki.ca.common.CASystemStatus;
-import org.xipki.ca.common.CertValidity;
-import org.xipki.ca.common.CmpControl;
+import org.xipki.ca.api.CAMgmtException;
+import org.xipki.ca.api.CAStatus;
+import org.xipki.ca.api.CASystemStatus;
+import org.xipki.ca.api.CertValidity;
+import org.xipki.ca.api.CmpControl;
 import org.xipki.common.CRLReason;
 import org.xipki.common.CertRevocationInfo;
 

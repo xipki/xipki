@@ -86,7 +86,11 @@ import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.jce.provider.X509CertificateObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xipki.ca.client.api.CertIDOrError;
+import org.xipki.ca.client.api.EnrollCertResult;
+import org.xipki.ca.client.api.PKIErrorException;
 import org.xipki.ca.client.api.RAWorker;
+import org.xipki.ca.client.api.RAWorkerException;
 import org.xipki.ca.client.api.RemoveExpiredCertsResult;
 import org.xipki.ca.client.api.dto.CRLResultType;
 import org.xipki.ca.client.api.dto.CmpResultType;
@@ -109,12 +113,9 @@ import org.xipki.ca.client.impl.jaxb.CAType;
 import org.xipki.ca.client.impl.jaxb.FileOrValueType;
 import org.xipki.ca.client.impl.jaxb.ObjectFactory;
 import org.xipki.ca.client.impl.jaxb.RequestorType;
-import org.xipki.ca.common.CertIDOrError;
-import org.xipki.ca.common.EnrollCertResult;
-import org.xipki.ca.common.PKIErrorException;
-import org.xipki.ca.common.RAWorkerException;
 import org.xipki.common.ConfigurationException;
-import org.xipki.common.IoCertUtil;
+import org.xipki.common.IoUtil;
+import org.xipki.common.SecurityUtil;
 import org.xipki.common.LogUtil;
 import org.xipki.common.ParamChecker;
 import org.xipki.security.api.ConcurrentContentSigner;
@@ -253,7 +254,7 @@ public final class RAWorkerImpl extends AbstractRAWorker implements RAWorker
             Security.addProvider(new BouncyCastleProvider());
         }
 
-        File configFile = new File(IoCertUtil.expandFilepath(confFile));
+        File configFile = new File(IoUtil.expandFilepath(confFile));
         if(configFile.exists() == false)
         {
             throw new FileNotFoundException("Cound not find configuration file " + confFile);
@@ -302,14 +303,14 @@ public final class RAWorkerImpl extends AbstractRAWorker implements RAWorker
                     ca.setAutoConf(false);
 
                     // CA cert
-                    X509Certificate cert = IoCertUtil.parseCert(readData(caInfo.getCert()));
+                    X509Certificate cert = SecurityUtil.parseCert(readData(caInfo.getCert()));
 
                     // profiles
                     Set<String> certProfiles = new HashSet<>(caInfo.getCertProfiles().getCertProfile());
                     ca.setCAInfo(cert, certProfiles);
 
                     // responder
-                    cert = IoCertUtil.parseCert(readData(caInfo.getResponder()));
+                    cert = SecurityUtil.parseCert(readData(caInfo.getResponder()));
                     ca.setResponder(cert);
                 }
                 else
@@ -351,7 +352,7 @@ public final class RAWorkerImpl extends AbstractRAWorker implements RAWorker
             {
                 try
                 {
-                    requestorCert = IoCertUtil.parseCert(readData(requestorConf.getCert()));
+                    requestorCert = SecurityUtil.parseCert(readData(requestorConf.getCert()));
                     requestorCerts.put(name, requestorCert);
                 } catch (Exception e)
                 {
@@ -490,7 +491,7 @@ public final class RAWorkerImpl extends AbstractRAWorker implements RAWorker
         byte[] data = fileOrValue.getValue();
         if(data == null)
         {
-            data = IoCertUtil.read(fileOrValue.getFile());
+            data = IoUtil.read(fileOrValue.getFile());
         }
         return data;
     }

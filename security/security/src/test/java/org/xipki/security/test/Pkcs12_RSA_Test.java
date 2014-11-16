@@ -46,7 +46,7 @@ import org.bouncycastle.operator.ContentSigner;
 import org.junit.Assert;
 import org.junit.Test;
 import org.xipki.common.CmpUtf8Pairs;
-import org.xipki.common.IoCertUtil;
+import org.xipki.common.SecurityUtil;
 import org.xipki.security.PasswordResolverImpl;
 import org.xipki.security.SecurityFactoryImpl;
 import org.xipki.security.api.ConcurrentContentSigner;
@@ -105,7 +105,7 @@ public abstract class Pkcs12_RSA_Test
         if(signer == null)
         {
             String certFile = getCertificateFile();
-            X509Certificate cert = IoCertUtil.parseCert(certFile);
+            X509Certificate cert = SecurityUtil.parseCert(certFile);
 
             String signerConf = getSignerConf();
             signer = securityFactory.createSigner("PKCS12", signerConf, cert);

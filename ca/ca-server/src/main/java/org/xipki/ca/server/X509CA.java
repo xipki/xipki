@@ -111,7 +111,14 @@ import org.xipki.audit.api.AuditLevel;
 import org.xipki.audit.api.AuditLoggingService;
 import org.xipki.audit.api.AuditLoggingServiceRegister;
 import org.xipki.audit.api.AuditStatus;
+import org.xipki.ca.api.BadCertTemplateException;
+import org.xipki.ca.api.BadFormatException;
+import org.xipki.ca.api.CAMgmtException;
+import org.xipki.ca.api.CAStatus;
+import org.xipki.ca.api.CertProfileException;
+import org.xipki.ca.api.CertValidity;
 import org.xipki.ca.api.OperationException;
+import org.xipki.ca.api.X509CertificateWithMetaInfo;
 import org.xipki.ca.api.OperationException.ErrorCode;
 import org.xipki.ca.api.profile.ExtensionOccurrence;
 import org.xipki.ca.api.profile.ExtensionTuple;
@@ -120,13 +127,6 @@ import org.xipki.ca.api.profile.SubjectInfo;
 import org.xipki.ca.api.profile.x509.SpecialX509CertProfileBehavior;
 import org.xipki.ca.api.profile.x509.X509Util;
 import org.xipki.ca.api.publisher.X509CertificateInfo;
-import org.xipki.ca.common.BadCertTemplateException;
-import org.xipki.ca.common.BadFormatException;
-import org.xipki.ca.common.CAMgmtException;
-import org.xipki.ca.common.CAStatus;
-import org.xipki.ca.common.CertProfileException;
-import org.xipki.ca.common.CertValidity;
-import org.xipki.ca.common.X509CertificateWithMetaInfo;
 import org.xipki.ca.server.mgmt.X509CAInfo;
 import org.xipki.ca.server.mgmt.CAManagerImpl;
 import org.xipki.ca.server.mgmt.CRLControl;
@@ -143,7 +143,7 @@ import org.xipki.common.CustomObjectIdentifiers;
 import org.xipki.common.HashAlgoType;
 import org.xipki.common.HashCalculator;
 import org.xipki.common.HealthCheckResult;
-import org.xipki.common.IoCertUtil;
+import org.xipki.common.SecurityUtil;
 import org.xipki.common.LogUtil;
 import org.xipki.common.ObjectIdentifiers;
 import org.xipki.common.ParamChecker;
@@ -608,7 +608,7 @@ public class X509CA
 
         try
         {
-            this.caSKI = IoCertUtil.extractSKI(caCert.getCert());
+            this.caSKI = SecurityUtil.extractSKI(caCert.getCert());
         } catch (CertificateEncodingException e)
         {
             throw new OperationException(ErrorCode.INVALID_EXTENSION, e.getMessage());
@@ -1196,7 +1196,7 @@ public class X509CA
             Extensions extensions)
     throws OperationException
     {
-        final String subjectText = IoCertUtil.canonicalizeName(subject);
+        final String subjectText = SecurityUtil.canonicalizeName(subject);
         LOG.info("START generateCertificate: CA={}, profile={}, subject={}",
                 new Object[]{caInfo.getName(), certProfileName, subjectText});
 
@@ -1249,7 +1249,7 @@ public class X509CA
             Extensions extensions)
     throws OperationException
     {
-        final String subjectText = IoCertUtil.canonicalizeName(subject);
+        final String subjectText = SecurityUtil.canonicalizeName(subject);
         LOG.info("START regenerateCertificate: CA={}, profile={}, subject={}",
                 new Object[]{caInfo.getName(), certProfileName, subjectText});
 
@@ -1760,9 +1760,9 @@ public class X509CA
                 LOG.error("Removing certificate issuer={}, serial={}, subject={} from publisher {} failed.",
                         new Object[]
                         {
-                                IoCertUtil.canonicalizeName(c.getIssuerX500Principal()),
+                                SecurityUtil.canonicalizeName(c.getIssuerX500Principal()),
                                 c.getSerialNumber(),
-                                IoCertUtil.canonicalizeName(c.getSubjectX500Principal()),
+                                SecurityUtil.canonicalizeName(c.getSubjectX500Principal()),
                                 publisher.getName()});
             }
         }
@@ -2087,7 +2087,7 @@ public class X509CA
                     "CA is not permitted to issue certifate after " + new Date(t));
         }
 
-        publicKeyInfo = IoCertUtil.toRfc3279Style(publicKeyInfo);
+        publicKeyInfo = SecurityUtil.toRfc3279Style(publicKeyInfo);
 
         // public key
         try
@@ -2167,11 +2167,11 @@ public class X509CA
             subjectMode = DuplicationMode.FORBIDDEN_WITHIN_PROFILE;
         }
 
-        String sha1FpSubject = IoCertUtil.sha1sum_canonicalized_name(grantedSubject);
-        String grandtedSubjectText = IoCertUtil.canonicalizeName(grantedSubject);
+        String sha1FpSubject = SecurityUtil.sha1sum_canonicalized_name(grantedSubject);
+        String grandtedSubjectText = SecurityUtil.canonicalizeName(grantedSubject);
 
         byte[] subjectPublicKeyData =  publicKeyInfo.getPublicKeyData().getBytes();
-        String sha1FpPublicKey = IoCertUtil.sha1sum(subjectPublicKeyData);
+        String sha1FpPublicKey = SecurityUtil.sha1sum(subjectPublicKeyData);
 
         if(keyUpdate)
         {
@@ -2307,7 +2307,7 @@ public class X509CA
                         }
 
                         foundUniqueSubject = (certstore.certIssuedForSubject(caInfo.getCertificate(),
-                                    IoCertUtil.sha1sum_canonicalized_name(grantedSubject)) == false);
+                                    SecurityUtil.sha1sum_canonicalized_name(grantedSubject)) == false);
                         if(foundUniqueSubject)
                         {
                             break;

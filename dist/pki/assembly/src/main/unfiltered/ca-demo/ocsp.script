@@ -102,3 +102,4 @@ ocsp:status -cacert output/TLS1.der -serial 2 -v -sign
 
 features:uninstall xipki-ocspclient-shell
 features:uninstall xipki-ocspclient
+features:uninstall xipki-ocspserver

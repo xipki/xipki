@@ -51,7 +51,7 @@
     <joda-time.version>2.1</joda-time.version>
   </properties>
   <modules>
-    <module>console-karaf</module>
+    <module>shell-base</module>
     <module>common</module>
     <module>audit</module>
     <module>security</module>

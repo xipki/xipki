@@ -41,7 +41,8 @@ import org.apache.felix.gogo.commands.Command;
 import org.apache.felix.gogo.commands.Option;
 import org.bouncycastle.util.encoders.Base64;
 import org.xipki.ca.server.mgmt.api.CAManager;
-import org.xipki.common.IoCertUtil;
+import org.xipki.common.IoUtil;
+import org.xipki.common.SecurityUtil;
 
 /**
  * @author Lijun Liao
@@ -82,8 +83,8 @@ public class CrlSignerUpdateCommand extends CaCommand
         }
         else if(signerCert != null)
         {
-            byte[] certBytes = IoCertUtil.read(signerCert);
-            IoCertUtil.parseCert(new ByteArrayInputStream(certBytes));
+            byte[] certBytes = IoUtil.read(signerCert);
+            SecurityUtil.parseCert(new ByteArrayInputStream(certBytes));
             signerCertConf = Base64.toBase64String(certBytes);
         }
 

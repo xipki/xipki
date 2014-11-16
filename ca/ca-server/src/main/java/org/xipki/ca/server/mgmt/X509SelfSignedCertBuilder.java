@@ -70,6 +70,9 @@ import org.bouncycastle.jcajce.provider.asymmetric.util.ECUtil;
 import org.bouncycastle.operator.ContentSigner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xipki.ca.api.BadCertTemplateException;
+import org.xipki.ca.api.CertProfileException;
+import org.xipki.ca.api.CertValidity;
 import org.xipki.ca.api.OperationException;
 import org.xipki.ca.api.OperationException.ErrorCode;
 import org.xipki.ca.api.profile.ExtensionOccurrence;
@@ -77,13 +80,10 @@ import org.xipki.ca.api.profile.ExtensionTuple;
 import org.xipki.ca.api.profile.ExtensionTuples;
 import org.xipki.ca.api.profile.SubjectInfo;
 import org.xipki.ca.api.profile.x509.X509Util;
-import org.xipki.ca.common.BadCertTemplateException;
-import org.xipki.ca.common.CertProfileException;
-import org.xipki.ca.common.CertValidity;
 import org.xipki.ca.server.PublicCAInfo;
 import org.xipki.common.CmpUtf8Pairs;
 import org.xipki.common.ConfigurationException;
-import org.xipki.common.IoCertUtil;
+import org.xipki.common.SecurityUtil;
 import org.xipki.security.api.ConcurrentContentSigner;
 import org.xipki.security.api.NoIdleSignerException;
 import org.xipki.security.api.SecurityFactory;
@@ -179,7 +179,7 @@ class X509SelfSignedCertBuilder
             List<String> deltaCrlUris)
     throws OperationException
     {
-        publicKeyInfo = IoCertUtil.toRfc3279Style(publicKeyInfo);
+        publicKeyInfo = SecurityUtil.toRfc3279Style(publicKeyInfo);
 
         try
         {

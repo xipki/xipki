@@ -52,7 +52,7 @@
   </feature>
   <feature name="xipki-camgmt-shell" version="${project.version}" resolver="(obr)">
     <feature>xipki-caserver</feature>
-    <bundle>mvn:org.xipki/console-karaf/${project.version}</bundle>
+    <bundle>mvn:org.xipki/shell-base/${project.version}</bundle>
     <bundle>mvn:org.xipki/ca-mgmt-shell/${project.version}</bundle>
   </feature>
   <feature name="xipki-caclient" version="${project.version}" resolver="(obr)">
@@ -62,12 +62,12 @@
   </feature>
   <feature name="xipki-caclient-shell" version="${project.version}" resolver="(obr)">
     <feature>xipki-caclient</feature>
-    <bundle>mvn:org.xipki/console-karaf/${project.version}</bundle>
+    <bundle>mvn:org.xipki/shell-base/${project.version}</bundle>
     <bundle>mvn:org.xipki/ca-client-shell/${project.version}</bundle>
   </feature>
   <feature name="xipki-security-shell" version="${project.version}" resolver="(obr)">
     <feature>xipki-security</feature>
-    <bundle>mvn:org.xipki/console-karaf/${project.version}</bundle>
+    <bundle>mvn:org.xipki/shell-base/${project.version}</bundle>
     <bundle>mvn:org.xipki/security-shell/${project.version}</bundle>
   </feature>
   <feature name="xipki-ocspserver" version="${project.version}" resolver="(obr)">
@@ -85,12 +85,12 @@
   </feature>
   <feature name="xipki-ocspclient-shell" version="${project.version}" resolver="(obr)">
     <feature>xipki-ocspclient</feature>
-    <bundle>mvn:org.xipki/console-karaf/${project.version}</bundle>
+    <bundle>mvn:org.xipki/shell-base/${project.version}</bundle>
     <bundle>mvn:org.xipki/ocsp-client-shell/${project.version}</bundle>
   </feature>
   <feature name="xipki-database-tool" version="${project.version}" resolver="(obr)">
     <feature>xipki-datasource</feature>
-    <bundle>mvn:org.xipki/console-karaf/${project.version}</bundle>
+    <bundle>mvn:org.xipki/shell-base/${project.version}</bundle>
     <bundle><![CDATA[wrap:mvn:junit/junit/${junit.version}/$Bundle-SymbolicName=junit&Bundle-Version=${junit.version}]]></bundle>
     <bundle>mvn:org.liquibase/liquibase-osgi/${liquibase.version}</bundle>
     <bundle>mvn:org.xipki/database-tool/${project.version}</bundle>

@@ -54,7 +54,7 @@ import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 
 import org.xipki.common.AbstractLoadTest;
-import org.xipki.common.IoCertUtil;
+import org.xipki.common.IoUtil;
 import org.xipki.common.ParamChecker;
 import org.xipki.datasource.api.DataSourceWrapper;
 import org.xml.sax.SAXException;
@@ -95,7 +95,7 @@ public class DbPorter
         this.dataSource = dataSource;
         this.connection = this.dataSource.getConnection();
         this.connectionAutoCommit = connection.getAutoCommit();
-        this.baseDir = IoCertUtil.expandFilepath(baseDir);
+        this.baseDir = IoUtil.expandFilepath(baseDir);
     }
 
     protected static void setLong(PreparedStatement ps, int index, Long i)

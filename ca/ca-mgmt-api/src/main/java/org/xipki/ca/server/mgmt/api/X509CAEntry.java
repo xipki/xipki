@@ -45,12 +45,13 @@ import java.util.List;
 import java.util.Set;
 
 import org.bouncycastle.util.encoders.Base64;
-import org.xipki.ca.common.CAMgmtException;
-import org.xipki.ca.common.CAStatus;
-import org.xipki.ca.common.CertValidity;
+import org.xipki.ca.api.CAMgmtException;
+import org.xipki.ca.api.CAStatus;
+import org.xipki.ca.api.CertValidity;
 import org.xipki.common.CertRevocationInfo;
-import org.xipki.common.IoCertUtil;
+import org.xipki.common.IoUtil;
 import org.xipki.common.ParamChecker;
+import org.xipki.common.SecurityUtil;
 
 /**
  * @author Lijun Liao
@@ -123,10 +124,10 @@ public class X509CAEntry implements Serializable
         this.numCrls = numCrls;
 
         this.name = name.toUpperCase();
-        this.serialSeqName = IoCertUtil.convertSequenceName("SERIAL_" + this.name);
+        this.serialSeqName = IoUtil.convertSequenceName("SERIAL_" + this.name);
         this.nextSerial = initialSerial;
         this.cert = cert;
-        this.subject = IoCertUtil.canonicalizeName(cert.getSubjectX500Principal());
+        this.subject = SecurityUtil.canonicalizeName(cert.getSubjectX500Principal());
 
         this.signerType = signerType;
         this.signerConf = signerConf;
@@ -274,7 +275,7 @@ public class X509CAEntry implements Serializable
         sb.append('\n');
         sb.append("cert: ").append("\n");
         sb.append("\tissuer: ").append(
-                IoCertUtil.canonicalizeName(cert.getIssuerX500Principal())).append("\n");
+                SecurityUtil.canonicalizeName(cert.getIssuerX500Principal())).append("\n");
         sb.append("\tserialNumber: ").append(cert.getSerialNumber()).append("\n");
         sb.append("\tsubject: ").append(subject).append("\n");
         sb.append("\tnotBefore: ").append(cert.getNotBefore()).append("\n");
