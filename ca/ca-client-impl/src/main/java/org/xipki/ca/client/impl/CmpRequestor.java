@@ -159,7 +159,7 @@ public abstract class CmpRequestor
         this.responderCert = responderCert;
         X500Name subject = X500Name.getInstance(responderCert.getSubjectX500Principal().getEncoded());
         this.recipient = new GeneralName(subject);
-        this.c14nRecipientName = canonicalizeSortedName(subject);
+        this.c14nRecipientName = getSortedRFC4519Name(subject);
     }
 
     protected abstract byte[] send(byte[] request)
@@ -529,7 +529,7 @@ public abstract class CmpRequestor
             }
             else
             {
-                String c14nMsgSender = canonicalizeSortedName((X500Name) h.getSender().getName());
+                String c14nMsgSender = getSortedRFC4519Name((X500Name) h.getSender().getName());
                 authorizedResponder = c14nRecipientName.equalsIgnoreCase(c14nMsgSender);
             }
 
@@ -603,7 +603,7 @@ public abstract class CmpRequestor
         this.sendRequestorCert = sendRequestorCert;
     }
 
-    private static String canonicalizeSortedName(X500Name name)
+    private static String getSortedRFC4519Name(X500Name name)
     {
         return SecurityUtil.getRFC4519Name(SecurityUtil.sortX509Name(name));
     }
