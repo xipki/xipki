@@ -201,7 +201,7 @@ class CaCertStoreDbImporter extends DbPorter
 
                     int idx = 1;
                     ps.setInt(idx++, info.getId());
-                    ps.setString(idx++, SecurityUtil.canonicalizeName(c.getSubjectX500Principal()));
+                    ps.setString(idx++, SecurityUtil.getRFC4519Name(c.getSubjectX500Principal()));
                     ps.setString(idx++, hexSha1FpCert);
                     ps.setString(idx++, b64Cert);
 
@@ -710,7 +710,7 @@ class CaCertStoreDbImporter extends DbPorter
                 ps_cert.setInt(idx++, certArt);
                 ps_cert.setLong(idx++, cert.getLastUpdate());
                 ps_cert.setLong(idx++, c.getSerialNumber().getPositiveValue().longValue());
-                ps_cert.setString(idx++, SecurityUtil.canonicalizeName(c.getSubject()));
+                ps_cert.setString(idx++, SecurityUtil.getRFC4519Name(c.getSubject()));
                 ps_cert.setLong(idx++, c.getTBSCertificate().getStartDate().getDate().getTime() / 1000);
                 ps_cert.setLong(idx++, c.getTBSCertificate().getEndDate().getDate().getTime() / 1000);
                 setBoolean(ps_cert, idx++, cert.isRevoked());
