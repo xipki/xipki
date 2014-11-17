@@ -305,7 +305,7 @@ class OcspCertStoreFromCaDbImporter extends DbPorter
 
                     int idx = 1;
                     ps.setInt(idx++, issuer.getId());
-                    ps.setString(idx++, SecurityUtil.canonicalizeName(c.getSubject()));
+                    ps.setString(idx++, SecurityUtil.getRFC4519Name(c.getSubject()));
                     ps.setLong(idx++, c.getTBSCertificate().getStartDate().getDate().getTime() / 1000);
                     ps.setLong(idx++, c.getTBSCertificate().getEndDate().getDate().getTime() / 1000);
                     ps.setString(idx++, HashCalculator.hexHash(HashAlgoType.SHA1, encodedName));
@@ -492,7 +492,7 @@ class OcspCertStoreFromCaDbImporter extends DbPorter
                 ps_cert.setInt(idx++, currentId);
                 ps_cert.setInt(idx++, caId);
                 ps_cert.setLong(idx++, c.getSerialNumber().longValue());
-                ps_cert.setString(idx++, SecurityUtil.canonicalizeName(c.getSubjectX500Principal()));
+                ps_cert.setString(idx++, SecurityUtil.getRFC4519Name(c.getSubjectX500Principal()));
                 ps_cert.setLong(idx++, cert.getLastUpdate());
                 ps_cert.setLong(idx++, c.getNotBefore().getTime() / 1000);
                 ps_cert.setLong(idx++, c.getNotAfter().getTime() / 1000);

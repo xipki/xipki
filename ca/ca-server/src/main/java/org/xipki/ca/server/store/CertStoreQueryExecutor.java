@@ -2140,7 +2140,7 @@ class CertStoreQueryExecutor
             }
         }
 
-        String namePattern = SecurityUtil.canonicalizeName(new X500Name(rdns2));
+        String namePattern = SecurityUtil.getRFC4519Name(new X500Name(rdns2));
 
         String sql = "SUBJECT FROM CERT WHERE SUBJECT LIKE ?";
         sql = dataSource.createFetchFirstSelectSQL(sql, 1, "NOTBEFORE DESC");

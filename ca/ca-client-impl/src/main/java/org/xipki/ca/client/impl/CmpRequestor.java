@@ -605,6 +605,6 @@ public abstract class CmpRequestor
 
     private static String canonicalizeSortedName(X500Name name)
     {
-        return SecurityUtil.canonicalizeName(SecurityUtil.sortX509Name(name));
+        return SecurityUtil.getRFC4519Name(SecurityUtil.sortX509Name(name));
     }
 }

@@ -1087,7 +1087,7 @@ public class IaikP11Slot implements P11WritableSlot
             int n = tmpObjects == null ? 0 : tmpObjects.size();
             if(n == 0)
             {
-                LOG.warn("found no certificate with subject {}", SecurityUtil.canonicalizeName(subject));
+                LOG.warn("found no certificate with subject {}", SecurityUtil.getRFC4519Name(subject));
                 return null;
             }
 

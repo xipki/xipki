@@ -1196,7 +1196,7 @@ public class X509CA
             Extensions extensions)
     throws OperationException
     {
-        final String subjectText = SecurityUtil.canonicalizeName(subject);
+        final String subjectText = SecurityUtil.getRFC4519Name(subject);
         LOG.info("START generateCertificate: CA={}, profile={}, subject={}",
                 new Object[]{caInfo.getName(), certProfileName, subjectText});
 
@@ -1249,7 +1249,7 @@ public class X509CA
             Extensions extensions)
     throws OperationException
     {
-        final String subjectText = SecurityUtil.canonicalizeName(subject);
+        final String subjectText = SecurityUtil.getRFC4519Name(subject);
         LOG.info("START regenerateCertificate: CA={}, profile={}, subject={}",
                 new Object[]{caInfo.getName(), certProfileName, subjectText});
 
@@ -1760,9 +1760,9 @@ public class X509CA
                 LOG.error("Removing certificate issuer={}, serial={}, subject={} from publisher {} failed.",
                         new Object[]
                         {
-                                SecurityUtil.canonicalizeName(c.getIssuerX500Principal()),
+                                SecurityUtil.getRFC4519Name(c.getIssuerX500Principal()),
                                 c.getSerialNumber(),
-                                SecurityUtil.canonicalizeName(c.getSubjectX500Principal()),
+                                SecurityUtil.getRFC4519Name(c.getSubjectX500Principal()),
                                 publisher.getName()});
             }
         }
@@ -2168,7 +2168,7 @@ public class X509CA
         }
 
         String sha1FpSubject = SecurityUtil.sha1sum_canonicalized_name(grantedSubject);
-        String grandtedSubjectText = SecurityUtil.canonicalizeName(grantedSubject);
+        String grandtedSubjectText = SecurityUtil.getRFC4519Name(grantedSubject);
 
         byte[] subjectPublicKeyData =  publicKeyInfo.getPublicKeyData().getBytes();
         String sha1FpPublicKey = SecurityUtil.sha1sum(subjectPublicKeyData);

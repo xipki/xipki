@@ -64,7 +64,7 @@ public class X509CertificateWithMetaInfo
 
         this.cert = cert;
 
-        this.subject = SecurityUtil.canonicalizeName(cert.getSubjectX500Principal());
+        this.subject = SecurityUtil.getRFC4519Name(cert.getSubjectX500Principal());
 
         if(encodedCert == null)
         {

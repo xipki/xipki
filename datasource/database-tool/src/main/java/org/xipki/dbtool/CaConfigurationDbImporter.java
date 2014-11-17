@@ -409,7 +409,7 @@ class CaConfigurationDbImporter extends DbPorter
                     int idx = 1;
                     ps.setString(idx++, ca.getName().toUpperCase());
                     ps.setInt(idx++, art);
-                    ps.setString(idx++, SecurityUtil.canonicalizeName(c.getSubjectX500Principal()));
+                    ps.setString(idx++, SecurityUtil.getRFC4519Name(c.getSubjectX500Principal()));
                     ps.setLong(idx++, ca.getNextSerial());
                     ps.setString(idx++, ca.getStatus());
                     ps.setString(idx++, ca.getCrlUris());

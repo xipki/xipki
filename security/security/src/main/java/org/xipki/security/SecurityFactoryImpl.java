@@ -221,7 +221,7 @@ public class SecurityFactoryImpl implements SecurityFactory
             boolean valid = verifier.verify(signatureValue);
             if(valid == false)
             {
-                String subject = SecurityUtil.canonicalizeName(cert.getSubjectX500Principal());
+                String subject = SecurityUtil.getRFC4519Name(cert.getSubjectX500Principal());
 
                 StringBuilder sb = new StringBuilder();
                 sb.append("key and certificate not match. ");
