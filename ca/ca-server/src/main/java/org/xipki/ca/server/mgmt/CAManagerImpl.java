@@ -1736,7 +1736,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
 
             if(iCert != null)
             {
-                ps.setString(iSubject, SecurityUtil.canonicalizeName(cert.getSubjectX500Principal()));
+                ps.setString(iSubject, SecurityUtil.getRFC4519Name(cert.getSubjectX500Principal()));
 
                 String base64Cert = Base64.toBase64String(cert.getEncoded());
                 ps.setString(iCert, base64Cert);

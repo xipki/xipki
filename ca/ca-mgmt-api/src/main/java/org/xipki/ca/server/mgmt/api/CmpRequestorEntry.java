@@ -88,10 +88,10 @@ public class CmpRequestorEntry implements Serializable
         {
             sb.append("cert: ").append("\n");
             sb.append("\tissuer: ").append(
-                    SecurityUtil.canonicalizeName(cert.getIssuerX500Principal())).append("\n");
+                    SecurityUtil.getRFC4519Name(cert.getIssuerX500Principal())).append("\n");
             sb.append("\tserialNumber: ").append(cert.getSerialNumber()).append("\n");
             sb.append("\tsubject: ").append(
-                    SecurityUtil.canonicalizeName(cert.getSubjectX500Principal())).append('\n');
+                    SecurityUtil.getRFC4519Name(cert.getSubjectX500Principal())).append('\n');
             if(verbose)
             {
                 sb.append("\tencoded: ");

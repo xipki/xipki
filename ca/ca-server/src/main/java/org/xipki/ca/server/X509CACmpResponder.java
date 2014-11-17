@@ -808,7 +808,7 @@ public class X509CACmpResponder extends CmpResponder
             X500Name subject = certTemp.getSubject();
             if(childAuditEvent != null)
             {
-                childAuditEvent.addEventData(new AuditEventData("subject", SecurityUtil.canonicalizeName(subject)));
+                childAuditEvent.addEventData(new AuditEventData("subject", SecurityUtil.getRFC4519Name(subject)));
             }
 
             SubjectPublicKeyInfo publicKeyInfo = certTemp.getSubjectPublicKeyInfo();

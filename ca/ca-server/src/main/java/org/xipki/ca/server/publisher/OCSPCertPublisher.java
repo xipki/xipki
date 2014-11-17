@@ -226,7 +226,7 @@ public class OCSPCertPublisher extends X509CertPublisher
             return true;
         } catch (Exception e)
         {
-            String issuerText = SecurityUtil.canonicalizeName(caCert.getCert().getIssuerX500Principal());
+            String issuerText = SecurityUtil.getRFC4519Name(caCert.getCert().getIssuerX500Principal());
             logAndAudit(issuerText, caCert, e, "Could not publish revocation of CA");
             return false;
         }
@@ -241,7 +241,7 @@ public class OCSPCertPublisher extends X509CertPublisher
             return true;
         } catch (Exception e)
         {
-            String issuerText = SecurityUtil.canonicalizeName(caCert.getCert().getIssuerX500Principal());
+            String issuerText = SecurityUtil.getRFC4519Name(caCert.getCert().getIssuerX500Principal());
             logAndAudit(issuerText, caCert, e, "Could not publish unrevocation of CA");
             return false;
         }
@@ -257,7 +257,7 @@ public class OCSPCertPublisher extends X509CertPublisher
             return true;
         } catch (Exception e)
         {
-            String issuerText = SecurityUtil.canonicalizeName(issuerCert.getCert().getIssuerX500Principal());
+            String issuerText = SecurityUtil.getRFC4519Name(issuerCert.getCert().getIssuerX500Principal());
             logAndAudit(issuerText, issuerCert, e, "Could not publish removal of certificate");
             return false;
         }

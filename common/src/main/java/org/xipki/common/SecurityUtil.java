@@ -297,12 +297,12 @@ public class SecurityUtil
         }
     }
 
-    public static String canonicalizeName(X500Principal name)
+    public static String getRFC4519Name(X500Principal name)
     {
-        return canonicalizeName(X500Name.getInstance(name.getEncoded()));
+        return getRFC4519Name(X500Name.getInstance(name.getEncoded()));
     }
 
-    public static String canonicalizeName(X500Name name)
+    public static String getRFC4519Name(X500Name name)
     {
         return RFC4519Style.INSTANCE.toString(name);
     }
@@ -318,6 +318,26 @@ public class SecurityUtil
     }
 
     public static String sha1sum_canonicalized_name(X500Name name)
+    {
+        String canonicalizedName = canonicalizName(name);
+        byte[] encoded;
+        try
+        {
+            encoded = canonicalizedName.getBytes("UTF-8");
+        } catch (UnsupportedEncodingException e)
+        {
+            encoded = canonicalizedName.getBytes();
+        }
+        return sha1sum(encoded);
+    }
+
+    public static String canonicalizName(X500Principal prin)
+    {
+        X500Name x500Name = X500Name.getInstance(prin.getEncoded());
+        return canonicalizName(x500Name);
+    }
+
+    public static String canonicalizName(X500Name name)
     {
         ASN1ObjectIdentifier[] _types = name.getAttributeTypes();
         int n = _types.length;
@@ -352,16 +372,7 @@ public class SecurityUtil
             }
         }
 
-        String canonicalizedName = sb.toString();
-        byte[] encoded;
-        try
-        {
-            encoded = canonicalizedName.getBytes("UTF-8");
-        } catch (UnsupportedEncodingException e)
-        {
-            encoded = canonicalizedName.getBytes();
-        }
-        return sha1sum(encoded);
+        return sb.toString();
     }
 
     public static String sha1sum(byte[] data)

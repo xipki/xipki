@@ -356,7 +356,7 @@ abstract class X509CmpRequestor extends CmpRequestor
                 if(certId == null)
                 {
                     LOG.warn("certId is not present in response for (issuer={}, serialNumber={})",
-                            SecurityUtil.canonicalizeName(re.getIssuer()), re.getSerialNumber());
+                            SecurityUtil.getRFC4519Name(re.getIssuer()), re.getSerialNumber());
                     certId = new CertId(new GeneralName(re.getIssuer()), re.getSerialNumber());
                     continue;
                 }

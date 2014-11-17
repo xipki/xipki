@@ -613,7 +613,7 @@ public class CrlCertStatusStore extends CertStatusStore
                         if(cert == null)
                         {
                             LOG.info("Could not find certificate (issuer = '{}', serialNumber = '{}'",
-                                    SecurityUtil.canonicalizeName(caName), serialNumber);
+                                    SecurityUtil.getRFC4519Name(caName), serialNumber);
                         }
                         else
                         {

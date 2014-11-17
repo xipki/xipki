@@ -127,7 +127,7 @@ public class X509CAEntry implements Serializable
         this.serialSeqName = IoUtil.convertSequenceName("SERIAL_" + this.name);
         this.nextSerial = initialSerial;
         this.cert = cert;
-        this.subject = SecurityUtil.canonicalizeName(cert.getSubjectX500Principal());
+        this.subject = SecurityUtil.getRFC4519Name(cert.getSubjectX500Principal());
 
         this.signerType = signerType;
         this.signerConf = signerConf;
@@ -275,7 +275,7 @@ public class X509CAEntry implements Serializable
         sb.append('\n');
         sb.append("cert: ").append("\n");
         sb.append("\tissuer: ").append(
-                SecurityUtil.canonicalizeName(cert.getIssuerX500Principal())).append("\n");
+                SecurityUtil.getRFC4519Name(cert.getIssuerX500Principal())).append("\n");
         sb.append("\tserialNumber: ").append(cert.getSerialNumber()).append("\n");
         sb.append("\tsubject: ").append(subject).append("\n");
         sb.append("\tnotBefore: ").append(cert.getNotBefore()).append("\n");

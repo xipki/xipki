@@ -416,7 +416,7 @@ public class OcspResponder
                 if(SecurityUtil.isSelfSigned(toplevelCaCert) == false)
                 {
                     throw new OcspResponderException("Could not build certchain of signer up to root CA, but only to "
-                            + SecurityUtil.canonicalizeName(toplevelCaCert.getSubjectX500Principal()));
+                            + SecurityUtil.getRFC4519Name(toplevelCaCert.getSubjectX500Principal()));
                 }
 
                 certsInResp = new X509CertificateHolder[certificateChain.length];
@@ -432,7 +432,7 @@ public class OcspResponder
                         } catch (Exception e)
                         {
                             throw new OcspResponderException("Could not parse certificate "
-                                    + SecurityUtil.canonicalizeName(certInChain.getSubjectX500Principal()));
+                                    + SecurityUtil.getRFC4519Name(certInChain.getSubjectX500Principal()));
                         }
                     }
                 }

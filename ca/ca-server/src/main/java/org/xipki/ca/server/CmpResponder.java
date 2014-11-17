@@ -300,7 +300,7 @@ public abstract class CmpResponder
             else
             {
                 LOG.warn("tid={}: not authorized requestor (TLS client {})",
-                        tid, SecurityUtil.canonicalizeName(tlsClientCert.getSubjectX500Principal()));
+                        tid, SecurityUtil.getRFC4519Name(tlsClientCert.getSubjectX500Principal()));
                 errorStatus = "Requestor (TLS client certificate) is not authorized";
             }
         }
@@ -338,6 +338,12 @@ public abstract class CmpResponder
         PKIMessage resp;
         if(cmdForCmpRespCert)
         {
+            if(auditEvent != null)
+            {
+                auditEvent.addEventData(new AuditEventData("eventType", "GET_CMPRESPONDER"));
+                auditEvent.addEventData(new AuditEventData("requestor", requestor.getCertificate().getSubject()));
+            }
+
             InfoTypeAndValue itv = new InfoTypeAndValue(
                     new ASN1ObjectIdentifier(CustomObjectIdentifiers.id_cmp_getCmpResponderCert),
                     responder.getCertificateAsBCObject().toASN1Structure());
@@ -532,7 +538,7 @@ public abstract class CmpResponder
 
     private static String canonicalizeSortedName(X500Name name)
     {
-        return SecurityUtil.canonicalizeName(SecurityUtil.sortX509Name(name));
+        return SecurityUtil.getRFC4519Name(SecurityUtil.sortX509Name(name));
     }
 
 }

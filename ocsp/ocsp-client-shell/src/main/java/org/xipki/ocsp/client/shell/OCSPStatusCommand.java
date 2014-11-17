@@ -163,7 +163,7 @@ public class OCSPStatusCommand extends AbstractOCSPStatusCommand
 
                 if(verbose.booleanValue())
                 {
-                    out("Responder is " + SecurityUtil.canonicalizeName(responderCerts[0].getSubject()));
+                    out("Responder is " + SecurityUtil.getRFC4519Name(responderCerts[0].getSubject()));
                 }
             }
         }
