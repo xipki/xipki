@@ -265,7 +265,7 @@ public class P11ListSlotCommand extends SecurityCommand
         try
         {
             X500Principal x500Prin = new X500Principal(bytes);
-            subject = SecurityUtil.canonicalizeName(x500Prin);
+            subject = SecurityUtil.getRFC4519Name(x500Prin);
         }catch(Exception e)
         {
             subject = new String(bytes);
@@ -287,7 +287,7 @@ public class P11ListSlotCommand extends SecurityCommand
         try
         {
             X500Principal x500Prin = new X500Principal(bytes);
-            issuer = SecurityUtil.canonicalizeName(x500Prin);
+            issuer = SecurityUtil.getRFC4519Name(x500Prin);
         }catch(Exception e)
         {
             issuer = new String(bytes);
@@ -324,7 +324,7 @@ public class P11ListSlotCommand extends SecurityCommand
 
     private void formatString(StringBuilder sb, X509Certificate cert)
     {
-        String subject = SecurityUtil.canonicalizeName(cert.getSubjectX500Principal());
+        String subject = SecurityUtil.getRFC4519Name(cert.getSubjectX500Principal());
 
         if(verbose.booleanValue() == false)
         {
@@ -337,7 +337,7 @@ public class P11ListSlotCommand extends SecurityCommand
             .append(subject)
             .append("\n");
 
-        String issuer = SecurityUtil.canonicalizeName(cert.getIssuerX500Principal());
+        String issuer = SecurityUtil.getRFC4519Name(cert.getIssuerX500Principal());
         sb.append("\t\t\tIssuer:     ")
             .append(issuer)
             .append("\n");
