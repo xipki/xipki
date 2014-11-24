@@ -118,8 +118,8 @@ import org.xipki.ca.api.CAStatus;
 import org.xipki.ca.api.CertProfileException;
 import org.xipki.ca.api.CertValidity;
 import org.xipki.ca.api.OperationException;
-import org.xipki.ca.api.X509CertificateWithMetaInfo;
 import org.xipki.ca.api.OperationException.ErrorCode;
+import org.xipki.ca.api.X509CertificateWithMetaInfo;
 import org.xipki.ca.api.profile.ExtensionOccurrence;
 import org.xipki.ca.api.profile.ExtensionTuple;
 import org.xipki.ca.api.profile.ExtensionTuples;
@@ -127,26 +127,26 @@ import org.xipki.ca.api.profile.SubjectInfo;
 import org.xipki.ca.api.profile.x509.SpecialX509CertProfileBehavior;
 import org.xipki.ca.api.profile.x509.X509Util;
 import org.xipki.ca.api.publisher.X509CertificateInfo;
-import org.xipki.ca.server.mgmt.X509CAInfo;
 import org.xipki.ca.server.mgmt.CAManagerImpl;
 import org.xipki.ca.server.mgmt.CRLControl;
 import org.xipki.ca.server.mgmt.CRLControl.UpdateMode;
 import org.xipki.ca.server.mgmt.IdentifiedX509CertProfile;
 import org.xipki.ca.server.mgmt.IdentifiedX509CertPublisher;
+import org.xipki.ca.server.mgmt.X509CAInfo;
 import org.xipki.ca.server.mgmt.api.DuplicationMode;
 import org.xipki.ca.server.mgmt.api.ValidityMode;
-import org.xipki.ca.server.store.X509CertWithRevocationInfo;
 import org.xipki.ca.server.store.CertificateStore;
+import org.xipki.ca.server.store.X509CertWithRevocationInfo;
 import org.xipki.common.CRLReason;
 import org.xipki.common.CertRevocationInfo;
 import org.xipki.common.CustomObjectIdentifiers;
 import org.xipki.common.HashAlgoType;
 import org.xipki.common.HashCalculator;
 import org.xipki.common.HealthCheckResult;
-import org.xipki.common.SecurityUtil;
 import org.xipki.common.LogUtil;
 import org.xipki.common.ObjectIdentifiers;
 import org.xipki.common.ParamChecker;
+import org.xipki.common.SecurityUtil;
 import org.xipki.security.api.ConcurrentContentSigner;
 import org.xipki.security.api.NoIdleSignerException;
 
@@ -1288,14 +1288,25 @@ public class X509CA
 
     public boolean publishCertificate(X509CertificateInfo certInfo)
     {
+        return intern_publishCertificate(certInfo) == 0;
+    }
+
+    /**
+     *
+     * @param certInfo
+     * @return 0 for published successfully, 1 if could not be published to CA certstore and any publishers,
+     *  2 if could be published to CA certstore but not to all publishers.
+     */
+    private int intern_publishCertificate(X509CertificateInfo certInfo)
+    {
         if(certInfo.isAlreadyIssued())
         {
-            return true;
+            return 0;
         }
 
         if(certstore.addCertificate(certInfo) == false)
         {
-            return false;
+            return 1;
         }
 
         for(IdentifiedX509CertPublisher publisher : getPublishers())
@@ -1336,11 +1347,11 @@ public class X509CA
                     LOG.error(LogUtil.buildExceptionLogFormat(message), t.getClass().getName(), t.getMessage());
                 }
                 LOG.debug(message, t);
-                return false;
+                return 2;
             }
         }
 
-        return true;
+        return 0;
     }
 
     public boolean republishCertificates(List<String> publisherNames)
@@ -2539,7 +2550,10 @@ public class X509CA
                         subjectPublicKeyData, certProfileName);
                 ret.setUser(user);
 
-                publishCertificate(ret);
+                if(intern_publishCertificate(ret) == 1)
+                {
+                    throw new OperationException(ErrorCode.System_Failure, "could not save certificate");
+                }
             } catch (CertificateException | IOException | CertProfileException e)
             {
                 throw new OperationException(ErrorCode.System_Failure, e.getClass().getName() + ": " + e.getMessage());
