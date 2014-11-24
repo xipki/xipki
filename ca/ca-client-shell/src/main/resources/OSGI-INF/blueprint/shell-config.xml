@@ -135,5 +135,13 @@
         <entry key="-cadb" value-ref="filePathCompleter"/>
       </optional-completers>
     </command>
+    <command name="caclient/health">
+      <action class="org.xipki.ca.client.shell.HealthCommand">
+        <property name="raWorker" ref="raWorker"/>
+      </action>
+      <optional-completers>
+        <entry key="-ca" value-ref="caNameCompleter"/>
+      </optional-completers>
+    </command>
   </command-bundle>
 </blueprint>

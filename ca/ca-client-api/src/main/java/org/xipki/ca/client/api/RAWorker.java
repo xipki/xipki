@@ -49,6 +49,7 @@ import org.xipki.ca.client.api.dto.EnrollCertEntryType;
 import org.xipki.ca.client.api.dto.EnrollCertRequestType;
 import org.xipki.ca.client.api.dto.RevokeCertRequestType;
 import org.xipki.ca.client.api.dto.UnrevokeOrRemoveCertRequestType;
+import org.xipki.common.HealthCheckResult;
 
 /**
  * @author Lijun Liao
@@ -130,5 +131,8 @@ public interface RAWorker
     RemoveExpiredCertsResult removeExpiredCerts(String caName,
             String certProfile, String userLike, long overlapSeconds)
     throws RAWorkerException, PKIErrorException;
+
+    HealthCheckResult getHealthCheckResult(String caName)
+    throws RAWorkerException;
 
 }

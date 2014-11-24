@@ -50,6 +50,7 @@ class CAConf
 {
     private final String name;
     private final String url;
+    private final String healthUrl;
     private final String requestorName;
     private X509CmpRequestor requestor;
 
@@ -59,7 +60,7 @@ class CAConf
     private X500Name subject;
     private Set<String> profiles = Collections.emptySet();
 
-    CAConf(String name, String url, String requestorName)
+    CAConf(String name, String url, String healthUrl, String requestorName)
     {
         ParamChecker.assertNotEmpty("name", name);
         ParamChecker.assertNotEmpty("url", url);
@@ -68,6 +69,14 @@ class CAConf
         this.name = name;
         this.url = url;
         this.requestorName = requestorName;
+        if(healthUrl == null || healthUrl.isEmpty())
+        {
+            this.healthUrl = url.replace("cmp", "health");
+        }
+        else
+        {
+            this.healthUrl = healthUrl;
+        }
     }
 
     public String getName()
@@ -78,6 +87,11 @@ class CAConf
     public String getUrl()
     {
         return url;
+    }
+
+    public String getHealthUrl()
+    {
+        return healthUrl;
     }
 
     public void setCAInfo(X509Certificate cert, Set<String> profiles)

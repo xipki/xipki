@@ -41,6 +41,8 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigInteger;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
@@ -114,10 +116,11 @@ import org.xipki.ca.client.impl.jaxb.FileOrValueType;
 import org.xipki.ca.client.impl.jaxb.ObjectFactory;
 import org.xipki.ca.client.impl.jaxb.RequestorType;
 import org.xipki.common.ConfigurationException;
+import org.xipki.common.HealthCheckResult;
 import org.xipki.common.IoUtil;
-import org.xipki.common.SecurityUtil;
 import org.xipki.common.LogUtil;
 import org.xipki.common.ParamChecker;
+import org.xipki.common.SecurityUtil;
 import org.xipki.security.api.ConcurrentContentSigner;
 import org.xipki.security.api.SignerException;
 import org.xml.sax.SAXException;
@@ -296,7 +299,7 @@ public final class RAWorkerImpl extends AbstractRAWorker implements RAWorker
             String caName = caType.getName();
             try
             {
-                CAConf ca = new CAConf(caName, caType.getUrl(), caType.getRequestor());
+                CAConf ca = new CAConf(caName, caType.getUrl(), caType.getHealthUrl(), caType.getRequestor());
                 CAInfoType caInfo = caType.getCAInfo();
                 if(caInfo.getAutoConf() == null)
                 {
@@ -1221,6 +1224,99 @@ public final class RAWorkerImpl extends AbstractRAWorker implements RAWorker
         {
             throw new RAWorkerException(e);
         }
+    }
+
+    @Override
+    public HealthCheckResult getHealthCheckResult(String caName)
+    throws RAWorkerException
+    {
+        ParamChecker.assertNotNull("caName", caName);
+
+        if(casMap.containsKey(caName) == false)
+        {
+            throw new IllegalArgumentException("Unknown CAConf " + caName);
+        }
+
+        String healthUrlStr = casMap.get(caName).getHealthUrl();
+
+        URL serverUrl;
+        try
+        {
+            serverUrl = new URL(healthUrlStr);
+        } catch (MalformedURLException e)
+        {
+            throw new RAWorkerException("invalid URL '" + healthUrlStr);
+        }
+
+        String name = "X509CA";
+        HealthCheckResult healthCheckResult = new HealthCheckResult(name);
+
+        try
+        {
+            HttpURLConnection httpUrlConnection = (HttpURLConnection) serverUrl.openConnection();
+            InputStream inputStream = httpUrlConnection.getInputStream();
+            int responseCode = httpUrlConnection.getResponseCode();
+            if (responseCode != HttpURLConnection.HTTP_OK && responseCode != HttpURLConnection.HTTP_INTERNAL_ERROR)
+            {
+                inputStream.close();
+                throw new IOException("Bad Response: "
+                        + httpUrlConnection.getResponseCode() + "  "
+                        + httpUrlConnection.getResponseMessage());
+            }
+
+            String responseContentType = httpUrlConnection.getContentType();
+            boolean isValidContentType = false;
+            if (responseContentType != null)
+            {
+                if (responseContentType.equalsIgnoreCase("application/json"))
+                {
+                    isValidContentType = true;
+                }
+            }
+            if (isValidContentType == false)
+            {
+                inputStream.close();
+                throw new IOException("Bad Response: Mime type " + responseContentType + " not supported!");
+            }
+
+            byte[] responseBytes = IoUtil.read(inputStream);
+            if(responseBytes.length == 0)
+            {
+                healthCheckResult.setHealthy(responseCode == HttpURLConnection.HTTP_OK);
+            }
+            else
+            {
+                String response = new String(responseBytes);
+                try
+                {
+                    healthCheckResult = HealthCheckResult.getInstanceFromJsonMessage(name, response);
+                }catch(IllegalArgumentException e)
+                {
+                    final String message = "IOException while parsing the health json message";
+                    if(LOG.isErrorEnabled())
+                    {
+                        LOG.error(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(), e.getMessage());
+                    }
+                    if(LOG.isDebugEnabled())
+                    {
+                        LOG.debug(message + ", json message: " + response, e);
+                    }
+                    healthCheckResult.setHealthy(false);
+                }
+            }
+        }catch(IOException e)
+        {
+            final String message = "IOException while calling the URL " + healthUrlStr;
+            if(LOG.isErrorEnabled())
+            {
+                LOG.error(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(), e.getMessage());
+            }
+            LOG.debug(message, e);
+
+            healthCheckResult.setHealthy(false);
+        }
+
+        return healthCheckResult;
     }
 
     private static CAClientType parse(InputStream configStream)
