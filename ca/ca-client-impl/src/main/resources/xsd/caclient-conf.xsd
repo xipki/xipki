@@ -54,6 +54,7 @@
     <xs:all>
       <xs:element name="name" type="xs:string"/>
       <xs:element name="url" type="xs:anyURI"/>
+      <xs:element name="healthUrl" type="xs:anyURI" minOccurs="0"/>
       <xs:element name="requestor" type="xs:string"/>
       <xs:element name="CAInfo" type="CAInfoType"/>
     </xs:all>
