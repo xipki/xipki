@@ -15,6 +15,13 @@
         <null/>
       </completers>
     </command>
+    <command name="file/ls">
+      <action class="org.xipki.console.karaf.FileListCommand"/>
+      <completers>
+        <ref component-id="filePathCompleter"/>
+        <null/>
+      </completers>
+    </command>
   </command-bundle>
 
 </blueprint>
