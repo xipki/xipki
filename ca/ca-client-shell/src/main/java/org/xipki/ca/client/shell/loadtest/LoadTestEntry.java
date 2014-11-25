@@ -39,11 +39,10 @@ import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.DERUTF8String;
 import org.bouncycastle.asn1.x500.RDN;
 import org.bouncycastle.asn1.x500.X500Name;
-import org.bouncycastle.asn1.x500.style.IETFUtils;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
-import org.xipki.common.SecurityUtil;
 import org.xipki.common.ObjectIdentifiers;
 import org.xipki.common.ParamChecker;
+import org.xipki.common.SecurityUtil;
 
 /**
  * @author Lijun Liao
@@ -134,7 +133,7 @@ public class LoadTestEntry
                 {
                     if(rdn.getFirst().getType().equals(subjectRDNForIncrement))
                     {
-                        String text = IETFUtils.valueToString(rdn.getFirst().getValue());
+                        String text = SecurityUtil.rdnValueToString(rdn.getFirst().getValue());
                         rdn = new RDN(subjectRDNForIncrement, new DERUTF8String(text + index));
                         incremented = true;
                     }
