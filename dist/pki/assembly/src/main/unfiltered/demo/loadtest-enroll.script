@@ -9,7 +9,7 @@ sleep 2000
 # Loadtest Template
 echo "Template enroll load test"
 caclient:loadtest-template-enroll \
-  -template ca-demo/loadtest-template.xml \
+  -template demo/loadtest-template.xml \
   -duration 10 -thread 8
 
 # Loadtest RSA key

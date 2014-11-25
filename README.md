@@ -191,36 +191,36 @@ Run Demo
      * For RSA key in PKCS#12 file
      
       ```sh
-      ca-demo/rsa-demo.script
+      demo/rsa-demo.script
       ```
        
      * For EC key in PKCS#12 file
      
       ```sh
-      ca-demo/ec-demo.script
+      demo/ec-demo.script
       ```
        
      * For DSA key in PKCS#12 file
      
       ```sh
-      ca-demo/dsa-demo.script
+      demo/dsa-demo.script
       ```
        
      * For RSA key in PKCS#11 device (simulator)
      
       ```sh
-      ca-demo/hsm-rsa-demo.script
+      demo/hsm-rsa-demo.script
       ```
        
      * For EC key in PKCS#11 device (simulator)
      
       ```sh
-      ca-demo/hsm-ec-demo.script
+      demo/hsm-ec-demo.script
       ```
      * For DSA key in PKCS#11 device (simulator)
      
       ```sh
-      ca-demo/hsm-dsa-demo.script
+      demo/hsm-dsa-demo.script
       ```
     The generated keys, certificates, CRLs are saved in folder `$XIPKI_HOME/output`
   
