@@ -69,13 +69,17 @@ public class EnrollCertCommand extends ClientCommand
             required = false, description = "Username")
     protected String user;
 
+    @Option(name = "-ca",
+            required = false, description = "Required if the profile is supported by more than one CA")
+    protected String caName;
+
     @Override
     protected Object doExecute()
     throws Exception
     {
         CertificationRequest p10Req = CertificationRequest.getInstance(
                 IoUtil.read(p10File));
-        EnrollCertResult result = raWorker.requestCert(p10Req, profile, null, user);
+        EnrollCertResult result = raWorker.requestCert(p10Req, profile, caName, user);
 
         X509Certificate cert = null;
         if(result != null)

@@ -83,6 +83,10 @@ public abstract class EnrollCert2Command extends ClientCommand
             required = false, description = "Hash algorithm name for the POPO computation")
     protected String hashAlgo = "SHA256";
 
+    @Option(name = "-ca",
+            required = false, description = "Required if the profile is supported by more than one CA")
+    protected String caName;
+
     protected SecurityFactory securityFactory;
 
     public void setSecurityFactory(SecurityFactory securityFactory)
@@ -125,7 +129,7 @@ public abstract class EnrollCert2Command extends ClientCommand
         EnrollCertRequestEntryType reqEntry = new EnrollCertRequestEntryType("id-1", profile, certReq, popo);
         request.addRequestEntry(reqEntry);
 
-        EnrollCertResult result = raWorker.requestCerts(request, null, user);
+        EnrollCertResult result = raWorker.requestCerts(request, caName, user);
 
         X509Certificate cert = null;
         if(result != null)

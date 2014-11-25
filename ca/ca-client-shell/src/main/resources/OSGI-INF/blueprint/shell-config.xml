@@ -31,6 +31,7 @@
       <optional-completers>
         <entry key="-out" value-ref="filePathCompleter"/>
         <entry key="-module" value-ref="p11ModuleNameCompleter"/>
+        <entry key="-ca" value-ref="caNameCompleter"/>
       </optional-completers>
     </command>
     <command name="caclient/enroll2-p12">
@@ -41,6 +42,7 @@
       <optional-completers>
         <entry key="-out" value-ref="filePathCompleter"/>
         <entry key="-p12" value-ref="filePathCompleter"/>
+        <entry key="-ca" value-ref="caNameCompleter"/>
       </optional-completers>
     </command>
     <command name="caclient/enroll">
@@ -50,6 +52,7 @@
       <optional-completers>
         <entry key="-out" value-ref="filePathCompleter"/>
         <entry key="-p10" value-ref="filePathCompleter"/>
+        <entry key="-ca" value-ref="caNameCompleter"/>
       </optional-completers>
     </command>
     <command name="caclient/revoke">
