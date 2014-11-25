@@ -67,11 +67,12 @@ import java.util.Set;
 import javax.security.auth.x500.X500Principal;
 
 import org.bouncycastle.asn1.ASN1Encodable;
+import org.bouncycastle.asn1.ASN1Encoding;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.ASN1OctetString;
+import org.bouncycastle.asn1.ASN1String;
 import org.bouncycastle.asn1.DERNull;
-import org.bouncycastle.asn1.DERPrintableString;
-import org.bouncycastle.asn1.DERUTF8String;
+import org.bouncycastle.asn1.DERUniversalString;
 import org.bouncycastle.asn1.cmp.PKIFreeText;
 import org.bouncycastle.asn1.cmp.PKIStatus;
 import org.bouncycastle.asn1.nist.NISTNamedCurves;
@@ -88,6 +89,7 @@ import org.bouncycastle.asn1.x509.Extension;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.bouncycastle.asn1.x9.X962NamedCurves;
 import org.bouncycastle.util.encoders.Base64;
+import org.bouncycastle.util.encoders.Hex;
 import org.bouncycastle.x509.extension.X509ExtensionUtil;
 
 /**
@@ -126,7 +128,7 @@ public class SecurityUtil
         RDN[] rdns = name.getRDNs(ObjectIdentifiers.DN_CN);
         if(rdns != null && rdns.length > 0)
         {
-            return IETFUtils.valueToString(rdns[0].getFirst().getValue());
+            return rdnValueToString(rdns[0].getFirst().getValue());
         }
         return null;
     }
@@ -174,8 +176,7 @@ public class SecurityUtil
 
             for(RDN thisRDN : thisRDNs)
             {
-                String text = IETFUtils.valueToString(thisRDN.getFirst().getValue());
-                rdns.add(createSubjectRDN(text, type));
+                rdns.add(thisRDN);
             }
         }
 
@@ -202,23 +203,6 @@ public class SecurityUtil
         {
             return ret.toArray(new RDN[0]);
         }
-    }
-
-    private static RDN createSubjectRDN(String text, ASN1ObjectIdentifier type)
-    {
-        ASN1Encodable dnValue;
-        if(ObjectIdentifiers.DN_SERIALNUMBER.equals(type) || ObjectIdentifiers.DN_C.equals(type))
-        {
-            dnValue = new DERPrintableString(text);
-        }
-        else
-        {
-            dnValue = new DERUTF8String(text);
-        }
-
-        RDN rdn = new RDN(type, dnValue);
-
-        return rdn;
     }
 
     private static CertificateFactory certFact;
@@ -718,5 +702,36 @@ public class SecurityUtil
         {
             throw new CertificateEncodingException("Invalid extension AuthorityKeyIdentifier: " + e.getMessage());
         }
+    }
+
+    public static String rdnValueToString(ASN1Encodable value)
+    {
+        if (value instanceof ASN1String && !(value instanceof DERUniversalString))
+        {
+            return ((ASN1String)value).getString();
+        }
+        else
+        {
+            try
+            {
+                return "#" + bytesToString(Hex.encode(value.toASN1Primitive().getEncoded(ASN1Encoding.DER)));
+            }
+            catch (IOException e)
+            {
+                throw new IllegalArgumentException("Other value has no encoded form");
+            }
+        }
+    }
+
+    private static String bytesToString(byte[] data)
+    {
+        char[]  cs = new char[data.length];
+
+        for (int i = 0; i != cs.length; i++)
+        {
+            cs[i] = (char)(data[i] & 0xff);
+        }
+
+        return new String(cs);
     }
 }
