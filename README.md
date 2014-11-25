@@ -53,8 +53,7 @@ eXtensible sImple Public Key Infrastructure consists of CA and OCSP responder.
   - Support of PKCS#11 devices, e.g. HSM
   - API to use customized key types, e.g. smartcard
   - High performance
-  - Java based, OS independent
-  - OSGi-based
+  - OSGi-based (java), OS independent
   - Support of health check
   - Audit with syslog and slf4j
 
