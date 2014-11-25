@@ -75,7 +75,6 @@ import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 import org.bouncycastle.asn1.x500.DirectoryString;
 import org.bouncycastle.asn1.x500.RDN;
 import org.bouncycastle.asn1.x500.X500Name;
-import org.bouncycastle.asn1.x500.style.IETFUtils;
 import org.bouncycastle.asn1.x509.AccessDescription;
 import org.bouncycastle.asn1.x509.CertPolicyId;
 import org.bouncycastle.asn1.x509.CertificatePolicies;
@@ -1158,7 +1157,7 @@ public class DefaultX509CertProfile extends AbstractX509CertProfile
 
             if(n == 1)
             {
-                String value = IETFUtils.valueToString(thisRDNs[0].getFirst().getValue());
+                String value = SecurityUtil.rdnValueToString(thisRDNs[0].getFirst().getValue());
                 rdns.add(createSubjectRDN(value, type));
             }
             else
@@ -1166,7 +1165,7 @@ public class DefaultX509CertProfile extends AbstractX509CertProfile
                 String[] values = new String[n];
                 for(int i = 0; i < n; i++)
                 {
-                    values[i] = IETFUtils.valueToString(thisRDNs[i].getFirst().getValue());
+                    values[i] = SecurityUtil.rdnValueToString(thisRDNs[i].getFirst().getValue());
                 }
                 values = sortRDNs(type, values);
 
@@ -1289,7 +1288,7 @@ public class DefaultX509CertProfile extends AbstractX509CertProfile
                     GeneralName[] names = new GeneralName[n];
                     for(int i = 0; i < n; i++)
                     {
-                        String value = IETFUtils.valueToString(rdns[i].getFirst().getValue());
+                        String value = SecurityUtil.rdnValueToString(rdns[i].getFirst().getValue());
                         names[i] = createGeneralName(value, allowedSubjectAltNameModes);
                     }
                     extension = createExtension(extensionType, occurence.isCritical(), new GeneralNames(names));
@@ -1351,7 +1350,7 @@ public class DefaultX509CertProfile extends AbstractX509CertProfile
 
                     for(RDN rdn : rdns)
                     {
-                        String value = IETFUtils.valueToString(rdn.getFirst().getValue());
+                        String value = SecurityUtil.rdnValueToString(rdn.getFirst().getValue());
                         try
                         {
                             CmpUtf8Pairs pairs = new CmpUtf8Pairs(value);

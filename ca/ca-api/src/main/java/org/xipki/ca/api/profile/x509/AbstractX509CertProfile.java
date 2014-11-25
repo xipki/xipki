@@ -50,7 +50,6 @@ import org.bouncycastle.asn1.DERPrintableString;
 import org.bouncycastle.asn1.DERUTF8String;
 import org.bouncycastle.asn1.x500.RDN;
 import org.bouncycastle.asn1.x500.X500Name;
-import org.bouncycastle.asn1.x500.style.IETFUtils;
 import org.bouncycastle.asn1.x509.BasicConstraints;
 import org.bouncycastle.asn1.x509.ExtendedKeyUsage;
 import org.bouncycastle.asn1.x509.Extension;
@@ -65,6 +64,7 @@ import org.xipki.ca.api.profile.ExtensionTuples;
 import org.xipki.ca.api.profile.RDNOccurrence;
 import org.xipki.ca.api.profile.SubjectInfo;
 import org.xipki.common.ObjectIdentifiers;
+import org.xipki.common.SecurityUtil;
 import org.xipki.common.StringUtil;
 
 /**
@@ -197,7 +197,7 @@ extends X509CertProfile
 
             if(n == 1)
             {
-                String value = IETFUtils.valueToString(thisRDNs[0].getFirst().getValue());
+                String value = SecurityUtil.rdnValueToString(thisRDNs[0].getFirst().getValue());
                 rdns.add(createSubjectRDN(value, type));
             }
             else
@@ -205,7 +205,7 @@ extends X509CertProfile
                 String[] values = new String[n];
                 for(int i = 0; i < n; i++)
                 {
-                    values[i] = IETFUtils.valueToString(thisRDNs[i].getFirst().getValue());
+                    values[i] = SecurityUtil.rdnValueToString(thisRDNs[i].getFirst().getValue());
                 }
                 values = sortRDNs(type, values);
 
@@ -436,7 +436,7 @@ extends X509CertProfile
         }
 
         RDN rdn = rdns[index];
-        return IETFUtils.valueToString(rdn.getFirst().getValue());
+        return SecurityUtil.rdnValueToString(rdn.getFirst().getValue());
     }
 
     protected RDN createSubjectRDN(String text, ASN1ObjectIdentifier type)

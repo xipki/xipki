@@ -80,7 +80,6 @@ import org.bouncycastle.asn1.DERSet;
 import org.bouncycastle.asn1.DERUTF8String;
 import org.bouncycastle.asn1.x500.RDN;
 import org.bouncycastle.asn1.x500.X500Name;
-import org.bouncycastle.asn1.x500.style.IETFUtils;
 import org.bouncycastle.asn1.x509.AuthorityInformationAccess;
 import org.bouncycastle.asn1.x509.AuthorityKeyIdentifier;
 import org.bouncycastle.asn1.x509.CRLDistPoint;
@@ -2117,7 +2116,7 @@ public class X509CA
             RDN[] cnRDNs = requestedSubject.getRDNs(ObjectIdentifiers.DN_CN);
             if(cnRDNs != null && cnRDNs.length > 0)
             {
-                String requestedCN = IETFUtils.valueToString(cnRDNs[0].getFirst().getValue());
+                String requestedCN = SecurityUtil.rdnValueToString(cnRDNs[0].getFirst().getValue());
                 Long gsmckFirstNotBeforeInSecond = certstore.getNotBeforeOfFirstCertStartsWithCN(
                         requestedCN, certProfileName);
                 if(gsmckFirstNotBeforeInSecond != null)
@@ -2603,7 +2602,7 @@ public class X509CA
         boolean changed = false;
         for(RDN rdn : rdns)
         {
-            String textValue = IETFUtils.valueToString(rdn.getFirst().getValue());
+            String textValue = SecurityUtil.rdnValueToString(rdn.getFirst().getValue());
             if(textValue == null || textValue.isEmpty())
             {
                 changed = true;
