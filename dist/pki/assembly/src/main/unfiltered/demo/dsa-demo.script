@@ -24,16 +24,16 @@ keytool:dsa-p12 -pwd 1234 -plen $PLEN -out output/SubCA1.p12 \
 keytool:dsa-p12 -pwd 1234 -plen $PLEN -out output/SubCAwithCRL1.p12 \
   -subject "CN=SubCAwithCRL1"
 
-source ./ca-demo/prepare.script
+source ./demo/prepare.script
 
-source ./ca-demo/p12.script
+source ./demo/p12.script
 
-source ./ca-demo/ra.script
+source ./demo/ra.script
 
-source ./ca-demo/ocsp.script
+source ./demo/ocsp.script
 
-#source ./ca-demo/loadtest-enroll.script
+#source ./demo/loadtest-enroll.script
 
-#source ./ca-demo/loadtest-ocsp.script
+#source ./demo/loadtest-ocsp.script
 
 

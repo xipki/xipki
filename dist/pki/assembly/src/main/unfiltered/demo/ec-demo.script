@@ -23,14 +23,14 @@ keytool:ec-p12 -curve $CURVE -pwd 1234 -out output/SubCA1.p12 \
 keytool:ec-p12 -curve $CURVE -pwd 1234 -out output/SubCAwithCRL1.p12 \
   -subject "CN=SubCAwithCRL1,O=xipki,C=DE"
 
-source ./ca-demo/prepare.script
+source ./demo/prepare.script
 
-source ./ca-demo/p12.script
+source ./demo/p12.script
 
-source ./ca-demo/ra.script
+source ./demo/ra.script
 
-source ./ca-demo/ocsp.script
+source ./demo/ocsp.script
 
-#source ./ca-demo/loadtest-enroll.script
+#source ./demo/loadtest-enroll.script
 
-#source ./ca-demo/loadtest-ocsp.script
+#source ./demo/loadtest-ocsp.script

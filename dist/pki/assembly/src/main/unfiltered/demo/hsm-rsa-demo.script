@@ -1,13 +1,13 @@
-# Valid signer algos are SHA<n>withRSAandMGF1, where n is 1, 256, 384 and 512
-
-CA_SIGNER_ALGO = SHA256withRSAandMGF1
+# Valid signer algos are SHA<n>withRSA where n is 1, 256, 384 and 512
+#
+CA_SIGNER_ALGO = SHA256withRSA
 
 RCA_KEY_LABEL = RCA1
 SubCA_KEY_LABEL = SubCA1
 SubCAwithCRL_KEY_LABEL = SubCAwithCRL1
 
 echo "========================================================"
-echo "||            DEMO RSA (PSS) with HSM Key             ||"
+echo "||      DEMO RSA (PKCS#1 v1.5) with HSM Key           ||"
 echo "========================================================"
 
 features:install xipki-security-shell
@@ -28,14 +28,14 @@ keytool:rsa -slot 1 -key-label $SubCAwithCRL_KEY_LABEL
 
 features:uninstall xipki-security-shell
 
-source ./ca-demo/prepare.script
+source ./demo/prepare.script
 
-source ./ca-demo/hsm.script
+source ./demo/hsm.script
 
-source ./ca-demo/ra.script
+source ./demo/ra.script
 
-source ./ca-demo/ocsp.script
+source ./demo/ocsp.script
 
-#source ./ca-demo/loadtest-enroll.script
+#source ./demo/loadtest-enroll.script
 
-#source ./ca-demo/loadtest-ocsp.script
+#source ./demo/loadtest-ocsp.script

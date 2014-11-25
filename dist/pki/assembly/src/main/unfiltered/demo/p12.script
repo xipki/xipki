@@ -4,7 +4,7 @@ features:install xipki-security-shell
 #                          GENERATE RCA                         #
 #################################################################
 ## Add the profile RCA
-ca:profile-add -name  RCA -type XML -confFile ca-demo/profile/CertProfile_RootCA.xml
+ca:profile-add -name  RCA -type XML -confFile demo/profile/CertProfile_RootCA.xml
 
 ## Generate selfsigned RCA
 ca:gen-rca -name RCA1 \
