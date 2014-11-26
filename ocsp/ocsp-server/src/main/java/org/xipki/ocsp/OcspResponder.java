@@ -577,6 +577,8 @@ public class OcspResponder
                 store.setCertHashAlgorithm(certHashAlgo);
             }
 
+            store.start();
+
             this.certStatusStores.add(store);
         }
     }

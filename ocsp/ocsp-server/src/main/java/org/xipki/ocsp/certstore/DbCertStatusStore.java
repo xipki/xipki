@@ -576,6 +576,12 @@ public class DbCertStatusStore extends CertStatusStore
     }
 
     @Override
+    public boolean start()
+    {
+        return true;
+    }
+
+    @Override
     public void shutdown()
     throws CertStatusStoreException
     {
@@ -598,4 +604,5 @@ public class DbCertStatusStore extends CertStatusStore
     {
         return issuerStore.getIssuerHashNameAndKeys();
     }
+
 }

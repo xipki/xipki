@@ -62,6 +62,8 @@ public abstract class CertStatusStore
     public abstract void init(String conf, DataSourceFactory datasourceFactory, PasswordResolver passwordResolver)
     throws CertStatusStoreException;
 
+    public abstract boolean start();
+
     public abstract void shutdown()
     throws CertStatusStoreException;
 

@@ -68,6 +68,10 @@
         <useUpdateDatesFromCRL>false</useUpdateDatesFromCRL>
         <caCertFile>output/SubCAwithCRL1.der</caCertFile>
         <caRevoked>false</caRevoked>
+        <!--
+        <caRevoked>true</caRevoked>
+        <caRevocationTime>2014-09-12T11:34:36Z</caRevocationTime>
+        -->
         <certsDir>output</certsDir>
       </crlStore>
       <inheritCaRevocation>true</inheritCaRevocation>

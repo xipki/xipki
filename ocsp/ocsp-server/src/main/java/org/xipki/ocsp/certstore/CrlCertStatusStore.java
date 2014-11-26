@@ -194,12 +194,18 @@ public class CrlCertStatusStore extends CertStatusStore
         this.certsDirname = certsDirname;
 
         this.sha1 = new SHA1Digest();
+    }
+
+    @Override
+    public boolean start()
+    {
         initializeStore(true);
 
         StoreUpdateService storeUpdateService = new StoreUpdateService();
         scheduledThreadPoolExecutor = new ScheduledThreadPoolExecutor(1);
         scheduledThreadPoolExecutor.scheduleAtFixedRate(
                 storeUpdateService, 60, 60, TimeUnit.SECONDS);
+        return true;
     }
 
     private synchronized void initializeStore(boolean force)
