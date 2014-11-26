@@ -2038,6 +2038,11 @@ public class X509CA
             boolean keyUpdate)
     throws OperationException
     {
+        if(caInfo.getRevocationInfo() != null)
+        {
+            throw new OperationException(ErrorCode.NOT_PERMITTED, "CA is revoked");
+        }
+
         IdentifiedX509CertProfile certProfile;
         try
         {
