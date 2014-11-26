@@ -64,7 +64,6 @@ import org.bouncycastle.asn1.DEROctetString;
 import org.bouncycastle.asn1.DERPrintableString;
 import org.bouncycastle.asn1.x500.RDN;
 import org.bouncycastle.asn1.x500.X500Name;
-import org.bouncycastle.asn1.x500.style.IETFUtils;
 import org.bouncycastle.asn1.x509.Certificate;
 import org.bouncycastle.asn1.x509.Extension;
 import org.bouncycastle.util.encoders.Base64;
@@ -2169,7 +2168,7 @@ class CertStoreQueryExecutor
                 }
                 else
                 {
-                    return IETFUtils.valueToString(rdns[0].getFirst().getValue());
+                    return SecurityUtil.rdnValueToString(rdns[0].getFirst().getValue());
                 }
             }
         }catch(SQLException e)
