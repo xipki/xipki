@@ -3305,45 +3305,33 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
         LOG.info("Revoking CA {}", caName);
         X509CA ca = x509cas.get(caName);
 
-        CRLReason currentReason = null;
         CertRevocationInfo currentRevInfo = ca.getCAInfo().getRevocationInfo();
         if(currentRevInfo != null)
         {
-            currentReason = currentRevInfo.getReason();
+            CRLReason currentReason = currentRevInfo.getReason();
+            if(currentReason != CRLReason.CERTIFICATE_HOLD)
+            {
+                throw new CAMgmtException("CA " + caName + " has been revoked with reason " + currentReason.name());
+            }
         }
 
         PreparedStatement ps = null;
         try
         {
-            if(currentReason == CRLReason.CERTIFICATE_HOLD || currentReason == CRLReason.SUPERSEDED)
+            if(revocationInfo.getInvalidityTime() == null)
             {
-                String sql = "UPDATE CA SET REV_REASON=? WHERE NAME=?";
-                ps = prepareStatement(sql);
-                int i = 1;
-                ps.setInt(i++, revocationInfo.getReason().getCode());
-                ps.setString(i++, caName);
-                ps.executeUpdate();
-
-                revocationInfo.setRevocationTime(currentRevInfo.getRevocationTime());
-                revocationInfo.setInvalidityTime(currentRevInfo.getInvalidityTime());
+                revocationInfo.setInvalidityTime(revocationInfo.getRevocationTime());
             }
-            else
-            {
-                if(revocationInfo.getInvalidityTime() == null)
-                {
-                    revocationInfo.setInvalidityTime(revocationInfo.getRevocationTime());
-                }
 
-                String sql = "UPDATE CA SET REVOKED=?, REV_REASON=?, REV_TIME=?, REV_INVALIDITY_TIME=? WHERE NAME=?";
-                ps = prepareStatement(sql);
-                int i = 1;
-                setBoolean(ps, i++, true);
-                ps.setInt(i++, revocationInfo.getReason().getCode());
-                ps.setLong(i++, revocationInfo.getRevocationTime().getTime() / 1000);
-                ps.setLong(i++, revocationInfo.getInvalidityTime().getTime() / 1000);
-                ps.setString(i++, caName);
-                ps.executeUpdate();
-            }
+            String sql = "UPDATE CA SET REVOKED=?, REV_REASON=?, REV_TIME=?, REV_INVALIDITY_TIME=? WHERE NAME=?";
+            ps = prepareStatement(sql);
+            int i = 1;
+            setBoolean(ps, i++, true);
+            ps.setInt(i++, revocationInfo.getReason().getCode());
+            ps.setLong(i++, revocationInfo.getRevocationTime().getTime() / 1000);
+            ps.setLong(i++, revocationInfo.getInvalidityTime().getTime() / 1000);
+            ps.setString(i++, caName);
+            ps.executeUpdate();
         }catch(SQLException e)
         {
             throw new CAMgmtException(e);
