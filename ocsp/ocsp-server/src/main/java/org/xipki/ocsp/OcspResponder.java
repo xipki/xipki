@@ -36,9 +36,7 @@
 package org.xipki.ocsp;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
@@ -122,7 +120,6 @@ import org.xipki.common.LogUtil;
 import org.xipki.common.ObjectIdentifiers;
 import org.xipki.common.SecurityUtil;
 import org.xipki.datasource.api.DataSourceFactory;
-import org.xipki.datasource.api.DataSourceWrapper;
 import org.xipki.ocsp.OCSPRespWithCacheInfo.ResponseCacheInfo;
 import org.xipki.ocsp.api.CertStatus;
 import org.xipki.ocsp.api.CertStatusInfo;
@@ -445,33 +442,14 @@ public class OcspResponder
 
         // CertStatus Stores
         List<CertstatusStoreType> storeConfs = conf.getCertstatusStores().getCertstatusStore();
+        String statusStoreConf;
         for(CertstatusStoreType storeConf : storeConfs)
         {
             CertStatusStore store;
             if(storeConf.getDbStore() != null)
             {
                 DbStoreType dbStoreConf = storeConf.getDbStore();
-                String databaseConfFile = dbStoreConf.getDbConfFile();
-
-                InputStream confStream = null;
-                DataSourceWrapper dataSource;
-                try
-                {
-                    confStream = new FileInputStream(IoUtil.expandFilepath(databaseConfFile));
-                    dataSource = dataSourceFactory.createDataSource(confStream, securityFactory.getPasswordResolver());
-                } catch (Exception e)
-                {
-                    throw new OcspResponderException(e);
-                } finally
-                {
-                    if(confStream != null)
-                    {
-                        try
-                        {
-                            confStream.close();
-                        }catch(IOException e){}
-                    }
-                }
+                statusStoreConf = "datasource?file:" + dbStoreConf.getDbConfFile();
 
                 Set<X509Certificate> issuers = null;
                 if(dbStoreConf.getCacerts() != null)
@@ -490,7 +468,13 @@ public class OcspResponder
                     }
                 }
 
-                store = new DbCertStatusStore(storeConf.getName(), dataSource, issuers);
+                try
+                {
+                    store = new DbCertStatusStore(storeConf.getName(), issuers);
+                } catch (CertificateEncodingException e)
+                {
+                    throw new OcspResponderException(e);
+                }
 
                 Integer i = storeConf.getRetentionInterval();
                 store.setRetentionInterval(i == null ? -1 : i.intValue());
@@ -499,6 +483,7 @@ public class OcspResponder
             }
             else if(storeConf.getCrlStore() != null)
             {
+                statusStoreConf = "";
                 CrlStoreType crlStoreConf = storeConf.getCrlStore();
                 String caCertFile = crlStoreConf.getCaCertFile();
                 String issuerCertFile = crlStoreConf.getIssuerCertFile();
@@ -530,7 +515,7 @@ public class OcspResponder
             {
                 CustomStoreType customStoreConf = storeConf.getCustomStore();
                 String className = customStoreConf.getClassName();
-                String conf = customStoreConf.getConf();
+                statusStoreConf = customStoreConf.getConf();
 
                 Object instance;
                 try
@@ -544,16 +529,7 @@ public class OcspResponder
 
                 if(instance instanceof CertStatusStore)
                 {
-                    CertStatusStore customStore = (CertStatusStore) instance;
-                    store = customStore;
-
-                    try
-                    {
-                        customStore.init(conf, dataSourceFactory, securityFactory.getPasswordResolver());
-                    } catch (CertStatusStoreException e)
-                    {
-                        throw new OcspResponderException(e.getMessage(), e);
-                    }
+                    store = (CertStatusStore) instance;
                 }
                 {
                     throw new OcspResponderException(className + " is not instanceof " + CertStatusStore.class.getName());
@@ -577,7 +553,14 @@ public class OcspResponder
                 store.setCertHashAlgorithm(certHashAlgo);
             }
 
-            store.start();
+            try
+            {
+                store.init(statusStoreConf, dataSourceFactory, securityFactory.getPasswordResolver());
+            }catch(CertStatusStoreException e)
+            {
+                throw new OcspResponderException("CertStatusStoreException of store " + storeConf.getName() +
+                        ":" + e.getMessage(), e);
+            }
 
             this.certStatusStores.add(store);
         }
