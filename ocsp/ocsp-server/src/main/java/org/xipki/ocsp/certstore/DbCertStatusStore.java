@@ -49,6 +49,7 @@ import java.sql.Statement;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -65,6 +66,7 @@ import org.xipki.common.CmpUtf8Pairs;
 import org.xipki.common.HashAlgoType;
 import org.xipki.common.IoUtil;
 import org.xipki.common.LogUtil;
+import org.xipki.common.SecurityUtil;
 import org.xipki.datasource.api.DataSourceFactory;
 import org.xipki.datasource.api.DataSourceWrapper;
 import org.xipki.ocsp.IssuerEntry;
@@ -150,6 +152,16 @@ public class DbCertStatusStore extends CertStatusStore
     throws CertificateEncodingException
     {
         super(name);
+        if(issuers != null)
+        {
+            Set<String> tmpIssuerSHA1FPs = new HashSet<>(issuers.size());
+            for(X509Certificate issuer : issuers)
+            {
+                String sha1Fp = SecurityUtil.sha1sum(issuer.getEncoded());
+                tmpIssuerSHA1FPs.add(sha1Fp);
+            }
+            this.issuerSHA1FPs = Collections.unmodifiableSet(tmpIssuerSHA1FPs);
+        }
     }
 
     @SuppressWarnings("resource")
@@ -253,7 +265,7 @@ public class DbCertStatusStore extends CertStatusStore
                 while(rs.next())
                 {
                     String sha1Fp = rs.getString("SHA1_FP_CERT");
-                    if(issuerSHA1FPs != null &&issuerSHA1FPs.contains(sha1Fp) == false)
+                    if(issuerSHA1FPs != null && issuerSHA1FPs.contains(sha1Fp) == false)
                     {
                         continue;
                     }
@@ -575,7 +587,7 @@ public class DbCertStatusStore extends CertStatusStore
         String databaseConfFile;
         if(dsConf.startsWith("file:"))
         {
-            databaseConfFile = conf.substring("file:".length());
+            databaseConfFile = dsConf.substring("file:".length());
         }
         else
         {
