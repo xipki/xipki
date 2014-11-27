@@ -39,8 +39,6 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigInteger;
-import java.security.cert.CertificateEncodingException;
-import java.security.cert.X509Certificate;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -49,7 +47,6 @@ import java.sql.Statement;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -66,7 +63,7 @@ import org.xipki.common.CmpUtf8Pairs;
 import org.xipki.common.HashAlgoType;
 import org.xipki.common.IoUtil;
 import org.xipki.common.LogUtil;
-import org.xipki.common.SecurityUtil;
+import org.xipki.common.ParamChecker;
 import org.xipki.datasource.api.DataSourceFactory;
 import org.xipki.datasource.api.DataSourceWrapper;
 import org.xipki.ocsp.IssuerEntry;
@@ -139,7 +136,7 @@ public class DbCertStatusStore extends CertStatusStore
     }
 
     private DataSourceWrapper dataSource;
-    private Set<String> issuerSHA1FPs;
+    private final IssuerFilter issuerFilter;
 
     private IssuerStore issuerStore;
 
@@ -148,20 +145,11 @@ public class DbCertStatusStore extends CertStatusStore
 
     private ScheduledThreadPoolExecutor scheduledThreadPoolExecutor;
 
-    public DbCertStatusStore(String name, Set<X509Certificate> issuers)
-    throws CertificateEncodingException
+    public DbCertStatusStore(String name, IssuerFilter issuerFilter)
     {
         super(name);
-        if(issuers != null)
-        {
-            Set<String> tmpIssuerSHA1FPs = new HashSet<>(issuers.size());
-            for(X509Certificate issuer : issuers)
-            {
-                String sha1Fp = SecurityUtil.sha1sum(issuer.getEncoded());
-                tmpIssuerSHA1FPs.add(sha1Fp);
-            }
-            this.issuerSHA1FPs = Collections.unmodifiableSet(tmpIssuerSHA1FPs);
-        }
+        ParamChecker.assertNotNull("issuerFilter", issuerFilter);
+        this.issuerFilter = issuerFilter;
     }
 
     @SuppressWarnings("resource")
@@ -182,13 +170,10 @@ public class DbCertStatusStore extends CertStatusStore
                     rs = ps.executeQuery();
                     while(rs.next())
                     {
-                        if(issuerSHA1FPs != null)
+                        String sha1Fp = rs.getString("SHA1_FP_CERT");
+                        if(issuerFilter.includeIssuerWithSha1Fp(sha1Fp) == false)
                         {
-                            String sha1Fp = rs.getString("SHA1_FP_CERT");
-                            if(issuerSHA1FPs.contains(sha1Fp) == false)
-                            {
                                 continue;
-                            }
                         }
 
                         int id = rs.getInt("ID");
@@ -265,7 +250,7 @@ public class DbCertStatusStore extends CertStatusStore
                 while(rs.next())
                 {
                     String sha1Fp = rs.getString("SHA1_FP_CERT");
-                    if(issuerSHA1FPs != null && issuerSHA1FPs.contains(sha1Fp) == false)
+                    if(issuerFilter.includeIssuerWithSha1Fp(sha1Fp) == false)
                     {
                         continue;
                     }

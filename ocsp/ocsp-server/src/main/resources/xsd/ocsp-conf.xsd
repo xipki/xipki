@@ -251,18 +251,32 @@
       <xs:element name="cacerts" minOccurs="0">
         <xs:annotation>
           <xs:documentation>
-            Which CAs should be considered. If not present, then all CAs will be 
+            Which CAs should be included and excluded. If not present, then all CAs will be 
             considered.
           </xs:documentation>
         </xs:annotation>
         <xs:complexType>
           <xs:sequence>
-            <xs:element name="cacert" type="xs:string" maxOccurs="unbounded"/>
+            <xs:element name="includes" type="includesType" minOccurs="0"/>
+            <xs:element name="excludes" type="excludesType" minOccurs="0"/>
           </xs:sequence>
         </xs:complexType>
       </xs:element>
     </xs:sequence>
   </xs:complexType>
+  
+  <xs:complexType name="includesType">
+    <xs:sequence>
+      <xs:element name="include" type="xs:string" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="excludesType">
+    <xs:sequence>
+      <xs:element name="exclude" type="xs:string" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+  
   <xs:complexType name="crlStoreType">
     <xs:sequence>
       <xs:element name="crlFile" type="xs:string"/>

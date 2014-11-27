@@ -129,12 +129,15 @@ import org.xipki.ocsp.api.CertStatusStoreException;
 import org.xipki.ocsp.api.OCSPMode;
 import org.xipki.ocsp.certstore.CrlCertStatusStore;
 import org.xipki.ocsp.certstore.DbCertStatusStore;
+import org.xipki.ocsp.certstore.IssuerFilter;
 import org.xipki.ocsp.conf.jaxb.AuditType;
 import org.xipki.ocsp.conf.jaxb.CacheType;
 import org.xipki.ocsp.conf.jaxb.CertstatusStoreType;
 import org.xipki.ocsp.conf.jaxb.CrlStoreType;
 import org.xipki.ocsp.conf.jaxb.CustomStoreType;
 import org.xipki.ocsp.conf.jaxb.DbStoreType;
+import org.xipki.ocsp.conf.jaxb.ExcludesType;
+import org.xipki.ocsp.conf.jaxb.IncludesType;
 import org.xipki.ocsp.conf.jaxb.MappingType;
 import org.xipki.ocsp.conf.jaxb.OCSPResponderType;
 import org.xipki.ocsp.conf.jaxb.ObjectFactory;
@@ -454,30 +457,33 @@ public class OcspResponder
                 utf8Pairs.putUtf8Pair("datasource", "file:" + dbStoreConf.getDbConfFile());
                 statusStoreConf = utf8Pairs.getEncoded();
 
-                Set<X509Certificate> issuers = null;
-                if(dbStoreConf.getCacerts() != null)
-                {
-                    List<String> caCertFiles = dbStoreConf.getCacerts().getCacert();
-                    issuers = new HashSet<>(caCertFiles.size());
-                    for(String caCertFile : caCertFiles)
-                    {
-                        try
-                        {
-                            issuers.add(SecurityUtil.parseCert(caCertFile));
-                        } catch (Exception e)
-                        {
-                            throw new OcspResponderException(e);
-                        }
-                    }
-                }
-
+                IssuerFilter issuerFilter;
                 try
                 {
-                    store = new DbCertStatusStore(storeConf.getName(), issuers);
-                } catch (CertificateEncodingException e)
+                    Set<X509Certificate> includeIssuers = null;
+                    Set<X509Certificate> excludeIssuers = null;
+
+                    if(dbStoreConf.getCacerts() != null)
+                    {
+                        IncludesType includes = dbStoreConf.getCacerts().getIncludes();
+                        if(includes != null)
+                        {
+                            includeIssuers = parseCerts(includes.getInclude());
+                        }
+
+                        ExcludesType excludes = dbStoreConf.getCacerts().getExcludes();
+                        if(excludes != null)
+                        {
+                            excludeIssuers = parseCerts(excludes.getExclude());
+                        }
+                    }
+
+                    issuerFilter = new IssuerFilter(includeIssuers, excludeIssuers);
+                } catch (CertificateException | IOException e)
                 {
                     throw new OcspResponderException(e);
                 }
+                store = new DbCertStatusStore(storeConf.getName(), issuerFilter);
 
                 Integer i = storeConf.getRetentionInterval();
                 store.setRetentionInterval(i == null ? -1 : i.intValue());
@@ -1297,6 +1303,17 @@ public class OcspResponder
     private static boolean getBoolean(Boolean b, boolean defaultValue)
     {
         return (b == null) ? defaultValue : b.booleanValue();
+    }
+
+    private static Set<X509Certificate> parseCerts(List<String> certFiles)
+    throws CertificateException, IOException
+    {
+        Set<X509Certificate> certs = new HashSet<>(certFiles.size());
+        for(String certFile : certFiles)
+        {
+            certs.add(SecurityUtil.parseCert(certFile));
+        }
+        return certs;
     }
 
 }
