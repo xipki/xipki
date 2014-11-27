@@ -35,7 +35,11 @@
 
 package org.xipki.ocsp.certstore;
 
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.math.BigInteger;
+import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -45,7 +49,6 @@ import java.sql.Statement;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -58,9 +61,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.common.CRLReason;
 import org.xipki.common.CertRevocationInfo;
+import org.xipki.common.CmpUtf8Pairs;
 import org.xipki.common.HashAlgoType;
+import org.xipki.common.IoUtil;
 import org.xipki.common.LogUtil;
-import org.xipki.common.ParamChecker;
 import org.xipki.datasource.api.DataSourceFactory;
 import org.xipki.datasource.api.DataSourceWrapper;
 import org.xipki.ocsp.IssuerEntry;
@@ -132,7 +136,7 @@ public class DbCertStatusStore extends CertStatusStore
         }
     }
 
-    private final DataSourceWrapper dataSource;
+    private DataSourceWrapper dataSource;
     private Set<String> issuerSHA1FPs;
 
     private IssuerStore issuerStore;
@@ -142,22 +146,10 @@ public class DbCertStatusStore extends CertStatusStore
 
     private ScheduledThreadPoolExecutor scheduledThreadPoolExecutor;
 
-    public DbCertStatusStore(String name, DataSourceWrapper dataSource, Set<X509Certificate> issuers)
+    public DbCertStatusStore(String name, Set<X509Certificate> issuers)
+    throws CertificateEncodingException
     {
         super(name);
-        ParamChecker.assertNotNull("dataSource", dataSource);
-        this.dataSource = dataSource;
-        if(issuers != null)
-        {
-            this.issuerSHA1FPs = new HashSet<>();
-        }
-
-        initIssuerStore();
-
-        StoreUpdateService storeUpdateService = new StoreUpdateService();
-        scheduledThreadPoolExecutor = new ScheduledThreadPoolExecutor(1);
-        scheduledThreadPoolExecutor.scheduleAtFixedRate(
-                storeUpdateService, 60, 60, TimeUnit.SECONDS);
     }
 
     @SuppressWarnings("resource")
@@ -573,12 +565,48 @@ public class DbCertStatusStore extends CertStatusStore
     public void init(String conf, DataSourceFactory datasourceFactory, PasswordResolver passwordResolver)
     throws CertStatusStoreException
     {
-    }
+        CmpUtf8Pairs utf8Pairs = new CmpUtf8Pairs(conf);
+        String dsConf = utf8Pairs.getValue("datasource");
+        if(dsConf == null)
+        {
+            throw new IllegalArgumentException("no datasource defined");
+        }
 
-    @Override
-    public boolean start()
-    {
-        return true;
+        String databaseConfFile;
+        if(dsConf.startsWith("file:"))
+        {
+            databaseConfFile = conf.substring("file:".length());
+        }
+        else
+        {
+            throw new CertStatusStoreException(dsConf + " does not start with 'file:'");
+        }
+
+        InputStream confStream = null;
+        try
+        {
+            confStream = new FileInputStream(IoUtil.expandFilepath(databaseConfFile));
+            dataSource = datasourceFactory.createDataSource(confStream, passwordResolver);
+        } catch (Exception e)
+        {
+            throw new CertStatusStoreException(e);
+        } finally
+        {
+            if(confStream != null)
+            {
+                try
+                {
+                    confStream.close();
+                }catch(IOException e){}
+            }
+        }
+
+        initIssuerStore();
+
+        StoreUpdateService storeUpdateService = new StoreUpdateService();
+        scheduledThreadPoolExecutor = new ScheduledThreadPoolExecutor(1);
+        scheduledThreadPoolExecutor.scheduleAtFixedRate(
+                storeUpdateService, 60, 60, TimeUnit.SECONDS);
     }
 
     @Override

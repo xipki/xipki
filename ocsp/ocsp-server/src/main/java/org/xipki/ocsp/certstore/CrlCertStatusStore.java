@@ -196,18 +196,6 @@ public class CrlCertStatusStore extends CertStatusStore
         this.sha1 = new SHA1Digest();
     }
 
-    @Override
-    public boolean start()
-    {
-        initializeStore(true);
-
-        StoreUpdateService storeUpdateService = new StoreUpdateService();
-        scheduledThreadPoolExecutor = new ScheduledThreadPoolExecutor(1);
-        scheduledThreadPoolExecutor.scheduleAtFixedRate(
-                storeUpdateService, 60, 60, TimeUnit.SECONDS);
-        return true;
-    }
-
     private synchronized void initializeStore(boolean force)
     {
         Boolean updateCRLSuccessfull = null;
@@ -908,6 +896,12 @@ public class CrlCertStatusStore extends CertStatusStore
     public void init(String conf, DataSourceFactory datasourceFactory, PasswordResolver passwordResolver)
     throws CertStatusStoreException
     {
+        initializeStore(true);
+
+        StoreUpdateService storeUpdateService = new StoreUpdateService();
+        scheduledThreadPoolExecutor = new ScheduledThreadPoolExecutor(1);
+        scheduledThreadPoolExecutor.scheduleAtFixedRate(
+                storeUpdateService, 60, 60, TimeUnit.SECONDS);
     }
 
     @Override
