@@ -113,6 +113,7 @@ import org.xipki.audit.api.ChildAuditEvent;
 import org.xipki.audit.api.PCIAuditEvent;
 import org.xipki.common.CRLReason;
 import org.xipki.common.CertRevocationInfo;
+import org.xipki.common.CmpUtf8Pairs;
 import org.xipki.common.HashAlgoType;
 import org.xipki.common.HealthCheckResult;
 import org.xipki.common.IoUtil;
@@ -449,7 +450,9 @@ public class OcspResponder
             if(storeConf.getDbStore() != null)
             {
                 DbStoreType dbStoreConf = storeConf.getDbStore();
-                statusStoreConf = "datasource?file:" + dbStoreConf.getDbConfFile();
+                CmpUtf8Pairs utf8Pairs = new CmpUtf8Pairs();
+                utf8Pairs.putUtf8Pair("datasource", "file:" + dbStoreConf.getDbConfFile());
+                statusStoreConf = utf8Pairs.getEncoded();
 
                 Set<X509Certificate> issuers = null;
                 if(dbStoreConf.getCacerts() != null)
