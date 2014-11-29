@@ -759,10 +759,10 @@ public class X509CA
     public X509CRL generateCRLonDemand(AuditEvent auditEvent)
     throws OperationException
     {
-        if(masterMode == false)
+        if(crlSigner == null)
         {
-            throw new OperationException(ErrorCode.INSUFFICIENT_PERMISSION,
-                    "CA cannot generate CRL at slave mode");
+            throw new OperationException(ErrorCode.NOT_PERMITTED,
+                    "CA cannot generate CRL");
         }
 
         if(crlGenInProcess.get())

@@ -33,57 +33,33 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.ca.client.shell;
-
-import java.math.BigInteger;
-import java.security.cert.X509Certificate;
+package org.xipki.ca.client.shell.neg;
 
 import org.apache.felix.gogo.commands.Command;
-import org.bouncycastle.asn1.x500.X500Name;
-import org.xipki.ca.client.api.CertIDOrError;
-import org.xipki.ca.common.cmp.PKIStatusInfo;
-import org.xipki.common.SecurityUtil;
+import org.xipki.ca.client.shell.UnrevokeCertCommand;
 import org.xipki.console.karaf.UnexpectedResultException;
 
 /**
  * @author Lijun Liao
  */
 
-@Command(scope = "caclient", name = "unrevoke", description="Unrevoke certificate")
-public class UnrevokeCertCommand extends UnRevRemoveCertCommand
+@Command(scope = "caclient", name = "neg-unrevoke", description="Unrevoke certificate (negative, for QA)")
+public class NegUnrevokeCertCommand extends UnrevokeCertCommand
 {
+
     @Override
     protected Object doExecute()
     throws Exception
     {
-        if(certFile == null && (caCertFile == null || serialNumber == null))
+        try
         {
-            err("either cert or (cacert, serial) must be specified");
-            return null;
+            super.doExecute();
+            throw new Exception("Error is excepted");
+        }catch(UnexpectedResultException e)
+        {
         }
 
-        CertIDOrError certIdOrError;
-        if(certFile != null)
-        {
-            X509Certificate cert = SecurityUtil.parseCert(certFile);
-            certIdOrError = raWorker.unrevokeCert(cert);
-        }
-        else
-        {
-            X509Certificate caCert = SecurityUtil.parseCert(caCertFile);
-            X500Name issuer = X500Name.getInstance(caCert.getSubjectX500Principal().getEncoded());
-            certIdOrError = raWorker.unrevokeCert(issuer, new BigInteger(serialNumber));
-        }
-
-        if(certIdOrError.getError() != null)
-        {
-            PKIStatusInfo error = certIdOrError.getError();
-            throw new UnexpectedResultException("Releasing revocation failed: " + error);
-        }
-        else
-        {
-            out("Unrevoked certificate");
-        }
         return null;
     }
+
 }

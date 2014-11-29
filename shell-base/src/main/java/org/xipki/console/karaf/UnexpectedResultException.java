@@ -33,57 +33,40 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.ca.client.shell;
-
-import java.math.BigInteger;
-import java.security.cert.X509Certificate;
-
-import org.apache.felix.gogo.commands.Command;
-import org.bouncycastle.asn1.x500.X500Name;
-import org.xipki.ca.client.api.CertIDOrError;
-import org.xipki.ca.common.cmp.PKIStatusInfo;
-import org.xipki.common.SecurityUtil;
-import org.xipki.console.karaf.UnexpectedResultException;
+package org.xipki.console.karaf;
 
 /**
  * @author Lijun Liao
  */
 
-@Command(scope = "caclient", name = "unrevoke", description="Unrevoke certificate")
-public class UnrevokeCertCommand extends UnRevRemoveCertCommand
+public class UnexpectedResultException extends Exception
 {
-    @Override
-    protected Object doExecute()
-    throws Exception
+
+    private static final long serialVersionUID = 189176458485831187L;
+
+    public UnexpectedResultException()
     {
-        if(certFile == null && (caCertFile == null || serialNumber == null))
-        {
-            err("either cert or (cacert, serial) must be specified");
-            return null;
-        }
-
-        CertIDOrError certIdOrError;
-        if(certFile != null)
-        {
-            X509Certificate cert = SecurityUtil.parseCert(certFile);
-            certIdOrError = raWorker.unrevokeCert(cert);
-        }
-        else
-        {
-            X509Certificate caCert = SecurityUtil.parseCert(caCertFile);
-            X500Name issuer = X500Name.getInstance(caCert.getSubjectX500Principal().getEncoded());
-            certIdOrError = raWorker.unrevokeCert(issuer, new BigInteger(serialNumber));
-        }
-
-        if(certIdOrError.getError() != null)
-        {
-            PKIStatusInfo error = certIdOrError.getError();
-            throw new UnexpectedResultException("Releasing revocation failed: " + error);
-        }
-        else
-        {
-            out("Unrevoked certificate");
-        }
-        return null;
     }
+
+    public UnexpectedResultException(String message)
+    {
+        super(message);
+    }
+
+    public UnexpectedResultException(Throwable cause)
+    {
+        super(cause);
+    }
+
+    public UnexpectedResultException(String message, Throwable cause)
+    {
+        super(message, cause);
+    }
+
+    public UnexpectedResultException(String message, Throwable cause,
+            boolean enableSuppression, boolean writableStackTrace)
+    {
+        super(message, cause, enableSuppression, writableStackTrace);
+    }
+
 }

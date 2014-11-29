@@ -56,7 +56,7 @@ sleep 2000
 keytool:req-p12 -p12 output/SubCA1.p12 -pwd 1234 -out output/SubCA1.p10 \
   -subject "CN=SubCA1,O=xipki,C=DE"
 
-caclient:enroll -p10 output/SubCA1.p10 -out output/SubCA1.der -profile SubCA
+caclient:ra-enroll -p10 output/SubCA1.p10 -out output/SubCA1.der -profile SubCA
 
 keytool:update-cert-p12 -p12 output/SubCA1.p12 -pwd 1234 -cert output/SubCA1.der \
   -cacert output/RCA1.der
@@ -65,7 +65,7 @@ keytool:update-cert-p12 -p12 output/SubCA1.p12 -pwd 1234 -cert output/SubCA1.der
 keytool:req-p12 -p12 output/SubCAwithCRL1.p12 -pwd 1234 -out output/SubCAwithCRL1.p10 \
   -subject "CN=SubCAwithCRL1, O=xipki, C=DE, 2.5.29.17=1|info@xipki.org, 2.5.29.17=2|xipki.org, 2.5.29.17=5|edi-nameAssigner-1|edi-partyName1, 2.5.29.17=6|http://xipki.org/abc, 2.5.29.17=7|192.168.0.1, 2.5.29.17=8|1.2.3.4, 2.5.29.17=0|2.5.4.10|long organization name, 1.3.6.1.5.5.7.1.11=1.3.6.1.5.5.7.48.5?6|http://example.org/abc"
 
-caclient:enroll -p10 output/SubCAwithCRL1.p10 -out output/SubCAwithCRL1.der -profile SubCA.Complex
+caclient:ra-enroll -p10 output/SubCAwithCRL1.p10 -out output/SubCAwithCRL1.der -profile SubCA.Complex
 
 keytool:update-cert-p12 -p12 output/SubCAwithCRL1.p12 -pwd 1234 -cert output/SubCAwithCRL1.der \
   -cacert output/RCA1.der

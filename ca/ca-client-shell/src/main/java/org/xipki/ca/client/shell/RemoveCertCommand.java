@@ -36,6 +36,7 @@
 package org.xipki.ca.client.shell;
 
 import java.math.BigInteger;
+import java.rmi.UnexpectedException;
 import java.security.cert.X509Certificate;
 
 import org.apache.felix.gogo.commands.Command;
@@ -78,7 +79,7 @@ public class RemoveCertCommand extends UnRevRemoveCertCommand
         if(certIdOrError.getError() != null)
         {
             PKIStatusInfo error = certIdOrError.getError();
-            err("Removing certificate failed: " + error);
+            throw new UnexpectedException("Removing certificate failed: " + error);
         }
         else
         {
