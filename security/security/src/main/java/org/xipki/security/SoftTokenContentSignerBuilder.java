@@ -237,8 +237,11 @@ public class SoftTokenContentSignerBuilder
                 {
                     Signature signature = Signature.getInstance(algoName, PROVIDER_XIPKI_NSS);
                     signature.initSign(key);
-                    signature.update(new byte[]{1,2,3,4});
-                    signature.sign();
+                    if(i == 0)
+                    {
+                        signature.update(new byte[]{1,2,3,4});
+                        signature.sign();
+                    }
                     ContentSigner signer = new SignatureSigner(signatureAlgId, signature, key);
                     signers.add(signer);
                 } catch (Exception e)
