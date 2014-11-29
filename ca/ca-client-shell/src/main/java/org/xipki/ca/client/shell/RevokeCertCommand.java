@@ -45,6 +45,7 @@ import org.xipki.ca.client.api.CertIDOrError;
 import org.xipki.ca.common.cmp.PKIStatusInfo;
 import org.xipki.common.CRLReason;
 import org.xipki.common.SecurityUtil;
+import org.xipki.console.karaf.UnexpectedResultException;
 
 /**
  * @author Lijun Liao
@@ -104,7 +105,7 @@ public class RevokeCertCommand extends UnRevRemoveCertCommand
         if(certIdOrError.getError() != null)
         {
             PKIStatusInfo error = certIdOrError.getError();
-            err("Revocation failed: " + error);
+            throw new UnexpectedResultException("Revocation failed: " + error);
         }
         else
         {

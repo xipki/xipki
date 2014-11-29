@@ -42,6 +42,7 @@ import java.util.Set;
 import org.apache.felix.gogo.commands.Option;
 import org.xipki.ca.client.api.PKIErrorException;
 import org.xipki.ca.client.api.RAWorkerException;
+import org.xipki.console.karaf.UnexpectedResultException;
 
 /**
  * @author Lijun Liao
@@ -92,11 +93,18 @@ public abstract class CRLCommand extends ClientCommand
             }
         }
 
-        X509CRL crl = retrieveCRL(caName);
+        X509CRL crl = null;
+        try
+        {
+            crl = retrieveCRL(caName);
+        }catch(PKIErrorException e)
+        {
+            throw new UnexpectedResultException("Received no CRL from server: " + e.getMessage());
+        }
+
         if(crl == null)
         {
-            err("Received no CRL from server");
-            return null;
+            throw new UnexpectedResultException("Received no CRL from server");
         }
 
         saveVerbose("Saved CRL to file", new File(outFile), crl.getEncoded());
