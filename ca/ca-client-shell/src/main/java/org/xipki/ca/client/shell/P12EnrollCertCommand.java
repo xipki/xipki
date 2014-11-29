@@ -35,55 +35,40 @@
 
 package org.xipki.ca.client.shell;
 
-import java.math.BigInteger;
 import java.security.cert.X509Certificate;
 
 import org.apache.felix.gogo.commands.Command;
-import org.bouncycastle.asn1.x500.X500Name;
-import org.xipki.ca.client.api.CertIDOrError;
-import org.xipki.ca.common.cmp.PKIStatusInfo;
-import org.xipki.common.SecurityUtil;
-import org.xipki.console.karaf.UnexpectedResultException;
+import org.apache.felix.gogo.commands.Option;
+import org.xipki.security.SecurityFactoryImpl;
+import org.xipki.security.api.ConcurrentContentSigner;
+import org.xipki.security.api.SignerException;
 
 /**
  * @author Lijun Liao
  */
 
-@Command(scope = "caclient", name = "unrevoke", description="Unrevoke certificate")
-public class UnrevokeCertCommand extends UnRevRemoveCertCommand
+@Command(scope = "caclient", name = "enroll-p12", description="Enroll certificate (PKCS#12 keystore)")
+public class P12EnrollCertCommand extends EnrollCertCommand
 {
+    @Option(name = "-p12",
+            required = true, description = "Required. PKCS#12 request file")
+    protected String p12File;
+
+    @Option(name = "-pwd", aliases = { "--password" },
+            required = false, description = "Password of the PKCS#12 file")
+    protected String password;
+
     @Override
-    protected Object doExecute()
-    throws Exception
+    protected ConcurrentContentSigner getSigner()
+    throws SignerException
     {
-        if(certFile == null && (caCertFile == null || serialNumber == null))
+        if(password == null)
         {
-            err("either cert or (cacert, serial) must be specified");
-            return null;
+            password = new String(readPassword());
         }
 
-        CertIDOrError certIdOrError;
-        if(certFile != null)
-        {
-            X509Certificate cert = SecurityUtil.parseCert(certFile);
-            certIdOrError = raWorker.unrevokeCert(cert);
-        }
-        else
-        {
-            X509Certificate caCert = SecurityUtil.parseCert(caCertFile);
-            X500Name issuer = X500Name.getInstance(caCert.getSubjectX500Principal().getEncoded());
-            certIdOrError = raWorker.unrevokeCert(issuer, new BigInteger(serialNumber));
-        }
-
-        if(certIdOrError.getError() != null)
-        {
-            PKIStatusInfo error = certIdOrError.getError();
-            throw new UnexpectedResultException("Releasing revocation failed: " + error);
-        }
-        else
-        {
-            out("Unrevoked certificate");
-        }
-        return null;
+        String signerConfWithoutAlgo = SecurityFactoryImpl.getKeystoreSignerConfWithoutAlgo(p12File, password, 1);
+        return securityFactory.createSigner("PKCS12", signerConfWithoutAlgo, hashAlgo, false, (X509Certificate[]) null);
     }
+
 }

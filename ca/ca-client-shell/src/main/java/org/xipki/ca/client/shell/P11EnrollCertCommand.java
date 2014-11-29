@@ -51,8 +51,8 @@ import org.xipki.security.api.p11.P11SlotIdentifier;
  * @author Lijun Liao
  */
 
-@Command(scope = "caclient", name = "enroll2", description="Enroll certificate as non-RA (PKCS#11 token)")
-public class P11EnrollCert2Command extends EnrollCert2Command
+@Command(scope = "caclient", name = "enroll", description="Enroll certificate (PKCS#11 token)")
+public class P11EnrollCertCommand extends EnrollCertCommand
 {
     @Option(name = "-slot",
             required = true, description = "Required. Slot index")
