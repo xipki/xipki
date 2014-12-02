@@ -565,7 +565,7 @@ class CertStoreQueryExecutor
         X509CertWithRevocationInfo certWithRevInfo = getCertWithRevocationInfo(caCert, serialNumber);
         if(certWithRevInfo == null)
         {
-            LOG.warn("Certificate with issuer={} and serialNumber={} does not exist",
+            LOG.warn("Certificate with issuer='{}' and serialNumber={} does not exist",
                     caCert.getSubject(), serialNumber);
             return null;
         }
@@ -653,7 +653,7 @@ class CertStoreQueryExecutor
         X509CertWithRevocationInfo certWithRevInfo = getCertWithRevocationInfo(caCert, serialNumber);
         if(certWithRevInfo == null)
         {
-            LOG.warn("Certificate with issuer={} and serialNumber={} does not exist",
+            LOG.warn("Certificate with issuer='{}' and serialNumber={} does not exist",
                     caCert.getSubject(), serialNumber);
             return null;
         }
@@ -1340,6 +1340,7 @@ class CertStoreQueryExecutor
                 + " T1.REV_REASON REV_REASON,"
                 + " T1.REV_TIME REV_TIME,"
                 + " T1.REV_INVALIDITY_TIME REV_INVALIDITY_TIME,"
+                + " T1.CERTPROFILEINFO_ID CERTPROFILEINFO_ID,"
                 + " T2.CERT CERT"
                 + " FROM CERT T1, RAWCERT T2"
                 + " WHERE T1.CAINFO_ID=? AND T1.SERIAL=? AND T2.CERT_ID=T1.ID";
@@ -1384,7 +1385,14 @@ class CertStoreQueryExecutor
 
                 X509CertificateWithMetaInfo certWithMeta = new X509CertificateWithMetaInfo(cert, certBytes);
                 certWithMeta.setCertId(certId);
-                return new X509CertWithRevocationInfo(certWithMeta, revInfo);
+
+                int certProfileId = rs.getInt("CERTPROFILEINFO_ID");
+                String profileName = certprofileStore.getName(certProfileId);
+                X509CertWithRevocationInfo ret = new X509CertWithRevocationInfo();
+                ret.setCertProfile(profileName);
+                ret.setCert(certWithMeta);
+                ret.setRevInfo(revInfo);
+                return ret;
             }
         }finally
         {

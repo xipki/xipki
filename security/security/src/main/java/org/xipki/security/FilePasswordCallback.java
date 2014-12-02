@@ -35,8 +35,9 @@
 
 package org.xipki.security;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 
 import org.xipki.common.IoUtil;
 import org.xipki.security.api.PasswordCallback;
@@ -59,22 +60,40 @@ public class FilePasswordCallback implements PasswordCallback
             throw new PasswordResolverException("please initialize me first");
         }
 
-        byte[] content;
+        String passwordHint = null;
+        BufferedReader reader = null;
         try
         {
-            content = IoUtil.read(passwordFile);
+            reader = new BufferedReader(new FileReader(IoUtil.expandFilepath(passwordFile)));
+            String line;
+            while((line = reader.readLine()) != null)
+            {
+                line = line.trim();
+                if(line.isEmpty() == false && line.startsWith("#") == false)
+                {
+                    passwordHint = line;
+                    break;
+                }
+            }
         }catch(IOException e)
         {
             throw new PasswordResolverException("Could not read file " + passwordFile, e);
+        }finally
+        {
+            if(reader != null)
+            {
+                try
+                {
+                    reader.close();
+                }catch(IOException e)
+                {
+                }
+            }
         }
 
-        String passwordHint;
-        try
+        if(passwordHint == null)
         {
-            passwordHint = new String(content, "UTF-8");
-        } catch (UnsupportedEncodingException e)
-        {
-            throw new PasswordResolverException("UnsupportedEncodingException: " + e.getMessage(), e);
+            throw new PasswordResolverException("No password is specified in file " + passwordFile);
         }
 
         if(passwordHint.startsWith(OBFPasswordResolver.__OBFUSCATE))

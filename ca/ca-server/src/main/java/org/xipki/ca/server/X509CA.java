@@ -1196,7 +1196,7 @@ public class X509CA
     throws OperationException
     {
         final String subjectText = SecurityUtil.getRFC4519Name(subject);
-        LOG.info("START generateCertificate: CA={}, profile={}, subject={}",
+        LOG.info("START generateCertificate: CA={}, profile={}, subject='{}'",
                 new Object[]{caInfo.getName(), certProfileName, subjectText});
 
         boolean successfull = false;
@@ -1213,7 +1213,7 @@ public class X509CA
 
                 String prefix = ret.isAlreadyIssued() ? "RETURN_OLD_CERT" : "SUCCESSFULL";
                 LOG.info("{} generateCertificate: CA={}, profile={},"
-                        + " subject={}, serialNumber={}",
+                        + " subject='{}', serialNumber={}",
                         new Object[]{prefix, caInfo.getName(), certProfileName,
                             ret.getCert().getSubject(), ret.getCert().getCert().getSerialNumber()});
                 return ret;
@@ -1231,7 +1231,7 @@ public class X509CA
         {
             if(successfull == false)
             {
-                LOG.warn("FAILED generateCertificate: CA={}, profile={}, subject={}",
+                LOG.warn("FAILED generateCertificate: CA={}, profile={}, subject='{}'",
                         new Object[]{caInfo.getName(), certProfileName, subjectText});
             }
         }
@@ -1249,7 +1249,7 @@ public class X509CA
     throws OperationException
     {
         final String subjectText = SecurityUtil.getRFC4519Name(subject);
-        LOG.info("START regenerateCertificate: CA={}, profile={}, subject={}",
+        LOG.info("START regenerateCertificate: CA={}, profile={}, subject='{}'",
                 new Object[]{caInfo.getName(), certProfileName, subjectText});
 
         boolean successfull = false;
@@ -1261,7 +1261,7 @@ public class X509CA
                     notBefore, notAfter, extensions, false);
             successfull = true;
             LOG.info("SUCCESSFULL generateCertificate: CA={}, profile={},"
-                    + " subject={}, serialNumber={}",
+                    + " subject='{}', serialNumber={}",
                     new Object[]{caInfo.getName(), certProfileName,
                         ret.getCert().getSubject(), ret.getCert().getCert().getSerialNumber()});
 
@@ -1279,7 +1279,7 @@ public class X509CA
         {
             if(successfull == false)
             {
-                LOG.warn("FAILED regenerateCertificate: CA={}, profile={}, subject={}",
+                LOG.warn("FAILED regenerateCertificate: CA={}, profile={}, subject='{}'",
                         new Object[]{caInfo.getName(), certProfileName, subjectText});
             }
         }
@@ -1767,7 +1767,7 @@ public class X509CA
             {
                 successful = false;
                 X509Certificate c = certToRemove.getCert();
-                LOG.error("Removing certificate issuer={}, serial={}, subject={} from publisher {} failed.",
+                LOG.error("Removing certificate issuer='{}', serial={}, subject='{}' from publisher {} failed.",
                         new Object[]
                         {
                                 SecurityUtil.getRFC4519Name(c.getIssuerX500Principal()),
@@ -1815,7 +1815,7 @@ public class X509CA
                     try
                     {
                         successfull = publisher.certificateRevoked(caInfo.getCertificate(),
-                                revokedCert.getCert(), revokedCert.getRevInfo());
+                                revokedCert.getCert(), revokedCert.getCertProfile(), revokedCert.getRevInfo());
                     }
                     catch (RuntimeException e)
                     {

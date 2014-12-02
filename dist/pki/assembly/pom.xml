@@ -283,6 +283,7 @@
                 <feature>xipki-caserver</feature>
                 <feature>xipki-camgmt-shell</feature>
                 <feature>xipki-caclient-shell</feature>
+                <feature>xipki-caqa-shell</feature>
                 <feature>xipki-security-shell</feature>
                 <feature>xipki-ocspserver</feature>
                 <feature>xipki-ocspclient-shell</feature>

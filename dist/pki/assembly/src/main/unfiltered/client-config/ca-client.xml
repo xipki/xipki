@@ -22,6 +22,9 @@
       <name>RCA1</name>
       <url>https://localhost:8443/cmp/RCA</url>
       <requestor>requestor1</requestor>
+      <responder>
+        <file>etc/tlskeys/tls-server.der</file>
+      </responder>
       <CAInfo>
         <autoConf/>
       </CAInfo>
@@ -30,6 +33,9 @@
       <name>SubCA1</name>
       <url>https://localhost:8443/cmp/SubCA</url>
       <requestor>requestor1</requestor>
+      <responder>
+        <file>etc/tlskeys/tls-server.der</file>
+      </responder>
       <CAInfo>
         <autoConf/>
       </CAInfo>
@@ -38,6 +44,9 @@
       <name>SubCAwithCRL1</name>
       <url>https://localhost:8443/cmp/SubCAwithCRL</url>
       <requestor>requestor1</requestor>
+      <responder>
+        <file>etc/tlskeys/tls-server.der</file>
+      </responder>
       <CAInfo>
         <autoConf/>
       </CAInfo>

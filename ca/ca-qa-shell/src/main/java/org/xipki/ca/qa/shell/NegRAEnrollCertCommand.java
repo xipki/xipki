@@ -33,7 +33,7 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.ca.client.shell.neg;
+package org.xipki.ca.qa.shell;
 
 import org.apache.felix.gogo.commands.Command;
 import org.xipki.ca.client.shell.RAEnrollCertCommand;
@@ -43,7 +43,7 @@ import org.xipki.console.karaf.UnexpectedResultException;
  * @author Lijun Liao
  */
 
-@Command(scope = "caclient", name = "neg-ra-enroll", description="Enroll certificate as RA (negative, for QA)")
+@Command(scope = "caqa", name = "neg-ra-enroll", description="Enroll certificate as RA (negative, for QA)")
 public class NegRAEnrollCertCommand extends RAEnrollCertCommand
 {
 

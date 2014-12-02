@@ -46,11 +46,10 @@ public class X509CertWithRevocationInfo
 {
     private X509CertificateWithMetaInfo cert;
     private CertRevocationInfo revInfo;
+    private String certProfile;
 
-    public X509CertWithRevocationInfo(X509CertificateWithMetaInfo cert, CertRevocationInfo revInfo)
+    public X509CertWithRevocationInfo()
     {
-        this.cert = cert;
-        this.revInfo = revInfo;
     }
 
     public X509CertificateWithMetaInfo getCert()
@@ -76,6 +75,16 @@ public class X509CertWithRevocationInfo
     public void setRevInfo(CertRevocationInfo revInfo)
     {
         this.revInfo = revInfo;
+    }
+
+    public String getCertProfile()
+    {
+        return certProfile;
+    }
+
+    public void setCertProfile(String certProfile)
+    {
+        this.certProfile = certProfile;
     }
 
 }

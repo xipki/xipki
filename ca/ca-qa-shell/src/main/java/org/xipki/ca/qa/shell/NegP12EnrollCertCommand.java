@@ -33,18 +33,18 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.ca.client.shell.neg;
+package org.xipki.ca.qa.shell;
 
 import org.apache.felix.gogo.commands.Command;
-import org.xipki.ca.client.shell.GetCRLCommand;
+import org.xipki.ca.client.shell.P12EnrollCertCommand;
 import org.xipki.console.karaf.UnexpectedResultException;
 
 /**
  * @author Lijun Liao
  */
 
-@Command(scope = "caclient", name = "neg-getcrl", description="Download CRL (negative, for QA)")
-public class NegGetCRLCommand extends GetCRLCommand
+@Command(scope = "caqa", name = "neg-enroll-p12", description="Enroll certificate (PKCS#12 keystore, negative, for QA)")
+public class NegP12EnrollCertCommand extends P12EnrollCertCommand
 {
 
     @Override
@@ -54,7 +54,7 @@ public class NegGetCRLCommand extends GetCRLCommand
         try
         {
             super.doExecute();
-            throw new Exception("No CRL is expected, but received one");
+            throw new Exception("No certificate is excepted, but received one");
         }catch(UnexpectedResultException e)
         {
         }
