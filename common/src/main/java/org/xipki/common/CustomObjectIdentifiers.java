@@ -45,7 +45,6 @@ public class CustomObjectIdentifiers
     public static final String id_crl_certset = id_private_dummy + ".100";
     public static final String id_cmp_generateCRL = id_private_dummy + ".101";
 
-    public static final String id_cmp_getCmpResponderCert = id_private_dummy + ".200.1";
     public static final String id_cmp_getSystemInfo = id_private_dummy + ".200.2";
     public static final String id_cmp_removeExpiredCerts = id_private_dummy + ".200.3";
 }

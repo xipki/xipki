@@ -56,7 +56,7 @@
     <module>audit</module>
     <module>security</module>
     <module>datasource</module>
-     <module>ca</module>
+    <module>ca</module>
     <module>ocsp</module>
     <module>pkiconsole</module>
   </modules>
