@@ -72,6 +72,7 @@ public abstract class X509CertPublisher
 
     public abstract boolean certificateRevoked(X509CertificateWithMetaInfo issuerCert,
             X509CertificateWithMetaInfo cert,
+            String certProfile,
             CertRevocationInfo revInfo);
 
     public abstract boolean certificateUnrevoked(X509CertificateWithMetaInfo issuerCert,

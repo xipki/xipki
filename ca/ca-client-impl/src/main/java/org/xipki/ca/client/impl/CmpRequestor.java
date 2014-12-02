@@ -37,7 +37,6 @@ package org.xipki.ca.client.impl;
 
 import java.io.IOException;
 import java.security.InvalidKeyException;
-import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Date;
@@ -59,7 +58,6 @@ import org.bouncycastle.asn1.cmp.PKIHeader;
 import org.bouncycastle.asn1.cmp.PKIHeaderBuilder;
 import org.bouncycastle.asn1.cmp.PKIMessage;
 import org.bouncycastle.asn1.x500.X500Name;
-import org.bouncycastle.asn1.x509.Certificate;
 import org.bouncycastle.asn1.x509.GeneralName;
 import org.bouncycastle.cert.cmp.CMPException;
 import org.bouncycastle.cert.cmp.GeneralPKIMessage;
@@ -71,13 +69,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.ca.client.api.dto.ErrorResultType;
 import org.xipki.ca.common.cmp.CmpUtil;
+import org.xipki.ca.common.cmp.PKIResponse;
 import org.xipki.ca.common.cmp.ProtectionResult;
 import org.xipki.ca.common.cmp.ProtectionVerificationResult;
-import org.xipki.ca.common.cmp.PKIResponse;
 import org.xipki.common.CmpUtf8Pairs;
-import org.xipki.common.CustomObjectIdentifiers;
-import org.xipki.common.SecurityUtil;
 import org.xipki.common.ParamChecker;
+import org.xipki.common.SecurityUtil;
 import org.xipki.security.api.ConcurrentContentSigner;
 import org.xipki.security.api.NoIdleSignerException;
 import org.xipki.security.api.SecurityFactory;
@@ -327,115 +324,6 @@ public abstract class CmpRequestor
         return itv.getInfoValue();
     }
 
-    public void autoConfigureResponder()
-    throws CmpRequestorException
-    {
-        PKIMessage request = buildMessageWithGeneralMsgContent(
-                new ASN1ObjectIdentifier(CustomObjectIdentifiers.id_cmp_getCmpResponderCert), null);
-
-        if(signRequest)
-        {
-            if(requestor == null)
-            {
-                throw new CmpRequestorException("No request signer is configured");
-            }
-
-            try
-            {
-                request = CmpUtil.addProtection(request, requestor, sender, false);
-            } catch (CMPException | NoIdleSignerException e)
-            {
-                throw new CmpRequestorException("Could not sign the request", e);
-            }
-        }
-
-        byte[] encodedRequest;
-        try
-        {
-            encodedRequest = request.getEncoded();
-        } catch (IOException e)
-        {
-            LOG.error("Error while encode the PKI request {}", request);
-            throw new CmpRequestorException(e);
-        }
-
-        byte[] encodedResponse;
-        try
-        {
-            encodedResponse = send(encodedRequest);
-        } catch (IOException e)
-        {
-            LOG.error("Error while send the PKI request {} to server", request);
-            throw new CmpRequestorException("TRANSPORT_ERROR", e);
-        }
-
-        GeneralPKIMessage response;
-        try
-        {
-            response = new GeneralPKIMessage(encodedResponse);
-        } catch (IOException e)
-        {
-            if(LOG.isErrorEnabled())
-            {
-                LOG.error("Error while decode the received PKI message: {}", Hex.toHexString(encodedResponse));
-            }
-            throw new CmpRequestorException(e);
-        }
-
-        PKIHeader respHeader = response.getHeader();
-        ASN1OctetString tid = respHeader.getTransactionID();
-        GeneralName recipient = respHeader.getRecipient();
-        if(sender.equals(recipient) == false)
-        {
-            LOG.warn("tid={}: Unknown CMP requestor '{}'", tid, recipient);
-        }
-
-        PKIResponse pkiResp = new PKIResponse(response);
-        if(response.hasProtection() == false && signRequest)
-        {
-            PKIBody respBody = response.getBody();
-            int bodyType = respBody.getType();
-            if(bodyType != PKIBody.TYPE_ERROR)
-            {
-                throw new CmpRequestorException("Response is not signed");
-            }
-        }
-
-        ASN1Encodable itvValue = extractGeneralRepContent(pkiResp,
-                CustomObjectIdentifiers.id_cmp_getCmpResponderCert, false);
-        Certificate cert = Certificate.getInstance(itvValue);
-
-        X509Certificate x509Cert;
-        try
-        {
-            x509Cert = SecurityUtil.parseCert(cert.getEncoded());
-        } catch (CertificateException | IOException e)
-        {
-            throw new CmpRequestorException("Returned certificate is invalid: " + e.getMessage(), e);
-        }
-
-        if(response.hasProtection())
-        {
-            try
-            {
-                ProtectionVerificationResult verifyProtection = verifyProtection(
-                        Hex.toHexString(tid.getOctets()), response, x509Cert);
-
-                if(verifyProtection.getProtectionResult() != ProtectionResult.VALID)
-                {
-                    throw new CmpRequestorException(SecurityUtil.formatPKIStatusInfo(
-                            ClientErrorCode.PKIStatus_RESPONSE_ERROR,
-                            PKIFailureInfo.badMessageCheck, "message check of the response failed"));
-                }
-            } catch (InvalidKeyException | OperatorCreationException | CMPException e)
-            {
-                throw new CmpRequestorException(e);
-            }
-        }
-
-        setResponderCert(x509Cert);
-    }
-
     protected PKIHeader buildPKIHeader(ASN1OctetString tid)
     {
         return buildPKIHeader(false, tid, null, (InfoTypeAndValue[]) null);
@@ -535,7 +423,7 @@ public abstract class CmpRequestor
 
             if(authorizedResponder == false)
             {
-                LOG.warn("tid={}: not authorized responder {}", tid, h.getSender());
+                LOG.warn("tid={}: not authorized responder '{}'", tid, h.getSender());
                 return new ProtectionVerificationResult(null, ProtectionResult.SENDER_NOT_AUTHORIZED);
             }
         }
@@ -544,7 +432,7 @@ public abstract class CmpRequestor
                 securityFactory.getContentVerifierProvider(cert);
         if(verifierProvider == null)
         {
-            LOG.warn("tid={}: not authorized responder {}", tid, h.getSender());
+            LOG.warn("tid={}: not authorized responder '{}'", tid, h.getSender());
             return new ProtectionVerificationResult(cert, ProtectionResult.SENDER_NOT_AUTHORIZED);
         }
 

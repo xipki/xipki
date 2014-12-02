@@ -15,6 +15,7 @@ ca:enroll-cert -ca RCA1 -profile RCA-Cross -p10 output/RCA2.p10 -out output/RCA2
 #              MANAGE CERTIFICATE WITH RA CLIENT                #
 #################################################################
 features:install xipki-caclient-shell
+features:install xipki-caqa-shell
 
 # Wait two seconds
 sleep 2000
@@ -158,25 +159,26 @@ keytool:rsa-p12 -pwd 1234 -out output/TLS101.p12 -subject "CN=TLS101,O=xipki,C=D
 
 keytool:req-p12 -p12 output/TLS101.p12 -pwd 1234 -out output/TLS101.p10
 
-caclient:neg-ra-enroll -p10 output/TLS101.p10 -out output/dummy -profile TLS -user USER-T
+caqa:neg-ra-enroll -p10 output/TLS101.p10 -out output/dummy -profile TLS -user USER-T
 
-caclient:neg-enroll-p12 -p12 output/TLS101.p12 -pwd 1234 -out output/dummy -profile TLS -user USER-T
+caqa:neg-enroll-p12 -p12 output/TLS101.p12 -pwd 1234 -out output/dummy -profile TLS -user USER-T
 
 ## Revoke certificate that has been revoked
 
-caclient:neg-revoke -cert output/TLS2.der -reason keyCompromise
+caqa:neg-revoke -cert output/TLS2.der -reason keyCompromise
 
-caclient:neg-unrevoke -cert output/TLS2.der
+caqa:neg-unrevoke -cert output/TLS2.der
 
 ## Generate CRL
-caclient:neg-gencrl -ca SubCA1 -out output/dummy
+caqa:neg-gencrl -ca SubCA1 -out output/dummy
 
 ## Get CRL
-caclient:neg-getcrl -ca SubCA1 -out output/dummy
+caqa:neg-getcrl -ca SubCA1 -out output/dummy
  
 #################################################################
 #              UNINSTALL UNNEEDED FEATURES                      #
 #################################################################
+features:uninstall xipki-caqa-shell
 features:uninstall xipki-caclient-shell
 features:uninstall xipki-caclient
 features:uninstall xipki-camgmt-shell

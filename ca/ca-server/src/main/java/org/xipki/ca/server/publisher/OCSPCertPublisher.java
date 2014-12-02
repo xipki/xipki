@@ -143,11 +143,12 @@ public class OCSPCertPublisher extends X509CertPublisher
     @Override
     public boolean certificateRevoked(X509CertificateWithMetaInfo caCert,
             X509CertificateWithMetaInfo cert,
+            String certProfile,
             CertRevocationInfo revInfo)
     {
         try
         {
-            queryExecutor.revokeCert(caCert, cert, revInfo);
+            queryExecutor.revokeCert(caCert, cert, certProfile, revInfo);
             return true;
         } catch (Exception e)
         {
@@ -177,7 +178,7 @@ public class OCSPCertPublisher extends X509CertPublisher
         String subjectText = cert.getSubject();
         String serialText = cert.getCert().getSerialNumber().toString();
 
-        LOG.error("{} (issuser={}: subject={}, serialNumber={}). Message: {}",
+        LOG.error("{} (issuser={}: subject='{}', serialNumber={}). Message: {}",
                 new Object[]{messagePrefix, issuer, subjectText, serialText, e.getMessage()});
         LOG.debug("error", e);
 

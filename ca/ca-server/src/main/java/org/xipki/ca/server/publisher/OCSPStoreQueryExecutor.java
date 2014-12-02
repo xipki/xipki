@@ -312,10 +312,11 @@ class OCSPStoreQueryExecutor
 
     void revokeCert(X509CertificateWithMetaInfo caCert,
             X509CertificateWithMetaInfo cert,
+            String certProfile,
             CertRevocationInfo revInfo)
     throws SQLException, CertificateEncodingException
     {
-        addOrUpdateCert(caCert, cert, null, revInfo);
+        addOrUpdateCert(caCert, cert, certProfile, revInfo);
     }
 
     void unrevokeCert(X509CertificateWithMetaInfo issuer,

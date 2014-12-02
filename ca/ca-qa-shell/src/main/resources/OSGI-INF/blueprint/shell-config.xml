@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0" xmlns:cm="http://aries.apache.org/blueprint/xmlns/blueprint-cm/v1.1.0" default-activation="lazy">
+  <reference id="securityFactory" interface="org.xipki.security.api.SecurityFactory"/>
+  <reference id="raWorker" interface="org.xipki.ca.client.api.RAWorker"/>
+  <reference id="filePathCompleter" interface="org.xipki.console.karaf.FilePathCompleter"/>
+  <reference id="dataSourceFactory" interface="org.xipki.datasource.api.DataSourceFactory" availability="optional"/>
+  <bean id="crlReasonCompleter" class="org.xipki.ca.client.shell.completer.ClientCRLReasonCompleter"/>
+  <bean id="curveNameCompleter" class="org.xipki.ca.client.shell.completer.ECCurveNameCompleter"/>
+  <bean id="caNameCompleter" class="org.xipki.ca.client.shell.completer.CaNameCompleter">
+    <property name="raWorker" ref="raWorker"/>
+  </bean>
+  <bean id="p11ModuleNameCompleter" class="org.xipki.ca.client.shell.completer.P11ModuleNameCompleter">
+    <property name="securityFactory" ref="securityFactory"/>
+  </bean>
+  <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.1.0">
+    <command name="caqa/neg-ra-enroll">
+      <action class="org.xipki.ca.qa.shell.NegRAEnrollCertCommand">
+        <property name="raWorker" ref="raWorker"/>
+      </action>
+      <optional-completers>
+        <entry key="-out" value-ref="filePathCompleter"/>
+        <entry key="-p10" value-ref="filePathCompleter"/>
+        <entry key="-ca" value-ref="caNameCompleter"/>
+      </optional-completers>
+    </command>
+    <command name="caqa/neg-enroll-p12">
+      <action class="org.xipki.ca.qa.shell.NegP12EnrollCertCommand">
+        <property name="raWorker" ref="raWorker"/>
+        <property name="securityFactory" ref="securityFactory"/>
+      </action>
+      <optional-completers>
+        <entry key="-out" value-ref="filePathCompleter"/>
+        <entry key="-p12" value-ref="filePathCompleter"/>
+        <entry key="-ca" value-ref="caNameCompleter"/>
+      </optional-completers>
+    </command>
+    <command name="caqa/neg-revoke">
+      <action class="org.xipki.ca.qa.shell.NegRevokeCertCommand">
+        <property name="raWorker" ref="raWorker"/>
+      </action>
+      <optional-completers>
+        <entry key="-cert" value-ref="filePathCompleter"/>
+        <entry key="-cacert" value-ref="filePathCompleter"/>
+        <entry key="-reason" value-ref="crlReasonCompleter"/>
+      </optional-completers>
+    </command>
+    <command name="caqa/neg-unrevoke">
+      <action class="org.xipki.ca.qa.shell.NegUnrevokeCertCommand">
+        <property name="raWorker" ref="raWorker"/>
+      </action>
+      <optional-completers>
+        <entry key="-cert" value-ref="filePathCompleter"/>
+        <entry key="-cacert" value-ref="filePathCompleter"/>
+      </optional-completers>
+    </command>
+    <command name="caqa/neg-gencrl">
+      <action class="org.xipki.ca.qa.shell.NegGenCRLCommand">
+        <property name="raWorker" ref="raWorker"/>
+      </action>
+      <optional-completers>
+        <entry key="-out" value-ref="filePathCompleter"/>
+        <entry key="-ca" value-ref="caNameCompleter"/>
+      </optional-completers>
+    </command>
+    <command name="caqa/neg-getcrl">
+      <action class="org.xipki.ca.qa.shell.NegGetCRLCommand">
+        <property name="raWorker" ref="raWorker"/>
+      </action>
+      <optional-completers>
+        <entry key="-out" value-ref="filePathCompleter"/>
+        <entry key="-ca" value-ref="caNameCompleter"/>
+        <entry key="-basecrl-out" value-ref="filePathCompleter"/>
+      </optional-completers>
+    </command>
+  </command-bundle>
+</blueprint>

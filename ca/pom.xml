@@ -17,6 +17,7 @@
     <module>ca-client-api</module>
     <module>ca-client-impl</module>
     <module>ca-client-shell</module>
+    <module>ca-qa-shell</module>
     <module>ca-api</module>
     <module>ca-mgmt-api</module>
     <module>ca-server</module>

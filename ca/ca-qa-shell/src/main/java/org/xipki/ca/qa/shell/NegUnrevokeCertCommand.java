@@ -33,18 +33,18 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.ca.client.shell.neg;
+package org.xipki.ca.qa.shell;
 
 import org.apache.felix.gogo.commands.Command;
-import org.xipki.ca.client.shell.GenCRLCommand;
+import org.xipki.ca.client.shell.UnrevokeCertCommand;
 import org.xipki.console.karaf.UnexpectedResultException;
 
 /**
  * @author Lijun Liao
  */
 
-@Command(scope = "caclient", name = "neg-gencrl", description="Generate CRL (negative, for QA)")
-public class NegGenCRLCommand extends GenCRLCommand
+@Command(scope = "caqa", name = "neg-unrevoke", description="Unrevoke certificate (negative, for QA)")
+public class NegUnrevokeCertCommand extends UnrevokeCertCommand
 {
 
     @Override
@@ -54,7 +54,7 @@ public class NegGenCRLCommand extends GenCRLCommand
         try
         {
             super.doExecute();
-            throw new Exception("No CRL is expected, but received one");
+            throw new Exception("Error is excepted");
         }catch(UnexpectedResultException e)
         {
         }

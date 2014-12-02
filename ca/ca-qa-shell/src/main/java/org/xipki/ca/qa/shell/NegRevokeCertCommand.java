@@ -33,18 +33,18 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.ca.client.shell.neg;
+package org.xipki.ca.qa.shell;
 
 import org.apache.felix.gogo.commands.Command;
-import org.xipki.ca.client.shell.P12EnrollCertCommand;
+import org.xipki.ca.client.shell.RevokeCertCommand;
 import org.xipki.console.karaf.UnexpectedResultException;
 
 /**
  * @author Lijun Liao
  */
 
-@Command(scope = "caclient", name = "neg-enroll-p12", description="Enroll certificate (PKCS#12 keystore, negative, for QA)")
-public class NegP12EnrollCertCommand extends P12EnrollCertCommand
+@Command(scope = "caqa", name = "neg-revoke", description="Revoke certificate (negative, for QA)")
+public class NegRevokeCertCommand extends RevokeCertCommand
 {
 
     @Override
@@ -54,7 +54,7 @@ public class NegP12EnrollCertCommand extends P12EnrollCertCommand
         try
         {
             super.doExecute();
-            throw new Exception("No certificate is excepted, but received one");
+            throw new Exception("Error is excepted");
         }catch(UnexpectedResultException e)
         {
         }

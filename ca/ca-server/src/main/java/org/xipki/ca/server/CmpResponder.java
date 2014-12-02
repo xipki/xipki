@@ -46,13 +46,9 @@ import java.util.Map;
 import javax.security.auth.x500.X500Principal;
 
 import org.bouncycastle.asn1.ASN1GeneralizedTime;
-import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.ASN1OctetString;
 import org.bouncycastle.asn1.DEROctetString;
 import org.bouncycastle.asn1.cmp.ErrorMsgContent;
-import org.bouncycastle.asn1.cmp.GenMsgContent;
-import org.bouncycastle.asn1.cmp.GenRepContent;
-import org.bouncycastle.asn1.cmp.InfoTypeAndValue;
 import org.bouncycastle.asn1.cmp.PKIBody;
 import org.bouncycastle.asn1.cmp.PKIFailureInfo;
 import org.bouncycastle.asn1.cmp.PKIFreeText;
@@ -82,10 +78,9 @@ import org.xipki.ca.common.cmp.CmpUtil;
 import org.xipki.ca.common.cmp.ProtectionResult;
 import org.xipki.ca.common.cmp.ProtectionVerificationResult;
 import org.xipki.common.CmpUtf8Pairs;
-import org.xipki.common.CustomObjectIdentifiers;
-import org.xipki.common.SecurityUtil;
 import org.xipki.common.LogUtil;
 import org.xipki.common.ParamChecker;
+import org.xipki.common.SecurityUtil;
 import org.xipki.security.api.ConcurrentContentSigner;
 import org.xipki.security.api.SecurityFactory;
 
@@ -169,30 +164,9 @@ public abstract class CmpResponder
             }
         }
 
-        boolean cmdForCmpRespCert = false;
-        int bodyType = message.getBody().getType();
-        if(bodyType == PKIBody.TYPE_GEN_MSG)
-        {
-            GenMsgContent genMsgBody = (GenMsgContent) message.getBody().getContent();
-            InfoTypeAndValue[] itvs = genMsgBody.toInfoTypeAndValueArray();
-
-            if(itvs != null && itvs.length > 0)
-            {
-                for(InfoTypeAndValue itv : itvs)
-                {
-                    String itvType = itv.getInfoType().getId();
-                    if(CustomObjectIdentifiers.id_cmp_getCmpResponderCert.equals(itvType))
-                    {
-                        cmdForCmpRespCert = true;
-                        break;
-                    }
-                }
-            }
-        }
-
         boolean intentMe = checkRequestRecipient(reqHeader);
 
-        if(intentMe == false && cmdForCmpRespCert == false)
+        if(intentMe == false)
         {
             LOG.warn("tid={}: I am not the intented recipient, but '{}'", tid, reqHeader.getRecipient());
             failureCode = PKIFailureInfo.badRequest;
@@ -299,7 +273,7 @@ public abstract class CmpResponder
             }
             else
             {
-                LOG.warn("tid={}: not authorized requestor (TLS client {})",
+                LOG.warn("tid={}: not authorized requestor (TLS client '{}')",
                         tid, SecurityUtil.getRFC4519Name(tlsClientCert.getSubjectX500Principal()));
                 errorStatus = "Requestor (TLS client certificate) is not authorized";
             }
@@ -310,17 +284,13 @@ public abstract class CmpResponder
             requestor = null;
         }
 
-        String username = null;
-        if(cmdForCmpRespCert == false)
+        CmpUtf8Pairs keyvalues = CmpUtil.extract(reqHeader.getGeneralInfo());
+        String username = keyvalues == null ? null : keyvalues.getValue(CmpUtf8Pairs.KEY_USER);
+        if(username != null)
         {
-            CmpUtf8Pairs keyvalues = CmpUtil.extract(reqHeader.getGeneralInfo());
-            username = keyvalues == null ? null : keyvalues.getValue(CmpUtf8Pairs.KEY_USER);
-            if(username != null)
+            if(username.indexOf('*') != -1 || username.indexOf('%') != -1)
             {
-                if(username.indexOf('*') != -1 || username.indexOf('%') != -1)
-                {
-                    errorStatus = "user could not contains characters '*' and '%'";
-                }
+                errorStatus = "user could not contains characters '*' and '%'";
             }
         }
 
@@ -335,32 +305,7 @@ public abstract class CmpResponder
             return buildErrorPkiMessage(tid, reqHeader, PKIFailureInfo.badMessageCheck, errorStatus);
         }
 
-        PKIMessage resp;
-        if(cmdForCmpRespCert)
-        {
-            if(auditEvent != null)
-            {
-                auditEvent.addEventData(new AuditEventData("eventType", "GET_CMPRESPONDER"));
-                auditEvent.addEventData(new AuditEventData("requestor", requestor.getCertificate().getSubject()));
-            }
-
-            InfoTypeAndValue itv = new InfoTypeAndValue(
-                    new ASN1ObjectIdentifier(CustomObjectIdentifiers.id_cmp_getCmpResponderCert),
-                    responder.getCertificateAsBCObject().toASN1Structure());
-            GenRepContent genRepContent = new GenRepContent(itv);
-            PKIBody respBody = new PKIBody(PKIBody.TYPE_GEN_REP, genRepContent);
-
-            PKIHeaderBuilder respHeader = new PKIHeaderBuilder(
-                    reqHeader.getPvno().getValue().intValue(),
-                    sender,
-                    reqHeader.getSender());
-            respHeader.setTransactionID(tid);
-            resp = new PKIMessage(respHeader.build(), respBody);
-        }
-        else
-        {
-            resp = intern_processPKIMessage(requestor, username, tid, message, auditEvent);
-        }
+        PKIMessage resp = intern_processPKIMessage(requestor, username, tid, message, auditEvent);
 
         if(isProtected)
         {
@@ -396,7 +341,7 @@ public abstract class CmpResponder
         CertBasedRequestorInfo requestor = getRequestor(h);
         if(requestor == null)
         {
-            LOG.warn("tid={}: not authorized requestor {}", tid, h.getSender());
+            LOG.warn("tid={}: not authorized requestor '{}'", tid, h.getSender());
             return new ProtectionVerificationResult(null, ProtectionResult.SENDER_NOT_AUTHORIZED);
         }
 
@@ -404,7 +349,7 @@ public abstract class CmpResponder
                 requestor.getCertificate().getCert());
         if(verifierProvider == null)
         {
-            LOG.warn("tid={}: not authorized requestor {}", tid, h.getSender());
+            LOG.warn("tid={}: not authorized requestor '{}'", tid, h.getSender());
             return new ProtectionVerificationResult(requestor, ProtectionResult.SENDER_NOT_AUTHORIZED);
         }
 

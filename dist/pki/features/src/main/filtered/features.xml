@@ -65,6 +65,10 @@
     <bundle>mvn:org.xipki/shell-base/${project.version}</bundle>
     <bundle>mvn:org.xipki/ca-client-shell/${project.version}</bundle>
   </feature>
+  <feature name="xipki-caqa-shell" version="${project.version}" resolver="(obr)">
+    <feature>xipki-caclient-shell</feature>
+    <bundle>mvn:org.xipki/ca-qa-shell/${project.version}</bundle>    
+  </feature>
   <feature name="xipki-security-shell" version="${project.version}" resolver="(obr)">
     <feature>xipki-security</feature>
     <bundle>mvn:org.xipki/shell-base/${project.version}</bundle>
