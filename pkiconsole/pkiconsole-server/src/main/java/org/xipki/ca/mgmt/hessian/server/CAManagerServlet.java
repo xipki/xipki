@@ -874,7 +874,7 @@ implements HessianCAManager
             String msg = "untrusted TLS client certificate ";
             if(LOG.isInfoEnabled())
             {
-                LOG.info(msg + "with subject={}, issuer={} and serialNumber={}",
+                LOG.info(msg + "with subject='{}', issuer='{}' and serialNumber={}",
                         new Object[]{clientCert.getSubjectX500Principal().getName(),
                         clientCert.getIssuerX500Principal().getName(),
                         clientCert.getSerialNumber()});
@@ -935,7 +935,7 @@ implements HessianCAManager
                     trustedUserCerts.add(x509Cert);
                     if(LOG.isInfoEnabled())
                     {
-                        LOG.info("added trusted user certificate with subject={}, issuer={} and serialNumber={}",
+                        LOG.info("added trusted user certificate with subject='{}', issuer='{}' and serialNumber={}",
                                 new Object[]{x509Cert.getSubjectX500Principal().getName(),
                                         x509Cert.getIssuerX500Principal().getName(),
                                         x509Cert.getSerialNumber()});

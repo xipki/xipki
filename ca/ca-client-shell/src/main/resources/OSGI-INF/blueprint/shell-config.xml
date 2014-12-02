@@ -24,16 +24,6 @@
         <entry key="-ca" value-ref="caNameCompleter"/>
       </optional-completers>
     </command>
-    <command name="caclient/neg-ra-enroll">
-      <action class="org.xipki.ca.client.shell.neg.NegRAEnrollCertCommand">
-        <property name="raWorker" ref="raWorker"/>
-      </action>
-      <optional-completers>
-        <entry key="-out" value-ref="filePathCompleter"/>
-        <entry key="-p10" value-ref="filePathCompleter"/>
-        <entry key="-ca" value-ref="caNameCompleter"/>
-      </optional-completers>
-    </command>
     <command name="caclient/enroll">
       <action class="org.xipki.ca.client.shell.P11EnrollCertCommand">
         <property name="raWorker" ref="raWorker"/>
@@ -56,17 +46,6 @@
         <entry key="-ca" value-ref="caNameCompleter"/>
       </optional-completers>
     </command>
-    <command name="caclient/neg-enroll-p12">
-      <action class="org.xipki.ca.client.shell.neg.NegP12EnrollCertCommand">
-        <property name="raWorker" ref="raWorker"/>
-        <property name="securityFactory" ref="securityFactory"/>
-      </action>
-      <optional-completers>
-        <entry key="-out" value-ref="filePathCompleter"/>
-        <entry key="-p12" value-ref="filePathCompleter"/>
-        <entry key="-ca" value-ref="caNameCompleter"/>
-      </optional-completers>
-    </command>
     <command name="caclient/revoke">
       <action class="org.xipki.ca.client.shell.RevokeCertCommand">
         <property name="raWorker" ref="raWorker"/>
@@ -77,27 +56,8 @@
         <entry key="-reason" value-ref="crlReasonCompleter"/>
       </optional-completers>
     </command>
-    <command name="caclient/neg-revoke">
-      <action class="org.xipki.ca.client.shell.neg.NegRevokeCertCommand">
-        <property name="raWorker" ref="raWorker"/>
-      </action>
-      <optional-completers>
-        <entry key="-cert" value-ref="filePathCompleter"/>
-        <entry key="-cacert" value-ref="filePathCompleter"/>
-        <entry key="-reason" value-ref="crlReasonCompleter"/>
-      </optional-completers>
-    </command>
     <command name="caclient/unrevoke">
       <action class="org.xipki.ca.client.shell.UnrevokeCertCommand">
-        <property name="raWorker" ref="raWorker"/>
-      </action>
-      <optional-completers>
-        <entry key="-cert" value-ref="filePathCompleter"/>
-        <entry key="-cacert" value-ref="filePathCompleter"/>
-      </optional-completers>
-    </command>
-    <command name="caclient/neg-unrevoke">
-      <action class="org.xipki.ca.client.shell.neg.NegUnrevokeCertCommand">
         <property name="raWorker" ref="raWorker"/>
       </action>
       <optional-completers>
@@ -131,27 +91,8 @@
         <entry key="-ca" value-ref="caNameCompleter"/>
       </optional-completers>
     </command>
-    <command name="caclient/neg-gencrl">
-      <action class="org.xipki.ca.client.shell.neg.NegGenCRLCommand">
-        <property name="raWorker" ref="raWorker"/>
-      </action>
-      <optional-completers>
-        <entry key="-out" value-ref="filePathCompleter"/>
-        <entry key="-ca" value-ref="caNameCompleter"/>
-      </optional-completers>
-    </command>
     <command name="caclient/getcrl">
       <action class="org.xipki.ca.client.shell.GetCRLCommand">
-        <property name="raWorker" ref="raWorker"/>
-      </action>
-      <optional-completers>
-        <entry key="-out" value-ref="filePathCompleter"/>
-        <entry key="-ca" value-ref="caNameCompleter"/>
-        <entry key="-basecrl-out" value-ref="filePathCompleter"/>
-      </optional-completers>
-    </command>
-    <command name="caclient/neg-getcrl">
-      <action class="org.xipki.ca.client.shell.neg.NegGetCRLCommand">
         <property name="raWorker" ref="raWorker"/>
       </action>
       <optional-completers>

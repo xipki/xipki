@@ -191,6 +191,7 @@ public final class RAWorkerImpl extends AbstractRAWorker implements RAWorker
     {
         Set<String> caNamesWithError = new HashSet<>();
 
+        Set<String> errorCANames = new HashSet<>();
         for(String name : casMap.keySet())
         {
             if(caNamesToBeConfigured != null && caNamesToBeConfigured.contains(name) == false)
@@ -204,28 +205,6 @@ public final class RAWorkerImpl extends AbstractRAWorker implements RAWorker
                 continue;
             }
 
-            boolean responderConfigured = false;
-            try
-            {
-                ca.getRequestor().autoConfigureResponder();
-                responderConfigured = true;
-                LOG.info("Retrieved CMP responder for CA " + name);
-            }catch(Throwable t)
-            {
-                caNamesWithError.add(name);
-                final String message = "Could not retrieve CMP responder for CA " + name;
-                if(LOG.isWarnEnabled())
-                {
-                    LOG.warn(LogUtil.buildExceptionLogFormat(message), t.getClass().getName(), t.getMessage());
-                }
-                LOG.debug(message, t);
-            }
-
-            if(responderConfigured == false)
-            {
-                continue;
-            }
-
             try
             {
                 CAInfo caInfo = ca.getRequestor().retrieveCAInfo(name);
@@ -233,6 +212,7 @@ public final class RAWorkerImpl extends AbstractRAWorker implements RAWorker
                 LOG.info("Retrieved CAInfo for CA " + name);
             } catch(Throwable t)
             {
+                errorCANames.add(name);
                 caNamesWithError.add(name);
                 final String message = "Could not retrieve CAInfo for CA " + name;
                 if(LOG.isWarnEnabled())
@@ -240,6 +220,14 @@ public final class RAWorkerImpl extends AbstractRAWorker implements RAWorker
                     LOG.warn(LogUtil.buildExceptionLogFormat(message), t.getClass().getName(), t.getMessage());
                 }
                 LOG.debug(message, t);
+            }
+        }
+
+        if(errorCANames.isEmpty() == false)
+        {
+            for(String caName : errorCANames)
+            {
+                casMap.remove(caName);
             }
         }
 
@@ -300,21 +288,21 @@ public final class RAWorkerImpl extends AbstractRAWorker implements RAWorker
             try
             {
                 CAConf ca = new CAConf(caName, caType.getUrl(), caType.getHealthUrl(), caType.getRequestor());
+                // responder
+                X509Certificate cert = SecurityUtil.parseCert(readData(caType.getResponder()));
+                ca.setResponder(cert);
+
                 CAInfoType caInfo = caType.getCAInfo();
                 if(caInfo.getAutoConf() == null)
                 {
                     ca.setAutoConf(false);
 
                     // CA cert
-                    X509Certificate cert = SecurityUtil.parseCert(readData(caInfo.getCert()));
+                    cert = SecurityUtil.parseCert(readData(caInfo.getCert()));
 
                     // profiles
                     Set<String> certProfiles = new HashSet<>(caInfo.getCertProfiles().getCertProfile());
                     ca.setCAInfo(cert, certProfiles);
-
-                    // responder
-                    cert = SecurityUtil.parseCert(readData(caInfo.getResponder()));
-                    ca.setResponder(cert);
                 }
                 else
                 {
@@ -391,7 +379,7 @@ public final class RAWorkerImpl extends AbstractRAWorker implements RAWorker
         boolean autoConf = false;
         for(CAConf ca :cas)
         {
-            if(null != this.casMap.put(ca.getName(), ca))
+            if(this.casMap.containsKey(ca.getName()))
             {
                 throw new ConfigurationException("duplicate CAs with the same name " + ca.getName());
             }
@@ -422,6 +410,7 @@ public final class RAWorkerImpl extends AbstractRAWorker implements RAWorker
             }
 
             ca.setRequestor(cmpRequestor);
+            this.casMap.put(ca.getName(), ca);
         }
 
         if(autoConf)
@@ -1245,7 +1234,7 @@ public final class RAWorkerImpl extends AbstractRAWorker implements RAWorker
             serverUrl = new URL(healthUrlStr);
         } catch (MalformedURLException e)
         {
-            throw new RAWorkerException("invalid URL '" + healthUrlStr);
+            throw new RAWorkerException("invalid URL '" + healthUrlStr + "'");
         }
 
         String name = "X509CA";
