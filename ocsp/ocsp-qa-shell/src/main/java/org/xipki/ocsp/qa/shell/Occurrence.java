@@ -33,31 +33,31 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.ca.client.shell.completer;
-
-import java.util.Set;
-
-import org.xipki.ca.client.api.RAWorker;
-import org.xipki.console.karaf.DynamicEnumCompleter;
+package org.xipki.ocsp.qa.shell;
 
 /**
  * @author Lijun Liao
  */
 
-public class CaNameCompleter extends DynamicEnumCompleter
+public enum Occurrence
 {
+    required,
+    optional,
+    forbidden;
 
-    protected RAWorker raWorker;
+    public static final String occurencesText = "required, optional and forbidden";
 
-    public final void setRaWorker(RAWorker raWorker)
+    public static Occurrence getOccurrence(String name)
     {
-        this.raWorker = raWorker;
-    }
+        for(Occurrence entry : values())
+        {
+            if(entry.name().equals(name))
+            {
+                return entry;
+            }
+        }
 
-    @Override
-    protected Set<String> getEnums()
-    {
-        return raWorker.getCaNames();
+        throw new IllegalArgumentException("Unknown Occurrence '" + name + "'");
     }
 
 }

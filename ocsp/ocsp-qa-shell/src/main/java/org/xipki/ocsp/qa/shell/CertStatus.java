@@ -33,31 +33,43 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.ca.client.shell.completer;
-
-import java.util.Set;
-
-import org.xipki.ca.client.api.RAWorker;
-import org.xipki.console.karaf.DynamicEnumCompleter;
+package org.xipki.ocsp.qa.shell;
 
 /**
  * @author Lijun Liao
  */
 
-public class CaNameCompleter extends DynamicEnumCompleter
+public enum CertStatus
 {
+    issuerUnknown,
+    unknown,
+    good,
+    rev_noreason,
+    unspecified,
+    keyCompromise,
+    cACompromise,
+    affiliationChanged,
+    superseded,
+    cessationOfOperation,
+    certificateHold,
+    privilegeWithdrawn,
+    aACompromise;
 
-    protected RAWorker raWorker;
+    public static final String certStatusesText =
+            "issuerUnknown, unknown, good, rev_noreason, unspecified, keyCompromise, " +
+            "cACompromise, affiliationChanged, superseded, cessationOfOperation, " +
+            "certificateHold, privilegeWithdrawn, aACompromise";
 
-    public final void setRaWorker(RAWorker raWorker)
+    public static CertStatus getCertStatus(String name)
     {
-        this.raWorker = raWorker;
-    }
+        for(CertStatus entry : values())
+        {
+            if(entry.name().equals(name))
+            {
+                return entry;
+            }
+        }
 
-    @Override
-    protected Set<String> getEnums()
-    {
-        return raWorker.getCaNames();
+        throw new IllegalArgumentException("Unknown CertStatus '" + name + "'");
     }
-
 }

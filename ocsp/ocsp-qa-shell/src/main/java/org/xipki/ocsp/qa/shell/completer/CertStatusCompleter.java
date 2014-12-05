@@ -33,31 +33,26 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.ca.client.shell.completer;
+package org.xipki.ocsp.qa.shell.completer;
 
-import java.util.Set;
-
-import org.xipki.ca.client.api.RAWorker;
-import org.xipki.console.karaf.DynamicEnumCompleter;
+import org.xipki.console.karaf.EnumCompleter;
+import org.xipki.ocsp.qa.shell.CertStatus;
 
 /**
  * @author Lijun Liao
  */
 
-public class CaNameCompleter extends DynamicEnumCompleter
+public class CertStatusCompleter extends EnumCompleter
 {
-
-    protected RAWorker raWorker;
-
-    public final void setRaWorker(RAWorker raWorker)
+    public CertStatusCompleter()
     {
-        this.raWorker = raWorker;
-    }
+        StringBuilder enums = new StringBuilder();
 
-    @Override
-    protected Set<String> getEnums()
-    {
-        return raWorker.getCaNames();
+        for(CertStatus entry : CertStatus.values())
+        {
+            enums.append(entry.name()).append(",");
+        }
+        enums.deleteCharAt(enums.length() - 1);
+        setTokens(enums.toString());
     }
-
 }
