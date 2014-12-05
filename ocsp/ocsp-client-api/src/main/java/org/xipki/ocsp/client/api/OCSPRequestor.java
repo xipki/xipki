@@ -56,7 +56,16 @@ public interface OCSPRequestor
             URL responderUrl, RequestOptions requestOptions)
     throws OCSPRequestorException;
 
+    OCSPResp ask(X509Certificate caCert, X509Certificate[] certs,
+            URL responderUrl, RequestOptions requestOptions)
+    throws OCSPRequestorException;
+
     OCSPResp ask(X509Certificate caCert, BigInteger serialNumber,
             URL responderUrl, RequestOptions requestOptions)
     throws OCSPRequestorException;
+
+    OCSPResp ask(X509Certificate caCert, BigInteger[] serialNumbers,
+            URL responderUrl, RequestOptions requestOptions)
+    throws OCSPRequestorException;
+
 }
