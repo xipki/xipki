@@ -2,104 +2,135 @@
 #                              OCSP                             #
 #################################################################
 features:install xipki-ocspserver
-features:install xipki-ocspclient-shell
+features:install xipki-ocspqa-shell
 
 # Wait one second
 sleep 1000
 
 ## POST
-echo "===== expected: Good (POST, DB) ====="
-ocsp:status -cacert output/RCA1.der -cert output/SubCA1.der -v
+echo "QA: Good (POST, DB)"
+ocspqa:status -cacert output/RCA1.der -cert output/SubCA1.der \
+  -expStatus good -expCerthash required -expSigalg SHA256withRSA
 
-echo "===== expected: Good (POST, DB) ====="
-ocsp:status -cacert output/SubCA1.der -cert output/TLS1.der -v
+echo "QA: Good (POST, DB)"
+ocspqa:status -cacert output/SubCA1.der -cert output/TLS1.der \
+  -expStatus good -expCerthash required -expSigalg SHA256withRSA
+  
+echo "QA: Revoked, reason = affiliationChanged (POST, DB)"
+ocspqa:status -cacert output/SubCA1.der -cert output/TLS2.der \
+  -expStatus affiliationChanged -expCerthash required -expSigalg SHA256withRSA
+  
+echo "QA: Good (POST, DB)"
+ocspqa:status -cacert output/SubCA1.der -cert output/TLS_C1.der \
+  -expStatus good -expCerthash required -expSigalg SHA256withRSA
 
-echo "===== expected: Revoked, reason = affiliationChanged (POST, DB) ====="
-ocsp:status -cacert output/SubCA1.der -cert output/TLS2.der -v
+echo "QA: Revoked, reason = affiliationChanged (POST, DB)"
+ocspqa:status -cacert output/SubCA1.der -cert output/TLS_C2.der \
+  -expStatus affiliationChanged -expCerthash required -expSigalg SHA256withRSA
 
-echo "===== expected: Good (POST, DB) ====="
-ocsp:status -cacert output/SubCA1.der -cert output/TLS_C1.der -v
+echo "QA: Good (POST, CRL)"
+ocspqa:status -cacert output/SubCAwithCRL1.der -cert output/OCSP1.der \
+  -expStatus good -expCerthash required -expSigalg SHA256withRSA
 
-echo "===== expected: Revoked, reason = affiliationChanged (POST, DB) ====="
-ocsp:status -cacert output/SubCA1.der -cert output/TLS_C2.der -v
+echo "QA: Revoked, reason = keyCompromise (POST, CRL)"
+ocspqa:status -cacert output/SubCAwithCRL1.der -cert output/OCSP2.der \
+  -expStatus keyCompromise -expCerthash required -expSigalg SHA256withRSA
 
-echo "===== expected: Good (POST, CRL) ====="
-ocsp:status -cacert output/SubCAwithCRL1.der -cert output/OCSP1.der -v
+echo "QA: Good (POST, CRL)"
+ocspqa:status -cacert output/SubCAwithCRL1.der -serial 99999 \
+  -expStatus good -expCerthash forbidden -expSigalg SHA256withRSA
 
-echo "===== expected: Revoked, reason = keyCompromise (POST, CRL) ====="
-ocsp:status -cacert output/SubCAwithCRL1.der -cert output/OCSP2.der -v
+echo "QA: Unknown (RFC6960) (POST, DB)"
+ocspqa:status -cacert output/SubCA1.der -serial 99999 \
+  -expStatus unknown -expSigalg SHA256withRSA
 
-echo "===== expected: Good (POST, CRL) ====="
-ocsp:status -cacert output/SubCAwithCRL1.der -serial 99999 -v
-
-echo "===== expected: Unknown (RFC6960) (POST, DB) ====="
-ocsp:status -cacert output/SubCA1.der -serial 99999 -v
-
-echo "===== expected: Unknown (RFC2560) (POST, ISSUER UNKNOWN) ====="
-ocsp:status -cacert output/TLS1.der -serial 2 -v
+echo "QA: Unknown (RFC2560) (POST, ISSUER UNKNOWN)"
+ocspqa:status -cacert output/TLS1.der -serial 2 \
+  -expStatus issuerUnknown -expSigalg SHA256withRSA
 
 ## GET
-echo "===== expected: Good (GET, DB) ====="
-ocsp:status -cacert output/RCA1.der -cert output/SubCA1.der -v -httpget
+echo "QA: Good (GET, DB)"
+ocspqa:status -cacert output/RCA1.der -cert output/SubCA1.der -httpget \
+  -expStatus good -expCerthash required -expSigalg SHA256withRSA
 
-echo "===== expected: Good (GET, DB) ====="
-ocsp:status -cacert output/SubCA1.der -cert output/TLS1.der -v -httpget
+echo "QA: Good (GET, DB)"
+ocspqa:status -cacert output/SubCA1.der -cert output/TLS1.der -httpget \
+  -expStatus good -expCerthash required -expSigalg SHA256withRSA
 
-echo "===== expected: Revoked, reason = affiliationChanged (GET, DB) ====="
-ocsp:status -cacert output/SubCA1.der -cert output/TLS2.der -v -httpget
+echo "QA: Revoked, reason = affiliationChanged (GET, DB)"
+ocspqa:status -cacert output/SubCA1.der -cert output/TLS2.der -httpget \
+  -expStatus affiliationChanged -expCerthash required -expSigalg SHA256withRSA
 
-echo "===== expected: Good (GET,DB) ====="
-ocsp:status -cacert output/SubCA1.der -cert output/TLS_C1.der -v -httpget
+echo "QA: Good (GET,DB)"
+ocspqa:status -cacert output/SubCA1.der -cert output/TLS_C1.der -httpget \
+  -expStatus good -expCerthash required -expSigalg SHA256withRSA
 
-echo "===== expected: Revoked, reason = affiliationChanged (GET, DB) ====="
-ocsp:status -cacert output/SubCA1.der -cert output/TLS_C2.der -v -httpget
+echo "QA: Revoked, reason = affiliationChanged (GET, DB)"
+ocspqa:status -cacert output/SubCA1.der -cert output/TLS_C2.der -httpget \
+  -expStatus affiliationChanged -expCerthash required -expSigalg SHA256withRSA
 
-echo "===== expected: Good (GET, CRL) ====="
-ocsp:status -cacert output/SubCAwithCRL1.der -cert output/OCSP1.der -v -httpget
+echo "QA: Good (GET, CRL)"
+ocspqa:status -cacert output/SubCAwithCRL1.der -cert output/OCSP1.der -httpget \
+  -expStatus good -expCerthash required -expSigalg SHA256withRSA
 
-echo "===== expected: Revoked, reason = keyCompromise (GET, CRL) ====="
-ocsp:status -cacert output/SubCAwithCRL1.der -cert output/OCSP2.der -v -httpget
+echo "QA: Revoked, reason = keyCompromise (GET, CRL)"
+ocspqa:status -cacert output/SubCAwithCRL1.der -cert output/OCSP2.der -httpget \
+  -expStatus keyCompromise -expCerthash required -expSigalg SHA256withRSA
 
-echo "===== expected: Good (GET, CRL) ====="
-ocsp:status -cacert output/SubCAwithCRL1.der -serial 99999 -v -httpget
+echo "QA: Good (GET, CRL)"
+ocspqa:status -cacert output/SubCAwithCRL1.der -serial 99999 -httpget \
+  -expStatus good -expCerthash forbidden -expSigalg SHA256withRSA
 
-echo "===== expected: Unknown (RFC6960) (GET, DB) ====="
-ocsp:status -cacert output/SubCA1.der -serial 99999 -v -httpget
+echo "QA: Unknown (RFC6960) (GET, DB)"
+ocspqa:status -cacert output/SubCA1.der -serial 99999 -httpget \
+  -expStatus unknown -expSigalg SHA256withRSA
 
-echo "===== expected: Unknown (RFC2560) (GET, ISSUER UNKNOWN) ====="
-ocsp:status -cacert output/TLS1.der -serial 2 -v -httpget
-
+echo "QA: Unknown (RFC2560) (GET, ISSUER UNKNOWN)"
+ocspqa:status -cacert output/TLS1.der -serial 2 -httpget \
+  -expStatus issuerUnknown -expSigalg SHA256withRSA
+ 
 ## POST, SIGNED
-echo "===== expected: Good (POST, SIGNED, DB) ====="
-ocsp:status -cacert output/RCA1.der -cert output/SubCA1.der -v -sign
+echo "QA: Good (POST, SIGNED, DB)"
+ocspqa:status -cacert output/RCA1.der -cert output/SubCA1.der -sign \
+-expStatus good -expCerthash required -expSigalg SHA256withRSA
 
-echo "===== expected: Good (POST, SIGNED, DB) ====="
-ocsp:status -cacert output/SubCA1.der -cert output/TLS1.der -v -sign
+echo "QA: Good (POST, SIGNED, DB)"
+ocspqa:status -cacert output/SubCA1.der -cert output/TLS1.der -sign \
+  -expStatus good -expCerthash required -expSigalg SHA256withRSA
 
-echo "===== expected: Revoked, reason = affiliationChanged (POST, SIGNED, DB) ====="
-ocsp:status -cacert output/SubCA1.der -cert output/TLS2.der -v -sign
+echo "QA: Revoked, reason = affiliationChanged (POST, SIGNED, DB)"
+ocspqa:status -cacert output/SubCA1.der -cert output/TLS2.der -sign \
+  -expStatus affiliationChanged -expCerthash required -expSigalg SHA256withRSA
 
-echo "===== expected: Good (POST, SIGNED, DB) ====="
-ocsp:status -cacert output/SubCA1.der -cert output/TLS_C1.der -v -sign
+echo "QA: Good (POST, SIGNED, DB)"
+ocspqa:status -cacert output/SubCA1.der -cert output/TLS_C1.der -sign \
+  -expStatus good -expCerthash required -expSigalg SHA256withRSA
 
-echo "===== expected: Revoked, reason = affiliationChanged (POST, SIGNED, DB) ====="
-ocsp:status -cacert output/SubCA1.der -cert output/TLS_C2.der -v -sign
+echo "QA: Revoked, reason = affiliationChanged (POST, SIGNED, DB)"
+ocspqa:status -cacert output/SubCA1.der -cert output/TLS_C2.der -sign \
+  -expStatus affiliationChanged -expCerthash required -expSigalg SHA256withRSA
 
-echo "===== expected: Good (POST, SIGNED, CRL) ====="
-ocsp:status -cacert output/SubCAwithCRL1.der -cert output/OCSP1.der -v -sign
+echo "QA: Good (POST, SIGNED, CRL)"
+ocspqa:status -cacert output/SubCAwithCRL1.der -cert output/OCSP1.der -sign \
+  -expStatus good -expCerthash required -expSigalg SHA256withRSA
+ 
+echo "QA: Revoked, reason = keyCompromise (POST, SIGNED, CRL)"
+ocspqa:status -cacert output/SubCAwithCRL1.der -cert output/OCSP2.der -sign \
+  -expStatus keyCompromise -expCerthash required -expSigalg SHA256withRSA
+ 
+echo "QA: Good (POST, SIGNED, CRL)"
+ocspqa:status -cacert output/SubCAwithCRL1.der -serial 99999 -sign \
+  -expStatus good -expCerthash forbidden -expSigalg SHA256withRSA
 
-echo "===== expected: Revoked, reason = keyCompromise (POST, SIGNED, CRL) ====="
-ocsp:status -cacert output/SubCAwithCRL1.der -cert output/OCSP2.der -v -sign
+echo "QA: Unknown (RFC6960) (POST, SIGNED, DB)"
+ocspqa:status -cacert output/SubCA1.der -serial 99999 -sign \
+  -expStatus unknown -expSigalg SHA256withRSA
 
-echo "===== expected: Good (POST, SIGNED, CRL) ====="
-ocsp:status -cacert output/SubCAwithCRL1.der -serial 99999 -v -sign
+echo "QA: Unknown (RFC2560) (POST, SIGNED, ISSUER UNKNOWN)"
+ocspqa:status -cacert output/TLS1.der -serial 2 -sign \
+  -expStatus issuerUnknown -expSigalg SHA256withRSA
 
-echo "===== expected: Unknown (RFC6960) (POST, SIGNED, DB) ====="
-ocsp:status -cacert output/SubCA1.der -serial 99999 -v -sign
-
-echo "===== expected: Unknown (RFC2560) (POST, SIGNED, ISSUER UNKNOWN) ====="
-ocsp:status -cacert output/TLS1.der -serial 2 -v -sign
-
+features:uninstall xipki-ocspqa-shell
 features:uninstall xipki-ocspclient-shell
 features:uninstall xipki-ocspclient
 features:uninstall xipki-ocspserver

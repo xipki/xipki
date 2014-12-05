@@ -22,11 +22,11 @@ sleep 2000
 
 ## Check the healthy status
 
-caclient:health -ca RCA
+caclient:health -ca RCA1
 
-caclient:health -ca SubCA
+caclient:health -ca SubCA1
 
-caclient:health -ca SubCAwithCRL
+caclient:health -ca SubCAwithCRL1
 
 ## Enroll certificates
 # Certificate OCSP1

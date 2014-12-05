@@ -33,31 +33,19 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.ca.client.shell.completer;
-
-import java.util.Set;
-
-import org.xipki.ca.client.api.RAWorker;
-import org.xipki.console.karaf.DynamicEnumCompleter;
+package org.xipki.ocsp.qa.shell;
 
 /**
  * @author Lijun Liao
  */
 
-public class CaNameCompleter extends DynamicEnumCompleter
+public class ViolationException extends Exception
 {
+    private static final long serialVersionUID = 4001129541427713229L;
 
-    protected RAWorker raWorker;
-
-    public final void setRaWorker(RAWorker raWorker)
+    public ViolationException(String message)
     {
-        this.raWorker = raWorker;
-    }
-
-    @Override
-    protected Set<String> getEnums()
-    {
-        return raWorker.getCaNames();
+        super("Violation: " + message);
     }
 
 }

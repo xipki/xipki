@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0" xmlns:cm="http://aries.apache.org/blueprint/xmlns/blueprint-cm/v1.1.0" default-activation="lazy">
+  <reference id="filePathCompleter" interface="org.xipki.console.karaf.FilePathCompleter"/>
+  <reference id="ocspRequestor" interface="org.xipki.ocsp.client.api.OCSPRequestor"/>
+  <bean id="certStatusCompleter" class="org.xipki.ocsp.qa.shell.completer.CertStatusCompleter"/>
+  <bean id="occurrenceCompleter" class="org.xipki.ocsp.qa.shell.completer.OccurrenceCompleter"/>
+  <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.1.0">
+    <command name="ocspqa/status">
+      <action class="org.xipki.ocsp.qa.shell.OCSPQAStatusCommand">
+        <property name="requestor" ref="ocspRequestor"/>
+      </action>
+      <optional-completers>
+        <entry key="-cert" value-ref="filePathCompleter"/>
+        <entry key="-cacert" value-ref="filePathCompleter"/>
+        <entry key="-expStatus" value-ref="certStatusCompleter"/>
+        <entry key="-expNextupdate" value-ref="occurrenceCompleter"/>
+        <entry key="-expCerthash" value-ref="occurrenceCompleter"/>
+        <entry key="-expNonce" value-ref="occurrenceCompleter"/>
+        <entry key="-expSigalg" value-ref="occurrenceCompleter"/>
+      </optional-completers>
+    </command>
+  </command-bundle>
+</blueprint>
