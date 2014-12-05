@@ -43,6 +43,7 @@ import java.security.cert.X509Certificate;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -83,12 +84,14 @@ import org.xipki.security.SignerUtil;
 public class OCSPStatusCommand extends AbstractOCSPStatusCommand
 {
     @Option(name = "-serial",
+            multiValued = true,
             description = "Serial number")
-    protected String serialNumber;
+    protected List<String> serialNumbers;
 
     @Option(name = "-cert",
+            multiValued = true,
             description = "Certificate")
-    protected String certFile;
+    protected List<String> certFiles;
 
     @Option(name = "-v", aliases="--verbose",
             required = false, description = "Show status verbosely")
@@ -107,32 +110,44 @@ public class OCSPStatusCommand extends AbstractOCSPStatusCommand
     protected Object doExecute()
     throws Exception
     {
-        if(serialNumber == null && certFile == null)
+        if((serialNumbers == null || serialNumbers.isEmpty()) &&
+                (certFiles == null || certFiles.isEmpty()))
         {
-            err("Neither serialNumber nor certFile is set");
+            err("Neither serialNumbers nor certFiles is set");
             return null;
         }
 
         X509Certificate caCert = SecurityUtil.parseCert(caCertFile);
 
-        byte[] encodedCert = null;
-        BigInteger sn;
-        if(certFile != null)
+        Map<BigInteger, byte[]> encodedCerts = null;
+        List<BigInteger> sns = new LinkedList<>();
+        if(certFiles != null && certFiles.isEmpty() == false)
         {
-            encodedCert = IoUtil.read(certFile);
-            X509Certificate cert = SecurityUtil.parseCert(certFile);
-            sn = cert.getSerialNumber();
+            encodedCerts = new HashMap<>(certFiles.size());
+
+            for(String certFile : certFiles)
+            {
+                byte[] encodedCert = IoUtil.read(certFile);
+                X509Certificate cert = SecurityUtil.parseCert(certFile);
+                BigInteger sn = cert.getSerialNumber();
+                sns.add(sn);
+                encodedCerts.put(sn, encodedCert);
+            }
         }
         else
         {
-            sn = new BigInteger(serialNumber);
+            for(String serialNumber : serialNumbers)
+            {
+                BigInteger sn = new BigInteger(serialNumber);
+                sns.add(sn);
+            }
         }
 
         URL serverUrl = getServiceURL();
 
         RequestOptions options = getRequestOptions();
 
-        OCSPResp response = requestor.ask(caCert, sn, serverUrl, options);
+        OCSPResp response = requestor.ask(caCert, sns.toArray(new BigInteger[0]), serverUrl, options);
         BasicOCSPResp basicResp = OCSPUtils.extractBasicOCSPResp(response);
 
         // check the signature if available
@@ -176,15 +191,25 @@ public class OCSPStatusCommand extends AbstractOCSPStatusCommand
         if(n == 0)
         {
             err("Received no status from server");
+            return null;
         }
-        else if(n != 1)
+
+        if(n != sns.size())
         {
             err("Received status with " + n +
-                    " single responses from server, but 1 was requested");
+                    " single responses from server, but " + sns.size() + " were requested");
+            return null;
         }
-        else
+
+        for(int i = 0; i < n; i++)
         {
-            SingleResp singleResp = singleResponses[0];
+            if(n > 1)
+            {
+                out("---------------------------- " + i + " ----------------------------");
+            }
+            SingleResp singleResp = singleResponses[i];
+            BigInteger serialNumber = singleResp.getCertID().getSerialNumber();
+
             CertificateStatus singleCertStatus = singleResp.getCertStatus();
 
             String status ;
@@ -240,8 +265,9 @@ public class OCSPStatusCommand extends AbstractOCSPStatusCommand
                 status = "ERROR";
             }
 
-            StringBuilder msg = new StringBuilder("Certificate status: ");
-            msg.append(status);
+            StringBuilder msg = new StringBuilder();
+            msg.append("SerialNumber: ").append(serialNumber);
+            msg.append("\nCertificate status: ").append(status);
 
             if(verbose.booleanValue())
             {
@@ -260,8 +286,10 @@ public class OCSPStatusCommand extends AbstractOCSPStatusCommand
 
                     msg.append("\tHash algo : ").append(hashAlgOid.getId()).append("\n");
                     msg.append("\tHash value: ").append(Hex.toHexString(hashValue)).append("\n");
-                    if(encodedCert != null)
+
+                    if(encodedCerts != null)
                     {
+                        byte[] encodedCert = encodedCerts.get(serialNumber);
                         MessageDigest md = MessageDigest.getInstance(hashAlgOid.getId());
                         byte[] expectedHashValue = md.digest(encodedCert);
                         if(Arrays.equals(expectedHashValue, hashValue))
@@ -322,12 +350,12 @@ public class OCSPStatusCommand extends AbstractOCSPStatusCommand
                 else
                 {
                     int size = extensionOIDs.size();
-                    for(int i = 0; i < size; i++)
+                    for(int j = 0; j < size; j++)
                     {
-                        ASN1ObjectIdentifier extensionOID = (ASN1ObjectIdentifier) extensionOIDs.get(i);
+                        ASN1ObjectIdentifier extensionOID = (ASN1ObjectIdentifier) extensionOIDs.get(j);
                         String name = extensionOidNameMap.get(extensionOID);
                         msg.append(name == null ? extensionOID.getId() : name);
-                        if(i != size - 1)
+                        if(j != size - 1)
                         {
                             msg.append(", ");
                         }

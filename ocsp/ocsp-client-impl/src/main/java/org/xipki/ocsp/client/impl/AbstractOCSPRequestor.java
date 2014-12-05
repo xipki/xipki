@@ -107,11 +107,38 @@ public abstract class AbstractOCSPRequestor implements OCSPRequestor
             throw new IllegalArgumentException("cert and caCert do not match");
         }
 
-        return ask(caCert, cert.getSerialNumber(), responderUrl, requestOptions);
+        return ask(caCert, new BigInteger[]{cert.getSerialNumber()}, responderUrl, requestOptions);
+    }
+
+    @Override
+    public OCSPResp ask(X509Certificate caCert, X509Certificate[] certs, URL responderUrl,
+            RequestOptions requestOptions)
+    throws OCSPRequestorException
+    {
+        BigInteger[] serialNumbers = new BigInteger[certs.length];
+        for(int i = 0; i < certs.length; i++)
+        {
+            X509Certificate cert = certs[i];
+            if(caCert.getSubjectX500Principal().equals(cert.getIssuerX500Principal()) == false)
+            {
+                throw new IllegalArgumentException("cert at index " + i + " and caCert do not match");
+            }
+            serialNumbers[i++] = cert.getSerialNumber();
+        }
+
+        return ask(caCert, serialNumbers, responderUrl, requestOptions);
     }
 
     @Override
     public OCSPResp ask(X509Certificate caCert, BigInteger serialNumber, URL responderUrl,
+            RequestOptions requestOptions)
+    throws OCSPRequestorException
+    {
+        return ask(caCert, new BigInteger[]{serialNumber}, responderUrl, requestOptions);
+    }
+
+    @Override
+    public OCSPResp ask(X509Certificate caCert, BigInteger[] serialNumbers, URL responderUrl,
             RequestOptions requestOptions)
     throws OCSPRequestorException
     {
@@ -126,7 +153,7 @@ public abstract class AbstractOCSPRequestor implements OCSPRequestor
             nonce = nextNonce();
         }
 
-        OCSPReq ocspReq = buildRequest(caCert, serialNumber, nonce, requestOptions);
+        OCSPReq ocspReq = buildRequest(caCert, serialNumbers, nonce, requestOptions);
         try
         {
             byte[] encodedReq = ocspReq.getEncoded();
@@ -159,7 +186,7 @@ public abstract class AbstractOCSPRequestor implements OCSPRequestor
         }
     }
 
-    private OCSPReq buildRequest(X509Certificate caCert, BigInteger serialNumber, byte[] nonce,
+    private OCSPReq buildRequest(X509Certificate caCert, BigInteger[] serialNumbers, byte[] nonce,
             RequestOptions requestOptions)
     throws OCSPRequestorException
     {
@@ -226,12 +253,15 @@ public abstract class AbstractOCSPRequestor implements OCSPRequestor
 
         try
         {
-            CertificateID certID = new CertificateID(
-                    digestCalculator,
-                    new X509CertificateHolder(caCert.getEncoded()),
-                    serialNumber);
+            for(BigInteger serialNumber : serialNumbers)
+            {
+                CertificateID certID = new CertificateID(
+                        digestCalculator,
+                        new X509CertificateHolder(caCert.getEncoded()),
+                        serialNumber);
 
-            reqBuilder.addRequest(certID);
+                reqBuilder.addRequest(certID);
+            }
 
             if(requestOptions.isSignRequest())
             {
