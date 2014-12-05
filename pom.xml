@@ -39,7 +39,7 @@
     <slf4j.version>1.7.7</slf4j.version>
     <servlet-api.version>2.5</servlet-api.version>
     <junit.version>4.8.2</junit.version>
-    <pkcs11Wrapper.version>1.2.18</pkcs11Wrapper.version>
+    <pkcs11Wrapper.version>1.3.0</pkcs11Wrapper.version>
     <hikaricp.version>2.1.0</hikaricp.version>
     <ldapsdk.version>2.3.6</ldapsdk.version>
     <hessian.version>4.0.38</hessian.version>
