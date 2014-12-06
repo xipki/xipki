@@ -1882,7 +1882,7 @@ public class X509CA
 
             for(IdentifiedX509CertPublisher publisher : getPublishers())
             {
-                if(publisher.isAsyn())
+                if(publisher.isAsyn() == false)
                 {
                     boolean successfull;
                     try

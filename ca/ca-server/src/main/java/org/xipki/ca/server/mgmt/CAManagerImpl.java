@@ -190,7 +190,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
     private Map<String, DataSourceWrapper> dataSources = null;
 
     private final Map<String, X509CAInfo> cas = new ConcurrentHashMap<>();
-    private final Map<String, CertProfileEntryWrapper> certProfiles = new ConcurrentHashMap<>();
+    private final Map<String, IdentifiedX509CertProfile> certProfiles = new ConcurrentHashMap<>();
     private final Map<String, X509PublisherEntryWrapper> publishers = new ConcurrentHashMap<>();
     private final Map<String, CmpRequestorEntry> requestors = new ConcurrentHashMap<>();
     private final Map<String, X509CrlSignerEntry> crlSigners = new ConcurrentHashMap<>();
@@ -1138,23 +1138,23 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
 
         for(String name : certProfiles.keySet())
         {
-            CertProfileEntryWrapper entry = certProfiles.get(name);
-            try
+            IdentifiedX509CertProfile profile = certProfiles.get(name);
+            if(profile != null)
             {
-                IdentifiedX509CertProfile profile = entry.getCertProfile();
-                if(profile != null)
+                try
                 {
                     profile.shutdown();
-                }
-            } catch(Exception e)
-            {
-                final String message = "could not shutdown CertProfile " + name;
-                if(LOG.isWarnEnabled())
+                } catch(Exception e)
                 {
-                    LOG.warn(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(), e.getMessage());
+                    final String message = "could not shutdown CertProfile " + name;
+                    if(LOG.isWarnEnabled())
+                    {
+                        LOG.warn(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(), e.getMessage());
+                    }
+                    LOG.debug(message, e);
                 }
-                LOG.debug(message, e);
             }
+
         }
         certProfiles.clear();
 
@@ -1174,21 +1174,8 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
                 String conf = rs.getString("CONF");
 
                 CertProfileEntry rawEntry = new CertProfileEntry(name, type, conf);
-                CertProfileEntryWrapper entry;
-                try
-                {
-                    entry = new CertProfileEntryWrapper(rawEntry);
-                } catch(CertProfileException | RuntimeException e)
-                {
-                    final String message = "Invalid configuration for the certProfile " + name;
-                    if(LOG.isErrorEnabled())
-                    {
-                        LOG.error(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(), e.getMessage());
-                    }
-                    LOG.debug(message, e);
-                    continue;
-                }
-                entry.setEnvironmentParamterResolver(envParameterResolver);
+                IdentifiedX509CertProfile entry = new IdentifiedX509CertProfile(rawEntry);
+                entry.setEnvironmentParameterResolver(envParameterResolver);
                 certProfiles.put(name, entry);
             }
         }catch(SQLException e)
@@ -2175,7 +2162,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
     @Override
     public CertProfileEntry getCertProfile(String profileName)
     {
-        CertProfileEntryWrapper entry = certProfiles.get(profileName);
+        IdentifiedX509CertProfile entry = certProfiles.get(profileName);
         return entry == null ? null : entry.getEntry();
     }
 
@@ -2281,15 +2268,8 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
             dataSource.releaseResources(ps, null);
         }
 
-        CertProfileEntryWrapper entry;
-        try
-        {
-            entry = new CertProfileEntryWrapper(dbEntry);
-        } catch (CertProfileException e)
-        {
-            throw new CAMgmtException("CertProfileException: " + e.getMessage(), e);
-        }
-        entry.setEnvironmentParamterResolver(envParameterResolver);
+        IdentifiedX509CertProfile entry = new IdentifiedX509CertProfile(dbEntry);
+        entry.setEnvironmentParameterResolver(envParameterResolver);
         certProfiles.put(name, entry);
     }
 
@@ -3606,14 +3586,11 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
     public IdentifiedX509CertProfile getIdentifiedCertProfile(String profileName)
     throws CertProfileException
     {
-        CertProfileEntryWrapper wrapper = certProfiles.get(profileName);
-        if(wrapper == null)
+        IdentifiedX509CertProfile certProfile = certProfiles.get(profileName);
+        if(certProfile != null)
         {
-            return null;
+            certProfile.assertInitialized();
         }
-
-        IdentifiedX509CertProfile certProfile = wrapper.getCertProfile();
-        certProfile.assertInitialized();
         return certProfile;
     }
 

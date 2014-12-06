@@ -52,6 +52,7 @@ import org.xipki.ca.api.profile.SubjectInfo;
 import org.xipki.ca.api.profile.x509.X509CertProfile;
 import org.xipki.ca.api.profile.x509.SpecialX509CertProfileBehavior;
 import org.xipki.ca.server.certprofile.x509.DefaultX509CertProfile;
+import org.xipki.ca.server.mgmt.api.CertProfileEntry;
 import org.xipki.common.ParamChecker;
 
 /**
@@ -60,26 +61,25 @@ import org.xipki.common.ParamChecker;
 
 public class IdentifiedX509CertProfile
 {
-    private final String name;
-    private final String type;
-    private final String conf;
+    private final CertProfileEntry entry;
     private final Object initlock = new Object();
     private X509CertProfile certProfile;
     private EnvironmentParameterResolver parameterResolver;
 
-    public IdentifiedX509CertProfile(String name, String type, String conf)
+    public IdentifiedX509CertProfile(CertProfileEntry entry)
     {
-        ParamChecker.assertNotEmpty("name", name);
-        ParamChecker.assertNotNull("type", type);
-
-        this.name = name;
-        this.type = type;
-        this.conf = conf;
+        ParamChecker.assertNotNull("entry", entry);
+        this.entry = entry;
     }
 
     public String getName()
     {
-        return name;
+        return entry.getName();
+    }
+
+    public CertProfileEntry getEntry()
+    {
+        return entry;
     }
 
     public void assertInitialized()
@@ -94,6 +94,7 @@ public class IdentifiedX509CertProfile
         {
             X509CertProfile tmpCertProfile = null;
 
+            final String type = entry.getType();
             if(type.equalsIgnoreCase("xml"))
             {
                 tmpCertProfile = new DefaultX509CertProfile();
@@ -116,7 +117,7 @@ public class IdentifiedX509CertProfile
                 throw new CertProfileException("invalid type " + type);
             }
 
-            tmpCertProfile.initialize(conf);
+            tmpCertProfile.initialize(entry.getConf());
             if(parameterResolver != null)
             {
                 tmpCertProfile.setEnvironmentParameterResolver(parameterResolver);
