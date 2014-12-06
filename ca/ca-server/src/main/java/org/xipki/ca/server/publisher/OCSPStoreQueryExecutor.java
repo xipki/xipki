@@ -337,26 +337,46 @@ class OCSPStoreQueryExecutor
             return;
         }
 
-        final String sql = "UPDATE CERT" +
-                " SET LAST_UPDATE=?, REVOKED=?, REV_TIME=?, REV_INVALIDITY_TIME=?, REV_REASON=?" +
-                " WHERE ISSUER_ID=? AND SERIAL=?";
-        PreparedStatement ps = borrowPreparedStatement(sql);
+        if(publishGoodCerts)
+        {
+            final String sql = "UPDATE CERT" +
+                    " SET LAST_UPDATE=?, REVOKED=?, REV_TIME=?, REV_INVALIDITY_TIME=?, REV_REASON=?" +
+                    " WHERE ISSUER_ID=? AND SERIAL=?";
+            PreparedStatement ps = borrowPreparedStatement(sql);
 
-        try
+            try
+            {
+                int idx = 1;
+                ps.setLong(idx++, new Date().getTime()/1000);
+                setBoolean(ps, idx++, false);
+                ps.setNull(idx++, Types.INTEGER);
+                ps.setNull(idx++, Types.INTEGER);
+                ps.setNull(idx++, Types.INTEGER);
+                ps.setInt(idx++, issuerId);
+                ps.setLong(idx++, serialNumber.longValue());
+                ps.executeUpdate();
+            }finally
+            {
+                releaseDbResources(ps, null);
+            }
+        } else
         {
-            int idx = 1;
-            ps.setLong(idx++, new Date().getTime()/1000);
-            setBoolean(ps, idx++, false);
-            ps.setNull(idx++, Types.INTEGER);
-            ps.setNull(idx++, Types.INTEGER);
-            ps.setNull(idx++, Types.INTEGER);
-            ps.setInt(idx++, issuerId);
-            ps.setLong(idx++, serialNumber.longValue());
-            ps.executeUpdate();
-        }finally
-        {
-            releaseDbResources(ps, null);
+            final String sql = "DELETE FROM CERT" +
+                    " WHERE ISSUER_ID=? AND SERIAL=?";
+            PreparedStatement ps = borrowPreparedStatement(sql);
+
+            try
+            {
+                int idx = 1;
+                ps.setInt(idx++, issuerId);
+                ps.setLong(idx++, serialNumber.longValue());
+                ps.executeUpdate();
+            }finally
+            {
+                releaseDbResources(ps, null);
+            }
         }
+
     }
 
     void removeCert(X509CertificateWithMetaInfo issuer,
