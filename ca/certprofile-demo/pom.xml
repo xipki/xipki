@@ -5,23 +5,18 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
-    <artifactId>xipki-group</artifactId>
+    <artifactId>ca-group</artifactId>
     <groupId>org.xipki</groupId>
     <version>2.0.0-SNAPSHOT</version>
   </parent>
-  <artifactId>ca-group</artifactId>
-  <packaging>pom</packaging>
+  <artifactId>certprofile-demo</artifactId>
+  <packaging>bundle</packaging>
   <name>XiPKI :: ${project.artifactId}</name>
-  <modules>
-    <module>ca-common</module>
-    <module>ca-client-api</module>
-    <module>ca-client-impl</module>
-    <module>ca-client-shell</module>
-    <module>ca-qa-shell</module>
-    <module>ca-api</module>
-    <module>ca-mgmt-api</module>
-    <module>ca-server</module>
-    <module>ca-mgmt-shell</module>
-    <module>certprofile-demo</module>
-  </modules>
+  <dependencies>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>ca-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+  </dependencies>
 </project>
