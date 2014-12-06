@@ -24,11 +24,6 @@
       <version>${project.version}</version>
     </dependency>
     <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>datasource-api</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
       <groupId>javax.servlet</groupId>
       <artifactId>servlet-api</artifactId>
       <optional>true</optional>
@@ -38,10 +33,6 @@
       <artifactId>unboundid-ldapsdk</artifactId>
       <version>${ldapsdk.version}</version>
     </dependency-->
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-api</artifactId>
-    </dependency>
   </dependencies>
   <build>
     <plugins>

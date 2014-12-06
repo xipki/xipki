@@ -39,6 +39,8 @@ ca:profile-add -name TLSwithIncSN -type XML -confFile demo/profile/CertProfile_T
 
 ca:profile-add -name gSMC_K -type XML -confFile demo/profile/CertProfile_gSMC_K.xml
 
+ca:profile-add -name DEMO -type java:org.xipki.certprofile.demo.x509.DemoEEX509CertProfile
+
 ## Publishers
 ca:publisher-add -name OCSP.PUBLISHER -type OCSP \
   -conf datasource?ocsp%publish.goodcerts?true

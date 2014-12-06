@@ -1256,6 +1256,10 @@ public class DefaultX509CertProfile extends AbstractX509CertProfile
         ExtensionTuples tuples = super.getExtensions(requestedSubject, requestedExtensions);
 
         Map<ASN1ObjectIdentifier, ExtensionOccurrence> occurences = new HashMap<>(getAdditionalExtensionOccurences());
+        if(occurences == null || occurences.isEmpty())
+        {
+            return tuples;
+        }
 
         // AuthorityKeyIdentifier
         // processed by the CA
