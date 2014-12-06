@@ -126,6 +126,13 @@
       <fileMode>0644</fileMode>
       <directoryMode>0755</directoryMode>
     </fileSet>
+    <!-- copy deploy -->
+    <fileSet>
+      <directory>${project.build.directory}/deploy</directory>
+      <outputDirectory>deploy</outputDirectory>
+      <fileMode>0644</fileMode>
+      <directoryMode>0755</directoryMode>
+    </fileSet>
   </fileSets>
   <files>
     <file>

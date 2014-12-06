@@ -48,6 +48,14 @@ keytool:update-cert-p12 -p12 output/OCSP2.p12 -pwd 1234 -cert output/OCSP2.der \
 ## Revocate certificates
 caclient:revoke -cert output/OCSP2.der -reason keyCompromise
 
+# Certificate DEMO1
+keytool:rsa-p12 -pwd 1234 -out output/DEMO1.p12 -subject "CN=DEMO1,O=xipki,C=DE"
+
+caclient:enroll-p12 -p12 output/DEMO1.p12 -pwd 1234 -out output/DEMO1.der -profile DEMO -user USER-O
+
+keytool:update-cert-p12 -p12 output/DEMO1.p12 -pwd 1234 -cert output/DEMO1.der \
+  -cacert output/SubCAwithCRL1.der -cacert output/RCA1.der
+
 # Certificate TLS1
 keytool:rsa-p12 -pwd 1234 -out output/TLS1.p12 -subject "CN=TLS1.xipki.org,O=xipki,C=DE"
 

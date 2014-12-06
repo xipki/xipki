@@ -3607,7 +3607,14 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
     throws CertProfileException
     {
         CertProfileEntryWrapper wrapper = certProfiles.get(profileName);
-        return wrapper == null ? null : wrapper.getCertProfile();
+        if(wrapper == null)
+        {
+            return null;
+        }
+
+        IdentifiedX509CertProfile certProfile = wrapper.getCertProfile();
+        certProfile.assertInitialized();
+        return certProfile;
     }
 
     public List<IdentifiedX509CertPublisher> getIdentifiedPublishersForCa(String caName)
@@ -3657,11 +3664,15 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
         }
 
         IdentifiedX509CertProfile certProfile;
-        if(certProfiles.containsKey(certprofileName))
+        try
         {
-            certProfile = certProfiles.get(certprofileName).getCertProfile();
+            certProfile = getIdentifiedCertProfile(certprofileName);
+        } catch (CertProfileException e)
+        {
+            throw new CAMgmtException(e);
         }
-        else
+
+        if(certProfile == null)
         {
             throw new CAMgmtException("unknown cert profile " + certprofileName);
         }

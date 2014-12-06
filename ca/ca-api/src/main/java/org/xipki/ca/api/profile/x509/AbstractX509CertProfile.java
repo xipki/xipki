@@ -260,7 +260,13 @@ extends X509CertProfile
     {
         ExtensionTuples tuples = new ExtensionTuples();
 
-        Map<ASN1ObjectIdentifier, ExtensionOccurrence> occurences = new HashMap<>(getAdditionalExtensionOccurences());
+        Map<ASN1ObjectIdentifier, ExtensionOccurrence> additionalExtOccurrences = getAdditionalExtensionOccurences();
+        if(additionalExtOccurrences == null || additionalExtOccurrences.isEmpty())
+        {
+            return tuples;
+        }
+
+        Map<ASN1ObjectIdentifier, ExtensionOccurrence> occurences = new HashMap<>(additionalExtOccurrences);
 
         // BasicConstraints
         ASN1ObjectIdentifier extensionType = Extension.basicConstraints;

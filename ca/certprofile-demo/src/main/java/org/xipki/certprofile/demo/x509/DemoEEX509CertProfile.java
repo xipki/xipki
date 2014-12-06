@@ -33,54 +33,54 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.ca.server.mgmt;
+package org.xipki.certprofile.demo.x509;
 
-import org.xipki.ca.api.CertProfileException;
-import org.xipki.ca.api.EnvironmentParameterResolver;
-import org.xipki.ca.server.mgmt.api.CertProfileEntry;
-import org.xipki.common.ParamChecker;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+
+import org.bouncycastle.asn1.ASN1ObjectIdentifier;
+import org.xipki.ca.api.CertValidity;
+import org.xipki.ca.api.CertValidity.Unit;
+import org.xipki.ca.api.profile.ExtensionOccurrence;
+import org.xipki.ca.api.profile.x509.AbstractEEX509CertProfile;
+import org.xipki.ca.api.profile.x509.KeyUsage;
 
 /**
  * @author Lijun Liao
  */
 
-public class CertProfileEntryWrapper
+public class DemoEEX509CertProfile extends AbstractEEX509CertProfile
 {
-    private final CertProfileEntry entry;
-    private final IdentifiedX509CertProfile certProfile;
+    private final CertValidity validity;
+    private final Set<KeyUsage> keyUsage;
 
-    public CertProfileEntryWrapper(CertProfileEntry entry)
-    throws CertProfileException
+    public DemoEEX509CertProfile()
     {
-        ParamChecker.assertNotNull("entry", entry);
-        this.entry = entry;
-        this.certProfile = new IdentifiedX509CertProfile(entry.getName(), entry.getType(), entry.getConf());
-    }
-
-    public CertProfileEntry getEntry()
-    {
-        return entry;
-    }
-
-    public String getName()
-    {
-        return entry.getName();
-    }
-
-    public void setEnvironmentParamterResolver(
-            EnvironmentParameterResolver envParamResolver)
-    {
-        certProfile.setEnvironmentParameterResolver(envParamResolver);
-    }
-
-    public IdentifiedX509CertProfile getCertProfile()
-    {
-        return certProfile;
+        validity = new CertValidity(10, Unit.YEAR);
+        Set<KeyUsage> _keyUsage = new HashSet<>(2);
+        _keyUsage.add(KeyUsage.digitalSignature);
+        _keyUsage.add(KeyUsage.dataEncipherment);
+        this.keyUsage = Collections.unmodifiableSet(_keyUsage);
     }
 
     @Override
-    public String toString()
+    protected Set<KeyUsage> getKeyUsage()
     {
-        return entry.toString();
+        return keyUsage;
     }
+
+    @Override
+    protected Map<ASN1ObjectIdentifier, ExtensionOccurrence> getAdditionalExtensionOccurences()
+    {
+        return null;
+    }
+
+    @Override
+    public CertValidity getValidity()
+    {
+        return validity;
+    }
+
 }

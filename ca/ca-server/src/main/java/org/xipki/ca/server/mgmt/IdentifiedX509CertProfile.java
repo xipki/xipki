@@ -51,6 +51,7 @@ import org.xipki.ca.api.profile.ExtensionTuples;
 import org.xipki.ca.api.profile.SubjectInfo;
 import org.xipki.ca.api.profile.x509.X509CertProfile;
 import org.xipki.ca.api.profile.x509.SpecialX509CertProfileBehavior;
+import org.xipki.ca.server.certprofile.x509.DefaultX509CertProfile;
 import org.xipki.common.ParamChecker;
 
 /**
@@ -60,15 +61,20 @@ import org.xipki.common.ParamChecker;
 public class IdentifiedX509CertProfile
 {
     private final String name;
-    private final X509CertProfile certProfile;
+    private final String type;
+    private final String conf;
+    private final Object initlock = new Object();
+    private X509CertProfile certProfile;
+    private EnvironmentParameterResolver parameterResolver;
 
-    public IdentifiedX509CertProfile(String name, X509CertProfile certProfile)
+    public IdentifiedX509CertProfile(String name, String type, String conf)
     {
         ParamChecker.assertNotEmpty("name", name);
-        ParamChecker.assertNotNull("certProfile", certProfile);
+        ParamChecker.assertNotNull("type", type);
 
         this.name = name;
-        this.certProfile = certProfile;
+        this.type = type;
+        this.conf = conf;
     }
 
     public String getName()
@@ -76,10 +82,72 @@ public class IdentifiedX509CertProfile
         return name;
     }
 
-    public void initialize(String data)
+    public void assertInitialized()
     throws CertProfileException
     {
-        certProfile.initialize(data);
+        if(certProfile != null)
+        {
+            return;
+        }
+
+        synchronized (initlock)
+        {
+            X509CertProfile tmpCertProfile = null;
+
+            if(type.equalsIgnoreCase("xml"))
+            {
+                tmpCertProfile = new DefaultX509CertProfile();
+            }
+            else if(type.toLowerCase().startsWith("java:"))
+            {
+                String className = type.substring("java:".length());
+                try
+                {
+                    Class<?> clazz = Class.forName(className);
+                    tmpCertProfile = (X509CertProfile) clazz.newInstance();
+                }catch(ClassNotFoundException | InstantiationException  | IllegalAccessException | ClassCastException e)
+                {
+                    throw new CertProfileException("invalid type " + type + ", " + e.getClass().getName() +
+                            ": " + e.getMessage());
+                }
+            }
+            else
+            {
+                throw new CertProfileException("invalid type " + type);
+            }
+
+            tmpCertProfile.initialize(conf);
+            if(parameterResolver != null)
+            {
+                tmpCertProfile.setEnvironmentParameterResolver(parameterResolver);
+            }
+
+            if(tmpCertProfile.getSpecialCertProfileBehavior() == SpecialX509CertProfileBehavior.gematik_gSMC_K)
+            {
+                String paramName = SpecialX509CertProfileBehavior.PARAMETER_MAXLIFTIME;
+                String s = tmpCertProfile.getParameter(paramName);
+                if(s == null)
+                {
+                    throw new CertProfileException("parameter " + paramName + " is not defined");
+                }
+
+                s = s.trim();
+                int i;
+                try
+                {
+                    i = Integer.parseInt(s);
+                }catch(NumberFormatException e)
+                {
+                    throw new CertProfileException("invalid " + paramName + ": " + s);
+                }
+                if(i < 1)
+                {
+                    throw new CertProfileException("invalid " + paramName + ": " + s);
+                }
+            }
+
+            this.certProfile = tmpCertProfile;
+        }
     }
 
     public SpecialX509CertProfileBehavior getSpecialCertProfileBehavior()
@@ -89,7 +157,14 @@ public class IdentifiedX509CertProfile
 
     public void setEnvironmentParameterResolver(EnvironmentParameterResolver parameterResolver)
     {
-        certProfile.setEnvironmentParameterResolver(parameterResolver);
+        synchronized (initlock)
+        {
+            this.parameterResolver = parameterResolver;
+            if(certProfile != null)
+            {
+                certProfile.setEnvironmentParameterResolver(parameterResolver);
+            }
+        }
     }
 
     public Date getNotBefore(Date notBefore)
@@ -162,7 +237,10 @@ public class IdentifiedX509CertProfile
 
     public void shutdown()
     {
-        certProfile.shutdown();
+        if(certProfile != null)
+        {
+            certProfile.shutdown();
+        }
     }
 
     public boolean includeIssuerAndSerialInAKI()
