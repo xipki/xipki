@@ -33,68 +33,34 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.ca.server.certprofile;
+package org.xipki.certprofile.dflt.x509;
 
-import java.util.List;
-import java.util.regex.Pattern;
-
-import org.xipki.ca.api.EnvironmentParameterResolver;
+import org.xipki.ca.api.profile.ExtensionOccurrence;
 
 /**
  * @author Lijun Liao
  */
 
-public class SubjectDNOption
+class AuthorityKeyIdentifierOption
 {
-    private final List<AddText> addprefixes;
-    private final List<AddText> addsufixes;
-    private final Pattern pattern;
+    private final boolean includeIssuerAndSerial;
+    private final ExtensionOccurrence occurence;
 
-    public SubjectDNOption(List<AddText> addprefixes, List<AddText> addsufixes, Pattern pattern)
+    AuthorityKeyIdentifierOption(boolean includeIssuerAndSerial,
+            ExtensionOccurrence occurence)
     {
-        this.addprefixes = addprefixes;
-        this.addsufixes = addsufixes;
-        this.pattern = pattern;
+        this.includeIssuerAndSerial = includeIssuerAndSerial;
+        this.occurence = occurence;
     }
 
-    public AddText getAddprefix(EnvironmentParameterResolver pr)
+    boolean isIncludeIssuerAndSerial()
     {
-        return getAddText(addprefixes, pr);
+        return includeIssuerAndSerial;
     }
 
-    public AddText getAddsufix(EnvironmentParameterResolver pr)
+    ExtensionOccurrence getOccurence()
     {
-        return getAddText(addsufixes, pr);
-    }
-
-    private static AddText getAddText(List<AddText> list, EnvironmentParameterResolver pr)
-    {
-        if(list == null || list.isEmpty())
-        {
-            return null;
-        }
-
-        for(AddText e : list)
-        {
-            if(e.getCondition() == null)
-            {
-                return e;
-            }
-
-            Condition c = e.getCondition();
-
-            if(c.satisfy(pr))
-            {
-                return e;
-            }
-        }
-
-        return null;
-    }
-
-    public Pattern getPattern()
-    {
-        return pattern;
+        return occurence;
     }
 
 }

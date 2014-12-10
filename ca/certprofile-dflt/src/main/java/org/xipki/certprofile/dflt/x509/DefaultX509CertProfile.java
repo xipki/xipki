@@ -33,7 +33,7 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.ca.server.certprofile.x509;
+package org.xipki.certprofile.dflt.x509;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -106,53 +106,53 @@ import org.xipki.ca.api.profile.x509.CertificatePolicyQualifier;
 import org.xipki.ca.api.profile.x509.KeyUsage;
 import org.xipki.ca.api.profile.x509.SpecialX509CertProfileBehavior;
 import org.xipki.ca.api.profile.x509.X509Util;
-import org.xipki.ca.server.certprofile.AddText;
-import org.xipki.ca.server.certprofile.Condition;
-import org.xipki.ca.server.certprofile.ExtensionTupleOption;
-import org.xipki.ca.server.certprofile.ExtensionTupleOptions;
-import org.xipki.ca.server.certprofile.GeneralNameMode;
-import org.xipki.ca.server.certprofile.GeneralNameTag;
-import org.xipki.ca.server.certprofile.KeyParamRange;
-import org.xipki.ca.server.certprofile.KeyParamRanges;
-import org.xipki.ca.server.certprofile.SubjectDNOption;
-import org.xipki.ca.server.certprofile.jaxb.AddTextType;
-import org.xipki.ca.server.certprofile.jaxb.AlgorithmType;
-import org.xipki.ca.server.certprofile.jaxb.CertificatePolicyInformationType;
-import org.xipki.ca.server.certprofile.jaxb.CertificatePolicyInformationType.PolicyQualifiers;
-import org.xipki.ca.server.certprofile.jaxb.ConditionType;
-import org.xipki.ca.server.certprofile.jaxb.ConstantExtensionType;
-import org.xipki.ca.server.certprofile.jaxb.CurveType;
-import org.xipki.ca.server.certprofile.jaxb.CurveType.Encodings;
-import org.xipki.ca.server.certprofile.jaxb.ECParameterType;
-import org.xipki.ca.server.certprofile.jaxb.ExtensionType;
-import org.xipki.ca.server.certprofile.jaxb.ExtensionsType;
-import org.xipki.ca.server.certprofile.jaxb.ExtensionsType.Admission;
-import org.xipki.ca.server.certprofile.jaxb.ExtensionsType.AuthorityKeyIdentifier;
-import org.xipki.ca.server.certprofile.jaxb.ExtensionsType.ConstantExtensions;
-import org.xipki.ca.server.certprofile.jaxb.ExtensionsType.ExtendedKeyUsage;
-import org.xipki.ca.server.certprofile.jaxb.ExtensionsType.InhibitAnyPolicy;
-import org.xipki.ca.server.certprofile.jaxb.ExtensionsType.PolicyConstraints;
-import org.xipki.ca.server.certprofile.jaxb.GeneralNameType;
-import org.xipki.ca.server.certprofile.jaxb.GeneralSubtreeBaseType;
-import org.xipki.ca.server.certprofile.jaxb.GeneralSubtreesType;
-import org.xipki.ca.server.certprofile.jaxb.KeyUsageType;
-import org.xipki.ca.server.certprofile.jaxb.NameValueType;
-import org.xipki.ca.server.certprofile.jaxb.ObjectFactory;
-import org.xipki.ca.server.certprofile.jaxb.OidWithDescType;
-import org.xipki.ca.server.certprofile.jaxb.ParameterType;
-import org.xipki.ca.server.certprofile.jaxb.PolicyIdMappingType;
-import org.xipki.ca.server.certprofile.jaxb.ProfileType;
-import org.xipki.ca.server.certprofile.jaxb.ProfileType.AllowedClientExtensions;
-import org.xipki.ca.server.certprofile.jaxb.ProfileType.KeyAlgorithms;
-import org.xipki.ca.server.certprofile.jaxb.ProfileType.Parameters;
-import org.xipki.ca.server.certprofile.jaxb.ProfileType.Subject;
-import org.xipki.ca.server.certprofile.jaxb.RdnType;
-import org.xipki.ca.server.certprofile.jaxb.SubjectInfoAccessType.Access;
+import org.xipki.certprofile.dflt.AddText;
+import org.xipki.certprofile.dflt.Condition;
+import org.xipki.certprofile.dflt.ExtensionTupleOption;
+import org.xipki.certprofile.dflt.ExtensionTupleOptions;
+import org.xipki.certprofile.dflt.GeneralNameMode;
+import org.xipki.certprofile.dflt.GeneralNameTag;
+import org.xipki.certprofile.dflt.KeyParamRange;
+import org.xipki.certprofile.dflt.KeyParamRanges;
+import org.xipki.certprofile.dflt.SubjectDNOption;
+import org.xipki.certprofile.dflt.x509.jaxb.AddTextType;
+import org.xipki.certprofile.dflt.x509.jaxb.AlgorithmType;
+import org.xipki.certprofile.dflt.x509.jaxb.CertificatePolicyInformationType;
+import org.xipki.certprofile.dflt.x509.jaxb.CertificatePolicyInformationType.PolicyQualifiers;
+import org.xipki.certprofile.dflt.x509.jaxb.ConditionType;
+import org.xipki.certprofile.dflt.x509.jaxb.ConstantExtensionType;
+import org.xipki.certprofile.dflt.x509.jaxb.CurveType;
+import org.xipki.certprofile.dflt.x509.jaxb.CurveType.Encodings;
+import org.xipki.certprofile.dflt.x509.jaxb.ECParameterType;
+import org.xipki.certprofile.dflt.x509.jaxb.ExtensionType;
+import org.xipki.certprofile.dflt.x509.jaxb.ExtensionsType;
+import org.xipki.certprofile.dflt.x509.jaxb.ExtensionsType.Admission;
+import org.xipki.certprofile.dflt.x509.jaxb.ExtensionsType.AuthorityKeyIdentifier;
+import org.xipki.certprofile.dflt.x509.jaxb.ExtensionsType.ConstantExtensions;
+import org.xipki.certprofile.dflt.x509.jaxb.ExtensionsType.ExtendedKeyUsage;
+import org.xipki.certprofile.dflt.x509.jaxb.ExtensionsType.InhibitAnyPolicy;
+import org.xipki.certprofile.dflt.x509.jaxb.ExtensionsType.PolicyConstraints;
+import org.xipki.certprofile.dflt.x509.jaxb.GeneralNameType;
+import org.xipki.certprofile.dflt.x509.jaxb.GeneralSubtreeBaseType;
+import org.xipki.certprofile.dflt.x509.jaxb.GeneralSubtreesType;
+import org.xipki.certprofile.dflt.x509.jaxb.KeyUsageType;
+import org.xipki.certprofile.dflt.x509.jaxb.NameValueType;
+import org.xipki.certprofile.dflt.x509.jaxb.ObjectFactory;
+import org.xipki.certprofile.dflt.x509.jaxb.OidWithDescType;
+import org.xipki.certprofile.dflt.x509.jaxb.ParameterType;
+import org.xipki.certprofile.dflt.x509.jaxb.PolicyIdMappingType;
+import org.xipki.certprofile.dflt.x509.jaxb.ProfileType;
+import org.xipki.certprofile.dflt.x509.jaxb.ProfileType.AllowedClientExtensions;
+import org.xipki.certprofile.dflt.x509.jaxb.ProfileType.KeyAlgorithms;
+import org.xipki.certprofile.dflt.x509.jaxb.ProfileType.Parameters;
+import org.xipki.certprofile.dflt.x509.jaxb.ProfileType.Subject;
+import org.xipki.certprofile.dflt.x509.jaxb.RdnType;
+import org.xipki.certprofile.dflt.x509.jaxb.SubjectInfoAccessType.Access;
 import org.xipki.common.CmpUtf8Pairs;
-import org.xipki.common.SecurityUtil;
 import org.xipki.common.LogUtil;
 import org.xipki.common.LruCache;
 import org.xipki.common.ObjectIdentifiers;
+import org.xipki.common.SecurityUtil;
 import org.xml.sax.SAXException;
 
 /**
@@ -464,12 +464,12 @@ public class DefaultX509CertProfile extends AbstractX509CertProfile
             this.pathLen = extensionsType.getPathLen();
 
             // Extension KeyUsage
-            List<org.xipki.ca.server.certprofile.jaxb.ExtensionsType.KeyUsage> keyUsageTypeList = extensionsType.getKeyUsage();
+            List<org.xipki.certprofile.dflt.x509.jaxb.ExtensionsType.KeyUsage> keyUsageTypeList = extensionsType.getKeyUsage();
             if(keyUsageTypeList.isEmpty() == false)
             {
                 List<KeyUsageOption> optionList = new ArrayList<>(keyUsageTypeList.size());
 
-                for(org.xipki.ca.server.certprofile.jaxb.ExtensionsType.KeyUsage t : keyUsageTypeList)
+                for(org.xipki.certprofile.dflt.x509.jaxb.ExtensionsType.KeyUsage t : keyUsageTypeList)
                 {
                     Set<KeyUsage> set = new HashSet<>();
                     for(KeyUsageType type : t.getUsage())
@@ -521,7 +521,7 @@ public class DefaultX509CertProfile extends AbstractX509CertProfile
             {
                 List<ExtKeyUsageOption> optionList = new ArrayList<>(extKeyUsageTypeList.size());
 
-                for(org.xipki.ca.server.certprofile.jaxb.ExtensionsType.ExtendedKeyUsage t : extKeyUsageTypeList)
+                for(org.xipki.certprofile.dflt.x509.jaxb.ExtensionsType.ExtendedKeyUsage t : extKeyUsageTypeList)
                 {
                     Set<ASN1ObjectIdentifier> set = new HashSet<>();
                     for(OidWithDescType type : t.getUsage())
@@ -1568,7 +1568,7 @@ public class DefaultX509CertProfile extends AbstractX509CertProfile
     }
 
     private static PolicyMappings buildPolicyMappings(
-            org.xipki.ca.server.certprofile.jaxb.ExtensionsType.PolicyMappings type)
+            org.xipki.certprofile.dflt.x509.jaxb.ExtensionsType.PolicyMappings type)
     {
         List<PolicyIdMappingType> mappings = type.getMapping();
         final int n = mappings.size();
@@ -1590,7 +1590,7 @@ public class DefaultX509CertProfile extends AbstractX509CertProfile
     }
 
     private static NameConstraints buildNameConstrains(
-            org.xipki.ca.server.certprofile.jaxb.ExtensionsType.NameConstraints type)
+            org.xipki.certprofile.dflt.x509.jaxb.ExtensionsType.NameConstraints type)
     throws CertProfileException
     {
         GeneralSubtree[] permitted = buildGeneralSubtrees(type.getPermittedSubtrees());

@@ -33,34 +33,33 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.ca.server.certprofile.x509;
+package org.xipki.certprofile.dflt;
 
-import org.xipki.ca.api.profile.ExtensionOccurrence;
+import org.xipki.ca.api.profile.ExtensionTuple;
 
 /**
  * @author Lijun Liao
  */
 
-class AuthorityKeyIdentifierOption
+public class ExtensionTupleOption
 {
-    private final boolean includeIssuerAndSerial;
-    private final ExtensionOccurrence occurence;
+    private final Condition condition;
+    private final ExtensionTuple extensionTuple;
 
-    AuthorityKeyIdentifierOption(boolean includeIssuerAndSerial,
-            ExtensionOccurrence occurence)
+    public ExtensionTupleOption(Condition condition, ExtensionTuple extensionTuple)
     {
-        this.includeIssuerAndSerial = includeIssuerAndSerial;
-        this.occurence = occurence;
+        this.condition = condition;
+        this.extensionTuple = extensionTuple;
     }
 
-    boolean isIncludeIssuerAndSerial()
+    public Condition getCondition()
     {
-        return includeIssuerAndSerial;
+        return condition;
     }
 
-    ExtensionOccurrence getOccurence()
+    public ExtensionTuple getExtensionTuple()
     {
-        return occurence;
+        return extensionTuple;
     }
 
 }
