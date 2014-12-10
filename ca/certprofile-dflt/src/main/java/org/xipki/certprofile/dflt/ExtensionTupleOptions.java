@@ -33,30 +33,40 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.ca.server.certprofile;
+package org.xipki.certprofile.dflt;
 
 import java.util.List;
-import java.util.Map;
 
+import org.xipki.ca.api.EnvironmentParameterResolver;
+import org.xipki.ca.api.profile.ExtensionTuple;
 import org.xipki.common.ParamChecker;
 
 /**
  * @author Lijun Liao
  */
 
-public class KeyParamRanges
+public class ExtensionTupleOptions
 {
-    private final Map<String, List<KeyParamRange>> ranges;
+    private final List<ExtensionTupleOption> options;
 
-    public KeyParamRanges(Map<String, List<KeyParamRange>> ranges)
+    public ExtensionTupleOptions(List<ExtensionTupleOption> options)
     {
-        ParamChecker.assertNotNull("ranges", ranges);
-        this.ranges = ranges;
+        ParamChecker.assertNotEmpty("options", options);
+        this.options = options;
     }
 
-    public List<KeyParamRange> getRanges(String name)
+    public ExtensionTuple getExtensionTuple(EnvironmentParameterResolver pr)
     {
-        return ranges.get(name);
+        for(ExtensionTupleOption o : options)
+        {
+            Condition c = o.getCondition();
+            if(c == null || c.satisfy(pr))
+            {
+                return o.getExtensionTuple();
+            }
+        }
+
+        return null;
     }
 
 }

@@ -33,31 +33,30 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.ca.server.certprofile;
+package org.xipki.certprofile.dflt;
+
+import java.util.List;
+import java.util.Map;
+
+import org.xipki.common.ParamChecker;
 
 /**
  * @author Lijun Liao
  */
 
-public class AddText
+public class KeyParamRanges
 {
-    private final Condition condition;
-    private final String text;
+    private final Map<String, List<KeyParamRange>> ranges;
 
-    public AddText(Condition condition, String text)
+    public KeyParamRanges(Map<String, List<KeyParamRange>> ranges)
     {
-        this.condition = condition;
-        this.text = text;
+        ParamChecker.assertNotNull("ranges", ranges);
+        this.ranges = ranges;
     }
 
-    public Condition getCondition()
+    public List<KeyParamRange> getRanges(String name)
     {
-        return condition;
-    }
-
-    public String getText()
-    {
-        return text;
+        return ranges.get(name);
     }
 
 }

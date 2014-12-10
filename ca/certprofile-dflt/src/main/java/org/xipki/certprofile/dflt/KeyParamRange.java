@@ -33,40 +33,44 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.ca.server.certprofile;
-
-import java.util.List;
-
-import org.xipki.ca.api.EnvironmentParameterResolver;
-import org.xipki.ca.api.profile.ExtensionTuple;
-import org.xipki.common.ParamChecker;
+package org.xipki.certprofile.dflt;
 
 /**
  * @author Lijun Liao
  */
 
-public class ExtensionTupleOptions
+public class KeyParamRange
 {
-    private final List<ExtensionTupleOption> options;
+    private final Integer min;
+    private final Integer max;
 
-    public ExtensionTupleOptions(List<ExtensionTupleOption> options)
+    public KeyParamRange(Integer min, Integer max)
     {
-        ParamChecker.assertNotEmpty("options", options);
-        this.options = options;
+        this.min = min;
+        this.max = max;
     }
 
-    public ExtensionTuple getExtensionTuple(EnvironmentParameterResolver pr)
+    public Integer getMin()
     {
-        for(ExtensionTupleOption o : options)
+        return min;
+    }
+
+    public Integer getMax()
+    {
+        return max;
+    }
+
+    public boolean match(int i)
+    {
+        if(min != null && i < min)
         {
-            Condition c = o.getCondition();
-            if(c == null || c.satisfy(pr))
-            {
-                return o.getExtensionTuple();
-            }
+            return false;
+        }
+        if(max != null && i > max)
+        {
+            return false;
         }
 
-        return null;
+        return true;
     }
-
 }

@@ -9,40 +9,43 @@
     <groupId>org.xipki</groupId>
     <version>2.0.0-SNAPSHOT</version>
   </parent>
-  <artifactId>ca-server</artifactId>
+  <artifactId>certprofile-dflt</artifactId>
   <packaging>bundle</packaging>
   <name>XiPKI :: ${project.artifactId}</name>
   <dependencies>
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>ca-mgmt-api</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
       <artifactId>ca-api</artifactId>
       <version>${project.version}</version>
     </dependency>
-    <dependency>
-      <groupId>javax.servlet</groupId>
-      <artifactId>servlet-api</artifactId>
-      <optional>true</optional>
-    </dependency>
-    <!--dependency>
-      <groupId>com.unboundid</groupId>
-      <artifactId>unboundid-ldapsdk</artifactId>
-      <version>${ldapsdk.version}</version>
-    </dependency-->
   </dependencies>
   <build>
     <plugins>
       <plugin>
-        <groupId>org.apache.felix</groupId>
-        <artifactId>maven-bundle-plugin</artifactId>
+        <groupId>org.jvnet.jaxb2.maven2</groupId>
+        <artifactId>maven-jaxb2-plugin</artifactId>
+        <version>0.7.3</version>
+        <executions>
+          <execution>
+            <goals>
+              <goal>generate</goal>
+            </goals>
+          </execution>
+        </executions>
         <configuration>
-          <instructions>
-            <DynamicImport-Package>*</DynamicImport-Package>
-          </instructions>
+          <schemaDirectory>src/main/resources/xsd</schemaDirectory>
+          <extension>true</extension>
+          <args>
+            <arg>-no-header</arg>
+            <arg>-Xdefault-value</arg>
+          </args>
+          <plugins>
+            <plugin>
+              <groupId>org.jvnet.jaxb2_commons</groupId>
+              <artifactId> jaxb2-default-value</artifactId>
+              <version>1.1</version>
+            </plugin>
+          </plugins>
         </configuration>
       </plugin>
     </plugins>

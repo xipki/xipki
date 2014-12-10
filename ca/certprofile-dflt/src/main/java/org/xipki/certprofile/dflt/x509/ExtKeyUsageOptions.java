@@ -33,33 +33,42 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.ca.server.certprofile;
+package org.xipki.certprofile.dflt.x509;
 
-import org.xipki.ca.api.profile.ExtensionTuple;
+import java.util.List;
+import java.util.Set;
+
+import org.bouncycastle.asn1.ASN1ObjectIdentifier;
+import org.xipki.ca.api.EnvironmentParameterResolver;
+import org.xipki.certprofile.dflt.Condition;
+import org.xipki.common.ParamChecker;
 
 /**
  * @author Lijun Liao
  */
 
-public class ExtensionTupleOption
+class ExtKeyUsageOptions
 {
-    private final Condition condition;
-    private final ExtensionTuple extensionTuple;
+    private final List<ExtKeyUsageOption> options;
 
-    public ExtensionTupleOption(Condition condition, ExtensionTuple extensionTuple)
+    public ExtKeyUsageOptions(List<ExtKeyUsageOption> options)
     {
-        this.condition = condition;
-        this.extensionTuple = extensionTuple;
+        ParamChecker.assertNotEmpty("options", options);
+        this.options = options;
     }
 
-    public Condition getCondition()
+    public Set<ASN1ObjectIdentifier> getExtKeyusage(EnvironmentParameterResolver pr)
     {
-        return condition;
-    }
+        for(ExtKeyUsageOption o : options)
+        {
+            Condition c = o.getCondition();
+            if(c == null || c.satisfy(pr))
+            {
+                return o.getExtKeyusages();
+            }
+        }
 
-    public ExtensionTuple getExtensionTuple()
-    {
-        return extensionTuple;
+        return null;
     }
 
 }
