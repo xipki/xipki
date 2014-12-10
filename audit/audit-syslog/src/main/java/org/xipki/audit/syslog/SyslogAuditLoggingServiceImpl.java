@@ -134,7 +134,14 @@ public class SyslogAuditLoggingServiceImpl implements AuditLoggingService
         sb.append(event.getApplicationName()).append(" - ").append(event.getName());
 
         Date timestamp = event.getTimestamp();
-        String timestampText = (timestamp == null) ? "undefined" : df.format(timestamp);
+        String timestampText;
+        if(timestamp == null)
+        {
+            timestampText = "undefined";
+        } else
+        {
+            timestampText = df.format(timestamp);
+        }
         sb.append(":\ttimestamp: ").append(timestampText);
 
         AuditStatus status = event.getStatus();
