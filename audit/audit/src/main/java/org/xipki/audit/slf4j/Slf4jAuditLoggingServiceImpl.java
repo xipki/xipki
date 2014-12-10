@@ -142,7 +142,18 @@ public class Slf4jAuditLoggingServiceImpl implements AuditLoggingService
                     break;
                 case TIMESTAMP:
                     Date t = element.getTimestampValue();
-                    sb.append(t == null ? "undefined" : df.format(element.getTimestampValue()));
+                    String value;
+                    if(t == null)
+                    {
+                        value = "undefined";
+                    } else
+                    {
+                        synchronized (df)
+                        {
+                            value = df.format(element.getTimestampValue());
+                        }
+                    }
+                    sb.append(value);
                     break;
                 }
             }
