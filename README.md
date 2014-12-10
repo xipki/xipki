@@ -2,7 +2,7 @@ XiPKI
 =========
 eXtensible sImple Public Key Infrastructure consists of CA and OCSP responder.
 
-- CA (Certificate Authority)
+- CA (Certification Authority)
 
   - X.509 Certificate v3 (RFC5280)
   - X.509 CRL v2 (RFC5280)
