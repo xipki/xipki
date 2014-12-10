@@ -140,7 +140,10 @@ public class SyslogAuditLoggingServiceImpl implements AuditLoggingService
             timestampText = "undefined";
         } else
         {
-            timestampText = df.format(timestamp);
+            synchronized (df)
+            {
+                timestampText = df.format(timestamp);
+            }
         }
         sb.append(":\ttimestamp: ").append(timestampText);
 
