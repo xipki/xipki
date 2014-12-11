@@ -35,9 +35,10 @@
 
 package org.xipki.security;
 
-import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xipki.security.api.PasswordResolver;
 import org.xipki.security.api.PasswordResolverException;
 import org.xipki.security.api.SinglePasswordResolver;
@@ -48,20 +49,51 @@ import org.xipki.security.api.SinglePasswordResolver;
 
 public class PasswordResolverImpl implements PasswordResolver
 {
+    private static final Logger LOG = LoggerFactory.getLogger(PasswordResolverImpl.class);
+
     private ConcurrentLinkedQueue<SinglePasswordResolver> resolvers = new ConcurrentLinkedQueue<>();
 
     public PasswordResolverImpl()
     {
     }
 
-    public void setPasswordResolvers(List<SinglePasswordResolver> resolvers)
+    public void bindService(SinglePasswordResolver service)
     {
-        this.resolvers = new ConcurrentLinkedQueue<SinglePasswordResolver>(resolvers);
+        //might be null if dependency is optional
+        if (service == null)
+        {
+            LOG.debug("bindService invoked with null.");
+            return;
+        }
+
+        boolean replaced = resolvers.remove(service);
+        resolvers.add(service);
+        LOG.debug("{} SinglePasswordResolver binding for {}", (replaced ? "replaced" : "added"), service);
     }
 
-    public void removePasswordResolver(SinglePasswordResolver resolver)
+    public void unbindService(SinglePasswordResolver service)
     {
-        resolvers.remove(resolver);
+        //might be null if dependency is optional
+        if (service == null)
+        {
+            LOG.debug("unbindService invoked with null.");
+            return;
+        }
+
+        try
+        {
+            if(resolvers.remove(service))
+            {
+                LOG.debug("removed SinglePasswordResolver binding for {}", service);
+            }
+            else
+            {
+                LOG.debug("no SinglePasswordResolver binding found to remove for '{}'", service);
+            }
+        } catch (Exception e)
+        {
+            LOG.debug("Caught Exception({}). service is probably destroyed.", e.getMessage());
+        }
     }
 
     public char[] resolvePassword(String passwordHint)
