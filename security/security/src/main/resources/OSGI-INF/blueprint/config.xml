@@ -14,13 +14,16 @@
   <bean id="sshBcBugfix" class="org.xipki.security.SshdBcBugfix">
   </bean>
   <bean id="passwordResolverImpl" class="org.xipki.security.PasswordResolverImpl">
-    <property name="passwordResolvers">
-      <list>
-        <ref component-id="pbePasswordResolver"/>
-        <ref component-id="obfPasswordResolver"/>
-      </list>
-    </property>
   </bean>
+  <reference-list id="singlePasswordResolvers" interface="org.xipki.security.api.SinglePasswordResolver" availability="optional">
+    <reference-listener ref="passwordResolverImpl" bind-method="bindService" unbind-method="unbindService"/>
+  </reference-list>
+  <bean id="obfPasswordResolver" class="org.xipki.security.OBFPasswordResolver"/>
+  <service ref="obfPasswordResolver" interface="org.xipki.security.api.SinglePasswordResolver"/>
+  <bean id="pbePasswordResolver" class="org.xipki.security.PBEPasswordResolver">
+    <property name="masterPasswordCallback" value="${masterPassword.callback}"/>
+  </bean>
+  <service ref="pbePasswordResolver" interface="org.xipki.security.api.SinglePasswordResolver"/>
   <bean id="XipkiProviderNssRegister" class="org.xipki.security.p11.sun.nss.XipkiNSSProviderRegister" init-method="regist" destroy-method="unregist"/>
   <service ref="passwordResolverImpl" interface="org.xipki.security.api.PasswordResolver"/>
   <bean id="securityFactoryImpl" class="org.xipki.security.SecurityFactoryImpl">
@@ -30,10 +33,6 @@
     <property name="passwordResolver" ref="passwordResolverImpl"/>
   </bean>
   <service ref="securityFactoryImpl" interface="org.xipki.security.api.SecurityFactory"/>
-  <bean id="obfPasswordResolver" class="org.xipki.security.OBFPasswordResolver"/>
-  <bean id="pbePasswordResolver" class="org.xipki.security.PBEPasswordResolver">
-    <property name="masterPasswordCallback" value="${masterPassword.callback}"/>
-  </bean>
   <bean id="XipkiProviderRegister" class="org.xipki.security.provider.XipkiProviderRegister" init-method="regist" destroy-method="unregist">
     <property name="securityFactory" ref="securityFactoryImpl"/>
   </bean>

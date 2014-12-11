@@ -170,7 +170,6 @@ public class PBEPasswordResolver implements SinglePasswordResolver
         if(delimIndex == -1)
         {
             className = masterPasswordCallback;
-                    ;
         }
         else
         {
