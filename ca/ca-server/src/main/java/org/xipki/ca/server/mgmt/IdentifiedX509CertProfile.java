@@ -62,15 +62,17 @@ public class IdentifiedX509CertProfile
 {
     private static final String CLASSNAME_XML = "org.xipki.certprofile.dflt.x509.DefaultX509CertProfile";
 
+    private final String realType;
     private final CertProfileEntry entry;
     private final Object initlock = new Object();
     private X509CertProfile certProfile;
     private EnvironmentParameterResolver parameterResolver;
 
-    public IdentifiedX509CertProfile(CertProfileEntry entry)
+    public IdentifiedX509CertProfile(CertProfileEntry entry, String realType)
     {
         ParamChecker.assertNotNull("entry", entry);
         this.entry = entry;
+        this.realType = realType;
     }
 
     public String getName()
@@ -95,7 +97,7 @@ public class IdentifiedX509CertProfile
         {
             X509CertProfile tmpCertProfile = null;
 
-            final String type = entry.getType();
+            final String type = realType == null ?  entry.getType() : realType;
             String className;
             if(type.equalsIgnoreCase("xml"))
             {
