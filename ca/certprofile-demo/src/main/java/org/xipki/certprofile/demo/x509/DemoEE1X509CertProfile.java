@@ -51,12 +51,12 @@ import org.xipki.ca.api.profile.x509.KeyUsage;
  * @author Lijun Liao
  */
 
-public class DemoEEX509CertProfile extends AbstractEEX509CertProfile
+public class DemoEE1X509CertProfile extends AbstractEEX509CertProfile
 {
     private final CertValidity validity;
     private final Set<KeyUsage> keyUsage;
 
-    public DemoEEX509CertProfile()
+    public DemoEE1X509CertProfile()
     {
         validity = new CertValidity(10, Unit.YEAR);
         Set<KeyUsage> _keyUsage = new HashSet<>(2);

@@ -60,6 +60,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
+import java.util.StringTokenizer;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
@@ -189,6 +190,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
 
     private Map<String, DataSourceWrapper> dataSources = null;
 
+    private final Map<String, String> certprofileMapping = new ConcurrentHashMap<String, String>();
     private final Map<String, X509CAInfo> cas = new ConcurrentHashMap<>();
     private final Map<String, IdentifiedX509CertProfile> certProfiles = new ConcurrentHashMap<>();
     private final Map<String, X509PublisherEntryWrapper> publishers = new ConcurrentHashMap<>();
@@ -1174,7 +1176,8 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
                 String conf = rs.getString("CONF");
 
                 CertProfileEntry rawEntry = new CertProfileEntry(name, type, conf);
-                IdentifiedX509CertProfile entry = new IdentifiedX509CertProfile(rawEntry);
+                String realType = certprofileMapping.get(type);
+                IdentifiedX509CertProfile entry = new IdentifiedX509CertProfile(rawEntry, realType);
                 entry.setEnvironmentParameterResolver(envParameterResolver);
                 certProfiles.put(name, entry);
             }
@@ -2268,7 +2271,8 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
             dataSource.releaseResources(ps, null);
         }
 
-        IdentifiedX509CertProfile entry = new IdentifiedX509CertProfile(dbEntry);
+        String realType = certprofileMapping.get(dbEntry.getType());
+        IdentifiedX509CertProfile entry = new IdentifiedX509CertProfile(dbEntry, realType);
         entry.setEnvironmentParameterResolver(envParameterResolver);
         certProfiles.put(name, entry);
     }
@@ -3015,6 +3019,44 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
     public void setCaConfFile(String caConfFile)
     {
         this.caConfFile = caConfFile;
+    }
+
+    public void setCertprofileMap(String certprofileMap)
+    {
+        if(certprofileMap == null)
+        {
+            LOG.debug("certprofileMap is null");
+            return;
+        }
+
+        certprofileMap = certprofileMap.trim();
+        if(certprofileMap.isEmpty())
+        {
+            LOG.debug("certprofileMap is empty");
+            return;
+        }
+
+        StringTokenizer st = new StringTokenizer(certprofileMap, " \t");
+        while(st.hasMoreTokens())
+        {
+            String token = st.nextToken();
+            StringTokenizer st2 = new StringTokenizer(token, "=");
+            if(st2.countTokens() != 2)
+            {
+                LOG.warn("invalid certprofileMap entry '" + token + "'");
+                continue;
+            }
+
+            String alias = st2.nextToken();
+            if(certprofileMapping.containsKey(alias))
+            {
+                LOG.warn("certprofile alias '" + alias + "' already defined, ignore map '" + token +"'");
+                continue;
+            }
+            String signerType = st2.nextToken();
+            certprofileMapping.put(alias, signerType);
+            LOG.info("add alias '" + alias + "' for certprofile '" + signerType + "'");
+        }
     }
 
     @Override
