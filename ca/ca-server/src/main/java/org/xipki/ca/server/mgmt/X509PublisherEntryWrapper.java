@@ -35,7 +35,6 @@
 
 package org.xipki.ca.server.mgmt;
 
-import java.util.HashMap;
 import java.util.Map;
 
 import org.xipki.audit.api.AuditLoggingServiceRegister;
@@ -54,18 +53,16 @@ import org.xipki.security.api.PasswordResolver;
 
 public class X509PublisherEntryWrapper
 {
-    private static final Map<String, IdentifiedX509CertPublisher> publisherPool = new HashMap<>();
-
     private final PublisherEntry entry;
     private final IdentifiedX509CertPublisher certPublisher;
 
-    public X509PublisherEntryWrapper(PublisherEntry entry, PasswordResolver passwordResolver,
+    public X509PublisherEntryWrapper(PublisherEntry entry, String realType, PasswordResolver passwordResolver,
             Map<String, DataSourceWrapper> dataSourceMap)
     throws CertPublisherException
     {
         ParamChecker.assertNotNull("entry", entry);
         this.entry = entry;
-        this.certPublisher = createCertPublisher(entry, passwordResolver, dataSourceMap);
+        this.certPublisher = createCertPublisher(entry, realType, passwordResolver, dataSourceMap);
     }
 
     public PublisherEntry getEntry()
@@ -78,22 +75,15 @@ public class X509PublisherEntryWrapper
         return entry.getName();
     }
 
-    public static IdentifiedX509CertPublisher createCertPublisher(PublisherEntry entry,
+    public static IdentifiedX509CertPublisher createCertPublisher(PublisherEntry entry, String realType,
             PasswordResolver passwordResolver, Map<String, DataSourceWrapper> dataSourceMap)
     throws CertPublisherException
     {
-        final String type = entry.getType();
+        final String type = realType == null ? entry.getType() : realType;
         final String conf = entry.getConf();
-        IdentifiedX509CertPublisher cachedPublisher = publisherPool.get(type + conf);
-        if(cachedPublisher != null)
-        {
-            return cachedPublisher;
-        }
 
         X509CertPublisher realPublisher;
-        if("ocsp".equalsIgnoreCase(type) ||
-                "java:org.xipki.ca.server.publisher.DefaultCertPublisher".equals(type) || // for backwards compatibility
-                "java:org.xipki.ca.server.publisher.OCSPCertPublisher".equals(type))
+        if("ocsp".equalsIgnoreCase(type))
         {
             realPublisher = new OCSPCertPublisher();
         }

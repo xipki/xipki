@@ -190,7 +190,9 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
 
     private Map<String, DataSourceWrapper> dataSources = null;
 
-    private final Map<String, String> certprofileMapping = new ConcurrentHashMap<String, String>();
+    private final Map<String, String> certprofileTypeMapping = new ConcurrentHashMap<String, String>();
+    private final Map<String, String> publisherTypeMapping = new ConcurrentHashMap<String, String>();
+
     private final Map<String, X509CAInfo> cas = new ConcurrentHashMap<>();
     private final Map<String, IdentifiedX509CertProfile> certProfiles = new ConcurrentHashMap<>();
     private final Map<String, X509PublisherEntryWrapper> publishers = new ConcurrentHashMap<>();
@@ -1176,7 +1178,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
                 String conf = rs.getString("CONF");
 
                 CertProfileEntry rawEntry = new CertProfileEntry(name, type, conf);
-                String realType = certprofileMapping.get(type);
+                String realType = certprofileTypeMapping.get(type);
                 IdentifiedX509CertProfile entry = new IdentifiedX509CertProfile(rawEntry, realType);
                 entry.setEnvironmentParameterResolver(envParameterResolver);
                 certProfiles.put(name, entry);
@@ -1238,10 +1240,12 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
                 String conf = rs.getString("CONF");
 
                 PublisherEntry rawEntry = new PublisherEntry(name, type, conf);
+                String realType = publisherTypeMapping.get(type);
                 X509PublisherEntryWrapper entry;
                 try
                 {
-                    entry = new X509PublisherEntryWrapper(rawEntry, securityFactory.getPasswordResolver(), dataSources);
+                    entry = new X509PublisherEntryWrapper(rawEntry, realType,
+                            securityFactory.getPasswordResolver(), dataSources);
                 } catch(CertPublisherException | RuntimeException e)
                 {
                     final String message = "Invalid configuration for the certPublisher " + name;
@@ -2271,7 +2275,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
             dataSource.releaseResources(ps, null);
         }
 
-        String realType = certprofileMapping.get(dbEntry.getType());
+        String realType = certprofileTypeMapping.get(dbEntry.getType());
         IdentifiedX509CertProfile entry = new IdentifiedX509CertProfile(dbEntry, realType);
         entry.setEnvironmentParameterResolver(envParameterResolver);
         certProfiles.put(name, entry);
@@ -2600,10 +2604,11 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
             dataSource.releaseResources(ps, null);
         }
 
+        String realType = publisherTypeMapping.get(dbEntry.getType());
         X509PublisherEntryWrapper entry;
         try
         {
-            entry = new X509PublisherEntryWrapper(dbEntry, securityFactory.getPasswordResolver(), dataSources);
+            entry = new X509PublisherEntryWrapper(dbEntry, realType, securityFactory.getPasswordResolver(), dataSources);
         } catch (CertPublisherException e)
         {
             throw new CAMgmtException("CertPublisherException: " + e.getMessage(), e);
@@ -3021,41 +3026,79 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
         this.caConfFile = caConfFile;
     }
 
-    public void setCertprofileMap(String certprofileMap)
+    public void setCertprofileTypeMap(String certprofileTypeMap)
     {
-        if(certprofileMap == null)
+        if(certprofileTypeMap == null)
         {
-            LOG.debug("certprofileMap is null");
+            LOG.debug("certprofileTypeMap is null");
             return;
         }
 
-        certprofileMap = certprofileMap.trim();
-        if(certprofileMap.isEmpty())
+        certprofileTypeMap = certprofileTypeMap.trim();
+        if(certprofileTypeMap.isEmpty())
         {
-            LOG.debug("certprofileMap is empty");
+            LOG.debug("certprofileTypeMap is empty");
             return;
         }
 
-        StringTokenizer st = new StringTokenizer(certprofileMap, " \t");
+        StringTokenizer st = new StringTokenizer(certprofileTypeMap, " \t");
         while(st.hasMoreTokens())
         {
             String token = st.nextToken();
             StringTokenizer st2 = new StringTokenizer(token, "=");
             if(st2.countTokens() != 2)
             {
-                LOG.warn("invalid certprofileMap entry '" + token + "'");
+                LOG.warn("invalid certprofileTypeMap entry '" + token + "'");
                 continue;
             }
 
             String alias = st2.nextToken();
-            if(certprofileMapping.containsKey(alias))
+            if(certprofileTypeMapping.containsKey(alias))
             {
-                LOG.warn("certprofile alias '" + alias + "' already defined, ignore map '" + token +"'");
+                LOG.warn("certprofile type alias '" + alias + "' already defined, ignore map '" + token +"'");
                 continue;
             }
             String signerType = st2.nextToken();
-            certprofileMapping.put(alias, signerType);
-            LOG.info("add alias '" + alias + "' for certprofile '" + signerType + "'");
+            certprofileTypeMapping.put(alias, signerType);
+            LOG.info("add alias '" + alias + "' for certprofile type '" + signerType + "'");
+        }
+    }
+
+    public void setPublisherTypeMap(String publisherTypeMap)
+    {
+        if(publisherTypeMap == null)
+        {
+            LOG.debug("publisherTypeMap is null");
+            return;
+        }
+
+        publisherTypeMap = publisherTypeMap.trim();
+        if(publisherTypeMap.isEmpty())
+        {
+            LOG.debug("publisherTypeMap is empty");
+            return;
+        }
+
+        StringTokenizer st = new StringTokenizer(publisherTypeMap, " \t");
+        while(st.hasMoreTokens())
+        {
+            String token = st.nextToken();
+            StringTokenizer st2 = new StringTokenizer(token, "=");
+            if(st2.countTokens() != 2)
+            {
+                LOG.warn("invalid publisherTypeMap entry '" + token + "'");
+                continue;
+            }
+
+            String alias = st2.nextToken();
+            if(publisherTypeMapping.containsKey(alias))
+            {
+                LOG.warn("publisher type alias '" + alias + "' already defined, ignore map '" + token +"'");
+                continue;
+            }
+            String signerType = st2.nextToken();
+            publisherTypeMapping.put(alias, signerType);
+            LOG.info("add alias '" + alias + "' for publisher type '" + signerType + "'");
         }
     }
 
