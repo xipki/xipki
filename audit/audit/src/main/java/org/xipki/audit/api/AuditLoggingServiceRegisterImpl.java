@@ -61,7 +61,7 @@ public class AuditLoggingServiceRegisterImpl implements AuditLoggingServiceRegis
         //might be null if dependency is optional
         if (service == null)
         {
-            LOG.debug("bindModule invoked with null.");
+            LOG.debug("bindService invoked with null.");
             return;
         }
 
