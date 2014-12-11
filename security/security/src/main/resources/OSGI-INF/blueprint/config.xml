@@ -9,6 +9,7 @@
       <cm:property name="defaultParallelism" value="20"/>
       <cm:property name="pkcs11.confFile" value=""/>
       <cm:property name="pkcs11.provider" value="org.xipki.security.p11.iaik.IaikP11CryptServiceFactory"/>
+      <cm:property name="signerType.map" value=""/>
     </cm:default-properties>
   </cm:property-placeholder>
   <bean id="sshBcBugfix" class="org.xipki.security.SshdBcBugfix">
@@ -31,6 +32,7 @@
     <property name="defaultParallelism" value="${defaultParallelism}"/>
     <property name="pkcs11ConfFile" value="${pkcs11.confFile}"/>
     <property name="passwordResolver" ref="passwordResolverImpl"/>
+    <property name="signerTypeMap" value="${signerType.map}"/>
   </bean>
   <service ref="securityFactoryImpl" interface="org.xipki.security.api.SecurityFactory"/>
   <bean id="XipkiProviderRegister" class="org.xipki.security.provider.XipkiProviderRegister" init-method="regist" destroy-method="unregist">

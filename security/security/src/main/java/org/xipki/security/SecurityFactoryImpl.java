@@ -60,6 +60,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.StringTokenizer;
 
 import javax.crypto.NoSuchPaddingException;
 import javax.xml.bind.JAXBContext;
@@ -141,6 +142,7 @@ public class SecurityFactoryImpl implements SecurityFactory
 
     private PasswordResolver passwordResolver;
     private String pkcs11ConfFile;
+    private final Map<String, String> signerTypeMapping = new HashMap<>();
 
     public SecurityFactoryImpl()
     {
@@ -258,6 +260,11 @@ public class SecurityFactoryImpl implements SecurityFactory
             X509Certificate[] certificateChain)
     throws SignerException
     {
+        if(signerTypeMapping.containsKey(type))
+        {
+            type = signerTypeMapping.get(type);
+        }
+
         if("PKCS11".equalsIgnoreCase(type) || "PKCS12".equalsIgnoreCase(type) || "JKS".equalsIgnoreCase(type))
         {
             CmpUtf8Pairs keyValues = new CmpUtf8Pairs(conf);
@@ -1237,6 +1244,44 @@ public class SecurityFactoryImpl implements SecurityFactory
         } catch (SignerException e)
         {
             throw new InvalidKeyException(e.getMessage(), e);
+        }
+    }
+
+    public void setSignerTypeMap(String signerTypeMap)
+    {
+        if(signerTypeMap == null)
+        {
+            LOG.debug("signerTypeMap is null");
+            return;
+        }
+
+        signerTypeMap = signerTypeMap.trim();
+        if(signerTypeMap.isEmpty())
+        {
+            LOG.debug("signerTypeMap is empty");
+            return;
+        }
+
+        StringTokenizer st = new StringTokenizer(signerTypeMap, " \t");
+        while(st.hasMoreTokens())
+        {
+            String token = st.nextToken();
+            StringTokenizer st2 = new StringTokenizer(token, "=");
+            if(st2.countTokens() != 2)
+            {
+                LOG.warn("invalid signerTypeMap entry '" + token + "'");
+                continue;
+            }
+
+            String alias = st2.nextToken();
+            if(signerTypeMapping.containsKey(alias))
+            {
+                LOG.warn("signerType alias '" + alias + "' already defined, ignore map '" + token +"'");
+                continue;
+            }
+            String signerType = st2.nextToken();
+            signerTypeMapping.put(alias, signerType);
+            LOG.info("add alias '" + alias + "' for signerType '" + signerType + "'");
         }
     }
 
