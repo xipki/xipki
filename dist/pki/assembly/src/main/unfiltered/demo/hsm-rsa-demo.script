@@ -10,7 +10,9 @@ echo "========================================================"
 echo "||      DEMO RSA (PKCS#1 v1.5) with HSM Key           ||"
 echo "========================================================"
 
-features:install xipki-security-shell
+feature:install xipki-security-shell
+
+sleep 1000
 
 file:rm -r -f output
 
@@ -26,7 +28,7 @@ keytool:rsa -slot 1 -key-label $SubCA_KEY_LABEL
 
 keytool:rsa -slot 1 -key-label $SubCAwithCRL_KEY_LABEL
 
-features:uninstall xipki-security-shell
+feature:uninstall xipki-security-shell
 
 source ./demo/prepare.script
 

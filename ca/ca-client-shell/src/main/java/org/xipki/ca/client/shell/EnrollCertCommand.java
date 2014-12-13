@@ -38,7 +38,7 @@ package org.xipki.ca.client.shell;
 import java.io.File;
 import java.security.cert.X509Certificate;
 
-import org.apache.felix.gogo.commands.Option;
+import org.apache.karaf.shell.commands.Option;
 import org.bouncycastle.asn1.crmf.CertRequest;
 import org.bouncycastle.asn1.crmf.CertTemplateBuilder;
 import org.bouncycastle.asn1.crmf.POPOSigningKey;

@@ -2,11 +2,17 @@
 #                      Initialize the database                  #
 #################################################################
 
-features:install xipki-database-tool
-dbtool:initdb --quiet
-features:uninstall xipki-database-tool
+feature:install xipki-database-tool
 
-features:install xipki-camgmt-shell
+sleep 1000
+
+dbtool:initdb --quiet
+
+feature:uninstall xipki-database-tool
+
+feature:install xipki-camgmt-shell
+
+sleep 1000
 
 ca:ca-restart
 

@@ -3,13 +3,7 @@
  Copyright (c) 2014 Lijun Liao
 -->
 <features xmlns="http://karaf.apache.org/xmlns/features/v1.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" name="xipki-${project.version}" xsi:schemaLocation="http://karaf.apache.org/xmlns/features/v1.0.0 http://karaf.apache.org/xmlns/features/v1.0.0">
-  <!--
-        Aggregate core features
-
-        feature url is:
-        mvn:org.xipki/features/${project.version}/xml/features
-    -->
-  <repository>mvn:org.apache.karaf.assemblies.features/standard/${karaf.version}/xml/features</repository>
+  <repository>mvn:org.apache.karaf.features/standard/${karaf.version}/xml/features</repository>
   <!--
         Note: instead of defining all features monolithically in a central features file,
         Project-plugins should be defined in their own feature descriptors and then aggregated later

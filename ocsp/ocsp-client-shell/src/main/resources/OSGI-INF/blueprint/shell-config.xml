@@ -3,7 +3,7 @@
   <reference id="filePathCompleter" interface="org.xipki.console.karaf.FilePathCompleter"/>
   <reference id="ocspRequestor" interface="org.xipki.ocsp.client.api.OCSPRequestor"/>
   <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.1.0">
-    <command name="ocsp/status">
+    <command>
       <action class="org.xipki.ocsp.client.shell.OCSPStatusCommand">
         <property name="requestor" ref="ocspRequestor"/>
       </action>
@@ -12,7 +12,7 @@
         <entry key="-cacert" value-ref="filePathCompleter"/>
       </optional-completers>
     </command>
-    <command name="ocsp/loadtest-status">
+    <command>
       <action class="org.xipki.ocsp.client.shell.loadtest.OCSPStatusLoadTestCommand">
         <property name="requestor" ref="ocspRequestor"/>
       </action>

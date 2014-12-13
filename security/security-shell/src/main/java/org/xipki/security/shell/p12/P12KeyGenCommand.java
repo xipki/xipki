@@ -38,7 +38,7 @@ package org.xipki.security.shell.p12;
 import java.io.File;
 import java.io.IOException;
 
-import org.apache.felix.gogo.commands.Option;
+import org.apache.karaf.shell.commands.Option;
 import org.xipki.security.api.P12KeypairGenerationResult;
 import org.xipki.security.shell.KeyGenCommand;
 

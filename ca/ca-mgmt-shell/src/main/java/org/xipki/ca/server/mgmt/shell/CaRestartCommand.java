@@ -38,7 +38,7 @@ package org.xipki.ca.server.mgmt.shell;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.apache.felix.gogo.commands.Command;
+import org.apache.karaf.shell.commands.Command;
 
 /**
  * @author Lijun Liao

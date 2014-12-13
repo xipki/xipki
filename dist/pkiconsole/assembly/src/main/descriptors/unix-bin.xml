@@ -52,6 +52,27 @@
       <fileMode>0644</fileMode>
       <directoryMode>0755</directoryMode>
     </fileSet>
+    <fileSet>
+      <directory>${shared.dir}/unfiltered</directory>
+      <includes>
+        <include>**/*.sh</include>
+      </includes>
+      <outputDirectory>/</outputDirectory>
+      <filtered>false</filtered>
+      <fileMode>0755</fileMode>
+      <directoryMode>0755</directoryMode>
+    </fileSet>
+    <fileSet>
+      <directory>${shared.dir}/unfiltered</directory>
+      <excludes>
+        <exclude>**/*.sh</exclude>
+        <exclude>**/*.bat</exclude>
+      </excludes>
+      <outputDirectory>/</outputDirectory>
+      <filtered>false</filtered>
+      <fileMode>0644</fileMode>
+      <directoryMode>0755</directoryMode>
+    </fileSet>
     <!-- native libraries -->
     <fileSet>
       <directory>${project.build.directory}/native-lib</directory>

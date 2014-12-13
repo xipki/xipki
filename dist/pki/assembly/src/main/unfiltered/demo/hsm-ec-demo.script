@@ -8,7 +8,9 @@ echo "========================================================"
 echo "||               DEMO EC with HSM Key                 ||"
 echo "========================================================"
 
-features:install xipki-security-shell
+feature:install xipki-security-shell
+
+sleep 1000
 
 file:rm -r -f output
 
@@ -24,7 +26,7 @@ keytool:ec -curve secp256r1 -slot 1 -key-label $SubCA_KEY_LABEL
 
 keytool:ec -curve secp256r1 -slot 1 -key-label $SubCAwithCRL_KEY_LABEL
 
-features:uninstall xipki-security-shell
+feature:uninstall xipki-security-shell
 
 source ./demo/prepare.script
 

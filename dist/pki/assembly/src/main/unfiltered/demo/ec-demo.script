@@ -7,7 +7,7 @@ echo "========================================================"
 echo "||            DEMO EC with PKCS#12 Key                ||"
 echo "========================================================"
 
-features:install xipki-security-shell
+feature:install xipki-security-shell
 
 # Wait one second
 sleep 1000

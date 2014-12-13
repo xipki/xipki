@@ -38,8 +38,8 @@ package org.xipki.ca.server.mgmt.shell.cert;
 import java.io.File;
 import java.security.cert.X509Certificate;
 
-import org.apache.felix.gogo.commands.Command;
-import org.apache.felix.gogo.commands.Option;
+import org.apache.karaf.shell.commands.Command;
+import org.apache.karaf.shell.commands.Option;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.ca.server.mgmt.api.X509CAEntry;

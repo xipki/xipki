@@ -37,8 +37,8 @@ package org.xipki.ca.server.mgmt.shell;
 
 import java.io.File;
 
-import org.apache.felix.gogo.commands.Command;
-import org.apache.felix.gogo.commands.Option;
+import org.apache.karaf.shell.commands.Command;
+import org.apache.karaf.shell.commands.Option;
 import org.xipki.ca.server.mgmt.api.CertProfileEntry;
 
 /**

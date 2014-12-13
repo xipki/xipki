@@ -39,9 +39,9 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import org.apache.felix.gogo.commands.Argument;
-import org.apache.felix.gogo.commands.Command;
-import org.apache.felix.gogo.commands.Option;
+import org.apache.karaf.shell.commands.Argument;
+import org.apache.karaf.shell.commands.Command;
+import org.apache.karaf.shell.commands.Option;
 import org.xipki.common.CRLReason;
 import org.xipki.common.CertRevocationInfo;
 

@@ -40,8 +40,8 @@ import java.security.cert.X509Certificate;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.apache.felix.gogo.commands.Command;
-import org.apache.felix.gogo.commands.Option;
+import org.apache.karaf.shell.commands.Command;
+import org.apache.karaf.shell.commands.Option;
 import org.xipki.ca.api.CAStatus;
 import org.xipki.ca.server.mgmt.api.DuplicationMode;
 import org.xipki.ca.server.mgmt.api.Permission;

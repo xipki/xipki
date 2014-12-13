@@ -35,7 +35,7 @@
 
 package org.xipki.security.shell.p11;
 
-import org.apache.felix.gogo.commands.Option;
+import org.apache.karaf.shell.commands.Option;
 import org.bouncycastle.util.encoders.Hex;
 import org.xipki.security.api.SecurityFactory;
 import org.xipki.security.api.p11.P11KeyIdentifier;
