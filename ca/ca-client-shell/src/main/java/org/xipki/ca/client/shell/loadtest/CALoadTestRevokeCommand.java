@@ -38,8 +38,8 @@ package org.xipki.ca.client.shell.loadtest;
 import java.io.FileInputStream;
 import java.util.Properties;
 
-import org.apache.felix.gogo.commands.Command;
-import org.apache.felix.gogo.commands.Option;
+import org.apache.karaf.shell.commands.Command;
+import org.apache.karaf.shell.commands.Option;
 import org.bouncycastle.asn1.x509.Certificate;
 import org.xipki.ca.client.shell.ClientCommand;
 import org.xipki.common.AbstractLoadTest;

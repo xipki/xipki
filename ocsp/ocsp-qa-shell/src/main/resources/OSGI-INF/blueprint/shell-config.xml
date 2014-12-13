@@ -5,7 +5,7 @@
   <bean id="certStatusCompleter" class="org.xipki.ocsp.qa.shell.completer.CertStatusCompleter"/>
   <bean id="occurrenceCompleter" class="org.xipki.ocsp.qa.shell.completer.OccurrenceCompleter"/>
   <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.1.0">
-    <command name="ocspqa/status">
+    <command>
       <action class="org.xipki.ocsp.qa.shell.OCSPQAStatusCommand">
         <property name="requestor" ref="ocspRequestor"/>
       </action>

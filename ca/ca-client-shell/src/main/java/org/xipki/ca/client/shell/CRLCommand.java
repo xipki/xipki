@@ -39,7 +39,7 @@ import java.io.File;
 import java.security.cert.X509CRL;
 import java.util.Set;
 
-import org.apache.felix.gogo.commands.Option;
+import org.apache.karaf.shell.commands.Option;
 import org.xipki.ca.client.api.PKIErrorException;
 import org.xipki.ca.client.api.RAWorkerException;
 import org.xipki.console.karaf.UnexpectedResultException;

@@ -35,7 +35,7 @@
 
 package org.xipki.ca.client.shell;
 
-import org.apache.felix.gogo.commands.Option;
+import org.apache.karaf.shell.commands.Option;
 
 /**
  * @author Lijun Liao

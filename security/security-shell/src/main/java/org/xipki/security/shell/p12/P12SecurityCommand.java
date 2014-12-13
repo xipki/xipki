@@ -38,7 +38,7 @@ package org.xipki.security.shell.p12;
 import java.io.FileInputStream;
 import java.security.KeyStore;
 
-import org.apache.felix.gogo.commands.Option;
+import org.apache.karaf.shell.commands.Option;
 import org.xipki.security.shell.SecurityCommand;
 
 /**

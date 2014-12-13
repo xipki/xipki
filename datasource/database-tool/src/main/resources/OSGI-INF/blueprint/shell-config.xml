@@ -8,7 +8,7 @@
     <property name="tokens" value="debug,info,warning,severe,off"/>
   </bean>
   <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.1.0">
-    <command name="dbtool/export-ca">
+    <command>
       <action class="org.xipki.dbtool.shell.ExportCaCommand">
         <property name="dataSourceFactory" ref="dataSourceFactory"/>
         <property name="passwordResolver" ref="passwordResolver"/>
@@ -18,7 +18,7 @@
         <entry key="-dbconf" value-ref="filePathCompleter"/>
       </optional-completers>
     </command>
-    <command name="dbtool/import-ca">
+    <command>
       <action class="org.xipki.dbtool.shell.ImportCaCommand">
         <property name="dataSourceFactory" ref="dataSourceFactory"/>
         <property name="passwordResolver" ref="passwordResolver"/>
@@ -28,7 +28,7 @@
         <entry key="-dbconf" value-ref="filePathCompleter"/>
       </optional-completers>
     </command>
-    <command name="dbtool/export-ocsp">
+    <command>
       <action class="org.xipki.dbtool.shell.ExportOcspCommand">
         <property name="dataSourceFactory" ref="dataSourceFactory"/>
         <property name="passwordResolver" ref="passwordResolver"/>
@@ -38,7 +38,7 @@
         <entry key="-dbconf" value-ref="filePathCompleter"/>
       </optional-completers>
     </command>
-    <command name="dbtool/import-ocsp">
+    <command>
       <action class="org.xipki.dbtool.shell.ImportOcspCommand">
         <property name="dataSourceFactory" ref="dataSourceFactory"/>
         <property name="passwordResolver" ref="passwordResolver"/>
@@ -48,7 +48,7 @@
         <entry key="-dbconf" value-ref="filePathCompleter"/>
       </optional-completers>
     </command>
-    <command name="dbtool/import-ocspfromca">
+    <command>
       <action class="org.xipki.dbtool.shell.ImportOcspFromCaCommand">
         <property name="dataSourceFactory" ref="dataSourceFactory"/>
         <property name="passwordResolver" ref="passwordResolver"/>
@@ -59,7 +59,7 @@
       </optional-completers>
     </command>
     <!-- Liquibase Commands -->
-    <command name="dbtool/initdb-ca">
+    <command>
       <action class="org.xipki.dbtool.shell.InitDbCaCommand">
         <property name="passwordResolver" ref="passwordResolver"/>
       </action>
@@ -67,7 +67,7 @@
         <entry key="-logLevel" value-ref="logLevelCompleter"/>
       </optional-completers>
     </command>
-    <command name="dbtool/initdb">
+    <command>
       <action class="org.xipki.dbtool.shell.InitDbAllCommand">
         <property name="passwordResolver" ref="passwordResolver"/>
       </action>
@@ -75,7 +75,7 @@
         <entry key="-logLevel" value-ref="logLevelCompleter"/>
       </optional-completers>
     </command>
-    <command name="dbtool/initdb-ocsp">
+    <command>
       <action class="org.xipki.dbtool.shell.InitDbOcspCommand">
         <property name="passwordResolver" ref="passwordResolver"/>
       </action>

@@ -37,7 +37,7 @@ package org.xipki.ca.client.shell;
 
 import java.security.cert.X509CRL;
 
-import org.apache.felix.gogo.commands.Command;
+import org.apache.karaf.shell.commands.Command;
 import org.xipki.ca.client.api.PKIErrorException;
 import org.xipki.ca.client.api.RAWorkerException;
 

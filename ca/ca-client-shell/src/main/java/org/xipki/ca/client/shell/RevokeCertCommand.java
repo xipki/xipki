@@ -38,8 +38,8 @@ package org.xipki.ca.client.shell;
 import java.math.BigInteger;
 import java.security.cert.X509Certificate;
 
-import org.apache.felix.gogo.commands.Command;
-import org.apache.felix.gogo.commands.Option;
+import org.apache.karaf.shell.commands.Command;
+import org.apache.karaf.shell.commands.Option;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.xipki.ca.client.api.CertIDOrError;
 import org.xipki.ca.common.cmp.PKIStatusInfo;

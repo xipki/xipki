@@ -35,8 +35,8 @@
 
 package org.xipki.dbtool.shell;
 
-import org.apache.felix.gogo.commands.Command;
-import org.apache.felix.gogo.commands.Option;
+import org.apache.karaf.shell.commands.Command;
+import org.apache.karaf.shell.commands.Option;
 import org.xipki.console.karaf.XipkiOsgiCommandSupport;
 import org.xipki.datasource.api.DataSourceFactory;
 import org.xipki.dbtool.OcspFromCaDbImporter;

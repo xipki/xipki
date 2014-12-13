@@ -8,14 +8,14 @@
   <service ref="yesNoCompleter" interface="org.xipki.console.karaf.YesNoCompleter"/>
   
   <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.1.0">
-    <command name="file/rm">
+    <command>
       <action class="org.xipki.console.karaf.FileRmCommand"/>
       <completers>
         <ref component-id="filePathCompleter"/>
         <null/>
       </completers>
     </command>
-    <command name="file/ls">
+    <command>
       <action class="org.xipki.console.karaf.FileListCommand"/>
       <completers>
         <ref component-id="filePathCompleter"/>
