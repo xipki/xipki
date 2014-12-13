@@ -41,8 +41,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.felix.gogo.commands.Command;
-import org.apache.felix.gogo.commands.Option;
+import org.apache.karaf.shell.commands.Command;
+import org.apache.karaf.shell.commands.Option;
 import org.xipki.ca.api.CAStatus;
 import org.xipki.ca.api.CertValidity;
 import org.xipki.ca.server.mgmt.api.CAManager;

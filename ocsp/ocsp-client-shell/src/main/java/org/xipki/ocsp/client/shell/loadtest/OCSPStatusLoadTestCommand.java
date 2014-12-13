@@ -40,8 +40,8 @@ import java.security.cert.X509Certificate;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.apache.felix.gogo.commands.Command;
-import org.apache.felix.gogo.commands.Option;
+import org.apache.karaf.shell.commands.Command;
+import org.apache.karaf.shell.commands.Option;
 import org.xipki.common.AbstractLoadTest;
 import org.xipki.common.SecurityUtil;
 import org.xipki.common.StringUtil;

@@ -1,4 +1,6 @@
-features:install xipki-security-shell
+feature:install xipki-security-shell
+
+sleep 1000
 
 #################################################################
 #                          GENERATE RCA                         #
@@ -47,7 +49,7 @@ ca:ca-restart
 ## Publish the self-signed certificate
 ca:publish-self -profile RCA RCA1
 
-features:install xipki-caclient-shell
+feature:install xipki-caclient-shell
 
 # Wait two seconds
 sleep 2000
@@ -70,8 +72,8 @@ caclient:ra-enroll -p10 output/SubCAwithCRL1.p10 -out output/SubCAwithCRL1.der -
 keytool:update-cert-p12 -p12 output/SubCAwithCRL1.p12 -pwd 1234 -cert output/SubCAwithCRL1.der \
   -cacert output/RCA1.der
 
-features:uninstall xipki-caclient-shell
-features:uninstall xipki-caclient
+feature:uninstall xipki-caclient-shell
+feature:uninstall xipki-caclient
 
 #################################################################
 #                        ADD SubCA with OCSP                    #

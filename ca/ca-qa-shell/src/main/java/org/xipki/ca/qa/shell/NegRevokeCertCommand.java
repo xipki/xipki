@@ -35,7 +35,7 @@
 
 package org.xipki.ca.qa.shell;
 
-import org.apache.felix.gogo.commands.Command;
+import org.apache.karaf.shell.commands.Command;
 import org.xipki.ca.client.shell.RevokeCertCommand;
 import org.xipki.console.karaf.UnexpectedResultException;
 

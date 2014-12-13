@@ -10,29 +10,12 @@
   <packaging>pom</packaging>
   <name>${project.groupId}.${project.artifactId}</name>
   <properties>
+    <shared.dir>${project.basedir}/../../shared</shared.dir>
     <features.repo>${project.build.directory}/features-repo</features.repo>
+    <application.shell.name>pkiconsole</application.shell.name>
+    <application.log.file>pkiconsole.log</application.log.file>
   </properties>
   <dependencies>
-    <dependency>
-      <groupId>org.apache.karaf</groupId>
-      <artifactId>apache-karaf</artifactId>
-      <version>${karaf.version}</version>
-      <type>tar.gz</type>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.karaf</groupId>
-      <artifactId>apache-karaf</artifactId>
-      <version>${karaf.version}</version>
-      <type>zip</type>
-    </dependency>
-    <dependency>
-      <!-- Karaf Standard Features -->
-      <groupId>org.apache.karaf.assemblies.features</groupId>
-      <artifactId>standard</artifactId>
-      <version>${karaf.version}</version>
-      <classifier>features</classifier>
-      <type>xml</type>
-    </dependency>
     <dependency>
       <!-- project base features -->
       <groupId>${project.groupId}</groupId>
@@ -52,6 +35,13 @@
     <resources>
       <resource>
         <directory>src/main/filtered</directory>
+        <filtering>true</filtering>
+        <includes>
+          <include>**/*</include>
+        </includes>
+      </resource>
+      <resource>
+        <directory>${shared.dir}/filtered</directory>
         <filtering>true</filtering>
         <includes>
           <include>**/*</include>
@@ -127,35 +117,28 @@
       </plugin>
       <plugin>
         <groupId>org.apache.karaf.tooling</groupId>
-        <artifactId>features-maven-plugin</artifactId>
+        <artifactId>karaf-maven-plugin</artifactId>
         <version>${karaf.version}</version>
+        <extensions>true</extensions>
         <executions>
           <execution>
             <id>add-features-to-repo</id>
             <phase>generate-resources</phase>
             <goals>
-              <goal>add-features-to-repo</goal>
+              <goal>features-add-to-repository</goal>
             </goals>
             <configuration>
               <!-- where to put the artifacts -->
               <repository>${features.repo}</repository>
               <!--
-			      Feature Descriptors (Karaf core features are available by default)
-
-				  NOTE: Remember to add the feature descriptors to the 'org.apache.karaf.features.cfg' config file
-				  to make them visible after deployment.
-			  -->
+                 Feature Descriptors (Karaf core features are available by default)
+                 NOTE: Remember to add the feature descriptors to the 'org.apache.karaf.features.cfg' config file
+                 to make them visible after deployment.
+               -->
               <descriptors>
                 <descriptor>mvn:${project.groupId}/features/${project.version}/xml/features</descriptor>
               </descriptors>
               <features>
-                <!-- karaf boot features (see etc/org.apache.karaf.features.cfg) -->
-                <feature>karaf-framework</feature>
-                <feature>config</feature>
-                <!-- feature>ssh</feature -->
-                <feature>management</feature>
-                <!-- transitive: http, jetty -->
-                <!-- feature>http-whiteboard</feature -->
                 <!-- project-core features -->
                 <feature>xipki-pkiconsole</feature>
                 <feature>xipki-pkiconsole-shell</feature>

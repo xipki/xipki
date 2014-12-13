@@ -13,33 +13,16 @@
   <packaging>pom</packaging>
   <name>${project.groupId}.${project.artifactId}</name>
   <properties>
+    <shared.dir>${project.basedir}/../../shared</shared.dir>
     <features.repo>${project.build.directory}/features-repo</features.repo>
     <mysql-jdbc.version>5.1.31</mysql-jdbc.version>
     <postgresql.version>9.3-1100-jdbc41</postgresql.version>
     <h2-jdbc.version>1.4.179</h2-jdbc.version>
     <hsqldb.version>2.3.2</hsqldb.version>
+    <application.shell.name>xipki</application.shell.name>
+    <application.log.file>xipki.log</application.log.file>
   </properties>
   <dependencies>
-    <dependency>
-      <groupId>org.apache.karaf</groupId>
-      <artifactId>apache-karaf</artifactId>
-      <version>${karaf.version}</version>
-      <type>tar.gz</type>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.karaf</groupId>
-      <artifactId>apache-karaf</artifactId>
-      <version>${karaf.version}</version>
-      <type>zip</type>
-    </dependency>
-    <dependency>
-      <!-- Karaf Standard Features -->
-      <groupId>org.apache.karaf.assemblies.features</groupId>
-      <artifactId>standard</artifactId>
-      <version>${karaf.version}</version>
-      <classifier>features</classifier>
-      <type>xml</type>
-    </dependency>
     <dependency>
       <!-- project base features -->
       <groupId>${project.groupId}</groupId>
@@ -59,6 +42,13 @@
     <resources>
       <resource>
         <directory>src/main/filtered</directory>
+        <filtering>true</filtering>
+        <includes>
+          <include>**/*</include>
+        </includes>
+      </resource>
+      <resource>
+        <directory>${shared.dir}/filtered</directory>
         <filtering>true</filtering>
         <includes>
           <include>**/*</include>
@@ -274,14 +264,15 @@
       </plugin>
       <plugin>
         <groupId>org.apache.karaf.tooling</groupId>
-        <artifactId>features-maven-plugin</artifactId>
+        <artifactId>karaf-maven-plugin</artifactId>
         <version>${karaf.version}</version>
+        <extensions>true</extensions>
         <executions>
           <execution>
             <id>add-features-to-repo</id>
             <phase>generate-resources</phase>
             <goals>
-              <goal>add-features-to-repo</goal>
+              <goal>features-add-to-repository</goal>
             </goals>
             <configuration>
               <!-- where to put the artifacts -->
@@ -296,8 +287,6 @@
                 <descriptor>mvn:${project.groupId}/features/${project.version}/xml/features</descriptor>
               </descriptors>
               <features>
-                <!-- karaf boot features (see etc/org.apache.karaf.features.cfg) -->
-                <feature>karaf-framework</feature>
                 <feature>http-whiteboard</feature>
                 <!-- project-core features -->
                 <feature>xipki-caserver</feature>

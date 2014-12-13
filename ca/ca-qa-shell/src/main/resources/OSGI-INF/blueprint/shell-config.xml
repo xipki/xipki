@@ -13,7 +13,7 @@
     <property name="securityFactory" ref="securityFactory"/>
   </bean>
   <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.1.0">
-    <command name="caqa/neg-ra-enroll">
+    <command>
       <action class="org.xipki.ca.qa.shell.NegRAEnrollCertCommand">
         <property name="raWorker" ref="raWorker"/>
       </action>
@@ -23,7 +23,7 @@
         <entry key="-ca" value-ref="caNameCompleter"/>
       </optional-completers>
     </command>
-    <command name="caqa/neg-enroll-p12">
+    <command>
       <action class="org.xipki.ca.qa.shell.NegP12EnrollCertCommand">
         <property name="raWorker" ref="raWorker"/>
         <property name="securityFactory" ref="securityFactory"/>
@@ -34,7 +34,7 @@
         <entry key="-ca" value-ref="caNameCompleter"/>
       </optional-completers>
     </command>
-    <command name="caqa/neg-revoke">
+    <command>
       <action class="org.xipki.ca.qa.shell.NegRevokeCertCommand">
         <property name="raWorker" ref="raWorker"/>
       </action>
@@ -44,7 +44,7 @@
         <entry key="-reason" value-ref="crlReasonCompleter"/>
       </optional-completers>
     </command>
-    <command name="caqa/neg-unrevoke">
+    <command>
       <action class="org.xipki.ca.qa.shell.NegUnrevokeCertCommand">
         <property name="raWorker" ref="raWorker"/>
       </action>
@@ -53,7 +53,7 @@
         <entry key="-cacert" value-ref="filePathCompleter"/>
       </optional-completers>
     </command>
-    <command name="caqa/neg-gencrl">
+    <command>
       <action class="org.xipki.ca.qa.shell.NegGenCRLCommand">
         <property name="raWorker" ref="raWorker"/>
       </action>
@@ -62,7 +62,7 @@
         <entry key="-ca" value-ref="caNameCompleter"/>
       </optional-completers>
     </command>
-    <command name="caqa/neg-getcrl">
+    <command>
       <action class="org.xipki.ca.qa.shell.NegGetCRLCommand">
         <property name="raWorker" ref="raWorker"/>
       </action>

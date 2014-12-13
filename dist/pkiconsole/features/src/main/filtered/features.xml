@@ -1,12 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <features xmlns="http://karaf.apache.org/xmlns/features/v1.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" name="xipki-remotep11-${project.version}" xsi:schemaLocation="http://karaf.apache.org/xmlns/features/v1.0.0 http://karaf.apache.org/xmlns/features/v1.0.0">
-  <!--
-        Aggregate core features
-
-        feature url is:
-        mvn:org.xipki.remotep11/features/${project.version}/xml/features
-    -->
-  <repository>mvn:org.apache.karaf.assemblies.features/standard/${karaf.version}/xml/features</repository>
+  <repository>mvn:org.apache.karaf.features/standard/${karaf.version}/xml/features</repository>
   <feature name="xipki-pkiconsole" version="${project.version}" resolver="(obr)">
     <bundle>mvn:org.bouncycastle/bcprov-jdk15on/${bc.version}</bundle>
     <bundle>mvn:org.bouncycastle/bcpkix-jdk15on/${bc.version}</bundle>

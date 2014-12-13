@@ -1,7 +1,7 @@
 #################################################################
 #              MANAGE CERTIFICATE WITH RA CLIENT                #
 #################################################################
-features:install xipki-caclient-shell
+feature:install xipki-caclient-shell
 
 # Wait two seconds
 sleep 2000
@@ -36,5 +36,5 @@ caclient:loadtest-enroll \
 #################################################################
 #              UNINSTALL UNNEEDED FEATURES                      #
 #################################################################
-features:uninstall xipki-caclient-shell
-features:uninstall xipki-caclient
+feature:uninstall xipki-caclient-shell
+feature:uninstall xipki-caclient

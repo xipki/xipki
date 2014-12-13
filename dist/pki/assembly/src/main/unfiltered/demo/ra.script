@@ -14,8 +14,9 @@ ca:enroll-cert -ca RCA1 -profile RCA-Cross -p10 output/RCA2.p10 -out output/RCA2
 #################################################################
 #              MANAGE CERTIFICATE WITH RA CLIENT                #
 #################################################################
-features:install xipki-caclient-shell
-features:install xipki-caqa-shell
+feature:install xipki-caclient-shell
+
+feature:install xipki-caqa-shell
 
 # Wait two seconds
 sleep 2000
@@ -186,8 +187,8 @@ caqa:neg-getcrl -ca SubCA1 -out output/dummy
 #################################################################
 #              UNINSTALL UNNEEDED FEATURES                      #
 #################################################################
-features:uninstall xipki-caqa-shell
-features:uninstall xipki-caclient-shell
-features:uninstall xipki-caclient
-features:uninstall xipki-camgmt-shell
-features:uninstall xipki-security-shell
+feature:uninstall xipki-caqa-shell
+feature:uninstall xipki-caclient-shell
+feature:uninstall xipki-caclient
+feature:uninstall xipki-camgmt-shell
+feature:uninstall xipki-security-shell
