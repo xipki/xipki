@@ -174,7 +174,7 @@ Run Demo
     bin/karaf
     ```
 
-    HSM devices of Thales, e.g. nCipher, uses preload to manage the PKCS#11 session. In this case, XiPKI should be started as follows
+    HSM devices of Thales, e.g. nCipher, uses Thales preload to manage the PKCS#11 session. In this case, XiPKI should be started as follows
     ```sh
     preload bin/karaf
     ```
