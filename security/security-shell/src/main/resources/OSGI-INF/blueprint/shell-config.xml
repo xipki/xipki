@@ -7,7 +7,7 @@
     <property name="securityFactory" ref="securityFactory"/>
   </bean>
   <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.1.0">
-    <command name="keytool/list">
+    <command>
       <action class="org.xipki.security.shell.p11.P11ListSlotCommand">
         <property name="securityFactory" ref="securityFactory"/>
       </action>
@@ -15,7 +15,7 @@
         <entry key="-module" value-ref="p11ModuleNameCompleter"/>
       </optional-completers>
     </command>
-    <command name="keytool/rsa">
+    <command>
       <action class="org.xipki.security.shell.p11.P11RSAKeyGenCommand">
         <property name="securityFactory" ref="securityFactory"/>
       </action>
@@ -24,7 +24,7 @@
         <entry key="-module" value-ref="p11ModuleNameCompleter"/>
       </optional-completers>
     </command>
-    <command name="keytool/rsa-p12">
+    <command>
       <action class="org.xipki.security.shell.p12.P12RSAKeyGenCommand">
         <property name="securityFactory" ref="securityFactory"/>
       </action>
@@ -33,7 +33,7 @@
         <entry key="-certout" value-ref="filePathCompleter"/>
       </optional-completers>
     </command>
-    <command name="keytool/dsa">
+    <command>
       <action class="org.xipki.security.shell.p11.P11DSAKeyGenCommand">
         <property name="securityFactory" ref="securityFactory"/>
       </action>
@@ -42,7 +42,7 @@
         <entry key="-module" value-ref="p11ModuleNameCompleter"/>
       </optional-completers>
     </command>
-    <command name="keytool/dsa-p12">
+    <command>
       <action class="org.xipki.security.shell.p12.P12DSAKeyGenCommand">
         <property name="securityFactory" ref="securityFactory"/>
       </action>
@@ -51,7 +51,7 @@
         <entry key="-certout" value-ref="filePathCompleter"/>
       </optional-completers>
     </command>
-    <command name="keytool/ec">
+    <command>
       <action class="org.xipki.security.shell.p11.P11ECKeyGenCommand">
         <property name="securityFactory" ref="securityFactory"/>
       </action>
@@ -61,7 +61,7 @@
         <entry key="-module" value-ref="p11ModuleNameCompleter"/>
       </optional-completers>
     </command>
-    <command name="keytool/ec-p12">
+    <command>
       <action class="org.xipki.security.shell.p12.P12ECKeyGenCommand">
         <property name="securityFactory" ref="securityFactory"/>
       </action>
@@ -71,7 +71,7 @@
         <entry key="-certout" value-ref="filePathCompleter"/>
       </optional-completers>
     </command>
-    <command name="keytool/req">
+    <command>
       <action class="org.xipki.security.shell.p11.P11CertRequestGenCommand">
         <property name="securityFactory" ref="securityFactory"/>
       </action>
@@ -80,7 +80,7 @@
         <entry key="-module" value-ref="p11ModuleNameCompleter"/>
       </optional-completers>
     </command>
-    <command name="keytool/req-p12">
+    <command>
       <action class="org.xipki.security.shell.p12.P12CertRequestGenCommand">
         <property name="securityFactory" ref="securityFactory"/>
       </action>
@@ -89,7 +89,7 @@
         <entry key="-p12" value-ref="filePathCompleter"/>
       </optional-completers>
     </command>
-    <command name="keytool/export-cert">
+    <command>
       <action class="org.xipki.security.shell.p11.P11CertExportCommand">
         <property name="securityFactory" ref="securityFactory"/>
       </action>
@@ -98,7 +98,7 @@
         <entry key="-module" value-ref="p11ModuleNameCompleter"/>
       </optional-completers>
     </command>
-    <command name="keytool/export-cert-p12">
+    <command>
       <action class="org.xipki.security.shell.p12.P12CertExportCommand">
             </action>
       <optional-completers>
@@ -106,7 +106,7 @@
         <entry key="-p12" value-ref="filePathCompleter"/>
       </optional-completers>
     </command>
-    <command name="keytool/update-cert">
+    <command>
       <action class="org.xipki.security.shell.p11.P11CertUpdateCommand">
         <property name="securityFactory" ref="securityFactory"/>
       </action>
@@ -116,7 +116,7 @@
         <entry key="-module" value-ref="p11ModuleNameCompleter"/>
       </optional-completers>
     </command>
-    <command name="keytool/add-cert">
+    <command>
       <action class="org.xipki.security.shell.p11.P11CertAddCommand">
         <property name="securityFactory" ref="securityFactory"/>
       </action>
@@ -125,7 +125,7 @@
         <entry key="-module" value-ref="p11ModuleNameCompleter"/>
       </optional-completers>
     </command>
-    <command name="keytool/rm-cert">
+    <command>
       <action class="org.xipki.security.shell.p11.P11CertDeleteCommand">
         <property name="securityFactory" ref="securityFactory"/>
       </action>
@@ -133,7 +133,7 @@
         <entry key="-module" value-ref="p11ModuleNameCompleter"/>
       </optional-completers>
     </command>
-    <command name="keytool/update-cert-p12">
+    <command>
       <action class="org.xipki.security.shell.p12.P12CertUpdateCommand">
         <property name="securityFactory" ref="securityFactory"/>
       </action>
@@ -143,7 +143,7 @@
         <entry key="-p12" value-ref="filePathCompleter"/>
       </optional-completers>
     </command>
-    <command name="keytool/delete-key">
+    <command>
       <action class="org.xipki.security.shell.p11.P11KeyDeleteCommand">
         <property name="securityFactory" ref="securityFactory"/>
       </action>
@@ -151,27 +151,27 @@
         <entry key="-module" value-ref="p11ModuleNameCompleter"/>
       </optional-completers>
     </command>
-    <command name="keytool/pbe-enc">
+    <command>
       <action class="org.xipki.security.shell.PBEEncryptCommand">
         <property name="securityFactory" ref="securityFactory"/>
       </action>
     </command>
-    <command name="keytool/pbe-dec">
+    <command>
       <action class="org.xipki.security.shell.PBEDecryptCommand">
         <property name="securityFactory" ref="securityFactory"/>
       </action>
     </command>
-    <command name="keytool/obfuscate">
+    <command>
       <action class="org.xipki.security.shell.ObfuscateCommand">
         <property name="securityFactory" ref="securityFactory"/>
       </action>
     </command>
-    <command name="keytool/deobfuscate">
+    <command>
       <action class="org.xipki.security.shell.DeobfuscateCommand">
         <property name="securityFactory" ref="securityFactory"/>
       </action>
     </command>
-    <command name="keytool/extract-cert">
+    <command>
       <action class="org.xipki.security.shell.ExtractCertFromCRLCommand">
         <property name="securityFactory" ref="securityFactory"/>
       </action>

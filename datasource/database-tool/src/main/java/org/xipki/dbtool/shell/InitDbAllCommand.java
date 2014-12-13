@@ -37,7 +37,7 @@ package org.xipki.dbtool.shell;
 
 import java.util.Map;
 
-import org.apache.felix.gogo.commands.Command;
+import org.apache.karaf.shell.commands.Command;
 import org.xipki.dbtool.LiquibaseDatabaseConf;
 
 /**

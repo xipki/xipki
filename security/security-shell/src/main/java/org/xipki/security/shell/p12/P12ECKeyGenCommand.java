@@ -35,8 +35,8 @@
 
 package org.xipki.security.shell.p12;
 
-import org.apache.felix.gogo.commands.Command;
-import org.apache.felix.gogo.commands.Option;
+import org.apache.karaf.shell.commands.Command;
+import org.apache.karaf.shell.commands.Option;
 import org.xipki.security.P12KeypairGenerator;
 import org.xipki.security.P12KeypairGenerator.ECDSAIdentityGenerator;
 import org.xipki.security.api.P12KeypairGenerationResult;
