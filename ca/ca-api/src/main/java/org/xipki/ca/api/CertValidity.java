@@ -35,6 +35,7 @@
 
 package org.xipki.ca.api;
 
+import java.io.Serializable;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.TimeZone;
@@ -45,8 +46,10 @@ import org.xipki.common.ParamChecker;
  * @author Lijun Liao
  */
 
-public class CertValidity implements Comparable<CertValidity>
+public class CertValidity implements Comparable<CertValidity>, Serializable
 {
+    private static final long serialVersionUID = 1917871166917453960L;
+
     private static final long SECOND = 1000L;
     private static final TimeZone utc = TimeZone.getTimeZone("UTC");
 
