@@ -10,9 +10,6 @@
   <artifactId>dist-group</artifactId>
   <name>${project.groupId}.${project.artifactId}</name>
   <packaging>pom</packaging>
-  <properties>
-    <junit.version>4.8.2</junit.version>
-  </properties>
   <modules>
     <module>assembly</module>
     <module>branding</module>
