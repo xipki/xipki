@@ -187,7 +187,7 @@ class ECDSASignatureSpi extends SignatureSpi
         }
         catch (Exception e)
         {
-            throw new SignatureException(e.toString());
+            throw new SignatureException(e.getMessage(), e);
         }
     }
 

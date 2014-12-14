@@ -376,7 +376,7 @@ public class NSSSignatureSpi extends SignatureSpi
             tbsHash = pkcs1padding(derEncode(hashAlgId, hash), blockSize);
         } catch (IOException e)
         {
-            throw new SignatureException(e);
+            throw new SignatureException(e.getMessage(), e);
         }
 
         try
@@ -384,7 +384,7 @@ public class NSSSignatureSpi extends SignatureSpi
             return cipher.doFinal(tbsHash);
         } catch (IllegalBlockSizeException | BadPaddingException e)
         {
-            throw new SignatureException(e);
+            throw new SignatureException(e.getMessage(), e);
         }
     }
 
@@ -438,7 +438,7 @@ public class NSSSignatureSpi extends SignatureSpi
                 encodedHash = decodePkcs11Block(cipher.doFinal(sigBytes), cipher.getOutputSize(1)-1);
             } catch (Exception e)
             {
-                throw new SignatureException(e);
+                throw new SignatureException(e.getMessage(), e);
             }
 
             byte[] hash = md.digest();
@@ -462,7 +462,7 @@ public class NSSSignatureSpi extends SignatureSpi
                 }
             } catch (IOException e)
             {
-                throw new SignatureException(e);
+                throw new SignatureException(e.getMessage(), e);
             } finally
             {
                 if(ain != null)

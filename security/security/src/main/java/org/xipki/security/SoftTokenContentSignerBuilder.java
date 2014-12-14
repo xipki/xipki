@@ -202,7 +202,7 @@ public class SoftTokenContentSignerBuilder
         }catch(KeyStoreException | NoSuchProviderException | NoSuchAlgorithmException |
                 CertificateException | IOException | UnrecoverableKeyException | ClassCastException e)
         {
-            throw new SignerException(e);
+            throw new SignerException(e.getMessage(), e);
         }
     }
 

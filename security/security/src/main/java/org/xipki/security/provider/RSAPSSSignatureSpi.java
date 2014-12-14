@@ -194,7 +194,7 @@ class RSAPSSSignatureSpi
         }
         catch (CryptoException e)
         {
-            throw new SignatureException(e.getMessage());
+            throw new SignatureException(e.getMessage(), e);
         }
     }
 
@@ -272,7 +272,7 @@ class RSAPSSSignatureSpi
                 }
                 catch (Exception e)
                 {
-                    throw new RuntimeException(e.toString());
+                    throw new RuntimeException(e.getMessage(), e);
                 }
             }
         }

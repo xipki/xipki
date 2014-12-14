@@ -99,7 +99,7 @@ public class OCSPCertPublisher extends X509CertPublisher
             queryExecutor = new OCSPStoreQueryExecutor(dataSource, this.publishsGoodCert);
         } catch (NoSuchAlgorithmException | SQLException e)
         {
-            throw new CertPublisherException(e);
+            throw new CertPublisherException(e.getMessage(), e);
         }
     }
 

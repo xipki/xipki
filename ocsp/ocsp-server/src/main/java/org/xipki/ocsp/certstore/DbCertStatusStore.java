@@ -471,7 +471,7 @@ public class DbCertStatusStore extends CertStatusStore
             return certStatusInfo;
         }catch(SQLException e)
         {
-            throw new CertStatusStoreException(e);
+            throw new CertStatusStoreException(e.getMessage(), e);
         }
     }
 
@@ -586,7 +586,7 @@ public class DbCertStatusStore extends CertStatusStore
             dataSource = datasourceFactory.createDataSource(confStream, passwordResolver);
         } catch (Exception e)
         {
-            throw new CertStatusStoreException(e);
+            throw new CertStatusStoreException(e.getMessage(), e);
         } finally
         {
             if(confStream != null)

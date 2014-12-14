@@ -118,7 +118,7 @@ public class SignatureSigner implements ContentSigner
                 signer.update((byte) b);
             }catch(SignatureException e)
             {
-                throw new IOException(e);
+                throw new IOException(e.getMessage(), e);
             }
         }
 
@@ -131,7 +131,7 @@ public class SignatureSigner implements ContentSigner
                 signer.update(b);
             }catch(SignatureException e)
             {
-                throw new IOException(e);
+                throw new IOException(e.getMessage(), e);
             }
         }
 
@@ -144,7 +144,7 @@ public class SignatureSigner implements ContentSigner
                 signer.update(b, off, len);
             }catch(SignatureException e)
             {
-                throw new IOException(e);
+                throw new IOException(e.getMessage(), e);
             }
         }
     }
