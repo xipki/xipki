@@ -245,7 +245,7 @@ public class OcspResponder
             this.conf = rootElement.getValue();
         } catch (JAXBException | SAXException e)
         {
-            throw new OcspResponderException(e);
+            throw new OcspResponderException(e.getMessage(), e);
         }
 
         // OCSP Mode
@@ -396,7 +396,7 @@ public class OcspResponder
                 signers.add(requestorSigner);
             } catch (SignerException e)
             {
-                throw new OcspResponderException(e);
+                throw new OcspResponderException(e.getMessage(), e);
             }
         }
 
@@ -405,7 +405,7 @@ public class OcspResponder
             responderSigner = new ResponderSigner(signers);
         } catch (CertificateEncodingException | IOException e)
         {
-            throw new OcspResponderException(e);
+            throw new OcspResponderException(e.getMessage(), e);
         }
 
         if(signerConf.isIncludeSignerCertInResp())
@@ -481,7 +481,7 @@ public class OcspResponder
                     issuerFilter = new IssuerFilter(includeIssuers, excludeIssuers);
                 } catch (CertificateException | IOException e)
                 {
-                    throw new OcspResponderException(e);
+                    throw new OcspResponderException(e.getMessage(), e);
                 }
                 store = new DbCertStatusStore(storeConf.getName(), issuerFilter);
 

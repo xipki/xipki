@@ -59,7 +59,7 @@ public class OCSPUtils
                 basicOCSPResp = (BasicOCSPResp) response.getResponseObject();
             } catch (OCSPException e)
             {
-                throw new OCSPRequestorException(e);
+                throw new OCSPRequestorException(e.getMessage(), e);
             }
             return basicOCSPResp;
         }

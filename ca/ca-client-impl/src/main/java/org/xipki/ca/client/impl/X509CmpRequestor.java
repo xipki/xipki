@@ -583,7 +583,7 @@ abstract class X509CmpRequestor extends CmpRequestor
             certConfirm = certConfirmBuilder.build(digesetCalculatorProvider);
         } catch (CMPException e)
         {
-            throw new CmpRequestorException(e);
+            throw new CmpRequestorException(e.getMessage(), e);
         }
         PKIBody body = new PKIBody(PKIBody.TYPE_CERT_CONFIRM, certConfirm.toASN1Structure());
         return new PKIMessage(header, body);
@@ -619,7 +619,7 @@ abstract class X509CmpRequestor extends CmpRequestor
                 }
             }catch(IOException e)
             {
-                throw new CmpRequestorException(e);
+                throw new CmpRequestorException(e.getMessage(), e);
             }
             Extensions exts = new Extensions(extensions);
 
@@ -658,7 +658,7 @@ abstract class X509CmpRequestor extends CmpRequestor
                         true, new DEROctetString(reason.getEncoded()));
             }catch(IOException e)
             {
-                throw new CmpRequestorException(e);
+                throw new CmpRequestorException(e.getMessage(), e);
             }
             Extensions exts = new Extensions(extensions);
 

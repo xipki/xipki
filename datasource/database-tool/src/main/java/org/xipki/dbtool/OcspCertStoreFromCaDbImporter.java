@@ -298,7 +298,7 @@ class OcspCertStoreFromCaDbImporter extends DbPorter
                         }
                         else
                         {
-                            throw new CertificateException(e);
+                            throw new CertificateException(e.getMessage(), e);
                         }
                     }
                     byte[] encodedKey = c.getSubjectPublicKeyInfo().getPublicKeyData().getBytes();
@@ -480,7 +480,7 @@ class OcspCertStoreFromCaDbImporter extends DbPorter
                     }
                     else
                     {
-                        throw new CertificateException(e);
+                        throw new CertificateException(e.getMessage(), e);
                     }
                 }
 

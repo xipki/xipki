@@ -205,7 +205,7 @@ public abstract class CmpRequestor
         } catch (IOException e)
         {
             LOG.error("Error while encode the PKI request {}", request);
-            throw new CmpRequestorException(e);
+            throw new CmpRequestorException(e.getMessage(), e);
         }
 
         byte[] encodedResponse;
@@ -228,7 +228,7 @@ public abstract class CmpRequestor
             {
                 LOG.error("Error while decode the received PKI message: {}", Hex.toHexString(encodedResponse));
             }
-            throw new CmpRequestorException(e);
+            throw new CmpRequestorException(e.getMessage(), e);
         }
 
         PKIHeader respHeader = response.getHeader();
@@ -249,7 +249,7 @@ public abstract class CmpRequestor
                 ret.setProtectionVerificationResult(verifyProtection);
             } catch (InvalidKeyException | OperatorCreationException | CMPException e)
             {
-                throw new CmpRequestorException(e);
+                throw new CmpRequestorException(e.getMessage(), e);
             }
         }
         else if(signRequest)

@@ -484,7 +484,7 @@ class OCSPStoreQueryExecutor
             encodedName = bcCert.getSubject().getEncoded("DER");
         } catch (IOException e)
         {
-            throw new CertificateEncodingException(e);
+            throw new CertificateEncodingException(e.getMessage(), e);
         }
         byte[] encodedKey = bcCert.getSubjectPublicKeyInfo().getPublicKeyData().getBytes();
 

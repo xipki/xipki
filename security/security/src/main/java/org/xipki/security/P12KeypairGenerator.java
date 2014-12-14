@@ -300,7 +300,7 @@ public abstract class P12KeypairGenerator
                 cert2 = org.bouncycastle.asn1.x509.Certificate.getInstance(cert.getEncoded());
             } catch (IOException e)
             {
-                throw new CertificateParsingException(e);
+                throw new CertificateParsingException(e.getMessage(), e);
             }
             this.jceCert = new X509CertificateObject(cert2);
         }

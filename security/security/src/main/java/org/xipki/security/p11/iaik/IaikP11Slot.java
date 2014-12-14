@@ -217,7 +217,7 @@ public class IaikP11Slot implements P11WritableSlot
             }
             LOG.debug(message, e);
             close();
-            throw new SignerException(e);
+            throw new SignerException(e.getMessage(), e);
         }
 
         try
@@ -232,7 +232,7 @@ public class IaikP11Slot implements P11WritableSlot
             }
             LOG.debug(message, e);
             close();
-            throw new SignerException(e);
+            throw new SignerException(e.getMessage(), e);
         }
 
         long maxSessionCount2 = 1;
@@ -500,7 +500,7 @@ public class IaikP11Slot implements P11WritableSlot
             }
         } catch (TokenException e)
         {
-            throw new SignerException(e);
+            throw new SignerException(e.getMessage(), e);
         }finally
         {
             returnIdleSession(session);
@@ -702,7 +702,7 @@ public class IaikP11Slot implements P11WritableSlot
             }
         } catch (TokenException e)
         {
-            throw new SignerException(e);
+            throw new SignerException(e.getMessage(), e);
         }
     }
 
@@ -715,7 +715,7 @@ public class IaikP11Slot implements P11WritableSlot
             info = session.getSessionInfo();
         } catch (TokenException e)
         {
-            throw new SignerException(e);
+            throw new SignerException(e.getMessage(), e);
         }
         if(LOG.isTraceEnabled())
         {
@@ -1053,7 +1053,7 @@ public class IaikP11Slot implements P11WritableSlot
             }
         } catch (TokenException e)
         {
-            throw new SignerException(e);
+            throw new SignerException(e.getMessage(), e);
         }
         finally
         {
@@ -2059,7 +2059,7 @@ public class IaikP11Slot implements P11WritableSlot
                 return keyFactory.generatePublic(keySpec);
             }catch(NoSuchAlgorithmException | InvalidKeySpecException e)
             {
-                throw new SignerException(e);
+                throw new SignerException(e.getMessage(), e);
             }
         }
         else if(p11Key instanceof DSAPublicKey)
@@ -2078,7 +2078,7 @@ public class IaikP11Slot implements P11WritableSlot
                 return keyFactory.generatePublic(keySpec);
             }catch(NoSuchAlgorithmException | InvalidKeySpecException e)
             {
-                throw new SignerException(e);
+                throw new SignerException(e.getMessage(), e);
             }
         }
         else if(p11Key instanceof ECDSAPublicKey)

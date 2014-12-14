@@ -130,7 +130,7 @@ public class RandomSerialNumberGenerator
             random = SecureRandom.getInstance(algorithm);
         } catch (NoSuchAlgorithmException e)
         {
-            throw new RuntimeException(e);
+            throw new RuntimeException(e.getMessage(), e);
         }
         long seed = Math.abs((new Date().getTime()) + this.hashCode());
         random.setSeed(seed);

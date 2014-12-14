@@ -318,7 +318,7 @@ public class CrlCertStatusStore extends CertStatusStore
                 crl.verify(crlSignerCert.getPublicKey());
             }catch(Exception e)
             {
-                throw new CertStatusStoreException(e);
+                throw new CertStatusStoreException(e.getMessage(), e);
             }
 
             X509CRL deltaCrl = null;
@@ -399,7 +399,7 @@ public class CrlCertStatusStore extends CertStatusStore
                 encodedCaCert = caCert.getEncoded();
             } catch (CertificateEncodingException e)
             {
-                throw new CertStatusStoreException(e);
+                throw new CertStatusStoreException(e.getMessage(), e);
             }
 
             Certificate bcCaCert = Certificate.getInstance(encodedCaCert);
@@ -409,7 +409,7 @@ public class CrlCertStatusStore extends CertStatusStore
                 encodedName = bcCaCert.getSubject().getEncoded("DER");
             } catch (IOException e)
             {
-                throw new CertStatusStoreException(e);
+                throw new CertStatusStoreException(e.getMessage(), e);
             }
 
             byte[] encodedKey = bcCaCert.getSubjectPublicKeyInfo().getPublicKeyData().getBytes();
@@ -582,7 +582,7 @@ public class CrlCertStatusStore extends CertStatusStore
                             invalidityTime = gTime.getDate();
                         } catch (ParseException e)
                         {
-                            throw new CertStatusStoreException(e);
+                            throw new CertStatusStoreException(e.getMessage(), e);
                         }
 
                         if(revTime.equals(invalidityTime))
@@ -719,7 +719,7 @@ public class CrlCertStatusStore extends CertStatusStore
             encodedCert = cert.getEncoded();
         } catch (IOException e)
         {
-            throw new CertStatusStoreException(e);
+            throw new CertStatusStoreException(e.getMessage(), e);
         }
 
         Map<HashAlgoType, byte[]> certHashes = new ConcurrentHashMap<>();

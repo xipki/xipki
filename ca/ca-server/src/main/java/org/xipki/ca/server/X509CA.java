@@ -1540,7 +1540,7 @@ public class X509CA
                 return true;
             } catch (SQLException | OperationException e)
             {
-                throw new CAMgmtException(e);
+                throw new CAMgmtException(e.getMessage(), e);
             }
         }
 
@@ -1551,7 +1551,7 @@ public class X509CA
                 certstore.clearPublishQueue(caInfo.getCertificate(), publisherName);
             } catch (SQLException | OperationException e)
             {
-                throw new CAMgmtException(e);
+                throw new CAMgmtException(e.getMessage(), e);
             }
         }
 

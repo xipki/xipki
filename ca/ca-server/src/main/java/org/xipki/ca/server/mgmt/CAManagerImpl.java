@@ -376,7 +376,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
             this.certstore = new CertificateStore(dataSource);
         } catch (SQLException e)
         {
-            throw new CAMgmtException(e);
+            throw new CAMgmtException(e.getMessage(), e);
         }
 
         initDataObjects();
@@ -975,7 +975,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
             }
         }catch(SQLException e)
         {
-            throw new CAMgmtException(e);
+            throw new CAMgmtException(e.getMessage(), e);
         }finally
         {
             dataSource.releaseResources(stmt, rs);
@@ -1035,7 +1035,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
 
         }catch(SQLException e)
         {
-            throw new CAMgmtException(e);
+            throw new CAMgmtException(e.getMessage(), e);
         }finally
         {
             dataSource.releaseResources(stmt, rs);
@@ -1058,7 +1058,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
             return SecurityUtil.parseCert(encodedCert);
         } catch (CertificateException | IOException e)
         {
-            throw new CAMgmtException(e);
+            throw new CAMgmtException(e.getMessage(), e);
         }
     }
 
@@ -1086,7 +1086,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
             }
         }catch(SQLException e)
         {
-            throw new CAMgmtException(e);
+            throw new CAMgmtException(e.getMessage(), e);
         }finally
         {
             dataSource.releaseResources(stmt, rs);
@@ -1123,7 +1123,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
             }
         }catch(SQLException e)
         {
-            throw new CAMgmtException(e);
+            throw new CAMgmtException(e.getMessage(), e);
         }finally
         {
             dataSource.releaseResources(stmt, rs);
@@ -1185,7 +1185,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
             }
         }catch(SQLException e)
         {
-            throw new CAMgmtException(e);
+            throw new CAMgmtException(e.getMessage(), e);
         } finally
         {
             dataSource.releaseResources(stmt, rs);
@@ -1260,7 +1260,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
             }
         }catch(SQLException e)
         {
-            throw new CAMgmtException(e);
+            throw new CAMgmtException(e.getMessage(), e);
         }finally
         {
             dataSource.releaseResources(stmt, rs);
@@ -1309,7 +1309,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
             }
         }catch(SQLException | ConfigurationException e)
         {
-            throw new CAMgmtException(e);
+            throw new CAMgmtException(e.getMessage(), e);
         }finally
         {
             dataSource.releaseResources(stmt, rs);
@@ -1367,7 +1367,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
             }
         }catch(SQLException e)
         {
-            throw new CAMgmtException(e);
+            throw new CAMgmtException(e.getMessage(), e);
         }finally
         {
             dataSource.releaseResources(stmt, rs);
@@ -1584,7 +1584,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
             rs = null;
         }catch(SQLException e)
         {
-            throw new CAMgmtException(e);
+            throw new CAMgmtException(e.getMessage(), e);
         }finally
         {
             dataSource.releaseResources(stmt, null);
@@ -1656,10 +1656,10 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
             }
         }catch(SQLException e)
         {
-            throw new CAMgmtException(e);
+            throw new CAMgmtException(e.getMessage(), e);
         } catch (CertificateEncodingException e)
         {
-            throw new CAMgmtException(e);
+            throw new CAMgmtException(e.getMessage(), e);
         }finally
         {
             dataSource.releaseResources(ps, null);
@@ -1805,7 +1805,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
             ps.executeUpdate();
         }catch(SQLException | CertificateEncodingException e)
         {
-            throw new CAMgmtException(e);
+            throw new CAMgmtException(e.getMessage(), e);
         }finally
         {
             dataSource.releaseResources(ps, null);
@@ -1831,7 +1831,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
             ps.executeUpdate();
         }catch(SQLException e)
         {
-            throw new CAMgmtException(e);
+            throw new CAMgmtException(e.getMessage(), e);
         }finally
         {
             dataSource.releaseResources(ps, null);
@@ -1855,7 +1855,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
             ps.executeUpdate();
         }catch(SQLException e)
         {
-            throw new CAMgmtException(e);
+            throw new CAMgmtException(e.getMessage(), e);
         }finally
         {
             dataSource.releaseResources(ps, null);
@@ -1897,7 +1897,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
             ps.executeUpdate();
         }catch(SQLException e)
         {
-            throw new CAMgmtException(e);
+            throw new CAMgmtException(e.getMessage(), e);
         }finally
         {
             dataSource.releaseResources(ps, null);
@@ -1920,7 +1920,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
             ps.executeUpdate();
         }catch(SQLException e)
         {
-            throw new CAMgmtException(e);
+            throw new CAMgmtException(e.getMessage(), e);
         }finally
         {
             dataSource.releaseResources(ps, null);
@@ -1962,7 +1962,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
             ps.executeUpdate();
         }catch(SQLException e)
         {
-            throw new CAMgmtException(e);
+            throw new CAMgmtException(e.getMessage(), e);
         }finally
         {
             dataSource.releaseResources(ps, null);
@@ -2011,7 +2011,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
             ps.executeUpdate();
         }catch(SQLException | CertificateEncodingException e)
         {
-            throw new CAMgmtException(e);
+            throw new CAMgmtException(e.getMessage(), e);
         }finally
         {
             dataSource.releaseResources(ps, null);
@@ -2042,7 +2042,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
             }
         }catch(SQLException e)
         {
-            throw new CAMgmtException(e);
+            throw new CAMgmtException(e.getMessage(), e);
         }finally
         {
             dataSource.releaseResources(ps, null);
@@ -2071,7 +2071,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
             ps.executeUpdate();
         }catch(SQLException e)
         {
-            throw new CAMgmtException(e);
+            throw new CAMgmtException(e.getMessage(), e);
         }finally
         {
             dataSource.releaseResources(ps, null);
@@ -2099,7 +2099,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
             }
         }catch(SQLException e)
         {
-            throw new CAMgmtException(e);
+            throw new CAMgmtException(e.getMessage(), e);
         }finally
         {
             dataSource.releaseResources(ps, null);
@@ -2158,7 +2158,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
             ps.executeUpdate();
         }catch(SQLException e)
         {
-            throw new CAMgmtException(e);
+            throw new CAMgmtException(e.getMessage(), e);
         }finally
         {
             dataSource.releaseResources(ps, null);
@@ -2191,7 +2191,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
             ps.executeUpdate();
         }catch(SQLException e)
         {
-            throw new CAMgmtException(e);
+            throw new CAMgmtException(e.getMessage(), e);
         }finally
         {
             dataSource.releaseResources(ps, null);
@@ -2238,7 +2238,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
             ps.executeUpdate();
         }catch(SQLException e)
         {
-            throw new CAMgmtException(e);
+            throw new CAMgmtException(e.getMessage(), e);
         }finally
         {
             dataSource.releaseResources(ps, null);
@@ -2269,7 +2269,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
             ps.executeUpdate();
         }catch(SQLException e)
         {
-            throw new CAMgmtException(e);
+            throw new CAMgmtException(e.getMessage(), e);
         }finally
         {
             dataSource.releaseResources(ps, null);
@@ -2313,7 +2313,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
             ps.executeUpdate();
         }catch(SQLException | CertificateEncodingException e)
         {
-            throw new CAMgmtException(e);
+            throw new CAMgmtException(e.getMessage(), e);
         }finally
         {
             dataSource.releaseResources(ps, null);
@@ -2332,7 +2332,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
             stmt.execute("DELETE FROM responder");
         } catch (SQLException e)
         {
-            throw new CAMgmtException(e);
+            throw new CAMgmtException(e.getMessage(), e);
         }finally
         {
             dataSource.releaseResources(stmt, null);
@@ -2384,7 +2384,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
             ps.executeUpdate();
         }catch(SQLException e)
         {
-            throw new CAMgmtException(e);
+            throw new CAMgmtException(e.getMessage(), e);
         }finally
         {
             dataSource.releaseResources(ps, null);
@@ -2429,7 +2429,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
             ps.executeUpdate();
         }catch(SQLException | CertificateEncodingException e)
         {
-            throw new CAMgmtException(e);
+            throw new CAMgmtException(e.getMessage(), e);
         }finally
         {
             dataSource.releaseResources(ps, null);
@@ -2460,7 +2460,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
             ps.executeUpdate();
         }catch(SQLException e)
         {
-            throw new CAMgmtException(e);
+            throw new CAMgmtException(e.getMessage(), e);
         }finally
         {
             dataSource.releaseResources(ps, null);
@@ -2523,7 +2523,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
             ps.executeUpdate();
         }catch(SQLException e)
         {
-            throw new CAMgmtException(e);
+            throw new CAMgmtException(e.getMessage(), e);
         }finally
         {
             dataSource.releaseResources(ps, null);
@@ -2568,7 +2568,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
             ps.executeUpdate();
         }catch(SQLException e)
         {
-            throw new CAMgmtException(e);
+            throw new CAMgmtException(e.getMessage(), e);
         }finally
         {
             dataSource.releaseResources(ps, null);
@@ -2598,7 +2598,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
             ps.executeUpdate();
         }catch(SQLException e)
         {
-            throw new CAMgmtException(e);
+            throw new CAMgmtException(e.getMessage(), e);
         }finally
         {
             dataSource.releaseResources(ps, null);
@@ -2661,7 +2661,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
             ps.executeUpdate();
         }catch(SQLException e)
         {
-            throw new CAMgmtException(e);
+            throw new CAMgmtException(e.getMessage(), e);
         }finally
         {
             dataSource.releaseResources(ps, null);
@@ -2707,7 +2707,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
             ps.executeUpdate();
         }catch(SQLException e)
         {
-            throw new CAMgmtException(e);
+            throw new CAMgmtException(e.getMessage(), e);
         }finally
         {
             dataSource.releaseResources(ps, null);
@@ -2751,7 +2751,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
             ps.executeUpdate();
         }catch(SQLException e)
         {
-            throw new CAMgmtException(e);
+            throw new CAMgmtException(e.getMessage(), e);
         }finally
         {
             dataSource.releaseResources(ps, null);
@@ -2770,7 +2770,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
             stmt.execute("DELETE FROM CMPCONTROL");
         }catch(SQLException e)
         {
-            throw new CAMgmtException(e);
+            throw new CAMgmtException(e.getMessage(), e);
         }finally
         {
             dataSource.releaseResources(stmt, null);
@@ -2843,7 +2843,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
             ps.executeUpdate();
         }catch(SQLException e)
         {
-            throw new CAMgmtException(e);
+            throw new CAMgmtException(e.getMessage(), e);
         }finally
         {
             dataSource.releaseResources(ps, null);
@@ -2886,7 +2886,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
             ps.executeUpdate();
         }catch(SQLException e)
         {
-            throw new CAMgmtException(e);
+            throw new CAMgmtException(e.getMessage(), e);
         }finally
         {
             dataSource.releaseResources(ps, null);
@@ -2908,7 +2908,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
             ps.executeUpdate();
         }catch(SQLException e)
         {
-            throw new CAMgmtException(e);
+            throw new CAMgmtException(e.getMessage(), e);
         }finally
         {
             dataSource.releaseResources(ps, null);
@@ -2939,7 +2939,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
             ps.executeUpdate();
         }catch(SQLException e)
         {
-            throw new CAMgmtException(e);
+            throw new CAMgmtException(e.getMessage(), e);
         }finally
         {
             dataSource.releaseResources(ps, null);
@@ -3122,7 +3122,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
             ps.executeUpdate();
         }catch(SQLException e)
         {
-            throw new CAMgmtException(e);
+            throw new CAMgmtException(e.getMessage(), e);
         }finally
         {
             dataSource.releaseResources(ps, null);
@@ -3144,7 +3144,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
             ps.executeUpdate();
         }catch(SQLException e)
         {
-            throw new CAMgmtException(e);
+            throw new CAMgmtException(e.getMessage(), e);
         }finally
         {
             dataSource.releaseResources(ps, null);
@@ -3197,7 +3197,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
             ps.executeUpdate();
         }catch(SQLException e)
         {
-            exception = new CAMgmtException(e);
+            exception = new CAMgmtException(e.getMessage(), e);
         }finally
         {
             dataSource.releaseResources(ps, null);
@@ -3221,7 +3221,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
                 LOG.debug(message, e);
                 if(exception == null)
                 {
-                    exception = new CAMgmtException(e);
+                    exception = new CAMgmtException(e.getMessage(), e);
                 }
             }
         }
@@ -3262,7 +3262,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
                     certprofile == null ? "UNKNOWN" : certprofile);
         } catch (CertificateEncodingException e)
         {
-            throw new CAMgmtException(e);
+            throw new CAMgmtException(e.getMessage(), e);
         }
         ca.publishCertificate(ci);
     }
@@ -3399,7 +3399,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
             ps.executeUpdate();
         }catch(SQLException e)
         {
-            throw new CAMgmtException(e);
+            throw new CAMgmtException(e.getMessage(), e);
         }finally
         {
             dataSource.releaseResources(ps, null);
@@ -3445,7 +3445,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
             ps.executeUpdate();
         }catch(SQLException e)
         {
-            throw new CAMgmtException(e);
+            throw new CAMgmtException(e.getMessage(), e);
         }finally
         {
             dataSource.releaseResources(ps, null);
@@ -3519,7 +3519,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
                 return true;
             } catch (SQLException | OperationException e)
             {
-                throw new CAMgmtException(e);
+                throw new CAMgmtException(e.getMessage(), e);
             }
         }
         else
@@ -3731,7 +3731,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
             certProfile = getIdentifiedCertProfile(certprofileName);
         } catch (CertProfileException e)
         {
-            throw new CAMgmtException(e);
+            throw new CAMgmtException(e.getMessage(), e);
         }
 
         if(certProfile == null)

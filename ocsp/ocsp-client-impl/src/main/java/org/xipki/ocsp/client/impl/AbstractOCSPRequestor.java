@@ -182,7 +182,7 @@ public abstract class AbstractOCSPRequestor implements OCSPRequestor
             return ocspResp;
         } catch (IOException | OCSPException e)
         {
-            throw new OCSPRequestorException(e);
+            throw new OCSPRequestorException(e.getMessage(), e);
         }
     }
 
@@ -240,7 +240,7 @@ public abstract class AbstractOCSPRequestor implements OCSPRequestor
                 extn = new Extension(id_pkix_ocsp_prefSigAlgs, false, new DEROctetString(extnValue));
             } catch (IOException e)
             {
-                throw new OCSPRequestorException(e);
+                throw new OCSPRequestorException(e.getMessage(), e);
             }
             extensions.add(extn);
         }
@@ -326,7 +326,7 @@ public abstract class AbstractOCSPRequestor implements OCSPRequestor
             }
         } catch (OCSPException | CertificateEncodingException | IOException e)
         {
-            throw new OCSPRequestorException(e);
+            throw new OCSPRequestorException(e.getMessage(), e);
         }
     }
 
