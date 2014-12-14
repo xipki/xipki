@@ -81,7 +81,7 @@ public class P10RequestGenerator
             contentSigner = signer.borrowContentSigner();
         } catch (NoIdleSignerException e)
         {
-            throw new SignerException(e);
+            throw new SignerException(e.getMessage(), e);
         }
         try
         {

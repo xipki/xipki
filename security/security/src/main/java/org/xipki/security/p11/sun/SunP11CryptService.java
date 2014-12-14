@@ -207,7 +207,7 @@ public final class SunP11CryptService implements P11CryptService
                         keystore.load(null, singlePassword);
                     } catch (Exception e)
                     {
-                        throw new SignerException(e);
+                        throw new SignerException(e.getMessage(), e);
                     }
                 }
 

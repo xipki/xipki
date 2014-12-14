@@ -81,7 +81,7 @@ public class P11PrivateKey implements PrivateKey
             publicKey = p11CryptService.getPublicKey(slotId, keyId);
         } catch (SignerException e)
         {
-            throw new InvalidKeyException(e);
+            throw new InvalidKeyException(e.getMessage(), e);
         }
 
         if(publicKey instanceof RSAPublicKey)

@@ -323,7 +323,7 @@ public final class RAWorkerImpl extends AbstractRAWorker implements RAWorker
 
                 if(devMode == false)
                 {
-                    throw new ConfigurationException(e);
+                    throw new ConfigurationException(e.getMessage(), e);
                 }
             }
         }
@@ -347,7 +347,7 @@ public final class RAWorkerImpl extends AbstractRAWorker implements RAWorker
                     requestorCerts.put(name, requestorCert);
                 } catch (Exception e)
                 {
-                    throw new ConfigurationException(e);
+                    throw new ConfigurationException(e.getMessage(), e);
                 }
             }
 
@@ -361,7 +361,7 @@ public final class RAWorkerImpl extends AbstractRAWorker implements RAWorker
                     requestorSigners.put(name, requestorSigner);
                 } catch (SignerException e)
                 {
-                    throw new ConfigurationException(e);
+                    throw new ConfigurationException(e.getMessage(), e);
                 }
             } else
             {
@@ -583,7 +583,7 @@ public final class RAWorkerImpl extends AbstractRAWorker implements RAWorker
             result = ca.getRequestor().requestCertificate(request, username);
         } catch (CmpRequestorException e)
         {
-            throw new RAWorkerException(e);
+            throw new RAWorkerException(e.getMessage(), e);
         }
 
         if(result instanceof ErrorResultType)
@@ -696,7 +696,7 @@ public final class RAWorkerImpl extends AbstractRAWorker implements RAWorker
             result = cmpRequestor.revokeCertificate(request);
         } catch (CmpRequestorException e)
         {
-            throw new RAWorkerException(e);
+            throw new RAWorkerException(e.getMessage(), e);
         }
 
         return parseRevokeCertResult(result);
@@ -768,7 +768,7 @@ public final class RAWorkerImpl extends AbstractRAWorker implements RAWorker
             result = crlNumber == null ? requestor.downloadCurrentCRL() : requestor.downloadCRL(crlNumber);
         } catch (CmpRequestorException e)
         {
-            throw new RAWorkerException(e);
+            throw new RAWorkerException(e.getMessage(), e);
         }
 
         if(result instanceof ErrorResultType)
@@ -804,7 +804,7 @@ public final class RAWorkerImpl extends AbstractRAWorker implements RAWorker
             result = requestor.generateCRL();
         } catch (CmpRequestorException e)
         {
-            throw new RAWorkerException(e);
+            throw new RAWorkerException(e.getMessage(), e);
         }
 
         if(result instanceof ErrorResultType)
@@ -1058,7 +1058,7 @@ public final class RAWorkerImpl extends AbstractRAWorker implements RAWorker
             return pkiMessage.getEncoded();
         } catch (CmpRequestorException | IOException e)
         {
-            throw new RAWorkerException(e);
+            throw new RAWorkerException(e.getMessage(), e);
         }
     }
 
@@ -1122,7 +1122,7 @@ public final class RAWorkerImpl extends AbstractRAWorker implements RAWorker
             result = cmpRequestor.unrevokeCertificate(request);
         } catch (CmpRequestorException e)
         {
-            throw new RAWorkerException(e);
+            throw new RAWorkerException(e.getMessage(), e);
         }
 
         return parseRevokeCertResult(result);
@@ -1180,7 +1180,7 @@ public final class RAWorkerImpl extends AbstractRAWorker implements RAWorker
             result = cmpRequestor.removeCertificate(request);
         } catch (CmpRequestorException e)
         {
-            throw new RAWorkerException(e);
+            throw new RAWorkerException(e.getMessage(), e);
         }
 
         return parseRevokeCertResult(result);
@@ -1211,7 +1211,7 @@ public final class RAWorkerImpl extends AbstractRAWorker implements RAWorker
             return requestor.removeExpiredCerts(certProfile, userLike, overlapSeconds);
         } catch (CmpRequestorException e)
         {
-            throw new RAWorkerException(e);
+            throw new RAWorkerException(e.getMessage(), e);
         }
     }
 
