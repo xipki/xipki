@@ -151,7 +151,7 @@ class RSADigestSignatureSpi
         }
         catch (Exception e)
         {
-            throw new SignatureException(e.toString());
+            throw new SignatureException(e.getMessage(), e);
         }
     }
 

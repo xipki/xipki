@@ -448,7 +448,7 @@ public abstract class RemoteP11CryptService implements P11CryptService
                 asn1SlotId = SlotIdentifier.getInstance(obj);
             }catch(Exception e)
             {
-                throw new SignerException(e);
+                throw new SignerException(e.getMessage(), e);
             }
 
             P11SlotIdentifier slotId = asn1SlotId.getSlotId();

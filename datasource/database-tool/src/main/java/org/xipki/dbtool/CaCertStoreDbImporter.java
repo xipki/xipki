@@ -696,7 +696,7 @@ class CaCertStoreDbImporter extends DbPorter
                     }
                     else
                     {
-                        throw new CertificateException(e);
+                        throw new CertificateException(e.getMessage(), e);
                     }
                 }
 
