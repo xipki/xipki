@@ -33,68 +33,42 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.certprofile.dflt;
+package org.xipki.ca.server.certprofile.x509;
 
 import java.util.List;
-import java.util.regex.Pattern;
+import java.util.Set;
 
+import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.xipki.ca.api.EnvironmentParameterResolver;
+import org.xipki.ca.server.certprofile.Condition;
+import org.xipki.common.ParamChecker;
 
 /**
  * @author Lijun Liao
  */
 
-public class SubjectDNOption
+class ExtKeyUsageOptions
 {
-    private final List<AddText> addprefixes;
-    private final List<AddText> addsufixes;
-    private final Pattern pattern;
+    private final List<ExtKeyUsageOption> options;
 
-    public SubjectDNOption(List<AddText> addprefixes, List<AddText> addsufixes, Pattern pattern)
+    public ExtKeyUsageOptions(List<ExtKeyUsageOption> options)
     {
-        this.addprefixes = addprefixes;
-        this.addsufixes = addsufixes;
-        this.pattern = pattern;
+        ParamChecker.assertNotEmpty("options", options);
+        this.options = options;
     }
 
-    public AddText getAddprefix(EnvironmentParameterResolver pr)
+    public Set<ASN1ObjectIdentifier> getExtKeyusage(EnvironmentParameterResolver pr)
     {
-        return getAddText(addprefixes, pr);
-    }
-
-    public AddText getAddsufix(EnvironmentParameterResolver pr)
-    {
-        return getAddText(addsufixes, pr);
-    }
-
-    private static AddText getAddText(List<AddText> list, EnvironmentParameterResolver pr)
-    {
-        if(list == null || list.isEmpty())
+        for(ExtKeyUsageOption o : options)
         {
-            return null;
-        }
-
-        for(AddText e : list)
-        {
-            if(e.getCondition() == null)
+            Condition c = o.getCondition();
+            if(c == null || c.satisfy(pr))
             {
-                return e;
-            }
-
-            Condition c = e.getCondition();
-
-            if(c.satisfy(pr))
-            {
-                return e;
+                return o.getExtKeyusages();
             }
         }
 
         return null;
-    }
-
-    public Pattern getPattern()
-    {
-        return pattern;
     }
 
 }

@@ -33,31 +33,42 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.certprofile.dflt;
+package org.xipki.ca.server.certprofile.x509;
+
+import java.util.List;
+import java.util.Set;
+
+import org.xipki.ca.api.EnvironmentParameterResolver;
+import org.xipki.ca.api.profile.x509.KeyUsage;
+import org.xipki.ca.server.certprofile.Condition;
+import org.xipki.common.ParamChecker;
 
 /**
  * @author Lijun Liao
  */
 
-public class AddText
+class KeyUsageOptions
 {
-    private final Condition condition;
-    private final String text;
+    private final List<KeyUsageOption> options;
 
-    public AddText(Condition condition, String text)
+    public KeyUsageOptions(List<KeyUsageOption> options)
     {
-        this.condition = condition;
-        this.text = text;
+        ParamChecker.assertNotEmpty("options", options);
+        this.options = options;
     }
 
-    public Condition getCondition()
+    public Set<KeyUsage> getKeyusage(EnvironmentParameterResolver pr)
     {
-        return condition;
-    }
+        for(KeyUsageOption o : options)
+        {
+            Condition c = o.getCondition();
+            if(c == null || c.satisfy(pr))
+            {
+                return o.getKeyusages();
+            }
+        }
 
-    public String getText()
-    {
-        return text;
+        return null;
     }
 
 }

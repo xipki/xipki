@@ -51,6 +51,7 @@ import org.xipki.ca.api.profile.ExtensionTuples;
 import org.xipki.ca.api.profile.SubjectInfo;
 import org.xipki.ca.api.profile.x509.X509CertProfile;
 import org.xipki.ca.api.profile.x509.SpecialX509CertProfileBehavior;
+import org.xipki.ca.server.certprofile.x509.DefaultX509CertProfile;
 import org.xipki.ca.server.mgmt.api.CertProfileEntry;
 import org.xipki.common.ParamChecker;
 
@@ -60,8 +61,6 @@ import org.xipki.common.ParamChecker;
 
 public class IdentifiedX509CertProfile
 {
-    private static final String CLASSNAME_XML = "org.xipki.certprofile.dflt.x509.DefaultX509CertProfile";
-
     private final String realType;
     private final CertProfileEntry entry;
     private final Object initlock = new Object();
@@ -101,26 +100,26 @@ public class IdentifiedX509CertProfile
             String className;
             if(type.equalsIgnoreCase("xml"))
             {
-                className = CLASSNAME_XML;
+                tmpCertProfile = new DefaultX509CertProfile();
             }
             else if(type.toLowerCase().startsWith("java:"))
             {
                 className = type.substring("java:".length());
+                try
+                {
+                    Class<?> clazz = Class.forName(className);
+                    tmpCertProfile = (X509CertProfile) clazz.newInstance();
+                }catch(ClassNotFoundException | InstantiationException  | IllegalAccessException | ClassCastException e)
+                {
+                    throw new CertProfileException("invalid type " + type + ", " + e.getClass().getName() +
+                            ": " + e.getMessage());
+                }
             }
             else
             {
                 throw new CertProfileException("invalid type " + type);
             }
 
-            try
-            {
-                Class<?> clazz = Class.forName(className);
-                tmpCertProfile = (X509CertProfile) clazz.newInstance();
-            }catch(ClassNotFoundException | InstantiationException  | IllegalAccessException | ClassCastException e)
-            {
-                throw new CertProfileException("invalid type " + type + ", " + e.getClass().getName() +
-                        ": " + e.getMessage());
-            }
             tmpCertProfile.initialize(entry.getConf());
 
             if(parameterResolver != null)
