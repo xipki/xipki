@@ -33,32 +33,44 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.certprofile.dflt;
+package org.xipki.ca.server.certprofile;
 
 /**
  * @author Lijun Liao
  */
 
-public enum GeneralNameTag
+public class KeyParamRange
 {
-    otherName(0),
-    rfc822Name(1),
-    dNSName(2),
-    x400Adress(3),
-    directoryName(4),
-    ediPartyName(5),
-    uniformResourceIdentifier(6),
-    iPAddress(7),
-    registeredID(8);
+    private final Integer min;
+    private final Integer max;
 
-    private final int tag;
-    private GeneralNameTag(int tag)
+    public KeyParamRange(Integer min, Integer max)
     {
-        this.tag = tag;
+        this.min = min;
+        this.max = max;
     }
 
-    public int getTag()
+    public Integer getMin()
     {
-        return tag;
+        return min;
+    }
+
+    public Integer getMax()
+    {
+        return max;
+    }
+
+    public boolean match(int i)
+    {
+        if(min != null && i < min)
+        {
+            return false;
+        }
+        if(max != null && i > max)
+        {
+            return false;
+        }
+
+        return true;
     }
 }

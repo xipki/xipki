@@ -42,7 +42,6 @@
     <feature>xipki-cabase</feature>
     <feature>xipki-audit</feature>
     <bundle>mvn:org.xipki/ca-mgmt-api/${project.version}</bundle>
-    <bundle>mvn:org.xipki/certprofile-dflt/${project.version}</bundle>
     <bundle>mvn:org.xipki/ca-server/${project.version}</bundle>
   </feature>
   <feature name="xipki-camgmt-shell" version="${project.version}" resolver="(obr)">

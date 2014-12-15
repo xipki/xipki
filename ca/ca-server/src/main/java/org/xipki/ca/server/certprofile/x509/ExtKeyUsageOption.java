@@ -33,43 +33,36 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.certprofile.dflt;
+package org.xipki.ca.server.certprofile.x509;
 
-import java.util.Collections;
 import java.util.Set;
 
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
+import org.xipki.ca.server.certprofile.Condition;
 
 /**
  * @author Lijun Liao
  */
 
-public class GeneralNameMode
+class ExtKeyUsageOption
 {
-    private final GeneralNameTag tag;
-    // not applied to all tags, currently only for tag otherName
-    private final Set<ASN1ObjectIdentifier> allowedTypes;
+    private final Condition condition;
+    private final Set<ASN1ObjectIdentifier> extKeyusages;
 
-    public GeneralNameMode(GeneralNameTag tag)
+    public ExtKeyUsageOption(Condition condition, Set<ASN1ObjectIdentifier> extKeyusages)
     {
-        this.tag = tag;
-        this.allowedTypes = null;
+        this.condition = condition;
+        this.extKeyusages = extKeyusages;
     }
 
-    public GeneralNameMode(GeneralNameTag tag, Set<ASN1ObjectIdentifier> allowedTypes)
+    public Condition getCondition()
     {
-        this.tag = tag;
-        this.allowedTypes = allowedTypes == null ? null : Collections.unmodifiableSet(allowedTypes);
+        return condition;
     }
 
-    public GeneralNameTag getTag()
+    public Set<ASN1ObjectIdentifier> getExtKeyusages()
     {
-        return tag;
-    }
-
-    public Set<ASN1ObjectIdentifier> getAllowedTypes()
-    {
-        return allowedTypes;
+        return extKeyusages;
     }
 
 }

@@ -33,15 +33,15 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.certprofile.dflt;
+package org.xipki.ca.server.certprofile;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import org.xipki.ca.api.EnvironmentParameterResolver;
-import org.xipki.certprofile.dflt.x509.jaxb.ConditionType;
-import org.xipki.certprofile.dflt.x509.jaxb.EnvParamType;
-import org.xipki.certprofile.dflt.x509.jaxb.OperatorType;
+import org.xipki.ca.server.certprofile.x509.jaxb.ConditionType;
+import org.xipki.ca.server.certprofile.x509.jaxb.EnvParamType;
+import org.xipki.ca.server.certprofile.x509.jaxb.OperatorType;
 
 /**
  * @author Lijun Liao
