@@ -47,6 +47,9 @@
             <Import-Package>
               sun.security.pkcs11;resolution:=optional,
               sun.security.pkcs11.wrapper;resolution:=optional,
+              iaik.pkcs.pkcs11;resolution:=optional,
+              iaik.pkcs.pkcs11.objects;resolution:=optional,
+              iaik.pkcs.pkcs11.wrapper;resolution:=optional,
               *
             </Import-Package>
           </instructions>
