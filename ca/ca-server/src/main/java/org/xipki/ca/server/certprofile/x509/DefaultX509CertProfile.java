@@ -430,19 +430,20 @@ public class DefaultX509CertProfile extends AbstractX509CertProfile
                             getInt(t.getMinOccurs(), 1), getInt(t.getMaxOccurs(), 1));
                     this.subjectDNOccurrences.add(occ);
 
-                    Pattern pattern = null;
-                    if(t.getConstraint() != null)
+                    List<Pattern> patterns = null;
+                    if(t.getRegex().isEmpty() == false)
                     {
-                        String regex = t.getConstraint().getRegex();
-                        if(regex != null)
+                        patterns = new LinkedList<>();
+                        for(String regex : t.getRegex())
                         {
-                            pattern = Pattern.compile(regex);
+                            Pattern pattern = Pattern.compile(regex);
+                            patterns.add(pattern);
                         }
                     }
 
                     List<AddText> addprefixes = buildAddText(t.getAddPrefix());
                     List<AddText> addsuffixes = buildAddText(t.getAddSuffix());
-                    SubjectDNOption option = new SubjectDNOption(addprefixes, addsuffixes, pattern);
+                    SubjectDNOption option = new SubjectDNOption(addprefixes, addsuffixes, patterns);
                     this.subjectDNOptions.put(type, option);
                 }
             }
@@ -1159,7 +1160,7 @@ public class DefaultX509CertProfile extends AbstractX509CertProfile
             if(n == 1)
             {
                 String value = SecurityUtil.rdnValueToString(thisRDNs[0].getFirst().getValue());
-                rdns.add(createSubjectRDN(value, type));
+                rdns.add(createSubjectRDN(value, type, 0));
             }
             else
             {
@@ -1170,9 +1171,10 @@ public class DefaultX509CertProfile extends AbstractX509CertProfile
                 }
                 values = sortRDNs(type, values);
 
+                int i = 0;
                 for(String value : values)
                 {
-                    rdns.add(createSubjectRDN(value, type));
+                    rdns.add(createSubjectRDN(value, type, i++));
                 }
             }
         }
@@ -1182,7 +1184,7 @@ public class DefaultX509CertProfile extends AbstractX509CertProfile
     }
 
     @Override
-    protected RDN createSubjectRDN(String text, ASN1ObjectIdentifier type)
+    protected RDN createSubjectRDN(String text, ASN1ObjectIdentifier type, int index)
     throws BadCertTemplateException
     {
         text = text.trim();
@@ -1217,11 +1219,15 @@ public class DefaultX509CertProfile extends AbstractX509CertProfile
                 }
             }
 
-            Pattern p = option.getPattern();
-            if(p != null && p.matcher(text).matches() == false)
+            List<Pattern> patterns = option.getPatterns();
+            if(patterns != null)
             {
-                throw new BadCertTemplateException("invalid subject " + ObjectIdentifiers.oidToDisplayName(type) +
-                        " '" + text + "' against regex '" + p.pattern() + "'");
+                Pattern p = patterns.get(index);
+                if(p.matcher(text).matches() == false)
+                {
+                    throw new BadCertTemplateException("invalid subject " + ObjectIdentifiers.oidToDisplayName(type) +
+                            " '" + text + "' against regex '" + p.pattern() + "'");
+                }
             }
 
             StringBuilder sb = new StringBuilder();
@@ -1248,6 +1254,43 @@ public class DefaultX509CertProfile extends AbstractX509CertProfile
         }
 
         return new RDN(type, dnValue);
+    }
+
+    @Override
+    protected String[] sortRDNs(ASN1ObjectIdentifier type, String[] values)
+    {
+        SubjectDNOption option = subjectDNOptions.get(type);
+        if(option == null)
+        {
+            return values;
+        }
+
+        List<Pattern> patterns = option.getPatterns();
+        if(patterns == null || patterns.isEmpty())
+        {
+            return values;
+        }
+
+        List<String> result = new ArrayList<>(values.length);
+        for(Pattern p : patterns)
+        {
+            for(String value : values)
+            {
+                if(result.contains(value) == false && p.matcher(value).matches())
+                {
+                    result.add(value);
+                }
+            }
+        }
+        for(String value : values)
+        {
+            if(result.contains(value) == false)
+            {
+                result.add(value);
+            }
+        }
+
+        return result.toArray(new String[0]);
     }
 
     @Override

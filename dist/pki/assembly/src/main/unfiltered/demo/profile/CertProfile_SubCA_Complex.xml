@@ -65,9 +65,7 @@
     <incSerialNrIfSubjectExists>false</incSerialNrIfSubjectExists>
     <rdn minOccurs="1" maxOccurs="1">
       <type description="c">2.5.4.6</type>
-      <constraint>
-        <regex>DE|FR</regex>
-      </constraint>
+      <regex>DE|FR</regex>
     </rdn>
     <rdn minOccurs="1" maxOccurs="1">
       <type description="o">2.5.4.10</type>
@@ -77,9 +75,7 @@
     </rdn>
     <rdn minOccurs="0" maxOccurs="1">
       <type description="serialNumber">2.5.4.5</type>
-      <constraint>
-        <regex>[\d]{1,}</regex>
-      </constraint>
+      <regex>[\d]{1,}</regex>
     </rdn>
     <rdn minOccurs="1" maxOccurs="1">
       <type description="cn">2.5.4.3</type>
@@ -164,13 +160,13 @@
       <skipCerts>1</skipCerts>
     </inhibitAnyPolicy>
     <subjectAltName>
-      <rfc822Name/>
-      <dNSName/>
-      <directoryName/>
-      <ediPartyName/>
-      <uniformResourceIdentifier/>
-      <iPAddress/>
-      <registeredID/>
+      <rfc822Name></rfc822Name>
+      <dNSName></dNSName>
+      <directoryName></directoryName>
+      <ediPartyName></ediPartyName>
+      <uniformResourceIdentifier></uniformResourceIdentifier>
+      <iPAddress></iPAddress>
+      <registeredID></registeredID>
       <otherName>
         <type description="o">2.5.4.10</type>
       </otherName>
@@ -179,8 +175,8 @@
       <access>
         <accessMethod description="id-ad-caRepository">1.3.6.1.5.5.7.48.5</accessMethod>
         <accessLocation>
-          <directoryName/>
-          <uniformResourceIdentifier/>
+          <directoryName></directoryName>
+          <uniformResourceIdentifier></uniformResourceIdentifier>
         </accessLocation>
       </access>
     </subjectInfoAccess>

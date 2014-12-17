@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <profile xmlns="http://xipki.org/xmlprofile/v1" onlyForRA="false">
-  <description>CertProfile gSMC_K (C.AK.AUT)</description>
+  <description>CertProfile gSMC_K</description>
   <ca>false</ca>
   <validity>5y</validity>
   <notBeforeTime>current</notBeforeTime>
@@ -72,9 +72,7 @@
     <incSerialNrIfSubjectExists>false</incSerialNrIfSubjectExists>
     <rdn minOccurs="1" maxOccurs="1">
       <type description="c">2.5.4.6</type>
-      <constraint>
-        <regex>DE</regex>
-      </constraint>
+      <regex>DE</regex>
     </rdn>
     <rdn minOccurs="1" maxOccurs="1">
       <type description="o">2.5.4.10</type>
@@ -96,9 +94,7 @@
     </rdn>
     <rdn minOccurs="1" maxOccurs="1">
       <type description="cn">2.5.4.3</type>
-      <constraint>
-        <regex>80276[\d]{15,15}-20\d\d(0[1-9]|1[012])(0[1-9]|[12][0-9]|3[01])</regex>
-      </constraint>
+      <regex>80276[\d]{15,15}-20\d\d(0[1-9]|1[012])(0[1-9]|[12][0-9]|3[01])</regex>
     </rdn>
   </subject>
   <extensions>
@@ -134,8 +130,6 @@
     <admission>
       <professionOid>1.2.276.0.76.4.103</professionOid>
       <professionItem>Anwendungskonnektor</professionItem>
-      <registrationNumber>example.reg.number</registrationNumber>
-      <addProfessionInfo>12ab23cd45ef67</addProfessionInfo>      
     </admission>
   </extensions>
 </profile>

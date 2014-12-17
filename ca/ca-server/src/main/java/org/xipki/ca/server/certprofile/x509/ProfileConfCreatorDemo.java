@@ -90,7 +90,6 @@ import org.xipki.ca.server.certprofile.x509.jaxb.ProfileType;
 import org.xipki.ca.server.certprofile.x509.jaxb.ProfileType.KeyAlgorithms;
 import org.xipki.ca.server.certprofile.x509.jaxb.ProfileType.Parameters;
 import org.xipki.ca.server.certprofile.x509.jaxb.ProfileType.Subject;
-import org.xipki.ca.server.certprofile.x509.jaxb.RdnConstraintType;
 import org.xipki.ca.server.certprofile.x509.jaxb.RdnType;
 import org.xipki.ca.server.certprofile.x509.jaxb.SubjectInfoAccessType;
 import org.xipki.ca.server.certprofile.x509.jaxb.SubjectInfoAccessType.Access;
@@ -193,6 +192,11 @@ public class ProfileConfCreatorDemo
             //gSMC-K
             profile = CertProfile_gSMC_K();
             marshall(m, profile, "CertProfile_gSMC_K.xml");
+
+            //multiple-OUs
+            profile = CertProfile_MultipleOUs();
+            marshall(m, profile, "CertProfile_multipleOUs.xml");
+
         }catch(Exception e)
         {
             e.printStackTrace();
@@ -227,10 +231,10 @@ public class ProfileConfCreatorDemo
         subject.setIncSerialNrIfSubjectExists(false);
 
         List<RdnType> occurrences = subject.getRdn();
-        occurrences.add(createRDN(ObjectIdentifiers.DN_C, 1, 1, "DE|FR"));
+        occurrences.add(createRDN(ObjectIdentifiers.DN_C, 1, 1, new String[]{"DE|FR"}));
         occurrences.add(createRDN(ObjectIdentifiers.DN_O, 1, 1, null));
         occurrences.add(createRDN(ObjectIdentifiers.DN_OU, 0, 1, null));
-        occurrences.add(createRDN(ObjectIdentifiers.DN_SN, 0, 1, REGEX_SN));
+        occurrences.add(createRDN(ObjectIdentifiers.DN_SN, 0, 1, new String[]{REGEX_SN}));
         occurrences.add(createRDN(ObjectIdentifiers.DN_CN, 1, 1, null));
 
         // Extensions
@@ -265,10 +269,10 @@ public class ProfileConfCreatorDemo
         subject.setIncSerialNrIfSubjectExists(false);
 
         List<RdnType> occurrences = subject.getRdn();
-        occurrences.add(createRDN(ObjectIdentifiers.DN_C, 1, 1, "DE|FR"));
+        occurrences.add(createRDN(ObjectIdentifiers.DN_C, 1, 1, new String[]{"DE|FR"}));
         occurrences.add(createRDN(ObjectIdentifiers.DN_O, 1, 1, null));
         occurrences.add(createRDN(ObjectIdentifiers.DN_OU, 0, 1, null));
-        occurrences.add(createRDN(ObjectIdentifiers.DN_SN, 0, 1, REGEX_SN));
+        occurrences.add(createRDN(ObjectIdentifiers.DN_SN, 0, 1, new String[]{REGEX_SN}));
         occurrences.add(createRDN(ObjectIdentifiers.DN_CN, 1, 1, null));
 
         // Extensions
@@ -301,10 +305,10 @@ public class ProfileConfCreatorDemo
         subject.setIncSerialNrIfSubjectExists(false);
 
         List<RdnType> occurrences = subject.getRdn();
-        occurrences.add(createRDN(ObjectIdentifiers.DN_C, 1, 1, "DE|FR"));
+        occurrences.add(createRDN(ObjectIdentifiers.DN_C, 1, 1, new String[]{"DE|FR"}));
         occurrences.add(createRDN(ObjectIdentifiers.DN_O, 1, 1, null));
         occurrences.add(createRDN(ObjectIdentifiers.DN_OU, 0, 1, null));
-        occurrences.add(createRDN(ObjectIdentifiers.DN_SN, 0, 1, REGEX_SN));
+        occurrences.add(createRDN(ObjectIdentifiers.DN_SN, 0, 1, new String[]{REGEX_SN}));
         occurrences.add(createRDN(ObjectIdentifiers.DN_CN, 1, 1, null, "PREFIX ", " SUFFIX"));
 
         // Extensions
@@ -415,10 +419,10 @@ public class ProfileConfCreatorDemo
         subject.setIncSerialNrIfSubjectExists(false);
 
         List<RdnType> occurrences = subject.getRdn();
-        occurrences.add(createRDN(ObjectIdentifiers.DN_C, 1, 1, "DE|FR"));
+        occurrences.add(createRDN(ObjectIdentifiers.DN_C, 1, 1, new String[]{"DE|FR"}));
         occurrences.add(createRDN(ObjectIdentifiers.DN_O, 1, 1, null));
         occurrences.add(createRDN(ObjectIdentifiers.DN_OU, 0, 1, null));
-        occurrences.add(createRDN(ObjectIdentifiers.DN_SN, 0, 1, REGEX_SN));
+        occurrences.add(createRDN(ObjectIdentifiers.DN_SN, 0, 1, new String[]{REGEX_SN}));
         occurrences.add(createRDN(ObjectIdentifiers.DN_CN, 1, 1, null));
 
         // Extensions
@@ -457,11 +461,11 @@ public class ProfileConfCreatorDemo
         subject.setIncSerialNrIfSubjectExists(false);
 
         List<RdnType> occurrences = subject.getRdn();
-        occurrences.add(createRDN(ObjectIdentifiers.DN_C, 1, 1, "DE|FR"));
+        occurrences.add(createRDN(ObjectIdentifiers.DN_C, 1, 1, new String[]{"DE|FR"}));
         occurrences.add(createRDN(ObjectIdentifiers.DN_O, 1, 1, null));
         occurrences.add(createRDN(ObjectIdentifiers.DN_OU, 0, 1, null));
-        occurrences.add(createRDN(ObjectIdentifiers.DN_SN, 0, 1, REGEX_SN));
-        occurrences.add(createRDN(ObjectIdentifiers.DN_CN, 1, 1, REGEX_FQDN));
+        occurrences.add(createRDN(ObjectIdentifiers.DN_SN, 0, 1, new String[]{REGEX_SN}));
+        occurrences.add(createRDN(ObjectIdentifiers.DN_CN, 1, 1, new String[]{REGEX_FQDN}));
 
         // Extensions
         // Extensions - general
@@ -504,10 +508,10 @@ public class ProfileConfCreatorDemo
         subject.setIncSerialNrIfSubjectExists(false);
 
         List<RdnType> occurrences = subject.getRdn();
-        occurrences.add(createRDN(ObjectIdentifiers.DN_C, 1, 1, "DE|FR"));
+        occurrences.add(createRDN(ObjectIdentifiers.DN_C, 1, 1, new String[]{"DE|FR"}));
         occurrences.add(createRDN(ObjectIdentifiers.DN_O, 1, 1, null));
         occurrences.add(createRDN(ObjectIdentifiers.DN_OU, 0, 1, null));
-        occurrences.add(createRDN(ObjectIdentifiers.DN_SN, 0, 1, REGEX_SN));
+        occurrences.add(createRDN(ObjectIdentifiers.DN_SN, 0, 1, new String[]{REGEX_SN}));
         occurrences.add(createRDN(ObjectIdentifiers.DN_CN, 1, 1, null));
 
         // Extensions
@@ -544,11 +548,11 @@ public class ProfileConfCreatorDemo
         subject.setIncSerialNrIfSubjectExists(true);
 
         List<RdnType> occurrences = subject.getRdn();
-        occurrences.add(createRDN(ObjectIdentifiers.DN_C, 1, 1, "DE|FR"));
+        occurrences.add(createRDN(ObjectIdentifiers.DN_C, 1, 1, new String[]{"DE|FR"}));
         occurrences.add(createRDN(ObjectIdentifiers.DN_O, 1, 1, null));
         occurrences.add(createRDN(ObjectIdentifiers.DN_OU, 0, 1, null));
-        occurrences.add(createRDN(ObjectIdentifiers.DN_SN, 0, 1, REGEX_SN));
-        occurrences.add(createRDN(ObjectIdentifiers.DN_CN, 1, 1, REGEX_FQDN));
+        occurrences.add(createRDN(ObjectIdentifiers.DN_SN, 0, 1, new String[]{REGEX_SN}));
+        occurrences.add(createRDN(ObjectIdentifiers.DN_CN, 1, 1, new String[]{REGEX_FQDN}));
 
         // Extensions
         // Extensions - general
@@ -576,12 +580,12 @@ public class ProfileConfCreatorDemo
         return profile;
     }
 
-    private static RdnType createRDN(ASN1ObjectIdentifier type, int min, int max, String regex)
+    private static RdnType createRDN(ASN1ObjectIdentifier type, int min, int max, String[] regexArrays)
     {
-        return createRDN(type, min, max, regex, null, null);
+        return createRDN(type, min, max, regexArrays, null, null);
     }
 
-    private static RdnType createRDN(ASN1ObjectIdentifier type, int min, int max, String regex,
+    private static RdnType createRDN(ASN1ObjectIdentifier type, int min, int max, String[] regexArrays,
             String prefix, String suffix)
     {
         RdnType ret = new RdnType();
@@ -589,11 +593,16 @@ public class ProfileConfCreatorDemo
         ret.setMinOccurs(min);
         ret.setMaxOccurs(max);
 
-        if(regex != null)
+        if(regexArrays != null)
         {
-            RdnConstraintType constraint = new RdnConstraintType();
-            constraint.setRegex(regex);
-            ret.setConstraint(constraint);
+            if(regexArrays.length != max)
+            {
+                throw new IllegalArgumentException("regexArrays.length " + regexArrays.length + " != max " + max);
+            }
+            for(String regex : regexArrays)
+            {
+                ret.getRegex().add(regex);
+            }
         }
 
         if(prefix != null && prefix.isEmpty() == false)
@@ -787,7 +796,7 @@ public class ProfileConfCreatorDemo
     private static ProfileType CertProfile_gSMC_K()
     throws Exception
     {
-        ProfileType profile = getBaseProfile("CertProfile gSMC_K (C.AK.AUT)", false, "5y", false);
+        ProfileType profile = getBaseProfile("CertProfile gSMC_K", false, "5y", false);
         profile.setDuplicateSubjectPermitted(true);
 
         // SpecialBehavior
@@ -806,7 +815,7 @@ public class ProfileConfCreatorDemo
         subject.setIncSerialNrIfSubjectExists(false);
 
         List<RdnType> occurrences = subject.getRdn();
-        occurrences.add(createRDN(ObjectIdentifiers.DN_C, 1, 1, "DE"));
+        occurrences.add(createRDN(ObjectIdentifiers.DN_C, 1, 1, new String[]{"DE"}));
         occurrences.add(createRDN(ObjectIdentifiers.DN_O, 1, 1, null));
         occurrences.add(createRDN(ObjectIdentifiers.DN_OU, 0, 1, null));
         occurrences.add(createRDN(ObjectIdentifiers.DN_ST, 0, 1, null));
@@ -815,7 +824,7 @@ public class ProfileConfCreatorDemo
         occurrences.add(createRDN(ObjectIdentifiers.DN_STREET, 0, 1, null));
         // regex: ICCSN-yyyyMMdd
         String regex = "80276[\\d]{15,15}-20\\d\\d(0[1-9]|1[012])(0[1-9]|[12][0-9]|3[01])";
-        occurrences.add(createRDN(ObjectIdentifiers.DN_CN, 1, 1, regex));
+        occurrences.add(createRDN(ObjectIdentifiers.DN_CN, 1, 1, new String[]{regex}));
 
         // Extensions
         // Extensions - general
@@ -861,6 +870,45 @@ public class ProfileConfCreatorDemo
         extensions.getAdmission().add(admission);
         admission.getProfessionOid().add(createOidType(id_gematik.branch("103")));
         admission.getProfessionItem().add("Anwendungskonnektor");
+
+        return profile;
+    }
+
+    private static ProfileType CertProfile_MultipleOUs()
+    throws Exception
+    {
+        ProfileType profile = getBaseProfile("CertProfile Multiple OUs DEMO", false, "5y", false);
+
+        // Subject
+        Subject subject = profile.getSubject();
+        subject.setIncSerialNrIfSubjectExists(false);
+
+        List<RdnType> occurrences = subject.getRdn();
+        occurrences.add(createRDN(ObjectIdentifiers.DN_C, 1, 1, new String[]{"DE|FR"}));
+        occurrences.add(createRDN(ObjectIdentifiers.DN_O, 1, 1, null));
+
+        final String regex_ou1 = "[A-Z]{1,1}[\\d]{5,5}";
+        final String regex_ou2 = "[\\d]{5,5}";
+        occurrences.add(createRDN(ObjectIdentifiers.DN_OU, 2, 2, new String[]{regex_ou1,regex_ou2}));
+        occurrences.add(createRDN(ObjectIdentifiers.DN_SN, 0, 1, new String[]{REGEX_SN}));
+        occurrences.add(createRDN(ObjectIdentifiers.DN_CN, 1, 1, null));
+
+        // Extensions
+        // Extensions - general
+        ExtensionsType extensions = profile.getExtensions();
+
+        // Extensions - occurrences
+        List<ExtensionType> list = extensions.getExtension();
+        list.add(createExtension(Extension.subjectKeyIdentifier, true));
+        list.add(createExtension(Extension.authorityKeyIdentifier, true));
+        list.add(createExtension(Extension.authorityInfoAccess, false));
+        list.add(createExtension(Extension.cRLDistributionPoints, false));
+        list.add(createExtension(Extension.freshestCRL, false));
+        list.add(createExtension(Extension.keyUsage, true));
+        list.add(createExtension(Extension.basicConstraints, true));
+
+        // Extensions - keyUsage
+        extensions.getKeyUsage().add(createKeyUsages(KeyUsageType.CONTENT_COMMITMENT));
 
         return profile;
     }

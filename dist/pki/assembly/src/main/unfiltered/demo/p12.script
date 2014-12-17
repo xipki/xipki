@@ -122,7 +122,7 @@ ca:ca-add -name SubCAwithCRL1 \
 ca:caalias-add -ca SubCAwithCRL1 -alias SubCAwithCRL
 
 ## Add cert profile to CA
-ca:caprofile-add -ca SubCAwithCRL1 -profile OCSP -profile DEMO
+ca:caprofile-add -ca SubCAwithCRL1 -profile OCSP -profile DEMO -profile multipleOUs
 
 ## Add CMP requestor to CA
 ca:careq-add -requestor requestor -permission all -ra yes -profile all -ca SubCAwithCRL1

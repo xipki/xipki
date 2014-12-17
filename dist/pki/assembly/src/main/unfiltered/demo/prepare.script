@@ -37,6 +37,8 @@ ca:profile-add -name SubCA.Complex -type XML -confFile demo/profile/CertProfile_
 
 ca:profile-add -name OCSP -type XML -confFile demo/profile/CertProfile_OCSP.xml
 
+ca:profile-add -name multipleOUs -type XML -confFile demo/profile/CertProfile_multipleOUs.xml
+
 ca:profile-add -name TLS -type XML -confFile demo/profile/CertProfile_TLS.xml
 
 ca:profile-add -name TLS_C -type XML -confFile demo/profile/CertProfile_TLS_C.xml
