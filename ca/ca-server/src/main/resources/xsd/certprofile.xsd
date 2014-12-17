@@ -126,7 +126,7 @@
   <xs:complexType name="rdnType">
     <xs:sequence>
       <xs:element name="type" type="OidWithDescType"/>
-      <xs:element name="constraint" type="RdnConstraintType" minOccurs="0"/>
+      <xs:element name="regex" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
       <xs:element name="addPrefix" type="addTextType" minOccurs="0" maxOccurs="10"/>
       <xs:element name="addSuffix" type="addTextType" minOccurs="0" maxOccurs="10"/>
     </xs:sequence>

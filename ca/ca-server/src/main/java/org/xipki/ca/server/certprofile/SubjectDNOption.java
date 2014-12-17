@@ -35,6 +35,7 @@
 
 package org.xipki.ca.server.certprofile;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -48,13 +49,19 @@ public class SubjectDNOption
 {
     private final List<AddText> addprefixes;
     private final List<AddText> addsufixes;
-    private final Pattern pattern;
+    private final List<Pattern> patterns;
 
-    public SubjectDNOption(List<AddText> addprefixes, List<AddText> addsufixes, Pattern pattern)
+    public SubjectDNOption(List<AddText> addprefixes, List<AddText> addsufixes, List<Pattern> patterns)
     {
         this.addprefixes = addprefixes;
         this.addsufixes = addsufixes;
-        this.pattern = pattern;
+        if(patterns == null)
+        {
+            this.patterns = null;
+        } else
+        {
+            this.patterns = Collections.unmodifiableList(patterns);
+        }
     }
 
     public AddText getAddprefix(EnvironmentParameterResolver pr)
@@ -92,9 +99,9 @@ public class SubjectDNOption
         return null;
     }
 
-    public Pattern getPattern()
+    public List<Pattern> getPatterns()
     {
-        return pattern;
+        return patterns;
     }
 
 }

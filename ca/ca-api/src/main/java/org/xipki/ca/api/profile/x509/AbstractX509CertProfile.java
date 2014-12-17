@@ -198,7 +198,7 @@ extends X509CertProfile
             if(n == 1)
             {
                 String value = SecurityUtil.rdnValueToString(thisRDNs[0].getFirst().getValue());
-                rdns.add(createSubjectRDN(value, type));
+                rdns.add(createSubjectRDN(value, type, 0));
             }
             else
             {
@@ -209,9 +209,10 @@ extends X509CertProfile
                 }
                 values = sortRDNs(type, values);
 
+                int i = 0;
                 for(String value : values)
                 {
-                    rdns.add(createSubjectRDN(value, type));
+                    rdns.add(createSubjectRDN(value, type, i++));
                 }
             }
         }
@@ -445,7 +446,7 @@ extends X509CertProfile
         return SecurityUtil.rdnValueToString(rdn.getFirst().getValue());
     }
 
-    protected RDN createSubjectRDN(String text, ASN1ObjectIdentifier type)
+    protected RDN createSubjectRDN(String text, ASN1ObjectIdentifier type, int index)
     throws BadCertTemplateException
     {
         text = text.trim();
@@ -468,7 +469,7 @@ extends X509CertProfile
         return ObjectIdentifiers.oidToDisplayName(type);
     }
 
-    protected static boolean isCountryCodeValid(String countryCode)
+    public static boolean isCountryCodeValid(String countryCode)
     {
         return countryCodes.contains(countryCode);
     }

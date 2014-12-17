@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <profile xmlns="http://xipki.org/xmlprofile/v1" onlyForRA="false">
-  <description>CertProfile RootCA Cross</description>
-  <ca>true</ca>
-  <validity>10y</validity>
+  <description>CertProfile Multiple OUs DEMO</description>
+  <ca>false</ca>
+  <validity>5y</validity>
   <notBeforeTime>current</notBeforeTime>
   <duplicateKeyPermitted>false</duplicateKeyPermitted>
   <duplicateSubjectPermitted>false</duplicateSubjectPermitted>
@@ -70,8 +70,10 @@
     <rdn minOccurs="1" maxOccurs="1">
       <type description="o">2.5.4.10</type>
     </rdn>
-    <rdn minOccurs="0" maxOccurs="1">
+    <rdn minOccurs="2" maxOccurs="2">
       <type description="ou">2.5.4.11</type>
+      <regex>[A-Z]{1,1}[\d]{5,5}</regex>
+      <regex>[\d]{5,5}</regex>
     </rdn>
     <rdn minOccurs="0" maxOccurs="1">
       <type description="serialNumber">2.5.4.5</type>
@@ -89,12 +91,12 @@
     <extension required="false" description="freshestCRL">2.5.29.46</extension>
     <extension required="true" description="keyUsage">2.5.29.15</extension>
     <extension required="true" description="basicConstraints">2.5.29.19</extension>
+    <extension required="true" description="extendedKeyUsage">2.5.29.37</extension>
     <authorityKeyIdentifier>
       <includeIssuerAndSerial>false</includeIssuerAndSerial>
     </authorityKeyIdentifier>
     <keyUsage>
-      <usage>KEYCERT_SIGN</usage>
-      <usage>CRL_SIGN</usage>
+      <usage>CONTENT_COMMITMENT</usage>
     </keyUsage>
   </extensions>
 </profile>
