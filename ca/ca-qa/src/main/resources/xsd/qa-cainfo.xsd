@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+ Copyright (c) 2014 Lijun Liao
+ -->
+<xs:schema xmlns="http://xipki.org/qa/cainfo/v1"
+  xmlns:xs="http://www.w3.org/2001/XMLSchema"
+  xmlns:jxb="http://java.sun.com/xml/ns/jaxb"
+  targetNamespace="http://xipki.org/qa/cainfo/v1"
+   elementFormDefault="qualified" version="1.0" jxb:version="2.0">
+  <xs:annotation>
+    <xs:appinfo>
+      <jxb:schemaBindings>
+        <jxb:package name="org.xipki.ca.qa.cainfo.jaxb"/>
+      </jxb:schemaBindings>
+    </xs:appinfo>
+  </xs:annotation>
+  <xs:element name="CAs" type="CAsType"/>
+  <xs:complexType name="CAsType">
+    <xs:sequence>
+      <xs:element name="X509CAs" type="X509CAsType" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="X509CAsType">
+    <xs:sequence>
+      <xs:element name="X509CA" type="X509CAType" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="X509CAType">
+    <xs:sequence>
+      <xs:element name="cert" type="fileOrValueType"/>
+      <xs:element name="ocspUrl" type="xs:anyURI" minOccurs="0"/>
+      <xs:element name="crlUrl" type="xs:anyURI" minOccurs="0"/>
+      <xs:element name="deltaCrlUrl" type="xs:anyURI" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="fileOrValueType">
+    <xs:choice>
+      <xs:element name="value" type="xs:base64Binary"/>
+      <xs:element name="file" type="xs:string"/>
+    </xs:choice>
+  </xs:complexType>
+</xs:schema>
