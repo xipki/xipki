@@ -91,7 +91,6 @@
     <extension required="false" description="freshestCRL">2.5.29.46</extension>
     <extension required="true" description="keyUsage">2.5.29.15</extension>
     <extension required="true" description="basicConstraints">2.5.29.19</extension>
-    <extension required="true" description="extendedKeyUsage">2.5.29.37</extension>
     <authorityKeyIdentifier>
       <includeIssuerAndSerial>false</includeIssuerAndSerial>
     </authorityKeyIdentifier>
