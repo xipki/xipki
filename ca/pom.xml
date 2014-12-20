@@ -22,7 +22,6 @@
     <module>ca-mgmt-api</module>
     <module>ca-server</module>
     <module>ca-mgmt-shell</module>
-    <module>certprofile-dflt</module>
     <module>certprofile-demo</module>
   </modules>
 </project>
