@@ -38,6 +38,10 @@ package org.xipki.ca.qa.cainfo;
 import java.io.IOException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 import org.bouncycastle.asn1.x509.Certificate;
 import org.bouncycastle.util.Arrays;
@@ -50,20 +54,47 @@ import org.xipki.common.SecurityUtil;
 
 public class X509CAInfo
 {
-    private final String ocspURL;
-    private final String crlURL;
-    private final String deltaCrlURL;
+    private final Set<String> ocspURLs;
+    private final Set<String> crlURLs;
+    private final Set<String> deltaCrlURLs;
     private final X509Certificate cert;
     private final Certificate bcCert;
     private final byte[] ski;
 
-    public X509CAInfo(String ocspURL, String crlURL, String deltaCrlURL, byte[] certBytes)
+    public X509CAInfo(List<String> ocspURLs, List<String> crlURLs, List<String> deltaCrlURLs, byte[] certBytes)
     throws CertificateException
     {
         ParamChecker.assertNotNull("certBytes", certBytes);
-        this.ocspURL = ocspURL;
-        this.crlURL = crlURL;
-        this.deltaCrlURL = deltaCrlURL;
+        if(ocspURLs == null || ocspURLs.isEmpty())
+        {
+            this.ocspURLs = null;
+        }else
+        {
+            Set<String> set = new HashSet<>();
+            set.addAll(ocspURLs);
+            this.ocspURLs = Collections.unmodifiableSet(set);
+        }
+
+        if(crlURLs == null || crlURLs.isEmpty())
+        {
+            this.crlURLs = null;
+        }else
+        {
+            Set<String> set = new HashSet<>();
+            set.addAll(crlURLs);
+            this.crlURLs = Collections.unmodifiableSet(set);
+        }
+
+        if(deltaCrlURLs == null || deltaCrlURLs.isEmpty())
+        {
+            this.deltaCrlURLs = null;
+        }else
+        {
+            Set<String> set = new HashSet<>();
+            set.addAll(deltaCrlURLs);
+            this.deltaCrlURLs = Collections.unmodifiableSet(set);
+        }
+
         try
         {
             this.cert = SecurityUtil.parseCert(certBytes);
@@ -75,19 +106,19 @@ public class X509CAInfo
         this.ski = SecurityUtil.extractSKI(cert);
     }
 
-    public String getOcspURL()
+    public Set<String> getOcspURLs()
     {
-        return ocspURL;
+        return ocspURLs;
     }
 
-    public String getCrlURL()
+    public Set<String> getCrlURLs()
     {
-        return crlURL;
+        return crlURLs;
     }
 
-    public String getDeltaCrlURL()
+    public Set<String> getDeltaCrlURLs()
     {
-        return deltaCrlURL;
+        return deltaCrlURLs;
     }
 
     public X509Certificate getCert()

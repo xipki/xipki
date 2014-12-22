@@ -185,24 +185,26 @@ public class X509Util
         }
 
         int n = crlUris.size();
-        DistributionPoint[] points = new DistributionPoint[n];
+        DistributionPoint[] points = new DistributionPoint[1];
 
+        GeneralName[] names = new GeneralName[n];
         for(int i = 0; i < n; i++)
         {
-            // Distribution Point
-            GeneralNames gns = new GeneralNames(new GeneralName(GeneralName.uniformResourceIdentifier, crlUris.get(i)));
-            DistributionPointName pointName = new DistributionPointName(gns);
-
-            GeneralNames crlIssuer = null;
-            if(crlSignerSubject != null && !crlSignerSubject.equals(caSubject))
-            {
-                X500Name bcCrlSignerSubject = X500Name.getInstance(crlSignerSubject.getEncoded());
-                GeneralName crlIssuerName = new GeneralName(bcCrlSignerSubject);
-                crlIssuer = new GeneralNames(crlIssuerName);
-            }
-
-            points[i++] = new DistributionPoint(pointName, null, crlIssuer);
+            names[i] = new GeneralName(GeneralName.uniformResourceIdentifier, crlUris.get(i));
         }
+        // Distribution Point
+        GeneralNames gns = new GeneralNames(names);
+        DistributionPointName pointName = new DistributionPointName(gns);
+
+        GeneralNames crlIssuer = null;
+        if(crlSignerSubject != null && crlSignerSubject.equals(caSubject) == false)
+        {
+            X500Name bcCrlSignerSubject = X500Name.getInstance(crlSignerSubject.getEncoded());
+            GeneralName crlIssuerName = new GeneralName(bcCrlSignerSubject);
+            crlIssuer = new GeneralNames(crlIssuerName);
+        }
+
+        points[0] = new DistributionPoint(pointName, null, crlIssuer);
 
         return new CRLDistPoint(points);
     }
