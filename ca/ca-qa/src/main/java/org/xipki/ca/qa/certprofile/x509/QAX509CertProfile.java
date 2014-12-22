@@ -44,6 +44,7 @@ import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -67,20 +68,29 @@ import org.bouncycastle.asn1.ASN1Integer;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.ASN1StreamParser;
+import org.bouncycastle.asn1.ASN1String;
 import org.bouncycastle.asn1.DERBitString;
 import org.bouncycastle.asn1.DERIA5String;
 import org.bouncycastle.asn1.DERSequence;
 import org.bouncycastle.asn1.DERTaggedObject;
 import org.bouncycastle.asn1.DERUTF8String;
+import org.bouncycastle.asn1.isismtt.x509.AdmissionSyntax;
+import org.bouncycastle.asn1.isismtt.x509.Admissions;
+import org.bouncycastle.asn1.isismtt.x509.ProfessionInfo;
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 import org.bouncycastle.asn1.x500.DirectoryString;
 import org.bouncycastle.asn1.x500.RDN;
 import org.bouncycastle.asn1.x500.X500Name;
+import org.bouncycastle.asn1.x509.AccessDescription;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
+import org.bouncycastle.asn1.x509.AuthorityInformationAccess;
 import org.bouncycastle.asn1.x509.AuthorityKeyIdentifier;
 import org.bouncycastle.asn1.x509.BasicConstraints;
+import org.bouncycastle.asn1.x509.CRLDistPoint;
 import org.bouncycastle.asn1.x509.CertPolicyId;
 import org.bouncycastle.asn1.x509.Certificate;
+import org.bouncycastle.asn1.x509.DistributionPoint;
+import org.bouncycastle.asn1.x509.DistributionPointName;
 import org.bouncycastle.asn1.x509.Extension;
 import org.bouncycastle.asn1.x509.Extensions;
 import org.bouncycastle.asn1.x509.GeneralName;
@@ -92,6 +102,7 @@ import org.bouncycastle.asn1.x509.PolicyQualifierInfo;
 import org.bouncycastle.asn1.x509.SubjectKeyIdentifier;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.bouncycastle.asn1.x509.UserNotice;
+import org.bouncycastle.asn1.x509.X509ObjectIdentifiers;
 import org.bouncycastle.asn1.x9.X9ECParameters;
 import org.bouncycastle.asn1.x9.X9ObjectIdentifiers;
 import org.bouncycastle.jcajce.provider.asymmetric.util.ECUtil;
@@ -122,8 +133,6 @@ import org.xipki.ca.qa.certprofile.x509.jaxb.CurveType.Encodings;
 import org.xipki.ca.qa.certprofile.x509.jaxb.ECParameterType;
 import org.xipki.ca.qa.certprofile.x509.jaxb.ExtensionType;
 import org.xipki.ca.qa.certprofile.x509.jaxb.ExtensionsType;
-import org.xipki.ca.qa.certprofile.x509.jaxb.ExtensionsType.Admission;
-import org.xipki.ca.qa.certprofile.x509.jaxb.ExtensionsType.CertificatePolicies;
 import org.xipki.ca.qa.certprofile.x509.jaxb.ExtensionsType.ConstantExtensions;
 import org.xipki.ca.qa.certprofile.x509.jaxb.ExtensionsType.InhibitAnyPolicy;
 import org.xipki.ca.qa.certprofile.x509.jaxb.ExtensionsType.NameConstraints;
@@ -221,12 +230,12 @@ public class QAX509CertProfile
 
     private AuthorityKeyIdentifierOption akiOption;
     private Set<String> sigantureAlgorithms;
-    private CertificatePolicies certificatePolicies;
+    private CertificatePoliciesConf certificatePolicies;
     private PolicyMappings policyMappings;
     private NameConstraints nameConstraints;
     private PolicyConstraints policyConstraints;
     private InhibitAnyPolicy inhibitAnyPolicy;
-    private Admission admission;
+    private AdmissionConf admission;
 
     private Map<ASN1ObjectIdentifier, byte[]> constantExtensions;
     private static LruCache<ASN1ObjectIdentifier, Integer> ecCurveFieldSizes = new LruCache<>(100);
@@ -479,7 +488,7 @@ public class QAX509CertProfile
             occurrence = occurrences.get(Extension.certificatePolicies);
             if(occurrence != null && extensionsType.getCertificatePolicies() != null)
             {
-                this.certificatePolicies = extensionsType.getCertificatePolicies();
+                this.certificatePolicies = new CertificatePoliciesConf(extensionsType.getCertificatePolicies());
             }
 
             // Policy Mappings
@@ -514,7 +523,7 @@ public class QAX509CertProfile
             occurrence = occurrences.get(ObjectIdentifiers.id_extension_admission);
             if(occurrence != null && extensionsType.getAdmission() == null)
             {
-                this.admission = extensionsType.getAdmission();
+                this.admission = new AdmissionConf(extensionsType.getAdmission());
             }
 
             // SubjectAltNameMode
@@ -953,22 +962,13 @@ public class QAX509CertProfile
                         for(PolicyInformation iPolicyInformation : iPolicyInformations)
                         {
                             ASN1ObjectIdentifier iPolicyId = iPolicyInformation.getPolicyIdentifier();
-                            CertificatePolicyInformationType eCp = null;
-                            for(CertificatePolicyInformationType cp : certificatePolicies.getCertificatePolicyInformation())
-                            {
-                                if(cp.getPolicyIdentifier().getValue().equals(iPolicyId.getId()))
-                                {
-                                    eCp = cp;
-                                    break;
-                                }
-                            }
-
+                            CertificatePolicyInformationConf eCp = certificatePolicies.getPolicyInformation(iPolicyId.getId());
                             if(eCp == null)
                             {
                                 failureMsg.append("certificate policy '" + iPolicyId + "' is not expected");
                             } else
                             {
-                                PolicyQualifiers eCpPq = eCp.getPolicyQualifiers();
+                                PolicyQualifiersConf eCpPq = eCp.getPolicyQualifiers();
                                 if(eCpPq != null)
                                 {
                                     ASN1Sequence iPolicyQualifiers = iPolicyInformation.getPolicyQualifiers();
@@ -996,23 +996,22 @@ public class QAX509CertProfile
                                         }
                                     }
 
-                                    List<JAXBElement<String>> elements = eCpPq.getCpsUriOrUserNotice();
-                                    for(JAXBElement<String> element : elements)
+                                    List<PolicyQualifierInfoConf> qualifierInfos = eCpPq.getPolicyQualifiers();
+                                    for(PolicyQualifierInfoConf qualifierInfo : qualifierInfos)
                                     {
-                                        String localPart = element.getName().getLocalPart();
-                                        String eleValue = element.getValue();
-
-                                        if("cpsUri".equals(localPart))
+                                        if(qualifierInfo instanceof CPSUriPolicyQualifierInfo)
                                         {
-                                            if(iCpsUris.contains(eleValue) == false)
+                                            String value = ((CPSUriPolicyQualifierInfo) qualifierInfo).getCPSUri();
+                                            if(iCpsUris.contains(value) == false)
                                             {
-                                                failureMsg.append("CPSuri '" + eleValue + "' is absent but is required");
+                                                failureMsg.append("CPSUri '" + value + "' is absent but is required");
                                             }
-                                        }else if("userNotice".equals(localPart))
+                                        }else if(qualifierInfo instanceof UserNoticePolicyQualifierInfo)
                                         {
-                                            if(iUserNotices.contains(eleValue) == false)
+                                            String value = ((UserNoticePolicyQualifierInfo) qualifierInfo).getUserNotice();
+                                            if(iUserNotices.contains(value) == false)
                                             {
-                                                failureMsg.append("userNotice '" + eleValue + "' is absent but is required");
+                                                failureMsg.append("userNotice '" + value + "' is absent but is required");
                                             }
                                         }else
                                         {
@@ -1023,12 +1022,12 @@ public class QAX509CertProfile
                             }
                         }
 
-                        for(CertificatePolicyInformationType cp : certificatePolicies.getCertificatePolicyInformation())
+                        for(CertificatePolicyInformationConf cp : certificatePolicies.getPolicyInformations())
                         {
                             boolean present = false;
                             for(PolicyInformation iPolicyInformation : iPolicyInformations)
                             {
-                                if(iPolicyInformation.getPolicyIdentifier().getId().equals(cp.getPolicyIdentifier().getValue()))
+                                if(iPolicyInformation.getPolicyIdentifier().getId().equals(cp.getPolicyId()))
                                 {
                                     present = true;
                                     break;
@@ -1037,7 +1036,7 @@ public class QAX509CertProfile
 
                             if(present == false)
                             {
-                                failureMsg.append("certificate policy '" + cp.getPolicyIdentifier().getValue() + "' is "
+                                failureMsg.append("certificate policy '" + cp.getPolicyId() + "' is "
                                         + "absent but is required");
                                 failureMsg.append("; ");
                             }
@@ -1111,19 +1110,307 @@ public class QAX509CertProfile
                     }
                 } else if(Extension.authorityInfoAccess.equals(oid))
                 {
-                    // TODO
+                    Set<String> eOCSPUris = caInfo.getOcspURLs();
+                    if(eOCSPUris == null)
+                    {
+                        failureMsg.append("AIA is present but expected is 'none'");
+                        failureMsg.append("; ");
+                    }
+                    else
+                    {
+                        AuthorityInformationAccess iAIA = AuthorityInformationAccess.getInstance(extValue);
+                        AccessDescription[] iAccessDescriptions = iAIA.getAccessDescriptions();
+                        List<AccessDescription> iOCSPAccessDescriptions = new LinkedList<>();
+                        for(AccessDescription iAccessDescription : iAccessDescriptions)
+                        {
+                            if(iAccessDescription.getAccessMethod().equals(X509ObjectIdentifiers.id_ad_ocsp))
+                            {
+                                iOCSPAccessDescriptions.add(iAccessDescription);
+                            }
+                        }
+
+                        int n = iOCSPAccessDescriptions.size();
+                        if(n != eOCSPUris.size())
+                        {
+                            failureMsg.append("Number of AIA OCSP URIs is '" + n +
+                                    "' but expected is '" + eOCSPUris.size() + "'");
+                            failureMsg.append("; ");
+                        }
+                        else
+                        {
+                            Set<String> iOCSPUris = new HashSet<>();
+                            for(int i = 0; i < n; i++)
+                            {
+                                GeneralName iAccessLocation = iOCSPAccessDescriptions.get(i).getAccessLocation();
+                                if(iAccessLocation.getTagNo() != GeneralName.uniformResourceIdentifier)
+                                {
+                                    failureMsg.append("Tag of accessLocation of AIA OCSP is '" + iAccessLocation.getTagNo() +
+                                            "' but expected is '" + GeneralName.uniformResourceIdentifier + "'");
+                                    failureMsg.append("; ");
+                                }
+                                else
+                                {
+                                    String iOCSPUri = ((ASN1String) iAccessLocation.getName()).getString();
+                                    iOCSPUris.add(iOCSPUri);
+                                }
+                            }
+
+                            Set<String> diffs = str_in_b_not_in_a(eOCSPUris, iOCSPUris);
+                            if(diffs.isEmpty() == false)
+                            {
+                                failureMsg.append("OCSP URLs " + diffs.toString() + " are present but not expected");
+                                failureMsg.append("; ");
+                            }
+
+                            diffs = str_in_b_not_in_a(iOCSPUris, eOCSPUris);
+                            if(diffs.isEmpty() == false)
+                            {
+                                failureMsg.append("OCSP URLs " + diffs.toString() + " are absent but are required");
+                                failureMsg.append("; ");
+                            }
+                        }
+                    }
                 } else if(Extension.cRLDistributionPoints.equals(oid))
                 {
-                    // TODO
+                    CRLDistPoint iCRLDistPoints = CRLDistPoint.getInstance(extValue);
+                    DistributionPoint[] iDistributionPoints = iCRLDistPoints.getDistributionPoints();
+                    int n = iDistributionPoints == null ? 0 : iDistributionPoints.length;
+                    if(n != 1)
+                    {
+                        failureMsg.append("Size of CRLDistributionPoints is '" + n + "' but expected is '1'");
+                    }
+                    else
+                    {
+                        Set<String> iCrlURLs = new HashSet<>();
+                        for(DistributionPoint entry : iDistributionPoints)
+                        {
+                            int asn1Type = entry.getDistributionPoint().getType();
+                            if(asn1Type != DistributionPointName.FULL_NAME)
+                            {
+                                failureMsg.append("Tag of DistributionPointName of CRLDistibutionPoints is '" + asn1Type +
+                                        "' but expected is '" + DistributionPointName.FULL_NAME + "'");
+                                failureMsg.append("; ");
+                            } else
+                            {
+                                GeneralNames iDistributionPointNames = (GeneralNames) entry.getDistributionPoint().getName();
+                                GeneralName[] names = iDistributionPointNames.getNames();
+
+                                for(int i = 0; i < names.length; i++)
+                                {
+                                    GeneralName name = names[i];
+                                    if(name.getTagNo() != GeneralName.uniformResourceIdentifier)
+                                    {
+                                        failureMsg.append("Tag of CRL URL is '" + name.getTagNo() +
+                                                "' but expected is '" + GeneralName.uniformResourceIdentifier + "'");
+                                        failureMsg.append("; ");
+                                    }
+                                    else
+                                    {
+                                        String uri = ((ASN1String) name.getName()).getString();
+                                        iCrlURLs.add(uri);
+                                    }
+                                }
+
+                                Set<String> eCRLUrls = caInfo.getCrlURLs();
+                                Set<String> diffs = str_in_b_not_in_a(eCRLUrls, iCrlURLs);
+                                if(diffs.isEmpty() == false)
+                                {
+                                    failureMsg.append("CRL URLs " + diffs.toString() + " are present but not expected");
+                                    failureMsg.append("; ");
+                                }
+
+                                diffs = str_in_b_not_in_a(iCrlURLs, eCRLUrls);
+                                if(diffs.isEmpty() == false)
+                                {
+                                    failureMsg.append("CRL URLs " + diffs.toString() + " are absent but are required");
+                                    failureMsg.append("; ");
+                                }
+                            }
+                        }
+                    }
                 } else if(Extension.deltaCRLIndicator.equals(oid))
                 {
-                    // TODO
+                    CRLDistPoint iCRLDistPoints = CRLDistPoint.getInstance(extValue);
+                    DistributionPoint[] iDistributionPoints = iCRLDistPoints.getDistributionPoints();
+                    int n = iDistributionPoints == null ? 0 : iDistributionPoints.length;
+                    if(n != 1)
+                    {
+                        failureMsg.append("Size of CRLDistributionPoints (deltaCRL) is '" + n + "' but expected is '1'");
+                    }
+                    else
+                    {
+                        Set<String> iCrlURLs = new HashSet<>();
+                        for(DistributionPoint entry : iDistributionPoints)
+                        {
+                            int asn1Type = entry.getDistributionPoint().getType();
+                            if(asn1Type != DistributionPointName.FULL_NAME)
+                            {
+                                failureMsg.append("Tag of DistributionPointName of CRLDistibutionPoints (deltaCRL) is '" +
+                                        asn1Type + "' but expected is '" + DistributionPointName.FULL_NAME + "'");
+                                failureMsg.append("; ");
+                            } else
+                            {
+                                GeneralNames iDistributionPointNames = (GeneralNames) entry.getDistributionPoint().getName();
+                                GeneralName[] names = iDistributionPointNames.getNames();
+
+                                for(int i = 0; i < names.length; i++)
+                                {
+                                    GeneralName name = names[i];
+                                    if(name.getTagNo() != GeneralName.uniformResourceIdentifier)
+                                    {
+                                        failureMsg.append("Tag of deltaCRL URL is '" + name.getTagNo() +
+                                                "' but expected is '" + GeneralName.uniformResourceIdentifier + "'");
+                                        failureMsg.append("; ");
+                                    }
+                                    else
+                                    {
+                                        String uri = ((ASN1String) name.getName()).getString();
+                                        iCrlURLs.add(uri);
+                                    }
+                                }
+
+                                Set<String> eCRLUrls = caInfo.getCrlURLs();
+                                Set<String> diffs = str_in_b_not_in_a(eCRLUrls, iCrlURLs);
+                                if(diffs.isEmpty() == false)
+                                {
+                                    failureMsg.append("deltaCRL URLs " + diffs.toString() + " are present but not expected");
+                                    failureMsg.append("; ");
+                                }
+
+                                diffs = str_in_b_not_in_a(iCrlURLs, eCRLUrls);
+                                if(diffs.isEmpty() == false)
+                                {
+                                    failureMsg.append("deltaCRL URLs " + diffs.toString() + " are absent but are required");
+                                    failureMsg.append("; ");
+                                }
+                            }
+                        }
+                    }
                 } else if(ObjectIdentifiers.id_extension_admission.equals(oid))
                 {
-                    // TODO
+                    if(admission == null)
+                    {
+                        failureMsg.append("Admissions is present but expected is 'none'");
+                        failureMsg.append("; ");
+                    } else
+                    {
+                        AdmissionSyntax iAdmissionSyntax = AdmissionSyntax.getInstance(extValue);
+                        Admissions[] iAdmissions = iAdmissionSyntax.getContentsOfAdmissions();
+                        int n = iAdmissions == null ? 0 : iAdmissions.length;
+                        if(n != 1)
+                        {
+                            failureMsg.append("Size of Admissions is '" + n + "' but expected is '1'");
+                            failureMsg.append("; ");
+                        }
+                        else
+                        {
+                            Admissions iAdmission = iAdmissions[0];
+                            ProfessionInfo[] iProfessionInfos = iAdmission.getProfessionInfos();
+                            n = iProfessionInfos == null ? 0 : iProfessionInfos.length;
+                            if(n != 1)
+                            {
+                                failureMsg.append("Size of ProfessionInfo is '" + n + "' but expected is '1'");
+                                failureMsg.append("; ");
+                            } else
+                            {
+                                ProfessionInfo iProfessionInfo = iProfessionInfos[0];
+                                String iRegistrationNumber = iProfessionInfo.getRegistrationNumber();
+                                String eRegistrationNumber = admission.getRegistrationNumber();
+                                if(eRegistrationNumber == null)
+                                {
+                                    if(iRegistrationNumber != null)
+                                    {
+                                        failureMsg.append("RegistrationNumber is '" + iRegistrationNumber +
+                                                "' but expected is 'null'");
+                                        failureMsg.append("; ");
+                                    }
+                                } else if(eRegistrationNumber.equals(iRegistrationNumber) == false)
+                                {
+                                    failureMsg.append("RegistrationNumber is '" + iRegistrationNumber +
+                                            "' but expected is '" + eRegistrationNumber + "'");
+                                    failureMsg.append("; ");
+                                }
+
+                                byte[] iAddProfessionInfo = iProfessionInfo.getAddProfessionInfo().getOctets();
+                                byte[] eAddProfessionInfo = admission.getAddProfessionInfo();
+                                if(eAddProfessionInfo == null)
+                                {
+                                    if(iAddProfessionInfo != null)
+                                    {
+                                        failureMsg.append("AddProfessionInfo is '" + hex(iAddProfessionInfo) +
+                                                "' but expected is 'null'");
+                                        failureMsg.append("; ");
+                                    }
+                                } else
+                                {
+                                    if(iAddProfessionInfo == null)
+                                    {
+                                        failureMsg.append("AddProfessionInfo is 'null' but expected is '" +
+                                                hex(eAddProfessionInfo) + "'");
+                                        failureMsg.append("; ");
+                                    } else if(Arrays.equals(eAddProfessionInfo, iAddProfessionInfo) == false)
+                                    {
+                                        failureMsg.append("AddProfessionInfo is '" + hex(iAddProfessionInfo) +
+                                                "' but expected is '" + hex(eAddProfessionInfo) + "'");
+                                        failureMsg.append("; ");
+                                    }
+                                }
+
+                                List<String> eProfessionOids = admission.getProfessionOIDs();
+                                ASN1ObjectIdentifier[] _iProfessionOids = iProfessionInfo.getProfessionOIDs();
+                                List<String> iProfessionOids = new LinkedList<>();
+                                if(_iProfessionOids != null)
+                                {
+                                    for(ASN1ObjectIdentifier entry : _iProfessionOids)
+                                    {
+                                        iProfessionOids.add(entry.getId());
+                                    }
+                                }
+
+                                Set<String> diffs = str_in_b_not_in_a(eProfessionOids, iProfessionOids);
+                                if(diffs.isEmpty() == false)
+                                {
+                                    failureMsg.append("ProfessionOIDs " + diffs.toString() + " are present but not expected");
+                                    failureMsg.append("; ");
+                                }
+
+                                diffs = str_in_b_not_in_a(iProfessionOids, eProfessionOids);
+                                if(diffs.isEmpty() == false)
+                                {
+                                    failureMsg.append("ProfessionOIDs " + diffs.toString() + " are absent but are required");
+                                    failureMsg.append("; ");
+                                }
+
+                                List<String> eProfessionItems = admission.getProfessionItems();
+                                DirectoryString[] items = iProfessionInfo.getProfessionItems();
+                                List<String> iProfessionItems = new LinkedList<>();
+                                if(items != null)
+                                {
+                                    for(DirectoryString item : items)
+                                    {
+                                        iProfessionItems.add(item.getString());
+                                    }
+                                }
+
+                                diffs = str_in_b_not_in_a(eProfessionItems, iProfessionItems);
+                                if(diffs.isEmpty() == false)
+                                {
+                                    failureMsg.append("ProfessionItems " + diffs.toString() + " are present but not expected");
+                                    failureMsg.append("; ");
+                                }
+
+                                diffs = str_in_b_not_in_a(iProfessionItems, eProfessionItems);
+                                if(diffs.isEmpty() == false)
+                                {
+                                    failureMsg.append("ProfessionItems " + diffs.toString() + " are absent but are required");
+                                    failureMsg.append("; ");
+                                }
+                            }
+                        }
+                    }
                 } else
                 {
-                    // TODO
+                    // do nothing
                 }
             }catch(IllegalArgumentException | ClassCastException | ArrayIndexOutOfBoundsException e)
             {
@@ -1777,6 +2064,19 @@ public class QAX509CertProfile
     private static String hex(byte[] bytes)
     {
         return Hex.toHexString(bytes);
+    }
+
+    private static Set<String> str_in_b_not_in_a(Collection<String> a, Collection<String> b)
+    {
+        Set<String> result = new HashSet<>();
+        for(String entry : b)
+        {
+            if(a.contains(entry) == false)
+            {
+                result.add(entry);
+            }
+        }
+        return result;
     }
 
 }
