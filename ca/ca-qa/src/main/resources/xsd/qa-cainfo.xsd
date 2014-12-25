@@ -30,7 +30,7 @@
       <xs:element name="cert" type="fileOrValueType"/>
       <xs:element name="ocspUrl" type="xs:anyURI" minOccurs="0" maxOccurs="unbounded"/>
       <xs:element name="crlUrl" type="xs:anyURI" minOccurs="0" maxOccurs="unbounded"/>
-      <xs:element name="deltaCrlUrl" type="xs:anyURI" minOccurs="0 maxOccurs="unbounded""/>
+      <xs:element name="deltaCrlUrl" type="xs:anyURI" minOccurs="0" maxOccurs="unbounded"/>
     </xs:sequence>
   </xs:complexType>
   <xs:complexType name="fileOrValueType">

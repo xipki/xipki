@@ -33,66 +33,74 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.ca.qa.certprofile;
+package org.xipki.ca.qa.certprofile.x509.conf;
 
 import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
-import java.util.regex.Pattern;
 
-import org.xipki.ca.qa.certprofile.x509.jaxb.DirectoryStringType;
+import org.bouncycastle.util.Arrays;
+import org.xipki.ca.qa.certprofile.x509.jaxb.OidWithDescType;
+import org.xipki.ca.qa.certprofile.x509.jaxb.ExtensionsType.Admission;
 
 /**
  * @author Lijun Liao
  */
 
-public class SubjectDNOption
+public class AdmissionConf
 {
-    private final String prefix;
-    private final String suffix;
-    private final List<Pattern> patterns;
-    private final Integer minLen;
-    private final Integer maxLen;
-    private final DirectoryStringType directoryStringType;
+    private final String registrationNumber;
+    private final byte[] addProfessionInfo;
+    private final List<String> professionOIDs;
+    private final List<String> professionItems;
 
-    public SubjectDNOption(String prefix, String suffix, List<Pattern> patterns,
-            Integer minLen, Integer maxLen, DirectoryStringType directoryStringType)
+    public AdmissionConf(Admission jaxb)
     {
-        this.prefix = prefix;
-        this.suffix = suffix;
-        this.patterns = Collections.unmodifiableList(patterns);
-        this.minLen = minLen;
-        this.maxLen = maxLen;
-        this.directoryStringType = directoryStringType;
+        this.registrationNumber = jaxb.getRegistrationNumber();
+        this.addProfessionInfo = jaxb.getAddProfessionInfo();
+
+        List<String> items = jaxb.getProfessionItem();
+        if(items.isEmpty())
+        {
+            professionItems = null;
+        } else
+        {
+            professionItems = Collections.unmodifiableList(items);
+        }
+
+        List<OidWithDescType> oids = jaxb.getProfessionOid();
+        if(oids == null)
+        {
+            this.professionOIDs = null;
+        } else
+        {
+            List<String> list = new LinkedList<>();
+            for(OidWithDescType oid : oids)
+            {
+                list.add(oid.getValue());
+            }
+            this.professionOIDs = Collections.unmodifiableList(list);
+        }
     }
 
-    public String getPrefix()
+    public String getRegistrationNumber()
     {
-        return prefix;
+        return registrationNumber;
     }
 
-    public String getSuffix()
+    public byte[] getAddProfessionInfo()
     {
-        return suffix;
+        return Arrays.clone(addProfessionInfo);
     }
 
-    public List<Pattern> getPatterns()
+    public List<String> getProfessionOIDs()
     {
-        return patterns;
+        return professionOIDs;
     }
 
-    public Integer getMinLen()
+    public List<String> getProfessionItems()
     {
-        return minLen;
-    }
-
-    public Integer getMaxLen()
-    {
-        return maxLen;
-    }
-
-    public DirectoryStringType getDirectoryStringType()
-    {
-        return directoryStringType;
+        return professionItems;
     }
 
 }

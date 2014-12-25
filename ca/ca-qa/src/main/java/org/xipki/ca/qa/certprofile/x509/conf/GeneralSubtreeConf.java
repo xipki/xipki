@@ -33,74 +33,70 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.ca.qa.certprofile.x509;
+package org.xipki.ca.qa.certprofile.x509.conf;
 
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
-
-import org.bouncycastle.util.Arrays;
-import org.xipki.ca.qa.certprofile.x509.jaxb.OidWithDescType;
-import org.xipki.ca.qa.certprofile.x509.jaxb.ExtensionsType.Admission;
+import org.xipki.ca.qa.certprofile.x509.jaxb.GeneralSubtreeBaseType;
+import org.xipki.common.ParamChecker;
 
 /**
  * @author Lijun Liao
  */
 
-class AdmissionConf
+public class GeneralSubtreeConf
 {
-    private final String registrationNumber;
-    private final byte[] addProfessionInfo;
-    private final List<String> professionOIDs;
-    private final List<String> professionItems;
+    private final GeneralSubtreeBaseType jaxb;
 
-    public AdmissionConf(Admission jaxb)
+    public GeneralSubtreeConf(GeneralSubtreeBaseType jaxb)
     {
-        this.registrationNumber = jaxb.getRegistrationNumber();
-        this.addProfessionInfo = jaxb.getAddProfessionInfo();
-
-        List<String> items = jaxb.getProfessionItem();
-        if(items.isEmpty())
+        ParamChecker.assertNotNull("jaxb", jaxb);
+        Integer i = jaxb.getMinimum();
+        if(i != null && i < 0)
         {
-            professionItems = null;
-        } else
-        {
-            professionItems = Collections.unmodifiableList(items);
+            throw new IllegalArgumentException("negative minimum is not allowed: " + i);
         }
 
-        List<OidWithDescType> oids = jaxb.getProfessionOid();
-        if(oids == null)
+        i = jaxb.getMaximum();
+        if(i != null && i < 0)
         {
-            this.professionOIDs = null;
-        } else
-        {
-            List<String> list = new LinkedList<>();
-            for(OidWithDescType oid : oids)
-            {
-                list.add(oid.getValue());
-            }
-            this.professionOIDs = Collections.unmodifiableList(list);
+            throw new IllegalArgumentException("negative maximum is not allowed: " + i);
         }
+
+        this.jaxb = jaxb;
     }
 
-    public String getRegistrationNumber()
+    public String getRfc822Name()
     {
-        return registrationNumber;
+        return jaxb.getRfc822Name();
     }
 
-    public byte[] getAddProfessionInfo()
+    public String getDNSName()
     {
-        return Arrays.clone(addProfessionInfo);
+        return jaxb.getDNSName();
     }
 
-    public List<String> getProfessionOIDs()
+    public String getDirectoryName()
     {
-        return professionOIDs;
+        return jaxb.getDirectoryName();
     }
 
-    public List<String> getProfessionItems()
+    public String getUri()
     {
-        return professionItems;
+        return jaxb.getUri();
+    }
+
+    public String getIpAddress()
+    {
+        return jaxb.getIpAddress();
+    }
+
+    public Integer getMinimum()
+    {
+        return jaxb.getMinimum();
+    }
+
+    public Integer getMaximum()
+    {
+        return jaxb.getMaximum();
     }
 
 }

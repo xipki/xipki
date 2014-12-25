@@ -33,66 +33,34 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.ca.qa.certprofile;
+package org.xipki.ca.qa.certprofile.x509.conf;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.regex.Pattern;
-
-import org.xipki.ca.qa.certprofile.x509.jaxb.DirectoryStringType;
+import org.xipki.ca.api.profile.ExtensionOccurrence;
 
 /**
  * @author Lijun Liao
  */
 
-public class SubjectDNOption
+public class AuthorityKeyIdentifierOption
 {
-    private final String prefix;
-    private final String suffix;
-    private final List<Pattern> patterns;
-    private final Integer minLen;
-    private final Integer maxLen;
-    private final DirectoryStringType directoryStringType;
+    private final boolean includeIssuerAndSerial;
+    private final ExtensionOccurrence occurence;
 
-    public SubjectDNOption(String prefix, String suffix, List<Pattern> patterns,
-            Integer minLen, Integer maxLen, DirectoryStringType directoryStringType)
+    public AuthorityKeyIdentifierOption(boolean includeIssuerAndSerial,
+            ExtensionOccurrence occurence)
     {
-        this.prefix = prefix;
-        this.suffix = suffix;
-        this.patterns = Collections.unmodifiableList(patterns);
-        this.minLen = minLen;
-        this.maxLen = maxLen;
-        this.directoryStringType = directoryStringType;
+        this.includeIssuerAndSerial = includeIssuerAndSerial;
+        this.occurence = occurence;
     }
 
-    public String getPrefix()
+    public boolean isIncludeIssuerAndSerial()
     {
-        return prefix;
+        return includeIssuerAndSerial;
     }
 
-    public String getSuffix()
+    public ExtensionOccurrence getOccurence()
     {
-        return suffix;
-    }
-
-    public List<Pattern> getPatterns()
-    {
-        return patterns;
-    }
-
-    public Integer getMinLen()
-    {
-        return minLen;
-    }
-
-    public Integer getMaxLen()
-    {
-        return maxLen;
-    }
-
-    public DirectoryStringType getDirectoryStringType()
-    {
-        return directoryStringType;
+        return occurence;
     }
 
 }

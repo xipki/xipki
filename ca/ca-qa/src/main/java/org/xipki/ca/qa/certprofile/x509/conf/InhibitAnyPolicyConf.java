@@ -33,34 +33,28 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.ca.qa.certprofile.x509;
+package org.xipki.ca.qa.certprofile.x509.conf;
 
-import org.xipki.ca.api.profile.ExtensionOccurrence;
+import org.xipki.ca.qa.certprofile.x509.jaxb.ExtensionsType.InhibitAnyPolicy;
+import org.xipki.common.ParamChecker;
 
 /**
  * @author Lijun Liao
  */
 
-class AuthorityKeyIdentifierOption
+public class InhibitAnyPolicyConf
 {
-    private final boolean includeIssuerAndSerial;
-    private final ExtensionOccurrence occurence;
+    private final int skipCerts;
 
-    AuthorityKeyIdentifierOption(boolean includeIssuerAndSerial,
-            ExtensionOccurrence occurence)
+    public InhibitAnyPolicyConf(InhibitAnyPolicy jaxb)
     {
-        this.includeIssuerAndSerial = includeIssuerAndSerial;
-        this.occurence = occurence;
+        ParamChecker.assertNotNull("jaxb", jaxb);
+        this.skipCerts = jaxb.getSkipCerts();
     }
 
-    boolean isIncludeIssuerAndSerial()
+    public int getSkipCerts()
     {
-        return includeIssuerAndSerial;
-    }
-
-    ExtensionOccurrence getOccurence()
-    {
-        return occurence;
+        return skipCerts;
     }
 
 }

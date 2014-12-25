@@ -33,7 +33,7 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.ca.qa.certprofile.x509;
+package org.xipki.ca.qa.certprofile.x509.conf;
 
 import org.xipki.ca.qa.certprofile.x509.jaxb.CertificatePolicyInformationType;
 import org.xipki.common.ParamChecker;
@@ -42,7 +42,7 @@ import org.xipki.common.ParamChecker;
  * @author Lijun Liao
  */
 
-class CertificatePolicyInformationConf
+public class CertificatePolicyInformationConf
 {
     private final String policyId;
     private final PolicyQualifiersConf policyQualifiers;

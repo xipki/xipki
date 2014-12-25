@@ -33,66 +33,45 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.ca.qa.certprofile;
+package org.xipki.ca.qa.certprofile.x509.conf;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.regex.Pattern;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 
-import org.xipki.ca.qa.certprofile.x509.jaxb.DirectoryStringType;
+import org.xipki.ca.qa.certprofile.x509.jaxb.ExtensionsType.PolicyMappings;
+import org.xipki.ca.qa.certprofile.x509.jaxb.PolicyIdMappingType;
+import org.xipki.common.ParamChecker;
 
 /**
  * @author Lijun Liao
  */
 
-public class SubjectDNOption
+public class PolicyMappingsConf
 {
-    private final String prefix;
-    private final String suffix;
-    private final List<Pattern> patterns;
-    private final Integer minLen;
-    private final Integer maxLen;
-    private final DirectoryStringType directoryStringType;
+    private final Map<String, String> policyMappings;
 
-    public SubjectDNOption(String prefix, String suffix, List<Pattern> patterns,
-            Integer minLen, Integer maxLen, DirectoryStringType directoryStringType)
+    public PolicyMappingsConf(PolicyMappings jaxb)
     {
-        this.prefix = prefix;
-        this.suffix = suffix;
-        this.patterns = Collections.unmodifiableList(patterns);
-        this.minLen = minLen;
-        this.maxLen = maxLen;
-        this.directoryStringType = directoryStringType;
+        ParamChecker.assertNotNull("jaxb", jaxb);
+
+        this.policyMappings = new HashMap<>();
+        for(PolicyIdMappingType type : jaxb.getMapping())
+        {
+            String issuerDomainPolicy = type.getIssuerDomainPolicy().getValue();
+            String subjectDomainPolicy = type.getSubjectDomainPolicy().getValue();
+            policyMappings.put(issuerDomainPolicy, subjectDomainPolicy);
+        }
     }
 
-    public String getPrefix()
+    public String getSubjectDomainPolicy(String issuerDomainPolicy)
     {
-        return prefix;
+        return policyMappings.get(issuerDomainPolicy);
     }
 
-    public String getSuffix()
+    public Set<String> getIssuerDomainPolicies()
     {
-        return suffix;
-    }
-
-    public List<Pattern> getPatterns()
-    {
-        return patterns;
-    }
-
-    public Integer getMinLen()
-    {
-        return minLen;
-    }
-
-    public Integer getMaxLen()
-    {
-        return maxLen;
-    }
-
-    public DirectoryStringType getDirectoryStringType()
-    {
-        return directoryStringType;
+        return policyMappings.keySet();
     }
 
 }

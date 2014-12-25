@@ -33,12 +33,53 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.ca.qa.certprofile.x509;
+package org.xipki.ca.qa.certprofile.x509.conf;
+
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
+
+import org.xipki.ca.qa.certprofile.x509.jaxb.CertificatePolicyInformationType;
+import org.xipki.ca.qa.certprofile.x509.jaxb.ExtensionsType.CertificatePolicies;
+import org.xipki.common.ParamChecker;
 
 /**
  * @author Lijun Liao
  */
 
-abstract class PolicyQualifierInfoConf
+public class CertificatePoliciesConf
 {
+    private final List<CertificatePolicyInformationConf> policyInformations;
+
+    public CertificatePoliciesConf(CertificatePolicies jaxb)
+    {
+        ParamChecker.assertNotNull("jaxb", jaxb);
+        List<CertificatePolicyInformationType> types = jaxb.getCertificatePolicyInformation();
+        List<CertificatePolicyInformationConf> list = new LinkedList<>();
+        for(CertificatePolicyInformationType type : types)
+        {
+            list.add(new CertificatePolicyInformationConf(type));
+        }
+
+        this.policyInformations = Collections.unmodifiableList(list);
+    }
+
+    public List<CertificatePolicyInformationConf> getPolicyInformations()
+    {
+        return policyInformations;
+    }
+
+    public CertificatePolicyInformationConf getPolicyInformation(String policyId)
+    {
+        for(CertificatePolicyInformationConf entry : policyInformations)
+        {
+            if(entry.getPolicyId().equals(policyId))
+            {
+                return entry;
+            }
+        }
+
+        return null;
+    }
+
 }
