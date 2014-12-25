@@ -50,8 +50,11 @@ public class SubjectDNOption
     private final List<AddText> addprefixes;
     private final List<AddText> addsufixes;
     private final List<Pattern> patterns;
+    private final Integer minLen;
+    private final Integer maxLen;
 
-    public SubjectDNOption(List<AddText> addprefixes, List<AddText> addsufixes, List<Pattern> patterns)
+    public SubjectDNOption(List<AddText> addprefixes, List<AddText> addsufixes, List<Pattern> patterns,
+            Integer minLen, Integer maxLen)
     {
         this.addprefixes = addprefixes;
         this.addsufixes = addsufixes;
@@ -62,6 +65,8 @@ public class SubjectDNOption
         {
             this.patterns = Collections.unmodifiableList(patterns);
         }
+        this.minLen = minLen;
+        this.maxLen = maxLen;
     }
 
     public AddText getAddprefix(EnvironmentParameterResolver pr)
@@ -102,6 +107,16 @@ public class SubjectDNOption
     public List<Pattern> getPatterns()
     {
         return patterns;
+    }
+
+    public Integer getMinLen()
+    {
+        return minLen;
+    }
+
+    public Integer getMaxLen()
+    {
+        return maxLen;
     }
 
 }

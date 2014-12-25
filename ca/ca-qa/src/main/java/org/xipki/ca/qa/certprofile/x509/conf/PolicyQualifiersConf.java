@@ -33,26 +33,56 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.ca.qa.certprofile.x509;
+package org.xipki.ca.qa.certprofile.x509.conf;
 
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
+
+import javax.xml.bind.JAXBElement;
+
+import org.xipki.ca.qa.certprofile.x509.jaxb.CertificatePolicyInformationType.PolicyQualifiers;
 import org.xipki.common.ParamChecker;
 
 /**
  * @author Lijun Liao
  */
 
-class CPSUriPolicyQualifierInfo extends PolicyQualifierInfoConf
+public class PolicyQualifiersConf
 {
-    private final String cPSUri;
-
-    public CPSUriPolicyQualifierInfo(String cPSUri)
+    private final List<PolicyQualifierInfoConf> policyQualifiers;
+    public PolicyQualifiersConf(PolicyQualifiers jaxb)
     {
-        ParamChecker.assertNotEmpty("cPSUri", cPSUri);
-        this.cPSUri = cPSUri;
+        ParamChecker.assertNotNull("jaxb", jaxb);
+
+        List<PolicyQualifierInfoConf> list = new LinkedList<>();
+
+        List<JAXBElement<String>> elements = jaxb.getCpsUriOrUserNotice();
+        for(JAXBElement<String> element : elements)
+        {
+            String value = element.getValue();
+            String localPart = element.getName().getLocalPart();
+
+            PolicyQualifierInfoConf info;
+            if("cpsUri".equals(localPart))
+            {
+                info = new CPSUriPolicyQualifierInfo(value);
+            } else if("userNotice".equals(localPart))
+            {
+                info = new UserNoticePolicyQualifierInfo(value);
+            } else
+            {
+                throw new RuntimeException("should not reach here");
+            }
+            list.add(info);
+        }
+
+        this.policyQualifiers = Collections.unmodifiableList(list);
     }
 
-    public String getCPSUri()
+    public List<PolicyQualifierInfoConf> getPolicyQualifiers()
     {
-        return cPSUri;
+        return policyQualifiers;
     }
+
 }

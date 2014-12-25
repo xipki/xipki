@@ -33,56 +33,40 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.ca.qa.certprofile.x509;
+package org.xipki.ca.qa.certprofile.x509.conf;
 
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
-
-import javax.xml.bind.JAXBElement;
-
-import org.xipki.ca.qa.certprofile.x509.jaxb.CertificatePolicyInformationType.PolicyQualifiers;
+import org.xipki.ca.qa.certprofile.x509.jaxb.ExtensionsType.PolicyConstraints;
 import org.xipki.common.ParamChecker;
 
 /**
  * @author Lijun Liao
  */
 
-class PolicyQualifiersConf
+public class PolicyConstraintsConf
 {
-    private final List<PolicyQualifierInfoConf> policyQualifiers;
-    public PolicyQualifiersConf(PolicyQualifiers jaxb)
+    private final Integer requireExplicitPolicy;
+    private final Integer inhibitPolicyMapping;
+
+    public PolicyConstraintsConf(PolicyConstraints jaxb)
     {
         ParamChecker.assertNotNull("jaxb", jaxb);
-
-        List<PolicyQualifierInfoConf> list = new LinkedList<>();
-
-        List<JAXBElement<String>> elements = jaxb.getCpsUriOrUserNotice();
-        for(JAXBElement<String> element : elements)
+        if(jaxb.getRequireExplicitPolicy() == null && jaxb.getInhibitPolicyMapping() == null)
         {
-            String value = element.getValue();
-            String localPart = element.getName().getLocalPart();
-
-            PolicyQualifierInfoConf info;
-            if("cpsUri".equals(localPart))
-            {
-                info = new CPSUriPolicyQualifierInfo(value);
-            } else if("userNotice".equals(localPart))
-            {
-                info = new UserNoticePolicyQualifierInfo(value);
-            } else
-            {
-                throw new RuntimeException("should not reach here");
-            }
-            list.add(info);
+            throw new IllegalArgumentException("at least one of requireExplicitPolicy and inhibitPolicyMapping must be set");
         }
 
-        this.policyQualifiers = Collections.unmodifiableList(list);
+        this.requireExplicitPolicy = jaxb.getRequireExplicitPolicy();
+        this.inhibitPolicyMapping = jaxb.getInhibitPolicyMapping();
     }
 
-    public List<PolicyQualifierInfoConf> getPolicyQualifiers()
+    public Integer getRequireExplicitPolicy()
     {
-        return policyQualifiers;
+        return requireExplicitPolicy;
+    }
+
+    public Integer getInhibitPolicyMapping()
+    {
+        return inhibitPolicyMapping;
     }
 
 }

@@ -33,7 +33,7 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.ca.qa.certprofile.x509;
+package org.xipki.ca.qa.certprofile.x509.conf;
 
 import org.xipki.common.ParamChecker;
 
@@ -41,18 +41,18 @@ import org.xipki.common.ParamChecker;
  * @author Lijun Liao
  */
 
-class UserNoticePolicyQualifierInfo extends PolicyQualifierInfoConf
+public class CPSUriPolicyQualifierInfo extends PolicyQualifierInfoConf
 {
-    private final String userNotice;
+    private final String cPSUri;
 
-    public UserNoticePolicyQualifierInfo(String userNotice)
+    public CPSUriPolicyQualifierInfo(String cPSUri)
     {
-        ParamChecker.assertNotEmpty("userNotice", userNotice);
-        this.userNotice = userNotice;
+        ParamChecker.assertNotEmpty("cPSUri", cPSUri);
+        this.cPSUri = cPSUri;
     }
 
-    public String getUserNotice()
+    public String getCPSUri()
     {
-        return userNotice;
+        return cPSUri;
     }
 }

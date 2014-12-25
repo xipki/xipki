@@ -109,6 +109,9 @@
   <xs:complexType name="rdnType">
     <xs:sequence>
       <xs:element name="type" type="OidWithDescType"/>
+      <xs:element name="minLen" type="xs:int" minOccurs="0"/>
+      <xs:element name="maxLen" type="xs:int" minOccurs="0"/>
+      <xs:element name="directoryStringType" type="DirectoryStringType" minOccurs="0"/>
       <xs:element name="regex" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
       <xs:element name="prefix" type="xs:string" minOccurs="0"/>
       <xs:element name="suffix" type="xs:string" minOccurs="0"/>
@@ -116,6 +119,15 @@
     <xs:attribute name="minOccurs" type="xs:int" default="1" use="optional"/>
     <xs:attribute name="maxOccurs" type="xs:int" default="1" use="optional"/>
   </xs:complexType>
+  <xs:simpleType name="DirectoryStringType">
+    <xs:restriction base="xs:normalizedString">
+        <xs:enumeration value="teletexString"/>
+        <xs:enumeration value="printableString"/>
+        <xs:enumeration value="universalString"/>
+        <xs:enumeration value="utf8String"/>
+        <xs:enumeration value="bmpString"/>
+    </xs:restriction>
+  </xs:simpleType>
   <xs:complexType name="ExtensionType">
     <xs:annotation>
       <xs:documentation>

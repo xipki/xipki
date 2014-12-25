@@ -443,7 +443,8 @@ public class DefaultX509CertProfile extends AbstractX509CertProfile
 
                     List<AddText> addprefixes = buildAddText(t.getAddPrefix());
                     List<AddText> addsuffixes = buildAddText(t.getAddSuffix());
-                    SubjectDNOption option = new SubjectDNOption(addprefixes, addsuffixes, patterns);
+                    SubjectDNOption option = new SubjectDNOption(addprefixes, addsuffixes, patterns,
+                            t.getMinLen(), t.getMaxLen());
                     this.subjectDNOptions.put(type, option);
                 }
             }
@@ -1241,6 +1242,27 @@ public class DefaultX509CertProfile extends AbstractX509CertProfile
                 sb.append(suffix);
             }
             text = sb.toString();
+
+            int len = text.length();
+            Integer minLen = option.getMinLen();
+            if(minLen != null)
+            {
+                if(len < minLen)
+                {
+                    throw new BadCertTemplateException("subject " + ObjectIdentifiers.oidToDisplayName(type) +
+                            " '" + text + "' is too short (length (" + len + ") < minLen (" + minLen + ")");
+                }
+            }
+
+            Integer maxLen = option.getMaxLen();
+            if(maxLen != null)
+            {
+                if(len > maxLen)
+                {
+                    throw new BadCertTemplateException("subject " + ObjectIdentifiers.oidToDisplayName(type) +
+                            " '" + text + "' is too long (length (" + len + ") > maxLen (" + maxLen + ")");
+                }
+            }
         }
 
         ASN1Encodable dnValue;

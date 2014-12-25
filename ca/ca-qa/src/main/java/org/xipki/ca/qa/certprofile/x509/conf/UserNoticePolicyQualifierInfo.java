@@ -33,53 +33,26 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.ca.qa.certprofile.x509;
+package org.xipki.ca.qa.certprofile.x509.conf;
 
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
-
-import org.xipki.ca.qa.certprofile.x509.jaxb.CertificatePolicyInformationType;
-import org.xipki.ca.qa.certprofile.x509.jaxb.ExtensionsType.CertificatePolicies;
 import org.xipki.common.ParamChecker;
 
 /**
  * @author Lijun Liao
  */
 
-class CertificatePoliciesConf
+public class UserNoticePolicyQualifierInfo extends PolicyQualifierInfoConf
 {
-    private final List<CertificatePolicyInformationConf> policyInformations;
+    private final String userNotice;
 
-    public CertificatePoliciesConf(CertificatePolicies jaxb)
+    public UserNoticePolicyQualifierInfo(String userNotice)
     {
-        ParamChecker.assertNotNull("jaxb", jaxb);
-        List<CertificatePolicyInformationType> types = jaxb.getCertificatePolicyInformation();
-        List<CertificatePolicyInformationConf> list = new LinkedList<>();
-        for(CertificatePolicyInformationType type : types)
-        {
-            list.add(new CertificatePolicyInformationConf(type));
-        }
-
-        this.policyInformations = Collections.unmodifiableList(list);
+        ParamChecker.assertNotEmpty("userNotice", userNotice);
+        this.userNotice = userNotice;
     }
 
-    public List<CertificatePolicyInformationConf> getPolicyInformations()
+    public String getUserNotice()
     {
-        return policyInformations;
+        return userNotice;
     }
-
-    public CertificatePolicyInformationConf getPolicyInformation(String policyId)
-    {
-        for(CertificatePolicyInformationConf entry : policyInformations)
-        {
-            if(entry.getPolicyId().equals(policyId))
-            {
-                return entry;
-            }
-        }
-
-        return null;
-    }
-
 }
