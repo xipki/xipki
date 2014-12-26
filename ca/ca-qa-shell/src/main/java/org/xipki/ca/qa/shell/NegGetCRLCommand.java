@@ -35,31 +35,25 @@
 
 package org.xipki.ca.qa.shell;
 
+import java.security.cert.X509CRL;
+
 import org.apache.karaf.shell.commands.Command;
-import org.xipki.ca.client.shell.GetCRLCommand;
-import org.xipki.console.karaf.UnexpectedResultException;
+import org.xipki.ca.client.api.PKIErrorException;
+import org.xipki.ca.client.api.RAWorkerException;
 
 /**
  * @author Lijun Liao
  */
 
 @Command(scope = "caqa", name = "neg-getcrl", description="Download CRL (negative, for QA)")
-public class NegGetCRLCommand extends GetCRLCommand
+public class NegGetCRLCommand extends NegCRLCommand
 {
 
     @Override
-    protected Object doExecute()
-    throws Exception
+    protected X509CRL retrieveCRL(String caName)
+    throws RAWorkerException, PKIErrorException
     {
-        try
-        {
-            super.doExecute();
-            throw new Exception("No CRL is expected, but received one");
-        }catch(UnexpectedResultException e)
-        {
-        }
-
-        return null;
+        return raWorker.downloadCRL(caName);
     }
 
 }

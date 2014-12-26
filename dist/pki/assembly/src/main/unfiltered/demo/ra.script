@@ -185,22 +185,22 @@ keytool:rsa-p12 -pwd 1234 -out output/TLS101.p12 -subject "CN=TLS101,O=xipki,C=D
 
 keytool:req-p12 -p12 output/TLS101.p12 -pwd 1234 -out output/TLS101.p10
 
-caqa:neg-ra-enroll -p10 output/TLS101.p10 -out output/dummy -profile TLS -user USER-T
+caqa:neg-ra-enroll -p10 output/TLS101.p10 -profile TLS -user USER-T
 
-caqa:neg-enroll-p12 -p12 output/TLS101.p12 -pwd 1234 -out output/dummy -profile TLS -user USER-T
+caqa:neg-enroll-p12 -p12 output/TLS101.p12 -pwd 1234 -profile TLS -user USER-T
 
 # multipleOUs
 keytool:rsa-p12 -pwd 1234 -out output/multipleOUs101.p12 -subject "CN=multipleOUs101,OU=A12345,OU=A54321,O=xipki,C=DE"
 
-caqa:neg-enroll-p12 -p12 output/multipleOUs101.p12 -pwd 1234 -out output/dummy -profile multipleOUs -user USER-O
+caqa:neg-enroll-p12 -p12 output/multipleOUs101.p12 -pwd 1234 -profile multipleOUs -user USER-O
 
 keytool:rsa-p12 -pwd 1234 -out output/multipleOUs102.p12 -subject "CN=multipleOUs102,OU=12345,OU=54321,O=xipki,C=DE"
 
-caqa:neg-enroll-p12 -p12 output/multipleOUs102.p12 -pwd 1234 -out output/dummy -profile multipleOUs -user USER-O
+caqa:neg-enroll-p12 -p12 output/multipleOUs102.p12 -pwd 1234 -profile multipleOUs -user USER-O
 
 keytool:rsa-p12 -pwd 1234 -out output/multipleOUs103.p12 -subject "CN=multipleOUs103,OU=A12345,O=xipki,C=DE"
 
-caqa:neg-enroll-p12 -p12 output/multipleOUs103.p12 -pwd 1234 -out output/dummy -profile multipleOUs -user USER-O
+caqa:neg-enroll-p12 -p12 output/multipleOUs103.p12 -pwd 1234 -profile multipleOUs -user USER-O
 
 ## Revoke certificate that has been revoked
 
@@ -209,10 +209,10 @@ caqa:neg-revoke -cert output/TLS2.der -reason keyCompromise
 caqa:neg-unrevoke -cert output/TLS2.der
 
 ## Generate CRL
-caqa:neg-gencrl -ca SubCA1 -out output/dummy
+caqa:neg-gencrl -ca SubCA1
 
 ## Get CRL
-caqa:neg-getcrl -ca SubCA1 -out output/dummy
+caqa:neg-getcrl -ca SubCA1
  
 #################################################################
 #              UNINSTALL UNNEEDED FEATURES                      #

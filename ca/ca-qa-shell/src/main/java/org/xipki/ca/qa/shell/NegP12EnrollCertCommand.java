@@ -35,31 +35,41 @@
 
 package org.xipki.ca.qa.shell;
 
+import java.security.cert.X509Certificate;
+
 import org.apache.karaf.shell.commands.Command;
-import org.xipki.ca.client.shell.P12EnrollCertCommand;
-import org.xipki.console.karaf.UnexpectedResultException;
+import org.apache.karaf.shell.commands.Option;
+import org.xipki.security.SecurityFactoryImpl;
+import org.xipki.security.api.ConcurrentContentSigner;
+import org.xipki.security.api.SignerException;
 
 /**
  * @author Lijun Liao
  */
 
 @Command(scope = "caqa", name = "neg-enroll-p12", description="Enroll certificate (PKCS#12 keystore, negative, for QA)")
-public class NegP12EnrollCertCommand extends P12EnrollCertCommand
+public class NegP12EnrollCertCommand extends NegEnrollCertCommand
 {
 
+    @Option(name = "-p12",
+            required = true, description = "Required. PKCS#12 request file")
+    protected String p12File;
+
+    @Option(name = "-pwd", aliases = { "--password" },
+            required = false, description = "Password of the PKCS#12 file")
+    protected String password;
+
     @Override
-    protected Object doExecute()
-    throws Exception
+    protected ConcurrentContentSigner getSigner()
+    throws SignerException
     {
-        try
+        if(password == null)
         {
-            super.doExecute();
-            throw new Exception("No certificate is excepted, but received one");
-        }catch(UnexpectedResultException e)
-        {
+            password = new String(readPassword());
         }
 
-        return null;
+        String signerConfWithoutAlgo = SecurityFactoryImpl.getKeystoreSignerConfWithoutAlgo(p12File, password, 1);
+        return securityFactory.createSigner("PKCS12", signerConfWithoutAlgo, hashAlgo, false, (X509Certificate[]) null);
     }
 
 }

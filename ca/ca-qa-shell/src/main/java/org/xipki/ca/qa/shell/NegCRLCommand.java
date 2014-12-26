@@ -36,24 +36,72 @@
 package org.xipki.ca.qa.shell;
 
 import java.security.cert.X509CRL;
+import java.util.Set;
 
-import org.apache.karaf.shell.commands.Command;
+import org.apache.karaf.shell.commands.Option;
 import org.xipki.ca.client.api.PKIErrorException;
 import org.xipki.ca.client.api.RAWorkerException;
+import org.xipki.ca.client.shell.ClientCommand;
+import org.xipki.console.karaf.UnexpectedResultException;
 
 /**
  * @author Lijun Liao
  */
 
-@Command(scope = "caqa", name = "neg-gencrl", description="Generate CRL (negative, for QA)")
-public class NegGenCRLCommand extends NegCRLCommand
+public abstract class NegCRLCommand extends ClientCommand
 {
 
+    @Option(name = "-ca",
+            required = false, description = "Required if multiple CAs are configured. CA name")
+    protected String caName;
+
+    protected abstract X509CRL retrieveCRL(String caName)
+    throws RAWorkerException, PKIErrorException;
+
     @Override
-    protected X509CRL retrieveCRL(String caName)
-    throws RAWorkerException, PKIErrorException
+    protected Object doExecute()
+    throws Exception
     {
-        return raWorker.generateCRL(caName);
+        Set<String> caNames = raWorker.getCaNames();
+        if(caNames.isEmpty())
+        {
+            err("No CA is configured");
+            return  null;
+        }
+
+        if(caName != null && ! caNames.contains(caName))
+        {
+            err("CA " + caName + " is not within the configured CAs " + caNames);
+            return null;
+        }
+
+        if(caName == null)
+        {
+            if(caNames.size() == 1)
+            {
+                caName = caNames.iterator().next();
+            }
+            else
+            {
+                err("No caname is specified, one of " + caNames + " is required");
+                return null;
+            }
+        }
+
+        X509CRL crl = null;
+        try
+        {
+            crl = retrieveCRL(caName);
+        }catch(PKIErrorException e)
+        {
+        }
+
+        if(crl != null)
+        {
+            throw new UnexpectedResultException("No CRL is expected, but received one");
+        }
+
+        return null;
     }
 
 }
