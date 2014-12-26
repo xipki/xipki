@@ -35,8 +35,16 @@
 
 package org.xipki.ca.qa.shell;
 
+import java.math.BigInteger;
+import java.security.cert.X509Certificate;
+
 import org.apache.karaf.shell.commands.Command;
-import org.xipki.ca.client.shell.RevokeCertCommand;
+import org.apache.karaf.shell.commands.Option;
+import org.bouncycastle.asn1.x500.X500Name;
+import org.xipki.ca.client.api.CertIDOrError;
+import org.xipki.ca.client.shell.UnRevRemoveCertCommand;
+import org.xipki.common.CRLReason;
+import org.xipki.common.SecurityUtil;
 import org.xipki.console.karaf.UnexpectedResultException;
 
 /**
@@ -44,21 +52,61 @@ import org.xipki.console.karaf.UnexpectedResultException;
  */
 
 @Command(scope = "caqa", name = "neg-revoke", description="Revoke certificate (negative, for QA)")
-public class NegRevokeCertCommand extends RevokeCertCommand
+public class NegRevokeCertCommand extends UnRevRemoveCertCommand
 {
+
+    @Option(name = "-reason",
+            required = true,
+            description = "Required. Reason, valid values are \n" +
+                    "  0: unspecified\n" +
+                    "  1: keyCompromise\n" +
+                    "  3: affiliationChanged\n" +
+                    "  4: superseded\n" +
+                    "  5: cessationOfOperation\n" +
+                    "  6: certificateHold\n" +
+                    "  9: privilegeWithdrawn")
+    protected String reason;
 
     @Override
     protected Object doExecute()
     throws Exception
     {
-        try
+        if(certFile == null && (caCertFile == null || serialNumber == null))
         {
-            super.doExecute();
-            throw new Exception("Error is excepted");
-        }catch(UnexpectedResultException e)
-        {
+            err("either cert or (cacert, serial) must be specified");
+            return null;
         }
 
+        CRLReason crlReason = CRLReason.getInstance(reason);
+        if(crlReason == null)
+        {
+            err("invalid reason " + reason);
+            return null;
+        }
+
+        if(CRLReason.PERMITTED_CLIENT_CRLREASONS.contains(crlReason) == false)
+        {
+            err("reason " + reason + " is not permitted");
+            return null;
+        }
+
+        CertIDOrError certIdOrError;
+        if(certFile != null)
+        {
+            X509Certificate cert = SecurityUtil.parseCert(certFile);
+            certIdOrError = raWorker.revokeCert(cert, crlReason.getCode());
+        }
+        else
+        {
+            X509Certificate caCert = SecurityUtil.parseCert(caCertFile);
+            X500Name issuer = X500Name.getInstance(caCert.getSubjectX500Principal().getEncoded());
+            certIdOrError = raWorker.revokeCert(issuer, new BigInteger(serialNumber), crlReason.getCode());
+        }
+
+        if(certIdOrError.getError() == null)
+        {
+            throw new UnexpectedResultException("Revocation sucessful but expected failure");
+        }
         return null;
     }
 

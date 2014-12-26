@@ -35,8 +35,8 @@
 
 package org.xipki.ca.qa.certprofile.x509;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.math.BigInteger;
 import java.net.URL;
 import java.security.cert.CertificateException;
@@ -123,7 +123,7 @@ import org.xipki.ca.api.CertValidity;
 import org.xipki.ca.api.profile.ExtensionOccurrence;
 import org.xipki.ca.api.profile.RDNOccurrence;
 import org.xipki.ca.qa.ValidationIssue;
-import org.xipki.ca.qa.cainfo.X509CAInfo;
+import org.xipki.ca.qa.ValidationResult;
 import org.xipki.ca.qa.certprofile.GeneralNameMode;
 import org.xipki.ca.qa.certprofile.GeneralNameTag;
 import org.xipki.ca.qa.certprofile.KeyParamRange;
@@ -156,7 +156,7 @@ import org.xipki.ca.qa.certprofile.x509.jaxb.KeyUsageType;
 import org.xipki.ca.qa.certprofile.x509.jaxb.ObjectFactory;
 import org.xipki.ca.qa.certprofile.x509.jaxb.OidWithDescType;
 import org.xipki.ca.qa.certprofile.x509.jaxb.ParameterType;
-import org.xipki.ca.qa.certprofile.x509.jaxb.ProfileType;
+import org.xipki.ca.qa.certprofile.x509.jaxb.X509ProfileType;
 import org.xipki.ca.qa.certprofile.x509.jaxb.RdnType;
 import org.xipki.ca.qa.certprofile.x509.jaxb.SubjectInfoAccessType.Access;
 import org.xipki.common.HashAlgoType;
@@ -172,9 +172,9 @@ import org.xml.sax.SAXException;
  * @author Lijun Liao
  */
 
-public class QAX509CertProfile
+public class X509CertProfileQA
 {
-    private static final Logger LOG = LoggerFactory.getLogger(QAX509CertProfile.class);
+    private static final Logger LOG = LoggerFactory.getLogger(X509CertProfileQA.class);
     private static final TimeZone UTC = TimeZone.getTimeZone("UTC");
     private static final long SECOND = 1000L;
     private static final char GENERALNAME_SEP = '|';
@@ -220,7 +220,7 @@ public class QAX509CertProfile
     private final static Object jaxbUnmarshallerLock = new Object();
     private static Unmarshaller jaxbUnmarshaller;
 
-    protected final ProfileType profileConf;
+    protected final X509ProfileType profileConf;
 
     private Map<ASN1ObjectIdentifier, Set<Byte>> allowedEcCurves;
     private Map<ASN1ObjectIdentifier, List<KeyParamRanges>> nonEcKeyAlgorithms;
@@ -258,13 +258,7 @@ public class QAX509CertProfile
         ignoreRDNs.add(Extension.subjectInfoAccess);
     }
 
-    public QAX509CertProfile(String xmlConf)
-    throws CertProfileException
-    {
-        this(parse(xmlConf));
-    }
-
-    public QAX509CertProfile(ProfileType conf)
+    public X509CertProfileQA(X509ProfileType conf)
     throws CertProfileException
     {
         try
@@ -605,18 +599,18 @@ public class QAX509CertProfile
         }
     }
 
-    public List<ValidationIssue> checkCert(
+    public ValidationResult checkCert(
             byte[] certBytes,
-            X509CAInfo caInfo,
+            X509IssuerInfo issuerInfo,
             X500Name requestedSubject,
             SubjectPublicKeyInfo requestedPublicKey)
     {
         ParamChecker.assertNotNull("certBytes", certBytes);
-        ParamChecker.assertNotNull("caInfo", caInfo);
+        ParamChecker.assertNotNull("issuerInfo", issuerInfo);
         ParamChecker.assertNotNull("requestedSubject", requestedSubject);
         ParamChecker.assertNotNull("requestedPublicKey", requestedPublicKey);
 
-        List<ValidationIssue> result = new LinkedList<ValidationIssue>();
+        List<ValidationIssue> resultIssues = new LinkedList<ValidationIssue>();
 
         Certificate bcCert;
         X509Certificate cert;
@@ -624,7 +618,7 @@ public class QAX509CertProfile
         // certificate encoding
         {
             ValidationIssue issue = new ValidationIssue("X509.ENCODING", "certificate encoding");
-            result.add(issue);
+            resultIssues.add(issue);
             try
             {
                 bcCert = Certificate.getInstance(certBytes);
@@ -632,14 +626,14 @@ public class QAX509CertProfile
             } catch (CertificateException | IOException e)
             {
                 issue.setFailureMessage("certificate is not corrected encoded");
-                return result;
+                return new ValidationResult(resultIssues);
             }
         }
 
         // syntax version
         {
             ValidationIssue issue = new ValidationIssue("X509.VERSION", "certificate version");
-            result.add(issue);
+            resultIssues.add(issue);
             int versionNumber = cert.getVersion();
             if(versionNumber != syntaxVersion)
             {
@@ -651,7 +645,7 @@ public class QAX509CertProfile
         if(sigantureAlgorithms != null)
         {
             ValidationIssue issue = new ValidationIssue("X509.SIGALG", "signature algorithm");
-            result.add(issue);
+            resultIssues.add(issue);
 
             AlgorithmIdentifier sigAlgId = bcCert.getSignatureAlgorithm();
             AlgorithmIdentifier tbsSigAlgId = bcCert.getTBSCertificate().getSignature();
@@ -672,7 +666,7 @@ public class QAX509CertProfile
         if(notBeforeMidnight)
         {
             ValidationIssue issue = new ValidationIssue("X509.NOTBEFORE", "not before midnight");
-            result.add(issue);
+            resultIssues.add(issue);
             Calendar c = Calendar.getInstance(UTC);
             c.setTime(cert.getNotBefore());
             int hourOfDay = c.get(Calendar.HOUR_OF_DAY);
@@ -688,7 +682,7 @@ public class QAX509CertProfile
         // validity
         {
             ValidationIssue issue = new ValidationIssue("X509.VALIDITY", "cert validity");
-            result.add(issue);
+            resultIssues.add(issue);
 
             Date expectedNotAfter = validity.add(cert.getNotBefore());
             if(Math.abs(expectedNotAfter.getTime() - cert.getNotAfter().getTime()) > 60 * SECOND)
@@ -704,7 +698,7 @@ public class QAX509CertProfile
                     && (allowedEcCurves == null || allowedEcCurves.isEmpty())) == false)
             {
                 ValidationIssue issue = new ValidationIssue("X509.PUBKEY.SYN", "whether public key is permitted");
-                result.add(issue);
+                resultIssues.add(issue);
                 try
                 {
                     checkPublicKey(publicKey);
@@ -715,7 +709,7 @@ public class QAX509CertProfile
             }
 
             ValidationIssue issue = new ValidationIssue("X509.PUBKEY.REQ", "whether public key matches the request one");
-            result.add(issue);
+            resultIssues.add(issue);
             SubjectPublicKeyInfo c14nRequestedPublicKey = SecurityUtil.toRfc3279Style(requestedPublicKey);
             if(c14nRequestedPublicKey.equals(publicKey) == false)
             {
@@ -726,10 +720,10 @@ public class QAX509CertProfile
         // Signature
         {
             ValidationIssue issue = new ValidationIssue("X509.SIG", "whether certificate is signed by CA");
-            result.add(issue);
+            resultIssues.add(issue);
             try
             {
-                cert.verify(caInfo.getCert().getPublicKey(), "BC");
+                cert.verify(issuerInfo.getCert().getPublicKey(), "BC");
             }catch(Exception e)
             {
                 issue.setFailureMessage("invalid signature");
@@ -739,8 +733,8 @@ public class QAX509CertProfile
         // issuer
         {
             ValidationIssue issue = new ValidationIssue("X509.ISSUER", "certificate issuer");
-            result.add(issue);
-            if(cert.getIssuerX500Principal().equals(caInfo.getCert().getSubjectX500Principal()) == false)
+            resultIssues.add(issue);
+            if(cert.getIssuerX500Principal().equals(issuerInfo.getCert().getSubjectX500Principal()) == false)
             {
                 issue.setFailureMessage("issue in certificate does not equal the subject of CA certificate");
             }
@@ -748,15 +742,15 @@ public class QAX509CertProfile
 
         // subject
         X500Name subject = bcCert.getTBSCertificate().getSubject();
-        result.addAll(checkSubject(subject, requestedSubject));
+        resultIssues.addAll(checkSubject(subject, requestedSubject));
 
         // extensions
-        result.addAll(checkExtensions(bcCert, caInfo, requestedSubject));
+        resultIssues.addAll(checkExtensions(bcCert, issuerInfo, requestedSubject));
 
-        return result;
+        return new ValidationResult(resultIssues);
     }
 
-    private List<ValidationIssue> checkExtensions(Certificate bcCert, X509CAInfo caInfo, X500Name requestedSubject)
+    private List<ValidationIssue> checkExtensions(Certificate bcCert, X509IssuerInfo issuerInfo, X500Name requestedSubject)
     {
         List<ValidationIssue> result = new LinkedList<>();
 
@@ -836,7 +830,7 @@ public class QAX509CertProfile
                     checkExtensionSubjectKeyIdentifier(extensionValue, bcCert.getSubjectPublicKeyInfo(), failureMsg);
                 } else if(Extension.authorityKeyIdentifier.equals(oid))
                 {
-                    checkExtensionIssuerKeyIdentifier(extensionValue, caInfo, failureMsg);
+                    checkExtensionIssuerKeyIdentifier(extensionValue, issuerInfo, failureMsg);
                 } else if(Extension.keyUsage.equals(oid))
                 {
                     if(keyusage != null)
@@ -884,19 +878,19 @@ public class QAX509CertProfile
                     checkExtensionSubjectAltName(extensionValue, requestedSubject, failureMsg);
                 } else if(Extension.issuerAlternativeName.equals(oid))
                 {
-                    checkExtensionIssuerAltNames(extensionValue, caInfo, failureMsg);
+                    checkExtensionIssuerAltNames(extensionValue, issuerInfo, failureMsg);
                 } else if(Extension.authorityInfoAccess.equals(oid))
                 {
-                    checkExtensionAuthorityInfoAccess(extensionValue, caInfo, failureMsg);
+                    checkExtensionAuthorityInfoAccess(extensionValue, issuerInfo, failureMsg);
                 } else if(Extension.cRLDistributionPoints.equals(oid))
                 {
-                    checkExtensionCrlDistributionPoints(extensionValue, caInfo, failureMsg);
+                    checkExtensionCrlDistributionPoints(extensionValue, issuerInfo, failureMsg);
                 } else if(Extension.deltaCRLIndicator.equals(oid))
                 {
-                    checkExtensionDeltaCrlDistributionPoints(extensionValue, caInfo, failureMsg);
+                    checkExtensionDeltaCrlDistributionPoints(extensionValue, issuerInfo, failureMsg);
                 } else if(ObjectIdentifiers.id_extension_admission.equals(oid))
                 {
-                    checkExtensionAdmission(extensionValue, caInfo, failureMsg);
+                    checkExtensionAdmission(extensionValue, issuerInfo, failureMsg);
                 } else
                 {
                     // do nothing
@@ -915,8 +909,8 @@ public class QAX509CertProfile
         return result;
     }
 
-    public static ProfileType parse(String xmlConf)
-    throws CertProfileException
+    public static X509ProfileType parse(InputStream confStream)
+    throws CertProfileException, IOException
     {
         synchronized (jaxbUnmarshallerLock)
         {
@@ -930,22 +924,24 @@ public class QAX509CertProfile
 
                     final SchemaFactory schemaFact = SchemaFactory.newInstance(
                             javax.xml.XMLConstants.W3C_XML_SCHEMA_NS_URI);
-                    URL url = QAX509CertProfile.class.getResource("/xsd/certprofile.xsd");
+                    URL url = X509CertProfileQA.class.getResource("/xsd/qa-x509certprofile.xsd");
                     jaxbUnmarshaller.setSchema(schemaFact.newSchema(url));
                 }
 
-                rootElement = (JAXBElement<?>) jaxbUnmarshaller.unmarshal(
-                        new ByteArrayInputStream(xmlConf.getBytes()));
+                rootElement = (JAXBElement<?>) jaxbUnmarshaller.unmarshal(confStream);
             }
             catch(JAXBException | SAXException e)
             {
                 throw new CertProfileException("parse profile failed, message: " + e.getMessage(), e);
+            } finally
+            {
+                confStream.close();
             }
 
             Object rootType = rootElement.getValue();
-            if(rootType instanceof ProfileType)
+            if(rootType instanceof X509ProfileType)
             {
-                return (ProfileType) rootElement.getValue();
+                return (X509ProfileType) rootElement.getValue();
             }
             else
             {
@@ -1527,7 +1523,7 @@ public class QAX509CertProfile
         }
     }
 
-    private void checkExtensionIssuerKeyIdentifier(byte[] extensionValue, X509CAInfo caInfo,
+    private void checkExtensionIssuerKeyIdentifier(byte[] extensionValue, X509IssuerInfo issuerInfo,
             StringBuilder failureMsg)
     {
         AuthorityKeyIdentifier asn1 = AuthorityKeyIdentifier.getInstance(extensionValue);
@@ -1537,10 +1533,10 @@ public class QAX509CertProfile
             failureMsg.append("keyIdentifier is 'absent' but expected 'present'");
             failureMsg.append("; ");
         }
-        else if(Arrays.equals(caInfo.getSubjectKeyIdentifier(), keyIdentifier) == false)
+        else if(Arrays.equals(issuerInfo.getSubjectKeyIdentifier(), keyIdentifier) == false)
         {
             failureMsg.append("keyIdentifier is '" + hex(keyIdentifier) + "' but expected '" +
-                    hex(caInfo.getSubjectKeyIdentifier()) + "'");
+                    hex(issuerInfo.getSubjectKeyIdentifier()) + "'");
             failureMsg.append("; ");
         }
 
@@ -1553,10 +1549,10 @@ public class QAX509CertProfile
                 failureMsg.append("authorityCertIssuer is 'absent' but expected 'present'");
                 failureMsg.append("; ");
             }
-            if(caInfo.getCert().getSerialNumber().equals(serialNumber) == false)
+            if(issuerInfo.getCert().getSerialNumber().equals(serialNumber) == false)
             {
                 failureMsg.append("authorityCertSerialNumber is '" + serialNumber + "' but expected '" +
-                        caInfo.getCert().getSerialNumber() + "'");
+                        issuerInfo.getCert().getSerialNumber() + "'");
                 failureMsg.append("; ");
             }
         }
@@ -1595,7 +1591,7 @@ public class QAX509CertProfile
             }
             else
             {
-                X500Name caSubject = caInfo.getBcCert().getTBSCertificate().getSubject();
+                X500Name caSubject = issuerInfo.getBcCert().getTBSCertificate().getSubject();
                 if(caSubject.equals(x500GenName) == false)
                 {
                     failureMsg.append("authorityCertIssuer is '" + x500GenName.toString()
@@ -1965,9 +1961,9 @@ public class QAX509CertProfile
         }
     }
 
-    private void checkExtensionIssuerAltNames(byte[] extensionValue, X509CAInfo caInfo, StringBuilder failureMsg)
+    private void checkExtensionIssuerAltNames(byte[] extensionValue, X509IssuerInfo issuerInfo, StringBuilder failureMsg)
     {
-        Extension caSubjectAltExtension = caInfo.getBcCert().getTBSCertificate().getExtensions().getExtension(
+        Extension caSubjectAltExtension = issuerInfo.getBcCert().getTBSCertificate().getExtensions().getExtension(
                 Extension.subjectAlternativeName);
         if(caSubjectAltExtension == null)
         {
@@ -1986,9 +1982,9 @@ public class QAX509CertProfile
         }
     }
 
-    private void checkExtensionAuthorityInfoAccess(byte[] extensionValue, X509CAInfo caInfo, StringBuilder failureMsg)
+    private void checkExtensionAuthorityInfoAccess(byte[] extensionValue, X509IssuerInfo issuerInfo, StringBuilder failureMsg)
     {
-        Set<String> eOCSPUris = caInfo.getOcspURLs();
+        Set<String> eOCSPUris = issuerInfo.getOcspURLs();
         if(eOCSPUris == null)
         {
             failureMsg.append("AIA is present but expected is 'none'");
@@ -2050,7 +2046,7 @@ public class QAX509CertProfile
         }
     }
 
-    private void checkExtensionCrlDistributionPoints(byte[] extensionValue, X509CAInfo caInfo, StringBuilder failureMsg)
+    private void checkExtensionCrlDistributionPoints(byte[] extensionValue, X509IssuerInfo issuerInfo, StringBuilder failureMsg)
     {
         CRLDistPoint iCRLDistPoints = CRLDistPoint.getInstance(extensionValue);
         DistributionPoint[] iDistributionPoints = iCRLDistPoints.getDistributionPoints();
@@ -2091,7 +2087,7 @@ public class QAX509CertProfile
                         }
                     }
 
-                    Set<String> eCRLUrls = caInfo.getCrlURLs();
+                    Set<String> eCRLUrls = issuerInfo.getCrlURLs();
                     Set<String> diffs = str_in_b_not_in_a(eCRLUrls, iCrlURLs);
                     if(diffs.isEmpty() == false)
                     {
@@ -2110,7 +2106,8 @@ public class QAX509CertProfile
         }
     }
 
-    private void checkExtensionDeltaCrlDistributionPoints(byte[] extensionValue, X509CAInfo caInfo, StringBuilder failureMsg)
+    private void checkExtensionDeltaCrlDistributionPoints(byte[] extensionValue,
+            X509IssuerInfo issuerInfo, StringBuilder failureMsg)
     {
         CRLDistPoint iCRLDistPoints = CRLDistPoint.getInstance(extensionValue);
         DistributionPoint[] iDistributionPoints = iCRLDistPoints.getDistributionPoints();
@@ -2151,7 +2148,7 @@ public class QAX509CertProfile
                         }
                     }
 
-                    Set<String> eCRLUrls = caInfo.getCrlURLs();
+                    Set<String> eCRLUrls = issuerInfo.getCrlURLs();
                     Set<String> diffs = str_in_b_not_in_a(eCRLUrls, iCrlURLs);
                     if(diffs.isEmpty() == false)
                     {
@@ -2170,7 +2167,7 @@ public class QAX509CertProfile
         }
     }
 
-    private void checkExtensionAdmission(byte[] extensionValue, X509CAInfo caInfo, StringBuilder failureMsg)
+    private void checkExtensionAdmission(byte[] extensionValue, X509IssuerInfo issuerInfo, StringBuilder failureMsg)
     {
         if(admission == null)
         {

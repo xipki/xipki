@@ -33,54 +33,67 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.ca.qa.shell;
+package org.xipki.ca.qa;
 
-import java.math.BigInteger;
-import java.security.cert.X509Certificate;
+import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
 
-import org.apache.karaf.shell.commands.Command;
-import org.bouncycastle.asn1.x500.X500Name;
-import org.xipki.ca.client.api.CertIDOrError;
-import org.xipki.ca.client.shell.UnRevRemoveCertCommand;
-import org.xipki.common.SecurityUtil;
-import org.xipki.console.karaf.UnexpectedResultException;
+import org.xipki.common.ParamChecker;
 
 /**
  * @author Lijun Liao
  */
 
-@Command(scope = "caqa", name = "neg-unrevoke", description="Unrevoke certificate (negative, for QA)")
-public class NegUnrevokeCertCommand extends UnRevRemoveCertCommand
+public class ValidationResult
 {
+    private final List<ValidationIssue> failedValidationIssues;
+    private final List<ValidationIssue> successfulValidationIssues;
 
-    @Override
-    protected Object doExecute()
-    throws Exception
+    private final boolean allSuccessful;
+
+    public ValidationResult(ValidationIssue validationIssues)
     {
-        if(certFile == null && (caCertFile == null || serialNumber == null))
+        this(Arrays.asList(validationIssues));
+    }
+
+    public ValidationResult(List<ValidationIssue> validationIssues)
+    {
+        ParamChecker.assertNotEmpty("validationIssues", validationIssues);
+
+        boolean allSuccessful = true;
+        List<ValidationIssue> failedIssues = new LinkedList<>();
+        List<ValidationIssue> successfulIssues = new LinkedList<>();
+        for(ValidationIssue issue : validationIssues)
         {
-            err("either cert or (cacert, serial) must be specified");
-            return null;
+            if(issue.isFailed())
+            {
+                allSuccessful = false;
+                failedIssues.add(issue);
+            } else
+            {
+                successfulIssues.add(issue);
+            }
         }
 
-        CertIDOrError certIdOrError;
-        if(certFile != null)
-        {
-            X509Certificate cert = SecurityUtil.parseCert(certFile);
-            certIdOrError = raWorker.unrevokeCert(cert);
-        }
-        else
-        {
-            X509Certificate caCert = SecurityUtil.parseCert(caCertFile);
-            X500Name issuer = X500Name.getInstance(caCert.getSubjectX500Principal().getEncoded());
-            certIdOrError = raWorker.unrevokeCert(issuer, new BigInteger(serialNumber));
-        }
+        this.allSuccessful = allSuccessful;
+        this.failedValidationIssues = failedIssues;
+        this.successfulValidationIssues = successfulIssues;
+    }
 
-        if(certIdOrError.getError() == null)
-        {
-            throw new UnexpectedResultException("Releasing revocation successful but expected failure");
-        }
-        return null;
+    public boolean isAllSuccessful()
+    {
+        return allSuccessful;
+    }
+
+    public List<ValidationIssue> getFailedValidationIssues()
+    {
+        return failedValidationIssues;
+    }
+
+    public List<ValidationIssue> getSuccessfulValidationIssues()
+    {
+        return successfulValidationIssues;
     }
 
 }
