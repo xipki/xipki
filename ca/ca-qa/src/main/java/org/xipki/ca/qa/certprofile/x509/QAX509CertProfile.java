@@ -41,6 +41,7 @@ import java.math.BigInteger;
 import java.net.URL;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collection;
@@ -260,9 +261,14 @@ public class QAX509CertProfile
     public QAX509CertProfile(String xmlConf)
     throws CertProfileException
     {
+        this(parse(xmlConf));
+    }
+
+    public QAX509CertProfile(ProfileType conf)
+    throws CertProfileException
+    {
         try
         {
-            ProfileType conf = parse(xmlConf);
             this.profileConf = conf;
 
             this.syntaxVersion = conf.getVersion();
@@ -909,7 +915,7 @@ public class QAX509CertProfile
         return result;
     }
 
-    private static ProfileType parse(String xmlConf)
+    public static ProfileType parse(String xmlConf)
     throws CertProfileException
     {
         synchronized (jaxbUnmarshallerLock)
@@ -1219,6 +1225,40 @@ public class QAX509CertProfile
         }
 
         StringBuilder failureMsg = new StringBuilder();
+        List<String> requestedCoreAtvTextValues = null;
+        if(requestedRdns != null)
+        {
+            requestedCoreAtvTextValues = new LinkedList<>();
+            for(RDN requestedRdn : requestedRdns)
+            {
+                String textValue = SecurityUtil.rdnValueToString(requestedRdn.getFirst().getValue());
+                requestedCoreAtvTextValues.add(textValue);
+            }
+
+            // sort the requestedRDNs
+            if(rdnOption != null && rdnOption.getPatterns() != null)
+            {
+                List<String> sorted = new ArrayList<>(requestedCoreAtvTextValues.size());
+                for(Pattern p : rdnOption.getPatterns())
+                {
+                    for(String value : requestedCoreAtvTextValues)
+                    {
+                        if(sorted.contains(value) == false && p.matcher(value).matches())
+                        {
+                            sorted.add(value);
+                        }
+                    }
+                }
+                for(String value : requestedCoreAtvTextValues)
+                {
+                    if(sorted.contains(value) == false)
+                    {
+                        sorted.add(value);
+                    }
+                }
+                requestedCoreAtvTextValues = sorted;
+            }
+        }
 
         for(int i = 0; i < rdns.length; i++)
         {
@@ -1312,7 +1352,7 @@ public class QAX509CertProfile
                 }
             }
 
-            if(requestedRdns == null)
+            if(requestedCoreAtvTextValues == null)
             {
                 if(type.equals(ObjectIdentifiers.DN_SERIALNUMBER) == false)
                 {
@@ -1321,8 +1361,7 @@ public class QAX509CertProfile
                 }
             } else
             {
-                RDN requestedRdn = requestedRdns[i];
-                String requestedCoreAtvTextValue = SecurityUtil.rdnValueToString(requestedRdn.getFirst().getValue());
+                String requestedCoreAtvTextValue = requestedCoreAtvTextValues.get(i);
                 if(coreAtvTextValue.equals(requestedCoreAtvTextValue) == false)
                 {
                     failureMsg.append("content '" + coreAtvTextValue + "' but expected '" +

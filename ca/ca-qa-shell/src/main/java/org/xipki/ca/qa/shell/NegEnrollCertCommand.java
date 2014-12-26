@@ -37,26 +37,36 @@ package org.xipki.ca.qa.shell;
 
 import java.security.cert.X509Certificate;
 
-import org.apache.karaf.shell.commands.Command;
 import org.apache.karaf.shell.commands.Option;
-import org.bouncycastle.asn1.pkcs.CertificationRequest;
+import org.bouncycastle.asn1.crmf.CertRequest;
+import org.bouncycastle.asn1.crmf.CertTemplateBuilder;
+import org.bouncycastle.asn1.crmf.POPOSigningKey;
+import org.bouncycastle.asn1.crmf.ProofOfPossession;
+import org.bouncycastle.asn1.x500.X500Name;
+import org.bouncycastle.cert.X509CertificateHolder;
+import org.bouncycastle.cert.crmf.ProofOfPossessionSigningKeyBuilder;
+import org.bouncycastle.operator.ContentSigner;
 import org.xipki.ca.client.api.CertificateOrError;
 import org.xipki.ca.client.api.EnrollCertResult;
+import org.xipki.ca.client.api.dto.EnrollCertRequestEntryType;
+import org.xipki.ca.client.api.dto.EnrollCertRequestType;
 import org.xipki.ca.client.shell.ClientCommand;
-import org.xipki.common.IoUtil;
 import org.xipki.console.karaf.UnexpectedResultException;
+import org.xipki.security.api.ConcurrentContentSigner;
+import org.xipki.security.api.SecurityFactory;
+import org.xipki.security.api.SignerException;
 
 /**
  * @author Lijun Liao
  */
 
-@Command(scope = "caqa", name = "neg-ra-enroll", description="Enroll certificate as RA (negative, for QA)")
-public class NegRAEnrollCertCommand extends ClientCommand
+public abstract class NegEnrollCertCommand extends ClientCommand
 {
-
-    @Option(name = "-p10",
-            required = true, description = "Required. PKCS#10 request file")
-    protected String p10File;
+    @Option(name = "-subject",
+            required = false,
+            description = "Subject to be requested.\n"
+                    + "The default is the subject of self-signed certifite.")
+    protected String subject;
 
     @Option(name = "-profile",
             required = true, description = "Required. Certificate profile")
@@ -66,17 +76,57 @@ public class NegRAEnrollCertCommand extends ClientCommand
             required = false, description = "Username")
     protected String user;
 
+    @Option(name = "-hash",
+            required = false, description = "Hash algorithm name for the POPO computation")
+    protected String hashAlgo = "SHA256";
+
     @Option(name = "-ca",
             required = false, description = "Required if the profile is supported by more than one CA")
     protected String caName;
+
+    protected SecurityFactory securityFactory;
+
+    public void setSecurityFactory(SecurityFactory securityFactory)
+    {
+        this.securityFactory = securityFactory;
+    }
+
+    protected abstract ConcurrentContentSigner getSigner()
+    throws SignerException;
 
     @Override
     protected Object doExecute()
     throws Exception
     {
-        CertificationRequest p10Req = CertificationRequest.getInstance(
-                IoUtil.read(p10File));
-        EnrollCertResult result = raWorker.requestCert(p10Req, profile, caName, user);
+        EnrollCertRequestType request = new EnrollCertRequestType(EnrollCertRequestType.Type.CERT_REQ);
+
+        CertTemplateBuilder certTemplateBuilder = new CertTemplateBuilder();
+
+        ConcurrentContentSigner signer = getSigner();
+        X509CertificateHolder ssCert = signer.getCertificateAsBCObject();
+
+        X500Name x500Subject = subject == null ? ssCert.getSubject() : new X500Name(subject);
+        certTemplateBuilder.setSubject(x500Subject);
+        certTemplateBuilder.setPublicKey(ssCert.getSubjectPublicKeyInfo());
+        CertRequest certReq = new CertRequest(1, certTemplateBuilder.build(), null);
+
+        ProofOfPossessionSigningKeyBuilder popoBuilder = new ProofOfPossessionSigningKeyBuilder(certReq);
+        ContentSigner contentSigner = signer.borrowContentSigner();
+        POPOSigningKey popoSk;
+        try
+        {
+            popoSk = popoBuilder.build(contentSigner);
+        }finally
+        {
+            signer.returnContentSigner(contentSigner);
+        }
+
+        ProofOfPossession popo = new ProofOfPossession(popoSk);
+
+        EnrollCertRequestEntryType reqEntry = new EnrollCertRequestEntryType("id-1", profile, certReq, popo);
+        request.addRequestEntry(reqEntry);
+
+        EnrollCertResult result = raWorker.requestCerts(request, caName, user);
 
         X509Certificate cert = null;
         if(result != null)
