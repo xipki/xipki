@@ -33,7 +33,7 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.ca.qa.cainfo;
+package org.xipki.ca.qa.certprofile.x509;
 
 import java.io.IOException;
 import java.security.cert.CertificateException;
@@ -52,7 +52,7 @@ import org.xipki.common.SecurityUtil;
  * @author Lijun Liao
  */
 
-public class X509CAInfo
+public class X509IssuerInfo
 {
     private final Set<String> ocspURLs;
     private final Set<String> crlURLs;
@@ -61,7 +61,7 @@ public class X509CAInfo
     private final Certificate bcCert;
     private final byte[] ski;
 
-    public X509CAInfo(List<String> ocspURLs, List<String> crlURLs, List<String> deltaCrlURLs, byte[] certBytes)
+    public X509IssuerInfo(List<String> ocspURLs, List<String> crlURLs, List<String> deltaCrlURLs, byte[] certBytes)
     throws CertificateException
     {
         ParamChecker.assertNotNull("certBytes", certBytes);

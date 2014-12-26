@@ -14,8 +14,8 @@
       </jxb:schemaBindings>
     </xs:appinfo>
   </xs:annotation>
-  <xs:element name="profile" type="ProfileType"/>
-  <xs:complexType name="ProfileType">
+  <xs:element name="x509Profile" type="X509ProfileType"/>
+  <xs:complexType name="X509ProfileType">
     <xs:sequence>
       <xs:element name="description" type="xs:string"/>
       <xs:element name="version" type="xs:int">
