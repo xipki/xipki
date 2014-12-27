@@ -30,6 +30,8 @@ source ./demo/p12.script
 
 source ./demo/ra.script
 
+source ./demo/ca-qa.script
+
 source ./demo/ocsp.script
 
 #source ./demo/loadtest-enroll.script

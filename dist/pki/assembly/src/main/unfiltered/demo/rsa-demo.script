@@ -16,7 +16,7 @@ sleep 1000
 file:rm -r -f output
 
 keytool:rsa-p12 -pwd 1234 -keysize $KEYSIZE -out output/RCA1.p12 \
-  -subject "CN=RCA1"
+  -subject "CN=RCA1,O=xipki,C=DE"
 
 keytool:rsa-p12 -pwd 1234 -keysize $KEYSIZE -out output/SubCA1.p12 \
   -subject "CN=SubCA1"
@@ -29,6 +29,8 @@ source ./demo/prepare.script
 source ./demo/p12.script
 
 source ./demo/ra.script
+
+source ./demo/ca-qa.script
 
 source ./demo/ocsp.script
 

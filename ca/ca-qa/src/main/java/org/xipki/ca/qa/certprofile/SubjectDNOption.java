@@ -53,16 +53,24 @@ public class SubjectDNOption
     private final Integer minLen;
     private final Integer maxLen;
     private final DirectoryStringType directoryStringType;
+    private final boolean ignoreReq;
 
     public SubjectDNOption(String prefix, String suffix, List<Pattern> patterns,
-            Integer minLen, Integer maxLen, DirectoryStringType directoryStringType)
+            Integer minLen, Integer maxLen, DirectoryStringType directoryStringType, boolean ignoreReq)
     {
         this.prefix = prefix;
         this.suffix = suffix;
-        this.patterns = Collections.unmodifiableList(patterns);
+        if(patterns == null)
+        {
+            this.patterns = null;
+        } else
+        {
+            this.patterns = Collections.unmodifiableList(patterns);
+        }
         this.minLen = minLen;
         this.maxLen = maxLen;
         this.directoryStringType = directoryStringType;
+        this.ignoreReq = ignoreReq;
     }
 
     public String getPrefix()
@@ -93,6 +101,11 @@ public class SubjectDNOption
     public DirectoryStringType getDirectoryStringType()
     {
         return directoryStringType;
+    }
+
+    public boolean isIgnoreReq()
+    {
+        return ignoreReq;
     }
 
 }

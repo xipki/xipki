@@ -35,9 +35,8 @@
 
 package org.xipki.ca.qa.shell;
 
-import java.io.File;
+import java.io.ByteArrayInputStream;
 import java.io.FileInputStream;
-import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
@@ -56,94 +55,68 @@ import javax.xml.validation.SchemaFactory;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xipki.ca.api.CertProfileException;
 import org.xipki.ca.qa.certprofile.x509.X509CertProfileQA;
 import org.xipki.ca.qa.certprofile.x509.X509IssuerInfo;
-import org.xipki.ca.qa.certprofile.x509.jaxb.ObjectFactory;
 import org.xipki.ca.qa.certprofile.x509.jaxb.X509ProfileType;
 import org.xipki.ca.qa.shell.jaxb.FileOrValueType;
-import org.xipki.ca.qa.shell.jaxb.IssuersType;
+import org.xipki.ca.qa.shell.jaxb.ObjectFactory;
+import org.xipki.ca.qa.shell.jaxb.QAConfType;
+import org.xipki.ca.qa.shell.jaxb.X509CertProfileType;
 import org.xipki.ca.qa.shell.jaxb.X509IssuerType;
 import org.xipki.common.ConfigurationException;
 import org.xipki.common.IoUtil;
-import org.xipki.common.ParamChecker;
 import org.xml.sax.SAXException;
 
 /**
  * @author Lijun Liao
  */
 
-public class IssuerAndCertprofileManager
+public class QASystemManager
 {
-    private static final Logger LOG = LoggerFactory.getLogger(IssuerAndCertprofileManager.class);
+    private static final Logger LOG = LoggerFactory.getLogger(QASystemManager.class);
 
-    private String certProfileDir;
-    private String issuerConfFile;
+    private String confFile;
+
+    public String getConfFile()
+    {
+        return confFile;
+    }
+
+    public void setConfFile(String confFile)
+    {
+        this.confFile = confFile;
+    }
 
     private Map<String, X509CertProfileQA> x509ProfileMap = new HashMap<>();
     private Map<String, X509IssuerInfo> x509IssuerInfoMap = new HashMap<>();
     private static Unmarshaller jaxbUnmarshaller;
 
-    public IssuerAndCertprofileManager()
+    public QASystemManager()
     {
     }
 
     public void init()
     throws ConfigurationException
     {
-        try
+        if(confFile == null || confFile.isEmpty())
         {
-            ParamChecker.assertNotNull("certProfileDir", certProfileDir);
-            ParamChecker.assertNotNull("issuerConfFile", issuerConfFile);
-        }catch(IllegalArgumentException e)
-        {
-            throw new ConfigurationException(e.getMessage());
+            throw new ConfigurationException("confFile could not be null and empty");
         }
 
-        File dir = new File(certProfileDir);
-        File[] children = dir.listFiles(new FilenameFilter()
-        {
-            @Override
-            public boolean accept(File dir, String name)
-            {
-                return name.endsWith(".xml");
-            }
-        });
-
-        if(children == null || children.length < 1)
-        {
-            LOG.warn("Could not find any X509 certificate profile in directory {}", certProfileDir);
-        } else
-        {
-            for(File child : children)
-            {
-                String filename = child.getName();
-                String name = filename.substring(0, filename.length() - ".xml".length());
-
-                try
-                {
-                    FileInputStream confStream = new FileInputStream(child);
-                    X509ProfileType profile = X509CertProfileQA.parse(confStream);
-                    x509ProfileMap.put(name, new X509CertProfileQA(profile));
-                }catch(Exception e)
-                {
-                    throw new ConfigurationException(e.getMessage(), e);
-                }
-            }
-        }
-
-        IssuersType issuersConf;
+        QAConfType qaConf;
         try
         {
-            FileInputStream issuerConfStream = new FileInputStream(issuerConfFile);
-            issuersConf = parseIssuerConf(issuerConfStream);
+            FileInputStream issuerConfStream = new FileInputStream(confFile);
+            qaConf = parseQAConf(issuerConfStream);
         }catch(IOException | JAXBException | SAXException e)
         {
             throw new ConfigurationException(e.getMessage(), e);
         }
 
-        if(issuersConf.getX509Issuers() != null)
+        if(qaConf.getX509Issuers() != null)
         {
-            List<X509IssuerType> x509IssuerTypes = issuersConf.getX509Issuers().getX509Issuer();
+            List<X509IssuerType> x509IssuerTypes = qaConf.getX509Issuers().getX509Issuer();
             for(X509IssuerType issuerType : x509IssuerTypes)
             {
                 byte[] certBytes;
@@ -164,13 +137,33 @@ public class IssuerAndCertprofileManager
                     throw new ConfigurationException(e.getMessage(), e);
                 }
                 x509IssuerInfoMap.put(issuerType.getName(), issuerInfo);
+                LOG.info("configured X509 issuer {}", issuerType.getName());
             }
         }
 
-        if(x509IssuerInfoMap.isEmpty())
+        if(qaConf.getX509CertProfiles() != null)
         {
-            LOG.warn("no issuer is configured");
+            List<X509CertProfileType> certProfileTypes = qaConf.getX509CertProfiles().getX509CertProfile();
+            for(X509CertProfileType type : certProfileTypes)
+            {
+                String name = type.getName();
+                try
+                {
+                    byte[] content = readData(type);
+                    ByteArrayInputStream confStream = new ByteArrayInputStream(content);
+                    X509ProfileType profile = X509CertProfileQA.parse(confStream);
+                    x509ProfileMap.put(name, new X509CertProfileQA(profile));
+                    LOG.info("configured X509 certificate profile {}", name);
+                }catch(IOException | CertProfileException e)
+                {
+                    throw new ConfigurationException(e.getMessage(), e);
+                }
+            }
         }
+    }
+
+    public void shutdown()
+    {
     }
 
     public Set<String> getIssuerNames()
@@ -193,7 +186,7 @@ public class IssuerAndCertprofileManager
         return x509ProfileMap.get(certprofileName);
     }
 
-    public static IssuersType parseIssuerConf(InputStream confStream)
+    public static QAConfType parseQAConf(InputStream confStream)
     throws IOException, JAXBException, SAXException
     {
         JAXBElement<?> rootElement;
@@ -206,7 +199,7 @@ public class IssuerAndCertprofileManager
 
                 final SchemaFactory schemaFact = SchemaFactory.newInstance(
                         javax.xml.XMLConstants.W3C_XML_SCHEMA_NS_URI);
-                URL url = X509CertProfileQA.class.getResource("/xsd/qa-issuer.xsd");
+                URL url = QASystemManager.class.getResource("/xsd/qa-conf.xsd");
                 jaxbUnmarshaller.setSchema(schemaFact.newSchema(url));
             }
 
@@ -217,9 +210,9 @@ public class IssuerAndCertprofileManager
         }
 
         Object rootType = rootElement.getValue();
-        if(rootType instanceof IssuersType)
+        if(rootType instanceof QAConfType)
         {
-            return (IssuersType) rootElement.getValue();
+            return (QAConfType) rootElement.getValue();
         }
         else
         {

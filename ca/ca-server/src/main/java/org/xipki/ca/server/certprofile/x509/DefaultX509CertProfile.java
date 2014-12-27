@@ -218,6 +218,7 @@ public class DefaultX509CertProfile extends AbstractX509CertProfile
     static
     {
         criticalOnlyExtensionTypes = new HashSet<>(5);
+        criticalOnlyExtensionTypes.add(Extension.basicConstraints.getId());
         criticalOnlyExtensionTypes.add(Extension.keyUsage.getId());
         criticalOnlyExtensionTypes.add(Extension.policyMappings.getId());
         criticalOnlyExtensionTypes.add(Extension.nameConstraints.getId());

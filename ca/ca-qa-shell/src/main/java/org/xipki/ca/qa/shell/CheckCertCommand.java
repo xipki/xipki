@@ -37,6 +37,7 @@ package org.xipki.ca.qa.shell;
 
 import java.util.Set;
 
+import org.apache.karaf.shell.commands.Command;
 import org.apache.karaf.shell.commands.Option;
 import org.bouncycastle.asn1.pkcs.CertificationRequest;
 import org.xipki.ca.qa.ValidationIssue;
@@ -50,7 +51,8 @@ import org.xipki.console.karaf.XipkiOsgiCommandSupport;
  * @author Lijun Liao
  */
 
-public class CertCheckCommand extends XipkiOsgiCommandSupport
+@Command(scope = "caqa", name = "check-cert", description="Check the certificate")
+public class CheckCertCommand extends XipkiOsgiCommandSupport
 {
     @Option(name = "-cert",
             required = true, description = "Required. Certificate file")
@@ -72,27 +74,27 @@ public class CertCheckCommand extends XipkiOsgiCommandSupport
             required = false, description = "Show status verbosely")
     protected Boolean verbose = Boolean.FALSE;
 
-    private IssuerAndCertprofileManager issuerAndCertprofileManager;
+    private QASystemManager qaSystemManager;
 
     @Override
     protected Object doExecute()
     throws Exception
     {
-        Set<String> issuerNames = issuerAndCertprofileManager.getIssuerNames();
+        Set<String> issuerNames = qaSystemManager.getIssuerNames();
         if(issuerNames.isEmpty())
         {
             err("No issuer is configured");
             return  null;
         }
 
-        if(issuerName != null && ! issuerNames.contains(issuerName))
+        if(issuerName != null && issuerNames.contains(issuerName) == false)
         {
             err("Issuer " + issuerName + " is not within the configured issuers " + issuerNames);
             return null;
         }
-        X509IssuerInfo issuerInfo = issuerAndCertprofileManager.getIssuer(issuerName);
+        X509IssuerInfo issuerInfo = qaSystemManager.getIssuer(issuerName);
 
-        X509CertProfileQA qa = issuerAndCertprofileManager.getCertprofile(profileName);
+        X509CertProfileQA qa = qaSystemManager.getCertprofile(profileName);
         if(qa == null)
         {
             err("Found no certificate profile named '" + profileName + "'");
@@ -108,33 +110,36 @@ public class CertCheckCommand extends XipkiOsgiCommandSupport
 
         sb.append("certificate is ");
         sb.append(result.isAllSuccessful()? "valid" : "invalid");
-        sb.append("\n");
 
         if(verbose.booleanValue())
         {
-            for(ValidationIssue issue : result.getFailedValidationIssues())
+            for(ValidationIssue issue : result.getValidationIssues())
             {
+                sb.append("\n");
                 format(issue, "    ", sb);
             }
+
         }
 
         System.out.println(sb);
         return null;
     }
 
-    public void setIssuerAndCertprofileManager(
-            IssuerAndCertprofileManager issuerAndCertprofileManager)
-            {
-        this.issuerAndCertprofileManager = issuerAndCertprofileManager;
+    public void setQaSystemManager(QASystemManager qaSystemManager)
+    {
+        this.qaSystemManager = qaSystemManager;
     }
 
     private static void format(ValidationIssue issue, String prefix, StringBuilder sb)
     {
         sb.append(prefix);
-        sb.append(issue.getCode()).append(", ");
-        sb.append(issue.isFailed() ? "   failure" : "successful");
-        sb.append(issue.getDescription()).append(", ");
-        sb.append(issue.getMessage());
+        sb.append(issue.getCode());
+        sb.append(", ").append(issue.getDescription());
+        sb.append(", ").append(issue.isFailed() ? "failure" : "successful");
+        if(issue.getMessage() != null)
+        {
+            sb.append(", ").append(issue.getMessage());
+        }
     }
 
 }

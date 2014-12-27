@@ -1,9 +1,3 @@
-#################################################################
-#              MANAGE CERTIFICATE WITH CAServer Shell           #
-#################################################################
-# Wait one second
-sleep 1000
-
 keytool:rsa-p12 -pwd 1234 -out output/RCA2.p12 \
   -subject "CN=RCA2,O=xipki,C=DE"
 
@@ -15,8 +9,6 @@ ca:enroll-cert -ca RCA1 -profile RCA-Cross -p10 output/RCA2.p10 -out output/RCA2
 #              MANAGE CERTIFICATE WITH RA CLIENT                #
 #################################################################
 feature:install xipki-caclient-shell
-
-feature:install xipki-caqa-shell
 
 # Wait two seconds
 sleep 2000
@@ -33,6 +25,11 @@ caclient:health -ca SubCAwithCRL1
 # Certificate OCSP1
 keytool:rsa-p12 -pwd 1234 -out output/OCSP1.p12 -subject "CN=OCSP1,O=xipki,C=DE"
 
+## Create the PKCS#10 request for the command caqa:check-cert in QA 
+keytool:req-p12 -p12 output/OCSP1.p12 -pwd 1234 \
+  -out output/OCSP1.p10 \
+  -subject "CN=OCSP1,O=xipki,C=DE"
+
 caclient:enroll-p12 -p12 output/OCSP1.p12 -pwd 1234 -out output/OCSP1.der -profile OCSP -user USER-O
 
 keytool:update-cert-p12 -p12 output/OCSP1.p12 -pwd 1234 -cert output/OCSP1.der \
@@ -40,6 +37,11 @@ keytool:update-cert-p12 -p12 output/OCSP1.p12 -pwd 1234 -cert output/OCSP1.der \
 
 # Certificate OCSP2
 keytool:rsa-p12 -pwd 1234 -out output/OCSP2.p12 -subject "CN=OCSP2,O=xipki,C=DE"
+
+## Create the PKCS#10 request for the command caqa:check-cert in QA 
+keytool:req-p12 -p12 output/OCSP2.p12 -pwd 1234 \
+  -out output/OCSP2.p10 \
+  -subject "CN=OCSP2,O=xipki,C=DE"
 
 caclient:enroll-p12 -p12 output/OCSP2.p12 -pwd 1234 -out output/OCSP2.der -profile OCSP -user USER-O
 
@@ -52,12 +54,22 @@ caclient:revoke -cert output/OCSP2.der -reason keyCompromise
 # Certificate multipleOUs
 keytool:rsa-p12 -pwd 1234 -out output/multipleOUs1.p12 -subject "CN=multipleOUs1,OU=A12345,OU=54321,O=xipki,C=DE"
 
+## Create the PKCS#10 request for the command caqa:check-cert in QA 
+keytool:req-p12 -p12 output/multipleOUs1.p12 -pwd 1234 \
+  -out output/multipleOUs1.p10 \
+  -subject "CN=multipleOUs1,OU=A12345,OU=54321,O=xipki,C=DE"
+
 caclient:enroll-p12 -p12 output/multipleOUs1.p12 -pwd 1234 -out output/multipleOUs1.der -profile multipleOUs -user USER-O
 
 keytool:update-cert-p12 -p12 output/multipleOUs1.p12 -pwd 1234 -cert output/multipleOUs1.der \
   -cacert output/SubCAwithCRL1.der -cacert output/RCA1.der
 
 keytool:rsa-p12 -pwd 1234 -out output/multipleOUs2.p12 -subject "CN=multipleOUs2,OU=54321,OU=A12345,O=xipki,C=DE"
+
+## Create the PKCS#10 request for the command caqa:check-cert in QA 
+keytool:req-p12 -p12 output/multipleOUs2.p12 -pwd 1234 \
+  -out output/multipleOUs2.p10 \
+  -subject "CN=multipleOUs2,OU=54321,OU=A12345,O=xipki,C=DE"
 
 caclient:enroll-p12 -p12 output/multipleOUs2.p12 -pwd 1234 -out output/multipleOUs2.der -profile multipleOUs -user USER-O
 
@@ -173,51 +185,9 @@ caclient:gencrl -ca SubCAwithCRL1 -out output/SubCAwithCRL1.crl
 ## Get CRL
 caclient:getcrl -ca SubCAwithCRL1 -out output/SubCAwithCRL1-get.crl
 
-
-#################################################################
-#                        NEGITIVE TESTS                         #
-#################################################################
-
-## Subject does not satisfy the requirement
-
-# TLS
-keytool:rsa-p12 -pwd 1234 -out output/TLS101.p12 -subject "CN=TLS101,O=xipki,C=DE"
-
-keytool:req-p12 -p12 output/TLS101.p12 -pwd 1234 -out output/TLS101.p10
-
-caqa:neg-ra-enroll -p10 output/TLS101.p10 -profile TLS -user USER-T
-
-caqa:neg-enroll-p12 -p12 output/TLS101.p12 -pwd 1234 -profile TLS -user USER-T
-
-# multipleOUs
-keytool:rsa-p12 -pwd 1234 -out output/multipleOUs101.p12 -subject "CN=multipleOUs101,OU=A12345,OU=A54321,O=xipki,C=DE"
-
-caqa:neg-enroll-p12 -p12 output/multipleOUs101.p12 -pwd 1234 -profile multipleOUs -user USER-O
-
-keytool:rsa-p12 -pwd 1234 -out output/multipleOUs102.p12 -subject "CN=multipleOUs102,OU=12345,OU=54321,O=xipki,C=DE"
-
-caqa:neg-enroll-p12 -p12 output/multipleOUs102.p12 -pwd 1234 -profile multipleOUs -user USER-O
-
-keytool:rsa-p12 -pwd 1234 -out output/multipleOUs103.p12 -subject "CN=multipleOUs103,OU=A12345,O=xipki,C=DE"
-
-caqa:neg-enroll-p12 -p12 output/multipleOUs103.p12 -pwd 1234 -profile multipleOUs -user USER-O
-
-## Revoke certificate that has been revoked
-
-caqa:neg-revoke -cert output/TLS2.der -reason keyCompromise
-
-caqa:neg-unrevoke -cert output/TLS2.der
-
-## Generate CRL
-caqa:neg-gencrl -ca SubCA1
-
-## Get CRL
-caqa:neg-getcrl -ca SubCA1
- 
 #################################################################
 #              UNINSTALL UNNEEDED FEATURES                      #
 #################################################################
-feature:uninstall xipki-caqa-shell
 feature:uninstall xipki-caclient-shell
 feature:uninstall xipki-caclient
 feature:uninstall xipki-camgmt-shell

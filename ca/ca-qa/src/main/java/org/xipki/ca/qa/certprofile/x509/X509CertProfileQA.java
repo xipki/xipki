@@ -70,7 +70,6 @@ import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.ASN1StreamParser;
 import org.bouncycastle.asn1.ASN1String;
 import org.bouncycastle.asn1.DERBMPString;
-import org.bouncycastle.asn1.DERBitString;
 import org.bouncycastle.asn1.DERIA5String;
 import org.bouncycastle.asn1.DERPrintableString;
 import org.bouncycastle.asn1.DERSequence;
@@ -122,6 +121,7 @@ import org.xipki.ca.api.CertProfileException;
 import org.xipki.ca.api.CertValidity;
 import org.xipki.ca.api.profile.ExtensionOccurrence;
 import org.xipki.ca.api.profile.RDNOccurrence;
+import org.xipki.ca.api.profile.x509.KeyUsage;
 import org.xipki.ca.qa.ValidationIssue;
 import org.xipki.ca.qa.ValidationResult;
 import org.xipki.ca.qa.certprofile.GeneralNameMode;
@@ -156,9 +156,9 @@ import org.xipki.ca.qa.certprofile.x509.jaxb.KeyUsageType;
 import org.xipki.ca.qa.certprofile.x509.jaxb.ObjectFactory;
 import org.xipki.ca.qa.certprofile.x509.jaxb.OidWithDescType;
 import org.xipki.ca.qa.certprofile.x509.jaxb.ParameterType;
-import org.xipki.ca.qa.certprofile.x509.jaxb.X509ProfileType;
 import org.xipki.ca.qa.certprofile.x509.jaxb.RdnType;
 import org.xipki.ca.qa.certprofile.x509.jaxb.SubjectInfoAccessType.Access;
+import org.xipki.ca.qa.certprofile.x509.jaxb.X509ProfileType;
 import org.xipki.common.HashAlgoType;
 import org.xipki.common.HashCalculator;
 import org.xipki.common.LogUtil;
@@ -183,10 +183,22 @@ public class X509CertProfileQA
     public static final String Q_LENGTH = "qlength";
 
     private static final Map<ASN1ObjectIdentifier, String> extOidNameMap;
+    private static final List<String> allUsages = Arrays.asList(
+            KeyUsage.digitalSignature.getName(), // 0
+            KeyUsage.contentCommitment.getName(), // 1
+            KeyUsage.keyEncipherment.getName(), // 2
+            KeyUsage.dataEncipherment.getName(), // 3
+            KeyUsage.keyAgreement.getName(), // 4
+            KeyUsage.keyCertSign.getName(), // 5
+            KeyUsage.cRLSign.getName(), // 6
+            KeyUsage.encipherOnly.getName(), // 7
+            KeyUsage.decipherOnly.getName() // 8
+        );
 
     static
     {
         extOidNameMap = new HashMap<>();
+        extOidNameMap.put(ObjectIdentifiers.id_extension_admission, "admission");
         extOidNameMap.put(Extension.auditIdentity, "auditIdentity");
         extOidNameMap.put(Extension.authorityInfoAccess, "authorityInfoAccess");
         extOidNameMap.put(Extension.authorityKeyIdentifier, "authorityKeyIdentifier");
@@ -197,6 +209,7 @@ public class X509CertProfileQA
         extOidNameMap.put(Extension.cRLDistributionPoints, "cRLDistributionPoints");
         extOidNameMap.put(Extension.deltaCRLIndicator, "deltaCRLIndicator");
         extOidNameMap.put(Extension.extendedKeyUsage, "extendedKeyUsage");
+        extOidNameMap.put(Extension.freshestCRL, "freshestCRL");
         extOidNameMap.put(Extension.inhibitAnyPolicy, "inhibitAnyPolicy");
         extOidNameMap.put(Extension.instructionCode, "instructionCode");
         extOidNameMap.put(Extension.issuerAlternativeName, "issuerAlternativeName");
@@ -204,6 +217,7 @@ public class X509CertProfileQA
         extOidNameMap.put(Extension.keyUsage, "keyUsage");
         extOidNameMap.put(Extension.logoType, "logoType");
         extOidNameMap.put(Extension.nameConstraints, "nameConstraints");
+        extOidNameMap.put(ObjectIdentifiers.id_extension_pkix_ocsp_nocheck, "pkixOcspNocheck");
         extOidNameMap.put(Extension.policyConstraints, "policyConstraints");
         extOidNameMap.put(Extension.policyMappings, "policyMappings");
         extOidNameMap.put(Extension.privateKeyUsagePeriod, "privateKeyUsagePeriod");
@@ -234,7 +248,7 @@ public class X509CertProfileQA
     private boolean ca;
     private boolean notBeforeMidnight;
     private Integer pathLen;
-    private org.bouncycastle.asn1.x509.KeyUsage keyusage;
+    private Set<String> keyusage;
     private Set<String> extendedKeyusages;
     private Set<GeneralNameMode> allowedSubjectAltNameModes;
     private Map<String, Set<GeneralNameMode>> allowedSubjectInfoAccessModes;
@@ -387,8 +401,9 @@ public class X509CertProfileQA
                         }
                     }
 
+                    boolean ignoreReq = t.isIgnoreReq() == null ? false : t.isIgnoreReq().booleanValue();
                     SubjectDNOption option = new SubjectDNOption(t.getPrefix(), t.getSuffix(), patterns,
-                            t.getMinLen(), t.getMaxLen(), t.getDirectoryStringType());
+                            t.getMinLen(), t.getMaxLen(), t.getDirectoryStringType(), ignoreReq);
                     this.subjectDNOptions.put(type, option);
                 }
             }
@@ -419,42 +434,42 @@ public class X509CertProfileQA
             {
                 List<KeyUsageType> keyUsageTypeList = extensionsType.getKeyUsage().getUsage();
 
-                int keyusage = 0;
+                Set<String> usages = new HashSet<>();
                 for(KeyUsageType type : keyUsageTypeList)
                 {
                     switch(type)
                     {
                     case CRL_SIGN:
-                        keyusage |= org.bouncycastle.asn1.x509.KeyUsage.cRLSign;
+                        usages.add(KeyUsage.cRLSign.getName());
                         break;
                     case DATA_ENCIPHERMENT:
-                        keyusage |= org.bouncycastle.asn1.x509.KeyUsage.dataEncipherment;
+                        usages.add(KeyUsage.dataEncipherment.getName());
                         break;
                     case CONTENT_COMMITMENT:
-                        keyusage |= org.bouncycastle.asn1.x509.KeyUsage.nonRepudiation;
+                        usages.add(KeyUsage.contentCommitment.getName());
                         break;
                     case DECIPHER_ONLY:
-                        keyusage |= org.bouncycastle.asn1.x509.KeyUsage.decipherOnly;
+                        usages.add(KeyUsage.decipherOnly.getName());
                         break;
                     case ENCIPHER_ONLY:
-                        keyusage |= org.bouncycastle.asn1.x509.KeyUsage.encipherOnly;
+                        usages.add(KeyUsage.encipherOnly.getName());
                         break;
                     case DIGITAL_SIGNATURE:
-                        keyusage |= org.bouncycastle.asn1.x509.KeyUsage.digitalSignature;
+                        usages.add(KeyUsage.digitalSignature.getName());
                         break;
                     case KEY_AGREEMENT:
-                        keyusage |= org.bouncycastle.asn1.x509.KeyUsage.keyAgreement;
+                        usages.add(KeyUsage.keyAgreement.getName());
                         break;
                     case KEYCERT_SIGN:
-                        keyusage |= org.bouncycastle.asn1.x509.KeyUsage.keyCertSign;
+                        usages.add(KeyUsage.keyCertSign.getName());
                         break;
                     case KEY_ENCIPHERMENT:
-                        keyusage |= org.bouncycastle.asn1.x509.KeyUsage.keyEncipherment;
+                        usages.add(KeyUsage.keyEncipherment.getName());
                         break;
                     }
                 }
 
-                this.keyusage = new org.bouncycastle.asn1.x509.KeyUsage(keyusage);
+                this.keyusage = Collections.unmodifiableSet(usages);
             }
 
             // ExtendedKeyUsage
@@ -532,7 +547,7 @@ public class X509CertProfileQA
 
             // admission
             occurrence = occurrences.get(ObjectIdentifiers.id_extension_admission);
-            if(occurrence != null && extensionsType.getAdmission() == null)
+            if(occurrence != null && extensionsType.getAdmission() != null)
             {
                 this.admission = new AdmissionConf(extensionsType.getAdmission());
             }
@@ -637,7 +652,7 @@ public class X509CertProfileQA
             int versionNumber = cert.getVersion();
             if(versionNumber != syntaxVersion)
             {
-                issue.setFailureMessage("expected='" + syntaxVersion + "', is='" + versionNumber + "'");
+                issue.setFailureMessage("is '" + versionNumber + "' but expected '" + syntaxVersion + "'");
             }
         }
 
@@ -745,12 +760,13 @@ public class X509CertProfileQA
         resultIssues.addAll(checkSubject(subject, requestedSubject));
 
         // extensions
-        resultIssues.addAll(checkExtensions(bcCert, issuerInfo, requestedSubject));
+        resultIssues.addAll(checkExtensions(bcCert, cert, issuerInfo, requestedSubject));
 
         return new ValidationResult(resultIssues);
     }
 
-    private List<ValidationIssue> checkExtensions(Certificate bcCert, X509IssuerInfo issuerInfo, X500Name requestedSubject)
+    private List<ValidationIssue> checkExtensions(Certificate bcCert, X509Certificate cert,
+            X509IssuerInfo issuerInfo, X500Name requestedSubject)
     {
         List<ValidationIssue> result = new LinkedList<>();
 
@@ -812,7 +828,7 @@ public class X509CertProfileQA
 
             try
             {
-                if(constantExtensions.containsKey(oid))
+                if(constantExtensions != null && constantExtensions.containsKey(oid))
                 {
                     byte[] expectedextensionValue = constantExtensions.get(oid);
                     if(Arrays.equals(expectedextensionValue, extensionValue) == false)
@@ -835,7 +851,7 @@ public class X509CertProfileQA
                 {
                     if(keyusage != null)
                     {
-                        checkExtensionKeyUsage(extensionValue, failureMsg);
+                        checkExtensionKeyUsage(cert.getKeyUsage(), failureMsg);
                     }
                 } else if(Extension.extendedKeyUsage.equals(oid))
                 {
@@ -863,7 +879,7 @@ public class X509CertProfileQA
                     }
                 } else if(Extension.policyConstraints.equals(oid))
                 {
-                    if(policyMappings != null)
+                    if(policyConstraints != null)
                     {
                         checkExtensionPolicyConstraints(extensionValue, failureMsg);
                     }
@@ -897,6 +913,7 @@ public class X509CertProfileQA
                 }
             }catch(IllegalArgumentException | ClassCastException | ArrayIndexOutOfBoundsException e)
             {
+                LOG.debug("extension value does not have correct syntax", e);
                 issue.setFailureMessage("extension value does not have correct syntax");
             }
 
@@ -1221,10 +1238,9 @@ public class X509CertProfileQA
         }
 
         StringBuilder failureMsg = new StringBuilder();
-        List<String> requestedCoreAtvTextValues = null;
+        List<String> requestedCoreAtvTextValues = new LinkedList<>();
         if(requestedRdns != null)
         {
-            requestedCoreAtvTextValues = new LinkedList<>();
             for(RDN requestedRdn : requestedRdns)
             {
                 String textValue = SecurityUtil.rdnValueToString(requestedRdn.getFirst().getValue());
@@ -1348,21 +1364,24 @@ public class X509CertProfileQA
                 }
             }
 
-            if(requestedCoreAtvTextValues == null)
+            if(rdnOption.isIgnoreReq() == false)
             {
-                if(type.equals(ObjectIdentifiers.DN_SERIALNUMBER) == false)
+                if(requestedCoreAtvTextValues.isEmpty())
                 {
-                    failureMsg.append("is present but not contained in the request");
-                    failureMsg.append("; ");
-                }
-            } else
-            {
-                String requestedCoreAtvTextValue = requestedCoreAtvTextValues.get(i);
-                if(coreAtvTextValue.equals(requestedCoreAtvTextValue) == false)
+                    if(type.equals(ObjectIdentifiers.DN_SERIALNUMBER) == false)
+                    {
+                        failureMsg.append("is present but not contained in the request");
+                        failureMsg.append("; ");
+                    }
+                } else
                 {
-                    failureMsg.append("content '" + coreAtvTextValue + "' but expected '" +
-                            requestedCoreAtvTextValue + "'");
-                    failureMsg.append("; ");
+                    String requestedCoreAtvTextValue = requestedCoreAtvTextValues.get(i);
+                    if(coreAtvTextValue.equals(requestedCoreAtvTextValue) == false)
+                    {
+                        failureMsg.append("content '" + coreAtvTextValue + "' but expected '" +
+                                requestedCoreAtvTextValue + "'");
+                        failureMsg.append("; ");
+                    }
                 }
             }
         }
@@ -1499,7 +1518,7 @@ public class X509CertProfileQA
                     failureMsg.append("pathLen is 'null' but expected '" +  pathLen + "'");
                     failureMsg.append("; ");
                 }
-                else if(BigInteger.valueOf(pathLen).equals(pathLen)== false)
+                else if(BigInteger.valueOf(pathLen).equals(_pathLen)== false)
                 {
                     failureMsg.append("pathLen is '" + _pathLen + "' but expected '" +  pathLen + "'");
                     failureMsg.append("; ");
@@ -1736,14 +1755,39 @@ public class X509CertProfileQA
         }
     }
 
-    private void checkExtensionKeyUsage(byte[] extensionValue, StringBuilder failureMsg)
+    private void checkExtensionKeyUsage(boolean[] usages, StringBuilder failureMsg)
     {
-        org.bouncycastle.asn1.x509.KeyUsage asn1 = org.bouncycastle.asn1.x509.KeyUsage.getInstance(extensionValue);
-        int _keyusage = ((DERBitString) asn1.toASN1Primitive()).intValue();
-        if(keyusage.equals(_keyusage) == false)
+        Set<String> iUsages = new HashSet<>();
+        int n = usages.length;
+
+        if(n > allUsages.size())
         {
-            failureMsg.append("is '" + asn1 + "' but expected '" + "'");
+            failureMsg.append("invalid syntax: size of valid bits is larger than 8");
             failureMsg.append("; ");
+        }
+        else
+        {
+            for(int i = 0; i < n; i++)
+            {
+                if(usages[i])
+                {
+                    iUsages.add(allUsages.get(i));
+                }
+            }
+
+            Set<String> diffs = str_in_b_not_in_a(keyusage, iUsages);
+            if(diffs.isEmpty() == false)
+            {
+                failureMsg.append("Usages " + diffs.toString() + " are present but not expected");
+                failureMsg.append("; ");
+            }
+
+            diffs = str_in_b_not_in_a(iUsages, keyusage);
+            if(diffs.isEmpty() == false)
+            {
+                failureMsg.append("Usages " + diffs.toString() + " are absent but are required");
+                failureMsg.append("; ");
+            }
         }
     }
 
@@ -2175,7 +2219,8 @@ public class X509CertProfileQA
             failureMsg.append("; ");
         } else
         {
-            AdmissionSyntax iAdmissionSyntax = AdmissionSyntax.getInstance(extensionValue);
+            ASN1Sequence seq = ASN1Sequence.getInstance(extensionValue);
+            AdmissionSyntax iAdmissionSyntax = AdmissionSyntax.getInstance(seq);
             Admissions[] iAdmissions = iAdmissionSyntax.getContentsOfAdmissions();
             int n = iAdmissions == null ? 0 : iAdmissions.length;
             if(n != 1)
@@ -2212,7 +2257,11 @@ public class X509CertProfileQA
                         failureMsg.append("; ");
                     }
 
-                    byte[] iAddProfessionInfo = iProfessionInfo.getAddProfessionInfo().getOctets();
+                    byte[] iAddProfessionInfo = null;
+                    if(iProfessionInfo.getAddProfessionInfo() != null)
+                    {
+                        iAddProfessionInfo = iProfessionInfo.getAddProfessionInfo().getOctets();
+                    }
                     byte[] eAddProfessionInfo = admission.getAddProfessionInfo();
                     if(eAddProfessionInfo == null)
                     {
@@ -2298,10 +2347,15 @@ public class X509CertProfileQA
 
     private static Set<String> str_in_b_not_in_a(Collection<String> a, Collection<String> b)
     {
+        if(b == null)
+        {
+            return Collections.emptySet();
+        }
+
         Set<String> result = new HashSet<>();
         for(String entry : b)
         {
-            if(a.contains(entry) == false)
+            if(a == null || a.contains(entry) == false)
             {
                 result.add(entry);
             }
