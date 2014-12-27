@@ -33,69 +33,31 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.ca.qa;
+package org.xipki.ca.qa.shell.completer;
 
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.Set;
 
-import org.xipki.common.ParamChecker;
+import org.xipki.ca.qa.shell.QASystemManager;
+import org.xipki.console.karaf.DynamicEnumCompleter;
 
 /**
  * @author Lijun Liao
  */
 
-public class ValidationResult
+public class X509IssuerNameCompleter extends DynamicEnumCompleter
 {
-    private final List<ValidationIssue> validationIssues;
-    private final List<ValidationIssue> failedValidationIssues;
-    private final List<ValidationIssue> successfulValidationIssues;
 
-    public ValidationResult(ValidationIssue validationIssues)
+    protected QASystemManager qaSystemManager;
+
+    public void setQaSystemManager(QASystemManager qaSystemManager)
     {
-        this(Arrays.asList(validationIssues));
+        this.qaSystemManager = qaSystemManager;
     }
 
-    public ValidationResult(List<ValidationIssue> validationIssues)
+    @Override
+    protected Set<String> getEnums()
     {
-        ParamChecker.assertNotEmpty("validationIssues", validationIssues);
-
-        List<ValidationIssue> failedIssues = new LinkedList<>();
-        List<ValidationIssue> successfulIssues = new LinkedList<>();
-        for(ValidationIssue issue : validationIssues)
-        {
-            if(issue.isFailed())
-            {
-                failedIssues.add(issue);
-            } else
-            {
-                successfulIssues.add(issue);
-            }
-        }
-
-        this.validationIssues = validationIssues;
-        this.failedValidationIssues = failedIssues;
-        this.successfulValidationIssues = successfulIssues;
-    }
-
-    public boolean isAllSuccessful()
-    {
-        return failedValidationIssues.isEmpty();
-    }
-
-    public List<ValidationIssue> getValidationIssues()
-    {
-        return validationIssues;
-    }
-
-    public List<ValidationIssue> getFailedValidationIssues()
-    {
-        return failedValidationIssues;
-    }
-
-    public List<ValidationIssue> getSuccessfulValidationIssues()
-    {
-        return successfulValidationIssues;
+        return qaSystemManager.getIssuerNames();
     }
 
 }

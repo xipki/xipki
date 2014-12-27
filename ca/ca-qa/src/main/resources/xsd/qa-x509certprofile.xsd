@@ -14,7 +14,7 @@
       </jxb:schemaBindings>
     </xs:appinfo>
   </xs:annotation>
-  <xs:element name="x509Profile" type="X509ProfileType"/>
+  <xs:element name="X509Profile" type="X509ProfileType"/>
   <xs:complexType name="X509ProfileType">
     <xs:sequence>
       <xs:element name="description" type="xs:string"/>
@@ -115,6 +115,7 @@
       <xs:element name="regex" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
       <xs:element name="prefix" type="xs:string" minOccurs="0"/>
       <xs:element name="suffix" type="xs:string" minOccurs="0"/>
+      <xs:element name="ignoreReq" type="xs:boolean" minOccurs="0"/>
     </xs:sequence>
     <xs:attribute name="minOccurs" type="xs:int" default="1" use="optional"/>
     <xs:attribute name="maxOccurs" type="xs:int" default="1" use="optional"/>
@@ -129,16 +130,10 @@
     </xs:restriction>
   </xs:simpleType>
   <xs:complexType name="ExtensionType">
-    <xs:annotation>
-      <xs:documentation>
-        Critical will be considered if both values (true and false) are allowed,
-        otherwise it will be ignored
-      </xs:documentation>
-    </xs:annotation>
     <xs:complexContent>
       <xs:extension base="OidWithDescType">
-        <xs:attribute name="critical" type="xs:boolean" use="optional"/>
-        <xs:attribute name="required" type="xs:boolean" default="false"/>
+        <xs:attribute name="critical" type="xs:boolean" use="required"/>
+        <xs:attribute name="required" type="xs:boolean" use="required"/>
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>

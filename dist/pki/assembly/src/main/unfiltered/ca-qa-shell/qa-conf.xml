@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<QAConf xmlns="http://xipki.org/qa/conf/v1">
+  <X509Issuers>
+    <X509Issuer name="RCA">
+      <cert>
+        <file>output/RCA1.der</file>
+      </cert>
+    </X509Issuer>
+    <X509Issuer name="SubCA">
+      <cert>
+        <file>output/SubCA1.der</file>
+      </cert>
+      <ocspUrl>http://example.org/ocsp</ocspUrl>
+    </X509Issuer>
+    <X509Issuer name="SubCAwithCRL">
+      <cert>
+        <file>output/SubCAwithCRL1.der</file>
+      </cert>
+      <crlUrl>http://example.org/crl</crlUrl>
+      <deltaCrlUrl>http://example.org/deltacrl</deltaCrlUrl>
+    </X509Issuer>
+  </X509Issuers>
+  <X509CertProfiles>
+    <X509CertProfile name="RCA">
+      <file>ca-qa-shell/qa-profile/QA-CertProfile_RootCA.xml</file>
+    </X509CertProfile>
+    <X509CertProfile name="RCA-Cross">
+      <file>ca-qa-shell/qa-profile/QA-CertProfile_RootCA_Cross.xml</file>
+    </X509CertProfile>
+    <X509CertProfile name="SubCA">
+      <file>ca-qa-shell/qa-profile/QA-CertProfile_SubCA.xml</file>
+    </X509CertProfile>
+    <X509CertProfile name="SubCA.Complex">
+      <file>ca-qa-shell/qa-profile/QA-CertProfile_SubCA_Complex.xml</file>
+    </X509CertProfile>
+    <X509CertProfile name="OCSP">
+      <file>ca-qa-shell/qa-profile/QA-CertProfile_OCSP.xml</file>
+    </X509CertProfile>
+    <X509CertProfile name="multipleOUs">
+      <file>ca-qa-shell/qa-profile/QA-CertProfile_multipleOUs.xml</file>
+    </X509CertProfile>
+    <X509CertProfile name="TLS">
+      <file>ca-qa-shell/qa-profile/QA-CertProfile_TLS.xml</file>
+    </X509CertProfile>
+    <X509CertProfile name="TLS_C">
+      <file>ca-qa-shell/qa-profile/QA-CertProfile_TLS_C.xml</file>
+    </X509CertProfile>
+    <X509CertProfile name="TLSwithIncSN">
+      <file>ca-qa-shell/qa-profile/QA-CertProfile_TLSwithIncSN.xml</file>
+    </X509CertProfile>
+    <X509CertProfile name="gSMC_K">
+      <file>ca-qa-shell/qa-profile/QA-CertProfile_gSMC_K.xml</file>
+    </X509CertProfile>
+  </X509CertProfiles>
+</QAConf>

@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<X509Profile xmlns="http://xipki.org/qa/certprofile/x509/v1">
+  <description>CertProfile TLS_C</description>
+  <version>3</version>
+  <ca>false</ca>
+  <validity>5y</validity>
+  <notBeforeTime>current</notBeforeTime>
+  <keyAlgorithms>
+    <algorithm>
+      <algorithm description="RSA">1.2.840.113549.1.1.1</algorithm>
+      <parameter name="moduluslength">
+        <Min>2048</Min>
+        <Max>2048</Max>
+      </parameter>
+      <parameter name="moduluslength">
+        <Min>3072</Min>
+        <Max>3072</Max>
+      </parameter>
+    </algorithm>
+    <algorithm>
+      <algorithm description="DSA">1.2.840.10040.4.1</algorithm>
+      <parameter name="plength">
+        <Min>1024</Min>
+        <Max>1024</Max>
+      </parameter>
+      <parameter name="plength">
+        <Min>2048</Min>
+        <Max>2048</Max>
+      </parameter>
+      <parameter name="qlength">
+        <Min>160</Min>
+        <Max>160</Max>
+      </parameter>
+      <parameter name="qlength">
+        <Min>224</Min>
+        <Max>224</Max>
+      </parameter>
+      <parameter name="qlength">
+        <Min>256</Min>
+        <Max>256</Max>
+      </parameter>
+    </algorithm>
+    <algorithm>
+      <algorithm description="EC">1.2.840.10045.2.1</algorithm>
+      <ecParameter>
+        <curve>
+          <oid description="prime256v1">1.2.840.10045.3.1.7</oid>
+          <encodings>
+            <encoding>4</encoding>
+          </encodings>
+        </curve>
+        <curve>
+          <oid description="brainpoolp256r1">1.3.36.3.3.2.8.1.1.7</oid>
+          <encodings>
+            <encoding>4</encoding>
+          </encodings>
+        </curve>
+      </ecParameter>
+    </algorithm>
+  </keyAlgorithms>
+  <subject>
+    <rdn minOccurs="1" maxOccurs="1">
+      <type description="c">2.5.4.6</type>
+      <regex>DE|FR</regex>
+    </rdn>
+    <rdn minOccurs="1" maxOccurs="1">
+      <type description="o">2.5.4.10</type>
+    </rdn>
+    <rdn minOccurs="0" maxOccurs="1">
+      <type description="ou">2.5.4.11</type>
+    </rdn>
+    <rdn minOccurs="0" maxOccurs="1">
+      <type description="serialNumber">2.5.4.5</type>
+      <regex>[\d]{1,}</regex>
+    </rdn>
+    <rdn minOccurs="1" maxOccurs="1">
+      <type description="cn">2.5.4.3</type>
+    </rdn>
+  </subject>
+  <extensions>
+    <extension critical="false" required="true" description="subjectKeyIdentifier">2.5.29.14</extension>
+    <extension critical="false" required="true" description="authorityKeyIdentifier">2.5.29.35</extension>
+    <extension critical="false" required="false" description="authorityInfoAccess">1.3.6.1.5.5.7.1.1</extension>
+    <extension critical="false" required="false" description="cRLDistributionPoints">2.5.29.31</extension>
+    <extension critical="false" required="false" description="freshestCRL">2.5.29.46</extension>
+    <extension critical="true" required="true" description="keyUsage">2.5.29.15</extension>
+    <extension critical="true" required="true" description="basicConstraints">2.5.29.19</extension>
+    <extension critical="false" required="true" description="extendedKeyUsage">2.5.29.37</extension>
+    <authorityKeyIdentifier>
+      <includeIssuerAndSerial>false</includeIssuerAndSerial>
+    </authorityKeyIdentifier>
+    <keyUsage>
+      <usage>DIGITAL_SIGNATURE</usage>
+      <usage>DATA_ENCIPHERMENT</usage>
+      <usage>KEY_ENCIPHERMENT</usage>
+    </keyUsage>
+    <extendedKeyUsage>
+      <usage description="id-kp-clientAuth">1.3.6.1.5.5.7.3.2</usage>
+    </extendedKeyUsage>
+  </extensions>
+</X509Profile>
