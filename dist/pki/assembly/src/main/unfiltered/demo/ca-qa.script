@@ -11,32 +11,34 @@ sleep 2000
 #                        NEGITIVE TESTS                         #
 #################################################################
 
+file:rm -r -f output/neg
+
 ## Subject does not satisfy the requirement
 
 # TLS
-keytool:rsa-p12 -pwd 1234 -out output/TLS101.p12 -subject "CN=TLS101,O=xipki,C=DE"
+keytool:rsa-p12 -pwd 1234 -out output/neg/TLS101.p12 -subject "CN=TLS101,O=xipki,C=DE"
 
-keytool:req-p12 -p12 output/TLS101.p12 -pwd 1234 -out output/TLS101.p10
+keytool:req-p12 -p12 output/neg/TLS101.p12 -pwd 1234 -out output/neg/TLS101.p10
 
-caqa:neg-ra-enroll -p10 output/TLS101.p10 -profile TLS -user USER-T
+caqa:neg-ra-enroll -p10 output/neg/TLS101.p10 -profile TLS -user USER-T
 
-caqa:neg-enroll-p12 -p12 output/TLS101.p12 -pwd 1234 -profile TLS -user USER-T
+caqa:neg-enroll-p12 -p12 output/neg/TLS101.p12 -pwd 1234 -profile TLS -user USER-T
 
 # multipleOUs
-keytool:rsa-p12 -pwd 1234 -out output/multipleOUs101.p12 \
+keytool:rsa-p12 -pwd 1234 -out output/neg/multipleOUs101.p12 \
   -subject "CN=multipleOUs101,OU=A12345,OU=A54321,O=xipki,C=DE"
 
-caqa:neg-enroll-p12 -p12 output/multipleOUs101.p12 -pwd 1234 -profile multipleOUs -user USER-O
+caqa:neg-enroll-p12 -p12 output/neg/multipleOUs101.p12 -pwd 1234 -profile multipleOUs -user USER-O
 
-keytool:rsa-p12 -pwd 1234 -out output/multipleOUs102.p12 \
+keytool:rsa-p12 -pwd 1234 -out output/neg/multipleOUs102.p12 \
   -subject "CN=multipleOUs102,OU=12345,OU=54321,O=xipki,C=DE"
 
-caqa:neg-enroll-p12 -p12 output/multipleOUs102.p12 -pwd 1234 -profile multipleOUs -user USER-O
+caqa:neg-enroll-p12 -p12 output/neg/multipleOUs102.p12 -pwd 1234 -profile multipleOUs -user USER-O
 
-keytool:rsa-p12 -pwd 1234 -out output/multipleOUs103.p12 \
+keytool:rsa-p12 -pwd 1234 -out output/neg/multipleOUs103.p12 \
   -subject "CN=multipleOUs103,OU=A12345,O=xipki,C=DE"
 
-caqa:neg-enroll-p12 -p12 output/multipleOUs103.p12 -pwd 1234 -profile multipleOUs -user USER-O
+caqa:neg-enroll-p12 -p12 output/neg/multipleOUs103.p12 -pwd 1234 -profile multipleOUs -user USER-O
 
 ## Revoke certificate that has been revoked
 

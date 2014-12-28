@@ -43,6 +43,14 @@
           </xs:documentation>
         </xs:annotation>
       </xs:element>
+      <xs:element name="specialBehavior" type="xs:string" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation>
+            some certificate profiles must be processed specially. Currently 
+            defined special behavior is gematik_gSMC_K.
+          </xs:documentation>
+        </xs:annotation>
+      </xs:element>
       <xs:element name="keyAlgorithms" minOccurs="0">
         <xs:complexType>
           <xs:sequence>

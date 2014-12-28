@@ -756,6 +756,8 @@ public class ProfileConfCreatorDemo
     {
         X509ProfileType profile = getBaseProfile("CertProfile gSMC_K", false, "5y", false);
 
+        profile.setSpecialBehavior("gematik_gSMC_K");
+
         // Subject
         Subject subject = profile.getSubject();
 
@@ -769,9 +771,7 @@ public class ProfileConfCreatorDemo
         rdns.add(createRDN(ObjectIdentifiers.DN_STREET, 0, 1, null));
         // regex: ICCSN-yyyyMMdd
         String regex = "80276[\\d]{15,15}-20\\d\\d(0[1-9]|1[012])(0[1-9]|[12][0-9]|3[01])";
-        RdnType rdn = createRDN(ObjectIdentifiers.DN_CN, 1, 1, new String[]{regex});
-        rdn.setIgnoreReq(true);
-        rdns.add(rdn);
+        rdns.add(createRDN(ObjectIdentifiers.DN_CN, 1, 1, new String[]{regex}));
 
         // Extensions
         // Extensions - general
