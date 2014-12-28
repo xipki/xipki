@@ -119,8 +119,8 @@
       <includeIssuerAndSerial>false</includeIssuerAndSerial>
     </authorityKeyIdentifier>
     <keyUsage>
-      <usage>KEYCERT_SIGN</usage>
-      <usage>CRL_SIGN</usage>
+      <usage>keyCertSign</usage>
+      <usage>cRLSign</usage>
     </keyUsage>
     <certificatePolicies>
       <certificatePolicyInformation>

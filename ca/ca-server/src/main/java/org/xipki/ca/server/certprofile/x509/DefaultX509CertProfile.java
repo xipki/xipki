@@ -480,7 +480,7 @@ public class DefaultX509CertProfile extends AbstractX509CertProfile
                     {
                         switch(type)
                         {
-                        case CRL_SIGN:
+                        case C_RL_SIGN:
                             set.add(KeyUsage.cRLSign);
                             break;
                         case DATA_ENCIPHERMENT:
@@ -501,12 +501,14 @@ public class DefaultX509CertProfile extends AbstractX509CertProfile
                         case KEY_AGREEMENT:
                             set.add(KeyUsage.keyAgreement);
                             break;
-                        case KEYCERT_SIGN:
+                        case KEY_CERT_SIGN:
                             set.add(KeyUsage.keyCertSign);
                             break;
                         case KEY_ENCIPHERMENT:
                             set.add(KeyUsage.keyEncipherment);
                             break;
+                        default:
+                            throw new RuntimeException("should not reach here");
                         }
                     }
                     Set<KeyUsage> keyusageSet = Collections.unmodifiableSet(set);

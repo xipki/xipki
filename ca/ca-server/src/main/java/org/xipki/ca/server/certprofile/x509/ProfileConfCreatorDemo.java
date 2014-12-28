@@ -256,7 +256,7 @@ public class ProfileConfCreatorDemo
         list.add(createExtension(Extension.basicConstraints, true));
 
         // Extensions - keyUsage
-        extensions.getKeyUsage().add(createKeyUsages(KeyUsageType.KEYCERT_SIGN, KeyUsageType.CRL_SIGN));
+        extensions.getKeyUsage().add(createKeyUsages(KeyUsageType.KEY_CERT_SIGN, KeyUsageType.C_RL_SIGN));
         return profile;
     }
 
@@ -292,7 +292,7 @@ public class ProfileConfCreatorDemo
         list.add(createExtension(Extension.basicConstraints, true));
 
         // Extensions - keyUsage
-        extensions.getKeyUsage().add(createKeyUsages(KeyUsageType.KEYCERT_SIGN, KeyUsageType.CRL_SIGN));
+        extensions.getKeyUsage().add(createKeyUsages(KeyUsageType.KEY_CERT_SIGN, KeyUsageType.C_RL_SIGN));
         return profile;
     }
 
@@ -338,7 +338,7 @@ public class ProfileConfCreatorDemo
         list.add(createExtension(customExtensionOid, true, "custom extension 1"));
 
         // Extensions - keyUsage
-        extensions.getKeyUsage().add(createKeyUsages(KeyUsageType.KEYCERT_SIGN, KeyUsageType.CRL_SIGN));
+        extensions.getKeyUsage().add(createKeyUsages(KeyUsageType.KEY_CERT_SIGN, KeyUsageType.C_RL_SIGN));
 
         // Certificate Policies
         ExtensionsType.CertificatePolicies certificatePolicies = createCertificatePolicies(

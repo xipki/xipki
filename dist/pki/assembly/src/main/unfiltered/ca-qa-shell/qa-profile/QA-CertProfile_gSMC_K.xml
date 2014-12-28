@@ -102,8 +102,8 @@
       <includeIssuerAndSerial>false</includeIssuerAndSerial>
     </authorityKeyIdentifier>
     <keyUsage>
-      <usage>DIGITAL_SIGNATURE</usage>
-      <usage>KEY_ENCIPHERMENT</usage>
+      <usage>digitalSignature</usage>
+      <usage>keyEncipherment</usage>
     </keyUsage>
     <certificatePolicies>
       <certificatePolicyInformation>
