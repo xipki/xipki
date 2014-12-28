@@ -1219,7 +1219,7 @@ public class X509CertProfileQA
 
         if(rdnsSize == 0)
         {
-            // check optional attribute but is present is requestedSubject
+            // check optional attribute but is present in requestedSubject
             if(maxOccurs > 0 && requestedRdns != null && requestedRdns.length > 0)
             {
                 issue.setFailureMessage("is absent but expected present");
