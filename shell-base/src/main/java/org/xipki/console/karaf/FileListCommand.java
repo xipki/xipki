@@ -36,6 +36,11 @@
 package org.xipki.console.karaf;
 
 import java.io.File;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
+
+import jline.console.ConsoleReader;
 
 import org.apache.karaf.shell.commands.Argument;
 import org.apache.karaf.shell.commands.Command;
@@ -64,10 +69,59 @@ public class FileListCommand extends XipkiOsgiCommandSupport
 
         if(target.isDirectory())
         {
-            String[] children = target.list();
-            for(String child : children)
+            List<String> l = new LinkedList<>();
+            File[] children = target.listFiles();
+            int maxLen = -1;
+            for(File child : children)
             {
-                out(child);
+                String name  = child.getName();
+                if(child.isDirectory())
+                {
+                    name += File.separator;
+                }
+                l.add(name);
+                maxLen = Math.max(maxLen, name.length());
+            }
+            if(l.isEmpty() == false)
+            {
+                Collections.sort(l);
+                List<String> l2 = new LinkedList<>();
+
+                for(String s : l)
+                {
+                    int diffLen = maxLen - s.length();
+                    if(diffLen > 0)
+                    {
+                        for(int i = 0; i < diffLen; i++)
+                        {
+                            s += " ";
+                        }
+                    }
+                    l2.add(s);
+                }
+
+                ConsoleReader reader = (ConsoleReader) session.get(".jline.reader");
+                int width = reader.getTerminal().getWidth();
+
+                int n = width / (maxLen + 1);
+                if(n == 0)
+                {
+                    for(String s :l2)
+                    {
+                        out(s);
+                    }
+                } else
+                {
+                    for(int i = 0; i < l2.size(); i += n)
+                    {
+                        StringBuilder sb = new StringBuilder();
+                        for(int j = i; j < Math.min(l2.size(), i + n); j++)
+                        {
+                            sb.append(l2.get(j)).append(" ");
+                        }
+                        out(sb.toString());
+                    }
+                }
             }
         }
         else
