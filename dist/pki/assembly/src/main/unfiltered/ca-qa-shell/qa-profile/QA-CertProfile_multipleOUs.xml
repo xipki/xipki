@@ -91,7 +91,7 @@
       <includeIssuerAndSerial>false</includeIssuerAndSerial>
     </authorityKeyIdentifier>
     <keyUsage>
-      <usage>CONTENT_COMMITMENT</usage>
+      <usage>contentCommitment</usage>
     </keyUsage>
   </extensions>
 </X509Profile>

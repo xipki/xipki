@@ -334,15 +334,15 @@
   </xs:simpleType>
   <xs:simpleType name="KeyUsageType">
     <xs:restriction base="xs:string">
-      <xs:enumeration value="DIGITAL_SIGNATURE"/>
-      <xs:enumeration value="CONTENT_COMMITMENT"/>
-      <xs:enumeration value="KEY_ENCIPHERMENT"/>
-      <xs:enumeration value="DATA_ENCIPHERMENT"/>
-      <xs:enumeration value="KEY_AGREEMENT"/>
-      <xs:enumeration value="KEYCERT_SIGN"/>
-      <xs:enumeration value="CRL_SIGN"/>
-      <xs:enumeration value="ENCIPHER_ONLY"/>
-      <xs:enumeration value="DECIPHER_ONLY"/>
+      <xs:enumeration value="digitalSignature"/>
+      <xs:enumeration value="contentCommitment"/>
+      <xs:enumeration value="keyEncipherment"/>
+      <xs:enumeration value="dataEncipherment"/>
+      <xs:enumeration value="keyAgreement"/>
+      <xs:enumeration value="keyCertSign"/>
+      <xs:enumeration value="cRLSign"/>
+      <xs:enumeration value="encipherOnly"/>
+      <xs:enumeration value="decipherOnly"/>
     </xs:restriction>
   </xs:simpleType>
 </xs:schema>

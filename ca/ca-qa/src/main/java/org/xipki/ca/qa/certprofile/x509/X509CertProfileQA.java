@@ -445,7 +445,7 @@ public class X509CertProfileQA
                 {
                     switch(type)
                     {
-                    case CRL_SIGN:
+                    case C_RL_SIGN:
                         usages.add(KeyUsage.cRLSign.getName());
                         break;
                     case DATA_ENCIPHERMENT:
@@ -466,7 +466,7 @@ public class X509CertProfileQA
                     case KEY_AGREEMENT:
                         usages.add(KeyUsage.keyAgreement.getName());
                         break;
-                    case KEYCERT_SIGN:
+                    case KEY_CERT_SIGN:
                         usages.add(KeyUsage.keyCertSign.getName());
                         break;
                     case KEY_ENCIPHERMENT:
@@ -573,8 +573,7 @@ public class X509CertProfileQA
                 this.allowedSubjectInfoAccessModes = new HashMap<>();
                 for(Access entry : list)
                 {
-                    this.allowedSubjectInfoAccessModes.put(
-                            entry.getAccessMethod().getValue(),
+                    this.allowedSubjectInfoAccessModes.put(entry.getAccessMethod().getValue(),
                             buildGeneralNameMode(entry.getAccessLocation()));
                 }
             }
@@ -620,11 +619,8 @@ public class X509CertProfileQA
         }
     }
 
-    public ValidationResult checkCert(
-            byte[] certBytes,
-            X509IssuerInfo issuerInfo,
-            X500Name requestedSubject,
-            SubjectPublicKeyInfo requestedPublicKey)
+    public ValidationResult checkCert(byte[] certBytes, X509IssuerInfo issuerInfo,
+            X500Name requestedSubject, SubjectPublicKeyInfo requestedPublicKey)
     {
         ParamChecker.assertNotNull("certBytes", certBytes);
         ParamChecker.assertNotNull("issuerInfo", issuerInfo);
@@ -826,7 +822,8 @@ public class X509CertProfileQA
                 failureMsg.append("; ");
             } else if(extOccurrence.isCritical() != ext.isCritical())
             {
-                failureMsg.append("critical is '" + ext.isCritical() + "' but expected '" + extOccurrence.isCritical() + "'");
+                failureMsg.append("critical is '" + ext.isCritical() +
+                        "' but expected '" + extOccurrence.isCritical() + "'");
                 failureMsg.append("; ");
             }
 
@@ -1209,7 +1206,8 @@ public class X509CertProfileQA
 
         if(rdnsSize < minOccurs || rdnsSize > maxOccurs)
         {
-            issue.setFailureMessage("number of RDNs '" + rdnsSize + "' is not within [" + minOccurs + ", " + maxOccurs + "]");
+            issue.setFailureMessage("number of RDNs '" + rdnsSize +
+                    "' is not within [" + minOccurs + ", " + maxOccurs + "]");
             return issue;
         }
 

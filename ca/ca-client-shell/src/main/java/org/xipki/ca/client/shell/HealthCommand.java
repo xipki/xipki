@@ -91,10 +91,10 @@ public class HealthCommand extends ClientCommand
         sb.append("Healthy status for CA ");
         sb.append(caName);
         sb.append(": ");
-        sb.append(healthResult.isHealthy() ? "healthy\n" : "not healthy\n");
+        sb.append(healthResult.isHealthy() ? "healthy" : "not healthy");
         if(verbose.booleanValue())
         {
-            sb.append(healthResult.toJsonMessage(true));
+            sb.append("\n").append(healthResult.toJsonMessage(true));
         }
         System.out.println(sb.toString());
         return null;
