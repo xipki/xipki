@@ -5,6 +5,7 @@
   <ca>false</ca>
   <validity>5y</validity>
   <notBeforeTime>current</notBeforeTime>
+  <specialBehavior>gematik_gSMC_K</specialBehavior>
   <keyAlgorithms>
     <algorithm>
       <algorithm description="RSA">1.2.840.113549.1.1.1</algorithm>
@@ -84,7 +85,6 @@
     <rdn minOccurs="1" maxOccurs="1">
       <type description="cn">2.5.4.3</type>
       <regex>80276[\d]{15,15}-20\d\d(0[1-9]|1[012])(0[1-9]|[12][0-9]|3[01])</regex>
-      <ignoreReq>true</ignoreReq>
     </rdn>
   </subject>
   <extensions>

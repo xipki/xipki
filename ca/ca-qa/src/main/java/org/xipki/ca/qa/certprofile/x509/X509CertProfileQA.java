@@ -245,6 +245,7 @@ public class X509CertProfileQA
 
     private CertValidity validity;
     private int syntaxVersion;
+    private String specialBehavior;
     private boolean ca;
     private boolean notBeforeMidnight;
     private Integer pathLen;
@@ -294,6 +295,11 @@ public class X509CertProfileQA
             this.validity = CertValidity.getInstance(conf.getValidity());
             this.ca = conf.isCa();
             this.notBeforeMidnight = "midnight".equalsIgnoreCase(conf.getNotBeforeTime());
+            this.specialBehavior = conf.getSpecialBehavior();
+            if(this.specialBehavior != null && "gematik_gSMC_K".equalsIgnoreCase(this.specialBehavior) == false)
+            {
+                throw new CertProfileException("unknown special bahavior " + this.specialBehavior);
+            }
 
             // KeyAlgorithms
             if(conf.getKeyAlgorithms() != null)
@@ -1348,23 +1354,23 @@ public class X509CertProfileQA
                         coreAtvTextValue = coreAtvTextValue.substring(0, coreAtvTextValue.length() - suffix.length());
                     }
                 }
-            }
 
-            List<Pattern> patterns = rdnOption.getPatterns();
-            if(patterns != null)
-            {
-                Pattern pattern = patterns.get(i);
-                boolean matches = pattern.matcher(coreAtvTextValue).matches();
-                if(matches == false)
+                List<Pattern> patterns = rdnOption.getPatterns();
+                if(patterns != null)
                 {
-                    failureMsg.append("RDN + [" + i + "] '" + coreAtvTextValue+
-                            "' is not valid against regex '" + pattern.pattern() + "'");
-                    failureMsg.append("; ");
-                    continue;
+                    Pattern pattern = patterns.get(i);
+                    boolean matches = pattern.matcher(coreAtvTextValue).matches();
+                    if(matches == false)
+                    {
+                        failureMsg.append("RDN + [" + i + "] '" + coreAtvTextValue+
+                                "' is not valid against regex '" + pattern.pattern() + "'");
+                        failureMsg.append("; ");
+                        continue;
+                    }
                 }
             }
 
-            if(rdnOption.isIgnoreReq() == false)
+            if(rdnOption == null || rdnOption.isIgnoreReq() == false)
             {
                 if(requestedCoreAtvTextValues.isEmpty())
                 {
@@ -1376,11 +1382,23 @@ public class X509CertProfileQA
                 } else
                 {
                     String requestedCoreAtvTextValue = requestedCoreAtvTextValues.get(i);
-                    if(coreAtvTextValue.equals(requestedCoreAtvTextValue) == false)
+                    if(ObjectIdentifiers.DN_CN.equals(type) &&
+                            specialBehavior != null && "gematik_gSMC_K".equals(specialBehavior))
                     {
-                        failureMsg.append("content '" + coreAtvTextValue + "' but expected '" +
-                                requestedCoreAtvTextValue + "'");
-                        failureMsg.append("; ");
+                        if(coreAtvTextValue.startsWith(requestedCoreAtvTextValue + "-") == false)
+                        {
+                            failureMsg.append("content '" + coreAtvTextValue + "' does not start with '" +
+                                    requestedCoreAtvTextValue + "-'");
+                            failureMsg.append("; ");
+                        }
+                    } else
+                    {
+                        if(coreAtvTextValue.equals(requestedCoreAtvTextValue) == false)
+                        {
+                            failureMsg.append("content '" + coreAtvTextValue + "' but expected '" +
+                                    requestedCoreAtvTextValue + "'");
+                            failureMsg.append("; ");
+                        }
                     }
                 }
             }
