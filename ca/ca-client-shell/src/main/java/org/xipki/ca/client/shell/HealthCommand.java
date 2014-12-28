@@ -53,6 +53,10 @@ public class HealthCommand extends ClientCommand
             required = false, description = "Required if multiple CAs are configured. CA name")
     protected String caName;
 
+    @Option(name = "-v", aliases="--verbose",
+            required = false, description = "Show status verbosely")
+    protected Boolean verbose = Boolean.FALSE;
+
     @Override
     protected Object doExecute()
     throws Exception
@@ -75,8 +79,7 @@ public class HealthCommand extends ClientCommand
             if(caNames.size() == 1)
             {
                 caName = caNames.iterator().next();
-            }
-            else
+            } else
             {
                 err("No caname is specified, one of " + caNames + " is required");
                 return null;
@@ -84,8 +87,16 @@ public class HealthCommand extends ClientCommand
         }
 
         HealthCheckResult healthResult = raWorker.getHealthCheckResult(caName);
-        System.out.println("Healthy status for CA " + caName);
-        System.out.println(healthResult.toJsonMessage(true));
+        StringBuilder sb = new StringBuilder();
+        sb.append("Healthy status for CA ");
+        sb.append(caName);
+        sb.append(": ");
+        sb.append(healthResult.isHealthy() ? "healthy\n" : "not healthy\n");
+        if(verbose.booleanValue())
+        {
+            sb.append(healthResult.toJsonMessage(true));
+        }
+        System.out.println(sb.toString());
         return null;
     }
 

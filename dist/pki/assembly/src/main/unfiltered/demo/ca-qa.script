@@ -78,7 +78,6 @@ caqa:check-cert -issuer SubCAwithCRL -profile OCSP \
 caqa:check-cert -issuer SubCAwithCRL -profile OCSP \
   -p10 output/OCSP2.p10 -cert output/OCSP2.der
 
-
 caqa:check-cert -issuer SubCAwithCRL -profile multipleOUs \
   -p10 output/multipleOUs1.p10 -cert output/multipleOUs1.der
 
@@ -101,7 +100,6 @@ caqa:check-cert -issuer SubCA -profile TLSwithIncSN \
 caqa:check-cert -issuer SubCA -profile TLSwithIncSN \
   -p10 output/TLSwithIncSN1-2.p10 -cert output/TLSwithIncSN1-2.der
 
-# TODO: check me
 caqa:check-cert -issuer SubCA -profile TLS \
   -p10 output/TLS2.p10 -cert output/TLS2.der
 

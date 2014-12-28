@@ -64,8 +64,8 @@ import org.xipki.ca.qa.shell.jaxb.ObjectFactory;
 import org.xipki.ca.qa.shell.jaxb.QAConfType;
 import org.xipki.ca.qa.shell.jaxb.X509CertProfileType;
 import org.xipki.ca.qa.shell.jaxb.X509IssuerType;
-import org.xipki.common.ConfigurationException;
 import org.xipki.common.IoUtil;
+import org.xipki.common.LogUtil;
 import org.xml.sax.SAXException;
 
 /**
@@ -97,11 +97,11 @@ public class QASystemManager
     }
 
     public void init()
-    throws ConfigurationException
     {
         if(confFile == null || confFile.isEmpty())
         {
-            throw new ConfigurationException("confFile could not be null and empty");
+            LOG.error("confFile could not be null and empty");
+            return;
         }
 
         QAConfType qaConf;
@@ -111,7 +111,13 @@ public class QASystemManager
             qaConf = parseQAConf(issuerConfStream);
         }catch(IOException | JAXBException | SAXException e)
         {
-            throw new ConfigurationException(e.getMessage(), e);
+            final String message = "Could not parse the QA configuration";
+            if(LOG.isErrorEnabled())
+            {
+                LOG.error(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(), e.getMessage());
+            }
+            LOG.debug(message, e);
+            return;
         }
 
         if(qaConf.getX509Issuers() != null)
@@ -125,7 +131,13 @@ public class QASystemManager
                     certBytes = readData(issuerType.getCert());
                 } catch (IOException e)
                 {
-                    throw new ConfigurationException(e.getMessage(), e);
+                    final String message = "Could not read the certificate bytes of issuer " + issuerType.getName();
+                    if(LOG.isErrorEnabled())
+                    {
+                        LOG.error(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(), e.getMessage());
+                    }
+                    LOG.debug(message, e);
+                    continue;
                 }
                 X509IssuerInfo issuerInfo;
                 try
@@ -134,7 +146,13 @@ public class QASystemManager
                             issuerType.getCrlUrl(), issuerType.getDeltaCrlUrl(), certBytes);
                 } catch (CertificateException e)
                 {
-                    throw new ConfigurationException(e.getMessage(), e);
+                    final String message = "Could not parse certificate of issuer " + issuerType.getName();
+                    if(LOG.isErrorEnabled())
+                    {
+                        LOG.error(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(), e.getMessage());
+                    }
+                    LOG.debug(message, e);
+                    continue;
                 }
                 x509IssuerInfoMap.put(issuerType.getName(), issuerInfo);
                 LOG.info("configured X509 issuer {}", issuerType.getName());
@@ -156,7 +174,13 @@ public class QASystemManager
                     LOG.info("configured X509 certificate profile {}", name);
                 }catch(IOException | CertProfileException e)
                 {
-                    throw new ConfigurationException(e.getMessage(), e);
+                    final String message = "Could not parse QA certificate profile " + name;
+                    if(LOG.isErrorEnabled())
+                    {
+                        LOG.error(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(), e.getMessage());
+                    }
+                    LOG.debug(message, e);
+                    continue;
                 }
             }
         }

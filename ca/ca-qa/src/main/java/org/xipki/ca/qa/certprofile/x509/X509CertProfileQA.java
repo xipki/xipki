@@ -1186,7 +1186,8 @@ public class X509CertProfileQA
         return result;
     }
 
-    private ValidationIssue checkSubjectAttribute(ASN1ObjectIdentifier type, X500Name subject, X500Name requestedSubject)
+    private ValidationIssue checkSubjectAttribute(ASN1ObjectIdentifier type,
+            X500Name subject, X500Name requestedSubject)
     {
         ValidationIssue issue = createSubjectIssue(type);
 
@@ -1975,7 +1976,8 @@ public class X509CertProfileQA
         }
     }
 
-    private void checkExtensionSubjectAltName(byte[] extensionValue, X500Name requestedSubject, StringBuilder failureMsg)
+    private void checkExtensionSubjectAltName(byte[] extensionValue,
+            X500Name requestedSubject, StringBuilder failureMsg)
     {
         RDN[] rdns = requestedSubject.getRDNs(Extension.subjectAlternativeName);
         if(rdns == null || rdns.length < 1)
@@ -2023,7 +2025,8 @@ public class X509CertProfileQA
         }
     }
 
-    private void checkExtensionIssuerAltNames(byte[] extensionValue, X509IssuerInfo issuerInfo, StringBuilder failureMsg)
+    private void checkExtensionIssuerAltNames(byte[] extensionValue,
+            X509IssuerInfo issuerInfo, StringBuilder failureMsg)
     {
         Extension caSubjectAltExtension = issuerInfo.getBcCert().getTBSCertificate().getExtensions().getExtension(
                 Extension.subjectAlternativeName);
@@ -2044,7 +2047,8 @@ public class X509CertProfileQA
         }
     }
 
-    private void checkExtensionAuthorityInfoAccess(byte[] extensionValue, X509IssuerInfo issuerInfo, StringBuilder failureMsg)
+    private void checkExtensionAuthorityInfoAccess(byte[] extensionValue,
+            X509IssuerInfo issuerInfo, StringBuilder failureMsg)
     {
         Set<String> eOCSPUris = issuerInfo.getOcspURLs();
         if(eOCSPUris == null)
@@ -2108,7 +2112,8 @@ public class X509CertProfileQA
         }
     }
 
-    private void checkExtensionCrlDistributionPoints(byte[] extensionValue, X509IssuerInfo issuerInfo, StringBuilder failureMsg)
+    private void checkExtensionCrlDistributionPoints(byte[] extensionValue,
+            X509IssuerInfo issuerInfo, StringBuilder failureMsg)
     {
         CRLDistPoint iCRLDistPoints = CRLDistPoint.getInstance(extensionValue);
         DistributionPoint[] iDistributionPoints = iCRLDistPoints.getDistributionPoints();
@@ -2229,7 +2234,8 @@ public class X509CertProfileQA
         }
     }
 
-    private void checkExtensionAdmission(byte[] extensionValue, X509IssuerInfo issuerInfo, StringBuilder failureMsg)
+    private void checkExtensionAdmission(byte[] extensionValue,
+            X509IssuerInfo issuerInfo, StringBuilder failureMsg)
     {
         if(admission == null)
         {

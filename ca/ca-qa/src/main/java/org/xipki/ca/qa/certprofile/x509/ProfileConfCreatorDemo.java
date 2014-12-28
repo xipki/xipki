@@ -858,7 +858,8 @@ public class ProfileConfCreatorDemo
         return profile;
     }
 
-    private static X509ProfileType getBaseProfile(String description, boolean ca, String validity, boolean useMidnightNotBefore)
+    private static X509ProfileType getBaseProfile(String description, boolean ca,
+            String validity, boolean useMidnightNotBefore)
     {
         X509ProfileType profile = new X509ProfileType();
         profile.setDescription(description);
@@ -962,8 +963,7 @@ public class ProfileConfCreatorDemo
             ec.setEcParameter(params);
 
             ASN1ObjectIdentifier[] curveIds = new ASN1ObjectIdentifier[]
-            {
-                    SECObjectIdentifiers.secp256r1, TeleTrusTObjectIdentifiers.brainpoolP256r1};
+                    { SECObjectIdentifiers.secp256r1, TeleTrusTObjectIdentifiers.brainpoolP256r1};
 
             for(ASN1ObjectIdentifier curveId : curveIds)
             {
