@@ -44,7 +44,7 @@ import org.xipki.security.api.p11.P11WritableSlot;
  * @author Lijun Liao
  */
 
-@Command(scope = "keytool", name = "dsa", description="Generate DSA keypair in PKCS#11 device")
+@Command(scope = "xipki-tk", name = "dsa", description="Generate DSA keypair in PKCS#11 device")
 public class P11DSAKeyGenCommand extends P11KeyGenCommand
 {
     @Option(name = "-plen",

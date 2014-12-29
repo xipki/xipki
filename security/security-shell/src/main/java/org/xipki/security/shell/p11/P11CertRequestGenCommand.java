@@ -55,7 +55,7 @@ import org.xipki.security.api.p11.P11SlotIdentifier;
  * @author Lijun Liao
  */
 
-@Command(scope = "keytool", name = "req", description="Generate PKCS#10 request with PKCS#11 device")
+@Command(scope = "xipki-tk", name = "req", description="Generate PKCS#10 request with PKCS#11 device")
 public class P11CertRequestGenCommand extends P11SecurityCommand
 {
     @Option(name = "-subject",

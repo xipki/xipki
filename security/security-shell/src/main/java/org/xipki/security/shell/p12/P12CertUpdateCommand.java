@@ -54,7 +54,7 @@ import org.xipki.security.api.SignerException;
  * @author Lijun Liao
  */
 
-@Command(scope = "keytool", name = "update-cert-p12", description="Update certificate in PKCS#12 keystore")
+@Command(scope = "xipki-tk", name = "update-cert-p12", description="Update certificate in PKCS#12 keystore")
 public class P12CertUpdateCommand extends P12SecurityCommand
 {
     @Option(name = "-cert",

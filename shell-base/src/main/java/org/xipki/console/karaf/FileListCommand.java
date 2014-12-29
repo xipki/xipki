@@ -49,7 +49,7 @@ import org.apache.karaf.shell.commands.Command;
  * @author Lijun Liao
  */
 
-@Command(scope = "file", name = "ls", description="List directory contents")
+@Command(scope = "xipki-file", name = "ls", description="List directory contents")
 public class FileListCommand extends XipkiOsgiCommandSupport
 {
     @Argument(index = 0, name = "file",

@@ -46,7 +46,7 @@ import org.xipki.security.api.PasswordResolver;
  * @author Lijun Liao
  */
 
-@Command(scope = "dbtool", name = "import-ca", description="Import CA database")
+@Command(scope = "xipki-db", name = "import-ca", description="Import CA database")
 public class ImportCaCommand extends XipkiOsgiCommandSupport
 {
     private static final String DFLT_DBCONF_FILE = "ca-config/ca-db.properties";

@@ -46,7 +46,7 @@ import org.xipki.security.api.P12KeypairGenerationResult;
  * @author Lijun Liao
  */
 
-@Command(scope = "keytool", name = "rsa-p12", description="Generate RSA keypair in PKCS#12 keystore")
+@Command(scope = "xipki-tk", name = "rsa-p12", description="Generate RSA keypair in PKCS#12 keystore")
 public class P12RSAKeyGenCommand extends P12KeyGenCommand
 {
     @Option(name = "-keysize",
