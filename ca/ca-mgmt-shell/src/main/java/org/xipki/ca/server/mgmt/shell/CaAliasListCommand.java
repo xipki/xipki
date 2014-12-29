@@ -47,7 +47,7 @@ import org.apache.karaf.shell.commands.Command;
  * @author Lijun Liao
  */
 
-@Command(scope = "ca", name = "caalias-list", description="List CA aliases")
+@Command(scope = "xipki-ca", name = "caalias-list", description="List CA aliases")
 public class CaAliasListCommand extends CaCommand
 {
     @Argument(index = 0, name = "alias", description = "CA alias", required = false)

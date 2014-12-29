@@ -45,7 +45,7 @@ import org.xipki.security.api.P12KeypairGenerationResult;
  * @author Lijun Liao
  */
 
-@Command(scope = "keytool", name = "ec-p12", description="Generate EC keypair in PKCS#12 keystore")
+@Command(scope = "xipki-tk", name = "ec-p12", description="Generate EC keypair in PKCS#12 keystore")
 public class P12ECKeyGenCommand extends P12KeyGenCommand
 {
     @Option(name = "-curve",

@@ -8,27 +8,27 @@ sleep 2000
 
 # Loadtest Template
 echo "Template enroll load test"
-caclient:loadtest-template-enroll \
+xipki-client:loadtest-template-enroll \
   -template demo/loadtest-template.xml \
   -duration 10 -thread 8
 
 # Loadtest RSA key
 echo "Enroll load test with RSA key"
-caclient:loadtest-enroll \
+xipki-client:loadtest-enroll \
   -keyType RSA \
   -subject "CN=xipki.org,O=example PKI company RSA,C=DE" -profile TLS -n 4 \
   -randomDN O -duration 10 -thread 8
 
 # Loadtest EC key
 echo "Enroll load test with EC key"
-caclient:loadtest-enroll \
+xipki-client:loadtest-enroll \
   -keyType EC -curve secp256r1 \
   -subject "CN=xipki.org,O=example PKI company EC,C=DE" -profile TLS -n 4 \
   -randomDN O -duration 10 -thread 8
  
 # Loadtest DSA key
 echo "Enroll load test with DSA key"
-caclient:loadtest-enroll \
+xipki-client:loadtest-enroll \
   -keyType DSA \
   -subject "CN=xipki.org,O=example PKI company DSA,C=DE" -profile TLS -n 4 \
   -randomDN O -duration 10 -thread 8

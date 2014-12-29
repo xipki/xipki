@@ -54,7 +54,7 @@ import org.xipki.security.api.ConcurrentContentSigner;
  * @author Lijun Liao
  */
 
-@Command(scope = "ca", name = "ca-add", description="Add CA")
+@Command(scope = "xipki-ca", name = "ca-add", description="Add CA")
 public class CaAddCommand extends CaAddOrGenCommand
 {
     @Option(name = "-cert",

@@ -6,7 +6,7 @@ feature:install xipki-database-tool
 
 sleep 1000
 
-dbtool:initdb --quiet
+xipki-db:initdb --quiet
 
 feature:uninstall xipki-database-tool
 
@@ -14,51 +14,51 @@ feature:install xipki-camgmt-shell
 
 sleep 1000
 
-ca:ca-restart
+xipki-ca:ca-restart
 
 #################################################################
 #                       PREPARE ENVIRONMENET                    #
 #################################################################
 
 ## Environment parameters
-ca:env-add -name add.prefix -value true
+xipki-ca:env-add -name add.prefix -value true
 
-ca:env-add -name add.suffix -value true
+xipki-ca:env-add -name add.suffix -value true
 
 ## CMP control: messageTimeBias is set to 300 seconds.
-ca:cmpcontrol-set --msgTimeBias 300 --sendCaCert yes
+xipki-ca:cmpcontrol-set --msgTimeBias 300 --sendCaCert yes
 
 ## Certificate Profiles
-ca:profile-add -name RCA-Cross -type XML -confFile demo/profile/CertProfile_RootCA_Cross.xml
+xipki-ca:profile-add -name RCA-Cross -type XML -confFile demo/profile/CertProfile_RootCA_Cross.xml
 
-ca:profile-add -name SubCA -type XML -confFile demo/profile/CertProfile_SubCA.xml
+xipki-ca:profile-add -name SubCA -type XML -confFile demo/profile/CertProfile_SubCA.xml
 
-ca:profile-add -name SubCA.Complex -type XML -confFile demo/profile/CertProfile_SubCA_Complex.xml
+xipki-ca:profile-add -name SubCA.Complex -type XML -confFile demo/profile/CertProfile_SubCA_Complex.xml
 
-ca:profile-add -name OCSP -type XML -confFile demo/profile/CertProfile_OCSP.xml
+xipki-ca:profile-add -name OCSP -type XML -confFile demo/profile/CertProfile_OCSP.xml
 
-ca:profile-add -name multipleOUs -type XML -confFile demo/profile/CertProfile_multipleOUs.xml
+xipki-ca:profile-add -name multipleOUs -type XML -confFile demo/profile/CertProfile_multipleOUs.xml
 
-ca:profile-add -name TLS -type XML -confFile demo/profile/CertProfile_TLS.xml
+xipki-ca:profile-add -name TLS -type XML -confFile demo/profile/CertProfile_TLS.xml
 
-ca:profile-add -name TLS_C -type XML -confFile demo/profile/CertProfile_TLS_C.xml
+xipki-ca:profile-add -name TLS_C -type XML -confFile demo/profile/CertProfile_TLS_C.xml
 
-ca:profile-add -name TLSwithIncSN -type XML -confFile demo/profile/CertProfile_TLSwithIncSN.xml
+xipki-ca:profile-add -name TLSwithIncSN -type XML -confFile demo/profile/CertProfile_TLSwithIncSN.xml
 
-ca:profile-add -name gSMC_K -type XML -confFile demo/profile/CertProfile_gSMC_K.xml
+xipki-ca:profile-add -name gSMC_K -type XML -confFile demo/profile/CertProfile_gSMC_K.xml
 
-ca:profile-add -name DEMO -type DemoEE1
+xipki-ca:profile-add -name DEMO -type DemoEE1
 
 ## Publishers
-ca:publisher-add -name OCSP.PUBLISHER -type OCSP \
+xipki-ca:publisher-add -name OCSP.PUBLISHER -type OCSP \
   -conf datasource?ocsp%publish.goodcerts?true
 
 # CMP Responder
-ca:responder-set -signerType JKS \
+xipki-ca:responder-set -signerType JKS \
   -signerConf password?1234%keystore?file:etc/tlskeys/tls-server-keystore.jks%algo?SHA256withRSA
 
 # CMP Requestors
-ca:requestor-add -cert etc/tlskeys/tls-client.der -name requestor
+xipki-ca:requestor-add -cert etc/tlskeys/tls-client.der -name requestor
 
 ## CRL Signer
-ca:crlsigner-add -signerType CA -name CASIGN.CRLSIGNER -crlControl updateMode?onDemand
+xipki-ca:crlsigner-add -signerType CA -name CASIGN.CRLSIGNER -crlControl updateMode?onDemand

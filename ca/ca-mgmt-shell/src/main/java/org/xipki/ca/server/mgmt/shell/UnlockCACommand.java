@@ -41,7 +41,7 @@ import org.apache.karaf.shell.commands.Command;
  * @author Lijun Liao
  */
 
-@Command(scope = "ca", name = "unlock", description="Unlock the CA syste")
+@Command(scope = "xipki-ca", name = "unlock", description="Unlock the CA syste")
 public class UnlockCACommand extends CaCommand
 {
     @Override

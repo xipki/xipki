@@ -49,7 +49,7 @@ import org.xipki.ca.server.mgmt.api.X509CAEntry;
  * @author Lijun Liao
  */
 
-@Command(scope = "ca", name = "ca-list", description="List CAs")
+@Command(scope = "xipki-ca", name = "ca-list", description="List CAs")
 public class CaListCommand extends CaCommand
 {
     @Argument(index = 0, name = "name", description = "CA name", required = false)

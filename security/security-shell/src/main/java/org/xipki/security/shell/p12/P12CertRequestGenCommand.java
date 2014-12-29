@@ -53,7 +53,7 @@ import org.xipki.security.api.ConcurrentContentSigner;
  * @author Lijun Liao
  */
 
-@Command(scope = "keytool", name = "req-p12", description="Generate PKCS#10 request with PKCS#12 keystore")
+@Command(scope = "xipki-tk", name = "req-p12", description="Generate PKCS#10 request with PKCS#12 keystore")
 public class P12CertRequestGenCommand extends P12SecurityCommand
 {
     @Option(name = "-subject",

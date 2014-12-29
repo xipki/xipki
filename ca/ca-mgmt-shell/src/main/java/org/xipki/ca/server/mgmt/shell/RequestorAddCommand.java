@@ -44,7 +44,7 @@ import org.xipki.common.SecurityUtil;
  * @author Lijun Liao
  */
 
-@Command(scope = "ca", name = "requestor-add", description="Add requestor")
+@Command(scope = "xipki-ca", name = "requestor-add", description="Add requestor")
 public class RequestorAddCommand extends CaCommand
 {
     @Option(name = "-name",

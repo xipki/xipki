@@ -52,7 +52,7 @@ import org.xipki.security.api.SecurityFactory;
  * @author Lijun Liao
  */
 
-@Command(scope = "caclient", name = "loadtest-revoke", description="CA Client Revoke Load test")
+@Command(scope = "xipki-client", name = "loadtest-revoke", description="CA Client Revoke Load test")
 public class CALoadTestRevokeCommand extends ClientCommand
 {
     @Option(name = "-cacert",

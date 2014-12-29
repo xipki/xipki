@@ -47,7 +47,7 @@ import org.xipki.security.api.SignerException;
  * @author Lijun Liao
  */
 
-@Command(scope = "caclient", name = "enroll-p12", description="Enroll certificate (PKCS#12 keystore)")
+@Command(scope = "xipki-client", name = "enroll-p12", description="Enroll certificate (PKCS#12 keystore)")
 public class P12EnrollCertCommand extends EnrollCertCommand
 {
     @Option(name = "-p12",

@@ -47,7 +47,7 @@ import org.xipki.security.api.SecurityFactory;
  * @author Lijun Liao
  */
 
-@Command(scope = "ca", name = "responder-set", description="Set responder")
+@Command(scope = "xipki-ca", name = "responder-set", description="Set responder")
 public class ResponderSetCommand extends CaCommand
 {
     @Option(name = "-signerType",

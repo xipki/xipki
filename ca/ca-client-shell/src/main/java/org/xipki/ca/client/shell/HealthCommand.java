@@ -45,7 +45,7 @@ import org.xipki.common.HealthCheckResult;
  * @author Lijun Liao
  */
 
-@Command(scope = "caclient", name = "health", description="Check healty status of CA")
+@Command(scope = "xipki-client", name = "health", description="Check healty status of CA")
 public class HealthCommand extends ClientCommand
 {
 

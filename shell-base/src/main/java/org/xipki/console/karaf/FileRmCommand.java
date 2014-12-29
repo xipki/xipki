@@ -48,7 +48,7 @@ import org.apache.karaf.shell.commands.Option;
  * @author Lijun Liao
  */
 
-@Command(scope = "file", name = "rm", description="Remove file or directory")
+@Command(scope = "xipki-file", name = "rm", description="Remove file or directory")
 public class FileRmCommand extends XipkiOsgiCommandSupport
 {
     @Argument(index = 0, name = "file",

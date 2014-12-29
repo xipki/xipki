@@ -76,7 +76,7 @@ import org.xipki.security.SignerUtil;
  * @author Lijun Liao
  */
 
-@Command(scope = "ocspqa", name = "status", description="Request certificate status")
+@Command(scope = "xipki-ocspqa", name = "status", description="Request certificate status")
 public class OCSPQAStatusCommand extends AbstractOCSPStatusCommand
 {
     @Option(name = "-serial",

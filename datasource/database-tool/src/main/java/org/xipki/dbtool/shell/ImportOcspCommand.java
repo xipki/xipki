@@ -46,7 +46,7 @@ import org.xipki.security.api.PasswordResolver;
  * @author Lijun Liao
  */
 
-@Command(scope = "dbtool", name = "import-ocsp", description="Import OCSP database")
+@Command(scope = "xipki-db", name = "import-ocsp", description="Import OCSP database")
 public class ImportOcspCommand extends XipkiOsgiCommandSupport
 {
     private static final String DFLT_DBCONF_FILE = "ca-config/ocsp-db.properties";

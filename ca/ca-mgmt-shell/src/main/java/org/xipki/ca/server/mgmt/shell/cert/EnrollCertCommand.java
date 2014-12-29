@@ -50,7 +50,7 @@ import org.xipki.common.IoUtil;
  * @author Lijun Liao
  */
 
-@Command(scope = "ca", name = "enroll-cert", description="Enroll certificate")
+@Command(scope = "xipki-ca", name = "enroll-cert", description="Enroll certificate")
 public class EnrollCertCommand extends CaCommand
 {
     private static final Logger LOG = LoggerFactory.getLogger(EnrollCertCommand.class);

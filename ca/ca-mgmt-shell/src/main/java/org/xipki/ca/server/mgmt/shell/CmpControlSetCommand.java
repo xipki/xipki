@@ -43,7 +43,7 @@ import org.xipki.ca.api.CmpControl;
  * @author Lijun Liao
  */
 
-@Command(scope = "ca", name = "cmpcontrol-set", description="Set CMP control")
+@Command(scope = "xipki-ca", name = "cmpcontrol-set", description="Set CMP control")
 public class CmpControlSetCommand extends CaCommand
 {
     @Option(name = "-cc", aliases = { "--confirmCert" },

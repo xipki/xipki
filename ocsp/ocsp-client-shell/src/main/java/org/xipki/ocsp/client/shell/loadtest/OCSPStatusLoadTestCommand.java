@@ -52,7 +52,7 @@ import org.xipki.ocsp.client.shell.AbstractOCSPStatusCommand;
  * @author Lijun Liao
  */
 
-@Command(scope = "ocsp", name = "loadtest-status", description="OCSP Load test")
+@Command(scope = "xipki-ocsp", name = "loadtest-status", description="OCSP Load test")
 public class OCSPStatusLoadTestCommand extends AbstractOCSPStatusCommand
 {
     @Option(name = "-serial",

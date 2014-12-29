@@ -12,15 +12,15 @@ feature:install xipki-security-shell
 # Wait one second
 sleep 1000
 
-file:rm -r -f output
+xipki-file:rm -r -f output
 
-keytool:ec-p12 -curve $CURVE -pwd 1234 -out output/RCA1.p12 \
+xipki-tk:ec-p12 -curve $CURVE -pwd 1234 -out output/RCA1.p12 \
   -subject "CN=RCA1,O=xipki,C=DE"
 
-keytool:ec-p12 -curve $CURVE -pwd 1234 -out output/SubCA1.p12 \
+xipki-tk:ec-p12 -curve $CURVE -pwd 1234 -out output/SubCA1.p12 \
   -subject "CN=SubCA1,O=xipki,C=DE"
 
-keytool:ec-p12 -curve $CURVE -pwd 1234 -out output/SubCAwithCRL1.p12 \
+xipki-tk:ec-p12 -curve $CURVE -pwd 1234 -out output/SubCAwithCRL1.p12 \
   -subject "CN=SubCAwithCRL1,O=xipki,C=DE"
 
 source ./demo/prepare.script

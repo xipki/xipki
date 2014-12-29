@@ -41,7 +41,7 @@ import org.apache.karaf.shell.commands.Command;
  * @author Lijun Liao
  */
 
-@Command(scope = "ca", name = "responder-rm", description="Remove responder")
+@Command(scope = "xipki-ca", name = "responder-rm", description="Remove responder")
 public class ResponderRemoveCommand extends CaCommand
 {
     @Override

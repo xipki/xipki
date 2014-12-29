@@ -48,7 +48,7 @@ import org.xipki.ca.server.mgmt.api.CertProfileEntry;
  * @author Lijun Liao
  */
 
-@Command(scope = "ca", name = "profile-list", description="List profiles")
+@Command(scope = "xipki-ca", name = "profile-list", description="List profiles")
 public class ProfileListCommand extends CaCommand
 {
     @Argument(index = 0, name = "name", description = "Certificate profile name", required = false)

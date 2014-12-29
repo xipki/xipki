@@ -49,7 +49,7 @@ import org.xipki.console.karaf.UnexpectedResultException;
  * @author Lijun Liao
  */
 
-@Command(scope = "caqa", name = "neg-unrevoke", description="Unrevoke certificate (negative, for QA)")
+@Command(scope = "xipki-caqa", name = "neg-unrevoke", description="Unrevoke certificate (negative, for QA)")
 public class NegUnrevokeCertCommand extends UnRevRemoveCertCommand
 {
 

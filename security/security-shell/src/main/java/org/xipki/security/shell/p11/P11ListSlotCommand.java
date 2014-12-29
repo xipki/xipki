@@ -74,7 +74,7 @@ import org.xipki.security.shell.SecurityCommand;
  * @author Lijun Liao
  */
 
-@Command(scope = "keytool", name = "list", description="List objects in PKCS#11 device")
+@Command(scope = "xipki-tk", name = "list", description="List objects in PKCS#11 device")
 public class P11ListSlotCommand extends SecurityCommand
 {
     @Option(name = "-v", aliases="--verbose",

@@ -47,7 +47,7 @@ import org.xipki.security.api.SecurityFactory;
  * @author Lijun Liao
  */
 
-@Command(scope = "ca", name = "crlsigner-add", description="Add CRL signer")
+@Command(scope = "xipki-ca", name = "crlsigner-add", description="Add CRL signer")
 public class CrlSignerAddCommand extends CaCommand
 {
     @Option(name = "-name",

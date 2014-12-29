@@ -42,7 +42,7 @@ import org.xipki.ca.api.CmpControl;
  * @author Lijun Liao
  */
 
-@Command(scope = "ca", name = "cmpcontrol-list", description="List CMP control")
+@Command(scope = "xipki-ca", name = "cmpcontrol-list", description="List CMP control")
 public class CmpControlListCommand extends CaCommand
 {
     @Override

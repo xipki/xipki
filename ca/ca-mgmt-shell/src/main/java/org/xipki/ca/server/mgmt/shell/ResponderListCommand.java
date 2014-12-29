@@ -43,7 +43,7 @@ import org.xipki.ca.server.mgmt.api.CmpResponderEntry;
  * @author Lijun Liao
  */
 
-@Command(scope = "ca", name = "responder-list", description="List responder")
+@Command(scope = "xipki-ca", name = "responder-list", description="List responder")
 public class ResponderListCommand extends CaCommand
 {
 
