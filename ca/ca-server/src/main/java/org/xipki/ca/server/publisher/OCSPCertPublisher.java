@@ -39,6 +39,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.cert.X509CRL;
 import java.sql.SQLException;
 import java.util.Date;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -55,8 +56,8 @@ import org.xipki.ca.api.publisher.X509CertPublisher;
 import org.xipki.ca.api.publisher.X509CertificateInfo;
 import org.xipki.common.CertRevocationInfo;
 import org.xipki.common.CmpUtf8Pairs;
-import org.xipki.common.SecurityUtil;
 import org.xipki.common.ParamChecker;
+import org.xipki.common.SecurityUtil;
 import org.xipki.datasource.api.DataSourceWrapper;
 import org.xipki.security.api.PasswordResolver;
 
@@ -81,11 +82,11 @@ public class OCSPCertPublisher extends X509CertPublisher
     }
 
     @Override
-    public void initialize(String conf, PasswordResolver passwordResolver, DataSourceWrapper dataSource)
+    public void initialize(String conf, PasswordResolver passwordResolver, Map<String, DataSourceWrapper> dataSources)
     throws CertPublisherException
     {
         ParamChecker.assertNotNull("conf", conf);
-        ParamChecker.assertNotNull("dataSource", dataSource);
+        ParamChecker.assertNotEmpty("dataSources", dataSources);
 
         CmpUtf8Pairs utf8pairs = new CmpUtf8Pairs(conf);
         String v = utf8pairs.getValue("publish.goodcerts");
@@ -93,6 +94,27 @@ public class OCSPCertPublisher extends X509CertPublisher
 
         v = utf8pairs.getValue("asyn");
         this.asyn = (v == null) ? false : Boolean.parseBoolean(v);
+
+        String datasourceName = null;
+        CmpUtf8Pairs confPairs = null;
+        try
+        {
+            confPairs = new CmpUtf8Pairs(conf);
+            datasourceName = confPairs.getValue("datasource");
+        }catch(Exception e)
+        {
+        }
+
+        DataSourceWrapper dataSource = null;
+        if(datasourceName != null)
+        {
+            dataSource = dataSources.get(datasourceName);
+        }
+
+        if(dataSource == null)
+        {
+            throw new CertPublisherException("no datasource named '" + datasourceName + "' is specified");
+        }
 
         try
         {
