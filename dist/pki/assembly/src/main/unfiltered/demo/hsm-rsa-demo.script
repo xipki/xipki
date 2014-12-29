@@ -14,19 +14,19 @@ feature:install xipki-security-shell
 
 sleep 1000
 
-file:rm -r -f output
+xipki-file:rm -r -f output
 
-keytool:delete-key -slot 1 -key-label $RCA_KEY_LABEL
+xipki-tk:delete-key -slot 1 -key-label $RCA_KEY_LABEL
 
-keytool:delete-key -slot 1 -key-label $SubCA_KEY_LABEL
+xipki-tk:delete-key -slot 1 -key-label $SubCA_KEY_LABEL
 
-keytool:delete-key -slot 1 -key-label $SubCAwithCRL_KEY_LABEL
+xipki-tk:delete-key -slot 1 -key-label $SubCAwithCRL_KEY_LABEL
 
-keytool:rsa -slot 1 -key-label $RCA_KEY_LABEL
+xipki-tk:rsa -slot 1 -key-label $RCA_KEY_LABEL
 
-keytool:rsa -slot 1 -key-label $SubCA_KEY_LABEL
+xipki-tk:rsa -slot 1 -key-label $SubCA_KEY_LABEL
 
-keytool:rsa -slot 1 -key-label $SubCAwithCRL_KEY_LABEL
+xipki-tk:rsa -slot 1 -key-label $SubCAwithCRL_KEY_LABEL
 
 feature:uninstall xipki-security-shell
 

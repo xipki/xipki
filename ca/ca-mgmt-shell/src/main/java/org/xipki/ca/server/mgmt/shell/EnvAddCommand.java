@@ -42,7 +42,7 @@ import org.apache.karaf.shell.commands.Option;
  * @author Lijun Liao
  */
 
-@Command(scope = "ca", name = "env-add", description="Add environment parameter")
+@Command(scope = "xipki-ca", name = "env-add", description="Add environment parameter")
 public class EnvAddCommand extends CaCommand
 {
 

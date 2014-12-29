@@ -50,7 +50,7 @@ import org.xipki.console.karaf.UnexpectedResultException;
  * @author Lijun Liao
  */
 
-@Command(scope = "caclient", name = "ra-enroll", description="Enroll certificate as RA")
+@Command(scope = "xipki-client", name = "ra-enroll", description="Enroll certificate as RA")
 public class RAEnrollCertCommand extends ClientCommand
 {
 

@@ -42,7 +42,7 @@ import org.apache.karaf.shell.commands.Command;
  * @author Lijun Liao
  */
 
-@Command(scope = "ca", name = "profile-rm", description="Remove Profile")
+@Command(scope = "xipki-ca", name = "profile-rm", description="Remove Profile")
 public class ProfileRemoveCommand extends CaCommand
 {
     @Argument(index = 0, name = "name", description = "Certificate profile name", required = true)

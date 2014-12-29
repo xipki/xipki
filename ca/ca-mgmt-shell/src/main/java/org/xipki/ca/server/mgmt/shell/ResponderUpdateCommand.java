@@ -49,7 +49,7 @@ import org.xipki.security.api.SecurityFactory;
  * @author Lijun Liao
  */
 
-@Command(scope = "ca", name = "responder-update", description="Update responder")
+@Command(scope = "xipki-ca", name = "responder-update", description="Update responder")
 public class ResponderUpdateCommand extends CaCommand
 {
     @Option(name = "-signerType",

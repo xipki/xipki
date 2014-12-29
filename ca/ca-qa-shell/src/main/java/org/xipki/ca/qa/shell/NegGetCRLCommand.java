@@ -45,7 +45,7 @@ import org.xipki.ca.client.api.RAWorkerException;
  * @author Lijun Liao
  */
 
-@Command(scope = "caqa", name = "neg-getcrl", description="Download CRL (negative, for QA)")
+@Command(scope = "xipki-caqa", name = "neg-getcrl", description="Download CRL (negative, for QA)")
 public class NegGetCRLCommand extends NegCRLCommand
 {
 

@@ -53,7 +53,7 @@ import org.xipki.console.karaf.UnexpectedResultException;
  * @author Lijun Liao
  */
 
-@Command(scope = "caclient", name = "getcrl", description="Download CRL")
+@Command(scope = "xipki-client", name = "getcrl", description="Download CRL")
 public class GetCRLCommand extends CRLCommand
 {
     @Option(name = "-with-basecrl",

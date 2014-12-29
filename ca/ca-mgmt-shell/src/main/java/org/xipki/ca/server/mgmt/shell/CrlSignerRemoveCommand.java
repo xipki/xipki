@@ -42,7 +42,7 @@ import org.apache.karaf.shell.commands.Command;
  * @author Lijun Liao
  */
 
-@Command(scope = "ca", name = "crlsigner-rm", description="Remove CRL signer")
+@Command(scope = "xipki-ca", name = "crlsigner-rm", description="Remove CRL signer")
 public class CrlSignerRemoveCommand extends CaCommand
 {
     @Argument(index = 0, name = "name", description = "CRL signer name", required = true)

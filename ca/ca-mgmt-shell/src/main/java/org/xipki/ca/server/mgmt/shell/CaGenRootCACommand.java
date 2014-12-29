@@ -52,7 +52,7 @@ import org.xipki.common.ConfigurationException;
  * @author Lijun Liao
  */
 
-@Command(scope = "ca", name = "gen-rca", description="Generate selfsigned CA")
+@Command(scope = "xipki-ca", name = "gen-rca", description="Generate selfsigned CA")
 public class CaGenRootCACommand extends CaAddOrGenCommand
 {
     @Option(name = "-subject",

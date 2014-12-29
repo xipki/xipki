@@ -47,7 +47,7 @@ import org.xipki.common.CRLReason;
  * @author Lijun Liao
  */
 
-@Command(scope = "ca", name = "revoke-cert", description="Revoke certificate")
+@Command(scope = "xipki-ca", name = "revoke-cert", description="Revoke certificate")
 public class RevokeCertCommand extends CaCommand
 {
     @Option(name = "-ca",

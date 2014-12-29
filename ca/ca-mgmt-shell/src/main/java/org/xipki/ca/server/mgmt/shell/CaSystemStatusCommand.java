@@ -42,7 +42,7 @@ import org.xipki.ca.api.CASystemStatus;
  * @author Lijun Liao
  */
 
-@Command(scope = "ca", name = "system-status", description="Show CA system status")
+@Command(scope = "xipki-ca", name = "system-status", description="Show CA system status")
 public class CaSystemStatusCommand extends CaCommand
 {
     @Override

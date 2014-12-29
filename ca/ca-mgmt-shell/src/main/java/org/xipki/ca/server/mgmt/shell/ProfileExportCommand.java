@@ -45,7 +45,7 @@ import org.xipki.ca.server.mgmt.api.CertProfileEntry;
  * @author Lijun Liao
  */
 
-@Command(scope = "ca", name = "profile-export", description="Export profile configuration")
+@Command(scope = "xipki-ca", name = "profile-export", description="Export profile configuration")
 public class ProfileExportCommand extends CaCommand
 {
     @Option(name = "-name",

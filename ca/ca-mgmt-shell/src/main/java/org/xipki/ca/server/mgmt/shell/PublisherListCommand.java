@@ -48,7 +48,7 @@ import org.xipki.ca.server.mgmt.api.PublisherEntry;
  * @author Lijun Liao
  */
 
-@Command(scope = "ca", name = "publisher-list", description="List publishers")
+@Command(scope = "xipki-ca", name = "publisher-list", description="List publishers")
 public class PublisherListCommand extends CaCommand
 {
     @Argument(index = 0, name = "name", description = "Publisher name", required = false)

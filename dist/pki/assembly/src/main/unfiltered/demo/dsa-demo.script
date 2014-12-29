@@ -13,15 +13,15 @@ feature:install xipki-security-shell
 # Wait one second
 sleep 1000
 
-file:rm -r -f output
+xipki-file:rm -r -f output
 
-keytool:dsa-p12 -pwd 1234 -plen $PLEN -out output/RCA1.p12 \
+xipki-tk:dsa-p12 -pwd 1234 -plen $PLEN -out output/RCA1.p12 \
   -subject "CN=RCA1"
 
-keytool:dsa-p12 -pwd 1234 -plen $PLEN -out output/SubCA1.p12 \
+xipki-tk:dsa-p12 -pwd 1234 -plen $PLEN -out output/SubCA1.p12 \
   -subject "CN=SubCA1"
 
-keytool:dsa-p12 -pwd 1234 -plen $PLEN -out output/SubCAwithCRL1.p12 \
+xipki-tk:dsa-p12 -pwd 1234 -plen $PLEN -out output/SubCAwithCRL1.p12 \
   -subject "CN=SubCAwithCRL1"
 
 source ./demo/prepare.script

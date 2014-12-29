@@ -45,7 +45,7 @@ import org.xipki.ca.server.mgmt.shell.CaCommand;
  * @author Lijun Liao
  */
 
-@Command(scope = "ca", name = "remove-cert", description="Remove certificate")
+@Command(scope = "xipki-ca", name = "remove-cert", description="Remove certificate")
 public class RemoveCertCommand extends CaCommand
 {
     @Option(name = "-ca",

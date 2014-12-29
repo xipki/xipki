@@ -45,7 +45,7 @@ import org.xipki.ca.client.api.RAWorkerException;
  * @author Lijun Liao
  */
 
-@Command(scope = "caclient", name = "gencrl", description="Generate CRL")
+@Command(scope = "xipki-client", name = "gencrl", description="Generate CRL")
 public class GenCRLCommand extends CRLCommand
 {
     @Override

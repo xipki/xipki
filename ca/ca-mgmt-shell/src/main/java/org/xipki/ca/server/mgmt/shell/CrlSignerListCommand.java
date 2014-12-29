@@ -49,7 +49,7 @@ import org.xipki.ca.server.mgmt.api.X509CrlSignerEntry;
  * @author Lijun Liao
  */
 
-@Command(scope = "ca", name = "crlsigner-list", description="List CRL signers")
+@Command(scope = "xipki-ca", name = "crlsigner-list", description="List CRL signers")
 public class CrlSignerListCommand extends CaCommand
 {
     @Argument(index = 0, name = "name", description = "CRL signer name", required = false)

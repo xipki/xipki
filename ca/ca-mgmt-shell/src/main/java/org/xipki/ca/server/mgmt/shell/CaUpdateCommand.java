@@ -57,7 +57,7 @@ import org.xipki.security.api.SecurityFactory;
  * @author Lijun Liao
  */
 
-@Command(scope = "ca", name = "ca-update", description="Update CA")
+@Command(scope = "xipki-ca", name = "ca-update", description="Update CA")
 public class CaUpdateCommand extends CaCommand
 {
     @Option(name = "-name",

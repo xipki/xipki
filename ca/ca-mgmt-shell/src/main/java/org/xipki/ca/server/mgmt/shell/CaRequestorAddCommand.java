@@ -48,7 +48,7 @@ import org.xipki.common.ConfigurationException;
  * @author Lijun Liao
  */
 
-@Command(scope = "ca", name = "careq-add", description="Add requestor to CA")
+@Command(scope = "xipki-ca", name = "careq-add", description="Add requestor to CA")
 public class CaRequestorAddCommand extends CaCommand
 {
     @Option(name = "-ca",

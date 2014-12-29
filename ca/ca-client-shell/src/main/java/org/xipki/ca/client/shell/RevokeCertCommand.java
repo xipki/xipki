@@ -51,7 +51,7 @@ import org.xipki.console.karaf.UnexpectedResultException;
  * @author Lijun Liao
  */
 
-@Command(scope = "caclient", name = "revoke", description="Revoke certificate")
+@Command(scope = "xipki-client", name = "revoke", description="Revoke certificate")
 public class RevokeCertCommand extends UnRevRemoveCertCommand
 {
     @Option(name = "-reason",

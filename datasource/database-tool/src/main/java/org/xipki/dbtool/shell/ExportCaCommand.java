@@ -46,7 +46,7 @@ import org.xipki.security.api.PasswordResolver;
  * @author Lijun Liao
  */
 
-@Command(scope = "dbtool", name = "export-ca", description="Export CA database")
+@Command(scope = "xipki-db", name = "export-ca", description="Export CA database")
 public class ExportCaCommand extends XipkiOsgiCommandSupport
 {
     private static final String DFLT_DBCONF_FILE = "ca-config/ca-db.properties";

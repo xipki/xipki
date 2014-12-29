@@ -42,7 +42,7 @@ import org.apache.karaf.shell.commands.Command;
  * @author Lijun Liao
  */
 
-@Command(scope = "ca", name = "publisher-rm", description="Remove publisher")
+@Command(scope = "xipki-ca", name = "publisher-rm", description="Remove publisher")
 public class PublisherRemoveCommand extends CaCommand
 {
     @Argument(index = 0, name = "name", description = "Publisher name", required = true)

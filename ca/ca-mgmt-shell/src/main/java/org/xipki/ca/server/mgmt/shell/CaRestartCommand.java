@@ -44,7 +44,7 @@ import org.apache.karaf.shell.commands.Command;
  * @author Lijun Liao
  */
 
-@Command(scope = "ca", name = "ca-restart", description="Restart CA system")
+@Command(scope = "xipki-ca", name = "ca-restart", description="Restart CA system")
 public class CaRestartCommand extends CaCommand
 {
 

@@ -44,7 +44,7 @@ import org.apache.karaf.shell.commands.Option;
  * @author Lijun Liao
  */
 
-@Command(scope = "ca", name = "caprofile-add", description="Add certificate profiles to CA")
+@Command(scope = "xipki-ca", name = "caprofile-add", description="Add certificate profiles to CA")
 public class CaProfileAddCommand extends CaCommand
 {
     @Option(name = "-ca",

@@ -43,7 +43,7 @@ import org.apache.karaf.shell.commands.Option;
  * @author Lijun Liao
  */
 
-@Command(scope = "ca", name = "publish-self", description="Publish the certificate of root CA")
+@Command(scope = "xipki-ca", name = "publish-self", description="Publish the certificate of root CA")
 public class CaPublishRCACertCommand extends CaCommand
 {
     @Argument(index = 0, name = "name", description = "CA name", required = true)

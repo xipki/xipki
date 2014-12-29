@@ -43,7 +43,7 @@ import org.xipki.security.OBFPasswordResolver;
  * @author Lijun Liao
  */
 
-@Command(scope = "keytool", name = "deobfuscate", description="Deobfuscate password")
+@Command(scope = "xipki-tk", name = "deobfuscate", description="Deobfuscate password")
 public class DeobfuscateCommand extends SecurityCommand
 {
     @Option(name = "-pwd", aliases = { "--password" },

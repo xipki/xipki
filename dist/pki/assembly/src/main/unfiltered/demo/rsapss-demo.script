@@ -13,15 +13,15 @@ feature:install xipki-security-shell
 # Wait one second
 sleep 1000
 
-file:rm -r -f output
+xipki-file:rm -r -f output
 
-keytool:rsa-p12 -pwd 1234 -keysize $KEYSIZE -out output/RCA1.p12 \
+xipki-tk:rsa-p12 -pwd 1234 -keysize $KEYSIZE -out output/RCA1.p12 \
   -subject "CN=RCA1"
 
-keytool:rsa-p12 -pwd 1234 -keysize $KEYSIZE -out output/SubCA1.p12 \
+xipki-tk:rsa-p12 -pwd 1234 -keysize $KEYSIZE -out output/SubCA1.p12 \
   -subject "CN=SubCA1"
 
-keytool:rsa-p12 -pwd 1234 -keysize $KEYSIZE -out output/SubCAwithCRL1.p12 \
+xipki-tk:rsa-p12 -pwd 1234 -keysize $KEYSIZE -out output/SubCAwithCRL1.p12 \
   -subject "CN=SubCAwithCRL1"
 
 source ./demo/prepare.script

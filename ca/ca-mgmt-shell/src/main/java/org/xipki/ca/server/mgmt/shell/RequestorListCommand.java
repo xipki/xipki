@@ -49,7 +49,7 @@ import org.xipki.ca.server.mgmt.api.CmpRequestorEntry;
  * @author Lijun Liao
  */
 
-@Command(scope = "ca", name = "requestor-list", description="List requestors")
+@Command(scope = "xipki-ca", name = "requestor-list", description="List requestors")
 public class RequestorListCommand extends CaCommand
 {
     @Argument(index = 0, name = "name", description = "Requestor name", required = false)

@@ -43,7 +43,7 @@ import org.xipki.security.PBEPasswordResolver;
  * @author Lijun Liao
  */
 
-@Command(scope = "keytool", name = "pbe-dec", description="Decrypt password with master password")
+@Command(scope = "xipki-tk", name = "pbe-dec", description="Decrypt password with master password")
 public class PBEDecryptCommand extends SecurityCommand
 {
     @Option(name = "-pwd", aliases = { "--password" },

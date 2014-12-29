@@ -46,7 +46,7 @@ import org.xipki.ca.server.mgmt.shell.CaCommand;
  * @author Lijun Liao
  */
 
-@Command(scope = "ca", name = "unrevoke-cert", description="Unrevoke certificate")
+@Command(scope = "xipki-ca", name = "unrevoke-cert", description="Unrevoke certificate")
 public class UnrevokeCertCommand extends CaCommand
 {
     @Option(name = "-ca",

@@ -44,7 +44,7 @@ import org.xipki.common.IoUtil;
  * @author Lijun Liao
  */
 
-@Command(scope = "ca", name = "profile-add", description="Add certificate profile")
+@Command(scope = "xipki-ca", name = "profile-add", description="Add certificate profile")
 public class ProfileAddCommand extends CaCommand
 {
 
