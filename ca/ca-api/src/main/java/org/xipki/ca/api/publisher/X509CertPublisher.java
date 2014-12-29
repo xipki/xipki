@@ -36,6 +36,7 @@
 package org.xipki.ca.api.publisher;
 
 import java.security.cert.X509CRL;
+import java.util.Map;
 
 import org.xipki.audit.api.AuditLoggingServiceRegister;
 import org.xipki.ca.api.CertPublisherException;
@@ -53,7 +54,7 @@ public abstract class X509CertPublisher
 {
     public abstract void initialize(String conf,
             PasswordResolver passwordResolver,
-            DataSourceWrapper dataSource)
+            Map<String, DataSourceWrapper> dataSources)
     throws CertPublisherException;
 
     public void shutdown()

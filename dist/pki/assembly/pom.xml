@@ -75,26 +75,6 @@
         <artifactId>maven-dependency-plugin</artifactId>
         <executions>
           <execution>
-            <id>copy-to-deploy</id>
-            <phase>generate-resources</phase>
-            <goals>
-              <goal>copy</goal>
-            </goals>
-            <configuration>
-              <!-- Define here the artifacts which should be considered in the assembly -->
-              <!-- For instance, the branding jar -->
-              <artifactItems>
-                <artifactItem>
-                  <groupId>org.xipki</groupId>
-                  <artifactId>certprofile-demo</artifactId>
-                  <version>${project.version}</version>
-                  <outputDirectory>target/deploy</outputDirectory>
-                  <destFileName>certprofile-demo-${project.version}.jar</destFileName>
-                </artifactItem>
-              </artifactItems>
-            </configuration>
-          </execution>
-          <execution>
             <id>copy</id>
             <phase>generate-resources</phase>
             <goals>

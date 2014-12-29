@@ -4,6 +4,19 @@
 -->
 <features xmlns="http://karaf.apache.org/xmlns/features/v1.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" name="xipki-${project.version}" xsi:schemaLocation="http://karaf.apache.org/xmlns/features/v1.0.0 http://karaf.apache.org/xmlns/features/v1.0.0">
   <repository>mvn:org.apache.karaf.features/standard/${karaf.version}/xml/features</repository>
+  <!-- Add the custom bundles for certprofiles here -->
+  <feature name="xipki-custom-certprofiles">
+    <feature>xipki-ca-api</feature>
+    <bundle>mvn:org.xipki/certprofile-demo/${project.version}</bundle>
+  </feature>
+  <!-- Add the custom bundles for cert publishers here -->
+  <feature name="xipki-custom-publishers">
+    <feature>xipki-ca-api</feature>
+  </feature>
+  <!-- Add the custom bundles for signers here -->
+  <feature name="xipki-custom-signers">
+    <feature>xipki-security-base</feature>
+  </feature>
   <!--
         Note: instead of defining all features monolithically in a central features file,
         Project-plugins should be defined in their own feature descriptors and then aggregated later
@@ -19,11 +32,15 @@
     <bundle>mvn:org.xipki/datasource-api/${project.version}</bundle>
     <bundle>mvn:org.xipki/datasource-impl/${project.version}</bundle>
   </feature>
-  <feature name="xipki-security" version="${project.version}" resolver="(obr)">
+  <feature name="xipki-security-base" version="${project.version}" resolver="(obr)">
     <feature>bouncycastle</feature>
     <bundle>mvn:org.xipki/common/${project.version}</bundle>
     <bundle><![CDATA[wrap:mvn:at.tugraz.iaik/iaikPkcs11Wrapper/${pkcs11Wrapper.version}/$Bundle-SymbolicName=iaikPkcs11Wrapper&Bundle-Version=${pkcs11Wrapper.version}]]></bundle>
     <bundle>mvn:org.xipki/security/${project.version}</bundle>
+  </feature>
+  <feature name="xipki-security" version="${project.version}" resolver="(obr)">
+    <feature>xipki-security-base</feature>
+    <feature>xipki-custom-signers</feature>
   </feature>
   <feature name="xipki-ca-api" version="${project.version}" resolver="(obr)">
     <bundle>mvn:org.xipki/common/${project.version}</bundle>
@@ -41,6 +58,8 @@
     <feature>xipki-datasource</feature>
     <feature>xipki-cabase</feature>
     <feature>xipki-audit</feature>
+    <feature>xipki-custom-certprofiles</feature>
+    <feature>xipki-custom-publishers</feature>
     <bundle>mvn:org.xipki/ca-mgmt-api/${project.version}</bundle>
     <bundle>mvn:org.xipki/ca-server/${project.version}</bundle>
   </feature>

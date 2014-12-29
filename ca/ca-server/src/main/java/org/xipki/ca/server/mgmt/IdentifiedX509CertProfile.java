@@ -61,17 +61,73 @@ import org.xipki.common.ParamChecker;
 
 public class IdentifiedX509CertProfile
 {
-    private final String realType;
     private final CertProfileEntry entry;
-    private final Object initlock = new Object();
-    private X509CertProfile certProfile;
+    private final X509CertProfile certProfile;
     private EnvironmentParameterResolver parameterResolver;
 
     public IdentifiedX509CertProfile(CertProfileEntry entry, String realType)
+    throws CertProfileException
     {
         ParamChecker.assertNotNull("entry", entry);
         this.entry = entry;
-        this.realType = realType;
+        X509CertProfile tmpCertProfile = null;
+
+        final String type = realType == null ?  entry.getType() : realType;
+        String className;
+        if(type.equalsIgnoreCase("xml"))
+        {
+            tmpCertProfile = new DefaultX509CertProfile();
+        }
+        else if(type.toLowerCase().startsWith("java:"))
+        {
+            className = type.substring("java:".length());
+            try
+            {
+                Class<?> clazz = Class.forName(className);
+                tmpCertProfile = (X509CertProfile) clazz.newInstance();
+            }catch(ClassNotFoundException | InstantiationException  | IllegalAccessException | ClassCastException e)
+            {
+                throw new CertProfileException("invalid type " + type + ", " + e.getClass().getName() +
+                        ": " + e.getMessage());
+            }
+        }
+        else
+        {
+            throw new CertProfileException("invalid type " + type);
+        }
+
+        tmpCertProfile.initialize(entry.getConf());
+
+        if(parameterResolver != null)
+        {
+            tmpCertProfile.setEnvironmentParameterResolver(parameterResolver);
+        }
+
+        if(tmpCertProfile.getSpecialCertProfileBehavior() == SpecialX509CertProfileBehavior.gematik_gSMC_K)
+        {
+            String paramName = SpecialX509CertProfileBehavior.PARAMETER_MAXLIFTIME;
+            String s = tmpCertProfile.getParameter(paramName);
+            if(s == null)
+            {
+                throw new CertProfileException("parameter " + paramName + " is not defined");
+            }
+
+            s = s.trim();
+            int i;
+            try
+            {
+                i = Integer.parseInt(s);
+            }catch(NumberFormatException e)
+            {
+                throw new CertProfileException("invalid " + paramName + ": " + s);
+            }
+            if(i < 1)
+            {
+                throw new CertProfileException("invalid " + paramName + ": " + s);
+            }
+        }
+
+        this.certProfile = tmpCertProfile;
     }
 
     public String getName()
@@ -84,77 +140,6 @@ public class IdentifiedX509CertProfile
         return entry;
     }
 
-    public void assertInitialized()
-    throws CertProfileException
-    {
-        if(certProfile != null)
-        {
-            return;
-        }
-
-        synchronized (initlock)
-        {
-            X509CertProfile tmpCertProfile = null;
-
-            final String type = realType == null ?  entry.getType() : realType;
-            String className;
-            if(type.equalsIgnoreCase("xml"))
-            {
-                tmpCertProfile = new DefaultX509CertProfile();
-            }
-            else if(type.toLowerCase().startsWith("java:"))
-            {
-                className = type.substring("java:".length());
-                try
-                {
-                    Class<?> clazz = Class.forName(className);
-                    tmpCertProfile = (X509CertProfile) clazz.newInstance();
-                }catch(ClassNotFoundException | InstantiationException  | IllegalAccessException | ClassCastException e)
-                {
-                    throw new CertProfileException("invalid type " + type + ", " + e.getClass().getName() +
-                            ": " + e.getMessage());
-                }
-            }
-            else
-            {
-                throw new CertProfileException("invalid type " + type);
-            }
-
-            tmpCertProfile.initialize(entry.getConf());
-
-            if(parameterResolver != null)
-            {
-                tmpCertProfile.setEnvironmentParameterResolver(parameterResolver);
-            }
-
-            if(tmpCertProfile.getSpecialCertProfileBehavior() == SpecialX509CertProfileBehavior.gematik_gSMC_K)
-            {
-                String paramName = SpecialX509CertProfileBehavior.PARAMETER_MAXLIFTIME;
-                String s = tmpCertProfile.getParameter(paramName);
-                if(s == null)
-                {
-                    throw new CertProfileException("parameter " + paramName + " is not defined");
-                }
-
-                s = s.trim();
-                int i;
-                try
-                {
-                    i = Integer.parseInt(s);
-                }catch(NumberFormatException e)
-                {
-                    throw new CertProfileException("invalid " + paramName + ": " + s);
-                }
-                if(i < 1)
-                {
-                    throw new CertProfileException("invalid " + paramName + ": " + s);
-                }
-            }
-
-            this.certProfile = tmpCertProfile;
-        }
-    }
-
     public SpecialX509CertProfileBehavior getSpecialCertProfileBehavior()
     {
         return certProfile.getSpecialCertProfileBehavior();
@@ -162,13 +147,10 @@ public class IdentifiedX509CertProfile
 
     public void setEnvironmentParameterResolver(EnvironmentParameterResolver parameterResolver)
     {
-        synchronized (initlock)
+        this.parameterResolver = parameterResolver;
+        if(certProfile != null)
         {
-            this.parameterResolver = parameterResolver;
-            if(certProfile != null)
-            {
-                certProfile.setEnvironmentParameterResolver(parameterResolver);
-            }
+            certProfile.setEnvironmentParameterResolver(parameterResolver);
         }
     }
 

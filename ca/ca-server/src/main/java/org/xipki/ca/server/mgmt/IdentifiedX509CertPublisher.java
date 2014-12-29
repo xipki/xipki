@@ -36,6 +36,7 @@
 package org.xipki.ca.server.mgmt;
 
 import java.security.cert.X509CRL;
+import java.util.Map;
 
 import org.xipki.audit.api.AuditLoggingServiceRegister;
 import org.xipki.ca.api.CertPublisherException;
@@ -43,6 +44,8 @@ import org.xipki.ca.api.EnvironmentParameterResolver;
 import org.xipki.ca.api.X509CertificateWithMetaInfo;
 import org.xipki.ca.api.publisher.X509CertPublisher;
 import org.xipki.ca.api.publisher.X509CertificateInfo;
+import org.xipki.ca.server.mgmt.api.PublisherEntry;
+import org.xipki.ca.server.publisher.OCSPCertPublisher;
 import org.xipki.common.CertRevocationInfo;
 import org.xipki.common.ParamChecker;
 import org.xipki.datasource.api.DataSourceWrapper;
@@ -54,23 +57,47 @@ import org.xipki.security.api.PasswordResolver;
 
 public class IdentifiedX509CertPublisher
 {
-    private final String name;
+    private final PublisherEntry entry;
     private final X509CertPublisher certPublisher;
 
-    public IdentifiedX509CertPublisher(String name, X509CertPublisher certPublisher)
-    {
-        ParamChecker.assertNotEmpty("name", name);
-        ParamChecker.assertNotNull("certPublisher", certPublisher);
-
-        this.name = name;
-        this.certPublisher = certPublisher;
-    }
-
-    public void initialize(String conf, PasswordResolver passwordResolver,
-            DataSourceWrapper dataSource)
+    public IdentifiedX509CertPublisher(PublisherEntry entry, String realType)
     throws CertPublisherException
     {
-        certPublisher.initialize(conf, passwordResolver, dataSource);
+        ParamChecker.assertNotNull("entry", entry);
+
+        this.entry = entry;
+
+        final String type = realType == null ? entry.getType() : realType;
+
+        X509CertPublisher realPublisher;
+        if("ocsp".equalsIgnoreCase(type))
+        {
+            realPublisher = new OCSPCertPublisher();
+        }
+        else if(type.toLowerCase().startsWith("java:"))
+        {
+            String className = type.substring("java:".length());
+            try
+            {
+                Class<?> clazz = Class.forName(className);
+                realPublisher = (X509CertPublisher) clazz.newInstance();
+            }catch(Exception e)
+            {
+                throw new CertPublisherException("invalid type " + type + ", " + e.getMessage());
+            }
+        }
+        else
+        {
+            throw new CertPublisherException("invalid type " + type);
+        }
+        this.certPublisher = realPublisher;
+    }
+
+    public void initialize(PasswordResolver passwordResolver,
+            Map<String, DataSourceWrapper> dataSources)
+    throws CertPublisherException
+    {
+        certPublisher.initialize(entry.getConf(), passwordResolver, dataSources);
     }
 
     public void setEnvironmentParameterResolver(EnvironmentParameterResolver parameterResolver)
@@ -99,9 +126,14 @@ public class IdentifiedX509CertPublisher
         return certPublisher.crlAdded(caCert, crl);
     }
 
+    public PublisherEntry getEntry()
+    {
+        return entry;
+    }
+
     public String getName()
     {
-        return name;
+        return entry.getName();
     }
 
     public boolean isHealthy()

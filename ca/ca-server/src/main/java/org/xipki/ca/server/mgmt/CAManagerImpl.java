@@ -195,7 +195,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
 
     private final Map<String, X509CAInfo> cas = new ConcurrentHashMap<>();
     private final Map<String, IdentifiedX509CertProfile> certProfiles = new ConcurrentHashMap<>();
-    private final Map<String, X509PublisherEntryWrapper> publishers = new ConcurrentHashMap<>();
+    private final Map<String, IdentifiedX509CertPublisher> publishers = new ConcurrentHashMap<>();
     private final Map<String, CmpRequestorEntry> requestors = new ConcurrentHashMap<>();
     private final Map<String, X509CrlSignerEntry> crlSigners = new ConcurrentHashMap<>();
     private final Map<String, Set<String>> ca_has_profiles = new ConcurrentHashMap<>();
@@ -1183,7 +1183,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
                 entry.setEnvironmentParameterResolver(envParameterResolver);
                 certProfiles.put(name, entry);
             }
-        }catch(SQLException e)
+        }catch(SQLException | CertProfileException e)
         {
             throw new CAMgmtException(e.getMessage(), e);
         } finally
@@ -1204,10 +1204,9 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
 
         for(String name : publishers.keySet())
         {
-            X509PublisherEntryWrapper entry = publishers.get(name);
+            IdentifiedX509CertPublisher publisher = publishers.get(name);
             try
             {
-                IdentifiedX509CertPublisher publisher = entry.getCertPublisher();
                 if(publisher != null)
                 {
                     publisher.shutdown();
@@ -1241,11 +1240,11 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
 
                 PublisherEntry rawEntry = new PublisherEntry(name, type, conf);
                 String realType = publisherTypeMapping.get(type);
-                X509PublisherEntryWrapper entry;
+                IdentifiedX509CertPublisher entry;
                 try
                 {
-                    entry = new X509PublisherEntryWrapper(rawEntry, realType,
-                            securityFactory.getPasswordResolver(), dataSources);
+                    entry = new IdentifiedX509CertPublisher(rawEntry, realType);
+                    entry.initialize(securityFactory.getPasswordResolver(), dataSources);
                 } catch(CertPublisherException | RuntimeException e)
                 {
                     final String message = "Invalid configuration for the certPublisher " + name;
@@ -2276,7 +2275,14 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
         }
 
         String realType = certprofileTypeMapping.get(dbEntry.getType());
-        IdentifiedX509CertProfile entry = new IdentifiedX509CertProfile(dbEntry, realType);
+        IdentifiedX509CertProfile entry;
+        try
+        {
+            entry = new IdentifiedX509CertProfile(dbEntry, realType);
+        } catch (CertProfileException e)
+        {
+            throw new CAMgmtException(e.getMessage(), e);
+        }
         entry.setEnvironmentParameterResolver(envParameterResolver);
         certProfiles.put(name, entry);
     }
@@ -2605,10 +2611,11 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
         }
 
         String realType = publisherTypeMapping.get(dbEntry.getType());
-        X509PublisherEntryWrapper entry;
+        IdentifiedX509CertPublisher entry;
         try
         {
-            entry = new X509PublisherEntryWrapper(dbEntry, realType, securityFactory.getPasswordResolver(), dataSources);
+            entry = new IdentifiedX509CertPublisher(dbEntry, realType);
+            entry.initialize(securityFactory.getPasswordResolver(), dataSources);
         } catch (CertPublisherException e)
         {
             throw new CAMgmtException("CertPublisherException: " + e.getMessage(), e);
@@ -2639,7 +2646,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
     @Override
     public PublisherEntry getPublisher(String publisherName)
     {
-        X509PublisherEntryWrapper entry = publishers.get(publisherName);
+        IdentifiedX509CertPublisher entry = publishers.get(publisherName);
         return entry == null ? null : entry.getEntry();
     }
 
@@ -3470,7 +3477,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
 
         for(String name : publishers.keySet())
         {
-            X509PublisherEntryWrapper publisherEntry = publishers.get(name);
+            IdentifiedX509CertPublisher publisherEntry = publishers.get(name);
             publisherEntry.setAuditServiceRegister(auditServiceRegister);
         }
 
@@ -3669,14 +3676,8 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
     }
 
     public IdentifiedX509CertProfile getIdentifiedCertProfile(String profileName)
-    throws CertProfileException
     {
-        IdentifiedX509CertProfile certProfile = certProfiles.get(profileName);
-        if(certProfile != null)
-        {
-            certProfile.assertInitialized();
-        }
-        return certProfile;
+        return certProfiles.get(profileName);
     }
 
     public List<IdentifiedX509CertPublisher> getIdentifiedPublishersForCa(String caName)
@@ -3688,8 +3689,8 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
         {
             for(String publisherName : publisherNames)
             {
-                X509PublisherEntryWrapper publisher = publishers.get(publisherName);
-                ret.add(publisher.getCertPublisher());
+                IdentifiedX509CertPublisher publisher = publishers.get(publisherName);
+                ret.add(publisher);
             }
         }
         return ret;
@@ -3725,15 +3726,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
             return null;
         }
 
-        IdentifiedX509CertProfile certProfile;
-        try
-        {
-            certProfile = getIdentifiedCertProfile(certprofileName);
-        } catch (CertProfileException e)
-        {
-            throw new CAMgmtException(e.getMessage(), e);
-        }
-
+        IdentifiedX509CertProfile certProfile = getIdentifiedCertProfile(certprofileName);
         if(certProfile == null)
         {
             throw new CAMgmtException("unknown cert profile " + certprofileName);
