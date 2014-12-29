@@ -49,7 +49,7 @@ import org.xipki.common.SecurityUtil;
  * @author Lijun Liao
  */
 
-@Command(scope = "caclient", name = "remove-cert", description="Remove certificate")
+@Command(scope = "xipki-client", name = "remove-cert", description="Remove certificate")
 public class RemoveCertCommand extends UnRevRemoveCertCommand
 {
 

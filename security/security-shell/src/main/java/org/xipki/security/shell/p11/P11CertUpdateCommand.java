@@ -49,7 +49,7 @@ import org.xipki.security.api.p11.P11WritableSlot;
  * @author Lijun Liao
  */
 
-@Command(scope = "keytool", name = "update-cert", description="Update certificate in PKCS#11 device")
+@Command(scope = "xipki-tk", name = "update-cert", description="Update certificate in PKCS#11 device")
 public class P11CertUpdateCommand extends P11SecurityCommand
 {
 

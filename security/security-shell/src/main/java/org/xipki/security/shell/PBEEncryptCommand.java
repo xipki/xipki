@@ -42,7 +42,7 @@ import org.xipki.security.PBEPasswordResolver;
  * @author Lijun Liao
  */
 
-@Command(scope = "keytool", name = "pbe-enc", description="Encrypt password with master password")
+@Command(scope = "xipki-tk", name = "pbe-enc", description="Encrypt password with master password")
 public class PBEEncryptCommand extends SecurityCommand
 {
     @Override

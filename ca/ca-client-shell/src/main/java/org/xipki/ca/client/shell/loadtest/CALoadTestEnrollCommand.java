@@ -48,7 +48,7 @@ import org.xipki.common.AbstractLoadTest;
  * @author Lijun Liao
  */
 
-@Command(scope = "caclient", name = "loadtest-enroll", description="CA Client Enroll Load test")
+@Command(scope = "xipki-client", name = "loadtest-enroll", description="CA Client Enroll Load test")
 public class CALoadTestEnrollCommand extends ClientCommand
 {
 

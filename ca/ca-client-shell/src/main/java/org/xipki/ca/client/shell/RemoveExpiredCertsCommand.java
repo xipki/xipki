@@ -45,7 +45,7 @@ import org.xipki.ca.client.api.RemoveExpiredCertsResult;
  * @author Lijun Liao
  */
 
-@Command(scope = "caclient", name = "remove-expired-certs", description="Remove expired certificates")
+@Command(scope = "xipki-client", name = "remove-expired-certs", description="Remove expired certificates")
 public class RemoveExpiredCertsCommand extends ClientCommand
 {
     @Option(name = "-ca",

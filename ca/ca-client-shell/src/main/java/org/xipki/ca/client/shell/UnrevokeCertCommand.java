@@ -49,7 +49,7 @@ import org.xipki.console.karaf.UnexpectedResultException;
  * @author Lijun Liao
  */
 
-@Command(scope = "caclient", name = "unrevoke", description="Unrevoke certificate")
+@Command(scope = "xipki-client", name = "unrevoke", description="Unrevoke certificate")
 public class UnrevokeCertCommand extends UnRevRemoveCertCommand
 {
     @Override
