@@ -127,7 +127,7 @@ public abstract class CaAddOrGenCommand extends CaCommand
                     + "\tSTRICT: Reject if the notBefore + validity behinds CA's notAfter \n"
                     + "\tLAX:    notBefore + validity after CA's notAfter is permitted\n"
                     + "\tCUTOFF: notAfter of issued certificates will be set to the earlier time of\n"
-                    + "\t        notBefore + validigty and CA's notAfter")
+                    + "\t        notBefore + validity and CA's notAfter")
     protected String validityModeS = "STRICT";
 
     protected SecurityFactory securityFactory;
