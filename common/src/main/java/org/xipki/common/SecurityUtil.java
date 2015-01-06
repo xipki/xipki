@@ -54,6 +54,7 @@ import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509CRL;
 import java.security.cert.X509Certificate;
+import java.security.spec.InvalidKeySpecException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
@@ -590,23 +591,26 @@ public class SecurityUtil
     }
 
     public static SubjectPublicKeyInfo toRfc3279Style(SubjectPublicKeyInfo publicKeyInfo)
+    throws InvalidKeySpecException
     {
+        // TODO: add support of other algorithms
         ASN1ObjectIdentifier algOid = publicKeyInfo.getAlgorithm().getAlgorithm();
-
-        if(PKCSObjectIdentifiers.rsaEncryption.equals(algOid) == false)
-        {
-            return publicKeyInfo;
-        }
-
         ASN1Encodable keyParameters = publicKeyInfo.getAlgorithm().getParameters();
-        if(DERNull.INSTANCE.equals(keyParameters))
+
+        if(PKCSObjectIdentifiers.rsaEncryption.equals(algOid))
+        {
+            if(DERNull.INSTANCE.equals(keyParameters))
+            {
+                return publicKeyInfo;
+            }
+            else
+            {
+                AlgorithmIdentifier keyAlgId = new AlgorithmIdentifier(algOid, DERNull.INSTANCE);
+                return new SubjectPublicKeyInfo(keyAlgId, publicKeyInfo.getPublicKeyData().getBytes());
+            }
+        } else
         {
             return publicKeyInfo;
-        }
-        else
-        {
-            AlgorithmIdentifier keyAlgId = new AlgorithmIdentifier(algOid, DERNull.INSTANCE);
-            return new SubjectPublicKeyInfo(keyAlgId, publicKeyInfo.getPublicKeyData().getBytes());
         }
     }
 
