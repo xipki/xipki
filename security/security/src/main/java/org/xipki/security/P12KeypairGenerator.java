@@ -49,6 +49,7 @@ import java.security.interfaces.DSAPrivateKey;
 import java.security.interfaces.DSAPublicKey;
 import java.security.interfaces.ECPrivateKey;
 import java.security.interfaces.RSAPrivateKey;
+import java.security.spec.InvalidKeySpecException;
 import java.util.Date;
 import java.util.List;
 
@@ -263,8 +264,8 @@ public abstract class P12KeypairGenerator
         private KeyPair keypair;
         private SubjectPublicKeyInfo subjectPublicKeyInfo;
 
-        public KeyPairWithSubjectPublicKeyInfo(KeyPair keypair,
-                SubjectPublicKeyInfo subjectPublicKeyInfo)
+        public KeyPairWithSubjectPublicKeyInfo(KeyPair keypair, SubjectPublicKeyInfo subjectPublicKeyInfo)
+        throws InvalidKeySpecException
         {
             super();
             this.keypair = keypair;

@@ -35,28 +35,42 @@
 
 package org.xipki.ca.server.certprofile;
 
-import java.util.List;
-import java.util.Map;
-
-import org.xipki.common.ParamChecker;
-
 /**
  * @author Lijun Liao
  */
 
-public class KeyParamRanges
+public class Range
 {
-    private final Map<String, List<KeyParamRange>> ranges;
+    private final Integer min;
+    private final Integer max;
 
-    public KeyParamRanges(Map<String, List<KeyParamRange>> ranges)
+    public Range(Integer min, Integer max)
     {
-        ParamChecker.assertNotNull("ranges", ranges);
-        this.ranges = ranges;
+        this.min = min;
+        this.max = max;
     }
 
-    public List<KeyParamRange> getRanges(String name)
+    public Integer getMin()
     {
-        return ranges.get(name);
+        return min;
     }
 
+    public Integer getMax()
+    {
+        return max;
+    }
+
+    public boolean match(int i)
+    {
+        if(min != null && i < min)
+        {
+            return false;
+        }
+        if(max != null && i > max)
+        {
+            return false;
+        }
+
+        return true;
+    }
 }

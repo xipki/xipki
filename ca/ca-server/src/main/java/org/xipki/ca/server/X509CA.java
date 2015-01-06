@@ -51,6 +51,7 @@ import java.security.cert.CertificateException;
 import java.security.cert.X509CRL;
 import java.security.cert.X509Certificate;
 import java.security.interfaces.ECPublicKey;
+import java.security.spec.InvalidKeySpecException;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -2102,7 +2103,14 @@ public class X509CA
                     "CA is not permitted to issue certifate after " + new Date(t));
         }
 
-        publicKeyInfo = SecurityUtil.toRfc3279Style(publicKeyInfo);
+        try
+        {
+            publicKeyInfo = SecurityUtil.toRfc3279Style(publicKeyInfo);
+        } catch (InvalidKeySpecException e)
+        {
+            throw new OperationException(ErrorCode.BAD_CERT_TEMPLATE,
+                    "invalid SubjectPublicKeyInfo");
+        }
 
         // public key
         try
