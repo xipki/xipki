@@ -49,6 +49,7 @@ import java.security.cert.X509Certificate;
 import java.security.interfaces.DSAPublicKey;
 import java.security.interfaces.ECPublicKey;
 import java.security.interfaces.RSAPublicKey;
+import java.security.spec.InvalidKeySpecException;
 import java.util.Date;
 import java.util.List;
 
@@ -179,7 +180,14 @@ class X509SelfSignedCertBuilder
             List<String> deltaCrlUris)
     throws OperationException
     {
-        publicKeyInfo = SecurityUtil.toRfc3279Style(publicKeyInfo);
+        try
+        {
+            publicKeyInfo = SecurityUtil.toRfc3279Style(publicKeyInfo);
+        } catch (InvalidKeySpecException e)
+        {
+            LOG.warn("SecurityUtil.toRfc3279Style", e);
+            throw new OperationException(ErrorCode.BAD_CERT_TEMPLATE, e.getMessage());
+        }
 
         try
         {

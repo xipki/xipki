@@ -2,7 +2,7 @@
 <!--
  Copyright (c) 2014 Lijun Liao
  -->
-<xs:schema xmlns="http://xipki.org/xmlprofile/v1" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:jxb="http://java.sun.com/xml/ns/jaxb" targetNamespace="http://xipki.org/xmlprofile/v1" elementFormDefault="qualified" version="1.0" jxb:version="2.0">
+<xs:schema xmlns="http://xipki.org/xmlprofile/v2" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:jxb="http://java.sun.com/xml/ns/jaxb" targetNamespace="http://xipki.org/xmlprofile/v2" elementFormDefault="qualified" version="1.0" jxb:version="2.0">
   <xs:annotation>
     <xs:appinfo>
       <jxb:schemaBindings>
@@ -10,8 +10,8 @@
       </jxb:schemaBindings>
     </xs:appinfo>
   </xs:annotation>
-  <xs:element name="profile" type="ProfileType"/>
-  <xs:complexType name="ProfileType">
+  <xs:element name="profile" type="profileType"/>
+  <xs:complexType name="profileType">
     <xs:sequence>
       <xs:element name="description" type="xs:string" minOccurs="0"/>
       <xs:element name="ca" type="xs:boolean"/>
@@ -39,14 +39,14 @@
       <xs:element name="parameters" minOccurs="0">
         <xs:complexType>
           <xs:sequence>
-            <xs:element name="parameter" type="NameValueType" maxOccurs="unbounded"/>
+            <xs:element name="parameter" type="nameValueType" maxOccurs="unbounded"/>
           </xs:sequence>
         </xs:complexType>
       </xs:element>
       <xs:element name="keyAlgorithms" minOccurs="0">
         <xs:complexType>
           <xs:sequence>
-            <xs:element name="algorithm" type="AlgorithmType" maxOccurs="10"/>
+            <xs:element name="algorithm" type="algorithmType" maxOccurs="10"/>
           </xs:sequence>
         </xs:complexType>
       </xs:element>
@@ -62,56 +62,86 @@
       <xs:element name="allowedClientExtensions" minOccurs="0">
         <xs:complexType>
           <xs:sequence>
-            <xs:element name="type" type="OidWithDescType" maxOccurs="unbounded"/>
+            <xs:element name="type" type="oidWithDescType" maxOccurs="unbounded"/>
           </xs:sequence>
         </xs:complexType>
       </xs:element>
-      <xs:element name="extensions" type="ExtensionsType"/>
+      <xs:element name="extensions" type="extensionsType"/>
       <xs:any namespace="##other" minOccurs="0"/>
     </xs:sequence>
     <xs:attribute name="onlyForRA" type="xs:boolean" default="false" use="optional"/>
   </xs:complexType>
-  <xs:complexType name="NameValueType">
+  <xs:complexType name="nameValueType">
     <xs:sequence>
       <xs:element name="name" type="xs:string"/>
       <xs:element name="value" type="xs:string"/>
     </xs:sequence>
   </xs:complexType>
-  <xs:complexType name="AlgorithmType">
+  <xs:complexType name="algorithmType">
     <xs:sequence>
-      <xs:element name="algorithm" type="OidWithDescType"/>
-      <xs:choice>
-        <xs:element name="parameter" type="ParameterType" minOccurs="0" maxOccurs="unbounded"/>
-        <xs:element name="ecParameter" type="ECParameterType" minOccurs="0" maxOccurs="1"/>
+      <xs:element name="algorithm" type="oidWithDescType" maxOccurs="unbounded"/>
+      <xs:choice minOccurs="0">
+        <xs:element name="RSAParameters" type="RSAParametersType"/>
+        <xs:element name="RSAPSSParameters" type="RSAPSSParametersType"/>
+        <xs:element name="DSAParameters" type="DSAParametersType"/>
+        <xs:element name="ECParameters" type="ECParametersType"/>
+        <xs:element name="DHParameters" type="DHParametersType"/>
+        <xs:element name="GostParameters" type="GostParametersType"/>
       </xs:choice>
     </xs:sequence>
   </xs:complexType>
-  <xs:complexType name="ParameterType">
+  <xs:complexType name="rangesType">
     <xs:sequence>
-      <xs:element name="Min" type="xs:int" minOccurs="0"/>
-      <xs:element name="Max" type="xs:int" minOccurs="0"/>
-    </xs:sequence>
-    <xs:attribute name="name" type="xs:string" use="required">
-      <xs:annotation>
-        <xs:documentation>
-          accepted names are 'moduluslength' for RSA,
-          'plength' and 'qlength' for DSA
-        </xs:documentation>
-      </xs:annotation>
-    </xs:attribute>
-  </xs:complexType>
-  <xs:complexType name="ECParameterType">
-    <xs:sequence>
-      <xs:element name="curve" type="curveType" maxOccurs="unbounded"/>
+      <xs:element name="range" type="rangeType" maxOccurs="unbounded"/>
     </xs:sequence>
   </xs:complexType>
-  <xs:complexType name="curveType">
+  <xs:complexType name="rangeType">
+    <xs:attribute name="min" type="xs:int" use="optional"/>
+    <xs:attribute name="max" type="xs:int" use="optional"/>
+  </xs:complexType>
+  <xs:complexType name="RSAParametersType">
     <xs:sequence>
-      <xs:element name="oid" type="OidWithDescType"/>
-      <xs:element name="encodings" minOccurs="0">
+      <xs:element name="modulusLength" type="rangesType" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="DSAParametersType">
+    <xs:sequence>
+      <xs:element name="pLength" type="rangesType" minOccurs="0"/>
+      <xs:element name="qLength" type="rangesType" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="DHParametersType">
+    <xs:complexContent>
+      <xs:extension base="DSAParametersType">
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="RSAPSSParametersType">
+    <xs:complexContent>
+      <xs:extension base="RSAParametersType">
+        <xs:sequence>
+          <xs:element name="hashAlgorithm" type="oidWithDescType" minOccurs="0" maxOccurs="unbounded"/>
+          <xs:element name="maskGenAlgorithm" type="oidWithDescType" minOccurs="0" maxOccurs="unbounded"/>
+          <xs:element name="saltLength" type="xs:int" minOccurs="0" maxOccurs="unbounded"/>
+          <xs:element name="trailerField" type="xs:int" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="ECParametersType">
+    <xs:sequence>
+      <xs:element name="implicitCA" type="xs:boolean"/>
+      <xs:element name="curves" minOccurs="0">
         <xs:complexType>
           <xs:sequence>
-            <xs:element name="encoding" type="xs:byte" minOccurs="0" maxOccurs="unbounded">
+            <xs:element name="curve" type="oidWithDescType" maxOccurs="unbounded"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="pointEncodings" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="pointEncoding" type="xs:byte" minOccurs="0" maxOccurs="unbounded">
               <xs:annotation>
                 <xs:documentation>
                   first byte of the encoded EC point
@@ -123,9 +153,16 @@
       </xs:element>
     </xs:sequence>
   </xs:complexType>
+  <xs:complexType name="GostParametersType">
+    <xs:sequence>
+      <xs:element name="publicKeyParamSet" type="oidWithDescType" minOccurs="0" maxOccurs="unbounded"/>
+      <xs:element name="digestParamSet" type="oidWithDescType" minOccurs="0" maxOccurs="unbounded"/>
+      <xs:element name="encryptionParamSet" type="oidWithDescType" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
   <xs:complexType name="rdnType">
     <xs:sequence>
-      <xs:element name="type" type="OidWithDescType"/>
+      <xs:element name="type" type="oidWithDescType"/>
       <xs:element name="minLen" type="xs:int" minOccurs="0"/>
       <xs:element name="maxLen" type="xs:int" minOccurs="0"/>
       <xs:element name="regex" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
@@ -137,17 +174,17 @@
   </xs:complexType>
   <xs:complexType name="addTextType">
     <xs:sequence>
-      <xs:element name="condition" type="ConditionType" minOccurs="0"/>
+      <xs:element name="condition" type="conditionType" minOccurs="0"/>
       <xs:element name="text" type="xs:string"/>
     </xs:sequence>
   </xs:complexType>
-  <xs:complexType name="ConditionType">
+  <xs:complexType name="conditionType">
     <xs:sequence>
-      <xs:element name="envParam" type="EnvParamType" maxOccurs="unbounded"/>
+      <xs:element name="envParam" type="envParamType" maxOccurs="unbounded"/>
     </xs:sequence>
-    <xs:attribute name="operator" type="OperatorType" default="AND" use="optional"/>
+    <xs:attribute name="operator" type="operatorType" default="AND" use="optional"/>
   </xs:complexType>
-  <xs:complexType name="EnvParamType">
+  <xs:complexType name="envParamType">
     <xs:sequence>
       <xs:element name="name" type="xs:string"/>
       <xs:element name="value" type="xs:string">
@@ -162,7 +199,7 @@
       <xs:element name="regex" type="xs:string"/>
     </xs:all>
   </xs:complexType>
-  <xs:complexType name="ExtensionType">
+  <xs:complexType name="extensionType">
     <xs:annotation>
       <xs:documentation>
         Critical will be considered if both values (true and false) are allowed,
@@ -170,15 +207,15 @@
       </xs:documentation>
     </xs:annotation>
     <xs:complexContent>
-      <xs:extension base="OidWithDescType">
+      <xs:extension base="oidWithDescType">
         <xs:attribute name="critical" type="xs:boolean" use="optional"/>
         <xs:attribute name="required" type="xs:boolean" default="false"/>
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
-  <xs:complexType name="ExtensionsType">
+  <xs:complexType name="extensionsType">
     <xs:sequence>
-      <xs:element name="extension" type="ExtensionType" minOccurs="1" maxOccurs="unbounded"/>
+      <xs:element name="extension" type="extensionType" minOccurs="1" maxOccurs="unbounded"/>
       <xs:element name="pathLen" type="xs:int" minOccurs="0"/>
       <xs:element name="authorityKeyIdentifier" minOccurs="0">
         <xs:complexType>
@@ -190,16 +227,16 @@
       <xs:element name="keyUsage" minOccurs="0" maxOccurs="10">
         <xs:complexType>
           <xs:sequence>
-            <xs:element name="condition" type="ConditionType" minOccurs="0"/>
-            <xs:element name="usage" type="KeyUsageType" maxOccurs="unbounded"/>
+            <xs:element name="condition" type="conditionType" minOccurs="0"/>
+            <xs:element name="usage" type="keyUsageType" maxOccurs="unbounded"/>
           </xs:sequence>
         </xs:complexType>
       </xs:element>
       <xs:element name="certificatePolicies" minOccurs="0" maxOccurs="10">
         <xs:complexType>
           <xs:sequence>
-            <xs:element name="condition" type="ConditionType" minOccurs="0"/>
-            <xs:element name="certificatePolicyInformation" type="CertificatePolicyInformationType" maxOccurs="unbounded"/>
+            <xs:element name="condition" type="conditionType" minOccurs="0"/>
+            <xs:element name="certificatePolicyInformation" type="certificatePolicyInformationType" maxOccurs="unbounded"/>
           </xs:sequence>
         </xs:complexType>
       </xs:element>
@@ -211,8 +248,8 @@
         </xs:annotation>
         <xs:complexType>
           <xs:sequence>
-            <xs:element name="condition" type="ConditionType" minOccurs="0"/>
-            <xs:element name="mapping" type="PolicyIdMappingType" maxOccurs="unbounded"/>
+            <xs:element name="condition" type="conditionType" minOccurs="0"/>
+            <xs:element name="mapping" type="policyIdMappingType" maxOccurs="unbounded"/>
           </xs:sequence>
         </xs:complexType>
       </xs:element>
@@ -224,9 +261,9 @@
         </xs:annotation>
         <xs:complexType>
           <xs:sequence>
-            <xs:element name="condition" type="ConditionType" minOccurs="0"/>
-            <xs:element name="permittedSubtrees" type="GeneralSubtreesType" minOccurs="0"/>
-            <xs:element name="excludedSubtrees" type="GeneralSubtreesType" minOccurs="0"/>
+            <xs:element name="condition" type="conditionType" minOccurs="0"/>
+            <xs:element name="permittedSubtrees" type="generalSubtreesType" minOccurs="0"/>
+            <xs:element name="excludedSubtrees" type="generalSubtreesType" minOccurs="0"/>
           </xs:sequence>
         </xs:complexType>
       </xs:element>
@@ -238,7 +275,7 @@
         </xs:annotation>
         <xs:complexType>
           <xs:sequence>
-            <xs:element name="condition" type="ConditionType" minOccurs="0"/>
+            <xs:element name="condition" type="conditionType" minOccurs="0"/>
             <xs:element name="requireExplicitPolicy" type="xs:int" minOccurs="0"/>
             <xs:element name="inhibitPolicyMapping" type="xs:int" minOccurs="0"/>
           </xs:sequence>
@@ -250,8 +287,8 @@
         </xs:annotation>
         <xs:complexType>
           <xs:sequence>
-            <xs:element name="condition" type="ConditionType" minOccurs="0"/>
-            <xs:element name="usage" type="OidWithDescType" maxOccurs="unbounded"/>
+            <xs:element name="condition" type="conditionType" minOccurs="0"/>
+            <xs:element name="usage" type="oidWithDescType" maxOccurs="unbounded"/>
           </xs:sequence>
         </xs:complexType>
       </xs:element>
@@ -261,7 +298,7 @@
         </xs:annotation>
         <xs:complexType>
           <xs:sequence>
-            <xs:element name="condition" type="ConditionType" minOccurs="0"/>
+            <xs:element name="condition" type="conditionType" minOccurs="0"/>
             <xs:element name="skipCerts" type="xs:int"/>
           </xs:sequence>
         </xs:complexType>
@@ -269,8 +306,8 @@
       <xs:element name="admission" minOccurs="0" maxOccurs="10">
         <xs:complexType>
           <xs:sequence>
-            <xs:element name="condition" type="ConditionType" minOccurs="0"/>
-            <xs:element name="professionOid" type="OidWithDescType" maxOccurs="unbounded"/>
+            <xs:element name="condition" type="conditionType" minOccurs="0"/>
+            <xs:element name="professionOid" type="oidWithDescType" maxOccurs="unbounded"/>
             <xs:element name="professionItem" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
             <xs:element name="registrationNumber" type="xs:string" minOccurs="0"/>
             <xs:element name="addProfessionInfo" type="xs:hexBinary" minOccurs="0"/>
@@ -282,7 +319,7 @@
       <xs:element name="constantExtensions" minOccurs="0" maxOccurs="10">
         <xs:complexType>
           <xs:sequence>
-            <xs:element name="constantExtension" type="ConstantExtensionType" maxOccurs="unbounded"/>
+            <xs:element name="constantExtension" type="constantExtensionType" maxOccurs="unbounded"/>
           </xs:sequence>
         </xs:complexType>
       </xs:element>
@@ -300,24 +337,24 @@
       <xs:element name="otherName" minOccurs="0">
         <xs:complexType>
           <xs:sequence>
-            <xs:element name="type" type="OidWithDescType" maxOccurs="unbounded"/>
+            <xs:element name="type" type="oidWithDescType" maxOccurs="unbounded"/>
           </xs:sequence>
         </xs:complexType>
       </xs:element>
     </xs:all>
   </xs:complexType>
-  <xs:complexType name="PolicyIdMappingType">
+  <xs:complexType name="policyIdMappingType">
     <xs:sequence>
-      <xs:element name="issuerDomainPolicy" type="OidWithDescType"/>
-      <xs:element name="subjectDomainPolicy" type="OidWithDescType"/>
+      <xs:element name="issuerDomainPolicy" type="oidWithDescType"/>
+      <xs:element name="subjectDomainPolicy" type="oidWithDescType"/>
     </xs:sequence>
   </xs:complexType>
-  <xs:complexType name="GeneralSubtreesType">
+  <xs:complexType name="generalSubtreesType">
     <xs:sequence>
-      <xs:element name="base" type="GeneralSubtreeBaseType" maxOccurs="unbounded"/>
+      <xs:element name="base" type="generalSubtreeBaseType" maxOccurs="unbounded"/>
     </xs:sequence>
   </xs:complexType>
-  <xs:complexType name="GeneralSubtreeBaseType">
+  <xs:complexType name="generalSubtreeBaseType">
     <xs:choice>
       <xs:element name="rfc822Name" type="xs:string"/>
       <xs:element name="dNSName" type="xs:string"/>
@@ -328,16 +365,16 @@
     <xs:attribute name="minimum" type="xs:int" use="optional"/>
     <xs:attribute name="maximum" type="xs:int" use="optional"/>
   </xs:complexType>
-  <xs:complexType name="ConstantExtensionType">
+  <xs:complexType name="constantExtensionType">
     <xs:sequence>
-      <xs:element name="condition" type="ConditionType" minOccurs="0"/>
-      <xs:element name="type" type="OidWithDescType"/>
+      <xs:element name="condition" type="conditionType" minOccurs="0"/>
+      <xs:element name="type" type="oidWithDescType"/>
       <xs:element name="value" type="xs:base64Binary"/>
     </xs:sequence>
   </xs:complexType>
-  <xs:complexType name="CertificatePolicyInformationType">
+  <xs:complexType name="certificatePolicyInformationType">
     <xs:sequence>
-      <xs:element name="policyIdentifier" type="OidWithDescType"/>
+      <xs:element name="policyIdentifier" type="oidWithDescType"/>
       <xs:element name="policyQualifiers" minOccurs="0">
         <xs:complexType>
           <xs:choice maxOccurs="unbounded">
@@ -353,32 +390,32 @@
       <xs:element name="access" maxOccurs="unbounded">
         <xs:complexType>
           <xs:sequence>
-            <xs:element name="accessMethod" type="OidWithDescType"/>
+            <xs:element name="accessMethod" type="oidWithDescType"/>
             <xs:element name="accessLocation" type="generalNameType"/>
           </xs:sequence>
         </xs:complexType>
       </xs:element>
     </xs:sequence>
   </xs:complexType>
-  <xs:complexType name="OidWithDescType">
+  <xs:complexType name="oidWithDescType">
     <xs:simpleContent>
-      <xs:extension base="OidType">
+      <xs:extension base="oidType">
         <xs:attribute name="description" type="xs:string" use="optional"/>
       </xs:extension>
     </xs:simpleContent>
   </xs:complexType>
-  <xs:simpleType name="OidType">
+  <xs:simpleType name="oidType">
     <xs:restriction base="xs:token">
       <xs:pattern value="\d+(\.\d+)*"/>
     </xs:restriction>
   </xs:simpleType>
-  <xs:simpleType name="OperatorType">
+  <xs:simpleType name="operatorType">
     <xs:restriction base="xs:string">
       <xs:enumeration value="OR"/>
       <xs:enumeration value="AND"/>
     </xs:restriction>
   </xs:simpleType>
-  <xs:simpleType name="KeyUsageType">
+  <xs:simpleType name="keyUsageType">
     <xs:restriction base="xs:string">
       <xs:enumeration value="digitalSignature"/>
       <xs:enumeration value="contentCommitment"/>

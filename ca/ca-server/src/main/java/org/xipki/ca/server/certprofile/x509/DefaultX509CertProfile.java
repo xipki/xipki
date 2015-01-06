@@ -35,10 +35,8 @@
 
 package org.xipki.ca.server.certprofile.x509;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.math.BigInteger;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -49,15 +47,10 @@ import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
 
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBElement;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Unmarshaller;
-import javax.xml.validation.SchemaFactory;
-
 import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1EncodableVector;
 import org.bouncycastle.asn1.ASN1Integer;
+import org.bouncycastle.asn1.ASN1Null;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.ASN1OctetString;
 import org.bouncycastle.asn1.ASN1Sequence;
@@ -66,30 +59,21 @@ import org.bouncycastle.asn1.DERNull;
 import org.bouncycastle.asn1.DEROctetString;
 import org.bouncycastle.asn1.DERPrintableString;
 import org.bouncycastle.asn1.DERSequence;
-import org.bouncycastle.asn1.DERTaggedObject;
 import org.bouncycastle.asn1.DERUTF8String;
 import org.bouncycastle.asn1.isismtt.x509.AdmissionSyntax;
 import org.bouncycastle.asn1.isismtt.x509.Admissions;
 import org.bouncycastle.asn1.isismtt.x509.ProfessionInfo;
-import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 import org.bouncycastle.asn1.x500.DirectoryString;
 import org.bouncycastle.asn1.x500.RDN;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.AccessDescription;
-import org.bouncycastle.asn1.x509.CertPolicyId;
 import org.bouncycastle.asn1.x509.CertificatePolicies;
 import org.bouncycastle.asn1.x509.Extension;
 import org.bouncycastle.asn1.x509.Extensions;
 import org.bouncycastle.asn1.x509.GeneralName;
 import org.bouncycastle.asn1.x509.GeneralNames;
-import org.bouncycastle.asn1.x509.GeneralSubtree;
 import org.bouncycastle.asn1.x509.NameConstraints;
-import org.bouncycastle.asn1.x509.PolicyMappings;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
-import org.bouncycastle.asn1.x9.X9ECParameters;
-import org.bouncycastle.asn1.x9.X9ObjectIdentifiers;
-import org.bouncycastle.jcajce.provider.asymmetric.util.ECUtil;
-import org.bouncycastle.math.ec.ECCurve;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.ca.api.BadCertTemplateException;
@@ -102,7 +86,6 @@ import org.xipki.ca.api.profile.RDNOccurrence;
 import org.xipki.ca.api.profile.SubjectInfo;
 import org.xipki.ca.api.profile.x509.AbstractX509CertProfile;
 import org.xipki.ca.api.profile.x509.CertificatePolicyInformation;
-import org.xipki.ca.api.profile.x509.CertificatePolicyQualifier;
 import org.xipki.ca.api.profile.x509.KeyUsage;
 import org.xipki.ca.api.profile.x509.SpecialX509CertProfileBehavior;
 import org.xipki.ca.api.profile.x509.X509Util;
@@ -111,19 +94,17 @@ import org.xipki.ca.server.certprofile.Condition;
 import org.xipki.ca.server.certprofile.ExtensionTupleOption;
 import org.xipki.ca.server.certprofile.ExtensionTupleOptions;
 import org.xipki.ca.server.certprofile.GeneralNameMode;
-import org.xipki.ca.server.certprofile.GeneralNameTag;
-import org.xipki.ca.server.certprofile.KeyParamRange;
-import org.xipki.ca.server.certprofile.KeyParamRanges;
+import org.xipki.ca.server.certprofile.KeyParametersOption;
+import org.xipki.ca.server.certprofile.KeyParametersOption.AllowAllParametersOption;
+import org.xipki.ca.server.certprofile.KeyParametersOption.DSAParametersOption;
+import org.xipki.ca.server.certprofile.KeyParametersOption.ECParamatersOption;
+import org.xipki.ca.server.certprofile.KeyParametersOption.RSAParametersOption;
+import org.xipki.ca.server.certprofile.Range;
 import org.xipki.ca.server.certprofile.SubjectDNOption;
-import org.xipki.ca.server.certprofile.x509.jaxb.AddTextType;
 import org.xipki.ca.server.certprofile.x509.jaxb.AlgorithmType;
-import org.xipki.ca.server.certprofile.x509.jaxb.CertificatePolicyInformationType;
-import org.xipki.ca.server.certprofile.x509.jaxb.CertificatePolicyInformationType.PolicyQualifiers;
-import org.xipki.ca.server.certprofile.x509.jaxb.ConditionType;
 import org.xipki.ca.server.certprofile.x509.jaxb.ConstantExtensionType;
-import org.xipki.ca.server.certprofile.x509.jaxb.CurveType;
-import org.xipki.ca.server.certprofile.x509.jaxb.CurveType.Encodings;
-import org.xipki.ca.server.certprofile.x509.jaxb.ECParameterType;
+import org.xipki.ca.server.certprofile.x509.jaxb.ECParametersType;
+import org.xipki.ca.server.certprofile.x509.jaxb.ECParametersType.Curves;
 import org.xipki.ca.server.certprofile.x509.jaxb.ExtensionType;
 import org.xipki.ca.server.certprofile.x509.jaxb.ExtensionsType;
 import org.xipki.ca.server.certprofile.x509.jaxb.ExtensionsType.Admission;
@@ -132,15 +113,9 @@ import org.xipki.ca.server.certprofile.x509.jaxb.ExtensionsType.ConstantExtensio
 import org.xipki.ca.server.certprofile.x509.jaxb.ExtensionsType.ExtendedKeyUsage;
 import org.xipki.ca.server.certprofile.x509.jaxb.ExtensionsType.InhibitAnyPolicy;
 import org.xipki.ca.server.certprofile.x509.jaxb.ExtensionsType.PolicyConstraints;
-import org.xipki.ca.server.certprofile.x509.jaxb.GeneralNameType;
-import org.xipki.ca.server.certprofile.x509.jaxb.GeneralSubtreeBaseType;
-import org.xipki.ca.server.certprofile.x509.jaxb.GeneralSubtreesType;
 import org.xipki.ca.server.certprofile.x509.jaxb.KeyUsageType;
 import org.xipki.ca.server.certprofile.x509.jaxb.NameValueType;
-import org.xipki.ca.server.certprofile.x509.jaxb.ObjectFactory;
 import org.xipki.ca.server.certprofile.x509.jaxb.OidWithDescType;
-import org.xipki.ca.server.certprofile.x509.jaxb.ParameterType;
-import org.xipki.ca.server.certprofile.x509.jaxb.PolicyIdMappingType;
 import org.xipki.ca.server.certprofile.x509.jaxb.ProfileType;
 import org.xipki.ca.server.certprofile.x509.jaxb.ProfileType.AllowedClientExtensions;
 import org.xipki.ca.server.certprofile.x509.jaxb.ProfileType.KeyAlgorithms;
@@ -150,10 +125,8 @@ import org.xipki.ca.server.certprofile.x509.jaxb.RdnType;
 import org.xipki.ca.server.certprofile.x509.jaxb.SubjectInfoAccessType.Access;
 import org.xipki.common.CmpUtf8Pairs;
 import org.xipki.common.LogUtil;
-import org.xipki.common.LruCache;
 import org.xipki.common.ObjectIdentifiers;
 import org.xipki.common.SecurityUtil;
-import org.xml.sax.SAXException;
 
 /**
  * @author Lijun Liao
@@ -162,24 +135,16 @@ import org.xml.sax.SAXException;
 public class DefaultX509CertProfile extends AbstractX509CertProfile
 {
     private static final Logger LOG = LoggerFactory.getLogger(DefaultX509CertProfile.class);
-    private static final char GENERALNAME_SEP = '|';
-    public static final String MODULUS_LENGTH = "moduluslength";
-    public static final String P_LENGTH = "plength";
-    public static final String Q_LENGTH = "qlength";
-
     private static final Set<String> criticalOnlyExtensionTypes;
     private static final Set<String> noncriticalOnlyExtensionTypes;
     private static final Set<String> caOnlyExtensionTypes;
     private static final Set<ASN1ObjectIdentifier> ignoreRDNs;
 
-    private final static Object jaxbUnmarshallerLock = new Object();
-    private static Unmarshaller jaxbUnmarshaller;
-
     protected ProfileType profileConf;
 
     private SpecialX509CertProfileBehavior specialBehavior;
-    private Map<ASN1ObjectIdentifier, Set<Byte>> allowedEcCurves;
-    private Map<ASN1ObjectIdentifier, List<KeyParamRanges>> nonEcKeyAlgorithms;
+
+    private Map<ASN1ObjectIdentifier, KeyParametersOption> keyAlgorithms;
 
     private Map<ASN1ObjectIdentifier, SubjectDNOption> subjectDNOptions;
     private Set<RDNOccurrence> subjectDNOccurrences;
@@ -213,7 +178,6 @@ public class DefaultX509CertProfile extends AbstractX509CertProfile
     private ExtensionTupleOptions admission;
 
     private Map<ASN1ObjectIdentifier, ExtensionTupleOptions> constantExtensions;
-    private static LruCache<ASN1ObjectIdentifier, Integer> ecCurveFieldSizes = new LruCache<>(100);
 
     static
     {
@@ -248,8 +212,7 @@ public class DefaultX509CertProfile extends AbstractX509CertProfile
     private void reset()
     {
         profileConf = null;
-        allowedEcCurves = null;
-        nonEcKeyAlgorithms = null;
+        keyAlgorithms = null;
         subjectDNOptions = null;
         subjectDNOccurrences = null;
         extensionOccurences = null;
@@ -286,7 +249,7 @@ public class DefaultX509CertProfile extends AbstractX509CertProfile
 
         try
         {
-            ProfileType conf = parse(data);
+            ProfileType conf = XmlX509CertProfileUtil.parse(data);
             this.profileConf = conf;
 
             this.raOnly = getBoolean(conf.isOnlyForRA(), false);
@@ -319,82 +282,97 @@ public class DefaultX509CertProfile extends AbstractX509CertProfile
             KeyAlgorithms keyAlgos = conf.getKeyAlgorithms();
             if(keyAlgos != null)
             {
-                List<AlgorithmType> types = keyAlgos.getAlgorithm();
-                this.nonEcKeyAlgorithms = new HashMap<>();
-                this.allowedEcCurves = new HashMap<>();
-
-                for(AlgorithmType type : types)
+                for(AlgorithmType type : keyAlgos.getAlgorithm())
                 {
-                    ASN1ObjectIdentifier oid = new ASN1ObjectIdentifier(type.getAlgorithm().getValue());
-                    if(X9ObjectIdentifiers.id_ecPublicKey.equals(oid))
+                    KeyParametersOption keyParamsOption;
+
+                    if(type.getECParameters() != null)
                     {
-                        ECParameterType params = type.getEcParameter();
-                        if(params != null)
+                        KeyParametersOption.ECParamatersOption option = new KeyParametersOption.ECParamatersOption();
+                        keyParamsOption = option;
+
+                        ECParametersType params = type.getECParameters();
+                        option.setImplicitCAAllowed(params.isImplicitCA());
+                        if(params.getCurves() != null)
                         {
-                            for(CurveType curveType :params.getCurve())
-                            {
-                                ASN1ObjectIdentifier curveOid = new ASN1ObjectIdentifier(curveType.getOid().getValue());
-                                Encodings encodingsType = curveType.getEncodings();
-                                Set<Byte> encodings = new HashSet<>();
-                                if(encodingsType != null)
-                                {
-                                    encodings.addAll(encodingsType.getEncoding());
-                                }
-                                this.allowedEcCurves.put(curveOid, encodings);
-                            }
+                            Curves curves = params.getCurves();
+                            Set<ASN1ObjectIdentifier> curveOids = XmlX509CertProfileUtil.toOIDSet(curves.getCurve());
+                            option.setCurveOids(curveOids);
                         }
-                    }
-                    else
+
+                        if(params.getPointEncodings() != null)
+                        {
+                            List<Byte> bytes = params.getPointEncodings().getPointEncoding();
+                            Set<Byte> pointEncodings = new HashSet<>(bytes);
+                            option.setPointEncodings(pointEncodings);
+                        }
+                    } else if(type.getRSAParameters() != null)
                     {
-                        KeyParamRanges ranges = null;
+                        KeyParametersOption.RSAParametersOption option = new KeyParametersOption.RSAParametersOption();
+                        keyParamsOption = option;
 
-                        List<ParameterType> paramTypes = type.getParameter();
-                        if(paramTypes.isEmpty() == false)
-                        {
-                            Map<String, List<KeyParamRange>> map = new HashMap<>(paramTypes.size());
-                            for(ParameterType paramType : paramTypes)
-                            {
-                                if(paramType.getMin() != null || paramType.getMax() != null)
-                                {
-                                    List<KeyParamRange> list = map.get(paramType.getName());
-                                    if(list == null)
-                                    {
-                                        list = new LinkedList<>();
-                                        map.put(paramType.getName(), list);
-                                    }
+                        Set<Range> modulusLengths = XmlX509CertProfileUtil.buildParametersMap(
+                                type.getRSAParameters().getModulusLength());
+                        option.setModulusLengths(modulusLengths);
 
-                                    list.add(new KeyParamRange(paramType.getMin(), paramType.getMax()));
-                                }
-                            }
+                    } else if(type.getRSAPSSParameters() != null)
+                    {
+                        KeyParametersOption.RSAPSSParametersOption option = new KeyParametersOption.RSAPSSParametersOption();
+                        keyParamsOption = option;
 
-                            if(map.isEmpty() == false)
-                            {
-                                ranges = new KeyParamRanges(map);
-                            }
-                        }
+                        Set<Range> modulusLengths = XmlX509CertProfileUtil.buildParametersMap(
+                                type.getRSAPSSParameters().getModulusLength());
+                        option.setModulusLengths(modulusLengths);
+                    } else if(type.getDSAParameters() != null)
+                    {
+                        KeyParametersOption.DSAParametersOption option = new KeyParametersOption.DSAParametersOption();
+                        keyParamsOption = option;
 
-                        List<KeyParamRanges> list = this.nonEcKeyAlgorithms.get(oid);
-                        if(list == null)
-                        {
-                            list = new LinkedList<>();
-                            this.nonEcKeyAlgorithms.put(oid, list);
-                        }
+                        Set<Range> pLengths = XmlX509CertProfileUtil.buildParametersMap(type.getDSAParameters().getPLength());
+                        option.setPLengths(pLengths);
 
-                        if(ranges != null)
-                        {
-                            list.add(ranges);
-                        }
+                        Set<Range> qLengths = XmlX509CertProfileUtil.buildParametersMap(type.getDSAParameters().getQLength());
+                        option.setQLengths(qLengths);
+                    } else if(type.getDHParameters() != null)
+                    {
+                        KeyParametersOption.DHParametersOption option = new KeyParametersOption.DHParametersOption();
+                        keyParamsOption = option;
+
+                        Set<Range> pLengths = XmlX509CertProfileUtil.buildParametersMap(type.getDHParameters().getPLength());
+                        option.setPLengths(pLengths);
+
+                        Set<Range> qLengths = XmlX509CertProfileUtil.buildParametersMap(type.getDHParameters().getQLength());
+                        option.setQLengths(qLengths);
                     }
-                }
+                    else if(type.getGostParameters() != null)
+                    {
+                        KeyParametersOption.GostParametersOption option = new KeyParametersOption.GostParametersOption();
+                        keyParamsOption = option;
 
-                if(allowedEcCurves.isEmpty())
-                {
-                    allowedEcCurves = null;
-                }
+                        Set<ASN1ObjectIdentifier> set = XmlX509CertProfileUtil.toOIDSet(
+                                type.getGostParameters().getPublicKeyParamSet());
+                        option.setPublicKeyParamSets(set);
 
-                if(nonEcKeyAlgorithms.isEmpty())
-                {
-                    nonEcKeyAlgorithms = null;
+                        set = XmlX509CertProfileUtil.toOIDSet(type.getGostParameters().getDigestParamSet());
+                        option.setDigestParamSets(set);
+
+                        set = XmlX509CertProfileUtil.toOIDSet(type.getGostParameters().getEncryptionParamSet());
+                        option.setEncryptionParamSets(set);
+                    } else
+                    {
+                        keyParamsOption = KeyParametersOption.allowAll;
+                    }
+
+                    List<OidWithDescType> algIds = type.getAlgorithm();
+                    for(OidWithDescType algId : algIds)
+                    {
+                        ASN1ObjectIdentifier oid = new ASN1ObjectIdentifier(algId.getValue());
+                        if(this.keyAlgorithms.containsKey(oid))
+                        {
+                            throw new CertProfileException("duplicate definition of keyAlgorithm " + oid.getId());
+                        }
+                        this.keyAlgorithms.put(oid, keyParamsOption);
+                    }
                 }
             }
 
@@ -442,8 +420,8 @@ public class DefaultX509CertProfile extends AbstractX509CertProfile
                         }
                     }
 
-                    List<AddText> addprefixes = buildAddText(t.getAddPrefix());
-                    List<AddText> addsuffixes = buildAddText(t.getAddSuffix());
+                    List<AddText> addprefixes = XmlX509CertProfileUtil.buildAddText(t.getAddPrefix());
+                    List<AddText> addsuffixes = XmlX509CertProfileUtil.buildAddText(t.getAddSuffix());
                     SubjectDNOption option = new SubjectDNOption(addprefixes, addsuffixes, patterns,
                             t.getMinLen(), t.getMaxLen());
                     this.subjectDNOptions.put(type, option);
@@ -454,11 +432,7 @@ public class DefaultX509CertProfile extends AbstractX509CertProfile
             AllowedClientExtensions clientExtensions = conf.getAllowedClientExtensions();
             if(clientExtensions != null)
             {
-                this.allowedClientExtensions = new HashSet<>();
-                for(OidWithDescType t : clientExtensions.getType())
-                {
-                    this.allowedClientExtensions.add(new ASN1ObjectIdentifier(t.getValue()));
-                }
+                this.allowedClientExtensions = XmlX509CertProfileUtil.toOIDSet(clientExtensions.getType());
             }
 
             // Extensions
@@ -513,7 +487,7 @@ public class DefaultX509CertProfile extends AbstractX509CertProfile
                     }
                     Set<KeyUsage> keyusageSet = Collections.unmodifiableSet(set);
 
-                    Condition condition = createCondition(t.getCondition());
+                    Condition condition = XmlX509CertProfileUtil.createCondition(t.getCondition());
                     KeyUsageOption option = new KeyUsageOption(condition, keyusageSet);
                     optionList.add(option);
                 }
@@ -529,14 +503,8 @@ public class DefaultX509CertProfile extends AbstractX509CertProfile
 
                 for(org.xipki.ca.server.certprofile.x509.jaxb.ExtensionsType.ExtendedKeyUsage t : extKeyUsageTypeList)
                 {
-                    Set<ASN1ObjectIdentifier> set = new HashSet<>();
-                    for(OidWithDescType type : t.getUsage())
-                    {
-                        set.add(new ASN1ObjectIdentifier(type.getValue()));
-                    }
-                    Set<ASN1ObjectIdentifier> extendedKeyusageSet = Collections.unmodifiableSet(set);
-
-                    Condition condition = createCondition(t.getCondition());
+                    Set<ASN1ObjectIdentifier> extendedKeyusageSet = XmlX509CertProfileUtil.toOIDSet(t.getUsage());
+                    Condition condition = XmlX509CertProfileUtil.createCondition(t.getCondition());
                     ExtKeyUsageOption option = new ExtKeyUsageOption(condition, extendedKeyusageSet);
                     optionList.add(option);
                 }
@@ -628,11 +596,11 @@ public class DefaultX509CertProfile extends AbstractX509CertProfile
                 List<ExtensionTupleOption> options = new ArrayList<>(types.size());
                 for(ExtensionsType.CertificatePolicies type : types)
                 {
-                    List<CertificatePolicyInformation> policyInfos = buildCertificatePolicies(type);
+                    List<CertificatePolicyInformation> policyInfos = XmlX509CertProfileUtil.buildCertificatePolicies(type);
                     CertificatePolicies value = X509Util.createCertificatePolicies(policyInfos);
                     ExtensionTuple extension = createExtension(extensionOid, occurrence.isCritical(), value);
                     ExtensionTupleOption option = new ExtensionTupleOption(
-                            createCondition(type.getCondition()), extension);
+                            XmlX509CertProfileUtil.createCondition(type.getCondition()), extension);
                     options.add(option);
                 }
                 this.certificatePolicies = new ExtensionTupleOptions(options);
@@ -647,10 +615,10 @@ public class DefaultX509CertProfile extends AbstractX509CertProfile
                 List<ExtensionTupleOption> options = new ArrayList<>(types.size());
                 for(ExtensionsType.PolicyMappings type : types)
                 {
-                    org.bouncycastle.asn1.x509.PolicyMappings value = buildPolicyMappings(type);
+                    org.bouncycastle.asn1.x509.PolicyMappings value = XmlX509CertProfileUtil.buildPolicyMappings(type);
                     ExtensionTuple extension = createExtension(extensionOid, occurrence.isCritical(), value);
                     ExtensionTupleOption option = new ExtensionTupleOption(
-                            createCondition(type.getCondition()), extension);
+                            XmlX509CertProfileUtil.createCondition(type.getCondition()), extension);
                     options.add(option);
                 }
                 this.policyMappings = new ExtensionTupleOptions(options);
@@ -665,10 +633,10 @@ public class DefaultX509CertProfile extends AbstractX509CertProfile
                 List<ExtensionTupleOption> options = new ArrayList<>(types.size());
                 for(ExtensionsType.NameConstraints type : types)
                 {
-                    NameConstraints value = buildNameConstrains(type);
+                    NameConstraints value = XmlX509CertProfileUtil.buildNameConstrains(type);
                     ExtensionTuple extension = createExtension(extensionOid, occurrence.isCritical(), value);
                     ExtensionTupleOption option = new ExtensionTupleOption(
-                            createCondition(type.getCondition()), extension);
+                            XmlX509CertProfileUtil.createCondition(type.getCondition()), extension);
                     options.add(option);
                 }
                 this.nameConstraints = new ExtensionTupleOptions(options);
@@ -683,10 +651,10 @@ public class DefaultX509CertProfile extends AbstractX509CertProfile
                 List<ExtensionTupleOption> options = new ArrayList<>(types.size());
                 for(PolicyConstraints type : types)
                 {
-                    ASN1Sequence value = buildPolicyConstrains(type);
+                    ASN1Sequence value = XmlX509CertProfileUtil.buildPolicyConstrains(type);
                     ExtensionTuple extension = createExtension(extensionOid, occurrence.isCritical(), value);
                     ExtensionTupleOption option = new ExtensionTupleOption(
-                            createCondition(type.getCondition()), extension);
+                            XmlX509CertProfileUtil.createCondition(type.getCondition()), extension);
                     options.add(option);
                 }
                 this.policyConstraints = new ExtensionTupleOptions(options);
@@ -709,7 +677,7 @@ public class DefaultX509CertProfile extends AbstractX509CertProfile
                     ASN1Integer value = new ASN1Integer(BigInteger.valueOf(skipCerts));
                     ExtensionTuple extension = createExtension(extensionOid, occurrence.isCritical(), value);
                     ExtensionTupleOption option = new ExtensionTupleOption(
-                            createCondition(type.getCondition()), extension);
+                            XmlX509CertProfileUtil.createCondition(type.getCondition()), extension);
                     options.add(option);
                 }
                 this.inhibitAnyPolicy = new ExtensionTupleOptions(options);
@@ -747,24 +715,12 @@ public class DefaultX509CertProfile extends AbstractX509CertProfile
                     }
 
                     List<OidWithDescType> oidWithDescs =  type == null ? null : type.getProfessionOid();
-                    if(oidWithDescs == null || oidWithDescs.isEmpty())
-                    {
-                        professionOIDs = null;
-                    }
-                    else
-                    {
-                        List<ASN1ObjectIdentifier> oids = new LinkedList<>();
-                        for(OidWithDescType entry : oidWithDescs)
-                        {
-                            oids.add(new ASN1ObjectIdentifier(entry.getValue()));
-                        }
-                        professionOIDs = Collections.unmodifiableList(oids);
-                    }
+                    professionOIDs = XmlX509CertProfileUtil.toOIDList(oidWithDescs);
 
                     ExtensionTuple extension = createAdmission(occurrence.isCritical(),
                             professionOIDs, professionItems, type.getRegistrationNumber(), type.getAddProfessionInfo());
                     ExtensionTupleOption option = new ExtensionTupleOption(
-                            createCondition(type.getCondition()), extension);
+                            XmlX509CertProfileUtil.createCondition(type.getCondition()), extension);
                     options.add(option);
                 }
                 this.admission = new ExtensionTupleOptions(options);
@@ -773,7 +729,8 @@ public class DefaultX509CertProfile extends AbstractX509CertProfile
             // SubjectAltNameMode
             if(extensionsType.getSubjectAltName() != null)
             {
-                this.allowedSubjectAltNameModes = buildGeneralNameMode(extensionsType.getSubjectAltName());
+                this.allowedSubjectAltNameModes = XmlX509CertProfileUtil.buildGeneralNameMode(
+                        extensionsType.getSubjectAltName());
             }
 
             // SubjectInfoAccess
@@ -785,7 +742,7 @@ public class DefaultX509CertProfile extends AbstractX509CertProfile
                 {
                     this.allowedSubjectInfoAccessModes.put(
                             new ASN1ObjectIdentifier(entry.getAccessMethod().getValue()),
-                            buildGeneralNameMode(entry.getAccessLocation()));
+                            XmlX509CertProfileUtil.buildGeneralNameMode(entry.getAccessLocation()));
                 }
             }
 
@@ -813,7 +770,7 @@ public class DefaultX509CertProfile extends AbstractX509CertProfile
                             }
                             ExtensionTuple extension = createExtension(type, occurrence.isCritical(), value);
                             ExtensionTupleOption option = new ExtensionTupleOption(
-                                    createCondition(ce.getCondition()), extension);
+                                    XmlX509CertProfileUtil.createCondition(ce.getCondition()), extension);
 
                             List<ExtensionTupleOption> options = map.get(type);
                             if(options == null)
@@ -845,45 +802,6 @@ public class DefaultX509CertProfile extends AbstractX509CertProfile
             }
             LOG.debug(message, e);
             throw new CertProfileException("RuntimeException thrown while initializing certprofile: " + e.getMessage());
-        }
-    }
-
-    private static ProfileType parse(String xmlConf)
-    throws CertProfileException
-    {
-        synchronized (jaxbUnmarshallerLock)
-        {
-            JAXBElement<?> rootElement;
-            try
-            {
-                if(jaxbUnmarshaller == null)
-                {
-                    JAXBContext context = JAXBContext.newInstance(ObjectFactory.class);
-                    jaxbUnmarshaller = context.createUnmarshaller();
-
-                    final SchemaFactory schemaFact = SchemaFactory.newInstance(
-                            javax.xml.XMLConstants.W3C_XML_SCHEMA_NS_URI);
-                    URL url = DefaultX509CertProfile.class.getResource("/xsd/certprofile.xsd");
-                    jaxbUnmarshaller.setSchema(schemaFact.newSchema(url));
-                }
-
-                rootElement = (JAXBElement<?>) jaxbUnmarshaller.unmarshal(
-                        new ByteArrayInputStream(xmlConf.getBytes()));
-            }
-            catch(JAXBException | SAXException e)
-            {
-                throw new CertProfileException("parse profile failed, message: " + e.getMessage(), e);
-            }
-
-            Object rootType = rootElement.getValue();
-            if(rootType instanceof ProfileType)
-            {
-                return (ProfileType) rootElement.getValue();
-            }
-            else
-            {
-                throw new CertProfileException("invalid root element type");
-            }
         }
     }
 
@@ -939,189 +857,138 @@ public class DefaultX509CertProfile extends AbstractX509CertProfile
     public void checkPublicKey(SubjectPublicKeyInfo publicKey)
     throws BadCertTemplateException
     {
-        if((nonEcKeyAlgorithms == null || nonEcKeyAlgorithms.isEmpty())
-                && (allowedEcCurves == null || allowedEcCurves.isEmpty()))
+        if(keyAlgorithms == null || keyAlgorithms.isEmpty())
         {
             return;
         }
 
         ASN1ObjectIdentifier keyType = publicKey.getAlgorithm().getAlgorithm();
-        if(X9ObjectIdentifiers.id_ecPublicKey.equals(keyType))
+        if(keyAlgorithms.containsKey(keyType) == false)
         {
-            ASN1ObjectIdentifier curveOid;
-            try
-            {
-                ASN1Encodable algParam = publicKey.getAlgorithm().getParameters();
-                curveOid = ASN1ObjectIdentifier.getInstance(algParam);
-            } catch(IllegalArgumentException e)
-            {
-                throw new BadCertTemplateException("Only named EC public key is supported");
-            }
+            throw new BadCertTemplateException("key type " + keyType.getId() + " is not permitted");
+        }
 
-            if(allowedEcCurves != null && allowedEcCurves.isEmpty() == false)
+        KeyParametersOption keyParamsOption = keyAlgorithms.get(keyType);
+        if(keyParamsOption instanceof AllowAllParametersOption)
+        {
+            return;
+        } else if(keyParamsOption instanceof ECParamatersOption)
+        {
+            ECParamatersOption ecOption = (ECParamatersOption) keyParamsOption;
+            // parameters
+            ASN1Encodable algParam = publicKey.getAlgorithm().getParameters();
+            ASN1ObjectIdentifier curveOid;
+
+            if(algParam instanceof ASN1Null)
             {
-                if(allowedEcCurves.containsKey(curveOid) == false)
+                if(ecOption.allowsImplicitCA() == false)
+                {
+                    throw new BadCertTemplateException("implicitCA is not permitted");
+                } else
+                {
+                    curveOid = null;
+                }
+            } else if(algParam instanceof ASN1ObjectIdentifier)
+            {
+                curveOid = (ASN1ObjectIdentifier) algParam;
+                if(ecOption.allowsCurve(curveOid) == false)
                 {
                     throw new BadCertTemplateException("EC curve " + SecurityUtil.getCurveName(curveOid) +
                             " (OID: " + curveOid.getId() + ") is not allowed");
                 }
+            } else
+            {
+                throw new BadCertTemplateException("Only namedCurve or implictCA EC public key is supported");
             }
 
-            byte[] keyData = publicKey.getPublicKeyData().getBytes();
-
-            Set<Byte> allowedEncodings = allowedEcCurves.get(curveOid);
-            if(allowedEncodings != null && allowedEncodings.isEmpty() == false)
+            // point encoding
+            if(ecOption.getPointEncodings() != null)
             {
-                if(allowedEncodings.contains(keyData[0]) == false)
+                byte[] keyData = publicKey.getPublicKeyData().getBytes();
+                if(keyData.length < 1)
                 {
-                    throw new BadCertTemplateException("Unaccepted EC point encoding " + keyData[0]);
+                    throw new BadCertTemplateException("invalid publicKeyData");
+                }
+                byte pointEncoding = keyData[0];
+                if(ecOption.getPointEncodings().contains(pointEncoding) == false)
+                {
+                    throw new BadCertTemplateException("Unaccepted EC point encoding " + pointEncoding);
                 }
             }
 
+            if(curveOid != null)
+            {
+                try
+                {
+                    XmlX509CertProfileUtil.checkECSubjectPublicKeyInfo(curveOid, publicKey.getPublicKeyData().getBytes());
+                }catch(BadCertTemplateException e)
+                {
+                    throw e;
+                }catch(Exception e)
+                {
+                    LOG.debug("populateFromPubKeyInfo", e);
+                    throw new BadCertTemplateException("Invalid public key: " + e.getMessage());
+                }
+            }
+        } else if(keyParamsOption instanceof RSAParametersOption)
+        {
+            RSAParametersOption rsaOption = (RSAParametersOption) keyParamsOption;
+
+            ASN1Integer modulus;
             try
             {
-                checkECSubjectPublicKeyInfo(curveOid, publicKey.getPublicKeyData().getBytes());
-            }catch(BadCertTemplateException e)
+                ASN1Sequence seq = ASN1Sequence.getInstance(publicKey.getPublicKeyData().getBytes());
+                modulus = ASN1Integer.getInstance(seq.getObjectAt(0));
+            }catch(IllegalArgumentException e)
             {
-                throw e;
-            }catch(Exception e)
-            {
-                LOG.debug("populateFromPubKeyInfo", e);
-                throw new BadCertTemplateException("Invalid public key: " + e.getMessage());
+                throw new BadCertTemplateException("invalid publicKeyData");
             }
 
-            return;
-        }
-        else
-        {
-            if(nonEcKeyAlgorithms == null || allowedEcCurves.isEmpty())
+            int modulusLength = modulus.getPositiveValue().bitLength();
+            if((rsaOption.allowsModulusLength(modulusLength)))
             {
                 return;
             }
-
-            if(nonEcKeyAlgorithms.containsKey(keyType))
+        } else if(keyParamsOption instanceof DSAParametersOption)
+        {
+            DSAParametersOption dsaOption = (DSAParametersOption) keyParamsOption;
+            ASN1Encodable params = publicKey.getAlgorithm().getParameters();
+            if(params == null)
             {
-                List<KeyParamRanges> list = nonEcKeyAlgorithms.get(keyType);
-                if(list.isEmpty())
-                {
-                    return;
-                }
-
-                if(PKCSObjectIdentifiers.rsaEncryption.equals(keyType))
-                {
-                    ASN1Sequence seq = ASN1Sequence.getInstance(publicKey.getPublicKeyData().getBytes());
-                    ASN1Integer modulus = ASN1Integer.getInstance(seq.getObjectAt(0));
-                    int modulusLength = modulus.getPositiveValue().bitLength();
-                    for(KeyParamRanges ranges : list)
-                    {
-                        if(satisfy(modulusLength, MODULUS_LENGTH, ranges))
-                        {
-                            return;
-                        }
-                    }
-                }
-                else if(X9ObjectIdentifiers.id_dsa.equals(keyType))
-                {
-                    ASN1Encodable params = publicKey.getAlgorithm().getParameters();
-                    if(params == null)
-                    {
-                        throw new BadCertTemplateException("null Dss-Parms is not permitted");
-                    }
-
-                    int pLength;
-                    int qLength;
-
-                    try
-                    {
-                        ASN1Sequence seq = ASN1Sequence.getInstance(params);
-                        ASN1Integer p = ASN1Integer.getInstance(seq.getObjectAt(0));
-                        ASN1Integer q = ASN1Integer.getInstance(seq.getObjectAt(1));
-                        pLength = p.getPositiveValue().bitLength();
-                        qLength = q.getPositiveValue().bitLength();
-                    } catch(IllegalArgumentException | ArrayIndexOutOfBoundsException e)
-                    {
-                        throw new BadCertTemplateException("illegal Dss-Parms");
-                    }
-
-                    for(KeyParamRanges ranges : list)
-                    {
-                        boolean match = satisfy(pLength, P_LENGTH, ranges);
-                        if(match)
-                        {
-                            match = satisfy(qLength, Q_LENGTH, ranges);
-                        }
-
-                        if(match)
-                        {
-                            return;
-                        }
-                    }
-                }
-                else
-                {
-                    throw new BadCertTemplateException("Unknown key type " + keyType.getId());
-                }
+                throw new BadCertTemplateException("null Dss-Parms is not permitted");
             }
+
+            int pLength;
+            int qLength;
+
+            try
+            {
+                ASN1Sequence seq = ASN1Sequence.getInstance(params);
+                ASN1Integer p = ASN1Integer.getInstance(seq.getObjectAt(0));
+                ASN1Integer q = ASN1Integer.getInstance(seq.getObjectAt(1));
+                pLength = p.getPositiveValue().bitLength();
+                qLength = q.getPositiveValue().bitLength();
+            } catch(IllegalArgumentException | ArrayIndexOutOfBoundsException e)
+            {
+                throw new BadCertTemplateException("illegal Dss-Parms");
+            }
+
+            boolean match = dsaOption.allowsPLength(pLength);
+            if(match)
+            {
+                match = dsaOption.allowsQLength(qLength);
+            }
+
+            if(match)
+            {
+                return;
+            }
+        } else
+        {
+            throw new RuntimeException("should not reach here");
         }
 
         throw new BadCertTemplateException("the given publicKey is not permitted");
-    }
-
-    private static void checkECSubjectPublicKeyInfo(ASN1ObjectIdentifier curveOid, byte[] encoded)
-    throws BadCertTemplateException
-    {
-        Integer expectedLength = ecCurveFieldSizes.get(curveOid);
-        if(expectedLength == null)
-        {
-            X9ECParameters ecP = ECUtil.getNamedCurveByOid(curveOid);
-            ECCurve curve = ecP.getCurve();
-            expectedLength = (curve.getFieldSize() + 7) / 8;
-            ecCurveFieldSizes.put(curveOid, expectedLength);
-        }
-
-        switch (encoded[0])
-        {
-            case 0x02: // compressed
-            case 0x03: // compressed
-            {
-                if (encoded.length != (expectedLength + 1))
-                {
-                    throw new BadCertTemplateException("Incorrect length for compressed encoding");
-                }
-                break;
-            }
-            case 0x04: // uncompressed
-            case 0x06: // hybrid
-            case 0x07: // hybrid
-            {
-                if (encoded.length != (2 * expectedLength + 1))
-                {
-                    throw new BadCertTemplateException("Incorrect length for uncompressed/hybrid encoding");
-                }
-                break;
-            }
-            default:
-                throw new BadCertTemplateException("Invalid point encoding 0x" + Integer.toString(encoded[0], 16));
-        }
-    }
-
-    private static boolean satisfy(int len, String paramName, KeyParamRanges ranges)
-    {
-        List<KeyParamRange> rangeList = ranges.getRanges(paramName);
-        if(rangeList == null || rangeList.isEmpty())
-        {
-            return true;
-        }
-
-        for(KeyParamRange range : rangeList)
-        {
-            if(range.match(len))
-            {
-                return true;
-            }
-        }
-
-        return false;
     }
 
     @Override
@@ -1362,7 +1229,7 @@ public class DefaultX509CertProfile extends AbstractX509CertProfile
                     for(int i = 0; i < n; i++)
                     {
                         String value = SecurityUtil.rdnValueToString(rdns[i].getFirst().getValue());
-                        names[i] = createGeneralName(value, allowedSubjectAltNameModes);
+                        names[i] = XmlX509CertProfileUtil.createGeneralName(value, allowedSubjectAltNameModes);
                     }
                     extension = createExtension(extensionType, occurence.isCritical(), new GeneralNames(names));
                 }
@@ -1438,7 +1305,7 @@ public class DefaultX509CertProfile extends AbstractX509CertProfile
 
                             String accessLocation = pairs.getValue(identifier);
 
-                            GeneralName location = createGeneralName(accessLocation, generalNameModes);
+                            GeneralName location = XmlX509CertProfileUtil.createGeneralName(accessLocation, generalNameModes);
                             AccessDescription accessDescription = new AccessDescription(accessMethod, location);
                             vector.add(accessDescription);
                         } catch(BadCertTemplateException e)
@@ -1591,189 +1458,6 @@ public class DefaultX509CertProfile extends AbstractX509CertProfile
         return akiOption == null ? false : akiOption.isIncludeIssuerAndSerial();
     }
 
-    private static List<CertificatePolicyInformation> buildCertificatePolicies(ExtensionsType.CertificatePolicies type)
-    {
-        List<CertificatePolicyInformationType> policyPairs = type.getCertificatePolicyInformation();
-        if(policyPairs == null || policyPairs.isEmpty())
-        {
-            return null;
-        }
-
-        List<CertificatePolicyInformation> policies = new ArrayList<CertificatePolicyInformation>(policyPairs.size());
-        for(CertificatePolicyInformationType policyPair : policyPairs)
-        {
-            List<CertificatePolicyQualifier> qualifiers = null;
-
-            PolicyQualifiers policyQualifiers = policyPair.getPolicyQualifiers();
-            if(policyQualifiers != null)
-            {
-                List<JAXBElement<String>> cpsUriOrUserNotice = policyQualifiers.getCpsUriOrUserNotice();
-
-                qualifiers = new ArrayList<CertificatePolicyQualifier>(cpsUriOrUserNotice.size());
-                for(JAXBElement<String> element : cpsUriOrUserNotice)
-                {
-                    String elementValue = element.getValue();
-                    CertificatePolicyQualifier qualifier = null;
-                    String elementName = element.getName().getLocalPart();
-                    if("cpsUri".equals(elementName))
-                    {
-                        qualifier = CertificatePolicyQualifier.getInstanceForCpsUri(elementValue);
-                    }
-                    else
-                    {
-                        qualifier = CertificatePolicyQualifier.getInstanceForUserNotice(elementValue);
-                    }
-                    qualifiers.add(qualifier);
-                }
-            }
-
-            CertificatePolicyInformation cpi = new CertificatePolicyInformation(
-                    policyPair.getPolicyIdentifier().getValue(), qualifiers);
-
-            policies.add(cpi);
-        }
-
-        return policies;
-    }
-
-    private static PolicyMappings buildPolicyMappings(
-            org.xipki.ca.server.certprofile.x509.jaxb.ExtensionsType.PolicyMappings type)
-    {
-        List<PolicyIdMappingType> mappings = type.getMapping();
-        final int n = mappings.size();
-
-        CertPolicyId[] issuerDomainPolicy = new CertPolicyId[n];
-        CertPolicyId[] subjectDomainPolicy = new CertPolicyId[n];
-
-        for(int i = 0; i < n; i++)
-        {
-            PolicyIdMappingType mapping = mappings.get(i);
-            ASN1ObjectIdentifier oid = new ASN1ObjectIdentifier(mapping.getIssuerDomainPolicy().getValue());
-            issuerDomainPolicy[i] = CertPolicyId.getInstance(oid);
-
-            oid = new ASN1ObjectIdentifier(mapping.getSubjectDomainPolicy().getValue());
-            subjectDomainPolicy[i] = CertPolicyId.getInstance(oid);
-        }
-
-        return new PolicyMappings(issuerDomainPolicy, subjectDomainPolicy);
-    }
-
-    private static NameConstraints buildNameConstrains(
-            org.xipki.ca.server.certprofile.x509.jaxb.ExtensionsType.NameConstraints type)
-    throws CertProfileException
-    {
-        GeneralSubtree[] permitted = buildGeneralSubtrees(type.getPermittedSubtrees());
-        GeneralSubtree[] excluded = buildGeneralSubtrees(type.getExcludedSubtrees());
-        if(permitted == null && excluded == null)
-        {
-            return null;
-        }
-        return new NameConstraints(permitted, excluded);
-    }
-
-    private static GeneralSubtree[] buildGeneralSubtrees(GeneralSubtreesType subtrees)
-    throws CertProfileException
-    {
-        if(subtrees == null || subtrees.getBase().isEmpty())
-        {
-            return null;
-        }
-
-        List<GeneralSubtreeBaseType> list = subtrees.getBase();
-        final int n = list.size();
-        GeneralSubtree[] ret = new GeneralSubtree[n];
-        for(int i = 0; i < n; i++)
-        {
-            ret[i] = buildGeneralSubtree(list.get(i));
-        }
-
-        return ret;
-    }
-
-    private static GeneralSubtree buildGeneralSubtree(GeneralSubtreeBaseType type)
-    throws CertProfileException
-    {
-        GeneralName base = null;
-        if(type.getDirectoryName() != null)
-        {
-            base = new GeneralName(SecurityUtil.reverse(
-                    new X500Name(type.getDirectoryName())));
-        }
-        else if(type.getDNSName() != null)
-        {
-            base = new GeneralName(GeneralName.dNSName, type.getDNSName());
-        }
-        else if(type.getIpAddress() != null)
-        {
-            base = new GeneralName(GeneralName.iPAddress, type.getIpAddress());
-        }
-        else if(type.getRfc822Name() != null)
-        {
-            base = new GeneralName(GeneralName.rfc822Name, type.getRfc822Name());
-        }
-        else if(type.getUri() != null)
-        {
-            base = new GeneralName(GeneralName.uniformResourceIdentifier, type.getUri());
-        }
-        else
-        {
-            throw new RuntimeException("should not reach here");
-        }
-
-        Integer i = type.getMinimum();
-        if(i != null && i < 0)
-        {
-            throw new CertProfileException("negative minimum is not allowed: " + i);
-        }
-
-        BigInteger minimum = (i == null) ? null : BigInteger.valueOf(i.intValue());
-
-        i = type.getMaximum();
-        if(i != null && i < 0)
-        {
-            throw new CertProfileException("negative maximum is not allowed: " + i);
-        }
-
-        BigInteger maximum = (i == null) ? null : BigInteger.valueOf(i.intValue());
-
-        return new GeneralSubtree(base, minimum, maximum);
-    }
-
-    private static ASN1Sequence buildPolicyConstrains(PolicyConstraints type)
-    throws CertProfileException
-    {
-        Integer requireExplicitPolicy = type.getRequireExplicitPolicy();
-        if(requireExplicitPolicy != null && requireExplicitPolicy < 0)
-        {
-            throw new CertProfileException("negative requireExplicitPolicy is not allowed: " + requireExplicitPolicy);
-        }
-
-        Integer inhibitPolicyMapping = type.getInhibitPolicyMapping();
-        if(inhibitPolicyMapping != null && inhibitPolicyMapping < 0)
-        {
-            throw new CertProfileException("negative inhibitPolicyMapping is not allowed: " + inhibitPolicyMapping);
-        }
-
-        if(requireExplicitPolicy == null && inhibitPolicyMapping == null)
-        {
-            return null;
-        }
-
-        final boolean explicit = false;
-        ASN1EncodableVector vec = new ASN1EncodableVector();
-        if (requireExplicitPolicy != null)
-        {
-            vec.add(new DERTaggedObject(explicit, 0, new ASN1Integer(BigInteger.valueOf(requireExplicitPolicy))));
-        }
-
-        if (inhibitPolicyMapping != null)
-        {
-            vec.add(new DERTaggedObject(explicit, 1, new ASN1Integer(BigInteger.valueOf(inhibitPolicyMapping))));
-        }
-
-        return new DERSequence(vec);
-    }
-
     @Override
     public Set<RDNOccurrence> getSubjectDNSubset()
     {
@@ -1784,16 +1468,6 @@ public class DefaultX509CertProfile extends AbstractX509CertProfile
     public SpecialX509CertProfileBehavior getSpecialCertProfileBehavior()
     {
         return specialBehavior;
-    }
-
-    private static boolean getBoolean(Boolean b, boolean dfltValue)
-    {
-        return b == null ? dfltValue : b.booleanValue();
-    }
-
-    private static int getInt(Integer i, int dfltValue)
-    {
-        return i == null ? dfltValue : i.intValue();
     }
 
     private ExtensionTuple createAdmission(boolean critical,
@@ -1911,177 +1585,14 @@ public class DefaultX509CertProfile extends AbstractX509CertProfile
         return serialNumberInReqPermitted;
     }
 
-    private static GeneralName createGeneralName(String value, Set<GeneralNameMode> modes)
-    throws BadCertTemplateException
+    private static boolean getBoolean(Boolean b, boolean dfltValue)
     {
-        int idxTagSep = value.indexOf(GENERALNAME_SEP);
-        if(idxTagSep == -1 || idxTagSep == 0 || idxTagSep == value.length() - 1)
-        {
-            throw new BadCertTemplateException("invalid generalName " + value);
-        }
-        String s = value.substring(0, idxTagSep);
-
-        int tag;
-        try
-        {
-            tag = Integer.parseInt(s);
-        }catch(NumberFormatException e)
-        {
-            throw new BadCertTemplateException("invalid generalName tag " + s);
-        }
-
-        GeneralNameMode mode = null;
-
-        for(GeneralNameMode m : modes)
-        {
-            if(m.getTag().getTag() == tag)
-            {
-                mode = m;
-                break;
-            }
-        }
-
-        if(mode == null)
-        {
-            throw new BadCertTemplateException("generalName tag " + tag + " is not allowed");
-        }
-
-        String name = value.substring(idxTagSep + 1);
-
-        switch(mode.getTag())
-        {
-            case otherName:
-            {
-                int idxSep = name.indexOf(GENERALNAME_SEP);
-                if(idxSep == -1 || idxSep == 0 || idxSep == name.length() - 1)
-                {
-                    throw new BadCertTemplateException("invalid otherName " + name);
-                }
-                String otherTypeOid = name.substring(0, idxSep);
-                ASN1ObjectIdentifier type = new ASN1ObjectIdentifier(otherTypeOid);
-                if(mode.getAllowedTypes().contains(type) == false)
-                {
-                    throw new BadCertTemplateException("otherName.type " + otherTypeOid + " is not allowed");
-                }
-                String otherValue = name.substring(idxSep + 1);
-
-                ASN1EncodableVector vector = new ASN1EncodableVector();
-                vector.add(type);
-                vector.add(new DERTaggedObject(true, 0, new DERUTF8String(otherValue)));
-                DERSequence seq = new DERSequence(vector);
-
-                return new GeneralName(GeneralName.otherName, seq);
-            }
-            case rfc822Name:
-                return new GeneralName(tag, name);
-            case dNSName:
-                return new GeneralName(tag, name);
-            case directoryName:
-            {
-                X500Name x500Name = SecurityUtil.reverse(new X500Name(name));
-                return new GeneralName(GeneralName.directoryName, x500Name);
-            }
-            case ediPartyName:
-            {
-                int idxSep = name.indexOf(GENERALNAME_SEP);
-                if(idxSep == -1 || idxSep == name.length() - 1)
-                {
-                    throw new BadCertTemplateException("invalid ediPartyName " + name);
-                }
-                String nameAssigner = idxSep == 0 ? null : name.substring(0, idxSep);
-                String partyName = name.substring(idxSep + 1);
-                ASN1EncodableVector vector = new ASN1EncodableVector();
-                if(nameAssigner != null)
-                {
-                    vector.add(new DERTaggedObject(false, 0, new DirectoryString(nameAssigner)));
-                }
-                vector.add(new DERTaggedObject(false, 1, new DirectoryString(partyName)));
-                ASN1Sequence seq = new DERSequence(vector);
-                return new GeneralName(GeneralName.ediPartyName, seq);
-            }
-            case uniformResourceIdentifier:
-                return new GeneralName(tag, name);
-            case iPAddress:
-                return new GeneralName(tag, name);
-            case registeredID:
-                return new GeneralName(tag, name);
-            default:
-                throw new RuntimeException("should not reach here");
-        }
+        return b == null ? dfltValue : b.booleanValue();
     }
 
-    private static Set<GeneralNameMode> buildGeneralNameMode(GeneralNameType name)
+    private static int getInt(Integer i, int dfltValue)
     {
-        Set<GeneralNameMode> ret = new HashSet<>();
-        if(name.getOtherName() != null)
-        {
-            List<OidWithDescType> list = name.getOtherName().getType();
-            Set<ASN1ObjectIdentifier> set = new HashSet<>();
-            for(OidWithDescType entry : list)
-            {
-                set.add(new ASN1ObjectIdentifier(entry.getValue()));
-            }
-            ret.add(new GeneralNameMode(GeneralNameTag.otherName, set));
-        }
-
-        if(name.getRfc822Name() != null)
-        {
-            ret.add(new GeneralNameMode(GeneralNameTag.rfc822Name));
-        }
-
-        if(name.getDNSName() != null)
-        {
-            ret.add(new GeneralNameMode(GeneralNameTag.dNSName));
-        }
-
-        if(name.getDirectoryName() != null)
-        {
-            ret.add(new GeneralNameMode(GeneralNameTag.directoryName));
-        }
-
-        if(name.getEdiPartyName() != null)
-        {
-            ret.add(new GeneralNameMode(GeneralNameTag.ediPartyName));
-        }
-
-        if(name.getUniformResourceIdentifier() != null)
-        {
-            ret.add(new GeneralNameMode(GeneralNameTag.uniformResourceIdentifier));
-        }
-
-        if(name.getIPAddress() != null)
-        {
-            ret.add(new GeneralNameMode(GeneralNameTag.iPAddress));
-        }
-
-        if(name.getRegisteredID() != null)
-        {
-            ret.add(new GeneralNameMode(GeneralNameTag.registeredID));
-        }
-
-        return ret;
-    }
-
-    private static List<AddText> buildAddText(List<AddTextType> types)
-    {
-        if(types == null || types.isEmpty())
-        {
-            return null;
-        }
-
-        List<AddText> ret = new ArrayList<>(types.size());
-        for(AddTextType type : types)
-        {
-            Condition c = createCondition(type.getCondition());
-            ret.add(new AddText(c, type.getText()));
-        }
-
-        return ret;
-    }
-
-    private static Condition createCondition(ConditionType type)
-    {
-        return type == null ? null : new Condition(type);
+        return i == null ? dfltValue : i.intValue();
     }
 
 }

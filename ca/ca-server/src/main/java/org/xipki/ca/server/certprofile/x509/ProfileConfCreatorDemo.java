@@ -60,9 +60,10 @@ import org.xipki.ca.server.certprofile.x509.jaxb.AlgorithmType;
 import org.xipki.ca.server.certprofile.x509.jaxb.CertificatePolicyInformationType;
 import org.xipki.ca.server.certprofile.x509.jaxb.ConditionType;
 import org.xipki.ca.server.certprofile.x509.jaxb.ConstantExtensionType;
-import org.xipki.ca.server.certprofile.x509.jaxb.CurveType;
-import org.xipki.ca.server.certprofile.x509.jaxb.CurveType.Encodings;
-import org.xipki.ca.server.certprofile.x509.jaxb.ECParameterType;
+import org.xipki.ca.server.certprofile.x509.jaxb.DSAParametersType;
+import org.xipki.ca.server.certprofile.x509.jaxb.ECParametersType;
+import org.xipki.ca.server.certprofile.x509.jaxb.ECParametersType.Curves;
+import org.xipki.ca.server.certprofile.x509.jaxb.ECParametersType.PointEncodings;
 import org.xipki.ca.server.certprofile.x509.jaxb.EnvParamType;
 import org.xipki.ca.server.certprofile.x509.jaxb.ExtensionType;
 import org.xipki.ca.server.certprofile.x509.jaxb.ExtensionsType;
@@ -84,12 +85,14 @@ import org.xipki.ca.server.certprofile.x509.jaxb.NameValueType;
 import org.xipki.ca.server.certprofile.x509.jaxb.ObjectFactory;
 import org.xipki.ca.server.certprofile.x509.jaxb.OidWithDescType;
 import org.xipki.ca.server.certprofile.x509.jaxb.OperatorType;
-import org.xipki.ca.server.certprofile.x509.jaxb.ParameterType;
 import org.xipki.ca.server.certprofile.x509.jaxb.PolicyIdMappingType;
 import org.xipki.ca.server.certprofile.x509.jaxb.ProfileType;
 import org.xipki.ca.server.certprofile.x509.jaxb.ProfileType.KeyAlgorithms;
 import org.xipki.ca.server.certprofile.x509.jaxb.ProfileType.Parameters;
 import org.xipki.ca.server.certprofile.x509.jaxb.ProfileType.Subject;
+import org.xipki.ca.server.certprofile.x509.jaxb.RSAParametersType;
+import org.xipki.ca.server.certprofile.x509.jaxb.RangeType;
+import org.xipki.ca.server.certprofile.x509.jaxb.RangesType;
 import org.xipki.ca.server.certprofile.x509.jaxb.RdnType;
 import org.xipki.ca.server.certprofile.x509.jaxb.SubjectInfoAccessType;
 import org.xipki.ca.server.certprofile.x509.jaxb.SubjectInfoAccessType.Access;
@@ -934,7 +937,7 @@ public class ProfileConfCreatorDemo
         subject.setDnBackwards(false);
 
         // Key
-        profile.setKeyAlgorithms(createKeyAlgorithms());
+        profile.setKeyAlgorithms(createKeyAlgorithms(ca));
 
         // AllowedClientExtensions
         profile.setAllowedClientExtensions(null);
@@ -951,7 +954,7 @@ public class ProfileConfCreatorDemo
         return profile;
     }
 
-    private static KeyAlgorithms createKeyAlgorithms()
+    private static KeyAlgorithms createKeyAlgorithms(boolean ca)
     {
         KeyAlgorithms ret = new KeyAlgorithms();
         List<AlgorithmType> list = ret.getAlgorithm();
@@ -961,18 +964,20 @@ public class ProfileConfCreatorDemo
             AlgorithmType rsa = new AlgorithmType();
             list.add(rsa);
 
-            rsa.setAlgorithm(createOidType(PKCSObjectIdentifiers.rsaEncryption, "RSA"));
-            List<ParameterType> params = rsa.getParameter();
+            rsa.getAlgorithm().add(createOidType(PKCSObjectIdentifiers.rsaEncryption, "RSA"));
+            rsa.setRSAParameters(new RSAParametersType());
+            RangesType ranges = new RangesType();
+            rsa.getRSAParameters().setModulusLength(ranges);
 
-            ParameterType param = new ParameterType();
-            params.add(param);
-            param.setName(DefaultX509CertProfile.MODULUS_LENGTH);
+            List<RangeType> modulusLengths = ranges.getRange();
+
+            RangeType param = new RangeType();
+            modulusLengths.add(param);
             param.setMin(2048);
             param.setMax(2048);
 
-            param = new ParameterType();
-            param.setName(DefaultX509CertProfile.MODULUS_LENGTH);
-            params.add(param);
+            param = new RangeType();
+            modulusLengths.add(param);
             param.setMin(3072);
             param.setMax(3072);
         }
@@ -982,36 +987,39 @@ public class ProfileConfCreatorDemo
             AlgorithmType dsa = new AlgorithmType();
             list.add(dsa);
 
-            dsa.setAlgorithm(createOidType(X9ObjectIdentifiers.id_dsa, "DSA"));
-            List<ParameterType> params = dsa.getParameter();
+            dsa.getAlgorithm().add(createOidType(X9ObjectIdentifiers.id_dsa, "DSA"));
+            dsa.setDSAParameters(new DSAParametersType());
 
-            ParameterType param = new ParameterType();
-            params.add(param);
-            param.setName(DefaultX509CertProfile.P_LENGTH);
+            RangesType ranges = new RangesType();
+            dsa.getDSAParameters().setPLength(ranges);
+
+            List<RangeType> pLengths = ranges.getRange();
+
+            RangeType param = new RangeType();
+            pLengths.add(param);
             param.setMin(1024);
             param.setMax(1024);
 
-            param = new ParameterType();
-            params.add(param);
-            param.setName(DefaultX509CertProfile.P_LENGTH);
+            param = new RangeType();
+            pLengths.add(param);
             param.setMin(2048);
             param.setMax(2048);
 
-            param = new ParameterType();
-            params.add(param);
-            param.setName(DefaultX509CertProfile.Q_LENGTH);
+            ranges = new RangesType();
+            dsa.getDSAParameters().setQLength(ranges);
+            List<RangeType> qLengths = ranges.getRange();
+            param = new RangeType();
+            qLengths.add(param);
             param.setMin(160);
             param.setMax(160);
 
-            param = new ParameterType();
-            params.add(param);
-            param.setName(DefaultX509CertProfile.Q_LENGTH);
+            param = new RangeType();
+            qLengths.add(param);
             param.setMin(224);
             param.setMax(224);
 
-            param = new ParameterType();
-            params.add(param);
-            param.setName(DefaultX509CertProfile.Q_LENGTH);
+            param = new RangeType();
+            qLengths.add(param);
             param.setMin(256);
             param.setMax(256);
         }
@@ -1019,29 +1027,31 @@ public class ProfileConfCreatorDemo
         // EC
         {
             AlgorithmType ec = new AlgorithmType();
-            ec.setAlgorithm(createOidType(X9ObjectIdentifiers.id_ecPublicKey, "EC"));
+            ec.getAlgorithm().add(createOidType(X9ObjectIdentifiers.id_ecPublicKey, "EC"));
 
             list.add(ec);
 
-            ECParameterType params = new ECParameterType();
-            ec.setEcParameter(params);
+            ec.setECParameters(new ECParametersType());
+            Curves curves = new Curves();
+            ec.getECParameters().setCurves(curves);
 
             ASN1ObjectIdentifier[] curveIds = new ASN1ObjectIdentifier[]
             {
-                    SECObjectIdentifiers.secp256r1, TeleTrusTObjectIdentifiers.brainpoolP256r1};
+                SECObjectIdentifiers.secp256r1, TeleTrusTObjectIdentifiers.brainpoolP256r1
+            };
+
+            boolean allowImplicitCA = (ca == false);
+            ec.getECParameters().setImplicitCA(allowImplicitCA);
 
             for(ASN1ObjectIdentifier curveId : curveIds)
             {
                 String name = SecurityUtil.getCurveName(curveId);
-                CurveType curve = new CurveType();
-                curve.setOid(createOidType(curveId, name));
-
-                Encodings encodings = new Encodings();
-                encodings.getEncoding().add((byte) 4); // uncompressed
-                curve.setEncodings(encodings);
-
-                params.getCurve().add(curve);
+                curves.getCurve().add(createOidType(curveId, name));
             }
+
+            ec.getECParameters().setPointEncodings(new PointEncodings());
+            final Byte unpressed = 4;
+            ec.getECParameters().getPointEncodings().getPointEncoding().add(unpressed);
         }
 
         return ret;

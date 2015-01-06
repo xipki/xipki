@@ -155,6 +155,7 @@ public class IaikP11Slot implements P11WritableSlot
         private final SubjectPublicKeyInfo publicKeyInfo;
 
         public PrivateKeyAndPKInfo(PrivateKey privateKey, SubjectPublicKeyInfo publicKeyInfo)
+        throws InvalidKeySpecException
         {
             super();
             this.privateKey = privateKey;
