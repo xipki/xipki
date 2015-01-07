@@ -35,6 +35,8 @@
 
 package org.xipki.console.karaf;
 
+import java.awt.Color;
+import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.Panel;
 import java.awt.event.ActionEvent;
@@ -62,9 +64,15 @@ class SecurePasswordInputPanel extends Panel
 
     private static final long serialVersionUID = 1L;
 
+    private static final String BACKSPACE = "\u21E6";
+    private static final String CAPS = "\u21E7";
+    private static final String CLEAR = "Clear";
+    private static final String OK = "OK";
+
     private final JPasswordField passwordField;
 
     private static final Map<Integer, String[]> keysMap = new HashMap<>();
+    private final Set<JButton> buttons = new HashSet<>();
 
     static
     {
@@ -72,9 +80,9 @@ class SecurePasswordInputPanel extends Panel
         keysMap.put(i++, new String[]{"1", "2", "3", "4", "5", "6", "7", "8", "9", "0"});
         keysMap.put(i++, new String[]{"!", "@", "§" , "#", "$", "%", "^", "&", "*", "(", ")", "{", "}"});
         keysMap.put(i++, new String[]{"'", "\"", "=", "_", ":", ";", "?", "~", "|", ",", ".", "-", "/"});
-        keysMap.put(i++, new String[]{"Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P"});
-        keysMap.put(i++, new String[]{"A", "S", "D", "F", "G", "H", "J", "K", "J", "BackSpace"});
-        keysMap.put(i++, new String[]{"Shift", "Z", "X", "C", "V", "B", "N", "M", "Clear"});
+        keysMap.put(i++, new String[]{"q", "w", "e", "r", "z", "y", "u", "i", "o", "p"});
+        keysMap.put(i++, new String[]{"a", "s", "d", "f", "g", "h", "j", "k", "j", BACKSPACE});
+        keysMap.put(i++, new String[]{CAPS, "z", "x", "c", "v", "b", "n", "m", CLEAR});
     }
 
     private SecurePasswordInputPanel()
@@ -104,8 +112,21 @@ class SecurePasswordInputPanel extends Panel
             JPanel panel = new JPanel();
             for (int column = 0; column < keys.length; column++)
             {
-                JButton button = new JButton(keys[column]);
-                button.putClientProperty("key", keys[column].toLowerCase());
+                String text = keys[column];
+                JButton button = new JButton(text);
+                button.setFont(button.getFont().deriveFont(Font.TRUETYPE_FONT));
+                if(CLEAR.equalsIgnoreCase(text))
+                {
+                    button.setBackground(Color.red);
+                } else if(CAPS.equalsIgnoreCase(text) || BACKSPACE.equalsIgnoreCase(text))
+                {
+                    button.setBackground(Color.lightGray);
+                } else
+                {
+                    buttons.add(button);
+                }
+
+                button.putClientProperty("key", text);
                 button.addActionListener(new MyActionListener());
                 panel.add(button);
             }
@@ -121,7 +142,7 @@ class SecurePasswordInputPanel extends Panel
     }
 
     private String password = "";
-    private boolean lastKeyShift = false;
+    private boolean caps = false;
 
     public class MyActionListener implements ActionListener
     {
@@ -131,29 +152,34 @@ class SecurePasswordInputPanel extends Panel
             JButton btn = (JButton) e.getSource();
             String pressedKey = (String) btn.getClientProperty("key");
 
-            if("shift".equals(pressedKey))
+            if(CAPS.equals(pressedKey))
             {
-                lastKeyShift = true;
+                for(JButton button : buttons)
+                {
+                    String text = button.getText();
+                    text = caps ? text.toLowerCase() : text.toUpperCase();
+                    button.setText(text);
+                }
+                caps = !caps;
             }
             else
             {
-                if("backspace".equals(pressedKey))
+                if(BACKSPACE.equals(pressedKey))
                 {
                     if(password.length() > 0)
                     {
                         password = password.substring(0, password.length() - 1);
                     }
                 }
-                else if("clear".equals(pressedKey))
+                else if(CLEAR.equals(pressedKey))
                 {
                     password = "";
                 }
                 else
                 {
-                    password += lastKeyShift ? pressedKey.toUpperCase() : pressedKey;
+                    password += btn.getText();
                 }
                 passwordField.setText(password);
-                lastKeyShift= false;
             }
         }
     }
@@ -180,7 +206,7 @@ class SecurePasswordInputPanel extends Panel
         try
         {
             SecurePasswordInputPanel gui = new SecurePasswordInputPanel();
-            String[] options = new String[]{"OK"};
+            String[] options = new String[]{OK};
             if(prompt == null || prompt.isEmpty())
             {
                 prompt = "Password required";
