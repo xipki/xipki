@@ -71,7 +71,7 @@ import org.xipki.common.StringUtil;
  * @author Lijun Liao
  */
 
-public abstract class AbstractX509CertProfile
+public abstract class BaseX509CertProfile
 extends X509CertProfile
 {
     private static Set<String> countryCodes;
@@ -130,7 +130,7 @@ extends X509CertProfile
         }
     }
 
-    protected AbstractX509CertProfile()
+    protected BaseX509CertProfile()
     {
     }
 

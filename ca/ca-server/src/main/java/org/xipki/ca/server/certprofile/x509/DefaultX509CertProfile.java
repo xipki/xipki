@@ -50,7 +50,6 @@ import java.util.regex.Pattern;
 import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1EncodableVector;
 import org.bouncycastle.asn1.ASN1Integer;
-import org.bouncycastle.asn1.ASN1Null;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.ASN1OctetString;
 import org.bouncycastle.asn1.ASN1Sequence;
@@ -84,7 +83,7 @@ import org.xipki.ca.api.profile.ExtensionTuple;
 import org.xipki.ca.api.profile.ExtensionTuples;
 import org.xipki.ca.api.profile.RDNOccurrence;
 import org.xipki.ca.api.profile.SubjectInfo;
-import org.xipki.ca.api.profile.x509.AbstractX509CertProfile;
+import org.xipki.ca.api.profile.x509.BaseX509CertProfile;
 import org.xipki.ca.api.profile.x509.CertificatePolicyInformation;
 import org.xipki.ca.api.profile.x509.KeyUsage;
 import org.xipki.ca.api.profile.x509.SpecialX509CertProfileBehavior;
@@ -116,11 +115,11 @@ import org.xipki.ca.server.certprofile.x509.jaxb.ExtensionsType.PolicyConstraint
 import org.xipki.ca.server.certprofile.x509.jaxb.KeyUsageType;
 import org.xipki.ca.server.certprofile.x509.jaxb.NameValueType;
 import org.xipki.ca.server.certprofile.x509.jaxb.OidWithDescType;
-import org.xipki.ca.server.certprofile.x509.jaxb.ProfileType;
-import org.xipki.ca.server.certprofile.x509.jaxb.ProfileType.AllowedClientExtensions;
-import org.xipki.ca.server.certprofile.x509.jaxb.ProfileType.KeyAlgorithms;
-import org.xipki.ca.server.certprofile.x509.jaxb.ProfileType.Parameters;
-import org.xipki.ca.server.certprofile.x509.jaxb.ProfileType.Subject;
+import org.xipki.ca.server.certprofile.x509.jaxb.X509ProfileType;
+import org.xipki.ca.server.certprofile.x509.jaxb.X509ProfileType.AllowedClientExtensions;
+import org.xipki.ca.server.certprofile.x509.jaxb.X509ProfileType.KeyAlgorithms;
+import org.xipki.ca.server.certprofile.x509.jaxb.X509ProfileType.Parameters;
+import org.xipki.ca.server.certprofile.x509.jaxb.X509ProfileType.Subject;
 import org.xipki.ca.server.certprofile.x509.jaxb.RdnType;
 import org.xipki.ca.server.certprofile.x509.jaxb.SubjectInfoAccessType.Access;
 import org.xipki.common.CmpUtf8Pairs;
@@ -132,7 +131,7 @@ import org.xipki.common.SecurityUtil;
  * @author Lijun Liao
  */
 
-public class DefaultX509CertProfile extends AbstractX509CertProfile
+public class DefaultX509CertProfile extends BaseX509CertProfile
 {
     private static final Logger LOG = LoggerFactory.getLogger(DefaultX509CertProfile.class);
     private static final Set<String> criticalOnlyExtensionTypes;
@@ -140,7 +139,7 @@ public class DefaultX509CertProfile extends AbstractX509CertProfile
     private static final Set<String> caOnlyExtensionTypes;
     private static final Set<ASN1ObjectIdentifier> ignoreRDNs;
 
-    protected ProfileType profileConf;
+    protected X509ProfileType profileConf;
 
     private SpecialX509CertProfileBehavior specialBehavior;
 
@@ -157,6 +156,7 @@ public class DefaultX509CertProfile extends AbstractX509CertProfile
     private boolean raOnly;
     private boolean backwardsSubject;
     private boolean ca;
+    private boolean prefersECImplicitCA;
     private boolean duplicateKeyPermitted;
     private boolean duplicateSubjectPermitted;
     private boolean serialNumberInReqPermitted;
@@ -224,6 +224,7 @@ public class DefaultX509CertProfile extends AbstractX509CertProfile
         raOnly = false;
         backwardsSubject = false;
         ca = false;
+        prefersECImplicitCA = false;
         duplicateKeyPermitted = true;
         duplicateSubjectPermitted = true;
         serialNumberInReqPermitted = true;
@@ -249,12 +250,13 @@ public class DefaultX509CertProfile extends AbstractX509CertProfile
 
         try
         {
-            ProfileType conf = XmlX509CertProfileUtil.parse(data);
+            X509ProfileType conf = XmlX509CertProfileUtil.parse(data);
             this.profileConf = conf;
 
             this.raOnly = getBoolean(conf.isOnlyForRA(), false);
             this.validity = CertValidity.getInstance(conf.getValidity());
             this.ca = conf.isCa();
+            this.prefersECImplicitCA = getBoolean(conf.isPrefersECImplicitCA(), false);
             this.notBeforeMidnight = "midnight".equalsIgnoreCase(conf.getNotBeforeTime());
 
             String specialBehavior = conf.getSpecialBehavior();
@@ -292,7 +294,6 @@ public class DefaultX509CertProfile extends AbstractX509CertProfile
                         keyParamsOption = option;
 
                         ECParametersType params = type.getECParameters();
-                        option.setImplicitCAAllowed(params.isImplicitCA());
                         if(params.getCurves() != null)
                         {
                             Curves curves = params.getCurves();
@@ -879,16 +880,7 @@ public class DefaultX509CertProfile extends AbstractX509CertProfile
             ASN1Encodable algParam = publicKey.getAlgorithm().getParameters();
             ASN1ObjectIdentifier curveOid;
 
-            if(algParam instanceof ASN1Null)
-            {
-                if(ecOption.allowsImplicitCA() == false)
-                {
-                    throw new BadCertTemplateException("implicitCA is not permitted");
-                } else
-                {
-                    curveOid = null;
-                }
-            } else if(algParam instanceof ASN1ObjectIdentifier)
+            if(algParam instanceof ASN1ObjectIdentifier)
             {
                 curveOid = (ASN1ObjectIdentifier) algParam;
                 if(ecOption.allowsCurve(curveOid) == false)
@@ -916,19 +908,16 @@ public class DefaultX509CertProfile extends AbstractX509CertProfile
                 }
             }
 
-            if(curveOid != null)
+            try
             {
-                try
-                {
-                    XmlX509CertProfileUtil.checkECSubjectPublicKeyInfo(curveOid, publicKey.getPublicKeyData().getBytes());
-                }catch(BadCertTemplateException e)
-                {
-                    throw e;
-                }catch(Exception e)
-                {
-                    LOG.debug("populateFromPubKeyInfo", e);
-                    throw new BadCertTemplateException("Invalid public key: " + e.getMessage());
-                }
+                XmlX509CertProfileUtil.checkECSubjectPublicKeyInfo(curveOid, publicKey.getPublicKeyData().getBytes());
+            }catch(BadCertTemplateException e)
+            {
+                throw e;
+            }catch(Exception e)
+            {
+                LOG.debug("populateFromPubKeyInfo", e);
+                throw new BadCertTemplateException("Invalid public key: " + e.getMessage());
             }
         } else if(keyParamsOption instanceof RSAParametersOption)
         {
@@ -1405,6 +1394,12 @@ public class DefaultX509CertProfile extends AbstractX509CertProfile
     protected boolean isCa()
     {
         return ca;
+    }
+
+    @Override
+    public boolean prefersECImplicitCA()
+    {
+        return prefersECImplicitCA;
     }
 
     @Override

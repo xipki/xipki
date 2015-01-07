@@ -259,7 +259,6 @@ public class KeyParametersOption
 
     public static class ECParamatersOption extends KeyParametersOption
     {
-        private boolean implicitCAAllowed;
         private Set<ASN1ObjectIdentifier> curveOids;
         private Set<Byte> pointEncodings;
 
@@ -285,16 +284,6 @@ public class KeyParametersOption
         public void setPointEncodings(Set<Byte> pointEncodings)
         {
             this.pointEncodings = pointEncodings;
-        }
-
-        public void setImplicitCAAllowed(boolean implicitCAAllowed)
-        {
-            this.implicitCAAllowed = implicitCAAllowed;
-        }
-
-        public boolean allowsImplicitCA()
-        {
-            return implicitCAAllowed;
         }
 
         public boolean allowsCurve(ASN1ObjectIdentifier curveOid)

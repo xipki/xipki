@@ -45,7 +45,7 @@ import org.xipki.ca.api.profile.ExtensionOccurrence;
  * @author Lijun Liao
  */
 
-public abstract class AbstractCAX509CertProfile extends AbstractX509CertProfile
+public abstract class AbstractCAX509CertProfile extends BaseX509CertProfile
 {
     protected Set<KeyUsage> keyUsages;
 

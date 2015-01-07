@@ -10,8 +10,8 @@
       </jxb:schemaBindings>
     </xs:appinfo>
   </xs:annotation>
-  <xs:element name="profile" type="profileType"/>
-  <xs:complexType name="profileType">
+  <xs:element name="X509Profile" type="X509ProfileType"/>
+  <xs:complexType name="X509ProfileType">
     <xs:sequence>
       <xs:element name="description" type="xs:string" minOccurs="0"/>
       <xs:element name="ca" type="xs:boolean"/>
@@ -43,6 +43,7 @@
           </xs:sequence>
         </xs:complexType>
       </xs:element>
+      <xs:element name="prefersECImplicitCA" type="xs:boolean" minOccurs="0"/>
       <xs:element name="keyAlgorithms" minOccurs="0">
         <xs:complexType>
           <xs:sequence>
@@ -130,7 +131,6 @@
   </xs:complexType>
   <xs:complexType name="ECParametersType">
     <xs:sequence>
-      <xs:element name="implicitCA" type="xs:boolean"/>
       <xs:element name="curves" minOccurs="0">
         <xs:complexType>
           <xs:sequence>
