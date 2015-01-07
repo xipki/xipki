@@ -115,13 +115,13 @@ import org.xipki.ca.server.certprofile.x509.jaxb.ExtensionsType.PolicyConstraint
 import org.xipki.ca.server.certprofile.x509.jaxb.KeyUsageType;
 import org.xipki.ca.server.certprofile.x509.jaxb.NameValueType;
 import org.xipki.ca.server.certprofile.x509.jaxb.OidWithDescType;
+import org.xipki.ca.server.certprofile.x509.jaxb.RdnType;
+import org.xipki.ca.server.certprofile.x509.jaxb.SubjectInfoAccessType.Access;
 import org.xipki.ca.server.certprofile.x509.jaxb.X509ProfileType;
 import org.xipki.ca.server.certprofile.x509.jaxb.X509ProfileType.AllowedClientExtensions;
 import org.xipki.ca.server.certprofile.x509.jaxb.X509ProfileType.KeyAlgorithms;
 import org.xipki.ca.server.certprofile.x509.jaxb.X509ProfileType.Parameters;
 import org.xipki.ca.server.certprofile.x509.jaxb.X509ProfileType.Subject;
-import org.xipki.ca.server.certprofile.x509.jaxb.RdnType;
-import org.xipki.ca.server.certprofile.x509.jaxb.SubjectInfoAccessType.Access;
 import org.xipki.common.CmpUtf8Pairs;
 import org.xipki.common.LogUtil;
 import org.xipki.common.ObjectIdentifiers;
@@ -150,7 +150,6 @@ public class DefaultX509CertProfile extends BaseX509CertProfile
     private Set<RDNOccurrence> subjectDNOccurrences;
     private Map<String, String> parameters;
     private Map<ASN1ObjectIdentifier, ExtensionOccurrence> extensionOccurences;
-    private Map<ASN1ObjectIdentifier, ExtensionOccurrence> additionalExtensionOccurences;
 
     private CertValidity validity;
     private boolean incSerialNrIfSubjectExists;
@@ -217,7 +216,6 @@ public class DefaultX509CertProfile extends BaseX509CertProfile
         subjectDNOptions = null;
         subjectDNOccurrences = null;
         extensionOccurences = null;
-        additionalExtensionOccurences = null;
         validity = null;
         notBeforeMidnight = false;
         akiOption = null;
@@ -489,6 +487,20 @@ public class DefaultX509CertProfile extends BaseX509CertProfile
                             throw new RuntimeException("should not reach here");
                         }
                     }
+                    if(ca)
+                    {
+                        if(set.contains(KeyUsage.keyCertSign) == false)
+                        {
+                            throw new CertProfileException("Required KeyUsage keyCertSign is not configured");
+                        }
+                    } else
+                    {
+                        if(set.contains(KeyUsage.keyCertSign))
+                        {
+                            throw new CertProfileException("KeyUsage keyCertSign is configured but not permitted");
+                        }
+                    }
+
                     Set<KeyUsage> keyusageSet = Collections.unmodifiableSet(set);
 
                     Condition condition = XmlX509CertProfileUtil.createCondition(t.getCondition());
@@ -558,15 +570,6 @@ public class DefaultX509CertProfile extends BaseX509CertProfile
             }
 
             this.extensionOccurences = Collections.unmodifiableMap(occurrences);
-
-            occurrences = new HashMap<>(occurrences);
-            occurrences.remove(Extension.authorityKeyIdentifier);
-            occurrences.remove(Extension.subjectKeyIdentifier);
-            occurrences.remove(Extension.authorityInfoAccess);
-            occurrences.remove(Extension.cRLDistributionPoints);
-            occurrences.remove(Extension.freshestCRL);
-            occurrences.remove(Extension.issuerAlternativeName);
-            this.additionalExtensionOccurences = Collections.unmodifiableMap(occurrences);
 
             // AuthorityKeyIdentifier
             if(extensionOccurences.containsKey(Extension.authorityKeyIdentifier))
@@ -813,42 +816,6 @@ public class DefaultX509CertProfile extends BaseX509CertProfile
     public CertValidity getValidity()
     {
         return validity;
-    }
-
-    @Override
-    public ExtensionOccurrence getOccurenceOfAuthorityKeyIdentifier()
-    {
-        return akiOption == null ? null : akiOption.getOccurence();
-    }
-
-    @Override
-    public ExtensionOccurrence getOccurenceOfSubjectKeyIdentifier()
-    {
-        return extensionOccurences.get(Extension.subjectKeyIdentifier);
-    }
-
-    @Override
-    public ExtensionOccurrence getOccurenceOfCRLDistributinPoints()
-    {
-        return extensionOccurences.get(Extension.cRLDistributionPoints);
-    }
-
-    @Override
-    public ExtensionOccurrence getOccurenceOfFreshestCRL()
-    {
-        return extensionOccurences.get(Extension.freshestCRL);
-    }
-
-    @Override
-    public ExtensionOccurrence getOccurenceOfAuthorityInfoAccess()
-    {
-        return extensionOccurences.get(Extension.authorityInfoAccess);
-    }
-
-    @Override
-    public ExtensionOccurrence getOccurenceOfIssuerAltName()
-    {
-        return extensionOccurences.get(Extension.issuerAlternativeName);
     }
 
     @Override
@@ -1178,16 +1145,18 @@ public class DefaultX509CertProfile extends BaseX509CertProfile
     }
 
     @Override
-    public ExtensionTuples getExtensions(X500Name requestedSubject, Extensions requestedExtensions)
+    public ExtensionTuples getExtensions(
+            Map<ASN1ObjectIdentifier, ExtensionOccurrence> extensionOccurences,
+            X500Name requestedSubject, Extensions requestedExtensions)
     throws CertProfileException, BadCertTemplateException
     {
-        ExtensionTuples tuples = super.getExtensions(requestedSubject, requestedExtensions);
-
-        Map<ASN1ObjectIdentifier, ExtensionOccurrence> occurences = new HashMap<>(getAdditionalExtensionOccurences());
-        if(occurences == null || occurences.isEmpty())
+        ExtensionTuples tuples = new ExtensionTuples();
+        if(extensionOccurences == null || extensionOccurences.isEmpty())
         {
             return tuples;
         }
+
+        Map<ASN1ObjectIdentifier, ExtensionOccurrence> occurences = new HashMap<>(extensionOccurences);
 
         // AuthorityKeyIdentifier
         // processed by the CA
@@ -1196,8 +1165,7 @@ public class DefaultX509CertProfile extends BaseX509CertProfile
         // processed by the CA
 
         // KeyUsage
-        // processed by the parent class
-        occurences.remove(Extension.keyUsage);
+        // processed by the CA
 
         // CertificatePolicies
         processExtension(tuples, occurences, Extension.certificatePolicies, certificatePolicies, requestedExtensions);
@@ -1242,8 +1210,7 @@ public class DefaultX509CertProfile extends BaseX509CertProfile
         // Will not supported
 
         // Basic Constraints
-        // processed by the parent class
-        occurences.remove(Extension.basicConstraints);
+        // processed by the CA
 
         // Name Constraints
         processExtension(tuples, occurences, Extension.nameConstraints, nameConstraints, requestedExtensions);
@@ -1252,8 +1219,7 @@ public class DefaultX509CertProfile extends BaseX509CertProfile
         processExtension(tuples, occurences, Extension.policyConstraints, policyConstraints, requestedExtensions);
 
         // ExtendedKeyUsage
-        // processed by the parent class
-        occurences.remove(Extension.extendedKeyUsage);
+        // processed by CA
 
         // CRL Distribution Points
         // processed by the CA
@@ -1382,19 +1348,19 @@ public class DefaultX509CertProfile extends BaseX509CertProfile
     }
 
     @Override
-    protected Set<KeyUsage> getKeyUsage()
+    public Set<KeyUsage> getKeyUsage()
     {
         return keyusages == null ? null : keyusages.getKeyusage(parameterResolver);
     }
 
     @Override
-    protected Set<ASN1ObjectIdentifier> getExtendedKeyUsages()
+    public Set<ASN1ObjectIdentifier> getExtendedKeyUsages()
     {
         return extendedKeyusages == null ? null : extendedKeyusages.getExtKeyusage(parameterResolver);
     }
 
     @Override
-    protected boolean isCa()
+    public boolean isCA()
     {
         return ca;
     }
@@ -1406,7 +1372,7 @@ public class DefaultX509CertProfile extends BaseX509CertProfile
     }
 
     @Override
-    protected Integer getPathLenBasicConstraint()
+    public Integer getPathLenBasicConstraint()
     {
         return pathLen;
     }
@@ -1418,24 +1384,24 @@ public class DefaultX509CertProfile extends BaseX509CertProfile
     }
 
     @Override
-    protected Map<ASN1ObjectIdentifier, ExtensionOccurrence> getAdditionalExtensionOccurences()
+    public Map<ASN1ObjectIdentifier, ExtensionOccurrence> getExtensionOccurences()
     {
-        if(additionalExtensionOccurences.containsKey(Extension.extendedKeyUsage))
+        if(extensionOccurences.containsKey(Extension.extendedKeyUsage))
         {
-            ExtensionOccurrence occ = additionalExtensionOccurences.get(Extension.extendedKeyUsage);
+            ExtensionOccurrence occ = extensionOccurences.get(Extension.extendedKeyUsage);
             if(occ.isCritical())
             {
                 Set<ASN1ObjectIdentifier> extKeyusage = extendedKeyusages.getExtKeyusage(parameterResolver);
                 if(extKeyusage != null && extKeyusage.contains(ObjectIdentifiers.anyExtendedKeyUsage))
                 {
-                    Map<ASN1ObjectIdentifier, ExtensionOccurrence> newMap = new HashMap<>(additionalExtensionOccurences);
+                    Map<ASN1ObjectIdentifier, ExtensionOccurrence> newMap = new HashMap<>(extensionOccurences);
                     newMap.put(Extension.extendedKeyUsage, ExtensionOccurrence.getInstance(false, occ.isRequired()));
                     return newMap;
                 }
             }
         }
 
-        return additionalExtensionOccurences;
+        return extensionOccurences;
     }
 
     @Override

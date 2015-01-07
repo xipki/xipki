@@ -36,8 +36,11 @@
 package org.xipki.ca.api.profile.x509;
 
 import java.util.Date;
+import java.util.Map;
+import java.util.Set;
 import java.util.TimeZone;
 
+import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.Extensions;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
@@ -87,16 +90,6 @@ public abstract class X509CertProfile
         return false;
     }
 
-    public ExtensionOccurrence getOccurenceOfFreshestCRL()
-    {
-        return ExtensionOccurrence.NONCRITICAL_OPTIONAL;
-    }
-
-    public ExtensionOccurrence getOccurenceOfIssuerAltName()
-    {
-        return ExtensionOccurrence.NONCRITICAL_OPTIONAL;
-    }
-
     public String incSerialNumber(String currentSerialNumber)
     throws BadFormatException
     {
@@ -143,8 +136,21 @@ public abstract class X509CertProfile
         return timeZone;
     }
 
+    public Set<ASN1ObjectIdentifier> getExtendedKeyUsages()
+    {
+        return null;
+    }
+
+    public abstract Map<ASN1ObjectIdentifier, ExtensionOccurrence> getExtensionOccurences();
+
     public abstract void initialize(String data)
     throws CertProfileException;
+
+    public abstract boolean isCA();
+
+    public abstract Set<KeyUsage> getKeyUsage();
+
+    public abstract Integer getPathLenBasicConstraint();
 
     public abstract void setEnvironmentParameterResolver(EnvironmentParameterResolver parameterResolver);
 
@@ -158,15 +164,9 @@ public abstract class X509CertProfile
     public abstract SubjectInfo getSubject(X500Name requestedSubject)
     throws CertProfileException, BadCertTemplateException;
 
-    public abstract ExtensionOccurrence getOccurenceOfAuthorityKeyIdentifier();
-
-    public abstract ExtensionOccurrence getOccurenceOfSubjectKeyIdentifier();
-
-    public abstract ExtensionOccurrence getOccurenceOfCRLDistributinPoints();
-
-    public abstract ExtensionOccurrence getOccurenceOfAuthorityInfoAccess();
-
-    public abstract ExtensionTuples getExtensions(X500Name requestedSubject, Extensions requestedExtensions)
+    public abstract ExtensionTuples getExtensions(
+            Map<ASN1ObjectIdentifier, ExtensionOccurrence> extensionOccurrences,
+            X500Name requestedSubject, Extensions requestedExtensions)
     throws CertProfileException, BadCertTemplateException;
 
     public abstract boolean incSerialNumberIfSubjectExists();

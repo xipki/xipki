@@ -37,11 +37,9 @@ package org.xipki.ca.api.profile.x509;
 
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import org.bouncycastle.asn1.ASN1Encodable;
@@ -50,10 +48,6 @@ import org.bouncycastle.asn1.DERPrintableString;
 import org.bouncycastle.asn1.DERUTF8String;
 import org.bouncycastle.asn1.x500.RDN;
 import org.bouncycastle.asn1.x500.X500Name;
-import org.bouncycastle.asn1.x509.BasicConstraints;
-import org.bouncycastle.asn1.x509.ExtendedKeyUsage;
-import org.bouncycastle.asn1.x509.Extension;
-import org.bouncycastle.asn1.x509.Extensions;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.xipki.ca.api.BadCertTemplateException;
 import org.xipki.ca.api.CertProfileException;
@@ -108,14 +102,6 @@ extends X509CertProfile
             countryCodes.addAll(StringUtil.split(s, ",; \t"));
         }
     }
-
-    protected abstract Set<KeyUsage> getKeyUsage();
-
-    protected abstract boolean isCa();
-
-    protected abstract Integer getPathLenBasicConstraint();
-
-    protected abstract Map<ASN1ObjectIdentifier, ExtensionOccurrence> getAdditionalExtensionOccurences();
 
     protected void checkSubjectContent(X500Name requestedSubject)
     throws BadCertTemplateException
@@ -255,53 +241,6 @@ extends X509CertProfile
         this.parameterResolver = parameterResolver;
     }
 
-    @Override
-    public ExtensionTuples getExtensions(X500Name requestedSubject, Extensions requestedExtensions)
-    throws CertProfileException, BadCertTemplateException
-    {
-        ExtensionTuples tuples = new ExtensionTuples();
-
-        Map<ASN1ObjectIdentifier, ExtensionOccurrence> additionalExtOccurrences = getAdditionalExtensionOccurences();
-        if(additionalExtOccurrences == null || additionalExtOccurrences.isEmpty())
-        {
-            return tuples;
-        }
-
-        Map<ASN1ObjectIdentifier, ExtensionOccurrence> occurences = new HashMap<>(additionalExtOccurrences);
-
-        // BasicConstraints
-        ASN1ObjectIdentifier extensionType = Extension.basicConstraints;
-        ExtensionOccurrence occurence = occurences.remove(extensionType);
-        if(occurence != null)
-        {
-            BasicConstraints value = X509Util.createBasicConstraints(isCa(), getPathLenBasicConstraint());
-            ExtensionTuple extension = createExtension(extensionType, occurence.isCritical(), value);
-            checkAndAddExtension(extensionType, occurence, extension, tuples);
-        }
-
-        // KeyUsage
-        extensionType = Extension.keyUsage;
-        occurence = occurences.remove(extensionType);
-        if(occurence != null)
-        {
-            org.bouncycastle.asn1.x509.KeyUsage value = X509Util.createKeyUsage(getKeyUsage());
-            ExtensionTuple extension = createExtension(extensionType, occurence.isCritical(), value);
-            checkAndAddExtension(extensionType, occurence, extension, tuples);
-        }
-
-        // ExtendedKeyUsage
-        extensionType = Extension.extendedKeyUsage;
-        occurence = occurences.remove(extensionType);
-        if(occurence != null)
-        {
-            ExtendedKeyUsage value = X509Util.createExtendedUsage(getExtendedKeyUsages());
-            ExtensionTuple extension = createExtension(extensionType, occurence.isCritical(), value);
-            checkAndAddExtension(extensionType, occurence, extension, tuples);
-        }
-
-        return tuples;
-    }
-
     protected static void checkAndAddExtension(ASN1ObjectIdentifier type, ExtensionOccurrence occurence,
             ExtensionTuple extension, ExtensionTuples tuples)
     throws CertProfileException
@@ -326,29 +265,6 @@ extends X509CertProfile
     public boolean incSerialNumberIfSubjectExists()
     {
         return false;
-    }
-
-    @Override
-    public ExtensionOccurrence getOccurenceOfSubjectKeyIdentifier()
-    {
-        return ExtensionOccurrence.NONCRITICAL_REQUIRED;
-    }
-
-    @Override
-    public ExtensionOccurrence getOccurenceOfCRLDistributinPoints()
-    {
-        return ExtensionOccurrence.NONCRITICAL_OPTIONAL;
-    }
-
-    @Override
-    public ExtensionOccurrence getOccurenceOfAuthorityInfoAccess()
-    {
-        return ExtensionOccurrence.NONCRITICAL_OPTIONAL;
-    }
-
-    protected Set<ASN1ObjectIdentifier> getExtendedKeyUsages()
-    {
-        return null;
     }
 
     @Override

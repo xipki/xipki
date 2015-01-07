@@ -57,8 +57,10 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.SimpleTimeZone;
 import java.util.TimeZone;
@@ -83,10 +85,12 @@ import org.bouncycastle.asn1.x500.RDN;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.AuthorityInformationAccess;
 import org.bouncycastle.asn1.x509.AuthorityKeyIdentifier;
+import org.bouncycastle.asn1.x509.BasicConstraints;
 import org.bouncycastle.asn1.x509.CRLDistPoint;
 import org.bouncycastle.asn1.x509.Certificate;
 import org.bouncycastle.asn1.x509.CertificateList;
 import org.bouncycastle.asn1.x509.DistributionPointName;
+import org.bouncycastle.asn1.x509.ExtendedKeyUsage;
 import org.bouncycastle.asn1.x509.Extension;
 import org.bouncycastle.asn1.x509.Extensions;
 import org.bouncycastle.asn1.x509.GeneralName;
@@ -2504,6 +2508,8 @@ public class X509CA
                 throw new OperationException(ErrorCode.BAD_CERT_TEMPLATE, e.getMessage());
             }
 
+            // TODO: if ImplicitCA should be applied to publicKeyInfo
+
             X509v3CertificateBuilder certBuilder = new X509v3CertificateBuilder(
                     caSubjectX500Name,
                     caInfo.nextSerial(),
@@ -2644,20 +2650,83 @@ public class X509CA
             PublicCAInfo publicCaInfo)
     throws CertProfileException, BadCertTemplateException, IOException
     {
-        addSubjectKeyIdentifier(certBuilder, requestedPublicKeyInfo, certProfile);
-        addAuthorityKeyIdentifier(certBuilder, certProfile);
-        addAuthorityInformationAccess(certBuilder, certProfile);
-        addCRLDistributionPoints(certBuilder, certProfile);
-        addDeltaCRLDistributionPoints(certBuilder, certProfile);
-        addIssuerAltName(certBuilder, certProfile);
-
-        ExtensionTuples extensionTuples = certProfile.getExtensions(requestedSubject, requestedExtensions);
-        for(ExtensionTuple extension : extensionTuples.getExtensions())
+        Map<ASN1ObjectIdentifier, ExtensionOccurrence> extOccs = new HashMap<>(certProfile.getExtensionOccurences());
+        // SubjectKeyIdentifier
+        ExtensionOccurrence extOccurrence = extOccs.remove(Extension.subjectKeyIdentifier);
+        if(extOccurrence != null)
         {
-            certBuilder.addExtension(extension.getType(), extension.isCritical(), extension.getValue());
+            addSubjectKeyIdentifier(certBuilder, requestedPublicKeyInfo, certProfile, extOccurrence);
         }
 
-        return extensionTuples.getWarning();
+        // AuthorityKeyIdentifier
+        extOccurrence = extOccs.remove(Extension.authorityKeyIdentifier);
+        if(extOccurrence != null)
+        {
+            addAuthorityKeyIdentifier(certBuilder, certProfile, extOccurrence);
+        }
+
+        // AuthorityInfoAccess
+        extOccurrence = extOccs.remove(Extension.authorityInfoAccess);
+        if(extOccurrence != null)
+        {
+            addAuthorityInformationAccess(certBuilder, certProfile, extOccurrence);
+        }
+
+        // CRLDistributionPoints
+        extOccurrence = extOccs.remove(Extension.cRLDistributionPoints);
+        if(extOccurrence != null)
+        {
+            addCRLDistributionPoints(certBuilder, certProfile, extOccurrence);
+        }
+
+        // freshestCRL
+        extOccurrence = extOccs.remove(Extension.freshestCRL);
+        if(extOccurrence != null)
+        {
+            addDeltaCRLDistributionPoints(certBuilder, certProfile, extOccurrence);
+        }
+
+        // IssuerAlternativeName
+        extOccurrence = extOccs.remove(Extension.issuerAlternativeName);
+        if(extOccurrence != null)
+        {
+            addIssuerAltName(certBuilder, certProfile, extOccurrence);
+        }
+
+        // BasicConstraints
+        extOccurrence = extOccs.remove(Extension.basicConstraints);
+        if(extOccurrence != null)
+        {
+            addBasicConstrains(certBuilder, certProfile, extOccurrence);
+        }
+
+        // KeyUsage
+        extOccurrence = extOccs.remove(Extension.keyUsage);
+        if(extOccurrence != null)
+        {
+            addKeyUsage(certBuilder, certProfile, extOccurrence);
+        }
+
+        // ExtendedKeyUsage
+        extOccurrence = extOccs.remove(Extension.extendedKeyUsage);
+        if(extOccurrence != null)
+        {
+            addExtendedKeyUsage(certBuilder, certProfile, extOccurrence);
+        }
+
+        ExtensionTuples extensionTuples = certProfile.getExtensions(extOccs, requestedSubject, requestedExtensions);
+        if(extensionTuples != null)
+        {
+            for(ExtensionTuple extension : extensionTuples.getExtensions())
+            {
+                certBuilder.addExtension(extension.getType(), extension.isCritical(), extension.getValue());
+            }
+
+            return extensionTuples.getWarning();
+        } else
+        {
+            return null;
+        }
     }
 
     public IdentifiedX509CertProfile getX509CertProfile(String certProfileName)
@@ -2678,15 +2747,9 @@ public class X509CA
 
     private void addSubjectKeyIdentifier(
             X509v3CertificateBuilder certBuilder, SubjectPublicKeyInfo publicKeyInfo,
-            IdentifiedX509CertProfile profile)
+            IdentifiedX509CertProfile profile, ExtensionOccurrence extOccurrence)
     throws IOException
     {
-        ExtensionOccurrence extOccurrence = profile.getOccurenceOfSubjectKeyIdentifier();
-        if(extOccurrence == null)
-        {
-            return;
-        }
-
         byte[] data = publicKeyInfo.getPublicKeyData().getBytes();
         byte[] skiValue = HashCalculator.hash(HashAlgoType.SHA1, data);
         SubjectKeyIdentifier value = new SubjectKeyIdentifier(skiValue);
@@ -2694,15 +2757,10 @@ public class X509CA
         certBuilder.addExtension(Extension.subjectKeyIdentifier, extOccurrence.isCritical(), value);
     }
 
-    private void addAuthorityKeyIdentifier(X509v3CertificateBuilder certBuilder, IdentifiedX509CertProfile profile)
+    private void addAuthorityKeyIdentifier(X509v3CertificateBuilder certBuilder,
+            IdentifiedX509CertProfile profile, ExtensionOccurrence extOccurrence)
     throws IOException
     {
-        ExtensionOccurrence extOccurrence = profile.getOccurenceOfAuthorityKeyIdentifier();
-        if(extOccurrence == null)
-        {
-            return;
-        }
-
         AuthorityKeyIdentifier value;
         if(profile.includeIssuerAndSerialInAKI())
         {
@@ -2718,15 +2776,10 @@ public class X509CA
         certBuilder.addExtension(Extension.authorityKeyIdentifier, extOccurrence.isCritical(), value);
     }
 
-    private void addIssuerAltName(X509v3CertificateBuilder certBuilder, IdentifiedX509CertProfile profile)
+    private void addIssuerAltName(X509v3CertificateBuilder certBuilder,
+            IdentifiedX509CertProfile profile, ExtensionOccurrence extOccurrence)
     throws IOException, CertProfileException
     {
-        ExtensionOccurrence extOccurrence = profile.getOccurenceOfIssuerAltName();
-        if(extOccurrence == null)
-        {
-            return;
-        }
-
         if(caSubjectAltName == null)
         {
             if(extOccurrence.isRequired())
@@ -2740,15 +2793,10 @@ public class X509CA
         }
     }
 
-    private void addAuthorityInformationAccess(X509v3CertificateBuilder certBuilder, IdentifiedX509CertProfile profile)
+    private void addAuthorityInformationAccess(X509v3CertificateBuilder certBuilder,
+            IdentifiedX509CertProfile profile, ExtensionOccurrence extOccurrence)
     throws IOException, CertProfileException
     {
-        ExtensionOccurrence extOccurrence = profile.getOccurenceOfAuthorityInfoAccess();
-        if(extOccurrence == null)
-        {
-            return;
-        }
-
         AuthorityInformationAccess value = X509Util.createAuthorityInformationAccess(caInfo.getOcspUris());
         if(value == null)
         {
@@ -2764,15 +2812,10 @@ public class X509CA
         }
     }
 
-    private void addCRLDistributionPoints(X509v3CertificateBuilder certBuilder, IdentifiedX509CertProfile profile)
+    private void addCRLDistributionPoints(X509v3CertificateBuilder certBuilder,
+            IdentifiedX509CertProfile profile, ExtensionOccurrence extOccurrence)
     throws IOException, CertProfileException
     {
-        ExtensionOccurrence extOccurrence = profile.getOccurenceOfCRLDistributinPoints();
-        if(extOccurrence == null)
-        {
-            return;
-        }
-
         List<String> crlUris = caInfo.getCrlUris();
         X500Principal crlSignerSubject = null;
         if(crlSigner != null && crlSigner.getSigner() != null)
@@ -2801,15 +2844,10 @@ public class X509CA
         }
     }
 
-    private void addDeltaCRLDistributionPoints(X509v3CertificateBuilder certBuilder, IdentifiedX509CertProfile profile)
+    private void addDeltaCRLDistributionPoints(X509v3CertificateBuilder certBuilder,
+            IdentifiedX509CertProfile profile, ExtensionOccurrence extOccurrence)
     throws IOException, CertProfileException
     {
-        ExtensionOccurrence extOccurrence = profile.getOccurenceOfFreshestCRL();
-        if(extOccurrence == null)
-        {
-            return;
-        }
-
         List<String> uris = caInfo.getDeltaCrlUris();
         X500Principal crlSignerSubject = null;
         if(crlSigner != null && crlSigner.getSigner() != null)
@@ -2835,6 +2873,68 @@ public class X509CA
         else
         {
             certBuilder.addExtension(Extension.freshestCRL, extOccurrence.isCritical(), value);
+        }
+    }
+
+    private void addBasicConstrains(X509v3CertificateBuilder certBuilder,
+            IdentifiedX509CertProfile profile, ExtensionOccurrence extOccurrence)
+    throws IOException, CertProfileException
+    {
+        BasicConstraints value = X509Util.createBasicConstraints(profile.isCA(),
+                profile.getPathLenBasicConstraint());
+
+        if(value == null)
+        {
+            if(extOccurrence.isRequired())
+            {
+                throw new CertProfileException("Could not add required extension BasicConstraints");
+            }
+            return;
+        }
+        else
+        {
+            certBuilder.addExtension(Extension.basicConstraints, extOccurrence.isCritical(), value);
+        }
+    }
+
+    private void addKeyUsage(X509v3CertificateBuilder certBuilder,
+            IdentifiedX509CertProfile profile, ExtensionOccurrence extOccurrence)
+    throws IOException, CertProfileException
+    {
+        org.bouncycastle.asn1.x509.KeyUsage value = X509Util.createKeyUsage(
+                profile.getKeyUsage());
+
+        if(value == null)
+        {
+            if(extOccurrence.isRequired())
+            {
+                throw new CertProfileException("Could not add required extension KeyUsage");
+            }
+            return;
+        }
+        else
+        {
+            certBuilder.addExtension(Extension.keyUsage, extOccurrence.isCritical(), value);
+        }
+    }
+
+    private void addExtendedKeyUsage(X509v3CertificateBuilder certBuilder,
+            IdentifiedX509CertProfile profile, ExtensionOccurrence extOccurrence)
+    throws IOException, CertProfileException
+    {
+        ExtendedKeyUsage value = X509Util.createExtendedUsage(profile.getExtendedKeyUsages());
+
+        if(value == null)
+        {
+            if(extOccurrence.isRequired())
+            {
+                throw new CertProfileException("Could not add required extension ExtendedKeyUsage");
+            }
+            return;
+        }
+        else
+        {
+            certBuilder.addExtension(Extension.extendedKeyUsage, extOccurrence.isCritical(), value);
         }
     }
 

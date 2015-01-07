@@ -50,12 +50,18 @@ public class ExtensionTuples
     private String warning;
     private final List<ExtensionTuple> extensions = new LinkedList<>();
 
-    public void addExtension(ExtensionTuple extension)
+    public boolean addExtension(ExtensionTuple extension)
     {
-        if(extension != null)
+        ASN1ObjectIdentifier type = extension.getType();
+        for(ExtensionTuple t : extensions)
         {
-            extensions.add(extension);
+            if(t.getType().equals(type))
+            {
+                return false;
+            }
         }
+        extensions.add(extension);
+        return true;
     }
 
     public List<ExtensionTuple> getExtensions()
@@ -71,6 +77,25 @@ public class ExtensionTuples
     public String getWarning()
     {
         return warning;
+    }
+
+    public boolean removeExtensionTuple(ASN1ObjectIdentifier type)
+    {
+        ExtensionTuple tbd = null;
+        for(ExtensionTuple t : extensions)
+        {
+            if(t.getType().equals(type))
+            {
+                tbd = t;
+            }
+        }
+
+        if(tbd != null)
+        {
+            extensions.remove(tbd);
+            return true;
+        }
+        return false;
     }
 
     public boolean containsExtension(ASN1ObjectIdentifier type)
