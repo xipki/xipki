@@ -125,6 +125,7 @@ import org.xipki.ca.server.certprofile.x509.jaxb.SubjectInfoAccessType.Access;
 import org.xipki.common.CmpUtf8Pairs;
 import org.xipki.common.LogUtil;
 import org.xipki.common.ObjectIdentifiers;
+import org.xipki.common.ParamChecker;
 import org.xipki.common.SecurityUtil;
 
 /**
@@ -246,6 +247,7 @@ public class DefaultX509CertProfile extends BaseX509CertProfile
     public void initialize(String data)
     throws CertProfileException
     {
+        ParamChecker.assertNotEmpty("data", data);
         reset();
 
         try
@@ -284,6 +286,7 @@ public class DefaultX509CertProfile extends BaseX509CertProfile
             KeyAlgorithms keyAlgos = conf.getKeyAlgorithms();
             if(keyAlgos != null)
             {
+                this.keyAlgorithms = new HashMap<>();
                 for(AlgorithmType type : keyAlgos.getAlgorithm())
                 {
                     KeyParametersOption keyParamsOption;
