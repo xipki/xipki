@@ -20,37 +20,37 @@ xipki-tk:rsa-p12 -pwd 1234 -out output/neg/TLS101.p12 -subject "CN=TLS101,O=xipk
 
 xipki-tk:req-p12 -p12 output/neg/TLS101.p12 -pwd 1234 -out output/neg/TLS101.p10
 
-xipki-caqa:neg-ra-enroll -p10 output/neg/TLS101.p10 -profile TLS -user USER-T
+xipki-qa:neg-ra-enroll -p10 output/neg/TLS101.p10 -profile TLS -user USER-T
 
-xipki-caqa:neg-enroll-p12 -p12 output/neg/TLS101.p12 -pwd 1234 -profile TLS -user USER-T
+xipki-qa:neg-enroll-p12 -p12 output/neg/TLS101.p12 -pwd 1234 -profile TLS -user USER-T
 
 # multipleOUs
 xipki-tk:rsa-p12 -pwd 1234 -out output/neg/multipleOUs101.p12 \
   -subject "CN=multipleOUs101,OU=A12345,OU=A54321,O=xipki,C=DE"
 
-xipki-caqa:neg-enroll-p12 -p12 output/neg/multipleOUs101.p12 -pwd 1234 -profile multipleOUs -user USER-O
+xipki-qa:neg-enroll-p12 -p12 output/neg/multipleOUs101.p12 -pwd 1234 -profile multipleOUs -user USER-O
 
 xipki-tk:rsa-p12 -pwd 1234 -out output/neg/multipleOUs102.p12 \
   -subject "CN=multipleOUs102,OU=12345,OU=54321,O=xipki,C=DE"
 
-xipki-caqa:neg-enroll-p12 -p12 output/neg/multipleOUs102.p12 -pwd 1234 -profile multipleOUs -user USER-O
+xipki-qa:neg-enroll-p12 -p12 output/neg/multipleOUs102.p12 -pwd 1234 -profile multipleOUs -user USER-O
 
 xipki-tk:rsa-p12 -pwd 1234 -out output/neg/multipleOUs103.p12 \
   -subject "CN=multipleOUs103,OU=A12345,O=xipki,C=DE"
 
-xipki-caqa:neg-enroll-p12 -p12 output/neg/multipleOUs103.p12 -pwd 1234 -profile multipleOUs -user USER-O
+xipki-qa:neg-enroll-p12 -p12 output/neg/multipleOUs103.p12 -pwd 1234 -profile multipleOUs -user USER-O
 
 ## Revoke certificate that has been revoked
 
-xipki-caqa:neg-revoke -cert output/TLS2.der -reason keyCompromise
+xipki-qa:neg-revoke -cert output/TLS2.der -reason keyCompromise
 
-xipki-caqa:neg-unrevoke -cert output/TLS2.der
+xipki-qa:neg-unrevoke -cert output/TLS2.der
 
 ## Generate CRL
-xipki-caqa:neg-gencrl -ca SubCA1
+xipki-qa:neg-gencrl -ca SubCA1
 
 ## Get CRL
-xipki-caqa:neg-getcrl -ca SubCA1
+xipki-qa:neg-getcrl -ca SubCA1
 
 #################################################################
 #                       Check certificate                       #
@@ -58,61 +58,61 @@ xipki-caqa:neg-getcrl -ca SubCA1
 
 ## RCA
 
-xipki-caqa:check-cert -issuer RCA -profile RCA \
+xipki-qa:check-cert -issuer RCA -profile RCA \
   -p10 output/RCA1.p10 -cert output/RCA1.der
 
-xipki-caqa:check-cert -issuer RCA -profile RCA-Cross \
+xipki-qa:check-cert -issuer RCA -profile RCA-Cross \
   -p10 output/RCA2.p10 -cert output/RCA2-cross.der
 
-xipki-caqa:check-cert -issuer RCA -profile SubCA \
+xipki-qa:check-cert -issuer RCA -profile SubCA \
   -p10 output/SubCA1.p10 -cert output/SubCA1.der
 
-xipki-caqa:check-cert -issuer RCA -profile SubCA.Complex \
+xipki-qa:check-cert -issuer RCA -profile SubCA.Complex \
   -p10 output/SubCAwithCRL1.p10 -cert output/SubCAwithCRL1.der
 
 ## SubCAwithCRL
 
-xipki-caqa:check-cert -issuer SubCAwithCRL -profile OCSP \
+xipki-qa:check-cert -issuer SubCAwithCRL -profile OCSP \
   -p10 output/OCSP1.p10 -cert output/OCSP1.der 
 
-xipki-caqa:check-cert -issuer SubCAwithCRL -profile OCSP \
+xipki-qa:check-cert -issuer SubCAwithCRL -profile OCSP \
   -p10 output/OCSP2.p10 -cert output/OCSP2.der
 
-xipki-caqa:check-cert -issuer SubCAwithCRL -profile multipleOUs \
+xipki-qa:check-cert -issuer SubCAwithCRL -profile multipleOUs \
   -p10 output/multipleOUs1.p10 -cert output/multipleOUs1.der
 
-xipki-caqa:check-cert -issuer SubCAwithCRL -profile multipleOUs \
+xipki-qa:check-cert -issuer SubCAwithCRL -profile multipleOUs \
   -p10 output/multipleOUs2.p10 -cert output/multipleOUs2.der
 
 ## SubCA
-xipki-caqa:check-cert -issuer SubCA -profile TLS \
+xipki-qa:check-cert -issuer SubCA -profile TLS \
   -p10 output/TLS1.p10 -cert output/TLS1.der
 
-xipki-caqa:check-cert -issuer SubCA -profile TLS_C \
+xipki-qa:check-cert -issuer SubCA -profile TLS_C \
   -p10 output/TLS1.p10 -cert output/TLS1-TLS_C.der
 
-xipki-caqa:check-cert -issuer SubCA -profile TLSwithIncSN \
+xipki-qa:check-cert -issuer SubCA -profile TLSwithIncSN \
   -p10 output/TLSwithIncSN1.p10 -cert output/TLSwithIncSN1.der
 
-xipki-caqa:check-cert -issuer SubCA -profile TLSwithIncSN \
+xipki-qa:check-cert -issuer SubCA -profile TLSwithIncSN \
   -p10 output/TLSwithIncSN1-1.p10 -cert output/TLSwithIncSN1-1.der
 
-xipki-caqa:check-cert -issuer SubCA -profile TLSwithIncSN \
+xipki-qa:check-cert -issuer SubCA -profile TLSwithIncSN \
   -p10 output/TLSwithIncSN1-2.p10 -cert output/TLSwithIncSN1-2.der
 
-xipki-caqa:check-cert -issuer SubCA -profile TLS \
+xipki-qa:check-cert -issuer SubCA -profile TLS \
   -p10 output/TLS2.p10 -cert output/TLS2.der
 
-xipki-caqa:check-cert -issuer SubCA -profile TLS_C \
+xipki-qa:check-cert -issuer SubCA -profile TLS_C \
   -p10 output/TLS_C1.p10 -cert output/TLS_C1.der
 
-xipki-caqa:check-cert -issuer SubCA -profile TLS_C \
+xipki-qa:check-cert -issuer SubCA -profile TLS_C \
   -p10 output/TLS_C2.p10 -cert output/TLS_C2.der
 
-xipki-caqa:check-cert -issuer SubCA -profile gSMC_K \
+xipki-qa:check-cert -issuer SubCA -profile gSMC_K \
   -p10 output/gSMC_K1.p10 -cert output/gSMC_K1.der
 
-xipki-caqa:check-cert -issuer SubCA -profile gSMC_K \
+xipki-qa:check-cert -issuer SubCA -profile gSMC_K \
   -p10 output/gSMC_K2.p10 -cert output/gSMC_K2.der
 
 #################################################################

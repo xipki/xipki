@@ -50,7 +50,7 @@ import org.xipki.console.karaf.UnexpectedResultException;
  * @author Lijun Liao
  */
 
-@Command(scope = "xipki-caqa", name = "neg-ra-enroll", description="Enroll certificate as RA (negative, for QA)")
+@Command(scope = "xipki-qa", name = "neg-ra-enroll", description="Enroll certificate as RA (negative, for QA)")
 public class NegRAEnrollCertCommand extends ClientCommand
 {
 

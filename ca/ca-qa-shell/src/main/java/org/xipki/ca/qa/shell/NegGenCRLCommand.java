@@ -45,7 +45,7 @@ import org.xipki.ca.client.api.RAWorkerException;
  * @author Lijun Liao
  */
 
-@Command(scope = "xipki-caqa", name = "neg-gencrl", description="Generate CRL (negative, for QA)")
+@Command(scope = "xipki-qa", name = "neg-gencrl", description="Generate CRL (negative, for QA)")
 public class NegGenCRLCommand extends NegCRLCommand
 {
 
