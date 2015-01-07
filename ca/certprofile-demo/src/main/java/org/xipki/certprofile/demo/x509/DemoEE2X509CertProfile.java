@@ -36,14 +36,21 @@
 package org.xipki.certprofile.demo.x509;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
+import org.bouncycastle.asn1.x500.X500Name;
+import org.bouncycastle.asn1.x509.Extension;
+import org.bouncycastle.asn1.x509.Extensions;
+import org.xipki.ca.api.BadCertTemplateException;
+import org.xipki.ca.api.CertProfileException;
 import org.xipki.ca.api.CertValidity;
 import org.xipki.ca.api.CertValidity.Unit;
 import org.xipki.ca.api.profile.ExtensionOccurrence;
+import org.xipki.ca.api.profile.ExtensionTuples;
 import org.xipki.ca.api.profile.x509.AbstractEEX509CertProfile;
 import org.xipki.ca.api.profile.x509.KeyUsage;
 
@@ -55,6 +62,7 @@ public class DemoEE2X509CertProfile extends AbstractEEX509CertProfile
 {
     private final CertValidity validity;
     private final Set<KeyUsage> keyUsage;
+    private final Map<ASN1ObjectIdentifier, ExtensionOccurrence> extensionOccurrences;
 
     public DemoEE2X509CertProfile()
     {
@@ -63,24 +71,52 @@ public class DemoEE2X509CertProfile extends AbstractEEX509CertProfile
         _keyUsage.add(KeyUsage.digitalSignature);
         _keyUsage.add(KeyUsage.dataEncipherment);
         this.keyUsage = Collections.unmodifiableSet(_keyUsage);
+        extensionOccurrences = new HashMap<>();
+        extensionOccurrences.put(Extension.authorityKeyIdentifier,
+                ExtensionOccurrence.NONCRITICAL_REQUIRED);
+        extensionOccurrences.put(Extension.freshestCRL,
+                ExtensionOccurrence.NONCRITICAL_OPTIONAL);
+        extensionOccurrences.put(Extension.issuerAlternativeName,
+                ExtensionOccurrence.NONCRITICAL_OPTIONAL);
+        extensionOccurrences.put(Extension.subjectKeyIdentifier,
+                ExtensionOccurrence.NONCRITICAL_REQUIRED);
+        extensionOccurrences.put(Extension.cRLDistributionPoints,
+                ExtensionOccurrence.NONCRITICAL_OPTIONAL);
+        extensionOccurrences.put(Extension.authorityKeyIdentifier,
+                ExtensionOccurrence.NONCRITICAL_REQUIRED);
+        extensionOccurrences.put(Extension.authorityInfoAccess,
+                ExtensionOccurrence.NONCRITICAL_OPTIONAL);
+        extensionOccurrences.put(Extension.basicConstraints,
+                ExtensionOccurrence.CRITICAL_REQUIRED);
+        extensionOccurrences.put(Extension.keyUsage,
+                ExtensionOccurrence.NONCRITICAL_REQUIRED);
     }
 
     @Override
-    protected Set<KeyUsage> getKeyUsage()
+    public Set<KeyUsage> getKeyUsage()
     {
         return keyUsage;
-    }
-
-    @Override
-    protected Map<ASN1ObjectIdentifier, ExtensionOccurrence> getAdditionalExtensionOccurences()
-    {
-        return null;
     }
 
     @Override
     public CertValidity getValidity()
     {
         return validity;
+    }
+
+    @Override
+    public Map<ASN1ObjectIdentifier, ExtensionOccurrence> getExtensionOccurences()
+    {
+        return extensionOccurrences;
+    }
+
+    @Override
+    public ExtensionTuples getExtensions(
+            Map<ASN1ObjectIdentifier, ExtensionOccurrence> extensionOccurrences,
+            X500Name requestedSubject, Extensions requestedExtensions)
+    throws CertProfileException, BadCertTemplateException
+    {
+        return null;
     }
 
 }
