@@ -89,7 +89,7 @@ import org.xipki.ca.server.certprofile.x509.jaxb.GeneralSubtreesType;
 import org.xipki.ca.server.certprofile.x509.jaxb.ObjectFactory;
 import org.xipki.ca.server.certprofile.x509.jaxb.OidWithDescType;
 import org.xipki.ca.server.certprofile.x509.jaxb.PolicyIdMappingType;
-import org.xipki.ca.server.certprofile.x509.jaxb.ProfileType;
+import org.xipki.ca.server.certprofile.x509.jaxb.X509ProfileType;
 import org.xipki.ca.server.certprofile.x509.jaxb.RangeType;
 import org.xipki.ca.server.certprofile.x509.jaxb.RangesType;
 import org.xipki.common.LruCache;
@@ -109,7 +109,7 @@ public class XmlX509CertProfileUtil
 
     private static LruCache<ASN1ObjectIdentifier, Integer> ecCurveFieldSizes = new LruCache<>(100);
 
-    static ProfileType parse(String xmlConf)
+    static X509ProfileType parse(String xmlConf)
     throws CertProfileException
     {
         synchronized (jaxbUnmarshallerLock)
@@ -137,9 +137,9 @@ public class XmlX509CertProfileUtil
             }
 
             Object rootType = rootElement.getValue();
-            if(rootType instanceof ProfileType)
+            if(rootType instanceof X509ProfileType)
             {
-                return (ProfileType) rootElement.getValue();
+                return (X509ProfileType) rootElement.getValue();
             }
             else
             {

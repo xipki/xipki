@@ -41,6 +41,7 @@ import java.math.BigInteger;
 import java.net.URL;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
+import java.security.spec.InvalidKeySpecException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -727,10 +728,17 @@ public class X509CertProfileQA
 
             ValidationIssue issue = new ValidationIssue("X509.PUBKEY.REQ", "whether public key matches the request one");
             resultIssues.add(issue);
-            SubjectPublicKeyInfo c14nRequestedPublicKey = SecurityUtil.toRfc3279Style(requestedPublicKey);
-            if(c14nRequestedPublicKey.equals(publicKey) == false)
+            SubjectPublicKeyInfo c14nRequestedPublicKey;
+            try
             {
-                issue.setFailureMessage("public in the certificate does not equal the requested one");
+                c14nRequestedPublicKey = SecurityUtil.toRfc3279Style(requestedPublicKey);
+                if(c14nRequestedPublicKey.equals(publicKey) == false)
+                {
+                    issue.setFailureMessage("public key in the certificate does not equal the requested one");
+                }
+            } catch (InvalidKeySpecException e)
+            {
+                issue.setFailureMessage("public key in request is invalid");
             }
         }
 

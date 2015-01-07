@@ -41,7 +41,7 @@ import org.xipki.ca.api.profile.ExtensionOccurrence;
  * @author Lijun Liao
  */
 
-public abstract class AbstractEEX509CertProfile extends AbstractX509CertProfile
+public abstract class AbstractEEX509CertProfile extends BaseX509CertProfile
 {
 
     @Override

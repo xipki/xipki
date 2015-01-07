@@ -72,6 +72,11 @@ public abstract class X509CertProfile
         return null;
     }
 
+    public boolean prefersECImplicitCA()
+    {
+        return false;
+    }
+
     /**
      * Whether include subject and serial number of the issuer certificate in the
      * AuthorityKeyIdentifier extension.
