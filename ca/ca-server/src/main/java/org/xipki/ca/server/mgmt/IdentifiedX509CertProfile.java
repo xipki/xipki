@@ -36,9 +36,13 @@
 package org.xipki.ca.server.mgmt;
 
 import java.util.Date;
+import java.util.Map;
+import java.util.Set;
 import java.util.TimeZone;
 
+import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.x500.X500Name;
+import org.bouncycastle.asn1.x509.Extension;
 import org.bouncycastle.asn1.x509.Extensions;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.xipki.ca.api.BadCertTemplateException;
@@ -49,6 +53,7 @@ import org.xipki.ca.api.EnvironmentParameterResolver;
 import org.xipki.ca.api.profile.ExtensionOccurrence;
 import org.xipki.ca.api.profile.ExtensionTuples;
 import org.xipki.ca.api.profile.SubjectInfo;
+import org.xipki.ca.api.profile.x509.KeyUsage;
 import org.xipki.ca.api.profile.x509.X509CertProfile;
 import org.xipki.ca.api.profile.x509.SpecialX509CertProfileBehavior;
 import org.xipki.ca.server.certprofile.x509.DefaultX509CertProfile;
@@ -180,35 +185,35 @@ public class IdentifiedX509CertProfile
         return certProfile.getSubject(requestedSubject);
     }
 
-    public ExtensionTuples getExtensions(X500Name requestedSubject, Extensions requestedExtensions)
+    public ExtensionTuples getExtensions(Map<ASN1ObjectIdentifier, ExtensionOccurrence> extensionOccurrences,
+            X500Name requestedSubject, Extensions requestedExtensions)
     throws CertProfileException, BadCertTemplateException
     {
-        return certProfile.getExtensions(requestedSubject, requestedExtensions);
+        ExtensionTuples tuples = certProfile.getExtensions(extensionOccurrences, requestedSubject, requestedExtensions);
+        if(tuples != null)
+        {
+            tuples.removeExtensionTuple(Extension.authorityKeyIdentifier);
+            tuples.removeExtensionTuple(Extension.freshestCRL);
+            tuples.removeExtensionTuple(Extension.issuerAlternativeName);
+            tuples.removeExtensionTuple(Extension.subjectKeyIdentifier);
+            tuples.removeExtensionTuple(Extension.cRLDistributionPoints);
+            tuples.removeExtensionTuple(Extension.authorityKeyIdentifier);
+            tuples.removeExtensionTuple(Extension.authorityInfoAccess);
+            tuples.removeExtensionTuple(Extension.basicConstraints);
+            tuples.removeExtensionTuple(Extension.keyUsage);
+            tuples.removeExtensionTuple(Extension.extendedKeyUsage);
+        }
+        return tuples;
+    }
+
+    public boolean isCA()
+    {
+        return certProfile.isCA();
     }
 
     public boolean isOnlyForRA()
     {
         return certProfile.isOnlyForRA();
-    }
-
-    public ExtensionOccurrence getOccurenceOfAuthorityKeyIdentifier()
-    {
-        return certProfile.getOccurenceOfAuthorityKeyIdentifier();
-    }
-
-    public ExtensionOccurrence getOccurenceOfSubjectKeyIdentifier()
-    {
-        return certProfile.getOccurenceOfSubjectKeyIdentifier();
-    }
-
-    public ExtensionOccurrence getOccurenceOfCRLDistributinPoints()
-    {
-        return certProfile.getOccurenceOfCRLDistributinPoints();
-    }
-
-    public ExtensionOccurrence getOccurenceOfAuthorityInfoAccess()
-    {
-        return certProfile.getOccurenceOfAuthorityInfoAccess();
     }
 
     public void checkPublicKey(SubjectPublicKeyInfo publicKey)
@@ -241,16 +246,6 @@ public class IdentifiedX509CertProfile
         return certProfile.incSerialNumber(currentSerialNumber);
     }
 
-    public ExtensionOccurrence getOccurenceOfFreshestCRL()
-    {
-        return certProfile.getOccurenceOfFreshestCRL();
-    }
-
-    public ExtensionOccurrence getOccurenceOfIssuerAltName()
-    {
-        return certProfile.getOccurenceOfIssuerAltName();
-    }
-
     public boolean isDuplicateKeyPermitted()
     {
         return certProfile.isDuplicateKeyPermitted();
@@ -271,4 +266,23 @@ public class IdentifiedX509CertProfile
         return certProfile.getParameter(paramName);
     }
 
+    public Map<ASN1ObjectIdentifier, ExtensionOccurrence> getExtensionOccurences()
+    {
+        return certProfile.getExtensionOccurences();
+    }
+
+    public Set<KeyUsage> getKeyUsage()
+    {
+        return certProfile.getKeyUsage();
+    }
+
+    public Integer getPathLenBasicConstraint()
+    {
+        return certProfile.getPathLenBasicConstraint();
+    }
+
+    public Set<ASN1ObjectIdentifier> getExtendedKeyUsages()
+    {
+        return certProfile.getExtendedKeyUsages();
+    }
 }

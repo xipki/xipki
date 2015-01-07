@@ -51,13 +51,18 @@ import java.security.interfaces.ECPublicKey;
 import java.security.interfaces.RSAPublicKey;
 import java.security.spec.InvalidKeySpecException;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.AuthorityInformationAccess;
 import org.bouncycastle.asn1.x509.AuthorityKeyIdentifier;
+import org.bouncycastle.asn1.x509.BasicConstraints;
 import org.bouncycastle.asn1.x509.CRLDistPoint;
 import org.bouncycastle.asn1.x509.Certificate;
+import org.bouncycastle.asn1.x509.ExtendedKeyUsage;
 import org.bouncycastle.asn1.x509.Extension;
 import org.bouncycastle.asn1.x509.GeneralName;
 import org.bouncycastle.asn1.x509.GeneralNames;
@@ -290,7 +295,9 @@ class X509SelfSignedCertBuilder
         MessageDigest sha1 = MessageDigest.getInstance("SHA-1");
         byte[] skiValue = sha1.digest(requestedPublicKeyInfo.getPublicKeyData().getBytes());
 
-        ExtensionOccurrence extOccurrence = profile.getOccurenceOfSubjectKeyIdentifier();
+        Map<ASN1ObjectIdentifier, ExtensionOccurrence> occurrences = new HashMap<>(profile.getExtensionOccurences());
+        ASN1ObjectIdentifier extType = Extension.subjectKeyIdentifier;
+        ExtensionOccurrence extOccurrence = occurrences.remove(extType);
         if(extOccurrence != null)
         {
             SubjectKeyIdentifier value = new SubjectKeyIdentifier(skiValue);
@@ -298,7 +305,8 @@ class X509SelfSignedCertBuilder
         }
 
         // Authority key identifier
-        extOccurrence = profile.getOccurenceOfAuthorityKeyIdentifier();
+        extType = Extension.authorityKeyIdentifier;
+        extOccurrence = occurrences.remove(extType);
         if(extOccurrence != null)
         {
             AuthorityKeyIdentifier value;
@@ -311,11 +319,12 @@ class X509SelfSignedCertBuilder
             {
                 value = new AuthorityKeyIdentifier(skiValue);
             }
-            certBuilder.addExtension(Extension.authorityKeyIdentifier, extOccurrence.isCritical(), value);
+            certBuilder.addExtension(extType, extOccurrence.isCritical(), value);
         }
 
         // AuthorityInfoAccess
-        extOccurrence = profile.getOccurenceOfAuthorityInfoAccess();
+        extType = Extension.authorityInfoAccess;
+        extOccurrence = occurrences.remove(extType);
         if(extOccurrence != null)
         {
             AuthorityInformationAccess aia = X509Util.createAuthorityInformationAccess(publicCaInfo.getOcspUris());
@@ -328,12 +337,13 @@ class X509SelfSignedCertBuilder
             }
             else
             {
-                certBuilder.addExtension(Extension.authorityInfoAccess, extOccurrence.isCritical(), aia);
+                certBuilder.addExtension(extType, extOccurrence.isCritical(), aia);
             }
         }
 
         // CRLDistributionPoints
-        extOccurrence = profile.getOccurenceOfCRLDistributinPoints();
+        extType = Extension.cRLDistributionPoints;
+        extOccurrence = occurrences.remove(extType);
         if(extOccurrence != null)
         {
             CRLDistPoint crlDistPoint = X509Util.createCRLDistributionPoints(publicCaInfo.getCrlUris(),
@@ -347,12 +357,13 @@ class X509SelfSignedCertBuilder
             }
             else
             {
-                certBuilder.addExtension(Extension.cRLDistributionPoints, extOccurrence.isCritical(), crlDistPoint);
+                certBuilder.addExtension(extType, extOccurrence.isCritical(), crlDistPoint);
             }
         }
 
         // FreshestCRL
-        extOccurrence = profile.getOccurenceOfFreshestCRL();
+        extType = Extension.freshestCRL;
+        extOccurrence = occurrences.remove(extType);
         if(extOccurrence != null)
         {
             CRLDistPoint deltaCrlDistPoint = X509Util.createCRLDistributionPoints(publicCaInfo.getDeltaCrlUris(),
@@ -366,18 +377,82 @@ class X509SelfSignedCertBuilder
             }
             else
             {
-                certBuilder.addExtension(Extension.freshestCRL, extOccurrence.isCritical(), deltaCrlDistPoint);
+                certBuilder.addExtension(extType, extOccurrence.isCritical(), deltaCrlDistPoint);
             }
         }
 
-        ExtensionTuples extensionTuples = profile.getExtensions(requestedSubject, null);
-
-        for(ExtensionTuple extension : extensionTuples.getExtensions())
+        // BasicConstraints
+        extType = Extension.basicConstraints;
+        extOccurrence = occurrences.remove(extType);
+        if(extOccurrence != null)
         {
-            certBuilder.addExtension(extension.getType(), extension.isCritical(), extension.getValue());
+            BasicConstraints value = X509Util.createBasicConstraints(profile.isCA(),
+                    profile.getPathLenBasicConstraint());
+            if(value == null)
+            {
+                if(extOccurrence.isRequired())
+                {
+                    throw new CertProfileException("Could not add required extension BasicConstraints");
+                }
+            }
+            else
+            {
+                certBuilder.addExtension(extType, extOccurrence.isCritical(), value);
+            }
         }
 
-        return extensionTuples.getWarning();
+        // KeyUsage
+        extType = Extension.keyUsage;
+        extOccurrence = occurrences.remove(extType);
+        if(extOccurrence != null)
+        {
+            org.bouncycastle.asn1.x509.KeyUsage value = X509Util.createKeyUsage(
+                    profile.getKeyUsage());
+            if(value == null)
+            {
+                if(extOccurrence.isRequired())
+                {
+                    throw new CertProfileException("Could not add required extension KeyUsage");
+                }
+            }
+            else
+            {
+                certBuilder.addExtension(extType, extOccurrence.isCritical(), value);
+            }
+        }
+
+        // ExtendedKeyUsage
+        extType = Extension.extendedKeyUsage;
+        extOccurrence = occurrences.remove(extType);
+        if(extOccurrence != null)
+        {
+            ExtendedKeyUsage value = X509Util.createExtendedUsage(profile.getExtendedKeyUsages());
+            if(value == null)
+            {
+                if(extOccurrence.isRequired())
+                {
+                    throw new CertProfileException("Could not add required extension ExtendedKeyUsage");
+                }
+            }
+            else
+            {
+                certBuilder.addExtension(extType, extOccurrence.isCritical(), value);
+            }
+        }
+
+        ExtensionTuples extensionTuples = profile.getExtensions(occurrences, requestedSubject, null);
+        if(extensionTuples != null)
+        {
+            for(ExtensionTuple extension : extensionTuples.getExtensions())
+            {
+                certBuilder.addExtension(extension.getType(), extension.isCritical(), extension.getValue());
+            }
+
+            return extensionTuples.getWarning();
+        } else
+        {
+            return null;
+        }
     }
 
     public static AsymmetricKeyParameter generatePublicKeyParameter(

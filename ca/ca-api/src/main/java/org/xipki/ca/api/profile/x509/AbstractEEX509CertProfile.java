@@ -35,8 +35,6 @@
 
 package org.xipki.ca.api.profile.x509;
 
-import org.xipki.ca.api.profile.ExtensionOccurrence;
-
 /**
  * @author Lijun Liao
  */
@@ -45,19 +43,13 @@ public abstract class AbstractEEX509CertProfile extends BaseX509CertProfile
 {
 
     @Override
-    public ExtensionOccurrence getOccurenceOfAuthorityKeyIdentifier()
-    {
-        return ExtensionOccurrence.NONCRITICAL_REQUIRED;
-    }
-
-    @Override
-    protected boolean isCa()
+    public boolean isCA()
     {
         return false;
     }
 
     @Override
-    protected Integer getPathLenBasicConstraint()
+    public Integer getPathLenBasicConstraint()
     {
         return null;
     }

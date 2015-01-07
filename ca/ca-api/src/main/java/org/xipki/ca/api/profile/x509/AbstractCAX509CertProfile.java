@@ -39,8 +39,6 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.xipki.ca.api.profile.ExtensionOccurrence;
-
 /**
  * @author Lijun Liao
  */
@@ -58,20 +56,15 @@ public abstract class AbstractCAX509CertProfile extends BaseX509CertProfile
     }
 
     @Override
-    protected boolean isCa()
+    public boolean isCA()
     {
         return true;
     }
 
     @Override
-    protected Set<KeyUsage> getKeyUsage()
+    public Set<KeyUsage> getKeyUsage()
     {
         return keyUsages;
     }
 
-    @Override
-    public ExtensionOccurrence getOccurenceOfAuthorityKeyIdentifier()
-    {
-        return ExtensionOccurrence.NONCRITICAL_REQUIRED;
-    }
 }
