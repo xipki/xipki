@@ -51,7 +51,7 @@ import org.xipki.console.karaf.XipkiOsgiCommandSupport;
  * @author Lijun Liao
  */
 
-@Command(scope = "xipki-caqa", name = "check-cert", description="Check the certificate")
+@Command(scope = "xipki-qa", name = "check-cert", description="Check the certificate")
 public class CheckCertCommand extends XipkiOsgiCommandSupport
 {
     @Option(name = "-cert",
