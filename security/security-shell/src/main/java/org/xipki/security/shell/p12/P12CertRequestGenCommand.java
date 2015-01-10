@@ -48,6 +48,9 @@ import org.bouncycastle.asn1.x509.Extension;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.bouncycastle.operator.ContentSigner;
 import org.bouncycastle.pkcs.PKCS10CertificationRequest;
+import org.xipki.common.CustomObjectIdentifiers;
+import org.xipki.common.SecurityUtil;
+import org.xipki.security.ExtensionExistence;
 import org.xipki.security.P10RequestGenerator;
 import org.xipki.security.SecurityFactoryImpl;
 import org.xipki.security.api.ConcurrentContentSigner;
@@ -81,6 +84,18 @@ public class P12CertRequestGenCommand extends P12SecurityCommand
             required = false, multiValued = true, description = "SubjectInfoAccess. Multi-valued")
     protected List<String> subjectInfoAccesses;
 
+    @Option(name = "-ne", aliases="--needExtension",
+            required = false, multiValued = true,
+            description = "Types of extension (except SubjectAltName and SubjectInfoAccess) that must\n"
+                    + "be contaied in the certificate. Multi-valued")
+    protected List<String> needExtensionTypes;
+
+    @Option(name = "-we", aliases="--wantExtension",
+            required = false, multiValued = true,
+            description = "Types of extension that should be contaied in the certificate if possible.\n"
+                    + "Multi-valued")
+    protected List<String> wantExtensionTypes;
+
     @Override
     protected Object doExecute()
     throws Exception
@@ -94,17 +109,33 @@ public class P12CertRequestGenCommand extends P12SecurityCommand
         ConcurrentContentSigner identifiedSigner = securityFactory.createSigner(
                 "PKCS12", signerConf, hashAlgo, false, (X509Certificate[]) null);
 
+        if(needExtensionTypes == null)
+        {
+            needExtensionTypes = new LinkedList<>();
+        }
+
         // SubjectAltNames
         List<Extension> extensions = new LinkedList<>();
         if(subjectAltNames != null && subjectAltNames.isEmpty() == false)
         {
             extensions.add(P10RequestGenerator.createExtensionSubjectAltName(subjectAltNames, false));
+            needExtensionTypes.add(Extension.subjectAlternativeName.getId());
         }
 
         // SubjectInfoAccess
         if(subjectInfoAccesses != null && subjectInfoAccesses.isEmpty() == false)
         {
             extensions.add(P10RequestGenerator.createExtensionSubjectInfoAccess(subjectInfoAccesses, false));
+            needExtensionTypes.add(Extension.subjectInfoAccess.getId());
+        }
+
+        if(needExtensionTypes.isEmpty() == false ||
+                (wantExtensionTypes != null && wantExtensionTypes.isEmpty() == false))
+        {
+            ExtensionExistence ee = new ExtensionExistence(SecurityUtil.textToASN1ObjectIdentifers(needExtensionTypes),
+                    SecurityUtil.textToASN1ObjectIdentifers(wantExtensionTypes));
+            extensions.add(new Extension(
+                    CustomObjectIdentifiers.id_request_extensions, false, ee.toASN1Primitive().getEncoded()));
         }
 
         Certificate cert = Certificate.getInstance(identifiedSigner.getCertificate().getEncoded());
