@@ -33,43 +33,34 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.ca.server.certprofile;
+package org.xipki.ca.api.profile.x509;
 
-import java.util.Collections;
-import java.util.Set;
-
-import org.bouncycastle.asn1.ASN1ObjectIdentifier;
+import org.xipki.common.ParamChecker;
 
 /**
  * @author Lijun Liao
  */
 
-public class GeneralNameMode
+public class KeyUsageOccurrence
 {
-    private final GeneralNameTag tag;
-    // not applied to all tags, currently only for tag otherName
-    private final Set<ASN1ObjectIdentifier> allowedTypes;
+    private final KeyUsage keyUsage;
+    private final boolean required;
 
-    public GeneralNameMode(GeneralNameTag tag)
+    public KeyUsageOccurrence(KeyUsage keyUsage, boolean required)
     {
-        this.tag = tag;
-        this.allowedTypes = null;
+        ParamChecker.assertNotNull("keyUsage", keyUsage);
+        this.keyUsage = keyUsage;
+        this.required = required;
     }
 
-    public GeneralNameMode(GeneralNameTag tag, Set<ASN1ObjectIdentifier> allowedTypes)
+    public KeyUsage getKeyUsage()
     {
-        this.tag = tag;
-        this.allowedTypes = allowedTypes == null ? null : Collections.unmodifiableSet(allowedTypes);
+        return keyUsage;
     }
 
-    public GeneralNameTag getTag()
+    public boolean isRequired()
     {
-        return tag;
-    }
-
-    public Set<ASN1ObjectIdentifier> getAllowedTypes()
-    {
-        return allowedTypes;
+        return required;
     }
 
 }

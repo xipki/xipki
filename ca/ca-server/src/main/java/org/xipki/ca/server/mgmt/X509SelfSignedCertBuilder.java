@@ -39,7 +39,6 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.security.InvalidKeyException;
-import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.PublicKey;
@@ -51,22 +50,11 @@ import java.security.interfaces.ECPublicKey;
 import java.security.interfaces.RSAPublicKey;
 import java.security.spec.InvalidKeySpecException;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.x500.X500Name;
-import org.bouncycastle.asn1.x509.AuthorityInformationAccess;
-import org.bouncycastle.asn1.x509.AuthorityKeyIdentifier;
-import org.bouncycastle.asn1.x509.BasicConstraints;
-import org.bouncycastle.asn1.x509.CRLDistPoint;
 import org.bouncycastle.asn1.x509.Certificate;
-import org.bouncycastle.asn1.x509.ExtendedKeyUsage;
-import org.bouncycastle.asn1.x509.Extension;
-import org.bouncycastle.asn1.x509.GeneralName;
-import org.bouncycastle.asn1.x509.GeneralNames;
-import org.bouncycastle.asn1.x509.SubjectKeyIdentifier;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.bouncycastle.cert.X509v3CertificateBuilder;
 import org.bouncycastle.crypto.params.AsymmetricKeyParameter;
@@ -81,11 +69,9 @@ import org.xipki.ca.api.CertProfileException;
 import org.xipki.ca.api.CertValidity;
 import org.xipki.ca.api.OperationException;
 import org.xipki.ca.api.OperationException.ErrorCode;
-import org.xipki.ca.api.profile.ExtensionOccurrence;
-import org.xipki.ca.api.profile.ExtensionTuple;
 import org.xipki.ca.api.profile.ExtensionTuples;
+import org.xipki.ca.api.profile.ExtensionValue;
 import org.xipki.ca.api.profile.SubjectInfo;
-import org.xipki.ca.api.profile.x509.X509Util;
 import org.xipki.ca.server.PublicCAInfo;
 import org.xipki.common.CmpUtf8Pairs;
 import org.xipki.common.ConfigurationException;
@@ -234,16 +220,17 @@ class X509SelfSignedCertBuilder
 
         X500Name grantedSubject = subjectInfo.getGrantedSubject();
 
+        BigInteger _serialNumber = BigInteger.valueOf(serialNumber);
         X509v3CertificateBuilder certBuilder = new X509v3CertificateBuilder(
                 grantedSubject,
-                BigInteger.valueOf(serialNumber),
+                _serialNumber,
                 notBefore,
                 notAfter,
                 grantedSubject,
                 publicKeyInfo);
 
         PublicCAInfo publicCaInfo = new PublicCAInfo(
-                null, ocspUris, crlUris, null, deltaCrlUris);
+                grantedSubject, _serialNumber, null, null, ocspUris, crlUris, null, deltaCrlUris);
 
         try
         {
@@ -251,10 +238,8 @@ class X509SelfSignedCertBuilder
                     certBuilder,
                     certProfile,
                     requestedSubject,
-                    grantedSubject,
                     publicKeyInfo,
-                    publicCaInfo,
-                    BigInteger.valueOf(serialNumber));
+                    publicCaInfo);
 
             ContentSigner contentSigner = signer.borrowContentSigner();
 
@@ -285,167 +270,18 @@ class X509SelfSignedCertBuilder
             X509v3CertificateBuilder certBuilder,
             IdentifiedX509CertProfile profile,
             X500Name requestedSubject,
-            X500Name subject,
             SubjectPublicKeyInfo requestedPublicKeyInfo,
-            PublicCAInfo publicCaInfo,
-            BigInteger serialNumber)
+            PublicCAInfo publicCaInfo)
     throws CertProfileException, IOException, BadCertTemplateException, NoSuchAlgorithmException
     {
-        // SubjectKeyIdentifier
-        MessageDigest sha1 = MessageDigest.getInstance("SHA-1");
-        byte[] skiValue = sha1.digest(requestedPublicKeyInfo.getPublicKeyData().getBytes());
-
-        Map<ASN1ObjectIdentifier, ExtensionOccurrence> occurrences = new HashMap<>(profile.getExtensionOccurences());
-        ASN1ObjectIdentifier extType = Extension.subjectKeyIdentifier;
-        ExtensionOccurrence extOccurrence = occurrences.remove(extType);
-        if(extOccurrence != null)
-        {
-            SubjectKeyIdentifier value = new SubjectKeyIdentifier(skiValue);
-            certBuilder.addExtension(Extension.subjectKeyIdentifier, extOccurrence.isCritical(), value);
-        }
-
-        // Authority key identifier
-        extType = Extension.authorityKeyIdentifier;
-        extOccurrence = occurrences.remove(extType);
-        if(extOccurrence != null)
-        {
-            AuthorityKeyIdentifier value;
-            if(profile.includeIssuerAndSerialInAKI())
-            {
-                GeneralNames caSubject = new GeneralNames(new GeneralName(subject));
-                value = new AuthorityKeyIdentifier(skiValue, caSubject, serialNumber);
-            }
-            else
-            {
-                value = new AuthorityKeyIdentifier(skiValue);
-            }
-            certBuilder.addExtension(extType, extOccurrence.isCritical(), value);
-        }
-
-        // AuthorityInfoAccess
-        extType = Extension.authorityInfoAccess;
-        extOccurrence = occurrences.remove(extType);
-        if(extOccurrence != null)
-        {
-            AuthorityInformationAccess aia = X509Util.createAuthorityInformationAccess(publicCaInfo.getOcspUris());
-            if(aia == null)
-            {
-                if(extOccurrence.isRequired())
-                {
-                    throw new CertProfileException("Could not add required extension authorityInfoAccess");
-                }
-            }
-            else
-            {
-                certBuilder.addExtension(extType, extOccurrence.isCritical(), aia);
-            }
-        }
-
-        // CRLDistributionPoints
-        extType = Extension.cRLDistributionPoints;
-        extOccurrence = occurrences.remove(extType);
-        if(extOccurrence != null)
-        {
-            CRLDistPoint crlDistPoint = X509Util.createCRLDistributionPoints(publicCaInfo.getCrlUris(),
-                    null, null);
-            if(crlDistPoint == null)
-            {
-                if(extOccurrence.isRequired())
-                {
-                    throw new CertProfileException("Could not add required extension CRLDistributionPoints");
-                }
-            }
-            else
-            {
-                certBuilder.addExtension(extType, extOccurrence.isCritical(), crlDistPoint);
-            }
-        }
-
-        // FreshestCRL
-        extType = Extension.freshestCRL;
-        extOccurrence = occurrences.remove(extType);
-        if(extOccurrence != null)
-        {
-            CRLDistPoint deltaCrlDistPoint = X509Util.createCRLDistributionPoints(publicCaInfo.getDeltaCrlUris(),
-                    null, null);
-            if(deltaCrlDistPoint == null)
-            {
-                if(extOccurrence.isRequired())
-                {
-                    throw new CertProfileException("Could not add required extension freshestCRL");
-                }
-            }
-            else
-            {
-                certBuilder.addExtension(extType, extOccurrence.isCritical(), deltaCrlDistPoint);
-            }
-        }
-
-        // BasicConstraints
-        extType = Extension.basicConstraints;
-        extOccurrence = occurrences.remove(extType);
-        if(extOccurrence != null)
-        {
-            BasicConstraints value = X509Util.createBasicConstraints(profile.isCA(),
-                    profile.getPathLenBasicConstraint());
-            if(value == null)
-            {
-                if(extOccurrence.isRequired())
-                {
-                    throw new CertProfileException("Could not add required extension BasicConstraints");
-                }
-            }
-            else
-            {
-                certBuilder.addExtension(extType, extOccurrence.isCritical(), value);
-            }
-        }
-
-        // KeyUsage
-        extType = Extension.keyUsage;
-        extOccurrence = occurrences.remove(extType);
-        if(extOccurrence != null)
-        {
-            org.bouncycastle.asn1.x509.KeyUsage value = X509Util.createKeyUsage(
-                    profile.getKeyUsage());
-            if(value == null)
-            {
-                if(extOccurrence.isRequired())
-                {
-                    throw new CertProfileException("Could not add required extension KeyUsage");
-                }
-            }
-            else
-            {
-                certBuilder.addExtension(extType, extOccurrence.isCritical(), value);
-            }
-        }
-
-        // ExtendedKeyUsage
-        extType = Extension.extendedKeyUsage;
-        extOccurrence = occurrences.remove(extType);
-        if(extOccurrence != null)
-        {
-            ExtendedKeyUsage value = X509Util.createExtendedUsage(profile.getExtendedKeyUsages());
-            if(value == null)
-            {
-                if(extOccurrence.isRequired())
-                {
-                    throw new CertProfileException("Could not add required extension ExtendedKeyUsage");
-                }
-            }
-            else
-            {
-                certBuilder.addExtension(extType, extOccurrence.isCritical(), value);
-            }
-        }
-
-        ExtensionTuples extensionTuples = profile.getExtensions(occurrences, requestedSubject, null);
+        ExtensionTuples extensionTuples = profile.getExtensions(requestedSubject, null, requestedPublicKeyInfo,
+                publicCaInfo, null);
         if(extensionTuples != null)
         {
-            for(ExtensionTuple extension : extensionTuples.getExtensions())
+            for(ASN1ObjectIdentifier extType : extensionTuples.getExtensionTypes())
             {
-                certBuilder.addExtension(extension.getType(), extension.isCritical(), extension.getValue());
+                ExtensionValue extValue = extensionTuples.getExtensionValue(extType);
+                certBuilder.addExtension(extType, extValue.isCritical(), extValue.getValue());
             }
 
             return extensionTuples.getWarning();

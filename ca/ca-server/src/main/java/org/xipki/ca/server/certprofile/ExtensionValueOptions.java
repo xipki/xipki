@@ -35,30 +35,38 @@
 
 package org.xipki.ca.server.certprofile;
 
+import java.util.List;
+
+import org.xipki.ca.api.EnvironmentParameterResolver;
+import org.xipki.ca.api.profile.ExtensionValue;
+import org.xipki.common.ParamChecker;
+
 /**
  * @author Lijun Liao
  */
 
-public enum GeneralNameTag
+public class ExtensionValueOptions
 {
-    otherName(0),
-    rfc822Name(1),
-    dNSName(2),
-    x400Adress(3),
-    directoryName(4),
-    ediPartyName(5),
-    uniformResourceIdentifier(6),
-    iPAddress(7),
-    registeredID(8);
+    private final List<ExtensionValueOption> options;
 
-    private final int tag;
-    private GeneralNameTag(int tag)
+    public ExtensionValueOptions(List<ExtensionValueOption> options)
     {
-        this.tag = tag;
+        ParamChecker.assertNotEmpty("options", options);
+        this.options = options;
     }
 
-    public int getTag()
+    public ExtensionValue getExtensionValue(EnvironmentParameterResolver pr)
     {
-        return tag;
+        for(ExtensionValueOption o : options)
+        {
+            Condition c = o.getCondition();
+            if(c == null || c.satisfy(pr))
+            {
+                return o.getExtensionValue();
+            }
+        }
+
+        return null;
     }
+
 }

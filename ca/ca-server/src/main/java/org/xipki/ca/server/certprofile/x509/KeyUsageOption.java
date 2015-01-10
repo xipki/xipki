@@ -37,7 +37,7 @@ package org.xipki.ca.server.certprofile.x509;
 
 import java.util.Set;
 
-import org.xipki.ca.api.profile.x509.KeyUsage;
+import org.xipki.ca.api.profile.x509.KeyUsageOccurrence;
 import org.xipki.ca.server.certprofile.Condition;
 
 /**
@@ -47,9 +47,9 @@ import org.xipki.ca.server.certprofile.Condition;
 class KeyUsageOption
 {
     private final Condition condition;
-    private final Set<KeyUsage> keyusages;
+    private final Set<KeyUsageOccurrence> keyusages;
 
-    public KeyUsageOption(Condition condition, Set<KeyUsage> keyusages)
+    public KeyUsageOption(Condition condition, Set<KeyUsageOccurrence> keyusages)
     {
         this.condition = condition;
         this.keyusages = keyusages;
@@ -60,7 +60,7 @@ class KeyUsageOption
         return condition;
     }
 
-    public Set<KeyUsage> getKeyusages()
+    public Set<KeyUsageOccurrence> getKeyusages()
     {
         return keyusages;
     }

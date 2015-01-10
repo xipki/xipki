@@ -36,10 +36,13 @@
 package org.xipki.ca.api.profile;
 
 import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 
+import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
+import org.xipki.common.ParamChecker;
 
 /**
  * @author Lijun Liao
@@ -48,25 +51,40 @@ import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 public class ExtensionTuples
 {
     private String warning;
-    private final List<ExtensionTuple> extensions = new LinkedList<>();
+    private final Map<ASN1ObjectIdentifier, ExtensionValue> extensions = new HashMap<>();
 
-    public boolean addExtension(ExtensionTuple extension)
+    public boolean addExtension(ASN1ObjectIdentifier type, boolean critical, ASN1Encodable value)
     {
-        ASN1ObjectIdentifier type = extension.getType();
-        for(ExtensionTuple t : extensions)
+        ParamChecker.assertNotNull("type", type);
+        ParamChecker.assertNotNull("value", value);
+        if(extensions.containsKey(type))
         {
-            if(t.getType().equals(type))
-            {
-                return false;
-            }
+            return false;
         }
-        extensions.add(extension);
+        extensions.put(type, new ExtensionValue(critical, value));
         return true;
     }
 
-    public List<ExtensionTuple> getExtensions()
+    public boolean addExtension(ASN1ObjectIdentifier type, ExtensionValue value)
     {
-        return Collections.unmodifiableList(extensions);
+        ParamChecker.assertNotNull("type", type);
+        ParamChecker.assertNotNull("value", value);
+        if(extensions.containsKey(type))
+        {
+            return false;
+        }
+        extensions.put(type, value);
+        return true;
+    }
+
+    public Set<ASN1ObjectIdentifier> getExtensionTypes()
+    {
+        return Collections.unmodifiableSet(extensions.keySet());
+    }
+
+    public ExtensionValue getExtensionValue(ASN1ObjectIdentifier type)
+    {
+        return extensions.get(type);
     }
 
     public void setWarning(String warning)
@@ -81,33 +99,12 @@ public class ExtensionTuples
 
     public boolean removeExtensionTuple(ASN1ObjectIdentifier type)
     {
-        ExtensionTuple tbd = null;
-        for(ExtensionTuple t : extensions)
-        {
-            if(t.getType().equals(type))
-            {
-                tbd = t;
-            }
-        }
-
-        if(tbd != null)
-        {
-            extensions.remove(tbd);
-            return true;
-        }
-        return false;
+        return extensions.remove(type) != null;
     }
 
     public boolean containsExtension(ASN1ObjectIdentifier type)
     {
-        for(ExtensionTuple t : extensions)
-        {
-            if(t.getType().equals(type))
-            {
-                return true;
-            }
-        }
-        return false;
+        return extensions.containsKey(type);
     }
 
 }

@@ -33,40 +33,43 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.ca.server.certprofile;
+package org.xipki.ca.api.profile;
 
-import java.util.List;
+import java.util.Collections;
+import java.util.Set;
 
-import org.xipki.ca.api.EnvironmentParameterResolver;
-import org.xipki.ca.api.profile.ExtensionTuple;
-import org.xipki.common.ParamChecker;
+import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 
 /**
  * @author Lijun Liao
  */
 
-public class ExtensionTupleOptions
+public class GeneralNameMode
 {
-    private final List<ExtensionTupleOption> options;
+    private final GeneralNameTag tag;
+    // not applied to all tags, currently only for tag otherName
+    private final Set<ASN1ObjectIdentifier> allowedTypes;
 
-    public ExtensionTupleOptions(List<ExtensionTupleOption> options)
+    public GeneralNameMode(GeneralNameTag tag)
     {
-        ParamChecker.assertNotEmpty("options", options);
-        this.options = options;
+        this.tag = tag;
+        this.allowedTypes = null;
     }
 
-    public ExtensionTuple getExtensionTuple(EnvironmentParameterResolver pr)
+    public GeneralNameMode(GeneralNameTag tag, Set<ASN1ObjectIdentifier> allowedTypes)
     {
-        for(ExtensionTupleOption o : options)
-        {
-            Condition c = o.getCondition();
-            if(c == null || c.satisfy(pr))
-            {
-                return o.getExtensionTuple();
-            }
-        }
+        this.tag = tag;
+        this.allowedTypes = allowedTypes == null ? null : Collections.unmodifiableSet(allowedTypes);
+    }
 
-        return null;
+    public GeneralNameTag getTag()
+    {
+        return tag;
+    }
+
+    public Set<ASN1ObjectIdentifier> getAllowedTypes()
+    {
+        return allowedTypes;
     }
 
 }

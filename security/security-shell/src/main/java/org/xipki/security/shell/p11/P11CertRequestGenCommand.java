@@ -37,11 +37,14 @@ package org.xipki.security.shell.p11;
 
 import java.io.File;
 import java.security.cert.X509Certificate;
+import java.util.LinkedList;
+import java.util.List;
 
 import org.apache.karaf.shell.commands.Command;
 import org.apache.karaf.shell.commands.Option;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.Certificate;
+import org.bouncycastle.asn1.x509.Extension;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.bouncycastle.operator.ContentSigner;
 import org.bouncycastle.pkcs.PKCS10CertificationRequest;
@@ -72,6 +75,14 @@ public class P11CertRequestGenCommand extends P11SecurityCommand
             required = true, description = "Required. Output file name")
     protected String outputFilename;
 
+    @Option(name = "-san", aliases="--subjectAltName",
+            required = false, multiValued = true, description = "SubjectAltName. Multi-valued.")
+    protected List<String> subjectAltNames;
+
+    @Option(name = "-sia", aliases="--subjectInfoAccess",
+            required = false, multiValued = true, description = "SubjectInfoAccess. Multi-valued")
+    protected List<String> subjectInfoAccesses;
+
     @Override
     protected Object doExecute()
     throws Exception
@@ -94,6 +105,19 @@ public class P11CertRequestGenCommand extends P11SecurityCommand
                 signerConfWithoutAlgo, hashAlgo, false,
                 (X509Certificate[]) null);
 
+        // SubjectAltNames
+        List<Extension> extensions = new LinkedList<>();
+        if(subjectAltNames != null && subjectAltNames.isEmpty() == false)
+        {
+            extensions.add(P10RequestGenerator.createExtensionSubjectAltName(subjectAltNames, false));
+        }
+
+        // SubjectInfoAccess
+        if(subjectInfoAccesses != null && subjectInfoAccesses.isEmpty() == false)
+        {
+            extensions.add(P10RequestGenerator.createExtensionSubjectInfoAccess(subjectInfoAccesses, false));
+        }
+
         Certificate cert = Certificate.getInstance(identifiedSigner.getCertificate().getEncoded());
 
         X500Name subjectDN;
@@ -113,7 +137,7 @@ public class P11CertRequestGenCommand extends P11SecurityCommand
         PKCS10CertificationRequest p10Req;
         try
         {
-            p10Req  = p10Gen.generateRequest(signer, subjectPublicKeyInfo, subjectDN);
+            p10Req  = p10Gen.generateRequest(signer, subjectPublicKeyInfo, subjectDN, extensions);
         }finally
         {
             identifiedSigner.returnContentSigner(signer);

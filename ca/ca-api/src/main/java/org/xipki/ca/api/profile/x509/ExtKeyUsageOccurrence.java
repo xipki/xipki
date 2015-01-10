@@ -33,33 +33,35 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.ca.server.certprofile;
+package org.xipki.ca.api.profile.x509;
 
-import org.xipki.ca.api.profile.ExtensionTuple;
+import org.bouncycastle.asn1.ASN1ObjectIdentifier;
+import org.xipki.common.ParamChecker;
 
 /**
  * @author Lijun Liao
  */
 
-public class ExtensionTupleOption
+public class ExtKeyUsageOccurrence
 {
-    private final Condition condition;
-    private final ExtensionTuple extensionTuple;
+    private final ASN1ObjectIdentifier extKeyUsage;
+    private final boolean required;
 
-    public ExtensionTupleOption(Condition condition, ExtensionTuple extensionTuple)
+    public ExtKeyUsageOccurrence(ASN1ObjectIdentifier extKeyUsage, boolean required)
     {
-        this.condition = condition;
-        this.extensionTuple = extensionTuple;
+        ParamChecker.assertNotNull("extKeyUsage", extKeyUsage);
+        this.extKeyUsage = extKeyUsage;
+        this.required = required;
     }
 
-    public Condition getCondition()
+    public ASN1ObjectIdentifier getExtKeyUsage()
     {
-        return condition;
+        return extKeyUsage;
     }
 
-    public ExtensionTuple getExtensionTuple()
+    public boolean isRequired()
     {
-        return extensionTuple;
+        return required;
     }
 
 }

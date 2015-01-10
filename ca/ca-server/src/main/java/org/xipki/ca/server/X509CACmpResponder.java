@@ -1130,7 +1130,8 @@ public class X509CACmpResponder extends CmpResponder
                 if(returnedObj != null)
                 {
                     PKIStatusInfo status = new PKIStatusInfo(PKIStatus.granted);
-                    CertId certId = new CertId(new GeneralName(ca.getCASubjectX500Name()), serialNumber);
+                    CertId certId = new CertId(new GeneralName(ca.getCAInfo().getPublicCAInfo().getX500Subject()),
+                            serialNumber);
                     repContentBuilder.add(status, certId);
                     if(childAuditEvent != null)
                     {

@@ -94,6 +94,11 @@ public enum KeyUsage
         return null;
     }
 
+    public int getBit()
+    {
+        return bit;
+    }
+
     public String getName()
     {
         return names[0];

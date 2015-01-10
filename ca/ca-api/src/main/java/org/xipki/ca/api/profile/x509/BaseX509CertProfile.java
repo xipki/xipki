@@ -53,8 +53,8 @@ import org.xipki.ca.api.BadCertTemplateException;
 import org.xipki.ca.api.CertProfileException;
 import org.xipki.ca.api.EnvironmentParameterResolver;
 import org.xipki.ca.api.profile.ExtensionOccurrence;
-import org.xipki.ca.api.profile.ExtensionTuple;
 import org.xipki.ca.api.profile.ExtensionTuples;
+import org.xipki.ca.api.profile.ExtensionValue;
 import org.xipki.ca.api.profile.RDNOccurrence;
 import org.xipki.ca.api.profile.SubjectInfo;
 import org.xipki.common.ObjectIdentifiers;
@@ -242,23 +242,17 @@ extends X509CertProfile
     }
 
     protected static void checkAndAddExtension(ASN1ObjectIdentifier type, ExtensionOccurrence occurence,
-            ExtensionTuple extension, ExtensionTuples tuples)
+            ExtensionValue value, ExtensionTuples tuples)
     throws CertProfileException
     {
-        if(extension != null)
+        if(value != null)
         {
-            tuples.addExtension(extension);
+            tuples.addExtension(type, value);
         }
         else if(occurence.isRequired())
         {
             throw new CertProfileException("Could not add required extension " + type.getId());
         }
-    }
-
-    protected static ExtensionTuple createExtension(ASN1ObjectIdentifier type, boolean critical, ASN1Encodable value)
-    throws CertProfileException
-    {
-        return (value == null) ? null : new ExtensionTuple(type, critical, value);
     }
 
     @Override
@@ -282,12 +276,6 @@ extends X509CertProfile
     protected void verifySubjectDNOccurence(X500Name requestedSubject)
     throws BadCertTemplateException
     {
-        verifySubjectDNOccurence(requestedSubject, null);
-    }
-
-    protected void verifySubjectDNOccurence(X500Name requestedSubject, Set<ASN1ObjectIdentifier> ignoreRDNs)
-    throws BadCertTemplateException
-    {
         Set<RDNOccurrence> occurences = getSubjectDNSubset();
         if(occurences == null)
         {
@@ -297,11 +285,6 @@ extends X509CertProfile
         ASN1ObjectIdentifier[] types = requestedSubject.getAttributeTypes();
         for(ASN1ObjectIdentifier type : types)
         {
-            if(ignoreRDNs != null && ignoreRDNs.contains(type))
-            {
-                continue;
-            }
-
             RDNOccurrence occu = null;
             for(RDNOccurrence occurence : occurences)
             {

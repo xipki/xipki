@@ -39,7 +39,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.xipki.ca.api.EnvironmentParameterResolver;
-import org.xipki.ca.api.profile.x509.KeyUsage;
+import org.xipki.ca.api.profile.x509.KeyUsageOccurrence;
 import org.xipki.ca.server.certprofile.Condition;
 import org.xipki.common.ParamChecker;
 
@@ -57,7 +57,7 @@ class KeyUsageOptions
         this.options = options;
     }
 
-    public Set<KeyUsage> getKeyusage(EnvironmentParameterResolver pr)
+    public Set<KeyUsageOccurrence> getKeyusage(EnvironmentParameterResolver pr)
     {
         for(KeyUsageOption o : options)
         {
