@@ -91,7 +91,7 @@
     <extension critical="false" required="false" permittedInRequest="false" description="freshestCRL">2.5.29.46</extension>
     <extension critical="true" required="true" permittedInRequest="true" description="keyUsage">2.5.29.15</extension>
     <extension critical="true" required="true" permittedInRequest="false" description="basicConstraints">2.5.29.19</extension>
-    <extension critical="false" required="true" permittedInRequest="false" description="subjectAlternativeName">2.5.29.17</extension>
+    <extension critical="false" required="true" permittedInRequest="true" description="subjectAlternativeName">2.5.29.17</extension>
     <extension critical="false" required="true" permittedInRequest="true" description="subjectInfoAccess">1.3.6.1.5.5.7.1.11</extension>
     <extension critical="true" required="true" permittedInRequest="false" description="policyMappings">2.5.29.33</extension>
     <extension critical="true" required="true" permittedInRequest="false" description="nameConstraints">2.5.29.30</extension>

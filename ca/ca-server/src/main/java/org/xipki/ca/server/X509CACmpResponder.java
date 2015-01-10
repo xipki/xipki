@@ -798,10 +798,10 @@ public class X509CACmpResponder extends CmpResponder
             ASN1Set attrs = certTemp.getAttributes();
             for(int i = 0; i < attrs.size(); i++)
             {
-                Attribute attr = (Attribute) attrs.getObjectAt(i);
+                Attribute attr = Attribute.getInstance(attrs.getObjectAt(i));
                 if(PKCSObjectIdentifiers.pkcs_9_at_extensionRequest.equals(attr.getAttrType()))
                 {
-                    extensions = (Extensions) attr.getAttributeValues()[0];
+                    extensions = Extensions.getInstance(attr.getAttributeValues()[0]);
                 }
             }
 

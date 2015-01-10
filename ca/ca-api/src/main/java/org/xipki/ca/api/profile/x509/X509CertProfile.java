@@ -61,6 +61,8 @@ import org.xipki.ca.api.profile.SubjectInfo;
 
 public abstract class X509CertProfile
 {
+    public static final ASN1ObjectIdentifier OID_NULL = new ASN1ObjectIdentifier("0.0.0.0");
+
     private TimeZone timeZone = TimeZone.getTimeZone("UTC");
 
     public boolean isOnlyForRA()
@@ -153,6 +155,10 @@ public abstract class X509CertProfile
         return null;
     }
 
+    /**
+     * Use the dummy oid 0.0.0.0 to identify the NULL accessMethod
+     * @return
+     */
     public Map<ASN1ObjectIdentifier, Set<GeneralNameMode>> getSubjectInfoAccessModes()
     {
         return null;

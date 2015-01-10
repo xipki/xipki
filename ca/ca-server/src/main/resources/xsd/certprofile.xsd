@@ -393,7 +393,12 @@
       <xs:element name="access" maxOccurs="unbounded">
         <xs:complexType>
           <xs:sequence>
-            <xs:element name="accessMethod" type="oidWithDescType"/>
+            <xs:element name="accessMethod" type="oidWithDescType">
+              <xs:annotation>
+                <xs:documentation>Use the dummy oid 0.0.0.0 for the NULL accessMethod 
+                </xs:documentation>
+              </xs:annotation>
+            </xs:element>
             <xs:element name="accessLocation" type="generalNameType"/>
           </xs:sequence>
         </xs:complexType>
