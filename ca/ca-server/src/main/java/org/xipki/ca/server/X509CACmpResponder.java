@@ -156,9 +156,9 @@ public class X509CACmpResponder extends CmpResponder
     static
     {
         knownGenMsgIds.add(CMPObjectIdentifiers.it_currentCRL.getId());
-        knownGenMsgIds.add(CustomObjectIdentifiers.id_cmp_generateCRL);
-        knownGenMsgIds.add(CustomObjectIdentifiers.id_cmp_getSystemInfo);
-        knownGenMsgIds.add(CustomObjectIdentifiers.id_cmp_removeExpiredCerts);
+        knownGenMsgIds.add(CustomObjectIdentifiers.id_cmp_generateCRL.getId());
+        knownGenMsgIds.add(CustomObjectIdentifiers.id_cmp_getSystemInfo.getId());
+        knownGenMsgIds.add(CustomObjectIdentifiers.id_cmp_removeExpiredCerts.getId());
     }
 
     public X509CACmpResponder(X509CA ca, ConcurrentContentSigner responder, SecurityFactory securityFactory)
@@ -472,7 +472,7 @@ public class X509CACmpResponder extends CmpResponder
                                     itvResp = new InfoTypeAndValue(infoType, crl);
                                 }
                             }
-                            else if(CustomObjectIdentifiers.id_cmp_generateCRL.equals(infoType.getId()))
+                            else if(CustomObjectIdentifiers.id_cmp_generateCRL.equals(infoType))
                             {
                                 eventType = "CRL_GEN_ONDEMAND";
 
@@ -489,13 +489,13 @@ public class X509CACmpResponder extends CmpResponder
                                     itvResp = new InfoTypeAndValue(infoType, crl);
                                 }
                             }
-                            else if(CustomObjectIdentifiers.id_cmp_getSystemInfo.equals(infoType.getId()))
+                            else if(CustomObjectIdentifiers.id_cmp_getSystemInfo.equals(infoType))
                             {
                                 eventType = "GET_SYSTEMINFO";
                                 String systemInfo = getSystemInfo(_requestor);
                                 itvResp = new InfoTypeAndValue(infoType, new DERUTF8String(systemInfo));
                             }
-                            else if(CustomObjectIdentifiers.id_cmp_removeExpiredCerts.equals(infoType.getId()))
+                            else if(CustomObjectIdentifiers.id_cmp_removeExpiredCerts.equals(infoType))
                             {
                                 eventType = "REMOVE_EXIPIRED_CERTS_TRIGGER";
                                 checkPermission(_requestor, Permission.REMOVE_CERT);

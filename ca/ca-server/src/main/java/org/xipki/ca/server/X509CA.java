@@ -1040,8 +1040,7 @@ public class X509CA
                 try
                 {
                     crlBuilder.addExtension(
-                            new ASN1ObjectIdentifier(CustomObjectIdentifiers.id_crl_certset),
-                                false, new DERSet(vector));
+                            CustomObjectIdentifiers.id_crl_certset, false, new DERSet(vector));
                 } catch (CertIOException e)
                 {
                     throw new OperationException(ErrorCode.INVALID_EXTENSION,

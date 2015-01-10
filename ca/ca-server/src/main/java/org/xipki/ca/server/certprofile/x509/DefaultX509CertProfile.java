@@ -1147,17 +1147,6 @@ public class DefaultX509CertProfile extends BaseX509CertProfile
             }
         }
 
-        // check whether there is unknown extensions
-        if(occurences.isEmpty() == false)
-        {
-            StringBuilder sb = new StringBuilder("Extensions with the following types are not processed: ");
-            for(ASN1ObjectIdentifier extnType : occurences.keySet())
-            {
-                sb.append(extnType.getId()).append(", ");
-            }
-            throw new CertProfileException(sb.substring(0, sb.length() - 2));
-        }
-
         return tuples;
     }
 

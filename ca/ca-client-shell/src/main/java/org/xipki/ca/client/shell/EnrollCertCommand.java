@@ -55,7 +55,10 @@ import org.xipki.ca.client.api.CertificateOrError;
 import org.xipki.ca.client.api.EnrollCertResult;
 import org.xipki.ca.client.api.dto.EnrollCertRequestEntryType;
 import org.xipki.ca.client.api.dto.EnrollCertRequestType;
+import org.xipki.common.CustomObjectIdentifiers;
+import org.xipki.common.SecurityUtil;
 import org.xipki.console.karaf.UnexpectedResultException;
+import org.xipki.security.ExtensionExistence;
 import org.xipki.security.P10RequestGenerator;
 import org.xipki.security.api.ConcurrentContentSigner;
 import org.xipki.security.api.SecurityFactory;
@@ -80,6 +83,18 @@ public abstract class EnrollCertCommand extends ClientCommand
     @Option(name = "-sia", aliases="--subjectInfoAccess",
             required = false, multiValued = true, description = "SubjectInfoAccess. Multi-valued")
     protected List<String> subjectInfoAccesses;
+
+    @Option(name = "-ne", aliases="--needExtension",
+            required = false, multiValued = true,
+            description = "Types of extension (except SubjectAltName and SubjectInfoAccess) that must\n"
+                    + "be contaied in the certificate. Multi-valued")
+    protected List<String> needExtensionTypes;
+
+    @Option(name = "-we", aliases="--wantExtension",
+            required = false, multiValued = true,
+            description = "Types of extension that should be contaied in the certificate if possible.\n"
+                    + "Multi-valued")
+    protected List<String> wantExtensionTypes;
 
     @Option(name = "-profile",
             required = true, description = "Required. Certificate profile")
@@ -126,17 +141,33 @@ public abstract class EnrollCertCommand extends ClientCommand
         certTemplateBuilder.setSubject(x500Subject);
         certTemplateBuilder.setPublicKey(ssCert.getSubjectPublicKeyInfo());
 
+        if(needExtensionTypes == null)
+        {
+            needExtensionTypes = new LinkedList<>();
+        }
+
         // SubjectAltNames
         List<Extension> extensions = new LinkedList<>();
         if(subjectAltNames != null && subjectAltNames.isEmpty() == false)
         {
             extensions.add(P10RequestGenerator.createExtensionSubjectAltName(subjectAltNames, false));
+            needExtensionTypes.add(Extension.subjectAlternativeName.getId());
         }
 
         // SubjectInfoAccess
         if(subjectInfoAccesses != null && subjectInfoAccesses.isEmpty() == false)
         {
             extensions.add(P10RequestGenerator.createExtensionSubjectInfoAccess(subjectInfoAccesses, false));
+            needExtensionTypes.add(Extension.subjectInfoAccess.getId());
+        }
+
+        if(needExtensionTypes.isEmpty() == false ||
+                (wantExtensionTypes != null && wantExtensionTypes.isEmpty() == false))
+        {
+            ExtensionExistence ee = new ExtensionExistence(SecurityUtil.textToASN1ObjectIdentifers(needExtensionTypes),
+                    SecurityUtil.textToASN1ObjectIdentifers(wantExtensionTypes));
+            extensions.add(new Extension(
+                    CustomObjectIdentifiers.id_request_extensions, false, ee.toASN1Primitive().getEncoded()));
         }
 
         if(extensions != null && extensions.isEmpty() == false)

@@ -184,7 +184,7 @@ abstract class X509CmpRequestor extends CmpRequestor
     public CmpResultType generateCRL()
     throws CmpRequestorException
     {
-        ASN1ObjectIdentifier type = new ASN1ObjectIdentifier(CustomObjectIdentifiers.id_cmp_generateCRL);
+        ASN1ObjectIdentifier type = CustomObjectIdentifiers.id_cmp_generateCRL;
         PKIMessage request = buildMessageWithGeneralMsgContent(type, null);
         PKIResponse response = signAndSend(request);
         return evaluateCRLResponse(response, type);
@@ -759,9 +759,9 @@ abstract class X509CmpRequestor extends CmpRequestor
     throws CmpRequestorException
     {
         PKIMessage request = buildMessageWithGeneralMsgContent(
-                new ASN1ObjectIdentifier(CustomObjectIdentifiers.id_cmp_getSystemInfo), null);
+                CustomObjectIdentifiers.id_cmp_getSystemInfo, null);
         PKIResponse response = signAndSend(request);
-        ASN1Encodable itvValue = extractGeneralRepContent(response, CustomObjectIdentifiers.id_cmp_getSystemInfo);
+        ASN1Encodable itvValue = extractGeneralRepContent(response, CustomObjectIdentifiers.id_cmp_getSystemInfo.getId());
         DERUTF8String utf8Str = DERUTF8String.getInstance(itvValue);
         String systemInfoStr = utf8Str.getString();
 
@@ -836,10 +836,10 @@ abstract class X509CmpRequestor extends CmpRequestor
 
         String requestInfo = sb.toString();
         PKIMessage request = buildMessageWithGeneralMsgContent(
-                new ASN1ObjectIdentifier(CustomObjectIdentifiers.id_cmp_removeExpiredCerts),
+                CustomObjectIdentifiers.id_cmp_removeExpiredCerts,
                 new DERUTF8String(requestInfo));
         PKIResponse response = signAndSend(request);
-        ASN1Encodable itvValue = extractGeneralRepContent(response, CustomObjectIdentifiers.id_cmp_removeExpiredCerts);
+        ASN1Encodable itvValue = extractGeneralRepContent(response, CustomObjectIdentifiers.id_cmp_removeExpiredCerts.getId());
         DERUTF8String utf8Str = DERUTF8String.getInstance(itvValue);
         String resultInfoStr = utf8Str.getString();
 
