@@ -72,6 +72,7 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.validation.SchemaFactory;
 
+import org.bouncycastle.asn1.ASN1Set;
 import org.bouncycastle.asn1.cmp.CMPCertificate;
 import org.bouncycastle.asn1.cmp.PKIFailureInfo;
 import org.bouncycastle.asn1.cmp.PKIMessage;
@@ -80,10 +81,13 @@ import org.bouncycastle.asn1.crmf.CertRequest;
 import org.bouncycastle.asn1.crmf.CertTemplate;
 import org.bouncycastle.asn1.crmf.CertTemplateBuilder;
 import org.bouncycastle.asn1.crmf.ProofOfPossession;
+import org.bouncycastle.asn1.pkcs.Attribute;
 import org.bouncycastle.asn1.pkcs.CertificationRequest;
 import org.bouncycastle.asn1.pkcs.CertificationRequestInfo;
+import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.Certificate;
+import org.bouncycastle.asn1.x509.Extensions;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.jce.provider.X509CertificateObject;
 import org.slf4j.Logger;
@@ -525,6 +529,18 @@ public final class RAWorkerImpl extends AbstractRAWorker implements RAWorker
             CertificationRequestInfo p10ReqInfo = entry.getP10Request().getCertificationRequestInfo();
             certTempBuilder.setPublicKey(p10ReqInfo.getSubjectPublicKeyInfo());
             certTempBuilder.setSubject(p10ReqInfo.getSubject());
+            ASN1Set attrs = p10ReqInfo.getAttributes();
+
+            for(int i = 0; i < attrs.size(); i++)
+            {
+                Attribute attr = Attribute.getInstance(attrs.getObjectAt(i));
+                if(PKCSObjectIdentifiers.pkcs_9_at_extensionRequest.equals(attr.getAttrType()))
+                {
+                    Extensions extensions = Extensions.getInstance(attr.getAttributeValues()[0]);
+                    certTempBuilder.setExtensions(extensions);
+                    break;
+                }
+            }
 
             CertTemplate certTemplate = certTempBuilder.build();
             CertRequest certReq = new CertRequest(1, certTemplate, null);

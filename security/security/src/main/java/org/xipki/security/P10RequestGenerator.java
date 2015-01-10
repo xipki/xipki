@@ -216,7 +216,7 @@ public class P10RequestGenerator
 
     /**
      *
-     * @param taggedValue [tag]value, and the value for tags otherName and ediPartyName is other-type=other-value.
+     * @param taggedValue [tag]value, and the value for tags otherName and ediPartyName is type=value.
      * @param modes
      * @return
      * @throws BadInputException

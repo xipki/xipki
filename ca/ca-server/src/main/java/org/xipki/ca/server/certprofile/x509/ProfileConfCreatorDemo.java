@@ -121,9 +121,8 @@ public class ProfileConfCreatorDemo
         requestExtensions = new HashSet<>();
         requestExtensions.add(Extension.keyUsage);
         requestExtensions.add(Extension.extendedKeyUsage);
-        requestExtensions.add(Extension.extendedKeyUsage);
+        requestExtensions.add(Extension.subjectAlternativeName);
         requestExtensions.add(Extension.subjectInfoAccess);
-        requestExtensions.add(ObjectIdentifiers.id_extension_pkix_ocsp_nocheck);
     }
 
     public static void main(String[] args)
