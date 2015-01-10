@@ -738,4 +738,23 @@ public class SecurityUtil
 
         return new String(cs);
     }
+
+    public static List<ASN1ObjectIdentifier> textToASN1ObjectIdentifers(List<String> oidTexts)
+    {
+        if(oidTexts == null)
+        {
+            return null;
+        }
+
+        List<ASN1ObjectIdentifier> ret = new ArrayList<>(oidTexts.size());
+        for(String oidText : oidTexts)
+        {
+            ASN1ObjectIdentifier oid = new ASN1ObjectIdentifier(oidText);
+            if(ret.contains(oid) == false)
+            {
+                ret.add(oid);
+            }
+        }
+        return ret;
+    }
 }
