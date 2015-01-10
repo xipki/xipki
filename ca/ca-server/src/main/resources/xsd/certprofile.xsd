@@ -25,9 +25,9 @@
           </xs:documentation>
         </xs:annotation>
       </xs:element>
-      <xs:element name="duplicateKeyPermitted" type="xs:boolean" minOccurs="0"/>
-      <xs:element name="duplicateSubjectPermitted" type="xs:boolean" minOccurs="0"/>
-      <xs:element name="serialNumberInReqPermitted" type="xs:boolean" minOccurs="0"/>
+      <xs:element name="duplicateKey" type="xs:boolean" minOccurs="0"/>
+      <xs:element name="duplicateSubject" type="xs:boolean" minOccurs="0"/>
+      <xs:element name="serialNumberInReq" type="xs:boolean" minOccurs="0"/>
       <xs:element name="specialBehavior" type="xs:string" minOccurs="0">
         <xs:annotation>
           <xs:documentation>
@@ -60,17 +60,11 @@
           </xs:sequence>
         </xs:complexType>
       </xs:element>
-      <xs:element name="allowedClientExtensions" minOccurs="0">
-        <xs:complexType>
-          <xs:sequence>
-            <xs:element name="type" type="oidWithDescType" maxOccurs="unbounded"/>
-          </xs:sequence>
-        </xs:complexType>
-      </xs:element>
       <xs:element name="extensions" type="extensionsType"/>
       <xs:any namespace="##other" minOccurs="0"/>
     </xs:sequence>
-    <xs:attribute name="onlyForRA" type="xs:boolean" default="false" use="optional"/>
+    <xs:attribute name="raOnly" type="xs:boolean" default="false" use="optional"/>
+    <xs:attribute name="qaOnly" type="xs:boolean" default="false" use="optional"/>
   </xs:complexType>
   <xs:complexType name="nameValueType">
     <xs:sequence>
@@ -208,8 +202,9 @@
     </xs:annotation>
     <xs:complexContent>
       <xs:extension base="oidWithDescType">
-        <xs:attribute name="critical" type="xs:boolean" use="optional"/>
-        <xs:attribute name="required" type="xs:boolean" default="false"/>
+        <xs:attribute name="critical" type="xs:boolean" use="required"/>
+        <xs:attribute name="required" type="xs:boolean" use="required"/>
+        <xs:attribute name="permittedInRequest" type="xs:boolean" use="required"/>
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
@@ -288,7 +283,15 @@
         <xs:complexType>
           <xs:sequence>
             <xs:element name="condition" type="conditionType" minOccurs="0"/>
-            <xs:element name="usage" type="oidWithDescType" maxOccurs="unbounded"/>
+            <xs:element name="usage" maxOccurs="unbounded">
+              <xs:complexType>
+                <xs:complexContent>
+			      <xs:extension base="oidWithDescType">
+                    <xs:attribute name="required" type="xs:boolean" use="required"/>
+	              </xs:extension>
+			    </xs:complexContent>
+              </xs:complexType>
+            </xs:element>
           </xs:sequence>
         </xs:complexType>
       </xs:element>
@@ -307,7 +310,7 @@
         <xs:complexType>
           <xs:sequence>
             <xs:element name="condition" type="conditionType" minOccurs="0"/>
-            <xs:element name="professionOid" type="oidWithDescType" maxOccurs="unbounded"/>
+            <xs:element name="professionOid" type="oidWithDescType" minOccurs="0" maxOccurs="unbounded"/>
             <xs:element name="professionItem" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
             <xs:element name="registrationNumber" type="xs:string" minOccurs="0"/>
             <xs:element name="addProfessionInfo" type="xs:hexBinary" minOccurs="0"/>
@@ -404,6 +407,13 @@
       </xs:extension>
     </xs:simpleContent>
   </xs:complexType>
+  <xs:complexType name="keyUsageType">
+    <xs:simpleContent>
+      <xs:extension base="keyUsageEnum">
+        <xs:attribute name="required" type="xs:boolean" use="required"/>
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>  
   <xs:simpleType name="oidType">
     <xs:restriction base="xs:token">
       <xs:pattern value="\d+(\.\d+)*"/>
@@ -415,7 +425,7 @@
       <xs:enumeration value="AND"/>
     </xs:restriction>
   </xs:simpleType>
-  <xs:simpleType name="keyUsageType">
+  <xs:simpleType name="keyUsageEnum">
     <xs:restriction base="xs:string">
       <xs:enumeration value="digitalSignature"/>
       <xs:enumeration value="contentCommitment"/>

@@ -51,6 +51,8 @@ import org.xipki.ca.api.CertValidity;
 import org.xipki.ca.api.EnvironmentParameterResolver;
 import org.xipki.ca.api.profile.ExtensionOccurrence;
 import org.xipki.ca.api.profile.ExtensionTuples;
+import org.xipki.ca.api.profile.ExtensionValue;
+import org.xipki.ca.api.profile.GeneralNameMode;
 import org.xipki.ca.api.profile.SubjectInfo;
 
 /**
@@ -136,10 +138,57 @@ public abstract class X509CertProfile
         return timeZone;
     }
 
-    public Set<ASN1ObjectIdentifier> getExtendedKeyUsages()
+    public Set<ExtKeyUsageOccurrence> getExtendedKeyUsages()
     {
         return null;
     }
+
+    public boolean isOnlyForQA()
+    {
+        return false;
+    }
+
+    public Set<GeneralNameMode> getSubjectAltNameModes()
+    {
+        return null;
+    }
+
+    public Map<ASN1ObjectIdentifier, Set<GeneralNameMode>> getSubjectInfoAccessModes()
+    {
+        return null;
+    }
+
+    public ExtensionValue getExtValueCertificatePolicies()
+    {
+        return null;
+    }
+
+    public ExtensionValue getExtValuePolicyConstraints()
+    {
+        return null;
+    }
+
+    public ExtensionValue getExtValueNameConstraints()
+    {
+        return null;
+    }
+
+    public ExtensionValue getExtValueInhibitAnyPolicy()
+    {
+        return null;
+    }
+
+    public ExtensionValue getExtValuePolicyMappings()
+    {
+        return null;
+    }
+
+    public ExtensionValue getExtValueAdmission()
+    {
+        return null;
+    }
+
+    public abstract Set<ASN1ObjectIdentifier> getAllowedRequestExtensions();
 
     public abstract Map<ASN1ObjectIdentifier, ExtensionOccurrence> getExtensionOccurences();
 
@@ -148,7 +197,7 @@ public abstract class X509CertProfile
 
     public abstract boolean isCA();
 
-    public abstract Set<KeyUsage> getKeyUsage();
+    public abstract Set<KeyUsageOccurrence> getKeyUsage();
 
     public abstract Integer getPathLenBasicConstraint();
 

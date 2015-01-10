@@ -38,8 +38,8 @@ package org.xipki.ca.server.certprofile.x509;
 import java.util.List;
 import java.util.Set;
 
-import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.xipki.ca.api.EnvironmentParameterResolver;
+import org.xipki.ca.api.profile.x509.ExtKeyUsageOccurrence;
 import org.xipki.ca.server.certprofile.Condition;
 import org.xipki.common.ParamChecker;
 
@@ -57,7 +57,7 @@ class ExtKeyUsageOptions
         this.options = options;
     }
 
-    public Set<ASN1ObjectIdentifier> getExtKeyusage(EnvironmentParameterResolver pr)
+    public Set<ExtKeyUsageOccurrence> getExtKeyusage(EnvironmentParameterResolver pr)
     {
         for(ExtKeyUsageOption o : options)
         {

@@ -157,14 +157,14 @@
   </fileSets>
   <files>
     <file>
-      <source>${project.basedir}/src/main/unfiltered/ca-config/example/ca-db.properties-hsqldb</source>
+      <source>${project.basedir}/src/main/unfiltered/ca-config/example/ca-db.properties-h2</source>
       <outputDirectory>ca-config</outputDirectory>
       <destName>ca-db.properties</destName>
       <fileMode>0644</fileMode>
       <lineEnding>dos</lineEnding>
     </file>
     <file>
-      <source>${project.basedir}/src/main/unfiltered/ocsp-config/example/ocsp-db.properties-hsqldb</source>
+      <source>${project.basedir}/src/main/unfiltered/ocsp-config/example/ocsp-db.properties-h2</source>
       <outputDirectory>ocsp-config</outputDirectory>
       <destName>ocsp-db.properties</destName>
       <fileMode>0644</fileMode>

@@ -57,8 +57,6 @@ import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.DERSequence;
 import org.bouncycastle.asn1.DERTaggedObject;
-import org.bouncycastle.asn1.DERUTF8String;
-import org.bouncycastle.asn1.x500.DirectoryString;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.CertPolicyId;
 import org.bouncycastle.asn1.x509.GeneralName;
@@ -70,12 +68,12 @@ import org.bouncycastle.jcajce.provider.asymmetric.util.ECUtil;
 import org.bouncycastle.math.ec.ECCurve;
 import org.xipki.ca.api.BadCertTemplateException;
 import org.xipki.ca.api.CertProfileException;
+import org.xipki.ca.api.profile.GeneralNameMode;
+import org.xipki.ca.api.profile.GeneralNameTag;
 import org.xipki.ca.api.profile.x509.CertificatePolicyInformation;
 import org.xipki.ca.api.profile.x509.CertificatePolicyQualifier;
 import org.xipki.ca.server.certprofile.AddText;
 import org.xipki.ca.server.certprofile.Condition;
-import org.xipki.ca.server.certprofile.GeneralNameMode;
-import org.xipki.ca.server.certprofile.GeneralNameTag;
 import org.xipki.ca.server.certprofile.Range;
 import org.xipki.ca.server.certprofile.x509.jaxb.AddTextType;
 import org.xipki.ca.server.certprofile.x509.jaxb.CertificatePolicyInformationType;
@@ -89,9 +87,9 @@ import org.xipki.ca.server.certprofile.x509.jaxb.GeneralSubtreesType;
 import org.xipki.ca.server.certprofile.x509.jaxb.ObjectFactory;
 import org.xipki.ca.server.certprofile.x509.jaxb.OidWithDescType;
 import org.xipki.ca.server.certprofile.x509.jaxb.PolicyIdMappingType;
-import org.xipki.ca.server.certprofile.x509.jaxb.X509ProfileType;
 import org.xipki.ca.server.certprofile.x509.jaxb.RangeType;
 import org.xipki.ca.server.certprofile.x509.jaxb.RangesType;
+import org.xipki.ca.server.certprofile.x509.jaxb.X509ProfileType;
 import org.xipki.common.LruCache;
 import org.xipki.common.SecurityUtil;
 import org.xml.sax.SAXException;
@@ -102,8 +100,6 @@ import org.xml.sax.SAXException;
 
 public class XmlX509CertProfileUtil
 {
-    private static final char GENERALNAME_SEP = '|';
-
     private final static Object jaxbUnmarshallerLock = new Object();
     private static Unmarshaller jaxbUnmarshaller;
 
@@ -367,105 +363,6 @@ public class XmlX509CertProfileUtil
         }
 
         return new DERSequence(vec);
-    }
-
-    static GeneralName createGeneralName(String value, Set<GeneralNameMode> modes)
-    throws BadCertTemplateException
-    {
-        int idxTagSep = value.indexOf(GENERALNAME_SEP);
-        if(idxTagSep == -1 || idxTagSep == 0 || idxTagSep == value.length() - 1)
-        {
-            throw new BadCertTemplateException("invalid generalName " + value);
-        }
-        String s = value.substring(0, idxTagSep);
-
-        int tag;
-        try
-        {
-            tag = Integer.parseInt(s);
-        }catch(NumberFormatException e)
-        {
-            throw new BadCertTemplateException("invalid generalName tag " + s);
-        }
-
-        GeneralNameMode mode = null;
-
-        for(GeneralNameMode m : modes)
-        {
-            if(m.getTag().getTag() == tag)
-            {
-                mode = m;
-                break;
-            }
-        }
-
-        if(mode == null)
-        {
-            throw new BadCertTemplateException("generalName tag " + tag + " is not allowed");
-        }
-
-        String name = value.substring(idxTagSep + 1);
-
-        switch(mode.getTag())
-        {
-            case otherName:
-            {
-                int idxSep = name.indexOf(GENERALNAME_SEP);
-                if(idxSep == -1 || idxSep == 0 || idxSep == name.length() - 1)
-                {
-                    throw new BadCertTemplateException("invalid otherName " + name);
-                }
-                String otherTypeOid = name.substring(0, idxSep);
-                ASN1ObjectIdentifier type = new ASN1ObjectIdentifier(otherTypeOid);
-                if(mode.getAllowedTypes().contains(type) == false)
-                {
-                    throw new BadCertTemplateException("otherName.type " + otherTypeOid + " is not allowed");
-                }
-                String otherValue = name.substring(idxSep + 1);
-
-                ASN1EncodableVector vector = new ASN1EncodableVector();
-                vector.add(type);
-                vector.add(new DERTaggedObject(true, 0, new DERUTF8String(otherValue)));
-                DERSequence seq = new DERSequence(vector);
-
-                return new GeneralName(GeneralName.otherName, seq);
-            }
-            case rfc822Name:
-                return new GeneralName(tag, name);
-            case dNSName:
-                return new GeneralName(tag, name);
-            case directoryName:
-            {
-                X500Name x500Name = SecurityUtil.reverse(new X500Name(name));
-                return new GeneralName(GeneralName.directoryName, x500Name);
-            }
-            case ediPartyName:
-            {
-                int idxSep = name.indexOf(GENERALNAME_SEP);
-                if(idxSep == -1 || idxSep == name.length() - 1)
-                {
-                    throw new BadCertTemplateException("invalid ediPartyName " + name);
-                }
-                String nameAssigner = idxSep == 0 ? null : name.substring(0, idxSep);
-                String partyName = name.substring(idxSep + 1);
-                ASN1EncodableVector vector = new ASN1EncodableVector();
-                if(nameAssigner != null)
-                {
-                    vector.add(new DERTaggedObject(false, 0, new DirectoryString(nameAssigner)));
-                }
-                vector.add(new DERTaggedObject(false, 1, new DirectoryString(partyName)));
-                ASN1Sequence seq = new DERSequence(vector);
-                return new GeneralName(GeneralName.ediPartyName, seq);
-            }
-            case uniformResourceIdentifier:
-                return new GeneralName(tag, name);
-            case iPAddress:
-                return new GeneralName(tag, name);
-            case registeredID:
-                return new GeneralName(tag, name);
-            default:
-                throw new RuntimeException("should not reach here");
-        }
     }
 
     static Set<GeneralNameMode> buildGeneralNameMode(GeneralNameType name)

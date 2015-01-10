@@ -33,36 +33,32 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.ca.server.certprofile.x509;
-
-import java.util.Set;
-
-import org.xipki.ca.api.profile.x509.ExtKeyUsageOccurrence;
-import org.xipki.ca.server.certprofile.Condition;
+package org.xipki.ca.api.profile;
 
 /**
  * @author Lijun Liao
  */
 
-class ExtKeyUsageOption
+public enum GeneralNameTag
 {
-    private final Condition condition;
-    private final Set<ExtKeyUsageOccurrence> extKeyusages;
+    otherName(0),
+    rfc822Name(1),
+    dNSName(2),
+    x400Adress(3),
+    directoryName(4),
+    ediPartyName(5),
+    uniformResourceIdentifier(6),
+    iPAddress(7),
+    registeredID(8);
 
-    public ExtKeyUsageOption(Condition condition, Set<ExtKeyUsageOccurrence> extKeyusages)
+    private final int tag;
+    private GeneralNameTag(int tag)
     {
-        this.condition = condition;
-        this.extKeyusages = extKeyusages;
+        this.tag = tag;
     }
 
-    public Condition getCondition()
+    public int getTag()
     {
-        return condition;
+        return tag;
     }
-
-    public Set<ExtKeyUsageOccurrence> getExtKeyusages()
-    {
-        return extKeyusages;
-    }
-
 }

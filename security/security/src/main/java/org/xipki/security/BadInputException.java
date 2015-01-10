@@ -33,36 +33,34 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.ca.server.certprofile.x509;
-
-import java.util.Set;
-
-import org.xipki.ca.api.profile.x509.ExtKeyUsageOccurrence;
-import org.xipki.ca.server.certprofile.Condition;
+package org.xipki.security;
 
 /**
  * @author Lijun Liao
  */
 
-class ExtKeyUsageOption
+public class BadInputException extends Exception
 {
-    private final Condition condition;
-    private final Set<ExtKeyUsageOccurrence> extKeyusages;
 
-    public ExtKeyUsageOption(Condition condition, Set<ExtKeyUsageOccurrence> extKeyusages)
+    private static final long serialVersionUID = 1L;
+
+    public BadInputException()
     {
-        this.condition = condition;
-        this.extKeyusages = extKeyusages;
     }
 
-    public Condition getCondition()
+    public BadInputException(String message)
     {
-        return condition;
+        super(message);
     }
 
-    public Set<ExtKeyUsageOccurrence> getExtKeyusages()
+    public BadInputException(Throwable cause)
     {
-        return extKeyusages;
+        super(cause);
+    }
+
+    public BadInputException(String message, Throwable cause)
+    {
+        super(message, cause);
     }
 
 }

@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<X509Profile xmlns="http://xipki.org/xmlprofile/v2" onlyForRA="false">
+<X509Profile xmlns="http://xipki.org/xmlprofile/v2">
   <description>CertProfile SubCA</description>
   <ca>true</ca>
   <validity>8y</validity>
   <notBeforeTime>current</notBeforeTime>
-  <duplicateKeyPermitted>false</duplicateKeyPermitted>
-  <duplicateSubjectPermitted>false</duplicateSubjectPermitted>
-  <serialNumberInReqPermitted>false</serialNumberInReqPermitted>
+  <duplicateKey>false</duplicateKey>
+  <duplicateSubject>false</duplicateSubject>
+  <serialNumberInReq>false</serialNumberInReq>
   <keyAlgorithms>
     <algorithm>
       <algorithm description="RSA">1.2.840.113549.1.1.1</algorithm>
@@ -66,20 +66,20 @@
     </rdn>
   </subject>
   <extensions>
-    <extension required="true" description="subjectKeyIdentifier">2.5.29.14</extension>
-    <extension required="true" description="authorityKeyIdentifier">2.5.29.35</extension>
-    <extension required="false" description="authorityInfoAccess">1.3.6.1.5.5.7.1.1</extension>
-    <extension required="false" description="cRLDistributionPoints">2.5.29.31</extension>
-    <extension required="false" description="freshestCRL">2.5.29.46</extension>
-    <extension required="true" description="keyUsage">2.5.29.15</extension>
-    <extension required="true" description="basicConstraints">2.5.29.19</extension>
+    <extension critical="false" required="true" permittedInRequest="false" description="subjectKeyIdentifier">2.5.29.14</extension>
+    <extension critical="false" required="true" permittedInRequest="false" description="authorityKeyIdentifier">2.5.29.35</extension>
+    <extension critical="false" required="false" permittedInRequest="false" description="authorityInfoAccess">1.3.6.1.5.5.7.1.1</extension>
+    <extension critical="false" required="false" permittedInRequest="false" description="cRLDistributionPoints">2.5.29.31</extension>
+    <extension critical="false" required="false" permittedInRequest="false" description="freshestCRL">2.5.29.46</extension>
+    <extension critical="true" required="true" permittedInRequest="true" description="keyUsage">2.5.29.15</extension>
+    <extension critical="true" required="true" permittedInRequest="false" description="basicConstraints">2.5.29.19</extension>
     <pathLen>1</pathLen>
     <authorityKeyIdentifier>
       <includeIssuerAndSerial>false</includeIssuerAndSerial>
     </authorityKeyIdentifier>
     <keyUsage>
-      <usage>keyCertSign</usage>
-      <usage>cRLSign</usage>
+      <usage required="true">keyCertSign</usage>
+      <usage required="false">cRLSign</usage>
     </keyUsage>
   </extensions>
 </X509Profile>

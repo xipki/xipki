@@ -53,6 +53,7 @@ import org.xipki.ca.api.profile.ExtensionOccurrence;
 import org.xipki.ca.api.profile.ExtensionTuples;
 import org.xipki.ca.api.profile.x509.AbstractEEX509CertProfile;
 import org.xipki.ca.api.profile.x509.KeyUsage;
+import org.xipki.ca.api.profile.x509.KeyUsageOccurrence;
 
 /**
  * @author Lijun Liao
@@ -61,16 +62,18 @@ import org.xipki.ca.api.profile.x509.KeyUsage;
 public class DemoEE2X509CertProfile extends AbstractEEX509CertProfile
 {
     private final CertValidity validity;
-    private final Set<KeyUsage> keyUsage;
+    private final Set<KeyUsageOccurrence> keyUsage;
     private final Map<ASN1ObjectIdentifier, ExtensionOccurrence> extensionOccurrences;
 
     public DemoEE2X509CertProfile()
     {
         validity = new CertValidity(10, Unit.YEAR);
-        Set<KeyUsage> _keyUsage = new HashSet<>(2);
-        _keyUsage.add(KeyUsage.digitalSignature);
-        _keyUsage.add(KeyUsage.dataEncipherment);
-        this.keyUsage = Collections.unmodifiableSet(_keyUsage);
+
+        Set<KeyUsageOccurrence> _keyUsage = new HashSet<>(2);
+        _keyUsage.add(new KeyUsageOccurrence(KeyUsage.digitalSignature, true));
+        _keyUsage.add(new KeyUsageOccurrence(KeyUsage.dataEncipherment, true));
+        keyUsage = Collections.unmodifiableSet(_keyUsage);
+
         extensionOccurrences = new HashMap<>();
         extensionOccurrences.put(Extension.authorityKeyIdentifier,
                 ExtensionOccurrence.NONCRITICAL_REQUIRED);
@@ -89,11 +92,11 @@ public class DemoEE2X509CertProfile extends AbstractEEX509CertProfile
         extensionOccurrences.put(Extension.basicConstraints,
                 ExtensionOccurrence.CRITICAL_REQUIRED);
         extensionOccurrences.put(Extension.keyUsage,
-                ExtensionOccurrence.NONCRITICAL_REQUIRED);
+                ExtensionOccurrence.CRITICAL_REQUIRED);
     }
 
     @Override
-    public Set<KeyUsage> getKeyUsage()
+    public Set<KeyUsageOccurrence> getKeyUsage()
     {
         return keyUsage;
     }
@@ -119,4 +122,9 @@ public class DemoEE2X509CertProfile extends AbstractEEX509CertProfile
         return null;
     }
 
+    @Override
+    public Set<ASN1ObjectIdentifier> getAllowedRequestExtensions()
+    {
+        return null;
+    }
 }

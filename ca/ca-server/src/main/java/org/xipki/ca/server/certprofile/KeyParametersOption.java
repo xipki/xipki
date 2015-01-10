@@ -288,7 +288,7 @@ public class KeyParametersOption
 
         public boolean allowsCurve(ASN1ObjectIdentifier curveOid)
         {
-            return curveOids.add(curveOid);
+            return curveOids.contains(curveOid);
         }
 
         public boolean allowsPointEncoding(byte encoding)

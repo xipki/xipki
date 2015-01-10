@@ -38,9 +38,9 @@ package org.xipki.ca.server.certprofile.x509;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.net.URL;
-import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
+import java.util.Set;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
@@ -73,29 +73,32 @@ import org.xipki.ca.server.certprofile.x509.jaxb.ExtensionsType.CertificatePolic
 import org.xipki.ca.server.certprofile.x509.jaxb.ExtensionsType.ConstantExtensions;
 import org.xipki.ca.server.certprofile.x509.jaxb.ExtensionsType.ExtendedKeyUsage;
 import org.xipki.ca.server.certprofile.x509.jaxb.ExtensionsType.InhibitAnyPolicy;
+import org.xipki.ca.server.certprofile.x509.jaxb.ExtensionsType.KeyUsage;
 import org.xipki.ca.server.certprofile.x509.jaxb.ExtensionsType.NameConstraints;
 import org.xipki.ca.server.certprofile.x509.jaxb.ExtensionsType.PolicyConstraints;
 import org.xipki.ca.server.certprofile.x509.jaxb.ExtensionsType.PolicyMappings;
+import org.xipki.ca.server.certprofile.x509.jaxb.ExtensionsType.ExtendedKeyUsage.Usage;
 import org.xipki.ca.server.certprofile.x509.jaxb.GeneralNameType;
 import org.xipki.ca.server.certprofile.x509.jaxb.GeneralNameType.OtherName;
 import org.xipki.ca.server.certprofile.x509.jaxb.GeneralSubtreeBaseType;
 import org.xipki.ca.server.certprofile.x509.jaxb.GeneralSubtreesType;
+import org.xipki.ca.server.certprofile.x509.jaxb.KeyUsageEnum;
 import org.xipki.ca.server.certprofile.x509.jaxb.KeyUsageType;
 import org.xipki.ca.server.certprofile.x509.jaxb.NameValueType;
 import org.xipki.ca.server.certprofile.x509.jaxb.ObjectFactory;
 import org.xipki.ca.server.certprofile.x509.jaxb.OidWithDescType;
 import org.xipki.ca.server.certprofile.x509.jaxb.OperatorType;
 import org.xipki.ca.server.certprofile.x509.jaxb.PolicyIdMappingType;
-import org.xipki.ca.server.certprofile.x509.jaxb.X509ProfileType;
-import org.xipki.ca.server.certprofile.x509.jaxb.X509ProfileType.KeyAlgorithms;
-import org.xipki.ca.server.certprofile.x509.jaxb.X509ProfileType.Parameters;
-import org.xipki.ca.server.certprofile.x509.jaxb.X509ProfileType.Subject;
 import org.xipki.ca.server.certprofile.x509.jaxb.RSAParametersType;
 import org.xipki.ca.server.certprofile.x509.jaxb.RangeType;
 import org.xipki.ca.server.certprofile.x509.jaxb.RangesType;
 import org.xipki.ca.server.certprofile.x509.jaxb.RdnType;
 import org.xipki.ca.server.certprofile.x509.jaxb.SubjectInfoAccessType;
 import org.xipki.ca.server.certprofile.x509.jaxb.SubjectInfoAccessType.Access;
+import org.xipki.ca.server.certprofile.x509.jaxb.X509ProfileType;
+import org.xipki.ca.server.certprofile.x509.jaxb.X509ProfileType.KeyAlgorithms;
+import org.xipki.ca.server.certprofile.x509.jaxb.X509ProfileType.Parameters;
+import org.xipki.ca.server.certprofile.x509.jaxb.X509ProfileType.Subject;
 import org.xipki.common.ObjectIdentifiers;
 import org.xipki.common.SecurityUtil;
 
@@ -111,43 +114,16 @@ public class ProfileConfCreatorDemo
             "(?=^.{1,254}$)(^(?:(?!\\d+\\.|-)[a-zA-Z0-9_\\-]{1,63}(?<!-)\\.?)+(?:[a-zA-Z]{2,})$)";
     private static final String REGEX_SN = "[\\d]{1,}";
 
-    private static final Map<ASN1ObjectIdentifier, String> oidDescMap;
+    private static final Set<ASN1ObjectIdentifier> requestExtensions;
 
     static
     {
-        oidDescMap = new HashMap<>();
-        oidDescMap.put(ObjectIdentifiers.id_extension_admission, "admission");
-        oidDescMap.put(Extension.auditIdentity, "auditIdentity");
-        oidDescMap.put(Extension.authorityInfoAccess, "authorityInfoAccess");
-        oidDescMap.put(Extension.authorityKeyIdentifier, "authorityKeyIdentifier");
-        oidDescMap.put(Extension.basicConstraints, "basicConstraints");
-        oidDescMap.put(Extension.biometricInfo, "biometricInfo");
-        oidDescMap.put(Extension.certificateIssuer, "certificateIssuer");
-        oidDescMap.put(Extension.certificatePolicies, "certificatePolicies");
-        oidDescMap.put(Extension.cRLDistributionPoints, "cRLDistributionPoints");
-        oidDescMap.put(Extension.cRLNumber, "cRLNumber");
-        oidDescMap.put(Extension.deltaCRLIndicator, "deltaCRLIndicator");
-        oidDescMap.put(Extension.extendedKeyUsage, "extendedKeyUsage");
-        oidDescMap.put(Extension.freshestCRL, "freshestCRL");
-        oidDescMap.put(Extension.inhibitAnyPolicy, "inhibitAnyPolicy");
-        oidDescMap.put(Extension.instructionCode, "instructionCode");
-        oidDescMap.put(Extension.invalidityDate, "invalidityDate");
-        oidDescMap.put(Extension.issuerAlternativeName, "issuerAlternativeName");
-        oidDescMap.put(Extension.issuingDistributionPoint, "issuingDistributionPoint");
-        oidDescMap.put(Extension.keyUsage, "keyUsage");
-        oidDescMap.put(Extension.logoType, "logoType");
-        oidDescMap.put(Extension.nameConstraints, "nameConstraints");
-        oidDescMap.put(Extension.noRevAvail, "noRevAvail");
-        oidDescMap.put(Extension.policyConstraints, "policyConstraints");
-        oidDescMap.put(Extension.policyMappings, "policyMappings");
-        oidDescMap.put(Extension.privateKeyUsagePeriod, "privateKeyUsagePeriod");
-        oidDescMap.put(Extension.qCStatements, "qCStatements");
-        oidDescMap.put(Extension.reasonCode, "reasonCode");
-        oidDescMap.put(Extension.subjectAlternativeName, "subjectAlternativeName");
-        oidDescMap.put(Extension.subjectDirectoryAttributes, "subjectDirectoryAttributes");
-        oidDescMap.put(Extension.subjectInfoAccess, "subjectInfoAccess");
-        oidDescMap.put(Extension.subjectKeyIdentifier, "subjectKeyIdentifier");
-        oidDescMap.put(Extension.targetInformation, "targetInformation");
+        requestExtensions = new HashSet<>();
+        requestExtensions.add(Extension.keyUsage);
+        requestExtensions.add(Extension.extendedKeyUsage);
+        requestExtensions.add(Extension.extendedKeyUsage);
+        requestExtensions.add(Extension.subjectInfoAccess);
+        requestExtensions.add(ObjectIdentifiers.id_extension_pkix_ocsp_nocheck);
     }
 
     public static void main(String[] args)
@@ -247,19 +223,22 @@ public class ProfileConfCreatorDemo
 
         // Extensions - occurrences
         List<ExtensionType> list = extensions.getExtension();
-        list.add(createExtension(Extension.subjectKeyIdentifier, true));
+        list.add(createExtension(Extension.subjectKeyIdentifier, true, false));
         if(cross)
         {
-            list.add(createExtension(Extension.authorityKeyIdentifier, true));
+            list.add(createExtension(Extension.authorityKeyIdentifier, true, false));
         }
-        list.add(createExtension(Extension.authorityInfoAccess, false));
-        list.add(createExtension(Extension.cRLDistributionPoints, false));
-        list.add(createExtension(Extension.freshestCRL, false));
-        list.add(createExtension(Extension.keyUsage, true));
-        list.add(createExtension(Extension.basicConstraints, true));
+        list.add(createExtension(Extension.authorityInfoAccess, false, false));
+        list.add(createExtension(Extension.cRLDistributionPoints, false, false));
+        list.add(createExtension(Extension.freshestCRL, false, false));
+        list.add(createExtension(Extension.keyUsage, true, true));
+        list.add(createExtension(Extension.basicConstraints, true, true));
 
         // Extensions - keyUsage
-        extensions.getKeyUsage().add(createKeyUsages(KeyUsageType.KEY_CERT_SIGN, KeyUsageType.C_RL_SIGN));
+        KeyUsage keyusage = createRequiredKeyUsages(KeyUsageEnum.KEY_CERT_SIGN);
+        keyusage.getUsage().add(createOptionalKeyUsage(KeyUsageEnum.C_RL_SIGN));
+        extensions.getKeyUsage().add(keyusage);
+
         return profile;
     }
 
@@ -286,16 +265,19 @@ public class ProfileConfCreatorDemo
 
         // Extensions - occurrences
         List<ExtensionType> list = extensions.getExtension();
-        list.add(createExtension(Extension.subjectKeyIdentifier, true));
-        list.add(createExtension(Extension.authorityKeyIdentifier, true));
-        list.add(createExtension(Extension.authorityInfoAccess, false));
-        list.add(createExtension(Extension.cRLDistributionPoints, false));
-        list.add(createExtension(Extension.freshestCRL, false));
-        list.add(createExtension(Extension.keyUsage, true));
-        list.add(createExtension(Extension.basicConstraints, true));
+        list.add(createExtension(Extension.subjectKeyIdentifier, true, false));
+        list.add(createExtension(Extension.authorityKeyIdentifier, true, false));
+        list.add(createExtension(Extension.authorityInfoAccess, false, false));
+        list.add(createExtension(Extension.cRLDistributionPoints, false, false));
+        list.add(createExtension(Extension.freshestCRL, false, false));
+        list.add(createExtension(Extension.keyUsage, true, true));
+        list.add(createExtension(Extension.basicConstraints, true, true));
 
         // Extensions - keyUsage
-        extensions.getKeyUsage().add(createKeyUsages(KeyUsageType.KEY_CERT_SIGN, KeyUsageType.C_RL_SIGN));
+        KeyUsage keyusage = createRequiredKeyUsages(KeyUsageEnum.KEY_CERT_SIGN);
+        keyusage.getUsage().add(createOptionalKeyUsage(KeyUsageEnum.C_RL_SIGN));
+        extensions.getKeyUsage().add(keyusage);
+
         return profile;
     }
 
@@ -322,26 +304,28 @@ public class ProfileConfCreatorDemo
 
         // Extensions - occurrences
         List<ExtensionType> list = extensions.getExtension();
-        list.add(createExtension(Extension.subjectKeyIdentifier, true));
-        list.add(createExtension(Extension.authorityKeyIdentifier, true));
-        list.add(createExtension(Extension.authorityInfoAccess, false));
-        list.add(createExtension(Extension.cRLDistributionPoints, false));
-        list.add(createExtension(Extension.freshestCRL, false));
-        list.add(createExtension(Extension.keyUsage, true));
-        list.add(createExtension(Extension.basicConstraints, true));
-        list.add(createExtension(Extension.subjectAlternativeName, true));
-        list.add(createExtension(Extension.subjectInfoAccess, true));
+        list.add(createExtension(Extension.subjectKeyIdentifier, true, false));
+        list.add(createExtension(Extension.authorityKeyIdentifier, true, false));
+        list.add(createExtension(Extension.authorityInfoAccess, false, false));
+        list.add(createExtension(Extension.cRLDistributionPoints, false, false));
+        list.add(createExtension(Extension.freshestCRL, false, false));
+        list.add(createExtension(Extension.keyUsage, true, true));
+        list.add(createExtension(Extension.basicConstraints, true, true));
+        list.add(createExtension(Extension.subjectAlternativeName, true, false));
+        list.add(createExtension(Extension.subjectInfoAccess, true, false));
 
-        list.add(createExtension(Extension.policyMappings, true));
-        list.add(createExtension(Extension.nameConstraints, true));
-        list.add(createExtension(Extension.policyConstraints, true));
-        list.add(createExtension(Extension.inhibitAnyPolicy, true));
+        list.add(createExtension(Extension.policyMappings, true, true));
+        list.add(createExtension(Extension.nameConstraints, true, true));
+        list.add(createExtension(Extension.policyConstraints, true, true));
+        list.add(createExtension(Extension.inhibitAnyPolicy, true, true));
 
         ASN1ObjectIdentifier customExtensionOid = new ASN1ObjectIdentifier("1.2.3.4");
-        list.add(createExtension(customExtensionOid, true, "custom extension 1"));
+        list.add(createExtension(customExtensionOid, true, false, "custom extension 1"));
 
         // Extensions - keyUsage
-        extensions.getKeyUsage().add(createKeyUsages(KeyUsageType.KEY_CERT_SIGN, KeyUsageType.C_RL_SIGN));
+        KeyUsage keyusage = createRequiredKeyUsages(KeyUsageEnum.KEY_CERT_SIGN);
+        keyusage.getUsage().add(createOptionalKeyUsage(KeyUsageEnum.C_RL_SIGN));
+        extensions.getKeyUsage().add(keyusage);
 
         // Certificate Policies
         ExtensionsType.CertificatePolicies certificatePolicies = createCertificatePolicies(
@@ -435,22 +419,23 @@ public class ProfileConfCreatorDemo
 
         // Extensions - occurrences
         List<ExtensionType> list = extensions.getExtension();
-        list.add(createExtension(Extension.subjectKeyIdentifier, true));
-        list.add(createExtension(Extension.authorityKeyIdentifier, true));
-        list.add(createExtension(Extension.authorityInfoAccess, false));
-        list.add(createExtension(Extension.cRLDistributionPoints, false));
-        list.add(createExtension(Extension.freshestCRL, false));
-        list.add(createExtension(Extension.keyUsage, true));
-        list.add(createExtension(Extension.basicConstraints, true));
-        list.add(createExtension(Extension.extendedKeyUsage, true));
-        list.add(createExtension(ObjectIdentifiers.id_extension_pkix_ocsp_nocheck, false));
+        list.add(createExtension(Extension.subjectKeyIdentifier, true, false));
+        list.add(createExtension(Extension.authorityKeyIdentifier, true, false));
+        list.add(createExtension(Extension.authorityInfoAccess, false, false));
+        list.add(createExtension(Extension.cRLDistributionPoints, false, false));
+        list.add(createExtension(Extension.freshestCRL, false, false));
+        list.add(createExtension(Extension.keyUsage, true, true));
+        list.add(createExtension(Extension.basicConstraints, true, true));
+        list.add(createExtension(Extension.extendedKeyUsage, true, false));
+        list.add(createExtension(ObjectIdentifiers.id_extension_pkix_ocsp_nocheck, false, false));
 
         // Extensions - keyUsage
-        extensions.getKeyUsage().add(createKeyUsages(KeyUsageType.CONTENT_COMMITMENT));
+        KeyUsage keyusage = createRequiredKeyUsages(KeyUsageEnum.CONTENT_COMMITMENT);
+        extensions.getKeyUsage().add(keyusage);
 
         // Extensions - extenedKeyUsage
-        extensions.getExtendedKeyUsage().add(createExtendedKeyUsage(
-                ObjectIdentifiers.id_kp_OCSPSigning));
+        ExtendedKeyUsage extKeyUsage = createRequiredExtendedKeyUsage(ObjectIdentifiers.id_kp_OCSPSigning);
+        extensions.getExtendedKeyUsage().add(extKeyUsage);
 
         return profile;
     }
@@ -477,23 +462,25 @@ public class ProfileConfCreatorDemo
 
         // Extensions - occurrences
         List<ExtensionType> list = extensions.getExtension();
-        list.add(createExtension(Extension.subjectKeyIdentifier, true));
-        list.add(createExtension(Extension.authorityKeyIdentifier, true));
-        list.add(createExtension(Extension.authorityInfoAccess, false));
-        list.add(createExtension(Extension.cRLDistributionPoints, false));
-        list.add(createExtension(Extension.freshestCRL, false));
-        list.add(createExtension(Extension.keyUsage, true));
-        list.add(createExtension(Extension.basicConstraints, true));
-        list.add(createExtension(Extension.extendedKeyUsage, true));
-        list.add(createExtension(ObjectIdentifiers.id_extension_admission, true));
+        list.add(createExtension(Extension.subjectKeyIdentifier, true, false));
+        list.add(createExtension(Extension.authorityKeyIdentifier, true, false));
+        list.add(createExtension(Extension.authorityInfoAccess, false, false));
+        list.add(createExtension(Extension.cRLDistributionPoints, false, false));
+        list.add(createExtension(Extension.freshestCRL, false, false));
+        list.add(createExtension(Extension.keyUsage, true, true));
+        list.add(createExtension(Extension.basicConstraints, true, true));
+        list.add(createExtension(Extension.extendedKeyUsage, true, false));
+        list.add(createExtension(ObjectIdentifiers.id_extension_admission, true, false));
 
         // Extensions - keyUsage
-        extensions.getKeyUsage().add(createKeyUsages(KeyUsageType.DIGITAL_SIGNATURE,
-                KeyUsageType.DATA_ENCIPHERMENT,  KeyUsageType.KEY_ENCIPHERMENT));
+        KeyUsage keyusage = createRequiredKeyUsages(KeyUsageEnum.DIGITAL_SIGNATURE,
+                KeyUsageEnum.DATA_ENCIPHERMENT,  KeyUsageEnum.KEY_ENCIPHERMENT);
+        extensions.getKeyUsage().add(keyusage);
 
         // Extensions - extenedKeyUsage
-        extensions.getExtendedKeyUsage().add(createExtendedKeyUsage(
-                ObjectIdentifiers.id_kp_clientAuth, ObjectIdentifiers.id_kp_serverAuth));
+        ExtendedKeyUsage extKeyUsage = createRequiredExtendedKeyUsage(ObjectIdentifiers.id_kp_serverAuth);
+        extKeyUsage.getUsage().add(createExtKeyUsage(ObjectIdentifiers.id_kp_clientAuth, false));
+        extensions.getExtendedKeyUsage().add(extKeyUsage);
 
         // Admission - just DEMO, does not belong to TLS certificate
         Admission admission = createAdmission(new ASN1ObjectIdentifier("1.1.1.2"), "demo item");
@@ -523,22 +510,24 @@ public class ProfileConfCreatorDemo
         ExtensionsType extensions = profile.getExtensions();
         // Extensions - occurrences
         List<ExtensionType> list = extensions.getExtension();
-        list.add(createExtension(Extension.subjectKeyIdentifier, true));
-        list.add(createExtension(Extension.authorityKeyIdentifier, true));
-        list.add(createExtension(Extension.authorityInfoAccess, false));
-        list.add(createExtension(Extension.cRLDistributionPoints, false));
-        list.add(createExtension(Extension.freshestCRL, false));
-        list.add(createExtension(Extension.keyUsage, true));
-        list.add(createExtension(Extension.basicConstraints, true));
-        list.add(createExtension(Extension.extendedKeyUsage, true));
+        list.add(createExtension(Extension.subjectKeyIdentifier, true, false));
+        list.add(createExtension(Extension.authorityKeyIdentifier, true, false));
+        list.add(createExtension(Extension.authorityInfoAccess, false, false));
+        list.add(createExtension(Extension.cRLDistributionPoints, false, false));
+        list.add(createExtension(Extension.freshestCRL, false, false));
+        list.add(createExtension(Extension.keyUsage, true, true));
+        list.add(createExtension(Extension.basicConstraints, true, true));
+        list.add(createExtension(Extension.extendedKeyUsage, true, false));
 
         // Extensions - keyUsage
-        extensions.getKeyUsage().add(createKeyUsages(KeyUsageType.DIGITAL_SIGNATURE,
-                KeyUsageType.DATA_ENCIPHERMENT,  KeyUsageType.KEY_ENCIPHERMENT));
+        KeyUsage keyusage = createRequiredKeyUsages(KeyUsageEnum.DIGITAL_SIGNATURE,
+                KeyUsageEnum.DATA_ENCIPHERMENT,  KeyUsageEnum.KEY_ENCIPHERMENT);
+        extensions.getKeyUsage().add(keyusage);
 
         // Extensions - extenedKeyUsage
-        extensions.getExtendedKeyUsage().add(createExtendedKeyUsage(
-                ObjectIdentifiers.id_kp_clientAuth));
+        ExtendedKeyUsage extKeyUsage = createRequiredExtendedKeyUsage(ObjectIdentifiers.id_kp_clientAuth);
+        extensions.getExtendedKeyUsage().add(extKeyUsage);
+
         return profile;
     }
 
@@ -564,22 +553,147 @@ public class ProfileConfCreatorDemo
 
         // Extensions - occurrences
         List<ExtensionType> list = extensions.getExtension();
-        list.add(createExtension(Extension.subjectKeyIdentifier, true));
-        list.add(createExtension(Extension.authorityKeyIdentifier, true));
-        list.add(createExtension(Extension.authorityInfoAccess, false));
-        list.add(createExtension(Extension.cRLDistributionPoints, false));
-        list.add(createExtension(Extension.freshestCRL, false));
-        list.add(createExtension(Extension.keyUsage, true));
-        list.add(createExtension(Extension.basicConstraints, true));
-        list.add(createExtension(Extension.extendedKeyUsage, true));
+        list.add(createExtension(Extension.subjectKeyIdentifier, true, false));
+        list.add(createExtension(Extension.authorityKeyIdentifier, true, false));
+        list.add(createExtension(Extension.authorityInfoAccess, false, false));
+        list.add(createExtension(Extension.cRLDistributionPoints, false, false));
+        list.add(createExtension(Extension.freshestCRL, false, false));
+        list.add(createExtension(Extension.keyUsage, true, true));
+        list.add(createExtension(Extension.basicConstraints, true, true));
+        list.add(createExtension(Extension.extendedKeyUsage, true, false));
 
         // Extensions - keyUsage
-        extensions.getKeyUsage().add(createKeyUsages(KeyUsageType.DIGITAL_SIGNATURE,
-                KeyUsageType.DATA_ENCIPHERMENT,  KeyUsageType.KEY_ENCIPHERMENT));
+        KeyUsage keyusage = createRequiredKeyUsages(KeyUsageEnum.DIGITAL_SIGNATURE,
+                KeyUsageEnum.DATA_ENCIPHERMENT,  KeyUsageEnum.KEY_ENCIPHERMENT);
+        extensions.getKeyUsage().add(keyusage);
 
         // Extensions - extenedKeyUsage
-        extensions.getExtendedKeyUsage().add(createExtendedKeyUsage(
-                ObjectIdentifiers.id_kp_clientAuth, ObjectIdentifiers.id_kp_serverAuth));
+        ExtendedKeyUsage extKeyUsage = createRequiredExtendedKeyUsage(ObjectIdentifiers.id_kp_serverAuth);
+        extKeyUsage.getUsage().add(createExtKeyUsage(ObjectIdentifiers.id_kp_clientAuth, false));
+        extensions.getExtendedKeyUsage().add(extKeyUsage);
+
+        return profile;
+    }
+
+    private static X509ProfileType CertProfile_gSMC_K()
+    throws Exception
+    {
+        X509ProfileType profile = getBaseProfile("CertProfile gSMC_K", false, "5y", false);
+        profile.setDuplicateSubject(true);
+
+        // SpecialBehavior
+        profile.setSpecialBehavior(SpecialX509CertProfileBehavior.gematik_gSMC_K.name());
+
+        // Maximal liftime
+        Parameters profileParams = new Parameters();
+        profile.setParameters(profileParams);
+        NameValueType nv = new NameValueType();
+        nv.setName(SpecialX509CertProfileBehavior.PARAMETER_MAXLIFTIME);
+        nv.setValue(Integer.toString(20 * 365));
+        profileParams.getParameter().add(nv);
+
+        // Subject
+        Subject subject = profile.getSubject();
+        subject.setIncSerialNrIfSubjectExists(false);
+
+        List<RdnType> occurrences = subject.getRdn();
+        occurrences.add(createRDN(ObjectIdentifiers.DN_C, 1, 1, new String[]{"DE"}));
+        occurrences.add(createRDN(ObjectIdentifiers.DN_O, 1, 1, null));
+        occurrences.add(createRDN(ObjectIdentifiers.DN_OU, 0, 1, null));
+        occurrences.add(createRDN(ObjectIdentifiers.DN_ST, 0, 1, null));
+        occurrences.add(createRDN(ObjectIdentifiers.DN_L, 0, 1, null));
+        occurrences.add(createRDN(ObjectIdentifiers.DN_POSTAL_CODE, 0, 1, null));
+        occurrences.add(createRDN(ObjectIdentifiers.DN_STREET, 0, 1, null));
+        // regex: ICCSN-yyyyMMdd
+        String regex = "80276[\\d]{15,15}-20\\d\\d(0[1-9]|1[012])(0[1-9]|[12][0-9]|3[01])";
+        occurrences.add(createRDN(ObjectIdentifiers.DN_CN, 1, 1, new String[]{regex}));
+
+        // Extensions
+        // Extensions - general
+        ExtensionsType extensions = profile.getExtensions();
+
+        // Extensions - occurrences
+        List<ExtensionType> list = extensions.getExtension();
+        list.add(createExtension(Extension.subjectKeyIdentifier, true, false));
+        list.add(createExtension(Extension.authorityKeyIdentifier, true, false));
+        list.add(createExtension(Extension.authorityInfoAccess, true, false));
+        list.add(createExtension(Extension.cRLDistributionPoints, false, false));
+        list.add(createExtension(Extension.keyUsage, true, true));
+        list.add(createExtension(Extension.subjectAlternativeName, false, false));
+        list.add(createExtension(Extension.basicConstraints, true, true));
+        list.add(createExtension(Extension.certificatePolicies, true, false));
+        list.add(createExtension(ObjectIdentifiers.id_extension_admission, true, false));
+        list.add(createExtension(Extension.extendedKeyUsage, true, false));
+
+        // Extensions - keyUsage
+        KeyUsage keyusage = createRequiredKeyUsages(KeyUsageEnum.DIGITAL_SIGNATURE,
+                KeyUsageEnum.KEY_ENCIPHERMENT);
+        extensions.getKeyUsage().add(keyusage);
+
+        // Extensions - extenedKeyUsage
+        ExtendedKeyUsage extKeyUsage = createRequiredExtendedKeyUsage(ObjectIdentifiers.id_kp_serverAuth);
+        extKeyUsage.getUsage().add(createExtKeyUsage(ObjectIdentifiers.id_kp_clientAuth, false));
+        extensions.getExtendedKeyUsage().add(extKeyUsage);
+
+        // Extensions - Policy
+        CertificatePolicies policies = new CertificatePolicies();
+        extensions.getCertificatePolicies().add(policies);
+
+        ASN1ObjectIdentifier[] policyIds = new ASN1ObjectIdentifier[]
+        {
+                id_gematik.branch("79"), id_gematik.branch("163")};
+        for(ASN1ObjectIdentifier id : policyIds)
+        {
+            CertificatePolicyInformationType policyInfo = new CertificatePolicyInformationType();
+            policies.getCertificatePolicyInformation().add(policyInfo);
+            policyInfo.setPolicyIdentifier(createOidType(id));
+        }
+
+        // Extension - Adminssion
+        Admission admission = new Admission();
+        extensions.getAdmission().add(admission);
+        admission.getProfessionOid().add(createOidType(id_gematik.branch("103")));
+        admission.getProfessionItem().add("Anwendungskonnektor");
+
+        return profile;
+    }
+
+    private static X509ProfileType CertProfile_MultipleOUs()
+    throws Exception
+    {
+        X509ProfileType profile = getBaseProfile("CertProfile Multiple OUs DEMO", false, "5y", false);
+
+        // Subject
+        Subject subject = profile.getSubject();
+        subject.setIncSerialNrIfSubjectExists(false);
+
+        List<RdnType> occurrences = subject.getRdn();
+        occurrences.add(createRDN(ObjectIdentifiers.DN_C, 1, 1, new String[]{"DE|FR"}));
+        occurrences.add(createRDN(ObjectIdentifiers.DN_O, 1, 1, null));
+
+        final String regex_ou1 = "[A-Z]{1,1}[\\d]{5,5}";
+        final String regex_ou2 = "[\\d]{5,5}";
+        occurrences.add(createRDN(ObjectIdentifiers.DN_OU, 2, 2, new String[]{regex_ou1,regex_ou2}));
+        occurrences.add(createRDN(ObjectIdentifiers.DN_SN, 0, 1, new String[]{REGEX_SN}));
+        occurrences.add(createRDN(ObjectIdentifiers.DN_CN, 1, 1, null));
+
+        // Extensions
+        // Extensions - general
+        ExtensionsType extensions = profile.getExtensions();
+
+        // Extensions - occurrences
+        List<ExtensionType> list = extensions.getExtension();
+        list.add(createExtension(Extension.subjectKeyIdentifier, true, false));
+        list.add(createExtension(Extension.authorityKeyIdentifier, true, false));
+        list.add(createExtension(Extension.authorityInfoAccess, false, false));
+        list.add(createExtension(Extension.cRLDistributionPoints, false, false));
+        list.add(createExtension(Extension.freshestCRL, false, false));
+        list.add(createExtension(Extension.keyUsage, true, true));
+        list.add(createExtension(Extension.basicConstraints, true, true));
+
+        // Extensions - keyUsage
+        KeyUsage keyusage = createRequiredKeyUsages(KeyUsageEnum.CONTENT_COMMITMENT);
+        extensions.getKeyUsage().add(keyusage);
 
         return profile;
     }
@@ -641,16 +755,20 @@ public class ProfileConfCreatorDemo
         return ret;
     }
 
-    private static ExtensionType createExtension(ASN1ObjectIdentifier type, boolean required)
+    private static ExtensionType createExtension(ASN1ObjectIdentifier type, boolean required, boolean critical)
     {
-        return createExtension(type, required, null);
+        return createExtension(type, required, critical, null);
     }
 
-    private static ExtensionType createExtension(ASN1ObjectIdentifier type, boolean required, String description)
+    private static ExtensionType createExtension(ASN1ObjectIdentifier type, boolean required, boolean critical,
+            String description)
     {
         ExtensionType ret = new ExtensionType();
         ret.setValue(type.getId());
         ret.setRequired(required);
+        ret.setCritical(critical);
+        ret.setPermittedInRequest(requestExtensions.contains(type));
+
         if(description == null)
         {
             description = getDescription(type);
@@ -663,16 +781,51 @@ public class ProfileConfCreatorDemo
         return ret;
     }
 
-    private static org.xipki.ca.server.certprofile.x509.jaxb.ExtensionsType.KeyUsage createKeyUsages(
-            KeyUsageType... keyUsages)
+    private static org.xipki.ca.server.certprofile.x509.jaxb.ExtensionsType.KeyUsage createRequiredKeyUsages(
+            KeyUsageEnum... keyUsages)
     {
         org.xipki.ca.server.certprofile.x509.jaxb.ExtensionsType.KeyUsage ret =
                 new org.xipki.ca.server.certprofile.x509.jaxb.ExtensionsType.KeyUsage();
-        for(KeyUsageType usage : keyUsages)
+        for(KeyUsageEnum usage : keyUsages)
         {
-            ret.getUsage().add(usage);
+            KeyUsageType type = new KeyUsageType();
+            type.setValue(usage);
+            type.setRequired(true);
+            ret.getUsage().add(type);
         }
         return ret;
+    }
+
+    private static KeyUsageType createOptionalKeyUsage(KeyUsageEnum usage)
+    {
+        KeyUsageType type = new KeyUsageType();
+        type.setValue(usage);
+        type.setRequired(false);
+        return type;
+    }
+
+    private static ExtendedKeyUsage createRequiredExtendedKeyUsage(
+            ASN1ObjectIdentifier... extKeyUsages)
+    {
+        ExtendedKeyUsage ret = new ExtendedKeyUsage();
+        for(ASN1ObjectIdentifier usage : extKeyUsages)
+        {
+            ret.getUsage().add(createExtKeyUsage(usage, true));
+        }
+        return ret;
+    }
+
+    private static Usage createExtKeyUsage(ASN1ObjectIdentifier usage, boolean required)
+    {
+        Usage type = new Usage();
+        type.setValue(usage.getId());
+        type.setRequired(required);
+        String desc = getDescription(usage);
+        if(desc != null)
+        {
+            type.setDescription(desc);
+        }
+        return type;
     }
 
     private static Admission createAdmission(ASN1ObjectIdentifier oid, String item)
@@ -703,26 +856,9 @@ public class ProfileConfCreatorDemo
         return ret;
     }
 
-    private static ExtendedKeyUsage createExtendedKeyUsage(
-            ASN1ObjectIdentifier... extKeyUsages)
-    {
-        ExtendedKeyUsage ret = new ExtendedKeyUsage();
-        for(ASN1ObjectIdentifier usage : extKeyUsages)
-        {
-            ret.getUsage().add(createOidType(usage));
-        }
-        return ret;
-    }
-
     private static String getDescription(ASN1ObjectIdentifier oid)
     {
-        String desc = ObjectIdentifiers.getName(oid);
-        if(desc == null)
-        {
-            desc = oidDescMap.get(oid);
-        }
-
-        return desc;
+        return ObjectIdentifiers.getName(oid);
     }
 
     private static PolicyIdMappingType createPolicyIdMapping(
@@ -797,138 +933,22 @@ public class ProfileConfCreatorDemo
         return ret;
     }
 
-    private static X509ProfileType CertProfile_gSMC_K()
-    throws Exception
-    {
-        X509ProfileType profile = getBaseProfile("CertProfile gSMC_K", false, "5y", false);
-        profile.setDuplicateSubjectPermitted(true);
-
-        // SpecialBehavior
-        profile.setSpecialBehavior(SpecialX509CertProfileBehavior.gematik_gSMC_K.name());
-
-        // Maximal liftime
-        Parameters profileParams = new Parameters();
-        profile.setParameters(profileParams);
-        NameValueType nv = new NameValueType();
-        nv.setName(SpecialX509CertProfileBehavior.PARAMETER_MAXLIFTIME);
-        nv.setValue(Integer.toString(20 * 365));
-        profileParams.getParameter().add(nv);
-
-        // Subject
-        Subject subject = profile.getSubject();
-        subject.setIncSerialNrIfSubjectExists(false);
-
-        List<RdnType> occurrences = subject.getRdn();
-        occurrences.add(createRDN(ObjectIdentifiers.DN_C, 1, 1, new String[]{"DE"}));
-        occurrences.add(createRDN(ObjectIdentifiers.DN_O, 1, 1, null));
-        occurrences.add(createRDN(ObjectIdentifiers.DN_OU, 0, 1, null));
-        occurrences.add(createRDN(ObjectIdentifiers.DN_ST, 0, 1, null));
-        occurrences.add(createRDN(ObjectIdentifiers.DN_L, 0, 1, null));
-        occurrences.add(createRDN(ObjectIdentifiers.DN_POSTAL_CODE, 0, 1, null));
-        occurrences.add(createRDN(ObjectIdentifiers.DN_STREET, 0, 1, null));
-        // regex: ICCSN-yyyyMMdd
-        String regex = "80276[\\d]{15,15}-20\\d\\d(0[1-9]|1[012])(0[1-9]|[12][0-9]|3[01])";
-        occurrences.add(createRDN(ObjectIdentifiers.DN_CN, 1, 1, new String[]{regex}));
-
-        // Extensions
-        // Extensions - general
-        ExtensionsType extensions = profile.getExtensions();
-
-        // Extensions - occurrences
-        List<ExtensionType> list = extensions.getExtension();
-        list.add(createExtension(Extension.subjectKeyIdentifier, true));
-        list.add(createExtension(Extension.authorityKeyIdentifier, true));
-        list.add(createExtension(Extension.authorityInfoAccess, true));
-        list.add(createExtension(Extension.cRLDistributionPoints, false));
-        list.add(createExtension(Extension.keyUsage, true));
-        list.add(createExtension(Extension.subjectAlternativeName, false));
-        list.add(createExtension(Extension.basicConstraints, true));
-        list.add(createExtension(Extension.certificatePolicies, true));
-        list.add(createExtension(ObjectIdentifiers.id_extension_admission, true));
-        list.add(createExtension(Extension.extendedKeyUsage, true));
-
-        // Extensions - keyUsage
-        extensions.getKeyUsage().add(createKeyUsages(KeyUsageType.DIGITAL_SIGNATURE,
-                KeyUsageType.KEY_ENCIPHERMENT));
-
-        // Extensions - extenedKeyUsage
-        extensions.getExtendedKeyUsage().add(createExtendedKeyUsage(
-                ObjectIdentifiers.id_kp_clientAuth, ObjectIdentifiers.id_kp_serverAuth));
-
-        // Extensions - Policy
-        CertificatePolicies policies = new CertificatePolicies();
-        extensions.getCertificatePolicies().add(policies);
-
-        ASN1ObjectIdentifier[] policyIds = new ASN1ObjectIdentifier[]
-        {
-                id_gematik.branch("79"), id_gematik.branch("163")};
-        for(ASN1ObjectIdentifier id : policyIds)
-        {
-            CertificatePolicyInformationType policyInfo = new CertificatePolicyInformationType();
-            policies.getCertificatePolicyInformation().add(policyInfo);
-            policyInfo.setPolicyIdentifier(createOidType(id));
-        }
-
-        // Extension - Adminssion
-        Admission admission = new Admission();
-        extensions.getAdmission().add(admission);
-        admission.getProfessionOid().add(createOidType(id_gematik.branch("103")));
-        admission.getProfessionItem().add("Anwendungskonnektor");
-
-        return profile;
-    }
-
-    private static X509ProfileType CertProfile_MultipleOUs()
-    throws Exception
-    {
-        X509ProfileType profile = getBaseProfile("CertProfile Multiple OUs DEMO", false, "5y", false);
-
-        // Subject
-        Subject subject = profile.getSubject();
-        subject.setIncSerialNrIfSubjectExists(false);
-
-        List<RdnType> occurrences = subject.getRdn();
-        occurrences.add(createRDN(ObjectIdentifiers.DN_C, 1, 1, new String[]{"DE|FR"}));
-        occurrences.add(createRDN(ObjectIdentifiers.DN_O, 1, 1, null));
-
-        final String regex_ou1 = "[A-Z]{1,1}[\\d]{5,5}";
-        final String regex_ou2 = "[\\d]{5,5}";
-        occurrences.add(createRDN(ObjectIdentifiers.DN_OU, 2, 2, new String[]{regex_ou1,regex_ou2}));
-        occurrences.add(createRDN(ObjectIdentifiers.DN_SN, 0, 1, new String[]{REGEX_SN}));
-        occurrences.add(createRDN(ObjectIdentifiers.DN_CN, 1, 1, null));
-
-        // Extensions
-        // Extensions - general
-        ExtensionsType extensions = profile.getExtensions();
-
-        // Extensions - occurrences
-        List<ExtensionType> list = extensions.getExtension();
-        list.add(createExtension(Extension.subjectKeyIdentifier, true));
-        list.add(createExtension(Extension.authorityKeyIdentifier, true));
-        list.add(createExtension(Extension.authorityInfoAccess, false));
-        list.add(createExtension(Extension.cRLDistributionPoints, false));
-        list.add(createExtension(Extension.freshestCRL, false));
-        list.add(createExtension(Extension.keyUsage, true));
-        list.add(createExtension(Extension.basicConstraints, true));
-
-        // Extensions - keyUsage
-        extensions.getKeyUsage().add(createKeyUsages(KeyUsageType.CONTENT_COMMITMENT));
-
-        return profile;
-    }
-
     private static X509ProfileType getBaseProfile(String description, boolean ca,
             String validity, boolean useMidnightNotBefore)
     {
-        return getBaseProfile(description, ca, null, validity, useMidnightNotBefore);
+        final boolean qa = false;
+        return getBaseProfile(description, ca, qa, null, validity, useMidnightNotBefore);
     }
 
-    private static X509ProfileType getBaseProfile(String description, boolean ca, Boolean prefersECImplicitCA,
-            String validity, boolean useMidnightNotBefore)
+    private static X509ProfileType getBaseProfile(String description, boolean ca, boolean qa,
+            Boolean prefersECImplicitCA, String validity, boolean useMidnightNotBefore)
     {
         X509ProfileType profile = new X509ProfileType();
         profile.setDescription(description);
-        profile.setOnlyForRA(false);
+        if(qa)
+        {
+            profile.setQaOnly(true);
+        }
         profile.setCa(ca);
         if(prefersECImplicitCA != null)
         {
@@ -937,9 +957,9 @@ public class ProfileConfCreatorDemo
         profile.setValidity(validity);
         profile.setNotBeforeTime(useMidnightNotBefore ? "midnight" : "current");
 
-        profile.setDuplicateKeyPermitted(false);
-        profile.setDuplicateSubjectPermitted(false);
-        profile.setSerialNumberInReqPermitted(false);
+        profile.setDuplicateKey(false);
+        profile.setDuplicateSubject(false);
+        profile.setSerialNumberInReq(false);
 
         // Subject
         Subject subject = new Subject();
@@ -949,9 +969,6 @@ public class ProfileConfCreatorDemo
 
         // Key
         profile.setKeyAlgorithms(createKeyAlgorithms());
-
-        // AllowedClientExtensions
-        profile.setAllowedClientExtensions(null);
 
         // Extensions
         // Extensions - general
@@ -981,16 +998,8 @@ public class ProfileConfCreatorDemo
             rsa.getRSAParameters().setModulusLength(ranges);
 
             List<RangeType> modulusLengths = ranges.getRange();
-
-            RangeType param = new RangeType();
-            modulusLengths.add(param);
-            param.setMin(2048);
-            param.setMax(2048);
-
-            param = new RangeType();
-            modulusLengths.add(param);
-            param.setMin(3072);
-            param.setMax(3072);
+            modulusLengths.add(createRange(2048));
+            modulusLengths.add(createRange(3072));
         }
 
         // DSA
@@ -1005,34 +1014,15 @@ public class ProfileConfCreatorDemo
             dsa.getDSAParameters().setPLength(ranges);
 
             List<RangeType> pLengths = ranges.getRange();
-
-            RangeType param = new RangeType();
-            pLengths.add(param);
-            param.setMin(1024);
-            param.setMax(1024);
-
-            param = new RangeType();
-            pLengths.add(param);
-            param.setMin(2048);
-            param.setMax(2048);
+            pLengths.add(createRange(1024));
+            pLengths.add(createRange(2048));
 
             ranges = new RangesType();
             dsa.getDSAParameters().setQLength(ranges);
             List<RangeType> qLengths = ranges.getRange();
-            param = new RangeType();
-            qLengths.add(param);
-            param.setMin(160);
-            param.setMax(160);
-
-            param = new RangeType();
-            qLengths.add(param);
-            param.setMin(224);
-            param.setMax(224);
-
-            param = new RangeType();
-            qLengths.add(param);
-            param.setMin(256);
-            param.setMax(256);
+            qLengths.add(createRange(160));
+            qLengths.add(createRange(224));
+            qLengths.add(createRange(256));
         }
 
         // EC
@@ -1063,6 +1053,25 @@ public class ProfileConfCreatorDemo
         }
 
         return ret;
+    }
+
+    private static RangeType createRange(Integer size)
+    {
+        return createRange(size, size);
+    }
+
+    private static RangeType createRange(Integer min, Integer max)
+    {
+        RangeType range = new RangeType();
+        if(min != null)
+        {
+            range.setMin(min);
+        }
+        if(max != null)
+        {
+            range.setMax(max);
+        }
+        return range;
     }
 
 }

@@ -45,13 +45,13 @@ import java.util.Set;
 
 public abstract class AbstractCAX509CertProfile extends BaseX509CertProfile
 {
-    protected Set<KeyUsage> keyUsages;
+    protected Set<KeyUsageOccurrence> keyUsages;
 
     public AbstractCAX509CertProfile()
     {
-        Set<KeyUsage> keyUsages = new HashSet<>();
-        keyUsages.add(KeyUsage.keyCertSign);
-        keyUsages.add(KeyUsage.cRLSign);
+        Set<KeyUsageOccurrence> keyUsages = new HashSet<>();
+        keyUsages.add(new KeyUsageOccurrence(KeyUsage.keyCertSign, true));
+        keyUsages.add(new KeyUsageOccurrence(KeyUsage.cRLSign, false));
         this.keyUsages = Collections.unmodifiableSet(keyUsages);
     }
 
@@ -62,7 +62,7 @@ public abstract class AbstractCAX509CertProfile extends BaseX509CertProfile
     }
 
     @Override
-    public Set<KeyUsage> getKeyUsage()
+    public Set<KeyUsageOccurrence> getKeyUsage()
     {
         return keyUsages;
     }

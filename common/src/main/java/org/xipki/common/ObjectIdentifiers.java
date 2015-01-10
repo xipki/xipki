@@ -37,7 +37,9 @@ package org.xipki.common;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.ocsp.OCSPObjectIdentifiers;
@@ -52,6 +54,7 @@ import org.bouncycastle.asn1.x509.X509ObjectIdentifiers;
 
 public class ObjectIdentifiers
 {
+
     /**
      * country code - StringType(SIZE(2))
      */
@@ -308,6 +311,7 @@ public class ObjectIdentifiers
 
     private static final List<ASN1ObjectIdentifier> forwardDNs;
     private static final List<ASN1ObjectIdentifier> backwardDNs;
+    private static final Map<ASN1ObjectIdentifier, String> oidNameMap;
 
     static
     {
@@ -348,6 +352,58 @@ public class ObjectIdentifiers
         }
 
         backwardDNs = Collections.unmodifiableList(_backwardDNs);
+
+        oidNameMap = new HashMap<>();
+        oidNameMap.put(id_kp_clientAuth, "id-kp-clientAuth");
+        oidNameMap.put(id_kp_codeSigning, "id-kp-codeSigning");
+        oidNameMap.put(id_kp_emailProtection, "id-kp-emailProtection");
+        oidNameMap.put(id_kp_ipsecEndSystem, "id-kp-ipsecEndSystem");
+        oidNameMap.put(id_kp_ipsecTunnel, "id-kp-ipsecTunnel");
+        oidNameMap.put(id_kp_ipsecUser, "id-kp-ipsecUser");
+        oidNameMap.put(id_kp_ocsp, "id-kp-ocsp");
+        oidNameMap.put(id_kp_OCSPSigning, "id-kp-OCSPSigning");
+        oidNameMap.put(id_kp_serverAuth, "id-kp-serverAuth");
+        oidNameMap.put(id_kp_timeStamping, "id-kp-timeStamping");
+        oidNameMap.put(id_pkix_ocsp_extendedRevoke, "id-pkix-ocsp-extendedRevoke");
+        oidNameMap.put(id_pkix_ocsp_prefSigAlgs, "id-pkix-ocsp-prefSigAlgs");
+        oidNameMap.put(id_tsl_kp_tslSigning, "id-tsl-kp-tslSigning");
+        oidNameMap.put(id_extension_pkix_ocsp_nocheck, "id-pkix-ocsp-nocheck");
+        oidNameMap.put(anyExtendedKeyUsage, "anyExtendedKeyUsage");
+        oidNameMap.put(id_ad_caRepository, "id-ad-caRepository");
+        oidNameMap.put(id_ad_timeStamping, "id-ad-timeStamping");
+
+        oidNameMap.put(ObjectIdentifiers.id_extension_admission, "admission");
+        oidNameMap.put(Extension.auditIdentity, "auditIdentity");
+        oidNameMap.put(Extension.authorityInfoAccess, "authorityInfoAccess");
+        oidNameMap.put(Extension.authorityKeyIdentifier, "authorityKeyIdentifier");
+        oidNameMap.put(Extension.basicConstraints, "basicConstraints");
+        oidNameMap.put(Extension.biometricInfo, "biometricInfo");
+        oidNameMap.put(Extension.certificateIssuer, "certificateIssuer");
+        oidNameMap.put(Extension.certificatePolicies, "certificatePolicies");
+        oidNameMap.put(Extension.cRLDistributionPoints, "cRLDistributionPoints");
+        oidNameMap.put(Extension.cRLNumber, "cRLNumber");
+        oidNameMap.put(Extension.deltaCRLIndicator, "deltaCRLIndicator");
+        oidNameMap.put(Extension.extendedKeyUsage, "extendedKeyUsage");
+        oidNameMap.put(Extension.freshestCRL, "freshestCRL");
+        oidNameMap.put(Extension.inhibitAnyPolicy, "inhibitAnyPolicy");
+        oidNameMap.put(Extension.instructionCode, "instructionCode");
+        oidNameMap.put(Extension.invalidityDate, "invalidityDate");
+        oidNameMap.put(Extension.issuerAlternativeName, "issuerAlternativeName");
+        oidNameMap.put(Extension.issuingDistributionPoint, "issuingDistributionPoint");
+        oidNameMap.put(Extension.keyUsage, "keyUsage");
+        oidNameMap.put(Extension.logoType, "logoType");
+        oidNameMap.put(Extension.nameConstraints, "nameConstraints");
+        oidNameMap.put(Extension.noRevAvail, "noRevAvail");
+        oidNameMap.put(Extension.policyConstraints, "policyConstraints");
+        oidNameMap.put(Extension.policyMappings, "policyMappings");
+        oidNameMap.put(Extension.privateKeyUsagePeriod, "privateKeyUsagePeriod");
+        oidNameMap.put(Extension.qCStatements, "qCStatements");
+        oidNameMap.put(Extension.reasonCode, "reasonCode");
+        oidNameMap.put(Extension.subjectAlternativeName, "subjectAlternativeName");
+        oidNameMap.put(Extension.subjectDirectoryAttributes, "subjectDirectoryAttributes");
+        oidNameMap.put(Extension.subjectInfoAccess, "subjectInfoAccess");
+        oidNameMap.put(Extension.subjectKeyIdentifier, "subjectKeyIdentifier");
+        oidNameMap.put(Extension.targetInformation, "targetInformation");
     }
 
     public static String oidToDisplayName(ASN1ObjectIdentifier type)
@@ -359,82 +415,10 @@ public class ObjectIdentifiers
     public static String getName(ASN1ObjectIdentifier type)
     {
         String name = RFC4519Style.INSTANCE.oidToDisplayName(type);
-        if(name == null)
+        if(name == null || name.isEmpty())
         {
-            if(id_kp_clientAuth.equals(type))
-            {
-                name = "id-kp-clientAuth";
-            }
-            else if(id_kp_codeSigning.equals(type))
-            {
-                name = "id-kp-codeSigning";
-            }
-            else if(id_kp_emailProtection.equals(type))
-            {
-                name = "id-kp-emailProtection";
-            }
-            else if(id_kp_ipsecEndSystem.equals(type))
-            {
-                name = "id-kp-ipsecEndSystem";
-            }
-            else if(id_kp_ipsecTunnel.equals(type))
-            {
-                name = "id-kp-ipsecTunnel";
-            }
-            else if(id_kp_ipsecUser.equals(type))
-            {
-                name = "id-kp-ipsecUser";
-            }
-            else if(id_kp_ocsp.equals(type))
-            {
-                name = "id-kp-ocsp";
-            }
-            else if(id_kp_OCSPSigning.equals(type))
-            {
-                name = "id-kp-OCSPSigning";
-            }
-            else if(id_kp_serverAuth.equals(type))
-            {
-                name = "id-kp-serverAuth";
-            }
-            else if(id_kp_timeStamping.equals(type))
-            {
-                name = "id-kp-timeStamping";
-            }
-            else if(id_pkix_ocsp_extendedRevoke.equals(type))
-            {
-                name = "id-pkix-ocsp-extendedRevoke";
-            }
-            else if(id_pkix_ocsp_prefSigAlgs.equals(type))
-            {
-                name = "id-pkix-ocsp-prefSigAlgs";
-            }
-            else if(id_tsl_kp_tslSigning.equals(type))
-            {
-                name = "id-tsl-kp-tslSigning";
-            }
-            else if(id_extension_pkix_ocsp_nocheck.equals(type))
-            {
-                name = "id-pkix-ocsp-nocheck";
-            }
-            else if(id_extension_admission.equals(type))
-            {
-                name = "admission";
-            }
-            else if(anyExtendedKeyUsage.equals(type))
-            {
-                name = "anyExtendedKeyUsage";
-            }
-            else if(id_ad_caRepository.equals(type))
-            {
-                name = "id-ad-caRepository";
-            }
-            else if(id_ad_timeStamping.equals(type))
-            {
-                name = "id-ad-timeStamping";
-            }
+            name = oidNameMap.get(type);
         }
-
         return name;
     }
 

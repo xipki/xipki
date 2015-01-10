@@ -33,26 +33,23 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.ca.server.certprofile.x509;
+package org.xipki.ca.server.certprofile;
 
-import java.util.Set;
-
-import org.xipki.ca.api.profile.x509.ExtKeyUsageOccurrence;
-import org.xipki.ca.server.certprofile.Condition;
+import org.xipki.ca.api.profile.ExtensionValue;
 
 /**
  * @author Lijun Liao
  */
 
-class ExtKeyUsageOption
+public class ExtensionValueOption
 {
     private final Condition condition;
-    private final Set<ExtKeyUsageOccurrence> extKeyusages;
+    private final ExtensionValue extensionValue;
 
-    public ExtKeyUsageOption(Condition condition, Set<ExtKeyUsageOccurrence> extKeyusages)
+    public ExtensionValueOption(Condition condition, ExtensionValue extensionValue)
     {
         this.condition = condition;
-        this.extKeyusages = extKeyusages;
+        this.extensionValue = extensionValue;
     }
 
     public Condition getCondition()
@@ -60,9 +57,9 @@ class ExtKeyUsageOption
         return condition;
     }
 
-    public Set<ExtKeyUsageOccurrence> getExtKeyusages()
+    public ExtensionValue getExtensionValue()
     {
-        return extKeyusages;
+        return extensionValue;
     }
 
 }

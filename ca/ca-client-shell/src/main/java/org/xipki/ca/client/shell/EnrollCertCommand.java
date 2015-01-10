@@ -37,6 +37,8 @@ package org.xipki.ca.client.shell;
 
 import java.io.File;
 import java.security.cert.X509Certificate;
+import java.util.LinkedList;
+import java.util.List;
 
 import org.apache.karaf.shell.commands.Option;
 import org.bouncycastle.asn1.crmf.CertRequest;
@@ -44,6 +46,8 @@ import org.bouncycastle.asn1.crmf.CertTemplateBuilder;
 import org.bouncycastle.asn1.crmf.POPOSigningKey;
 import org.bouncycastle.asn1.crmf.ProofOfPossession;
 import org.bouncycastle.asn1.x500.X500Name;
+import org.bouncycastle.asn1.x509.Extension;
+import org.bouncycastle.asn1.x509.Extensions;
 import org.bouncycastle.cert.X509CertificateHolder;
 import org.bouncycastle.cert.crmf.ProofOfPossessionSigningKeyBuilder;
 import org.bouncycastle.operator.ContentSigner;
@@ -52,6 +56,7 @@ import org.xipki.ca.client.api.EnrollCertResult;
 import org.xipki.ca.client.api.dto.EnrollCertRequestEntryType;
 import org.xipki.ca.client.api.dto.EnrollCertRequestType;
 import org.xipki.console.karaf.UnexpectedResultException;
+import org.xipki.security.P10RequestGenerator;
 import org.xipki.security.api.ConcurrentContentSigner;
 import org.xipki.security.api.SecurityFactory;
 import org.xipki.security.api.SignerException;
@@ -67,6 +72,14 @@ public abstract class EnrollCertCommand extends ClientCommand
             description = "Subject to be requested.\n"
                     + "The default is the subject of self-signed certifite.")
     protected String subject;
+
+    @Option(name = "-san", aliases="--subjectAltName",
+            required = false, multiValued = true, description = "SubjectAltName. Multi-valued.")
+    protected List<String> subjectAltNames;
+
+    @Option(name = "-sia", aliases="--subjectInfoAccess",
+            required = false, multiValued = true, description = "SubjectInfoAccess. Multi-valued")
+    protected List<String> subjectInfoAccesses;
 
     @Option(name = "-profile",
             required = true, description = "Required. Certificate profile")
@@ -112,6 +125,26 @@ public abstract class EnrollCertCommand extends ClientCommand
         X500Name x500Subject = subject == null ? ssCert.getSubject() : new X500Name(subject);
         certTemplateBuilder.setSubject(x500Subject);
         certTemplateBuilder.setPublicKey(ssCert.getSubjectPublicKeyInfo());
+
+        // SubjectAltNames
+        List<Extension> extensions = new LinkedList<>();
+        if(subjectAltNames != null && subjectAltNames.isEmpty() == false)
+        {
+            extensions.add(P10RequestGenerator.createExtensionSubjectAltName(subjectAltNames, false));
+        }
+
+        // SubjectInfoAccess
+        if(subjectInfoAccesses != null && subjectInfoAccesses.isEmpty() == false)
+        {
+            extensions.add(P10RequestGenerator.createExtensionSubjectInfoAccess(subjectInfoAccesses, false));
+        }
+
+        if(extensions != null && extensions.isEmpty() == false)
+        {
+            Extensions asn1Extensions = new Extensions(extensions.toArray(new Extension[0]));
+            certTemplateBuilder.setExtensions(asn1Extensions);
+        }
+
         CertRequest certReq = new CertRequest(1, certTemplateBuilder.build(), null);
 
         ProofOfPossessionSigningKeyBuilder popoBuilder = new ProofOfPossessionSigningKeyBuilder(certReq);

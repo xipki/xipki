@@ -1177,13 +1177,25 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
                 String type = rs.getString("TYPE");
                 String conf = rs.getString("CONF");
 
-                CertProfileEntry rawEntry = new CertProfileEntry(name, type, conf);
-                String realType = certprofileTypeMapping.get(type);
-                IdentifiedX509CertProfile entry = new IdentifiedX509CertProfile(rawEntry, realType);
-                entry.setEnvironmentParameterResolver(envParameterResolver);
-                certProfiles.put(name, entry);
+                try
+                {
+                    CertProfileEntry rawEntry = new CertProfileEntry(name, type, conf);
+                    String realType = certprofileTypeMapping.get(type);
+                    IdentifiedX509CertProfile entry = new IdentifiedX509CertProfile(rawEntry, realType);
+                    entry.setEnvironmentParameterResolver(envParameterResolver);
+                    entry.validate();
+                    certProfiles.put(name, entry);
+                }catch(CertProfileException e)
+                {
+                    final String message = "could not initialize CertProfile " + name + ", ignore it";
+                    if(LOG.isErrorEnabled())
+                    {
+                        LOG.error(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(), e.getMessage());
+                    }
+                    LOG.debug(message, e);
+                }
             }
-        }catch(SQLException | CertProfileException e)
+        }catch(SQLException e)
         {
             throw new CAMgmtException(e.getMessage(), e);
         } finally
@@ -3633,35 +3645,33 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
         {
             throw new CAMgmtException("could not validate POP for the pkcs#10 requst");
         }
-        else
+
+        CertificationRequestInfo certTemp = p10cr.getCertificationRequestInfo();
+        Extensions extensions = null;
+        ASN1Set attrs = certTemp.getAttributes();
+        for(int i = 0; i < attrs.size(); i++)
         {
-            CertificationRequestInfo certTemp = p10cr.getCertificationRequestInfo();
-            Extensions extensions = null;
-            ASN1Set attrs = certTemp.getAttributes();
-            for(int i = 0; i < attrs.size(); i++)
+            Attribute attr = (Attribute) attrs.getObjectAt(i);
+            if(PKCSObjectIdentifiers.pkcs_9_at_extensionRequest.equals(attr.getAttrType()))
             {
-                Attribute attr = (Attribute) attrs.getObjectAt(i);
-                if(PKCSObjectIdentifiers.pkcs_9_at_extensionRequest.equals(attr.getAttrType()))
-                {
-                    extensions = (Extensions) attr.getAttributeValues()[0];
-                }
+                extensions = (Extensions) attr.getAttributeValues()[0];
             }
-
-            X500Name subject = certTemp.getSubject();
-            SubjectPublicKeyInfo publicKeyInfo = certTemp.getSubjectPublicKeyInfo();
-
-            X509CertificateInfo certInfo;
-            try
-            {
-                certInfo = ca.generateCertificate(false, profileName, user, subject, publicKeyInfo,
-                            null, null, extensions);
-            } catch (OperationException e)
-            {
-                throw new CAMgmtException(e.getMessage(), e);
-            }
-
-            return certInfo.getCert().getCert();
         }
+
+        X500Name subject = certTemp.getSubject();
+        SubjectPublicKeyInfo publicKeyInfo = certTemp.getSubjectPublicKeyInfo();
+
+        X509CertificateInfo certInfo;
+        try
+        {
+            certInfo = ca.generateCertificate(false, profileName, user, subject, publicKeyInfo,
+                        null, null, extensions);
+        } catch (OperationException e)
+        {
+            throw new CAMgmtException(e.getMessage(), e);
+        }
+
+        return certInfo.getCert().getCert();
     }
 
     private X509CA getX509CA(String caName)
