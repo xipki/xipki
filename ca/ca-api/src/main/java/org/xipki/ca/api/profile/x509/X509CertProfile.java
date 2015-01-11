@@ -49,9 +49,8 @@ import org.xipki.ca.api.BadFormatException;
 import org.xipki.ca.api.CertProfileException;
 import org.xipki.ca.api.CertValidity;
 import org.xipki.ca.api.EnvironmentParameterResolver;
-import org.xipki.ca.api.profile.ExtensionOccurrence;
+import org.xipki.ca.api.profile.ExtensionControl;
 import org.xipki.ca.api.profile.ExtensionTuples;
-import org.xipki.ca.api.profile.ExtensionValue;
 import org.xipki.ca.api.profile.GeneralNameMode;
 import org.xipki.ca.api.profile.SubjectInfo;
 
@@ -164,39 +163,7 @@ public abstract class X509CertProfile
         return null;
     }
 
-    public ExtensionValue getExtValueCertificatePolicies()
-    {
-        return null;
-    }
-
-    public ExtensionValue getExtValuePolicyConstraints()
-    {
-        return null;
-    }
-
-    public ExtensionValue getExtValueNameConstraints()
-    {
-        return null;
-    }
-
-    public ExtensionValue getExtValueInhibitAnyPolicy()
-    {
-        return null;
-    }
-
-    public ExtensionValue getExtValuePolicyMappings()
-    {
-        return null;
-    }
-
-    public ExtensionValue getExtValueAdmission()
-    {
-        return null;
-    }
-
-    public abstract Set<ASN1ObjectIdentifier> getAllowedRequestExtensions();
-
-    public abstract Map<ASN1ObjectIdentifier, ExtensionOccurrence> getExtensionOccurences();
+    public abstract Map<ASN1ObjectIdentifier, ExtensionControl> getExtensionControls();
 
     public abstract void initialize(String data)
     throws CertProfileException;
@@ -220,7 +187,7 @@ public abstract class X509CertProfile
     throws CertProfileException, BadCertTemplateException;
 
     public abstract ExtensionTuples getExtensions(
-            Map<ASN1ObjectIdentifier, ExtensionOccurrence> extensionOccurrences,
+            Map<ASN1ObjectIdentifier, ExtensionControl> extensionOccurrences,
             X500Name requestedSubject, Extensions requestedExtensions)
     throws CertProfileException, BadCertTemplateException;
 

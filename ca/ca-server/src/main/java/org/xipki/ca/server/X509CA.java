@@ -2490,12 +2490,6 @@ public class X509CA
                         ExtensionValue extValue = extensionTuples.getExtensionValue(extensionType);
                         certBuilder.addExtension(extensionType, extValue.isCritical(), extValue.getValue());
                     }
-
-                    String warningMsg = extensionTuples.getWarning();
-                    if(warningMsg != null && warningMsg.isEmpty() == false)
-                    {
-                        msgBuilder.append(", ").append(warningMsg);
-                    }
                 }
 
                 ContentSigner contentSigner;
@@ -2536,12 +2530,15 @@ public class X509CA
                 {
                     throw new OperationException(ErrorCode.System_Failure, "could not save certificate");
                 }
-            } catch (CertificateException | IOException | CertProfileException e)
-            {
-                throw new OperationException(ErrorCode.System_Failure, e.getClass().getName() + ": " + e.getMessage());
             } catch (BadCertTemplateException e)
             {
                 throw new OperationException(ErrorCode.BAD_CERT_TEMPLATE, e.getMessage());
+            } catch (CertificateException | IOException | CertProfileException | RuntimeException e)
+            {
+                throw new OperationException(ErrorCode.System_Failure, e.getClass().getName() + ": " + e.getMessage());
+            } catch (Throwable t2)
+            {
+                throw new OperationException(ErrorCode.System_Failure, t2.getClass().getName() + ": " + t2.getMessage());
             }
 
             if(msgBuilder.length() > 2)

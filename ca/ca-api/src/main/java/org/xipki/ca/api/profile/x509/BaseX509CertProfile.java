@@ -52,7 +52,7 @@ import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.xipki.ca.api.BadCertTemplateException;
 import org.xipki.ca.api.CertProfileException;
 import org.xipki.ca.api.EnvironmentParameterResolver;
-import org.xipki.ca.api.profile.ExtensionOccurrence;
+import org.xipki.ca.api.profile.ExtensionControl;
 import org.xipki.ca.api.profile.ExtensionTuples;
 import org.xipki.ca.api.profile.ExtensionValue;
 import org.xipki.ca.api.profile.RDNOccurrence;
@@ -241,7 +241,7 @@ extends X509CertProfile
         this.parameterResolver = parameterResolver;
     }
 
-    protected static void checkAndAddExtension(ASN1ObjectIdentifier type, ExtensionOccurrence occurence,
+    protected static void checkAndAddExtension(ASN1ObjectIdentifier type, ExtensionControl occurence,
             ExtensionValue value, ExtensionTuples tuples)
     throws CertProfileException
     {

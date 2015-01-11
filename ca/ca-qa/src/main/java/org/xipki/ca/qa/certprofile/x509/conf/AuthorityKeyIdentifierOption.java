@@ -35,7 +35,7 @@
 
 package org.xipki.ca.qa.certprofile.x509.conf;
 
-import org.xipki.ca.api.profile.ExtensionOccurrence;
+import org.xipki.ca.api.profile.ExtensionControl;
 
 /**
  * @author Lijun Liao
@@ -44,10 +44,10 @@ import org.xipki.ca.api.profile.ExtensionOccurrence;
 public class AuthorityKeyIdentifierOption
 {
     private final boolean includeIssuerAndSerial;
-    private final ExtensionOccurrence occurence;
+    private final ExtensionControl occurence;
 
     public AuthorityKeyIdentifierOption(boolean includeIssuerAndSerial,
-            ExtensionOccurrence occurence)
+            ExtensionControl occurence)
     {
         this.includeIssuerAndSerial = includeIssuerAndSerial;
         this.occurence = occurence;
@@ -58,7 +58,7 @@ public class AuthorityKeyIdentifierOption
         return includeIssuerAndSerial;
     }
 
-    public ExtensionOccurrence getOccurence()
+    public ExtensionControl getOccurence()
     {
         return occurence;
     }

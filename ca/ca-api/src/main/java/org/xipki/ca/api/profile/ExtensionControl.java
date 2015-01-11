@@ -39,20 +39,17 @@ package org.xipki.ca.api.profile;
  * @author Lijun Liao
  */
 
-public enum ExtensionOccurrence
+public class ExtensionControl
 {
-    CRITICAL_REQUIRED(true, true),
-    CRITICAL_OPTIONAL(true, false),
-    NONCRITICAL_REQUIRED(false, true),
-    NONCRITICAL_OPTIONAL(false, false);
-
     private final boolean critical;
     private final boolean required;
+    private final boolean request;
 
-    private ExtensionOccurrence(boolean critical, boolean required)
+    public ExtensionControl(boolean critical, boolean required, boolean request)
     {
         this.critical = critical;
         this.required = required;
+        this.request = request;
     }
 
     public boolean isCritical()
@@ -65,17 +62,8 @@ public enum ExtensionOccurrence
         return required;
     }
 
-    public static ExtensionOccurrence getInstance(boolean critical, boolean required)
+    public boolean isRequest()
     {
-        for(ExtensionOccurrence value : values())
-        {
-            if(value.critical == critical && value.required == required)
-            {
-                return value;
-            }
-        }
-
-        throw new RuntimeException("Could not reach here");
+        return request;
     }
-
 }

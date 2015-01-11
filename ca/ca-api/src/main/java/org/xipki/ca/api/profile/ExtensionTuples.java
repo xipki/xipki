@@ -50,7 +50,6 @@ import org.xipki.common.ParamChecker;
 
 public class ExtensionTuples
 {
-    private String warning;
     private final Map<ASN1ObjectIdentifier, ExtensionValue> extensions = new HashMap<>();
 
     public boolean addExtension(ASN1ObjectIdentifier type, boolean critical, ASN1Encodable value)
@@ -85,16 +84,6 @@ public class ExtensionTuples
     public ExtensionValue getExtensionValue(ASN1ObjectIdentifier type)
     {
         return extensions.get(type);
-    }
-
-    public void setWarning(String warning)
-    {
-        this.warning = warning;
-    }
-
-    public String getWarning()
-    {
-        return warning;
     }
 
     public boolean removeExtensionTuple(ASN1ObjectIdentifier type)
