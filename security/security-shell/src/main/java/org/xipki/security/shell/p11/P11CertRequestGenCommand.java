@@ -35,148 +35,75 @@
 
 package org.xipki.security.shell.p11;
 
-import java.io.File;
 import java.security.cert.X509Certificate;
-import java.util.LinkedList;
-import java.util.List;
 
 import org.apache.karaf.shell.commands.Command;
 import org.apache.karaf.shell.commands.Option;
-import org.bouncycastle.asn1.x500.X500Name;
-import org.bouncycastle.asn1.x509.Certificate;
-import org.bouncycastle.asn1.x509.Extension;
-import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
-import org.bouncycastle.operator.ContentSigner;
-import org.bouncycastle.pkcs.PKCS10CertificationRequest;
-import org.xipki.common.CustomObjectIdentifiers;
-import org.xipki.common.SecurityUtil;
-import org.xipki.security.ExtensionExistence;
-import org.xipki.security.P10RequestGenerator;
+import org.bouncycastle.util.encoders.Hex;
 import org.xipki.security.SecurityFactoryImpl;
 import org.xipki.security.api.ConcurrentContentSigner;
+import org.xipki.security.api.SecurityFactory;
 import org.xipki.security.api.p11.P11KeyIdentifier;
 import org.xipki.security.api.p11.P11SlotIdentifier;
+import org.xipki.security.shell.CertRequestGenCommand;
 
 /**
  * @author Lijun Liao
  */
 
 @Command(scope = "xipki-tk", name = "req", description="Generate PKCS#10 request with PKCS#11 device")
-public class P11CertRequestGenCommand extends P11SecurityCommand
+public class P11CertRequestGenCommand extends CertRequestGenCommand
 {
-    @Option(name = "-subject",
-            required = false,
-            description = "Subject in the PKCS#10 request.\n"
-                    + "The default is the subject of self-signed certifite")
-    protected String subject;
+    @Option(name = "-slot",
+            required = true, description = "Required. Slot index")
+    protected Integer slotIndex;
 
-    @Option(name = "-hash",
-            required = false, description = "Hash algorithm name")
-    protected String hashAlgo = "SHA256";
+    @Option(name = "-key-id",
+            required = false, description = "Id of the private key in the PKCS#11 device.\n"
+                    + "Either keyId or keyLabel must be specified")
+    protected String keyId;
 
-    @Option(name = "-out",
-            required = true, description = "Required. Output file name")
-    protected String outputFilename;
+    @Option(name = "-key-label",
+            required = false, description = "Label of the private key in the PKCS#11 device.\n"
+                    + "Either keyId or keyLabel must be specified")
+    protected String keyLabel;
 
-    @Option(name = "-san", aliases="--subjectAltName",
-            required = false, multiValued = true, description = "SubjectAltName. Multi-valued.")
-    protected List<String> subjectAltNames;
+    @Option(name = "-module",
+            required = false, description = "Name of the PKCS#11 module.")
+    protected String moduleName = SecurityFactory.DEFAULT_P11MODULE_NAME;
 
-    @Option(name = "-sia", aliases="--subjectInfoAccess",
-            required = false, multiValued = true, description = "SubjectInfoAccess. Multi-valued")
-    protected List<String> subjectInfoAccesses;
-
-    @Option(name = "-ne", aliases="--needExtension",
-            required = false, multiValued = true,
-            description = "Types of extension (except SubjectAltName and SubjectInfoAccess) that must\n"
-                    + "be contaied in the certificate. Multi-valued")
-    protected List<String> needExtensionTypes;
-
-    @Option(name = "-we", aliases="--wantExtension",
-            required = false, multiValued = true,
-            description = "Types of extension that should be contaied in the certificate if possible.\n"
-                    + "Multi-valued")
-    protected List<String> wantExtensionTypes;
-
-    @Override
-    protected Object doExecute()
+    private P11KeyIdentifier getKeyIdentifier()
     throws Exception
     {
-        P10RequestGenerator p10Gen = new P10RequestGenerator();
-
-        hashAlgo = hashAlgo.trim().toUpperCase();
-        if(hashAlgo.indexOf('-') != -1)
+        P11KeyIdentifier keyIdentifier;
+        if(keyId != null && keyLabel == null)
         {
-            hashAlgo = hashAlgo.replaceAll("-", "");
+            keyIdentifier = new P11KeyIdentifier(Hex.decode(keyId));
         }
+        else if(keyId == null && keyLabel != null)
+        {
+            keyIdentifier = new P11KeyIdentifier(keyLabel);
+        }
+        else
+        {
+            throw new Exception("Exactly one of keyId or keyLabel should be specified");
+        }
+        return keyIdentifier;
+    }
 
+    @Override
+    protected ConcurrentContentSigner getSigner(String hashAlgo)
+    throws Exception
+    {
         P11SlotIdentifier slotIdentifier = new P11SlotIdentifier(slotIndex, null);
         P11KeyIdentifier keyIdentifier = getKeyIdentifier();
 
         String signerConfWithoutAlgo = SecurityFactoryImpl.getPkcs11SignerConfWithoutAlgo(
                         moduleName, slotIdentifier, keyIdentifier, 1);
 
-        ConcurrentContentSigner identifiedSigner = securityFactory.createSigner("PKCS11",
+        return securityFactory.createSigner("PKCS11",
                 signerConfWithoutAlgo, hashAlgo, false,
                 (X509Certificate[]) null);
-
-        if(needExtensionTypes == null)
-        {
-            needExtensionTypes = new LinkedList<>();
-        }
-
-        // SubjectAltNames
-        List<Extension> extensions = new LinkedList<>();
-        if(subjectAltNames != null && subjectAltNames.isEmpty() == false)
-        {
-            extensions.add(P10RequestGenerator.createExtensionSubjectAltName(subjectAltNames, false));
-            needExtensionTypes.add(Extension.subjectAlternativeName.getId());
-        }
-
-        // SubjectInfoAccess
-        if(subjectInfoAccesses != null && subjectInfoAccesses.isEmpty() == false)
-        {
-            extensions.add(P10RequestGenerator.createExtensionSubjectInfoAccess(subjectInfoAccesses, false));
-            needExtensionTypes.add(Extension.subjectInfoAccess.getId());
-        }
-
-        if(needExtensionTypes.isEmpty() == false ||
-                (wantExtensionTypes != null && wantExtensionTypes.isEmpty() == false))
-        {
-            ExtensionExistence ee = new ExtensionExistence(SecurityUtil.textToASN1ObjectIdentifers(needExtensionTypes),
-                    SecurityUtil.textToASN1ObjectIdentifers(wantExtensionTypes));
-            extensions.add(new Extension(
-                    CustomObjectIdentifiers.id_extension_existence, false, ee.toASN1Primitive().getEncoded()));
-        }
-
-        Certificate cert = Certificate.getInstance(identifiedSigner.getCertificate().getEncoded());
-
-        X500Name subjectDN;
-        if(subject != null)
-        {
-            subjectDN = new X500Name(subject);
-        }
-        else
-        {
-            subjectDN = cert.getSubject();
-        }
-
-        SubjectPublicKeyInfo subjectPublicKeyInfo = cert.getSubjectPublicKeyInfo();
-
-        ContentSigner signer = identifiedSigner.borrowContentSigner();
-
-        PKCS10CertificationRequest p10Req;
-        try
-        {
-            p10Req  = p10Gen.generateRequest(signer, subjectPublicKeyInfo, subjectDN, extensions);
-        }finally
-        {
-            identifiedSigner.returnContentSigner(signer);
-        }
-
-        File file = new File(outputFilename);
-        saveVerbose("Saved PKCS#10 request to file", file, p10Req.getEncoded());
-        return null;
     }
 
 }
