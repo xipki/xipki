@@ -3,6 +3,9 @@
   <reference id="securityFactory" interface="org.xipki.security.api.SecurityFactory"/>
   <reference id="filePathCompleter" interface="org.xipki.console.karaf.FilePathCompleter"/>
   <bean id="curveNameCompleter" class="org.xipki.security.shell.completer.ECCurveNameCompleter"/>
+  <bean id="keyusageCompleter" class="org.xipki.security.shell.completer.KeyusageCompleter"/>
+  <bean id="extKeyusageCompleter" class="org.xipki.security.shell.completer.ExtKeyusageCompleter"/>
+  
   <bean id="p11ModuleNameCompleter" class="org.xipki.security.shell.completer.P11ModuleNameCompleter">
     <property name="securityFactory" ref="securityFactory"/>
   </bean>
@@ -78,6 +81,8 @@
       <optional-completers>
         <entry key="-out" value-ref="filePathCompleter"/>
         <entry key="-module" value-ref="p11ModuleNameCompleter"/>
+        <entry key="-keyusage" value-ref="keyusageCompleter"/>
+        <entry key="-extKeyusage" value-ref="extKeyusageCompleter"/>
       </optional-completers>
     </command>
     <command>
@@ -87,6 +92,8 @@
       <optional-completers>
         <entry key="-out" value-ref="filePathCompleter"/>
         <entry key="-p12" value-ref="filePathCompleter"/>
+        <entry key="-keyusage" value-ref="keyusageCompleter"/>
+        <entry key="-extKeyusage" value-ref="extKeyusageCompleter"/>
       </optional-completers>
     </command>
     <command>

@@ -71,14 +71,15 @@ xipki-tk:update-cert -slot 1 -key-label $SubCA_KEY_LABEL -cert output/SubCA1.der
 ## Generate keys and PKCS#10 request for SubCAwithCRL1
 xipki-tk:req -slot 1 -key-label $SubCAwithCRL_KEY_LABEL -out output/SubCAwithCRL1.p10 \
   -subject "CN=SubCAwithCRL1, O=xipki, C=DE" \
-  --subjectAltName "[1]info@xipki.org" \
-  --subjectAltName "[2]xipki.org" \
-  --subjectAltName "[5]edi-nameAssigner-1=edi-partyName1" \
-  --subjectAltName "[6]http://xipki.org/abc" \
-  --subjectAltName "[7]192.168.0.1" \
-  --subjectAltName "[8]1.2.3.4" \
-  --subjectAltName "[0]2.5.4.10=long organization name" \
-  --subjectInfoAccess "1.3.6.1.5.5.7.48.5?[6]http://example.org/abc"
+  -subjectAltName "[1]info@xipki.org" \
+  -subjectAltName "[2]xipki.org" \
+  -subjectAltName "[5]edi-nameAssigner-1=edi-partyName1" \
+  -subjectAltName "[6]http://xipki.org/abc" \
+  -subjectAltName "[7]192.168.0.1" \
+  -subjectAltName "[8]1.2.3.4" \
+  -subjectAltName "[0]2.5.4.10=long organization name" \
+  -subjectInfoAccess "1.3.6.1.5.5.7.48.5?[6]http://example.org/abc" \
+  -keyusage cRLSign
 
 xipki-client:ra-enroll -p10 output/SubCAwithCRL1.p10 -out output/SubCAwithCRL1.der -profile SubCA.Complex
 

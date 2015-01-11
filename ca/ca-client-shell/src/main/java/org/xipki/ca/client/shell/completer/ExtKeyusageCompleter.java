@@ -33,74 +33,42 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.ca.api.profile.x509;
+package org.xipki.ca.client.shell.completer;
+
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
+
+import org.xipki.common.ObjectIdentifiers;
+import org.xipki.console.karaf.DynamicEnumCompleter;
 
 /**
  * @author Lijun Liao
  */
 
-public enum KeyUsage
+public class ExtKeyusageCompleter extends DynamicEnumCompleter
 {
-    digitalSignature  (0, "digitalSignature"),
-    contentCommitment (1, "contentCommitment", "nonRepudiation"),
-    keyEncipherment   (2, "keyEncipherment"),
-    dataEncipherment  (3, "dataEncipherment"),
-    keyAgreement      (4, "keyAgreement"),
-    keyCertSign       (5, "keyCertSign"),
-    cRLSign           (6, "cRLSign"),
-    encipherOnly      (7, "encipherOnly"),
-    decipherOnly      (8, "decipherOnly");
+    private static final Set<String> usages;
 
-    private int bit;
-    private String[] names;
-
-    private KeyUsage(int bit, String... names)
+    static
     {
-        this.bit = bit;
-        this.names = names;
+        Set<String> set = new HashSet<>();
+        set.add(ObjectIdentifiers.id_kp_clientAuth.getId());
+        set.add(ObjectIdentifiers.id_kp_codeSigning.getId());
+        set.add(ObjectIdentifiers.id_kp_emailProtection.getId());
+        set.add(ObjectIdentifiers.id_kp_ipsecEndSystem.getId());
+        set.add(ObjectIdentifiers.id_kp_ipsecTunnel.getId());
+        set.add(ObjectIdentifiers.id_kp_OCSPSigning.getId());
+        set.add(ObjectIdentifiers.id_kp_serverAuth.getId());
+        set.add(ObjectIdentifiers.id_kp_timeStamping.getId());
+
+        usages = Collections.unmodifiableSet(set);
     }
 
-    public static KeyUsage getKeyUsage(String usage)
+    @Override
+    protected Set<String> getEnums()
     {
-        if(usage == null)
-        {
-            return null;
-        }
-
-        for(KeyUsage ku : KeyUsage.values())
-        {
-            for(String name : ku.names)
-            {
-                if(name.equals(usage))
-                {
-                    return ku;
-                }
-            }
-        }
-
-        return null;
+        return usages;
     }
 
-    public static KeyUsage getKeyUsage(int bit)
-    {
-        for(KeyUsage ku : KeyUsage.values())
-        {
-            if(ku.bit == bit)
-            {
-                return ku;
-            }
-        }
-
-        return null;
-    }
-
-    public int getBit()
-    {
-        return bit;
-    }
-
-    public String getName()
-    {
-        return names[0];
-    }
 }

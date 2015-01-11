@@ -83,7 +83,6 @@ import org.xipki.ca.api.profile.SubjectInfo;
 import org.xipki.ca.api.profile.x509.BaseX509CertProfile;
 import org.xipki.ca.api.profile.x509.CertificatePolicyInformation;
 import org.xipki.ca.api.profile.x509.ExtKeyUsageOccurrence;
-import org.xipki.ca.api.profile.x509.KeyUsage;
 import org.xipki.ca.api.profile.x509.KeyUsageOccurrence;
 import org.xipki.ca.api.profile.x509.SpecialX509CertProfileBehavior;
 import org.xipki.ca.api.profile.x509.X509Util;
@@ -120,6 +119,7 @@ import org.xipki.ca.server.certprofile.x509.jaxb.X509ProfileType;
 import org.xipki.ca.server.certprofile.x509.jaxb.X509ProfileType.KeyAlgorithms;
 import org.xipki.ca.server.certprofile.x509.jaxb.X509ProfileType.Parameters;
 import org.xipki.ca.server.certprofile.x509.jaxb.X509ProfileType.Subject;
+import org.xipki.common.KeyUsage;
 import org.xipki.common.LogUtil;
 import org.xipki.common.ObjectIdentifiers;
 import org.xipki.common.ParamChecker;
@@ -524,7 +524,7 @@ public class DefaultX509CertProfile extends BaseX509CertProfile
                 {
                     List<CertificatePolicyInformation> policyInfos = XmlX509CertProfileUtil.buildCertificatePolicies(type);
                     CertificatePolicies value = X509Util.createCertificatePolicies(policyInfos);
-                    ExtensionValue extension =new ExtensionValue(occurrence.isCritical(), value);
+                    ExtensionValue extension = new ExtensionValue(occurrence.isCritical(), value);
                     ExtensionValueOption option = new ExtensionValueOption(
                             XmlX509CertProfileUtil.createCondition(type.getCondition()), extension);
                     options.add(option);

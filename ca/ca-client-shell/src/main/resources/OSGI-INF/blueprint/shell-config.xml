@@ -13,6 +13,8 @@
   <bean id="p11ModuleNameCompleter" class="org.xipki.ca.client.shell.completer.P11ModuleNameCompleter">
     <property name="securityFactory" ref="securityFactory"/>
   </bean>
+  <bean id="keyusageCompleter" class="org.xipki.ca.client.shell.completer.KeyusageCompleter"/>
+  <bean id="extKeyusageCompleter" class="org.xipki.ca.client.shell.completer.ExtKeyusageCompleter"/>
   <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.1.0">
     <command>
       <action class="org.xipki.ca.client.shell.RAEnrollCertCommand">
@@ -33,6 +35,8 @@
         <entry key="-out" value-ref="filePathCompleter"/>
         <entry key="-module" value-ref="p11ModuleNameCompleter"/>
         <entry key="-ca" value-ref="caNameCompleter"/>
+        <entry key="-keyusage" value-ref="keyusageCompleter"/>
+        <entry key="-extKeyusage" value-ref="extKeyusageCompleter"/>
       </optional-completers>
     </command>
     <command>
@@ -44,6 +48,8 @@
         <entry key="-out" value-ref="filePathCompleter"/>
         <entry key="-p12" value-ref="filePathCompleter"/>
         <entry key="-ca" value-ref="caNameCompleter"/>
+        <entry key="-keyusage" value-ref="keyusageCompleter"/>
+        <entry key="-extKeyusage" value-ref="extKeyusageCompleter"/>
       </optional-completers>
     </command>
     <command>

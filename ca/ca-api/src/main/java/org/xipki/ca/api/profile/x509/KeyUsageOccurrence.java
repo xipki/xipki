@@ -35,6 +35,7 @@
 
 package org.xipki.ca.api.profile.x509;
 
+import org.xipki.common.KeyUsage;
 import org.xipki.common.ParamChecker;
 
 /**

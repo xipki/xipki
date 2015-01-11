@@ -85,7 +85,6 @@ import org.xipki.ca.api.profile.ExtensionValue;
 import org.xipki.ca.api.profile.GeneralNameMode;
 import org.xipki.ca.api.profile.SubjectInfo;
 import org.xipki.ca.api.profile.x509.ExtKeyUsageOccurrence;
-import org.xipki.ca.api.profile.x509.KeyUsage;
 import org.xipki.ca.api.profile.x509.KeyUsageOccurrence;
 import org.xipki.ca.api.profile.x509.SpecialX509CertProfileBehavior;
 import org.xipki.ca.api.profile.x509.X509CertProfile;
@@ -95,8 +94,10 @@ import org.xipki.ca.server.PublicCAInfo;
 import org.xipki.ca.server.certprofile.x509.DefaultX509CertProfile;
 import org.xipki.ca.server.mgmt.api.CertProfileEntry;
 import org.xipki.common.CustomObjectIdentifiers;
+import org.xipki.common.KeyUsage;
 import org.xipki.common.ObjectIdentifiers;
 import org.xipki.common.ParamChecker;
+import org.xipki.common.SecurityUtil;
 import org.xipki.security.ExtensionExistence;
 
 /**
@@ -486,7 +487,7 @@ public class IdentifiedX509CertProfile
                                 continue;
                             }
 
-                            if(reqKeyUsage.hasUsages(k.getKeyUsage().getBit()))
+                            if(reqKeyUsage.hasUsages(k.getKeyUsage().getBcUsage()))
                             {
                                 usages.add(k.getKeyUsage());
                             }
@@ -494,7 +495,7 @@ public class IdentifiedX509CertProfile
                     }
                 }
 
-                org.bouncycastle.asn1.x509.KeyUsage value = X509Util.createKeyUsage(usages);
+                org.bouncycastle.asn1.x509.KeyUsage value = SecurityUtil.createKeyUsage(usages);
                 addExtension(tuples, extType, value, extOccurrence,
                         neededExtensionTypes, wantedExtensionTypes);
             }
@@ -546,7 +547,7 @@ public class IdentifiedX509CertProfile
                     extOccurrence = new ExtensionControl(false, extOccurrence.isRequired(), extOccurrence.isRequest());
                 }
 
-                ExtendedKeyUsage value = X509Util.createExtendedUsage(usages);
+                ExtendedKeyUsage value = SecurityUtil.createExtendedUsage(usages);
                 addExtension(tuples, extType, value, extOccurrence,
                         neededExtensionTypes, wantedExtensionTypes);
             }

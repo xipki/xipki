@@ -38,7 +38,6 @@ package org.xipki.ca.api.profile.x509;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 import javax.security.auth.x500.X500Principal;
 
@@ -54,10 +53,8 @@ import org.bouncycastle.asn1.x509.CRLDistPoint;
 import org.bouncycastle.asn1.x509.CertificatePolicies;
 import org.bouncycastle.asn1.x509.DistributionPoint;
 import org.bouncycastle.asn1.x509.DistributionPointName;
-import org.bouncycastle.asn1.x509.ExtendedKeyUsage;
 import org.bouncycastle.asn1.x509.GeneralName;
 import org.bouncycastle.asn1.x509.GeneralNames;
-import org.bouncycastle.asn1.x509.KeyPurposeId;
 import org.bouncycastle.asn1.x509.PolicyInformation;
 import org.bouncycastle.asn1.x509.PolicyQualifierInfo;
 import org.bouncycastle.asn1.x509.UserNotice;
@@ -90,71 +87,6 @@ public class X509Util
             basicConstraints = new BasicConstraints(false);
         }
         return basicConstraints;
-    }
-
-    public static org.bouncycastle.asn1.x509.KeyUsage createKeyUsage(Set<KeyUsage> keyUsages)
-    {
-        if(keyUsages == null || keyUsages.isEmpty())
-        {
-            return null;
-        }
-
-        int usage = 0;
-        for (KeyUsage keyUsage : keyUsages)
-        {
-            switch (keyUsage)
-            {
-                case contentCommitment:
-                    usage |= org.bouncycastle.asn1.x509.KeyUsage.nonRepudiation;
-                    break;
-                case cRLSign:
-                    usage |= org.bouncycastle.asn1.x509.KeyUsage.cRLSign;
-                    break;
-                case dataEncipherment:
-                    usage |= org.bouncycastle.asn1.x509.KeyUsage.dataEncipherment;
-                    break;
-                case decipherOnly:
-                    usage |= org.bouncycastle.asn1.x509.KeyUsage.decipherOnly;
-                    break;
-                case digitalSignature:
-                    usage |= org.bouncycastle.asn1.x509.KeyUsage.digitalSignature;
-                    break;
-                case encipherOnly:
-                    usage |= org.bouncycastle.asn1.x509.KeyUsage.encipherOnly;
-                    break;
-                case keyAgreement:
-                    usage |= org.bouncycastle.asn1.x509.KeyUsage.keyAgreement;
-                    break;
-                case keyCertSign:
-                    usage |= org.bouncycastle.asn1.x509.KeyUsage.keyCertSign;
-                    break;
-                case keyEncipherment:
-                    usage |= org.bouncycastle.asn1.x509.KeyUsage.keyEncipherment;
-                    break;
-                default:
-                    break;
-            }
-        }
-
-        return new org.bouncycastle.asn1.x509.KeyUsage(usage);
-    }
-
-    public static ExtendedKeyUsage createExtendedUsage(Set<ASN1ObjectIdentifier> keyUsages)
-    {
-        if(keyUsages == null || keyUsages.isEmpty())
-        {
-            return null;
-        }
-
-        KeyPurposeId[] kps = new KeyPurposeId[keyUsages.size()];
-
-        int i = 0;
-        for (ASN1ObjectIdentifier oid : keyUsages)
-        {
-            kps[i++] = KeyPurposeId.getInstance(oid);
-        }
-
-        return new ExtendedKeyUsage(kps);
     }
 
     public static AuthorityInformationAccess createAuthorityInformationAccess(List<String> ocspUris)
