@@ -33,7 +33,7 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.ca.server.certprofile;
+package org.xipki.ca.api.profile;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -47,6 +47,42 @@ import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 public class KeyParametersOption
 {
     public static final AllowAllParametersOption allowAll = new AllowAllParametersOption();
+
+    public static class Range
+    {
+        private final Integer min;
+        private final Integer max;
+
+        public Range(Integer min, Integer max)
+        {
+            this.min = min;
+            this.max = max;
+        }
+
+        public Integer getMin()
+        {
+            return min;
+        }
+
+        public Integer getMax()
+        {
+            return max;
+        }
+
+        public boolean match(int i)
+        {
+            if(min != null && i < min)
+            {
+                return false;
+            }
+            if(max != null && i > max)
+            {
+                return false;
+            }
+
+            return true;
+        }
+    }
 
     public static class AllowAllParametersOption extends KeyParametersOption
     {
