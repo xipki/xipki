@@ -33,10 +33,9 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.ca.client.shell;
+package org.xipki.security.shell;
 
 import java.io.File;
-import java.security.cert.X509Certificate;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -44,62 +43,39 @@ import java.util.Set;
 
 import org.apache.karaf.shell.commands.Option;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
-import org.bouncycastle.asn1.crmf.CertRequest;
-import org.bouncycastle.asn1.crmf.CertTemplateBuilder;
-import org.bouncycastle.asn1.crmf.POPOSigningKey;
-import org.bouncycastle.asn1.crmf.ProofOfPossession;
 import org.bouncycastle.asn1.x500.X500Name;
+import org.bouncycastle.asn1.x509.Certificate;
 import org.bouncycastle.asn1.x509.ExtendedKeyUsage;
 import org.bouncycastle.asn1.x509.Extension;
-import org.bouncycastle.asn1.x509.Extensions;
-import org.bouncycastle.cert.X509CertificateHolder;
-import org.bouncycastle.cert.crmf.ProofOfPossessionSigningKeyBuilder;
+import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.bouncycastle.operator.ContentSigner;
-import org.xipki.ca.client.api.CertificateOrError;
-import org.xipki.ca.client.api.EnrollCertResult;
-import org.xipki.ca.client.api.dto.EnrollCertRequestEntryType;
-import org.xipki.ca.client.api.dto.EnrollCertRequestType;
+import org.bouncycastle.pkcs.PKCS10CertificationRequest;
 import org.xipki.common.CustomObjectIdentifiers;
 import org.xipki.common.KeyUsage;
 import org.xipki.common.SecurityUtil;
-import org.xipki.console.karaf.UnexpectedResultException;
 import org.xipki.security.ExtensionExistence;
 import org.xipki.security.P10RequestGenerator;
 import org.xipki.security.api.ConcurrentContentSigner;
-import org.xipki.security.api.SecurityFactory;
-import org.xipki.security.api.SignerException;
 
 /**
  * @author Lijun Liao
  */
 
-public abstract class EnrollCertCommand extends ClientCommand
+public abstract class CertRequestGenCommand extends SecurityCommand
 {
     @Option(name = "-subject",
             required = false,
-            description = "Subject to be requested.\n"
-                    + "The default is the subject of self-signed certifite.")
+            description = "Subject in the PKCS#10 request.\n"
+                    + "The default is the subject of self-signed certifite")
     protected String subject;
 
-    @Option(name = "-profile",
-            required = true, description = "Required. Certificate profile")
-    protected String profile;
-
-    @Option(name = "-out",
-            required = true, description = "Where to save the certificate")
-    protected String outputFile;
-
-    @Option(name = "-user",
-            required = false, description = "Username")
-    protected String user;
-
     @Option(name = "-hash",
-            required = false, description = "Hash algorithm name for the POPO computation")
+            required = false, description = "Hash algorithm name")
     protected String hashAlgo = "SHA256";
 
-    @Option(name = "-ca",
-            required = false, description = "Required if the profile is supported by more than one CA")
-    protected String caName;
+    @Option(name = "-out",
+            required = true, description = "Required. Output file name")
+    protected String outputFilename;
 
     @Option(name = "-keyusage",
             required = false, multiValued = true, description = "keyusage. Multi-valued.")
@@ -128,30 +104,20 @@ public abstract class EnrollCertCommand extends ClientCommand
                     + "Multi-valued")
     protected List<String> wantExtensionTypes;
 
-    protected SecurityFactory securityFactory;
-
-    public void setSecurityFactory(SecurityFactory securityFactory)
-    {
-        this.securityFactory = securityFactory;
-    }
-
-    protected abstract ConcurrentContentSigner getSigner()
-    throws SignerException;
+    protected abstract ConcurrentContentSigner getSigner(String hashAlgo)
+    throws Exception;
 
     @Override
     protected Object doExecute()
     throws Exception
     {
-        EnrollCertRequestType request = new EnrollCertRequestType(EnrollCertRequestType.Type.CERT_REQ);
+        P10RequestGenerator p10Gen = new P10RequestGenerator();
 
-        CertTemplateBuilder certTemplateBuilder = new CertTemplateBuilder();
-
-        ConcurrentContentSigner signer = getSigner();
-        X509CertificateHolder ssCert = signer.getCertificateAsBCObject();
-
-        X500Name x500Subject = subject == null ? ssCert.getSubject() : new X500Name(subject);
-        certTemplateBuilder.setSubject(x500Subject);
-        certTemplateBuilder.setPublicKey(ssCert.getSubjectPublicKeyInfo());
+        hashAlgo = hashAlgo.trim().toUpperCase();
+        if(hashAlgo.indexOf('-') != -1)
+        {
+            hashAlgo = hashAlgo.replaceAll("-", "");
+        }
 
         if(needExtensionTypes == null)
         {
@@ -207,48 +173,35 @@ public abstract class EnrollCertCommand extends ClientCommand
                     CustomObjectIdentifiers.id_extension_existence, false, ee.toASN1Primitive().getEncoded()));
         }
 
-        if(extensions != null && extensions.isEmpty() == false)
+        ConcurrentContentSigner identifiedSigner = getSigner(hashAlgo);
+
+        Certificate cert = Certificate.getInstance(identifiedSigner.getCertificate().getEncoded());
+
+        X500Name subjectDN;
+        if(subject != null)
         {
-            Extensions asn1Extensions = new Extensions(extensions.toArray(new Extension[0]));
-            certTemplateBuilder.setExtensions(asn1Extensions);
+            subjectDN = new X500Name(subject);
+        }
+        else
+        {
+            subjectDN = cert.getSubject();
         }
 
-        CertRequest certReq = new CertRequest(1, certTemplateBuilder.build(), null);
+        SubjectPublicKeyInfo subjectPublicKeyInfo = cert.getSubjectPublicKeyInfo();
 
-        ProofOfPossessionSigningKeyBuilder popoBuilder = new ProofOfPossessionSigningKeyBuilder(certReq);
-        ContentSigner contentSigner = signer.borrowContentSigner();
-        POPOSigningKey popoSk;
+        ContentSigner signer = identifiedSigner.borrowContentSigner();
+
+        PKCS10CertificationRequest p10Req;
         try
         {
-            popoSk = popoBuilder.build(contentSigner);
+            p10Req  = p10Gen.generateRequest(signer, subjectPublicKeyInfo, subjectDN, extensions);
         }finally
         {
-            signer.returnContentSigner(contentSigner);
+            identifiedSigner.returnContentSigner(signer);
         }
 
-        ProofOfPossession popo = new ProofOfPossession(popoSk);
-
-        EnrollCertRequestEntryType reqEntry = new EnrollCertRequestEntryType("id-1", profile, certReq, popo);
-        request.addRequestEntry(reqEntry);
-
-        EnrollCertResult result = raWorker.requestCerts(request, caName, user);
-
-        X509Certificate cert = null;
-        if(result != null)
-        {
-            String id = result.getAllIds().iterator().next();
-            CertificateOrError certOrError = result.getCertificateOrError(id);
-            cert = (X509Certificate) certOrError.getCertificate();
-        }
-
-        if(cert == null)
-        {
-            throw new UnexpectedResultException("No certificate received from the server");
-        }
-
-        File certFile = new File(outputFile);
-        saveVerbose("Certificate saved to file", certFile, cert.getEncoded());
-
+        File file = new File(outputFilename);
+        saveVerbose("Saved PKCS#10 request to file", file, p10Req.getEncoded());
         return null;
     }
 

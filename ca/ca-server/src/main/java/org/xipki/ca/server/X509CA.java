@@ -133,6 +133,7 @@ import org.xipki.common.CRLReason;
 import org.xipki.common.CertRevocationInfo;
 import org.xipki.common.CustomObjectIdentifiers;
 import org.xipki.common.HealthCheckResult;
+import org.xipki.common.KeyUsage;
 import org.xipki.common.LogUtil;
 import org.xipki.common.ObjectIdentifiers;
 import org.xipki.common.ParamChecker;
@@ -585,10 +586,24 @@ public class X509CA
 
         X509CertificateWithMetaInfo caCert = caInfo.getCertificate();
 
-        // corrected the lastCRLIntervalDate if required
-        if(crlSigner != null && caInfo.getLastCRLIntervalDate() == 0)
+        if(crlSigner != null)
         {
-            caInfo.setLastCRLIntervalDate(certstore.getThisUpdateOfCurrentCRL(caCert));
+            // corrected the lastCRLIntervalDate if required
+            if(caInfo.getLastCRLIntervalDate() == 0)
+            {
+                caInfo.setLastCRLIntervalDate(certstore.getThisUpdateOfCurrentCRL(caCert));
+            }
+
+            // CA signs the CRL
+            if(crlSigner.getSigner() == null)
+            {
+                if(SecurityUtil.hasKeyusage(caInfo.getCertificate().getCert(), KeyUsage.cRLSign) == false)
+                {
+                    final String msg = "CRL signer does not have keyusage cRLSign";
+                    LOG.error(msg);
+                    throw new OperationException(ErrorCode.System_Failure, msg);
+                }
+            }
         }
 
         try

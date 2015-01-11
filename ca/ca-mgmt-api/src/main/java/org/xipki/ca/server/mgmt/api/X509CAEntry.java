@@ -50,6 +50,7 @@ import org.xipki.ca.api.CAStatus;
 import org.xipki.ca.api.CertValidity;
 import org.xipki.common.CertRevocationInfo;
 import org.xipki.common.IoUtil;
+import org.xipki.common.KeyUsage;
 import org.xipki.common.ParamChecker;
 import org.xipki.common.SecurityUtil;
 
@@ -105,6 +106,11 @@ public class X509CAEntry implements Serializable
         ParamChecker.assertNotEmpty("name", name);
         ParamChecker.assertNotEmpty("signerType", signerType);
         ParamChecker.assertNotNull("cert", cert);
+
+        if(SecurityUtil.hasKeyusage(cert, KeyUsage.keyCertSign) == false)
+        {
+            throw new CAMgmtException("CA certificate does not have keyusage keyCertSign");
+        }
 
         if(initialSerial < 0)
         {

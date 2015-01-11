@@ -122,7 +122,6 @@ import org.xipki.ca.api.CertProfileException;
 import org.xipki.ca.api.CertValidity;
 import org.xipki.ca.api.profile.ExtensionControl;
 import org.xipki.ca.api.profile.RDNOccurrence;
-import org.xipki.ca.api.profile.x509.KeyUsage;
 import org.xipki.ca.qa.ValidationIssue;
 import org.xipki.ca.qa.ValidationResult;
 import org.xipki.ca.qa.certprofile.GeneralNameMode;
@@ -162,6 +161,7 @@ import org.xipki.ca.qa.certprofile.x509.jaxb.SubjectInfoAccessType.Access;
 import org.xipki.ca.qa.certprofile.x509.jaxb.X509ProfileType;
 import org.xipki.common.HashAlgoType;
 import org.xipki.common.HashCalculator;
+import org.xipki.common.KeyUsage;
 import org.xipki.common.LogUtil;
 import org.xipki.common.LruCache;
 import org.xipki.common.ObjectIdentifiers;
@@ -918,6 +918,9 @@ public class X509CertProfileQA
                 } else if(ObjectIdentifiers.id_extension_admission.equals(oid))
                 {
                     checkExtensionAdmission(extensionValue, issuerInfo, failureMsg);
+                } else if(Extension.subjectInfoAccess.equals(oid))
+                {
+                    // TODO
                 } else
                 {
                     // do nothing

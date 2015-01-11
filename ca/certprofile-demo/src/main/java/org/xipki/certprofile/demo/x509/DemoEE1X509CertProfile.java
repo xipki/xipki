@@ -52,8 +52,8 @@ import org.xipki.ca.api.CertValidity.Unit;
 import org.xipki.ca.api.profile.ExtensionControl;
 import org.xipki.ca.api.profile.ExtensionTuples;
 import org.xipki.ca.api.profile.x509.AbstractEEX509CertProfile;
-import org.xipki.ca.api.profile.x509.KeyUsage;
 import org.xipki.ca.api.profile.x509.KeyUsageOccurrence;
+import org.xipki.common.KeyUsage;
 
 /**
  * @author Lijun Liao

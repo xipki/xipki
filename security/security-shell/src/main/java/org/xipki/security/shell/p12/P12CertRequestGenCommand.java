@@ -35,138 +35,73 @@
 
 package org.xipki.security.shell.p12;
 
-import java.io.File;
+import java.io.FileInputStream;
+import java.security.KeyStore;
 import java.security.cert.X509Certificate;
-import java.util.LinkedList;
-import java.util.List;
 
 import org.apache.karaf.shell.commands.Command;
 import org.apache.karaf.shell.commands.Option;
-import org.bouncycastle.asn1.x500.X500Name;
-import org.bouncycastle.asn1.x509.Certificate;
-import org.bouncycastle.asn1.x509.Extension;
-import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
-import org.bouncycastle.operator.ContentSigner;
-import org.bouncycastle.pkcs.PKCS10CertificationRequest;
-import org.xipki.common.CustomObjectIdentifiers;
-import org.xipki.common.SecurityUtil;
-import org.xipki.security.ExtensionExistence;
-import org.xipki.security.P10RequestGenerator;
 import org.xipki.security.SecurityFactoryImpl;
 import org.xipki.security.api.ConcurrentContentSigner;
+import org.xipki.security.shell.CertRequestGenCommand;
 
 /**
  * @author Lijun Liao
  */
 
 @Command(scope = "xipki-tk", name = "req-p12", description="Generate PKCS#10 request with PKCS#12 keystore")
-public class P12CertRequestGenCommand extends P12SecurityCommand
+public class P12CertRequestGenCommand extends CertRequestGenCommand
 {
-    @Option(name = "-subject",
-            required = false,
-            description = "Subject in the PKCS#10 request.\n"
-                    + "The default is the subject of self-signed certifite.")
-    protected String subject;
+    @Option(name = "-p12",
+            required = true, description = "Required. PKCS#12 keystore file")
+    protected String p12File;
 
-    @Option(name = "-hash",
-            required = false, description = "Hash algorithm name.")
-    protected String hashAlgo = "SHA256";
+    @Option(name = "-pwd", aliases = { "--password" },
+            required = false, description = "Password of the PKCS#12 file")
+    protected String password;
 
-    @Option(name = "-out",
-            required = true, description = "Required. Output file name")
-    protected String outputFilename;
+    protected char[] getPassword()
+    {
+        char[] pwdInChar = readPasswordIfNotSet(password);
+        if(pwdInChar != null)
+        {
+            password = new String(pwdInChar);
+        }
+        return pwdInChar;
+    }
 
-    @Option(name = "-san", aliases="--subjectAltName",
-            required = false, multiValued = true, description = "SubjectAltName. Multi-valued.")
-    protected List<String> subjectAltNames;
-
-    @Option(name = "-sia", aliases="--subjectInfoAccess",
-            required = false, multiValued = true, description = "SubjectInfoAccess. Multi-valued")
-    protected List<String> subjectInfoAccesses;
-
-    @Option(name = "-ne", aliases="--needExtension",
-            required = false, multiValued = true,
-            description = "Types of extension (except SubjectAltName and SubjectInfoAccess) that must\n"
-                    + "be contaied in the certificate. Multi-valued")
-    protected List<String> needExtensionTypes;
-
-    @Option(name = "-we", aliases="--wantExtension",
-            required = false, multiValued = true,
-            description = "Types of extension that should be contaied in the certificate if possible.\n"
-                    + "Multi-valued")
-    protected List<String> wantExtensionTypes;
-
-    @Override
-    protected Object doExecute()
+    protected KeyStore getKeyStore()
     throws Exception
     {
-        P10RequestGenerator p10Gen = new P10RequestGenerator();
+        KeyStore ks;
 
+        FileInputStream fIn = null;
+        try
+        {
+            fIn = new FileInputStream(expandFilepath(p12File));
+            ks = KeyStore.getInstance("PKCS12", "BC");
+            ks.load(fIn, getPassword());
+        }finally
+        {
+            if(fIn != null)
+            {
+                fIn.close();
+            }
+        }
+
+        return ks;
+    }
+
+    @Override
+    protected ConcurrentContentSigner getSigner(String hashAlgo)
+    throws Exception
+    {
         char[] pwd = getPassword();
 
         String signerConf = SecurityFactoryImpl.getKeystoreSignerConfWithoutAlgo(
                 p12File, new String(pwd), 1);
-        ConcurrentContentSigner identifiedSigner = securityFactory.createSigner(
+        return securityFactory.createSigner(
                 "PKCS12", signerConf, hashAlgo, false, (X509Certificate[]) null);
-
-        if(needExtensionTypes == null)
-        {
-            needExtensionTypes = new LinkedList<>();
-        }
-
-        // SubjectAltNames
-        List<Extension> extensions = new LinkedList<>();
-        if(subjectAltNames != null && subjectAltNames.isEmpty() == false)
-        {
-            extensions.add(P10RequestGenerator.createExtensionSubjectAltName(subjectAltNames, false));
-            needExtensionTypes.add(Extension.subjectAlternativeName.getId());
-        }
-
-        // SubjectInfoAccess
-        if(subjectInfoAccesses != null && subjectInfoAccesses.isEmpty() == false)
-        {
-            extensions.add(P10RequestGenerator.createExtensionSubjectInfoAccess(subjectInfoAccesses, false));
-            needExtensionTypes.add(Extension.subjectInfoAccess.getId());
-        }
-
-        if(needExtensionTypes.isEmpty() == false ||
-                (wantExtensionTypes != null && wantExtensionTypes.isEmpty() == false))
-        {
-            ExtensionExistence ee = new ExtensionExistence(SecurityUtil.textToASN1ObjectIdentifers(needExtensionTypes),
-                    SecurityUtil.textToASN1ObjectIdentifers(wantExtensionTypes));
-            extensions.add(new Extension(
-                    CustomObjectIdentifiers.id_extension_existence, false, ee.toASN1Primitive().getEncoded()));
-        }
-
-        Certificate cert = Certificate.getInstance(identifiedSigner.getCertificate().getEncoded());
-
-        X500Name subjectDN;
-        if(subject != null)
-        {
-            subjectDN = new X500Name(subject);
-        }
-        else
-        {
-            subjectDN = cert.getSubject();
-        }
-
-        SubjectPublicKeyInfo subjectPublicKeyInfo = cert.getSubjectPublicKeyInfo();
-
-        ContentSigner signer = identifiedSigner.borrowContentSigner();
-
-        PKCS10CertificationRequest p10Req;
-        try
-        {
-            p10Req  = p10Gen.generateRequest(signer, subjectPublicKeyInfo, subjectDN, extensions);
-        }finally
-        {
-            identifiedSigner.returnContentSigner(signer);
-        }
-
-        File file = new File(outputFilename);
-        saveVerbose("Saved PKCS#10 request to file", file, p10Req.getEncoded());
-
-        return null;
     }
 
 }

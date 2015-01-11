@@ -45,7 +45,9 @@ import org.xipki.ca.api.OperationException;
 import org.xipki.ca.api.OperationException.ErrorCode;
 import org.xipki.ca.server.mgmt.CRLControl;
 import org.xipki.common.ConfigurationException;
+import org.xipki.common.KeyUsage;
 import org.xipki.common.ParamChecker;
+import org.xipki.common.SecurityUtil;
 import org.xipki.security.api.ConcurrentContentSigner;
 
 /**
@@ -95,6 +97,12 @@ public class CrlSigner
                 throw new OperationException(ErrorCode.INVALID_EXTENSION, e.getMessage());
             }
             this.subjectKeyIdentifier = ski.getOctets();
+
+            if(SecurityUtil.hasKeyusage(signer.getCertificate(), KeyUsage.cRLSign) == false)
+            {
+                throw new OperationException(ErrorCode.System_Failure,
+                        "CRL signer does not have keyusage cRLSign");
+            }
         }
     }
 

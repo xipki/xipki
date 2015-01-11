@@ -33,40 +33,42 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.ca.api.profile.x509;
+package org.xipki.security.shell.completer;
 
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.xipki.common.KeyUsage;
+import org.xipki.common.ObjectIdentifiers;
+import org.xipki.console.karaf.DynamicEnumCompleter;
 
 /**
  * @author Lijun Liao
  */
 
-public abstract class AbstractCAX509CertProfile extends BaseX509CertProfile
+public class ExtKeyusageCompleter extends DynamicEnumCompleter
 {
-    protected Set<KeyUsageOccurrence> keyUsages;
+    private static final Set<String> usages;
 
-    public AbstractCAX509CertProfile()
+    static
     {
-        Set<KeyUsageOccurrence> keyUsages = new HashSet<>();
-        keyUsages.add(new KeyUsageOccurrence(KeyUsage.keyCertSign, true));
-        keyUsages.add(new KeyUsageOccurrence(KeyUsage.cRLSign, false));
-        this.keyUsages = Collections.unmodifiableSet(keyUsages);
+        Set<String> set = new HashSet<>();
+        set.add(ObjectIdentifiers.id_kp_clientAuth.getId());
+        set.add(ObjectIdentifiers.id_kp_codeSigning.getId());
+        set.add(ObjectIdentifiers.id_kp_emailProtection.getId());
+        set.add(ObjectIdentifiers.id_kp_ipsecEndSystem.getId());
+        set.add(ObjectIdentifiers.id_kp_ipsecTunnel.getId());
+        set.add(ObjectIdentifiers.id_kp_OCSPSigning.getId());
+        set.add(ObjectIdentifiers.id_kp_serverAuth.getId());
+        set.add(ObjectIdentifiers.id_kp_timeStamping.getId());
+
+        usages = Collections.unmodifiableSet(set);
     }
 
     @Override
-    public boolean isCA()
+    protected Set<String> getEnums()
     {
-        return true;
-    }
-
-    @Override
-    public Set<KeyUsageOccurrence> getKeyUsage()
-    {
-        return keyUsages;
+        return usages;
     }
 
 }

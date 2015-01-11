@@ -33,40 +33,37 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.ca.api.profile.x509;
+package org.xipki.security.shell.completer;
 
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
 import org.xipki.common.KeyUsage;
+import org.xipki.console.karaf.DynamicEnumCompleter;
 
 /**
  * @author Lijun Liao
  */
 
-public abstract class AbstractCAX509CertProfile extends BaseX509CertProfile
+public class KeyusageCompleter extends DynamicEnumCompleter
 {
-    protected Set<KeyUsageOccurrence> keyUsages;
+    private static final Set<String> usages;
 
-    public AbstractCAX509CertProfile()
+    static
     {
-        Set<KeyUsageOccurrence> keyUsages = new HashSet<>();
-        keyUsages.add(new KeyUsageOccurrence(KeyUsage.keyCertSign, true));
-        keyUsages.add(new KeyUsageOccurrence(KeyUsage.cRLSign, false));
-        this.keyUsages = Collections.unmodifiableSet(keyUsages);
+        Set<String> set = new HashSet<>();
+        for(KeyUsage usage : KeyUsage.values())
+        {
+            set.add(usage.getName());
+        }
+        usages = Collections.unmodifiableSet(set);
     }
 
     @Override
-    public boolean isCA()
+    protected Set<String> getEnums()
     {
-        return true;
-    }
-
-    @Override
-    public Set<KeyUsageOccurrence> getKeyUsage()
-    {
-        return keyUsages;
+        return usages;
     }
 
 }
