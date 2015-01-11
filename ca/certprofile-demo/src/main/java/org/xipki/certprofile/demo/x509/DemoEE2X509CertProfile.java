@@ -49,7 +49,7 @@ import org.xipki.ca.api.BadCertTemplateException;
 import org.xipki.ca.api.CertProfileException;
 import org.xipki.ca.api.CertValidity;
 import org.xipki.ca.api.CertValidity.Unit;
-import org.xipki.ca.api.profile.ExtensionOccurrence;
+import org.xipki.ca.api.profile.ExtensionControl;
 import org.xipki.ca.api.profile.ExtensionTuples;
 import org.xipki.ca.api.profile.x509.AbstractEEX509CertProfile;
 import org.xipki.ca.api.profile.x509.KeyUsage;
@@ -63,7 +63,7 @@ public class DemoEE2X509CertProfile extends AbstractEEX509CertProfile
 {
     private final CertValidity validity;
     private final Set<KeyUsageOccurrence> keyUsage;
-    private final Map<ASN1ObjectIdentifier, ExtensionOccurrence> extensionOccurrences;
+    private final Map<ASN1ObjectIdentifier, ExtensionControl> extensionControls;
 
     public DemoEE2X509CertProfile()
     {
@@ -74,25 +74,25 @@ public class DemoEE2X509CertProfile extends AbstractEEX509CertProfile
         _keyUsage.add(new KeyUsageOccurrence(KeyUsage.dataEncipherment, true));
         keyUsage = Collections.unmodifiableSet(_keyUsage);
 
-        extensionOccurrences = new HashMap<>();
-        extensionOccurrences.put(Extension.authorityKeyIdentifier,
-                ExtensionOccurrence.NONCRITICAL_REQUIRED);
-        extensionOccurrences.put(Extension.freshestCRL,
-                ExtensionOccurrence.NONCRITICAL_OPTIONAL);
-        extensionOccurrences.put(Extension.issuerAlternativeName,
-                ExtensionOccurrence.NONCRITICAL_OPTIONAL);
-        extensionOccurrences.put(Extension.subjectKeyIdentifier,
-                ExtensionOccurrence.NONCRITICAL_REQUIRED);
-        extensionOccurrences.put(Extension.cRLDistributionPoints,
-                ExtensionOccurrence.NONCRITICAL_OPTIONAL);
-        extensionOccurrences.put(Extension.authorityKeyIdentifier,
-                ExtensionOccurrence.NONCRITICAL_REQUIRED);
-        extensionOccurrences.put(Extension.authorityInfoAccess,
-                ExtensionOccurrence.NONCRITICAL_OPTIONAL);
-        extensionOccurrences.put(Extension.basicConstraints,
-                ExtensionOccurrence.CRITICAL_REQUIRED);
-        extensionOccurrences.put(Extension.keyUsage,
-                ExtensionOccurrence.CRITICAL_REQUIRED);
+        extensionControls = new HashMap<>();
+        extensionControls.put(Extension.authorityKeyIdentifier,
+                new ExtensionControl(false, true, false));
+        extensionControls.put(Extension.freshestCRL,
+                new ExtensionControl(false, false, false));
+        extensionControls.put(Extension.issuerAlternativeName,
+                new ExtensionControl(false, false, false));
+        extensionControls.put(Extension.subjectKeyIdentifier,
+                new ExtensionControl(false, true, false));
+        extensionControls.put(Extension.cRLDistributionPoints,
+                new ExtensionControl(false, false, false));
+        extensionControls.put(Extension.authorityKeyIdentifier,
+                new ExtensionControl(false, true, false));
+        extensionControls.put(Extension.authorityInfoAccess,
+                new ExtensionControl(false, false, false));
+        extensionControls.put(Extension.basicConstraints,
+                new ExtensionControl(true, true, false));
+        extensionControls.put(Extension.keyUsage,
+                new ExtensionControl(true, true, true));
     }
 
     @Override
@@ -108,23 +108,18 @@ public class DemoEE2X509CertProfile extends AbstractEEX509CertProfile
     }
 
     @Override
-    public Map<ASN1ObjectIdentifier, ExtensionOccurrence> getExtensionOccurences()
+    public Map<ASN1ObjectIdentifier, ExtensionControl> getExtensionControls()
     {
-        return extensionOccurrences;
+        return extensionControls;
     }
 
     @Override
     public ExtensionTuples getExtensions(
-            Map<ASN1ObjectIdentifier, ExtensionOccurrence> extensionOccurrences,
+            Map<ASN1ObjectIdentifier, ExtensionControl> extensionOccurrences,
             X500Name requestedSubject, Extensions requestedExtensions)
     throws CertProfileException, BadCertTemplateException
     {
         return null;
     }
 
-    @Override
-    public Set<ASN1ObjectIdentifier> getAllowedRequestExtensions()
-    {
-        return null;
-    }
 }

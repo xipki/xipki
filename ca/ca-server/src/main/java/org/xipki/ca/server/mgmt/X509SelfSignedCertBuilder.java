@@ -266,7 +266,7 @@ class X509SelfSignedCertBuilder
         }
     }
 
-    private static String addExtensions(
+    private static void addExtensions(
             X509v3CertificateBuilder certBuilder,
             IdentifiedX509CertProfile profile,
             X500Name requestedSubject,
@@ -283,11 +283,6 @@ class X509SelfSignedCertBuilder
                 ExtensionValue extValue = extensionTuples.getExtensionValue(extType);
                 certBuilder.addExtension(extType, extValue.isCritical(), extValue.getValue());
             }
-
-            return extensionTuples.getWarning();
-        } else
-        {
-            return null;
         }
     }
 

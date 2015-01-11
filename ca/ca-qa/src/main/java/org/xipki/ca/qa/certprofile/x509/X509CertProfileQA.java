@@ -120,7 +120,7 @@ import org.slf4j.LoggerFactory;
 import org.xipki.ca.api.BadCertTemplateException;
 import org.xipki.ca.api.CertProfileException;
 import org.xipki.ca.api.CertValidity;
-import org.xipki.ca.api.profile.ExtensionOccurrence;
+import org.xipki.ca.api.profile.ExtensionControl;
 import org.xipki.ca.api.profile.RDNOccurrence;
 import org.xipki.ca.api.profile.x509.KeyUsage;
 import org.xipki.ca.qa.ValidationIssue;
@@ -242,7 +242,7 @@ public class X509CertProfileQA
 
     private Map<ASN1ObjectIdentifier, SubjectDNOption> subjectDNOptions;
     private Map<ASN1ObjectIdentifier, RDNOccurrence> subjectDNOccurrences;
-    private Map<ASN1ObjectIdentifier, ExtensionOccurrence> extensionOccurences;
+    private Map<ASN1ObjectIdentifier, ExtensionControl> extensionOccurences;
 
     private CertValidity validity;
     private int syntaxVersion;
@@ -420,7 +420,7 @@ public class X509CertProfileQA
             this.pathLen = extensionsType.getPathLen();
 
             // Extension Occurrences
-            Map<ASN1ObjectIdentifier, ExtensionOccurrence> occurrences = new HashMap<>();
+            Map<ASN1ObjectIdentifier, ExtensionControl> occurrences = new HashMap<>();
             for(ExtensionType extensionType : extensionsType.getExtension())
             {
                 String oid = extensionType.getValue();
@@ -428,15 +428,15 @@ public class X509CertProfileQA
                 Boolean b = extensionType.isCritical();
 
                 boolean critical = b == null ? false : b.booleanValue();
-
+                boolean request = false; // TODO
                 occurrences.put(new ASN1ObjectIdentifier(oid),
-                        ExtensionOccurrence.getInstance(critical, required));
+                        new ExtensionControl(critical, required, request));
             }
 
             this.extensionOccurences = Collections.unmodifiableMap(occurrences);
 
             // Extension KeyUsage
-            ExtensionOccurrence occurrence = extensionOccurences.get(Extension.keyUsage);
+            ExtensionControl occurrence = extensionOccurences.get(Extension.keyUsage);
             if(occurrence != null && extensionsType.getKeyUsage() != null)
             {
                 List<KeyUsageType> keyUsageTypeList = extensionsType.getKeyUsage().getUsage();
@@ -792,7 +792,7 @@ public class X509CertProfileQA
 
         for(ASN1ObjectIdentifier extType : extensionOccurences.keySet())
         {
-            ExtensionOccurrence extOccurrence = extensionOccurences.get(extType);
+            ExtensionControl extOccurrence = extensionOccurences.get(extType);
             if(extOccurrence.isRequired() == false)
             {
                 continue;
@@ -823,7 +823,7 @@ public class X509CertProfileQA
 
             Extension ext = extensions.getExtension(oid);
             StringBuilder failureMsg = new StringBuilder();
-            ExtensionOccurrence extOccurrence = extensionOccurences.get(oid);
+            ExtensionControl extOccurrence = extensionOccurences.get(oid);
             if(extOccurrence == null)
             {
                 failureMsg.append("extension is present but is not permitted");
