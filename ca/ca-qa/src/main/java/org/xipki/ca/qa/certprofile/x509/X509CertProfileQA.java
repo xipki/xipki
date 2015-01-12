@@ -64,7 +64,6 @@ import javax.xml.bind.Unmarshaller;
 import javax.xml.validation.SchemaFactory;
 
 import org.bouncycastle.asn1.ASN1Encodable;
-import org.bouncycastle.asn1.ASN1EncodableVector;
 import org.bouncycastle.asn1.ASN1Integer;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.ASN1Sequence;
@@ -75,13 +74,11 @@ import org.bouncycastle.asn1.DERIA5String;
 import org.bouncycastle.asn1.DERPrintableString;
 import org.bouncycastle.asn1.DERSequence;
 import org.bouncycastle.asn1.DERT61String;
-import org.bouncycastle.asn1.DERTaggedObject;
 import org.bouncycastle.asn1.DERUTF8String;
 import org.bouncycastle.asn1.DERUniversalString;
 import org.bouncycastle.asn1.isismtt.x509.AdmissionSyntax;
 import org.bouncycastle.asn1.isismtt.x509.Admissions;
 import org.bouncycastle.asn1.isismtt.x509.ProfessionInfo;
-import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 import org.bouncycastle.asn1.x500.AttributeTypeAndValue;
 import org.bouncycastle.asn1.x500.DirectoryString;
 import org.bouncycastle.asn1.x500.RDN;
@@ -111,7 +108,6 @@ import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.bouncycastle.asn1.x509.UserNotice;
 import org.bouncycastle.asn1.x509.X509ObjectIdentifiers;
 import org.bouncycastle.asn1.x9.X9ECParameters;
-import org.bouncycastle.asn1.x9.X9ObjectIdentifiers;
 import org.bouncycastle.jcajce.provider.asymmetric.util.ECUtil;
 import org.bouncycastle.math.ec.ECCurve;
 import org.bouncycastle.util.encoders.Hex;
@@ -123,11 +119,17 @@ import org.xipki.ca.api.CertValidity;
 import org.xipki.ca.api.profile.ExtensionControl;
 import org.xipki.ca.api.profile.GeneralNameMode;
 import org.xipki.ca.api.profile.GeneralNameTag;
+import org.xipki.ca.api.profile.KeyParametersOption;
+import org.xipki.ca.api.profile.KeyParametersOption.AllowAllParametersOption;
+import org.xipki.ca.api.profile.KeyParametersOption.DSAParametersOption;
+import org.xipki.ca.api.profile.KeyParametersOption.ECParamatersOption;
+import org.xipki.ca.api.profile.KeyParametersOption.RSAParametersOption;
+import org.xipki.ca.api.profile.KeyParametersOption.Range;
 import org.xipki.ca.api.profile.RDNOccurrence;
+import org.xipki.ca.api.profile.x509.ExtKeyUsageOccurrence;
+import org.xipki.ca.api.profile.x509.KeyUsageOccurrence;
 import org.xipki.ca.qa.ValidationIssue;
 import org.xipki.ca.qa.ValidationResult;
-import org.xipki.ca.qa.certprofile.KeyParamRange;
-import org.xipki.ca.qa.certprofile.KeyParamRanges;
 import org.xipki.ca.qa.certprofile.SubjectDNOption;
 import org.xipki.ca.qa.certprofile.x509.conf.AdmissionConf;
 import org.xipki.ca.qa.certprofile.x509.conf.AuthorityKeyIdentifierOption;
@@ -144,21 +146,23 @@ import org.xipki.ca.qa.certprofile.x509.conf.PolicyQualifiersConf;
 import org.xipki.ca.qa.certprofile.x509.conf.UserNoticePolicyQualifierInfo;
 import org.xipki.ca.qa.certprofile.x509.jaxb.AlgorithmType;
 import org.xipki.ca.qa.certprofile.x509.jaxb.ConstantExtensionType;
-import org.xipki.ca.qa.certprofile.x509.jaxb.CurveType;
-import org.xipki.ca.qa.certprofile.x509.jaxb.CurveType.Encodings;
 import org.xipki.ca.qa.certprofile.x509.jaxb.DirectoryStringType;
-import org.xipki.ca.qa.certprofile.x509.jaxb.ECParameterType;
+import org.xipki.ca.qa.certprofile.x509.jaxb.ECParametersType;
+import org.xipki.ca.qa.certprofile.x509.jaxb.ECParametersType.Curves;
 import org.xipki.ca.qa.certprofile.x509.jaxb.ExtensionType;
 import org.xipki.ca.qa.certprofile.x509.jaxb.ExtensionsType;
 import org.xipki.ca.qa.certprofile.x509.jaxb.ExtensionsType.ConstantExtensions;
+import org.xipki.ca.qa.certprofile.x509.jaxb.ExtensionsType.ExtendedKeyUsage.Usage;
 import org.xipki.ca.qa.certprofile.x509.jaxb.GeneralNameType;
 import org.xipki.ca.qa.certprofile.x509.jaxb.KeyUsageType;
 import org.xipki.ca.qa.certprofile.x509.jaxb.ObjectFactory;
 import org.xipki.ca.qa.certprofile.x509.jaxb.OidWithDescType;
-import org.xipki.ca.qa.certprofile.x509.jaxb.ParameterType;
+import org.xipki.ca.qa.certprofile.x509.jaxb.RangeType;
+import org.xipki.ca.qa.certprofile.x509.jaxb.RangesType;
 import org.xipki.ca.qa.certprofile.x509.jaxb.RdnType;
 import org.xipki.ca.qa.certprofile.x509.jaxb.SubjectInfoAccessType.Access;
 import org.xipki.ca.qa.certprofile.x509.jaxb.X509ProfileType;
+import org.xipki.common.CustomObjectIdentifiers;
 import org.xipki.common.HashAlgoType;
 import org.xipki.common.HashCalculator;
 import org.xipki.common.KeyUsage;
@@ -167,6 +171,7 @@ import org.xipki.common.LruCache;
 import org.xipki.common.ObjectIdentifiers;
 import org.xipki.common.ParamChecker;
 import org.xipki.common.SecurityUtil;
+import org.xipki.security.ExtensionExistence;
 import org.xml.sax.SAXException;
 
 /**
@@ -175,15 +180,11 @@ import org.xml.sax.SAXException;
 
 public class X509CertProfileQA
 {
+    private static final byte[] DERNull = new byte[]{5, 0};
     private static final Logger LOG = LoggerFactory.getLogger(X509CertProfileQA.class);
     private static final TimeZone UTC = TimeZone.getTimeZone("UTC");
     private static final long SECOND = 1000L;
-    private static final char GENERALNAME_SEP = '|';
-    public static final String MODULUS_LENGTH = "moduluslength";
-    public static final String P_LENGTH = "plength";
-    public static final String Q_LENGTH = "qlength";
 
-    private static final Map<ASN1ObjectIdentifier, String> extOidNameMap;
     private static final List<String> allUsages = Arrays.asList(
             KeyUsage.digitalSignature.getName(), // 0
             KeyUsage.contentCommitment.getName(), // 1
@@ -196,49 +197,14 @@ public class X509CertProfileQA
             KeyUsage.decipherOnly.getName() // 8
         );
 
-    static
-    {
-        extOidNameMap = new HashMap<>();
-        extOidNameMap.put(ObjectIdentifiers.id_extension_admission, "admission");
-        extOidNameMap.put(Extension.auditIdentity, "auditIdentity");
-        extOidNameMap.put(Extension.authorityInfoAccess, "authorityInfoAccess");
-        extOidNameMap.put(Extension.authorityKeyIdentifier, "authorityKeyIdentifier");
-        extOidNameMap.put(Extension.basicConstraints, "basicConstraints");
-        extOidNameMap.put(Extension.biometricInfo, "biometricInfo");
-        extOidNameMap.put(Extension.certificateIssuer, "certificateIssuer");
-        extOidNameMap.put(Extension.certificatePolicies, "certificatePolicies");
-        extOidNameMap.put(Extension.cRLDistributionPoints, "cRLDistributionPoints");
-        extOidNameMap.put(Extension.deltaCRLIndicator, "deltaCRLIndicator");
-        extOidNameMap.put(Extension.extendedKeyUsage, "extendedKeyUsage");
-        extOidNameMap.put(Extension.freshestCRL, "freshestCRL");
-        extOidNameMap.put(Extension.inhibitAnyPolicy, "inhibitAnyPolicy");
-        extOidNameMap.put(Extension.instructionCode, "instructionCode");
-        extOidNameMap.put(Extension.issuerAlternativeName, "issuerAlternativeName");
-        extOidNameMap.put(Extension.issuingDistributionPoint, "issuingDistributionPoint");
-        extOidNameMap.put(Extension.keyUsage, "keyUsage");
-        extOidNameMap.put(Extension.logoType, "logoType");
-        extOidNameMap.put(Extension.nameConstraints, "nameConstraints");
-        extOidNameMap.put(ObjectIdentifiers.id_extension_pkix_ocsp_nocheck, "pkixOcspNocheck");
-        extOidNameMap.put(Extension.policyConstraints, "policyConstraints");
-        extOidNameMap.put(Extension.policyMappings, "policyMappings");
-        extOidNameMap.put(Extension.privateKeyUsagePeriod, "privateKeyUsagePeriod");
-        extOidNameMap.put(Extension.qCStatements, "qCStatements");
-        extOidNameMap.put(Extension.subjectAlternativeName, "subjectAlternativeName");
-        extOidNameMap.put(Extension.subjectDirectoryAttributes, "subjectDirectoryAttributes");
-        extOidNameMap.put(Extension.subjectInfoAccess, "subjectInfoAccess");
-        extOidNameMap.put(Extension.subjectKeyIdentifier, "subjectKeyIdentifier");
-        extOidNameMap.put(Extension.targetInformation, "targetInformation");
-    }
-
-    private static final Set<ASN1ObjectIdentifier> ignoreRDNs;
-
     private final static Object jaxbUnmarshallerLock = new Object();
     private static Unmarshaller jaxbUnmarshaller;
 
     protected final X509ProfileType profileConf;
 
-    private Map<ASN1ObjectIdentifier, Set<Byte>> allowedEcCurves;
-    private Map<ASN1ObjectIdentifier, List<KeyParamRanges>> nonEcKeyAlgorithms;
+    private String specialBehavior;
+
+    private Map<ASN1ObjectIdentifier, KeyParametersOption> keyAlgorithms;
 
     private Map<ASN1ObjectIdentifier, SubjectDNOption> subjectDNOptions;
     private Map<ASN1ObjectIdentifier, RDNOccurrence> subjectDNOccurrences;
@@ -246,12 +212,15 @@ public class X509CertProfileQA
 
     private CertValidity validity;
     private int syntaxVersion;
-    private String specialBehavior;
     private boolean ca;
+    private boolean prefersECImplicitCA;
+
     private boolean notBeforeMidnight;
     private Integer pathLen;
-    private Set<String> keyusage;
-    private Set<String> extendedKeyusages;
+    private Set<KeyUsageOccurrence> keyusage;
+    private Set<String> keyusageText;
+    private Set<ExtKeyUsageOccurrence> extendedKeyusages;
+    private Set<String> extendedKeyusagesText;
     private Set<GeneralNameMode> allowedSubjectAltNameModes;
     private Map<String, Set<GeneralNameMode>> allowedSubjectInfoAccessModes;
 
@@ -266,13 +235,6 @@ public class X509CertProfileQA
 
     private Map<ASN1ObjectIdentifier, byte[]> constantExtensions;
     private static LruCache<ASN1ObjectIdentifier, Integer> ecCurveFieldSizes = new LruCache<>(100);
-
-    static
-    {
-        ignoreRDNs = new HashSet<>(2);
-        ignoreRDNs.add(Extension.subjectAlternativeName);
-        ignoreRDNs.add(Extension.subjectInfoAccess);
-    }
 
     public X509CertProfileQA(X509ProfileType conf)
     throws CertProfileException
@@ -295,6 +257,7 @@ public class X509CertProfileQA
 
             this.validity = CertValidity.getInstance(conf.getValidity());
             this.ca = conf.isCa();
+            this.prefersECImplicitCA = getBoolean(conf.isPrefersECImplicitCA(), false);
             this.notBeforeMidnight = "midnight".equalsIgnoreCase(conf.getNotBeforeTime());
             this.specialBehavior = conf.getSpecialBehavior();
             if(this.specialBehavior != null && "gematik_gSMC_K".equalsIgnoreCase(this.specialBehavior) == false)
@@ -305,82 +268,94 @@ public class X509CertProfileQA
             // KeyAlgorithms
             if(conf.getKeyAlgorithms() != null)
             {
-                List<AlgorithmType> types = conf.getKeyAlgorithms().getAlgorithm();
-                this.nonEcKeyAlgorithms = new HashMap<>();
-                this.allowedEcCurves = new HashMap<>();
-
-                for(AlgorithmType type : types)
+                this.keyAlgorithms = new HashMap<>();
+                for(AlgorithmType type : conf.getKeyAlgorithms().getAlgorithm())
                 {
-                    ASN1ObjectIdentifier oid = new ASN1ObjectIdentifier(type.getAlgorithm().getValue());
-                    if(X9ObjectIdentifiers.id_ecPublicKey.equals(oid))
+                    KeyParametersOption keyParamsOption;
+
+                    if(type.getECParameters() != null)
                     {
-                        ECParameterType params = type.getEcParameter();
-                        if(params != null)
+                        KeyParametersOption.ECParamatersOption option = new KeyParametersOption.ECParamatersOption();
+                        keyParamsOption = option;
+
+                        ECParametersType params = type.getECParameters();
+                        if(params.getCurves() != null)
                         {
-                            for(CurveType curveType :params.getCurve())
-                            {
-                                ASN1ObjectIdentifier curveOid = new ASN1ObjectIdentifier(curveType.getOid().getValue());
-                                Encodings encodingsType = curveType.getEncodings();
-                                Set<Byte> encodings = new HashSet<>();
-                                if(encodingsType != null)
-                                {
-                                    encodings.addAll(encodingsType.getEncoding());
-                                }
-                                this.allowedEcCurves.put(curveOid, encodings);
-                            }
+                            Curves curves = params.getCurves();
+                            Set<ASN1ObjectIdentifier> curveOids = toOIDSet(curves.getCurve());
+                            option.setCurveOids(curveOids);
                         }
-                    }
-                    else
+
+                        if(params.getPointEncodings() != null)
+                        {
+                            List<Byte> bytes = params.getPointEncodings().getPointEncoding();
+                            Set<Byte> pointEncodings = new HashSet<>(bytes);
+                            option.setPointEncodings(pointEncodings);
+                        }
+                    } else if(type.getRSAParameters() != null)
                     {
-                        KeyParamRanges ranges = null;
+                        KeyParametersOption.RSAParametersOption option = new KeyParametersOption.RSAParametersOption();
+                        keyParamsOption = option;
 
-                        List<ParameterType> paramTypes = type.getParameter();
-                        if(paramTypes.isEmpty() == false)
-                        {
-                            Map<String, List<KeyParamRange>> map = new HashMap<>(paramTypes.size());
-                            for(ParameterType paramType : paramTypes)
-                            {
-                                if(paramType.getMin() != null || paramType.getMax() != null)
-                                {
-                                    List<KeyParamRange> list = map.get(paramType.getName());
-                                    if(list == null)
-                                    {
-                                        list = new LinkedList<>();
-                                        map.put(paramType.getName(), list);
-                                    }
+                        Set<Range> modulusLengths = buildParametersMap(type.getRSAParameters().getModulusLength());
+                        option.setModulusLengths(modulusLengths);
 
-                                    list.add(new KeyParamRange(paramType.getMin(), paramType.getMax()));
-                                }
-                            }
+                    } else if(type.getRSAPSSParameters() != null)
+                    {
+                        KeyParametersOption.RSAPSSParametersOption option = new KeyParametersOption.RSAPSSParametersOption();
+                        keyParamsOption = option;
 
-                            if(map.isEmpty() == false)
-                            {
-                                ranges = new KeyParamRanges(map);
-                            }
-                        }
+                        Set<Range> modulusLengths = buildParametersMap(type.getRSAPSSParameters().getModulusLength());
+                        option.setModulusLengths(modulusLengths);
+                    } else if(type.getDSAParameters() != null)
+                    {
+                        KeyParametersOption.DSAParametersOption option = new KeyParametersOption.DSAParametersOption();
+                        keyParamsOption = option;
 
-                        List<KeyParamRanges> list = this.nonEcKeyAlgorithms.get(oid);
-                        if(list == null)
-                        {
-                            list = new LinkedList<>();
-                            this.nonEcKeyAlgorithms.put(oid, list);
-                        }
+                        Set<Range> pLengths = buildParametersMap(type.getDSAParameters().getPLength());
+                        option.setPLengths(pLengths);
 
-                        if(ranges != null)
-                        {
-                            list.add(ranges);
-                        }
+                        Set<Range> qLengths = buildParametersMap(type.getDSAParameters().getQLength());
+                        option.setQLengths(qLengths);
+                    } else if(type.getDHParameters() != null)
+                    {
+                        KeyParametersOption.DHParametersOption option = new KeyParametersOption.DHParametersOption();
+                        keyParamsOption = option;
+
+                        Set<Range> pLengths = buildParametersMap(type.getDHParameters().getPLength());
+                        option.setPLengths(pLengths);
+
+                        Set<Range> qLengths = buildParametersMap(type.getDHParameters().getQLength());
+                        option.setQLengths(qLengths);
                     }
-                }
+                    else if(type.getGostParameters() != null)
+                    {
+                        KeyParametersOption.GostParametersOption option = new KeyParametersOption.GostParametersOption();
+                        keyParamsOption = option;
 
-                if(allowedEcCurves.isEmpty())
-                {
-                    allowedEcCurves = null;
-                }
+                        Set<ASN1ObjectIdentifier> set = toOIDSet(type.getGostParameters().getPublicKeyParamSet());
+                        option.setPublicKeyParamSets(set);
 
-                if(nonEcKeyAlgorithms.isEmpty())
-                {
-                    nonEcKeyAlgorithms = null;
+                        set = toOIDSet(type.getGostParameters().getDigestParamSet());
+                        option.setDigestParamSets(set);
+
+                        set = toOIDSet(type.getGostParameters().getEncryptionParamSet());
+                        option.setEncryptionParamSets(set);
+                    } else
+                    {
+                        keyParamsOption = KeyParametersOption.allowAll;
+                    }
+
+                    List<OidWithDescType> algIds = type.getAlgorithm();
+                    for(OidWithDescType algId : algIds)
+                    {
+                        ASN1ObjectIdentifier oid = new ASN1ObjectIdentifier(algId.getValue());
+                        if(this.keyAlgorithms.containsKey(oid))
+                        {
+                            throw new CertProfileException("duplicate definition of keyAlgorithm " + oid.getId());
+                        }
+                        this.keyAlgorithms.put(oid, keyParamsOption);
+                    }
                 }
             }
 
@@ -440,57 +415,72 @@ public class X509CertProfileQA
             if(occurrence != null && extensionsType.getKeyUsage() != null)
             {
                 List<KeyUsageType> keyUsageTypeList = extensionsType.getKeyUsage().getUsage();
+                Set<KeyUsageOccurrence> set = new HashSet<>(keyUsageTypeList.size());
 
-                Set<String> usages = new HashSet<>();
                 for(KeyUsageType type : keyUsageTypeList)
                 {
-                    switch(type)
+                    boolean required = type.isRequired();
+                    switch(type.getValue())
                     {
                     case C_RL_SIGN:
-                        usages.add(KeyUsage.cRLSign.getName());
+                        set.add(new KeyUsageOccurrence(KeyUsage.cRLSign, required));
                         break;
                     case DATA_ENCIPHERMENT:
-                        usages.add(KeyUsage.dataEncipherment.getName());
+                        set.add(new KeyUsageOccurrence(KeyUsage.dataEncipherment, required));
                         break;
                     case CONTENT_COMMITMENT:
-                        usages.add(KeyUsage.contentCommitment.getName());
+                        set.add(new KeyUsageOccurrence(KeyUsage.contentCommitment, required));
                         break;
                     case DECIPHER_ONLY:
-                        usages.add(KeyUsage.decipherOnly.getName());
+                        set.add(new KeyUsageOccurrence(KeyUsage.decipherOnly, required));
                         break;
                     case ENCIPHER_ONLY:
-                        usages.add(KeyUsage.encipherOnly.getName());
+                        set.add(new KeyUsageOccurrence(KeyUsage.encipherOnly, required));
                         break;
                     case DIGITAL_SIGNATURE:
-                        usages.add(KeyUsage.digitalSignature.getName());
+                        set.add(new KeyUsageOccurrence(KeyUsage.digitalSignature, required));
                         break;
                     case KEY_AGREEMENT:
-                        usages.add(KeyUsage.keyAgreement.getName());
+                        set.add(new KeyUsageOccurrence(KeyUsage.keyAgreement, required));
                         break;
                     case KEY_CERT_SIGN:
-                        usages.add(KeyUsage.keyCertSign.getName());
+                        set.add(new KeyUsageOccurrence(KeyUsage.keyCertSign, required));
                         break;
                     case KEY_ENCIPHERMENT:
-                        usages.add(KeyUsage.keyEncipherment.getName());
+                        set.add(new KeyUsageOccurrence(KeyUsage.keyEncipherment, required));
                         break;
+                    default:
+                        throw new RuntimeException("should not reach here");
                     }
                 }
 
-                this.keyusage = Collections.unmodifiableSet(usages);
+                this.keyusage = Collections.unmodifiableSet(set);
+                this.keyusageText = new HashSet<>();
+                for(KeyUsageOccurrence m : this.keyusage)
+                {
+                    this.keyusageText.add(m.getKeyUsage().getName());
+                }
             }
 
             // ExtendedKeyUsage
             occurrence = extensionOccurences.get(Extension.extendedKeyUsage);
             if(occurrence != null && extensionsType.getExtendedKeyUsage() != null)
             {
-                List<OidWithDescType> extKeyUsageTypeList = extensionsType.getExtendedKeyUsage().getUsage();
-                Set<String> extendedKeyusageSet = new HashSet<String>();
-                for(OidWithDescType t : extKeyUsageTypeList)
+                List<Usage> extKeyUsageTypeList = extensionsType.getExtendedKeyUsage().getUsage();
+                Set<ExtKeyUsageOccurrence> extendedKeyusageSet = new HashSet<>();
+                for(Usage t : extKeyUsageTypeList)
                 {
-                    extendedKeyusageSet.add(t.getValue());
+                    ExtKeyUsageOccurrence usage = new ExtKeyUsageOccurrence(
+                            new ASN1ObjectIdentifier(t.getValue()), t.isRequired());
+                    extendedKeyusageSet.add(usage);
                 }
 
                 this.extendedKeyusages = Collections.unmodifiableSet(extendedKeyusageSet);
+                this.extendedKeyusagesText = new HashSet<>();
+                for(ExtKeyUsageOccurrence m : this.extendedKeyusages)
+                {
+                    this.extendedKeyusagesText.add(m.getExtKeyUsage().getId());
+                }
             }
 
             // AuthorityKeyIdentifier
@@ -621,7 +611,8 @@ public class X509CertProfileQA
     }
 
     public ValidationResult checkCert(byte[] certBytes, X509IssuerInfo issuerInfo,
-            X500Name requestedSubject, SubjectPublicKeyInfo requestedPublicKey)
+            X500Name requestedSubject, SubjectPublicKeyInfo requestedPublicKey,
+            Extensions requestedExtensions)
     {
         ParamChecker.assertNotNull("certBytes", certBytes);
         ParamChecker.assertNotNull("issuerInfo", issuerInfo);
@@ -711,9 +702,9 @@ public class X509CertProfileQA
 
         // public key
         {
+            // TODO: consider ImplicitCA
             SubjectPublicKeyInfo publicKey = bcCert.getSubjectPublicKeyInfo();
-            if(((nonEcKeyAlgorithms == null || nonEcKeyAlgorithms.isEmpty())
-                    && (allowedEcCurves == null || allowedEcCurves.isEmpty())) == false)
+            if(keyAlgorithms != null)
             {
                 ValidationIssue issue = new ValidationIssue("X509.PUBKEY.SYN", "whether public key is permitted");
                 resultIssues.add(issue);
@@ -770,55 +761,51 @@ public class X509CertProfileQA
         resultIssues.addAll(checkSubject(subject, requestedSubject));
 
         // extensions
-        resultIssues.addAll(checkExtensions(bcCert, cert, issuerInfo, requestedSubject));
+        resultIssues.addAll(checkExtensions(bcCert, cert, issuerInfo, requestedExtensions));
 
         return new ValidationResult(resultIssues);
     }
 
     private List<ValidationIssue> checkExtensions(Certificate bcCert, X509Certificate cert,
-            X509IssuerInfo issuerInfo, X500Name requestedSubject)
+            X509IssuerInfo issuerInfo, Extensions requestedExtensions)
     {
         List<ValidationIssue> result = new LinkedList<>();
 
+        // detect the list of extension types in certificate
+        Set<ASN1ObjectIdentifier> presentExtenionTypes = getExensionTypes(bcCert, cert, issuerInfo, requestedExtensions);
+
         Extensions extensions = bcCert.getTBSCertificate().getExtensions();
-        ASN1ObjectIdentifier[] oids = extensions.getExtensionOIDs();
-        if(oids == null)
+        ASN1ObjectIdentifier[] certExtTypes = extensions.getExtensionOIDs();
+
+        if(certExtTypes == null)
         {
             ValidationIssue issue = new ValidationIssue("X509.EXT.GEN", "extension general");
             result.add(issue);
             issue.setFailureMessage("no extension is present");
             return result;
-        }
-
-        for(ASN1ObjectIdentifier extType : extensionOccurences.keySet())
+        } else
         {
-            ExtensionControl extOccurrence = extensionOccurences.get(extType);
-            if(extOccurrence.isRequired() == false)
+            Set<ASN1ObjectIdentifier> oids = new HashSet<>();
+            for(ASN1ObjectIdentifier oid : certExtTypes)
             {
-                continue;
-            }
-
-            boolean present = false;
-            for(ASN1ObjectIdentifier oid : oids)
-            {
-                if(oid.equals(extType))
+                if(presentExtenionTypes.contains(oid) == false)
                 {
-                    present = true;
-                    break;
+                    oids.add(oid);
                 }
             }
 
-            if(present == false)
+            if(oids.isEmpty() == false)
             {
-                ValidationIssue issue = createExtensionIssue(extType);
+                ValidationIssue issue = new ValidationIssue("X509.EXT.GEN", "extension general");
                 result.add(issue);
-                issue.setFailureMessage("extension is absent but is required");
+                issue.setFailureMessage("following extensions are present but not expected " + oids_to_string(oids));
             }
         }
 
-        for(ASN1ObjectIdentifier oid : oids)
+        for(ASN1ObjectIdentifier oid : certExtTypes)
         {
             ValidationIssue issue = createExtensionIssue(oid);
+            presentExtenionTypes.remove(oid);
             result.add(issue);
 
             Extension ext = extensions.getExtension(oid);
@@ -839,6 +826,103 @@ public class X509CertProfileQA
 
             try
             {
+                if(Extension.authorityKeyIdentifier.equals(oid))
+                {
+                    // AuthorityKeyIdentifier
+                    checkExtensionIssuerKeyIdentifier(extensionValue, issuerInfo, failureMsg);
+                } else if(Extension.subjectKeyIdentifier.equals(oid))
+                {
+                    // SubjectKeyIdentifier
+                    checkExtensionSubjectKeyIdentifier(extensionValue, bcCert.getSubjectPublicKeyInfo(), failureMsg);
+                } else if(Extension.keyUsage.equals(oid))
+                {
+                    // KeyUsage
+                    // TODO
+                    if(keyusage != null)
+                    {
+                        checkExtensionKeyUsage(cert.getKeyUsage(), failureMsg);
+                    }
+                } else if(Extension.certificatePolicies.equals(oid))
+                {
+                    // CertificatePolicies
+                    checkExtensionCertificatePolicies(extensionValue, requestedExtensions, failureMsg);
+                } else if(Extension.policyMappings.equals(oid))
+                {
+                    // Policy Mappings
+                    if(policyMappings != null)
+                    {
+                        checkExtensionPolicyMappings(extensionValue, failureMsg);
+                    }
+                } else if(Extension.subjectAlternativeName.equals(oid))
+                {
+                    // SubjectAltName
+                    checkExtensionSubjectAltName(extensionValue, requestedExtensions.getExtension(oid), failureMsg);
+                } else if(Extension.issuerAlternativeName.equals(oid))
+                {
+                    // IssuerAltName
+                    checkExtensionIssuerAltNames(extensionValue, issuerInfo, failureMsg);
+                } else if(Extension.basicConstraints.equals(oid))
+                {
+                    // Basic Constraints
+                    checkExtensionBasicConstraints(extensionValue, failureMsg);
+                } else if(Extension.nameConstraints.equals(oid))
+                {
+                    // Name Constraints
+                    if(nameConstraints != null)
+                    {
+                        checkExtensionNameConstraints(extensionValue, failureMsg);
+                    }
+                } else if(Extension.policyConstraints.equals(oid))
+                {
+                    // PolicyConstrains
+                    if(policyConstraints != null)
+                    {
+                        checkExtensionPolicyConstraints(extensionValue, failureMsg);
+                    }
+                } else if(Extension.extendedKeyUsage.equals(oid))
+                {
+                    // ExtendedKeyUsage
+                    // TODO
+                    if(extendedKeyusages != null)
+                    {
+                        checkExtensionExtendedKeyUsage(extensionValue, failureMsg);
+                    }
+                } else if(Extension.cRLDistributionPoints.equals(oid))
+                {
+                    // CRL Distribution Points
+                    checkExtensionCrlDistributionPoints(extensionValue, issuerInfo, failureMsg);
+                } else if(Extension.inhibitAnyPolicy.equals(oid))
+                {
+                    // Inhibit anyPolicy
+                    if(inhibitAnyPolicy != null)
+                    {
+                        checkExtensionInhibitAnyPolicy(extensionValue, failureMsg);
+                    }
+                } else if(Extension.freshestCRL.equals(oid))
+                {
+                    // Freshest CRL
+                    checkExtensionDeltaCrlDistributionPoints(extensionValue, issuerInfo, failureMsg);
+                } else if(Extension.authorityInfoAccess.equals(oid))
+                {
+                    // Authority Information Access
+                    checkExtensionAuthorityInfoAccess(extensionValue, issuerInfo, failureMsg);
+                } else if(Extension.subjectInfoAccess.equals(oid))
+                {
+                    // SubjectInfoAccess
+                    // TODO
+                } else if(ObjectIdentifiers.id_extension_admission.equals(oid))
+                {
+                    // Admission
+                    checkExtensionAdmission(extensionValue, issuerInfo, failureMsg);
+                } else if(ObjectIdentifiers.id_extension_pkix_ocsp_nocheck.equals(oid))
+                {
+                    // ocsp-nocheck
+                    checkExtensionOcspNocheck(extensionValue, failureMsg);
+                } else
+                {
+                    // do nothing
+                }
+
                 if(constantExtensions != null && constantExtensions.containsKey(oid))
                 {
                     byte[] expectedextensionValue = constantExtensions.get(oid);
@@ -849,82 +933,7 @@ public class X509CertProfileQA
                         failureMsg.append("; ");
                     }
                 }
-                else if(Extension.basicConstraints.equals(oid))
-                {
-                    checkExtensionBasicConstraints(extensionValue, failureMsg);
-                } else if(Extension.subjectKeyIdentifier.equals(oid))
-                {
-                    checkExtensionSubjectKeyIdentifier(extensionValue, bcCert.getSubjectPublicKeyInfo(), failureMsg);
-                } else if(Extension.authorityKeyIdentifier.equals(oid))
-                {
-                    checkExtensionIssuerKeyIdentifier(extensionValue, issuerInfo, failureMsg);
-                } else if(Extension.keyUsage.equals(oid))
-                {
-                    if(keyusage != null)
-                    {
-                        checkExtensionKeyUsage(cert.getKeyUsage(), failureMsg);
-                    }
-                } else if(Extension.extendedKeyUsage.equals(oid))
-                {
-                    if(extendedKeyusages != null)
-                    {
-                        checkExtensionExtendedKeyUsage(extensionValue, failureMsg);
-                    }
-                } else if(Extension.certificatePolicies.equals(oid))
-                {
-                    if(certificatePolicies != null)
-                    {
-                        checkExtensionCertificatePolicies(extensionValue, failureMsg);
-                    }
-                } else if(Extension.policyMappings.equals(oid))
-                {
-                    if(policyMappings != null)
-                    {
-                        checkExtensionPolicyMappings(extensionValue, failureMsg);
-                    }
-                } else if(Extension.nameConstraints.equals(oid))
-                {
-                    if(nameConstraints != null)
-                    {
-                        checkExtensionNameConstraints(extensionValue, failureMsg);
-                    }
-                } else if(Extension.policyConstraints.equals(oid))
-                {
-                    if(policyConstraints != null)
-                    {
-                        checkExtensionPolicyConstraints(extensionValue, failureMsg);
-                    }
-                } else if(Extension.inhibitAnyPolicy.equals(oid))
-                {
-                    if(inhibitAnyPolicy != null)
-                    {
-                        checkExtensionInhibitAnyPolicy(extensionValue, failureMsg);
-                    }
-                } else if(Extension.subjectAlternativeName.equals(oid))
-                {
-                    checkExtensionSubjectAltName(extensionValue, requestedSubject, failureMsg);
-                } else if(Extension.issuerAlternativeName.equals(oid))
-                {
-                    checkExtensionIssuerAltNames(extensionValue, issuerInfo, failureMsg);
-                } else if(Extension.authorityInfoAccess.equals(oid))
-                {
-                    checkExtensionAuthorityInfoAccess(extensionValue, issuerInfo, failureMsg);
-                } else if(Extension.cRLDistributionPoints.equals(oid))
-                {
-                    checkExtensionCrlDistributionPoints(extensionValue, issuerInfo, failureMsg);
-                } else if(Extension.deltaCRLIndicator.equals(oid))
-                {
-                    checkExtensionDeltaCrlDistributionPoints(extensionValue, issuerInfo, failureMsg);
-                } else if(ObjectIdentifiers.id_extension_admission.equals(oid))
-                {
-                    checkExtensionAdmission(extensionValue, issuerInfo, failureMsg);
-                } else if(Extension.subjectInfoAccess.equals(oid))
-                {
-                    // TODO
-                } else
-                {
-                    // do nothing
-                }
+
             }catch(IllegalArgumentException | ClassCastException | ArrayIndexOutOfBoundsException e)
             {
                 LOG.debug("extension value does not have correct syntax", e);
@@ -937,7 +946,267 @@ public class X509CertProfileQA
             }
         }
 
+        for(ASN1ObjectIdentifier extType : presentExtenionTypes)
+        {
+            if(cert.getExtensionValue(extType.getId()) == null)
+            {
+                ValidationIssue issue = createExtensionIssue(extType);
+                result.add(issue);
+                issue.setFailureMessage("extension is absent but is required");
+            }
+        }
+
         return result;
+    }
+
+    private Set<ASN1ObjectIdentifier> getExensionTypes(Certificate bcCert, X509Certificate cert,
+            X509IssuerInfo issuerInfo, Extensions requestedExtensions)
+    {
+        Set<ASN1ObjectIdentifier> types = new HashSet<>();
+        // profile required extension types
+        for(ASN1ObjectIdentifier oid : extensionOccurences.keySet())
+        {
+            if(extensionOccurences.get(oid).isRequired())
+            {
+                types.add(oid);
+            }
+        }
+
+        Set<ASN1ObjectIdentifier> wantedExtensionTypes = new HashSet<>();
+
+        if(requestedExtensions != null)
+        {
+            Extension reqExtension = requestedExtensions.getExtension(
+                    CustomObjectIdentifiers.id_extension_existence);
+            if(reqExtension != null)
+            {
+                ExtensionExistence ee = ExtensionExistence.getInstance(reqExtension.getParsedValue());
+                types.addAll(ee.getNeedExtensions());
+                wantedExtensionTypes.addAll(ee.getWantExtensions());
+            }
+        }
+
+        if(wantedExtensionTypes.isEmpty())
+        {
+            return types;
+        }
+
+        // wanted extension types
+        // Authority key identifier
+        ASN1ObjectIdentifier type = Extension.authorityKeyIdentifier;
+        if(wantedExtensionTypes.contains(type))
+        {
+            types.add(type);
+        }
+
+        // Subject key identifier
+        type = Extension.subjectKeyIdentifier;
+        if(wantedExtensionTypes.contains(type))
+        {
+            types.add(type);
+        }
+
+        // KeyUsage
+        type = Extension.keyUsage;
+        if(wantedExtensionTypes.contains(type))
+        {
+            boolean required = false;
+            if(requestedExtensions.getExtension(type) != null)
+            {
+                required = true;
+            }
+
+            if(required == false)
+            {
+                for(KeyUsageOccurrence m : keyusage)
+                {
+                    if(m.isRequired())
+                    {
+                        required = true;
+                        break;
+                    }
+                }
+            }
+
+            if(required)
+            {
+                types.add(type);
+            }
+        }
+
+        // CertificatePolicies
+        type = Extension.certificatePolicies;
+        if(wantedExtensionTypes.contains(type))
+        {
+            if(certificatePolicies != null)
+            {
+                types.add(type);
+            }
+        }
+
+        // Policy Mappings
+        type = Extension.policyMappings;
+        if(wantedExtensionTypes.contains(type))
+        {
+            if(policyMappings != null)
+            {
+                types.add(type);
+            }
+        }
+
+        // SubjectAltNames
+        type = Extension.subjectAlternativeName;
+        if(wantedExtensionTypes.contains(type))
+        {
+            if(requestedExtensions.getExtension(type) != null)
+            {
+                types.add(type);
+            }
+        }
+
+        // IssuerAltName
+        type = Extension.issuerAlternativeName;
+        if(wantedExtensionTypes.contains(type))
+        {
+            if(cert.getExtensionValue(Extension.subjectAlternativeName.getId()) != null)
+            {
+                types.add(type);
+            }
+        }
+
+        // BasicConstraints
+        type = Extension.basicConstraints;
+        if(wantedExtensionTypes.contains(type))
+        {
+            types.add(type);
+        }
+
+        // Name Constraints
+        type = Extension.nameConstraints;
+        if(wantedExtensionTypes.contains(type))
+        {
+            if(nameConstraints != null)
+            {
+                types.add(type);
+            }
+        }
+
+        // PolicyConstrains
+        type = Extension.policyConstraints;
+        if(wantedExtensionTypes.contains(type))
+        {
+            if(policyConstraints != null)
+            {
+                types.add(type);
+            }
+        }
+
+        // ExtendedKeyUsage
+        type = Extension.extendedKeyUsage;
+        if(wantedExtensionTypes.contains(type))
+        {
+            boolean required = false;
+            if(requestedExtensions.getExtension(type) != null)
+            {
+                required = true;
+            }
+
+            if(required == false)
+            {
+                for(ExtKeyUsageOccurrence m : extendedKeyusages)
+                {
+                    if(m.isRequired())
+                    {
+                        required = true;
+                        break;
+                    }
+                }
+            }
+
+            if(required)
+            {
+                types.add(type);
+            }
+        }
+
+        // CRLDistributionPoints
+        type = Extension.cRLDistributionPoints;
+        if(wantedExtensionTypes.contains(type))
+        {
+            if(issuerInfo.getCrlURLs() != null)
+            {
+                types.add(type);
+            }
+        }
+
+        // Inhibit anyPolicy
+        type = Extension.inhibitAnyPolicy;
+        if(wantedExtensionTypes.contains(type))
+        {
+            if(inhibitAnyPolicy != null)
+            {
+                types.add(type);
+            }
+        }
+
+        // FreshestCRL
+        type = Extension.freshestCRL;
+        if(wantedExtensionTypes.contains(type))
+        {
+            if(issuerInfo.getDeltaCrlURLs() != null)
+            {
+                types.add(type);
+            }
+        }
+
+        // AuthorityInfoAccess
+        type = Extension.authorityInfoAccess;
+        if(wantedExtensionTypes.contains(type))
+        {
+            if(issuerInfo.getOcspURLs() != null)
+            {
+                types.add(type);
+            }
+        }
+
+        // SubjectInfoAccess
+        type = Extension.subjectInfoAccess;
+        if(wantedExtensionTypes.contains(type))
+        {
+            if(requestedExtensions.getExtension(type) != null)
+            {
+                types.add(type);
+            }
+        }
+
+        // Admission
+        type = ObjectIdentifiers.id_extension_admission;
+        if(wantedExtensionTypes.contains(type))
+        {
+            if(admission != null)
+            {
+                types.add(type);
+            }
+        }
+
+        // ocsp-nocheck
+        type = ObjectIdentifiers.id_extension_pkix_ocsp_nocheck;
+        if(wantedExtensionTypes.contains(type))
+        {
+            types.add(type);
+        }
+
+        wantedExtensionTypes.removeAll(types);
+
+        for(ASN1ObjectIdentifier oid : wantedExtensionTypes)
+        {
+            if(requestedExtensions.getExtension(oid) != null || constantExtensions.containsKey(oid))
+            {
+                types.add(oid);
+            }
+        }
+
+        return types;
     }
 
     public static X509ProfileType parse(InputStream confStream)
@@ -984,42 +1253,53 @@ public class X509CertProfileQA
     private void checkPublicKey(SubjectPublicKeyInfo publicKey)
     throws BadCertTemplateException
     {
-        if((nonEcKeyAlgorithms == null || nonEcKeyAlgorithms.isEmpty())
-                && (allowedEcCurves == null || allowedEcCurves.isEmpty()))
+        if(keyAlgorithms == null || keyAlgorithms.isEmpty())
         {
             return;
         }
 
         ASN1ObjectIdentifier keyType = publicKey.getAlgorithm().getAlgorithm();
-        if(X9ObjectIdentifiers.id_ecPublicKey.equals(keyType))
+        if(keyAlgorithms.containsKey(keyType) == false)
         {
-            ASN1ObjectIdentifier curveOid;
-            try
-            {
-                ASN1Encodable algParam = publicKey.getAlgorithm().getParameters();
-                curveOid = ASN1ObjectIdentifier.getInstance(algParam);
-            } catch(IllegalArgumentException e)
-            {
-                throw new BadCertTemplateException("Only named EC public key is supported");
-            }
+            throw new BadCertTemplateException("key type " + keyType.getId() + " is not permitted");
+        }
 
-            if(allowedEcCurves != null && allowedEcCurves.isEmpty() == false)
+        KeyParametersOption keyParamsOption = keyAlgorithms.get(keyType);
+        if(keyParamsOption instanceof AllowAllParametersOption)
+        {
+            return;
+        } else if(keyParamsOption instanceof ECParamatersOption)
+        {
+            ECParamatersOption ecOption = (ECParamatersOption) keyParamsOption;
+            // parameters
+            ASN1Encodable algParam = publicKey.getAlgorithm().getParameters();
+            ASN1ObjectIdentifier curveOid;
+
+            if(algParam instanceof ASN1ObjectIdentifier)
             {
-                if(allowedEcCurves.containsKey(curveOid) == false)
+                curveOid = (ASN1ObjectIdentifier) algParam;
+                if(ecOption.allowsCurve(curveOid) == false)
                 {
                     throw new BadCertTemplateException("EC curve " + SecurityUtil.getCurveName(curveOid) +
                             " (OID: " + curveOid.getId() + ") is not allowed");
                 }
+            } else
+            {
+                throw new BadCertTemplateException("Only namedCurve or implictCA EC public key is supported");
             }
 
-            byte[] keyData = publicKey.getPublicKeyData().getBytes();
-
-            Set<Byte> allowedEncodings = allowedEcCurves.get(curveOid);
-            if(allowedEncodings != null && allowedEncodings.isEmpty() == false)
+            // point encoding
+            if(ecOption.getPointEncodings() != null)
             {
-                if(allowedEncodings.contains(keyData[0]) == false)
+                byte[] keyData = publicKey.getPublicKeyData().getBytes();
+                if(keyData.length < 1)
                 {
-                    throw new BadCertTemplateException("Unaccepted EC point encoding " + keyData[0]);
+                    throw new BadCertTemplateException("invalid publicKeyData");
+                }
+                byte pointEncoding = keyData[0];
+                if(ecOption.getPointEncodings().contains(pointEncoding) == false)
+                {
+                    throw new BadCertTemplateException("Unaccepted EC point encoding " + pointEncoding);
                 }
             }
 
@@ -1036,77 +1316,62 @@ public class X509CertProfileQA
             }
 
             return;
-        }
-        else
+        } else if(keyParamsOption instanceof RSAParametersOption)
         {
-            if(nonEcKeyAlgorithms == null || allowedEcCurves.isEmpty())
+            RSAParametersOption rsaOption = (RSAParametersOption) keyParamsOption;
+
+            ASN1Integer modulus;
+            try
+            {
+                ASN1Sequence seq = ASN1Sequence.getInstance(publicKey.getPublicKeyData().getBytes());
+                modulus = ASN1Integer.getInstance(seq.getObjectAt(0));
+            }catch(IllegalArgumentException e)
+            {
+                throw new BadCertTemplateException("invalid publicKeyData");
+            }
+
+            int modulusLength = modulus.getPositiveValue().bitLength();
+            if((rsaOption.allowsModulusLength(modulusLength)))
             {
                 return;
             }
-
-            if(nonEcKeyAlgorithms.containsKey(keyType))
+        } else if(keyParamsOption instanceof DSAParametersOption)
+        {
+            DSAParametersOption dsaOption = (DSAParametersOption) keyParamsOption;
+            ASN1Encodable params = publicKey.getAlgorithm().getParameters();
+            if(params == null)
             {
-                List<KeyParamRanges> list = nonEcKeyAlgorithms.get(keyType);
-                if(list.isEmpty())
-                {
-                    return;
-                }
-
-                if(PKCSObjectIdentifiers.rsaEncryption.equals(keyType))
-                {
-                    ASN1Sequence seq = ASN1Sequence.getInstance(publicKey.getPublicKeyData().getBytes());
-                    ASN1Integer modulus = ASN1Integer.getInstance(seq.getObjectAt(0));
-                    int modulusLength = modulus.getPositiveValue().bitLength();
-                    for(KeyParamRanges ranges : list)
-                    {
-                        if(satisfy(modulusLength, MODULUS_LENGTH, ranges))
-                        {
-                            return;
-                        }
-                    }
-                }
-                else if(X9ObjectIdentifiers.id_dsa.equals(keyType))
-                {
-                    ASN1Encodable params = publicKey.getAlgorithm().getParameters();
-                    if(params == null)
-                    {
-                        throw new BadCertTemplateException("null Dss-Parms is not permitted");
-                    }
-
-                    int pLength;
-                    int qLength;
-
-                    try
-                    {
-                        ASN1Sequence seq = ASN1Sequence.getInstance(params);
-                        ASN1Integer p = ASN1Integer.getInstance(seq.getObjectAt(0));
-                        ASN1Integer q = ASN1Integer.getInstance(seq.getObjectAt(1));
-                        pLength = p.getPositiveValue().bitLength();
-                        qLength = q.getPositiveValue().bitLength();
-                    } catch(IllegalArgumentException | ArrayIndexOutOfBoundsException e)
-                    {
-                        throw new BadCertTemplateException("illegal Dss-Parms");
-                    }
-
-                    for(KeyParamRanges ranges : list)
-                    {
-                        boolean match = satisfy(pLength, P_LENGTH, ranges);
-                        if(match)
-                        {
-                            match = satisfy(qLength, Q_LENGTH, ranges);
-                        }
-
-                        if(match)
-                        {
-                            return;
-                        }
-                    }
-                }
-                else
-                {
-                    throw new BadCertTemplateException("Unknown key type " + keyType.getId());
-                }
+                throw new BadCertTemplateException("null Dss-Parms is not permitted");
             }
+
+            int pLength;
+            int qLength;
+
+            try
+            {
+                ASN1Sequence seq = ASN1Sequence.getInstance(params);
+                ASN1Integer p = ASN1Integer.getInstance(seq.getObjectAt(0));
+                ASN1Integer q = ASN1Integer.getInstance(seq.getObjectAt(1));
+                pLength = p.getPositiveValue().bitLength();
+                qLength = q.getPositiveValue().bitLength();
+            } catch(IllegalArgumentException | ArrayIndexOutOfBoundsException e)
+            {
+                throw new BadCertTemplateException("illegal Dss-Parms");
+            }
+
+            boolean match = dsaOption.allowsPLength(pLength);
+            if(match)
+            {
+                match = dsaOption.allowsQLength(qLength);
+            }
+
+            if(match)
+            {
+                return;
+            }
+        } else
+        {
+            throw new RuntimeException("should not reach here");
         }
 
         throw new BadCertTemplateException("the given publicKey is not permitted");
@@ -1148,25 +1413,6 @@ public class X509CertProfileQA
             default:
                 throw new BadCertTemplateException("Invalid point encoding 0x" + Integer.toString(encoded[0], 16));
         }
-    }
-
-    private static boolean satisfy(int len, String paramName, KeyParamRanges ranges)
-    {
-        List<KeyParamRange> rangeList = ranges.getRanges(paramName);
-        if(rangeList == null || rangeList.isEmpty())
-        {
-            return true;
-        }
-
-        for(KeyParamRange range : rangeList)
-        {
-            if(range.match(len))
-            {
-                return true;
-            }
-        }
-
-        return false;
     }
 
     private List<ValidationIssue> checkSubject(X500Name subject, X500Name requestedSubject)
@@ -1222,11 +1468,7 @@ public class X509CertProfileQA
             return issue;
         }
 
-        RDN[] requestedRdns = null;
-        if(ignoreRDNs.contains(type) == false)
-        {
-            requestedRdns = requestedSubject.getRDNs(type);
-        }
+        RDN[] requestedRdns = requestedSubject.getRDNs(type);
 
         if(rdnsSize == 0)
         {
@@ -1506,7 +1748,7 @@ public class X509CertProfileQA
     private ValidationIssue createExtensionIssue(ASN1ObjectIdentifier extId)
     {
         ValidationIssue issue;
-        String extName = extOidNameMap.get(extId);
+        String extName = ObjectIdentifiers.getName(extId);
         if(extName == null)
         {
             extName = extId.getId().replace('.', '_');
@@ -1803,14 +2045,14 @@ public class X509CertProfileQA
                 }
             }
 
-            Set<String> diffs = str_in_b_not_in_a(keyusage, iUsages);
+            Set<String> diffs = str_in_b_not_in_a(keyusageText, iUsages);
             if(diffs.isEmpty() == false)
             {
                 failureMsg.append("Usages " + diffs.toString() + " are present but not expected");
                 failureMsg.append("; ");
             }
 
-            diffs = str_in_b_not_in_a(iUsages, keyusage);
+            diffs = str_in_b_not_in_a(iUsages, keyusageText);
             if(diffs.isEmpty() == false)
             {
                 failureMsg.append("Usages " + diffs.toString() + " are absent but are required");
@@ -1829,14 +2071,14 @@ public class X509CertProfileQA
             iUsages.add(_usage.getId());
         }
 
-        Set<String> diffs = str_in_b_not_in_a(extendedKeyusages, iUsages);
+        Set<String> diffs = str_in_b_not_in_a(extendedKeyusagesText, iUsages);
         if(diffs.isEmpty() == false)
         {
             failureMsg.append("Usages " + diffs.toString() + " are present but not expected");
             failureMsg.append("; ");
         }
 
-        diffs = str_in_b_not_in_a(iUsages, extendedKeyusages);
+        diffs = str_in_b_not_in_a(iUsages, extendedKeyusagesText);
         if(diffs.isEmpty() == false)
         {
             failureMsg.append("Usages " + diffs.toString() + " are absent but are required");
@@ -1844,8 +2086,29 @@ public class X509CertProfileQA
         }
     }
 
-    private void checkExtensionCertificatePolicies(byte[] extensionValue, StringBuilder failureMsg)
+    private void checkExtensionCertificatePolicies(byte[] extensionValue, Extensions requestedExtensions,
+            StringBuilder failureMsg)
     {
+        if(certificatePolicies == null)
+        {
+            Extension requestedExtension = requestedExtensions.getExtension(Extension.certificatePolicies);
+            if(requestedExtension != null)
+            {
+                byte[] expected = requestedExtension.getExtnValue().getOctets();
+                if(Arrays.equals(expected, extensionValue))
+                {
+                    return;
+                } else
+                {
+                    failureMsg.append("content does not equal the requested one");
+                    failureMsg.append("; ");
+                }
+            } else
+            {
+                throw new RuntimeException("should not reach here");
+            }
+        }
+
         org.bouncycastle.asn1.x509.CertificatePolicies asn1 =
                 org.bouncycastle.asn1.x509.CertificatePolicies.getInstance(extensionValue);
         PolicyInformation[] iPolicyInformations = asn1.getPolicyInformation();
@@ -1857,6 +2120,7 @@ public class X509CertProfileQA
             if(eCp == null)
             {
                 failureMsg.append("certificate policy '" + iPolicyId + "' is not expected");
+                failureMsg.append("; ");
             } else
             {
                 PolicyQualifiersConf eCpPq = eCp.getPolicyQualifiers();
@@ -1896,6 +2160,7 @@ public class X509CertProfileQA
                             if(iCpsUris.contains(value) == false)
                             {
                                 failureMsg.append("CPSUri '" + value + "' is absent but is required");
+                                failureMsg.append("; ");
                             }
                         }else if(qualifierInfo instanceof UserNoticePolicyQualifierInfo)
                         {
@@ -1903,6 +2168,7 @@ public class X509CertProfileQA
                             if(iUserNotices.contains(value) == false)
                             {
                                 failureMsg.append("userNotice '" + value + "' is absent but is required");
+                                failureMsg.append("; ");
                             }
                         }else
                         {
@@ -1986,8 +2252,9 @@ public class X509CertProfileQA
     }
 
     private void checkExtensionSubjectAltName(byte[] extensionValue,
-            X500Name requestedSubject, StringBuilder failureMsg)
+            Extension requestedSubjectAltName, StringBuilder failureMsg)
     {
+        /* TODO
         RDN[] rdns = requestedSubject.getRDNs(Extension.subjectAlternativeName);
         if(rdns == null || rdns.length < 1)
         {
@@ -2032,6 +2299,7 @@ public class X509CertProfileQA
             failureMsg.append("subjectAltName entries " + diffs.toString() + " are absent but are required");
             failureMsg.append("; ");
         }
+        */
     }
 
     private void checkExtensionIssuerAltNames(byte[] extensionValue,
@@ -2373,6 +2641,15 @@ public class X509CertProfileQA
         }
     }
 
+    private void checkExtensionOcspNocheck(byte[] extensionValue, StringBuilder failureMsg)
+    {
+        if(Arrays.equals(DERNull, extensionValue) == false)
+        {
+            failureMsg.append("value is not DER NULL");
+            failureMsg.append("; ");
+        }
+    }
+
     private static String hex(byte[] bytes)
     {
         return Hex.toHexString(bytes);
@@ -2409,102 +2686,52 @@ public class X509CertProfileQA
         return result;
     }
 
-    private static GeneralName createGeneralName(String value, Set<GeneralNameMode> modes)
+    static Set<Range> buildParametersMap(RangesType ranges)
     {
-        int idxTagSep = value.indexOf(GENERALNAME_SEP);
-        if(idxTagSep == -1 || idxTagSep == 0 || idxTagSep == value.length() - 1)
+        if(ranges == null)
         {
-            throw new IllegalArgumentException("invalid generalName " + value);
-        }
-        String s = value.substring(0, idxTagSep);
-
-        int tag;
-        try
-        {
-            tag = Integer.parseInt(s);
-        }catch(NumberFormatException e)
-        {
-            throw new IllegalArgumentException("invalid generalName tag " + s);
+            return null;
         }
 
-        GeneralNameMode mode = null;
-
-        for(GeneralNameMode m : modes)
+        Set<Range> ret = new HashSet<>();
+        for(RangeType range : ranges.getRange())
         {
-            if(m.getTag().getTag() == tag)
+            if(range.getMin() != null || range.getMax() != null)
             {
-                mode = m;
-                break;
+                ret.add(new Range(range.getMin(), range.getMax()));
             }
         }
+        return ret;
+    }
 
-        if(mode == null)
+    private static Set<ASN1ObjectIdentifier> toOIDSet(List<OidWithDescType> oidWithDescTypes)
+    {
+        if(oidWithDescTypes == null || oidWithDescTypes.isEmpty())
         {
-            throw new IllegalArgumentException("generalName tag " + tag + " is not allowed");
+            return null;
         }
 
-        String name = value.substring(idxTagSep + 1);
-
-        switch(mode.getTag())
+        Set<ASN1ObjectIdentifier> oids = new HashSet<>();
+        for(OidWithDescType type : oidWithDescTypes)
         {
-            case otherName:
-            {
-                int idxSep = name.indexOf(GENERALNAME_SEP);
-                if(idxSep == -1 || idxSep == 0 || idxSep == name.length() - 1)
-                {
-                    throw new IllegalArgumentException("invalid otherName " + name);
-                }
-                String otherTypeOid = name.substring(0, idxSep);
-                ASN1ObjectIdentifier type = new ASN1ObjectIdentifier(otherTypeOid);
-                if(mode.getAllowedTypes().contains(type) == false)
-                {
-                    throw new IllegalArgumentException("otherName.type " + otherTypeOid + " is not allowed");
-                }
-                String otherValue = name.substring(idxSep + 1);
-
-                ASN1EncodableVector vector = new ASN1EncodableVector();
-                vector.add(type);
-                vector.add(new DERTaggedObject(true, 0, new DERUTF8String(otherValue)));
-                DERSequence seq = new DERSequence(vector);
-
-                return new GeneralName(GeneralName.otherName, seq);
-            }
-            case rfc822Name:
-                return new GeneralName(tag, name);
-            case dNSName:
-                return new GeneralName(tag, name);
-            case directoryName:
-            {
-                X500Name x500Name = SecurityUtil.reverse(new X500Name(name));
-                return new GeneralName(GeneralName.directoryName, x500Name);
-            }
-            case ediPartyName:
-            {
-                int idxSep = name.indexOf(GENERALNAME_SEP);
-                if(idxSep == -1 || idxSep == name.length() - 1)
-                {
-                    throw new IllegalArgumentException("invalid ediPartyName " + name);
-                }
-                String nameAssigner = idxSep == 0 ? null : name.substring(0, idxSep);
-                String partyName = name.substring(idxSep + 1);
-                ASN1EncodableVector vector = new ASN1EncodableVector();
-                if(nameAssigner != null)
-                {
-                    vector.add(new DERTaggedObject(false, 0, new DirectoryString(nameAssigner)));
-                }
-                vector.add(new DERTaggedObject(false, 1, new DirectoryString(partyName)));
-                ASN1Sequence seq = new DERSequence(vector);
-                return new GeneralName(GeneralName.ediPartyName, seq);
-            }
-            case uniformResourceIdentifier:
-                return new GeneralName(tag, name);
-            case iPAddress:
-                return new GeneralName(tag, name);
-            case registeredID:
-                return new GeneralName(tag, name);
-            default:
-                throw new RuntimeException("should not reach here");
+            oids.add(new ASN1ObjectIdentifier(type.getValue()));
         }
+        return Collections.unmodifiableSet(oids);
+    }
+
+    private static Set<String> oids_to_string(Collection<ASN1ObjectIdentifier> oids)
+    {
+        Set<String> oidTexts = new HashSet<>();
+        for(ASN1ObjectIdentifier type : oids)
+        {
+            oidTexts.add(type.getId());
+        }
+        return oidTexts;
+    }
+
+    private static boolean getBoolean(Boolean b, boolean dfltValue)
+    {
+        return b == null ? dfltValue : b.booleanValue();
     }
 
 }
