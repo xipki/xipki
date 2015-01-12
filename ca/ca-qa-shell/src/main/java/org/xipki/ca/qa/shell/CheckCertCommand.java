@@ -39,7 +39,11 @@ import java.util.Set;
 
 import org.apache.karaf.shell.commands.Command;
 import org.apache.karaf.shell.commands.Option;
+import org.bouncycastle.asn1.ASN1Set;
+import org.bouncycastle.asn1.pkcs.Attribute;
 import org.bouncycastle.asn1.pkcs.CertificationRequest;
+import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
+import org.bouncycastle.asn1.x509.Extensions;
 import org.xipki.ca.qa.ValidationIssue;
 import org.xipki.ca.qa.ValidationResult;
 import org.xipki.ca.qa.certprofile.x509.X509CertProfileQA;
@@ -87,13 +91,26 @@ public class CheckCertCommand extends XipkiOsgiCommandSupport
             return  null;
         }
 
-        if(issuerName != null && issuerNames.contains(issuerName) == false)
+        if(issuerName == null)
+        {
+        	if(issuerNames.size() != 1)
+        	{
+                err("No issue is specified");
+                return null;
+        	}
+        	
+        	issuerName = issuerNames.iterator().next();
+        }
+        
+        if(issuerNames.contains(issuerName) == false)
         {
             err("Issuer " + issuerName + " is not within the configured issuers " + issuerNames);
             return null;
         }
+        
         X509IssuerInfo issuerInfo = qaSystemManager.getIssuer(issuerName);
 
+        
         X509CertProfileQA qa = qaSystemManager.getCertprofile(profileName);
         if(qa == null)
         {
@@ -102,10 +119,20 @@ public class CheckCertCommand extends XipkiOsgiCommandSupport
         }
 
         CertificationRequest p10Req = CertificationRequest.getInstance(IoUtil.read(p10File));
+        Extensions extensions = null;
+        ASN1Set attrs = p10Req.getCertificationRequestInfo().getAttributes();
+        for(int i = 0; i < attrs.size(); i++)
+        {
+            Attribute attr = Attribute.getInstance(attrs.getObjectAt(i));
+            if(PKCSObjectIdentifiers.pkcs_9_at_extensionRequest.equals(attr.getAttrType()))
+            {
+                extensions = Extensions.getInstance(attr.getAttributeValues()[0]);
+            }
+        }
 
         byte[] certBytes = IoUtil.read(certFile);
         ValidationResult result = qa.checkCert(certBytes, issuerInfo, p10Req.getCertificationRequestInfo().getSubject(),
-                p10Req.getCertificationRequestInfo().getSubjectPublicKeyInfo());
+                p10Req.getCertificationRequestInfo().getSubjectPublicKeyInfo(), extensions);
         StringBuilder sb = new StringBuilder();
 
         sb.append("certificate is ");
