@@ -68,7 +68,6 @@ import org.bouncycastle.asn1.x509.CertificatePolicies;
 import org.bouncycastle.asn1.x509.Extension;
 import org.bouncycastle.asn1.x509.Extensions;
 import org.bouncycastle.asn1.x509.NameConstraints;
-import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.ca.api.BadCertTemplateException;
@@ -79,10 +78,6 @@ import org.xipki.ca.api.profile.ExtensionTuples;
 import org.xipki.ca.api.profile.ExtensionValue;
 import org.xipki.ca.api.profile.GeneralNameMode;
 import org.xipki.ca.api.profile.KeyParametersOption;
-import org.xipki.ca.api.profile.KeyParametersOption.AllowAllParametersOption;
-import org.xipki.ca.api.profile.KeyParametersOption.DSAParametersOption;
-import org.xipki.ca.api.profile.KeyParametersOption.ECParamatersOption;
-import org.xipki.ca.api.profile.KeyParametersOption.RSAParametersOption;
 import org.xipki.ca.api.profile.KeyParametersOption.Range;
 import org.xipki.ca.api.profile.RDNOccurrence;
 import org.xipki.ca.api.profile.SubjectInfo;
@@ -338,6 +333,8 @@ public class DefaultX509CertProfile extends BaseX509CertProfile
                         }
                         this.keyAlgorithms.put(oid, keyParamsOption);
                     }
+
+                    this.keyAlgorithms = Collections.unmodifiableMap(this.keyAlgorithms);
                 }
             }
 
@@ -727,134 +724,6 @@ public class DefaultX509CertProfile extends BaseX509CertProfile
     public String getParameter(String paramName)
     {
         return parameters == null ? null : parameters.get(paramName);
-    }
-
-    @Override
-    public void checkPublicKey(SubjectPublicKeyInfo publicKey)
-    throws BadCertTemplateException
-    {
-        if(keyAlgorithms == null || keyAlgorithms.isEmpty())
-        {
-            return;
-        }
-
-        ASN1ObjectIdentifier keyType = publicKey.getAlgorithm().getAlgorithm();
-        if(keyAlgorithms.containsKey(keyType) == false)
-        {
-            throw new BadCertTemplateException("key type " + keyType.getId() + " is not permitted");
-        }
-
-        KeyParametersOption keyParamsOption = keyAlgorithms.get(keyType);
-        if(keyParamsOption instanceof AllowAllParametersOption)
-        {
-            return;
-        } else if(keyParamsOption instanceof ECParamatersOption)
-        {
-            ECParamatersOption ecOption = (ECParamatersOption) keyParamsOption;
-            // parameters
-            ASN1Encodable algParam = publicKey.getAlgorithm().getParameters();
-            ASN1ObjectIdentifier curveOid;
-
-            if(algParam instanceof ASN1ObjectIdentifier)
-            {
-                curveOid = (ASN1ObjectIdentifier) algParam;
-                if(ecOption.allowsCurve(curveOid) == false)
-                {
-                    throw new BadCertTemplateException("EC curve " + SecurityUtil.getCurveName(curveOid) +
-                            " (OID: " + curveOid.getId() + ") is not allowed");
-                }
-            } else
-            {
-                throw new BadCertTemplateException("Only namedCurve or implictCA EC public key is supported");
-            }
-
-            // point encoding
-            if(ecOption.getPointEncodings() != null)
-            {
-                byte[] keyData = publicKey.getPublicKeyData().getBytes();
-                if(keyData.length < 1)
-                {
-                    throw new BadCertTemplateException("invalid publicKeyData");
-                }
-                byte pointEncoding = keyData[0];
-                if(ecOption.getPointEncodings().contains(pointEncoding) == false)
-                {
-                    throw new BadCertTemplateException("Unaccepted EC point encoding " + pointEncoding);
-                }
-            }
-
-            try
-            {
-                XmlX509CertProfileUtil.checkECSubjectPublicKeyInfo(curveOid, publicKey.getPublicKeyData().getBytes());
-            }catch(BadCertTemplateException e)
-            {
-                throw e;
-            }catch(Exception e)
-            {
-                LOG.debug("populateFromPubKeyInfo", e);
-                throw new BadCertTemplateException("Invalid public key: " + e.getMessage());
-            }
-
-            return;
-        } else if(keyParamsOption instanceof RSAParametersOption)
-        {
-            RSAParametersOption rsaOption = (RSAParametersOption) keyParamsOption;
-
-            ASN1Integer modulus;
-            try
-            {
-                ASN1Sequence seq = ASN1Sequence.getInstance(publicKey.getPublicKeyData().getBytes());
-                modulus = ASN1Integer.getInstance(seq.getObjectAt(0));
-            }catch(IllegalArgumentException e)
-            {
-                throw new BadCertTemplateException("invalid publicKeyData");
-            }
-
-            int modulusLength = modulus.getPositiveValue().bitLength();
-            if((rsaOption.allowsModulusLength(modulusLength)))
-            {
-                return;
-            }
-        } else if(keyParamsOption instanceof DSAParametersOption)
-        {
-            DSAParametersOption dsaOption = (DSAParametersOption) keyParamsOption;
-            ASN1Encodable params = publicKey.getAlgorithm().getParameters();
-            if(params == null)
-            {
-                throw new BadCertTemplateException("null Dss-Parms is not permitted");
-            }
-
-            int pLength;
-            int qLength;
-
-            try
-            {
-                ASN1Sequence seq = ASN1Sequence.getInstance(params);
-                ASN1Integer p = ASN1Integer.getInstance(seq.getObjectAt(0));
-                ASN1Integer q = ASN1Integer.getInstance(seq.getObjectAt(1));
-                pLength = p.getPositiveValue().bitLength();
-                qLength = q.getPositiveValue().bitLength();
-            } catch(IllegalArgumentException | ArrayIndexOutOfBoundsException e)
-            {
-                throw new BadCertTemplateException("illegal Dss-Parms");
-            }
-
-            boolean match = dsaOption.allowsPLength(pLength);
-            if(match)
-            {
-                match = dsaOption.allowsQLength(qLength);
-            }
-
-            if(match)
-            {
-                return;
-            }
-        } else
-        {
-            throw new RuntimeException("should not reach here");
-        }
-
-        throw new BadCertTemplateException("the given publicKey is not permitted");
     }
 
     @Override
@@ -1329,6 +1198,12 @@ public class DefaultX509CertProfile extends BaseX509CertProfile
     public Set<GeneralNameMode> getSubjectAltNameModes()
     {
         return allowedSubjectAltNameModes;
+    }
+
+    @Override
+    protected Map<ASN1ObjectIdentifier, KeyParametersOption> getKeyAlgorithms()
+    {
+        return keyAlgorithms;
     }
 
     @Override

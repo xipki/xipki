@@ -63,10 +63,6 @@ import org.bouncycastle.asn1.x509.GeneralName;
 import org.bouncycastle.asn1.x509.GeneralSubtree;
 import org.bouncycastle.asn1.x509.NameConstraints;
 import org.bouncycastle.asn1.x509.PolicyMappings;
-import org.bouncycastle.asn1.x9.X9ECParameters;
-import org.bouncycastle.jcajce.provider.asymmetric.util.ECUtil;
-import org.bouncycastle.math.ec.ECCurve;
-import org.xipki.ca.api.BadCertTemplateException;
 import org.xipki.ca.api.CertProfileException;
 import org.xipki.ca.api.profile.GeneralNameMode;
 import org.xipki.ca.api.profile.GeneralNameTag;
@@ -90,7 +86,6 @@ import org.xipki.ca.server.certprofile.x509.jaxb.PolicyIdMappingType;
 import org.xipki.ca.server.certprofile.x509.jaxb.RangeType;
 import org.xipki.ca.server.certprofile.x509.jaxb.RangesType;
 import org.xipki.ca.server.certprofile.x509.jaxb.X509ProfileType;
-import org.xipki.common.LruCache;
 import org.xipki.common.SecurityUtil;
 import org.xml.sax.SAXException;
 
@@ -102,8 +97,6 @@ public class XmlX509CertProfileUtil
 {
     private final static Object jaxbUnmarshallerLock = new Object();
     private static Unmarshaller jaxbUnmarshaller;
-
-    private static LruCache<ASN1ObjectIdentifier, Integer> ecCurveFieldSizes = new LruCache<>(100);
 
     static X509ProfileType parse(String xmlConf)
     throws CertProfileException
@@ -141,44 +134,6 @@ public class XmlX509CertProfileUtil
             {
                 throw new CertProfileException("invalid root element type");
             }
-        }
-    }
-
-    static void checkECSubjectPublicKeyInfo(ASN1ObjectIdentifier curveOid, byte[] encoded)
-    throws BadCertTemplateException
-    {
-        Integer expectedLength = ecCurveFieldSizes.get(curveOid);
-        if(expectedLength == null)
-        {
-            X9ECParameters ecP = ECUtil.getNamedCurveByOid(curveOid);
-            ECCurve curve = ecP.getCurve();
-            expectedLength = (curve.getFieldSize() + 7) / 8;
-            ecCurveFieldSizes.put(curveOid, expectedLength);
-        }
-
-        switch (encoded[0])
-        {
-            case 0x02: // compressed
-            case 0x03: // compressed
-            {
-                if (encoded.length != (expectedLength + 1))
-                {
-                    throw new BadCertTemplateException("Incorrect length for compressed encoding");
-                }
-                break;
-            }
-            case 0x04: // uncompressed
-            case 0x06: // hybrid
-            case 0x07: // hybrid
-            {
-                if (encoded.length != (2 * expectedLength + 1))
-                {
-                    throw new BadCertTemplateException("Incorrect length for uncompressed/hybrid encoding");
-                }
-                break;
-            }
-            default:
-                throw new BadCertTemplateException("Invalid point encoding 0x" + Integer.toString(encoded[0], 16));
         }
     }
 

@@ -40,23 +40,37 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.bouncycastle.asn1.ASN1Encodable;
+import org.bouncycastle.asn1.ASN1Integer;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
+import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.DERPrintableString;
 import org.bouncycastle.asn1.DERUTF8String;
 import org.bouncycastle.asn1.x500.RDN;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
+import org.bouncycastle.asn1.x9.X9ECParameters;
+import org.bouncycastle.jcajce.provider.asymmetric.util.ECUtil;
+import org.bouncycastle.math.ec.ECCurve;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xipki.ca.api.BadCertTemplateException;
 import org.xipki.ca.api.CertProfileException;
 import org.xipki.ca.api.EnvironmentParameterResolver;
 import org.xipki.ca.api.profile.ExtensionControl;
 import org.xipki.ca.api.profile.ExtensionTuples;
 import org.xipki.ca.api.profile.ExtensionValue;
+import org.xipki.ca.api.profile.KeyParametersOption;
+import org.xipki.ca.api.profile.KeyParametersOption.AllowAllParametersOption;
+import org.xipki.ca.api.profile.KeyParametersOption.DSAParametersOption;
+import org.xipki.ca.api.profile.KeyParametersOption.ECParamatersOption;
+import org.xipki.ca.api.profile.KeyParametersOption.RSAParametersOption;
 import org.xipki.ca.api.profile.RDNOccurrence;
 import org.xipki.ca.api.profile.SubjectInfo;
+import org.xipki.common.LruCache;
 import org.xipki.common.ObjectIdentifiers;
 import org.xipki.common.SecurityUtil;
 import org.xipki.common.StringUtil;
@@ -68,7 +82,9 @@ import org.xipki.common.StringUtil;
 public abstract class BaseX509CertProfile
 extends X509CertProfile
 {
+    private static final Logger LOG = LoggerFactory.getLogger(BaseX509CertProfile.class);
     private static Set<String> countryCodes;
+    private static LruCache<ASN1ObjectIdentifier, Integer> ecCurveFieldSizes = new LruCache<>(100);
 
     static
     {
@@ -102,6 +118,8 @@ extends X509CertProfile
             countryCodes.addAll(StringUtil.split(s, ",; \t"));
         }
     }
+
+    protected abstract Map<ASN1ObjectIdentifier, KeyParametersOption> getKeyAlgorithms();
 
     protected void checkSubjectContent(X500Name requestedSubject)
     throws BadCertTemplateException
@@ -265,6 +283,129 @@ extends X509CertProfile
     public void checkPublicKey(SubjectPublicKeyInfo publicKey)
     throws BadCertTemplateException
     {
+        Map<ASN1ObjectIdentifier, KeyParametersOption> keyAlgorithms = getKeyAlgorithms();
+        if(keyAlgorithms == null || keyAlgorithms.isEmpty())
+        {
+            return;
+        }
+
+        ASN1ObjectIdentifier keyType = publicKey.getAlgorithm().getAlgorithm();
+        if(keyAlgorithms.containsKey(keyType) == false)
+        {
+            throw new BadCertTemplateException("key type " + keyType.getId() + " is not permitted");
+        }
+
+        KeyParametersOption keyParamsOption = keyAlgorithms.get(keyType);
+        if(keyParamsOption instanceof AllowAllParametersOption)
+        {
+            return;
+        } else if(keyParamsOption instanceof ECParamatersOption)
+        {
+            ECParamatersOption ecOption = (ECParamatersOption) keyParamsOption;
+            // parameters
+            ASN1Encodable algParam = publicKey.getAlgorithm().getParameters();
+            ASN1ObjectIdentifier curveOid;
+
+            if(algParam instanceof ASN1ObjectIdentifier)
+            {
+                curveOid = (ASN1ObjectIdentifier) algParam;
+                if(ecOption.allowsCurve(curveOid) == false)
+                {
+                    throw new BadCertTemplateException("EC curve " + SecurityUtil.getCurveName(curveOid) +
+                            " (OID: " + curveOid.getId() + ") is not allowed");
+                }
+            } else
+            {
+                throw new BadCertTemplateException("Only namedCurve or implictCA EC public key is supported");
+            }
+
+            // point encoding
+            if(ecOption.getPointEncodings() != null)
+            {
+                byte[] keyData = publicKey.getPublicKeyData().getBytes();
+                if(keyData.length < 1)
+                {
+                    throw new BadCertTemplateException("invalid publicKeyData");
+                }
+                byte pointEncoding = keyData[0];
+                if(ecOption.getPointEncodings().contains(pointEncoding) == false)
+                {
+                    throw new BadCertTemplateException("Unaccepted EC point encoding " + pointEncoding);
+                }
+            }
+
+            try
+            {
+                checkECSubjectPublicKeyInfo(curveOid, publicKey.getPublicKeyData().getBytes());
+            }catch(BadCertTemplateException e)
+            {
+                throw e;
+            }catch(Exception e)
+            {
+                LOG.debug("populateFromPubKeyInfo", e);
+                throw new BadCertTemplateException("Invalid public key: " + e.getMessage());
+            }
+
+            return;
+        } else if(keyParamsOption instanceof RSAParametersOption)
+        {
+            RSAParametersOption rsaOption = (RSAParametersOption) keyParamsOption;
+
+            ASN1Integer modulus;
+            try
+            {
+                ASN1Sequence seq = ASN1Sequence.getInstance(publicKey.getPublicKeyData().getBytes());
+                modulus = ASN1Integer.getInstance(seq.getObjectAt(0));
+            }catch(IllegalArgumentException e)
+            {
+                throw new BadCertTemplateException("invalid publicKeyData");
+            }
+
+            int modulusLength = modulus.getPositiveValue().bitLength();
+            if((rsaOption.allowsModulusLength(modulusLength)))
+            {
+                return;
+            }
+        } else if(keyParamsOption instanceof DSAParametersOption)
+        {
+            DSAParametersOption dsaOption = (DSAParametersOption) keyParamsOption;
+            ASN1Encodable params = publicKey.getAlgorithm().getParameters();
+            if(params == null)
+            {
+                throw new BadCertTemplateException("null Dss-Parms is not permitted");
+            }
+
+            int pLength;
+            int qLength;
+
+            try
+            {
+                ASN1Sequence seq = ASN1Sequence.getInstance(params);
+                ASN1Integer p = ASN1Integer.getInstance(seq.getObjectAt(0));
+                ASN1Integer q = ASN1Integer.getInstance(seq.getObjectAt(1));
+                pLength = p.getPositiveValue().bitLength();
+                qLength = q.getPositiveValue().bitLength();
+            } catch(IllegalArgumentException | ArrayIndexOutOfBoundsException e)
+            {
+                throw new BadCertTemplateException("illegal Dss-Parms");
+            }
+
+            boolean match = dsaOption.allowsPLength(pLength);
+            if(match)
+            {
+                match = dsaOption.allowsQLength(qLength);
+            }
+
+            if(match)
+            {
+                return;
+            }
+        } else
+        {
+            throw new RuntimeException("should not reach here");
+        }
+
+        throw new BadCertTemplateException("the given publicKey is not permitted");
     }
 
     @Override
@@ -372,4 +513,43 @@ extends X509CertProfile
     {
         return countryCodes.contains(countryCode);
     }
+
+    private static void checkECSubjectPublicKeyInfo(ASN1ObjectIdentifier curveOid, byte[] encoded)
+    throws BadCertTemplateException
+    {
+        Integer expectedLength = ecCurveFieldSizes.get(curveOid);
+        if(expectedLength == null)
+        {
+            X9ECParameters ecP = ECUtil.getNamedCurveByOid(curveOid);
+            ECCurve curve = ecP.getCurve();
+            expectedLength = (curve.getFieldSize() + 7) / 8;
+            ecCurveFieldSizes.put(curveOid, expectedLength);
+        }
+
+        switch (encoded[0])
+        {
+            case 0x02: // compressed
+            case 0x03: // compressed
+            {
+                if (encoded.length != (expectedLength + 1))
+                {
+                    throw new BadCertTemplateException("Incorrect length for compressed encoding");
+                }
+                break;
+            }
+            case 0x04: // uncompressed
+            case 0x06: // hybrid
+            case 0x07: // hybrid
+            {
+                if (encoded.length != (2 * expectedLength + 1))
+                {
+                    throw new BadCertTemplateException("Incorrect length for uncompressed/hybrid encoding");
+                }
+                break;
+            }
+            default:
+                throw new BadCertTemplateException("Invalid point encoding 0x" + Integer.toString(encoded[0], 16));
+        }
+    }
+
 }

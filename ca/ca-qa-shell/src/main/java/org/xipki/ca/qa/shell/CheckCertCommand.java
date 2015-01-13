@@ -93,24 +93,23 @@ public class CheckCertCommand extends XipkiOsgiCommandSupport
 
         if(issuerName == null)
         {
-        	if(issuerNames.size() != 1)
-        	{
+            if(issuerNames.size() != 1)
+            {
                 err("No issue is specified");
                 return null;
-        	}
-        	
-        	issuerName = issuerNames.iterator().next();
+            }
+
+            issuerName = issuerNames.iterator().next();
         }
-        
+
         if(issuerNames.contains(issuerName) == false)
         {
             err("Issuer " + issuerName + " is not within the configured issuers " + issuerNames);
             return null;
         }
-        
+
         X509IssuerInfo issuerInfo = qaSystemManager.getIssuer(issuerName);
 
-        
         X509CertProfileQA qa = qaSystemManager.getCertprofile(profileName);
         if(qa == null)
         {
