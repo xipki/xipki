@@ -51,6 +51,7 @@ import org.xipki.ca.api.CertValidity;
 import org.xipki.ca.api.CertValidity.Unit;
 import org.xipki.ca.api.profile.ExtensionControl;
 import org.xipki.ca.api.profile.ExtensionTuples;
+import org.xipki.ca.api.profile.KeyParametersOption;
 import org.xipki.ca.api.profile.x509.AbstractEEX509CertProfile;
 import org.xipki.ca.api.profile.x509.KeyUsageOccurrence;
 import org.xipki.common.KeyUsage;
@@ -118,6 +119,12 @@ public class DemoEE1X509CertProfile extends AbstractEEX509CertProfile
             Map<ASN1ObjectIdentifier, ExtensionControl> extensionOccurrences,
             X500Name requestedSubject, Extensions requestedExtensions)
     throws CertProfileException, BadCertTemplateException
+    {
+        return null;
+    }
+
+    @Override
+    protected Map<ASN1ObjectIdentifier, KeyParametersOption> getKeyAlgorithms()
     {
         return null;
     }
