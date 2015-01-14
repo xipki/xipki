@@ -65,6 +65,7 @@ import org.slf4j.LoggerFactory;
 import org.xipki.common.IoUtil;
 import org.xipki.common.ParamChecker;
 import org.xipki.common.SecurityUtil;
+import org.xipki.common.XMLUtil;
 import org.xipki.datasource.api.DataSourceWrapper;
 import org.xipki.dbi.ca.jaxb.CainfoType;
 import org.xipki.dbi.ca.jaxb.CertStoreType;
@@ -128,15 +129,23 @@ class CaCertStoreDbExporter extends DbPorter
         this.resume = resume;
     }
 
+    @SuppressWarnings("unchecked")
     public void export()
     throws Exception
     {
         CertStoreType certstore;
         if(resume)
         {
-            @SuppressWarnings("unchecked")
-            JAXBElement<CertStoreType> root = (JAXBElement<CertStoreType>)
+            JAXBElement<CertStoreType> root;
+            try
+            {
+                root = (JAXBElement<CertStoreType>)
                     unmarshaller.unmarshal(new File(baseDir, FILENAME_CA_CertStore));
+            } catch(JAXBException e)
+            {
+                throw XMLUtil.convert(e);
+            }
+
             certstore = root.getValue();
             if(certstore.getVersion() > VERSION)
             {
@@ -168,8 +177,15 @@ class CaCertStoreDbExporter extends DbPorter
             exception = export_cert(certstore, processLogFile);
 
             JAXBElement<CertStoreType> root = new ObjectFactory().createCertStore(certstore);
-            marshaller.marshal(root, new File(baseDir + File.separator + FILENAME_CA_CertStore));
-        }catch(Exception e)
+            try
+            {
+                marshaller.marshal(root, new File(baseDir + File.separator + FILENAME_CA_CertStore));
+            }catch(JAXBException e)
+            {
+                throw XMLUtil.convert(e);
+            }
+        }
+        catch(Exception e)
         {
             System.err.println("Error while exporting CA certstore from database");
             exception = e;
@@ -431,7 +447,13 @@ class CaCertStoreDbExporter extends DbPorter
                                 minIdOfCurrentFile, maxIdOfCurrentFile, maxId);
 
                         JAXBElement<UsersType> root = new ObjectFactory().createUsers(usersInCurrentFile);
-                        marshaller.marshal(root, new File(baseDir + File.separator + currentCertsFilename));
+                        try
+                        {
+                            marshaller.marshal(root, new File(baseDir + File.separator + currentCertsFilename));
+                        }catch(JAXBException e)
+                        {
+                            throw XMLUtil.convert(e);
+                        }
 
                         usersFiles.getUsersFile().add(currentCertsFilename);
 
@@ -460,13 +482,18 @@ class CaCertStoreDbExporter extends DbPorter
                         minIdOfCurrentFile, maxIdOfCurrentFile, maxId);
 
                 JAXBElement<UsersType> root = new ObjectFactory().createUsers(usersInCurrentFile);
-                marshaller.marshal(root, new File(baseDir + File.separator + currentCertsFilename));
+                try
+                {
+                    marshaller.marshal(root, new File(baseDir + File.separator + currentCertsFilename));
+                }catch(JAXBException e)
+                {
+                    throw XMLUtil.convert(e);
+                }
 
                 usersFiles.getUsersFile().add(currentCertsFilename);
 
                 System.out.println(" Exported " + numUsersInCurrentFile + " users in " + currentCertsFilename);
             }
-
         }finally
         {
             releaseResources(ps, null);
@@ -864,7 +891,13 @@ class CaCertStoreDbExporter extends DbPorter
     throws JAXBException, IOException
     {
         ByteArrayOutputStream bout = new ByteArrayOutputStream();
-        marshaller.marshal(objFact.createCerts(certsType), bout);
+        try
+        {
+            marshaller.marshal(objFact.createCerts(certsType), bout);
+        }catch(JAXBException e)
+        {
+            throw XMLUtil.convert(e);
+        }
         bout.flush();
 
         ZipEntry certZipEntry = new ZipEntry("certs.xml");
