@@ -59,6 +59,7 @@ import org.slf4j.LoggerFactory;
 import org.xipki.common.IoUtil;
 import org.xipki.common.ParamChecker;
 import org.xipki.common.SecurityUtil;
+import org.xipki.common.XMLUtil;
 import org.xipki.datasource.api.DataSourceWrapper;
 import org.xipki.dbi.ocsp.jaxb.CertStoreType;
 import org.xipki.dbi.ocsp.jaxb.CertStoreType.CertsFiles;
@@ -119,10 +120,17 @@ class OcspCertStoreDbExporter extends DbPorter
         CertStoreType certstore;
         if(resume)
         {
-            @SuppressWarnings("unchecked")
-            JAXBElement<CertStoreType> root = (JAXBElement<CertStoreType>)
-                    unmarshaller.unmarshal(new File(baseDir, FILENAME_OCSP_CertStore));
-            certstore = root.getValue();
+            try
+            {
+                @SuppressWarnings("unchecked")
+                JAXBElement<CertStoreType> root = (JAXBElement<CertStoreType>)
+                        unmarshaller.unmarshal(new File(baseDir, FILENAME_OCSP_CertStore));
+                certstore = root.getValue();
+            }catch(JAXBException e)
+            {
+                throw XMLUtil.convert(e);
+            }
+
             if(certstore.getVersion() > VERSION)
             {
                 throw new Exception("Cannot continue with CertStore greater than " + VERSION + ": " + certstore.getVersion());
@@ -142,7 +150,14 @@ class OcspCertStoreDbExporter extends DbPorter
         Exception exception = export_cert(certstore, processLogFile);
 
         JAXBElement<CertStoreType> root = new ObjectFactory().createCertStore(certstore);
-        marshaller.marshal(root, new File(baseDir, FILENAME_OCSP_CertStore));
+        try
+        {
+            marshaller.marshal(root, new File(baseDir, FILENAME_OCSP_CertStore));
+        }catch(JAXBException e)
+        {
+            throw XMLUtil.convert(e);
+        }
+
         if(exception == null)
         {
             System.out.println(" Exported OCSP certstore from database");
@@ -455,7 +470,14 @@ class OcspCertStoreDbExporter extends DbPorter
     throws JAXBException, IOException
     {
         ByteArrayOutputStream bout = new ByteArrayOutputStream();
-        marshaller.marshal(objFact.createCerts(certsType), bout);
+        try
+        {
+            marshaller.marshal(objFact.createCerts(certsType), bout);
+        }catch(JAXBException e)
+        {
+            throw XMLUtil.convert(e);
+        }
+
         bout.flush();
 
         ZipEntry certZipEntry = new ZipEntry("certs.xml");

@@ -51,6 +51,7 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
 import javax.xml.bind.JAXBElement;
+import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 
 import org.bouncycastle.asn1.ASN1Encodable;
@@ -67,6 +68,7 @@ import org.xipki.common.HashCalculator;
 import org.xipki.common.IoUtil;
 import org.xipki.common.ParamChecker;
 import org.xipki.common.SecurityUtil;
+import org.xipki.common.XMLUtil;
 import org.xipki.datasource.api.DataSourceWrapper;
 import org.xipki.dbi.ca.jaxb.CainfoType;
 import org.xipki.dbi.ca.jaxb.CertStoreType;
@@ -139,10 +141,18 @@ class CaCertStoreDbImporter extends DbPorter
     public void importToDB()
     throws Exception
     {
-        @SuppressWarnings("unchecked")
-        JAXBElement<CertStoreType> root = (JAXBElement<CertStoreType>)
-                unmarshaller.unmarshal(new File(baseDir, FILENAME_CA_CertStore));
-        CertStoreType certstore = root.getValue();
+        CertStoreType certstore;
+        try
+        {
+            @SuppressWarnings("unchecked")
+            JAXBElement<CertStoreType> root = (JAXBElement<CertStoreType>)
+                    unmarshaller.unmarshal(new File(baseDir, FILENAME_CA_CertStore));
+            certstore = root.getValue();
+        }catch(JAXBException e)
+        {
+            throw XMLUtil.convert(e);
+        }
+
         if(certstore.getVersion() > VERSION)
         {
             throw new Exception("Cannot import CertStore greater than " + VERSION + ": " + certstore.getVersion());
@@ -368,10 +378,17 @@ class CaCertStoreDbImporter extends DbPorter
     {
         System.out.println("Importing table USERNAME");
 
-        @SuppressWarnings("unchecked")
-        JAXBElement<UsersType> rootElement = (JAXBElement<UsersType>)
-                unmarshaller.unmarshal(new File(baseDir, usersFile));
-        UsersType users = rootElement.getValue();
+        UsersType users;
+        try
+        {
+            @SuppressWarnings("unchecked")
+            JAXBElement<UsersType> rootElement = (JAXBElement<UsersType>)
+                    unmarshaller.unmarshal(new File(baseDir, usersFile));
+            users = rootElement.getValue();
+        }catch(JAXBException e)
+        {
+            throw XMLUtil.convert(e);
+        }
 
         int sum = 0;
             for(UserType user : users.getUser())
@@ -646,10 +663,23 @@ class CaCertStoreDbImporter extends DbPorter
         ZipFile zipFile = new ZipFile(new File(baseDir, certsZipFile));
         ZipEntry certsXmlEntry = zipFile.getEntry("certs.xml");
 
-        @SuppressWarnings("unchecked")
-        JAXBElement<CertsType> rootElement = (JAXBElement<CertsType>)
-                unmarshaller.unmarshal(zipFile.getInputStream(certsXmlEntry));
-        CertsType certs = rootElement.getValue();
+        CertsType certs;
+        try
+        {
+            @SuppressWarnings("unchecked")
+            JAXBElement<CertsType> rootElement = (JAXBElement<CertsType>)
+                    unmarshaller.unmarshal(zipFile.getInputStream(certsXmlEntry));
+            certs = rootElement.getValue();
+        }catch(JAXBException e)
+        {
+            try
+            {
+                zipFile.close();
+            }catch(Exception e2)
+            {
+            }
+            throw XMLUtil.convert(e);
+        }
 
         disableAutoCommit();
 
