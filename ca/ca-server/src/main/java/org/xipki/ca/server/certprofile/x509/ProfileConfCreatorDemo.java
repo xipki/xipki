@@ -44,6 +44,7 @@ import java.util.Set;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
+import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.validation.SchemaFactory;
 
@@ -101,6 +102,7 @@ import org.xipki.ca.server.certprofile.x509.jaxb.X509ProfileType.Parameters;
 import org.xipki.ca.server.certprofile.x509.jaxb.X509ProfileType.Subject;
 import org.xipki.common.ObjectIdentifiers;
 import org.xipki.common.SecurityUtil;
+import org.xipki.common.XMLUtil;
 
 /**
  * @author Lijun Liao
@@ -192,7 +194,10 @@ public class ProfileConfCreatorDemo
         try
         {
             m.marshal(root, out);
-        }finally
+        } catch(JAXBException e)
+        {
+            throw XMLUtil.convert(e);
+        } finally
         {
             out.close();
         }

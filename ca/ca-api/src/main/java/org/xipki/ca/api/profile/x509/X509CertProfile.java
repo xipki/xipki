@@ -188,7 +188,7 @@ public abstract class X509CertProfile
 
     public abstract ExtensionTuples getExtensions(
             Map<ASN1ObjectIdentifier, ExtensionControl> extensionOccurrences,
-            X500Name requestedSubject, Extensions requestedExtensions)
+            X500Name requestedSubject, Extensions requestExtensions)
     throws CertProfileException, BadCertTemplateException;
 
     public abstract boolean incSerialNumberIfSubjectExists();

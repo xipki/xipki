@@ -87,6 +87,7 @@ import org.xipki.ca.server.certprofile.x509.jaxb.RangeType;
 import org.xipki.ca.server.certprofile.x509.jaxb.RangesType;
 import org.xipki.ca.server.certprofile.x509.jaxb.X509ProfileType;
 import org.xipki.common.SecurityUtil;
+import org.xipki.common.XMLUtil;
 import org.xml.sax.SAXException;
 
 /**
@@ -120,9 +121,12 @@ public class XmlX509CertProfileUtil
                 rootElement = (JAXBElement<?>) jaxbUnmarshaller.unmarshal(
                         new ByteArrayInputStream(xmlConf.getBytes()));
             }
-            catch(JAXBException | SAXException e)
+            catch(SAXException e)
             {
                 throw new CertProfileException("parse profile failed, message: " + e.getMessage(), e);
+            } catch(JAXBException e)
+            {
+                throw new CertProfileException("parse profile failed, message: " + XMLUtil.getMessage((JAXBException) e), e);
             }
 
             Object rootType = rootElement.getValue();
