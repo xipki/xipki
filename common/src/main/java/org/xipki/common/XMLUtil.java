@@ -46,6 +46,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.TimeZone;
 
+import javax.xml.bind.JAXBException;
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeConstants;
 import javax.xml.datatype.DatatypeFactory;
@@ -367,4 +368,20 @@ public class XMLUtil
         }
         return elements;
     }
+
+    public static String getMessage(JAXBException e)
+    {
+        String ret = e.getMessage();
+        if(ret == null && e.getLinkedException() != null)
+        {
+            ret = e.getLinkedException().getMessage();
+        }
+        return ret;
+    }
+
+    public static JAXBException convert(JAXBException e)
+    {
+        return new JAXBException(getMessage(e), e.getLinkedException());
+    }
+
 }
