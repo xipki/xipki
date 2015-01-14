@@ -120,6 +120,7 @@ import org.xipki.common.IoUtil;
 import org.xipki.common.LogUtil;
 import org.xipki.common.ObjectIdentifiers;
 import org.xipki.common.SecurityUtil;
+import org.xipki.common.XMLUtil;
 import org.xipki.datasource.api.DataSourceFactory;
 import org.xipki.ocsp.OCSPRespWithCacheInfo.ResponseCacheInfo;
 import org.xipki.ocsp.api.CertStatus;
@@ -243,9 +244,12 @@ public class OcspResponder
             JAXBElement<OCSPResponderType> rootElement = (JAXBElement<OCSPResponderType>)
                     unmarshaller.unmarshal(new File(IoUtil.expandFilepath(confFile)));
             this.conf = rootElement.getValue();
-        } catch (JAXBException | SAXException e)
+        } catch(SAXException e)
         {
-            throw new OcspResponderException(e.getMessage(), e);
+            throw new OcspResponderException("parse profile failed, message: " + e.getMessage(), e);
+        } catch(JAXBException e)
+        {
+            throw new OcspResponderException("parse profile failed, message: " + XMLUtil.getMessage((JAXBException) e), e);
         }
 
         // OCSP Mode
@@ -740,9 +744,21 @@ public class OcspResponder
             Req[] requestList = request.getRequestList();
             int n = requestList.length;
 
+            Set<ASN1ObjectIdentifier> criticalExtensionOIDs = new HashSet<>();
+            Set<?> tmp = request.getCriticalExtensionOIDs();
+            if(tmp != null)
+            {
+                for(Object oid : tmp)
+                {
+                    criticalExtensionOIDs.add((ASN1ObjectIdentifier) oid);
+                }
+            }
+
             RespID respID = new RespID(responderSigner.getResponderId());
             BasicOCSPRespBuilder basicOcspBuilder = new BasicOCSPRespBuilder(respID);
-            Extension nonceExtn = request.getExtension(OCSPObjectIdentifiers.id_pkix_ocsp_nonce);
+            ASN1ObjectIdentifier extensionType = OCSPObjectIdentifiers.id_pkix_ocsp_nonce;
+            criticalExtensionOIDs.remove(extensionType);
+            Extension nonceExtn = request.getExtension(extensionType);
             if(nonceExtn != null)
             {
                 byte[] nonce = nonceExtn.getExtnValue().getOctets();
@@ -1049,12 +1065,19 @@ public class OcspResponder
             ConcurrentContentSigner concurrentSigner = null;
             if(ocspMode != OCSPMode.RFC2560)
             {
-                Extension ext = request.getExtension(ObjectIdentifiers.id_pkix_ocsp_prefSigAlgs);
+                extensionType = ObjectIdentifiers.id_pkix_ocsp_prefSigAlgs;
+                criticalExtensionOIDs.remove(extensionType);
+                Extension ext = request.getExtension(extensionType);
                 if(ext != null)
                 {
                     ASN1Sequence preferredSigAlgs = ASN1Sequence.getInstance(ext.getParsedValue());
                     concurrentSigner = responderSigner.getSigner(preferredSigAlgs);
                 }
+            }
+
+            if(criticalExtensionOIDs.isEmpty() == false)
+            {
+                return createUnsuccessfullOCSPResp(OcspResponseStatus.malformedRequest);
             }
 
             if(concurrentSigner == null)
