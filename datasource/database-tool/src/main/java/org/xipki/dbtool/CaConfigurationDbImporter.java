@@ -42,12 +42,14 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
 import javax.xml.bind.JAXBElement;
+import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 
 import org.bouncycastle.util.encoders.Base64;
 import org.xipki.common.IoUtil;
 import org.xipki.common.ParamChecker;
 import org.xipki.common.SecurityUtil;
+import org.xipki.common.XMLUtil;
 import org.xipki.datasource.api.DataSourceWrapper;
 import org.xipki.dbi.ca.jaxb.CAConfigurationType;
 import org.xipki.dbi.ca.jaxb.CAConfigurationType.CaHasCertprofiles;
@@ -93,10 +95,17 @@ class CaConfigurationDbImporter extends DbPorter
     public void importToDB()
     throws Exception
     {
-        @SuppressWarnings("unchecked")
-        JAXBElement<CAConfigurationType> root = (JAXBElement<CAConfigurationType>)
-                unmarshaller.unmarshal(new File(baseDir, FILENAME_CA_Configuration));
-        CAConfigurationType caconf = root.getValue();
+        CAConfigurationType caconf;
+        try
+        {
+            @SuppressWarnings("unchecked")
+            JAXBElement<CAConfigurationType> root = (JAXBElement<CAConfigurationType>)
+                    unmarshaller.unmarshal(new File(baseDir, FILENAME_CA_Configuration));
+            caconf = root.getValue();
+        }catch(JAXBException e)
+        {
+            throw XMLUtil.convert(e);
+        }
 
         if(caconf.getVersion() > VERSION)
         {

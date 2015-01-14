@@ -42,10 +42,12 @@ import java.sql.SQLException;
 import java.sql.Statement;
 
 import javax.xml.bind.JAXBElement;
+import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 
 import org.xipki.common.IoUtil;
 import org.xipki.common.ParamChecker;
+import org.xipki.common.XMLUtil;
 import org.xipki.datasource.api.DataSourceWrapper;
 import org.xipki.dbi.ca.jaxb.CAConfigurationType;
 import org.xipki.dbi.ca.jaxb.CAConfigurationType.CaHasCertprofiles;
@@ -111,7 +113,13 @@ class CaConfigurationDbExporter extends DbPorter
         export_ca_has_certprofile(caconf);
 
         JAXBElement<CAConfigurationType> root = new ObjectFactory().createCAConfiguration(caconf);
-        marshaller.marshal(root, new File(baseDir, FILENAME_CA_Configuration));
+        try
+        {
+            marshaller.marshal(root, new File(baseDir, FILENAME_CA_Configuration));
+        }catch(JAXBException e)
+        {
+            throw XMLUtil.convert(e);
+        }
 
         System.out.println(" Exported CA configuration from database");
     }
