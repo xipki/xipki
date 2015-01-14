@@ -94,6 +94,7 @@ import org.xipki.common.IoUtil;
 import org.xipki.common.LogUtil;
 import org.xipki.common.ParamChecker;
 import org.xipki.common.SecurityUtil;
+import org.xipki.common.XMLUtil;
 import org.xipki.security.api.ConcurrentContentSigner;
 import org.xipki.security.api.NoIdleSignerException;
 import org.xipki.security.api.PasswordResolver;
@@ -1138,7 +1139,15 @@ public class SecurityFactoryImpl implements SecurityFactory
             final String message = "Invalid configuration file " + pkcs11ConfFile;
             if(LOG.isErrorEnabled())
             {
-                LOG.error(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(), e.getMessage());
+                final String exceptionMessage;
+                if(e instanceof JAXBException)
+                {
+                    exceptionMessage = XMLUtil.getMessage((JAXBException) e);
+                } else
+                {
+                    exceptionMessage = e.getMessage();
+                }
+                LOG.error(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(), exceptionMessage);
             }
             LOG.debug(message, e);
 
