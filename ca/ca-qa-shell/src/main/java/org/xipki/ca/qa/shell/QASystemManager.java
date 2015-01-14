@@ -66,6 +66,7 @@ import org.xipki.ca.qa.shell.jaxb.X509CertProfileType;
 import org.xipki.ca.qa.shell.jaxb.X509IssuerType;
 import org.xipki.common.IoUtil;
 import org.xipki.common.LogUtil;
+import org.xipki.common.XMLUtil;
 import org.xml.sax.SAXException;
 
 /**
@@ -112,9 +113,17 @@ public class QASystemManager
         }catch(IOException | JAXBException | SAXException e)
         {
             final String message = "Could not parse the QA configuration";
+            String exceptionMessage;
+            if(e instanceof JAXBException)
+            {
+                exceptionMessage = XMLUtil.getMessage((JAXBException) e);
+            } else
+            {
+                exceptionMessage = e.getMessage();
+            }
             if(LOG.isErrorEnabled())
             {
-                LOG.error(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(), e.getMessage());
+                LOG.error(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(), exceptionMessage);
             }
             LOG.debug(message, e);
             return;

@@ -125,6 +125,7 @@ import org.xipki.common.IoUtil;
 import org.xipki.common.LogUtil;
 import org.xipki.common.ParamChecker;
 import org.xipki.common.SecurityUtil;
+import org.xipki.common.XMLUtil;
 import org.xipki.security.api.ConcurrentContentSigner;
 import org.xipki.security.api.SignerException;
 import org.xml.sax.SAXException;
@@ -1345,9 +1346,12 @@ public final class RAWorkerImpl extends AbstractRAWorker implements RAWorker
 
                 root = jaxbUnmarshaller.unmarshal(configStream);
             }
-            catch(JAXBException | SAXException e)
+            catch(SAXException e)
             {
-                throw new ConfigurationException("parse configuration failed, message: " + e.getMessage(), e);
+                throw new ConfigurationException("parse profile failed, message: " + e.getMessage(), e);
+            } catch(JAXBException e)
+            {
+                throw new ConfigurationException("parse profile failed, message: " + XMLUtil.getMessage((JAXBException) e), e);
             }
 
             if(root instanceof JAXBElement)

@@ -265,7 +265,7 @@ public class IdentifiedX509CertProfile
     }
 
     public ExtensionTuples getExtensions(
-            X500Name requestedSubject, Extensions requestedExtensions,
+            X500Name requestedSubject, Extensions requestExtensions,
             SubjectPublicKeyInfo publicKeyInfo,
             PublicCAInfo publicCaInfo, CrlSigner crlSigner)
     throws CertProfileException, BadCertTemplateException
@@ -276,9 +276,9 @@ public class IdentifiedX509CertProfile
 
         Set<ASN1ObjectIdentifier> neededExtensionTypes = new HashSet<>();
         Set<ASN1ObjectIdentifier> wantedExtensionTypes = new HashSet<>();
-        if(requestedExtensions != null)
+        if(requestExtensions != null)
         {
-            Extension reqExtension = requestedExtensions.getExtension(CustomObjectIdentifiers.id_extension_existence);
+            Extension reqExtension = requestExtensions.getExtension(CustomObjectIdentifiers.id_extension_existence);
             if(reqExtension != null)
             {
                 ExtensionExistence ee = ExtensionExistence.getInstance(reqExtension.getParsedValue());
@@ -473,9 +473,9 @@ public class IdentifiedX509CertProfile
                 }
 
                 // the optional KeyUsage will only be set if requested explicitly
-                if(requestedExtensions != null && extOccurrence.isRequest())
+                if(requestExtensions != null && extOccurrence.isRequest())
                 {
-                    Extension extension = requestedExtensions.getExtension(extType);
+                    Extension extension = requestExtensions.getExtension(extType);
                     if(extension != null)
                     {
                         org.bouncycastle.asn1.x509.KeyUsage reqKeyUsage =
@@ -520,9 +520,9 @@ public class IdentifiedX509CertProfile
                 }
 
                 // the optional ExtKeyUsage will only be set if requested explicitly
-                if(requestedExtensions != null && extOccurrence.isRequest())
+                if(requestExtensions != null && extOccurrence.isRequest())
                 {
-                    Extension extension = requestedExtensions.getExtension(extType);
+                    Extension extension = requestExtensions.getExtension(extType);
                     if(extension != null)
                     {
                         ExtendedKeyUsage reqKeyUsage =
@@ -577,9 +577,9 @@ public class IdentifiedX509CertProfile
             if(addMe)
             {
                 GeneralNames value = null;
-                if(requestedExtensions != null && extOccurrence.isRequest())
+                if(requestExtensions != null && extOccurrence.isRequest())
                 {
-                    ASN1Encodable extValue = requestedExtensions.getExtensionParsedValue(extType);
+                    ASN1Encodable extValue = requestExtensions.getExtensionParsedValue(extType);
                     if(extValue != null)
                     {
                         GeneralNames reqNames = GeneralNames.getInstance(extValue);
@@ -616,9 +616,9 @@ public class IdentifiedX509CertProfile
             if(addMe)
             {
                 ASN1Sequence value = null;
-                if(requestedExtensions != null && extOccurrence.isRequest())
+                if(requestExtensions != null && extOccurrence.isRequest())
                 {
-                    ASN1Encodable extValue = requestedExtensions.getExtensionParsedValue(extType);
+                    ASN1Encodable extValue = requestExtensions.getExtensionParsedValue(extType);
                     if(extValue != null)
                     {
                         ASN1Sequence reqSeq = ASN1Sequence.getInstance(extValue);
@@ -664,7 +664,7 @@ public class IdentifiedX509CertProfile
         }
 
         ExtensionTuples subtuples = certProfile.getExtensions(
-                Collections.unmodifiableMap(occurrences), requestedSubject, requestedExtensions);
+                Collections.unmodifiableMap(occurrences), requestedSubject, requestExtensions);
 
         Set<ASN1ObjectIdentifier> extTypes = new HashSet<>(occurrences.keySet());
         for(ASN1ObjectIdentifier type : extTypes)
@@ -676,7 +676,7 @@ public class IdentifiedX509CertProfile
                 ExtensionValue value = null;
                 if(control.isRequest())
                 {
-                    Extension reqExt = requestedExtensions.getExtension(type);
+                    Extension reqExt = requestExtensions.getExtension(type);
                     if(reqExt != null)
                     {
                         value = new ExtensionValue(reqExt.isCritical(), reqExt.getParsedValue());

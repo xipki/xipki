@@ -333,9 +333,8 @@ public class DefaultX509CertProfile extends BaseX509CertProfile
                         }
                         this.keyAlgorithms.put(oid, keyParamsOption);
                     }
-
-                    this.keyAlgorithms = Collections.unmodifiableMap(this.keyAlgorithms);
                 }
+                this.keyAlgorithms = Collections.unmodifiableMap(this.keyAlgorithms);
             }
 
             // parameters
