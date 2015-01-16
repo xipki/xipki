@@ -252,9 +252,16 @@ public class KeyUtil
     }
 
     public static PublicKey generatePublicKey(SubjectPublicKeyInfo pkInfo)
-    throws IOException, NoSuchAlgorithmException, InvalidKeySpecException
+    throws NoSuchAlgorithmException, InvalidKeySpecException
     {
-        X509EncodedKeySpec keyspec = new X509EncodedKeySpec(pkInfo.getEncoded());
+        X509EncodedKeySpec keyspec;
+        try
+        {
+            keyspec = new X509EncodedKeySpec(pkInfo.getEncoded());
+        } catch (IOException e)
+        {
+            throw new InvalidKeySpecException(e.getMessage(), e);
+        }
         ASN1ObjectIdentifier aid = pkInfo.getAlgorithm().getAlgorithm();
 
         KeyFactory kf;

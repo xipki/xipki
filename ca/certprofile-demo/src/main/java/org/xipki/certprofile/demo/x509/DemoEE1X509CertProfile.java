@@ -47,13 +47,13 @@ import org.bouncycastle.asn1.x509.Extension;
 import org.bouncycastle.asn1.x509.Extensions;
 import org.xipki.ca.api.BadCertTemplateException;
 import org.xipki.ca.api.CertProfileException;
-import org.xipki.ca.api.CertValidity;
-import org.xipki.ca.api.CertValidity.Unit;
+import org.xipki.ca.api.profile.CertValidity;
 import org.xipki.ca.api.profile.ExtensionControl;
 import org.xipki.ca.api.profile.ExtensionTuples;
 import org.xipki.ca.api.profile.KeyParametersOption;
+import org.xipki.ca.api.profile.CertValidity.Unit;
 import org.xipki.ca.api.profile.x509.AbstractEEX509CertProfile;
-import org.xipki.ca.api.profile.x509.KeyUsageOccurrence;
+import org.xipki.ca.api.profile.x509.KeyUsageControl;
 import org.xipki.common.KeyUsage;
 
 /**
@@ -63,16 +63,16 @@ import org.xipki.common.KeyUsage;
 public class DemoEE1X509CertProfile extends AbstractEEX509CertProfile
 {
     private final CertValidity validity;
-    private final Set<KeyUsageOccurrence> keyUsage;
+    private final Set<KeyUsageControl> keyUsage;
     private final Map<ASN1ObjectIdentifier, ExtensionControl> extensionControls;
 
     public DemoEE1X509CertProfile()
     {
         validity = new CertValidity(10, Unit.YEAR);
 
-        Set<KeyUsageOccurrence> _keyUsage = new HashSet<>(2);
-        _keyUsage.add(new KeyUsageOccurrence(KeyUsage.digitalSignature, true));
-        _keyUsage.add(new KeyUsageOccurrence(KeyUsage.dataEncipherment, true));
+        Set<KeyUsageControl> _keyUsage = new HashSet<>(2);
+        _keyUsage.add(new KeyUsageControl(KeyUsage.digitalSignature, true));
+        _keyUsage.add(new KeyUsageControl(KeyUsage.dataEncipherment, true));
         keyUsage = Collections.unmodifiableSet(_keyUsage);
 
         extensionControls = new HashMap<>();
@@ -97,7 +97,7 @@ public class DemoEE1X509CertProfile extends AbstractEEX509CertProfile
     }
 
     @Override
-    public Set<KeyUsageOccurrence> getKeyUsage()
+    public Set<KeyUsageControl> getKeyUsage()
     {
         return keyUsage;
     }
@@ -116,7 +116,7 @@ public class DemoEE1X509CertProfile extends AbstractEEX509CertProfile
 
     @Override
     public ExtensionTuples getExtensions(
-            Map<ASN1ObjectIdentifier, ExtensionControl> extensionOccurrences,
+            Map<ASN1ObjectIdentifier, ExtensionControl> extensionControls,
             X500Name requestedSubject, Extensions requestedExtensions)
     throws CertProfileException, BadCertTemplateException
     {
