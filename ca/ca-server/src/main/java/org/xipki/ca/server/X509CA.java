@@ -110,14 +110,15 @@ import org.xipki.ca.api.BadFormatException;
 import org.xipki.ca.api.CAMgmtException;
 import org.xipki.ca.api.CAStatus;
 import org.xipki.ca.api.CertProfileException;
-import org.xipki.ca.api.CertValidity;
 import org.xipki.ca.api.OperationException;
 import org.xipki.ca.api.OperationException.ErrorCode;
 import org.xipki.ca.api.X509CertificateWithMetaInfo;
+import org.xipki.ca.api.profile.CertValidity;
 import org.xipki.ca.api.profile.ExtensionTuples;
 import org.xipki.ca.api.profile.ExtensionValue;
 import org.xipki.ca.api.profile.SubjectInfo;
 import org.xipki.ca.api.profile.x509.SpecialX509CertProfileBehavior;
+import org.xipki.ca.api.profile.x509.X509CertVersion;
 import org.xipki.ca.api.publisher.X509CertificateInfo;
 import org.xipki.ca.server.mgmt.CAManagerImpl;
 import org.xipki.ca.server.mgmt.CRLControl;
@@ -547,7 +548,6 @@ public class X509CA
 
     private final X509CAInfo caInfo;
     private final ConcurrentContentSigner caSigner;
-    private final byte[] caSKI;
     private final CertificateStore certstore;
     private final CrlSigner crlSigner;
     private final boolean masterMode;
@@ -604,14 +604,6 @@ public class X509CA
                     throw new OperationException(ErrorCode.System_Failure, msg);
                 }
             }
-        }
-
-        try
-        {
-            this.caSKI = SecurityUtil.extractSKI(caCert.getCert());
-        } catch (CertificateEncodingException e)
-        {
-            throw new OperationException(ErrorCode.INVALID_EXTENSION, e.getMessage());
         }
 
         this.cf = new CertificateFactory();
@@ -953,7 +945,9 @@ public class X509CA
             try
             {
                 // AuthorityKeyIdentifier
-                byte[] akiValues = directCRL ? this.caSKI : crlSigner.getSubjectKeyIdentifier();
+                byte[] akiValues = directCRL ?
+                        caInfo.getPublicCAInfo().getSubjectKeyIdentifer() :
+                        crlSigner.getSubjectKeyIdentifier();
                 AuthorityKeyIdentifier aki = new AuthorityKeyIdentifier(akiValues);
                 crlBuilder.addExtension(Extension.authorityKeyIdentifier, false, aki);
 
@@ -2036,10 +2030,26 @@ public class X509CA
             throw new OperationException(ErrorCode.UNKNOWN_CERT_PROFILE, "unknown cert profile " + certProfileName);
         }
 
+        if(certProfile.getVersion() != X509CertVersion.V3)
+        {
+            throw new OperationException(ErrorCode.System_Failure, "unknown cert version " + certProfile);
+        }
+
         if(certProfile.isOnlyForRA() && requestedByRA == false)
         {
             throw new OperationException(ErrorCode.INSUFFICIENT_PERMISSION,
                     "Profile " + certProfileName + " not applied to non-RA");
+        }
+
+        Set<ASN1ObjectIdentifier> permittedSigAlgs = certProfile.getSignatureAlgorithms();
+        if(permittedSigAlgs != null && permittedSigAlgs.isEmpty() == false)
+        {
+            ASN1ObjectIdentifier sigAlgId = caSigner.getAlgorithmIdentifier().getAlgorithm();
+            if(permittedSigAlgs.contains(sigAlgId) == false)
+            {
+                throw new OperationException(ErrorCode.System_Failure,
+                        "Signature algorithm  " + sigAlgId.getId() + " is not permitted");
+            }
         }
 
         requestedSubject = removeEmptyRDNs(requestedSubject);
@@ -2093,7 +2103,7 @@ public class X509CA
         // public key
         try
         {
-            certProfile.checkPublicKey(publicKeyInfo);
+            publicKeyInfo = certProfile.checkPublicKey(publicKeyInfo);
         } catch (BadCertTemplateException e)
         {
             throw new OperationException(ErrorCode.BAD_CERT_TEMPLATE, e.getMessage());
@@ -2481,8 +2491,6 @@ public class X509CA
             {
                 throw new OperationException(ErrorCode.BAD_CERT_TEMPLATE, e.getMessage());
             }
-
-            // TODO: if ImplicitCA should be applied to publicKeyInfo
 
             X509v3CertificateBuilder certBuilder = new X509v3CertificateBuilder(
                     caInfo.getPublicCAInfo().getX500Subject(),

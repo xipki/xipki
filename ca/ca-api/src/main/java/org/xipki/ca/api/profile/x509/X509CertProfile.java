@@ -47,8 +47,8 @@ import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.xipki.ca.api.BadCertTemplateException;
 import org.xipki.ca.api.BadFormatException;
 import org.xipki.ca.api.CertProfileException;
-import org.xipki.ca.api.CertValidity;
 import org.xipki.ca.api.EnvironmentParameterResolver;
+import org.xipki.ca.api.profile.CertValidity;
 import org.xipki.ca.api.profile.ExtensionControl;
 import org.xipki.ca.api.profile.ExtensionTuples;
 import org.xipki.ca.api.profile.GeneralNameMode;
@@ -60,7 +60,7 @@ import org.xipki.ca.api.profile.SubjectInfo;
 
 public abstract class X509CertProfile
 {
-    public static final ASN1ObjectIdentifier OID_NULL = new ASN1ObjectIdentifier("0.0.0.0");
+    public static final ASN1ObjectIdentifier OID_ZERO = new ASN1ObjectIdentifier("0.0.0.0");
 
     private TimeZone timeZone = TimeZone.getTimeZone("UTC");
 
@@ -73,14 +73,19 @@ public abstract class X509CertProfile
     {
     }
 
-    public SpecialX509CertProfileBehavior getSpecialCertProfileBehavior()
+    public X509CertVersion getVersion()
+    {
+        return X509CertVersion.V3;
+    }
+
+    public Set<ASN1ObjectIdentifier> getSignatureAlgorithms()
     {
         return null;
     }
 
-    public boolean prefersECImplicitCA()
+    public SpecialX509CertProfileBehavior getSpecialCertProfileBehavior()
     {
-        return false;
+        return null;
     }
 
     /**
@@ -139,7 +144,7 @@ public abstract class X509CertProfile
         return timeZone;
     }
 
-    public Set<ExtKeyUsageOccurrence> getExtendedKeyUsages()
+    public Set<ExtKeyUsageControl> getExtendedKeyUsages()
     {
         return null;
     }
@@ -170,7 +175,7 @@ public abstract class X509CertProfile
 
     public abstract boolean isCA();
 
-    public abstract Set<KeyUsageOccurrence> getKeyUsage();
+    public abstract Set<KeyUsageControl> getKeyUsage();
 
     public abstract Integer getPathLenBasicConstraint();
 
@@ -180,14 +185,14 @@ public abstract class X509CertProfile
 
     public abstract CertValidity getValidity();
 
-    public abstract void checkPublicKey(SubjectPublicKeyInfo publicKey)
+    public abstract SubjectPublicKeyInfo checkPublicKey(SubjectPublicKeyInfo publicKey)
     throws BadCertTemplateException;
 
     public abstract SubjectInfo getSubject(X500Name requestedSubject)
     throws CertProfileException, BadCertTemplateException;
 
     public abstract ExtensionTuples getExtensions(
-            Map<ASN1ObjectIdentifier, ExtensionControl> extensionOccurrences,
+            Map<ASN1ObjectIdentifier, ExtensionControl> extensionControls,
             X500Name requestedSubject, Extensions requestExtensions)
     throws CertProfileException, BadCertTemplateException;
 

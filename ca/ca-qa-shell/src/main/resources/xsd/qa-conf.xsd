@@ -19,6 +19,7 @@
     <xs:sequence>
       <xs:element name="X509Issuers" type="X509IssuersType" minOccurs="0"/>
       <xs:element name="X509CertProfiles" type="X509CertProfilesType" minOccurs="0"/>
+      <xs:element name="environments" type="environmentsType" minOccurs="0"/>
     </xs:sequence>
   </xs:complexType>
   <xs:complexType name="X509IssuersType">
@@ -52,5 +53,23 @@
       <xs:element name="value" type="xs:base64Binary"/>
       <xs:element name="file" type="xs:string"/>
     </xs:choice>
+  </xs:complexType>
+  <xs:complexType name="environmentsType">
+    <xs:sequence>
+      <xs:element name="environment" type="environmentType" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="environmentType">
+    <xs:sequence>
+      <xs:element name="parameter" type="parameterType" maxOccurs="unbounded"/>
+    </xs:sequence>
+    <xs:attribute name="name" type="xs:string" use="required"/>
+  </xs:complexType>
+  <xs:complexType name="parameterType">
+    <xs:simpleContent>
+      <xs:extension base="xs:string">
+        <xs:attribute name="name" type="xs:string" use="required"/>
+      </xs:extension>
+    </xs:simpleContent>
   </xs:complexType>
 </xs:schema>

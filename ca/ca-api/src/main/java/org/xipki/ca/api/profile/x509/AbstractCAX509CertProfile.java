@@ -47,13 +47,13 @@ import org.xipki.common.KeyUsage;
 
 public abstract class AbstractCAX509CertProfile extends BaseX509CertProfile
 {
-    protected Set<KeyUsageOccurrence> keyUsages;
+    protected Set<KeyUsageControl> keyUsages;
 
     public AbstractCAX509CertProfile()
     {
-        Set<KeyUsageOccurrence> keyUsages = new HashSet<>();
-        keyUsages.add(new KeyUsageOccurrence(KeyUsage.keyCertSign, true));
-        keyUsages.add(new KeyUsageOccurrence(KeyUsage.cRLSign, false));
+        Set<KeyUsageControl> keyUsages = new HashSet<>();
+        keyUsages.add(new KeyUsageControl(KeyUsage.keyCertSign, true));
+        keyUsages.add(new KeyUsageControl(KeyUsage.cRLSign, false));
         this.keyUsages = Collections.unmodifiableSet(keyUsages);
     }
 
@@ -64,7 +64,7 @@ public abstract class AbstractCAX509CertProfile extends BaseX509CertProfile
     }
 
     @Override
-    public Set<KeyUsageOccurrence> getKeyUsage()
+    public Set<KeyUsageControl> getKeyUsage()
     {
         return keyUsages;
     }

@@ -38,9 +38,10 @@ package org.xipki.ca.api;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
 
-import org.bouncycastle.crypto.RuntimeCryptoException;
-import org.xipki.common.SecurityUtil;
+import org.bouncycastle.util.Arrays;
+import org.xipki.ca.api.OperationException.ErrorCode;
 import org.xipki.common.ParamChecker;
+import org.xipki.common.SecurityUtil;
 
 /**
  * @author Lijun Liao
@@ -52,19 +53,28 @@ public class X509CertificateWithMetaInfo
     private final X509Certificate cert;
     private final String subject;
     private final byte[] encodedCert;
+    private final byte[] subjectKeyIdentifer;
 
     public X509CertificateWithMetaInfo(X509Certificate cert)
+    throws OperationException
     {
         this(cert, null);
     }
 
     public X509CertificateWithMetaInfo(X509Certificate cert, byte[] encodedCert)
+    throws OperationException
     {
         ParamChecker.assertNotNull("cert", cert);
 
         this.cert = cert;
-
         this.subject = SecurityUtil.getRFC4519Name(cert.getSubjectX500Principal());
+        try
+        {
+            this.subjectKeyIdentifer = SecurityUtil.extractSKI(cert);
+        } catch(CertificateEncodingException e)
+        {
+            throw new OperationException(ErrorCode.INVALID_EXTENSION, e.getMessage());
+        }
 
         if(encodedCert == null)
         {
@@ -73,7 +83,8 @@ public class X509CertificateWithMetaInfo
                 this.encodedCert = cert.getEncoded();
             } catch (CertificateEncodingException e)
             {
-                throw new RuntimeCryptoException("could not encode certificate: " + e.getMessage());
+                throw new OperationException(ErrorCode.System_Failure,
+                        "CertificateEncodingException: " + e.getMessage());
             }
         }
         else
@@ -111,6 +122,11 @@ public class X509CertificateWithMetaInfo
     public void setCertId(Integer certId)
     {
         this.certId = certId;
+    }
+
+    public byte[] getSubjectKeyIdentifier()
+    {
+        return Arrays.clone(subjectKeyIdentifer);
     }
 
 }

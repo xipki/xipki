@@ -32,6 +32,9 @@
   <bean id="x509CertprofileNameCompleter" class="org.xipki.ca.qa.shell.completer.X509CertprofileNameCompleter">
     <property name="qaSystemManager" ref="qaSystemManager"/>
   </bean>
+  <bean id="environmentNameCompleter" class="org.xipki.ca.qa.shell.completer.EnvironmentNameCompleter">
+    <property name="qaSystemManager" ref="qaSystemManager"/>
+  </bean>
   <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.1.0">
     <command>
       <action class="org.xipki.ca.qa.shell.CheckCertCommand">
@@ -42,6 +45,7 @@
         <entry key="-p10" value-ref="filePathCompleter"/>
         <entry key="-issuer" value-ref="x509IssuerNameCompleter"/>
         <entry key="-profile" value-ref="x509CertprofileNameCompleter"/>
+        <entry key="-env" value-ref="environmentNameCompleter"/>
       </optional-completers>
     </command>
     <command>

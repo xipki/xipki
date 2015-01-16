@@ -77,21 +77,22 @@ import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.xipki.ca.api.BadCertTemplateException;
 import org.xipki.ca.api.BadFormatException;
 import org.xipki.ca.api.CertProfileException;
-import org.xipki.ca.api.CertValidity;
 import org.xipki.ca.api.EnvironmentParameterResolver;
+import org.xipki.ca.api.profile.CertValidity;
 import org.xipki.ca.api.profile.ExtensionControl;
 import org.xipki.ca.api.profile.ExtensionTuples;
 import org.xipki.ca.api.profile.ExtensionValue;
 import org.xipki.ca.api.profile.GeneralNameMode;
 import org.xipki.ca.api.profile.SubjectInfo;
-import org.xipki.ca.api.profile.x509.ExtKeyUsageOccurrence;
-import org.xipki.ca.api.profile.x509.KeyUsageOccurrence;
+import org.xipki.ca.api.profile.x509.ExtKeyUsageControl;
+import org.xipki.ca.api.profile.x509.KeyUsageControl;
 import org.xipki.ca.api.profile.x509.SpecialX509CertProfileBehavior;
 import org.xipki.ca.api.profile.x509.X509CertProfile;
+import org.xipki.ca.api.profile.x509.X509CertVersion;
 import org.xipki.ca.api.profile.x509.X509Util;
+import org.xipki.ca.certprofile.x509.XmlX509CertProfile;
 import org.xipki.ca.server.CrlSigner;
 import org.xipki.ca.server.PublicCAInfo;
-import org.xipki.ca.server.certprofile.x509.DefaultX509CertProfile;
 import org.xipki.ca.server.mgmt.api.CertProfileEntry;
 import org.xipki.common.CustomObjectIdentifiers;
 import org.xipki.common.KeyUsage;
@@ -160,7 +161,7 @@ public class IdentifiedX509CertProfile
         String className;
         if(type.equalsIgnoreCase("xml"))
         {
-            tmpCertProfile = new DefaultX509CertProfile();
+            tmpCertProfile = new XmlX509CertProfile();
         }
         else if(type.toLowerCase().startsWith("java:"))
         {
@@ -224,6 +225,16 @@ public class IdentifiedX509CertProfile
         return entry;
     }
 
+    public X509CertVersion getVersion()
+    {
+        return certProfile.getVersion();
+    }
+
+    public Set<ASN1ObjectIdentifier> getSignatureAlgorithms()
+    {
+        return certProfile.getSignatureAlgorithms();
+    }
+
     public SpecialX509CertProfileBehavior getSpecialCertProfileBehavior()
     {
         return certProfile.getSpecialCertProfileBehavior();
@@ -272,7 +283,7 @@ public class IdentifiedX509CertProfile
     {
         ExtensionTuples tuples = new ExtensionTuples();
 
-        Map<ASN1ObjectIdentifier, ExtensionControl> occurrences = new HashMap<>(certProfile.getExtensionControls());
+        Map<ASN1ObjectIdentifier, ExtensionControl> controls = new HashMap<>(certProfile.getExtensionControls());
 
         Set<ASN1ObjectIdentifier> neededExtensionTypes = new HashSet<>();
         Set<ASN1ObjectIdentifier> wantedExtensionTypes = new HashSet<>();
@@ -293,7 +304,7 @@ public class IdentifiedX509CertProfile
                     wantedExtensionTypes.remove(oid);
                 }
 
-                if(occurrences.containsKey(oid) == false)
+                if(controls.containsKey(oid) == false)
                 {
                     throw new BadCertTemplateException("could not add needed extension " + oid.getId());
                 }
@@ -302,10 +313,10 @@ public class IdentifiedX509CertProfile
 
         // SubjectKeyIdentifier
         ASN1ObjectIdentifier extType = Extension.subjectKeyIdentifier;
-        ExtensionControl extOccurrence = occurrences.remove(extType);
-        if(extOccurrence != null)
+        ExtensionControl extControl = controls.remove(extType);
+        if(extControl != null)
         {
-            boolean addMe = addMe(extType, extOccurrence, neededExtensionTypes, wantedExtensionTypes);
+            boolean addMe = addMe(extType, extControl, neededExtensionTypes, wantedExtensionTypes);
             if(addMe)
             {
                 MessageDigest sha1;
@@ -319,17 +330,17 @@ public class IdentifiedX509CertProfile
                 byte[] skiValue = sha1.digest(publicKeyInfo.getPublicKeyData().getBytes());
 
                 SubjectKeyIdentifier value = new SubjectKeyIdentifier(skiValue);
-                addExtension(tuples, extType, value, extOccurrence,
+                addExtension(tuples, extType, value, extControl,
                         neededExtensionTypes, wantedExtensionTypes);
             }
         }
 
         // Authority key identifier
         extType = Extension.authorityKeyIdentifier;
-        extOccurrence = occurrences.remove(extType);
-        if(extOccurrence != null)
+        extControl = controls.remove(extType);
+        if(extControl != null)
         {
-            boolean addMe = addMe(extType, extOccurrence, neededExtensionTypes, wantedExtensionTypes);
+            boolean addMe = addMe(extType, extControl, neededExtensionTypes, wantedExtensionTypes);
             if(addMe)
             {
                 byte[] ikiValue = publicCaInfo.getSubjectKeyIdentifer();
@@ -347,40 +358,40 @@ public class IdentifiedX509CertProfile
                     }
                 }
 
-                addExtension(tuples, extType, value, extOccurrence,
+                addExtension(tuples, extType, value, extControl,
                         neededExtensionTypes, wantedExtensionTypes);
             }
         }
 
         // IssuerAltName
         extType = Extension.issuerAlternativeName;
-        extOccurrence = occurrences.remove(extType);
-        if(extOccurrence != null)
+        extControl = controls.remove(extType);
+        if(extControl != null)
         {
-            boolean addMe = addMe(extType, extOccurrence, neededExtensionTypes, wantedExtensionTypes);
+            boolean addMe = addMe(extType, extControl, neededExtensionTypes, wantedExtensionTypes);
             if(addMe)
             {
                 GeneralNames value = publicCaInfo.getSubjectAltName();
-                addExtension(tuples, extType, value, extOccurrence,
+                addExtension(tuples, extType, value, extControl,
                         neededExtensionTypes, wantedExtensionTypes);
             }
         }
 
         // AuthorityInfoAccess
         extType = Extension.authorityInfoAccess;
-        extOccurrence = occurrences.remove(extType);
-        if(extOccurrence != null)
+        extControl = controls.remove(extType);
+        if(extControl != null)
         {
-            boolean addMe = addMe(extType, extOccurrence, neededExtensionTypes, wantedExtensionTypes);
+            boolean addMe = addMe(extType, extControl, neededExtensionTypes, wantedExtensionTypes);
             if(addMe)
             {
                 AuthorityInformationAccess value = X509Util.createAuthorityInformationAccess(publicCaInfo.getOcspUris());
-                addExtension(tuples, extType, value, extOccurrence,
+                addExtension(tuples, extType, value, extControl,
                         neededExtensionTypes, wantedExtensionTypes);
             }
         }
 
-        if(occurrences.containsKey(Extension.cRLDistributionPoints) || occurrences.containsKey(Extension.freshestCRL))
+        if(controls.containsKey(Extension.cRLDistributionPoints) || controls.containsKey(Extension.freshestCRL))
         {
             X500Principal crlSignerSubject = null;
             if(crlSigner != null && crlSigner.getSigner() != null)
@@ -396,10 +407,10 @@ public class IdentifiedX509CertProfile
 
             // CRLDistributionPoints
             extType = Extension.cRLDistributionPoints;
-            extOccurrence = occurrences.remove(extType);
-            if(extOccurrence != null)
+            extControl = controls.remove(extType);
+            if(extControl != null)
             {
-                boolean addMe = addMe(extType, extOccurrence, neededExtensionTypes, wantedExtensionTypes);
+                boolean addMe = addMe(extType, extControl, neededExtensionTypes, wantedExtensionTypes);
                 if(addMe)
                 {
                     CRLDistPoint value;
@@ -411,17 +422,17 @@ public class IdentifiedX509CertProfile
                     {
                         throw new CertProfileException(e.getMessage(), e);
                     }
-                    addExtension(tuples, extType, value, extOccurrence,
+                    addExtension(tuples, extType, value, extControl,
                             neededExtensionTypes, wantedExtensionTypes);
                 }
             }
 
             // FreshestCRL
             extType = Extension.freshestCRL;
-            extOccurrence = occurrences.remove(extType);
-            if(extOccurrence != null)
+            extControl = controls.remove(extType);
+            if(extControl != null)
             {
-                boolean addMe = addMe(extType, extOccurrence, neededExtensionTypes, wantedExtensionTypes);
+                boolean addMe = addMe(extType, extControl, neededExtensionTypes, wantedExtensionTypes);
                 if(addMe)
                 {
                     CRLDistPoint value;
@@ -433,7 +444,7 @@ public class IdentifiedX509CertProfile
                     {
                         throw new CertProfileException(e.getMessage(), e);
                     }
-                    addExtension(tuples, extType, value, extOccurrence,
+                    addExtension(tuples, extType, value, extControl,
                             neededExtensionTypes, wantedExtensionTypes);
                 }
             }
@@ -441,30 +452,30 @@ public class IdentifiedX509CertProfile
 
         // BasicConstraints
         extType = Extension.basicConstraints;
-        extOccurrence = occurrences.remove(extType);
-        if(extOccurrence != null)
+        extControl = controls.remove(extType);
+        if(extControl != null)
         {
-            boolean addMe = addMe(extType, extOccurrence, neededExtensionTypes, wantedExtensionTypes);
+            boolean addMe = addMe(extType, extControl, neededExtensionTypes, wantedExtensionTypes);
             if(addMe)
             {
                 BasicConstraints value = X509Util.createBasicConstraints(certProfile.isCA(),
                         certProfile.getPathLenBasicConstraint());
-                addExtension(tuples, extType, value, extOccurrence,
+                addExtension(tuples, extType, value, extControl,
                         neededExtensionTypes, wantedExtensionTypes);
             }
         }
 
         // KeyUsage
         extType = Extension.keyUsage;
-        extOccurrence = occurrences.remove(extType);
-        if(extOccurrence != null)
+        extControl = controls.remove(extType);
+        if(extControl != null)
         {
-            boolean addMe = addMe(extType, extOccurrence, neededExtensionTypes, wantedExtensionTypes);
+            boolean addMe = addMe(extType, extControl, neededExtensionTypes, wantedExtensionTypes);
             if(addMe)
             {
                 Set<KeyUsage> usages = new HashSet<>();
-                Set<KeyUsageOccurrence> usageOccs = certProfile.getKeyUsage();
-                for(KeyUsageOccurrence k : usageOccs)
+                Set<KeyUsageControl> usageOccs = certProfile.getKeyUsage();
+                for(KeyUsageControl k : usageOccs)
                 {
                     if(k.isRequired())
                     {
@@ -473,14 +484,14 @@ public class IdentifiedX509CertProfile
                 }
 
                 // the optional KeyUsage will only be set if requested explicitly
-                if(requestExtensions != null && extOccurrence.isRequest())
+                if(requestExtensions != null && extControl.isRequest())
                 {
                     Extension extension = requestExtensions.getExtension(extType);
                     if(extension != null)
                     {
                         org.bouncycastle.asn1.x509.KeyUsage reqKeyUsage =
                                 org.bouncycastle.asn1.x509.KeyUsage.getInstance(extension.getParsedValue());
-                        for(KeyUsageOccurrence k : usageOccs)
+                        for(KeyUsageControl k : usageOccs)
                         {
                             if(k.isRequired())
                             {
@@ -496,22 +507,22 @@ public class IdentifiedX509CertProfile
                 }
 
                 org.bouncycastle.asn1.x509.KeyUsage value = SecurityUtil.createKeyUsage(usages);
-                addExtension(tuples, extType, value, extOccurrence,
+                addExtension(tuples, extType, value, extControl,
                         neededExtensionTypes, wantedExtensionTypes);
             }
         }
 
         // ExtendedKeyUsage
         extType = Extension.extendedKeyUsage;
-        extOccurrence = occurrences.remove(extType);
-        if(extOccurrence != null)
+        extControl = controls.remove(extType);
+        if(extControl != null)
         {
-            boolean addMe = addMe(extType, extOccurrence, neededExtensionTypes, wantedExtensionTypes);
+            boolean addMe = addMe(extType, extControl, neededExtensionTypes, wantedExtensionTypes);
             if(addMe)
             {
                 Set<ASN1ObjectIdentifier> usages = new HashSet<>();
-                Set<ExtKeyUsageOccurrence> usageOccs = certProfile.getExtendedKeyUsages();
-                for(ExtKeyUsageOccurrence k : usageOccs)
+                Set<ExtKeyUsageControl> usageOccs = certProfile.getExtendedKeyUsages();
+                for(ExtKeyUsageControl k : usageOccs)
                 {
                     if(k.isRequired())
                     {
@@ -520,14 +531,14 @@ public class IdentifiedX509CertProfile
                 }
 
                 // the optional ExtKeyUsage will only be set if requested explicitly
-                if(requestExtensions != null && extOccurrence.isRequest())
+                if(requestExtensions != null && extControl.isRequest())
                 {
                     Extension extension = requestExtensions.getExtension(extType);
                     if(extension != null)
                     {
                         ExtendedKeyUsage reqKeyUsage =
                                 ExtendedKeyUsage.getInstance(extension.getParsedValue());
-                        for(ExtKeyUsageOccurrence k : usageOccs)
+                        for(ExtKeyUsageControl k : usageOccs)
                         {
                             if(k.isRequired())
                             {
@@ -542,42 +553,42 @@ public class IdentifiedX509CertProfile
                     }
                 }
 
-                if(extOccurrence.isCritical() && usages.contains(ObjectIdentifiers.anyExtendedKeyUsage))
+                if(extControl.isCritical() && usages.contains(ObjectIdentifiers.anyExtendedKeyUsage))
                 {
-                    extOccurrence = new ExtensionControl(false, extOccurrence.isRequired(), extOccurrence.isRequest());
+                    extControl = new ExtensionControl(false, extControl.isRequired(), extControl.isRequest());
                 }
 
                 ExtendedKeyUsage value = SecurityUtil.createExtendedUsage(usages);
-                addExtension(tuples, extType, value, extOccurrence,
+                addExtension(tuples, extType, value, extControl,
                         neededExtensionTypes, wantedExtensionTypes);
             }
         }
 
         // ocsp-nocheck
         extType = ObjectIdentifiers.id_extension_pkix_ocsp_nocheck;
-        extOccurrence = occurrences.remove(extType);
-        if(extOccurrence != null)
+        extControl = controls.remove(extType);
+        if(extControl != null)
         {
-            boolean addMe = addMe(extType, extOccurrence, neededExtensionTypes, wantedExtensionTypes);
+            boolean addMe = addMe(extType, extControl, neededExtensionTypes, wantedExtensionTypes);
             if(addMe)
             {
                 // the extension ocsp-nocheck will only be set if requested explicitly
                 DERNull value = DERNull.INSTANCE;
-                addExtension(tuples, extType, value, extOccurrence,
+                addExtension(tuples, extType, value, extControl,
                         neededExtensionTypes, wantedExtensionTypes);
             }
         }
 
         // SubjectAltName
         extType = Extension.subjectAlternativeName;
-        extOccurrence = occurrences.remove(extType);
-        if(extOccurrence != null)
+        extControl = controls.remove(extType);
+        if(extControl != null)
         {
-            boolean addMe = addMe(extType, extOccurrence, neededExtensionTypes, wantedExtensionTypes);
+            boolean addMe = addMe(extType, extControl, neededExtensionTypes, wantedExtensionTypes);
             if(addMe)
             {
                 GeneralNames value = null;
-                if(requestExtensions != null && extOccurrence.isRequest())
+                if(requestExtensions != null && extControl.isRequest())
                 {
                     ASN1Encodable extValue = requestExtensions.getExtensionParsedValue(extType);
                     if(extValue != null)
@@ -602,21 +613,21 @@ public class IdentifiedX509CertProfile
                     }
                 }
 
-                addExtension(tuples, extType, value, extOccurrence,
+                addExtension(tuples, extType, value, extControl,
                         neededExtensionTypes, wantedExtensionTypes);
             }
         }
 
         // SubjectInfoAccess
         extType = Extension.subjectInfoAccess;
-        extOccurrence = occurrences.remove(extType);
-        if(extOccurrence != null)
+        extControl = controls.remove(extType);
+        if(extControl != null)
         {
-            boolean addMe = addMe(extType, extOccurrence, neededExtensionTypes, wantedExtensionTypes);
+            boolean addMe = addMe(extType, extControl, neededExtensionTypes, wantedExtensionTypes);
             if(addMe)
             {
                 ASN1Sequence value = null;
-                if(requestExtensions != null && extOccurrence.isRequest())
+                if(requestExtensions != null && extControl.isRequest())
                 {
                     ASN1Encodable extValue = requestExtensions.getExtensionParsedValue(extType);
                     if(extValue != null)
@@ -637,7 +648,7 @@ public class IdentifiedX509CertProfile
                                 ASN1ObjectIdentifier accessMethod = ad.getAccessMethod();
                                 if(accessMethod == null)
                                 {
-                                    accessMethod = X509CertProfile.OID_NULL;
+                                    accessMethod = X509CertProfile.OID_ZERO;
                                 }
                                 Set<GeneralNameMode> generalNameModes = modes.get(accessMethod);
 
@@ -658,18 +669,18 @@ public class IdentifiedX509CertProfile
                         }
                     }
                 }
-                addExtension(tuples, extType, value, extOccurrence,
+                addExtension(tuples, extType, value, extControl,
                         neededExtensionTypes, wantedExtensionTypes);
             }
         }
 
         ExtensionTuples subtuples = certProfile.getExtensions(
-                Collections.unmodifiableMap(occurrences), requestedSubject, requestExtensions);
+                Collections.unmodifiableMap(controls), requestedSubject, requestExtensions);
 
-        Set<ASN1ObjectIdentifier> extTypes = new HashSet<>(occurrences.keySet());
+        Set<ASN1ObjectIdentifier> extTypes = new HashSet<>(controls.keySet());
         for(ASN1ObjectIdentifier type : extTypes)
         {
-            ExtensionControl control = occurrences.remove(type);
+            ExtensionControl control = controls.remove(type);
             boolean addMe = addMe(type, control, neededExtensionTypes, wantedExtensionTypes);
             if(addMe)
             {
@@ -688,15 +699,15 @@ public class IdentifiedX509CertProfile
                     value = subtuples.getExtensionValue(type);
                 }
 
-                addExtension(tuples, type, value, extOccurrence,
+                addExtension(tuples, type, value, extControl,
                         neededExtensionTypes, wantedExtensionTypes);
             }
         }
 
         Set<ASN1ObjectIdentifier> unprocessedExtTypes = new HashSet<>();
-        for(ASN1ObjectIdentifier type : occurrences.keySet())
+        for(ASN1ObjectIdentifier type : controls.keySet())
         {
-            if(occurrences.get(type).isRequired())
+            if(controls.get(type).isRequired())
             {
                 unprocessedExtTypes.add(type);
             }
@@ -716,13 +727,13 @@ public class IdentifiedX509CertProfile
     }
 
     private static void addExtension(ExtensionTuples tuples, ASN1ObjectIdentifier extType,
-            ExtensionValue extValue, ExtensionControl extOccurrence,
+            ExtensionValue extValue, ExtensionControl extControl,
             Set<ASN1ObjectIdentifier> neededExtensionTypes, Set<ASN1ObjectIdentifier> wantedExtensionTypes)
     throws CertProfileException
     {
         if(extValue == null)
         {
-            if(extOccurrence.isRequired())
+            if(extControl.isRequired())
             {
                 String description = ObjectIdentifiers.getName(extType);
                 if(description == null)
@@ -740,13 +751,13 @@ public class IdentifiedX509CertProfile
     }
 
     private static void addExtension(ExtensionTuples tuples, ASN1ObjectIdentifier extType,
-            ASN1Encodable extValue, ExtensionControl extOccurrence,
+            ASN1Encodable extValue, ExtensionControl extControl,
             Set<ASN1ObjectIdentifier> neededExtensionTypes, Set<ASN1ObjectIdentifier> wantedExtensionTypes)
     throws CertProfileException
     {
         if(extValue == null)
         {
-            if(extOccurrence.isRequired())
+            if(extControl.isRequired())
             {
                 String description = ObjectIdentifiers.getName(extType);
                 if(description == null)
@@ -757,7 +768,7 @@ public class IdentifiedX509CertProfile
             }
         } else
         {
-            tuples.addExtension(extType, extOccurrence.isCritical(), extValue);
+            tuples.addExtension(extType, extControl.isCritical(), extValue);
             neededExtensionTypes.remove(extType);
             wantedExtensionTypes.remove(extType);
         }
@@ -778,10 +789,10 @@ public class IdentifiedX509CertProfile
         return certProfile.isOnlyForQA();
     }
 
-    public void checkPublicKey(SubjectPublicKeyInfo publicKey)
+    public SubjectPublicKeyInfo checkPublicKey(SubjectPublicKeyInfo publicKey)
     throws BadCertTemplateException
     {
-        certProfile.checkPublicKey(publicKey);
+        return certProfile.checkPublicKey(publicKey);
     }
 
     public boolean incSerialNumberIfSubjectExists()
@@ -833,7 +844,7 @@ public class IdentifiedX509CertProfile
         return certProfile.getExtensionControls();
     }
 
-    public Set<KeyUsageOccurrence> getKeyUsage()
+    public Set<KeyUsageControl> getKeyUsage()
     {
         return certProfile.getKeyUsage();
     }
@@ -843,22 +854,14 @@ public class IdentifiedX509CertProfile
         return certProfile.getPathLenBasicConstraint();
     }
 
-    public Set<ExtKeyUsageOccurrence> getExtendedKeyUsages()
+    public Set<ExtKeyUsageControl> getExtendedKeyUsages()
     {
         return certProfile.getExtendedKeyUsages();
     }
 
     public void validate()
     throws CertProfileException
-    {/*
-        subjectKeyIdentifier
-        authorityKeyIdentifier
-        issuerAlternativeName
-        authorityInfoAccess
-        cRLDistributionPoints
-        freshestCRL
-        basicConstraints
-        */
+    {
         if(isOnlyForQA())
         {
             return;
@@ -866,11 +869,11 @@ public class IdentifiedX509CertProfile
 
         StringBuilder msg = new StringBuilder();
 
-        Map<ASN1ObjectIdentifier, ExtensionControl> occurrences = getExtensionControls();
+        Map<ASN1ObjectIdentifier, ExtensionControl> controls = getExtensionControls();
         Set<ASN1ObjectIdentifier> set = new HashSet<>();
         for(ASN1ObjectIdentifier type : noneRequestExtensionTypes)
         {
-            ExtensionControl control = occurrences.get(type);
+            ExtensionControl control = controls.get(type);
             if(control != null && control.isRequest())
             {
                 set.add(type);
@@ -890,7 +893,7 @@ public class IdentifiedX509CertProfile
             set.clear();
             for(ASN1ObjectIdentifier type : caOnlyExtensionTypes)
             {
-                if(occurrences.containsKey(type))
+                if(controls.containsKey(type))
                 {
                     set.add(type);
                 }
@@ -903,12 +906,12 @@ public class IdentifiedX509CertProfile
         }
 
         set.clear();
-        for(ASN1ObjectIdentifier type : occurrences.keySet())
+        for(ASN1ObjectIdentifier type : controls.keySet())
         {
-            ExtensionControl occurrence = occurrences.get(type);
+            ExtensionControl control = controls.get(type);
             if(criticalOnlyExtensionTypes.contains(type))
             {
-                if(occurrence.isCritical() == false)
+                if(control.isCritical() == false)
                 {
                     set.add(type);
                 }
@@ -921,12 +924,12 @@ public class IdentifiedX509CertProfile
         }
 
         set.clear();
-        for(ASN1ObjectIdentifier type : occurrences.keySet())
+        for(ASN1ObjectIdentifier type : controls.keySet())
         {
-            ExtensionControl occurrence = occurrences.get(type);
+            ExtensionControl control = controls.get(type);
             if(noncriticalOnlyExtensionTypes.contains(type))
             {
-                if(occurrence.isCritical())
+                if(control.isCritical())
                 {
                     set.add(type);
                 }
@@ -938,7 +941,7 @@ public class IdentifiedX509CertProfile
             msg.append("None-critical extensions are marked as critical ").append(toString(set)).append(", ");
         }
 
-        Set<KeyUsageOccurrence> usages = getKeyUsage();
+        Set<KeyUsageControl> usages = getKeyUsage();
 
         boolean b = containsKeyusage(usages, KeyUsage.digitalSignature);
         if(b == false)
@@ -962,7 +965,7 @@ public class IdentifiedX509CertProfile
             set.clear();
             for(ASN1ObjectIdentifier type : types)
             {
-                if(occurrences.containsKey(type) == false || occurrences.get(type).isRequired() == false)
+                if(controls.containsKey(type) == false || controls.get(type).isRequired() == false)
                 {
                     set.add(type);
                 }
@@ -1040,9 +1043,9 @@ public class IdentifiedX509CertProfile
         return sb.toString();
     }
 
-    private static boolean containsKeyusage(Set<KeyUsageOccurrence> usageOccurrences, KeyUsage usage)
+    private static boolean containsKeyusage(Set<KeyUsageControl> usageControls, KeyUsage usage)
     {
-        for(KeyUsageOccurrence entry : usageOccurrences)
+        for(KeyUsageControl entry : usageControls)
         {
             if(usage == entry.getKeyUsage())
             {
@@ -1142,11 +1145,11 @@ public class IdentifiedX509CertProfile
         }
     }
 
-    private static boolean addMe(ASN1ObjectIdentifier extType, ExtensionControl extOccurrence,
+    private static boolean addMe(ASN1ObjectIdentifier extType, ExtensionControl extControl,
             Set<ASN1ObjectIdentifier> neededExtensionTypes,
             Set<ASN1ObjectIdentifier> wantedExtensionTypes)
     {
-        boolean addMe = extOccurrence.isRequired();
+        boolean addMe = extControl.isRequired();
         if(addMe == false)
         {
             if(neededExtensionTypes.contains(extType) || wantedExtensionTypes.contains(extType))

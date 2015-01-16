@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <X509Profile xmlns="http://xipki.org/xmlprofile/v2">
   <description>CertProfile TLS</description>
+  <version>3</version>
   <ca>false</ca>
   <validity>5y</validity>
   <notBeforeTime>midnight</notBeforeTime>

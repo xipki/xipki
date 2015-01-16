@@ -51,6 +51,7 @@ import org.bouncycastle.util.Arrays;
 import org.bouncycastle.x509.extension.X509ExtensionUtil;
 import org.xipki.ca.api.OperationException;
 import org.xipki.ca.api.OperationException.ErrorCode;
+import org.xipki.ca.api.X509CertificateWithMetaInfo;
 import org.xipki.common.ParamChecker;
 import org.xipki.common.SecurityUtil;
 
@@ -65,7 +66,7 @@ public class PublicCAInfo
     private final byte[] subjectKeyIdentifier;
     private final GeneralNames  subjectAltName;
     private final BigInteger serialNumber;
-    private final X509Certificate caCertificate;
+    private final X509CertificateWithMetaInfo caCertificate;
     private X509Certificate crlSignerCertificate;
     private final List<String> ocspUris;
     private final List<String> crlUris;
@@ -78,7 +79,7 @@ public class PublicCAInfo
     throws OperationException
     {
         ParamChecker.assertNotNull("caCertificate", caCertificate);
-        this.caCertificate = caCertificate;
+        this.caCertificate = new X509CertificateWithMetaInfo(caCertificate);
         this.serialNumber = caCertificate.getSerialNumber();
         this.subject = caCertificate.getSubjectX500Principal();
         this.x500Subject = X500Name.getInstance(subject.getEncoded());
@@ -146,11 +147,6 @@ public class PublicCAInfo
         this.deltaCrlUris = deltaCrlUris;
     }
 
-    public X509Certificate getCACertificate()
-    {
-        return caCertificate;
-    }
-
     public List<String> getOcspUris()
     {
         return ocspUris == null ? null : Collections.unmodifiableList(ocspUris);
@@ -205,7 +201,13 @@ public class PublicCAInfo
 
     public byte[] getSubjectKeyIdentifer()
     {
-        return Arrays.clone(subjectKeyIdentifier);
+        if(caCertificate != null)
+        {
+            return caCertificate.getSubjectKeyIdentifier();
+        } else
+        {
+            return subjectKeyIdentifier == null ? null : Arrays.clone(subjectKeyIdentifier);
+        }
     }
 
     public BigInteger getSerialNumber()
@@ -213,7 +215,7 @@ public class PublicCAInfo
         return serialNumber;
     }
 
-    public X509Certificate getCaCertificate()
+    public X509CertificateWithMetaInfo getCaCertificate()
     {
         return caCertificate;
     }

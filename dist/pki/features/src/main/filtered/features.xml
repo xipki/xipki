@@ -61,6 +61,7 @@
     <feature>xipki-custom-certprofiles</feature>
     <feature>xipki-custom-publishers</feature>
     <bundle>mvn:org.xipki/ca-mgmt-api/${project.version}</bundle>
+    <bundle>mvn:org.xipki/ca-certprofile/${project.version}</bundle>
     <bundle>mvn:org.xipki/ca-server/${project.version}</bundle>
   </feature>
   <feature name="xipki-camgmt-shell" version="${project.version}" resolver="(obr)">
@@ -80,7 +81,7 @@
   </feature>
   <feature name="xipki-caqa-shell" version="${project.version}" resolver="(obr)">
     <feature>xipki-caclient-shell</feature>
-    <bundle>mvn:org.xipki/ca-qa/${project.version}</bundle>
+    <bundle>mvn:org.xipki/ca-certprofile/${project.version}</bundle>
     <bundle>mvn:org.xipki/ca-qa-shell/${project.version}</bundle>    
   </feature>
   <feature name="xipki-security-shell" version="${project.version}" resolver="(obr)">

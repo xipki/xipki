@@ -47,10 +47,10 @@ import org.bouncycastle.asn1.x509.Certificate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.ca.api.CAStatus;
-import org.xipki.ca.api.CertValidity;
 import org.xipki.ca.api.OperationException;
 import org.xipki.ca.api.X509CertificateWithMetaInfo;
 import org.xipki.ca.api.OperationException.ErrorCode;
+import org.xipki.ca.api.profile.CertValidity;
 import org.xipki.ca.server.PublicCAInfo;
 import org.xipki.ca.server.RandomSerialNumberGenerator;
 import org.xipki.ca.server.mgmt.api.X509CAEntry;
@@ -80,7 +80,6 @@ public class X509CAInfo
     private boolean selfSigned;
     private CMPCertificate certInCMPFormat;
     private PublicCAInfo publicCAInfo;
-    private X509CertificateWithMetaInfo cert;
 
     private CertificateStore certStore;
     private boolean useRandomSerialNumber;
@@ -104,7 +103,6 @@ public class X509CAInfo
         try
         {
             byte[] encodedCert = cert.getEncoded();
-            this.cert = new X509CertificateWithMetaInfo(cert, encodedCert);
             bcCert = Certificate.getInstance(encodedCert);
         } catch (CertificateEncodingException e)
         {
@@ -113,7 +111,8 @@ public class X509CAInfo
         this.certInCMPFormat = new CMPCertificate(bcCert);
 
         this.publicCAInfo = new PublicCAInfo(cert,
-                caEntry.getOcspUris(), caEntry.getCrlUris(), caEntry.getCaIssuerLocations(), caEntry.getDeltaCrlUris());
+                caEntry.getOcspUris(), caEntry.getCrlUris(),
+                caEntry.getCaIssuerLocations(), caEntry.getDeltaCrlUris());
 
         this.noNewCertificateAfter = this.notAfter.getTime() - MS_PER_DAY * caEntry.getExpirationPeriod();
 
@@ -124,7 +123,7 @@ public class X509CAInfo
             return;
         }
 
-        Long greatestSerialNumber = certStore.getGreatestSerialNumber(this.cert);
+        Long greatestSerialNumber = certStore.getGreatestSerialNumber(this.publicCAInfo.getCaCertificate());
 
         if(greatestSerialNumber == null)
         {
@@ -254,7 +253,7 @@ public class X509CAInfo
 
     public X509CertificateWithMetaInfo getCertificate()
     {
-        return cert;
+        return publicCAInfo.getCaCertificate();
     }
 
     public String getSignerConf()
