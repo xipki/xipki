@@ -22,34 +22,40 @@
   </X509Issuers>
   <X509CertProfiles>
     <X509CertProfile name="RCA">
-      <file>ca-qa-shell/qa-profile/QA-CertProfile_RootCA.xml</file>
+      <file>demo/profile/CertProfile_RootCA.xml</file>
     </X509CertProfile>
     <X509CertProfile name="RCA-Cross">
-      <file>ca-qa-shell/qa-profile/QA-CertProfile_RootCA_Cross.xml</file>
+      <file>demo/profile/CertProfile_RootCA_Cross.xml</file>
     </X509CertProfile>
     <X509CertProfile name="SubCA">
-      <file>ca-qa-shell/qa-profile/QA-CertProfile_SubCA.xml</file>
+      <file>demo/profile/CertProfile_SubCA.xml</file>
     </X509CertProfile>
     <X509CertProfile name="SubCA.Complex">
-      <file>ca-qa-shell/qa-profile/QA-CertProfile_SubCA_Complex.xml</file>
+      <file>demo/profile/CertProfile_SubCA_Complex.xml</file>
     </X509CertProfile>
     <X509CertProfile name="OCSP">
-      <file>ca-qa-shell/qa-profile/QA-CertProfile_OCSP.xml</file>
+      <file>demo/profile/CertProfile_OCSP.xml</file>
     </X509CertProfile>
     <X509CertProfile name="multipleOUs">
-      <file>ca-qa-shell/qa-profile/QA-CertProfile_multipleOUs.xml</file>
+      <file>demo/profile/CertProfile_multipleOUs.xml</file>
     </X509CertProfile>
     <X509CertProfile name="TLS">
-      <file>ca-qa-shell/qa-profile/QA-CertProfile_TLS.xml</file>
+      <file>demo/profile/CertProfile_TLS.xml</file>
     </X509CertProfile>
     <X509CertProfile name="TLS_C">
-      <file>ca-qa-shell/qa-profile/QA-CertProfile_TLS_C.xml</file>
+      <file>demo/profile/CertProfile_TLS_C.xml</file>
     </X509CertProfile>
     <X509CertProfile name="TLSwithIncSN">
-      <file>ca-qa-shell/qa-profile/QA-CertProfile_TLSwithIncSN.xml</file>
+      <file>demo/profile/CertProfile_TLSwithIncSN.xml</file>
     </X509CertProfile>
     <X509CertProfile name="gSMC_K">
-      <file>ca-qa-shell/qa-profile/QA-CertProfile_gSMC_K.xml</file>
+      <file>demo/profile/CertProfile_gSMC_K.xml</file>
     </X509CertProfile>
   </X509CertProfiles>
+  <environments>
+    <environment name="env-a">
+      <parameter name="add.prefix">true</parameter>
+      <parameter name="add.suffix">true</parameter>
+    </environment>
+  </environments>
 </QAConf>

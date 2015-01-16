@@ -47,8 +47,6 @@ import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1Integer;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.ASN1Sequence;
-import org.bouncycastle.asn1.DERPrintableString;
-import org.bouncycastle.asn1.DERUTF8String;
 import org.bouncycastle.asn1.x500.RDN;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
@@ -60,6 +58,7 @@ import org.slf4j.LoggerFactory;
 import org.xipki.ca.api.BadCertTemplateException;
 import org.xipki.ca.api.CertProfileException;
 import org.xipki.ca.api.EnvironmentParameterResolver;
+import org.xipki.ca.api.profile.DirectoryStringEnum;
 import org.xipki.ca.api.profile.ExtensionControl;
 import org.xipki.ca.api.profile.ExtensionTuples;
 import org.xipki.ca.api.profile.ExtensionValue;
@@ -68,7 +67,7 @@ import org.xipki.ca.api.profile.KeyParametersOption.AllowAllParametersOption;
 import org.xipki.ca.api.profile.KeyParametersOption.DSAParametersOption;
 import org.xipki.ca.api.profile.KeyParametersOption.ECParamatersOption;
 import org.xipki.ca.api.profile.KeyParametersOption.RSAParametersOption;
-import org.xipki.ca.api.profile.RDNOccurrence;
+import org.xipki.ca.api.profile.RDNControl;
 import org.xipki.ca.api.profile.SubjectInfo;
 import org.xipki.common.LruCache;
 import org.xipki.common.ObjectIdentifiers;
@@ -148,7 +147,7 @@ extends X509CertProfile
         return values;
     }
 
-    public Set<RDNOccurrence> getSubjectDNSubset()
+    public Set<RDNControl> getSubjectDNControls()
     {
         return null;
     }
@@ -175,18 +174,18 @@ extends X509CertProfile
         checkSubjectContent(requestedSubject);
 
         RDN[] requstedRDNs = requestedSubject.getRDNs();
-        Set<RDNOccurrence> occurences = getSubjectDNSubset();
+        Set<RDNControl> controls = getSubjectDNControls();
         List<RDN> rdns = new LinkedList<>();
         List<ASN1ObjectIdentifier> types = backwardsSubject() ?
                 ObjectIdentifiers.getBackwardDNs() : ObjectIdentifiers.getForwardDNs();
 
         for(ASN1ObjectIdentifier type : types)
         {
-            RDNOccurrence occurrence = null;
-            if(occurences != null)
+            RDNControl control = null;
+            if(controls != null)
             {
-                occurrence = getRDNOccurrence(occurences, type);
-                if(occurrence == null || occurrence.getMaxOccurs() < 1)
+                control = getRDNControl(controls, type);
+                if(control == null || control.getMaxOccurs() < 1)
                 {
                     continue;
                 }
@@ -202,7 +201,7 @@ extends X509CertProfile
             if(n == 1)
             {
                 String value = SecurityUtil.rdnValueToString(thisRDNs[0].getFirst().getValue());
-                rdns.add(createSubjectRDN(value, type, 0));
+                rdns.add(createSubjectRDN(value, type, control, 0));
             }
             else
             {
@@ -213,10 +212,10 @@ extends X509CertProfile
                 }
                 values = sortRDNs(type, values);
 
-                int i = 0;
+                int index = 0;
                 for(String value : values)
                 {
-                    rdns.add(createSubjectRDN(value, type, i++));
+                    rdns.add(createSubjectRDN(value, type, control, index++));
                 }
             }
         }
@@ -225,13 +224,13 @@ extends X509CertProfile
         return new SubjectInfo(grantedSubject, null);
     }
 
-    protected static RDNOccurrence getRDNOccurrence(Set<RDNOccurrence> occurences, ASN1ObjectIdentifier type)
+    protected static RDNControl getRDNControl(Set<RDNControl> controls, ASN1ObjectIdentifier type)
     {
-        for(RDNOccurrence occurence : occurences)
+        for(RDNControl control : controls)
         {
-            if(occurence.getType().equals(type))
+            if(control.getType().equals(type))
             {
-                return occurence;
+                return control;
             }
         }
         return null;
@@ -280,13 +279,13 @@ extends X509CertProfile
     }
 
     @Override
-    public void checkPublicKey(SubjectPublicKeyInfo publicKey)
+    public SubjectPublicKeyInfo checkPublicKey(SubjectPublicKeyInfo publicKey)
     throws BadCertTemplateException
     {
         Map<ASN1ObjectIdentifier, KeyParametersOption> keyAlgorithms = getKeyAlgorithms();
         if(keyAlgorithms == null || keyAlgorithms.isEmpty())
         {
-            return;
+            return publicKey;
         }
 
         ASN1ObjectIdentifier keyType = publicKey.getAlgorithm().getAlgorithm();
@@ -298,7 +297,7 @@ extends X509CertProfile
         KeyParametersOption keyParamsOption = keyAlgorithms.get(keyType);
         if(keyParamsOption instanceof AllowAllParametersOption)
         {
-            return;
+            return publicKey;
         } else if(keyParamsOption instanceof ECParamatersOption)
         {
             ECParamatersOption ecOption = (ECParamatersOption) keyParamsOption;
@@ -334,9 +333,10 @@ extends X509CertProfile
                 }
             }
 
+            byte[] keyData = publicKey.getPublicKeyData().getBytes();
             try
             {
-                checkECSubjectPublicKeyInfo(curveOid, publicKey.getPublicKeyData().getBytes());
+                checkECSubjectPublicKeyInfo(curveOid, keyData);
             }catch(BadCertTemplateException e)
             {
                 throw e;
@@ -345,8 +345,7 @@ extends X509CertProfile
                 LOG.debug("populateFromPubKeyInfo", e);
                 throw new BadCertTemplateException("Invalid public key: " + e.getMessage());
             }
-
-            return;
+            return publicKey;
         } else if(keyParamsOption instanceof RSAParametersOption)
         {
             RSAParametersOption rsaOption = (RSAParametersOption) keyParamsOption;
@@ -364,7 +363,7 @@ extends X509CertProfile
             int modulusLength = modulus.getPositiveValue().bitLength();
             if((rsaOption.allowsModulusLength(modulusLength)))
             {
-                return;
+                return publicKey;
             }
         } else if(keyParamsOption instanceof DSAParametersOption)
         {
@@ -398,7 +397,7 @@ extends X509CertProfile
 
             if(match)
             {
-                return;
+                return publicKey;
             }
         } else
         {
@@ -417,7 +416,7 @@ extends X509CertProfile
     protected void verifySubjectDNOccurence(X500Name requestedSubject)
     throws BadCertTemplateException
     {
-        Set<RDNOccurrence> occurences = getSubjectDNSubset();
+        Set<RDNControl> occurences = getSubjectDNControls();
         if(occurences == null)
         {
             return;
@@ -426,8 +425,8 @@ extends X509CertProfile
         ASN1ObjectIdentifier[] types = requestedSubject.getAttributeTypes();
         for(ASN1ObjectIdentifier type : types)
         {
-            RDNOccurrence occu = null;
-            for(RDNOccurrence occurence : occurences)
+            RDNControl occu = null;
+            for(RDNControl occurence : occurences)
             {
                 if(occurence.getType().equals(type))
                 {
@@ -449,7 +448,7 @@ extends X509CertProfile
             }
         }
 
-        for(RDNOccurrence occurence : occurences)
+        for(RDNControl occurence : occurences)
         {
             if(occurence.getMinOccurs() == 0)
             {
@@ -486,21 +485,25 @@ extends X509CertProfile
         return SecurityUtil.rdnValueToString(rdn.getFirst().getValue());
     }
 
-    protected RDN createSubjectRDN(String text, ASN1ObjectIdentifier type, int index)
+    protected RDN createSubjectRDN(String text, ASN1ObjectIdentifier type, RDNControl rdnControl, int index)
     throws BadCertTemplateException
     {
-        text = text.trim();
-        ASN1Encodable dnValue;
-        if(ObjectIdentifiers.DN_SERIALNUMBER.equals(type) ||
-                ObjectIdentifiers.DN_C.equals(type))
+        DirectoryStringEnum dsEnum = rdnControl == null ? null : rdnControl.getDirectoryStringEnum();
+        if(dsEnum == null)
         {
-            dnValue = new DERPrintableString(text);
-        }
-        else
-        {
-            dnValue = new DERUTF8String(text);
+            if(ObjectIdentifiers.DN_SERIALNUMBER.equals(type) ||
+                    ObjectIdentifiers.DN_C.equals(type))
+            {
+                dsEnum = DirectoryStringEnum.printableString;
+            }
+            else
+            {
+                dsEnum = DirectoryStringEnum.utf8String;
+            }
         }
 
+        text = text.trim();
+        ASN1Encodable dnValue = dsEnum.createDirectoryString(text);
         return new RDN(type, dnValue);
     }
 

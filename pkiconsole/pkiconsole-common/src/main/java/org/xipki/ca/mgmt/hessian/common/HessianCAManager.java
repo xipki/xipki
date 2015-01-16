@@ -43,8 +43,8 @@ import java.util.Set;
 
 import org.xipki.ca.api.CAStatus;
 import org.xipki.ca.api.CASystemStatus;
-import org.xipki.ca.api.CertValidity;
 import org.xipki.ca.api.CmpControl;
+import org.xipki.ca.api.profile.CertValidity;
 import org.xipki.ca.server.mgmt.api.X509CAEntry;
 import org.xipki.ca.server.mgmt.api.CAHasRequestorEntry;
 import org.xipki.ca.server.mgmt.api.CertProfileEntry;

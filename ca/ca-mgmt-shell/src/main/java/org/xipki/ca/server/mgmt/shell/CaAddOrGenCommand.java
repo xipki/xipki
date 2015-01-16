@@ -39,7 +39,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.karaf.shell.commands.Option;
-import org.xipki.ca.api.CertValidity;
+import org.xipki.ca.api.profile.CertValidity;
 import org.xipki.security.api.SecurityFactory;
 
 /**

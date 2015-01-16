@@ -90,12 +90,12 @@ import org.xipki.ca.api.CASystemStatus;
 import org.xipki.ca.api.CertArt;
 import org.xipki.ca.api.CertProfileException;
 import org.xipki.ca.api.CertPublisherException;
-import org.xipki.ca.api.CertValidity;
 import org.xipki.ca.api.CmpControl;
 import org.xipki.ca.api.DfltEnvironmentParameterResolver;
 import org.xipki.ca.api.EnvironmentParameterResolver;
 import org.xipki.ca.api.OperationException;
 import org.xipki.ca.api.X509CertificateWithMetaInfo;
+import org.xipki.ca.api.profile.CertValidity;
 import org.xipki.ca.api.publisher.X509CertificateInfo;
 import org.xipki.ca.server.CmpRequestorInfo;
 import org.xipki.ca.server.CrlSigner;
@@ -770,8 +770,23 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
                         for(CAHasRequestorEntry entry : caHasRequestorEntries)
                         {
                             CmpRequestorEntry cmpRequestorEntry = getCmpRequestor(entry.getRequestorName());
+                            X509CertificateWithMetaInfo requestorCert;
+                            try
+                            {
+                                requestorCert = new X509CertificateWithMetaInfo(cmpRequestorEntry.getCert());
+                            } catch (OperationException e)
+                            {
+                                final String message = "X509CA.<init> (cmpRequestor=" + entry.getRequestorName() + ")";
+                                if(LOG.isErrorEnabled())
+                                {
+                                    LOG.error(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(), e.getMessage());
+                                }
+                                LOG.debug(message, e);
+                                return false;
+                            }
+
                             CmpRequestorInfo requestorInfo = new CmpRequestorInfo(cmpRequestorEntry.getName(),
-                                    new X509CertificateWithMetaInfo(cmpRequestorEntry.getCert()), entry.isRa());
+                                    requestorCert, entry.isRa());
                             requestorInfo.setPermissions(entry.getPermissions());
                             requestorInfo.setProfiles(entry.getProfiles());
                             caResponder.addAutorizatedRequestor(requestorInfo);

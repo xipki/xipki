@@ -56,11 +56,16 @@ import javax.xml.validation.SchemaFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.ca.api.CertProfileException;
+import org.xipki.ca.api.DfltEnvironmentParameterResolver;
+import org.xipki.ca.api.EnvironmentParameterResolver;
+import org.xipki.ca.certprofile.x509.XmlX509CertProfileUtil;
+import org.xipki.ca.certprofile.x509.jaxb.X509ProfileType;
 import org.xipki.ca.qa.certprofile.x509.X509CertProfileQA;
 import org.xipki.ca.qa.certprofile.x509.X509IssuerInfo;
-import org.xipki.ca.qa.certprofile.x509.jaxb.X509ProfileType;
+import org.xipki.ca.qa.shell.jaxb.EnvironmentType;
 import org.xipki.ca.qa.shell.jaxb.FileOrValueType;
 import org.xipki.ca.qa.shell.jaxb.ObjectFactory;
+import org.xipki.ca.qa.shell.jaxb.ParameterType;
 import org.xipki.ca.qa.shell.jaxb.QAConfType;
 import org.xipki.ca.qa.shell.jaxb.X509CertProfileType;
 import org.xipki.ca.qa.shell.jaxb.X509IssuerType;
@@ -91,6 +96,7 @@ public class QASystemManager
 
     private Map<String, X509CertProfileQA> x509ProfileMap = new HashMap<>();
     private Map<String, X509IssuerInfo> x509IssuerInfoMap = new HashMap<>();
+    private Map<String, EnvironmentParameterResolver> environmentMap = new HashMap<>();
     private static Unmarshaller jaxbUnmarshaller;
 
     public QASystemManager()
@@ -178,8 +184,8 @@ public class QASystemManager
                 {
                     byte[] content = readData(type);
                     ByteArrayInputStream confStream = new ByteArrayInputStream(content);
-                    X509ProfileType profile = X509CertProfileQA.parse(confStream);
-                    x509ProfileMap.put(name, new X509CertProfileQA(profile));
+                    X509ProfileType conf = XmlX509CertProfileUtil.parse(confStream);
+                    x509ProfileMap.put(name, new X509CertProfileQA(conf));
                     LOG.info("configured X509 certificate profile {}", name);
                 }catch(IOException | CertProfileException e)
                 {
@@ -193,6 +199,23 @@ public class QASystemManager
                 }
             }
         }
+
+        if(qaConf.getEnvironments() != null)
+        {
+            List<EnvironmentType> environments = qaConf.getEnvironments().getEnvironment();
+            for(EnvironmentType m : environments)
+            {
+                String name = m.getName();
+                DfltEnvironmentParameterResolver resolver = new DfltEnvironmentParameterResolver();
+                for(ParameterType n : m.getParameter())
+                {
+                    resolver.addEnvParam(n.getName(), n.getValue());
+                }
+
+                this.environmentMap.put(name, resolver);
+            }
+        }
+
     }
 
     public void shutdown()
@@ -217,6 +240,16 @@ public class QASystemManager
     public X509CertProfileQA getCertprofile(String certprofileName)
     {
         return x509ProfileMap.get(certprofileName);
+    }
+
+    public Set<String> getEnvironmentNames()
+    {
+        return Collections.unmodifiableSet(environmentMap.keySet());
+    }
+
+    public EnvironmentParameterResolver getEnvironment(String environmentName)
+    {
+        return environmentMap.get(environmentName);
     }
 
     public static QAConfType parseQAConf(InputStream confStream)

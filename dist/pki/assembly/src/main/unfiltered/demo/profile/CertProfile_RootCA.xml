@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <X509Profile xmlns="http://xipki.org/xmlprofile/v2">
   <description>CertProfile RootCA</description>
+  <version>3</version>
   <ca>true</ca>
   <validity>10y</validity>
   <notBeforeTime>current</notBeforeTime>

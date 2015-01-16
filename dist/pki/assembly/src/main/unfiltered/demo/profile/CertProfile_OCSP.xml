@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <X509Profile xmlns="http://xipki.org/xmlprofile/v2">
   <description>CertProfile OCSP</description>
+  <version>3</version>
   <ca>false</ca>
   <validity>5y</validity>
   <notBeforeTime>current</notBeforeTime>
@@ -74,7 +75,7 @@
     <extension critical="true" required="true" permittedInRequest="true" description="keyUsage">2.5.29.15</extension>
     <extension critical="true" required="true" permittedInRequest="false" description="basicConstraints">2.5.29.19</extension>
     <extension critical="false" required="true" permittedInRequest="true" description="extendedKeyUsage">2.5.29.37</extension>
-    <extension critical="false" required="false" permittedInRequest="true" description="id-pkix-ocsp-nocheck">1.3.6.1.5.5.7.48.1.5</extension>
+    <extension critical="false" required="false" permittedInRequest="false" description="id-pkix-ocsp-nocheck">1.3.6.1.5.5.7.48.1.5</extension>
     <authorityKeyIdentifier>
       <includeIssuerAndSerial>false</includeIssuerAndSerial>
     </authorityKeyIdentifier>

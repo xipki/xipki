@@ -20,7 +20,7 @@
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>ca-qa</artifactId>
+      <artifactId>ca-certprofile</artifactId>
       <version>${project.version}</version>
     </dependency>
   </dependencies>
