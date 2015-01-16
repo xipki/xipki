@@ -792,7 +792,7 @@ public class SecurityFactoryImpl implements SecurityFactory
         {
             PublicKey pk = KeyUtil.generatePublicKey(cert.getSubjectPublicKeyInfo());
             return KeyUtil.getContentVerifierProvider(pk);
-        } catch (OperatorCreationException | NoSuchAlgorithmException | InvalidKeySpecException | IOException e)
+        } catch (OperatorCreationException | NoSuchAlgorithmException | InvalidKeySpecException e)
         {
             throw new InvalidKeyException(e.getMessage(), e);
         }
@@ -805,7 +805,7 @@ public class SecurityFactoryImpl implements SecurityFactory
         try
         {
             return KeyUtil.generatePublicKey(subjectPublicKeyInfo);
-        } catch (NoSuchAlgorithmException | InvalidKeySpecException | IOException e)
+        } catch (NoSuchAlgorithmException | InvalidKeySpecException e)
         {
             throw new InvalidKeyException(e.getMessage(), e);
         }

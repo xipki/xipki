@@ -35,7 +35,6 @@
 
 package org.xipki.security;
 
-import java.io.IOException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.PublicKey;
@@ -425,7 +424,7 @@ public class SignerUtil
             ContentVerifierProvider cvp = KeyUtil.getContentVerifierProvider(pk);
             return p10Request.isSignatureValid(cvp);
         } catch (OperatorCreationException | InvalidKeyException | PKCSException |
-                NoSuchAlgorithmException | InvalidKeySpecException | IOException e)
+                NoSuchAlgorithmException | InvalidKeySpecException e)
         {
             return false;
         }
