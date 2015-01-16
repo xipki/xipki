@@ -123,8 +123,6 @@ import org.xipki.ca.api.publisher.X509CertificateInfo;
 import org.xipki.ca.server.mgmt.CAManagerImpl;
 import org.xipki.ca.server.mgmt.CRLControl;
 import org.xipki.ca.server.mgmt.CRLControl.UpdateMode;
-import org.xipki.ca.server.mgmt.IdentifiedX509CertProfile;
-import org.xipki.ca.server.mgmt.IdentifiedX509CertPublisher;
 import org.xipki.ca.server.mgmt.X509CAInfo;
 import org.xipki.ca.server.mgmt.api.DuplicationMode;
 import org.xipki.ca.server.mgmt.api.ValidityMode;

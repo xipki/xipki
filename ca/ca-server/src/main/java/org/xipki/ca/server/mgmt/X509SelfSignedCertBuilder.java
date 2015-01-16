@@ -72,6 +72,7 @@ import org.xipki.ca.api.profile.CertValidity;
 import org.xipki.ca.api.profile.ExtensionTuples;
 import org.xipki.ca.api.profile.ExtensionValue;
 import org.xipki.ca.api.profile.SubjectInfo;
+import org.xipki.ca.server.IdentifiedX509CertProfile;
 import org.xipki.ca.server.PublicCAInfo;
 import org.xipki.common.CmpUtf8Pairs;
 import org.xipki.common.ConfigurationException;

@@ -33,7 +33,7 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.ca.server.mgmt;
+package org.xipki.ca.server;
 
 import java.security.cert.X509CRL;
 import java.util.Map;

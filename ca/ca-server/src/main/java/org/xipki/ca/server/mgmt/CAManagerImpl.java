@@ -99,6 +99,8 @@ import org.xipki.ca.api.profile.CertValidity;
 import org.xipki.ca.api.publisher.X509CertificateInfo;
 import org.xipki.ca.server.CmpRequestorInfo;
 import org.xipki.ca.server.CrlSigner;
+import org.xipki.ca.server.IdentifiedX509CertProfile;
+import org.xipki.ca.server.IdentifiedX509CertPublisher;
 import org.xipki.ca.server.RandomSerialNumberGenerator;
 import org.xipki.ca.server.X509CA;
 import org.xipki.ca.server.X509CACmpResponder;
