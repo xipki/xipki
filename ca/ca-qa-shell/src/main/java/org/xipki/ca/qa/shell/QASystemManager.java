@@ -35,7 +35,6 @@
 
 package org.xipki.ca.qa.shell;
 
-import java.io.ByteArrayInputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -58,17 +57,15 @@ import org.slf4j.LoggerFactory;
 import org.xipki.ca.api.CertProfileException;
 import org.xipki.ca.api.DfltEnvironmentParameterResolver;
 import org.xipki.ca.api.EnvironmentParameterResolver;
-import org.xipki.ca.certprofile.x509.XmlX509CertProfileUtil;
-import org.xipki.ca.certprofile.x509.jaxb.X509ProfileType;
-import org.xipki.ca.qa.certprofile.x509.X509CertProfileQA;
-import org.xipki.ca.qa.certprofile.x509.X509IssuerInfo;
-import org.xipki.ca.qa.shell.jaxb.EnvironmentType;
-import org.xipki.ca.qa.shell.jaxb.FileOrValueType;
-import org.xipki.ca.qa.shell.jaxb.ObjectFactory;
-import org.xipki.ca.qa.shell.jaxb.ParameterType;
-import org.xipki.ca.qa.shell.jaxb.QAConfType;
-import org.xipki.ca.qa.shell.jaxb.X509CertProfileType;
-import org.xipki.ca.qa.shell.jaxb.X509IssuerType;
+import org.xipki.ca.qa.X509CertProfileQA;
+import org.xipki.ca.qa.X509IssuerInfo;
+import org.xipki.ca.qa.shell.internal.jaxb.EnvironmentType;
+import org.xipki.ca.qa.shell.internal.jaxb.FileOrValueType;
+import org.xipki.ca.qa.shell.internal.jaxb.ObjectFactory;
+import org.xipki.ca.qa.shell.internal.jaxb.ParameterType;
+import org.xipki.ca.qa.shell.internal.jaxb.QAConfType;
+import org.xipki.ca.qa.shell.internal.jaxb.X509CertProfileType;
+import org.xipki.ca.qa.shell.internal.jaxb.X509IssuerType;
 import org.xipki.common.IoUtil;
 import org.xipki.common.LogUtil;
 import org.xipki.common.XMLUtil;
@@ -183,9 +180,7 @@ public class QASystemManager
                 try
                 {
                     byte[] content = readData(type);
-                    ByteArrayInputStream confStream = new ByteArrayInputStream(content);
-                    X509ProfileType conf = XmlX509CertProfileUtil.parse(confStream);
-                    x509ProfileMap.put(name, new X509CertProfileQA(conf));
+                    x509ProfileMap.put(name, new X509CertProfileQA(content));
                     LOG.info("configured X509 certificate profile {}", name);
                 }catch(IOException | CertProfileException e)
                 {

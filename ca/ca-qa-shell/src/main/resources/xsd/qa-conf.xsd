@@ -10,7 +10,7 @@
   <xs:annotation>
     <xs:appinfo>
       <jxb:schemaBindings>
-        <jxb:package name="org.xipki.ca.qa.shell.jaxb"/>
+        <jxb:package name="org.xipki.ca.qa.shell.internal.jaxb"/>
       </jxb:schemaBindings>
     </xs:appinfo>
   </xs:annotation>
