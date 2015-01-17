@@ -238,7 +238,7 @@ public interface CAManager
     throws CAMgmtException;
 
     public X509Certificate generateSelfSignedCA(
-            String name, String certprofileName, String subject,
+            String name, String certprofileName, byte[] p10Req,
             CAStatus status, long nextSerial,
             List<String> crl_uris, List<String> delta_crl_uris, List<String> ocsp_uris,
             CertValidity max_validity, String signer_type, String signer_conf,

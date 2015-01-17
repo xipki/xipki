@@ -10,11 +10,11 @@ xipki-ca:profile-add -name  RCA -type XML -confFile demo/profile/CertProfile_Roo
 
 ## Create the PKCS#10 request for the command caqa:check-cert in QA
 xipki-tk:req -slot 1 -key-label $RCA_KEY_LABEL -out output/RCA1.p10 \
-  -subject "CN=SubCA1,O=xipki,C=DE"
+  -subject "CN=RCA1,O=xipki,C=DE"
 
 ## Generate selfsigned RCA
 xipki-ca:gen-rca -name RCA1 \
-  -subject "CN=RCA1,O=xipki,C=DE" \
+  -p10 output/RCA1.p10 \
   -profile RCA \
   -out output/RCA1.der \
   -permission all \

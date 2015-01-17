@@ -14,7 +14,7 @@ xipki-tk:req-p12 -p12 output/RCA1.p12 -pwd 1234 -out output/RCA1.p10 \
   
 ## Generate selfsigned RCA
 xipki-ca:gen-rca -name RCA1 \
-  -subject "CN=RCA1,O=xipki,C=DE" \
+  -p10 output/RCA1.p10 \
   -profile RCA \
   -out output/RCA1.der \
   -permission all \
