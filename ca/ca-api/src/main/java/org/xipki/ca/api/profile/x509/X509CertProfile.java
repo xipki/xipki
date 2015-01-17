@@ -50,7 +50,7 @@ import org.xipki.ca.api.CertProfileException;
 import org.xipki.ca.api.EnvironmentParameterResolver;
 import org.xipki.ca.api.profile.CertValidity;
 import org.xipki.ca.api.profile.ExtensionControl;
-import org.xipki.ca.api.profile.ExtensionTuples;
+import org.xipki.ca.api.profile.ExtensionValues;
 import org.xipki.ca.api.profile.GeneralNameMode;
 import org.xipki.ca.api.profile.SubjectInfo;
 
@@ -191,7 +191,7 @@ public abstract class X509CertProfile
     public abstract SubjectInfo getSubject(X500Name requestedSubject)
     throws CertProfileException, BadCertTemplateException;
 
-    public abstract ExtensionTuples getExtensions(
+    public abstract ExtensionValues getExtensions(
             Map<ASN1ObjectIdentifier, ExtensionControl> extensionControls,
             X500Name requestedSubject, Extensions requestExtensions)
     throws CertProfileException, BadCertTemplateException;

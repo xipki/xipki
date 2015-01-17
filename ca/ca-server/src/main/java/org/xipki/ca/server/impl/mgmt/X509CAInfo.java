@@ -46,14 +46,14 @@ import org.bouncycastle.asn1.cmp.CMPCertificate;
 import org.bouncycastle.asn1.x509.Certificate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.ca.api.CAStatus;
 import org.xipki.ca.api.OperationException;
-import org.xipki.ca.api.X509CertificateWithMetaInfo;
+import org.xipki.ca.api.X509CertWithId;
 import org.xipki.ca.api.OperationException.ErrorCode;
 import org.xipki.ca.api.profile.CertValidity;
 import org.xipki.ca.server.impl.PublicCAInfo;
 import org.xipki.ca.server.impl.RandomSerialNumberGenerator;
 import org.xipki.ca.server.impl.store.CertificateStore;
+import org.xipki.ca.server.mgmt.api.CAStatus;
 import org.xipki.ca.server.mgmt.api.X509CAEntry;
 import org.xipki.ca.server.mgmt.api.DuplicationMode;
 import org.xipki.ca.server.mgmt.api.Permission;
@@ -251,7 +251,7 @@ public class X509CAInfo
         caEntry.setMaxValidity(maxValidity);
     }
 
-    public X509CertificateWithMetaInfo getCertificate()
+    public X509CertWithId getCertificate()
     {
         return publicCAInfo.getCaCertificate();
     }

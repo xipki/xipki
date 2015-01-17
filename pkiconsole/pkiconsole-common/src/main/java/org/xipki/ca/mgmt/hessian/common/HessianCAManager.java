@@ -41,10 +41,10 @@ import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
-import org.xipki.ca.api.CAStatus;
-import org.xipki.ca.api.CASystemStatus;
-import org.xipki.ca.api.CmpControl;
 import org.xipki.ca.api.profile.CertValidity;
+import org.xipki.ca.server.mgmt.api.CAStatus;
+import org.xipki.ca.server.mgmt.api.CASystemStatus;
+import org.xipki.ca.server.mgmt.api.CmpControl;
 import org.xipki.ca.server.mgmt.api.X509CAEntry;
 import org.xipki.ca.server.mgmt.api.CAHasRequestorEntry;
 import org.xipki.ca.server.mgmt.api.CertProfileEntry;

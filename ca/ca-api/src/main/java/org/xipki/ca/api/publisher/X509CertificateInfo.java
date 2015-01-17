@@ -38,7 +38,7 @@ package org.xipki.ca.api.publisher;
 import java.security.cert.CertificateEncodingException;
 
 import org.xipki.ca.api.RequestorInfo;
-import org.xipki.ca.api.X509CertificateWithMetaInfo;
+import org.xipki.ca.api.X509CertWithId;
 import org.xipki.common.CertRevocationInfo;
 import org.xipki.common.ParamChecker;
 
@@ -49,8 +49,8 @@ import org.xipki.common.ParamChecker;
 public class X509CertificateInfo
 {
     private final byte[] subjectPublicKey;
-    private final X509CertificateWithMetaInfo cert;
-    private final X509CertificateWithMetaInfo issuerCert;
+    private final X509CertWithId cert;
+    private final X509CertWithId issuerCert;
     private final String profileName;
 
     private RequestorInfo requestor;
@@ -61,8 +61,8 @@ public class X509CertificateInfo
     private CertRevocationInfo revInfo;
     private boolean alreadyIssued;
 
-    public X509CertificateInfo(X509CertificateWithMetaInfo cert,
-            X509CertificateWithMetaInfo issuerCert,
+    public X509CertificateInfo(X509CertWithId cert,
+            X509CertWithId issuerCert,
             byte[] subjectPublicKey,
             String profileName)
     throws CertificateEncodingException
@@ -84,12 +84,12 @@ public class X509CertificateInfo
         return subjectPublicKey;
     }
 
-    public X509CertificateWithMetaInfo getCert()
+    public X509CertWithId getCert()
     {
         return cert;
     }
 
-    public X509CertificateWithMetaInfo getIssuerCert()
+    public X509CertWithId getIssuerCert()
     {
         return issuerCert;
     }

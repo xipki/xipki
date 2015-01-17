@@ -110,7 +110,7 @@ import org.xipki.ca.api.BadCertTemplateException;
 import org.xipki.ca.api.CertProfileException;
 import org.xipki.ca.api.EnvironmentParameterResolver;
 import org.xipki.ca.api.profile.CertValidity;
-import org.xipki.ca.api.profile.DirectoryStringEnum;
+import org.xipki.ca.api.profile.DirectoryStringType;
 import org.xipki.ca.api.profile.ExtensionControl;
 import org.xipki.ca.api.profile.GeneralNameMode;
 import org.xipki.ca.api.profile.KeyParametersOption;
@@ -146,22 +146,22 @@ import org.xipki.ca.certprofile.internal.x509.jaxb.RdnType;
 import org.xipki.ca.certprofile.internal.x509.jaxb.SubjectInfoAccessType.Access;
 import org.xipki.ca.certprofile.internal.x509.jaxb.X509ProfileType;
 import org.xipki.ca.certprofile.internal.x509.jaxb.X509ProfileType.Subject;
-import org.xipki.ca.qa.internal.QaAdmissionConf;
-import org.xipki.ca.qa.internal.QaCPSUriPolicyQualifierInfo;
-import org.xipki.ca.qa.internal.QaCertificatePoliciesConf;
-import org.xipki.ca.qa.internal.QaCertificatePolicyInformationConf;
-import org.xipki.ca.qa.internal.QaConstantExtensionConf;
-import org.xipki.ca.qa.internal.QaExtensionConf;
+import org.xipki.ca.qa.internal.QaAdmissionOption;
+import org.xipki.ca.qa.internal.QaCertificatePoliciesOption;
+import org.xipki.ca.qa.internal.QaCertificatePoliciesOption.QaCertificatePolicyInformation;
+import org.xipki.ca.qa.internal.QaConstantExtensionOption;
+import org.xipki.ca.qa.internal.QaExtensionOption;
 import org.xipki.ca.qa.internal.QaExtensionOptions;
 import org.xipki.ca.qa.internal.QaExtensionValue;
-import org.xipki.ca.qa.internal.QaGeneralSubtreeConf;
-import org.xipki.ca.qa.internal.QaInhibitAnyPolicyConf;
-import org.xipki.ca.qa.internal.QaNameConstraintsConf;
-import org.xipki.ca.qa.internal.QaPolicyConstraintsConf;
-import org.xipki.ca.qa.internal.QaPolicyMappingsConf;
-import org.xipki.ca.qa.internal.QaPolicyQualifierInfoConf;
-import org.xipki.ca.qa.internal.QaPolicyQualifiersConf;
-import org.xipki.ca.qa.internal.QaUserNoticePolicyQualifierInfo;
+import org.xipki.ca.qa.internal.QaGeneralSubtree;
+import org.xipki.ca.qa.internal.QaInhibitAnyPolicyOption;
+import org.xipki.ca.qa.internal.QaNameConstraintsOption;
+import org.xipki.ca.qa.internal.QaPolicyConstraintsOption;
+import org.xipki.ca.qa.internal.QaPolicyMappingsOption;
+import org.xipki.ca.qa.internal.QaPolicyQualifierInfo;
+import org.xipki.ca.qa.internal.QaPolicyQualifierInfo.QaCPSUriPolicyQualifier;
+import org.xipki.ca.qa.internal.QaPolicyQualifierInfo.QaUserNoticePolicyQualifierInfo;
+import org.xipki.ca.qa.internal.QaPolicyQualifiersOption;
 import org.xipki.common.CustomObjectIdentifiers;
 import org.xipki.common.HashAlgoType;
 import org.xipki.common.HashCalculator;
@@ -277,22 +277,22 @@ public class X509CertProfileQA
 
                 for(RdnType t : subject.getRdn())
                 {
-                    DirectoryStringEnum directoryStringEnum = null;
+                    DirectoryStringType directoryStringEnum = null;
                     if(t.getDirectoryStringType() != null)
                     {
                         switch(t.getDirectoryStringType())
                         {
                             case BMP_STRING:
-                                directoryStringEnum = DirectoryStringEnum.bmpString;
+                                directoryStringEnum = DirectoryStringType.bmpString;
                                 break;
                             case PRINTABLE_STRING:
-                                directoryStringEnum = DirectoryStringEnum.printableString;
+                                directoryStringEnum = DirectoryStringType.printableString;
                                 break;
                             case TELETEX_STRING:
-                                directoryStringEnum = DirectoryStringEnum.teletexString;
+                                directoryStringEnum = DirectoryStringType.teletexString;
                                 break;
                             case UTF_8_STRING:
-                                directoryStringEnum = DirectoryStringEnum.utf8String;
+                                directoryStringEnum = DirectoryStringType.utf8String;
                                 break;
                             default:
                                 throw new RuntimeException("should not reach here");
@@ -368,10 +368,10 @@ public class X509CertProfileQA
                 List<CertificatePolicies> l1 = extensionsType.getCertificatePolicies();
                 if(extensionControl != null && l1.isEmpty() == false)
                 {
-                    List<QaCertificatePoliciesConf> l2 = new ArrayList<>(l1.size());
+                    List<QaCertificatePoliciesOption> l2 = new ArrayList<>(l1.size());
                     for(CertificatePolicies m : l1)
                     {
-                        l2.add(new QaCertificatePoliciesConf(m));
+                        l2.add(new QaCertificatePoliciesOption(m));
                     }
                     this.certificatePolicies = new QaExtensionOptions(l2);
                 }
@@ -383,10 +383,10 @@ public class X509CertProfileQA
                 List<PolicyMappings> l1 = extensionsType.getPolicyMappings();
                 if(extensionControl != null && l1.isEmpty() == false)
                 {
-                    List<QaPolicyMappingsConf> l2 = new ArrayList<>(l1.size());
+                    List<QaPolicyMappingsOption> l2 = new ArrayList<>(l1.size());
                     for(PolicyMappings m : l1)
                     {
-                        l2.add(new QaPolicyMappingsConf(m));
+                        l2.add(new QaPolicyMappingsOption(m));
                     }
                     this.policyMappings = new QaExtensionOptions(l2);
                 }
@@ -398,10 +398,10 @@ public class X509CertProfileQA
                 List<NameConstraints> l1 = extensionsType.getNameConstraints();
                 if(extensionControl != null && l1.isEmpty() == false)
                 {
-                    List<QaNameConstraintsConf> l2 = new ArrayList<>(l1.size());
+                    List<QaNameConstraintsOption> l2 = new ArrayList<>(l1.size());
                     for(NameConstraints m : l1)
                     {
-                        l2.add(new QaNameConstraintsConf(m));
+                        l2.add(new QaNameConstraintsOption(m));
                     }
                     this.nameConstraints = new QaExtensionOptions(l2);
                 }
@@ -413,10 +413,10 @@ public class X509CertProfileQA
                 List<PolicyConstraints> l1 = extensionsType.getPolicyConstraints();
                 if(extensionControl != null && l1.isEmpty() == false)
                 {
-                    List<QaPolicyConstraintsConf> l2 = new ArrayList<>(l1.size());
+                    List<QaPolicyConstraintsOption> l2 = new ArrayList<>(l1.size());
                     for(PolicyConstraints m : l1)
                     {
-                        l2.add(new QaPolicyConstraintsConf(m));
+                        l2.add(new QaPolicyConstraintsOption(m));
                     }
                     this.policyConstraints = new QaExtensionOptions(l2);
                 }
@@ -428,10 +428,10 @@ public class X509CertProfileQA
                 List<InhibitAnyPolicy> l1 = extensionsType.getInhibitAnyPolicy();
                 if(extensionControl != null && l1.isEmpty() == false)
                 {
-                    List<QaInhibitAnyPolicyConf> l2 = new ArrayList<>(l1.size());
+                    List<QaInhibitAnyPolicyOption> l2 = new ArrayList<>(l1.size());
                     for(InhibitAnyPolicy m : l1)
                     {
-                        l2.add(new QaInhibitAnyPolicyConf(m));
+                        l2.add(new QaInhibitAnyPolicyOption(m));
                     }
                     this.inhibitAnyPolicy = new QaExtensionOptions(l2);
                 }
@@ -443,10 +443,10 @@ public class X509CertProfileQA
                 List<Admission> l1 = extensionsType.getAdmission();
                 if(extensionControl != null && l1.isEmpty() == false)
                 {
-                    List<QaAdmissionConf> l2 = new ArrayList<>(l1.size());
+                    List<QaAdmissionOption> l2 = new ArrayList<>(l1.size());
                     for(Admission m : l1)
                     {
-                        l2.add(new QaAdmissionConf(m));
+                        l2.add(new QaAdmissionOption(m));
                     }
                     this.admission = new QaExtensionOptions(l2);
                 }
@@ -475,7 +475,7 @@ public class X509CertProfileQA
             List<ConstantExtensions> cess = extensionsType.getConstantExtensions();
             if(cess != null && cess.isEmpty() == false)
             {
-                Map<ASN1ObjectIdentifier, List<QaConstantExtensionConf>> map = new HashMap<>();
+                Map<ASN1ObjectIdentifier, List<QaConstantExtensionOption>> map = new HashMap<>();
                 for(ConstantExtensions ces : cess)
                 {
                     for(ConstantExtensionType ce :ces.getConstantExtension())
@@ -486,10 +486,10 @@ public class X509CertProfileQA
                         {
                             byte[] encodedValue = ce.getValue();
                             QaExtensionValue extension = new QaExtensionValue(control.isCritical(), encodedValue);
-                            QaConstantExtensionConf option = new QaConstantExtensionConf(
+                            QaConstantExtensionOption option = new QaConstantExtensionOption(
                                     ce.getCondition(), extension);
 
-                            List<QaConstantExtensionConf> options = map.get(type);
+                            List<QaConstantExtensionOption> options = map.get(type);
                             if(options == null)
                             {
                                 options = new LinkedList<>();
@@ -505,7 +505,7 @@ public class X509CertProfileQA
                     Map<ASN1ObjectIdentifier, QaExtensionOptions> constantExtensions = new HashMap<>(map.size());
                     for(ASN1ObjectIdentifier type : map.keySet())
                     {
-                        List<QaConstantExtensionConf> options = map.get(type);
+                        List<QaConstantExtensionOption> options = map.get(type);
                         constantExtensions.put(type, new QaExtensionOptions(options));
                     }
 
@@ -852,8 +852,8 @@ public class X509CertProfileQA
             }
         } else if(constantExtensions != null && constantExtensions.containsKey(type))
         {
-            QaExtensionConf conf = constantExtensions.get(type).getExtensionConf(pr);
-            return ((QaConstantExtensionConf) conf).getExtensionValue().getValue();
+            QaExtensionOption conf = constantExtensions.get(type).getExtensionConf(pr);
+            return ((QaConstantExtensionOption) conf).getExtensionValue().getValue();
         }
 
         return null;
@@ -1349,15 +1349,15 @@ public class X509CertProfileQA
         SubjectDNOption rdnOption = subjectDNOptions.get(type);
 
         // check the encoding
-        DirectoryStringEnum stringType = rdnControl.getDirectoryStringEnum();
+        DirectoryStringType stringType = rdnControl.getDirectoryStringEnum();
         if(stringType == null)
         {
             if(ObjectIdentifiers.DN_C.equals(type) || ObjectIdentifiers.DN_SERIALNUMBER.equals(type))
             {
-                stringType = DirectoryStringEnum.printableString;
+                stringType = DirectoryStringType.printableString;
             } else
             {
-                stringType = DirectoryStringEnum.utf8String;
+                stringType = DirectoryStringType.utf8String;
             }
         }
 
@@ -1707,8 +1707,8 @@ public class X509CertProfileQA
             byte[] extensionValue, Extensions requestExtensions, ExtensionControl extControl,
             EnvironmentParameterResolver pr)
     {
-        QaNameConstraintsConf conf = (nameConstraints == null) ?
-                null : (QaNameConstraintsConf) nameConstraints.getExtensionConf(pr);
+        QaNameConstraintsOption conf = (nameConstraints == null) ?
+                null : (QaNameConstraintsOption) nameConstraints.getExtensionConf(pr);
 
         if(conf == null)
         {
@@ -1732,7 +1732,7 @@ public class X509CertProfileQA
     }
 
     private void checkExtensionNameConstraintsSubtrees(StringBuilder failureMsg,
-            String description, GeneralSubtree[] subtrees, List<QaGeneralSubtreeConf> expectedSubtrees)
+            String description, GeneralSubtree[] subtrees, List<QaGeneralSubtree> expectedSubtrees)
     {
         int iSize = subtrees == null ? 0 : subtrees.length;
         int eSize = expectedSubtrees == null ? 0 : expectedSubtrees.size();
@@ -1745,7 +1745,7 @@ public class X509CertProfileQA
             for(int i = 0; i < iSize; i++)
             {
                 GeneralSubtree iSubtree = subtrees[i];
-                QaGeneralSubtreeConf eSubtree = expectedSubtrees.get(i);
+                QaGeneralSubtree eSubtree = expectedSubtrees.get(i);
                 BigInteger bigInt = iSubtree.getMinimum();
                 int iMinimum = bigInt == null ? 0 : bigInt.intValue();
                 Integer _int = eSubtree.getMinimum();
@@ -1808,7 +1808,7 @@ public class X509CertProfileQA
             byte[] extensionValue, Extensions requestExtensions, ExtensionControl extControl,
             EnvironmentParameterResolver pr)
     {
-        QaPolicyConstraintsConf conf = (QaPolicyConstraintsConf) ((policyConstraints == null) ?
+        QaPolicyConstraintsOption conf = (QaPolicyConstraintsOption) ((policyConstraints == null) ?
                 null : policyConstraints.getExtensionConf(pr));
         if(conf == null)
         {
@@ -2017,7 +2017,7 @@ public class X509CertProfileQA
             byte[] extensionValue, Extensions requestExtensions, ExtensionControl extControl,
             EnvironmentParameterResolver pr)
     {
-        QaCertificatePoliciesConf conf = (QaCertificatePoliciesConf) ((certificatePolicies == null) ?
+        QaCertificatePoliciesOption conf = (QaCertificatePoliciesOption) ((certificatePolicies == null) ?
                 null : certificatePolicies.getExtensionConf(pr));
         if(certificatePolicies == null)
         {
@@ -2038,14 +2038,14 @@ public class X509CertProfileQA
         for(PolicyInformation iPolicyInformation : iPolicyInformations)
         {
             ASN1ObjectIdentifier iPolicyId = iPolicyInformation.getPolicyIdentifier();
-            QaCertificatePolicyInformationConf eCp = conf.getPolicyInformation(iPolicyId.getId());
+            QaCertificatePolicyInformation eCp = conf.getPolicyInformation(iPolicyId.getId());
             if(eCp == null)
             {
                 failureMsg.append("certificate policy '" + iPolicyId + "' is not expected");
                 failureMsg.append("; ");
             } else
             {
-                QaPolicyQualifiersConf eCpPq = eCp.getPolicyQualifiers();
+                QaPolicyQualifiersOption eCpPq = eCp.getPolicyQualifiers();
                 if(eCpPq != null)
                 {
                     ASN1Sequence iPolicyQualifiers = iPolicyInformation.getPolicyQualifiers();
@@ -2073,12 +2073,12 @@ public class X509CertProfileQA
                         }
                     }
 
-                    List<QaPolicyQualifierInfoConf> qualifierInfos = eCpPq.getPolicyQualifiers();
-                    for(QaPolicyQualifierInfoConf qualifierInfo : qualifierInfos)
+                    List<QaPolicyQualifierInfo> qualifierInfos = eCpPq.getPolicyQualifiers();
+                    for(QaPolicyQualifierInfo qualifierInfo : qualifierInfos)
                     {
-                        if(qualifierInfo instanceof QaCPSUriPolicyQualifierInfo)
+                        if(qualifierInfo instanceof QaCPSUriPolicyQualifier)
                         {
-                            String value = ((QaCPSUriPolicyQualifierInfo) qualifierInfo).getCPSUri();
+                            String value = ((QaCPSUriPolicyQualifier) qualifierInfo).getCPSUri();
                             if(iCpsUris.contains(value) == false)
                             {
                                 failureMsg.append("CPSUri '" + value + "' is absent but is required");
@@ -2101,7 +2101,7 @@ public class X509CertProfileQA
             }
         }
 
-        for(QaCertificatePolicyInformationConf cp : conf.getPolicyInformations())
+        for(QaCertificatePolicyInformation cp : conf.getPolicyInformations())
         {
             boolean present = false;
             for(PolicyInformation iPolicyInformation : iPolicyInformations)
@@ -2126,7 +2126,7 @@ public class X509CertProfileQA
             Extensions requestExtensions, ExtensionControl extControl,
             EnvironmentParameterResolver pr)
     {
-        QaPolicyMappingsConf conf = (QaPolicyMappingsConf) ((policyMappings == null) ?
+        QaPolicyMappingsOption conf = (QaPolicyMappingsOption) ((policyMappings == null) ?
                 null : policyMappings.getExtensionConf(pr));
         if(conf == null)
         {
@@ -2181,7 +2181,7 @@ public class X509CertProfileQA
             byte[] extensionValue, Extensions requestExtensions, ExtensionControl extControl,
             EnvironmentParameterResolver pr)
     {
-        QaInhibitAnyPolicyConf conf = (QaInhibitAnyPolicyConf) ((inhibitAnyPolicy == null) ?
+        QaInhibitAnyPolicyOption conf = (QaInhibitAnyPolicyOption) ((inhibitAnyPolicy == null) ?
                 null : inhibitAnyPolicy.getExtensionConf(pr));
         if(conf == null)
         {
@@ -2589,8 +2589,8 @@ public class X509CertProfileQA
             byte[] extensionValue, Extensions requestExtensions, ExtensionControl extControl,
             EnvironmentParameterResolver pr)
     {
-        QaAdmissionConf conf = (admission == null) ?
-                null : (QaAdmissionConf) admission.getExtensionConf(pr);
+        QaAdmissionOption conf = (admission == null) ?
+                null : (QaAdmissionOption) admission.getExtensionConf(pr);
         if(conf == null)
         {
             byte[] expected = getExpectedExtValue(ObjectIdentifiers.id_extension_admission, requestExtensions, extControl, pr);
@@ -2949,7 +2949,7 @@ public class X509CertProfileQA
         QaExtensionOptions c = constantExtensions.get(type);
         if(c != null)
         {
-            QaConstantExtensionConf d = (QaConstantExtensionConf) c.getExtensionConf(pr);
+            QaConstantExtensionOption d = (QaConstantExtensionOption) c.getExtensionConf(pr);
             if(d != null)
             {
                 return d.getExtensionValue().getValue();

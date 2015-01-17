@@ -33,40 +33,67 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.ca.qa.internal;
+package org.xipki.ca.api.profile;
 
-import org.xipki.ca.certprofile.internal.x509.jaxb.ExtensionsType.PolicyConstraints;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+
+import org.bouncycastle.asn1.ASN1Encodable;
+import org.bouncycastle.asn1.ASN1ObjectIdentifier;
+import org.xipki.common.ParamChecker;
 
 /**
  * @author Lijun Liao
  */
 
-public class QaPolicyConstraintsConf extends QaExtensionConf
+public class ExtensionValues
 {
-    private final Integer requireExplicitPolicy;
-    private final Integer inhibitPolicyMapping;
+    private final Map<ASN1ObjectIdentifier, ExtensionValue> extensions = new HashMap<>();
 
-    public QaPolicyConstraintsConf(PolicyConstraints jaxb)
+    public boolean addExtension(ASN1ObjectIdentifier type, boolean critical, ASN1Encodable value)
     {
-        super(jaxb.getCondition());
-
-        if(jaxb.getRequireExplicitPolicy() == null && jaxb.getInhibitPolicyMapping() == null)
+        ParamChecker.assertNotNull("type", type);
+        ParamChecker.assertNotNull("value", value);
+        if(extensions.containsKey(type))
         {
-            throw new IllegalArgumentException("at least one of requireExplicitPolicy and inhibitPolicyMapping must be set");
+            return false;
         }
-
-        this.requireExplicitPolicy = jaxb.getRequireExplicitPolicy();
-        this.inhibitPolicyMapping = jaxb.getInhibitPolicyMapping();
+        extensions.put(type, new ExtensionValue(critical, value));
+        return true;
     }
 
-    public Integer getRequireExplicitPolicy()
+    public boolean addExtension(ASN1ObjectIdentifier type, ExtensionValue value)
     {
-        return requireExplicitPolicy;
+        ParamChecker.assertNotNull("type", type);
+        ParamChecker.assertNotNull("value", value);
+        if(extensions.containsKey(type))
+        {
+            return false;
+        }
+        extensions.put(type, value);
+        return true;
     }
 
-    public Integer getInhibitPolicyMapping()
+    public Set<ASN1ObjectIdentifier> getExtensionTypes()
     {
-        return inhibitPolicyMapping;
+        return Collections.unmodifiableSet(extensions.keySet());
+    }
+
+    public ExtensionValue getExtensionValue(ASN1ObjectIdentifier type)
+    {
+        return extensions.get(type);
+    }
+
+    public boolean removeExtensionTuple(ASN1ObjectIdentifier type)
+    {
+        return extensions.remove(type) != null;
+    }
+
+    public boolean containsExtension(ASN1ObjectIdentifier type)
+    {
+        return extensions.containsKey(type);
     }
 
 }

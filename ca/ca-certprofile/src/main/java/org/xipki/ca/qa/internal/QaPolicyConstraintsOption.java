@@ -35,68 +35,38 @@
 
 package org.xipki.ca.qa.internal;
 
-import org.xipki.ca.certprofile.internal.x509.jaxb.GeneralSubtreeBaseType;
-import org.xipki.common.ParamChecker;
+import org.xipki.ca.certprofile.internal.x509.jaxb.ExtensionsType.PolicyConstraints;
 
 /**
  * @author Lijun Liao
  */
 
-public class QaGeneralSubtreeConf
+public class QaPolicyConstraintsOption extends QaExtensionOption
 {
-    private final GeneralSubtreeBaseType jaxb;
+    private final Integer requireExplicitPolicy;
+    private final Integer inhibitPolicyMapping;
 
-    public QaGeneralSubtreeConf(GeneralSubtreeBaseType jaxb)
+    public QaPolicyConstraintsOption(PolicyConstraints jaxb)
     {
-        ParamChecker.assertNotNull("jaxb", jaxb);
-        Integer i = jaxb.getMinimum();
-        if(i != null && i < 0)
+        super(jaxb.getCondition());
+
+        if(jaxb.getRequireExplicitPolicy() == null && jaxb.getInhibitPolicyMapping() == null)
         {
-            throw new IllegalArgumentException("negative minimum is not allowed: " + i);
+            throw new IllegalArgumentException("at least one of requireExplicitPolicy and inhibitPolicyMapping must be set");
         }
 
-        i = jaxb.getMaximum();
-        if(i != null && i < 0)
-        {
-            throw new IllegalArgumentException("negative maximum is not allowed: " + i);
-        }
-
-        this.jaxb = jaxb;
+        this.requireExplicitPolicy = jaxb.getRequireExplicitPolicy();
+        this.inhibitPolicyMapping = jaxb.getInhibitPolicyMapping();
     }
 
-    public String getRfc822Name()
+    public Integer getRequireExplicitPolicy()
     {
-        return jaxb.getRfc822Name();
+        return requireExplicitPolicy;
     }
 
-    public String getDNSName()
+    public Integer getInhibitPolicyMapping()
     {
-        return jaxb.getDNSName();
-    }
-
-    public String getDirectoryName()
-    {
-        return jaxb.getDirectoryName();
-    }
-
-    public String getUri()
-    {
-        return jaxb.getUri();
-    }
-
-    public String getIpAddress()
-    {
-        return jaxb.getIpAddress();
-    }
-
-    public Integer getMinimum()
-    {
-        return jaxb.getMinimum();
-    }
-
-    public Integer getMaximum()
-    {
-        return jaxb.getMaximum();
+        return inhibitPolicyMapping;
     }
 
 }

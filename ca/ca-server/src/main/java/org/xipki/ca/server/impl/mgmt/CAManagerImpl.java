@@ -84,17 +84,12 @@ import org.xipki.audit.api.AuditLoggingService;
 import org.xipki.audit.api.AuditLoggingServiceRegister;
 import org.xipki.audit.api.AuditStatus;
 import org.xipki.audit.api.PCIAuditEvent;
-import org.xipki.ca.api.CAMgmtException;
-import org.xipki.ca.api.CAStatus;
-import org.xipki.ca.api.CASystemStatus;
-import org.xipki.ca.api.CertArt;
 import org.xipki.ca.api.CertProfileException;
 import org.xipki.ca.api.CertPublisherException;
-import org.xipki.ca.api.CmpControl;
 import org.xipki.ca.api.DfltEnvironmentParameterResolver;
 import org.xipki.ca.api.EnvironmentParameterResolver;
 import org.xipki.ca.api.OperationException;
-import org.xipki.ca.api.X509CertificateWithMetaInfo;
+import org.xipki.ca.api.X509CertWithId;
 import org.xipki.ca.api.profile.CertValidity;
 import org.xipki.ca.api.publisher.X509CertificateInfo;
 import org.xipki.ca.server.impl.CmpRequestorInfo;
@@ -108,7 +103,12 @@ import org.xipki.ca.server.impl.mgmt.X509SelfSignedCertBuilder.GenerateSelfSigne
 import org.xipki.ca.server.impl.store.CertificateStore;
 import org.xipki.ca.server.mgmt.api.CAHasRequestorEntry;
 import org.xipki.ca.server.mgmt.api.CAManager;
+import org.xipki.ca.server.mgmt.api.CAMgmtException;
+import org.xipki.ca.server.mgmt.api.CAStatus;
+import org.xipki.ca.server.mgmt.api.CASystemStatus;
+import org.xipki.ca.server.mgmt.api.CertArt;
 import org.xipki.ca.server.mgmt.api.CertProfileEntry;
+import org.xipki.ca.server.mgmt.api.CmpControl;
 import org.xipki.ca.server.mgmt.api.CmpRequestorEntry;
 import org.xipki.ca.server.mgmt.api.CmpResponderEntry;
 import org.xipki.ca.server.mgmt.api.DuplicationMode;
@@ -772,10 +772,10 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
                         for(CAHasRequestorEntry entry : caHasRequestorEntries)
                         {
                             CmpRequestorEntry cmpRequestorEntry = getCmpRequestor(entry.getRequestorName());
-                            X509CertificateWithMetaInfo requestorCert;
+                            X509CertWithId requestorCert;
                             try
                             {
-                                requestorCert = new X509CertificateWithMetaInfo(cmpRequestorEntry.getCert());
+                                requestorCert = new X509CertWithId(cmpRequestorEntry.getCert());
                             } catch (OperationException e)
                             {
                                 final String message = "X509CA.<init> (cmpRequestor=" + entry.getRequestorName() + ")";
@@ -1535,7 +1535,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
                 {
                     if(masterMode)
                     {
-                        X509CertificateWithMetaInfo cm = new X509CertificateWithMetaInfo(entry.getCertificate());
+                        X509CertWithId cm = new X509CertWithId(entry.getCertificate());
                         certstore.addCa(cm);
                     }
 
@@ -3282,7 +3282,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
             throw new CAMgmtException("Cannot find CA named " + caName);
         }
 
-        X509CertificateWithMetaInfo certInfo = ca.getCAInfo().getCertificate();
+        X509CertWithId certInfo = ca.getCAInfo().getCertificate();
         if(certInfo.getCert().getSubjectX500Principal().equals(
                 certInfo.getCert().getIssuerX500Principal()) == false)
         {
@@ -3551,7 +3551,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
         {
             try
             {
-                certstore.clearPublishQueue((X509CertificateWithMetaInfo) null, (String) null);
+                certstore.clearPublishQueue((X509CertWithId) null, (String) null);
                 return true;
             } catch (SQLException | OperationException e)
             {

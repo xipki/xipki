@@ -107,14 +107,12 @@ import org.xipki.audit.api.AuditLoggingServiceRegister;
 import org.xipki.audit.api.AuditStatus;
 import org.xipki.ca.api.BadCertTemplateException;
 import org.xipki.ca.api.BadFormatException;
-import org.xipki.ca.api.CAMgmtException;
-import org.xipki.ca.api.CAStatus;
 import org.xipki.ca.api.CertProfileException;
 import org.xipki.ca.api.OperationException;
 import org.xipki.ca.api.OperationException.ErrorCode;
-import org.xipki.ca.api.X509CertificateWithMetaInfo;
+import org.xipki.ca.api.X509CertWithId;
 import org.xipki.ca.api.profile.CertValidity;
-import org.xipki.ca.api.profile.ExtensionTuples;
+import org.xipki.ca.api.profile.ExtensionValues;
 import org.xipki.ca.api.profile.ExtensionValue;
 import org.xipki.ca.api.profile.SubjectInfo;
 import org.xipki.ca.api.profile.x509.SpecialX509CertProfileBehavior;
@@ -126,6 +124,8 @@ import org.xipki.ca.server.impl.mgmt.X509CAInfo;
 import org.xipki.ca.server.impl.mgmt.CRLControl.UpdateMode;
 import org.xipki.ca.server.impl.store.CertificateStore;
 import org.xipki.ca.server.impl.store.X509CertWithRevocationInfo;
+import org.xipki.ca.server.mgmt.api.CAMgmtException;
+import org.xipki.ca.server.mgmt.api.CAStatus;
 import org.xipki.ca.server.mgmt.api.DuplicationMode;
 import org.xipki.ca.server.mgmt.api.ValidityMode;
 import org.xipki.common.CRLReason;
@@ -206,7 +206,7 @@ public class X509CA
 
                 final int numEntries = 100;
 
-                X509CertificateWithMetaInfo caCert = caInfo.getCertificate();
+                X509CertWithId caCert = caInfo.getCertificate();
                 long expiredAt = task.getExpiredAt();
 
                 List<BigInteger> serials;
@@ -582,7 +582,7 @@ public class X509CA
         this.crlSigner = crlSigner;
         this.masterMode = masterMode;
 
-        X509CertificateWithMetaInfo caCert = caInfo.getCertificate();
+        X509CertWithId caCert = caInfo.getCertificate();
 
         if(crlSigner != null)
         {
@@ -844,7 +844,7 @@ public class X509CA
             BigInteger startSerial = BigInteger.ONE;
             final int numEntries = 100;
 
-            X509CertificateWithMetaInfo caCert = caInfo.getCertificate();
+            X509CertWithId caCert = caInfo.getCertificate();
             List<CertRevocationInfoWithSerial> revInfos;
             boolean isFirstCRLEntry = true;
 
@@ -1405,7 +1405,7 @@ public class X509CA
         try
         {
             List<BigInteger> serials;
-            X509CertificateWithMetaInfo caCert = caInfo.getCertificate();
+            X509CertWithId caCert = caInfo.getCertificate();
 
             Date notExpiredAt = null;
 
@@ -1545,7 +1545,7 @@ public class X509CA
 
     private boolean publishCertsInQueue(IdentifiedX509CertPublisher publisher)
     {
-        X509CertificateWithMetaInfo caCert = caInfo.getCertificate();
+        X509CertWithId caCert = caInfo.getCertificate();
 
         final int numEntries = 500;
 
@@ -1620,7 +1620,7 @@ public class X509CA
 
     private boolean publishCRL(X509CRL crl)
     {
-        X509CertificateWithMetaInfo caCert = caInfo.getCertificate();
+        X509CertWithId caCert = caInfo.getCertificate();
         if(certstore.addCRL(caCert, crl) == false)
         {
             return false;
@@ -1680,7 +1680,7 @@ public class X509CA
         return do_revokeCertificate(serialNumber, reason, invalidityTime, false);
     }
 
-    public X509CertificateWithMetaInfo unrevokeCertificate(BigInteger serialNumber)
+    public X509CertWithId unrevokeCertificate(BigInteger serialNumber)
     throws OperationException
     {
         if(caInfo.isSelfSigned() && caInfo.getSerialNumber().equals(serialNumber))
@@ -1692,7 +1692,7 @@ public class X509CA
         return do_unrevokeCertificate(serialNumber, false);
     }
 
-    public X509CertificateWithMetaInfo removeCertificate(BigInteger serialNumber)
+    public X509CertWithId removeCertificate(BigInteger serialNumber)
     throws OperationException
     {
         if(caInfo.isSelfSigned() && caInfo.getSerialNumber().equals(serialNumber))
@@ -1704,7 +1704,7 @@ public class X509CA
         return do_removeCertificate(serialNumber);
     }
 
-    private X509CertificateWithMetaInfo do_removeCertificate(BigInteger serialNumber)
+    private X509CertWithId do_removeCertificate(BigInteger serialNumber)
     throws OperationException
     {
         X509CertWithRevocationInfo certWithRevInfo =
@@ -1715,7 +1715,7 @@ public class X509CA
         }
 
         boolean successful = true;
-        X509CertificateWithMetaInfo certToRemove = certWithRevInfo.getCert();
+        X509CertWithId certToRemove = certWithRevInfo.getCert();
         for(IdentifiedX509CertPublisher publisher : getPublishers())
         {
             boolean singleSuccessful;
@@ -1834,13 +1834,13 @@ public class X509CA
         return revokedCert;
     }
 
-    private X509CertificateWithMetaInfo do_unrevokeCertificate(BigInteger serialNumber, boolean force)
+    private X509CertWithId do_unrevokeCertificate(BigInteger serialNumber, boolean force)
     throws OperationException
     {
         LOG.info("START unrevokeCertificate: ca={}, serialNumber={}", caInfo.getName(), serialNumber);
 
         numActiveRevocations.addAndGet(1);
-        X509CertificateWithMetaInfo unrevokedCert = null;
+        X509CertWithId unrevokedCert = null;
 
         try
         {
@@ -2213,7 +2213,7 @@ public class X509CA
                 }
                 else
                 {
-                    X509CertificateWithMetaInfo issuedCert = certstore.getCertForId(triple.getCertId());
+                    X509CertWithId issuedCert = certstore.getCertForId(triple.getCertId());
                     if(issuedCert == null)
                     {
                         throw new OperationException(ErrorCode.System_Failure,
@@ -2502,7 +2502,7 @@ public class X509CA
 
             try
             {
-                ExtensionTuples extensionTuples = certProfile.getExtensions(requestedSubject, extensions,
+                ExtensionValues extensionTuples = certProfile.getExtensions(requestedSubject, extensions,
                         publicKeyInfo, caInfo.getPublicCAInfo(), crlSigner);
                 if(extensionTuples != null)
                 {
@@ -2541,7 +2541,7 @@ public class X509CA
                             "Could not verify the signature of generated certificate");
                 }
 
-                X509CertificateWithMetaInfo certWithMeta = new X509CertificateWithMetaInfo(cert, encodedCert);
+                X509CertWithId certWithMeta = new X509CertWithId(cert, encodedCert);
 
                 ret = new X509CertificateInfo(certWithMeta, caInfo.getCertificate(),
                         subjectPublicKeyData, certProfileName);

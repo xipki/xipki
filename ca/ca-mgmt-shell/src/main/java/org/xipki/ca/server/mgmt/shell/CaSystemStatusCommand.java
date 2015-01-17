@@ -36,7 +36,7 @@
 package org.xipki.ca.server.mgmt.shell;
 
 import org.apache.karaf.shell.commands.Command;
-import org.xipki.ca.api.CASystemStatus;
+import org.xipki.ca.server.mgmt.api.CASystemStatus;
 
 /**
  * @author Lijun Liao

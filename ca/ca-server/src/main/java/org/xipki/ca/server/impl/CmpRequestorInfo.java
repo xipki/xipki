@@ -37,8 +37,8 @@ package org.xipki.ca.server.impl;
 
 import java.util.Set;
 
-import org.xipki.ca.api.CertBasedRequestorInfo;
-import org.xipki.ca.api.X509CertificateWithMetaInfo;
+import org.xipki.ca.api.X509CertWithId;
+import org.xipki.ca.server.mgmt.api.CertBasedRequestorInfo;
 import org.xipki.ca.server.mgmt.api.Permission;
 
 /**
@@ -50,7 +50,7 @@ public class CmpRequestorInfo extends CertBasedRequestorInfo
     private Set<Permission> permissions;
     private Set<String> profiles;
 
-    public CmpRequestorInfo(String name, X509CertificateWithMetaInfo certificate, boolean ra)
+    public CmpRequestorInfo(String name, X509CertWithId certificate, boolean ra)
     {
         super(name, certificate, ra);
     }

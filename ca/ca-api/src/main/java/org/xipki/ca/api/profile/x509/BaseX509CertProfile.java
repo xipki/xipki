@@ -58,9 +58,9 @@ import org.slf4j.LoggerFactory;
 import org.xipki.ca.api.BadCertTemplateException;
 import org.xipki.ca.api.CertProfileException;
 import org.xipki.ca.api.EnvironmentParameterResolver;
-import org.xipki.ca.api.profile.DirectoryStringEnum;
+import org.xipki.ca.api.profile.DirectoryStringType;
 import org.xipki.ca.api.profile.ExtensionControl;
-import org.xipki.ca.api.profile.ExtensionTuples;
+import org.xipki.ca.api.profile.ExtensionValues;
 import org.xipki.ca.api.profile.ExtensionValue;
 import org.xipki.ca.api.profile.KeyParametersOption;
 import org.xipki.ca.api.profile.KeyParametersOption.AllowAllParametersOption;
@@ -259,7 +259,7 @@ extends X509CertProfile
     }
 
     protected static void checkAndAddExtension(ASN1ObjectIdentifier type, ExtensionControl occurence,
-            ExtensionValue value, ExtensionTuples tuples)
+            ExtensionValue value, ExtensionValues tuples)
     throws CertProfileException
     {
         if(value != null)
@@ -488,17 +488,17 @@ extends X509CertProfile
     protected RDN createSubjectRDN(String text, ASN1ObjectIdentifier type, RDNControl rdnControl, int index)
     throws BadCertTemplateException
     {
-        DirectoryStringEnum dsEnum = rdnControl == null ? null : rdnControl.getDirectoryStringEnum();
+        DirectoryStringType dsEnum = rdnControl == null ? null : rdnControl.getDirectoryStringEnum();
         if(dsEnum == null)
         {
             if(ObjectIdentifiers.DN_SERIALNUMBER.equals(type) ||
                     ObjectIdentifiers.DN_C.equals(type))
             {
-                dsEnum = DirectoryStringEnum.printableString;
+                dsEnum = DirectoryStringType.printableString;
             }
             else
             {
-                dsEnum = DirectoryStringEnum.utf8String;
+                dsEnum = DirectoryStringType.utf8String;
             }
         }
 

@@ -41,37 +41,38 @@ import java.util.List;
 
 import org.xipki.ca.certprofile.internal.x509.jaxb.CertificatePolicyInformationType;
 import org.xipki.ca.certprofile.internal.x509.jaxb.ExtensionsType.CertificatePolicies;
+import org.xipki.common.ParamChecker;
 
 /**
  * @author Lijun Liao
  */
 
-public class QaCertificatePoliciesConf extends QaExtensionConf
+public class QaCertificatePoliciesOption extends QaExtensionOption
 {
-    private final List<QaCertificatePolicyInformationConf> policyInformations;
+    private final List<QaCertificatePolicyInformation> policyInformations;
 
-    public QaCertificatePoliciesConf(CertificatePolicies jaxb)
+    public QaCertificatePoliciesOption(CertificatePolicies jaxb)
     {
         super(jaxb.getCondition());
 
         List<CertificatePolicyInformationType> types = jaxb.getCertificatePolicyInformation();
-        List<QaCertificatePolicyInformationConf> list = new LinkedList<>();
+        List<QaCertificatePolicyInformation> list = new LinkedList<>();
         for(CertificatePolicyInformationType type : types)
         {
-            list.add(new QaCertificatePolicyInformationConf(type));
+            list.add(new QaCertificatePolicyInformation(type));
         }
 
         this.policyInformations = Collections.unmodifiableList(list);
     }
 
-    public List<QaCertificatePolicyInformationConf> getPolicyInformations()
+    public List<QaCertificatePolicyInformation> getPolicyInformations()
     {
         return policyInformations;
     }
 
-    public QaCertificatePolicyInformationConf getPolicyInformation(String policyId)
+    public QaCertificatePolicyInformation getPolicyInformation(String policyId)
     {
-        for(QaCertificatePolicyInformationConf entry : policyInformations)
+        for(QaCertificatePolicyInformation entry : policyInformations)
         {
             if(entry.getPolicyId().equals(policyId))
             {
@@ -80,6 +81,35 @@ public class QaCertificatePoliciesConf extends QaExtensionConf
         }
 
         return null;
+    }
+
+    public static class QaCertificatePolicyInformation
+    {
+        private final String policyId;
+        private final QaPolicyQualifiersOption policyQualifiers;
+
+        public QaCertificatePolicyInformation(CertificatePolicyInformationType jaxb)
+        {
+            ParamChecker.assertNotNull("jaxb", jaxb);
+            this.policyId = jaxb.getPolicyIdentifier().getValue();
+            if(jaxb.getPolicyQualifiers() == null)
+            {
+                this.policyQualifiers = null;
+            }else
+            {
+                this.policyQualifiers = new QaPolicyQualifiersOption(jaxb.getPolicyQualifiers());
+            }
+        }
+
+        public String getPolicyId()
+        {
+            return policyId;
+        }
+
+        public QaPolicyQualifiersOption getPolicyQualifiers()
+        {
+            return policyQualifiers;
+        }
     }
 
 }

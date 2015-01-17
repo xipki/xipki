@@ -47,15 +47,15 @@ public class RDNControl
     private final int minOccurs;
     private final int maxOccurs;
     private final ASN1ObjectIdentifier type;
-    private final DirectoryStringEnum directoryStringEnum;
+    private final DirectoryStringType directoryStringEnum;
 
-    public RDNControl(ASN1ObjectIdentifier type, DirectoryStringEnum directoryStringEnum)
+    public RDNControl(ASN1ObjectIdentifier type, DirectoryStringType directoryStringEnum)
     {
         this(type, 1, 1, directoryStringEnum);
     }
 
     public RDNControl(ASN1ObjectIdentifier type, int minOccurs, int maxOccurs,
-            DirectoryStringEnum directoryStringEnum)
+            DirectoryStringType directoryStringEnum)
     {
         ParamChecker.assertNotNull("type", type);
         if(minOccurs < 0 || maxOccurs < 1 || minOccurs > maxOccurs)
@@ -83,7 +83,7 @@ public class RDNControl
         return type;
     }
 
-    public DirectoryStringEnum getDirectoryStringEnum()
+    public DirectoryStringType getDirectoryStringEnum()
     {
         return directoryStringEnum;
     }
