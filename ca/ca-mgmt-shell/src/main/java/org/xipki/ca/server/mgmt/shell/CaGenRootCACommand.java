@@ -47,6 +47,7 @@ import org.xipki.ca.server.mgmt.api.DuplicationMode;
 import org.xipki.ca.server.mgmt.api.Permission;
 import org.xipki.ca.server.mgmt.api.ValidityMode;
 import org.xipki.common.ConfigurationException;
+import org.xipki.common.IoUtil;
 
 /**
  * @author Lijun Liao
@@ -55,10 +56,10 @@ import org.xipki.common.ConfigurationException;
 @Command(scope = "xipki-ca", name = "gen-rca", description="Generate selfsigned CA")
 public class CaGenRootCACommand extends CaAddOrGenCommand
 {
-    @Option(name = "-subject",
-            description = "Required. Subject of the Root CA",
+    @Option(name = "-p10",
+            description = "Required. PKCS#10 request of the Root CA",
             required = true)
-    protected String rcaSubject;
+    protected String p10ReqFile;
 
     @Option(name = "-profile",
             description = "Required. Profile of the Root CA",
@@ -127,9 +128,10 @@ public class CaGenRootCACommand extends CaAddOrGenCommand
             _permissions.add(_permission);
         }
 
+        byte[] p10Req = IoUtil.read(p10ReqFile);
         X509Certificate rcaCert = caManager.generateSelfSignedCA(caName,
                 rcaProfile,
-                rcaSubject,
+                p10Req,
                 status,
                 nextSerial,
                 crlUris,

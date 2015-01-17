@@ -53,8 +53,13 @@ import java.util.Date;
 import java.util.List;
 
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
+import org.bouncycastle.asn1.ASN1Set;
+import org.bouncycastle.asn1.pkcs.Attribute;
+import org.bouncycastle.asn1.pkcs.CertificationRequest;
+import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.Certificate;
+import org.bouncycastle.asn1.x509.Extensions;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.bouncycastle.cert.X509v3CertificateBuilder;
 import org.bouncycastle.crypto.params.AsymmetricKeyParameter;
@@ -117,13 +122,18 @@ class X509SelfSignedCertBuilder
             String signerType,
             String signerConf,
             IdentifiedX509CertProfile certProfile,
-            String subject,
+            CertificationRequest p10Request,
             long serialNumber,
             List<String> ocspUris,
             List<String> crlUris,
             List<String> deltaCrlUris)
     throws OperationException, ConfigurationException
     {
+        if(securityFactory.verifyPOPO(p10Request) == false)
+        {
+            throw new ConfigurationException("could not validate POP for the pkcs#10 requst");
+        }
+
         if("pkcs12".equalsIgnoreCase(signerType) || "jks".equalsIgnoreCase(signerType))
         {
             CmpUtf8Pairs keyValues = new CmpUtf8Pairs(signerConf);
@@ -155,7 +165,7 @@ class X509SelfSignedCertBuilder
         SubjectPublicKeyInfo publicKeyInfo = bcCert.getSubjectPublicKeyInfo();
 
         X509Certificate newCert = generateCertificate(
-                signer, certProfile, new X500Name(subject), serialNumber, publicKeyInfo,
+                signer, certProfile, p10Request, serialNumber, publicKeyInfo,
                 ocspUris, crlUris, deltaCrlUris);
 
         return new GenerateSelfSignedResult(signerConf, newCert);
@@ -164,7 +174,7 @@ class X509SelfSignedCertBuilder
     private static X509Certificate generateCertificate(
             ConcurrentContentSigner signer,
             IdentifiedX509CertProfile certProfile,
-            X500Name requestedSubject,
+            CertificationRequest p10Request,
             long serialNumber,
             SubjectPublicKeyInfo publicKeyInfo,
             List<String> ocspUris,
@@ -189,6 +199,8 @@ class X509SelfSignedCertBuilder
             LOG.warn("certProfile.checkPublicKey", e);
             throw new OperationException(ErrorCode.BAD_CERT_TEMPLATE, e.getMessage());
         }
+
+        X500Name requestedSubject = p10Request.getCertificationRequestInfo().getSubject();
 
         SubjectInfo subjectInfo;
         // subject
@@ -233,12 +245,24 @@ class X509SelfSignedCertBuilder
         PublicCAInfo publicCaInfo = new PublicCAInfo(
                 grantedSubject, _serialNumber, null, null, ocspUris, crlUris, null, deltaCrlUris);
 
+        Extensions extensions = null;
+        ASN1Set attrs = p10Request.getCertificationRequestInfo().getAttributes();
+        for(int i = 0; i < attrs.size(); i++)
+        {
+            Attribute attr = Attribute.getInstance(attrs.getObjectAt(i));
+            if(PKCSObjectIdentifiers.pkcs_9_at_extensionRequest.equals(attr.getAttrType()))
+            {
+                extensions = Extensions.getInstance(attr.getAttributeValues()[0]);
+            }
+        }
+
         try
         {
             addExtensions(
                     certBuilder,
                     certProfile,
                     requestedSubject,
+                    extensions,
                     publicKeyInfo,
                     publicCaInfo);
 
@@ -271,11 +295,12 @@ class X509SelfSignedCertBuilder
             X509v3CertificateBuilder certBuilder,
             IdentifiedX509CertProfile profile,
             X500Name requestedSubject,
+            Extensions extensions,
             SubjectPublicKeyInfo requestedPublicKeyInfo,
             PublicCAInfo publicCaInfo)
     throws CertProfileException, IOException, BadCertTemplateException, NoSuchAlgorithmException
     {
-        ExtensionTuples extensionTuples = profile.getExtensions(requestedSubject, null, requestedPublicKeyInfo,
+        ExtensionTuples extensionTuples = profile.getExtensions(requestedSubject, extensions, requestedPublicKeyInfo,
                 publicCaInfo, null);
         if(extensionTuples != null)
         {

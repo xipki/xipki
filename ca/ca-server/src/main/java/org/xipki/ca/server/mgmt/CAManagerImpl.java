@@ -3725,7 +3725,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
 
     @Override
     public X509Certificate generateSelfSignedCA(
-            String name, String certprofileName, String subject,
+            String name, String certprofileName, byte[] p10Req,
             CAStatus status, long nextSerial,
             List<String> crl_uris, List<String> delta_crl_uris, List<String> ocsp_uris,
             CertValidity max_validity, String signer_type, String signer_conf,
@@ -3753,6 +3753,23 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
             return null;
         }
 
+        CertificationRequest p10Request;
+        if(p10Req == null)
+        {
+            System.err.println("p10Req is null");
+            return null;
+        } else
+        {
+            try
+            {
+                p10Request = CertificationRequest.getInstance(p10Req);
+            } catch (Exception e)
+            {
+                System.err.println("invalid p10Req");
+                return null;
+            }
+        }
+
         IdentifiedX509CertProfile certProfile = getIdentifiedCertProfile(certprofileName);
         if(certProfile == null)
         {
@@ -3774,7 +3791,7 @@ public class CAManagerImpl implements CAManager, CmpResponderManager
         try
         {
             result = X509SelfSignedCertBuilder.generateSelfSigned(securityFactory, signer_type, signer_conf,
-                    certProfile, subject, serialOfThisCert, ocsp_uris, crl_uris, delta_crl_uris);
+                    certProfile, p10Request, serialOfThisCert, ocsp_uris, crl_uris, delta_crl_uris);
         } catch (OperationException | ConfigurationException e)
         {
             throw new CAMgmtException(e.getClass().getName() + ": " + e.getMessage(), e);
