@@ -45,8 +45,6 @@ import java.util.List;
 import java.util.Set;
 
 import org.bouncycastle.util.encoders.Base64;
-import org.xipki.ca.api.CAMgmtException;
-import org.xipki.ca.api.CAStatus;
 import org.xipki.ca.api.profile.CertValidity;
 import org.xipki.common.CertRevocationInfo;
 import org.xipki.common.IoUtil;

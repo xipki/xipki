@@ -35,7 +35,7 @@
 
 package org.xipki.ca.server.impl.store;
 
-import org.xipki.ca.api.X509CertificateWithMetaInfo;
+import org.xipki.ca.api.X509CertWithId;
 
 /**
  * @author Lijun Liao
@@ -43,16 +43,16 @@ import org.xipki.ca.api.X509CertificateWithMetaInfo;
 
 public class X509CertWithRevokedInfo
 {
-    private final X509CertificateWithMetaInfo cert;
+    private final X509CertWithId cert;
     private final boolean revoked;
 
-    public X509CertWithRevokedInfo(X509CertificateWithMetaInfo cert, boolean revoked)
+    public X509CertWithRevokedInfo(X509CertWithId cert, boolean revoked)
     {
         this.cert = cert;
         this.revoked = revoked;
     }
 
-    public X509CertificateWithMetaInfo getCert()
+    public X509CertWithId getCert()
     {
         return cert;
     }

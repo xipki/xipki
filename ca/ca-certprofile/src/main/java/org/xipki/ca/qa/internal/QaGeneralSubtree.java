@@ -33,42 +33,70 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.ca.api.profile;
+package org.xipki.ca.qa.internal;
 
-import org.bouncycastle.asn1.ASN1Encodable;
-import org.bouncycastle.asn1.DERBMPString;
-import org.bouncycastle.asn1.DERPrintableString;
-import org.bouncycastle.asn1.DERT61String;
-import org.bouncycastle.asn1.DERUTF8String;
+import org.xipki.ca.certprofile.internal.x509.jaxb.GeneralSubtreeBaseType;
+import org.xipki.common.ParamChecker;
 
 /**
  * @author Lijun Liao
  */
 
-public enum DirectoryStringEnum
+public class QaGeneralSubtree
 {
-    teletexString,
-    printableString,
-    utf8String,
-    bmpString;
+    private final GeneralSubtreeBaseType jaxb;
 
-    public ASN1Encodable createDirectoryString(String text)
+    public QaGeneralSubtree(GeneralSubtreeBaseType jaxb)
     {
-        if(teletexString == this)
+        ParamChecker.assertNotNull("jaxb", jaxb);
+        Integer i = jaxb.getMinimum();
+        if(i != null && i < 0)
         {
-            return new DERT61String(text);
-        } else if(printableString == this)
-        {
-            return new DERPrintableString(text);
-        } else if(utf8String == this)
-        {
-            return new DERUTF8String(text);
-        } else if(bmpString == this)
-        {
-            return new DERBMPString(text);
-        } else
-        {
-            throw new RuntimeException("should not reach here");
+            throw new IllegalArgumentException("negative minimum is not allowed: " + i);
         }
+
+        i = jaxb.getMaximum();
+        if(i != null && i < 0)
+        {
+            throw new IllegalArgumentException("negative maximum is not allowed: " + i);
+        }
+
+        this.jaxb = jaxb;
     }
+
+    public String getRfc822Name()
+    {
+        return jaxb.getRfc822Name();
+    }
+
+    public String getDNSName()
+    {
+        return jaxb.getDNSName();
+    }
+
+    public String getDirectoryName()
+    {
+        return jaxb.getDirectoryName();
+    }
+
+    public String getUri()
+    {
+        return jaxb.getUri();
+    }
+
+    public String getIpAddress()
+    {
+        return jaxb.getIpAddress();
+    }
+
+    public Integer getMinimum()
+    {
+        return jaxb.getMinimum();
+    }
+
+    public Integer getMaximum()
+    {
+        return jaxb.getMaximum();
+    }
+
 }

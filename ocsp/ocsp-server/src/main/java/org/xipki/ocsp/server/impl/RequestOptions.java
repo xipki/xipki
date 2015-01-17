@@ -59,12 +59,12 @@ import org.bouncycastle.x509.ExtendedPKIXBuilderParameters;
 import org.xipki.common.HashAlgoType;
 import org.xipki.common.IoUtil;
 import org.xipki.common.SecurityUtil;
-import org.xipki.ocsp.conf.jaxb.CertCollectionType;
-import org.xipki.ocsp.conf.jaxb.CertCollectionType.Keystore;
-import org.xipki.ocsp.conf.jaxb.NonceType;
-import org.xipki.ocsp.conf.jaxb.RequestType;
-import org.xipki.ocsp.conf.jaxb.RequestType.CertpathValidation;
-import org.xipki.ocsp.conf.jaxb.RequestType.HashAlgorithms;
+import org.xipki.ocsp.server.impl.jaxb.CertCollectionType;
+import org.xipki.ocsp.server.impl.jaxb.CertCollectionType.Keystore;
+import org.xipki.ocsp.server.impl.jaxb.NonceType;
+import org.xipki.ocsp.server.impl.jaxb.RequestType;
+import org.xipki.ocsp.server.impl.jaxb.RequestType.CertpathValidation;
+import org.xipki.ocsp.server.impl.jaxb.RequestType.HashAlgorithms;
 
 /**
  * @author Lijun Liao

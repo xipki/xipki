@@ -33,41 +33,35 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.ca.qa.internal;
-
-import org.xipki.ca.certprofile.internal.x509.jaxb.CertificatePolicyInformationType;
-import org.xipki.common.ParamChecker;
+package org.xipki.ca.server.mgmt.api;
 
 /**
  * @author Lijun Liao
  */
 
-public class QaCertificatePolicyInformationConf
+public class CAMgmtException extends Exception
 {
-    private final String policyId;
-    private final QaPolicyQualifiersConf policyQualifiers;
 
-    public QaCertificatePolicyInformationConf(CertificatePolicyInformationType jaxb)
+    private static final long serialVersionUID = 1L;
+
+    public CAMgmtException()
     {
-        ParamChecker.assertNotNull("jaxb", jaxb);
-        this.policyId = jaxb.getPolicyIdentifier().getValue();
-        if(jaxb.getPolicyQualifiers() == null)
-        {
-            this.policyQualifiers = null;
-        }else
-        {
-            this.policyQualifiers = new QaPolicyQualifiersConf(jaxb.getPolicyQualifiers());
-        }
+        super();
     }
 
-    public String getPolicyId()
+    public CAMgmtException(String message, Throwable cause)
     {
-        return policyId;
+        super(message, cause);
     }
 
-    public QaPolicyQualifiersConf getPolicyQualifiers()
+    public CAMgmtException(String message)
     {
-        return policyQualifiers;
+        super(message);
+    }
+
+    public CAMgmtException(Throwable cause)
+    {
+        super(cause);
     }
 
 }

@@ -80,7 +80,7 @@ import org.xipki.ca.api.CertProfileException;
 import org.xipki.ca.api.EnvironmentParameterResolver;
 import org.xipki.ca.api.profile.CertValidity;
 import org.xipki.ca.api.profile.ExtensionControl;
-import org.xipki.ca.api.profile.ExtensionTuples;
+import org.xipki.ca.api.profile.ExtensionValues;
 import org.xipki.ca.api.profile.ExtensionValue;
 import org.xipki.ca.api.profile.GeneralNameMode;
 import org.xipki.ca.api.profile.SubjectInfo;
@@ -273,13 +273,13 @@ public class IdentifiedX509CertProfile
         return certProfile.getSubject(requestedSubject);
     }
 
-    public ExtensionTuples getExtensions(
+    public ExtensionValues getExtensions(
             X500Name requestedSubject, Extensions requestExtensions,
             SubjectPublicKeyInfo publicKeyInfo,
             PublicCAInfo publicCaInfo, CrlSigner crlSigner)
     throws CertProfileException, BadCertTemplateException
     {
-        ExtensionTuples tuples = new ExtensionTuples();
+        ExtensionValues tuples = new ExtensionValues();
 
         Map<ASN1ObjectIdentifier, ExtensionControl> controls = new HashMap<>(certProfile.getExtensionControls());
 
@@ -672,7 +672,7 @@ public class IdentifiedX509CertProfile
             }
         }
 
-        ExtensionTuples subtuples = certProfile.getExtensions(
+        ExtensionValues subtuples = certProfile.getExtensions(
                 Collections.unmodifiableMap(controls), requestedSubject, requestExtensions);
 
         Set<ASN1ObjectIdentifier> extTypes = new HashSet<>(controls.keySet());
@@ -724,7 +724,7 @@ public class IdentifiedX509CertProfile
         return tuples;
     }
 
-    private static void addExtension(ExtensionTuples tuples, ASN1ObjectIdentifier extType,
+    private static void addExtension(ExtensionValues tuples, ASN1ObjectIdentifier extType,
             ExtensionValue extValue, ExtensionControl extControl,
             Set<ASN1ObjectIdentifier> neededExtensionTypes, Set<ASN1ObjectIdentifier> wantedExtensionTypes)
     throws CertProfileException
@@ -748,7 +748,7 @@ public class IdentifiedX509CertProfile
         }
     }
 
-    private static void addExtension(ExtensionTuples tuples, ASN1ObjectIdentifier extType,
+    private static void addExtension(ExtensionValues tuples, ASN1ObjectIdentifier extType,
             ASN1Encodable extValue, ExtensionControl extControl,
             Set<ASN1ObjectIdentifier> neededExtensionTypes, Set<ASN1ObjectIdentifier> wantedExtensionTypes)
     throws CertProfileException

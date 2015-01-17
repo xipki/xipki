@@ -33,44 +33,41 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.ca.qa.internal;
-
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
-
-import org.xipki.ca.certprofile.internal.x509.jaxb.ExtensionsType.PolicyMappings;
-import org.xipki.ca.certprofile.internal.x509.jaxb.PolicyIdMappingType;
+package org.xipki.ca.server.mgmt.api;
 
 /**
  * @author Lijun Liao
  */
 
-public class QaPolicyMappingsConf extends QaExtensionConf
+public enum CAStatus
 {
-    private final Map<String, String> policyMappings;
+    PENDING("pending"),
+    ACTIVE ("active"),
+    INACTIVE ("inactive");
 
-    public QaPolicyMappingsConf(PolicyMappings jaxb)
+    private String status;
+
+    private CAStatus(String status)
     {
-        super(jaxb.getCondition());
+        this.status = status;
+    }
 
-        this.policyMappings = new HashMap<>();
-        for(PolicyIdMappingType type : jaxb.getMapping())
+    public String getStatus()
+    {
+        return status;
+    }
+
+    public static CAStatus getCAStatus(String status)
+    {
+        for(CAStatus value : values())
         {
-            String issuerDomainPolicy = type.getIssuerDomainPolicy().getValue();
-            String subjectDomainPolicy = type.getSubjectDomainPolicy().getValue();
-            policyMappings.put(issuerDomainPolicy, subjectDomainPolicy);
+            if(value.status.equalsIgnoreCase(status))
+            {
+                return value;
+            }
         }
-    }
 
-    public String getSubjectDomainPolicy(String issuerDomainPolicy)
-    {
-        return policyMappings.get(issuerDomainPolicy);
-    }
-
-    public Set<String> getIssuerDomainPolicies()
-    {
-        return policyMappings.keySet();
+        return null;
     }
 
 }

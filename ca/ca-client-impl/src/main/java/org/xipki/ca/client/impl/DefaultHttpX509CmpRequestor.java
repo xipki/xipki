@@ -52,14 +52,14 @@ import org.xipki.security.api.SecurityFactory;
  * @author Lijun Liao
  */
 
-class DefaultHttpCmpRequestor extends X509CmpRequestor
+class DefaultHttpX509CmpRequestor extends X509CmpRequestor
 {
     private static final String CMP_REQUEST_MIMETYPE = "application/pkixcmp";
     private static final String CMP_RESPONSE_MIMETYPE = "application/pkixcmp";
 
     private final URL serverUrl;
 
-    DefaultHttpCmpRequestor(X509Certificate requestorCert,
+    DefaultHttpX509CmpRequestor(X509Certificate requestorCert,
             X509Certificate responderCert,
             String serverUrl,
             SecurityFactory securityFactory)
@@ -76,7 +76,7 @@ class DefaultHttpCmpRequestor extends X509CmpRequestor
         }
     }
 
-    DefaultHttpCmpRequestor(ConcurrentContentSigner requestor,
+    DefaultHttpX509CmpRequestor(ConcurrentContentSigner requestor,
             X509Certificate responderCert,
             String serverUrl,
             SecurityFactory securityFactory,

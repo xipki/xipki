@@ -46,12 +46,12 @@ import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.ca.api.CAMgmtException;
-import org.xipki.ca.api.CAStatus;
-import org.xipki.ca.api.CASystemStatus;
-import org.xipki.ca.api.CmpControl;
 import org.xipki.ca.api.profile.CertValidity;
 import org.xipki.ca.mgmt.hessian.common.HessianCAManager;
+import org.xipki.ca.server.mgmt.api.CAMgmtException;
+import org.xipki.ca.server.mgmt.api.CAStatus;
+import org.xipki.ca.server.mgmt.api.CASystemStatus;
+import org.xipki.ca.server.mgmt.api.CmpControl;
 import org.xipki.ca.server.mgmt.api.X509CAEntry;
 import org.xipki.ca.server.mgmt.api.CAHasRequestorEntry;
 import org.xipki.ca.server.mgmt.api.CAManager;

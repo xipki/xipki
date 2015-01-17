@@ -54,7 +54,7 @@ import org.bouncycastle.asn1.x509.Certificate;
 import org.bouncycastle.util.encoders.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.ca.api.X509CertificateWithMetaInfo;
+import org.xipki.ca.api.X509CertWithId;
 import org.xipki.common.CertRevocationInfo;
 import org.xipki.common.HashAlgoType;
 import org.xipki.common.HashCalculator;
@@ -117,16 +117,16 @@ class OCSPStoreQueryExecutor
      * @throws NoSuchAlgorithmException
      * @throws CertificateEncodingException
      */
-    void addCert(X509CertificateWithMetaInfo issuer,
-            X509CertificateWithMetaInfo certificate,
+    void addCert(X509CertWithId issuer,
+            X509CertWithId certificate,
             String certProfile)
     throws SQLException, CertificateEncodingException
     {
         addCert(issuer, certificate, certProfile, null);
     }
 
-    void addCert(X509CertificateWithMetaInfo issuer,
-            X509CertificateWithMetaInfo certificate,
+    void addCert(X509CertWithId issuer,
+            X509CertWithId certificate,
             String certProfile,
             CertRevocationInfo revInfo)
     throws SQLException, CertificateEncodingException
@@ -134,8 +134,8 @@ class OCSPStoreQueryExecutor
         addOrUpdateCert(issuer, certificate, certProfile, revInfo);
     }
 
-    private void addOrUpdateCert(X509CertificateWithMetaInfo issuer,
-            X509CertificateWithMetaInfo certificate,
+    private void addOrUpdateCert(X509CertWithId issuer,
+            X509CertWithId certificate,
             String certProfile,
             CertRevocationInfo revInfo)
     throws SQLException, CertificateEncodingException
@@ -310,8 +310,8 @@ class OCSPStoreQueryExecutor
         }
     }
 
-    void revokeCert(X509CertificateWithMetaInfo caCert,
-            X509CertificateWithMetaInfo cert,
+    void revokeCert(X509CertWithId caCert,
+            X509CertWithId cert,
             String certProfile,
             CertRevocationInfo revInfo)
     throws SQLException, CertificateEncodingException
@@ -319,8 +319,8 @@ class OCSPStoreQueryExecutor
         addOrUpdateCert(caCert, cert, certProfile, revInfo);
     }
 
-    void unrevokeCert(X509CertificateWithMetaInfo issuer,
-            X509CertificateWithMetaInfo cert)
+    void unrevokeCert(X509CertWithId issuer,
+            X509CertWithId cert)
     throws SQLException
     {
         Integer issuerId =  issuerStore.getIdForCert(issuer.getEncodedCert());
@@ -379,8 +379,8 @@ class OCSPStoreQueryExecutor
 
     }
 
-    void removeCert(X509CertificateWithMetaInfo issuer,
-            X509CertificateWithMetaInfo cert)
+    void removeCert(X509CertWithId issuer,
+            X509CertWithId cert)
     throws SQLException
     {
         Integer issuerId =  issuerStore.getIdForCert(issuer.getEncodedCert());
@@ -404,7 +404,7 @@ class OCSPStoreQueryExecutor
         }
     }
 
-    void revokeCa(X509CertificateWithMetaInfo caCert, CertRevocationInfo revocationInfo)
+    void revokeCa(X509CertWithId caCert, CertRevocationInfo revocationInfo)
     throws SQLException, CertificateEncodingException
     {
         Date revocationTime = revocationInfo.getRevocationTime();
@@ -433,7 +433,7 @@ class OCSPStoreQueryExecutor
         }
     }
 
-    void unrevokeCa(X509CertificateWithMetaInfo caCert)
+    void unrevokeCa(X509CertWithId caCert)
     throws SQLException, CertificateEncodingException
     {
         int issuerId = getIssuerId(caCert);
@@ -455,7 +455,7 @@ class OCSPStoreQueryExecutor
         }
     }
 
-    private int getIssuerId(X509CertificateWithMetaInfo issuerCert)
+    private int getIssuerId(X509CertWithId issuerCert)
     throws SQLException, CertificateEncodingException
     {
         Integer id = issuerStore.getIdForCert(issuerCert.getEncodedCert());
@@ -467,7 +467,7 @@ class OCSPStoreQueryExecutor
         return id.intValue();
     }
 
-    void addIssuer(X509CertificateWithMetaInfo issuerCert)
+    void addIssuer(X509CertWithId issuerCert)
     throws CertificateEncodingException, SQLException
     {
         if(issuerStore.getIdForCert(issuerCert.getEncodedCert()) != null)

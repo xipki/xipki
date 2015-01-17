@@ -42,11 +42,11 @@ import org.xipki.common.ParamChecker;
  * @author Lijun Liao
  */
 
-public class QaConstantExtensionConf extends QaExtensionConf
+public class QaConstantExtensionOption extends QaExtensionOption
 {
     private final QaExtensionValue extensionValue;
 
-    public QaConstantExtensionConf(ConditionType conditionType, QaExtensionValue extensionValue)
+    public QaConstantExtensionOption(ConditionType conditionType, QaExtensionValue extensionValue)
     {
         super(conditionType);
 

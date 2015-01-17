@@ -33,7 +33,7 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.ca.api;
+package org.xipki.ca.server.mgmt.api;
 
 import java.io.Serializable;
 

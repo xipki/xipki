@@ -33,52 +33,27 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.ca.server.impl;
+package org.xipki.ca.qa.internal;
 
-import java.io.InputStream;
-import java.util.jar.Manifest;
+import org.xipki.ca.certprofile.internal.Condition;
+import org.xipki.ca.certprofile.internal.x509.jaxb.ConditionType;
 
 /**
  * @author Lijun Liao
  */
 
-final public class Version
+public abstract class QaExtensionOption
 {
-    public static String PRODUCT_NAME = "XiPKI";
+    private final Condition condition;
 
-    public static void main(String []argv)
+    public QaExtensionOption(ConditionType conditionConf)
     {
-        System.out.println(getVersion());
+        this.condition = conditionConf == null ? null : new Condition(conditionConf);
     }
 
-    /**
-     * @return the Maven Version, SVN Revision and Build timestamp as a human-readable String.
-     */
-    public static String getVersion()
+    public Condition getCondition()
     {
-        StringBuilder version = new StringBuilder();
-
-        try
-        {
-            InputStream is = Version.class.getResourceAsStream("/MANIFEST.MF");
-            java.util.jar.Manifest   man    = new Manifest(is);
-            java.util.jar.Attributes jattr  = man.getMainAttributes();
-            // Copyright
-            // Maven Version, SVN Revision, Build timestamp
-            version.append(jattr.getValue("Implementation-Copyright")).append("\n");
-            version.append("Version: ");
-            version.append(jattr.getValue("Implementation-Version")).append(" ");
-            version.append("Revision: ");
-            version.append(jattr.getValue("Implementation-Build")).append(" ");
-            version.append("Build at: ");
-            version.append(jattr.getValue("Implementation-Build-Timestamp")).append(" ");
-        }
-        catch (Exception e)
-        {
-            return PRODUCT_NAME;
-        }
-        return version.toString();
+        return condition;
     }
 
 }
-

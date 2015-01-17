@@ -33,38 +33,28 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.ca.api;
+package org.xipki.ca.qa.internal;
+
+import org.xipki.ca.certprofile.internal.x509.jaxb.ExtensionsType.InhibitAnyPolicy;
 
 /**
  * @author Lijun Liao
  */
 
-public enum CertArt
+public class QaInhibitAnyPolicyOption extends QaExtensionOption
 {
-    X509PKC(1),
-    X509AC(2),
-    CVC(3);
+    private final int skipCerts;
 
-    private final int code;
-    private CertArt(int code)
+    public QaInhibitAnyPolicyOption(InhibitAnyPolicy jaxb)
     {
-        this.code = code;
+        super(jaxb.getCondition());
+
+        this.skipCerts = jaxb.getSkipCerts();
     }
 
-    public int getCode()
+    public int getSkipCerts()
     {
-        return code;
+        return skipCerts;
     }
 
-    public static CertArt getInstance(int code)
-    {
-        for(CertArt value : values())
-        {
-            if(value.code == code)
-            {
-                return value;
-            }
-        }
-        throw new IllegalArgumentException("invalid code " + code);
-    }
 }

@@ -33,18 +33,42 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.ca.api;
+package org.xipki.ca.api.profile;
+
+import org.bouncycastle.asn1.ASN1Encodable;
+import org.bouncycastle.asn1.DERBMPString;
+import org.bouncycastle.asn1.DERPrintableString;
+import org.bouncycastle.asn1.DERT61String;
+import org.bouncycastle.asn1.DERUTF8String;
 
 /**
  * @author Lijun Liao
  */
 
-public enum CASystemStatus
+public enum DirectoryStringType
 {
-    STARTED_AS_MASTER,
-    STARTED_AS_SLAVE,
-    NOT_INITED,
-    INITIALIZING,
-    LOCK_FAILED,
-    ERROR;
+    teletexString,
+    printableString,
+    utf8String,
+    bmpString;
+
+    public ASN1Encodable createDirectoryString(String text)
+    {
+        if(teletexString == this)
+        {
+            return new DERT61String(text);
+        } else if(printableString == this)
+        {
+            return new DERPrintableString(text);
+        } else if(utf8String == this)
+        {
+            return new DERUTF8String(text);
+        } else if(bmpString == this)
+        {
+            return new DERBMPString(text);
+        } else
+        {
+            throw new RuntimeException("should not reach here");
+        }
+    }
 }

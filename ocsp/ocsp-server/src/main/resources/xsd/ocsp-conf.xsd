@@ -3,7 +3,7 @@
   <xs:annotation>
     <xs:appinfo>
       <jxb:schemaBindings>
-        <jxb:package name="org.xipki.ocsp.conf.jaxb"/>
+        <jxb:package name="org.xipki.ocsp.server.impl.jaxb"/>
       </jxb:schemaBindings>
     </xs:appinfo>
   </xs:annotation>

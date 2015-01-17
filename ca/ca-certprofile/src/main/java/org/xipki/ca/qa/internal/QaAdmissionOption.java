@@ -39,50 +39,70 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
-import javax.xml.bind.JAXBElement;
-
-import org.xipki.ca.certprofile.internal.x509.jaxb.CertificatePolicyInformationType.PolicyQualifiers;
-import org.xipki.common.ParamChecker;
+import org.bouncycastle.util.Arrays;
+import org.xipki.ca.certprofile.internal.x509.jaxb.ExtensionsType.Admission;
+import org.xipki.ca.certprofile.internal.x509.jaxb.OidWithDescType;
 
 /**
  * @author Lijun Liao
  */
 
-public class QaPolicyQualifiersConf
+public class QaAdmissionOption extends QaExtensionOption
 {
-    private final List<QaPolicyQualifierInfoConf> policyQualifiers;
-    public QaPolicyQualifiersConf(PolicyQualifiers jaxb)
+    private final String registrationNumber;
+    private final byte[] addProfessionInfo;
+    private final List<String> professionOIDs;
+    private final List<String> professionItems;
+
+    public QaAdmissionOption(Admission jaxb)
     {
-        ParamChecker.assertNotNull("jaxb", jaxb);
+        super(jaxb.getCondition());
 
-        List<QaPolicyQualifierInfoConf> list = new LinkedList<>();
+        this.registrationNumber = jaxb.getRegistrationNumber();
+        this.addProfessionInfo = jaxb.getAddProfessionInfo();
 
-        List<JAXBElement<String>> elements = jaxb.getCpsUriOrUserNotice();
-        for(JAXBElement<String> element : elements)
+        List<String> items = jaxb.getProfessionItem();
+        if(items.isEmpty())
         {
-            String value = element.getValue();
-            String localPart = element.getName().getLocalPart();
-
-            QaPolicyQualifierInfoConf info;
-            if("cpsUri".equals(localPart))
-            {
-                info = new QaCPSUriPolicyQualifierInfo(value);
-            } else if("userNotice".equals(localPart))
-            {
-                info = new QaUserNoticePolicyQualifierInfo(value);
-            } else
-            {
-                throw new RuntimeException("should not reach here");
-            }
-            list.add(info);
+            professionItems = null;
+        } else
+        {
+            professionItems = Collections.unmodifiableList(items);
         }
 
-        this.policyQualifiers = Collections.unmodifiableList(list);
+        List<OidWithDescType> oids = jaxb.getProfessionOid();
+        if(oids == null)
+        {
+            this.professionOIDs = null;
+        } else
+        {
+            List<String> list = new LinkedList<>();
+            for(OidWithDescType oid : oids)
+            {
+                list.add(oid.getValue());
+            }
+            this.professionOIDs = Collections.unmodifiableList(list);
+        }
     }
 
-    public List<QaPolicyQualifierInfoConf> getPolicyQualifiers()
+    public String getRegistrationNumber()
     {
-        return policyQualifiers;
+        return registrationNumber;
+    }
+
+    public byte[] getAddProfessionInfo()
+    {
+        return Arrays.clone(addProfessionInfo);
+    }
+
+    public List<String> getProfessionOIDs()
+    {
+        return professionOIDs;
+    }
+
+    public List<String> getProfessionItems()
+    {
+        return professionItems;
     }
 
 }

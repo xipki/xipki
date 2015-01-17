@@ -33,67 +33,58 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.ca.api.profile;
+package org.xipki.ca.qa.internal;
 
 import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.LinkedList;
+import java.util.List;
 
-import org.bouncycastle.asn1.ASN1Encodable;
-import org.bouncycastle.asn1.ASN1ObjectIdentifier;
+import javax.xml.bind.JAXBElement;
+
+import org.xipki.ca.certprofile.internal.x509.jaxb.CertificatePolicyInformationType.PolicyQualifiers;
+import org.xipki.ca.qa.internal.QaPolicyQualifierInfo.QaCPSUriPolicyQualifier;
+import org.xipki.ca.qa.internal.QaPolicyQualifierInfo.QaUserNoticePolicyQualifierInfo;
 import org.xipki.common.ParamChecker;
 
 /**
  * @author Lijun Liao
  */
 
-public class ExtensionTuples
+public class QaPolicyQualifiersOption
 {
-    private final Map<ASN1ObjectIdentifier, ExtensionValue> extensions = new HashMap<>();
-
-    public boolean addExtension(ASN1ObjectIdentifier type, boolean critical, ASN1Encodable value)
+    private final List<QaPolicyQualifierInfo> policyQualifiers;
+    public QaPolicyQualifiersOption(PolicyQualifiers jaxb)
     {
-        ParamChecker.assertNotNull("type", type);
-        ParamChecker.assertNotNull("value", value);
-        if(extensions.containsKey(type))
+        ParamChecker.assertNotNull("jaxb", jaxb);
+
+        List<QaPolicyQualifierInfo> list = new LinkedList<>();
+
+        List<JAXBElement<String>> elements = jaxb.getCpsUriOrUserNotice();
+        for(JAXBElement<String> element : elements)
         {
-            return false;
+            String value = element.getValue();
+            String localPart = element.getName().getLocalPart();
+
+            QaPolicyQualifierInfo info;
+            if("cpsUri".equals(localPart))
+            {
+                info = new QaCPSUriPolicyQualifier(value);
+            } else if("userNotice".equals(localPart))
+            {
+                info = new QaUserNoticePolicyQualifierInfo(value);
+            } else
+            {
+                throw new RuntimeException("should not reach here");
+            }
+            list.add(info);
         }
-        extensions.put(type, new ExtensionValue(critical, value));
-        return true;
+
+        this.policyQualifiers = Collections.unmodifiableList(list);
     }
 
-    public boolean addExtension(ASN1ObjectIdentifier type, ExtensionValue value)
+    public List<QaPolicyQualifierInfo> getPolicyQualifiers()
     {
-        ParamChecker.assertNotNull("type", type);
-        ParamChecker.assertNotNull("value", value);
-        if(extensions.containsKey(type))
-        {
-            return false;
-        }
-        extensions.put(type, value);
-        return true;
-    }
-
-    public Set<ASN1ObjectIdentifier> getExtensionTypes()
-    {
-        return Collections.unmodifiableSet(extensions.keySet());
-    }
-
-    public ExtensionValue getExtensionValue(ASN1ObjectIdentifier type)
-    {
-        return extensions.get(type);
-    }
-
-    public boolean removeExtensionTuple(ASN1ObjectIdentifier type)
-    {
-        return extensions.remove(type) != null;
-    }
-
-    public boolean containsExtension(ASN1ObjectIdentifier type)
-    {
-        return extensions.containsKey(type);
+        return policyQualifiers;
     }
 
 }

@@ -47,17 +47,17 @@ import org.xipki.common.ParamChecker;
 
 public class QaExtensionOptions
 {
-    private final List<? extends QaExtensionConf> options;
+    private final List<? extends QaExtensionOption> options;
 
-    public QaExtensionOptions(List<? extends QaExtensionConf> options)
+    public QaExtensionOptions(List<? extends QaExtensionOption> options)
     {
         ParamChecker.assertNotEmpty("options", options);
         this.options = options;
     }
 
-    public QaExtensionConf getExtensionConf(EnvironmentParameterResolver pr)
+    public QaExtensionOption getExtensionConf(EnvironmentParameterResolver pr)
     {
-        for(QaExtensionConf o : options)
+        for(QaExtensionOption o : options)
         {
             Condition c = o.getCondition();
             if(c == null || c.satisfy(pr))

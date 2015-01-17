@@ -33,41 +33,47 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.ca.api;
+package org.xipki.ca.server.mgmt.api;
+
+import org.xipki.ca.api.RequestorInfo;
+import org.xipki.ca.api.X509CertWithId;
+import org.xipki.common.ParamChecker;
 
 /**
  * @author Lijun Liao
  */
 
-public enum CAStatus
+public class CertBasedRequestorInfo implements RequestorInfo
 {
-    PENDING("pending"),
-    ACTIVE ("active"),
-    INACTIVE ("inactive");
+    private final String name;
+    private final X509CertWithId certificate;
+    private final boolean ra;
 
-    private String status;
-
-    private CAStatus(String status)
+    public CertBasedRequestorInfo(String name, X509CertWithId certificate, boolean ra)
     {
-        this.status = status;
+        ParamChecker.assertNotEmpty("name", name);
+        ParamChecker.assertNotNull("certificate", certificate);
+
+        this.name = name;
+        this.certificate = certificate;
+        this.ra = ra;
     }
 
-    public String getStatus()
+    public X509CertWithId getCertificate()
     {
-        return status;
+        return certificate;
     }
 
-    public static CAStatus getCAStatus(String status)
+    @Override
+    public boolean isRA()
     {
-        for(CAStatus value : values())
-        {
-            if(value.status.equalsIgnoreCase(status))
-            {
-                return value;
-            }
-        }
+        return ra;
+    }
 
-        return null;
+    @Override
+    public String getName()
+    {
+        return name;
     }
 
 }

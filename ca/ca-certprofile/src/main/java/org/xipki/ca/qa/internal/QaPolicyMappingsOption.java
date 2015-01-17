@@ -35,24 +35,42 @@
 
 package org.xipki.ca.qa.internal;
 
-import org.xipki.common.ParamChecker;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+
+import org.xipki.ca.certprofile.internal.x509.jaxb.ExtensionsType.PolicyMappings;
+import org.xipki.ca.certprofile.internal.x509.jaxb.PolicyIdMappingType;
 
 /**
  * @author Lijun Liao
  */
 
-public class QaUserNoticePolicyQualifierInfo extends QaPolicyQualifierInfoConf
+public class QaPolicyMappingsOption extends QaExtensionOption
 {
-    private final String userNotice;
+    private final Map<String, String> policyMappings;
 
-    public QaUserNoticePolicyQualifierInfo(String userNotice)
+    public QaPolicyMappingsOption(PolicyMappings jaxb)
     {
-        ParamChecker.assertNotEmpty("userNotice", userNotice);
-        this.userNotice = userNotice;
+        super(jaxb.getCondition());
+
+        this.policyMappings = new HashMap<>();
+        for(PolicyIdMappingType type : jaxb.getMapping())
+        {
+            String issuerDomainPolicy = type.getIssuerDomainPolicy().getValue();
+            String subjectDomainPolicy = type.getSubjectDomainPolicy().getValue();
+            policyMappings.put(issuerDomainPolicy, subjectDomainPolicy);
+        }
     }
 
-    public String getUserNotice()
+    public String getSubjectDomainPolicy(String issuerDomainPolicy)
     {
-        return userNotice;
+        return policyMappings.get(issuerDomainPolicy);
     }
+
+    public Set<String> getIssuerDomainPolicies()
+    {
+        return policyMappings.keySet();
+    }
+
 }

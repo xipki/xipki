@@ -74,7 +74,7 @@ import org.xipki.ca.api.CertProfileException;
 import org.xipki.ca.api.OperationException;
 import org.xipki.ca.api.OperationException.ErrorCode;
 import org.xipki.ca.api.profile.CertValidity;
-import org.xipki.ca.api.profile.ExtensionTuples;
+import org.xipki.ca.api.profile.ExtensionValues;
 import org.xipki.ca.api.profile.ExtensionValue;
 import org.xipki.ca.api.profile.SubjectInfo;
 import org.xipki.ca.server.impl.IdentifiedX509CertProfile;
@@ -300,7 +300,7 @@ class X509SelfSignedCertBuilder
             PublicCAInfo publicCaInfo)
     throws CertProfileException, IOException, BadCertTemplateException, NoSuchAlgorithmException
     {
-        ExtensionTuples extensionTuples = profile.getExtensions(requestedSubject, extensions, requestedPublicKeyInfo,
+        ExtensionValues extensionTuples = profile.getExtensions(requestedSubject, extensions, requestedPublicKeyInfo,
                 publicCaInfo, null);
         if(extensionTuples != null)
         {
@@ -312,8 +312,7 @@ class X509SelfSignedCertBuilder
         }
     }
 
-    public static AsymmetricKeyParameter generatePublicKeyParameter(
-            PublicKey key)
+    public static AsymmetricKeyParameter generatePublicKeyParameter(PublicKey key)
     throws InvalidKeyException
     {
         if (key instanceof RSAPublicKey)

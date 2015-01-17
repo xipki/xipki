@@ -35,10 +35,44 @@
 
 package org.xipki.ca.qa.internal;
 
+import org.xipki.common.ParamChecker;
+
 /**
  * @author Lijun Liao
  */
 
-public abstract class QaPolicyQualifierInfoConf
+public abstract class QaPolicyQualifierInfo
 {
+
+    public static class QaCPSUriPolicyQualifier extends QaPolicyQualifierInfo
+    {
+        private final String cPSUri;
+
+        public QaCPSUriPolicyQualifier(String cPSUri)
+        {
+            ParamChecker.assertNotEmpty("cPSUri", cPSUri);
+            this.cPSUri = cPSUri;
+        }
+
+        public String getCPSUri()
+        {
+            return cPSUri;
+        }
+    }
+
+    public static class QaUserNoticePolicyQualifierInfo extends QaPolicyQualifierInfo
+    {
+        private final String userNotice;
+
+        public QaUserNoticePolicyQualifierInfo(String userNotice)
+        {
+            ParamChecker.assertNotEmpty("userNotice", userNotice);
+            this.userNotice = userNotice;
+        }
+
+        public String getUserNotice()
+        {
+            return userNotice;
+        }
+    }
 }
