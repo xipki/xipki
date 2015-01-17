@@ -399,12 +399,12 @@ public final class RAWorkerImpl extends AbstractRAWorker implements RAWorker
             X509CmpRequestor cmpRequestor;
             if(requestorSigners.containsKey(requestorName))
             {
-                cmpRequestor = new DefaultHttpCmpRequestor(
+                cmpRequestor = new DefaultHttpX509CmpRequestor(
                         requestorSigners.get(requestorName), ca.getResponder(), ca.getUrl(),
                         securityFactory, requestorSignRequests.get(requestorName));
             } else if(requestorCerts.containsKey(requestorName))
             {
-                cmpRequestor = new DefaultHttpCmpRequestor(
+                cmpRequestor = new DefaultHttpX509CmpRequestor(
                         requestorCerts.get(requestorName), ca.getResponder(), ca.getUrl(),
                         securityFactory);
             }

@@ -69,9 +69,9 @@ import org.slf4j.LoggerFactory;
 import org.xipki.ca.api.BadCertTemplateException;
 import org.xipki.ca.api.CertProfileException;
 import org.xipki.ca.api.profile.CertValidity;
-import org.xipki.ca.api.profile.DirectoryStringEnum;
+import org.xipki.ca.api.profile.DirectoryStringType;
 import org.xipki.ca.api.profile.ExtensionControl;
-import org.xipki.ca.api.profile.ExtensionTuples;
+import org.xipki.ca.api.profile.ExtensionValues;
 import org.xipki.ca.api.profile.ExtensionValue;
 import org.xipki.ca.api.profile.GeneralNameMode;
 import org.xipki.ca.api.profile.KeyParametersOption;
@@ -275,22 +275,22 @@ public class XmlX509CertProfile extends BaseX509CertProfile
 
                 for(RdnType t : subject.getRdn())
                 {
-                    DirectoryStringEnum directoryStringEnum = null;
+                    DirectoryStringType directoryStringEnum = null;
                     if(t.getDirectoryStringType() != null)
                     {
                         switch(t.getDirectoryStringType())
                         {
                             case BMP_STRING:
-                                directoryStringEnum = DirectoryStringEnum.bmpString;
+                                directoryStringEnum = DirectoryStringType.bmpString;
                                 break;
                             case PRINTABLE_STRING:
-                                directoryStringEnum = DirectoryStringEnum.printableString;
+                                directoryStringEnum = DirectoryStringType.printableString;
                                 break;
                             case TELETEX_STRING:
-                                directoryStringEnum = DirectoryStringEnum.teletexString;
+                                directoryStringEnum = DirectoryStringType.teletexString;
                                 break;
                             case UTF_8_STRING:
-                                directoryStringEnum = DirectoryStringEnum.utf8String;
+                                directoryStringEnum = DirectoryStringType.utf8String;
                                 break;
                             default:
                                 throw new RuntimeException("should not reach here");
@@ -718,12 +718,12 @@ public class XmlX509CertProfile extends BaseX509CertProfile
     }
 
     @Override
-    public ExtensionTuples getExtensions(
+    public ExtensionValues getExtensions(
             Map<ASN1ObjectIdentifier, ExtensionControl> extensionOccurences,
             X500Name requestedSubject, Extensions requestedExtensions)
     throws CertProfileException, BadCertTemplateException
     {
-        ExtensionTuples tuples = new ExtensionTuples();
+        ExtensionValues tuples = new ExtensionValues();
         if(extensionOccurences == null || extensionOccurences.isEmpty())
         {
             return tuples;

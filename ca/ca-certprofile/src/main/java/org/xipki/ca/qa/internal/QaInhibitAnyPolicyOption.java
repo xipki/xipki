@@ -35,24 +35,26 @@
 
 package org.xipki.ca.qa.internal;
 
-import org.xipki.common.ParamChecker;
+import org.xipki.ca.certprofile.internal.x509.jaxb.ExtensionsType.InhibitAnyPolicy;
 
 /**
  * @author Lijun Liao
  */
 
-public class QaUserNoticePolicyQualifierInfo extends QaPolicyQualifierInfoConf
+public class QaInhibitAnyPolicyOption extends QaExtensionOption
 {
-    private final String userNotice;
+    private final int skipCerts;
 
-    public QaUserNoticePolicyQualifierInfo(String userNotice)
+    public QaInhibitAnyPolicyOption(InhibitAnyPolicy jaxb)
     {
-        ParamChecker.assertNotEmpty("userNotice", userNotice);
-        this.userNotice = userNotice;
+        super(jaxb.getCondition());
+
+        this.skipCerts = jaxb.getSkipCerts();
     }
 
-    public String getUserNotice()
+    public int getSkipCerts()
     {
-        return userNotice;
+        return skipCerts;
     }
+
 }

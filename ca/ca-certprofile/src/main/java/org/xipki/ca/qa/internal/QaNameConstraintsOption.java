@@ -39,70 +39,64 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.bouncycastle.util.Arrays;
-import org.xipki.ca.certprofile.internal.x509.jaxb.ExtensionsType.Admission;
-import org.xipki.ca.certprofile.internal.x509.jaxb.OidWithDescType;
+import org.xipki.ca.certprofile.internal.x509.jaxb.ExtensionsType.NameConstraints;
+import org.xipki.ca.certprofile.internal.x509.jaxb.GeneralSubtreeBaseType;
 
 /**
  * @author Lijun Liao
  */
 
-public class QaAdmissionConf extends QaExtensionConf
+public class QaNameConstraintsOption extends QaExtensionOption
 {
-    private final String registrationNumber;
-    private final byte[] addProfessionInfo;
-    private final List<String> professionOIDs;
-    private final List<String> professionItems;
+    private final List<QaGeneralSubtree> permittedSubtrees;
+    private final List<QaGeneralSubtree> excludedSubtrees;
 
-    public QaAdmissionConf(Admission jaxb)
+    public QaNameConstraintsOption(NameConstraints jaxb)
     {
         super(jaxb.getCondition());
 
-        this.registrationNumber = jaxb.getRegistrationNumber();
-        this.addProfessionInfo = jaxb.getAddProfessionInfo();
-
-        List<String> items = jaxb.getProfessionItem();
-        if(items.isEmpty())
+        if(jaxb.getPermittedSubtrees() != null && jaxb.getPermittedSubtrees().getBase().isEmpty() == false)
         {
-            professionItems = null;
-        } else
-        {
-            professionItems = Collections.unmodifiableList(items);
-        }
-
-        List<OidWithDescType> oids = jaxb.getProfessionOid();
-        if(oids == null)
-        {
-            this.professionOIDs = null;
-        } else
-        {
-            List<String> list = new LinkedList<>();
-            for(OidWithDescType oid : oids)
+            List<QaGeneralSubtree> list = new LinkedList<>();
+            List<GeneralSubtreeBaseType> bases =  jaxb.getPermittedSubtrees().getBase();
+            for(GeneralSubtreeBaseType base : bases)
             {
-                list.add(oid.getValue());
+                list.add(new QaGeneralSubtree(base));
             }
-            this.professionOIDs = Collections.unmodifiableList(list);
+            this.permittedSubtrees = Collections.unmodifiableList(list);
+        } else
+        {
+            permittedSubtrees = null;
+        }
+
+        if(jaxb.getExcludedSubtrees() != null && jaxb.getExcludedSubtrees().getBase().isEmpty() == false)
+        {
+            List<QaGeneralSubtree> list = new LinkedList<>();
+            List<GeneralSubtreeBaseType> bases =  jaxb.getExcludedSubtrees().getBase();
+            for(GeneralSubtreeBaseType base : bases)
+            {
+                list.add(new QaGeneralSubtree(base));
+            }
+            this.excludedSubtrees = Collections.unmodifiableList(list);
+        } else
+        {
+            excludedSubtrees = null;
+        }
+
+        if(permittedSubtrees == null && excludedSubtrees == null)
+        {
+            throw new IllegalArgumentException("At least one of permittedSubtrees and excludesSubtrees should be non-null");
         }
     }
 
-    public String getRegistrationNumber()
+    public List<QaGeneralSubtree> getPermittedSubtrees()
     {
-        return registrationNumber;
+        return permittedSubtrees;
     }
 
-    public byte[] getAddProfessionInfo()
+    public List<QaGeneralSubtree> getExcludedSubtrees()
     {
-        return Arrays.clone(addProfessionInfo);
-    }
-
-    public List<String> getProfessionOIDs()
-    {
-        return professionOIDs;
-    }
-
-    public List<String> getProfessionItems()
-    {
-        return professionItems;
+        return excludedSubtrees;
     }
 
 }

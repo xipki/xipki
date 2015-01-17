@@ -35,38 +35,42 @@
 
 package org.xipki.ca.qa.internal;
 
-import org.xipki.ca.certprofile.internal.x509.jaxb.ExtensionsType.PolicyConstraints;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+
+import org.xipki.ca.certprofile.internal.x509.jaxb.ExtensionsType.PolicyMappings;
+import org.xipki.ca.certprofile.internal.x509.jaxb.PolicyIdMappingType;
 
 /**
  * @author Lijun Liao
  */
 
-public class QaPolicyConstraintsConf extends QaExtensionConf
+public class QaPolicyMappingsOption extends QaExtensionOption
 {
-    private final Integer requireExplicitPolicy;
-    private final Integer inhibitPolicyMapping;
+    private final Map<String, String> policyMappings;
 
-    public QaPolicyConstraintsConf(PolicyConstraints jaxb)
+    public QaPolicyMappingsOption(PolicyMappings jaxb)
     {
         super(jaxb.getCondition());
 
-        if(jaxb.getRequireExplicitPolicy() == null && jaxb.getInhibitPolicyMapping() == null)
+        this.policyMappings = new HashMap<>();
+        for(PolicyIdMappingType type : jaxb.getMapping())
         {
-            throw new IllegalArgumentException("at least one of requireExplicitPolicy and inhibitPolicyMapping must be set");
+            String issuerDomainPolicy = type.getIssuerDomainPolicy().getValue();
+            String subjectDomainPolicy = type.getSubjectDomainPolicy().getValue();
+            policyMappings.put(issuerDomainPolicy, subjectDomainPolicy);
         }
-
-        this.requireExplicitPolicy = jaxb.getRequireExplicitPolicy();
-        this.inhibitPolicyMapping = jaxb.getInhibitPolicyMapping();
     }
 
-    public Integer getRequireExplicitPolicy()
+    public String getSubjectDomainPolicy(String issuerDomainPolicy)
     {
-        return requireExplicitPolicy;
+        return policyMappings.get(issuerDomainPolicy);
     }
 
-    public Integer getInhibitPolicyMapping()
+    public Set<String> getIssuerDomainPolicies()
     {
-        return inhibitPolicyMapping;
+        return policyMappings.keySet();
     }
 
 }

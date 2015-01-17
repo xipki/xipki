@@ -35,26 +35,68 @@
 
 package org.xipki.ca.qa.internal;
 
-import org.xipki.ca.certprofile.internal.x509.jaxb.ExtensionsType.InhibitAnyPolicy;
+import org.xipki.ca.certprofile.internal.x509.jaxb.GeneralSubtreeBaseType;
+import org.xipki.common.ParamChecker;
 
 /**
  * @author Lijun Liao
  */
 
-public class QaInhibitAnyPolicyConf extends QaExtensionConf
+public class QaGeneralSubtree
 {
-    private final int skipCerts;
+    private final GeneralSubtreeBaseType jaxb;
 
-    public QaInhibitAnyPolicyConf(InhibitAnyPolicy jaxb)
+    public QaGeneralSubtree(GeneralSubtreeBaseType jaxb)
     {
-        super(jaxb.getCondition());
+        ParamChecker.assertNotNull("jaxb", jaxb);
+        Integer i = jaxb.getMinimum();
+        if(i != null && i < 0)
+        {
+            throw new IllegalArgumentException("negative minimum is not allowed: " + i);
+        }
 
-        this.skipCerts = jaxb.getSkipCerts();
+        i = jaxb.getMaximum();
+        if(i != null && i < 0)
+        {
+            throw new IllegalArgumentException("negative maximum is not allowed: " + i);
+        }
+
+        this.jaxb = jaxb;
     }
 
-    public int getSkipCerts()
+    public String getRfc822Name()
     {
-        return skipCerts;
+        return jaxb.getRfc822Name();
+    }
+
+    public String getDNSName()
+    {
+        return jaxb.getDNSName();
+    }
+
+    public String getDirectoryName()
+    {
+        return jaxb.getDirectoryName();
+    }
+
+    public String getUri()
+    {
+        return jaxb.getUri();
+    }
+
+    public String getIpAddress()
+    {
+        return jaxb.getIpAddress();
+    }
+
+    public Integer getMinimum()
+    {
+        return jaxb.getMinimum();
+    }
+
+    public Integer getMaximum()
+    {
+        return jaxb.getMaximum();
     }
 
 }

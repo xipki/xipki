@@ -35,39 +35,25 @@
 
 package org.xipki.ca.qa.internal;
 
-import org.xipki.ca.certprofile.internal.x509.jaxb.CertificatePolicyInformationType;
-import org.xipki.common.ParamChecker;
+import org.xipki.ca.certprofile.internal.Condition;
+import org.xipki.ca.certprofile.internal.x509.jaxb.ConditionType;
 
 /**
  * @author Lijun Liao
  */
 
-public class QaCertificatePolicyInformationConf
+public abstract class QaExtensionOption
 {
-    private final String policyId;
-    private final QaPolicyQualifiersConf policyQualifiers;
+    private final Condition condition;
 
-    public QaCertificatePolicyInformationConf(CertificatePolicyInformationType jaxb)
+    public QaExtensionOption(ConditionType conditionConf)
     {
-        ParamChecker.assertNotNull("jaxb", jaxb);
-        this.policyId = jaxb.getPolicyIdentifier().getValue();
-        if(jaxb.getPolicyQualifiers() == null)
-        {
-            this.policyQualifiers = null;
-        }else
-        {
-            this.policyQualifiers = new QaPolicyQualifiersConf(jaxb.getPolicyQualifiers());
-        }
+        this.condition = conditionConf == null ? null : new Condition(conditionConf);
     }
 
-    public String getPolicyId()
+    public Condition getCondition()
     {
-        return policyId;
-    }
-
-    public QaPolicyQualifiersConf getPolicyQualifiers()
-    {
-        return policyQualifiers;
+        return condition;
     }
 
 }

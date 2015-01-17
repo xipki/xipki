@@ -35,10 +35,56 @@
 
 package org.xipki.ca.qa.internal;
 
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
+
+import javax.xml.bind.JAXBElement;
+
+import org.xipki.ca.certprofile.internal.x509.jaxb.CertificatePolicyInformationType.PolicyQualifiers;
+import org.xipki.ca.qa.internal.QaPolicyQualifierInfo.QaCPSUriPolicyQualifier;
+import org.xipki.ca.qa.internal.QaPolicyQualifierInfo.QaUserNoticePolicyQualifierInfo;
+import org.xipki.common.ParamChecker;
+
 /**
  * @author Lijun Liao
  */
 
-public abstract class QaPolicyQualifierInfoConf
+public class QaPolicyQualifiersOption
 {
+    private final List<QaPolicyQualifierInfo> policyQualifiers;
+    public QaPolicyQualifiersOption(PolicyQualifiers jaxb)
+    {
+        ParamChecker.assertNotNull("jaxb", jaxb);
+
+        List<QaPolicyQualifierInfo> list = new LinkedList<>();
+
+        List<JAXBElement<String>> elements = jaxb.getCpsUriOrUserNotice();
+        for(JAXBElement<String> element : elements)
+        {
+            String value = element.getValue();
+            String localPart = element.getName().getLocalPart();
+
+            QaPolicyQualifierInfo info;
+            if("cpsUri".equals(localPart))
+            {
+                info = new QaCPSUriPolicyQualifier(value);
+            } else if("userNotice".equals(localPart))
+            {
+                info = new QaUserNoticePolicyQualifierInfo(value);
+            } else
+            {
+                throw new RuntimeException("should not reach here");
+            }
+            list.add(info);
+        }
+
+        this.policyQualifiers = Collections.unmodifiableList(list);
+    }
+
+    public List<QaPolicyQualifierInfo> getPolicyQualifiers()
+    {
+        return policyQualifiers;
+    }
+
 }
