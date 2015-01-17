@@ -14,7 +14,7 @@
       <cm:property name="serverURL" value="https://localhost:8443/pkiconsole/hessian"/>
     </cm:default-properties>
   </cm:property-placeholder>
-  <bean id="caManager" class="org.xipki.ca.mgmt.hessian.client.CAManagerClient" init-method="init" destroy-method="shutdown">
+  <bean id="caManager" class="org.xipki.ca.mgmt.hessian.client.impl.CAManagerClient" init-method="init" destroy-method="shutdown">
     <property name="serverURL" value="${serverURL}"/>
   </bean>
   <service ref="caManager" interface="org.xipki.ca.server.mgmt.api.CAManager"/>

@@ -39,7 +39,7 @@ import java.util.concurrent.ConcurrentLinkedDeque;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.audit.slf4j.Slf4jAuditLoggingServiceImpl;
+import org.xipki.audit.slf4j.impl.Slf4jAuditLoggingServiceImpl;
 
 /**
  * @author Lijun Liao
