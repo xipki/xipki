@@ -42,6 +42,7 @@ import java.security.PublicKey;
 import java.security.cert.X509Certificate;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 
 import org.apache.karaf.shell.commands.Command;
 import org.apache.karaf.shell.commands.Option;
@@ -87,6 +88,10 @@ public class OCSPQAStatusCommand extends AbstractOCSPStatusCommand
             description = "Certificate")
     protected String certFile;
 
+    @Option(name = "-url",
+            required = false, description = "OCSP responder URL")
+    protected String serverURL;
+
     @Option(name = "-expStatus",
             required = true,
             description = "Expected status. Valid values are " + CertStatus.certStatusesText)
@@ -130,14 +135,45 @@ public class OCSPQAStatusCommand extends AbstractOCSPStatusCommand
         {
             encodedCert = IoUtil.read(certFile);
             X509Certificate cert = SecurityUtil.parseCert(certFile);
+
+            boolean issuedByCA = false;
+            if(cert.getIssuerX500Principal().equals(caCert.getSubjectX500Principal()))
+            {
+                if(Arrays.equals(SecurityUtil.extractSKI(caCert), SecurityUtil.extractAKI(cert)))
+                {
+                    issuedByCA = true;
+                }
+            }
+
+            if(issuedByCA == false)
+            {
+                err("certificate " + certFile + " is not issued by the given CA");
+                return null;
+            }
+
             sn = cert.getSerialNumber();
+
+            if(serverURL == null || serverURL.isEmpty())
+            {
+                List<String> ocspUrls = SecurityUtil.extractOCSPUrls(cert);
+                if(ocspUrls.size() > 0)
+                {
+                    serverURL = ocspUrls.get(0);
+                }
+            }
         }
         else
         {
             sn = new BigInteger(serialNumber);
         }
 
-        URL serverUrl = getServiceURL();
+        if(serverURL == null || serverURL.isEmpty())
+        {
+            err("Could not get URL for the OCSP responder");
+            return null;
+        }
+
+        URL serverUrl = new URL(serverURL);
 
         RequestOptions options = getRequestOptions();
 
