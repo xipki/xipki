@@ -824,7 +824,7 @@ implements HessianCAManager
 
     @Override
     public X509Certificate generateSelfSignedCA(String name, String certprofileName,
-            String subject, CAStatus status, long nextSerial,
+            byte[] p10Req, CAStatus status, long nextSerial,
             List<String> crl_uris, List<String> delta_crl_uris,
             List<String> ocsp_uris, CertValidity max_validity, String signer_type,
             String signer_conf, String crlsigner_name,
@@ -835,7 +835,7 @@ implements HessianCAManager
     {
         try
         {
-            return generateSelfSignedCA(name, certprofileName, subject, status, nextSerial,
+            return caManager.generateSelfSignedCA(name, certprofileName, p10Req, status, nextSerial,
                     crl_uris, delta_crl_uris, ocsp_uris, max_validity, signer_type, signer_conf,
                     crlsigner_name, duplicate_key, duplicate_subject, permissions, numCrls,
                     expirationPeriod, validityMode);
