@@ -35,6 +35,7 @@
 
 package org.xipki.ocsp.client.shell.loadtest;
 
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.security.cert.X509Certificate;
 import java.util.LinkedList;
@@ -58,7 +59,7 @@ public class OCSPStatusLoadTestCommand extends AbstractOCSPStatusCommand
     @Option(name = "-serial",
             required = true,
             description = "Required. Serial numbers.\n"
-                    + "Comma-seperated serial numbers or ranges")
+                    + "Comma-separated serial numbers or ranges")
     protected String serialNumbers;
 
     @Option(name = "-duration",
@@ -70,6 +71,10 @@ public class OCSPStatusLoadTestCommand extends AbstractOCSPStatusCommand
             required = false,
             description = "Number of threads")
     protected Integer numThreads = 5;
+
+    @Option(name = "-url",
+            required = true, description = "OCSP responder URL")
+    protected String serverURL;
 
     @Override
     protected Object doExecute()
@@ -120,7 +125,14 @@ public class OCSPStatusLoadTestCommand extends AbstractOCSPStatusCommand
             return null;
         }
 
-        URL serverUrl = getServiceURL();
+        URL serverUrl;
+        try
+        {
+            serverUrl = new URL(serverURL);
+        } catch(MalformedURLException e)
+        {
+            throw new RuntimeException("invalid URL: " + serverURL);
+        }
 
         StringBuilder startMsg = new StringBuilder();
 
@@ -144,4 +156,5 @@ public class OCSPStatusLoadTestCommand extends AbstractOCSPStatusCommand
 
         return null;
     }
+
 }

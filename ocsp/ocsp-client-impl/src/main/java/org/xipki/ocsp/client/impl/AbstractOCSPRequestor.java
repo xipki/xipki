@@ -182,7 +182,7 @@ public abstract class AbstractOCSPRequestor implements OCSPRequestor
             return ocspResp;
         } catch (IOException | OCSPException e)
         {
-            throw new OCSPRequestorException(e.getMessage(), e);
+            throw new OCSPRequestorException(e.getClass().getName() + ": " + e.getMessage(), e);
         }
     }
 

@@ -35,9 +35,6 @@
 
 package org.xipki.ocsp.client.shell;
 
-import java.net.MalformedURLException;
-import java.net.URL;
-
 import org.apache.karaf.shell.commands.Option;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.nist.NISTObjectIdentifiers;
@@ -53,12 +50,6 @@ import org.xipki.ocsp.client.api.RequestOptions;
 
 public abstract class AbstractOCSPStatusCommand extends XipkiOsgiCommandSupport
 {
-    private static final String DFLT_URL = "http://localhost:8080/ocsp";
-
-    @Option(name = "-url",
-            description = "Server URL")
-    protected String serverURL = DFLT_URL;
-
     @Option(name = "-cacert",
             required = true, description = "Required. CA certificate file")
     protected String caCertFile;
@@ -72,7 +63,7 @@ public abstract class AbstractOCSPStatusCommand extends XipkiOsgiCommandSupport
     protected String hashAlgo = "SHA256";
 
     @Option(name = "-sigalgs",
-            required = false, description = "comma-seperated preferred signature algorithms")
+            required = false, description = "Comma-separated preferred signature algorithms")
     protected String prefSigAlgs;
 
     @Option(name = "-httpget",
@@ -84,12 +75,6 @@ public abstract class AbstractOCSPStatusCommand extends XipkiOsgiCommandSupport
     protected Boolean signRequest = Boolean.FALSE;
 
     protected OCSPRequestor requestor;
-
-    protected URL getServiceURL()
-    throws MalformedURLException
-    {
-        return new URL(serverURL);
-    }
 
     protected RequestOptions getRequestOptions()
     throws Exception
