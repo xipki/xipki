@@ -93,6 +93,10 @@ public class OCSPStatusCommand extends AbstractOCSPStatusCommand
             description = "Certificate")
     protected List<String> certFiles;
 
+    @Option(name = "-url",
+            required = false, description = "OCSP responder URL")
+    protected String serverURL;
+
     @Option(name = "-v", aliases="--verbose",
             required = false, description = "Show status verbosely")
     protected Boolean verbose = Boolean.FALSE;
@@ -125,13 +129,52 @@ public class OCSPStatusCommand extends AbstractOCSPStatusCommand
         {
             encodedCerts = new HashMap<>(certFiles.size());
 
+            String ocspUrl = null;
             for(String certFile : certFiles)
             {
                 byte[] encodedCert = IoUtil.read(certFile);
                 X509Certificate cert = SecurityUtil.parseCert(certFile);
+
+                boolean issuedByCA = false;
+                if(cert.getIssuerX500Principal().equals(caCert.getSubjectX500Principal()))
+                {
+                    if(Arrays.equals(SecurityUtil.extractSKI(caCert), SecurityUtil.extractAKI(cert)))
+                    {
+                        issuedByCA = true;
+                    }
+                }
+
+                if(issuedByCA == false)
+                {
+                    err("certificate " + certFile + " is not issued by the given CA");
+                    return null;
+                }
+
+                if(serverURL == null || serverURL.isEmpty())
+                {
+                    List<String> ocspUrls = SecurityUtil.extractOCSPUrls(cert);
+                    if(ocspUrls.size() > 0)
+                    {
+                        String url = ocspUrls.get(0);
+                        if(ocspUrl != null && ocspUrl.equals(url) == false)
+                        {
+                            err("given certificates have different OCSP responder URL in certificate");
+                            return null;
+                        } else
+                        {
+                            ocspUrl = url;
+                        }
+                    }
+                }
+
                 BigInteger sn = cert.getSerialNumber();
                 sns.add(sn);
                 encodedCerts.put(sn, encodedCert);
+            }
+
+            if(serverURL == null || serverURL.isEmpty())
+            {
+                serverURL = ocspUrl;
             }
         }
         else
@@ -143,7 +186,13 @@ public class OCSPStatusCommand extends AbstractOCSPStatusCommand
             }
         }
 
-        URL serverUrl = getServiceURL();
+        if(serverURL == null || serverURL.isEmpty())
+        {
+            err("Could not get URL for the OCSP responder");
+            return null;
+        }
+
+        URL serverUrl = new URL(serverURL);
 
         RequestOptions options = getRequestOptions();
 

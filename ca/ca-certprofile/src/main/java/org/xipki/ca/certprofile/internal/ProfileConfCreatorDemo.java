@@ -233,7 +233,7 @@ public class ProfileConfCreatorDemo
         {
             list.add(createExtension(Extension.authorityKeyIdentifier, true, false));
         }
-        list.add(createExtension(Extension.authorityInfoAccess, false, false));
+        list.add(createExtension(Extension.authorityInfoAccess, true, false));
         list.add(createExtension(Extension.cRLDistributionPoints, false, false));
         list.add(createExtension(Extension.freshestCRL, false, false));
         list.add(createExtension(Extension.keyUsage, true, true));
@@ -272,7 +272,7 @@ public class ProfileConfCreatorDemo
         List<ExtensionType> list = extensions.getExtension();
         list.add(createExtension(Extension.subjectKeyIdentifier, true, false));
         list.add(createExtension(Extension.authorityKeyIdentifier, true, false));
-        list.add(createExtension(Extension.authorityInfoAccess, false, false));
+        list.add(createExtension(Extension.authorityInfoAccess, true, false));
         list.add(createExtension(Extension.cRLDistributionPoints, false, false));
         list.add(createExtension(Extension.freshestCRL, false, false));
         list.add(createExtension(Extension.keyUsage, true, true));
@@ -311,7 +311,7 @@ public class ProfileConfCreatorDemo
         List<ExtensionType> list = extensions.getExtension();
         list.add(createExtension(Extension.subjectKeyIdentifier, true, false));
         list.add(createExtension(Extension.authorityKeyIdentifier, true, false));
-        list.add(createExtension(Extension.authorityInfoAccess, false, false));
+        list.add(createExtension(Extension.authorityInfoAccess, true, false));
         list.add(createExtension(Extension.cRLDistributionPoints, false, false));
         list.add(createExtension(Extension.freshestCRL, false, false));
         list.add(createExtension(Extension.keyUsage, true, true));
@@ -469,7 +469,7 @@ public class ProfileConfCreatorDemo
         List<ExtensionType> list = extensions.getExtension();
         list.add(createExtension(Extension.subjectKeyIdentifier, true, false));
         list.add(createExtension(Extension.authorityKeyIdentifier, true, false));
-        list.add(createExtension(Extension.authorityInfoAccess, false, false));
+        list.add(createExtension(Extension.authorityInfoAccess, true, false));
         list.add(createExtension(Extension.cRLDistributionPoints, false, false));
         list.add(createExtension(Extension.freshestCRL, false, false));
         list.add(createExtension(Extension.keyUsage, true, true));
@@ -517,7 +517,7 @@ public class ProfileConfCreatorDemo
         List<ExtensionType> list = extensions.getExtension();
         list.add(createExtension(Extension.subjectKeyIdentifier, true, false));
         list.add(createExtension(Extension.authorityKeyIdentifier, true, false));
-        list.add(createExtension(Extension.authorityInfoAccess, false, false));
+        list.add(createExtension(Extension.authorityInfoAccess, true, false));
         list.add(createExtension(Extension.cRLDistributionPoints, false, false));
         list.add(createExtension(Extension.freshestCRL, false, false));
         list.add(createExtension(Extension.keyUsage, true, true));
@@ -560,7 +560,7 @@ public class ProfileConfCreatorDemo
         List<ExtensionType> list = extensions.getExtension();
         list.add(createExtension(Extension.subjectKeyIdentifier, true, false));
         list.add(createExtension(Extension.authorityKeyIdentifier, true, false));
-        list.add(createExtension(Extension.authorityInfoAccess, false, false));
+        list.add(createExtension(Extension.authorityInfoAccess, true, false));
         list.add(createExtension(Extension.cRLDistributionPoints, false, false));
         list.add(createExtension(Extension.freshestCRL, false, false));
         list.add(createExtension(Extension.keyUsage, true, true));

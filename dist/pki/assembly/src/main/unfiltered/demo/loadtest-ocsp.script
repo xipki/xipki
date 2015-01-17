@@ -3,14 +3,18 @@
 #################################################################
 feature:install xipki-ocspclient-shell
 
+URL = http://localhost:8080/ocsp
+
 # Wait one second
 sleep 1000
 
 echo "Loadtest OCSP status (database based cert source)"
-xipki-ocsp:loadtest-status -cacert output/SubCA1.der -duration 15 -serial 1-500 -thread 8
+xipki-ocsp:loadtest-status -cacert output/SubCA1.der -duration 15 -serial 1-500 -thread 8 \
+  -url $URL
 
 echo "Loadtest OCSP status (CRL based cert source)"
-xipki-ocsp:loadtest-status -cacert output/SubCAwithCRL1.der -duration 15 -serial 1-2 -thread 8
+xipki-ocsp:loadtest-status -cacert output/SubCAwithCRL1.der -duration 15 -serial 1-2 -thread 8 \
+  -url $URL
 
 feature:uninstall xipki-ocspclient-shell
 feature:uninstall xipki-ocspclient
