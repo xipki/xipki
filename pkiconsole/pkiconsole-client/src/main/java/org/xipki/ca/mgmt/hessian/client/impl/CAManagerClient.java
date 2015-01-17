@@ -33,7 +33,7 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.ca.mgmt.hessian.client;
+package org.xipki.ca.mgmt.hessian.client.impl;
 
 import java.io.IOException;
 import java.math.BigInteger;

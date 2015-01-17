@@ -33,7 +33,7 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.audit.slf4j;
+package org.xipki.audit.slf4j.impl;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;

@@ -33,7 +33,7 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.audit.syslog;
+package org.xipki.audit.syslog.impl;
 
 import java.nio.charset.Charset;
 import java.text.DateFormat;

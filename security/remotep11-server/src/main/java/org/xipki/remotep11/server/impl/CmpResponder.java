@@ -33,7 +33,7 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.remotep11.server;
+package org.xipki.remotep11.server.impl;
 
 import java.security.SecureRandom;
 
