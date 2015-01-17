@@ -6,7 +6,7 @@
   <xs:annotation>
     <xs:appinfo>
       <jxb:schemaBindings>
-        <jxb:package name="org.xipki.ca.certprofile.x509.jaxb"/>
+        <jxb:package name="org.xipki.ca.certprofile.internal.x509.jaxb"/>
       </jxb:schemaBindings>
     </xs:appinfo>
   </xs:annotation>

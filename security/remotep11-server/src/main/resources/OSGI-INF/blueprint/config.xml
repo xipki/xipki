@@ -6,11 +6,11 @@
     </cm:default-properties>
   </cm:property-placeholder>
   <reference id="securityFactory" interface="org.xipki.security.api.SecurityFactory"/>
-  <bean id="localP11CryptServicePool" class="org.xipki.remotep11.server.LocalP11CryptServicePool" init-method="init">
+  <bean id="localP11CryptServicePool" class="org.xipki.remotep11.server.impl.LocalP11CryptServicePool" init-method="init">
     <property name="securityFactory" ref="securityFactory"/>
   </bean>
   <!-- create the servlet and inject our own app factory -->
-  <bean id="serverServlet" class="org.xipki.remotep11.server.Rfc6712Servlet">
+  <bean id="serverServlet" class="org.xipki.remotep11.server.impl.Rfc6712Servlet">
     <property name="localP11CryptServicePool" ref="localP11CryptServicePool"/>
   </bean>
   <!-- register it as a servlet service for the web extender -->

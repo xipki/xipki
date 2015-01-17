@@ -47,8 +47,8 @@ import org.bouncycastle.asn1.x509.Extensions;
 import org.xipki.ca.api.EnvironmentParameterResolver;
 import org.xipki.ca.qa.ValidationIssue;
 import org.xipki.ca.qa.ValidationResult;
-import org.xipki.ca.qa.certprofile.x509.X509CertProfileQA;
-import org.xipki.ca.qa.certprofile.x509.X509IssuerInfo;
+import org.xipki.ca.qa.X509CertProfileQA;
+import org.xipki.ca.qa.X509IssuerInfo;
 import org.xipki.common.IoUtil;
 import org.xipki.console.karaf.XipkiOsgiCommandSupport;
 

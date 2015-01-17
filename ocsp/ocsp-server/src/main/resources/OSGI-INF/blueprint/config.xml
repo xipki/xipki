@@ -19,14 +19,14 @@
   <reference id="dataSourceFactory" interface="org.xipki.datasource.api.DataSourceFactory"/>
   <reference id="securityFactory" interface="org.xipki.security.api.SecurityFactory"/>
   <reference id="auditServiceRegister" interface="org.xipki.audit.api.AuditLoggingServiceRegister"/>
-  <bean id="ocspResponder" class="org.xipki.ocsp.OcspResponder" init-method="init" destroy-method="shutdown">
+  <bean id="ocspResponder" class="org.xipki.ocsp.server.impl.OcspResponder" init-method="init" destroy-method="shutdown">
     <property name="confFile" value="${confFile}"/>
     <property name="dataSourceFactory" ref="dataSourceFactory"/>
     <property name="securityFactory" ref="securityFactory"/>
     <property name="auditServiceRegister" ref="auditServiceRegister"/>
   </bean>
   <!-- create the servlet and inject our own app factory -->
-  <bean id="ocspServlet" class="org.xipki.ocsp.Rfc2560Servlet">
+  <bean id="ocspServlet" class="org.xipki.ocsp.server.impl.Rfc2560Servlet">
     <property name="responder" ref="ocspResponder"/>
     <property name="auditServiceRegister" ref="auditServiceRegister"/>
   </bean>
@@ -37,7 +37,7 @@
     </service-properties>
   </service>
   <!-- create the servlet and inject our own app factory -->
-  <bean id="healthServlet" class="org.xipki.ocsp.HealthCheckServlet">
+  <bean id="healthServlet" class="org.xipki.ocsp.server.impl.HealthCheckServlet">
     <property name="responder" ref="ocspResponder"/>
   </bean>
   <service ref="healthServlet" interface="javax.servlet.Servlet">

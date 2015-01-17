@@ -3,7 +3,7 @@
   <xs:annotation>
     <xs:appinfo>
       <jxb:schemaBindings>
-        <jxb:package name="org.xipki.ca.client.shell.loadtest.jaxb"/>
+        <jxb:package name="org.xipki.ca.client.shell.internal.loadtest.jaxb"/>
       </jxb:schemaBindings>
     </xs:appinfo>
   </xs:annotation>

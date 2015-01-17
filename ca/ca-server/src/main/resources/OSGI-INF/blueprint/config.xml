@@ -21,7 +21,7 @@
   <reference id="dataSourceFactory" interface="org.xipki.datasource.api.DataSourceFactory"/>
   <reference id="securityFactory" interface="org.xipki.security.api.SecurityFactory"/>
   <reference id="auditServiceRegister" interface="org.xipki.audit.api.AuditLoggingServiceRegister"/>
-  <bean id="caManager" class="org.xipki.ca.server.mgmt.CAManagerImpl" init-method="startCaSystem" destroy-method="shutdown">
+  <bean id="caManager" class="org.xipki.ca.server.impl.mgmt.CAManagerImpl" init-method="startCaSystem" destroy-method="shutdown">
     <property name="securityFactory" ref="securityFactory"/>
     <property name="dataSourceFactory" ref="dataSourceFactory"/>
     <property name="caConfFile" value="${caConfFile}"/>
@@ -29,14 +29,10 @@
     <property name="certprofileTypeMap" value="${certprofileType.map}"/>
     <property name="publisherTypeMap" value="${publisherType.map}"/>
   </bean>
-  <service ref="caManager">
-    <interfaces>
-      <value>org.xipki.ca.server.mgmt.api.CAManager</value>
-      <value>org.xipki.ca.server.mgmt.CmpResponderManager</value>
-    </interfaces>
-  </service>
+  <service ref="caManager" interface="org.xipki.ca.server.mgmt.api.CAManager"/>
+
   <!-- create the servlet and inject our own app factory -->
-  <bean id="caServlet" class="org.xipki.ca.server.Rfc6712Servlet">
+  <bean id="caServlet" class="org.xipki.ca.server.impl.Rfc6712Servlet">
     <property name="responderManager" ref="caManager"/>
     <property name="auditServiceRegister" ref="auditServiceRegister"/>
   </bean>
@@ -46,7 +42,7 @@
       <entry key="urlPatterns" value="${urlPatterns}"/>
     </service-properties>
   </service>
-  <bean id="healthServlet" class="org.xipki.ca.server.HealthCheckServlet">
+  <bean id="healthServlet" class="org.xipki.ca.server.impl.HealthCheckServlet">
     <property name="responderManager" ref="caManager"/>
   </bean>
   <service ref="healthServlet" interface="javax.servlet.Servlet">
