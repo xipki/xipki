@@ -159,7 +159,7 @@ public class DbCertStatusStore extends CertStatusStore
         {
             if(initialized)
             {
-                String sql = "SELECT ID, REVOKED, REV_TIME, SHA1_FP_CERT FROM ISSUER";
+                final String sql = "SELECT ID, REVOKED, REV_TIME, SHA1_FP_CERT FROM ISSUER";
                 PreparedStatement ps = borrowPreparedStatement(sql);
                 ResultSet rs = null;
 
@@ -358,6 +358,13 @@ public class DbCertStatusStore extends CertStatusStore
             if(issuer == null)
             {
                 return CertStatusInfo.getIssuerUnknownCertStatusInfo(thisUpdate, null);
+            }
+
+            long serialNumberLong = serialNumber.longValue();
+            // our database supports up to 8 byte serialNumber
+            if(serialNumber.signum() < 0 || BigInteger.valueOf(serialNumberLong).equals(serialNumber) == false)
+            {
+                return CertStatusInfo.getUnknownCertStatusInfo(thisUpdate, null);
             }
 
             final String sql = "ID, NOTBEFORE, REVOKED, REV_REASON, REV_TIME, REV_INVALIDITY_TIME, PROFILE" +
@@ -583,7 +590,7 @@ public class DbCertStatusStore extends CertStatusStore
         try
         {
             confStream = new FileInputStream(IoUtil.expandFilepath(databaseConfFile));
-            dataSource = datasourceFactory.createDataSource(confStream, passwordResolver);
+            dataSource = datasourceFactory.createDataSource(null, confStream, passwordResolver);
         } catch (Exception e)
         {
             throw new CertStatusStoreException(e.getMessage(), e);

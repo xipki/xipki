@@ -1,6 +1,11 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <X509Profile xmlns="http://xipki.org/xmlprofile/v2">
-  <description>CertProfile TLSwithIncSN</description>
+  <appInfo>
+    <my:myDescription xmlns:my="http://example.org">
+      <my:category>cat A</my:category>
+      <my:details>CertProfile TLSwithIncSN</my:details>
+    </my:myDescription>
+  </appInfo>
   <version>3</version>
   <ca>false</ca>
   <validity>5y</validity>

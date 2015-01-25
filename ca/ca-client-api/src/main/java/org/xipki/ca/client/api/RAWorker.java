@@ -59,7 +59,7 @@ public interface RAWorker
 {
     Set<String> getCaNames();
 
-    Set<String> getCertProfiles(String caName);
+    Set<CertProfileInfo> getCertProfiles(String caName);
 
     EnrollCertResult requestCert(CertificationRequest p10Request, String profile, String caName,
             String username)

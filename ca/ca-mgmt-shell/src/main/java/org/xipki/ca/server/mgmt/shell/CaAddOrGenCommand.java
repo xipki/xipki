@@ -82,6 +82,11 @@ public abstract class CaAddOrGenCommand extends CaCommand
             required = true)
     protected Long nextSerial;
 
+    @Option(name = "-nextCrlNo",
+            description = "Required. CRL number for the next CRL",
+            required = true)
+    protected Integer nextCrlNumber ;
+
     @Option(name = "-maxValidity",
             description = "Required. maximal validity.",
             required = true)

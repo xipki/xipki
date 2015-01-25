@@ -55,7 +55,7 @@ import org.xipki.security.api.PasswordResolver;
  * @author Lijun Liao
  */
 
-public class IdentifiedX509CertPublisher
+class IdentifiedX509CertPublisher
 {
     private final PublisherEntry entry;
     private final X509CertPublisher certPublisher;

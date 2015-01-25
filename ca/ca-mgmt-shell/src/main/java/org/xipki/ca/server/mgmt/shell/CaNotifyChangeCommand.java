@@ -33,47 +33,24 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.ca.server.mgmt.api;
+package org.xipki.ca.server.mgmt.shell;
 
-import org.xipki.ca.api.RequestorInfo;
-import org.xipki.ca.api.X509CertWithId;
-import org.xipki.common.ParamChecker;
+import org.apache.karaf.shell.commands.Command;
 
 /**
  * @author Lijun Liao
  */
 
-public class CertBasedRequestorInfo implements RequestorInfo
+@Command(scope = "xipki-ca", name = "notify-change", description="Notify the chagne of CA system")
+public class CaNotifyChangeCommand extends CaCommand
 {
-    private final String name;
-    private final X509CertWithId certificate;
-    private final boolean ra;
-
-    public CertBasedRequestorInfo(String name, X509CertWithId certificate, boolean ra)
-    {
-        ParamChecker.assertNotEmpty("name", name);
-        ParamChecker.assertNotNull("certificate", certificate);
-
-        this.name = name;
-        this.certificate = certificate;
-        this.ra = ra;
-    }
-
-    public X509CertWithId getCertificate()
-    {
-        return certificate;
-    }
 
     @Override
-    public boolean isRA()
+    protected Object doExecute()
+    throws Exception
     {
-        return ra;
+        caManager.notifyCAChange();
+        out("Notified the change of CA system");
+        return null;
     }
-
-    @Override
-    public String getName()
-    {
-        return name;
-    }
-
 }

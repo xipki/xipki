@@ -39,8 +39,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.security.auth.x500.X500Principal;
-
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.DERSequence;
@@ -108,7 +106,7 @@ public class X509Util
     }
 
     public static CRLDistPoint createCRLDistributionPoints(List<String> crlUris,
-            X500Principal caSubject, X500Principal crlSignerSubject)
+            X500Name caSubject, X500Name crlSignerSubject)
     throws IOException, CertProfileException
     {
         if(crlUris == null || crlUris.isEmpty())
@@ -131,8 +129,7 @@ public class X509Util
         GeneralNames crlIssuer = null;
         if(crlSignerSubject != null && crlSignerSubject.equals(caSubject) == false)
         {
-            X500Name bcCrlSignerSubject = X500Name.getInstance(crlSignerSubject.getEncoded());
-            GeneralName crlIssuerName = new GeneralName(bcCrlSignerSubject);
+            GeneralName crlIssuerName = new GeneralName(crlSignerSubject);
             crlIssuer = new GeneralNames(crlIssuerName);
         }
 

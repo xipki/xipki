@@ -54,7 +54,7 @@ import org.xipki.ca.api.X509CertWithId;
 import org.xipki.ca.api.publisher.X509CertificateInfo;
 import org.xipki.ca.server.impl.CertRevocationInfoWithSerial;
 import org.xipki.ca.server.impl.CertStatus;
-import org.xipki.ca.server.impl.SubjectKeyProfileTriple;
+import org.xipki.ca.server.impl.SubjectKeyProfileBundle;
 import org.xipki.common.CertRevocationInfo;
 import org.xipki.common.LogUtil;
 import org.xipki.common.ParamChecker;
@@ -246,12 +246,25 @@ public class CertificateStore
         }
     }
 
-    public int getNextFreeCRLNumber(X509CertWithId caCert)
+    public boolean hasCRL(X509CertWithId caCert)
     throws OperationException
     {
         try
         {
-            return queryExecutor.getNextFreeCrlNumber(caCert);
+            return queryExecutor.hasCRL(caCert);
+        } catch (Exception e)
+        {
+            LOG.debug("SQLException", e);
+            throw new OperationException(ErrorCode.DATABASE_FAILURE, e.getMessage());
+        }
+    }
+
+    public int getMaxCRLNumber(X509CertWithId caCert)
+    throws OperationException
+    {
+        try
+        {
+            return queryExecutor.getMaxCrlNumber(caCert);
         } catch (SQLException e)
         {
             LOG.debug("SQLException", e);
@@ -492,7 +505,7 @@ public class CertificateStore
         return queryExecutor.isHealthy();
     }
 
-    public SubjectKeyProfileTriple getLatestCert(X509CertWithId caCert, String subjectFp,
+    public SubjectKeyProfileBundle getLatestCert(X509CertWithId caCert, String subjectFp,
             String keyFp, String profile)
     throws OperationException
     {
@@ -615,12 +628,27 @@ public class CertificateStore
         }
     }
 
-    public long nextSerial(String seqName)
+    public long nextSerial(X509CertWithId caCert, String seqName)
     throws OperationException
     {
         try
         {
-            return queryExecutor.nextSerial(seqName);
+            return queryExecutor.nextSerial(caCert, seqName);
+        } catch (SQLException e)
+        {
+            throw new OperationException(ErrorCode.DATABASE_FAILURE, e.getMessage());
+        } catch (RuntimeException e)
+        {
+            throw new OperationException(ErrorCode.System_Failure, e.getMessage());
+        }
+    }
+
+    public int nextCertId()
+    throws OperationException
+    {
+        try
+        {
+            return queryExecutor.nextCertId();
         } catch (SQLException e)
         {
             throw new OperationException(ErrorCode.DATABASE_FAILURE, e.getMessage());
@@ -636,6 +664,21 @@ public class CertificateStore
         try
         {
             queryExecutor.commitNextSerialIfLess(caName, nextSerial);
+        } catch (SQLException e)
+        {
+            throw new OperationException(ErrorCode.DATABASE_FAILURE, e.getMessage());
+        } catch (RuntimeException e)
+        {
+            throw new OperationException(ErrorCode.System_Failure, e.getMessage());
+        }
+    }
+
+    public void commitNextCrlNo(String caName, int nextCrlNo)
+    throws OperationException
+    {
+        try
+        {
+            queryExecutor.commitNextCrlNoIfLess(caName, nextCrlNo);
         } catch (SQLException e)
         {
             throw new OperationException(ErrorCode.DATABASE_FAILURE, e.getMessage());

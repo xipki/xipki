@@ -2,7 +2,11 @@
 <!--
  Copyright (c) 2014 Lijun Liao
  -->
-<xs:schema xmlns="http://xipki.org/caclient/conf/v1" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:jxb="http://java.sun.com/xml/ns/jaxb" targetNamespace="http://xipki.org/caclient/conf/v1" elementFormDefault="qualified" version="1.0" jxb:version="2.0">
+<xs:schema xmlns="http://xipki.org/caclient/conf/v2"
+  xmlns:xs="http://www.w3.org/2001/XMLSchema"
+  xmlns:jxb="http://java.sun.com/xml/ns/jaxb"  
+  targetNamespace="http://xipki.org/caclient/conf/v2"
+  elementFormDefault="qualified" version="1.0" jxb:version="2.0">
   <xs:annotation>
     <xs:appinfo>
       <jxb:schemaBindings>
@@ -18,6 +22,13 @@
         <xs:complexType>
           <xs:sequence>
             <xs:element name="requestor" type="requestorType" maxOccurs="unbounded"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="responders">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="responder" type="responderType" maxOccurs="unbounded"/>
           </xs:sequence>
         </xs:complexType>
       </xs:element>
@@ -50,32 +61,45 @@
       <xs:element name="signerConf" type="xs:string" minOccurs="0"/>
     </xs:all>
   </xs:complexType>
+  <xs:complexType name="responderType">
+    <xs:all>
+      <xs:element name="name" type="xs:string"/>
+      <xs:element name="cert" type="fileOrValueType" minOccurs="0"/>
+    </xs:all>
+  </xs:complexType>
   <xs:complexType name="CAType">
     <xs:all>
       <xs:element name="name" type="xs:string"/>
       <xs:element name="url" type="xs:anyURI"/>
       <xs:element name="healthUrl" type="xs:anyURI" minOccurs="0"/>
       <xs:element name="requestor" type="xs:string"/>
-      <xs:element name="responder" type="fileOrValueType"/>
-      <xs:element name="CAInfo" type="CAInfoType"/>
+      <xs:element name="responder" type="xs:string"/>
+      <xs:element name="caCert" type="CACertType"/>
+      <xs:element name="certProfiles" type="certProfilesType"/>
     </xs:all>
     <xs:attribute name="enabled" type="xs:boolean" default="true"/>
   </xs:complexType>
-  <xs:complexType name="CAInfoType">
+  <xs:complexType name="certProfilesType">
     <xs:choice>
-      <xs:element name="autoConf"/>
+      <xs:element name="autoconf" type="xs:anyType"/>
       <xs:sequence>
-        <xs:element name="cert" type="fileOrValueType"/>
-        <xs:element name="certProfiles">
-          <xs:complexType>
-            <xs:sequence>
-              <xs:element name="certProfile" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
-            </xs:sequence>
-          </xs:complexType>
-        </xs:element>
+        <xs:element name="certProfile" type="certProfileType" maxOccurs="unbounded"/>
       </xs:sequence>
+    </xs:choice>          
+  </xs:complexType>
+  <xs:complexType name="CACertType">
+    <xs:choice>
+      <xs:element name="autoconf" type="xs:anyType"/>
+      <xs:element name="cert" type="fileOrValueType"/>
     </xs:choice>
   </xs:complexType>
+  <xs:complexType name="certProfileType">
+    <xs:sequence>
+      <xs:element name="name" type="xs:string"/>
+      <xs:element name="type" type="xs:string"/>
+      <xs:element name="conf" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>  
   <xs:complexType name="fileOrValueType">
     <xs:choice>
       <xs:element name="value" type="xs:base64Binary"/>

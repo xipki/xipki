@@ -164,8 +164,8 @@
       <lineEnding>dos</lineEnding>
     </file>
     <file>
-      <source>${project.basedir}/src/main/unfiltered/ocsp-config/example/ocsp-db.properties-h2</source>
-      <outputDirectory>ocsp-config</outputDirectory>
+      <source>${project.basedir}/src/main/unfiltered/ca-config/example/ocsp-db.properties-h2</source>
+      <outputDirectory>ca-config</outputDirectory>
       <destName>ocsp-db.properties</destName>
       <fileMode>0644</fileMode>
       <lineEnding>dos</lineEnding>

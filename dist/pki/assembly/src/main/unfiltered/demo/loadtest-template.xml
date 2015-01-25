@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <enrollTemplate xmlns="http://xipki.org/xipki/caclient/loadtest">
   <!--
-  <user>user name</user>
   <enrollCert>
     <certProfile>certificate profile name</certProfile>
     <subject>subject DN</subject>
@@ -10,7 +9,6 @@
     <rsaKey modulusLength="2048"/>
   </enrollCert>
   -->
-  <user>Loadtester-1</user>
   <enrollCert>
     <certProfile>TLS</certProfile>
     <subject>CN=xipki.org,O=example PKI TLS RSA,C=DE</subject>

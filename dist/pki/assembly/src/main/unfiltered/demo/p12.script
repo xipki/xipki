@@ -19,6 +19,7 @@ xipki-ca:gen-rca -name RCA1 \
   -out output/RCA1.der \
   -permission all \
   -nextSerial 1 \
+  -nextCrlNo 2 \
   -maxValidity 10y \
   -signerType PKCS12 \
   -signerConf password?1234%keystore?file:output/RCA1.p12%algo?$CA_SIGNER_ALGO \
@@ -47,9 +48,6 @@ xipki-ca:capub-add -ca RCA1 -publisher OCSP.PUBLISHER
 
 # Add requestor to CA
 xipki-ca:careq-add -requestor requestor -permission all -ra yes -profile all -ca RCA1
-
-## Restart the CA
-xipki-ca:ca-restart
 
 ## Publish the self-signed certificate
 xipki-ca:publish-self -profile RCA RCA1
@@ -96,6 +94,7 @@ feature:uninstall xipki-caclient
 xipki-ca:ca-add -name SubCA1.complex-Name \
   -permission all \
   -nextSerial 1 \
+  -nextCrlNo 2 \
   -maxValidity 5y \
   -signerType PKCS12 \
   -signerConf password?1234%keystore?file:output/SubCA1.p12%algo?$CA_SIGNER_ALGO \
@@ -115,7 +114,7 @@ xipki-ca:capub-add -ca SubCA1.complex-Name -publisher OCSP.PUBLISHER
 xipki-ca:careq-add -requestor requestor -permission all -ra yes -profile all -ca SubCA1.complex-Name
 
 ## Restart the CA
-xipki-ca:ca-restart
+#xipki-ca:ca-restart
 
 #################################################################
 #                       ADD SubCA with CRL                      #
@@ -124,6 +123,7 @@ xipki-ca:ca-restart
 xipki-ca:ca-add -name SubCAwithCRL1 \
   -permission all \
   -nextSerial 1 \
+  -nextCrlNo 2 \
   -maxValidity 5y \
   -signerType PKCS12 \
   -signerConf password?1234%keystore?file:output/SubCAwithCRL1.p12%algo?$CA_SIGNER_ALGO \
@@ -142,4 +142,4 @@ xipki-ca:caprofile-add -ca SubCAwithCRL1 -profile OCSP -profile DEMO -profile mu
 xipki-ca:careq-add -requestor requestor -permission all -ra yes -profile all -ca SubCAwithCRL1
 
 ## Restart the CA
-xipki-ca:ca-restart
+#xipki-ca:ca-restart

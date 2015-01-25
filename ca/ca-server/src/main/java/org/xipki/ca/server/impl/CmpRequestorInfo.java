@@ -35,44 +35,48 @@
 
 package org.xipki.ca.server.impl;
 
-import java.util.Set;
-
+import org.xipki.ca.api.RequestorInfo;
 import org.xipki.ca.api.X509CertWithId;
-import org.xipki.ca.server.mgmt.api.CertBasedRequestorInfo;
-import org.xipki.ca.server.mgmt.api.Permission;
+import org.xipki.ca.server.mgmt.api.CAHasRequestorEntry;
+import org.xipki.common.ParamChecker;
 
 /**
  * @author Lijun Liao
  */
 
-public class CmpRequestorInfo extends CertBasedRequestorInfo
+class CmpRequestorInfo implements RequestorInfo
 {
-    private Set<Permission> permissions;
-    private Set<String> profiles;
+    private final CAHasRequestorEntry caHasRequestor;
+    private final X509CertWithId cert;
 
-    public CmpRequestorInfo(String name, X509CertWithId certificate, boolean ra)
+    public CmpRequestorInfo(CAHasRequestorEntry caHasRequestor, X509CertWithId cert)
     {
-        super(name, certificate, ra);
+        ParamChecker.assertNotNull("caHasRequestor", caHasRequestor);
+        ParamChecker.assertNotNull("cert", cert);
+        this.caHasRequestor = caHasRequestor;
+        this.cert = cert;
     }
 
-    public Set<Permission> getPermissions()
+    public CAHasRequestorEntry getCaHasRequestor()
     {
-        return permissions;
+        return caHasRequestor;
     }
 
-    public void setPermissions(Set<Permission> permissions)
+    public X509CertWithId getCert()
     {
-        this.permissions = permissions;
+        return cert;
     }
 
-    public Set<String> getProfiles()
+    @Override
+    public String getName()
     {
-        return profiles;
+        return caHasRequestor.getRequestorName();
     }
 
-    public void setProfiles(Set<String> profiles)
+    @Override
+    public boolean isRA()
     {
-        this.profiles = profiles;
+        return caHasRequestor.isRa();
     }
 
 }

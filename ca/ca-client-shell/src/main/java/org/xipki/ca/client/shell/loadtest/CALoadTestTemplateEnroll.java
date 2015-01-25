@@ -135,7 +135,7 @@ public class CALoadTestTemplateEnroll extends AbstractLoadTest
                     request.addRequestEntry(requestEntry);
                 }
 
-                result = raWorker.requestCerts(request, null, user);
+                result = raWorker.requestCerts(request, null, userPrefix + System.currentTimeMillis());
             } catch (RAWorkerException | PKIErrorException e)
             {
                 LOG.warn("{}: {}", e.getClass().getName(), e.getMessage());
@@ -180,7 +180,7 @@ public class CALoadTestTemplateEnroll extends AbstractLoadTest
     private static Unmarshaller jaxbUnmarshaller;
 
     private final RAWorker raWorker;
-    private final String user;
+    private final String userPrefix = "LOADTEST-";
     private final List<LoadTestEntry> loadtestEntries;
 
     private final AtomicLong index;
@@ -201,7 +201,6 @@ public class CALoadTestTemplateEnroll extends AbstractLoadTest
         this.index = new AtomicLong(getSecureIndex());
 
         EnrollTemplateType template = parse(new FileInputStream(templateFile));
-        this.user = template.getUser();
 
         List<EnrollCertType> list = template.getEnrollCert();
         loadtestEntries = new ArrayList<>(list.size());

@@ -61,4 +61,6 @@ xipki-ca:responder-set -signerType JKS \
 xipki-ca:requestor-add -cert etc/tlskeys/tls-client.der -name requestor
 
 ## CRL Signer
-xipki-ca:crlsigner-add -signerType CA -name CASIGN.CRLSIGNER -crlControl updateMode?onDemand
+# Generate CRL every day at 02:00 UTC with 90 minutes overlap time
+xipki-ca:crlsigner-add -signerType CA -name CASIGN.CRLSIGNER \
+  -crlControl updateMode?interval%fullCRL.intervals?1%overlap.minutes?90%interval.time?02:00%

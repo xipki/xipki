@@ -96,6 +96,11 @@ public class CmpResponderEntry implements Serializable
 
     public String toString(boolean verbose)
     {
+        return toString(verbose, true);
+    }
+
+    public String toString(boolean verbose, boolean ignoreSensitiveInfo)
+    {
         StringBuilder sb = new StringBuilder();
         sb.append("name: ").append(name).append('\n');
         sb.append("type: ").append(type).append('\n');
@@ -103,14 +108,9 @@ public class CmpResponderEntry implements Serializable
         if(conf == null)
         {
             sb.append("null");
-        }
-        else if(verbose || conf.length() < 101)
+        } else
         {
-            sb.append(conf);
-        }
-        else
-        {
-            sb.append(conf.substring(0, 97)).append("...");
+            sb.append(SecurityUtil.signerConfToString(conf, verbose, ignoreSensitiveInfo));
         }
         sb.append('\n');
         sb.append("cert: ").append("\n");

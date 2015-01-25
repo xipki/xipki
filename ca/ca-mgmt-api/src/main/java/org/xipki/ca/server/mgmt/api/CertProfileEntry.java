@@ -82,10 +82,23 @@ public class CertProfileEntry implements Serializable
     @Override
     public String toString()
     {
+        return toString(false);
+    }
+
+    public String toString(boolean verbose)
+    {
         StringBuilder sb = new StringBuilder();
         sb.append("name: ").append(name).append('\n');
         sb.append("type: ").append(type).append('\n');
-        sb.append("conf: ").append(conf);
+        sb.append("conf: ");
+        if(verbose || conf == null || conf.length() < 301)
+        {
+            sb.append(conf);
+        } else
+        {
+            sb.append(conf.substring(0, 297)).append("...");
+        }
         return sb.toString();
     }
+
 }

@@ -51,7 +51,7 @@
     <certstatusStore>
       <name>db1</name>
       <dbStore>
-        <dbConfFile>ocsp-config/ocsp-db.properties</dbConfFile>
+        <dbConfFile>ca-config/ocsp-db.properties</dbConfFile>
       </dbStore>
       <inheritCaRevocation>true</inheritCaRevocation>
       <retentionInterval>-1</retentionInterval>

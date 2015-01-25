@@ -79,7 +79,7 @@ public class CaDbExporter
     {
         ParamChecker.assertNotEmpty("destFolder", destFolder);
         Properties props = DbPorter.getDbConfProperties(dbConfStream);
-        this.dataSource = dataSourceFactory.createDataSource(props, passwordResolver);
+        this.dataSource = dataSourceFactory.createDataSource(null, props, passwordResolver);
         this.marshaller = getMarshaller();
         this.unmarshaller = getUnmarshaller();
         this.destFolder = IoUtil.expandFilepath(destFolder);

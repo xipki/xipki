@@ -40,10 +40,6 @@ import java.security.SecureRandom;
 import java.security.cert.X509Certificate;
 import java.text.ParseException;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-
-import javax.security.auth.x500.X500Principal;
 
 import org.bouncycastle.asn1.ASN1GeneralizedTime;
 import org.bouncycastle.asn1.ASN1OctetString;
@@ -75,7 +71,6 @@ import org.xipki.ca.api.RequestorInfo;
 import org.xipki.ca.common.cmp.CmpUtil;
 import org.xipki.ca.common.cmp.ProtectionResult;
 import org.xipki.ca.common.cmp.ProtectionVerificationResult;
-import org.xipki.ca.server.mgmt.api.CertBasedRequestorInfo;
 import org.xipki.ca.server.mgmt.api.CmpControl;
 import org.xipki.common.CmpUtf8Pairs;
 import org.xipki.common.LogUtil;
@@ -88,16 +83,14 @@ import org.xipki.security.api.SecurityFactory;
  * @author Lijun Liao
  */
 
-public abstract class CmpResponder
+abstract class CmpResponder
 {
     private static final Logger LOG = LoggerFactory.getLogger(CmpResponder.class);
 
     private final SecureRandom random = new SecureRandom();
-    protected final ConcurrentContentSigner responder;
-    protected final GeneralName sender;
-    private final String c14nSenderName;
-
-    private final Map<String, CertBasedRequestorInfo> authorizatedRequestors = new HashMap<>();
+    protected abstract ConcurrentContentSigner getSigner();
+    protected abstract GeneralName getSender();
+    protected abstract boolean intendsMe(GeneralName requestRecipient);
 
     protected final SecurityFactory securityFactory;
 
@@ -108,19 +101,16 @@ public abstract class CmpResponder
      */
     protected abstract CmpControl getCmpControl();
 
+    protected abstract CmpRequestorInfo getRequestor(X500Name requestorSender);
+
     protected abstract PKIMessage intern_processPKIMessage(RequestorInfo requestor, String user,
             ASN1OctetString transactionId, GeneralPKIMessage pkiMessage, AuditEvent auditEvent);
 
-    protected CmpResponder(ConcurrentContentSigner responder, SecurityFactory securityFactory)
+    protected CmpResponder(SecurityFactory securityFactory)
     {
-        ParamChecker.assertNotNull("responder", responder);
         ParamChecker.assertNotNull("securityFactory", securityFactory);
 
-        this.responder = responder;
         this.securityFactory = securityFactory;
-        X500Name x500Name = X500Name.getInstance(responder.getCertificate().getSubjectX500Principal().getEncoded());
-        this.sender = new GeneralName(x500Name);
-        this.c14nSenderName = canonicalizeSortedName(x500Name);
     }
 
     public PKIMessage processPKIMessage(PKIMessage pkiMessage, X509Certificate tlsClientCert, AuditEvent auditEvent)
@@ -164,8 +154,8 @@ public abstract class CmpResponder
             }
         }
 
-        boolean intentMe = checkRequestRecipient(reqHeader);
-
+        GeneralName recipient = reqHeader.getRecipient();
+        boolean intentMe = (recipient == null) ? null : intendsMe(recipient);
         if(intentMe == false)
         {
             LOG.warn("tid={}: I am not the intented recipient, but '{}'", tid, reqHeader.getRecipient());
@@ -215,7 +205,7 @@ public abstract class CmpResponder
         }
 
         boolean isProtected = message.hasProtection();
-        CertBasedRequestorInfo requestor = null;
+        CmpRequestorInfo requestor = null;
 
         String errorStatus;
 
@@ -242,7 +232,7 @@ public abstract class CmpResponder
                 default:
                     throw new RuntimeException("Should not reach here");
                 }
-                requestor = (CertBasedRequestorInfo) verificationResult.getRequestor();
+                requestor = (CmpRequestorInfo) verificationResult.getRequestor();
             } catch (Exception e)
             {
                 final String msg = "tid=" + tidStr + ": error while verifying the signature";
@@ -261,7 +251,7 @@ public abstract class CmpResponder
             requestor = getRequestor(reqHeader);
             if(requestor != null)
             {
-                if(tlsClientCert.equals(requestor.getCertificate().getCert()))
+                if(tlsClientCert.equals(requestor.getCert().getCert()))
                 {
                     authorized = true;
                 }
@@ -338,7 +328,7 @@ public abstract class CmpResponder
         }
 
         PKIHeader h = pMsg.getHeader();
-        CertBasedRequestorInfo requestor = getRequestor(h);
+        CmpRequestorInfo requestor = getRequestor(h);
         if(requestor == null)
         {
             LOG.warn("tid={}: not authorized requestor '{}'", tid, h.getSender());
@@ -346,7 +336,7 @@ public abstract class CmpResponder
         }
 
         ContentVerifierProvider verifierProvider = securityFactory.getContentVerifierProvider(
-                requestor.getCertificate().getCert());
+                requestor.getCert().getCert());
         if(verifierProvider == null)
         {
             LOG.warn("tid={}: not authorized requestor '{}'", tid, h.getSender());
@@ -362,7 +352,7 @@ public abstract class CmpResponder
     {
         try
         {
-            return CmpUtil.addProtection(pkiMessage, responder, sender, getCmpControl().isSendResponderCert());
+            return CmpUtil.addProtection(pkiMessage, getSigner(), getSender(), getCmpControl().isSendResponderCert());
         } catch (Exception e)
         {
             final String message = "error while add protection to the PKI message";
@@ -386,32 +376,6 @@ public abstract class CmpResponder
         }
     }
 
-    private boolean checkRequestRecipient(PKIHeader reqHeader)
-    {
-        GeneralName recipient = reqHeader.getRecipient();
-        if(recipient == null)
-        {
-            return false;
-        }
-
-        if(sender.equals(recipient))
-        {
-            return true;
-        }
-
-        if(recipient.getTagNo() == GeneralName.directoryName)
-        {
-            X500Name x500Name = X500Name.getInstance(recipient.getName());
-            String sortedName = canonicalizeSortedName(x500Name);
-            if(sortedName.equals(this.c14nSenderName))
-            {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
     protected PKIMessage buildErrorPkiMessage(ASN1OctetString tid,
             PKIHeader requestHeader,
             int failureCode,
@@ -420,7 +384,7 @@ public abstract class CmpResponder
         GeneralName respRecipient = requestHeader.getSender();
 
         PKIHeaderBuilder respHeader = new PKIHeaderBuilder(requestHeader.getPvno().getValue().intValue(),
-                sender, respRecipient);
+                getSender(), respRecipient);
         respHeader.setMessageTime(new ASN1GeneralizedTime(new Date()));
         if(tid != null)
         {
@@ -434,7 +398,7 @@ public abstract class CmpResponder
         return new PKIMessage(respHeader.build(), body);
     }
 
-    private CertBasedRequestorInfo getRequestor(PKIHeader reqHeader)
+    private CmpRequestorInfo getRequestor(PKIHeader reqHeader)
     {
         GeneralName requestSender = reqHeader.getSender();
         if(requestSender.getTagNo() != GeneralName.directoryName)
@@ -442,18 +406,7 @@ public abstract class CmpResponder
             return null;
         }
 
-        String c14nName = canonicalizeSortedName((X500Name) requestSender.getName());
-        CertBasedRequestorInfo requestor = authorizatedRequestors.get(c14nName);
-        if(requestor != null)
-        {
-            ASN1OctetString kid = reqHeader.getSenderKID();
-            if(kid != null)
-            {
-                // TODO : check the kid
-            }
-        }
-
-        return requestor;
+        return getRequestor((X500Name) requestSender.getName());
     }
 
     protected PKIStatusInfo generateCmpRejectionStatus(Integer info, String errorMessage)
@@ -463,27 +416,16 @@ public abstract class CmpResponder
         return new PKIStatusInfo(PKIStatus.rejection, statusMessage, failureInfo);
     }
 
-    public void addAutorizatedRequestor(CertBasedRequestorInfo requestor)
-    {
-        X500Principal x500Prin = requestor.getCertificate().getCert().getSubjectX500Principal();
-        X500Name x500Name = X500Name.getInstance(x500Prin.getEncoded());
-        String c14nName = canonicalizeSortedName(x500Name);
-        this.authorizatedRequestors.put(c14nName, requestor);
-    }
-
     public X500Name getResponderName()
     {
+        GeneralName sender = getSender();
         return sender == null ? null : (X500Name) sender.getName();
     }
 
     public X509Certificate getResponderCert()
     {
-        return responder == null ? null : responder.getCertificate();
-    }
-
-    private static String canonicalizeSortedName(X500Name name)
-    {
-        return SecurityUtil.getRFC4519Name(SecurityUtil.sortX509Name(name));
+        ConcurrentContentSigner signer = getSigner();
+        return signer == null ? null : signer.getCertificate();
     }
 
 }

@@ -61,7 +61,6 @@ import org.xipki.audit.api.AuditLevel;
 import org.xipki.audit.api.AuditLoggingService;
 import org.xipki.audit.api.AuditLoggingServiceRegister;
 import org.xipki.audit.api.AuditStatus;
-import org.xipki.ca.server.impl.mgmt.CmpResponderManager;
 import org.xipki.common.LogUtil;
 
 /**

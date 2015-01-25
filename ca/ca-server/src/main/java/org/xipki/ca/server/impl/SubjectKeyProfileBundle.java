@@ -39,7 +39,7 @@ package org.xipki.ca.server.impl;
  * @author Lijun Liao
  */
 
-public class SubjectKeyProfileTriple
+public class SubjectKeyProfileBundle
 {
     private final int certId;
     private final String subjectFp;
@@ -47,7 +47,7 @@ public class SubjectKeyProfileTriple
     private final String profile;
     private final boolean revoked;
 
-    public SubjectKeyProfileTriple(int certId, String subjectFp, String keyFp, String profile, boolean revoked)
+    public SubjectKeyProfileBundle(int certId, String subjectFp, String keyFp, String profile, boolean revoked)
     {
         super();
         this.certId = certId;

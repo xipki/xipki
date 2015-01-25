@@ -123,6 +123,7 @@
         <constraints nullable="false"/>
       </column>
       <column name="NEXT_SERIAL" type="BIGINT"/>
+      <column name="NEXT_CRLNO" type="INT"/>
       <column name="STATUS" remarks="valid values: pending, enabled, disabled" type="VARCHAR(10)">
         <constraints nullable="false"/>
       </column>
@@ -165,8 +166,7 @@
       <column name="CERT" type="VARCHAR(3000)">
         <constraints nullable="false"/>
       </column>
-      <column name="LAST_CRL_INTERVAL" type="INT"/>
-      <column name="LAST_CRL_INTERVAL_DATE" type="BIGINT"/>
+      <column name="ADDITIONAL_CONTROL" type="VARCHAR(4000)"/>
     </createTable>
     <!-- table CAALIAS -->
     <createTable tableName="CAALIAS">
@@ -396,14 +396,6 @@
     </insert>
     <insert tableName="SEQ_TBL">
       <column name="SEQ_NAME" value="CERT_ID"/>
-      <column name="SEQ_VALUE" value="1"/>
-    </insert>
-    <insert tableName="SEQ_TBL">
-      <column name="SEQ_NAME" value="USER_ID"/>
-      <column name="SEQ_VALUE" value="1"/>
-    </insert>
-    <insert tableName="SEQ_TBL">
-      <column name="SEQ_NAME" value="CRL_ID"/>
       <column name="SEQ_VALUE" value="1"/>
     </insert>
   </changeSet>

@@ -204,7 +204,7 @@ public abstract class EnrollCertCommand extends ClientCommand
             ExtensionExistence ee = new ExtensionExistence(SecurityUtil.textToASN1ObjectIdentifers(needExtensionTypes),
                     SecurityUtil.textToASN1ObjectIdentifers(wantExtensionTypes));
             extensions.add(new Extension(
-                    CustomObjectIdentifiers.id_extension_existence, false, ee.toASN1Primitive().getEncoded()));
+                    CustomObjectIdentifiers.id_request_extensions, false, ee.toASN1Primitive().getEncoded()));
         }
 
         if(extensions != null && extensions.isEmpty() == false)

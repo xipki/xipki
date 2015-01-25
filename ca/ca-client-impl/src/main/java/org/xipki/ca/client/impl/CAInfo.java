@@ -38,6 +38,8 @@ package org.xipki.ca.client.impl;
 import java.security.cert.X509Certificate;
 import java.util.Set;
 
+import org.xipki.ca.client.api.CertProfileInfo;
+
 /**
  * @author Lijun Liao
  */
@@ -45,9 +47,9 @@ import java.util.Set;
 class CAInfo
 {
     private final X509Certificate cert;
-    private final Set<String> certProfiles;
+    private final Set<CertProfileInfo> certProfiles;
 
-    CAInfo(X509Certificate cert, Set<String> certProfiles)
+    CAInfo(X509Certificate cert, Set<CertProfileInfo> certProfiles)
     {
         this.cert = cert;
         this.certProfiles = certProfiles;
@@ -58,7 +60,7 @@ class CAInfo
         return cert;
     }
 
-    Set<String> getCertProfiles()
+    Set<CertProfileInfo> getCertProfiles()
     {
         return certProfiles;
     }
