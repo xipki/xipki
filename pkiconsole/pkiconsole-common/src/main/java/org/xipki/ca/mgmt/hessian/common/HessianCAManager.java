@@ -44,6 +44,7 @@ import java.util.Set;
 import org.xipki.ca.api.profile.CertValidity;
 import org.xipki.ca.server.mgmt.api.CAStatus;
 import org.xipki.ca.server.mgmt.api.CASystemStatus;
+import org.xipki.ca.server.mgmt.api.CRLControl;
 import org.xipki.ca.server.mgmt.api.CmpControl;
 import org.xipki.ca.server.mgmt.api.X509CAEntry;
 import org.xipki.ca.server.mgmt.api.CAHasRequestorEntry;
@@ -83,6 +84,8 @@ public interface HessianCAManager
     throws HessianCAMgmtException;
 
     boolean restartCaSystem();
+
+    void notifyCAChange();
 
     void addCaAlias(String aliasName, String caName)
     throws HessianCAMgmtException;
@@ -181,7 +184,7 @@ public interface HessianCAManager
     throws HessianCAMgmtException;
 
     void changeCrlSigner(String name, String signer_type, String signer_conf, String signer_cert,
-            String crlControl)
+            CRLControl crlControl)
     throws HessianCAMgmtException;
 
     X509CrlSignerEntry getCrlSigner(String name);
@@ -248,7 +251,7 @@ public interface HessianCAManager
 
     public X509Certificate generateSelfSignedCA(
             String name, String certprofileName, byte[] p10Req,
-            CAStatus status, long nextSerial,
+            CAStatus status, long nextSerial, int nextCrlNo,
             List<String> crl_uris, List<String> delta_crl_uris, List<String> ocsp_uris,
             CertValidity max_validity, String signer_type, String signer_conf,
             String crlsigner_name, DuplicationMode duplicate_key,

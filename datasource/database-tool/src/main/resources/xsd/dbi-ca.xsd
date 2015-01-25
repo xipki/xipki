@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<xs:schema xmlns="http://xipki.org/xipki/dbi/ca/v1" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:jxb="http://java.sun.com/xml/ns/jaxb" targetNamespace="http://xipki.org/xipki/dbi/ca/v1" elementFormDefault="qualified" version="1.0" jxb:version="2.0">
+<xs:schema xmlns="http://xipki.org/xipki/dbi/ca/v2"
+  xmlns:xs="http://www.w3.org/2001/XMLSchema"
+  xmlns:jxb="http://java.sun.com/xml/ns/jaxb"
+  targetNamespace="http://xipki.org/xipki/dbi/ca/v2"
+  elementFormDefault="qualified" version="1.0" jxb:version="2.0">
   <xs:annotation>
     <xs:appinfo>
       <jxb:schemaBindings>
@@ -155,6 +159,7 @@
       <xs:element name="name" type="xs:string"/>
       <xs:element name="art" type="xs:int" minOccurs="0"/>
       <xs:element name="next_serial" type="xs:long"/>
+      <xs:element name="next_crlNo" type="xs:int"/>
       <xs:element name="status" type="xs:string"/>
       <xs:element name="crl_uris" type="xs:string" minOccurs="0"/>
       <xs:element name="delta_crl_uris" type="xs:string" minOccurs="0"/>
@@ -174,8 +179,7 @@
       <xs:element name="rev_time" type="xs:long" minOccurs="0"/>
       <xs:element name="rev_invalidity_time" type="xs:long" minOccurs="0"/>
       <xs:element name="validity_mode" type="xs:string" minOccurs="0"/>
-      <xs:element name="last_crl_interval" type="xs:int" minOccurs="0"/>
-      <xs:element name="last_crl_interval_date" type="xs:long" minOccurs="0"/>
+      <xs:element name="additionalControl" type="xs:string" minOccurs="0"/>
     </xs:sequence>
   </xs:complexType>
   <xs:element name="caalias" type="caaliasType"/>

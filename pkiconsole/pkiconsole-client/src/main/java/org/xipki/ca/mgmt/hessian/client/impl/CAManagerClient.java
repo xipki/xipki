@@ -51,6 +51,7 @@ import org.xipki.ca.mgmt.hessian.common.HessianCAManager;
 import org.xipki.ca.server.mgmt.api.CAMgmtException;
 import org.xipki.ca.server.mgmt.api.CAStatus;
 import org.xipki.ca.server.mgmt.api.CASystemStatus;
+import org.xipki.ca.server.mgmt.api.CRLControl;
 import org.xipki.ca.server.mgmt.api.CmpControl;
 import org.xipki.ca.server.mgmt.api.X509CAEntry;
 import org.xipki.ca.server.mgmt.api.CAHasRequestorEntry;
@@ -176,6 +177,12 @@ public class CAManagerClient implements CAManager
     public boolean restartCaSystem()
     {
         return client.restartCaSystem();
+    }
+
+    @Override
+    public void notifyCAChange()
+    {
+        client.notifyCAChange();
     }
 
     @Override
@@ -428,7 +435,7 @@ public class CAManagerClient implements CAManager
 
     @Override
     public void changeCrlSigner(String name, String signer_type,
-            String signer_conf, String signer_cert, String crlControl)
+            String signer_conf, String signer_cert, CRLControl crlControl)
     throws CAMgmtException
     {
         client.changeCrlSigner(name, signer_type, signer_conf, signer_cert, crlControl);
@@ -598,7 +605,7 @@ public class CAManagerClient implements CAManager
     @Override
     public X509Certificate generateSelfSignedCA(String name,
             String certprofileName, byte[] p10Req, CAStatus status,
-            long nextSerial, List<String> crl_uris,
+            long nextSerial, int nextCrlNo, List<String> crl_uris,
             List<String> delta_crl_uris, List<String> ocsp_uris,
             CertValidity max_validity, String signer_type, String signer_conf,
             String crlsigner_name, DuplicationMode duplicate_key,
@@ -607,7 +614,7 @@ public class CAManagerClient implements CAManager
     throws CAMgmtException
     {
         return client.generateSelfSignedCA(name, certprofileName, p10Req, status,
-                nextSerial, crl_uris, delta_crl_uris, ocsp_uris, max_validity,
+                nextSerial, nextCrlNo, crl_uris, delta_crl_uris, ocsp_uris, max_validity,
                 signer_type, signer_conf, crlsigner_name, duplicate_key, duplicate_subject,
                 permissions, numCrls, expirationPeriod, validityMode);
     }
@@ -629,4 +636,5 @@ public class CAManagerClient implements CAManager
             e.printStackTrace();
         }
     }
+
 }

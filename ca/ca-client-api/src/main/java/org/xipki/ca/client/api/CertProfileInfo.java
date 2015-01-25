@@ -33,21 +33,48 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.common;
+package org.xipki.ca.client.api;
 
-import org.bouncycastle.asn1.ASN1ObjectIdentifier;
+import org.xipki.common.ParamChecker;
 
 /**
  * @author Lijun Liao
  */
 
-public class CustomObjectIdentifiers
+public class CertProfileInfo
 {
-    private static final ASN1ObjectIdentifier id_private_dummy = new ASN1ObjectIdentifier("1.3.6.1.4.1.12655");
-    public static final ASN1ObjectIdentifier id_crl_certset = id_private_dummy.branch("100");
-    public static final ASN1ObjectIdentifier id_cmp_generateCRL = id_private_dummy.branch("101");
-    public static final ASN1ObjectIdentifier id_request_extensions = id_private_dummy.branch("200.1");
+    private final String name;
+    private final String type;
+    private final String conf;
 
-    public static final ASN1ObjectIdentifier id_cmp_getSystemInfo = id_private_dummy.branch("200.2");
-    public static final ASN1ObjectIdentifier id_cmp_removeExpiredCerts = id_private_dummy.branch("200.3");
+    public CertProfileInfo(String name, String type, String conf)
+    {
+        ParamChecker.assertNotEmpty("name", name);
+        ParamChecker.assertNotEmpty("type", type);
+        this.name = name;
+        this.type = type;
+        if(conf == null || conf.isEmpty())
+        {
+            this.conf = null;
+        } else
+        {
+            this.conf = conf;
+        }
+    }
+
+    public String getName()
+    {
+        return name;
+    }
+
+    public String getType()
+    {
+        return type;
+    }
+
+    public String getConf()
+    {
+        return conf;
+    }
+
 }

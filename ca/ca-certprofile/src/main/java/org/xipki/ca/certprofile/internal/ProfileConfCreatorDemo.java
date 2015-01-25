@@ -37,7 +37,9 @@ package org.xipki.ca.certprofile.internal;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -55,10 +57,12 @@ import org.bouncycastle.asn1.sec.SECObjectIdentifiers;
 import org.bouncycastle.asn1.teletrust.TeleTrusTObjectIdentifiers;
 import org.bouncycastle.asn1.x509.Extension;
 import org.bouncycastle.asn1.x9.X9ObjectIdentifiers;
+import org.w3c.dom.Element;
 import org.xipki.ca.api.profile.x509.SpecialX509CertProfileBehavior;
 import org.xipki.ca.certprofile.XmlX509CertProfile;
 import org.xipki.ca.certprofile.internal.x509.jaxb.AddTextType;
 import org.xipki.ca.certprofile.internal.x509.jaxb.AlgorithmType;
+import org.xipki.ca.certprofile.internal.x509.jaxb.AnyType;
 import org.xipki.ca.certprofile.internal.x509.jaxb.CertificatePolicyInformationType;
 import org.xipki.ca.certprofile.internal.x509.jaxb.ConditionType;
 import org.xipki.ca.certprofile.internal.x509.jaxb.ConstantExtensionType;
@@ -104,6 +108,7 @@ import org.xipki.ca.certprofile.internal.x509.jaxb.X509ProfileType.Subject;
 import org.xipki.common.ObjectIdentifiers;
 import org.xipki.common.SecurityUtil;
 import org.xipki.common.XMLUtil;
+import org.xml.sax.SAXException;
 
 /**
  * @author Lijun Liao
@@ -126,6 +131,15 @@ public class ProfileConfCreatorDemo
         requestExtensions.add(Extension.extendedKeyUsage);
         requestExtensions.add(Extension.subjectAlternativeName);
         requestExtensions.add(Extension.subjectInfoAccess);
+    }
+
+    private static class ExampleDescription extends AnyType
+    {
+        public ExampleDescription(Element description)
+        {
+            content = new ArrayList<>(1);
+            content.add(description);
+        }
     }
 
     public static void main(String[] args)
@@ -949,7 +963,8 @@ public class ProfileConfCreatorDemo
             String validity, boolean useMidnightNotBefore)
     {
         X509ProfileType profile = new X509ProfileType();
-        profile.setDescription(description);
+
+        profile.setAppInfo(createDescription(description));
         if(qa)
         {
             profile.setQaOnly(true);
@@ -1074,6 +1089,24 @@ public class ProfileConfCreatorDemo
             range.setMax(max);
         }
         return range;
+    }
+
+    private static AnyType createDescription(String details)
+    {
+        StringBuilder sb = new StringBuilder();
+        sb.append("<my:myDescription xmlns:my=\"http://example.org\">\n");
+        sb.append("      <my:category>cat A</my:category>\n");
+        sb.append("      <my:details>").append(details).append("</my:details>\n");
+        sb.append("    </my:myDescription>\n");
+        Element element;
+        try
+        {
+            element = XMLUtil.getDocumentElment(sb.toString().getBytes());
+        } catch (IOException | SAXException e)
+        {
+            throw new RuntimeException(e.getMessage(), e);
+        }
+        return new ExampleDescription(element);
     }
 
 }

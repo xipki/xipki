@@ -83,10 +83,6 @@ public class CALoadTestEnrollCommand extends ClientCommand
             description = "Key type to be requested. Valid values are RSA, EC and DSA")
     private String keyType = "RSA";
 
-    @Option(name = "-user",
-            required = false, description = "Username")
-    protected String user;
-
     @Option(name="-keysize",
             required = false,
             description = "Modulus length of RSA key or p length of DSA key")
@@ -165,7 +161,7 @@ public class CALoadTestEnrollCommand extends ClientCommand
         }
 
         LoadTestEntry loadtestEntry = new LoadTestEntry(certProfile, keyEntry, subjectTemplate, randomDN);
-        CALoadTestEnroll loadTest = new CALoadTestEnroll(raWorker, loadtestEntry, user, n);
+        CALoadTestEnroll loadTest = new CALoadTestEnroll(raWorker, loadtestEntry, n);
 
         loadTest.setDuration(durationInSecond);
         loadTest.setThreads(numThreads);

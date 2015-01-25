@@ -71,8 +71,8 @@ class CALoadTestEnroll extends AbstractLoadTest
 
     private final RAWorker raWorker;
     private final LoadTestEntry loadtestEntry;
-    private final String user;
     private final AtomicLong index;
+    private final String userPrefix = "LOADTEST-";
     private final int n;
 
     @Override
@@ -82,8 +82,7 @@ class CALoadTestEnroll extends AbstractLoadTest
         return new Testor();
     }
 
-    public CALoadTestEnroll(RAWorker raWorker, LoadTestEntry loadtestEntry,
-            String user, int n)
+    public CALoadTestEnroll(RAWorker raWorker, LoadTestEntry loadtestEntry, int n)
     {
         ParamChecker.assertNotNull("raWorker", raWorker);
         ParamChecker.assertNotNull("loadtestEntry", loadtestEntry);
@@ -93,7 +92,6 @@ class CALoadTestEnroll extends AbstractLoadTest
         }
         this.n = n;
         this.loadtestEntry = loadtestEntry;
-        this.user = user == null ? "LOADTESTER" : user;
         this.raWorker = raWorker;
 
         this.index = new AtomicLong(getSecureIndex());
@@ -160,7 +158,7 @@ class CALoadTestEnroll extends AbstractLoadTest
                     request.addRequestEntry(requestEntry);
                 }
 
-                result = raWorker.requestCerts(request, null, user);
+                result = raWorker.requestCerts(request, null, userPrefix + System.currentTimeMillis());
             } catch (RAWorkerException | PKIErrorException e)
             {
                 LOG.warn("{}: {}", e.getClass().getName(), e.getMessage());

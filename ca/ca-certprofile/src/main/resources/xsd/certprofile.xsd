@@ -13,7 +13,7 @@
   <xs:element name="X509Profile" type="X509ProfileType"/>
   <xs:complexType name="X509ProfileType">
     <xs:sequence>
-      <xs:element name="description" type="xs:string" minOccurs="0"/>
+      <xs:element name="appInfo" type="anyType" minOccurs="0"/>
       <xs:element name="version" type="xs:int">
         <xs:annotation>
           <xs:documentation>
@@ -465,4 +465,9 @@
       <xs:enumeration value="decipherOnly"/>
     </xs:restriction>
   </xs:simpleType>
+  <xs:complexType name="anyType" mixed="true">
+    <xs:sequence minOccurs="0" maxOccurs="unbounded">
+       <xs:any processContents="lax"/>
+    </xs:sequence>
+  </xs:complexType>
 </xs:schema>

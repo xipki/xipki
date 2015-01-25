@@ -55,12 +55,15 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.bouncycastle.asn1.ASN1Encodable;
+import org.bouncycastle.asn1.ASN1EncodableVector;
 import org.bouncycastle.asn1.ASN1Enumerated;
 import org.bouncycastle.asn1.ASN1GeneralizedTime;
 import org.bouncycastle.asn1.ASN1Integer;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.ASN1OctetString;
+import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.DEROctetString;
+import org.bouncycastle.asn1.DERSequence;
 import org.bouncycastle.asn1.DERUTF8String;
 import org.bouncycastle.asn1.cmp.CMPCertificate;
 import org.bouncycastle.asn1.cmp.CMPObjectIdentifiers;
@@ -102,6 +105,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.xipki.ca.client.api.CertProfileInfo;
 import org.xipki.ca.client.api.RemoveExpiredCertsResult;
 import org.xipki.ca.client.api.dto.CRLResultType;
 import org.xipki.ca.client.api.dto.CmpResultType;
@@ -758,8 +762,11 @@ abstract class X509CmpRequestor extends CmpRequestor
     CAInfo retrieveCAInfo(String caName)
     throws CmpRequestorException
     {
+        ASN1EncodableVector v = new ASN1EncodableVector();
+        v.add(new ASN1Integer(2));
+        ASN1Sequence acceptVersions = new DERSequence(v);
         PKIMessage request = buildMessageWithGeneralMsgContent(
-                CustomObjectIdentifiers.id_cmp_getSystemInfo, null);
+                CustomObjectIdentifiers.id_cmp_getSystemInfo, acceptVersions);
         PKIResponse response = signAndSend(request);
         ASN1Encodable itvValue = extractGeneralRepContent(response, CustomObjectIdentifiers.id_cmp_getSystemInfo.getId());
         DERUTF8String utf8Str = DERUTF8String.getInstance(itvValue);
@@ -777,28 +784,59 @@ abstract class X509CmpRequestor extends CmpRequestor
 
         X509Certificate caCert;
         String namespace = null;
-        String b64CACert = XMLUtil.getValueOfFirstElementChild(doc.getDocumentElement(), namespace, "CACert");
-        try
+        Element root = doc.getDocumentElement();
+        String s = root.getAttribute("version");
+        if(s == null)
         {
-            caCert = SecurityUtil.parseBase64EncodedCert(b64CACert);
-        } catch (CertificateException | IOException e)
-        {
-            throw new CmpRequestorException("Could no parse the CA certificate", e);
+            s = root.getAttributeNS(namespace, "version");
         }
 
-        Element profilesElement = XMLUtil.getFirstElementChild(doc.getDocumentElement(), namespace, "certProfiles");
-        Set<String> profiles = new HashSet<>();
-        if(profilesElement != null)
+        int version = (s == null) ? 2 : Integer.parseInt(s);
+
+        if(version == 2)
         {
-            List<Element> profileElements = XMLUtil.getElementChilden(profilesElement, namespace, "certProfile");
-            for(Element element : profileElements)
+            String b64CACert = XMLUtil.getValueOfFirstElementChild(root, namespace, "CACert");
+            try
             {
-                String profile = XMLUtil.getNodeValue(element);
-                profiles.add(profile.trim());
+                caCert = SecurityUtil.parseBase64EncodedCert(b64CACert);
+            } catch (CertificateException | IOException e)
+            {
+                throw new CmpRequestorException("Could no parse the CA certificate", e);
             }
-        }
 
-        return new CAInfo(caCert, profiles);
+            Element profilesElement = XMLUtil.getFirstElementChild(root, namespace, "certProfiles");
+            Set<CertProfileInfo> profiles = new HashSet<>();
+            Set<String> profileNames = new HashSet<>();
+            if(profilesElement != null)
+            {
+                List<Element> profileElements = XMLUtil.getElementChilden(profilesElement, namespace, "certProfile");
+
+                for(Element element : profileElements)
+                {
+                    String name = XMLUtil.getValueOfFirstElementChild(element, namespace, "name");
+                    String type = XMLUtil.getValueOfFirstElementChild(element, namespace, "type");
+                    String conf = XMLUtil.getValueOfFirstElementChild(element, namespace, "conf");
+                    CertProfileInfo profile = new CertProfileInfo(name, type, conf);
+                    profiles.add(profile);
+                    profileNames.add(name);
+                    if(LOG.isDebugEnabled())
+                    {
+                        StringBuilder sb = new StringBuilder();
+                        sb.append("configured for CA ").append(caName).append(" certprofile (");
+                        sb.append("name=").append(name).append(", ");
+                        sb.append("type=").append(type).append(", ");
+                        sb.append("conf=").append(conf).append(")");
+                        LOG.debug(sb.toString());
+                    }
+                }
+            }
+
+            LOG.info("CA {} supports profiles {}", caName, profileNames);
+            return new CAInfo(caCert, profiles);
+        } else
+        {
+            throw new CmpRequestorException("unknown CAInfo version " + version);
+        }
     }
 
     RemoveExpiredCertsResult removeExpiredCerts(

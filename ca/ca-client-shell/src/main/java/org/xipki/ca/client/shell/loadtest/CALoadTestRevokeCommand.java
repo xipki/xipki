@@ -128,7 +128,7 @@ public class CALoadTestRevokeCommand extends ClientCommand
         props.setProperty("maximumPoolSize", "1");
         props.setProperty("minimumIdle", "1");
 
-        DataSourceWrapper caDataSource = dataSourceFactory.createDataSource(props, securityFactory.getPasswordResolver());
+        DataSourceWrapper caDataSource = dataSourceFactory.createDataSource(null, props, securityFactory.getPasswordResolver());
         try
         {
             CALoadTestRevoke loadTest = new CALoadTestRevoke(raWorker, caCert, caDataSource, maxCerts, n);

@@ -367,9 +367,6 @@ class CaCertStoreDbImporter extends DbPorter
             releaseResources(ps, null);
         }
 
-        long maxId = getMax("USERNAME", "ID");
-        dataSource.dropAndCreateSequence("USER_ID", maxId + 1);
-
         System.out.println(" Imported " + sum + " users");
     }
 
@@ -579,9 +576,6 @@ class CaCertStoreDbImporter extends DbPorter
         {
             releaseResources(ps, null);
         }
-
-        long maxId = getMax("CRL", "ID");
-        dataSource.dropAndCreateSequence("CRL_ID", maxId + 1);
 
         System.out.println(" Imported table CRL");
     }

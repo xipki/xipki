@@ -35,6 +35,8 @@
 
 package org.xipki.common;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -60,6 +62,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
 
 /**
  * @author Lijun Liao
@@ -69,10 +72,10 @@ public class XMLUtil
 {
     static final TimeZone UTC = TimeZone.getTimeZone("UTC");
     private static Document document;
+    private static DocumentBuilder builder;
 
     static
     {
-        DocumentBuilder builder = null;
         try
         {
             builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
@@ -97,6 +100,13 @@ public class XMLUtil
         Element element = document.createElementNS(namespace, "ns:" + localPart);
         element.appendChild(document.createTextNode(value));
         return element;
+    }
+
+    public static Element getDocumentElment(byte[] xmlFragement)
+    throws IOException, SAXException
+    {
+        Document doc = builder.parse(new ByteArrayInputStream(xmlFragement));
+        return doc.getDocumentElement();
     }
 
     public static Calendar getCalendar(Date dateAndTime)

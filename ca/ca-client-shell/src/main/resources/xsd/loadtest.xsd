@@ -11,7 +11,6 @@
   <xs:element name="enrollTemplate" type="enrollTemplateType"/>
   <xs:complexType name="enrollTemplateType">
     <xs:sequence>
-      <xs:element name="user" type="xs:string" minOccurs="0"/>
       <xs:element name="enrollCert" type="enrollCertType" maxOccurs="unbounded"/>
     </xs:sequence>
   </xs:complexType>
