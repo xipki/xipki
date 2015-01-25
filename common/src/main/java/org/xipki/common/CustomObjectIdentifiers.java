@@ -46,7 +46,7 @@ public class CustomObjectIdentifiers
     private static final ASN1ObjectIdentifier id_private_dummy = new ASN1ObjectIdentifier("1.3.6.1.4.1.12655");
     public static final ASN1ObjectIdentifier id_crl_certset = id_private_dummy.branch("100");
     public static final ASN1ObjectIdentifier id_cmp_generateCRL = id_private_dummy.branch("101");
-    public static final ASN1ObjectIdentifier id_extension_existence = id_private_dummy.branch("200.1");
+    public static final ASN1ObjectIdentifier id_request_extensions = id_private_dummy.branch("200.1");
 
     public static final ASN1ObjectIdentifier id_cmp_getSystemInfo = id_private_dummy.branch("200.2");
     public static final ASN1ObjectIdentifier id_cmp_removeExpiredCerts = id_private_dummy.branch("200.3");
