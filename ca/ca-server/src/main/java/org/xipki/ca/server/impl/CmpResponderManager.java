@@ -33,9 +33,7 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.ca.server.impl.mgmt;
-
-import org.xipki.ca.server.impl.X509CACmpResponder;
+package org.xipki.ca.server.impl;
 
 /**
  * @author Lijun Liao

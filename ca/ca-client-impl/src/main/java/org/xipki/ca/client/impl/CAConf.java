@@ -37,9 +37,12 @@ package org.xipki.ca.client.impl;
 
 import java.security.cert.X509Certificate;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 
 import org.bouncycastle.asn1.x500.X500Name;
+import org.xipki.ca.client.api.CertProfileInfo;
 import org.xipki.common.ParamChecker;
 
 /**
@@ -54,11 +57,13 @@ class CAConf
     private final String requestorName;
     private X509CmpRequestor requestor;
 
-    private boolean autoConf;
+    private boolean certAutoconf;
+    private boolean certprofilesAutoconf;
+
     private X509Certificate cert;
     private X509Certificate responder;
     private X500Name subject;
-    private Set<String> profiles = Collections.emptySet();
+    private Map<String, CertProfileInfo> profiles = Collections.emptyMap();
 
     CAConf(String name, String url, String healthUrl, String requestorName)
     {
@@ -94,7 +99,7 @@ class CAConf
         return healthUrl;
     }
 
-    public void setCAInfo(X509Certificate cert, Set<String> profiles)
+    public void setCert(X509Certificate cert)
     {
         this.cert = cert;
         if(cert != null)
@@ -105,20 +110,22 @@ class CAConf
         {
             this.subject = null;
         }
+    }
 
+    public void setCertprofiles(Set<CertProfileInfo> profiles)
+    {
         if(profiles == null)
         {
-            this.profiles = Collections.emptySet();
+            this.profiles = Collections.emptyMap();
         }
         else
         {
-            this.profiles = profiles;
+            this.profiles = new HashMap<>();
+            for(CertProfileInfo m : profiles)
+            {
+                this.profiles.put(m.getName(), m);
+            }
         }
-    }
-
-    public void setCAInfo(CAInfo caInfo)
-    {
-        setCAInfo(caInfo.getCert(), caInfo.getCertProfiles());
     }
 
     public X509Certificate getCert()
@@ -131,9 +138,19 @@ class CAConf
         return subject;
     }
 
-    public Set<String> getProfiles()
+    public Set<String> getProfileNames()
     {
-        return profiles;
+        return profiles.keySet();
+    }
+
+    public boolean supportsProfile(String profileName)
+    {
+        return profiles.containsKey(profileName);
+    }
+
+    public CertProfileInfo getProfile(String profileName)
+    {
+        return profiles.get(profileName);
     }
 
     public boolean isCAInfoConfigured()
@@ -151,14 +168,24 @@ class CAConf
         return responder;
     }
 
-    public boolean isAutoConf()
+    public boolean isCertAutoconf()
     {
-        return autoConf;
+        return certAutoconf;
     }
 
-    public void setAutoConf(boolean autoConf)
+    public void setCertAutoconf(boolean autoconf)
     {
-        this.autoConf = autoConf;
+        this.certAutoconf = autoconf;
+    }
+
+    public boolean isCertprofilesAutoconf()
+    {
+        return certprofilesAutoconf;
+    }
+
+    public void setCertprofilesAutoconf(boolean autoconf)
+    {
+        this.certprofilesAutoconf = autoconf;
     }
 
     public void setRequestor(X509CmpRequestor requestor)

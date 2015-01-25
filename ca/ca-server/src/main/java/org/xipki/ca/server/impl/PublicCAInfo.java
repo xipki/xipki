@@ -59,7 +59,7 @@ import org.xipki.common.SecurityUtil;
  * @author Lijun Liao
  */
 
-public class PublicCAInfo
+class PublicCAInfo
 {
     private final X500Principal subject;
     private final X500Name x500Subject;

@@ -21,7 +21,7 @@
   <reference id="dataSourceFactory" interface="org.xipki.datasource.api.DataSourceFactory"/>
   <reference id="securityFactory" interface="org.xipki.security.api.SecurityFactory"/>
   <reference id="auditServiceRegister" interface="org.xipki.audit.api.AuditLoggingServiceRegister"/>
-  <bean id="caManager" class="org.xipki.ca.server.impl.mgmt.CAManagerImpl" init-method="startCaSystem" destroy-method="shutdown">
+  <bean id="caManager" class="org.xipki.ca.server.impl.CAManagerImpl" init-method="startCaSystem" destroy-method="shutdown">
     <property name="securityFactory" ref="securityFactory"/>
     <property name="dataSourceFactory" ref="dataSourceFactory"/>
     <property name="caConfFile" value="${caConfFile}"/>

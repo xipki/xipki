@@ -33,7 +33,7 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.ca.server.impl.mgmt;
+package org.xipki.ca.server.impl;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;

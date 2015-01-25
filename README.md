@@ -159,7 +159,7 @@ Install
 
     ```sh
     $XIPKI_HOME/ca-config/ca-db.properties
-    $XIPKI_HOME/ocsp-config/ocsp-db.properties
+    $XIPKI_HOME/ca-config/ocsp-db.properties
     ```
 
 Run Demo

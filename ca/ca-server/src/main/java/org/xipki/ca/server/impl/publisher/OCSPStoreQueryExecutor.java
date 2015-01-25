@@ -215,6 +215,8 @@ class OCSPStoreQueryExecutor
                     + " (CERT_ID, SHA1_FP, SHA224_FP, SHA256_FP, SHA384_FP, SHA512_FP)"
                     + " VALUES (?, ?, ?, ?, ?, ?)";
 
+            int certId = nextCertId();
+
             PreparedStatement[] pss = borrowPreparedStatements(SQL_ADD_CERT, SQL_ADD_RAWCERT, SQL_ADD_CERTHASH);
             // all statements have the same connection
             Connection conn = null;
@@ -226,7 +228,6 @@ class OCSPStoreQueryExecutor
                 PreparedStatement ps_addCerthash = pss[2];
                 conn = ps_addcert.getConnection();
 
-                int certId = (int) dataSource.nextSeqValue("CERT_ID");
                 // CERT
                 X509Certificate cert = certificate.getCert();
                 int idx = 1;
@@ -288,7 +289,13 @@ class OCSPStoreQueryExecutor
                 {
                     conn.setAutoCommit(origAutoCommit);
                 }
-            } finally
+            } catch(SQLException e)
+            {
+                LOG.error("datasource {} SQLException while adding certificate with id {}: {}",
+                        dataSource.getDatasourceName(), certId, e.getMessage());
+                throw e;
+            }
+            finally
             {
                 try
                 {
@@ -595,8 +602,8 @@ class OCSPStoreQueryExecutor
     private boolean certRegistered(int issuerId, BigInteger serialNumber)
     throws SQLException
     {
-        String sql = "COUNT(*) FROM CERT WHERE ISSUER_ID=? AND SERIAL=?";
-        sql = dataSource.createFetchFirstSelectSQL(sql, 1);
+        final String sql = dataSource.createFetchFirstSelectSQL(
+                "COUNT(*) FROM CERT WHERE ISSUER_ID=? AND SERIAL=?", 1);
         ResultSet rs = null;
         PreparedStatement ps = borrowPreparedStatement(sql);
 
@@ -651,6 +658,26 @@ class OCSPStoreQueryExecutor
     private void releaseDbResources(Statement ps, ResultSet rs)
     {
         dataSource.releaseResources(ps, rs);
+    }
+
+    int nextCertId()
+    throws SQLException
+    {
+        Connection conn = dataSource.getConnection();
+        try
+        {
+            while(true)
+            {
+                int certId = (int) dataSource.nextSeqValue("CERT_ID");
+                if(dataSource.columnExists(conn, "CERT", "ID", certId) == false)
+                {
+                    return certId;
+                }
+            }
+        } finally
+        {
+            dataSource.returnConnection(conn);
+        }
     }
 
     private static void setBoolean(PreparedStatement ps, int index, boolean b)

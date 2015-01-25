@@ -1,0 +1,44 @@
+#################################################################
+#               EXPORT THEN IMPORT CA AND OCSP                  #
+#################################################################
+
+feature:install xipki-database-tool
+
+# Wait two seconds
+sleep 1000
+
+xipki-file:rm -r -f output/DB
+
+## Export CA
+
+xipki-db:export-ca -outdir output/DB/CA
+
+## Export OCSP
+
+xipki-db:export-ocsp -outdir output/DB/OCSP
+
+# Reset the CA and OCSP database
+
+xipki-db:initdb --quiet
+
+## Import CA
+
+xipki-db:import-ca -indir output/DB/CA
+
+## Import OCSP
+
+xipki-db:import-ocsp -indir output/DB/OCSP
+
+## Restart the CA
+feature:install xipki-camgmt-shell
+
+# Wait two seconds
+sleep 1000
+
+xipki-ca:ca-restart
+
+#################################################################
+#              UNINSTALL UNNEEDED FEATURES                      #
+#################################################################
+feature:uninstall xipki-database-tool
+feature:uninstall xipki-camgmt-shell

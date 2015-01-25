@@ -441,12 +441,16 @@ class CaConfigurationDbExporter extends DbPorter
         {
             StringBuilder sb = new StringBuilder();
 
-            sb.append("SELECT NAME, ART, NEXT_SERIAL, STATUS, CRL_URIS, OCSP_URIS, MAX_VALIDITY,");
+            sb.append("SELECT NAME, ART, NEXT_SERIAL, NEXT_CRLNO, STATUS, CRL_URIS, OCSP_URIS, MAX_VALIDITY,");
             sb.append(" CERT, SIGNER_TYPE, SIGNER_CONF, CRLSIGNER_NAME,");
             sb.append(" DUPLICATE_KEY_MODE, DUPLICATE_SUBJECT_MODE, PERMISSIONS, NUM_CRLS,");
             sb.append(" EXPIRATION_PERIOD, REVOKED, REV_REASON, REV_TIME, REV_INVALIDITY_TIME,");
-            sb.append(" DELTA_CRL_URIS, VALIDITY_MODE,");
-            sb.append(" LAST_CRL_INTERVAL, LAST_CRL_INTERVAL_DATE");
+            sb.append(" DELTA_CRL_URIS, VALIDITY_MODE");
+            boolean additionalControlExists = dataSource.tableHasColumn(null, "CA", "ADDITIONAL_CONTROL");
+            if(additionalControlExists)
+            {
+                sb.append(", ADDITIONAL_CONTROL");
+            }
             sb.append(" FROM CA");
 
             String sql = sb.toString();
@@ -459,6 +463,7 @@ class CaConfigurationDbExporter extends DbPorter
                 String name = rs.getString("NAME");
                 int art = rs.getInt("ART");
                 long next_serial = rs.getLong("NEXT_SERIAL");
+                int next_crlNo = rs.getInt("NEXT_CRLNO");
                 String status = rs.getString("STATUS");
                 String crl_uris = rs.getString("CRL_URIS");
                 String delta_crl_uris = rs.getString("DELTA_CRL_URIS");
@@ -474,13 +479,12 @@ class CaConfigurationDbExporter extends DbPorter
                 String permissions = rs.getString("PERMISSIONS");
                 int expirationPeriod = rs.getInt("EXPIRATION_PERIOD");
                 String validityMode = rs.getString("VALIDITY_MODE");
-                int lastCRLInterval = rs.getInt("LAST_CRL_INTERVAL");
-                long lastCRLIntervalDate = rs.getLong("LAST_CRL_INTERVAL_DATE");
 
                 CaType ca = new CaType();
                 ca.setName(name);
                 ca.setArt(art);
                 ca.setNextSerial(next_serial);
+                ca.setNextCrlNo(next_crlNo);
                 ca.setStatus(status);
                 ca.setCrlUris(crl_uris);
                 ca.setDeltaCrlUris(delta_crl_uris);
@@ -495,8 +499,11 @@ class CaConfigurationDbExporter extends DbPorter
                 ca.setPermissions(permissions);
                 ca.setExpirationPeriod(expirationPeriod);
                 ca.setValidityMode(validityMode);
-                ca.setLastCrlInterval(lastCRLInterval);
-                ca.setLastCrlIntervalDate(lastCRLIntervalDate);
+                if(additionalControlExists)
+                {
+                    String additionalControl = rs.getString("ADDITIONAL_CONTROL");
+                    ca.setAdditionalControl(additionalControl);
+                }
 
                 int numCrls = rs.getInt("num_crls");
                 ca.setNumCrls(numCrls);

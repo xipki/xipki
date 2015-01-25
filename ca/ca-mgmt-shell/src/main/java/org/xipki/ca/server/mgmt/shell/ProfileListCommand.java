@@ -42,6 +42,7 @@ import java.util.Set;
 
 import org.apache.karaf.shell.commands.Argument;
 import org.apache.karaf.shell.commands.Command;
+import org.apache.karaf.shell.commands.Option;
 import org.xipki.ca.server.mgmt.api.CertProfileEntry;
 
 /**
@@ -53,6 +54,10 @@ public class ProfileListCommand extends CaCommand
 {
     @Argument(index = 0, name = "name", description = "Certificate profile name", required = false)
     protected String name;
+
+    @Option(name = "-v", aliases="--verbose",
+            required = false, description = "Show CA information verbosely")
+    protected Boolean verbose = Boolean.FALSE;
 
     @Override
     protected Object doExecute()
@@ -87,7 +92,7 @@ public class ProfileListCommand extends CaCommand
             CertProfileEntry entry = caManager.getCertProfile(name);
             if(entry != null)
             {
-                sb.append(entry.toString());
+                sb.append(entry.toString(verbose));
             }
         }
 

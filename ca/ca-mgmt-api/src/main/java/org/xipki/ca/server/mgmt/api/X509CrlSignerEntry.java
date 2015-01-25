@@ -41,8 +41,8 @@ import java.security.cert.X509Certificate;
 
 import org.bouncycastle.util.encoders.Base64;
 import org.xipki.common.ConfigurationException;
-import org.xipki.common.SecurityUtil;
 import org.xipki.common.ParamChecker;
+import org.xipki.common.SecurityUtil;
 
 /**
  * @author Lijun Liao
@@ -56,14 +56,14 @@ public class X509CrlSignerEntry implements Serializable
     private final String signerConf;
     private X509Certificate cert;
 
-    private String crlControl;
+    private CRLControl crlControl;
 
-    public X509CrlSignerEntry(String name, String signerType, String signerConf, String crlControl)
+    public X509CrlSignerEntry(String name, String signerType, String signerConf, CRLControl crlControl)
     throws ConfigurationException
     {
         ParamChecker.assertNotEmpty("name", name);
         ParamChecker.assertNotEmpty("type", signerType);
-        ParamChecker.assertNotEmpty("crlControl", crlControl);
+        ParamChecker.assertNotNull("crlControl", crlControl);
 
         this.name = name;
         this.signerType = signerType;
@@ -96,7 +96,7 @@ public class X509CrlSignerEntry implements Serializable
         this.cert = cert;
     }
 
-    public String getCRLControl()
+    public CRLControl getCRLControl()
     {
         return crlControl;
     }
@@ -109,6 +109,11 @@ public class X509CrlSignerEntry implements Serializable
 
     public String toString(boolean verbose)
     {
+        return toString(verbose, true);
+    }
+
+    public String toString(boolean verbose, boolean ignoreSensitiveInfo)
+    {
         StringBuilder sb = new StringBuilder();
         sb.append("name: ").append(name).append('\n');
         sb.append("signerType: ").append(signerType).append('\n');
@@ -116,17 +121,12 @@ public class X509CrlSignerEntry implements Serializable
         if(signerConf == null)
         {
             sb.append("null");
-        }
-        else if(verbose || signerConf.length() < 101)
+        } else
         {
-            sb.append(signerConf);
-        }
-        else
-        {
-            sb.append(signerConf.substring(0, 97)).append("...");
+            sb.append(SecurityUtil.signerConfToString(signerConf, verbose, ignoreSensitiveInfo));
         }
         sb.append('\n');
-        sb.append("crlControl: ").append(crlControl).append("\n");
+        sb.append("crlControl: ").append(crlControl.getConf()).append("\n");
         if(cert != null)
         {
             sb.append("cert: ").append("\n");

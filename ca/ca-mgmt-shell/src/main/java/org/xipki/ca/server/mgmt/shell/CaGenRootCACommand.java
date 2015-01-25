@@ -134,6 +134,7 @@ public class CaGenRootCACommand extends CaAddOrGenCommand
                 p10Req,
                 status,
                 nextSerial,
+                nextCrlNumber,
                 crlUris,
                 deltaCrlUris,
                 ocspUris,

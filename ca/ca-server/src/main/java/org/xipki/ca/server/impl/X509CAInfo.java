@@ -33,7 +33,7 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.ca.server.impl.mgmt;
+package org.xipki.ca.server.impl;
 
 import java.math.BigInteger;
 import java.security.cert.CertificateEncodingException;
@@ -47,25 +47,26 @@ import org.bouncycastle.asn1.x509.Certificate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.ca.api.OperationException;
-import org.xipki.ca.api.X509CertWithId;
 import org.xipki.ca.api.OperationException.ErrorCode;
+import org.xipki.ca.api.X509CertWithId;
 import org.xipki.ca.api.profile.CertValidity;
-import org.xipki.ca.server.impl.PublicCAInfo;
-import org.xipki.ca.server.impl.RandomSerialNumberGenerator;
 import org.xipki.ca.server.impl.store.CertificateStore;
 import org.xipki.ca.server.mgmt.api.CAStatus;
-import org.xipki.ca.server.mgmt.api.X509CAEntry;
 import org.xipki.ca.server.mgmt.api.DuplicationMode;
 import org.xipki.ca.server.mgmt.api.Permission;
 import org.xipki.ca.server.mgmt.api.ValidityMode;
+import org.xipki.ca.server.mgmt.api.X509CAEntry;
 import org.xipki.common.CertRevocationInfo;
 import org.xipki.common.ParamChecker;
+import org.xipki.security.api.ConcurrentContentSigner;
+import org.xipki.security.api.SecurityFactory;
+import org.xipki.security.api.SignerException;
 
 /**
  * @author Lijun Liao
  */
 
-public class X509CAInfo
+class X509CAInfo
 {
     private final static Logger LOG = LoggerFactory.getLogger(X509CAInfo.class);
 
@@ -84,6 +85,7 @@ public class X509CAInfo
     private CertificateStore certStore;
     private boolean useRandomSerialNumber;
     private RandomSerialNumberGenerator randomSNGenerator;
+    private ConcurrentContentSigner signer;
 
     public X509CAInfo(X509CAEntry caEntry, CertificateStore certStore)
     throws OperationException
@@ -153,12 +155,16 @@ public class X509CAInfo
     public void commitNextSerial()
     throws OperationException
     {
-        if(useRandomSerialNumber)
+        if(useRandomSerialNumber == false)
         {
-            return;
+            certStore.commitNextSerialIfLess(caEntry.getName(), caEntry.getNextSerial());
         }
-        long nextSerial = caEntry.getNextSerial();
-        certStore.commitNextSerialIfLess(caEntry.getName(), nextSerial);
+    }
+
+    public void commitNextCrlNo()
+    throws OperationException
+    {
+        certStore.commitNextCrlNo(caEntry.getName(), caEntry.getNextCRLNumber());
     }
 
     public PublicCAInfo getPublicCAInfo()
@@ -362,24 +368,9 @@ public class X509CAInfo
         return caEntry.getExpirationPeriod();
     }
 
-    public int getLastCRLInterval()
+    public Date getCrlBaseTime()
     {
-        return caEntry.getLastCRLInterval();
-    }
-
-    public void setLastCRLInterval(int lastInterval)
-    {
-        caEntry.setLastCRLInterval(lastInterval);
-    }
-
-    public long getLastCRLIntervalDate()
-    {
-        return caEntry.getLastCRLIntervalDate();
-    }
-
-    public void setLastCRLIntervalDate(long lastIntervalDate)
-    {
-        caEntry.setLastCRLIntervalDate(lastIntervalDate);
+        return caEntry.getCrlBaseTime();
     }
 
     public BigInteger nextSerial()
@@ -390,13 +381,76 @@ public class X509CAInfo
             return randomSNGenerator.getSerialNumber();
         }
 
-        long serial = certStore.nextSerial(caEntry.getSerialSeqName());
+        long serial = certStore.nextSerial(getCertificate(), caEntry.getSerialSeqName());
         caEntry.setNextSerial(serial + 1);
         return BigInteger.valueOf(serial);
+    }
+
+    public BigInteger nextCRLNumber()
+    throws OperationException
+    {
+        int crlNo = caEntry.getNextCRLNumber();
+        int currentMaxNo = certStore.getMaxCRLNumber(getCertificate());
+        if(crlNo <= currentMaxNo)
+        {
+            crlNo = currentMaxNo + 1;
+        }
+        caEntry.setNextCRLNumber(crlNo + 1);
+        return BigInteger.valueOf(crlNo);
     }
 
     public boolean useRandomSerialNumber()
     {
         return useRandomSerialNumber;
     }
+
+    public ConcurrentContentSigner getSigner()
+    {
+        return signer;
+    }
+
+    public boolean initSigner(SecurityFactory securityFactory)
+    throws SignerException
+    {
+        if(signer != null)
+        {
+            return true;
+        }
+
+        this.signer = securityFactory.createSigner(caEntry.getSignerType(), caEntry.getSignerConf(),
+                caEntry.getCertificate());
+        return true;
+    }
+
+    public boolean isSignerRequired()
+    {
+        Set<Permission> permissions = caEntry.getPermissions();
+        if(permissions == null)
+        {
+            return true;
+        }
+
+        boolean signerRequired = false;
+        for(Permission permission : permissions)
+        {
+            switch(permission)
+            {
+                case REMOVE_CERT:
+                case UNREVOKE_CERT:
+                case REVOKE_CERT:
+                    break;
+                default:
+                    signerRequired = true;
+                    break;
+            }
+
+            if(signerRequired)
+            {
+                break;
+            }
+        }
+
+        return signerRequired;
+    }
+
 }

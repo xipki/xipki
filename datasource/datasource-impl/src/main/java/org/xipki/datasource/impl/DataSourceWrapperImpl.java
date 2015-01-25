@@ -45,6 +45,7 @@ import java.util.Properties;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xipki.common.ParamChecker;
 import org.xipki.datasource.api.DataSourceWrapper;
 import org.xipki.datasource.api.DatabaseType;
 
@@ -55,20 +56,412 @@ import com.zaxxer.hikari.HikariDataSource;
  * @author Lijun Liao
  */
 
-public class DataSourceWrapperImpl implements DataSourceWrapper
+public abstract class DataSourceWrapperImpl implements DataSourceWrapper
 {
     private static final Logger LOG = LoggerFactory.getLogger(DataSourceWrapperImpl.class);
+
+    private static class MySQL extends DataSourceWrapperImpl
+    {
+        MySQL(String name, HikariDataSource service)
+        {
+            super(name, service);
+        }
+
+        @Override
+        public final DatabaseType getDatabaseType()
+        {
+            return DatabaseType.MYSQL;
+        }
+
+        @Override
+        public String createFetchFirstSelectSQL(String coreSql, int rows, String orderBy)
+        {
+            StringBuilder sql = new StringBuilder(coreSql.length() + 50);
+            sql.append("SELECT ").append(coreSql);
+
+            if(orderBy != null && orderBy.isEmpty() == false)
+            {
+                sql.append(" ORDER BY ").append(orderBy);
+            }
+
+            sql.append(" LIMIT ").append(rows);
+            return sql.toString();
+        }
+
+        @Override
+        protected String buildCreateSequenceSql(String sequenceName, long startValue)
+        {
+            StringBuilder sql = new StringBuilder(sequenceName.length() + 80);
+            sql.append("INSERT INTO SEQ_TBL (SEQ_NAME, SEQ_VALUE) VALUES('");
+            sql.append(sequenceName).append("', ").append(startValue).append(")");
+            return sql.toString();
+        }
+
+        @Override
+        protected String buildDropSequenceSql(String sequenceName)
+        {
+            StringBuilder sql = new StringBuilder(sequenceName.length() + 40);
+            sql.append("DELETE FROM SEQ_TBL WHERE SEQ_NAME='").append(sequenceName).append("'");
+            return sql.toString();
+        }
+
+        @Override
+        protected String buildNextSeqValueSql(String sequenceName)
+        {
+            StringBuilder sql = new StringBuilder(sequenceName.length() + 100);
+            sql.append("UPDATE SEQ_TBL SET SEQ_VALUE = (@cur_value := SEQ_VALUE) + 1 WHERE SEQ_NAME = '");
+            sql.append(sequenceName).append("'");
+            return sql.toString();
+        }
+
+        @Override
+        public long nextSeqValue(String sequenceName)
+        throws SQLException
+        {
+            final String sqlUpdate = buildNextSeqValueSql(sequenceName);
+            final String SQL_SELECT = "SELECT @cur_value";
+
+            Connection conn = getConnection();
+            Statement stmt = conn.createStatement();
+            ResultSet rs = null;
+
+            long ret;
+            try
+            {
+                stmt.executeUpdate(sqlUpdate);
+                rs = stmt.executeQuery(SQL_SELECT);
+                if(rs.next())
+                {
+                    ret = rs.getLong(1);
+                } else
+                {
+                    throw new SQLException("Could not increment the sequence " + sequenceName);
+                }
+            }finally
+            {
+                releaseResources(stmt, rs);
+            }
+
+            LOG.debug("datasource {} NEXVALUE({}): {}", name, sequenceName, ret);
+            return ret;
+        }
+
+    }
+
+    private static class DB2 extends DataSourceWrapperImpl
+    {
+        DB2(String name, HikariDataSource service)
+        {
+            super(name, service);
+        }
+
+        @Override
+        public final DatabaseType getDatabaseType()
+        {
+            return DatabaseType.DB2;
+        }
+
+        @Override
+        public String createFetchFirstSelectSQL(String coreSql, int rows, String orderBy)
+        {
+            StringBuilder sql = new StringBuilder(coreSql.length() + 50);
+            sql.append("SELECT ").append(coreSql);
+
+            if(orderBy != null && orderBy.isEmpty() == false)
+            {
+                sql.append(" ORDER BY ").append(orderBy);
+            }
+
+            sql.append(" FETCH FIRST ").append(rows).append(" ROWS ONLY");
+            return sql.toString();
+        }
+
+        @Override
+        protected String buildCreateSequenceSql(String sequenceName, long startValue)
+        {
+            StringBuilder sql = new StringBuilder(sequenceName.length() + 80);
+            sql.append("CREATE SEQUENCE ").append(sequenceName);
+            sql.append("AS BIGINT START WITH ").append(startValue);
+            sql.append(" INCREMENT BY 1 NO CYCLE NO CACHE");
+            return sql.toString();
+        }
+
+        @Override
+        protected String buildDropSequenceSql(String sequenceName)
+        {
+            StringBuilder sql = new StringBuilder(sequenceName.length() + 20);
+            sql.append("DROP SEQUENCE ").append(sequenceName);
+            return sql.toString();
+        }
+
+        @Override
+        protected String buildNextSeqValueSql(String sequenceName)
+        {
+            StringBuilder sql = new StringBuilder(sequenceName.length() + 50);
+            sql.append("SELECT NEXT VALUE FOR ").append(sequenceName).append(" FROM sysibm.sysdummy1");
+            return sql.toString();
+        }
+
+    }
+
+    private static class PostgreSQL extends DataSourceWrapperImpl
+    {
+        PostgreSQL(String name, HikariDataSource service)
+        {
+            super(name, service);
+        }
+
+        @Override
+        public final DatabaseType getDatabaseType()
+        {
+            return DatabaseType.POSTGRESQL;
+        }
+
+        @Override
+        public String createFetchFirstSelectSQL(String coreSql, int rows, String orderBy)
+        {
+            StringBuilder sql = new StringBuilder(coreSql.length() + 50);
+            sql.append("SELECT ").append(coreSql);
+
+            if(orderBy != null && orderBy.isEmpty() == false)
+            {
+                sql.append(" ORDER BY ").append(orderBy);
+            }
+
+            sql.append(" FETCH FIRST ").append(rows).append(" ROWS ONLY");
+            return sql.toString();
+        }
+
+        @Override
+        protected String buildCreateSequenceSql(String sequenceName, long startValue)
+        {
+            StringBuilder sql = new StringBuilder(sequenceName.length() + 80);
+            sql.append("CREATE SEQUENCE ").append(sequenceName);
+            sql.append(" START WITH ").append(startValue);
+            sql.append(" INCREMENT BY 1 NO CYCLE");
+            return sql.toString();
+        }
+
+        @Override
+        protected String buildDropSequenceSql(String sequenceName)
+        {
+            StringBuilder sql = new StringBuilder(sequenceName.length() + 20);
+            sql.append("DROP SEQUENCE ").append(sequenceName);
+            return sql.toString();
+        }
+
+        @Override
+        protected String buildNextSeqValueSql(String sequenceName)
+        {
+            StringBuilder sql = new StringBuilder(sequenceName.length() + 20);
+            sql.append("SELECT NEXTVAL ('").append(sequenceName).append("')");
+            return sql.toString();
+        }
+
+    }
+
+    private static class Oracle extends DataSourceWrapperImpl
+    {
+        Oracle(String name, HikariDataSource service)
+        {
+            super(name, service);
+        }
+
+        @Override
+        public final DatabaseType getDatabaseType()
+        {
+            return DatabaseType.ORACLE;
+        }
+
+        /*
+         * Oracle: http://www.oracle.com/technetwork/issue-archive/2006/06-sep/o56asktom-086197.html
+         *
+         */
+        @Override
+        public String createFetchFirstSelectSQL(String coreSql, int rows, String orderBy)
+        {
+            StringBuilder sql = new StringBuilder(coreSql.length() + 50);
+
+            if(orderBy == null || orderBy.isEmpty())
+            {
+                sql.append("SELECT ").append(coreSql);
+                if(coreSql.contains(" WHERE"))
+                {
+                    sql.append(" AND");
+                } else
+                {
+                    sql.append(" WHERE");
+                }
+            } else
+            {
+                sql.append("SELECT * FROM ( SELECT ");
+                sql.append(coreSql);
+                sql.append(" ORDER BY ").append(orderBy).append(" ) WHERE");
+            }
+
+            sql.append(" ROWNUM < ").append(rows + 1);
+            return sql.toString();
+        }
+
+        @Override
+        protected String buildCreateSequenceSql(String sequenceName, long startValue)
+        {
+            StringBuilder sql = new StringBuilder(sequenceName.length() + 80);
+            sql.append("CREATE SEQUENCE ").append(sequenceName);
+            sql.append(" START WITH ").append(startValue);
+            sql.append(" INCREMENT BY 1 NOCYCLE NOCACHE");
+            return sql.toString();
+        }
+
+        @Override
+        protected String buildDropSequenceSql(String sequenceName)
+        {
+            StringBuilder sql = new StringBuilder(sequenceName.length() + 20);
+            sql.append("DROP SEQUENCE ").append(sequenceName);
+            return sql.toString();
+        }
+
+        @Override
+        protected String buildNextSeqValueSql(String sequenceName)
+        {
+            StringBuilder sql = new StringBuilder(sequenceName.length() + 50);
+            sql.append("SELECT ").append(sequenceName).append(".NEXTVAL FROM DUAL");
+            return sql.toString();
+        }
+    }
+
+    private static class H2 extends DataSourceWrapperImpl
+    {
+        H2(String name, HikariDataSource service)
+        {
+            super(name, service);
+        }
+
+        @Override
+        public final DatabaseType getDatabaseType()
+        {
+            return DatabaseType.H2;
+        }
+
+        @Override
+        public String createFetchFirstSelectSQL(String coreSql, int rows, String orderBy)
+        {
+            StringBuilder sql = new StringBuilder(coreSql.length() + 50);
+            sql.append("SELECT ").append(coreSql);
+
+            if(orderBy != null && orderBy.isEmpty() == false)
+            {
+                sql.append(" ORDER BY ").append(orderBy);
+            }
+
+            sql.append(" LIMIT ").append(rows);
+            return sql.toString();
+        }
+
+        @Override
+        protected String buildCreateSequenceSql(String sequenceName, long startValue)
+        {
+            StringBuilder sql = new StringBuilder(sequenceName.length() + 80);
+            sql.append("CREATE SEQUENCE ").append(sequenceName);
+            sql.append(" START WITH ").append(startValue);
+            sql.append(" INCREMENT BY 1 NO CYCLE NO CACHE");
+            return sql.toString();
+        }
+
+        @Override
+        protected String buildDropSequenceSql(String sequenceName)
+        {
+            StringBuilder sql = new StringBuilder(sequenceName.length() + 20);
+            sql.append("DROP SEQUENCE ").append(sequenceName);
+            return sql.toString();
+        }
+
+        @Override
+        protected String buildNextSeqValueSql(String sequenceName)
+        {
+            StringBuilder sql = new StringBuilder(sequenceName.length() + 20);
+            sql.append("SELECT NEXTVAL ('").append(sequenceName).append("')");
+            return sql.toString();
+        }
+
+    }
+
+    private static class HSQLDB extends DataSourceWrapperImpl
+    {
+        HSQLDB(String name, HikariDataSource service)
+        {
+            super(name, service);
+        }
+
+        @Override
+        public final DatabaseType getDatabaseType()
+        {
+            return DatabaseType.H2;
+        }
+
+        @Override
+        public String createFetchFirstSelectSQL(String coreSql, int rows, String orderBy)
+        {
+            StringBuilder sql = new StringBuilder(coreSql.length() + 80);
+            sql.append("SELECT ").append(coreSql);
+
+            if(orderBy != null && orderBy.isEmpty() == false)
+            {
+                sql.append(" ORDER BY ").append(orderBy);
+            }
+
+            sql.append(" LIMIT ").append(rows);
+            return sql.toString();
+        }
+
+        @Override
+        protected String buildCreateSequenceSql(String sequenceName, long startValue)
+        {
+            StringBuilder sql = new StringBuilder(sequenceName.length() + 80);
+            sql.append("CREATE SEQUENCE ").append(sequenceName);
+            sql.append(" AS BIGINT START WITH ").append(startValue);
+            sql.append(" INCREMENT BY 1");
+            return sql.toString();
+        }
+
+        @Override
+        protected String buildDropSequenceSql(String sequenceName)
+        {
+            StringBuilder sql = new StringBuilder(sequenceName.length() + 20);
+            sql.append("DROP SEQUENCE ").append(sequenceName);
+            return sql.toString();
+        }
+
+        @Override
+        protected String buildNextSeqValueSql(String sequenceName)
+        {
+            StringBuilder sql = new StringBuilder(sequenceName.length() + 20);
+            sql.append("SELECT NEXTVAL ('").append(sequenceName).append("')");
+            return sql.toString();
+        }
+
+    }
 
     /**
      * References the real data source implementation this class acts as pure
      * proxy for. Derived classes must set this field at construction time.
      */
-    final HikariDataSource service;
+    protected final HikariDataSource service;
 
-    private final DatabaseType databaseType;
+    protected final String name;
 
-    DataSourceWrapperImpl(Properties props, DatabaseType databaseType)
+    private DataSourceWrapperImpl(String name, HikariDataSource service)
     {
+        ParamChecker.assertNotNull("service", service);
+        this.name = name;
+        this.service = service;
+    }
+
+    static DataSourceWrapper createDataSource(String name, Properties props, DatabaseType databaseType)
+    {
+        ParamChecker.assertNotEmpty("props", props);
+        ParamChecker.assertNotNull("databaseType", databaseType);
+
         // The DB2 schema name is case-sensitive, and must be specified in uppercase characters
         String dataSourceClassName = props.getProperty("dataSourceClassName");
         if(dataSourceClassName != null)
@@ -113,9 +506,37 @@ public class DataSourceWrapperImpl implements DataSourceWrapper
             }
         }
 
-        HikariConfig conf = new HikariConfig(props);
-        this.service = new HikariDataSource(conf);
-        this.databaseType = databaseType;
+        if(databaseType == DatabaseType.DB2 || databaseType == DatabaseType.H2 ||
+                databaseType == DatabaseType.HSQLDB ||databaseType == DatabaseType.MYSQL ||
+                databaseType == DatabaseType.ORACLE ||databaseType == DatabaseType.POSTGRESQL)
+        {
+            HikariConfig conf = new HikariConfig(props);
+            HikariDataSource service = new HikariDataSource(conf);
+            switch (databaseType)
+            {
+                case DB2:
+                    return new DB2(name, service);
+                case H2:
+                    return new H2(name, service);
+                case HSQLDB:
+                    return new HSQLDB(name, service);
+                case MYSQL:
+                    return new MySQL(name, service);
+                case ORACLE:
+                    return new Oracle(name, service);
+                default: // POSTGRESQL:
+                    return new PostgreSQL(name, service);
+            }
+        } else
+        {
+            throw new IllegalArgumentException("unknown datasource type " + databaseType);
+        }
+    }
+
+    @Override
+    public final String getDatasourceName()
+    {
+        return name;
     }
 
     @Override
@@ -181,12 +602,6 @@ public class DataSourceWrapperImpl implements DataSourceWrapper
     }
 
     @Override
-    public final DatabaseType getDatabaseType()
-    {
-        return databaseType;
-    }
-
-    @Override
     public Statement createStatement(Connection conn)
     throws SQLException
     {
@@ -194,8 +609,7 @@ public class DataSourceWrapperImpl implements DataSourceWrapper
     }
 
     @Override
-    public PreparedStatement prepareStatement(Connection conn,
-            String sqlQuery)
+    public PreparedStatement prepareStatement(Connection conn, String sqlQuery)
     throws SQLException
     {
         return conn.prepareStatement(sqlQuery);
@@ -265,73 +679,11 @@ public class DataSourceWrapperImpl implements DataSourceWrapper
             }
         }
     }
+
     @Override
     public String createFetchFirstSelectSQL(String coreSql, int rows)
     {
         return createFetchFirstSelectSQL(coreSql, rows, null);
-    }
-
-    /*
-     * Oracle: http://www.oracle.com/technetwork/issue-archive/2006/06-sep/o56asktom-086197.html
-     *
-     */
-    @Override
-    public String createFetchFirstSelectSQL(String coreSql, int rows, String orderBy)
-    {
-        String prefix;
-        String suffix;
-
-        if(databaseType == DatabaseType.ORACLE)
-        {
-            if(orderBy == null || orderBy.isEmpty())
-            {
-                prefix = "SELECT";
-                if(coreSql.contains("WHERE"))
-                {
-                    suffix = " AND ROWNUM < " + (rows + 1);
-                }
-                else
-                {
-                    suffix = " WHERE ROWNUM < " + (rows + 1);
-                }
-            }
-            else
-            {
-                prefix = "SELECT * FROM ( SELECT";
-                suffix = "ORDER BY " + orderBy + " ) WHERE ROWNUM < " + (rows + 1);
-            }
-        }
-        else
-        {
-            prefix = "SELECT";
-            suffix = "";
-
-            if(orderBy != null && orderBy.isEmpty() == false)
-            {
-                suffix += "ORDER BY " + orderBy + " ";
-            }
-
-            switch(databaseType)
-            {
-                case DB2:
-                case POSTGRESQL:
-                case SYBASE:
-                    suffix += "FETCH FIRST " + rows + " ROWS ONLY";
-                    break;
-                case H2:
-                case MYSQL:
-                case HSQLDB:
-                    suffix += "LIMIT " + rows;
-                    break;
-                case MSSQL2000:
-                    prefix = "SELECT TOP " + rows;
-                    break;
-                default:
-                    break;
-            }
-        }
-
-        return prefix + " " + coreSql + " " + suffix;
     }
 
     @Override
@@ -343,8 +695,9 @@ public class DataSourceWrapperImpl implements DataSourceWrapper
         try
         {
             stmt = (conn != null) ? conn.createStatement() : getConnection().createStatement();
-            final String sql = "SELECT MIN(" + column + ") FROM " + table;
-            rs = stmt.executeQuery(sql);
+            StringBuilder sql = new StringBuilder(column.length() + table.length() + 20);
+            sql.append("SELECT MIN(").append(column).append(") FROM ").append(table);
+            rs = stmt.executeQuery(sql.toString());
 
             rs.next();
             return rs.getLong(1);
@@ -370,9 +723,9 @@ public class DataSourceWrapperImpl implements DataSourceWrapper
         try
         {
             stmt = (conn != null) ? conn.createStatement() : getConnection().createStatement();
-            final String sql = "SELECT COUNT(*) FROM " + table;
-            rs = stmt.executeQuery(sql);
-
+            StringBuilder sql = new StringBuilder(table.length() + 25);
+            sql.append("SELECT COUNT(*) FROM ").append(table);
+            rs = stmt.executeQuery(sql.toString());
             rs.next();
             return rs.getInt(1);
         }finally
@@ -397,11 +750,53 @@ public class DataSourceWrapperImpl implements DataSourceWrapper
         try
         {
             stmt = (conn != null) ? conn.createStatement() : getConnection().createStatement();
-            final String sql = "SELECT MAX(" + column + ") FROM " + table;
-            rs = stmt.executeQuery(sql);
-
+            StringBuilder sql = new StringBuilder(column.length() + table.length() + 20);
+            sql.append("SELECT MAX(").append(column).append(") FROM ").append(table);
+            rs = stmt.executeQuery(sql.toString());
             rs.next();
             return rs.getLong(1);
+        }finally
+        {
+            if(conn == null)
+            {
+                releaseResources(stmt, rs);
+            }
+            else
+            {
+                releaseStatementAndResultSet(stmt, rs);
+            }
+        }
+    }
+
+    @Override
+    public boolean columnExists(Connection conn, String table, String column, Object value)
+    throws SQLException
+    {
+        StringBuilder sb = new StringBuilder();
+        sb.append("SELECT COUNT(*) FROM ").append(table).append(" WHERE ").append(column).append("=?");
+        String sql = sb.toString();
+
+        PreparedStatement stmt = null;
+        ResultSet rs = null;
+        try
+        {
+            stmt = (conn != null) ? conn.prepareStatement(sql) : getConnection().prepareStatement(sql);
+            if(value instanceof Integer)
+            {
+                stmt.setInt(1, (Integer) value);
+            } else if(value instanceof Long)
+            {
+                stmt.setLong(1, (Long) value);
+            } else if(value instanceof String)
+            {
+                stmt.setString(1, (String) value);
+            } else
+            {
+                stmt.setString(1, value.toString());
+            }
+            rs = stmt.executeQuery();
+            rs.next();
+            return rs.getInt(1) > 0;
         }finally
         {
             if(conn == null)
@@ -422,7 +817,9 @@ public class DataSourceWrapperImpl implements DataSourceWrapper
         Statement stmt = (conn != null) ? conn.createStatement() : getConnection().createStatement();
         try
         {
-            stmt.execute(createFetchFirstSelectSQL(column + " FROM " + table, 1));
+            StringBuilder sql = new StringBuilder(column.length() + table.length() + 20);
+            sql.append(column).append(" FROM ").append(table);
+            stmt.execute(createFetchFirstSelectSQL(sql.toString(), 1));
             return true;
         }catch(SQLException e)
         {
@@ -447,7 +844,9 @@ public class DataSourceWrapperImpl implements DataSourceWrapper
         Statement stmt = (conn != null) ? conn.createStatement() : getConnection().createStatement();
         try
         {
-            stmt.execute(createFetchFirstSelectSQL("1 FROM " + table, 1));
+            StringBuilder sql = new StringBuilder(table.length() + 10);
+            sql.append("1 FROM ").append(table);
+            stmt.execute(createFetchFirstSelectSQL(sql.toString(), 1));
             return true;
         }catch(SQLException e)
         {
@@ -464,6 +863,10 @@ public class DataSourceWrapperImpl implements DataSourceWrapper
             }
         }
     }
+
+    protected abstract String buildCreateSequenceSql(String sequenceName, long startValue);
+    protected abstract String buildDropSequenceSql(String sequenceName);
+    protected abstract String buildNextSeqValueSql(String sequenceName);
 
     @Override
     public void dropAndCreateSequence(String sequenceName, long startValue)
@@ -483,67 +886,14 @@ public class DataSourceWrapperImpl implements DataSourceWrapper
     public void createSequence(String sequenceName, long startValue)
     throws SQLException
     {
-        String sql;
-        switch(databaseType)
-        {
-            case DB2:
-            case ORACLE:
-            case POSTGRESQL:
-            case H2:
-            case HSQLDB:
-                StringBuilder sb = new StringBuilder();
-                sb.append("CREATE SEQUENCE ").append(sequenceName).append(" ");
-
-                if(DatabaseType.DB2 == databaseType)
-                {
-                    sb.append("AS BIGINT START WITH ");
-                    sb.append(startValue);
-                    sb.append(" INCREMENT BY 1 NO CYCLE NO CACHE");
-                }
-                else if(DatabaseType.ORACLE == databaseType)
-                {
-                    sb.append("START WITH ");
-                    sb.append(startValue);
-                    sb.append(" INCREMENT BY 1 NOCYCLE NOCACHE");
-                }
-                else if(DatabaseType.POSTGRESQL == databaseType)
-                {
-                    sb.append("START WITH ");
-                    sb.append(startValue);
-                    sb.append(" INCREMENT BY 1 NO CYCLE");
-                }
-                else if(DatabaseType.H2 == databaseType)
-                {
-                    sb.append("START WITH ");
-                    sb.append(startValue);
-                    sb.append(" INCREMENT BY 1 NO CYCLE NO CACHE");
-                }
-                else if(DatabaseType.HSQLDB == databaseType)
-                {
-                    sb.append("AS BIGINT START WITH ");
-                    sb.append(startValue);
-                    sb.append(" INCREMENT BY 1");
-                }
-                else
-                {
-                    throw new RuntimeException("should not reach here");
-                }
-
-                sql = sb.toString();
-                break;
-            case MYSQL:
-                sql = "INSERT INTO SEQ_TBL (SEQ_NAME, SEQ_VALUE) VALUES('" + sequenceName + "', " + startValue + ")";
-                break;
-            default:
-                throw new RuntimeException("unsupported database type " + databaseType);
-        }
-
+        String sql = buildCreateSequenceSql(sequenceName, startValue);
         Connection conn = getConnection();
         Statement stmt = null;
         try
         {
             stmt = conn.createStatement();
             stmt.execute(sql);
+            LOG.info("datasource {} CREATESEQ {} START {}", name, sequenceName, startValue);
         }
         finally
         {
@@ -556,22 +906,7 @@ public class DataSourceWrapperImpl implements DataSourceWrapper
     public void dropSequence(String sequenceName)
     throws SQLException
     {
-        String sql;
-        switch(databaseType)
-        {
-            case DB2:
-            case ORACLE:
-            case POSTGRESQL:
-            case H2:
-            case HSQLDB:
-                sql = "DROP SEQUENCE " + sequenceName;
-                break;
-            case MYSQL:
-                sql = "DELETE FROM SEQ_TBL WHERE SEQ_NAME='" + sequenceName + "'";
-                break;
-            default:
-                throw new RuntimeException("unsupported database type " + databaseType);
-        }
+        String sql = buildDropSequenceSql(sequenceName);
 
         Connection conn = getConnection();
         Statement stmt = null;
@@ -579,6 +914,7 @@ public class DataSourceWrapperImpl implements DataSourceWrapper
         {
             stmt = conn.createStatement();
             stmt.execute(sql);
+            LOG.info("datasource {} DROPSEQ {}", name, sequenceName);
         }
         finally
         {
@@ -587,82 +923,32 @@ public class DataSourceWrapperImpl implements DataSourceWrapper
     }
 
     @Override
-    public long nextSeqValue(String seqName)
+    public long nextSeqValue(String sequenceName)
     throws SQLException
     {
-        switch(databaseType)
+        String sql = buildNextSeqValueSql(sequenceName);
+        Connection conn = getConnection();
+        Statement stmt = conn.createStatement();
+        ResultSet rs = null;
+
+        long ret;
+        try
         {
-            case DB2:
-            case ORACLE:
-            case POSTGRESQL:
-            case H2:
-            case HSQLDB:
+            rs = stmt.executeQuery(sql);
+            if(rs.next())
             {
-                String sql;
-                if(DatabaseType.DB2 == databaseType)
-                {
-                    sql = "SELECT NEXT VALUE FOR " + seqName + " FROM sysibm.sysdummy1";
-                }
-                else if(DatabaseType.ORACLE == databaseType)
-                {
-                    sql = "SELECT " + seqName + ".NEXTVAL FROM DUAL";
-                }
-                else if(DatabaseType.POSTGRESQL == databaseType || DatabaseType.H2 == databaseType ||
-                        DatabaseType.HSQLDB == databaseType)
-                {
-                    sql = "SELECT NEXTVAL ('" + seqName + "')";
-                }
-                else
-                {
-                    throw new RuntimeException("should not reach here");
-                }
-                Connection conn = getConnection();
-                Statement stmt = conn.createStatement();
-                ResultSet rs = null;
-                try
-                {
-                    rs = stmt.executeQuery(sql);
-                    if(rs.next())
-                    {
-                        return rs.getLong(1);
-                    }
-                    else
-                    {
-                        throw new SQLException("Could not increment the serial number in " + databaseType);
-                    }
-                }finally
-                {
-                    releaseResources(stmt, rs);
-                }
-            }
-            case MYSQL:
+                ret = rs.getLong(1);
+            } else
             {
-                final String SQL_UPDATE =
-                        "UPDATE SEQ_TBL SET SEQ_VALUE = (@cur_value := SEQ_VALUE) + 1 WHERE SEQ_NAME = '" + seqName + "'";
-                final String SQL_SELECT = "SELECT @cur_value";
-                Connection conn = getConnection();
-                Statement stmt = conn.createStatement();
-                ResultSet rs = null;
-                try
-                {
-                    stmt.executeUpdate(SQL_UPDATE);
-                    rs = stmt.executeQuery(SQL_SELECT);
-                    if(rs.next())
-                    {
-                        return rs.getLong(1);
-                    }
-                    else
-                    {
-                        throw new SQLException("Could not increment the serial number in " + databaseType);
-                    }
-                }finally
-                {
-                    releaseResources(stmt, rs);
-                }
+                throw new SQLException("Could not increment the sequence " + sequenceName);
             }
-            default:
-                throw new RuntimeException("unsupported database type " + databaseType);
+        }finally
+        {
+            releaseResources(stmt, rs);
         }
+
+        LOG.debug("datasource {} NEXVALUE({}): {}", name, sequenceName, ret);
+        return ret;
     }
 
 }

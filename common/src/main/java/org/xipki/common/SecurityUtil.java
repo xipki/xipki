@@ -844,4 +844,43 @@ public class SecurityUtil
         return false;
     }
 
+    public static String signerConfToString(String signerConf, boolean verbose, boolean ignoreSensitiveInfo)
+    {
+        if(ignoreSensitiveInfo)
+        {
+            signerConf = SecurityUtil.eraseSensitiveData(signerConf);
+        }
+
+        if(verbose || signerConf.length() < 101)
+        {
+            return signerConf;
+        }
+        else
+        {
+            return new StringBuilder().append(signerConf.substring(0, 97)).append("...").toString();
+        }
+    }
+
+    private static String eraseSensitiveData(String conf)
+    {
+        if(conf == null || conf.contains("password?") == false)
+        {
+            return conf;
+        }
+
+        try
+        {
+            CmpUtf8Pairs pairs = new CmpUtf8Pairs(conf);
+            String value = pairs.getValue("password");
+            if(value != null && value.startsWith("PBE:") == false && value.startsWith("pbe:") == false)
+            {
+                pairs.putUtf8Pair("password", "<sensitve>");
+            }
+            return pairs.getEncoded();
+        }catch(Exception e)
+        {
+            return conf;
+        }
+    }
+
 }

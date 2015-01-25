@@ -33,7 +33,7 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.ca.server.impl.mgmt;
+package org.xipki.ca.server.impl;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -77,8 +77,6 @@ import org.xipki.ca.api.profile.CertValidity;
 import org.xipki.ca.api.profile.ExtensionValues;
 import org.xipki.ca.api.profile.ExtensionValue;
 import org.xipki.ca.api.profile.SubjectInfo;
-import org.xipki.ca.server.impl.IdentifiedX509CertProfile;
-import org.xipki.ca.server.impl.PublicCAInfo;
 import org.xipki.common.CmpUtf8Pairs;
 import org.xipki.common.ConfigurationException;
 import org.xipki.common.SecurityUtil;

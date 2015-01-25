@@ -1,6 +1,11 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <X509Profile xmlns="http://xipki.org/xmlprofile/v2">
-  <description>CertProfile RootCA Cross</description>
+  <appInfo>
+    <my:myDescription xmlns:my="http://example.org">
+      <my:category>cat A</my:category>
+      <my:details>CertProfile RootCA Cross</my:details>
+    </my:myDescription>
+  </appInfo>
   <version>3</version>
   <ca>true</ca>
   <validity>10y</validity>

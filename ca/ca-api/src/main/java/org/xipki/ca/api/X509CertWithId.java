@@ -38,8 +38,10 @@ package org.xipki.ca.api;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
 
+import javax.security.auth.x500.X500Principal;
+
+import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.util.Arrays;
-import org.xipki.ca.api.OperationException.ErrorCode;
 import org.xipki.common.ParamChecker;
 import org.xipki.common.SecurityUtil;
 
@@ -54,26 +56,27 @@ public class X509CertWithId
     private final String subject;
     private final byte[] encodedCert;
     private final byte[] subjectKeyIdentifer;
+    private final X500Name subjectAsX500Name;
 
     public X509CertWithId(X509Certificate cert)
-    throws OperationException
     {
         this(cert, null);
     }
 
     public X509CertWithId(X509Certificate cert, byte[] encodedCert)
-    throws OperationException
     {
         ParamChecker.assertNotNull("cert", cert);
 
         this.cert = cert;
-        this.subject = SecurityUtil.getRFC4519Name(cert.getSubjectX500Principal());
+        X500Principal x500Subject = cert.getSubjectX500Principal();
+        this.subject = SecurityUtil.getRFC4519Name(x500Subject);
+        this.subjectAsX500Name = X500Name.getInstance(x500Subject.getEncoded());
         try
         {
             this.subjectKeyIdentifer = SecurityUtil.extractSKI(cert);
         } catch(CertificateEncodingException e)
         {
-            throw new OperationException(ErrorCode.INVALID_EXTENSION, e.getMessage());
+            throw new RuntimeException("CertificateEncodingException: " + e.getMessage());
         }
 
         if(encodedCert == null)
@@ -83,8 +86,7 @@ public class X509CertWithId
                 this.encodedCert = cert.getEncoded();
             } catch (CertificateEncodingException e)
             {
-                throw new OperationException(ErrorCode.System_Failure,
-                        "CertificateEncodingException: " + e.getMessage());
+                throw new RuntimeException("CertificateEncodingException: " + e.getMessage());
             }
         }
         else
@@ -106,6 +108,11 @@ public class X509CertWithId
     public String getSubject()
     {
         return subject;
+    }
+
+    public X500Name getSubjectAsX500Name()
+    {
+        return subjectAsX500Name;
     }
 
     @Override

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<CAClient xmlns="http://xipki.org/caclient/conf/v1">
-  <devMode>true</devMode>
+<CAClient xmlns="http://xipki.org/caclient/conf/v2">
+  <devMode>true</devMode>  
   <requestors>
     <requestor>
       <name>requestor1</name>
@@ -16,40 +16,51 @@
       -->
     </requestor>
   </requestors>
+  <responders>
+    <responder>
+      <name>responder1</name>
+      <cert>
+        <file>etc/tlskeys/tls-server.der</file>
+      </cert>
+    </responder>
+  </responders>  
   <CAs>
     <CAInfoUpdateInterval>0</CAInfoUpdateInterval>
     <CA enabled="true">
       <name>RCA1</name>
       <url>https://localhost:8443/cmp/RCA</url>
       <requestor>requestor1</requestor>
-      <responder>
-        <file>etc/tlskeys/tls-server.der</file>
-      </responder>
-      <CAInfo>
-        <autoConf/>
-      </CAInfo>
+      <responder>responder1</responder>
+      <caCert>
+        <autoconf/>
+      </caCert>
+      <certProfiles>
+        <autoconf/>
+      </certProfiles>
     </CA>
     <CA enabled="true">
       <name>SubCA1</name>
       <url>https://localhost:8443/cmp/SubCA</url>
       <requestor>requestor1</requestor>
-      <responder>
-        <file>etc/tlskeys/tls-server.der</file>
-      </responder>
-      <CAInfo>
-        <autoConf/>
-      </CAInfo>
+      <responder>responder1</responder>
+      <caCert>
+        <autoconf/>
+      </caCert>
+      <certProfiles>
+        <autoconf/>
+      </certProfiles>
     </CA>
     <CA enabled="true">
       <name>SubCAwithCRL1</name>
       <url>https://localhost:8443/cmp/SubCAwithCRL</url>
       <requestor>requestor1</requestor>
-      <responder>
-        <file>etc/tlskeys/tls-server.der</file>
-      </responder>
-      <CAInfo>
-        <autoConf/>
-      </CAInfo>
+      <responder>responder1</responder>
+      <caCert>
+        <autoconf/>
+      </caCert>
+      <certProfiles>
+        <autoconf/>
+      </certProfiles>
     </CA>
   </CAs>
 </CAClient>

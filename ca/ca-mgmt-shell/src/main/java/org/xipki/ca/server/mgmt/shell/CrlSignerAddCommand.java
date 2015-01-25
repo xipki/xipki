@@ -39,6 +39,7 @@ import java.security.cert.X509Certificate;
 
 import org.apache.karaf.shell.commands.Command;
 import org.apache.karaf.shell.commands.Option;
+import org.xipki.ca.server.mgmt.api.CRLControl;
 import org.xipki.ca.server.mgmt.api.X509CrlSignerEntry;
 import org.xipki.common.SecurityUtil;
 import org.xipki.security.api.SecurityFactory;
@@ -70,7 +71,7 @@ public class CrlSignerAddCommand extends CaCommand
 
     @Option(name = "-crlControl",
             required = true, description = "Required. CRL control")
-    protected String crlControl;
+    protected String crlControlS;
 
     private SecurityFactory securityFactory;
 
@@ -98,6 +99,7 @@ public class CrlSignerAddCommand extends CaCommand
             securityFactory.createSigner(signerType, signerConf, signerCert);
         }
 
+        CRLControl crlControl = CRLControl.getInstance(crlControlS);
         X509CrlSignerEntry entry = new X509CrlSignerEntry(name, signerType, signerConf, crlControl);
         if(signerCert != null)
         {

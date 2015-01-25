@@ -57,6 +57,8 @@ public interface CAManager
 
     boolean unlockCA();
 
+    void notifyCAChange();
+
     void publishRootCA(String caName, String certprofile)
     throws CAMgmtException;
 
@@ -168,7 +170,7 @@ public interface CAManager
     throws CAMgmtException;
 
     void changeCrlSigner(String name, String signer_type, String signer_conf, String signer_cert,
-            String crlControl)
+            CRLControl crlControl)
     throws CAMgmtException;
 
     X509CrlSignerEntry getCrlSigner(String name);
@@ -235,7 +237,7 @@ public interface CAManager
 
     public X509Certificate generateSelfSignedCA(
             String name, String certprofileName, byte[] p10Req,
-            CAStatus status, long nextSerial,
+            CAStatus status, long nextSerial, int nextCrlNumber,
             List<String> crl_uris, List<String> delta_crl_uris, List<String> ocsp_uris,
             CertValidity max_validity, String signer_type, String signer_conf,
             String crlsigner_name, DuplicationMode duplicate_key,

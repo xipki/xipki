@@ -94,7 +94,7 @@ import java.util.Random;
  * @author Lijun Liao
  */
 
-public class RandomSerialNumberGenerator
+class RandomSerialNumberGenerator
 {
 
     /** random generator algorithm, default SHA1PRNG */

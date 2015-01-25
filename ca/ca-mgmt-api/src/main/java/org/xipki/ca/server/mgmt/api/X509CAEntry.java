@@ -41,6 +41,7 @@ import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
@@ -71,6 +72,7 @@ public class X509CAEntry implements Serializable
     private String signerConf;
     private String crlSignerName;
     private long nextSerial;
+    private int nextCRLNumber;
     private DuplicationMode duplicateKeyMode;
     private DuplicationMode duplicateSubjectMode;
     private ValidityMode validityMode = ValidityMode.STRICT;
@@ -78,23 +80,21 @@ public class X509CAEntry implements Serializable
     private int numCrls;
     private int expirationPeriod;
     private CertRevocationInfo revocationInfo;
-    private int lastCRLInterval;
-    private long lastCRLIntervalDate;
     private String subject;
     private String serialSeqName;
 
-    public X509CAEntry(String name, long initialSerial,
+    public X509CAEntry(String name, long nextSerial, int nextCRLNumber,
             String signerType, String signerConf, X509Certificate cert,
             List<String> ocspUris, List<String> crlUris, List<String> deltaCrlUris,
             List<String> issuerLocations, int numCrls,
             int expirationPeriod)
     throws CAMgmtException
     {
-        init(name, initialSerial, signerType, signerConf, cert, ocspUris,
+        init(name, nextSerial, nextCRLNumber, signerType, signerConf, cert, ocspUris,
                 crlUris, deltaCrlUris, issuerLocations, numCrls, expirationPeriod);
     }
 
-    private void init(String name, long initialSerial,
+    private void init(String name, long nextSerial, int nextCRLNumber,
             String signerType, String signerConf, X509Certificate cert,
             List<String> ocspUris, List<String> crlUris, List<String> deltaCrlUris,
             List<String> issuerLocations, int numCrls,
@@ -110,9 +110,14 @@ public class X509CAEntry implements Serializable
             throw new CAMgmtException("CA certificate does not have keyusage keyCertSign");
         }
 
-        if(initialSerial < 0)
+        if(nextSerial < 0)
         {
-            throw new IllegalArgumentException("initialSerial is negative (" + initialSerial + " < 0)");
+            throw new IllegalArgumentException("nextSerial is negative (" + nextSerial + " < 0)");
+        }
+
+        if(nextCRLNumber <= 0)
+        {
+            throw new IllegalArgumentException("nextCRLNumber is not positive (" + nextCRLNumber + " < 1)");
         }
 
         if(expirationPeriod < 0)
@@ -129,7 +134,8 @@ public class X509CAEntry implements Serializable
 
         this.name = name.toUpperCase();
         this.serialSeqName = IoUtil.convertSequenceName("SERIAL_" + this.name);
-        this.nextSerial = initialSerial;
+        this.nextSerial = nextSerial;
+        this.nextCRLNumber = nextCRLNumber;
         this.cert = cert;
         this.subject = SecurityUtil.getRFC4519Name(cert.getSubjectX500Principal());
 
@@ -159,6 +165,16 @@ public class X509CAEntry implements Serializable
     public void setNextSerial(long nextSerial)
     {
         this.nextSerial = nextSerial;
+    }
+
+    public int getNextCRLNumber()
+    {
+        return nextCRLNumber;
+    }
+
+    public void setNextCRLNumber(int crlNumber)
+    {
+        this.nextCRLNumber = crlNumber;
     }
 
     public List<String> getCrlUris()
@@ -253,28 +269,29 @@ public class X509CAEntry implements Serializable
 
     public String toString(boolean verbose)
     {
+        return toString(verbose, true);
+    }
+
+    public String toString(boolean verbose, boolean ignoreSensitiveInfo)
+    {
         StringBuilder sb = new StringBuilder();
         sb.append("name: ").append(name).append('\n');
         sb.append("next_serial: ").append(nextSerial).append('\n');
+        sb.append("next_crlNumber: ").append(nextCRLNumber).append('\n');
         sb.append("status: ").append(status.getStatus()).append('\n');
         sb.append("deltaCrl_uris: ").append(getDeltaCrlUrisAsString()).append('\n');
         sb.append("crl_uris: ").append(getCrlUrisAsString()).append('\n');
         sb.append("ocsp_uris: ").append(getOcspUrisAsString()).append('\n');
-        sb.append("max_validity: ").append(maxValidity).append(" days\n");
+        sb.append("max_validity: ").append(maxValidity).append("\n");
         sb.append("expirationPeriod: ").append(expirationPeriod).append(" days\n");
         sb.append("signer_type: ").append(signerType).append('\n');
         sb.append("signer_conf: ");
         if(signerConf == null)
         {
             sb.append("null");
-        }
-        else if(verbose || signerConf.length() < 101)
+        } else
         {
-            sb.append(signerConf);
-        }
-        else
-        {
-            sb.append(signerConf.substring(0, 97)).append("...");
+            sb.append(SecurityUtil.signerConfToString(signerConf, verbose, ignoreSensitiveInfo));
         }
         sb.append('\n');
         sb.append("cert: ").append("\n");
@@ -302,8 +319,6 @@ public class X509CAEntry implements Serializable
         sb.append("duplicateSubject: ").append(duplicateSubjectMode.getDescription()).append('\n');
         sb.append("validityMode: ").append(validityMode).append('\n');
         sb.append("permissions: ").append(Permission.toString(permissions)).append('\n');
-        sb.append("lastCRLInterval: ").append(lastCRLInterval).append('\n');
-        sb.append("lastCRLIntervalDate: ").append(lastCRLIntervalDate).append('\n');
 
         return sb.toString();
     }
@@ -388,24 +403,9 @@ public class X509CAEntry implements Serializable
         return expirationPeriod;
     }
 
-    public int getLastCRLInterval()
+    public Date getCrlBaseTime()
     {
-        return lastCRLInterval;
-    }
-
-    public void setLastCRLInterval(int lastInterval)
-    {
-        this.lastCRLInterval = lastInterval;
-    }
-
-    public long getLastCRLIntervalDate()
-    {
-        return lastCRLIntervalDate;
-    }
-
-    public void setLastCRLIntervalDate(long lastIntervalDate)
-    {
-        this.lastCRLIntervalDate = lastIntervalDate;
+        return cert == null ? null : cert.getNotBefore();
     }
 
     public String getSubject()

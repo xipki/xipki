@@ -47,8 +47,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TimeZone;
 
-import javax.security.auth.x500.X500Principal;
-
 import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1EncodableVector;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
@@ -80,8 +78,8 @@ import org.xipki.ca.api.CertProfileException;
 import org.xipki.ca.api.EnvironmentParameterResolver;
 import org.xipki.ca.api.profile.CertValidity;
 import org.xipki.ca.api.profile.ExtensionControl;
-import org.xipki.ca.api.profile.ExtensionValues;
 import org.xipki.ca.api.profile.ExtensionValue;
+import org.xipki.ca.api.profile.ExtensionValues;
 import org.xipki.ca.api.profile.GeneralNameMode;
 import org.xipki.ca.api.profile.SubjectInfo;
 import org.xipki.ca.api.profile.x509.ExtKeyUsageControl;
@@ -103,7 +101,7 @@ import org.xipki.security.ExtensionExistence;
  * @author Lijun Liao
  */
 
-public class IdentifiedX509CertProfile
+class IdentifiedX509CertProfile
 {
     private static final Set<ASN1ObjectIdentifier> criticalOnlyExtensionTypes;
     private static final Set<ASN1ObjectIdentifier> noncriticalOnlyExtensionTypes;
@@ -276,7 +274,7 @@ public class IdentifiedX509CertProfile
     public ExtensionValues getExtensions(
             X500Name requestedSubject, Extensions requestExtensions,
             SubjectPublicKeyInfo publicKeyInfo,
-            PublicCAInfo publicCaInfo, CrlSigner crlSigner)
+            PublicCAInfo publicCaInfo, X509Certificate crlSignerCert)
     throws CertProfileException, BadCertTemplateException
     {
         ExtensionValues tuples = new ExtensionValues();
@@ -287,7 +285,7 @@ public class IdentifiedX509CertProfile
         Set<ASN1ObjectIdentifier> wantedExtensionTypes = new HashSet<>();
         if(requestExtensions != null)
         {
-            Extension reqExtension = requestExtensions.getExtension(CustomObjectIdentifiers.id_extension_existence);
+            Extension reqExtension = requestExtensions.getExtension(CustomObjectIdentifiers.id_request_extensions);
             if(reqExtension != null)
             {
                 ExtensionExistence ee = ExtensionExistence.getInstance(reqExtension.getParsedValue());
@@ -391,17 +389,13 @@ public class IdentifiedX509CertProfile
 
         if(controls.containsKey(Extension.cRLDistributionPoints) || controls.containsKey(Extension.freshestCRL))
         {
-            X500Principal crlSignerSubject = null;
-            if(crlSigner != null && crlSigner.getSigner() != null)
+            X500Name crlSignerSubject = null;
+            if(crlSignerCert != null)
             {
-                X509Certificate crlSignerCert =  crlSigner.getSigner().getCertificate();
-                if(crlSignerCert != null)
-                {
-                    crlSignerSubject = crlSignerCert.getSubjectX500Principal();
-                }
+                crlSignerSubject = X500Name.getInstance(crlSignerCert.getSubjectX500Principal().getEncoded());
             }
 
-            X500Principal x500CaPrincipal = publicCaInfo.getSubject();
+            X500Name x500CaPrincipal = publicCaInfo.getX500Subject();
 
             // CRLDistributionPoints
             extType = Extension.cRLDistributionPoints;

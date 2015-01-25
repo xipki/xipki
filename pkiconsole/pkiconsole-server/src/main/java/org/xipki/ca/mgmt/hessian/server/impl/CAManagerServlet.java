@@ -63,6 +63,7 @@ import org.xipki.ca.server.mgmt.api.CAManager;
 import org.xipki.ca.server.mgmt.api.CAMgmtException;
 import org.xipki.ca.server.mgmt.api.CAStatus;
 import org.xipki.ca.server.mgmt.api.CASystemStatus;
+import org.xipki.ca.server.mgmt.api.CRLControl;
 import org.xipki.ca.server.mgmt.api.CertProfileEntry;
 import org.xipki.ca.server.mgmt.api.CmpControl;
 import org.xipki.ca.server.mgmt.api.CmpRequestorEntry;
@@ -178,6 +179,12 @@ implements HessianCAManager
     public boolean restartCaSystem()
     {
         return caManager.restartCaSystem();
+    }
+
+    @Override
+    public void notifyCAChange()
+    {
+        caManager.notifyCAChange();
     }
 
     @Override
@@ -556,7 +563,7 @@ implements HessianCAManager
 
     @Override
     public void changeCrlSigner(String name, String signer_type,
-            String signer_conf, String signer_cert, String crlControl)
+            String signer_conf, String signer_cert, CRLControl crlControl)
     throws HessianCAMgmtException
     {
         try
@@ -824,7 +831,7 @@ implements HessianCAManager
 
     @Override
     public X509Certificate generateSelfSignedCA(String name, String certprofileName,
-            byte[] p10Req, CAStatus status, long nextSerial,
+            byte[] p10Req, CAStatus status, long nextSerial, int nextCrlNo,
             List<String> crl_uris, List<String> delta_crl_uris,
             List<String> ocsp_uris, CertValidity max_validity, String signer_type,
             String signer_conf, String crlsigner_name,
@@ -835,7 +842,8 @@ implements HessianCAManager
     {
         try
         {
-            return caManager.generateSelfSignedCA(name, certprofileName, p10Req, status, nextSerial,
+            return caManager.generateSelfSignedCA(name, certprofileName, p10Req, status,
+                    nextSerial, nextCrlNo,
                     crl_uris, delta_crl_uris, ocsp_uris, max_validity, signer_type, signer_conf,
                     crlsigner_name, duplicate_key, duplicate_subject, permissions, numCrls,
                     expirationPeriod, validityMode);

@@ -47,6 +47,8 @@ import java.sql.Statement;
 
 public interface DataSourceWrapper
 {
+    String getDatasourceName();
+
     Connection getConnection()
     throws SQLException;
 
@@ -75,6 +77,9 @@ public interface DataSourceWrapper
     throws SQLException;
 
     int getCount(Connection conn, String table)
+    throws SQLException;
+
+    boolean columnExists(Connection conn, String table, String column, Object value)
     throws SQLException;
 
     boolean tableHasColumn(Connection conn, String table, String column)

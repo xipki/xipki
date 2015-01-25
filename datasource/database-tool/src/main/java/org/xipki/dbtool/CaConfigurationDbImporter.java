@@ -396,12 +396,12 @@ class CaConfigurationDbImporter extends DbPorter
         try
         {
             StringBuilder sqlBuilder = new StringBuilder();
-            sqlBuilder.append("INSERT INTO CA (NAME, ART, SUBJECT, NEXT_SERIAL, STATUS,");
+            sqlBuilder.append("INSERT INTO CA (NAME, ART, SUBJECT, NEXT_SERIAL, NEXT_CRLNO, STATUS,");
             sqlBuilder.append(" CRL_URIS, DELTA_CRL_URIS, OCSP_URIS, MAX_VALIDITY,");
             sqlBuilder.append(" CERT, SIGNER_TYPE, SIGNER_CONF, CRLSIGNER_NAME,");
             sqlBuilder.append(" DUPLICATE_KEY_MODE, DUPLICATE_SUBJECT_MODE, PERMISSIONS, NUM_CRLS,");
             sqlBuilder.append(" EXPIRATION_PERIOD, REVOKED, REV_REASON, REV_TIME, REV_INVALIDITY_TIME, VALIDITY_MODE,");
-            sqlBuilder.append(" LAST_CRL_INTERVAL, LAST_CRL_INTERVAL_DATE)");
+            sqlBuilder.append(" ADDITIONAL_CONTROL)");
             sqlBuilder.append(" VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
 
             ps = prepareStatement(sqlBuilder.toString());
@@ -420,6 +420,7 @@ class CaConfigurationDbImporter extends DbPorter
                     ps.setInt(idx++, art);
                     ps.setString(idx++, SecurityUtil.getRFC4519Name(c.getSubjectX500Principal()));
                     ps.setLong(idx++, ca.getNextSerial());
+                    ps.setInt(idx++, ca.getNextCrlNo());
                     ps.setString(idx++, ca.getStatus());
                     ps.setString(idx++, ca.getCrlUris());
                     ps.setString(idx++, ca.getDeltaCrlUris());
@@ -440,8 +441,7 @@ class CaConfigurationDbImporter extends DbPorter
                     setLong(ps, idx++, ca.getRevTime());
                     setLong(ps, idx++, ca.getRevInvalidityTime());
                     ps.setString(idx++, ca.getValidityMode());
-                    setInt(ps, idx++, ca.getLastCrlInterval());
-                    setLong(ps, idx++, ca.getLastCrlIntervalDate());
+                    ps.setString(idx++, ca.getAdditionalControl());
 
                     ps.executeUpdate();
                 }catch(Exception e)

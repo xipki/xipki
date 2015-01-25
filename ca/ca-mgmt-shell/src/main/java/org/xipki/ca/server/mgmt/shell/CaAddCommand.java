@@ -71,6 +71,12 @@ public class CaAddCommand extends CaAddOrGenCommand
             return null;
         }
 
+        if(nextCrlNumber < 1)
+        {
+            err("invalid CRL number: " + nextCrlNumber);
+            return null;
+        }
+
         if(numCrls < 0)
         {
             err("invalid numCrls: " + numCrls);
@@ -109,7 +115,7 @@ public class CaAddCommand extends CaAddOrGenCommand
             caCert = signer.getCertificate();
         }
 
-        X509CAEntry entry = new X509CAEntry(caName, nextSerial, signerType, signerConf, caCert,
+        X509CAEntry entry = new X509CAEntry(caName, nextSerial, nextCrlNumber, signerType, signerConf, caCert,
                 ocspUris, crlUris, deltaCrlUris, null, numCrls.intValue(), expirationPeriod.intValue());
 
         DuplicationMode duplicateKey = DuplicationMode.getInstance(duplicateKeyS);

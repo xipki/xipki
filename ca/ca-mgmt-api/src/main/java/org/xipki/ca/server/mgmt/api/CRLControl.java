@@ -33,7 +33,7 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.ca.server.impl.mgmt;
+package org.xipki.ca.server.mgmt.api;
 
 import java.io.Serializable;
 import java.util.List;
@@ -53,10 +53,10 @@ import org.xipki.common.StringUtil;
  *
  * # For all updateMode
  *
- * # Whether expired certificates are considered
+ * # Whether expired certificates are considered. Default is false
  * expiredCerts.included?<'true'|'false'>
  *
- * # Whether certificates are embedded in CRL, XiPKI-customized extension
+ * # Whether certificates are embedded in CRL, XiPKI-customized extension. Default is false
  * certs.embedded = <'true'|'false'>
  *
  * # List of OIDs of extensions to be embedded in CRL,

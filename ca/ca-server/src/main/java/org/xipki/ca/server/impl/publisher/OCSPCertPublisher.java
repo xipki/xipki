@@ -202,6 +202,7 @@ public class OCSPCertPublisher extends X509CertPublisher
 
         LOG.error("{} (issuser={}: subject='{}', serialNumber={}). Message: {}",
                 new Object[]{messagePrefix, issuer, subjectText, serialText, e.getMessage()});
+
         LOG.debug("error", e);
 
         AuditLoggingService auditLoggingService = auditServiceRegister == null ? null :
@@ -214,6 +215,7 @@ public class OCSPCertPublisher extends X509CertPublisher
             auditEvent.setName("SYSTEM");
             auditEvent.setLevel(AuditLevel.ERROR);
             auditEvent.setStatus(AuditStatus.FAILED);
+            auditEvent.addEventData(new AuditEventData("id", cert.getCertId()));
             auditEvent.addEventData(new AuditEventData("issuer", issuer));
             auditEvent.addEventData(new AuditEventData("subject", subjectText));
             auditEvent.addEventData(new AuditEventData("serialNumber", serialText));

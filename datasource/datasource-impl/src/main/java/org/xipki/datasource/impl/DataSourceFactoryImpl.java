@@ -55,17 +55,17 @@ import org.xipki.security.api.PasswordResolverException;
 public class DataSourceFactoryImpl implements DataSourceFactory
 {
     @Override
-    public DataSourceWrapper createDataSourceForFile(String confFile, PasswordResolver passwordResolver)
+    public DataSourceWrapper createDataSourceForFile(String name, String confFile, PasswordResolver passwordResolver)
     throws SQLException, PasswordResolverException, IOException
     {
         assertNotNull("confFile", confFile);
 
         FileInputStream fIn = new FileInputStream(expandFilepath(confFile));
-        return createDataSource(fIn, passwordResolver);
+        return createDataSource(name, fIn, passwordResolver);
     }
 
     @Override
-    public DataSourceWrapper createDataSource(InputStream conf, PasswordResolver passwordResolver)
+    public DataSourceWrapper createDataSource(String name, InputStream conf, PasswordResolver passwordResolver)
     throws SQLException, PasswordResolverException, IOException
     {
         assertNotNull("conf", conf);
@@ -84,11 +84,11 @@ public class DataSourceFactoryImpl implements DataSourceFactory
             }
         }
 
-        return createDataSource(config, passwordResolver);
+        return createDataSource(name, config, passwordResolver);
     }
 
     @Override
-    public DataSourceWrapper createDataSource(Properties conf, PasswordResolver passwordResolver)
+    public DataSourceWrapper createDataSource(String name, Properties conf, PasswordResolver passwordResolver)
     throws SQLException, PasswordResolverException
     {
         assertNotNull("conf", conf);
@@ -123,8 +123,7 @@ public class DataSourceFactoryImpl implements DataSourceFactory
             conf.setProperty("dataSource.password", password);
         }
 
-        DataSourceWrapperImpl ds = new DataSourceWrapperImpl(conf, databaseType);
-        return ds;
+        return DataSourceWrapperImpl.createDataSource(name, conf, databaseType);
     }
 
     private static void assertNotNull(String parameterName, Object parameter)

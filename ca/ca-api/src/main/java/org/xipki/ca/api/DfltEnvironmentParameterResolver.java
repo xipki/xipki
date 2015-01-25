@@ -79,9 +79,9 @@ public class DfltEnvironmentParameterResolver implements
         envParameters.clear();
     }
 
-    public String removeEnvParam(String envParamName)
+    public String removeEnvParam(String name)
     {
-        return envParameters.remove(envParamName);
+        return envParameters.remove(name);
     }
 
 }
