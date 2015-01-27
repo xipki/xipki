@@ -36,11 +36,13 @@
 package org.xipki.datasource.impl;
 
 import java.io.PrintWriter;
+import java.sql.BatchUpdateException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.Arrays;
 import java.util.Properties;
 
 import org.slf4j.Logger;
@@ -62,6 +64,12 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
 
     private static class MySQL extends DataSourceWrapperImpl
     {
+        private static final String[] duplicateKeyErrorCodes = new String[]{"1062"};
+        private static final String[] dataIntegrityViolationCodes = new String[]
+        {
+            "630", "839", "840", "893", "1169", "1215", "1216", "1217", "1364", "1451", "1452", "1557"
+        };
+
         MySQL(String name, HikariDataSource service)
         {
             super(name, service);
@@ -146,10 +154,28 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
             return ret;
         }
 
+        @Override
+        protected String[] getDuplicateKeyErrorCodes()
+        {
+            return duplicateKeyErrorCodes;
+        }
+
+        @Override
+        protected String[] getDataIntegrityViolationCodes()
+        {
+            return dataIntegrityViolationCodes;
+        }
+
     }
 
     private static class DB2 extends DataSourceWrapperImpl
     {
+        private static final String[] duplicateKeyErrorCodes = new String[]{"-803"};
+        private static final String[] dataIntegrityViolationCodes = new String[]
+        {
+            "-407", "-530", "-531", "-532", "-543", "-544", "-545", "-603", "-667"
+        };
+
         DB2(String name, HikariDataSource service)
         {
             super(name, service);
@@ -202,10 +228,28 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
             return sql.toString();
         }
 
+        @Override
+        protected String[] getDuplicateKeyErrorCodes()
+        {
+            return duplicateKeyErrorCodes;
+        }
+
+        @Override
+        protected String[] getDataIntegrityViolationCodes()
+        {
+            return dataIntegrityViolationCodes;
+        }
+
     }
 
     private static class PostgreSQL extends DataSourceWrapperImpl
     {
+        private static final String[] duplicateKeyErrorCodes = new String[]{"23505"};
+        private static final String[] dataIntegrityViolationCodes = new String[]
+        {
+            "23000", "23502", "23503", "23514"
+        };
+
         PostgreSQL(String name, HikariDataSource service)
         {
             super(name, service);
@@ -214,7 +258,7 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
         @Override
         public final DatabaseType getDatabaseType()
         {
-            return DatabaseType.POSTGRESQL;
+            return DatabaseType.POSTGRES;
         }
 
         @Override
@@ -258,10 +302,34 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
             return sql.toString();
         }
 
+        @Override
+        protected String[] getDuplicateKeyErrorCodes()
+        {
+            return duplicateKeyErrorCodes;
+        }
+
+        @Override
+        protected String[] getDataIntegrityViolationCodes()
+        {
+            return dataIntegrityViolationCodes;
+        }
+
+        @Override
+        protected boolean isUseSqlStateAsCode()
+        {
+            return true;
+        }
+
     }
 
     private static class Oracle extends DataSourceWrapperImpl
     {
+        private static final String[] duplicateKeyErrorCodes = new String[]{"1"};
+        private static final String[] dataIntegrityViolationCodes = new String[]
+        {
+            "1400", "1722", "2291", "2292"
+        };
+
         Oracle(String name, HikariDataSource service)
         {
             super(name, service);
@@ -328,10 +396,30 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
             sql.append("SELECT ").append(sequenceName).append(".NEXTVAL FROM DUAL");
             return sql.toString();
         }
+
+        @Override
+        protected String[] getDuplicateKeyErrorCodes()
+        {
+            return duplicateKeyErrorCodes;
+        }
+
+        @Override
+        protected String[] getDataIntegrityViolationCodes()
+        {
+            return dataIntegrityViolationCodes;
+        }
+
     }
 
     private static class H2 extends DataSourceWrapperImpl
     {
+        private static final String[] duplicateKeyErrorCodes = new String[]{"23001", "23505"};
+        private static final String[] dataIntegrityViolationCodes = new String[]
+        {
+            "22001", "22003", "22012", "22018", "22025", "23000", "23002",
+            "23003", "23502", "23503", "23506", "23507", "23513"
+        };
+
         H2(String name, HikariDataSource service)
         {
             super(name, service);
@@ -384,11 +472,26 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
             return sql.toString();
         }
 
+        @Override
+        protected String[] getDuplicateKeyErrorCodes()
+        {
+            return duplicateKeyErrorCodes;
+        }
+
+        @Override
+        protected String[] getDataIntegrityViolationCodes()
+        {
+            return dataIntegrityViolationCodes;
+        }
+
     }
 
-    private static class HSQLDB extends DataSourceWrapperImpl
+    private static class HSQL extends DataSourceWrapperImpl
     {
-        HSQLDB(String name, HikariDataSource service)
+        private static final String[] duplicateKeyErrorCodes = new String[]{"-104"};
+        private static final String[] dataIntegrityViolationCodes = new String[]{"-9"};
+
+        HSQL(String name, HikariDataSource service)
         {
             super(name, service);
         }
@@ -438,6 +541,18 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
             StringBuilder sql = new StringBuilder(sequenceName.length() + 20);
             sql.append("SELECT NEXTVAL ('").append(sequenceName).append("')");
             return sql.toString();
+        }
+
+        @Override
+        protected String[] getDuplicateKeyErrorCodes()
+        {
+            return duplicateKeyErrorCodes;
+        }
+
+        @Override
+        protected String[] getDataIntegrityViolationCodes()
+        {
+            return dataIntegrityViolationCodes;
         }
 
     }
@@ -507,8 +622,8 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
         }
 
         if(databaseType == DatabaseType.DB2 || databaseType == DatabaseType.H2 ||
-                databaseType == DatabaseType.HSQLDB ||databaseType == DatabaseType.MYSQL ||
-                databaseType == DatabaseType.ORACLE ||databaseType == DatabaseType.POSTGRESQL)
+                databaseType == DatabaseType.HSQL ||databaseType == DatabaseType.MYSQL ||
+                databaseType == DatabaseType.ORACLE ||databaseType == DatabaseType.POSTGRES)
         {
             HikariConfig conf = new HikariConfig(props);
             HikariDataSource service = new HikariDataSource(conf);
@@ -518,8 +633,8 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
                     return new DB2(name, service);
                 case H2:
                     return new H2(name, service);
-                case HSQLDB:
-                    return new HSQLDB(name, service);
+                case HSQL:
+                    return new HSQL(name, service);
                 case MYSQL:
                     return new MySQL(name, service);
                 case ORACLE:
@@ -865,8 +980,19 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
     }
 
     protected abstract String buildCreateSequenceSql(String sequenceName, long startValue);
+
     protected abstract String buildDropSequenceSql(String sequenceName);
+
     protected abstract String buildNextSeqValueSql(String sequenceName);
+
+    protected abstract String[] getDuplicateKeyErrorCodes();
+
+    protected abstract String[] getDataIntegrityViolationCodes();
+
+    protected boolean isUseSqlStateAsCode()
+    {
+        return false;
+    }
 
     @Override
     public void dropAndCreateSequence(String sequenceName, long startValue)
@@ -949,6 +1075,58 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
 
         LOG.debug("datasource {} NEXVALUE({}): {}", name, sequenceName, ret);
         return ret;
+    }
+
+    @Override
+    public boolean isDuplicateKeyException(SQLException sqlException)
+    {
+        return isSqlExceptionContained(sqlException, getDuplicateKeyErrorCodes());
+    }
+
+    @Override
+    public boolean isDataIntegrityViolation(SQLException sqlException)
+    {
+        return isSqlExceptionContained(sqlException, getDataIntegrityViolationCodes());
+    }
+
+    private boolean isSqlExceptionContained(SQLException ex, String[] errorCodes)
+    {
+        SQLException sqlEx = ex;
+        if (sqlEx instanceof BatchUpdateException && sqlEx.getNextException() != null)
+        {
+            SQLException nestedSqlEx = sqlEx.getNextException();
+            if (nestedSqlEx.getErrorCode() > 0 || nestedSqlEx.getSQLState() != null)
+            {
+                LOG.debug("Using nested SQLException from the BatchUpdateException");
+                sqlEx = nestedSqlEx;
+            }
+        }
+
+        String errorCode;
+        if (isUseSqlStateAsCode())
+        {
+            errorCode = sqlEx.getSQLState();
+        } else
+        {
+            // Try to find SQLException with actual error code, looping through the causes.
+            // E.g. applicable to java.sql.DataTruncation as of JDK 1.6.
+            SQLException current = sqlEx;
+            while (current.getErrorCode() == 0 && current.getCause() instanceof SQLException)
+            {
+                current = (SQLException) current.getCause();
+            }
+            errorCode = Integer.toString(current.getErrorCode());
+        }
+
+        LOG.debug("datasource {} SQLException errorCode: {}", name, errorCode);
+
+        if (errorCode != null)
+        {
+            return Arrays.binarySearch(errorCodes, errorCode) >= 0;
+        } else
+        {
+            return false;
+        }
     }
 
 }

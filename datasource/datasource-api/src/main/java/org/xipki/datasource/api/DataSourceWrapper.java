@@ -100,4 +100,8 @@ public interface DataSourceWrapper
     long nextSeqValue(String sequenceName)
     throws SQLException;
 
+    boolean isDuplicateKeyException(SQLException sqlException);
+
+    boolean isDataIntegrityViolation(SQLException sqlException);
+
 }
