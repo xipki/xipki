@@ -36,6 +36,7 @@
 package org.xipki.common;
 
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
+import org.bouncycastle.asn1.x509.GeneralName;
 
 /**
  * @author Lijun Liao
@@ -43,11 +44,33 @@ import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 
 public class CustomObjectIdentifiers
 {
-    private static final ASN1ObjectIdentifier id_private_dummy = new ASN1ObjectIdentifier("1.3.6.1.4.1.12655");
-    public static final ASN1ObjectIdentifier id_crl_certset = id_private_dummy.branch("100");
-    public static final ASN1ObjectIdentifier id_cmp_generateCRL = id_private_dummy.branch("101");
-    public static final ASN1ObjectIdentifier id_request_extensions = id_private_dummy.branch("200.1");
+    private static final ASN1ObjectIdentifier id_private_dummy = new ASN1ObjectIdentifier("1.2.3.4.5.6");
 
-    public static final ASN1ObjectIdentifier id_cmp_getSystemInfo = id_private_dummy.branch("200.2");
-    public static final ASN1ObjectIdentifier id_cmp_removeExpiredCerts = id_private_dummy.branch("200.3");
+    private static final ASN1ObjectIdentifier id_ext                      = id_private_dummy.branch("1");
+    private static final ASN1ObjectIdentifier id_cmp                      = id_private_dummy.branch("2");
+    private static final ASN1ObjectIdentifier id_remotep11                = id_private_dummy.branch("3");
+
+    public static final ASN1ObjectIdentifier id_ext_crl_certset           = id_ext.branch("1");
+
+    public static final ASN1ObjectIdentifier id_cmp_generateCRL           = id_cmp.branch("1");
+    public static final ASN1ObjectIdentifier id_cmp_request_extensions    = id_cmp.branch("2");
+
+    public static final ASN1ObjectIdentifier id_cmp_getSystemInfo         = id_cmp.branch("3");
+    public static final ASN1ObjectIdentifier id_cmp_removeExpiredCerts    = id_cmp.branch("4");
+
+    public static final ASN1ObjectIdentifier id_remotep11_version         = id_remotep11.branch("1");
+    public static final ASN1ObjectIdentifier id_remotep11_pso_rsa_x509    = id_remotep11.branch("2");
+    public static final ASN1ObjectIdentifier id_remotep11_pso_rsa_pkcs    = id_remotep11.branch("3");
+    public static final ASN1ObjectIdentifier id_remotep11_pso_ecdsa       = id_remotep11.branch("4");
+    public static final ASN1ObjectIdentifier id_remotep11_pso_dsa         = id_remotep11.branch("5");
+    public static final ASN1ObjectIdentifier id_remotep11_get_publickey   = id_remotep11.branch("11");
+    public static final ASN1ObjectIdentifier id_remotep11_get_certificate = id_remotep11.branch("12");
+    public static final ASN1ObjectIdentifier id_remotep11_list_slots      = id_remotep11.branch("13");
+    public static final ASN1ObjectIdentifier id_remotep11_list_keylabels  = id_remotep11.branch("14");
+
+    public static final GeneralName CMP_SERVER =
+            new GeneralName(GeneralName.uniformResourceIdentifier, "http://xipki.org/remotep11/server");
+    public static final GeneralName CMP_CLIENT =
+            new GeneralName(GeneralName.uniformResourceIdentifier, "http://xipki.org/remotep11/client");
+
 }

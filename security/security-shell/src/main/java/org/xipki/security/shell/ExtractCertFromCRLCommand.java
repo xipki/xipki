@@ -73,7 +73,7 @@ public class ExtractCertFromCRLCommand extends SecurityCommand
     throws Exception
     {
         X509CRL crl = SecurityUtil.parseCRL(crlFile);
-        String oidExtnCerts = CustomObjectIdentifiers.id_crl_certset.getId();
+        String oidExtnCerts = CustomObjectIdentifiers.id_ext_crl_certset.getId();
         byte[] extnValue = crl.getExtensionValue(oidExtnCerts);
         if(extnValue == null)
         {
