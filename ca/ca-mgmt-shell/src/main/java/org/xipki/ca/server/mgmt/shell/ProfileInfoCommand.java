@@ -35,22 +35,68 @@
 
 package org.xipki.ca.server.mgmt.shell;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
+
+import org.apache.karaf.shell.commands.Argument;
 import org.apache.karaf.shell.commands.Command;
-import org.xipki.ca.server.mgmt.api.CmpControl;
+import org.apache.karaf.shell.commands.Option;
+import org.xipki.ca.server.mgmt.api.CertProfileEntry;
 
 /**
  * @author Lijun Liao
  */
 
-@Command(scope = "xipki-ca", name = "cmpcontrol-list", description="List CMP control")
-public class CmpControlListCommand extends CaCommand
+@Command(scope = "xipki-ca", name = "profile-info", description="Show information of profiles")
+public class ProfileInfoCommand extends CaCommand
 {
+    @Argument(index = 0, name = "name", description = "Certificate profile name", required = false)
+    protected String name;
+
+    @Option(name = "-v", aliases="--verbose",
+            required = false, description = "Show certificate profile information verbosely")
+    protected Boolean verbose = Boolean.FALSE;
+
     @Override
     protected Object doExecute()
     throws Exception
     {
-        CmpControl cmpcontrol = caManager.getCmpControl();
-        out(cmpcontrol == null ? "NULL" : cmpcontrol.toString());
+        StringBuilder sb = new StringBuilder();
+
+        if(name == null)
+        {
+            Set<String> names = caManager.getCertProfileNames();
+            int n = names.size();
+
+            if(n == 0 || n == 1)
+            {
+                sb.append(((n == 0) ? "no" : "1") + " profile is configured\n");
+            }
+            else
+            {
+                sb.append(n + " profiles are configured:\n");
+            }
+
+            List<String> sorted = new ArrayList<>(names);
+            Collections.sort(sorted);
+
+            for(String name : sorted)
+            {
+                sb.append("\t").append(name).append("\n");
+            }
+        }
+        else
+        {
+            CertProfileEntry entry = caManager.getCertProfile(name);
+            if(entry != null)
+            {
+                sb.append(entry.toString(verbose));
+            }
+        }
+
+        out(sb.toString());
         return null;
     }
 }

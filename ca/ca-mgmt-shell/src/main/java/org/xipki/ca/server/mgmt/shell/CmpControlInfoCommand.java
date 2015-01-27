@@ -35,69 +35,22 @@
 
 package org.xipki.ca.server.mgmt.shell;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
-
-import org.apache.karaf.shell.commands.Argument;
 import org.apache.karaf.shell.commands.Command;
-import org.apache.karaf.shell.commands.Option;
-import org.xipki.ca.server.mgmt.api.X509CrlSignerEntry;
+import org.xipki.ca.server.mgmt.api.CmpControl;
 
 /**
  * @author Lijun Liao
  */
 
-@Command(scope = "xipki-ca", name = "crlsigner-list", description="List CRL signers")
-public class CrlSignerListCommand extends CaCommand
+@Command(scope = "xipki-ca", name = "cmpcontrol-info", description="Show information of CMP control")
+public class CmpControlInfoCommand extends CaCommand
 {
-    @Argument(index = 0, name = "name", description = "CRL signer name", required = false)
-    protected String name;
-
-    @Option(name = "-v", aliases="--verbose",
-            required = false, description = "Show CRL signer information verbosely")
-    protected Boolean verbose = Boolean.FALSE;
-
     @Override
     protected Object doExecute()
     throws Exception
     {
-        StringBuilder sb = new StringBuilder();
-
-        if(name == null)
-        {
-            Set<String> names = caManager.getCrlSignerNames();
-            int n = names.size();
-
-            if(n == 0 || n == 1)
-            {
-                sb.append(((n == 0) ? "no" : "1") + " CRL signer is configured\n");
-            }
-            else
-            {
-                sb.append(n + " CRL signers are configured:\n");
-            }
-
-            List<String> sorted = new ArrayList<>(names);
-            Collections.sort(sorted);
-
-            for(String name : sorted)
-            {
-                sb.append("\t").append(name).append("\n");
-            }
-        }
-        else
-        {
-            X509CrlSignerEntry entry = caManager.getCrlSigner(name);
-            if(entry != null)
-            {
-                sb.append(entry.toString(verbose.booleanValue()));
-            }
-        }
-
-        out(sb.toString());
-
+        CmpControl cmpcontrol = caManager.getCmpControl();
+        out(cmpcontrol == null ? "NULL" : cmpcontrol.toString());
         return null;
     }
 }

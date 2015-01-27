@@ -35,45 +35,28 @@
 
 package org.xipki.ca.server.mgmt.shell;
 
-import java.util.Set;
-
 import org.apache.karaf.shell.commands.Command;
 import org.apache.karaf.shell.commands.Option;
-import org.xipki.ca.server.mgmt.api.CAHasRequestorEntry;
+import org.xipki.ca.server.mgmt.api.CmpResponderEntry;
 
 /**
  * @author Lijun Liao
  */
 
-@Command(scope = "xipki-ca", name = "careq-list", description="List requestors in CA")
-public class CaRequestorListCommand extends CaCommand
+@Command(scope = "xipki-ca", name = "responder-info", description="Show information of responder")
+public class ResponderInfoCommand extends CaCommand
 {
-    @Option(name = "-ca",
-            description = "Required. CA name",
-            required = true)
-    protected String caName;
+
+    @Option(name = "-v", aliases="--verbose",
+            required = false, description = "Show responder information verbosely")
+    protected Boolean verbose = Boolean.FALSE;
 
     @Override
     protected Object doExecute()
     throws Exception
     {
-        StringBuilder sb = new StringBuilder();
-
-        Set<CAHasRequestorEntry> entries = caManager.getCmpRequestorsForCA(caName);
-        if(entries != null && entries.isEmpty() == false)
-        {
-            sb.append("Requestors trusted by CA " + caName).append("\n");
-            for(CAHasRequestorEntry entry  : entries)
-            {
-                sb.append("\t").append(entry).append("\n");
-            }
-        }
-        else
-        {
-            sb.append("\tNo requestor for CA " + caName + " is configured");
-        }
-        out(sb.toString());
-
+        CmpResponderEntry responder = caManager.getCmpResponder();
+        out(responder.toString(verbose.booleanValue()));
         return null;
     }
 }

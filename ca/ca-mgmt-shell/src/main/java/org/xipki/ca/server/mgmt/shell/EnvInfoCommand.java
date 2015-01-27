@@ -42,22 +42,16 @@ import java.util.Set;
 
 import org.apache.karaf.shell.commands.Argument;
 import org.apache.karaf.shell.commands.Command;
-import org.apache.karaf.shell.commands.Option;
-import org.xipki.ca.server.mgmt.api.X509CAEntry;
 
 /**
  * @author Lijun Liao
  */
 
-@Command(scope = "xipki-ca", name = "ca-list", description="List CAs")
-public class CaListCommand extends CaCommand
+@Command(scope = "xipki-ca", name = "env-info", description="Show information of CA environment parameters")
+public class EnvInfoCommand extends CaCommand
 {
-    @Argument(index = 0, name = "name", description = "CA name", required = false)
-    protected String caName;
-
-    @Option(name = "-v", aliases="--verbose",
-            required = false, description = "Show CA information verbosely")
-    protected Boolean verbose = Boolean.FALSE;
+    @Argument(index = 0, name = "name", description = "Environment parameter name", required = false)
+    protected String name;
 
     @Override
     protected Object doExecute()
@@ -65,43 +59,32 @@ public class CaListCommand extends CaCommand
     {
         StringBuilder sb = new StringBuilder();
 
-        if(caName == null)
+        if(name == null)
         {
-            Set<String> names = caManager.getCaNames();
-            int n = names.size();
+            Set<String> paramNames = caManager.getEnvParamNames();
+            int n = paramNames.size();
+
             if(n == 0 || n == 1)
             {
-                sb.append(((n == 0) ? "no" : "1") + " CA is configured\n");
+                sb.append(((n == 0) ? "no" : "1") + " environment parameter is configured\n");
             }
             else
             {
-                sb.append(n + " CAs are configured:\n");
+                sb.append(n + " enviroment paramters are configured:\n");
             }
 
-            List<String> sorted = new ArrayList<>(names);
+            List<String> sorted = new ArrayList<>(paramNames);
             Collections.sort(sorted);
+
             for(String paramName : sorted)
             {
-                sb.append("\t").append(paramName);
-                String alias = caManager.getAliasName(paramName);
-                if(alias != null)
-                {
-                    sb.append(" (alias: ").append(alias).append(")");
-                }
-                sb.append("\n");
+                sb.append("\t").append(paramName).append("\n");
             }
         }
         else
         {
-            X509CAEntry entry = caManager.getCA(caName);
-            if(entry == null)
-            {
-                sb.append("Could not find CA '" + caName + "'");
-            }
-            else
-            {
-                sb.append(entry.toString(verbose.booleanValue()));
-            }
+            String paramValue = caManager.getEnvParam(name);
+            sb.append(name).append("\n\t").append(paramValue);
         }
 
         out(sb.toString());

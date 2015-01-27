@@ -32,6 +32,9 @@
   <bean id="profileNameCompleter" class="org.xipki.ca.server.mgmt.shell.completer.ProfileNameCompleter">
     <property name="caManager" ref="caManager"/>
   </bean>
+  <bean id="profileNameAndAllCompleter" class="org.xipki.ca.server.mgmt.shell.completer.ProfileNameAndAllCompleter">
+    <property name="caManager" ref="caManager"/>
+  </bean>
   <bean id="publisherNameCompleter" class="org.xipki.ca.server.mgmt.shell.completer.PublisherNameCompleter">
     <property name="caManager" ref="caManager"/>
   </bean>
@@ -146,7 +149,7 @@
       </completers>
     </command>
     <command>
-      <action class="org.xipki.ca.server.mgmt.shell.CaListCommand">
+      <action class="org.xipki.ca.server.mgmt.shell.CaInfoCommand">
         <property name="caManager" ref="caManager"/>
       </action>
       <completers>
@@ -181,7 +184,7 @@
       </optional-completers>
     </command>
     <command>
-      <action class="org.xipki.ca.server.mgmt.shell.CaAliasListCommand">
+      <action class="org.xipki.ca.server.mgmt.shell.CaAliasInfoCommand">
         <property name="caManager" ref="caManager"/>
       </action>
       <completers>
@@ -209,7 +212,7 @@
       </optional-completers>
     </command>
     <command>
-      <action class="org.xipki.ca.server.mgmt.shell.CaProfileListCommand">
+      <action class="org.xipki.ca.server.mgmt.shell.CaProfileInfoCommand">
         <property name="caManager" ref="caManager"/>
       </action>
       <optional-completers>
@@ -236,7 +239,7 @@
       </optional-completers>
     </command>
     <command>
-      <action class="org.xipki.ca.server.mgmt.shell.CaPublisherListCommand">
+      <action class="org.xipki.ca.server.mgmt.shell.CaPublisherInfoCommand">
         <property name="caManager" ref="caManager"/>
       </action>
       <optional-completers>
@@ -260,12 +263,12 @@
         <entry key="-ca" value-ref="caNameCompleter"/>
         <entry key="-requestor" value-ref="requestorNameCompleter"/>
         <entry key="-permission" value-ref="permissionCompleter"/>
-        <entry key="-profile" value-ref="profileNameCompleter"/>
+        <entry key="-profile" value-ref="profileNameAndAllCompleter"/>
         <entry key="-ra" value-ref="yesNoCompleter"/>
       </optional-completers>
     </command>
     <command>
-      <action class="org.xipki.ca.server.mgmt.shell.CaRequestorListCommand">
+      <action class="org.xipki.ca.server.mgmt.shell.CaRequestorInfoCommand">
         <property name="caManager" ref="caManager"/>
       </action>
       <optional-completers>
@@ -283,7 +286,7 @@
     </command>
     <!-- CMPControl -->
     <command>
-      <action class="org.xipki.ca.server.mgmt.shell.CmpControlListCommand">
+      <action class="org.xipki.ca.server.mgmt.shell.CmpControlInfoCommand">
         <property name="caManager" ref="caManager"/>
       </action>
     </command>
@@ -328,7 +331,7 @@
       </optional-completers>
     </command>
     <command>
-      <action class="org.xipki.ca.server.mgmt.shell.CrlSignerListCommand">
+      <action class="org.xipki.ca.server.mgmt.shell.CrlSignerInfoCommand">
         <property name="caManager" ref="caManager"/>
       </action>
       <completers>
@@ -364,7 +367,7 @@
       </action>
     </command>
     <command>
-      <action class="org.xipki.ca.server.mgmt.shell.EnvListCommand">
+      <action class="org.xipki.ca.server.mgmt.shell.EnvInfoCommand">
         <property name="caManager" ref="caManager"/>
       </action>
       <completers>
@@ -399,7 +402,7 @@
       </optional-completers>
     </command>
     <command>
-      <action class="org.xipki.ca.server.mgmt.shell.ProfileListCommand">
+      <action class="org.xipki.ca.server.mgmt.shell.ProfileInfoCommand">
         <property name="caManager" ref="caManager"/>
       </action>
       <completers>
@@ -444,7 +447,7 @@
       </optional-completers>
     </command>
     <command>
-      <action class="org.xipki.ca.server.mgmt.shell.PublisherListCommand">
+      <action class="org.xipki.ca.server.mgmt.shell.PublisherInfoCommand">
         <property name="caManager" ref="caManager"/>
       </action>
       <completers>
@@ -498,7 +501,7 @@
       </optional-completers>
     </command>
     <command>
-      <action class="org.xipki.ca.server.mgmt.shell.RequestorListCommand">
+      <action class="org.xipki.ca.server.mgmt.shell.RequestorInfoCommand">
         <property name="caManager" ref="caManager"/>
       </action>
       <completers>
@@ -526,7 +529,7 @@
     </command>
     <!-- Responder -->
     <command>
-      <action class="org.xipki.ca.server.mgmt.shell.ResponderListCommand">
+      <action class="org.xipki.ca.server.mgmt.shell.ResponderInfoCommand">
         <property name="caManager" ref="caManager"/>
       </action>
     </command>

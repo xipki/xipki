@@ -40,48 +40,59 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.karaf.shell.commands.Argument;
 import org.apache.karaf.shell.commands.Command;
 import org.apache.karaf.shell.commands.Option;
+import org.xipki.ca.server.mgmt.api.X509CrlSignerEntry;
 
 /**
  * @author Lijun Liao
  */
 
-@Command(scope = "xipki-ca", name = "caprofile-list", description="List certificate profiles in given CA")
-public class CaProfileListCommand extends CaCommand
+@Command(scope = "xipki-ca", name = "crlsigner-info", description="Show information of CRL signers")
+public class CrlSignerInfoCommand extends CaCommand
 {
-    @Option(name = "-ca",
-            description = "Required. CA name",
-            required = true)
-    protected String caName;
+    @Argument(index = 0, name = "name", description = "CRL signer name", required = false)
+    protected String name;
+
+    @Option(name = "-v", aliases="--verbose",
+            required = false, description = "Show CRL signer information verbosely")
+    protected Boolean verbose = Boolean.FALSE;
 
     @Override
     protected Object doExecute()
     throws Exception
     {
         StringBuilder sb = new StringBuilder();
-        if(caManager.getCA(caName) == null)
+
+        if(name == null)
         {
-            sb.append("Could not find CA '" + caName + "'");
-        }
-        else
-        {
-            Set<String> entries = caManager.getCertProfilesForCA(caName);
-            if(entries != null && entries.isEmpty() == false)
+            Set<String> names = caManager.getCrlSignerNames();
+            int n = names.size();
+
+            if(n == 0 || n == 1)
             {
-                sb.append("Certificate Profiles supported by CA " + caName).append("\n");
-
-                List<String> sorted = new ArrayList<>(entries);
-                Collections.sort(sorted);
-
-                for(String entry  : sorted)
-                {
-                    sb.append("\t").append(entry).append("\n");
-                }
+                sb.append(((n == 0) ? "no" : "1") + " CRL signer is configured\n");
             }
             else
             {
-                sb.append("\tNo profile for CA " + caName + " is configured");
+                sb.append(n + " CRL signers are configured:\n");
+            }
+
+            List<String> sorted = new ArrayList<>(names);
+            Collections.sort(sorted);
+
+            for(String name : sorted)
+            {
+                sb.append("\t").append(name).append("\n");
+            }
+        }
+        else
+        {
+            X509CrlSignerEntry entry = caManager.getCrlSigner(name);
+            if(entry != null)
+            {
+                sb.append(entry.toString(verbose.booleanValue()));
             }
         }
 
