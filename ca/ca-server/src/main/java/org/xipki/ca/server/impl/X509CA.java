@@ -1033,7 +1033,7 @@ class X509CA
                 try
                 {
                     crlBuilder.addExtension(
-                            CustomObjectIdentifiers.id_crl_certset, false, new DERSet(vector));
+                            CustomObjectIdentifiers.id_ext_crl_certset, false, new DERSet(vector));
                 } catch (CertIOException e)
                 {
                     throw new OperationException(ErrorCode.INVALID_EXTENSION,

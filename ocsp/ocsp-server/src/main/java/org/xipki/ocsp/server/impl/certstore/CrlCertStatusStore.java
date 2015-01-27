@@ -429,7 +429,7 @@ public class CrlCertStatusStore extends CertStatusStore
             // extract the certificate, only in full CRL, not in delta CRL
             boolean certsIncluded = false;
             Set<CertWithInfo> certs = new HashSet<>();
-            String oidExtnCerts = CustomObjectIdentifiers.id_crl_certset.getId();
+            String oidExtnCerts = CustomObjectIdentifiers.id_ext_crl_certset.getId();
             byte[] extnValue = crl.getExtensionValue(oidExtnCerts);
             if(extnValue != null)
             {

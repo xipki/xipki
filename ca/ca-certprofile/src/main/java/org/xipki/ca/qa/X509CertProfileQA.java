@@ -878,7 +878,7 @@ public class X509CertProfileQA
         if(requestedExtensions != null)
         {
             Extension reqExtension = requestedExtensions.getExtension(
-                    CustomObjectIdentifiers.id_request_extensions);
+                    CustomObjectIdentifiers.id_cmp_request_extensions);
             if(reqExtension != null)
             {
                 ExtensionExistence ee = ExtensionExistence.getInstance(reqExtension.getParsedValue());
