@@ -74,8 +74,9 @@ import org.bouncycastle.cert.cmp.GeneralPKIMessage;
 import org.bouncycastle.util.encoders.Hex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.common.SecurityUtil;
+import org.xipki.common.CustomObjectIdentifiers;
 import org.xipki.common.ParamChecker;
+import org.xipki.common.SecurityUtil;
 import org.xipki.security.api.SignerException;
 import org.xipki.security.api.p11.P11CryptService;
 import org.xipki.security.api.p11.P11KeyIdentifier;
@@ -83,7 +84,6 @@ import org.xipki.security.api.p11.P11ModuleConf;
 import org.xipki.security.api.p11.P11SlotIdentifier;
 import org.xipki.security.api.p11.remote.KeyIdentifier;
 import org.xipki.security.api.p11.remote.PSOTemplate;
-import org.xipki.security.api.p11.remote.RemoteP11Constants;
 import org.xipki.security.api.p11.remote.SlotAndKeyIdentifer;
 import org.xipki.security.api.p11.remote.SlotIdentifier;
 
@@ -96,8 +96,8 @@ public abstract class RemoteP11CryptService implements P11CryptService
     private static final Logger LOG = LoggerFactory.getLogger(RemoteP11CryptService.class);
     private final  Random random = new Random();
 
-    private final GeneralName sender = RemoteP11Constants.CMP_CLIENT;
-    private final GeneralName recipient = RemoteP11Constants.CMP_SERVER;
+    private final GeneralName sender = CustomObjectIdentifiers.CMP_CLIENT;
+    private final GeneralName recipient = CustomObjectIdentifiers.CMP_SERVER;
 
     private final P11ModuleConf moduleConf;
 
@@ -113,7 +113,7 @@ public abstract class RemoteP11CryptService implements P11CryptService
     public int getServerVersion()
     throws SignerException
     {
-        InfoTypeAndValue itv = new InfoTypeAndValue(RemoteP11Constants.id_version, DERNull.INSTANCE);
+        InfoTypeAndValue itv = new InfoTypeAndValue(CustomObjectIdentifiers.id_remotep11_version, DERNull.INSTANCE);
         ASN1Encodable result = send(itv);
 
         ASN1Integer derInt;
@@ -133,7 +133,7 @@ public abstract class RemoteP11CryptService implements P11CryptService
     throws SignerException
     {
         checkSlotId(slotId);
-        return pso(RemoteP11Constants.id_pso_rsa_pkcs, encodedDigestInfo, slotId, keyId);
+        return pso(CustomObjectIdentifiers.id_remotep11_pso_rsa_pkcs, encodedDigestInfo, slotId, keyId);
     }
 
     @Override
@@ -141,7 +141,7 @@ public abstract class RemoteP11CryptService implements P11CryptService
     throws SignerException
     {
         checkSlotId(slotId);
-        return pso(RemoteP11Constants.id_pso_rsa_x509, hash, slotId, keyId);
+        return pso(CustomObjectIdentifiers.id_remotep11_pso_rsa_x509, hash, slotId, keyId);
     }
 
     @Override
@@ -149,7 +149,7 @@ public abstract class RemoteP11CryptService implements P11CryptService
     throws SignerException
     {
         checkSlotId(slotId);
-        return pso(RemoteP11Constants.id_pso_ecdsa, hash, slotId, keyId);
+        return pso(CustomObjectIdentifiers.id_remotep11_pso_ecdsa, hash, slotId, keyId);
     }
 
     @Override
@@ -158,14 +158,14 @@ public abstract class RemoteP11CryptService implements P11CryptService
     throws SignerException
     {
         checkSlotId(slotId);
-        return pso(RemoteP11Constants.id_pso_dsa, hash, slotId, keyId);    }
+        return pso(CustomObjectIdentifiers.id_remotep11_pso_dsa, hash, slotId, keyId);    }
 
     @Override
     public PublicKey getPublicKey(P11SlotIdentifier slotId, P11KeyIdentifier keyId)
     throws SignerException
     {
         checkSlotId(slotId);
-        byte[] keyBytes = getCertOrKey(RemoteP11Constants.id_get_publickey, slotId, keyId);
+        byte[] keyBytes = getCertOrKey(CustomObjectIdentifiers.id_remotep11_get_publickey, slotId, keyId);
         if(keyBytes == null)
         {
             throw new SignerException("Received no public key from server for " + keyId);
@@ -179,7 +179,7 @@ public abstract class RemoteP11CryptService implements P11CryptService
     throws SignerException
     {
         checkSlotId(slotId);
-        byte[] certBytes = getCertOrKey(RemoteP11Constants.id_get_certificate, slotId, keyId);
+        byte[] certBytes = getCertOrKey(CustomObjectIdentifiers.id_remotep11_get_certificate, slotId, keyId);
         if(certBytes == null)
         {
             throw new SignerException("Received no certificate from server for " + keyId);
@@ -428,7 +428,7 @@ public abstract class RemoteP11CryptService implements P11CryptService
     public P11SlotIdentifier[] getSlotIdentifiers()
     throws SignerException
     {
-        InfoTypeAndValue itv = new InfoTypeAndValue(RemoteP11Constants.id_list_slots, null);
+        InfoTypeAndValue itv = new InfoTypeAndValue(CustomObjectIdentifiers.id_remotep11_list_slots, null);
         ASN1Encodable resp = send(itv);
         if(resp instanceof ASN1Sequence == false)
         {
@@ -465,7 +465,7 @@ public abstract class RemoteP11CryptService implements P11CryptService
     throws SignerException
     {
         checkSlotId(slotId);
-        InfoTypeAndValue itv = new InfoTypeAndValue(RemoteP11Constants.id_list_keylabels,
+        InfoTypeAndValue itv = new InfoTypeAndValue(CustomObjectIdentifiers.id_remotep11_list_keylabels,
                 new SlotIdentifier(slotId));
         ASN1Encodable resp = send(itv);
         if(resp instanceof ASN1Sequence == false)
