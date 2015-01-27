@@ -348,7 +348,7 @@ class X509CA
 
             try
             {
-                final long SIGN_WINDOW_MIN = 10;
+                final long SIGN_WINDOW_MIN = 20;
 
                 Date thisUpdate = new Date();
                 long minSinceCrlBaseTime = (thisUpdate.getTime() - caInfo.getCrlBaseTime().getTime())
@@ -2560,7 +2560,7 @@ class X509CA
                 throw new OperationException(ErrorCode.BAD_CERT_TEMPLATE, e.getMessage());
             } catch (Throwable t2)
             {
-                final String message = "Could not commit the next_serial";
+                final String message = "Could not generate certificate";
                 if(LOG.isErrorEnabled())
                 {
                     LOG.error(LogUtil.buildExceptionLogFormat(message), t2.getClass().getName(), t2.getMessage());

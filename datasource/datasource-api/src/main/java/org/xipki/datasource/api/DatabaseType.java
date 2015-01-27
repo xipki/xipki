@@ -43,11 +43,11 @@ public enum DatabaseType
 {
     H2,
     DB2,
-    HSQLDB,
+    HSQL,
     MSSQL2000,
     MYSQL,
     ORACLE,
-    POSTGRESQL,
+    POSTGRES,
     SYBASE,
     UNKNOWN;
 
@@ -73,7 +73,7 @@ public enum DatabaseType
         }
         else if(className.contains("hsqldb."))
         {
-            return DatabaseType.HSQLDB;
+            return DatabaseType.HSQL;
         }
         else if(className.contains("mysql."))
         {
@@ -85,7 +85,7 @@ public enum DatabaseType
         }
         else if(className.contains("postgres.") || className.contains("postgresql."))
         {
-            return DatabaseType.POSTGRESQL;
+            return DatabaseType.POSTGRES;
         }
         else if(className.contains("sqlserver."))
         {

@@ -194,6 +194,16 @@ class CertStoreQueryExecutor
 
         Integer userId = (user == null) ? null : getUserId(user);
         int certId = nextCertId();
+        int caId = getCaId(issuer);
+        X509Certificate cert = certificate.getCert();
+        // the profile name of self signed CA certificate may not be contained in the
+        // table CETPROFILEINFO
+        if(cert.getIssuerDN().equals(cert.getSubjectDN()))
+        {
+            addCertprofileName(certprofileName);
+        }
+        int certprofileId = getCertprofileId(certprofileName);
+        Integer requestorId = (requestor == null) ? null : getRequestorId(requestor.getName());
 
         Connection conn = null;
         PreparedStatement[] pss = borrowPreparedStatements(SQL_ADD_CERT, SQL_ADD_RAWCERT);
@@ -205,23 +215,10 @@ class CertStoreQueryExecutor
             // all statements have the same connection
             conn = ps_addcert.getConnection();
 
-            X509Certificate cert = certificate.getCert();
-
-            int caId = getCaId(issuer);
-
-            // the profile name of self signed CA certificate may not be contained in the
-            // table CETPROFILEINFO
-            if(cert.getIssuerDN().equals(cert.getSubjectDN()))
-            {
-                addCertprofileName(certprofileName);
-            }
-            int certprofileId = getCertprofileId(certprofileName);
-
             certificate.setCertId(certId);
 
             // cert
-            int idx = 1;
-            ps_addcert.setInt(idx++, certId);
+            int idx = 2;
             ps_addcert.setInt(idx++, CertArt.X509PKC.getCode());
             ps_addcert.setLong(idx++, System.currentTimeMillis()/1000);
             ps_addcert.setLong(idx++, cert.getSerialNumber().longValue());
@@ -232,7 +229,6 @@ class CertStoreQueryExecutor
             ps_addcert.setInt(idx++, certprofileId);
             ps_addcert.setInt(idx++, caId);
 
-            Integer requestorId = (requestor == null) ? null : getRequestorId(requestor.getName());
             if(requestorId != null)
             {
                 ps_addcert.setInt(idx++, requestorId.intValue());
@@ -259,17 +255,24 @@ class CertStoreQueryExecutor
             ps_addcert.setInt(idx++, isEECert ? 1 : 0);
 
             // rawcert
-            String sha1_fp = fp(certificate.getEncodedCert());
-
-            idx = 1;
-            ps_addRawcert.setInt(idx++, certId);
-            ps_addRawcert.setString(idx++, sha1_fp);
+            idx = 2;
+            ps_addRawcert.setString(idx++, fp(certificate.getEncodedCert()));
             ps_addRawcert.setString(idx++, Base64.toBase64String(certificate.getEncodedCert()));
 
-            final boolean origAutoCommit = conn.getAutoCommit();
-            conn.setAutoCommit(false);
-            try
+            final int tries = 3;
+            for(int i = 0; i < tries; i++)
             {
+                if(i > 0)
+                {
+                    certId = nextCertId();
+                }
+
+                ps_addcert.setInt(1, certId);
+                ps_addRawcert.setInt(1, certId);
+
+                final boolean origAutoCommit = conn.getAutoCommit();
+                conn.setAutoCommit(false);
+
                 try
                 {
                     ps_addcert.executeUpdate();
@@ -278,18 +281,22 @@ class CertStoreQueryExecutor
                 }catch(SQLException e)
                 {
                     conn.rollback();
+                    if(dataSource.isDuplicateKeyException(e) && i < tries - 1)
+                    {
+                        continue;
+                    }
+
+                    LOG.error("datasource {} SQLException while adding certificate with id {}: {}",
+                            dataSource.getDatasourceName(), certId, e.getMessage());
                     throw e;
                 }
+                finally
+                {
+                    conn.setAutoCommit(origAutoCommit);
+                }
+
+                break;
             }
-            finally
-            {
-                conn.setAutoCommit(origAutoCommit);
-            }
-        } catch(SQLException e)
-        {
-            LOG.error("datasource {} SQLException while adding certificate with id {}: {}",
-                    dataSource.getDatasourceName(), certId, e.getMessage());
-            throw e;
         }
         finally
         {
@@ -1945,19 +1952,6 @@ class CertStoreQueryExecutor
                     executeAddUserSql(user, tmpId);
                     id = tmpId;
                     break;
-                /*}catch(SQLIntegrityConstraintViolationException e)
-                {
-                    Integer id2 = executeGetUserIdSql(user);
-                    if(id2 != null)
-                    {
-                        id = id2.intValue();
-                        break;
-                    } else if(i == tries - 1)
-                    {
-                        LOG.error("datasource {} SQLException while adding user {} after {} tries {} with id {}: {}",
-                                dataSource.getDatasourceName(), user, tries, tmpId, e.getMessage());
-                        throw e;
-                    }*/
                 }catch(SQLException e)
                 {
                     Integer id2 = executeGetUserIdSql(user);
@@ -1965,17 +1959,23 @@ class CertStoreQueryExecutor
                     {
                         id = id2.intValue();
                         break;
-                    } else if(i == tries - 1)
+                    }
+
+                    if(dataSource.isDuplicateKeyException(e) && i < tries - 1)
                     {
-                        LOG.error("datasource {} SQLException while adding user {} after {} retries {} with id {}: {}",
-                                dataSource.getDatasourceName(), user, i, tmpId, e.getMessage());
+                        continue;
+                    } else
+                    {
                         throw e;
                     }
                 }
             }
 
-            LOG.debug("datasource {} added user {} after {} retries",
-                    dataSource.getDatasourceName(), user, i);
+            if(id != null && i > 0)
+            {
+                LOG.debug("datasource {} added user {} after {} tries",
+                        dataSource.getDatasourceName(), user, i + 1);
+            }
         }
 
         if(id == null)
