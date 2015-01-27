@@ -62,12 +62,12 @@ import org.bouncycastle.cert.cmp.GeneralPKIMessage;
 import org.bouncycastle.util.encoders.Hex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xipki.common.CustomObjectIdentifiers;
 import org.xipki.security.api.p11.P11CryptService;
-import org.xipki.security.api.p11.P11SlotIdentifier;
 import org.xipki.security.api.p11.P11KeyIdentifier;
+import org.xipki.security.api.p11.P11SlotIdentifier;
 import org.xipki.security.api.p11.remote.KeyIdentifier;
 import org.xipki.security.api.p11.remote.PSOTemplate;
-import org.xipki.security.api.p11.remote.RemoteP11Constants;
 import org.xipki.security.api.p11.remote.SlotAndKeyIdentifer;
 import org.xipki.security.api.p11.remote.SlotIdentifier;
 
@@ -81,29 +81,29 @@ class CmpResponder
 
     private static final ASN1ObjectIdentifier[] knownTypes = new ASN1ObjectIdentifier[]
     {
-            RemoteP11Constants.id_version,
-            RemoteP11Constants.id_pso_ecdsa,
-            RemoteP11Constants.id_pso_dsa,
-            RemoteP11Constants.id_pso_rsa_x509,
-            RemoteP11Constants.id_pso_rsa_pkcs,
-            RemoteP11Constants.id_get_certificate,
-            RemoteP11Constants.id_get_publickey,
-            RemoteP11Constants.id_list_slots,
-            RemoteP11Constants.id_list_keylabels};
+            CustomObjectIdentifiers.id_remotep11_version,
+            CustomObjectIdentifiers.id_remotep11_pso_ecdsa,
+            CustomObjectIdentifiers.id_remotep11_pso_dsa,
+            CustomObjectIdentifiers.id_remotep11_pso_rsa_x509,
+            CustomObjectIdentifiers.id_remotep11_pso_rsa_pkcs,
+            CustomObjectIdentifiers.id_remotep11_get_certificate,
+            CustomObjectIdentifiers.id_remotep11_get_publickey,
+            CustomObjectIdentifiers.id_remotep11_list_slots,
+            CustomObjectIdentifiers.id_remotep11_list_keylabels};
 
     private static final String UNKOWNTYPE_MSG = "PKIBody type %s is only supported with the sub-knownTypes " +
-            RemoteP11Constants.id_version.getId() + ", " +
-            RemoteP11Constants.id_pso_ecdsa.getId() + ", " +
-            RemoteP11Constants.id_pso_dsa.getId() + ", " +
-            RemoteP11Constants.id_pso_rsa_x509.getId() + ", " +
-            RemoteP11Constants.id_pso_rsa_pkcs.getId() + ", " +
-            RemoteP11Constants.id_get_certificate.getId() + ", " +
-            RemoteP11Constants.id_get_publickey.getId() + ", " +
-            RemoteP11Constants.id_list_slots.getId() + " and" +
-            RemoteP11Constants.id_list_keylabels.getId();
+            CustomObjectIdentifiers.id_remotep11_version.getId() + ", " +
+            CustomObjectIdentifiers.id_remotep11_pso_ecdsa.getId() + ", " +
+            CustomObjectIdentifiers.id_remotep11_pso_dsa.getId() + ", " +
+            CustomObjectIdentifiers.id_remotep11_pso_rsa_x509.getId() + ", " +
+            CustomObjectIdentifiers.id_remotep11_pso_rsa_pkcs.getId() + ", " +
+            CustomObjectIdentifiers.id_remotep11_get_certificate.getId() + ", " +
+            CustomObjectIdentifiers.id_remotep11_get_publickey.getId() + ", " +
+            CustomObjectIdentifiers.id_remotep11_list_slots.getId() + " and" +
+            CustomObjectIdentifiers.id_remotep11_list_keylabels.getId();
 
     private final SecureRandom random = new SecureRandom();
-    private final GeneralName sender = RemoteP11Constants.CMP_SERVER;
+    private final GeneralName sender = CustomObjectIdentifiers.CMP_SERVER;
 
     CmpResponder()
     {
@@ -189,14 +189,14 @@ class CmpResponder
             ASN1Encodable respItvInfoValue = null;
             try
             {
-                if(RemoteP11Constants.id_version.equals(itvType))
+                if(CustomObjectIdentifiers.id_remotep11_version.equals(itvType))
                 {
                     respItvInfoValue = new ASN1Integer(localP11CryptServicePool.getVersion());
                 }
-                else if(RemoteP11Constants.id_pso_ecdsa.equals(itvType) ||
-                        RemoteP11Constants.id_pso_dsa.equals(itvType) ||
-                        RemoteP11Constants.id_pso_rsa_x509.equals(itvType) ||
-                        RemoteP11Constants.id_pso_rsa_pkcs.equals(itvType))
+                else if(CustomObjectIdentifiers.id_remotep11_pso_ecdsa.equals(itvType) ||
+                        CustomObjectIdentifiers.id_remotep11_pso_dsa.equals(itvType) ||
+                        CustomObjectIdentifiers.id_remotep11_pso_rsa_x509.equals(itvType) ||
+                        CustomObjectIdentifiers.id_remotep11_pso_rsa_pkcs.equals(itvType))
                 {
                     PSOTemplate psoTemplate = PSOTemplate.getInstance(itvP11.getInfoValue());
                     byte[] psoMessage = psoTemplate.getMessage();
@@ -208,19 +208,19 @@ class CmpResponder
 
                     byte[] signature;
 
-                    if(RemoteP11Constants.id_pso_ecdsa.equals(itvType))
+                    if(CustomObjectIdentifiers.id_remotep11_pso_ecdsa.equals(itvType))
                     {
                         signature = p11CryptService.CKM_ECDSA(psoMessage, slot, keyId);
                     }
-                    else if(RemoteP11Constants.id_pso_dsa.equals(itvType))
+                    else if(CustomObjectIdentifiers.id_remotep11_pso_dsa.equals(itvType))
                     {
                         signature = p11CryptService.CKM_DSA(psoMessage, slot, keyId);
                     }
-                    else if(RemoteP11Constants.id_pso_rsa_x509.equals(itvType))
+                    else if(CustomObjectIdentifiers.id_remotep11_pso_rsa_x509.equals(itvType))
                     {
                         signature = p11CryptService.CKM_RSA_X509(psoMessage, slot, keyId);
                     }
-                    else if(RemoteP11Constants.id_pso_rsa_pkcs.equals(itvType))
+                    else if(CustomObjectIdentifiers.id_remotep11_pso_rsa_pkcs.equals(itvType))
                     {
                         signature = p11CryptService.CKM_RSA_PKCS(psoMessage, slot, keyId);
                     }
@@ -231,8 +231,8 @@ class CmpResponder
 
                     respItvInfoValue = new DEROctetString(signature);
                 }
-                else if(RemoteP11Constants.id_get_certificate.equals(itvType) ||
-                        RemoteP11Constants.id_get_publickey.equals(itvType))
+                else if(CustomObjectIdentifiers.id_remotep11_get_certificate.equals(itvType) ||
+                        CustomObjectIdentifiers.id_remotep11_get_publickey.equals(itvType))
                 {
                     SlotAndKeyIdentifer slotAndKeyIdentifier = SlotAndKeyIdentifer.getInstance(itvP11.getInfoValue());
                     P11SlotIdentifier slot = slotAndKeyIdentifier.getSlotIdentifier().getSlotId();
@@ -241,7 +241,7 @@ class CmpResponder
                     P11KeyIdentifier keyId = keyIdentifier.getKeyId();
 
                     byte[] encodeCertOrKey;
-                    if(RemoteP11Constants.id_get_certificate.equals(itvType))
+                    if(CustomObjectIdentifiers.id_remotep11_get_certificate.equals(itvType))
                     {
                         encodeCertOrKey = p11CryptService.getCertificate(slot, keyId).getEncoded();
                     }
@@ -252,7 +252,7 @@ class CmpResponder
 
                     respItvInfoValue = new DEROctetString(encodeCertOrKey);
                 }
-                else if(RemoteP11Constants.id_list_slots.equals(itvType))
+                else if(CustomObjectIdentifiers.id_remotep11_list_slots.equals(itvType))
                 {
                     P11SlotIdentifier[] slotIds = p11CryptService.getSlotIdentifiers();
 
@@ -263,7 +263,7 @@ class CmpResponder
                     }
                     respItvInfoValue = new DERSequence(vector);
                 }
-                else if(RemoteP11Constants.id_list_keylabels.equals(itvType))
+                else if(CustomObjectIdentifiers.id_remotep11_list_keylabels.equals(itvType))
                 {
                     SlotIdentifier slotId = SlotIdentifier.getInstance(itvP11.getInfoValue());
                     String[] keyLabels = p11CryptService.getKeyLabels(slotId.getSlotId());
