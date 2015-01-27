@@ -35,24 +35,23 @@
 
 package org.xipki.ca.server.mgmt.shell;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-import java.util.Set;
 
-import org.apache.karaf.shell.commands.Argument;
 import org.apache.karaf.shell.commands.Command;
+import org.apache.karaf.shell.commands.Option;
 import org.xipki.ca.server.mgmt.api.PublisherEntry;
 
 /**
  * @author Lijun Liao
  */
 
-@Command(scope = "xipki-ca", name = "publisher-list", description="List publishers")
-public class PublisherListCommand extends CaCommand
+@Command(scope = "xipki-ca", name = "capub-info", description="Show information of publishers in given CA")
+public class CaPublisherInfoCommand extends CaCommand
 {
-    @Argument(index = 0, name = "name", description = "Publisher name", required = false)
-    protected String name;
+    @Option(name = "-ca",
+            description = "Required. CA name",
+            required = true)
+    protected String caName;
 
     @Override
     protected Object doExecute()
@@ -60,35 +59,18 @@ public class PublisherListCommand extends CaCommand
     {
         StringBuilder sb = new StringBuilder();
 
-        if(name == null)
+        List<PublisherEntry> entries = caManager.getPublishersForCA(caName);
+        if(entries != null && entries.isEmpty() == false)
         {
-            Set<String> names = caManager.getPublisherNames();
-            int n = names.size();
-
-            if(n == 0 || n == 1)
+            sb.append("Publishers for CA " + caName).append("\n");
+            for(PublisherEntry entry  : entries)
             {
-                sb.append(((n == 0) ? "no" : "1") + " publisher is configured\n");
-            }
-            else
-            {
-                sb.append(n + " publishers are configured:\n");
-            }
-
-            List<String> sorted = new ArrayList<>(names);
-            Collections.sort(sorted);
-
-            for(String name : sorted)
-            {
-                sb.append("\t").append(name).append("\n");
+                sb.append("\t").append(entry.getName()).append("\n");
             }
         }
         else
         {
-            PublisherEntry entry = caManager.getPublisher(name);
-            if(entry != null)
-            {
-                sb.append(entry.toString());
-            }
+            sb.append("\tNo publisher for CA " + caName + " is configured");
         }
 
         out(sb.toString());

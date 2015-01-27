@@ -184,6 +184,46 @@
                   <includes>xsd/**</includes>
                   <outputDirectory>target</outputDirectory>
                 </artifactItem>
+                <artifactItem>
+                  <groupId>org.xipki</groupId>
+                  <artifactId>database-tool</artifactId>
+                  <version>${project.version}</version>
+                  <type>jar</type>
+                  <includes>xsd/**</includes>
+                  <outputDirectory>target</outputDirectory>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>org.xipki</groupId>
+                  <artifactId>ca-client-impl</artifactId>
+                  <version>${project.version}</version>
+                  <type>jar</type>
+                  <includes>xsd/**</includes>
+                  <outputDirectory>target</outputDirectory>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>org.xipki</groupId>
+                  <artifactId>ca-client-shell</artifactId>
+                  <version>${project.version}</version>
+                  <type>jar</type>
+                  <includes>xsd/**</includes>
+                  <outputDirectory>target</outputDirectory>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>org.xipki</groupId>
+                  <artifactId>ca-qa-shell</artifactId>
+                  <version>${project.version}</version>
+                  <type>jar</type>
+                  <includes>xsd/**</includes>
+                  <outputDirectory>target</outputDirectory>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>org.xipki</groupId>
+                  <artifactId>ca-certprofile</artifactId>
+                  <version>${project.version}</version>
+                  <type>jar</type>
+                  <includes>xsd/**</includes>
+                  <outputDirectory>target</outputDirectory>
+                </artifactItem>
               </artifactItems>
             </configuration>
           </execution>

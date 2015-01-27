@@ -42,56 +42,52 @@ import java.util.Set;
 
 import org.apache.karaf.shell.commands.Argument;
 import org.apache.karaf.shell.commands.Command;
+import org.xipki.ca.server.mgmt.api.PublisherEntry;
 
 /**
  * @author Lijun Liao
  */
 
-@Command(scope = "xipki-ca", name = "caalias-list", description="List CA aliases")
-public class CaAliasListCommand extends CaCommand
+@Command(scope = "xipki-ca", name = "publisher-info", description="Show information of publishers")
+public class PublisherInfoCommand extends CaCommand
 {
-    @Argument(index = 0, name = "alias", description = "CA alias", required = false)
-    protected String caAlias;
+    @Argument(index = 0, name = "name", description = "Publisher name", required = false)
+    protected String name;
 
     @Override
     protected Object doExecute()
     throws Exception
     {
-        Set<String> aliasNames = caManager.getCaAliasNames();
-
         StringBuilder sb = new StringBuilder();
 
-        if(caAlias == null)
+        if(name == null)
         {
-            int n = aliasNames.size();
+            Set<String> names = caManager.getPublisherNames();
+            int n = names.size();
 
             if(n == 0 || n == 1)
             {
-                sb.append(((n == 0) ? "no" : "1") + " CA alias is configured\n");
+                sb.append(((n == 0) ? "no" : "1") + " publisher is configured\n");
             }
             else
             {
-                sb.append(n + " CA aliases are configured:\n");
+                sb.append(n + " publishers are configured:\n");
             }
 
-            List<String> sorted = new ArrayList<>(aliasNames);
+            List<String> sorted = new ArrayList<>(names);
             Collections.sort(sorted);
 
-            for(String aliasName : sorted)
+            for(String name : sorted)
             {
-                sb.append("\t").append(aliasName).append("\n");
+                sb.append("\t").append(name).append("\n");
             }
         }
         else
         {
-            if(aliasNames.contains(caAlias))
+            PublisherEntry entry = caManager.getPublisher(name);
+            if(entry != null)
             {
-                String paramValue = caManager.getCaName(caAlias);
-                sb.append(caAlias).append("\n\t").append(paramValue);
-            }
-            else
-            {
-                sb.append("Could not find CA alias '" + caAlias + "'");
+                sb.append(entry.toString());
             }
         }
 

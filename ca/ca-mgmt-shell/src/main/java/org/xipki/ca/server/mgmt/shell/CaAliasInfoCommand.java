@@ -47,44 +47,52 @@ import org.apache.karaf.shell.commands.Command;
  * @author Lijun Liao
  */
 
-@Command(scope = "xipki-ca", name = "env-list", description="List environment parameters")
-public class EnvListCommand extends CaCommand
+@Command(scope = "xipki-ca", name = "caalias-info", description="Show information of CA aliases")
+public class CaAliasInfoCommand extends CaCommand
 {
-    @Argument(index = 0, name = "name", description = "Environment parameter name", required = false)
-    protected String name;
+    @Argument(index = 0, name = "alias", description = "CA alias", required = false)
+    protected String caAlias;
 
     @Override
     protected Object doExecute()
     throws Exception
     {
+        Set<String> aliasNames = caManager.getCaAliasNames();
+
         StringBuilder sb = new StringBuilder();
 
-        if(name == null)
+        if(caAlias == null)
         {
-            Set<String> paramNames = caManager.getEnvParamNames();
-            int n = paramNames.size();
+            int n = aliasNames.size();
 
             if(n == 0 || n == 1)
             {
-                sb.append(((n == 0) ? "no" : "1") + " environment parameter is configured\n");
+                sb.append(((n == 0) ? "no" : "1") + " CA alias is configured\n");
             }
             else
             {
-                sb.append(n + " enviroment paramters are configured:\n");
+                sb.append(n + " CA aliases are configured:\n");
             }
 
-            List<String> sorted = new ArrayList<>(paramNames);
+            List<String> sorted = new ArrayList<>(aliasNames);
             Collections.sort(sorted);
 
-            for(String paramName : sorted)
+            for(String aliasName : sorted)
             {
-                sb.append("\t").append(paramName).append("\n");
+                sb.append("\t").append(aliasName).append("\n");
             }
         }
         else
         {
-            String paramValue = caManager.getEnvParam(name);
-            sb.append(name).append("\n\t").append(paramValue);
+            if(aliasNames.contains(caAlias))
+            {
+                String paramValue = caManager.getCaName(caAlias);
+                sb.append(caAlias).append("\n\t").append(paramValue);
+            }
+            else
+            {
+                sb.append("Could not find CA alias '" + caAlias + "'");
+            }
         }
 
         out(sb.toString());

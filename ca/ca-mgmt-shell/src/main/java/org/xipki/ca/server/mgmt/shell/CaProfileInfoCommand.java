@@ -40,63 +40,53 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.karaf.shell.commands.Argument;
 import org.apache.karaf.shell.commands.Command;
 import org.apache.karaf.shell.commands.Option;
-import org.xipki.ca.server.mgmt.api.CertProfileEntry;
 
 /**
  * @author Lijun Liao
  */
 
-@Command(scope = "xipki-ca", name = "profile-list", description="List profiles")
-public class ProfileListCommand extends CaCommand
+@Command(scope = "xipki-ca", name = "caprofile-info", description="Show information of certificate profiles in given CA")
+public class CaProfileInfoCommand extends CaCommand
 {
-    @Argument(index = 0, name = "name", description = "Certificate profile name", required = false)
-    protected String name;
-
-    @Option(name = "-v", aliases="--verbose",
-            required = false, description = "Show CA information verbosely")
-    protected Boolean verbose = Boolean.FALSE;
+    @Option(name = "-ca",
+            description = "Required. CA name",
+            required = true)
+    protected String caName;
 
     @Override
     protected Object doExecute()
     throws Exception
     {
         StringBuilder sb = new StringBuilder();
-
-        if(name == null)
+        if(caManager.getCA(caName) == null)
         {
-            Set<String> names = caManager.getCertProfileNames();
-            int n = names.size();
-
-            if(n == 0 || n == 1)
-            {
-                sb.append(((n == 0) ? "no" : "1") + " profile is configured\n");
-            }
-            else
-            {
-                sb.append(n + " profiles are configured:\n");
-            }
-
-            List<String> sorted = new ArrayList<>(names);
-            Collections.sort(sorted);
-
-            for(String name : sorted)
-            {
-                sb.append("\t").append(name).append("\n");
-            }
+            sb.append("Could not find CA '" + caName + "'");
         }
         else
         {
-            CertProfileEntry entry = caManager.getCertProfile(name);
-            if(entry != null)
+            Set<String> entries = caManager.getCertProfilesForCA(caName);
+            if(entries != null && entries.isEmpty() == false)
             {
-                sb.append(entry.toString(verbose));
+                sb.append("Certificate Profiles supported by CA " + caName).append("\n");
+
+                List<String> sorted = new ArrayList<>(entries);
+                Collections.sort(sorted);
+
+                for(String entry  : sorted)
+                {
+                    sb.append("\t").append(entry).append("\n");
+                }
+            }
+            else
+            {
+                sb.append("\tNo profile for CA " + caName + " is configured");
             }
         }
 
         out(sb.toString());
+
         return null;
     }
 }

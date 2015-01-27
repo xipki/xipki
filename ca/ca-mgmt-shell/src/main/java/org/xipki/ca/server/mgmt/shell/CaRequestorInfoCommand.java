@@ -35,29 +35,23 @@
 
 package org.xipki.ca.server.mgmt.shell;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 import java.util.Set;
 
-import org.apache.karaf.shell.commands.Argument;
 import org.apache.karaf.shell.commands.Command;
 import org.apache.karaf.shell.commands.Option;
-import org.xipki.ca.server.mgmt.api.CmpRequestorEntry;
+import org.xipki.ca.server.mgmt.api.CAHasRequestorEntry;
 
 /**
  * @author Lijun Liao
  */
 
-@Command(scope = "xipki-ca", name = "requestor-list", description="List requestors")
-public class RequestorListCommand extends CaCommand
+@Command(scope = "xipki-ca", name = "careq-info", description="Show information of requestors in CA")
+public class CaRequestorInfoCommand extends CaCommand
 {
-    @Argument(index = 0, name = "name", description = "Requestor name", required = false)
-    protected String name;
-
-    @Option(name = "-v", aliases="--verbose",
-            required = false, description = "Show requestor information verbosely")
-    protected Boolean verbose = Boolean.FALSE;
+    @Option(name = "-ca",
+            description = "Required. CA name",
+            required = true)
+    protected String caName;
 
     @Override
     protected Object doExecute()
@@ -65,41 +59,19 @@ public class RequestorListCommand extends CaCommand
     {
         StringBuilder sb = new StringBuilder();
 
-        if(name == null)
+        Set<CAHasRequestorEntry> entries = caManager.getCmpRequestorsForCA(caName);
+        if(entries != null && entries.isEmpty() == false)
         {
-            Set<String> names = caManager.getCmpRequestorNames();
-            int n = names.size();
-
-            if(n == 0 || n == 1)
+            sb.append("Requestors trusted by CA " + caName).append("\n");
+            for(CAHasRequestorEntry entry  : entries)
             {
-                sb.append(((n == 0) ? "no" : "1") + " CMP requestor is configured\n");
-            }
-            else
-            {
-                sb.append(n + " CMP requestors are configured:\n");
-            }
-
-            List<String> sorted = new ArrayList<>(names);
-            Collections.sort(sorted);
-
-            for(String name : sorted)
-            {
-                sb.append("\t").append(name).append("\n");
+                sb.append("\t").append(entry).append("\n");
             }
         }
         else
         {
-            CmpRequestorEntry entry = caManager.getCmpRequestor(name);
-            if(entry == null)
-            {
-                sb.append("Could not find CMP requestor '" + name + "'");
-            }
-            else
-            {
-                sb.append(entry.toString(verbose.booleanValue()));
-            }
+            sb.append("\tNo requestor for CA " + caName + " is configured");
         }
-
         out(sb.toString());
 
         return null;

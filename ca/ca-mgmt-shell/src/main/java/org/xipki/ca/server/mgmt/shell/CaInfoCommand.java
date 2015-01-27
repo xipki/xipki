@@ -35,28 +35,77 @@
 
 package org.xipki.ca.server.mgmt.shell;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
+
+import org.apache.karaf.shell.commands.Argument;
 import org.apache.karaf.shell.commands.Command;
 import org.apache.karaf.shell.commands.Option;
-import org.xipki.ca.server.mgmt.api.CmpResponderEntry;
+import org.xipki.ca.server.mgmt.api.X509CAEntry;
 
 /**
  * @author Lijun Liao
  */
 
-@Command(scope = "xipki-ca", name = "responder-list", description="List responder")
-public class ResponderListCommand extends CaCommand
+@Command(scope = "xipki-ca", name = "ca-info", description="Show information of CAs")
+public class CaInfoCommand extends CaCommand
 {
+    @Argument(index = 0, name = "name", description = "CA name", required = false)
+    protected String caName;
 
     @Option(name = "-v", aliases="--verbose",
-            required = false, description = "Show responder information verbosely")
+            required = false, description = "Show CA information verbosely")
     protected Boolean verbose = Boolean.FALSE;
 
     @Override
     protected Object doExecute()
     throws Exception
     {
-        CmpResponderEntry responder = caManager.getCmpResponder();
-        out(responder.toString(verbose.booleanValue()));
+        StringBuilder sb = new StringBuilder();
+
+        if(caName == null)
+        {
+            Set<String> names = caManager.getCaNames();
+            int n = names.size();
+            if(n == 0 || n == 1)
+            {
+                sb.append(((n == 0) ? "no" : "1") + " CA is configured\n");
+            }
+            else
+            {
+                sb.append(n + " CAs are configured:\n");
+            }
+
+            List<String> sorted = new ArrayList<>(names);
+            Collections.sort(sorted);
+            for(String paramName : sorted)
+            {
+                sb.append("\t").append(paramName);
+                String alias = caManager.getAliasName(paramName);
+                if(alias != null)
+                {
+                    sb.append(" (alias: ").append(alias).append(")");
+                }
+                sb.append("\n");
+            }
+        }
+        else
+        {
+            X509CAEntry entry = caManager.getCA(caName);
+            if(entry == null)
+            {
+                sb.append("Could not find CA '" + caName + "'");
+            }
+            else
+            {
+                sb.append(entry.toString(verbose.booleanValue()));
+            }
+        }
+
+        out(sb.toString());
+
         return null;
     }
 }
