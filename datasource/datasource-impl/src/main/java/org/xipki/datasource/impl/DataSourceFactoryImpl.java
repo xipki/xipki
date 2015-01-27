@@ -109,7 +109,10 @@ public class DataSourceFactoryImpl implements DataSourceFactory
         String password = conf.getProperty("password");
         if(password != null)
         {
-            password = new String(passwordResolver.resolvePassword(password));
+            if(passwordResolver != null)
+            {
+                password = new String(passwordResolver.resolvePassword(password));
+            }
             conf.setProperty("password", password);
         }
 

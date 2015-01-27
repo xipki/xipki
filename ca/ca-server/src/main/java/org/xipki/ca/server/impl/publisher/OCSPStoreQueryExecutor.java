@@ -230,8 +230,7 @@ class OCSPStoreQueryExecutor
 
                 // CERT
                 X509Certificate cert = certificate.getCert();
-                int idx = 1;
-                ps_addcert.setInt(idx++, certId);
+                int idx = 2;
                 ps_addcert.setLong(idx++, System.currentTimeMillis()/1000);
                 ps_addcert.setLong(idx++, serialNumber.longValue());
                 ps_addcert.setString(idx++, certificate.getSubject());
@@ -256,23 +255,31 @@ class OCSPStoreQueryExecutor
 
                 // RAWCERT
                 byte[] encodedCert = certificate.getEncodedCert();
-                idx = 1;
-                ps_addRawcert.setInt(idx++, certId);
+                idx = 2;
                 ps_addRawcert.setString(idx++, Base64.toBase64String(encodedCert));
 
                 // CERTHASH
-                idx = 1;
-                ps_addCerthash.setInt(idx++, certId);
+                idx = 2;
                 ps_addCerthash.setString(idx++, HashCalculator.hexHash(HashAlgoType.SHA1, encodedCert));
                 ps_addCerthash.setString(idx++, HashCalculator.hexHash(HashAlgoType.SHA224, encodedCert));
                 ps_addCerthash.setString(idx++, HashCalculator.hexHash(HashAlgoType.SHA256, encodedCert));
                 ps_addCerthash.setString(idx++, HashCalculator.hexHash(HashAlgoType.SHA384, encodedCert));
                 ps_addCerthash.setString(idx++, HashCalculator.hexHash(HashAlgoType.SHA512, encodedCert));
 
-                final boolean origAutoCommit = conn.getAutoCommit();
-                conn.setAutoCommit(false);
-                try
+                final int tries = 3;
+                for(int i = 0; i < tries; i++)
                 {
+                    if(i > 0)
+                    {
+                        certId = nextCertId();
+                    }
+
+                    ps_addcert.setInt(1, certId);
+                    ps_addCerthash.setInt(1, certId);
+                    ps_addRawcert.setInt(1, certId);
+
+                    final boolean origAutoCommit = conn.getAutoCommit();
+                    conn.setAutoCommit(false);
                     try
                     {
                         ps_addcert.executeUpdate();
@@ -282,18 +289,21 @@ class OCSPStoreQueryExecutor
                     }catch(SQLException e)
                     {
                         conn.rollback();
+                        if(dataSource.isDuplicateKeyException(e) && i < tries - 1)
+                        {
+                            continue;
+                        }
+                        LOG.error("datasource {} SQLException while adding certificate with id {}: {}",
+                                dataSource.getDatasourceName(), certId, e.getMessage());
                         throw e;
                     }
+                    finally
+                    {
+                        conn.setAutoCommit(origAutoCommit);
+                    }
+
+                    break;
                 }
-                finally
-                {
-                    conn.setAutoCommit(origAutoCommit);
-                }
-            } catch(SQLException e)
-            {
-                LOG.error("datasource {} SQLException while adding certificate with id {}: {}",
-                        dataSource.getDatasourceName(), certId, e.getMessage());
-                throw e;
             }
             finally
             {
