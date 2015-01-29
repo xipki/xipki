@@ -215,8 +215,6 @@ class CertStoreQueryExecutor
             // all statements have the same connection
             conn = ps_addcert.getConnection();
 
-            certificate.setCertId(certId);
-
             // cert
             int idx = 2;
             ps_addcert.setInt(idx++, CertArt.X509PKC.getCode());
@@ -266,6 +264,7 @@ class CertStoreQueryExecutor
                 {
                     certId = nextCertId();
                 }
+                certificate.setCertId(certId);
 
                 ps_addcert.setInt(1, certId);
                 ps_addRawcert.setInt(1, certId);
