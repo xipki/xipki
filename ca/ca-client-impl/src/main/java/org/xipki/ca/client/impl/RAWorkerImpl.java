@@ -117,6 +117,7 @@ import org.xipki.ca.client.api.dto.UnrevokeOrRemoveCertRequestType;
 import org.xipki.ca.client.impl.jaxb.CAClientType;
 import org.xipki.ca.client.impl.jaxb.CAType;
 import org.xipki.ca.client.impl.jaxb.CertProfileType;
+import org.xipki.ca.client.impl.jaxb.CertProfilesType;
 import org.xipki.ca.client.impl.jaxb.FileOrValueType;
 import org.xipki.ca.client.impl.jaxb.ObjectFactory;
 import org.xipki.ca.client.impl.jaxb.RequestorType;
@@ -141,7 +142,7 @@ public final class RAWorkerImpl extends AbstractRAWorker implements RAWorker
     private class ClientConfigUpdater implements Runnable
     {
         private static final long MINUTE = 60L * 1000;
-        private AtomicBoolean crlGenInProcess = new AtomicBoolean(false);
+        private AtomicBoolean inProcess = new AtomicBoolean(false);
         private long lastUpdate;
 
         ClientConfigUpdater()
@@ -151,12 +152,12 @@ public final class RAWorkerImpl extends AbstractRAWorker implements RAWorker
         @Override
         public void run()
         {
-            if(crlGenInProcess.get())
+            if(inProcess.get())
             {
                 return;
             }
 
-            crlGenInProcess.set(true);
+            inProcess.set(true);
 
             try
             {
@@ -170,7 +171,7 @@ public final class RAWorkerImpl extends AbstractRAWorker implements RAWorker
             }finally
             {
                 lastUpdate = System.currentTimeMillis();
-                crlGenInProcess.set(false);
+                inProcess.set(false);
             }
         }
     }
@@ -323,14 +324,13 @@ public final class RAWorkerImpl extends AbstractRAWorker implements RAWorker
             String caName = caType.getName();
             try
             {
-                CAConf ca = new CAConf(caName, caType.getUrl(), caType.getHealthUrl(), caType.getRequestor());
                 // responder
                 X509Certificate responder = responders.get(caType.getResponder());
                 if(responder == null)
                 {
                     throw new ConfigurationException("No responder named " + caType.getResponder() + " is configured");
                 }
-                ca.setResponder(responder);
+                CAConf ca = new CAConf(caName, caType.getUrl(), caType.getHealthUrl(), caType.getRequestor(), responder);
 
                 // CA cert
                 if(caType.getCaCert().getAutoconf() != null)
@@ -343,18 +343,27 @@ public final class RAWorkerImpl extends AbstractRAWorker implements RAWorker
                 }
 
                 // CertProfiles
-                if(caType.getCertProfiles().getAutoconf() != null)
+                CertProfilesType certProfilesType = caType.getCertProfiles();
+                if(certProfilesType != null && certProfilesType.getAutoconf() != null)
                 {
                     ca.setCertprofilesAutoconf(true);
                 } else
                 {
                     ca.setCertprofilesAutoconf(false);
-                    List<CertProfileType> types = caType.getCertProfiles().getCertProfile();
-                    Set<CertProfileInfo> profiles = new HashSet<>(types.size());
-                    for(CertProfileType m : types)
+
+                    Set<CertProfileInfo> profiles;
+                    if(certProfilesType == null)
                     {
-                        CertProfileInfo profile = new CertProfileInfo(m.getName(), m.getType(), m.getConf());
-                        profiles.add(profile);
+                        profiles = Collections.emptySet();
+                    } else
+                    {
+                        List<CertProfileType> types = certProfilesType.getCertProfile();
+                        profiles = new HashSet<>(types.size());
+                        for(CertProfileType m : types)
+                        {
+                            CertProfileInfo profile = new CertProfileInfo(m.getName(), m.getType(), m.getConf());
+                            profiles.add(profile);
+                        }
                     }
                     ca.setCertprofiles(profiles);
                 }

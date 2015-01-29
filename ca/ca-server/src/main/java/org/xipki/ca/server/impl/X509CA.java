@@ -408,7 +408,7 @@ class X509CA
                 long thisUpdateOfCurrentCRL = certstore.getThisUpdateOfCurrentCRL(caInfo.getCertificate());
                 if(nowInSecond - thisUpdateOfCurrentCRL <= (SIGN_WINDOW_MIN + 5) * SECOND_PER_MIN)
                 {
-                    // CRL was just generated within 15 minutes
+                    // CRL was just generated within SIGN_WINDOW_MIN + 5 minutes
                     return;
                 }
 

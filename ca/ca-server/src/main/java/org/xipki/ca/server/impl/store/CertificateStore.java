@@ -643,21 +643,6 @@ public class CertificateStore
         }
     }
 
-    public int nextCertId()
-    throws OperationException
-    {
-        try
-        {
-            return queryExecutor.nextCertId();
-        } catch (SQLException e)
-        {
-            throw new OperationException(ErrorCode.DATABASE_FAILURE, e.getMessage());
-        } catch (RuntimeException e)
-        {
-            throw new OperationException(ErrorCode.System_Failure, e.getMessage());
-        }
-    }
-
     public void commitNextSerialIfLess(String caName, long nextSerial)
     throws OperationException
     {

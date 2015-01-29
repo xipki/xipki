@@ -887,6 +887,7 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
     public boolean columnExists(Connection conn, String table, String column, Object value)
     throws SQLException
     {
+        // TODO use fetch first
         StringBuilder sb = new StringBuilder();
         sb.append("SELECT COUNT(*) FROM ").append(table).append(" WHERE ").append(column).append("=?");
         String sql = sb.toString();
@@ -1091,6 +1092,11 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
 
     private boolean isSqlExceptionContained(SQLException ex, String[] errorCodes)
     {
+        if(errorCodes == null)
+        {
+            return false;
+        }
+
         SQLException sqlEx = ex;
         if (sqlEx instanceof BatchUpdateException && sqlEx.getNextException() != null)
         {

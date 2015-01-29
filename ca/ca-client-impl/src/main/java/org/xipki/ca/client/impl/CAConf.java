@@ -61,19 +61,21 @@ class CAConf
     private boolean certprofilesAutoconf;
 
     private X509Certificate cert;
-    private X509Certificate responder;
+    private final X509Certificate responder;
     private X500Name subject;
     private Map<String, CertProfileInfo> profiles = Collections.emptyMap();
 
-    CAConf(String name, String url, String healthUrl, String requestorName)
+    CAConf(String name, String url, String healthUrl, String requestorName, X509Certificate responder)
     {
         ParamChecker.assertNotEmpty("name", name);
         ParamChecker.assertNotEmpty("url", url);
         ParamChecker.assertNotEmpty("requestorName", requestorName);
+        ParamChecker.assertNotNull("responder", responder);
 
         this.name = name;
         this.url = url;
         this.requestorName = requestorName;
+        this.responder = responder;
         if(healthUrl == null || healthUrl.isEmpty())
         {
             this.healthUrl = url.replace("cmp", "health");
@@ -156,11 +158,6 @@ class CAConf
     public boolean isCAInfoConfigured()
     {
         return cert != null;
-    }
-
-    public void setResponder(X509Certificate responder)
-    {
-        this.responder = responder;
     }
 
     public X509Certificate getResponder()
