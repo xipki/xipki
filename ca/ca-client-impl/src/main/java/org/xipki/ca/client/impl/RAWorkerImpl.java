@@ -208,7 +208,8 @@ public final class RAWorkerImpl extends AbstractRAWorker implements RAWorker
             }
 
             CAConf ca = casMap.get(name);
-            if(ca.isCertAutoconf() == false || ca.isCertprofilesAutoconf() == false)
+
+            if(ca.isCertAutoconf() == false && ca.isCertprofilesAutoconf() == false)
             {
                 continue;
             }
@@ -344,26 +345,19 @@ public final class RAWorkerImpl extends AbstractRAWorker implements RAWorker
 
                 // CertProfiles
                 CertProfilesType certProfilesType = caType.getCertProfiles();
-                if(certProfilesType != null && certProfilesType.getAutoconf() != null)
+                if(certProfilesType.getAutoconf() != null)
                 {
                     ca.setCertprofilesAutoconf(true);
                 } else
                 {
                     ca.setCertprofilesAutoconf(false);
 
-                    Set<CertProfileInfo> profiles;
-                    if(certProfilesType == null)
+                    List<CertProfileType> types = certProfilesType.getCertProfile();
+                    Set<CertProfileInfo> profiles = new HashSet<>(types.size());
+                    for(CertProfileType m : types)
                     {
-                        profiles = Collections.emptySet();
-                    } else
-                    {
-                        List<CertProfileType> types = certProfilesType.getCertProfile();
-                        profiles = new HashSet<>(types.size());
-                        for(CertProfileType m : types)
-                        {
-                            CertProfileInfo profile = new CertProfileInfo(m.getName(), m.getType(), m.getConf());
-                            profiles.add(profile);
-                        }
+                        CertProfileInfo profile = new CertProfileInfo(m.getName(), m.getType(), m.getConf());
+                        profiles.add(profile);
                     }
                     ca.setCertprofiles(profiles);
                 }

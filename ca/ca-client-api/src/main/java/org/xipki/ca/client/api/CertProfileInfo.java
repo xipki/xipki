@@ -50,9 +50,15 @@ public class CertProfileInfo
     public CertProfileInfo(String name, String type, String conf)
     {
         ParamChecker.assertNotEmpty("name", name);
-        ParamChecker.assertNotEmpty("type", type);
         this.name = name;
-        this.type = type;
+        if(type == null || type.isEmpty())
+        {
+            this.type = null;
+        } else
+        {
+            this.type = type;
+        }
+
         if(conf == null || conf.isEmpty())
         {
             this.conf = null;

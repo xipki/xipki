@@ -14,8 +14,6 @@
       <cm:property name="urlPatterns" value="/cmp/*"/>
       <cm:property name="caConfFile" value="ca-config/ca.properties"/>
       <cm:property name="healthUrlPatterns" value="/health/*"/>
-      <cm:property name="certprofileType.map" value=""/>
-      <cm:property name="publisherType.map" value=""/>
     </cm:default-properties>
   </cm:property-placeholder>
   <reference id="dataSourceFactory" interface="org.xipki.datasource.api.DataSourceFactory"/>
@@ -26,8 +24,6 @@
     <property name="dataSourceFactory" ref="dataSourceFactory"/>
     <property name="caConfFile" value="${caConfFile}"/>
     <property name="auditServiceRegister" ref="auditServiceRegister"/>
-    <property name="certprofileTypeMap" value="${certprofileType.map}"/>
-    <property name="publisherTypeMap" value="${publisherType.map}"/>
   </bean>
   <service ref="caManager" interface="org.xipki.ca.server.mgmt.api.CAManager"/>
 

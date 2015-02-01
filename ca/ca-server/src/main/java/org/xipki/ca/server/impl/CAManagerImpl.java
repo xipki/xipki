@@ -110,6 +110,7 @@ import org.xipki.ca.server.mgmt.api.X509CAEntry;
 import org.xipki.ca.server.mgmt.api.X509CrlSignerEntry;
 import org.xipki.common.CRLReason;
 import org.xipki.common.CertRevocationInfo;
+import org.xipki.common.CmpUtf8Pairs;
 import org.xipki.common.ConfigurationException;
 import org.xipki.common.IoUtil;
 import org.xipki.common.LogUtil;
@@ -3373,6 +3374,43 @@ implements CAManager, CmpResponderManager
         {
             throw new CAMgmtException("Operation not allowed in slave mode");
         }
+    }
+
+    @Override
+    protected String getRealCertprofileType(String certprofileType)
+    {
+        return getRealType(envParameterResolver.getEnvParam("certprofileType.map"), certprofileType);
+    }
+
+    @Override
+    protected String getRealPublisherType(String publisherType)
+    {
+        return getRealType(envParameterResolver.getEnvParam("publisherType.map"), publisherType);
+    }
+
+    private String getRealType(String typeMap, String type)
+    {
+        if(typeMap == null)
+        {
+            return null;
+        }
+
+        typeMap = typeMap.trim();
+        if(typeMap.isEmpty())
+        {
+            return null;
+        }
+
+        CmpUtf8Pairs pairs;
+        try
+        {
+            pairs = new CmpUtf8Pairs(typeMap);
+        }catch(IllegalArgumentException e)
+        {
+            LOG.error("CA environment {}: '{}' is not valid CMP UTF-8 pairs",typeMap, type);
+            return null;
+        }
+        return pairs.getValue(type);
     }
 
 }

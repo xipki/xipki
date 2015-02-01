@@ -791,10 +791,26 @@ class X509CA
         LOG.info("START generateCRL: ca={}, deltaCRL={}, nextUpdate={}",
                 new Object[]{caInfo.getName(), deltaCRL, nextUpdate});
 
+        if(auditEvent != null)
+        {
+            auditEvent.addEventData(new AuditEventData("crlType", deltaCRL ? "DELTA_CRL" : "FULL_CRL"));
+            if(nextUpdate != null)
+            {
+                auditEvent.addEventData(new AuditEventData("nextUpdate", nextUpdate));
+            }
+            else
+            {
+                auditEvent.addEventData(new AuditEventData("nextUpdate", "NULL"));
+            }
+        }
+
         if(nextUpdate != null)
         {
-            if(nextUpdate.getTime() - thisUpdate.getTime() < 10 * 60 * MS_PER_SECOND) // less than 10 minutes
-            throw new OperationException(ErrorCode.CRL_FAILURE, "nextUpdate and thisUpdate are too close");
+            if(nextUpdate.getTime() - thisUpdate.getTime() < 10 * 60 * MS_PER_SECOND)
+            {
+                // less than 10 minutes
+                throw new OperationException(ErrorCode.CRL_FAILURE, "nextUpdate and thisUpdate are too close");
+            }
         }
 
         CRLControl crlControl = crlSigner.getCRLControl();
@@ -814,17 +830,6 @@ class X509CA
             if(nextUpdate != null)
             {
                 crlBuilder.setNextUpdate(nextUpdate);
-                if(auditEvent != null)
-                {
-                    auditEvent.addEventData(new AuditEventData("nextUpdate", nextUpdate));
-                }
-            }
-            else
-            {
-                if(auditEvent != null)
-                {
-                    auditEvent.addEventData(new AuditEventData("nextUpdate", "NULL"));
-                }
             }
 
             BigInteger startSerial = BigInteger.ONE;
@@ -856,11 +861,6 @@ class X509CA
                 {
                     revInfos = certstore.getRevokedCertificates(caCert, notExpireAt, startSerial, numEntries,
                             control.isOnlyContainsCACerts(), control.isOnlyContainsUserCerts());
-                }
-
-                if(auditEvent != null)
-                {
-                    auditEvent.addEventData(new AuditEventData("crlType", deltaCRL ? "DELTA_CRL" : "FULL_CRL"));
                 }
 
                 BigInteger maxSerial = BigInteger.ONE;
