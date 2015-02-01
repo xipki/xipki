@@ -1,12 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
- Copyright (c) 2014 Lijun Liao
- -->
+ Copyright (c) 2014 - 2015 Lijun Liao
+-->
 <xs:schema xmlns="http://xipki.org/caclient/conf/v2"
   xmlns:xs="http://www.w3.org/2001/XMLSchema"
-  xmlns:jxb="http://java.sun.com/xml/ns/jaxb"  
+  xmlns:jxb="http://java.sun.com/xml/ns/jaxb"
   targetNamespace="http://xipki.org/caclient/conf/v2"
-  elementFormDefault="qualified" version="1.0" jxb:version="2.0">
+  elementFormDefault="qualified"
+  version="1.0"
+  jxb:version="2.0">
   <xs:annotation>
     <xs:appinfo>
       <jxb:schemaBindings>
@@ -85,7 +87,7 @@
       <xs:sequence>
         <xs:element name="certProfile" type="certProfileType" minOccurs="0" maxOccurs="unbounded"/>
       </xs:sequence>
-    </xs:choice>          
+    </xs:choice>
   </xs:complexType>
   <xs:complexType name="CACertType">
     <xs:choice>
@@ -99,7 +101,7 @@
       <xs:element name="type" type="xs:string" minOccurs="0"/>
       <xs:element name="conf" type="xs:string" minOccurs="0"/>
     </xs:sequence>
-  </xs:complexType>  
+  </xs:complexType>
   <xs:complexType name="fileOrValueType">
     <xs:choice>
       <xs:element name="value" type="xs:base64Binary"/>

@@ -1,12 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
- Copyright (c) 2014 Lijun Liao
- -->
+ Copyright (c) 2014 - 2015 Lijun Liao
+-->
 <xs:schema xmlns="http://xipki.org/qa/conf/v1"
   xmlns:xs="http://www.w3.org/2001/XMLSchema"
   xmlns:jxb="http://java.sun.com/xml/ns/jaxb"
   targetNamespace="http://xipki.org/qa/conf/v1"
-   elementFormDefault="qualified" version="1.0" jxb:version="2.0">
+  elementFormDefault="qualified"
+  version="1.0"
+  jxb:version="2.0">
   <xs:annotation>
     <xs:appinfo>
       <jxb:schemaBindings>
@@ -44,7 +46,7 @@
   <xs:complexType name="X509CertProfileType">
     <xs:complexContent>
       <xs:extension base="fileOrValueType">
-    <xs:attribute name="name" type="xs:string" use="required"/>
+        <xs:attribute name="name" type="xs:string" use="required"/>
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>

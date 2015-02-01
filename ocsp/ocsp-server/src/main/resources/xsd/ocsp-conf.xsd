@@ -1,5 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
-<xs:schema xmlns="http://xipki.org/xipki/ocsp/conf/v1" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:jxb="http://java.sun.com/xml/ns/jaxb" targetNamespace="http://xipki.org/xipki/ocsp/conf/v1" elementFormDefault="qualified" version="1.0" jxb:version="2.0">
+<!--
+ Copyright (c) 2014 - 2015 Lijun Liao
+-->
+<xs:schema xmlns="http://xipki.org/xipki/ocsp/conf/v1"
+  xmlns:xs="http://www.w3.org/2001/XMLSchema"
+  xmlns:jxb="http://java.sun.com/xml/ns/jaxb"
+  targetNamespace="http://xipki.org/xipki/ocsp/conf/v1"
+  elementFormDefault="qualified"
+  version="1.0"
+  jxb:version="2.0">
   <xs:annotation>
     <xs:appinfo>
       <jxb:schemaBindings>
@@ -265,19 +274,16 @@
       </xs:element>
     </xs:sequence>
   </xs:complexType>
-  
   <xs:complexType name="includesType">
     <xs:sequence>
       <xs:element name="include" type="xs:string" maxOccurs="unbounded"/>
     </xs:sequence>
   </xs:complexType>
-
   <xs:complexType name="excludesType">
     <xs:sequence>
       <xs:element name="exclude" type="xs:string" maxOccurs="unbounded"/>
     </xs:sequence>
   </xs:complexType>
-  
   <xs:complexType name="crlStoreType">
     <xs:sequence>
       <xs:element name="crlFile" type="xs:string"/>

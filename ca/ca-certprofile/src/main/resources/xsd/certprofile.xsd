@@ -1,8 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
- Copyright (c) 2014 Lijun Liao
- -->
-<xs:schema xmlns="http://xipki.org/xmlprofile/v2" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:jxb="http://java.sun.com/xml/ns/jaxb" targetNamespace="http://xipki.org/xmlprofile/v2" elementFormDefault="qualified" version="1.0" jxb:version="2.0">
+ Copyright (c) 2014 - 2015 Lijun Liao
+-->
+<xs:schema xmlns="http://xipki.org/xmlprofile/v2"
+  xmlns:xs="http://www.w3.org/2001/XMLSchema"
+  xmlns:jxb="http://java.sun.com/xml/ns/jaxb"
+  targetNamespace="http://xipki.org/xmlprofile/v2"
+  elementFormDefault="qualified"
+  version="1.0"
+  jxb:version="2.0">
   <xs:annotation>
     <xs:appinfo>
       <jxb:schemaBindings>
@@ -188,10 +194,10 @@
   </xs:complexType>
   <xs:simpleType name="DirectoryStringType">
     <xs:restriction base="xs:normalizedString">
-        <xs:enumeration value="teletexString"/>
-        <xs:enumeration value="printableString"/>
-        <xs:enumeration value="utf8String"/>
-        <xs:enumeration value="bmpString"/>
+      <xs:enumeration value="teletexString"/>
+      <xs:enumeration value="printableString"/>
+      <xs:enumeration value="utf8String"/>
+      <xs:enumeration value="bmpString"/>
     </xs:restriction>
   </xs:simpleType>
   <xs:complexType name="conditionType">
@@ -308,10 +314,10 @@
             <xs:element name="usage" maxOccurs="unbounded">
               <xs:complexType>
                 <xs:complexContent>
-			      <xs:extension base="oidWithDescType">
+                  <xs:extension base="oidWithDescType">
                     <xs:attribute name="required" type="xs:boolean" use="required"/>
-	              </xs:extension>
-			    </xs:complexContent>
+                  </xs:extension>
+                </xs:complexContent>
               </xs:complexType>
             </xs:element>
           </xs:sequence>
@@ -440,7 +446,7 @@
         <xs:attribute name="required" type="xs:boolean" use="required"/>
       </xs:extension>
     </xs:simpleContent>
-  </xs:complexType>  
+  </xs:complexType>
   <xs:simpleType name="oidType">
     <xs:restriction base="xs:token">
       <xs:pattern value="\d+(\.\d+)*"/>
@@ -467,7 +473,7 @@
   </xs:simpleType>
   <xs:complexType name="anyType" mixed="true">
     <xs:sequence minOccurs="0" maxOccurs="unbounded">
-       <xs:any processContents="lax"/>
+      <xs:any processContents="lax"/>
     </xs:sequence>
   </xs:complexType>
 </xs:schema>

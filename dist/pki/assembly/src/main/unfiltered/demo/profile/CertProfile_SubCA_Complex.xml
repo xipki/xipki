@@ -150,13 +150,13 @@
       <skipCerts>1</skipCerts>
     </inhibitAnyPolicy>
     <subjectAltName>
-      <rfc822Name></rfc822Name>
-      <dNSName></dNSName>
-      <directoryName></directoryName>
-      <ediPartyName></ediPartyName>
-      <uniformResourceIdentifier></uniformResourceIdentifier>
-      <iPAddress></iPAddress>
-      <registeredID></registeredID>
+      <rfc822Name/>
+      <dNSName/>
+      <directoryName/>
+      <ediPartyName/>
+      <uniformResourceIdentifier/>
+      <iPAddress/>
+      <registeredID/>
       <otherName>
         <type description="o">2.5.4.10</type>
       </otherName>
@@ -165,8 +165,8 @@
       <access>
         <accessMethod description="id-ad-caRepository">1.3.6.1.5.5.7.48.5</accessMethod>
         <accessLocation>
-          <directoryName></directoryName>
-          <uniformResourceIdentifier></uniformResourceIdentifier>
+          <directoryName/>
+          <uniformResourceIdentifier/>
         </accessLocation>
       </access>
     </subjectInfoAccess>
