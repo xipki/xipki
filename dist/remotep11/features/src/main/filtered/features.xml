@@ -6,6 +6,7 @@
     <bundle>mvn:org.bouncycastle/bcprov-jdk15on/${bc.version}</bundle>
     <bundle>mvn:org.bouncycastle/bcpkix-jdk15on/${bc.version}</bundle>
     <bundle>mvn:org.xipki/common/${project.version}</bundle>
+    <bundle>mvn:org.xipki/security-api/${project.version}</bundle>
     <bundle>mvn:org.xipki/security/${project.version}</bundle>
   </feature>
   <feature name="xipki-remotep11-server" version="${project.version}" resolver="(obr)">

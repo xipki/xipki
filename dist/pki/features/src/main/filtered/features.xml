@@ -36,6 +36,7 @@
     <feature>bouncycastle</feature>
     <bundle>mvn:org.xipki/common/${project.version}</bundle>
     <bundle><![CDATA[wrap:mvn:at.tugraz.iaik/iaikPkcs11Wrapper/${pkcs11Wrapper.version}/$Bundle-SymbolicName=iaikPkcs11Wrapper&Bundle-Version=${pkcs11Wrapper.version}]]></bundle>
+    <bundle>mvn:org.xipki/security-api/${project.version}</bundle>
     <bundle>mvn:org.xipki/security/${project.version}</bundle>
   </feature>
   <feature name="xipki-security" version="${project.version}" resolver="(obr)">
