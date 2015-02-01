@@ -49,8 +49,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.StringTokenizer;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.bouncycastle.util.encoders.Base64;
@@ -97,7 +95,7 @@ import org.xipki.security.api.SignerException;
  * @author Lijun Liao
  */
 
-public class BaseCAManager
+public abstract class BaseCAManager
 {
 
     private static final Logger LOG = LoggerFactory.getLogger(BaseCAManager.class);
@@ -106,8 +104,6 @@ public class BaseCAManager
     protected DataSourceWrapper dataSource;
     protected SecurityFactory securityFactory;
     protected DataSourceFactory dataSourceFactory;
-    private final Map<String, String> certprofileTypeMapping = new ConcurrentHashMap<String, String>();
-    private final Map<String, String> publisherTypeMapping = new ConcurrentHashMap<String, String>();
 
     public BaseCAManager()
     {
@@ -131,82 +127,6 @@ public class BaseCAManager
     public void setDataSourceFactory(DataSourceFactory dataSourceFactory)
     {
         this.dataSourceFactory = dataSourceFactory;
-    }
-
-    public void setCertprofileTypeMap(String certprofileTypeMap)
-    {
-        if(certprofileTypeMap == null)
-        {
-            LOG.debug("certprofileTypeMap is null");
-            return;
-        }
-
-        certprofileTypeMap = certprofileTypeMap.trim();
-        if(certprofileTypeMap.isEmpty())
-        {
-            LOG.debug("certprofileTypeMap is empty");
-            return;
-        }
-
-        StringTokenizer st = new StringTokenizer(certprofileTypeMap, " \t");
-        while(st.hasMoreTokens())
-        {
-            String token = st.nextToken();
-            StringTokenizer st2 = new StringTokenizer(token, "=");
-            if(st2.countTokens() != 2)
-            {
-                LOG.warn("invalid certprofileTypeMap entry '" + token + "'");
-                continue;
-            }
-
-            String alias = st2.nextToken();
-            if(certprofileTypeMapping.containsKey(alias))
-            {
-                LOG.warn("certprofile type alias '{}' already defined, ignore map '{}'", alias, token);
-                continue;
-            }
-            String signerType = st2.nextToken();
-            certprofileTypeMapping.put(alias, signerType);
-            LOG.info("add alias '{}' for certprofile type '{}'", alias, signerType);
-        }
-    }
-
-    public void setPublisherTypeMap(String publisherTypeMap)
-    {
-        if(publisherTypeMap == null)
-        {
-            LOG.debug("publisherTypeMap is null");
-            return;
-        }
-
-        publisherTypeMap = publisherTypeMap.trim();
-        if(publisherTypeMap.isEmpty())
-        {
-            LOG.debug("publisherTypeMap is empty");
-            return;
-        }
-
-        StringTokenizer st = new StringTokenizer(publisherTypeMap, " \t");
-        while(st.hasMoreTokens())
-        {
-            String token = st.nextToken();
-            StringTokenizer st2 = new StringTokenizer(token, "=");
-            if(st2.countTokens() != 2)
-            {
-                LOG.warn("invalid publisherTypeMap entry '" + token + "'");
-                continue;
-            }
-
-            String alias = st2.nextToken();
-            if(publisherTypeMapping.containsKey(alias))
-            {
-                LOG.warn("publisher type alias '" + alias + "' already defined, ignore map '" + token +"'");
-                continue;
-            }
-            String signerType = st2.nextToken();
-            publisherTypeMapping.put(alias, signerType);
-            LOG.info("add alias '" + alias + "' for publisher type '" + signerType + "'");
-        }
     }
 
     protected X509Certificate generateCert(String b64Cert)
@@ -450,7 +370,7 @@ public class BaseCAManager
                 try
                 {
                     CertProfileEntry rawEntry = new CertProfileEntry(name, type, conf);
-                    String realType = certprofileTypeMapping.get(type);
+                    String realType = getRealCertprofileType(type);
                     IdentifiedX509CertProfile ret = new IdentifiedX509CertProfile(rawEntry, realType);
                     ret.setEnvironmentParameterResolver(envParameterResolver);
                     ret.validate();
@@ -527,7 +447,7 @@ public class BaseCAManager
                 String conf = rs.getString("CONF");
 
                 PublisherEntry rawEntry = new PublisherEntry(name, type, conf);
-                String realType = publisherTypeMapping.get(type);
+                String realType = getRealPublisherType(type);
                 IdentifiedX509CertPublisher ret;
                 try
                 {
@@ -1024,5 +944,8 @@ public class BaseCAManager
             dataSource.releaseResources(stmt, null);
         }
     }
+
+    protected abstract String getRealCertprofileType(String certprofileType);
+    protected abstract String getRealPublisherType(String publisherType);
 
 }
