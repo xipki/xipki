@@ -63,9 +63,9 @@ import org.xipki.common.CustomObjectIdentifiers;
 import org.xipki.common.KeyUsage;
 import org.xipki.common.SecurityUtil;
 import org.xipki.console.karaf.UnexpectedResultException;
-import org.xipki.security.ExtensionExistence;
 import org.xipki.security.P10RequestGenerator;
 import org.xipki.security.api.ConcurrentContentSigner;
+import org.xipki.security.api.ExtensionExistence;
 import org.xipki.security.api.SecurityFactory;
 import org.xipki.security.api.SignerException;
 
