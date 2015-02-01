@@ -95,6 +95,7 @@
   <xs:complexType name="requestType">
     <xs:sequence>
       <xs:element name="maxRequestSize" type="xs:int" minOccurs="0"/>
+      <xs:element name="versions" type="versionsType" minOccurs="0"/>
       <xs:element name="nonce" type="nonceType" minOccurs="0"/>
       <xs:element name="signatureRequired" type="xs:boolean"/>
       <xs:element name="validateSignature" type="xs:boolean"/>
@@ -331,6 +332,11 @@
         </xs:annotation>
       </xs:element>
       <xs:element name="conf" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="versionsType">
+    <xs:sequence>
+      <xs:element name="version" type="xs:int" maxOccurs="unbounded"/>
     </xs:sequence>
   </xs:complexType>
 </xs:schema>

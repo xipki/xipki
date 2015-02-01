@@ -50,6 +50,7 @@ import java.security.cert.CertificateException;
 import java.security.cert.CollectionCertStoreParameters;
 import java.security.cert.TrustAnchor;
 import java.security.cert.X509Certificate;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashSet;
@@ -63,6 +64,7 @@ import org.xipki.ocsp.server.impl.jaxb.CertCollectionType;
 import org.xipki.ocsp.server.impl.jaxb.CertCollectionType.Keystore;
 import org.xipki.ocsp.server.impl.jaxb.NonceType;
 import org.xipki.ocsp.server.impl.jaxb.RequestType;
+import org.xipki.ocsp.server.impl.jaxb.VersionsType;
 import org.xipki.ocsp.server.impl.jaxb.RequestType.CertpathValidation;
 import org.xipki.ocsp.server.impl.jaxb.RequestType.HashAlgorithms;
 
@@ -87,6 +89,7 @@ class RequestOptions
     private final boolean validateSignature;
 
     private final int maxRequestSize;
+    private final Collection<Integer> versions;
     private final boolean nonceRequired;
     private final int nonceMinLen;
     private final int nonceMaxLen;
@@ -138,6 +141,19 @@ class RequestOptions
 
         this.nonceMinLen = minLen;
         this.nonceMaxLen = maxLen;
+
+        // Request versions
+
+        VersionsType versionsConf = conf.getVersions();
+        if(versionsConf == null)
+        {
+            this.versions = null;
+        }
+        else
+        {
+            this.versions = new HashSet<>();
+            this.versions.addAll(versionsConf.getVersion());
+        }
 
         // Request hash algorithms
         hashAlgos = new HashSet<>();
@@ -275,6 +291,11 @@ class RequestOptions
     public CertStore getCerts()
     {
         return certs;
+    }
+
+    public boolean isVersionAllowed(Integer version)
+    {
+        return versions == null || versions.contains(version);
     }
 
     private Set<X509Certificate> getCerts(CertCollectionType conf)

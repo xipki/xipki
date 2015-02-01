@@ -609,6 +609,18 @@ public class OcspResponder
             return createUnsuccessfullOCSPResp(OcspResponseStatus.internalError);
         }
 
+        int version = request.getVersionNumber();
+        if(requestOptions.isVersionAllowed(version) == false)
+        {
+            String message = "invalid request version " + version;
+            LOG.warn(message);
+            if(auditEvent != null)
+            {
+                fillAuditEvent(auditEvent, AuditLevel.INFO, AuditStatus.FAILED, message);
+            }
+            return createUnsuccessfullOCSPResp(OcspResponseStatus.malformedRequest);
+        }
+
         try
         {
             if(request.isSigned())
