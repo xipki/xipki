@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <CAClient xmlns="http://xipki.org/caclient/conf/v2">
-  <devMode>true</devMode>  
+  <devMode>true</devMode>
   <requestors>
     <requestor>
       <name>requestor1</name>
@@ -23,7 +23,7 @@
         <file>etc/tlskeys/tls-server.der</file>
       </cert>
     </responder>
-  </responders>  
+  </responders>
   <CAs>
     <CAInfoUpdateInterval>0</CAInfoUpdateInterval>
     <CA enabled="true">

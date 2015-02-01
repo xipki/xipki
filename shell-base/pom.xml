@@ -22,6 +22,6 @@
       <groupId>org.osgi</groupId>
       <artifactId>org.osgi.core</artifactId>
       <version>${osgi.version}</version>
-    </dependency>     	
+    </dependency>
   </dependencies>
 </project>

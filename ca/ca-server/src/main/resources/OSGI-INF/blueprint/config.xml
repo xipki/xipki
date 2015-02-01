@@ -26,7 +26,6 @@
     <property name="auditServiceRegister" ref="auditServiceRegister"/>
   </bean>
   <service ref="caManager" interface="org.xipki.ca.server.mgmt.api.CAManager"/>
-
   <!-- create the servlet and inject our own app factory -->
   <bean id="caServlet" class="org.xipki.ca.server.impl.Rfc6712Servlet">
     <property name="responderManager" ref="caManager"/>

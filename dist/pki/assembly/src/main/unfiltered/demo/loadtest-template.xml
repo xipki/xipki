@@ -20,7 +20,7 @@
     <subject>CN=xipki.org,O=example PKI TLSwithIncSN DSA,C=DE</subject>
     <randomDN>O</randomDN>
     <dsaKey pLength="2048"/>
-  </enrollCert>  
+  </enrollCert>
   <enrollCert>
     <certProfile>TLS_C</certProfile>
     <subject>CN=TLS Client Muster,O=example PKI TLS_C EC,C=DE</subject>

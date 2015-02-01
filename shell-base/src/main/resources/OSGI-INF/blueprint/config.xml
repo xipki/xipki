@@ -6,7 +6,6 @@
   <service ref="filePathCompleter" interface="org.xipki.console.karaf.FilePathCompleter"/>
   <bean id="yesNoCompleter" class="org.xipki.console.karaf.YesNoCompleterImpl"/>
   <service ref="yesNoCompleter" interface="org.xipki.console.karaf.YesNoCompleter"/>
-  
   <command-bundle xmlns="http://karaf.apache.org/xmlns/shell/v1.1.0">
     <command>
       <action class="org.xipki.console.karaf.FileRmCommand"/>
@@ -23,5 +22,4 @@
       </completers>
     </command>
   </command-bundle>
-
 </blueprint>
