@@ -171,7 +171,7 @@ import org.xipki.common.LruCache;
 import org.xipki.common.ObjectIdentifiers;
 import org.xipki.common.ParamChecker;
 import org.xipki.common.SecurityUtil;
-import org.xipki.security.ExtensionExistence;
+import org.xipki.security.api.ExtensionExistence;
 
 /**
  * @author Lijun Liao

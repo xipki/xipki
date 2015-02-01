@@ -33,7 +33,7 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.security;
+package org.xipki.security.api;
 
 import java.io.IOException;
 import java.util.Collections;
