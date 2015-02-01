@@ -49,7 +49,7 @@
     <!-- required by hikaricp -->
     <hikaricp.version>2.2.5</hikaricp.version>
     <javassist.version>3.18.1-GA</javassist.version>
-    <!-- required by syslog4j -->    
+    <!-- required by syslog4j -->
     <syslog4j.version>0.9.47-NESS-8</syslog4j.version>
     <commons-lang3.version>3.1</commons-lang3.version>
     <guava.version>13.0</guava.version>

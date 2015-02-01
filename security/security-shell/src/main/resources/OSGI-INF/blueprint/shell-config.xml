@@ -5,7 +5,6 @@
   <bean id="curveNameCompleter" class="org.xipki.security.shell.completer.ECCurveNameCompleter"/>
   <bean id="keyusageCompleter" class="org.xipki.security.shell.completer.KeyusageCompleter"/>
   <bean id="extKeyusageCompleter" class="org.xipki.security.shell.completer.ExtKeyusageCompleter"/>
-  
   <bean id="p11ModuleNameCompleter" class="org.xipki.security.shell.completer.P11ModuleNameCompleter">
     <property name="securityFactory" ref="securityFactory"/>
   </bean>
