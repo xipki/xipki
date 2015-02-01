@@ -34,7 +34,7 @@
     </developer>
   </developers>
   <properties>
-    <karaf.version>3.0.2</karaf.version>
+    <karaf.version>3.0.3</karaf.version>
     <!-- the following OSGi and paxweb version are used in karaf 3.0.2 -->
     <osgi.version>5.0.0</osgi.version>
     <paxweb.version>3.1.2</paxweb.version>
