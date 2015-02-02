@@ -2402,7 +2402,7 @@ class CertStoreQueryExecutor
         }
     }
 
-    int nextCertId()
+    private int nextCertId()
     throws SQLException
     {
         Connection conn = dataSource.getConnection();
