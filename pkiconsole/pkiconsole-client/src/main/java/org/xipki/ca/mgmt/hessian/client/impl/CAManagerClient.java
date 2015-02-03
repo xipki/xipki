@@ -56,7 +56,7 @@ import org.xipki.ca.server.mgmt.api.CmpControl;
 import org.xipki.ca.server.mgmt.api.X509CAEntry;
 import org.xipki.ca.server.mgmt.api.CAHasRequestorEntry;
 import org.xipki.ca.server.mgmt.api.CAManager;
-import org.xipki.ca.server.mgmt.api.CertProfileEntry;
+import org.xipki.ca.server.mgmt.api.CertprofileEntry;
 import org.xipki.ca.server.mgmt.api.CmpRequestorEntry;
 import org.xipki.ca.server.mgmt.api.CmpResponderEntry;
 import org.xipki.ca.server.mgmt.api.X509CrlSignerEntry;
@@ -218,9 +218,9 @@ public class CAManagerClient implements CAManager
     }
 
     @Override
-    public Set<String> getCertProfileNames()
+    public Set<String> getCertprofileNames()
     {
-        return client.getCertProfileNames();
+        return client.getCertprofileNames();
     }
 
     @Override
@@ -285,17 +285,17 @@ public class CAManagerClient implements CAManager
     }
 
     @Override
-    public void removeCertProfileFromCA(String profileName, String caName)
+    public void removeCertprofileFromCA(String profileName, String caName)
     throws CAMgmtException
     {
-        client.removeCertProfileFromCA(profileName, caName);
+        client.removeCertprofileFromCA(profileName, caName);
     }
 
     @Override
-    public void addCertProfileToCA(String profileName, String caName)
+    public void addCertprofileToCA(String profileName, String caName)
     throws CAMgmtException
     {
-        client.addCertProfileToCA(profileName, caName);
+        client.addCertprofileToCA(profileName, caName);
     }
 
     @Override
@@ -313,9 +313,9 @@ public class CAManagerClient implements CAManager
     }
 
     @Override
-    public Set<String> getCertProfilesForCA(String caName)
+    public Set<String> getCertprofilesForCA(String caName)
     {
-        return client.getCertProfilesForCA(caName);
+        return client.getCertprofilesForCA(caName);
     }
 
     @Override
@@ -366,30 +366,30 @@ public class CAManagerClient implements CAManager
     }
 
     @Override
-    public CertProfileEntry getCertProfile(String profileName)
+    public CertprofileEntry getCertprofile(String profileName)
     {
-        return client.getCertProfile(profileName);
+        return client.getCertprofile(profileName);
     }
 
     @Override
-    public void removeCertProfile(String profileName)
+    public void removeCertprofile(String profileName)
     throws CAMgmtException
     {
-        client.removeCertProfile(profileName);
+        client.removeCertprofile(profileName);
     }
 
     @Override
-    public void changeCertProfile(String name, String type, String conf)
+    public void changeCertprofile(String name, String type, String conf)
     throws CAMgmtException
     {
-        client.changeCertProfile(name, type, conf);
+        client.changeCertprofile(name, type, conf);
     }
 
     @Override
-    public void addCertProfile(CertProfileEntry dbEntry)
+    public void addCertprofile(CertprofileEntry dbEntry)
     throws CAMgmtException
     {
-        client.addCertProfile(dbEntry);
+        client.addCertprofile(dbEntry);
     }
 
     @Override
