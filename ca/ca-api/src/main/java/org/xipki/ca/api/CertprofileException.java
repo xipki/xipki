@@ -33,54 +33,34 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.ca.client.api;
-
-import org.xipki.common.ParamChecker;
+package org.xipki.ca.api;
 
 /**
  * @author Lijun Liao
  */
 
-public class CertProfileInfo
+public class CertprofileException extends Exception
 {
-    private final String name;
-    private final String type;
-    private final String conf;
 
-    public CertProfileInfo(String name, String type, String conf)
+    private static final long serialVersionUID = 1L;
+
+    public CertprofileException()
     {
-        ParamChecker.assertNotEmpty("name", name);
-        this.name = name;
-        if(type == null || type.isEmpty())
-        {
-            this.type = null;
-        } else
-        {
-            this.type = type;
-        }
-
-        if(conf == null || conf.isEmpty())
-        {
-            this.conf = null;
-        } else
-        {
-            this.conf = conf;
-        }
     }
 
-    public String getName()
+    public CertprofileException(String message)
     {
-        return name;
+        super(message);
     }
 
-    public String getType()
+    public CertprofileException(Throwable cause)
     {
-        return type;
+        super(cause);
     }
 
-    public String getConf()
+    public CertprofileException(String message, Throwable cause)
     {
-        return conf;
+        super(message, cause);
     }
 
 }

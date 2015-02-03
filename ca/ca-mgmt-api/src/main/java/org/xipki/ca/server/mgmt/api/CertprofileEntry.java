@@ -33,28 +33,72 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.ca.api.profile.x509;
+package org.xipki.ca.server.mgmt.api;
+
+import java.io.Serializable;
+
+import org.xipki.common.ParamChecker;
 
 /**
  * @author Lijun Liao
  */
 
-public enum SpecialX509CertProfileBehavior
+public class CertprofileEntry implements Serializable
 {
-    gematik_gSMC_K;
+    private static final long serialVersionUID = 1L;
+    private final String name;
+    private final String type;
+    private final String conf;
 
-    public static final String PARAMETER_MAXLIFTIME = "maxLifetime";
-
-    public static SpecialX509CertProfileBehavior getInstance(String behavior)
+    public CertprofileEntry(String name, String type, String conf)
     {
-        for(SpecialX509CertProfileBehavior b : values())
-        {
-            if(b.name().equalsIgnoreCase(behavior))
-            {
-                return b;
-            }
-        }
+        ParamChecker.assertNotEmpty("name", name);
+        ParamChecker.assertNotEmpty("type", type);
 
-        return null;
+        if("all".equalsIgnoreCase(name) || "null".equalsIgnoreCase(name))
+        {
+            throw new IllegalArgumentException("certificate profile name could not be 'all' and 'null'");
+        }
+        this.name = name;
+        this.type = type;
+        this.conf = conf;
     }
+
+    public String getName()
+    {
+        return name;
+    }
+
+    public String getType()
+    {
+        return type;
+    }
+
+    public String getConf()
+    {
+        return conf;
+    }
+
+    @Override
+    public String toString()
+    {
+        return toString(false);
+    }
+
+    public String toString(boolean verbose)
+    {
+        StringBuilder sb = new StringBuilder();
+        sb.append("name: ").append(name).append('\n');
+        sb.append("type: ").append(type).append('\n');
+        sb.append("conf: ");
+        if(verbose || conf == null || conf.length() < 301)
+        {
+            sb.append(conf);
+        } else
+        {
+            sb.append(conf.substring(0, 297)).append("...");
+        }
+        return sb.toString();
+    }
+
 }

@@ -124,7 +124,7 @@ import org.xipki.ca.api.publisher.X509CertificateInfo;
 import org.xipki.ca.common.cmp.CmpUtil;
 import org.xipki.ca.server.mgmt.api.CAMgmtException;
 import org.xipki.ca.server.mgmt.api.CAStatus;
-import org.xipki.ca.server.mgmt.api.CertProfileEntry;
+import org.xipki.ca.server.mgmt.api.CertprofileEntry;
 import org.xipki.ca.server.mgmt.api.CmpControl;
 import org.xipki.ca.server.mgmt.api.Permission;
 import org.xipki.common.CRLReason;
@@ -524,6 +524,11 @@ class X509CACmpResponder extends CmpResponder
                                     }
                                 }
 
+                                if(acceptVersions.isEmpty())
+                                {
+                                    acceptVersions.add(1);
+                                }
+
                                 String systemInfo = getSystemInfo(_requestor, acceptVersions);
                                 itvResp = new InfoTypeAndValue(infoType, new DERUTF8String(systemInfo));
                             }
@@ -749,21 +754,21 @@ class X509CACmpResponder extends CmpResponder
                     try
                     {
                         CmpUtf8Pairs keyvalues  = CmpUtil.extract(reqMsg.getRegInfo());
-                        String certProfileName = keyvalues == null ? null : keyvalues.getValue(CmpUtf8Pairs.KEY_CERT_PROFILE);
-                        if(certProfileName == null)
+                        String certprofileName = keyvalues == null ? null : keyvalues.getValue(CmpUtf8Pairs.KEY_CERT_PROFILE);
+                        if(certprofileName == null)
                         {
                             throw new CMPException("no certificate profile is specified");
                         }
 
                         if(childAuditEvent != null)
                         {
-                            childAuditEvent.addEventData(new AuditEventData("certProfile", certProfileName));
+                            childAuditEvent.addEventData(new AuditEventData("certprofile", certprofileName));
                         }
 
-                        checkPermission(_requestor, certProfileName);
+                        checkPermission(_requestor, certprofileName);
                         certResponses[i] = generateCertificate(_requestor, user, tid, certReqId,
                                 subject, publicKeyInfo,validity, extensions,
-                                certProfileName, keyUpdate, confirmWaitTime, childAuditEvent);
+                                certprofileName, keyUpdate, confirmWaitTime, childAuditEvent);
                     } catch (CMPException e)
                     {
                         final String message = "generateCertificate";
@@ -849,21 +854,21 @@ class X509CACmpResponder extends CmpResponder
             try
             {
                 CmpUtf8Pairs keyvalues = CmpUtil.extract(reqHeader.getGeneralInfo());
-                String certProfileName = keyvalues == null ? null : keyvalues.getValue(CmpUtf8Pairs.KEY_CERT_PROFILE);
-                if(certProfileName == null)
+                String certprofileName = keyvalues == null ? null : keyvalues.getValue(CmpUtf8Pairs.KEY_CERT_PROFILE);
+                if(certprofileName == null)
                 {
                     throw new CMPException("no certificate profile is specified");
                 }
 
                 if(childAuditEvent != null)
                 {
-                    childAuditEvent.addEventData(new AuditEventData("certProfile", certProfileName));
+                    childAuditEvent.addEventData(new AuditEventData("certprofile", certprofileName));
                 }
 
-                checkPermission(requestor, certProfileName);
+                checkPermission(requestor, certprofileName);
 
                 certResp = generateCertificate(requestor, user, tid, certReqId,
-                    subject, publicKeyInfo, null, extensions, certProfileName,
+                    subject, publicKeyInfo, null, extensions, certprofileName,
                     false, confirmWaitTime, childAuditEvent);
             }catch(CMPException e)
             {
@@ -893,13 +898,13 @@ class X509CACmpResponder extends CmpResponder
             SubjectPublicKeyInfo publicKeyInfo,
             OptionalValidity validity,
             Extensions extensions,
-            String certProfileName,
+            String certprofileName,
             boolean keyUpdate,
             long confirmWaitTime,
             ChildAuditEvent childAuditEvent)
     throws InsuffientPermissionException
     {
-        checkPermission(requestor, certProfileName);
+        checkPermission(requestor, certprofileName);
 
         Date notBefore = null;
         Date notAfter = null;
@@ -923,13 +928,13 @@ class X509CACmpResponder extends CmpResponder
             X509CertificateInfo certInfo;
             if(keyUpdate)
             {
-                certInfo = ca.regenerateCertificate(requestor.isRA(), requestor, certProfileName, user,
+                certInfo = ca.regenerateCertificate(requestor.isRA(), requestor, certprofileName, user,
                         subject, publicKeyInfo,
                         notBefore, notAfter, extensions);
             }
             else
             {
-                certInfo = ca.generateCertificate(requestor.isRA(), requestor, certProfileName, user,
+                certInfo = ca.generateCertificate(requestor.isRA(), requestor, certprofileName, user,
                         subject, publicKeyInfo,
                         notBefore, notAfter, extensions);
             }
@@ -1432,19 +1437,19 @@ class X509CACmpResponder extends CmpResponder
         }
     }
 
-    private void checkPermission(CmpRequestorInfo requestor, String certProfile)
+    private void checkPermission(CmpRequestorInfo requestor, String certprofile)
     throws InsuffientPermissionException
     {
         Set<String> profiles = requestor.getCaHasRequestor().getProfiles();
         if(profiles != null)
         {
-            if(profiles.contains("all") || profiles.contains(certProfile))
+            if(profiles.contains("all") || profiles.contains(certprofile))
             {
                 return;
             }
         }
 
-        String msg = "CertProfile " + certProfile + " is not allowed";
+        String msg = "Certprofile " + certprofile + " is not allowed";
         LOG.warn(msg);
         throw new InsuffientPermissionException(msg);
     }
@@ -1513,7 +1518,7 @@ class X509CACmpResponder extends CmpResponder
             Set<String> requestorProfiles = requestor.getCaHasRequestor().getProfiles();
 
             Set<String> supportedProfileNames = new HashSet<>();
-            Set<String> caProfileNames = ca.getCAManager().getCertProfilesForCA(ca.getCAInfo().getName());
+            Set<String> caProfileNames = ca.getCAManager().getCertprofilesForCA(ca.getCAInfo().getName());
             for(String caProfileName : caProfileNames)
             {
                 if(requestorProfiles.contains("all") || requestorProfiles.contains(caProfileName))
@@ -1524,11 +1529,11 @@ class X509CACmpResponder extends CmpResponder
 
             if(supportedProfileNames.isEmpty() == false)
             {
-                sb.append("<certProfiles>");
+                sb.append("<certprofiles>");
                 for(String name : supportedProfileNames)
                 {
-                    CertProfileEntry entry = ca.getCAManager().getCertProfile(name);
-                    sb.append("<certProfile>");
+                    CertprofileEntry entry = ca.getCAManager().getCertprofile(name);
+                    sb.append("<certprofile>");
                     sb.append("<name>").append(name).append("</name>");
                     sb.append("<type>").append(entry.getType()).append("</type>");
                     sb.append("<conf>");
@@ -1540,10 +1545,10 @@ class X509CACmpResponder extends CmpResponder
                         sb.append("]]>");
                     }
                     sb.append("</conf>");
-                    sb.append("</certProfile>");
+                    sb.append("</certprofile>");
                 }
 
-                sb.append("</certProfiles>");
+                sb.append("</certprofiles>");
             }
 
             sb.append("</systemInfo>");
@@ -1578,14 +1583,14 @@ class X509CACmpResponder extends CmpResponder
             throw new OperationException(ErrorCode.BAD_REQUEST, "Invalid request" + e.getMessage());
         }
 
-        String certProfile = XMLUtil.getValueOfFirstElementChild(doc.getDocumentElement(), namespace, "certProfile");
-        if(certProfile == null)
+        String certprofile = XMLUtil.getValueOfFirstElementChild(doc.getDocumentElement(), namespace, "certprofile");
+        if(certprofile == null)
         {
-            throw new OperationException(ErrorCode.BAD_REQUEST, "certProfile is not specified");
+            throw new OperationException(ErrorCode.BAD_REQUEST, "certprofile is not specified");
         }
 
         // make sure that the requestor is permitted to remove the certificate profiles
-        checkPermission(requestor, certProfile);
+        checkPermission(requestor, certprofile);
 
         String userLike = XMLUtil.getValueOfFirstElementChild(doc.getDocumentElement(), namespace, "userLike");
 
@@ -1604,16 +1609,16 @@ class X509CACmpResponder extends CmpResponder
         }
 
         X509CA ca = getCA();
-        RemoveExpiredCertsInfo result = ca.removeExpiredCerts(certProfile, userLike, overlapSeconds);
+        RemoveExpiredCertsInfo result = ca.removeExpiredCerts(certprofile, userLike, overlapSeconds);
 
         StringBuilder sb = new StringBuilder();
         sb.append("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>");
         sb.append("<removedExpiredCertsResp version=\"1\">");
         // Profile
-        certProfile = result.getCertProfile();
-        sb.append("<certProfile>");
-        sb.append(certProfile);
-        sb.append("</certProfile>");
+        certprofile = result.getCertprofile();
+        sb.append("<certprofile>");
+        sb.append(certprofile);
+        sb.append("</certprofile>");
 
         // Username
         userLike = result.getUserLike();

@@ -58,8 +58,8 @@ import org.bouncycastle.asn1.teletrust.TeleTrusTObjectIdentifiers;
 import org.bouncycastle.asn1.x509.Extension;
 import org.bouncycastle.asn1.x9.X9ObjectIdentifiers;
 import org.w3c.dom.Element;
-import org.xipki.ca.api.profile.x509.SpecialX509CertProfileBehavior;
-import org.xipki.ca.certprofile.XmlX509CertProfile;
+import org.xipki.ca.api.profile.x509.SpecialX509CertprofileBehavior;
+import org.xipki.ca.certprofile.XmlX509Certprofile;
 import org.xipki.ca.certprofile.internal.x509.jaxb.AddTextType;
 import org.xipki.ca.certprofile.internal.x509.jaxb.AlgorithmType;
 import org.xipki.ca.certprofile.internal.x509.jaxb.AnyType;
@@ -149,49 +149,49 @@ public class ProfileConfCreatorDemo
             Marshaller m = JAXBContext.newInstance(ObjectFactory.class).createMarshaller();
             final SchemaFactory schemaFact = SchemaFactory.newInstance(
                     javax.xml.XMLConstants.W3C_XML_SCHEMA_NS_URI);
-            URL url = XmlX509CertProfile.class.getResource("/xsd/certprofile.xsd");
+            URL url = XmlX509Certprofile.class.getResource("/xsd/certprofile.xsd");
             m.setSchema(schemaFact.newSchema(url));
             m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
             m.setProperty("com.sun.xml.internal.bind.indentString", "  ");
 
             // RootCA
-            X509ProfileType profile = CertProfile_RootCA(false);
-            marshall(m, profile, "CertProfile_RootCA.xml");
+            X509ProfileType profile = Certprofile_RootCA(false);
+            marshall(m, profile, "Certprofile_RootCA.xml");
 
             // RootCA-Cross
-            profile = CertProfile_RootCA(true);
-            marshall(m, profile, "CertProfile_RootCA_Cross.xml");
+            profile = Certprofile_RootCA(true);
+            marshall(m, profile, "Certprofile_RootCA_Cross.xml");
 
             // SubCA
-            profile = CertProfile_SubCA();
-            marshall(m, profile, "CertProfile_SubCA.xml");
+            profile = Certprofile_SubCA();
+            marshall(m, profile, "Certprofile_SubCA.xml");
 
-            profile = CertProfile_SubCA_Complex();
-            marshall(m, profile, "CertProfile_SubCA_Complex.xml");
+            profile = Certprofile_SubCA_Complex();
+            marshall(m, profile, "Certprofile_SubCA_Complex.xml");
 
             // OCSP
-            profile = CertProfile_OCSP();
-            marshall(m, profile, "CertProfile_OCSP.xml");
+            profile = Certprofile_OCSP();
+            marshall(m, profile, "Certprofile_OCSP.xml");
 
             // TLS
-            profile = CertProfile_TLS();
-            marshall(m, profile, "CertProfile_TLS.xml");
+            profile = Certprofile_TLS();
+            marshall(m, profile, "Certprofile_TLS.xml");
 
             // TLS_C
-            profile = CertProfile_TLS_C();
-            marshall(m, profile, "CertProfile_TLS_C.xml");
+            profile = Certprofile_TLS_C();
+            marshall(m, profile, "Certprofile_TLS_C.xml");
 
             // TLSwithIncSN
-            profile = CertProfile_TLSwithIncSN();
-            marshall(m, profile, "CertProfile_TLSwithIncSN.xml");
+            profile = Certprofile_TLSwithIncSN();
+            marshall(m, profile, "Certprofile_TLSwithIncSN.xml");
 
             //gSMC-K
-            profile = CertProfile_gSMC_K();
-            marshall(m, profile, "CertProfile_gSMC_K.xml");
+            profile = Certprofile_gSMC_K();
+            marshall(m, profile, "Certprofile_gSMC_K.xml");
 
             //multiple-OUs
-            profile = CertProfile_MultipleOUs();
-            marshall(m, profile, "CertProfile_multipleOUs.xml");
+            profile = Certprofile_MultipleOUs();
+            marshall(m, profile, "Certprofile_multipleOUs.xml");
 
         }catch(Exception e)
         {
@@ -219,10 +219,10 @@ public class ProfileConfCreatorDemo
 
     }
 
-    private static X509ProfileType CertProfile_RootCA(boolean cross)
+    private static X509ProfileType Certprofile_RootCA(boolean cross)
     throws Exception
     {
-        X509ProfileType profile = getBaseProfile("CertProfile RootCA" + (cross ? " Cross" : ""),
+        X509ProfileType profile = getBaseProfile("Certprofile RootCA" + (cross ? " Cross" : ""),
                 true, "10y", false);
 
         // Subject
@@ -261,10 +261,10 @@ public class ProfileConfCreatorDemo
         return profile;
     }
 
-    private static X509ProfileType CertProfile_SubCA()
+    private static X509ProfileType Certprofile_SubCA()
     throws Exception
     {
-        X509ProfileType profile = getBaseProfile("CertProfile SubCA", true, "8y", false);
+        X509ProfileType profile = getBaseProfile("Certprofile SubCA", true, "8y", false);
 
         // Subject
         Subject subject = profile.getSubject();
@@ -300,10 +300,10 @@ public class ProfileConfCreatorDemo
         return profile;
     }
 
-    private static X509ProfileType CertProfile_SubCA_Complex()
+    private static X509ProfileType Certprofile_SubCA_Complex()
     throws Exception
     {
-        X509ProfileType profile = getBaseProfile("CertProfile SubCA with most extensions", true, "8y", false);
+        X509ProfileType profile = getBaseProfile("Certprofile SubCA with most extensions", true, "8y", false);
 
         // Subject
         Subject subject = profile.getSubject();
@@ -416,10 +416,10 @@ public class ProfileConfCreatorDemo
         return profile;
     }
 
-    private static X509ProfileType CertProfile_OCSP()
+    private static X509ProfileType Certprofile_OCSP()
     throws Exception
     {
-        X509ProfileType profile = getBaseProfile("CertProfile OCSP", false, "5y", false);
+        X509ProfileType profile = getBaseProfile("Certprofile OCSP", false, "5y", false);
 
         // Subject
         Subject subject = profile.getSubject();
@@ -459,10 +459,10 @@ public class ProfileConfCreatorDemo
         return profile;
     }
 
-    private static X509ProfileType CertProfile_TLS()
+    private static X509ProfileType Certprofile_TLS()
     throws Exception
     {
-        X509ProfileType profile = getBaseProfile("CertProfile TLS", false, "5y", true);
+        X509ProfileType profile = getBaseProfile("Certprofile TLS", false, "5y", true);
 
         // Subject
         Subject subject = profile.getSubject();
@@ -508,10 +508,10 @@ public class ProfileConfCreatorDemo
         return profile;
     }
 
-    private static X509ProfileType CertProfile_TLS_C()
+    private static X509ProfileType Certprofile_TLS_C()
     throws Exception
     {
-        X509ProfileType profile = getBaseProfile("CertProfile TLS_C", false, "5y", false);
+        X509ProfileType profile = getBaseProfile("Certprofile TLS_C", false, "5y", false);
 
         // Subject
         Subject subject = profile.getSubject();
@@ -550,10 +550,10 @@ public class ProfileConfCreatorDemo
         return profile;
     }
 
-    private static X509ProfileType CertProfile_TLSwithIncSN()
+    private static X509ProfileType Certprofile_TLSwithIncSN()
     throws Exception
     {
-        X509ProfileType profile = getBaseProfile("CertProfile TLSwithIncSN", false, "5y", false);
+        X509ProfileType profile = getBaseProfile("Certprofile TLSwithIncSN", false, "5y", false);
 
         // Subject
         Subject subject = profile.getSubject();
@@ -594,20 +594,20 @@ public class ProfileConfCreatorDemo
         return profile;
     }
 
-    private static X509ProfileType CertProfile_gSMC_K()
+    private static X509ProfileType Certprofile_gSMC_K()
     throws Exception
     {
-        X509ProfileType profile = getBaseProfile("CertProfile gSMC_K", false, "5y", false);
+        X509ProfileType profile = getBaseProfile("Certprofile gSMC_K", false, "5y", false);
         profile.setDuplicateSubject(true);
 
         // SpecialBehavior
-        profile.setSpecialBehavior(SpecialX509CertProfileBehavior.gematik_gSMC_K.name());
+        profile.setSpecialBehavior(SpecialX509CertprofileBehavior.gematik_gSMC_K.name());
 
         // Maximal liftime
         Parameters profileParams = new Parameters();
         profile.setParameters(profileParams);
         NameValueType nv = new NameValueType();
-        nv.setName(SpecialX509CertProfileBehavior.PARAMETER_MAXLIFTIME);
+        nv.setName(SpecialX509CertprofileBehavior.PARAMETER_MAXLIFTIME);
         nv.setValue(Integer.toString(20 * 365));
         profileParams.getParameter().add(nv);
 
@@ -677,10 +677,10 @@ public class ProfileConfCreatorDemo
         return profile;
     }
 
-    private static X509ProfileType CertProfile_MultipleOUs()
+    private static X509ProfileType Certprofile_MultipleOUs()
     throws Exception
     {
-        X509ProfileType profile = getBaseProfile("CertProfile Multiple OUs DEMO", false, "5y", false);
+        X509ProfileType profile = getBaseProfile("Certprofile Multiple OUs DEMO", false, "5y", false);
 
         // Subject
         Subject subject = profile.getSubject();

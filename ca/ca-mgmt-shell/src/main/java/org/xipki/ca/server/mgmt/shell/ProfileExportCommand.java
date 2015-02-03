@@ -39,7 +39,7 @@ import java.io.File;
 
 import org.apache.karaf.shell.commands.Command;
 import org.apache.karaf.shell.commands.Option;
-import org.xipki.ca.server.mgmt.api.CertProfileEntry;
+import org.xipki.ca.server.mgmt.api.CertprofileEntry;
 
 /**
  * @author Lijun Liao
@@ -62,7 +62,7 @@ public class ProfileExportCommand extends CaCommand
     protected Object doExecute()
     throws Exception
     {
-        CertProfileEntry entry = caManager.getCertProfile(name);
+        CertprofileEntry entry = caManager.getCertprofile(name);
         if(entry == null)
         {
             err("No cert profile named " + name + " is defined");

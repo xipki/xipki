@@ -3,7 +3,7 @@
   <appInfo>
     <my:myDescription xmlns:my="http://example.org">
       <my:category>cat A</my:category>
-      <my:details>CertProfile SubCA with most extensions</my:details>
+      <my:details>Certprofile SubCA with most extensions</my:details>
     </my:myDescription>
   </appInfo>
   <version>3</version>

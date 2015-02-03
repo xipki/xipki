@@ -107,7 +107,7 @@ import org.bouncycastle.util.encoders.Hex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.ca.api.BadCertTemplateException;
-import org.xipki.ca.api.CertProfileException;
+import org.xipki.ca.api.CertprofileException;
 import org.xipki.ca.api.EnvironmentParameterResolver;
 import org.xipki.ca.api.profile.CertValidity;
 import org.xipki.ca.api.profile.DirectoryStringType;
@@ -122,14 +122,14 @@ import org.xipki.ca.api.profile.KeyParametersOption.Range;
 import org.xipki.ca.api.profile.RDNControl;
 import org.xipki.ca.api.profile.x509.ExtKeyUsageControl;
 import org.xipki.ca.api.profile.x509.KeyUsageControl;
-import org.xipki.ca.api.profile.x509.X509CertProfile;
+import org.xipki.ca.api.profile.x509.X509Certprofile;
 import org.xipki.ca.api.profile.x509.X509CertVersion;
 import org.xipki.ca.certprofile.internal.AddText;
 import org.xipki.ca.certprofile.internal.AuthorityKeyIdentifierOption;
 import org.xipki.ca.certprofile.internal.ExtKeyUsageOptions;
 import org.xipki.ca.certprofile.internal.KeyUsageOptions;
 import org.xipki.ca.certprofile.internal.SubjectDNOption;
-import org.xipki.ca.certprofile.internal.XmlX509CertProfileUtil;
+import org.xipki.ca.certprofile.internal.XmlX509CertprofileUtil;
 import org.xipki.ca.certprofile.internal.x509.jaxb.ConstantExtensionType;
 import org.xipki.ca.certprofile.internal.x509.jaxb.ExtensionsType;
 import org.xipki.ca.certprofile.internal.x509.jaxb.ExtensionsType.Admission;
@@ -177,10 +177,10 @@ import org.xipki.security.api.ExtensionExistence;
  * @author Lijun Liao
  */
 
-public class X509CertProfileQA
+public class X509CertprofileQA
 {
     private static final byte[] DERNull = new byte[]{5, 0};
-    private static final Logger LOG = LoggerFactory.getLogger(X509CertProfileQA.class);
+    private static final Logger LOG = LoggerFactory.getLogger(X509CertprofileQA.class);
     private static final TimeZone UTC = TimeZone.getTimeZone("UTC");
     private static final long SECOND = 1000L;
 
@@ -227,28 +227,28 @@ public class X509CertProfileQA
 
     private static LruCache<ASN1ObjectIdentifier, Integer> ecCurveFieldSizes = new LruCache<>(100);
 
-    public X509CertProfileQA(String data)
-    throws CertProfileException
+    public X509CertprofileQA(String data)
+    throws CertprofileException
     {
         this(data.getBytes());
     }
 
-    public X509CertProfileQA(byte[] dataBytes)
-    throws CertProfileException
+    public X509CertprofileQA(byte[] dataBytes)
+    throws CertprofileException
     {
         try
         {
-            X509ProfileType conf = XmlX509CertProfileUtil.parse(new ByteArrayInputStream(dataBytes));
+            X509ProfileType conf = XmlX509CertprofileUtil.parse(new ByteArrayInputStream(dataBytes));
 
             this.version = X509CertVersion.getInstance(conf.getVersion());
             if(this.version == null)
             {
-                throw new CertProfileException("invalid version " + conf.getVersion());
+                throw new CertprofileException("invalid version " + conf.getVersion());
             }
 
             if(conf.getSignatureAlgorithms() != null)
             {
-                this.signatureAlgorithms = XmlX509CertProfileUtil.toOIDSet(
+                this.signatureAlgorithms = XmlX509CertprofileUtil.toOIDSet(
                         conf.getSignatureAlgorithms().getAlgorithm());
             }
 
@@ -258,13 +258,13 @@ public class X509CertProfileQA
             this.specialBehavior = conf.getSpecialBehavior();
             if(this.specialBehavior != null && "gematik_gSMC_K".equalsIgnoreCase(this.specialBehavior) == false)
             {
-                throw new CertProfileException("unknown special bahavior " + this.specialBehavior);
+                throw new CertprofileException("unknown special bahavior " + this.specialBehavior);
             }
 
             // KeyAlgorithms
             if(conf.getKeyAlgorithms() != null)
             {
-                this.keyAlgorithms = XmlX509CertProfileUtil.buildKeyAlgorithms(conf.getKeyAlgorithms());
+                this.keyAlgorithms = XmlX509CertprofileUtil.buildKeyAlgorithms(conf.getKeyAlgorithms());
             }
 
             // Subject
@@ -314,8 +314,8 @@ public class X509CertProfileQA
                         }
                     }
 
-                    List<AddText> addprefixes = XmlX509CertProfileUtil.buildAddText(t.getAddPrefix());
-                    List<AddText> addsuffixes = XmlX509CertProfileUtil.buildAddText(t.getAddSuffix());
+                    List<AddText> addprefixes = XmlX509CertprofileUtil.buildAddText(t.getAddPrefix());
+                    List<AddText> addsuffixes = XmlX509CertprofileUtil.buildAddText(t.getAddSuffix());
                     SubjectDNOption option = new SubjectDNOption(addprefixes, addsuffixes, patterns,
                             t.getMinLen(), t.getMaxLen());
                     this.subjectDNOptions.put(type, option);
@@ -327,7 +327,7 @@ public class X509CertProfileQA
             this.pathLen = extensionsType.getPathLen();
 
             // Extension controls
-            this.extensionControls = XmlX509CertProfileUtil.buildExtensionControls(extensionsType);
+            this.extensionControls = XmlX509CertprofileUtil.buildExtensionControls(extensionsType);
 
             // Extension KeyUsage
             if(extensionControls.containsKey(Extension.keyUsage))
@@ -336,7 +336,7 @@ public class X509CertProfileQA
                         extensionsType.getKeyUsage();
                 if(keyUsageTypeList.isEmpty() == false)
                 {
-                    this.keyusages = XmlX509CertProfileUtil.buildKeyUsageOptions(keyUsageTypeList);
+                    this.keyusages = XmlX509CertprofileUtil.buildKeyUsageOptions(keyUsageTypeList);
                 }
             }
 
@@ -346,7 +346,7 @@ public class X509CertProfileQA
                 List<ExtendedKeyUsage> extKeyUsageTypeList = extensionsType.getExtendedKeyUsage();
                 if(extKeyUsageTypeList.isEmpty() == false)
                 {
-                    this.extendedKeyusages = XmlX509CertProfileUtil.buildExtKeyUsageOptions(
+                    this.extendedKeyusages = XmlX509CertprofileUtil.buildExtKeyUsageOptions(
                             extKeyUsageTypeList);
                 }
             }
@@ -356,7 +356,7 @@ public class X509CertProfileQA
                 ExtensionControl extensionControl = extensionControls.get(Extension.authorityKeyIdentifier);
                 if(extensionControl != null)
                 {
-                    this.akiOption = XmlX509CertProfileUtil.buildAuthorityKeyIdentifier(
+                    this.akiOption = XmlX509CertprofileUtil.buildAuthorityKeyIdentifier(
                             extensionsType.getAuthorityKeyIdentifier(),
                             extensionControl);
                 }
@@ -455,7 +455,7 @@ public class X509CertProfileQA
             // SubjectAltNameMode
             if(extensionsType.getSubjectAltName() != null)
             {
-                this.allowedSubjectAltNameModes = XmlX509CertProfileUtil.buildGeneralNameMode(
+                this.allowedSubjectAltNameModes = XmlX509CertprofileUtil.buildGeneralNameMode(
                         extensionsType.getSubjectAltName());
             }
 
@@ -468,7 +468,7 @@ public class X509CertProfileQA
                 {
                     this.allowedSubjectInfoAccessModes.put(
                             new ASN1ObjectIdentifier(entry.getAccessMethod().getValue()),
-                            XmlX509CertProfileUtil.buildGeneralNameMode(entry.getAccessLocation()));
+                            XmlX509CertprofileUtil.buildGeneralNameMode(entry.getAccessLocation()));
                 }
             }
             // constant extensions
@@ -520,7 +520,7 @@ public class X509CertProfileQA
                 LOG.error(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(), e.getMessage());
             }
             LOG.debug(message, e);
-            throw new CertProfileException("RuntimeException thrown while initializing certprofile: " + e.getMessage());
+            throw new CertprofileException("RuntimeException thrown while initializing certprofile: " + e.getMessage());
         }
     }
 
@@ -2319,7 +2319,7 @@ public class X509CertProfileQA
             Set<GeneralNameMode> generalNameModes;
             if(accessMethod == null)
             {
-                generalNameModes = allowedSubjectInfoAccessModes.get(X509CertProfile.OID_ZERO);
+                generalNameModes = allowedSubjectInfoAccessModes.get(X509Certprofile.OID_ZERO);
             } else
             {
                 generalNameModes = allowedSubjectInfoAccessModes.get(accessMethod);

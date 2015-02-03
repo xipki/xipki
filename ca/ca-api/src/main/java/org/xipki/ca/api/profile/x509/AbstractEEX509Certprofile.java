@@ -33,72 +33,25 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.ca.server.mgmt.api;
-
-import java.io.Serializable;
-
-import org.xipki.common.ParamChecker;
+package org.xipki.ca.api.profile.x509;
 
 /**
  * @author Lijun Liao
  */
 
-public class CertProfileEntry implements Serializable
+public abstract class AbstractEEX509Certprofile extends BaseX509Certprofile
 {
-    private static final long serialVersionUID = 1L;
-    private final String name;
-    private final String type;
-    private final String conf;
 
-    public CertProfileEntry(String name, String type, String conf)
+    @Override
+    public boolean isCA()
     {
-        ParamChecker.assertNotEmpty("name", name);
-        ParamChecker.assertNotEmpty("type", type);
-
-        if("all".equalsIgnoreCase(name) || "null".equalsIgnoreCase(name))
-        {
-            throw new IllegalArgumentException("certificate profile name could not be 'all' and 'null'");
-        }
-        this.name = name;
-        this.type = type;
-        this.conf = conf;
-    }
-
-    public String getName()
-    {
-        return name;
-    }
-
-    public String getType()
-    {
-        return type;
-    }
-
-    public String getConf()
-    {
-        return conf;
+        return false;
     }
 
     @Override
-    public String toString()
+    public Integer getPathLenBasicConstraint()
     {
-        return toString(false);
-    }
-
-    public String toString(boolean verbose)
-    {
-        StringBuilder sb = new StringBuilder();
-        sb.append("name: ").append(name).append('\n');
-        sb.append("type: ").append(type).append('\n');
-        sb.append("conf: ");
-        if(verbose || conf == null || conf.length() < 301)
-        {
-            sb.append(conf);
-        } else
-        {
-            sb.append(conf.substring(0, 297)).append("...");
-        }
-        return sb.toString();
+        return null;
     }
 
 }

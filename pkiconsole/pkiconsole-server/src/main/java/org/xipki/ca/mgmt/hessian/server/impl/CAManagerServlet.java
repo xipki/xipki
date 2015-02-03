@@ -64,7 +64,7 @@ import org.xipki.ca.server.mgmt.api.CAMgmtException;
 import org.xipki.ca.server.mgmt.api.CAStatus;
 import org.xipki.ca.server.mgmt.api.CASystemStatus;
 import org.xipki.ca.server.mgmt.api.CRLControl;
-import org.xipki.ca.server.mgmt.api.CertProfileEntry;
+import org.xipki.ca.server.mgmt.api.CertprofileEntry;
 import org.xipki.ca.server.mgmt.api.CmpControl;
 import org.xipki.ca.server.mgmt.api.CmpRequestorEntry;
 import org.xipki.ca.server.mgmt.api.CmpResponderEntry;
@@ -232,9 +232,9 @@ implements HessianCAManager
     }
 
     @Override
-    public Set<String> getCertProfileNames()
+    public Set<String> getCertprofileNames()
     {
-        return caManager.getCertProfileNames();
+        return caManager.getCertprofileNames();
     }
 
     @Override
@@ -311,12 +311,12 @@ implements HessianCAManager
     }
 
     @Override
-    public void removeCertProfileFromCA(String profileName, String caName)
+    public void removeCertprofileFromCA(String profileName, String caName)
     throws HessianCAMgmtException
     {
         try
         {
-            caManager.removeCertProfileFromCA(profileName, caName);
+            caManager.removeCertprofileFromCA(profileName, caName);
         } catch (CAMgmtException e)
         {
             throw new HessianCAMgmtException(e.getMessage());
@@ -324,12 +324,12 @@ implements HessianCAManager
     }
 
     @Override
-    public void addCertProfileToCA(String profileName, String caName)
+    public void addCertprofileToCA(String profileName, String caName)
     throws HessianCAMgmtException
     {
         try
         {
-            caManager.addCertProfileToCA(profileName, caName);
+            caManager.addCertprofileToCA(profileName, caName);
         } catch (CAMgmtException e)
         {
             throw new HessianCAMgmtException(e.getMessage());
@@ -363,9 +363,9 @@ implements HessianCAManager
     }
 
     @Override
-    public Set<String> getCertProfilesForCA(String caName)
+    public Set<String> getCertprofilesForCA(String caName)
     {
-        return caManager.getCertProfilesForCA(caName);
+        return caManager.getCertprofilesForCA(caName);
     }
 
     @Override
@@ -446,18 +446,18 @@ implements HessianCAManager
     }
 
     @Override
-    public CertProfileEntry getCertProfile(String profileName)
+    public CertprofileEntry getCertprofile(String profileName)
     {
-        return caManager.getCertProfile(profileName);
+        return caManager.getCertprofile(profileName);
     }
 
     @Override
-    public void removeCertProfile(String profileName)
+    public void removeCertprofile(String profileName)
     throws HessianCAMgmtException
     {
         try
         {
-            caManager.removeCertProfile(profileName);
+            caManager.removeCertprofile(profileName);
         } catch (CAMgmtException e)
         {
             throw new HessianCAMgmtException(e.getMessage());
@@ -465,12 +465,12 @@ implements HessianCAManager
     }
 
     @Override
-    public void changeCertProfile(String name, String type, String conf)
+    public void changeCertprofile(String name, String type, String conf)
     throws HessianCAMgmtException
     {
         try
         {
-            caManager.changeCertProfile(name, type, conf);
+            caManager.changeCertprofile(name, type, conf);
         } catch (CAMgmtException e)
         {
             throw new HessianCAMgmtException(e.getMessage());
@@ -478,12 +478,12 @@ implements HessianCAManager
     }
 
     @Override
-    public void addCertProfile(CertProfileEntry dbEntry)
+    public void addCertprofile(CertprofileEntry dbEntry)
     throws HessianCAMgmtException
     {
         try
         {
-            caManager.addCertProfile(dbEntry);
+            caManager.addCertprofile(dbEntry);
         } catch (CAMgmtException e)
         {
             throw new HessianCAMgmtException(e.getMessage());

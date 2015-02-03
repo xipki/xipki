@@ -20,7 +20,7 @@
   <xs:complexType name="QAConfType">
     <xs:sequence>
       <xs:element name="X509Issuers" type="X509IssuersType" minOccurs="0"/>
-      <xs:element name="X509CertProfiles" type="X509CertProfilesType" minOccurs="0"/>
+      <xs:element name="X509Certprofiles" type="X509CertprofilesType" minOccurs="0"/>
       <xs:element name="environments" type="environmentsType" minOccurs="0"/>
     </xs:sequence>
   </xs:complexType>
@@ -38,12 +38,12 @@
     </xs:sequence>
     <xs:attribute name="name" type="xs:string" use="required"/>
   </xs:complexType>
-  <xs:complexType name="X509CertProfilesType">
+  <xs:complexType name="X509CertprofilesType">
     <xs:sequence>
-      <xs:element name="X509CertProfile" type="X509CertProfileType" maxOccurs="unbounded"/>
+      <xs:element name="X509Certprofile" type="X509CertprofileType" maxOccurs="unbounded"/>
     </xs:sequence>
   </xs:complexType>
-  <xs:complexType name="X509CertProfileType">
+  <xs:complexType name="X509CertprofileType">
     <xs:complexContent>
       <xs:extension base="fileOrValueType">
         <xs:attribute name="name" type="xs:string" use="required"/>

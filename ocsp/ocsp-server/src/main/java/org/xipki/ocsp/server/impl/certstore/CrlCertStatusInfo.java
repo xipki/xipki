@@ -52,16 +52,16 @@ class CrlCertStatusInfo
 {
     private final CertStatus certStatus;
     private final CertRevocationInfo revocationInfo;
-    private final String certProfile;
+    private final String certprofile;
     private final Map<HashAlgoType, byte[]> certHashes;
 
     private CrlCertStatusInfo(CertStatus certStatus, CertRevocationInfo revocationInfo,
-            String certProfile,
+            String certprofile,
             Map<HashAlgoType, byte[]> certHashes)
     {
         this.certStatus = certStatus;
         this.revocationInfo = revocationInfo;
-        this.certProfile = certProfile;
+        this.certprofile = certprofile;
         this.certHashes = certHashes;
     }
 
@@ -71,20 +71,20 @@ class CrlCertStatusInfo
     }
 
     static CrlCertStatusInfo getGoodCertStatusInfo(
-            String certProfile,
+            String certprofile,
             Map<HashAlgoType, byte[]> certHashes)
     {
-        ParamChecker.assertNotEmpty("certProfile", certProfile);
-        return new CrlCertStatusInfo(CertStatus.GOOD, null, certProfile, certHashes);
+        ParamChecker.assertNotEmpty("certprofile", certprofile);
+        return new CrlCertStatusInfo(CertStatus.GOOD, null, certprofile, certHashes);
     }
 
     static CrlCertStatusInfo getRevokedCertStatusInfo(
             CertRevocationInfo revocationInfo,
-            String certProfile,
+            String certprofile,
             Map<HashAlgoType, byte[]> certHashes)
     {
         ParamChecker.assertNotNull("revocationInfo", revocationInfo);
-        return new CrlCertStatusInfo(CertStatus.REVOKED, revocationInfo, certProfile, certHashes);
+        return new CrlCertStatusInfo(CertStatus.REVOKED, revocationInfo, certprofile, certHashes);
     }
 
     CertStatus getCertStatus()
@@ -97,9 +97,9 @@ class CrlCertStatusInfo
         return revocationInfo;
     }
 
-    String getCertProfile()
+    String getCertprofile()
     {
-        return certProfile;
+        return certprofile;
     }
 
     byte[] getCertHash(HashAlgoType hashAlgo)
@@ -123,12 +123,12 @@ class CrlCertStatusInfo
             }
             if(certStatus == CertStatus.GOOD)
             {
-                return CertStatusInfo.getGoodCertStatusInfo(hashAlgo, certHash, thisUpdate, nextUpdate, certProfile);
+                return CertStatusInfo.getGoodCertStatusInfo(hashAlgo, certHash, thisUpdate, nextUpdate, certprofile);
             }
             else
             {
                 return CertStatusInfo.getRevokedCertStatusInfo(revocationInfo, hashAlgo,
-                        certHash, thisUpdate, nextUpdate, certProfile);
+                        certHash, thisUpdate, nextUpdate, certprofile);
             }
         }
 

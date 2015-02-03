@@ -3,13 +3,13 @@
   <appInfo>
     <my:myDescription xmlns:my="http://example.org">
       <my:category>cat A</my:category>
-      <my:details>CertProfile TLS</my:details>
+      <my:details>Certprofile RootCA</my:details>
     </my:myDescription>
   </appInfo>
   <version>3</version>
-  <ca>false</ca>
-  <validity>5y</validity>
-  <notBeforeTime>midnight</notBeforeTime>
+  <ca>true</ca>
+  <validity>10y</validity>
+  <notBeforeTime>current</notBeforeTime>
   <duplicateKey>false</duplicateKey>
   <duplicateSubject>false</duplicateSubject>
   <serialNumberInReq>false</serialNumberInReq>
@@ -69,34 +69,21 @@
     </rdn>
     <rdn minOccurs="1" maxOccurs="1">
       <type description="cn">2.5.4.3</type>
-      <regex>(?=^.{1,254}$)(^(?:(?!\d+\.|-)[a-zA-Z0-9_\-]{1,63}(?&lt;!-)\.?)+(?:[a-zA-Z]{2,})$)</regex>
     </rdn>
   </subject>
   <extensions>
     <extension critical="false" required="true" permittedInRequest="false" description="subjectKeyIdentifier">2.5.29.14</extension>
-    <extension critical="false" required="true" permittedInRequest="false" description="authorityKeyIdentifier">2.5.29.35</extension>
     <extension critical="false" required="true" permittedInRequest="false" description="authorityInfoAccess">1.3.6.1.5.5.7.1.1</extension>
     <extension critical="false" required="false" permittedInRequest="false" description="cRLDistributionPoints">2.5.29.31</extension>
     <extension critical="false" required="false" permittedInRequest="false" description="freshestCRL">2.5.29.46</extension>
     <extension critical="true" required="true" permittedInRequest="true" description="keyUsage">2.5.29.15</extension>
     <extension critical="true" required="true" permittedInRequest="false" description="basicConstraints">2.5.29.19</extension>
-    <extension critical="false" required="true" permittedInRequest="true" description="extendedKeyUsage">2.5.29.37</extension>
-    <extension critical="false" required="true" permittedInRequest="false" description="admission">1.3.36.8.3.3</extension>
     <authorityKeyIdentifier>
       <includeIssuerAndSerial>false</includeIssuerAndSerial>
     </authorityKeyIdentifier>
     <keyUsage>
-      <usage required="true">digitalSignature</usage>
-      <usage required="true">dataEncipherment</usage>
-      <usage required="true">keyEncipherment</usage>
+      <usage required="true">keyCertSign</usage>
+      <usage required="false">cRLSign</usage>
     </keyUsage>
-    <extendedKeyUsage>
-      <usage required="true" description="id-kp-serverAuth">1.3.6.1.5.5.7.3.1</usage>
-      <usage required="false" description="id-kp-clientAuth">1.3.6.1.5.5.7.3.2</usage>
-    </extendedKeyUsage>
-    <admission>
-      <professionOid>1.1.1.2</professionOid>
-      <professionItem>demo item</professionItem>
-    </admission>
   </extensions>
 </X509Profile>

@@ -35,23 +35,38 @@
 
 package org.xipki.ca.api.profile.x509;
 
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
+
+import org.xipki.common.KeyUsage;
+
 /**
  * @author Lijun Liao
  */
 
-public abstract class AbstractEEX509CertProfile extends BaseX509CertProfile
+public abstract class AbstractCAX509Certprofile extends BaseX509Certprofile
 {
+    protected Set<KeyUsageControl> keyUsages;
+
+    public AbstractCAX509Certprofile()
+    {
+        Set<KeyUsageControl> keyUsages = new HashSet<>();
+        keyUsages.add(new KeyUsageControl(KeyUsage.keyCertSign, true));
+        keyUsages.add(new KeyUsageControl(KeyUsage.cRLSign, false));
+        this.keyUsages = Collections.unmodifiableSet(keyUsages);
+    }
 
     @Override
     public boolean isCA()
     {
-        return false;
+        return true;
     }
 
     @Override
-    public Integer getPathLenBasicConstraint()
+    public Set<KeyUsageControl> getKeyUsage()
     {
-        return null;
+        return keyUsages;
     }
 
 }

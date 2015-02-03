@@ -25,7 +25,7 @@
   </xs:complexType>
   <xs:complexType name="enrollCertType">
     <xs:sequence>
-      <xs:element name="certProfile" type="xs:string"/>
+      <xs:element name="certprofile" type="xs:string"/>
       <xs:element name="subject" type="xs:string"/>
       <xs:element name="randomDN" type="xs:string">
         <xs:annotation>

@@ -46,7 +46,7 @@ import org.bouncycastle.asn1.x509.Extensions;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.xipki.ca.api.BadCertTemplateException;
 import org.xipki.ca.api.BadFormatException;
-import org.xipki.ca.api.CertProfileException;
+import org.xipki.ca.api.CertprofileException;
 import org.xipki.ca.api.EnvironmentParameterResolver;
 import org.xipki.ca.api.profile.CertValidity;
 import org.xipki.ca.api.profile.ExtensionControl;
@@ -58,7 +58,7 @@ import org.xipki.ca.api.profile.SubjectInfo;
  * @author Lijun Liao
  */
 
-public abstract class X509CertProfile
+public abstract class X509Certprofile
 {
     public static final ASN1ObjectIdentifier OID_ZERO = new ASN1ObjectIdentifier("0.0.0.0");
 
@@ -83,7 +83,7 @@ public abstract class X509CertProfile
         return null;
     }
 
-    public SpecialX509CertProfileBehavior getSpecialCertProfileBehavior()
+    public SpecialX509CertprofileBehavior getSpecialCertprofileBehavior()
     {
         return null;
     }
@@ -171,7 +171,7 @@ public abstract class X509CertProfile
     public abstract Map<ASN1ObjectIdentifier, ExtensionControl> getExtensionControls();
 
     public abstract void initialize(String data)
-    throws CertProfileException;
+    throws CertprofileException;
 
     public abstract boolean isCA();
 
@@ -189,12 +189,12 @@ public abstract class X509CertProfile
     throws BadCertTemplateException;
 
     public abstract SubjectInfo getSubject(X500Name requestedSubject)
-    throws CertProfileException, BadCertTemplateException;
+    throws CertprofileException, BadCertTemplateException;
 
     public abstract ExtensionValues getExtensions(
             Map<ASN1ObjectIdentifier, ExtensionControl> extensionControls,
             X500Name requestedSubject, Extensions requestExtensions)
-    throws CertProfileException, BadCertTemplateException;
+    throws CertprofileException, BadCertTemplateException;
 
     public abstract boolean incSerialNumberIfSubjectExists();
 

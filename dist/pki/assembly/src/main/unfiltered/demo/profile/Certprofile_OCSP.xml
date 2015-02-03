@@ -3,7 +3,7 @@
   <appInfo>
     <my:myDescription xmlns:my="http://example.org">
       <my:category>cat A</my:category>
-      <my:details>CertProfile gSMC_K</my:details>
+      <my:details>Certprofile OCSP</my:details>
     </my:myDescription>
   </appInfo>
   <version>3</version>
@@ -11,15 +11,8 @@
   <validity>5y</validity>
   <notBeforeTime>current</notBeforeTime>
   <duplicateKey>false</duplicateKey>
-  <duplicateSubject>true</duplicateSubject>
+  <duplicateSubject>false</duplicateSubject>
   <serialNumberInReq>false</serialNumberInReq>
-  <specialBehavior>gematik_gSMC_K</specialBehavior>
-  <parameters>
-    <parameter>
-      <name>maxLifetime</name>
-      <value>7300</value>
-    </parameter>
-  </parameters>
   <keyAlgorithms>
     <algorithm>
       <algorithm description="RSA">1.2.840.113549.1.1.1</algorithm>
@@ -62,7 +55,7 @@
     <incSerialNrIfSubjectExists>false</incSerialNrIfSubjectExists>
     <rdn minOccurs="1" maxOccurs="1">
       <type description="c">2.5.4.6</type>
-      <regex>DE</regex>
+      <regex>DE|FR</regex>
     </rdn>
     <rdn minOccurs="1" maxOccurs="1">
       <type description="o">2.5.4.10</type>
@@ -71,55 +64,31 @@
       <type description="ou">2.5.4.11</type>
     </rdn>
     <rdn minOccurs="0" maxOccurs="1">
-      <type description="st">2.5.4.8</type>
-    </rdn>
-    <rdn minOccurs="0" maxOccurs="1">
-      <type description="l">2.5.4.7</type>
-    </rdn>
-    <rdn minOccurs="0" maxOccurs="1">
-      <type description="postalCode">2.5.4.17</type>
-    </rdn>
-    <rdn minOccurs="0" maxOccurs="1">
-      <type description="street">2.5.4.9</type>
+      <type description="serialNumber">2.5.4.5</type>
+      <regex>[\d]{1,}</regex>
     </rdn>
     <rdn minOccurs="1" maxOccurs="1">
       <type description="cn">2.5.4.3</type>
-      <regex>80276[\d]{15,15}-20\d\d(0[1-9]|1[012])(0[1-9]|[12][0-9]|3[01])</regex>
     </rdn>
   </subject>
   <extensions>
     <extension critical="false" required="true" permittedInRequest="false" description="subjectKeyIdentifier">2.5.29.14</extension>
     <extension critical="false" required="true" permittedInRequest="false" description="authorityKeyIdentifier">2.5.29.35</extension>
-    <extension critical="false" required="true" permittedInRequest="false" description="authorityInfoAccess">1.3.6.1.5.5.7.1.1</extension>
+    <extension critical="false" required="false" permittedInRequest="false" description="authorityInfoAccess">1.3.6.1.5.5.7.1.1</extension>
     <extension critical="false" required="false" permittedInRequest="false" description="cRLDistributionPoints">2.5.29.31</extension>
+    <extension critical="false" required="false" permittedInRequest="false" description="freshestCRL">2.5.29.46</extension>
     <extension critical="true" required="true" permittedInRequest="true" description="keyUsage">2.5.29.15</extension>
-    <extension critical="false" required="false" permittedInRequest="true" description="subjectAlternativeName">2.5.29.17</extension>
     <extension critical="true" required="true" permittedInRequest="false" description="basicConstraints">2.5.29.19</extension>
-    <extension critical="false" required="true" permittedInRequest="false" description="certificatePolicies">2.5.29.32</extension>
-    <extension critical="false" required="true" permittedInRequest="false" description="admission">1.3.36.8.3.3</extension>
     <extension critical="false" required="true" permittedInRequest="true" description="extendedKeyUsage">2.5.29.37</extension>
+    <extension critical="false" required="false" permittedInRequest="false" description="id-pkix-ocsp-nocheck">1.3.6.1.5.5.7.48.1.5</extension>
     <authorityKeyIdentifier>
       <includeIssuerAndSerial>false</includeIssuerAndSerial>
     </authorityKeyIdentifier>
     <keyUsage>
-      <usage required="true">digitalSignature</usage>
-      <usage required="true">keyEncipherment</usage>
+      <usage required="true">contentCommitment</usage>
     </keyUsage>
-    <certificatePolicies>
-      <certificatePolicyInformation>
-        <policyIdentifier>1.2.276.0.76.4.79</policyIdentifier>
-      </certificatePolicyInformation>
-      <certificatePolicyInformation>
-        <policyIdentifier>1.2.276.0.76.4.163</policyIdentifier>
-      </certificatePolicyInformation>
-    </certificatePolicies>
     <extendedKeyUsage>
-      <usage required="true" description="id-kp-serverAuth">1.3.6.1.5.5.7.3.1</usage>
-      <usage required="false" description="id-kp-clientAuth">1.3.6.1.5.5.7.3.2</usage>
+      <usage required="true" description="id-kp-OCSPSigning">1.3.6.1.5.5.7.3.9</usage>
     </extendedKeyUsage>
-    <admission>
-      <professionOid>1.2.276.0.76.4.103</professionOid>
-      <professionItem>Anwendungskonnektor</professionItem>
-    </admission>
   </extensions>
 </X509Profile>

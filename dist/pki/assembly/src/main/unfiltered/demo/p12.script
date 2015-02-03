@@ -6,7 +6,7 @@ sleep 1000
 #                          GENERATE RCA                         #
 #################################################################
 ## Add the profile RCA
-xipki-ca:profile-add -name  RCA -type XML -confFile demo/profile/CertProfile_RootCA.xml
+xipki-ca:profile-add -name  RCA -type XML -confFile demo/profile/Certprofile_RootCA.xml
 
 ## Create the PKCS#10 request for the command caqa:check-cert in QA 
 xipki-tk:req-p12 -p12 output/RCA1.p12 -pwd 1234 -out output/RCA1.p10 \

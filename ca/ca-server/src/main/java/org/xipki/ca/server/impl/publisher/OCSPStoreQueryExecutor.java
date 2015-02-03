@@ -119,24 +119,24 @@ class OCSPStoreQueryExecutor
      */
     void addCert(X509CertWithId issuer,
             X509CertWithId certificate,
-            String certProfile)
+            String certprofile)
     throws SQLException, CertificateEncodingException
     {
-        addCert(issuer, certificate, certProfile, null);
+        addCert(issuer, certificate, certprofile, null);
     }
 
     void addCert(X509CertWithId issuer,
             X509CertWithId certificate,
-            String certProfile,
+            String certprofile,
             CertRevocationInfo revInfo)
     throws SQLException, CertificateEncodingException
     {
-        addOrUpdateCert(issuer, certificate, certProfile, revInfo);
+        addOrUpdateCert(issuer, certificate, certprofile, revInfo);
     }
 
     private void addOrUpdateCert(X509CertWithId issuer,
             X509CertWithId certificate,
-            String certProfile,
+            String certprofile,
             CertRevocationInfo revInfo)
     throws SQLException, CertificateEncodingException
     {
@@ -238,7 +238,7 @@ class OCSPStoreQueryExecutor
                 ps_addcert.setLong(idx++, cert.getNotAfter().getTime()/1000);
                 setBoolean(ps_addcert, idx++, revoked);
                 ps_addcert.setInt(idx++, issuerId);
-                ps_addcert.setString(idx++, certProfile);
+                ps_addcert.setString(idx++, certprofile);
 
                 if(revoked)
                 {
@@ -329,11 +329,11 @@ class OCSPStoreQueryExecutor
 
     void revokeCert(X509CertWithId caCert,
             X509CertWithId cert,
-            String certProfile,
+            String certprofile,
             CertRevocationInfo revInfo)
     throws SQLException, CertificateEncodingException
     {
-        addOrUpdateCert(caCert, cert, certProfile, revInfo);
+        addOrUpdateCert(caCert, cert, certprofile, revInfo);
     }
 
     void unrevokeCert(X509CertWithId issuer,

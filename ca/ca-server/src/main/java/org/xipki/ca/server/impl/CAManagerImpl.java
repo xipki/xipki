@@ -98,7 +98,7 @@ import org.xipki.ca.server.mgmt.api.CAStatus;
 import org.xipki.ca.server.mgmt.api.CASystemStatus;
 import org.xipki.ca.server.mgmt.api.CRLControl;
 import org.xipki.ca.server.mgmt.api.CertArt;
-import org.xipki.ca.server.mgmt.api.CertProfileEntry;
+import org.xipki.ca.server.mgmt.api.CertprofileEntry;
 import org.xipki.ca.server.mgmt.api.CmpControl;
 import org.xipki.ca.server.mgmt.api.CmpRequestorEntry;
 import org.xipki.ca.server.mgmt.api.CmpResponderEntry;
@@ -236,7 +236,7 @@ implements CAManager, CmpResponderManager
     private Map<String, DataSourceWrapper> dataSources = null;
 
     private final Map<String, X509CAInfo> caInfos = new ConcurrentHashMap<>();
-    private final Map<String, IdentifiedX509CertProfile> certProfiles = new ConcurrentHashMap<>();
+    private final Map<String, IdentifiedX509Certprofile> certprofiles = new ConcurrentHashMap<>();
     private final Map<String, IdentifiedX509CertPublisher> publishers = new ConcurrentHashMap<>();
     private final Map<String, CmpRequestorEntryWrapper> requestors = new ConcurrentHashMap<>();
     private final Map<String, X509CrlSignerEntryWrapper> crlSigners = new ConcurrentHashMap<>();
@@ -260,7 +260,7 @@ implements CAManager, CmpResponderManager
     private boolean responderInitialized = false;
     private boolean requestorsInitialized = false;
     private boolean caAliasesInitialized = false;
-    private boolean certProfilesInitialized = false;
+    private boolean certprofilesInitialized = false;
     private boolean publishersInitialized = false;
     private boolean crlSignersInitialized = false;
     private boolean cmpControlInitialized = false;
@@ -558,7 +558,7 @@ implements CAManager, CmpResponderManager
         responderInitialized = false;
         requestorsInitialized = false;
         caAliasesInitialized = false;
-        certProfilesInitialized = false;
+        certprofilesInitialized = false;
         publishersInitialized = false;
         crlSignersInitialized = false;
         cmpControlInitialized = false;
@@ -573,7 +573,7 @@ implements CAManager, CmpResponderManager
     {
         initEnvironemtParamters();
         initCaAliases();
-        initCertProfiles();
+        initCertprofiles();
         initPublishers();
         initCmpControl();
         initRequestors();
@@ -893,9 +893,9 @@ implements CAManager, CmpResponderManager
     }
 
     @Override
-    public Set<String> getCertProfileNames()
+    public Set<String> getCertprofileNames()
     {
-        return certProfiles.keySet();
+        return certprofiles.keySet();
     }
 
     @Override
@@ -1030,19 +1030,19 @@ implements CAManager, CmpResponderManager
         caAliasesInitialized = true;
     }
 
-    private void initCertProfiles()
+    private void initCertprofiles()
     throws CAMgmtException
     {
-        if(certProfilesInitialized)
+        if(certprofilesInitialized)
         {
             return;
         }
 
-        for(String name : certProfiles.keySet())
+        for(String name : certprofiles.keySet())
         {
-            shutdownCertProfile(certProfiles.get(name));
+            shutdownCertprofile(certprofiles.get(name));
         }
-        certProfiles.clear();
+        certprofiles.clear();
 
         List<String> names = getNamesFromTable("CERTPROFILE");
 
@@ -1050,15 +1050,15 @@ implements CAManager, CmpResponderManager
         {
             for(String name : names)
             {
-                IdentifiedX509CertProfile profile = createCertProfile(name, envParameterResolver);
+                IdentifiedX509Certprofile profile = createCertprofile(name, envParameterResolver);
                 if(profile != null)
                 {
-                    certProfiles.put(name, profile);
+                    certprofiles.put(name, profile);
                 }
             }
         }
 
-        certProfilesInitialized = true;
+        certprofilesInitialized = true;
     }
 
     private void initPublishers()
@@ -1170,7 +1170,7 @@ implements CAManager, CmpResponderManager
         Set<CAHasRequestorEntry> caHasRequestors = createCAhasRequestors(name);
         ca_has_requestors.put(name, caHasRequestors);
 
-        Set<String> profileNames = createCAhasCertProfiles(name);
+        Set<String> profileNames = createCAhasCertprofiles(name);
         ca_has_profiles.put(name, profileNames);
 
         Set<String> publisherNames = createCAhasPublishers(name);
@@ -1442,7 +1442,7 @@ implements CAManager, CmpResponderManager
     }
 
     @Override
-    public void removeCertProfileFromCA(String profileName, String caName)
+    public void removeCertprofileFromCA(String profileName, String caName)
     throws CAMgmtException
     {
         asssertMasterMode();
@@ -1471,7 +1471,7 @@ implements CAManager, CmpResponderManager
     }
 
     @Override
-    public void addCertProfileToCA(String profileName, String caName)
+    public void addCertprofileToCA(String profileName, String caName)
     throws CAMgmtException
     {
         asssertMasterMode();
@@ -1581,7 +1581,7 @@ implements CAManager, CmpResponderManager
     }
 
     @Override
-    public Set<String> getCertProfilesForCA(String caName)
+    public Set<String> getCertprofilesForCA(String caName)
     {
         caName = caName.toUpperCase();
         return ca_has_profiles.get(caName);
@@ -1820,30 +1820,30 @@ implements CAManager, CmpResponderManager
     }
 
     @Override
-    public CertProfileEntry getCertProfile(String profileName)
+    public CertprofileEntry getCertprofile(String profileName)
     {
-        IdentifiedX509CertProfile entry = certProfiles.get(profileName);
+        IdentifiedX509Certprofile entry = certprofiles.get(profileName);
         return entry == null ? null : entry.getEntry();
     }
 
     @Override
-    public void removeCertProfile(String profileName)
+    public void removeCertprofile(String profileName)
     throws CAMgmtException
     {
         asssertMasterMode();
         for(String caName : ca_has_profiles.keySet())
         {
-            removeCertProfileFromCA(profileName, caName);
+            removeCertprofileFromCA(profileName, caName);
         }
 
         deleteRowWithName(profileName, "CERTPROFILE");
         LOG.info("remove profile '{}'", profileName);
-        IdentifiedX509CertProfile profile = certProfiles.remove(profileName);
-        shutdownCertProfile(profile);
+        IdentifiedX509Certprofile profile = certprofiles.remove(profileName);
+        shutdownCertprofile(profile);
     }
 
     @Override
-    public void changeCertProfile(String name, String type, String conf)
+    public void changeCertprofile(String name, String type, String conf)
     throws CAMgmtException
     {
         asssertMasterMode();
@@ -1904,24 +1904,24 @@ implements CAManager, CmpResponderManager
             dataSource.releaseResources(ps, null);
         }
 
-        IdentifiedX509CertProfile profile = certProfiles.remove(name);
-        shutdownCertProfile(profile);
-        profile = createCertProfile(name, envParameterResolver);
+        IdentifiedX509Certprofile profile = certprofiles.remove(name);
+        shutdownCertprofile(profile);
+        profile = createCertprofile(name, envParameterResolver);
         if(profile != null)
         {
-            certProfiles.put(name, profile);
+            certprofiles.put(name, profile);
         }
     }
 
     @Override
-    public void addCertProfile(CertProfileEntry dbEntry)
+    public void addCertprofile(CertprofileEntry dbEntry)
     throws CAMgmtException
     {
         asssertMasterMode();
         String name = dbEntry.getName();
-        if(certProfiles.containsKey(name))
+        if(certprofiles.containsKey(name))
         {
-            throw new CAMgmtException("CertProfile named " + name + " exists");
+            throw new CAMgmtException("Certprofile named " + name + " exists");
         }
 
         PreparedStatement ps = null;
@@ -1945,10 +1945,10 @@ implements CAManager, CmpResponderManager
             dataSource.releaseResources(ps, null);
         }
 
-        IdentifiedX509CertProfile profile = createCertProfile(name, envParameterResolver);
+        IdentifiedX509Certprofile profile = createCertprofile(name, envParameterResolver);
         if(profile != null)
         {
-            certProfiles.put(name, profile);
+            certprofiles.put(name, profile);
         }
 
         try
@@ -1956,7 +1956,7 @@ implements CAManager, CmpResponderManager
             certstore.addCertprofileName(name);
         }catch(OperationException e)
         {
-            final String message = "Exception while publishing certprofile nameto certStore";
+            final String message = "Exception while publishing certprofile name to certStore";
             if(LOG.isErrorEnabled())
             {
                 LOG.error(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(), e.getMessage());
@@ -3239,9 +3239,9 @@ implements CAManager, CmpResponderManager
         return ca;
     }
 
-    public IdentifiedX509CertProfile getIdentifiedCertProfile(String profileName)
+    public IdentifiedX509Certprofile getIdentifiedCertprofile(String profileName)
     {
-        return certProfiles.get(profileName);
+        return certprofiles.get(profileName);
     }
 
     public List<IdentifiedX509CertPublisher> getIdentifiedPublishersForCa(String caName)
@@ -3307,8 +3307,8 @@ implements CAManager, CmpResponderManager
             }
         }
 
-        IdentifiedX509CertProfile certProfile = getIdentifiedCertProfile(certprofileName);
-        if(certProfile == null)
+        IdentifiedX509Certprofile certprofile = getIdentifiedCertprofile(certprofileName);
+        if(certprofile == null)
         {
             throw new CAMgmtException("unknown cert profile " + certprofileName);
         }
@@ -3328,7 +3328,7 @@ implements CAManager, CmpResponderManager
         try
         {
             result = X509SelfSignedCertBuilder.generateSelfSigned(securityFactory, signer_type, signer_conf,
-                    certProfile, p10Request, serialOfThisCert, ocsp_uris, crl_uris, delta_crl_uris);
+                    certprofile, p10Request, serialOfThisCert, ocsp_uris, crl_uris, delta_crl_uris);
         } catch (OperationException | ConfigurationException e)
         {
             throw new CAMgmtException(e.getClass().getName() + ": " + e.getMessage(), e);

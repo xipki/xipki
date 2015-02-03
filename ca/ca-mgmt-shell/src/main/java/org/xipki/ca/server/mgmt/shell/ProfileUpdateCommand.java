@@ -79,7 +79,7 @@ public class ProfileUpdateCommand extends CaCommand
             conf = new String(IoUtil.read(confFile));
         }
 
-        caManager.changeCertProfile(name, type, conf);
+        caManager.changeCertprofile(name, type, conf);
         out("updated certificate profile " + name);
         return null;
     }

@@ -55,17 +55,17 @@ public class CertStatusInfo
 
     private final Date thisUpdate;
     private final Date nextUpdate;
-    private final String certProfile;
+    private final String certprofile;
 
     private CrlID crlID;
     private Date archiveCutOff;
 
-    private CertStatusInfo(CertStatus certStatus, Date thisUpdate, Date nextUpdate, String certProfile)
+    private CertStatusInfo(CertStatus certStatus, Date thisUpdate, Date nextUpdate, String certprofile)
     {
         this.certStatus = certStatus;
         this.thisUpdate = thisUpdate;
         this.nextUpdate = nextUpdate;
-        this.certProfile = certProfile;
+        this.certprofile = certprofile;
     }
 
     public static CertStatusInfo getUnknownCertStatusInfo(Date thisUpdate, Date nextUpdate)
@@ -80,9 +80,9 @@ public class CertStatusInfo
 
     public static CertStatusInfo getGoodCertStatusInfo(
             HashAlgoType certHashAlgo, byte[] certHash,
-            Date thisUpdate, Date nextUpdate, String certProfile)
+            Date thisUpdate, Date nextUpdate, String certprofile)
     {
-        CertStatusInfo ret = new CertStatusInfo(CertStatus.GOOD, thisUpdate, nextUpdate, certProfile);
+        CertStatusInfo ret = new CertStatusInfo(CertStatus.GOOD, thisUpdate, nextUpdate, certprofile);
         ret.certHashAlgo = certHashAlgo;
         ret.certHash = certHash;
         return ret;
@@ -90,13 +90,13 @@ public class CertStatusInfo
 
     public static CertStatusInfo getRevokedCertStatusInfo(CertRevocationInfo revocationInfo,
             HashAlgoType certHashAlgo, byte[] certHash,
-            Date thisUpdate, Date nextUpdate, String certProfile)
+            Date thisUpdate, Date nextUpdate, String certprofile)
     {
         if(revocationInfo == null)
         {
             throw new IllegalArgumentException("revocationInfo could not be null");
         }
-        CertStatusInfo ret = new CertStatusInfo(CertStatus.REVOKED, thisUpdate, nextUpdate, certProfile);
+        CertStatusInfo ret = new CertStatusInfo(CertStatus.REVOKED, thisUpdate, nextUpdate, certprofile);
         ret.revocationInfo = revocationInfo;
         ret.certHashAlgo = certHashAlgo;
         ret.certHash = certHash;
@@ -133,9 +133,9 @@ public class CertStatusInfo
         return certHash;
     }
 
-    public String getCertProfile()
+    public String getCertprofile()
     {
-        return certProfile;
+        return certprofile;
     }
 
     public CrlID getCrlID()

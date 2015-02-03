@@ -42,7 +42,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.bouncycastle.asn1.x500.X500Name;
-import org.xipki.ca.client.api.CertProfileInfo;
+import org.xipki.ca.client.api.CertprofileInfo;
 import org.xipki.common.ParamChecker;
 
 /**
@@ -63,7 +63,7 @@ class CAConf
     private X509Certificate cert;
     private final X509Certificate responder;
     private X500Name subject;
-    private Map<String, CertProfileInfo> profiles = Collections.emptyMap();
+    private Map<String, CertprofileInfo> profiles = Collections.emptyMap();
 
     CAConf(String name, String url, String healthUrl, String requestorName, X509Certificate responder)
     {
@@ -114,7 +114,7 @@ class CAConf
         }
     }
 
-    public void setCertprofiles(Set<CertProfileInfo> profiles)
+    public void setCertprofiles(Set<CertprofileInfo> profiles)
     {
         if(profiles == null)
         {
@@ -123,7 +123,7 @@ class CAConf
         else
         {
             this.profiles = new HashMap<>();
-            for(CertProfileInfo m : profiles)
+            for(CertprofileInfo m : profiles)
             {
                 this.profiles.put(m.getName(), m);
             }
@@ -150,7 +150,7 @@ class CAConf
         return profiles.containsKey(profileName);
     }
 
-    public CertProfileInfo getProfile(String profileName)
+    public CertprofileInfo getProfile(String profileName)
     {
         return profiles.get(profileName);
     }

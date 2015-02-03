@@ -116,9 +116,9 @@ class IdentifiedX509CertPublisher
     }
 
     public boolean certificateRevoked(X509CertWithId issuerCert,
-            X509CertWithId cert, String certProfile, CertRevocationInfo revInfo)
+            X509CertWithId cert, String certprofile, CertRevocationInfo revInfo)
     {
-        return certPublisher.certificateRevoked(issuerCert, cert, certProfile, revInfo);
+        return certPublisher.certificateRevoked(issuerCert, cert, certprofile, revInfo);
     }
 
     public boolean crlAdded(X509CertWithId caCert, X509CRL crl)

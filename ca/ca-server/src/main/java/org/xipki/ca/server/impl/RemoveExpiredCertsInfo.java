@@ -44,7 +44,7 @@ class RemoveExpiredCertsInfo
     private int numOfCerts;
     private long expiredAt;
     private String userLike;
-    private String certProfile;
+    private String certprofile;
     private long overlap;
 
     public int getNumOfCerts()
@@ -77,14 +77,14 @@ class RemoveExpiredCertsInfo
         this.userLike = userLike;
     }
 
-    public String getCertProfile()
+    public String getCertprofile()
     {
-        return certProfile;
+        return certprofile;
     }
 
-    public void setCertProfile(String certProfile)
+    public void setCertprofile(String certprofile)
     {
-        this.certProfile = certProfile;
+        this.certprofile = certprofile;
     }
 
     public long getOverlap()

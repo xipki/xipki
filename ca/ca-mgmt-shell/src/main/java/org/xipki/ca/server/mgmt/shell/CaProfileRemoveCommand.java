@@ -58,7 +58,7 @@ public class CaProfileRemoveCommand extends CaCommand
     protected Object doExecute()
     throws Exception
     {
-        caManager.removeCertProfileFromCA(profileName, caName);
+        caManager.removeCertprofileFromCA(profileName, caName);
         out("removed certificate " + profileName + " from CA " + caName);
         return null;
     }

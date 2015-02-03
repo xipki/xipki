@@ -20,38 +20,38 @@
       <deltaCrlUrl>http://example.org/deltacrl</deltaCrlUrl>
     </X509Issuer>
   </X509Issuers>
-  <X509CertProfiles>
-    <X509CertProfile name="RCA">
-      <file>demo/profile/CertProfile_RootCA.xml</file>
-    </X509CertProfile>
-    <X509CertProfile name="RCA-Cross">
-      <file>demo/profile/CertProfile_RootCA_Cross.xml</file>
-    </X509CertProfile>
-    <X509CertProfile name="SubCA">
-      <file>demo/profile/CertProfile_SubCA.xml</file>
-    </X509CertProfile>
-    <X509CertProfile name="SubCA.Complex">
-      <file>demo/profile/CertProfile_SubCA_Complex.xml</file>
-    </X509CertProfile>
-    <X509CertProfile name="OCSP">
-      <file>demo/profile/CertProfile_OCSP.xml</file>
-    </X509CertProfile>
-    <X509CertProfile name="multipleOUs">
-      <file>demo/profile/CertProfile_multipleOUs.xml</file>
-    </X509CertProfile>
-    <X509CertProfile name="TLS">
-      <file>demo/profile/CertProfile_TLS.xml</file>
-    </X509CertProfile>
-    <X509CertProfile name="TLS_C">
-      <file>demo/profile/CertProfile_TLS_C.xml</file>
-    </X509CertProfile>
-    <X509CertProfile name="TLSwithIncSN">
-      <file>demo/profile/CertProfile_TLSwithIncSN.xml</file>
-    </X509CertProfile>
-    <X509CertProfile name="gSMC_K">
-      <file>demo/profile/CertProfile_gSMC_K.xml</file>
-    </X509CertProfile>
-  </X509CertProfiles>
+  <X509Certprofiles>
+    <X509Certprofile name="RCA">
+      <file>demo/profile/Certprofile_RootCA.xml</file>
+    </X509Certprofile>
+    <X509Certprofile name="RCA-Cross">
+      <file>demo/profile/Certprofile_RootCA_Cross.xml</file>
+    </X509Certprofile>
+    <X509Certprofile name="SubCA">
+      <file>demo/profile/Certprofile_SubCA.xml</file>
+    </X509Certprofile>
+    <X509Certprofile name="SubCA.Complex">
+      <file>demo/profile/Certprofile_SubCA_Complex.xml</file>
+    </X509Certprofile>
+    <X509Certprofile name="OCSP">
+      <file>demo/profile/Certprofile_OCSP.xml</file>
+    </X509Certprofile>
+    <X509Certprofile name="multipleOUs">
+      <file>demo/profile/Certprofile_multipleOUs.xml</file>
+    </X509Certprofile>
+    <X509Certprofile name="TLS">
+      <file>demo/profile/Certprofile_TLS.xml</file>
+    </X509Certprofile>
+    <X509Certprofile name="TLS_C">
+      <file>demo/profile/Certprofile_TLS_C.xml</file>
+    </X509Certprofile>
+    <X509Certprofile name="TLSwithIncSN">
+      <file>demo/profile/Certprofile_TLSwithIncSN.xml</file>
+    </X509Certprofile>
+    <X509Certprofile name="gSMC_K">
+      <file>demo/profile/Certprofile_gSMC_K.xml</file>
+    </X509Certprofile>
+  </X509Certprofiles>
   <environments>
     <environment name="env-a">
       <parameter name="add.prefix">true</parameter>

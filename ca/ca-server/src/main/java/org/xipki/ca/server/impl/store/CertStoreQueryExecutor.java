@@ -1004,12 +1004,12 @@ class CertStoreQueryExecutor
     }
 
     List<BigInteger> getExpiredSerialNumbers(X509CertWithId caCert,
-            long expiredAt, int numEntries, String certProfile, String userLike)
+            long expiredAt, int numEntries, String certprofile, String userLike)
     throws SQLException, OperationException
     {
         ParamChecker.assertNotNull("caCert", caCert);
         ParamChecker.assertNotNull("expiredAt", expiredAt);
-        ParamChecker.assertNotEmpty("certProfile", certProfile);
+        ParamChecker.assertNotEmpty("certprofile", certprofile);
 
         if(numEntries < 1)
         {
@@ -1030,8 +1030,8 @@ class CertStoreQueryExecutor
             }
         }
 
-        Integer certProfileId = certprofileStore.getId(certProfile);
-        if(certProfileId == null)
+        Integer certprofileId = certprofileStore.getId(certprofile);
+        if(certprofileId == null)
         {
             return Collections.emptyList();
         }
@@ -1054,7 +1054,7 @@ class CertStoreQueryExecutor
             int idx = 1;
             ps.setInt(idx++, caId);
             ps.setLong(idx++, expiredAt);
-            ps.setInt(idx++, certProfileId);
+            ps.setInt(idx++, certprofileId);
 
             if(userLike != null && "all".equalsIgnoreCase(userLike) == false)
             {
@@ -1078,12 +1078,12 @@ class CertStoreQueryExecutor
     }
 
     int getNumOfExpiredCerts(X509CertWithId caCert, long expiredAt,
-            String certProfile, String userLike)
+            String certprofile, String userLike)
     throws SQLException, OperationException
     {
         ParamChecker.assertNotNull("caCert", caCert);
         ParamChecker.assertNotNull("expiredAt", expiredAt);
-        ParamChecker.assertNotEmpty("certProfile", certProfile);
+        ParamChecker.assertNotEmpty("certprofile", certprofile);
 
         int caId = getCaId(caCert);
 
@@ -1098,8 +1098,8 @@ class CertStoreQueryExecutor
             }
         }
 
-        Integer certProfileId = certprofileStore.getId(certProfile);
-        if(certProfileId == null)
+        Integer certprofileId = certprofileStore.getId(certprofile);
+        if(certprofileId == null)
         {
             return 0;
         }
@@ -1121,7 +1121,7 @@ class CertStoreQueryExecutor
             int idx = 1;
             ps.setInt(idx++, caId);
             ps.setLong(idx++, expiredAt);
-            ps.setInt(idx++, certProfileId);
+            ps.setInt(idx++, certprofileId);
 
             if(userLike != null && "all".equalsIgnoreCase(userLike) == false)
             {
@@ -1280,13 +1280,13 @@ class CertStoreQueryExecutor
                 byte[] encodedCert = Base64.decode(b64Cert);
                 X509Certificate cert = SecurityUtil.parseCert(encodedCert);
 
-                int certProfileInfo_id = rs.getInt("CERTPROFILEINFO_ID");
-                String certProfileName = certprofileStore.getName(certProfileInfo_id);
+                int certprofileInfo_id = rs.getInt("CERTPROFILEINFO_ID");
+                String certprofileName = certprofileStore.getName(certprofileInfo_id);
 
                 X509CertWithId certWithMeta = new X509CertWithId(cert, encodedCert);
 
                 X509CertificateInfo certInfo = new X509CertificateInfo(certWithMeta,
-                        caCert, cert.getPublicKey().getEncoded(), certProfileName);
+                        caCert, cert.getPublicKey().getEncoded(), certprofileName);
 
                 boolean revoked = rs.getBoolean("REVOKED");
 
@@ -1417,10 +1417,10 @@ class CertStoreQueryExecutor
                 X509CertWithId certWithMeta = new X509CertWithId(cert, certBytes);
                 certWithMeta.setCertId(certId);
 
-                int certProfileId = rs.getInt("CERTPROFILEINFO_ID");
-                String profileName = certprofileStore.getName(certProfileId);
+                int certprofileId = rs.getInt("CERTPROFILEINFO_ID");
+                String profileName = certprofileStore.getName(certprofileId);
                 X509CertWithRevocationInfo ret = new X509CertWithRevocationInfo();
-                ret.setCertProfile(profileName);
+                ret.setCertprofile(profileName);
                 ret.setCert(certWithMeta);
                 ret.setRevInfo(revInfo);
                 return ret;
@@ -1468,15 +1468,15 @@ class CertStoreQueryExecutor
                 byte[] encodedCert = Base64.decode(b64Cert);
                 X509Certificate cert = SecurityUtil.parseCert(encodedCert);
 
-                int certProfileInfo_id = rs.getInt("CERTPROFILEINFO_ID");
-                String certProfileName = certprofileStore.getName(certProfileInfo_id);
+                int certprofileInfo_id = rs.getInt("CERTPROFILEINFO_ID");
+                String certprofileName = certprofileStore.getName(certprofileInfo_id);
 
                 X509CertWithId certWithMeta = new X509CertWithId(cert, encodedCert);
 
                 byte[] subjectPublicKeyInfo = Certificate.getInstance(encodedCert).getTBSCertificate()
                         .getSubjectPublicKeyInfo().getEncoded();
                 X509CertificateInfo certInfo = new X509CertificateInfo(certWithMeta,
-                        caCert, subjectPublicKeyInfo, certProfileName);
+                        caCert, subjectPublicKeyInfo, certprofileName);
 
                 boolean revoked = rs.getBoolean("REVOKED");
 

@@ -419,12 +419,12 @@ public class CertificateStore
     }
 
     public List<BigInteger> getExpiredCertSerials(X509CertWithId caCert,
-            long expiredAt, int numEntries, String certProfile, String userLike)
+            long expiredAt, int numEntries, String certprofile, String userLike)
     throws OperationException
     {
         try
         {
-            return queryExecutor.getExpiredSerialNumbers(caCert, expiredAt, numEntries, certProfile, userLike);
+            return queryExecutor.getExpiredSerialNumbers(caCert, expiredAt, numEntries, certprofile, userLike);
         } catch (SQLException e)
         {
             LOG.debug("SQLException", e);
@@ -433,12 +433,12 @@ public class CertificateStore
     }
 
     public int getNumOfExpiredCerts(X509CertWithId caCert, long expiredAt,
-            String certProfile, String userLike)
+            String certprofile, String userLike)
     throws OperationException
     {
         try
         {
-            return queryExecutor.getNumOfExpiredCerts(caCert, expiredAt, certProfile, userLike);
+            return queryExecutor.getNumOfExpiredCerts(caCert, expiredAt, certprofile, userLike);
         } catch (SQLException e)
         {
             LOG.debug("SQLException", e);

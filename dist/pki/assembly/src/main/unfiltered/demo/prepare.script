@@ -26,29 +26,29 @@ xipki-ca:env-add -name add.prefix -value true
 xipki-ca:env-add -name add.suffix -value true
 
 xipki-ca:env-add -name certprofileType.map -value \
- "DemoEE1?java:org.xipki.certprofile.demo.x509.DemoEE1X509CertProfile%DemoEE2?java:org.xipki.certprofile.demo.x509.DemoEE2X509CertProfile%"
+ "DemoEE1?java:org.xipki.certprofile.demo.x509.DemoEE1X509Certprofile%DemoEE2?java:org.xipki.certprofile.demo.x509.DemoEE2X509Certprofile%"
 
 ## CMP control: messageTimeBias is set to 300 seconds.
 xipki-ca:cmpcontrol-set --msgTimeBias 300 --sendCaCert yes
 
 ## Certificate Profiles
-xipki-ca:profile-add -name RCA-Cross -type XML -confFile demo/profile/CertProfile_RootCA_Cross.xml
+xipki-ca:profile-add -name RCA-Cross -type XML -confFile demo/profile/Certprofile_RootCA_Cross.xml
 
-xipki-ca:profile-add -name SubCA -type XML -confFile demo/profile/CertProfile_SubCA.xml
+xipki-ca:profile-add -name SubCA -type XML -confFile demo/profile/Certprofile_SubCA.xml
 
-xipki-ca:profile-add -name SubCA.Complex -type XML -confFile demo/profile/CertProfile_SubCA_Complex.xml
+xipki-ca:profile-add -name SubCA.Complex -type XML -confFile demo/profile/Certprofile_SubCA_Complex.xml
 
-xipki-ca:profile-add -name OCSP -type XML -confFile demo/profile/CertProfile_OCSP.xml
+xipki-ca:profile-add -name OCSP -type XML -confFile demo/profile/Certprofile_OCSP.xml
 
-xipki-ca:profile-add -name multipleOUs -type XML -confFile demo/profile/CertProfile_multipleOUs.xml
+xipki-ca:profile-add -name multipleOUs -type XML -confFile demo/profile/Certprofile_multipleOUs.xml
 
-xipki-ca:profile-add -name TLS -type XML -confFile demo/profile/CertProfile_TLS.xml
+xipki-ca:profile-add -name TLS -type XML -confFile demo/profile/Certprofile_TLS.xml
 
-xipki-ca:profile-add -name TLS_C -type XML -confFile demo/profile/CertProfile_TLS_C.xml
+xipki-ca:profile-add -name TLS_C -type XML -confFile demo/profile/Certprofile_TLS_C.xml
 
-xipki-ca:profile-add -name TLSwithIncSN -type XML -confFile demo/profile/CertProfile_TLSwithIncSN.xml
+xipki-ca:profile-add -name TLSwithIncSN -type XML -confFile demo/profile/Certprofile_TLSwithIncSN.xml
 
-xipki-ca:profile-add -name gSMC_K -type XML -confFile demo/profile/CertProfile_gSMC_K.xml
+xipki-ca:profile-add -name gSMC_K -type XML -confFile demo/profile/Certprofile_gSMC_K.xml
 
 xipki-ca:profile-add -name DEMO -type DemoEE1
 

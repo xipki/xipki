@@ -37,7 +37,7 @@ package org.xipki.ca.server.mgmt.shell;
 
 import org.apache.karaf.shell.commands.Command;
 import org.apache.karaf.shell.commands.Option;
-import org.xipki.ca.server.mgmt.api.CertProfileEntry;
+import org.xipki.ca.server.mgmt.api.CertprofileEntry;
 import org.xipki.common.IoUtil;
 
 /**
@@ -75,8 +75,8 @@ public class ProfileAddCommand extends CaCommand
             conf = new String(IoUtil.read(confFile));
         }
 
-        CertProfileEntry entry = new CertProfileEntry(name, type, conf);
-        caManager.addCertProfile(entry);
+        CertprofileEntry entry = new CertprofileEntry(name, type, conf);
+        caManager.addCertprofile(entry);
         out("added certificate profile " + name);
         return null;
     }

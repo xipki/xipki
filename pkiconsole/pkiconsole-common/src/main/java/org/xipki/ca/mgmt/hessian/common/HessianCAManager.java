@@ -48,7 +48,7 @@ import org.xipki.ca.server.mgmt.api.CRLControl;
 import org.xipki.ca.server.mgmt.api.CmpControl;
 import org.xipki.ca.server.mgmt.api.X509CAEntry;
 import org.xipki.ca.server.mgmt.api.CAHasRequestorEntry;
-import org.xipki.ca.server.mgmt.api.CertProfileEntry;
+import org.xipki.ca.server.mgmt.api.CertprofileEntry;
 import org.xipki.ca.server.mgmt.api.CmpRequestorEntry;
 import org.xipki.ca.server.mgmt.api.CmpResponderEntry;
 import org.xipki.ca.server.mgmt.api.X509CrlSignerEntry;
@@ -98,7 +98,7 @@ public interface HessianCAManager
 
     Set<String> getCaAliasNames();
 
-    Set<String> getCertProfileNames();
+    Set<String> getCertprofileNames();
 
     Set<String> getPublisherNames();
 
@@ -122,10 +122,10 @@ public interface HessianCAManager
             Integer numCrls, Integer expirationPeriod, ValidityMode validityMode)
     throws HessianCAMgmtException;
 
-    void removeCertProfileFromCA(String profileName, String caName)
+    void removeCertprofileFromCA(String profileName, String caName)
     throws HessianCAMgmtException;
 
-    void addCertProfileToCA(String profileName, String caName)
+    void addCertprofileToCA(String profileName, String caName)
     throws HessianCAMgmtException;
 
     void removePublisherFromCA(String publisherName, String caName)
@@ -134,7 +134,7 @@ public interface HessianCAManager
     void addPublisherToCA(String publisherName, String caName)
     throws HessianCAMgmtException;
 
-    Set<String> getCertProfilesForCA(String caName);
+    Set<String> getCertprofilesForCA(String caName);
 
     Set<CAHasRequestorEntry> getCmpRequestorsForCA(String caName);
 
@@ -155,15 +155,15 @@ public interface HessianCAManager
     void addCmpRequestorToCA(CAHasRequestorEntry requestor, String caName)
     throws HessianCAMgmtException;
 
-    CertProfileEntry getCertProfile(String profileName);
+    CertprofileEntry getCertprofile(String profileName);
 
-    void removeCertProfile(String profileName)
+    void removeCertprofile(String profileName)
     throws HessianCAMgmtException;
 
-    void changeCertProfile(String name, String type, String conf)
+    void changeCertprofile(String name, String type, String conf)
     throws HessianCAMgmtException;
 
-    void addCertProfile(CertProfileEntry dbEntry)
+    void addCertprofile(CertprofileEntry dbEntry)
     throws HessianCAMgmtException;
 
     void setCmpResponder(CmpResponderEntry dbEntry)
