@@ -532,9 +532,9 @@ class OcspCertStoreFromCaDbImporter extends DbPorter
                 setLong(ps_cert, idx++, cert.getRevTime());
                 setLong(ps_cert, idx++, cert.getRevInvalidityTime());
 
-                int certProfileId = cert.getCertprofileinfoId();
-                String certProfileName = profileMap.get(certProfileId);
-                ps_cert.setString(idx++, certProfileName);
+                int certprofileId = cert.getCertprofileinfoId();
+                String certprofileName = profileMap.get(certprofileId);
+                ps_cert.setString(idx++, certprofileName);
                 ps_cert.addBatch();
 
                 // certhash

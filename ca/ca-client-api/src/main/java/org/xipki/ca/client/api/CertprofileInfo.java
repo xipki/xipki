@@ -41,13 +41,13 @@ import org.xipki.common.ParamChecker;
  * @author Lijun Liao
  */
 
-public class CertProfileInfo
+public class CertprofileInfo
 {
     private final String name;
     private final String type;
     private final String conf;
 
-    public CertProfileInfo(String name, String type, String conf)
+    public CertprofileInfo(String name, String type, String conf)
     {
         ParamChecker.assertNotEmpty("name", name);
         this.name = name;

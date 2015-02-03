@@ -105,7 +105,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.xipki.ca.client.api.CertProfileInfo;
+import org.xipki.ca.client.api.CertprofileInfo;
 import org.xipki.ca.client.api.RemoveExpiredCertsResult;
 import org.xipki.ca.client.api.dto.CRLResultType;
 import org.xipki.ca.client.api.dto.CmpResultType;
@@ -680,14 +680,14 @@ abstract class X509CmpRequestor extends CmpRequestor
 
     private PKIMessage buildPKIMessage(P10EnrollCertRequestType p10Req, String username)
     {
-        InfoTypeAndValue certProfileInfo = null;
-        if(p10Req.getCertProfile() != null)
+        InfoTypeAndValue certprofileInfo = null;
+        if(p10Req.getCertprofile() != null)
         {
-            CmpUtf8Pairs utf8Pairs = new CmpUtf8Pairs(CmpUtf8Pairs.KEY_CERT_PROFILE, p10Req.getCertProfile());
-            certProfileInfo = CmpUtil.buildInfoTypeAndValue(utf8Pairs);
+            CmpUtf8Pairs utf8Pairs = new CmpUtf8Pairs(CmpUtf8Pairs.KEY_CERT_PROFILE, p10Req.getCertprofile());
+            certprofileInfo = CmpUtil.buildInfoTypeAndValue(utf8Pairs);
         }
 
-        PKIHeader header = buildPKIHeader(implicitConfirm, null, username, certProfileInfo);
+        PKIHeader header = buildPKIHeader(implicitConfirm, null, username, certprofileInfo);
         PKIBody body = new PKIBody(PKIBody.TYPE_P10_CERT_REQ, p10Req.getP10Req());
 
         PKIMessage pkiMessage = new PKIMessage(header, body);
@@ -704,12 +704,12 @@ abstract class X509CmpRequestor extends CmpRequestor
         for(int i = 0; i < reqEntries.size(); i++)
         {
             EnrollCertRequestEntryType reqEntry = reqEntries.get(i);
-            CmpUtf8Pairs utf8Pairs = new CmpUtf8Pairs(CmpUtf8Pairs.KEY_CERT_PROFILE, reqEntry.getCertProfile());
-            AttributeTypeAndValue certProfileInfo = CmpUtil.buildAttributeTypeAndValue(utf8Pairs);
+            CmpUtf8Pairs utf8Pairs = new CmpUtf8Pairs(CmpUtf8Pairs.KEY_CERT_PROFILE, reqEntry.getCertprofile());
+            AttributeTypeAndValue certprofileInfo = CmpUtil.buildAttributeTypeAndValue(utf8Pairs);
 
             certReqMsgs[i] = new CertReqMsg(
                     reqEntry.getCertReq(), reqEntry.getPopo(),
-                    (certProfileInfo == null) ? null : new AttributeTypeAndValue[]{certProfileInfo});
+                    (certprofileInfo == null) ? null : new AttributeTypeAndValue[]{certprofileInfo});
         }
 
         int bodyType;
@@ -736,9 +736,9 @@ abstract class X509CmpRequestor extends CmpRequestor
         PKIHeader header = buildPKIHeader(implicitConfirm, null, username, (InfoTypeAndValue[]) null);
 
         CmpUtf8Pairs utf8Pairs = new CmpUtf8Pairs(CmpUtf8Pairs.KEY_CERT_PROFILE, profileName);
-        AttributeTypeAndValue certProfileInfo = CmpUtil.buildAttributeTypeAndValue(utf8Pairs);
+        AttributeTypeAndValue certprofileInfo = CmpUtil.buildAttributeTypeAndValue(utf8Pairs);
         CertReqMsg[] certReqMsgs = new CertReqMsg[1];
-        certReqMsgs[0] = new CertReqMsg(req, pop, new AttributeTypeAndValue[]{certProfileInfo});
+        certReqMsgs[0] = new CertReqMsg(req, pop, new AttributeTypeAndValue[]{certprofileInfo});
         PKIBody body = new PKIBody(PKIBody.TYPE_CERT_REQ, new CertReqMessages(certReqMsgs));
 
         return new PKIMessage(header, body);
@@ -786,12 +786,12 @@ abstract class X509CmpRequestor extends CmpRequestor
         String namespace = null;
         Element root = doc.getDocumentElement();
         String s = root.getAttribute("version");
-        if(s == null)
+        if(s == null || s.isEmpty())
         {
             s = root.getAttributeNS(namespace, "version");
         }
 
-        int version = (s == null) ? 2 : Integer.parseInt(s);
+        int version = (s == null || s.isEmpty()) ? 1 : Integer.parseInt(s);
 
         if(version == 2)
         {
@@ -804,19 +804,19 @@ abstract class X509CmpRequestor extends CmpRequestor
                 throw new CmpRequestorException("Could no parse the CA certificate", e);
             }
 
-            Element profilesElement = XMLUtil.getFirstElementChild(root, namespace, "certProfiles");
-            Set<CertProfileInfo> profiles = new HashSet<>();
+            Element profilesElement = XMLUtil.getFirstElementChild(root, namespace, "certprofiles");
+            Set<CertprofileInfo> profiles = new HashSet<>();
             Set<String> profileNames = new HashSet<>();
             if(profilesElement != null)
             {
-                List<Element> profileElements = XMLUtil.getElementChilden(profilesElement, namespace, "certProfile");
+                List<Element> profileElements = XMLUtil.getElementChilden(profilesElement, namespace, "certprofile");
 
                 for(Element element : profileElements)
                 {
                     String name = XMLUtil.getValueOfFirstElementChild(element, namespace, "name");
                     String type = XMLUtil.getValueOfFirstElementChild(element, namespace, "type");
                     String conf = XMLUtil.getValueOfFirstElementChild(element, namespace, "conf");
-                    CertProfileInfo profile = new CertProfileInfo(name, type, conf);
+                    CertprofileInfo profile = new CertprofileInfo(name, type, conf);
                     profiles.add(profile);
                     profileNames.add(name);
                     if(LOG.isDebugEnabled())
@@ -840,10 +840,10 @@ abstract class X509CmpRequestor extends CmpRequestor
     }
 
     RemoveExpiredCertsResult removeExpiredCerts(
-            String certProfile, String userLike, long overlapSeconds)
+            String certprofile, String userLike, long overlapSeconds)
     throws CmpRequestorException
     {
-        ParamChecker.assertNotEmpty("certProfile", certProfile);
+        ParamChecker.assertNotEmpty("certprofile", certprofile);
         if(overlapSeconds < 0)
         {
             throw new IllegalArgumentException("overlapSeconds could not be negative");
@@ -854,9 +854,9 @@ abstract class X509CmpRequestor extends CmpRequestor
         sb.append("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>");
         sb.append("<removeExpiredCertsReq version=\"1\">");
         // Profile
-        sb.append("<certProfile>");
-        sb.append(certProfile);
-        sb.append("</certProfile>");
+        sb.append("<certprofile>");
+        sb.append(certprofile);
+        sb.append("</certprofile>");
 
         // Username
         if(userLike != null && userLike.isEmpty() == false)
@@ -884,7 +884,7 @@ abstract class X509CmpRequestor extends CmpRequestor
         if(LOG.isDebugEnabled())
         {
             LOG.debug("removeExpiredCertsResp for (profile={}, usernameLike={}, overlapSeconds={}): {}",
-                    new Object[]{certProfile, userLike, overlapSeconds, resultInfoStr});
+                    new Object[]{certprofile, userLike, overlapSeconds, resultInfoStr});
         }
         Document doc;
         try
@@ -919,7 +919,7 @@ abstract class X509CmpRequestor extends CmpRequestor
         nodeValue = XMLUtil.getValueOfFirstElementChild(doc.getDocumentElement(), namespace, "profile");
         if(nodeValue != null)
         {
-            result.setCertProfile(nodeValue);
+            result.setCertprofile(nodeValue);
         }
 
         nodeValue = XMLUtil.getValueOfFirstElementChild(doc.getDocumentElement(), namespace, "expiredAt");

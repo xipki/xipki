@@ -145,18 +145,18 @@ public class LoadTestEntry
         }
     }
 
-    private final String certProfile;
+    private final String certprofile;
     private final KeyEntry keyEntry;
     private final IncreasableSubject subject;
 
-    public LoadTestEntry(String certProfile, KeyEntry keyEntry, String subjectTemplate, RandomDN randomDN)
+    public LoadTestEntry(String certprofile, KeyEntry keyEntry, String subjectTemplate, RandomDN randomDN)
     {
-        ParamChecker.assertNotEmpty("certProfile", certProfile);
+        ParamChecker.assertNotEmpty("certprofile", certprofile);
         ParamChecker.assertNotNull("keyEntry", keyEntry);
         ParamChecker.assertNotNull("subjectTemplate", subjectTemplate);
         ParamChecker.assertNotNull("randomDN", randomDN);
 
-        this.certProfile = certProfile;
+        this.certprofile = certprofile;
         this.keyEntry = keyEntry;
         this.subject = new IncreasableSubject(subjectTemplate, randomDN);
     }
@@ -171,9 +171,9 @@ public class LoadTestEntry
         return subject.getX500Name(index);
     }
 
-    public String getCertProfile()
+    public String getCertprofile()
     {
-        return certProfile;
+        return certprofile;
     }
 
 }

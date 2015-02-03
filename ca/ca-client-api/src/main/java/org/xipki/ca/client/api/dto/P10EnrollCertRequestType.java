@@ -44,15 +44,15 @@ import org.xipki.common.ParamChecker;
 
 public class P10EnrollCertRequestType extends IdentifiedObject
 {
-    private final String certProfile;
+    private final String certprofile;
     private final CertificationRequest p10Req;
 
-    public P10EnrollCertRequestType(String id, String certProfile, CertificationRequest p10Req)
+    public P10EnrollCertRequestType(String id, String certprofile, CertificationRequest p10Req)
     {
         super(id);
         ParamChecker.assertNotNull("p10Req", p10Req);
 
-        this.certProfile = certProfile;
+        this.certprofile = certprofile;
         this.p10Req = p10Req;
     }
 
@@ -61,8 +61,8 @@ public class P10EnrollCertRequestType extends IdentifiedObject
         return p10Req;
     }
 
-    public String getCertProfile()
+    public String getCertprofile()
     {
-        return certProfile;
+        return certprofile;
     }
 }

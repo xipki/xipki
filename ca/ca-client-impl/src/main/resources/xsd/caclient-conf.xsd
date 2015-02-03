@@ -77,15 +77,15 @@
       <xs:element name="requestor" type="xs:string"/>
       <xs:element name="responder" type="xs:string"/>
       <xs:element name="caCert" type="CACertType"/>
-      <xs:element name="certProfiles" type="certProfilesType"/>
+      <xs:element name="certprofiles" type="certprofilesType"/>
     </xs:all>
     <xs:attribute name="enabled" type="xs:boolean" default="true"/>
   </xs:complexType>
-  <xs:complexType name="certProfilesType">
+  <xs:complexType name="certprofilesType">
     <xs:choice>
       <xs:element name="autoconf" type="xs:anyType"/>
       <xs:sequence>
-        <xs:element name="certProfile" type="certProfileType" minOccurs="0" maxOccurs="unbounded"/>
+        <xs:element name="certprofile" type="certprofileType" minOccurs="0" maxOccurs="unbounded"/>
       </xs:sequence>
     </xs:choice>
   </xs:complexType>
@@ -95,7 +95,7 @@
       <xs:element name="cert" type="fileOrValueType"/>
     </xs:choice>
   </xs:complexType>
-  <xs:complexType name="certProfileType">
+  <xs:complexType name="certprofileType">
     <xs:sequence>
       <xs:element name="name" type="xs:string"/>
       <xs:element name="type" type="xs:string" minOccurs="0"/>

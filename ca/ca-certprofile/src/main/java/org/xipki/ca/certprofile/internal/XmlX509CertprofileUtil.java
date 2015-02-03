@@ -68,7 +68,7 @@ import org.bouncycastle.asn1.x509.GeneralName;
 import org.bouncycastle.asn1.x509.GeneralSubtree;
 import org.bouncycastle.asn1.x509.NameConstraints;
 import org.bouncycastle.asn1.x509.PolicyMappings;
-import org.xipki.ca.api.CertProfileException;
+import org.xipki.ca.api.CertprofileException;
 import org.xipki.ca.api.profile.ExtensionControl;
 import org.xipki.ca.api.profile.ExtensionValue;
 import org.xipki.ca.api.profile.GeneralNameMode;
@@ -114,13 +114,13 @@ import org.xml.sax.SAXException;
  * @author Lijun Liao
  */
 
-public class XmlX509CertProfileUtil
+public class XmlX509CertprofileUtil
 {
     private final static Object jaxbUnmarshallerLock = new Object();
     private static Unmarshaller jaxbUnmarshaller;
 
     public static X509ProfileType parse(InputStream xmlConfStream)
-    throws CertProfileException
+    throws CertprofileException
     {
         synchronized (jaxbUnmarshallerLock)
         {
@@ -134,7 +134,7 @@ public class XmlX509CertProfileUtil
 
                     final SchemaFactory schemaFact = SchemaFactory.newInstance(
                             javax.xml.XMLConstants.W3C_XML_SCHEMA_NS_URI);
-                    URL url = XmlX509CertProfileUtil.class.getResource("/xsd/certprofile.xsd");
+                    URL url = XmlX509CertprofileUtil.class.getResource("/xsd/certprofile.xsd");
                     jaxbUnmarshaller.setSchema(schemaFact.newSchema(url));
                 }
 
@@ -148,10 +148,10 @@ public class XmlX509CertProfileUtil
             }
             catch(SAXException e)
             {
-                throw new CertProfileException("parse profile failed, message: " + e.getMessage(), e);
+                throw new CertprofileException("parse profile failed, message: " + e.getMessage(), e);
             } catch(JAXBException e)
             {
-                throw new CertProfileException("parse profile failed, message: " + XMLUtil.getMessage((JAXBException) e), e);
+                throw new CertprofileException("parse profile failed, message: " + XMLUtil.getMessage((JAXBException) e), e);
             }
 
             Object rootType = rootElement.getValue();
@@ -161,7 +161,7 @@ public class XmlX509CertProfileUtil
             }
             else
             {
-                throw new CertProfileException("invalid root element type");
+                throw new CertprofileException("invalid root element type");
             }
         }
     }
@@ -235,7 +235,7 @@ public class XmlX509CertProfileUtil
 
     public static NameConstraints buildNameConstrains(
             org.xipki.ca.certprofile.internal.x509.jaxb.ExtensionsType.NameConstraints type)
-    throws CertProfileException
+    throws CertprofileException
     {
         GeneralSubtree[] permitted = buildGeneralSubtrees(type.getPermittedSubtrees());
         GeneralSubtree[] excluded = buildGeneralSubtrees(type.getExcludedSubtrees());
@@ -247,7 +247,7 @@ public class XmlX509CertProfileUtil
     }
 
     public static GeneralSubtree[] buildGeneralSubtrees(GeneralSubtreesType subtrees)
-    throws CertProfileException
+    throws CertprofileException
     {
         if(subtrees == null || subtrees.getBase().isEmpty())
         {
@@ -266,7 +266,7 @@ public class XmlX509CertProfileUtil
     }
 
     public static GeneralSubtree buildGeneralSubtree(GeneralSubtreeBaseType type)
-    throws CertProfileException
+    throws CertprofileException
     {
         GeneralName base = null;
         if(type.getDirectoryName() != null)
@@ -298,7 +298,7 @@ public class XmlX509CertProfileUtil
         Integer i = type.getMinimum();
         if(i != null && i < 0)
         {
-            throw new CertProfileException("negative minimum is not allowed: " + i);
+            throw new CertprofileException("negative minimum is not allowed: " + i);
         }
 
         BigInteger minimum = (i == null) ? null : BigInteger.valueOf(i.intValue());
@@ -306,7 +306,7 @@ public class XmlX509CertProfileUtil
         i = type.getMaximum();
         if(i != null && i < 0)
         {
-            throw new CertProfileException("negative maximum is not allowed: " + i);
+            throw new CertprofileException("negative maximum is not allowed: " + i);
         }
 
         BigInteger maximum = (i == null) ? null : BigInteger.valueOf(i.intValue());
@@ -315,18 +315,18 @@ public class XmlX509CertProfileUtil
     }
 
     public static ASN1Sequence buildPolicyConstrains(PolicyConstraints type)
-    throws CertProfileException
+    throws CertprofileException
     {
         Integer requireExplicitPolicy = type.getRequireExplicitPolicy();
         if(requireExplicitPolicy != null && requireExplicitPolicy < 0)
         {
-            throw new CertProfileException("negative requireExplicitPolicy is not allowed: " + requireExplicitPolicy);
+            throw new CertprofileException("negative requireExplicitPolicy is not allowed: " + requireExplicitPolicy);
         }
 
         Integer inhibitPolicyMapping = type.getInhibitPolicyMapping();
         if(inhibitPolicyMapping != null && inhibitPolicyMapping < 0)
         {
-            throw new CertProfileException("negative inhibitPolicyMapping is not allowed: " + inhibitPolicyMapping);
+            throw new CertprofileException("negative inhibitPolicyMapping is not allowed: " + inhibitPolicyMapping);
         }
 
         if(requireExplicitPolicy == null && inhibitPolicyMapping == null)
@@ -442,7 +442,7 @@ public class XmlX509CertProfileUtil
     }
 
     public static Map<ASN1ObjectIdentifier, KeyParametersOption> buildKeyAlgorithms(KeyAlgorithms keyAlgos)
-    throws CertProfileException
+    throws CertprofileException
     {
         Map<ASN1ObjectIdentifier, KeyParametersOption> keyAlgorithms = new HashMap<>();
         for(AlgorithmType type : keyAlgos.getAlgorithm())
@@ -458,7 +458,7 @@ public class XmlX509CertProfileUtil
                 if(params.getCurves() != null)
                 {
                     Curves curves = params.getCurves();
-                    Set<ASN1ObjectIdentifier> curveOids = XmlX509CertProfileUtil.toOIDSet(curves.getCurve());
+                    Set<ASN1ObjectIdentifier> curveOids = XmlX509CertprofileUtil.toOIDSet(curves.getCurve());
                     option.setCurveOids(curveOids);
                 }
 
@@ -473,7 +473,7 @@ public class XmlX509CertProfileUtil
                 KeyParametersOption.RSAParametersOption option = new KeyParametersOption.RSAParametersOption();
                 keyParamsOption = option;
 
-                Set<Range> modulusLengths = XmlX509CertProfileUtil.buildParametersMap(
+                Set<Range> modulusLengths = XmlX509CertprofileUtil.buildParametersMap(
                         type.getRSAParameters().getModulusLength());
                 option.setModulusLengths(modulusLengths);
 
@@ -482,7 +482,7 @@ public class XmlX509CertProfileUtil
                 KeyParametersOption.RSAPSSParametersOption option = new KeyParametersOption.RSAPSSParametersOption();
                 keyParamsOption = option;
 
-                Set<Range> modulusLengths = XmlX509CertProfileUtil.buildParametersMap(
+                Set<Range> modulusLengths = XmlX509CertprofileUtil.buildParametersMap(
                         type.getRSAPSSParameters().getModulusLength());
                 option.setModulusLengths(modulusLengths);
             } else if(type.getDSAParameters() != null)
@@ -490,20 +490,20 @@ public class XmlX509CertProfileUtil
                 KeyParametersOption.DSAParametersOption option = new KeyParametersOption.DSAParametersOption();
                 keyParamsOption = option;
 
-                Set<Range> pLengths = XmlX509CertProfileUtil.buildParametersMap(type.getDSAParameters().getPLength());
+                Set<Range> pLengths = XmlX509CertprofileUtil.buildParametersMap(type.getDSAParameters().getPLength());
                 option.setPLengths(pLengths);
 
-                Set<Range> qLengths = XmlX509CertProfileUtil.buildParametersMap(type.getDSAParameters().getQLength());
+                Set<Range> qLengths = XmlX509CertprofileUtil.buildParametersMap(type.getDSAParameters().getQLength());
                 option.setQLengths(qLengths);
             } else if(type.getDHParameters() != null)
             {
                 KeyParametersOption.DHParametersOption option = new KeyParametersOption.DHParametersOption();
                 keyParamsOption = option;
 
-                Set<Range> pLengths = XmlX509CertProfileUtil.buildParametersMap(type.getDHParameters().getPLength());
+                Set<Range> pLengths = XmlX509CertprofileUtil.buildParametersMap(type.getDHParameters().getPLength());
                 option.setPLengths(pLengths);
 
-                Set<Range> qLengths = XmlX509CertProfileUtil.buildParametersMap(type.getDHParameters().getQLength());
+                Set<Range> qLengths = XmlX509CertprofileUtil.buildParametersMap(type.getDHParameters().getQLength());
                 option.setQLengths(qLengths);
             }
             else if(type.getGostParameters() != null)
@@ -511,14 +511,14 @@ public class XmlX509CertProfileUtil
                 KeyParametersOption.GostParametersOption option = new KeyParametersOption.GostParametersOption();
                 keyParamsOption = option;
 
-                Set<ASN1ObjectIdentifier> set = XmlX509CertProfileUtil.toOIDSet(
+                Set<ASN1ObjectIdentifier> set = XmlX509CertprofileUtil.toOIDSet(
                         type.getGostParameters().getPublicKeyParamSet());
                 option.setPublicKeyParamSets(set);
 
-                set = XmlX509CertProfileUtil.toOIDSet(type.getGostParameters().getDigestParamSet());
+                set = XmlX509CertprofileUtil.toOIDSet(type.getGostParameters().getDigestParamSet());
                 option.setDigestParamSets(set);
 
-                set = XmlX509CertProfileUtil.toOIDSet(type.getGostParameters().getEncryptionParamSet());
+                set = XmlX509CertprofileUtil.toOIDSet(type.getGostParameters().getEncryptionParamSet());
                 option.setEncryptionParamSets(set);
             } else
             {
@@ -531,7 +531,7 @@ public class XmlX509CertProfileUtil
                 ASN1ObjectIdentifier oid = new ASN1ObjectIdentifier(algId.getValue());
                 if(keyAlgorithms.containsKey(oid))
                 {
-                    throw new CertProfileException("duplicate definition of keyAlgorithm " + oid.getId());
+                    throw new CertprofileException("duplicate definition of keyAlgorithm " + oid.getId());
                 }
                 keyAlgorithms.put(oid, keyParamsOption);
             }
@@ -617,7 +617,7 @@ public class XmlX509CertProfileUtil
 
             Set<KeyUsageControl> keyusageSet = Collections.unmodifiableSet(set);
 
-            Condition condition = XmlX509CertProfileUtil.createCondition(t.getCondition());
+            Condition condition = XmlX509CertprofileUtil.createCondition(t.getCondition());
             KeyUsageOption option = new KeyUsageOption(condition, keyusageSet);
             optionList.add(option);
         }
@@ -639,7 +639,7 @@ public class XmlX509CertProfileUtil
                         new ASN1ObjectIdentifier(entry.getValue()), entry.isRequired());
                 extendedKeyusageSet.add(usage);
             }
-            Condition condition = XmlX509CertProfileUtil.createCondition(t.getCondition());
+            Condition condition = XmlX509CertprofileUtil.createCondition(t.getCondition());
             ExtKeyUsageOption option = new ExtKeyUsageOption(condition, extendedKeyusageSet);
             optionList.add(option);
         }
@@ -666,7 +666,7 @@ public class XmlX509CertProfileUtil
     public static Map<ASN1ObjectIdentifier, ExtensionValueOptions> buildConstantExtesions(
             List<ConstantExtensions> cess,
             Map<ASN1ObjectIdentifier, ExtensionControl> extensionControls)
-    throws CertProfileException
+    throws CertprofileException
     {
         Map<ASN1ObjectIdentifier, List<ExtensionValueOption>> map = new HashMap<>();
         for(ConstantExtensions ces : cess)
@@ -685,11 +685,11 @@ public class XmlX509CertProfileUtil
                         value = parser.readObject();
                     } catch (IOException e)
                     {
-                        throw new CertProfileException("Could not parse the constant extension value", e);
+                        throw new CertprofileException("Could not parse the constant extension value", e);
                     }
                     ExtensionValue extension = new ExtensionValue(extensionControl.isCritical(), value);
                     ExtensionValueOption option = new ExtensionValueOption(
-                            XmlX509CertProfileUtil.createCondition(ce.getCondition()), extension);
+                            XmlX509CertprofileUtil.createCondition(ce.getCondition()), extension);
 
                     List<ExtensionValueOption> options = map.get(type);
                     if(options == null)

@@ -153,7 +153,7 @@ class CALoadTestEnroll extends AbstractLoadTest
                 {
                     String id = "id-" + certId;
                     EnrollCertRequestEntryType requestEntry = new EnrollCertRequestEntryType
-                            (id, loadtestEntry.getCertProfile(), certRequests.get(certId), RA_VERIFIED);
+                            (id, loadtestEntry.getCertprofile(), certRequests.get(certId), RA_VERIFIED);
 
                     request.addRequestEntry(requestEntry);
                 }

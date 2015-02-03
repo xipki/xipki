@@ -45,25 +45,25 @@ import org.xipki.common.ParamChecker;
 
 public class EnrollCertRequestEntryType extends IdentifiedObject
 {
-    private final String certProfile;
+    private final String certprofile;
 
     private final CertRequest certReq;
     private final ProofOfPossession popo;
 
-    public EnrollCertRequestEntryType(String id, String certProfile,
+    public EnrollCertRequestEntryType(String id, String certprofile,
             CertRequest certReq, ProofOfPossession popo)
     {
         super(id);
         ParamChecker.assertNotNull("certReq", certReq);
 
-        this.certProfile = certProfile;
+        this.certprofile = certprofile;
         this.certReq = certReq;
         this.popo = popo;
     }
 
-    public String getCertProfile()
+    public String getCertprofile()
     {
-        return certProfile;
+        return certprofile;
     }
 
     public CertRequest getCertReq()

@@ -59,7 +59,7 @@ public interface RAWorker
 {
     Set<String> getCaNames();
 
-    Set<CertProfileInfo> getCertProfiles(String caName);
+    Set<CertprofileInfo> getCertprofiles(String caName);
 
     EnrollCertResult requestCert(CertificationRequest p10Request, String profile, String caName,
             String username)
@@ -124,12 +124,12 @@ public interface RAWorker
     /**
      * Remove the expired certificates
      * @param caName
-     * @param certProfile certificate profile name or 'all' for all certificate profiles
+     * @param certprofile certificate profile name or 'all' for all certificate profiles
      * @param userLike user name pattern, or 'all' for all users, or {@code null} for those without user info
      * @param overlapSeconds
      */
     RemoveExpiredCertsResult removeExpiredCerts(String caName,
-            String certProfile, String userLike, long overlapSeconds)
+            String certprofile, String userLike, long overlapSeconds)
     throws RAWorkerException, PKIErrorException;
 
     HealthCheckResult getHealthCheckResult(String caName)
