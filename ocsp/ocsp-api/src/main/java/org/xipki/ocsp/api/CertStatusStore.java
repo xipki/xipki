@@ -56,7 +56,7 @@ public abstract class CertStatusStore
     public abstract boolean canResolveIssuer(HashAlgoType hashAlgo, byte[] issuerNameHash, byte[] issuerKeyHash);
 
     public abstract CertStatusInfo getCertStatus(HashAlgoType hashAlgo, byte[] issuerNameHash,
-            byte[] issuerKeyHash, BigInteger serialNumber, Set<String> excludeCertProfiles)
+            byte[] issuerKeyHash, BigInteger serialNumber, Set<String> excludeCertprofiles)
     throws CertStatusStoreException;
 
     public abstract void init(String conf, DataSourceFactory datasourceFactory, PasswordResolver passwordResolver)

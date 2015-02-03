@@ -55,7 +55,7 @@ public class CALoadTestEnrollCommand extends ClientCommand
     @Option(name = "-profile",
             required = true,
             description = "Required. Certificate profile")
-    protected String certProfile;
+    protected String certprofile;
 
     @Option(name = "-subject",
             required = true,
@@ -119,7 +119,7 @@ public class CALoadTestEnrollCommand extends ClientCommand
         startMsg.append("Threads:         ").append(numThreads).append("\n");
         startMsg.append("Duration:        ").append(AbstractLoadTest.formatTime(durationInSecond).trim()).append("\n");
         startMsg.append("SubjectTemplate: ").append(subjectTemplate).append("\n");
-        startMsg.append("Profile:         ").append(certProfile).append("\n");
+        startMsg.append("Profile:         ").append(certprofile).append("\n");
         startMsg.append("KeyType:         ").append(keyType).append("\n");
         startMsg.append("#Certs/Request:  ").append(n).append("\n");
         startMsg.append("Unit:            ").append(n).append(" certificate");
@@ -160,7 +160,7 @@ public class CALoadTestEnrollCommand extends ClientCommand
             return null;
         }
 
-        LoadTestEntry loadtestEntry = new LoadTestEntry(certProfile, keyEntry, subjectTemplate, randomDN);
+        LoadTestEntry loadtestEntry = new LoadTestEntry(certprofile, keyEntry, subjectTemplate, randomDN);
         CALoadTestEnroll loadTest = new CALoadTestEnroll(raWorker, loadtestEntry, n);
 
         loadTest.setDuration(durationInSecond);

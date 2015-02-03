@@ -84,7 +84,7 @@ public interface CAManager
 
     Set<String> getCaAliasNames();
 
-    Set<String> getCertProfileNames();
+    Set<String> getCertprofileNames();
 
     Set<String> getPublisherNames();
 
@@ -108,10 +108,10 @@ public interface CAManager
             Integer numCrls, Integer expirationPeriod, ValidityMode validityMode)
     throws CAMgmtException;
 
-    void removeCertProfileFromCA(String profileName, String caName)
+    void removeCertprofileFromCA(String profileName, String caName)
     throws CAMgmtException;
 
-    void addCertProfileToCA(String profileName, String caName)
+    void addCertprofileToCA(String profileName, String caName)
     throws CAMgmtException;
 
     void removePublisherFromCA(String publisherName, String caName)
@@ -120,7 +120,7 @@ public interface CAManager
     void addPublisherToCA(String publisherName, String caName)
     throws CAMgmtException;
 
-    Set<String> getCertProfilesForCA(String caName);
+    Set<String> getCertprofilesForCA(String caName);
 
     Set<CAHasRequestorEntry> getCmpRequestorsForCA(String caName);
 
@@ -141,15 +141,15 @@ public interface CAManager
     void addCmpRequestorToCA(CAHasRequestorEntry requestor, String caName)
     throws CAMgmtException;
 
-    CertProfileEntry getCertProfile(String profileName);
+    CertprofileEntry getCertprofile(String profileName);
 
-    void removeCertProfile(String profileName)
+    void removeCertprofile(String profileName)
     throws CAMgmtException;
 
-    void changeCertProfile(String name, String type, String conf)
+    void changeCertprofile(String name, String type, String conf)
     throws CAMgmtException;
 
-    void addCertProfile(CertProfileEntry dbEntry)
+    void addCertprofile(CertprofileEntry dbEntry)
     throws CAMgmtException;
 
     void setCmpResponder(CmpResponderEntry dbEntry)

@@ -56,7 +56,7 @@ import org.bouncycastle.math.ec.ECCurve;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.ca.api.BadCertTemplateException;
-import org.xipki.ca.api.CertProfileException;
+import org.xipki.ca.api.CertprofileException;
 import org.xipki.ca.api.EnvironmentParameterResolver;
 import org.xipki.ca.api.profile.DirectoryStringType;
 import org.xipki.ca.api.profile.ExtensionControl;
@@ -78,10 +78,10 @@ import org.xipki.common.StringUtil;
  * @author Lijun Liao
  */
 
-public abstract class BaseX509CertProfile
-extends X509CertProfile
+public abstract class BaseX509Certprofile
+extends X509Certprofile
 {
-    private static final Logger LOG = LoggerFactory.getLogger(BaseX509CertProfile.class);
+    private static final Logger LOG = LoggerFactory.getLogger(BaseX509Certprofile.class);
     private static Set<String> countryCodes;
     private static LruCache<ASN1ObjectIdentifier, Integer> ecCurveFieldSizes = new LruCache<>(100);
 
@@ -133,7 +133,7 @@ extends X509CertProfile
         }
     }
 
-    protected BaseX509CertProfile()
+    protected BaseX509Certprofile()
     {
     }
 
@@ -168,7 +168,7 @@ extends X509CertProfile
 
     @Override
     public SubjectInfo getSubject(X500Name requestedSubject)
-    throws CertProfileException, BadCertTemplateException
+    throws CertprofileException, BadCertTemplateException
     {
         verifySubjectDNOccurence(requestedSubject);
         checkSubjectContent(requestedSubject);
@@ -260,7 +260,7 @@ extends X509CertProfile
 
     protected static void checkAndAddExtension(ASN1ObjectIdentifier type, ExtensionControl occurence,
             ExtensionValue value, ExtensionValues tuples)
-    throws CertProfileException
+    throws CertprofileException
     {
         if(value != null)
         {
@@ -268,7 +268,7 @@ extends X509CertProfile
         }
         else if(occurence.isRequired())
         {
-            throw new CertProfileException("Could not add required extension " + type.getId());
+            throw new CertprofileException("Could not add required extension " + type.getId());
         }
     }
 
@@ -409,7 +409,7 @@ extends X509CertProfile
 
     @Override
     public void initialize(String data)
-    throws CertProfileException
+    throws CertprofileException
     {
     }
 

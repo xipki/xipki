@@ -34,9 +34,9 @@
       <caCert>
         <autoconf/>
       </caCert>
-      <certProfiles>
+      <certprofiles>
         <autoconf/>
-      </certProfiles>
+      </certprofiles>
     </CA>
     <CA enabled="true">
       <name>SubCA1</name>
@@ -46,9 +46,9 @@
       <caCert>
         <autoconf/>
       </caCert>
-      <certProfiles>
+      <certprofiles>
         <autoconf/>
-      </certProfiles>
+      </certprofiles>
     </CA>
     <CA enabled="true">
       <name>SubCAwithCRL1</name>
@@ -58,9 +58,9 @@
       <caCert>
         <autoconf/>
       </caCert>
-      <certProfiles>
+      <certprofiles>
         <autoconf/>
-      </certProfiles>
+      </certprofiles>
     </CA>
   </CAs>
 </CAClient>

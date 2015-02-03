@@ -178,7 +178,7 @@ public class OcspResponder
     private boolean supportsHttpGet = false;
     private Long cacheMaxAge;
     private final Map<String, String> auditCertprofileMapping = new ConcurrentHashMap<>();
-    private Set<String> excludeCertProfiles;
+    private Set<String> excludeCertprofiles;
 
     private AuditLoggingServiceRegister auditServiceRegister;
     private CertPathBuilder certpathBuilder;
@@ -345,16 +345,16 @@ public class OcspResponder
             }
         }
 
-        if(conf.getExcludeCertProfiles() != null)
+        if(conf.getExcludeCertprofiles() != null)
         {
-            List<String> list = conf.getExcludeCertProfiles().getCertProfile();
+            List<String> list = conf.getExcludeCertprofiles().getCertprofile();
             if(list.isEmpty())
             {
-                excludeCertProfiles = null;
+                excludeCertprofiles = null;
             }
             else
             {
-                excludeCertProfiles = new HashSet<>(list);
+                excludeCertprofiles = new HashSet<>(list);
             }
         }
 
@@ -852,7 +852,7 @@ public class OcspResponder
                     {
                         certStatusInfo = store.getCertStatus(
                                 reqHashAlgo, certID.getIssuerNameHash(), certID.getIssuerKeyHash(),
-                                certID.getSerialNumber(), excludeCertProfiles);
+                                certID.getSerialNumber(), excludeCertprofiles);
                         if(certStatusInfo.getCertStatus() != CertStatus.ISSUER_UNKNOWN)
                         {
                             break;
@@ -888,14 +888,14 @@ public class OcspResponder
 
                 if(childAuditEvent != null)
                 {
-                    String certProfile = certStatusInfo.getCertProfile();
+                    String certprofile = certStatusInfo.getCertprofile();
                     String auditCertType;
-                    if(certProfile != null)
+                    if(certprofile != null)
                     {
-                        auditCertType = auditCertprofileMapping.get(certProfile);
+                        auditCertType = auditCertprofileMapping.get(certprofile);
                         if(auditCertType == null)
                         {
-                            auditCertType = certProfile;
+                            auditCertType = certprofile;
                         }
                     }
                     else

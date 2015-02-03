@@ -735,7 +735,7 @@ public class CrlCertStatusStore extends CertStatusStore
     @Override
     public CertStatusInfo getCertStatus(
             HashAlgoType hashAlgo, byte[] issuerNameHash, byte[] issuerKeyHash,
-            BigInteger serialNumber, Set<String> excludeCertProfiles)
+            BigInteger serialNumber, Set<String> excludeCertprofiles)
     throws CertStatusStoreException
     {
         // wait for max. 0.5 second
@@ -801,8 +801,8 @@ public class CrlCertStatusStore extends CertStatusStore
         // SerialNumber is unknown
         if(crlCertStatusInfo != null)
         {
-            String profile = crlCertStatusInfo.getCertProfile();
-            if(profile == null || excludeCertProfiles == null || excludeCertProfiles.contains(profile) == false)
+            String profile = crlCertStatusInfo.getCertprofile();
+            if(profile == null || excludeCertprofiles == null || excludeCertprofiles.contains(profile) == false)
             {
                 certStatusInfo = crlCertStatusInfo.getCertStatusInfo(certHashAlgo, thisUpdate, nextUpdate);
             }

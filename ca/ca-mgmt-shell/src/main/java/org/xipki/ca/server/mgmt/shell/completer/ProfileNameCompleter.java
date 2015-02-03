@@ -47,7 +47,7 @@ public class ProfileNameCompleter extends MgmtNameCompleter
     @Override
     protected Set<String> getEnums()
     {
-        return caManager.getCertProfileNames();
+        return caManager.getCertprofileNames();
     }
 
 }

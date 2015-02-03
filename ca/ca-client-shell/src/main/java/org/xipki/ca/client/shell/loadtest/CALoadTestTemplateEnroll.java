@@ -90,11 +90,11 @@ public class CALoadTestTemplateEnroll extends AbstractLoadTest
 {
     private final static class CertRequestWithProfile
     {
-        private final String certProfile;
+        private final String certprofile;
         private final CertRequest certRequest;
-        public CertRequestWithProfile(String certProfile, CertRequest certRequest)
+        public CertRequestWithProfile(String certprofile, CertRequest certRequest)
         {
-            this.certProfile = certProfile;
+            this.certprofile = certprofile;
             this.certRequest = certRequest;
         }
     }
@@ -130,7 +130,7 @@ public class CALoadTestTemplateEnroll extends AbstractLoadTest
                 {
                     CertRequestWithProfile certRequest = certRequests.get(certId);
                     EnrollCertRequestEntryType requestEntry = new EnrollCertRequestEntryType
-                            ("id-" + certId, certRequest.certProfile, certRequest.certRequest, RA_VERIFIED);
+                            ("id-" + certId, certRequest.certprofile, certRequest.certRequest, RA_VERIFIED);
 
                     request.addRequestEntry(requestEntry);
                 }
@@ -232,7 +232,7 @@ public class CALoadTestTemplateEnroll extends AbstractLoadTest
                 throw new ConfigurationException("Invalid randomDN " + randomDNStr);
             }
 
-            LoadTestEntry loadtestEntry = new LoadTestEntry(entry.getCertProfile(),
+            LoadTestEntry loadtestEntry = new LoadTestEntry(entry.getCertprofile(),
                     keyEntry, entry.getSubject(), randomDN);
             loadtestEntries.add(loadtestEntry);
         }
@@ -273,9 +273,9 @@ public class CALoadTestTemplateEnroll extends AbstractLoadTest
 
             CertTemplate certTemplate = certTempBuilder.build();
             CertRequest certRequest = new CertRequest(certId, certTemplate, null);
-            CertRequestWithProfile requestWithCertProfile = new CertRequestWithProfile(
-                    loadtestEntry.getCertProfile(), certRequest);
-            certRequests.put(certId, requestWithCertProfile);
+            CertRequestWithProfile requestWithCertprofile = new CertRequestWithProfile(
+                    loadtestEntry.getCertprofile(), certRequest);
+            certRequests.put(certId, requestWithCertprofile);
         }
         return certRequests;
     }

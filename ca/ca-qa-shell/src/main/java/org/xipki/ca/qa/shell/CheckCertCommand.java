@@ -47,7 +47,7 @@ import org.bouncycastle.asn1.x509.Extensions;
 import org.xipki.ca.api.EnvironmentParameterResolver;
 import org.xipki.ca.qa.ValidationIssue;
 import org.xipki.ca.qa.ValidationResult;
-import org.xipki.ca.qa.X509CertProfileQA;
+import org.xipki.ca.qa.X509CertprofileQA;
 import org.xipki.ca.qa.X509IssuerInfo;
 import org.xipki.common.IoUtil;
 import org.xipki.console.karaf.XipkiOsgiCommandSupport;
@@ -129,7 +129,7 @@ public class CheckCertCommand extends XipkiOsgiCommandSupport
 
         X509IssuerInfo issuerInfo = qaSystemManager.getIssuer(issuerName);
 
-        X509CertProfileQA qa = qaSystemManager.getCertprofile(profileName);
+        X509CertprofileQA qa = qaSystemManager.getCertprofile(profileName);
         if(qa == null)
         {
             err("Found no certificate profile named '" + profileName + "'");

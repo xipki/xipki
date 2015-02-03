@@ -43,7 +43,7 @@ import java.util.Set;
 import org.apache.karaf.shell.commands.Argument;
 import org.apache.karaf.shell.commands.Command;
 import org.apache.karaf.shell.commands.Option;
-import org.xipki.ca.server.mgmt.api.CertProfileEntry;
+import org.xipki.ca.server.mgmt.api.CertprofileEntry;
 
 /**
  * @author Lijun Liao
@@ -67,7 +67,7 @@ public class ProfileInfoCommand extends CaCommand
 
         if(name == null)
         {
-            Set<String> names = caManager.getCertProfileNames();
+            Set<String> names = caManager.getCertprofileNames();
             int n = names.size();
 
             if(n == 0 || n == 1)
@@ -89,7 +89,7 @@ public class ProfileInfoCommand extends CaCommand
         }
         else
         {
-            CertProfileEntry entry = caManager.getCertProfile(name);
+            CertprofileEntry entry = caManager.getCertprofile(name);
             if(entry != null)
             {
                 sb.append(entry.toString(verbose));

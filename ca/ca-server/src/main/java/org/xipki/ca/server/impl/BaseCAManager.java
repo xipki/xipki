@@ -54,7 +54,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.bouncycastle.util.encoders.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.ca.api.CertProfileException;
+import org.xipki.ca.api.CertprofileException;
 import org.xipki.ca.api.CertPublisherException;
 import org.xipki.ca.api.EnvironmentParameterResolver;
 import org.xipki.ca.api.OperationException;
@@ -67,7 +67,7 @@ import org.xipki.ca.server.mgmt.api.CAMgmtException;
 import org.xipki.ca.server.mgmt.api.CAStatus;
 import org.xipki.ca.server.mgmt.api.CRLControl;
 import org.xipki.ca.server.mgmt.api.CertArt;
-import org.xipki.ca.server.mgmt.api.CertProfileEntry;
+import org.xipki.ca.server.mgmt.api.CertprofileEntry;
 import org.xipki.ca.server.mgmt.api.CmpControl;
 import org.xipki.ca.server.mgmt.api.CmpRequestorEntry;
 import org.xipki.ca.server.mgmt.api.CmpResponderEntry;
@@ -308,7 +308,7 @@ public abstract class BaseCAManager
         return index.getAndIncrement();
     }
 
-    protected void shutdownCertProfile(IdentifiedX509CertProfile profile)
+    protected void shutdownCertprofile(IdentifiedX509Certprofile profile)
     {
         if(profile == null)
         {
@@ -320,7 +320,7 @@ public abstract class BaseCAManager
             profile.shutdown();
         } catch(Exception e)
         {
-            final String message = "could not shutdown CertProfile " + profile.getName();
+            final String message = "could not shutdown Certprofile " + profile.getName();
             if(LOG.isWarnEnabled())
             {
                 LOG.warn(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(), e.getMessage());
@@ -350,7 +350,7 @@ public abstract class BaseCAManager
         }
     }
 
-    protected IdentifiedX509CertProfile createCertProfile(String name, EnvironmentParameterResolver envParameterResolver)
+    protected IdentifiedX509Certprofile createCertprofile(String name, EnvironmentParameterResolver envParameterResolver)
     throws CAMgmtException
     {
         PreparedStatement stmt = null;
@@ -369,15 +369,15 @@ public abstract class BaseCAManager
 
                 try
                 {
-                    CertProfileEntry rawEntry = new CertProfileEntry(name, type, conf);
+                    CertprofileEntry rawEntry = new CertprofileEntry(name, type, conf);
                     String realType = getRealCertprofileType(type);
-                    IdentifiedX509CertProfile ret = new IdentifiedX509CertProfile(rawEntry, realType);
+                    IdentifiedX509Certprofile ret = new IdentifiedX509Certprofile(rawEntry, realType);
                     ret.setEnvironmentParameterResolver(envParameterResolver);
                     ret.validate();
                     return ret;
-                }catch(CertProfileException e)
+                }catch(CertprofileException e)
                 {
-                    final String message = "could not initialize CertProfile " + name + ", ignore it";
+                    final String message = "could not initialize Certprofile " + name + ", ignore it";
                     if(LOG.isErrorEnabled())
                     {
                         LOG.error(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(), e.getMessage());
@@ -863,7 +863,7 @@ public abstract class BaseCAManager
         }
     }
 
-    protected Set<String> createCAhasCertProfiles(String caName)
+    protected Set<String> createCAhasCertprofiles(String caName)
     throws CAMgmtException
     {
         return createCAhasNames(caName, "CERTPROFILE_NAME", "CA_HAS_CERTPROFILE");

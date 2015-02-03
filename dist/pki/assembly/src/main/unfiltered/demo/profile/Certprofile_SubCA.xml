@@ -3,12 +3,12 @@
   <appInfo>
     <my:myDescription xmlns:my="http://example.org">
       <my:category>cat A</my:category>
-      <my:details>CertProfile OCSP</my:details>
+      <my:details>Certprofile SubCA</my:details>
     </my:myDescription>
   </appInfo>
   <version>3</version>
-  <ca>false</ca>
-  <validity>5y</validity>
+  <ca>true</ca>
+  <validity>8y</validity>
   <notBeforeTime>current</notBeforeTime>
   <duplicateKey>false</duplicateKey>
   <duplicateSubject>false</duplicateSubject>
@@ -74,21 +74,18 @@
   <extensions>
     <extension critical="false" required="true" permittedInRequest="false" description="subjectKeyIdentifier">2.5.29.14</extension>
     <extension critical="false" required="true" permittedInRequest="false" description="authorityKeyIdentifier">2.5.29.35</extension>
-    <extension critical="false" required="false" permittedInRequest="false" description="authorityInfoAccess">1.3.6.1.5.5.7.1.1</extension>
+    <extension critical="false" required="true" permittedInRequest="false" description="authorityInfoAccess">1.3.6.1.5.5.7.1.1</extension>
     <extension critical="false" required="false" permittedInRequest="false" description="cRLDistributionPoints">2.5.29.31</extension>
     <extension critical="false" required="false" permittedInRequest="false" description="freshestCRL">2.5.29.46</extension>
     <extension critical="true" required="true" permittedInRequest="true" description="keyUsage">2.5.29.15</extension>
     <extension critical="true" required="true" permittedInRequest="false" description="basicConstraints">2.5.29.19</extension>
-    <extension critical="false" required="true" permittedInRequest="true" description="extendedKeyUsage">2.5.29.37</extension>
-    <extension critical="false" required="false" permittedInRequest="false" description="id-pkix-ocsp-nocheck">1.3.6.1.5.5.7.48.1.5</extension>
+    <pathLen>1</pathLen>
     <authorityKeyIdentifier>
       <includeIssuerAndSerial>false</includeIssuerAndSerial>
     </authorityKeyIdentifier>
     <keyUsage>
-      <usage required="true">contentCommitment</usage>
+      <usage required="true">keyCertSign</usage>
+      <usage required="false">cRLSign</usage>
     </keyUsage>
-    <extendedKeyUsage>
-      <usage required="true" description="id-kp-OCSPSigning">1.3.6.1.5.5.7.3.9</usage>
-    </extendedKeyUsage>
   </extensions>
 </X509Profile>

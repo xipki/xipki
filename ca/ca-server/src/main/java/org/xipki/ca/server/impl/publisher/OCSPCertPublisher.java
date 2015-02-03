@@ -165,12 +165,12 @@ public class OCSPCertPublisher extends X509CertPublisher
     @Override
     public boolean certificateRevoked(X509CertWithId caCert,
             X509CertWithId cert,
-            String certProfile,
+            String certprofile,
             CertRevocationInfo revInfo)
     {
         try
         {
-            queryExecutor.revokeCert(caCert, cert, certProfile, revInfo);
+            queryExecutor.revokeCert(caCert, cert, certprofile, revInfo);
             return true;
         } catch (Exception e)
         {

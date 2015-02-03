@@ -57,7 +57,7 @@ import org.bouncycastle.asn1.x509.PolicyInformation;
 import org.bouncycastle.asn1.x509.PolicyQualifierInfo;
 import org.bouncycastle.asn1.x509.UserNotice;
 import org.bouncycastle.asn1.x509.X509ObjectIdentifiers;
-import org.xipki.ca.api.CertProfileException;
+import org.xipki.ca.api.CertprofileException;
 
 /**
  * @author Lijun Liao
@@ -107,7 +107,7 @@ public class X509Util
 
     public static CRLDistPoint createCRLDistributionPoints(List<String> crlUris,
             X500Name caSubject, X500Name crlSignerSubject)
-    throws IOException, CertProfileException
+    throws IOException, CertprofileException
     {
         if(crlUris == null || crlUris.isEmpty())
         {
@@ -139,7 +139,7 @@ public class X509Util
     }
 
     public static CertificatePolicies createCertificatePolicies(List<CertificatePolicyInformation> policyInfos)
-    throws CertProfileException
+    throws CertprofileException
     {
         if(policyInfos == null || policyInfos.isEmpty())
         {

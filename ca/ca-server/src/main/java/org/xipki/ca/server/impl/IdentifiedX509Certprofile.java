@@ -74,7 +74,7 @@ import org.bouncycastle.asn1.x509.SubjectKeyIdentifier;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.xipki.ca.api.BadCertTemplateException;
 import org.xipki.ca.api.BadFormatException;
-import org.xipki.ca.api.CertProfileException;
+import org.xipki.ca.api.CertprofileException;
 import org.xipki.ca.api.EnvironmentParameterResolver;
 import org.xipki.ca.api.profile.CertValidity;
 import org.xipki.ca.api.profile.ExtensionControl;
@@ -84,12 +84,12 @@ import org.xipki.ca.api.profile.GeneralNameMode;
 import org.xipki.ca.api.profile.SubjectInfo;
 import org.xipki.ca.api.profile.x509.ExtKeyUsageControl;
 import org.xipki.ca.api.profile.x509.KeyUsageControl;
-import org.xipki.ca.api.profile.x509.SpecialX509CertProfileBehavior;
-import org.xipki.ca.api.profile.x509.X509CertProfile;
+import org.xipki.ca.api.profile.x509.SpecialX509CertprofileBehavior;
+import org.xipki.ca.api.profile.x509.X509Certprofile;
 import org.xipki.ca.api.profile.x509.X509CertVersion;
 import org.xipki.ca.api.profile.x509.X509Util;
-import org.xipki.ca.certprofile.XmlX509CertProfile;
-import org.xipki.ca.server.mgmt.api.CertProfileEntry;
+import org.xipki.ca.certprofile.XmlX509Certprofile;
+import org.xipki.ca.server.mgmt.api.CertprofileEntry;
 import org.xipki.common.CustomObjectIdentifiers;
 import org.xipki.common.KeyUsage;
 import org.xipki.common.ObjectIdentifiers;
@@ -101,7 +101,7 @@ import org.xipki.security.api.ExtensionExistence;
  * @author Lijun Liao
  */
 
-class IdentifiedX509CertProfile
+class IdentifiedX509Certprofile
 {
     private static final Set<ASN1ObjectIdentifier> criticalOnlyExtensionTypes;
     private static final Set<ASN1ObjectIdentifier> noncriticalOnlyExtensionTypes;
@@ -142,22 +142,22 @@ class IdentifiedX509CertProfile
         noneRequestExtensionTypes.add(Extension.basicConstraints);
     }
 
-    private final CertProfileEntry entry;
-    private final X509CertProfile certProfile;
+    private final CertprofileEntry entry;
+    private final X509Certprofile certprofile;
     private EnvironmentParameterResolver parameterResolver;
 
-    public IdentifiedX509CertProfile(CertProfileEntry entry, String realType)
-    throws CertProfileException
+    public IdentifiedX509Certprofile(CertprofileEntry entry, String realType)
+    throws CertprofileException
     {
         ParamChecker.assertNotNull("entry", entry);
         this.entry = entry;
-        X509CertProfile tmpCertProfile = null;
+        X509Certprofile tmpCertprofile = null;
 
         final String type = realType == null ?  entry.getType() : realType;
         String className;
         if(type.equalsIgnoreCase("xml"))
         {
-            tmpCertProfile = new XmlX509CertProfile();
+            tmpCertprofile = new XmlX509Certprofile();
         }
         else if(type.toLowerCase().startsWith("java:"))
         {
@@ -165,32 +165,32 @@ class IdentifiedX509CertProfile
             try
             {
                 Class<?> clazz = Class.forName(className);
-                tmpCertProfile = (X509CertProfile) clazz.newInstance();
+                tmpCertprofile = (X509Certprofile) clazz.newInstance();
             }catch(ClassNotFoundException | InstantiationException  | IllegalAccessException | ClassCastException e)
             {
-                throw new CertProfileException("invalid type " + type + ", " + e.getClass().getName() +
+                throw new CertprofileException("invalid type " + type + ", " + e.getClass().getName() +
                         ": " + e.getMessage());
             }
         }
         else
         {
-            throw new CertProfileException("invalid type " + type);
+            throw new CertprofileException("invalid type " + type);
         }
 
-        tmpCertProfile.initialize(entry.getConf());
+        tmpCertprofile.initialize(entry.getConf());
 
         if(parameterResolver != null)
         {
-            tmpCertProfile.setEnvironmentParameterResolver(parameterResolver);
+            tmpCertprofile.setEnvironmentParameterResolver(parameterResolver);
         }
 
-        if(tmpCertProfile.getSpecialCertProfileBehavior() == SpecialX509CertProfileBehavior.gematik_gSMC_K)
+        if(tmpCertprofile.getSpecialCertprofileBehavior() == SpecialX509CertprofileBehavior.gematik_gSMC_K)
         {
-            String paramName = SpecialX509CertProfileBehavior.PARAMETER_MAXLIFTIME;
-            String s = tmpCertProfile.getParameter(paramName);
+            String paramName = SpecialX509CertprofileBehavior.PARAMETER_MAXLIFTIME;
+            String s = tmpCertprofile.getParameter(paramName);
             if(s == null)
             {
-                throw new CertProfileException("parameter " + paramName + " is not defined");
+                throw new CertprofileException("parameter " + paramName + " is not defined");
             }
 
             s = s.trim();
@@ -200,15 +200,15 @@ class IdentifiedX509CertProfile
                 i = Integer.parseInt(s);
             }catch(NumberFormatException e)
             {
-                throw new CertProfileException("invalid " + paramName + ": " + s);
+                throw new CertprofileException("invalid " + paramName + ": " + s);
             }
             if(i < 1)
             {
-                throw new CertProfileException("invalid " + paramName + ": " + s);
+                throw new CertprofileException("invalid " + paramName + ": " + s);
             }
         }
 
-        this.certProfile = tmpCertProfile;
+        this.certprofile = tmpCertprofile;
     }
 
     public String getName()
@@ -216,70 +216,70 @@ class IdentifiedX509CertProfile
         return entry.getName();
     }
 
-    public CertProfileEntry getEntry()
+    public CertprofileEntry getEntry()
     {
         return entry;
     }
 
     public X509CertVersion getVersion()
     {
-        return certProfile.getVersion();
+        return certprofile.getVersion();
     }
 
     public Set<ASN1ObjectIdentifier> getSignatureAlgorithms()
     {
-        return certProfile.getSignatureAlgorithms();
+        return certprofile.getSignatureAlgorithms();
     }
 
-    public SpecialX509CertProfileBehavior getSpecialCertProfileBehavior()
+    public SpecialX509CertprofileBehavior getSpecialCertprofileBehavior()
     {
-        return certProfile.getSpecialCertProfileBehavior();
+        return certprofile.getSpecialCertprofileBehavior();
     }
 
     public void setEnvironmentParameterResolver(EnvironmentParameterResolver parameterResolver)
     {
         this.parameterResolver = parameterResolver;
-        if(certProfile != null)
+        if(certprofile != null)
         {
-            certProfile.setEnvironmentParameterResolver(parameterResolver);
+            certprofile.setEnvironmentParameterResolver(parameterResolver);
         }
     }
 
     public Date getNotBefore(Date notBefore)
     {
-        return certProfile.getNotBefore(notBefore);
+        return certprofile.getNotBefore(notBefore);
     }
 
     public CertValidity getValidity()
     {
-        return certProfile.getValidity();
+        return certprofile.getValidity();
     }
 
     public boolean hasMidnightNotBefore()
     {
-        return certProfile.hasMidnightNotBefore();
+        return certprofile.hasMidnightNotBefore();
     }
 
     public TimeZone getTimezone()
     {
-        return certProfile.getTimezone();
+        return certprofile.getTimezone();
     }
 
     public SubjectInfo getSubject(X500Name requestedSubject)
-    throws CertProfileException, BadCertTemplateException
+    throws CertprofileException, BadCertTemplateException
     {
-        return certProfile.getSubject(requestedSubject);
+        return certprofile.getSubject(requestedSubject);
     }
 
     public ExtensionValues getExtensions(
             X500Name requestedSubject, Extensions requestExtensions,
             SubjectPublicKeyInfo publicKeyInfo,
             PublicCAInfo publicCaInfo, X509Certificate crlSignerCert)
-    throws CertProfileException, BadCertTemplateException
+    throws CertprofileException, BadCertTemplateException
     {
         ExtensionValues tuples = new ExtensionValues();
 
-        Map<ASN1ObjectIdentifier, ExtensionControl> controls = new HashMap<>(certProfile.getExtensionControls());
+        Map<ASN1ObjectIdentifier, ExtensionControl> controls = new HashMap<>(certprofile.getExtensionControls());
 
         Set<ASN1ObjectIdentifier> neededExtensionTypes = new HashSet<>();
         Set<ASN1ObjectIdentifier> wantedExtensionTypes = new HashSet<>();
@@ -321,7 +321,7 @@ class IdentifiedX509CertProfile
                     sha1 = MessageDigest.getInstance("SHA-1");
                 } catch (NoSuchAlgorithmException e)
                 {
-                    throw new CertProfileException(e.getMessage(), e);
+                    throw new CertprofileException(e.getMessage(), e);
                 }
                 byte[] skiValue = sha1.digest(publicKeyInfo.getPublicKeyData().getBytes());
 
@@ -343,7 +343,7 @@ class IdentifiedX509CertProfile
                 AuthorityKeyIdentifier value = null;
                 if(ikiValue != null)
                 {
-                    if(certProfile.includeIssuerAndSerialInAKI())
+                    if(certprofile.includeIssuerAndSerialInAKI())
                     {
                         GeneralNames x509CaSubject = new GeneralNames(new GeneralName(publicCaInfo.getX500Subject()));
                         value = new AuthorityKeyIdentifier(ikiValue, x509CaSubject, publicCaInfo.getSerialNumber());
@@ -412,7 +412,7 @@ class IdentifiedX509CertProfile
                                 x500CaPrincipal, crlSignerSubject);
                     } catch (IOException e)
                     {
-                        throw new CertProfileException(e.getMessage(), e);
+                        throw new CertprofileException(e.getMessage(), e);
                     }
                     addExtension(tuples, extType, value, extControl,
                             neededExtensionTypes, wantedExtensionTypes);
@@ -434,7 +434,7 @@ class IdentifiedX509CertProfile
                                 x500CaPrincipal, crlSignerSubject);
                     } catch (IOException e)
                     {
-                        throw new CertProfileException(e.getMessage(), e);
+                        throw new CertprofileException(e.getMessage(), e);
                     }
                     addExtension(tuples, extType, value, extControl,
                             neededExtensionTypes, wantedExtensionTypes);
@@ -450,8 +450,8 @@ class IdentifiedX509CertProfile
             boolean addMe = addMe(extType, extControl, neededExtensionTypes, wantedExtensionTypes);
             if(addMe)
             {
-                BasicConstraints value = X509Util.createBasicConstraints(certProfile.isCA(),
-                        certProfile.getPathLenBasicConstraint());
+                BasicConstraints value = X509Util.createBasicConstraints(certprofile.isCA(),
+                        certprofile.getPathLenBasicConstraint());
                 addExtension(tuples, extType, value, extControl,
                         neededExtensionTypes, wantedExtensionTypes);
             }
@@ -466,7 +466,7 @@ class IdentifiedX509CertProfile
             if(addMe)
             {
                 Set<KeyUsage> usages = new HashSet<>();
-                Set<KeyUsageControl> usageOccs = certProfile.getKeyUsage();
+                Set<KeyUsageControl> usageOccs = certprofile.getKeyUsage();
                 for(KeyUsageControl k : usageOccs)
                 {
                     if(k.isRequired())
@@ -513,7 +513,7 @@ class IdentifiedX509CertProfile
             if(addMe)
             {
                 Set<ASN1ObjectIdentifier> usages = new HashSet<>();
-                Set<ExtKeyUsageControl> usageOccs = certProfile.getExtendedKeyUsages();
+                Set<ExtKeyUsageControl> usageOccs = certprofile.getExtendedKeyUsages();
                 for(ExtKeyUsageControl k : usageOccs)
                 {
                     if(k.isRequired())
@@ -587,7 +587,7 @@ class IdentifiedX509CertProfile
                     {
                         GeneralNames reqNames = GeneralNames.getInstance(extValue);
 
-                        Set<GeneralNameMode> modes = certProfile.getSubjectAltNameModes();
+                        Set<GeneralNameMode> modes = certprofile.getSubjectAltNameModes();
                         if(modes != null)
                         {
                             GeneralName[] reqL = reqNames.getNames();
@@ -627,7 +627,7 @@ class IdentifiedX509CertProfile
                         ASN1Sequence reqSeq = ASN1Sequence.getInstance(extValue);
                         int size = reqSeq.size();
 
-                        Map<ASN1ObjectIdentifier, Set<GeneralNameMode>> modes = certProfile.getSubjectInfoAccessModes();
+                        Map<ASN1ObjectIdentifier, Set<GeneralNameMode>> modes = certprofile.getSubjectInfoAccessModes();
                         if(modes == null)
                         {
                             value = reqSeq;
@@ -640,7 +640,7 @@ class IdentifiedX509CertProfile
                                 ASN1ObjectIdentifier accessMethod = ad.getAccessMethod();
                                 if(accessMethod == null)
                                 {
-                                    accessMethod = X509CertProfile.OID_ZERO;
+                                    accessMethod = X509Certprofile.OID_ZERO;
                                 }
                                 Set<GeneralNameMode> generalNameModes = modes.get(accessMethod);
 
@@ -666,7 +666,7 @@ class IdentifiedX509CertProfile
             }
         }
 
-        ExtensionValues subtuples = certProfile.getExtensions(
+        ExtensionValues subtuples = certprofile.getExtensions(
                 Collections.unmodifiableMap(controls), requestedSubject, requestExtensions);
 
         Set<ASN1ObjectIdentifier> extTypes = new HashSet<>(controls.keySet());
@@ -707,7 +707,7 @@ class IdentifiedX509CertProfile
 
         if(unprocessedExtTypes.isEmpty() == false)
         {
-            throw new CertProfileException("Could not add required extensions " + toString(unprocessedExtTypes));
+            throw new CertprofileException("Could not add required extensions " + toString(unprocessedExtTypes));
         }
 
         if(neededExtensionTypes.isEmpty() == false)
@@ -721,7 +721,7 @@ class IdentifiedX509CertProfile
     private static void addExtension(ExtensionValues tuples, ASN1ObjectIdentifier extType,
             ExtensionValue extValue, ExtensionControl extControl,
             Set<ASN1ObjectIdentifier> neededExtensionTypes, Set<ASN1ObjectIdentifier> wantedExtensionTypes)
-    throws CertProfileException
+    throws CertprofileException
     {
         if(extValue == null)
         {
@@ -732,7 +732,7 @@ class IdentifiedX509CertProfile
                 {
                     description = extType.getId();
                 }
-                throw new CertProfileException("Could not add required extension " + description);
+                throw new CertprofileException("Could not add required extension " + description);
             }
         } else
         {
@@ -745,7 +745,7 @@ class IdentifiedX509CertProfile
     private static void addExtension(ExtensionValues tuples, ASN1ObjectIdentifier extType,
             ASN1Encodable extValue, ExtensionControl extControl,
             Set<ASN1ObjectIdentifier> neededExtensionTypes, Set<ASN1ObjectIdentifier> wantedExtensionTypes)
-    throws CertProfileException
+    throws CertprofileException
     {
         if(extValue == null)
         {
@@ -756,7 +756,7 @@ class IdentifiedX509CertProfile
                 {
                     description = extType.getId();
                 }
-                throw new CertProfileException("Could not add required extension " + description);
+                throw new CertprofileException("Could not add required extension " + description);
             }
         } else
         {
@@ -768,91 +768,91 @@ class IdentifiedX509CertProfile
 
     public boolean isCA()
     {
-        return certProfile.isCA();
+        return certprofile.isCA();
     }
 
     public boolean isOnlyForRA()
     {
-        return certProfile.isOnlyForRA();
+        return certprofile.isOnlyForRA();
     }
 
     public boolean isOnlyForQA()
     {
-        return certProfile.isOnlyForQA();
+        return certprofile.isOnlyForQA();
     }
 
     public SubjectPublicKeyInfo checkPublicKey(SubjectPublicKeyInfo publicKey)
     throws BadCertTemplateException
     {
-        return certProfile.checkPublicKey(publicKey);
+        return certprofile.checkPublicKey(publicKey);
     }
 
     public boolean incSerialNumberIfSubjectExists()
     {
-        return certProfile.incSerialNumberIfSubjectExists();
+        return certprofile.incSerialNumberIfSubjectExists();
     }
 
     public void shutdown()
     {
-        if(certProfile != null)
+        if(certprofile != null)
         {
-            certProfile.shutdown();
+            certprofile.shutdown();
         }
     }
 
     public boolean includeIssuerAndSerialInAKI()
     {
-        return certProfile.includeIssuerAndSerialInAKI();
+        return certprofile.includeIssuerAndSerialInAKI();
     }
 
     public String incSerialNumber(String currentSerialNumber)
     throws BadFormatException
     {
-        return certProfile.incSerialNumber(currentSerialNumber);
+        return certprofile.incSerialNumber(currentSerialNumber);
     }
 
     public boolean isDuplicateKeyPermitted()
     {
-        return certProfile.isDuplicateKeyPermitted();
+        return certprofile.isDuplicateKeyPermitted();
     }
 
     public boolean isDuplicateSubjectPermitted()
     {
-        return certProfile.isDuplicateSubjectPermitted();
+        return certprofile.isDuplicateSubjectPermitted();
     }
 
     public boolean isSerialNumberInReqPermitted()
     {
-        return certProfile.isSerialNumberInReqPermitted();
+        return certprofile.isSerialNumberInReqPermitted();
     }
 
     public  String getParameter(String paramName)
     {
-        return certProfile.getParameter(paramName);
+        return certprofile.getParameter(paramName);
     }
 
     public Map<ASN1ObjectIdentifier, ExtensionControl> getExtensionControls()
     {
-        return certProfile.getExtensionControls();
+        return certprofile.getExtensionControls();
     }
 
     public Set<KeyUsageControl> getKeyUsage()
     {
-        return certProfile.getKeyUsage();
+        return certprofile.getKeyUsage();
     }
 
     public Integer getPathLenBasicConstraint()
     {
-        return certProfile.getPathLenBasicConstraint();
+        return certprofile.getPathLenBasicConstraint();
     }
 
     public Set<ExtKeyUsageControl> getExtendedKeyUsages()
     {
-        return certProfile.getExtendedKeyUsages();
+        return certprofile.getExtendedKeyUsages();
     }
 
     public void validate()
-    throws CertProfileException
+    throws CertprofileException
     {
         if(isOnlyForQA())
         {
@@ -999,7 +999,7 @@ class IdentifiedX509CertProfile
         if(len > 2)
         {
             msg.delete(len - 2, len);
-            throw new CertProfileException(msg.toString());
+            throw new CertprofileException(msg.toString());
         }
     }
 

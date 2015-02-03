@@ -46,7 +46,7 @@ public class X509CertWithRevocationInfo
 {
     private X509CertWithId cert;
     private CertRevocationInfo revInfo;
-    private String certProfile;
+    private String certprofile;
 
     public X509CertWithRevocationInfo()
     {
@@ -77,14 +77,14 @@ public class X509CertWithRevocationInfo
         this.revInfo = revInfo;
     }
 
-    public String getCertProfile()
+    public String getCertprofile()
     {
-        return certProfile;
+        return certprofile;
     }
 
-    public void setCertProfile(String certProfile)
+    public void setCertprofile(String certprofile)
     {
-        this.certProfile = certProfile;
+        this.certprofile = certprofile;
     }
 
 }

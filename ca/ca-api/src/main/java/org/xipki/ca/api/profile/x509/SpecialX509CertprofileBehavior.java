@@ -35,38 +35,26 @@
 
 package org.xipki.ca.api.profile.x509;
 
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
-
-import org.xipki.common.KeyUsage;
-
 /**
  * @author Lijun Liao
  */
 
-public abstract class AbstractCAX509CertProfile extends BaseX509CertProfile
+public enum SpecialX509CertprofileBehavior
 {
-    protected Set<KeyUsageControl> keyUsages;
+    gematik_gSMC_K;
 
-    public AbstractCAX509CertProfile()
+    public static final String PARAMETER_MAXLIFTIME = "maxLifetime";
+
+    public static SpecialX509CertprofileBehavior getInstance(String behavior)
     {
-        Set<KeyUsageControl> keyUsages = new HashSet<>();
-        keyUsages.add(new KeyUsageControl(KeyUsage.keyCertSign, true));
-        keyUsages.add(new KeyUsageControl(KeyUsage.cRLSign, false));
-        this.keyUsages = Collections.unmodifiableSet(keyUsages);
-    }
+        for(SpecialX509CertprofileBehavior b : values())
+        {
+            if(b.name().equalsIgnoreCase(behavior))
+            {
+                return b;
+            }
+        }
 
-    @Override
-    public boolean isCA()
-    {
-        return true;
+        return null;
     }
-
-    @Override
-    public Set<KeyUsageControl> getKeyUsage()
-    {
-        return keyUsages;
-    }
-
 }

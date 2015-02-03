@@ -54,17 +54,17 @@ import javax.xml.validation.SchemaFactory;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.ca.api.CertProfileException;
+import org.xipki.ca.api.CertprofileException;
 import org.xipki.ca.api.DfltEnvironmentParameterResolver;
 import org.xipki.ca.api.EnvironmentParameterResolver;
-import org.xipki.ca.qa.X509CertProfileQA;
+import org.xipki.ca.qa.X509CertprofileQA;
 import org.xipki.ca.qa.X509IssuerInfo;
 import org.xipki.ca.qa.shell.internal.jaxb.EnvironmentType;
 import org.xipki.ca.qa.shell.internal.jaxb.FileOrValueType;
 import org.xipki.ca.qa.shell.internal.jaxb.ObjectFactory;
 import org.xipki.ca.qa.shell.internal.jaxb.ParameterType;
 import org.xipki.ca.qa.shell.internal.jaxb.QAConfType;
-import org.xipki.ca.qa.shell.internal.jaxb.X509CertProfileType;
+import org.xipki.ca.qa.shell.internal.jaxb.X509CertprofileType;
 import org.xipki.ca.qa.shell.internal.jaxb.X509IssuerType;
 import org.xipki.common.IoUtil;
 import org.xipki.common.LogUtil;
@@ -91,7 +91,7 @@ public class QASystemManager
         this.confFile = confFile;
     }
 
-    private Map<String, X509CertProfileQA> x509ProfileMap = new HashMap<>();
+    private Map<String, X509CertprofileQA> x509ProfileMap = new HashMap<>();
     private Map<String, X509IssuerInfo> x509IssuerInfoMap = new HashMap<>();
     private Map<String, EnvironmentParameterResolver> environmentMap = new HashMap<>();
     private static Unmarshaller jaxbUnmarshaller;
@@ -171,18 +171,18 @@ public class QASystemManager
             }
         }
 
-        if(qaConf.getX509CertProfiles() != null)
+        if(qaConf.getX509Certprofiles() != null)
         {
-            List<X509CertProfileType> certProfileTypes = qaConf.getX509CertProfiles().getX509CertProfile();
-            for(X509CertProfileType type : certProfileTypes)
+            List<X509CertprofileType> certprofileTypes = qaConf.getX509Certprofiles().getX509Certprofile();
+            for(X509CertprofileType type : certprofileTypes)
             {
                 String name = type.getName();
                 try
                 {
                     byte[] content = readData(type);
-                    x509ProfileMap.put(name, new X509CertProfileQA(content));
+                    x509ProfileMap.put(name, new X509CertprofileQA(content));
                     LOG.info("configured X509 certificate profile {}", name);
-                }catch(IOException | CertProfileException e)
+                }catch(IOException | CertprofileException e)
                 {
                     final String message = "Could not parse QA certificate profile " + name;
                     if(LOG.isErrorEnabled())
@@ -232,7 +232,7 @@ public class QASystemManager
         return Collections.unmodifiableSet(x509ProfileMap.keySet());
     }
 
-    public X509CertProfileQA getCertprofile(String certprofileName)
+    public X509CertprofileQA getCertprofile(String certprofileName)
     {
         return x509ProfileMap.get(certprofileName);
     }

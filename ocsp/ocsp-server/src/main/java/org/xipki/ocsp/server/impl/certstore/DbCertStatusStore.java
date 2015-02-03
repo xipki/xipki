@@ -319,7 +319,7 @@ public class DbCertStatusStore extends CertStatusStore
     @Override
     public CertStatusInfo getCertStatus(
             HashAlgoType hashAlgo, byte[] issuerNameHash, byte[] issuerKeyHash,
-            BigInteger serialNumber, Set<String> excludeCertProfiles)
+            BigInteger serialNumber, Set<String> excludeCertprofiles)
     throws CertStatusStoreException
     {
         // wait for max. 0.5 second
@@ -390,7 +390,7 @@ public class DbCertStatusStore extends CertStatusStore
                     unknownOrIgnore = false;
 
                     String certprofile = rs.getString("PROFILE");
-                    if(excludeCertProfiles != null && excludeCertProfiles.contains(certprofile))
+                    if(excludeCertprofiles != null && excludeCertprofiles.contains(certprofile))
                     {
                         unknownOrIgnore = true;
                     }

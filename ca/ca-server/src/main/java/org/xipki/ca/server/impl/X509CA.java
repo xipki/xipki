@@ -107,7 +107,7 @@ import org.xipki.audit.api.AuditLoggingServiceRegister;
 import org.xipki.audit.api.AuditStatus;
 import org.xipki.ca.api.BadCertTemplateException;
 import org.xipki.ca.api.BadFormatException;
-import org.xipki.ca.api.CertProfileException;
+import org.xipki.ca.api.CertprofileException;
 import org.xipki.ca.api.OperationException;
 import org.xipki.ca.api.OperationException.ErrorCode;
 import org.xipki.ca.api.RequestorInfo;
@@ -116,7 +116,7 @@ import org.xipki.ca.api.profile.CertValidity;
 import org.xipki.ca.api.profile.ExtensionValue;
 import org.xipki.ca.api.profile.ExtensionValues;
 import org.xipki.ca.api.profile.SubjectInfo;
-import org.xipki.ca.api.profile.x509.SpecialX509CertProfileBehavior;
+import org.xipki.ca.api.profile.x509.SpecialX509CertprofileBehavior;
 import org.xipki.ca.api.profile.x509.X509CertVersion;
 import org.xipki.ca.api.publisher.X509CertificateInfo;
 import org.xipki.ca.server.impl.store.CertificateStore;
@@ -232,7 +232,7 @@ class X509CA
                 do
                 {
                     serials = certstore.getExpiredCertSerials(caCert, expiredAt, numEntries,
-                            task.getCertProfile(), task.getUserLike());
+                            task.getCertprofile(), task.getUserLike());
 
                     for(BigInteger serial : serials)
                     {
@@ -303,7 +303,7 @@ class X509CA
                     AuditEvent auditEvent = newAuditEvent();
                     auditEvent.addEventData(new AuditEventData("duration", durationMillis));
                     auditEvent.addEventData(new AuditEventData("CA", caInfo.getName()));
-                    auditEvent.addEventData(new AuditEventData("cerProfile", task.getCertProfile()));
+                    auditEvent.addEventData(new AuditEventData("cerProfile", task.getCertprofile()));
                     auditEvent.addEventData(new AuditEventData("user", task.getUserLike()));
                     auditEvent.addEventData(new AuditEventData("expiredAt",
                             new Date(task.getExpiredAt() * MS_PER_SECOND).toString()));
@@ -1145,7 +1145,7 @@ class X509CA
     public X509CertificateInfo generateCertificate(
             boolean requestedByRA,
             RequestorInfo requestor,
-            String certProfileName,
+            String certprofileName,
             String user,
             X500Name subject,
             SubjectPublicKeyInfo publicKeyInfo,
@@ -1156,7 +1156,7 @@ class X509CA
     {
         final String subjectText = SecurityUtil.getRFC4519Name(subject);
         LOG.info("START generateCertificate: CA={}, profile={}, subject='{}'",
-                new Object[]{caInfo.getName(), certProfileName, subjectText});
+                new Object[]{caInfo.getName(), certprofileName, subjectText});
 
         boolean successfull = false;
 
@@ -1166,7 +1166,7 @@ class X509CA
             {
                 X509CertificateInfo ret = intern_generateCertificate(
                         requestedByRA, requestor,
-                        certProfileName, user,
+                        certprofileName, user,
                         subject, publicKeyInfo,
                         notBefore, notAfter, extensions, false);
                 successfull = true;
@@ -1174,7 +1174,7 @@ class X509CA
                 String prefix = ret.isAlreadyIssued() ? "RETURN_OLD_CERT" : "SUCCESSFULL";
                 LOG.info("{} generateCertificate: CA={}, profile={},"
                         + " subject='{}', serialNumber={}",
-                        new Object[]{prefix, caInfo.getName(), certProfileName,
+                        new Object[]{prefix, caInfo.getName(), certprofileName,
                             ret.getCert().getSubject(), ret.getCert().getCert().getSerialNumber()});
                 return ret;
             }catch(RuntimeException e)
@@ -1192,7 +1192,7 @@ class X509CA
             if(successfull == false)
             {
                 LOG.warn("FAILED generateCertificate: CA={}, profile={}, subject='{}'",
-                        new Object[]{caInfo.getName(), certProfileName, subjectText});
+                        new Object[]{caInfo.getName(), certprofileName, subjectText});
             }
         }
     }
@@ -1200,7 +1200,7 @@ class X509CA
     public X509CertificateInfo regenerateCertificate(
             boolean requestedByRA,
             RequestorInfo requestor,
-            String certProfileName,
+            String certprofileName,
             String user,
             X500Name subject,
             SubjectPublicKeyInfo publicKeyInfo,
@@ -1211,20 +1211,20 @@ class X509CA
     {
         final String subjectText = SecurityUtil.getRFC4519Name(subject);
         LOG.info("START regenerateCertificate: CA={}, profile={}, subject='{}'",
-                new Object[]{caInfo.getName(), certProfileName, subjectText});
+                new Object[]{caInfo.getName(), certprofileName, subjectText});
 
         boolean successfull = false;
 
         try
         {
             X509CertificateInfo ret = intern_generateCertificate(
-                    requestedByRA, requestor, certProfileName, user,
+                    requestedByRA, requestor, certprofileName, user,
                     subject, publicKeyInfo,
                     notBefore, notAfter, extensions, false);
             successfull = true;
             LOG.info("SUCCESSFULL generateCertificate: CA={}, profile={},"
                     + " subject='{}', serialNumber={}",
-                    new Object[]{caInfo.getName(), certProfileName,
+                    new Object[]{caInfo.getName(), certprofileName,
                         ret.getCert().getSubject(), ret.getCert().getCert().getSerialNumber()});
 
             return ret;
@@ -1242,7 +1242,7 @@ class X509CA
             if(successfull == false)
             {
                 LOG.warn("FAILED regenerateCertificate: CA={}, profile={}, subject='{}'",
-                        new Object[]{caInfo.getName(), certProfileName, subjectText});
+                        new Object[]{caInfo.getName(), certprofileName, subjectText});
             }
         }
     }
@@ -1777,7 +1777,7 @@ class X509CA
                     try
                     {
                         successfull = publisher.certificateRevoked(caInfo.getCertificate(),
-                                revokedCert.getCert(), revokedCert.getCertProfile(), revokedCert.getRevInfo());
+                                revokedCert.getCert(), revokedCert.getCertprofile(), revokedCert.getRevInfo());
                     }
                     catch (RuntimeException e)
                     {
@@ -1993,7 +1993,7 @@ class X509CA
     private X509CertificateInfo intern_generateCertificate(
             boolean requestedByRA,
             RequestorInfo requestor,
-            String certProfileName,
+            String certprofileName,
             String user,
             X500Name requestedSubject,
             SubjectPublicKeyInfo publicKeyInfo,
@@ -2014,32 +2014,32 @@ class X509CA
             throw new OperationException(ErrorCode.NOT_PERMITTED, "CA is revoked");
         }
 
-        IdentifiedX509CertProfile certProfile;
+        IdentifiedX509Certprofile certprofile;
         try
         {
-            certProfile = getX509CertProfile(certProfileName);
-        } catch (CertProfileException e)
+            certprofile = getX509Certprofile(certprofileName);
+        } catch (CertprofileException e)
         {
-            throw new OperationException(ErrorCode.System_Failure, "invalid configuration of cert profile " + certProfileName);
+            throw new OperationException(ErrorCode.System_Failure, "invalid configuration of cert profile " + certprofileName);
         }
 
-        if(certProfile == null)
+        if(certprofile == null)
         {
-            throw new OperationException(ErrorCode.UNKNOWN_CERT_PROFILE, "unknown cert profile " + certProfileName);
+            throw new OperationException(ErrorCode.UNKNOWN_CERT_PROFILE, "unknown cert profile " + certprofileName);
         }
 
-        if(certProfile.getVersion() != X509CertVersion.V3)
+        if(certprofile.getVersion() != X509CertVersion.V3)
         {
-            throw new OperationException(ErrorCode.System_Failure, "unknown cert version " + certProfile);
+            throw new OperationException(ErrorCode.System_Failure, "unknown cert version " + certprofile);
         }
 
-        if(certProfile.isOnlyForRA() && requestedByRA == false)
+        if(certprofile.isOnlyForRA() && requestedByRA == false)
         {
             throw new OperationException(ErrorCode.INSUFFICIENT_PERMISSION,
-                    "Profile " + certProfileName + " not applied to non-RA");
+                    "Profile " + certprofileName + " not applied to non-RA");
         }
 
-        Set<ASN1ObjectIdentifier> permittedSigAlgs = certProfile.getSignatureAlgorithms();
+        Set<ASN1ObjectIdentifier> permittedSigAlgs = certprofile.getSignatureAlgorithms();
         if(permittedSigAlgs != null && permittedSigAlgs.isEmpty() == false)
         {
             ASN1ObjectIdentifier sigAlgId = signer.getAlgorithmIdentifier().getAlgorithm();
@@ -2052,7 +2052,7 @@ class X509CA
 
         requestedSubject = removeEmptyRDNs(requestedSubject);
 
-        if(certProfile.isSerialNumberInReqPermitted() == false)
+        if(certprofile.isSerialNumberInReqPermitted() == false)
         {
             RDN[] rdns = requestedSubject.getRDNs(ObjectIdentifiers.DN_SN);
             if(rdns != null && rdns.length > 0)
@@ -2062,23 +2062,23 @@ class X509CA
             }
         }
 
-        notBefore = certProfile.getNotBefore(notBefore);
+        notBefore = certprofile.getNotBefore(notBefore);
         if(notBefore == null)
         {
             notBefore = new Date();
         }
 
-        if(certProfile.hasMidnightNotBefore())
+        if(certprofile.hasMidnightNotBefore())
         {
-            notBefore = setToMidnight(notBefore, certProfile.getTimezone());
+            notBefore = setToMidnight(notBefore, certprofile.getTimezone());
         }
 
         if(notBefore.before(caInfo.getNotBefore()))
         {
             notBefore = caInfo.getNotBefore();
-            if(certProfile.hasMidnightNotBefore())
+            if(certprofile.hasMidnightNotBefore())
             {
-                notBefore = setToMidnight(new Date(notBefore.getTime() + DAY), certProfile.getTimezone());
+                notBefore = setToMidnight(new Date(notBefore.getTime() + DAY), certprofile.getTimezone());
             }
         }
 
@@ -2101,14 +2101,14 @@ class X509CA
         // public key
         try
         {
-            publicKeyInfo = certProfile.checkPublicKey(publicKeyInfo);
+            publicKeyInfo = certprofile.checkPublicKey(publicKeyInfo);
         } catch (BadCertTemplateException e)
         {
             throw new OperationException(ErrorCode.BAD_CERT_TEMPLATE, e.getMessage());
         }
 
         Date gSMC_KFirstNotBefore = null;
-        if(certProfile.getSpecialCertProfileBehavior() == SpecialX509CertProfileBehavior.gematik_gSMC_K)
+        if(certprofile.getSpecialCertprofileBehavior() == SpecialX509CertprofileBehavior.gematik_gSMC_K)
         {
             gSMC_KFirstNotBefore = notBefore;
 
@@ -2117,7 +2117,7 @@ class X509CA
             {
                 String requestedCN = SecurityUtil.rdnValueToString(cnRDNs[0].getFirst().getValue());
                 Long gsmckFirstNotBeforeInSecond = certstore.getNotBeforeOfFirstCertStartsWithCN(
-                        requestedCN, certProfileName);
+                        requestedCN, certprofileName);
                 if(gsmckFirstNotBeforeInSecond != null)
                 {
                     gSMC_KFirstNotBefore = new Date(gsmckFirstNotBeforeInSecond * MS_PER_SECOND);
@@ -2146,10 +2146,10 @@ class X509CA
         SubjectInfo subjectInfo;
         try
         {
-            subjectInfo = certProfile.getSubject(requestedSubject);
-        }catch(CertProfileException e)
+            subjectInfo = certprofile.getSubject(requestedSubject);
+        }catch(CertprofileException e)
         {
-            throw new OperationException(ErrorCode.System_Failure, "exception in cert profile " + certProfileName);
+            throw new OperationException(ErrorCode.System_Failure, "exception in cert profile " + certprofileName);
         } catch (BadCertTemplateException e)
         {
             throw new OperationException(ErrorCode.BAD_CERT_TEMPLATE, e.getMessage());
@@ -2165,13 +2165,13 @@ class X509CA
         }
 
         DuplicationMode keyMode = caInfo.getDuplicateKeyMode();
-        if(keyMode == DuplicationMode.PERMITTED && certProfile.isDuplicateKeyPermitted() == false)
+        if(keyMode == DuplicationMode.PERMITTED && certprofile.isDuplicateKeyPermitted() == false)
         {
             keyMode = DuplicationMode.FORBIDDEN_WITHIN_PROFILE;
         }
 
         DuplicationMode subjectMode = caInfo.getDuplicateSubjectMode();
-        if(subjectMode == DuplicationMode.PERMITTED && certProfile.isDuplicateSubjectPermitted() == false)
+        if(subjectMode == DuplicationMode.PERMITTED && certprofile.isDuplicateSubjectPermitted() == false)
         {
             subjectMode = DuplicationMode.FORBIDDEN_WITHIN_PROFILE;
         }
@@ -2198,7 +2198,7 @@ class X509CA
         {
             // try to get certificate with the same subject, key and certificate profile
             SubjectKeyProfileBundle triple = certstore.getLatestCert(caInfo.getCertificate(),
-                    sha1FpSubject, sha1FpPublicKey, certProfileName);
+                    sha1FpSubject, sha1FpPublicKey, certprofileName);
 
             if(triple != null)
             {
@@ -2225,7 +2225,7 @@ class X509CA
                         try
                         {
                             certInfo = new X509CertificateInfo(issuedCert,
-                                    caInfo.getCertificate(), subjectPublicKeyData, certProfileName);
+                                    caInfo.getCertificate(), subjectPublicKeyData, certprofileName);
                         } catch (CertificateEncodingException e)
                         {
                             throw new OperationException(ErrorCode.System_Failure,
@@ -2249,10 +2249,10 @@ class X509CA
                 }
                 else if(keyMode == DuplicationMode.FORBIDDEN_WITHIN_PROFILE)
                 {
-                    if(certstore.isCertForKeyIssued(caInfo.getCertificate(), sha1FpPublicKey, certProfileName))
+                    if(certstore.isCertForKeyIssued(caInfo.getCertificate(), sha1FpPublicKey, certprofileName))
                     {
                         throw new OperationException(ErrorCode.ALREADY_ISSUED,
-                                "Certificate for the given public key and profile " + certProfileName + " already issued");
+                                "Certificate for the given public key and profile " + certprofileName + " already issued");
                     }
                 }
                 else
@@ -2263,7 +2263,7 @@ class X509CA
 
             if(subjectMode != DuplicationMode.PERMITTED)
             {
-                final boolean incSerial = certProfile.incSerialNumberIfSubjectExists();
+                final boolean incSerial = certprofile.incSerialNumberIfSubjectExists();
                 final boolean certIssued;
                 if(subjectMode == DuplicationMode.FORBIDDEN)
                 {
@@ -2276,12 +2276,12 @@ class X509CA
                 }
                 else if(subjectMode == DuplicationMode.FORBIDDEN_WITHIN_PROFILE)
                 {
-                    certIssued = certstore.isCertForSubjectIssued(caInfo.getCertificate(), sha1FpSubject, certProfileName);
+                    certIssued = certstore.isCertForSubjectIssued(caInfo.getCertificate(), sha1FpSubject, certprofileName);
                     if(certIssued && incSerial == false)
                     {
                         throw new OperationException(ErrorCode.ALREADY_ISSUED,
                                 "Certificate for the given subject " + grandtedSubjectText +
-                                " and profile " + certProfileName + " already issued");
+                                " and profile " + certprofileName + " already issued");
                     }
                 }
                 else
@@ -2294,7 +2294,7 @@ class X509CA
                     String latestSN;
                     try
                     {
-                        Object[] objs = incSerialNumber(certProfile, grantedSubject, null);
+                        Object[] objs = incSerialNumber(certprofile, grantedSubject, null);
                         latestSN = certstore.getLatestSN((X500Name) objs[0]);
                     }catch(BadFormatException e)
                     {
@@ -2307,7 +2307,7 @@ class X509CA
                     {
                         try
                         {
-                            Object[] objs = incSerialNumber(certProfile, grantedSubject, latestSN);
+                            Object[] objs = incSerialNumber(certprofile, grantedSubject, latestSN);
                             grantedSubject = (X500Name) objs[0];
                             latestSN = (String) objs[1];
                         }catch (BadFormatException e)
@@ -2327,7 +2327,7 @@ class X509CA
                     {
                         throw new OperationException(ErrorCode.ALREADY_ISSUED,
                                 "Certificate for the given subject " + grandtedSubjectText +
-                                " and profile " + certProfileName +
+                                " and profile " + certprofileName +
                                 " already issued, and could not create new unique serial number");
                     }
                 }
@@ -2352,11 +2352,11 @@ class X509CA
                     else if(subjectMode == DuplicationMode.FORBIDDEN_WITHIN_PROFILE)
                     {
                         if(pendingSubjectMap.containsKey(sha1FpSubject) &&
-                                pendingSubjectMap.get(sha1FpSubject).contains(certProfileName))
+                                pendingSubjectMap.get(sha1FpSubject).contains(certprofileName))
                         {
                             throw new OperationException(ErrorCode.ALREADY_ISSUED,
                                     "Certificate for the given subject " + grandtedSubjectText +
-                                    " and profile " + certProfileName + " already in process");
+                                    " and profile " + certprofileName + " already in process");
                         }
                     }
 
@@ -2366,7 +2366,7 @@ class X509CA
                         profiles = new LinkedList<>();
                         pendingSubjectMap.put(sha1FpSubject, profiles);
                     }
-                    profiles.add(certProfileName);
+                    profiles.add(certprofileName);
                 }
             }
 
@@ -2386,11 +2386,11 @@ class X509CA
                     else if(keyMode == DuplicationMode.FORBIDDEN_WITHIN_PROFILE)
                     {
                         if(pendingKeyMap.containsKey(sha1FpPublicKey) &&
-                                pendingKeyMap.get(sha1FpPublicKey).contains(certProfileName))
+                                pendingKeyMap.get(sha1FpPublicKey).contains(certprofileName))
                         {
                             throw new OperationException(ErrorCode.ALREADY_ISSUED,
                                     "Certificate for the given public key" +
-                                    " and profile " + certProfileName + " already in process");
+                                    " and profile " + certprofileName + " already in process");
                         }
                     }
 
@@ -2400,7 +2400,7 @@ class X509CA
                         profiles = new LinkedList<>();
                         pendingKeyMap.put(sha1FpPublicKey, profiles);
                     }
-                    profiles.add(certProfileName);
+                    profiles.add(certprofileName);
                 }
             }
 
@@ -2411,7 +2411,7 @@ class X509CA
                 msgBuilder.append(", ").append(subjectInfo.getWarning());
             }
 
-            CertValidity validity = certProfile.getValidity();
+            CertValidity validity = certprofile.getValidity();
 
             if(validity == null)
             {
@@ -2425,9 +2425,9 @@ class X509CA
             Date maxNotAfter = validity.add(notBefore);
             Date origMaxNotAfter = maxNotAfter;
 
-            if(certProfile.getSpecialCertProfileBehavior() == SpecialX509CertProfileBehavior.gematik_gSMC_K)
+            if(certprofile.getSpecialCertprofileBehavior() == SpecialX509CertprofileBehavior.gematik_gSMC_K)
             {
-                String s = certProfile.getParameter(SpecialX509CertProfileBehavior.PARAMETER_MAXLIFTIME);
+                String s = certprofile.getParameter(SpecialX509CertprofileBehavior.PARAMETER_MAXLIFTIME);
                 long maxLifetimeInDays = Long.parseLong(s);
                 Date maxLifetime = new Date(gSMC_KFirstNotBefore.getTime() + maxLifetimeInDays * DAY - MS_PER_SECOND);
                 if(maxNotAfter.after(maxLifetime))
@@ -2471,9 +2471,9 @@ class X509CA
                 }
             }
 
-            if(certProfile.hasMidnightNotBefore() && maxNotAfter.equals(origMaxNotAfter) == false)
+            if(certprofile.hasMidnightNotBefore() && maxNotAfter.equals(origMaxNotAfter) == false)
             {
-                Calendar c = Calendar.getInstance(certProfile.getTimezone());
+                Calendar c = Calendar.getInstance(certprofile.getTimezone());
                 c.setTime(new Date(notAfter.getTime() - DAY));
                 c.set(Calendar.HOUR_OF_DAY, 23);
                 c.set(Calendar.MINUTE, 59);
@@ -2505,7 +2505,7 @@ class X509CA
                 X509CrlSignerEntryWrapper crlSigner = getCrlSigner();
                 X509Certificate crlSignerCert = crlSigner == null ? null : crlSigner.getCert();
 
-                ExtensionValues extensionTuples = certProfile.getExtensions(requestedSubject, extensions,
+                ExtensionValues extensionTuples = certprofile.getExtensions(requestedSubject, extensions,
                         publicKeyInfo, caInfo.getPublicCAInfo(), crlSignerCert);
                 if(extensionTuples != null)
                 {
@@ -2547,7 +2547,7 @@ class X509CA
                 X509CertWithId certWithMeta = new X509CertWithId(cert, encodedCert);
 
                 ret = new X509CertificateInfo(certWithMeta, caInfo.getCertificate(),
-                        subjectPublicKeyData, certProfileName);
+                        subjectPublicKeyData, certprofileName);
                 ret.setUser(user);
                 ret.setRequestor(requestor);
 
@@ -2583,7 +2583,7 @@ class X509CA
                 List<String> profiles = pendingSubjectMap.remove(sha1FpSubject);
                 if(profiles != null)
                 {
-                    profiles.remove(certProfileName);
+                    profiles.remove(certprofileName);
                     if(profiles.isEmpty() == false)
                     {
                         pendingSubjectMap.put(sha1FpSubject, profiles);
@@ -2593,7 +2593,7 @@ class X509CA
                 profiles = pendingKeyMap.remove(sha1FpSubject);
                 if(profiles != null)
                 {
-                    profiles.remove(certProfileName);
+                    profiles.remove(certprofileName);
                     if(profiles.isEmpty() == false)
                     {
                         pendingKeyMap.put(sha1FpSubject, profiles);
@@ -2632,21 +2632,21 @@ class X509CA
         }
     }
 
-    public IdentifiedX509CertProfile getX509CertProfile(String certProfileName)
-    throws CertProfileException
+    public IdentifiedX509Certprofile getX509Certprofile(String certprofileName)
+    throws CertprofileException
     {
-        if(certProfileName == null)
+        if(certprofileName == null)
         {
             return null;
         }
 
-        Set<String> profileNames = caManager.getCertProfilesForCA(caInfo.getName());
-        if(profileNames == null || profileNames.contains(certProfileName) == false)
+        Set<String> profileNames = caManager.getCertprofilesForCA(caInfo.getName());
+        if(profileNames == null || profileNames.contains(certprofileName) == false)
         {
             return null;
         }
 
-        return caManager.getIdentifiedCertProfile(certProfileName);
+        return caManager.getIdentifiedCertprofile(certprofileName);
     }
 
     public CmpRequestorInfo getRequestor(X500Name requestorSender)
@@ -2679,7 +2679,7 @@ class X509CA
         return caManager;
     }
 
-    public RemoveExpiredCertsInfo removeExpiredCerts(String certProfile, String userLike, Long overlapSeconds)
+    public RemoveExpiredCertsInfo removeExpiredCerts(String certprofile, String userLike, Long overlapSeconds)
     throws OperationException
     {
         if(masterMode == false)
@@ -2704,7 +2704,7 @@ class X509CA
 
         RemoveExpiredCertsInfo info = new RemoveExpiredCertsInfo();
         info.setUserLike(userLike);
-        info.setCertProfile(certProfile);
+        info.setCertprofile(certprofile);
 
         if(overlapSeconds == null || overlapSeconds < 0)
         {
@@ -2720,7 +2720,7 @@ class X509CA
         info.setExpiredAt(expiredAt);
 
         int numOfCerts = certstore.getNumOfExpiredCerts(caInfo.getCertificate(), expiredAt,
-                certProfile, userLike);
+                certprofile, userLike);
         info.setNumOfCerts(numOfCerts);
 
         if(numOfCerts > 0)
@@ -2848,7 +2848,7 @@ class X509CA
         return ae;
     }
 
-    private static Object[] incSerialNumber(IdentifiedX509CertProfile profile, X500Name origName, String latestSN)
+    private static Object[] incSerialNumber(IdentifiedX509Certprofile profile, X500Name origName, String latestSN)
     throws BadFormatException
     {
         RDN[] rdns = origName.getRDNs();

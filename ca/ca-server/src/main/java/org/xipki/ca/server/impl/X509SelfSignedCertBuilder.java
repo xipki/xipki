@@ -70,7 +70,7 @@ import org.bouncycastle.operator.ContentSigner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.ca.api.BadCertTemplateException;
-import org.xipki.ca.api.CertProfileException;
+import org.xipki.ca.api.CertprofileException;
 import org.xipki.ca.api.OperationException;
 import org.xipki.ca.api.OperationException.ErrorCode;
 import org.xipki.ca.api.profile.CertValidity;
@@ -119,7 +119,7 @@ class X509SelfSignedCertBuilder
             SecurityFactory securityFactory,
             String signerType,
             String signerConf,
-            IdentifiedX509CertProfile certProfile,
+            IdentifiedX509Certprofile certprofile,
             CertificationRequest p10Request,
             long serialNumber,
             List<String> ocspUris,
@@ -163,7 +163,7 @@ class X509SelfSignedCertBuilder
         SubjectPublicKeyInfo publicKeyInfo = bcCert.getSubjectPublicKeyInfo();
 
         X509Certificate newCert = generateCertificate(
-                signer, certProfile, p10Request, serialNumber, publicKeyInfo,
+                signer, certprofile, p10Request, serialNumber, publicKeyInfo,
                 ocspUris, crlUris, deltaCrlUris);
 
         return new GenerateSelfSignedResult(signerConf, newCert);
@@ -171,7 +171,7 @@ class X509SelfSignedCertBuilder
 
     private static X509Certificate generateCertificate(
             ConcurrentContentSigner signer,
-            IdentifiedX509CertProfile certProfile,
+            IdentifiedX509Certprofile certprofile,
             CertificationRequest p10Request,
             long serialNumber,
             SubjectPublicKeyInfo publicKeyInfo,
@@ -191,10 +191,10 @@ class X509SelfSignedCertBuilder
 
         try
         {
-            certProfile.checkPublicKey(publicKeyInfo);
+            certprofile.checkPublicKey(publicKeyInfo);
         } catch (BadCertTemplateException e)
         {
-            LOG.warn("certProfile.checkPublicKey", e);
+            LOG.warn("certprofile.checkPublicKey", e);
             throw new OperationException(ErrorCode.BAD_CERT_TEMPLATE, e.getMessage());
         }
 
@@ -204,27 +204,27 @@ class X509SelfSignedCertBuilder
         // subject
         try
         {
-            subjectInfo = certProfile.getSubject(requestedSubject);
-        }catch(CertProfileException e)
+            subjectInfo = certprofile.getSubject(requestedSubject);
+        }catch(CertprofileException e)
         {
-            throw new OperationException(ErrorCode.System_Failure, "exception in cert profile " + certProfile.getName());
+            throw new OperationException(ErrorCode.System_Failure, "exception in cert profile " + certprofile.getName());
         } catch (BadCertTemplateException e)
         {
-            LOG.warn("certProfile.getSubject", e);
+            LOG.warn("certprofile.getSubject", e);
             throw new OperationException(ErrorCode.BAD_CERT_TEMPLATE, e.getMessage());
         }
 
-        Date notBefore = certProfile.getNotBefore(null);
+        Date notBefore = certprofile.getNotBefore(null);
         if(notBefore == null)
         {
             notBefore = new Date();
         }
 
-        CertValidity validity = certProfile.getValidity();
+        CertValidity validity = certprofile.getValidity();
         if(validity == null)
         {
             throw new OperationException(ErrorCode.BAD_CERT_TEMPLATE,
-                    "no validity specified in the profile " + certProfile.getName());
+                    "no validity specified in the profile " + certprofile.getName());
         }
 
         Date notAfter = validity.add(notBefore);
@@ -258,7 +258,7 @@ class X509SelfSignedCertBuilder
         {
             addExtensions(
                     certBuilder,
-                    certProfile,
+                    certprofile,
                     requestedSubject,
                     extensions,
                     publicKeyInfo,
@@ -282,7 +282,7 @@ class X509SelfSignedCertBuilder
         } catch (BadCertTemplateException e)
         {
             throw new OperationException(ErrorCode.BAD_CERT_TEMPLATE, e.getMessage());
-        } catch (NoIdleSignerException | CertificateException | IOException | CertProfileException |
+        } catch (NoIdleSignerException | CertificateException | IOException | CertprofileException |
                 NoSuchAlgorithmException | NoSuchProviderException e)
         {
             throw new OperationException(ErrorCode.System_Failure, e.getClass().getName() + ": " + e.getMessage());
@@ -291,12 +291,12 @@ class X509SelfSignedCertBuilder
 
     private static void addExtensions(
             X509v3CertificateBuilder certBuilder,
-            IdentifiedX509CertProfile profile,
+            IdentifiedX509Certprofile profile,
             X500Name requestedSubject,
             Extensions extensions,
             SubjectPublicKeyInfo requestedPublicKeyInfo,
             PublicCAInfo publicCaInfo)
-    throws CertProfileException, IOException, BadCertTemplateException, NoSuchAlgorithmException
+    throws CertprofileException, IOException, BadCertTemplateException, NoSuchAlgorithmException
     {
         ExtensionValues extensionTuples = profile.getExtensions(requestedSubject, extensions, requestedPublicKeyInfo,
                 publicCaInfo, null);
