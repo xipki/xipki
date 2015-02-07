@@ -53,12 +53,12 @@ public class CertRevocationInfo implements Serializable
 
     public CertRevocationInfo(CRLReason reason)
     {
-        this(reason, null, null);
+        this(reason, new Date(), null);
     }
 
     public CertRevocationInfo(int reasonCode)
     {
-        this(reasonCode, null, null);
+        this(reasonCode, new Date(), null);
     }
 
     public CertRevocationInfo(CRLReason reason, Date revocationTime, Date invalidityTime)
