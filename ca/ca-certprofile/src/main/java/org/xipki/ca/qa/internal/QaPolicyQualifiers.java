@@ -35,26 +35,56 @@
 
 package org.xipki.ca.qa.internal;
 
-import org.xipki.ca.certprofile.internal.x509.jaxb.ExtensionsType.InhibitAnyPolicy;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
+
+import javax.xml.bind.JAXBElement;
+
+import org.xipki.ca.certprofile.internal.x509.jaxb.CertificatePolicyInformationType.PolicyQualifiers;
+import org.xipki.ca.qa.internal.QaPolicyQualifierInfo.QaCPSUriPolicyQualifier;
+import org.xipki.ca.qa.internal.QaPolicyQualifierInfo.QaUserNoticePolicyQualifierInfo;
+import org.xipki.common.ParamChecker;
 
 /**
  * @author Lijun Liao
  */
 
-public class QaInhibitAnyPolicyOption extends QaExtensionOption
+public class QaPolicyQualifiers
 {
-    private final int skipCerts;
-
-    public QaInhibitAnyPolicyOption(InhibitAnyPolicy jaxb)
+    private final List<QaPolicyQualifierInfo> policyQualifiers;
+    public QaPolicyQualifiers(PolicyQualifiers jaxb)
     {
-        super(jaxb.getCondition());
+        ParamChecker.assertNotNull("jaxb", jaxb);
 
-        this.skipCerts = jaxb.getSkipCerts();
+        List<QaPolicyQualifierInfo> list = new LinkedList<>();
+
+        List<JAXBElement<String>> elements = jaxb.getCpsUriOrUserNotice();
+        for(JAXBElement<String> element : elements)
+        {
+            String value = element.getValue();
+            String localPart = element.getName().getLocalPart();
+
+            QaPolicyQualifierInfo info;
+            if("cpsUri".equals(localPart))
+            {
+                info = new QaCPSUriPolicyQualifier(value);
+            } else if("userNotice".equals(localPart))
+            {
+                info = new QaUserNoticePolicyQualifierInfo(value);
+            } else
+            {
+                throw new RuntimeException("should not reach here");
+            }
+            list.add(info);
+        }
+
+        this.policyQualifiers = Collections.unmodifiableList(list);
     }
 
-    public int getSkipCerts()
+    public List<QaPolicyQualifierInfo> getPolicyQualifiers()
     {
-        return skipCerts;
+        return policyQualifiers;
     }
 
 }

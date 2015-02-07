@@ -79,30 +79,32 @@ import org.xipki.ca.api.profile.x509.CertificatePolicyInformation;
 import org.xipki.ca.api.profile.x509.CertificatePolicyQualifier;
 import org.xipki.ca.api.profile.x509.ExtKeyUsageControl;
 import org.xipki.ca.api.profile.x509.KeyUsageControl;
-import org.xipki.ca.certprofile.internal.x509.jaxb.AddTextType;
 import org.xipki.ca.certprofile.internal.x509.jaxb.AlgorithmType;
+import org.xipki.ca.certprofile.internal.x509.jaxb.CertificatePolicies;
 import org.xipki.ca.certprofile.internal.x509.jaxb.CertificatePolicyInformationType;
 import org.xipki.ca.certprofile.internal.x509.jaxb.CertificatePolicyInformationType.PolicyQualifiers;
-import org.xipki.ca.certprofile.internal.x509.jaxb.ConditionType;
-import org.xipki.ca.certprofile.internal.x509.jaxb.ConstantExtensionType;
-import org.xipki.ca.certprofile.internal.x509.jaxb.ECParametersType;
-import org.xipki.ca.certprofile.internal.x509.jaxb.ECParametersType.Curves;
+import org.xipki.ca.certprofile.internal.x509.jaxb.ConstantExtValue;
+import org.xipki.ca.certprofile.internal.x509.jaxb.DHParameters;
+import org.xipki.ca.certprofile.internal.x509.jaxb.DSAParameters;
+import org.xipki.ca.certprofile.internal.x509.jaxb.ECParameters;
+import org.xipki.ca.certprofile.internal.x509.jaxb.ECParameters.Curves;
+import org.xipki.ca.certprofile.internal.x509.jaxb.ExtendedKeyUsage;
+import org.xipki.ca.certprofile.internal.x509.jaxb.ExtendedKeyUsage.Usage;
 import org.xipki.ca.certprofile.internal.x509.jaxb.ExtensionType;
 import org.xipki.ca.certprofile.internal.x509.jaxb.ExtensionsType;
-import org.xipki.ca.certprofile.internal.x509.jaxb.ExtensionsType.AuthorityKeyIdentifier;
-import org.xipki.ca.certprofile.internal.x509.jaxb.ExtensionsType.ConstantExtensions;
-import org.xipki.ca.certprofile.internal.x509.jaxb.ExtensionsType.ExtendedKeyUsage;
-import org.xipki.ca.certprofile.internal.x509.jaxb.ExtensionsType.ExtendedKeyUsage.Usage;
-import org.xipki.ca.certprofile.internal.x509.jaxb.ExtensionsType.PolicyConstraints;
 import org.xipki.ca.certprofile.internal.x509.jaxb.GeneralNameType;
 import org.xipki.ca.certprofile.internal.x509.jaxb.GeneralSubtreeBaseType;
 import org.xipki.ca.certprofile.internal.x509.jaxb.GeneralSubtreesType;
-import org.xipki.ca.certprofile.internal.x509.jaxb.KeyUsageType;
+import org.xipki.ca.certprofile.internal.x509.jaxb.GostParameters;
 import org.xipki.ca.certprofile.internal.x509.jaxb.ObjectFactory;
 import org.xipki.ca.certprofile.internal.x509.jaxb.OidWithDescType;
+import org.xipki.ca.certprofile.internal.x509.jaxb.PolicyConstraints;
 import org.xipki.ca.certprofile.internal.x509.jaxb.PolicyIdMappingType;
+import org.xipki.ca.certprofile.internal.x509.jaxb.RSAPSSParameters;
+import org.xipki.ca.certprofile.internal.x509.jaxb.RSAParameters;
 import org.xipki.ca.certprofile.internal.x509.jaxb.RangeType;
 import org.xipki.ca.certprofile.internal.x509.jaxb.RangesType;
+import org.xipki.ca.certprofile.internal.x509.jaxb.UsageType;
 import org.xipki.ca.certprofile.internal.x509.jaxb.X509ProfileType;
 import org.xipki.ca.certprofile.internal.x509.jaxb.X509ProfileType.KeyAlgorithms;
 import org.xipki.common.KeyUsage;
@@ -166,7 +168,7 @@ public class XmlX509CertprofileUtil
         }
     }
 
-    public static List<CertificatePolicyInformation> buildCertificatePolicies(ExtensionsType.CertificatePolicies type)
+    public static List<CertificatePolicyInformation> buildCertificatePolicies(CertificatePolicies type)
     {
         List<CertificatePolicyInformationType> policyPairs = type.getCertificatePolicyInformation();
         if(policyPairs == null || policyPairs.isEmpty())
@@ -212,7 +214,7 @@ public class XmlX509CertprofileUtil
     }
 
     public static PolicyMappings buildPolicyMappings(
-            org.xipki.ca.certprofile.internal.x509.jaxb.ExtensionsType.PolicyMappings type)
+            org.xipki.ca.certprofile.internal.x509.jaxb.PolicyMappings type)
     {
         List<PolicyIdMappingType> mappings = type.getMapping();
         final int n = mappings.size();
@@ -234,7 +236,7 @@ public class XmlX509CertprofileUtil
     }
 
     public static NameConstraints buildNameConstrains(
-            org.xipki.ca.certprofile.internal.x509.jaxb.ExtensionsType.NameConstraints type)
+            org.xipki.ca.certprofile.internal.x509.jaxb.NameConstraints type)
     throws CertprofileException
     {
         GeneralSubtree[] permitted = buildGeneralSubtrees(type.getPermittedSubtrees());
@@ -246,7 +248,7 @@ public class XmlX509CertprofileUtil
         return new NameConstraints(permitted, excluded);
     }
 
-    public static GeneralSubtree[] buildGeneralSubtrees(GeneralSubtreesType subtrees)
+    private static GeneralSubtree[] buildGeneralSubtrees(GeneralSubtreesType subtrees)
     throws CertprofileException
     {
         if(subtrees == null || subtrees.getBase().isEmpty())
@@ -265,7 +267,7 @@ public class XmlX509CertprofileUtil
         return ret;
     }
 
-    public static GeneralSubtree buildGeneralSubtree(GeneralSubtreeBaseType type)
+    private static GeneralSubtree buildGeneralSubtree(GeneralSubtreeBaseType type)
     throws CertprofileException
     {
         GeneralName base = null;
@@ -401,29 +403,7 @@ public class XmlX509CertprofileUtil
         return ret;
     }
 
-    public static List<AddText> buildAddText(List<AddTextType> types)
-    {
-        if(types == null || types.isEmpty())
-        {
-            return null;
-        }
-
-        List<AddText> ret = new ArrayList<>(types.size());
-        for(AddTextType type : types)
-        {
-            Condition c = createCondition(type.getCondition());
-            ret.add(new AddText(c, type.getText()));
-        }
-
-        return ret;
-    }
-
-    public static Condition createCondition(ConditionType type)
-    {
-        return type == null ? null : new Condition(type);
-    }
-
-    public static Set<Range> buildParametersMap(RangesType ranges)
+    private static Set<Range> buildParametersMap(RangesType ranges)
     {
         if(ranges == null)
         {
@@ -449,80 +429,94 @@ public class XmlX509CertprofileUtil
         {
             KeyParametersOption keyParamsOption;
 
-            if(type.getECParameters() != null)
-            {
-                KeyParametersOption.ECParamatersOption option = new KeyParametersOption.ECParamatersOption();
-                keyParamsOption = option;
-
-                ECParametersType params = type.getECParameters();
-                if(params.getCurves() != null)
-                {
-                    Curves curves = params.getCurves();
-                    Set<ASN1ObjectIdentifier> curveOids = XmlX509CertprofileUtil.toOIDSet(curves.getCurve());
-                    option.setCurveOids(curveOids);
-                }
-
-                if(params.getPointEncodings() != null)
-                {
-                    List<Byte> bytes = params.getPointEncodings().getPointEncoding();
-                    Set<Byte> pointEncodings = new HashSet<>(bytes);
-                    option.setPointEncodings(pointEncodings);
-                }
-            } else if(type.getRSAParameters() != null)
-            {
-                KeyParametersOption.RSAParametersOption option = new KeyParametersOption.RSAParametersOption();
-                keyParamsOption = option;
-
-                Set<Range> modulusLengths = XmlX509CertprofileUtil.buildParametersMap(
-                        type.getRSAParameters().getModulusLength());
-                option.setModulusLengths(modulusLengths);
-
-            } else if(type.getRSAPSSParameters() != null)
-            {
-                KeyParametersOption.RSAPSSParametersOption option = new KeyParametersOption.RSAPSSParametersOption();
-                keyParamsOption = option;
-
-                Set<Range> modulusLengths = XmlX509CertprofileUtil.buildParametersMap(
-                        type.getRSAPSSParameters().getModulusLength());
-                option.setModulusLengths(modulusLengths);
-            } else if(type.getDSAParameters() != null)
-            {
-                KeyParametersOption.DSAParametersOption option = new KeyParametersOption.DSAParametersOption();
-                keyParamsOption = option;
-
-                Set<Range> pLengths = XmlX509CertprofileUtil.buildParametersMap(type.getDSAParameters().getPLength());
-                option.setPLengths(pLengths);
-
-                Set<Range> qLengths = XmlX509CertprofileUtil.buildParametersMap(type.getDSAParameters().getQLength());
-                option.setQLengths(qLengths);
-            } else if(type.getDHParameters() != null)
-            {
-                KeyParametersOption.DHParametersOption option = new KeyParametersOption.DHParametersOption();
-                keyParamsOption = option;
-
-                Set<Range> pLengths = XmlX509CertprofileUtil.buildParametersMap(type.getDHParameters().getPLength());
-                option.setPLengths(pLengths);
-
-                Set<Range> qLengths = XmlX509CertprofileUtil.buildParametersMap(type.getDHParameters().getQLength());
-                option.setQLengths(qLengths);
-            }
-            else if(type.getGostParameters() != null)
-            {
-                KeyParametersOption.GostParametersOption option = new KeyParametersOption.GostParametersOption();
-                keyParamsOption = option;
-
-                Set<ASN1ObjectIdentifier> set = XmlX509CertprofileUtil.toOIDSet(
-                        type.getGostParameters().getPublicKeyParamSet());
-                option.setPublicKeyParamSets(set);
-
-                set = XmlX509CertprofileUtil.toOIDSet(type.getGostParameters().getDigestParamSet());
-                option.setDigestParamSets(set);
-
-                set = XmlX509CertprofileUtil.toOIDSet(type.getGostParameters().getEncryptionParamSet());
-                option.setEncryptionParamSets(set);
-            } else
+            if(type.getParameters() == null || type.getParameters().getAny() == null)
             {
                 keyParamsOption = KeyParametersOption.allowAll;
+            }
+            else
+            {
+                Object paramsObj = type.getParameters().getAny();
+                if(paramsObj instanceof ECParameters)
+                {
+                    ECParameters params = (ECParameters) paramsObj;
+                    KeyParametersOption.ECParamatersOption option = new KeyParametersOption.ECParamatersOption();
+                    keyParamsOption = option;
+
+                    if(params.getCurves() != null)
+                    {
+                        Curves curves = params.getCurves();
+                        Set<ASN1ObjectIdentifier> curveOids = toOIDSet(curves.getCurve());
+                        option.setCurveOids(curveOids);
+                    }
+
+                    if(params.getPointEncodings() != null)
+                    {
+                        List<Byte> bytes = params.getPointEncodings().getPointEncoding();
+                        Set<Byte> pointEncodings = new HashSet<>(bytes);
+                        option.setPointEncodings(pointEncodings);
+                    }
+                }
+                else if(paramsObj instanceof RSAParameters)
+                {
+                    RSAParameters params = (RSAParameters) paramsObj;
+                    KeyParametersOption.RSAParametersOption option = new KeyParametersOption.RSAParametersOption();
+                    keyParamsOption = option;
+
+                    Set<Range> modulusLengths = buildParametersMap(params.getModulusLength());
+                    option.setModulusLengths(modulusLengths);
+                }
+                else if(paramsObj instanceof RSAPSSParameters)
+                {
+                    RSAPSSParameters params = (RSAPSSParameters) paramsObj;
+                    KeyParametersOption.RSAPSSParametersOption option = new KeyParametersOption.RSAPSSParametersOption();
+                    keyParamsOption = option;
+
+                    Set<Range> modulusLengths = buildParametersMap(params.getModulusLength());
+                    option.setModulusLengths(modulusLengths);
+                }
+                else if(paramsObj instanceof DSAParameters)
+                {
+                    DSAParameters params = (DSAParameters) paramsObj;
+                    KeyParametersOption.DSAParametersOption option = new KeyParametersOption.DSAParametersOption();
+                    keyParamsOption = option;
+
+                    Set<Range> pLengths = buildParametersMap(params.getPLength());
+                    option.setPLengths(pLengths);
+
+                    Set<Range> qLengths = buildParametersMap(params.getQLength());
+                    option.setQLengths(qLengths);
+                }
+                else if(paramsObj instanceof DHParameters)
+                {
+                    DHParameters params = (DHParameters) paramsObj;
+                    KeyParametersOption.DHParametersOption option = new KeyParametersOption.DHParametersOption();
+                    keyParamsOption = option;
+
+                    Set<Range> pLengths = buildParametersMap(params.getPLength());
+                    option.setPLengths(pLengths);
+
+                    Set<Range> qLengths = buildParametersMap(params.getQLength());
+                    option.setQLengths(qLengths);
+                }
+                else if(paramsObj instanceof GostParameters)
+                {
+                    GostParameters params = (GostParameters) paramsObj;
+                    KeyParametersOption.GostParametersOption option = new KeyParametersOption.GostParametersOption();
+                    keyParamsOption = option;
+
+                    Set<ASN1ObjectIdentifier> set = toOIDSet(params.getPublicKeyParamSet());
+                    option.setPublicKeyParamSets(set);
+
+                    set = toOIDSet(params.getDigestParamSet());
+                    option.setDigestParamSets(set);
+
+                    set = toOIDSet(params.getEncryptionParamSet());
+                    option.setEncryptionParamSets(set);
+                }
+                else
+                {
+                    throw new CertprofileException("unknown public key parameters type " + paramsObj.getClass().getName());
+                }
             }
 
             List<OidWithDescType> algIds = type.getAlgorithm();
@@ -541,15 +535,18 @@ public class XmlX509CertprofileUtil
 
     public static Map<ASN1ObjectIdentifier, ExtensionControl> buildExtensionControls(
             ExtensionsType extensionsType)
+    throws CertprofileException
     {
         // Extension controls
         Map<ASN1ObjectIdentifier, ExtensionControl> controls = new HashMap<>();
-        for(ExtensionType extensionType : extensionsType.getExtension())
+        for(ExtensionType m : extensionsType.getExtension())
         {
-            ASN1ObjectIdentifier oid = new ASN1ObjectIdentifier(extensionType.getValue());
-            boolean required = extensionType.isRequired();
-            boolean critical = getBoolean(extensionType.isCritical(), false);
-            controls.put(oid, new ExtensionControl(critical, required, extensionType.isPermittedInRequest()));
+            ASN1ObjectIdentifier oid = new ASN1ObjectIdentifier(m.getType().getValue());
+            if(controls.containsKey(oid))
+            {
+                throw new CertprofileException("Duplicated definition of extension " + oid.getId());
+            }
+            controls.put(oid, new ExtensionControl(m.isCritical(), m.isRequired(), m.isPermittedInRequest()));
         }
 
         return Collections.unmodifiableMap(controls);
@@ -570,136 +567,98 @@ public class XmlX509CertprofileUtil
         return Collections.unmodifiableList(oids);
     }
 
-    public static KeyUsageOptions buildKeyUsageOptions(
-            List<org.xipki.ca.certprofile.internal.x509.jaxb.ExtensionsType.KeyUsage> usages)
+    public static Set<KeyUsageControl> buildKeyUsageOptions(
+            org.xipki.ca.certprofile.internal.x509.jaxb.KeyUsage extConf)
     {
-        List<KeyUsageOption> optionList = new ArrayList<>(usages.size());
+        List<UsageType> usages = extConf.getUsage();
+        Set<KeyUsageControl> controls = new HashSet<>(usages.size());
 
-        for(org.xipki.ca.certprofile.internal.x509.jaxb.ExtensionsType.KeyUsage t : usages)
+        for(UsageType m : usages)
         {
-            Set<KeyUsageControl> set = new HashSet<>();
-            for(KeyUsageType type : t.getUsage())
+            boolean required = m.isRequired();
+            switch(m.getValue())
             {
-                boolean required = type.isRequired();
-                switch(type.getValue())
-                {
-                case C_RL_SIGN:
-                    set.add(new KeyUsageControl(KeyUsage.cRLSign, required));
-                    break;
-                case DATA_ENCIPHERMENT:
-                    set.add(new KeyUsageControl(KeyUsage.dataEncipherment, required));
-                    break;
-                case CONTENT_COMMITMENT:
-                    set.add(new KeyUsageControl(KeyUsage.contentCommitment, required));
-                    break;
-                case DECIPHER_ONLY:
-                    set.add(new KeyUsageControl(KeyUsage.decipherOnly, required));
-                    break;
-                case ENCIPHER_ONLY:
-                    set.add(new KeyUsageControl(KeyUsage.encipherOnly, required));
-                    break;
-                case DIGITAL_SIGNATURE:
-                    set.add(new KeyUsageControl(KeyUsage.digitalSignature, required));
-                    break;
-                case KEY_AGREEMENT:
-                    set.add(new KeyUsageControl(KeyUsage.keyAgreement, required));
-                    break;
-                case KEY_CERT_SIGN:
-                    set.add(new KeyUsageControl(KeyUsage.keyCertSign, required));
-                    break;
-                case KEY_ENCIPHERMENT:
-                    set.add(new KeyUsageControl(KeyUsage.keyEncipherment, required));
-                    break;
-                default:
-                    throw new RuntimeException("should not reach here");
-                }
-            }
-
-            Set<KeyUsageControl> keyusageSet = Collections.unmodifiableSet(set);
-
-            Condition condition = XmlX509CertprofileUtil.createCondition(t.getCondition());
-            KeyUsageOption option = new KeyUsageOption(condition, keyusageSet);
-            optionList.add(option);
-        }
-
-        return new KeyUsageOptions(optionList);
-    }
-
-    public static ExtKeyUsageOptions buildExtKeyUsageOptions(List<ExtendedKeyUsage> usages)
-    {
-        List<ExtKeyUsageOption> optionList = new ArrayList<>(usages.size());
-
-        for(org.xipki.ca.certprofile.internal.x509.jaxb.ExtensionsType.ExtendedKeyUsage t : usages)
-        {
-            List<Usage> list = t.getUsage();
-            Set<ExtKeyUsageControl> extendedKeyusageSet = new HashSet<>();
-            for(Usage entry : list)
-            {
-                ExtKeyUsageControl usage = new ExtKeyUsageControl(
-                        new ASN1ObjectIdentifier(entry.getValue()), entry.isRequired());
-                extendedKeyusageSet.add(usage);
-            }
-            Condition condition = XmlX509CertprofileUtil.createCondition(t.getCondition());
-            ExtKeyUsageOption option = new ExtKeyUsageOption(condition, extendedKeyusageSet);
-            optionList.add(option);
-        }
-
-        return new ExtKeyUsageOptions(optionList);
-    }
-
-    public static AuthorityKeyIdentifierOption buildAuthorityKeyIdentifier(
-            AuthorityKeyIdentifier akiType, ExtensionControl control)
-    {
-        boolean includeIssuerAndSerial = true;
-        if(akiType != null)
-        {
-            Boolean B = akiType.isIncludeIssuerAndSerial();
-            if(B != null)
-            {
-                includeIssuerAndSerial = B.booleanValue();
+            case C_RL_SIGN:
+                controls.add(new KeyUsageControl(KeyUsage.cRLSign, required));
+                break;
+            case DATA_ENCIPHERMENT:
+                controls.add(new KeyUsageControl(KeyUsage.dataEncipherment, required));
+                break;
+            case CONTENT_COMMITMENT:
+                controls.add(new KeyUsageControl(KeyUsage.contentCommitment, required));
+                break;
+            case DECIPHER_ONLY:
+                controls.add(new KeyUsageControl(KeyUsage.decipherOnly, required));
+                break;
+            case ENCIPHER_ONLY:
+                controls.add(new KeyUsageControl(KeyUsage.encipherOnly, required));
+                break;
+            case DIGITAL_SIGNATURE:
+                controls.add(new KeyUsageControl(KeyUsage.digitalSignature, required));
+                break;
+            case KEY_AGREEMENT:
+                controls.add(new KeyUsageControl(KeyUsage.keyAgreement, required));
+                break;
+            case KEY_CERT_SIGN:
+                controls.add(new KeyUsageControl(KeyUsage.keyCertSign, required));
+                break;
+            case KEY_ENCIPHERMENT:
+                controls.add(new KeyUsageControl(KeyUsage.keyEncipherment, required));
+                break;
+            default:
+                throw new RuntimeException("should not reach here");
             }
         }
 
-        return new AuthorityKeyIdentifierOption(includeIssuerAndSerial, control);
+        return Collections.unmodifiableSet(controls);
     }
 
-    public static Map<ASN1ObjectIdentifier, ExtensionValueOptions> buildConstantExtesions(
-            List<ConstantExtensions> cess,
-            Map<ASN1ObjectIdentifier, ExtensionControl> extensionControls)
+    public static Set<ExtKeyUsageControl> buildExtKeyUsageOptions(ExtendedKeyUsage extConf)
+    {
+        List<Usage> usages = extConf.getUsage();
+        Set<ExtKeyUsageControl> controls = new HashSet<>(usages.size());
+
+        for(Usage m : usages)
+        {
+            ExtKeyUsageControl usage = new ExtKeyUsageControl(
+                    new ASN1ObjectIdentifier(m.getValue()), m.isRequired());
+            controls.add(usage);
+        }
+
+        return Collections.unmodifiableSet(controls);
+    }
+
+    public static Map<ASN1ObjectIdentifier, ExtensionValue> buildConstantExtesions(
+            ExtensionsType extensionsType)
     throws CertprofileException
     {
-        Map<ASN1ObjectIdentifier, List<ExtensionValueOption>> map = new HashMap<>();
-        for(ConstantExtensions ces : cess)
+        if(extensionsType == null)
         {
-            for(ConstantExtensionType ce :ces.getConstantExtension())
-            {
-                ASN1ObjectIdentifier type = new ASN1ObjectIdentifier(ce.getType().getValue());
-                ExtensionControl extensionControl = extensionControls.get(type);
-                if(extensionControl != null)
-                {
-                    byte[] encodedValue = ce.getValue();
-                    ASN1StreamParser parser = new ASN1StreamParser(encodedValue);
-                    ASN1Encodable value;
-                    try
-                    {
-                        value = parser.readObject();
-                    } catch (IOException e)
-                    {
-                        throw new CertprofileException("Could not parse the constant extension value", e);
-                    }
-                    ExtensionValue extension = new ExtensionValue(extensionControl.isCritical(), value);
-                    ExtensionValueOption option = new ExtensionValueOption(
-                            XmlX509CertprofileUtil.createCondition(ce.getCondition()), extension);
+            return null;
+        }
 
-                    List<ExtensionValueOption> options = map.get(type);
-                    if(options == null)
-                    {
-                        options = new LinkedList<>();
-                        map.put(type, options);
-                    }
-                    options.add(option);
-                }
+        Map<ASN1ObjectIdentifier, ExtensionValue> map = new HashMap<>();
+
+        for(ExtensionType m : extensionsType.getExtension())
+        {
+            if(m.getValue() == null || m.getValue().getAny() instanceof ConstantExtValue == false)
+            {
+                continue;
             }
+
+            ConstantExtValue extConf = (ConstantExtValue) m.getValue().getAny();
+            byte[] encodedValue = extConf.getValue();
+            ASN1StreamParser parser = new ASN1StreamParser(encodedValue);
+            ASN1Encodable value;
+            try
+            {
+                value = parser.readObject();
+            } catch (IOException e)
+            {
+                throw new CertprofileException("Could not parse the constant extension value", e);
+            }
+            ExtensionValue extension = new ExtensionValue(m.isCritical(), value);
+            map.put(new ASN1ObjectIdentifier(m.getType().getValue()), extension);
         }
 
         if(map.isEmpty())
@@ -707,14 +666,7 @@ public class XmlX509CertprofileUtil
             return null;
         }
 
-        Map<ASN1ObjectIdentifier, ExtensionValueOptions> constantExtensions = new HashMap<>(map.size());
-        for(ASN1ObjectIdentifier type : map.keySet())
-        {
-            List<ExtensionValueOption> options = map.get(type);
-            constantExtensions.put(type, new ExtensionValueOptions(options));
-        }
-
-        return Collections.unmodifiableMap(constantExtensions);
+        return Collections.unmodifiableMap(map);
     }
 
     public static Set<ASN1ObjectIdentifier> toOIDSet(List<OidWithDescType> oidWithDescTypes)
@@ -730,16 +682,6 @@ public class XmlX509CertprofileUtil
             oids.add(new ASN1ObjectIdentifier(type.getValue()));
         }
         return Collections.unmodifiableSet(oids);
-    }
-
-    public static boolean getBoolean(Boolean b, boolean dfltValue)
-    {
-        return b == null ? dfltValue : b.booleanValue();
-    }
-
-    public static int getInt(Integer i, int dfltValue)
-    {
-        return i == null ? dfltValue : i.intValue();
     }
 
 }

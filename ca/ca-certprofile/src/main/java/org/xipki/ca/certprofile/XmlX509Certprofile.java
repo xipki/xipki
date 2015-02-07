@@ -60,10 +60,8 @@ import org.bouncycastle.asn1.isismtt.x509.ProfessionInfo;
 import org.bouncycastle.asn1.x500.DirectoryString;
 import org.bouncycastle.asn1.x500.RDN;
 import org.bouncycastle.asn1.x500.X500Name;
-import org.bouncycastle.asn1.x509.CertificatePolicies;
 import org.bouncycastle.asn1.x509.Extension;
 import org.bouncycastle.asn1.x509.Extensions;
-import org.bouncycastle.asn1.x509.NameConstraints;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.ca.api.BadCertTemplateException;
@@ -84,24 +82,27 @@ import org.xipki.ca.api.profile.x509.KeyUsageControl;
 import org.xipki.ca.api.profile.x509.SpecialX509CertprofileBehavior;
 import org.xipki.ca.api.profile.x509.X509CertVersion;
 import org.xipki.ca.api.profile.x509.X509Util;
-import org.xipki.ca.certprofile.internal.AddText;
-import org.xipki.ca.certprofile.internal.AuthorityKeyIdentifierOption;
-import org.xipki.ca.certprofile.internal.ExtKeyUsageOptions;
-import org.xipki.ca.certprofile.internal.ExtensionValueOption;
-import org.xipki.ca.certprofile.internal.ExtensionValueOptions;
-import org.xipki.ca.certprofile.internal.KeyUsageOptions;
 import org.xipki.ca.certprofile.internal.SubjectDNOption;
 import org.xipki.ca.certprofile.internal.XmlX509CertprofileUtil;
+import org.xipki.ca.certprofile.internal.x509.jaxb.Admission;
+import org.xipki.ca.certprofile.internal.x509.jaxb.AuthorityKeyIdentifier;
+import org.xipki.ca.certprofile.internal.x509.jaxb.BasicConstraints;
+import org.xipki.ca.certprofile.internal.x509.jaxb.CertificatePolicies;
+import org.xipki.ca.certprofile.internal.x509.jaxb.ConstantExtValue;
+import org.xipki.ca.certprofile.internal.x509.jaxb.ExtendedKeyUsage;
+import org.xipki.ca.certprofile.internal.x509.jaxb.ExtensionType;
 import org.xipki.ca.certprofile.internal.x509.jaxb.ExtensionsType;
-import org.xipki.ca.certprofile.internal.x509.jaxb.ExtensionsType.Admission;
-import org.xipki.ca.certprofile.internal.x509.jaxb.ExtensionsType.ConstantExtensions;
-import org.xipki.ca.certprofile.internal.x509.jaxb.ExtensionsType.ExtendedKeyUsage;
-import org.xipki.ca.certprofile.internal.x509.jaxb.ExtensionsType.InhibitAnyPolicy;
-import org.xipki.ca.certprofile.internal.x509.jaxb.ExtensionsType.PolicyConstraints;
+import org.xipki.ca.certprofile.internal.x509.jaxb.InhibitAnyPolicy;
+import org.xipki.ca.certprofile.internal.x509.jaxb.KeyUsage;
+import org.xipki.ca.certprofile.internal.x509.jaxb.NameConstraints;
 import org.xipki.ca.certprofile.internal.x509.jaxb.NameValueType;
 import org.xipki.ca.certprofile.internal.x509.jaxb.OidWithDescType;
+import org.xipki.ca.certprofile.internal.x509.jaxb.PolicyConstraints;
+import org.xipki.ca.certprofile.internal.x509.jaxb.PolicyMappings;
 import org.xipki.ca.certprofile.internal.x509.jaxb.RdnType;
-import org.xipki.ca.certprofile.internal.x509.jaxb.SubjectInfoAccessType.Access;
+import org.xipki.ca.certprofile.internal.x509.jaxb.SubjectAltName;
+import org.xipki.ca.certprofile.internal.x509.jaxb.SubjectInfoAccess;
+import org.xipki.ca.certprofile.internal.x509.jaxb.SubjectInfoAccess.Access;
 import org.xipki.ca.certprofile.internal.x509.jaxb.X509ProfileType;
 import org.xipki.ca.certprofile.internal.x509.jaxb.X509ProfileType.KeyAlgorithms;
 import org.xipki.ca.certprofile.internal.x509.jaxb.X509ProfileType.Parameters;
@@ -131,7 +132,7 @@ public class XmlX509Certprofile extends BaseX509Certprofile
     private CertValidity validity;
     private X509CertVersion version;
     private Set<ASN1ObjectIdentifier> signatureAlgorithms;
-    private boolean incSerialNrIfSubjectExists;
+    private boolean incSerialNoIfSubjectExists;
     private boolean raOnly;
     private boolean qaOnly;
     private boolean backwardsSubject;
@@ -140,21 +141,21 @@ public class XmlX509Certprofile extends BaseX509Certprofile
     private boolean duplicateSubjectPermitted;
     private boolean serialNumberInReqPermitted;
     private boolean notBeforeMidnight;
+    private boolean includeIssuerAndSerialInAKI;
     private Integer pathLen;
-    private KeyUsageOptions keyusages;
-    private ExtKeyUsageOptions extendedKeyusages;
+    private Set<KeyUsageControl> keyusages;
+    private Set<ExtKeyUsageControl> extendedKeyusages;
     private Set<GeneralNameMode> allowedSubjectAltNameModes;
     private Map<ASN1ObjectIdentifier, Set<GeneralNameMode>> allowedSubjectInfoAccessModes;
 
-    private AuthorityKeyIdentifierOption akiOption;
-    private ExtensionValueOptions certificatePolicies;
-    private ExtensionValueOptions policyMappings;
-    private ExtensionValueOptions nameConstraints;
-    private ExtensionValueOptions policyConstraints;
-    private ExtensionValueOptions inhibitAnyPolicy;
-    private ExtensionValueOptions admission;
+    private ExtensionValue certificatePolicies;
+    private ExtensionValue policyMappings;
+    private ExtensionValue nameConstraints;
+    private ExtensionValue policyConstraints;
+    private ExtensionValue inhibitAnyPolicy;
+    private ExtensionValue admission;
 
-    private Map<ASN1ObjectIdentifier, ExtensionValueOptions> constantExtensions;
+    private Map<ASN1ObjectIdentifier, ExtensionValue> constantExtensions;
 
     private void reset()
     {
@@ -166,8 +167,8 @@ public class XmlX509Certprofile extends BaseX509Certprofile
         extensionControls = null;
         validity = null;
         notBeforeMidnight = false;
-        akiOption = null;
-        incSerialNrIfSubjectExists = false;
+        includeIssuerAndSerialInAKI = false;
+        incSerialNoIfSubjectExists = false;
         raOnly = false;
         qaOnly = false;
         backwardsSubject = false;
@@ -268,7 +269,7 @@ public class XmlX509Certprofile extends BaseX509Certprofile
             if(subject != null)
             {
                 this.backwardsSubject = subject.isDnBackwards();
-                this.incSerialNrIfSubjectExists = subject.isIncSerialNrIfSubjectExists();
+                this.incSerialNoIfSubjectExists = subject.isIncSerialNumber();
 
                 this.subjectDNControls = new HashSet<RDNControl>();
                 this.subjectDNOptions = new HashMap<>();
@@ -297,9 +298,7 @@ public class XmlX509Certprofile extends BaseX509Certprofile
                         }
                     }
                     ASN1ObjectIdentifier type = new ASN1ObjectIdentifier(t.getType().getValue());
-                    RDNControl occ = new RDNControl(type,
-                            XmlX509CertprofileUtil.getInt(t.getMinOccurs(), 1),
-                            XmlX509CertprofileUtil.getInt(t.getMaxOccurs(), 1), directoryStringEnum);
+                    RDNControl occ = new RDNControl(type, t.getMinOccurs(), t.getMaxOccurs(), directoryStringEnum);
                     this.subjectDNControls.add(occ);
 
                     List<Pattern> patterns = null;
@@ -313,9 +312,7 @@ public class XmlX509Certprofile extends BaseX509Certprofile
                         }
                     }
 
-                    List<AddText> addprefixes = XmlX509CertprofileUtil.buildAddText(t.getAddPrefix());
-                    List<AddText> addsuffixes = XmlX509CertprofileUtil.buildAddText(t.getAddSuffix());
-                    SubjectDNOption option = new SubjectDNOption(addprefixes, addsuffixes, patterns,
+                    SubjectDNOption option = new SubjectDNOption(t.getPrefix(), t.getSuffix(), patterns,
                             t.getMinLen(), t.getMaxLen());
                     this.subjectDNOptions.put(type, option);
                 }
@@ -324,144 +321,140 @@ public class XmlX509Certprofile extends BaseX509Certprofile
             // Extensions
             ExtensionsType extensionsType = conf.getExtensions();
 
-            this.pathLen = extensionsType.getPathLen();
-
             // Extension controls
             this.extensionControls = XmlX509CertprofileUtil.buildExtensionControls(extensionsType);
 
-            // Extension KeyUsage
-            if(extensionControls.containsKey(Extension.keyUsage))
+            // BasicConstrains
+            ASN1ObjectIdentifier type = Extension.basicConstraints;
+            if(extensionControls.containsKey(type))
             {
-                List<org.xipki.ca.certprofile.internal.x509.jaxb.ExtensionsType.KeyUsage> keyUsageTypeList =
-                        extensionsType.getKeyUsage();
-                if(keyUsageTypeList.isEmpty() == false)
+                BasicConstraints extConf = (BasicConstraints) getExtensionValue(
+                        type, extensionsType, BasicConstraints.class);
+                if(extConf != null)
                 {
-                    this.keyusages = XmlX509CertprofileUtil.buildKeyUsageOptions(keyUsageTypeList);
+                    this.pathLen = extConf.getPathLen();
+                }
+            }
+
+            // Extension KeyUsage
+            type = Extension.keyUsage;
+            if(extensionControls.containsKey(type))
+            {
+                KeyUsage extConf = (KeyUsage) getExtensionValue(
+                        type, extensionsType, KeyUsage.class);
+                if(extConf != null)
+                {
+                    this.keyusages = XmlX509CertprofileUtil.buildKeyUsageOptions(extConf);
                 }
             }
 
             // ExtendedKeyUsage
-            if(extensionControls.containsKey(Extension.extendedKeyUsage))
+            type = Extension.extendedKeyUsage;
+            if(extensionControls.containsKey(type))
             {
-                List<ExtendedKeyUsage> extKeyUsageTypeList = extensionsType.getExtendedKeyUsage();
-                if(extKeyUsageTypeList.isEmpty() == false)
+                ExtendedKeyUsage extConf = (ExtendedKeyUsage) getExtensionValue(
+                        type, extensionsType, ExtendedKeyUsage.class);
+                if(extConf != null)
                 {
-                    this.extendedKeyusages = XmlX509CertprofileUtil.buildExtKeyUsageOptions(extKeyUsageTypeList);
+                    this.extendedKeyusages = XmlX509CertprofileUtil.buildExtKeyUsageOptions(extConf);
                 }
             }
 
             // AuthorityKeyIdentifier
-            ExtensionControl extensionControl = extensionControls.get(Extension.authorityKeyIdentifier);
-            if(extensionControl != null)
+            type = Extension.authorityKeyIdentifier;
+            if(extensionControls.containsKey(type))
             {
-                this.akiOption = XmlX509CertprofileUtil.buildAuthorityKeyIdentifier(
-                        extensionsType.getAuthorityKeyIdentifier(),
-                        extensionControl);
+                AuthorityKeyIdentifier extConf = (AuthorityKeyIdentifier) getExtensionValue(
+                        type, extensionsType, AuthorityKeyIdentifier.class);
+                if(extConf != null)
+                {
+                    this.includeIssuerAndSerialInAKI = extConf.isIncludeIssuerAndSerial();
+                }
             }
 
             // Certificate Policies
-            extensionControl = extensionControls.get(Extension.certificatePolicies);
-            if(extensionControl != null && extensionsType.getCertificatePolicies().isEmpty() == false)
+            type = Extension.certificatePolicies;
+            if(extensionControls.containsKey(type))
             {
-                List<ExtensionsType.CertificatePolicies> types = extensionsType.getCertificatePolicies();
-                List<ExtensionValueOption> options = new ArrayList<>(types.size());
-                for(ExtensionsType.CertificatePolicies type : types)
+                CertificatePolicies extConf = (CertificatePolicies) getExtensionValue(
+                        type, extensionsType, CertificatePolicies.class);
+                if(extConf != null)
                 {
-                    List<CertificatePolicyInformation> policyInfos = XmlX509CertprofileUtil.buildCertificatePolicies(type);
-                    CertificatePolicies value = X509Util.createCertificatePolicies(policyInfos);
-                    ExtensionValue extension = new ExtensionValue(extensionControl.isCritical(), value);
-                    ExtensionValueOption option = new ExtensionValueOption(
-                            XmlX509CertprofileUtil.createCondition(type.getCondition()), extension);
-                    options.add(option);
+                    List<CertificatePolicyInformation> policyInfos = XmlX509CertprofileUtil.buildCertificatePolicies(extConf);
+                    org.bouncycastle.asn1.x509.CertificatePolicies value = X509Util.createCertificatePolicies(policyInfos);
+                    this.certificatePolicies = new ExtensionValue(extensionControls.get(type).isCritical(), value);
                 }
-                this.certificatePolicies = new ExtensionValueOptions(options);
             }
 
             // Policy Mappings
-            extensionControl = extensionControls.get(Extension.policyMappings);
-            if(extensionControl != null && extensionsType.getPolicyMappings().isEmpty() == false)
+            type = Extension.policyMappings;
+            if(extensionControls.containsKey(type))
             {
-                List<ExtensionsType.PolicyMappings> types = extensionsType.getPolicyMappings();
-                List<ExtensionValueOption> options = new ArrayList<>(types.size());
-                for(ExtensionsType.PolicyMappings type : types)
+                PolicyMappings extConf = (PolicyMappings) getExtensionValue(
+                        type, extensionsType, PolicyMappings.class);
+                if(extConf != null)
                 {
-                    org.bouncycastle.asn1.x509.PolicyMappings value = XmlX509CertprofileUtil.buildPolicyMappings(type);
-                    ExtensionValue extension = new ExtensionValue(extensionControl.isCritical(), value);
-                    ExtensionValueOption option = new ExtensionValueOption(
-                            XmlX509CertprofileUtil.createCondition(type.getCondition()), extension);
-                    options.add(option);
+                    org.bouncycastle.asn1.x509.PolicyMappings value = XmlX509CertprofileUtil.buildPolicyMappings(extConf);
+                    this.policyMappings = new ExtensionValue(extensionControls.get(type).isCritical(), value);
                 }
-                this.policyMappings = new ExtensionValueOptions(options);
             }
 
             // Name Constrains
-            extensionControl = extensionControls.get(Extension.nameConstraints);
-            if(extensionControl != null && extensionsType.getNameConstraints().isEmpty() == false)
+            type = Extension.nameConstraints;
+            if(extensionControls.containsKey(type))
             {
-                List<ExtensionsType.NameConstraints> types = extensionsType.getNameConstraints();
-                List<ExtensionValueOption> options = new ArrayList<>(types.size());
-                for(ExtensionsType.NameConstraints type : types)
+                NameConstraints extConf = (NameConstraints) getExtensionValue(
+                        type, extensionsType, NameConstraints.class);
+                if(extConf != null)
                 {
-                    NameConstraints value = XmlX509CertprofileUtil.buildNameConstrains(type);
-                    ExtensionValue extension =new ExtensionValue(extensionControl.isCritical(), value);
-                    ExtensionValueOption option = new ExtensionValueOption(
-                            XmlX509CertprofileUtil.createCondition(type.getCondition()), extension);
-                    options.add(option);
+                    org.bouncycastle.asn1.x509.NameConstraints value = XmlX509CertprofileUtil.buildNameConstrains(extConf);
+                    this.nameConstraints = new ExtensionValue(extensionControls.get(type).isCritical(), value);
                 }
-                this.nameConstraints = new ExtensionValueOptions(options);
             }
 
             // Policy Constraints
-            extensionControl = extensionControls.get(Extension.policyConstraints);
-            if(extensionControl != null && extensionsType.getPolicyConstraints().isEmpty() == false)
+            type = Extension.policyConstraints;
+            if(extensionControls.containsKey(type))
             {
-                List<PolicyConstraints> types = extensionsType.getPolicyConstraints();
-                List<ExtensionValueOption> options = new ArrayList<>(types.size());
-                for(PolicyConstraints type : types)
+                PolicyConstraints extConf = (PolicyConstraints) getExtensionValue(
+                        type, extensionsType, PolicyConstraints.class);
+                if(extConf != null)
                 {
-                    ASN1Sequence value = XmlX509CertprofileUtil.buildPolicyConstrains(type);
-                    ExtensionValue extension =new ExtensionValue(extensionControl.isCritical(), value);
-                    ExtensionValueOption option = new ExtensionValueOption(
-                            XmlX509CertprofileUtil.createCondition(type.getCondition()), extension);
-                    options.add(option);
+                    ASN1Sequence value = XmlX509CertprofileUtil.buildPolicyConstrains(extConf);
+                    this.policyConstraints = new ExtensionValue(extensionControls.get(type).isCritical(), value);
                 }
-                this.policyConstraints = new ExtensionValueOptions(options);
             }
 
             // Inhibit anyPolicy
-            extensionControl = extensionControls.get(Extension.inhibitAnyPolicy);
-            if(extensionControl != null && extensionsType.getInhibitAnyPolicy().isEmpty() == false)
+            type = Extension.inhibitAnyPolicy;
+            if(extensionControls.containsKey(type))
             {
-                List<InhibitAnyPolicy> types = extensionsType.getInhibitAnyPolicy();
-                List<ExtensionValueOption> options = new ArrayList<>(types.size());
-                for(InhibitAnyPolicy type : types)
+                InhibitAnyPolicy extConf = (InhibitAnyPolicy) getExtensionValue(
+                        type, extensionsType, InhibitAnyPolicy.class);
+                if(extConf != null)
                 {
-                    int skipCerts = type.getSkipCerts();
+                    int skipCerts = extConf.getSkipCerts();
                     if(skipCerts < 0)
                     {
                         throw new CertprofileException("negative inhibitAnyPolicy.skipCerts is not allowed: " + skipCerts);
                     }
                     ASN1Integer value = new ASN1Integer(BigInteger.valueOf(skipCerts));
-                    ExtensionValue extension =new ExtensionValue(extensionControl.isCritical(), value);
-                    ExtensionValueOption option = new ExtensionValueOption(
-                            XmlX509CertprofileUtil.createCondition(type.getCondition()), extension);
-                    options.add(option);
+                    this.inhibitAnyPolicy =new ExtensionValue(extensionControls.get(type).isCritical(), value);
                 }
-                this.inhibitAnyPolicy = new ExtensionValueOptions(options);
             }
 
             // admission
-            extensionControl = extensionControls.get(ObjectIdentifiers.id_extension_admission);
-            if(extensionControl != null && extensionsType.getAdmission().isEmpty() == false)
+            type = ObjectIdentifiers.id_extension_admission;
+            if(extensionControls.containsKey(type))
             {
-                List<Admission> types = extensionsType.getAdmission();
-                List<ExtensionValueOption> options = new ArrayList<>(types.size());
-                for(Admission type : types)
+                Admission extConf = (Admission) getExtensionValue(
+                        type, extensionsType, Admission.class);
+                if(extConf != null)
                 {
                     List<ASN1ObjectIdentifier> professionOIDs;
                     List<String> professionItems;
 
-                    List<String> items = type == null ? null : type.getProfessionItem();
+                    List<String> items = type == null ? null : extConf.getProfessionItem();
                     if(items == null || items.isEmpty())
                     {
                         professionItems = null;
@@ -471,44 +464,49 @@ public class XmlX509Certprofile extends BaseX509Certprofile
                         professionItems = Collections.unmodifiableList(new LinkedList<>(items));
                     }
 
-                    List<OidWithDescType> oidWithDescs = (type == null) ? null : type.getProfessionOid();
+                    List<OidWithDescType> oidWithDescs = (type == null) ? null : extConf.getProfessionOid();
                     professionOIDs = XmlX509CertprofileUtil.toOIDList(oidWithDescs);
 
-                    ExtensionValue extension = createAdmission(extensionControl.isCritical(),
-                            professionOIDs, professionItems, type.getRegistrationNumber(), type.getAddProfessionInfo());
-                    ExtensionValueOption option = new ExtensionValueOption(
-                            XmlX509CertprofileUtil.createCondition(type.getCondition()), extension);
-                    options.add(option);
+                    this.admission = createAdmission(extensionControls.get(type).isCritical(),
+                            professionOIDs, professionItems,
+                            extConf.getRegistrationNumber(),
+                            extConf.getAddProfessionInfo());
                 }
-                this.admission = new ExtensionValueOptions(options);
             }
 
             // SubjectAltNameMode
-            if(extensionsType.getSubjectAltName() != null)
+            type = Extension.subjectAlternativeName;
+            if(extensionControls.containsKey(type))
             {
-                this.allowedSubjectAltNameModes = XmlX509CertprofileUtil.buildGeneralNameMode(
-                        extensionsType.getSubjectAltName());
+                SubjectAltName extConf = (SubjectAltName) getExtensionValue(
+                        type, extensionsType, SubjectAltName.class);
+                if(extConf != null)
+                {
+                    this.allowedSubjectAltNameModes = XmlX509CertprofileUtil.buildGeneralNameMode(extConf);
+                }
             }
 
             // SubjectInfoAccess
-            if(extensionsType.getSubjectInfoAccess() != null)
+            type = Extension.subjectInfoAccess;
+            if(extensionControls.containsKey(type))
             {
-                List<Access> list = extensionsType.getSubjectInfoAccess().getAccess();
-                this.allowedSubjectInfoAccessModes = new HashMap<>();
-                for(Access entry : list)
+                SubjectInfoAccess extConf = (SubjectInfoAccess) getExtensionValue(
+                        type, extensionsType, SubjectInfoAccess.class);
+                if(extConf != null)
                 {
-                    this.allowedSubjectInfoAccessModes.put(
-                            new ASN1ObjectIdentifier(entry.getAccessMethod().getValue()),
-                            XmlX509CertprofileUtil.buildGeneralNameMode(entry.getAccessLocation()));
+                    List<Access> list = extConf.getAccess();
+                    this.allowedSubjectInfoAccessModes = new HashMap<>();
+                    for(Access entry : list)
+                    {
+                        this.allowedSubjectInfoAccessModes.put(
+                                new ASN1ObjectIdentifier(entry.getAccessMethod().getValue()),
+                                XmlX509CertprofileUtil.buildGeneralNameMode(entry.getAccessLocation()));
+                    }
                 }
             }
 
             // constant extensions
-            List<ConstantExtensions> cess = extensionsType.getConstantExtensions();
-            if(cess != null && cess.isEmpty() == false)
-            {
-                this.constantExtensions = XmlX509CertprofileUtil.buildConstantExtesions(cess, extensionControls);
-            }
+            this.constantExtensions = XmlX509CertprofileUtil.buildConstantExtesions(extensionsType);
         }catch(RuntimeException e)
         {
             final String message = "RuntimeException";
@@ -605,11 +603,8 @@ public class XmlX509Certprofile extends BaseX509Certprofile
         SubjectDNOption option = subjectDNOptions.get(type);
         if(option != null)
         {
-            AddText addPrefix = option.getAddprefix(parameterResolver);
-            String prefix = addPrefix == null ? null : addPrefix.getText();
-
-            AddText addSuffix = option.getAddsufix(parameterResolver);
-            String suffix = addSuffix == null ? null : addSuffix.getText();
+            String prefix = option.getPrefix();
+            String suffix = option.getSufix();
 
             if(prefix != null || suffix != null)
             {
@@ -744,14 +739,14 @@ public class XmlX509Certprofile extends BaseX509Certprofile
         ASN1ObjectIdentifier type = Extension.certificatePolicies;
         if(certificatePolicies != null && occurences.remove(type) != null)
         {
-            tuples.addExtension(type, certificatePolicies.getExtensionValue(parameterResolver));
+            tuples.addExtension(type, certificatePolicies);
         }
 
         // Policy Mappings
         type = Extension.policyMappings;
         if(policyMappings != null && occurences.remove(type) != null)
         {
-            tuples.addExtension(type, policyMappings.getExtensionValue(parameterResolver));
+            tuples.addExtension(type, policyMappings);
         }
 
         // SubjectAltName
@@ -770,14 +765,14 @@ public class XmlX509Certprofile extends BaseX509Certprofile
         type = Extension.nameConstraints;
         if(nameConstraints != null && occurences.remove(type) != null)
         {
-            tuples.addExtension(type, nameConstraints.getExtensionValue(parameterResolver));
+            tuples.addExtension(type, nameConstraints);
         }
 
         // PolicyConstrains
         type = Extension.policyConstraints;
         if(policyConstraints != null && occurences.remove(type) != null)
         {
-            tuples.addExtension(type, policyConstraints.getExtensionValue(parameterResolver));
+            tuples.addExtension(type, policyConstraints);
         }
 
         // ExtendedKeyUsage
@@ -790,7 +785,7 @@ public class XmlX509Certprofile extends BaseX509Certprofile
         type = Extension.inhibitAnyPolicy;
         if(inhibitAnyPolicy != null && occurences.remove(type) != null)
         {
-            tuples.addExtension(type, inhibitAnyPolicy.getExtensionValue(parameterResolver));
+            tuples.addExtension(type, inhibitAnyPolicy);
         }
 
         // Freshest CRL
@@ -806,7 +801,7 @@ public class XmlX509Certprofile extends BaseX509Certprofile
         type = ObjectIdentifiers.id_extension_admission;
         if(admission != null && occurences.remove(type) != null)
         {
-            tuples.addExtension(type, admission.getExtensionValue(parameterResolver));
+            tuples.addExtension(type, admission);
         }
 
         // OCSP Nocheck
@@ -820,7 +815,7 @@ public class XmlX509Certprofile extends BaseX509Certprofile
                 ExtensionControl occurence = occurences.remove(m);
                 if(occurence != null)
                 {
-                    ExtensionValue extensionValue = constantExtensions.get(m).getExtensionValue(parameterResolver);
+                    ExtensionValue extensionValue = constantExtensions.get(m);
                     if(extensionValue != null)
                     {
                         tuples.addExtension(m, extensionValue);
@@ -835,19 +830,19 @@ public class XmlX509Certprofile extends BaseX509Certprofile
     @Override
     public boolean incSerialNumberIfSubjectExists()
     {
-        return incSerialNrIfSubjectExists;
+        return incSerialNoIfSubjectExists;
     }
 
     @Override
     public Set<KeyUsageControl> getKeyUsage()
     {
-        return keyusages == null ? null : keyusages.getKeyusage(parameterResolver);
+        return keyusages;
     }
 
     @Override
     public Set<ExtKeyUsageControl> getExtendedKeyUsages()
     {
-        return extendedKeyusages == null ? null : extendedKeyusages.getExtKeyusage(parameterResolver);
+        return extendedKeyusages;
     }
 
     @Override
@@ -895,7 +890,7 @@ public class XmlX509Certprofile extends BaseX509Certprofile
     @Override
     public boolean includeIssuerAndSerialInAKI()
     {
-        return akiOption == null ? false : akiOption.isIncludeIssuerAndSerial();
+        return includeIssuerAndSerialInAKI;
     }
 
     @Override
@@ -1013,6 +1008,39 @@ public class XmlX509Certprofile extends BaseX509Certprofile
     public Set<ASN1ObjectIdentifier> getSignatureAlgorithms()
     {
         return signatureAlgorithms;
+    }
+
+    private Object getExtensionValue(ASN1ObjectIdentifier type,
+            ExtensionsType extensionsType, Class<?> expectedClass)
+    throws CertprofileException
+    {
+        for(ExtensionType m : extensionsType.getExtension())
+        {
+            if(m.getType().getValue().equals(type.getId()))
+            {
+                if(m.getValue() == null || m.getValue().getAny() == null)
+                {
+                    return null;
+                }
+                Object o = m.getValue().getAny();
+                if(expectedClass.isAssignableFrom(o.getClass()))
+                {
+                    return o;
+                }
+                else if(ConstantExtValue.class.isAssignableFrom(o.getClass()))
+                {
+                    // will be processed later
+                }
+                else
+                {
+                    String displayName = ObjectIdentifiers.oidToDisplayName(type);
+                    throw new CertprofileException("the extension configuration for " + displayName +
+                            " is not of the expected type " + expectedClass.getName());
+                }
+            }
+        }
+
+        throw new RuntimeException("Should not reach here: undefined extension " + type.getId());
     }
 
 }

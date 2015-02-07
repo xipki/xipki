@@ -20,11 +20,6 @@ xipki-ca:ca-restart
 #                       PREPARE ENVIRONMENET                    #
 #################################################################
 
-## Environment parameters
-xipki-ca:env-add -name add.prefix -value true
-
-xipki-ca:env-add -name add.suffix -value true
-
 xipki-ca:env-add -name certprofileType.map -value \
  "DemoEE1?java:org.xipki.certprofile.demo.x509.DemoEE1X509Certprofile%DemoEE2?java:org.xipki.certprofile.demo.x509.DemoEE2X509Certprofile%"
 

@@ -39,22 +39,20 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.xipki.ca.certprofile.internal.x509.jaxb.ExtensionsType.NameConstraints;
+import org.xipki.ca.certprofile.internal.x509.jaxb.NameConstraints;
 import org.xipki.ca.certprofile.internal.x509.jaxb.GeneralSubtreeBaseType;
 
 /**
  * @author Lijun Liao
  */
 
-public class QaNameConstraintsOption extends QaExtensionOption
+public class QaNameConstraints extends QaExtension
 {
     private final List<QaGeneralSubtree> permittedSubtrees;
     private final List<QaGeneralSubtree> excludedSubtrees;
 
-    public QaNameConstraintsOption(NameConstraints jaxb)
+    public QaNameConstraints(NameConstraints jaxb)
     {
-        super(jaxb.getCondition());
-
         if(jaxb.getPermittedSubtrees() != null && jaxb.getPermittedSubtrees().getBase().isEmpty() == false)
         {
             List<QaGeneralSubtree> list = new LinkedList<>();
