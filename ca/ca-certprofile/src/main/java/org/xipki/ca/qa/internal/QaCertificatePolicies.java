@@ -39,22 +39,20 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.xipki.ca.certprofile.internal.x509.jaxb.CertificatePolicies;
 import org.xipki.ca.certprofile.internal.x509.jaxb.CertificatePolicyInformationType;
-import org.xipki.ca.certprofile.internal.x509.jaxb.ExtensionsType.CertificatePolicies;
 import org.xipki.common.ParamChecker;
 
 /**
  * @author Lijun Liao
  */
 
-public class QaCertificatePoliciesOption extends QaExtensionOption
+public class QaCertificatePolicies extends QaExtension
 {
     private final List<QaCertificatePolicyInformation> policyInformations;
 
-    public QaCertificatePoliciesOption(CertificatePolicies jaxb)
+    public QaCertificatePolicies(CertificatePolicies jaxb)
     {
-        super(jaxb.getCondition());
-
         List<CertificatePolicyInformationType> types = jaxb.getCertificatePolicyInformation();
         List<QaCertificatePolicyInformation> list = new LinkedList<>();
         for(CertificatePolicyInformationType type : types)
@@ -86,7 +84,7 @@ public class QaCertificatePoliciesOption extends QaExtensionOption
     public static class QaCertificatePolicyInformation
     {
         private final String policyId;
-        private final QaPolicyQualifiersOption policyQualifiers;
+        private final QaPolicyQualifiers policyQualifiers;
 
         public QaCertificatePolicyInformation(CertificatePolicyInformationType jaxb)
         {
@@ -97,7 +95,7 @@ public class QaCertificatePoliciesOption extends QaExtensionOption
                 this.policyQualifiers = null;
             }else
             {
-                this.policyQualifiers = new QaPolicyQualifiersOption(jaxb.getPolicyQualifiers());
+                this.policyQualifiers = new QaPolicyQualifiers(jaxb.getPolicyQualifiers());
             }
         }
 
@@ -106,7 +104,7 @@ public class QaCertificatePoliciesOption extends QaExtensionOption
             return policyId;
         }
 
-        public QaPolicyQualifiersOption getPolicyQualifiers()
+        public QaPolicyQualifiers getPolicyQualifiers()
         {
             return policyQualifiers;
         }

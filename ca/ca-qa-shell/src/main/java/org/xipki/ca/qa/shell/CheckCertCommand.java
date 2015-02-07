@@ -44,7 +44,6 @@ import org.bouncycastle.asn1.pkcs.Attribute;
 import org.bouncycastle.asn1.pkcs.CertificationRequest;
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 import org.bouncycastle.asn1.x509.Extensions;
-import org.xipki.ca.api.EnvironmentParameterResolver;
 import org.xipki.ca.qa.ValidationIssue;
 import org.xipki.ca.qa.ValidationResult;
 import org.xipki.ca.qa.X509CertprofileQA;
@@ -66,10 +65,6 @@ public class CheckCertCommand extends XipkiOsgiCommandSupport
     @Option(name = "-issuer",
             required = false, description = "Required if multiple issuers are configured. Issuer name")
     protected String issuerName;
-
-    @Option(name = "-env",
-            required = false, description = "Environment name")
-    protected String envName;
 
     @Option(name = "-p10",
             required = true, description = "Required. PKCS#10 request file")
@@ -113,20 +108,6 @@ public class CheckCertCommand extends XipkiOsgiCommandSupport
             return null;
         }
 
-        EnvironmentParameterResolver environment = null;
-        if(envName != null)
-        {
-            Set<String> envNames = qaSystemManager.getEnvironmentNames();
-            if(envNames.contains(envName) == false)
-            {
-                err("Environment " + envName + " is not within the configured environments " + envNames);
-                return null;
-            } else
-            {
-                environment = qaSystemManager.getEnvironment(envName);
-            }
-        }
-
         X509IssuerInfo issuerInfo = qaSystemManager.getIssuer(issuerName);
 
         X509CertprofileQA qa = qaSystemManager.getCertprofile(profileName);
@@ -150,7 +131,7 @@ public class CheckCertCommand extends XipkiOsgiCommandSupport
 
         byte[] certBytes = IoUtil.read(certFile);
         ValidationResult result = qa.checkCert(certBytes, issuerInfo, p10Req.getCertificationRequestInfo().getSubject(),
-                p10Req.getCertificationRequestInfo().getSubjectPublicKeyInfo(), extensions, environment);
+                p10Req.getCertificationRequestInfo().getSubjectPublicKeyInfo(), extensions);
         StringBuilder sb = new StringBuilder();
 
         sb.append("certificate is ");

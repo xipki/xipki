@@ -52,10 +52,4 @@
       <file>demo/profile/Certprofile_gSMC_K.xml</file>
     </X509Certprofile>
   </X509Certprofiles>
-  <environments>
-    <environment name="env-a">
-      <parameter name="add.prefix">true</parameter>
-      <parameter name="add.suffix">true</parameter>
-    </environment>
-  </environments>
 </QAConf>

@@ -39,7 +39,6 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -60,47 +59,45 @@ import org.bouncycastle.asn1.x9.X9ObjectIdentifiers;
 import org.w3c.dom.Element;
 import org.xipki.ca.api.profile.x509.SpecialX509CertprofileBehavior;
 import org.xipki.ca.certprofile.XmlX509Certprofile;
-import org.xipki.ca.certprofile.internal.x509.jaxb.AddTextType;
+import org.xipki.ca.certprofile.internal.x509.jaxb.Admission;
 import org.xipki.ca.certprofile.internal.x509.jaxb.AlgorithmType;
 import org.xipki.ca.certprofile.internal.x509.jaxb.AnyType;
+import org.xipki.ca.certprofile.internal.x509.jaxb.AuthorityKeyIdentifier;
+import org.xipki.ca.certprofile.internal.x509.jaxb.BasicConstraints;
+import org.xipki.ca.certprofile.internal.x509.jaxb.CertificatePolicies;
 import org.xipki.ca.certprofile.internal.x509.jaxb.CertificatePolicyInformationType;
-import org.xipki.ca.certprofile.internal.x509.jaxb.ConditionType;
-import org.xipki.ca.certprofile.internal.x509.jaxb.ConstantExtensionType;
-import org.xipki.ca.certprofile.internal.x509.jaxb.DSAParametersType;
-import org.xipki.ca.certprofile.internal.x509.jaxb.ECParametersType;
-import org.xipki.ca.certprofile.internal.x509.jaxb.ECParametersType.Curves;
-import org.xipki.ca.certprofile.internal.x509.jaxb.ECParametersType.PointEncodings;
-import org.xipki.ca.certprofile.internal.x509.jaxb.EnvParamType;
+import org.xipki.ca.certprofile.internal.x509.jaxb.ConstantExtValue;
+import org.xipki.ca.certprofile.internal.x509.jaxb.DSAParameters;
+import org.xipki.ca.certprofile.internal.x509.jaxb.ECParameters;
+import org.xipki.ca.certprofile.internal.x509.jaxb.ECParameters.Curves;
+import org.xipki.ca.certprofile.internal.x509.jaxb.ECParameters.PointEncodings;
+import org.xipki.ca.certprofile.internal.x509.jaxb.ExtendedKeyUsage;
+import org.xipki.ca.certprofile.internal.x509.jaxb.ExtendedKeyUsage.Usage;
 import org.xipki.ca.certprofile.internal.x509.jaxb.ExtensionType;
+import org.xipki.ca.certprofile.internal.x509.jaxb.ExtensionValueType;
 import org.xipki.ca.certprofile.internal.x509.jaxb.ExtensionsType;
-import org.xipki.ca.certprofile.internal.x509.jaxb.ExtensionsType.Admission;
-import org.xipki.ca.certprofile.internal.x509.jaxb.ExtensionsType.AuthorityKeyIdentifier;
-import org.xipki.ca.certprofile.internal.x509.jaxb.ExtensionsType.CertificatePolicies;
-import org.xipki.ca.certprofile.internal.x509.jaxb.ExtensionsType.ConstantExtensions;
-import org.xipki.ca.certprofile.internal.x509.jaxb.ExtensionsType.ExtendedKeyUsage;
-import org.xipki.ca.certprofile.internal.x509.jaxb.ExtensionsType.ExtendedKeyUsage.Usage;
-import org.xipki.ca.certprofile.internal.x509.jaxb.ExtensionsType.InhibitAnyPolicy;
-import org.xipki.ca.certprofile.internal.x509.jaxb.ExtensionsType.KeyUsage;
-import org.xipki.ca.certprofile.internal.x509.jaxb.ExtensionsType.NameConstraints;
-import org.xipki.ca.certprofile.internal.x509.jaxb.ExtensionsType.PolicyConstraints;
-import org.xipki.ca.certprofile.internal.x509.jaxb.ExtensionsType.PolicyMappings;
 import org.xipki.ca.certprofile.internal.x509.jaxb.GeneralNameType;
 import org.xipki.ca.certprofile.internal.x509.jaxb.GeneralNameType.OtherName;
 import org.xipki.ca.certprofile.internal.x509.jaxb.GeneralSubtreeBaseType;
 import org.xipki.ca.certprofile.internal.x509.jaxb.GeneralSubtreesType;
+import org.xipki.ca.certprofile.internal.x509.jaxb.InhibitAnyPolicy;
+import org.xipki.ca.certprofile.internal.x509.jaxb.KeyParametersType;
+import org.xipki.ca.certprofile.internal.x509.jaxb.KeyUsage;
 import org.xipki.ca.certprofile.internal.x509.jaxb.KeyUsageEnum;
-import org.xipki.ca.certprofile.internal.x509.jaxb.KeyUsageType;
+import org.xipki.ca.certprofile.internal.x509.jaxb.NameConstraints;
 import org.xipki.ca.certprofile.internal.x509.jaxb.NameValueType;
 import org.xipki.ca.certprofile.internal.x509.jaxb.ObjectFactory;
 import org.xipki.ca.certprofile.internal.x509.jaxb.OidWithDescType;
-import org.xipki.ca.certprofile.internal.x509.jaxb.OperatorType;
+import org.xipki.ca.certprofile.internal.x509.jaxb.PolicyConstraints;
 import org.xipki.ca.certprofile.internal.x509.jaxb.PolicyIdMappingType;
-import org.xipki.ca.certprofile.internal.x509.jaxb.RSAParametersType;
+import org.xipki.ca.certprofile.internal.x509.jaxb.PolicyMappings;
+import org.xipki.ca.certprofile.internal.x509.jaxb.RSAParameters;
 import org.xipki.ca.certprofile.internal.x509.jaxb.RangeType;
 import org.xipki.ca.certprofile.internal.x509.jaxb.RangesType;
 import org.xipki.ca.certprofile.internal.x509.jaxb.RdnType;
-import org.xipki.ca.certprofile.internal.x509.jaxb.SubjectInfoAccessType;
-import org.xipki.ca.certprofile.internal.x509.jaxb.SubjectInfoAccessType.Access;
+import org.xipki.ca.certprofile.internal.x509.jaxb.SubjectAltName;
+import org.xipki.ca.certprofile.internal.x509.jaxb.SubjectInfoAccess;
+import org.xipki.ca.certprofile.internal.x509.jaxb.UsageType;
 import org.xipki.ca.certprofile.internal.x509.jaxb.X509ProfileType;
 import org.xipki.ca.certprofile.internal.x509.jaxb.X509ProfileType.KeyAlgorithms;
 import org.xipki.ca.certprofile.internal.x509.jaxb.X509ProfileType.Parameters;
@@ -135,10 +132,9 @@ public class ProfileConfCreatorDemo
 
     private static class ExampleDescription extends AnyType
     {
-        public ExampleDescription(Element description)
+        public ExampleDescription(Element appInfo)
         {
-            content = new ArrayList<>(1);
-            content.add(description);
+            setAny(appInfo);
         }
     }
 
@@ -227,36 +223,40 @@ public class ProfileConfCreatorDemo
 
         // Subject
         Subject subject = profile.getSubject();
-        subject.setIncSerialNrIfSubjectExists(false);
+        subject.setIncSerialNumber(false);
 
         List<RdnType> rdnControls = subject.getRdn();
-        rdnControls.add(createRDN(ObjectIdentifiers.DN_C, 1, 1, new String[]{"DE|FR"}));
-        rdnControls.add(createRDN(ObjectIdentifiers.DN_O, 1, 1, null));
-        rdnControls.add(createRDN(ObjectIdentifiers.DN_OU, 0, 1, null));
-        rdnControls.add(createRDN(ObjectIdentifiers.DN_SN, 0, 1, new String[]{REGEX_SN}));
-        rdnControls.add(createRDN(ObjectIdentifiers.DN_CN, 1, 1, null));
+        rdnControls.add(createRDN(ObjectIdentifiers.DN_C, 1, 1, new String[]{"DE|FR"}, null, null));
+        rdnControls.add(createRDN(ObjectIdentifiers.DN_O, 1, 1));
+        rdnControls.add(createRDN(ObjectIdentifiers.DN_OU, 0, 1));
+        rdnControls.add(createRDN(ObjectIdentifiers.DN_SN, 0, 1, new String[]{REGEX_SN}, null, null));
+        rdnControls.add(createRDN(ObjectIdentifiers.DN_CN, 1, 1));
 
         // Extensions
-        // Extensions - general
         ExtensionsType extensions = profile.getExtensions();
 
-        // Extensions - controls
         List<ExtensionType> list = extensions.getExtension();
-        list.add(createExtension(Extension.subjectKeyIdentifier, true, false));
+        list.add(createExtension(Extension.subjectKeyIdentifier, true, false, null));
+        list.add(createExtension(Extension.authorityInfoAccess, true, false, null));
+        list.add(createExtension(Extension.cRLDistributionPoints, false, false, null));
+        list.add(createExtension(Extension.freshestCRL, false, false, null));
+
+        // Extensions - basicConstraints
+        ExtensionValueType extensionValue = null;
+        list.add(createExtension(Extension.basicConstraints, true, true, extensionValue));
+
+        // Extensions - AuthorityKeyIdentifier
         if(cross)
         {
-            list.add(createExtension(Extension.authorityKeyIdentifier, true, false));
+            extensionValue = createAuthorityKeyIdentifier(false);
+            list.add(createExtension(Extension.authorityKeyIdentifier, true, false, extensionValue));
         }
-        list.add(createExtension(Extension.authorityInfoAccess, true, false));
-        list.add(createExtension(Extension.cRLDistributionPoints, false, false));
-        list.add(createExtension(Extension.freshestCRL, false, false));
-        list.add(createExtension(Extension.keyUsage, true, true));
-        list.add(createExtension(Extension.basicConstraints, true, true));
 
         // Extensions - keyUsage
-        KeyUsage keyusage = createRequiredKeyUsages(KeyUsageEnum.KEY_CERT_SIGN);
-        keyusage.getUsage().add(createOptionalKeyUsage(KeyUsageEnum.C_RL_SIGN));
-        extensions.getKeyUsage().add(keyusage);
+        extensionValue = createKeyUsages(
+                new KeyUsageEnum[]{KeyUsageEnum.KEY_CERT_SIGN},
+                new KeyUsageEnum[]{KeyUsageEnum.C_RL_SIGN});
+        list.add(createExtension(Extension.keyUsage, true, true, extensionValue));
 
         return profile;
     }
@@ -268,34 +268,38 @@ public class ProfileConfCreatorDemo
 
         // Subject
         Subject subject = profile.getSubject();
-        subject.setIncSerialNrIfSubjectExists(false);
+        subject.setIncSerialNumber(false);
 
         List<RdnType> rdnControls = subject.getRdn();
-        rdnControls.add(createRDN(ObjectIdentifiers.DN_C, 1, 1, new String[]{"DE|FR"}));
-        rdnControls.add(createRDN(ObjectIdentifiers.DN_O, 1, 1, null));
-        rdnControls.add(createRDN(ObjectIdentifiers.DN_OU, 0, 1, null));
-        rdnControls.add(createRDN(ObjectIdentifiers.DN_SN, 0, 1, new String[]{REGEX_SN}));
-        rdnControls.add(createRDN(ObjectIdentifiers.DN_CN, 1, 1, null));
+        rdnControls.add(createRDN(ObjectIdentifiers.DN_C, 1, 1, new String[]{"DE|FR"}, null, null));
+        rdnControls.add(createRDN(ObjectIdentifiers.DN_O, 1, 1));
+        rdnControls.add(createRDN(ObjectIdentifiers.DN_OU, 0, 1));
+        rdnControls.add(createRDN(ObjectIdentifiers.DN_SN, 0, 1, new String[]{REGEX_SN}, null, null));
+        rdnControls.add(createRDN(ObjectIdentifiers.DN_CN, 1, 1));
 
         // Extensions
-        // Extensions - general
         ExtensionsType extensions = profile.getExtensions();
-        extensions.setPathLen(1);
 
         // Extensions - controls
         List<ExtensionType> list = extensions.getExtension();
-        list.add(createExtension(Extension.subjectKeyIdentifier, true, false));
-        list.add(createExtension(Extension.authorityKeyIdentifier, true, false));
-        list.add(createExtension(Extension.authorityInfoAccess, true, false));
-        list.add(createExtension(Extension.cRLDistributionPoints, false, false));
-        list.add(createExtension(Extension.freshestCRL, false, false));
-        list.add(createExtension(Extension.keyUsage, true, true));
-        list.add(createExtension(Extension.basicConstraints, true, true));
+        list.add(createExtension(Extension.subjectKeyIdentifier, true, false, null));
+        list.add(createExtension(Extension.authorityInfoAccess, true, false, null));
+        list.add(createExtension(Extension.cRLDistributionPoints, false, false, null));
+        list.add(createExtension(Extension.freshestCRL, false, false, null));
+
+        // Extensions - basicConstraints
+        ExtensionValueType extensionValue = createBasicConstraints(1);
+        list.add(createExtension(Extension.basicConstraints, true, true, extensionValue));
+
+        // Extensions - AuthorityKeyIdentifier
+        extensionValue = createAuthorityKeyIdentifier(false);
+        list.add(createExtension(Extension.authorityKeyIdentifier, true, false, extensionValue));
 
         // Extensions - keyUsage
-        KeyUsage keyusage = createRequiredKeyUsages(KeyUsageEnum.KEY_CERT_SIGN);
-        keyusage.getUsage().add(createOptionalKeyUsage(KeyUsageEnum.C_RL_SIGN));
-        extensions.getKeyUsage().add(keyusage);
+        extensionValue = createKeyUsages(
+                new KeyUsageEnum[]{KeyUsageEnum.KEY_CERT_SIGN},
+                new KeyUsageEnum[]{KeyUsageEnum.C_RL_SIGN});
+        list.add(createExtension(Extension.keyUsage, true, true, extensionValue));
 
         return profile;
     }
@@ -307,49 +311,42 @@ public class ProfileConfCreatorDemo
 
         // Subject
         Subject subject = profile.getSubject();
-        subject.setIncSerialNrIfSubjectExists(false);
+        subject.setIncSerialNumber(false);
 
         List<RdnType> rdnControls = subject.getRdn();
-        rdnControls.add(createRDN(ObjectIdentifiers.DN_C, 1, 1, new String[]{"DE|FR"}));
-        rdnControls.add(createRDN(ObjectIdentifiers.DN_O, 1, 1, null));
-        rdnControls.add(createRDN(ObjectIdentifiers.DN_OU, 0, 1, null));
-        rdnControls.add(createRDN(ObjectIdentifiers.DN_SN, 0, 1, new String[]{REGEX_SN}));
+        rdnControls.add(createRDN(ObjectIdentifiers.DN_C, 1, 1, new String[]{"DE|FR"}, null, null));
+        rdnControls.add(createRDN(ObjectIdentifiers.DN_O, 1, 1));
+        rdnControls.add(createRDN(ObjectIdentifiers.DN_OU, 0, 1));
+        rdnControls.add(createRDN(ObjectIdentifiers.DN_SN, 0, 1, new String[]{REGEX_SN}, null, null));
         rdnControls.add(createRDN(ObjectIdentifiers.DN_CN, 1, 1, null, "PREFIX ", " SUFFIX"));
 
         // Extensions
-        // Extensions - general
         ExtensionsType extensions = profile.getExtensions();
-        extensions.setPathLen(1);
 
-        // Extensions - controls
         List<ExtensionType> list = extensions.getExtension();
-        list.add(createExtension(Extension.subjectKeyIdentifier, true, false));
-        list.add(createExtension(Extension.authorityKeyIdentifier, true, false));
-        list.add(createExtension(Extension.authorityInfoAccess, true, false));
-        list.add(createExtension(Extension.cRLDistributionPoints, false, false));
-        list.add(createExtension(Extension.freshestCRL, false, false));
-        list.add(createExtension(Extension.keyUsage, true, true));
-        list.add(createExtension(Extension.basicConstraints, true, true));
-        list.add(createExtension(Extension.subjectAlternativeName, true, false));
-        list.add(createExtension(Extension.subjectInfoAccess, true, false));
+        list.add(createExtension(Extension.subjectKeyIdentifier, true, false, null));
+        list.add(createExtension(Extension.authorityInfoAccess, true, false, null));
+        list.add(createExtension(Extension.cRLDistributionPoints, false, false, null));
+        list.add(createExtension(Extension.freshestCRL, false, false, null));
 
-        list.add(createExtension(Extension.policyMappings, true, true));
-        list.add(createExtension(Extension.nameConstraints, true, true));
-        list.add(createExtension(Extension.policyConstraints, true, true));
-        list.add(createExtension(Extension.inhibitAnyPolicy, true, true));
+        // Extensions - basicConstraints
+        ExtensionValueType extensionValue = createBasicConstraints(1);
+        list.add(createExtension(Extension.basicConstraints, true, true, extensionValue));
 
-        ASN1ObjectIdentifier customExtensionOid = new ASN1ObjectIdentifier("1.2.3.4");
-        list.add(createExtension(customExtensionOid, true, false, "custom extension 1"));
+        // Extensions - AuthorityKeyIdentifier
+        extensionValue = createAuthorityKeyIdentifier(false);
+        list.add(createExtension(Extension.authorityKeyIdentifier, true, false, extensionValue));
 
         // Extensions - keyUsage
-        KeyUsage keyusage = createRequiredKeyUsages(KeyUsageEnum.KEY_CERT_SIGN);
-        keyusage.getUsage().add(createOptionalKeyUsage(KeyUsageEnum.C_RL_SIGN));
-        extensions.getKeyUsage().add(keyusage);
+        extensionValue = createKeyUsages(
+                new KeyUsageEnum[]{KeyUsageEnum.KEY_CERT_SIGN},
+                new KeyUsageEnum[]{KeyUsageEnum.C_RL_SIGN});
+        list.add(createExtension(Extension.keyUsage, true, true, extensionValue));
 
         // Certificate Policies
-        ExtensionsType.CertificatePolicies certificatePolicies = createCertificatePolicies(
+        extensionValue = createCertificatePolicies(
                 new ASN1ObjectIdentifier("1.2.3.4.5"), new ASN1ObjectIdentifier("2.4.3.2.1"));
-        extensions.getCertificatePolicies().add(certificatePolicies);
+        list.add(createExtension(Extension.certificatePolicies, true, false, extensionValue));
 
         // Policy Mappings
         PolicyMappings policyMappings = new PolicyMappings();
@@ -359,23 +356,26 @@ public class ProfileConfCreatorDemo
         policyMappings.getMapping().add(createPolicyIdMapping(
                 new ASN1ObjectIdentifier("1.1.1.1.2"),
                 new ASN1ObjectIdentifier("2.1.1.1.2")));
-        extensions.getPolicyMappings().add(policyMappings);
+        extensionValue = createExtensionValueType(policyMappings);
+        list.add(createExtension(Extension.policyMappings, true, true, extensionValue));
 
         // Policy Constraints
         PolicyConstraints policyConstraints = createPolicyConstraints(2, 2);
-        extensions.getPolicyConstraints().add(policyConstraints);
+        extensionValue = createExtensionValueType(policyConstraints);
+        list.add(createExtension(Extension.policyConstraints, true, true, extensionValue));
 
         // Name Constrains
         NameConstraints nameConstraints = createNameConstraints();
-        extensions.getNameConstraints().add(nameConstraints);
+        extensionValue = createExtensionValueType(nameConstraints);
+        list.add(createExtension(Extension.nameConstraints, true, true, extensionValue));
 
         // Inhibit anyPolicy
         InhibitAnyPolicy inhibitAnyPolicy = createInhibitAnyPolicy(1);
-        extensions.getInhibitAnyPolicy().add(inhibitAnyPolicy);
+        extensionValue = createExtensionValueType(inhibitAnyPolicy);
+        list.add(createExtension(Extension.inhibitAnyPolicy, true, true, extensionValue));
 
         // SubjectAltName
-        GeneralNameType subjectAltNameMode = new GeneralNameType();
-        extensions.setSubjectAltName(subjectAltNameMode);
+        SubjectAltName subjectAltNameMode = new SubjectAltName();
 
         OtherName otherName = new OtherName();
         otherName.getType().add(createOidType(ObjectIdentifiers.DN_O));
@@ -388,11 +388,13 @@ public class ProfileConfCreatorDemo
         subjectAltNameMode.setIPAddress("");
         subjectAltNameMode.setRegisteredID("");
 
-        // SubjectInfoAccess
-        SubjectInfoAccessType subjectInfoAccessMode = new SubjectInfoAccessType();
-        extensions.setSubjectInfoAccess(subjectInfoAccessMode);
+        extensionValue = createExtensionValueType(subjectAltNameMode);
+        list.add(createExtension(Extension.subjectAlternativeName, true, false, extensionValue));
 
-        Access access = new Access();
+        // SubjectInfoAccess
+        SubjectInfoAccess subjectInfoAccessMode = new SubjectInfoAccess();
+
+        SubjectInfoAccess.Access access = new SubjectInfoAccess.Access();
         access.setAccessMethod(createOidType(ObjectIdentifiers.id_ad_caRepository));
 
         GeneralNameType accessLocation = new GeneralNameType();
@@ -402,16 +404,13 @@ public class ProfileConfCreatorDemo
 
         subjectInfoAccessMode.getAccess().add(access);
 
+        extensionValue = createExtensionValueType(subjectInfoAccessMode);
+        list.add(createExtension(Extension.subjectInfoAccess, true, false, extensionValue));
+
         // Custom Extension
-        ConstantExtensions constantExts = new ConstantExtensions();
-        extensions.getConstantExtensions().add(constantExts);
-
-        ConstantExtensionType constantExt = new ConstantExtensionType();
-        constantExts.getConstantExtension().add(constantExt);
-
-        OidWithDescType type = createOidType(customExtensionOid, "custom extension 1");
-        constantExt.setType(type);
-        constantExt.setValue(DERNull.INSTANCE.getEncoded());
+        ASN1ObjectIdentifier customExtensionOid = new ASN1ObjectIdentifier("1.2.3.4");
+        extensionValue = createConstantExtValue(DERNull.INSTANCE.getEncoded());
+        list.add(createExtension(customExtensionOid, true, false, extensionValue, "custom extension 1"));
 
         return profile;
     }
@@ -423,38 +422,42 @@ public class ProfileConfCreatorDemo
 
         // Subject
         Subject subject = profile.getSubject();
-        subject.setIncSerialNrIfSubjectExists(false);
+        subject.setIncSerialNumber(false);
 
         List<RdnType> rdnControls = subject.getRdn();
-        rdnControls.add(createRDN(ObjectIdentifiers.DN_C, 1, 1, new String[]{"DE|FR"}));
-        rdnControls.add(createRDN(ObjectIdentifiers.DN_O, 1, 1, null));
-        rdnControls.add(createRDN(ObjectIdentifiers.DN_OU, 0, 1, null));
-        rdnControls.add(createRDN(ObjectIdentifiers.DN_SN, 0, 1, new String[]{REGEX_SN}));
-        rdnControls.add(createRDN(ObjectIdentifiers.DN_CN, 1, 1, null));
+        rdnControls.add(createRDN(ObjectIdentifiers.DN_C, 1, 1, new String[]{"DE|FR"}, null, null));
+        rdnControls.add(createRDN(ObjectIdentifiers.DN_O, 1, 1));
+        rdnControls.add(createRDN(ObjectIdentifiers.DN_OU, 0, 1));
+        rdnControls.add(createRDN(ObjectIdentifiers.DN_SN, 0, 1, new String[]{REGEX_SN}, null, null));
+        rdnControls.add(createRDN(ObjectIdentifiers.DN_CN, 1, 1));
 
         // Extensions
-        // Extensions - general
         ExtensionsType extensions = profile.getExtensions();
-
-        // Extensions - controls
         List<ExtensionType> list = extensions.getExtension();
-        list.add(createExtension(Extension.subjectKeyIdentifier, true, false));
-        list.add(createExtension(Extension.authorityKeyIdentifier, true, false));
-        list.add(createExtension(Extension.authorityInfoAccess, false, false));
-        list.add(createExtension(Extension.cRLDistributionPoints, false, false));
-        list.add(createExtension(Extension.freshestCRL, false, false));
-        list.add(createExtension(Extension.keyUsage, true, true));
-        list.add(createExtension(Extension.basicConstraints, true, true));
-        list.add(createExtension(Extension.extendedKeyUsage, true, false));
-        list.add(createExtension(ObjectIdentifiers.id_extension_pkix_ocsp_nocheck, false, false));
+
+        list.add(createExtension(Extension.subjectKeyIdentifier, true, false, null));
+        list.add(createExtension(Extension.authorityInfoAccess, false, false, null));
+        list.add(createExtension(Extension.cRLDistributionPoints, false, false, null));
+        list.add(createExtension(Extension.freshestCRL, false, false, null));
+        list.add(createExtension(ObjectIdentifiers.id_extension_pkix_ocsp_nocheck, false, false, null));
+
+        // Extensions - basicConstraints
+        ExtensionValueType extensionValue = null;
+        list.add(createExtension(Extension.basicConstraints, true, true, extensionValue));
+
+        // Extensions - AuthorityKeyIdentifier
+        extensionValue = createAuthorityKeyIdentifier(true);
+        list.add(createExtension(Extension.authorityKeyIdentifier, true, false, extensionValue));
 
         // Extensions - keyUsage
-        KeyUsage keyusage = createRequiredKeyUsages(KeyUsageEnum.CONTENT_COMMITMENT);
-        extensions.getKeyUsage().add(keyusage);
+        extensionValue = createKeyUsages(
+                new KeyUsageEnum[]{KeyUsageEnum.CONTENT_COMMITMENT},
+                null);
+        list.add(createExtension(Extension.keyUsage, true, true, extensionValue));
 
         // Extensions - extenedKeyUsage
-        ExtendedKeyUsage extKeyUsage = createRequiredExtendedKeyUsage(ObjectIdentifiers.id_kp_OCSPSigning);
-        extensions.getExtendedKeyUsage().add(extKeyUsage);
+        extensionValue = createExtendedKeyUsage(new ASN1ObjectIdentifier[]{ObjectIdentifiers.id_kp_OCSPSigning}, null);
+        list.add(createExtension(Extension.extendedKeyUsage, true, false, extensionValue));
 
         return profile;
     }
@@ -466,14 +469,14 @@ public class ProfileConfCreatorDemo
 
         // Subject
         Subject subject = profile.getSubject();
-        subject.setIncSerialNrIfSubjectExists(false);
+        subject.setIncSerialNumber(false);
 
         List<RdnType> rdnControls = subject.getRdn();
-        rdnControls.add(createRDN(ObjectIdentifiers.DN_C, 1, 1, new String[]{"DE|FR"}));
-        rdnControls.add(createRDN(ObjectIdentifiers.DN_O, 1, 1, null));
-        rdnControls.add(createRDN(ObjectIdentifiers.DN_OU, 0, 1, null));
-        rdnControls.add(createRDN(ObjectIdentifiers.DN_SN, 0, 1, new String[]{REGEX_SN}));
-        rdnControls.add(createRDN(ObjectIdentifiers.DN_CN, 1, 1, new String[]{REGEX_FQDN}));
+        rdnControls.add(createRDN(ObjectIdentifiers.DN_C, 1, 1, new String[]{"DE|FR"}, null, null));
+        rdnControls.add(createRDN(ObjectIdentifiers.DN_O, 1, 1));
+        rdnControls.add(createRDN(ObjectIdentifiers.DN_OU, 0, 1));
+        rdnControls.add(createRDN(ObjectIdentifiers.DN_SN, 0, 1, new String[]{REGEX_SN}, null, null));
+        rdnControls.add(createRDN(ObjectIdentifiers.DN_CN, 1, 1, new String[]{REGEX_FQDN}, null, null));
 
         // Extensions
         // Extensions - general
@@ -481,29 +484,34 @@ public class ProfileConfCreatorDemo
 
         // Extensions - controls
         List<ExtensionType> list = extensions.getExtension();
-        list.add(createExtension(Extension.subjectKeyIdentifier, true, false));
-        list.add(createExtension(Extension.authorityKeyIdentifier, true, false));
-        list.add(createExtension(Extension.authorityInfoAccess, true, false));
-        list.add(createExtension(Extension.cRLDistributionPoints, false, false));
-        list.add(createExtension(Extension.freshestCRL, false, false));
-        list.add(createExtension(Extension.keyUsage, true, true));
-        list.add(createExtension(Extension.basicConstraints, true, true));
-        list.add(createExtension(Extension.extendedKeyUsage, true, false));
-        list.add(createExtension(ObjectIdentifiers.id_extension_admission, true, false));
+        list.add(createExtension(Extension.subjectKeyIdentifier, true, false, null));
+        list.add(createExtension(Extension.authorityInfoAccess, true, false, null));
+        list.add(createExtension(Extension.cRLDistributionPoints, false, false, null));
+        list.add(createExtension(Extension.freshestCRL, false, false, null));
+
+        // Extensions - basicConstraints
+        ExtensionValueType extensionValue = null;
+        list.add(createExtension(Extension.basicConstraints, true, true, extensionValue));
+
+        // Extensions - AuthorityKeyIdentifier
+        extensionValue = createAuthorityKeyIdentifier(true);
+        list.add(createExtension(Extension.authorityKeyIdentifier, true, false, extensionValue));
 
         // Extensions - keyUsage
-        KeyUsage keyusage = createRequiredKeyUsages(KeyUsageEnum.DIGITAL_SIGNATURE,
-                KeyUsageEnum.DATA_ENCIPHERMENT,  KeyUsageEnum.KEY_ENCIPHERMENT);
-        extensions.getKeyUsage().add(keyusage);
+        extensionValue = createKeyUsages(
+                new KeyUsageEnum[]{KeyUsageEnum.DIGITAL_SIGNATURE, KeyUsageEnum.DATA_ENCIPHERMENT,
+                        KeyUsageEnum.KEY_ENCIPHERMENT},
+                null);
+        list.add(createExtension(Extension.keyUsage, true, true, extensionValue));
 
         // Extensions - extenedKeyUsage
-        ExtendedKeyUsage extKeyUsage = createRequiredExtendedKeyUsage(ObjectIdentifiers.id_kp_serverAuth);
-        extKeyUsage.getUsage().add(createExtKeyUsage(ObjectIdentifiers.id_kp_clientAuth, false));
-        extensions.getExtendedKeyUsage().add(extKeyUsage);
+        extensionValue = createExtendedKeyUsage(new ASN1ObjectIdentifier[]{ObjectIdentifiers.id_kp_serverAuth},
+                new ASN1ObjectIdentifier[]{ObjectIdentifiers.id_kp_clientAuth});
+        list.add(createExtension(Extension.extendedKeyUsage, true, false, extensionValue));
 
         // Admission - just DEMO, does not belong to TLS certificate
-        Admission admission = createAdmission(new ASN1ObjectIdentifier("1.1.1.2"), "demo item");
-        extensions.getAdmission().add(admission);
+        extensionValue = createAdmission(new ASN1ObjectIdentifier("1.1.1.2"), "demo item");
+        list.add(createExtension(ObjectIdentifiers.id_extension_admission, true, false, extensionValue));
 
         return profile;
     }
@@ -515,37 +523,42 @@ public class ProfileConfCreatorDemo
 
         // Subject
         Subject subject = profile.getSubject();
-        subject.setIncSerialNrIfSubjectExists(false);
+        subject.setIncSerialNumber(false);
 
         List<RdnType> rdnControls = subject.getRdn();
-        rdnControls.add(createRDN(ObjectIdentifiers.DN_C, 1, 1, new String[]{"DE|FR"}));
-        rdnControls.add(createRDN(ObjectIdentifiers.DN_O, 1, 1, null));
-        rdnControls.add(createRDN(ObjectIdentifiers.DN_OU, 0, 1, null));
-        rdnControls.add(createRDN(ObjectIdentifiers.DN_SN, 0, 1, new String[]{REGEX_SN}));
-        rdnControls.add(createRDN(ObjectIdentifiers.DN_CN, 1, 1, null));
+        rdnControls.add(createRDN(ObjectIdentifiers.DN_C, 1, 1, new String[]{"DE|FR"}, null, null));
+        rdnControls.add(createRDN(ObjectIdentifiers.DN_O, 1, 1));
+        rdnControls.add(createRDN(ObjectIdentifiers.DN_OU, 0, 1));
+        rdnControls.add(createRDN(ObjectIdentifiers.DN_SN, 0, 1, new String[]{REGEX_SN}, null, null));
+        rdnControls.add(createRDN(ObjectIdentifiers.DN_CN, 1, 1));
 
         // Extensions
-        // Extensions - general
         ExtensionsType extensions = profile.getExtensions();
-        // Extensions - controls
         List<ExtensionType> list = extensions.getExtension();
-        list.add(createExtension(Extension.subjectKeyIdentifier, true, false));
-        list.add(createExtension(Extension.authorityKeyIdentifier, true, false));
-        list.add(createExtension(Extension.authorityInfoAccess, true, false));
-        list.add(createExtension(Extension.cRLDistributionPoints, false, false));
-        list.add(createExtension(Extension.freshestCRL, false, false));
-        list.add(createExtension(Extension.keyUsage, true, true));
-        list.add(createExtension(Extension.basicConstraints, true, true));
-        list.add(createExtension(Extension.extendedKeyUsage, true, false));
+
+        list.add(createExtension(Extension.subjectKeyIdentifier, true, false, null));
+        list.add(createExtension(Extension.authorityInfoAccess, true, false, null));
+        list.add(createExtension(Extension.cRLDistributionPoints, false, false, null));
+        list.add(createExtension(Extension.freshestCRL, false, false, null));
+
+        // Extensions - basicConstraints
+        ExtensionValueType extensionValue = null;
+        list.add(createExtension(Extension.basicConstraints, true, true, extensionValue));
+
+        // Extensions - AuthorityKeyIdentifier
+        extensionValue = createAuthorityKeyIdentifier(true);
+        list.add(createExtension(Extension.authorityKeyIdentifier, true, false, extensionValue));
 
         // Extensions - keyUsage
-        KeyUsage keyusage = createRequiredKeyUsages(KeyUsageEnum.DIGITAL_SIGNATURE,
-                KeyUsageEnum.DATA_ENCIPHERMENT,  KeyUsageEnum.KEY_ENCIPHERMENT);
-        extensions.getKeyUsage().add(keyusage);
+        extensionValue = createKeyUsages(
+                new KeyUsageEnum[]{KeyUsageEnum.DIGITAL_SIGNATURE, KeyUsageEnum.DATA_ENCIPHERMENT,
+                        KeyUsageEnum.KEY_ENCIPHERMENT},
+                null);
+        list.add(createExtension(Extension.keyUsage, true, true, extensionValue));
 
         // Extensions - extenedKeyUsage
-        ExtendedKeyUsage extKeyUsage = createRequiredExtendedKeyUsage(ObjectIdentifiers.id_kp_clientAuth);
-        extensions.getExtendedKeyUsage().add(extKeyUsage);
+        extensionValue = createExtendedKeyUsage(new ASN1ObjectIdentifier[]{ObjectIdentifiers.id_kp_clientAuth}, null);
+        list.add(createExtension(Extension.extendedKeyUsage, true, false, extensionValue));
 
         return profile;
     }
@@ -557,14 +570,14 @@ public class ProfileConfCreatorDemo
 
         // Subject
         Subject subject = profile.getSubject();
-        subject.setIncSerialNrIfSubjectExists(true);
+        subject.setIncSerialNumber(true);
 
         List<RdnType> rdnControls = subject.getRdn();
-        rdnControls.add(createRDN(ObjectIdentifiers.DN_C, 1, 1, new String[]{"DE|FR"}));
-        rdnControls.add(createRDN(ObjectIdentifiers.DN_O, 1, 1, null));
-        rdnControls.add(createRDN(ObjectIdentifiers.DN_OU, 0, 1, null));
-        rdnControls.add(createRDN(ObjectIdentifiers.DN_SN, 0, 1, new String[]{REGEX_SN}));
-        rdnControls.add(createRDN(ObjectIdentifiers.DN_CN, 1, 1, new String[]{REGEX_FQDN}));
+        rdnControls.add(createRDN(ObjectIdentifiers.DN_C, 1, 1, new String[]{"DE|FR"}, null, null));
+        rdnControls.add(createRDN(ObjectIdentifiers.DN_O, 1, 1));
+        rdnControls.add(createRDN(ObjectIdentifiers.DN_OU, 0, 1));
+        rdnControls.add(createRDN(ObjectIdentifiers.DN_SN, 0, 1, new String[]{REGEX_SN}, null, null));
+        rdnControls.add(createRDN(ObjectIdentifiers.DN_CN, 1, 1, new String[]{REGEX_FQDN}, null, null));
 
         // Extensions
         // Extensions - general
@@ -572,24 +585,30 @@ public class ProfileConfCreatorDemo
 
         // Extensions - controls
         List<ExtensionType> list = extensions.getExtension();
-        list.add(createExtension(Extension.subjectKeyIdentifier, true, false));
-        list.add(createExtension(Extension.authorityKeyIdentifier, true, false));
-        list.add(createExtension(Extension.authorityInfoAccess, true, false));
-        list.add(createExtension(Extension.cRLDistributionPoints, false, false));
-        list.add(createExtension(Extension.freshestCRL, false, false));
-        list.add(createExtension(Extension.keyUsage, true, true));
-        list.add(createExtension(Extension.basicConstraints, true, true));
-        list.add(createExtension(Extension.extendedKeyUsage, true, false));
+        list.add(createExtension(Extension.subjectKeyIdentifier, true, false, null));
+        list.add(createExtension(Extension.authorityInfoAccess, true, false, null));
+        list.add(createExtension(Extension.cRLDistributionPoints, false, false, null));
+        list.add(createExtension(Extension.freshestCRL, false, false, null));
+
+        // Extensions - basicConstraints
+        ExtensionValueType extensionValue = null;
+        list.add(createExtension(Extension.basicConstraints, true, true, extensionValue));
+
+        // Extensions - AuthorityKeyIdentifier
+        extensionValue = createAuthorityKeyIdentifier(true);
+        list.add(createExtension(Extension.authorityKeyIdentifier, true, false, extensionValue));
 
         // Extensions - keyUsage
-        KeyUsage keyusage = createRequiredKeyUsages(KeyUsageEnum.DIGITAL_SIGNATURE,
-                KeyUsageEnum.DATA_ENCIPHERMENT,  KeyUsageEnum.KEY_ENCIPHERMENT);
-        extensions.getKeyUsage().add(keyusage);
+        extensionValue = createKeyUsages(
+                new KeyUsageEnum[]{KeyUsageEnum.DIGITAL_SIGNATURE, KeyUsageEnum.DATA_ENCIPHERMENT,
+                        KeyUsageEnum.KEY_ENCIPHERMENT},
+                null);
+        list.add(createExtension(Extension.keyUsage, true, true, extensionValue));
 
         // Extensions - extenedKeyUsage
-        ExtendedKeyUsage extKeyUsage = createRequiredExtendedKeyUsage(ObjectIdentifiers.id_kp_serverAuth);
-        extKeyUsage.getUsage().add(createExtKeyUsage(ObjectIdentifiers.id_kp_clientAuth, false));
-        extensions.getExtendedKeyUsage().add(extKeyUsage);
+        extensionValue = createExtendedKeyUsage(new ASN1ObjectIdentifier[]{ObjectIdentifiers.id_kp_serverAuth},
+                new ASN1ObjectIdentifier[]{ObjectIdentifiers.id_kp_clientAuth});
+        list.add(createExtension(Extension.extendedKeyUsage, true, false, extensionValue));
 
         return profile;
     }
@@ -613,66 +632,72 @@ public class ProfileConfCreatorDemo
 
         // Subject
         Subject subject = profile.getSubject();
-        subject.setIncSerialNrIfSubjectExists(false);
+        subject.setIncSerialNumber(false);
 
         List<RdnType> rdnControls = subject.getRdn();
-        rdnControls.add(createRDN(ObjectIdentifiers.DN_C, 1, 1, new String[]{"DE"}));
-        rdnControls.add(createRDN(ObjectIdentifiers.DN_O, 1, 1, null));
-        rdnControls.add(createRDN(ObjectIdentifiers.DN_OU, 0, 1, null));
-        rdnControls.add(createRDN(ObjectIdentifiers.DN_ST, 0, 1, null));
-        rdnControls.add(createRDN(ObjectIdentifiers.DN_L, 0, 1, null));
-        rdnControls.add(createRDN(ObjectIdentifiers.DN_POSTAL_CODE, 0, 1, null));
-        rdnControls.add(createRDN(ObjectIdentifiers.DN_STREET, 0, 1, null));
+        rdnControls.add(createRDN(ObjectIdentifiers.DN_C, 1, 1, new String[]{"DE"}, null, null));
+        rdnControls.add(createRDN(ObjectIdentifiers.DN_O, 1, 1));
+        rdnControls.add(createRDN(ObjectIdentifiers.DN_OU, 0, 1));
+        rdnControls.add(createRDN(ObjectIdentifiers.DN_ST, 0, 1));
+        rdnControls.add(createRDN(ObjectIdentifiers.DN_L, 0, 1));
+        rdnControls.add(createRDN(ObjectIdentifiers.DN_POSTAL_CODE, 0, 1));
+        rdnControls.add(createRDN(ObjectIdentifiers.DN_STREET, 0, 1));
         // regex: ICCSN-yyyyMMdd
         String regex = "80276[\\d]{15,15}-20\\d\\d(0[1-9]|1[012])(0[1-9]|[12][0-9]|3[01])";
-        rdnControls.add(createRDN(ObjectIdentifiers.DN_CN, 1, 1, new String[]{regex}));
+        rdnControls.add(createRDN(ObjectIdentifiers.DN_CN, 1, 1, new String[]{regex}, null, null));
 
         // Extensions
-        // Extensions - general
         ExtensionsType extensions = profile.getExtensions();
-
-        // Extensions - controls
         List<ExtensionType> list = extensions.getExtension();
-        list.add(createExtension(Extension.subjectKeyIdentifier, true, false));
-        list.add(createExtension(Extension.authorityKeyIdentifier, true, false));
-        list.add(createExtension(Extension.authorityInfoAccess, true, false));
-        list.add(createExtension(Extension.cRLDistributionPoints, false, false));
-        list.add(createExtension(Extension.keyUsage, true, true));
-        list.add(createExtension(Extension.subjectAlternativeName, false, false));
-        list.add(createExtension(Extension.basicConstraints, true, true));
-        list.add(createExtension(Extension.certificatePolicies, true, false));
-        list.add(createExtension(ObjectIdentifiers.id_extension_admission, true, false));
-        list.add(createExtension(Extension.extendedKeyUsage, true, false));
+
+        list.add(createExtension(Extension.subjectKeyIdentifier, true, false, null));
+        list.add(createExtension(Extension.authorityInfoAccess, true, false, null));
+        list.add(createExtension(Extension.cRLDistributionPoints, false, false, null));
+
+        // Extensions - basicConstraints
+        ExtensionValueType extensionValue = null;
+        list.add(createExtension(Extension.basicConstraints, true, true, extensionValue));
+
+        // Extensions - AuthorityKeyIdentifier
+        extensionValue = createAuthorityKeyIdentifier(true);
+        list.add(createExtension(Extension.authorityKeyIdentifier, true, false, extensionValue));
 
         // Extensions - keyUsage
-        KeyUsage keyusage = createRequiredKeyUsages(KeyUsageEnum.DIGITAL_SIGNATURE,
-                KeyUsageEnum.KEY_ENCIPHERMENT);
-        extensions.getKeyUsage().add(keyusage);
+        extensionValue = createKeyUsages(
+                new KeyUsageEnum[]{KeyUsageEnum.DIGITAL_SIGNATURE, KeyUsageEnum.KEY_ENCIPHERMENT},
+                null);
+        list.add(createExtension(Extension.keyUsage, true, true, extensionValue));
 
         // Extensions - extenedKeyUsage
-        ExtendedKeyUsage extKeyUsage = createRequiredExtendedKeyUsage(ObjectIdentifiers.id_kp_serverAuth);
-        extKeyUsage.getUsage().add(createExtKeyUsage(ObjectIdentifiers.id_kp_clientAuth, false));
-        extensions.getExtendedKeyUsage().add(extKeyUsage);
+        extensionValue = createExtendedKeyUsage(new ASN1ObjectIdentifier[]{ObjectIdentifiers.id_kp_serverAuth},
+                new ASN1ObjectIdentifier[]{ObjectIdentifiers.id_kp_clientAuth});
+        list.add(createExtension(Extension.extendedKeyUsage, true, false, extensionValue));
 
         // Extensions - Policy
         CertificatePolicies policies = new CertificatePolicies();
-        extensions.getCertificatePolicies().add(policies);
-
         ASN1ObjectIdentifier[] policyIds = new ASN1ObjectIdentifier[]
         {
-                id_gematik.branch("79"), id_gematik.branch("163")};
+                id_gematik.branch("79"), id_gematik.branch("163")
+        };
         for(ASN1ObjectIdentifier id : policyIds)
         {
             CertificatePolicyInformationType policyInfo = new CertificatePolicyInformationType();
             policies.getCertificatePolicyInformation().add(policyInfo);
             policyInfo.setPolicyIdentifier(createOidType(id));
         }
+        extensionValue = createExtensionValueType(policies);
+        list.add(createExtension(Extension.certificatePolicies, true, false, extensionValue));
 
         // Extension - Adminssion
         Admission admission = new Admission();
-        extensions.getAdmission().add(admission);
         admission.getProfessionOid().add(createOidType(id_gematik.branch("103")));
         admission.getProfessionItem().add("Anwendungskonnektor");
+        extensionValue = createExtensionValueType(admission);
+        list.add(createExtension(ObjectIdentifiers.id_extension_admission, true, false, extensionValue));
+
+        // SubjectAltNames
+        extensionValue = null;
+        list.add(createExtension(Extension.subjectAlternativeName, false, false, extensionValue));
 
         return profile;
     }
@@ -684,42 +709,48 @@ public class ProfileConfCreatorDemo
 
         // Subject
         Subject subject = profile.getSubject();
-        subject.setIncSerialNrIfSubjectExists(false);
+        subject.setIncSerialNumber(false);
 
         List<RdnType> rdnControls = subject.getRdn();
-        rdnControls.add(createRDN(ObjectIdentifiers.DN_C, 1, 1, new String[]{"DE|FR"}));
-        rdnControls.add(createRDN(ObjectIdentifiers.DN_O, 1, 1, null));
+        rdnControls.add(createRDN(ObjectIdentifiers.DN_C, 1, 1, new String[]{"DE|FR"}, null, null));
+        rdnControls.add(createRDN(ObjectIdentifiers.DN_O, 1, 1));
 
         final String regex_ou1 = "[A-Z]{1,1}[\\d]{5,5}";
         final String regex_ou2 = "[\\d]{5,5}";
-        rdnControls.add(createRDN(ObjectIdentifiers.DN_OU, 2, 2, new String[]{regex_ou1,regex_ou2}));
-        rdnControls.add(createRDN(ObjectIdentifiers.DN_SN, 0, 1, new String[]{REGEX_SN}));
-        rdnControls.add(createRDN(ObjectIdentifiers.DN_CN, 1, 1, null));
+        rdnControls.add(createRDN(ObjectIdentifiers.DN_OU, 2, 2, new String[]{regex_ou1,regex_ou2}, null, null));
+        rdnControls.add(createRDN(ObjectIdentifiers.DN_SN, 0, 1, new String[]{REGEX_SN}, null, null));
+        rdnControls.add(createRDN(ObjectIdentifiers.DN_CN, 1, 1));
 
         // Extensions
         // Extensions - general
         ExtensionsType extensions = profile.getExtensions();
-
-        // Extensions - controls
         List<ExtensionType> list = extensions.getExtension();
-        list.add(createExtension(Extension.subjectKeyIdentifier, true, false));
-        list.add(createExtension(Extension.authorityKeyIdentifier, true, false));
-        list.add(createExtension(Extension.authorityInfoAccess, false, false));
-        list.add(createExtension(Extension.cRLDistributionPoints, false, false));
-        list.add(createExtension(Extension.freshestCRL, false, false));
-        list.add(createExtension(Extension.keyUsage, true, true));
-        list.add(createExtension(Extension.basicConstraints, true, true));
+
+        list.add(createExtension(Extension.subjectKeyIdentifier, true, false, null));
+        list.add(createExtension(Extension.authorityInfoAccess, false, false, null));
+        list.add(createExtension(Extension.cRLDistributionPoints, false, false, null));
+        list.add(createExtension(Extension.freshestCRL, false, false, null));
+
+        // Extensions - basicConstraints
+        ExtensionValueType extensionValue = null;
+        list.add(createExtension(Extension.basicConstraints, true, true, extensionValue));
+
+        // Extensions - AuthorityKeyIdentifier
+        extensionValue = createAuthorityKeyIdentifier(true);
+        list.add(createExtension(Extension.authorityKeyIdentifier, true, false, extensionValue));
 
         // Extensions - keyUsage
-        KeyUsage keyusage = createRequiredKeyUsages(KeyUsageEnum.CONTENT_COMMITMENT);
-        extensions.getKeyUsage().add(keyusage);
+        extensionValue = createKeyUsages(
+                new KeyUsageEnum[]{KeyUsageEnum.CONTENT_COMMITMENT},
+                null);
+        list.add(createExtension(Extension.keyUsage, true, true, extensionValue));
 
         return profile;
     }
 
-    private static RdnType createRDN(ASN1ObjectIdentifier type, int min, int max, String[] regexArrays)
+    private static RdnType createRDN(ASN1ObjectIdentifier type, int min, int max)
     {
-        return createRDN(type, min, max, regexArrays, null, null);
+        return createRDN(type, min, max, null, null, null);
     }
 
     private static RdnType createRDN(ASN1ObjectIdentifier type, int min, int max, String[] regexArrays,
@@ -744,97 +775,105 @@ public class ProfileConfCreatorDemo
 
         if(prefix != null && prefix.isEmpty() == false)
         {
-            ret.getAddPrefix().add(createAddText(prefix, "add.prefix", "true", OperatorType.AND));
+            ret.setPrefix(prefix);
         }
 
         if(suffix != null && suffix.isEmpty() == false)
         {
-            ret.getAddSuffix().add(createAddText(suffix, "add.suffix", "true", OperatorType.AND));
+            ret.setSuffix(suffix);
         }
 
         return ret;
     }
 
-    private static AddTextType createAddText(String text, String envName, String envValue,
-            OperatorType operator)
+    private static ExtensionType createExtension(ASN1ObjectIdentifier type,
+            boolean required, boolean critical,
+            ExtensionValueType extValue)
     {
-        AddTextType ret = new AddTextType();
-        ret.setText(text);
-
-        ConditionType condition = new ConditionType();
-        ret.setCondition(condition);
-
-        condition.setOperator(operator);
-        EnvParamType envParam = new EnvParamType();
-        condition.getEnvParam().add(envParam);
-
-        envParam.setName(envName);
-        envParam.setValue(envValue);
-
-        return ret;
-    }
-
-    private static ExtensionType createExtension(ASN1ObjectIdentifier type, boolean required, boolean critical)
-    {
-        return createExtension(type, required, critical, null);
+        return createExtension(type, required, critical, extValue, null);
     }
 
     private static ExtensionType createExtension(ASN1ObjectIdentifier type, boolean required, boolean critical,
-            String description)
+            ExtensionValueType extValue, String description)
     {
         ExtensionType ret = new ExtensionType();
-        ret.setValue(type.getId());
+        // abbributes
         ret.setRequired(required);
-        ret.setCritical(critical);
         ret.setPermittedInRequest(requestExtensions.contains(type));
-
-        if(description == null)
-        {
-            description = getDescription(type);
-        }
-
-        if(description != null)
-        {
-            ret.setDescription(description);
-        }
+        // children
+        ret.setType(createOidType(type, description));
+        ret.setCritical(critical);
+        ret.setValue(extValue);
         return ret;
     }
 
-    private static org.xipki.ca.certprofile.internal.x509.jaxb.ExtensionsType.KeyUsage createRequiredKeyUsages(
-            KeyUsageEnum... keyUsages)
+    private static ExtensionValueType createAuthorityKeyIdentifier(boolean includeSerialAndSerial)
     {
-        org.xipki.ca.certprofile.internal.x509.jaxb.ExtensionsType.KeyUsage ret =
-                new org.xipki.ca.certprofile.internal.x509.jaxb.ExtensionsType.KeyUsage();
-        for(KeyUsageEnum usage : keyUsages)
+
+        AuthorityKeyIdentifier akiType = new AuthorityKeyIdentifier();
+        akiType.setIncludeIssuerAndSerial(includeSerialAndSerial);
+        return createExtensionValueType(akiType);
+
+    }
+    private static ExtensionValueType createBasicConstraints(int pathLen)
+    {
+        BasicConstraints extValue = new BasicConstraints();
+        extValue.setPathLen(pathLen);
+        return createExtensionValueType(extValue);
+    }
+
+    private static ExtensionValueType createKeyUsages(
+            KeyUsageEnum[] requiredUsages, KeyUsageEnum[] optionalUsages)
+    {
+        KeyUsage extValue = new KeyUsage();
+        if(requiredUsages != null)
         {
-            KeyUsageType type = new KeyUsageType();
-            type.setValue(usage);
-            type.setRequired(true);
-            ret.getUsage().add(type);
+            for(KeyUsageEnum m : requiredUsages)
+            {
+                UsageType usage = new UsageType();
+                usage.setValue(m);
+                usage.setRequired(true);
+                extValue.getUsage().add(usage);
+            }
         }
-        return ret;
-    }
-
-    private static KeyUsageType createOptionalKeyUsage(KeyUsageEnum usage)
-    {
-        KeyUsageType type = new KeyUsageType();
-        type.setValue(usage);
-        type.setRequired(false);
-        return type;
-    }
-
-    private static ExtendedKeyUsage createRequiredExtendedKeyUsage(
-            ASN1ObjectIdentifier... extKeyUsages)
-    {
-        ExtendedKeyUsage ret = new ExtendedKeyUsage();
-        for(ASN1ObjectIdentifier usage : extKeyUsages)
+        if(optionalUsages != null)
         {
-            ret.getUsage().add(createExtKeyUsage(usage, true));
+            for(KeyUsageEnum m : optionalUsages)
+            {
+                UsageType usage = new UsageType();
+                usage.setValue(m);
+                usage.setRequired(false);
+                extValue.getUsage().add(usage);
+            }
         }
-        return ret;
+
+        return createExtensionValueType(extValue);
     }
 
-    private static Usage createExtKeyUsage(ASN1ObjectIdentifier usage, boolean required)
+    private static ExtensionValueType createExtendedKeyUsage(
+            ASN1ObjectIdentifier[] requiredUsages, ASN1ObjectIdentifier[] optionalUsages)
+    {
+        ExtendedKeyUsage extValue = new ExtendedKeyUsage();
+        if(requiredUsages != null)
+        {
+            for(ASN1ObjectIdentifier usage : requiredUsages)
+            {
+                extValue.getUsage().add(createSingleExtKeyUsage(usage, true));
+            }
+        }
+
+        if(optionalUsages != null)
+        {
+            for(ASN1ObjectIdentifier usage : optionalUsages)
+            {
+                extValue.getUsage().add(createSingleExtKeyUsage(usage, false));
+            }
+        }
+
+        return createExtensionValueType(extValue);
+    }
+
+    private static Usage createSingleExtKeyUsage(ASN1ObjectIdentifier usage, boolean required)
     {
         Usage type = new Usage();
         type.setValue(usage.getId());
@@ -847,15 +886,15 @@ public class ProfileConfCreatorDemo
         return type;
     }
 
-    private static Admission createAdmission(ASN1ObjectIdentifier oid, String item)
+    private static ExtensionValueType createAdmission(ASN1ObjectIdentifier oid, String item)
     {
-        Admission ret = new Admission();
-        ret.getProfessionItem().add(item);
-        ret.getProfessionOid().add(createOidType(oid));
-        return ret;
+        Admission extValue = new Admission();
+        extValue.getProfessionItem().add(item);
+        extValue.getProfessionOid().add(createOidType(oid));
+        return createExtensionValueType(extValue);
     }
 
-    private static ExtensionsType.CertificatePolicies createCertificatePolicies(
+    private static ExtensionValueType createCertificatePolicies(
             ASN1ObjectIdentifier... policyOids)
     {
         if(policyOids == null || policyOids.length == 0)
@@ -863,8 +902,8 @@ public class ProfileConfCreatorDemo
             return null;
         }
 
-        ExtensionsType.CertificatePolicies ret = new ExtensionsType.CertificatePolicies();
-        List<CertificatePolicyInformationType> l = ret.getCertificatePolicyInformation();
+        CertificatePolicies extValue = new CertificatePolicies();
+        List<CertificatePolicyInformationType> l = extValue.getCertificatePolicyInformation();
         for(ASN1ObjectIdentifier oid : policyOids)
         {
             CertificatePolicyInformationType single = new CertificatePolicyInformationType();
@@ -872,7 +911,7 @@ public class ProfileConfCreatorDemo
             single.setPolicyIdentifier(createOidType(oid));
         }
 
-        return ret;
+        return createExtensionValueType(extValue);
     }
 
     private static String getDescription(ASN1ObjectIdentifier oid)
@@ -952,6 +991,13 @@ public class ProfileConfCreatorDemo
         return ret;
     }
 
+    private static ExtensionValueType createConstantExtValue(byte[] bytes)
+    {
+        ConstantExtValue extValue = new ConstantExtValue();
+        extValue.setValue(bytes);
+        return createExtensionValueType(extValue);
+    }
+
     private static X509ProfileType getBaseProfile(String description, boolean ca,
             String validity, boolean useMidnightNotBefore)
     {
@@ -988,13 +1034,8 @@ public class ProfileConfCreatorDemo
         profile.setKeyAlgorithms(createKeyAlgorithms());
 
         // Extensions
-        // Extensions - general
         ExtensionsType extensions = new ExtensionsType();
         profile.setExtensions(extensions);
-
-        AuthorityKeyIdentifier akiType = new AuthorityKeyIdentifier();
-        akiType.setIncludeIssuerAndSerial(Boolean.FALSE);
-        extensions.setAuthorityKeyIdentifier(akiType);
 
         return profile;
     }
@@ -1006,14 +1047,16 @@ public class ProfileConfCreatorDemo
 
         // RSA
         {
-            AlgorithmType rsa = new AlgorithmType();
-            list.add(rsa);
+            AlgorithmType algorithm = new AlgorithmType();
+            list.add(algorithm);
 
-            rsa.getAlgorithm().add(createOidType(PKCSObjectIdentifiers.rsaEncryption, "RSA"));
-            rsa.setRSAParameters(new RSAParametersType());
+            algorithm.getAlgorithm().add(createOidType(PKCSObjectIdentifiers.rsaEncryption, "RSA"));
+
+            RSAParameters params = new RSAParameters();
+            algorithm.setParameters(createKeyParametersType(params));
+
             RangesType ranges = new RangesType();
-            rsa.getRSAParameters().setModulusLength(ranges);
-
+            params.setModulusLength(ranges);
             List<RangeType> modulusLengths = ranges.getRange();
             modulusLengths.add(createRange(2048));
             modulusLengths.add(createRange(3072));
@@ -1021,21 +1064,22 @@ public class ProfileConfCreatorDemo
 
         // DSA
         {
-            AlgorithmType dsa = new AlgorithmType();
-            list.add(dsa);
+            AlgorithmType algorithm = new AlgorithmType();
+            list.add(algorithm);
 
-            dsa.getAlgorithm().add(createOidType(X9ObjectIdentifiers.id_dsa, "DSA"));
-            dsa.setDSAParameters(new DSAParametersType());
+            algorithm.getAlgorithm().add(createOidType(X9ObjectIdentifiers.id_dsa, "DSA"));
+            DSAParameters params = new DSAParameters();
+            algorithm.setParameters(createKeyParametersType(params));
 
             RangesType ranges = new RangesType();
-            dsa.getDSAParameters().setPLength(ranges);
+            params.setPLength(ranges);
 
             List<RangeType> pLengths = ranges.getRange();
             pLengths.add(createRange(1024));
             pLengths.add(createRange(2048));
 
             ranges = new RangesType();
-            dsa.getDSAParameters().setQLength(ranges);
+            params.setQLength(ranges);
             List<RangeType> qLengths = ranges.getRange();
             qLengths.add(createRange(160));
             qLengths.add(createRange(224));
@@ -1044,14 +1088,15 @@ public class ProfileConfCreatorDemo
 
         // EC
         {
-            AlgorithmType ec = new AlgorithmType();
-            ec.getAlgorithm().add(createOidType(X9ObjectIdentifiers.id_ecPublicKey, "EC"));
+            AlgorithmType algorithm = new AlgorithmType();
+            list.add(algorithm);
 
-            list.add(ec);
+            algorithm.getAlgorithm().add(createOidType(X9ObjectIdentifiers.id_ecPublicKey, "EC"));
+            ECParameters params = new ECParameters();
+            algorithm.setParameters(createKeyParametersType(params));
 
-            ec.setECParameters(new ECParametersType());
             Curves curves = new Curves();
-            ec.getECParameters().setCurves(curves);
+            params.setCurves(curves);
 
             ASN1ObjectIdentifier[] curveIds = new ASN1ObjectIdentifier[]
             {
@@ -1064,9 +1109,9 @@ public class ProfileConfCreatorDemo
                 curves.getCurve().add(createOidType(curveId, name));
             }
 
-            ec.getECParameters().setPointEncodings(new PointEncodings());
+            params.setPointEncodings(new PointEncodings());
             final Byte unpressed = 4;
-            ec.getECParameters().getPointEncodings().getPointEncoding().add(unpressed);
+            params.getPointEncodings().getPointEncoding().add(unpressed);
         }
 
         return ret;
@@ -1107,6 +1152,20 @@ public class ProfileConfCreatorDemo
             throw new RuntimeException(e.getMessage(), e);
         }
         return new ExampleDescription(element);
+    }
+
+    private static ExtensionValueType createExtensionValueType(Object object)
+    {
+        ExtensionValueType ret = new ExtensionValueType();
+        ret.setAny(object);
+        return ret;
+    }
+
+    private static KeyParametersType createKeyParametersType(Object object)
+    {
+        KeyParametersType ret = new KeyParametersType();
+        ret.setAny(object);
+        return ret;
     }
 
 }

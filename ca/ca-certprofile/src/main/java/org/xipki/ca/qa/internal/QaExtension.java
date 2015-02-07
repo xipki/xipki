@@ -33,31 +33,12 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.ca.certprofile.internal;
+package org.xipki.ca.qa.internal;
 
 /**
  * @author Lijun Liao
  */
 
-public class AddText
+public abstract class QaExtension
 {
-    private final Condition condition;
-    private final String text;
-
-    public AddText(Condition condition, String text)
-    {
-        this.condition = condition;
-        this.text = text;
-    }
-
-    public Condition getCondition()
-    {
-        return condition;
-    }
-
-    public String getText()
-    {
-        return text;
-    }
-
 }

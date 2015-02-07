@@ -33,31 +33,38 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.ca.qa.shell.completer;
+package org.xipki.ca.qa.internal;
 
-import java.util.Set;
-
-import org.xipki.ca.qa.shell.QASystemManager;
-import org.xipki.console.karaf.DynamicEnumCompleter;
+import org.xipki.ca.certprofile.internal.x509.jaxb.PolicyConstraints;
 
 /**
  * @author Lijun Liao
  */
 
-public class EnvironmentNameCompleter extends DynamicEnumCompleter
+public class QaPolicyConstraints extends QaExtension
 {
+    private final Integer requireExplicitPolicy;
+    private final Integer inhibitPolicyMapping;
 
-    protected QASystemManager qaSystemManager;
-
-    public void setQaSystemManager(QASystemManager qaSystemManager)
+    public QaPolicyConstraints(PolicyConstraints jaxb)
     {
-        this.qaSystemManager = qaSystemManager;
+        if(jaxb.getRequireExplicitPolicy() == null && jaxb.getInhibitPolicyMapping() == null)
+        {
+            throw new IllegalArgumentException("at least one of requireExplicitPolicy and inhibitPolicyMapping must be set");
+        }
+
+        this.requireExplicitPolicy = jaxb.getRequireExplicitPolicy();
+        this.inhibitPolicyMapping = jaxb.getInhibitPolicyMapping();
     }
 
-    @Override
-    protected Set<String> getEnums()
+    public Integer getRequireExplicitPolicy()
     {
-        return qaSystemManager.getEnvironmentNames();
+        return requireExplicitPolicy;
+    }
+
+    public Integer getInhibitPolicyMapping()
+    {
+        return inhibitPolicyMapping;
     }
 
 }
