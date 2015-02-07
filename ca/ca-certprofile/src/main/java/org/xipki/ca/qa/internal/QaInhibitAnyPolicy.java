@@ -33,40 +33,26 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.ca.certprofile.internal;
+package org.xipki.ca.qa.internal;
 
-import java.util.List;
-
-import org.xipki.ca.api.EnvironmentParameterResolver;
-import org.xipki.ca.api.profile.ExtensionValue;
-import org.xipki.common.ParamChecker;
+import org.xipki.ca.certprofile.internal.x509.jaxb.InhibitAnyPolicy;
 
 /**
  * @author Lijun Liao
  */
 
-public class ExtensionValueOptions
+public class QaInhibitAnyPolicy extends QaExtension
 {
-    private final List<ExtensionValueOption> options;
+    private final int skipCerts;
 
-    public ExtensionValueOptions(List<ExtensionValueOption> options)
+    public QaInhibitAnyPolicy(InhibitAnyPolicy jaxb)
     {
-        ParamChecker.assertNotEmpty("options", options);
-        this.options = options;
+        this.skipCerts = jaxb.getSkipCerts();
     }
 
-    public ExtensionValue getExtensionValue(EnvironmentParameterResolver pr)
+    public int getSkipCerts()
     {
-        for(ExtensionValueOption o : options)
-        {
-            Condition c = o.getCondition();
-            if(c == null || c.satisfy(pr))
-            {
-                return o.getExtensionValue();
-            }
-        }
-
-        return null;
+        return skipCerts;
     }
 
 }

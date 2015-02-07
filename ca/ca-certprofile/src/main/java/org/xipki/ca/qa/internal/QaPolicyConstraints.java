@@ -33,34 +33,38 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.ca.certprofile.internal;
+package org.xipki.ca.qa.internal;
 
-import org.xipki.ca.api.profile.ExtensionControl;
+import org.xipki.ca.certprofile.internal.x509.jaxb.PolicyConstraints;
 
 /**
  * @author Lijun Liao
  */
 
-public class AuthorityKeyIdentifierOption
+public class QaPolicyConstraints extends QaExtension
 {
-    private final boolean includeIssuerAndSerial;
-    private final ExtensionControl occurence;
+    private final Integer requireExplicitPolicy;
+    private final Integer inhibitPolicyMapping;
 
-    public AuthorityKeyIdentifierOption(boolean includeIssuerAndSerial,
-            ExtensionControl occurence)
+    public QaPolicyConstraints(PolicyConstraints jaxb)
     {
-        this.includeIssuerAndSerial = includeIssuerAndSerial;
-        this.occurence = occurence;
+        if(jaxb.getRequireExplicitPolicy() == null && jaxb.getInhibitPolicyMapping() == null)
+        {
+            throw new IllegalArgumentException("at least one of requireExplicitPolicy and inhibitPolicyMapping must be set");
+        }
+
+        this.requireExplicitPolicy = jaxb.getRequireExplicitPolicy();
+        this.inhibitPolicyMapping = jaxb.getInhibitPolicyMapping();
     }
 
-    public boolean isIncludeIssuerAndSerial()
+    public Integer getRequireExplicitPolicy()
     {
-        return includeIssuerAndSerial;
+        return requireExplicitPolicy;
     }
 
-    public ExtensionControl getOccurence()
+    public Integer getInhibitPolicyMapping()
     {
-        return occurence;
+        return inhibitPolicyMapping;
     }
 
 }

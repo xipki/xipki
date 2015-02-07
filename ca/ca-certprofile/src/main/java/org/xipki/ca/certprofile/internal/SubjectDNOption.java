@@ -39,25 +39,23 @@ import java.util.Collections;
 import java.util.List;
 import java.util.regex.Pattern;
 
-import org.xipki.ca.api.EnvironmentParameterResolver;
-
 /**
  * @author Lijun Liao
  */
 
 public class SubjectDNOption
 {
-    private final List<AddText> addprefixes;
-    private final List<AddText> addsufixes;
+    private final String prefix;
+    private final String suffix;
     private final List<Pattern> patterns;
     private final Integer minLen;
     private final Integer maxLen;
 
-    public SubjectDNOption(List<AddText> addprefixes, List<AddText> addsufixes, List<Pattern> patterns,
+    public SubjectDNOption(String prefix, String suffix, List<Pattern> patterns,
             Integer minLen, Integer maxLen)
     {
-        this.addprefixes = addprefixes;
-        this.addsufixes = addsufixes;
+        this.prefix = prefix;
+        this.suffix = suffix;
         if(patterns == null)
         {
             this.patterns = null;
@@ -69,33 +67,14 @@ public class SubjectDNOption
         this.maxLen = maxLen;
     }
 
-    public AddText getAddprefix(EnvironmentParameterResolver pr)
+    public String getPrefix()
     {
-        return getAddText(addprefixes, pr);
+        return prefix;
     }
 
-    public AddText getAddsufix(EnvironmentParameterResolver pr)
+    public String getSufix()
     {
-        return getAddText(addsufixes, pr);
-    }
-
-    private static AddText getAddText(List<AddText> list, EnvironmentParameterResolver pr)
-    {
-        if(list == null || list.isEmpty())
-        {
-            return null;
-        }
-
-        for(AddText e : list)
-        {
-            Condition c = e.getCondition();
-            if(c == null || c.satisfy(pr))
-            {
-                return e;
-            }
-        }
-
-        return null;
+        return suffix;
     }
 
     public List<Pattern> getPatterns()

@@ -39,21 +39,19 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import org.xipki.ca.certprofile.internal.x509.jaxb.ExtensionsType.PolicyMappings;
+import org.xipki.ca.certprofile.internal.x509.jaxb.PolicyMappings;
 import org.xipki.ca.certprofile.internal.x509.jaxb.PolicyIdMappingType;
 
 /**
  * @author Lijun Liao
  */
 
-public class QaPolicyMappingsOption extends QaExtensionOption
+public class QaPolicyMappingsOption extends QaExtension
 {
     private final Map<String, String> policyMappings;
 
     public QaPolicyMappingsOption(PolicyMappings jaxb)
     {
-        super(jaxb.getCondition());
-
         this.policyMappings = new HashMap<>();
         for(PolicyIdMappingType type : jaxb.getMapping())
         {

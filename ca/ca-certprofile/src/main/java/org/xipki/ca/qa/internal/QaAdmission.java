@@ -40,24 +40,22 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.bouncycastle.util.Arrays;
-import org.xipki.ca.certprofile.internal.x509.jaxb.ExtensionsType.Admission;
+import org.xipki.ca.certprofile.internal.x509.jaxb.Admission;
 import org.xipki.ca.certprofile.internal.x509.jaxb.OidWithDescType;
 
 /**
  * @author Lijun Liao
  */
 
-public class QaAdmissionOption extends QaExtensionOption
+public class QaAdmission extends QaExtension
 {
     private final String registrationNumber;
     private final byte[] addProfessionInfo;
     private final List<String> professionOIDs;
     private final List<String> professionItems;
 
-    public QaAdmissionOption(Admission jaxb)
+    public QaAdmission(Admission jaxb)
     {
-        super(jaxb.getCondition());
-
         this.registrationNumber = jaxb.getRegistrationNumber();
         this.addProfessionInfo = jaxb.getAddProfessionInfo();
 
