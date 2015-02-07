@@ -62,13 +62,13 @@ public class RevokeCertCommand extends CaCommand
     @Option(name = "-reason",
             required = true,
             description = "Required. Reason, valid values are \n" +
-                    "0: unspecified\n" +
-                    "1: keyCompromise\n" +
-                    "3: affiliationChanged\n" +
-                    "4: superseded\n" +
-                    "5: cessationOfOperation\n" +
-                    "6: certificateHold\n" +
-                    "9: privilegeWithdrawn")
+                    " 0: unspecified\n" +
+                    " 1: keyCompromise\n" +
+                    " 3: affiliationChanged\n" +
+                    " 4: superseded\n" +
+                    " 5: cessationOfOperation\n" +
+                    " 6: certificateHold\n" +
+                    " 9: privilegeWithdrawn")
     protected String reason;
 
     @Override

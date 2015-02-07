@@ -466,8 +466,8 @@ public class DbCertStatusStore extends CertStatusStore
                     }
                     else
                     {
-                        long nowÍnMs = System.currentTimeMillis();
-                        long tInMs = Math.max(issuer.getCaNotBefore().getTime(), nowÍnMs - DAY * retentionInterval);
+                        long nowInMs = System.currentTimeMillis();
+                        long tInMs = Math.max(issuer.getCaNotBefore().getTime(), nowInMs - DAY * retentionInterval);
                         t = new Date(tInMs);
                     }
 
