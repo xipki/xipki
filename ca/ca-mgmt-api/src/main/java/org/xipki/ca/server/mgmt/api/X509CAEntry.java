@@ -319,6 +319,12 @@ public class X509CAEntry implements Serializable
         sb.append("duplicateSubject: ").append(duplicateSubjectMode.getDescription()).append('\n');
         sb.append("validityMode: ").append(validityMode).append('\n');
         sb.append("permissions: ").append(Permission.toString(permissions)).append('\n');
+        sb.append("revocation: ").append(revocationInfo == null ? "not revoked" : "revoked").append("\n");
+        if(revocationInfo != null)
+        {
+            sb.append("\treason: ").append(revocationInfo.getReason().getDescription()).append("\n");
+            sb.append("\trevoked at ").append(revocationInfo.getRevocationTime()).append("\n");
+        }
 
         return sb.toString();
     }

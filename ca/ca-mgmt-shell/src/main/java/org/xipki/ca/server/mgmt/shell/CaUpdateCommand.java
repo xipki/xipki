@@ -65,7 +65,7 @@ public class CaUpdateCommand extends CaCommand
     protected String caName;
 
     @Option(name = "-status",
-            description = "CA status, active|pending|deactivated")
+            description = "CA status, active|pending|inactive")
     protected String caStatus;
 
     @Option(name = "-ocspUri",

@@ -2003,6 +2003,11 @@ class X509CA
             boolean keyUpdate)
     throws OperationException
     {
+        if(caInfo.getRevocationInfo() != null)
+        {
+            throw new OperationException(ErrorCode.System_Failure, "CA has been revoked");
+        }
+
         ConcurrentContentSigner signer = caInfo.getSigner();
         if(signer == null)
         {

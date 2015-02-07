@@ -672,12 +672,12 @@ class IdentifiedX509Certprofile
         Set<ASN1ObjectIdentifier> extTypes = new HashSet<>(controls.keySet());
         for(ASN1ObjectIdentifier type : extTypes)
         {
-            ExtensionControl control = controls.remove(type);
-            boolean addMe = addMe(type, control, neededExtensionTypes, wantedExtensionTypes);
+            extControl = controls.remove(type);
+            boolean addMe = addMe(type, extControl, neededExtensionTypes, wantedExtensionTypes);
             if(addMe)
             {
                 ExtensionValue value = null;
-                if(control.isRequest())
+                if(extControl.isRequest())
                 {
                     Extension reqExt = requestExtensions.getExtension(type);
                     if(reqExt != null)
