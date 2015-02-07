@@ -5,7 +5,7 @@
   <reference id="filePathCompleter" interface="org.xipki.console.karaf.FilePathCompleter"/>
   <reference id="yesNoCompleter" interface="org.xipki.console.karaf.YesNoCompleter"/>
   <bean id="caStatusCompleter" class="org.xipki.console.karaf.EnumCompleter">
-    <property name="tokens" value="active, pending, deactivated"/>
+    <property name="tokens" value="active, pending, inactive"/>
   </bean>
   <bean id="signerTypeCompleter" class="org.xipki.console.karaf.EnumCompleter">
     <property name="tokens" value="JKS, PKCS11, PKCS12"/>
