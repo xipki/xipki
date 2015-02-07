@@ -41,7 +41,6 @@ import java.math.BigInteger;
 import java.security.KeyStore;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateEncodingException;
-import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.Date;
 import java.util.Enumeration;
@@ -78,7 +77,6 @@ import org.xipki.common.CRLReason;
 import org.xipki.common.CertRevocationInfo;
 import org.xipki.common.IoUtil;
 import org.xipki.common.LogUtil;
-import org.xipki.common.SecurityUtil;
 import org.xipki.security.api.SecurityFactory;
 
 import com.caucho.hessian.server.HessianServlet;
@@ -282,7 +280,7 @@ implements HessianCAManager
 
     @Override
     public void changeCA(String name, CAStatus status,
-            byte[] encodedCert, Set<String> crl_uris,
+            X509Certificate cert, Set<String> crl_uris,
             Set<String> delta_crl_uris, Set<String> ocsp_uris,
             CertValidity max_validity, String signer_type, String signer_conf,
             String crlsigner_name, DuplicationMode duplicate_key,
@@ -290,15 +288,6 @@ implements HessianCAManager
             Integer numCrls, Integer expirationPeriod, ValidityMode validityMode)
     throws HessianCAMgmtException
     {
-        X509Certificate cert;
-        try
-        {
-            cert = SecurityUtil.parseCert(encodedCert);
-        } catch (CertificateException | IOException e)
-        {
-            throw new HessianCAMgmtException("could not parse certificate: " + e.getMessage());
-        }
-
         try
         {
             caManager.changeCA(name, status, cert, crl_uris, delta_crl_uris, ocsp_uris,

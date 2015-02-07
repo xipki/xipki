@@ -37,7 +37,6 @@ package org.xipki.ca.mgmt.hessian.client.impl;
 
 import java.io.IOException;
 import java.math.BigInteger;
-import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.Date;
@@ -48,22 +47,22 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.ca.api.profile.CertValidity;
 import org.xipki.ca.mgmt.hessian.common.HessianCAManager;
+import org.xipki.ca.server.mgmt.api.CAHasRequestorEntry;
+import org.xipki.ca.server.mgmt.api.CAManager;
 import org.xipki.ca.server.mgmt.api.CAMgmtException;
 import org.xipki.ca.server.mgmt.api.CAStatus;
 import org.xipki.ca.server.mgmt.api.CASystemStatus;
 import org.xipki.ca.server.mgmt.api.CRLControl;
-import org.xipki.ca.server.mgmt.api.CmpControl;
-import org.xipki.ca.server.mgmt.api.X509CAEntry;
-import org.xipki.ca.server.mgmt.api.CAHasRequestorEntry;
-import org.xipki.ca.server.mgmt.api.CAManager;
 import org.xipki.ca.server.mgmt.api.CertprofileEntry;
+import org.xipki.ca.server.mgmt.api.CmpControl;
 import org.xipki.ca.server.mgmt.api.CmpRequestorEntry;
 import org.xipki.ca.server.mgmt.api.CmpResponderEntry;
-import org.xipki.ca.server.mgmt.api.X509CrlSignerEntry;
 import org.xipki.ca.server.mgmt.api.DuplicationMode;
 import org.xipki.ca.server.mgmt.api.Permission;
 import org.xipki.ca.server.mgmt.api.PublisherEntry;
 import org.xipki.ca.server.mgmt.api.ValidityMode;
+import org.xipki.ca.server.mgmt.api.X509CAEntry;
+import org.xipki.ca.server.mgmt.api.X509CrlSignerEntry;
 import org.xipki.common.CRLReason;
 import org.xipki.common.CertRevocationInfo;
 import org.xipki.common.SecurityUtil;
@@ -270,16 +269,7 @@ public class CAManagerClient implements CAManager
             Integer numCrls, Integer expirationPeriod, ValidityMode validityMode)
     throws CAMgmtException
     {
-        byte[] encodedCert;
-        try
-        {
-            encodedCert = cert.getEncoded();
-        } catch (CertificateEncodingException e)
-        {
-            throw new CAMgmtException("Could not encode the certificate", e);
-        }
-
-        client.changeCA(name, status, encodedCert, crl_uris, delta_crl_uris, ocsp_uris,
+        client.changeCA(name, status, cert, crl_uris, delta_crl_uris, ocsp_uris,
                 max_validity, signer_type, signer_conf, crlsigner_name, duplicate_key, duplicate_subject,
                 permissions, numCrls, expirationPeriod, validityMode);
     }
