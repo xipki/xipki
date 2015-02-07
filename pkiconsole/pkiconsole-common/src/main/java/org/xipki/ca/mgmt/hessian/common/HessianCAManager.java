@@ -113,8 +113,7 @@ public interface HessianCAManager
 
     X509CAEntry getCA(String caName);
 
-    void changeCA(String name, CAStatus status,
-            byte[] encodedCert,
+    void changeCA(String name, CAStatus status, X509Certificate cert,
             Set<String> crl_uris, Set<String> delta_crl_uris, Set<String> ocsp_uris,
             CertValidity max_validity, String signer_type, String signer_conf,
             String crlsigner_name, DuplicationMode duplicate_key,
@@ -258,4 +257,5 @@ public interface HessianCAManager
             DuplicationMode duplicate_subject, Set<Permission> permissions,
             int numCrls, int expirationPeriod, ValidityMode validityMode)
     throws HessianCAMgmtException;
+
 }
