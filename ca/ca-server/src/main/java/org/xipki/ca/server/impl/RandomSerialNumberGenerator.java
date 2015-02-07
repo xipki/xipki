@@ -69,14 +69,14 @@ import java.util.Random;
  * and bit 8 of the second octet:
  * a) shall not all be ones; and
  * b) shall not all be zero.
- * NOTE – These rules ensure that an integer value is always encoded in the smallest
+ * NOTE - These rules ensure that an integer value is always encoded in the smallest
  *  possible number of octets.
  * 8.3.3 The contents octets shall be a two's complement binary number equal to the
  *  integer value, and consisting of
  * bits 8 to 1 of the first octet, followed by bits 8 to 1 of the second octet,
  *  followed by bits 8 to 1 of each octet in turn up to
  * and including the last octet of the contents octets.
- * NOTE – The value of a two's complement binary number is derived by numbering the
+ * NOTE - The value of a two's complement binary number is derived by numbering the
  *  bits in the contents octets, starting with bit
  * 1 of the last octet as bit zero and ending the numbering with bit 8 of the first
  *  octet. Each bit is assigned a numerical value of 2N,

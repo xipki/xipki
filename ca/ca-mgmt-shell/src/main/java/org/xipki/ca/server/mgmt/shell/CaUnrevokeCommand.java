@@ -45,7 +45,7 @@ import org.apache.karaf.shell.commands.Command;
 @Command(scope = "xipki-ca", name = "ca-unrevoke", description="Unrevoke CA")
 public class CaUnrevokeCommand extends CaCommand
 {
-    @Argument(index = 0, name="name", description = "CA name", required = true)
+    @Argument(index = 0, name = "name", description = "CA name", required = true)
     protected String caName;
 
     @Override

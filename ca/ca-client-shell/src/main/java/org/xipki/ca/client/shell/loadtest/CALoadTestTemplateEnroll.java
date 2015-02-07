@@ -110,8 +110,8 @@ public class CALoadTestTemplateEnroll extends AbstractLoadTest
                 Map<Integer, CertRequestWithProfile> certReqs = nextCertRequests();
                 if(certReqs != null)
                 {
-                    boolean succ = testNext(certReqs);
-                    account(1, succ ? 0 : 1);
+                    boolean successful = testNext(certReqs);
+                    account(1, successful ? 0 : 1);
                 }
                 else
                 {

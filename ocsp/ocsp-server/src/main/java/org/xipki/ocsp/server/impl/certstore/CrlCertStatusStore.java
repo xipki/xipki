@@ -848,8 +848,8 @@ public class CrlCertStatusStore extends CertStatusStore
                 }
                 else
                 {
-                    long nowÍnMs = System.currentTimeMillis();
-                    long tInMs = Math.max(caNotBefore.getTime(), nowÍnMs - DAY * retentionInterval);
+                    long nowInMs = System.currentTimeMillis();
+                    long tInMs = Math.max(caNotBefore.getTime(), nowInMs - DAY * retentionInterval);
                     t = new Date(tInMs);
                 }
 

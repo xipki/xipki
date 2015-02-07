@@ -53,7 +53,7 @@ import org.xipki.common.CertRevocationInfo;
 public class CaRevokeCommand extends CaCommand
 {
     public static List<CRLReason> permitted_reasons = Collections.unmodifiableList(
-            Arrays.asList(    new CRLReason[]
+            Arrays.asList(new CRLReason[]
             {
                 CRLReason.UNSPECIFIED, CRLReason.KEY_COMPROMISE, CRLReason.CA_COMPROMISE,
                 CRLReason.AFFILIATION_CHANGED, CRLReason.SUPERSEDED, CRLReason.CESSATION_OF_OPERATION,
@@ -65,14 +65,14 @@ public class CaRevokeCommand extends CaCommand
     @Option(name = "-reason",
             required = true,
             description = "Required. Reason, valid values are \n" +
-                    "0: unspecified\n" +
-                    "1: keyCompromise\n" +
-                    "2: cACompromise\n" +
-                    "3: affiliationChanged\n" +
-                    "4: superseded\n" +
-                    "5: cessationOfOperation\n" +
-                    "6: certificateHold\n" +
-                    "9: privilegeWithdrawn")
+                    " 0: unspecified\n" +
+                    " 1: keyCompromise\n" +
+                    " 2: cACompromise\n" +
+                    " 3: affiliationChanged\n" +
+                    " 4: superseded\n" +
+                    " 5: cessationOfOperation\n" +
+                    " 6: certificateHold\n" +
+                    " 9: privilegeWithdrawn")
     protected String reason;
 
     @Override
