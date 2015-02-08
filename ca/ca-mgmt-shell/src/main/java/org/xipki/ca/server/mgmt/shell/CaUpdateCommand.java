@@ -100,6 +100,10 @@ public class CaUpdateCommand extends CaCommand
             description = "CRL signer name or 'NULL'")
     protected String crlSignerName;
 
+    @Option(name = "-cmpControl",
+            description = "CMP control name or 'NULL'")
+    protected String cmpControlName;
+
     @Option(name = "-numCrls",
             description = "Number of CRLs to be kept in database")
     protected Integer numCrls;
@@ -317,6 +321,7 @@ public class CaUpdateCommand extends CaCommand
                 signerType,
                 signerConf,
                 crlSignerName,
+                cmpControlName,
                 duplicateKey,
                 duplicateSubject,
                 _permissions,

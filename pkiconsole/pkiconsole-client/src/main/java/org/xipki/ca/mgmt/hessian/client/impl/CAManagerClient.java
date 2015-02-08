@@ -241,6 +241,12 @@ public class CAManagerClient implements CAManager
     }
 
     @Override
+    public Set<String> getCmpControlNames()
+    {
+        return client.getCmpControlNames();
+    }
+
+    @Override
     public Set<String> getCaNames()
     {
         return client.getCaNames();
@@ -264,13 +270,14 @@ public class CAManagerClient implements CAManager
             X509Certificate cert, Set<String> crl_uris,
             Set<String> delta_crl_uris, Set<String> ocsp_uris,
             CertValidity max_validity, String signer_type, String signer_conf,
-            String crlsigner_name, DuplicationMode duplicate_key,
+            String crlsigner_name, String cmpcontrol_name, DuplicationMode duplicate_key,
             DuplicationMode duplicate_subject, Set<Permission> permissions,
             Integer numCrls, Integer expirationPeriod, ValidityMode validityMode)
     throws CAMgmtException
     {
         client.changeCA(name, status, cert, crl_uris, delta_crl_uris, ocsp_uris,
-                max_validity, signer_type, signer_conf, crlsigner_name, duplicate_key, duplicate_subject,
+                max_validity, signer_type, signer_conf, crlsigner_name, cmpcontrol_name,
+                duplicate_key, duplicate_subject,
                 permissions, numCrls, expirationPeriod, validityMode);
     }
 
@@ -438,13 +445,6 @@ public class CAManagerClient implements CAManager
     }
 
     @Override
-    public void setCrlSignerInCA(String crlSignerName, String caName)
-    throws CAMgmtException
-    {
-        client.setCrlSignerInCA(crlSignerName, caName);
-    }
-
-    @Override
     public void addPublisher(PublisherEntry dbEntry)
     throws CAMgmtException
     {
@@ -478,33 +478,33 @@ public class CAManagerClient implements CAManager
     }
 
     @Override
-    public CmpControl getCmpControl()
+    public CmpControl getCmpControl(String name)
     {
-        return client.getCmpControl();
+        return client.getCmpControl(name);
     }
 
     @Override
-    public void setCmpControl(CmpControl dbEntry)
+    public void addCmpControl(CmpControl dbEntry)
     throws CAMgmtException
     {
-        client.setCmpControl(dbEntry);
+        client.addCmpControl(dbEntry);
     }
 
     @Override
-    public void removeCmpControl()
+    public void removeCmpControl(String name)
     throws CAMgmtException
     {
-        client.removeCmpControl();
+        client.removeCmpControl(name);
     }
 
     @Override
-    public void changeCmpControl(Boolean requireConfirmCert,
+    public void changeCmpControl(String name, Boolean requireConfirmCert,
             Boolean requireMessageTime, Integer messageTimeBias,
             Integer confirmWaitTime, Boolean sendCaCert,
             Boolean sendResponderCert)
     throws CAMgmtException
     {
-        client.changeCmpControl(requireConfirmCert, requireMessageTime, messageTimeBias,
+        client.changeCmpControl(name, requireConfirmCert, requireMessageTime, messageTimeBias,
                 confirmWaitTime, sendCaCert, sendResponderCert);
     }
 
@@ -598,14 +598,15 @@ public class CAManagerClient implements CAManager
             long nextSerial, int nextCrlNo, List<String> crl_uris,
             List<String> delta_crl_uris, List<String> ocsp_uris,
             CertValidity max_validity, String signer_type, String signer_conf,
-            String crlsigner_name, DuplicationMode duplicate_key,
+            String crlsigner_name, String cmpcontrol_name, DuplicationMode duplicate_key,
             DuplicationMode duplicate_subject, Set<Permission> permissions,
             int numCrls, int expirationPeriod, ValidityMode validityMode)
     throws CAMgmtException
     {
         return client.generateSelfSignedCA(name, certprofileName, p10Req, status,
                 nextSerial, nextCrlNo, crl_uris, delta_crl_uris, ocsp_uris, max_validity,
-                signer_type, signer_conf, crlsigner_name, duplicate_key, duplicate_subject,
+                signer_type, signer_conf, crlsigner_name, cmpcontrol_name,
+                duplicate_key, duplicate_subject,
                 permissions, numCrls, expirationPeriod, validityMode);
     }
 

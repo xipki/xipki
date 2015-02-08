@@ -553,56 +553,46 @@ public abstract class BaseCAManager
         return null;
     }
 
-    protected CmpControl createCmpControl()
+    protected CmpControl createCmpControl(String name)
     throws CAMgmtException
     {
-        Statement stmt = null;
+        PreparedStatement stmt = null;
         ResultSet rs = null;
 
         try
         {
-            stmt = createStatement();
             final String sql = "SELECT REQUIRE_CONFIRM_CERT, SEND_CA_CERT, SEND_RESPONDER_CERT" +
                     ", REQUIRE_MESSAGE_TIME, MESSAGE_TIME_BIAS, CONFIRM_WAIT_TIME" +
-                    " FROM CMPCONTROL";
+                    " FROM CMPCONTROL WHERE NAME=?";
+            stmt = prepareFetchFirstStatement(sql);
+            stmt.setString(1, name);
+            rs = stmt.executeQuery();
 
-            rs = stmt.executeQuery(sql);
-
-            CmpControl cmpControl = null;
-            String errorMsg = null;
-            while(rs.next())
+            if(rs.next())
             {
-                if(cmpControl != null)
-                {
-                    errorMsg = "More than one CMPCONTROL is configured, but maximal one is allowed";
-                }
-                boolean requireConfirmCert = rs.getBoolean("REQUIRE_CONFIRM_CERT");
-                boolean sendCaCert = rs.getBoolean("SEND_CA_CERT");
-                boolean sendResponderCert = rs.getBoolean("SEND_RESPONDER_CERT");
-                boolean requireMessageTime = rs.getBoolean("REQUIRE_MESSAGE_TIME");
-                int messageTimeBias = rs.getInt("MESSAGE_TIME_BIAS");
-                int confirmWaitTime = rs.getInt("CONFIRM_WAIT_TIME");
-
-                cmpControl = new CmpControl();
-                cmpControl.setRequireConfirmCert(requireConfirmCert);
-                cmpControl.setSendCaCert(sendCaCert);
-                cmpControl.setSendResponderCert(sendResponderCert);
-                cmpControl.setMessageTimeRequired(requireMessageTime);
-                if(messageTimeBias != 0)
-                {
-                    cmpControl.setMessageBias(messageTimeBias);
-                }
-                if(confirmWaitTime != 0)
-                {
-                    cmpControl.setConfirmWaitTime(confirmWaitTime);
-                }
+                return null;
             }
 
-            if(errorMsg != null)
-            {
-                throw new CAMgmtException(errorMsg);
-            }
+            boolean requireConfirmCert = rs.getBoolean("REQUIRE_CONFIRM_CERT");
+            boolean sendCaCert = rs.getBoolean("SEND_CA_CERT");
+            boolean sendResponderCert = rs.getBoolean("SEND_RESPONDER_CERT");
+            boolean requireMessageTime = rs.getBoolean("REQUIRE_MESSAGE_TIME");
+            int messageTimeBias = rs.getInt("MESSAGE_TIME_BIAS");
+            int confirmWaitTime = rs.getInt("CONFIRM_WAIT_TIME");
 
+            CmpControl cmpControl = new CmpControl(name);
+            cmpControl.setRequireConfirmCert(requireConfirmCert);
+            cmpControl.setSendCaCert(sendCaCert);
+            cmpControl.setSendResponderCert(sendResponderCert);
+            cmpControl.setMessageTimeRequired(requireMessageTime);
+            if(messageTimeBias != 0)
+            {
+                cmpControl.setMessageBias(messageTimeBias);
+            }
+            if(confirmWaitTime != 0)
+            {
+                cmpControl.setConfirmWaitTime(confirmWaitTime);
+            }
             return cmpControl;
         }catch(SQLException e)
         {
@@ -693,7 +683,7 @@ public abstract class BaseCAManager
         try
         {
             final String sql = "NAME, ART, NEXT_SERIAL, NEXT_CRLNO, STATUS, CRL_URIS, OCSP_URIS, MAX_VALIDITY" +
-                    ", CERT, SIGNER_TYPE, SIGNER_CONF, CRLSIGNER_NAME" +
+                    ", CERT, SIGNER_TYPE, SIGNER_CONF, CRLSIGNER_NAME, CMPCONTROL_NAME" +
                     ", DUPLICATE_KEY_MODE, DUPLICATE_SUBJECT_MODE, PERMISSIONS, NUM_CRLS" +
                     ", EXPIRATION_PERIOD, REVOKED, REV_REASON, REV_TIME, REV_INVALIDITY_TIME" +
                     ", DELTA_CRL_URIS, VALIDITY_MODE" +
@@ -722,6 +712,7 @@ public abstract class BaseCAManager
                 String signer_type = rs.getString("SIGNER_TYPE");
                 String signer_conf = rs.getString("SIGNER_CONF");
                 String crlsigner_name = rs.getString("CRLSIGNER_NAME");
+                String cmpcontrol_name = rs.getString("CMPCONTROL_NAME");
                 int duplicateKeyI = rs.getInt("DUPLICATE_KEY_MODE");
                 int duplicateSubjectI = rs.getInt("DUPLICATE_SUBJECT_MODE");
                 int numCrls = rs.getInt("NUM_CRLS");
@@ -776,6 +767,11 @@ public abstract class BaseCAManager
                 if(crlsigner_name != null)
                 {
                     entry.setCrlSignerName(crlsigner_name);
+                }
+
+                if(cmpcontrol_name != null)
+                {
+                    entry.setCmpControlName(cmpcontrol_name);
                 }
 
                 entry.setDuplicateKeyMode(DuplicationMode.getInstance(duplicateKeyI));

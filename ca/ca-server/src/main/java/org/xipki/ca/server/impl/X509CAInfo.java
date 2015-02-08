@@ -272,14 +272,24 @@ class X509CAInfo
         return caEntry.getCrlSignerName();
     }
 
-    public int getNumCrls()
-    {
-        return caEntry.getNumCrls();
-    }
-
     public void setCrlSignerName(String crlSignerName)
     {
         caEntry.setCrlSignerName(crlSignerName);
+    }
+
+    public String getCmpControlName()
+    {
+        return caEntry.getCmpControlName();
+    }
+
+    public void setCmpControlName(String name)
+    {
+        caEntry.setCmpControlName(name);
+    }
+
+    public int getNumCrls()
+    {
+        return caEntry.getNumCrls();
     }
 
     public CAStatus getStatus()

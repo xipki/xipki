@@ -35,6 +35,7 @@
 
 package org.xipki.ca.server.mgmt.shell;
 
+import org.apache.karaf.shell.commands.Argument;
 import org.apache.karaf.shell.commands.Command;
 
 /**
@@ -44,11 +45,14 @@ import org.apache.karaf.shell.commands.Command;
 @Command(scope = "xipki-ca", name = "cmpcontrol-remove", description="Remove CMP control")
 public class CmpControlRemoveCommand extends CaCommand
 {
+    @Argument(index = 0, name = "name", description = "CMP control name", required = true)
+    protected String name;
+
     @Override
     protected Object doExecute()
     throws Exception
     {
-        caManager.removeCmpControl();
+        caManager.removeCmpControl(name);
         out("removed CMP control");
         return null;
     }

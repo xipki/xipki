@@ -142,6 +142,7 @@ public class CaGenRootCACommand extends CaAddOrGenCommand
                 signerType,
                 signerConf,
                 crlSignerName,
+                cmpControlName,
                 duplicateKey,
                 duplicateSubject,
                 _permissions,

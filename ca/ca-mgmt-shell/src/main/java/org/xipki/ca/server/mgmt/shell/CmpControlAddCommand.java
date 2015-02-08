@@ -43,9 +43,14 @@ import org.xipki.ca.server.mgmt.api.CmpControl;
  * @author Lijun Liao
  */
 
-@Command(scope = "xipki-ca", name = "cmpcontrol-set", description="Set CMP control")
-public class CmpControlSetCommand extends CaCommand
+@Command(scope = "xipki-ca", name = "cmpcontrol-add", description="Add CMP control")
+public class CmpControlAddCommand extends CaCommand
 {
+    @Option(name = "-name",
+            description = "Required. CMP control name",
+            required = true, multiValued = false)
+    protected String name;
+
     @Option(name = "-cc", aliases = { "--confirmCert" },
             description = "Whether confirm of certificate is required.\n"
                 + "Valid values are 'yes' and 'no'")
@@ -78,7 +83,7 @@ public class CmpControlSetCommand extends CaCommand
     protected Object doExecute()
     throws Exception
     {
-        CmpControl entry = new CmpControl();
+        CmpControl entry = new CmpControl(name);
 
         boolean confirmCert = isEnabled(confirmCertS, false, "confirmCert");
         entry.setRequireConfirmCert(confirmCert);
@@ -102,8 +107,8 @@ public class CmpControlSetCommand extends CaCommand
             entry.setConfirmWaitTime(confirmWaitTime);
         }
 
-        caManager.setCmpControl(entry);
-        out("configured CMP control");
+        caManager.addCmpControl(entry);
+        out("added CMP control " + name);
 
         return null;
     }

@@ -92,6 +92,8 @@ public interface CAManager
 
     Set<String> getCrlSignerNames();
 
+    Set<String> getCmpControlNames();
+
     Set<String> getCaNames();
 
     void addCA(X509CAEntry newCaDbEntry)
@@ -103,7 +105,7 @@ public interface CAManager
             X509Certificate cert,
             Set<String> crl_uris, Set<String> delta_crl_uris, Set<String> ocsp_uris,
             CertValidity max_validity, String signer_type, String signer_conf,
-            String crlsigner_name, DuplicationMode duplicate_key,
+            String crlsigner_name, String cmpcontrol_name, DuplicationMode duplicate_key,
             DuplicationMode duplicate_subject, Set<Permission> permissions,
             Integer numCrls, Integer expirationPeriod, ValidityMode validityMode)
     throws CAMgmtException;
@@ -175,9 +177,6 @@ public interface CAManager
 
     X509CrlSignerEntry getCrlSigner(String name);
 
-    void setCrlSignerInCA(String crlSignerName, String caName)
-    throws CAMgmtException;
-
     void addPublisher(PublisherEntry dbEntry)
     throws CAMgmtException;
 
@@ -191,15 +190,15 @@ public interface CAManager
     void changePublisher(String name, String type, String conf)
     throws CAMgmtException;
 
-    CmpControl getCmpControl();
+    CmpControl getCmpControl(String name);
 
-    void setCmpControl(CmpControl dbEntry)
+    void addCmpControl(CmpControl dbEntry)
     throws CAMgmtException;
 
-    void removeCmpControl()
+    void removeCmpControl(String name)
     throws CAMgmtException;
 
-    void changeCmpControl(Boolean requireConfirmCert,
+    void changeCmpControl(String name, Boolean requireConfirmCert,
             Boolean requireMessageTime, Integer messageTimeBias,
             Integer confirmWaitTime, Boolean sendCaCert, Boolean sendResponderCert)
     throws CAMgmtException;
@@ -240,7 +239,7 @@ public interface CAManager
             CAStatus status, long nextSerial, int nextCrlNumber,
             List<String> crl_uris, List<String> delta_crl_uris, List<String> ocsp_uris,
             CertValidity max_validity, String signer_type, String signer_conf,
-            String crlsigner_name, DuplicationMode duplicate_key,
+            String crlsigner_name, String cmpcontrol_name, DuplicationMode duplicate_key,
             DuplicationMode duplicate_subject, Set<Permission> permissions,
             int numCrls, int expirationPeriod, ValidityMode validityMode)
     throws CAMgmtException;

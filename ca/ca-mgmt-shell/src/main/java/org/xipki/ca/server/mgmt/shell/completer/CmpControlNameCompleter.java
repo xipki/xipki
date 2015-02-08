@@ -33,39 +33,21 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.dbtool.shell;
+package org.xipki.ca.server.mgmt.shell.completer;
 
-import java.util.Map;
-
-import org.apache.karaf.shell.commands.Command;
-import org.xipki.dbtool.LiquibaseDatabaseConf;
+import java.util.Set;
 
 /**
  * @author Lijun Liao
  */
 
-@Command(scope = "xipki-db", name = "initdb-ocsp", description="Reset and initialize the OCSP databases")
-public class InitDbOcspCommand extends LiquibaseCommand
+public class CmpControlNameCompleter extends MgmtNameCompleter
 {
-    private static final String schemaFile = "sql/ocsp-init.xml";
 
     @Override
-    protected Object doExecute()
-    throws Exception
+    protected Set<String> getEnums()
     {
-        Map<String, LiquibaseDatabaseConf> dbConfs = getDatabaseConfs();
-
-        for(String dbName : dbConfs.keySet())
-        {
-            if(dbName.toLowerCase().contains("ocsp") == false)
-            {
-                continue;
-            }
-
-            LiquibaseDatabaseConf dbConf = dbConfs.get(dbName);
-            resetAndInit(dbConf, schemaFile);
-        }
-        return null;
+        return caManager.getCmpControlNames();
     }
 
 }

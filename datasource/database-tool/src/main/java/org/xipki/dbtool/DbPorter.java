@@ -359,4 +359,19 @@ public class DbPorter
         }
     }
 
+    protected int getDbSchemaVersion()
+    throws SQLException
+    {
+        final String tblName = "DBSCHEMAINFO";
+        if(dataSource.tableExists(null, tblName) == false)
+        {
+            return 1;
+        }
+        else
+        {
+            int version = (int) dataSource.getMax(null, tblName, "VERSION");
+            return Math.max(1, version);
+        }
+    }
+
 }

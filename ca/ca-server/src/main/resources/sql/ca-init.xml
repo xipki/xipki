@@ -15,16 +15,13 @@
       <column name="VERSION" value="2"/>
     </insert>
     <!-- table CALOCK -->
-    <createTable tableName="CALOCK">
+    <createTable tableName="SYSTEM_EVENT">
       <column name="NAME" type="VARCHAR(45)">
         <constraints primaryKey="true" nullable="false"/>
       </column>
-      <column name="LOCKED" type="SMALLINT">
-        <constraints nullable="false"/>
-      </column>
-      <column name="LOCKGRANTED" remarks="seconds since January 1, 1970, 00:00:00 GMT" type="BIGINT"/>
-      <column name="LOCKGRANTED2" type="TIMESTAMP"/>
-      <column name="LOCKEDBY" type="VARCHAR(255)"/>
+      <column name="EVENT_TIME" remarks="seconds since January 1, 1970, 00:00:00 GMT" type="BIGINT"/>
+      <column name="EVENT_TIME2" type="TIMESTAMP"/>
+      <column name="EVENT_OWNER" type="VARCHAR(255)"/>
     </createTable>
     <!-- table CMPCONTROL -->
     <createTable tableName="CMPCONTROL">
@@ -135,6 +132,7 @@
         <constraints nullable="false"/>
       </column>
       <column name="CRLSIGNER_NAME" type="VARCHAR(45)"/>
+      <column name="CMPCONTROL_NAME" type="VARCHAR(45)"/>
       <column defaultValueNumeric="2" name="DUPLICATE_KEY_MODE" type="SMALLINT">
         <constraints nullable="false"/>
       </column>
@@ -164,7 +162,7 @@
       <column name="CERT" type="VARCHAR(3000)">
         <constraints nullable="false"/>
       </column>
-      <column name="ADDITIONAL_CONTROL" type="VARCHAR(4000)"/>
+      <column name="ADD_CONTROL" type="VARCHAR(4000)"/>
     </createTable>
     <!-- table CAALIAS -->
     <createTable tableName="CAALIAS">
@@ -269,7 +267,7 @@
       <column name="ID" type="INT">
         <constraints primaryKey="true"/>
       </column>
-      <column name="CAINFO_ID" type="INT">
+      <column name="CA_ID" type="INT">
         <constraints nullable="false"/>
       </column>
       <column name="CRL_NUMBER" type="INT">
@@ -287,7 +285,7 @@
         <constraints nullable="false"/>
       </column>
     </createTable>
-    <addUniqueConstraint tableName="CRL" columnNames="CAINFO_ID, CRL_NUMBER" constraintName="CONST_CA_CRLNUMBER"/>
+    <addUniqueConstraint tableName="CRL" columnNames="CA_ID, CRL_NUMBER" constraintName="CONST_CA_CRLNUMBER"/>
     <!-- table CERT -->
     <createTable tableName="CERT">
       <column name="ID" type="INT">
@@ -296,16 +294,16 @@
       <column name="ART" type="SMALLINT">
         <constraints nullable="false"/>
       </column>
-      <column name="CAINFO_ID" type="INT">
+      <column name="CA_ID" type="INT">
         <constraints nullable="false"/>
       </column>
       <column name="SERIAL" type="BIGINT">
         <constraints nullable="false"/>
       </column>
-      <column name="CERTPROFILEINFO_ID" type="INT">
+      <column name="CERTPROFILE_ID" type="INT">
         <constraints nullable="false"/>
       </column>
-      <column name="REQUESTORINFO_ID" type="INT"/>
+      <column name="REQUESTOR_ID" type="INT"/>
       <column name="SUBJECT" type="VARCHAR(300)">
         <constraints nullable="false"/>
       </column>
@@ -335,7 +333,7 @@
         <constraints nullable="false"/>
       </column>
     </createTable>
-    <addUniqueConstraint tableName="CERT" columnNames="CAINFO_ID, SERIAL" constraintName="CONST_CA_SERIAL"/>
+    <addUniqueConstraint tableName="CERT" columnNames="CA_ID, SERIAL" constraintName="CONST_CA_SERIAL"/>
     <createIndex tableName="CERT" unique="false" indexName="IDX_FP_PK">
       <column name="SHA1_FP_PK"/>
     </createIndex>
@@ -362,7 +360,7 @@
       <column name="PUBLISHER_ID" type="INT">
         <constraints nullable="false"/>
       </column>
-      <column name="CAINFO_ID" type="INT">
+      <column name="CA_ID" type="INT">
         <constraints nullable="false"/>
       </column>
     </createTable>
@@ -371,7 +369,7 @@
       <column name="ID" type="BIGINT">
         <constraints primaryKey="true" nullable="false"/>
       </column>
-      <column name="CAINFO_ID" type="INT">
+      <column name="CA_ID" type="INT">
         <constraints nullable="false"/>
       </column>
       <column name="SERIAL" type="BIGINT">
@@ -406,8 +404,9 @@
   </changeSet>
   <!-- CA Configuration :: foreign key -->
   <changeSet author="xipki" id="5">
-    <addForeignKeyConstraint deferrable="false" initiallyDeferred="false" onDelete="CASCADE" onUpdate="NO ACTION" baseColumnNames="CRLSIGNER_NAME" baseTableName="CA" constraintName="FK_CA_CRLSIGNER1" referencedColumnNames="NAME" referencedTableName="CRLSIGNER"/>
-    <addForeignKeyConstraint deferrable="false" initiallyDeferred="false" onDelete="CASCADE" onUpdate="NO ACTION" baseColumnNames="CA_NAME" baseTableName="CAALIAS" constraintName="FK_SERVLETNAME_CA1" referencedColumnNames="NAME" referencedTableName="CA"/>
+    <addForeignKeyConstraint deferrable="false" initiallyDeferred="false" onDelete="SET NULL" onUpdate="NO ACTION" baseColumnNames="CMPCONTROL_NAME" baseTableName="CA" constraintName="FK_CA_CMPCONTROL1" referencedColumnNames="NAME" referencedTableName="CMPCONTROL"/>
+    <addForeignKeyConstraint deferrable="false" initiallyDeferred="false" onDelete="SET NULL" onUpdate="NO ACTION" baseColumnNames="CRLSIGNER_NAME" baseTableName="CA" constraintName="FK_CA_CRLSIGNER1" referencedColumnNames="NAME" referencedTableName="CRLSIGNER"/>
+    <addForeignKeyConstraint deferrable="false" initiallyDeferred="false" onDelete="CASCADE" onUpdate="NO ACTION" baseColumnNames="CA_NAME" baseTableName="CAALIAS" constraintName="FK_CAALIAS_CA1" referencedColumnNames="NAME" referencedTableName="CA"/>
     <!-- ca_ha_requestor -->
     <addForeignKeyConstraint deferrable="false" initiallyDeferred="false" onDelete="CASCADE" onUpdate="NO ACTION" baseColumnNames="REQUESTOR_NAME" baseTableName="CA_HAS_REQUESTOR" constraintName="FK_CA_HAS_REQUESTOR_REQUESTOR1" referencedColumnNames="NAME" referencedTableName="REQUESTOR"/>
     <addForeignKeyConstraint deferrable="false" initiallyDeferred="false" onDelete="CASCADE" onUpdate="NO ACTION" baseColumnNames="CA_NAME" baseTableName="CA_HAS_REQUESTOR" constraintName="FK_CA_HAS_REQUESTOR1_CA1" referencedColumnNames="NAME" referencedTableName="CA"/>
@@ -420,11 +419,11 @@
   </changeSet>
   <!-- CertStore :: foreigen key -->
   <changeSet author="xipki" id="6">
-    <addForeignKeyConstraint deferrable="false" initiallyDeferred="false" onDelete="CASCADE" onUpdate="NO ACTION" baseColumnNames="CAINFO_ID" baseTableName="CRL" constraintName="FK_CRL_CAINFO1" referencedColumnNames="ID" referencedTableName="CAINFO"/>
-    <addForeignKeyConstraint deferrable="false" initiallyDeferred="false" onDelete="CASCADE" onUpdate="NO ACTION" baseColumnNames="CAINFO_ID" baseTableName="CERT" constraintName="FK_CERT_CAINFO1" referencedColumnNames="ID" referencedTableName="CAINFO"/>
-    <addForeignKeyConstraint deferrable="false" initiallyDeferred="false" onDelete="CASCADE" onUpdate="NO ACTION" baseColumnNames="REQUESTORINFO_ID" baseTableName="CERT" constraintName="FK_CERT_REQUESTORINFO1" referencedColumnNames="ID" referencedTableName="REQUESTORINFO"/>
+    <addForeignKeyConstraint deferrable="false" initiallyDeferred="false" onDelete="CASCADE" onUpdate="NO ACTION" baseColumnNames="CA_ID" baseTableName="CRL" constraintName="FK_CRL_CAINFO1" referencedColumnNames="ID" referencedTableName="CAINFO"/>
+    <addForeignKeyConstraint deferrable="false" initiallyDeferred="false" onDelete="CASCADE" onUpdate="NO ACTION" baseColumnNames="CA_ID" baseTableName="CERT" constraintName="FK_CERT_CAINFO1" referencedColumnNames="ID" referencedTableName="CAINFO"/>
+    <addForeignKeyConstraint deferrable="false" initiallyDeferred="false" onDelete="CASCADE" onUpdate="NO ACTION" baseColumnNames="REQUESTOR_ID" baseTableName="CERT" constraintName="FK_CERT_REQUESTORINFO1" referencedColumnNames="ID" referencedTableName="REQUESTORINFO"/>
     <addForeignKeyConstraint deferrable="false" initiallyDeferred="false" onDelete="CASCADE" onUpdate="NO ACTION" baseColumnNames="USER_ID" baseTableName="CERT" constraintName="FK_CERT_USER1" referencedColumnNames="ID" referencedTableName="USERNAME"/>
-    <addForeignKeyConstraint deferrable="false" initiallyDeferred="false" onDelete="CASCADE" onUpdate="NO ACTION" baseColumnNames="CERTPROFILEINFO_ID" baseTableName="CERT" constraintName="FK_CERT_CERTPROFILEINFO1" referencedColumnNames="ID" referencedTableName="CERTPROFILEINFO"/>
+    <addForeignKeyConstraint deferrable="false" initiallyDeferred="false" onDelete="CASCADE" onUpdate="NO ACTION" baseColumnNames="CERTPROFILE_ID" baseTableName="CERT" constraintName="FK_CERT_CERTPROFILEINFO1" referencedColumnNames="ID" referencedTableName="CERTPROFILEINFO"/>
     <addForeignKeyConstraint deferrable="false" initiallyDeferred="false" onDelete="CASCADE" onUpdate="NO ACTION" baseColumnNames="CERT_ID" baseTableName="RAWCERT" constraintName="FK_RAWCERT_CERT1" referencedColumnNames="ID" referencedTableName="CERT"/>
     <addForeignKeyConstraint deferrable="false" initiallyDeferred="false" onDelete="CASCADE" onUpdate="NO ACTION" baseColumnNames="PUBLISHER_ID" baseTableName="PUBLISHQUEUE" constraintName="FK_PUBLISHQUEUE_PUBLISHER1" referencedColumnNames="ID" referencedTableName="PUBLISHERINFO"/>
     <addForeignKeyConstraint deferrable="false" initiallyDeferred="false" onDelete="CASCADE" onUpdate="NO ACTION" baseColumnNames="CERT_ID" baseTableName="PUBLISHQUEUE" constraintName="FK_PUBLISHQUEUE_CERT1" referencedColumnNames="ID" referencedTableName="CERT"/>

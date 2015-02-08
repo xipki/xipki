@@ -45,6 +45,11 @@ import org.apache.karaf.shell.commands.Option;
 @Command(scope = "xipki-ca", name = "cmpcontrol-update", description="Update CMP control")
 public class CmpControlUpdateCommand extends CaCommand
 {
+    @Option(name = "-name",
+            description = "Required. CMP control name",
+            required = true, multiValued = false)
+    protected String name;
+
     @Option(name = "-cc", aliases = { "--confirmCert" },
             description = "Whether confirm of certificate is required.\n"
                 + "Valid values are 'yes' and 'no'")
@@ -82,7 +87,7 @@ public class CmpControlUpdateCommand extends CaCommand
         Boolean requireMessageTime = isEnabled(requireMessageTimeS, "messageTime");
         Boolean requireConfirmCert = isEnabled(confirmCertS, "confirmCert");
 
-        caManager.changeCmpControl(requireConfirmCert, requireMessageTime, messageTimeBias, confirmWaitTime,
+        caManager.changeCmpControl(name, requireConfirmCert, requireMessageTime, messageTimeBias, confirmWaitTime,
                 sendCaCert, sendResponderCert);
         out("updated CMP control");
         return null;

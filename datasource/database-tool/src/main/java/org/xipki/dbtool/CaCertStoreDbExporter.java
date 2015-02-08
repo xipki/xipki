@@ -103,6 +103,7 @@ class CaCertStoreDbExporter extends DbPorter
     private final int numCertsInBundle;
     private final int numCrls;
     private final boolean resume;
+    private final int dbSchemaVersion;
 
     CaCertStoreDbExporter(DataSourceWrapper dataSource,
             Marshaller marshaller, Unmarshaller unmarshaller, String baseDir,
@@ -127,6 +128,7 @@ class CaCertStoreDbExporter extends DbPorter
         this.marshaller = marshaller;
         this.unmarshaller = unmarshaller;
         this.resume = resume;
+        this.dbSchemaVersion = getDbSchemaVersion();
     }
 
     @SuppressWarnings("unchecked")
@@ -210,15 +212,25 @@ class CaCertStoreDbExporter extends DbPorter
         try
         {
             stmt = createStatement();
-            String sql = "SELECT ID, CAINFO_ID FROM CRL";
-            ResultSet rs = stmt.executeQuery(sql);
+            StringBuilder sql = new StringBuilder("SELECT");
+            sql.append(" ID,");
+            if(dbSchemaVersion == 1)
+            {
+                sql.append(" CAINFO_ID");
+            }
+            else
+            {
+                sql.append(" CA_ID");
+            }
+            sql.append(" FROM CRL");
+            ResultSet rs = stmt.executeQuery(sql.toString());
 
             Map<Integer, List<Integer>> idMap = new HashMap<>();
 
             while(rs.next())
             {
                 int id = rs.getInt("ID");
-                int cainfo_id = rs.getInt("CAINFO_ID");
+                int cainfo_id = rs.getInt(dbSchemaVersion == 1 ? "CAINFO_ID" : "CA_ID");
                 List<Integer> ids = idMap.get(cainfo_id);
                 if(ids == null)
                 {
@@ -229,10 +241,10 @@ class CaCertStoreDbExporter extends DbPorter
             }
             rs.close();
 
-            Set<Integer> cainfo_ids = idMap.keySet();
-            for(Integer cainfo_id : cainfo_ids)
+            Set<Integer> ca_ids = idMap.keySet();
+            for(Integer ca_id : ca_ids)
             {
-                List<Integer> ids = idMap.get(cainfo_id);
+                List<Integer> ids = idMap.get(ca_id);
                 if(ids.isEmpty())
                 {
                     continue;
@@ -260,7 +272,7 @@ class CaCertStoreDbExporter extends DbPorter
                     CrlType crl = new CrlType();
 
                     crl.setId(id);
-                    crl.setCainfoId(cainfo_id);
+                    crl.setCaId(ca_id);
                     crl.setCrlFile("CRL/" + fp + ".crl");
 
                     crls.getCrl().add(crl);
@@ -381,37 +393,36 @@ class CaCertStoreDbExporter extends DbPorter
         UsersFiles usersFiles = new UsersFiles();
 
         String tableName = "USERNAME";
-
         final int minId = (int) getMin(tableName, "ID");
-        final int maxId = (int) getMax(tableName, "ID");
+        String coreSql = "ID, NAME FROM " + tableName + " WHERE ID >= ?";
 
-        String sql = "SELECT ID, NAME FROM " + tableName +
-                " WHERE ID >= ? AND ID < ?" +
-                " ORDER BY ID ASC";
-
-        PreparedStatement ps = prepareStatement(sql);
+        final int rows = 100;
+        PreparedStatement ps = prepareStatement(
+                dataSource.createFetchFirstSelectSQL(coreSql, rows, "ID ASC"));
 
         int numUsersInCurrentFile = 0;
         UsersType usersInCurrentFile = new UsersType();
 
         int sum = 0;
-        final int n = 100;
 
         int minIdOfCurrentFile = -1;
         int maxIdOfCurrentFile = -1;
 
         try
         {
-            for(int i = minId; i <= maxId; i += n)
+            int startId = minId;
+            while(true)
             {
-                ps.setInt(1, i);
-                ps.setInt(2, i + n);
-
+                ps.setInt(1, startId);
                 ResultSet rs = ps.executeQuery();
+                int n = 0;
 
                 while(rs.next())
                 {
+                    n++;
+
                     int id = rs.getInt("ID");
+                    startId = id + 1;
 
                     if(minIdOfCurrentFile == -1)
                     {
@@ -443,17 +454,10 @@ class CaCertStoreDbExporter extends DbPorter
 
                     if(numUsersInCurrentFile == numCertsInBundle * 10)
                     {
-                        String currentCertsFilename = DbiUtil.buildFilename("users_", ".xml",
-                                minIdOfCurrentFile, maxIdOfCurrentFile, maxId);
+                        String currentCertsFilename = "users_" + minIdOfCurrentFile + "_" + maxIdOfCurrentFile + ".xml";
 
                         JAXBElement<UsersType> root = new ObjectFactory().createUsers(usersInCurrentFile);
-                        try
-                        {
-                            marshaller.marshal(root, new File(baseDir + File.separator + currentCertsFilename));
-                        }catch(JAXBException e)
-                        {
-                            throw XMLUtil.convert(e);
-                        }
+                        marshaller.marshal(root, new File(baseDir + File.separator + currentCertsFilename));
 
                         usersFiles.getUsersFile().add(currentCertsFilename);
 
@@ -474,26 +478,25 @@ class CaCertStoreDbExporter extends DbPorter
                 } catch(SQLException e)
                 {
                 }
+
+                if(n == 0)
+                {
+                    break;
+                }
             }
 
             if(numUsersInCurrentFile > 0)
             {
-                String currentCertsFilename = DbiUtil.buildFilename("users_", ".xml",
-                        minIdOfCurrentFile, maxIdOfCurrentFile, maxId);
+                String currentCertsFilename = "users_" + minIdOfCurrentFile + "_" + maxIdOfCurrentFile + ".xml";
 
                 JAXBElement<UsersType> root = new ObjectFactory().createUsers(usersInCurrentFile);
-                try
-                {
-                    marshaller.marshal(root, new File(baseDir + File.separator + currentCertsFilename));
-                }catch(JAXBException e)
-                {
-                    throw XMLUtil.convert(e);
-                }
+                marshaller.marshal(root, new File(baseDir + File.separator + currentCertsFilename));
 
                 usersFiles.getUsersFile().add(currentCertsFilename);
 
                 System.out.println(" Exported " + numUsersInCurrentFile + " users in " + currentCertsFilename);
             }
+
         }finally
         {
             releaseResources(ps, null);
@@ -591,16 +594,21 @@ class CaCertStoreDbExporter extends DbPorter
             total = 1; // to avoid exception
         }
 
-        String certSql = "SELECT ID, ART, CAINFO_ID, CERTPROFILEINFO_ID," +
-                " REQUESTORINFO_ID, LAST_UPDATE, REVOKED," +
-                " REV_REASON, REV_TIME, REV_INVALIDITY_TIME, USER_ID" +
-                " FROM CERT" +
-                " WHERE ID >= ? AND ID < ?" +
-                " ORDER BY ID ASC";
+        StringBuilder certSql = new StringBuilder("SELECT ID,");
+        if(dbSchemaVersion == 1)
+        {
+            certSql.append(" CAINFO_ID, CERTPROFILEINFO_ID, REQUESTORINFO_ID,");
+        }
+        else
+        {
+            certSql.append(" ART, CA_ID, CERTPROFILE_ID, REQUESTOR_ID,");
+        }
+        certSql.append(" LAST_UPDATE, REVOKED, REV_REASON, REV_TIME, REV_INVALIDITY_TIME, USER_ID");
+        certSql.append(" FROM CERT WHERE ID >= ? AND ID < ? ORDER BY ID ASC");
 
-        PreparedStatement ps = prepareStatement(certSql);
+        PreparedStatement ps = prepareStatement(certSql.toString());
 
-        String rawCertSql = "SELECT CERT_ID, CERT FROM RAWCERT WHERE CERT_ID >= ? AND CERT_ID < ?";
+        final String rawCertSql = "SELECT CERT_ID, CERT FROM RAWCERT WHERE CERT_ID >= ? AND CERT_ID < ?";
         PreparedStatement rawCertPs = prepareStatement(rawCertSql);
 
         int numCertsInCurrentFile = 0;
@@ -690,19 +698,27 @@ class CaCertStoreDbExporter extends DbPorter
                     CertType cert = new CertType();
                     cert.setId(id);
 
-                    int art = rs.getInt("ART");
+                    int art;
+                    if(dbSchemaVersion == 1)
+                    {
+                        art = 1; // X.509
+                    }
+                    else
+                    {
+                        art = rs.getInt("ART");
+                    }
                     cert.setArt(art);
 
-                    int cainfo_id = rs.getInt("CAINFO_ID");
-                    cert.setCainfoId(cainfo_id);
+                    int cainfo_id = rs.getInt(dbSchemaVersion == 1 ? "CAINFO_ID" : "CA_ID");
+                    cert.setCaId(cainfo_id);
 
-                    int certprofileinfo_id = rs.getInt("CERTPROFILEINFO_ID");
-                    cert.setCertprofileinfoId(certprofileinfo_id);
+                    int certprofileinfo_id = rs.getInt(dbSchemaVersion == 1 ? "CERTPROFILEINFO_ID" : "CERTPROFILE_ID");
+                    cert.setCertprofileId(certprofileinfo_id);
 
-                    int requestorinfo_id = rs.getInt("REQUESTORINFO_ID");
+                    int requestorinfo_id = rs.getInt(dbSchemaVersion == 1 ? "REQUESTORINFO_ID" : "REQUESTOR_ID");
                     if(requestorinfo_id != 0)
                     {
-                        cert.setRequestorinfoId(requestorinfo_id);
+                        cert.setRequestorId(requestorinfo_id);
                     }
 
                     long last_update = rs.getLong("LAST_UPDATE");
@@ -801,10 +817,17 @@ class CaCertStoreDbExporter extends DbPorter
     {
         System.out.println("Exporting table PUBLISHQUEUE");
 
-        String sql = "SELECT CERT_ID, PUBLISHER_ID, CAINFO_ID" +
-                " FROM PUBLISHQUEUE" +
-                " WHERE CERT_ID >= ? AND CERT_ID < ?" +
-                " ORDER BY CERT_ID ASC";
+        StringBuilder sql = new StringBuilder("SELECT");
+        sql.append(" CERT_ID, PUBLISHER_ID,");
+        if(dbSchemaVersion == 1)
+        {
+            sql.append(" CAINFO_ID");
+        }
+        else
+        {
+            sql.append(" CA_ID");
+        }
+        sql.append(" FROM PUBLISHQUEUE WHERE CERT_ID >= ? AND CERT_ID < ? ORDER BY CERT_ID ASC");
 
         final int minId = (int) getMin("PUBLISHQUEUE", "CERT_ID");
         final int maxId = (int) getMax("PUBLISHQUEUE", "CERT_ID");
@@ -813,7 +836,7 @@ class CaCertStoreDbExporter extends DbPorter
         certstore.setPublishQueue(queue);
         if(maxId != 0)
         {
-            PreparedStatement ps = prepareStatement(sql);
+            PreparedStatement ps = prepareStatement(sql.toString());
             ResultSet rs = null;
 
             List<ToPublishType> list = queue.getTop();
@@ -832,7 +855,7 @@ class CaCertStoreDbExporter extends DbPorter
                     {
                         int cert_id = rs.getInt("CERT_ID");
                         int pub_id = rs.getInt("PUBLISHER_ID");
-                        int ca_id = rs.getInt("CAINFO_ID");
+                        int ca_id = rs.getInt(dbSchemaVersion == 1 ? "CAINFO_ID" : "CA_ID");
 
                         ToPublishType toPub = new ToPublishType();
                         toPub.setPubId(pub_id);
@@ -855,12 +878,22 @@ class CaCertStoreDbExporter extends DbPorter
     {
         System.out.println("Exporting table DELTACRL_CACHE");
 
-        String sql = "SELECT SERIAL, CAINFO_ID FROM DELTACRL_CACHE";
+        StringBuilder sql = new StringBuilder("SELECT");
+        sql.append(" SERIAL,");
+        if(dbSchemaVersion == 1)
+        {
+            sql.append(" CAINFO_ID");
+        }
+        else
+        {
+            sql.append(" CA_ID");
+        }
+        sql.append(" FROM DELTACRL_CACHE");
 
         DeltaCRLCache deltaCache = new DeltaCRLCache();
         certstore.setDeltaCRLCache(deltaCache);
 
-        PreparedStatement ps = prepareStatement(sql);
+        PreparedStatement ps = prepareStatement(sql.toString());
         ResultSet rs = null;
 
         List<DeltaCRLCacheEntryType> list = deltaCache.getEntry();
@@ -872,7 +905,7 @@ class CaCertStoreDbExporter extends DbPorter
             while(rs.next())
             {
                 long serial = rs.getLong("SERIAL");
-                int ca_id = rs.getInt("CAINFO_ID");
+                int ca_id = rs.getInt(dbSchemaVersion == 1 ? "CAINFO_ID": "CA_ID");
 
                 DeltaCRLCacheEntryType entry = new DeltaCRLCacheEntryType();
                 entry.setCaId(ca_id);

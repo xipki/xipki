@@ -56,6 +56,7 @@ import org.xipki.dbi.ca.jaxb.CAConfigurationType.CaHasRequestors;
 import org.xipki.dbi.ca.jaxb.CAConfigurationType.Caaliases;
 import org.xipki.dbi.ca.jaxb.CAConfigurationType.Cas;
 import org.xipki.dbi.ca.jaxb.CAConfigurationType.Certprofiles;
+import org.xipki.dbi.ca.jaxb.CAConfigurationType.Cmpcontrols;
 import org.xipki.dbi.ca.jaxb.CAConfigurationType.Crlsigners;
 import org.xipki.dbi.ca.jaxb.CAConfigurationType.Environments;
 import org.xipki.dbi.ca.jaxb.CAConfigurationType.Publishers;
@@ -82,6 +83,7 @@ import org.xipki.security.api.PasswordResolverException;
 class CaConfigurationDbExporter extends DbPorter
 {
     private final Marshaller marshaller;
+    private final int dbSchemaVersion;
 
     CaConfigurationDbExporter(DataSourceWrapper dataSource, Marshaller marshaller, String destDir)
     throws SQLException, PasswordResolverException, IOException
@@ -89,6 +91,7 @@ class CaConfigurationDbExporter extends DbPorter
         super(dataSource, destDir);
         ParamChecker.assertNotNull("marshaller", marshaller);
         this.marshaller = marshaller;
+        this.dbSchemaVersion = getDbSchemaVersion();
     }
 
     public void export()
@@ -127,20 +130,22 @@ class CaConfigurationDbExporter extends DbPorter
     private void export_cmpcontrol(CAConfigurationType caconf)
     throws SQLException
     {
-        CmpcontrolType cmpcontrol = null;
+        Cmpcontrols cmpcontrols = new Cmpcontrols();
+        caconf.setCmpcontrols(cmpcontrols);
         System.out.println("Exporting table CMPCONTROL");
         Statement stmt = null;
         ResultSet rs = null;
         try
         {
             stmt = createStatement();
-            String sql = "SELECT REQUIRE_CONFIRM_CERT, SEND_CA_CERT, SEND_RESPONDER_CERT, "
+            String sql = "SELECT NAME, REQUIRE_CONFIRM_CERT, SEND_CA_CERT, SEND_RESPONDER_CERT, "
                     + " REQUIRE_MESSAGE_TIME, MESSAGE_TIME_BIAS, CONFIRM_WAIT_TIME"
                     + " FROM CMPCONTROL";
             rs = stmt.executeQuery(sql);
 
-            if(rs.next())
+            while(rs.next())
             {
+                String name = rs.getString("NAME");
                 boolean requireConfirmCert = rs.getBoolean("REQUIRE_CONFIRM_CERT");
                 boolean sendCaCert = rs.getBoolean("SEND_CA_CERT");
                 boolean sendResponderCert = rs.getBoolean("SEND_RESPONDER_CERT");
@@ -148,7 +153,10 @@ class CaConfigurationDbExporter extends DbPorter
                 int messageTimeBias = rs.getInt("MESSAGE_TIME_BIAS");
                 int confirmWaitTime = rs.getInt("CONFIRM_WAIT_TIME");
 
-                cmpcontrol = new CmpcontrolType();
+                CmpcontrolType cmpcontrol = new CmpcontrolType();
+                cmpcontrols.getCmpcontrol().add(cmpcontrol);
+
+                cmpcontrol.setName(name);
                 cmpcontrol.setRequireConfirmCert(requireConfirmCert);
                 cmpcontrol.setSendCaCert(sendCaCert);
                 cmpcontrol.setSendResponderCert(sendResponderCert);
@@ -161,7 +169,6 @@ class CaConfigurationDbExporter extends DbPorter
             releaseResources(stmt, rs);
         }
 
-        caconf.setCmpcontrol(cmpcontrol);
         System.out.println(" Exported table CMPCONTROL");
     }
 
@@ -392,13 +399,27 @@ class CaConfigurationDbExporter extends DbPorter
         try
         {
             stmt = createStatement();
-            String sql = "SELECT NAME, ART, TYPE, CONF FROM CERTPROFILE";
-            rs = stmt.executeQuery(sql);
+            StringBuilder sql = new StringBuilder("SELECT");
+            sql.append(" NAME");
+            if(dbSchemaVersion > 1)
+            {
+                sql.append(", ART");
+            }
+            sql.append(", TYPE, CONF FROM CERTPROFILE");
+            rs = stmt.executeQuery(sql.toString());
 
             while(rs.next())
             {
                 String name = rs.getString("NAME");
-                int art = rs.getInt("ART");
+                int art;
+                if(dbSchemaVersion == 1)
+                {
+                    art = 1; // X.509
+                }
+                else
+                {
+                    art = rs.getInt("ART");
+                }
                 String type = rs.getString("TYPE");
                 String conf = rs.getString("CONF");
 
@@ -441,15 +462,15 @@ class CaConfigurationDbExporter extends DbPorter
         {
             StringBuilder sb = new StringBuilder();
 
-            sb.append("SELECT NAME, ART, NEXT_SERIAL, NEXT_CRLNO, STATUS, CRL_URIS, OCSP_URIS, MAX_VALIDITY,");
+            sb.append("SELECT NAME,");
+            sb.append(" NEXT_SERIAL, STATUS, CRL_URIS, OCSP_URIS, MAX_VALIDITY,");
             sb.append(" CERT, SIGNER_TYPE, SIGNER_CONF, CRLSIGNER_NAME,");
             sb.append(" DUPLICATE_KEY_MODE, DUPLICATE_SUBJECT_MODE, PERMISSIONS, NUM_CRLS,");
             sb.append(" EXPIRATION_PERIOD, REVOKED, REV_REASON, REV_TIME, REV_INVALIDITY_TIME,");
             sb.append(" DELTA_CRL_URIS, VALIDITY_MODE");
-            boolean additionalControlExists = dataSource.tableHasColumn(null, "CA", "ADDITIONAL_CONTROL");
-            if(additionalControlExists)
+            if(dbSchemaVersion > 1)
             {
-                sb.append(", ADDITIONAL_CONTROL");
+                sb.append(", ART, NEXT_CRLNO, CMPCONTROL_NAME, ADD_CONTROL");
             }
             sb.append(" FROM CA");
 
@@ -461,9 +482,28 @@ class CaConfigurationDbExporter extends DbPorter
             while(rs.next())
             {
                 String name = rs.getString("NAME");
-                int art = rs.getInt("ART");
+
+                int art;
+                int next_crlNo;
+                String cmpcontrol_name;
+                String addControl;
+                if(dbSchemaVersion == 1)
+                {
+                    art = 1; // X.509
+                    next_crlNo = 1;
+                    cmpcontrol_name = "default";
+                    addControl = null;
+                }
+                else
+                {
+                    art = rs.getInt("ART");
+                    next_crlNo = rs.getInt("NEXT_CRLNO");
+                    cmpcontrol_name = rs.getString("CMPCONTROL_NAME");
+                    addControl = rs.getString("ADD_CONTROL");
+                }
+
                 long next_serial = rs.getLong("NEXT_SERIAL");
-                int next_crlNo = rs.getInt("NEXT_CRLNO");
+
                 String status = rs.getString("STATUS");
                 String crl_uris = rs.getString("CRL_URIS");
                 String delta_crl_uris = rs.getString("DELTA_CRL_URIS");
@@ -494,16 +534,13 @@ class CaConfigurationDbExporter extends DbPorter
                 ca.setSignerType(signer_type);
                 ca.setSignerConf(signer_conf);
                 ca.setCrlsignerName(crlsigner_name);
+                ca.setCmpcontrolName(cmpcontrol_name);
                 ca.setDuplicateKeyMode(duplicateKeyMode);
                 ca.setDuplicateSubjectMode(duplicateSubjectMode);
                 ca.setPermissions(permissions);
                 ca.setExpirationPeriod(expirationPeriod);
                 ca.setValidityMode(validityMode);
-                if(additionalControlExists)
-                {
-                    String additionalControl = rs.getString("ADDITIONAL_CONTROL");
-                    ca.setAdditionalControl(additionalControl);
-                }
+                ca.setAddControl(addControl);
 
                 int numCrls = rs.getInt("num_crls");
                 ca.setNumCrls(numCrls);
