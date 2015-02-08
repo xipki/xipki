@@ -484,7 +484,7 @@ class OcspCertStoreFromCaDbImporter extends DbPorter
                     continue;
                 }
 
-                int caId = cert.getCainfoId();
+                int caId = cert.getCaId();
                 if(caIds.contains(caId) == false)
                 {
                     continue;
@@ -532,7 +532,7 @@ class OcspCertStoreFromCaDbImporter extends DbPorter
                 setLong(ps_cert, idx++, cert.getRevTime());
                 setLong(ps_cert, idx++, cert.getRevInvalidityTime());
 
-                int certprofileId = cert.getCertprofileinfoId();
+                int certprofileId = cert.getCertprofileId();
                 String certprofileName = profileMap.get(certprofileId);
                 ps_cert.setString(idx++, certprofileName);
                 ps_cert.addBatch();

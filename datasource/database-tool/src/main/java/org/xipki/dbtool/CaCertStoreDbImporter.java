@@ -102,8 +102,8 @@ class CaCertStoreDbImporter extends DbPorter
             "INSERT INTO CERT " +
             "(ID, ART, LAST_UPDATE, SERIAL, SUBJECT,"
             + " NOTBEFORE, NOTAFTER, REVOKED, REV_REASON, REV_TIME, REV_INVALIDITY_TIME,"
-            + " CERTPROFILEINFO_ID, CAINFO_ID,"
-            + " REQUESTORINFO_ID, USER_ID, SHA1_FP_PK, SHA1_FP_SUBJECT, EE)" +
+            + " CERTPROFILE_ID, CA_ID,"
+            + " REQUESTOR_ID, USER_ID, SHA1_FP_PK, SHA1_FP_SUBJECT, EE)" +
             " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
     private static final String SQL_ADD_RAWCERT = "INSERT INTO RAWCERT (CERT_ID, SHA1_FP, CERT) VALUES (?, ?, ?)";
@@ -413,7 +413,7 @@ class CaCertStoreDbImporter extends DbPorter
     throws Exception
     {
         final String SQL = "INSERT INTO PUBLISHQUEUE" +
-                " (CERT_ID, PUBLISHER_ID, CAINFO_ID)" +
+                " (CERT_ID, PUBLISHER_ID, CA_ID)" +
                 " VALUES (?, ?, ?)";
 
         System.out.println("Importing table PUBLISHQUEUE");
@@ -449,7 +449,7 @@ class CaCertStoreDbImporter extends DbPorter
     throws Exception
     {
         final String SQL = "INSERT INTO DELTACRL_CACHE" +
-                " (ID, SERIAL, CAINFO_ID)" +
+                " (ID, SERIAL, CA_ID)" +
                 " VALUES (?, ?, ?)";
 
         System.out.println("Importing table DELTACRL_CACHE");
@@ -488,7 +488,7 @@ class CaCertStoreDbImporter extends DbPorter
     private void import_crl(Crls crls)
     throws Exception
     {
-        final String sql = "INSERT INTO CRL (ID, CAINFO_ID, CRL_NUMBER, THISUPDATE, NEXTUPDATE, DELTACRL, BASECRL_NUMBER, CRL)"
+        final String sql = "INSERT INTO CRL (ID, CA_ID, CRL_NUMBER, THISUPDATE, NEXTUPDATE, DELTACRL, BASECRL_NUMBER, CRL)"
                 + " VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
 
         System.out.println("Importing table CRL");
@@ -539,7 +539,7 @@ class CaCertStoreDbImporter extends DbPorter
 
                     int idx = 1;
                     ps.setInt(idx++, id++);
-                    ps.setInt(idx++, crl.getCainfoId());
+                    ps.setInt(idx++, crl.getCaId());
                     ps.setLong(idx++, crlNumber.longValue());
                     ps.setLong(idx++, c.getThisUpdate().getTime() / 1000);
                     if(c.getNextUpdate() != null)
@@ -741,9 +741,9 @@ class CaCertStoreDbImporter extends DbPorter
                 setInt(ps_cert, idx++, cert.getRevReason());
                 setLong(ps_cert, idx++, cert.getRevTime());
                 setLong(ps_cert, idx++, cert.getRevInvalidityTime());
-                setInt(ps_cert, idx++, cert.getCertprofileinfoId());
-                setInt(ps_cert, idx++, cert.getCainfoId());
-                setInt(ps_cert, idx++, cert.getRequestorinfoId());
+                setInt(ps_cert, idx++, cert.getCertprofileId());
+                setInt(ps_cert, idx++, cert.getCaId());
+                setInt(ps_cert, idx++, cert.getRequestorId());
                 setInt(ps_cert, idx++, cert.getUserId());
 
                 ps_cert.setString(idx++, HashCalculator.hexHash(HashAlgoType.SHA1, encodedKey));
