@@ -35,6 +35,12 @@
 
 package org.xipki.ca.server.mgmt.shell;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
+
+import org.apache.karaf.shell.commands.Argument;
 import org.apache.karaf.shell.commands.Command;
 import org.xipki.ca.server.mgmt.api.CmpControl;
 
@@ -45,12 +51,48 @@ import org.xipki.ca.server.mgmt.api.CmpControl;
 @Command(scope = "xipki-ca", name = "cmpcontrol-info", description="Show information of CMP control")
 public class CmpControlInfoCommand extends CaCommand
 {
+    @Argument(index = 0, name = "name", description = "CMP control name", required = false)
+    protected String name;
+
     @Override
     protected Object doExecute()
     throws Exception
     {
-        CmpControl cmpcontrol = caManager.getCmpControl();
-        out(cmpcontrol == null ? "NULL" : cmpcontrol.toString());
+        StringBuilder sb = new StringBuilder();
+
+        if(name == null)
+        {
+            Set<String> names = caManager.getCmpControlNames();
+            int n = names.size();
+
+            if(n == 0 || n == 1)
+            {
+                sb.append(((n == 0) ? "no" : "1") + " CMP control is configured\n");
+            }
+            else
+            {
+                sb.append(n + " CMP controls are configured:\n");
+            }
+
+            List<String> sorted = new ArrayList<>(names);
+            Collections.sort(sorted);
+
+            for(String name : sorted)
+            {
+                sb.append("\t").append(name).append("\n");
+            }
+        }
+        else
+        {
+            CmpControl entry = caManager.getCmpControl(name);
+            if(entry != null)
+            {
+                sb.append(entry.toString());
+            }
+        }
+
+        out(sb.toString());
+
         return null;
     }
 }

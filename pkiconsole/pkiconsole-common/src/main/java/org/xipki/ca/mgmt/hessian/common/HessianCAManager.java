@@ -106,6 +106,8 @@ public interface HessianCAManager
 
     Set<String> getCrlSignerNames();
 
+    Set<String> getCmpControlNames();
+
     Set<String> getCaNames();
 
     void addCA(X509CAEntry newCaDbEntry)
@@ -116,7 +118,7 @@ public interface HessianCAManager
     void changeCA(String name, CAStatus status, X509Certificate cert,
             Set<String> crl_uris, Set<String> delta_crl_uris, Set<String> ocsp_uris,
             CertValidity max_validity, String signer_type, String signer_conf,
-            String crlsigner_name, DuplicationMode duplicate_key,
+            String crlsigner_name, String cmpcontrol_name, DuplicationMode duplicate_key,
             DuplicationMode duplicate_subject, Set<Permission> permissions,
             Integer numCrls, Integer expirationPeriod, ValidityMode validityMode)
     throws HessianCAMgmtException;
@@ -188,9 +190,6 @@ public interface HessianCAManager
 
     X509CrlSignerEntry getCrlSigner(String name);
 
-    void setCrlSignerInCA(String crlSignerName, String caName)
-    throws HessianCAMgmtException;
-
     void addPublisher(PublisherEntry dbEntry)
     throws HessianCAMgmtException;
 
@@ -204,15 +203,15 @@ public interface HessianCAManager
     void changePublisher(String name, String type, String conf)
     throws HessianCAMgmtException;
 
-    CmpControl getCmpControl();
+    CmpControl getCmpControl(String name);
 
-    void setCmpControl(CmpControl dbEntry)
+    void addCmpControl(CmpControl dbEntry)
     throws HessianCAMgmtException;
 
-    void removeCmpControl()
+    void removeCmpControl(String name)
     throws HessianCAMgmtException;
 
-    void changeCmpControl(Boolean requireConfirmCert,
+    void changeCmpControl(String name, Boolean requireConfirmCert,
             Boolean requireMessageTime, Integer messageTimeBias,
             Integer confirmWaitTime, Boolean sendCaCert, Boolean sendResponderCert)
     throws HessianCAMgmtException;
@@ -253,7 +252,7 @@ public interface HessianCAManager
             CAStatus status, long nextSerial, int nextCrlNo,
             List<String> crl_uris, List<String> delta_crl_uris, List<String> ocsp_uris,
             CertValidity max_validity, String signer_type, String signer_conf,
-            String crlsigner_name, DuplicationMode duplicate_key,
+            String crlsigner_name, String cmpcontrol_name, DuplicationMode duplicate_key,
             DuplicationMode duplicate_subject, Set<Permission> permissions,
             int numCrls, int expirationPeriod, ValidityMode validityMode)
     throws HessianCAMgmtException;

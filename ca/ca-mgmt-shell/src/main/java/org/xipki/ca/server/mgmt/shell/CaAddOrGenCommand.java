@@ -96,6 +96,10 @@ public abstract class CaAddOrGenCommand extends CaCommand
             description = "CRL signer name")
     protected String crlSignerName;
 
+    @Option(name = "-cmpControl",
+            description = "CMP control name")
+    protected String cmpControlName;
+
     @Option(name = "-numCrls",
             description = "Number of CRLs to be kept in database")
     protected Integer numCrls = 30;

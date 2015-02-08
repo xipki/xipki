@@ -76,7 +76,7 @@ public class CaDbImporter
         private final byte[] cert;
 
         private long should_CA_nextSerial;
-        private Integer CAINFO_id;
+        private Integer CA_id;
 
         public CAInfoBundle(String CA_name, long CA_nextSerial, byte[] cert)
         {
@@ -85,7 +85,6 @@ public class CaDbImporter
             this.should_CA_nextSerial = CA_nextSerial;
             this.cert = cert;
         }
-
     }
 
     private static final Logger LOG = LoggerFactory.getLogger(CaDbImporter.class);
@@ -203,7 +202,7 @@ public class CaDbImporter
                 {
                     if(Arrays.equals(cert, entry.cert))
                     {
-                        entry.CAINFO_id = id;
+                        entry.CA_id = id;
                         break;
                     }
                 }
@@ -213,10 +212,10 @@ public class CaDbImporter
             st.close();
 
             // get the maximal serial number
-            PreparedStatement ps = conn.prepareStatement("SELECT MAX(SERIAL) FROM CERT WHERE CAINFO_ID=?");
+            PreparedStatement ps = conn.prepareStatement("SELECT MAX(SERIAL) FROM CERT WHERE CA_ID=?");
             for(CAInfoBundle entry : CAInfoBundles)
             {
-                ps.setInt(1, entry.CAINFO_id);
+                ps.setInt(1, entry.CA_id);
                 rs = ps.executeQuery();
                 if(rs.next() == false)
                 {

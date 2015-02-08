@@ -37,6 +37,8 @@ package org.xipki.ca.server.mgmt.api;
 
 import java.io.Serializable;
 
+import org.xipki.common.ParamChecker;
+
 /**
  * @author Lijun Liao
  */
@@ -47,12 +49,13 @@ public class CmpControl implements Serializable
     private static final int DFLT_messageTimeBias = 300; // 300 seconds
     private static final int DFLT_confirmWaitTime = 300; // 300 seconds
 
-    public static final String name = "default";
-    private boolean requireConfirmCert;
-    private boolean sendCaCert;
+    private final String name;
+    private boolean requireConfirmCert = false;
+    private boolean sendCaCert = false;
 
     private boolean messageTimeRequired = true;
     private boolean sendResponderCert = true;
+    public static CmpControl defaultInstance = new CmpControl("__DEFAULT");
 
     public boolean isMessageTimeRequired()
     {
@@ -67,20 +70,15 @@ public class CmpControl implements Serializable
     private int messageTimeBias = DFLT_messageTimeBias;
     private int confirmWaitTime = DFLT_confirmWaitTime;
 
-    private static final CmpControl defaultInstance;
-    static
+    public CmpControl(String name)
     {
-        defaultInstance = new CmpControl();
-        defaultInstance.setRequireConfirmCert(false);
+        ParamChecker.assertNotEmpty("name", name);
+        this.name = name;
     }
 
-    public static CmpControl getDefaultCmpControlEntry()
+    public String getName()
     {
-        return defaultInstance;
-    }
-
-    public CmpControl()
-    {
+        return name;
     }
 
     public boolean isRequireConfirmCert()

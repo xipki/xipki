@@ -71,6 +71,7 @@ public class X509CAEntry implements Serializable
     private String signerType;
     private String signerConf;
     private String crlSignerName;
+    private String cmpControlName;
     private long nextSerial;
     private int nextCRLNumber;
     private DuplicationMode duplicateKeyMode;
@@ -261,6 +262,16 @@ public class X509CAEntry implements Serializable
         return issuerLocations;
     }
 
+    public void setCmpControlName(String name)
+    {
+        this.cmpControlName = name;
+    }
+
+    public String getCmpControlName()
+    {
+        return cmpControlName;
+    }
+
     @Override
     public String toString()
     {
@@ -315,6 +326,7 @@ public class X509CAEntry implements Serializable
         }
 
         sb.append("crlsigner_name: ").append(crlSignerName).append('\n');
+        sb.append("cmpcontrol_name: ").append(cmpControlName).append('\n');
         sb.append("duplicateKey: ").append(duplicateKeyMode.getDescription()).append('\n');
         sb.append("duplicateSubject: ").append(duplicateSubjectMode.getDescription()).append('\n');
         sb.append("validityMode: ").append(validityMode).append('\n');

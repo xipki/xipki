@@ -147,6 +147,11 @@ public class CaAddCommand extends CaAddOrGenCommand
         }
         entry.setMaxValidity(getMaxValidity());
 
+        if(cmpControlName != null)
+        {
+            entry.setCmpControlName(cmpControlName);
+        }
+
         Set<Permission> _permissions = new HashSet<>();
         for(String permission : permissions)
         {

@@ -188,12 +188,12 @@ implements CAManager, CmpResponderManager
                 try
                 {
                     stmt = createStatement();
-                    String sql = "SELECT LOCKGRANTED FROM CALOCK WHERE NAME='CA_CHANGE'";
+                    String sql = "SELECT EVENT_TIME FROM SYSTEM_EVENT WHERE NAME='CA_CHANGE'";
                     rs = stmt.executeQuery(sql);
 
                     if(rs.next())
                     {
-                        caChangedTime = rs.getLong("LOCKGRANTED");
+                        caChangedTime = rs.getLong("EVENT_TIME");
                     }
                 }finally
                 {
@@ -247,7 +247,7 @@ implements CAManager, CmpResponderManager
 
     private final DfltEnvironmentParameterResolver envParameterResolver = new DfltEnvironmentParameterResolver();
 
-    private CmpControl cmpControl;
+    private final Map<String, CmpControl> cmpControls = new ConcurrentHashMap<>();
 
     private ScheduledThreadPoolExecutor persistentScheduledThreadPoolExecutor;
     private ScheduledThreadPoolExecutor scheduledThreadPoolExecutor;
@@ -453,41 +453,37 @@ implements CAManager, CmpResponderManager
         try
         {
             stmt = createStatement();
-            final String sql = "SELECT LOCKED, LOCKGRANTED, LOCKEDBY FROM CALOCK WHERE NAME='LOCK'";
+            final String sql = "SELECT EVENT_TIME, EVENT_OWNER FROM SYSTEM_EVENT WHERE NAME='LOCK'";
             rs = stmt.executeQuery(sql);
 
             if(rs.next())
             {
-                boolean alreadyLocked = rs.getBoolean("LOCKED");
-                if(alreadyLocked)
+                long lockGranted = rs.getLong("EVENT_TIME");
+                String lockedBy = rs.getString("EVENT_OWNER");
+                if(this.lockInstanceId.equals(lockedBy))
                 {
-                    long lockGranted = rs.getLong("LOCKGRANTED");
-                    String lockedBy = rs.getString("LOCKEDBY");
-                    if(this.lockInstanceId.equals(lockedBy))
+                    if(forceRelock == false)
                     {
-                        if(forceRelock == false)
-                        {
-                            return true;
-                        } else
-                        {
-                            LOG.info("CA has been locked by me since {}, relock it", new Date(lockGranted * 1000));
-                        }
-                    }
-                    else
+                        return true;
+                    } else
                     {
-                        LOG.error("Cannot lock CA, it has been locked by {} since {}", lockedBy, new Date(lockGranted * 1000));
-                        return false;
+                        LOG.info("CA has been locked by me since {}, relock it", new Date(lockGranted * 1000));
                     }
                 }
+                else
+                {
+                    LOG.error("Cannot lock CA, it has been locked by {} since {}", lockedBy, new Date(lockGranted * 1000));
+                    return false;
+                }
             }
-            stmt.execute("DELETE FROM CALOCK WHERE NAME='LOCK'");
+            stmt.execute("DELETE FROM SYSTEM_EVENT WHERE NAME='LOCK'");
         }finally
         {
             dataSource.releaseResources(stmt, rs);
         }
 
-        final String lockSql = "INSERT INTO CALOCK (NAME, LOCKED, LOCKGRANTED, LOCKGRANTED2, LOCKEDBY)"
-                + " VALUES ('LOCK', ?, ?, ?, ?)";
+        final String lockSql = "INSERT INTO SYSTEM_EVENT (NAME, EVENT_TIME, EVENT_TIME2, EVENT_OWNER)"
+                + " VALUES ('LOCK', ?, ?, ?)";
 
         PreparedStatement ps = null;
         try
@@ -495,7 +491,6 @@ implements CAManager, CmpResponderManager
             long nowMillis = System.currentTimeMillis();
             ps = prepareStatement(lockSql);
             int idx = 1;
-            ps.setInt(idx++, 1);
             ps.setLong(idx++, nowMillis / 1000);
             ps.setTimestamp(idx++, new Timestamp(nowMillis));
             ps.setString(idx++, lockInstanceId);
@@ -525,7 +520,7 @@ implements CAManager, CmpResponderManager
         try
         {
             stmt = createStatement();
-            stmt.execute("DELETE FROM CALOCK WHERE NAME='LOCK'");
+            stmt.execute("DELETE FROM SYSTEM_EVENT WHERE NAME='LOCK'");
             successfull = true;
         }catch(SQLException | CAMgmtException e)
         {
@@ -575,7 +570,7 @@ implements CAManager, CmpResponderManager
         initCaAliases();
         initCertprofiles();
         initPublishers();
-        initCmpControl();
+        initCmpControls();
         initRequestors();
         initResponder();
         initCrlSigners();
@@ -607,7 +602,7 @@ implements CAManager, CmpResponderManager
             try
             {
                 stmt = createStatement();
-                stmt.execute("DELETE FROM CALOCK WHERE NAME='CA_CHANGE'");
+                stmt.execute("DELETE FROM SYSTEM_EVENT WHERE NAME='CA_CHANGE'");
             }finally
             {
                 dataSource.releaseResources(stmt, null);
@@ -617,13 +612,12 @@ implements CAManager, CmpResponderManager
             try
             {
                 // notify the slave CAs
-                final String sql = "INSERT INTO CALOCK (NAME, LOCKED, LOCKGRANTED, LOCKGRANTED2, LOCKEDBY)"
-                        + " VALUES ('CA_CHANGE', ?, ?, ?, ?)";
+                final String sql = "INSERT INTO SYSTEM_EVENT (NAME, EVENT_TIME, EVENT_TIME2, EVENT_OWNER)"
+                        + " VALUES ('CA_CHANGE', ?, ?, ?)";
                 ps = prepareStatement(sql);
 
                 long nowMillis = System.currentTimeMillis();
                 int idx = 1;
-                ps.setInt(idx++, 1);
                 ps.setLong(idx++, nowMillis / 1000);
                 ps.setTimestamp(idx++, new Timestamp(nowMillis));
                 ps.setString(idx++, lockInstanceId);
@@ -917,6 +911,12 @@ implements CAManager, CmpResponderManager
     }
 
     @Override
+    public Set<String> getCmpControlNames()
+    {
+        return cmpControls.keySet();
+    }
+
+    @Override
     public Set<String> getCaNames()
     {
         return caInfos.keySet();
@@ -1118,7 +1118,7 @@ implements CAManager, CmpResponderManager
         crlSignersInitialized = true;
     }
 
-    private void initCmpControl()
+    private void initCmpControls()
     throws CAMgmtException
     {
         if(cmpControlInitialized)
@@ -1126,8 +1126,22 @@ implements CAManager, CmpResponderManager
             return;
         }
 
-        cmpControl = null;
-        cmpControl = createCmpControl();
+        crlSigners.clear();
+
+        List<String> names = getNamesFromTable("CMPCONTROL");
+
+        if(names.isEmpty() == false)
+        {
+            for(String name : names)
+            {
+                CmpControl cmpControl = createCmpControl(name);
+                if(cmpControl != null)
+                {
+                    cmpControls.put(name, cmpControl);
+                }
+            }
+        }
+
         cmpControlInitialized = true;
     }
 
@@ -1196,10 +1210,10 @@ implements CAManager, CmpResponderManager
             StringBuilder sqlBuilder = new StringBuilder();
             sqlBuilder.append("INSERT INTO CA (");
             sqlBuilder.append("NAME, ART, SUBJECT, NEXT_SERIAL, NEXT_CRLNO, STATUS, CRL_URIS, OCSP_URIS, MAX_VALIDITY");
-            sqlBuilder.append(", CERT, SIGNER_TYPE, SIGNER_CONF, CRLSIGNER_NAME");
+            sqlBuilder.append(", CERT, SIGNER_TYPE, SIGNER_CONF, CRLSIGNER_NAME, CMPCONTROL_NAME");
             sqlBuilder.append(", DUPLICATE_KEY_MODE, DUPLICATE_SUBJECT_MODE, PERMISSIONS, NUM_CRLS, EXPIRATION_PERIOD");
             sqlBuilder.append(", VALIDITY_MODE, DELTA_CRL_URIS");
-            sqlBuilder.append(") VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+            sqlBuilder.append(") VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
 
             ps = prepareStatement(sqlBuilder.toString());
             int idx = 1;
@@ -1224,6 +1238,7 @@ implements CAManager, CmpResponderManager
             ps.setString(idx++, newCaDbEntry.getSignerType());
             ps.setString(idx++, newCaDbEntry.getSignerConf());
             ps.setString(idx++, newCaDbEntry.getCrlSignerName());
+            ps.setString(idx++, newCaDbEntry.getCmpControlName());
             ps.setInt(idx++, newCaDbEntry.getDuplicateKeyMode().getMode());
             ps.setInt(idx++, newCaDbEntry.getDuplicateSubjectMode().getMode());
             ps.setString(idx++, Permission.toString(newCaDbEntry.getPermissions()));
@@ -1271,7 +1286,7 @@ implements CAManager, CmpResponderManager
     public void changeCA(String name, CAStatus status, X509Certificate cert,
             Set<String> crl_uris, Set<String> delta_crl_uris, Set<String> ocsp_uris,
             CertValidity max_validity, String signer_type, String signer_conf,
-            String crlsigner_name, DuplicationMode duplicate_key,
+            String crlsigner_name, String cmpcontrol_name, DuplicationMode duplicate_key,
             DuplicationMode duplicate_subject, Set<Permission> permissions,
             Integer numCrls, Integer expirationPeriod, ValidityMode validityMode)
     throws CAMgmtException
@@ -1294,6 +1309,7 @@ implements CAManager, CmpResponderManager
         Integer iSigner_type = addToSqlIfNotNull(sqlBuilder, index, signer_type, "SIGNER_TYPE");
         Integer iSigner_conf = addToSqlIfNotNull(sqlBuilder, index, signer_conf, "SIGNER_CONF");
         Integer iCrlsigner_name = addToSqlIfNotNull(sqlBuilder, index, crlsigner_name, "CRLSIGNER_NAME");
+        Integer iCmpcontrol_name = addToSqlIfNotNull(sqlBuilder, index, cmpcontrol_name, "CMPCONTROL_NAME");
         Integer iDuplicate_key = addToSqlIfNotNull(sqlBuilder, index, duplicate_key, "DUPLICATE_KEY_MODE");
         Integer iDuplicate_subject = addToSqlIfNotNull(sqlBuilder, index, duplicate_subject, "DUPLICATE_SUBJECT_MODE");
         Integer iPermissions = addToSqlIfNotNull(sqlBuilder, index, permissions, "PERMISSIONS");
@@ -1379,6 +1395,13 @@ implements CAManager, CmpResponderManager
                 String txt = getRealString(crlsigner_name);
                 m.append("crlSigner: '").append(txt).append("'; ");
                 ps.setString(iCrlsigner_name, txt);
+            }
+
+            if(iCmpcontrol_name != null)
+            {
+                String txt = getRealString(cmpcontrol_name);
+                m.append("cmpControl: '").append(txt).append("'; ");
+                ps.setString(iCmpcontrol_name, txt);
             }
 
             if(iDuplicate_key != null)
@@ -2167,7 +2190,7 @@ implements CAManager, CmpResponderManager
             X509CAInfo caInfo = caInfos.get(caName);
             if(crlSignerName.equals(caInfo.getCrlSignerName()))
             {
-                setCrlSignerInCA(null, caName);
+                caInfo.setCrlSignerName(null);
             }
         }
 
@@ -2280,46 +2303,6 @@ implements CAManager, CmpResponderManager
     public X509CrlSignerEntryWrapper getCrlSignerWrapper(String name)
     {
         return crlSigners.get(name);
-    }
-
-    @Override
-    public void setCrlSignerInCA(String crlSignerName, String caName)
-    throws CAMgmtException
-    {
-        caName = caName.toUpperCase();
-        X509CAInfo caInfo = caInfos.get(caName);
-        if(caInfo == null)
-        {
-            throw new CAMgmtException("Unknown CA " + caName);
-        }
-
-        String oldCrlSignerName = caInfo.getCrlSignerName();
-        if(oldCrlSignerName == crlSignerName)
-        {
-            return;
-        }
-
-        if(crlSignerName != null && !crlSigners.containsKey(crlSignerName))
-        {
-            throw new CAMgmtException("Unknown CRL signer " + crlSignerName);
-        }
-
-        PreparedStatement ps = null;
-        try
-        {
-            ps = prepareStatement("UPDATE CA SET CRLSIGNER_NAME=? WHERE NAME=?");
-            ps.setString(1, crlSignerName);
-            ps.setString(2, caName);
-
-            ps.executeUpdate();
-            LOG.info("update CA '{}': crlSigner: '{}'", caName, crlSignerName);
-        }catch(SQLException e)
-        {
-            throw new CAMgmtException(e.getMessage(), e);
-        }finally
-        {
-            dataSource.releaseResources(ps, null);
-        }
     }
 
     @Override
@@ -2479,22 +2462,21 @@ implements CAManager, CmpResponderManager
     }
 
     @Override
-    public CmpControl getCmpControl()
+    public CmpControl getCmpControl(String name)
     {
-        return cmpControl;
+        return cmpControls.get(name);
     }
 
     @Override
-    public void setCmpControl(CmpControl dbEntry)
+    public void addCmpControl(CmpControl dbEntry)
     throws CAMgmtException
     {
         asssertMasterMode();
-        if(cmpControl != null)
+        final String name = dbEntry.getName();
+        if(cmpControls.containsKey(name))
         {
-            removeCmpControl();
+            throw new CAMgmtException("CMPControl named " + name + " exists");
         }
-
-        cmpControl = dbEntry;
 
         PreparedStatement ps = null;
         try
@@ -2505,7 +2487,6 @@ implements CAManager, CmpResponderManager
                     + " VALUES (?, ?, ?, ?, ?, ?, ?)");
 
             int idx = 1;
-            String name = CmpControl.name;
             ps.setString(idx++, name);
             setBoolean(ps, idx++, dbEntry.isRequireConfirmCert());
             setBoolean(ps, idx++, dbEntry.isSendCaCert());
@@ -2515,7 +2496,7 @@ implements CAManager, CmpResponderManager
             ps.setInt(idx++, dbEntry.getConfirmWaitTime());
 
             ps.executeUpdate();
-            LOG.info("set CMP control: {}", dbEntry);
+            LOG.info("added CMP control: {}", dbEntry);
         }catch(SQLException e)
         {
             throw new CAMgmtException(e.getMessage(), e);
@@ -2524,21 +2505,30 @@ implements CAManager, CmpResponderManager
             dataSource.releaseResources(ps, null);
         }
 
-        cmpControl = createCmpControl();
+        cmpControls.put(name, dbEntry);
     }
 
     @Override
-    public void removeCmpControl()
+    public void removeCmpControl(String name)
     throws CAMgmtException
     {
         asssertMasterMode();
-        deleteRows("CMPCONTROL");
-        LOG.info("remove CMP control");
-        cmpControl = null;
+        for(String caName : caInfos.keySet())
+        {
+            X509CAInfo caInfo = caInfos.get(caName);
+            if(name.equals(caInfo.getCmpControlName()))
+            {
+                caInfo.setCmpControlName(null);
+            }
+        }
+
+        deleteRowWithName(name, "CMPCONTROL");
+        LOG.info("remove CMPControl '{}'", name);
+        cmpControls.remove(name);
     }
 
     @Override
-    public void changeCmpControl(Boolean requireConfirmCert,
+    public void changeCmpControl(String name, Boolean requireConfirmCert,
             Boolean requireMessageTime, Integer messageTimeBias,
             Integer confirmWaitTime, Boolean sendCaCert, Boolean sendResponderCert)
     throws CAMgmtException
@@ -2621,8 +2611,8 @@ implements CAManager, CmpResponderManager
             dataSource.releaseResources(ps, null);
         }
 
-        cmpControl = null;
-        cmpControl = createCmpControl();
+        CmpControl cmpControl = createCmpControl(name);
+        cmpControls.put(name, cmpControl);
     }
 
     public EnvironmentParameterResolver getEnvParameterResolver()
@@ -3266,7 +3256,7 @@ implements CAManager, CmpResponderManager
             CAStatus status, long nextSerial, int nextCrlNumber,
             List<String> crl_uris, List<String> delta_crl_uris, List<String> ocsp_uris,
             CertValidity max_validity, String signer_type, String signer_conf,
-            String crlsigner_name, DuplicationMode duplicate_key,
+            String crlsigner_name, String cmpcontrol_name, DuplicationMode duplicate_key,
             DuplicationMode duplicate_subject, Set<Permission> permissions,
             int numCrls, int expirationPeriod, ValidityMode validityMode)
     throws CAMgmtException
@@ -3358,6 +3348,10 @@ implements CAManager, CmpResponderManager
         if(crlsigner_name != null)
         {
             entry.setCrlSignerName(crlsigner_name);
+        }
+        if(cmpcontrol_name != null)
+        {
+            entry.setCmpControlName(cmpcontrol_name);
         }
         entry.setMaxValidity(max_validity);
         entry.setPermissions(permissions);
