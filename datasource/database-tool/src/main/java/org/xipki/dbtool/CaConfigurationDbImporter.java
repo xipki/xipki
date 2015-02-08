@@ -58,6 +58,7 @@ import org.xipki.dbi.ca.jaxb.CAConfigurationType.CaHasRequestors;
 import org.xipki.dbi.ca.jaxb.CAConfigurationType.Caaliases;
 import org.xipki.dbi.ca.jaxb.CAConfigurationType.Cas;
 import org.xipki.dbi.ca.jaxb.CAConfigurationType.Certprofiles;
+import org.xipki.dbi.ca.jaxb.CAConfigurationType.Cmpcontrols;
 import org.xipki.dbi.ca.jaxb.CAConfigurationType.Crlsigners;
 import org.xipki.dbi.ca.jaxb.CAConfigurationType.Environments;
 import org.xipki.dbi.ca.jaxb.CAConfigurationType.Publishers;
@@ -115,7 +116,7 @@ class CaConfigurationDbImporter extends DbPorter
         System.out.println("Importing CA configuration to database");
         try
         {
-            import_cmpcontrol(caconf.getCmpcontrol());
+            import_cmpcontrol(caconf.getCmpcontrols());
             import_responder(caconf.getResponder());
             import_environment(caconf.getEnvironments());
             import_requestor(caconf.getRequestors());
@@ -135,44 +136,44 @@ class CaConfigurationDbImporter extends DbPorter
         System.out.println(" Imported CA configuration to database");
     }
 
-    private void import_cmpcontrol(CmpcontrolType control)
+    private void import_cmpcontrol(Cmpcontrols controls)
     throws Exception
     {
         System.out.println("Importing table CMPCONTROL");
-        if(control == null)
+        if(controls != null && controls.getCmpcontrol().isEmpty() == false)
         {
-            System.out.println(" Imported table CMPCONTROL: nothing to import");
-            return;
-        }
-
-        PreparedStatement ps = null;
-        try
-        {
-            ps = prepareStatement(
-                    "INSERT INTO CMPCONTROL (NAME, REQUIRE_CONFIRM_CERT, SEND_CA_CERT, SEND_RESPONDER_CERT, "
-                    + " REQUIRE_MESSAGE_TIME, MESSAGE_TIME_BIAS, CONFIRM_WAIT_TIME)"
-                    + " VALUES (?, ?, ?, ?, ?, ?, ?)");
-
+            PreparedStatement ps = null;
             try
             {
-                int idx = 1;
-                ps.setString(idx++, "default");
-                setBoolean(ps, idx++, control.isRequireConfirmCert());
-                setBoolean(ps, idx++, control.isSendCaCert());
-                setBoolean(ps, idx++, control.isSendResponderCert());
-                setBoolean(ps, idx++, control.isRequireMessageTime());
-                ps.setInt(idx++, control.getMessageTimeBias());
-                ps.setInt(idx++, control.getConfirmWaitTime());
+                ps = prepareStatement(
+                        "INSERT INTO CMPCONTROL (NAME, REQUIRE_CONFIRM_CERT, SEND_CA_CERT, SEND_RESPONDER_CERT, "
+                        + " REQUIRE_MESSAGE_TIME, MESSAGE_TIME_BIAS, CONFIRM_WAIT_TIME)"
+                        + " VALUES (?, ?, ?, ?, ?, ?, ?)");
 
-                ps.executeUpdate();
-            }catch(Exception e)
+                for(CmpcontrolType control : controls.getCmpcontrol())
+                {
+                    try
+                    {
+                        int idx = 1;
+                        ps.setString(idx++, control.getName());
+                        setBoolean(ps, idx++, control.isRequireConfirmCert());
+                        setBoolean(ps, idx++, control.isSendCaCert());
+                        setBoolean(ps, idx++, control.isSendResponderCert());
+                        setBoolean(ps, idx++, control.isRequireMessageTime());
+                        ps.setInt(idx++, control.getMessageTimeBias());
+                        ps.setInt(idx++, control.getConfirmWaitTime());
+
+                        ps.executeUpdate();
+                    }catch(Exception e)
+                    {
+                        System.err.println("Error while importing CMPCONTROL " + control.getName());
+                        throw e;
+                    }
+                }
+            }finally
             {
-                System.err.println("Error while importing CMPCONTROL");
-                throw e;
+                releaseResources(ps, null);
             }
-        }finally
-        {
-            releaseResources(ps, null);
         }
         System.out.println(" Imported table CMPCONTROL");
     }
@@ -401,7 +402,7 @@ class CaConfigurationDbImporter extends DbPorter
             sqlBuilder.append(" CERT, SIGNER_TYPE, SIGNER_CONF, CRLSIGNER_NAME,");
             sqlBuilder.append(" DUPLICATE_KEY_MODE, DUPLICATE_SUBJECT_MODE, PERMISSIONS, NUM_CRLS,");
             sqlBuilder.append(" EXPIRATION_PERIOD, REVOKED, REV_REASON, REV_TIME, REV_INVALIDITY_TIME, VALIDITY_MODE,");
-            sqlBuilder.append(" ADDITIONAL_CONTROL)");
+            sqlBuilder.append(" ADD_CONTROL)");
             sqlBuilder.append(" VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
 
             ps = prepareStatement(sqlBuilder.toString());
@@ -441,7 +442,7 @@ class CaConfigurationDbImporter extends DbPorter
                     setLong(ps, idx++, ca.getRevTime());
                     setLong(ps, idx++, ca.getRevInvalidityTime());
                     ps.setString(idx++, ca.getValidityMode());
-                    ps.setString(idx++, ca.getAdditionalControl());
+                    ps.setString(idx++, ca.getAddControl());
 
                     ps.executeUpdate();
                 }catch(Exception e)

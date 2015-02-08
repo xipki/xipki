@@ -254,6 +254,12 @@ implements HessianCAManager
     }
 
     @Override
+    public Set<String> getCmpControlNames()
+    {
+        return caManager.getCmpControlNames();
+    }
+
+    @Override
     public Set<String> getCaNames()
     {
         return caManager.getCaNames();
@@ -283,7 +289,7 @@ implements HessianCAManager
             X509Certificate cert, Set<String> crl_uris,
             Set<String> delta_crl_uris, Set<String> ocsp_uris,
             CertValidity max_validity, String signer_type, String signer_conf,
-            String crlsigner_name, DuplicationMode duplicate_key,
+            String crlsigner_name, String cmpcontrol_name, DuplicationMode duplicate_key,
             DuplicationMode duplicate_subject, Set<Permission> permissions,
             Integer numCrls, Integer expirationPeriod, ValidityMode validityMode)
     throws HessianCAMgmtException
@@ -291,7 +297,8 @@ implements HessianCAManager
         try
         {
             caManager.changeCA(name, status, cert, crl_uris, delta_crl_uris, ocsp_uris,
-                    max_validity, signer_type, signer_conf, crlsigner_name, duplicate_key, duplicate_subject,
+                    max_validity, signer_type, signer_conf, crlsigner_name, cmpcontrol_name,
+                    duplicate_key, duplicate_subject,
                     permissions, numCrls, expirationPeriod, validityMode);
         } catch (CAMgmtException e)
         {
@@ -571,19 +578,6 @@ implements HessianCAManager
     }
 
     @Override
-    public void setCrlSignerInCA(String crlSignerName, String caName)
-    throws HessianCAMgmtException
-    {
-        try
-        {
-            caManager.setCrlSignerInCA(crlSignerName, caName);
-        } catch (CAMgmtException e)
-        {
-            throw new HessianCAMgmtException(e.getMessage());
-        }
-    }
-
-    @Override
     public void addPublisher(PublisherEntry dbEntry)
     throws HessianCAMgmtException
     {
@@ -635,18 +629,18 @@ implements HessianCAManager
     }
 
     @Override
-    public CmpControl getCmpControl()
+    public CmpControl getCmpControl(String name)
     {
-        return caManager.getCmpControl();
+        return caManager.getCmpControl(name);
     }
 
     @Override
-    public void setCmpControl(CmpControl dbEntry)
+    public void addCmpControl(CmpControl dbEntry)
     throws HessianCAMgmtException
     {
         try
         {
-            caManager.setCmpControl(dbEntry);
+            caManager.addCmpControl(dbEntry);
         } catch (CAMgmtException e)
         {
             throw new HessianCAMgmtException(e.getMessage());
@@ -654,12 +648,12 @@ implements HessianCAManager
     }
 
     @Override
-    public void removeCmpControl()
+    public void removeCmpControl(String name)
     throws HessianCAMgmtException
     {
         try
         {
-            caManager.removeCmpControl();
+            caManager.removeCmpControl(name);
         } catch (CAMgmtException e)
         {
             throw new HessianCAMgmtException(e.getMessage());
@@ -667,7 +661,7 @@ implements HessianCAManager
     }
 
     @Override
-    public void changeCmpControl(Boolean requireConfirmCert,
+    public void changeCmpControl(String name, Boolean requireConfirmCert,
             Boolean requireMessageTime, Integer messageTimeBias,
             Integer confirmWaitTime, Boolean sendCaCert,
             Boolean sendResponderCert)
@@ -675,7 +669,7 @@ implements HessianCAManager
     {
         try
         {
-            caManager.changeCmpControl(requireConfirmCert, requireMessageTime, messageTimeBias,
+            caManager.changeCmpControl(name, requireConfirmCert, requireMessageTime, messageTimeBias,
                     confirmWaitTime, sendCaCert, sendResponderCert);
         } catch (CAMgmtException e)
         {
@@ -823,7 +817,7 @@ implements HessianCAManager
             byte[] p10Req, CAStatus status, long nextSerial, int nextCrlNo,
             List<String> crl_uris, List<String> delta_crl_uris,
             List<String> ocsp_uris, CertValidity max_validity, String signer_type,
-            String signer_conf, String crlsigner_name,
+            String signer_conf, String crlsigner_name, String cmpcontrol_name,
             DuplicationMode duplicate_key, DuplicationMode duplicate_subject,
             Set<Permission> permissions, int numCrls, int expirationPeriod,
             ValidityMode validityMode)
@@ -834,7 +828,8 @@ implements HessianCAManager
             return caManager.generateSelfSignedCA(name, certprofileName, p10Req, status,
                     nextSerial, nextCrlNo,
                     crl_uris, delta_crl_uris, ocsp_uris, max_validity, signer_type, signer_conf,
-                    crlsigner_name, duplicate_key, duplicate_subject, permissions, numCrls,
+                    crlsigner_name, cmpcontrol_name,
+                    duplicate_key, duplicate_subject, permissions, numCrls,
                     expirationPeriod, validityMode);
         } catch (CAMgmtException e)
         {
