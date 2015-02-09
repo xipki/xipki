@@ -310,12 +310,8 @@ public class Rfc2560Servlet extends HttpServlet
             response.setContentLength(0);
         }catch(Throwable t)
         {
-            final String message = "Throwable";
-            if(LOG.isErrorEnabled())
-            {
-                LOG.error(LogUtil.buildExceptionLogFormat(message), t.getClass().getName(), t.getMessage());
-            }
-            LOG.debug(message, t);
+            final String message = "Throwable thrown, this should not happen!";
+            LOG.error(message, t);
 
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             response.setContentLength(0);
