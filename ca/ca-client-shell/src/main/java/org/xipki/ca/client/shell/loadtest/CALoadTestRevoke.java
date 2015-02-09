@@ -138,13 +138,13 @@ class CALoadTestRevoke extends AbstractLoadTest
             }
             rs.close();
 
-            sql = "SELECT MIN(SERIAL) FROM CERT WHERE REVOKED=0 AND CAINFO_ID=" + caInfoId;
+            sql = "SELECT MIN(SERIAL) FROM CERT WHERE REVOKED=0 AND CA_ID=" + caInfoId;
             rs = stmt.executeQuery(sql);
             rs.next();
             minSerial = rs.getLong(1);
             nextStartSerial = minSerial;
 
-            sql = "SELECT MAX(SERIAL) FROM CERT WHERE REVOKED=0 AND CAINFO_ID=" + caInfoId;
+            sql = "SELECT MAX(SERIAL) FROM CERT WHERE REVOKED=0 AND CA_ID=" + caInfoId;
             rs = stmt.executeQuery(sql);
             rs.next();
             maxSerial = rs.getLong(1);
@@ -195,7 +195,7 @@ class CALoadTestRevoke extends AbstractLoadTest
 
             if(noUnrevokedCerts == false)
             {
-                String sql = "SERIAL FROM CERT WHERE REVOKED=0 AND CAINFO_ID=" + caInfoId +
+                String sql = "SERIAL FROM CERT WHERE REVOKED=0 AND CA_ID=" + caInfoId +
                         " AND SERIAL > " + (nextStartSerial - 1) +
                         " AND SERIAL < " + (maxSerial + 1);
                 sql = caDataSource.createFetchFirstSelectSQL(sql, 1000, "SERIAL");

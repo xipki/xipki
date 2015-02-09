@@ -73,7 +73,6 @@ import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.ASN1OctetString;
 import org.bouncycastle.asn1.ASN1String;
 import org.bouncycastle.asn1.DERNull;
-import org.bouncycastle.asn1.DEROctetString;
 import org.bouncycastle.asn1.DERUniversalString;
 import org.bouncycastle.asn1.cmp.PKIFreeText;
 import org.bouncycastle.asn1.cmp.PKIStatus;
@@ -645,19 +644,18 @@ public class SecurityUtil
     public static byte[] extractSKI(X509Certificate cert)
     throws CertificateEncodingException
     {
-        byte[] encodedExtValue = cert.getExtensionValue(Extension.subjectKeyIdentifier.getId());
-        if(encodedExtValue == null)
+        byte[] extValue = getCoreExtValue(cert, Extension.subjectKeyIdentifier);
+        if(extValue == null)
         {
             return null;
         }
 
         try
         {
-            ASN1OctetString ski = ASN1OctetString.getInstance(encodedExtValue);
-            return ski.getOctets();
-        } catch (IllegalArgumentException e)
+            return ASN1OctetString.getInstance(extValue).getOctets();
+        }catch(IllegalArgumentException e)
         {
-            throw new CertificateEncodingException("Invalid extension SubjectKeyIdentifier: " + e.getMessage());
+            throw new CertificateEncodingException(e.getMessage());
         }
     }
 
@@ -682,16 +680,14 @@ public class SecurityUtil
     public static byte[] extractAKI(X509Certificate cert)
     throws CertificateEncodingException
     {
-        byte[] encodedExtValue = cert.getExtensionValue(Extension.authorityKeyIdentifier.getId());
-        if(encodedExtValue == null)
+        byte[] extValue = getCoreExtValue(cert, Extension.authorityKeyIdentifier);
+        if(extValue == null)
         {
             return null;
         }
 
         try
         {
-            ASN1OctetString v = ASN1OctetString.getInstance(encodedExtValue);
-            byte[] extValue = v.getOctets();
             AuthorityKeyIdentifier aki = AuthorityKeyIdentifier.getInstance(extValue);
             return aki.getKeyIdentifier();
         } catch (IllegalArgumentException e)
@@ -701,15 +697,15 @@ public class SecurityUtil
     }
 
     public static List<String> extractOCSPUrls(X509Certificate cert)
+    throws CertificateEncodingException
     {
-        byte[] encodedExtValue = cert.getExtensionValue(Extension.authorityInfoAccess.getId());
-        if(encodedExtValue == null)
+        byte[] extValue = getCoreExtValue(cert, Extension.authorityInfoAccess);
+        if(extValue == null)
         {
             return Collections.emptyList();
         }
 
-        AuthorityInformationAccess iAIA = AuthorityInformationAccess.getInstance(
-                DEROctetString.getInstance(encodedExtValue).getOctets());
+        AuthorityInformationAccess iAIA = AuthorityInformationAccess.getInstance(extValue);
 
         AccessDescription[] iAccessDescriptions = iAIA.getAccessDescriptions();
         List<AccessDescription> iOCSPAccessDescriptions = new LinkedList<>();
@@ -880,6 +876,23 @@ public class SecurityUtil
         }catch(Exception e)
         {
             return conf;
+        }
+    }
+
+    private static byte[] getCoreExtValue(X509Certificate cert, ASN1ObjectIdentifier type)
+    throws CertificateEncodingException
+    {
+        byte[] fullExtValue = cert.getExtensionValue(type.getId());
+        if(fullExtValue == null)
+        {
+            return null;
+        }
+        try
+        {
+            return ASN1OctetString.getInstance(fullExtValue).getOctets();
+        } catch (IllegalArgumentException e)
+        {
+            throw new CertificateEncodingException("Invalid extension " + type.getId() + ": " + e.getMessage());
         }
     }
 
