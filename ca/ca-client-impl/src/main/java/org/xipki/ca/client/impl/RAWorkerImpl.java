@@ -718,6 +718,10 @@ public final class RAWorkerImpl extends AbstractRAWorker implements RAWorker
     public CertIDOrError revokeCert(X500Name issuer, BigInteger serial, int reason)
     throws RAWorkerException, PKIErrorException
     {
+        if(getCaNameByIssuer(issuer) == null)
+        {
+            throw new RAWorkerException("Unknown issuer '" + issuer.toString() + "'");
+        }
         final String id = "cert-1";
         RevokeCertRequestEntryType entry =
                 new RevokeCertRequestEntryType(id, issuer, serial, reason, null);
@@ -1136,6 +1140,11 @@ public final class RAWorkerImpl extends AbstractRAWorker implements RAWorker
     public CertIDOrError unrevokeCert(X500Name issuer, BigInteger serial)
     throws RAWorkerException, PKIErrorException
     {
+        if(getCaNameByIssuer(issuer) == null)
+        {
+            throw new RAWorkerException("Unknown issuer '" + issuer.toString() + "'");
+        }
+
         final String id = "cert-1";
         IssuerSerialEntryType entry =
                 new IssuerSerialEntryType(id, issuer, serial);
@@ -1194,6 +1203,11 @@ public final class RAWorkerImpl extends AbstractRAWorker implements RAWorker
     public CertIDOrError removeCert(X500Name issuer, BigInteger serial)
     throws RAWorkerException, PKIErrorException
     {
+        if(getCaNameByIssuer(issuer) == null)
+        {
+            throw new RAWorkerException("Unknown issuer '" + issuer.toString() + "'");
+        }
+
         final String id = "cert-1";
         IssuerSerialEntryType entry =
                 new IssuerSerialEntryType(id, issuer, serial);

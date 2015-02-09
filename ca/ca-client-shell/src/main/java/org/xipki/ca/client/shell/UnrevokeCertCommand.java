@@ -62,15 +62,29 @@ public class UnrevokeCertCommand extends UnRevRemoveCertCommand
             return null;
         }
 
+        X509Certificate caCert = null;
+        if(caCertFile != null)
+        {
+            caCert = SecurityUtil.parseCert(caCertFile);
+        }
+
         CertIDOrError certIdOrError;
         if(certFile != null)
         {
             X509Certificate cert = SecurityUtil.parseCert(certFile);
+            if(caCert != null)
+            {
+                String errorMsg = checkCertificate(cert, caCert);
+                if(errorMsg != null)
+                {
+                    err(errorMsg);
+                    return null;
+                }
+            }
             certIdOrError = raWorker.unrevokeCert(cert);
         }
         else
         {
-            X509Certificate caCert = SecurityUtil.parseCert(caCertFile);
             X500Name issuer = X500Name.getInstance(caCert.getSubjectX500Principal().getEncoded());
             certIdOrError = raWorker.unrevokeCert(issuer, new BigInteger(serialNumber));
         }
