@@ -35,7 +35,17 @@
 
 package org.xipki.ca.client.shell;
 
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
+import java.security.SignatureException;
+import java.security.cert.CertificateEncodingException;
+import java.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
+import java.util.Arrays;
+
 import org.apache.karaf.shell.commands.Option;
+import org.xipki.common.SecurityUtil;
 
 /**
  * @author Lijun Liao
@@ -54,5 +64,37 @@ public abstract class UnRevRemoveCertCommand extends ClientCommand
     @Option(name = "-serial",
             description = "Serial number")
     protected String serialNumber;
+
+    protected String checkCertificate(X509Certificate cert, X509Certificate caCert)
+    throws CertificateEncodingException
+    {
+        if(cert.getIssuerX500Principal().equals(caCert.getSubjectX500Principal()) == false)
+        {
+            return "The given certificate is not issued by the given CA";
+        }
+
+        byte[] caSki = SecurityUtil.extractSKI(caCert);
+        byte[] aki = SecurityUtil.extractAKI(cert);
+        if(caSki != null && aki != null)
+        {
+            if(Arrays.equals(aki, caSki) == false)
+            {
+                return "The given certificate is not issued by the given CA";
+            }
+        }
+
+        try
+        {
+            cert.verify(caCert.getPublicKey(), "BC");
+        } catch(SignatureException e)
+        {
+            return "could not verify the signaure of given certificate by the CA";
+        } catch (InvalidKeyException | CertificateException | NoSuchAlgorithmException | NoSuchProviderException e)
+        {
+            return "could not verify the signaure of given certificate by the CA: " + e.getMessage();
+        }
+
+        return null;
+    }
 
 }
