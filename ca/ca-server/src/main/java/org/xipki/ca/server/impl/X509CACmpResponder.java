@@ -1124,114 +1124,87 @@ class X509CACmpResponder extends CmpResponder
             {
                 X500Name caSubject = getCA().getCAInfo().getCertificate().getSubjectAsX500Name();
 
-                String errorMsg = null;
-
                 if(issuer == null)
                 {
-                    errorMsg = "issuer is not present";
+                    throw new OperationException(ErrorCode.UNKNOWN_CERT, "issuer is not present");
                 }
                 else if(issuer.equals(caSubject) == false)
                 {
-                    errorMsg = "issuer not target on the CA";
+                    throw new OperationException(ErrorCode.UNKNOWN_CERT, "issuer not targets at the CA");
                 }
                 else if(serialNumber == null)
                 {
-                    errorMsg = "serialNumber is not present";
+                    throw new OperationException(ErrorCode.UNKNOWN_CERT, "serialNumber is not present");
+                }
+                else if(certDetails.getSigningAlg() != null || certDetails.getValidity() != null ||
+                        certDetails.getSubject() != null || certDetails.getPublicKey() != null ||
+                        certDetails.getIssuerUID() != null || certDetails.getSubjectUID() != null ||
+                        certDetails.getExtensions() != null)
+                {
+                    throw new OperationException(ErrorCode.UNKNOWN_CERT,
+                            "Only version, issuer and serialNumber in RevDetails.certDetails are allowed, "
+                            + "but more is specified");
+                }
+
+                BigInteger snBigInt = serialNumber.getPositiveValue();
+                Object returnedObj = null;
+                X509CA ca = getCA();
+                if(Permission.UNREVOKE_CERT == permission)
+                {
+                    returnedObj = ca.unrevokeCertificate(snBigInt);
+                }
+                else if(Permission.REMOVE_CERT == permission)
+                {
+                    returnedObj = ca.removeCertificate(snBigInt);
                 }
                 else
                 {
-                    if(certDetails.getSigningAlg() != null || certDetails.getValidity() != null ||
-                            certDetails.getSubject() != null || certDetails.getPublicKey() != null ||
-                            certDetails.getIssuerUID() != null || certDetails.getSubjectUID() != null ||
-                            certDetails.getExtensions() != null)
-                    {
-                        errorMsg = "Only version, issuer and serialNumber in RevDetails.certDetails are allowed, "
-                                + "but more is specified";
-                    }
-                }
+                    Extensions crlDetails = revDetails.getCrlEntryDetails();
 
-                if(errorMsg == null)
-                {
-                    BigInteger snBigInt = serialNumber.getPositiveValue();
-                    Object returnedObj = null;
-                    X509CA ca = getCA();
-                    if(Permission.UNREVOKE_CERT == permission)
-                    {
-                        returnedObj = ca.unrevokeCertificate(snBigInt);
-                    }
-                    else if(Permission.REMOVE_CERT == permission)
-                    {
-                        returnedObj = ca.removeCertificate(snBigInt);
-                    }
-                    else
-                    {
-                        Extensions crlDetails = revDetails.getCrlEntryDetails();
-
-                        ASN1ObjectIdentifier extId = Extension.reasonCode;
-                        ASN1Encodable extValue = crlDetails.getExtensionParsedValue(extId);
-                        int reasonCode = ((ASN1Enumerated) extValue).getValue().intValue();
-                        CRLReason reason = CRLReason.forReasonCode(reasonCode);
-                        if(childAuditEvent != null)
-                        {
-                            childAuditEvent.addEventData(new AuditEventData("reason",
-                                    reason == null ? Integer.toString(reasonCode) : reason.getDescription()));
-                        }
-
-                        extId = Extension.invalidityDate;
-                        extValue = crlDetails.getExtensionParsedValue(extId);
-
-                        Date invalidityDate = null;
-                        if(extValue != null)
-                        {
-                            try
-                            {
-                                invalidityDate = ((ASN1GeneralizedTime) extValue).getDate();
-                            } catch (ParseException e)
-                            {
-                                String errMsg = "invalid extension " + extId.getId();
-                                LOG.warn(errMsg);
-                                PKIStatusInfo status = generateCmpRejectionStatus(PKIFailureInfo.unacceptedExtension, errMsg);
-                                repContentBuilder.add(status);
-                                continue;
-                            }
-
-                            if(childAuditEvent != null)
-                            {
-                                childAuditEvent.addEventData(new AuditEventData("invalidityDate", invalidityDate));
-                            }
-                        }
-
-                        returnedObj = ca.revokeCertificate(snBigInt, reason, invalidityDate);
-                    }
-
-                    if(returnedObj != null)
-                    {
-                        PKIStatusInfo status = new PKIStatusInfo(PKIStatus.granted);
-                        CertId certId = new CertId(new GeneralName(caSubject),
-                                serialNumber);
-                        repContentBuilder.add(status, certId);
-                        if(childAuditEvent != null)
-                        {
-                            childAuditEvent.setStatus(AuditStatus.SUCCESSFUL);
-                        }
-                    }
-                    else
-                    {
-                        errorMsg = "cert not exists";
-                    }
-                }
-
-                if(errorMsg != null)
-                {
-                    PKIStatusInfo status = new PKIStatusInfo(
-                            PKIStatus.rejection, new PKIFreeText(errorMsg),
-                            new PKIFailureInfo(PKIFailureInfo.incorrectData));
-                    repContentBuilder.add(status);
+                    ASN1ObjectIdentifier extId = Extension.reasonCode;
+                    ASN1Encodable extValue = crlDetails.getExtensionParsedValue(extId);
+                    int reasonCode = ((ASN1Enumerated) extValue).getValue().intValue();
+                    CRLReason reason = CRLReason.forReasonCode(reasonCode);
                     if(childAuditEvent != null)
                     {
-                        childAuditEvent.setStatus(AuditStatus.FAILED);
-                        childAuditEvent.addEventData(new AuditEventData("message", errorMsg));
+                        childAuditEvent.addEventData(new AuditEventData("reason",
+                                reason == null ? Integer.toString(reasonCode) : reason.getDescription()));
                     }
+
+                    extId = Extension.invalidityDate;
+                    extValue = crlDetails.getExtensionParsedValue(extId);
+
+                    Date invalidityDate = null;
+                    if(extValue != null)
+                    {
+                        try
+                        {
+                            invalidityDate = ((ASN1GeneralizedTime) extValue).getDate();
+                        } catch (ParseException e)
+                        {
+                            throw new OperationException(ErrorCode.INVALID_EXTENSION, "invalid extension " + extId.getId());
+                        }
+
+                        if(childAuditEvent != null)
+                        {
+                            childAuditEvent.addEventData(new AuditEventData("invalidityDate", invalidityDate));
+                        }
+                    }
+
+                    returnedObj = ca.revokeCertificate(snBigInt, reason, invalidityDate);
+                }
+
+                if(returnedObj == null)
+                {
+                    throw new OperationException(ErrorCode.UNKNOWN_CERT, "cert not exists");
+                }
+
+                PKIStatusInfo status = new PKIStatusInfo(PKIStatus.granted);
+                CertId certId = new CertId(new GeneralName(caSubject), serialNumber);
+                repContentBuilder.add(status, certId);
+                if(childAuditEvent != null)
+                {
+                    childAuditEvent.setStatus(AuditStatus.SUCCESSFUL);
                 }
             } catch(OperationException e)
             {
@@ -1264,6 +1237,11 @@ class X509CACmpResponder extends CmpResponder
                         failureInfo = PKIFailureInfo.systemFailure;
                         auditStatus = AuditStatus.ERROR;
                         auditMessage = "DATABASE_FAILURE";
+                        break;
+                    case INVALID_EXTENSION:
+                        failureInfo = PKIFailureInfo.unacceptedExtension;
+                        auditStatus = AuditStatus.FAILED;
+                        auditMessage = "INVALID_EXTENSION";
                         break;
                     case INSUFFICIENT_PERMISSION:
                         failureInfo = PKIFailureInfo.notAuthorized;
@@ -1462,8 +1440,7 @@ class X509CACmpResponder extends CmpResponder
             }
         }
 
-        LOG.warn("no CMP control for CA {} defined, use the default one", ca);
-        return CmpControl.defaultInstance;
+        throw new IllegalStateException("should not happen, no CMP control is defined for CA " + caName);
     }
 
     private class PendingPoolCleaner implements Runnable

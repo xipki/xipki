@@ -55,7 +55,6 @@ public class CmpControl implements Serializable
 
     private boolean messageTimeRequired = true;
     private boolean sendResponderCert = true;
-    public static CmpControl defaultInstance = new CmpControl("__DEFAULT");
 
     public boolean isMessageTimeRequired()
     {

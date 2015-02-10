@@ -1126,7 +1126,7 @@ implements CAManager, CmpResponderManager
             return;
         }
 
-        crlSigners.clear();
+        cmpControls.clear();
 
         List<String> names = getNamesFromTable("CMPCONTROL");
 
@@ -2185,6 +2185,7 @@ implements CAManager, CmpResponderManager
     throws CAMgmtException
     {
         asssertMasterMode();
+        deleteRowWithName(crlSignerName, "CRLSIGNER");
         for(String caName : caInfos.keySet())
         {
             X509CAInfo caInfo = caInfos.get(caName);
@@ -2194,9 +2195,8 @@ implements CAManager, CmpResponderManager
             }
         }
 
-        deleteRowWithName(crlSignerName, "CRLSIGNER");
-        LOG.info("remove CRLSigner '{}'", crlSignerName);
         crlSigners.remove(crlSignerName);
+        LOG.info("remove CRLSigner '{}'", crlSignerName);
     }
 
     @Override
@@ -2513,6 +2513,8 @@ implements CAManager, CmpResponderManager
     throws CAMgmtException
     {
         asssertMasterMode();
+        deleteRowWithName(name, "CMPCONTROL");
+
         for(String caName : caInfos.keySet())
         {
             X509CAInfo caInfo = caInfos.get(caName);
@@ -2522,9 +2524,8 @@ implements CAManager, CmpResponderManager
             }
         }
 
-        deleteRowWithName(name, "CMPCONTROL");
-        LOG.info("remove CMPControl '{}'", name);
         cmpControls.remove(name);
+        LOG.info("remove CMPControl '{}'", name);
     }
 
     @Override

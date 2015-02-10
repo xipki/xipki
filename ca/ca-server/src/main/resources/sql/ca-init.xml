@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog dbchangelog-3.0.xsd" logicalFilePath="ca-init.xml">
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog dbchangelog-3.0.xsd"
+  logicalFilePath="ca-init.xml">
   <!-- 100 MB for DB2 -->
   <property name="crl.data.type" value="CLOB(104857600)" dbms="db2"/>
   <property name="crl.data.type" value="CLOB" dbms="oracle,postgresql,mysql,h2,hsqldb"/>
@@ -132,7 +135,9 @@
         <constraints nullable="false"/>
       </column>
       <column name="CRLSIGNER_NAME" type="VARCHAR(45)"/>
-      <column name="CMPCONTROL_NAME" type="VARCHAR(45)"/>
+      <column name="CMPCONTROL_NAME" type="VARCHAR(45)">
+        <constraints nullable="false"/>
+      </column>
       <column defaultValueNumeric="2" name="DUPLICATE_KEY_MODE" type="SMALLINT">
         <constraints nullable="false"/>
       </column>
@@ -404,28 +409,96 @@
   </changeSet>
   <!-- CA Configuration :: foreign key -->
   <changeSet author="xipki" id="5">
-    <addForeignKeyConstraint deferrable="false" initiallyDeferred="false" onDelete="SET NULL" onUpdate="NO ACTION" baseColumnNames="CMPCONTROL_NAME" baseTableName="CA" constraintName="FK_CA_CMPCONTROL1" referencedColumnNames="NAME" referencedTableName="CMPCONTROL"/>
-    <addForeignKeyConstraint deferrable="false" initiallyDeferred="false" onDelete="SET NULL" onUpdate="NO ACTION" baseColumnNames="CRLSIGNER_NAME" baseTableName="CA" constraintName="FK_CA_CRLSIGNER1" referencedColumnNames="NAME" referencedTableName="CRLSIGNER"/>
-    <addForeignKeyConstraint deferrable="false" initiallyDeferred="false" onDelete="CASCADE" onUpdate="NO ACTION" baseColumnNames="CA_NAME" baseTableName="CAALIAS" constraintName="FK_CAALIAS_CA1" referencedColumnNames="NAME" referencedTableName="CA"/>
+    <addForeignKeyConstraint  constraintName="FK_CA_CMPCONTROL1"
+      deferrable="false" initiallyDeferred="false"
+      onDelete="NO ACTION" onUpdate="NO ACTION"
+      baseColumnNames="CMPCONTROL_NAME" baseTableName="CA"
+      referencedColumnNames="NAME" referencedTableName="CMPCONTROL"/>
+    <addForeignKeyConstraint constraintName="FK_CA_CRLSIGNER1"
+      deferrable="false" initiallyDeferred="false"
+      onDelete="SET NULL" onUpdate="NO ACTION"
+      baseColumnNames="CRLSIGNER_NAME" baseTableName="CA"
+      referencedColumnNames="NAME" referencedTableName="CRLSIGNER"/>
+    <addForeignKeyConstraint constraintName="FK_CAALIAS_CA1"
+      deferrable="false" initiallyDeferred="false"
+      onDelete="CASCADE" onUpdate="NO ACTION"
+      baseColumnNames="CA_NAME" baseTableName="CAALIAS"
+      referencedColumnNames="NAME" referencedTableName="CA"/>
     <!-- ca_ha_requestor -->
-    <addForeignKeyConstraint deferrable="false" initiallyDeferred="false" onDelete="CASCADE" onUpdate="NO ACTION" baseColumnNames="REQUESTOR_NAME" baseTableName="CA_HAS_REQUESTOR" constraintName="FK_CA_HAS_REQUESTOR_REQUESTOR1" referencedColumnNames="NAME" referencedTableName="REQUESTOR"/>
-    <addForeignKeyConstraint deferrable="false" initiallyDeferred="false" onDelete="CASCADE" onUpdate="NO ACTION" baseColumnNames="CA_NAME" baseTableName="CA_HAS_REQUESTOR" constraintName="FK_CA_HAS_REQUESTOR1_CA1" referencedColumnNames="NAME" referencedTableName="CA"/>
+    <addForeignKeyConstraint constraintName="FK_CA_HAS_REQUESTOR_REQUESTOR1"
+      deferrable="false" initiallyDeferred="false"
+      onDelete="CASCADE" onUpdate="NO ACTION"
+      baseColumnNames="REQUESTOR_NAME" baseTableName="CA_HAS_REQUESTOR"
+      referencedColumnNames="NAME" referencedTableName="REQUESTOR"/>
+    <addForeignKeyConstraint constraintName="FK_CA_HAS_REQUESTOR1_CA1"
+      deferrable="false" initiallyDeferred="false"
+      onDelete="CASCADE" onUpdate="NO ACTION"
+      baseColumnNames="CA_NAME" baseTableName="CA_HAS_REQUESTOR"
+      referencedColumnNames="NAME" referencedTableName="CA"/>
     <!-- ca_has_publisher -->
-    <addForeignKeyConstraint deferrable="false" initiallyDeferred="false" onDelete="CASCADE" onUpdate="NO ACTION" baseColumnNames="PUBLISHER_NAME" baseTableName="CA_HAS_PUBLISHER" constraintName="FK_CA_HAS_PUBLISHER_PUBLISHER1" referencedColumnNames="NAME" referencedTableName="PUBLISHER"/>
-    <addForeignKeyConstraint deferrable="false" initiallyDeferred="false" onDelete="CASCADE" onUpdate="NO ACTION" baseColumnNames="CA_NAME" baseTableName="CA_HAS_PUBLISHER" constraintName="FK_CA_HAS_PUBLISHER_CA1" referencedColumnNames="NAME" referencedTableName="CA"/>
+    <addForeignKeyConstraint constraintName="FK_CA_HAS_PUBLISHER_PUBLISHER1"
+      deferrable="false" initiallyDeferred="false"
+      onDelete="CASCADE" onUpdate="NO ACTION"
+      baseColumnNames="PUBLISHER_NAME" baseTableName="CA_HAS_PUBLISHER"
+      referencedColumnNames="NAME" referencedTableName="PUBLISHER"/>
+    <addForeignKeyConstraint constraintName="FK_CA_HAS_PUBLISHER_CA1"
+      deferrable="false" initiallyDeferred="false"
+      onDelete="CASCADE" onUpdate="NO ACTION"
+      baseColumnNames="CA_NAME" baseTableName="CA_HAS_PUBLISHER"
+      referencedColumnNames="NAME" referencedTableName="CA"/>
     <!-- ca_has_certprofile -->
-    <addForeignKeyConstraint deferrable="false" initiallyDeferred="false" onDelete="CASCADE" onUpdate="NO ACTION" baseColumnNames="CERTPROFILE_NAME" baseTableName="CA_HAS_CERTPROFILE" constraintName="FK_CA_HAS_PROFILE_PROFILE1" referencedColumnNames="NAME" referencedTableName="CERTPROFILE"/>
-    <addForeignKeyConstraint deferrable="false" initiallyDeferred="false" onDelete="CASCADE" onUpdate="NO ACTION" baseColumnNames="CA_NAME" baseTableName="CA_HAS_CERTPROFILE" constraintName="FK_CA_HAS_CERTPROFILE_CA1" referencedColumnNames="NAME" referencedTableName="CA"/>
+    <addForeignKeyConstraint constraintName="FK_CA_HAS_PROFILE_PROFILE1"
+      deferrable="false" initiallyDeferred="false"
+      onDelete="CASCADE" onUpdate="NO ACTION"
+      baseColumnNames="CERTPROFILE_NAME" baseTableName="CA_HAS_CERTPROFILE"
+      referencedColumnNames="NAME" referencedTableName="CERTPROFILE"/>
+    <addForeignKeyConstraint constraintName="FK_CA_HAS_CERTPROFILE_CA1"
+      deferrable="false" initiallyDeferred="false"
+      onDelete="CASCADE" onUpdate="NO ACTION"
+      baseColumnNames="CA_NAME" baseTableName="CA_HAS_CERTPROFILE"
+      referencedColumnNames="NAME" referencedTableName="CA"/>
   </changeSet>
   <!-- CertStore :: foreigen key -->
   <changeSet author="xipki" id="6">
-    <addForeignKeyConstraint deferrable="false" initiallyDeferred="false" onDelete="CASCADE" onUpdate="NO ACTION" baseColumnNames="CA_ID" baseTableName="CRL" constraintName="FK_CRL_CAINFO1" referencedColumnNames="ID" referencedTableName="CAINFO"/>
-    <addForeignKeyConstraint deferrable="false" initiallyDeferred="false" onDelete="CASCADE" onUpdate="NO ACTION" baseColumnNames="CA_ID" baseTableName="CERT" constraintName="FK_CERT_CAINFO1" referencedColumnNames="ID" referencedTableName="CAINFO"/>
-    <addForeignKeyConstraint deferrable="false" initiallyDeferred="false" onDelete="CASCADE" onUpdate="NO ACTION" baseColumnNames="REQUESTOR_ID" baseTableName="CERT" constraintName="FK_CERT_REQUESTORINFO1" referencedColumnNames="ID" referencedTableName="REQUESTORINFO"/>
-    <addForeignKeyConstraint deferrable="false" initiallyDeferred="false" onDelete="CASCADE" onUpdate="NO ACTION" baseColumnNames="USER_ID" baseTableName="CERT" constraintName="FK_CERT_USER1" referencedColumnNames="ID" referencedTableName="USERNAME"/>
-    <addForeignKeyConstraint deferrable="false" initiallyDeferred="false" onDelete="CASCADE" onUpdate="NO ACTION" baseColumnNames="CERTPROFILE_ID" baseTableName="CERT" constraintName="FK_CERT_CERTPROFILEINFO1" referencedColumnNames="ID" referencedTableName="CERTPROFILEINFO"/>
-    <addForeignKeyConstraint deferrable="false" initiallyDeferred="false" onDelete="CASCADE" onUpdate="NO ACTION" baseColumnNames="CERT_ID" baseTableName="RAWCERT" constraintName="FK_RAWCERT_CERT1" referencedColumnNames="ID" referencedTableName="CERT"/>
-    <addForeignKeyConstraint deferrable="false" initiallyDeferred="false" onDelete="CASCADE" onUpdate="NO ACTION" baseColumnNames="PUBLISHER_ID" baseTableName="PUBLISHQUEUE" constraintName="FK_PUBLISHQUEUE_PUBLISHER1" referencedColumnNames="ID" referencedTableName="PUBLISHERINFO"/>
-    <addForeignKeyConstraint deferrable="false" initiallyDeferred="false" onDelete="CASCADE" onUpdate="NO ACTION" baseColumnNames="CERT_ID" baseTableName="PUBLISHQUEUE" constraintName="FK_PUBLISHQUEUE_CERT1" referencedColumnNames="ID" referencedTableName="CERT"/>
+    <addForeignKeyConstraint constraintName="FK_CRL_CAINFO1"
+      deferrable="false" initiallyDeferred="false"
+      onDelete="CASCADE" onUpdate="NO ACTION"
+      baseColumnNames="CA_ID" baseTableName="CRL"
+      referencedColumnNames="ID" referencedTableName="CAINFO"/>
+    <addForeignKeyConstraint constraintName="FK_CERT_CAINFO1"
+      deferrable="false" initiallyDeferred="false"
+      onDelete="CASCADE" onUpdate="NO ACTION"
+      baseColumnNames="CA_ID" baseTableName="CERT"
+      referencedColumnNames="ID" referencedTableName="CAINFO"/>
+    <addForeignKeyConstraint constraintName="FK_CERT_REQUESTORINFO1"
+      deferrable="false" initiallyDeferred="false"
+      onDelete="CASCADE" onUpdate="NO ACTION"
+      baseColumnNames="REQUESTOR_ID" baseTableName="CERT"
+      referencedColumnNames="ID" referencedTableName="REQUESTORINFO"/>
+    <addForeignKeyConstraint constraintName="FK_CERT_USER1"
+      deferrable="false" initiallyDeferred="false"
+      onDelete="CASCADE" onUpdate="NO ACTION"
+      baseColumnNames="USER_ID" baseTableName="CERT"
+      referencedColumnNames="ID" referencedTableName="USERNAME"/>
+    <addForeignKeyConstraint constraintName="FK_CERT_CERTPROFILEINFO1"
+      deferrable="false" initiallyDeferred="false"
+      onDelete="CASCADE" onUpdate="NO ACTION"
+      baseColumnNames="CERTPROFILE_ID" baseTableName="CERT"
+      referencedColumnNames="ID" referencedTableName="CERTPROFILEINFO"/>
+    <addForeignKeyConstraint constraintName="FK_RAWCERT_CERT1"
+      deferrable="false" initiallyDeferred="false"
+      onDelete="CASCADE" onUpdate="NO ACTION"
+      baseColumnNames="CERT_ID" baseTableName="RAWCERT"
+      referencedColumnNames="ID" referencedTableName="CERT"/>
+    <addForeignKeyConstraint constraintName="FK_PUBLISHQUEUE_PUBLISHER1"
+      deferrable="false" initiallyDeferred="false"
+      onDelete="CASCADE" onUpdate="NO ACTION"
+      baseColumnNames="PUBLISHER_ID" baseTableName="PUBLISHQUEUE"
+      referencedColumnNames="ID" referencedTableName="PUBLISHERINFO"/>
+    <addForeignKeyConstraint constraintName="FK_PUBLISHQUEUE_CERT1"
+      deferrable="false" initiallyDeferred="false"
+      onDelete="CASCADE" onUpdate="NO ACTION"
+      baseColumnNames="CERT_ID" baseTableName="PUBLISHQUEUE"
+      referencedColumnNames="ID" referencedTableName="CERT"/>
   </changeSet>
 </databaseChangeLog>
