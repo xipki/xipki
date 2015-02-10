@@ -356,7 +356,12 @@ public final class RAWorkerImpl extends AbstractRAWorker implements RAWorker
                     Set<CertprofileInfo> profiles = new HashSet<>(types.size());
                     for(CertprofileType m : types)
                     {
-                        CertprofileInfo profile = new CertprofileInfo(m.getName(), m.getType(), m.getConf());
+                        String conf = null;
+                        if(m.getConf() != null)
+                        {
+                            conf = new String(readData(m.getConf()));
+                        }
+                        CertprofileInfo profile = new CertprofileInfo(m.getName(), m.getType(), conf);
                         profiles.add(profile);
                     }
                     ca.setCertprofiles(profiles);
@@ -718,10 +723,6 @@ public final class RAWorkerImpl extends AbstractRAWorker implements RAWorker
     public CertIDOrError revokeCert(X500Name issuer, BigInteger serial, int reason)
     throws RAWorkerException, PKIErrorException
     {
-        if(getCaNameByIssuer(issuer) == null)
-        {
-            throw new RAWorkerException("Unknown issuer '" + issuer.toString() + "'");
-        }
         final String id = "cert-1";
         RevokeCertRequestEntryType entry =
                 new RevokeCertRequestEntryType(id, issuer, serial, reason, null);
@@ -1140,11 +1141,6 @@ public final class RAWorkerImpl extends AbstractRAWorker implements RAWorker
     public CertIDOrError unrevokeCert(X500Name issuer, BigInteger serial)
     throws RAWorkerException, PKIErrorException
     {
-        if(getCaNameByIssuer(issuer) == null)
-        {
-            throw new RAWorkerException("Unknown issuer '" + issuer.toString() + "'");
-        }
-
         final String id = "cert-1";
         IssuerSerialEntryType entry =
                 new IssuerSerialEntryType(id, issuer, serial);
@@ -1203,11 +1199,6 @@ public final class RAWorkerImpl extends AbstractRAWorker implements RAWorker
     public CertIDOrError removeCert(X500Name issuer, BigInteger serial)
     throws RAWorkerException, PKIErrorException
     {
-        if(getCaNameByIssuer(issuer) == null)
-        {
-            throw new RAWorkerException("Unknown issuer '" + issuer.toString() + "'");
-        }
-
         final String id = "cert-1";
         IssuerSerialEntryType entry =
                 new IssuerSerialEntryType(id, issuer, serial);

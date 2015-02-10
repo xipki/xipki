@@ -99,7 +99,7 @@
     <xs:sequence>
       <xs:element name="name" type="xs:string"/>
       <xs:element name="type" type="xs:string" minOccurs="0"/>
-      <xs:element name="conf" type="xs:string" minOccurs="0"/>
+      <xs:element name="conf" type="fileOrValueType" minOccurs="0"/>
     </xs:sequence>
   </xs:complexType>
   <xs:complexType name="fileOrValueType">
