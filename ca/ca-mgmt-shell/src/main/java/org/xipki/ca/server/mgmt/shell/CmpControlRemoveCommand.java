@@ -42,7 +42,7 @@ import org.apache.karaf.shell.commands.Command;
  * @author Lijun Liao
  */
 
-@Command(scope = "xipki-ca", name = "cmpcontrol-remove", description="Remove CMP control")
+@Command(scope = "xipki-ca", name = "cmpcontrol-rm", description="Remove CMP control")
 public class CmpControlRemoveCommand extends CaCommand
 {
     @Argument(index = 0, name = "name", description = "CMP control name", required = true)
