@@ -2596,7 +2596,7 @@ implements CAManager, CmpResponderManager
                 setBoolean(ps, iSendResponderCert, sendResponderCert);
             }
 
-            ps.setString(index.get(), "default");
+            ps.setString(index.get(), name);
             ps.executeUpdate();
 
             if(m.length() > 0)
