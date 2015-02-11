@@ -205,6 +205,11 @@ class CertStoreQueryExecutor
         int certprofileId = getCertprofileId(certprofileName);
         Integer requestorId = (requestor == null) ? null : getRequestorId(requestor.getName());
 
+        String fpPK = fp(encodedSubjectPublicKey);
+        String fpSubject = SecurityUtil.sha1sum_canonicalized_name(cert.getSubjectX500Principal());
+        String fpCert = fp(certificate.getEncodedCert());
+        String b64Cert = Base64.toBase64String(certificate.getEncodedCert());
+
         Connection conn = null;
         PreparedStatement[] pss = borrowPreparedStatements(SQL_ADD_CERT, SQL_ADD_RAWCERT);
 
@@ -245,17 +250,16 @@ class CertStoreQueryExecutor
                 ps_addcert.setNull(idx++, Types.INTEGER);
             }
 
-            ps_addcert.setString(idx++, fp(encodedSubjectPublicKey));
-            String sha1_fp_subject = SecurityUtil.sha1sum_canonicalized_name(cert.getSubjectX500Principal());
-            ps_addcert.setString(idx++, sha1_fp_subject);
+            ps_addcert.setString(idx++, fpPK);
+            ps_addcert.setString(idx++, fpSubject);
 
             boolean isEECert = cert.getBasicConstraints() == -1;
             ps_addcert.setInt(idx++, isEECert ? 1 : 0);
 
             // rawcert
             idx = 2;
-            ps_addRawcert.setString(idx++, fp(certificate.getEncodedCert()));
-            ps_addRawcert.setString(idx++, Base64.toBase64String(certificate.getEncodedCert()));
+            ps_addRawcert.setString(idx++, fpCert);
+            ps_addRawcert.setString(idx++, b64Cert);
 
             final int tries = 3;
             for(int i = 0; i < tries; i++)

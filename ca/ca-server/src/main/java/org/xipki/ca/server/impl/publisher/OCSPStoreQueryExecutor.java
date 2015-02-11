@@ -216,6 +216,13 @@ class OCSPStoreQueryExecutor
                     + " VALUES (?, ?, ?, ?, ?, ?)";
 
             int certId = nextCertId();
+            byte[] encodedCert = certificate.getEncodedCert();
+            String b64Cert = Base64.toBase64String(encodedCert);
+            String sha1Fp = HashCalculator.hexHash(HashAlgoType.SHA1, encodedCert);
+            String sha224Fp = HashCalculator.hexHash(HashAlgoType.SHA224, encodedCert);
+            String sha256Fp = HashCalculator.hexHash(HashAlgoType.SHA256, encodedCert);
+            String sha384Fp = HashCalculator.hexHash(HashAlgoType.SHA384, encodedCert);
+            String sha512Fp = HashCalculator.hexHash(HashAlgoType.SHA512, encodedCert);
 
             PreparedStatement[] pss = borrowPreparedStatements(SQL_ADD_CERT, SQL_ADD_RAWCERT, SQL_ADD_CERTHASH);
             // all statements have the same connection
@@ -254,17 +261,16 @@ class OCSPStoreQueryExecutor
                 }
 
                 // RAWCERT
-                byte[] encodedCert = certificate.getEncodedCert();
                 idx = 2;
-                ps_addRawcert.setString(idx++, Base64.toBase64String(encodedCert));
+                ps_addRawcert.setString(idx++, b64Cert);
 
                 // CERTHASH
                 idx = 2;
-                ps_addCerthash.setString(idx++, HashCalculator.hexHash(HashAlgoType.SHA1, encodedCert));
-                ps_addCerthash.setString(idx++, HashCalculator.hexHash(HashAlgoType.SHA224, encodedCert));
-                ps_addCerthash.setString(idx++, HashCalculator.hexHash(HashAlgoType.SHA256, encodedCert));
-                ps_addCerthash.setString(idx++, HashCalculator.hexHash(HashAlgoType.SHA384, encodedCert));
-                ps_addCerthash.setString(idx++, HashCalculator.hexHash(HashAlgoType.SHA512, encodedCert));
+                ps_addCerthash.setString(idx++, sha1Fp);
+                ps_addCerthash.setString(idx++, sha224Fp);
+                ps_addCerthash.setString(idx++, sha256Fp);
+                ps_addCerthash.setString(idx++, sha384Fp);
+                ps_addCerthash.setString(idx++, sha512Fp);
 
                 final int tries = 3;
                 for(int i = 0; i < tries; i++)
