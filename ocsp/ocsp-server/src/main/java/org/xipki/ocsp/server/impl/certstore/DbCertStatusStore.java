@@ -66,6 +66,7 @@ import org.xipki.common.LogUtil;
 import org.xipki.common.ParamChecker;
 import org.xipki.datasource.api.DataSourceFactory;
 import org.xipki.datasource.api.DataSourceWrapper;
+import org.xipki.ocsp.api.CertStatus;
 import org.xipki.ocsp.api.CertStatusInfo;
 import org.xipki.ocsp.api.CertStatusStore;
 import org.xipki.ocsp.api.CertStatusStoreException;
@@ -447,6 +448,27 @@ public class DbCertStatusStore extends CertStatusStore
                     else
                     {
                         certStatusInfo = CertStatusInfo.getUnknownCertStatusInfo(thisUpdate, null);
+                    }
+                } else if(inheritCaRevocation && issuer.isRevoked())
+                {
+                    if(certStatusInfo.getCertStatus() == CertStatus.GOOD)
+                    {
+                        CertRevocationInfo revocationInfo = new CertRevocationInfo(
+                                CRLReason.CA_COMPROMISE.getCode(), issuer.getRevocationTime(), null);
+                        certStatusInfo = CertStatusInfo.getRevokedCertStatusInfo(revocationInfo,
+                                null, null, thisUpdate, null, null);
+                    } else if(certStatusInfo.getCertStatus() == CertStatus.REVOKED)
+                    {
+                        Date revTime = certStatusInfo.getRevocationInfo().getRevocationTime();
+                        if(revTime.after(issuer.getRevocationTime()))
+                        {
+                            CertRevocationInfo newRevInfo = new CertRevocationInfo(CRLReason.CA_COMPROMISE,
+                                    issuer.getRevocationTime(), null);
+                            certStatusInfo = CertStatusInfo.getRevokedCertStatusInfo(newRevInfo,
+                                    certStatusInfo.getCertHashAlgo(), certStatusInfo.getCertHash(),
+                                    certStatusInfo.getThisUpdate(), certStatusInfo.getNextUpdate(),
+                                    certStatusInfo.getCertprofile());
+                        }
                     }
                 }
             }finally
