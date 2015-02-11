@@ -561,14 +561,14 @@ public abstract class BaseCAManager
 
         try
         {
-            final String sql = "SELECT REQUIRE_CONFIRM_CERT, SEND_CA_CERT, SEND_RESPONDER_CERT" +
+            final String sql = "REQUIRE_CONFIRM_CERT, SEND_CA_CERT, SEND_RESPONDER_CERT" +
                     ", REQUIRE_MESSAGE_TIME, MESSAGE_TIME_BIAS, CONFIRM_WAIT_TIME" +
                     " FROM CMPCONTROL WHERE NAME=?";
             stmt = prepareFetchFirstStatement(sql);
             stmt.setString(1, name);
             rs = stmt.executeQuery();
 
-            if(rs.next())
+            if(rs.next() == false)
             {
                 return null;
             }
