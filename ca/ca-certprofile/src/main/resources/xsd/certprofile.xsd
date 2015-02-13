@@ -319,9 +319,6 @@
     </xs:complexType>
   </xs:element>
   <xs:element name="extendedKeyUsage">
-    <xs:annotation>
-      <xs:documentation>Only for CA</xs:documentation>
-    </xs:annotation>
     <xs:complexType>
       <xs:sequence>
         <xs:element name="usage" maxOccurs="unbounded">
