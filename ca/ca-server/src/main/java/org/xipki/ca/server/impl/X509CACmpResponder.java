@@ -1159,33 +1159,43 @@ class X509CACmpResponder extends CmpResponder
                 }
                 else
                 {
-                    Extensions crlDetails = revDetails.getCrlEntryDetails();
-
-                    ASN1ObjectIdentifier extId = Extension.reasonCode;
-                    ASN1Encodable extValue = crlDetails.getExtensionParsedValue(extId);
-                    int reasonCode = ((ASN1Enumerated) extValue).getValue().intValue();
-                    CRLReason reason = CRLReason.forReasonCode(reasonCode);
-                    if(childAuditEvent != null)
-                    {
-                        childAuditEvent.addEventData(new AuditEventData("reason",
-                                reason == null ? Integer.toString(reasonCode) : reason.getDescription()));
-                    }
-
-                    extId = Extension.invalidityDate;
-                    extValue = crlDetails.getExtensionParsedValue(extId);
-
                     Date invalidityDate = null;
-                    if(extValue != null)
+                    CRLReason reason = null;
+
+                    Extensions crlDetails = revDetails.getCrlEntryDetails();
+                    if(crlDetails != null)
                     {
-                        try
+                        ASN1ObjectIdentifier extId = Extension.reasonCode;
+                        ASN1Encodable extValue = crlDetails.getExtensionParsedValue(extId);
+                        if(extValue != null)
                         {
-                            invalidityDate = ((ASN1GeneralizedTime) extValue).getDate();
-                        } catch (ParseException e)
-                        {
-                            throw new OperationException(ErrorCode.INVALID_EXTENSION, "invalid extension " + extId.getId());
+                            int reasonCode = ((ASN1Enumerated) extValue).getValue().intValue();
+                            reason = CRLReason.forReasonCode(reasonCode);
                         }
 
-                        if(childAuditEvent != null)
+                        extId = Extension.invalidityDate;
+                        extValue = crlDetails.getExtensionParsedValue(extId);
+                        if(extValue != null)
+                        {
+                            try
+                            {
+                                invalidityDate = ((ASN1GeneralizedTime) extValue).getDate();
+                            } catch (ParseException e)
+                            {
+                                throw new OperationException(ErrorCode.INVALID_EXTENSION, "invalid extension " + extId.getId());
+                            }
+                        }
+                    }
+
+                    if(reason == null)
+                    {
+                        reason = CRLReason.UNSPECIFIED;
+                    }
+
+                    if(childAuditEvent != null)
+                    {
+                        childAuditEvent.addEventData(new AuditEventData("reason", reason.getDescription()));
+                        if(invalidityDate != null)
                         {
                             childAuditEvent.addEventData(new AuditEventData("invalidityDate", invalidityDate));
                         }
