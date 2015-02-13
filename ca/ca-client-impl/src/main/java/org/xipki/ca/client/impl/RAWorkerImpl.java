@@ -359,7 +359,11 @@ public final class RAWorkerImpl extends AbstractRAWorker implements RAWorker
                         String conf = null;
                         if(m.getConf() != null)
                         {
-                            conf = new String(readData(m.getConf()));
+                            conf = m.getConf().getValue();
+                            if(conf == null)
+                            {
+                                conf = new String(IoUtil.read(m.getConf().getFile()));
+                            }
                         }
                         CertprofileInfo profile = new CertprofileInfo(m.getName(), m.getType(), conf);
                         profiles.add(profile);
