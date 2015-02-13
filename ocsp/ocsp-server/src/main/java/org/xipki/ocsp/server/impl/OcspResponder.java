@@ -66,6 +66,7 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
+import javax.xml.datatype.XMLGregorianCalendar;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 
@@ -163,6 +164,7 @@ public class OcspResponder
     private X509CertificateHolder[] certsInResp;
 
     private List<CertStatusStore> certStatusStores = new ArrayList<>();
+    private Map<String, Boolean> inheritCaRevocationMap = new ConcurrentHashMap<>();
 
     private DataSourceFactory dataSourceFactory;
     private SecurityFactory securityFactory;
@@ -178,7 +180,6 @@ public class OcspResponder
     private boolean supportsHttpGet = false;
     private Long cacheMaxAge;
     private final Map<String, String> auditCertprofileMapping = new ConcurrentHashMap<>();
-    private Set<String> excludeCertprofiles;
 
     private AuditLoggingServiceRegister auditServiceRegister;
     private CertPathBuilder certpathBuilder;
@@ -345,17 +346,11 @@ public class OcspResponder
             }
         }
 
+        Set<String> excludeCertprofiles = new HashSet<>();
         if(conf.getExcludeCertprofiles() != null)
         {
             List<String> list = conf.getExcludeCertprofiles().getCertprofile();
-            if(list.isEmpty())
-            {
-                excludeCertprofiles = null;
-            }
-            else
-            {
-                excludeCertprofiles = new HashSet<>(list);
-            }
+            excludeCertprofiles.addAll(list);
         }
 
         // Signer
@@ -453,6 +448,9 @@ public class OcspResponder
         String statusStoreConf;
         for(CertstatusStoreType storeConf : storeConfs)
         {
+            final String name = storeConf.getName();
+            inheritCaRevocationMap.put(name, getBoolean(storeConf.isInheritCaRevocation(), true));
+
             CertStatusStore store;
             if(storeConf.getDbStore() != null)
             {
@@ -487,7 +485,7 @@ public class OcspResponder
                 {
                     throw new OcspResponderException(e.getMessage(), e);
                 }
-                store = new DbCertStatusStore(storeConf.getName(), issuerFilter);
+                store = new DbCertStatusStore(name, issuerFilter);
 
                 Integer i = storeConf.getRetentionInterval();
                 store.setRetentionInterval(i == null ? -1 : i.intValue());
@@ -504,7 +502,7 @@ public class OcspResponder
                 X509Certificate caCert = parseCert(caCertFile);
                 X509Certificate crlIssuerCert = issuerCertFile == null ? null : parseCert(issuerCertFile);
 
-                CrlCertStatusStore crlStore = new CrlCertStatusStore(storeConf.getName(),
+                CrlCertStatusStore crlStore = new CrlCertStatusStore(name,
                         crlStoreConf.getCrlFile(), crlStoreConf.getDeltaCrlFile(),
                         caCert, crlIssuerCert, crlStoreConf.getCrlUrl(),
                         crlStoreConf.getCertsDir());
@@ -513,10 +511,14 @@ public class OcspResponder
                 crlStore.setUseUpdateDatesFromCRL(
                         getBoolean(crlStoreConf.isUseUpdateDatesFromCRL(), true));
                 boolean caRevoked = getBoolean(crlStoreConf.isCaRevoked(), false);
-                crlStore.setCaRevoked(caRevoked);
-                if(caRevoked & crlStoreConf.getCaRevocationTime() != null)
+                if(caRevoked)
                 {
-                    crlStore.setCaRevocationTime(crlStoreConf.getCaRevocationTime().toGregorianCalendar().getTime());
+                    XMLGregorianCalendar caRevTime = crlStoreConf.getCaRevocationTime();
+                    if(caRevTime == null)
+                    {
+                        throw new OcspResponderException("CaRevocationTime is not specified");
+                    }
+                    crlStore.setCARevocationInfo(caRevTime.toGregorianCalendar().getTime());
                 }
 
                 Integer i = storeConf.getRetentionInterval();
@@ -557,10 +559,10 @@ public class OcspResponder
                     getBoolean(storeConf.isIncludeArchiveCutoff(), true));
             store.setIncludeCrlID(
                     getBoolean(storeConf.isIncludeCrlID(), true));
-            store.setInheritCaRevocation(
-                    getBoolean(storeConf.isInheritCaRevocation(), true));
             store.setIncludeCertHash(
                     getBoolean(storeConf.isIncludeCertHash(), false));
+            store.setExcludeCertProfiles(excludeCertprofiles);
+
             if(certHashAlgo != null)
             {
                 store.setCertHashAlgorithm(certHashAlgo);
@@ -844,6 +846,7 @@ public class OcspResponder
                 }
 
                 CertStatusInfo certStatusInfo = null;
+                CertStatusStore answeredStore = null;
                 boolean exceptionOccurs = false;
 
                 for(CertStatusStore store : certStatusStores)
@@ -852,9 +855,10 @@ public class OcspResponder
                     {
                         certStatusInfo = store.getCertStatus(
                                 reqHashAlgo, certID.getIssuerNameHash(), certID.getIssuerKeyHash(),
-                                certID.getSerialNumber(), excludeCertprofiles);
+                                certID.getSerialNumber());
                         if(certStatusInfo.getCertStatus() != CertStatus.ISSUER_UNKNOWN)
                         {
+                            answeredStore = store;
                             break;
                         }
                     } catch (CertStatusStoreException e)
@@ -883,6 +887,49 @@ public class OcspResponder
                     else
                     {
                         certStatusInfo = CertStatusInfo.getIssuerUnknownCertStatusInfo(new Date(), null);
+                    }
+                } else if(answeredStore != null)
+                {
+                    final String storeName = answeredStore.getName();
+                    if(inheritCaRevocationMap.get(storeName).booleanValue())
+                    {
+                        CertRevocationInfo caRevInfo = answeredStore.getCARevocationInfo(
+                                reqHashAlgo, certID.getIssuerNameHash(), certID.getIssuerKeyHash());
+                        if(caRevInfo != null)
+                        {
+                            CertStatus certStatus = certStatusInfo.getCertStatus();
+                            boolean replaced = false;
+                            if(certStatus == CertStatus.GOOD || certStatus == CertStatus.UNKNOWN)
+                            {
+                                replaced = true;
+                            }
+                            else if(certStatus == CertStatus.REVOKED)
+                            {
+                                if(certStatusInfo.getRevocationInfo().getRevocationTime().after(
+                                        caRevInfo.getRevocationTime()))
+                                {
+                                    replaced = true;
+                                }
+                            }
+
+                            if(replaced)
+                            {
+                                CertRevocationInfo newRevInfo;
+                                if(caRevInfo.getReason() == CRLReason.CA_COMPROMISE)
+                                {
+                                    newRevInfo = caRevInfo;
+                                }
+                                else
+                                {
+                                    newRevInfo = new CertRevocationInfo(CRLReason.CA_COMPROMISE,
+                                        caRevInfo.getRevocationTime(), caRevInfo.getInvalidityTime());
+                                }
+                                certStatusInfo = CertStatusInfo.getRevokedCertStatusInfo(newRevInfo,
+                                        certStatusInfo.getCertHashAlgo(), certStatusInfo.getCertHash(),
+                                        certStatusInfo.getThisUpdate(), certStatusInfo.getNextUpdate(),
+                                        certStatusInfo.getCertprofile());
+                            }
+                        }
                     }
                 }
 
@@ -915,7 +962,6 @@ public class OcspResponder
                 Date nextUpdate = certStatusInfo.getNextUpdate();
 
                 List<Extension> extensions = new LinkedList<>();
-
                 boolean unknownAsRevoked = false;
                 CertificateStatus bcCertStatus = null;
                 switch(certStatusInfo.getCertStatus())
@@ -930,6 +976,7 @@ public class OcspResponder
                         break;
 
                     case UNKNOWN:
+                    case IGNORE:
                         couldCacheInfo = false;
                         if(ocspMode == OCSPMode.RFC2560)
                         {

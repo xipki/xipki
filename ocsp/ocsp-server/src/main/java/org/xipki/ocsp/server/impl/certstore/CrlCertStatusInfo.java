@@ -65,14 +65,13 @@ class CrlCertStatusInfo
         this.certHashes = certHashes;
     }
 
-    static CrlCertStatusInfo getUnknownCertStatusInfo(Date thisUpdate)
+    static CrlCertStatusInfo getIgnoreCertStatusInfo()
     {
-        return new CrlCertStatusInfo(CertStatus.UNKNOWN, null, null, null);
+        return new CrlCertStatusInfo(CertStatus.IGNORE, null, null, null);
     }
 
     static CrlCertStatusInfo getGoodCertStatusInfo(
-            String certprofile,
-            Map<HashAlgoType, byte[]> certHashes)
+            String certprofile, Map<HashAlgoType, byte[]> certHashes)
     {
         ParamChecker.assertNotEmpty("certprofile", certprofile);
         return new CrlCertStatusInfo(CertStatus.GOOD, null, certprofile, certHashes);
@@ -102,24 +101,21 @@ class CrlCertStatusInfo
         return certprofile;
     }
 
-    byte[] getCertHash(HashAlgoType hashAlgo)
-    {
-        return certHashes == null ? null : certHashes.get(hashAlgo);
-    }
-
     CertStatusInfo getCertStatusInfo(HashAlgoType hashAlgo, Date thisUpdate, Date nextUpdate)
     {
         switch(certStatus)
         {
         case ISSUER_UNKNOWN:
         case UNKNOWN:
-            return CertStatusInfo.getUnknownCertStatusInfo(thisUpdate, nextUpdate);
+            throw new RuntimeException("should not reach here");
+        case IGNORE:
+            return CertStatusInfo.getIgnoreCertStatusInfo(thisUpdate, nextUpdate);
         case GOOD:
         case REVOKED:
             byte[] certHash = null;
             if(hashAlgo != null)
             {
-                certHash = getCertHash(hashAlgo);
+                certHash = certHashes == null ? null : certHashes.get(hashAlgo);
             }
             if(certStatus == CertStatus.GOOD)
             {

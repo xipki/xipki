@@ -40,6 +40,8 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.Map;
 
+import org.xipki.common.CRLReason;
+import org.xipki.common.CertRevocationInfo;
 import org.xipki.common.HashAlgoType;
 import org.xipki.common.ParamChecker;
 import org.xipki.ocsp.api.IssuerHashNameAndKey;
@@ -52,10 +54,9 @@ public class IssuerEntry
 {
     private final int id;
     private final Map<HashAlgoType, IssuerHashNameAndKey> issuerHashMap;
-    private final Date caNotBefore;
+    private final Date notBefore;
 
-    private boolean revoked;
-    private Date revocationTime;
+    private CertRevocationInfo revocationInfo;
 
     public IssuerEntry(int id, Map<HashAlgoType, IssuerHashNameAndKey> issuerHashMap, Date caNotBefore)
     {
@@ -64,7 +65,7 @@ public class IssuerEntry
 
         this.id = id;
         this.issuerHashMap = issuerHashMap;
-        this.caNotBefore = caNotBefore;
+        this.notBefore = caNotBefore;
     }
 
     public int getId()
@@ -78,29 +79,20 @@ public class IssuerEntry
         return issuerHash == null ? false : issuerHash.match(hashAlgo, issuerNameHash, issuerKeyHash);
     }
 
-    public boolean isRevoked()
+    public void setRevocationInfo(Date revocationTime)
     {
-        return revoked;
+        ParamChecker.assertNotNull("revocationTime", revocationTime);
+        this.revocationInfo = new CertRevocationInfo(CRLReason.CA_COMPROMISE, revocationTime, null);
     }
 
-    public void setRevoked(boolean revoked)
+    public CertRevocationInfo getRevocationInfo()
     {
-        this.revoked = revoked;
+        return revocationInfo;
     }
 
-    public Date getRevocationTime()
+    public Date getNotBefore()
     {
-        return revocationTime;
-    }
-
-    public void setRevocationTime(Date revocationTime)
-    {
-        this.revocationTime = revocationTime;
-    }
-
-    public Date getCaNotBefore()
-    {
-        return caNotBefore;
+        return notBefore;
     }
 
     Collection<IssuerHashNameAndKey> getIssuerHashNameAndKeys()
