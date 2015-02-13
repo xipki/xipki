@@ -73,6 +73,11 @@ public class CertStatusInfo
         return new CertStatusInfo(CertStatus.UNKNOWN, thisUpdate, nextUpdate, null);
     }
 
+    public static CertStatusInfo getIgnoreCertStatusInfo(Date thisUpdate, Date nextUpdate)
+    {
+        return new CertStatusInfo(CertStatus.IGNORE, thisUpdate, nextUpdate, null);
+    }
+
     public static CertStatusInfo getIssuerUnknownCertStatusInfo(Date thisUpdate, Date nextUpdate)
     {
         return new CertStatusInfo(CertStatus.ISSUER_UNKNOWN, thisUpdate, nextUpdate, null);

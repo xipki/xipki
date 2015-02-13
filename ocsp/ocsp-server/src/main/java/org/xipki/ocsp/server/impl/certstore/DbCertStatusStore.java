@@ -57,7 +57,6 @@ import java.util.concurrent.TimeUnit;
 import org.bouncycastle.util.encoders.Hex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.common.CRLReason;
 import org.xipki.common.CertRevocationInfo;
 import org.xipki.common.CmpUtf8Pairs;
 import org.xipki.common.HashAlgoType;
@@ -66,7 +65,6 @@ import org.xipki.common.LogUtil;
 import org.xipki.common.ParamChecker;
 import org.xipki.datasource.api.DataSourceFactory;
 import org.xipki.datasource.api.DataSourceWrapper;
-import org.xipki.ocsp.api.CertStatus;
 import org.xipki.ocsp.api.CertStatusInfo;
 import org.xipki.ocsp.api.CertStatusStore;
 import org.xipki.ocsp.api.CertStatusStoreException;
@@ -86,14 +84,12 @@ public class DbCertStatusStore extends CertStatusStore
     private static class SimpleIssuerEntry
     {
         private final int id;
-        private final boolean revoked;
-        private final long revocationTimeInMs;
+        private final Long revocationTimeMs;
 
-        public SimpleIssuerEntry(int id, boolean revoked, long revocationTimeInMs)
+        public SimpleIssuerEntry(int id, Long revocationTimeMs)
         {
             this.id = id;
-            this.revoked = revoked;
-            this.revocationTimeInMs = revocationTimeInMs;
+            this.revocationTimeMs = revocationTimeMs;
         }
 
         public boolean match(IssuerEntry issuer)
@@ -103,27 +99,20 @@ public class DbCertStatusStore extends CertStatusStore
                 return false;
             }
 
-            if(revoked != issuer.isRevoked())
+            if(revocationTimeMs == null)
             {
-                return false;
-            }
-
-            if(revocationTimeInMs == 0)
-            {
-                return issuer.getRevocationTime() == null;
+                return issuer.getRevocationInfo() == null;
             }
             else
             {
-                Date issuerRevTime = issuer.getRevocationTime();
-                if(issuerRevTime == null)
+                if(issuer.getRevocationInfo() == null)
                 {
                     return false;
                 }
-                else
-                {
-                    return revocationTimeInMs == issuerRevTime.getTime();
-                }
+
+                return revocationTimeMs == issuer.getRevocationInfo().getRevocationTime().getTime();
             }
+
         }
     }
 
@@ -179,9 +168,13 @@ public class DbCertStatusStore extends CertStatusStore
 
                         int id = rs.getInt("ID");
                         boolean revoked = rs.getBoolean("REVOKED");
-                        long revTime = rs.getLong("REV_TIME");
+                        Long revTimeMs = null;
+                        if(revoked)
+                        {
+                            revTimeMs = rs.getLong("REV_TIME") * 1000;
+                        }
 
-                        SimpleIssuerEntry issuerEntry = new SimpleIssuerEntry(id, revoked, revTime * 1000);
+                        SimpleIssuerEntry issuerEntry = new SimpleIssuerEntry(id, revTimeMs);
                         newIssuers.put(id, issuerEntry);
                     }
 
@@ -285,11 +278,10 @@ public class DbCertStatusStore extends CertStatusStore
 
                     IssuerEntry caInfoEntry = new IssuerEntry(id, hashes, new Date(notBeforeInSecond * 1000));
                     boolean revoked = rs.getBoolean("REVOKED");
-                    caInfoEntry.setRevoked(revoked);
                     if(revoked)
                     {
                         long l = rs.getLong("REV_TIME");
-                        caInfoEntry.setRevocationTime(new Date(l * 1000));
+                        caInfoEntry.setRevocationInfo(new Date(l * 1000));
                     }
 
                     caInfos.add(caInfoEntry);
@@ -320,7 +312,7 @@ public class DbCertStatusStore extends CertStatusStore
     @Override
     public CertStatusInfo getCertStatus(
             HashAlgoType hashAlgo, byte[] issuerNameHash, byte[] issuerKeyHash,
-            BigInteger serialNumber, Set<String> excludeCertprofiles)
+            BigInteger serialNumber)
     throws CertStatusStoreException
     {
         // wait for max. 0.5 second
@@ -384,16 +376,12 @@ public class DbCertStatusStore extends CertStatusStore
 
                 rs = ps.executeQuery();
 
-                boolean unknownOrIgnore = true;
-
                 if(rs.next())
                 {
-                    unknownOrIgnore = false;
-
                     String certprofile = rs.getString("PROFILE");
-                    if(excludeCertprofiles != null && excludeCertprofiles.contains(certprofile))
+                    if(excludeCertprofiles.contains(certprofile))
                     {
-                        unknownOrIgnore = true;
+                        certStatusInfo = CertStatusInfo.getIgnoreCertStatusInfo(thisUpdate, null);
                     }
                     else
                     {
@@ -428,47 +416,15 @@ public class DbCertStatusStore extends CertStatusStore
                         }
                     }
                 }
-
-                if(unknownOrIgnore)
+                else
                 {
                     if(unknownSerialAsGood)
                     {
-                        if(inheritCaRevocation && issuer.isRevoked())
-                        {
-                            CertRevocationInfo revocationInfo = new CertRevocationInfo(
-                                    CRLReason.CA_COMPROMISE.getCode(), issuer.getRevocationTime(), null);
-                            certStatusInfo = CertStatusInfo.getRevokedCertStatusInfo(revocationInfo,
-                                    null, null, thisUpdate, null, null);
-                        }
-                        else
-                        {
-                            certStatusInfo = CertStatusInfo.getGoodCertStatusInfo(certHashAlgo, null, thisUpdate, null, null);
-                        }
+                        certStatusInfo = CertStatusInfo.getGoodCertStatusInfo(certHashAlgo, null, thisUpdate, null, null);
                     }
                     else
                     {
                         certStatusInfo = CertStatusInfo.getUnknownCertStatusInfo(thisUpdate, null);
-                    }
-                } else if(inheritCaRevocation && issuer.isRevoked())
-                {
-                    if(certStatusInfo.getCertStatus() == CertStatus.GOOD)
-                    {
-                        CertRevocationInfo revocationInfo = new CertRevocationInfo(
-                                CRLReason.CA_COMPROMISE.getCode(), issuer.getRevocationTime(), null);
-                        certStatusInfo = CertStatusInfo.getRevokedCertStatusInfo(revocationInfo,
-                                null, null, thisUpdate, null, null);
-                    } else if(certStatusInfo.getCertStatus() == CertStatus.REVOKED)
-                    {
-                        Date revTime = certStatusInfo.getRevocationInfo().getRevocationTime();
-                        if(revTime.after(issuer.getRevocationTime()))
-                        {
-                            CertRevocationInfo newRevInfo = new CertRevocationInfo(CRLReason.CA_COMPROMISE,
-                                    issuer.getRevocationTime(), null);
-                            certStatusInfo = CertStatusInfo.getRevokedCertStatusInfo(newRevInfo,
-                                    certStatusInfo.getCertHashAlgo(), certStatusInfo.getCertHash(),
-                                    certStatusInfo.getThisUpdate(), certStatusInfo.getNextUpdate(),
-                                    certStatusInfo.getCertprofile());
-                        }
                     }
                 }
             }finally
@@ -484,12 +440,12 @@ public class DbCertStatusStore extends CertStatusStore
                     // expired certificate remains in status store for ever
                     if(retentionInterval < 0)
                     {
-                        t = issuer.getCaNotBefore();
+                        t = issuer.getNotBefore();
                     }
                     else
                     {
                         long nowInMs = System.currentTimeMillis();
-                        long tInMs = Math.max(issuer.getCaNotBefore().getTime(), nowInMs - DAY * retentionInterval);
+                        long tInMs = Math.max(issuer.getNotBefore().getTime(), nowInMs - DAY * retentionInterval);
                         t = new Date(tInMs);
                     }
 
@@ -657,6 +613,14 @@ public class DbCertStatusStore extends CertStatusStore
     public Set<IssuerHashNameAndKey> getIssuerHashNameAndKeys()
     {
         return issuerStore.getIssuerHashNameAndKeys();
+    }
+
+    @Override
+    public CertRevocationInfo getCARevocationInfo(HashAlgoType hashAlgo,
+            byte[] issuerNameHash, byte[] issuerKeyHash)
+    {
+        IssuerEntry issuer = issuerStore.getIssuerForFp(hashAlgo, issuerNameHash, issuerKeyHash);
+        return issuer == null ? null : issuer.getRevocationInfo();
     }
 
 }

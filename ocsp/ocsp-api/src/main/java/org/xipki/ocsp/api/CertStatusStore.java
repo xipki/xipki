@@ -36,10 +36,12 @@
 package org.xipki.ocsp.api;
 
 import java.math.BigInteger;
+import java.util.Collections;
 import java.util.Set;
 
 import org.xipki.audit.api.AuditLoggingService;
 import org.xipki.audit.api.AuditLoggingServiceRegister;
+import org.xipki.common.CertRevocationInfo;
 import org.xipki.common.HashAlgoType;
 import org.xipki.common.ParamChecker;
 import org.xipki.datasource.api.DataSourceFactory;
@@ -56,11 +58,14 @@ public abstract class CertStatusStore
     public abstract boolean canResolveIssuer(HashAlgoType hashAlgo, byte[] issuerNameHash, byte[] issuerKeyHash);
 
     public abstract CertStatusInfo getCertStatus(HashAlgoType hashAlgo, byte[] issuerNameHash,
-            byte[] issuerKeyHash, BigInteger serialNumber, Set<String> excludeCertprofiles)
+            byte[] issuerKeyHash, BigInteger serialNumber)
     throws CertStatusStoreException;
 
     public abstract void init(String conf, DataSourceFactory datasourceFactory, PasswordResolver passwordResolver)
     throws CertStatusStoreException;
+
+    public abstract CertRevocationInfo getCARevocationInfo(HashAlgoType hashAlgo, byte[] issuerNameHash,
+            byte[] issuerKeyHash);
 
     public abstract void shutdown()
     throws CertStatusStoreException;
@@ -72,11 +77,11 @@ public abstract class CertStatusStore
     private final String name;
     protected boolean unknownSerialAsGood;
     protected int retentionInterval;
-    protected boolean inheritCaRevocation;
     protected boolean includeArchiveCutoff;
     protected boolean includeCrlID;
     protected boolean includeCertHash;
     protected HashAlgoType certHashAlgorithm;
+    protected Set<String> excludeCertprofiles;
 
     protected AuditLoggingServiceRegister auditServiceRegister;
 
@@ -131,16 +136,6 @@ public abstract class CertStatusStore
         this.retentionInterval = retentionInterval;
     }
 
-    public boolean isInheritCaRevocation()
-    {
-        return inheritCaRevocation;
-    }
-
-    public void setInheritCaRevocation(boolean inheritCaRevocation)
-    {
-        this.inheritCaRevocation = inheritCaRevocation;
-    }
-
     public boolean isIncludeCrlID()
     {
         return includeCrlID;
@@ -169,6 +164,23 @@ public abstract class CertStatusStore
     public void setCertHashAlgorithm(HashAlgoType algorithm)
     {
         this.certHashAlgorithm = algorithm;
+    }
+
+    public Set<String> getExcludeCertProfiles()
+    {
+        return excludeCertprofiles;
+    }
+
+    public void setExcludeCertProfiles(Set<String> profiles)
+    {
+        if(profiles == null)
+        {
+            this.excludeCertprofiles = Collections.emptySet();
+        }
+        else
+        {
+            this.excludeCertprofiles = profiles;
+        }
     }
 
 }
