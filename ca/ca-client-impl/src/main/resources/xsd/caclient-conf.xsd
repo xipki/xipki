@@ -99,12 +99,18 @@
     <xs:sequence>
       <xs:element name="name" type="xs:string"/>
       <xs:element name="type" type="xs:string" minOccurs="0"/>
-      <xs:element name="conf" type="fileOrValueType" minOccurs="0"/>
+      <xs:element name="conf" type="fileOrPlainValueType" minOccurs="0"/>
     </xs:sequence>
   </xs:complexType>
   <xs:complexType name="fileOrValueType">
     <xs:choice>
       <xs:element name="value" type="xs:base64Binary"/>
+      <xs:element name="file" type="xs:string"/>
+    </xs:choice>
+  </xs:complexType>
+  <xs:complexType name="fileOrPlainValueType">
+    <xs:choice>
+      <xs:element name="value" type="xs:string"/>
       <xs:element name="file" type="xs:string"/>
     </xs:choice>
   </xs:complexType>
