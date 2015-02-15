@@ -2003,11 +2003,6 @@ class X509CA
             boolean keyUpdate)
     throws OperationException
     {
-        if(caInfo.getRevocationInfo() != null)
-        {
-            throw new OperationException(ErrorCode.System_Failure, "CA has been revoked");
-        }
-
         ConcurrentContentSigner signer = caInfo.getSigner();
         if(signer == null)
         {
@@ -2019,14 +2014,7 @@ class X509CA
             throw new OperationException(ErrorCode.NOT_PERMITTED, "CA is revoked");
         }
 
-        IdentifiedX509Certprofile certprofile;
-        try
-        {
-            certprofile = getX509Certprofile(certprofileName);
-        } catch (CertprofileException e)
-        {
-            throw new OperationException(ErrorCode.System_Failure, "invalid configuration of cert profile " + certprofileName);
-        }
+        IdentifiedX509Certprofile certprofile = getX509Certprofile(certprofileName);
 
         if(certprofile == null)
         {
@@ -2638,7 +2626,6 @@ class X509CA
     }
 
     public IdentifiedX509Certprofile getX509Certprofile(String certprofileName)
-    throws CertprofileException
     {
         if(certprofileName == null)
         {
