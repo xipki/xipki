@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog dbchangelog-3.0.xsd" logicalFilePath="ocsp-init.xml">
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog dbchangelog-3.0.xsd"
+  logicalFilePath="ocsp-init.xml">
   <changeSet author="xipki" id="1">
     <!-- table DBSCHEMAINFO -->
     <createTable tableName="DBSCHEMAINFO">
@@ -130,9 +133,21 @@
   </changeSet>
   <!-- foreign key -->
   <changeSet author="xipki" id="2">
-    <addForeignKeyConstraint deferrable="false" initiallyDeferred="false" onDelete="CASCADE" onUpdate="NO ACTION" baseColumnNames="ISSUER_ID" baseTableName="CERT" constraintName="FK_CERT_CAINFO1" referencedColumnNames="ID" referencedTableName="ISSUER"/>
-    <addForeignKeyConstraint deferrable="false" initiallyDeferred="false" onDelete="CASCADE" onUpdate="NO ACTION" baseColumnNames="CERT_ID" baseTableName="CERTHASH" constraintName="FK_CERTHASH_CERT1" referencedColumnNames="ID" referencedTableName="CERT"/>
-    <addForeignKeyConstraint deferrable="false" initiallyDeferred="false" onDelete="CASCADE" onUpdate="NO ACTION" baseColumnNames="CERT_ID" baseTableName="RAWCERT" constraintName="FK_RAWCERT_CERT1" referencedColumnNames="ID" referencedTableName="CERT"/>
+    <addForeignKeyConstraint constraintName="FK_CERT_CAINFO1"
+      deferrable="false" initiallyDeferred="false"
+      onDelete="NO ACTION" onUpdate="NO ACTION"
+      baseColumnNames="ISSUER_ID" baseTableName="CERT"
+      referencedColumnNames="ID" referencedTableName="ISSUER"/>
+    <addForeignKeyConstraint baseColumnNames="CERT_ID"
+      deferrable="false" initiallyDeferred="false"
+      onDelete="CASCADE" onUpdate="NO ACTION"
+      baseTableName="CERTHASH" constraintName="FK_CERTHASH_CERT1"
+      referencedColumnNames="ID" referencedTableName="CERT"/>
+    <addForeignKeyConstraint constraintName="FK_RAWCERT_CERT1"
+      deferrable="false" initiallyDeferred="false"
+      onDelete="CASCADE" onUpdate="NO ACTION"
+      baseColumnNames="CERT_ID" baseTableName="RAWCERT"
+      referencedColumnNames="ID" referencedTableName="CERT"/>
   </changeSet>
   <changeSet author="xipki" id="3" dbms="mysql">
     <createTable tableName="SEQ_TBL">

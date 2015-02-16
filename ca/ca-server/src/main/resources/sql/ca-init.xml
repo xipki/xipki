@@ -462,27 +462,27 @@
   <changeSet author="xipki" id="6">
     <addForeignKeyConstraint constraintName="FK_CRL_CAINFO1"
       deferrable="false" initiallyDeferred="false"
-      onDelete="CASCADE" onUpdate="NO ACTION"
+      onDelete="NO ACTION" onUpdate="NO ACTION"
       baseColumnNames="CA_ID" baseTableName="CRL"
       referencedColumnNames="ID" referencedTableName="CAINFO"/>
     <addForeignKeyConstraint constraintName="FK_CERT_CAINFO1"
       deferrable="false" initiallyDeferred="false"
-      onDelete="CASCADE" onUpdate="NO ACTION"
+      onDelete="NO ACTION" onUpdate="NO ACTION"
       baseColumnNames="CA_ID" baseTableName="CERT"
       referencedColumnNames="ID" referencedTableName="CAINFO"/>
     <addForeignKeyConstraint constraintName="FK_CERT_REQUESTORINFO1"
       deferrable="false" initiallyDeferred="false"
-      onDelete="CASCADE" onUpdate="NO ACTION"
+      onDelete="NO ACTION" onUpdate="NO ACTION"
       baseColumnNames="REQUESTOR_ID" baseTableName="CERT"
       referencedColumnNames="ID" referencedTableName="REQUESTORINFO"/>
     <addForeignKeyConstraint constraintName="FK_CERT_USER1"
       deferrable="false" initiallyDeferred="false"
-      onDelete="CASCADE" onUpdate="NO ACTION"
+      onDelete="NO ACTION" onUpdate="NO ACTION"
       baseColumnNames="USER_ID" baseTableName="CERT"
       referencedColumnNames="ID" referencedTableName="USERNAME"/>
     <addForeignKeyConstraint constraintName="FK_CERT_CERTPROFILEINFO1"
       deferrable="false" initiallyDeferred="false"
-      onDelete="CASCADE" onUpdate="NO ACTION"
+      onDelete="NO ACTION" onUpdate="NO ACTION"
       baseColumnNames="CERTPROFILE_ID" baseTableName="CERT"
       referencedColumnNames="ID" referencedTableName="CERTPROFILEINFO"/>
     <addForeignKeyConstraint constraintName="FK_RAWCERT_CERT1"
