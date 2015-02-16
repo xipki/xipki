@@ -53,7 +53,7 @@ public abstract class CaAddOrGenCommand extends CaCommand
     protected String caName;
 
     @Option(name = "-status",
-            description = "CA status, active|pending|deactivated")
+            description = "CA status, active|inactive")
     protected String caStatus = "active";
 
     @Option(name = "-ocspUri",

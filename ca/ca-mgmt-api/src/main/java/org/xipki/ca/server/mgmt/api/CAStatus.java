@@ -41,7 +41,6 @@ package org.xipki.ca.server.mgmt.api;
 
 public enum CAStatus
 {
-    PENDING("pending"),
     ACTIVE ("active"),
     INACTIVE ("inactive");
 
