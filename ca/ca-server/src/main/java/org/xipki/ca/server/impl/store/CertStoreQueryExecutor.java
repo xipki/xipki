@@ -783,7 +783,7 @@ class CertStoreQueryExecutor
 
         try
         {
-            long id = dataSource.nextSeqValue("DCC_ID");
+            long id = nextDccId();
             ps = borrowPreparedStatement(SQL);
             int idx = 1;
             ps.setLong(idx++, id);
@@ -2396,13 +2396,20 @@ class CertStoreQueryExecutor
     long nextSerial(X509CertWithId caCert, String seqName)
     throws SQLException
     {
-        while(true)
+        Connection conn = dataSource.getConnection();
+        try
         {
-            long serial = dataSource.nextSeqValue(seqName);
-            if(certExists(caCert, serial) == false)
+            while(true)
             {
-                return serial;
+                long serial = dataSource.nextSeqValue(conn, seqName);
+                if(certExists(caCert, serial) == false)
+                {
+                    return serial;
+                }
             }
+        } finally
+        {
+            dataSource.returnConnection(conn);
         }
     }
 
@@ -2414,10 +2421,30 @@ class CertStoreQueryExecutor
         {
             while(true)
             {
-                int certId = (int) dataSource.nextSeqValue("CERT_ID");
+                int certId = (int) dataSource.nextSeqValue(conn, "CERT_ID");
                 if(dataSource.columnExists(conn, "CERT", "ID", certId) == false)
                 {
                     return certId;
+                }
+            }
+        } finally
+        {
+            dataSource.returnConnection(conn);
+        }
+    }
+
+    private long nextDccId()
+    throws SQLException
+    {
+        Connection conn = dataSource.getConnection();
+        try
+        {
+            while(true)
+            {
+                long id = dataSource.nextSeqValue(conn, "DCC_ID");
+                if(dataSource.columnExists(conn, "DELTACRL_CACHE", "ID", id) == false)
+                {
+                    return id;
                 }
             }
         } finally
@@ -2453,6 +2480,67 @@ class CertStoreQueryExecutor
                 return false;
             }
         }finally
+        {
+            dataSource.releaseResources(ps, rs);
+        }
+    }
+
+    void deleteCertInProcess(String fpKey, String fpSubject)
+    throws SQLException
+    {
+        final String sql = "DELETE FROM CERT_IN_PROCESS WHERE SHA1_PK=? AND SHA1_SUBJECT=?";
+        PreparedStatement ps = borrowPreparedStatement(sql);
+        ResultSet rs = null;
+        try
+        {
+            ps.setString(1, fpKey);
+            ps.setString(2, fpSubject);
+            ps.executeUpdate();
+        } finally
+        {
+            dataSource.releaseResources(ps, rs);
+        }
+    }
+
+    boolean addCertInProcess(String fpKey, String fpSubject)
+    throws SQLException
+    {
+        final String sql = "INSERT INTO CERT_IN_PROCESS (SHA1_PK, SHA1_SUBJECT, TIME2) VALUES (?, ?, ?)";
+        PreparedStatement ps = borrowPreparedStatement(sql);
+        ResultSet rs = null;
+        try
+        {
+            ps.setString(1, fpKey);
+            ps.setString(2, fpSubject);
+            ps.setLong(3, System.currentTimeMillis() / 1000);
+            try
+            {
+                ps.executeUpdate();
+            }catch(SQLException e)
+            {
+                if(dataSource.isDuplicateKeyException(e) || dataSource.isDataIntegrityViolation(e))
+                {
+                    return false;
+                }
+            }
+            return true;
+        } finally
+        {
+            dataSource.releaseResources(ps, rs);
+        }
+    }
+
+    void deleteCertsInProcessOlderThan(Date time)
+    throws SQLException
+    {
+        final String sql = "DELETE FROM CERT_IN_PROCESS WHERE TIME2 < ?";
+        PreparedStatement ps = borrowPreparedStatement(sql);
+        ResultSet rs = null;
+        try
+        {
+            ps.setLong(1, time.getTime() / 1000);
+            ps.executeUpdate();
+        } finally
         {
             dataSource.releaseResources(ps, rs);
         }

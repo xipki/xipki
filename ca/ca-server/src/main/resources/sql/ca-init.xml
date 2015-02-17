@@ -385,6 +385,17 @@
         <constraints nullable="false"/>
       </column>
     </createTable>
+    <createTable tableName="CERT_IN_PROCESS">
+      <column name="SHA1_PK" type="CHAR(40)">
+        <constraints primaryKey="true"/>
+      </column>
+      <column name="SHA1_SUBJECT" type="CHAR(40)">
+        <constraints primaryKey="true"/>
+      </column>
+      <column name="TIME2" remarks="seconds since January 1, 1970, 00:00:00 GMT" type="BIGINT">
+        <constraints nullable="false"/>
+      </column>
+    </createTable>
   </changeSet>
   <changeSet author="xipki" id="3" dbms="mysql">
     <createTable tableName="SEQ_TBL">

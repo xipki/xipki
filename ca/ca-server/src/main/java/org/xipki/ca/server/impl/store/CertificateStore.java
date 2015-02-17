@@ -732,4 +732,22 @@ public class CertificateStore
             throw new OperationException(ErrorCode.System_Failure, e.getMessage());
         }
     }
+
+    public boolean addCertInProcess(String fpKey, String fpSubject)
+    throws SQLException
+    {
+        return queryExecutor.addCertInProcess(fpKey, fpSubject);
+    }
+
+    public void delteCertInProcess(String fpKey, String fpSubject)
+    throws SQLException
+    {
+        queryExecutor.deleteCertInProcess(fpKey, fpSubject);
+    }
+
+    public void deleteCertsInProcessOlderThan(Date time)
+    throws SQLException
+    {
+        queryExecutor.deleteCertsInProcessOlderThan(time);
+    }
 }

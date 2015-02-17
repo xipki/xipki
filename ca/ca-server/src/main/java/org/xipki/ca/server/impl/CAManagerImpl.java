@@ -166,6 +166,41 @@ implements CAManager, CmpResponderManager
         }
     }
 
+    private class ScheduledDeleteCertsInProcessService implements Runnable
+    {
+        private boolean inProcess = false;
+        @Override
+        public void run()
+        {
+            if(inProcess)
+            {
+                return;
+            }
+
+            inProcess = true;
+            try
+            {
+                try
+                {
+                    // older than 10 minutes
+                    certstore.deleteCertsInProcessOlderThan(new Date(System.currentTimeMillis() - 10 * 60 * 1000L));
+                } catch (Throwable t)
+                {
+                    final String message = "Could not call certstore.deleteCertsInProcessOlderThan";
+                    if(LOG.isErrorEnabled())
+                    {
+                        LOG.error(LogUtil.buildExceptionLogFormat(message), t.getClass().getName(), t.getMessage());
+                    }
+                    LOG.debug(message, t);
+                }
+            } finally
+            {
+                inProcess = false;
+            }
+
+        }
+    }
+
     private class ScheduledCARestarter implements Runnable
     {
         private boolean inProcess = false;
@@ -733,8 +768,10 @@ implements CAManager, CmpResponderManager
                 int len = sb.length();
                 sb.delete(len - 2, len);
 
-                ScheduledPublishQueueCleaner publishQueueCleaner = new ScheduledPublishQueueCleaner();
-                scheduledThreadPoolExecutor.scheduleAtFixedRate(publishQueueCleaner, 120, 120, TimeUnit.SECONDS);
+                scheduledThreadPoolExecutor.scheduleAtFixedRate(new ScheduledPublishQueueCleaner(),
+                        120, 120, TimeUnit.SECONDS);
+                scheduledThreadPoolExecutor.scheduleAtFixedRate(new ScheduledDeleteCertsInProcessService(),
+                        120, 120, TimeUnit.SECONDS);
             }
             else
             {
