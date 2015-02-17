@@ -123,13 +123,17 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
         }
 
         @Override
-        public long nextSeqValue(String sequenceName)
+        public long nextSeqValue(Connection conn, String sequenceName)
         throws SQLException
         {
             final String sqlUpdate = buildNextSeqValueSql(sequenceName);
             final String SQL_SELECT = "SELECT @cur_value";
 
-            Connection conn = getConnection();
+            boolean newConn = conn == null;
+            if(newConn)
+            {
+                conn = getConnection();
+            }
             Statement stmt = conn.createStatement();
             ResultSet rs = null;
 
@@ -147,7 +151,14 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
                 }
             }finally
             {
-                releaseResources(stmt, rs);
+                if(newConn)
+                {
+                    releaseResources(stmt, rs);
+                }
+                else
+                {
+                    super.releaseStatementAndResultSet(stmt, rs);
+                }
             }
 
             LOG.debug("datasource {} NEXVALUE({}): {}", name, sequenceName, ret);
@@ -1050,11 +1061,15 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
     }
 
     @Override
-    public long nextSeqValue(String sequenceName)
+    public long nextSeqValue(Connection conn, String sequenceName)
     throws SQLException
     {
         String sql = buildNextSeqValueSql(sequenceName);
-        Connection conn = getConnection();
+        boolean newConn = conn == null;
+        if(newConn)
+        {
+            conn = getConnection();
+        }
         Statement stmt = conn.createStatement();
         ResultSet rs = null;
 
@@ -1071,7 +1086,14 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
             }
         }finally
         {
-            releaseResources(stmt, rs);
+            if(newConn)
+            {
+                releaseResources(stmt, rs);
+            }
+            else
+            {
+                releaseStatementAndResultSet(stmt, rs);
+            }
         }
 
         LOG.debug("datasource {} NEXVALUE({}): {}", name, sequenceName, ret);

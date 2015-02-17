@@ -97,7 +97,7 @@ public interface DataSourceWrapper
     void dropSequence(String sequenceName)
     throws SQLException;
 
-    long nextSeqValue(String sequenceName)
+    long nextSeqValue(Connection conn, String sequenceName)
     throws SQLException;
 
     boolean isDuplicateKeyException(SQLException sqlException);
