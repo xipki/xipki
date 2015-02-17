@@ -79,12 +79,12 @@ class OcspCertStoreDbImporter extends DbPorter
             "INSERT INTO ISSUER (" +
             " ID, SUBJECT," +
             " NOTBEFORE, NOTAFTER," +
-            " SHA1_FP_NAME, SHA1_FP_KEY," +
-            " SHA224_FP_NAME, SHA224_FP_KEY," +
-            " SHA256_FP_NAME, SHA256_FP_KEY," +
-            " SHA384_FP_NAME, SHA384_FP_KEY," +
-            " SHA512_FP_NAME, SHA512_FP_KEY," +
-            " SHA1_FP_CERT, CERT," +
+            " SHA1_NAME, SHA1_KEY," +
+            " SHA224_NAME, SHA224_KEY," +
+            " SHA256_NAME, SHA256_KEY," +
+            " SHA384_NAME, SHA384_KEY," +
+            " SHA512_NAME, SHA512_KEY," +
+            " SHA1_CERT, CERT," +
             " REVOKED, REV_REASON, REV_TIME, REV_INVALIDITY_TIME" +
             " ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
@@ -96,7 +96,7 @@ class OcspCertStoreDbImporter extends DbPorter
             " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
     static final String SQL_ADD_CERTHASH = "INSERT INTO CERTHASH (" +
-            "CERT_ID, SHA1_FP, SHA224_FP, SHA256_FP, SHA384_FP, SHA512_FP)" +
+            "CERT_ID, SHA1, SHA224, SHA256, SHA384, SHA512)" +
             " VALUES (?, ?, ?, ?, ?, ?)";
 
     static final String SQL_ADD_RAWCERT = "INSERT INTO RAWCERT (CERT_ID, CERT) VALUES (?, ?)";
