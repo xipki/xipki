@@ -517,7 +517,7 @@ class OcspCertStoreFromCaDbImporter extends DbPorter
 
                 // cert
                 String seqName = "CERT_ID";
-                int currentId = (int) dataSource.nextSeqValue(seqName);
+                int currentId = (int) dataSource.nextSeqValue(null, seqName);
 
                 int idx = 1;
                 ps_cert.setInt(idx++, currentId);
