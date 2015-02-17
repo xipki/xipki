@@ -355,9 +355,9 @@ class OcspCertStoreDbExporter extends DbPorter
                         continue;
                     }
 
-                    String sha1_fp_cert = SecurityUtil.sha1sum(certBytes);
+                    String sha1_cert = SecurityUtil.sha1sum(certBytes);
 
-                    ZipEntry certZipEntry = new ZipEntry(sha1_fp_cert + ".der");
+                    ZipEntry certZipEntry = new ZipEntry(sha1_cert + ".der");
                     currentCertsZip.putNextEntry(certZipEntry);
                     try
                     {
@@ -395,7 +395,7 @@ class OcspCertStoreDbExporter extends DbPorter
                         cert.setRevTime(rev_time);
                         cert.setRevInvalidityTime(rev_invalidity_time);
                     }
-                    cert.setCertFile(sha1_fp_cert + ".der");
+                    cert.setCertFile(sha1_cert + ".der");
 
                     String profile = rs.getString("PROFILE");
                     cert.setProfile(profile);

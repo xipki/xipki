@@ -103,10 +103,10 @@ class CaCertStoreDbImporter extends DbPorter
             "(ID, ART, LAST_UPDATE, SERIAL, SUBJECT,"
             + " NOTBEFORE, NOTAFTER, REVOKED, REV_REASON, REV_TIME, REV_INVALIDITY_TIME,"
             + " CERTPROFILE_ID, CA_ID,"
-            + " REQUESTOR_ID, USER_ID, SHA1_FP_PK, SHA1_FP_SUBJECT, EE)" +
+            + " REQUESTOR_ID, USER_ID, SHA1_PK, SHA1_SUBJECT, EE)" +
             " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
-    private static final String SQL_ADD_RAWCERT = "INSERT INTO RAWCERT (CERT_ID, SHA1_FP, CERT) VALUES (?, ?, ?)";
+    private static final String SQL_ADD_RAWCERT = "INSERT INTO RAWCERT (CERT_ID, SHA1, CERT) VALUES (?, ?, ?)";
 
     private static final String SQL_ADD_USER = "INSERT INTO USERNAME (ID, NAME) VALUES (?, ?)";
 
@@ -190,7 +190,7 @@ class CaCertStoreDbImporter extends DbPorter
     {
         final String SQL_ADD_CAINFO =
                 "INSERT INTO CAINFO" +
-                " (ID, SUBJECT, SHA1_FP_CERT, CERT)" +
+                " (ID, SUBJECT, SHA1_CERT, CERT)" +
                 " VALUES (?, ?, ?, ?)";
 
         System.out.println("Importing table CAINFO");

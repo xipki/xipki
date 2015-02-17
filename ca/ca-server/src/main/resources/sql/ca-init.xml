@@ -22,9 +22,13 @@
       <column name="NAME" type="VARCHAR(45)">
         <constraints primaryKey="true" nullable="false"/>
       </column>
-      <column name="EVENT_TIME" remarks="seconds since January 1, 1970, 00:00:00 GMT" type="BIGINT"/>
+      <column name="EVENT_TIME" remarks="seconds since January 1, 1970, 00:00:00 GMT" type="BIGINT">
+        <constraints nullable="false"/>
+      </column>
       <column name="EVENT_TIME2" type="TIMESTAMP"/>
-      <column name="EVENT_OWNER" type="VARCHAR(255)"/>
+      <column name="EVENT_OWNER" type="VARCHAR(255)">
+        <constraints nullable="false"/>
+      </column>
     </createTable>
     <!-- table CMPCONTROL -->
     <createTable tableName="CMPCONTROL">
@@ -224,7 +228,7 @@
       <column name="CERT" type="VARCHAR(3000)">
         <constraints nullable="false"/>
       </column>
-      <column name="SHA1_FP_CERT" type="CHAR(40)">
+      <column name="SHA1_CERT" type="CHAR(40)">
         <constraints nullable="false"/>
       </column>
     </createTable>
@@ -331,26 +335,26 @@
         <constraints nullable="false"/>
       </column>
       <column name="USER_ID" type="INT"/>
-      <column name="SHA1_FP_PK" type="CHAR(40)">
+      <column name="SHA1_PK" type="CHAR(40)">
         <constraints nullable="false"/>
       </column>
-      <column name="SHA1_FP_SUBJECT" type="CHAR(40)">
+      <column name="SHA1_SUBJECT" type="CHAR(40)">
         <constraints nullable="false"/>
       </column>
     </createTable>
     <addUniqueConstraint tableName="CERT" columnNames="CA_ID, SERIAL" constraintName="CONST_CA_SERIAL"/>
     <createIndex tableName="CERT" unique="false" indexName="IDX_FP_PK">
-      <column name="SHA1_FP_PK"/>
+      <column name="SHA1_PK"/>
     </createIndex>
     <createIndex tableName="CERT" unique="false" indexName="IDX_FP_SUBJECT">
-      <column name="SHA1_FP_SUBJECT"/>
+      <column name="SHA1_SUBJECT"/>
     </createIndex>
     <!-- table RAWCERT -->
     <createTable tableName="RAWCERT">
       <column name="CERT_ID" type="INT">
         <constraints primaryKey="true" nullable="false"/>
       </column>
-      <column name="SHA1_FP" type="VARCHAR(40)">
+      <column name="SHA1" type="VARCHAR(40)">
         <constraints nullable="false"/>
       </column>
       <column name="CERT" remarks="Base64 encoded certificate" type="VARCHAR(3000)">

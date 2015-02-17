@@ -149,7 +149,7 @@ public class DbCertStatusStore extends CertStatusStore
         {
             if(initialized)
             {
-                final String sql = "SELECT ID, REVOKED, REV_TIME, SHA1_FP_CERT FROM ISSUER";
+                final String sql = "SELECT ID, REVOKED, REV_TIME, SHA1_CERT FROM ISSUER";
                 PreparedStatement ps = borrowPreparedStatement(sql);
                 ResultSet rs = null;
 
@@ -160,7 +160,7 @@ public class DbCertStatusStore extends CertStatusStore
                     rs = ps.executeQuery();
                     while(rs.next())
                     {
-                        String sha1Fp = rs.getString("SHA1_FP_CERT");
+                        String sha1Fp = rs.getString("SHA1_CERT");
                         if(issuerFilter.includeIssuerWithSha1Fp(sha1Fp) == false)
                         {
                                 continue;
@@ -224,12 +224,12 @@ public class DbCertStatusStore extends CertStatusStore
                     HashAlgoType.SHA384, HashAlgoType.SHA512};
 
             StringBuilder sb = new StringBuilder();
-            sb.append("SELECT ID, NOTBEFORE, REVOKED, REV_TIME, SHA1_FP_CERT");
+            sb.append("SELECT ID, NOTBEFORE, REVOKED, REV_TIME, SHA1_CERT");
             for(HashAlgoType hashAlgoType : hashAlgoTypes)
             {
                 String hashAlgo = hashAlgoType.name().toUpperCase();
-                sb.append(", ").append(hashAlgo).append("_FP_NAME");
-                sb.append(", ").append(hashAlgo).append("_FP_KEY");
+                sb.append(", ").append(hashAlgo).append("_NAME");
+                sb.append(", ").append(hashAlgo).append("_KEY");
             };
             sb.append(" FROM ISSUER");
 
@@ -243,7 +243,7 @@ public class DbCertStatusStore extends CertStatusStore
                 List<IssuerEntry> caInfos = new LinkedList<>();
                 while(rs.next())
                 {
-                    String sha1Fp = rs.getString("SHA1_FP_CERT");
+                    String sha1Fp = rs.getString("SHA1_CERT");
                     if(issuerFilter.includeIssuerWithSha1Fp(sha1Fp) == false)
                     {
                         continue;
@@ -256,8 +256,8 @@ public class DbCertStatusStore extends CertStatusStore
                     for(HashAlgoType hashAlgoType : hashAlgoTypes)
                     {
                         String hashAlgo = hashAlgoType.name().toUpperCase();
-                        String hash_name = rs.getString(hashAlgo + "_FP_NAME");
-                        String hash_key = rs.getString(hashAlgo + "_FP_KEY");
+                        String hash_name = rs.getString(hashAlgo + "_NAME");
+                        String hash_key = rs.getString(hashAlgo + "_KEY");
                         byte[] hashNameBytes = Hex.decode(hash_name);
                         byte[] hashKeyBytes = Hex.decode(hash_key);
                         IssuerHashNameAndKey hash = new IssuerHashNameAndKey(
@@ -463,7 +463,7 @@ public class DbCertStatusStore extends CertStatusStore
     private byte[] getCertHash(int certId, HashAlgoType hashAlgo)
     throws SQLException
     {
-        final String sql = hashAlgo.name().toUpperCase() + "_FP FROM CERTHASH WHERE CERT_ID=?";
+        final String sql = hashAlgo.name().toUpperCase() + " FROM CERTHASH WHERE CERT_ID=?";
         ResultSet rs = null;
         PreparedStatement ps = borrowPreparedStatement(
                 dataSource.createFetchFirstSelectSQL(sql, 1));

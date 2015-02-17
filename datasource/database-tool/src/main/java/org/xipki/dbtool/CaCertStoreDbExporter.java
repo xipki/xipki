@@ -683,9 +683,9 @@ class CaCertStoreDbExporter extends DbPorter
                         continue;
                     }
 
-                    String sha1_fp_cert = SecurityUtil.sha1sum(certBytes);
+                    String sha1_cert = SecurityUtil.sha1sum(certBytes);
 
-                    ZipEntry certZipEntry = new ZipEntry(sha1_fp_cert + ".der");
+                    ZipEntry certZipEntry = new ZipEntry(sha1_cert + ".der");
                     currentCertsZip.putNextEntry(certZipEntry);
                     try
                     {
@@ -745,7 +745,7 @@ class CaCertStoreDbExporter extends DbPorter
                     {
                         cert.setUserId(user_id);
                     }
-                    cert.setCertFile(sha1_fp_cert + ".der");
+                    cert.setCertFile(sha1_cert + ".der");
 
                     certsInCurrentFile.getCert().add(cert);
                     numCertsInCurrentFile ++;

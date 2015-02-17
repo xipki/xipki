@@ -27,37 +27,37 @@
       <column name="NOTAFTER" type="BIGINT" remarks="seconds since January 1, 1970, 00:00:00 GMT">
         <constraints nullable="false"/>
       </column>
-      <column name="SHA1_FP_NAME" type="CHAR(40)">
+      <column name="SHA1_NAME" type="CHAR(40)">
         <constraints nullable="false"/>
       </column>
-      <column name="SHA1_FP_KEY" type="CHAR(40)">
+      <column name="SHA1_KEY" type="CHAR(40)">
         <constraints nullable="false"/>
       </column>
-      <column name="SHA224_FP_NAME" type="CHAR(56)">
+      <column name="SHA224_NAME" type="CHAR(56)">
         <constraints nullable="false"/>
       </column>
-      <column name="SHA224_FP_KEY" type="CHAR(56)">
+      <column name="SHA224_KEY" type="CHAR(56)">
         <constraints nullable="false"/>
       </column>
-      <column name="SHA256_FP_NAME" type="CHAR(64)">
+      <column name="SHA256_NAME" type="CHAR(64)">
         <constraints nullable="false"/>
       </column>
-      <column name="SHA256_FP_KEY" type="CHAR(64)">
+      <column name="SHA256_KEY" type="CHAR(64)">
         <constraints nullable="false"/>
       </column>
-      <column name="SHA384_FP_NAME" type="CHAR(96)">
+      <column name="SHA384_NAME" type="CHAR(96)">
         <constraints nullable="false"/>
       </column>
-      <column name="SHA384_FP_KEY" type="CHAR(96)">
+      <column name="SHA384_KEY" type="CHAR(96)">
         <constraints nullable="false"/>
       </column>
-      <column name="SHA512_FP_NAME" type="CHAR(128)">
+      <column name="SHA512_NAME" type="CHAR(128)">
         <constraints nullable="false"/>
       </column>
-      <column name="SHA512_FP_KEY" type="CHAR(128)">
+      <column name="SHA512_KEY" type="CHAR(128)">
         <constraints nullable="false"/>
       </column>
-      <column name="SHA1_FP_CERT" type="CHAR(40)">
+      <column name="SHA1_CERT" type="CHAR(40)">
         <constraints nullable="false"/>
       </column>
       <column defaultValueNumeric="0" name="REVOKED" type="SMALLINT"/>
@@ -105,19 +105,19 @@
       <column name="CERT_ID" type="INT">
         <constraints primaryKey="true" nullable="false"/>
       </column>
-      <column name="SHA1_FP" type="CHAR(40)">
+      <column name="SHA1" type="CHAR(40)">
         <constraints nullable="false"/>
       </column>
-      <column name="SHA224_FP" type="CHAR(56)">
+      <column name="SHA224" type="CHAR(56)">
         <constraints nullable="false"/>
       </column>
-      <column name="SHA256_FP" type="CHAR(64)">
+      <column name="SHA256" type="CHAR(64)">
         <constraints nullable="false"/>
       </column>
-      <column name="SHA384_FP" type="CHAR(96)">
+      <column name="SHA384" type="CHAR(96)">
         <constraints nullable="false"/>
       </column>
-      <column name="SHA512_FP" type="CHAR(128)">
+      <column name="SHA512" type="CHAR(128)">
         <constraints nullable="false"/>
       </column>
     </createTable>

@@ -120,7 +120,7 @@ class CertStoreQueryExecutor
     throws SQLException
     {
         final String SQL_GET_CAINFO =
-                new StringBuilder("SELECT ID, SUBJECT, SHA1_FP_CERT, CERT FROM ").append(table).toString();
+                new StringBuilder("SELECT ID, SUBJECT, SHA1_CERT, CERT FROM ").append(table).toString();
         ResultSet rs = null;
         PreparedStatement ps = borrowPreparedStatement(SQL_GET_CAINFO);
         try
@@ -131,7 +131,7 @@ class CertStoreQueryExecutor
             {
                 int id = rs.getInt("ID");
                 String subject = rs.getString("SUBJECT");
-                String hexSha1Fp = rs.getString("SHA1_FP_CERT");
+                String hexSha1Fp = rs.getString("SHA1_CERT");
                 String b64Cert = rs.getString("CERT");
 
                 CertBasedIdentityEntry caInfoEntry = new CertBasedIdentityEntry(id, subject, hexSha1Fp, b64Cert);
@@ -187,10 +187,10 @@ class CertStoreQueryExecutor
         final String SQL_ADD_CERT =
                 "INSERT INTO CERT" +
                 " (ID, ART, LAST_UPDATE, SERIAL, SUBJECT, NOTBEFORE, NOTAFTER, REVOKED, CERTPROFILE_ID," +
-                " CA_ID, REQUESTOR_ID, USER_ID, SHA1_FP_PK, SHA1_FP_SUBJECT, EE)" +
+                " CA_ID, REQUESTOR_ID, USER_ID, SHA1_PK, SHA1_SUBJECT, EE)" +
                 " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
-        final String SQL_ADD_RAWCERT = "INSERT INTO RAWCERT (CERT_ID, SHA1_FP, CERT) VALUES (?, ?, ?)";
+        final String SQL_ADD_RAWCERT = "INSERT INTO RAWCERT (CERT_ID, SHA1, CERT) VALUES (?, ?, ?)";
 
         Integer userId = (user == null) ? null : getUserId(user);
         int certId = nextCertId();
@@ -1702,7 +1702,7 @@ class CertStoreQueryExecutor
         }
 
         final String sql = dataSource.createFetchFirstSelectSQL(
-                "REVOKED FROM CERT WHERE SHA1_FP_SUBJECT=? AND CA_ID=?", 1);
+                "REVOKED FROM CERT WHERE SHA1_SUBJECT=? AND CA_ID=?", 1);
         ResultSet rs = null;
         PreparedStatement ps = borrowPreparedStatement(sql);
 
@@ -1739,7 +1739,7 @@ class CertStoreQueryExecutor
         }
 
         final String sql = dataSource.createFetchFirstSelectSQL(
-                "COUNT(ID) FROM CERT WHERE SHA1_FP_SUBJECT=? AND CA_ID=?", 1);
+                "COUNT(ID) FROM CERT WHERE SHA1_SUBJECT=? AND CA_ID=?", 1);
 
         ResultSet rs = null;
         PreparedStatement ps = borrowPreparedStatement(sql);
@@ -1782,7 +1782,7 @@ class CertStoreQueryExecutor
         }
 
         String sql =
-                "ID, REVOKED FROM CERT WHERE SHA1_FP_PK=? AND SHA1_FP_SUBJECT=? AND CA_ID=? AND CERTPROFILE_ID=?";
+                "ID, REVOKED FROM CERT WHERE SHA1_PK=? AND SHA1_SUBJECT=? AND CA_ID=? AND CERTPROFILE_ID=?";
         sql = dataSource.createFetchFirstSelectSQL(sql, 1, "ID DESC");
         ResultSet rs = null;
         PreparedStatement ps = borrowPreparedStatement(sql);
@@ -1814,13 +1814,13 @@ class CertStoreQueryExecutor
     boolean isCertForSubjectIssued(X509CertWithId caCert, String subjectFp, String profile)
     throws SQLException
     {
-        return isCertIssuedForFp("SHA1_FP_SUBJECT", caCert, subjectFp, profile);
+        return isCertIssuedForFp("SHA1_SUBJECT", caCert, subjectFp, profile);
     }
 
     boolean isCertForKeyIssued(X509CertWithId caCert, String keyFp, String profile)
     throws SQLException
     {
-        return isCertIssuedForFp("SHA1_FP_PK", caCert, keyFp, profile);
+        return isCertIssuedForFp("SHA1_PK", caCert, keyFp, profile);
     }
 
     private boolean isCertIssuedForFp(String fpColumnName, X509CertWithId caCert,
@@ -1909,7 +1909,7 @@ class CertStoreQueryExecutor
         int id = (int) maxId + 1;
 
         final String SQL_ADD_CAINFO = new StringBuilder("INSERT INTO ").append(tblName)
-                .append(" (ID, SUBJECT, SHA1_FP_CERT, CERT)").append(" VALUES (?, ?, ?, ?)").toString();
+                .append(" (ID, SUBJECT, SHA1_CERT, CERT)").append(" VALUES (?, ?, ?, ?)").toString();
         PreparedStatement ps = borrowPreparedStatement(SQL_ADD_CAINFO);
 
         try
