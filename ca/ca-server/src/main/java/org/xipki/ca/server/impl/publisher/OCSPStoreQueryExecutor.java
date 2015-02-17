@@ -676,7 +676,7 @@ class OCSPStoreQueryExecutor
         dataSource.releaseResources(ps, rs);
     }
 
-    int nextCertId()
+    private int nextCertId()
     throws SQLException
     {
         Connection conn = dataSource.getConnection();
@@ -684,7 +684,7 @@ class OCSPStoreQueryExecutor
         {
             while(true)
             {
-                int certId = (int) dataSource.nextSeqValue("CERT_ID");
+                int certId = (int) dataSource.nextSeqValue(conn, "CERT_ID");
                 if(dataSource.columnExists(conn, "CERT", "ID", certId) == false)
                 {
                     return certId;

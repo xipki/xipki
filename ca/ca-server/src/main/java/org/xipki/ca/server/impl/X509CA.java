@@ -57,16 +57,13 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.SimpleTimeZone;
 import java.util.TimeZone;
 import java.util.concurrent.ConcurrentLinkedDeque;
-import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import org.bouncycastle.asn1.ASN1EncodableVector;
 import org.bouncycastle.asn1.ASN1GeneralizedTime;
@@ -125,10 +122,10 @@ import org.xipki.ca.server.mgmt.api.CAHasRequestorEntry;
 import org.xipki.ca.server.mgmt.api.CAMgmtException;
 import org.xipki.ca.server.mgmt.api.CAStatus;
 import org.xipki.ca.server.mgmt.api.CRLControl;
-import org.xipki.ca.server.mgmt.api.DuplicationMode;
-import org.xipki.ca.server.mgmt.api.ValidityMode;
 import org.xipki.ca.server.mgmt.api.CRLControl.HourMinute;
 import org.xipki.ca.server.mgmt.api.CRLControl.UpdateMode;
+import org.xipki.ca.server.mgmt.api.DuplicationMode;
+import org.xipki.ca.server.mgmt.api.ValidityMode;
 import org.xipki.common.CRLReason;
 import org.xipki.common.CertRevocationInfo;
 import org.xipki.common.CustomObjectIdentifiers;
@@ -545,14 +542,9 @@ class X509CA
     private Boolean tryXipkiNSStoVerify;
     private AtomicBoolean crlGenInProcess = new AtomicBoolean(false);
 
-    private final ConcurrentSkipListMap<String, List<String>> pendingSubjectMap =
-            new ConcurrentSkipListMap<>();
-    private final ConcurrentSkipListMap<String, List<String>> pendingKeyMap =
-            new ConcurrentSkipListMap<>();
     private final ConcurrentLinkedDeque<RemoveExpiredCertsInfo> removeExpiredCertsQueue =
             new ConcurrentLinkedDeque<>();
 
-    private final AtomicInteger numActiveRevocations = new AtomicInteger(0);
     private AuditLoggingServiceRegister serviceRegister;
 
     public X509CA(
@@ -1356,18 +1348,6 @@ class X509CA
 
         caInfo.setStatus(CAStatus.INACTIVE);
 
-        // wait till no certificate request in process
-        while(pendingSubjectMap.isEmpty() == false || numActiveRevocations.get() > 0)
-        {
-            LOG.info("Certificate requests are still in process, wait 1 second");
-            try
-            {
-                Thread.sleep(MS_PER_SECOND);
-            }catch(InterruptedException e)
-            {
-            }
-        }
-
         boolean allPublishersOnlyForRevokedCerts = true;
         for(IdentifiedX509CertPublisher publisher : publishers)
         {
@@ -1755,65 +1735,58 @@ class X509CA
         LOG.info("START revokeCertificate: ca={}, serialNumber={}, reason={}, invalidityTime={}",
                 new Object[]{caInfo.getName(), serialNumber, reason.getDescription(), invalidityTime});
 
-        numActiveRevocations.addAndGet(1);
         X509CertWithRevocationInfo revokedCert = null;
 
-        try
+        CertRevocationInfo revInfo = new CertRevocationInfo(reason, new Date(), invalidityTime);
+        revokedCert = certstore.revokeCertificate(
+                caInfo.getCertificate(),
+                serialNumber, revInfo, force, shouldPublishToDeltaCRLCache());
+        if(revokedCert == null)
         {
-            CertRevocationInfo revInfo = new CertRevocationInfo(reason, new Date(), invalidityTime);
-            revokedCert = certstore.revokeCertificate(
-                    caInfo.getCertificate(),
-                    serialNumber, revInfo, force, shouldPublishToDeltaCRLCache());
-            if(revokedCert == null)
+            return null;
+        }
+
+        for(IdentifiedX509CertPublisher publisher : getPublishers())
+        {
+            if(publisher.isAsyn() == false)
             {
-                return null;
-            }
-
-            for(IdentifiedX509CertPublisher publisher : getPublishers())
-            {
-                if(publisher.isAsyn() == false)
-                {
-                    boolean successfull;
-                    try
-                    {
-                        successfull = publisher.certificateRevoked(caInfo.getCertificate(),
-                                revokedCert.getCert(), revokedCert.getCertprofile(), revokedCert.getRevInfo());
-                    }
-                    catch (RuntimeException e)
-                    {
-                        successfull = false;
-                        final String message = "Error while publish revocation of certificate to the publisher " +
-                                publisher.getName();
-                        if(LOG.isErrorEnabled())
-                        {
-                            LOG.error(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(), e.getMessage());
-                        }
-                        LOG.debug(message, e);
-                    }
-
-                    if(successfull)
-                    {
-                        continue;
-                    }
-                }
-
-                Integer certId = revokedCert.getCert().getCertId();
+                boolean successfull;
                 try
                 {
-                    certstore.addToPublishQueue(publisher.getName(), certId.intValue(), caInfo.getCertificate());
-                }catch(Throwable t)
+                    successfull = publisher.certificateRevoked(caInfo.getCertificate(),
+                            revokedCert.getCert(), revokedCert.getCertprofile(), revokedCert.getRevInfo());
+                }
+                catch (RuntimeException e)
                 {
-                    final String message = "Error while add entry to PublishQueue";
+                    successfull = false;
+                    final String message = "Error while publish revocation of certificate to the publisher " +
+                            publisher.getName();
                     if(LOG.isErrorEnabled())
                     {
-                        LOG.error(LogUtil.buildExceptionLogFormat(message), t.getClass().getName(), t.getMessage());
+                        LOG.error(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(), e.getMessage());
                     }
-                    LOG.debug(message, t);
+                    LOG.debug(message, e);
+                }
+
+                if(successfull)
+                {
+                    continue;
                 }
             }
-        } finally
-        {
-            numActiveRevocations.addAndGet(-1);
+
+            Integer certId = revokedCert.getCert().getCertId();
+            try
+            {
+                certstore.addToPublishQueue(publisher.getName(), certId.intValue(), caInfo.getCertificate());
+            }catch(Throwable t)
+            {
+                final String message = "Error while add entry to PublishQueue";
+                if(LOG.isErrorEnabled())
+                {
+                    LOG.error(LogUtil.buildExceptionLogFormat(message), t.getClass().getName(), t.getMessage());
+                }
+                LOG.debug(message, t);
+            }
         }
 
         String resultText = revokedCert == null ? "CERT_NOT_EXIST" : "REVOKED";
@@ -1830,62 +1803,55 @@ class X509CA
     {
         LOG.info("START unrevokeCertificate: ca={}, serialNumber={}", caInfo.getName(), serialNumber);
 
-        numActiveRevocations.addAndGet(1);
         X509CertWithId unrevokedCert = null;
 
-        try
+        unrevokedCert = certstore.unrevokeCertificate(
+                caInfo.getCertificate(), serialNumber, force, shouldPublishToDeltaCRLCache());
+        if(unrevokedCert == null)
         {
-            unrevokedCert = certstore.unrevokeCertificate(
-                    caInfo.getCertificate(), serialNumber, force, shouldPublishToDeltaCRLCache());
-            if(unrevokedCert == null)
+            return null;
+        }
+
+        for(IdentifiedX509CertPublisher publisher : getPublishers())
+        {
+            if(publisher.isAsyn() == false)
             {
-                return null;
-            }
-
-            for(IdentifiedX509CertPublisher publisher : getPublishers())
-            {
-                if(publisher.isAsyn() == false)
-                {
-                    boolean successfull;
-                    try
-                    {
-                        successfull = publisher.certificateUnrevoked(caInfo.getCertificate(), unrevokedCert);
-                    }
-                    catch (RuntimeException e)
-                    {
-                        successfull = false;
-                        final String message = "Error while publish unrevocation of certificate to the publisher " +
-                                publisher.getName();
-                        if(LOG.isErrorEnabled())
-                        {
-                            LOG.error(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(), e.getMessage());
-                        }
-                        LOG.debug(message, e);
-                    }
-
-                    if(successfull)
-                    {
-                        continue;
-                    }
-                }
-
-                Integer certId = unrevokedCert.getCertId();
+                boolean successfull;
                 try
                 {
-                    certstore.addToPublishQueue(publisher.getName(), certId.intValue(), caInfo.getCertificate());
-                }catch(Throwable t)
+                    successfull = publisher.certificateUnrevoked(caInfo.getCertificate(), unrevokedCert);
+                }
+                catch (RuntimeException e)
                 {
-                    final String message = "Error while add entry to PublishQueue";
+                    successfull = false;
+                    final String message = "Error while publish unrevocation of certificate to the publisher " +
+                            publisher.getName();
                     if(LOG.isErrorEnabled())
                     {
-                        LOG.error(LogUtil.buildExceptionLogFormat(message), t.getClass().getName(), t.getMessage());
+                        LOG.error(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(), e.getMessage());
                     }
-                    LOG.debug(message, t);
+                    LOG.debug(message, e);
+                }
+
+                if(successfull)
+                {
+                    continue;
                 }
             }
-        } finally
-        {
-            numActiveRevocations.addAndGet(-1);
+
+            Integer certId = unrevokedCert.getCertId();
+            try
+            {
+                certstore.addToPublishQueue(publisher.getName(), certId.intValue(), caInfo.getCertificate());
+            }catch(Throwable t)
+            {
+                final String message = "Error while add entry to PublishQueue";
+                if(LOG.isErrorEnabled())
+                {
+                    LOG.error(LogUtil.buildExceptionLogFormat(message), t.getClass().getName(), t.getMessage());
+                }
+                LOG.debug(message, t);
+            }
         }
 
         String resultText = unrevokedCert == null ? "CERT_NOT_EXIST" : "UNREVOKED";
@@ -2329,72 +2295,21 @@ class X509CA
 
         try
         {
-            if(subjectMode == DuplicationMode.FORBIDDEN || subjectMode == DuplicationMode.FORBIDDEN_WITHIN_PROFILE)
+            boolean addedCertInProcess;
+            try
             {
-                synchronized (pendingSubjectMap)
-                {
-                    // check request with the same subject is still in process
-                    if(subjectMode == DuplicationMode.FORBIDDEN)
-                    {
-                        if(pendingSubjectMap.containsKey(sha1FpSubject))
-                        {
-                            throw new OperationException(ErrorCode.ALREADY_ISSUED,
-                                    "Certificate for the given subject " + grandtedSubjectText + " already in process");
-                        }
-                    }
-                    else if(subjectMode == DuplicationMode.FORBIDDEN_WITHIN_PROFILE)
-                    {
-                        if(pendingSubjectMap.containsKey(sha1FpSubject) &&
-                                pendingSubjectMap.get(sha1FpSubject).contains(certprofileName))
-                        {
-                            throw new OperationException(ErrorCode.ALREADY_ISSUED,
-                                    "Certificate for the given subject " + grandtedSubjectText +
-                                    " and profile " + certprofileName + " already in process");
-                        }
-                    }
-
-                    List<String> profiles = pendingSubjectMap.get(sha1FpSubject);
-                    if(profiles == null)
-                    {
-                        profiles = new LinkedList<>();
-                        pendingSubjectMap.put(sha1FpSubject, profiles);
-                    }
-                    profiles.add(certprofileName);
-                }
+                addedCertInProcess = certstore.addCertInProcess(sha1FpPublicKey, sha1FpSubject);
+            } catch (SQLException e)
+            {
+                throw new OperationException(ErrorCode.DATABASE_FAILURE,
+                        "CertStore.addCertInProcess " + e.getMessage());
             }
 
-            if(keyMode == DuplicationMode.FORBIDDEN || keyMode == DuplicationMode.FORBIDDEN_WITHIN_PROFILE)
+            if(addedCertInProcess == false)
             {
-                synchronized (pendingSubjectMap)
-                {
-                    // check request with the same subject is still in process
-                    if(keyMode == DuplicationMode.FORBIDDEN)
-                    {
-                        if(pendingKeyMap.containsKey(sha1FpPublicKey))
-                        {
-                            throw new OperationException(ErrorCode.ALREADY_ISSUED,
-                                    "Certificate for the given public key already in process");
-                        }
-                    }
-                    else if(keyMode == DuplicationMode.FORBIDDEN_WITHIN_PROFILE)
-                    {
-                        if(pendingKeyMap.containsKey(sha1FpPublicKey) &&
-                                pendingKeyMap.get(sha1FpPublicKey).contains(certprofileName))
-                        {
-                            throw new OperationException(ErrorCode.ALREADY_ISSUED,
-                                    "Certificate for the given public key" +
-                                    " and profile " + certprofileName + " already in process");
-                        }
-                    }
-
-                    List<String> profiles = pendingKeyMap.get(sha1FpSubject);
-                    if(profiles == null)
-                    {
-                        profiles = new LinkedList<>();
-                        pendingKeyMap.put(sha1FpPublicKey, profiles);
-                    }
-                    profiles.add(certprofileName);
-                }
+                throw new OperationException(ErrorCode.ALREADY_ISSUED,
+                        "Certificate with the given subject " + grandtedSubjectText +
+                        " and/or public key already in process");
             }
 
             StringBuilder msgBuilder = new StringBuilder();
@@ -2571,27 +2486,11 @@ class X509CA
             return ret;
         }finally
         {
-            synchronized (pendingSubjectMap)
+            try
             {
-                List<String> profiles = pendingSubjectMap.remove(sha1FpSubject);
-                if(profiles != null)
-                {
-                    profiles.remove(certprofileName);
-                    if(profiles.isEmpty() == false)
-                    {
-                        pendingSubjectMap.put(sha1FpSubject, profiles);
-                    }
-                }
-
-                profiles = pendingKeyMap.remove(sha1FpSubject);
-                if(profiles != null)
-                {
-                    profiles.remove(certprofileName);
-                    if(profiles.isEmpty() == false)
-                    {
-                        pendingKeyMap.put(sha1FpSubject, profiles);
-                    }
-                }
+                certstore.delteCertInProcess(sha1FpPublicKey, sha1FpSubject);
+            }catch(SQLException e)
+            {
             }
         }
     }
