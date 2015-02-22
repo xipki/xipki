@@ -33,29 +33,41 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.datasource.api;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Properties;
-
-import org.xipki.datasource.api.exception.DataAccessException;
-import org.xipki.security.api.PasswordResolver;
-import org.xipki.security.api.PasswordResolverException;
+package org.xipki.datasource.api.exception;
 
 /**
- * @author Lijun Liao
+ * Copied from Spring Framework licensed under Apache License, version 2.0.
+ *
+ * Exception to be thrown on a query timeout. This could have different causes depending on
+ * the database API in use but most likely thrown after the database interrupts or stops
+ * the processing of a query before it has completed.
+ *
+ * <p>This exception can be thrown by user code trapping the native database exception or
+ * by exception translation.
+ *
+ * @author Thomas Risberg
  */
-
-public interface DataSourceFactory
+@SuppressWarnings("serial")
+public class QueryTimeoutException extends TransientDataAccessException
 {
-    DataSourceWrapper createDataSource(String name, InputStream conf, PasswordResolver passwordResolver)
-    throws DataAccessException, PasswordResolverException, IOException;
 
-    DataSourceWrapper createDataSourceForFile(String name, String confFile, PasswordResolver passwordResolver)
-    throws DataAccessException, PasswordResolverException, IOException;
+    /**
+     * Constructor for QueryTimeoutException.
+     * @param msg the detail message
+     */
+    public QueryTimeoutException(String msg)
+    {
+        super(msg);
+    }
 
-    DataSourceWrapper createDataSource(String name, Properties conf, PasswordResolver passwordResolver)
-    throws DataAccessException, PasswordResolverException, IOException;
+    /**
+     * Constructor for QueryTimeoutException.
+     * @param msg the detail message
+     * @param cause the root cause from the data access API in use
+     */
+    public QueryTimeoutException(String msg, Throwable cause)
+    {
+        super(msg, cause);
+    }
 
 }

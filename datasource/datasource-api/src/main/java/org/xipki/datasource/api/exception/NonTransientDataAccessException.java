@@ -33,29 +33,40 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.datasource.api;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Properties;
-
-import org.xipki.datasource.api.exception.DataAccessException;
-import org.xipki.security.api.PasswordResolver;
-import org.xipki.security.api.PasswordResolverException;
+package org.xipki.datasource.api.exception;
 
 /**
- * @author Lijun Liao
+ * Copied from Spring Framework licensed under Apache License, version 2.0.
+ *
+ * Root of the hierarchy of data access exceptions that are considered non-transient -
+ * where a retry of the same operation would fail unless the cause of the Exception
+ * is corrected.
+ *
+ * @author Thomas Risberg
+ * @see java.sql.SQLNonTransientException
  */
-
-public interface DataSourceFactory
+@SuppressWarnings("serial")
+public abstract class NonTransientDataAccessException extends DataAccessException
 {
-    DataSourceWrapper createDataSource(String name, InputStream conf, PasswordResolver passwordResolver)
-    throws DataAccessException, PasswordResolverException, IOException;
 
-    DataSourceWrapper createDataSourceForFile(String name, String confFile, PasswordResolver passwordResolver)
-    throws DataAccessException, PasswordResolverException, IOException;
+    /**
+     * Constructor for NonTransientDataAccessException.
+     * @param msg the detail message
+     */
+    public NonTransientDataAccessException(String msg)
+    {
+        super(msg);
+    }
 
-    DataSourceWrapper createDataSource(String name, Properties conf, PasswordResolver passwordResolver)
-    throws DataAccessException, PasswordResolverException, IOException;
+    /**
+     * Constructor for NonTransientDataAccessException.
+     * @param msg the detail message
+     * @param cause the root cause (usually from using a underlying
+     * data access API such as JDBC)
+     */
+    public NonTransientDataAccessException(String msg, Throwable cause)
+    {
+        super(msg, cause);
+    }
 
 }

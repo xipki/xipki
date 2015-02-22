@@ -39,12 +39,12 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.sql.SQLException;
 import java.util.Properties;
 
 import org.xipki.datasource.api.DataSourceFactory;
 import org.xipki.datasource.api.DataSourceWrapper;
 import org.xipki.datasource.api.DatabaseType;
+import org.xipki.datasource.api.exception.DataAccessException;
 import org.xipki.security.api.PasswordResolver;
 import org.xipki.security.api.PasswordResolverException;
 
@@ -56,7 +56,7 @@ public class DataSourceFactoryImpl implements DataSourceFactory
 {
     @Override
     public DataSourceWrapper createDataSourceForFile(String name, String confFile, PasswordResolver passwordResolver)
-    throws SQLException, PasswordResolverException, IOException
+    throws DataAccessException, PasswordResolverException, IOException
     {
         assertNotNull("confFile", confFile);
 
@@ -66,7 +66,7 @@ public class DataSourceFactoryImpl implements DataSourceFactory
 
     @Override
     public DataSourceWrapper createDataSource(String name, InputStream conf, PasswordResolver passwordResolver)
-    throws SQLException, PasswordResolverException, IOException
+    throws DataAccessException, PasswordResolverException, IOException
     {
         assertNotNull("conf", conf);
 
@@ -89,7 +89,7 @@ public class DataSourceFactoryImpl implements DataSourceFactory
 
     @Override
     public DataSourceWrapper createDataSource(String name, Properties conf, PasswordResolver passwordResolver)
-    throws SQLException, PasswordResolverException
+    throws DataAccessException, PasswordResolverException
     {
         assertNotNull("conf", conf);
 
