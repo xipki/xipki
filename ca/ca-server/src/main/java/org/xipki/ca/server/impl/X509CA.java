@@ -52,7 +52,6 @@ import java.security.cert.X509CRL;
 import java.security.cert.X509Certificate;
 import java.security.interfaces.ECPublicKey;
 import java.security.spec.InvalidKeySpecException;
-import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -1362,7 +1361,7 @@ class X509CA
                 LOG.info("Clearing PublishQueue for publisher {}", name);
                 certstore.clearPublishQueue(this.caInfo.getCertificate(), name);
                 LOG.info(" Cleared PublishQueue for publisher {}", name);
-            } catch (SQLException | OperationException e)
+            } catch (OperationException e)
             {
                 final String message = "Exception while clearing PublishQueue for publisher";
                 if(LOG.isErrorEnabled())
@@ -1480,7 +1479,7 @@ class X509CA
             {
                 certstore.clearPublishQueue(caInfo.getCertificate(), null);
                 return true;
-            } catch (SQLException | OperationException e)
+            } catch (OperationException e)
             {
                 throw new CAMgmtException(e.getMessage(), e);
             }
@@ -1491,7 +1490,7 @@ class X509CA
             try
             {
                 certstore.clearPublishQueue(caInfo.getCertificate(), publisherName);
-            } catch (SQLException | OperationException e)
+            } catch (OperationException e)
             {
                 throw new CAMgmtException(e.getMessage(), e);
             }
@@ -1568,7 +1567,7 @@ class X509CA
                         certstore.removeFromPublishQueue(publisher.getName(), certId);
                     } catch (OperationException e)
                     {
-                        final String message = "SQLException while removing republished cert id=" + certId +
+                        final String message = "Exception while removing republished cert id=" + certId +
                                 " and publisher=" + publisher.getName();
                         if(LOG.isWarnEnabled())
                         {
@@ -2295,16 +2294,7 @@ class X509CA
 
         try
         {
-            boolean addedCertInProcess;
-            try
-            {
-                addedCertInProcess = certstore.addCertInProcess(sha1FpPublicKey, sha1FpSubject);
-            } catch (SQLException e)
-            {
-                throw new OperationException(ErrorCode.DATABASE_FAILURE,
-                        "CertStore.addCertInProcess " + e.getMessage());
-            }
-
+            boolean addedCertInProcess = certstore.addCertInProcess(sha1FpPublicKey, sha1FpSubject);
             if(addedCertInProcess == false)
             {
                 throw new OperationException(ErrorCode.ALREADY_ISSUED,
@@ -2489,7 +2479,7 @@ class X509CA
             try
             {
                 certstore.delteCertInProcess(sha1FpPublicKey, sha1FpSubject);
-            }catch(SQLException e)
+            }catch(OperationException e)
             {
             }
         }

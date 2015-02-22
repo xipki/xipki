@@ -33,62 +33,65 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.datasource.api;
+package org.xipki.datasource.api.exception;
+
+import java.sql.SQLException;
 
 /**
- * @author Lijun Liao
+ * Copied from Spring Framework licensed under Apache License, version 2.0.
+ *
+ * Exception thrown when a ResultSet has been accessed in an invalid fashion.
+ * Such exceptions always have a {@code java.sql.SQLException} root cause.
+ *
+ * <p>This typically happens when an invalid ResultSet column index or name
+ * has been specified. Also thrown by disconnected SqlRowSets.
+ *
+ * @author Juergen Hoeller
+ * @see BadSqlGrammarException
+ * @see org.springframework.jdbc.support.rowset.SqlRowSet
  */
-
-public enum DatabaseType
+@SuppressWarnings("serial")
+public class InvalidResultSetAccessException extends InvalidDataAccessResourceUsageException
 {
-    H2,
-    DB2,
-    HSQL,
-    MYSQL,
-    ORACLE,
-    POSTGRES,
-    UNKNOWN;
 
-    public static DatabaseType getDataSourceForDriver(String driverClass)
+    private String sql;
+
+    /**
+     * Constructor for InvalidResultSetAccessException.
+     * @param task name of current task
+     * @param sql the offending SQL statement
+     * @param ex the root cause
+     */
+    public InvalidResultSetAccessException(String sql, SQLException ex)
     {
-        return getDatabaseType(driverClass);
+        super("invalid ResultSet access for SQL [" + sql + "]", ex);
+        this.sql = sql;
     }
 
-    public static DatabaseType getDataSourceForDataSource(String dataSourceClass)
+    /**
+     * Constructor for InvalidResultSetAccessException.
+     * @param ex the root cause
+     */
+    public InvalidResultSetAccessException(SQLException ex)
     {
-        return getDatabaseType(dataSourceClass);
+        super(ex.getMessage(), ex);
     }
 
-    private static DatabaseType getDatabaseType(String className)
+    /**
+     * Return the wrapped SQLException.
+     */
+    public SQLException getSQLException()
     {
-        if(className.contains("db2."))
-        {
-            return DatabaseType.DB2;
-        }
-        if(className.contains("h2."))
-        {
-            return DatabaseType.H2;
-        }
-        else if(className.contains("hsqldb."))
-        {
-            return DatabaseType.HSQL;
-        }
-        else if(className.contains("mysql."))
-        {
-            return DatabaseType.MYSQL;
-        }
-        else if(className.contains("oracle."))
-        {
-            return DatabaseType.ORACLE;
-        }
-        else if(className.contains("postgres.") || className.contains("postgresql."))
-        {
-            return DatabaseType.POSTGRES;
-        }
-        else
-        {
-            return DatabaseType.UNKNOWN;
-        }
+        return (SQLException) getCause();
+    }
+
+    /**
+     * Return the SQL that caused the problem.
+     * @return the offending SQL, if known
+     */
+    public String getSql()
+    {
+        return this.sql;
     }
 
 }

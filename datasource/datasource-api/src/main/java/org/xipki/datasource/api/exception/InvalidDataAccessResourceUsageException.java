@@ -33,29 +33,38 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.datasource.api;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Properties;
-
-import org.xipki.datasource.api.exception.DataAccessException;
-import org.xipki.security.api.PasswordResolver;
-import org.xipki.security.api.PasswordResolverException;
+package org.xipki.datasource.api.exception;
 
 /**
- * @author Lijun Liao
+ * Copied from Spring Framework licensed under Apache License, version 2.0.
+ *
+ * Root for exceptions thrown when we use a data access resource incorrectly.
+ * Thrown for example on specifying bad SQL when using a RDBMS.
+ * Resource-specific subclasses are supplied by concrete data access packages.
+ *
+ * @author Rod Johnson
  */
-
-public interface DataSourceFactory
+@SuppressWarnings("serial")
+public class InvalidDataAccessResourceUsageException extends NonTransientDataAccessException
 {
-    DataSourceWrapper createDataSource(String name, InputStream conf, PasswordResolver passwordResolver)
-    throws DataAccessException, PasswordResolverException, IOException;
 
-    DataSourceWrapper createDataSourceForFile(String name, String confFile, PasswordResolver passwordResolver)
-    throws DataAccessException, PasswordResolverException, IOException;
+    /**
+     * Constructor for InvalidDataAccessResourceUsageException.
+     * @param msg the detail message
+     */
+    public InvalidDataAccessResourceUsageException(String msg)
+    {
+        super(msg);
+    }
 
-    DataSourceWrapper createDataSource(String name, Properties conf, PasswordResolver passwordResolver)
-    throws DataAccessException, PasswordResolverException, IOException;
+    /**
+     * Constructor for InvalidDataAccessResourceUsageException.
+     * @param msg the detail message
+     * @param cause the root cause from the data access API in use
+     */
+    public InvalidDataAccessResourceUsageException(String msg, Throwable cause)
+    {
+        super(msg, cause);
+    }
 
 }

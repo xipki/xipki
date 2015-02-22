@@ -59,6 +59,7 @@ import org.xipki.common.AbstractLoadTest;
 import org.xipki.common.IoUtil;
 import org.xipki.datasource.api.DataSourceFactory;
 import org.xipki.datasource.api.DataSourceWrapper;
+import org.xipki.datasource.api.exception.DataAccessException;
 import org.xipki.dbi.ca.jaxb.ObjectFactory;
 import org.xipki.security.api.PasswordResolver;
 import org.xipki.security.api.PasswordResolverException;
@@ -94,7 +95,7 @@ public class CaDbImporter
 
     public CaDbImporter(DataSourceFactory dataSourceFactory,
             PasswordResolver passwordResolver, String dbConfFile, boolean resume)
-    throws SQLException, PasswordResolverException, IOException, JAXBException
+    throws DataAccessException, PasswordResolverException, IOException, JAXBException
     {
         Properties props = DbPorter.getDbConfProperties(
                 new FileInputStream(IoUtil.expandFilepath(dbConfFile)));
@@ -159,16 +160,18 @@ public class CaDbImporter
     }
 
     private void createSerialNumberSequences()
-    throws Exception
+    throws DataAccessException
     {
         List<CAInfoBundle> CAInfoBundles = new LinkedList<>();
 
         // create the sequence for the certificate serial numbers
         Connection conn = dataSource.getConnection();
+        String sql = null;
         try
         {
             Statement st = dataSource.createStatement(conn);
-            ResultSet rs = st.executeQuery("SELECT NAME, NEXT_SERIAL, CERT FROM CA");
+            sql = "SELECT NAME, NEXT_SERIAL, CERT FROM CA";
+            ResultSet rs = st.executeQuery(sql);
 
             while(rs.next())
             {
@@ -193,7 +196,8 @@ public class CaDbImporter
             }
 
             // get the CAINFO.ID
-            rs = st.executeQuery("SELECT ID, CERT FROM CAINFO");
+            sql = "SELECT ID, CERT FROM CAINFO";
+            rs = st.executeQuery(sql);
             while(rs.next())
             {
                 byte[] cert = Base64.decode(rs.getString("CERT"));
@@ -212,7 +216,8 @@ public class CaDbImporter
             st.close();
 
             // get the maximal serial number
-            PreparedStatement ps = conn.prepareStatement("SELECT MAX(SERIAL) FROM CERT WHERE CA_ID=?");
+            sql = "SELECT MAX(SERIAL) FROM CERT WHERE CA_ID=?";
+            PreparedStatement ps = conn.prepareStatement(sql);
             for(CAInfoBundle entry : CAInfoBundles)
             {
                 ps.setInt(1, entry.CA_id);
@@ -231,7 +236,8 @@ public class CaDbImporter
             }
             ps.close();
 
-            ps = conn.prepareStatement("UPDATE CA SET NEXT_SERIAL=? WHERE NAME=?");
+            sql = "UPDATE CA SET NEXT_SERIAL=? WHERE NAME=?";
+            ps = conn.prepareStatement(sql);
             for(CAInfoBundle entry : CAInfoBundles)
             {
                 if(entry.CA_nextSerial != entry.should_CA_nextSerial)
@@ -241,7 +247,9 @@ public class CaDbImporter
                     ps.executeUpdate();
                 }
             }
-
+        }catch(SQLException e)
+        {
+            throw dataSource.translate(sql, e);
         }finally
         {
             dataSource.returnConnection(conn);

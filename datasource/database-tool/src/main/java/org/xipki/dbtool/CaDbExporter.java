@@ -39,7 +39,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.sql.SQLException;
 import java.util.Properties;
 
 import javax.xml.bind.JAXBContext;
@@ -54,6 +53,7 @@ import org.xipki.common.IoUtil;
 import org.xipki.common.ParamChecker;
 import org.xipki.datasource.api.DataSourceFactory;
 import org.xipki.datasource.api.DataSourceWrapper;
+import org.xipki.datasource.api.exception.DataAccessException;
 import org.xipki.dbi.ca.jaxb.ObjectFactory;
 import org.xipki.security.api.PasswordResolver;
 import org.xipki.security.api.PasswordResolverException;
@@ -75,7 +75,7 @@ public class CaDbExporter
     public CaDbExporter(DataSourceFactory dataSourceFactory,
             PasswordResolver passwordResolver, InputStream dbConfStream,
             String destFolder, boolean resume)
-    throws SQLException, PasswordResolverException, IOException, JAXBException
+    throws DataAccessException, PasswordResolverException, IOException, JAXBException
     {
         ParamChecker.assertNotEmpty("destFolder", destFolder);
         Properties props = DbPorter.getDbConfProperties(dbConfStream);
@@ -90,7 +90,7 @@ public class CaDbExporter
     public CaDbExporter(DataSourceFactory dataSourceFactory,
             PasswordResolver passwordResolver, String dbConfFile, String destFolder,
             boolean destFolderEmpty)
-    throws SQLException, PasswordResolverException, IOException, JAXBException
+    throws DataAccessException, PasswordResolverException, IOException, JAXBException
     {
         this(dataSourceFactory, passwordResolver,
                 new FileInputStream(IoUtil.expandFilepath(dbConfFile)), destFolder, destFolderEmpty);

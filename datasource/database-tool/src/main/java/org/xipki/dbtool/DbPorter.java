@@ -57,6 +57,7 @@ import org.xipki.common.AbstractLoadTest;
 import org.xipki.common.IoUtil;
 import org.xipki.common.ParamChecker;
 import org.xipki.datasource.api.DataSourceWrapper;
+import org.xipki.datasource.api.exception.DataAccessException;
 import org.xml.sax.SAXException;
 
 /**
@@ -86,7 +87,7 @@ public class DbPorter
     protected final String baseDir;
 
     public DbPorter(DataSourceWrapper dataSource, String baseDir)
-    throws SQLException
+    throws DataAccessException
     {
         super();
         ParamChecker.assertNotNull("dataSource", dataSource);
@@ -94,7 +95,13 @@ public class DbPorter
 
         this.dataSource = dataSource;
         this.connection = this.dataSource.getConnection();
-        this.connectionAutoCommit = connection.getAutoCommit();
+        try
+        {
+            this.connectionAutoCommit = connection.getAutoCommit();
+        } catch (SQLException e)
+        {
+            throw dataSource.translate(null, e);
+        }
         this.baseDir = IoUtil.expandFilepath(baseDir);
     }
 
@@ -131,15 +138,27 @@ public class DbPorter
     }
 
     protected Statement createStatement()
-    throws SQLException
+    throws DataAccessException
     {
-        return connection.createStatement();
+        try
+        {
+            return connection.createStatement();
+        }catch(SQLException e)
+        {
+            throw dataSource.translate(null, e);
+        }
     }
 
     protected PreparedStatement prepareStatement(String sql)
-    throws SQLException
+    throws DataAccessException
     {
-        return connection.prepareStatement(sql);
+        try
+        {
+            return connection.prepareStatement(sql);
+        }catch(SQLException e)
+        {
+            throw dataSource.translate(sql, e);
+        }
     }
 
     protected void releaseResources(Statement ps, ResultSet rs)
@@ -172,31 +191,31 @@ public class DbPorter
     }
 
     public long getMin(String table, String column)
-    throws SQLException
+    throws DataAccessException
     {
         return dataSource.getMin(connection, table, column);
     }
 
     public long getMax(String table, String column)
-    throws SQLException
+    throws DataAccessException
     {
         return dataSource.getMax(connection, table, column);
     }
 
     public int getCount(String table)
-    throws SQLException
+    throws DataAccessException
     {
         return dataSource.getCount(connection, table);
     }
 
     public boolean tableHasColumn(String table, String column)
-    throws SQLException
+    throws DataAccessException
     {
         return dataSource.tableHasColumn(connection, table, column);
     }
 
     public boolean tableExists(String table)
-    throws SQLException
+    throws DataAccessException
     {
         return dataSource.tableExists(connection, table);
     }
@@ -216,33 +235,63 @@ public class DbPorter
     }
 
     protected Savepoint setSavepoint()
-    throws SQLException
+    throws DataAccessException
     {
-        return connection.setSavepoint();
+        try
+        {
+            return connection.setSavepoint();
+        }catch(SQLException e)
+        {
+            throw dataSource.translate(null, e);
+        }
     }
 
     protected void rollback()
-    throws SQLException
+    throws DataAccessException
     {
-        connection.rollback();
+        try
+        {
+            connection.rollback();
+        }catch(SQLException e)
+        {
+            throw dataSource.translate(null, e);
+        }
     }
 
     protected void disableAutoCommit()
-    throws SQLException
+    throws DataAccessException
     {
-        connection.setAutoCommit(false);
+        try
+        {
+            connection.setAutoCommit(false);
+        }catch(SQLException e)
+        {
+            throw dataSource.translate(null, e);
+        }
     }
 
     protected void recoverAutoCommit()
-    throws SQLException
+    throws DataAccessException
     {
-        connection.setAutoCommit(connectionAutoCommit);
+        try
+        {
+            connection.setAutoCommit(connectionAutoCommit);
+        }catch(SQLException e)
+        {
+            throw dataSource.translate(null, e);
+        }
     }
 
     protected void commit()
-    throws SQLException
+    throws DataAccessException
     {
-        connection.commit();
+        try
+        {
+            connection.commit();
+        }catch(SQLException e)
+        {
+            throw dataSource.translate(null, e);
+        }
     }
 
     public static Properties getDbConfProperties(InputStream is)
@@ -360,7 +409,7 @@ public class DbPorter
     }
 
     protected int getDbSchemaVersion()
-    throws SQLException
+    throws DataAccessException
     {
         final String tblName = "DBSCHEMAINFO";
         if(dataSource.tableExists(null, tblName) == false)

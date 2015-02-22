@@ -60,9 +60,10 @@ import org.xipki.ca.client.api.dto.RevokeCertRequestEntryType;
 import org.xipki.ca.client.api.dto.RevokeCertRequestType;
 import org.xipki.common.AbstractLoadTest;
 import org.xipki.common.CRLReason;
-import org.xipki.common.SecurityUtil;
 import org.xipki.common.ParamChecker;
+import org.xipki.common.SecurityUtil;
 import org.xipki.datasource.api.DataSourceWrapper;
+import org.xipki.datasource.api.exception.DataAccessException;
 
 /**
  * @author Lijun Liao
@@ -155,7 +156,7 @@ class CALoadTestRevoke extends AbstractLoadTest
     }
 
     private List<Long> nextSerials()
-    throws SQLException
+    throws DataAccessException
     {
         List<Long> ret = new ArrayList<>(n);
         for(int i = 0; i < n; i++)
@@ -174,7 +175,7 @@ class CALoadTestRevoke extends AbstractLoadTest
     }
 
     private Long nextSerial()
-    throws SQLException
+    throws DataAccessException
     {
         synchronized (caDataSource)
         {
@@ -199,12 +200,13 @@ class CALoadTestRevoke extends AbstractLoadTest
                         " AND SERIAL > " + (nextStartSerial - 1) +
                         " AND SERIAL < " + (maxSerial + 1);
                 sql = caDataSource.createFetchFirstSelectSQL(sql, 1000, "SERIAL");
-                PreparedStatement stmt = caDataSource.getConnection().prepareStatement(sql);
+                PreparedStatement stmt = null;
                 ResultSet rs = null;
 
                 int n = 0;
                 try
                 {
+                    stmt = caDataSource.getConnection().prepareStatement(sql);
                     rs = stmt.executeQuery();
                     while(rs.next())
                     {
@@ -219,7 +221,10 @@ class CALoadTestRevoke extends AbstractLoadTest
                             serials.addLast(serial);
                         }
                     }
-                }finally
+                } catch(SQLException e)
+                {
+                    throw caDataSource.translate(sql, e);
+                } finally
                 {
                     caDataSource.releaseResources(stmt, rs);
                 }
@@ -252,7 +257,7 @@ class CALoadTestRevoke extends AbstractLoadTest
                 try
                 {
                     serialNumbers = nextSerials();
-                } catch (SQLException e)
+                } catch (DataAccessException e)
                 {
                     account(1, 1);
                     break;

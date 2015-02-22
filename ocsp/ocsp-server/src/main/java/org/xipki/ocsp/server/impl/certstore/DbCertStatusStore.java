@@ -65,6 +65,7 @@ import org.xipki.common.LogUtil;
 import org.xipki.common.ParamChecker;
 import org.xipki.datasource.api.DataSourceFactory;
 import org.xipki.datasource.api.DataSourceWrapper;
+import org.xipki.datasource.api.exception.DataAccessException;
 import org.xipki.ocsp.api.CertStatusInfo;
 import org.xipki.ocsp.api.CertStatusStore;
 import org.xipki.ocsp.api.CertStatusStoreException;
@@ -427,7 +428,10 @@ public class DbCertStatusStore extends CertStatusStore
                         certStatusInfo = CertStatusInfo.getUnknownCertStatusInfo(thisUpdate, null);
                     }
                 }
-            }finally
+            } catch(SQLException e)
+            {
+                throw dataSource.translate(sql, e);
+            } finally
             {
                 releaseDbResources(ps, rs);
             }
@@ -454,14 +458,14 @@ public class DbCertStatusStore extends CertStatusStore
             }
 
             return certStatusInfo;
-        }catch(SQLException e)
+        }catch(DataAccessException e)
         {
             throw new CertStatusStoreException(e.getMessage(), e);
         }
     }
 
     private byte[] getCertHash(int certId, HashAlgoType hashAlgo)
-    throws SQLException
+    throws DataAccessException
     {
         final String sql = hashAlgo.name().toUpperCase() + " FROM CERTHASH WHERE CERT_ID=?";
         ResultSet rs = null;
@@ -481,7 +485,10 @@ public class DbCertStatusStore extends CertStatusStore
             {
                 return null;
             }
-        }finally
+        } catch(SQLException e)
+        {
+            throw dataSource.translate(sql, e);
+        } finally
         {
             releaseDbResources(ps, rs);
         }
@@ -491,10 +498,10 @@ public class DbCertStatusStore extends CertStatusStore
      *
      * @return the next idle preparedStatement, {@code null} will be returned
      *         if no PreparedStament can be created within 5 seconds
-     * @throws SQLException
+     * @throws DataAccessException
      */
     private PreparedStatement borrowPreparedStatement(String sqlQuery)
-    throws SQLException
+    throws DataAccessException
     {
         PreparedStatement ps = null;
         Connection c = dataSource.getConnection();
@@ -504,7 +511,7 @@ public class DbCertStatusStore extends CertStatusStore
         }
         if(ps == null)
         {
-            throw new SQLException("Cannot create prepared statement for " + sqlQuery);
+            throw new DataAccessException("Cannot create prepared statement for " + sqlQuery);
         }
         return ps;
     }

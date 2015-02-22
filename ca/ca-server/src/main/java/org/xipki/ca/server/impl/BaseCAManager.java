@@ -54,8 +54,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.bouncycastle.util.encoders.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xipki.ca.api.CertprofileException;
 import org.xipki.ca.api.CertPublisherException;
+import org.xipki.ca.api.CertprofileException;
 import org.xipki.ca.api.EnvironmentParameterResolver;
 import org.xipki.ca.api.OperationException;
 import org.xipki.ca.api.X509CertWithId;
@@ -87,6 +87,7 @@ import org.xipki.common.SecurityUtil;
 import org.xipki.common.StringUtil;
 import org.xipki.datasource.api.DataSourceFactory;
 import org.xipki.datasource.api.DataSourceWrapper;
+import org.xipki.datasource.api.exception.DataAccessException;
 import org.xipki.security.api.PasswordResolver;
 import org.xipki.security.api.SecurityFactory;
 import org.xipki.security.api.SignerException;
@@ -212,7 +213,7 @@ public abstract class BaseCAManager
         try
         {
             dsConnection = dataSource.getConnection();
-        } catch (SQLException e)
+        } catch (DataAccessException e)
         {
             throw new CAMgmtException("Could not get connection", e);
         }
@@ -220,7 +221,7 @@ public abstract class BaseCAManager
         try
         {
             return dataSource.createStatement(dsConnection);
-        }catch(SQLException e)
+        }catch(DataAccessException e)
         {
             throw new CAMgmtException("Could not create statement", e);
         }
@@ -239,7 +240,7 @@ public abstract class BaseCAManager
         try
         {
             dsConnection = dataSource.getConnection();
-        } catch (SQLException e)
+        } catch (DataAccessException e)
         {
             throw new CAMgmtException("Could not get connection", e);
         }
@@ -247,7 +248,7 @@ public abstract class BaseCAManager
         try
         {
             return dataSource.prepareStatement(dsConnection, sql);
-        }catch(SQLException e)
+        }catch(DataAccessException e)
         {
             throw new CAMgmtException("Could not get connection", e);
         }
@@ -355,9 +356,9 @@ public abstract class BaseCAManager
     {
         PreparedStatement stmt = null;
         ResultSet rs = null;
+        final String sql = "TYPE, CONF FROM CERTPROFILE WHERE NAME=?";
         try
         {
-            final String sql = "TYPE, CONF FROM CERTPROFILE WHERE NAME=?";
             stmt = prepareFetchFirstStatement(sql);
             stmt.setString(1, name);
             rs = stmt.executeQuery();
@@ -387,7 +388,8 @@ public abstract class BaseCAManager
             }
         }catch(SQLException e)
         {
-            throw new CAMgmtException(e.getMessage(), e);
+            DataAccessException tEx = dataSource.translate(sql, e);
+            throw new CAMgmtException(tEx.getMessage(), tEx);
         } finally
         {
             dataSource.releaseResources(stmt, rs);
@@ -399,12 +401,12 @@ public abstract class BaseCAManager
     protected List<String> getNamesFromTable(String table)
     throws CAMgmtException
     {
+        final String sql = new StringBuilder("SELECT NAME FROM ").append(table).toString();
         Statement stmt = null;
         ResultSet rs = null;
         try
         {
             stmt = createStatement();
-            final String sql = new StringBuilder("SELECT NAME FROM ").append(table).toString();
             rs = stmt.executeQuery(sql);
 
             List<String> names = new LinkedList<>();
@@ -421,7 +423,8 @@ public abstract class BaseCAManager
             return names;
         } catch(SQLException e)
         {
-            throw new CAMgmtException("SQLException: " + e.getMessage(), e);
+            DataAccessException tEx = dataSource.translate(sql, e);
+            throw new CAMgmtException(tEx.getMessage(), tEx);
         }
         finally
         {
@@ -432,11 +435,11 @@ public abstract class BaseCAManager
     protected IdentifiedX509CertPublisher createPublisher(String name, Map<String, DataSourceWrapper> dataSources)
     throws CAMgmtException
     {
+        final String sql = "TYPE, CONF FROM PUBLISHER WHERE NAME=?";
         PreparedStatement stmt = null;
         ResultSet rs = null;
         try
         {
-            final String sql = "TYPE, CONF FROM PUBLISHER WHERE NAME=?";
             stmt = prepareFetchFirstStatement(sql);
             stmt.setString(1, name);
             rs = stmt.executeQuery();
@@ -466,7 +469,8 @@ public abstract class BaseCAManager
             }
         }catch(SQLException e)
         {
-            throw new CAMgmtException(e.getMessage(), e);
+            DataAccessException tEx = dataSource.translate(sql, e);
+            throw new CAMgmtException(tEx.getMessage(), tEx);
         }finally
         {
             dataSource.releaseResources(stmt, rs);
@@ -478,12 +482,12 @@ public abstract class BaseCAManager
     protected CmpRequestorEntryWrapper createRequestor(String name)
     throws CAMgmtException
     {
+        final String sql = "CERT FROM REQUESTOR WHERE NAME=?";
         PreparedStatement stmt = null;
         ResultSet rs = null;
 
         try
         {
-            final String sql = "CERT FROM REQUESTOR WHERE NAME=?";
             stmt = prepareFetchFirstStatement(sql);
             stmt.setString(1, name);
             rs = stmt.executeQuery();
@@ -501,7 +505,8 @@ public abstract class BaseCAManager
             }
         }catch(SQLException e)
         {
-            throw new CAMgmtException(e.getMessage(), e);
+            DataAccessException tEx = dataSource.translate(sql, e);
+            throw new CAMgmtException(tEx.getMessage(), tEx);
         }finally
         {
             dataSource.releaseResources(stmt, rs);
@@ -513,12 +518,12 @@ public abstract class BaseCAManager
     protected X509CrlSignerEntryWrapper createCrlSigner(String name)
     throws CAMgmtException
     {
+        final String sql = "SIGNER_TYPE, SIGNER_CONF, SIGNER_CERT, CRL_CONTROL FROM CRLSIGNER WHERE NAME=?";
         PreparedStatement stmt = null;
         ResultSet rs = null;
 
         try
         {
-            final String sql = "SIGNER_TYPE, SIGNER_CONF, SIGNER_CERT, CRL_CONTROL FROM CRLSIGNER WHERE NAME=?";
             stmt = prepareFetchFirstStatement(sql);
             stmt.setString(1, name);
             rs = stmt.executeQuery();
@@ -543,7 +548,11 @@ public abstract class BaseCAManager
                 signer.setDbEntry(entry);
                 return signer;
             }
-        }catch(SQLException | ConfigurationException e)
+        }catch(SQLException e)
+        {
+            DataAccessException tEx = dataSource.translate(sql, e);
+            throw new CAMgmtException(tEx.getMessage(), tEx);
+        }catch(ConfigurationException e)
         {
             throw new CAMgmtException(e.getMessage(), e);
         }finally
@@ -556,14 +565,14 @@ public abstract class BaseCAManager
     protected CmpControl createCmpControl(String name)
     throws CAMgmtException
     {
+        final String sql = "REQUIRE_CONFIRM_CERT, SEND_CA_CERT, SEND_RESPONDER_CERT" +
+                ", REQUIRE_MESSAGE_TIME, MESSAGE_TIME_BIAS, CONFIRM_WAIT_TIME" +
+                " FROM CMPCONTROL WHERE NAME=?";
         PreparedStatement stmt = null;
         ResultSet rs = null;
 
         try
         {
-            final String sql = "REQUIRE_CONFIRM_CERT, SEND_CA_CERT, SEND_RESPONDER_CERT" +
-                    ", REQUIRE_MESSAGE_TIME, MESSAGE_TIME_BIAS, CONFIRM_WAIT_TIME" +
-                    " FROM CMPCONTROL WHERE NAME=?";
             stmt = prepareFetchFirstStatement(sql);
             stmt.setString(1, name);
             rs = stmt.executeQuery();
@@ -596,7 +605,8 @@ public abstract class BaseCAManager
             return cmpControl;
         }catch(SQLException e)
         {
-            throw new CAMgmtException(e.getMessage(), e);
+            DataAccessException tEx = dataSource.translate(sql, e);
+            throw new CAMgmtException(tEx.getMessage(), tEx);
         }finally
         {
             dataSource.releaseResources(stmt, rs);
@@ -606,13 +616,14 @@ public abstract class BaseCAManager
     protected CmpResponderEntryWrapper createResponder()
     throws CAMgmtException
     {
+        final String sql = "SELECT TYPE, CONF, CERT FROM RESPONDER";
         Statement stmt = null;
         ResultSet rs = null;
 
         try
         {
             stmt = createStatement();
-            rs = stmt.executeQuery("SELECT TYPE, CONF, CERT FROM RESPONDER");
+            rs = stmt.executeQuery(sql);
 
             CmpResponderEntry dbEntry = null;
             String errorMsg = null;
@@ -668,7 +679,8 @@ public abstract class BaseCAManager
             return ret;
         }catch(SQLException e)
         {
-            throw new CAMgmtException(e.getMessage(), e);
+            DataAccessException tEx = dataSource.translate(sql, e);
+            throw new CAMgmtException(tEx.getMessage(), tEx);
         }finally
         {
             dataSource.releaseResources(stmt, rs);
@@ -678,16 +690,16 @@ public abstract class BaseCAManager
     protected X509CAInfo createCAInfo(String name, boolean masterMode)
     throws CAMgmtException
     {
+        final String sql = "NAME, ART, NEXT_SERIAL, NEXT_CRLNO, STATUS, CRL_URIS, OCSP_URIS, MAX_VALIDITY" +
+                ", CERT, SIGNER_TYPE, SIGNER_CONF, CRLSIGNER_NAME, CMPCONTROL_NAME" +
+                ", DUPLICATE_KEY_MODE, DUPLICATE_SUBJECT_MODE, PERMISSIONS, NUM_CRLS" +
+                ", EXPIRATION_PERIOD, REVOKED, REV_REASON, REV_TIME, REV_INVALIDITY_TIME" +
+                ", DELTA_CRL_URIS, VALIDITY_MODE" +
+                " FROM CA WHERE NAME=?";
         PreparedStatement stmt = null;
         ResultSet rs = null;
         try
         {
-            final String sql = "NAME, ART, NEXT_SERIAL, NEXT_CRLNO, STATUS, CRL_URIS, OCSP_URIS, MAX_VALIDITY" +
-                    ", CERT, SIGNER_TYPE, SIGNER_CONF, CRLSIGNER_NAME, CMPCONTROL_NAME" +
-                    ", DUPLICATE_KEY_MODE, DUPLICATE_SUBJECT_MODE, PERMISSIONS, NUM_CRLS" +
-                    ", EXPIRATION_PERIOD, REVOKED, REV_REASON, REV_TIME, REV_INVALIDITY_TIME" +
-                    ", DELTA_CRL_URIS, VALIDITY_MODE" +
-                    " FROM CA WHERE NAME=?";
             stmt = prepareFetchFirstStatement(sql);
             stmt.setString(1, name);
             rs = stmt.executeQuery();
@@ -808,7 +820,8 @@ public abstract class BaseCAManager
             }
         }catch(SQLException e)
         {
-            throw new CAMgmtException(e.getMessage(), e);
+            DataAccessException tEx = dataSource.translate(sql, e);
+            throw new CAMgmtException(tEx.getMessage(), tEx);
         }finally
         {
             dataSource.releaseResources(stmt, rs);
@@ -820,12 +833,12 @@ public abstract class BaseCAManager
     protected Set<CAHasRequestorEntry> createCAhasRequestors(String caName)
     throws CAMgmtException
     {
+        final String sql = "SELECT REQUESTOR_NAME, RA, PERMISSIONS, PROFILES FROM CA_HAS_REQUESTOR" +
+                " WHERE CA_NAME=?";
         PreparedStatement stmt = null;
         ResultSet rs = null;
         try
         {
-            final String sql = "SELECT REQUESTOR_NAME, RA, PERMISSIONS, PROFILES FROM CA_HAS_REQUESTOR" +
-                    " WHERE CA_NAME=?";
             stmt = prepareStatement(sql);
             stmt.setString(1, caName);
             rs = stmt.executeQuery();
@@ -852,7 +865,8 @@ public abstract class BaseCAManager
             return ret;
         }catch(SQLException e)
         {
-            throw new CAMgmtException(e.getMessage(), e);
+            DataAccessException tEx = dataSource.translate(sql, e);
+            throw new CAMgmtException(tEx.getMessage(), tEx);
         }finally
         {
             dataSource.releaseResources(stmt, rs);
@@ -874,12 +888,12 @@ public abstract class BaseCAManager
     protected Set<String> createCAhasNames(String caName, String columnName, String table)
     throws CAMgmtException
     {
+        final String sql = new StringBuilder("SELECT ").append(columnName).append(" FROM ")
+                .append(table).append(" WHERE CA_NAME=?").toString();
         PreparedStatement stmt = null;
         ResultSet rs = null;
         try
         {
-            final String sql = new StringBuilder("SELECT ").append(columnName).append(" FROM ")
-                .append(table).append(" WHERE CA_NAME=?").toString();
             stmt = prepareStatement(sql);
             stmt.setString(1, caName);
             rs = stmt.executeQuery();
@@ -894,7 +908,8 @@ public abstract class BaseCAManager
             return ret;
         }catch(SQLException e)
         {
-            throw new CAMgmtException(e.getMessage(), e);
+            DataAccessException tEx = dataSource.translate(sql, e);
+            throw new CAMgmtException(tEx.getMessage(), tEx);
         }finally
         {
             dataSource.releaseResources(stmt, rs);
@@ -904,10 +919,11 @@ public abstract class BaseCAManager
     protected void deleteRowWithName(String name, String table)
     throws CAMgmtException
     {
+        final String sql = new StringBuilder("DELETE FROM ").append(table).append(" WHERE NAME=?").toString();
         PreparedStatement ps = null;
         try
         {
-            ps = prepareStatement(new StringBuilder("DELETE FROM ").append(table).append(" WHERE NAME=?").toString());
+            ps = prepareStatement(sql);
             ps.setString(1, name);
             int rows = ps.executeUpdate();
             if(rows != 1)
@@ -916,7 +932,8 @@ public abstract class BaseCAManager
             }
         }catch(SQLException e)
         {
-            throw new CAMgmtException(e.getMessage(), e);
+            DataAccessException tEx = dataSource.translate(sql, e);
+            throw new CAMgmtException(tEx.getMessage(), tEx);
         }finally
         {
             dataSource.releaseResources(ps, null);
@@ -926,15 +943,16 @@ public abstract class BaseCAManager
     protected void deleteRows(String table)
     throws CAMgmtException
     {
+        final String sql = "DELETE FROM " + table;
         Statement stmt = null;
         try
         {
-            String sql = "DELETE FROM " + table;
             stmt = createStatement();
             stmt.executeQuery(sql);
         }catch(SQLException e)
         {
-            throw new CAMgmtException(e.getMessage(), e);
+            DataAccessException tEx = dataSource.translate(sql, e);
+            throw new CAMgmtException(tEx.getMessage(), tEx);
         }finally
         {
             dataSource.releaseResources(stmt, null);

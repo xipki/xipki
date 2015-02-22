@@ -316,7 +316,7 @@ public class CanonicalizeCode
             String line;
             while((line = reader.readLine()) != null)
             {
-                if(authorsLineAvailable == false && line.contains("* @author Lijun Liao"))
+                if(authorsLineAvailable == false && line.contains("* @author"))
                 {
                     authorsLineAvailable = true;
                 }
