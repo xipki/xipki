@@ -33,29 +33,28 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.datasource.api;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Properties;
-
-import org.xipki.datasource.api.exception.DataAccessException;
-import org.xipki.security.api.PasswordResolver;
-import org.xipki.security.api.PasswordResolverException;
+package org.xipki.datasource.api.exception;
 
 /**
- * @author Lijun Liao
+ * Copied from Spring Framework licensed under Apache License, version 2.0.
+ *
+ * Generic exception thrown when the current process was
+ * a deadlock loser, and its transaction rolled back.
+ *
+ * @author Rod Johnson
  */
-
-public interface DataSourceFactory
+@SuppressWarnings("serial")
+public class DeadlockLoserDataAccessException extends PessimisticLockingFailureException
 {
-    DataSourceWrapper createDataSource(String name, InputStream conf, PasswordResolver passwordResolver)
-    throws DataAccessException, PasswordResolverException, IOException;
 
-    DataSourceWrapper createDataSourceForFile(String name, String confFile, PasswordResolver passwordResolver)
-    throws DataAccessException, PasswordResolverException, IOException;
-
-    DataSourceWrapper createDataSource(String name, Properties conf, PasswordResolver passwordResolver)
-    throws DataAccessException, PasswordResolverException, IOException;
+    /**
+     * Constructor for DeadlockLoserDataAccessException.
+     * @param msg the detail message
+     * @param cause the root cause from the data access API in use
+     */
+    public DeadlockLoserDataAccessException(String msg, Throwable cause)
+    {
+        super(msg, cause);
+    }
 
 }

@@ -41,6 +41,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
+import org.xipki.datasource.api.exception.DataAccessException;
+
 /**
  * @author Lijun Liao
  */
@@ -50,7 +52,7 @@ public interface DataSourceWrapper
     String getDatasourceName();
 
     Connection getConnection()
-    throws SQLException;
+    throws DataAccessException;
 
     void returnConnection(Connection conn);
 
@@ -59,10 +61,10 @@ public interface DataSourceWrapper
     DatabaseType getDatabaseType();
 
     Statement createStatement(Connection conn)
-    throws SQLException;
+    throws DataAccessException;
 
     PreparedStatement prepareStatement(Connection conn, String sqlQuery)
-    throws SQLException;
+    throws DataAccessException;
 
     void releaseResources(Statement ps, ResultSet rs);
 
@@ -71,37 +73,35 @@ public interface DataSourceWrapper
     String createFetchFirstSelectSQL(String coreSql, int rows, String orderBy);
 
     long getMin(Connection conn, String table, String column)
-    throws SQLException;
+    throws DataAccessException;
 
     long getMax(Connection conn, String table, String column)
-    throws SQLException;
+    throws DataAccessException;
 
     int getCount(Connection conn, String table)
-    throws SQLException;
+    throws DataAccessException;
 
     boolean columnExists(Connection conn, String table, String column, Object value)
-    throws SQLException;
+    throws DataAccessException;
 
     boolean tableHasColumn(Connection conn, String table, String column)
-    throws SQLException;
+    throws DataAccessException;
 
     boolean tableExists(Connection conn, String table)
-    throws SQLException;
+    throws DataAccessException;
 
     void dropAndCreateSequence(String sequenceName, long startValue)
-    throws SQLException;
+    throws DataAccessException;
 
     void createSequence(String sequenceName, long startValue)
-    throws SQLException;
+    throws DataAccessException;
 
     void dropSequence(String sequenceName)
-    throws SQLException;
+    throws DataAccessException;
 
     long nextSeqValue(Connection conn, String sequenceName)
-    throws SQLException;
+    throws DataAccessException;
 
-    boolean isDuplicateKeyException(SQLException sqlException);
-
-    boolean isDataIntegrityViolation(SQLException sqlException);
+    DataAccessException translate(String sql, SQLException ex);
 
 }

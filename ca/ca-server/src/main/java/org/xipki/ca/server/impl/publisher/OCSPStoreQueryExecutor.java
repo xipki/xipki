@@ -60,6 +60,8 @@ import org.xipki.common.HashAlgoType;
 import org.xipki.common.HashCalculator;
 import org.xipki.common.LogUtil;
 import org.xipki.datasource.api.DataSourceWrapper;
+import org.xipki.datasource.api.exception.DataAccessException;
+import org.xipki.datasource.api.exception.DuplicateKeyException;
 
 /**
  * @author Lijun Liao
@@ -76,7 +78,7 @@ class OCSPStoreQueryExecutor
     private final boolean publishGoodCerts;
 
     OCSPStoreQueryExecutor(DataSourceWrapper dataSource, boolean publishGoodCerts)
-    throws SQLException, NoSuchAlgorithmException
+    throws DataAccessException, NoSuchAlgorithmException
     {
         this.dataSource = dataSource;
         this.issuerStore = initIssuerStore();
@@ -84,7 +86,7 @@ class OCSPStoreQueryExecutor
     }
 
     private IssuerStore initIssuerStore()
-    throws SQLException
+    throws DataAccessException
     {
         final String sql = "SELECT ID, SUBJECT, SHA1_CERT, CERT FROM ISSUER";
         PreparedStatement ps = borrowPreparedStatement(sql);
@@ -106,21 +108,24 @@ class OCSPStoreQueryExecutor
             }
 
             return new IssuerStore(caInfos);
-        }finally
+        } catch(SQLException e)
+        {
+            throw dataSource.translate(sql, e);
+        } finally
         {
             releaseDbResources(ps, rs);
         }
     }
 
     /**
-     * @throws SQLException if there is problem while accessing database.
+     * @throws DataAccessException if there is problem while accessing database.
      * @throws NoSuchAlgorithmException
      * @throws CertificateEncodingException
      */
     void addCert(X509CertWithId issuer,
             X509CertWithId certificate,
             String certprofile)
-    throws SQLException, CertificateEncodingException
+    throws DataAccessException, CertificateEncodingException
     {
         addCert(issuer, certificate, certprofile, null);
     }
@@ -129,7 +134,7 @@ class OCSPStoreQueryExecutor
             X509CertWithId certificate,
             String certprofile,
             CertRevocationInfo revInfo)
-    throws SQLException, CertificateEncodingException
+    throws DataAccessException, CertificateEncodingException
     {
         addOrUpdateCert(issuer, certificate, certprofile, revInfo);
     }
@@ -138,7 +143,7 @@ class OCSPStoreQueryExecutor
             X509CertWithId certificate,
             String certprofile,
             CertRevocationInfo revInfo)
-    throws SQLException, CertificateEncodingException
+    throws DataAccessException, CertificateEncodingException
     {
         boolean revoked = revInfo != null;
         int issuerId = getIssuerId(issuer);
@@ -184,6 +189,9 @@ class OCSPStoreQueryExecutor
                 ps.setInt(idx++, issuerId);
                 ps.setLong(idx++, serialNumber.longValue());
                 ps.executeUpdate();
+            } catch(SQLException e)
+            {
+                throw dataSource.translate(sql, e);
             }finally
             {
                 releaseDbResources(ps, null);
@@ -295,13 +303,14 @@ class OCSPStoreQueryExecutor
                     }catch(SQLException e)
                     {
                         conn.rollback();
-                        if(dataSource.isDuplicateKeyException(e) && i < tries - 1)
+                        DataAccessException tEx = dataSource.translate(null, e);
+                        if(tEx instanceof DuplicateKeyException && i < tries - 1)
                         {
                             continue;
                         }
                         LOG.error("datasource {} SQLException while adding certificate with id {}: {}",
                                 dataSource.getDatasourceName(), certId, e.getMessage());
-                        throw e;
+                        throw tEx;
                     }
                     finally
                     {
@@ -310,8 +319,10 @@ class OCSPStoreQueryExecutor
 
                     break;
                 }
-            }
-            finally
+            } catch(SQLException e)
+            {
+                throw dataSource.translate(null, e);
+            } finally
             {
                 try
                 {
@@ -337,14 +348,14 @@ class OCSPStoreQueryExecutor
             X509CertWithId cert,
             String certprofile,
             CertRevocationInfo revInfo)
-    throws SQLException, CertificateEncodingException
+    throws DataAccessException, CertificateEncodingException
     {
         addOrUpdateCert(caCert, cert, certprofile, revInfo);
     }
 
     void unrevokeCert(X509CertWithId issuer,
             X509CertWithId cert)
-    throws SQLException
+    throws DataAccessException
     {
         Integer issuerId =  issuerStore.getIdForCert(issuer.getEncodedCert());
         if(issuerId == null)
@@ -378,6 +389,9 @@ class OCSPStoreQueryExecutor
                 ps.setInt(idx++, issuerId);
                 ps.setLong(idx++, serialNumber.longValue());
                 ps.executeUpdate();
+            } catch(SQLException e)
+            {
+                throw dataSource.translate(sql, e);
             }finally
             {
                 releaseDbResources(ps, null);
@@ -394,6 +408,9 @@ class OCSPStoreQueryExecutor
                 ps.setInt(idx++, issuerId);
                 ps.setLong(idx++, serialNumber.longValue());
                 ps.executeUpdate();
+            } catch(SQLException e)
+            {
+                throw dataSource.translate(sql, e);
             }finally
             {
                 releaseDbResources(ps, null);
@@ -404,7 +421,7 @@ class OCSPStoreQueryExecutor
 
     void removeCert(X509CertWithId issuer,
             X509CertWithId cert)
-    throws SQLException
+    throws DataAccessException
     {
         Integer issuerId =  issuerStore.getIdForCert(issuer.getEncodedCert());
         if(issuerId == null)
@@ -421,6 +438,9 @@ class OCSPStoreQueryExecutor
             ps.setInt(idx++, issuerId);
             ps.setLong(idx++, cert.getCert().getSerialNumber().longValue());
             ps.executeUpdate();
+        } catch(SQLException e)
+        {
+            throw dataSource.translate(sql, e);
         }finally
         {
             releaseDbResources(ps, null);
@@ -428,7 +448,7 @@ class OCSPStoreQueryExecutor
     }
 
     void revokeCa(X509CertWithId caCert, CertRevocationInfo revocationInfo)
-    throws SQLException, CertificateEncodingException
+    throws DataAccessException, CertificateEncodingException
     {
         Date revocationTime = revocationInfo.getRevocationTime();
         Date invalidityTime = revocationInfo.getInvalidityTime();
@@ -450,6 +470,9 @@ class OCSPStoreQueryExecutor
             ps.setInt(idx++, revocationInfo.getReason().getCode());
             ps.setInt(idx++, issuerId);
             ps.executeUpdate();
+        } catch(SQLException e)
+        {
+            throw dataSource.translate(sql, e);
         }finally
         {
             releaseDbResources(ps, null);
@@ -457,7 +480,7 @@ class OCSPStoreQueryExecutor
     }
 
     void unrevokeCa(X509CertWithId caCert)
-    throws SQLException, CertificateEncodingException
+    throws DataAccessException, CertificateEncodingException
     {
         int issuerId = getIssuerId(caCert);
         final String sql = "UPDATE ISSUER SET REVOKED=?, REV_TIME=?, REV_INVALIDITY_TIME=?, REV_REASON=? WHERE ID=?";
@@ -472,6 +495,9 @@ class OCSPStoreQueryExecutor
             ps.setNull(idx++, Types.INTEGER);
             ps.setInt(idx++, issuerId);
             ps.executeUpdate();
+        } catch(SQLException e)
+        {
+            throw dataSource.translate(sql, e);
         }finally
         {
             releaseDbResources(ps, null);
@@ -479,7 +505,7 @@ class OCSPStoreQueryExecutor
     }
 
     private int getIssuerId(X509CertWithId issuerCert)
-    throws SQLException, CertificateEncodingException
+    throws DataAccessException, CertificateEncodingException
     {
         Integer id = issuerStore.getIdForCert(issuerCert.getEncodedCert());
         if(id == null)
@@ -491,7 +517,7 @@ class OCSPStoreQueryExecutor
     }
 
     void addIssuer(X509CertWithId issuerCert)
-    throws CertificateEncodingException, SQLException
+    throws CertificateEncodingException, DataAccessException
     {
         if(issuerStore.getIdForCert(issuerCert.getEncodedCert()) != null)
         {
@@ -547,6 +573,9 @@ class OCSPStoreQueryExecutor
 
             IssuerEntry newInfo = new IssuerEntry(id, subject, hexSha1FpCert, b64Cert);
             issuerStore.addIdentityEntry(newInfo);
+        } catch(SQLException e)
+        {
+            throw dataSource.translate(sql, e);
         }finally
         {
             releaseDbResources(ps, null);
@@ -557,10 +586,10 @@ class OCSPStoreQueryExecutor
      *
      * @return the next idle preparedStatement, {@code null} will be returned
      *         if no PreparedStament can be created within 5 seconds
-     * @throws SQLException
+     * @throws DataAccessException
      */
     private PreparedStatement borrowPreparedStatement(String sqlQuery)
-    throws SQLException
+    throws DataAccessException
     {
         PreparedStatement ps = null;
         Connection c = dataSource.getConnection();
@@ -570,13 +599,13 @@ class OCSPStoreQueryExecutor
         }
         if(ps == null)
         {
-            throw new SQLException("Cannot create prepared statement for " + sqlQuery);
+            throw new DataAccessException("Cannot create prepared statement for " + sqlQuery);
         }
         return ps;
     }
 
     private PreparedStatement[] borrowPreparedStatements(String... sqlQueries)
-    throws SQLException
+    throws DataAccessException
     {
         PreparedStatement[] pss = new PreparedStatement[sqlQueries.length];
 
@@ -607,7 +636,7 @@ class OCSPStoreQueryExecutor
                         LOG.warn("Could not close connection", t);
                     }
 
-                    throw new SQLException("Cannot create prepared statement for " + sqlQueries[i]);
+                    throw new DataAccessException("Cannot create prepared statement for " + sqlQueries[i]);
                 }
             }
         }
@@ -616,7 +645,7 @@ class OCSPStoreQueryExecutor
     }
 
     private boolean certRegistered(int issuerId, BigInteger serialNumber)
-    throws SQLException
+    throws DataAccessException
     {
         final String sql = dataSource.createFetchFirstSelectSQL(
                 "COUNT(*) FROM CERT WHERE ISSUER_ID=? AND SERIAL=?", 1);
@@ -634,6 +663,9 @@ class OCSPStoreQueryExecutor
             {
                 return rs.getInt(1) > 0;
             }
+        } catch(SQLException e)
+        {
+            throw dataSource.translate(sql, e);
         }finally
         {
             releaseDbResources(ps, rs);
@@ -677,7 +709,7 @@ class OCSPStoreQueryExecutor
     }
 
     private int nextCertId()
-    throws SQLException
+    throws DataAccessException
     {
         Connection conn = dataSource.getConnection();
         try

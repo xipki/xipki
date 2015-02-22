@@ -33,29 +33,38 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.datasource.api;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Properties;
-
-import org.xipki.datasource.api.exception.DataAccessException;
-import org.xipki.security.api.PasswordResolver;
-import org.xipki.security.api.PasswordResolverException;
+package org.xipki.datasource.api.exception;
 
 /**
- * @author Lijun Liao
+ * Copied from Spring Framework licensed under Apache License, version 2.0.
+ *
+ * Data access exception thrown when a resource fails temporarily
+ * and the operation can be retried.
+ *
+ * @author Thomas Risberg
+ * @see java.sql.SQLTransientConnectionException
  */
-
-public interface DataSourceFactory
+@SuppressWarnings("serial")
+public class TransientDataAccessResourceException extends TransientDataAccessException
 {
-    DataSourceWrapper createDataSource(String name, InputStream conf, PasswordResolver passwordResolver)
-    throws DataAccessException, PasswordResolverException, IOException;
 
-    DataSourceWrapper createDataSourceForFile(String name, String confFile, PasswordResolver passwordResolver)
-    throws DataAccessException, PasswordResolverException, IOException;
+    /**
+     * Constructor for TransientDataAccessResourceException.
+     * @param msg the detail message
+     */
+    public TransientDataAccessResourceException(String msg)
+    {
+        super(msg);
+    }
 
-    DataSourceWrapper createDataSource(String name, Properties conf, PasswordResolver passwordResolver)
-    throws DataAccessException, PasswordResolverException, IOException;
+    /**
+     * Constructor for TransientDataAccessResourceException.
+     * @param msg the detail message
+     * @param cause the root cause from the data access API in use
+     */
+    public TransientDataAccessResourceException(String msg, Throwable cause)
+    {
+        super(msg, cause);
+    }
 
 }

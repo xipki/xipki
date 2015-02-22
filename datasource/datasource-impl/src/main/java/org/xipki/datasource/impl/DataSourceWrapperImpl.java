@@ -42,7 +42,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.Arrays;
 import java.util.Properties;
 
 import org.slf4j.Logger;
@@ -50,6 +49,20 @@ import org.slf4j.LoggerFactory;
 import org.xipki.common.ParamChecker;
 import org.xipki.datasource.api.DataSourceWrapper;
 import org.xipki.datasource.api.DatabaseType;
+import org.xipki.datasource.api.exception.BadSqlGrammarException;
+import org.xipki.datasource.api.exception.CannotAcquireLockException;
+import org.xipki.datasource.api.exception.CannotSerializeTransactionException;
+import org.xipki.datasource.api.exception.ConcurrencyFailureException;
+import org.xipki.datasource.api.exception.DataAccessException;
+import org.xipki.datasource.api.exception.DataAccessResourceFailureException;
+import org.xipki.datasource.api.exception.DataIntegrityViolationException;
+import org.xipki.datasource.api.exception.DeadlockLoserDataAccessException;
+import org.xipki.datasource.api.exception.DuplicateKeyException;
+import org.xipki.datasource.api.exception.InvalidResultSetAccessException;
+import org.xipki.datasource.api.exception.PermissionDeniedDataAccessException;
+import org.xipki.datasource.api.exception.QueryTimeoutException;
+import org.xipki.datasource.api.exception.TransientDataAccessResourceException;
+import org.xipki.datasource.api.exception.UncategorizedSQLException;
 
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
@@ -64,15 +77,9 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
 
     private static class MySQL extends DataSourceWrapperImpl
     {
-        private static final String[] duplicateKeyErrorCodes = new String[]{"1062"};
-        private static final String[] dataIntegrityViolationCodes = new String[]
-        {
-            "630", "839", "840", "893", "1169", "1215", "1216", "1217", "1364", "1451", "1452", "1557"
-        };
-
         MySQL(String name, HikariDataSource service)
         {
-            super(name, service);
+            super(name, service, DatabaseType.MYSQL);
         }
 
         @Override
@@ -124,31 +131,39 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
 
         @Override
         public long nextSeqValue(Connection conn, String sequenceName)
-        throws SQLException
+        throws DataAccessException
         {
             final String sqlUpdate = buildNextSeqValueSql(sequenceName);
             final String SQL_SELECT = "SELECT @cur_value";
+            String sql = null;
 
             boolean newConn = conn == null;
             if(newConn)
             {
                 conn = getConnection();
             }
-            Statement stmt = conn.createStatement();
+            Statement stmt = null;
             ResultSet rs = null;
 
             long ret;
             try
             {
-                stmt.executeUpdate(sqlUpdate);
-                rs = stmt.executeQuery(SQL_SELECT);
+                stmt = conn.createStatement();
+                sql = sqlUpdate;
+                stmt.executeUpdate(sql);
+
+                sql = SQL_SELECT;
+                rs = stmt.executeQuery(sql);
                 if(rs.next())
                 {
                     ret = rs.getLong(1);
                 } else
                 {
-                    throw new SQLException("Could not increment the sequence " + sequenceName);
+                    throw new DataAccessException("Could not increment the sequence " + sequenceName);
                 }
+            }catch(SQLException e)
+            {
+                throw translate(sqlUpdate, e);
             }finally
             {
                 if(newConn)
@@ -165,31 +180,13 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
             return ret;
         }
 
-        @Override
-        protected String[] getDuplicateKeyErrorCodes()
-        {
-            return duplicateKeyErrorCodes;
-        }
-
-        @Override
-        protected String[] getDataIntegrityViolationCodes()
-        {
-            return dataIntegrityViolationCodes;
-        }
-
     }
 
     private static class DB2 extends DataSourceWrapperImpl
     {
-        private static final String[] duplicateKeyErrorCodes = new String[]{"-803"};
-        private static final String[] dataIntegrityViolationCodes = new String[]
-        {
-            "-407", "-530", "-531", "-532", "-543", "-544", "-545", "-603", "-667"
-        };
-
         DB2(String name, HikariDataSource service)
         {
-            super(name, service);
+            super(name, service, DatabaseType.DB2);
         }
 
         @Override
@@ -239,31 +236,13 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
             return sql.toString();
         }
 
-        @Override
-        protected String[] getDuplicateKeyErrorCodes()
-        {
-            return duplicateKeyErrorCodes;
-        }
-
-        @Override
-        protected String[] getDataIntegrityViolationCodes()
-        {
-            return dataIntegrityViolationCodes;
-        }
-
     }
 
     private static class PostgreSQL extends DataSourceWrapperImpl
     {
-        private static final String[] duplicateKeyErrorCodes = new String[]{"23505"};
-        private static final String[] dataIntegrityViolationCodes = new String[]
-        {
-            "23000", "23502", "23503", "23514"
-        };
-
         PostgreSQL(String name, HikariDataSource service)
         {
-            super(name, service);
+            super(name, service, DatabaseType.POSTGRES);
         }
 
         @Override
@@ -314,18 +293,6 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
         }
 
         @Override
-        protected String[] getDuplicateKeyErrorCodes()
-        {
-            return duplicateKeyErrorCodes;
-        }
-
-        @Override
-        protected String[] getDataIntegrityViolationCodes()
-        {
-            return dataIntegrityViolationCodes;
-        }
-
-        @Override
         protected boolean isUseSqlStateAsCode()
         {
             return true;
@@ -335,15 +302,9 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
 
     private static class Oracle extends DataSourceWrapperImpl
     {
-        private static final String[] duplicateKeyErrorCodes = new String[]{"1"};
-        private static final String[] dataIntegrityViolationCodes = new String[]
-        {
-            "1400", "1722", "2291", "2292"
-        };
-
         Oracle(String name, HikariDataSource service)
         {
-            super(name, service);
+            super(name, service, DatabaseType.ORACLE);
         }
 
         @Override
@@ -408,32 +369,13 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
             return sql.toString();
         }
 
-        @Override
-        protected String[] getDuplicateKeyErrorCodes()
-        {
-            return duplicateKeyErrorCodes;
-        }
-
-        @Override
-        protected String[] getDataIntegrityViolationCodes()
-        {
-            return dataIntegrityViolationCodes;
-        }
-
     }
 
     private static class H2 extends DataSourceWrapperImpl
     {
-        private static final String[] duplicateKeyErrorCodes = new String[]{"23001", "23505"};
-        private static final String[] dataIntegrityViolationCodes = new String[]
-        {
-            "22001", "22003", "22012", "22018", "22025", "23000", "23002",
-            "23003", "23502", "23503", "23506", "23507", "23513"
-        };
-
         H2(String name, HikariDataSource service)
         {
-            super(name, service);
+            super(name, service, DatabaseType.H2);
         }
 
         @Override
@@ -483,28 +425,13 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
             return sql.toString();
         }
 
-        @Override
-        protected String[] getDuplicateKeyErrorCodes()
-        {
-            return duplicateKeyErrorCodes;
-        }
-
-        @Override
-        protected String[] getDataIntegrityViolationCodes()
-        {
-            return dataIntegrityViolationCodes;
-        }
-
     }
 
     private static class HSQL extends DataSourceWrapperImpl
     {
-        private static final String[] duplicateKeyErrorCodes = new String[]{"-104"};
-        private static final String[] dataIntegrityViolationCodes = new String[]{"-9"};
-
         HSQL(String name, HikariDataSource service)
         {
-            super(name, service);
+            super(name, service, DatabaseType.HSQL);
         }
 
         @Override
@@ -554,18 +481,6 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
             return sql.toString();
         }
 
-        @Override
-        protected String[] getDuplicateKeyErrorCodes()
-        {
-            return duplicateKeyErrorCodes;
-        }
-
-        @Override
-        protected String[] getDataIntegrityViolationCodes()
-        {
-            return dataIntegrityViolationCodes;
-        }
-
     }
 
     /**
@@ -576,11 +491,16 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
 
     protected final String name;
 
-    private DataSourceWrapperImpl(String name, HikariDataSource service)
+    private final SQLErrorCodes sqlErrorCodes;
+    private final SQLStateCodes sqlStateCodes;
+
+    private DataSourceWrapperImpl(String name, HikariDataSource service, DatabaseType dbType)
     {
         ParamChecker.assertNotNull("service", service);
         this.name = name;
         this.service = service;
+        this.sqlErrorCodes = SQLErrorCodes.newInstance(dbType);
+        this.sqlStateCodes = SQLStateCodes.newInstance(dbType);
     }
 
     static DataSourceWrapper createDataSource(String name, Properties props, DatabaseType databaseType)
@@ -667,7 +587,7 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
 
     @Override
     public final Connection getConnection()
-    throws SQLException
+    throws DataAccessException
     {
         try
         {
@@ -681,7 +601,7 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
             }
             LOG.error("Could not create connection to database {}", e.getMessage());
             LOG.debug("Could not create connection to database", e);
-            throw e;
+            throw translate(null, e);
         }
     }
 
@@ -729,16 +649,28 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
 
     @Override
     public Statement createStatement(Connection conn)
-    throws SQLException
+    throws DataAccessException
     {
-        return conn.createStatement();
+        try
+        {
+            return conn.createStatement();
+        }catch(SQLException e)
+        {
+            throw translate(null, e);
+        }
     }
 
     @Override
     public PreparedStatement prepareStatement(Connection conn, String sqlQuery)
-    throws SQLException
+    throws DataAccessException
     {
-        return conn.prepareStatement(sqlQuery);
+        try
+        {
+            return conn.prepareStatement(sqlQuery);
+        }catch(SQLException e)
+        {
+            throw translate(sqlQuery, e);
+        }
     }
 
     @Override
@@ -814,20 +746,24 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
 
     @Override
     public long getMin(Connection conn, String table, String column)
-    throws SQLException
+    throws DataAccessException
     {
+        StringBuilder sqlBuilder = new StringBuilder(column.length() + table.length() + 20);
+        sqlBuilder.append("SELECT MIN(").append(column).append(") FROM ").append(table);
+        final String sql = sqlBuilder.toString();
+
         Statement stmt = null;
         ResultSet rs = null;
         try
         {
             stmt = (conn != null) ? conn.createStatement() : getConnection().createStatement();
-            StringBuilder sql = new StringBuilder(column.length() + table.length() + 20);
-            sql.append("SELECT MIN(").append(column).append(") FROM ").append(table);
-            rs = stmt.executeQuery(sql.toString());
-
+            rs = stmt.executeQuery(sql);
             rs.next();
             return rs.getLong(1);
-        }finally
+        } catch(SQLException e)
+        {
+            throw translate(sql, e);
+        } finally
         {
             if(conn == null)
             {
@@ -842,18 +778,23 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
 
     @Override
     public int getCount(Connection conn, String table)
-    throws SQLException
+    throws DataAccessException
     {
+        StringBuilder sqlBuilder = new StringBuilder(table.length() + 25);
+        sqlBuilder.append("SELECT COUNT(*) FROM ").append(table);
+        final String sql = sqlBuilder.toString();
+
         Statement stmt = null;
         ResultSet rs = null;
         try
         {
             stmt = (conn != null) ? conn.createStatement() : getConnection().createStatement();
-            StringBuilder sql = new StringBuilder(table.length() + 25);
-            sql.append("SELECT COUNT(*) FROM ").append(table);
-            rs = stmt.executeQuery(sql.toString());
+            rs = stmt.executeQuery(sql);
             rs.next();
             return rs.getInt(1);
+        } catch(SQLException e)
+        {
+            throw translate(sql, e);
         }finally
         {
             if(conn == null)
@@ -869,18 +810,23 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
 
     @Override
     public long getMax(Connection conn, String table, String column)
-    throws SQLException
+    throws DataAccessException
     {
+        StringBuilder sqlBuilder = new StringBuilder(column.length() + table.length() + 20);
+        sqlBuilder.append("SELECT MAX(").append(column).append(") FROM ").append(table);
+        final String sql = sqlBuilder.toString();
+
         Statement stmt = null;
         ResultSet rs = null;
         try
         {
             stmt = (conn != null) ? conn.createStatement() : getConnection().createStatement();
-            StringBuilder sql = new StringBuilder(column.length() + table.length() + 20);
-            sql.append("SELECT MAX(").append(column).append(") FROM ").append(table);
-            rs = stmt.executeQuery(sql.toString());
+            rs = stmt.executeQuery(sql);
             rs.next();
             return rs.getLong(1);
+        } catch(SQLException e)
+        {
+            throw translate(sql, e);
         }finally
         {
             if(conn == null)
@@ -896,7 +842,7 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
 
     @Override
     public boolean columnExists(Connection conn, String table, String column, Object value)
-    throws SQLException
+    throws DataAccessException
     {
         // TODO use fetch first
         StringBuilder sb = new StringBuilder();
@@ -924,6 +870,9 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
             rs = stmt.executeQuery();
             rs.next();
             return rs.getInt(1) > 0;
+        } catch(SQLException e)
+        {
+            throw translate(sql, e);
         }finally
         {
             if(conn == null)
@@ -939,14 +888,24 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
 
     @Override
     public boolean tableHasColumn(Connection conn, String table, String column)
-    throws SQLException
+    throws DataAccessException
     {
-        Statement stmt = (conn != null) ? conn.createStatement() : getConnection().createStatement();
+        Statement stmt;
         try
         {
-            StringBuilder sql = new StringBuilder(column.length() + table.length() + 20);
-            sql.append(column).append(" FROM ").append(table);
-            stmt.execute(createFetchFirstSelectSQL(sql.toString(), 1));
+            stmt = (conn != null) ? conn.createStatement() : getConnection().createStatement();
+        } catch (SQLException e)
+        {
+            throw translate(null, e);
+        }
+
+        StringBuilder sqlBuilder = new StringBuilder(column.length() + table.length() + 20);
+        sqlBuilder.append(column).append(" FROM ").append(table);
+        final String sql = createFetchFirstSelectSQL(sqlBuilder.toString(), 1);
+
+        try
+        {
+            stmt.execute(sql);
             return true;
         }catch(SQLException e)
         {
@@ -966,14 +925,24 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
 
     @Override
     public boolean tableExists(Connection conn, String table)
-    throws SQLException
+    throws DataAccessException
     {
-        Statement stmt = (conn != null) ? conn.createStatement() : getConnection().createStatement();
+        Statement stmt;
         try
         {
-            StringBuilder sql = new StringBuilder(table.length() + 10);
-            sql.append("1 FROM ").append(table);
-            stmt.execute(createFetchFirstSelectSQL(sql.toString(), 1));
+            stmt = (conn != null) ? conn.createStatement() : getConnection().createStatement();
+        } catch (SQLException e)
+        {
+            throw translate(null, e);
+        }
+
+        StringBuilder sqlBuilder = new StringBuilder(table.length() + 10);
+        sqlBuilder.append("1 FROM ").append(table);
+        final String sql = createFetchFirstSelectSQL(sqlBuilder.toString(), 1);
+
+        try
+        {
+            stmt.execute(sql);
             return true;
         }catch(SQLException e)
         {
@@ -997,10 +966,6 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
 
     protected abstract String buildNextSeqValueSql(String sequenceName);
 
-    protected abstract String[] getDuplicateKeyErrorCodes();
-
-    protected abstract String[] getDataIntegrityViolationCodes();
-
     protected boolean isUseSqlStateAsCode()
     {
         return false;
@@ -1008,12 +973,12 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
 
     @Override
     public void dropAndCreateSequence(String sequenceName, long startValue)
-    throws SQLException
+    throws DataAccessException
     {
         try
         {
             dropSequence(sequenceName);
-        }catch(SQLException e)
+        }catch(DataAccessException e)
         {
         }
 
@@ -1022,9 +987,9 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
 
     @Override
     public void createSequence(String sequenceName, long startValue)
-    throws SQLException
+    throws DataAccessException
     {
-        String sql = buildCreateSequenceSql(sequenceName, startValue);
+        final String sql = buildCreateSequenceSql(sequenceName, startValue);
         Connection conn = getConnection();
         Statement stmt = null;
         try
@@ -1032,6 +997,9 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
             stmt = conn.createStatement();
             stmt.execute(sql);
             LOG.info("datasource {} CREATESEQ {} START {}", name, sequenceName, startValue);
+        } catch(SQLException e)
+        {
+            throw translate(sql, e);
         }
         finally
         {
@@ -1042,9 +1010,9 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
 
     @Override
     public void dropSequence(String sequenceName)
-    throws SQLException
+    throws DataAccessException
     {
-        String sql = buildDropSequenceSql(sequenceName);
+        final String sql = buildDropSequenceSql(sequenceName);
 
         Connection conn = getConnection();
         Statement stmt = null;
@@ -1053,6 +1021,9 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
             stmt = conn.createStatement();
             stmt.execute(sql);
             LOG.info("datasource {} DROPSEQ {}", name, sequenceName);
+        } catch(SQLException e)
+        {
+            throw translate(sql, e);
         }
         finally
         {
@@ -1062,28 +1033,32 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
 
     @Override
     public long nextSeqValue(Connection conn, String sequenceName)
-    throws SQLException
+    throws DataAccessException
     {
-        String sql = buildNextSeqValueSql(sequenceName);
+        final String sql = buildNextSeqValueSql(sequenceName);
         boolean newConn = conn == null;
         if(newConn)
         {
             conn = getConnection();
         }
-        Statement stmt = conn.createStatement();
+        Statement stmt = null;
         ResultSet rs = null;
 
         long ret;
         try
         {
+            stmt = conn.createStatement();
             rs = stmt.executeQuery(sql);
             if(rs.next())
             {
                 ret = rs.getLong(1);
             } else
             {
-                throw new SQLException("Could not increment the sequence " + sequenceName);
+                throw new DataAccessException("Could not increment the sequence " + sequenceName);
             }
+        } catch(SQLException e)
+        {
+            throw translate(sql, e);
         }finally
         {
             if(newConn)
@@ -1101,22 +1076,12 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
     }
 
     @Override
-    public boolean isDuplicateKeyException(SQLException sqlException)
+    public DataAccessException translate(String sql, SQLException ex)
     {
-        return isSqlExceptionContained(sqlException, getDuplicateKeyErrorCodes());
-    }
-
-    @Override
-    public boolean isDataIntegrityViolation(SQLException sqlException)
-    {
-        return isSqlExceptionContained(sqlException, getDataIntegrityViolationCodes());
-    }
-
-    private boolean isSqlExceptionContained(SQLException ex, String[] errorCodes)
-    {
-        if(errorCodes == null)
+        ParamChecker.assertNotNull("ex", ex);
+        if(sql == null)
         {
-            return false;
+            sql = "";
         }
 
         SQLException sqlEx = ex;
@@ -1130,11 +1095,16 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
             }
         }
 
+        // Check SQLErrorCodes with corresponding error code, if available.
         String errorCode;
-        if (isUseSqlStateAsCode())
+        String sqlState;
+
+        if (sqlErrorCodes.isUseSqlStateForTranslation())
         {
             errorCode = sqlEx.getSQLState();
-        } else
+            sqlState = null;
+        }
+        else
         {
             // Try to find SQLException with actual error code, looping through the causes.
             // E.g. applicable to java.sql.DataTruncation as of JDK 1.6.
@@ -1144,17 +1114,127 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
                 current = (SQLException) current.getCause();
             }
             errorCode = Integer.toString(current.getErrorCode());
+            sqlState = current.getSQLState();
         }
-
-        LOG.debug("datasource {} SQLException errorCode: {}", name, errorCode);
 
         if (errorCode != null)
         {
-            return Arrays.binarySearch(errorCodes, errorCode) >= 0;
-        } else
-        {
-            return false;
+            // look for grouped error codes.
+            if (sqlErrorCodes.getBadSqlGrammarCodes().contains(errorCode))
+            {
+                logTranslation(sql, sqlEx);
+                return new BadSqlGrammarException(sql, sqlEx);
+            }
+            else if (sqlErrorCodes.getInvalidResultSetAccessCodes().contains(errorCode))
+            {
+                logTranslation(sql, sqlEx);
+                return new InvalidResultSetAccessException(sql, sqlEx);
+            }
+            else if (sqlErrorCodes.getDuplicateKeyCodes().contains(errorCode))
+            {
+                logTranslation(sql, sqlEx);
+                return new DuplicateKeyException(buildMessage(sql, sqlEx), sqlEx);
+            }
+            else if (sqlErrorCodes.getDataIntegrityViolationCodes().contains(errorCode))
+            {
+                logTranslation(sql, sqlEx);
+                return new DataIntegrityViolationException(buildMessage(sql, sqlEx), sqlEx);
+            }
+            else if (sqlErrorCodes.getPermissionDeniedCodes().contains(errorCode))
+            {
+                logTranslation(sql, sqlEx);
+                return new PermissionDeniedDataAccessException(buildMessage(sql, sqlEx), sqlEx);
+            }
+            else if (sqlErrorCodes.getDataAccessResourceFailureCodes().contains(errorCode))
+            {
+                logTranslation(sql, sqlEx);
+                return new DataAccessResourceFailureException(buildMessage(sql, sqlEx), sqlEx);
+            }
+            else if (sqlErrorCodes.getTransientDataAccessResourceCodes().contains(errorCode))
+            {
+                logTranslation(sql, sqlEx);
+                return new TransientDataAccessResourceException(buildMessage(sql, sqlEx), sqlEx);
+            }
+            else if (sqlErrorCodes.getCannotAcquireLockCodes().contains(errorCode))
+            {
+                logTranslation(sql, sqlEx);
+                return new CannotAcquireLockException(buildMessage(sql, sqlEx), sqlEx);
+            }
+            else if (sqlErrorCodes.getDeadlockLoserCodes().contains(errorCode))
+            {
+                logTranslation(sql, sqlEx);
+                return new DeadlockLoserDataAccessException(buildMessage(sql, sqlEx), sqlEx);
+            }
+            else if (sqlErrorCodes.getCannotSerializeTransactionCodes().contains(errorCode))
+            {
+                logTranslation(sql, sqlEx);
+                return new CannotSerializeTransactionException(buildMessage(sql, sqlEx), sqlEx);
+            }
         }
+
+        // try SQLState
+        if (sqlState != null && sqlState.length() >= 2)
+        {
+            String classCode = sqlState.substring(0, 2);
+            if (sqlStateCodes.getBadSQLGrammarCodes().contains(classCode))
+            {
+                return new BadSqlGrammarException(sql, ex);
+            }
+            else if (sqlStateCodes.getDataIntegrityViolationCodes().contains(classCode))
+            {
+                return new DataIntegrityViolationException(buildMessage(sql, ex), ex);
+            }
+            else if (sqlStateCodes.getDataAccessResourceFailureCodes().contains(classCode))
+            {
+                return new DataAccessResourceFailureException(buildMessage(sql, ex), ex);
+            }
+            else if (sqlStateCodes.getTransientDataAccessResourceCodes().contains(classCode))
+            {
+                return new TransientDataAccessResourceException(buildMessage(sql, ex), ex);
+            }
+            else if (sqlStateCodes.getConcurrencyFailureCodes().contains(classCode))
+            {
+                return new ConcurrencyFailureException(buildMessage(sql, ex), ex);
+            }
+        }
+
+        // For MySQL: exception class name indicating a timeout?
+        // (since MySQL doesn't throw the JDBC 4 SQLTimeoutException)
+        if (ex.getClass().getName().contains("Timeout"))
+        {
+            return new QueryTimeoutException(buildMessage(sql, ex), ex);
+        }
+
+        // We couldn't identify it more precisely
+        if (LOG.isDebugEnabled())
+        {
+            String codes;
+            if (sqlErrorCodes != null && sqlErrorCodes.isUseSqlStateForTranslation())
+            {
+                codes = "SQL state '" + sqlEx.getSQLState() + "', error code '" + sqlEx.getErrorCode();
+            }
+            else
+            {
+                codes = "Error code '" + sqlEx.getErrorCode() + "'";
+            }
+            LOG.debug("Unable to translate SQLException with " + codes);
+        }
+
+        return new UncategorizedSQLException(sql, sqlEx);
+    }
+
+    private void logTranslation(String sql, SQLException sqlEx)
+    {
+        if (LOG.isDebugEnabled())
+        {
+            LOG.debug("Translating SQLException with SQL state '{}', error code '{}', message [{}]; SQL was [{}]",
+                    sqlEx.getSQLState(), sqlEx.getErrorCode(), sqlEx.getMessage(), sql);
+        }
+    }
+
+    private String buildMessage(String sql, SQLException ex)
+    {
+        return "SQL [" + sql + "]; " + ex.getMessage();
     }
 
 }

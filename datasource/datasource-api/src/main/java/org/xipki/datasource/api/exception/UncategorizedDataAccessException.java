@@ -33,29 +33,29 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.datasource.api;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Properties;
-
-import org.xipki.datasource.api.exception.DataAccessException;
-import org.xipki.security.api.PasswordResolver;
-import org.xipki.security.api.PasswordResolverException;
+package org.xipki.datasource.api.exception;
 
 /**
- * @author Lijun Liao
+ * Copied from Spring Framework licensed under Apache License, version 2.0.
+ *
+ * Normal superclass when we can't distinguish anything more specific
+ * than "something went wrong with the underlying resource": for example,
+ * a SQLException from JDBC we can't pinpoint more precisely.
+ *
+ * @author Rod Johnson
  */
-
-public interface DataSourceFactory
+@SuppressWarnings("serial")
+public abstract class UncategorizedDataAccessException extends NonTransientDataAccessException
 {
-    DataSourceWrapper createDataSource(String name, InputStream conf, PasswordResolver passwordResolver)
-    throws DataAccessException, PasswordResolverException, IOException;
 
-    DataSourceWrapper createDataSourceForFile(String name, String confFile, PasswordResolver passwordResolver)
-    throws DataAccessException, PasswordResolverException, IOException;
-
-    DataSourceWrapper createDataSource(String name, Properties conf, PasswordResolver passwordResolver)
-    throws DataAccessException, PasswordResolverException, IOException;
+    /**
+     * Constructor for UncategorizedDataAccessException.
+     * @param msg the detail message
+     * @param cause the exception thrown by underlying data access API
+     */
+    public UncategorizedDataAccessException(String msg, Throwable cause)
+    {
+        super(msg, cause);
+    }
 
 }

@@ -61,6 +61,7 @@ import org.xipki.common.ParamChecker;
 import org.xipki.common.SecurityUtil;
 import org.xipki.common.XMLUtil;
 import org.xipki.datasource.api.DataSourceWrapper;
+import org.xipki.datasource.api.exception.DataAccessException;
 import org.xipki.dbi.ocsp.jaxb.CertStoreType;
 import org.xipki.dbi.ocsp.jaxb.CertStoreType.CertsFiles;
 import org.xipki.dbi.ocsp.jaxb.CertStoreType.Issuers;
@@ -169,11 +170,12 @@ class OcspCertStoreDbExporter extends DbPorter
     }
 
     private void export_issuer(CertStoreType certstore)
-    throws SQLException
+    throws DataAccessException
     {
         System.out.println("Exporting table ISSUER");
         Issuers issuers = new Issuers();
         certstore.setIssuers(issuers);
+        final String sql = "SELECT ID, CERT, REVOKED, REV_REASON, REV_TIME, REV_INVALIDITY_TIME FROM ISSUER";
 
         Statement stmt = null;
         ResultSet rs = null;
@@ -181,9 +183,6 @@ class OcspCertStoreDbExporter extends DbPorter
         try
         {
             stmt = createStatement();
-
-            String sql = "SELECT ID, CERT, REVOKED, REV_REASON, REV_TIME, REV_INVALIDITY_TIME FROM ISSUER";
-
             rs = stmt.executeQuery(sql);
 
             while(rs.next())
@@ -212,6 +211,9 @@ class OcspCertStoreDbExporter extends DbPorter
 
                 issuers.getIssuer().add(issuer);
             }
+        }catch(SQLException e)
+        {
+            throw dataSource.translate(sql, e);
         }finally
         {
             releaseResources(stmt, rs);
@@ -238,7 +240,7 @@ class OcspCertStoreDbExporter extends DbPorter
     }
 
     private void do_export_cert(CertStoreType certstore, File processLogFile)
-    throws SQLException, IOException, JAXBException
+    throws DataAccessException, IOException, JAXBException
     {
         CertsFiles certsFiles = certstore.getCertsFiles();
         int numProcessedBefore = 0;
@@ -270,10 +272,8 @@ class OcspCertStoreDbExporter extends DbPorter
 
         System.out.println("Exporting tables CERT, CERTHASH and RAWCERT from ID " + minCertId);
 
-        String certSql = "SELECT ID, ISSUER_ID, LAST_UPDATE, REVOKED " +
-                ", REV_REASON, REV_TIME, REV_INVALIDITY_TIME, PROFILE " +
-                " FROM CERT" +
-                " WHERE ID >= ? AND ID < ?";
+        String certSql = "SELECT ID, ISSUER_ID, LAST_UPDATE, REVOKED, REV_REASON, REV_TIME, REV_INVALIDITY_TIME, PROFILE " +
+                " FROM CERT WHERE ID >= ? AND ID < ?";
 
         String rawCertSql = "SELECT CERT_ID, CERT FROM RAWCERT WHERE CERT_ID >= ? AND CERT_ID < ?";
 
@@ -300,6 +300,8 @@ class OcspCertStoreDbExporter extends DbPorter
         final long startTime = System.currentTimeMillis();
         printHeader();
 
+        String sql = null;
+
         Integer id = null;
         try
         {
@@ -308,6 +310,7 @@ class OcspCertStoreDbExporter extends DbPorter
                 Map<Integer, byte[]> rawCertMaps = new HashMap<>();
 
                 // retrieve raw certificates
+                sql = rawCertSql;
                 rawCertPs.setInt(1, i);
                 rawCertPs.setInt(2, i + n);
                 ResultSet rawCertRs = rawCertPs.executeQuery();
@@ -320,6 +323,7 @@ class OcspCertStoreDbExporter extends DbPorter
                 }
                 rawCertRs.close();
 
+                sql = certSql;
                 certPs.setInt(1, i);
                 certPs.setInt(2, i + n);
 
@@ -452,7 +456,9 @@ class OcspCertStoreDbExporter extends DbPorter
                 currentCertsZip.close();
                 currentCertsZipFile.delete();
             }
-
+        }catch(SQLException e)
+        {
+            throw dataSource.translate(sql, e);
         }finally
         {
             releaseResources(certPs, null);

@@ -37,7 +37,6 @@ package org.xipki.ca.server.impl.publisher;
 
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.X509CRL;
-import java.sql.SQLException;
 import java.util.Date;
 import java.util.Map;
 
@@ -59,6 +58,7 @@ import org.xipki.common.CmpUtf8Pairs;
 import org.xipki.common.ParamChecker;
 import org.xipki.common.SecurityUtil;
 import org.xipki.datasource.api.DataSourceWrapper;
+import org.xipki.datasource.api.exception.DataAccessException;
 import org.xipki.security.api.PasswordResolver;
 
 /**
@@ -119,7 +119,7 @@ public class OCSPCertPublisher extends X509CertPublisher
         try
         {
             queryExecutor = new OCSPStoreQueryExecutor(dataSource, this.publishsGoodCert);
-        } catch (NoSuchAlgorithmException | SQLException e)
+        } catch (NoSuchAlgorithmException | DataAccessException e)
         {
             throw new CertPublisherException(e.getMessage(), e);
         }

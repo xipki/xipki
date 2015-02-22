@@ -117,6 +117,7 @@ import org.xipki.common.LogUtil;
 import org.xipki.common.ParamChecker;
 import org.xipki.common.SecurityUtil;
 import org.xipki.datasource.api.DataSourceWrapper;
+import org.xipki.datasource.api.exception.DataAccessException;
 import org.xipki.security.api.PasswordResolverException;
 import org.xipki.security.api.SignerException;
 
@@ -412,7 +413,7 @@ implements CAManager, CmpResponderManager
                         datasource.returnConnection(conn);
 
                         this.dataSources.put(datasourceName, datasource);
-                    } catch (SQLException | PasswordResolverException | IOException | RuntimeException e)
+                    } catch (DataAccessException | PasswordResolverException | IOException | RuntimeException e)
                     {
                         throw new CAMgmtException(e.getClass().getName() + " while parsing datasoure " + datasourceFile, e);
                     }
@@ -433,9 +434,9 @@ implements CAManager, CmpResponderManager
             try
             {
                 lockedSuccessfull = lockCA(true);
-            }catch(SQLException e)
+            }catch(DataAccessException e)
             {
-                throw new CAMgmtException("SQLException while locking CA", e);
+                throw new CAMgmtException("DataAccessException while locking CA", e);
             }
 
             if(lockedSuccessfull == false)
@@ -450,7 +451,7 @@ implements CAManager, CmpResponderManager
         try
         {
             this.certstore = new CertificateStore(dataSource);
-        } catch (SQLException e)
+        } catch (DataAccessException e)
         {
             throw new CAMgmtException(e.getMessage(), e);
         }
@@ -480,15 +481,15 @@ implements CAManager, CmpResponderManager
     }
 
     private boolean lockCA(boolean forceRelock)
-    throws SQLException, CAMgmtException
+    throws DataAccessException, CAMgmtException
     {
+        String sql = "SELECT EVENT_TIME, EVENT_OWNER FROM SYSTEM_EVENT WHERE NAME='LOCK'";
         Statement stmt = null;
         ResultSet rs = null;
 
         try
         {
             stmt = createStatement();
-            final String sql = "SELECT EVENT_TIME, EVENT_OWNER FROM SYSTEM_EVENT WHERE NAME='LOCK'";
             rs = stmt.executeQuery(sql);
 
             if(rs.next())
@@ -511,8 +512,15 @@ implements CAManager, CmpResponderManager
                     return false;
                 }
             }
-            stmt.execute("DELETE FROM SYSTEM_EVENT WHERE NAME='LOCK'");
-        }finally
+
+            sql = "DELETE FROM SYSTEM_EVENT WHERE NAME='LOCK'";
+            stmt.execute(sql);
+        } catch(SQLException e)
+        {
+            DataAccessException tEx = dataSource.translate(sql, e);
+            throw new CAMgmtException(tEx.getMessage(), tEx);
+        }
+        finally
         {
             dataSource.releaseResources(stmt, rs);
         }
@@ -532,6 +540,10 @@ implements CAManager, CmpResponderManager
             int numColumns = ps.executeUpdate();
             caLockedByMe = numColumns > 0;
             return caLockedByMe;
+        } catch(SQLException e)
+        {
+            DataAccessException tEx = dataSource.translate(lockSql, e);
+            throw new CAMgmtException(tEx.getMessage(), tEx);
         }finally
         {
             dataSource.releaseResources(ps, null);
@@ -550,14 +562,23 @@ implements CAManager, CmpResponderManager
         caLockedByMe = false;
 
         boolean successfull = false;
-
+        final String sql = "DELETE FROM SYSTEM_EVENT WHERE NAME='LOCK'";
         Statement stmt = null;
         try
         {
             stmt = createStatement();
-            stmt.execute("DELETE FROM SYSTEM_EVENT WHERE NAME='LOCK'");
+            stmt.execute(sql);
             successfull = true;
-        }catch(SQLException | CAMgmtException e)
+        }catch(SQLException e)
+        {
+            final String message = "Error in unlockCA()";
+            DataAccessException tEx = dataSource.translate(sql, e);
+            if(LOG.isWarnEnabled())
+            {
+                LOG.warn(LogUtil.buildExceptionLogFormat(message), tEx.getClass().getName(), tEx.getMessage());
+            }
+            LOG.debug(message, tEx);
+        }catch(CAMgmtException e)
         {
             final String message = "Error in unlockCA()";
             if(LOG.isWarnEnabled())
@@ -631,24 +652,28 @@ implements CAManager, CmpResponderManager
     @Override
     public void notifyCAChange()
     {
+        String sql = null;
+
         try
         {
             Statement stmt = null;
+            sql = "DELETE FROM SYSTEM_EVENT WHERE NAME='CA_CHANGE'";
             try
             {
                 stmt = createStatement();
-                stmt.execute("DELETE FROM SYSTEM_EVENT WHERE NAME='CA_CHANGE'");
+                stmt.execute(sql);
             }finally
             {
                 dataSource.releaseResources(stmt, null);
             }
 
+            sql = "INSERT INTO SYSTEM_EVENT (NAME, EVENT_TIME, EVENT_TIME2, EVENT_OWNER)"
+                    + " VALUES ('CA_CHANGE', ?, ?, ?)";
+
             PreparedStatement ps = null;
             try
             {
                 // notify the slave CAs
-                final String sql = "INSERT INTO SYSTEM_EVENT (NAME, EVENT_TIME, EVENT_TIME2, EVENT_OWNER)"
-                        + " VALUES ('CA_CHANGE', ?, ?, ?)";
                 ps = prepareStatement(sql);
 
                 long nowMillis = System.currentTimeMillis();
@@ -663,7 +688,16 @@ implements CAManager, CmpResponderManager
             }
 
             LOG.info("notified the change of CA system");
-        }catch(SQLException | CAMgmtException e)
+        }catch(SQLException e)
+        {
+            final String message = "Error while notifying Slave CAs to restart";
+            DataAccessException tEx = dataSource.translate(sql, e);
+            if(LOG.isWarnEnabled())
+            {
+                LOG.warn(LogUtil.buildExceptionLogFormat(message), tEx.getClass().getName(), tEx.getMessage());
+            }
+            LOG.debug(message, tEx);
+        }catch(CAMgmtException e)
         {
             final String message = "Error while notifying Slave CAs to restart";
             if(LOG.isWarnEnabled())
@@ -1004,13 +1038,13 @@ implements CAManager, CmpResponderManager
 
         envParameterResolver.clear();
 
+        final String sql = "SELECT NAME, VALUE2 FROM ENVIRONMENT";
         Statement stmt = null;
         ResultSet rs = null;
 
         try
         {
             stmt = createStatement();
-            String sql = "SELECT NAME, VALUE2 FROM ENVIRONMENT";
             rs = stmt.executeQuery(sql);
 
             while(rs.next())
@@ -1021,7 +1055,8 @@ implements CAManager, CmpResponderManager
             }
         }catch(SQLException e)
         {
-            throw new CAMgmtException(e.getMessage(), e);
+            DataAccessException tEx = dataSource.translate(sql, e);
+            throw new CAMgmtException(tEx.getMessage(), tEx);
         }finally
         {
             dataSource.releaseResources(stmt, rs);
@@ -1040,13 +1075,13 @@ implements CAManager, CmpResponderManager
 
         caAliases.clear();
 
+        final String sql = "SELECT NAME, CA_NAME FROM CAALIAS";
         Statement stmt = null;
         ResultSet rs = null;
 
         try
         {
             stmt = createStatement();
-            final String sql = "SELECT NAME, CA_NAME FROM CAALIAS";
             rs = stmt.executeQuery(sql);
 
             while(rs.next())
@@ -1058,7 +1093,8 @@ implements CAManager, CmpResponderManager
             }
         }catch(SQLException e)
         {
-            throw new CAMgmtException(e.getMessage(), e);
+            DataAccessException tEx = dataSource.translate(sql, e);
+            throw new CAMgmtException(tEx.getMessage(), tEx);
         }finally
         {
             dataSource.releaseResources(stmt, rs);
@@ -1240,19 +1276,20 @@ implements CAManager, CmpResponderManager
             throw new CAMgmtException("CA named " + name + " exists");
         }
 
+        StringBuilder sqlBuilder = new StringBuilder();
+        sqlBuilder.append("INSERT INTO CA (");
+        sqlBuilder.append("NAME, ART, SUBJECT, NEXT_SERIAL, NEXT_CRLNO, STATUS, CRL_URIS, OCSP_URIS, MAX_VALIDITY");
+        sqlBuilder.append(", CERT, SIGNER_TYPE, SIGNER_CONF, CRLSIGNER_NAME, CMPCONTROL_NAME");
+        sqlBuilder.append(", DUPLICATE_KEY_MODE, DUPLICATE_SUBJECT_MODE, PERMISSIONS, NUM_CRLS, EXPIRATION_PERIOD");
+        sqlBuilder.append(", VALIDITY_MODE, DELTA_CRL_URIS");
+        sqlBuilder.append(") VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+        final String sql = sqlBuilder.toString();
+
         // insert to table ca
         PreparedStatement ps = null;
         try
         {
-            StringBuilder sqlBuilder = new StringBuilder();
-            sqlBuilder.append("INSERT INTO CA (");
-            sqlBuilder.append("NAME, ART, SUBJECT, NEXT_SERIAL, NEXT_CRLNO, STATUS, CRL_URIS, OCSP_URIS, MAX_VALIDITY");
-            sqlBuilder.append(", CERT, SIGNER_TYPE, SIGNER_CONF, CRLSIGNER_NAME, CMPCONTROL_NAME");
-            sqlBuilder.append(", DUPLICATE_KEY_MODE, DUPLICATE_SUBJECT_MODE, PERMISSIONS, NUM_CRLS, EXPIRATION_PERIOD");
-            sqlBuilder.append(", VALIDITY_MODE, DELTA_CRL_URIS");
-            sqlBuilder.append(") VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
-
-            ps = prepareStatement(sqlBuilder.toString());
+            ps = prepareStatement(sql);
             int idx = 1;
             ps.setString(idx++, name);
             ps.setInt(idx++, CertArt.X509PKC.getCode());
@@ -1298,8 +1335,9 @@ implements CAManager, CmpResponderManager
             }
         }catch(SQLException e)
         {
-            throw new CAMgmtException(e.getMessage(), e);
-        } catch (CertificateEncodingException e)
+            DataAccessException tEx = dataSource.translate(sql, e);
+            throw new CAMgmtException(tEx.getMessage(), tEx);
+        } catch (CertificateEncodingException | DataAccessException e)
         {
             throw new CAMgmtException(e.getMessage(), e);
         }finally
@@ -1364,11 +1402,13 @@ implements CAManager, CmpResponderManager
         }
         int iName = index.get();
 
+        final String sql = sqlBuilder.toString();
         StringBuilder m = new StringBuilder();
         PreparedStatement ps = null;
+
         try
         {
-            ps = prepareStatement(sqlBuilder.toString());
+            ps = prepareStatement(sql);
 
             if(iStatus != null)
             {
@@ -1489,7 +1529,11 @@ implements CAManager, CmpResponderManager
                 m.deleteCharAt(m.length() - 1).deleteCharAt(m.length() - 1);
             }
             LOG.info("changed CA '{}': {}", name, m);
-        }catch(SQLException | CertificateEncodingException e)
+        }catch(SQLException e)
+        {
+            DataAccessException tEx = dataSource.translate(sql, e);
+            throw new CAMgmtException(tEx.getMessage(), tEx);
+        }catch(CertificateEncodingException e)
         {
             throw new CAMgmtException(e.getMessage(), e);
         }finally
@@ -1508,17 +1552,19 @@ implements CAManager, CmpResponderManager
         asssertMasterMode();
         caName = caName.toUpperCase();
 
+        final String sql = "DELETE FROM CA_HAS_CERTPROFILE WHERE CA_NAME=? AND CERTPROFILE_NAME=?";
         PreparedStatement ps = null;
         try
         {
-            ps = prepareStatement("DELETE FROM CA_HAS_CERTPROFILE WHERE CA_NAME=? AND CERTPROFILE_NAME=?");
+            ps = prepareStatement(sql);
             ps.setString(1, caName);
             ps.setString(2, profileName);
             ps.executeUpdate();
             LOG.info("remove profile '{}' from CA '{}'", profileName, caName);
         }catch(SQLException e)
         {
-            throw new CAMgmtException(e.getMessage(), e);
+            DataAccessException tEx = dataSource.translate(sql, e);
+            throw new CAMgmtException(tEx.getMessage(), tEx);
         }finally
         {
             dataSource.releaseResources(ps, null);
@@ -1551,17 +1597,19 @@ implements CAManager, CmpResponderManager
         }
         profileNames.add(profileName);
 
+        final String sql = "INSERT INTO CA_HAS_CERTPROFILE (CA_NAME, CERTPROFILE_NAME) VALUES (?, ?)";
         PreparedStatement ps = null;
         try
         {
-            ps = prepareStatement("INSERT INTO CA_HAS_CERTPROFILE (CA_NAME, CERTPROFILE_NAME) VALUES (?, ?)");
+            ps = prepareStatement(sql);
             ps.setString(1, caName);
             ps.setString(2, profileName);
             ps.executeUpdate();
             LOG.info("add profile '{}' to CA '{}'", profileName, caName);
         }catch(SQLException e)
         {
-            throw new CAMgmtException(e.getMessage(), e);
+            DataAccessException tEx = dataSource.translate(sql, e);
+            throw new CAMgmtException(tEx.getMessage(), tEx);
         }finally
         {
             dataSource.releaseResources(ps, null);
@@ -1577,17 +1625,19 @@ implements CAManager, CmpResponderManager
         asssertMasterMode();
         caName = caName.toUpperCase();
         Set<String> publisherNames = ca_has_publishers.get(caName);
+        final String sql = "DELETE FROM CA_HAS_PUBLISHER WHERE CA_NAME=? AND PUBLISHER_NAME=?";
         PreparedStatement ps = null;
         try
         {
-            ps = prepareStatement("DELETE FROM CA_HAS_PUBLISHER WHERE CA_NAME=? AND PUBLISHER_NAME=?");
+            ps = prepareStatement(sql);
             ps.setString(1, caName);
             ps.setString(2, publisherName);
             ps.executeUpdate();
             LOG.info("remove publisher '{}' from CA '{}'", publisherName, caName);
         }catch(SQLException e)
         {
-            throw new CAMgmtException(e.getMessage(), e);
+            DataAccessException tEx = dataSource.translate(sql, e);
+            throw new CAMgmtException(tEx.getMessage(), tEx);
         }finally
         {
             dataSource.releaseResources(ps, null);
@@ -1620,17 +1670,19 @@ implements CAManager, CmpResponderManager
         }
         publisherNames.add(publisherName);
 
+        final String sql = "INSERT INTO CA_HAS_PUBLISHER (CA_NAME, PUBLISHER_NAME) VALUES (?, ?)";
         PreparedStatement ps = null;
         try
         {
-            ps = prepareStatement("INSERT INTO CA_HAS_PUBLISHER (CA_NAME, PUBLISHER_NAME) VALUES (?, ?)");
+            ps = prepareStatement(sql);
             ps.setString(1, caName);
             ps.setString(2, publisherName);
             ps.executeUpdate();
             LOG.info("add publisher '{}' to CA '{}'", publisherName, caName);
         }catch(SQLException e)
         {
-            throw new CAMgmtException(e.getMessage(), e);
+            DataAccessException tEx = dataSource.translate(sql, e);
+            throw new CAMgmtException(tEx.getMessage(), tEx);
         }finally
         {
             dataSource.releaseResources(ps, null);
@@ -1676,10 +1728,11 @@ implements CAManager, CmpResponderManager
             throw new CAMgmtException("CMP requestor named " + name + " exists");
         }
 
+        final String sql = "INSERT INTO REQUESTOR (NAME, CERT) VALUES (?, ?)";
         PreparedStatement ps = null;
         try
         {
-            ps = prepareStatement("INSERT INTO REQUESTOR (NAME, CERT) VALUES (?, ?)");
+            ps = prepareStatement(sql);
             int idx = 1;
             ps.setString(idx++, name);
             ps.setString(idx++, Base64.toBase64String(dbEntry.getCert().getEncoded()));
@@ -1688,7 +1741,11 @@ implements CAManager, CmpResponderManager
             {
                 LOG.info("add requestor '{}': {}", name, dbEntry.toString(false));
             }
-        }catch(SQLException | CertificateEncodingException e)
+        }catch(SQLException e)
+        {
+            DataAccessException tEx = dataSource.translate(sql, e);
+            throw new CAMgmtException(tEx.getMessage(), tEx);
+        }catch(CertificateEncodingException e)
         {
             throw new CAMgmtException(e.getMessage(), e);
         }finally
@@ -1737,7 +1794,7 @@ implements CAManager, CmpResponderManager
             return;
         }
 
-        String sql = "UPDATE REQUESTOR SET CERT=? WHERE NAME=?";
+        final String sql = "UPDATE REQUESTOR SET CERT=? WHERE NAME=?";
         PreparedStatement ps = null;
         try
         {
@@ -1764,7 +1821,8 @@ implements CAManager, CmpResponderManager
             }
         }catch(SQLException e)
         {
-            throw new CAMgmtException(e.getMessage(), e);
+            DataAccessException tEx = dataSource.translate(sql, e);
+            throw new CAMgmtException(tEx.getMessage(), tEx);
         }finally
         {
             dataSource.releaseResources(ps, null);
@@ -1785,10 +1843,11 @@ implements CAManager, CmpResponderManager
         asssertMasterMode();
         caName = caName.toUpperCase();
         Set<CAHasRequestorEntry> requestors = ca_has_requestors.get(caName);
+        final String sql = "DELETE FROM CA_HAS_REQUESTOR WHERE CA_NAME=? AND REQUESTOR_NAME=?";
         PreparedStatement ps = null;
         try
         {
-            ps = prepareStatement("DELETE FROM CA_HAS_REQUESTOR WHERE CA_NAME=? AND REQUESTOR_NAME=?");
+            ps = prepareStatement(sql);
             ps.setString(1, caName);
             ps.setString(2, requestorName);
             ps.executeUpdate();
@@ -1800,7 +1859,8 @@ implements CAManager, CmpResponderManager
             LOG.info("remove requestor '{}' from CA '{}'", requestorName, caName);
         }catch(SQLException e)
         {
-            throw new CAMgmtException(e.getMessage(), e);
+            DataAccessException tEx = dataSource.translate(sql, e);
+            throw new CAMgmtException(tEx.getMessage(), tEx);
         }finally
         {
             dataSource.releaseResources(ps, null);
@@ -1848,14 +1908,15 @@ implements CAManager, CmpResponderManager
         cmpRequestors.add(requestor);
 
         PreparedStatement ps = null;
+        final String sql =
+                "INSERT INTO CA_HAS_REQUESTOR (CA_NAME, REQUESTOR_NAME, RA, PERMISSIONS, PROFILES) VALUES (?, ?, ?, ?, ?)";
         try
         {
             boolean ra = requestor.isRa();
             String permissionText = Permission.toString(requestor.getPermissions());
             String profilesText = toString(requestor.getProfiles(), ",");
 
-            ps = prepareStatement("INSERT INTO CA_HAS_REQUESTOR "
-                    + "(CA_NAME, REQUESTOR_NAME, RA, PERMISSIONS, PROFILES) VALUES (?, ?, ?, ?, ?)");
+            ps = prepareStatement(sql);
             int idx = 1;
             ps.setString(idx++, caName);
             ps.setString(idx++, requestorName);
@@ -1870,7 +1931,8 @@ implements CAManager, CmpResponderManager
                     requestorName, caName, ra, permissionText, profilesText);
         }catch(SQLException e)
         {
-            throw new CAMgmtException(e.getMessage(), e);
+            DataAccessException tEx = dataSource.translate(sql, e);
+            throw new CAMgmtException(tEx.getMessage(), tEx);
         }finally
         {
             dataSource.releaseResources(ps, null);
@@ -1933,11 +1995,12 @@ implements CAManager, CmpResponderManager
         Integer iConf = addToSqlIfNotNull(sqlBuilder, index, conf, "CONF");
         sqlBuilder.deleteCharAt(sqlBuilder.length() - 1);
         sqlBuilder.append(" WHERE NAME=?");
+        final String sql = sqlBuilder.toString();
 
         PreparedStatement ps = null;
         try
         {
-            ps = prepareStatement(sqlBuilder.toString());
+            ps = prepareStatement(sql);
             if(iType != null)
             {
                 ps.setString(iType, type);
@@ -1958,7 +2021,8 @@ implements CAManager, CmpResponderManager
             LOG.info("change profile '{}': {}", name, m);
         }catch(SQLException e)
         {
-            throw new CAMgmtException(e.getMessage(), e);
+            DataAccessException tEx = dataSource.translate(sql, e);
+            throw new CAMgmtException(tEx.getMessage(), tEx);
         }finally
         {
             dataSource.releaseResources(ps, null);
@@ -1983,11 +2047,12 @@ implements CAManager, CmpResponderManager
         {
             throw new CAMgmtException("Certprofile named " + name + " exists");
         }
+        final String sql = "INSERT INTO CERTPROFILE (NAME, ART, TYPE, CONF) VALUES (?, ?, ?, ?)";
 
         PreparedStatement ps = null;
         try
         {
-            ps = prepareStatement("INSERT INTO CERTPROFILE (NAME, ART, TYPE, CONF) VALUES (?, ?, ?, ?)");
+            ps = prepareStatement(sql);
             ps.setString(1, name);
             ps.setInt(2, CertArt.X509PKC.getCode());
             ps.setString(3, dbEntry.getType());
@@ -1999,7 +2064,8 @@ implements CAManager, CmpResponderManager
             LOG.info("add profile '{}': {}", name, dbEntry);
         }catch(SQLException e)
         {
-            throw new CAMgmtException(e.getMessage(), e);
+            DataAccessException tEx = dataSource.translate(sql, e);
+            throw new CAMgmtException(tEx.getMessage(), tEx);
         }finally
         {
             dataSource.releaseResources(ps, null);
@@ -2034,11 +2100,12 @@ implements CAManager, CmpResponderManager
         {
             removeCmpResponder();
         }
+        final String sql = "INSERT INTO RESPONDER (NAME, TYPE, CONF, CERT) VALUES (?, ?, ?, ?)";
 
         PreparedStatement ps = null;
         try
         {
-            ps = prepareStatement("INSERT INTO RESPONDER (NAME, TYPE, CONF, CERT) VALUES (?, ?, ?, ?)");
+            ps = prepareStatement(sql);
             int idx = 1;
             ps.setString(idx++, CmpResponderEntry.name);
             ps.setString(idx++, dbEntry.getType());
@@ -2055,7 +2122,11 @@ implements CAManager, CmpResponderManager
             ps.executeUpdate();
 
             LOG.info("change responder: {}", dbEntry.toString(false, true));
-        }catch(SQLException | CertificateEncodingException e)
+        }catch(SQLException e)
+        {
+            DataAccessException tEx = dataSource.translate(sql, e);
+            throw new CAMgmtException(tEx.getMessage(), tEx);
+        }catch(CertificateEncodingException e)
         {
             throw new CAMgmtException(e.getMessage(), e);
         }finally
@@ -2097,11 +2168,12 @@ implements CAManager, CmpResponderManager
         Integer iCert = addToSqlIfNotNull(sqlBuilder, index, cert, "CERT");
         sqlBuilder.deleteCharAt(sqlBuilder.length() - 1);
         sqlBuilder.append(" WHERE NAME=?");
+        final String sql = sqlBuilder.toString();
 
         PreparedStatement ps = null;
         try
         {
-            ps = prepareStatement(sqlBuilder.toString());
+            ps = prepareStatement(sql);
             if(iType != null)
             {
                 String txt = type;
@@ -2154,7 +2226,8 @@ implements CAManager, CmpResponderManager
             LOG.info("set CMP responder: {}", m);
         }catch(SQLException e)
         {
-            throw new CAMgmtException(e.getMessage(), e);
+            DataAccessException tEx = dataSource.translate(sql, e);
+            throw new CAMgmtException(tEx.getMessage(), tEx);
         }finally
         {
             dataSource.releaseResources(ps, null);
@@ -2185,15 +2258,16 @@ implements CAManager, CmpResponderManager
         {
             throw new CAMgmtException("CRL signer named " + name + " exists");
         }
+        StringBuilder sqlBuilder = new StringBuilder();
+        sqlBuilder.append("INSERT INTO CRLSIGNER (NAME, SIGNER_TYPE, SIGNER_CONF, SIGNER_CERT, CRL_CONTROL)");
+        sqlBuilder.append(" VALUES (?, ?, ?, ?, ?)");
+        final String sql = sqlBuilder.toString();
 
         PreparedStatement ps = null;
         try
         {
-            StringBuilder sqlBuilder = new StringBuilder();
-            sqlBuilder.append("INSERT INTO CRLSIGNER (NAME, SIGNER_TYPE, SIGNER_CONF, SIGNER_CERT, CRL_CONTROL)");
-            sqlBuilder.append(" VALUES (?, ?, ?, ?, ?)");
 
-            ps = prepareStatement(sqlBuilder.toString());
+            ps = prepareStatement(sql);
             int idx = 1;
             ps.setString(idx++, name);
             ps.setString(idx++, dbEntry.getType());
@@ -2206,7 +2280,11 @@ implements CAManager, CmpResponderManager
 
             ps.executeUpdate();
             LOG.info("add CRL signer '{}': {}", name, dbEntry.toString(false, true));
-        }catch(SQLException | CertificateEncodingException e)
+        }catch(SQLException e)
+        {
+            DataAccessException tEx = dataSource.translate(sql, e);
+            throw new CAMgmtException(tEx.getMessage(), tEx);
+        }catch(CertificateEncodingException e)
         {
             throw new CAMgmtException(e.getMessage(), e);
         }finally
@@ -2259,13 +2337,14 @@ implements CAManager, CmpResponderManager
         {
             return;
         }
+        final String sql = sqlBuilder.toString();
 
         PreparedStatement ps = null;
         try
         {
             StringBuilder m = new StringBuilder();
 
-            ps = prepareStatement(sqlBuilder.toString());
+            ps = prepareStatement(sql);
 
             if(iSigner_type != null)
             {
@@ -2317,7 +2396,8 @@ implements CAManager, CmpResponderManager
             LOG.info("set CRL signer '{}': {}", name, m);
         }catch(SQLException e)
         {
-            throw new CAMgmtException(e.getMessage(), e);
+            DataAccessException tEx = dataSource.translate(sql, e);
+            throw new CAMgmtException(tEx.getMessage(), tEx);
         }finally
         {
             dataSource.releaseResources(ps, null);
@@ -2352,11 +2432,12 @@ implements CAManager, CmpResponderManager
         {
             throw new CAMgmtException("Publisher named " + name + " exists");
         }
+        final String sql = "INSERT INTO PUBLISHER (NAME, TYPE, CONF) VALUES (?, ?, ?)";
 
         PreparedStatement ps = null;
         try
         {
-            ps = prepareStatement("INSERT INTO PUBLISHER (NAME, TYPE, CONF) VALUES (?, ?, ?)");
+            ps = prepareStatement(sql);
             ps.setString(1, name);
             ps.setString(2, dbEntry.getType());
             String conf = dbEntry.getConf();
@@ -2366,7 +2447,8 @@ implements CAManager, CmpResponderManager
             LOG.info("add publisher '{}': {}", name, dbEntry);
         }catch(SQLException e)
         {
-            throw new CAMgmtException(e.getMessage(), e);
+            DataAccessException tEx = dataSource.translate(sql, e);
+            throw new CAMgmtException(tEx.getMessage(), tEx);
         }finally
         {
             dataSource.releaseResources(ps, null);
@@ -2453,12 +2535,13 @@ implements CAManager, CmpResponderManager
         {
             return;
         }
+        final String sql = sqlBuilder.toString();
 
         PreparedStatement ps = null;
         try
         {
             StringBuilder m = new StringBuilder();
-            ps = prepareStatement(sqlBuilder.toString());
+            ps = prepareStatement(sql);
             if(iType != null)
             {
                 m.append("type: '").append(type).append("'; ");
@@ -2482,7 +2565,8 @@ implements CAManager, CmpResponderManager
             LOG.info("change publisher {}: '{}'", name, m);
         }catch(SQLException e)
         {
-            throw new CAMgmtException(e.getMessage(), e);
+            DataAccessException tEx = dataSource.translate(sql, e);
+            throw new CAMgmtException(tEx.getMessage(), tEx);
         }finally
         {
             dataSource.releaseResources(ps, null);
@@ -2515,13 +2599,13 @@ implements CAManager, CmpResponderManager
             throw new CAMgmtException("CMPControl named " + name + " exists");
         }
 
+        final String sql = "INSERT INTO CMPCONTROL (NAME, REQUIRE_CONFIRM_CERT, SEND_CA_CERT, SEND_RESPONDER_CERT," +
+                " REQUIRE_MESSAGE_TIME, MESSAGE_TIME_BIAS, CONFIRM_WAIT_TIME) VALUES (?, ?, ?, ?, ?, ?, ?)";
+
         PreparedStatement ps = null;
         try
         {
-            ps = prepareStatement(
-                    "INSERT INTO CMPCONTROL (NAME, REQUIRE_CONFIRM_CERT, SEND_CA_CERT, SEND_RESPONDER_CERT"
-                    + ", REQUIRE_MESSAGE_TIME, MESSAGE_TIME_BIAS, CONFIRM_WAIT_TIME)"
-                    + " VALUES (?, ?, ?, ?, ?, ?, ?)");
+            ps = prepareStatement(sql);
 
             int idx = 1;
             ps.setString(idx++, name);
@@ -2536,7 +2620,8 @@ implements CAManager, CmpResponderManager
             LOG.info("added CMP control: {}", dbEntry);
         }catch(SQLException e)
         {
-            throw new CAMgmtException(e.getMessage(), e);
+            DataAccessException tEx = dataSource.translate(sql, e);
+            throw new CAMgmtException(tEx.getMessage(), tEx);
         }finally
         {
             dataSource.releaseResources(ps, null);
@@ -2590,13 +2675,14 @@ implements CAManager, CmpResponderManager
         Integer iSendResponderCert = addToSqlIfNotNull(sqlBuilder, index, sendResponderCert, "SEND_RESPONDER_CERT");
         sqlBuilder.deleteCharAt(sqlBuilder.length() - 1);
         sqlBuilder.append(" WHERE NAME=?");
+        final String sql = sqlBuilder.toString();
 
         PreparedStatement ps = null;
         try
         {
             StringBuilder m = new StringBuilder();
 
-            ps = prepareStatement(sqlBuilder.toString());
+            ps = prepareStatement(sql);
             if(iConfirmCert != null)
             {
                 m.append("requireConfirmCert: '").append(requireConfirmCert).append("'; ");
@@ -2643,7 +2729,8 @@ implements CAManager, CmpResponderManager
             LOG.info("change CMP control: {}", m);
         }catch(SQLException e)
         {
-            throw new CAMgmtException(e.getMessage(), e);
+            DataAccessException tEx = dataSource.translate(sql, e);
+            throw new CAMgmtException(tEx.getMessage(), tEx);
         }finally
         {
             dataSource.releaseResources(ps, null);
@@ -2679,18 +2766,20 @@ implements CAManager, CmpResponderManager
         {
             throw new CAMgmtException("Environemt parameter named " + name + " exists");
         }
+        final String sql = "INSERT INTO ENVIRONMENT (NAME, VALUE2) VALUES (?, ?)";
 
         PreparedStatement ps = null;
         try
         {
-            ps = prepareStatement("INSERT INTO ENVIRONMENT (NAME, VALUE2) VALUES (?, ?)");
+            ps = prepareStatement(sql);
             ps.setString(1, name);
             ps.setString(2, value);
             ps.executeUpdate();
             LOG.info("add environment param '{}': {}", name, value);
         }catch(SQLException e)
         {
-            throw new CAMgmtException(e.getMessage(), e);
+            DataAccessException tEx = dataSource.translate(sql, e);
+            throw new CAMgmtException(tEx.getMessage(), tEx);
         }finally
         {
             dataSource.releaseResources(ps, null);
@@ -2721,11 +2810,12 @@ implements CAManager, CmpResponderManager
         {
             throw new CAMgmtException("Could not find environment paramter " + name);
         }
+        final String sql = "UPDATE ENVIRONMENT SET VALUE2=? WHERE NAME=?";
 
         PreparedStatement ps = null;
         try
         {
-            ps = prepareStatement("UPDATE ENVIRONMENT SET VALUE2=? WHERE NAME=?");
+            ps = prepareStatement(sql);
             ps.setString(1, getRealString(value));
             ps.setString(2, name);
             ps.executeUpdate();
@@ -2733,7 +2823,8 @@ implements CAManager, CmpResponderManager
             LOG.info("change environment param '{}': {}", name, value);
         }catch(SQLException e)
         {
-            throw new CAMgmtException(e.getMessage(), e);
+            DataAccessException tEx = dataSource.translate(sql, e);
+            throw new CAMgmtException(tEx.getMessage(), tEx);
         }finally
         {
             dataSource.releaseResources(ps, null);
@@ -2760,18 +2851,20 @@ implements CAManager, CmpResponderManager
         {
             throw new CAMgmtException("CA alias " + aliasName + " exists");
         }
+        final String sql = "INSERT INTO CAALIAS (NAME, CA_NAME) VALUES (?, ?)";
 
         PreparedStatement ps = null;
         try
         {
-            ps = prepareStatement("INSERT INTO CAALIAS (NAME, CA_NAME) VALUES (?, ?)");
+            ps = prepareStatement(sql);
             ps.setString(1, aliasName);
             ps.setString(2, caName);
             ps.executeUpdate();
             LOG.info("add CA alias '{}' for CA '{}'", aliasName, caName);
         }catch(SQLException e)
         {
-            throw new CAMgmtException(e.getMessage(), e);
+            DataAccessException tEx = dataSource.translate(sql, e);
+            throw new CAMgmtException(tEx.getMessage(), tEx);
         }finally
         {
             dataSource.releaseResources(ps, null);
@@ -2785,16 +2878,19 @@ implements CAManager, CmpResponderManager
     throws CAMgmtException
     {
         asssertMasterMode();
+        final String sql = "DELETE FROM CAALIAS WHERE NAME=?";
+
         PreparedStatement ps = null;
         try
         {
-            ps = prepareStatement("DELETE FROM CAALIAS WHERE NAME=?");
+            ps = prepareStatement(sql);
             ps.setString(1, aliasName);
             ps.executeUpdate();
             LOG.info("remove CA alias '{}'", aliasName);
         }catch(SQLException e)
         {
-            throw new CAMgmtException(e.getMessage(), e);
+            DataAccessException tEx = dataSource.translate(sql, e);
+            throw new CAMgmtException(tEx.getMessage(), tEx);
         }finally
         {
             dataSource.releaseResources(ps, null);
@@ -2837,17 +2933,19 @@ implements CAManager, CmpResponderManager
     {
         asssertMasterMode();
         caName = caName.toUpperCase();
-        PreparedStatement ps = null;
+        final String sql = "DELETE FROM CA WHERE NAME=?";
 
+        PreparedStatement ps = null;
         CAMgmtException exception = null;
         try
         {
-            ps = prepareStatement("DELETE FROM CA WHERE NAME=?");
+            ps = prepareStatement(sql);
             ps.setString(1, caName);
             ps.executeUpdate();
         }catch(SQLException e)
         {
-            exception = new CAMgmtException(e.getMessage(), e);
+            DataAccessException tEx = dataSource.translate(sql, e);
+            throw new CAMgmtException(tEx.getMessage(), tEx);
         }finally
         {
             dataSource.releaseResources(ps, null);
@@ -2861,7 +2959,7 @@ implements CAManager, CmpResponderManager
             try
             {
                 dataSource.dropSequence(sequenceName);
-            }catch(SQLException e)
+            }catch(DataAccessException e)
             {
                 final String message = "Error in dropSequence " + sequenceName;
                 if(LOG.isWarnEnabled())
@@ -2986,6 +3084,7 @@ implements CAManager, CmpResponderManager
             }
         }
 
+        String sql = "UPDATE CA SET REVOKED=?, REV_REASON=?, REV_TIME=?, REV_INVALIDITY_TIME=? WHERE NAME=?";
         PreparedStatement ps = null;
         try
         {
@@ -2994,7 +3093,6 @@ implements CAManager, CmpResponderManager
                 revocationInfo.setInvalidityTime(revocationInfo.getRevocationTime());
             }
 
-            String sql = "UPDATE CA SET REVOKED=?, REV_REASON=?, REV_TIME=?, REV_INVALIDITY_TIME=? WHERE NAME=?";
             ps = prepareStatement(sql);
             int i = 1;
             setBoolean(ps, i++, true);
@@ -3005,7 +3103,8 @@ implements CAManager, CmpResponderManager
             ps.executeUpdate();
         }catch(SQLException e)
         {
-            throw new CAMgmtException(e.getMessage(), e);
+            DataAccessException tEx = dataSource.translate(sql, e);
+            throw new CAMgmtException(tEx.getMessage(), tEx);
         }finally
         {
             dataSource.releaseResources(ps, null);
@@ -3037,7 +3136,7 @@ implements CAManager, CmpResponderManager
 
         LOG.info("Unrevoking of CA '{}'", caName);
 
-        String sql = "UPDATE CA SET REVOKED=?, REV_REASON=?, REV_TIME=?, REV_INVALIDITY_TIME=? WHERE NAME=?";
+        final String sql = "UPDATE CA SET REVOKED=?, REV_REASON=?, REV_TIME=?, REV_INVALIDITY_TIME=? WHERE NAME=?";
         PreparedStatement ps = null;
         try
         {
@@ -3051,7 +3150,8 @@ implements CAManager, CmpResponderManager
             ps.executeUpdate();
         }catch(SQLException e)
         {
-            throw new CAMgmtException(e.getMessage(), e);
+            DataAccessException tEx = dataSource.translate(sql, e);
+            throw new CAMgmtException(tEx.getMessage(), tEx);
         }finally
         {
             dataSource.releaseResources(ps, null);
@@ -3123,7 +3223,7 @@ implements CAManager, CmpResponderManager
             {
                 certstore.clearPublishQueue((X509CertWithId) null, (String) null);
                 return true;
-            } catch (SQLException | OperationException e)
+            } catch (OperationException e)
             {
                 throw new CAMgmtException(e.getMessage(), e);
             }
