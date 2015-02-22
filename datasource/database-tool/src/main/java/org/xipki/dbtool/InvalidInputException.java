@@ -33,29 +33,39 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.datasource.api;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Properties;
-
-import org.xipki.datasource.api.exception.DataAccessException;
-import org.xipki.security.api.PasswordResolver;
-import org.xipki.security.api.PasswordResolverException;
+package org.xipki.dbtool;
 
 /**
  * @author Lijun Liao
  */
 
-public interface DataSourceFactory
+@SuppressWarnings("serial")
+class InvalidInputException extends Exception
 {
-    DataSourceWrapper createDataSource(String name, InputStream conf, PasswordResolver passwordResolver)
-    throws DataAccessException, PasswordResolverException, IOException;
 
-    DataSourceWrapper createDataSourceForFile(String name, String confFile, PasswordResolver passwordResolver)
-    throws DataAccessException, PasswordResolverException, IOException;
+    public InvalidInputException()
+    {
+    }
 
-    DataSourceWrapper createDataSource(String name, Properties conf, PasswordResolver passwordResolver)
-    throws DataAccessException, PasswordResolverException, IOException;
+    public InvalidInputException(String message)
+    {
+        super(message);
+    }
+
+    public InvalidInputException(Throwable cause)
+    {
+        super(cause);
+    }
+
+    public InvalidInputException(String message, Throwable cause)
+    {
+        super(message, cause);
+    }
+
+    public InvalidInputException(String message, Throwable cause,
+            boolean enableSuppression, boolean writableStackTrace)
+            {
+        super(message, cause, enableSuppression, writableStackTrace);
+    }
 
 }

@@ -33,29 +33,53 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.datasource.api;
+package org.xipki.datasource.api.exception;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Properties;
-
-import org.xipki.datasource.api.exception.DataAccessException;
-import org.xipki.security.api.PasswordResolver;
-import org.xipki.security.api.PasswordResolverException;
+import java.sql.SQLException;
 
 /**
- * @author Lijun Liao
+ * Copied from Spring Framework licensed under Apache License, version 2.0.
+ *
+ * Exception thrown when we can't classify a SQLException into
+ * one of our generic data access exceptions.
+ *
+ * @author Rod Johnson
+ * @author Juergen Hoeller
  */
-
-public interface DataSourceFactory
+@SuppressWarnings("serial")
+public class UncategorizedSQLException extends UncategorizedDataAccessException
 {
-    DataSourceWrapper createDataSource(String name, InputStream conf, PasswordResolver passwordResolver)
-    throws DataAccessException, PasswordResolverException, IOException;
 
-    DataSourceWrapper createDataSourceForFile(String name, String confFile, PasswordResolver passwordResolver)
-    throws DataAccessException, PasswordResolverException, IOException;
+    /** SQL that led to the problem */
+    private final String sql;
 
-    DataSourceWrapper createDataSource(String name, Properties conf, PasswordResolver passwordResolver)
-    throws DataAccessException, PasswordResolverException, IOException;
+    /**
+     * Constructor for UncategorizedSQLException.
+     * @param task name of current task
+     * @param sql the offending SQL statement
+     * @param ex the root cause
+     */
+    public UncategorizedSQLException(String sql, SQLException ex)
+    {
+        super("uncategorized SQLException for SQL [" + sql + "]; SQL state [" +
+                ex.getSQLState() + "]; error code [" + ex.getErrorCode() + "]; " + ex.getMessage(), ex);
+        this.sql = sql;
+    }
+
+    /**
+     * Return the underlying SQLException.
+     */
+    public SQLException getSQLException()
+    {
+        return (SQLException) getCause();
+    }
+
+    /**
+     * Return the SQL that led to the problem.
+     */
+    public String getSql()
+    {
+        return this.sql;
+    }
 
 }

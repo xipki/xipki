@@ -36,6 +36,7 @@
 package org.xipki.dbtool;
 
 import java.io.File;
+import java.io.IOException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.sql.PreparedStatement;
@@ -60,6 +61,7 @@ import org.xipki.common.ParamChecker;
 import org.xipki.common.SecurityUtil;
 import org.xipki.common.XMLUtil;
 import org.xipki.datasource.api.DataSourceWrapper;
+import org.xipki.datasource.api.exception.DataAccessException;
 import org.xipki.dbi.ocsp.jaxb.CertStoreType;
 import org.xipki.dbi.ocsp.jaxb.CertStoreType.CertsFiles;
 import org.xipki.dbi.ocsp.jaxb.CertStoreType.Issuers;
@@ -168,7 +170,7 @@ class OcspCertStoreDbImporter extends DbPorter
     }
 
     private void import_issuer(Issuers issuers)
-    throws Exception
+    throws DataAccessException, CertificateException
     {
         System.out.println("Importing table ISSUER");
         PreparedStatement ps = prepareStatement(SQL_ADD_CAINFO);
@@ -226,7 +228,11 @@ class OcspCertStoreDbImporter extends DbPorter
                     setLong(ps, idx++, issuer.getRevInvalidityTime());
 
                     ps.execute();
-                }catch(Exception e)
+                }catch(SQLException e)
+                {
+                    System.err.println("Error while importing issuer with id=" + issuer.getId());
+                    throw dataSource.translate(SQL_ADD_CAINFO, e);
+                }catch(CertificateException e)
                 {
                     System.err.println("Error while importing issuer with id=" + issuer.getId());
                     throw e;
@@ -315,7 +321,7 @@ class OcspCertStoreDbImporter extends DbPorter
 
     private int[] do_import_cert(PreparedStatement ps_cert, PreparedStatement ps_certhash, PreparedStatement ps_rawcert,
             String certsZipFile, int minId)
-    throws Exception
+    throws IOException, JAXBException, DataAccessException, CertificateException
     {
         ZipFile zipFile = new ZipFile(new File(baseDir, certsZipFile));
         ZipEntry certsXmlEntry = zipFile.getEntry("certs.xml");
@@ -386,35 +392,54 @@ class OcspCertStoreDbImporter extends DbPorter
                 }
 
                 // cert
-                int idx = 1;
-                ps_cert.setInt(idx++, id);
-                ps_cert.setInt(idx++, cert.getIssuerId());
-                ps_cert.setLong(idx++, c.getSerialNumber().longValue());
-                ps_cert.setString(idx++, SecurityUtil.getRFC4519Name(c.getSubjectX500Principal()));
-                ps_cert.setLong(idx++, cert.getLastUpdate());
-                ps_cert.setLong(idx++, c.getNotBefore().getTime() / 1000);
-                ps_cert.setLong(idx++, c.getNotAfter().getTime() / 1000);
-                setBoolean(ps_cert, idx++, cert.isRevoked());
-                setInt(ps_cert, idx++, cert.getRevReason());
-                setLong(ps_cert, idx++, cert.getRevTime());
-                setLong(ps_cert, idx++, cert.getRevInvalidityTime());
-                ps_cert.setString(idx++, cert.getProfile());
-                ps_cert.addBatch();
+                try
+                {
+                    int idx = 1;
+                    ps_cert.setInt(idx++, id);
+                    ps_cert.setInt(idx++, cert.getIssuerId());
+                    ps_cert.setLong(idx++, c.getSerialNumber().longValue());
+                    ps_cert.setString(idx++, SecurityUtil.getRFC4519Name(c.getSubjectX500Principal()));
+                    ps_cert.setLong(idx++, cert.getLastUpdate());
+                    ps_cert.setLong(idx++, c.getNotBefore().getTime() / 1000);
+                    ps_cert.setLong(idx++, c.getNotAfter().getTime() / 1000);
+                    setBoolean(ps_cert, idx++, cert.isRevoked());
+                    setInt(ps_cert, idx++, cert.getRevReason());
+                    setLong(ps_cert, idx++, cert.getRevTime());
+                    setLong(ps_cert, idx++, cert.getRevInvalidityTime());
+                    ps_cert.setString(idx++, cert.getProfile());
+                    ps_cert.addBatch();
+                }catch(SQLException e)
+                {
+                    throw dataSource.translate(SQL_ADD_CERT, e);
+                }
 
                 // certhash
-                idx = 1;
-                ps_certhash.setInt(idx++, cert.getId());
-                ps_certhash.setString(idx++, HashCalculator.hexHash(HashAlgoType.SHA1, encodedCert));
-                ps_certhash.setString(idx++, HashCalculator.hexHash(HashAlgoType.SHA224, encodedCert));
-                ps_certhash.setString(idx++, HashCalculator.hexHash(HashAlgoType.SHA256, encodedCert));
-                ps_certhash.setString(idx++, HashCalculator.hexHash(HashAlgoType.SHA384, encodedCert));
-                ps_certhash.setString(idx++, HashCalculator.hexHash(HashAlgoType.SHA512, encodedCert));
-                ps_certhash.addBatch();
+                try
+                {
+                    int idx = 1;
+                    ps_certhash.setInt(idx++, cert.getId());
+                    ps_certhash.setString(idx++, HashCalculator.hexHash(HashAlgoType.SHA1, encodedCert));
+                    ps_certhash.setString(idx++, HashCalculator.hexHash(HashAlgoType.SHA224, encodedCert));
+                    ps_certhash.setString(idx++, HashCalculator.hexHash(HashAlgoType.SHA256, encodedCert));
+                    ps_certhash.setString(idx++, HashCalculator.hexHash(HashAlgoType.SHA384, encodedCert));
+                    ps_certhash.setString(idx++, HashCalculator.hexHash(HashAlgoType.SHA512, encodedCert));
+                    ps_certhash.addBatch();
+                }catch(SQLException e)
+                {
+                    throw dataSource.translate(SQL_ADD_CERTHASH, e);
+                }
 
                 // rawcert
-                ps_rawcert.setInt(1, cert.getId());
-                ps_rawcert.setString(2, Base64.toBase64String(encodedCert));
-                ps_rawcert.addBatch();
+                try
+                {
+                    int idx = 1;
+                    ps_rawcert.setInt(idx++, cert.getId());
+                    ps_rawcert.setString(idx++, Base64.toBase64String(encodedCert));
+                    ps_rawcert.addBatch();
+                }catch(SQLException e)
+                {
+                    throw dataSource.translate(SQL_ADD_RAWCERT, e);
+                }
             }
 
             try
@@ -426,7 +451,7 @@ class OcspCertStoreDbImporter extends DbPorter
             }catch(SQLException e)
             {
                 rollback();
-                throw e;
+                throw dataSource.translate(null, e);
             }
 
             return new int[]{n, lastSuccessfulCertId};
@@ -436,7 +461,7 @@ class OcspCertStoreDbImporter extends DbPorter
             try
             {
                 recoverAutoCommit();
-            }catch(SQLException e)
+            }catch(DataAccessException e)
             {
             }
             zipFile.close();
