@@ -72,7 +72,7 @@ public class ImportOcspFromCaCommand extends XipkiOsgiCommandSupport
     private PasswordResolver passwordResolver;
 
     @Override
-    protected Object doExecute()
+    protected Object _doExecute()
     throws Exception
     {
         OcspFromCaDbImporter importer = new OcspFromCaDbImporter(
