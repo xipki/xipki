@@ -37,6 +37,7 @@ package org.xipki.ca.qa.shell;
 
 import java.math.BigInteger;
 import java.security.cert.X509Certificate;
+import java.util.Date;
 
 import org.apache.karaf.shell.commands.Command;
 import org.apache.karaf.shell.commands.Option;
@@ -44,6 +45,7 @@ import org.bouncycastle.asn1.x500.X500Name;
 import org.xipki.ca.client.api.CertIDOrError;
 import org.xipki.ca.client.shell.UnRevRemoveCertCommand;
 import org.xipki.common.CRLReason;
+import org.xipki.common.DateUtil;
 import org.xipki.common.SecurityUtil;
 import org.xipki.console.karaf.UnexpectedResultException;
 
@@ -66,6 +68,11 @@ public class NegRevokeCertCommand extends UnRevRemoveCertCommand
                     "  6: certificateHold\n" +
                     "  9: privilegeWithdrawn")
     protected String reason;
+
+    @Option(name = "-invDate",
+            required = false,
+            description = "Invalidity date, UTC time of format yyyyMMddHHmmss")
+    protected String invalidityDateS;
 
     @Override
     protected Object doExecute()
@@ -90,17 +97,36 @@ public class NegRevokeCertCommand extends UnRevRemoveCertCommand
             return null;
         }
 
+        Date invalidityDate = null;
+        if(invalidityDateS != null && invalidityDateS.isEmpty() == false)
+        {
+            invalidityDate = DateUtil.parseUTCTimeyyyyMMddhhmmss(invalidityDateS);
+        }
+
+        X509Certificate caCert = null;
+        if(caCertFile != null)
+        {
+            caCert = SecurityUtil.parseCert(caCertFile);
+        }
+
         CertIDOrError certIdOrError;
         if(certFile != null)
         {
             X509Certificate cert = SecurityUtil.parseCert(certFile);
-            certIdOrError = raWorker.revokeCert(cert, crlReason.getCode());
+            if(caCert != null)
+            {
+                String errorMsg = checkCertificate(cert, caCert);
+                if(errorMsg != null)
+                {
+                    throw new UnexpectedResultException(errorMsg);
+                }
+            }
+            certIdOrError = raWorker.revokeCert(cert, crlReason.getCode(), invalidityDate);
         }
         else
         {
-            X509Certificate caCert = SecurityUtil.parseCert(caCertFile);
             X500Name issuer = X500Name.getInstance(caCert.getSubjectX500Principal().getEncoded());
-            certIdOrError = raWorker.revokeCert(issuer, new BigInteger(serialNumber), crlReason.getCode());
+            certIdOrError = raWorker.revokeCert(issuer, new BigInteger(serialNumber), crlReason.getCode(), invalidityDate);
         }
 
         if(certIdOrError.getError() == null)

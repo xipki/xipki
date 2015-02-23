@@ -36,12 +36,14 @@
 package org.xipki.ca.server.mgmt.shell.cert;
 
 import java.math.BigInteger;
+import java.util.Date;
 
 import org.apache.karaf.shell.commands.Command;
 import org.apache.karaf.shell.commands.Option;
 import org.xipki.ca.server.mgmt.api.X509CAEntry;
 import org.xipki.ca.server.mgmt.shell.CaCommand;
 import org.xipki.common.CRLReason;
+import org.xipki.common.DateUtil;
 
 /**
  * @author Lijun Liao
@@ -71,6 +73,11 @@ public class RevokeCertCommand extends CaCommand
                     " 9: privilegeWithdrawn")
     protected String reason;
 
+    @Option(name = "-invDate",
+            required = false,
+            description = "Invalidity date, UTC time of format yyyyMMddHHmmss")
+    protected String invalidityDateS;
+
     @Override
     protected Object doExecute()
     throws Exception
@@ -95,7 +102,14 @@ public class RevokeCertCommand extends CaCommand
             return null;
         }
 
-        boolean successful = caManager.revokeCertificate(caName, BigInteger.valueOf(serialNumber), crlReason, null);
+        Date invalidityDate = null;
+        if(invalidityDateS != null && invalidityDateS.isEmpty() == false)
+        {
+            invalidityDate = DateUtil.parseUTCTimeyyyyMMddhhmmss(invalidityDateS);
+        }
+
+        boolean successful = caManager.revokeCertificate(caName, BigInteger.valueOf(serialNumber),
+                crlReason, invalidityDate);
 
         if(successful)
         {
