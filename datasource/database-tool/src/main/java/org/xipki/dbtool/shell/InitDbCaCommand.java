@@ -50,7 +50,7 @@ public class InitDbCaCommand extends LiquibaseCommand
     private static final String schemaFile = "sql/ca-init.xml";
 
     @Override
-    protected Object doExecute()
+    protected Object _doExecute()
     throws Exception
     {
         Map<String, LiquibaseDatabaseConf> dbConfs = getDatabaseConfs();

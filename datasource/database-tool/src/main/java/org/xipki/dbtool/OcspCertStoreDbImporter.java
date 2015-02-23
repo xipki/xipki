@@ -231,7 +231,7 @@ class OcspCertStoreDbImporter extends DbPorter
                 }catch(SQLException e)
                 {
                     System.err.println("Error while importing issuer with id=" + issuer.getId());
-                    throw dataSource.translate(SQL_ADD_CAINFO, e);
+                    throw translate(SQL_ADD_CAINFO, e);
                 }catch(CertificateException e)
                 {
                     System.err.println("Error while importing issuer with id=" + issuer.getId());
@@ -271,7 +271,7 @@ class OcspCertStoreDbImporter extends DbPorter
         final long total = certsfiles.getCountCerts() - numProcessedBefore;
 
         final long startTime = System.currentTimeMillis();
-        long sum = 0;
+        int sum = 0;
 
         System.out.println("Importing certificates from ID " + minId);
         printHeader();
@@ -286,13 +286,14 @@ class OcspCertStoreDbImporter extends DbPorter
             {
                 try
                 {
-                    int[] numAndLastId = do_import_cert(ps_cert, ps_certhash, ps_rawcert, certsFile, minId);
+                    int[] numAndLastId = do_import_cert(ps_cert, ps_certhash, ps_rawcert, certsFile, minId,
+                            processLogFile, sum + numProcessedBefore);
                     int numProcessed = numAndLastId[0];
                     int lastId = numAndLastId[1];
+                    minId = lastId + 1;
                     if(numProcessed > 0)
                     {
                         sum += numProcessed;
-                        echoToFile((sum + numProcessedBefore) + ":" + lastId, processLogFile);
                         printStatus(total, sum, startTime);
                     }
                 }catch(Exception e)
@@ -319,8 +320,10 @@ class OcspCertStoreDbImporter extends DbPorter
         System.out.println("Processed " + sum + " certificates");
     }
 
-    private int[] do_import_cert(PreparedStatement ps_cert, PreparedStatement ps_certhash, PreparedStatement ps_rawcert,
-            String certsZipFile, int minId)
+    private int[] do_import_cert(PreparedStatement ps_cert,
+            PreparedStatement ps_certhash, PreparedStatement ps_rawcert,
+            String certsZipFile, int minId,
+            File processLogFile, int totalProcessedSum)
     throws IOException, JAXBException, DataAccessException, CertificateException
     {
         ZipFile zipFile = new ZipFile(new File(baseDir, certsZipFile));
@@ -350,8 +353,9 @@ class OcspCertStoreDbImporter extends DbPorter
         {
             List<CertType> list = certs.getCert();
             final int size = list.size();
-            int n = 0;
-
+            final int n = 100;
+            int numProcessed = 0;
+            int numEntriesInBatch = 0;
             int lastSuccessfulCertId = 0;
 
             for(int i = 0; i < size; i++)
@@ -364,7 +368,7 @@ class OcspCertStoreDbImporter extends DbPorter
                     continue;
                 }
 
-                n++;
+                numEntriesInBatch++;
 
                 String filename = cert.getCertFile();
 
@@ -410,7 +414,7 @@ class OcspCertStoreDbImporter extends DbPorter
                     ps_cert.addBatch();
                 }catch(SQLException e)
                 {
-                    throw dataSource.translate(SQL_ADD_CERT, e);
+                    throw translate(SQL_ADD_CERT, e);
                 }
 
                 // certhash
@@ -426,7 +430,7 @@ class OcspCertStoreDbImporter extends DbPorter
                     ps_certhash.addBatch();
                 }catch(SQLException e)
                 {
-                    throw dataSource.translate(SQL_ADD_CERTHASH, e);
+                    throw translate(SQL_ADD_CERTHASH, e);
                 }
 
                 // rawcert
@@ -438,23 +442,36 @@ class OcspCertStoreDbImporter extends DbPorter
                     ps_rawcert.addBatch();
                 }catch(SQLException e)
                 {
-                    throw dataSource.translate(SQL_ADD_RAWCERT, e);
+                    throw translate(SQL_ADD_RAWCERT, e);
                 }
+
+                if(numEntriesInBatch > 0 && (numEntriesInBatch % n == 0 || i == size - 1))
+                {
+                    try
+                    {
+                        ps_cert.executeBatch();
+                        ps_certhash.executeBatch();
+                        ps_rawcert.executeBatch();
+
+                        commit();
+                    } catch(SQLException e)
+                    {
+                        rollback();
+                        throw translate(null, e);
+                    } catch(DataAccessException e)
+                    {
+                        rollback();
+                        throw e;
+                    }
+
+                    numProcessed += numEntriesInBatch;
+                    numEntriesInBatch = 0;
+                    echoToFile((totalProcessedSum + numProcessed) + ":" + lastSuccessfulCertId, processLogFile);
+                }
+
             }
 
-            try
-            {
-                ps_cert.executeBatch();
-                ps_certhash.executeBatch();
-                ps_rawcert.executeBatch();
-                commit();
-            }catch(SQLException e)
-            {
-                rollback();
-                throw dataSource.translate(null, e);
-            }
-
-            return new int[]{n, lastSuccessfulCertId};
+            return new int[]{numProcessed, lastSuccessfulCertId};
         }
         finally
         {

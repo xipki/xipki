@@ -77,7 +77,7 @@ public class ExportCaCommand extends XipkiOsgiCommandSupport
     private PasswordResolver passwordResolver;
 
     @Override
-    protected Object doExecute()
+    protected Object _doExecute()
     throws Exception
     {
         CaDbExporter exporter = new CaDbExporter(dataSourceFactory, passwordResolver, dbconfFile, outdir, resume);

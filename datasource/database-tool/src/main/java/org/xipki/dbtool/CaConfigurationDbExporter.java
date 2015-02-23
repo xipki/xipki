@@ -167,7 +167,7 @@ class CaConfigurationDbExporter extends DbPorter
             }
         }catch(SQLException e)
         {
-            throw dataSource.translate(sql, e);
+            throw translate(sql, e);
         }finally
         {
             releaseResources(stmt, rs);
@@ -203,7 +203,7 @@ class CaConfigurationDbExporter extends DbPorter
             }
         }catch(SQLException e)
         {
-            throw dataSource.translate(sql, e);
+            throw translate(sql, e);
         }finally
         {
             releaseResources(stmt, rs);
@@ -249,7 +249,7 @@ class CaConfigurationDbExporter extends DbPorter
             }
         }catch(SQLException e)
         {
-            throw dataSource.translate(sql, e);
+            throw translate(sql, e);
         }finally
         {
             releaseResources(stmt, rs);
@@ -286,7 +286,7 @@ class CaConfigurationDbExporter extends DbPorter
             }
         }catch(SQLException e)
         {
-            throw dataSource.translate(sql, e);
+            throw translate(sql, e);
         }finally
         {
             releaseResources(stmt, rs);
@@ -323,7 +323,7 @@ class CaConfigurationDbExporter extends DbPorter
             }
         }catch(SQLException e)
         {
-            throw dataSource.translate(sql, e);
+            throw translate(sql, e);
         }finally
         {
             releaseResources(stmt, rs);
@@ -360,7 +360,7 @@ class CaConfigurationDbExporter extends DbPorter
             }
         }catch(SQLException e)
         {
-            throw dataSource.translate(sql, e);
+            throw translate(sql, e);
         }finally
         {
             releaseResources(stmt, rs);
@@ -399,7 +399,7 @@ class CaConfigurationDbExporter extends DbPorter
             }
         }catch(SQLException e)
         {
-            throw dataSource.translate(sql, e);
+            throw translate(sql, e);
         }finally
         {
             releaseResources(stmt, rs);
@@ -465,7 +465,7 @@ class CaConfigurationDbExporter extends DbPorter
             }
         }catch(SQLException e)
         {
-            throw dataSource.translate(sql, e);
+            throw translate(sql, e);
         }finally
         {
             releaseResources(stmt, rs);
@@ -483,7 +483,7 @@ class CaConfigurationDbExporter extends DbPorter
         StringBuilder sqlBuilder = new StringBuilder();
         sqlBuilder.append("SELECT NAME,");
         sqlBuilder.append(" NEXT_SERIAL, STATUS, CRL_URIS, OCSP_URIS, MAX_VALIDITY,");
-        sqlBuilder.append(" CERT, SIGNER_TYPE, SIGNER_CONF, CRLSIGNER_NAME, CMP_CONTROL");
+        sqlBuilder.append(" CERT, SIGNER_TYPE, SIGNER_CONF, CRLSIGNER_NAME, CMPCONTROL_NAME,");
         sqlBuilder.append(" DUPLICATE_KEY_MODE, DUPLICATE_SUBJECT_MODE, PERMISSIONS, NUM_CRLS,");
         sqlBuilder.append(" EXPIRATION_PERIOD, REVOKED, REV_REASON, REV_TIME, REV_INVALIDITY_TIME,");
         sqlBuilder.append(" DELTA_CRL_URIS, VALIDITY_MODE");
@@ -584,7 +584,7 @@ class CaConfigurationDbExporter extends DbPorter
             }
         }catch(SQLException e)
         {
-            throw dataSource.translate(sql, e);
+            throw translate(sql, e);
         }finally
         {
             releaseResources(stmt, rs);
@@ -627,7 +627,7 @@ class CaConfigurationDbExporter extends DbPorter
             }
         }catch(SQLException e)
         {
-            throw dataSource.translate(sql, e);
+            throw translate(sql, e);
         }finally
         {
             releaseResources(stmt, rs);
@@ -664,7 +664,7 @@ class CaConfigurationDbExporter extends DbPorter
             }
         }catch(SQLException e)
         {
-            throw dataSource.translate(sql, e);
+            throw translate(sql, e);
         }finally
         {
             releaseResources(stmt, rs);
@@ -701,7 +701,7 @@ class CaConfigurationDbExporter extends DbPorter
             }
         }catch(SQLException e)
         {
-            throw dataSource.translate(sql, e);
+            throw translate(sql, e);
         }finally
         {
             releaseResources(stmt, rs);

@@ -213,7 +213,7 @@ class OcspCertStoreDbExporter extends DbPorter
             }
         }catch(SQLException e)
         {
-            throw dataSource.translate(sql, e);
+            throw translate(sql, e);
         }finally
         {
             releaseResources(stmt, rs);
@@ -458,7 +458,7 @@ class OcspCertStoreDbExporter extends DbPorter
             }
         }catch(SQLException e)
         {
-            throw dataSource.translate(sql, e);
+            throw translate(sql, e);
         }finally
         {
             releaseResources(certPs, null);

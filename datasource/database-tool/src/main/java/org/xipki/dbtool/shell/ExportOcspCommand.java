@@ -72,7 +72,7 @@ public class ExportOcspCommand extends XipkiOsgiCommandSupport
     private PasswordResolver passwordResolver;
 
     @Override
-    protected Object doExecute()
+    protected Object _doExecute()
     throws Exception
     {
         OcspDbExporter exporter = new OcspDbExporter(dataSourceFactory, passwordResolver, dbconfFile, outdir, resume);
