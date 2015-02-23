@@ -64,7 +64,7 @@ public class FileRmCommand extends XipkiOsgiCommandSupport
     protected Boolean force = Boolean.FALSE;
 
     @Override
-    protected Object doExecute()
+    protected Object _doExecute()
     throws Exception
     {
         ConsoleReader reader = (ConsoleReader) session.get(".jline.reader");

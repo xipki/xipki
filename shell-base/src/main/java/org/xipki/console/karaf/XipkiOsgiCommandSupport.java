@@ -44,6 +44,8 @@ import java.security.SecureRandom;
 import jline.console.ConsoleReader;
 
 import org.apache.karaf.shell.console.OsgiCommandSupport;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Lijun Liao
@@ -51,6 +53,25 @@ import org.apache.karaf.shell.console.OsgiCommandSupport;
 
 public abstract class XipkiOsgiCommandSupport extends OsgiCommandSupport
 {
+    private static final Logger LOG = LoggerFactory.getLogger(XipkiOsgiCommandSupport.class);
+
+    protected abstract Object _doExecute()
+    throws Exception;
+
+    @Override
+    protected Object doExecute()
+    throws Exception
+    {
+        try
+        {
+            return _doExecute();
+        } catch(Exception e)
+        {
+            LOG.debug("Exception caught while executing command", e);
+            throw new Exception(e.getClass().getName() + ": " + e.getMessage());
+        }
+    }
+
     protected boolean isTrue(Boolean b)
     {
         return b != null && b.booleanValue();

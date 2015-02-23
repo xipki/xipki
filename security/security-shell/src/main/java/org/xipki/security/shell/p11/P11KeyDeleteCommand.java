@@ -47,7 +47,7 @@ import org.xipki.security.api.p11.P11WritableSlot;
 public class P11KeyDeleteCommand extends P11SecurityCommand
 {
     @Override
-    protected Object doExecute()
+    protected Object _doExecute()
     throws Exception
     {
         P11WritableSlot slot = getP11WritablSlot(moduleName, slotIndex);

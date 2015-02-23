@@ -57,7 +57,7 @@ public class FileListCommand extends XipkiOsgiCommandSupport
     protected String targetPath;
 
     @Override
-    protected Object doExecute()
+    protected Object _doExecute()
     throws Exception
     {
         File target = new File(expandFilepath(targetPath));

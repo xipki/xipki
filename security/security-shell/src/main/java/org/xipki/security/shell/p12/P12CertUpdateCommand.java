@@ -66,7 +66,7 @@ public class P12CertUpdateCommand extends P12SecurityCommand
     protected Set<String> caCertFiles;
 
     @Override
-    protected Object doExecute()
+    protected Object _doExecute()
     throws Exception
     {
         KeyStore ks = getKeyStore();
