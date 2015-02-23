@@ -57,7 +57,7 @@ public class EnvUpdateCommand extends CaCommand
     protected String value;
 
     @Override
-    protected Object doExecute()
+    protected Object _doExecute()
     throws Exception
     {
         caManager.changeEnvParam(name, value);

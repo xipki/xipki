@@ -73,7 +73,7 @@ public class ResponderUpdateCommand extends CaCommand
     }
 
     @Override
-    protected Object doExecute()
+    protected Object _doExecute()
     throws Exception
     {
         String cert = null;

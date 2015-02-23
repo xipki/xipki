@@ -79,7 +79,7 @@ public class CmpControlUpdateCommand extends CaCommand
     protected Integer confirmWaitTime;
 
     @Override
-    protected Object doExecute()
+    protected Object _doExecute()
     throws Exception
     {
         Boolean sendCaCert = isEnabled(sendCaCertS, "sendCaCert");

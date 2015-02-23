@@ -60,7 +60,7 @@ public class P11RSAKeyGenCommand extends P11KeyGenCommand
     protected String publicExponent = "65537";
 
     @Override
-    protected Object doExecute()
+    protected Object _doExecute()
     throws Exception
     {
         if(keysize % 1024 != 0)

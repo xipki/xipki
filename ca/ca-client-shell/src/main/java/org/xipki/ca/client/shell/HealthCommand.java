@@ -58,7 +58,7 @@ public class HealthCommand extends ClientCommand
     protected Boolean verbose = Boolean.FALSE;
 
     @Override
-    protected Object doExecute()
+    protected Object _doExecute()
     throws Exception
     {
         Set<String> caNames = raWorker.getCaNames();

@@ -65,7 +65,7 @@ public class PublisherUpdateCommand extends CaCommand
     protected String confFile;
 
     @Override
-    protected Object doExecute()
+    protected Object _doExecute()
     throws Exception
     {
         if(type == null && conf == null && confFile == null)

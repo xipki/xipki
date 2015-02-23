@@ -108,7 +108,7 @@ public abstract class CertRequestGenCommand extends SecurityCommand
     throws Exception;
 
     @Override
-    protected Object doExecute()
+    protected Object _doExecute()
     throws Exception
     {
         P10RequestGenerator p10Gen = new P10RequestGenerator();

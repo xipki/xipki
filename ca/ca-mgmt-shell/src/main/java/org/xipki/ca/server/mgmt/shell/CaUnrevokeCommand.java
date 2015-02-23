@@ -49,7 +49,7 @@ public class CaUnrevokeCommand extends CaCommand
     protected String caName;
 
     @Override
-    protected Object doExecute()
+    protected Object _doExecute()
     throws Exception
     {
         if(caManager.getCaNames().contains(caName) == false)

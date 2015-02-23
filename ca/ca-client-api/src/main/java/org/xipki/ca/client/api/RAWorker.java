@@ -38,6 +38,7 @@ package org.xipki.ca.client.api;
 import java.math.BigInteger;
 import java.security.cert.X509CRL;
 import java.security.cert.X509Certificate;
+import java.util.Date;
 import java.util.Map;
 import java.util.Set;
 
@@ -72,10 +73,10 @@ public interface RAWorker
     EnrollCertResult requestCerts(EnrollCertRequestType request, String caName, String username)
     throws RAWorkerException, PKIErrorException;
 
-    CertIDOrError revokeCert(X500Name issuer, BigInteger serial, int reason)
+    CertIDOrError revokeCert(X500Name issuer, BigInteger serial, int reason, Date invalidityTime)
     throws RAWorkerException, PKIErrorException;
 
-    CertIDOrError revokeCert(X509Certificate cert, int reason)
+    CertIDOrError revokeCert(X509Certificate cert, int reason, Date invalidityTime)
     throws RAWorkerException, PKIErrorException;
 
     Map<String, CertIDOrError> revokeCerts(RevokeCertRequestType request)

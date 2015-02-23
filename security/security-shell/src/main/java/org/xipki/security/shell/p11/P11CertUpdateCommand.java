@@ -62,7 +62,7 @@ public class P11CertUpdateCommand extends P11SecurityCommand
     protected Set<String> caCertFiles;
 
     @Override
-    protected Object doExecute()
+    protected Object _doExecute()
     throws Exception
     {
         P11WritableSlot slot = getP11WritablSlot(moduleName, slotIndex);

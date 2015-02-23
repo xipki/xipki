@@ -75,7 +75,7 @@ public class RAEnrollCertCommand extends ClientCommand
     protected String caName;
 
     @Override
-    protected Object doExecute()
+    protected Object _doExecute()
     throws Exception
     {
         CertificationRequest p10Req = CertificationRequest.getInstance(

@@ -71,7 +71,7 @@ public class CaGenRootCACommand extends CaAddOrGenCommand
     protected String rcaCertOutFile;
 
     @Override
-    protected Object doExecute()
+    protected Object _doExecute()
     throws Exception
     {
         if(nextSerial < 0)

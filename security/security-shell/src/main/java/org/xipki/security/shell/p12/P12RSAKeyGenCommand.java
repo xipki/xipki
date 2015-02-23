@@ -55,7 +55,7 @@ public class P12RSAKeyGenCommand extends P12KeyGenCommand
     protected Integer keysize = 2048;
 
     @Override
-    protected Object doExecute()
+    protected Object _doExecute()
     throws Exception
     {
         if(keysize % 1024 != 0)

@@ -64,7 +64,7 @@ public abstract class CRLCommand extends ClientCommand
     throws RAWorkerException, PKIErrorException;
 
     @Override
-    protected Object doExecute()
+    protected Object _doExecute()
     throws Exception
     {
         Set<String> caNames = raWorker.getCaNames();

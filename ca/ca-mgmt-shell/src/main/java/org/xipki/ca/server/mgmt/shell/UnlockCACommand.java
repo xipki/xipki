@@ -45,7 +45,7 @@ import org.apache.karaf.shell.commands.Command;
 public class UnlockCACommand extends CaCommand
 {
     @Override
-    protected Object doExecute()
+    protected Object _doExecute()
     throws Exception
     {
         boolean unlocked = caManager.unlockCA();

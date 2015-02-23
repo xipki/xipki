@@ -89,7 +89,7 @@ public class CALoadTestRevokeCommand extends ClientCommand
     private SecurityFactory securityFactory;
 
     @Override
-    protected Object doExecute()
+    protected Object _doExecute()
     throws Exception
     {
         if(numThreads < 1)

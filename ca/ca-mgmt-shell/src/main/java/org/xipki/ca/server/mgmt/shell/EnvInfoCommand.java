@@ -54,7 +54,7 @@ public class EnvInfoCommand extends CaCommand
     protected String name;
 
     @Override
-    protected Object doExecute()
+    protected Object _doExecute()
     throws Exception
     {
         StringBuilder sb = new StringBuilder();

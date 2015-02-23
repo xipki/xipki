@@ -77,7 +77,7 @@ public class OCSPStatusLoadTestCommand extends AbstractOCSPStatusCommand
     protected String serverURL;
 
     @Override
-    protected Object doExecute()
+    protected Object _doExecute()
     throws Exception
     {
         List<Long> serialNumbers = new LinkedList<>();

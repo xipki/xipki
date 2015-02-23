@@ -80,7 +80,7 @@ public class CmpControlAddCommand extends CaCommand
     protected Integer confirmWaitTime;
 
     @Override
-    protected Object doExecute()
+    protected Object _doExecute()
     throws Exception
     {
         CmpControl entry = new CmpControl(name);

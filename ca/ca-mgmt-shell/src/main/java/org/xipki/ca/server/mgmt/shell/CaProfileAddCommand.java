@@ -58,7 +58,7 @@ public class CaProfileAddCommand extends CaCommand
     protected List<String> profileNames;
 
     @Override
-    protected Object doExecute()
+    protected Object _doExecute()
     throws Exception
     {
         for(String name : profileNames)
