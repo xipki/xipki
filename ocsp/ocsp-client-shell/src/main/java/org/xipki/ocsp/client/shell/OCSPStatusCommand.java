@@ -111,7 +111,7 @@ public class OCSPStatusCommand extends AbstractOCSPStatusCommand
     }
 
     @Override
-    protected Object doExecute()
+    protected Object _doExecute()
     throws Exception
     {
         if((serialNumbers == null || serialNumbers.isEmpty()) &&

@@ -56,6 +56,7 @@ import java.security.cert.X509CRL;
 import java.security.cert.X509Certificate;
 import java.security.interfaces.ECPublicKey;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -716,20 +717,20 @@ public final class RAWorkerImpl extends AbstractRAWorker implements RAWorker
     }
 
     @Override
-    public CertIDOrError revokeCert(X509Certificate cert, int reason)
+    public CertIDOrError revokeCert(X509Certificate cert, int reason, Date invalidityDate)
     throws RAWorkerException, PKIErrorException
     {
         X500Name issuer = X500Name.getInstance(cert.getIssuerX500Principal().getEncoded());
-        return revokeCert(issuer, cert.getSerialNumber(), reason);
+        return revokeCert(issuer, cert.getSerialNumber(), reason, invalidityDate);
     }
 
     @Override
-    public CertIDOrError revokeCert(X500Name issuer, BigInteger serial, int reason)
+    public CertIDOrError revokeCert(X500Name issuer, BigInteger serial, int reason, Date invalidityDate)
     throws RAWorkerException, PKIErrorException
     {
         final String id = "cert-1";
         RevokeCertRequestEntryType entry =
-                new RevokeCertRequestEntryType(id, issuer, serial, reason, null);
+                new RevokeCertRequestEntryType(id, issuer, serial, reason, invalidityDate);
         RevokeCertRequestType request = new RevokeCertRequestType();
         request.addRequestEntry(entry);
         Map<String, CertIDOrError> result = revokeCerts(request);

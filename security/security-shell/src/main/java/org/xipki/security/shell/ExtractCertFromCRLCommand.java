@@ -69,7 +69,7 @@ public class ExtractCertFromCRLCommand extends SecurityCommand
     protected String outFile;
 
     @Override
-    protected Object doExecute()
+    protected Object _doExecute()
     throws Exception
     {
         X509CRL crl = SecurityUtil.parseCRL(crlFile);

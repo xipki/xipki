@@ -54,7 +54,7 @@ public class P12ECKeyGenCommand extends P12KeyGenCommand
     protected String curveName = "brainpoolp256r1";
 
     @Override
-    protected Object doExecute()
+    protected Object _doExecute()
     throws Exception
     {
         ECDSAIdentityGenerator gen = new P12KeypairGenerator.ECDSAIdentityGenerator(

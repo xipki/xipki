@@ -51,7 +51,7 @@ public class DeobfuscateCommand extends SecurityCommand
     protected String passwordHint;
 
     @Override
-    protected Object doExecute()
+    protected Object _doExecute()
     throws Exception
     {
         if(passwordHint.startsWith("OBF:") == false)

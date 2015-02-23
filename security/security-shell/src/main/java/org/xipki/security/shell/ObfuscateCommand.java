@@ -46,7 +46,7 @@ import org.xipki.security.OBFPasswordResolver;
 public class ObfuscateCommand extends SecurityCommand
 {
     @Override
-    protected Object doExecute()
+    protected Object _doExecute()
     throws Exception
     {
         char[] password = readPassword("Please enter the password");

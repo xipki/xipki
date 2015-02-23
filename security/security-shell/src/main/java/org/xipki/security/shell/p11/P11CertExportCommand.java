@@ -56,7 +56,7 @@ public class P11CertExportCommand extends P11SecurityCommand
     protected String outFile;
 
     @Override
-    protected Object doExecute()
+    protected Object _doExecute()
     throws Exception
     {
         P11WritableSlot slot = getP11WritablSlot(moduleName, slotIndex);
