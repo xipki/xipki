@@ -258,6 +258,11 @@ public class DbPorter
         }
     }
 
+    protected DataAccessException translate(String sql, SQLException e)
+    {
+        return dataSource.translate(sql, e);
+    }
+
     protected void disableAutoCommit()
     throws DataAccessException
     {
