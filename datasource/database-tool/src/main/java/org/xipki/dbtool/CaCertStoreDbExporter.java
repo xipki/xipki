@@ -288,7 +288,7 @@ class CaCertStoreDbExporter extends DbPorter
             rs = null;
         } catch(SQLException e)
         {
-            throw dataSource.translate(sql, e);
+            throw translate(sql, e);
         }
         finally
         {
@@ -326,7 +326,7 @@ class CaCertStoreDbExporter extends DbPorter
             }
         }catch(SQLException e)
         {
-            throw dataSource.translate(sql, e);
+            throw translate(sql, e);
         }finally
         {
             releaseResources(stmt, rs);
@@ -360,7 +360,7 @@ class CaCertStoreDbExporter extends DbPorter
             }
         }catch(SQLException e)
         {
-            throw dataSource.translate(sql, e);
+            throw translate(sql, e);
         }finally
         {
             releaseResources(stmt, rs);
@@ -394,7 +394,7 @@ class CaCertStoreDbExporter extends DbPorter
             }
         }catch(SQLException e)
         {
-            throw dataSource.translate(sql, e);
+            throw translate(sql, e);
         }finally
         {
             releaseResources(stmt, rs);
@@ -516,7 +516,7 @@ class CaCertStoreDbExporter extends DbPorter
             }
         }catch(SQLException e)
         {
-            throw dataSource.translate(sql, e);
+            throw translate(sql, e);
         }finally
         {
             releaseResources(ps, null);
@@ -550,7 +550,7 @@ class CaCertStoreDbExporter extends DbPorter
             }
         }catch(SQLException e)
         {
-            throw dataSource.translate(sql, e);
+            throw translate(sql, e);
         }finally
         {
             releaseResources(stmt, rs);
@@ -830,7 +830,7 @@ class CaCertStoreDbExporter extends DbPorter
 
         }catch(SQLException e)
         {
-            throw dataSource.translate(null, e);
+            throw translate(null, e);
         }finally
         {
             releaseResources(ps, null);
@@ -896,7 +896,7 @@ class CaCertStoreDbExporter extends DbPorter
                 }
             }catch(SQLException e)
             {
-                throw dataSource.translate(sql, e);
+                throw translate(sql, e);
             }finally
             {
                 releaseResources(ps, rs);
@@ -948,7 +948,7 @@ class CaCertStoreDbExporter extends DbPorter
             }
         }catch(SQLException e)
         {
-            throw dataSource.translate(sql, e);
+            throw translate(sql, e);
         }finally
         {
             releaseResources(ps, rs);

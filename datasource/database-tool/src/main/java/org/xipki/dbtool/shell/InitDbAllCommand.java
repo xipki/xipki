@@ -51,7 +51,7 @@ public class InitDbAllCommand extends LiquibaseCommand
     private static final String ocsp_schemaFile = "sql/ocsp-init.xml";
 
     @Override
-    protected Object doExecute()
+    protected Object _doExecute()
     throws Exception
     {
         Map<String, LiquibaseDatabaseConf> dbConfs = getDatabaseConfs();

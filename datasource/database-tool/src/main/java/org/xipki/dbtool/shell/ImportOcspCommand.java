@@ -67,7 +67,7 @@ public class ImportOcspCommand extends XipkiOsgiCommandSupport
     private PasswordResolver passwordResolver;
 
     @Override
-    protected Object doExecute()
+    protected Object _doExecute()
     throws Exception
     {
         OcspDbImporter importer = new OcspDbImporter(dataSourceFactory, passwordResolver, dbconfFile, resume);

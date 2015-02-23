@@ -67,7 +67,7 @@ public class ImportCaCommand extends XipkiOsgiCommandSupport
     private PasswordResolver passwordResolver;
 
     @Override
-    protected Object doExecute()
+    protected Object _doExecute()
     throws Exception
     {
         CaDbImporter importer = new CaDbImporter(dataSourceFactory, passwordResolver, dbconfFile, resume);
