@@ -81,7 +81,7 @@ public class CheckCertCommand extends XipkiOsgiCommandSupport
     private QASystemManager qaSystemManager;
 
     @Override
-    protected Object doExecute()
+    protected Object _doExecute()
     throws Exception
     {
         Set<String> issuerNames = qaSystemManager.getIssuerNames();

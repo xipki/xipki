@@ -49,7 +49,7 @@ public class CaRestartCommand extends CaCommand
 {
 
     @Override
-    protected Object doExecute()
+    protected Object _doExecute()
     throws Exception
     {
         boolean successfull = caManager.restartCaSystem();

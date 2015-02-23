@@ -150,7 +150,7 @@ public class CaUpdateCommand extends CaCommand
     }
 
     @Override
-    protected Object doExecute()
+    protected Object _doExecute()
     throws Exception
     {
         CAStatus status = null;

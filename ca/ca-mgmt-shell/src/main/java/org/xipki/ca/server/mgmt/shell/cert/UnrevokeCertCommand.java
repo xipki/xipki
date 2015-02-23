@@ -59,7 +59,7 @@ public class UnrevokeCertCommand extends CaCommand
     protected Long serialNumber;
 
     @Override
-    protected Object doExecute()
+    protected Object _doExecute()
     throws Exception
     {
         X509CAEntry ca = caManager.getCA(caName);

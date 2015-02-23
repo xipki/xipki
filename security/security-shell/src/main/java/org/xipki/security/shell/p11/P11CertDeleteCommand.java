@@ -63,7 +63,7 @@ public class P11CertDeleteCommand extends SecurityCommand
     protected String moduleName = SecurityFactory.DEFAULT_P11MODULE_NAME;
 
     @Override
-    protected Object doExecute()
+    protected Object _doExecute()
     throws Exception
     {
         P11WritableSlot slot = getP11WritablSlot(moduleName, slotIndex);

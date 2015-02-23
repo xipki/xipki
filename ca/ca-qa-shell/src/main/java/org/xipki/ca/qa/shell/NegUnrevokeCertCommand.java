@@ -54,7 +54,7 @@ public class NegUnrevokeCertCommand extends UnRevRemoveCertCommand
 {
 
     @Override
-    protected Object doExecute()
+    protected Object _doExecute()
     throws Exception
     {
         if(certFile == null && (caCertFile == null || serialNumber == null))
@@ -63,15 +63,28 @@ public class NegUnrevokeCertCommand extends UnRevRemoveCertCommand
             return null;
         }
 
+        X509Certificate caCert = null;
+        if(caCertFile != null)
+        {
+            caCert = SecurityUtil.parseCert(caCertFile);
+        }
+
         CertIDOrError certIdOrError;
         if(certFile != null)
         {
             X509Certificate cert = SecurityUtil.parseCert(certFile);
+            if(caCert != null)
+            {
+                String errorMsg = checkCertificate(cert, caCert);
+                if(errorMsg != null)
+                {
+                    throw new UnexpectedResultException(errorMsg);
+                }
+            }
             certIdOrError = raWorker.unrevokeCert(cert);
         }
         else
         {
-            X509Certificate caCert = SecurityUtil.parseCert(caCertFile);
             X500Name issuer = X500Name.getInstance(caCert.getSubjectX500Principal().getEncoded());
             certIdOrError = raWorker.unrevokeCert(issuer, new BigInteger(serialNumber));
         }

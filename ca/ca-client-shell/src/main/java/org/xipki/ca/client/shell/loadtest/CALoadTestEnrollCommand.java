@@ -99,7 +99,7 @@ public class CALoadTestEnrollCommand extends ClientCommand
     protected Integer n = 1;
 
     @Override
-    protected Object doExecute()
+    protected Object _doExecute()
     throws Exception
     {
         if(numThreads < 1)

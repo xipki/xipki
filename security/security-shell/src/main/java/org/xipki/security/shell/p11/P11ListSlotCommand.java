@@ -90,7 +90,7 @@ public class P11ListSlotCommand extends SecurityCommand
     protected Integer slotIndex;
 
     @Override
-    protected Object doExecute()
+    protected Object _doExecute()
     throws Exception
     {
         P11Module module = getP11Module(moduleName);

@@ -46,7 +46,7 @@ import org.xipki.security.PBEPasswordResolver;
 public class PBEEncryptCommand extends SecurityCommand
 {
     @Override
-    protected Object doExecute()
+    protected Object _doExecute()
     throws Exception
     {
         char[] masterPassword = readPassword("Please enter the master password");

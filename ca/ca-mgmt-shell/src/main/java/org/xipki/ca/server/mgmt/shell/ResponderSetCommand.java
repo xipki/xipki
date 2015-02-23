@@ -66,7 +66,7 @@ public class ResponderSetCommand extends CaCommand
     private SecurityFactory securityFactory;
 
     @Override
-    protected Object doExecute()
+    protected Object _doExecute()
     throws Exception
     {
         CmpResponderEntry entry = new CmpResponderEntry();

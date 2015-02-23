@@ -114,7 +114,7 @@ public class OCSPQAStatusCommand extends AbstractOCSPStatusCommand
     protected String nonceOccurrenceText = Occurrence.optional.name();
 
     @Override
-    protected Object doExecute()
+    protected Object _doExecute()
     throws Exception
     {
         if(serialNumber == null && certFile == null)

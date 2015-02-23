@@ -45,7 +45,7 @@ import org.apache.karaf.shell.commands.Command;
 public class ResponderRemoveCommand extends CaCommand
 {
     @Override
-    protected Object doExecute()
+    protected Object _doExecute()
     throws Exception
     {
         caManager.removeCmpResponder();

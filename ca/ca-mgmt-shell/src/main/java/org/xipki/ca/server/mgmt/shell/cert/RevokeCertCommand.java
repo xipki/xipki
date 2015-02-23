@@ -79,7 +79,7 @@ public class RevokeCertCommand extends CaCommand
     protected String invalidityDateS;
 
     @Override
-    protected Object doExecute()
+    protected Object _doExecute()
     throws Exception
     {
         X509CAEntry ca = caManager.getCA(caName);

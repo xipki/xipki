@@ -52,7 +52,7 @@ public class ResponderInfoCommand extends CaCommand
     protected Boolean verbose = Boolean.FALSE;
 
     @Override
-    protected Object doExecute()
+    protected Object _doExecute()
     throws Exception
     {
         CmpResponderEntry responder = caManager.getCmpResponder();

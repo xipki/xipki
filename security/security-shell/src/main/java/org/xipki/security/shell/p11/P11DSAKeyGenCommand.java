@@ -58,7 +58,7 @@ public class P11DSAKeyGenCommand extends P11KeyGenCommand
     protected Integer qLen;
 
     @Override
-    protected Object doExecute()
+    protected Object _doExecute()
     throws Exception
     {
         if(pLen % 1024 != 0)

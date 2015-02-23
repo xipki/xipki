@@ -60,7 +60,7 @@ public class CrlSignerInfoCommand extends CaCommand
     protected Boolean verbose = Boolean.FALSE;
 
     @Override
-    protected Object doExecute()
+    protected Object _doExecute()
     throws Exception
     {
         StringBuilder sb = new StringBuilder();

@@ -51,7 +51,7 @@ public class PBEDecryptCommand extends SecurityCommand
     protected String passwordHint;
 
     @Override
-    protected Object doExecute()
+    protected Object _doExecute()
     throws Exception
     {
         if(passwordHint.startsWith("PBE:") == false)

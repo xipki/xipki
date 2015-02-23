@@ -76,7 +76,7 @@ public class CrlSignerAddCommand extends CaCommand
     private SecurityFactory securityFactory;
 
     @Override
-    protected Object doExecute()
+    protected Object _doExecute()
     throws Exception
     {
         X509Certificate signerCert = null;

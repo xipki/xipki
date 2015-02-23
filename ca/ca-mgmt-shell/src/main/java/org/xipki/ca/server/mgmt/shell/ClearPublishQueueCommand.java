@@ -58,7 +58,7 @@ public class ClearPublishQueueCommand extends CaCommand
     protected List<String> publisherNames;
 
     @Override
-    protected Object doExecute()
+    protected Object _doExecute()
     throws Exception
     {
         boolean allPublishers = false;

@@ -66,7 +66,7 @@ public class RemoveExpiredCertsCommand extends ClientCommand
     protected Long overlapSeconds = 24L * 60 * 60;
 
     @Override
-    protected Object doExecute()
+    protected Object _doExecute()
     throws Exception
     {
         Set<String> caNames = raWorker.getCaNames();

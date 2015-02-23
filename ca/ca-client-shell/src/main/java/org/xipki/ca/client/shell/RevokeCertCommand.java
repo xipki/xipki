@@ -74,7 +74,7 @@ public class RevokeCertCommand extends UnRevRemoveCertCommand
     protected String invalidityDateS;
 
     @Override
-    protected Object doExecute()
+    protected Object _doExecute()
     throws Exception
     {
         if(certFile == null && (caCertFile == null || serialNumber == null))

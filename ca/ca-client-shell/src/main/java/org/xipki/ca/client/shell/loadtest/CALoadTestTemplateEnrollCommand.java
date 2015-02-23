@@ -64,7 +64,7 @@ public class CALoadTestTemplateEnrollCommand extends ClientCommand
     protected Integer numThreads = 5;
 
     @Override
-    protected Object doExecute()
+    protected Object _doExecute()
     throws Exception
     {
         if(numThreads < 1)

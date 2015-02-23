@@ -49,7 +49,7 @@ public class CmpControlRemoveCommand extends CaCommand
     protected String name;
 
     @Override
-    protected Object doExecute()
+    protected Object _doExecute()
     throws Exception
     {
         caManager.removeCmpControl(name);

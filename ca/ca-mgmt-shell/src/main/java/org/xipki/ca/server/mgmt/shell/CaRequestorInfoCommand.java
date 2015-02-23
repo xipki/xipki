@@ -54,7 +54,7 @@ public class CaRequestorInfoCommand extends CaCommand
     protected String caName;
 
     @Override
-    protected Object doExecute()
+    protected Object _doExecute()
     throws Exception
     {
         StringBuilder sb = new StringBuilder();

@@ -46,7 +46,7 @@ import org.xipki.ca.server.mgmt.api.CASystemStatus;
 public class CaSystemStatusCommand extends CaCommand
 {
     @Override
-    protected Object doExecute()
+    protected Object _doExecute()
     throws Exception
     {
         CASystemStatus status = caManager.getCASystemStatus();

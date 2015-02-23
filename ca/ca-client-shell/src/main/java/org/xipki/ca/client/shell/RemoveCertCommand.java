@@ -54,7 +54,7 @@ public class RemoveCertCommand extends UnRevRemoveCertCommand
 {
 
     @Override
-    protected Object doExecute()
+    protected Object _doExecute()
     throws Exception
     {
         if(certFile == null && (caCertFile == null || serialNumber == null))

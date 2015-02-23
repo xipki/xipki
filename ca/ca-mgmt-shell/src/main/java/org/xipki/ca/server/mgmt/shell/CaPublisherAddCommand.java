@@ -57,7 +57,7 @@ public class CaPublisherAddCommand extends CaCommand
     protected List<String> publisherNames;
 
     @Override
-    protected Object doExecute()
+    protected Object _doExecute()
     throws Exception
     {
         for(String publisherName : publisherNames)

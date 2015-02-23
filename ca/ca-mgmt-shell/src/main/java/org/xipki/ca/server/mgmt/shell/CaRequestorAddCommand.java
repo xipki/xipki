@@ -77,7 +77,7 @@ public class CaRequestorAddCommand extends CaCommand
     protected Set<String> profiles;
 
     @Override
-    protected Object doExecute()
+    protected Object _doExecute()
     throws Exception
     {
         boolean ra = isEnabled(raS, false, "ra");

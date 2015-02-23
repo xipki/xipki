@@ -95,7 +95,7 @@ public abstract class NegEnrollCertCommand extends ClientCommand
     throws SignerException;
 
     @Override
-    protected Object doExecute()
+    protected Object _doExecute()
     throws Exception
     {
         EnrollCertRequestType request = new EnrollCertRequestType(EnrollCertRequestType.Type.CERT_REQ);

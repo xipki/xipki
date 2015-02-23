@@ -58,7 +58,7 @@ public class RequestorAddCommand extends CaCommand
     protected String certFile;
 
     @Override
-    protected Object doExecute()
+    protected Object _doExecute()
     throws Exception
     {
         CmpRequestorEntry entry = new CmpRequestorEntry(name);

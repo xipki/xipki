@@ -55,7 +55,7 @@ public class CaPublishRCACertCommand extends CaCommand
     protected String certprofile;
 
     @Override
-    protected Object doExecute()
+    protected Object _doExecute()
     throws Exception
     {
         caManager.publishRootCA(caName, certprofile);

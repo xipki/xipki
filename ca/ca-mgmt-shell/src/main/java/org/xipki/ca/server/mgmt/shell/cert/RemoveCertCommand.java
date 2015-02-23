@@ -58,7 +58,7 @@ public class RemoveCertCommand extends CaCommand
     protected Long serialNumber;
 
     @Override
-    protected Object doExecute()
+    protected Object _doExecute()
     throws Exception
     {
         if(caManager.getCA(caName) == null)

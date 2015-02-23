@@ -66,7 +66,7 @@ public class P11CertAddCommand extends SecurityCommand
     protected String moduleName = SecurityFactory.DEFAULT_P11MODULE_NAME;
 
     @Override
-    protected Object doExecute()
+    protected Object _doExecute()
     throws Exception
     {
         X509Certificate cert = SecurityUtil.parseCert(certFile);
