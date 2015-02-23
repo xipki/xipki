@@ -37,6 +37,7 @@ package org.xipki.ca.client.shell;
 
 import java.math.BigInteger;
 import java.security.cert.X509Certificate;
+import java.util.Date;
 
 import org.apache.karaf.shell.commands.Command;
 import org.apache.karaf.shell.commands.Option;
@@ -44,6 +45,7 @@ import org.bouncycastle.asn1.x500.X500Name;
 import org.xipki.ca.client.api.CertIDOrError;
 import org.xipki.ca.common.cmp.PKIStatusInfo;
 import org.xipki.common.CRLReason;
+import org.xipki.common.DateUtil;
 import org.xipki.common.SecurityUtil;
 import org.xipki.console.karaf.UnexpectedResultException;
 
@@ -65,6 +67,11 @@ public class RevokeCertCommand extends UnRevRemoveCertCommand
                     "  6: certificateHold\n" +
                     "  9: privilegeWithdrawn")
     protected String reason;
+
+    @Option(name = "-invDate",
+            required = false,
+            description = "Invalidity date, UTC time of format yyyyMMddHHmmss")
+    protected String invalidityDateS;
 
     @Override
     protected Object doExecute()
@@ -96,6 +103,12 @@ public class RevokeCertCommand extends UnRevRemoveCertCommand
             caCert = SecurityUtil.parseCert(caCertFile);
         }
 
+        Date invalidityDate = null;
+        if(invalidityDateS != null && invalidityDateS.isEmpty() == false)
+        {
+            invalidityDate = DateUtil.parseUTCTimeyyyyMMddhhmmss(invalidityDateS);
+        }
+
         if(certFile != null)
         {
             X509Certificate cert = SecurityUtil.parseCert(certFile);
@@ -108,12 +121,12 @@ public class RevokeCertCommand extends UnRevRemoveCertCommand
                     return null;
                 }
             }
-            certIdOrError = raWorker.revokeCert(cert, crlReason.getCode());
+            certIdOrError = raWorker.revokeCert(cert, crlReason.getCode(), invalidityDate);
         }
         else
         {
             X500Name issuer = X500Name.getInstance(caCert.getSubjectX500Principal().getEncoded());
-            certIdOrError = raWorker.revokeCert(issuer, new BigInteger(serialNumber), crlReason.getCode());
+            certIdOrError = raWorker.revokeCert(issuer, new BigInteger(serialNumber), crlReason.getCode(), invalidityDate);
         }
 
         if(certIdOrError.getError() != null)

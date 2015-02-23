@@ -37,6 +37,7 @@ package org.xipki.ca.server.mgmt.shell;
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 
 import org.apache.karaf.shell.commands.Argument;
@@ -44,6 +45,7 @@ import org.apache.karaf.shell.commands.Command;
 import org.apache.karaf.shell.commands.Option;
 import org.xipki.common.CRLReason;
 import org.xipki.common.CertRevocationInfo;
+import org.xipki.common.DateUtil;
 
 /**
  * @author Lijun Liao
@@ -75,6 +77,16 @@ public class CaRevokeCommand extends CaCommand
                     " 9: privilegeWithdrawn")
     protected String reason;
 
+    @Option(name = "-revDate",
+            required = false,
+            description = "Revocation date, UTC time of format yyyyMMddHHmmss.\nThe default is current time")
+    protected String revocationDateS;
+
+    @Option(name = "-invDate",
+            required = false,
+            description = "Invalidity date, UTC time of format yyyyMMddHHmmss")
+    protected String invalidityDateS;
+
     @Override
     protected Object doExecute()
     throws Exception
@@ -99,7 +111,23 @@ public class CaRevokeCommand extends CaCommand
             return null;
         }
 
-        CertRevocationInfo revInfo = new CertRevocationInfo(crlReason);
+        Date revocationDate = null;
+        if(revocationDateS != null && revocationDateS.isEmpty() == false)
+        {
+            revocationDate = DateUtil.parseUTCTimeyyyyMMddhhmmss(revocationDateS);
+        }
+        else
+        {
+            revocationDate = new Date();
+        }
+
+        Date invalidityDate = null;
+        if(invalidityDateS != null && invalidityDateS.isEmpty() == false)
+        {
+            invalidityDate = DateUtil.parseUTCTimeyyyyMMddhhmmss(invalidityDateS);
+        }
+
+        CertRevocationInfo revInfo = new CertRevocationInfo(crlReason, revocationDate, invalidityDate);
         caManager.revokeCa(caName, revInfo);
 
         out("revoked CA " + caName);
