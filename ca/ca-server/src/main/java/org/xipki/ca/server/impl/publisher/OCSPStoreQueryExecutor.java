@@ -294,16 +294,24 @@ class OCSPStoreQueryExecutor
 
                     final boolean origAutoCommit = conn.getAutoCommit();
                     conn.setAutoCommit(false);
+                    String sql = null;
                     try
                     {
+                        sql = SQL_ADD_CERT;
                         ps_addcert.executeUpdate();
+
+                        sql = SQL_ADD_CERTHASH;
                         ps_addRawcert.executeUpdate();
+
+                        sql = SQL_ADD_CERTHASH;
                         ps_addCerthash.executeUpdate();
+
+                        sql = "(commit add cert to OCSP)";
                         conn.commit();
                     }catch(SQLException e)
                     {
                         conn.rollback();
-                        DataAccessException tEx = dataSource.translate(null, e);
+                        DataAccessException tEx = dataSource.translate(sql, e);
                         if(tEx instanceof DuplicateKeyException && i < tries - 1)
                         {
                             continue;

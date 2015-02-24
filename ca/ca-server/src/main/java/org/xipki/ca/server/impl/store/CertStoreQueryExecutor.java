@@ -285,15 +285,21 @@ class CertStoreQueryExecutor
                 final boolean origAutoCommit = conn.getAutoCommit();
                 conn.setAutoCommit(false);
 
+                String sql = null;
                 try
                 {
+                    sql = SQL_ADD_CERT;
                     ps_addcert.executeUpdate();
+
+                    sql = SQL_ADD_RAWCERT;
                     ps_addRawcert.executeUpdate();
+
+                    sql = "(commit add cert to CA certstore)";
                     conn.commit();
                 }catch(SQLException e)
                 {
                     conn.rollback();
-                    DataAccessException tEx = dataSource.translate(null, e);
+                    DataAccessException tEx = dataSource.translate(sql, e);
                     if(tEx instanceof DuplicateKeyException && i < tries - 1)
                     {
                         continue;
