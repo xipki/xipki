@@ -447,17 +447,24 @@ class OcspCertStoreDbImporter extends DbPorter
 
                 if(numEntriesInBatch > 0 && (numEntriesInBatch % n == 0 || i == size - 1))
                 {
+                    String sql = null;
                     try
                     {
+                        sql = SQL_ADD_CERT;
                         ps_cert.executeBatch();
+
+                        sql = SQL_ADD_CERTHASH;
                         ps_certhash.executeBatch();
+
+                        sql = SQL_ADD_RAWCERT;
                         ps_rawcert.executeBatch();
 
-                        commit();
+                        sql = null;
+                        commit("(commit import cert to OCSP)");
                     } catch(SQLException e)
                     {
                         rollback();
-                        throw translate(null, e);
+                        throw translate(sql, e);
                     } catch(DataAccessException e)
                     {
                         rollback();

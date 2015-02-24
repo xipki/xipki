@@ -287,7 +287,7 @@ public class DbPorter
         }
     }
 
-    protected void commit()
+    protected void commit(String task)
     throws DataAccessException
     {
         try
@@ -295,7 +295,7 @@ public class DbPorter
             connection.commit();
         }catch(SQLException e)
         {
-            throw dataSource.translate(null, e);
+            throw dataSource.translate(task, e);
         }
     }
 
