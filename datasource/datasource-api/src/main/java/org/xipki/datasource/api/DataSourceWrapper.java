@@ -99,6 +99,8 @@ public interface DataSourceWrapper
     void dropSequence(String sequenceName)
     throws DataAccessException;
 
+    void setLastUsedSeqValue(String sequenceName, long sequenceValue);
+
     long nextSeqValue(Connection conn, String sequenceName)
     throws DataAccessException;
 

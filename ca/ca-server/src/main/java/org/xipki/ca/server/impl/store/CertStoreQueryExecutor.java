@@ -2425,6 +2425,46 @@ class CertStoreQueryExecutor
         }
     }
 
+    void markMaxSerial(X509CertWithId caCert, String seqName)
+    throws DataAccessException
+    {
+        byte[] encodedCert = caCert.getEncodedCert();
+        Integer caId =  caInfoStore.getCaIdForCert(encodedCert);
+        if(caId == null)
+        {
+            return;
+        }
+
+        final String sql = "SELECT MAX(SERIAL) FROM CERT WHERE CA_ID=?";
+        Long maxSerial = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        try
+        {
+            ps = borrowPreparedStatement(sql);
+            ps.setInt(1, caId);
+            rs = ps.executeQuery();
+            if(rs.next())
+            {
+                maxSerial = rs.getLong(1);
+            } else
+            {
+                return;
+            }
+        }catch(SQLException e)
+        {
+            throw dataSource.translate(sql, e);
+        }finally
+        {
+            dataSource.releaseResources(ps, rs);
+        }
+
+        if(maxSerial != null)
+        {
+            dataSource.setLastUsedSeqValue(seqName, maxSerial);
+        }
+    }
+
     void commitNextSerialIfLess(String caName, long nextSerial)
     throws DataAccessException
     {

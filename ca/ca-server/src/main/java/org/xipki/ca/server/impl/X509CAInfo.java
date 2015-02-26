@@ -396,6 +396,15 @@ class X509CAInfo
         return BigInteger.valueOf(serial);
     }
 
+    public void markMaxSerial()
+    throws OperationException
+    {
+        if(useRandomSerialNumber == false)
+        {
+            certStore.markMaxSerial(getCertificate(), caEntry.getSerialSeqName());
+        }
+    }
+
     public BigInteger nextCRLNumber()
     throws OperationException
     {

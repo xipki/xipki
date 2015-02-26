@@ -43,6 +43,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Properties;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -74,6 +75,7 @@ import com.zaxxer.hikari.HikariDataSource;
 public abstract class DataSourceWrapperImpl implements DataSourceWrapper
 {
     private static final Logger LOG = LoggerFactory.getLogger(DataSourceWrapperImpl.class);
+    private final ConcurrentHashMap<String, Long> lastUsedSeqValues = new ConcurrentHashMap<>();
 
     private static class MySQL extends DataSourceWrapperImpl
     {
@@ -1032,6 +1034,12 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
     }
 
     @Override
+    public void setLastUsedSeqValue(String sequenceName, long sequenceValue)
+    {
+        lastUsedSeqValues.put(sequenceName, sequenceValue);
+    }
+
+    @Override
     public long nextSeqValue(Connection conn, String sequenceName)
     throws DataAccessException
     {
@@ -1042,19 +1050,37 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
             conn = getConnection();
         }
         Statement stmt = null;
-        ResultSet rs = null;
 
-        long ret;
+        long next;
         try
         {
             stmt = conn.createStatement();
-            rs = stmt.executeQuery(sql);
-            if(rs.next())
+
+            while(true)
             {
-                ret = rs.getLong(1);
-            } else
-            {
-                throw new DataAccessException("Could not increment the sequence " + sequenceName);
+                ResultSet rs = stmt.executeQuery(sql);
+                try
+                {
+                    if(rs.next())
+                    {
+                        next = rs.getLong(1);
+                        synchronized (lastUsedSeqValues)
+                        {
+                            Long lastValue = lastUsedSeqValues.get(sequenceName);
+                            if(lastValue == null || next > lastValue)
+                            {
+                                lastUsedSeqValues.put(sequenceName, next);
+                                break;
+                            }
+                        }
+                    } else
+                    {
+                        throw new DataAccessException("Could not increment the sequence " + sequenceName);
+                    }
+                }finally
+                {
+                    releaseStatementAndResultSet(null, rs);
+                }
             }
         } catch(SQLException e)
         {
@@ -1063,16 +1089,16 @@ public abstract class DataSourceWrapperImpl implements DataSourceWrapper
         {
             if(newConn)
             {
-                releaseResources(stmt, rs);
+                releaseResources(stmt, null);
             }
             else
             {
-                releaseStatementAndResultSet(stmt, rs);
+                releaseStatementAndResultSet(stmt, null);
             }
         }
 
-        LOG.debug("datasource {} NEXVALUE({}): {}", name, sequenceName, ret);
-        return ret;
+        LOG.debug("datasource {} NEXVALUE({}): {}", name, sequenceName, next);
+        return next;
     }
 
     @Override
