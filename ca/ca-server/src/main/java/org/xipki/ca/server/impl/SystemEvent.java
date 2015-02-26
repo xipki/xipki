@@ -33,32 +33,39 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.ca.server.mgmt.shell;
-
-import org.apache.karaf.shell.commands.Command;
+package org.xipki.ca.server.impl;
 
 /**
  * @author Lijun Liao
  */
 
-@Command(scope = "xipki-ca", name = "unlock", description="Unlock the CA syste")
-public class UnlockCACommand extends CaCommand
+class SystemEvent
 {
-    @Override
-    protected Object _doExecute()
-    throws Exception
+    private final String name;
+    private final String owner;
+    private final long eventTime;
+
+    public SystemEvent(String name, String owner, long eventTime)
     {
-        boolean unlocked = caManager.unlockCA();
-
-        if(unlocked)
-        {
-            out("Unlocked CA system, calling xipki-ca:ca-restart to restart CA system");
-        }
-        else
-        {
-            err("Could not unlock CA system");
-        }
-
-        return null;
+        super();
+        this.name = name;
+        this.owner = owner;
+        this.eventTime = eventTime;
     }
+
+    public String getName()
+    {
+        return name;
+    }
+
+    public String getOwner()
+    {
+        return owner;
+    }
+
+    public long getEventTime()
+    {
+        return eventTime;
+    }
+
 }
