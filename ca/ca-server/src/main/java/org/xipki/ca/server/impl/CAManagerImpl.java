@@ -42,15 +42,8 @@ import java.math.BigInteger;
 import java.net.SocketException;
 import java.security.Security;
 import java.security.cert.CertificateEncodingException;
-import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.sql.Timestamp;
-import java.sql.Types;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -64,7 +57,6 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import org.bouncycastle.asn1.ASN1Set;
 import org.bouncycastle.asn1.pkcs.Attribute;
@@ -97,7 +89,6 @@ import org.xipki.ca.server.mgmt.api.CAMgmtException;
 import org.xipki.ca.server.mgmt.api.CAStatus;
 import org.xipki.ca.server.mgmt.api.CASystemStatus;
 import org.xipki.ca.server.mgmt.api.CRLControl;
-import org.xipki.ca.server.mgmt.api.CertArt;
 import org.xipki.ca.server.mgmt.api.CertprofileEntry;
 import org.xipki.ca.server.mgmt.api.CmpControl;
 import org.xipki.ca.server.mgmt.api.CmpRequestorEntry;
@@ -116,16 +107,19 @@ import org.xipki.common.IoUtil;
 import org.xipki.common.LogUtil;
 import org.xipki.common.ParamChecker;
 import org.xipki.common.SecurityUtil;
+import org.xipki.datasource.api.DataSourceFactory;
 import org.xipki.datasource.api.DataSourceWrapper;
 import org.xipki.datasource.api.exception.DataAccessException;
+import org.xipki.security.api.PasswordResolver;
 import org.xipki.security.api.PasswordResolverException;
+import org.xipki.security.api.SecurityFactory;
 import org.xipki.security.api.SignerException;
 
 /**
  * @author Lijun Liao
  */
 
-public class CAManagerImpl extends BaseCAManager
+public class CAManagerImpl
 implements CAManager, CmpResponderManager
 {
 
@@ -217,24 +211,8 @@ implements CAManager, CmpResponderManager
             inProcess = true;
             try
             {
-                Statement stmt = null;
-                ResultSet rs = null;
-
-                long caChangedTime = 0;
-                try
-                {
-                    stmt = createStatement();
-                    String sql = "SELECT EVENT_TIME FROM SYSTEM_EVENT WHERE NAME='CA_CHANGE'";
-                    rs = stmt.executeQuery(sql);
-
-                    if(rs.next())
-                    {
-                        caChangedTime = rs.getLong("EVENT_TIME");
-                    }
-                }finally
-                {
-                    dataSource.releaseResources(stmt, rs);
-                }
+                SystemEvent event = queryExecutor.getSystemEvent(EVENT_CACHAGNE);
+                long caChangedTime = (event == null) ? 0 : event.getEventTime();
 
                 if(LOG.isDebugEnabled())
                 {
@@ -261,6 +239,8 @@ implements CAManager, CmpResponderManager
     }
 
     private static final Logger LOG = LoggerFactory.getLogger(CAManagerImpl.class);
+    private static final String EVENT_LOCK = "LOCK";
+    private static final String EVENT_CACHAGNE = "CA_CHANGE";
 
     private final String lockInstanceId;
 
@@ -306,6 +286,12 @@ implements CAManager, CmpResponderManager
 
     private AuditLoggingServiceRegister auditServiceRegister;
 
+    private DataSourceWrapper dataSource;
+    private CertificateStore certstore;
+    private SecurityFactory securityFactory;
+    private DataSourceFactory dataSourceFactory;
+    private CAManagerQueryExecutor queryExecutor;
+
     public CAManagerImpl()
     throws ConfigurationException
     {
@@ -346,6 +332,26 @@ implements CAManager, CmpResponderManager
         }
 
         this.lockInstanceId = (hostAddress == null) ? calockId :hostAddress + "/" + calockId;
+    }
+
+    public SecurityFactory getSecurityFactory()
+    {
+        return securityFactory;
+    }
+
+    public void setSecurityFactory(SecurityFactory securityFactory)
+    {
+        this.securityFactory = securityFactory;
+    }
+
+    public DataSourceFactory getDataSourceFactory()
+    {
+        return dataSourceFactory;
+    }
+
+    public void setDataSourceFactory(DataSourceFactory dataSourceFactory)
+    {
+        this.dataSourceFactory = dataSourceFactory;
     }
 
     private void init()
@@ -428,6 +434,8 @@ implements CAManager, CmpResponderManager
             throw new CAMgmtException("no datasource configured with name 'ca'");
         }
 
+        this.queryExecutor = new CAManagerQueryExecutor(this.dataSource);
+
         if(masterMode)
         {
             boolean lockedSuccessfull;
@@ -483,71 +491,33 @@ implements CAManager, CmpResponderManager
     private boolean lockCA(boolean forceRelock)
     throws DataAccessException, CAMgmtException
     {
-        String sql = "SELECT EVENT_TIME, EVENT_OWNER FROM SYSTEM_EVENT WHERE NAME='LOCK'";
-        Statement stmt = null;
-        ResultSet rs = null;
+        SystemEvent lockInfo = queryExecutor.getSystemEvent(EVENT_LOCK);
 
-        try
+        if(lockInfo != null)
         {
-            stmt = createStatement();
-            rs = stmt.executeQuery(sql);
+            String lockedBy = lockInfo.getOwner();
+            Date lockedAt = new Date(lockInfo.getEventTime() * 1000L);
 
-            if(rs.next())
+            if(this.lockInstanceId.equals(lockedBy))
             {
-                long lockGranted = rs.getLong("EVENT_TIME");
-                String lockedBy = rs.getString("EVENT_OWNER");
-                if(this.lockInstanceId.equals(lockedBy))
+                if(forceRelock == false)
                 {
-                    if(forceRelock == false)
-                    {
-                        return true;
-                    } else
-                    {
-                        LOG.info("CA has been locked by me since {}, relock it", new Date(lockGranted * 1000));
-                    }
-                }
-                else
+                    return true;
+                } else
                 {
-                    LOG.error("Cannot lock CA, it has been locked by {} since {}", lockedBy, new Date(lockGranted * 1000));
-                    return false;
+                    LOG.info("CA has been locked by me since {}, relock it", lockedAt);
                 }
             }
-
-            sql = "DELETE FROM SYSTEM_EVENT WHERE NAME='LOCK'";
-            stmt.execute(sql);
-        } catch(SQLException e)
-        {
-            DataAccessException tEx = dataSource.translate(sql, e);
-            throw new CAMgmtException(tEx.getMessage(), tEx);
-        }
-        finally
-        {
-            dataSource.releaseResources(stmt, rs);
+            else
+            {
+                LOG.error("Cannot lock CA, it has been locked by {} since {}", lockedBy, lockedAt);
+                return false;
+            }
         }
 
-        final String lockSql = "INSERT INTO SYSTEM_EVENT (NAME, EVENT_TIME, EVENT_TIME2, EVENT_OWNER)"
-                + " VALUES ('LOCK', ?, ?, ?)";
-
-        PreparedStatement ps = null;
-        try
-        {
-            long nowMillis = System.currentTimeMillis();
-            ps = prepareStatement(lockSql);
-            int idx = 1;
-            ps.setLong(idx++, nowMillis / 1000);
-            ps.setTimestamp(idx++, new Timestamp(nowMillis));
-            ps.setString(idx++, lockInstanceId);
-            int numColumns = ps.executeUpdate();
-            caLockedByMe = numColumns > 0;
-            return caLockedByMe;
-        } catch(SQLException e)
-        {
-            DataAccessException tEx = dataSource.translate(lockSql, e);
-            throw new CAMgmtException(tEx.getMessage(), tEx);
-        }finally
-        {
-            dataSource.releaseResources(ps, null);
-        }
+        SystemEvent newLockInfo = new SystemEvent(EVENT_LOCK, lockInstanceId, System.currentTimeMillis() / 1000L);
+        queryExecutor.changeSystemEvent(newLockInfo);
+        return true;
     }
 
     @Override
@@ -562,23 +532,11 @@ implements CAManager, CmpResponderManager
         caLockedByMe = false;
 
         boolean successfull = false;
-        final String sql = "DELETE FROM SYSTEM_EVENT WHERE NAME='LOCK'";
-        Statement stmt = null;
         try
         {
-            stmt = createStatement();
-            stmt.execute(sql);
+            queryExecutor.unlockCA();
             successfull = true;
-        }catch(SQLException e)
-        {
-            final String message = "Error in unlockCA()";
-            DataAccessException tEx = dataSource.translate(sql, e);
-            if(LOG.isWarnEnabled())
-            {
-                LOG.warn(LogUtil.buildExceptionLogFormat(message), tEx.getClass().getName(), tEx.getMessage());
-            }
-            LOG.debug(message, tEx);
-        }catch(CAMgmtException e)
+        }catch(DataAccessException | CAMgmtException e)
         {
             final String message = "Error in unlockCA()";
             if(LOG.isWarnEnabled())
@@ -586,9 +544,6 @@ implements CAManager, CmpResponderManager
                 LOG.warn(LogUtil.buildExceptionLogFormat(message), e.getClass().getName(), e.getMessage());
             }
             LOG.debug(message, e);
-        }finally
-        {
-            dataSource.releaseResources(stmt, null);
         }
 
         if(successfull)
@@ -653,51 +608,11 @@ implements CAManager, CmpResponderManager
     @Override
     public void notifyCAChange()
     {
-        String sql = null;
-
         try
         {
-            Statement stmt = null;
-            sql = "DELETE FROM SYSTEM_EVENT WHERE NAME='CA_CHANGE'";
-            try
-            {
-                stmt = createStatement();
-                stmt.execute(sql);
-            }finally
-            {
-                dataSource.releaseResources(stmt, null);
-            }
-
-            sql = "INSERT INTO SYSTEM_EVENT (NAME, EVENT_TIME, EVENT_TIME2, EVENT_OWNER)"
-                    + " VALUES ('CA_CHANGE', ?, ?, ?)";
-
-            PreparedStatement ps = null;
-            try
-            {
-                // notify the slave CAs
-                ps = prepareStatement(sql);
-
-                long nowMillis = System.currentTimeMillis();
-                int idx = 1;
-                ps.setLong(idx++, nowMillis / 1000);
-                ps.setTimestamp(idx++, new Timestamp(nowMillis));
-                ps.setString(idx++, lockInstanceId);
-                ps.executeUpdate();
-            }finally
-            {
-                dataSource.releaseResources(ps, null);
-            }
-
+            SystemEvent systemEvent = new SystemEvent(EVENT_CACHAGNE, lockInstanceId, System.currentTimeMillis() / 1000L);
+            queryExecutor.changeSystemEvent(systemEvent);
             LOG.info("notified the change of CA system");
-        }catch(SQLException e)
-        {
-            final String message = "Error while notifying Slave CAs to restart";
-            DataAccessException tEx = dataSource.translate(sql, e);
-            if(LOG.isWarnEnabled())
-            {
-                LOG.warn(LogUtil.buildExceptionLogFormat(message), tEx.getClass().getName(), tEx.getMessage());
-            }
-            LOG.debug(message, tEx);
         }catch(CAMgmtException e)
         {
             final String message = "Error while notifying Slave CAs to restart";
@@ -1003,13 +918,13 @@ implements CAManager, CmpResponderManager
         }
 
         requestors.clear();
-        List<String> names = getNamesFromTable("REQUESTOR");
+        List<String> names = queryExecutor.getNamesFromTable("REQUESTOR");
 
         if(names.isEmpty() == false)
         {
             for(String name : names)
             {
-                CmpRequestorEntryWrapper requestor = createRequestor(name);
+                CmpRequestorEntryWrapper requestor = queryExecutor.createRequestor(name);
                 if(requestor != null)
                 {
                     requestors.put(name, requestor);
@@ -1028,39 +943,23 @@ implements CAManager, CmpResponderManager
             return;
         }
 
-        responder = createResponder();
+        responder = queryExecutor.createResponder(securityFactory);
         responderInitialized = true;
     }
 
     private void initEnvironemtParamters()
     throws CAMgmtException
     {
-        if(environmentParametersInitialized) return;
+        if(environmentParametersInitialized)
+        {
+            return;
+        }
 
+        Map<String, String> map = queryExecutor.createEnvParameters();
         envParameterResolver.clear();
-
-        final String sql = "SELECT NAME, VALUE2 FROM ENVIRONMENT";
-        Statement stmt = null;
-        ResultSet rs = null;
-
-        try
+        for(String name : map.keySet())
         {
-            stmt = createStatement();
-            rs = stmt.executeQuery(sql);
-
-            while(rs.next())
-            {
-                String name = rs.getString("NAME");
-                String value = rs.getString("VALUE2");
-                envParameterResolver.addEnvParam(name, value);
-            }
-        }catch(SQLException e)
-        {
-            DataAccessException tEx = dataSource.translate(sql, e);
-            throw new CAMgmtException(tEx.getMessage(), tEx);
-        }finally
-        {
-            dataSource.releaseResources(stmt, rs);
+            envParameterResolver.addEnvParam(name, map.get(name));
         }
 
         environmentParametersInitialized = true;
@@ -1074,31 +973,11 @@ implements CAManager, CmpResponderManager
             return;
         }
 
+        Map<String, String> map = queryExecutor.createCaAliases();
         caAliases.clear();
-
-        final String sql = "SELECT NAME, CA_NAME FROM CAALIAS";
-        Statement stmt = null;
-        ResultSet rs = null;
-
-        try
+        for(String aliasName : map.keySet())
         {
-            stmt = createStatement();
-            rs = stmt.executeQuery(sql);
-
-            while(rs.next())
-            {
-                String name = rs.getString("NAME");
-                String caName = rs.getString("CA_NAME");
-
-                caAliases.put(name, caName);
-            }
-        }catch(SQLException e)
-        {
-            DataAccessException tEx = dataSource.translate(sql, e);
-            throw new CAMgmtException(tEx.getMessage(), tEx);
-        }finally
-        {
-            dataSource.releaseResources(stmt, rs);
+            caAliases.put(aliasName, map.get(aliasName));
         }
 
         caAliasesInitialized = true;
@@ -1114,17 +993,17 @@ implements CAManager, CmpResponderManager
 
         for(String name : certprofiles.keySet())
         {
-            shutdownCertprofile(certprofiles.get(name));
+            queryExecutor.shutdownCertprofile(certprofiles.get(name));
         }
         certprofiles.clear();
 
-        List<String> names = getNamesFromTable("CERTPROFILE");
+        List<String> names = queryExecutor.getNamesFromTable("CERTPROFILE");
 
         if(names.isEmpty() == false)
         {
             for(String name : names)
             {
-                IdentifiedX509Certprofile profile = createCertprofile(name, envParameterResolver);
+                IdentifiedX509Certprofile profile = queryExecutor.createCertprofile(name, envParameterResolver);
                 if(profile != null)
                 {
                     certprofiles.put(name, profile);
@@ -1145,17 +1024,18 @@ implements CAManager, CmpResponderManager
 
         for(String name : publishers.keySet())
         {
-            shutdownPublisher(publishers.get(name));
+            queryExecutor.shutdownPublisher(publishers.get(name));
         }
         publishers.clear();
 
-        List<String> names = getNamesFromTable("PUBLISHER");
+        List<String> names = queryExecutor.getNamesFromTable("PUBLISHER");
 
         if(names.isEmpty() == false)
         {
             for(String name : names)
             {
-                IdentifiedX509CertPublisher publisher = createPublisher(name, dataSources);
+                IdentifiedX509CertPublisher publisher = queryExecutor.createPublisher(name, dataSources,
+                        securityFactory.getPasswordResolver(), envParameterResolver);
                 if(publisher != null)
                 {
                     publishers.put(name, publisher);
@@ -1175,13 +1055,13 @@ implements CAManager, CmpResponderManager
         }
         crlSigners.clear();
 
-        List<String> names = getNamesFromTable("CRLSIGNER");
+        List<String> names = queryExecutor.getNamesFromTable("CRLSIGNER");
 
         if(names.isEmpty() == false)
         {
             for(String name : names)
             {
-                X509CrlSignerEntryWrapper crlSigner = createCrlSigner(name);
+                X509CrlSignerEntryWrapper crlSigner = queryExecutor.createCrlSigner(name);
                 if(crlSigner != null)
                 {
                     crlSigners.put(name, crlSigner);
@@ -1202,13 +1082,13 @@ implements CAManager, CmpResponderManager
 
         cmpControls.clear();
 
-        List<String> names = getNamesFromTable("CMPCONTROL");
+        List<String> names = queryExecutor.getNamesFromTable("CMPCONTROL");
 
         if(names.isEmpty() == false)
         {
             for(String name : names)
             {
-                CmpControl cmpControl = createCmpControl(name);
+                CmpControl cmpControl = queryExecutor.createCmpControl(name);
                 if(cmpControl != null)
                 {
                     cmpControls.put(name, cmpControl);
@@ -1232,7 +1112,7 @@ implements CAManager, CmpResponderManager
         ca_has_publishers.clear();
         ca_has_profiles.clear();
 
-        List<String> names = getNamesFromTable("CA");
+        List<String> names = queryExecutor.getNamesFromTable("CA");
         if(names.isEmpty() == false)
         {
             for(String name : names)
@@ -1252,7 +1132,7 @@ implements CAManager, CmpResponderManager
         ca_has_publishers.remove(name);
         ca_has_requestors.remove(name);
 
-        X509CAInfo ca = createCAInfo(name, masterMode);
+        X509CAInfo ca = queryExecutor.createCAInfo(name, masterMode, certstore);
         try
         {
             ca.markMaxSerial();
@@ -1262,13 +1142,13 @@ implements CAManager, CmpResponderManager
         }
         caInfos.put(name, ca);
 
-        Set<CAHasRequestorEntry> caHasRequestors = createCAhasRequestors(name);
+        Set<CAHasRequestorEntry> caHasRequestors = queryExecutor.createCAhasRequestors(name);
         ca_has_requestors.put(name, caHasRequestors);
 
-        Set<String> profileNames = createCAhasCertprofiles(name);
+        Set<String> profileNames = queryExecutor.createCAhasCertprofiles(name);
         ca_has_profiles.put(name, profileNames);
 
-        Set<String> publisherNames = createCAhasPublishers(name);
+        Set<String> publisherNames = queryExecutor.createCAhasPublishers(name);
         ca_has_publishers.put(name, publisherNames);
     }
 
@@ -1302,75 +1182,7 @@ implements CAManager, CmpResponderManager
             throw new CAMgmtException("CA named " + name + " exists");
         }
 
-        StringBuilder sqlBuilder = new StringBuilder();
-        sqlBuilder.append("INSERT INTO CA (");
-        sqlBuilder.append("NAME, ART, SUBJECT, NEXT_SERIAL, NEXT_CRLNO, STATUS, CRL_URIS, OCSP_URIS, MAX_VALIDITY");
-        sqlBuilder.append(", CERT, SIGNER_TYPE, SIGNER_CONF, CRLSIGNER_NAME, CMPCONTROL_NAME");
-        sqlBuilder.append(", DUPLICATE_KEY_MODE, DUPLICATE_SUBJECT_MODE, PERMISSIONS, NUM_CRLS, EXPIRATION_PERIOD");
-        sqlBuilder.append(", VALIDITY_MODE, DELTA_CRL_URIS");
-        sqlBuilder.append(") VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
-        final String sql = sqlBuilder.toString();
-
-        // insert to table ca
-        PreparedStatement ps = null;
-        try
-        {
-            ps = prepareStatement(sql);
-            int idx = 1;
-            ps.setString(idx++, name);
-            ps.setInt(idx++, CertArt.X509PKC.getCode());
-            ps.setString(idx++, newCaDbEntry.getSubject());
-
-            long nextSerial = newCaDbEntry.getNextSerial();
-            if(nextSerial < 0)
-            {
-                nextSerial = 0;
-            }
-            ps.setLong(idx++, nextSerial);
-
-            ps.setInt(idx++, newCaDbEntry.getNextCRLNumber());
-            ps.setString(idx++, newCaDbEntry.getStatus().getStatus());
-            ps.setString(idx++, newCaDbEntry.getCrlUrisAsString());
-            ps.setString(idx++, newCaDbEntry.getOcspUrisAsString());
-            ps.setString(idx++, newCaDbEntry.getMaxValidity().toString());
-            byte[] encodedCert = newCaDbEntry.getCertificate().getEncoded();
-            ps.setString(idx++, Base64.toBase64String(encodedCert));
-            ps.setString(idx++, newCaDbEntry.getSignerType());
-            ps.setString(idx++, newCaDbEntry.getSignerConf());
-            ps.setString(idx++, newCaDbEntry.getCrlSignerName());
-            ps.setString(idx++, newCaDbEntry.getCmpControlName());
-            ps.setInt(idx++, newCaDbEntry.getDuplicateKeyMode().getMode());
-            ps.setInt(idx++, newCaDbEntry.getDuplicateSubjectMode().getMode());
-            ps.setString(idx++, Permission.toString(newCaDbEntry.getPermissions()));
-            ps.setInt(idx++, newCaDbEntry.getNumCrls());
-            ps.setInt(idx++, newCaDbEntry.getExpirationPeriod());
-            ps.setString(idx++, newCaDbEntry.getValidityMode().name());
-            ps.setString(idx++, newCaDbEntry.getDeltaCrlUrisAsString());
-
-            ps.executeUpdate();
-
-            // create serial sequence
-            if(nextSerial > 0)
-            {
-                dataSource.createSequence(newCaDbEntry.getSerialSeqName(), nextSerial);
-            }
-
-            if(LOG.isInfoEnabled())
-            {
-                LOG.info("added CA '{}': {}", name, newCaDbEntry.toString(false, true));
-            }
-        }catch(SQLException e)
-        {
-            DataAccessException tEx = dataSource.translate(sql, e);
-            throw new CAMgmtException(tEx.getMessage(), tEx);
-        } catch (CertificateEncodingException | DataAccessException e)
-        {
-            throw new CAMgmtException(e.getMessage(), e);
-        }finally
-        {
-            dataSource.releaseResources(ps, null);
-        }
-
+        queryExecutor.addCA(newCaDbEntry);
         createCA(name);
         startCA(name);
     }
@@ -1395,176 +1207,17 @@ implements CAManager, CmpResponderManager
         asssertMasterMode();
         name = name.toUpperCase();
 
-        StringBuilder sqlBuilder = new StringBuilder();
-        sqlBuilder.append("UPDATE CA SET ");
-
-        AtomicInteger index = new AtomicInteger(1);
-
-        Integer iStatus = addToSqlIfNotNull(sqlBuilder, index, status, "STATUS");
-        Integer iSubject = addToSqlIfNotNull(sqlBuilder, index, cert, "SUBJECT");
-        Integer iCert = addToSqlIfNotNull(sqlBuilder, index, cert, "CERT");
-        Integer iCrl_uris = addToSqlIfNotNull(sqlBuilder, index, crl_uris, "CRL_URIS");
-        Integer iDelta_crl_uris = addToSqlIfNotNull(sqlBuilder, index, delta_crl_uris, "DELTA_CRL_URIS");
-        Integer iOcsp_uris = addToSqlIfNotNull(sqlBuilder, index, ocsp_uris, "OCSP_URIS");
-        Integer iMax_validity = addToSqlIfNotNull(sqlBuilder, index, max_validity, "MAX_VALIDITY");
-        Integer iSigner_type = addToSqlIfNotNull(sqlBuilder, index, signer_type, "SIGNER_TYPE");
-        Integer iSigner_conf = addToSqlIfNotNull(sqlBuilder, index, signer_conf, "SIGNER_CONF");
-        Integer iCrlsigner_name = addToSqlIfNotNull(sqlBuilder, index, crlsigner_name, "CRLSIGNER_NAME");
-        Integer iCmpcontrol_name = addToSqlIfNotNull(sqlBuilder, index, cmpcontrol_name, "CMPCONTROL_NAME");
-        Integer iDuplicate_key = addToSqlIfNotNull(sqlBuilder, index, duplicate_key, "DUPLICATE_KEY_MODE");
-        Integer iDuplicate_subject = addToSqlIfNotNull(sqlBuilder, index, duplicate_subject, "DUPLICATE_SUBJECT_MODE");
-        Integer iPermissions = addToSqlIfNotNull(sqlBuilder, index, permissions, "PERMISSIONS");
-        Integer iNum_crls = addToSqlIfNotNull(sqlBuilder, index, numCrls, "NUM_CRLS");
-        Integer iExpiration_period = addToSqlIfNotNull(sqlBuilder, index, expirationPeriod, "EXPIRATION_PERIOD");
-        Integer iValidity_mode = addToSqlIfNotNull(sqlBuilder, index, validityMode, "VALIDITY_MODE");
-
-        // delete the last ','
-        sqlBuilder.deleteCharAt(sqlBuilder.length() - 1);
-        sqlBuilder.append(" WHERE NAME=?");
-
-        if(index.get() == 1)
+        boolean changed = queryExecutor.changeCA(name, status, cert,
+                crl_uris, delta_crl_uris, ocsp_uris,
+                max_validity, signer_type, signer_conf,
+                crlsigner_name, cmpcontrol_name,
+                duplicate_key, duplicate_subject,
+                permissions, numCrls,
+                expirationPeriod, validityMode);
+        if(changed == false)
         {
+            LOG.info("No change of CA '{}' is processed", name);
             return;
-        }
-        int iName = index.get();
-
-        final String sql = sqlBuilder.toString();
-        StringBuilder m = new StringBuilder();
-        PreparedStatement ps = null;
-
-        try
-        {
-            ps = prepareStatement(sql);
-
-            if(iStatus != null)
-            {
-                m.append("status: '").append(status.name()).append("'; ");
-                ps.setString(iStatus, status.name());
-            }
-
-            if(iCert != null)
-            {
-                String subject = SecurityUtil.getRFC4519Name(cert.getSubjectX500Principal());
-                m.append("cert: '").append(subject).append("'; ");
-                ps.setString(iSubject, subject);
-                String base64Cert = Base64.toBase64String(cert.getEncoded());
-                ps.setString(iCert, base64Cert);
-            }
-
-            if(iCrl_uris != null)
-            {
-                String txt = toString(crl_uris, " ");
-                m.append("crlUri: '").append(txt).append("'; ");
-                ps.setString(iCrl_uris, txt);
-            }
-
-            if(iDelta_crl_uris != null)
-            {
-                String txt = toString(delta_crl_uris, " ");
-                m.append("deltaCrlUri: '").append(txt).append("'; ");
-                ps.setString(iDelta_crl_uris, txt);
-            }
-
-            if(iOcsp_uris != null)
-            {
-                String txt = toString(ocsp_uris, " ");
-                m.append("ocspUri: '").append(txt).append("'; ");
-                ps.setString(iOcsp_uris, txt);
-            }
-
-            if(iMax_validity != null)
-            {
-                String txt = max_validity.toString();
-                m.append("maxValidity: '").append(txt).append("'; ");
-                ps.setString(iMax_validity, txt);
-            }
-
-            if(iSigner_type != null)
-            {
-                m.append("signerType: '").append(signer_type).append("'; ");
-                ps.setString(iSigner_type, signer_type);
-            }
-
-            if(iSigner_conf != null)
-            {
-                m.append("signerConf: '");
-                m.append(SecurityUtil.signerConfToString(signer_conf, false, true));
-                m.append("'; ");
-                ps.setString(iSigner_conf, signer_conf);
-            }
-
-            if(iCrlsigner_name != null)
-            {
-                String txt = getRealString(crlsigner_name);
-                m.append("crlSigner: '").append(txt).append("'; ");
-                ps.setString(iCrlsigner_name, txt);
-            }
-
-            if(iCmpcontrol_name != null)
-            {
-                String txt = getRealString(cmpcontrol_name);
-                m.append("cmpControl: '").append(txt).append("'; ");
-                ps.setString(iCmpcontrol_name, txt);
-            }
-
-            if(iDuplicate_key != null)
-            {
-                int mode = duplicate_key.getMode();
-                m.append("duplicateKey: '").append(mode).append("'; ");
-                ps.setInt(iDuplicate_key, mode);
-            }
-
-            if(iDuplicate_subject != null)
-            {
-                int mode = duplicate_subject.getMode();
-                m.append("duplicateSubject: '").append(mode).append("'; ");
-                ps.setInt(iDuplicate_subject, mode);
-            }
-
-            if(iPermissions != null)
-            {
-                String txt = Permission.toString(permissions);
-                m.append("permission: '").append(txt).append("'; ");
-                ps.setString(iPermissions, txt);
-            }
-
-            if(iNum_crls != null)
-            {
-                m.append("numCrls: '").append(numCrls).append("'; ");
-                ps.setInt(iNum_crls, numCrls);
-            }
-
-            if(iExpiration_period != null)
-            {
-                m.append("expirationPeriod: '").append(numCrls).append("'; ");
-                ps.setInt(iExpiration_period, expirationPeriod);
-            }
-
-            if(iValidity_mode != null)
-            {
-                String txt = validityMode.name();
-                m.append("validityMode: '").append(txt).append("'; ");
-                ps.setString(iValidity_mode, txt);
-            }
-
-            ps.setString(iName, name);
-            ps.executeUpdate();
-
-            if(m.length() > 0)
-            {
-                m.deleteCharAt(m.length() - 1).deleteCharAt(m.length() - 1);
-            }
-            LOG.info("changed CA '{}': {}", name, m);
-        }catch(SQLException e)
-        {
-            DataAccessException tEx = dataSource.translate(sql, e);
-            throw new CAMgmtException(tEx.getMessage(), tEx);
-        }catch(CertificateEncodingException e)
-        {
-            throw new CAMgmtException(e.getMessage(), e);
-        }finally
-        {
-            dataSource.releaseResources(ps, null);
         }
 
         createCA(name);
@@ -1577,25 +1230,7 @@ implements CAManager, CmpResponderManager
     {
         asssertMasterMode();
         caName = caName.toUpperCase();
-
-        final String sql = "DELETE FROM CA_HAS_CERTPROFILE WHERE CA_NAME=? AND CERTPROFILE_NAME=?";
-        PreparedStatement ps = null;
-        try
-        {
-            ps = prepareStatement(sql);
-            ps.setString(1, caName);
-            ps.setString(2, profileName);
-            ps.executeUpdate();
-            LOG.info("remove profile '{}' from CA '{}'", profileName, caName);
-        }catch(SQLException e)
-        {
-            DataAccessException tEx = dataSource.translate(sql, e);
-            throw new CAMgmtException(tEx.getMessage(), tEx);
-        }finally
-        {
-            dataSource.releaseResources(ps, null);
-        }
-
+        queryExecutor.removeCertprofileFromCA(profileName, caName);
         if(ca_has_profiles.containsKey(caName))
         {
             ca_has_profiles.get(caName).remove(profileName);
@@ -1623,24 +1258,7 @@ implements CAManager, CmpResponderManager
         }
         profileNames.add(profileName);
 
-        final String sql = "INSERT INTO CA_HAS_CERTPROFILE (CA_NAME, CERTPROFILE_NAME) VALUES (?, ?)";
-        PreparedStatement ps = null;
-        try
-        {
-            ps = prepareStatement(sql);
-            ps.setString(1, caName);
-            ps.setString(2, profileName);
-            ps.executeUpdate();
-            LOG.info("add profile '{}' to CA '{}'", profileName, caName);
-        }catch(SQLException e)
-        {
-            DataAccessException tEx = dataSource.translate(sql, e);
-            throw new CAMgmtException(tEx.getMessage(), tEx);
-        }finally
-        {
-            dataSource.releaseResources(ps, null);
-        }
-
+        queryExecutor.addCertprofileToCA(profileName, caName);
         ca_has_profiles.get(caName).add(profileName);
     }
 
@@ -1650,25 +1268,9 @@ implements CAManager, CmpResponderManager
     {
         asssertMasterMode();
         caName = caName.toUpperCase();
-        Set<String> publisherNames = ca_has_publishers.get(caName);
-        final String sql = "DELETE FROM CA_HAS_PUBLISHER WHERE CA_NAME=? AND PUBLISHER_NAME=?";
-        PreparedStatement ps = null;
-        try
-        {
-            ps = prepareStatement(sql);
-            ps.setString(1, caName);
-            ps.setString(2, publisherName);
-            ps.executeUpdate();
-            LOG.info("remove publisher '{}' from CA '{}'", publisherName, caName);
-        }catch(SQLException e)
-        {
-            DataAccessException tEx = dataSource.translate(sql, e);
-            throw new CAMgmtException(tEx.getMessage(), tEx);
-        }finally
-        {
-            dataSource.releaseResources(ps, null);
-        }
+        queryExecutor.removePublisherFromCA(publisherName, caName);
 
+        Set<String> publisherNames = ca_has_publishers.get(caName);
         if(publisherNames != null)
         {
             publisherNames.remove(publisherName);
@@ -1695,25 +1297,7 @@ implements CAManager, CmpResponderManager
             }
         }
         publisherNames.add(publisherName);
-
-        final String sql = "INSERT INTO CA_HAS_PUBLISHER (CA_NAME, PUBLISHER_NAME) VALUES (?, ?)";
-        PreparedStatement ps = null;
-        try
-        {
-            ps = prepareStatement(sql);
-            ps.setString(1, caName);
-            ps.setString(2, publisherName);
-            ps.executeUpdate();
-            LOG.info("add publisher '{}' to CA '{}'", publisherName, caName);
-        }catch(SQLException e)
-        {
-            DataAccessException tEx = dataSource.translate(sql, e);
-            throw new CAMgmtException(tEx.getMessage(), tEx);
-        }finally
-        {
-            dataSource.releaseResources(ps, null);
-        }
-
+        queryExecutor.addPublisherToCA(publisherName, caName);
         ca_has_publishers.get(caName).add(publisherName);
         publishers.get(publisherName).issuerAdded(caInfos.get(caName).getCertificate());
     }
@@ -1754,32 +1338,9 @@ implements CAManager, CmpResponderManager
             throw new CAMgmtException("CMP requestor named " + name + " exists");
         }
 
-        final String sql = "INSERT INTO REQUESTOR (NAME, CERT) VALUES (?, ?)";
-        PreparedStatement ps = null;
-        try
-        {
-            ps = prepareStatement(sql);
-            int idx = 1;
-            ps.setString(idx++, name);
-            ps.setString(idx++, Base64.toBase64String(dbEntry.getCert().getEncoded()));
-            ps.executeUpdate();
-            if(LOG.isInfoEnabled())
-            {
-                LOG.info("add requestor '{}': {}", name, dbEntry.toString(false));
-            }
-        }catch(SQLException e)
-        {
-            DataAccessException tEx = dataSource.translate(sql, e);
-            throw new CAMgmtException(tEx.getMessage(), tEx);
-        }catch(CertificateEncodingException e)
-        {
-            throw new CAMgmtException(e.getMessage(), e);
-        }finally
-        {
-            dataSource.releaseResources(ps, null);
-        }
+        queryExecutor.addCmpRequestor(dbEntry);
 
-        requestors.put(name, createRequestor(name));
+        requestors.put(name, queryExecutor.createRequestor(name));
 
         try
         {
@@ -1805,7 +1366,7 @@ implements CAManager, CmpResponderManager
             removeCmpRequestorFromCA(requestorName, caName);
         }
 
-        deleteRowWithName(requestorName, "REQUESTOR");
+        queryExecutor.deleteRowWithName(requestorName, "REQUESTOR");
         requestors.remove(requestorName);
         LOG.info("remove requestor '{}'", requestorName);
     }
@@ -1820,42 +1381,15 @@ implements CAManager, CmpResponderManager
             return;
         }
 
-        final String sql = "UPDATE REQUESTOR SET CERT=? WHERE NAME=?";
-        PreparedStatement ps = null;
-        try
+        boolean changed = queryExecutor.changeCmpRequestor(name, cert);
+        if(changed == false)
         {
-            ps = prepareStatement(sql);
-            String b64Cert = getRealString(cert);
-            ps.setString(1, b64Cert);
-            ps.setString(2, name);
-            ps.executeUpdate();
-            if(LOG.isInfoEnabled())
-            {
-                String subject = null;
-                if(b64Cert != null)
-                {
-                    try
-                    {
-                        subject = SecurityUtil.canonicalizName(
-                                SecurityUtil.parseBase64EncodedCert(b64Cert).getSubjectX500Principal());
-                    } catch (CertificateException | IOException e)
-                    {
-                        subject = "ERROR";
-                    }
-                }
-                LOG.info("change requestor '{}': {}", name, subject);
-            }
-        }catch(SQLException e)
-        {
-            DataAccessException tEx = dataSource.translate(sql, e);
-            throw new CAMgmtException(tEx.getMessage(), tEx);
-        }finally
-        {
-            dataSource.releaseResources(ps, null);
+            LOG.info("No change of CMP control '{}' is processed", name);
+            return;
         }
 
         requestors.remove(name);
-        CmpRequestorEntryWrapper requestor = createRequestor(name);
+        CmpRequestorEntryWrapper requestor = queryExecutor.createRequestor(name);
         if(requestor != null)
         {
             requestors.put(name, requestor);
@@ -1868,29 +1402,7 @@ implements CAManager, CmpResponderManager
     {
         asssertMasterMode();
         caName = caName.toUpperCase();
-        Set<CAHasRequestorEntry> requestors = ca_has_requestors.get(caName);
-        final String sql = "DELETE FROM CA_HAS_REQUESTOR WHERE CA_NAME=? AND REQUESTOR_NAME=?";
-        PreparedStatement ps = null;
-        try
-        {
-            ps = prepareStatement(sql);
-            ps.setString(1, caName);
-            ps.setString(2, requestorName);
-            ps.executeUpdate();
-
-            if(requestors != null)
-            {
-                requestors.remove(requestorName);
-            }
-            LOG.info("remove requestor '{}' from CA '{}'", requestorName, caName);
-        }catch(SQLException e)
-        {
-            DataAccessException tEx = dataSource.translate(sql, e);
-            throw new CAMgmtException(tEx.getMessage(), tEx);
-        }finally
-        {
-            dataSource.releaseResources(ps, null);
-        }
+        queryExecutor.removeCmpRequestorFromCA(requestorName, caName);
 
         if(ca_has_requestors.containsKey(caName))
         {
@@ -1932,38 +1444,7 @@ implements CAManager, CmpResponderManager
         }
 
         cmpRequestors.add(requestor);
-
-        PreparedStatement ps = null;
-        final String sql =
-                "INSERT INTO CA_HAS_REQUESTOR (CA_NAME, REQUESTOR_NAME, RA, PERMISSIONS, PROFILES) VALUES (?, ?, ?, ?, ?)";
-        try
-        {
-            boolean ra = requestor.isRa();
-            String permissionText = Permission.toString(requestor.getPermissions());
-            String profilesText = toString(requestor.getProfiles(), ",");
-
-            ps = prepareStatement(sql);
-            int idx = 1;
-            ps.setString(idx++, caName);
-            ps.setString(idx++, requestorName);
-
-            setBoolean(ps, idx++, ra);
-            ps.setString(idx++, permissionText);
-
-            ps.setString(idx++, profilesText);
-
-            ps.executeUpdate();
-            LOG.info("add requestor '{}' to CA '{}': ra: {}; permission: {}; profile: {}",
-                    requestorName, caName, ra, permissionText, profilesText);
-        }catch(SQLException e)
-        {
-            DataAccessException tEx = dataSource.translate(sql, e);
-            throw new CAMgmtException(tEx.getMessage(), tEx);
-        }finally
-        {
-            dataSource.releaseResources(ps, null);
-        }
-
+        queryExecutor.addCmpRequestorToCA(requestor, caName);
         ca_has_requestors.get(caName).add(requestor);
     }
 
@@ -1984,10 +1465,10 @@ implements CAManager, CmpResponderManager
             removeCertprofileFromCA(profileName, caName);
         }
 
-        deleteRowWithName(profileName, "CERTPROFILE");
+        queryExecutor.deleteRowWithName(profileName, "CERTPROFILE");
         LOG.info("remove profile '{}'", profileName);
         IdentifiedX509Certprofile profile = certprofiles.remove(profileName);
-        shutdownCertprofile(profile);
+        queryExecutor.shutdownCertprofile(profile);
     }
 
     @Override
@@ -1999,64 +1480,17 @@ implements CAManager, CmpResponderManager
         {
             throw new IllegalArgumentException("at least one of type and conf should not be null");
         }
-        assertNotNULL("type", type);
 
-        StringBuilder sqlBuilder = new StringBuilder();
-        sqlBuilder.append("UPDATE CERTPROFILE SET ");
-
-        AtomicInteger index = new AtomicInteger(1);
-
-        StringBuilder m = new StringBuilder();
-
-        if(type != null)
+        boolean changed = queryExecutor.changeCertprofile(name, type, conf);
+        if(changed == false)
         {
-            m.append("type: '").append(type).append("'; ");
-        }
-        if(conf != null)
-        {
-            m.append("conf: '").append(conf).append("'; ");
-        }
-
-        Integer iType = addToSqlIfNotNull(sqlBuilder, index, type, "TYPE");
-        Integer iConf = addToSqlIfNotNull(sqlBuilder, index, conf, "CONF");
-        sqlBuilder.deleteCharAt(sqlBuilder.length() - 1);
-        sqlBuilder.append(" WHERE NAME=?");
-        final String sql = sqlBuilder.toString();
-
-        PreparedStatement ps = null;
-        try
-        {
-            ps = prepareStatement(sql);
-            if(iType != null)
-            {
-                ps.setString(iType, type);
-            }
-
-            if(iConf != null)
-            {
-                ps.setString(iConf, getRealString(conf));
-            }
-
-            ps.setString(index.get(), name);
-            ps.executeUpdate();
-
-            if(m.length() > 0)
-            {
-                m.deleteCharAt(m.length() - 1).deleteCharAt(m.length() - 1);
-            }
-            LOG.info("change profile '{}': {}", name, m);
-        }catch(SQLException e)
-        {
-            DataAccessException tEx = dataSource.translate(sql, e);
-            throw new CAMgmtException(tEx.getMessage(), tEx);
-        }finally
-        {
-            dataSource.releaseResources(ps, null);
+            LOG.info("No change of certprofile '{}' is processed", name);
+            return;
         }
 
         IdentifiedX509Certprofile profile = certprofiles.remove(name);
-        shutdownCertprofile(profile);
-        profile = createCertprofile(name, envParameterResolver);
+        queryExecutor.shutdownCertprofile(profile);
+        profile = queryExecutor.createCertprofile(name, envParameterResolver);
         if(profile != null)
         {
             certprofiles.put(name, profile);
@@ -2073,31 +1507,9 @@ implements CAManager, CmpResponderManager
         {
             throw new CAMgmtException("Certprofile named " + name + " exists");
         }
-        final String sql = "INSERT INTO CERTPROFILE (NAME, ART, TYPE, CONF) VALUES (?, ?, ?, ?)";
+        queryExecutor.addCertprofile(dbEntry);
 
-        PreparedStatement ps = null;
-        try
-        {
-            ps = prepareStatement(sql);
-            ps.setString(1, name);
-            ps.setInt(2, CertArt.X509PKC.getCode());
-            ps.setString(3, dbEntry.getType());
-            String conf = dbEntry.getConf();
-            ps.setString(4, conf);
-
-            ps.executeUpdate();
-
-            LOG.info("add profile '{}': {}", name, dbEntry);
-        }catch(SQLException e)
-        {
-            DataAccessException tEx = dataSource.translate(sql, e);
-            throw new CAMgmtException(tEx.getMessage(), tEx);
-        }finally
-        {
-            dataSource.releaseResources(ps, null);
-        }
-
-        IdentifiedX509Certprofile profile = createCertprofile(name, envParameterResolver);
+        IdentifiedX509Certprofile profile = queryExecutor.createCertprofile(name, envParameterResolver);
         if(profile != null)
         {
             certprofiles.put(name, profile);
@@ -2126,41 +1538,9 @@ implements CAManager, CmpResponderManager
         {
             removeCmpResponder();
         }
-        final String sql = "INSERT INTO RESPONDER (NAME, TYPE, CONF, CERT) VALUES (?, ?, ?, ?)";
 
-        PreparedStatement ps = null;
-        try
-        {
-            ps = prepareStatement(sql);
-            int idx = 1;
-            ps.setString(idx++, CmpResponderEntry.name);
-            ps.setString(idx++, dbEntry.getType());
-            ps.setString(idx++, dbEntry.getConf());
-
-            String b64Cert = null;
-            X509Certificate cert = dbEntry.getCertificate();
-            if(cert != null)
-            {
-                b64Cert = Base64.toBase64String(dbEntry.getCertificate().getEncoded());
-            }
-            ps.setString(idx++, b64Cert);
-
-            ps.executeUpdate();
-
-            LOG.info("change responder: {}", dbEntry.toString(false, true));
-        }catch(SQLException e)
-        {
-            DataAccessException tEx = dataSource.translate(sql, e);
-            throw new CAMgmtException(tEx.getMessage(), tEx);
-        }catch(CertificateEncodingException e)
-        {
-            throw new CAMgmtException(e.getMessage(), e);
-        }finally
-        {
-            dataSource.releaseResources(ps, null);
-        }
-
-        responder = createResponder();
+        queryExecutor.setCmpResponder(dbEntry);
+        responder = queryExecutor.createResponder(securityFactory);
     }
 
     @Override
@@ -2168,7 +1548,7 @@ implements CAManager, CmpResponderManager
     throws CAMgmtException
     {
         asssertMasterMode();
-        deleteRows("RESPONDER");
+        queryExecutor.deleteRows("RESPONDER");
         LOG.info("remove responder");
         responder = null;
     }
@@ -2183,84 +1563,15 @@ implements CAManager, CmpResponderManager
             return;
         }
 
-        StringBuilder m = new StringBuilder();
-        StringBuilder sqlBuilder = new StringBuilder();
-
-        sqlBuilder.append("UPDATE RESPONDER SET ");
-
-        AtomicInteger index = new AtomicInteger(1);
-        Integer iType = addToSqlIfNotNull(sqlBuilder, index, type, "TYPE");
-        Integer iConf = addToSqlIfNotNull(sqlBuilder, index, conf, "CONF");
-        Integer iCert = addToSqlIfNotNull(sqlBuilder, index, cert, "CERT");
-        sqlBuilder.deleteCharAt(sqlBuilder.length() - 1);
-        sqlBuilder.append(" WHERE NAME=?");
-        final String sql = sqlBuilder.toString();
-
-        PreparedStatement ps = null;
-        try
+        boolean changed = queryExecutor.changeCmpResponder(type, conf, cert);
+        if(changed == false)
         {
-            ps = prepareStatement(sql);
-            if(iType != null)
-            {
-                String txt = type;
-                ps.setString(iType, txt);
-                m.append("type: '").append(txt).append("'; ");
-            }
-
-            if(iConf != null)
-            {
-                String txt = getRealString(conf);
-                m.append("conf: '").append(SecurityUtil.signerConfToString(txt, false, true));
-                ps.setString(iConf, txt);
-            }
-
-            if(iCert != null)
-            {
-                String txt = getRealString(cert);
-                m.append("cert: '");
-                if(txt == null)
-                {
-                    m.append("null");
-                } else
-                {
-                    if(txt != null)
-                    {
-                        try
-                        {
-                            String subject = SecurityUtil.canonicalizName(
-                                    SecurityUtil.parseBase64EncodedCert(txt).getSubjectX500Principal());
-                            m.append(subject);
-                        } catch (CertificateException | IOException e)
-                        {
-                            m.append("ERROR");
-                        }
-                    }
-
-                }
-                m.append("'; ");
-                ps.setString(iCert, txt);
-            }
-
-            ps.setString(index.get(), CmpResponderEntry.name);
-
-            ps.executeUpdate();
-
-            if(m.length() > 0)
-            {
-                m.deleteCharAt(m.length() - 1).deleteCharAt(m.length() - 1);
-            }
-            LOG.info("set CMP responder: {}", m);
-        }catch(SQLException e)
-        {
-            DataAccessException tEx = dataSource.translate(sql, e);
-            throw new CAMgmtException(tEx.getMessage(), tEx);
-        }finally
-        {
-            dataSource.releaseResources(ps, null);
+            LOG.info("No change of CMP responder is processed");
+            return;
         }
 
         responder = null;
-        responder = createResponder();
+        responder = queryExecutor.createResponder(securityFactory);
     }
 
     @Override
@@ -2284,41 +1595,8 @@ implements CAManager, CmpResponderManager
         {
             throw new CAMgmtException("CRL signer named " + name + " exists");
         }
-        StringBuilder sqlBuilder = new StringBuilder();
-        sqlBuilder.append("INSERT INTO CRLSIGNER (NAME, SIGNER_TYPE, SIGNER_CONF, SIGNER_CERT, CRL_CONTROL)");
-        sqlBuilder.append(" VALUES (?, ?, ?, ?, ?)");
-        final String sql = sqlBuilder.toString();
-
-        PreparedStatement ps = null;
-        try
-        {
-
-            ps = prepareStatement(sql);
-            int idx = 1;
-            ps.setString(idx++, name);
-            ps.setString(idx++, dbEntry.getType());
-            ps.setString(idx++, dbEntry.getConf());
-            ps.setString(idx++, dbEntry.getCertificate() == null ? null :
-                    Base64.toBase64String(dbEntry.getCertificate().getEncoded()));
-
-            String crlControl = dbEntry.getCRLControl().getConf();
-            ps.setString(idx++, crlControl);
-
-            ps.executeUpdate();
-            LOG.info("add CRL signer '{}': {}", name, dbEntry.toString(false, true));
-        }catch(SQLException e)
-        {
-            DataAccessException tEx = dataSource.translate(sql, e);
-            throw new CAMgmtException(tEx.getMessage(), tEx);
-        }catch(CertificateEncodingException e)
-        {
-            throw new CAMgmtException(e.getMessage(), e);
-        }finally
-        {
-            dataSource.releaseResources(ps, null);
-        }
-
-        crlSigners.put(name, createCrlSigner(name));
+        queryExecutor.addCrlSigner(dbEntry);
+        crlSigners.put(name, queryExecutor.createCrlSigner(name));
     }
 
     @Override
@@ -2326,7 +1604,7 @@ implements CAManager, CmpResponderManager
     throws CAMgmtException
     {
         asssertMasterMode();
-        deleteRowWithName(crlSignerName, "CRLSIGNER");
+        queryExecutor.deleteRowWithName(crlSignerName, "CRLSIGNER");
         for(String caName : caInfos.keySet())
         {
             X509CAInfo caInfo = caInfos.get(caName);
@@ -2346,91 +1624,15 @@ implements CAManager, CmpResponderManager
     throws CAMgmtException
     {
         asssertMasterMode();
-        StringBuilder sqlBuilder = new StringBuilder();
-        sqlBuilder.append("UPDATE CRLSIGNER SET ");
-
-        AtomicInteger index = new AtomicInteger(1);
-
-        Integer iSigner_type = addToSqlIfNotNull(sqlBuilder, index, signer_type, "SIGNER_TYPE");
-        Integer iSigner_conf = addToSqlIfNotNull(sqlBuilder, index, signer_conf, "SIGNER_CONF");
-        Integer iSigner_cert = addToSqlIfNotNull(sqlBuilder, index, signer_cert, "SIGNER_CERT");
-        Integer iCrlControl = addToSqlIfNotNull(sqlBuilder, index, crlControl, "CRL_CONTROL");
-
-        sqlBuilder.deleteCharAt(sqlBuilder.length() - 1);
-        sqlBuilder.append(" WHERE NAME=?");
-
-        if(index.get() == 1)
+        boolean changed = queryExecutor.changeCrlSigner(name, signer_type, signer_conf, signer_cert, crlControl);
+        if(changed == false)
         {
+            LOG.info("No change of CRL signer '{}' is processed", name);
             return;
-        }
-        final String sql = sqlBuilder.toString();
-
-        PreparedStatement ps = null;
-        try
-        {
-            StringBuilder m = new StringBuilder();
-
-            ps = prepareStatement(sql);
-
-            if(iSigner_type != null)
-            {
-                m.append("signerType: '").append(signer_type).append("'; ");
-                ps.setString(iSigner_type, signer_type);
-            }
-
-            if(iSigner_conf != null)
-            {
-                String txt = getRealString(signer_conf);
-                m.append("signerConf: '").append(SecurityUtil.signerConfToString(txt, false, true)).append("'; ");
-                ps.setString(iSigner_conf, txt);
-            }
-
-            if(iSigner_cert != null)
-            {
-                String txt = getRealString(signer_cert);
-                String subject = null;
-                if(txt != null)
-                {
-                    try
-                    {
-                        subject = SecurityUtil.canonicalizName(
-                                SecurityUtil.parseBase64EncodedCert(txt).getSubjectX500Principal());
-                    } catch (CertificateException | IOException e)
-                    {
-                        subject = "ERROR";
-                    }
-                }
-                m.append("signerCert: '").append(subject).append("'; ");
-
-                ps.setString(iSigner_cert, txt);
-            }
-
-            if(iCrlControl != null)
-            {
-                m.append("crlControl: '").append(crlControl).append("'; ");
-                ps.setString(iCrlControl, crlControl.getConf());
-            }
-
-            ps.setString(index.get(), name);
-
-            ps.executeUpdate();
-
-            if(m.length() > 0)
-            {
-                m.deleteCharAt(m.length() - 1).deleteCharAt(m.length() - 1);
-            }
-            LOG.info("set CRL signer '{}': {}", name, m);
-        }catch(SQLException e)
-        {
-            DataAccessException tEx = dataSource.translate(sql, e);
-            throw new CAMgmtException(tEx.getMessage(), tEx);
-        }finally
-        {
-            dataSource.releaseResources(ps, null);
         }
 
         X509CrlSignerEntryWrapper crlSigner = crlSigners.remove(name);
-        crlSigner = createCrlSigner(name);
+        crlSigner = queryExecutor.createCrlSigner(name);
         if(crlSigner != null)
         {
             crlSigners.put(name, crlSigner);
@@ -2458,29 +1660,11 @@ implements CAManager, CmpResponderManager
         {
             throw new CAMgmtException("Publisher named " + name + " exists");
         }
-        final String sql = "INSERT INTO PUBLISHER (NAME, TYPE, CONF) VALUES (?, ?, ?)";
 
-        PreparedStatement ps = null;
-        try
-        {
-            ps = prepareStatement(sql);
-            ps.setString(1, name);
-            ps.setString(2, dbEntry.getType());
-            String conf = dbEntry.getConf();
-            ps.setString(3, conf);
+        queryExecutor.addPublisher(dbEntry);
 
-            ps.executeUpdate();
-            LOG.info("add publisher '{}': {}", name, dbEntry);
-        }catch(SQLException e)
-        {
-            DataAccessException tEx = dataSource.translate(sql, e);
-            throw new CAMgmtException(tEx.getMessage(), tEx);
-        }finally
-        {
-            dataSource.releaseResources(ps, null);
-        }
-
-        IdentifiedX509CertPublisher publisher = createPublisher(name, dataSources);
+        IdentifiedX509CertPublisher publisher = queryExecutor.createPublisher(name, dataSources,
+                securityFactory.getPasswordResolver(), envParameterResolver);
         if(publisher != null)
         {
             publishers.put(name, publisher);
@@ -2537,10 +1721,10 @@ implements CAManager, CmpResponderManager
             removePublisherFromCA(publisherName, caName);
         }
 
-        deleteRowWithName(publisherName, "PUBLISHER");
+        queryExecutor.deleteRowWithName(publisherName, "PUBLISHER");
         LOG.info("remove publisher '{}'", publisherName);
         IdentifiedX509CertPublisher publisher = publishers.remove(publisherName);
-        shutdownPublisher(publisher);
+        queryExecutor.shutdownPublisher(publisher);
     }
 
     @Override
@@ -2548,64 +1732,21 @@ implements CAManager, CmpResponderManager
     throws CAMgmtException
     {
         asssertMasterMode();
-        StringBuilder sqlBuilder = new StringBuilder();
-        sqlBuilder.append("UPDATE PUBLISHER SET ");
-
-        AtomicInteger index = new AtomicInteger(1);
-        Integer iType = addToSqlIfNotNull(sqlBuilder, index, type, "TYPE");
-        Integer iConf = addToSqlIfNotNull(sqlBuilder, index, conf, "CONF");
-        sqlBuilder.deleteCharAt(sqlBuilder.length() - 1);
-        sqlBuilder.append(" WHERE NAME=?");
-
-        if(index.get() == 1)
+        boolean changed = queryExecutor.changePublisher(name, type, conf);
+        if(changed == false)
         {
+            LOG.info("No change of publisher '{}' is processed", name);
             return;
-        }
-        final String sql = sqlBuilder.toString();
-
-        PreparedStatement ps = null;
-        try
-        {
-            StringBuilder m = new StringBuilder();
-            ps = prepareStatement(sql);
-            if(iType != null)
-            {
-                m.append("type: '").append(type).append("'; ");
-                ps.setString(iType, type);
-            }
-
-            if(iConf != null)
-            {
-                String txt = getRealString(conf);
-                m.append("conf: '").append(txt).append("'; ");
-                ps.setString(iConf, getRealString(conf));
-            }
-
-            ps.setString(index.get(), name);
-            ps.executeUpdate();
-
-            if(m.length() > 0)
-            {
-                m.deleteCharAt(m.length() - 1).deleteCharAt(m.length() - 1);
-            }
-            LOG.info("change publisher {}: '{}'", name, m);
-        }catch(SQLException e)
-        {
-            DataAccessException tEx = dataSource.translate(sql, e);
-            throw new CAMgmtException(tEx.getMessage(), tEx);
-        }finally
-        {
-            dataSource.releaseResources(ps, null);
         }
 
         IdentifiedX509CertPublisher publisher = publishers.remove(name);
-        shutdownPublisher(publisher);
-        publisher = createPublisher(name, dataSources);
+        queryExecutor.shutdownPublisher(publisher);
+        publisher = queryExecutor.createPublisher(name, dataSources,
+                securityFactory.getPasswordResolver(), envParameterResolver);
         if(publisher != null)
         {
             publishers.put(name, publisher);
         }
-
     }
 
     @Override
@@ -2625,34 +1766,7 @@ implements CAManager, CmpResponderManager
             throw new CAMgmtException("CMPControl named " + name + " exists");
         }
 
-        final String sql = "INSERT INTO CMPCONTROL (NAME, REQUIRE_CONFIRM_CERT, SEND_CA_CERT, SEND_RESPONDER_CERT," +
-                " REQUIRE_MESSAGE_TIME, MESSAGE_TIME_BIAS, CONFIRM_WAIT_TIME) VALUES (?, ?, ?, ?, ?, ?, ?)";
-
-        PreparedStatement ps = null;
-        try
-        {
-            ps = prepareStatement(sql);
-
-            int idx = 1;
-            ps.setString(idx++, name);
-            setBoolean(ps, idx++, dbEntry.isRequireConfirmCert());
-            setBoolean(ps, idx++, dbEntry.isSendCaCert());
-            setBoolean(ps, idx++, dbEntry.isSendResponderCert());
-            setBoolean(ps, idx++, dbEntry.isMessageTimeRequired());
-            ps.setInt(idx++, dbEntry.getMessageTimeBias());
-            ps.setInt(idx++, dbEntry.getConfirmWaitTime());
-
-            ps.executeUpdate();
-            LOG.info("added CMP control: {}", dbEntry);
-        }catch(SQLException e)
-        {
-            DataAccessException tEx = dataSource.translate(sql, e);
-            throw new CAMgmtException(tEx.getMessage(), tEx);
-        }finally
-        {
-            dataSource.releaseResources(ps, null);
-        }
-
+        queryExecutor.addCmpControl(dbEntry);
         cmpControls.put(name, dbEntry);
     }
 
@@ -2661,7 +1775,7 @@ implements CAManager, CmpResponderManager
     throws CAMgmtException
     {
         asssertMasterMode();
-        deleteRowWithName(name, "CMPCONTROL");
+        queryExecutor.deleteRowWithName(name, "CMPCONTROL");
 
         for(String caName : caInfos.keySet())
         {
@@ -2689,80 +1803,17 @@ implements CAManager, CmpResponderManager
             return;
         }
 
-        StringBuilder sqlBuilder = new StringBuilder();
-        sqlBuilder.append("UPDATE CMPCONTROL SET ");
-
-        AtomicInteger index = new AtomicInteger(1);
-        Integer iConfirmCert = addToSqlIfNotNull(sqlBuilder, index, requireConfirmCert, "REQUIRE_CONFIRM_CERT");
-        Integer iRequireMessageTime = addToSqlIfNotNull(sqlBuilder, index, requireMessageTime, "REQUIRE_MESSAGE_TIME");
-        Integer iMessageTimeBias = addToSqlIfNotNull(sqlBuilder, index, messageTimeBias, "MESSAGE_TIME_BIAS");
-        Integer iConfirmWaitTime = addToSqlIfNotNull(sqlBuilder, index, confirmWaitTime, "CONFIRM_WAIT_TIME");
-        Integer iSendCaCert = addToSqlIfNotNull(sqlBuilder, index, sendCaCert, "SEND_CA_CERT");
-        Integer iSendResponderCert = addToSqlIfNotNull(sqlBuilder, index, sendResponderCert, "SEND_RESPONDER_CERT");
-        sqlBuilder.deleteCharAt(sqlBuilder.length() - 1);
-        sqlBuilder.append(" WHERE NAME=?");
-        final String sql = sqlBuilder.toString();
-
-        PreparedStatement ps = null;
-        try
+        boolean changed = queryExecutor.changeCmpControl(name,
+                requireConfirmCert, requireMessageTime,
+                messageTimeBias, confirmWaitTime,
+                sendCaCert, sendResponderCert);
+        if(changed == false)
         {
-            StringBuilder m = new StringBuilder();
-
-            ps = prepareStatement(sql);
-            if(iConfirmCert != null)
-            {
-                m.append("requireConfirmCert: '").append(requireConfirmCert).append("'; ");
-                setBoolean(ps, iConfirmCert, requireConfirmCert);
-            }
-
-            if(iRequireMessageTime != null)
-            {
-                m.append("requireMessageTime: '").append(requireMessageTime).append("'; ");
-                setBoolean(ps, iRequireMessageTime, requireMessageTime);
-            }
-
-            if(iMessageTimeBias != null)
-            {
-                m.append("messageTimeBias: '").append(messageTimeBias).append("'; ");
-                ps.setInt(iMessageTimeBias, messageTimeBias);
-            }
-
-            if(iConfirmWaitTime != null)
-            {
-                m.append("confirmWaitTime: '").append(confirmWaitTime).append("'; ");
-                ps.setInt(iConfirmWaitTime, confirmWaitTime);
-            }
-
-            if(iSendCaCert != null)
-            {
-                m.append("sendCaCert: '").append(sendCaCert).append("'; ");
-                setBoolean(ps, iSendCaCert, sendCaCert);
-            }
-
-            if(iSendResponderCert != null)
-            {
-                m.append("sendResponderCert: '").append(sendResponderCert).append("'; ");
-                setBoolean(ps, iSendResponderCert, sendResponderCert);
-            }
-
-            ps.setString(index.get(), name);
-            ps.executeUpdate();
-
-            if(m.length() > 0)
-            {
-                m.deleteCharAt(m.length() - 1).deleteCharAt(m.length() - 1);
-            }
-            LOG.info("change CMP control: {}", m);
-        }catch(SQLException e)
-        {
-            DataAccessException tEx = dataSource.translate(sql, e);
-            throw new CAMgmtException(tEx.getMessage(), tEx);
-        }finally
-        {
-            dataSource.releaseResources(ps, null);
+            LOG.info("No change of CMP control '{}' is processed", name);
+            return;
         }
 
-        CmpControl cmpControl = createCmpControl(name);
+        CmpControl cmpControl = queryExecutor.createCmpControl(name);
         cmpControls.put(name, cmpControl);
     }
 
@@ -2792,25 +1843,7 @@ implements CAManager, CmpResponderManager
         {
             throw new CAMgmtException("Environemt parameter named " + name + " exists");
         }
-        final String sql = "INSERT INTO ENVIRONMENT (NAME, VALUE2) VALUES (?, ?)";
-
-        PreparedStatement ps = null;
-        try
-        {
-            ps = prepareStatement(sql);
-            ps.setString(1, name);
-            ps.setString(2, value);
-            ps.executeUpdate();
-            LOG.info("add environment param '{}': {}", name, value);
-        }catch(SQLException e)
-        {
-            DataAccessException tEx = dataSource.translate(sql, e);
-            throw new CAMgmtException(tEx.getMessage(), tEx);
-        }finally
-        {
-            dataSource.releaseResources(ps, null);
-        }
-
+        queryExecutor.addEnvParam(name, value);
         envParameterResolver.addEnvParam(name, value);
     }
 
@@ -2819,7 +1852,7 @@ implements CAManager, CmpResponderManager
     throws CAMgmtException
     {
         asssertMasterMode();
-        deleteRowWithName(envParamName, "ENVIRONMENT");
+        queryExecutor.deleteRowWithName(envParamName, "ENVIRONMENT");
         LOG.info("remove environment param '{}'", envParamName);
         envParameterResolver.removeEnvParam(envParamName);
     }
@@ -2836,25 +1869,15 @@ implements CAManager, CmpResponderManager
         {
             throw new CAMgmtException("Could not find environment paramter " + name);
         }
-        final String sql = "UPDATE ENVIRONMENT SET VALUE2=? WHERE NAME=?";
 
-        PreparedStatement ps = null;
-        try
+        boolean changed = queryExecutor.changeEnvParam(name, value);
+        if(changed == false)
         {
-            ps = prepareStatement(sql);
-            ps.setString(1, getRealString(value));
-            ps.setString(2, name);
-            ps.executeUpdate();
-            envParameterResolver.addEnvParam(name, value);
-            LOG.info("change environment param '{}': {}", name, value);
-        }catch(SQLException e)
-        {
-            DataAccessException tEx = dataSource.translate(sql, e);
-            throw new CAMgmtException(tEx.getMessage(), tEx);
-        }finally
-        {
-            dataSource.releaseResources(ps, null);
+            LOG.info("No change of environment '{}' is processed", name);
+            return;
         }
+
+        envParameterResolver.addEnvParam(name, value);
     }
 
     public String getCaConfFile()
@@ -2877,25 +1900,7 @@ implements CAManager, CmpResponderManager
         {
             throw new CAMgmtException("CA alias " + aliasName + " exists");
         }
-        final String sql = "INSERT INTO CAALIAS (NAME, CA_NAME) VALUES (?, ?)";
-
-        PreparedStatement ps = null;
-        try
-        {
-            ps = prepareStatement(sql);
-            ps.setString(1, aliasName);
-            ps.setString(2, caName);
-            ps.executeUpdate();
-            LOG.info("add CA alias '{}' for CA '{}'", aliasName, caName);
-        }catch(SQLException e)
-        {
-            DataAccessException tEx = dataSource.translate(sql, e);
-            throw new CAMgmtException(tEx.getMessage(), tEx);
-        }finally
-        {
-            dataSource.releaseResources(ps, null);
-        }
-
+        queryExecutor.addCaAlias(aliasName, caName);
         caAliases.put(aliasName, caName);
     }
 
@@ -2904,24 +1909,7 @@ implements CAManager, CmpResponderManager
     throws CAMgmtException
     {
         asssertMasterMode();
-        final String sql = "DELETE FROM CAALIAS WHERE NAME=?";
-
-        PreparedStatement ps = null;
-        try
-        {
-            ps = prepareStatement(sql);
-            ps.setString(1, aliasName);
-            ps.executeUpdate();
-            LOG.info("remove CA alias '{}'", aliasName);
-        }catch(SQLException e)
-        {
-            DataAccessException tEx = dataSource.translate(sql, e);
-            throw new CAMgmtException(tEx.getMessage(), tEx);
-        }finally
-        {
-            dataSource.releaseResources(ps, null);
-        }
-
+        queryExecutor.removeCaAlias(aliasName);
         caAliases.remove(aliasName);
     }
 
@@ -2959,23 +1947,9 @@ implements CAManager, CmpResponderManager
     {
         asssertMasterMode();
         caName = caName.toUpperCase();
-        final String sql = "DELETE FROM CA WHERE NAME=?";
+        queryExecutor.removeCA(caName);
 
-        PreparedStatement ps = null;
         CAMgmtException exception = null;
-        try
-        {
-            ps = prepareStatement(sql);
-            ps.setString(1, caName);
-            ps.executeUpdate();
-        }catch(SQLException e)
-        {
-            DataAccessException tEx = dataSource.translate(sql, e);
-            throw new CAMgmtException(tEx.getMessage(), tEx);
-        }finally
-        {
-            dataSource.releaseResources(ps, null);
-        }
 
         X509CAInfo caInfo = caInfos.get(caName);
         if(caInfo == null || caInfo.getCaEntry().getNextSerial() > 0)
@@ -3110,31 +2084,7 @@ implements CAManager, CmpResponderManager
             }
         }
 
-        String sql = "UPDATE CA SET REVOKED=?, REV_REASON=?, REV_TIME=?, REV_INVALIDITY_TIME=? WHERE NAME=?";
-        PreparedStatement ps = null;
-        try
-        {
-            if(revocationInfo.getInvalidityTime() == null)
-            {
-                revocationInfo.setInvalidityTime(revocationInfo.getRevocationTime());
-            }
-
-            ps = prepareStatement(sql);
-            int i = 1;
-            setBoolean(ps, i++, true);
-            ps.setInt(i++, revocationInfo.getReason().getCode());
-            ps.setLong(i++, revocationInfo.getRevocationTime().getTime() / 1000);
-            ps.setLong(i++, revocationInfo.getInvalidityTime().getTime() / 1000);
-            ps.setString(i++, caName);
-            ps.executeUpdate();
-        }catch(SQLException e)
-        {
-            DataAccessException tEx = dataSource.translate(sql, e);
-            throw new CAMgmtException(tEx.getMessage(), tEx);
-        }finally
-        {
-            dataSource.releaseResources(ps, null);
-        }
+        queryExecutor.revokeCa(caName, revocationInfo);
 
         try
         {
@@ -3162,26 +2112,7 @@ implements CAManager, CmpResponderManager
 
         LOG.info("Unrevoking of CA '{}'", caName);
 
-        final String sql = "UPDATE CA SET REVOKED=?, REV_REASON=?, REV_TIME=?, REV_INVALIDITY_TIME=? WHERE NAME=?";
-        PreparedStatement ps = null;
-        try
-        {
-            ps = prepareStatement(sql);
-            int i = 1;
-            setBoolean(ps, i++, false);
-            ps.setNull(i++, Types.INTEGER);
-            ps.setNull(i++, Types.INTEGER);
-            ps.setNull(i++, Types.INTEGER);
-            ps.setString(i++, caName);
-            ps.executeUpdate();
-        }catch(SQLException e)
-        {
-            DataAccessException tEx = dataSource.translate(sql, e);
-            throw new CAMgmtException(tEx.getMessage(), tEx);
-        }finally
-        {
-            dataSource.releaseResources(ps, null);
-        }
+        queryExecutor.unrevokeCa(caName);
 
         X509CA ca = x509cas.get(caName);
         try
@@ -3534,41 +2465,49 @@ implements CAManager, CmpResponderManager
         }
     }
 
-    @Override
-    protected String getRealCertprofileType(String certprofileType)
+    private static void assertNotNULL(String parameterName, String parameterValue)
     {
-        return getRealType(envParameterResolver.getEnvParam("certprofileType.map"), certprofileType);
+        if(CAManager.NULL.equalsIgnoreCase(parameterValue))
+        {
+            throw new IllegalArgumentException(parameterName + " could not be " + CAManager.NULL);
+        }
     }
 
-    @Override
-    protected String getRealPublisherType(String publisherType)
+    private static String canonicalizeSignerConf(String keystoreType, String signerConf,
+            PasswordResolver passwordResolver)
+    throws Exception
     {
-        return getRealType(envParameterResolver.getEnvParam("publisherType.map"), publisherType);
-    }
-
-    private String getRealType(String typeMap, String type)
-    {
-        if(typeMap == null)
+        if(signerConf.contains("file:") == false && signerConf.contains("base64:") == false )
         {
-            return null;
+            return signerConf;
         }
 
-        typeMap = typeMap.trim();
-        if(typeMap.isEmpty())
+        CmpUtf8Pairs utf8Pairs = new CmpUtf8Pairs(signerConf);
+        String keystoreConf = utf8Pairs.getValue("keystore");
+        String passwordHint = utf8Pairs.getValue("password");
+        String keyLabel     = utf8Pairs.getValue("key-label");
+
+        byte[] keystoreBytes;
+        if(keystoreConf.startsWith("file:"))
         {
-            return null;
+            String keystoreFile = keystoreConf.substring("file:".length());
+            keystoreBytes = IoUtil.read(keystoreFile);
+        }
+        else if(keystoreConf.startsWith("base64:"))
+        {
+            keystoreBytes = Base64.decode(keystoreConf.substring("base64:".length()));
+        }
+        else
+        {
+            return signerConf;
         }
 
-        CmpUtf8Pairs pairs;
-        try
-        {
-            pairs = new CmpUtf8Pairs(typeMap);
-        }catch(IllegalArgumentException e)
-        {
-            LOG.error("CA environment {}: '{}' is not valid CMP UTF-8 pairs",typeMap, type);
-            return null;
-        }
-        return pairs.getValue(type);
+        keystoreBytes = SecurityUtil.extractMinimalKeyStore(keystoreType,
+                keystoreBytes, keyLabel,
+                passwordResolver.resolvePassword(passwordHint));
+
+        utf8Pairs.putUtf8Pair("keystore", "base64:" + Base64.toBase64String(keystoreBytes));
+        return utf8Pairs.getEncoded();
     }
 
 }
