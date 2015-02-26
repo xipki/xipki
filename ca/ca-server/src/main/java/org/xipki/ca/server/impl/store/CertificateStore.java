@@ -768,6 +768,21 @@ public class CertificateStore
         }
     }
 
+    public void markMaxSerial(X509CertWithId caCert, String seqName)
+    throws OperationException
+    {
+        try
+        {
+            queryExecutor.markMaxSerial(caCert, seqName);
+        } catch (DataAccessException e)
+        {
+            throw new OperationException(ErrorCode.DATABASE_FAILURE, e.getMessage());
+        } catch (RuntimeException e)
+        {
+            throw new OperationException(ErrorCode.System_Failure, e.getMessage());
+        }
+    }
+
     public void commitNextCrlNo(String caName, int nextCrlNo)
     throws OperationException
     {

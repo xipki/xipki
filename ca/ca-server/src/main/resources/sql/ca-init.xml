@@ -419,8 +419,6 @@
     <!-- sequence for the column ID in table DELTACRL_CACHE -->
     <createSequence sequenceName="DCC_ID" incrementBy="1" startValue="1"/>
     <createSequence sequenceName="CERT_ID" incrementBy="1" startValue="1"/>
-    <createSequence sequenceName="USER_ID" incrementBy="1" startValue="1"/>
-    <createSequence sequenceName="CRL_ID" incrementBy="1" startValue="1"/>
   </changeSet>
   <!-- CA Configuration :: foreign key -->
   <changeSet author="xipki" id="5">

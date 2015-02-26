@@ -631,6 +631,7 @@ implements CAManager, CmpResponderManager
         initResponder();
         initCrlSigners();
         initCAs();
+        markLastSeqValues();
     }
 
     @Override
@@ -1252,6 +1253,13 @@ implements CAManager, CmpResponderManager
         ca_has_requestors.remove(name);
 
         X509CAInfo ca = createCAInfo(name, masterMode);
+        try
+        {
+            ca.markMaxSerial();
+        }catch(OperationException e)
+        {
+            throw new CAMgmtException(e.getMessage(), e);
+        }
         caInfos.put(name, ca);
 
         Set<CAHasRequestorEntry> caHasRequestors = createCAhasRequestors(name);
@@ -1262,6 +1270,24 @@ implements CAManager, CmpResponderManager
 
         Set<String> publisherNames = createCAhasPublishers(name);
         ca_has_publishers.put(name, publisherNames);
+    }
+
+    private void markLastSeqValues()
+    throws CAMgmtException
+    {
+        try
+        {
+            // sequence DCC_ID
+            long maxId = dataSource.getMax(null, "DELTACRL_CACHE", "ID");
+            dataSource.setLastUsedSeqValue("DCC_ID", maxId);
+
+            // sequence CERT_ID
+            maxId = dataSource.getMax(null, "CERT", "ID");
+            dataSource.setLastUsedSeqValue("CERT_ID", maxId);
+        }catch(DataAccessException e)
+        {
+            throw new CAMgmtException(e.getMessage(), e);
+        }
     }
 
     @Override
