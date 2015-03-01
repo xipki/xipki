@@ -41,7 +41,7 @@ import org.bouncycastle.cert.ocsp.OCSPResp;
  * @author Lijun Liao
  */
 
-class OCSPRespWithCacheInfo
+class OcspRespWithCacheInfo
 {
     final static class ResponseCacheInfo
     {
@@ -73,7 +73,7 @@ class OCSPRespWithCacheInfo
     private final OCSPResp response;
     private final ResponseCacheInfo cacheInfo;
 
-    public OCSPRespWithCacheInfo(OCSPResp response, ResponseCacheInfo cacheInfo)
+    public OcspRespWithCacheInfo(OCSPResp response, ResponseCacheInfo cacheInfo)
     {
         this.response = response;
         this.cacheInfo = cacheInfo;

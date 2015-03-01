@@ -35,12 +35,11 @@
 
 package org.xipki.ocsp.server.impl;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URL;
-import java.net.URLDecoder;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
@@ -57,22 +56,23 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.bouncycastle.x509.ExtendedPKIXBuilderParameters;
+import org.xipki.common.ConfigurationException;
 import org.xipki.common.HashAlgoType;
 import org.xipki.common.IoUtil;
 import org.xipki.common.SecurityUtil;
 import org.xipki.ocsp.server.impl.jaxb.CertCollectionType;
 import org.xipki.ocsp.server.impl.jaxb.CertCollectionType.Keystore;
 import org.xipki.ocsp.server.impl.jaxb.NonceType;
-import org.xipki.ocsp.server.impl.jaxb.RequestType;
+import org.xipki.ocsp.server.impl.jaxb.RequestOptionType;
+import org.xipki.ocsp.server.impl.jaxb.RequestOptionType.CertpathValidation;
+import org.xipki.ocsp.server.impl.jaxb.RequestOptionType.HashAlgorithms;
 import org.xipki.ocsp.server.impl.jaxb.VersionsType;
-import org.xipki.ocsp.server.impl.jaxb.RequestType.CertpathValidation;
-import org.xipki.ocsp.server.impl.jaxb.RequestType.HashAlgorithms;
 
 /**
  * @author Lijun Liao
  */
 
-class RequestOptions
+class RequestOption
 {
     static final Set<HashAlgoType> supportedHashAlgorithms = new HashSet<>();
 
@@ -85,6 +85,7 @@ class RequestOptions
         supportedHashAlgorithms.add(HashAlgoType.SHA512);
     }
 
+    private final boolean supportsHttpGet;
     private final boolean signatureRequired;
     private final boolean validateSignature;
 
@@ -98,11 +99,12 @@ class RequestOptions
     private final CertStore certs;
     private final int certpathValidationModel;
 
-    public RequestOptions(RequestType conf)
-    throws OcspResponderException
+    public RequestOption(RequestOptionType conf)
+    throws ConfigurationException
     {
         NonceType nonceConf = conf.getNonce();
 
+        supportsHttpGet = conf.isSupportsHttpGet();
         signatureRequired = conf.isSignatureRequired();
         validateSignature = conf.isValidateSignature();
 
@@ -170,7 +172,7 @@ class RequestOptions
                 }
                 else
                 {
-                    throw new OcspResponderException("Hash algorithm " + token + " is unsupported");
+                    throw new ConfigurationException("Hash algorithm " + token + " is unsupported");
                 }
             }
         }
@@ -185,7 +187,7 @@ class RequestOptions
         {
             if(validateSignature)
             {
-                throw new OcspResponderException("certpathValidation is not specified");
+                throw new ConfigurationException("certpathValidation is not specified");
             }
             trustAnchors = null;
             certs = null;
@@ -215,7 +217,7 @@ class RequestOptions
                 this.trustAnchors = Collections.unmodifiableSet(_trustAnchors);
             }catch(Exception e)
             {
-                throw new OcspResponderException("Error while initializing the trustAnchors: " + e.getMessage(), e);
+                throw new ConfigurationException("Error while initializing the trustAnchors: " + e.getMessage(), e);
             }
 
             CertCollectionType certsType = certpathConf.getCerts();
@@ -231,7 +233,7 @@ class RequestOptions
                     this.certs = CertStore.getInstance("Collection", csp, "BC");
                 }catch(Exception e)
                 {
-                    throw new OcspResponderException("Error while initializing the certs: " + e.getMessage(), e);
+                    throw new ConfigurationException("Error while initializing the certs: " + e.getMessage(), e);
                 }
             }
         }
@@ -251,6 +253,11 @@ class RequestOptions
     public boolean isValidateSignature()
     {
         return validateSignature;
+    }
+
+    public boolean supportsHttpGet()
+    {
+        return supportsHttpGet;
     }
 
     public boolean isNonceRequired()
@@ -309,19 +316,14 @@ class RequestOptions
             KeyStore trustStore = KeyStore.getInstance(ksConf.getType());
             InputStream is = null;
 
-            String uriS = ksConf.getUri();
-            if(uriS != null)
+            String fileName = ksConf.getKeystore().getFile();
+            if(fileName != null)
             {
-                URL uri = new URL(uriS);
-                if("file".equalsIgnoreCase(uri.getProtocol()))
-                {
-                    is = new FileInputStream(IoUtil.expandFilepath(
-                            URLDecoder.decode(uri.getPath(), "UTF-8")));
-                }
-                else
-                {
-                    is = uri.openStream();
-                }
+                is = new FileInputStream(IoUtil.expandFilepath(fileName));
+            }
+            else
+            {
+                is = new ByteArrayInputStream(ksConf.getKeystore().getValue());
             }
 
             char[] password = ksConf.getPassword() == null ?

@@ -94,12 +94,12 @@ import org.xipki.common.IoUtil;
 import org.xipki.common.LogUtil;
 import org.xipki.common.ParamChecker;
 import org.xipki.common.SecurityUtil;
-import org.xipki.datasource.api.DataSourceFactory;
+import org.xipki.datasource.api.DataSourceWrapper;
 import org.xipki.ocsp.api.CertStatusInfo;
 import org.xipki.ocsp.api.CertStatusStore;
 import org.xipki.ocsp.api.CertStatusStoreException;
+import org.xipki.ocsp.api.CertprofileOption;
 import org.xipki.ocsp.api.IssuerHashNameAndKey;
-import org.xipki.security.api.PasswordResolver;
 
 /**
  * @author Lijun Liao
@@ -431,7 +431,6 @@ public class CrlCertStatusStore extends CertStatusStore
             // extract the certificate, only in full CRL, not in delta CRL
             boolean certsIncluded = false;
             Set<CertWithInfo> certs = new HashSet<>();
-            Set<BigInteger> ignoreSerials = new HashSet<>();
             String oidExtnCerts = CustomObjectIdentifiers.id_ext_crl_certset.getId();
             byte[] extnValue = crl.getExtensionValue(oidExtnCerts);
             if(extnValue != null)
@@ -470,14 +469,7 @@ public class CrlCertStatusStore extends CertStatusStore
                         profileName = "UNKNOWN";
                     }
 
-                    if(excludeCertprofiles.contains(profileName))
-                    {
-                        ignoreSerials.add(bcCert.getSerialNumber().getPositiveValue());
-                    }
-                    else
-                    {
-                        certs.add(new CertWithInfo(bcCert, profileName));
-                    }
+                    certs.add(new CertWithInfo(bcCert, profileName));
                 }
             }
 
@@ -542,27 +534,20 @@ public class CrlCertStatusStore extends CertStatusStore
                 revokedCertMap = new HashMap<BigInteger, X509CRLEntry>();
                 for(X509CRLEntry entry : revokedCertListInFullCRL)
                 {
-                    BigInteger serialNumber = entry.getSerialNumber();
-                    if(ignoreSerials.contains(serialNumber) == false)
-                    {
-                        revokedCertMap.put(entry.getSerialNumber(), entry);
-                    }
+                    revokedCertMap.put(entry.getSerialNumber(), entry);
                 }
 
                 for(X509CRLEntry entry : revokedCertListInDeltaCRL)
                 {
                     BigInteger serialNumber = entry.getSerialNumber();
-                    if(ignoreSerials.contains(serialNumber) == false)
+                    java.security.cert.CRLReason reason = entry.getRevocationReason();
+                    if(reason == java.security.cert.CRLReason.REMOVE_FROM_CRL)
                     {
-                        java.security.cert.CRLReason reason = entry.getRevocationReason();
-                        if(reason == java.security.cert.CRLReason.REMOVE_FROM_CRL)
-                        {
-                            revokedCertMap.remove(serialNumber);
-                        }
-                        else
-                        {
-                            revokedCertMap.put(serialNumber, entry);
-                        }
+                        revokedCertMap.remove(serialNumber);
+                    }
+                    else
+                    {
+                        revokedCertMap.put(serialNumber, entry);
                     }
                 }
             }
@@ -663,11 +648,6 @@ public class CrlCertStatusStore extends CertStatusStore
                 newCertStatusInfoMap.put(cert.cert.getSerialNumber().getPositiveValue(), crlCertStatusInfo);
             }
 
-            for(BigInteger serial : ignoreSerials)
-            {
-                newCertStatusInfoMap.put(serial, CrlCertStatusInfo.getIgnoreCertStatusInfo());
-            }
-
             this.initialized = false;
             this.lastmodifiedOfCrlFile = newLastModifed;
             this.fpOfCrlFile = newFp;
@@ -744,7 +724,8 @@ public class CrlCertStatusStore extends CertStatusStore
     @Override
     public CertStatusInfo getCertStatus(
             HashAlgoType hashAlgo, byte[] issuerNameHash, byte[] issuerKeyHash,
-            BigInteger serialNumber)
+            BigInteger serialNumber, boolean includeCertHash, HashAlgoType certHashAlg,
+            CertprofileOption certprofileOption)
     throws CertStatusStoreException
     {
         // wait for max. 0.5 second
@@ -772,7 +753,7 @@ public class CrlCertStatusStore extends CertStatusStore
         HashAlgoType certHashAlgo = null;
         if(includeCertHash)
         {
-            certHashAlgo = certHashAlgorithm == null ? hashAlgo : certHashAlgorithm;
+            certHashAlgo = certHashAlg == null ? hashAlgo : certHashAlg;
         }
 
         Date thisUpdate;
@@ -807,13 +788,24 @@ public class CrlCertStatusStore extends CertStatusStore
 
         CrlCertStatusInfo crlCertStatusInfo = certStatusInfoMap.get(serialNumber);
 
-        // SerialNumber is unknown
         if(crlCertStatusInfo != null)
         {
-            certStatusInfo = crlCertStatusInfo.getCertStatusInfo(certHashAlgo, thisUpdate, nextUpdate);
+            String profileName = crlCertStatusInfo.getCertprofile();
+            boolean ignore = profileName != null &&
+                    certprofileOption != null &&
+                    certprofileOption.include(profileName) == false;
+            if(ignore)
+            {
+                certStatusInfo = CertStatusInfo.getIgnoreCertStatusInfo(thisUpdate, nextUpdate);
+            }
+            else
+            {
+                certStatusInfo = crlCertStatusInfo.getCertStatusInfo(certHashAlgo, thisUpdate, nextUpdate);
+            }
         }
         else
         {
+            // SerialNumber is unknown
             if(unknownSerialAsGood)
             {
                 certStatusInfo = CertStatusInfo.getGoodCertStatusInfo(
@@ -886,7 +878,7 @@ public class CrlCertStatusStore extends CertStatusStore
     }
 
     @Override
-    public void init(String conf, DataSourceFactory datasourceFactory, PasswordResolver passwordResolver)
+    public void init(String conf, DataSourceWrapper datasource)
     throws CertStatusStoreException
     {
         initializeStore(true);

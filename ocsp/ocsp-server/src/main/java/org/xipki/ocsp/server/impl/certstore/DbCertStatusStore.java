@@ -35,9 +35,6 @@
 
 package org.xipki.ocsp.server.impl.certstore;
 
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
 import java.math.BigInteger;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -58,21 +55,18 @@ import org.bouncycastle.util.encoders.Hex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xipki.common.CertRevocationInfo;
-import org.xipki.common.CmpUtf8Pairs;
 import org.xipki.common.HashAlgoType;
-import org.xipki.common.IoUtil;
 import org.xipki.common.LogUtil;
 import org.xipki.common.ParamChecker;
-import org.xipki.datasource.api.DataSourceFactory;
 import org.xipki.datasource.api.DataSourceWrapper;
 import org.xipki.datasource.api.exception.DataAccessException;
 import org.xipki.ocsp.api.CertStatusInfo;
 import org.xipki.ocsp.api.CertStatusStore;
 import org.xipki.ocsp.api.CertStatusStoreException;
+import org.xipki.ocsp.api.CertprofileOption;
 import org.xipki.ocsp.api.IssuerHashNameAndKey;
 import org.xipki.ocsp.server.impl.IssuerEntry;
 import org.xipki.ocsp.server.impl.IssuerStore;
-import org.xipki.security.api.PasswordResolver;
 
 /**
  * @author Lijun Liao
@@ -313,7 +307,8 @@ public class DbCertStatusStore extends CertStatusStore
     @Override
     public CertStatusInfo getCertStatus(
             HashAlgoType hashAlgo, byte[] issuerNameHash, byte[] issuerKeyHash,
-            BigInteger serialNumber)
+            BigInteger serialNumber, boolean includeCertHash, HashAlgoType certHashAlg,
+            CertprofileOption certprofileOption)
     throws CertStatusStoreException
     {
         // wait for max. 0.5 second
@@ -341,7 +336,7 @@ public class DbCertStatusStore extends CertStatusStore
         HashAlgoType certHashAlgo = null;
         if(includeCertHash)
         {
-            certHashAlgo = certHashAlgorithm == null ? hashAlgo : certHashAlgorithm;
+            certHashAlgo = certHashAlg == null ? hashAlgo : certHashAlg;
         }
 
         try
@@ -380,7 +375,10 @@ public class DbCertStatusStore extends CertStatusStore
                 if(rs.next())
                 {
                     String certprofile = rs.getString("PROFILE");
-                    if(excludeCertprofiles.contains(certprofile))
+                    boolean ignore = certprofile != null &&
+                            certprofileOption != null &&
+                            certprofileOption.include(certprofile) == false;
+                    if(ignore)
                     {
                         certStatusInfo = CertStatusInfo.getIgnoreCertStatusInfo(thisUpdate, null);
                     }
@@ -551,45 +549,11 @@ public class DbCertStatusStore extends CertStatusStore
     }
 
     @Override
-    public void init(String conf, DataSourceFactory datasourceFactory, PasswordResolver passwordResolver)
+    public void init(String conf, DataSourceWrapper datasource)
     throws CertStatusStoreException
     {
-        CmpUtf8Pairs utf8Pairs = new CmpUtf8Pairs(conf);
-        String dsConf = utf8Pairs.getValue("datasource");
-        if(dsConf == null)
-        {
-            throw new IllegalArgumentException("no datasource defined");
-        }
-
-        String databaseConfFile;
-        if(dsConf.startsWith("file:"))
-        {
-            databaseConfFile = dsConf.substring("file:".length());
-        }
-        else
-        {
-            throw new CertStatusStoreException(dsConf + " does not start with 'file:'");
-        }
-
-        InputStream confStream = null;
-        try
-        {
-            confStream = new FileInputStream(IoUtil.expandFilepath(databaseConfFile));
-            dataSource = datasourceFactory.createDataSource(null, confStream, passwordResolver);
-        } catch (Exception e)
-        {
-            throw new CertStatusStoreException(e.getMessage(), e);
-        } finally
-        {
-            if(confStream != null)
-            {
-                try
-                {
-                    confStream.close();
-                }catch(IOException e){}
-            }
-        }
-
+        ParamChecker.assertNotNull("datasource", datasource);
+        this.dataSource = datasource;
         initIssuerStore();
 
         StoreUpdateService storeUpdateService = new StoreUpdateService();
