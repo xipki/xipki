@@ -4,7 +4,8 @@
 feature:install xipki-ocspserver
 feature:install xipki-ocspqa-shell
 
-URL = http://localhost:8080/ocsp
+URL = http://localhost:8080/ocsp/responder1
+URL_CRL = http://localhost:8080/ocsp/responder2
 
 # Wait one second
 sleep 1000
@@ -38,17 +39,17 @@ xipki-qa:ocsp-status -cacert output/SubCA1.der -cert output/TLS_C2.der \
 echo "QA: Good (POST, CRL)"
 xipki-qa:ocsp-status -cacert output/SubCAwithCRL1.der -cert output/OCSP1.der \
   -expStatus good -expCerthash required -expSigalg SHA256withRSA \
-  -url $URL
+  -url $URL_CRL
 
 echo "QA: Revoked, reason = keyCompromise (POST, CRL)"
 xipki-qa:ocsp-status -cacert output/SubCAwithCRL1.der -cert output/OCSP2.der \
   -expStatus keyCompromise -expCerthash required -expSigalg SHA256withRSA \
-  -url $URL
+  -url $URL_CRL
 
 echo "QA: Good (POST, CRL)"
 xipki-qa:ocsp-status -cacert output/SubCAwithCRL1.der -serial 99999 \
   -expStatus good -expCerthash forbidden -expSigalg SHA256withRSA \
-  -url $URL
+  -url $URL_CRL
 
 echo "QA: Unknown (RFC6960) (POST, DB)"
 xipki-qa:ocsp-status -cacert output/SubCA1.der -serial 99999 \
@@ -89,17 +90,17 @@ xipki-qa:ocsp-status -cacert output/SubCA1.der -cert output/TLS_C2.der -httpget 
 echo "QA: Good (GET, CRL)"
 xipki-qa:ocsp-status -cacert output/SubCAwithCRL1.der -cert output/OCSP1.der -httpget \
   -expStatus good -expCerthash required -expSigalg SHA256withRSA \
-  -url $URL
+  -url $URL_CRL
 
 echo "QA: Revoked, reason = keyCompromise (GET, CRL)"
 xipki-qa:ocsp-status -cacert output/SubCAwithCRL1.der -cert output/OCSP2.der -httpget \
   -expStatus keyCompromise -expCerthash required -expSigalg SHA256withRSA \
-  -url $URL
+  -url $URL_CRL
 
 echo "QA: Good (GET, CRL)"
 xipki-qa:ocsp-status -cacert output/SubCAwithCRL1.der -serial 99999 -httpget \
   -expStatus good -expCerthash forbidden -expSigalg SHA256withRSA \
-  -url $URL
+  -url $URL_CRL
 
 echo "QA: Unknown (RFC6960) (GET, DB)"
 xipki-qa:ocsp-status -cacert output/SubCA1.der -serial 99999 -httpget \
@@ -140,17 +141,17 @@ xipki-qa:ocsp-status -cacert output/SubCA1.der -cert output/TLS_C2.der -sign \
 echo "QA: Good (POST, SIGNED, CRL)"
 xipki-qa:ocsp-status -cacert output/SubCAwithCRL1.der -cert output/OCSP1.der -sign \
   -expStatus good -expCerthash required -expSigalg SHA256withRSA \
-  -url $URL
+  -url $URL_CRL
  
 echo "QA: Revoked, reason = keyCompromise (POST, SIGNED, CRL)"
 xipki-qa:ocsp-status -cacert output/SubCAwithCRL1.der -cert output/OCSP2.der -sign \
   -expStatus keyCompromise -expCerthash required -expSigalg SHA256withRSA \
-  -url $URL
+  -url $URL_CRL
  
 echo "QA: Good (POST, SIGNED, CRL)"
 xipki-qa:ocsp-status -cacert output/SubCAwithCRL1.der -serial 99999 -sign \
   -expStatus good -expCerthash forbidden -expSigalg SHA256withRSA \
-  -url $URL
+  -url $URL_CRL
 
 echo "QA: Unknown (RFC6960) (POST, SIGNED, DB)"
 xipki-qa:ocsp-status -cacert output/SubCA1.der -serial 99999 -sign \

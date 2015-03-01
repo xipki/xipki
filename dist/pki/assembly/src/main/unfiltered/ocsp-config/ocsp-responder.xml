@@ -3,9 +3,6 @@
   <!-- responders -->
   <responders>
     <responder name="responder1">
-      <servletPaths>
-        <servletPath></servletPath>
-      </servletPaths>
       <mode>RFC6960</mode>
       <inheritCaRevocation>true</inheritCaRevocation>
       <signer>signer1</signer>
@@ -14,6 +11,16 @@
       <audit>audit1</audit>
       <stores>
         <store>dbstore1</store>
+      </stores>
+    </responder>
+    <responder name="responder2">
+      <mode>RFC6960</mode>
+      <inheritCaRevocation>true</inheritCaRevocation>
+      <signer>signer1</signer>
+      <request>request1</request>
+      <response>response1</response>
+      <audit>audit1</audit>
+      <stores>
         <store>crlstore1</store>
       </stores>
     </responder>
