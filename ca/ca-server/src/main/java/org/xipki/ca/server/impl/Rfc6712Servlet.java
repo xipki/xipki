@@ -127,48 +127,39 @@ public class Rfc6712Servlet extends HttpServlet
                 return;
             }
 
-            String encodedUrl = request.getRequestURI();
-            String constructedPath = null;
-            if (encodedUrl != null)
-            {
-                constructedPath = URLDecoder.decode(encodedUrl, "UTF-8");
-                String servletPath = request.getServletPath();
-                if(servletPath.endsWith("/") == false)
-                {
-                    servletPath += "/";
-                }
+            String requestURI = request.getRequestURI();
+            String servletPath = request.getServletPath();
 
-                int indexOf = constructedPath.indexOf(servletPath);
-                if (indexOf >= 0)
+            String caName = null;
+            X509CACmpResponder responder = null;
+            int n = servletPath.length();
+            if(requestURI.length() > n + 1)
+            {
+                String caAlias = URLDecoder.decode(requestURI.substring(n + 1), "UTF-8");
+                caName = responderManager.getCaName(caAlias);
+                if(caName == null)
                 {
-                    constructedPath = constructedPath.substring(indexOf + servletPath.length());
+                    caName = caAlias;
                 }
+                caName = caName.toUpperCase();
+                responder = responderManager.getX509CACmpResponder(caName);
             }
 
-            int caAlias_end_index = constructedPath.indexOf('/');
-            String caAlias = (caAlias_end_index == -1) ?
-                    constructedPath : constructedPath.substring(0, caAlias_end_index);
-
-            String caName = responderManager.getCaName(caAlias);
-            if(caName == null)
+            if(caName == null || responder == null || responder.isCAInService() == false)
             {
-                caName = caAlias;
-            }
-            caName = caName.toUpperCase();
-
-            X509CACmpResponder responder = responderManager.getX509CACmpResponder(caName);
-            if(responder == null || responder.isCAInService() == false)
-            {
-                if(responder == null)
+                if(caName == null)
                 {
-                    auditMessage = "Unknown CA " + caName;
-                    LOG.warn(auditMessage);
+                    auditMessage = "No CA is specified";
+                }
+                else if(responder == null)
+                {
+                    auditMessage = "Unknown CA '" + caName + "'";
                 }
                 else
                 {
-                    auditMessage = "CA " + caName + " is out of service";
-                    LOG.warn(auditMessage);
+                    auditMessage = "CA '" + caName + "' is out of service";
                 }
+                LOG.warn(auditMessage);
 
                 response.setContentLength(0);
                 response.setStatus(HttpServletResponse.SC_NOT_FOUND);
