@@ -2,10 +2,10 @@
 <!--
  Copyright (c) 2014 - 2015 Lijun Liao
 -->
-<xs:schema xmlns="http://xipki.org/xipki/ocsp/conf/v1"
+<xs:schema  xmlns="http://xipki.org/xipki/ocsp/conf/v2"
+  targetNamespace="http://xipki.org/xipki/ocsp/conf/v2"
   xmlns:xs="http://www.w3.org/2001/XMLSchema"
   xmlns:jxb="http://java.sun.com/xml/ns/jaxb"
-  targetNamespace="http://xipki.org/xipki/ocsp/conf/v1"
   elementFormDefault="qualified"
   version="1.0"
   jxb:version="2.0">
@@ -17,55 +17,73 @@
     </xs:appinfo>
   </xs:annotation>
   <!-- CertStore -->
-  <xs:element name="OCSPResponder" type="OCSPResponderType"/>
-  <xs:complexType name="OCSPResponderType">
+  <xs:element name="OCSPServer">
+    <xs:complexType>
+      <xs:all>
+        <xs:element name="responders" type="respondersType"/>
+        <xs:element name="signers" type="signersType"/>
+        <xs:element name="stores" type="storesType"/>
+        <xs:element name="datasources" type="datasourcesType" minOccurs="0"/>
+        <xs:element name="requestOptions" type="requestOptionsType"/>
+        <xs:element name="responseOptions" type="responseOptionsType"/>
+        <xs:element name="auditOptions" type="auditOptionsType" minOccurs="0"/>
+        <xs:element name="certprofileOptions" type="certprofileOptionsType" minOccurs="0"/>
+      </xs:all>
+    </xs:complexType>
+  </xs:element>
+  <!-- Responders -->
+  <xs:complexType name="respondersType">
     <xs:sequence>
+      <xs:element name="responder" type="responderType" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="responderType">
+    <xs:all>
+      <xs:element name="servletPaths" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="servletPath" type="xs:string" maxOccurs="unbounded"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
       <xs:element name="mode" type="xs:string" minOccurs="0">
         <xs:annotation>
           <xs:documentation>
             Valid values are RFC2560 and RFC6960. If not present, then 
-            RFC2560 mode will be applied.
+            RFC6960 mode will be applied.
           </xs:documentation>
         </xs:annotation>
       </xs:element>
-      <xs:element name="supportsHttpGet" type="xs:boolean" minOccurs="0">
+      <xs:element name="inheritCaRevocation" type="xs:boolean">
         <xs:annotation>
           <xs:documentation>
-            Whether to support HTTP GET for small request.
-            The default is false.
+            Whether to consider certificate as revoked if CA is revoked.
           </xs:documentation>
         </xs:annotation>
       </xs:element>
-      <xs:element name="signer" type="signerType"/>
-      <xs:element name="request" type="requestType"/>
-      <xs:element name="response" type="responseType"/>
-      <xs:element name="certhashAlgorithm" type="xs:string" minOccurs="0">
-        <xs:annotation>
-          <xs:documentation>
-            CertHash algorithm in the response, If this element is not present,
-            the hash algorithm in the request will be applied.
-          </xs:documentation>
-        </xs:annotation>
-      </xs:element>
-      <xs:element name="audit" type="auditType" minOccurs="0"/>
-      <xs:element name="excludeCertprofiles" minOccurs="0">
+      <xs:element name="signer" type="xs:string"/>
+      <xs:element name="request" type="xs:string"/>
+      <xs:element name="response" type="xs:string"/>
+      <xs:element name="audit" type="xs:string" minOccurs="0"/>
+      <xs:element name="certprofile" type="xs:string" minOccurs="0"/>
+      <xs:element name="stores">
         <xs:complexType>
           <xs:sequence>
-            <xs:element name="certprofile" type="xs:string" maxOccurs="unbounded"/>
+            <xs:element name="store" type="xs:string" maxOccurs="unbounded"/>
           </xs:sequence>
         </xs:complexType>
       </xs:element>
-      <xs:element name="certstatusStores">
-        <xs:complexType>
-          <xs:sequence>
-            <xs:element name="certstatusStore" type="certstatusStoreType" maxOccurs="unbounded"/>
-          </xs:sequence>
-        </xs:complexType>
-      </xs:element>
+    </xs:all>
+    <xs:attribute name="name" type="xs:string" use="required"/>    
+  </xs:complexType>
+  <!-- signers -->
+  <xs:complexType name="signersType">
+    <xs:sequence>
+      <xs:element name="signer" type="signerType" maxOccurs="unbounded"/>
     </xs:sequence>
   </xs:complexType>
   <xs:complexType name="signerType">
-    <xs:sequence>
+    <xs:all>
       <xs:element name="type" type="xs:string"/>
       <xs:element name="key" type="xs:string"/>
       <xs:element name="algorithms">
@@ -75,34 +93,33 @@
           </xs:sequence>
         </xs:complexType>
       </xs:element>
-      <xs:element name="includeSignerCertInResp" type="xs:boolean">
-        <xs:annotation>
-          <xs:documentation>
-            Whether to include responder certificate in the response.
-            The default is false.
-          </xs:documentation>
-        </xs:annotation>
-      </xs:element>
-      <xs:element name="includeSignerCACertsInResp" type="xs:boolean">
-        <xs:annotation>
-          <xs:documentation>
-            Whether to include responder certificate in the response.
-            The default is false.
-          </xs:documentation>
-        </xs:annotation>
-      </xs:element>
-      <xs:element name="certFile" type="xs:string" minOccurs="0"/>
-      <xs:element name="caCertFiles" minOccurs="0">
+      <xs:element name="cert" type="fileOrValueType" minOccurs="0"/>
+      <xs:element name="caCerts" minOccurs="0">
         <xs:complexType>
           <xs:sequence>
-            <xs:element name="caCertFile" type="xs:string" maxOccurs="unbounded"/>
+            <xs:element name="caCert" type="fileOrValueType" maxOccurs="unbounded"/>
           </xs:sequence>
         </xs:complexType>
       </xs:element>
+    </xs:all>
+    <xs:attribute name="name" type="xs:string" use="required"/>
+  </xs:complexType>
+  <!-- requests -->
+  <xs:complexType name="requestOptionsType">
+    <xs:sequence>
+      <xs:element name="requestOption" type="requestOptionType" maxOccurs="unbounded"/>
     </xs:sequence>
   </xs:complexType>
-  <xs:complexType name="requestType">
-    <xs:sequence>
+  <xs:complexType name="requestOptionType">
+    <xs:all>
+      <xs:element name="supportsHttpGet" type="xs:boolean" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation>
+            Whether to support HTTP GET for small request.
+            The default is false.
+          </xs:documentation>
+        </xs:annotation>
+      </xs:element>    
       <xs:element name="maxRequestSize" type="xs:int" minOccurs="0"/>
       <xs:element name="versions" type="versionsType" minOccurs="0"/>
       <xs:element name="nonce" type="nonceType" minOccurs="0"/>
@@ -124,7 +141,8 @@
           </xs:sequence>
         </xs:complexType>
       </xs:element>
-    </xs:sequence>
+    </xs:all>
+    <xs:attribute name="name" type="xs:string" use="required"/>
   </xs:complexType>
   <xs:simpleType name="validationModelType">
     <xs:restriction base="xs:string">
@@ -139,36 +157,66 @@
         <xs:complexType>
           <xs:all>
             <xs:element name="type" type="xs:string"/>
-            <xs:element name="uri" type="xs:anyURI" minOccurs="0"/>
+            <xs:element name="keystore" type="fileOrValueType" minOccurs="0"/>
             <xs:element name="password" type="xs:string" minOccurs="0"/>
           </xs:all>
         </xs:complexType>
       </xs:element>
     </xs:choice>
   </xs:complexType>
-  <xs:complexType name="responseType">
+  <!-- responses -->
+  <xs:complexType name="responseOptionsType">
+    <xs:sequence>
+      <xs:element name="responseOption" type="responseOptionType" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="responseOptionType">
     <xs:all>
-      <xs:element name="noRevReason" type="xs:boolean" minOccurs="0"/>
-      <xs:element name="noInvalidityDate" type="xs:boolean" minOccurs="0">
+      <xs:element name="embedCertsMode" type="embedCertsMode" minOccurs="0">
         <xs:annotation>
           <xs:documentation>
-            Whether not to include extension InvalidityDate in OCSP response.
-            The default is false.
+            The default is SIGNER.
+          </xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="includeRevReason" type="xs:boolean" minOccurs="0"/>
+      <xs:element name="includeInvalidityDate" type="xs:boolean" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation>
+            Whether to include extension InvalidityDate in OCSP response.
+            The default is true.
+          </xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="includeCertHash" type="xs:boolean" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation>
+            Whether to include extension CertHash in OCSP response.
+            The default is false. 
+          </xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="certhashAlgorithm" type="xs:string" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation>
+            CertHash algorithm in the response, If this element is not present,
+            the hash algorithm in the request will be applied.
           </xs:documentation>
         </xs:annotation>
       </xs:element>
       <xs:element name="cache" type="cacheType" minOccurs="0"/>
     </xs:all>
+    <xs:attribute name="name" type="xs:string" use="required"/>
   </xs:complexType>
   <xs:complexType name="nonceType">
-    <xs:sequence>
+    <xs:all>
       <xs:element name="required" type="xs:boolean"/>
       <xs:element name="minLen" type="xs:int" minOccurs="0"/>
       <xs:element name="maxLen" type="xs:int" minOccurs="0"/>
-    </xs:sequence>
+    </xs:all>
   </xs:complexType>
   <xs:complexType name="cacheType">
-    <xs:sequence>
+    <xs:all>
       <xs:element name="cacheMaxAge" type="xs:int" minOccurs="0">
         <xs:annotation>
           <xs:documentation>
@@ -176,11 +224,16 @@
           </xs:documentation>
         </xs:annotation>
       </xs:element>
+    </xs:all>
+  </xs:complexType>
+  <!-- audit -->
+  <xs:complexType name="auditOptionsType">
+    <xs:sequence>
+      <xs:element name="auditOption" type="auditOptionType" maxOccurs="unbounded"/>
     </xs:sequence>
   </xs:complexType>
-  <xs:complexType name="auditType">
-    <xs:sequence>
-      <xs:element name="enabled" type="xs:boolean"/>
+  <xs:complexType name="auditOptionType">
+    <xs:all>
       <xs:element name="certprofileMappings" minOccurs="0">
         <xs:complexType>
           <xs:sequence>
@@ -188,27 +241,54 @@
           </xs:sequence>
         </xs:complexType>
       </xs:element>
-    </xs:sequence>
+    </xs:all>
+    <xs:attribute name="name" type="xs:string" use="required"/>    
   </xs:complexType>
   <xs:complexType name="mappingType">
     <xs:attribute name="from" type="xs:string"/>
     <xs:attribute name="to" type="xs:string"/>
   </xs:complexType>
-  <xs:complexType name="certstatusStoreType">
+  <!-- certprofile -->
+  <xs:complexType name="certprofileOptionsType">
     <xs:sequence>
-      <xs:element name="name" type="xs:string"/>
-      <xs:choice>
-        <xs:element name="dbStore" type="dbStoreType"/>
-        <xs:element name="crlStore" type="crlStoreType"/>
-        <xs:element name="customStore" type="customStoreType"/>
-      </xs:choice>
-      <xs:element name="inheritCaRevocation" type="xs:boolean" minOccurs="0">
-        <xs:annotation>
-          <xs:documentation>
-            Whether to consider certificate as revoked if CA is revoked.
-            The default is true.
-          </xs:documentation>
-        </xs:annotation>
+      <xs:element name="certprofileOption" type="certprofileOptionType" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="certprofileOptionType">
+    <xs:all>
+       <xs:element name="includes" type="includesType" minOccurs="0"/>
+       <xs:element name="excludes" type="excludesType" minOccurs="0"/>
+    </xs:all>
+    <xs:attribute name="name" type="xs:string" use="required"/>    
+  </xs:complexType>
+  <!-- datasource -->
+  <xs:complexType name="datasourcesType">
+    <xs:sequence>
+      <xs:element name="datasource" type="datasourceType" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="datasourceType">
+    <xs:sequence>
+      <xs:element name="conf" type="fileOrPlainValueType"/>
+    </xs:sequence>
+    <xs:attribute name="name" type="xs:string" use="required"/>
+  </xs:complexType>
+  <!-- certstatus store -->
+  <xs:complexType name="storesType">
+    <xs:sequence>
+      <xs:element name="store" type="storeType" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="storeType">
+    <xs:all>
+      <xs:element name="source">
+        <xs:complexType>
+          <xs:choice>
+            <xs:element name="dbStore" type="dbStoreType"/>
+            <xs:element name="crlStore" type="crlStoreType"/>
+            <xs:element name="customStore" type="customStoreType"/>          
+          </xs:choice>
+        </xs:complexType>
       </xs:element>
       <xs:element name="retentionInterval" type="xs:int" minOccurs="0">
         <xs:annotation>
@@ -245,19 +325,12 @@
           </xs:documentation>
         </xs:annotation>
       </xs:element>
-      <xs:element name="includeCertHash" type="xs:boolean" minOccurs="0">
-        <xs:annotation>
-          <xs:documentation>
-            Whether to include extension CertHash in OCSP response.
-            The default is false. 
-          </xs:documentation>
-        </xs:annotation>
-      </xs:element>
-    </xs:sequence>
+    </xs:all>
+    <xs:attribute name="name" type="xs:string" use="required"/>    
   </xs:complexType>
   <xs:complexType name="dbStoreType">
-    <xs:sequence>
-      <xs:element name="dbConfFile" type="xs:string"/>
+    <xs:all>
+      <xs:element name="datasource" type="xs:string"/>
       <xs:element name="cacerts" minOccurs="0">
         <xs:annotation>
           <xs:documentation>
@@ -266,26 +339,16 @@
           </xs:documentation>
         </xs:annotation>
         <xs:complexType>
-          <xs:sequence>
-            <xs:element name="includes" type="includesType" minOccurs="0"/>
-            <xs:element name="excludes" type="excludesType" minOccurs="0"/>
-          </xs:sequence>
+          <xs:all>
+            <xs:element name="includes" type="includesFileOrValueType" minOccurs="0"/>
+            <xs:element name="excludes" type="excludesFileOrValueType" minOccurs="0"/>
+          </xs:all>
         </xs:complexType>
       </xs:element>
-    </xs:sequence>
-  </xs:complexType>
-  <xs:complexType name="includesType">
-    <xs:sequence>
-      <xs:element name="include" type="xs:string" maxOccurs="unbounded"/>
-    </xs:sequence>
-  </xs:complexType>
-  <xs:complexType name="excludesType">
-    <xs:sequence>
-      <xs:element name="exclude" type="xs:string" maxOccurs="unbounded"/>
-    </xs:sequence>
+    </xs:all>
   </xs:complexType>
   <xs:complexType name="crlStoreType">
-    <xs:sequence>
+    <xs:all>
       <xs:element name="crlFile" type="xs:string"/>
       <xs:element name="crlUrl" type="xs:string" minOccurs="0"/>
       <xs:element name="deltaCrlFile" type="xs:string" minOccurs="0"/>
@@ -297,8 +360,8 @@
           </xs:documentation>
         </xs:annotation>
       </xs:element>
-      <xs:element name="caCertFile" type="xs:string"/>
-      <xs:element name="issuerCertFile" type="xs:string" minOccurs="0">
+      <xs:element name="caCert" type="fileOrValueType"/>
+      <xs:element name="issuerCert" type="fileOrValueType" minOccurs="0">
         <xs:annotation>
           <xs:documentation>
              Required for indirect CRL
@@ -326,10 +389,10 @@
           </xs:documentation>
         </xs:annotation>
       </xs:element>
-    </xs:sequence>
+    </xs:all>
   </xs:complexType>
   <xs:complexType name="customStoreType">
-    <xs:sequence>
+    <xs:all>
       <xs:element name="className" type="xs:string">
         <xs:annotation>
           <xs:documentation>
@@ -337,12 +400,52 @@
           </xs:documentation>
         </xs:annotation>
       </xs:element>
+      <xs:element name="datasource" type="xs:string" minOccurs="0"/>
       <xs:element name="conf" type="xs:string"/>
-    </xs:sequence>
+    </xs:all>
   </xs:complexType>
   <xs:complexType name="versionsType">
     <xs:sequence>
       <xs:element name="version" type="xs:int" maxOccurs="unbounded"/>
     </xs:sequence>
   </xs:complexType>
+  <xs:complexType name="fileOrValueType">
+    <xs:choice>
+      <xs:element name="value" type="xs:base64Binary"/>
+      <xs:element name="file" type="xs:string"/>
+    </xs:choice>
+  </xs:complexType>  
+  <xs:complexType name="fileOrPlainValueType">
+    <xs:choice>
+      <xs:element name="value" type="xs:string"/>
+      <xs:element name="file" type="xs:string"/>
+    </xs:choice>
+  </xs:complexType>
+  <xs:complexType name="includesType">
+    <xs:sequence>
+      <xs:element name="include" type="xs:string" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="excludesType">
+    <xs:sequence>
+      <xs:element name="exclude" type="xs:string" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="includesFileOrValueType">
+    <xs:sequence>
+      <xs:element name="include" type="fileOrValueType" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="excludesFileOrValueType">
+    <xs:sequence>
+      <xs:element name="exclude" type="fileOrValueType" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:simpleType name="embedCertsMode">
+    <xs:restriction base="xs:string">
+       <xs:enumeration value="NONE" />
+       <xs:enumeration value="SIGNER" />
+       <xs:enumeration value="SIGNER_AND_CA" />
+     </xs:restriction>
+   </xs:simpleType>
 </xs:schema>

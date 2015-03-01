@@ -39,7 +39,6 @@ import java.io.ByteArrayInputStream;
 import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URLDecoder;
 import java.util.Date;
 import java.util.List;
 
@@ -61,9 +60,9 @@ import org.xipki.audit.api.AuditLevel;
 import org.xipki.audit.api.AuditLoggingService;
 import org.xipki.audit.api.AuditLoggingServiceRegister;
 import org.xipki.audit.api.AuditStatus;
-import org.xipki.common.SecurityUtil;
 import org.xipki.common.LogUtil;
-import org.xipki.ocsp.server.impl.OCSPRespWithCacheInfo.ResponseCacheInfo;
+import org.xipki.common.SecurityUtil;
+import org.xipki.ocsp.server.impl.OcspRespWithCacheInfo.ResponseCacheInfo;
 
 /**
  * @author Lijun Liao
@@ -80,24 +79,32 @@ public class Rfc2560Servlet extends HttpServlet
 
     private AuditLoggingServiceRegister auditServiceRegister;
 
-    private OcspResponder responder;
+    private OcspServer server;
 
     public Rfc2560Servlet()
     {
     }
 
-    public void setResponder(OcspResponder responder)
+    public void setServer(OcspServer server)
     {
-        this.responder = responder;
+        this.server = server;
     }
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
     throws ServletException, IOException
     {
-        if(responder != null || responder.supportsHttpGet())
+        ResponderAndRelativeUri r = server.getResponderAndRelativeUri(request);
+        if(r == null)
         {
-            processRequest(request, response, true);
+            response.sendError(HttpServletResponse.SC_NOT_FOUND);
+            return;
+        }
+
+        Responder responder = r.getResponder();
+        if(responder.getRequestOption().supportsHttpGet())
+        {
+            processRequest(request, response, r, true);
         }
         else
         {
@@ -109,12 +116,27 @@ public class Rfc2560Servlet extends HttpServlet
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
     throws ServletException, IOException
     {
-        processRequest(request, response, false);
+        ResponderAndRelativeUri r = server.getResponderAndRelativeUri(request);
+        if(r == null)
+        {
+            response.sendError(HttpServletResponse.SC_NOT_FOUND);
+            return;
+        }
+
+        if(r.getRelativeUri() != null && r.getRelativeUri().isEmpty() == false)
+        {
+            response.sendError(HttpServletResponse.SC_NOT_FOUND);
+            return;
+        }
+
+        processRequest(request, response, r, false);
     }
 
-    private void processRequest(HttpServletRequest request, HttpServletResponse response, boolean getMethod)
+    private void processRequest(HttpServletRequest request, HttpServletResponse response,
+            ResponderAndRelativeUri r, boolean getMethod)
     throws ServletException, IOException
     {
+        Responder responder = r.getResponder();
         AuditEvent auditEvent = null;
 
         AuditLevel auditLevel = AuditLevel.INFO;
@@ -126,7 +148,7 @@ public class Rfc2560Servlet extends HttpServlet
         AuditLoggingService auditLoggingService = auditServiceRegister == null ? null :
             auditServiceRegister.getAuditLoggingService();
 
-        if(auditLoggingService != null && responder.isAuditResponse())
+        if(auditLoggingService != null && responder.getAuditOption() != null)
         {
             startInUs = System.nanoTime()/1000;
             auditEvent = new AuditEvent(new Date());
@@ -136,7 +158,7 @@ public class Rfc2560Servlet extends HttpServlet
 
         try
         {
-            if(responder == null)
+            if(server == null)
             {
                 String message = "responder in servlet not configured";
                 LOG.error(message);
@@ -152,17 +174,11 @@ public class Rfc2560Servlet extends HttpServlet
             InputStream requestStream;
             if(getMethod)
             {
-                String requestURI = request.getRequestURI();
-                requestURI = URLDecoder.decode(requestURI, "UTF-8");
-                String servletPath = request.getServletPath();
-                if(servletPath.endsWith("/") == false)
-                {
-                    servletPath += "/";
-                }
+                String relativeUri = r.getRelativeUri();
 
                 // RFC2560 A.1.1 specifies that request longer than 255 bytes SHOULD be sent by POST,
                 // we support GET for longer requests anyway.
-                if(requestURI.length() > responder.getMaxRequestSize() + servletPath.length())
+                if(relativeUri.length() > responder.getRequestOption().getMaxRequestSize())
                 {
                     response.setContentLength(0);
                     response.setStatus(HttpServletResponse.SC_REQUEST_ENTITY_TOO_LARGE);
@@ -172,19 +188,7 @@ public class Rfc2560Servlet extends HttpServlet
                     return;
                 }
 
-                int indexOf = requestURI.indexOf(servletPath);
-
-                String b64Request;
-                if (indexOf >= 0)
-                {
-                    b64Request = requestURI.substring(indexOf+servletPath.length());
-                }
-                else
-                {
-                    b64Request = requestURI;
-                }
-
-                requestStream = new ByteArrayInputStream(Base64.decode(b64Request));
+                requestStream = new ByteArrayInputStream(Base64.decode(relativeUri));
             }
             else
             {
@@ -200,7 +204,7 @@ public class Rfc2560Servlet extends HttpServlet
                 }
 
                 // request too long
-                if(request.getContentLength() > responder.getMaxRequestSize())
+                if(request.getContentLength() > responder.getRequestOption().getMaxRequestSize())
                 {
                     response.setContentLength(0);
                     response.setStatus(HttpServletResponse.SC_REQUEST_ENTITY_TOO_LARGE);
@@ -240,7 +244,7 @@ public class Rfc2560Servlet extends HttpServlet
 
             response.setContentType(Rfc2560Servlet.CT_RESPONSE);
 
-            OCSPRespWithCacheInfo ocspRespWithCacheInfo = responder.answer(ocspReq, auditEvent, getMethod);
+            OcspRespWithCacheInfo ocspRespWithCacheInfo = server.answer(responder, ocspReq, auditEvent, getMethod);
             if (ocspRespWithCacheInfo == null)
             {
                 auditMessage = "processRequest returned null, this should not happen";
@@ -279,13 +283,13 @@ public class Rfc2560Servlet extends HttpServlet
 
                     // Max age must be in seconds in the cache-control header
                     long maxAge;
-                    if(responder.getCachMaxAge() != null)
+                    if(responder.getResponseOption().getCacheMaxAge() != null)
                     {
-                        maxAge = responder.getCachMaxAge().longValue();
+                        maxAge = responder.getResponseOption().getCacheMaxAge().longValue();
                     }
                     else
                     {
-                        maxAge = responder.getDefaultCacheMaxAge();
+                        maxAge = OcspServer.defaultCacheMaxAge;
                     }
 
                     if(cacheInfo.getNextUpdate() != null)
@@ -373,7 +377,6 @@ public class Rfc2560Servlet extends HttpServlet
                 }
             }
         }
-
     }
 
     public void setAuditServiceRegister(AuditLoggingServiceRegister auditServiceRegister)

@@ -36,7 +36,6 @@
 package org.xipki.ocsp.api;
 
 import java.math.BigInteger;
-import java.util.Collections;
 import java.util.Set;
 
 import org.xipki.audit.api.AuditLoggingService;
@@ -44,8 +43,7 @@ import org.xipki.audit.api.AuditLoggingServiceRegister;
 import org.xipki.common.CertRevocationInfo;
 import org.xipki.common.HashAlgoType;
 import org.xipki.common.ParamChecker;
-import org.xipki.datasource.api.DataSourceFactory;
-import org.xipki.security.api.PasswordResolver;
+import org.xipki.datasource.api.DataSourceWrapper;
 
 /**
  * @author Lijun Liao
@@ -57,11 +55,14 @@ public abstract class CertStatusStore
 
     public abstract boolean canResolveIssuer(HashAlgoType hashAlgo, byte[] issuerNameHash, byte[] issuerKeyHash);
 
-    public abstract CertStatusInfo getCertStatus(HashAlgoType hashAlgo, byte[] issuerNameHash,
-            byte[] issuerKeyHash, BigInteger serialNumber)
+    public abstract CertStatusInfo getCertStatus(
+            HashAlgoType hashAlgo, byte[] issuerNameHash,
+            byte[] issuerKeyHash, BigInteger serialNumber,
+            boolean includeCertHash, HashAlgoType certHashAlg,
+            CertprofileOption certprofileOption)
     throws CertStatusStoreException;
 
-    public abstract void init(String conf, DataSourceFactory datasourceFactory, PasswordResolver passwordResolver)
+    public abstract void init(String conf, DataSourceWrapper datasource)
     throws CertStatusStoreException;
 
     public abstract CertRevocationInfo getCARevocationInfo(HashAlgoType hashAlgo, byte[] issuerNameHash,
@@ -79,9 +80,6 @@ public abstract class CertStatusStore
     protected int retentionInterval;
     protected boolean includeArchiveCutoff;
     protected boolean includeCrlID;
-    protected boolean includeCertHash;
-    protected HashAlgoType certHashAlgorithm;
-    protected Set<String> excludeCertprofiles;
 
     protected AuditLoggingServiceRegister auditServiceRegister;
 
@@ -144,43 +142,6 @@ public abstract class CertStatusStore
     public void setIncludeCrlID(boolean includeCrlID)
     {
         this.includeCrlID = includeCrlID;
-    }
-
-    public boolean isIncludeCertHash()
-    {
-        return includeCertHash;
-    }
-
-    public void setIncludeCertHash(boolean includeCertHash)
-    {
-        this.includeCertHash = includeCertHash;
-    }
-
-    public HashAlgoType getCertHashAlgorithm()
-    {
-        return certHashAlgorithm;
-    }
-
-    public void setCertHashAlgorithm(HashAlgoType algorithm)
-    {
-        this.certHashAlgorithm = algorithm;
-    }
-
-    public Set<String> getExcludeCertProfiles()
-    {
-        return excludeCertprofiles;
-    }
-
-    public void setExcludeCertProfiles(Set<String> profiles)
-    {
-        if(profiles == null)
-        {
-            this.excludeCertprofiles = Collections.emptySet();
-        }
-        else
-        {
-            this.excludeCertprofiles = profiles;
-        }
     }
 
 }

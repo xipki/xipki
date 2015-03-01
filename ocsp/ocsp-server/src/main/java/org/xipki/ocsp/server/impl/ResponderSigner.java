@@ -62,8 +62,9 @@ class ResponderSigner
     private final Map<String, ConcurrentContentSigner> algoSignerMap;
     private final List<ConcurrentContentSigner> signers;
 
-    private final X509CertificateHolder certificateHolder;
+    private final X509CertificateHolder bcCertificate;
     private final X509Certificate certificate;
+    private final X509CertificateHolder[] bcCertificateChain;
     private final X509Certificate[] certificateChain;
 
     private final X500Name responderId;
@@ -74,11 +75,29 @@ class ResponderSigner
         ParamChecker.assertNotEmpty("signers", signers);
 
         this.signers = signers;
-        this.certificateChain = signers.get(0).getCertificateChain();
+        X509Certificate[] _certificateChain = signers.get(0).getCertificateChain();
+        int n = _certificateChain.length;
+        if(n > 1)
+        {
+            X509Certificate c = _certificateChain[n - 1];
+            if(c.getIssuerX500Principal().equals(c.getSubjectX500Principal()))
+            {
+                n--;
+            }
+        }
+        this.certificateChain = new X509Certificate[n];
+        System.arraycopy(_certificateChain, 0, this.certificateChain, 0, n);
+
         this.certificate = certificateChain[0];
 
-        this.certificateHolder = new X509CertificateHolder(this.certificate.getEncoded());
-        this.responderId = this.certificateHolder.getSubject();
+        this.bcCertificate = new X509CertificateHolder(this.certificate.getEncoded());
+        this.bcCertificateChain = new X509CertificateHolder[this.certificateChain.length];
+        for(int i = 0; i < certificateChain.length; i++)
+        {
+            this.bcCertificateChain[i] = new X509CertificateHolder(this.certificateChain[i].getEncoded());
+        }
+
+        this.responderId = this.bcCertificate.getSubject();
         algoSignerMap = new HashMap<>();
         for(ConcurrentContentSigner signer : signers)
         {
@@ -92,7 +111,7 @@ class ResponderSigner
         return signers.get(0);
     }
 
-    public ConcurrentContentSigner getSigner(ASN1Sequence preferredSigAlgs)
+    public ConcurrentContentSigner getSignerForPreferredSigAlgs(ASN1Sequence preferredSigAlgs)
     {
         if(preferredSigAlgs == null)
         {
@@ -147,9 +166,14 @@ class ResponderSigner
         return certificateChain;
     }
 
-    public X509CertificateHolder getCertificateHolder()
+    public X509CertificateHolder getBcCertificate()
     {
-        return certificateHolder;
+        return bcCertificate;
+    }
+
+    public X509CertificateHolder[] getBcCertificateChain()
+    {
+        return bcCertificateChain;
     }
 
     public boolean isHealthy()

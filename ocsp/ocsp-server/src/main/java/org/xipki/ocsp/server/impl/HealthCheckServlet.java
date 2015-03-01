@@ -60,16 +60,17 @@ public class HealthCheckServlet extends HttpServlet
 
     private static final String CT_RESPONSE = "application/json";
 
-    private OcspResponder responder;
+    private OcspServer server;
 
     public HealthCheckServlet()
     {
     }
 
-    public void setResponder(OcspResponder responder)
+    public void setServer(OcspServer server)
     {
-        this.responder = responder;
+        this.server = server;
     }
+
     @Override
     protected void doGet(HttpServletRequest request,
             HttpServletResponse response)
@@ -78,15 +79,30 @@ public class HealthCheckServlet extends HttpServlet
         response.setHeader("Access-Control-Allow-Origin", "*");
         try
         {
-            if(responder == null)
+            if(server == null)
             {
-                LOG.error("responder in servlet not configured");
+                LOG.error("server in servlet not configured");
                 response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
                 response.setContentLength(0);
                 return;
             }
 
-            HealthCheckResult healthResult = responder.healthCheck();
+            ResponderAndRelativeUri r = server.getResponderAndRelativeUri(request);
+            if(r == null)
+            {
+                response.sendError(HttpServletResponse.SC_NOT_FOUND);
+                return;
+            }
+
+            if(r.getRelativeUri() != null && r.getRelativeUri().isEmpty() == false)
+            {
+                response.sendError(HttpServletResponse.SC_NOT_FOUND);
+                return;
+            }
+
+            Responder responder = r.getResponder();
+
+            HealthCheckResult healthResult = server.healthCheck(responder);
             if (healthResult.isHealthy())
             {
                 response.setStatus(HttpServletResponse.SC_OK);
