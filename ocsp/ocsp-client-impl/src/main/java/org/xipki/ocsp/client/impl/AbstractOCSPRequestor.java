@@ -66,9 +66,13 @@ import org.bouncycastle.cert.ocsp.OCSPResp;
 import org.bouncycastle.operator.ContentSigner;
 import org.bouncycastle.operator.DigestCalculator;
 import org.xipki.common.SecurityUtil;
+import org.xipki.ocsp.client.api.InvalidOCSPResponseException;
+import org.xipki.ocsp.client.api.OCSPNonceUnmatchedException;
 import org.xipki.ocsp.client.api.OCSPRequestor;
 import org.xipki.ocsp.client.api.OCSPRequestorException;
+import org.xipki.ocsp.client.api.OCSPResponseException;
 import org.xipki.ocsp.client.api.RequestOptions;
+import org.xipki.ocsp.client.api.ResponderUnreachableException;
 import org.xipki.security.api.ConcurrentContentSigner;
 import org.xipki.security.api.NoIdleSignerException;
 import org.xipki.security.api.SecurityFactory;
@@ -79,7 +83,6 @@ import org.xipki.security.api.SecurityFactory;
 
 public abstract class AbstractOCSPRequestor implements OCSPRequestor
 {
-
     private SecurityFactory securityFactory;
 
     private final Object signerLock = new Object();
@@ -98,49 +101,61 @@ public abstract class AbstractOCSPRequestor implements OCSPRequestor
     }
 
     @Override
-    public OCSPResp ask(X509Certificate caCert, X509Certificate cert, URL responderUrl,
+    public OCSPResp ask(X509Certificate issuerCert, X509Certificate cert, URL responderUrl,
             RequestOptions requestOptions)
-    throws OCSPRequestorException
+    throws OCSPResponseException, OCSPRequestorException
     {
-        if(caCert.getSubjectX500Principal().equals(cert.getIssuerX500Principal()) == false)
+        try
         {
-            throw new IllegalArgumentException("cert and caCert do not match");
+            if(SecurityUtil.issues(issuerCert, cert) == false)
+            {
+                throw new IllegalArgumentException("cert and issuerCert do not match");
+            }
+        } catch (CertificateEncodingException e)
+        {
+            throw new OCSPRequestorException(e.getMessage(), e);
         }
 
-        return ask(caCert, new BigInteger[]{cert.getSerialNumber()}, responderUrl, requestOptions);
+        return ask(issuerCert, new BigInteger[]{cert.getSerialNumber()}, responderUrl, requestOptions);
     }
 
     @Override
-    public OCSPResp ask(X509Certificate caCert, X509Certificate[] certs, URL responderUrl,
+    public OCSPResp ask(X509Certificate issuerCert, X509Certificate[] certs, URL responderUrl,
             RequestOptions requestOptions)
-    throws OCSPRequestorException
+    throws OCSPResponseException, OCSPRequestorException
     {
         BigInteger[] serialNumbers = new BigInteger[certs.length];
         for(int i = 0; i < certs.length; i++)
         {
             X509Certificate cert = certs[i];
-            if(caCert.getSubjectX500Principal().equals(cert.getIssuerX500Principal()) == false)
+            try
             {
-                throw new IllegalArgumentException("cert at index " + i + " and caCert do not match");
+                if(SecurityUtil.issues(issuerCert, cert) == false)
+                {
+                    throw new IllegalArgumentException("cert at index " + i + " and issuerCert do not match");
+                }
+            } catch (CertificateEncodingException e)
+            {
+                throw new OCSPRequestorException(e.getMessage(), e);
             }
             serialNumbers[i++] = cert.getSerialNumber();
         }
 
-        return ask(caCert, serialNumbers, responderUrl, requestOptions);
+        return ask(issuerCert, serialNumbers, responderUrl, requestOptions);
     }
 
     @Override
-    public OCSPResp ask(X509Certificate caCert, BigInteger serialNumber, URL responderUrl,
+    public OCSPResp ask(X509Certificate issuerCert, BigInteger serialNumber, URL responderUrl,
             RequestOptions requestOptions)
-    throws OCSPRequestorException
+    throws OCSPResponseException, OCSPRequestorException
     {
-        return ask(caCert, new BigInteger[]{serialNumber}, responderUrl, requestOptions);
+        return ask(issuerCert, new BigInteger[]{serialNumber}, responderUrl, requestOptions);
     }
 
     @Override
-    public OCSPResp ask(X509Certificate caCert, BigInteger[] serialNumbers, URL responderUrl,
+    public OCSPResp ask(X509Certificate issuerCert, BigInteger[] serialNumbers, URL responderUrl,
             RequestOptions requestOptions)
-    throws OCSPRequestorException
+    throws OCSPResponseException, OCSPRequestorException
     {
         if(requestOptions == null)
         {
@@ -150,40 +165,73 @@ public abstract class AbstractOCSPRequestor implements OCSPRequestor
         byte[] nonce = null;
         if(requestOptions.isUseNonce())
         {
-            nonce = nextNonce();
+            nonce = nextNonce(requestOptions.getNonceLen());
         }
 
-        OCSPReq ocspReq = buildRequest(caCert, serialNumbers, nonce, requestOptions);
+        OCSPReq ocspReq = buildRequest(issuerCert, serialNumbers, nonce, requestOptions);
+        byte[] encodedReq;
         try
         {
-            byte[] encodedReq = ocspReq.getEncoded();
-            byte[] encodedResp = send(encodedReq, responderUrl, requestOptions);
-            OCSPResp ocspResp = new OCSPResp(encodedResp);
-
-            Object respObject = ocspResp.getResponseObject();
-            if(ocspResp.getStatus() == 0 && respObject instanceof BasicOCSPResp)
-            {
-                BasicOCSPResp basicOCSPResp = (BasicOCSPResp) respObject;
-                Extension nonceExtn = basicOCSPResp.getExtension(OCSPObjectIdentifiers.id_pkix_ocsp_nonce);
-
-                if(nonce != null)
-                {
-                    if(nonceExtn == null)
-                    {
-                        throw new OCSPRequestorException("No nonce is contained in response");
-                    }
-                    if(Arrays.equals(nonce, nonceExtn.getExtnValue().getOctets()) == false)
-                    {
-                        throw new OCSPRequestorException("The nonce in response does not match the one in request");
-                    }
-                }
-            }
-
-            return ocspResp;
-        } catch (IOException | OCSPException e)
+            encodedReq = ocspReq.getEncoded();
+        } catch (IOException e)
         {
-            throw new OCSPRequestorException(e.getClass().getName() + ": " + e.getMessage(), e);
+            throw new OCSPRequestorException("could not encode OCSP request: " + e.getMessage(), e);
         }
+
+        byte[] encodedResp;
+        try
+        {
+            encodedResp = send(encodedReq, responderUrl, requestOptions);
+        } catch (IOException e)
+        {
+            throw new ResponderUnreachableException("IOException: " + e.getMessage(), e);
+        }
+
+        OCSPResp ocspResp;
+        try
+        {
+            ocspResp = new OCSPResp(encodedResp);
+        } catch (IOException e)
+        {
+            throw new InvalidOCSPResponseException("IOException: " + e.getMessage(), e);
+        }
+
+        Object respObject;
+        try
+        {
+            respObject = ocspResp.getResponseObject();
+        } catch (OCSPException e)
+        {
+            throw new InvalidOCSPResponseException("responseObject is invalid");
+        }
+
+        if(ocspResp.getStatus() != 0)
+        {
+            return ocspResp;
+        }
+
+        if(respObject instanceof BasicOCSPResp == false)
+        {
+            return ocspResp;
+        }
+
+        BasicOCSPResp basicOCSPResp = (BasicOCSPResp) respObject;
+        Extension nonceExtn = basicOCSPResp.getExtension(OCSPObjectIdentifiers.id_pkix_ocsp_nonce);
+
+        if(nonce != null)
+        {
+            if(nonceExtn == null)
+            {
+                throw new OCSPNonceUnmatchedException(nonce, null);
+            }
+            byte[] receivedNonce = nonceExtn.getExtnValue().getOctets();
+            if(Arrays.equals(nonce, receivedNonce) == false)
+            {
+                throw new OCSPNonceUnmatchedException(nonce, receivedNonce);
+            }
+        }
+
+        return ocspResp;
     }
 
     private OCSPReq buildRequest(X509Certificate caCert, BigInteger[] serialNumbers, byte[] nonce,
@@ -330,9 +378,9 @@ public abstract class AbstractOCSPRequestor implements OCSPRequestor
         }
     }
 
-    private byte[] nextNonce()
+    private byte[] nextNonce(int nonceLen)
     {
-        byte[] nonce = new byte[20];
+        byte[] nonce = new byte[nonceLen];
         random.nextBytes(nonce);
         return nonce;
     }

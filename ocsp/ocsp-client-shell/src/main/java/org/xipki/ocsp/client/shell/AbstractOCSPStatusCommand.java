@@ -50,13 +50,17 @@ import org.xipki.ocsp.client.api.RequestOptions;
 
 public abstract class AbstractOCSPStatusCommand extends XipkiOsgiCommandSupport
 {
-    @Option(name = "-cacert",
-            required = true, description = "Required. CA certificate file")
-    protected String caCertFile;
+    @Option(name = "-issuer",
+            required = true, description = "Required. Issuer certificate file")
+    protected String issuerCertFile;
 
     @Option(name = "-nonce",
             description = "Use nonce")
     protected Boolean useNonce = Boolean.FALSE;
+
+    @Option(name = "-nonceLen",
+            description = "nonce length in octects")
+    protected Integer nonceLen;
 
     @Option(name = "-hash",
             required = false, description = "Hash algorithm name")
@@ -106,6 +110,10 @@ public abstract class AbstractOCSPStatusCommand extends XipkiOsgiCommandSupport
 
         RequestOptions options = new RequestOptions();
         options.setUseNonce(useNonce.booleanValue());
+        if(nonceLen != null)
+        {
+            options.setNonceLen(nonceLen);
+        }
         options.setHashAlgorithmId(hashAlgoOid);
         options.setSignRequest(signRequest.booleanValue());
         options.setUseHttpGetForRequest(useHttpGetForSmallRequest.booleanValue());

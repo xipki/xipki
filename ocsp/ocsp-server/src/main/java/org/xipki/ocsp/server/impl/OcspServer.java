@@ -1429,7 +1429,13 @@ public class OcspServer
                 }
             }
 
-            explicitCertificateChain = SecurityUtil.buildCertPath(explicitResponderCert, caCerts);
+            try
+            {
+                explicitCertificateChain = SecurityUtil.buildCertPath(explicitResponderCert, caCerts);
+            } catch (CertificateEncodingException e)
+            {
+                throw new ConfigurationException(e.getMessage(), e);
+            }
         }
 
         String responderSignerType = m.getType();

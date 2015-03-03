@@ -101,6 +101,7 @@ public class RequestOptions
 
     private boolean signRequest = false;
     private boolean useNonce = true;
+    private int nonceLen = 8;
     private boolean useHttpGetForRequest = false;
     private ASN1ObjectIdentifier hashAlgorithmId = NISTObjectIdentifiers.id_sha256;
     private List<AlgorithmIdentifier> preferredSignatureAlgorithms;
@@ -117,6 +118,20 @@ public class RequestOptions
     public void setUseNonce(boolean useNonce)
     {
         this.useNonce = useNonce;
+    }
+
+    public int getNonceLen()
+    {
+        return nonceLen;
+    }
+
+    public void setNonceLen(int nonceLen)
+    {
+        if(nonceLen < 1)
+        {
+            throw new IllegalArgumentException("invalid nonceLen " + nonceLen);
+        }
+        this.nonceLen = nonceLen;
     }
 
     public ASN1ObjectIdentifier getHashAlgorithmId()

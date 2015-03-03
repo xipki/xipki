@@ -62,6 +62,7 @@ import org.bouncycastle.cert.ocsp.OCSPResp;
 import org.bouncycastle.cert.ocsp.RevokedStatus;
 import org.bouncycastle.cert.ocsp.SingleResp;
 import org.bouncycastle.cert.ocsp.UnknownStatus;
+import org.bouncycastle.jce.provider.X509CertificateObject;
 import org.bouncycastle.operator.ContentVerifierProvider;
 import org.xipki.common.CRLReason;
 import org.xipki.common.IoUtil;
@@ -80,6 +81,10 @@ import org.xipki.security.SignerUtil;
 @Command(scope = "xipki-qa", name = "ocsp-status", description="Request certificate status (QA)")
 public class OCSPQAStatusCommand extends AbstractOCSPStatusCommand
 {
+    @Option(name = "-respIssuer",
+            required = false, description = "Certificate file of the responder's issuer")
+    protected String respIssuerFile;
+
     @Option(name = "-serial",
             description = "Serial number")
     protected String serialNumber;
@@ -127,7 +132,7 @@ public class OCSPQAStatusCommand extends AbstractOCSPStatusCommand
         Occurrence certhashOccurrence = Occurrence.getOccurrence(certhashOccurrenceText);
         Occurrence nonceOccurrence = Occurrence.getOccurrence(nonceOccurrenceText);
 
-        X509Certificate caCert = SecurityUtil.parseCert(caCertFile);
+        X509Certificate issuerCert = SecurityUtil.parseCert(issuerCertFile);
 
         byte[] encodedCert = null;
         BigInteger sn;
@@ -136,16 +141,7 @@ public class OCSPQAStatusCommand extends AbstractOCSPStatusCommand
             encodedCert = IoUtil.read(certFile);
             X509Certificate cert = SecurityUtil.parseCert(certFile);
 
-            boolean issuedByCA = false;
-            if(cert.getIssuerX500Principal().equals(caCert.getSubjectX500Principal()))
-            {
-                if(Arrays.equals(SecurityUtil.extractSKI(caCert), SecurityUtil.extractAKI(cert)))
-                {
-                    issuedByCA = true;
-                }
-            }
-
-            if(issuedByCA == false)
+            if(SecurityUtil.issues(issuerCert, cert) == false)
             {
                 err("certificate " + certFile + " is not issued by the given CA");
                 return null;
@@ -173,11 +169,17 @@ public class OCSPQAStatusCommand extends AbstractOCSPStatusCommand
             return null;
         }
 
+        X509Certificate respIssuer  = null;
+        if(respIssuerFile != null)
+        {
+            respIssuer = SecurityUtil.parseCert(IoUtil.expandFilepath(respIssuerFile));
+        }
+
         URL serverUrl = new URL(serverURL);
 
         RequestOptions options = getRequestOptions();
 
-        OCSPResp response = requestor.ask(caCert, sn, serverUrl, options);
+        OCSPResp response = requestor.ask(issuerCert, sn, serverUrl, options);
         BasicOCSPResp basicResp = OCSPUtils.extractBasicOCSPResp(response);
 
         // check the signature if available
@@ -185,26 +187,6 @@ public class OCSPQAStatusCommand extends AbstractOCSPStatusCommand
         {
             throw new Exception("Response is not signed");
         }
-
-        X509CertificateHolder[] responderCerts = basicResp.getCerts();
-        if(responderCerts == null || responderCerts.length < 1)
-        {
-            throw new Exception("No responder certificate is contained in the response");
-        }
-        else
-        {
-            PublicKey responderPubKey = KeyUtil.generatePublicKey(responderCerts[0].getSubjectPublicKeyInfo());
-            ContentVerifierProvider cvp = KeyUtil.getContentVerifierProvider(responderPubKey);
-            boolean sigValid = basicResp.isSignatureValid(cvp);
-            if(sigValid == false)
-            {
-                throw new Exception("Response is equipped with invalid signature");
-            }
-        }
-
-        boolean extendedRevoke = basicResp.getExtension(OCSPRequestor.id_pkix_ocsp_extendedRevoke) != null;
-        Extension nonceExtn = basicResp.getExtension(OCSPObjectIdentifiers.id_pkix_ocsp_nonce);
-        checkOccurrence("nonce", nonceExtn, nonceOccurrence);
 
         SingleResp[] singleResponses = basicResp.getResponses();
 
@@ -220,6 +202,44 @@ public class OCSPQAStatusCommand extends AbstractOCSPStatusCommand
         }
 
         SingleResp singleResp = singleResponses[0];
+        X509CertificateHolder[] responderCerts = basicResp.getCerts();
+        if(responderCerts == null || responderCerts.length < 1)
+        {
+            throw new Exception("No responder certificate is contained in the response");
+        }
+
+        X509CertificateHolder respSigner = responderCerts[0];
+
+        if(respSigner.isValidOn(singleResp.getThisUpdate()) == false)
+        {
+            throw new Exception("Responder certificate is not valid on " + singleResp.getThisUpdate());
+        }
+
+        PublicKey responderPubKey = KeyUtil.generatePublicKey(responderCerts[0].getSubjectPublicKeyInfo());
+        ContentVerifierProvider cvp = KeyUtil.getContentVerifierProvider(responderPubKey);
+        boolean sigValid = basicResp.isSignatureValid(cvp);
+        if(sigValid == false)
+        {
+            throw new Exception("Response is equipped with invalid signature");
+        }
+
+        if(respIssuer != null)
+        {
+            X509Certificate jceRespSigner = new X509CertificateObject(respSigner.toASN1Structure());
+            if(SecurityUtil.issues(respIssuer, jceRespSigner))
+            {
+                jceRespSigner.verify(respIssuer.getPublicKey());
+            }
+            else
+            {
+                throw new Exception("Responder signer is not trusted");
+            }
+        }
+
+        boolean extendedRevoke = basicResp.getExtension(OCSPRequestor.id_pkix_ocsp_extendedRevoke) != null;
+        Extension nonceExtn = basicResp.getExtension(OCSPObjectIdentifiers.id_pkix_ocsp_nonce);
+        checkOccurrence("nonce", nonceExtn, nonceOccurrence);
+
         CertificateStatus singleCertStatus = singleResp.getCertStatus();
 
         CertStatus status ;

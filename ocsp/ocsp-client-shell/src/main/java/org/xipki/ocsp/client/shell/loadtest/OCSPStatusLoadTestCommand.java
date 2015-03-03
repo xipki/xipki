@@ -139,17 +139,17 @@ public class OCSPStatusLoadTestCommand extends AbstractOCSPStatusCommand
         startMsg.append("Threads:        ").append(numThreads).append("\n");
         startMsg.append("Duration:       ").append(AbstractLoadTest.formatTime(durationInSecond).trim()).append("\n");
         startMsg.append("Serial numbers: ").append(this.serialNumbers).append("\n");
-        startMsg.append("CA cert:        ").append(caCertFile).append("\n");
+        startMsg.append("Issuer cert:    ").append(issuerCertFile).append("\n");
         startMsg.append("Server URL:     ").append(serverUrl.toString()).append("\n");
         startMsg.append("Hash:           ").append(hashAlgo).append("\n");
         System.out.print(startMsg.toString());
 
-        X509Certificate caCert = SecurityUtil.parseCert(caCertFile);
+        X509Certificate issuerCert = SecurityUtil.parseCert(issuerCertFile);
 
         RequestOptions options = getRequestOptions();
 
         OcspLoadTest loadTest = new OcspLoadTest(requestor, serialNumbers,
-                caCert, serverUrl, options);
+                issuerCert, serverUrl, options);
         loadTest.setDuration(durationInSecond);
         loadTest.setThreads(numThreads);
         loadTest.test();

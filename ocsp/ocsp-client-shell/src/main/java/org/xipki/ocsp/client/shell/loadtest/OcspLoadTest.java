@@ -53,6 +53,7 @@ import org.xipki.common.AbstractLoadTest;
 import org.xipki.common.ParamChecker;
 import org.xipki.ocsp.client.api.OCSPRequestor;
 import org.xipki.ocsp.client.api.OCSPRequestorException;
+import org.xipki.ocsp.client.api.OCSPResponseException;
 import org.xipki.ocsp.client.api.RequestOptions;
 import org.xipki.ocsp.client.shell.OCSPUtils;
 
@@ -132,6 +133,10 @@ public class OcspLoadTest extends AbstractLoadTest
             } catch (OCSPRequestorException e)
             {
                 LOG.warn("OCSPRequestorException: {}", e.getMessage());
+                return false;
+            } catch (OCSPResponseException e)
+            {
+                LOG.warn("OCSPResponseException: {}", e.getMessage());
                 return false;
             } catch (Throwable t)
             {
