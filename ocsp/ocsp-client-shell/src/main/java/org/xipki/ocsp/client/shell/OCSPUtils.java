@@ -38,8 +38,8 @@ package org.xipki.ocsp.client.shell;
 import org.bouncycastle.cert.ocsp.BasicOCSPResp;
 import org.bouncycastle.cert.ocsp.OCSPException;
 import org.bouncycastle.cert.ocsp.OCSPResp;
-import org.xipki.ocsp.client.api.OCSPRequestorException;
-import org.xipki.ocsp.client.api.OCSPResponseNotSuccessfullException;
+import org.xipki.ocsp.client.api.InvalidOCSPResponseException;
+import org.xipki.ocsp.client.api.OCSPResponseException;
 
 /**
  * @author Lijun Liao
@@ -48,10 +48,10 @@ import org.xipki.ocsp.client.api.OCSPResponseNotSuccessfullException;
 public class OCSPUtils
 {
     public static BasicOCSPResp extractBasicOCSPResp(OCSPResp response)
-    throws OCSPRequestorException
+    throws OCSPResponseException
     {
-        int statusCode = response.getStatus();
-        if(statusCode == 0)
+        int status = response.getStatus();
+        if(status == 0)
         {
             BasicOCSPResp basicOCSPResp;
             try
@@ -59,13 +59,13 @@ public class OCSPUtils
                 basicOCSPResp = (BasicOCSPResp) response.getResponseObject();
             } catch (OCSPException e)
             {
-                throw new OCSPRequestorException(e.getMessage(), e);
+                throw new InvalidOCSPResponseException(e.getMessage(), e);
             }
             return basicOCSPResp;
         }
         else
         {
-            throw new OCSPResponseNotSuccessfullException(statusCode);
+            throw new OCSPResponseUnsuccessfulException(status);
         }
     }
 }

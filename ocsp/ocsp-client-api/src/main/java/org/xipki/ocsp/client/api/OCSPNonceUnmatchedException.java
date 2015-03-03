@@ -35,37 +35,43 @@
 
 package org.xipki.ocsp.client.api;
 
-import java.math.BigInteger;
-import java.net.URL;
-import java.security.cert.X509Certificate;
-
-import org.bouncycastle.asn1.ASN1ObjectIdentifier;
-import org.bouncycastle.asn1.ocsp.OCSPObjectIdentifiers;
-import org.bouncycastle.cert.ocsp.OCSPResp;
+import org.bouncycastle.util.encoders.Hex;
 
 /**
  * @author Lijun Liao
  */
 
-public interface OCSPRequestor
+@SuppressWarnings("serial")
+public class OCSPNonceUnmatchedException extends OCSPResponseException
 {
-    public static final ASN1ObjectIdentifier id_pkix_ocsp_prefSigAlgs = OCSPObjectIdentifiers.id_pkix_ocsp.branch("8");
-    public static final ASN1ObjectIdentifier id_pkix_ocsp_extendedRevoke = OCSPObjectIdentifiers.id_pkix_ocsp.branch("9");
+    public OCSPNonceUnmatchedException(byte[] expected, byte[] is)
+    {
+        super(buildMessage(expected, is));
+    }
 
-    OCSPResp ask(X509Certificate issuerCert, X509Certificate cert,
-            URL responderUrl, RequestOptions requestOptions)
-    throws OCSPResponseException, OCSPRequestorException;
-
-    OCSPResp ask(X509Certificate issuerCert, X509Certificate[] certs,
-            URL responderUrl, RequestOptions requestOptions)
-    throws OCSPResponseException, OCSPRequestorException;
-
-    OCSPResp ask(X509Certificate issuerCert, BigInteger serialNumber,
-            URL responderUrl, RequestOptions requestOptions)
-    throws OCSPResponseException, OCSPRequestorException;
-
-    OCSPResp ask(X509Certificate issuerCert, BigInteger[] serialNumbers,
-            URL responderUrl, RequestOptions requestOptions)
-    throws OCSPResponseException, OCSPRequestorException;
+    private static String buildMessage(byte[] expected, byte[] is)
+    {
+        StringBuilder sb = new StringBuilder(100);
+        sb.append("nonce unmatch (received ");
+        if(is == null || is.length == 0)
+        {
+            sb.append("none");
+        }
+        else
+        {
+            sb.append(Hex.toHexString(is));
+        }
+        sb.append(", but expected ");
+        if(expected == null || expected.length == 0)
+        {
+            sb.append("nonce");
+        }
+        else
+        {
+            sb.append(Hex.toHexString(expected));
+        }
+        sb.append(")");
+        return sb.toString();
+    }
 
 }

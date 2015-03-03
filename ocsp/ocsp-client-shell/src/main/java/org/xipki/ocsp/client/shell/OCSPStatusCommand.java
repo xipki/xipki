@@ -39,6 +39,7 @@ import java.math.BigInteger;
 import java.net.URL;
 import java.security.MessageDigest;
 import java.security.PublicKey;
+import java.security.SignatureException;
 import java.security.cert.X509Certificate;
 import java.util.Arrays;
 import java.util.Date;
@@ -66,6 +67,7 @@ import org.bouncycastle.cert.ocsp.OCSPResp;
 import org.bouncycastle.cert.ocsp.RevokedStatus;
 import org.bouncycastle.cert.ocsp.SingleResp;
 import org.bouncycastle.cert.ocsp.UnknownStatus;
+import org.bouncycastle.jce.provider.X509CertificateObject;
 import org.bouncycastle.operator.ContentVerifierProvider;
 import org.bouncycastle.util.encoders.Hex;
 import org.xipki.common.CRLReason;
@@ -83,6 +85,10 @@ import org.xipki.security.SignerUtil;
 @Command(scope = "xipki-ocsp", name = "status", description="Request certificate status")
 public class OCSPStatusCommand extends AbstractOCSPStatusCommand
 {
+    @Option(name = "-respIssuer",
+            required = false, description = "Certificate file of the responder's issuer")
+    protected String respIssuerFile;
+
     @Option(name = "-serial",
             multiValued = true,
             description = "Serial number")
@@ -121,7 +127,7 @@ public class OCSPStatusCommand extends AbstractOCSPStatusCommand
             return null;
         }
 
-        X509Certificate caCert = SecurityUtil.parseCert(caCertFile);
+        X509Certificate issuerCert = SecurityUtil.parseCert(issuerCertFile);
 
         Map<BigInteger, byte[]> encodedCerts = null;
         List<BigInteger> sns = new LinkedList<>();
@@ -135,18 +141,9 @@ public class OCSPStatusCommand extends AbstractOCSPStatusCommand
                 byte[] encodedCert = IoUtil.read(certFile);
                 X509Certificate cert = SecurityUtil.parseCert(certFile);
 
-                boolean issuedByCA = false;
-                if(cert.getIssuerX500Principal().equals(caCert.getSubjectX500Principal()))
+                if(SecurityUtil.issues(issuerCert, cert) == false)
                 {
-                    if(Arrays.equals(SecurityUtil.extractSKI(caCert), SecurityUtil.extractAKI(cert)))
-                    {
-                        issuedByCA = true;
-                    }
-                }
-
-                if(issuedByCA == false)
-                {
-                    err("certificate " + certFile + " is not issued by the given CA");
+                    err("certificate " + certFile + " is not issued by the given issuer");
                     return null;
                 }
 
@@ -192,45 +189,18 @@ public class OCSPStatusCommand extends AbstractOCSPStatusCommand
             return null;
         }
 
+        X509Certificate respIssuer  = null;
+        if(respIssuerFile != null)
+        {
+            respIssuer = SecurityUtil.parseCert(IoUtil.expandFilepath(respIssuerFile));
+        }
+
         URL serverUrl = new URL(serverURL);
 
         RequestOptions options = getRequestOptions();
 
-        OCSPResp response = requestor.ask(caCert, sns.toArray(new BigInteger[0]), serverUrl, options);
+        OCSPResp response = requestor.ask(issuerCert, sns.toArray(new BigInteger[0]), serverUrl, options);
         BasicOCSPResp basicResp = OCSPUtils.extractBasicOCSPResp(response);
-
-        // check the signature if available
-        if(null == basicResp.getSignature())
-        {
-            out("Response is not signed");
-        }
-        else
-        {
-            X509CertificateHolder[] responderCerts = basicResp.getCerts();
-            if(responderCerts == null || responderCerts.length < 1)
-            {
-                err("No responder certificate is contained in the response");
-            }
-            else
-            {
-                PublicKey responderPubKey = KeyUtil.generatePublicKey(responderCerts[0].getSubjectPublicKeyInfo());
-                ContentVerifierProvider cvp = KeyUtil.getContentVerifierProvider(responderPubKey);
-                boolean sigValid = basicResp.isSignatureValid(cvp);
-                if(sigValid == false)
-                {
-                    err("Response is equipped with invalid signature");
-                }
-                else
-                {
-                    err("Response is equipped with valid signature");
-                }
-
-                if(verbose.booleanValue())
-                {
-                    out("Responder is " + SecurityUtil.getRFC4519Name(responderCerts[0].getSubject()));
-                }
-            }
-        }
 
         boolean extendedRevoke = basicResp.getExtension(OCSPRequestor.id_pkix_ocsp_extendedRevoke) != null;
 
@@ -248,6 +218,85 @@ public class OCSPStatusCommand extends AbstractOCSPStatusCommand
             err("Received status with " + n +
                     " single responses from server, but " + sns.size() + " were requested");
             return null;
+        }
+
+        Date[] thisUpdates = new Date[n];
+        for(int i = 0; i < n; i++)
+        {
+            thisUpdates[i] = singleResponses[i].getThisUpdate();
+        }
+
+        // check the signature if available
+        if(null == basicResp.getSignature())
+        {
+            out("Response is not signed");
+        }
+        else
+        {
+            X509CertificateHolder[] responderCerts = basicResp.getCerts();
+            if(responderCerts == null || responderCerts.length < 1)
+            {
+                err("No responder certificate is contained in the response");
+            }
+            else
+            {
+                X509CertificateHolder respSigner = responderCerts[0];
+                boolean validOn = true;
+                for(Date thisUpdate : thisUpdates)
+                {
+                    validOn = respSigner.isValidOn(thisUpdate);
+                    if(validOn == false)
+                    {
+                        err("Responder certificate is not valid on " + thisUpdate);
+                        break;
+                    }
+                }
+
+                if(validOn)
+                {
+                    PublicKey responderPubKey = KeyUtil.generatePublicKey(respSigner.getSubjectPublicKeyInfo());
+                    ContentVerifierProvider cvp = KeyUtil.getContentVerifierProvider(responderPubKey);
+                    boolean sigValid = basicResp.isSignatureValid(cvp);
+
+                    if(sigValid == false)
+                    {
+                        err("Response is equipped with invalid signature");
+                    }
+                    else
+                    {
+                        // verify the OCSPResponse signer
+                        if(respIssuer != null)
+                        {
+                            boolean certValid = true;
+                            X509Certificate jceRespSigner = new X509CertificateObject(respSigner.toASN1Structure());
+                            if(SecurityUtil.issues(respIssuer, jceRespSigner))
+                            {
+                                try
+                                {
+                                    jceRespSigner.verify(respIssuer.getPublicKey());
+                                }catch(SignatureException e)
+                                {
+                                    certValid = false;
+                                }
+                            }
+
+                            if(certValid == false)
+                            {
+                                err("Response is equipped with valid signature but the OCSP signer is not trusted");
+                            }
+                        }
+                        else
+                        {
+                            out("Response is equipped with valid signature");
+                        }
+                    }
+                }
+
+                if(verbose.booleanValue())
+                {
+                    out("Responder is " + SecurityUtil.getRFC4519Name(responderCerts[0].getSubject()));
+                }
+            }
         }
 
         for(int i = 0; i < n; i++)

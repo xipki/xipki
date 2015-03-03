@@ -56,6 +56,7 @@ import java.security.cert.X509CRL;
 import java.security.cert.X509Certificate;
 import java.security.spec.InvalidKeySpecException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -441,6 +442,7 @@ public class SecurityUtil
     }
 
     public static X509Certificate[] buildCertPath(X509Certificate cert, Set<? extends Certificate> certs)
+    throws CertificateEncodingException
     {
         List<X509Certificate> certChain = new LinkedList<>();
         certChain.add(cert);
@@ -466,6 +468,7 @@ public class SecurityUtil
     }
 
     public static X509Certificate[] buildCertPath(X509Certificate cert, Certificate[] certs)
+    throws CertificateEncodingException
     {
         Set<Certificate> setOfCerts = new HashSet<>();
         for(Certificate entry : certs)
@@ -478,6 +481,7 @@ public class SecurityUtil
 
     private static X509Certificate getCaCertOf(X509Certificate cert,
             Set<? extends Certificate> caCerts)
+    throws CertificateEncodingException
     {
         if(isSelfSigned(cert))
         {
@@ -558,8 +562,44 @@ public class SecurityUtil
     }
 
     public static boolean isSelfSigned(X509Certificate cert)
+    throws CertificateEncodingException
     {
-        return cert.getSubjectX500Principal().equals(cert.getIssuerX500Principal());
+        boolean equals = cert.getSubjectX500Principal().equals(cert.getIssuerX500Principal());
+        if(equals)
+        {
+            byte[] ski = extractSKI(cert);
+            byte[] aki = extractAKI(cert);
+            if(ski != null && aki != null)
+            {
+                equals = Arrays.equals(ski, aki);
+            }
+        }
+        return equals;
+    }
+
+    public static boolean issues(X509Certificate issuerCert, X509Certificate cert)
+    throws CertificateEncodingException
+    {
+        boolean issues = issuerCert.getSubjectX500Principal().equals(cert.getIssuerX500Principal());
+        if(issues)
+        {
+            byte[] ski = extractSKI(issuerCert);
+            byte[] aki = extractAKI(cert);
+            if(ski != null)
+            {
+                issues = Arrays.equals(ski, aki);
+            }
+        }
+
+        if(issues)
+        {
+            long issuerNotBefore = issuerCert.getNotBefore().getTime();
+            long issuerNotAfter = issuerCert.getNotAfter().getTime();
+            long notBefore = cert.getNotBefore().getTime();
+            issues = notBefore <= issuerNotAfter && notBefore >= issuerNotBefore;
+        }
+
+        return issues;
     }
 
     public static byte[] leftmost(byte[] bytes, int bitCount)

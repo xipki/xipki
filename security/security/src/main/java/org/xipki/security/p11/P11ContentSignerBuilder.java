@@ -40,6 +40,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.cert.Certificate;
+import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
 import java.security.interfaces.DSAPublicKey;
 import java.security.interfaces.ECPublicKey;
@@ -133,7 +134,13 @@ public class P11ContentSignerBuilder
             }
         }
 
-        this.certificateChain = SecurityUtil.buildCertPath(cert, caCerts);
+        try
+        {
+            this.certificateChain = SecurityUtil.buildCertPath(cert, caCerts);
+        } catch (CertificateEncodingException e)
+        {
+            throw new SignerException(e.getMessage(), e);
+        }
     }
 
     public ConcurrentContentSigner createSigner(
