@@ -35,37 +35,32 @@
 
 package org.xipki.ocsp.client.api;
 
-import java.math.BigInteger;
-import java.net.URL;
-import java.security.cert.X509Certificate;
-
-import org.bouncycastle.asn1.ASN1ObjectIdentifier;
-import org.bouncycastle.asn1.ocsp.OCSPObjectIdentifiers;
-import org.bouncycastle.cert.ocsp.OCSPResp;
-
 /**
  * @author Lijun Liao
  */
 
-public interface OCSPRequestor
+@SuppressWarnings("serial")
+public class InvalidOCSPResponseException extends OCSPResponseException
 {
-    public static final ASN1ObjectIdentifier id_pkix_ocsp_prefSigAlgs = OCSPObjectIdentifiers.id_pkix_ocsp.branch("8");
-    public static final ASN1ObjectIdentifier id_pkix_ocsp_extendedRevoke = OCSPObjectIdentifiers.id_pkix_ocsp.branch("9");
 
-    OCSPResp ask(X509Certificate issuerCert, X509Certificate cert,
-            URL responderUrl, RequestOptions requestOptions)
-    throws OCSPResponseException, OCSPRequestorException;
+    public InvalidOCSPResponseException()
+    {
+        super();
+    }
 
-    OCSPResp ask(X509Certificate issuerCert, X509Certificate[] certs,
-            URL responderUrl, RequestOptions requestOptions)
-    throws OCSPResponseException, OCSPRequestorException;
+    public InvalidOCSPResponseException(String message, Throwable cause)
+    {
+        super(message, cause);
+    }
 
-    OCSPResp ask(X509Certificate issuerCert, BigInteger serialNumber,
-            URL responderUrl, RequestOptions requestOptions)
-    throws OCSPResponseException, OCSPRequestorException;
+    public InvalidOCSPResponseException(String message)
+    {
+        super(message);
+    }
 
-    OCSPResp ask(X509Certificate issuerCert, BigInteger[] serialNumbers,
-            URL responderUrl, RequestOptions requestOptions)
-    throws OCSPResponseException, OCSPRequestorException;
+    public InvalidOCSPResponseException(Throwable cause)
+    {
+        super(cause);
+    }
 
 }

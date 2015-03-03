@@ -11,7 +11,8 @@
       </action>
       <optional-completers>
         <entry key="-cert" value-ref="filePathCompleter"/>
-        <entry key="-cacert" value-ref="filePathCompleter"/>
+        <entry key="-issuer" value-ref="filePathCompleter"/>
+        <entry key="-respIssuer" value-ref="filePathCompleter"/>
         <entry key="-expStatus" value-ref="certStatusCompleter"/>
         <entry key="-expNextupdate" value-ref="occurrenceCompleter"/>
         <entry key="-expCerthash" value-ref="occurrenceCompleter"/>

@@ -33,42 +33,38 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.ocsp.client.api;
+package org.xipki.ocsp.client.shell;
+
+import org.xipki.ocsp.client.api.OCSPResponseException;
 
 /**
  * @author Lijun Liao
  */
 
-public class OCSPResponseNotSuccessfullException extends OCSPRequestorException
+@SuppressWarnings("serial")
+public class OCSPResponseUnsuccessfulException extends OCSPResponseException
 {
-
-    private static final long serialVersionUID = 1L;
-    private final int statusCode;
-    private final String statusText;
-
-    public OCSPResponseNotSuccessfullException(int statusCode)
+    private int status;
+    public OCSPResponseUnsuccessfulException(int status)
     {
-        super("OCSPResponse with status " + statusCode + " (" + getOCSPResponseStatus(statusCode) + ")");
-        this.statusCode = statusCode;
-        this.statusText = getOCSPResponseStatus(statusCode);
+        super(getOCSPResponseStatus(status));
+        this.status = status;
     }
 
-    public int getStatusCode()
+    public int getStatus()
     {
-        return statusCode;
+        return status;
     }
 
     public String getStatusText()
     {
-        return statusText;
+        return getOCSPResponseStatus(status);
     }
 
     private static String getOCSPResponseStatus(int statusCode)
     {
         switch(statusCode)
         {
-        case 0:
-            return "successfull";
         case 1:
             return "malformedRequest";
         case 2:
