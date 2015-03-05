@@ -295,15 +295,15 @@ public abstract class P12KeypairGenerator
             this.cert = cert;
             this.key = key;
             // Due to bug in BC we must reparse the certificate from ByteArray
-            org.bouncycastle.asn1.x509.Certificate cert2;
+            /*org.bouncycastle.asn1.x509.Certificate cert2;
             try
             {
                 cert2 = org.bouncycastle.asn1.x509.Certificate.getInstance(cert.getEncoded());
             } catch (IOException e)
             {
                 throw new CertificateParsingException(e.getMessage(), e);
-            }
-            this.jceCert = new X509CertificateObject(cert2);
+            }*/
+            this.jceCert = new X509CertificateObject(cert.toASN1Structure());
         }
 
         public X509CertificateHolder getCert()
