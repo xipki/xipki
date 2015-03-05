@@ -40,7 +40,6 @@ import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.cert.Certificate;
-import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
 import java.security.interfaces.DSAPublicKey;
 import java.security.interfaces.ECPublicKey;
@@ -56,8 +55,8 @@ import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.operator.ContentSigner;
 import org.bouncycastle.operator.OperatorCreationException;
-import org.xipki.common.SecurityUtil;
 import org.xipki.common.ParamChecker;
+import org.xipki.common.SecurityUtil;
 import org.xipki.security.DefaultConcurrentContentSigner;
 import org.xipki.security.api.ConcurrentContentSigner;
 import org.xipki.security.api.SignerException;
@@ -134,13 +133,7 @@ public class P11ContentSignerBuilder
             }
         }
 
-        try
-        {
-            this.certificateChain = SecurityUtil.buildCertPath(cert, caCerts);
-        } catch (CertificateEncodingException e)
-        {
-            throw new SignerException(e.getMessage(), e);
-        }
+        this.certificateChain = SecurityUtil.buildCertPath(cert, caCerts);
     }
 
     public ConcurrentContentSigner createSigner(

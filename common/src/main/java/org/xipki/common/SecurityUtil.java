@@ -441,45 +441,78 @@ public class SecurityUtil
         return bytes;
     }
 
+    /**
+     * Cross certificate will not be considered
+     */
     public static X509Certificate[] buildCertPath(X509Certificate cert, Set<? extends Certificate> certs)
-    throws CertificateEncodingException
     {
         List<X509Certificate> certChain = new LinkedList<>();
         certChain.add(cert);
-        if(certs != null && isSelfSigned(cert) == false)
+        try
         {
-            while(true)
+            if(certs != null && isSelfSigned(cert) == false)
             {
-                X509Certificate caCert = getCaCertOf(certChain.get(certChain.size() - 1), certs);
-                if(caCert == null)
+                while(true)
                 {
-                    break;
+                    X509Certificate caCert = getCaCertOf(certChain.get(certChain.size() - 1), certs);
+                    if(caCert == null)
+                    {
+                        break;
+                    }
+                    certChain.add(caCert);
+                    if(isSelfSigned(caCert))
+                    {
+                        // reaches root self-signed certificate
+                        break;
+                    }
                 }
-                certChain.add(caCert);
-                if(isSelfSigned(caCert))
+            }
+        }catch(CertificateEncodingException e)
+        {
+        }
+
+        final int n = certChain.size();
+        int len = n;
+        if(n > 1)
+        {
+            for(int i = 1; i < n; i++)
+            {
+                int pathLen = certChain.get(i).getBasicConstraints();
+                if(pathLen < 0 || pathLen < i)
                 {
-                    // reaches root self-signed certificate
+                    len = i;
                     break;
                 }
             }
         }
 
-        return certChain.toArray(new X509Certificate[0]);
+        if(len == n)
+        {
+            return certChain.toArray(new X509Certificate[0]);
+        }
+        else
+        {
+            X509Certificate[] ret = new X509Certificate[len];
+            for(int i = 0; i < len; i++)
+            {
+                ret[i] = certChain.get(i);
+            }
+            return ret;
+        }
     }
 
     public static X509Certificate[] buildCertPath(X509Certificate cert, Certificate[] certs)
-    throws CertificateEncodingException
     {
         Set<Certificate> setOfCerts = new HashSet<>();
-        for(Certificate entry : certs)
+        for(Certificate m : certs)
         {
-            setOfCerts.add(entry);
+            setOfCerts.add(m);
         }
 
         return buildCertPath(cert, setOfCerts);
     }
 
-    private static X509Certificate getCaCertOf(X509Certificate cert,
+    public static X509Certificate getCaCertOf(X509Certificate cert,
             Set<? extends Certificate> caCerts)
     throws CertificateEncodingException
     {
@@ -488,8 +521,6 @@ public class SecurityUtil
             return null;
         }
 
-        X500Principal issuer = cert.getIssuerX500Principal();
-
         for(Certificate caCert : caCerts)
         {
             if(caCert instanceof X509Certificate == false)
@@ -497,22 +528,16 @@ public class SecurityUtil
                 continue;
             }
 
-            X509Certificate x509Cert = (X509Certificate) caCert;
-            if(issuer.equals(x509Cert.getSubjectX500Principal()) == false)
-            {
-                continue;
-            }
-
-            boolean isCACert = x509Cert.getBasicConstraints() >= 0;
-            if(isCACert == false)
+            X509Certificate x509CaCert = (X509Certificate) caCert;
+            if(issues(x509CaCert, cert) == false)
             {
                 continue;
             }
 
             try
             {
-                cert.verify(x509Cert.getPublicKey());
-                return x509Cert;
+                cert.verify(x509CaCert.getPublicKey());
+                return x509CaCert;
             } catch (Exception e)
             {
             }
@@ -580,6 +605,12 @@ public class SecurityUtil
     public static boolean issues(X509Certificate issuerCert, X509Certificate cert)
     throws CertificateEncodingException
     {
+        boolean isCA = issuerCert.getBasicConstraints() >= 0;
+        if(isCA == false)
+        {
+            return false;
+        }
+
         boolean issues = issuerCert.getSubjectX500Principal().equals(cert.getIssuerX500Principal());
         if(issues)
         {
