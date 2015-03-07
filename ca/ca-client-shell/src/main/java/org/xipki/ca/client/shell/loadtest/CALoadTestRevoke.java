@@ -290,7 +290,7 @@ class CALoadTestRevoke extends AbstractLoadTest
             Map<String, CertIDOrError> result;
             try
             {
-                result = raWorker.revokeCerts(request);
+                result = raWorker.revokeCerts(request, null);
             } catch (RAWorkerException | PKIErrorException e)
             {
                 LOG.warn("{}: {}", e.getClass().getName(), e.getMessage());

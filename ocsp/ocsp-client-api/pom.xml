@@ -14,8 +14,9 @@
   <name>XiPKI :: ${project.artifactId}</name>
   <dependencies>
     <dependency>
-      <groupId>org.bouncycastle</groupId>
-      <artifactId>bcpkix-jdk15on</artifactId>
+      <groupId>org.xipki</groupId>
+      <artifactId>common</artifactId>
+      <version>${project.version}</version>
     </dependency>
   </dependencies>
 </project>

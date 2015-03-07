@@ -71,7 +71,9 @@ import org.bouncycastle.jce.provider.X509CertificateObject;
 import org.bouncycastle.operator.ContentVerifierProvider;
 import org.bouncycastle.util.encoders.Hex;
 import org.xipki.common.CRLReason;
+import org.xipki.common.RequestResponseDebug;
 import org.xipki.common.IoUtil;
+import org.xipki.common.RequestResponsePair;
 import org.xipki.common.SecurityUtil;
 import org.xipki.ocsp.client.api.OCSPRequestor;
 import org.xipki.ocsp.client.api.RequestOptions;
@@ -106,6 +108,14 @@ public class OCSPStatusCommand extends AbstractOCSPStatusCommand
     @Option(name = "-v", aliases="--verbose",
             required = false, description = "Show status verbosely")
     protected Boolean verbose = Boolean.FALSE;
+
+    @Option(name = "-reqout",
+            required = false, description = "write DER encoded OCSP request to fie")
+    protected String reqout;
+
+    @Option(name = "-respout",
+            required = false, description = "write DER encoded OCSP response to fie")
+    protected String respout;
 
     private static final Map<ASN1ObjectIdentifier, String> extensionOidNameMap = new HashMap<>();
     static
@@ -198,7 +208,38 @@ public class OCSPStatusCommand extends AbstractOCSPStatusCommand
 
         RequestOptions options = getRequestOptions();
 
-        OCSPResp response = requestor.ask(issuerCert, sns.toArray(new BigInteger[0]), serverUrl, options);
+        boolean saveReq = isNotBlank(reqout);
+        boolean saveResp = isNotBlank(respout);
+        RequestResponseDebug debug = null;
+        if(saveReq || saveResp)
+        {
+            debug = new RequestResponseDebug();
+        }
+
+        OCSPResp response = requestor.ask(issuerCert, sns.toArray(new BigInteger[0]), serverUrl,
+                options, debug);
+        if(debug != null && debug.size() > 0)
+        {
+            RequestResponsePair reqResp = debug.get(0);
+            if(saveReq)
+            {
+                byte[] bytes = reqResp.getRequest();
+                if(bytes != null)
+                {
+                    IoUtil.save(reqout, bytes);
+                }
+            }
+
+            if(saveResp)
+            {
+                byte[] bytes = reqResp.getResponse();
+                if(bytes != null)
+                {
+                    IoUtil.save(respout, bytes);
+                }
+            }
+        }
+
         BasicOCSPResp basicResp = OCSPUtils.extractBasicOCSPResp(response);
 
         boolean extendedRevoke = basicResp.getExtension(OCSPRequestor.id_pkix_ocsp_extendedRevoke) != null;

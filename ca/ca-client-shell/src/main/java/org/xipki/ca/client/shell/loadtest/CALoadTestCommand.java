@@ -33,34 +33,22 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.ca.client.shell;
+package org.xipki.ca.client.shell.loadtest;
 
-import java.security.cert.X509CRL;
-
-import org.apache.karaf.shell.commands.Command;
-import org.xipki.ca.client.api.PKIErrorException;
-import org.xipki.ca.client.api.RAWorkerException;
-import org.xipki.common.RequestResponseDebug;
+import org.xipki.ca.client.api.RAWorker;
+import org.xipki.console.karaf.XipkiOsgiCommandSupport;
 
 /**
  * @author Lijun Liao
  */
 
-@Command(scope = "xipki-client", name = "gencrl", description="Generate CRL")
-public class GenCRLCommand extends CRLCommand
+public abstract class CALoadTestCommand extends XipkiOsgiCommandSupport
 {
-    @Override
-    protected X509CRL retrieveCRL(String caName)
-    throws RAWorkerException, PKIErrorException
+    protected RAWorker raWorker;
+
+    public final void setRaWorker(RAWorker raWorker)
     {
-        RequestResponseDebug debug = getRequestResponseDebug();
-        try
-        {
-            return raWorker.generateCRL(caName, debug);
-        }finally
-        {
-            saveRequestResponse(debug);
-        }
+        this.raWorker = raWorker;
     }
 
 }

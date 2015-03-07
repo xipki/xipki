@@ -128,7 +128,7 @@ public class OcspLoadTest extends AbstractLoadTest
             BasicOCSPResp basicResp;
             try
             {
-                OCSPResp response = requestor.ask(caCert, BigInteger.valueOf(sn), serverUrl, options);
+                OCSPResp response = requestor.ask(caCert, BigInteger.valueOf(sn), serverUrl, options, null);
                 basicResp = OCSPUtils.extractBasicOCSPResp(response);
             } catch (OCSPRequestorException e)
             {

@@ -129,8 +129,9 @@ import org.xipki.common.CRLReason;
 import org.xipki.common.CmpUtf8Pairs;
 import org.xipki.common.CollectionUtil;
 import org.xipki.common.CustomObjectIdentifiers;
-import org.xipki.common.SecurityUtil;
 import org.xipki.common.ParamChecker;
+import org.xipki.common.RequestResponseDebug;
+import org.xipki.common.SecurityUtil;
 import org.xipki.common.StringUtil;
 import org.xipki.common.XMLUtil;
 import org.xipki.security.api.ConcurrentContentSigner;
@@ -184,25 +185,22 @@ abstract class X509CmpRequestor extends CmpRequestor
         }
     }
 
-    protected abstract byte[] send(byte[] request)
-    throws IOException;
-
-    public CmpResultType generateCRL()
+    public CmpResultType generateCRL(RequestResponseDebug debug)
     throws CmpRequestorException
     {
         ASN1ObjectIdentifier type = CustomObjectIdentifiers.id_cmp_generateCRL;
         PKIMessage request = buildMessageWithGeneralMsgContent(type, null);
-        PKIResponse response = signAndSend(request);
+        PKIResponse response = signAndSend(request, debug);
         return evaluateCRLResponse(response, type);
     }
 
-    public CmpResultType downloadCurrentCRL()
+    public CmpResultType downloadCurrentCRL(RequestResponseDebug debug)
     throws CmpRequestorException
     {
-        return downloadCRL(null);
+        return downloadCRL((BigInteger) null, debug);
     }
 
-    public CmpResultType downloadCRL(BigInteger crlNumber)
+    public CmpResultType downloadCRL(BigInteger crlNumber, RequestResponseDebug debug)
     throws CmpRequestorException
     {
         ASN1ObjectIdentifier type = CMPObjectIdentifiers.it_currentCRL;
@@ -213,7 +211,7 @@ abstract class X509CmpRequestor extends CmpRequestor
             value = new ASN1Integer(crlNumber);
         }
         PKIMessage request = buildMessageWithGeneralMsgContent(type, value);
-        PKIResponse response = signAndSend(request);
+        PKIResponse response = signAndSend(request, debug);
         return evaluateCRLResponse(response, type);
     }
 
@@ -278,27 +276,30 @@ abstract class X509CmpRequestor extends CmpRequestor
         return result;
     }
 
-    public CmpResultType revokeCertificate(RevokeCertRequestType request)
+    public CmpResultType revokeCertificate(RevokeCertRequestType request,
+            RequestResponseDebug debug)
     throws CmpRequestorException
     {
         PKIMessage reqMessage = buildRevokeCertRequest(request);
-        PKIResponse response = signAndSend(reqMessage);
+        PKIResponse response = signAndSend(reqMessage, debug);
         return parse(response, request.getRequestEntries());
     }
 
-    public CmpResultType unrevokeCertificate(UnrevokeOrRemoveCertRequestType request)
+    public CmpResultType unrevokeCertificate(UnrevokeOrRemoveCertRequestType request,
+            RequestResponseDebug debug)
     throws CmpRequestorException
     {
         PKIMessage reqMessage = buildUnrevokeOrRemoveCertRequest(request, CRLReason.REMOVE_FROM_CRL.getCode());
-        PKIResponse response = signAndSend(reqMessage);
+        PKIResponse response = signAndSend(reqMessage, debug);
         return parse(response, request.getRequestEntries());
     }
 
-    public CmpResultType removeCertificate(UnrevokeOrRemoveCertRequestType request)
+    public CmpResultType removeCertificate(UnrevokeOrRemoveCertRequestType request,
+            RequestResponseDebug debug)
     throws CmpRequestorException
     {
         PKIMessage reqMessage = buildUnrevokeOrRemoveCertRequest(request, XiPKI_CRL_REASON_REMOVE);
-        PKIResponse response = signAndSend(reqMessage);
+        PKIResponse response = signAndSend(reqMessage, debug);
         return parse(response, request.getRequestEntries());
     }
 
@@ -385,16 +386,18 @@ abstract class X509CmpRequestor extends CmpRequestor
         return result;
     }
 
-    public CmpResultType requestCertificate(P10EnrollCertRequestType p10Req, String username)
+    public CmpResultType requestCertificate(P10EnrollCertRequestType p10Req, String username,
+            RequestResponseDebug debug)
     throws CmpRequestorException
     {
         PKIMessage request = buildPKIMessage(p10Req, username);
         Map<BigInteger, String> reqIdIdMap = new HashMap<>();
         reqIdIdMap.put(MINUS_ONE, p10Req.getId());
-        return intern_requestCertificate(request, reqIdIdMap, PKIBody.TYPE_CERT_REP);
+        return intern_requestCertificate(request, reqIdIdMap, PKIBody.TYPE_CERT_REP, debug);
     }
 
-    public CmpResultType requestCertificate(EnrollCertRequestType req, String username)
+    public CmpResultType requestCertificate(EnrollCertRequestType req, String username,
+            RequestResponseDebug debug)
     throws CmpRequestorException
     {
         PKIMessage request = buildPKIMessage(req, username);
@@ -419,14 +422,15 @@ abstract class X509CmpRequestor extends CmpRequestor
             exptectedBodyType = PKIBody.TYPE_CROSS_CERT_REP;
         }
 
-        return intern_requestCertificate(request, reqIdIdMap, exptectedBodyType);
+        return intern_requestCertificate(request, reqIdIdMap, exptectedBodyType, debug);
     }
 
     private CmpResultType intern_requestCertificate(
-            PKIMessage reqMessage, Map<BigInteger, String> reqIdIdMap, int expectedBodyType)
+            PKIMessage reqMessage, Map<BigInteger, String> reqIdIdMap, int expectedBodyType,
+            RequestResponseDebug debug)
     throws CmpRequestorException
     {
-        PKIResponse response = signAndSend(reqMessage);
+        PKIResponse response = signAndSend(reqMessage, debug);
 
         ErrorResultType errorResult = checkAndBuildErrorResultIfRequired(response);
         if(errorResult != null)
@@ -560,7 +564,7 @@ abstract class X509CmpRequestor extends CmpRequestor
         PKIMessage confirmRequest = buildCertConfirmRequest(response.getPkiMessage().getHeader().getTransactionID(),
                 certConfirmBuilder);
 
-        response = signAndSend(confirmRequest);
+        response = signAndSend(confirmRequest, debug);
 
         errorResult = checkAndBuildErrorResultIfRequired(response);
         if(errorResult != null)
@@ -761,7 +765,7 @@ abstract class X509CmpRequestor extends CmpRequestor
         return reqMessage;
     }
 
-    CAInfo retrieveCAInfo(String caName)
+    public CAInfo retrieveCAInfo(String caName, RequestResponseDebug debug)
     throws CmpRequestorException
     {
         ASN1EncodableVector v = new ASN1EncodableVector();
@@ -769,7 +773,7 @@ abstract class X509CmpRequestor extends CmpRequestor
         ASN1Sequence acceptVersions = new DERSequence(v);
         PKIMessage request = buildMessageWithGeneralMsgContent(
                 CustomObjectIdentifiers.id_cmp_getSystemInfo, acceptVersions);
-        PKIResponse response = signAndSend(request);
+        PKIResponse response = signAndSend(request, debug);
         ASN1Encodable itvValue = extractGeneralRepContent(response, CustomObjectIdentifiers.id_cmp_getSystemInfo.getId());
         DERUTF8String utf8Str = DERUTF8String.getInstance(itvValue);
         String systemInfoStr = utf8Str.getString();
@@ -841,8 +845,8 @@ abstract class X509CmpRequestor extends CmpRequestor
         }
     }
 
-    RemoveExpiredCertsResult removeExpiredCerts(
-            String certprofile, String userLike, long overlapSeconds)
+    public RemoveExpiredCertsResult removeExpiredCerts(String certprofile, String userLike, long overlapSeconds,
+            RequestResponseDebug debug)
     throws CmpRequestorException
     {
         ParamChecker.assertNotEmpty("certprofile", certprofile);
@@ -878,7 +882,7 @@ abstract class X509CmpRequestor extends CmpRequestor
         PKIMessage request = buildMessageWithGeneralMsgContent(
                 CustomObjectIdentifiers.id_cmp_removeExpiredCerts,
                 new DERUTF8String(requestInfo));
-        PKIResponse response = signAndSend(request);
+        PKIResponse response = signAndSend(request, debug);
         ASN1Encodable itvValue = extractGeneralRepContent(response, CustomObjectIdentifiers.id_cmp_removeExpiredCerts.getId());
         DERUTF8String utf8Str = DERUTF8String.getInstance(itvValue);
         String resultInfoStr = utf8Str.getString();
