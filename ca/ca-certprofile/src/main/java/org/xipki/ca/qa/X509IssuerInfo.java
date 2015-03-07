@@ -45,6 +45,7 @@ import java.util.Set;
 
 import org.bouncycastle.asn1.x509.Certificate;
 import org.bouncycastle.util.Arrays;
+import org.xipki.common.CollectionUtil;
 import org.xipki.common.ParamChecker;
 import org.xipki.common.SecurityUtil;
 
@@ -65,7 +66,7 @@ public class X509IssuerInfo
     throws CertificateException
     {
         ParamChecker.assertNotNull("certBytes", certBytes);
-        if(ocspURLs == null || ocspURLs.isEmpty())
+        if(CollectionUtil.isEmpty(ocspURLs))
         {
             this.ocspURLs = null;
         }else
@@ -75,7 +76,7 @@ public class X509IssuerInfo
             this.ocspURLs = Collections.unmodifiableSet(set);
         }
 
-        if(crlURLs == null || crlURLs.isEmpty())
+        if(CollectionUtil.isEmpty(crlURLs))
         {
             this.crlURLs = null;
         }else
@@ -85,7 +86,7 @@ public class X509IssuerInfo
             this.crlURLs = Collections.unmodifiableSet(set);
         }
 
-        if(deltaCrlURLs == null || deltaCrlURLs.isEmpty())
+        if(CollectionUtil.isEmpty(deltaCrlURLs))
         {
             this.deltaCrlURLs = null;
         }else

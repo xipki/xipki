@@ -160,21 +160,21 @@ public abstract class EnrollCertCommand extends ClientCommand
 
         // SubjectAltNames
         List<Extension> extensions = new LinkedList<>();
-        if(subjectAltNames != null && subjectAltNames.isEmpty() == false)
+        if(isNotEmpty(subjectAltNames))
         {
             extensions.add(P10RequestGenerator.createExtensionSubjectAltName(subjectAltNames, false));
             needExtensionTypes.add(Extension.subjectAlternativeName.getId());
         }
 
         // SubjectInfoAccess
-        if(subjectInfoAccesses != null && subjectInfoAccesses.isEmpty() == false)
+        if(isNotEmpty(subjectInfoAccesses))
         {
             extensions.add(P10RequestGenerator.createExtensionSubjectInfoAccess(subjectInfoAccesses, false));
             needExtensionTypes.add(Extension.subjectInfoAccess.getId());
         }
 
         // Keyusage
-        if(keyusages != null && keyusages.isEmpty() == false)
+        if(isNotEmpty(keyusages))
         {
             Set<KeyUsage> usages = new HashSet<>();
             for(String usage : keyusages)
@@ -188,7 +188,7 @@ public abstract class EnrollCertCommand extends ClientCommand
         }
 
         // ExtendedKeyusage
-        if(extkeyusages != null && extkeyusages.isEmpty() == false)
+        if(isNotEmpty(extkeyusages))
         {
             Set<ASN1ObjectIdentifier> oids = new HashSet<>(
                     SecurityUtil.textToASN1ObjectIdentifers(extkeyusages));
@@ -198,8 +198,7 @@ public abstract class EnrollCertCommand extends ClientCommand
             needExtensionTypes.add(extType.getId());
         }
 
-        if(needExtensionTypes.isEmpty() == false ||
-                (wantExtensionTypes != null && wantExtensionTypes.isEmpty() == false))
+        if(isNotEmpty(needExtensionTypes) || isNotEmpty(wantExtensionTypes))
         {
             ExtensionExistence ee = new ExtensionExistence(SecurityUtil.textToASN1ObjectIdentifers(needExtensionTypes),
                     SecurityUtil.textToASN1ObjectIdentifers(wantExtensionTypes));
@@ -207,7 +206,7 @@ public abstract class EnrollCertCommand extends ClientCommand
                     CustomObjectIdentifiers.id_cmp_request_extensions, false, ee.toASN1Primitive().getEncoded()));
         }
 
-        if(extensions != null && extensions.isEmpty() == false)
+        if(isNotEmpty(extensions))
         {
             Extensions asn1Extensions = new Extensions(extensions.toArray(new Extension[0]));
             certTemplateBuilder.setExtensions(asn1Extensions);

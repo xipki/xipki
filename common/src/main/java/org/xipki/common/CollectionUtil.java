@@ -33,70 +33,35 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.ca.qa;
+package org.xipki.common;
 
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.List;
-
-import org.xipki.common.CollectionUtil;
-import org.xipki.common.ParamChecker;
+import java.util.Collection;
+import java.util.Map;
 
 /**
  * @author Lijun Liao
  */
 
-public class ValidationResult
+public class CollectionUtil
 {
-    private final List<ValidationIssue> validationIssues;
-    private final List<ValidationIssue> failedValidationIssues;
-    private final List<ValidationIssue> successfulValidationIssues;
-
-    public ValidationResult(ValidationIssue validationIssues)
+    public static boolean isEmpty(Collection<?> c)
     {
-        this(Arrays.asList(validationIssues));
+        return c == null || c.isEmpty();
     }
 
-    public ValidationResult(List<ValidationIssue> validationIssues)
+    public static boolean isNotEmpty(Collection<?> c)
     {
-        ParamChecker.assertNotEmpty("validationIssues", validationIssues);
-
-        List<ValidationIssue> failedIssues = new LinkedList<>();
-        List<ValidationIssue> successfulIssues = new LinkedList<>();
-        for(ValidationIssue issue : validationIssues)
-        {
-            if(issue.isFailed())
-            {
-                failedIssues.add(issue);
-            } else
-            {
-                successfulIssues.add(issue);
-            }
-        }
-
-        this.validationIssues = validationIssues;
-        this.failedValidationIssues = failedIssues;
-        this.successfulValidationIssues = successfulIssues;
+        return c != null && c.isEmpty() == false;
     }
 
-    public boolean isAllSuccessful()
+    public static boolean isEmpty(Map<?, ?> m)
     {
-        return CollectionUtil.isEmpty(failedValidationIssues);
+        return m == null || m.isEmpty();
     }
 
-    public List<ValidationIssue> getValidationIssues()
+    public static boolean isNotEmpty(Map<?, ?> m)
     {
-        return validationIssues;
-    }
-
-    public List<ValidationIssue> getFailedValidationIssues()
-    {
-        return failedValidationIssues;
-    }
-
-    public List<ValidationIssue> getSuccessfulValidationIssues()
-    {
-        return successfulValidationIssues;
+        return m != null && m.isEmpty() == false;
     }
 
 }

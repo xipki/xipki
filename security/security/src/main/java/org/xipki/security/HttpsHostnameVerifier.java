@@ -129,7 +129,7 @@ public class HttpsHostnameVerifier implements HostnameVerifier
     public void setCommonnameHostMap(String commonnameHostMap)
     {
         hostnameMap.clear();
-        if(commonnameHostMap == null || commonnameHostMap.isEmpty())
+        if(StringUtil.isBlank(commonnameHostMap))
         {
             return;
         }

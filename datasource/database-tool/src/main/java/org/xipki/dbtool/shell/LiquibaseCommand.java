@@ -189,7 +189,7 @@ public abstract class LiquibaseCommand extends XipkiOsgiCommandSupport
             prompt = "Please enter";
         }
 
-        if(validValues.isEmpty() == false)
+        if(isNotEmpty(validValues))
         {
             StringBuilder promptBuilder = new StringBuilder(prompt);
             promptBuilder.append(" [");
@@ -215,7 +215,7 @@ public abstract class LiquibaseCommand extends XipkiOsgiCommandSupport
                 throw new IOException("interrupted");
             }
 
-            if(validValues.isEmpty() || validValues.contains(answer))
+            if(isEmpty(validValues) || validValues.contains(answer))
             {
                 return answer;
             }

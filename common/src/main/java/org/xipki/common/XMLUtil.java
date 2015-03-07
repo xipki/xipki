@@ -319,7 +319,7 @@ public class XMLUtil
             Map<String, String> nsPrefixURIMap)
     {
         List<Node> nodes = getMatch(contextNode, relativeXPath, nsPrefixURIMap, true);
-        return nodes.isEmpty() ? null : nodes.get(0);
+        return CollectionUtil.isEmpty(nodes) ? null : nodes.get(0);
     }
 
     public static List<Node> getMatch(

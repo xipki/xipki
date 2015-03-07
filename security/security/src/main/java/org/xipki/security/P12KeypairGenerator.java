@@ -36,7 +36,6 @@
 package org.xipki.security;
 
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.math.BigInteger;
 import java.security.KeyPair;
 import java.security.KeyStore;
@@ -80,6 +79,7 @@ import org.bouncycastle.operator.ContentSigner;
 import org.bouncycastle.operator.bc.BcContentSignerBuilder;
 import org.bouncycastle.operator.bc.BcDSAContentSignerBuilder;
 import org.bouncycastle.operator.bc.BcRSAContentSignerBuilder;
+import org.xipki.common.CollectionUtil;
 import org.xipki.common.SecurityUtil;
 import org.xipki.security.api.P12KeypairGenerationResult;
 import org.xipki.security.bcext.ECDSAContentSignerBuilder;
@@ -154,7 +154,7 @@ public abstract class P12KeypairGenerator
 
         certGenerator.addExtension(Extension.keyUsage, true, ku);
 
-        if(extendedKeyUsage != null && extendedKeyUsage.isEmpty() == false)
+        if(CollectionUtil.isNotEmpty(extendedKeyUsage))
         {
             KeyPurposeId[] kps = new KeyPurposeId[extendedKeyUsage.size()];
 

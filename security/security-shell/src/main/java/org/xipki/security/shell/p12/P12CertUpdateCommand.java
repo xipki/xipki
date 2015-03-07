@@ -95,7 +95,7 @@ public class P12CertUpdateCommand extends P12SecurityCommand
 
         Key key = ks.getKey(keyname, pwd);
         Set<X509Certificate> caCerts = new HashSet<>();
-        if(caCertFiles != null && caCertFiles.isEmpty() == false)
+        if(isNotEmpty(caCertFiles))
         {
             for(String caCertFile : caCertFiles)
             {

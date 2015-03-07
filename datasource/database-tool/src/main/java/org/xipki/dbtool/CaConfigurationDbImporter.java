@@ -47,6 +47,7 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 
 import org.bouncycastle.util.encoders.Base64;
+import org.xipki.common.CollectionUtil;
 import org.xipki.common.IoUtil;
 import org.xipki.common.ParamChecker;
 import org.xipki.common.SecurityUtil;
@@ -146,7 +147,7 @@ class CaConfigurationDbImporter extends DbPorter
         final String sql = "INSERT INTO CMPCONTROL (NAME, REQUIRE_CONFIRM_CERT, SEND_CA_CERT, SEND_RESPONDER_CERT, " +
                 " REQUIRE_MESSAGE_TIME, MESSAGE_TIME_BIAS, CONFIRM_WAIT_TIME) VALUES (?, ?, ?, ?, ?, ?, ?)";
 
-        if(controls != null && controls.getCmpcontrol().isEmpty() == false)
+        if(controls != null && CollectionUtil.isNotEmpty(controls.getCmpcontrol()))
         {
             PreparedStatement ps = null;
             try

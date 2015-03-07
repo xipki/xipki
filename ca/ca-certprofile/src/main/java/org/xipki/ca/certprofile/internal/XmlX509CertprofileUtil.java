@@ -107,6 +107,7 @@ import org.xipki.ca.certprofile.internal.x509.jaxb.RangesType;
 import org.xipki.ca.certprofile.internal.x509.jaxb.UsageType;
 import org.xipki.ca.certprofile.internal.x509.jaxb.X509ProfileType;
 import org.xipki.ca.certprofile.internal.x509.jaxb.X509ProfileType.KeyAlgorithms;
+import org.xipki.common.CollectionUtil;
 import org.xipki.common.KeyUsage;
 import org.xipki.common.SecurityUtil;
 import org.xipki.common.XMLUtil;
@@ -171,7 +172,7 @@ public class XmlX509CertprofileUtil
     public static List<CertificatePolicyInformation> buildCertificatePolicies(CertificatePolicies type)
     {
         List<CertificatePolicyInformationType> policyPairs = type.getCertificatePolicyInformation();
-        if(policyPairs == null || policyPairs.isEmpty())
+        if(CollectionUtil.isEmpty(policyPairs))
         {
             return null;
         }
@@ -251,7 +252,7 @@ public class XmlX509CertprofileUtil
     private static GeneralSubtree[] buildGeneralSubtrees(GeneralSubtreesType subtrees)
     throws CertprofileException
     {
-        if(subtrees == null || subtrees.getBase().isEmpty())
+        if(subtrees == null || CollectionUtil.isEmpty(subtrees.getBase()))
         {
             return null;
         }
@@ -294,7 +295,7 @@ public class XmlX509CertprofileUtil
         }
         else
         {
-            throw new RuntimeException("should not reach here");
+            throw new RuntimeException("should not reach here, unknown child of GeneralSubtreeBaseType");
         }
 
         Integer i = type.getMinimum();
@@ -530,7 +531,7 @@ public class XmlX509CertprofileUtil
                 keyAlgorithms.put(oid, keyParamsOption);
             }
         }
-        return keyAlgorithms.isEmpty() ? null : Collections.unmodifiableMap(keyAlgorithms);
+        return CollectionUtil.isEmpty(keyAlgorithms) ? null : Collections.unmodifiableMap(keyAlgorithms);
     }
 
     public static Map<ASN1ObjectIdentifier, ExtensionControl> buildExtensionControls(
@@ -554,7 +555,7 @@ public class XmlX509CertprofileUtil
 
     public static List<ASN1ObjectIdentifier> toOIDList(List<OidWithDescType> oidWithDescTypes)
     {
-        if(oidWithDescTypes == null || oidWithDescTypes.isEmpty())
+        if(CollectionUtil.isEmpty(oidWithDescTypes))
         {
             return null;
         }
@@ -606,7 +607,7 @@ public class XmlX509CertprofileUtil
                 controls.add(new KeyUsageControl(KeyUsage.keyEncipherment, required));
                 break;
             default:
-                throw new RuntimeException("should not reach here");
+                throw new RuntimeException("should not reach here, unknown GeneralSubtreeBaseType " + m.getValue());
             }
         }
 
@@ -661,7 +662,7 @@ public class XmlX509CertprofileUtil
             map.put(new ASN1ObjectIdentifier(m.getType().getValue()), extension);
         }
 
-        if(map.isEmpty())
+        if(CollectionUtil.isEmpty(map))
         {
             return null;
         }
@@ -671,7 +672,7 @@ public class XmlX509CertprofileUtil
 
     public static Set<ASN1ObjectIdentifier> toOIDSet(List<OidWithDescType> oidWithDescTypes)
     {
-        if(oidWithDescTypes == null || oidWithDescTypes.isEmpty())
+        if(CollectionUtil.isEmpty(oidWithDescTypes))
         {
             return null;
         }

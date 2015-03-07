@@ -40,6 +40,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.xipki.console.karaf.DynamicEnumCompleter;
+import org.xipki.console.karaf.XipkiOsgiCommandSupport;
 import org.xipki.security.api.SecurityFactory;
 
 /**
@@ -59,7 +60,7 @@ public class P11ModuleNameCompleter extends DynamicEnumCompleter
     protected Set<String> getEnums()
     {
         Set<String> names = securityFactory.getPkcs11ModuleNames();
-        if(names == null | names.isEmpty())
+        if(XipkiOsgiCommandSupport.isEmpty(names))
         {
             return Collections.emptySet();
         }

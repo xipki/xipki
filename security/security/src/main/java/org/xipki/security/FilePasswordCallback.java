@@ -40,6 +40,7 @@ import java.io.FileReader;
 import java.io.IOException;
 
 import org.xipki.common.IoUtil;
+import org.xipki.common.StringUtil;
 import org.xipki.security.api.PasswordCallback;
 import org.xipki.security.api.PasswordResolverException;
 
@@ -69,7 +70,7 @@ public class FilePasswordCallback implements PasswordCallback
             while((line = reader.readLine()) != null)
             {
                 line = line.trim();
-                if(line.isEmpty() == false && line.startsWith("#") == false)
+                if(StringUtil.isNotBlank(line) && line.startsWith("#") == false)
                 {
                     passwordHint = line;
                     break;
@@ -110,7 +111,7 @@ public class FilePasswordCallback implements PasswordCallback
     public void init(String conf)
     throws PasswordResolverException
     {
-        if(conf == null || conf.isEmpty())
+        if(StringUtil.isBlank(conf))
         {
             throw new PasswordResolverException("conf could not be null or empty");
         }

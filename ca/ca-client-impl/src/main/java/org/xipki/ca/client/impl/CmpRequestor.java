@@ -73,8 +73,10 @@ import org.xipki.ca.common.cmp.PKIResponse;
 import org.xipki.ca.common.cmp.ProtectionResult;
 import org.xipki.ca.common.cmp.ProtectionVerificationResult;
 import org.xipki.common.CmpUtf8Pairs;
+import org.xipki.common.CollectionUtil;
 import org.xipki.common.ParamChecker;
 import org.xipki.common.SecurityUtil;
+import org.xipki.common.StringUtil;
 import org.xipki.security.api.ConcurrentContentSigner;
 import org.xipki.security.api.NoIdleSignerException;
 import org.xipki.security.api.SecurityFactory;
@@ -355,7 +357,7 @@ public abstract class CmpRequestor
         {
             itvs.add(CmpUtil.getImplictConfirmGeneralInfo());
         }
-        if(username != null && username.isEmpty() == false)
+        if(StringUtil.isNotBlank(username))
         {
             CmpUtf8Pairs utf8Pairs = new CmpUtf8Pairs(CmpUtf8Pairs.KEY_USER, username);
             itvs.add(CmpUtil.buildInfoTypeAndValue(utf8Pairs));
@@ -372,7 +374,7 @@ public abstract class CmpRequestor
             }
         }
 
-        if(itvs.isEmpty() == false)
+        if(CollectionUtil.isNotEmpty(itvs))
         {
             hBuilder.setGeneralInfo(itvs.toArray(new InfoTypeAndValue[0]));
         }

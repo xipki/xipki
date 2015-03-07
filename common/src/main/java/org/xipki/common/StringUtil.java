@@ -71,6 +71,16 @@ public class StringUtil
         return ret;
     }
 
+    public static boolean isBlank(String s)
+    {
+        return s == null || s.isEmpty();
+    }
+
+    public static boolean isNotBlank(String s)
+    {
+        return s != null && s.isEmpty() == false;
+    }
+
     public static Set<String> splitAsSet(String str, String delim)
     {
         if(str == null)

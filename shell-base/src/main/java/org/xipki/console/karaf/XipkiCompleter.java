@@ -33,55 +33,14 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.ca.client.api;
+package org.xipki.console.karaf;
 
-import org.xipki.common.ParamChecker;
-import org.xipki.common.StringUtil;
+import org.apache.karaf.shell.console.Completer;
 
 /**
  * @author Lijun Liao
  */
 
-public class CertprofileInfo
+public interface XipkiCompleter extends Completer
 {
-    private final String name;
-    private final String type;
-    private final String conf;
-
-    public CertprofileInfo(String name, String type, String conf)
-    {
-        ParamChecker.assertNotEmpty("name", name);
-        this.name = name;
-        if(StringUtil.isBlank(type))
-        {
-            this.type = null;
-        } else
-        {
-            this.type = type;
-        }
-
-        if(StringUtil.isBlank(conf))
-        {
-            this.conf = null;
-        } else
-        {
-            this.conf = conf;
-        }
-    }
-
-    public String getName()
-    {
-        return name;
-    }
-
-    public String getType()
-    {
-        return type;
-    }
-
-    public String getConf()
-    {
-        return conf;
-    }
-
 }

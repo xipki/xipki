@@ -38,14 +38,13 @@ package org.xipki.console.karaf;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.karaf.shell.console.Completer;
 import org.apache.karaf.shell.console.completer.StringsCompleter;
 
 /**
  * @author Lijun Liao
  */
 
-public abstract class DynamicEnumCompleter implements Completer
+public abstract class DynamicEnumCompleter implements XipkiCompleter
 {
     protected abstract Set<String> getEnums();
 

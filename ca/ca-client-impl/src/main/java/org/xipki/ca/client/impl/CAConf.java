@@ -44,6 +44,7 @@ import java.util.Set;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.xipki.ca.client.api.CertprofileInfo;
 import org.xipki.common.ParamChecker;
+import org.xipki.common.StringUtil;
 
 /**
  * @author Lijun Liao
@@ -76,7 +77,7 @@ class CAConf
         this.url = url;
         this.requestorName = requestorName;
         this.responder = responder;
-        if(healthUrl == null || healthUrl.isEmpty())
+        if(StringUtil.isBlank(healthUrl))
         {
             this.healthUrl = url.replace("cmp", "health");
         }

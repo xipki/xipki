@@ -82,7 +82,7 @@ public class FileListCommand extends XipkiOsgiCommandSupport
                 l.add(name);
                 maxLen = Math.max(maxLen, name.length());
             }
-            if(l.isEmpty() == false)
+            if(isNotEmpty(l))
             {
                 Collections.sort(l);
                 List<String> l2 = new LinkedList<>();
