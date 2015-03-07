@@ -415,7 +415,7 @@ public class ObjectIdentifiers
     public static String getName(ASN1ObjectIdentifier type)
     {
         String name = RFC4519Style.INSTANCE.oidToDisplayName(type);
-        if(name == null || name.isEmpty())
+        if(StringUtil.isBlank(name))
         {
             name = oidNameMap.get(type);
         }

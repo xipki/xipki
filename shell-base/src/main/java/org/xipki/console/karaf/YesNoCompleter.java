@@ -35,12 +35,10 @@
 
 package org.xipki.console.karaf;
 
-import org.apache.karaf.shell.console.Completer;
-
 /**
  * @author Lijun Liao
  */
 
-public interface YesNoCompleter extends Completer
+public interface YesNoCompleter extends XipkiCompleter
 {
 }

@@ -124,11 +124,11 @@ public class HealthCheckResult
         sb.append("{");
 
         boolean lastElement = true;
-        if(lastElement && statuses.isEmpty() == false)
+        if(lastElement && CollectionUtil.isNotEmpty(statuses))
         {
             lastElement = false;
         }
-        if(lastElement && childChecks.isEmpty() == false)
+        if(lastElement && CollectionUtil.isNotEmpty(childChecks))
         {
             lastElement = false;
         }
@@ -140,10 +140,11 @@ public class HealthCheckResult
         for(String name : names)
         {
             count++;
-            append(sb, name, statuses.get(name), level + 1, pretty, childChecks.isEmpty() && count == size);
+            append(sb, name, statuses.get(name), level + 1, pretty,
+                    CollectionUtil.isEmpty(childChecks) && count == size);
         }
 
-        if(childChecks.isEmpty() == false)
+        if(CollectionUtil.isNotEmpty(childChecks))
         {
             if(pretty)
             {

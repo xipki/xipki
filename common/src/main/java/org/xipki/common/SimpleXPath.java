@@ -116,13 +116,13 @@ public class SimpleXPath
     {
         List<Node> rv = new LinkedList<Node>();
         select(rv, context, this.steps, 0, true);
-        return rv.isEmpty() ? null : rv.get(0);
+        return CollectionUtil.isEmpty(rv) ? null : rv.get(0);
     }
 
     private static void select(
             List<Node> results, Element context, List<SimpleXPathStep> steps, int stepIndex, boolean onlyFirst)
     {
-        if(onlyFirst && ! results.isEmpty())
+        if(onlyFirst && CollectionUtil.isNotEmpty(results))
         {
             return;
         }

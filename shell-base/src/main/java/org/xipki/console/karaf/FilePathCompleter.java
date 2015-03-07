@@ -35,13 +35,11 @@
 
 package org.xipki.console.karaf;
 
-import org.apache.karaf.shell.console.Completer;
-
 /**
  * @author Lijun Liao
  */
 
-public interface FilePathCompleter extends Completer
+public interface FilePathCompleter extends XipkiCompleter
 {
 
 }

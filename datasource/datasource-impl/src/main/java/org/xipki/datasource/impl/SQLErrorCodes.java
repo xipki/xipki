@@ -83,7 +83,7 @@ public class SQLErrorCodes
         case UNKNOWN:
             return new SQLErrorCodes();
         default:
-            throw new RuntimeException("should not reach here");
+            throw new RuntimeException("should not reach here, unknown database type " + dbType);
         }
     }
 

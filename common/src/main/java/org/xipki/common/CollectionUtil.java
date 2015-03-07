@@ -33,63 +33,35 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.security.api.p11;
+package org.xipki.common;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
+import java.util.Collection;
 import java.util.Map;
-import java.util.Set;
-
-import org.xipki.common.CollectionUtil;
-import org.xipki.common.ParamChecker;
 
 /**
  * @author Lijun Liao
  */
 
-public class P11Control
+public class CollectionUtil
 {
-    private final String defaultModuleName;
-    private final Map<String, P11ModuleConf> moduleConfs;
-    private final Set<String> moduleNames;
-
-    public P11Control(String defaultModuleName, Set<P11ModuleConf> moduleConfs)
+    public static boolean isEmpty(Collection<?> c)
     {
-        ParamChecker.assertNotEmpty("defaultModuleName", defaultModuleName);
-
-        this.defaultModuleName = defaultModuleName;
-        if(CollectionUtil.isEmpty(moduleConfs))
-        {
-            this.moduleConfs = Collections.emptyMap();
-            this.moduleNames = Collections.emptySet();
-        }
-        else
-        {
-            this.moduleConfs = new HashMap<>(moduleConfs.size());
-            Set<String> _moduleNames = new HashSet<>();
-            for(P11ModuleConf conf : moduleConfs)
-            {
-                this.moduleConfs.put(conf.getName(), conf);
-                _moduleNames.add(conf.getName());
-            }
-            this.moduleNames = Collections.unmodifiableSet(_moduleNames);
-        }
+        return c == null || c.isEmpty();
     }
 
-    public String getDefaultModuleName()
+    public static boolean isNotEmpty(Collection<?> c)
     {
-        return defaultModuleName;
+        return c != null && c.isEmpty() == false;
     }
 
-    public P11ModuleConf getModuleConf(String moduleName)
+    public static boolean isEmpty(Map<?, ?> m)
     {
-        return moduleConfs == null ? null : moduleConfs.get(moduleName);
+        return m == null || m.isEmpty();
     }
 
-    public Set<String> getModuleNames()
+    public static boolean isNotEmpty(Map<?, ?> m)
     {
-        return moduleNames;
+        return m != null && m.isEmpty() == false;
     }
 
 }

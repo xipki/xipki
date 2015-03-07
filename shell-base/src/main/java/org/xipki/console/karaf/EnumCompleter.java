@@ -39,14 +39,13 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.StringTokenizer;
 
-import org.apache.karaf.shell.console.Completer;
 import org.apache.karaf.shell.console.completer.StringsCompleter;
 
 /**
  * @author Lijun Liao
  */
 
-public class EnumCompleter implements Completer
+public class EnumCompleter implements XipkiCompleter
 {
     private final List<String> enums = new LinkedList<>();
 
