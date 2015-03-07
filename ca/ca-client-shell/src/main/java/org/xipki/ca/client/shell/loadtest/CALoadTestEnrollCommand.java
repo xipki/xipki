@@ -37,7 +37,6 @@ package org.xipki.ca.client.shell.loadtest;
 
 import org.apache.karaf.shell.commands.Command;
 import org.apache.karaf.shell.commands.Option;
-import org.xipki.ca.client.shell.ClientCommand;
 import org.xipki.ca.client.shell.loadtest.KeyEntry.DSAKeyEntry;
 import org.xipki.ca.client.shell.loadtest.KeyEntry.ECKeyEntry;
 import org.xipki.ca.client.shell.loadtest.KeyEntry.RSAKeyEntry;
@@ -49,7 +48,7 @@ import org.xipki.common.AbstractLoadTest;
  */
 
 @Command(scope = "xipki-client", name = "loadtest-enroll", description="CA Client Enroll Load test")
-public class CALoadTestEnrollCommand extends ClientCommand
+public class CALoadTestEnrollCommand extends CALoadTestCommand
 {
 
     @Option(name = "-profile",

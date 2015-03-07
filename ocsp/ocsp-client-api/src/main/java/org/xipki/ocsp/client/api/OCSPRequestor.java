@@ -42,6 +42,7 @@ import java.security.cert.X509Certificate;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.ocsp.OCSPObjectIdentifiers;
 import org.bouncycastle.cert.ocsp.OCSPResp;
+import org.xipki.common.RequestResponseDebug;
 
 /**
  * @author Lijun Liao
@@ -53,19 +54,23 @@ public interface OCSPRequestor
     public static final ASN1ObjectIdentifier id_pkix_ocsp_extendedRevoke = OCSPObjectIdentifiers.id_pkix_ocsp.branch("9");
 
     OCSPResp ask(X509Certificate issuerCert, X509Certificate cert,
-            URL responderUrl, RequestOptions requestOptions)
+            URL responderUrl, RequestOptions requestOptions,
+            RequestResponseDebug debug)
     throws OCSPResponseException, OCSPRequestorException;
 
     OCSPResp ask(X509Certificate issuerCert, X509Certificate[] certs,
-            URL responderUrl, RequestOptions requestOptions)
+            URL responderUrl, RequestOptions requestOptions,
+            RequestResponseDebug debug)
     throws OCSPResponseException, OCSPRequestorException;
 
     OCSPResp ask(X509Certificate issuerCert, BigInteger serialNumber,
-            URL responderUrl, RequestOptions requestOptions)
+            URL responderUrl, RequestOptions requestOptions,
+            RequestResponseDebug debug)
     throws OCSPResponseException, OCSPRequestorException;
 
     OCSPResp ask(X509Certificate issuerCert, BigInteger[] serialNumbers,
-            URL responderUrl, RequestOptions requestOptions)
+            URL responderUrl, RequestOptions requestOptions,
+            RequestResponseDebug debug)
     throws OCSPResponseException, OCSPRequestorException;
 
 }

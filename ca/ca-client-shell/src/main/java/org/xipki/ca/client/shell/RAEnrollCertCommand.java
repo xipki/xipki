@@ -44,6 +44,7 @@ import org.bouncycastle.asn1.pkcs.CertificationRequest;
 import org.xipki.ca.client.api.CertificateOrError;
 import org.xipki.ca.client.api.EnrollCertResult;
 import org.xipki.common.IoUtil;
+import org.xipki.common.RequestResponseDebug;
 import org.xipki.console.karaf.UnexpectedResultException;
 
 /**
@@ -80,7 +81,16 @@ public class RAEnrollCertCommand extends ClientCommand
     {
         CertificationRequest p10Req = CertificationRequest.getInstance(
                 IoUtil.read(p10File));
-        EnrollCertResult result = raWorker.requestCert(p10Req, profile, caName, user);
+
+        EnrollCertResult result;
+        RequestResponseDebug debug = getRequestResponseDebug();
+        try
+        {
+            result = raWorker.requestCert(p10Req, profile, caName, user, debug);
+        }finally
+        {
+            saveRequestResponse(debug);
+        }
 
         X509Certificate cert = null;
         if(result != null)

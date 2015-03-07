@@ -33,35 +33,42 @@
  * address: lijun.liao@gmail.com
  */
 
-package org.xipki.ca.qa.shell;
+package org.xipki.common;
 
-import java.security.cert.X509CRL;
-
-import org.apache.karaf.shell.commands.Command;
-import org.xipki.ca.client.api.PKIErrorException;
-import org.xipki.ca.client.api.RAWorkerException;
-import org.xipki.common.RequestResponseDebug;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * @author Lijun Liao
  */
 
-@Command(scope = "xipki-qa", name = "neg-getcrl", description="Download CRL (negative, for QA)")
-public class NegGetCRLCommand extends NegCRLCommand
+public class RequestResponseDebug
 {
+    private final List<RequestResponsePair> pairs = new LinkedList<>();
 
-    @Override
-    protected X509CRL retrieveCRL(String caName)
-    throws RAWorkerException, PKIErrorException
+    public void add(RequestResponsePair pair)
     {
-        RequestResponseDebug debug = getRequestResponseDebug();
-        try
-        {
-            return raWorker.downloadCRL(caName, debug);
-        }finally
-        {
-            saveRequestResponse(debug);
-        }
+        pairs.add(pair);
+    }
+
+    public int size()
+    {
+        return pairs.size();
+    }
+
+    public RequestResponsePair get(int index)
+    {
+        return pairs.get(index);
+    }
+
+    public boolean remove(RequestResponsePair pair)
+    {
+        return pairs.remove(pair);
+    }
+
+    public RequestResponsePair remove(int index)
+    {
+        return pairs.remove(index);
     }
 
 }

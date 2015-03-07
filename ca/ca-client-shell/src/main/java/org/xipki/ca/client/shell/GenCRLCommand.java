@@ -40,6 +40,7 @@ import java.security.cert.X509CRL;
 import org.apache.karaf.shell.commands.Command;
 import org.xipki.ca.client.api.PKIErrorException;
 import org.xipki.ca.client.api.RAWorkerException;
+import org.xipki.common.RequestResponseDebug;
 
 /**
  * @author Lijun Liao
@@ -52,7 +53,14 @@ public class GenCRLCommand extends CRLCommand
     protected X509CRL retrieveCRL(String caName)
     throws RAWorkerException, PKIErrorException
     {
-        return raWorker.generateCRL(caName);
+        RequestResponseDebug debug = getRequestResponseDebug();
+        try
+        {
+            return raWorker.generateCRL(caName, debug);
+        }finally
+        {
+            saveRequestResponse(debug);
+        }
     }
 
 }

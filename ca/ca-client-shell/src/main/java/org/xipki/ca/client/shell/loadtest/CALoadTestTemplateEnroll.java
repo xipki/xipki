@@ -135,7 +135,7 @@ public class CALoadTestTemplateEnroll extends AbstractLoadTest
                     request.addRequestEntry(requestEntry);
                 }
 
-                result = raWorker.requestCerts(request, null, userPrefix + System.currentTimeMillis());
+                result = raWorker.requestCerts(request, null, userPrefix + System.currentTimeMillis(), null);
             } catch (RAWorkerException | PKIErrorException e)
             {
                 LOG.warn("{}: {}", e.getClass().getName(), e.getMessage());

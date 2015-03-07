@@ -43,6 +43,7 @@ import org.apache.karaf.shell.commands.Command;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.xipki.ca.client.api.CertIDOrError;
 import org.xipki.ca.common.cmp.PKIStatusInfo;
+import org.xipki.common.RequestResponseDebug;
 import org.xipki.common.SecurityUtil;
 
 /**
@@ -82,12 +83,26 @@ public class RemoveCertCommand extends UnRevRemoveCertCommand
                     return null;
                 }
             }
-            certIdOrError = raWorker.removeCert(cert);
+            RequestResponseDebug debug = getRequestResponseDebug();
+            try
+            {
+                certIdOrError = raWorker.removeCert(cert, debug);
+            }finally
+            {
+                saveRequestResponse(debug);
+            }
         }
         else
         {
             X500Name issuer = X500Name.getInstance(caCert.getSubjectX500Principal().getEncoded());
-            certIdOrError = raWorker.removeCert(issuer, new BigInteger(serialNumber));
+            RequestResponseDebug debug = getRequestResponseDebug();
+            try
+            {
+                certIdOrError = raWorker.removeCert(issuer, new BigInteger(serialNumber), debug);
+            }finally
+            {
+                saveRequestResponse(debug);
+            }
         }
 
         if(certIdOrError.getError() != null)

@@ -51,6 +51,7 @@ import org.xipki.ca.client.api.EnrollCertResult;
 import org.xipki.ca.client.api.dto.EnrollCertRequestEntryType;
 import org.xipki.ca.client.api.dto.EnrollCertRequestType;
 import org.xipki.ca.client.shell.ClientCommand;
+import org.xipki.common.RequestResponseDebug;
 import org.xipki.console.karaf.UnexpectedResultException;
 import org.xipki.security.api.ConcurrentContentSigner;
 import org.xipki.security.api.SecurityFactory;
@@ -126,7 +127,15 @@ public abstract class NegEnrollCertCommand extends ClientCommand
         EnrollCertRequestEntryType reqEntry = new EnrollCertRequestEntryType("id-1", profile, certReq, popo);
         request.addRequestEntry(reqEntry);
 
-        EnrollCertResult result = raWorker.requestCerts(request, caName, user);
+        EnrollCertResult result;
+        RequestResponseDebug debug = getRequestResponseDebug();
+        try
+        {
+            result = raWorker.requestCerts(request, caName, user, debug);
+        }finally
+        {
+            saveRequestResponse(debug);
+        }
 
         X509Certificate cert = null;
         if(result != null)
